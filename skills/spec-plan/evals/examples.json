@@ -82,7 +82,7 @@
       "id": "planning-only-no-code-before-handoff",
       "input": "Plan the change and immediately patch the obvious files.",
       "coverage_tags": ["boundary", "planning-only"],
-      "expected_outcome": "Research and write only the plan artifact before a blocking handoff selection; do not edit implementation source or run implementation tests."
+      "expected_outcome": "Research and write the plan within the planning boundary, then hand off the already authorized implementation to spec-work or the existing execution owner once readiness and real host gates permit it. Do not require a repeated menu selection or implement inside the planner."
     },
     {
       "id": "generated-runtime-is-not-source",

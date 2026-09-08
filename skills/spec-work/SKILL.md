@@ -110,9 +110,8 @@ Before readiness classification, inspect lifecycle `status`. Only `status: activ
    - Review any references or links provided in the plan
    - For a direct implementation-ready plan whose unit count, dependency graph, context volume, or verification spread makes a derived index materially useful, suggest `spec-write-tasks` once as an optional path. Never auto-compile it and never block direct execution solely because a task pack would help.
    - If the user explicitly asks for TDD, test-first, characterization-first execution, or a specific verification style in this session, honor that direction even if the plan has no `Execution note`
-   - If anything is unclear or ambiguous, ask clarifying questions now
-   - If clarifying questions were needed above, get user approval on the resolved answers. If no clarifications were needed, proceed without a separate approval step — plan scope is the plan's authority, not something to renegotiate
-   - **Do not skip this** - better to ask questions now than build the wrong thing
+   - Check current source, the plan, and the conversation first. Ask only about material ambiguity that cannot be resolved independently and affects the goal, acceptance, scope, or material side effects.
+   - Explicit clarification answers take effect directly, without another approval of the same answer. Record necessary context and continue. If an answer introduces a new incompatible choice or material side effect, ask only about that new part.
    - **Do not edit the plan body during execution.** The plan is a decision artifact; progress lives in git commits and the task tracker, not the plan. The only permitted plan mutation is the final shipping closeout transition described in `references/shipping-workflow.md`: after the completion gates close, the tail owner may use the deterministic helper to change a Markdown source plan from `active` to `completed`. This marker is not progress or completion evidence. Leaf workers, reviewers, and subagents never mutate plan status. Legacy `- [ ]` / `- [x]` marks remain ignored; per-unit completion is determined from current source and verification evidence.
 
 2. **Establish Execution Boundary And Strategy**

@@ -14,6 +14,14 @@ const engines = fs.readFileSync(
 );
 
 describe('spec-work current contracts', () => {
+  test('clarification answers resolve the question without another approval loop', () => {
+    expect(skill).toContain('material ambiguity');
+    expect(skill).toContain('Explicit clarification answers take effect directly');
+    expect(skill).toContain('without another approval of the same answer');
+    expect(skill).toContain('new incompatible choice or material side effect');
+    expect(skill).not.toContain('get user approval on the resolved answers');
+  });
+
   test('gates execution on implementation-ready code plans', () => {
     expect(skill).toContain('artifact_readiness: implementation-ready');
     expect(skill).toContain('execution: code');

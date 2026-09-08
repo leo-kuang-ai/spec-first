@@ -33,11 +33,49 @@ describe('spec-plan quality integration contracts', () => {
   const handoff = read('references/plan-handoff.md');
   const enrichmentJudge = read('evals/fixtures/scripts/check-enrichment.sh');
 
-  test('keeps planning-only and blocking handoff in the hot path', () => {
+  test('计划边界允许已授权交接，但不把计划产物当作实施授权', () => {
     expect(skill).toContain('## Planning-Only Safety Contract');
-    expect(skill).toContain('planning is the only authorized effect');
-    expect(skill).toContain('Handoff stays blocking');
+    expect(skill).toContain('plan-only request');
+    expect(skill).toContain('real Plan Mode');
+    expect(skill).toContain('explicitly requests planning followed by implementation');
+    expect(skill).not.toContain('Handoff stays blocking');
     expect(skill).toMatch(/do not claim a hard write guarantee from prose alone/i);
+  });
+
+  test('计划交接按请求范围完成，普通复审不继承写权限', () => {
+    for (const source of [skill, handoff]) {
+      expect(source).toContain('mutation:report-only');
+      expect(source).toContain('Ordinary review requests');
+      expect(source).toContain('the menu is not a completion requirement');
+      expect(source).toContain('top-level owner');
+      expect(source).toContain('update_goal');
+      expect(source).not.toMatch(/do \*\*not\*\* call `update_goal`|do not call `update_goal`/);
+      expect(source).not.toContain('Never silently skip the question');
+    }
+    expect(handoff).toContain('existing active goal');
+    expect(handoff).toContain('mutation:apply-fixes');
+    expect(handoff).toContain('byte-identical');
+    expect(handoff).toContain('return control to the caller');
+  });
+
+  test('goal 收尾仅作用于已存在且属于当前完整任务的目标', () => {
+    for (const source of [skill, handoff]) {
+      expect(source).toContain('belongs to the current full task');
+      expect(source).toContain('If no goal exists');
+      expect(source).toContain('do not update an unrelated goal');
+    }
+  });
+
+  test('多宿主 goal 按实际能力分支，创建不推导读取或完成能力', () => {
+    for (const source of [skill, handoff]) {
+      expect(source).not.toContain('available tool list (Codex)');
+      expect(source).not.toContain('`create_goal` on Codex');
+      expect(source).not.toContain('user-typed `/goal` exists (Claude Code)');
+      expect(source).toContain('creation, inspection, and completion');
+    }
+    expect(handoff).toContain('Creation capability does not prove inspection or completion capability');
+    expect(handoff).toContain('exact documented command');
+    expect(handoff).toContain('do not infer support from the host name');
   });
 
   test('新增 assurance 指令遵循项目中文治理且保留 contract literals', () => {

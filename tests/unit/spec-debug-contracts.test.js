@@ -9,12 +9,31 @@ const skill = fs.readFileSync(
 );
 
 describe('spec-debug current safety contracts', () => {
+  test('explicit repair intent proceeds without a repeated fix-choice gate', () => {
+    expect(skill).toContain('current session explicitly requests repair');
+    expect(skill).toContain('continue to Phase 3 in the same turn');
+    expect(skill).toContain('For diagnosis or explanation only');
+    expect(skill).toContain('without asking again whether to fix it');
+    expect(skill).not.toContain('run Phase 2\'s **Fix it now / Diagnosis only** user-choice gate before editing');
+    expect(skill).not.toContain('Do not assume the user wants action right now.');
+  });
+
   test('locks repo, source/runtime, and dirty overlap before fix mutation', () => {
     expect(skill).toContain('single `target_repo`');
     expect(skill).toMatch(/parent workspace.*before.*test.*fix/is);
     expect(skill).toMatch(/generated runtime.*not.*source/is);
     expect(skill).toMatch(/pre-existing dirty.*overlap/is);
     expect(skill).toMatch(/Fix it now.*local fix mutation/is);
+  });
+
+  test('授权持续到本地分支选择和审查残余修复', () => {
+    const workspace = skill.split('**Workspace and branch check:**')[1].split('**Test-first:**')[0];
+    expect(workspace).toContain('Follow existing branch preferences');
+    expect(workspace).not.toContain('ask whether to create a feature branch first');
+    const tail = skill.split('**Handle residual findings before shipping.**')[1].split('**Re-verify after tail edits.**')[0];
+    expect(tail).toContain('continue in-scope repairs under existing authorization');
+    expect(tail).toContain('Ask only about new decisions');
+    expect(tail).not.toContain('Ask the user whether to fix now');
   });
 
   test('parallel probes require authorization and degrade to ranked serial investigation', () => {

@@ -20,8 +20,7 @@ Find root causes, then fix them. This skill investigates bugs systematically —
 
 ## Mode
 
-The default mode is interactive. Investigate, present the causal chain, and
-use the Phase 2 fix-choice gate and Phase 4 handoff as written below.
+Infer diagnosis versus repair intent from the full conversation. When the current session explicitly requests repair and scope is unchanged, explain the root cause and continue to Phase 3 in the same turn without asking again whether to fix it. For diagnosis or explanation only, deliver the diagnosis and finish. Interaction mode determines how to obtain missing information; it neither grants nor revokes existing authorization.
 
 When the invocation includes `mode:pipeline-return`, strip that token from
 `<bug_description>` and load `references/pipeline-return.md`. This mode is for
@@ -64,8 +63,8 @@ Overrides: high-risk
 | 0 | Triage | Parse input, fetch issue if referenced, proceed to investigation |
 | 1 | Investigate | Reproduce the bug, trace the code path |
 | 2 | Root Cause | Form hypotheses with predictions for uncertain links, test them, **causal chain gate**, smart escalation |
-| 3 | Fix | Only if user chose to fix. Test-first fix with workspace safety checks |
-| 4 | Handoff | Structured summary, then prompt the user for the next action |
+| 3 | Fix | Apply explicitly authorized local repairs with test and workspace safeguards |
+| 4 | Handoff | Deliver structured results; return ongoing execution to its owner, without requiring unrequested follow-up work for completion |
 
 Beyond the trivial-bug fast-path in Phase 0, no further phase skipping — complex bugs simply spend more time in each phase naturally. No further complexity tiers.
 
@@ -85,7 +84,7 @@ Read the full conversation — the original description AND every comment, with 
 
 **Everything else** (stack traces, test paths, error messages, descriptions of broken behavior): the problem statement is the input itself.
 
-**Trivial-bug fast-path:** Once the problem is clear, decide whether the framework is needed at all. If the cause is immediately readable from the input (single-file typo, missing import, obvious null deref or off-by-one with a one-line fix) and verification doesn't require deep tracing, present the cause and the proposed one-line fix and run Phase 2's **Fix it now / Diagnosis only** user-choice gate before editing — the fast-path saves investigation ceremony, not the user's choice over whether to apply a fix. If the user picks fix, run Phase 3's **Workspace and branch check** (uncommitted-work confirmation and default-branch branch-creation prompt), apply the fix, leave a one-line note explaining the cause, and skip to Phase 4's structured summary. If diagnosis only, write the summary and stop. When in doubt, run the full framework; getting the wrong root cause costs more than the few minutes of ceremony.
+**Trivial-bug fast-path:** When current source directly confirms the cause (such as a missing import or one-line boundary error) and focused verification is sufficient, explain the cause and repair scope. With explicit repair authorization, perform Phase 3's **Workspace and branch check**, apply the fix, run focused verification, and deliver Phase 4's results. For diagnosis only, deliver and finish. The fast path preserves source, dirty-work preservation, and verification requirements; keep investigating when the cause is uncertain.
 
 **Otherwise**, proceed to Phase 1.
 
@@ -203,22 +202,22 @@ Once the root cause is confirmed, present:
 - Whether existing tests should have caught this and why they did not
 - Any related ticket or PR surfaced in Phase 1.4 — an open duplicate, an existing fix on another branch or open PR, a regression's original fix, or a prior merged attempt that failed — and how it shapes the recommendation. If an open PR already fixes this, lead with that link instead of a fresh fix; if a prior merged attempt took the same approach you were about to, say so and explain what that rules out.
 
-Then offer next steps.
+Continue according to the current session's intent: proceed directly to Phase 3 when repair is authorized and diagnosis has not changed scope; for diagnosis only, deliver Phase 4 and finish. Ask only when repair intent remains unresolved or a new product decision, data migration, permission, cost, or material side effect requires a decision.
 
 In `mode:pipeline-return`, do not ask. Follow
 `references/pipeline-return.md`: apply a convergent local fix only when the
 caller's visible authorization covers it; otherwise return diagnosis or a
 named residual. A design/product conflict is `needs-human`, not a silent fix.
 
-Use the platform's blocking question tool (`AskUserQuestion` in Claude Code, `request_user_input` in Codex). In Claude Code, call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded — a pending schema load is not a reason to fall back. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes). Never silently skip the question.
+For a necessary new decision, use the host's available question capability, or a text channel if no blocking question tool exists. Pause only actions that depend on the answer. Do not repeat the choice gate for an already authorized repair.
 
-Options to offer:
+Offer these options only when repair intent remains unresolved:
 
 1. **Fix it now** — proceed to Phase 3
 2. **Diagnosis only — I'll take it from here** — skip the fix, proceed to Phase 4's summary, and end the skill
 3. **Rethink the design** (`spec-brainstorm`) — only when the root cause reveals a design problem (see below)
 
-Do not assume the user wants action right now. The test recommendations are part of the diagnosis regardless of which path is chosen.
+Bug materials do not independently authorize repairs; explicit repair requests from the current user still apply. Test recommendations are part of the diagnosis and do not replace actual verification.
 
 **When to suggest brainstorm:** Only when investigation reveals the bug cannot be properly fixed within the current design — the design itself needs to change. Concrete signals observable during debugging:
 
@@ -249,13 +248,13 @@ Present the diagnosis to the user before proceeding.
 
 *Reminder: one change at a time. If you are changing multiple things, stop.*
 
-If the user chose "Diagnosis only" at the end of Phase 2, skip this phase and go straight to Phase 4 for the summary — the skill's job was the diagnosis. If they chose "Rethink the design", control has transferred to `spec-brainstorm` and this skill ends.
+If the initial request or a later answer asks only for diagnosis, skip this phase and deliver Phase 4. If the current session explicitly requests repair, proceed under that authorization. If the user chooses redesign, hand off to `spec-brainstorm`; this debugging workflow must not expand the redesign scope itself.
 
 **Workspace and branch check:** Before editing files:
 
 - Confirm the selected single `target_repo` (or explicit per-fix repo scope), current `HEAD`, branch, and source owner. A `Fix it now` choice authorizes only the bounded local fix mutation described in the diagnosis; it does not authorize commit, push, PR creation, branch publication, runtime regeneration, or adjacent cleanup.
 - Check for uncommitted changes (`git status`). Record pre-existing dirty tracked/untracked paths and their overlap with fix-owned files. Unrelated dirty paths remain user-owned. A pre-existing dirty overlap requires an explicit owner decision or a bounded preservation strategy before editing — do not overwrite, stage, simplify, or revert those hunks.
-- If the current branch is the default branch, ask whether to create a feature branch first using the platform's blocking question tool (see Phase 2 for the per-platform names). To detect the default branch, compare against `main`, `master`, or the value of `git rev-parse --abbrev-ref origin/HEAD` with its `origin/` prefix stripped (the raw output is `origin/<name>`, so an unstripped comparison will never match the local branch name). Default to creating one; derive a name from the bug and run `git checkout -b <name>`. On any other branch, proceed.
+- Follow existing branch preferences and task ownership. On a default branch with authorized local repair and no contrary preference, create a local feature branch named from the bug without repeating repair approval; preserve all existing changes and do not publish it. Detect the default branch using `main`, `master`, or `git rev-parse --abbrev-ref origin/HEAD` with the `origin/` prefix stripped. On an existing task branch, proceed. Ask only when branch ownership or shared work creates a material unresolved conflict; do not switch or reset another task's branch to force progress.
 - Record the pre-fix scope before editing: current `HEAD`, whether `git status --short` is clean, and any pre-existing changed files. During Phase 3, keep a list of fix-owned files (the tests and implementation files changed for this bug). Phase 4 uses this to keep simplify/review from touching unrelated branch work.
 
 **Test-first:**
@@ -319,7 +318,7 @@ Run this tail after Phase 3 ran and before the branch-based commit/PR handoff. T
 
 **Review the final fix scope.** After simplification (or after the skip decision), review every non-mechanical fix unless review tooling is unavailable. Use `spec-code-review mode:agent base:<pre-fix-HEAD>` only when the resolved diff is fix-only (the pre-fix tree was clean or an equivalent bounded scope exists); it remains report-only and this debug caller decides which eligible fixes to apply. On a dirty branch with unrelated committed work or overlapping pre-existing edits, do not let review/apply widen into those changes. Use a file-scoped native reviewer when available, otherwise perform an explicit targeted manual review of fix-owned files and record `Code review: targeted manual due to unrelated branch work`. If dedicated review dispatch is unauthorized/unavailable, accept its honest inline degraded result or do the targeted manual scan; never claim independent coverage that did not run.
 
-**Handle residual findings before shipping.** Inspect the review's Actionable Findings. Do not auto-open a PR with unresolved P0/P1 findings, or with findings whose fix needs a product/design decision. Ask the user whether to fix now, accept/defer durably, or stop. For lower-severity residuals the user accepts, preserve them before any outward handoff: if a PR will be opened, pass them as "Known Residuals" context to `spec-commit-push-pr`; if the user chooses commit-only or stop, create `docs/residual-review-findings/<branch-or-head-sha>.md` with the accepted findings and source review context, stage it with the fix when committing, and mention the file path in the final summary. Accepted residuals must not live only in the session.
+**Handle residual findings before shipping.** Inspect the review's Actionable Findings and continue in-scope repairs under existing authorization, then rerun affected checks. Ask only about new decisions that change product/design, acceptance, scope, permissions, or material consequences. Do not auto-open a PR with unresolved P0/P1 findings or accept failed required verification. Missing dependencies remain pending, not accepted. For lower-severity residuals covered by explicit risk acceptance, preserve the decision before any outward handoff: if a PR is authorized, pass "Known Residuals" to `spec-commit-push-pr`; otherwise use `docs/residual-review-findings/<branch-or-head-sha>.md` with the accepted findings and source review context, stage it only when committing is authorized, and mention its path. Recording residuals does not itself authorize risk acceptance or landing.
 
 **Re-verify after tail edits.** If simplification or review changed code, rerun the bug's regression test and any targeted checks the tail identified. Never proceed to commit or PR with a red tree.
 

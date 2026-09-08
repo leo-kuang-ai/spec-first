@@ -6,16 +6,19 @@ file (claude -> CLAUDE.md, codex -> AGENTS.md) — faithful to a real session.
 Ground truth derives from skills/using-spec-first/references/public-route-map.md
 and the using-spec-first Fast Paths (Direct Lane cases).
 """
+import argparse
 import concurrent.futures
 import json
+import math
 import os
 import re
 import subprocess
-import sys
+import tempfile
 import time
 
-REPO = "/Users/kuang/xiaobu/spec-first"
+REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../.."))
 OUT = os.path.join(REPO, "docs/validation/skill-evals/routing-audit-20260902")
+SCHEMA_VERSION = "spec-first-routing-eval/v2"
 
 CASES = [
     # --- P: direct-intent positives ---
@@ -79,10 +82,8 @@ USER_TMPL = """[路由决策任务] 只做入口选择判断,不要执行任何�
 ENTRY: <spec-<名称> 或 direct>
 REASON: <一句话理由>"""
 
-ENTRY_RE = re.compile(r"^ENTRY:\s*(.+)$", re.M)
+ANSWER_RE = re.compile(r"ENTRY:[ \t]*(spec-[a-z0-9-]+|direct)[ \t]*\r?\nREASON:[ \t]*([^\r\n]+)")
 
-# Engine-failure markers: output that only echoes the prompt plus gateway errors
-# (e.g. codex "exceeded retry limit ... 429") is an environment failure, not an answer.
 ENV_ERROR_MARKERS = ("429 too many requests", "exceeded retry limit")
 
 
@@ -91,112 +92,216 @@ def is_env_error_output(out):
     return any(marker in low for marker in ENV_ERROR_MARKERS)
 
 
-def norm_entry(s):
-    s = (s or "").strip().strip("`*\"'。.").lower()
-    # The instruction template's own placeholder line ("ENTRY: <spec-<名称> 或 direct>")
-    # gets echoed back verbatim in engine-failure output; a leading '<' marks that echo,
-    # never a real answer.
-    if s.startswith("<"):
-        return "[unparsed]"
-    s = re.sub(r"\s*\(.*?\)\s*$", "", s)
-    if s.startswith("spec-"):
-        return s.split()[0]
-    if "direct" in s or s in ("none", "无", "直接回答"):
-        return "direct"
-    return s
-
-
 def call_engine(engine, prompt, timeout=240, claude_model=None):
-    if engine == "claude":
-        cmd = ["claude", "-p", prompt, "--output-format", "text"]
-        if claude_model:
-            cmd += ["--model", claude_model]
-    else:
-        cmd = ["codex", "exec", "--sandbox", "read-only", "--skip-git-repo-check", prompt]
-    t0 = time.time()
-    try:
-        p = subprocess.run(cmd, cwd=REPO, capture_output=True, text=True, timeout=timeout)
-        out = (p.stdout or "") + ("\n[stderr]" + p.stderr[-400:] if p.returncode != 0 and p.stderr else "")
-        return out, time.time() - t0, p.returncode
-    except subprocess.TimeoutExpired:
-        return "[TIMEOUT]", time.time() - t0, -1
+    t0 = time.monotonic()
+    with tempfile.TemporaryDirectory(prefix="routing-final-") as scratch:
+        final_path = os.path.join(scratch, "final.txt")
+        if engine == "claude":
+            cmd = ["claude", "-p", prompt, "--output-format", "text"]
+            if claude_model:
+                cmd += ["--model", claude_model]
+        elif engine == "codex":
+            cmd = ["codex", "exec", "--sandbox", "read-only", "--skip-git-repo-check",
+                   "--output-last-message", final_path, prompt]
+        else:
+            raise ValueError("unsupported engine")
+        try:
+            p = subprocess.run(cmd, cwd=REPO, capture_output=True, text=True, timeout=timeout)
+            if engine == "codex" and p.returncode == 0:
+                # 最终消息缺失时不回退到可能包含提示回显的执行日志。
+                out = ""
+                if os.path.isfile(final_path):
+                    with open(final_path, encoding="utf-8") as source:
+                        out = source.read()
+            else:
+                out = (p.stdout or "") + ("\n[stderr]" + p.stderr if p.returncode != 0 and p.stderr else "")
+            return out, time.monotonic() - t0, p.returncode
+        except subprocess.TimeoutExpired as exc:
+            def text(value):
+                return value.decode("utf-8", errors="replace") if isinstance(value, bytes) else (value or "")
+            return "[TIMEOUT]\n" + text(exc.stdout) + "\n" + text(exc.stderr), time.monotonic() - t0, -1
+
+
+def classify_output(out, rc, expected):
+    if rc == -1 and out.startswith("[TIMEOUT]"):
+        return "timeout", "[unparsed]"
+    if rc != 0:
+        return ("api-error" if is_env_error_output(out) else "engine-error"), "[unparsed]"
+    match = ANSWER_RE.fullmatch(out.strip())
+    if match and match.group(2).strip():
+        got = match.group(1)
+        return ("correct" if got == expected else "wrong-answer"), got
+    if is_env_error_output(out):
+        return "api-error", "[unparsed]"
+    return ("parse-error" if out.strip() else "empty-output"), "[unparsed]"
 
 
 def run_one(engine, case, rep, claude_model=None, raw_dir="raw"):
     text = USER_TMPL.format(prompt=case["prompt"])
-    out, dur, rc = call_engine(engine, text, claude_model=claude_model)
-    m = ENTRY_RE.search(out)
-    got = norm_entry(m.group(1)) if m else "[unparsed]"
-    if got == "[unparsed]" and not is_env_error_output(out):  # one retry, env errors excluded
-        out2, dur2, rc2 = call_engine(engine, text, claude_model=claude_model)
-        m2 = ENTRY_RE.search(out2)
-        if m2:
-            out, dur, rc = out2, dur + dur2, rc2
-            got = norm_entry(m2.group(1))
-    raw_path = os.path.join(OUT, raw_dir, f"{engine}-{case['id']}-r{rep}.txt")
-    with open(raw_path, "w") as f:
-        f.write(out)
-    env_error = is_env_error_output(out)
-    return {"engine": engine + (f":{claude_model}" if engine == "claude" and claude_model else ""),
-            "case": case["id"], "group": case["group"],
-            "expected": case["expected"], "got": got,
-            "ok": got == case["expected"] and not env_error, "env_error": env_error,
-            "dur_s": round(dur, 1)}
+    attempts = []
+    evidence_errors = []
+
+    def write_raw(filename, output):
+        raw_path = os.path.join(OUT, raw_dir, filename)
+        relative_path = os.path.relpath(raw_path, OUT)
+        try:
+            with open(raw_path, "x", encoding="utf-8") as raw:
+                raw.write(output)
+            return relative_path
+        except OSError as exc:
+            evidence_errors.append({"path": relative_path, "error": type(exc).__name__})
+            return None
+
+    os.makedirs(os.path.join(OUT, raw_dir), exist_ok=True)
+    for number in (1, 2):
+        started = time.monotonic()
+        try:
+            out, dur, rc = call_engine(engine, text, claude_model=claude_model)
+            status, got = classify_output(out, rc, case["expected"])
+        except Exception as exc:
+            out = f"[{type(exc).__name__}] {exc}"
+            dur, rc = time.monotonic() - started, None
+            status, got = "engine-error", "[unparsed]"
+        raw_path = write_raw(f"{engine}-{case['id']}-r{rep}-a{number}.txt", out)
+        attempts.append({"attempt": number, "exit_code": rc, "status": status,
+                         "got": got, "dur_s": dur, "cost_usd": None,
+                         "raw_path": raw_path})
+        if raw_path is None:
+            # 独立 raw 无法持久化时，仍在结果中保留已发生的尝试与输出。
+            attempts[-1]["raw_output"] = out
+        if evidence_errors or status not in ("parse-error", "empty-output"):
+            break
+    raw_path = write_raw(f"{engine}-{case['id']}-r{rep}.txt", out)
+    if evidence_errors:
+        status, got = "harness-error", "[unparsed]"
+    return {"schema_version": SCHEMA_VERSION,
+            "engine": engine + (f":{claude_model}" if engine == "claude" and claude_model else ""),
+            "case": case["id"], "group": case["group"], "rep": rep,
+            "expected": case["expected"], "got": got, "status": status,
+            "ok": status == "correct", "env_error": status in ("engine-error", "api-error", "timeout", "harness-error"),
+            "dur_s": round(sum(a["dur_s"] for a in attempts), 3), "cost_usd": None,
+            "attempts": attempts, "raw_path": raw_path, "evidence_errors": evidence_errors}
+
+
+def summarize_records(records, cases, reps):
+    if any(r.get("schema_version") not in (None, SCHEMA_VERSION) for r in records):
+        raise ValueError("unsupported-result-schema")
+    case_index = {case["id"]: case for case in cases}
+    planned = len(cases) * reps
+    modern = [r for r in records if r.get("schema_version") == SCHEMA_VERSION]
+    identities = set()
+    engines = set()
+    for record in modern:
+        case_id, rep, engine = record.get("case"), record.get("rep"), record.get("engine")
+        if (not isinstance(case_id, str) or case_id not in case_index
+                or type(rep) is not int or not 1 <= rep <= reps
+                or not isinstance(engine, str) or not engine):
+            raise ValueError("invalid-result-identity: unplanned task")
+        identity = (case_id, rep)
+        engines.add(engine)
+        if identity in identities or len(engines) != 1:
+            raise ValueError("invalid-result-identity: duplicate task or mixed engines")
+        identities.add(identity)
+    legacy_n = len(records) - len(modern)
+    attempts_known = not legacy_n and all(isinstance(r.get("attempts"), list) for r in modern)
+    valid = [r for r in records if not r.get("env_error") and r.get("status") != "not-run"]
+    answers = [r for r in modern if r.get("status") in ("correct", "wrong-answer")]
+    correct = sum(r.get("ok") is True for r in answers)
+    durations = [r["dur_s"] for r in records if isinstance(r.get("dur_s"), (int, float))
+                 and not isinstance(r["dur_s"], bool) and math.isfinite(r["dur_s"]) and r["dur_s"] >= 0]
+
+    def ratio(numerator, denominator):
+        return round(numerator / denominator, 3) if denominator else None
+
+    by_group = {}
+    for group in ("P", "N", "D"):
+        sub = [r for r in valid if case_index.get(r.get("case"), {}).get("group", r.get("group")) == group]
+        group_planned = sum(c["group"] == group for c in cases) * reps
+        by_group[group] = {"n": len(sub), "correct": sum(r.get("ok") is True for r in sub),
+                           "acc": ratio(sum(r.get("ok") is True for r in sub), len(sub)),
+                           "planned_n": group_planned}
+    confusions = {}
+    for record in valid:
+        if record.get("ok") is not True:
+            expected = case_index.get(record.get("case"), {}).get("expected", record.get("expected", "[unknown]"))
+            key = f"{record.get('case', '[unknown]')}: {expected} -> {record.get('got', '[unparsed]')}"
+            confusions[key] = confusions.get(key, 0) + 1
+    statuses = {}
+    for record in records:
+        status = record.get("status", "legacy-unverified")
+        statuses[status] = statuses.get(status, 0) + 1
+    return {"overall_acc": ratio(sum(r.get("ok") is True for r in valid), len(valid)),
+            "valid_n": len(valid), "env_errors": sum(bool(r.get("env_error")) for r in records),
+            "by_group": by_group, "confusions": confusions,
+            "unparsed": sum(r.get("got", "[unparsed]") == "[unparsed]" for r in valid),
+            "avg_dur_s": ratio(sum(durations), len(records)) if len(durations) == len(records) else None,
+            "planned_n": planned, "recorded_n": len(records),
+            "attempted_n": sum(bool(r["attempts"]) for r in modern) if attempts_known else None,
+            "attempt_n": sum(len(r["attempts"]) for r in modern) if attempts_known else None,
+            "correct_n": correct if not legacy_n else None, "answer_n": len(answers) if not legacy_n else None,
+            "task_success_rate": ratio(correct, planned) if not legacy_n else None,
+            "answer_accuracy": ratio(correct, len(answers)) if not legacy_n else None,
+            "missing_n": max(0, planned - len(records)), "status_counts": statuses,
+            "not_run_n": statuses.get("not-run", 0) + max(0, planned - len(records)),
+            "legacy_n": legacy_n, "compatibility_status": "legacy-unverified" if legacy_n else "current",
+            "total_cost_usd": None}
 
 
 def main():
-    args = sys.argv[1:]
-    engines = args[0].split(",") if args else ["claude", "codex"]
-    reps = int(args[1]) if len(args) > 1 and args[1].isdigit() else 3
-    rest = args[2:] if len(args) > 1 else args[1:]
-    only_pilot = "pilot" in rest
-    claude_model = None
-    tag = ""
-    if "--claude-model" in rest:
-        claude_model = rest[rest.index("--claude-model") + 1]
-    if "--tag" in rest:
-        tag = rest[rest.index("--tag") + 1]
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("engines", nargs="?", default="claude,codex")
+    parser.add_argument("reps", nargs="?", default="3")
+    parser.add_argument("mode", nargs="?", choices=["pilot"])
+    parser.add_argument("--claude-model")
+    parser.add_argument("--tag", default="")
+    args = parser.parse_args()
+    if args.reps == "pilot" and args.mode is None:
+        args.reps, args.mode = "3", "pilot"
+    try:
+        reps = int(args.reps)
+    except ValueError:
+        parser.error("reps must be a positive integer")
+    engines, claude_model, tag = args.engines.split(","), args.claude_model, args.tag
+    if reps < 1 or len(set(engines)) != len(engines) or any(e not in ("claude", "codex") for e in engines):
+        parser.error("engines must be distinct claude/codex values and reps must be positive")
+    if tag and not re.fullmatch(r"[a-zA-Z0-9_-]+", tag):
+        parser.error("tag must contain only letters, digits, underscores or hyphens")
+    runs_dir = os.path.join(OUT, "runs")
+    os.makedirs(runs_dir, exist_ok=True)
+    run_dir = tempfile.mkdtemp(prefix=time.strftime("%Y%m%dT%H%M%SZ-", time.gmtime()), dir=runs_dir)
     raw_dir = "raw" if not tag else f"raw-{tag.lstrip('-')}"
-    os.makedirs(os.path.join(OUT, raw_dir), exist_ok=True)
-    cases = CASES[:2] if only_pilot else CASES
+    raw_dir = os.path.relpath(os.path.join(run_dir, raw_dir), OUT)
+    cases = CASES[:2] if args.mode == "pilot" else CASES
     jobs = [(e, c, r) for e in engines for c in cases for r in range(1, reps + 1)]
     records = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=3) as ex:
-        futs = {ex.submit(run_one, e, c, r, claude_model, raw_dir): (e, c["id"], r) for e, c, r in jobs}
+        futs = {ex.submit(run_one, e, c, r, claude_model, raw_dir): (e, c, r) for e, c, r in jobs}
         done = 0
         for fut in concurrent.futures.as_completed(futs):
             try:
                 records.append(fut.result())
             except Exception as exc:
-                e, cid, r = futs[fut]
-                records.append({"engine": e, "case": cid, "rep": r, "got": "[error]",
-                                "ok": False, "err": str(exc)[:200]})
+                e, case, r = futs[fut]
+                records.append({"schema_version": SCHEMA_VERSION,
+                                "engine": e + (f":{claude_model}" if e == "claude" and claude_model else ""),
+                                "case": case["id"], "group": case["group"], "expected": case["expected"],
+                                "rep": r, "got": "[unparsed]", "status": "harness-error", "attempts": None,
+                                "ok": False, "env_error": True, "dur_s": None, "err": type(exc).__name__})
             done += 1
             print(f"[{done}/{len(jobs)}] {records[-1].get('engine')} {records[-1]['case']} -> {records[-1]['got']}", flush=True)
 
+    records.sort(key=lambda r: (r["engine"], r["case"], r["rep"]))
     summary = {}
     for e in engines:
         ename = e + (f":{claude_model}" if e == "claude" and claude_model else "")
         recs = [r for r in records if r["engine"] == ename]
-        env_errors = [r for r in recs if r.get("env_error")]
-        valid = [r for r in recs if not r.get("env_error")]
-        by_group = {}
-        for g in ("P", "N", "D"):
-            sub = [r for r in valid if r["group"] == g]
-            by_group[g] = {"n": len(sub), "correct": sum(r["ok"] for r in sub),
-                           "acc": round(sum(r["ok"] for r in sub) / len(sub), 3) if sub else None}
-        confusions = {}
-        for r in valid:
-            if not r["ok"]:
-                key = f"{r['case']}: {r['expected']} -> {r['got']}"
-                confusions[key] = confusions.get(key, 0) + 1
-        summary[e] = {"overall_acc": round(sum(r["ok"] for r in valid) / len(valid), 3) if valid else None,
-                      "valid_n": len(valid), "env_errors": len(env_errors),
-                      "by_group": by_group, "confusions": confusions,
-                      "unparsed": sum(1 for r in valid if r["got"] == "[unparsed]"),
-                      "avg_dur_s": round(sum(r["dur_s"] for r in recs) / len(recs), 1)}
-    with open(os.path.join(OUT, f"results{tag}.json"), "w") as f:
-        json.dump({"records": records, "summary": summary}, f, ensure_ascii=False, indent=1)
+        summary[e] = summarize_records(recs, cases, reps)
+    result_path = os.path.join(run_dir, f"results{tag}.json")
+    with open(result_path, "x", encoding="utf-8") as f:
+        json.dump({"schema_version": SCHEMA_VERSION, "records": records, "summary": summary,
+                   "raw_path_base": OUT, "run_status": "degraded" if any(r["env_error"] for r in records) else "completed"},
+                  f, ensure_ascii=False, indent=1)
+    print(f"Results: {result_path}")
     print(json.dumps(summary, ensure_ascii=False, indent=1))
 
 
