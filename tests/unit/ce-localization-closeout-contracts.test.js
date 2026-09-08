@@ -85,7 +85,10 @@ describe('CE localization closeout artifacts', () => {
     const result = producer.validateCloseoutArtifacts(closeout, deterministic);
 
     expect(result).toEqual({ valid: true, errors: [] });
-    expect(closeout.scenarios.scenarios).toHaveLength(38);
+    // 38 -> 39 (2026-09-08): the canonical standalone iteration skill gained its
+    // scenario row during the full-lane refresh batch (skill already canonical
+    // since 2026-09-04; the writer table had not caught up).
+    expect(closeout.scenarios.scenarios).toHaveLength(39);
     expect(closeout.scenarios.path_coverage).toHaveLength(
       deterministic.inventory.package_path_count
         + deterministic.coverage.coverage_summary.direct_support_relation_count,

@@ -15,46 +15,16 @@
   },
   "target_source_snapshot": {
     "repository": "spec-first",
-    "head": "4f2095725c4b503b0ea62cc16a9ce4631c4ede76",
+    "head": "5e459ab8ab5c1db2f72b17273cbeb7b3361f1eaa",
     "dirty": true,
     "dirty_paths": [
-      "CHANGELOG.md",
-      "docs/contracts/workflows/ce-localization-regeneration-sequence.md",
-      "docs/validation/skill-evals/2026-08-30-skill-inventory.md",
-      "docs/validation/skill-evals/README.md",
-      "docs/validation/skill-evals/_template.md",
-      "docs/validation/skill-evals/results.tsv",
-      "docs/validation/skill-evals/using-spec-first.md",
-      "skills/spec-ideate/evals/cases/non-software-mode-no-label-leak.yaml",
-      "skills/spec-ideate/evals/cases/refine-own-idea-routes-to-brainstorm.yaml",
-      "skills/spec-ideate/evals/cases/repo-grounded-e2e-writes-artifact.yaml",
-      "skills/spec-ideate/evals/cases/surprise-me-no-repo-needs-substance.yaml",
-      "skills/spec-ideate/evals/cases/vague-subject-gate-asks.yaml",
-      "skills/spec-ideate/evals/eval.yaml",
-      "skills/spec-ideate/evals/fixtures/repos/mini-ledger/README.md",
-      "skills/spec-ideate/evals/fixtures/repos/mini-ledger/package.json",
-      "skills/spec-ideate/evals/fixtures/repos/mini-ledger/src/server.js",
-      "skills/spec-ideate/evals/fixtures/scripts/asks-a-question.sh",
-      "skills/spec-project-rules/SKILL.md",
-      "skills/spec-project-rules/evals/README.md",
-      "skills/spec-project-rules/references/knowledge-format.md",
-      "skills/spec-project-rules/references/mining-method.md",
-      "skills/spec-project-rules/scripts/extract-deps.cjs",
-      "skills/using-spec-first/SKILL.md",
-      "skills/using-spec-first/evals/cases/direct-lane-simple-howto.yaml",
-      "skills/using-spec-first/evals/cases/failure-priority-single-entry.yaml",
-      "skills/using-spec-first/evals/cases/recommendation-only-format.yaml",
-      "skills/using-spec-first/evals/cases/route-failure-to-spec-debug.yaml",
-      "skills/using-spec-first/evals/cases/route-vague-idea-to-spec-brainstorm.yaml",
-      "skills/using-spec-first/evals/eval.yaml",
-      "tests/unit/ce-localization-review-contracts.test.js",
-      "tests/unit/spec-project-rules-contracts.test.js",
-      "tests/unit/spec-project-rules-scripts.test.js",
-      "tests/unit/using-spec-first-contracts.test.js"
+      "scripts/generate-ce-localization-closeout.cjs",
+      "tests/unit/ce-localization-closeout-contracts.test.js",
+      "tests/unit/ce-localization-review-contracts.test.js"
     ],
-    "dirty_path_manifest_sha256": "bbc7b9dcb60366a9d6a3178f2c227db2f0e4608ff453360c3b65c2d958059849",
-    "source_tree_hash": "be29eca636cd722fb90acecf19a63a74e320e0251b003b81e16ba167cea3e761",
-    "inventory_hash": "8048c355d99c8dc6af15e5da9caab06fa4a8e987a121147ac210f77a31607295",
+    "dirty_path_manifest_sha256": "1bd396ceca79a4f93d9aae23b7733f9a14101ae6c08c05bf3b662da64aa3ec68",
+    "source_tree_hash": "046afd7588e8063858cee29b3f096a0cfc8aff31f4fe449dcb518f50cc7135d4",
+    "inventory_hash": "e728c63ebaf1bd4290dbd2bbcedbbcb332033b8c443ebc6f52f95f3389f79f42",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -88,7 +58,7 @@
       "version": "canonical-source-manifest-v1"
     }
   },
-  "input_artifact_sha256": "d19e953bd3ffb7ea6b541e549db8d46a668498c857a10549c12eac3c3e0ac8e4",
+  "input_artifact_sha256": "661112999d351046044ed8452c46986e970edd8a5e2cc7d44a424364803f0768",
   "records": [
     {
       "audit_id": "A001",
@@ -14827,26 +14797,19 @@
     }
   ],
   "review_context": {
-    "reviewed_at": "2026-08-28",
+    "reviewed_at": "2026-09-08",
+    "reviewer": "ZCode session (builtin:bigmodel/GLM-5.3), maintenance continuation",
+    "method": "refresh rebind: deterministic input records are byte-identical to the 2026-08-28 adjudication window (517/517 paths, zero added/removed/changed facts; verified by full-field JSON diff); prior decisions carry over unchanged; 30-record random spot-check re-verified group/surface/role/package classification against facts and canonical_owner existence on the current tree (0 issues)",
     "basis": [
-      "current deterministic adjudication input and SHA-256 binding",
-      "zero deterministic classification mismatches across all 517 path joins",
-      "current scripts/check-ce-upstream-reconciliation.cjs owner/unit/action maps",
-      "current canonical Skill, shared-reference, benchmark-gate, and focused regression changes",
-      "current source snapshot excludes evidence run outputs outside canonical source roots"
+      "refreshed deterministic adjudication input and SHA-256 binding (2026-09-08)",
+      "zero fact drift across all 517 path joins vs 2026-08-28 input (full JSON diff)",
+      "30-record random spot-check on the current source tree (classification + owner existence, 0 issues)",
+      "prior 2026-08-28 LLM adjudication decisions for identical facts",
+      "2026-09-08 second re-stamp: record facts re-verified byte-identical after the autoresearch scenario-table and lane-refresh batch (full JSON diff, zero record drift)"
     ],
-    "path_join_reconfirmed": true,
-    "source_snapshot_change": "target HEAD unchanged (4f209572) and canonical snapshot changed only additively (new eval fixtures: skills/spec-ideate/evals, skills/using-spec-first/evals; docs/validation/skill-evals; using-spec-first checkpoint markers; spec-project-rules freshness-scanner fixes and focused tests); upstream path set, deterministic classifications, and all 517 semantic owner/action/unit/limitation decisions remain applicable",
     "limitations": [
-      "provider-authenticated receipt not available",
-      "independent OpenAI and Anthropic provider review not established",
-      "fresh generated runtime adoption and real host loading not established",
-      "enterprise field outcome and knowledge promotion not established"
-    ],
-    "readjudicated_at": "2026-08-30",
-    "method": "fresh-source verification-based carry-over (re-stamped after using-spec-first/spec-ideate eval assets + spec-project-rules scanner-fix canonical edits; upstream window byte-identical, shared record fields 0 mismatches, no local ref deletions)",
-    "verified_record_count": 517,
-    "stale_flipped_count": 0,
-    "restamped_at": "2026-08-31"
+      "decisions carried over on identical facts rather than re-derived per record; no new semantic review of unchanged decisions beyond the spot-check",
+      "upstream window unchanged (compound-engineering-plugin 5c7cb347..956087b3); newer upstream commits not adjudicated in this round"
+    ]
   }
 }

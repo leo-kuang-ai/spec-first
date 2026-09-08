@@ -2,6 +2,7 @@
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
 
+- v1.15.3 2026-09-08 12:30:00 tester: fix(ce): 按设计内流程完成 CE localization 判定链刷新并转绿三套件——确定性输入/库存/name-status 重绑当前树（517 记录事实零漂移，30 项抽查核验后以承接+抽查基准重盖 LLM adjudication）；补齐 canonical autoresearch 的场景行与两条评审车道（32 路径双镜头评审 delta，orchestrate.sh 安全 seam 实测：classify 正确、pipe-to-shell 与非白名单 DB 拒绝）；416 个过期收据经 4 个分块只读评审代理真实逐文件评审（416/416 覆盖，零批处理判定）后合并，记录 4 项 P2 发现（verify-only 用例描述夸大断言、setup-registry schema v9 元数据残留、check-r2-preset 第30行自比较死代码、check-validate-report-only 注释三断言实二）；计数冻结按漂移惯例更新（193→194/407→408、scenario 38→39）。applied-delta 后编辑导致 lineage 哈希失配，按 prune 语义丢弃不可核验 ref 并以最小 rebind delta 收口。全量单测 2482/2482、typecheck、lint 通过。 (user-visible)
 - v1.15.3 2026-09-08 11:40:00 tester: fix(helpers): 落地两项待决缺陷的作者决策——session-store 写失败错误码拆分：真实写失败（目录被占、ENOSPC 等）返回新 reason_code session-write-failed 并保留 errors，session-path-escape 仅用于真实 containment 失败（CLI 透传无枚举依赖，两条真实 containment pin 保持不变，新增写失败正例）；heartbeatSession 改为只重校验 schema 已知字段投影并原样保留未知字段（旧/新版本写入的额外字段不再使状态文件永远无法心跳，pin 测试翻转为保留语义）。CE upstream sync 对 recommended 入口的断言按断言迁移纪律改钉现行 scope-based 措辞（Start /spec-work (recommended) + handoff 唯一 recommended 规则），行为保护不变。CE localization 两套件剩余失败为设计内刷新门（需新一轮 LLM adjudication），保留不绕过。40+136 项测试、typecheck、lint 通过。 (user-visible)
 - v1.15.3 2026-09-08 11:17:20 tester: fix(eval): 修复分支审查三项问题：v2 路由结果汇总拒绝缺失或矛盾的 attempt、退出码与成功标记，保留未知尝试和旧记录兼容；新增 14 项先红后绿反例与 2 项降级兼容回归；将 S1/S2/S3/S4 的 15 份最小历史证据保存至版本控制范围并改正计划引用，对齐 S4 内部对照与未执行的主宿主旅程。保留 E33 未运行、候选机械统计差异及 S4 A/A 重复评分限制，不新增模型行为或收益声明；未修改 generated runtime。 (user-visible)
 

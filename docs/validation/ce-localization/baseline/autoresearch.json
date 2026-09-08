@@ -1,7 +1,7 @@
 {
   "schema_version": "ce-localization-skill-baseline/v1",
   "artifact_kind": "source-bound-skill-baseline",
-  "producer": "skill-owner:spec-commit-push-pr",
+  "producer": "skill-owner:autoresearch",
   "single_writer": "ce-localization-baseline-writer",
   "source_snapshot": {
     "repository": "spec-first",
@@ -50,21 +50,40 @@
   },
   "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
   "inventory_sha256": "c6bbdf598030a3227c1d3e041ad01677e95761a0a92029d3836e6a7fd6773c28",
-  "skill_id": "spec-commit-push-pr",
+  "skill_id": "autoresearch",
   "source_refs": [
-    "skills/spec-commit-push-pr/evals/cases/description-only-non-mutating.yaml",
-    "skills/spec-commit-push-pr/evals/cases/no-landing-auth-stops-before-push.yaml",
-    "skills/spec-commit-push-pr/evals/eval.yaml",
-    "skills/spec-commit-push-pr/evals/fixtures/repos/mini-ledger/package.json",
-    "skills/spec-commit-push-pr/evals/fixtures/repos/mini-ledger/README.md",
-    "skills/spec-commit-push-pr/evals/fixtures/repos/mini-ledger/src/server.js",
-    "skills/spec-commit-push-pr/evals/fixtures/scripts/check-desc-only.sh",
-    "skills/spec-commit-push-pr/evals/fixtures/scripts/check-landing-gate.sh",
-    "skills/spec-commit-push-pr/references/branch-creation.md",
-    "skills/spec-commit-push-pr/references/pr-description-writing.md",
-    "skills/spec-commit-push-pr/SKILL.md"
+    "skills/autoresearch/agents/openai.yaml",
+    "skills/autoresearch/autoresearch.md",
+    "skills/autoresearch/debug.md",
+    "skills/autoresearch/evals.md",
+    "skills/autoresearch/evals/cases/dispatch-classic-mode.yaml",
+    "skills/autoresearch/evals/cases/screen-cmd-refuses-unsafe-predicate.yaml",
+    "skills/autoresearch/evals/cases/ship-never-auto-approves.yaml",
+    "skills/autoresearch/evals/eval.yaml",
+    "skills/autoresearch/evals/fixtures/repos/empty-repo/README.md",
+    "skills/autoresearch/evals/fixtures/scripts/check-classic-banner.sh",
+    "skills/autoresearch/evals/fixtures/scripts/check-screen-refusal.sh",
+    "skills/autoresearch/evals/fixtures/scripts/check-ship-gate.sh",
+    "skills/autoresearch/fix.md",
+    "skills/autoresearch/improve.md",
+    "skills/autoresearch/learn.md",
+    "skills/autoresearch/plan.md",
+    "skills/autoresearch/predict.md",
+    "skills/autoresearch/probe.md",
+    "skills/autoresearch/reason.md",
+    "skills/autoresearch/references/orchestrator-routing.md",
+    "skills/autoresearch/references/predict-personas.md",
+    "skills/autoresearch/references/reason-judge-protocol.md",
+    "skills/autoresearch/references/security-checklist.md",
+    "skills/autoresearch/regression.md",
+    "skills/autoresearch/scenario.md",
+    "skills/autoresearch/scripts/orchestrate.sh",
+    "skills/autoresearch/scripts/score-regression.sh",
+    "skills/autoresearch/security.md",
+    "skills/autoresearch/ship.md",
+    "skills/autoresearch/SKILL.md"
   ],
-  "before_state": "Current canonical spec-commit-push-pr source is the baseline; semantic improvement is not assumed from CE coverage.",
+  "before_state": "Current canonical autoresearch source is the baseline; semantic improvement is not assumed from CE coverage.",
   "target_state": "A source-bound Skill contract that preserves authorization, evidence and owner boundaries while improving the declared user task.",
   "known_limitations": [
     "No field task or provider outcome has been executed in this closeout."
@@ -124,14 +143,14 @@
     "frozen_at": "2026-08-20T00:00:00.000Z",
     "metric_owner": "skills/spec-optimize",
     "metric_contract_ref": "skills/spec-optimize/references/experiment-log-schema.yaml",
-    "metric_contract_sha256": "bf52b4225c15b6fd7c78606f0f54ee92a86a276172e82a2f323708e4cffb2eef",
+    "metric_contract_sha256": "cd117ea87e6b8588896b5823369e0dba4532bb060d85253fd9fdd9d1934d0116",
     "noise_floor": "not observed; field protocol must establish before comparison",
     "budget": "one bounded validation cohort before any promotion decision",
     "measurement_artifact_refs": [
       "docs/validation/ce-localization/field-validation/protocol.json"
     ],
     "primary_metric": {
-      "metric_id": "spec-commit-push-pr.trusted-change-gate",
+      "metric_id": "autoresearch.trusted-change-gate",
       "metric_type": "binary-gate",
       "direction": "pass",
       "instrumentation_ref": "docs/contracts/ai-coding-harness.md#quality-adjusted-throughput",
@@ -146,14 +165,14 @@
     "sample_requirement": "at least three paired tasks for exploratory evidence; independent replication for confirmed improvement",
     "decision_rule": "not-run or degraded remains incomplete; only predeclared thresholds can support confirmed claims"
   },
-  "improvement_contract_sha256": "ef52ad34eb1a9ddcabf2e24f9dcaa8cb6e5a3c4f3393446d3222ea64efbc9faf",
+  "improvement_contract_sha256": "3d320a2069930fdb7d6c0a0dc98fdf8346be22ed65f88c6edc24155906a1182c",
   "evidence_axes": {
     "structure_contract": {
       "state": "confirmed",
       "evidence_refs": [
-        "skills/spec-commit-push-pr/evals/cases/description-only-non-mutating.yaml",
-        "skills/spec-commit-push-pr/evals/cases/no-landing-auth-stops-before-push.yaml",
-        "skills/spec-commit-push-pr/evals/eval.yaml"
+        "skills/autoresearch/agents/openai.yaml",
+        "skills/autoresearch/autoresearch.md",
+        "skills/autoresearch/debug.md"
       ],
       "limitations": []
     },

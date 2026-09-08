@@ -62,8 +62,11 @@ describe('CE localization deterministic review producer', () => {
     // is the pi adapter test file itself (its runtime-setup transform fixture's
     // frontmatter names that skill, incidentally matching the focused-test
     // relation); the adapter source file carries no relation of its own.
-    expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(193);
-    expect(coverage.coverage_summary.direct_support_relation_count).toBe(407);
+    // 2026-09-08: 193 -> 194 / 407 -> 408 — the deterministic governance JSON
+    // test fixture in this file grew an explicit dual-host relation row for the
+    // canonical standalone iteration skill during its lane-refresh batch.
+    expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(194);
+    expect(coverage.coverage_summary.direct_support_relation_count).toBe(408);
     expect(coverage.direct_support).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',
