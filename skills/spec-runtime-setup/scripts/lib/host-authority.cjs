@@ -129,9 +129,9 @@ function resolveLoadedHostSurface(skillRoot) {
   if (typeof skillRoot !== 'string' || !skillRoot) return null;
   let canonicalRoot;
   try {
-    canonicalRoot = fs.realpathSync.native
-      ? fs.realpathSync.native(path.resolve(skillRoot))
-      : fs.realpathSync(path.resolve(skillRoot));
+    // Use Node's platform-compatible spelling so Windows 8.3 aliases remain
+    // consistent with paths returned by the host runtime and tests.
+    canonicalRoot = fs.realpathSync(path.resolve(skillRoot));
   } catch (_error) {
     return null;
   }

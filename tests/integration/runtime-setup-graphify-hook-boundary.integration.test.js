@@ -63,6 +63,9 @@ function realToolEnvironment(home) {
     HOME: home,
     USERPROFILE: home,
     MCP_SETUP_HOST: 'qoder',
+    // 初始化、版本预检与场景指纹必须消费同一 checkout，不能混入 PATH 上的旧安装。
+    SPEC_FIRST_BUNDLED_VERSION: JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8')).version,
+    SPEC_FIRST_CLI: cliPath,
     UV_TOOL_BIN_DIR: uvBin.stdout.trim(),
     UV_TOOL_DIR: uvTools.stdout.trim(),
     npm_config_cache: path.join(home, '.npm-cache'),

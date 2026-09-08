@@ -1,0 +1,51 @@
+{
+  "artifact_kind": "confirmed",
+  "claim_ceiling": "确定性修复及 source review，不证明宿主收益",
+  "verified_at": "2026-09-08T07:45:47.648Z",
+  "source_head": "b557f8bc6f884f0fef460108e6279b31227c50fb",
+  "checks": [
+    {
+      "command": "npx jest tests/unit/verification-run-summary.test.js tests/unit/honest-closeout.test.js --runInBand",
+      "phase": "before",
+      "exit_code": 1,
+      "failed_tests": 5,
+      "passed_tests": 26
+    },
+    {
+      "command": "npx jest tests/unit/verification-run-summary.test.js tests/unit/honest-closeout.test.js tests/unit/spec-work-run-artifact-contract.test.js tests/unit/spec-work-run-artifact-producer.test.js tests/unit/spec-debug-contracts.test.js tests/unit/active-docs-links.test.js tests/unit/changelog-format.test.js --runInBand",
+      "phase": "final",
+      "exit_code": 0,
+      "suites_passed": 7,
+      "tests_passed": 83
+    },
+    {
+      "command": "npm run typecheck",
+      "exit_code": 0,
+      "files_checked": 257
+    }
+  ],
+  "source_snapshots": [
+    {
+      "path": "src/cli/helpers/verification-run-summary.js",
+      "sha256": "25a16b0f265641ebd2d1c1dc7872bf6fc25208c9b492fa31ffbda99ebb2199e1"
+    },
+    {
+      "path": "src/cli/helpers/honest-closeout.js",
+      "sha256": "f876c18d5c925d52b228b9c8820756f7f3c7737533008f14a334ccbd16d823b7"
+    },
+    {
+      "path": "tests/unit/verification-run-summary.test.js",
+      "sha256": "d24bd03959e4473f2012bffbd306b8d1705430eba3c7265bce585274a67ac89a"
+    },
+    {
+      "path": "tests/unit/honest-closeout.test.js",
+      "sha256": "fe1026e9f99c5275fa45375067cf06667fa6e09e8e4f38732a549df3439e91d2"
+    }
+  ],
+  "review": {
+    "status": "passed",
+    "reviewer": "fresh_f13_review 的独立只读差量审查",
+    "coverage": "四文件全文与 diff；engineering/safety 两个维度",
+    "limitations": "未执行修复后的真实宿主旅程；双 lens 不等于双 provider"
+  }
+}

@@ -145,6 +145,12 @@
       "forbidden": ["code task loop", "shipping workflow", "implementation-quality matrix"]
     },
     {
+      "id": "mechanical-result-keeps-evidence-closeout",
+      "input": "补完历史计划时复用有效 active 后继，只改一行数据，真实检查通过；独立审查按机械改动例外跳过。",
+      "expected": "保留旧计划，记录实际 verification-run-summary 并执行 honest-closeout，必要验证与收尾满足后才完成后继生命周期；跳过审查不豁免证据收尾。",
+      "forbidden": ["先 plan-status complete 再补证据", "以机械修改为由省略 summary", "只读检查强制创建后继"]
+    },
+    {
       "id": "shipping-not-triggered-mid-execution",
       "input": "One implementation unit is complete but dependent units remain.",
       "expected": "Continue the execution loop and focused verification; do not load shipping or claim lifecycle completion yet.",

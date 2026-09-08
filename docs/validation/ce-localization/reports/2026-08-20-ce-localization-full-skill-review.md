@@ -1,10 +1,10 @@
 # CE 本地化与全量 Skill 第三轮审查报告
 
-> 本报告绑定当前 target source snapshot：`source_tree_hash=046afd7588e8063858cee29b3f096a0cfc8aff31f4fe449dcb518f50cc7135d4`、`dirty_path_manifest_sha256=1bd396ceca79a4f93d9aae23b7733f9a14101ae6c08c05bf3b662da64aa3ec68`。当前 closeout 以 deterministic validator 为准；provider、runtime adoption 和 field outcome 仍受本报告 Claim Ceiling 限制。
+> 本报告绑定当前 target source snapshot：`source_tree_hash=31f6342f194db75c0a07343e4574b1311a30c907a02bfab9513fbd41a9c41985`、`dirty_path_manifest_sha256=33b61786960964e9410d7896334c5d74af7d9864197c34485c42c5e7682c5b73`。当前 closeout 以 deterministic validator 为准；provider、runtime adoption 和 field outcome 仍受本报告 Claim Ceiling 限制。
 
 ## 结论
 
-当前不能进入“全部 Skill 已改善”或“CE 集成已完成”的声明。第三轮已完成当前工作树的全量 source packet coverage：38 个 canonical Skill、1029 个 package path、6,305,178 bytes，文件缺失 0、inventory hash/byte mismatch 0；另有 408 条 direct-support relations、194 个 unique direct-support paths。两个角色 lane 均为内部模拟视角，`role-simulated/provider_unverified/degraded_inherited`，不是 OpenAI 或 Anthropic 公司审查，也没有真实跨模型独立性证明。
+当前不能进入“全部 Skill 已改善”或“CE 集成已完成”的声明。第三轮已完成当前工作树的全量 source packet coverage：38 个 canonical Skill、1029 个 package path、6,316,468 bytes，文件缺失 0、inventory hash/byte mismatch 0；另有 408 条 direct-support relations、194 个 unique direct-support paths。两个角色 lane 均为内部模拟视角，`role-simulated/provider_unverified/degraded_inherited`，不是 OpenAI 或 Anthropic 公司审查，也没有真实跨模型独立性证明。
 
 语义审查产物显示：当前聚合包含 13 个已完成 source-contract closure 的 P1/P2 历史 finding，以及 2 个 OpenAI lane 的 P3 `defer-pending-measurement`。`spec-ideate` 与 `spec-sweep` 的本轮 source 修复已由 Anthropic lane 回源确认并关闭；P3 只在取得 paired token/latency/quality 数据后重评。Round 3 的最高 claim 是“当前源码合同与审查范围可追溯”，不是现场价值或真实 provider 结果。
 
@@ -12,16 +12,16 @@
 
 | 维度 | 结果 |
 |---|---|
-| target HEAD | `5e459ab8ab5c1db2f72b17273cbeb7b3361f1eaa` |
+| target HEAD | `b557f8bc6f884f0fef460108e6279b31227c50fb` |
 | canonical Skill | 38/38 |
 | package path | 1029/1029 |
-| package bytes | 6,305,178 |
+| package bytes | 6,316,468 |
 | package missing/hash mismatch | 0/0 |
 | direct-support relations | 408 |
 | unique direct-support paths | 194 |
-| source-tree hash | `046afd7588e8063858cee29b3f096a0cfc8aff31f4fe449dcb518f50cc7135d4`，见 inventory/coverage artifact |
-| inventory hash | `e728c63ebaf1bd4290dbd2bbcedbbcb332033b8c443ebc6f52f95f3389f79f42`，见 inventory snapshot |
-| dirty manifest | `1bd396ceca79a4f93d9aae23b7733f9a14101ae6c08c05bf3b662da64aa3ec68`，计算时排除 `docs/validation/ce-localization/**` derived artifacts |
+| source-tree hash | `31f6342f194db75c0a07343e4574b1311a30c907a02bfab9513fbd41a9c41985`，见 inventory/coverage artifact |
+| inventory hash | `e45bd0fdd5d8d88fef13e0e50f2da78becc28d53ba639abc968a571f7f335063`，见 inventory snapshot |
+| dirty manifest | `33b61786960964e9410d7896334c5d74af7d9864197c34485c42c5e7682c5b73`，计算时排除 `docs/validation/ce-localization/**` derived artifacts |
 | excluded | `skills/autoresearch` tracked symlink，host-owned/local-only，不计入 36 |
 
 确定性产物：[round-3-source-coverage.json](/Users/kuang/xiaobu/spec-first/docs/validation/ce-localization/review/round-3-source-coverage.json)。该产物明确禁止 blanket 纳入整个 `src/**` 或 `tests/**`；当前 `unresolved_non_semantic_boundary` 为 `null`，`spec-write-tasks` 的 Claude command template 已纳入当前 source inventory。

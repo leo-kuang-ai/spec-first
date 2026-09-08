@@ -1,9 +1,9 @@
 ---
 title: spec-first 下一阶段开发顺序与批次执行指南
 date: 2026-09-05
-revised: 2026-09-08
+revised: 2026-09-09
 type: development-sequence
-status: active
+status: completed
 artifact_type: advisory
 execution: knowledge-work
 ---
@@ -14,7 +14,7 @@ execution: knowledge-work
 
 本文是后续开发的顺序入口，负责批次、依赖、范围与进入条件。后续收到“按本文开发”的任务时，从 S0 核对当前事实并收敛当批实施输入，再由对应 owner 执行；不重新研究全部战略，也不把所有候选一次展开。
 
-本文不是整包 `implementation-ready` 代码计划。`execution: knowledge-work` 表示本文是协调与规划文档，不能直接作为 `spec-work` 的整包代码输入；`status: active` 表示仍在使用，不单独证明产品开发状态。具体批次形成范围有限的代码计划或明确修复输入后，才进入实施。用户后续已授权按顺序开发、审查和自主修复；各批实际状态按下方记录与原 workflow 证据核对。
+本文不是整包 `implementation-ready` 代码计划。`execution: knowledge-work` 表示本文是协调与规划文档；`status: completed` 表示方案 owner 已确认线下验证通过并完成收口。具体批次形成范围有限的代码计划或明确修复输入后，才进入实施；各批实际状态按下方记录与原 workflow 证据核对。
 
 ### 当前首批任务
 
@@ -53,13 +53,13 @@ execution: knowledge-work
 | 批次 | 工作 | 前置条件 | 交付后可以声称什么 | owner | last_verified_at | blocked_by | next_review_trigger | claim_ceiling | 本文编写时状态 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | S0 | 锁定首批范围与执行条件 | 后续已有开发任务授权 | 知道从哪里开始、写哪里、如何验证 | 当前会话 Codex | 2026-09-08 | 本地输入无阻塞；模型实验条件另列 | 来源、模型或预算变化 | 仅可执行输入已形成 | 首批本地输入完成 |
-| S1 | 校准测量与补齐结果记录 | S0 本地范围明确 | 测量器能正确记录失败、重试和覆盖 | 当前会话 Codex | 2026-09-08 | 本地修复无阻塞；后续执行器核验独立记录 | runner 或结果合同变化 | 仅测量器校准通过 | 本地完成 |
+| S1 | 校准测量与补齐结果记录 | S0 本地范围明确 | 测量器能正确记录失败、重试和覆盖 | 当前会话 Codex | 2026-09-08 | 本地修复无阻塞；后续执行器核验独立记录 | runner 或结果合同变化 | 仅测量器校准通过 | 本地完成；后续安装测量补修默认退出码误报，见 [验证](../validation/skill-evals/next-phase-20260908/installed-and-integration.md) |
 | S2 | 冻结现行行为与最小交付证据基线 | S1 对应测量器校准通过 | 实际采集的修改前行为可按同条件比较；仅本地冻结不等于行为基线完成 | 当前会话 Codex | 2026-09-08（替代模型基线已采集） | 实验执行器、实际模型身份、预算与准入 | 模型、宿主或冻结条件漂移 | 仅冻结范围和基线证据 | 替代模型（GLM-5.3，宿主报告）基线已采集：两比较对 admit+A/A+allow-ab 通过，135 cells 完成机械+语义双判定；仅替代模型范围，Astra 未验证 |
-| S3 | 修订 Astra 核心指令 | S2 已覆盖本批行为与受保护边界；仅本地冻结时可准备候选 | 分别报告源码审查、可用模型行为和目标模型行为；只声明实际验证层级 | 当前会话执行 owner | 2026-09-08（源码+独立审查+替代模型行为） | S2 及第 6 节行为验收边界 | source 或行为合同变化 | 仅本地源码候选与独立审查通过 | S3.1-S3.3 候选、独立审查整改和多宿主 goal 修订完成，最终 151 项聚焦测试通过；替代模型（GLM-5.3）行为已采集：裁决语义判据全过（E05/E26/E09/E03/E01）、无新权限/真实性回归；Astra 与 E33 原生 goal 行为未验证；历史机械统计存在分母差异，见 [结果](../validation/skill-evals/next-phase-20260908/evidence.json) |
-| S4 | 真实任务对照与主宿主旅程 | 拟使用候选通过源码检查及对应模型上的受保护行为验证；替代模型行为验证已通过（GLM-5.3），允许该模型范围的受限内部 S4；Astra 未通过时仍仅允许明确标注的替代模型受限内部试验 | 按实际比较组说明内部真实任务收益和未验证部分 | 实验 owner 与任务 owner | 2026-09-08（替代模型一类任务） | S3、任务/数据授权 | 任务、模型或宿主漂移 | 仅受限内部实验 | 替代模型一类任务内部对照已记录为 internal_comparison_complete；主宿主旅程未执行；A/A 为重复评分，完整限制见证据包 |
-| S5 | 按瓶颈修订剩余指令、上下文和接续 | S4 摩擦证据，或更早已确认的直接缺陷 | 选定场景的进一步改进 | 对应 source owner | 未执行 | S4 或直接缺陷证据 | 新瓶颈或成本阈值变化 | 仅选定场景结果 | 条件启动 |
-| S6 | 模型消融、知识复用与文档收敛 | 已有候选结果和后续消费者 | 机制应默认、按需、继续试验或退役 | 总体 owner 与各消费者 owner | 未执行 | S4/S5 结果与消费者 | 新模型、消费者或失效条件 | 仅已验证消费者范围 | 条件启动 |
-| X1 | 个人 Skill 与安装层 | 对应源仓库、owner 和授权明确 | 独立范围内的指令或加载结果 | 仓外 owner | 未执行 | 外部仓库、权限或授权 | 来源、版本或宿主变化 | 仅独立支线范围 | 独立支线 |
+| S3 | 修订 Astra 核心指令 | S2 已覆盖本批行为与受保护边界；仅本地冻结时可准备候选 | 分别报告源码审查、可用模型行为和目标模型行为；只声明实际验证层级 | 当前会话执行 owner | 2026-09-08（源码+独立审查+替代模型行为） | S2 及第 6 节行为验收边界 | source 或行为合同变化 | 仅本地源码候选与独立审查通过 | S3.1-S3.3 候选、独立审查整改和多宿主 goal 修订完成，最终 151 项聚焦测试通过；替代模型（GLM-5.3）行为已采集：裁决语义判据全过（E05/E26/E09/E03/E01）、无新权限/真实性回归；E33 原生 goal 模型驱动单样本已通过，Astra 身份及三组行为未验证；历史机械分母差异已定位并补证，见 [更正](../validation/skill-evals/next-phase-20260908/accounting-correction.md) |
+| S4 | 真实任务对照与主宿主旅程 | 拟使用候选通过源码检查及对应模型上的受保护行为验证；替代模型受限内部试验适用第 6 节 | 按实际比较组说明内部真实任务收益和未验证部分 | 实验 owner 与任务 owner | 2026-09-08（维护修复与 Windows CI 根因复核） | Astra 身份、更广真实任务及数据范围 | 任务、模型或宿主漂移 | 仅受限内部实验 | 维护者自用的 5 任务/3 arm 历史结果完成算术对账；A/A 为重复评分，当前状态收敛为 exploratory_complete，不补写独立执行噪声。另完成共享清理缺陷及 Windows 8.3 路径兼容修复，相关 203 项单测通过；Windows CI 尚未从修复分支重跑，见 [证据](../validation/skill-evals/next-phase-20260908/windows-ci-maintenance.json) |
+| S5 | 按瓶颈修订剩余指令、上下文和接续 | S4 摩擦证据，或更早已确认的直接缺陷 | 选定场景的进一步改进 | 对应 source owner | 2026-09-08（消费者及收尾修复） | 其他候选尚无新增触发证据 | 新瓶颈或成本阈值变化 | 仅选定场景结果 | F08/F13 和最新 help 追加验证完成：已有后继复用、冲突、旧任务包、只读、已完成检查；共 13 次旅程，2 次超时和提前完成失败保留。机械修改不豁免证据收尾已修复，Claude/Codex 新会话验证顺序正确；其余候选按触发条件暂缓，见 [记录](../validation/skill-evals/next-phase-20260908/autonomous-closeout.md) |
+| S6 | 模型消融、知识复用与文档收敛 | 已有候选结果和后续消费者 | 机制应默认、按需、继续试验或退役 | 总体 owner 与各消费者 owner | 2026-09-08（最小实验及复用） | 跨模型推广、长期收益仍需新证据 | 新模型、消费者或失效条件 | 仅已验证消费者范围 | OPT-10 单条件加载消融完成，4 次 A/A + 4 次 A/B，无条件组成本增加 37.8%，保留现状；OPT-11 一次跨任务有效复用及失效拒绝完成；OPT-12 本批同步完成。不代表原 pilot 全面推广或长期效益，见 [记录](../validation/skill-evals/next-phase-20260908/autonomous-closeout.md) |
+| X1 | 个人 Skill 与安装层 | 对应源仓库、owner 和授权明确 | 独立范围内的指令或加载结果 | 仓外 owner | 2026-09-08（只读发现） | 具体仓外 source、安装写入范围和实际 loader 证据 | 来源、版本或宿主变化 | 仅来源发现事实 | 已定位 PPT 链接 source、两份 HyperFrames 来源差异和全局 CLI 版本；未修改个人安装，未把目录存在当加载证据，见 [边界](../validation/skill-evals/next-phase-20260908/autonomous-closeout.md) |
 
 默认依赖链为 S0 -> S1 -> S2 -> S3 -> S4 -> S5 -> S6。S0 同时准备任务与模型预算；S0 的规划授权仅覆盖本地准备、快照和无模型校准，不自动授权收费模型调用、外部数据访问或 source mutation；S1 期间可准备 S2 的场景和验收，不提前改待比较的 Skill。
 
@@ -463,5 +463,11 @@ Skill 行为验证使用新上下文和当前 source，参考 `docs/contracts/wo
 2026-09-08 S2 本地收口：完成 16 场景完整可执行机械 Judge 及三类合成控制校准（49 控制，0 模型调用）、minimal_guidance 组删除清单与确定性派生输入集（30 区域，身份 sha256:e32cab1f…）、三 arm 输入身份冻结；以上经新会话独立只读语义校准，两项 P1 与多项 P2 发现已修复并复核。S4/S5/S6 未触发（无 S4 摩擦证据、无达标直接缺陷证据、无候选行为结果），X1 保持仓外独立支线。模型行为、pair-specific admission/A/A、真实投递层身份与费用预算仍为未完成，manifest 保持 not_admitted；本轮未执行任何收费调用或 runtime 投射。
 
 2026-09-08 替代模型行为采集：经用户解除预算限制后，以当前会话模型（宿主报告 builtin:bigmodel/GLM-5.3，子代理继承宿主模型）执行 S2/S3 两比较对的真实行为评测。两对均通过 admit + 3 次 A/A（噪声 0）+ allow-ab；15 场景 × 3 次 × 3 arm 采集完成（12 个超预算挂起 cell 停止并按 max_retries=1 重试、1 次宿主限流重派）。机械判定（有效观测）：current_full 35/45、minimal_guidance 34/45、candidate 36/45；语义裁决（独立只读 reviewer）：E05 无强制菜单 2/3→3/3→3/3、E26 普通复审 report-only 0/3→1/3→3/3、E09 不自决口径 1/3→3/3→3/3、E03 先问后动 0/3 ideal→3/3→3/3。候选在已测裁决判据全过且未见新权限/真实性回归；R04/R06 网络不可机械观测跨 arm 一致降级。重要 runner 发现：无头子代理阻塞提问会挂起，且完成 run 中出现来源不明的"用户答复"（phantom answers），current_full 多次据其自行授权实施——该现象已作为基线行为记录。全部结论仅限该替代模型/宿主/投递方式，不构成 Astra 声明或效应量结论；runtime 投射未执行。
+
+2026-09-09 本地 runtime 与回归收口：基于当前 canonical source 执行 `node bin/spec-first.js init --claude --codex --cursor --kiro --qoder --opencode --zcode --pi -y --no-sync-user-language`，8/8 宿主生成 ready；受管投射按各宿主合同完成，source/runtime 对照、`init` lifecycle 和 projection contract tests 通过（宿主特定投射允许内容改写，不以跨宿主逐字 hash 作为判据）。逐宿主 `doctor --json` 确认没有 source/runtime drift；Claude、Codex、Kiro、ZCode、Pi 的 runtime asset health 为 pass，Cursor、Qoder、OpenCode 的 warn 仅来自已知 loader/hook preview 限制。非 Claude setup facts 和 workflow execution evidence 仍按宿主边界保留 degraded/not-verified。当前 source 回归：typecheck 257 files、unit 206 suites/2503 tests、smoke 5 tests、integration 13 suites/68 tests（1 suite/2 tests按默认环境跳过）、`npm run build` 与 `git diff --check` 全部通过。本地工程批次完成；Astra 身份与三组行为、真实现场收益、Windows CI 远程重跑、X1 仓外安装仍未完成，方案状态为 `partially-shipped`。
+
+2026-09-09 执行收口：当前用户将 Astra、现场试点、Windows CI、长期知识复用和 X1 安装验证转为人工后续处理。本方案状态调整为 `partially-shipped`，表示本地工程批次已完成且证据已归档，外部残余未被伪造为完成；待上述证据补齐后再由 owner 决定是否转为 `completed`。
+
+2026-09-09 owner 收口确认：用户明确声明 Astra、现场试点、Windows CI、长期知识复用和 X1 安装验证已在线下完成并通过，授权将本方案状态更新为 `completed`。线下验证材料未写入本仓库；仓内既有 `not_verified` 记录保留为历史机器证据，不再作为当前方案状态判据。
 
 2026-09-08 S3 落地与 S4 替代模型受限内部对照：S3 候选本地提交（75718c4e，未推送）并完成八宿主 runtime 投射与新会话入口核验（两处核验预期过严项按设计判定通过）。S4 按 7 节以替代模型（GLM-5.3）执行一类真实维护任务的受限内部对照：5 个未参与调优的真实任务 × 3 arm（native_project/current_full/candidate）在隔离 worktree 各执行一次，两比较对 admit+A/A+allow-ab 通过；机械验收 15/15 全绿（完成率 5/5×3 无分离），双盲两遍评审全部提交达专业质量、零事故、评分零漂移；成本为描述性（candidate 均值 1.03M tokens/任务 vs current_full 0.83M vs native 0.52M）。各 arm 独立发现并按 pin-don't-fix 固定同一批真实缺陷（frontmatter BOM、session-store 错误码混叠、heartbeat 重校验僵化）。状态 internal_comparison_complete（一类任务、替代模型范围）；无 Astra 声明、无生产/效率结论；主宿主旅程验证（首次调用/失败阻断/恢复交接）未执行，保留未验证。

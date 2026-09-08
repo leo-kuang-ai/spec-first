@@ -633,13 +633,13 @@ function classifySharedInstructionConsumers(projectRoot, adapter) {
     .filter((platform) => platform !== adapter.id)
     .map((platform) => getAdapter(platform))
     .filter((candidate) => candidate.instructionFile === adapter.instructionFile)
-    .map((candidate) => classifyInstructionConsumer(projectRoot, candidate));
+    .map((candidate) => classifyInstructionConsumer(projectRoot, candidate, adapter));
 }
 
-function classifyInstructionConsumer(projectRoot, adapter) {
+function classifyInstructionConsumer(projectRoot, adapter, cleaningAdapter) {
   const statePath = path.join(projectRoot, adapter.stateFile);
   if (!fs.existsSync(statePath)) {
-    if (hasManagedRuntimeSurface(projectRoot, adapter)) {
+    if (hasManagedRuntimeSurface(projectRoot, adapter, cleaningAdapter)) {
       return {
         platform: adapter.id,
         status: 'uncertain',
@@ -668,14 +668,22 @@ function classifyInstructionConsumer(projectRoot, adapter) {
   }
 }
 
-function hasManagedRuntimeSurface(projectRoot, adapter) {
+function managedRuntimeRoots(adapter) {
   return [...new Set([
     adapter.managedRoot,
     adapter.commandRoot,
     adapter.skillsRoot,
     adapter.workflowsRoot,
     adapter.agentsRoot,
-  ].filter(Boolean))].some((relativePath) => fs.existsSync(path.join(projectRoot, relativePath)));
+  ].filter(Boolean))];
+}
+
+function hasManagedRuntimeSurface(projectRoot, adapter, cleaningAdapter) {
+  const cleaningRoots = new Set(managedRuntimeRoots(cleaningAdapter));
+  // 当前宿主共享的目录不能单独证明另一个无状态宿主仍已安装。
+  return managedRuntimeRoots(adapter)
+    .filter((relativePath) => !cleaningRoots.has(relativePath))
+    .some((relativePath) => fs.existsSync(path.join(projectRoot, relativePath)));
 }
 
 function buildSharedInstructionDiagnostics(adapter, consumers) {

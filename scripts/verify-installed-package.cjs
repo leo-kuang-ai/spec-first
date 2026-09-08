@@ -272,7 +272,7 @@ function verifyHeal(cli, tempRoot) {
 }
 
 
-// 六宿主生命周期矩阵：每宿主 init → 宿主特有 surface 断言 → doctor → clean。
+// 宿主生命周期矩阵：每宿主 init → 宿主特有 surface 断言 → doctor → clean。
 // surface 锚点来自 platform-registry 声明与实测投射（claude 扁平 commands、
 // codex skill-only 等），多轮测评已校准。
 const HOST_SURFACES = {
@@ -300,11 +300,23 @@ const HOST_SURFACES = {
     stateFile: path.join('.opencode', 'spec-first', 'state.json'),
     proof: path.join('.opencode', 'skills', 'spec-runtime-setup'),
   },
+  zcode: {
+    stateFile: path.join('.zcode', 'spec-first', 'state.json'),
+    proof: path.join('.agents', 'skills', 'spec-runtime-setup'),
+  },
+  pi: {
+    stateFile: path.join('.pi', 'spec-first', 'state.json'),
+    proof: path.join('.agents', 'skills', 'spec-runtime-setup'),
+  },
 };
 
 function verifyMultiHost(cli, tempRoot) {
-  console.log('\n▸ Phase: multihost（六宿主逐一生命周期 + 全宿主组合）');
-  const allHosts = Object.keys(HOST_SURFACES);
+  console.log('\n▸ Phase: multihost（注册宿主逐一生命周期 + 全宿主组合）');
+  const { getSupportedPlatforms } = require(path.resolve(path.dirname(cli), '..', 'src', 'cli', 'adapters'));
+  const allHosts = getSupportedPlatforms();
+  assert('MH0-host-coverage',
+    JSON.stringify([...allHosts].sort()) === JSON.stringify(Object.keys(HOST_SURFACES).sort()),
+    '安装包注册宿主与验证矩阵一致');
 
   // 逐宿主：独立 repo，init → doctor → clean 全闭环。
   for (const host of allHosts) {
@@ -325,16 +337,17 @@ function verifyMultiHost(cli, tempRoot) {
       clean.status === 0 && !fs.existsSync(path.join(repo, surface.stateFile)),
       'managed state removed',
     );
+    assert(`MH6a-surface-removed-${host}`, !fs.existsSync(path.join(repo, surface.proof)), surface.proof);
   }
 
-  // 全宿主组合：同一 repo 六宿主共存 → 共享 instruction 的消费者递减 → 最终清空。
+  // 全宿主组合：共享 instruction 的消费者递减，最后一个消费者退出后才移除。
   const shared = createGitRepo(path.join(tempRoot, 'repo-all-hosts'));
   const initAll = run(process.execPath, [cli, 'init', ...allHosts.map((host) => `--${host}`), '-y', '-u', 'tester', '--lang', 'zh'], { cwd: shared });
   assert('MH7-init-all-hosts', initAll.status === 0, String(initAll.stdout).split('\n')[0]);
   for (const host of allHosts) {
     assert(`MH7a-coexist-${host}`, fs.existsSync(path.join(shared, HOST_SURFACES[host].stateFile)), HOST_SURFACES[host].stateFile);
   }
-  // 共享 instruction：claude 拥有 CLAUDE.md，codex 拥有 AGENTS.md；六宿主共存时两者都在。
+  // 共享 instruction：claude 拥有 CLAUDE.md，codex/zcode/pi 消费 AGENTS.md。
   assert('MH7b-claude-md', fs.existsSync(path.join(shared, 'CLAUDE.md')), 'CLAUDE.md');
   assert('MH7c-agents-md', fs.existsSync(path.join(shared, 'AGENTS.md')), 'AGENTS.md');
 
@@ -347,13 +360,28 @@ function verifyMultiHost(cli, tempRoot) {
     `platforms=${autoPlatforms && autoPlatforms.length}`,
   );
 
-  // 逐宿主 clean：codex 被清掉之前，AGENTS.md 必须保留（claude 共享消费者语义见 clean.js）。
+  // 逐宿主清理不能提前移除仍被其他宿主使用的共享投射。
   for (const host of allHosts) {
     runOk(`MH9-clean-${host}`, process.execPath, [cli, 'clean', `--${host}`], { cwd: shared });
+    const sharedConsumers = ['codex', 'zcode', 'pi'].filter((id) => fs.existsSync(path.join(shared, HOST_SURFACES[id].stateFile)));
+    if (sharedConsumers.length > 0) {
+      assert(`MH9b-shared-skills-after-${host}`,
+        fs.existsSync(path.join(shared, '.agents', 'skills', 'spec-runtime-setup', 'SKILL.md')),
+        `remaining=${sharedConsumers.join(',')}`);
+      assert(`MH9c-shared-instruction-after-${host}`, fs.existsSync(path.join(shared, 'AGENTS.md')), 'AGENTS.md');
+    }
   }
   for (const host of allHosts) {
     assert(`MH9a-removed-${host}`, !fs.existsSync(path.join(shared, HOST_SURFACES[host].stateFile)), host);
   }
+  assert('MH10-shared-skills-removed',
+    !fs.existsSync(path.join(shared, '.agents', 'skills', 'spec-runtime-setup')),
+    '最后一个消费者退出后移除受管 skill');
+  const agentsPath = path.join(shared, 'AGENTS.md');
+  const remainingInstruction = fs.existsSync(agentsPath) ? fs.readFileSync(agentsPath, 'utf8') : '';
+  assert('MH11-shared-instruction-unmanaged',
+    !/<!-- spec-first:(?:bootstrap|lang|coding-guidelines|runtime-tools):start -->/.test(remainingInstruction),
+    '仅检查受管区清理，不要求删除用户 instruction 文件');
 }
 
 function writeSummary(tempRoot, phase, packageVersion) {
@@ -362,7 +390,7 @@ function writeSummary(tempRoot, phase, packageVersion) {
   fs.mkdirSync(path.resolve(outputDir), { recursive: true });
   fs.writeFileSync(path.join(outputDir, 'installed-package-verification.json'), `${JSON.stringify({
     schema_version: 'installed-package-verification.v1',
-    status: process.exitCode === 0 ? 'passed' : 'failed',
+    status: (process.exitCode === undefined || process.exitCode === 0) ? 'passed' : 'failed',
     phase,
     os: process.platform,
     node: process.version,
@@ -425,4 +453,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { createGitRepo, main };
+module.exports = { createGitRepo, main, writeSummary, HOST_SURFACES };

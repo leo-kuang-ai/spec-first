@@ -2,6 +2,32 @@
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
 
+- v1.15.3 2026-09-09 00:45:00 leokuang: docs(plan): 根据方案 owner 的线下验证通过确认，将 `2026-09-05-002-next-phase-development-sequence.md` 状态更新为 `completed`；仓内机器证据保留为历史记录，完成依据为 owner 的线下验收。 (user-visible)
+
+- v1.15.3 2026-09-09 00:35:00 leokuang: docs(plan): 将下一阶段方案状态收口为 `partially-shipped`；本地工程批次已完成并归档，Astra、现场试点、Windows CI、长期知识复用和 X1 安装验证转由人工后续处理，待证据补齐后再决定是否完成总方案。 (user-visible)
+
+- v1.15.3 2026-09-09 00:20:00 leokuang: docs(validation): 基于当前 canonical source 完成八宿主 runtime 投射刷新与逐宿主 doctor 复核；补录 typecheck、skill lint、unit、smoke、integration、build 和 diff check 的本地回归结果。保留 Cursor/OpenCode loader、Qoder hook、Astra 行为、真实现场、Windows 远程 CI 与 X1 仓外安装的未验证边界，整体方案继续 active。 (user-visible)
+
+- v1.15.3 2026-09-08 23:25:00 leokuang: fix(runtime): 修复 Windows 8.3 短路径导致 host authority receipt 与实际路径表示不一致的问题；保留既有 containment 与 symlink 错误分类。复现 PR #55 Windows Node 20/22 CI 失败根因后，host authority、workspace graph、child hook 与 git exclude 相关 203 项单测通过；未修改 generated runtime。 (user-visible)
+
+- v1.15.3 2026-09-08 19:00:00 leokuang: fix(clean): 自主收尾的真实八宿主验证发现共享 .agents/skills 被误判为其他无状态宿主残留，导致最后消费者卸载后 AGENTS.md 受管区未清除；按当前清理宿主排除不可归属的共享 root，保留真实状态、独立残留与用户文本。6 个失败回归修复后通过，ownership 50 项及真实安装 multihost 112 项通过。真实模型旅程发现机械修改跳过证据收尾，spec-work 入口补清 summary/closeout/lifecycle 顺序和免测例外；补齐后继复用/冲突/旧任务包与 help 验证、单条件加载消融、知识回源复用及来源 discovery，保留失败与外部验证限制。 (user-visible)
+
+- v1.15.3 2026-09-08 18:17:36 leokuang: fix(validation): 真实安装验证发现正常 exit 0 被 JSON 摘要误报 failed、全宿主矩阵漏掉 ZCode/Pi；修正默认退出状态判定，矩阵与安装包 getSupportedPlatforms 对账，新增共享 skills/instruction 消费者保护检查。两个反例先红后绿，重跑隔离 pack/install 与八宿主生命周期 132 项通过。显式 Graphify 集成回归暴露 PATH 旧 CLI 与 source 初始化混用，将测试版本及指纹 CLI 绑定同一 checkout；不改个人安装或主仓 generated runtime。 (user-visible)
+
+- v1.15.3 2026-09-08 16:20:00 leokuang: fix(cli): 真实消费者已完成 F13 历史计划后继生产及缺项补完、Claude help 驱动的证据记录与收尾；E33 恢复会话真实完成原生 goal 生命周期并保存工具回执。保留首次 reason_code 冲突、宿主权限拒绝和模型身份限制，帮助补明 schedulable 仅用于 not-run，实际执行须同步替换原因。后续证据独立保存，不覆盖旧超时或升级为全量验收。 (user-visible)
+
+- v1.15.3 2026-09-08 15:43:00 leokuang: fix(cli): S4 双宿主合成旅程发现证据收尾输入不可发现，给 verification-run-summary 与 honest-closeout 补充只读 help、实际允许字段及可消费的 not-run 示例；5 个新增反例先红后绿，保留验证出口。保存 9 次宿主调用的成功与 3 次超时、跨进程恢复和 E33 原生 API 完整生命周期回执；Claude 辅助恢复成功不等于无辅助通过，原生 smoke 不等于 Astra 模型行为验收。 (user-visible)
+
+- v1.15.3 2026-09-08 15:04:52 leokuang: fix(plan): 补齐 S5.2/F13 历史计划补完接续，当前用户授权后由 plan owner 核验有效后继或创建仅覆盖剩余范围的新计划，经正常审查和 intake 交回执行；覆盖直接计划、任务包校验失败和任务生产入口，保留旧计划及旧 pins。增加正反场景和合同回归，仅声明 source 候选，不宣称完整主宿主或 Astra 验收。 (user-visible)
+
+- v1.15.3 2026-09-08 14:12:00 leokuang: fix(handoff): S5.2 区分只读恢复与当前用户明确授权的继续任务，回源核验后直接交给执行 owner；保留 artifact 不授权、非活跃计划返回 producer、旧 pins 和外部副作用边界，新增正反合同场景。仅 source 候选，不宣称 Astra 或真实宿主旅程已验证。 (user-visible)
+
+- v1.15.3 2026-09-08 14:05:00 leokuang: docs(eval): 定位 S2/S3 历史汇总遗漏的 E03/candidate-r7，补存原始记录及哈希并逐项核对计数，解释候选 35/44 与 36/45 差异；不改变历史证据包，不宣称补齐模型行为、重试准入或宿主事件证据。
+
+- v1.15.3 2026-09-08 14:01:49 leokuang: fix(ce): 核对固定上游窗口的 517 条事实及两条审查车道收据，事实无变化、源码收据无缺口；按差量复核承接既有判定并刷新当前快照绑定，保留历史判定及本轮范围说明，不宣称新增独立审查、模型行为或现场结果。
+
+- v1.15.3 2026-09-08 13:05:00 leokuang: docs(plan): 结合最新代码（HEAD b557f8bc，评审后 5 个新提交）第四轮核对 SDLC 提升方案——全部代码声称逐项重验：B1 双锚点（SKILL.md:348、shipping-workflow.md:62,72 行号精确）、vendor/ 失效、4 workflow 无治理检查接入、init -y、run summary 时间字段缺失、schema/事件/22 用例/2500ms/活链/空前提/饱和数字/WIP 2/12 OPT+33 F 计数均仍成立；修正 AGENTS.md vendor 引用行号 158→164（S3 候选落地漂移）；为 §4.3 G1 与 §6 重估触发补 2026-09-08 主计划推进状态注记（S1 完成、S2 替代模型 GLM-5.3 基线采集 135 cells、S3 goal 修订候选落地为指令净增 +6 行非消融、S4 替代模型内部对照记录）——G1 消融启动前提在替代模型范围已就绪；§8 新增第四轮核对记录。仅修改方案文档与本记录。
+
 - v1.15.3 2026-09-08 12:30:00 tester: fix(ce): 按设计内流程完成 CE localization 判定链刷新并转绿三套件——确定性输入/库存/name-status 重绑当前树（517 记录事实零漂移，30 项抽查核验后以承接+抽查基准重盖 LLM adjudication）；补齐 canonical autoresearch 的场景行与两条评审车道（32 路径双镜头评审 delta，orchestrate.sh 安全 seam 实测：classify 正确、pipe-to-shell 与非白名单 DB 拒绝）；416 个过期收据经 4 个分块只读评审代理真实逐文件评审（416/416 覆盖，零批处理判定）后合并，记录 4 项 P2 发现（verify-only 用例描述夸大断言、setup-registry schema v9 元数据残留、check-r2-preset 第30行自比较死代码、check-validate-report-only 注释三断言实二）；计数冻结按漂移惯例更新（193→194/407→408、scenario 38→39）。applied-delta 后编辑导致 lineage 哈希失配，按 prune 语义丢弃不可核验 ref 并以最小 rebind delta 收口。全量单测 2482/2482、typecheck、lint 通过。 (user-visible)
 - v1.15.3 2026-09-08 11:40:00 tester: fix(helpers): 落地两项待决缺陷的作者决策——session-store 写失败错误码拆分：真实写失败（目录被占、ENOSPC 等）返回新 reason_code session-write-failed 并保留 errors，session-path-escape 仅用于真实 containment 失败（CLI 透传无枚举依赖，两条真实 containment pin 保持不变，新增写失败正例）；heartbeatSession 改为只重校验 schema 已知字段投影并原样保留未知字段（旧/新版本写入的额外字段不再使状态文件永远无法心跳，pin 测试翻转为保留语义）。CE upstream sync 对 recommended 入口的断言按断言迁移纪律改钉现行 scope-based 措辞（Start /spec-work (recommended) + handoff 唯一 recommended 规则），行为保护不变。CE localization 两套件剩余失败为设计内刷新门（需新一轮 LLM adjudication），保留不绕过。40+136 项测试、typecheck、lint 通过。 (user-visible)
 - v1.15.3 2026-09-08 11:17:20 tester: fix(eval): 修复分支审查三项问题：v2 路由结果汇总拒绝缺失或矛盾的 attempt、退出码与成功标记，保留未知尝试和旧记录兼容；新增 14 项先红后绿反例与 2 项降级兼容回归；将 S1/S2/S3/S4 的 15 份最小历史证据保存至版本控制范围并改正计划引用，对齐 S4 内部对照与未执行的主宿主旅程。保留 E33 未运行、候选机械统计差异及 S4 A/A 重复评分限制，不新增模型行为或收益声明；未修改 generated runtime。 (user-visible)

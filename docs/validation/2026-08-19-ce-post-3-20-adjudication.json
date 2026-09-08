@@ -5,7 +5,7 @@
     "kind": "llm-adjudication",
     "model": "codex-current-session",
     "status": "confirmed",
-    "adjudication_scope": "reconfirmed all 517 owner/action/unit/limitation decisions against the current deterministic input after formatting-only review-plan cleanup and a concurrent changelog-only update; the deterministic 517-record digest remains unchanged, no upstream join or semantic ownership map changed, and no provider, runtime-adoption, or field-outcome claim is made"
+    "adjudication_scope": "2026-09-08 自主收尾差量承接：固定窗口 517 条 records、upstream 与 deterministic_facts 与既有输入逐字段相同。新增 spec-work 机械修改仍需证据收尾的澄清、共享清理 ownership 修复及实验记录；不改变既有上游 owner/action/unit，不重审未变条目。"
   },
   "upstream": {
     "repository": "compound-engineering-plugin",
@@ -15,16 +15,59 @@
   },
   "target_source_snapshot": {
     "repository": "spec-first",
-    "head": "5e459ab8ab5c1db2f72b17273cbeb7b3361f1eaa",
+    "head": "b557f8bc6f884f0fef460108e6279b31227c50fb",
     "dirty": true,
     "dirty_paths": [
-      "scripts/generate-ce-localization-closeout.cjs",
-      "tests/unit/ce-localization-closeout-contracts.test.js",
-      "tests/unit/ce-localization-review-contracts.test.js"
+      "CHANGELOG.md",
+      "docs/contracts/verification/verification-run-summary.md",
+      "docs/contracts/workflows/honest-closeout.md",
+      "docs/plans/2026-09-05-001-next-phase-optimization-program-plan.md",
+      "docs/plans/2026-09-05-002-next-phase-development-sequence.md",
+      "docs/plans/2026-09-07-001-sdlc-lens-multi-expert-improvement-plan.md",
+      "docs/validation/skill-evals/next-phase-20260908/README.md",
+      "docs/validation/skill-evals/next-phase-20260908/accounting-correction.md",
+      "docs/validation/skill-evals/next-phase-20260908/autonomous-closeout.json",
+      "docs/validation/skill-evals/next-phase-20260908/autonomous-closeout.md",
+      "docs/validation/skill-evals/next-phase-20260908/installed-and-integration.json",
+      "docs/validation/skill-evals/next-phase-20260908/installed-and-integration.md",
+      "docs/validation/skill-evals/next-phase-20260908/missing-e03-r7.json",
+      "docs/validation/skill-evals/next-phase-20260908/s4-evidence-reconciliation.json",
+      "docs/validation/skill-evals/next-phase-20260908/s4-host-journey.json",
+      "docs/validation/skill-evals/next-phase-20260908/s4-host-journey.md",
+      "docs/validation/skill-evals/next-phase-20260908/s5-cli-help-verification.json",
+      "docs/validation/skill-evals/next-phase-20260908/s5-consumer-journey.json",
+      "docs/validation/skill-evals/next-phase-20260908/s5-consumer-journey.md",
+      "docs/validation/skill-evals/next-phase-20260908/s5-historical-plan-verification.json",
+      "docs/validation/skill-evals/next-phase-20260908/s5-historical-plan.md",
+      "docs/validation/skill-evals/next-phase-20260908/s5-resume-journey.json",
+      "docs/validation/skill-evals/next-phase-20260908/s5-resume.md",
+      "docs/validation/skill-evals/next-phase-20260908/windows-ci-maintenance.json",
+      "scripts/verify-installed-package.cjs",
+      "skills/spec-handoff/SKILL.md",
+      "skills/spec-handoff/evals/examples.json",
+      "skills/spec-plan/SKILL.md",
+      "skills/spec-plan/evals/examples.json",
+      "skills/spec-plan/references/plan-sections.md",
+      "skills/spec-runtime-setup/scripts/lib/host-authority.cjs",
+      "skills/spec-work/SKILL.md",
+      "skills/spec-work/evals/examples.json",
+      "skills/spec-work/references/work-intake-and-task-pack.md",
+      "skills/spec-write-tasks/SKILL.md",
+      "src/cli/commands/clean.js",
+      "src/cli/helpers/honest-closeout.js",
+      "src/cli/helpers/verification-run-summary.js",
+      "tests/integration/runtime-setup-graphify-hook-boundary.integration.test.js",
+      "tests/unit/honest-closeout.test.js",
+      "tests/unit/managed-removal-ownership.test.js",
+      "tests/unit/spec-handoff-contracts.test.js",
+      "tests/unit/spec-plan-contracts.test.js",
+      "tests/unit/spec-work-contracts.test.js",
+      "tests/unit/verification-run-summary.test.js",
+      "tests/unit/verify-installed-package.test.js"
     ],
-    "dirty_path_manifest_sha256": "1bd396ceca79a4f93d9aae23b7733f9a14101ae6c08c05bf3b662da64aa3ec68",
-    "source_tree_hash": "046afd7588e8063858cee29b3f096a0cfc8aff31f4fe449dcb518f50cc7135d4",
-    "inventory_hash": "e728c63ebaf1bd4290dbd2bbcedbbcb332033b8c443ebc6f52f95f3389f79f42",
+    "dirty_path_manifest_sha256": "33b61786960964e9410d7896334c5d74af7d9864197c34485c42c5e7682c5b73",
+    "source_tree_hash": "31f6342f194db75c0a07343e4574b1311a30c907a02bfab9513fbd41a9c41985",
+    "inventory_hash": "e45bd0fdd5d8d88fef13e0e50f2da78becc28d53ba639abc968a571f7f335063",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -58,7 +101,7 @@
       "version": "canonical-source-manifest-v1"
     }
   },
-  "input_artifact_sha256": "661112999d351046044ed8452c46986e970edd8a5e2cc7d44a424364803f0768",
+  "input_artifact_sha256": "4571838b626e34095db0c7cdd2d258c77ebb394d23029d130aefa8215b70b3af",
   "records": [
     {
       "audit_id": "A001",
@@ -14797,19 +14840,20 @@
     }
   ],
   "review_context": {
+    "continuation_review": "本轮读取当前 source、保留真实宿主失败并完成修复后验证，新增独立 fresh-source 审查与安装实测。上游 517 项事实未变，延续既有决策，仅更新本地快照绑定；两类镜像清理与 workflow 证据出口语义由本次源码和验证支持，不声明 Astra 身份、普遍收益或独立双模型复审。",
     "reviewed_at": "2026-09-08",
-    "reviewer": "ZCode session (builtin:bigmodel/GLM-5.3), maintenance continuation",
-    "method": "refresh rebind: deterministic input records are byte-identical to the 2026-08-28 adjudication window (517/517 paths, zero added/removed/changed facts; verified by full-field JSON diff); prior decisions carry over unchanged; 30-record random spot-check re-verified group/surface/role/package classification against facts and canonical_owner existence on the current tree (0 issues)",
+    "reviewer": "current Codex session",
+    "method": "deterministic carry-over after source snapshot refresh: 517/517 upstream records matched byte-for-byte against the refreshed adjudication input; zero missing or changed deterministic_facts; local source change was separately reviewed in a bounded review delta.",
     "basis": [
       "refreshed deterministic adjudication input and SHA-256 binding (2026-09-08)",
-      "zero fact drift across all 517 path joins vs 2026-08-28 input (full JSON diff)",
-      "30-record random spot-check on the current source tree (classification + owner existence, 0 issues)",
-      "prior 2026-08-28 LLM adjudication decisions for identical facts",
-      "2026-09-08 second re-stamp: record facts re-verified byte-identical after the autoresearch scenario-table and lane-refresh batch (full JSON diff, zero record drift)"
+      "517/517 records matched by path and upstream with zero deterministic_facts drift",
+      "current local source change reviewed separately in a source-bound delta before closeout generation",
+      "prior adjudication decisions carried over only for identical upstream facts"
     ],
     "limitations": [
-      "decisions carried over on identical facts rather than re-derived per record; no new semantic review of unchanged decisions beyond the spot-check",
-      "upstream window unchanged (compound-engineering-plugin 5c7cb347..956087b3); newer upstream commits not adjudicated in this round"
+      "decisions carried over on identical facts rather than re-derived per record; no independent provider review of unchanged decisions",
+      "upstream window unchanged (compound-engineering-plugin 5c7cb347..956087b3e1dd7ccc03df32cee9e7c044dfbe75cf); newer upstream commits not adjudicated in this round",
+      "current local maintenance change is not evidence of Astra identity, production impact, or field outcome"
     ]
   }
 }

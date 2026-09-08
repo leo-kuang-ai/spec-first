@@ -1,9 +1,9 @@
 {
   "schema_version": "spec-first-current-skill-package-inventory/v2",
-  "source_head": "5e459ab8ab5c1db2f72b17273cbeb7b3361f1eaa",
+  "source_head": "b557f8bc6f884f0fef460108e6279b31227c50fb",
   "skills_tree_oid": "28228ff7b46a1f62604cb50db190db357a57c18e",
   "source_mode": "working-tree",
-  "manifest_sha256": "a4b252713f1f33bb21e522044a79c7a9c81016eef554e5ed303ad73b408f6012",
+  "manifest_sha256": "1f2e08e654494625175cc56f6c2b5a06d8f5b35264197ab3a3255f892455992f",
   "skill_count": 38,
   "file_count": 1036,
   "per_skill_counts": {
@@ -2634,8 +2634,8 @@
       "path": "skills/spec-handoff/evals/examples.json",
       "skill": "spec-handoff",
       "owner_role": "evaluation",
-      "bytes": 2454,
-      "sha256": "d2da52de91310af01d71d8f163264b35ee4df98f047ceff57b1c45f2222fc917"
+      "bytes": 5558,
+      "sha256": "934dc05e3a24f5dd6f0f69f13f7a7d316b38ba66441d8fca401e323f058727e3"
     },
     {
       "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger/package.json",
@@ -2690,8 +2690,8 @@
       "path": "skills/spec-handoff/SKILL.md",
       "skill": "spec-handoff",
       "owner_role": "entry-contract",
-      "bytes": 7133,
-      "sha256": "845e122ffb4da32e0e482b535f1a594ab97e907bb66e1079466aaf71ee5ab8af"
+      "bytes": 8436,
+      "sha256": "57603d74cfcddd7d6c36ce84f7d9782cf093566ecc6bf52944324e176bc09182"
     },
     {
       "path": "skills/spec-ideate/evals/cases/non-software-mode-no-label-leak.yaml",
@@ -3278,8 +3278,8 @@
       "path": "skills/spec-plan/evals/examples.json",
       "skill": "spec-plan",
       "owner_role": "evaluation",
-      "bytes": 18923,
-      "sha256": "196295e90c49350ff2c4957cc273d8965a4b2a58924f3fd9b8fb8018c64d6c72"
+      "bytes": 20608,
+      "sha256": "1d12ae88324e1899f335b3c18d5172cb14fc7cf82b3a6c8f5e1611b9212543a7"
     },
     {
       "path": "skills/spec-plan/evals/fixtures/consumer-replay/implementation-ready.html",
@@ -3677,8 +3677,8 @@
       "path": "skills/spec-plan/references/plan-sections.md",
       "skill": "spec-plan",
       "owner_role": "reference-contract",
-      "bytes": 25693,
-      "sha256": "1fef82740a3d34e5137386399bd1ba0ff40cbfbb3d29e168f70b1fbd18423429"
+      "bytes": 26084,
+      "sha256": "6de6fef4ac1dff9c585eac9e4fd2da1974166b1576bff9fba16c33efcfd66ad0"
     },
     {
       "path": "skills/spec-plan/references/planning-evidence-boundaries.md",
@@ -3712,8 +3712,8 @@
       "path": "skills/spec-plan/SKILL.md",
       "skill": "spec-plan",
       "owner_role": "entry-contract",
-      "bytes": 109907,
-      "sha256": "09bfb3f9e18091ebe6a99e60c650299c74358daa2b04c7276579ed2aca5da57c"
+      "bytes": 111540,
+      "sha256": "ded9ff7fe82f7645ca9fdf62c53cdc6d47378458b774f36906eef6bddfeb1f82"
     },
     {
       "path": "skills/spec-polish/evals/cases/r2-screenshot-review-routes-out.yaml",
@@ -5784,8 +5784,8 @@
       "path": "skills/spec-runtime-setup/scripts/lib/host-authority.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 7528,
-      "sha256": "c08c6df572e69efc135fa63efa350aecd6be70d3ce9192741bf0638e5b909c14"
+      "bytes": 7587,
+      "sha256": "785e07eccaa5470ba6ef2e6af41983980d90a7bfb9f1ca624ba9e5d1d073c9c0"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
@@ -6589,8 +6589,8 @@
       "path": "skills/spec-work/evals/examples.json",
       "skill": "spec-work",
       "owner_role": "evaluation",
-      "bytes": 10522,
-      "sha256": "ae6c96ebe140c7ca746a992a44d8950778b5734f709a2b9be02f7105d742dd02"
+      "bytes": 11081,
+      "sha256": "edcb99e764bdc608eedd9092f0855041a9c6b59bb62c291d34e8b9a1e8ea171f"
     },
     {
       "path": "skills/spec-work/evals/skillup/cases/drifted-pack-rejects.yaml",
@@ -6848,8 +6848,8 @@
       "path": "skills/spec-work/references/work-intake-and-task-pack.md",
       "skill": "spec-work",
       "owner_role": "reference-contract",
-      "bytes": 13793,
-      "sha256": "949a28f8a034ef23ed3267082fe3ead8d75d1a14c2bff131be7b1ef4c092fe06"
+      "bytes": 14806,
+      "sha256": "57db393caa33fd44d5f7fe27c762758fe1d4ee42207aa1e806bbe5702bb54303"
     },
     {
       "path": "skills/spec-work/scripts/source-plan-file-hash.cjs",
@@ -6869,8 +6869,8 @@
       "path": "skills/spec-work/SKILL.md",
       "skill": "spec-work",
       "owner_role": "entry-contract",
-      "bytes": 38114,
-      "sha256": "b9309e9452ccbe7c67dee700b336749334e74883ff24d8583648abceab841c5e"
+      "bytes": 39315,
+      "sha256": "d213191ded6b6e9c958851f43b62abd305ec7ae9e36bec2c823b6daf45d9050e"
     },
     {
       "path": "skills/spec-worktree/scripts/worktree-manager.sh",
@@ -7219,8 +7219,8 @@
       "path": "skills/spec-write-tasks/SKILL.md",
       "skill": "spec-write-tasks",
       "owner_role": "entry-contract",
-      "bytes": 10297,
-      "sha256": "dddabe599934d90204a4967fd1a33924393838767d887be74433d7765cbafb3d"
+      "bytes": 10639,
+      "sha256": "ad4decabc11124b24bfe45b850ba1f4e959f86340159bb5ebdbd90bc8e04c8e2"
     },
     {
       "path": "skills/using-spec-first/evals/cases/direct-lane-simple-howto.yaml",

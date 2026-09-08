@@ -384,6 +384,8 @@ metadata blocks enrichment for repair. Whether a non-`active` source later
 enters execution remains the existing consumer's decision; this producer does
 not add an intake gate.
 
+当前用户明确要求补完非活跃历史计划时，按 `SKILL.md` Phase 0.1 核验并复用有效后继，或创建仅覆盖已确认剩余范围的新计划。旧计划原文、状态与旧 task-pack pins 保持不变；新计划正文记录历史来源、替代关系、当前证据和验收边界。只读审阅不触发新计划生产，历史完成声明不替代当前验证。
+
 HTML plans do not carry `status`. Likewise, knowledge-work,
 universal-planning, answer-seeking, and approach-plan outputs do not carry
 `status`; their own artifact shapes remain authoritative.

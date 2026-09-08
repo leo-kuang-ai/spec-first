@@ -1,0 +1,108 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "s4-host-cli-help-20260908",
+  "producer": "当前 Codex owner",
+  "reviewed_at": "2026-09-08T07:47:22.293Z",
+  "source_binding": {
+    "head": "b557f8bc6f884f0fef460108e6279b31227c50fb",
+    "dirty_path_manifest_sha256": "6f1e256d8ed37a020b40dc13dd5d54d1dee179d2c46b56e932f6308c59584db5",
+    "source_tree_hash": "c1eea35a239465f8439b6d38fab68c5150a580511d76df22aa7a8eb0cb01a68e",
+    "inventory_hash": "34ff47158f6923701242dd88f5fb8984949e7369e7b133e872eb6295579bd326",
+    "inventory_artifact_sha256": "62803d909a4d04379f35f9a1405e18e4f9f1315d48245ab091fd84408b4af417",
+    "review_input_hash": "5807218a62f16ccd3e31ebd8ef32b1da533003cb79fe010bd8e94e60fe3a002e"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "unverified",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "reviewed_paths": [
+    {
+      "path": "docs/contracts/verification/verification-run-summary.md",
+      "skill_ids": [
+        "spec-code-review",
+        "spec-debug"
+      ],
+      "sha256": "28eb18e949c7385909a6df2aedb8207e28322413864a4181c9cffa4866f1bf5d",
+      "bytes": 3158,
+      "line_count": 35,
+      "covered_line_ranges": [
+        [
+          1,
+          35
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "全文核对两个合同文档：help 明确输入/输出区别，示例保持 not-run，退出码不冒充 overall；日志扫描说明同步当前全文分块实现。源码帮助和消费测试由独立 reviewer 检查通过，原有权限与证据门保持。"
+          ],
+          "limitations": [
+            "双 lens 为当前 owner 内联审查维度，不是两个 provider；没有修复后宿主对照或效率验收。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "全文核对两个合同文档：help 明确输入/输出区别，示例保持 not-run，退出码不冒充 overall；日志扫描说明同步当前全文分块实现。源码帮助和消费测试由独立 reviewer 检查通过，原有权限与证据门保持。"
+          ],
+          "limitations": [
+            "双 lens 为当前 owner 内联审查维度，不是两个 provider；没有修复后宿主对照或效率验收。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "docs/contracts/workflows/honest-closeout.md",
+      "skill_ids": [
+        "spec-debug"
+      ],
+      "sha256": "bc067f6496d2911cb55337864303eb44b567e0f7d70eeba014f15472ac930aac",
+      "bytes": 2271,
+      "line_count": 24,
+      "covered_line_ranges": [
+        [
+          1,
+          24
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "全文核对两个合同文档：help 明确输入/输出区别，示例保持 not-run，退出码不冒充 overall；日志扫描说明同步当前全文分块实现。源码帮助和消费测试由独立 reviewer 检查通过，原有权限与证据门保持。"
+          ],
+          "limitations": [
+            "双 lens 为当前 owner 内联审查维度，不是两个 provider；没有修复后宿主对照或效率验收。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "全文核对两个合同文档：help 明确输入/输出区别，示例保持 not-run，退出码不冒充 overall；日志扫描说明同步当前全文分块实现。源码帮助和消费测试由独立 reviewer 检查通过，原有权限与证据门保持。"
+          ],
+          "limitations": [
+            "双 lens 为当前 owner 内联审查维度，不是两个 provider；没有修复后宿主对照或效率验收。"
+          ]
+        }
+      ]
+    }
+  ],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "两份合同文档差量收据，非独立多模型评测。"
+  ],
+  "claim_ceiling": "当前文档与实际 CLI 输入、验证结果和日志扫描边界一致。"
+}

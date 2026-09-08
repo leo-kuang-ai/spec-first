@@ -14,6 +14,33 @@ const engines = fs.readFileSync(
 );
 
 describe('spec-work current contracts', () => {
+  test('keeps mechanical review exceptions separate from evidence and lifecycle closeout', () => {
+    const entry = skill.slice(0, skill.indexOf('## Reference Trigger Map'));
+    expect(entry).toContain('跳过 simplify 或独立 review 不豁免证据收尾');
+    expect(entry).toContain('verification-run-summary');
+    expect(entry).toContain('honest-closeout');
+    expect(entry).toContain('plan-status complete');
+    expect(entry).toContain('不回写旧计划');
+    expect(skill).toContain('no-test exception 只说明无需自动测试的原因');
+    expect(skill).not.toContain('or a deliberate non-behavior exception');
+  });
+
+  test('returns authorized historical completion to the plan owner and repeats intake', () => {
+    expect(skill).toContain('当前用户已明确要求补完该历史计划');
+    expect(skill).toContain('重新执行完整 intake');
+    expect(skill).toContain('旧计划与旧 task-pack pins 不变');
+    const intake = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-work/references/work-intake-and-task-pack.md'), 'utf8');
+    expect(intake).toContain('旧 pins 不得重绑');
+    expect(intake).toContain('再从 intake 接续');
+    const validation = intake.slice(intake.indexOf('## Fallback'), intake.indexOf('## 2. Replay'));
+    expect(validation).toContain('执行第 1 节的 plan owner 接续分支');
+    expect(validation).toContain('task-pack-source-plan-non-active');
+    expect(validation).toContain('该交接不视为 validation 成功');
+    expect(validation).toContain('不从非法任务包猜测 source path');
+    const producer = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-write-tasks/SKILL.md'), 'utf8');
+    expect(producer).toContain('owner 返回有效后继后才');
+  });
+
   test('clarification answers resolve the question without another approval loop', () => {
     expect(skill).toContain('material ambiguity');
     expect(skill).toContain('Explicit clarification answers take effect directly');

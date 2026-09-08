@@ -38,6 +38,24 @@ function payload(root) {
 }
 
 describe('spec-handoff contracts', () => {
+  test('distinguishes orientation from explicitly authorized continuation', () => {
+    const skill = read('skills/spec-handoff/SKILL.md');
+    const evals = JSON.parse(read('skills/spec-handoff/evals/examples.json'));
+    expect(skill).toContain('当前用户明确要求继续完成指定任务');
+    expect(skill).toContain('source-plan-non-active');
+    expect(skill).toContain('核验目标仓库、当前 HEAD/dirty、任务范围、source refs 和已有完成证据');
+    expect(skill).not.toContain('Then **stop without acting** until the user chooses.');
+    expect(evals.cases.some((entry) => entry.id === 'explicit-resume-and-continue')).toBe(true);
+    expect(evals.cases.some((entry) => entry.id === 'continue-does-not-reopen-stale-plan')).toBe(true);
+    expect(skill).toContain('只读恢复遇到同类问题时仅报告问题和建议，不调用修订或执行 owner');
+    expect(skill).toContain('明确来源不可达时报告缺失，不把该路径降级为关键词搜索');
+    expect(evals.cases.find((entry) => entry.id === 'continue-unreachable-source').must_not)
+      .toContain('不得调用 discovery，也不得把指定路径转换为关键词搜索');
+    expect(evals.cases.find((entry) => entry.id === 'continue-stale-completion-and-dirty-tree').must_not)
+      .toContain('不能继承旧测试通过结论');
+    expect(evals.cases.find((entry) => entry.id === 'readonly-completed-plan').must_not)
+      .toContain('不能调用 spec-plan 修改状态');
+  });
   test('keeps creation, resume, and authority boundaries explicit', () => {
     const skill = read('skills/spec-handoff/SKILL.md');
     const contract = read('skills/spec-handoff/references/artifact-contract.md');

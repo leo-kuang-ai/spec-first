@@ -34,6 +34,19 @@ function sectionBetween(source, start, end) {
 }
 
 describe('spec-plan current contracts', () => {
+  test('continues historical plans through an evidence-scoped successor without resetting history', () => {
+    const resume = sectionBetween(skill, '#### 0.1 Resume', '#### 0.2');
+    expect(resume).toContain('当前用户明确要求补完');
+    expect(resume).toContain('仅审阅、解释或深化文档不触发');
+    expect(resume).toContain('保留旧计划原文、状态和旧 task-pack pins');
+    expect(resume).toContain('有明确来源关系的现有 active 后继计划');
+    expect(resume).toContain('来源缺失或后继范围存在实质冲突');
+    expect(resume).toContain('没有可复用后继且确认仍有未完成范围');
+    expect(resume).toContain('readiness 与审查流程');
+    expect(resume).toContain('若无剩余范围');
+    expect(sections).toContain('只读审阅不触发新计划生产');
+  });
+
   test('enriches requirements-only unified plans in place', () => {
     expect(skill).toContain('planning should enrich it in place');
     expect(skill).toContain('artifact_readiness: implementation-ready');

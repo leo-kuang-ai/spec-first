@@ -41,7 +41,7 @@ sources:
 
 1. `skills/spec-code-review/SKILL.md:348`：trivial-PR 预判明确把 "dependency lock-file or manifest-only bumps" 列为可跳过 review 的候选。
 2. `skills/spec-work/references/shipping-workflow.md:62,72`：dependency-version bumps 被列为 mechanical diff，可跳过 simplify 与 dedicated review。
-3. `vendor/` 目录不存在，但 `AGENTS.md:158` 仍引用 "`vendor/`：vendored parser dependencies"。
+3. `vendor/` 目录不存在，但 `AGENTS.md:164` 仍引用 "`vendor/`：vendored parser dependencies"（2026-09-07 时为 158 行，S3 候选落地后行号漂移；实施时以文本检索定位，不依赖行号）。
 4. `.github/workflows/` 现有 4 条 workflow，均未接入 `check:shared-references` / `sync:instructions` 校验；`npm test` 全量仅在 windows runner 执行。
 
 **第二轮原核实记录**：会议记录称对 6 项关键引用做了回源。当前 §3.2 已按本轮复核修正由这些引用推导出的结论；引用存在不等于原推论成立，实施仍以 owning source 为准。
@@ -186,7 +186,7 @@ P0 是可单独承接的小项，不再包括默认指令瘦身（P0-4 已按其
 
 | 编号 | SDLC 判断与试点范围 | 消费者、验证与停止条件 |
 | --- | --- | --- |
-| G1（原 P0-4） | 风险驱动的指令消融。先由 S2 保存当前指令、引用、模型和任务身份，并采集修改前基线；S3 在候选快照内对具体冗余教学做删减，保留权限、验证、source/runtime、handoff 与知识边界。**S2 基线保存时须按权限、验证、source/runtime、handoff、知识五类边界建立受保护指令片段清单；候选快照必须通过确定性 diff 检查（受保护片段逐字保留）方可进入行为比较，不允许以语义自觉替代该校验** | S3 source owner 与 S4 实验 owner 消费。分别看结构、行为、成本、现场结果；反例场景覆盖任务正确性、路由、未授权副作用、虚假完成，以及 source/runtime 边界（误改 generated runtime mirror）与 handoff 边界（跨上下文 artifact 缺摘要/source refs）两类边界回归——前四类探不出边界指令被误删，边界回归由确定性 diff 与专用反例共同拦截。以主计划既有准入、阈值和预算判定；退化则恢复对应候选片段。只有同条件结果支持时才调整默认加载，不能用 Sonnet 5 的旧五任务结果代替 Astra/其他宿主验证。**有界兜底**：若 S2 在 90 天内未启动或付费授权持续不可得，允许按原饱和实验模式做一次预注册、限额（≤$50）的独立复现；其结果仅作候选证据，不替代主计划比较，不据此单独调整默认加载 |
+| G1（原 P0-4） | 风险驱动的指令消融。先由 S2 保存当前指令、引用、模型和任务身份，并采集修改前基线；S3 在候选快照内对具体冗余教学做删减，保留权限、验证、source/runtime、handoff 与知识边界。**S2 基线保存时须按权限、验证、source/runtime、handoff、知识五类边界建立受保护指令片段清单；候选快照必须通过确定性 diff 检查（受保护片段逐字保留）方可进入行为比较，不允许以语义自觉替代该校验** | S3 source owner 与 S4 实验 owner 消费。分别看结构、行为、成本、现场结果；反例场景覆盖任务正确性、路由、未授权副作用、虚假完成，以及 source/runtime 边界（误改 generated runtime mirror）与 handoff 边界（跨上下文 artifact 缺摘要/source refs）两类边界回归——前四类探不出边界指令被误删，边界回归由确定性 diff 与专用反例共同拦截。以主计划既有准入、阈值和预算判定；退化则恢复对应候选片段。只有同条件结果支持时才调整默认加载，不能用 Sonnet 5 的旧五任务结果代替 Astra/其他宿主验证。**有界兜底**：若 S2 在 90 天内未启动或付费授权持续不可得，允许按原饱和实验模式做一次预注册、限额（≤$50）的独立复现；其结果仅作候选证据，不替代主计划比较，不据此单独调整默认加载。**2026-09-08 状态注记**：主计划 S2 替代模型（GLM-5.3）基线已采集（两比较对 admit+A/A+allow-ab、135 cells，仅替代模型范围，Astra 未验证），S3 goal 修订候选已落地（AGENTS.md/CLAUDE.md 净 +6 行「任务授权与完成责任」，属补强非消融）——G1 消融的基线前提在替代模型范围已就绪，启动前仅须核对该基线是否覆盖五类受保护边界片段清单，未覆盖则补登记；有界兜底仅在替代模型范围亦停滞时适用 |
 | G2 | 首期限定“独立且可定位的上游 requirements 文档”。试验 `origin_body_hash` advisory；由确定性工具读取约定正文区域并算 hash，LLM 判断变化是否影响规划。统一原地文档与无 origin 的直接规划不强加该字段 | spec-plan/work intake 消费。在试点前明确正文提取、编码/换行规则与刷新 owner；覆盖不变、正文变更、元数据变化、文件丢失和旧 plan 无 hash。漂移只给事实，不自动作废或更新 hash。若要覆盖统一文档，另评估 Product Contract 区域快照；不能通过整篇自引用 hash 制造每次 planning 更新都漂移。**停止条件**：试点窗口内找不到活的 plan↔独立上游链、或未发生一次真实 drift 判断影响 planning 决策，即停止并保留一次性结论；首批可用的活链为 `docs/plans/2026-09-03-001`（R3 需求）与其首个下游 plan（当前近两月新计划中仅此一处 origin 指向仍存在的独立需求文档，其余 origin 多指向已删除目录） |
 | G7 | 将“验收可测性 lint”缩为显式引用完整性试点。脚本只解析已声明的 check/AE/source 引用并报告缺失或悬空，不用关键词判定任意自然语言句子是否可测 | 一个 workflow 的文档 reviewer 消费。先用真实验收条款人工回源对照误报与遗漏；可测性仍由 reviewer 判断。若只产生格式告警、不改变验收决策，停止建设；不强制所有 prose 加机器标记 |
 | G8 | 一次性知识引用体检：用结构化 frontmatter parser 读 source_refs，区分仓内路径、版本引用、URL 和无法解析项；文件消失只标引用异常，文件存在也不证明知识有效 | `spec-compound-refresh` owner 消费报告，对真实被消费的知识优先语义复核。分母列出可检查引用与排除项，不把无 source_refs 当零失效。盘点前声明样本与判定口径；只在发现反复影响任务的悬空引用且误报可控时考虑常态化，否则保留一次性结果 |
@@ -241,7 +241,7 @@ P0 是可单独承接的小项，不再包括默认指令瘦身（P0-4 已按其
 
 **采纳顺序按证据加权**：主计划 owner 分诊 16 项 P1 时，按 §1.2 的证据等级排序——结构缺口 + 直接缩短等待项优先（B1、A1、F1、F4、G3、G13、C1、D1），理论适配项（B4、A2、C2、C3、G4）可随批顺延而不阻塞前者；容量受限时收缩理论适配项，不为凑齐批次整包接受。
 
-**重估触发**：主计划对应 S 窗口关闭，或本方案定稿后超过 90 天仍无任何候选被启动采纳时，由文档 owner 重新基线化候选清单并记录决定（继续采纳、收缩或作废），不静默搁置——16 项 P1 与 5 项 P2 的价值全部依赖主计划队列被执行，主计划 WIP 上限为 2 且窗口已排有 12 个 OPT 与 33 个 F 映射，无重估触发的等待即静默腐烂。
+**重估触发**：主计划对应 S 窗口关闭，或本方案定稿后超过 90 天仍无任何候选被启动采纳时，由文档 owner 重新基线化候选清单并记录决定（继续采纳、收缩或作废），不静默搁置——16 项 P1 与 5 项 P2 的价值全部依赖主计划队列被执行，主计划 WIP 上限为 2 且窗口已排有 12 个 OPT 与 33 个 F 映射，无重估触发的等待即静默腐烂。90 天时钟基点为本文定稿（2026-09-07）；2026-09-08 主计划已在执行（S1 路由测量器修复完成、S2 替代模型基线已采集、S3 goal 修订候选已落地、S4 替代模型内部对照已记录，主宿主旅程未执行），窗口推进中，重估条件未被触发。
 
 方案中的最小验证描述供实施 owner 选用；正式接受的要求只在主计划或其有来源关系的实施输入维护一次。本轮未修改主计划，未建立第二套关闭条件。
 
@@ -272,6 +272,8 @@ source 变更落在 `skills/`、`templates/`、`src/cli/`、contracts 或指定�
 **第三轮评审修订已执行**（2026-09-07，`revised` 日期）：6 个独立只读 reviewer agent（coherence、feasibility、product-lens、security-lens、scope-guardian、adversarial）对本文做多视角评审，18 项发现（0 项 P0 阻断、8 项 P1、5 项 P2、5 项 FYI）全部附行级引证并回源核对——**方案对代码库的全部具体声称（trivial-PR 免审文案、vendor/ 失效引用、4 条 workflow 现状、init -y、schema 字段现状、S3.2/S3.3 归属）经 feasibility reviewer 逐项核实属实，无一被推翻**。本轮修订按其结论执行：G1 价值定位与承接顺序语义（结论先行、§4 导言）、净过程账与证据等级（§1.2）、B1 提前修复通道（§4.2/§4.5）、B2 轮换处置与工具决定（§4.2）、外发边界并入隔离执行通道并标注未硬强制（§4.2 边界段）、G1 五类边界清单+确定性 diff 校验+90 天有界兜底（§4.3）、G2 停止条件与活链（§4.3）、D3/D4 触发信号面（§4.4）、A2 入冻结清单与净方向约束（§4.5）、A1 披露/证据加权/90 天重估触发（§6）、F1 提前（§4.2/§4.5/§7）、论题观测锚点与本记录（§8）、谱系算术与 P0 编号空洞说明（§4）、会议记录措辞消歧（§9）。cross-model 外部模型评审因准入门槛（无 journey receipt 与外部 provider 授权）未运行，不声称独立跨模型覆盖。
 
 **两轮均未执行**：未修改产品代码、skill、schema、CI 或 generated runtime，未运行产品测试、模型行为评测、依赖扫描、知识盘点、现场试验或 runtime 投射。G1/G2/G7/G8/G9 仍是未执行试点，任何假设、字段或检查都未因此成为当前运行时能力。
+
+**2026-09-08 第四轮代码核对**（结合 HEAD `b557f8bc`，评审后出现 5 个新提交且工作树已清洁）：方案全部代码声称逐项重验——**仍成立**：B1 双锚点（`spec-code-review/SKILL.md:348`、`shipping-workflow.md:62,72` 行号精确）、vendor/ 不存在、4 条 workflow 均无 shared-references/instructions 接入且 `npm test` 全量仅 windows runner、CI 无 routing job、`init -y/--yes` 仍在（解析移至 `init-args.js`）、run summary 仍只有 `generated_at`、field-validation schema 未变且无 description 字段、session-store 无 stop_if/重路由事件、spec-plan 的 supersede 责任缺口未被后续 SKILL.md 修订触及、R3 22 用例与 codex hook 2500ms、G2 活链、B2 扫描器空前提、饱和报告数字（+51%/+59%、45 次运行）、WIP 2、12 OPT + 33 F 计数精确。**漂移已修**：AGENTS.md vendor 引用行号 158→164（S3 候选落地所致，§1 已更新）。**前提变化已注记**（§4.3 G1、§6）：主计划于 2026-09-08 大幅推进（S1 完成、S2 替代模型基线采集、S3 goal 修订候选落地、S4 替代模型内部对照记录），其中 S3 落地为指令**净增** +6 行（补强授权边界，非消融），与 §1.2 净膨胀判断的方向一致；G1 的消融删减仍未执行，36166 行指令警告仍在。本轮核对未修改产品代码，仅更新本文三处状态注记与本记录。
 
 **后续验证归属**：确定性检查证明来源、结构和工具结果；fresh-source 行为验证检查候选是否保留授权与完成边界；S4 才评估真实任务的质量、成本与返工。引用 `docs/solutions/workflow-issues/skill-prose-rewrite-contract-test-coverage-2026-06-28.md` 的限制：源码字符串检查通过不等于新行为已验证。没有可强制的 primitive 时，相关约定必须明确标为未硬强制。
 
