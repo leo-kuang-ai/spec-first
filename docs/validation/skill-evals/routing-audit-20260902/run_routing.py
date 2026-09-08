@@ -183,6 +183,69 @@ def run_one(engine, case, rep, claude_model=None, raw_dir="raw"):
             "attempts": attempts, "raw_path": raw_path, "evidence_errors": evidence_errors}
 
 
+def validate_record_evidence(record, expected):
+    answer_statuses = ("correct", "wrong-answer")
+    retry_statuses = ("parse-error", "empty-output")
+    engine_statuses = ("engine-error", "api-error", "timeout")
+    status = record.get("status")
+
+    def reject(reason):
+        raise ValueError(f"invalid-result-evidence: {reason}")
+
+    if status not in answer_statuses + retry_statuses + engine_statuses + ("harness-error", "not-run"):
+        reject("unknown status")
+    if (record.get("expected") != expected or record.get("ok") is not (status == "correct")
+            or record.get("env_error") is not (status in engine_statuses + ("harness-error",))):
+        reject("inconsistent result flags or expected answer")
+    if status not in answer_statuses and record.get("got") != "[unparsed]":
+        reject("non-answer result carries an answer")
+    if record.get("evidence_errors") and status != "harness-error":
+        reject("evidence write failure requires harness-error")
+    attempts = record.get("attempts")
+    # 执行器异常可能无法知道尝试数；未知不能转换为未执行或成功。
+    if attempts is None and "attempts" in record and status == "harness-error":
+        return
+    if not isinstance(attempts, list):
+        reject("missing attempts")
+    if status == "not-run":
+        if attempts:
+            reject("not-run has attempts")
+        return
+    if not 1 <= len(attempts) <= 2:
+        reject("invalid attempt count")
+    for number, attempt in enumerate(attempts, 1):
+        if not isinstance(attempt, dict):
+            reject("invalid attempt")
+        attempt_status, rc, got = attempt.get("status"), attempt.get("exit_code"), attempt.get("got")
+        if type(attempt.get("attempt")) is not int or attempt["attempt"] != number:
+            reject("invalid attempt sequence")
+        if "exit_code" not in attempt or (rc is not None and type(rc) is not int):
+            reject("invalid exit code")
+        if attempt_status in answer_statuses + retry_statuses:
+            if rc != 0:
+                reject("completed attempt has no successful exit")
+        elif attempt_status in engine_statuses:
+            if (attempt_status == "timeout" and rc != -1
+                    or attempt_status == "engine-error" and rc == 0
+                    or attempt_status == "api-error" and rc is None):
+                reject("inconsistent engine failure")
+        else:
+            reject("unknown attempt status")
+        if attempt_status in answer_statuses:
+            if (not isinstance(got, str) or not re.fullmatch(r"spec-[a-z0-9-]+|direct", got)
+                    or (got == expected) != (attempt_status == "correct")):
+                reject("inconsistent attempt answer")
+        elif got != "[unparsed]":
+            reject("failed attempt carries an answer")
+        if number < len(attempts) and attempt_status not in retry_statuses:
+            reject("retry after terminal attempt")
+    if status == "harness-error":
+        if not record.get("evidence_errors"):
+            reject("attempts require evidence failure for harness-error")
+    elif status != attempts[-1]["status"] or record.get("got") != attempts[-1]["got"]:
+        reject("final result differs from last attempt")
+
+
 def summarize_records(records, cases, reps):
     if any(r.get("schema_version") not in (None, SCHEMA_VERSION) for r in records):
         raise ValueError("unsupported-result-schema")
@@ -202,6 +265,7 @@ def summarize_records(records, cases, reps):
         if identity in identities or len(engines) != 1:
             raise ValueError("invalid-result-identity: duplicate task or mixed engines")
         identities.add(identity)
+        validate_record_evidence(record, case_index[case_id]["expected"])
     legacy_n = len(records) - len(modern)
     attempts_known = not legacy_n and all(isinstance(r.get("attempts"), list) for r in modern)
     valid = [r for r in records if not r.get("env_error") and r.get("status") != "not-run"]

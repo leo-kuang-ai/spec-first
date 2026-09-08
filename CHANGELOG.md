@@ -2,6 +2,8 @@
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
 
+- v1.15.3 2026-09-08 11:17:20 tester: fix(eval): 修复分支审查三项问题：v2 路由结果汇总拒绝缺失或矛盾的 attempt、退出码与成功标记，保留未知尝试和旧记录兼容；新增 14 项先红后绿反例与 2 项降级兼容回归；将 S1/S2/S3/S4 的 15 份最小历史证据保存至版本控制范围并改正计划引用，对齐 S4 内部对照与未执行的主宿主旅程。保留 E33 未运行、候选机械统计差异及 S4 A/A 重复评分限制，不新增模型行为或收益声明；未修改 generated runtime。 (user-visible)
+
 - v1.15.3 2026-09-08 11:05:00 tester: fix(helpers): 修复 S4 对照独立发现并经 pin 测试固化的两处真实缺陷——markdown-frontmatter 在模块入口消费前导 UTF-8 BOM（此前 BOM 文件 frontmatter 被静默当作正文，两条 pin 测试按作者决定翻转为剥离语义）；session-store registerSession 改用 writeFileAtomicIfAbsent 原子创建并在 EEXIST 时返回 session-already-registered（关闭 check-then-write 并发覆盖窗口，新增强制 existsSync 失效的回归测试）。错误码混叠与 heartbeat 重校验僵化两项涉及公共 reason_code 合同，保留 pin 待作者决策。CE localization 三套件 5 例失败经 stash 验证为本会话之前已存在，与本批无关。 (user-visible)
 - v1.15.3 2026-09-08 10:40:00 tester: fix(skills): 落地后独立代码审查修复——spec-work 摘要行的 headless 自动接受残留（P1，与 shipping-workflow 修订直接矛盾，会重新引入被消除的不安全行为）、spec-plan STOP 段落对已删除强制菜单的失效模式描述（P2）、Completion Contract 标题更名与 note 位置措辞（P3）、spec-debug 悬空的 described above 工具引用（P3）；新增两条回归 pin（residual 摘要不得再现 auto-accept、plan 完成合同保持 scope-based 且无 Mandatory 标题）。issue-creation 的宿主示例按审查判定保留（有通用回退，非硬绑定）。68+151 项测试、typecheck、入口 lint、instructions 同步全部通过。
 - v1.15.3 2026-09-08 10:05:00 tester: test(repo): 收编 S4 受限内部对照经双盲评审认可的真实修复与测试副产物——README.en.md 补齐 npm monthly downloads 徽章与 Documentation 缺失的 Project Role Contract 链接（三变体徽章/标题一致，验收脚本绿）；spec-sweep plan-template 的 <permalink> 链接占位符改为纯文本 PERMALINK_PLACEHOLDER；新增 4 个单测套件（markdown-frontmatter 56 例、session-store 38 例、supported-host-flags 11 例、active-docs-links 链接守护），共 110 例全过，pin 住三处真实待修缺陷（frontmatter BOM 处理、session-store 错误码混叠、heartbeat 重校验僵化）不改实现。副产物来源、评审与选择记录见 s4-byproducts-picked.json。 (user-visible)

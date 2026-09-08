@@ -308,6 +308,66 @@ with tempfile.TemporaryDirectory() as root:
     expect(result.error).toMatch(/^invalid-result-identity:/);
   });
 
+  test.each([
+    'empty-attempts', 'missing-attempts', 'failed-exit', 'failed-attempt',
+    'wrong-answer', 'wrong-expected', 'wrong-ok', 'wrong-env', 'unknown-status',
+    'wrong-final', 'missing-exit', 'boolean-exit', 'evidence-error', 'attempt-number',
+  ])('v2 汇总拒绝矛盾记录：%s', (invalid) => {
+    const result = probe(String.raw`
+with tempfile.TemporaryDirectory() as root:
+    m.OUT = root
+    with patch.object(m, 'call_engine', return_value=('ENTRY: spec-debug\nREASON: fixture', 1, 0)):
+        record = m.run_one('claude', m.CASES[0], 1)
+    invalid = '${invalid}'
+    if invalid == 'empty-attempts': record['attempts'] = []
+    elif invalid == 'missing-attempts': del record['attempts']
+    elif invalid == 'failed-exit': record['attempts'][0]['exit_code'] = 1
+    elif invalid == 'failed-attempt': record['attempts'][0].update(status='engine-error', exit_code=1, got='[unparsed]')
+    elif invalid == 'wrong-answer': record['attempts'][0]['got'] = 'spec-plan'
+    elif invalid == 'wrong-expected': record['expected'] = 'spec-plan'
+    elif invalid == 'wrong-ok': record['ok'] = False
+    elif invalid == 'wrong-env': record['env_error'] = True
+    elif invalid == 'unknown-status': record['status'] = 'future-success'
+    elif invalid == 'wrong-final': record['got'] = 'spec-plan'
+    elif invalid == 'missing-exit': del record['attempts'][0]['exit_code']
+    elif invalid == 'boolean-exit': record['attempts'][0]['exit_code'] = False
+    elif invalid == 'evidence-error': record['evidence_errors'] = [{'error': 'OSError'}]
+    elif invalid == 'attempt-number': record['attempts'][0]['attempt'] = 2
+    try:
+        print(json.dumps({'summary': m.summarize_records([record], [m.CASES[0]], 1)}))
+    except ValueError as exc:
+        print(json.dumps({'error': str(exc)}))
+`);
+    expect(result.error).toMatch(/^invalid-result-evidence:/);
+  });
+
+  test.each(['not-run', 'harness-error'])('无尝试的 %s 保持非成功且可汇总', (status) => {
+    const result = probe(String.raw`
+case = m.CASES[0]
+record = {'schema_version': m.SCHEMA_VERSION, 'engine': 'claude', 'case': case['id'],
+          'rep': 1, 'expected': case['expected'], 'got': '[unparsed]', 'status': '${status}',
+          'ok': False, 'env_error': '${status}' == 'harness-error',
+          'attempts': None if '${status}' == 'harness-error' else [], 'dur_s': None}
+print(json.dumps(m.summarize_records([record], [case], 1)))
+`);
+    expect(result).toMatchObject({ correct_n: 0, answer_n: 0, task_success_rate: 0, answer_accuracy: null });
+    expect(result.attempted_n).toBe(status === 'not-run' ? 0 : null);
+  });
+
+  test.each([
+    [[{ out: wrong }], 'wrong-answer', 0],
+    [[{ out: correct, rc: 1 }], 'engine-error', 0],
+    [[{ out: '429 Too Many Requests' }], 'api-error', 0],
+    [[{ out: '[TIMEOUT]', rc: -1 }], 'timeout', 0],
+    [[{ out: '' }, { out: '' }], 'empty-output', 0],
+    [[{ out: 'incomplete' }, { out: correct }], 'correct', 1],
+  ])('writer 生成的 %j 记录可通过 reader 校验', (responses, status, rate) => {
+    const result = replay(responses, { main: true });
+    expect(result.error).toBeUndefined();
+    expect(result.reports[0].records[0].status).toBe(status);
+    expect(result.reports[0].summary.claude.task_success_rate).toBe(rate);
+  });
+
   test('repeated runs do not overwrite historical reports or earlier attempts', () => {
     const result = probe(String.raw`
 with tempfile.TemporaryDirectory() as root:

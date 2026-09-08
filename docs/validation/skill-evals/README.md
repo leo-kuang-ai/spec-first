@@ -75,6 +75,9 @@
 | 旧 writer → `summarize_records` | 保留旧观察口径并标 `legacy-unverified`；不补造退出码、attempt、新口径准确率或费用；缺字段不会让汇总崩溃 |
 | 未知 schema → `summarize_records` | 显式拒绝 `unsupported-result-schema`，不将其当作兼容旧数据 |
 | v2 异常身份 → `summarize_records` | 单引擎汇总拒绝重复 case/rep、计划外 case/rep 与混合引擎，返回 `invalid-result-identity`；不以截断比例掩盖错误分母 |
+| v2 矛盾证据 → `summarize_records` | 校验 expected、状态、ok/env_error、attempt 顺序、退出码及最终答案一致性；缺失或矛盾记录返回 `invalid-result-evidence`，不自动修正为成功。not-run 保留空 attempts，未知尝试数仅允许明确的 harness-error + attempts:null；旧记录仍按 legacy-unverified 处理 |
+
+该变更收紧 v2 reader 的有效性校验，不改变 writer/schema 版本或旧记录口径；校验只证明记录内部一致性，不证明原始证据真实性。下一阶段的历史校准与受限模型结果见[最小证据包](next-phase-20260908/README.md)。
 
 无模型回归入口：`npx --no-install jest tests/unit/routing-eval-runner.test.js --runInBand`。测试使用替身引擎与临时文件，检查失败分类、重试记录、分母、最终消息读取和历史数据保护；通过仅证明本地测量行为，不证明真实模型路由或产品收益。
 
