@@ -3,7 +3,7 @@
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
-const { writeFileAtomic } = require('../atomic-write');
+const { writeFileAtomic, writeFileAtomicIfAbsent } = require('../atomic-write');
 const { validateAgainstSchema } = require('../../contracts/schema-validator');
 const { isExactRepoRelativePath } = require('./secret-deny-patterns');
 
@@ -204,8 +204,11 @@ function registerSession(repoRoot, options = {}) {
   }
   try {
     ensureSessionDir(repoRoot);
-    writeFileAtomic(filePath, `${JSON.stringify(record, null, 2)}\n`);
+    writeFileAtomicIfAbsent(filePath, `${JSON.stringify(record, null, 2)}\n`);
   } catch (error) {
+    if (error.code === 'EEXIST') {
+      return { ok: false, reason_code: 'session-already-registered', session_id: sessionId, path: filePath };
+    }
     return { ok: false, reason_code: 'session-path-escape', session_id: sessionId, errors: [error.message] };
   }
   return { ok: true, session_id: sessionId, path: filePath, record };

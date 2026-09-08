@@ -458,3 +458,23 @@ describe('validateAdvisoryFields', () => {
     });
   });
 });
+
+
+  test('register does not overwrite when the existence check misses a concurrent write (EEXIST path)', () => {
+    const repoRoot = makeRepoRoot();
+    const first = registerSession(repoRoot, { session_id: 'sess-race' });
+    expect(first.ok).toBe(true);
+    const before = fs.readFileSync(first.path, 'utf8');
+    // Force the pre-check to miss the file, simulating a concurrent registrant
+    // winning the check-then-write window.
+    const realExistsSync = fs.existsSync;
+    jest.spyOn(fs, 'existsSync').mockImplementation((p) => (p === first.path ? false : realExistsSync(p)));
+    try {
+      const second = registerSession(repoRoot, { session_id: 'sess-race' });
+      expect(second.ok).toBe(false);
+      expect(second.reason_code).toBe('session-already-registered');
+    } finally {
+      jest.restoreAllMocks();
+    }
+    expect(fs.readFileSync(first.path, 'utf8')).toBe(before);
+  });

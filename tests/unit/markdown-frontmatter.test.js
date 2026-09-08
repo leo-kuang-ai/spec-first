@@ -85,19 +85,16 @@ describe('markdown-frontmatter splitMarkdownFrontmatter', () => {
     });
   });
 
-  // TODO(module-author): confirm intended behavior. A UTF-8 BOM in front of the
-  // opening --- makes the document parse as frontmatter-less (the BOM bytes stay
-  // in the body), so BOM-saved Markdown files silently lose their frontmatter.
-  // This test pins current behavior; flip the expectations if BOM stripping is
-  // added.
-  test('keeps a BOM-prefixed document as body instead of detecting frontmatter', () => {
+  // A leading UTF-8 BOM is consumed at module entry so BOM-saved Markdown
+  // files keep their frontmatter; callers hand us raw utf8 reads.
+  test('strips a leading BOM and still detects frontmatter', () => {
     const source = '\uFEFF---\nname: sample\n---\nBody';
     const result = splitMarkdownFrontmatter(source);
 
-    expect(result.removedFrontmatter).toBe(false);
+    expect(result.removedFrontmatter).toBe(true);
     expect(result.error).toBeNull();
-    expect(result.frontmatter).toBe('');
-    expect(result.body.startsWith('\uFEFF---')).toBe(true);
+    expect(result.frontmatter).toBe('name: sample');
+    expect(result.body).toBe('Body');
   });
 });
 
@@ -185,14 +182,12 @@ describe('markdown-frontmatter inspectMarkdownFrontmatter', () => {
     expect(result.removedFrontmatter).toBe(false);
   });
 
-  // TODO(module-author): confirm intended behavior, matching the BOM note on
-  // splitMarkdownFrontmatter above.
-  test('treats a BOM-prefixed document as frontmatter-less', () => {
+  test('strips a leading BOM and still detects frontmatter (inspect)', () => {
     const result = inspectMarkdownFrontmatter('\uFEFF---\nname: sample\n---\nBody');
 
-    expect(result.removedFrontmatter).toBe(false);
-    expect(result.frontmatter).toBe('');
-    expect(result.occurrences).toEqual([]);
+    expect(result.removedFrontmatter).toBe(true);
+    expect(result.frontmatter).toContain('name: sample');
+    expect(result.occurrences.length).toBe(1);
     expect(result.error).toBeNull();
   });
 });
