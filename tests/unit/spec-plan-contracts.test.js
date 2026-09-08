@@ -207,3 +207,10 @@ describe('spec-plan current contracts', () => {
     expect(handoff).toContain('**Open in browser**');
   });
 });
+
+test('completion contract stays scope-based: no mandatory menu completion, no stale heading', () => {
+  const skillText = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-plan/SKILL.md'), 'utf8');
+  expect(skillText).not.toContain('Mandatory Completion Contract');
+  expect(skillText).toContain('the menu is not a completion requirement');
+  expect(skillText).not.toMatch(/renders the post-generation menu, captures the user's selection/);
+});

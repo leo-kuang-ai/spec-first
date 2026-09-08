@@ -389,4 +389,4 @@ Most bugs are localized mechanical fixes (typo, missed null check, missing impor
 - **Offer neutrally** when the lesson can be stated in one sentence — e.g., "X.foo() returns T | undefined when Y, not just T", or "the diagnostic path was non-obvious and worth recording." If you cannot articulate the lesson, skip rather than offer.
 - **Lean into the offer** when the pattern appears in 3+ locations OR the root cause reveals a wrong assumption about a shared dependency, framework, or convention that other code is likely to repeat.
 
-When offering, use the blocking question tool described above. If the user accepts, run `spec-compound`. Commit and push the resulting learning only when the same commit and landing authorization still covers that additional durable artifact; otherwise leave it as a verified local follow-up and say so.
+When offering, use an available blocking question tool, or ask in chat if none exists. If the user accepts, run `spec-compound`. Commit and push the resulting learning only when the same commit and landing authorization still covers that additional durable artifact; otherwise leave it as a verified local follow-up and say so.

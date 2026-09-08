@@ -158,3 +158,11 @@ describe('spec-work structured shipping and shared verification contracts', () =
     ]));
   });
 });
+
+test('SKILL.md residual-gate summary stays aligned with no-auto-accept shipping rule', () => {
+  const skill = read('skills/spec-work/SKILL.md');
+  const summary = skill.split('\n').find((line) => line.includes('**Residual Work Gate**')) || '';
+  expect(summary).not.toMatch(/auto-accept(?!s risk)/i);
+  expect(summary).toMatch(/never auto-accepts risk/);
+  expect(read('skills/spec-work/references/shipping-workflow.md')).toContain('Headless mode does not authorize risk acceptance');
+});
