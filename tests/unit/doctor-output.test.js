@@ -12,6 +12,10 @@ function createReport({
   hostSupport = {},
   selectionMode = 'auto',
   hasError = false,
+  decisionInputHealth,
+  decisionInputHealthBasis,
+  workflowRunnability,
+  workflowRunnabilityBasis,
 } = {}) {
   const resolvedPlatformChecks = Object.fromEntries(
     platforms.map((platform) => [platform, platformChecks[platform] || []]),
@@ -30,6 +34,10 @@ function createReport({
     checks,
     warnings: checks.filter((check) => check.level === 'WARNING'),
     has_error: hasError,
+    decision_input_health: decisionInputHealth,
+    decision_input_health_basis: decisionInputHealthBasis,
+    workflow_runnability: workflowRunnability,
+    workflow_runnability_basis: workflowRunnabilityBasis,
   };
 }
 
@@ -72,7 +80,7 @@ describe('doctor human-readable output', () => {
     expect(output).not.toContain('.codex: ready');
   });
 
-  test('attributes actionable warnings to the affected host and preserves the safe fix', () => {
+  test('labels a producer-declared safe fix as a repair suggestion', () => {
     const output = formatDoctorHumanReport(createReport({
       platformChecks: {
         claude: [{ level: 'PASS', name: '.claude', message: 'ready' }],
@@ -80,7 +88,8 @@ describe('doctor human-readable output', () => {
           level: 'WARNING',
           name: 'Codex hook',
           message: 'duplicate hook',
-          fix: 'Run `spec-first clean --codex`.',
+          fixSafety: 'safe',
+          fix: 'Run `codex --version`.',
         }],
       },
     })).join('\n');
@@ -88,7 +97,7 @@ describe('doctor human-readable output', () => {
     expect(output).toContain('诊断结果：可用，但需处理');
     expect(output).toContain('CODEX：需处理');
     expect(output).toContain('[CODEX] Codex hook: duplicate hook');
-    expect(output).toContain('修复：Run `spec-first clean --codex`.');
+    expect(output).toContain('修复：Run `codex --version`.');
     expect(output).not.toContain('.claude: ready');
   });
 
@@ -107,6 +116,7 @@ describe('doctor human-readable output', () => {
           message: 'not found on PATH',
           reasonCode: 'cursor_cli_not_found',
           disposition: 'optional',
+          fixSafety: 'safe',
           fix: 'Install Cursor CLI and restart your shell.',
         }],
         qoder: [{
@@ -149,6 +159,7 @@ describe('doctor human-readable output', () => {
           message: 'not found on PATH',
           reasonCode: 'cursor_cli_not_found',
           disposition: 'optional',
+          fixSafety: 'safe',
           fix: 'Install Cursor CLI and restart your shell.',
         }],
       },
@@ -160,7 +171,7 @@ describe('doctor human-readable output', () => {
     expect(output).toContain('修复：Install Cursor CLI and restart your shell.');
   });
 
-  test('attributes errors to the affected host and preserves the safe fix', () => {
+  test('keeps an unsafe error fix under the manual handling boundary', () => {
     const output = formatDoctorHumanReport(createReport({
       platformChecks: {
         claude: [{ level: 'PASS', name: '.claude', message: 'ready' }],
@@ -176,7 +187,8 @@ describe('doctor human-readable output', () => {
     expect(output).toContain('诊断结果：不可用');
     expect(output).toContain('CODEX：有问题');
     expect(output).toContain('[CODEX] Codex runtime: managed file missing');
-    expect(output).toContain('修复：Run `spec-first init --codex`.');
+    expect(output).toContain('需要人工处理：Run `spec-first init --codex`.');
+    expect(output).toContain('producer 未声明该建议可安全自动执行');
     expect(output).not.toContain('.claude: ready');
   });
 
@@ -208,5 +220,18 @@ describe('doctor human-readable output', () => {
     expect(output).toContain('详细检查：');
     expect(output).toContain('PASS    .claude: ready');
     expect(output).toContain('WARNING Codex hook: duplicate hook');
+  });
+
+  test('shows workflow and decision evidence dimensions in verbose mode', () => {
+    const output = formatDoctorHumanReport(createReport({
+      decisionInputHealth: 'missing',
+      decisionInputHealthBasis: { reason_code: 'setup-facts-host-mismatch' },
+      workflowRunnability: 'simulated',
+      workflowRunnabilityBasis: { fallback_reason: 'verification_evidence_missing' },
+    }), { verbose: true }).join('\n');
+
+    expect(output).toContain('证据维度：');
+    expect(output).toContain('decision_input_health: missing (reason=setup-facts-host-mismatch)');
+    expect(output).toContain('workflow_runnability: simulated (reason=verification_evidence_missing)');
   });
 });

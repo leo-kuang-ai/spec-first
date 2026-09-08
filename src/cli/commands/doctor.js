@@ -53,14 +53,17 @@ function runDoctor(argv) {
   }
 
   if (platforms.length === 0) {
+    const report = buildDoctorReport({ projectRoot, platforms, selectionMode });
     if (parsed.json) {
-      printDoctorJson(buildDoctorReport({ projectRoot, platforms, selectionMode }));
-      return 0;
+      printDoctorJson(report);
+      return report.has_error ? 3 : 0;
     }
 
-    console.log('No spec-first platform detected in this project.');
-    console.log('Run `spec-first init` and select Claude Code, Codex, Cursor, Kiro, Qoder, and/or OpenCode when prompted to initialize.');
-    return 0;
+    printDoctorHumanReport(report, { verbose: parsed.verbose });
+    console.log('');
+    console.log('未检测到宿主。');
+    console.log('运行 `spec-first init`，并在交互提示中选择 Claude Code、Codex、Cursor、Kiro、Qoder、OpenCode、ZCode 和/或 Pi 进行初始化。');
+    return report.has_error ? 3 : 0;
   }
 
   const report = buildDoctorReport({ projectRoot, platforms, selectionMode });
@@ -145,6 +148,7 @@ function formatDoctorHumanReport(report, { verbose = false } = {}) {
 
   if (!verbose) return lines;
 
+  appendDoctorEvidenceSummary(lines, report);
   lines.push('', '详细检查：');
   appendDoctorCheckDetails(lines, '通用环境', commonChecks, { selectionMode });
   for (const platform of platforms) {
@@ -153,6 +157,25 @@ function formatDoctorHumanReport(report, { verbose = false } = {}) {
     });
   }
   return lines;
+}
+
+function appendDoctorEvidenceSummary(lines, report) {
+  const hasDecisionInput = typeof report.decision_input_health === 'string';
+  const hasWorkflowRunnability = typeof report.workflow_runnability === 'string';
+  if (!hasDecisionInput && !hasWorkflowRunnability) return;
+
+  lines.push('', '证据维度：');
+  if (hasDecisionInput) {
+    const basis = report.decision_input_health_basis || {};
+    const reason = basis.reason_code ? ` (reason=${basis.reason_code})` : '';
+    lines.push(`  decision_input_health: ${report.decision_input_health}${reason}`);
+  }
+  if (hasWorkflowRunnability) {
+    const basis = report.workflow_runnability_basis || {};
+    const reason = basis.fallback_reason || basis.reason_code;
+    const suffix = reason ? ` (reason=${reason})` : '';
+    lines.push(`  workflow_runnability: ${report.workflow_runnability}${suffix}`);
+  }
 }
 
 function isDoctorAttentionCheck(check) {
@@ -252,8 +275,11 @@ function appendDoctorAttentionSection(lines, title, items, kind) {
       else lines.push(`    说明：${kind === 'degraded' ? '能力已降级，当前结论受限。' : '本项尚未执行，不能作为完成证据。'}`);
       continue;
     }
-    if (check.fix) {
+    if (check.fix && check.fixSafety === 'safe') {
       lines.push(`    修复：${check.fix}`);
+    } else if (check.fix) {
+      lines.push(`    需要人工处理：${check.fix}`);
+      lines.push('    说明：producer 未声明该建议可安全自动执行；请先确认所有权、覆盖和删除影响。');
     } else {
       lines.push('    需要人工处理：此检查未提供可安全执行的修复建议；请根据诊断谨慎处理用户拥有的配置。');
     }
@@ -295,8 +321,13 @@ function appendDoctorCheckDetails(lines, scope, checks, { selectionMode = 'auto'
           ? '验证建议'
           : ['degraded', 'not-run'].includes(disposition)
             ? '下一步'
-          : '修复';
+          : check.fixSafety === 'safe'
+            ? '修复'
+            : '需要人工处理';
       lines.push(`             ${actionLabel}：${check.fix}`);
+      if (actionLabel === '需要人工处理') {
+        lines.push('             说明：producer 未声明该建议可安全自动执行；请先确认所有权、覆盖和删除影响。');
+      }
     } else if (buildRuntimeStatusProjection(check, { scope, selectionMode }).disposition === 'known-limitation') {
       lines.push('             说明：当前为已知限制，无需手工修改用户配置。');
     }
@@ -385,6 +416,7 @@ function checkPlatformCli(platform, options = {}) {
       message: 'version check timed out',
       reasonCode: `${platform}_cli_version_check_timeout`,
       disposition: options.selectionMode === 'explicit' ? 'action_required' : 'optional',
+      fixSafety: 'safe',
       fix: `Run \`${command} --version\` manually and inspect PATH or shell startup scripts.`,
     };
   }
@@ -396,6 +428,7 @@ function checkPlatformCli(platform, options = {}) {
       message: 'not found on PATH',
       reasonCode: `${platform}_cli_not_found`,
       disposition: options.selectionMode === 'explicit' ? 'action_required' : 'optional',
+      fixSafety: 'safe',
       fix: `Install ${displayName} and restart your shell.`,
     };
   }
@@ -406,6 +439,7 @@ function checkPlatformCli(platform, options = {}) {
     message: 'could not verify version',
     reasonCode: `${platform}_cli_version_check_failed`,
     disposition: options.selectionMode === 'explicit' ? 'action_required' : 'optional',
+    fixSafety: 'safe',
     fix: `Run \`${command} --version\` manually to confirm the CLI works.`,
   };
 }

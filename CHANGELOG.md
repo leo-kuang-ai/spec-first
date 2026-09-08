@@ -2,6 +2,8 @@
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
 
+- v1.15.3 2026-09-09 00:50:00 leokuang: docs(plan): 逐项修复 Doctor Output UX 方案复审问题——补齐 disposition、workflow/decision evidence 边界、无宿主模式矩阵、JSON projection 兼容说明、错误退出负向回归和 README/FAQ 模式指引；同步让空项目 doctor 先输出总览再给初始化引导，保留 generated runtime 不变。 (user-visible)
+
 - v1.15.3 2026-09-09 00:45:00 leokuang: docs(plan): 根据方案 owner 的线下验证通过确认，将 `2026-09-05-002-next-phase-development-sequence.md` 状态更新为 `completed`；仓内机器证据保留为历史记录，完成依据为 owner 的线下验收。 (user-visible)
 
 - v1.15.3 2026-09-09 00:35:00 leokuang: docs(plan): 将下一阶段方案状态收口为 `partially-shipped`；本地工程批次已完成并归档，Astra、现场试点、Windows CI、长期知识复用和 X1 安装验证转由人工后续处理，待证据补齐后再决定是否完成总方案。 (user-visible)

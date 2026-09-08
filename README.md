@@ -89,7 +89,7 @@ docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
 
 如果需求已经明确，可直接使用 `spec-plan`；准备执行时使用 `spec-work`。如果没有值得持久化的决策，workflow 可以合法地不创建文档；这不表示运行失败。
 
-找不到入口时，运行 `spec-first doctor --verbose`，并核对 [Runtime Capability Catalog](docs/catalog/runtime-capabilities.md) 中的宿主限制。
+找不到入口时，先运行 `spec-first doctor` 查看简明总览；需要完整检查明细时使用 `spec-first doctor --verbose`，脚本和 CI 使用 `spec-first doctor --json`。宿主限制以 [Runtime Capability Catalog](docs/catalog/runtime-capabilities.md) 为准。
 
 ## 选择合适的 Workflow
 
@@ -223,7 +223,7 @@ docs/
 | ZCode | opt-in preview，部分能力已有实机验证 | `--zcode` |
 | Pi | opt-in preview，部分能力已有实机验证 | `--pi` |
 
-生成 runtime、宿主发现入口和真实 workflow 验证是不同层次。运行 `spec-first doctor --verbose` 查看当前项目事实；详细状态以[Runtime Capability Catalog](docs/catalog/runtime-capabilities.md)为准。
+生成 runtime、宿主发现入口和真实 workflow 验证是不同层次。运行 `spec-first doctor` 查看总览，运行 `spec-first doctor --verbose` 查看当前项目完整事实；脚本消费者使用 `--json`。详细状态以[Runtime Capability Catalog](docs/catalog/runtime-capabilities.md)为准。
 
 ## 适用边界
 
