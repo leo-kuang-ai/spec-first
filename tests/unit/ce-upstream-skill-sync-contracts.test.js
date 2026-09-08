@@ -53,7 +53,11 @@ describe('CE upstream skill sync contracts', () => {
     expect(work).toContain('[Execution engines](references/execution-engines.md)');
     expect(engines).toContain('The engine is chosen once');
     expect(engines).toContain('The engine decides *how* implementation runs; it never changes *who* owns the shipping tail');
-    expect(plan).toContain('**Recommended marker:** `spec-work` (option 1) always carries *(recommended)*');
+    // Scope-based delivery keeps spec-work as the single recommended execution
+    // entry: the SKILL.md names it recommended among optional next steps, and
+    // the handoff reference retains the exactly-one recommended marker rule.
+    expect(plan).toContain('Start `/spec-work` (recommended)');
+    expect(plan).toContain('`spec-work` owns engine selection and the tail when chosen');
     expect(handoff).toContain('**Recommended marker:** `spec-work` (option 1) always carries *(recommended)*');
     expect(plan).not.toContain('**Recommended marker (dynamic):** Goal mode is the recommended default');
     expect(handoff).not.toContain('**Recommended marker (dynamic):** Goal mode is the recommended default');

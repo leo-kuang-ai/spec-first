@@ -331,22 +331,22 @@ describe('concurrent overwrite semantics', () => {
     expect(registerSession(repoRoot, { session_id: 'sess-live' }).reason_code).toBe('session-already-registered');
   });
 
-  test('heartbeatSession re-validates the full record and refuses files carrying unknown keys', () => {
+  test('heartbeatSession preserves unknown keys instead of freezing the record out', () => {
     const repoRoot = makeRepoRoot();
-    // 固定当前行为:heartbeat 会整记录重校验(additionalProperties: false),
-    // 因此带未知字段的既有状态文件永远无法被心跳刷新,只能 unregister 后重建。
+    // 修复后语义:heartbeat 只重校验 schema 已知字段投影,未知字段原样保留,
+    // 旧/新版本写入的额外字段不会再使状态文件永远无法心跳。
     const filePath = writeRawSession(repoRoot, 'sess-strict', validRecord({
       session_id: 'sess-strict',
       unexpected: 'field',
     }));
-    const originalRaw = fs.readFileSync(filePath, 'utf8');
 
     const result = heartbeatSession(repoRoot, 'sess-strict');
 
-    expect(result.ok).toBe(false);
-    expect(result.reason_code).toBe('session-schema-invalid');
-    expect(result.errors).toEqual([expect.stringContaining('unexpected additional key')]);
-    expect(fs.readFileSync(filePath, 'utf8')).toBe(originalRaw);
+    expect(result.ok).toBe(true);
+    expect(result.record.unexpected).toBe('field');
+    expect(typeof result.record.last_heartbeat_at).toBe('string');
+    const onDisk = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    expect(onDisk.unexpected).toBe('field');
   });
 
   test('unregisterSession removes the state file and later reads report session-not-found', () => {
@@ -478,3 +478,18 @@ describe('validateAdvisoryFields', () => {
     }
     expect(fs.readFileSync(first.path, 'utf8')).toBe(before);
   });
+
+
+describe('write-failure reason codes', () => {
+  test('a genuine write failure is reported as session-write-failed, not a path escape', () => {
+    const repoRoot = makeRepoRoot();
+    // .spec-first occupied by a regular file -> ensureSessionDir cannot create the dir
+    fs.mkdirSync(path.dirname(path.join(repoRoot, '.spec-first')), { recursive: true });
+    fs.writeFileSync(path.join(repoRoot, '.spec-first'), 'not a directory');
+
+    const result = registerSession(repoRoot, { session_id: 'sess-write' });
+    expect(result.ok).toBe(false);
+    expect(result.reason_code).toBe('session-write-failed');
+    expect(result.errors[0]).toEqual(expect.any(String));
+  });
+});

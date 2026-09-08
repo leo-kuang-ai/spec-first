@@ -10,6 +10,14 @@ const { isExactRepoRelativePath } = require('./secret-deny-patterns');
 const SCHEMA_VERSION = 'spec-first-session.v1';
 const SESSION_DIR_REL = path.join('.spec-first', 'sessions');
 const SCHEMA_PATH = path.join(__dirname, '..', 'contracts', 'session', 'spec-first-session.schema.json');
+
+// Schema-known keys; extras are preserved verbatim on heartbeat instead of
+// failing additionalProperties, so records written by older/newer versions
+// with extra fields keep beating rather than being frozen out.
+const KNOWN_RECORD_FIELDS = [
+  'schema_version', 'session_id', 'agent_kind', 'host_marker_path',
+  'started_at', 'last_heartbeat_at', 'scope_hint', 'pid',
+];
 const STALE_MS = 24 * 60 * 60 * 1000;
 const ID_PATTERN = /^[A-Za-z0-9._-]+$/;
 const ALLOWED_AGENT_KINDS = ['claude-code', 'codex', 'other'];
@@ -209,7 +217,7 @@ function registerSession(repoRoot, options = {}) {
     if (error.code === 'EEXIST') {
       return { ok: false, reason_code: 'session-already-registered', session_id: sessionId, path: filePath };
     }
-    return { ok: false, reason_code: 'session-path-escape', session_id: sessionId, errors: [error.message] };
+    return { ok: false, reason_code: 'session-write-failed', session_id: sessionId, errors: [error.message] };
   }
   return { ok: true, session_id: sessionId, path: filePath, record };
 }
@@ -230,15 +238,24 @@ function heartbeatSession(repoRoot, sessionId) {
   if (record.__invalid__) {
     return { ok: false, reason_code: 'session-schema-invalid', session_id: sessionId, reason: record.__reason__ };
   }
-  const updated = { ...record, last_heartbeat_at: nowIso() };
-  const validation = validateRecord(updated);
+  const extras = {};
+  for (const key of Object.keys(record)) {
+    if (!KNOWN_RECORD_FIELDS.includes(key)) extras[key] = record[key];
+  }
+  const known = {};
+  for (const key of KNOWN_RECORD_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(record, key)) known[key] = record[key];
+  }
+  known.last_heartbeat_at = nowIso();
+  const validation = validateRecord(known);
   if (!validation.valid) {
     return { ok: false, reason_code: 'session-schema-invalid', session_id: sessionId, errors: validation.errors };
   }
+  const updated = { ...extras, ...known };
   try {
     writeFileAtomic(filePath, `${JSON.stringify(updated, null, 2)}\n`);
   } catch (error) {
-    return { ok: false, reason_code: 'session-path-escape', session_id: sessionId, errors: [error.message] };
+    return { ok: false, reason_code: 'session-write-failed', session_id: sessionId, errors: [error.message] };
   }
   return { ok: true, session_id: sessionId, path: filePath, record: updated };
 }

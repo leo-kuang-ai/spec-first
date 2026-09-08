@@ -2,6 +2,7 @@
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
 
+- v1.15.3 2026-09-08 11:40:00 tester: fix(helpers): 落地两项待决缺陷的作者决策——session-store 写失败错误码拆分：真实写失败（目录被占、ENOSPC 等）返回新 reason_code session-write-failed 并保留 errors，session-path-escape 仅用于真实 containment 失败（CLI 透传无枚举依赖，两条真实 containment pin 保持不变，新增写失败正例）；heartbeatSession 改为只重校验 schema 已知字段投影并原样保留未知字段（旧/新版本写入的额外字段不再使状态文件永远无法心跳，pin 测试翻转为保留语义）。CE upstream sync 对 recommended 入口的断言按断言迁移纪律改钉现行 scope-based 措辞（Start /spec-work (recommended) + handoff 唯一 recommended 规则），行为保护不变。CE localization 两套件剩余失败为设计内刷新门（需新一轮 LLM adjudication），保留不绕过。40+136 项测试、typecheck、lint 通过。 (user-visible)
 - v1.15.3 2026-09-08 11:17:20 tester: fix(eval): 修复分支审查三项问题：v2 路由结果汇总拒绝缺失或矛盾的 attempt、退出码与成功标记，保留未知尝试和旧记录兼容；新增 14 项先红后绿反例与 2 项降级兼容回归；将 S1/S2/S3/S4 的 15 份最小历史证据保存至版本控制范围并改正计划引用，对齐 S4 内部对照与未执行的主宿主旅程。保留 E33 未运行、候选机械统计差异及 S4 A/A 重复评分限制，不新增模型行为或收益声明；未修改 generated runtime。 (user-visible)
 
 - v1.15.3 2026-09-08 11:05:00 tester: fix(helpers): 修复 S4 对照独立发现并经 pin 测试固化的两处真实缺陷——markdown-frontmatter 在模块入口消费前导 UTF-8 BOM（此前 BOM 文件 frontmatter 被静默当作正文，两条 pin 测试按作者决定翻转为剥离语义）；session-store registerSession 改用 writeFileAtomicIfAbsent 原子创建并在 EEXIST 时返回 session-already-registered（关闭 check-then-write 并发覆盖窗口，新增强制 existsSync 失效的回归测试）。错误码混叠与 heartbeat 重校验僵化两项涉及公共 reason_code 合同，保留 pin 待作者决策。CE localization 三套件 5 例失败经 stash 验证为本会话之前已存在，与本批无关。 (user-visible)
