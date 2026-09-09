@@ -10,7 +10,6 @@ describe('CE upstream skill sync contracts', () => {
   test('keeps pre-resolved git commands shell-portable', () => {
     const files = [
       'skills/spec-brainstorm/SKILL.md',
-      'skills/spec-commit-push-pr/SKILL.md',
       'skills/spec-compound/SKILL.md',
       'skills/spec-ideate/SKILL.md',
       'skills/spec-plan/SKILL.md',
@@ -39,6 +38,7 @@ describe('CE upstream skill sync contracts', () => {
     expect(commit).toContain('Re-read the branch and staged paths immediately');
     expect(commit).not.toContain('!`git status`');
     expect(commit).not.toContain('Context fallback');
+    expect(read('skills/spec-commit-push-pr/SKILL.md')).toContain('Read `references/context.md` before Step 1');
     expect(pulse).toContain('Resolve `<repo-root>` at runtime');
     expect(pulse).toContain('fixed `docs/pulse-reports/` contract');
     expect(pulse).not.toContain('!`git rev-parse');

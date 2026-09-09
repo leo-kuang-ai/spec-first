@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-09 14:10:00 codex: fix(spec-commit-push-pr): 将 CE commit/push/PR 的上下文探针、非零状态语义、显式路径暂存和描述组合门禁收敛到 required-read references，保留 spec-first 授权边界。 (user-visible)
 - v1.15.3 2026-09-09 14:00:00 codex: fix(spec-optimize): 将 CE retune 的测量、噪声基线、独立审计和失败归因机制融合到优化循环 reference，保留 spec-first 的 admission 与 owner 边界。 (user-visible)
 - v1.15.3 2026-09-09 13:40:00 codex: fix(spec-debug): 将回归测试选择与失败假设失效流程迁移到 required-read reference，保留入口触发 pin 与因果链验证边界。 (user-visible)
 - v1.15.3 2026-09-09 13:30:00 codex: fix(spec-explain): 将 Phase 6 destination close、受众与改进路由收敛到 required-read reference，保留发布确认与非交互可恢复边界。 (user-visible)

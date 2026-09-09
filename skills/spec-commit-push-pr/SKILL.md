@@ -31,42 +31,12 @@ The landing disclosure for `mode:pipeline` includes bounded PR-feedback fixes an
 
 ## Context
 
-**On platforms other than Claude Code**, skip to the "Context fallback" section below and run the command there to gather context.
-
-**In Claude Code**, the six labeled sections below contain pre-populated data. Use them directly -- do not re-run these commands.
-
-**Git status:**
-!`git status`
-
-**Working tree diff:**
-!`git diff HEAD`
-
-**Current branch:**
-!`git branch --show-current`
-
-**Recent commits:**
-!`git log --oneline -10`
-
-**Remote default branch:**
-!`git rev-parse --abbrev-ref origin/HEAD`
-
-**Existing PR check:**
-!`gh pr view --json url,title,state`
-
-### Context fallback
-
-**In Claude Code, skip this section — the data above is already available.**
-
-Run these commands separately to gather context without interleaving unrelated output:
-
-```bash
-git status
-git diff HEAD
-git branch --show-current
-git log --oneline -10
-git rev-parse --abbrev-ref origin/HEAD 2>/dev/null || echo 'DEFAULT_BRANCH_UNRESOLVED'
-gh pr view --json url,title,state 2>/dev/null || echo 'NO_OPEN_PR'
-```
+Read `references/context.md` before Step 1. It owns the portable context
+probes, exit-code interpretation, fork and detached-HEAD traps, and the
+re-verification points used before push or PR mutation. Host-provided context
+may be used when it is explicit and complete; otherwise run the reference's
+argv-form probes separately and keep non-zero results visible as unknown
+state, never as a successful empty result.
 
 ---
 
@@ -110,7 +80,8 @@ Report the PR URL.
 
 ### Step 1: Gather context
 
-Use the context above. All data needed for this step and Step 3 is already available -- do not re-run those commands.
+Use the context gathered under `references/context.md`. Re-run only the
+reference's required probes when a consequential step needs fresh state.
 
 The remote default branch value returns something like `origin/main`. Strip the `origin/` prefix. If it returned `DEFAULT_BRANCH_UNRESOLVED`, an error, or a bare `HEAD`, try:
 
@@ -158,7 +129,7 @@ If the PR check returned `state: OPEN`, note the URL -- this is the existing-PR 
 
 1. If on the default branch, branch creation must handle stale local base state, unpushed commits on local `<base>`, and uncommitted checkout collisions. Read `references/branch-creation.md` and follow its decision flow, then continue to step 2 below.
 2. Scan changed files for naturally distinct concerns. If files clearly group into separate logical changes, create separate commits (2-3 max). Group at the file level only (no `git add -p`). When ambiguous, one commit is fine.
-3. Stage and commit each group. Avoid `git add -A` or `git add .`. Follow conventions from Step 2 and use `-F` for the message body:
+   3. Read `references/commit-and-push.md`, then stage and commit each group. Avoid `git add -A` or `git add .`. Follow conventions from Step 2 and use `-F` for the message body:
    ```bash
    COMMIT_MSG=$(mktemp "${TMPDIR:-/tmp}/spec-commit-message.XXXXXX")
    cat > "$COMMIT_MSG" <<'EOF'
@@ -178,7 +149,9 @@ git push -u origin HEAD
 
 The working-tree diff from Step 1 only shows uncommitted changes at invocation time. The PR description must cover **all commits** in the PR.
 
-**Read `references/pr-description-writing.md` once now** — the core principle at the top governs every step. Step 6 walks through it in order (Pre-A through H) with one interruption (the evidence decision below). Do not re-read the file later; refer to it by step letter.
+**Read `references/pr-description-writing.md` once now** and then read
+`references/compose.md`; the two references own title/body composition and its
+evidence, teaching, and branding gates. Step 6 walks through them in order.
 
 **Resolve the commit range and diff.** Run Step Pre-A from the reference (current-branch mode by default; PR mode if a PR ref was passed in from description-only mode). Pre-A handles base detection, in-repo SHA fetching with the `refs/pull/N/head` fallback, and the API-only fallback for fork-PRs and any local-git failure. Use Pre-A's commit list and diff (not Step 1's working-tree diff or `git log -10`) for both the evidence decision below and the rest of the reference.
 
@@ -276,3 +249,5 @@ raw provider content, or authorize merge, rebase, force-push, history rewrite,
 additional data egress, credentials, or external communication.
 
 If a body applied by this run contains a `## New concepts` section, print one line after the PR URL in every mode: `New concepts: <name>[, <name>]`. In interactive full-workflow runs, follow it with one line per taught concept: `Run spec-explain <name> to go deeper.` Do not print the trailer when this run applied no body, including a rewrite that was declined or pipeline-defaulted to no, or when no PR exists.
+
+Read `references/context.md` before composing commit or PR text.
