@@ -140,6 +140,10 @@ Keep one idea per sentence in ordinary language. Do not fuse clauses, drop artic
 
 ## Size restructure checkpoints
 
+Classify the current body and consumers before extracting, even below a size ceiling. A procedure without references may need phase owners; a compact router may need only a shared invocation reference. Audit frontmatter as its own always-loaded activation contract. Read public product documentation before changing behavior, including whether completion promises a local commit or a separate shipping handoff.
+
+Trace every moved reference from its executing step. Delete a reference that loses all callers unless an independent consumer or provenance requires retention. A green baseline supports a no-regression comparison, not a claim that behavior improved; validate any claimed improvement separately.
+
 Before rewriting for a size limit, identify the constraint's source and the shipping path it governs. Distinguish observed truncation from a future packaging target; neither a target nor an upstream incident proves that the current host truncates this Skill. Preserve required behavior even when the body cannot meet the target, and record the remaining constraint.
 
 Run the existing contract tests before rewriting and audit each verbatim pin by the failure it protects. Check the test comment or introducing commit, not the author's identity or the pin's age:

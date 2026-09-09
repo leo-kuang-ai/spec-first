@@ -27,13 +27,13 @@ Polish reads `.claude/launch.json` at the repo root to resolve the dev-server st
 | `name` | yes (when multiple configurations) | Used to disambiguate when the array has more than one entry. Polish asks the user to pick by `name`. |
 | `runtimeExecutable` | yes | The binary polish spawns (e.g., `bin/dev`, `npm`, `overmind`, `bun`). |
 | `runtimeArgs` | no | Array of arguments passed to `runtimeExecutable`. Default: empty array. |
-| `port` | yes | The port the dev server will listen on. Polish probes `http://localhost:<port>` for reachability and uses it for the IDE browser handoff. |
+| `port` | yes for a complete tuple | Integer from 1 to 65535. Seeds an HTTP URL candidate; server output or user correction can replace the actual URL, including its scheme. Verify attributed reachability before handoff. |
 | `cwd` | no | Repo-relative working directory for the dev server. Default: repo root. Useful for monorepos (`apps/web`, `packages/frontend`). |
 | `env` | no | Additional environment variables for the dev-server process. Default: inherit polish's environment. |
 
 ## Stub template (written on first run when user accepts)
 
-When polish auto-detects a project type and the user confirms "Save this as `.claude/launch.json`?", polish writes a minimal stub derived from the detected type. These templates intentionally hard-code common defaults — users can edit them later.
+When authorized to save the startup tuple, write the resolved command, cwd, environment, and port. The templates below illustrate shape; replace their defaults with the selected facts. A complete tuple bypasses discovery. If a field is missing, derive only that field without replacing other selected facts.
 
 ### Rails stub
 

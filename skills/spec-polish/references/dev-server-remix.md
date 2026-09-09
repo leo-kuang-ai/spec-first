@@ -1,6 +1,6 @@
 # Remix dev-server recipe (auto-detect fallback)
 
-Loaded when `detect-project-type.sh` returns `remix` and there is no `.claude/launch.json` to consult.
+Read only when classification resolves to `remix` and the startup command is still missing. Preserve selected cwd, environment, and numeric port; use the port resolver only for a missing port.
 
 ## Signature
 

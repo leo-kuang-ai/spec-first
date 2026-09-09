@@ -2,7 +2,7 @@
 
 Port resolution runs via `scripts/resolve-port.sh`. This document explains the probe order, framework defaults, and the script's intentional parsing choices.
 
-This cascade runs **only when** `.claude/launch.json` is absent or has no `port` field for the resolved configuration. When `launch.json` specifies a port, use it verbatim and skip this cascade entirely.
+Run this cascade only while the port remains unresolved. Preserve a selected usable numeric port and all other startup facts. Resolve against the selected project directory. The table's Unknown fallback is a script default, not authority to start an unclassified project; unresolved classification still requires the user's startup facts. The resolved port seeds a URL candidate, while server output and attributed reachability determine the actual handoff URL.
 
 ## Priority order
 

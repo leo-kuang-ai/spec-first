@@ -4,14 +4,7 @@ Use this path when the input is a longer recording (over ~60 seconds), contains 
 
 ## Workflow
 
-1. Run the analyzer (`SKILL_DIR` is the directory containing the `spec-riffrec-feedback-analysis` SKILL.md; set it in the same command — shell state does not persist between Bash calls):
-
-   ```bash
-   SKILL_DIR="<absolute path of the directory containing the spec-riffrec-feedback-analysis SKILL.md>"
-   bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/analyze_riffrec_zip.py" /path/to/input --no-transcribe
-   ```
-
-   Use `--output-dir <dir>` when the artifact should live somewhere specific. Use `--transcribe` instead of `--no-transcribe` only when `transcription_egress_authorization: authorized` explicitly covers this recording and provider transfer; ambient credentials do not grant it. Preserve the analyzer's authorization/provider receipt. In a repo with `docs/brainstorms/`, the default output goes under `docs/brainstorms/riffrec-feedback/` as an evidence/kickoff-artifact exception, not as the durable brainstorm output convention.
+1. Read [Shared analyzer](analyzer.md) and run its extensive command. Let the script resolve its default output unless the user selected a destination. Use `--no-transcribe` unless explicit egress authority permits `--transcribe`; preserve the output paths and provider receipt.
 
 2. Read the generated `analysis.md`, `problem-analysis.md`, `review-prompt.md`, and `requirements-kickoff.md`.
 
@@ -44,7 +37,7 @@ Use this path when the input is a longer recording (over ~60 seconds), contains 
 
 ## Authorized handoff
 
-Only invoke `spec-brainstorm` when the current user explicitly requested brainstorm, requirements, or planning in the original request, or confirms the ready handoff after analysis. Analysis-only and headless runs return the handoff without creating a durable plan. The intended authorized sequence is:
+Only invoke `spec-brainstorm` when the current user explicitly requested brainstorm, requirements, or planning in the original request, or confirms the ready handoff after analysis. An explicit extract-only or "analyze, do not brainstorm" instruction takes precedence and ends at the artifacts. Analysis-only and headless runs return the handoff without creating a durable plan. The intended authorized sequence is:
 
 1. Run the analyzer.
 2. Read `source-materials.md` so brainstorm has direct links to raw feedback, transcript, frames, and analysis artifacts.

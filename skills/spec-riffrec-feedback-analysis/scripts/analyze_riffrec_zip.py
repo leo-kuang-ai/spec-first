@@ -2,7 +2,7 @@
 """
 Analyze a product feedback source.
 
-Supported sources: Riffrec zip, standalone video, standalone audio, and
+Supported sources: Riffrec zip or unpacked capture, standalone video, audio, and
 meeting notes text/markdown. The script extracts transcript, high-signal
 video frames when available, and spec-first-friendly markdown artifacts.
 
@@ -55,6 +55,7 @@ NOISY_NETWORK_PATTERNS = (
 VIDEO_EXTENSIONS = {".webm", ".mp4", ".mov", ".m4v", ".mkv", ".avi"}
 AUDIO_EXTENSIONS = {".webm", ".mp3", ".mp4", ".mpeg", ".mpga", ".m4a", ".wav", ".ogg", ".flac"}
 NOTES_EXTENSIONS = {".txt", ".md", ".markdown", ".text"}
+RIFFREC_DIRECTORY_MARKERS = {"session.json", "events.json"}
 MAX_ZIP_MEMBERS = 512
 MAX_ZIP_MEMBER_BYTES = 1024 * 1024 * 1024
 MAX_ZIP_TOTAL_BYTES = 2 * 1024 * 1024 * 1024
@@ -62,9 +63,13 @@ MAX_ZIP_COMPRESSION_RATIO = 200
 ZIP_COPY_CHUNK_BYTES = 1024 * 1024
 
 
+class SourceInputError(ValueError):
+    pass
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Analyze a product feedback source")
-    parser.add_argument("source_path", type=Path, help="Path to a Riffrec zip, video, audio, or meeting notes file")
+    parser.add_argument("source_path", type=Path, help="Path to a Riffrec zip or unpacked capture directory, video, audio, or notes")
     parser.add_argument(
         "--output-dir",
         type=Path,
@@ -167,15 +172,55 @@ def safe_extract(zip_path: Path, dest: Path) -> None:
                         f"Zip member size mismatch: {member.filename} ({member_written} != {member.file_size})"
                     )
 
-        if dest.exists():
-            if dest.is_dir():
-                shutil.rmtree(dest)
-            else:
-                dest.unlink()
-        staging.replace(dest)
+        promote_snapshot(staging, dest)
     except Exception:
         shutil.rmtree(staging, ignore_errors=True)
         raise
+
+
+def validate_snapshot_destination(destination: Path) -> None:
+    if destination.is_symlink() or (destination.exists() and not destination.is_dir()):
+        raise SourceInputError(f"Output must be a non-symlink directory: {destination}")
+    if destination.exists():
+        for entry in destination.rglob("*"):
+            if entry.is_symlink() or not (entry.is_dir() or entry.is_file()):
+                raise SourceInputError(f"Output contains an unsafe entry: {entry}")
+
+
+def promote_snapshot(staging: Path, destination: Path) -> None:
+    validate_snapshot_destination(destination)
+    previous = staging.with_name(staging.name + ".previous")
+    if previous.exists() or previous.is_symlink():
+        raise SourceInputError(f"Snapshot backup already exists: {previous}")
+    had_previous = destination.exists()
+    if had_previous:
+        os.replace(destination, previous)
+    try:
+        os.replace(staging, destination)
+    except BaseException:
+        if had_previous:
+            os.replace(previous, destination)
+        raise
+    if had_previous:
+        shutil.rmtree(previous)
+
+
+def safe_copy_capture_directory(source_dir: Path, destination: Path) -> None:
+    entries = sorted(source_dir.rglob("*"))
+    for entry in entries:
+        if entry.is_symlink() or not (entry.is_dir() or entry.is_file()):
+            raise SourceInputError(f"Unpacked capture contains an unsafe entry: {entry}")
+        if not entry.resolve().is_relative_to(source_dir.resolve()):
+            raise SourceInputError(f"Unpacked capture entry escapes source: {entry}")
+    for entry in entries:
+        target = destination / entry.relative_to(source_dir)
+        if entry.is_dir():
+            target.mkdir(parents=True, exist_ok=True)
+        else:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(entry, target)
+    if any(not (destination / marker).is_file() for marker in RIFFREC_DIRECTORY_MARKERS):
+        raise SourceInputError("Unpacked capture changed during normalization; missing session.json or events.json")
 
 
 def default_output_dir(zip_path: Path) -> Path:
@@ -187,6 +232,15 @@ def default_output_dir(zip_path: Path) -> Path:
 
 
 def classify_source(source_path: Path) -> str:
+    if source_path.is_symlink():
+        raise SourceInputError(f"Source must not be a symlink: {source_path}")
+    if source_path.is_dir():
+        missing = sorted(marker for marker in RIFFREC_DIRECTORY_MARKERS if not (source_path / marker).is_file())
+        if missing:
+            raise SourceInputError(f"Unpacked Riffrec capture is missing: {', '.join(missing)}")
+        return "riffrec_directory"
+    if not source_path.is_file():
+        raise SourceInputError(f"Unsupported source path type: {source_path}")
     if zipfile.is_zipfile(source_path):
         return "riffrec_zip"
     suffix = source_path.suffix.lower()
@@ -253,12 +307,14 @@ def read_notes(path: Path) -> dict[str, Any]:
     return {"status": "ok", "text": text.strip(), "source": "meeting_notes"}
 
 
-def prepare_source(source_path: Path, raw_dir: Path) -> dict[str, Any]:
+def populate_source_snapshot(source_path: Path, raw_dir: Path, source_kind: str) -> dict[str, Any]:
     raw_dir.mkdir(parents=True, exist_ok=True)
-    source_kind = classify_source(source_path)
 
-    if source_kind == "riffrec_zip":
-        safe_extract(source_path, raw_dir)
+    if source_kind in {"riffrec_zip", "riffrec_directory"}:
+        if source_kind == "riffrec_zip":
+            safe_extract(source_path, raw_dir)
+        else:
+            safe_copy_capture_directory(source_path, raw_dir)
         session_payload = read_json(raw_dir / "session.json", {})
         session = session_payload if isinstance(session_payload, dict) else {}
         events_payload = read_json(raw_dir / "events.json", {})
@@ -323,6 +379,24 @@ def prepare_source(source_path: Path, raw_dir: Path) -> dict[str, Any]:
         "transcription_path": transcription_path,
         "notes_transcript": None,
     }
+
+
+def prepare_source(source_path: Path, raw_dir: Path) -> dict[str, Any]:
+    source_kind = classify_source(source_path)
+    validate_snapshot_destination(raw_dir)
+    raw_dir.parent.mkdir(parents=True, exist_ok=True)
+    staging = Path(tempfile.mkdtemp(prefix=f".{raw_dir.name}.staging-", dir=raw_dir.parent))
+    try:
+        source = populate_source_snapshot(source_path, staging, source_kind)
+        promote_snapshot(staging, raw_dir)
+    except BaseException:
+        if staging.exists() and not staging.is_symlink():
+            shutil.rmtree(staging, ignore_errors=True)
+        raise
+    for key in ("recording_path", "transcription_path"):
+        if source[key] is not None:
+            source[key] = raw_dir / source[key].relative_to(staging)
+    return source
 
 
 def repo_relative(path: Path, base: Path) -> str:
@@ -662,7 +736,7 @@ def select_moments(
     return deduped
 
 
-def extract_frames(recording_path: Path | None, frames_dir: Path, moments: list[dict[str, Any]]) -> None:
+def populate_frames(recording_path: Path | None, frames_dir: Path, moments: list[dict[str, Any]]) -> None:
     frames_dir.mkdir(parents=True, exist_ok=True)
     if not recording_path or not recording_path.exists():
         for moment in moments:
@@ -694,6 +768,7 @@ def extract_frames(recording_path: Path | None, frames_dir: Path, moments: list[
         try:
             result = subprocess.run(command, capture_output=True, text=True, timeout=60)
         except subprocess.TimeoutExpired:
+            frame_path.unlink(missing_ok=True)
             moment["screenshot"] = None
             moment["screenshot_status"] = "ffmpeg frame extraction timed out"
             continue
@@ -701,8 +776,25 @@ def extract_frames(recording_path: Path | None, frames_dir: Path, moments: list[
             moment["screenshot"] = str(frame_path)
             moment["screenshot_status"] = "ok"
         else:
+            frame_path.unlink(missing_ok=True)
             moment["screenshot"] = None
             moment["screenshot_status"] = compact_text(result.stderr or result.stdout, 300)
+
+
+def extract_frames(recording_path: Path | None, frames_dir: Path, moments: list[dict[str, Any]]) -> None:
+    validate_snapshot_destination(frames_dir)
+    frames_dir.parent.mkdir(parents=True, exist_ok=True)
+    staging = Path(tempfile.mkdtemp(prefix=f".{frames_dir.name}.staging-", dir=frames_dir.parent))
+    try:
+        populate_frames(recording_path, staging, moments)
+        promote_snapshot(staging, frames_dir)
+    except BaseException:
+        if staging.exists() and not staging.is_symlink():
+            shutil.rmtree(staging, ignore_errors=True)
+        raise
+    for moment in moments:
+        if moment.get("screenshot"):
+            moment["screenshot"] = str(frames_dir / Path(moment["screenshot"]).relative_to(staging))
 
 
 def event_counts(events: list[dict[str, Any]]) -> dict[str, int]:
@@ -896,7 +988,7 @@ def write_requirements_kickoff(
         "## Key Flows",
         "",
         "- F1. Evidence-backed feedback triage",
-        "  - **Trigger:** A feedback zip, video, audio file, or meeting notes file is available.",
+        "  - **Trigger:** A feedback bundle, video, audio file, or meeting notes file is available.",
         "  - **Actors:** A1, A2, A3",
         "  - **Steps:** Extract or copy the source, transcribe media or read notes, select high-signal moments when video exists, inspect screenshots when available, confirm problems, and write requirements with supporting evidence.",
         "  - **Outcome:** Confirmed product problems are represented as requirements with transcript support and screenshot support when visual evidence exists.",
@@ -1190,16 +1282,32 @@ def write_review_prompt(
 
 def main() -> int:
     args = parse_args()
-    source_path = args.source_path.expanduser().resolve()
+    source_path = args.source_path.expanduser().absolute()
     if not source_path.exists():
         print(f"Source file not found: {source_path}", file=sys.stderr)
         return 1
 
     output_dir = (args.output_dir or default_output_dir(source_path)).expanduser().resolve()
+    try:
+        classify_source(source_path)
+        resolved_source = source_path.resolve()
+        if resolved_source.is_relative_to(output_dir) or (
+            source_path.is_dir() and output_dir.is_relative_to(resolved_source)
+        ):
+            raise SourceInputError("Source and output must not contain one another")
+        validate_snapshot_destination(output_dir / "raw")
+        validate_snapshot_destination(output_dir / "frames")
+    except SourceInputError as error:
+        print(f"Invalid source or output: {error}", file=sys.stderr)
+        return 2
     output_dir.mkdir(parents=True, exist_ok=True)
     raw_dir = output_dir / "raw"
     frames_dir = output_dir / "frames"
-    source = prepare_source(source_path, raw_dir)
+    try:
+        source = prepare_source(source_path, raw_dir)
+    except SourceInputError as error:
+        print(f"Invalid source: {error}", file=sys.stderr)
+        return 2
     source_kind = source["source_kind"]
     session = source["session"]
     events = source["events"]
@@ -1239,7 +1347,11 @@ def main() -> int:
             {"id": f"M{index}", "t": timestamp, "reason": "representative video frame", "events": []}
             for index, timestamp in enumerate(fallback_times[: args.max_moments], start=1)
         ]
-    extract_frames(source["recording_path"], frames_dir, moments)
+    try:
+        extract_frames(source["recording_path"], frames_dir, moments)
+    except SourceInputError as error:
+        print(f"Invalid output: {error}", file=sys.stderr)
+        return 2
     findings = summarize_candidate_findings(moments, transcript.get("text", ""))
 
     topic = slugify(args.topic or source_path.stem)
