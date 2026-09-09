@@ -21,7 +21,7 @@ describe('fresh repo grounding contracts', () => {
     const skillDir = path.join(repoRoot, 'skills', skill);
     const source = fs.readFileSync(path.join(skillDir,
       skill === 'spec-code-review' ? 'references/intent-and-plan.md'
-        : skill === 'spec-compound' ? 'references/research.md' : 'SKILL.md'), 'utf8');
+        : ['spec-compound', 'spec-plan'].includes(skill) ? 'references/research.md' : 'SKILL.md'), 'utf8');
 
     expect(source).toMatch(/current (?:target repo\/worktree|target repo|git identity|target)/i);
     expect(source).toMatch(/dirty state|dirty worktree/i);

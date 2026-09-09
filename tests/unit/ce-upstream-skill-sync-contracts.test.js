@@ -11,7 +11,6 @@ describe('CE upstream skill sync contracts', () => {
     const files = [
       'skills/spec-brainstorm/SKILL.md',
       'skills/spec-ideate/SKILL.md',
-      'skills/spec-plan/SKILL.md',
       'skills/spec-sweep/SKILL.md',
     ];
 
@@ -30,6 +29,9 @@ describe('CE upstream skill sync contracts', () => {
   });
 
   test('gathers commit and product-pulse context at runtime without host pre-resolution', () => {
+    const plan = read('skills/spec-plan/SKILL.md');
+    expect(plan).toContain('Resolve `<repo-root>` at runtime');
+    expect(plan).not.toContain('!`git rev-parse');
     const commit = read('skills/spec-commit/SKILL.md');
     const pulse = read('skills/spec-product-pulse/SKILL.md');
 

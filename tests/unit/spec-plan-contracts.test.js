@@ -3,7 +3,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const skill = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-plan/SKILL.md'), 'utf8');
+const { readPlanContract } = require('../helpers/plan-contract');
+const skill = readPlanContract();
 const sections = fs.readFileSync(
   path.resolve(__dirname, '../../skills/spec-plan/references/plan-sections.md'),
   'utf8',
@@ -36,14 +37,14 @@ function sectionBetween(source, start, end) {
 describe('spec-plan current contracts', () => {
   test('continues historical plans through an evidence-scoped successor without resetting history', () => {
     const resume = sectionBetween(skill, '#### 0.1 Resume', '#### 0.2');
-    expect(resume).toContain('当前用户明确要求补完');
-    expect(resume).toContain('仅审阅、解释或深化文档不触发');
-    expect(resume).toContain('保留旧计划原文、状态和旧 task-pack pins');
-    expect(resume).toContain('有明确来源关系的现有 active 后继计划');
-    expect(resume).toContain('来源缺失或后继范围存在实质冲突');
-    expect(resume).toContain('没有可复用后继且确认仍有未完成范围');
-    expect(resume).toContain('readiness 与审查流程');
-    expect(resume).toContain('若无剩余范围');
+    expect(resume).toContain('current user explicitly requests completion');
+    expect(resume).toContain('Read-only review, explanation, or document deepening does not trigger');
+    expect(resume).toContain('Preserve the old plan text, status, and old task-pack pins');
+    expect(resume).toContain('existing active successor named by the user or linked through explicit provenance');
+    expect(resume).toContain('Missing provenance or materially conflicting successor scope');
+    expect(resume).toContain('no reusable successor exists and unfinished scope is confirmed');
+    expect(resume).toContain('normal planning, readiness, and review');
+    expect(resume).toContain('If no remaining scope exists');
     expect(sections).toContain('只读审阅不触发新计划生产');
   });
 

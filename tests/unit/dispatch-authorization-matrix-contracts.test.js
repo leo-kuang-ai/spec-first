@@ -108,9 +108,10 @@ const existingQualifiedPackages = [
   },
   {
     name: 'spec-plan',
-    boundarySource: 'skills/spec-plan/SKILL.md',
+    boundarySource: 'skills/spec-plan/references/research.md',
     sources: [
       'skills/spec-plan/SKILL.md',
+      'skills/spec-plan/references/research.md',
       'skills/spec-plan/references/deepening-workflow.md',
       'skills/spec-plan/references/universal-planning.md',
     ],
