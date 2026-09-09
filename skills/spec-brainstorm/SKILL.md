@@ -10,6 +10,8 @@ Note: Use the current date from the active host context. Use this when weighting
 
 Brainstorming helps answer **WHAT** to build through collaborative dialogue. It precedes `spec-plan`, which enriches the same unified plan artifact with **HOW** to build it.
 
+**Lightweight work ends in chat.** When the request is small, well-bounded, and low ambiguity, classify it before dispatch: return a concise chat result without a file, grounding scout, approach generation, or claim verifier. When uncertain, use the fuller durable route. Write a requirements artifact only when a downstream consumer needs stable IDs or the user asks for a file.
+
 The durable output of this workflow is a **requirements-only unified plan**. In other workflows this might be called a lightweight PRD or feature brief. In spec-first, keep the workflow name `brainstorm`, but write the first version of the plan artifact under `docs/plans/` with `artifact_readiness: requirements-only` so planning does not need to invent product behavior, scope boundaries, or success criteria.
 
 This skill does not implement code. It explores, clarifies, and documents decisions for later planning or execution. It also never delivers an adopt/switch/replace verdict on a named external candidate — that is `spec-pov`'s job (see `references/phase-0.md`, gate 0.1c); routing it out by name is mandatory even when no project context is visible.

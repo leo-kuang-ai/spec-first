@@ -18,6 +18,10 @@ Note: Use the current date from the active host context. Use this when weighting
 
 This workflow produces a durable implementation plan. It does **not** implement code, run tests, or learn from execution-time results. If the answer depends on changing code and seeing what happens, that belongs in `spec-work`, not here.
 
+## Output Contract
+
+Before dispatch or repository-backed research, classify solo low-risk requests. **Direct** work is stated and verified in one pass with no user decision; return a concise chat result and offer `spec-work` only when implementation is authorized. **Chat brief** work has at most one decision and no risk surface; return the brief and stop. **Durable** is the default for multi-pass, ambiguous, user-requested plan files, pipeline/headless runs, existing-plan continuation, or authentication, payment, migration, and external-contract surfaces. Read `references/output-contracts.md` when this gate selects Direct or Chat brief. When uncertain, choose Durable.
+
 ## Workflow Contract Summary
 
 - **Input:** A requirements-only unified plan, legacy requirements, a bug or feature description, an existing plan, or an explicit answer-seeking objective.

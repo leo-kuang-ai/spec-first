@@ -7517,3 +7517,4 @@
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE f1a80f21 发布元数据 bump，判定为上游发布证据，无本地同步。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(spec-code-review): 融合 CE dfeae095 的 diff 占位符去重语义，避免大 diff 路径说明再次造成内容重复。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 925b4ef7 发布元数据 bump，判定为上游发布证据，无本地同步。 (user-visible)
+- v1.15.3 2026-09-10 codex: refactor(skills): 融合 CE 6f6c5779 的小任务输出契约，允许低风险工作在 chat/brief 收口，并保留复杂任务的 durable planning 与验证边界。 (user-visible)
