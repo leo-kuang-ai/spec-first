@@ -23,6 +23,14 @@
 
 closeout 分开报告 deterministic checks、eval adequacy、五轴 readiness、default-source bytes、field outcome（默认 `not-run`）、not-run reasons、generated runtime status 和 residual risks。`manual_observation` 不能支持 default promotion。
 
-## Fresh reader pass for prose restructures
+## Restructure Coverage
+
+For a restructure, derive cases from the Skill's entry paths and modes, including conditional reads, early exits, and recovery. Compare before and after on the same cases. Choose available, authorized hosts and repetitions in proportion to usage and risk; disclose omitted paths and hosts instead of importing a fixed upstream matrix. Add any missed path that yields a review defect before claiming coverage of the fix.
+
+Use surviving artifacts, logs, read traces, and actual dispatch receipts as evidence. A model's account of what it did cannot establish that a file was read or a delegate ran. If delegation is the behavior under test, a dispatch-forbidden recognition case cannot verify it; live checks require current authorization and an isolated subject. Without that authorization, keep the delegation claim `not-run` and continue independent checks.
+
+Use `not-run` for a path never attempted. Use `unexercised` only after an attempt failed to reach it, with the attempt and reason recorded. Neither state counts as passing.
+
+### Fresh Reader
 
 After a prose or placement restructure, use a fresh reader that did not author the change. Give it the pre-change and current body, ask it to identify sentences that require rereading and any meaning drift, then fix by restating plainly or relocating the block. Source size or a passing structural validator cannot substitute for this semantic check; if a fresh reader is unavailable, record the evaluation as `not-run`.

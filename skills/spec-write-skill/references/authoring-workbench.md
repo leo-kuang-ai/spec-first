@@ -22,6 +22,10 @@ multi-agent/hybrid 先做 ArchitectureFit：独立子问题是否有不同证据
 
 ## Eval And Topology Preview
 
+For a restructure, place each moved block in the reference read by the step that executes it. Its former phase or neighboring paragraph does not determine ownership. Keep instructions that must act before a read in the body and put each required-read pointer before its consumer. If one block is misplaced, audit every block moved by that restructure; a corpus match alone cannot prove timely reachability. Remove duplicate rules from references when the body still owns them, then reread moved rules against their new neighbors for changed preconditions.
+
+Even a behavior-preserving Tier A restructure must apply the size and pin audit in [Authoring Method](authoring-method.md#size-restructure-checkpoints) and the applicable evaluation guidance in [Evaluation Design](evaluation-design.md#restructure-coverage). This does not require the full Design Record for Tier A.
+
 full apply 在 source patch 前先按 `evaluation-design.md` 形成最小 eval plan。create 至少有 positive、negative/near-neighbor、主要 failure/adversarial 三例；revise 固定旧版 protected behavior 与 before baseline，不能按候选实现反向编写。每个承重行为给出 `protected_behavior → source carrier → contract assertion → semantic eval case`；没有新增 assertion 或 semantic case 时，旧测试全绿不构成覆盖。
 
 只有文件集合、resource placement 或 runtime carrier 发生变化时才展开 package topology preview，区分 spine、triggered references、scripts、assets、maintainer-only evals、target sidecar 与 project governance；单文件 revise 只需报告 changed surfaces。新增或变更的 runtime reference 仍要记录 consumer、trigger condition、must-read、fallback 与 eval case；未满足时不得声称 runtime closure。

@@ -140,4 +140,12 @@ Keep one idea per sentence in ordinary language. Do not fuse clauses, drop artic
 
 ## Size restructure checkpoints
 
-Before rewriting a body for a size limit, run its contract tests and enumerate every verbatim pin. Preserve each pin word-for-word or change the test with a recorded reason. Relocate a coherent block before deleting it. If the body remains over the limit after plain rewriting, relocate another block instead of compressing prose, and leave practical headroom for later fixes.
+Before rewriting for a size limit, identify the constraint's source and the shipping path it governs. Distinguish observed truncation from a future packaging target; neither a target nor an upstream incident proves that the current host truncates this Skill. Preserve required behavior even when the body cannot meet the target, and record the remaining constraint.
+
+Run the existing contract tests before rewriting and audit each verbatim pin by the failure it protects. Check the test comment or introducing commit, not the author's identity or the pin's age:
+
+- Keep incident-backed rules that must act before any reference read in the body. Preserve exact wording only when wording is the contract, such as an invocation or status token.
+- Check artifact invariants over the reachable body and references when they need not act at load time. Do not turn every body assertion into a corpus search.
+- Restate incidental wording as the condition it protects, or remove an unsupported assertion with a reason in the test comment. Missing provenance does not by itself justify removing a safety rule.
+
+Read what each assertion measures. A search-window ceiling is not a required section size or a minimum body size. Relocate coherent blocks before deleting them; do not compress prose to satisfy a numeric target. For placement and evaluation, follow the workbench and evaluation references required by the current apply branch.
