@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-09 15:20:00 codex: fix(spec-optimize): 同步 CE 3ef049a3，将优化流程按阶段拆分为 required-read references，保留 spec-first 的 admission、dispatch、持久化与验证边界。 (user-visible)
 - v1.15.3 2026-09-09 codex: fix(spec-doc-review): 补齐 CE a6e53e07 的 settled decisions 模板传递、内容歧义判别和 dispatch fallback 遗漏。 (user-visible)
 - v1.15.3 2026-09-09 codex: fix(spec-doc-review): 融合 CE 文档审查的 required-read references、内容分类、受控 roster 与 dispatch 证据边界，补齐 settled decisions 传递及上游合同回归。 (user-visible)
 - v1.15.3 2026-09-09 14:20:00 codex: fix(spec-compound-refresh): 将 CE refresh 的模式、范围、调查、分类、词汇、报告、提交和 discoverability 阶段拆分为 required-read references，保留 spec-first 授权与当前源证据边界。 (user-visible)
