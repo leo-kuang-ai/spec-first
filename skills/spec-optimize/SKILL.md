@@ -149,8 +149,6 @@ worker_bounded_parallelism: supported | unsupported | unknown
 
 Parallel experiments additionally require both dispatch facts above, explicit `execution.mode`, bounded `execution.max_concurrent`, clean mutable/immutable scope, and the worktree readiness probes below. Worktree-backed mutation happens in experiment worktrees; Codex delegation must fall back after repeated failures when the serial/local path can continue. The orchestrator owns final integration: selecting kept experiments, merging or cherry-picking winners, reverting non-winners, cleaning worktrees, updating experiment logs, and presenting post-completion actions. Workers never stage, commit, merge, push, or mutate the authoritative experiment log.
 
----
-
 ## Required-read phase references
 
 Load the phase reference before entering that phase; these files are the canonical procedures for the workflow body:

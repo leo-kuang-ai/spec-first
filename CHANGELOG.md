@@ -7379,3 +7379,4 @@
 - v1.8.2 2026-09-09: refactor(spec-pov): 将 grounding、follow-up 与跨模型参与披露规则下沉为 required-read references
 
 - v1.8.2 2026-09-09: feat(skill-sync): 增量吸收 CE 的 review、POV、compound、optimize、dogfood、pulse、ideate 与 browser 阶段引用及边界
+- v1.15.3 2026-09-09 16:10:00 codex: fix(sync): 补齐 CE 3ef049a3/248f7eb8/3fa7a5fd 的 Skill 阶段 reference 迁移、owner 测试读取、pulse DB gate 与 PII 最小化边界，保留 spec-first 授权与本地配置语义。 (user-visible)

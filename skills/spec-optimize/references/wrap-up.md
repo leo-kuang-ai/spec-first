@@ -63,5 +63,3 @@ rm -f .spec-first/workflows/spec-optimize/<spec-name>/strategy-digest.md
 
 Do NOT delete the experiment log if the user may resume locally or wants a local audit trail. If they need a durable shared artifact, summarize or export the results into a tracked path before cleanup.
 Do NOT delete experiment worktrees that are still being referenced.
-
-Read `references/loop.md` before the optimization loop.

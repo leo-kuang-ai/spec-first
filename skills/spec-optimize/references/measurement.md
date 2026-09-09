@@ -43,6 +43,8 @@ SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
 bash "$SKILL_DIR/scripts/<name>"
 ```
 
+## Phase 1: measurement scaffolding and approval
+
 ### 1.1 Clean-Tree Gate
 
 Verify no uncommitted changes to files within `scope.mutable` or `scope.immutable`:
