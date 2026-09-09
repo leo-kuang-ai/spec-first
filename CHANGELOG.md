@@ -7384,3 +7384,4 @@
 - v1.15.3 2026-09-09 16:20:00 codex: fix(spec-product-pulse): 同步 CE 3fa7a5fd，将配置、设置和查询流程拆分为 references，补齐 DB enable gate 与 source receipt 语义。 (user-visible)
 - v1.15.3 2026-09-09 16:30:00 codex: fix(spec-ideate): 同步 CE 7db168ba，将范围、输出、grounding 阶段迁入 references，保留 spec-first 研究授权、上下文适配器与串行降级边界。 (user-visible)
 - v1.15.3 2026-09-09 16:40:00 codex: fix(spec-test-browser): 同步 CE 1ee62446，将路由、端口、页面检查和报告流程迁入 reference，保留 exact-origin、wrapper 与 caller-owned server 边界。 (user-visible)
+- v1.15.3 2026-09-09 16:50:00 codex: docs(sync): 核对 CE cf098d23 的 debug pipeline 枚举，确认 spec-first source 已覆盖 fixed-not-pushed，无需重复行为改动。 (user-visible)
