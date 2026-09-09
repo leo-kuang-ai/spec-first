@@ -18,6 +18,10 @@ The user personally — dense, technical, one voice, no audience adaptation. Mee
 
 ## Interaction Method
 
+Read `references/orchestration.md` before the first blocking question, dispatch, or run-directory creation.
+
+
+
 When you must ask the user a question, use the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. In the fallback, stop and wait for the user's reply. Never silently skip the question. Ask one question at a time.
 
 ## Model Tiers

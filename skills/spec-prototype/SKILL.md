@@ -14,6 +14,10 @@ This is a throwaway exploration, never the production implementation. The web is
 
 ## Run-Local Phases
 
+Read `references/scoping.md` before defining the question and `references/build.md` before building the throwaway artifact.
+
+
+
 These labels describe the current invocation and its allowed exit; they are not a persisted workflow state machine.
 
 | Phase | Allowed action and user-visible output | Exit condition |

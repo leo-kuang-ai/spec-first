@@ -7355,3 +7355,5 @@
 - v1.8.2 2026-09-09: fix(strategy-consumers): 将 STRATEGY.md 明确为共享项目策略文档并统一下游消费口径
 
 - v1.8.2 2026-09-09: feat(spec-handoff): 将创建/恢复规则拆为 required-read references，并区分用户决策与作者推断
+
+- v1.8.2 2026-09-09: feat(skill-structure): 为 spec-explain、spec-debug、spec-prototype、spec-sweep 补齐 CE required-read 与复现/原型边界
