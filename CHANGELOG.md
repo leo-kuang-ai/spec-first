@@ -2,6 +2,16 @@
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
 
+- v1.15.3 2026-09-09 11:10:47 codex: docs(plan): 按用户指令将 Project Intelligence Skill 消费方案状态更新为 `completed`，补充收口依据与本地复核记录；保留现场 runtime drift、两项全量回归失败及 fresh-source/Provider field 未验证状态，不将计划关闭等同验证通过。 (user-visible)
+
+- v1.15.3 2026-09-09 09:05:00 codex: feat(project-intelligence): 落地共享 project-graph 消费边界、`using-spec-first` 条件入口、11 个 H Skill 短锚点、38/38 分类合同测试与八宿主 source-to-projection 检查；保留 SessionStart short-pointer、Provider mechanical-only、fresh-source/Provider field 未验证边界。
+
+- v1.15.3 2026-09-09 08:58:00 codex: fix(init): workspace 摘要双文件写入失败时恢复已写入的首份摘要，保留原始错误与回滚状态，避免 init 失败后留下半更新的 advisory summary；补充 EISDIR 回归验证。 (user-visible)
+
+- v1.15.3 2026-09-09 03:30:00 codex: fix(runtime-setup): 明确 Graphify 只读校验中的 unknown 是缺少当轮 currentness 证据，而非安装、索引或 query probe 失败；Provider 状态输出新增 install/index readiness 与 probe_status 说明，并补充回归测试。 (user-visible)
+
+- v1.15.3 2026-09-09 03:08:04 codex: fix(cli): 逐项收口 quickstart、init、doctor 的失败边界；quickstart --yes 遇到非唯一宿主时 fail-closed，init 保留多宿主 partial receipt、捕获 workspace summary 写入异常并回滚新建 ensure_dir，损坏 developer profile 不再直接复用，doctor 隔离 malformed runtime inspection，并在显式宿主且 runtime 未就绪时让缺失 CLI 返回非零；补齐针对性回归测试。 (user-visible)
+
 - v1.15.3 2026-09-09 00:50:00 leokuang: docs(plan): 逐项修复 Doctor Output UX 方案复审问题——补齐 disposition、workflow/decision evidence 边界、无宿主模式矩阵、JSON projection 兼容说明、错误退出负向回归和 README/FAQ 模式指引；同步让空项目 doctor 先输出总览再给初始化引导，保留 generated runtime 不变。 (user-visible)
 
 - v1.15.3 2026-09-09 00:45:00 leokuang: docs(plan): 根据方案 owner 的线下验证通过确认，将 `2026-09-05-002-next-phase-development-sequence.md` 状态更新为 `completed`；仓内机器证据保留为历史记录，完成依据为 owner 的线下验收。 (user-visible)
@@ -7329,3 +7339,5 @@
 - v1.8.2 2026-05-15 00:16:00 leokuang: feat(governance): 落地 multi-actor worktree 治理 plan U3 — 新增 spec-first-session.v1 opt-in advisory schema、CLI register/heartbeat/list/unregister 子命令、共享 helper、jest contract tests 与合同文档；未启用时所有现有 workflow 行为不变 (user-visible)
 
 - v1.8.2 2026-05-15 00:16:00 leokuang: feat(governance): 落地 multi-actor worktree 治理 plan U4 — using-spec-first guide mode 增加 Multi-Session Awareness 段落，substantial work 前可调用 `spec-first session list` 进行 read-only 感知，advisory 不阻塞;新增 prose 防漂移测试 (user-visible)
+
+- v1.8.2 2026-09-09: feat(spec-write-skill): 吸收 CE 3eb0c7a3 的 Skill 瘦身原则，要求保持 plain prose、优先迁移结构并保留字节余量

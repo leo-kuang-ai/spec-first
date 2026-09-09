@@ -133,3 +133,7 @@ Same-repo migration 对每个非 portable 文件给出 disposition：
 - Description 不使用 `<placeholder>`；需要占位时用自然语言或 `{placeholder}`。
 - 新增脚本必须有实际运行和零意外写入证据。
 - Forward testing 只传 raw artifact 和真实用户请求，不泄漏预期答案或 intended fix。
+
+### Plain prose during size restructuring
+
+Keep one idea per sentence in ordinary language. Do not fuse clauses, drop articles, or pack several rules into a compressed sentence merely to meet a byte ceiling. When a body is too large, move a coherent block to a reference named at its point of use or remove genuine redundancy. Leave headroom for later fixes; readability and preserved safety meaning take priority over squeezing bytes.
