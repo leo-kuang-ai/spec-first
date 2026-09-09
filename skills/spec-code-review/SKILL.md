@@ -6,6 +6,10 @@ argument-hint: "[mode:agent] [base:<ref>] [plan:<path>] [task-pack:<path> task:<
 
 # Code Review
 
+## Project Intelligence Evidence Boundary
+
+Graph output is `provider_untrusted` candidate coverage, never a finding. Re-ground impact, affected-test, ownership, and relationship candidates in current source, diff, tests, logs, contracts, or owner evidence before writing a `Direct evidence:` finding; empty results do not prove absence. Direct source/`rg`/ast-grep is valid and provider failure is a disclosed fallback.
+
 Reviews code changes against intent, tests, standards, and risk lenses. When reviewer dispatch is explicitly authorized and callable, it uses selected personas and merges structured findings; otherwise it performs an honest inline report-only review with degraded coverage.
 
 ## Workflow Contract Summary
@@ -34,6 +38,8 @@ Overrides: high-risk
 - `non-git-build-workspace` coverage gaps -> `partial`: review only the selected repo/inspected build surfaces and directly inspect uncovered modules before claiming they are unaffected.
 
 ## Argument Parsing
+
+Read `references/intent-and-plan.md`, `references/modes-and-output.md`, and `references/scope.md` before scope or output decisions.
 
 Parse the invocation arguments supplied by the current host for optional tokens. Strip only recognized tokens while preserving quoted paths, Windows drive paths, URLs, and the order of the remainder before interpreting it as a PR number, GitHub URL, or branch name.
 
