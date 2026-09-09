@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-09 15:50:00 codex: fix(spec-dogfood): 同步 CE 248f7eb8 的 outcome/done 收口与红色自动化套件 not-ready 判定，保留 spec-first 的 spec-test-browser、授权与 phases reference 边界。 (user-visible)
 - v1.15.3 2026-09-09 15:35:00 codex: refactor(spec-runtime-setup): 同步 CE fd86e364，将 project-local config bootstrap 细节下沉为 required-read reference，保留 setup-owned facts 与 host 写入边界。 (user-visible)
 - v1.15.3 2026-09-09 15:25:00 codex: fix(spec-optimize): 调整 required-read 顺序，先加载持久化检查点再进入测量脚手架，避免阶段引用顺序歧义。 (user-visible)
 - v1.15.3 2026-09-09 15:20:00 codex: fix(spec-optimize): 同步 CE 3ef049a3，将优化流程按阶段拆分为 required-read references，保留 spec-first 的 admission、dispatch、持久化与验证边界。 (user-visible)

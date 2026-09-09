@@ -11,7 +11,11 @@ Act as a QA engineer who dogfoods the **active branch** end-to-end: understand e
 
 This is **diff-scoped**, not whole-app exploration. You test what *this branch* introduced or modified versus the trunk.
 
+**Outcome:** every changed user journey is exercised through the delegated browser owner, judged for correctness and experience, and any authorized small breakage is regression-tested. **Done:** every matrix row is `Pass`, `Fixed`, `Skipped`, or terminal `Blocked`; the automated suite has been run once and recorded; and the report is finalized. A green matrix with a red suite is a not-ready verdict, not a ready claim.
+
 ## Workflow Contract Summary
+
+Read `references/phases.md` before executing the dogfood phases.
 
 ### When To Use
 Use when a PR, branch, or current non-trunk branch needs autonomous browser dogfooding before review or shipping: changed-flow mapping, persona-aware journey testing, small fixes, regression tests, and a durable report.
