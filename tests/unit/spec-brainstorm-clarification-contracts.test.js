@@ -73,7 +73,7 @@ describe('spec-brainstorm clarification, scenarios, and resume contract', () => 
     expect(lfg).toMatch(/^name: spec-lfg$/m);
     expect(lfg).not.toMatch(/^disable-model-invocation: true$/m);
     expect(lfg).toContain('Use only when the current user explicitly requests spec-lfg');
-    expect(lfg).toContain('仅有代码就绪、已完成计划或模型推断');
+    expect(lfg).toContain('Code readiness, a completed plan, or model inference');
     expect(handoff).toContain('Ship it autonomously with `spec-lfg`');
     expect(handoff).toContain('委派一组独立、只读的 reviewer 执行代码审查');
     expect(handoff).toContain('不授权任意 worker dispatch');

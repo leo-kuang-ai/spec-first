@@ -1,3 +1,7 @@
+# Browser And Final Verification (Steps 6-6.5)
+
+This reference owns the local verification stages, not cross-harness model routing.
+
 6. **Decide browser applicability, then verify when applicable.** Decide
    `browser_applicability: applicable | not_applicable` from the settled plan and
    actual changed flow, not filename extension alone. A changed user-visible

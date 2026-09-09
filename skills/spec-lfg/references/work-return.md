@@ -1,4 +1,6 @@
-2. Invoke the `spec-work` skill with `mode:return-to-caller <plan-path-from-step-1>`.
+# Implementation Return (Step 2)
+
+Invoke the `spec-work` skill with `mode:return-to-caller <plan-path-from-step-1>`.
 
    GATE: STOP. Verify that implementation work was performed - files were created or modified beyond the plan. Read the structured return and require `status: complete`, the same plan path, changed files, all in-scope U-IDs/tasks accounted for and completed, verification results with every required check passed or explicitly not applicable, an empty blocker list, behavior-change signal, `plan_status_completion_candidate`, `plan_status_completion_degraded_reason`, and `standalone_shipping_skipped: true`. Failed, not-run, vague, or missing required verification blocks the pipeline. Exactly one lifecycle shape is allowed: a non-null candidate with a null degraded reason, or a null candidate with one of `html-plan-lifecycle-degraded`, `legacy-plan-lifecycle-degraded`, `read-compatible-status-unmanaged`, or `source-plan-path-lifecycle-degraded`. Any missing, conflicting, or unknown lifecycle shape is blocked. When `behavior_change: true`, also require `verification_evidence` that names the relevant units/tasks, existing tests inspected, tests added/changed or used unchanged, red failure or characterization evidence when applicable, verification run, and any deliberate test exception. Do NOT decide the test strategy inside LFG; the evidence is spec-work's contract.
 

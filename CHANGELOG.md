@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 09:10:00 codex: refactor(spec-lfg): 完成 CE 956087b3 的 required-read 迁移，收敛入口与 references 的职责并补齐消费者读取路径；Skill 内容使用英文。 (user-visible)
 - v1.15.3 2026-09-09 18:35:00 codex: refactor(spec-lfg): 融合 CE 956087b3 的阶段 references 与 required-read 路由；Skill 正文及新增 references 使用英文，保留 pipeline admission、独立 review、browser/fingerprint 和 lifecycle 边界。 (user-visible)
 - v1.15.3 2026-09-09 18:25:00 codex: refactor(spec-brainstorm): 融合 CE ff4d21b8 的阶段按需加载结构，Skill 与新增 references 使用英文；保留当前用户确认、派发授权、私有 scratch、视觉决策退役和产品边界，补齐消费者测试读取实际 corpus。 (user-visible)
 - v1.15.3 2026-09-09 18:13:00 codex: refactor(spec-plan): 融合 CE 312943d4，缩减配置重复解释，将 scoping 与 goal 细节归回实际 owner；质量测试跟随阶段规则迁移，保留入口安全与目标责任断言。 (user-visible)

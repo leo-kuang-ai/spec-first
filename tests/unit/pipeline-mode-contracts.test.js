@@ -19,7 +19,7 @@ describe('pipeline mode contracts', () => {
   test('spec-commit-push-pr produces the New concepts trailer consumed by spec-lfg', () => {
     const skill = read('skills/spec-commit-push-pr/SKILL.md');
     const writingReference = read('skills/spec-commit-push-pr/references/pr-description-writing.md');
-    const lfg = read('skills/spec-lfg/SKILL.md');
+    const lfg = read('skills/spec-lfg/references/shipping-tail.md');
 
     expect(lfg).toContain('If it prints a `New concepts:` trailer after the PR URL');
     expect(lfg).toContain('run spec-explain <name> to go deeper');

@@ -14,7 +14,7 @@ describe('spec-work review consumer chain contracts', () => {
   const shipping = read('skills/spec-work/references/shipping-workflow.md');
   const tracker = read('skills/spec-work/references/tracker-defer.md');
   const lfgTracker = read('skills/spec-lfg/references/tracker-defer.md');
-  const lfgSkill = read('skills/spec-lfg/SKILL.md');
+  const lfgSkill = require('../helpers/lfg-contract').readLfgContract();
 
   test('run-local consumers reuse the returned artifact_path and never guess a temp path', () => {
     for (const source of [followup, shipping, tracker]) {

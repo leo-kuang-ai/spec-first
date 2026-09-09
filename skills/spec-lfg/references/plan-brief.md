@@ -1,4 +1,6 @@
-1. Invoke the `spec-plan` skill with the exact `forwarded_arguments` payload. When
+# Plan Input And Readiness (Step 1)
+
+Invoke the `spec-plan` skill with the exact `forwarded_arguments` payload. When
    `spec-brainstorm` invoked LFG, this payload is the absolute requirements-only
    unified plan path, so `spec-plan` recognizes it as an explicit Product Contract
    source and enriches that same artifact in place.

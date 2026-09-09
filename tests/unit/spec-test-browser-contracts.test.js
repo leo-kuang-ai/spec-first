@@ -13,10 +13,7 @@ const pipelineSource = fs.readFileSync(
   path.resolve(__dirname, '../../skills/spec-test-browser/references/pipeline-orchestration.md'),
   'utf8',
 );
-const lfgSource = fs.readFileSync(
-  path.resolve(__dirname, '../../skills/spec-lfg/SKILL.md'),
-  'utf8',
-);
+const lfgSource = require('../helpers/lfg-contract').readLfgContract();
 const testSuiteSource = fs.readFileSync(
   path.resolve(__dirname, '../../scripts/run-test-suite.cjs'),
   'utf8',

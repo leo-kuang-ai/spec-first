@@ -1,3 +1,5 @@
+# Shipping And Closeout (Steps 7-10)
+
 **Shipping precondition (steps 7–9).** Only after step 6.5 closes, run `git remote`
 once. If it lists **no remote** (e.g. a sandbox/throwaway checkout that has
 `git init` but no `origin`), shipping is **local-only**: make the local commits
@@ -66,5 +68,3 @@ retry a push or hunt for a remote. Run steps 7–9 normally when a remote exists
     offer in a later turn.
 
     If step 8 recorded a `New concepts:` trailer, first echo one line per concept: `New concept introduced: <name> — run spec-explain <name> to go deeper.` Then make any eligible non-blocking next-work offer and output `<promise>DONE</promise>`.
-
-Start with step 1 now. Remember: plan FIRST, then work. Never skip the plan.

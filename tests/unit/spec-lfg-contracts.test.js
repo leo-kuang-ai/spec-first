@@ -7,7 +7,9 @@ const path = require('node:path');
 const { getAdapter, getSupportedPlatforms } = require('../../src/cli/adapters');
 const plugin = require('../../src/cli/plugin');
 
-const skill = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-lfg/SKILL.md'), 'utf8');
+const entry = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-lfg/SKILL.md'), 'utf8');
+const { readLfgContract, phaseFiles } = require('../helpers/lfg-contract');
+const skill = readLfgContract();
 const simplifySkill = fs.readFileSync(
   path.resolve(__dirname, '../../skills/spec-simplify-code/SKILL.md'),
   'utf8',
@@ -22,6 +24,30 @@ const nextWorkHandoff = fs.readFileSync(
 );
 
 describe('spec-lfg current contracts', () => {
+  test('requires every relocated stage before execution and keeps its content out of the entry', () => {
+    for (const file of phaseFiles) {
+      expect(entry).toContain(`references/${file}`);
+      expect(fs.existsSync(path.resolve(__dirname, '../../skills/spec-lfg/references', file))).toBe(true);
+    }
+    expect(entry).toContain('Read the named reference before executing each stage');
+    expect(entry).toContain('mode:agent plan:<plan-path-from-step-1>');
+    expect(entry).not.toContain('verification_run_summary_ref');
+    expect(entry).not.toContain('gh pr edit PR_NUMBER');
+    expect(entry).not.toContain('capabilities.exact_origin_confirmed');
+    expect(entry).not.toMatch(/[\u3400-\u9fff]/);
+    for (const file of phaseFiles) {
+      const source = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-lfg/references', file), 'utf8');
+      expect(source).not.toMatch(/[\u3400-\u9fff]/);
+    }
+  });
+
+  test('gives child skills the task view and restores the remaining pipeline after return', () => {
+    const tasks = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-lfg/references/task-visibility.md'), 'utf8');
+    expect(tasks).toMatch(/replace or clear LFG's view.*only the child skill's task surface/s);
+    expect(tasks).toMatch(/after it returns, recreate or refresh LFG's remaining work/);
+    expect(tasks).toContain('without simulating a task list in chat');
+  });
+
   test('owns plan completion after return-to-caller gates close', () => {
     expect(skill).toContain('plan_status_completion_candidate');
     expect(skill).toContain('internal plan-status complete');
@@ -58,7 +84,7 @@ describe('spec-lfg current contracts', () => {
     expect(skill).toContain('one delegated read-only independent code review');
     expect(skill).toContain('coverage.dispatch_reason_code');
     expect(skill).toMatch(/status: complete[\s\S]*inline-fallback/is);
-    expect(skill).toMatch(/`failed`、`degraded`、`skipped`[\s\S]*副作用前停止/is);
+    expect(entry).toMatch(/`failed`, `degraded`, `skipped`[\s\S]*stops before step 5/is);
     expect(reviewFollowup).toContain('Consume only the returned JSON object');
     expect(reviewFollowup).toContain('coverage.dispatch_reason_code');
     expect(reviewFollowup).toMatch(/`failed`, `degraded`,\s+`skipped`/);
@@ -90,6 +116,7 @@ describe('spec-lfg current contracts', () => {
   });
 
   test('closes browser and cleanup gates before every durable or outward shipping side effect', () => {
+    const skill = entry;
     const reviewIndex = skill.indexOf('5. **Apply review fixes locally**');
     const browserIndex = skill.indexOf('6. **Decide browser applicability');
     const finalVerificationIndex = skill.indexOf('6.5. **Final working-tree verification**');
