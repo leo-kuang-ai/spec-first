@@ -121,6 +121,8 @@ The artifact file **must** carry the full detail-tier fields (`why_it_matters`, 
 
 #### Cross-model adversarial pass
 
+For native reviewers, correct a pre-launch argument rejection once without changing the prompt, scope, or required capabilities; capacity backpressure keeps its existing queue policy. Only a non-capacity launch error that survives correction counts as failure. After launch, collect the terminal result before any retry. Parent-context passes remain attributed evidence, never `independent_reviewers`; their agreement cannot promote confidence, and Coverage must name the lost independence.
+
 Collect terminal results from every started reviewer before Stage 5. Use the host's collection/wait capability for asynchronous tools; a pending reviewer is not an empty finding set. Preserve queued reviewers during capacity backpressure instead of silently dropping coverage.
 
 When `adversarial-reviewer` was selected (Stage 3) **and** scope is `local-aligned` or standalone, load `references/cross-model-review.md` and evaluate its admission gates. The peer lifecycle is optional and non-blocking for the main review, but its start is fail-closed: no canonical authorization journey receipt, mismatched receipt/request/payload hashes, non-allowlisted `input_refs`, incomplete external-data authorization, failed redaction, same-provider selection, or requested/actual model mismatch means no peer process and no independent coverage claim.

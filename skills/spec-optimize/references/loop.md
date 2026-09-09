@@ -18,7 +18,16 @@ metrics. Broken runs, timeouts, and harness errors are first-class outcomes;
 they must not receive synthetic scores or inflate an apparent improvement.
 
 Audit proposed reductions and their defenses in independent contexts when
-dispatch is available. A cut with no provenance after a real search is a
+authorized dispatch is available. For this corpus audit, separate proposal and
+defense contexts are required: if either cannot run, stop that audit as blocked
+and retain its candidates without applying them. A pre-launch argument rejection
+may be corrected once without weakening the packet or required capabilities;
+capacity-limited work stays queued, with a bounded stop if no slot becomes
+available. Other launch failures cannot be replaced by arguing both sides in
+one context. Collect every started job before retrying. Ordinary measurement
+and implementation keep their own permitted serial fallback.
+
+A cut with no provenance after a real search is a
 candidate; a cited test, contract, or learning that protects the text removes
 it from the cut list. Absence of evidence is a verification task when the
 project's normal change bar requires a reproduced failure.

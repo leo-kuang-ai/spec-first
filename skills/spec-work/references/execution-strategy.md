@@ -105,6 +105,8 @@ Normalize dispatch, inline, and serial paths as `worker_dispatch_outcome`. Host 
 
 ## 6. Choose Inline, Serial, Or Bounded Parallel
 
+For an authorized native dispatch, correct a pre-launch argument rejection once without changing the unit packet, isolation, or required capabilities. Capacity-limited work stays queued until a slot frees; repeated zero capacity uses the bounded inline fallback. Other launch failures execute the unit inline under the same packet and verification contract only after confirming no worker launched. Once a worker launches, reconcile its terminal outcome and actual tree before retrying or falling back.
+
 Map real dependencies and contention before a batch:
 
 - same-file edits, shared types/APIs, migrations, generated clients, lockfiles, snapshots, shared config/schema, and an environment singleton such as one dev server/port, database, browser session, package install, or rate-limited provider are contention;

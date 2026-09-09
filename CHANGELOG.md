@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(skills): 融合 CE 66ccf579 的启动前参数修正、容量背压与 owner 级失败处理，禁止本地多 lens 冒充独立佐证；语料审计保留独立提案/反驳要求。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(skills): 融合 CE dedf3013 的临近生成阶段模型意图复核与实际执行披露；不引入无本地消费者的 CE 配置键和上下文脚本。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(skills): 融合 CE 3c049544 的跨模型网络与认证归因、可信约束隔离及本地规则权威；保留 serving receipt 门禁、独立外发授权和严格模型要求。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(skills): 融合 CE 12d3d8c3，统一人工决策载荷与完整来源交接，LFG 以私有文件引用和 CAS 状态保存决策、失效整组并显式消费答案；继续独立工作且禁止未决或空检查集冒充完成。 (user-visible)

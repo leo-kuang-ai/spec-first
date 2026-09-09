@@ -1,5 +1,7 @@
 # Ideation grounding
 
+At each authorized native dispatch boundary, correct a pre-launch argument rejection once without changing scope or required capabilities. Capacity-limited work stays queued until a slot frees; repeated zero capacity uses the phase's bounded degraded path. Other launch failures use that same path and retain every required lens. Once an agent launches, collect its outcome before retrying; inline lenses are not independent agents.
+
 ### Phase 1: Mode-Aware Grounding
 
 Read `references/grounding.md` before grounding and `references/scope-gates.md` before exploration/convergence.

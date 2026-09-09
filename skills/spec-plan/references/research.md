@@ -1,5 +1,7 @@
 # Planning Research
 
+At every authorized native dispatch boundary, correct a pre-launch argument rejection once without changing scope or required capabilities. Capacity-limited work stays queued until a slot frees; repeated zero capacity uses the boundary's bounded fallback. Other launch failures follow that boundary's inline or failed-pass handling. Once an agent launches, collect its outcome before retrying; do not duplicate unresolved work. Apply this distinction to later deepening and review dispatches as well.
+
 **Trigger:** Before Phase 1 research, including inline research or authorized worker dispatch.
 
 This reference owns only the phases below. The entrypoint's planning-only, Product Contract, evidence, authorization, and completion boundaries remain in force. Resolve `references/...` paths from the `spec-plan` skill root. If a required source is unavailable, keep its dependent action and claim open.

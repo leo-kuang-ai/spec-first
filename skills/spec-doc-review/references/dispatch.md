@@ -1,5 +1,7 @@
 # Dispatching reviewers
 
+For an authorized native reviewer dispatch, correct a pre-launch argument rejection once without changing scope or required capabilities. Keep capacity-limited work queued under the bounded policy below. Other launch failures take the inline fallback with the same lens contract. Once a reviewer launches, collect its terminal outcome before retrying. Parent-context review remains non-independent evidence.
+
 ### Dispatch
 
 Before reviewer dispatch, record `worker_dispatch_authorization`, `capability_probe`, `worker_dispatch_capability`, `worker_context_isolation`, `worker_model_override`, and `worker_bounded_parallelism`, then normalize the result as `worker_dispatch_outcome`.

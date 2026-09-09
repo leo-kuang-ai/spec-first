@@ -1,5 +1,7 @@
 ## Phase 1: Investigate Candidate Learnings
 
+For an authorized dispatch, correct a pre-launch argument rejection once without changing the read-only scope or required capabilities. Capacity-limited work stays queued until a slot frees; repeated zero capacity uses the bounded inline fallback. Other launch failures run the same investigation inline with the same inputs and an explicit substitution note. Once a worker launches, collect its outcome before retrying; inline work earns no independent coverage.
+
 For each learning in scope, read it, cross-reference its claims against the current codebase, and form a recommendation.
 
 A learning has several dimensions that can independently go stale. Surface-level checks catch the obvious drift, but staleness often hides deeper:

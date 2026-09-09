@@ -246,6 +246,8 @@ If 2-3 hypotheses are exhausted without confirmation, diagnose why:
 
 Present the diagnosis to the user before proceeding.
 
+For an authorized probe dispatch, correct a pre-launch argument rejection once without changing the hypothesis, read-only scope, or required capabilities. Capacity-limited work stays queued until a slot frees; repeated zero capacity uses the bounded sequential path. Other launch failures run the same probes sequentially. Once a probe launches, collect its outcome before retrying; inline probes do not provide independent context evidence.
+
 ---
 
 ### Phase 3: Fix

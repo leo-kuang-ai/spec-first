@@ -1,5 +1,7 @@
 # Research Inputs
 
+For an authorized dispatch, correct a pre-launch argument rejection once without changing scope or required capabilities. Capacity-limited work stays queued until a slot frees; repeated zero capacity uses the bounded inline fallback. Other launch failures run the role in the parent context with the same contract and scratch artifact path. Once a worker launches, collect its outcome before retrying; disclose the substitution and do not claim independent coverage.
+
 Load and include the contents of each skill-local contract required by the selected roles, including `references/schema.yaml` and `references/yaml-schema.md`. A relative path alone does not give a fresh worker access to a skill's files. Resolve `SKILL_DIR` to the loaded skill directory; pass repo and scratch paths explicitly.
 
 Scratch is ephemeral, never the only durable deliverable or handoff evidence. Only the orchestrator publishes the approved learning or vocabulary candidates; research roles never write tracked paths.

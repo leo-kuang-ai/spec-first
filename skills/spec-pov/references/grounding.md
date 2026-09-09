@@ -1,5 +1,7 @@
 # Grounding the POV
 
+For an authorized scout dispatch, correct a pre-launch argument rejection once without changing scope or required capabilities. Capacity-limited work stays queued until a slot frees; repeated zero capacity uses the bounded inline fallback. Other launch failures gather the same bounded evidence inline and lower the stated confidence where lost independent evidence matters. Once a scout launches, collect its outcome before retrying; do not duplicate unresolved work.
+
 Read before project or precedent grounding. This reference owns the execution detail removed from the entry body.
 
 Dispatch is tiered by task shape, never hardcoded to a model name:
