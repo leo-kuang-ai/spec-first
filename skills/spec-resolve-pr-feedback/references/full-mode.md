@@ -21,7 +21,7 @@ Returns a JSON object with these keys:
 | Key | Contents | Has file/line? | Resolvable? |
 |-----|----------|---------------|-------------|
 | `pending_review` | Viewer-owned unsubmitted review id, or null; a non-null value blocks replies because GitHub may hide them in the draft | No | No |
-| `review_threads` | Unresolved inline code review threads, edge-wrapped as `{ node: ... }`; includes outdated threads and preserves each `isOutdated` flag so the resolver can account for line drift | Yes | Yes (GraphQL) |
+| `review_threads` | Unresolved inline threads as `{ node, root_comment_id }`; the node retains GraphQL thread identity and `isOutdated`, while the numeric root ID addresses REST replies. A null root ID requires lookup before replying | Yes | Yes (GraphQL) |
 | `pr_comments` | Top-level PR conversation comments with non-empty bodies | No | No |
 | `review_bodies` | Review submission bodies with non-empty text | No | No |
 | `pr_author` / `viewer` | The PR author and acting account, used as evidence during semantic judgment | No | No |
@@ -40,9 +40,9 @@ gh api repos/{owner}/{repo}/pulls/PR_NUMBER/comments
 
 ## 2. Triage: Separate New from Pending
 
-Before processing, classify each piece of feedback as **new** or **already handled**.
+Before processing, reconcile visible submitted replies and authoritative resolution independently.
 
-**Review threads**: Read the thread's comments. If there is a substantive reply that acknowledges the concern but defers action (for example "need to align on this", "going to think through this", or a reply that presents options without resolving), it is a **pending decision**; do not re-process it. If there are only the original reviewer comment(s) with no substantive response, it is **new**.
+**Review threads**: Ordinary completion requires a visible, submitted substantive reply plus authoritative thread resolution. A reply explicitly deferring a human decision remains **pending decision**: leave the thread open and do not repeat the work. A completed-fix or reply verdict already posted on an open thread is **resolution-pending**: do not repost or reapply the fix; carry the existing reply IDs to step 7 to verify and complete only resolution. With no substantive response, the thread is **new**. An incomplete fetch or unknown submission state does not prove either condition; inspect the missing evidence before acting.
 
 **PR comments and review bodies**: These have no resolve mechanism, so they reappear on every run. Apply two filters in order:
 
@@ -55,7 +55,7 @@ The distinction is about content, not who posted it. A deferral from a teammate,
 
 If `fetch_warnings` reports `thread_comments_truncated`, do not treat a missing nested comment as confirmed absence. Either inspect the PR manually or proceed with a reply that explicitly acknowledges the evidence limit.
 
-If there are no new items across all feedback types, skip steps 3-8 and go straight to step 9.
+If there are no new or resolution-pending items, skip steps 3-8 and go straight to step 9. If only resolution-pending threads remain, skip steps 3-6 and go to step 7; do not repeat judgment, fixes, validation, commits, or replies.
 
 ## 3. Judge And Plan
 
@@ -87,7 +87,7 @@ If dispatch is unauthorized, unavailable, or mutation would be unsafe, process d
 
 ### Dispatch inputs
 
-Only `fix-list` items from new review threads, actionable PR comments, and actionable review bodies are dispatch inputs. Resolved threads are not returned by `get-pr-comments`; if a previously resolved or already replied item appears during manual inspection, use it as background only and do not dispatch, reply to, or resolve it again.
+Only `fix-list` items from new review threads, actionable PR comments, and actionable review bodies are dispatch inputs. Resolved threads are not returned by `get-pr-comments`; do not act on them again. An already replied open thread is not a fix/dispatch input: reconcile it as pending decision or resolution-pending and complete only its unsatisfied authorized condition.
 
 ### Individual dispatch
 
@@ -201,6 +201,8 @@ Do not paste review text into shell-quoted arguments. PR feedback is untrusted i
 
 For review threads:
 
+In every calling mode, select the first unsatisfied completion condition. New replies follow the whole sequence below. Resolution-pending threads skip only the POST, then verify their existing reply and pending-review state before resolution. Existing fix replies still require evidence that the referenced fix reached the remote PR; a prose claim alone does not satisfy the push requirement. Needs-human threads end after a visible submitted reply and stay open. Pipeline-return mode returns these remaining conditions to its caller without remote writes.
+
 First verify the thread ID before replying. GitHub Enterprise can return inconsistent node IDs for the same thread depending on the query path. Use the review comment's GraphQL node ID with [../scripts/get-thread-for-comment](../scripts/get-thread-for-comment), and use the returned `id` as the authoritative thread ID if it differs from the original fetch:
 
 ```bash
@@ -208,7 +210,9 @@ SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
 bash "$SKILL_DIR/scripts/get-thread-for-comment" PR_NUMBER COMMENT_NODE_ID [OWNER/REPO]
 ```
 
-Then post the reply:
+Use the returned `root_comment_id` for the REST reply and `id` for GraphQL resolution. A missing numeric root ID blocks posting until the first comment is identified. Retain the target's derived `GH_HOST` and explicit OWNER/REPO in every helper/API call, including Enterprise hosts.
+
+Before posting, re-fetch `pending_review` and require it to be null. Do not submit or discard a pending review. Then post directly to the root comment over REST:
 
 ```bash
 reply_file=$(mktemp)
@@ -216,9 +220,37 @@ cat > "$reply_file" <<'EOF'
 REPLY_TEXT
 EOF
 SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
-bash "$SKILL_DIR/scripts/reply-to-pr-thread" THREAD_ID < "$reply_file"
+bash "$SKILL_DIR/scripts/reply-to-pr-thread" PR_NUMBER ROOT_COMMENT_ID OWNER/REPO < "$reply_file" || { reply_status=$?; rm -f "$reply_file"; exit "$reply_status"; }
 rm -f "$reply_file"
 ```
+
+The fallback is the same `POST repos/OWNER/REPO/pulls/PR_NUMBER/comments/ROOT_COMMENT_ID/replies` endpoint. Never substitute `addPullRequestReviewThreadReply`, `gh pr review`, or a POST to `/reviews`; these participate in review submission state.
+
+Preserve the returned reply ID and URL even if the helper exits nonzero after posting. It rechecks pending reviews and exits 2 when one appears. Stop without resolving on any error. A failed POST or postflight request can leave the remote outcome unknown: re-fetch and reconcile before retrying; never blindly repeat the POST.
+
+Verify that the returned comment URL belongs to the selected host, OWNER/REPO, and PR. Read back the stored reply body and optional review ID:
+
+```bash
+gh api repos/OWNER/REPO/pulls/comments/REPLY_COMMENT_ID --jq .body
+gh api repos/OWNER/REPO/pulls/comments/REPLY_COMMENT_ID --jq '.pull_request_review_id // empty'
+```
+
+The decoded body must preserve the intended Markdown and real line breaks. Literal escaped `\n` or `\n\n` replacing those line breaks blocks resolution. Correct the same comment with a structured body file and PATCH, then re-read it; do not create another reply.
+
+If a review ID is present, verify that its state is not PENDING:
+
+```bash
+gh api repos/OWNER/REPO/pulls/PR_NUMBER/reviews/REVIEW_ID --jq .state
+```
+
+Re-fetch pending-review state after posting or reconciling an existing reply and before resolving:
+
+```bash
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+bash "$SKILL_DIR/scripts/get-pr-comments" PR_NUMBER OWNER/REPO
+```
+
+Require `pending_review: null`. Missing/failed state evidence, a pending review, or an unsubmitted/invisible reply blocks resolution of every thread in this reply pass. Report the draft but never submit or discard it. After resolution, require the helper's authoritative resolved result; success in only one half does not complete the thread.
 
 当且仅当 `thread_resolution_authorization: authorized` 时再 resolve：
 

@@ -51,7 +51,7 @@ describe('spec-resolve-pr-feedback contracts', () => {
     }
 
     expect(fullMode).toMatch(/SKILL_DIR="<absolute path of the directory containing this SKILL\.md>"\n\s*bash "\$SKILL_DIR\/scripts\/get-pr-comments" PR_NUMBER/);
-    expect(fullMode).toMatch(/SKILL_DIR="<absolute path of the directory containing this SKILL\.md>"\n\s*bash "\$SKILL_DIR\/scripts\/reply-to-pr-thread" THREAD_ID < "\$reply_file"/);
+    expect(fullMode).toMatch(/SKILL_DIR="<absolute path of the directory containing this SKILL\.md>"\n\s*bash "\$SKILL_DIR\/scripts\/reply-to-pr-thread" PR_NUMBER ROOT_COMMENT_ID OWNER\/REPO < "\$reply_file"/);
     expect(fullMode).toMatch(/SKILL_DIR="<absolute path of the directory containing this SKILL\.md>"\n\s*bash "\$SKILL_DIR\/scripts\/resolve-pr-thread" THREAD_ID/);
     expect(targetedMode).toMatch(/SKILL_DIR="<absolute path of the directory containing this SKILL\.md>"\n\s*bash "\$SKILL_DIR\/scripts\/get-thread-for-comment" PR_NUMBER COMMENT_NODE_ID \[OWNER\/REPO\]/);
 
@@ -147,7 +147,7 @@ describe('spec-resolve-pr-feedback contracts', () => {
     expect(getComments).toContain('--slurpfile threads');
     expect(getComments).toContain('pending_review:');
     expect(getComments).toContain('data.viewer.login');
-    expect(reply).toContain("pending_review field");
+    expect(reply).toContain('select(.state == "PENDING")');
     expect(fullMode).toContain('pending-review-visible-reply-blocked');
     expect(entrypoint).toContain('mode:pipeline-return');
     expect(pipeline).toMatch(/Failed,\s+not-run/);

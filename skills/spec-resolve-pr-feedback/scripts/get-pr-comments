@@ -29,13 +29,12 @@ if [ -z "$OWNER" ] || [ -z "$REPO" ]; then
     exit 1
 fi
 
-# Output is a JSON object with five keys:
+# Output is a JSON object with these keys:
 #   pending_review   - viewer-owned PENDING review id or null. Replies can be
 #                      absorbed into this draft and remain invisible, so
 #                      consumers must stop before replying when it is non-null.
-#   review_threads   - unresolved inline review threads, edge-wrapped as
-#                      [{ node: { id, isResolved, isOutdated, path, line, ...,
-#                                 comments: { nodes: [...], pageInfo: ... } } }]
+#   review_threads   - unresolved threads as { node, root_comment_id }; the
+#                      numeric root REST ID is null if its URL is unavailable.
 #   pr_comments      - top-level PR conversation comments with non-empty bodies
 #   review_bodies    - review submissions with non-empty bodies
 #   pr_author        - the PR author's login, or null
@@ -164,7 +163,12 @@ jq -n \
     | select(.state == "PENDING")
     | select(($viewer == null) or (.author.login == $viewer))
     | .id) // null),
-  review_threads: [$unresolved[] | { node: . }],
+  review_threads: [$unresolved[] | {
+    node: .,
+    root_comment_id: ((try (.comments.nodes[0].url
+      | capture("#discussion_r(?<id>[0-9]+)$").id
+      | tonumber) catch null) // null)
+  }],
   pr_comments: [$all_comments[]
     | select(.body | test("^\\s*$") | not)],
   review_bodies: [$all_reviews[]

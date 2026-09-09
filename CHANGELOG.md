@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(spec-resolve-pr-feedback): 融合 CE 9f55d68a，使用根评论 REST 回复并复查 pending review，独立对账已发布回复与线程解决状态，避免恢复时重复处理。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(skills): 融合 CE 15ab6f76，Polish 按实际服务 URL 和选定目录启动，Riffrec 支持解压目录及可回滚快照替换，Xcode 按观测和复测保留失败状态；拆分阶段引用并保留本地授权与隐私边界。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(spec-brainstorm): 融合 CE ebef4813，先查环境事实、继续独立问题并及时说明影响产品决策的源码/词汇冲突；隔离访谈评估的提问通道。 (user-visible)
 - v1.15.3 2026-09-10 codex: refactor(skills): 融合 CE 6d2e6b41 的精简发现描述，明确审查与 PR 反馈路由，保留本地授权和 caller-owned work 边界。 (user-visible)

@@ -28,6 +28,8 @@ The script paginates the top-level `reviewThreads` connection and returns the ma
 
 ## 2. Fix, Reply, Resolve
 
+Before judgment, read Full Mode steps 2 and 7 in [full-mode.md](full-mode.md) and reconcile the reply and resolution conditions. A resolution-pending target skips judgment, fixing, validation, commit, push, and another reply; verify its existing submitted reply and empty pending-review state, then perform only authorized resolution. A pending human decision remains open. These shared checks also apply to new replies.
+
 Read [evaluation-rubric.md](evaluation-rubric.md) and judge this thread before any resolver dispatch. Account for `isOutdated` and the location fields (`line`, `originalLine`, `startLine`, `originalStartLine`). The cross-item reasoning is mostly inert for a single thread, but the read-depth and divert logic still apply: do not fix on reviewer authority alone.
 
 先应用 `SKILL.md` 的五项 Exit Authority Admission。没有 `local_fix_authorization` 时只做回源判断，不编辑；没有 `reply_authorization` 时不发布回复；没有 `thread_resolution_authorization` 时不 resolve。Commit 与 push 也分别要求自己的 authority，一项授权不得推导另一项。
