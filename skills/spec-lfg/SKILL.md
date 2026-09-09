@@ -39,7 +39,7 @@ Read the named reference before executing each stage. A missing required referen
 
 1. Invoke the `spec-plan` skill with the exact `forwarded_arguments` payload after reading `references/plan-brief.md`. Require a written `docs/plans/` implementation-ready code plan. Stop on a blocked, invalid, non-software, or requirements-only result. LFG never launches `/goal` directly; `spec-work` owns the implementation engine.
 
-2. Invoke the `spec-work` skill with `mode:return-to-caller <plan-path-from-step-1>` after reading `references/work-return.md`. Accept only its complete structured return; blocked, failed, missing, or vague required evidence stops the pipeline. The reference owns the single evidence-recovery retry and initial fingerprint.
+2. Invoke the `spec-work` skill with `mode:return-to-caller <plan-path-from-step-1>` after reading `references/work-return.md`. Only a valid `status: complete` return may advance. Blocked, failed, missing, unknown, or malformed status stops without retry regardless of files already created. The reference owns the minimum blocked recovery shape, complete field inventory, single evidence-recovery retry, and initial fingerprint.
 
 3. Invoke the `spec-simplify-code` skill on the branch diff after reading `references/review-followup.md`. Docs-only or trivial work may skip the invocation, but still read the reference before step 4. Do not commit here.
 

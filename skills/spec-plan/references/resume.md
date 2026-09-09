@@ -63,7 +63,7 @@ On entry (explicit, or an accepted offer), read `references/approach-altitude.md
 
 #### 0.1b Classify Task Domain
 
-If the task asks to build, modify, refactor, deploy, or architect software (code, schemas, infrastructure), continue to Phase 0.2.
+If the task asks to build, modify, refactor, deploy, or architect software (code, schemas, infrastructure), the artifact-producing route is now known. Re-read `references/output-mode.md` and settle pending configuration/default values before selecting a renderer or continuing to Phase 0.2.
 
 Classify by task-type, not topic. A request that merely *references* code, a repo, an API, or a database is not automatically software work: building or modifying code is software; investigating or analyzing it is an answer-seeking question. "How often does X star repos — is it a big deal?" or "how does our approach compare to Y?" route to `references/universal-planning.md` (answer-seeking), not the implementation-plan path.
 
