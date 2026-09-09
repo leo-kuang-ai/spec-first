@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(spec-lfg): 融合 CE d05e3951，明确从 host catalog 的 listed path 调用 spec-code-review，避免误读宿主 review skill；补齐 cold-caller fallback 文案。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 180fcd21 的 blocking question capability 文案与宿主测试；本地已无固定宿主探测文案，reference-only。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE f293ca43 的 README front door、安装/开发文档与演示资产改版；判定为 CE 产品文档与发布测试范围，reference-only，不迁移到 spec-first。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(spec-optimize): 融合 CE 6dda2038 的多目标比较、分阶段采样和中止退出语义；确认与集成后才记 kept，拒绝无效协议与伪造配对样本，保留现有测量授权边界。 (user-visible)

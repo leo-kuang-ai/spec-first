@@ -11,7 +11,9 @@ pipeline-return journey described below.
 
    Do not commit in this step. `spec-simplify-code` leaves its changes in the working tree; step 4's review scopes the working tree (uncommitted changes included), and step 8's `spec-commit-push-pr` commits whatever remains. Committing here would sweep any still-uncommitted `spec-work` edits into a misleading `refactor` commit and could stall on a tree that never goes clean.
 
-## Step 4 — Invoke Review
+## Step 4 — Invoke `spec-code-review`
+
+Load `spec-code-review` from the host catalog's listed path. A host skill named `review` is not this step; do not invent `skills/review/SKILL.md` under this skill package.
 
 ```text
 spec-code-review mode:agent plan:<plan-path-from-step-1>
