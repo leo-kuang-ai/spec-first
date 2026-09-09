@@ -7516,3 +7516,4 @@
 - v1.15.3 2026-09-10 codex: fix(sync): 修正 CE bcd86d04 迁移中的阶段 owner 归属与验证记录，恢复本地原有 Work 约束并明确聚焦测试仍受既有 dirty runtime anchor 影响。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE f1a80f21 发布元数据 bump，判定为上游发布证据，无本地同步。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(spec-code-review): 融合 CE dfeae095 的 diff 占位符去重语义，避免大 diff 路径说明再次造成内容重复。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 925b4ef7 发布元数据 bump，判定为上游发布证据，无本地同步。 (user-visible)
