@@ -7424,3 +7424,4 @@
 - v1.15.3 2026-09-09 17:20:00 codex: docs(sync): 完成 CE d05e3951 固定窗口提交的 owner 对账与 spec-first 边界核对。 (user-visible)
 - v1.15.3 2026-09-09 17:20:00 codex: docs(sync): 完成 CE 5d5b7843 固定窗口提交的 owner 对账与 spec-first 边界核对。 (user-visible)
 - v1.15.3 2026-09-09 17:20:00 codex: docs(sync): 完成 CE 5ac4c01a 固定窗口提交的 owner 对账与 spec-first 边界核对。 (user-visible)
+- v1.15.3 2026-09-09 17:20:00 codex: docs(sync): 完成 CE 871996c4 固定窗口提交的 owner 对账与 spec-first 边界核对。 (user-visible)
