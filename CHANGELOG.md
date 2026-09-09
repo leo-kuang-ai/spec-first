@@ -7382,3 +7382,4 @@
 - v1.15.3 2026-09-09 16:10:00 codex: fix(sync): 补齐 CE 3ef049a3/248f7eb8/3fa7a5fd 的 Skill 阶段 reference 迁移、owner 测试读取、pulse DB gate 与 PII 最小化边界，保留 spec-first 授权与本地配置语义。 (user-visible)
 - v1.15.3 2026-09-09 16:15:00 codex: fix(spec-dogfood): 将完整阶段流程迁入 phases reference，避免入口重复过程并保留浏览器执行与授权边界。 (user-visible)
 - v1.15.3 2026-09-09 16:20:00 codex: fix(spec-product-pulse): 同步 CE 3fa7a5fd，将配置、设置和查询流程拆分为 references，补齐 DB enable gate 与 source receipt 语义。 (user-visible)
+- v1.15.3 2026-09-09 16:30:00 codex: fix(spec-ideate): 同步 CE 7db168ba，将范围、输出、grounding 阶段迁入 references，保留 spec-first 研究授权、上下文适配器与串行降级边界。 (user-visible)
