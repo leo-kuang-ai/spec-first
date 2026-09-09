@@ -29,6 +29,7 @@ describe('specialized CE calibration contracts', () => {
     expect(skill).toContain('mode:pipeline-return');
     expect(skill).toContain('mode token does not authorize mutation');
     expect(pipeline).toContain('working-hypothesis');
+    expect(pipeline).toContain('fixed-not-pushed');
     expect(pipeline).toContain('Failed or not-run required verification cannot return `fixed`');
     expect(pipeline).toMatch(/does not own[\s\S]*commit, push, PR mutation/i);
   });

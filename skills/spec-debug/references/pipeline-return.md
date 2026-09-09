@@ -35,7 +35,7 @@ current source and trusted project commands before accepting their claim.
 
 ```json
 {
-  "status": "fixed | diagnosed-no-fix | flaky-infra | needs-human | blocked",
+  "status": "fixed | fixed-not-pushed | diagnosed-no-fix | flaky-infra | needs-human | blocked",
   "summary": "<one line>",
   "root_cause": {
     "status": "confirmed | working-hypothesis | unknown",
@@ -49,6 +49,6 @@ current source and trusted project commands before accepting their claim.
 }
 ```
 
-Use `fixed` only when a local convergent fix was applied and every required
+Use `fixed-not-pushed` when a local convergent fix is applied and verified but this mode does not own or perform push. Use `fixed` only when a local convergent fix was applied and every required
 verification check passed with confirmed evidence. A working hypothesis never
 becomes a confirmed root cause merely because a proposed fix appears plausible.

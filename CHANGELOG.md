@@ -7357,3 +7357,5 @@
 - v1.8.2 2026-09-09: feat(spec-handoff): 将创建/恢复规则拆为 required-read references，并区分用户决策与作者推断
 
 - v1.8.2 2026-09-09: feat(skill-structure): 为 spec-explain、spec-debug、spec-prototype、spec-sweep 补齐 CE required-read 与复现/原型边界
+
+- v1.8.2 2026-09-09: fix(spec-debug): 区分本地已修复但未推送与已推送的 pipeline 返回状态
