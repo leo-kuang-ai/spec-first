@@ -20,12 +20,14 @@ This command takes a work document (plan or specification) or a bare prompt desc
 - **Ownership:** scripts prepare deterministic facts; LLMs judge semantic fit. Canonical source is modified; generated runtime mirrors are never source fixes. Local mutation, commit, landing, lifecycle, and durable evidence are separate exits.
 - **Consumers:** `spec-code-review`, caller-owned LFG/goal flows, commit/PR/release workflows, `spec-compound`, and human reviewers.
 
-**代码执行的收尾边界：** 跳过 simplify 或独立 review 不豁免证据收尾。完成了本地修改与验证后，先按 `references/shipping-workflow.md` 记录 `verification-run-summary`、运行 `honest-closeout`，再由 owning workflow 判断是否可执行 `plan-status complete`；不以“机械修改”或“一行数据”省略该顺序。历史补完仅关闭有效后继，不回写旧计划；只读审查、无需修改的已完成检查和 `execution: knowledge-work` 仍按各自入口范围交付。
+**Code closeout boundary:** Skipping simplify or independent review does not waive evidence closeout. After local changes and verification, follow `references/shipping-workflow.md`: record `verification-run-summary`, run `honest-closeout`, then let the owning workflow decide whether `plan-status complete` is eligible. Mechanical or one-line changes do not waive that order. Historical completion closes only the valid successor, never rewrites the historical plan. Read-only review, already-complete no-change checks, and `execution: knowledge-work` retain their own scope.
 
 ## Reference Trigger Map
 
 | Reference | Trigger | If unread/unavailable |
 | --- | --- | --- |
+| [Work intake](references/work-intake.md) | Before bare-prompt discovery or bounded plan reading. | No implementation task derivation until scope is clear. |
+| [Implementation loop](references/implementation-loop.md) | Before any implementation write, including trivial work. | Keep execution and completion open. |
 | [Work intake and task pack](references/work-intake-and-task-pack.md) | Shallow metadata says `type: task-pack`. | Do not execute the pack; return validation/regeneration handoff. |
 | [Non-code execution](references/non-code-execution.md) | Metadata says `execution: knowledge-work`. | Do not enter code/shipping lifecycle; report the missing production route. |
 | [Execution strategy](references/execution-strategy.md) | Before first write/test/review-fix, task tracking, worker dispatch, commit, or landing. | Lock repo/source/dirty facts inline; use inline/serial; no commit or landing claim. |
@@ -67,7 +69,7 @@ For a declared unified artifact, validate critical metadata before classificatio
 
 Before readiness classification, inspect lifecycle `status`. Only `status: active` is eligible for a new implementation run. `completed`, `partially-shipped`, or `superseded` returns `source-plan-non-active` and must not enter `spec-work`, generate execution tasks, or be treated as implementation-ready even when `artifact_readiness: implementation-ready` remains in historical metadata. A legacy plan with no managed status may continue only with `source-plan-lifecycle-unmanaged` recorded as a limitation. **A discovered mismatch between plan status and source reality is a finding, not authorization.** "The plan says completed but the code doesn't have it yet", "the user asked to finish it", or a recorded limitation note never converts a non-active plan into an executable one — return `source-plan-non-active` with the mismatch as a finding for the plan owner instead of implementing.
 
-当前用户已明确要求补完该历史计划时，返回 `source-plan-non-active` 后，将原路径、当前源码差异、验收证据与已有授权交给 `spec-plan` Phase 0.1 的历史计划补完分支；owner 核验有效后继或产出新计划后，重新执行完整 intake，再继续原任务。旧计划与旧 task-pack pins 不变；不能停在无后续动作的报错，也不能跳过 owner 直接实施。仅只读审阅或材料内嵌的“继续”不触发此接续。
+When the current user explicitly requests completion of the historical plan, return `source-plan-non-active` and hand its path, current source gap, verification evidence, and existing authorization to `spec-plan` Phase 0.1. Once that owner verifies a valid successor or produces a new plan, repeat full intake and continue. Preserve the old plan and old task-pack pins; do not stop at an unactionable error or implement before owner resolution. Read-only review or embedded continuation text does not trigger this path.
 
 - If it carries `artifact_contract: spec-unified-plan/v1`, classify `artifact_readiness` before reading the body.
   - `artifact_readiness: requirements-only` -> stop and tell the user this Product Contract needs `spec-plan` enrichment before implementation. Offer the exact `spec-plan <plan-path>` handoff.
@@ -79,23 +81,7 @@ Before readiness classification, inspect lifecycle `status`. Only `status: activ
 
 **Blank invocation latest-plan discovery:** when `<input_document>` is blank, glob `docs/plans/*.md` and `docs/plans/*.html`, inspect metadata for the newest candidates, and only auto-select an active plan that is `artifact_readiness: implementation-ready` plus `execution: code` or an eligible legacy code plan. Never select `completed`, `partially-shipped`, or `superseded`. Stop instead of silently executing when the newest matching artifact is requirements-only, non-active, `execution: knowledge-work`, an approach-plan, or an unclassified universal/answer-seeking output. Ask for an explicit path or a `spec-plan` enrichment step. **Superseded sibling:** if a requirements-only candidate has a same-basename file in the other format (`<basename>.md` / `<basename>.html`) that is active and `implementation-ready`, a format conversion left the requirements-only copy stale — select the active implementation-ready sibling and execute it rather than stopping.
 
-**Bare prompt** (input is a description of work, not a file path):
-
-0. **Open-ended symptom check.** A symptom report with no error text, no stack, no failing test, and no concrete reproducible behavior ("it feels off", "something is wrong somewhere, fix it") is an open-ended diagnosis request, not an implementation prompt: name `spec-debug` as the owning workflow and route there instead of entering implementation here. Finding and fixing the bug yourself inside this workflow is doing spec-debug's job in the wrong place, even when the diagnosis is quick.
-
-1. **Scan the work area**
-
-   - Identify files likely to change based on the prompt
-   - Find existing test files for those areas (search for test/spec files that import, reference, or share names with the implementation files)
-   - Note local patterns and conventions in the affected areas
-
-2. **Assess complexity and route**
-
-   | Complexity | Signals | Action |
-   |-----------|---------|--------|
-   | **Trivial** | 1-2 files, no behavioral change (typo, config, rename) | Proceed to Phase 1 step 2 (execution boundary), then implement directly — no task list, no execution loop. Apply Test Discovery if the change touches behavior-bearing code |
-   | **Small / Medium** | Clear scope, under ~10 files | Build a task list from discovery. Proceed to Phase 1 step 2 |
-   | **Large** | Cross-cutting, architectural decisions, 10+ files, touches auth/payments/migrations | Inform the user this would benefit from `spec-brainstorm` or `spec-plan` to surface edge cases and scope boundaries. Honor their choice. If proceeding, build a task list and continue to Phase 1 step 2 |
+**Bare prompt** (input is a description of work, not a file path): read `references/work-intake.md` for bounded discovery and routing. Open-ended symptoms still belong to `spec-debug`; no unclear prompt grants worker or egress authorization.
 
 ---
 
@@ -103,20 +89,7 @@ Before readiness classification, inspect lifecycle `status`. Only `status: activ
 
 1. **Read Plan and Clarify** _(skip if arriving from Phase 0 with a bare prompt)_
 
-   - For validated task-pack input, treat the resolved `source_plan` as the plan read below and use only the machine-readable `Task Pack Contract`/`execution_waves` for task creation. Follow `references/work-intake-and-task-pack.md`; do not re-split from the source plan or human-readable cards.
-   - For unified plans, size your read. A short plan (lightweight or requirements-only, a screen or two) can be read in full. For a long implementation-ready plan, do **not** read the whole document first — it is expensive and unnecessary. Build a section map, then read only what the active unit needs: metadata, then `Goal Capsule`, `Verification Contract`, `Definition of Done`, the `Implementation Units` heading list, and only the active U-ID section plus referenced R/F/AE/KTD excerpts. Read appendices or unrelated U-IDs only when the active unit cites them. To build the map: in **markdown** scan headings (`rg -n '^#{1,3} ' <plan>` — top-level sections plus `### U<N>.` units); in **HTML** scan the `<h1>`–`<h3>` heading elements and their anchor ids. Match on the stable section names / unit IDs (`Goal Capsule`, `Verification Contract`, `### U<N>.`, …), ignoring HTML wrapper tags — not on a format-specific pattern.
-   - For legacy plans, read the work document completely. Both formats (`.md`, `.html`) carry the same section names and IDs; HTML just wraps them in semantic elements (`<section>`, `<article>`, etc.).
-   - Treat the plan as a decision artifact, not an execution script
-   - If the plan includes sections such as `Implementation Units`, `Work Breakdown`, `Requirements` (or legacy `Requirements Trace`), `Files`, `Test Scenarios`, or `Verification`, use those as the primary source material for execution
-   - Check for `Execution note` on each implementation unit — these carry the plan's natural-language execution direction for that unit (for example, start from failing proof, characterize legacy behavior, or prefer smoke/runtime verification). Note them when creating tasks, but do not reduce them to keyword matching.
-   - Check for a `Deferred to Implementation` or `Implementation-Time Unknowns` section — these are questions the planner intentionally left for you to resolve during execution. Note them before starting so they inform your approach rather than surprising you mid-task
-   - Check for a `Scope Boundaries` section — these are explicit non-goals. Refer back to them if implementation starts pulling you toward adjacent work
-   - Review any references or links provided in the plan
-   - For a direct implementation-ready plan whose unit count, dependency graph, context volume, or verification spread makes a derived index materially useful, suggest `spec-write-tasks` once as an optional path. Never auto-compile it and never block direct execution solely because a task pack would help.
-   - If the user explicitly asks for TDD, test-first, characterization-first execution, or a specific verification style in this session, honor that direction even if the plan has no `Execution note`
-   - Check current source, the plan, and the conversation first. Ask only about material ambiguity that cannot be resolved independently and affects the goal, acceptance, scope, or material side effects.
-   - Explicit clarification answers take effect directly, without another approval of the same answer. Record necessary context and continue. If an answer introduces a new incompatible choice or material side effect, ask only about that new part.
-   - **Do not edit the plan body during execution.** The plan is a decision artifact; progress lives in git commits and the task tracker, not the plan. The only permitted plan mutation is the final shipping closeout transition described in `references/shipping-workflow.md`: after the completion gates close, the tail owner may use the deterministic helper to change a Markdown source plan from `active` to `completed`. This marker is not progress or completion evidence. Leaf workers, reviewers, and subagents never mutate plan status. Legacy `- [ ]` / `- [x]` marks remain ignored; per-unit completion is determined from current source and verification evidence.
+   Read `references/work-intake.md` before reading implementation units. It owns bounded plan reading and clarification; validated task packs still use `references/work-intake-and-task-pack.md`. Do not edit the plan body during execution. Progress lives in verified task evidence and Git; only the shipping owner may close lifecycle after required gates.
 
 2. **Establish Execution Boundary And Strategy**
 
@@ -155,80 +128,20 @@ Before readiness classification, inspect lifecycle `status`. Only `status: activ
 
 ## Anti-Rationalization Red Flags
 
-| 红旗念头 | 停下来做什么 |
+| Rationalization | Response |
 | --- | --- |
-| 「测试大概会过，先声明完成」 | 跑匹配当前 slice 的真实验证，读取 exit/log，再声明 passed 或记录 not-run reason。 |
-| 「计划写了 new wrapper，照着建就行」 | 读 current source，按 `reuse / extend / compose / new` 重查 owner；无 translation/sequencing/safety/evidence 边界的 wrapper 不创建。 |
-| 「相邻代码顺手一起清理」 | 回到 active plan/task 与实际 changed set；非必要 debt 进入既有 residual/defer sink。 |
-| 「临时文件或 orphan 留着不影响」 | 清理本次 run 造成的 orphaned source、test、reference、log 或 runtime artifact，并复跑对应 feedback loop。 |
+| "Tests probably pass; call it complete." | Run verification appropriate to the slice, read exit/log evidence, and report passed or a concrete not-run reason. |
+| "The plan says new wrapper; just build it." | Read current source and recheck `reuse / extend / compose / new`; do not add a wrapper without a translation, sequencing, safety, or evidence responsibility. |
+| "Clean up nearby code while here." | Recheck active scope and changed paths; unnecessary debt belongs in the existing residual/defer sink. |
+| "Temporary or orphaned files do not matter." | Clean up this run\'s orphaned source, tests, references, logs, and runtime artifacts, then rerun the affected feedback loop. |
 
-这是注意力提醒,不是 gate,也不替代 LLM 判断;最终是否停下、如何处理仍由你按当前证据决定。
+These are attention reminders, not additional gates or substitutes for judgment.
 
 ### Phase 2: Execute
 
-1. **Task Execution Loop**
+Before the first implementation write, including a trivial route without tasks, read `references/implementation-loop.md`. It owns task execution, targeted verification, pattern reuse, simplification, UI checks, progress, and commit checkpoints. Follow `references/feedback-and-tests.md` before behavior changes and `references/implementation-quality.md` before durable-surface changes.
 
-   Execute one dependency-ready unit/task at a time, or one bounded disjoint wave when dispatch/isolation facts allow it:
-
-   1. Recheck task-pack/source-plan pins and `stop_if` when applicable; drift or stop conditions halt this task and dependents before mutation.
-   2. Capture pre-task dirty/untracked/file facts, read the active unit packet and current source, and verify whether the work already exists before reimplementing.
-   3. For behavior-bearing work, apply [Feedback and tests](references/feedback-and-tests.md): establish the smallest loop, choose proof/characterization/replacement evidence, and keep the slice vertical.
-   4. Before durable-surface mutation, apply [Implementation quality](references/implementation-quality.md): inventory current owners, recheck `reuse / extend / compose / new`, and stop back on unapproved architecture/scope.
-   5. Implement only the current slice in canonical source, update the correct existing/new tests, rerun the same loop, then run applicable system-wide/integration checks.
-   6. Inspect the actual changed tree against declared scope; record behavior/test/red-or-characterization/command/result/exception evidence. Do not reconstruct worker-only pre-implementation observations from the diff.
-   7. For task packs, compute attributed task delta facts and close any `review_gate: required` with bounded `spec-code-review mode:agent` before dependent waves. Caller-owned fixes rerun affected verification; at most one follow-up review is allowed. Blocking/degraded round two stops; non-blocking P2/P3 remains run-local residual work.
-   8. Mark complete only after scope, evidence, required review, and blockers close. Record a logical commit candidate; create it only with `commit_authorization: authorized`.
-
-   Execution notes are intent, not enums. Proof-first requires observing the expected failure before production change; characterization records existing behavior without declaring it correct. Trivial rename/config/style/generated/manual-only work may use an explicit replacement check. Never add duplicate tests merely to demonstrate ceremony, over-implement beyond the active slice, or claim coverage for a check that did not run.
-2. **Commit Checkpoint**
-
-   Follow `references/execution-strategy.md` § Commit Authorization. Local implementation and green tests do not authorize a commit. Workers never commit. Without explicit commit authorization, keep verified changes uncommitted and report coherent commit candidates; with authorization, the orchestrator stages only run-owned files and commits only a verified logical unit.
-
-3. **Follow Existing Patterns**
-
-   - The plan should reference similar code - read those files first
-   - Match naming conventions exactly
-   - Reuse existing components where possible
-   - Follow the project's coding standards already in your context
-   - When in doubt, grep for similar implementations
-
-4. **Test Continuously**
-
-   - Run relevant tests after each significant change
-   - Don't wait until the end to test
-   - Fix failures immediately
-   - Add new tests for new behavior, update tests for changed behavior, remove tests for deleted behavior
-   - **Unit tests with mocks prove logic in isolation. Integration tests with real objects prove the layers work together.** If your change touches callbacks, middleware, or error handling — you need both.
-
-5. **Simplify as You Go**
-
-   At a behavior-cluster/dependency-wave boundary, read `references/implementation-quality.md` § Simplification At Phase Boundaries. Classify findings as `remove-now`, `minimality-debt`, `protected`, or `architecture-mismatch`; do not default to extract-helper, delete security/data-integrity/a11y/observability/required-verification code for lower LOC, or widen scope to pay unrelated debt.
-
-   If **`spec-simplify-code`** is available, invoke it at phase boundaries (especially before Phase 3 when the diff is >=30 lines) with the same classification and protected-surface constraints. Otherwise, perform the bounded pass inline. Rerun the same feedback loop for every `remove-now` or authorized architecture correction.
-
-6. **Figma Design Sync** (if applicable)
-
-   For UI work with Figma designs:
-
-   - Implement components following design specs
-   - Read `references/agents/figma-design-sync.md` and dispatch a generic subagent seeded with that local prompt to compare implementation against the Figma design. Do not dispatch a standalone agent by type/name.
-   - Fix visual differences identified
-   - Repeat until implementation matches design
-
-7. **Frontend Design Guidance** (if applicable)
-
-   For UI tasks without a Figma design -- where the implementation touches view, template, component, layout, or page files, creates user-visible routes, or the plan contains explicit UI/frontend/design language:
-
-   - Apply the frontend guidance embedded in this skill and the active repo instructions: preserve existing design-system conventions, use real UI controls and states, keep layouts responsive, and verify text does not overflow or overlap.
-   - When browser tooling is available, inspect the changed UI at desktop and mobile widths before final validation. If no browser access is available, do a code-level responsive/layout review and record that browser verification was unavailable.
-   - Phase 4's screenshot capture still applies when the change is user-visible.
-
-8. **Track Progress**
-   - Keep the task list updated as you complete tasks
-   - Note any blockers or unexpected discoveries
-   - Do not create replacement tasks when scope expands; for task-pack input honor `stop_if` and return to `spec-write-tasks`/`spec-plan`, and for direct-plan input return to the plan owner when acceptance, architecture, ownership, or verification scope changes
-   - Keep user informed of major milestones
-   - When the plan defines U-IDs for Implementation Units, or the plan or origin document carries stable R-IDs (and optionally A/F/AE IDs), reference them in blockers, deferred-work notes, task summaries, and final verification — not routine status updates. U-IDs anchor units across plan edits; R/A/F/AE anchor product intent across the brainstorm-plan handoff. Use the IDs the plan supplies and do not invent ones it does not. This preserves traceability without burying signal under noise.
+One commit boundary remains unconditional: only the orchestrator may stage and commit an authorized, verified logical unit. Preserve pre-existing staged and unstaged work; never commit another task's index entries or whole-file changes merely because paths overlap.
 
 ### Phase 3-4: Quality Check and Finishing Work
 
@@ -262,7 +175,7 @@ Return:
 - `verification_results`
 - `verification_evidence`: one entry per attempted behavior-bearing unit, plus any non-behavioral unit where tests were intentionally skipped. Each entry states the unit/task, `behavior_changed`, `existing_tests_inspected`, `tests_added_or_changed`, tests used unchanged, red failure or characterization observed when applicable, verification commands/results, and any exception reason. For units executed by subagents, this entry is assembled from each worker's returned evidence (Phase 1 Step 4), not reconstructed from the diff — the red-before-implementation observation exists only in the worker's report.
 - `verification_run_summary_ref`: repo-relative `verification-run-summary.v1` ref produced from the commands this work run actually executed, or `null` with an explicit limitation when no structured summary could be written
-- `verified_worktree_fingerprint`: the complete `spec-work-working-tree-fingerprint/v1` object produced by `scripts/working-tree-fingerprint.cjs` (resolved from this skill's own `SKILL_DIR`) after this invocation's final required verification and immediately before return. It covers HEAD, tracked/staged/unstaged diff, untracked paths, and untracked bytes. A behavior-bearing `status: complete` return requires it; non-behavior returns still include it whenever the helper can run, so callers can apply freshness gates uniformly. 非行为修改的 no-test exception 只说明无需自动测试的原因、replacement verification 与覆盖限制，不豁免可运行的 fingerprint helper 或已执行验证的 structured closeout。If the helper cannot run (missing runtime asset, no git, no Node), record a `fingerprint-helper-unavailable` blocker naming the concrete cause — never fabricate the object or omit it silently.
+- `verified_worktree_fingerprint`: the complete `spec-work-working-tree-fingerprint/v1` object produced by `scripts/working-tree-fingerprint.cjs` (resolved from this skill's own `SKILL_DIR`) after this invocation's final required verification and immediately before return. It covers HEAD, tracked/staged/unstaged diff, untracked paths, and untracked bytes. A behavior-bearing `status: complete` return requires it; non-behavior returns still include it whenever the helper can run, so callers can apply freshness gates uniformly. A non-behavior no-test exception explains why automated tests are unnecessary, replacement verification, and coverage limits; it does not waive an available fingerprint helper or structured closeout for executed verification. If the helper cannot run (missing runtime asset, no git, no Node), record a `fingerprint-helper-unavailable` blocker naming the concrete cause — never fabricate the object or omit it silently.
 - `honest_closeout_verdict`: `verified`, `degraded`, or `unsupported`, together with the validator `overall_reason_code`
 - `run_artifact_path`: repo-relative `spec-work-run-artifact/v2` path when a durable trigger wrote one; otherwise `null`
 - `run_artifact_reason_code`: the matched durable trigger, `no-trigger-matched`, or the producer's concrete `not-written` reason
@@ -278,7 +191,7 @@ Return `status: complete` only when every in-scope unit/task is accounted for an
 
 If a previous return-to-caller run implemented code but omitted evidence, or the caller re-enters after caller-owned simplification/review fixes, the later same-plan invocation must use the idempotency path instead of reimplementing. Re-read the current plan and tree, rerun the complete applicable Verification Contract against the current working tree, create a fresh verification-run-summary ref for commands executed by this invocation, and capture a new `verified_worktree_fingerprint` only after those checks finish. Never reuse the earlier run summary or fingerprint as final-tree evidence.
 
-`standalone_shipping_skipped: true` 只表示 caller owns simplify、full review、plan lifecycle 与 landing tail；它不跳过本次 work 已执行命令的 structured closeout。按照 `references/shipping-workflow.md` 的 Step 5.1 记录 run summary、校验 honest closeout，并按 durable trigger 返回 run artifact path/reason。不得把 plan 中列出的候选命令、worker 的自然语言“tests pass”或 session-temp review path 当成这些字段的 confirmed evidence。
+`standalone_shipping_skipped: true` only assigns simplify, full review, plan lifecycle, and landing to the caller; it does not skip structured closeout for commands this work run executed. Follow `references/shipping-workflow.md` Step 5.1 to record the run summary, validate honest closeout, and return the run artifact path/reason when the durable trigger applies. Candidate commands in a plan, worker prose saying tests pass, and session-temp review paths are not confirmed evidence for these fields.
 
 Engine selection (`references/execution-engines.md`) still applies in this mode,
 but only for implementation. In return-to-caller mode do not emit a copyable

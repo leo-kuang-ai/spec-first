@@ -3,7 +3,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const skill = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-work/SKILL.md'), 'utf8');
+const skill = ['SKILL.md', 'references/work-intake.md', 'references/implementation-loop.md']
+  .map(file => fs.readFileSync(path.resolve(__dirname, '../../skills/spec-work', file), 'utf8')).join('\n');
 const shipping = fs.readFileSync(
   path.resolve(__dirname, '../../skills/spec-work/references/shipping-workflow.md'),
   'utf8',
@@ -16,19 +17,19 @@ const engines = fs.readFileSync(
 describe('spec-work current contracts', () => {
   test('keeps mechanical review exceptions separate from evidence and lifecycle closeout', () => {
     const entry = skill.slice(0, skill.indexOf('## Reference Trigger Map'));
-    expect(entry).toContain('跳过 simplify 或独立 review 不豁免证据收尾');
+    expect(entry).toContain('Skipping simplify or independent review does not waive evidence closeout');
     expect(entry).toContain('verification-run-summary');
     expect(entry).toContain('honest-closeout');
     expect(entry).toContain('plan-status complete');
-    expect(entry).toContain('不回写旧计划');
-    expect(skill).toContain('no-test exception 只说明无需自动测试的原因');
+    expect(entry).toContain('never rewrites the historical plan');
+    expect(skill).toContain('A non-behavior no-test exception explains why automated tests are unnecessary');
     expect(skill).not.toContain('or a deliberate non-behavior exception');
   });
 
   test('returns authorized historical completion to the plan owner and repeats intake', () => {
-    expect(skill).toContain('当前用户已明确要求补完该历史计划');
-    expect(skill).toContain('重新执行完整 intake');
-    expect(skill).toContain('旧计划与旧 task-pack pins 不变');
+    expect(skill).toContain('current user explicitly requests completion of the historical plan');
+    expect(skill).toContain('repeat full intake');
+    expect(skill).toContain('Preserve the old plan and old task-pack pins');
     const intake = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-work/references/work-intake-and-task-pack.md'), 'utf8');
     expect(intake).toContain('旧 pins 不得重绑');
     expect(intake).toContain('再从 intake 接续');

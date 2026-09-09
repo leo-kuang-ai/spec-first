@@ -165,6 +165,7 @@ Local implementation authorization does not imply git commit authorization.
 - Set `commit_authorization: authorized` only when the current user or visible upstream contract explicitly requests commits or owns a commit-producing tail.
 - Without commit authorization, leave verified changes uncommitted and report the logical commit candidates.
 - With authorization, stage only run-owned files; never use broad staging that captures unrelated dirty paths. Commit only a coherent, verified logical unit. Default-branch commits still require explicit permission.
+- Inspect the full staged diff immediately before committing. A bare `git commit` consumes every staged entry, including pre-existing staged work. Path-limited commits are suitable only for wholly run-owned paths; they can include unstaged edits from those paths, so they do not isolate overlapping user hunks. For overlaps, preserve unrelated hunks and use an inspected task-only index or leave the overlapping path uncommitted. Never treat a path list as proof of hunk ownership.
 - Workers never commit; the orchestrator is the single commit owner.
 
 ## 10. Landing Authorization

@@ -125,6 +125,7 @@ const existingQualifiedPackages = [
     boundarySource: 'skills/spec-work/SKILL.md',
     sources: [
       'skills/spec-work/SKILL.md',
+      'skills/spec-work/references/implementation-loop.md',
       'skills/spec-work/references/execution-strategy.md',
       'skills/spec-work/references/execution-engines.md',
       'skills/spec-work/references/review-findings-followup.md',

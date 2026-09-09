@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-09 18:20:00 codex: refactor(spec-work): 融合 CE cb230f14，将计划读取和实施循环迁入按需 references，保留任务包与收尾证据边界；入口和新增 references 使用英文，补齐提交前全 index 核对及重叠 hunk 保护。 (user-visible)
 - v1.15.3 2026-09-09 18:10:00 codex: refactor(spec-compound): 融合 CE 26f38961 的按阶段加载结构，Skill 与新增 references 使用英文，保留候选验证后发布、独立授权与原子写入边界，补齐 Lightweight 依赖和部分发布报告。 (user-visible)
 - v1.15.3 2026-09-09 17:34:00 codex: refactor(spec-code-review): 补齐 CE 4df5f99d 的阶段迁移，消除入口与 references 重复并统一为英文；修正早期 run identity 与 snapshot endpoint 顺序，保留本地授权、task scope、provider receipt 与失败披露，测试改读实际 owner。 (user-visible)
 - v1.15.3 2026-09-09 17:22:29 codex: fix(sync): 修正 CE 129 项任务表的状态列错位，撤回 97 份模板证据的不实完成声明，恢复执行方案 active 状态并登记逐项补验范围。 (user-visible)

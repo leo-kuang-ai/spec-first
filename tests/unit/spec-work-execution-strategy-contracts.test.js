@@ -60,6 +60,8 @@ describe('spec-work execution strategy contracts', () => {
     expect(strategy).toMatch(/without landing authorization.*do not push.*do not open.*PR/is);
     expect(strategy).toMatch(/do not promise.*upload/is);
     expect(strategy).not.toContain('edits its forked workspace');
+    expect(strategy).toContain('Inspect the full staged diff immediately before committing');
+    expect(strategy).toContain('they do not isolate overlapping user hunks');
   });
 
   test('fails closed when the host cannot enforce Git index and credential isolation', () => {
