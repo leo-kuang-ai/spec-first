@@ -22,3 +22,7 @@
 如果真实模型调用需要未获授权的外部成本，或缺少 fresh-source 隔离 runner，则对应 treatment 保持 `not_run`。可以继续做有独立依据的 source hygiene，但只能称为 prompt-hygiene candidate；不得从 source 文案、runtime projection 或 structural fixture 推断模型已配置、语义已适配或效率已提升。`model-family-source-adaptation` 覆盖这一边界。
 
 closeout 分开报告 deterministic checks、eval adequacy、五轴 readiness、default-source bytes、field outcome（默认 `not-run`）、not-run reasons、generated runtime status 和 residual risks。`manual_observation` 不能支持 default promotion。
+
+## Fresh reader pass for prose restructures
+
+After a prose or placement restructure, use a fresh reader that did not author the change. Give it the pre-change and current body, ask it to identify sentences that require rereading and any meaning drift, then fix by restating plainly or relocating the block. Source size or a passing structural validator cannot substitute for this semantic check; if a fresh reader is unavailable, record the evaluation as `not-run`.

@@ -137,3 +137,7 @@ Same-repo migration 对每个非 portable 文件给出 disposition：
 ### Plain prose during size restructuring
 
 Keep one idea per sentence in ordinary language. Do not fuse clauses, drop articles, or pack several rules into a compressed sentence merely to meet a byte ceiling. When a body is too large, move a coherent block to a reference named at its point of use or remove genuine redundancy. Leave headroom for later fixes; readability and preserved safety meaning take priority over squeezing bytes.
+
+## Size restructure checkpoints
+
+Before rewriting a body for a size limit, run its contract tests and enumerate every verbatim pin. Preserve each pin word-for-word or change the test with a recorded reason. Relocate a coherent block before deleting it. If the body remains over the limit after plain rewriting, relocate another block instead of compressing prose, and leave practical headroom for later fixes.

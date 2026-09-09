@@ -2,6 +2,8 @@
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
 
+- v1.15.3 2026-09-09 12:00:00 codex: docs(plan): 新增 Skill 自动观测、候选生成与受控进化闭环技术方案，定义 run-local evidence、隔离 candidate、非补偿式门禁、rollback/invalidation 与 `spec-code-review`/`spec-plan` pilot 边界；仅新增方案与变更记录，未实施自动进化、模型评测、canonical promotion 或 runtime 投射。
+
 - v1.15.3 2026-09-09 11:10:47 codex: docs(plan): 按用户指令将 Project Intelligence Skill 消费方案状态更新为 `completed`，补充收口依据与本地复核记录；保留现场 runtime drift、两项全量回归失败及 fresh-source/Provider field 未验证状态，不将计划关闭等同验证通过。 (user-visible)
 
 - v1.15.3 2026-09-09 09:05:00 codex: feat(project-intelligence): 落地共享 project-graph 消费边界、`using-spec-first` 条件入口、11 个 H Skill 短锚点、38/38 分类合同测试与八宿主 source-to-projection 检查；保留 SessionStart short-pointer、Provider mechanical-only、fresh-source/Provider field 未验证边界。
@@ -7347,3 +7349,5 @@
 - v1.8.2 2026-09-09: feat(spec-debug): 强化可重复复现门槛与调试证据脱敏规则
 
 - v1.8.2 2026-09-09: feat(spec-debug): 强化调试证据脱敏规则
+
+- v1.8.2 2026-09-09: fix(spec-write-skill): 补齐重构前 contract pin 核对、迁移优先和 fresh reader 语义检查
