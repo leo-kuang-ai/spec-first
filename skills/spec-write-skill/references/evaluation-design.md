@@ -39,4 +39,6 @@ Use `not-run` for a path never attempted. Use `unexercised` only after an attemp
 
 ### Fresh Reader
 
+Interview-skill behavioral tests must isolate their question tools from the authoring conversation. Use an authorized isolated harness with scripted input or a noninteractive question-capture path; do not let a test subject's clarification request reach the real user. If that isolation is unavailable, record the behavioral case as `not-run`. Keep cases in the project's actual evaluation owner instead of creating a foreign helper's default suite layout.
+
 After a prose or placement restructure, use a fresh reader that did not author the change. Give it the pre-change and current body, ask it to identify sentences that require rereading and any meaning drift, then fix by restating plainly or relocating the block. Source size or a passing structural validator cannot substitute for this semantic check; if a fresh reader is unavailable, record the evaluation as `not-run`.

@@ -55,11 +55,11 @@ Read each phase's reference before performing its work. Read conditional detail 
 
 | Trigger | Required read | Responsibility |
 | --- | --- | --- |
-| Before the first question, including non-software work | `references/interaction-rules.md` | Core principles, single current-user confirmation, question shape, and output economy. |
+| Before the first question, including non-software work | `references/interaction-rules.md` | Core principles, source lookup before questions, single current-user confirmation, question shape, and output economy. |
 | Before scope questions or classifying carried decisions | `references/settled-decisions.md` | Settlement, directives, and the Product Contract decision owner. |
 | Phase 0.0, before other phases | `references/output-mode.md` | Exclusive format, config precedence, token parsing, and pipeline override. |
 | Phases 0.1-0.3 | `references/phase-0.md` | Resume, domain and verdict routing, scope, visual decisions, and unfamiliarity. |
-| Phase 1 | `references/dialogue.md` | Current-tree grounding, private scratch, source-sensitive questions, pressure test, and dialogue exit. |
+| Phase 1 | `references/dialogue.md` | Current-tree grounding, private scratch, source-sensitive questions, decision-relevant vocabulary/code conflicts, pressure test, and dialogue exit. |
 | Phases 2-2.6 | `references/approaches.md`; also `references/synthesis-summary.md` before synthesis | Approaches, scenario coverage, confirmation, and claim verification. |
 | Phase 3 | `references/plan-write.md`, then `references/brainstorm-sections.md` and the selected rendering reference | Document need, Product Contract, durable recovery, and promotion candidates. |
 | Phase 4 | `references/handoff.md` | Scope-aware options, format, downstream payload, and closing summary. |

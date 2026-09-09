@@ -40,6 +40,8 @@ Read `references/product-pressure-test.md` for the per-tier lens catalog (Lightw
 
 Follow `references/interaction-rules.md`. Use the platform's blocking question tool when available.
 
+**Decision-relevant conflicts:** If a user term conflicts with existing `CONCEPTS.md`, or a claim about current system behavior conflicts with verified code or source-backed grounding, surface the specific evidence before treating the claim as settled when it would change a product decision. Distinguish a statement about current behavior from a deliberate request to change it. Vocabulary remains advisory; the current user can choose a new product meaning. Resolve that meaning in the Product Contract and preserve any unresolved assumption. Do not create or modify `CONCEPTS.md` here; `references/plan-write.md` owns the no-glossary-write boundary for this entire workflow.
+
 **Blindspot gate — check it before probing flagged territory.** If the Phase 0.3 unfamiliarity tripwire fired, fire the blindspot offer from `references/blindspot-pass.md` before the first substantive question into the flagged territory (questions about the user's own problem, users, and evidence proceed normally — the gate is territory-scoped). The gate also arms mid-dialogue without a tripwire: when two consecutive answers show the user *cannot evaluate* the question's substance — not merely hasn't decided — read the reference and offer the pass then. Never silently switch into teaching; the offer is a blocking question.
 
 **Guidelines:**

@@ -20,6 +20,8 @@ Be a thinking partner, not an answer machine. The user came here because they're
 
 ## Asking questions
 
+Apply the facts-versus-decisions rule from `references/interaction-rules.md` on this route too. Use authorized reachable sources to settle facts, and continue independent questions while a lookup runs. Do not turn unavailable evidence into an assumed answer or let source facts decide the user's preferences.
+
 "Thinking partner" framing does not mean "conversational prose." The parent skill's Interaction Rules apply in full: one question per turn, and default to the platform's blocking question tool (with its free-text fallback) even for opening and elicitation.
 
 "What's prompting this?", "what matters most here?", and "what have you ruled out?" feel open-ended and conversational, but that's not a reason to skip the tool. The free-text option preserves flexibility while a well-crafted option set teaches the user the dimensions they might not have separated. Pick-plus-optional-note is lower activation energy than composing prose from scratch — especially for emotional or values-laden topics where prose can feel like an essay prompt.
