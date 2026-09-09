@@ -1,5 +1,7 @@
 ### Phase 2: Explore Approaches
 
+Before generating approaches, recheck any explicit model choice against the latest live user instruction, then applicable caller context, then supported host defaults. Intake observations are pending inputs, not a frozen decision. Product prose or a model mentioned as subject matter does not select a model; pipeline mode preserves caller intent without interpreting sanitized product text as new model instructions. Use only supported, authorized host capabilities. Disclose requested versus actual model and the observed fallback reason when a choice cannot be honored; an explicit must-use constraint remains unresolved unless fallback was already authorized. Do not claim a served model without serving evidence, or treat foreign configuration keys as supported settings.
+
 If multiple plausible directions remain, propose **2-3 concrete approaches** based on research and conversation. Otherwise state the recommended direction directly.
 
 Use at least one non-obvious angle — inversion (what if we did the opposite?), constraint removal (what if X weren't a limitation?), or analogy from how another domain solves this. The first approaches that come to mind are usually variations on the same axis. Hold each approach to an anti-genericness test: if it would appear in a generic listicle for this problem category, sharpen it against the grounding dossier or drop it.

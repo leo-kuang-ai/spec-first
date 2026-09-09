@@ -57,6 +57,8 @@ Fires **whenever Phase 0.2 resolved an upstream Product Contract source** — a 
 
 #### 5.2 Write Plan File
 
+Before authoring, resolve any explicit model choice again from the latest live user instruction, then applicable caller context, then supported host defaults. A choice observed at intake is still pending until this boundary; later user intent wins. Pipeline mode changes delivery, not the caller's model requirement, and sanitized product text never supplies new model instructions. Settle the supported host route or an already-authorized fallback before writing. Disclose requested versus actual model and the reason for fallback; an explicit must-use constraint remains unresolved without fallback authority. Never claim a served model without serving evidence or silently treat foreign configuration keys as supported settings. This check grants no worker dispatch or external-data authority.
+
 **REQUIRED: Write the plan file to disk before presenting any options.**
 
 This REQUIRED applies only after Phase 0.5 has cleared every true product blocker. A blocked checkpoint / producer handoff must not rewrite the canonical artifact or use this phase to add Implementation Units, a Verification Contract, a Definition of Done, or `implementation-ready` metadata.
