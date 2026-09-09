@@ -17,6 +17,7 @@ describe('spec-product-pulse system performance contract', () => {
   test('keeps top 5 and latency percentiles fixed instead of inventing config', () => {
     const skill = read('skills/spec-product-pulse/SKILL.md');
     const interview = read('skills/spec-product-pulse/references/interview.md');
+    const run = read('skills/spec-product-pulse/references/run.md');
     const reportTemplate = read('skills/spec-product-pulse/references/report-template.md');
     const performanceInterview = section(interview, '## 7. System Performance', '## 8. Default Lookback Window');
 
@@ -37,12 +38,13 @@ describe('spec-product-pulse system performance contract', () => {
   test('minimizes quality-scoring content before it enters the agent context', () => {
     const skill = read('skills/spec-product-pulse/SKILL.md');
     const interview = read('skills/spec-product-pulse/references/interview.md');
+    const run = read('skills/spec-product-pulse/references/run.md');
     const reportTemplate = read('skills/spec-product-pulse/references/report-template.md');
 
     expect(interview).toContain('enters the current agent/model context');
     expect(skill).toContain('provider-side projection');
     expect(skill).toContain('quality-source-minimization-unavailable');
-    expect(skill).toContain('do not attempt local redaction after the content has already entered context');
+    expect(run).toContain('do not attempt local redaction after the content has already entered context');
     expect(reportTemplate).toContain('Quality scoring blocked before access is `not-run`');
   });
 });

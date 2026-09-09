@@ -18,6 +18,8 @@ allowed-tools:
 
 The skill does not mutate the product, the database, or any external system. Its only writes are pulse settings appended to `.spec-first/config.local.yaml` (the unified spec-first local config, gitignored, machine-local) and the report file (`docs/pulse-reports/...`). MCP and other data-source tools are invoked read-only; if a tool offers write modes, do not use them.
 
+The fixed `docs/pulse-reports/` contract always renders latency (p50/p95/p99) and top 5 errors by count when system performance data is available. Quality scoring requires provider-side projection; if unavailable, record `not-run` with `quality-source-minimization-unavailable` and do not attempt local redaction after content enters context.
+
 ## Interaction Method
 
 Default to the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
@@ -48,134 +50,21 @@ Apply a **15-minute trailing buffer** to the window's upper bound. Many analytic
 
 ## Execution Flow
 
+Read `references/config.md`, `references/setup.md`, and `references/run.md` at their corresponding phases. These references own detailed config interpretation, interview/setup, and query/report procedures; this entrypoint retains the read-only, local-config, PII, and artifact boundaries.
+
 ### Phase 0: Route by Config State
 
-**Read config.** Resolve `<repo-root>` at runtime by running
-`git rev-parse --show-toplevel` with the shell tool. Then read
-`<repo-root>/.spec-first/config.local.yaml` with the native file-read tool. If
-the root cannot be resolved or the file does not exist, treat this as a first
-run. Otherwise extract the `pulse_*` keys listed below. Reports remain owned by
-the fixed `docs/pulse-reports/` contract; this Skill does not introduce a
-global configurable artifact root.
+Read `references/config.md`. Resolve `<repo-root>` at runtime with `git rev-parse --show-toplevel`, then read `<repo-root>/.spec-first/config.local.yaml`. An absent root/config or unset `pulse_product_name` routes to the first-run interview; otherwise continue to the pulse run. An explicit `setup`, `reconfigure`, or `edit config` argument always routes to setup.
 
-**Config keys:**
-- `pulse_product_name` -- string, used in report titles. Required for routing: if unset, skill is unconfigured.
-- `pulse_lookback_default` -- one of `1h`, `24h`, `7d`, `30d` (default: `24h`)
-- `pulse_primary_event` -- string, the engagement event name
-- `pulse_value_event` -- string, the value-realization event name
-- `pulse_completion_events` -- comma-separated string of 0-3 event names
-- `pulse_quality_scoring` -- `true` or default `false` (AI products only)
-- `pulse_quality_dimension` -- string scored 1-5 when `pulse_quality_scoring` is true; ignored otherwise
-- `pulse_analytics_source` -- string identifying analytics provider (e.g., `posthog`, `mixpanel`, `custom`)
-- `pulse_tracing_source` -- string identifying tracing provider (e.g., `sentry`, `datadog`, `custom`)
-- `pulse_payments_source` -- string identifying payments provider (e.g., `stripe`, `custom`); omit if not used
-- `pulse_db_enabled` -- `true` or default `false`; when `true`, read-only DB access is part of the pulse
-- `pulse_metric_sources` -- comma-separated `metric=source` pairs giving per-strategy-metric source overrides (e.g., `retention_d7=posthog,nps=delighted`). Strategy metrics not listed fall back to `pulse_analytics_source` and are rendered with a `(default source)` marker so the implicit routing is visible.
-- `pulse_pending_metrics` -- comma-separated string of strategy-doc metric names awaiting instrumentation; rendered as `no data` in each pulse report until instrumentation lands
-- `pulse_excluded_metrics` -- comma-separated string of strategy-doc metric names intentionally excluded from the pulse; the metric stays in `STRATEGY.md` but is not surfaced in pulse reports
-- `pulse_schedule` -- `daily`, `weekly`, `manual`, or `ask-again-after-3-runs`; include time/day if applicable
-
-**Routing:**
-
-- **`pulse_product_name` is unset (or config file missing)** -> First run. Go to Phase 1 (interview), then Phase 2.
-- **`pulse_product_name` is set** -> Skip to Phase 2.
-
-If the argument was `setup`, `reconfigure`, or `edit config`, go to Phase 1 regardless of config state.
+The active keys include `pulse_product_name`, `pulse_lookback_default`, `pulse_primary_event`, `pulse_value_event`, `pulse_completion_events`, `pulse_quality_scoring`, `pulse_quality_dimension`, `pulse_analytics_source`, `pulse_tracing_source`, `pulse_payments_source`, `pulse_db_enabled`, `pulse_metric_sources`, `pulse_pending_metrics`, `pulse_excluded_metrics`, and `pulse_schedule`. Invalid or missing values use the defaults documented in `references/config.md`; do not guess.
 
 ### Phase 1: First-Run Interview
 
-#### 1.0 Seed from strategy (if available)
-
-Before asking any questions, read `STRATEGY.md` using the native file-read tool. If the file exists, extract:
-
-- The product name from the `name` key in the YAML frontmatter, falling back to the H1 title (stripping the trailing ` Strategy` suffix, e.g., `# Spiral Strategy` -> `Spiral`) if frontmatter is missing
-- The list of key metrics from the `## Key metrics` section, one per line
-
-Open the interview by surfacing what was extracted: announce that a strategy doc was found, show the seeded product name and the list of key metrics that will be carried into event/data setup, and invite the user to correct any of it before continuing.
-
-If `STRATEGY.md` does not exist, note that explicitly in chat: no strategy doc on file, running setup from scratch, and mention that `spec-strategy` can seed pulse later if run first.
-
-#### 1.1 Interview
-
-Read `references/interview.md`. This load is non-optional - the pushback rules, anti-pattern examples, and metric-to-source mapping logic live there.
-
-Run the interview in this order:
-
-1. Product name (confirm or edit the seeded value)
-2. Primary engagement event
-3. Value-realization event
-4. Completions or conversions (0-3)
-5. Quality scoring (opt-in, AI products only)
-6. Data sources - wire up connections for each agreed metric and event. Nudge toward MCP. Reject read-write database access. DB entirely optional.
-7. System performance - a short recommended setup for top errors and latency. Users rarely have strong opinions here; present defaults and accept.
-8. Default lookback window
-
-Apply the pushback rules in `references/interview.md` for each section. Treat every metric, event, and signal the user proposes against the **SMART bar** (specific, measurable, actionable, relevant, timely) spelled out in `references/interview.md` under "Overall Rules" - push back on anything vague, vanity, or unactionable.
-
-If the user offers read-write database access, refuse and offer the alternatives documented in `references/interview.md` section 6.
-
-Write the captured config to `<repo-root>/.spec-first/config.local.yaml` as flat `pulse_*` keys, using the schema in `references/interview.md` under "Config file shape". Resolve the repo root with `git rev-parse --show-toplevel`. To write: (1) if the file or directory does not exist, create `.spec-first/` and write the YAML file; (2) if the file exists, merge new keys into the existing YAML, preserving any non-pulse keys (e.g., `work_delegate_*`, `plan_*`) untouched. If `.spec-first/config.local.yaml` is not already covered by the repo's `.gitignore`, offer to add the entry before writing. Show the resulting pulse block to the user in chat and offer one round of edits.
-
-After the config is written, run the **scheduling recommendation** from `references/interview.md` section 9: offer to set up a recurring run so the user gets the pulse on a cadence instead of having to remember to run it. Accept yes/no/later. If yes, hand off to whichever scheduling primitive the current harness exposes; otherwise note that scheduling is platform-specific (cron, GitHub Actions, the host's own automation) and emit a brief hint covering what would need to run. Do not schedule inline. Then proceed to Phase 2.
+Read `references/setup.md`, which requires `references/interview.md`. It owns strategy seeding from `STRATEGY.md`, the SMART interview bar, read-write database refusal, preserving non-pulse keys in `.spec-first/config.local.yaml`, and the explicit scheduling handoff.
 
 ### Phase 2: Run the Pulse
 
-If Phase 1 ran (first run, or `setup`/`reconfigure` argument), re-read `.spec-first/config.local.yaml` from the repo root using the native file-read tool to pick up any edits accepted during the Phase 1 review step. Otherwise, use the `pulse_*` values already extracted in Phase 0. Apply hard defaults for any unset settings (see Phase 0 "Config keys").
-
-#### 2.1 Dispatch Queries
-
-Every configured or expected source returns a per-source receipt before report synthesis:
-
-```yaml
-source: <configured source id>
-status: confirmed-value | confirmed-zero | not-configured | unavailable | permission-denied | partial | not-run
-reason_code: <stable source-specific reason>
-window: { start: <timestamp>, end: <timestamp> }
-freshness: <query completion timestamp or provider watermark>
-values: <confirmed values only>
-limitations: [<missing slice or claim boundary>]
-```
-
-Use `confirmed-zero` only when the source successfully measured the requested window and explicitly returned numeric zero. Missing/empty responses, tool absence, auth failures, timeouts, and truncated pagination are not zero: classify them as `unavailable`, `permission-denied`, or `partial` with a `reason_code`. Use `not-run` only when a pre-query gate deliberately prevented access, such as unavailable provider-side minimization. Preserve `not-configured` for an expected source that has no configured owner. Do not collapse these states to `no data`, omit the source row, or let one successful source hide another source's failure.
-
-Run these in **parallel** (different tools, no shared load):
-
-- Product analytics query (primary event count, value-realization count, completions, conversion ratios) over the window
-- Application tracing query (error counts by category, latency distribution, top error signatures) over the window
-- Payments query, if configured (new customers, churn, revenue delta) over the window
-
-Run these **serially**, after the parallel batch:
-
-- Read-only database queries. One at a time. Tight, scoped queries only. Never full-table scans on large tables. If a DB query would be expensive, skip it and note "DB query skipped (estimated cost too high)".
-
-#### 2.2 Optional: Sample Quality Scoring
-
-If `pulse_quality_scoring` is `true` (AI products only), sample up to 10 sessions or conversations from the window and score each 1-5 on the dimension recorded in `pulse_quality_dimension`.
-
-Quality scoring is content processing, not an aggregate metrics query. Before setup records the opt-in, disclose that the projected conversation/session content needed for scoring will enter the current agent/model context even though it will not be copied into the saved report. At run time, request only a provider-side projection that removes direct identity fields and unrelated message/history fields before the result is returned to the agent. The minimal accepted row contains a provider-stable opaque sample id, the bounded content needed for the configured dimension, window membership, and projection provenance.
-
-If the source cannot project or de-identify before returning data, do not fetch raw sessions and do not attempt local redaction after the content has already entered context. Record the quality source as `not-run` with `reason_code: quality-source-minimization-unavailable`, omit the quality score, and preserve that limitation in the report. Provider-side projection reduces exposure but does not make the content anonymous; keep it out of durable artifacts and worker prompts.
-
-**Scoring discipline:** Default to 4 or 5 when the session looks normal. Reserve 1-3 for sessions with a clear failure mode (product gave wrong answer, user got stuck, error surfaced). If every session is scoring 3, the bar is too strict; if every session is scoring 5, the bar is too loose.
-
-**No PII in the score summary.** Capture a count distribution (e.g., "8x 5, 1x 4, 1x 2") and a short anonymized note on any session scored below 4. Do not include message content or user identifiers in the saved report.
-
-#### 2.3 Assemble the Report
-
-Read `references/report-template.md`. Fill in the template using the query results and per-source receipts. Four sections, in order:
-
-1. **Headlines** - 2-3 lines summarizing the window
-2. **Usage** - primary engagement, value realization, completions, quality sample
-3. **System performance** - latency (p50/p95/p99) and top 5 errors by count with one-line explanation each
-4. **Followups** - 1-5 things worth investigating
-
-Keep the total to 30-40 lines. If a section is thin, leave it thin; do not pad.
-
-#### 2.4 Write the Report
-
-Save to `docs/pulse-reports/YYYY-MM-DD_HH-MM.md` using the local time of the run. Create `docs/pulse-reports/` if it does not exist.
-
-Surface the Headlines and top Followup in chat. Provide the full file path so the user can open the saved report.
+Read `references/run.md` before dispatching queries. Re-read local config after setup edits, preserve per-source receipts (`confirmed-value`, `confirmed-zero`, `not-configured`, `unavailable`, `permission-denied`, `partial`, `not-run`) and `confirmed-zero` semantics, keep analytics/tracing/payments parallel and read-only DB work serial, and write the four-section report to the fixed `docs/pulse-reports/` contract.
 
 ### Phase 3: Routine Hook
 
