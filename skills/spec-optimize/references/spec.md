@@ -89,6 +89,8 @@ Check whether the input is:
 5. Guide the user through the remaining spec fields:
    - What degenerate cases should be rejected? (gates — e.g., "solo_pct <= 0.95" catches all-singletons, "max_cluster_size <= 500" catches mega-clusters)
    - What command runs the measurement?
+   - Which additional hard objectives are required, which are secondary, and what regression tolerances or targets are fixed before measurement?
+   - For expensive runs, select `measurement.stability.mode: ladder`, declare smoke, exploratory and confirmation counts, and any justified futility bound. Use relative or paired comparison unless absolute thresholds are deliberately retained. Validate these fields before baseline spend.
    - What files can be modified? What is immutable?
    - Any constraints or dependencies?
    - If this is the first run: recommend `execution.mode: serial`, `execution.max_concurrent: 1`, `stopping.max_iterations: 4`, and `stopping.max_hours: 1`

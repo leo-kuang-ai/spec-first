@@ -16,7 +16,8 @@
 # Output:
 #   stdout: Raw JSON output from the measurement command
 #   stderr: Passed through from the measurement command
-#   exit code: Same as the measurement command (124 for timeout)
+#   exit code: Same as the command; 124 for timeout, 125 plus the runner marker
+#              when SPEC_OPTIMIZE_CENSOR_AFTER fires before the hard timeout.
 
 set -euo pipefail
 
@@ -59,36 +60,58 @@ cd "$WORKDIR" || {
   exit 1
 }
 
+run_timed_command() {
+  local timeout_bin="$1"
+  if [[ -n "$CENSOR_STATUS_FILE" ]]; then
+    "$timeout_bin" -k 5 "$TIMEOUT" bash -c 'bash -c "$1"; printf "%s\n" "$?" > "$2"; exit 0' _ "$COMMAND" "$CENSOR_STATUS_FILE"
+    return
+  fi
+  "$timeout_bin" -k 5 "$TIMEOUT" bash -c "$COMMAND"
+}
+
 run_with_timeout() {
   if command -v timeout >/dev/null 2>&1; then
-    timeout "$TIMEOUT" bash -c "$COMMAND"
+    run_timed_command timeout
     return
   fi
 
   if command -v gtimeout >/dev/null 2>&1; then
-    gtimeout "$TIMEOUT" bash -c "$COMMAND"
+    run_timed_command gtimeout
     return
   fi
 
   if resolve_python; then
-    "${PYTHON_CMD[@]}" - "$TIMEOUT" "$COMMAND" <<'PY'
+    "${PYTHON_CMD[@]}" - "$TIMEOUT" "$COMMAND" "$CENSOR_STATUS_FILE" <<'PY'
 import os
 import signal
 import subprocess
 import sys
 
-timeout_seconds = int(sys.argv[1])
+timeout_seconds = float(sys.argv[1])
 command = sys.argv[2]
+status_file = sys.argv[3]
 proc = subprocess.Popen(["bash", "-c", command], start_new_session=True)
 
 try:
-    sys.exit(proc.wait(timeout=timeout_seconds))
+    status = proc.wait(timeout=timeout_seconds)
+    status = 128 - status if status < 0 else status
+    if status_file:
+        with open(status_file, "w", encoding="utf-8") as handle:
+            handle.write(f"{status}\n")
+        sys.exit(0)
+    sys.exit(status)
 except subprocess.TimeoutExpired:
-    os.killpg(proc.pid, signal.SIGTERM)
+    try:
+        os.killpg(proc.pid, signal.SIGTERM)
+    except ProcessLookupError:
+        pass
     try:
         proc.wait(timeout=5)
     except subprocess.TimeoutExpired:
-        os.killpg(proc.pid, signal.SIGKILL)
+        try:
+            os.killpg(proc.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
         proc.wait()
     sys.exit(124)
 PY
@@ -99,7 +122,30 @@ PY
   exit 1
 }
 
-# Run the measurement command with timeout
-# timeout returns 124 if the command times out
-# We pass stdout and stderr through directly
+# The owner must establish futility for every required objective before setting
+# this bound. A command's own 124/125 exit is not a runner censor event.
+CENSOR_AFTER="${SPEC_OPTIMIZE_CENSOR_AFTER:-}"
+CENSOR_STATUS_FILE=""
+if [[ -n "$CENSOR_AFTER" ]]; then
+  if ! awk -v a="$CENSOR_AFTER" -v t="$TIMEOUT" 'BEGIN { exit !(a ~ /^[0-9]+(\.[0-9]+)?$/ && a+0 > 0 && a+0 < t+0) }'; then
+    echo "Error: SPEC_OPTIMIZE_CENSOR_AFTER must be positive and below timeout_seconds" >&2
+    exit 1
+  fi
+  TIMEOUT="$CENSOR_AFTER"
+  CENSOR_STATUS_FILE=$(mktemp "${TMPDIR:-/tmp}/spec-optimize-censor-XXXXXX")
+  trap 'rm -f "$CENSOR_STATUS_FILE"' EXIT
+fi
+
+set +e
 run_with_timeout
+status=$?
+set -e
+if [[ -n "$CENSOR_STATUS_FILE" ]]; then
+  if [[ -s "$CENSOR_STATUS_FILE" ]]; then
+    status=$(<"$CENSOR_STATUS_FILE")
+  elif [[ $status -eq 124 ]]; then
+    echo "SPEC_OPTIMIZE_CENSORED: measurement censored after ${CENSOR_AFTER}s (noncompetitive bound)" >&2
+    exit 125
+  fi
+fi
+exit "$status"

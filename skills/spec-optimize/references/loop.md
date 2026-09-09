@@ -157,13 +157,12 @@ Process experiments as they complete — do NOT wait for the entire batch to fin
 
 For each completed experiment, **immediately**:
 
-1. **Run measurement** in the experiment's worktree:
+1. **Run measurement** in the experiment's worktree. Spend only the measurement the current decision needs (see Phase 1). When `stability.mode` is `ladder` and a smoke command is set, run that smoke check first: failure is terminally `degenerate`, and success proceeds to the first exploratory sample of `measurement.command` before comparison. Otherwise start with one exploratory sample. Pass `SPEC_OPTIMIZE_CENSOR_AFTER` to `measure.sh` only when elapsed wall time itself proves the candidate cannot become eligible — every required objective is already hopeless, not merely the primary. Otherwise let measurement finish so other required objectives can still win, and let `decide.cjs` assess futility after the payload is complete.
    ```bash
    SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
    bash "$SKILL_DIR/scripts/measure.sh" "<measurement.command>" <timeout_seconds> "<worktree_path>/<measurement.working_directory or .>" <env_vars...>
    ```
-   - If stability mode is `repeat`, run the measurement harness `repeat_count` times in that working directory and aggregate the results exactly as in Phase 1 before evaluating gates or ranking the experiment.
-   - Use the aggregated metrics as the experiment's score; if variance exceeds `noise_threshold`, record that in learnings so the operator knows the result is noisy.
+   When mode is `repeat`, keep running `repeat_count` times and aggregating as in Phase 1. When mode is `stable`, run once.
 
 2. **Write crash-recovery marker** — immediately after measurement, write `result.yaml` in the experiment worktree containing the raw metrics. This ensures the measurement is recoverable even if the agent crashes before updating the main log.
 
@@ -184,10 +183,17 @@ For each completed experiment, **immediately**:
    - Aggregate scores: compute the configured primary judge field from `metric.judge.scoring.primary` (which should match `metric.primary.name`) plus any `scoring.secondary` values
    - If `singleton_sample > 0`: evaluate singleton batches through the same authorized-dispatch or serial-inline path
 
-6. **If gates pass AND primary type is `hard`**:
-   - Use the metric value directly from the measurement output
+6. **Compare with `decide.cjs`.** Invoke it only after gates pass and the payload holds every required objective value — hard metrics from measurement, and judge scores when those were collected. The payload is the spec as loaded plus the baseline and candidate snapshots. The script reads the nested spec (`metric`, `measurement.stability`) and owns eligibility, noise, and the ladder next step. Do not reconstruct a flattened payload, and do not re-derive the threshold in prose.
+   ```bash
+   SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+   NODE="$(for c in node nodejs; do command -v "$c" >/dev/null 2>&1 && "$c" -e '' >/dev/null 2>&1 && { echo "$c"; break; }; done)";
+   [ -n "$NODE" ] || { echo "no working Node runtime on PATH (tried node, nodejs)" >&2; exit 1; };
+   "$NODE" "$SKILL_DIR/scripts/decide.cjs" "<payload.json>"
+   ```
+   Preserve ordered sample arrays and the measured source identity in both snapshots. The comparison helper emits a nonzero exit and an `error` decision for invalid configuration or missing evidence; never replace that failure with a prose eligibility claim. Smoke and censor settings must be covered by the measurement execution envelope from Phase 1.
+   If that probe finds no runtime, do not invoke an empty command: mark the experiment `error` with that reason and continue the batch. Use `decision` and `next_measurement`. Collect the requested measurement and repeat this sequence whenever `next_measurement` is not `none`. Do not keep a candidate until `next_measurement` is `none`. Record `inconclusive` and `censored` as those outcomes, not as `reverted`. Each extra sample belongs to this same experiment: write it onto the existing entry at CP-3, then decide again.
 
-7. **IMMEDIATELY append to experiment log on disk (CP-3)** — do not defer this to batch evaluation. Write the experiment entry (iteration, hypothesis, outcome, metrics, learnings) to `.spec-first/workflows/spec-optimize/<spec-name>/experiment-log.yaml` right now. Use the transitional outcome `measured` once the experiment has valid metrics but has not yet been compared to the current best. Update the outcome to `kept`, `reverted`, or another terminal state in the evaluation step, but the raw metrics are on disk and safe from context compaction.
+7. **IMMEDIATELY persist this experiment on disk (CP-3)** — do not defer this to batch evaluation. The durable unit is one log entry per experiment at `.spec-first/workflows/spec-optimize/<spec-name>/experiment-log.yaml`. After the first measurement, append that entry. After every later ladder sample for the same experiment, write the accumulated metrics and current outcome onto that same entry. Do not append a second entry for the same hypothesis, and do not rewrite a different experiment's samples. Write a decide terminal only when `next_measurement` is `none`. Until then the entry stays nonterminal: `promising` while the keep path still needs samples, `measured` otherwise (including an inconclusive result that still wants samples). When `next_measurement` is `none`, an eligible result stays `measured` until its diff is on the optimization branch; a non-eligible result gets the decide terminal (`reverted`, `inconclusive`, `censored`, `degenerate`). `kept` and `runner_up_kept` wait until that integration. The raw metrics are on disk and safe from context compaction.
 
 8. **VERIFY the write (CP-3 verification)** — read the experiment log back from disk and confirm the entry just written is present. If verification fails, retry the write. Do NOT proceed to the next experiment until this entry is confirmed on disk.
 
@@ -197,13 +203,11 @@ For each completed experiment, **immediately**:
 
 After all experiments in the batch have been measured:
 
-1. **Rank** experiments by primary metric improvement:
-   - For hard metrics: compare to the current best using `metric.primary.direction` (`maximize` means higher is better, `minimize` means lower is better), and require the absolute improvement to exceed `measurement.stability.noise_threshold` before treating it as a real win
-   - For judge metrics: compare the configured primary judge score (`metric.judge.scoring.primary` / `metric.primary.name`) to the current best, and require it to exceed `minimum_improvement`
+1. **Decide eligibility from `decide.cjs`, not from the primary metric alone.** An experiment is eligible when it improves at least one required objective beyond the configured comparison threshold and does not violate any other required objective. When `metric.objectives` is absent, the primary is the only required objective. `inconclusive` is not a keep.
 
-2. **Identify the best experiment** that passes all gates and improves the primary metric
+2. **Rank** the eligible experiments in the batch by the script's `rank_score` (primary relative gain when the primary moved; otherwise the strongest required-objective relative gain). Identify that winner as the experiment to keep. An eligible experiment may be kept even if the ranking primary did not move.
 
-3. **If best improves on current best: KEEP**
+3. **If `decide.cjs` returns `keep` for that winner: KEEP**
    - Commit the experiment branch first so the winning diff exists as a real commit before any merge or cherry-pick
    - Include only mutable-scope changes in that commit; if no eligible diff remains, treat the experiment as non-improving and revert it
    - Merge the committed experiment branch into the optimization branch
@@ -214,14 +218,14 @@ After all experiments in the batch have been measured:
 4. **Check file-disjoint runners-up** (up to `max_runner_up_merges_per_batch`):
    - For each runner-up that also improved, check file-level disjointness with the kept experiment
    - **File-level disjointness**: two experiments are disjoint if they modified completely different files. Same file = overlapping, even if different lines.
-   - If disjoint: cherry-pick the runner-up onto the new baseline, re-run full measurement
-   - If combined measurement is strictly better: keep the cherry-pick (outcome: `runner_up_kept`), then clean up that runner-up's experiment worktree and branch
+   - If disjoint: cherry-pick the runner-up onto the new baseline and run the same decide loop as step 3.3 against a fresh sample set for that combined snapshot — do not reuse the standalone experiment's accumulated samples, whose meaning is against the previous baseline. Collect further measurement whenever `next_measurement` is not `none`. Keep the original standalone log entry for audit.
+   - Keep the cherry-pick only when that result is eligible and `next_measurement` is `none` (outcome: `runner_up_kept`); then clean up that runner-up's experiment worktree and branch
    - Otherwise: revert the cherry-pick, log as "promising alone but neutral/harmful in combination" (outcome: `runner_up_reverted`), then clean up the runner-up's experiment worktree and branch
    - Stop after first failed combination
 
 5. **Handle deferred deps**: experiments that need unapproved dependencies get outcome `deferred_needs_approval`
 
-6. **Revert all others**: cleanup worktrees, log as `reverted`
+6. **Close the rest.** Cleanup worktrees. `kept` and `runner_up_kept` are only for diffs on the optimization branch. Eligible candidates that were not integrated become `not_selected`. Leave `inconclusive`, `censored`, and `degenerate` as `decide.cjs` returned them.
 
 ### 3.5 Update State (CP-4)
 
@@ -254,7 +258,7 @@ After all experiments in the batch have been measured:
 ### 3.6 Check Stopping Criteria
 
 Stop the loop if ANY of these are true:
-- **Target reached**: `stopping.target_reached` is true, `metric.primary.target` is set, and the primary metric reaches that target according to `metric.primary.direction` (`>=` for `maximize`, `<=` for `minimize`)
+- **Target reached**: `stopping.target_reached` is true and the current best meets every declared required target (`scripts/decide.cjs` returns `target_reached` for that confirmed snapshot). The primary alone cannot close a run while another required target is unmet. With no extra objectives, this is the primary target if set.
 - **Max iterations**: total experiments run >= `stopping.max_iterations`
 - **Max hours**: wall-clock time since Phase 3 start >= `stopping.max_hours`
 - **Judge budget exhausted**: cumulative judge spend >= `metric.judge.max_total_cost_usd` (if set)
@@ -268,10 +272,7 @@ If no stopping criterion is met, proceed to the next batch (step 3.1).
 
 **Codex failure cascade**: Track consecutive Codex delegation failures. After 3 consecutive failures, auto-disable Codex for remaining experiments. Fall back to subagent dispatch only when authorization and callable capability still permit it; otherwise continue through serial inline/local execution. Log the switch and reason code.
 
-**Error handling**: If an experiment's measurement command crashes, times out, or produces malformed output:
-- Log as outcome `error` or `timeout` with the error message
-- Revert the experiment (cleanup worktree)
-- The loop continues with remaining experiments in the batch
+**Error handling**: Exit 125 plus the runner's `SPEC_OPTIMIZE_CENSORED:` stderr marker is `censored`; exit 124 is `timeout`. Any other nonzero exit, including 125 without that marker, or malformed output is `error`. Persist the actual exit, stderr, and partial output without synthetic scores, clean up the failed experiment, and continue the batch. Missing or invalid decision evidence cannot authorize integration.
 
 **Progress reporting**: After each batch, report:
 - Batch N of estimated M (based on backlog size)

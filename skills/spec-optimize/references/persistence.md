@@ -19,7 +19,7 @@ This skill runs for hours. Context windows compact, sessions crash, and agents r
 
 3. **Re-read from disk at every phase boundary and before every decision** — never trust in-memory state across phase transitions, batch boundaries, or after any operation that might have taken significant time. Re-read the experiment log and strategy digest from disk.
 
-4. **The experiment log is append-only during Phase 3** — never rewrite the full file. Append new experiment entries. Update the `best` section in place only when a new best is found. This prevents data loss if a write is interrupted.
+4. **One experiment, one log entry.** Append its first result; later ladder samples update that same entry with accumulated observations, comparison, outcome, and next step. Preserve every earlier sample and gate value, and never rebuild another experiment's history from memory. Update `best` and the backlog in place at CP-4. Persist combined runner-up observations separately from the standalone snapshot; a new measured source identity starts a fresh sample set.
 
 5. **Per-experiment result markers for crash recovery** — each experiment writes a `result.yaml` marker in its worktree immediately after measurement. On resume, scan for these markers to recover experiments that were measured but not yet logged.
 
@@ -36,7 +36,7 @@ These are non-negotiable write-then-verify steps. At each checkpoint, the agent 
 | CP-0: Spec saved | `spec.yaml` | Phase 0, after user approval |
 | CP-1: Baseline recorded | `experiment-log.yaml` (initial with baseline) | Phase 1, after baseline measurement |
 | CP-2: Hypothesis backlog saved | `experiment-log.yaml` (hypothesis_backlog section) | Phase 2, after hypothesis generation |
-| CP-3: Each experiment result | `experiment-log.yaml` (append experiment entry) | Phase 3.3, immediately after each measurement |
+| CP-3: Each experiment result | `experiment-log.yaml` (append first result; update same entry after further samples) | Phase 3.3, immediately after each measurement |
 | CP-4: Batch summary | `experiment-log.yaml` (outcomes + best) + `strategy-digest.md` | Phase 3.5, after batch evaluation |
 | CP-5: Final summary | `experiment-log.yaml` (final state) | Phase 4, at wrap-up |
 
@@ -51,7 +51,7 @@ These are non-negotiable write-then-verify steps. At each checkpoint, the agent 
 | File | Purpose | Written When |
 |------|---------|-------------|
 | `spec.yaml` | Optimization spec (immutable during run) | Phase 0 (CP-0) |
-| `experiment-log.yaml` | Full history of all experiments | Initialized at CP-1, appended at CP-3, updated at CP-4 |
+| `experiment-log.yaml` | Full history of all experiments | Initialized at CP-1, appended at first CP-3, updated on later samples and at CP-4 |
 | `strategy-digest.md` | Compressed learnings for hypothesis generation | Written at CP-4 after each batch |
 | `<worktree>/result.yaml` | Per-experiment crash-recovery marker | Immediately after measurement, before CP-3 |
 
@@ -60,7 +60,7 @@ These are non-negotiable write-then-verify steps. At each checkpoint, the agent 
 When Phase 0.4 detects an existing run:
 1. Read the experiment log from disk — this is the ground truth
 2. Scan worktree directories for `result.yaml` markers not yet in the log
-3. Recover any measured-but-unlogged experiments
+3. Recover any measured-but-unlogged experiments and merge later samples into their existing entry by experiment and measured source identity; never duplicate a hypothesis or combine samples from different source snapshots
 4. Continue from where the log left off
 
 ---

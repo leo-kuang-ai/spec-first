@@ -9,9 +9,10 @@
 # in-memory context is expendable and will be compacted during long runs.
 #
 # Write discipline:
-# - Each experiment entry is APPENDED immediately after its measurement
-#   completes (references/loop.md step 3.3), before batch evaluation
-# - Outcome fields may be updated in-place after batch evaluation (step 3.5)
+# - Each experiment gets one log entry, appended on its first measurement
+#   (references/loop.md step 3.3), before batch evaluation
+# - Later ladder samples for that experiment update the same entry in place
+# - Outcome fields may also be updated in-place after batch evaluation (step 3.5)
 # - The `best` section is updated after each batch if a new best is found
 # - The `hypothesis_backlog` is updated after each batch
 # - The agent re-reads this file from disk at every phase boundary
@@ -53,6 +54,9 @@ structure:
       gates:
         type: object
         description: "Key-value pairs of gate metric names to their baseline values"
+      metrics:
+        type: object
+        description: "Required hard-objective snapshots (aggregate plus samples) that decide.cjs loads for later comparisons"
       diagnostics:
         type: object
         description: "Key-value pairs of diagnostic metric names to their baseline values"
@@ -177,10 +181,14 @@ experiment_entry:
     outcome:
       type: enum
       values:
-        - measured                # measurement finished and metrics were persisted, awaiting batch evaluation
-        - kept                    # primary metric improved, gates passed -> merged to optimization branch
-        - reverted                # primary metric did not improve or was worse -> changes discarded
-        - degenerate              # degenerate gate failed -> immediately reverted, no judge evaluation
+        - measured                # measurement finished and metrics were persisted, awaiting batch evaluation / integration
+        - promising               # eligible on current samples but the ladder still needs confirmation before keep
+        - kept                    # eligible, confirmed, and integrated onto the optimization branch
+        - not_selected            # eligible after comparison but not integrated (not the winner, overlapping, or past the runner-up cap)
+        - reverted                # compared and not eligible (regressed a required objective, or none improved)
+        - inconclusive            # delta inside the comparison threshold; not a keep and not a demonstrated regression
+        - censored                # aborted as noncompetitive under the predeclared futility bound
+        - degenerate              # degenerate gate or smoke test failed -> immediately reverted, no judge evaluation
         - error                   # measurement command crashed, timed out, or produced malformed output
         - deferred_needs_approval # experiment needs an unapproved dependency -> set aside for batch approval
         - timeout                 # measurement command exceeded timeout_seconds
@@ -188,11 +196,14 @@ experiment_entry:
         - runner_up_reverted      # file-disjoint runner-up that was cherry-picked but combined measurement was not better
       description: >
         Load-bearing state: the loop branches on this value.
-        'measured' is the only non-terminal state and exists so CP-3 can persist
-        raw metrics before batch-level comparison decides the final outcome.
-        'kept' and 'runner_up_kept' advance the optimization branch.
-        'deferred_needs_approval' items are re-presented at wrap-up.
-        All other states are terminal for that experiment.
+        'measured' and 'promising' are non-terminal: CP-3 persists raw metrics
+        before batch-level comparison, and 'promising' means the ladder still
+        needs confirmation samples. An eligible decide `keep` stays `measured`
+        until its diff is on the optimization branch. 'kept' and 'runner_up_kept'
+        mean that integration happened. 'not_selected' is terminal for an
+        eligible candidate that was not integrated. 'deferred_needs_approval'
+        items are re-presented at wrap-up. All other states are terminal for
+        that experiment.
 
   optional_children:
 
@@ -219,6 +230,10 @@ experiment_entry:
       type: object
       description: "Diagnostic metric values from the measurement command"
 
+    metrics:
+      type: object
+      description: "Required hard-objective snapshots (aggregate plus samples) that decide.cjs loads"
+
     judge:
       type: object
       description: "Judge evaluation scores (only when primary type is 'judge' and gates passed)"
@@ -232,6 +247,19 @@ experiment_entry:
     primary_delta:
       type: string
       description: "Change in primary metric from current best (e.g., '+0.7', '-0.3')"
+
+    objective_results:
+      type: object
+      description: "Per-required-objective comparison from decide.cjs (verdict, delta, relative)"
+
+    sample_count:
+      type: integer
+      description: "How many harness samples were spent on this experiment"
+
+    next_measurement:
+      type: string
+      enum: [none, smoke, exploratory, add_sample, confirm]
+      description: "Ladder next step from decide.cjs; none when the decision is terminal"
 
     learnings:
       type: string
@@ -264,14 +292,19 @@ experiment_entry:
 #         -> gates failed           -> outcome: degenerate
 #         -> measurement error      -> outcome: error
 #         -> measurement timeout    -> outcome: timeout
+#         -> smoke failed           -> outcome: degenerate
+#         -> futile / censored      -> outcome: censored
 #         -> gates passed
-#           -> persist raw metrics   -> outcome: measured
+#           -> persist raw metrics   -> outcome: measured or promising
 #           -> judge evaluated (if type: judge)
-#             -> best in batch, improved  -> outcome: kept
+#             -> decide.cjs eligible, next_measurement none -> stay measured until integration
+#               -> diff on optimization branch -> outcome: kept
+#               -> eligible leftover             -> outcome: not_selected
 #             -> runner-up, file-disjoint -> cherry-pick + re-measure
-#               -> combined better        -> outcome: runner_up_kept
-#               -> combined not better    -> outcome: runner_up_reverted
-#             -> not improved             -> outcome: reverted
+#               -> combined eligible and integrated -> outcome: runner_up_kept
+#               -> combined not kept              -> outcome: runner_up_reverted
+#             -> inconclusive             -> outcome: inconclusive
+#             -> not eligible             -> outcome: reverted
 #       -> needs unapproved dep    -> outcome: deferred_needs_approval
 #
 # Only 'kept' and 'runner_up_kept' produce a commit on the optimization branch.

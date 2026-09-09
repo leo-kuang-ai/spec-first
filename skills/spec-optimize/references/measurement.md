@@ -95,13 +95,20 @@ An approved optimization spec, clean tree, executable harness, baseline approval
 
 ### 1.3 Establish Baseline
 
-Run the measurement harness on the current code.
+Run the measurement harness on the current code. Resolve a working Node runtime (`node` or `nodejs`) before starting an optimization run: `scripts/decide.cjs` owns numeric eligibility and the next measurement step. No runtime means a blocked prerequisite, never a guessed comparison.
 
-**If stability mode is `repeat`:**
-1. Run the harness `repeat_count` times
+**If stability mode is `repeat` or `ladder`:**
+Validate positive integer counts first. Repeat uses `repeat_count` (default 5). Ladder uses `confirmation_repeats`, falling back to `repeat_count` (default 5), and it must be at least `exploratory_pairs` (default 1). Reject incoherent counts instead of silently repairing the approved protocol. A repeat-mode spec does not need ladder fields.
+1. Run the harness for the full count above
 2. Aggregate results using the configured aggregation method (median, mean, min, max)
 3. Calculate variance across runs
 4. If variance exceeds `noise_threshold`, warn the user and suggest increasing `repeat_count`
+
+**Spend only the measurement the current decision needs.** Baseline and final confirmation use the full protocol. A ladder candidate starts with its optional smoke check, then an exploratory sample, and only spends further samples when `scripts/decide.cjs` requests them. Stable runs use one sample; repeat runs use the full repeat count. For paired comparisons, preserve the correspondence and order of baseline/candidate samples; acquire a matching baseline observation if missing, never copy or recycle an observation to manufacture a pair.
+
+Persist every required hard objective under `metrics` as `{aggregate, samples}` and primary judge observations under `judge`. The supplied sample arrays take precedence over aggregate fields. Verify every required hard objective is a finite number, including objectives absent from diagnostics; booleans remain permitted for gates only. Retain gates, diagnostics, raw outputs, source identity, and sample order. Copy this complete snapshot into `best` at CP-1 and after integration; do not reduce it to a primary scalar.
+
+The optional smoke command has its own measurement execution envelope: require authorization for its exact command, cwd, environment names, and effects under the same rule as the main command before running it. A declared smoke command or ladder does not grant new execution authority. The optional `SPEC_OPTIMIZE_CENSOR_AFTER` also belongs in the frozen environment names and must be predeclared; enable it only when elapsed time proves no required objective can still win. Completed-payload futility is evaluated by the decision script.
 
 Record the baseline in the experiment log:
 ```yaml
@@ -109,6 +116,9 @@ baseline:
   timestamp: "<current ISO 8601 timestamp>"
   gates:
     <gate_name>: <value>
+    ...
+  metrics:
+    <required_hard_objective>: { aggregate: <value>, samples: [<value>, ...] }
     ...
   diagnostics:
     <diagnostic_name>: <value>

@@ -20,6 +20,9 @@ Duration: <wall-clock time>
 Total experiments: <count>
   Kept: <count> (including <runner_up_kept_count> runner-up merges)
   Reverted: <count>
+  Not selected: <count>
+  Inconclusive: <count>
+  Censored: <count>
   Degenerate: <count>
   Errors: <count>
   Deferred: <count>
@@ -38,6 +41,8 @@ Key improvements:
 ```
 
 ### 4.3 Preserve and Offer Next Steps
+
+Before claiming final improvement or target completion, confirm the integrated snapshot with the full configured measurement protocol and every required objective. Persist failures or unavailable confirmation as unresolved evidence. Report each required target against the final snapshot, and distinguish a target stop from budget, plateau, manual stop, or blocked execution. Comparison eligibility alone is not proof of integration.
 
 The optimization branch (`optimize/<spec-name>`) is preserved with all commits from kept experiments.
 The experiment log remains in local `.spec-first/workflows/spec-optimize/<spec-name>/` scratch space for resume and audit on this machine only; it does not travel with the branch because that run-state path is gitignored. The strategy digest is derived, reconstructable state and may be regenerated from the canonical experiment log.
