@@ -20,8 +20,9 @@ const packages = [
   },
   {
     name: 'spec-compound',
-    boundarySource: 'skills/spec-compound/SKILL.md',
-    sources: ['skills/spec-compound/SKILL.md'],
+    boundarySource: 'skills/spec-compound/references/modes.md',
+    sources: ['skills/spec-compound/SKILL.md', ...require('../helpers/compound-contract').phaseFiles
+      .map(file => `skills/spec-compound/references/${file}`)],
   },
   {
     name: 'spec-compound-refresh',
@@ -202,7 +203,7 @@ const dispatchSourceContracts = [
     ],
   },
   {
-    path: 'skills/spec-compound/SKILL.md',
+    path: 'skills/spec-compound/references/report.md',
     requiredPatterns: [
       /Execution:[^\n]*dispatch_authorization_missing[^\n]*subagent_capability_missing[^\n]*worker_capability_unproven/,
     ],
@@ -555,7 +556,7 @@ describe('generic dispatch authorization matrix', () => {
 
   test('inline fallback labels stay honest in downstream workflow text', () => {
     const brainstorm = read('skills/spec-brainstorm/SKILL.md');
-    const compound = read('skills/spec-compound/SKILL.md');
+    const compound = read('skills/spec-compound/references/report.md');
     const dogfood = read('skills/spec-dogfood/SKILL.md');
     const ideate = read('skills/spec-ideate/SKILL.md');
 

@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-09 18:10:00 codex: refactor(spec-compound): 融合 CE 26f38961 的按阶段加载结构，Skill 与新增 references 使用英文，保留候选验证后发布、独立授权与原子写入边界，补齐 Lightweight 依赖和部分发布报告。 (user-visible)
 - v1.15.3 2026-09-09 17:34:00 codex: refactor(spec-code-review): 补齐 CE 4df5f99d 的阶段迁移，消除入口与 references 重复并统一为英文；修正早期 run identity 与 snapshot endpoint 顺序，保留本地授权、task scope、provider receipt 与失败披露，测试改读实际 owner。 (user-visible)
 - v1.15.3 2026-09-09 17:22:29 codex: fix(sync): 修正 CE 129 项任务表的状态列错位，撤回 97 份模板证据的不实完成声明，恢复执行方案 active 状态并登记逐项补验范围。 (user-visible)
 - v1.15.3 2026-09-09 15:50:00 codex: fix(spec-dogfood): 同步 CE 248f7eb8 的 outcome/done 收口与红色自动化套件 not-ready 判定，保留 spec-first 的 spec-test-browser、授权与 phases reference 边界。 (user-visible)

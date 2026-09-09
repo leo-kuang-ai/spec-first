@@ -36,7 +36,7 @@ describe('Skill-flow 剩余 P2 关闭合同', () => {
   });
 
   test('SF-16 session historian 只拥有 caller 提供的 scratch artifact return', () => {
-    const caller = read('skills/spec-compound/SKILL.md');
+    const caller = read('skills/spec-compound/references/session-history.md');
     const prompt = read('skills/spec-compound/references/agents/session-historian.md');
 
     expect(caller).toContain('`output_path: <private-scratch-dir>/session-history.md`');

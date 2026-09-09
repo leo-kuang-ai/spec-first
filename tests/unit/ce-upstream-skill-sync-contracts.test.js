@@ -10,7 +10,6 @@ describe('CE upstream skill sync contracts', () => {
   test('keeps pre-resolved git commands shell-portable', () => {
     const files = [
       'skills/spec-brainstorm/SKILL.md',
-      'skills/spec-compound/SKILL.md',
       'skills/spec-ideate/SKILL.md',
       'skills/spec-plan/SKILL.md',
       'skills/spec-sweep/SKILL.md',
@@ -105,7 +104,7 @@ describe('CE upstream skill sync contracts', () => {
   });
 
   test('keeps compound mode selection local and session-history reads authorization-gated', () => {
-    const compound = read('skills/spec-compound/SKILL.md');
+    const compound = require('../helpers/compound-contract').readCompoundContract();
 
     expect(compound).toContain('**Mode selection (Full vs Lightweight) — decide it, don\'t ask it.**');
     expect(compound).toContain('**Session history — an authorization-gated probe in Full mode.**');

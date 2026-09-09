@@ -20,8 +20,9 @@ const consumers = [
 
 describe('host-neutral Skill invocation arguments', () => {
   test.each(consumers)('%s does not depend on a host-specific argument variable', (skill) => {
-    const source = skill === 'spec-code-review'
-      ? fs.readFileSync(path.join(repoRoot, 'skills', skill, 'references/modes-and-output.md'), 'utf8')
+    const source = ['spec-code-review', 'spec-compound'].includes(skill)
+      ? fs.readFileSync(path.join(repoRoot, 'skills', skill,
+        skill === 'spec-compound' ? 'references/modes.md' : 'references/modes-and-output.md'), 'utf8')
       : fs.readFileSync(path.join(repoRoot, 'skills', skill, 'SKILL.md'), 'utf8');
     expect(source).not.toContain('$ARGUMENTS');
     expect(source).toMatch(/invocation arguments/i);
@@ -29,8 +30,9 @@ describe('host-neutral Skill invocation arguments', () => {
 
   test('token parsers preserve quoted and platform-specific input shapes', () => {
     for (const skill of ['spec-code-review', 'spec-compound', 'spec-compound-refresh', 'spec-dogfood']) {
-      const source = skill === 'spec-code-review'
-        ? fs.readFileSync(path.join(repoRoot, 'skills', skill, 'references/modes-and-output.md'), 'utf8')
+      const source = ['spec-code-review', 'spec-compound'].includes(skill)
+        ? fs.readFileSync(path.join(repoRoot, 'skills', skill,
+          skill === 'spec-compound' ? 'references/modes.md' : 'references/modes-and-output.md'), 'utf8')
         : fs.readFileSync(path.join(repoRoot, 'skills', skill, 'SKILL.md'), 'utf8');
       expect(source).toMatch(/preserv(?:e|ing).*quoted|quoted paths\/tokens/i);
     }

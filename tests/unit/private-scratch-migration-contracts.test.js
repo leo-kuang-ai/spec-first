@@ -19,7 +19,8 @@ const ephemeral = [
   'skills/spec-brainstorm/SKILL.md',
   'skills/spec-brainstorm/references/handoff.md',
   'skills/spec-brainstorm/references/universal-brainstorming.md',
-  'skills/spec-compound/SKILL.md',
+  'skills/spec-compound/references/research.md',
+  'skills/spec-compound/references/session-history.md',
   'skills/spec-compound/references/agents/session-historian.md',
   'skills/spec-explain/SKILL.md',
   'skills/spec-plan/references/universal-planning.md',
@@ -29,7 +30,10 @@ const ephemeral = [
 
 describe('private scratch migration', () => {
   test('all 32 baseline source files have exactly one migration class', () => {
-    expect(deletedOwners.length * 2 + durable.length + ephemeral.length).toBe(32);
+    const baselineEphemeral = new Set(ephemeral.map(file =>
+      /skills\/spec-compound\/references\/(research|session-history)\.md$/.test(file)
+        ? 'skills/spec-compound/SKILL.md' : file));
+    expect(deletedOwners.length * 2 + durable.length + baselineEphemeral.size).toBe(32);
     expect(new Set([...durable, ...ephemeral]).size).toBe(durable.length + ephemeral.length);
   });
 

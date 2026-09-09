@@ -17,7 +17,7 @@ describe('specialized CE calibration contracts', () => {
       expect(source).toContain('sys.stdout.reconfigure(encoding="utf-8", errors="replace")');
       expect(source).toContain('encoding="utf-8"');
     }
-    const compound = read('skills/spec-compound/SKILL.md');
+    const compound = require('../helpers/compound-contract').readCompoundContract();
     expect(compound).toContain('Report discoverability gaps without editing instruction files');
     expect(compound).toContain('Discoverability recommendation');
     expect(compound).toContain('Documentation skipped');

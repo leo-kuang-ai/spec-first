@@ -18,6 +18,9 @@ const SHARED_PROMOTION_FILES = [
 ];
 
 function read(filePath) {
+  if (filePath === 'skills/spec-compound/SKILL.md') {
+    return require('../helpers/compound-contract').readCompoundContract();
+  }
   return fs.readFileSync(filePath, 'utf8');
 }
 
@@ -78,7 +81,7 @@ describe('compound knowledge-promotion contract', () => {
     const refresh = read('skills/spec-compound-refresh/references/per-action-flows.md');
 
     const compoundFull = markdownSection(compound, '### Phase 2: Assembly & Candidate Validation', '### Phase 2.4:');
-    const compoundLightweight = markdownSection(compound, '### Lightweight Mode', '## What It Captures');
+    const compoundLightweight = read('skills/spec-compound/references/lightweight.md');
     const refreshConsolidate = markdownSection(refresh, '## Consolidate Flow', '## Replace Flow');
     const refreshReplace = markdownSection(refresh, '## Replace Flow', '## Delete Flow');
 
@@ -115,7 +118,7 @@ describe('compound knowledge-promotion contract', () => {
       '**Mode selection (Full vs Lightweight) — decide it, don\'t ask it.**',
       '**In headless mode**',
     );
-    const lightweight = markdownSection(compound, '### Lightweight Mode', '## What It Captures');
+    const lightweight = read('skills/spec-compound/references/lightweight.md');
 
     expect(modeSelection).toContain('low-risk, bounded, source-grounded, and already backed by verification evidence');
     expect(modeSelection).toContain('Context pressure alone never waives promotion obligations');
@@ -131,7 +134,7 @@ describe('compound knowledge-promotion contract', () => {
       '### Phase 2: Assembly & Candidate Validation',
       '### Phase 2.5: Selective Refresh Check',
     );
-    const lightweight = markdownSection(compound, '### Lightweight Mode', '## What It Captures');
+    const lightweight = read('skills/spec-compound/references/lightweight.md');
 
     for (const section of [full, lightweight]) {
       expect(section).toContain('<private-scratch-dir>/learning-candidate.md');
