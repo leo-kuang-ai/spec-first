@@ -2,6 +2,8 @@
 
 The panel is an optional governed cross-check. `spec-pov` remains the decision owner; peers are evidence, not votes. A request for a POV, an `oracle` label, a named model, available CLI, or permission setting does not by itself authorize worker dispatch or data egress.
 
+Before this reference is loaded, form and freeze the host's own independent POV. Keep it out of an independent peer's initial context; expose it only for a requested critique or a later reconciliation round. Finish the panel branch, including any fold-in or reconciliation, before composing the user-facing verdict.
+
 ## Admission and approach set
 
 First freeze the approach set being judged. List every user-supplied candidate, the status quo when relevant, and the explicit option to reject the framing or all candidates. Round-one payloads describe these approaches symmetrically and omit the host's verdict, advocacy, risk ranking, and other peers' conclusions. A prior opinion may be the subject, but fresh host meta-judgment about it stays out of round one.

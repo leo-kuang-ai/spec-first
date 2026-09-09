@@ -37,9 +37,10 @@ describe('review peer expansion contracts', () => {
 
   test('POV freezes a complete approach set and keeps peers non-voting', () => {
     const skill = read('skills/spec-pov/SKILL.md');
+    const intake = read('skills/spec-pov/references/intake.md');
     const panel = read('skills/spec-pov/references/cross-model-panel.md');
-    expect(skill).toContain('Freeze an explicit approach set');
-    expect(skill).toContain('never decide by vote');
+    expect(skill).toContain('complete approach set');
+    expect(intake).toContain('freeze the complete approach set');
     expect(panel).toContain('peers are evidence, not votes');
     expect(panel).toContain('reject the framing or all candidates');
     expect(panel).toContain('starts no peer process');
@@ -52,9 +53,9 @@ describe('review peer expansion contracts', () => {
     const panel = read('skills/spec-pov/references/cross-model-panel.md');
 
     expect(skill).toContain('Read `references/grounding.md` before grounding');
-    expect(skill).toContain('Read `references/followup.md` before follow-up decisions');
+    expect(skill).toContain('`references/followup.md` before follow-up decisions');
     expect(grounding).toContain('provenance buckets');
-    expect(followup).toContain('Any implementation is outside this read-only contract');
+    expect(followup).toContain('Any implementation, commit, or landing is outside this read-only contract');
     expect(panel).toContain('A summons is an **affirmative** request');
     expect(panel).toContain('which peers ran');
   });
