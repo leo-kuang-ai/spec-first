@@ -94,6 +94,18 @@ describe('spec-resolve-pr-feedback contracts', () => {
     expect(fullMode).toMatch(/bash "\$SKILL_DIR\/scripts\/get-thread-for-comment" PR_NUMBER COMMENT_NODE_ID \[OWNER\/REPO\]/);
   });
 
+  test('pipeline mode keeps unattended escalation and convergence rules explicit', () => {
+    const entrypoint = read('skills/spec-resolve-pr-feedback/SKILL.md');
+    const fullMode = read('skills/spec-resolve-pr-feedback/references/full-mode.md');
+    const pipelineMode = read('skills/spec-resolve-pr-feedback/references/pipeline-mode.md');
+
+    expect(entrypoint).toContain('Read `references/pipeline-mode.md` when pipeline mode is selected.');
+    expect(pipelineMode).toContain('Never call the blocking-question tool');
+    expect(pipelineMode).toContain('open thread is the escalation ledger');
+    expect(pipelineMode).toContain('demonstrated non-converging approach');
+    expect(fullMode).toContain('When a `trajectory` is present, apply the non-convergence check');
+  });
+
   test('helper scripts preserve friendly owner repo fallback under set -e', () => {
     const getComments = read('skills/spec-resolve-pr-feedback/scripts/get-pr-comments');
     const getThread = read('skills/spec-resolve-pr-feedback/scripts/get-thread-for-comment');

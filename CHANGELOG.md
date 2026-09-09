@@ -7359,3 +7359,5 @@
 - v1.8.2 2026-09-09: feat(skill-structure): 为 spec-explain、spec-debug、spec-prototype、spec-sweep 补齐 CE required-read 与复现/原型边界
 
 - v1.8.2 2026-09-09: fix(spec-debug): 区分本地已修复但未推送与已推送的 pipeline 返回状态
+
+- v1.8.2 2026-09-09: feat(spec-resolve-pr-feedback): 吸收 CE pipeline 模式的无人值守升级与非收敛判断边界

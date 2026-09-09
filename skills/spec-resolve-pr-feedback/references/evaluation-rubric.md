@@ -87,7 +87,7 @@ For `needs-human`, the **reply_text** posted to the thread should sound like the
 [Natural acknowledgment, e.g., "Good question -- this is a tradeoff between X and Y. I need to align on it before making the call."]
 ```
 
-The **decision_context** presented to the user, not posted, carries the depth:
+The **decision_context** presented to the user in ordinary runs carries the depth; in `mode:pipeline`, post a condensed version on the open thread as described in [pipeline-mode.md](pipeline-mode.md):
 
 ```markdown
 ## What the reviewer said

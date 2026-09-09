@@ -53,6 +53,8 @@ thread_resolution_authorization: authorized | missing
 
 ## Mode Detection
 
+Read `references/pipeline-mode.md` when pipeline mode is selected.
+
 If the invocation contains `mode:pipeline-return`, strip the token, load
 `references/pipeline-return.md`, and then use Full or Targeted mode only for
 fetch, source validation, and local fix mechanics. The pipeline-return
