@@ -15,7 +15,7 @@ describe('spec-work structured shipping and shared verification contracts', () =
   const workSkill = read('skills/spec-work/SKILL.md');
   const shipping = read('skills/spec-work/references/shipping-workflow.md');
   const debug = read('skills/spec-debug/SKILL.md');
-  const review = read('skills/spec-code-review/SKILL.md');
+  const review = read('skills/spec-code-review/references/finish-review.md');
   const reviewOutput = read('skills/spec-code-review/references/review-output-template.md');
   const catalog = read('docs/catalog/runtime-capabilities.md');
 

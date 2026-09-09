@@ -1,4 +1,43 @@
-# modes and output
+# Arguments, Modes, And Output
+
+Read before any scope tool call. This file owns argument conflicts, read-only and dispatch authorization, quick-review routing, and output modes. Completion artifacts belong to `references/finish-review.md`.
+
+## Argument Parsing
+
+Parse the invocation arguments supplied by the current host for optional tokens. Strip only recognized tokens while preserving quoted paths, Windows drive paths, URLs, and the order of the remainder before interpreting it as a PR number, GitHub URL, or branch name.
+
+| Token | Example | Effect |
+|-------|---------|--------|
+| `mode:agent` | `mode:agent` | **Report-only**: return **JSON** instead of markdown tables and skip the Stage 5c apply (the caller applies). Does not change reviewer selection, merge logic, or scope rules (see Output format) |
+| `mode:headless` | `mode:headless` | **Deprecated alias** for `mode:agent` |
+| `mode:report-only` | `mode:report-only` | **Deprecated — ignored.** Former no-artifacts mode; default behavior is review-only without checkout |
+| `base:<sha-or-ref>` | `base:abc1234` or `base:origin/main` | Diff base on the **current checkout** (explicit; skips auto base detection) |
+| `plan:<path>` | `plan:docs/plans/2026-03-25-001-feat-foo-plan.md` | Plan file for requirements verification (explicit). Supports markdown and HTML unified plans. |
+| `task-pack:<path>` | `task-pack:docs/tasks/example-tasks.md` | Local task-pack source for a bounded task review. Requires `task:`, `task-context:`, `mode:agent`, and `base:`. |
+| `task:<task_id>` | `task:T003` | Task Card ID to review from the paired task pack. |
+| `task-context:<path>` | `task-context:<run-local-json>` | Caller-captured `spec-code-review-task-context/v1` facts for digest, pre-task state, and task delta attribution. |
+| `depth:full` | `depth:full` | **Force the full reviewer roster** — skip the Stage 3c small-diff lite path so every always-on persona runs regardless of diff size. Use when a deep/thorough review is explicitly requested (the one escalation signal Stage 3c cannot infer from the diff). Does not change conditional selection, merge, or scope. |
+| `depth:auto` | `depth:auto` | **Default** — self-right-size via Stage 3c (lite roster for trivial, low-risk, code-only diffs; full roster otherwise). |
+| `grouping:auto` | `grouping:auto` | **Default** — build thematic triage groups when findings span distinct concerns (Stage 5 step 9b) |
+| `grouping:off` | `grouping:off` | Suppress triage groups: no Triage Groups section, empty `triage_groups` in JSON |
+| `grouping:always` | `grouping:always` | Always build triage groups, even for small reviews |
+
+**Grouping is presentation, not a mode.** The `grouping:` tokens change how the finding set is organized for triage — never reviewer selection, merge logic, scope rules, or the Stage 5c apply decision.
+
+**Mode alias:** `mode:headless` normalizes to `mode:agent`. `mode:agent` + `mode:headless` is not a conflict.
+
+Path-valued tokens split only at their first `:` and may be host-quoted so paths with spaces remain one argument. Preserve the decoded path exactly; do not split it again on whitespace. Windows drive letters inside the value and POSIX paths are data, not extra tokens.
+
+**Conflicting arguments:** Stop without dispatching reviewers when:
+- Multiple incompatible scope selectors appear together (e.g. `base:` **and** a PR number/branch target — `base:` means "review the current checkout against this base")
+- Multiple distinct `mode:` tokens other than the `mode:agent`/`mode:headless` alias pair
+- Multiple distinct `grouping:` tokens (e.g. `grouping:off` **and** `grouping:always`)
+- task-pack and task tokens must appear together, exactly once, with exactly one `task-context:` token
+- any task token appears without `mode:agent` or without `base:`, or task context is combined with a PR number/URL/branch target
+
+Deprecated `mode:autofix` is **not** a conflict — ignore the token and proceed with the normal flow (see below).
+
+Emit a one-line failure reason. In `mode:agent`, return JSON: `{"status":"failed","reason":"..."}`.
 
 ### Phase 0a: Freeze effective mode before any tool call
 
@@ -12,7 +51,11 @@ artifact_write_gate: review-artifacts-only
 
 When `mode:agent` or its `mode:headless` alias is present, set `effective_mode: agent`, `mutation_policy: report-only`, and `source_mutation_gate: closed`. In this mode, adjacent fix/apply wording is intent data, not mutation authority. Do not call project-writing tools, `apply_patch`, edit/write APIs, `git apply`, `git restore`, `git checkout`, formatters with write flags, or any command that can rewrite reviewed source. The only permitted writes are run-scoped review artifacts and deterministic evidence under the exact artifact roots owned below.
 
-Generate the run ID and resolve `REVIEW_ARTIFACT_DIR` here, before scope inspection. Use the OS-native temporary-directory rules in Stage 4 and reuse the same canonical path for the entire run. Failure to create an artifact directory does not open the source mutation gate; `mode:agent` continues report-only with an in-band limitation.
+Generate the run ID and resolve `REVIEW_ARTIFACT_DIR` here, before scope inspection. Use the following OS-native temporary-directory rules and reuse the same canonical path for the entire run. Failure to create an artifact directory does not open the source mutation gate; `mode:agent` continues report-only with an in-band limitation.
+
+Resolve `REVIEW_ARTIFACT_DIR` exactly once with an OS-native temp primitive, then reuse that exact absolute path everywhere. Prefer the runtime API (`os.tmpdir()` in Node.js; an equivalent host temp API otherwise), which already respects platform conventions such as `$TMPDIR` on POSIX and `%TEMP%` on Windows. Create a run-scoped child such as `spec-first/spec-code-review/<run-id>`, canonicalize it, verify it is writable, and never reconstruct it later from a hard-coded root or `run_id` alone. A host-provided writable run-local temp directory is an acceptable fallback.
+
+If no writable artifact directory can be created, continue report-only with the complete in-band reviewer/merge JSON when available, set `artifact_path: null`, `artifact_write_status: unavailable`, and record limitation `review-artifact-write-unavailable`. Do not re-run reviewers merely to recover an artifact. A task review with complete in-band coverage may still report findings, but any durable handoff must first materialize a sanitized repo-local copy or carry a structured summary with the limitation.
 
 ### Phase 0: Resolve mutation, commit, and dispatch policy
 
@@ -38,32 +81,25 @@ worker_bounded_parallelism: supported | unsupported | unknown
 
 If review repo scope is ambiguous in a parent multi-repo workspace, stop before local diff claims or apply and return a failure reason naming the required selected child repo/current checkout; do not open a blocking prompt. Read-only PR-remote scope may proceed from explicit PR metadata without choosing a sibling checkout. Generated runtime mirrors remain out of source-fix scope.
 
-## Operating principles
-
-Same review pipeline for default and `mode:agent`:
-
-- **Report-only by default; never land.** Never push, open PRs, or file tickets in any mode. Ordinary default review and every `mode:agent` run report findings only. Stage 5c runs solely for default mode with `mutation_policy: apply-fixes`; commit remains a separate authorization gate.
-- **Agent mode never mutates.** In **`mode:agent`** it never mutates the tree, regardless of adjacent apply/fix wording.
-- **No blocking prompts.** Never use `AskUserQuestion`, `request_user_input`, or other blocking question tools. Infer intent, plan, and scope from explicit tokens, git state, PR metadata, and conversation. Note uncertainty in Coverage or the verdict — do not stop to ask.
-- **Explicit mutations only.** Never run `gh pr checkout`, `git checkout`, `git switch`, or similar branch-switch commands. Passing a PR number, URL, or branch name selects **review scope**, not permission to mutate the working tree. To review local uncommitted work on a feature branch, check out that branch yourself (or stay on it) and pass `base:` or no target.
-- **Smart defaults.** Untracked files: review tracked changes only and list excluded paths in Coverage. Plan: use `plan:` when passed; otherwise discover conservatively from PR body or branch keywords. Weak advisory P2/P3 from testing/maintainability alone: demote to `testing_gaps` / `residual_risks` per Stage 5.
-- **Report outcomes, not machinery.** What you show the user is about the review: what's being examined (the PR/branch), which coverage is included and the one-line reason for each conditional lens, the independent cross-model pass and which model runs it, and the findings. Keep the skill's internals out of user-facing text — model-tier assignments, raw scope-mode codenames (`local-aligned`/`pr-remote`), staging the diff to disk, loading persona files, parallel-dispatch bookkeeping, and step-by-step narration of your own setup. Name what the user would recognize (a PR number, a reviewer's concern, a peer model), not the plumbing. This governs *what* you surface and suppress; it does not script the wording — use your own voice.
-
-## Anti-Rationalization Red Flags
-
-| 红旗念头 | 停下来做什么 |
-| --- | --- |
-| 「看着没问题，跳过应有的证伪」 | 按当前风险运行被触发的 adversarial/validator/direct fact check；未运行的独立视角必须在 Coverage 降级。 |
-| 「这条 finding 大概成立」 | 回到 source、diff、test、log 或 artifact 核对；provider/advisory evidence 不能升级为 confirmed。 |
-| 「口头说一下 residual 就行」 | 产出结构化 finding、Actionable Findings、Coverage 与 durable limitation，让下游不依赖会话记忆。 |
-
-这是注意力提醒,不是 gate,也不替代 LLM 判断;最终是否停下、如何处理仍由你按当前证据决定。
-
 ## Output format
 
 | Invocation | Deliverable |
 |------------|-------------|
 | **Default** | Markdown report (pipe-delimited finding tables where useful) + Actionable Findings summary; optional Applied section only for explicit `mutation_policy: apply-fixes` |
-| **`mode:agent`** | One JSON object (see ### JSON output format below) + artifacts under the returned concrete `artifact_path` when writable |
+| **`mode:agent`** | One JSON object (see `references/finish-review.md`, JSON output format) + artifacts under the returned concrete `artifact_path` when writable |
 
 `mode:agent` is **report-only**: it skips the Stage 5c apply (the caller applies) and serializes findings as JSON instead of markdown. It does not change reviewer selection, merge logic, or scope rules — the JSON is the deterministic contract for programmatic and cross-harness callers (Codex and other harnesses). The default markdown is the human view; keep it ASCII-safe (pipe tables, `->` not middot `·`, no box-drawing) so it degrades gracefully across terminals.
+
+## Quick Review Short-Circuit
+
+If the invocation arguments indicate the user wants a quick, fast, or light code review — and **`mode:agent` is not active** — do not dispatch the multi-agent flow.
+
+**Announce the chosen path** before any other work (Quick review vs Multi-agent review). Skip this announcement when `mode:agent` is active.
+
+Sequence:
+
+1. **Run the harness's built-in code review.** Forward any review target after stripping tokens. Then stop — do not dispatch the multi-agent pipeline.
+2. **Exemption:** If no built-in review exists, continue into the full multi-agent review.
+3. **`mode:agent` bypasses this short-circuit** — always run the full multi-agent review and return JSON.
+
+**Deprecated:** `mode:autofix` is no longer supported. If passed, ignore the token; it does not create apply authorization. The run stays report-only unless the current user/upstream independently and explicitly requested review-and-fix, and `mode:agent` remains report-only regardless.

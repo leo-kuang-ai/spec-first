@@ -19,7 +19,8 @@ const consumers = [
 describe('fresh repo grounding contracts', () => {
   test.each(consumers)('%s has a current-source path and an honest degraded path', (skill) => {
     const skillDir = path.join(repoRoot, 'skills', skill);
-    const source = fs.readFileSync(path.join(skillDir, 'SKILL.md'), 'utf8');
+    const source = fs.readFileSync(path.join(skillDir,
+      skill === 'spec-code-review' ? 'references/intent-and-plan.md' : 'SKILL.md'), 'utf8');
 
     expect(source).toMatch(/current (?:target repo\/worktree|target repo|git identity|target)/i);
     expect(source).toMatch(/dirty state|dirty worktree/i);

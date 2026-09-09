@@ -1,49 +1,6 @@
-# scope
+# Reviewed Scope And Provenance
 
-## Review Scope
-
-A full review spawns generic subagents for all 4 always-on personas plus the 2 spec-first always-on local prompt assets, then adds whichever cross-cutting and stack-specific conditionals fit the diff (Stage 3c can collapse this to a lite roster for trivial, low-risk diffs). The model naturally right-sizes: a small config change triggers 0 conditionals = 6 reviewers. A Rails auth feature might trigger security + reliability + adversarial = 9 reviewers.
-
-## Protected Artifacts
-
-The following paths are spec-first pipeline artifacts and must never be flagged for deletion, removal, or gitignore by any reviewer:
-
-- `docs/brainstorms/*` -- legacy requirements documents created by older spec-brainstorm versions
-- `docs/plans/*.{md,html}` -- unified plan artifacts created by spec-brainstorm or spec-plan (decision artifacts; execution progress is derived from git, not stored in plan bodies)
-- `docs/solutions/*.md` -- solution documents created during the pipeline
-
-If a reviewer flags any file in these directories for cleanup or removal, discard that finding during synthesis.
-
-## Plan Requirements Completeness
-
-When a plan is provided via `plan:<path>` or discovered from PR/branch context,
-classify readiness before checking completeness:
-
-- Unified artifact: metadata includes `artifact_contract: spec-unified-plan/v1`.
-  - `artifact_readiness: requirements-only` can inform product intent, but it
-    must not trigger implementation-unit completeness findings. Report that the
-    artifact was not implementation-ready if the diff appears to implement it.
-  - `artifact_readiness: implementation-ready` is eligible for full
-    requirements and U-ID completeness checks.
-  - Invalid progress-like readiness values (`active`, `in_progress`,
-    `completed`, `done`) are contract errors.
-- Legacy plan: use the existing completeness checks.
-
-Extract requirements from these shapes, in order:
-
-1. Unified `Product Contract` -> `### Requirements`
-2. Legacy top-level `## Requirements`
-3. Legacy `## Requirements Trace`
-
-For unified implementation-ready plans, also extract U-IDs from
-`## Implementation Units` and compare against PR body/branch context when
-available. Do not require every Product Contract R-ID to map one-to-one to a
-single U-ID; verify that implemented U-IDs cite the relevant R/F/AE/KTD IDs and
-that no claimed U-ID is missing from the plan.
-
-Task-mode exception: completeness scope is the selected Task Card, its `source_unit`/`requirement_refs`, and the bounded task delta only. Do not flag other plan requirements or U-IDs as unaddressed during an early task review; the final full review owns whole-plan completeness.
-
-## How to Run
+Read before Stage 1. This file owns local, remote, and task scope, snapshot validation, and the inline path when dispatch is unavailable. Remote review must not inspect unrelated local source.
 
 ### Stage 1: Determine scope
 
@@ -215,3 +172,59 @@ echo "BASE:$BASE" && echo "FILES:" && git diff --name-only $BASE && echo "DIFF:"
 Using `git diff $BASE` (without `..HEAD`) diffs the merge-base against the working tree, which includes committed, staged, and unstaged changes together.
 
 **Untracked file handling:** Outside task mode, always inspect `UNTRACKED:`. Untracked paths are out of scope unless staged. When non-empty, list excluded files in Coverage and continue on tracked changes only — never stop or prompt. Task mode uses the caller-captured pre-task/task-owned classification above instead of this blanket exclusion.
+
+### Stage 1a: Freeze the reviewed local scope
+
+For `mode:agent` and every report-only review whose reviewed tree is local (`base:`, standalone, `local-aligned`, or task-scoped current checkout), freeze the diff before semantic review. Set `SKILL_DIR` and run:
+
+```bash
+SCOPE_SNAPSHOT="$REVIEW_ARTIFACT_DIR/scope-snapshot.json"
+DIFF_A="$BASE"
+DIFF_B=""
+SCOPE_ARGS=(--base "$DIFF_A" --snapshot-out "$SCOPE_SNAPSHOT")
+[ -n "${DIFF_B:-}" ] && SCOPE_ARGS+=(--head "$DIFF_B")
+bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/review-scope.py" "${SCOPE_ARGS[@]}"
+```
+
+The returned `changed_files`, `files_changed`, and `diff_sha256` are immutable scope facts for the rest of the run. `mode:agent` JSON must use the frozen `files_changed`; never recompute it after tests or inspection. For task mode, the task-attributed bundle remains the semantic review scope, while the whole local base-to-working-tree snapshot is only the mutation detector. Remote-only PR/branch review has no reviewed local tree and records the guard as not applicable.
+
+If the helper, snapshot write, or artifact root is unavailable, keep `source_mutation_gate: closed`, record `mutation_guard_unavailable`, and do not emit a successful/complete machine handoff. Do not replace the deterministic snapshot with remembered prose or a later `git diff`.
+
+### Stage 1b: Compute scope signals (cheap, deterministic)
+
+Derive deterministic signals from the resolved diff once, so reviewer selection (Stage 3) and the small-diff fast path (Stage 3c) do not each re-reason over the whole diff. **These signals only ever shrink the roster via Stage 3c, and that gate fails closed (Stage 3c) — so any failure here (unresolved base, count failure, an uncounted file type) must surface as `UNKNOWN`/non-zero `UNCOUNTED_FILES`, never as a silent `0` that reads as "trivial."**
+
+**Set `DIFF_A`/`DIFF_B` to the two endpoints to diff, by Stage 1 scope mode:**
+- **`local-aligned` / standalone / `base:`** — `DIFF_A="$BASE"` (a real SHA/ref), `DIFF_B` empty (diffs base vs working tree).
+- **`pr-remote` / `branch-remote`** — `DIFF_A=<PR_BASE_REF>`, `DIFF_B=<PR_HEAD_REF>` (or `<branch-head-ref>`) — the **fetched** refs from Stage 1. Do **not** model-count from hunks (it drifts per host/model). If either ref was not fetched, skip the block and emit `EXEC_LINES:UNKNOWN` + `UNCOUNTED_FILES:1` so Stage 3c forces the full roster.
+- **Task-scoped `mode:agent`** — compute signals from the attributed task `FILES`/`DIFF` bundle only, including task-owned full-addition files. Never count the entire base-to-working-tree diff. If any task file is degraded/unattributed or cannot be counted consistently, emit `EXEC_LINES:UNKNOWN` + `UNCOUNTED_FILES:1` so the full roster runs and the coverage limitation remains visible.
+
+For every non-task scope, set `SKILL_DIR` to this Skill's runtime directory and run the facts helper through its portable Python wrapper:
+
+```bash
+SCOPE_ARGS=(--base "$DIFF_A")
+[ -n "${DIFF_B:-}" ] && SCOPE_ARGS+=(--head "$DIFF_B")
+bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/review-scope.py" "${SCOPE_ARGS[@]}"
+```
+
+Consume only its JSON facts (`status`, endpoints, `exec_lines`, `uncounted_files`, `changed_files`, path `signals`, test/agent-surface flags, fixed `docs/solutions` corpus presence, and `lite_eligible`). The helper does not select personas or decide semantic risk. A non-`complete` status, malformed output, invocation failure, or changed-file mismatch becomes `EXEC_LINES:UNKNOWN` plus `UNCOUNTED_FILES:1`; never reconstruct a favorable zero. Task-scoped mode continues to compute from its attributed bundle and uses the same fail-closed fields because the helper intentionally has no authority to reinterpret caller-owned task attribution.
+
+`EXEC_LINES` counts changed executable lines (added + removed, counted code extensions only — so a modified line counts as 2; the Stage 3c `<40` threshold is in add+delete units). `EXEC_LINES:UNKNOWN` means the base was unresolved — treat as non-trivial. `UNCOUNTED_FILES` is the count of changed files outside the code set (skill `.md`, JSON schemas, `.sh`, config, CI, lockfiles, unknown extensions) — **spec-first's own product surface is mostly uncounted, which is exactly why Stage 3c must fail closed on it.** The `SIGNALS` list is **path heuristics, not selection decisions**: Stage 3 still applies judgment and adds the matching conditional persona only when the runtime concern is real. Content-based risk (auth, payments, data mutation) is **not** path-derivable — read it from the diff in Stage 3 as before; it also disqualifies the Stage 3c fast path regardless of line count.
+
+### Stage 1c: Dispatch gate and inline fallback
+
+After scope/diff/task-context resolution, enforce the Phase 0 dispatch policy before profile derivation, persona loading, team announcements, validators, or cross-model work.
+
+- If `worker_dispatch_authorization: missing`, select the bounded inline report-only path, set `status: degraded` and `coverage.dispatch_reason_code: dispatch_authorization_missing`.
+- If authorization is present but confirmed current-session capability is missing, use the same path with `subagent_capability_missing`; if the probe is unavailable or cannot establish a unique eligible candidate, use `worker_capability_unproven`.
+- On this path, continue only through Stage 2 intent discovery and Stage 2b plan/task completeness context when applicable, then perform the inline pass, run the mandatory Stage 5e mutation check, and go to Stage 6. Skip Stage 2c, Stages 3/3b/3c, persona/validator/cross-model dispatch, and Stage 5/5b/5c. No persona prompt may be represented as independently executed.
+- Reuse the Phase 0a Run ID/artifact-directory setup before synthesis even though no reviewer is dispatched. If the directory is unavailable, keep the complete result in band with `artifact_path: null` and `artifact_write_status: unavailable`.
+
+Inline fallback output contract:
+
+1. Inspect the entire resolved diff or attributed task bundle once with direct correctness, testing, project-standards, scope, and plan/task-completeness checks. These are orchestrator checks, not executed personas.
+2. Normalize every surviving issue directly into the final finding fields, assign stable `#` values in Stage 5 ordering, set `reviewers: ["inline-fallback"]`, and derive `actionable_findings` from the normal routing fields. Do not emit a preliminary fast-pass block or claim validation/cross-reviewer agreement.
+3. Set `reviewers: ["inline-fallback"]`, `coverage.dispatch_reason_code` to the concrete fallback reason, and record independent/validator/cross-model coverage as not run. When no targeted command ran, use the Stage 5d `no-targeted-command-executed` evidence shape.
+4. Return `status: degraded` and `verdict: Not ready` even when no issue is found; single-model bounded coverage cannot close merge readiness. In task mode also set `required_gate_eligible: false`.
+
+The explicit Quick Review Short-Circuit is separate: when the user asked for a quick/light review and the harness has a built-in report-only reviewer, use that path as requested rather than labelling it a failed multi-agent run.

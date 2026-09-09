@@ -84,8 +84,16 @@ const packages = [
 const existingQualifiedPackages = [
   {
     name: 'spec-code-review',
-    boundarySource: 'skills/spec-code-review/SKILL.md',
-    sources: ['skills/spec-code-review/SKILL.md'],
+    boundarySource: 'skills/spec-code-review/references/modes-and-output.md',
+    sources: [
+      'skills/spec-code-review/SKILL.md',
+      'skills/spec-code-review/references/modes-and-output.md',
+      'skills/spec-code-review/references/scope.md',
+      'skills/spec-code-review/references/intent-and-plan.md',
+      'skills/spec-code-review/references/select-and-route.md',
+      'skills/spec-code-review/references/dispatch-reviewers.md',
+      'skills/spec-code-review/references/finish-review.md',
+    ],
   },
   {
     name: 'spec-debug',
@@ -492,7 +500,7 @@ describe('generic dispatch authorization matrix', () => {
   });
 
   test('code review keeps pre-roster trivial-PR classification inline and behind no hidden dispatch', () => {
-    const source = read('skills/spec-code-review/SKILL.md');
+    const source = require('../helpers/code-review-contract').readCodeReviewContract();
     const trivialPrSection = source.match(/\*\*Trivial-PR judgment\*\*:[\s\S]*?(?=\n\nWhen any skip rule fires)/);
     const dispatchGateIndex = source.indexOf('### Stage 1c: Dispatch gate and inline fallback');
     const orientationIndex = source.indexOf('### Stage 2c: Resolve current-tree orientation');

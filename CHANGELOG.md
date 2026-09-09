@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-09 17:34:00 codex: refactor(spec-code-review): 补齐 CE 4df5f99d 的阶段迁移，消除入口与 references 重复并统一为英文；修正早期 run identity 与 snapshot endpoint 顺序，保留本地授权、task scope、provider receipt 与失败披露，测试改读实际 owner。 (user-visible)
 - v1.15.3 2026-09-09 17:22:29 codex: fix(sync): 修正 CE 129 项任务表的状态列错位，撤回 97 份模板证据的不实完成声明，恢复执行方案 active 状态并登记逐项补验范围。 (user-visible)
 - v1.15.3 2026-09-09 15:50:00 codex: fix(spec-dogfood): 同步 CE 248f7eb8 的 outcome/done 收口与红色自动化套件 not-ready 判定，保留 spec-first 的 spec-test-browser、授权与 phases reference 边界。 (user-visible)
 - v1.15.3 2026-09-09 15:35:00 codex: refactor(spec-runtime-setup): 同步 CE fd86e364，将 project-local config bootstrap 细节下沉为 required-read reference，保留 setup-owned facts 与 host 写入边界。 (user-visible)

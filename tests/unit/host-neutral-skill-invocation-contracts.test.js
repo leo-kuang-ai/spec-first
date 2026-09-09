@@ -20,17 +20,21 @@ const consumers = [
 
 describe('host-neutral Skill invocation arguments', () => {
   test.each(consumers)('%s does not depend on a host-specific argument variable', (skill) => {
-    const source = fs.readFileSync(path.join(repoRoot, 'skills', skill, 'SKILL.md'), 'utf8');
+    const source = skill === 'spec-code-review'
+      ? fs.readFileSync(path.join(repoRoot, 'skills', skill, 'references/modes-and-output.md'), 'utf8')
+      : fs.readFileSync(path.join(repoRoot, 'skills', skill, 'SKILL.md'), 'utf8');
     expect(source).not.toContain('$ARGUMENTS');
     expect(source).toMatch(/invocation arguments/i);
   });
 
   test('token parsers preserve quoted and platform-specific input shapes', () => {
     for (const skill of ['spec-code-review', 'spec-compound', 'spec-compound-refresh', 'spec-dogfood']) {
-      const source = fs.readFileSync(path.join(repoRoot, 'skills', skill, 'SKILL.md'), 'utf8');
+      const source = skill === 'spec-code-review'
+        ? fs.readFileSync(path.join(repoRoot, 'skills', skill, 'references/modes-and-output.md'), 'utf8')
+        : fs.readFileSync(path.join(repoRoot, 'skills', skill, 'SKILL.md'), 'utf8');
       expect(source).toMatch(/preserv(?:e|ing).*quoted|quoted paths\/tokens/i);
     }
-    const review = fs.readFileSync(path.join(repoRoot, 'skills/spec-code-review/SKILL.md'), 'utf8');
+    const review = fs.readFileSync(path.join(repoRoot, 'skills/spec-code-review/references/modes-and-output.md'), 'utf8');
     expect(review).toContain('Windows drive paths');
     expect(review).toContain('URLs');
   });

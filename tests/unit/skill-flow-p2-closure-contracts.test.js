@@ -75,7 +75,7 @@ describe('Skill-flow 剩余 P2 关闭合同', () => {
   });
 
   test('SF-20 code review 从真实 reviewed tree 当轮派生且不跨 source identity 复用', () => {
-    const skill = read('skills/spec-code-review/SKILL.md');
+    const skill = read('skills/spec-code-review/references/intent-and-plan.md');
     const groundingSection = section(skill, '### Stage 2c: Resolve current-tree orientation');
 
     expect(groundingSection).toContain('tree actually under review');

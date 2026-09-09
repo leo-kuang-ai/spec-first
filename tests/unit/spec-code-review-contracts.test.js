@@ -2,9 +2,11 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { readCodeReviewContract, phaseFiles } = require('../helpers/code-review-contract');
 
 const repoRoot = path.resolve(__dirname, '../..');
-const skill = fs.readFileSync(path.join(repoRoot, 'skills/spec-code-review/SKILL.md'), 'utf8');
+const skillEntry = fs.readFileSync(path.join(repoRoot, 'skills/spec-code-review/SKILL.md'), 'utf8');
+const skill = readCodeReviewContract();
 const deploymentPrompt = fs.readFileSync(
   path.join(repoRoot, 'skills/spec-code-review/references/personas/deployment-verification-agent.md'),
   'utf8',
@@ -91,6 +93,33 @@ const deploymentVerificationActivationCases = JSON.parse(fs.readFileSync(
 ));
 
 describe('spec-code-review current contracts', () => {
+  test('入口在行为执行前连接实际阶段 owner，过程不复制回入口', () => {
+    for (const file of phaseFiles) {
+      expect(skillEntry).toContain(`references/${file}`);
+    }
+    expect(skillEntry).not.toContain('### Stage 1: Determine scope');
+    expect(skillEntry).not.toContain('### Stage 5: Merge findings');
+    expect(skillEntry).toContain('**Report-only by default; never land.**');
+    expect(skillEntry).toContain('In **`mode:agent`** it never mutates the tree');
+    const modes = fs.readFileSync(path.join(repoRoot, 'skills/spec-code-review/references/modes-and-output.md'), 'utf8');
+    const intent = fs.readFileSync(path.join(repoRoot, 'skills/spec-code-review/references/intent-and-plan.md'), 'utf8');
+    const finish = fs.readFileSync(path.join(repoRoot, 'skills/spec-code-review/references/finish-review.md'), 'utf8');
+    expect(modes).toContain('### Phase 0a: Freeze effective mode before any tool call');
+    expect(intent).toContain('### Stage 2: Intent discovery');
+    expect(intent).not.toContain('## Argument Parsing');
+    expect(finish).toContain('scripts/findings-mechanics.py');
+    expect(finish).toContain('reviewer_mutation_detected');
+    expect(finish).toContain('metadata.json');
+    const scope = fs.readFileSync(path.join(repoRoot, 'skills/spec-code-review/references/scope.md'), 'utf8');
+    const snapshot = scope.split('### Stage 1a: Freeze the reviewed local scope')[1].split('### Stage 1b:')[0];
+    const endpointAssignment = snapshot.indexOf('DIFF_A="$BASE"');
+    const snapshotCapture = snapshot.indexOf('SCOPE_ARGS=(--base "$DIFF_A"');
+    expect(endpointAssignment).toBeGreaterThanOrEqual(0);
+    expect(snapshotCapture).toBeGreaterThanOrEqual(0);
+    expect(endpointAssignment).toBeLessThan(snapshotCapture);
+    expect(snapshot).toContain('DIFF_B=""');
+  });
+
   test('mode:agent is JSON report-only and never applies fixes', () => {
     expect(skill).toContain('**Report-only**: return **JSON**');
     expect(skill).toContain('In **`mode:agent`** it never mutates the tree');
@@ -132,7 +161,7 @@ describe('spec-code-review current contracts', () => {
     expect(skill).toContain('Inline fallback output contract');
     expect(skill).toContain('`reviewers: ["inline-fallback"]`');
     expect(skill).toContain('`verdict: Not ready`');
-    expect(skill).toMatch(/resolve the Stage 4 Run ID.*before synthesis/is);
+    expect(skill).toMatch(/reuse the Phase 0a Run ID.*before synthesis/is);
   });
 
   test('high-risk scenario posture limits review claims before dispatch or apply', () => {
@@ -218,7 +247,7 @@ describe('spec-code-review current contracts', () => {
     const stage3 = skill.match(/### Stage 3: Select reviewers([\s\S]*?)### Stage 4:/)?.[1] || '';
     const stage4 = skill.match(/### Stage 4:([\s\S]*?)### Stage 5:/)?.[1] || '';
 
-    expect(skill).toContain('只有 orchestrator 能应用该 gate');
+    expect(skill).toContain('Only the orchestrator applies this gate');
     expect(stage3).toContain('Only when both conditions pass');
     expect(stage3).toContain('selected_local_prompt_assets');
     expect(stage3).toContain('artifact path and the concrete risky operation');

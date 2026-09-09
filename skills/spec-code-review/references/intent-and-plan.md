@@ -1,78 +1,79 @@
-# intent and plan
+# Intent And Plan Verification
 
-## Argument Parsing
+Read before Stage 2. This file owns intent, plan discovery, readiness, task-level completeness, and current-tree orientation. Task-Scoped Live Plan Context inputs are defined in `references/scope.md`.
 
-Read `references/intent-and-plan.md`, `references/modes-and-output.md`, and `references/scope.md` before scope or output decisions.
+## Plan Requirements Completeness
 
-Parse the invocation arguments supplied by the current host for optional tokens. Strip only recognized tokens while preserving quoted paths, Windows drive paths, URLs, and the order of the remainder before interpreting it as a PR number, GitHub URL, or branch name.
+When a plan is provided via `plan:<path>` or discovered from PR/branch context,
+classify readiness before checking completeness:
 
-| Token | Example | Effect |
-|-------|---------|--------|
-| `mode:agent` | `mode:agent` | **Report-only**: return **JSON** instead of markdown tables and skip the Stage 5c apply (the caller applies). Does not change reviewer selection, merge logic, or scope rules (see Output format) |
-| `mode:headless` | `mode:headless` | **Deprecated alias** for `mode:agent` |
-| `mode:report-only` | `mode:report-only` | **Deprecated — ignored.** Former no-artifacts mode; default behavior is review-only without checkout |
-| `base:<sha-or-ref>` | `base:abc1234` or `base:origin/main` | Diff base on the **current checkout** (explicit; skips auto base detection) |
-| `plan:<path>` | `plan:docs/plans/2026-03-25-001-feat-foo-plan.md` | Plan file for requirements verification (explicit). Supports markdown and HTML unified plans. |
-| `task-pack:<path>` | `task-pack:docs/tasks/example-tasks.md` | Local task-pack source for a bounded task review. Requires `task:`, `task-context:`, `mode:agent`, and `base:`. |
-| `task:<task_id>` | `task:T003` | Task Card ID to review from the paired task pack. |
-| `task-context:<path>` | `task-context:<run-local-json>` | Caller-captured `spec-code-review-task-context/v1` facts for digest, pre-task state, and task delta attribution. |
-| `depth:full` | `depth:full` | **Force the full reviewer roster** — skip the Stage 3c small-diff lite path so every always-on persona runs regardless of diff size. Use when a deep/thorough review is explicitly requested (the one escalation signal Stage 3c cannot infer from the diff). Does not change conditional selection, merge, or scope. |
-| `depth:auto` | `depth:auto` | **Default** — self-right-size via Stage 3c (lite roster for trivial, low-risk, code-only diffs; full roster otherwise). |
-| `grouping:auto` | `grouping:auto` | **Default** — build thematic triage groups when findings span distinct concerns (Stage 5 step 9b) |
-| `grouping:off` | `grouping:off` | Suppress triage groups: no Triage Groups section, empty `triage_groups` in JSON |
-| `grouping:always` | `grouping:always` | Always build triage groups, even for small reviews |
+- Unified artifact: metadata includes `artifact_contract: spec-unified-plan/v1`.
+  - `artifact_readiness: requirements-only` can inform product intent, but it
+    must not trigger implementation-unit completeness findings. Report that the
+    artifact was not implementation-ready if the diff appears to implement it.
+  - `artifact_readiness: implementation-ready` is eligible for full
+    requirements and U-ID completeness checks.
+  - Invalid progress-like readiness values (`active`, `in_progress`,
+    `completed`, `done`) are contract errors.
+- Legacy plan: use the existing completeness checks.
 
-**Grouping is presentation, not a mode.** The `grouping:` tokens change how the finding set is organized for triage — never reviewer selection, merge logic, scope rules, or the Stage 5c apply decision.
+Extract requirements from these shapes, in order:
 
-**Mode alias:** `mode:headless` normalizes to `mode:agent`. `mode:agent` + `mode:headless` is not a conflict.
+1. Unified `Product Contract` -> `### Requirements`
+2. Legacy top-level `## Requirements`
+3. Legacy `## Requirements Trace`
 
-Path-valued tokens split only at their first `:` and may be host-quoted so paths with spaces remain one argument. Preserve the decoded path exactly; do not split it again on whitespace. Windows drive letters inside the value and POSIX paths are data, not extra tokens.
+For unified implementation-ready plans, also extract U-IDs from
+`## Implementation Units` and compare against PR body/branch context when
+available. Do not require every Product Contract R-ID to map one-to-one to a
+single U-ID; verify that implemented U-IDs cite the relevant R/F/AE/KTD IDs and
+that no claimed U-ID is missing from the plan.
 
-**Conflicting arguments:** Stop without dispatching reviewers when:
-- Multiple incompatible scope selectors appear together (e.g. `base:` **and** a PR number/branch target — `base:` means "review the current checkout against this base")
-- Multiple distinct `mode:` tokens other than the `mode:agent`/`mode:headless` alias pair
-- Multiple distinct `grouping:` tokens (e.g. `grouping:off` **and** `grouping:always`)
-- task-pack and task tokens must appear together, exactly once, with exactly one `task-context:` token
-- any task token appears without `mode:agent` or without `base:`, or task context is combined with a PR number/URL/branch target
+Task-mode exception: completeness scope is the selected Task Card, its `source_unit`/`requirement_refs`, and the bounded task delta only. Do not flag other plan requirements or U-IDs as unaddressed during an early task review; the final full review owns whole-plan completeness.
 
-Deprecated `mode:autofix` is **not** a conflict — ignore the token and proceed with the normal flow (see below).
+### Stage 2: Intent discovery
 
-Emit a one-line failure reason. In `mode:agent`, return JSON: `{"status":"failed","reason":"..."}`.
+Understand what the change is trying to accomplish. The source of intent depends on which Stage 1 path was taken:
 
-### Phase 0a: Freeze effective mode before any tool call
+**PR/URL mode:** Use the PR title, body, and linked issues from `gh pr view` metadata. Supplement with commit messages from the PR if the body is sparse.
 
-Normalize mode before interpreting intent or running any repository command. This is an exit gate, not a later presentation choice:
+**Branch mode:** Run `git log --oneline ${BASE}..<branch-ref>` using the resolved merge-base and resolved branch ref from Stage 1. Use `<branch-ref>` (the resolved `origin/<branch>` or fetched ref), not the raw `<branch>` argument — a remote-only branch has no matching local ref, so the raw name would fail or read a stale same-named local branch.
 
-```yaml
-effective_mode: default | agent
-source_mutation_gate: open | closed
-artifact_write_gate: review-artifacts-only
+**Standalone (current branch):** Run:
+
+```
+echo "BRANCH:" && git rev-parse --abbrev-ref HEAD && echo "COMMITS:" && git log --oneline ${BASE}..HEAD
 ```
 
-When `mode:agent` or its `mode:headless` alias is present, set `effective_mode: agent`, `mutation_policy: report-only`, and `source_mutation_gate: closed`. In this mode, adjacent fix/apply wording is intent data, not mutation authority. Do not call project-writing tools, `apply_patch`, edit/write APIs, `git apply`, `git restore`, `git checkout`, formatters with write flags, or any command that can rewrite reviewed source. The only permitted writes are run-scoped review artifacts and deterministic evidence under the exact artifact roots owned below.
+Combined with conversation context (plan section summary, PR description), write a 2-3 line intent summary:
 
-Generate the run ID and resolve `REVIEW_ARTIFACT_DIR` here, before scope inspection. Use the OS-native temporary-directory rules in Stage 4 and reuse the same canonical path for the entire run. Failure to create an artifact directory does not open the source mutation gate; `mode:agent` continues report-only with an in-band limitation.
-
-### Phase 0: Resolve mutation, commit, and dispatch policy
-
-Before scope detection, derive three independent run-local facts from the current user request and any visible upstream handoff:
-
-```yaml
-mutation_policy: report-only | apply-fixes
-commit_authorization: authorized | missing
-worker_dispatch_authorization: authorized | missing
-capability_probe: not_applicable | attempted | unavailable
-worker_dispatch_capability: available | missing | unknown
-worker_context_isolation: isolated | inherited | unknown
-worker_model_override: supported | unsupported | unknown
-worker_bounded_parallelism: supported | unsupported | unknown
+```
+Intent: Simplify tax calculation by replacing the multi-tier rate lookup
+with a flat-rate computation. Must not regress edge cases in tax-exempt handling.
 ```
 
-- Ordinary requests to "review", "check", "audit", or run `spec-code-review` use `mutation_policy: report-only`.
-- **Report-only means the reviewed files stay byte-identical.** Under `report-only`, never "helpfully" fix, revert, restore, or normalize a defect you found — not even to undo an obviously bad change, and not even when the finding is P0. Finding a bug is evidence for the report; repairing it belongs to an explicitly authorized `apply-fixes` run (or the caller). `git restore`, `git checkout <file>`, `git apply -R`, edit/write tools on reviewed source, and formatter runs that rewrite it are all violations, regardless of the declared `mutation_policy` in the output JSON matching report-only.
-- Use `mutation_policy: apply-fixes` only when the current user or upstream caller explicitly says review-and-fix, review and fix, apply fixes, or equivalent. `mode:agent` always forces report-only even when adjacent text asks to apply.
-- `apply-fixes` authorizes only bounded local review-owned edits. It does not authorize commit, push, PR creation/update, tickets, or unrelated cleanup.
-- Set `commit_authorization: authorized` only when commit creation is separately explicit. Without commit authorization, return a verified uncommitted review-fix set.
-- Set `worker_dispatch_authorization: authorized` only when the current user/upstream explicitly requests subagents, personas, delegated reviewers, multi-agent review, or parallel review. A review invocation, task context, plan, available primitive, or permission setting is not dispatch authorization. Missing authorization forbids schema discovery and fixes `capability_probe: not_applicable` + `worker_dispatch_capability: unknown`. Only after authorization may the current-session registry/schema be consumed as `provider_untrusted` evidence; confirmed absence records `subagent_capability_missing`, while unavailable/incomplete/ambiguous discovery records `worker_capability_unproven`. Normalize every path as `worker_dispatch_outcome`; use only live facts for isolation, model override, parallelism, permission, capacity, output, and mutation claims.
+Pass this to every reviewer in their spawn prompt. Intent shapes *how hard each reviewer looks*, not which reviewers are selected.
 
-If review repo scope is ambiguous in a parent multi-repo workspace, stop before local diff claims or apply and return a failure reason naming the required selected child repo/current checkout; do not open a blocking prompt. Read-only PR-remote scope may proceed from explicit PR metadata without choosing a sibling checkout. Generated runtime mirrors remain out of source-fix scope.
+**When intent is ambiguous:** Infer from branch name, commits, PR title/body, diff, `plan:`, and conversation. Write the best-effort intent summary and note uncertainty in Coverage — never block on a clarifying question.
+
+### Stage 2b: Plan discovery (requirements verification)
+
+Locate the plan document so Stage 6 can verify requirements completeness. Check these sources in priority order — stop at the first hit:
+
+1. **`plan:` argument.** If the caller passed a plan path, use it directly. Read the file to confirm it exists.
+2. **PR body.** If PR metadata was fetched in Stage 1, scan the body for paths matching `docs/plans/*.{md,html}` (unified plans may be markdown or HTML). If exactly one match is found and the file exists, use it as `plan_source: explicit`. If multiple plan paths appear, treat as ambiguous — demote to `plan_source: inferred` for the most recent match that exists on disk, or skip if none exist or none clearly relate to the PR title/intent. Always verify the selected file exists before using it — stale or copied plan links in PR descriptions are common.
+3. **Auto-discover.** Extract 2-3 keywords from the branch name (e.g., `feat/onboarding-skill` -> `onboarding`, `skill`). Glob `docs/plans/*` and filter filenames containing those keywords. If exactly one match, use it. If multiple matches or the match looks ambiguous (e.g., generic keywords like `review`, `fix`, `update` that could hit many plans), **skip auto-discovery** — a wrong plan is worse than no plan. If zero matches, skip.
+
+**Confidence tagging:** Record how the plan was found:
+- `plan:` argument -> `plan_source: explicit` (high confidence)
+- Single unambiguous PR body match -> `plan_source: explicit` (high confidence)
+- Multiple/ambiguous PR body matches -> `plan_source: inferred` (lower confidence)
+- Auto-discover with single unambiguous match -> `plan_source: inferred` (lower confidence)
+
+If a plan is found, classify readiness before extraction (see "Plan Requirements Completeness" above): for a unified plan read the metadata/header first, and treat a requirements-only artifact as product intent only — it must not drive implementation-unit completeness findings. Then read its **Requirements** in this order — unified `Product Contract` -> `### Requirements`, then legacy top-level `## Requirements`, then legacy `## Requirements Trace` — and the R-IDs (R1, R2, etc.) listed there, plus **Implementation Units** (current numeric subsections such as `### U1.`, `### U2.`, or `### Unit 1:` under `## Implementation Units`; legacy bullet or checkbox unit entries under that section also count). For HTML unified plans the same section names and R-/U-IDs appear as visible headings/anchors — match on the section name, ignoring HTML wrapper tags. Store the extracted requirements list and `plan_source` for Stage 6. In task mode, retain only the selected Task Card's cited source refs for this review and set `completeness_scope: selected-task`; when `source_plan_section_titles` are present, use the Task-Scoped Live Plan Context branch in `references/scope.md` rather than injecting a plan body or asserting freshness. Do not compare the bounded task delta with unrelated U-IDs. Do not block the review if no plan is found — requirements verification is additive, not required.
+
+### Stage 2c: Resolve current-tree orientation
+
+Derive one run-local stack/conventions orientation from the tree actually under review so reviewer selection and the non-standards reviewers (`correctness`, `testing`, `maintainability`) share the same current facts. For `local-aligned`, standalone, and `base:` scope, record the current git identity and dirty state, then read current manifests, layout, and active instructions. For `pr-remote` or `branch-remote`, derive only from the fetched reviewed refs/diff; never substitute the local checkout's profile. Do not persist or reuse this orientation across runs, branches, or worktrees.
+
+Include a compact orientation slice plus direct source refs in the Stage 4 review context bundle passed to every reviewer **except** `project-standards` and `learnings-researcher`. This is orientation only and never replaces a fresh read. The `project-standards-reviewer` still reads the actual root and subdirectory `AGENTS.md`/`CLAUDE.md` standards files through the Stage 3b path list, and `learnings-researcher` re-globs `docs/solutions/` per run. If the reviewed tree or a required source cannot be read, record the exact degraded fact and narrow reviewer claims; do not silently fall back to a profile from another source identity.

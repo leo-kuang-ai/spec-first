@@ -24,3 +24,31 @@
 | `release` | Operational / rollout follow-up. |
 
 Do not use `review-fixer`.
+
+## Severity Scale
+
+All reviewers use P0-P3:
+
+| Level | Meaning | Action |
+|-------|---------|--------|
+| **P0** | Critical breakage, exploitable vulnerability, data loss/corruption | Must fix before merge |
+| **P1** | High-impact defect likely hit in normal usage, breaking contract | Should fix |
+| **P2** | Moderate issue with meaningful downside (edge case, perf regression, maintainability trap) | Fix if straightforward |
+| **P3** | Low-impact, narrow scope, minor improvement | User's discretion |
+
+## Action Routing
+
+Severity answers **urgency**. `autofix_class` and `owner` are **signal** describing follow-up shape for callers — not apply permission or an apply gate. Ordinary/default review reports. Only explicit `mutation_policy: apply-fixes` can enter Stage 5c, and `mode:agent` never mutates.
+
+| `autofix_class` | Default owner | Meaning |
+|-----------------|---------------|---------|
+| `gated_auto` | `downstream-resolver` or `human` | Concrete `suggested_fix` proposed; caller applies after judgment |
+| `manual` | `downstream-resolver` or `human` | Actionable work needing design input or handoff |
+| `advisory` | `human` or `release` | Report-only — learnings, rollout notes, residual risk |
+
+Routing rules:
+
+- **Synthesis owns the final route.** Persona-provided routing metadata is input, not the last word.
+- **Choose the more conservative route on disagreement.** A merged finding may move from `gated_auto` to `manual`, but never widen without stronger evidence.
+- **Reject `safe_auto` and `review-fixer` if present** — drop the finding or remap to `gated_auto` / `downstream-resolver` during synthesis.
+- **`requires_verification: true` means any caller-applied fix needs targeted tests or follow-up validation.**

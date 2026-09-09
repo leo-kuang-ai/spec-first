@@ -8,7 +8,7 @@ function read(filePath) {
 
 describe('mutation authority baseline contracts', () => {
   test('code-review classification assets never grant apply authority', () => {
-    const skill = read('skills/spec-code-review/SKILL.md');
+    const skill = read('skills/spec-code-review/references/modes-and-output.md');
     const rubric = read('skills/spec-code-review/references/action-class-rubric.md');
 
     expect(skill).toContain('mutation_policy: report-only | apply-fixes');
