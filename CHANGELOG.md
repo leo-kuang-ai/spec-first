@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-09 13:30:00 codex: fix(spec-explain): 将 Phase 6 destination close、受众与改进路由收敛到 required-read reference，保留发布确认与非交互可恢复边界。 (user-visible)
 - v1.15.3 2026-09-09 13:20:00 codex: fix(spec-pov): 将 CE POV 阶段执行语义完整迁移到 required-read references，保留 spec-first 授权、证据地板与只读边界，并补齐结构契约回归。 (user-visible)
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`

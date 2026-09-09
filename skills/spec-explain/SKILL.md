@@ -100,28 +100,11 @@ For concepts, ideas, and dense recaps where the check-in was accepted: pose the 
 
 ### Phase 6: Destination ask and close
 
-Detect destinations by capability — probe the agent's own toolset and session context, never a closed list, and never treat a missing binary, env var, or unloaded MCP tool as proof a destination is unavailable when a connector could supply it. Local file and Leave it are ungated and always offered. Offer only what is detected; absence hides an option silently. Ask once with the blocking question tool — counting visible options against the platform's cap first (Claude Code's `AskUserQuestion` allows up to 4 explicit options; Codex's `request_user_input` only 2-3): when the visible set exceeds the cap, render a numbered list in chat with "Pick a number or describe what you want." and wait instead. Per-option routing:
+**Required read before you render anything in this phase: `references/destinations.md`.** It owns capability detection, the destination menu, per-option actions, audience re-render ordering, consent gates, and improvement observations. Read it now; do not render the menu or act on a selection without it.
 
-- **Artifact surface** (offered when an artifact-publishing tool is present in the current session's tools) — publish per `references/destinations.md`: re-emit the explainer as body-only markup (no doctype/html/head/body, styles inline, no external font links); the surface wraps content in its own skeleton and blocks external hosts.
-- **Local file** — copy the artifact out of `$RUN_DIR` to the path the user names, then where the platform exposes a browser-opening primitive (`open` on macOS, `xdg-open` on Linux, `start` on Windows) offer to open it; otherwise print the absolute path.
-- **Send to Thinkroom** (offered only when a Thinkroom skill or CLI capability is detected) — send per `references/destinations.md`.
-- **Leave it** — materialize the canonical artifact under
-  `.spec-first/workflows/spec-explain/<run-id>/explainer.<html|md>` using a
-  private temp file and atomic rename, then report that repo-relative path.
-  Never leave ephemeral `$RUN_DIR` as the only recoverable copy.
+Publishing is never headless or inferred. A public destination requires its full warning and a separate confirmation after the user has seen the warning. If that sequence cannot be completed, do not publish; preserve the canonical artifact and report its path. The handoffs this phase closes on are offered before anything fires; once accepted, invoke the owning skill through the skill primitive, except `spec-polish`, which remains user-run only.
 
-**Non-interactive degradation:** when no interaction is possible at this ask,
-do not hang or publish. Materialize the artifact under the same repo-local
-`.spec-first/workflows/spec-explain/<run-id>/` owner, report the path, and end.
-If no target repo is available, preserve the owned private `$RUN_DIR` path and
-state the durability limitation explicitly; never imply that it survives
-reboot or cleanup.
-
-**Improvement observations.** When composing the explainer surfaced things that could be better, route them by type after the destination ask — offer, don't auto-fire:
-
-- **New-capability ideas** — offer first; on acceptance invoke the `spec-ideate` skill via the platform's skill-invocation primitive, passing the observations as seed context. Do not merely tell the user to run it.
-- **Code-clarity findings** — offer first; on acceptance invoke the `spec-simplify-code` skill via the platform's skill-invocation primitive, passing the observations and the files they concern. Do not merely tell the user to run it.
-- **UI/UX polish opportunities** — present the observations in chat and tell the user to run `spec-polish` themselves; spec-polish is user-invoked only ; do not invoke it automatically — the in-session observations carry into their run.
+**Non-interactive degradation:** when no interaction is possible at this ask, do not hang or discard the artifact. Materialize it under the repo-local `.spec-first/workflows/spec-explain/<run-id>/` owner when a target repo exists, report the path, and end. Never leave ephemeral `$RUN_DIR` as the only recoverable copy. If no target repo is available, preserve the private run directory and state the durability limitation explicitly.
 
 ## Boundaries
 

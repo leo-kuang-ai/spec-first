@@ -1,6 +1,32 @@
-# Destination Sub-flows
+# Destinations and Close
 
-Per-destination mechanics for Phase 6. The menu itself and the one-line action per option live inline in SKILL.md — this file carries only the elaborate sub-flows. Detection is by capability: probe the current session's tools and context; a missing binary, env var, or unloaded MCP tool is not proof of absence when a connector could supply the capability. Local file is the always-present floor.
+Everything Phase 6 does: capability detection, the destination menu, the action for each option, each destination sub-flow, audience re-render ordering, consent gates, and improvement observations. `SKILL.md` names this file as a required read before Phase 6 renders anything; do not render the menu or act on a selection without it. Local file and Leave it are the always-present floor.
+
+## Menu and per-option actions
+
+Detect destinations from the current session's tools and context. Missing binaries, environment variables, or unloaded MCP tools do not prove absence when a connector could supply the capability. Count visible options against the host's cap; when the set is too large, render a numbered list in chat and wait. Ask for the destination once; a chosen publisher's consent is a separate ask.
+
+- **Artifact surface** (when an artifact-publishing capability is present) — re-emit the canonical explainer as body-only markup, keep CSS inline and metadata visible, publish through the detected surface, and report the returned reference.
+- **Local file** — copy the artifact out of `$RUN_DIR` to the user-named path, create parent directories as needed, and offer the host's open primitive when available.
+- **Send to Thinkroom** (when a Thinkroom skill, MCP tool, or documented CLI is detected) — send the explainer through that capability's contract and report the returned reference; on failure, report it and fall back to the local-file path.
+- **Leave it** — materialize the canonical artifact under `.spec-first/workflows/spec-explain/<run-id>/explainer.<html|md>` with a private temp file and atomic rename, then report the repo-relative path. Never leave ephemeral `$RUN_DIR` as the only recoverable copy.
+
+## Audience mismatch and consent ordering
+
+Artifact surface and Thinkroom may expose the artifact to other readers. Before sending a personally-composed artifact to such a destination, offer once to re-render for the requested audience using the compose-time rendering reference. Take the answer and proceed either way; never re-render unasked. Complete this offer before any destination-specific consent gate.
+
+Publishing is never headless or inferred. If a destination is public or its capability contract requires confirmation, show the full warning first and obtain explicit confirmation in a separate ask; naming the destination is not confirmation. If confirmation cannot be obtained, do not publish; preserve the canonical artifact and report its local `$RUN_DIR/explainer.html` (or `.md`) path.
+
+## Improvement observations
+
+Once the destination is settled — sent, declined, or stopped at an unanswered consent gate — offer surfaced improvements, never auto-fire them while an ask remains open:
+
+- **New-capability ideas** — on acceptance invoke `spec-ideate` through the skill-invocation primitive with the observations as seed context.
+- **Code-clarity findings** — on acceptance invoke `spec-simplify-code` through the skill-invocation primitive with the observations and files.
+- **UI/UX polish opportunities** — present them in chat and tell the user to invoke `spec-polish` themselves; it is user-run only.
+- **Contradicted repo docs** — on acceptance invoke `spec-compound-refresh` through the skill-invocation primitive with the document and superseding evidence; do not edit repo memory here.
+
+Only these user-runnable invocation forms are printed for `spec-polish`: `/spec-polish` by default, `$spec-polish` on Codex when required, and `/skill:spec-polish` on oh-my-pi. Render one form only.
 
 ## Artifact surface
 
