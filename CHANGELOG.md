@@ -7480,3 +7480,4 @@
 - v1.15.3 2026-09-09 17:20:00 codex: docs(sync): 完成 CE cf601afc 固定窗口提交的 owner 对账与 spec-first 边界核对。 (user-visible)
 - v1.15.3 2026-09-09 17:20:00 codex: docs(sync): 完成 CE 098ccdb8 固定窗口提交的 owner 对账与 spec-first 边界核对。 (user-visible)
 - v1.15.3 2026-09-09 17:20:00 codex: docs(sync): 完成 CE caa3b231 固定窗口提交的 owner 对账与 spec-first 边界核对。 (user-visible)
+- v1.15.3 2026-09-09 17:20:00 codex: docs(sync): 完成 CE 8df67793 固定窗口提交的 owner 对账与 spec-first 边界核对。 (user-visible)
