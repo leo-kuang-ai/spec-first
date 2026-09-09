@@ -16,10 +16,12 @@ argument-hint: "[PR number, branch name, 'current'] [mode:pipeline] [target-orig
 - browser wrapper 持有 provider/static capability probe、execution-readiness classification、resolved scalar origin validation、test-plan validation、private run context、argv allowlist、synthetic input、raw-output/screenshot 写入与 isolated session cleanup。
 - caller 持有 exact target origin 的提供和项目 server 的生命周期。origin 不证明 server 属于当前 branch，也不证明其已被 spec-first 安全启动或完整清理。
 - workflow 持有 changed-file 到 route 的语义映射、browser applicability、test-plan 选择、durable/external effect 判断、结果解释与 claim ceiling。
-- `mode:pipeline` 读取 `references/pipeline-orchestration.md`；缺少 origin 返回 `not_run` / `target-origin-missing`，不搜索 package scripts、不推断端口、不启动 server。
+- `mode:pipeline` 读取 `references/pipeline-orchestration.md` and `scripts/resolve-port.sh`; 缺少 origin 返回 `not_run` / `target-origin-missing`，不搜索 package scripts、不推断端口、不启动 server。
 - 未确认 request-time exact-origin enforcement 时，返回 `not_supported`；不得把 domain allowlist、help marker 或调用方声明提升为 exact-origin 证明。
 
 ## 1. Parse Invocation And Test Scope
+
+Read `references/route-and-report.md` before preparing routes or reports.
 
 识别 PR number、branch、`current`、`mode:pipeline`，以及至多一个 whitespace-delimited exact token `target-origin:<origin>`。先把这个 modifier 从 scope selector 中剥离，再解析 PR/branch/`current`；branch 或其他参数中仅包含该子串不算 modifier。
 

@@ -20,19 +20,7 @@ Map each changed file to the route(s) that render it, then build the list of URL
 
 ## Determine the dev server port
 
-```bash
-# Set EXPLICIT_PORT first when a higher-priority source gave you a port: a --port argument,
-# or a port your in-context project instructions state.
-PORT="${EXPLICIT_PORT:-}"
-if [ -z "$PORT" ]; then
-  PORT=$(grep -Eo '\-\-port[= ]+[0-9]{4,5}' package.json 2>/dev/null | grep -Eo '[0-9]{4,5}' | head -1)
-fi
-if [ -z "$PORT" ]; then
-  PORT=$(grep -h '^PORT=' .env .env.local .env.development 2>/dev/null | tail -1 | cut -d= -f2)
-fi
-PORT="${PORT:-3000}"
-echo "Preferred dev server port: $PORT"
-```
+`skills/spec-test-browser/scripts/resolve-port.sh` owns port resolution. Invoke it in the shell call that needs the value; it prints only the resolved port. Pass an explicit numeric port when the user or project context supplied one.
 
 ## Verify the dev server is running
 
