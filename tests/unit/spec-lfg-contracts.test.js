@@ -39,10 +39,10 @@ describe('spec-lfg current contracts', () => {
   });
 
   test('describes Simplify verification scope without claiming an unconditional full test suite', () => {
-    expect(skill).toContain('全项目 typecheck/lint');
-    expect(skill).toContain('默认运行 changed-path scoped tests');
-    expect(skill).toContain('影响面明显扩大或 runner 无法缩小时才扩大测试范围');
-    expect(skill).toContain('最终 verification gate 仍拥有完整 closeout truth');
+    expect(skill).toContain('full-project typecheck/lint');
+    expect(skill).toContain('defaults to changed-path scoped tests');
+    expect(skill).toContain('broaden scope only when impact is clearly wide or the runner cannot narrow it');
+    expect(skill).toContain('final verification gate owns complete closeout truth');
     expect(skill).not.toContain('it preserves behavior and runs the test suite');
     expect(simplifySkill).toContain('Run typecheck and lint over the full project');
     expect(simplifySkill).toContain('Run tests scoped to the changed paths');
@@ -51,7 +51,7 @@ describe('spec-lfg current contracts', () => {
   });
 
   test('uses the explicit LFG request as a scoped independent-review dispatch authorization', () => {
-    expect(skill).toContain('委派独立代码审查副作用');
+    expect(skill).toContain('delegated independent review side effects');
     expect(skill).toContain('worker_dispatch_authorization: authorized');
     expect(skill).not.toContain('review_dispatch_authorization');
     expect(skill).toContain('authorization_source: current-user-explicit-spec-lfg');

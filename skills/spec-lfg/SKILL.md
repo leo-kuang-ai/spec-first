@@ -8,11 +8,11 @@ CRITICAL — ADMISSION BEFORE EXECUTION: before any step below runs, the admissi
 
 CRITICAL: You MUST execute every step below IN ORDER. Do NOT skip any required step. Do NOT jump ahead to coding or implementation. The plan phase (step 1) MUST be completed and verified BEFORE any work begins. Violating this order produces bad output.
 
-进入该管线前，当前用户必须明确请求 `spec-lfg`，或选择清楚披露 commit、push、PR、CI 与委派独立代码审查副作用的 handoff 选项。仅有代码就绪、已完成计划或模型推断”适合 shipping”都不构成授权。
+Before entering this pipeline, the current user must explicitly request `spec-lfg` or select a handoff option that clearly discloses commit, push, PR, CI, and delegated independent review side effects. Code readiness, a completed plan, or model inference that shipping is appropriate does not grant admission.
 
 A natural-language shipping request (“ship it”, “直接发布上线”, “开个 PR 吧”) that neither names `spec-lfg` nor follows a disclosed-options handoff is close to the admission but is not it: the user has signaled shipping intent without seeing the full side-effect list (commit, push, PR creation, one delegated independent code review, CI watch). In that case, present the concrete side-effect list once as a single confirmation question and wait — the user's reply becomes the admission. Never treat the bare shipping request as already-admitted and start implementing or committing.
 
-上述 admission 成立时，当前用户对完整管线副作用的明确请求是本次 pipeline-owned implementation、commit 与 landing authority 的来源；同时只额外授权第 4 步委派一次 `spec-code-review` 的只读独立审查。将 `commit_authorization: authorized`、`landing_authorization: authorized`、`worker_dispatch_authorization: authorized` 与 `authorization_source: current-user-explicit-spec-lfg` 作为可见 run-local facts 传给对应下游 owner。外部 tracker filing 是独立副作用：只有当前请求或可见 upstream handoff 明确要求提交 residual tickets 时，才记录 `tracker_deferral_authorization: authorized`；否则固定为 `tracker_deferral_authorization: missing`。Skill invocation、`mode:pipeline`、工具权限、green tests、branch/PR facts 都不能替代该 admission，也不能把 authority 扩大到 unrelated dirty paths、任意 worker dispatch、tracker 或其他未披露外部副作用。若 admission 不成立，以 `commit_authorization_missing` / `landing_authorization_missing` 停在对应副作用之前；若独立审查不可用或降级，LFG 必须停止，不能用同一会话的 inline review 冒充该 gate。
+When that admission holds, the current user's explicit request for the full pipeline is the authority for pipeline-owned implementation, commits, and landing; it additionally authorizes exactly one delegated read-only independent `spec-code-review` in step 4.Set `commit_authorization: authorized`, `landing_authorization: authorized`, `worker_dispatch_authorization: authorized`, and `authorization_source: current-user-explicit-spec-lfg` as visible run-local facts for downstream owners. Tracker filing is separate: set `tracker_deferral_authorization: authorized` only when explicitly requested; otherwise keep it `missing`. Skill invocation, `mode:pipeline`, tool permissions, green tests, and branch/PR facts cannot replace admission or expand authority. If admission is absent, stop before the relevant side effect with `commit_authorization_missing` or `landing_authorization_missing`; if independent review is unavailable or degraded, LFG must stop rather than presenting inline review as independent.
 
 ```yaml
 tracker_deferral_authorization: authorized | missing
@@ -52,11 +52,11 @@ dev-server default. An empty, malformed, or repeated modifier records
 
 3. Invoke the `spec-simplify-code` skill on the branch diff.
 
-   This runs before review so the code-review in step 4 covers the simplified code. **Skip** this step when the change is docs-only (only markdown/docs paths changed) or trivial (roughly under 10 changed lines). Otherwise let `spec-simplify-code` resolve the branch-diff scope itself：它保持行为，运行全项目 typecheck/lint，并默认运行 changed-path scoped tests；影响面明显扩大或 runner 无法缩小时才扩大测试范围。该步骤只提供 behavior-preservation signal，最终 verification gate 仍拥有完整 closeout truth。
+   This runs before review so the code-review in step 4 covers the simplified code. **Skip** this step when the change is docs-only (only markdown/docs paths changed) or trivial (roughly under 10 changed lines). Otherwise let `spec-simplify-code` resolve the branch-diff scope itself：it preserves behavior, runs full-project typecheck/lint, and defaults to changed-path scoped tests; broaden scope only when impact is clearly wide or the runner cannot narrow it.This step provides only a behavior-preservation signal; the final verification gate owns complete closeout truth.
 
    Do not commit in this step. `spec-simplify-code` leaves its changes in the working tree; step 4's review scopes the working tree (uncommitted changes included), and step 8's `spec-commit-push-pr` commits whatever remains. Committing here would sweep any still-uncommitted `spec-work` edits into a misleading `refactor` commit and could stall on a tree that never goes clean.
 
-4. 以 `mode:agent plan:<plan-path-from-step-1>` 调用 `spec-code-review`，并传递以下可见上游上下文：
+4. Invoke `spec-code-review`，并传递以下可见上游上下文：
 
    ```yaml
    worker_dispatch_authorization: authorized
@@ -64,9 +64,9 @@ dev-server default. An empty, malformed, or repeated modifier records
    authorization_scope: one delegated read-only independent code review
    ```
 
-   传递步骤 1 的 plan path，使 spec-code-review 能核对 requirements completeness。`mode:agent` 返回单一 JSON object，而非 Markdown Actionable Findings summary。解析其中的 `status`、`actionable_findings`、`findings`、`artifact_path`、`run_id` 与 `coverage.dispatch_reason_code`。
+   Pass step 1's plan path so spec-code-review can check requirements completeness. `mode:agent` returns one JSON object rather than a Markdown Actionable Findings summary. Parse its `status`、`actionable_findings`、`findings`、`artifact_path`、`run_id` 与 `coverage.dispatch_reason_code`。
 
-   GATE: 只有 `status: complete`、`coverage.dispatch_reason_code` 为 null，且实际 reviewer 不只是 `inline-fallback` 时才能继续。JSON 损坏或缺失，以及 `failed`、`degraded`、`skipped` 或其他不完整结果都表示独立审查不可用；保留其有界 findings，并在步骤 5、browser verification、lifecycle、commit、push、PR、tracker 或 CI 副作用前停止。
+   GATE: 只有 `status: complete`、`coverage.dispatch_reason_code` null, and the actual reviewer is not only `inline-fallback`. Corrupt or missing JSON, and `failed`、`degraded`、`skipped` 或其他不完整结果都表示独立审查不可用；保留其有界 findings，并在步骤 5、browser verification、lifecycle、commit、push、PR、tracker 或 CI 副作用前停止。
 
    `mode:agent` is report-only **by design** — it surfaces findings but never edits the tree; LFG applies the eligible ones in step 5. When narrating progress to the user, frame this as "review found X → applied X in step 5," not as "code review did not auto-fix." A report-only review followed by an LFG-applied fix is the intended contract, not a gap.
 
@@ -233,5 +233,9 @@ retry a push or hunt for a remote. Run steps 7–9 normally when a remote exists
     offer in a later turn.
 
     If step 8 recorded a `New concepts:` trailer, first echo one line per concept: `New concept introduced: <name> — run spec-explain <name> to go deeper.` Then make any eligible non-blocking next-work offer and output `<promise>DONE</promise>`.
+
+## Required-read map
+
+Read the matching reference immediately before each stage: [plan brief](references/plan-brief.md) before step 1, [work return](references/work-return.md) before step 2, [review follow-up](references/review-followup.md) before steps 3–6, [shipping tail](references/shipping-tail.md) before steps 7.5–10, [stage routing](references/stage-routing.md) before browser and shipping decisions, and [task visibility](references/task-visibility.md) whenever conditional stages or task status are recorded. These references carry the detailed contracts; this entry keeps the admission, ordering, and hard gates.
 
 Start with step 1 now. Remember: plan FIRST, then work. Never skip the plan.

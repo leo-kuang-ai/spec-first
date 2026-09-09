@@ -1,9 +1,12 @@
 # Changelog
+- v1.15.3 2026-09-09 18:35:00 codex: refactor(spec-lfg): 融合 CE 956087b3 的阶段 references 与 required-read 路由；Skill 正文及新增 references 使用英文，保留 pipeline admission、独立 review、browser/fingerprint 和 lifecycle 边界。 (user-visible)
 - v1.15.3 2026-09-09 18:25:00 codex: refactor(spec-brainstorm): 融合 CE ff4d21b8 的阶段按需加载结构，Skill 与新增 references 使用英文；保留当前用户确认、派发授权、私有 scratch、视觉决策退役和产品边界，补齐消费者测试读取实际 corpus。 (user-visible)
 - v1.15.3 2026-09-09 18:13:00 codex: refactor(spec-plan): 融合 CE 312943d4，缩减配置重复解释，将 scoping 与 goal 细节归回实际 owner；质量测试跟随阶段规则迁移，保留入口安全与目标责任断言。 (user-visible)
 - v1.15.3 2026-09-09 18:09:23 codex: refactor(spec-plan): 融合 CE 3568cd94 的五阶段按需加载，入口与新增 references 使用英文；保留 Product Contract 原字节、历史接续、产品阻断和格式审查边界，修正缓存画像引用并补齐消费者测试。 (user-visible)
 - v1.15.3 2026-09-09 18:20:00 codex: refactor(spec-work): 融合 CE cb230f14，将计划读取和实施循环迁入按需 references，保留任务包与收尾证据边界；入口和新增 references 使用英文，补齐提交前全 index 核对及重叠 hunk 保护。 (user-visible)
+- v1.15.3 2026-09-09 17:55:40 codex: docs(plan): 按用户指令将 Top 3 优化优先级分析状态更新为 `completed`，记录计划关闭依据并保留 E2E、pilot 和 field trial 的验证边界。 (user-visible)
 - v1.15.3 2026-09-09 18:10:00 codex: refactor(spec-compound): 融合 CE 26f38961 的按阶段加载结构，Skill 与新增 references 使用英文，保留候选验证后发布、独立授权与原子写入边界，补齐 Lightweight 依赖和部分发布报告。 (user-visible)
+- v1.15.3 2026-09-09 17:42:42 codex: docs(plan): 按用户指令将全 Skill 渐进披露方案状态更新为 `completed`，记录用户决定的计划关闭依据；保留未勾选验收项和未验证边界，不将生命周期关闭等同于全部实现、评测通过或 pilot promotion。 (user-visible)
 - v1.15.3 2026-09-09 17:34:00 codex: refactor(spec-code-review): 补齐 CE 4df5f99d 的阶段迁移，消除入口与 references 重复并统一为英文；修正早期 run identity 与 snapshot endpoint 顺序，保留本地授权、task scope、provider receipt 与失败披露，测试改读实际 owner。 (user-visible)
 - v1.15.3 2026-09-09 17:22:29 codex: fix(sync): 修正 CE 129 项任务表的状态列错位，撤回 97 份模板证据的不实完成声明，恢复执行方案 active 状态并登记逐项补验范围。 (user-visible)
 - v1.15.3 2026-09-09 15:50:00 codex: fix(spec-dogfood): 同步 CE 248f7eb8 的 outcome/done 收口与红色自动化套件 not-ready 判定，保留 spec-first 的 spec-test-browser、授权与 phases reference 边界。 (user-visible)
