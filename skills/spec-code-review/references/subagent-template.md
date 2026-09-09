@@ -186,7 +186,7 @@ Changed files: {file_list}
 Diff:
 {diff}
 
-(For a large staged review, `{file_list}` and `{diff}` may be **file paths** rather than inline content. When a value above is a path, Read that file to get the full list/diff before reviewing — never treat the path string itself as the content to review.)
+(The `Changed files:` and `Diff:` values above are either inline content or, for a large staged review, a single file path each. Inline content is authoritative: review it as given. A lone file path is not the content — Read that file to get the full list/diff.)
 
 When live plan context says `plan_context_mode: live-plan`, re-read the listed current file and only the named section titles before making a plan-aware claim. When it says `diff-only`, do not infer missing plan intent or claim plan-aware coverage. Never request plan body transport, hash comparison, byte offsets, anchor parsing, or a second context schema.
 </review-context>
