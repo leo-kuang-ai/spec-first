@@ -70,7 +70,7 @@ describe('spec-runtime-setup active config consumers', () => {
     const setup = read('skills/spec-runtime-setup/SKILL.md');
     const template = read('skills/spec-runtime-setup/references/config-template.yaml');
     const plan = read('skills/spec-plan/SKILL.md');
-    const brainstorm = read('skills/spec-brainstorm/SKILL.md');
+    const brainstorm = read('skills/spec-brainstorm/references/output-mode.md');
     const ideate = read('skills/spec-ideate/references/output-mode.md');
 
     expect(plan).toContain('active (non-commented)** `plan_output:`');

@@ -16,7 +16,8 @@ const packages = [
   {
     name: 'spec-brainstorm',
     boundarySource: 'skills/spec-brainstorm/SKILL.md',
-    sources: ['skills/spec-brainstorm/SKILL.md'],
+    sources: ['skills/spec-brainstorm/SKILL.md', ...require('../helpers/brainstorm-contract').phaseFiles
+      .map(file => `skills/spec-brainstorm/references/${file}`)],
   },
   {
     name: 'spec-compound',
@@ -557,7 +558,7 @@ describe('generic dispatch authorization matrix', () => {
   });
 
   test('inline fallback labels stay honest in downstream workflow text', () => {
-    const brainstorm = read('skills/spec-brainstorm/SKILL.md');
+    const brainstorm = require('../helpers/brainstorm-contract').readBrainstormContract();
     const compound = read('skills/spec-compound/references/report.md');
     const dogfood = read('skills/spec-dogfood/SKILL.md');
     const ideate = read('skills/spec-ideate/SKILL.md');

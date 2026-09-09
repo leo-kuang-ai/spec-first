@@ -11,7 +11,7 @@ function read(filePath) {
   return fs.readFileSync(filePath, 'utf8');
 }
 
-const brainstorm = read('skills/spec-brainstorm/SKILL.md');
+const brainstorm = require('../helpers/brainstorm-contract').readBrainstormContract();
 const pressure = read('skills/spec-brainstorm/references/product-pressure-test.md');
 const sections = read('skills/spec-brainstorm/references/brainstorm-sections.md');
 const handoff = read('skills/spec-brainstorm/references/handoff.md');

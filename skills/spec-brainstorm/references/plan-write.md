@@ -1,0 +1,20 @@
+### Phase 3: Capture the Requirements-Only Unified Plan
+
+Write or update a requirements-only unified plan only when the conversation produced durable decisions worth preserving — see `references/brainstorm-sections.md` "Decide whether a doc is warranted at all" for the criteria and the bug-fix stress test. Skip document creation when the user only needs brief alignment and the decisions can flow downstream (spec-plan, commit message, docs/solutions/) without a brainstorm artifact in the middle.
+
+When a doc is warranted, compose it using:
+
+- `references/brainstorm-sections.md` — section contract (unified plan skeleton contract, Product Contract hard floor, include-when-material catalog, agency rules, ID conventions).
+- The format-specific rendering reference for the `OUTPUT_FORMAT` resolved at Phase 0.0 — read `references/markdown-rendering.md` (md) or `references/html-rendering.md` (html) **now**, before composing. It defines how the format presents the sections and was deliberately deferred from Phase 0.0; composing without it produces format drift the section contract alone cannot prevent.
+
+**Write tight.** A section being material is not license to pad it. Hold every kept section to the prose-economy discipline in `references/brainstorm-sections.md`: lead with the decision or outcome, one idea per sentence, a requirement is intent plus at most one qualifier, defer forks to Outstanding Questions rather than specifying both arms, resolve superseded text in place rather than stacking strata. Before declaring the doc written, run the named test there — could a reader find a contradiction in each section in one pass?
+
+Write to `docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.<md|html>` — extension follows `OUTPUT_FORMAT`. Include `artifact_contract: spec-unified-plan/v1`, `artifact_readiness: requirements-only`, `product_contract_source: spec-brainstorm`, and `execution: code`. Only when `OUTPUT_FORMAT=md`, also include `status: active`; HTML output does not carry lifecycle metadata. Title is `<Name> - Plan` (matching the H1; no conventional-commit prefix). Keep the doc light and standalone-readable: a Goal Capsule (objective, product authority, open blockers) and the Product Contract. Do **not** emit a Goal Launch Block or Reader Index. See `references/brainstorm-sections.md` — which owns the artifact content rules, including repo-relative file paths inside the doc. When confirming in chat, report the written artifact with its absolute path so the reference is clickable.
+
+If the run pauses, becomes headless, or approaches a context reset after any durable decision, write or update this artifact before stopping. Preserve confirmed decisions and assumptions plus load-bearing source refs, source snapshot or observed version, limitations, invalidation conditions, named blockers, and the next highest-impact question with its Product Contract write target. Never fabricate current-user closure or turn `status: active` into per-unit progress.
+
+#### Project-level promotion candidates — after Product Contract-local closure
+
+Never create or modify `CONCEPTS.md`, a project glossary, `CONTEXT.md`, `CONTEXT-MAP.md`, or ADR files in this workflow. Existing project language is an advisory calibration source; if it conflicts with the current release slice, expose the conflict and close the required meaning inside the Product Contract.
+
+Only when a resolved term or decision clearly has cross-release reuse value, append a **project-level promotion candidate** to the Product Contract or closeout. Include target kind/path, proposed meaning, provenance, applicability scope, a real consumer, reuse rationale, invalidation condition, and the statement `not written by this workflow`. ADR candidates additionally require all three: hard to reverse, surprising without context, and a real tradeoff. If any qualification is missing, keep the result Product Contract-local. A later explicit knowledge-maintenance or document-editing request owns any mutation; do not auto-dispatch it.

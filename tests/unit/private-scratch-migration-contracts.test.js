@@ -16,7 +16,7 @@ const durable = [
   'skills/spec-sweep/references/interview.md',
 ];
 const ephemeral = [
-  'skills/spec-brainstorm/SKILL.md',
+  'skills/spec-brainstorm/references/dialogue.md',
   'skills/spec-brainstorm/references/handoff.md',
   'skills/spec-brainstorm/references/universal-brainstorming.md',
   'skills/spec-compound/references/research.md',
