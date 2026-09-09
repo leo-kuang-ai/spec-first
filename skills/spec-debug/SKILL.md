@@ -261,14 +261,7 @@ If the initial request or a later answer asks only for diagnosis, skip this phas
 - Follow existing branch preferences and task ownership. On a default branch with authorized local repair and no contrary preference, create a local feature branch named from the bug without repeating repair approval; preserve all existing changes and do not publish it. Detect the default branch using `main`, `master`, or `git rev-parse --abbrev-ref origin/HEAD` with the `origin/` prefix stripped. On an existing task branch, proceed. Ask only when branch ownership or shared work creates a material unresolved conflict; do not switch or reset another task's branch to force progress.
 - Record the pre-fix scope before editing: current `HEAD`, whether `git status --short` is clean, and any pre-existing changed files. During Phase 3, keep a list of fix-owned files (the tests and implementation files changed for this bug). Phase 4 uses this to keep simplify/review from touching unrelated branch work.
 
-**Test-first:**
-1. Inspect existing tests for the affected behavior before adding coverage.
-2. Choose the right regression home: use an existing failing test, update an existing test that owns the contract but has the wrong expectation, narrowly strengthen an over-mocked test that should have caught the bug, or add a new focused test when no existing test fits.
-3. Verify the chosen test fails for the right reason — the root cause, not unrelated setup.
-4. Implement the minimal fix — address the root cause and nothing else. Do not bundle drive-by refactors, formatting, or unrelated cleanup into a bug-fix change; those belong in separate commits.
-5. Verify the test passes.
-6. Run the broader test suite for regressions.
-7. Self-review the diff before declaring the root-cause fix done: read every changed line and check for style violations, missed edge cases, regressions in adjacent behavior, and missing test coverage for the fix. Do not run the broader polish/review/PR tail here; Phase 4 owns it after the debug summary so the user can see the root-cause result before shipping work begins.
+**Test-first:** Read `references/fix.md` before writing Phase 2's recommendation or editing any file. It owns regression-test placement, the confirmed-defect precondition, the one-change-at-a-time implementation loop, and the required verification/self-review sequence. The body keeps the load-time condition that the regression starts from existing tests and never treats a deliberately reversed expectation as a defect.
 
 For every command in steps 3, 5, and 6, retain the real command, `ran`, exit code, status, required/missing tools, reason code, and a bounded secret-stripped log. These are provisional until the Phase 4 tail finishes: if simplify or review changes the fix, rerun affected checks and use only the final results for closeout. A planned command, a dry-run, or a worker's natural-language “passed” statement is not confirmed command evidence.
 
