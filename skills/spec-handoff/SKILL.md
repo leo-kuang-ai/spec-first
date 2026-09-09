@@ -25,6 +25,8 @@ Preserve enough verified context for a fresh session to orient safely, while kee
 
 ## Create
 
+Read `references/create.md` before writing.
+
 Read [Artifact Contract](references/artifact-contract.md) before writing.
 
 1. Distill the current objective, latest user intent, completed work, decisions, blockers, verification, fragile local state, and one bounded next-session focus.
@@ -50,6 +52,8 @@ Read [Artifact Contract](references/artifact-contract.md) before writing.
    ```
 
 ## Resume
+
+Read `references/resume.md` before searching or orienting.
 
 ### Explicit Source
 
