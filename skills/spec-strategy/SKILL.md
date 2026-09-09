@@ -12,11 +12,22 @@ Note: Use the current date from the active host context. Use this when weighting
 
 The document is short and structured on purpose. Good answers to a handful of sharp questions produce a better strategy than any amount of prose. This skill asks those questions, pushes back on weak answers, and writes the doc.
 
+## Boundaries
+
+- Strategy is an anchor, not a plan; features, schedules, and implementation plans belong to their owning workflows.
+- The repository grounds questions but never fills in the user's answers.
+- Preserve the existing document's shape and meaning; update only the targeted section.
+- Keep the document short and leave room for future changes.
+
 ## Interaction Method
 
 Default to the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
 
 Ask one question at a time. Prefer free-form responses for the substantive sections (problem, approach, persona); reserve single-select for routing decisions (which section to revisit). Each option label must be self-contained.
+
+## Grounding
+
+Before the first question, read `references/grounding.md`, build a bounded repo model from `STRATEGY.md`, README, `CONCEPTS.md`, relevant docs, code structure, and recent history, then show the model and invite correction.
 
 ## Focus Hint
 

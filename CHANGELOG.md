@@ -7341,3 +7341,5 @@
 - v1.8.2 2026-05-15 00:16:00 leokuang: feat(governance): 落地 multi-actor worktree 治理 plan U4 — using-spec-first guide mode 增加 Multi-Session Awareness 段落，substantial work 前可调用 `spec-first session list` 进行 read-only 感知，advisory 不阻塞;新增 prose 防漂移测试 (user-visible)
 
 - v1.8.2 2026-09-09: feat(spec-write-skill): 吸收 CE 3eb0c7a3 的 Skill 瘦身原则，要求保持 plain prose、优先迁移结构并保留字节余量
+
+- v1.8.2 2026-09-09: feat(spec-strategy): 吸收 CE strategy 的 grounding、边界和文档形状保护规则
