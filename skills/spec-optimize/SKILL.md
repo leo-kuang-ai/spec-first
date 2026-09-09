@@ -166,8 +166,8 @@ The top-level skill owns the workflow contract, admission and budget gates, runt
 ## Workflow sequence
 
 1. Read `references/spec.md` and save or validate the optimization spec.
-2. Read `references/measurement.md` and clear measurement authorization, baseline, and approval gates.
-3. Read `references/persistence.md` before creating or resuming run state.
+2. Read `references/persistence.md` before creating or resuming run state.
+3. Read `references/measurement.md` and clear measurement authorization, baseline, and approval gates.
 4. Read `references/loop.md` for bounded hypothesis and experiment execution.
 5. Read `references/wrap-up.md` to close with evidence, deferred items, and durable local state.
 
