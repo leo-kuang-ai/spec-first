@@ -69,7 +69,7 @@ describe('spec-runtime-setup active config consumers', () => {
   test('classifies every document rendering output key by its active workflow consumer', () => {
     const setup = read('skills/spec-runtime-setup/SKILL.md');
     const template = read('skills/spec-runtime-setup/references/config-template.yaml');
-    const plan = read('skills/spec-plan/SKILL.md');
+    const plan = read('skills/spec-plan/references/output-mode.md');
     const brainstorm = read('skills/spec-brainstorm/references/output-mode.md');
     const ideate = read('skills/spec-ideate/references/output-mode.md');
 

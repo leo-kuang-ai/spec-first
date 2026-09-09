@@ -12,7 +12,7 @@ function read(relativePath) {
 }
 
 describe('spec-work structured shipping and shared verification contracts', () => {
-  const workSkill = read('skills/spec-work/SKILL.md');
+  const workSkill = read('skills/spec-work/references/return-to-caller.md');
   const shipping = read('skills/spec-work/references/shipping-workflow.md');
   const debug = read('skills/spec-debug/SKILL.md');
   const review = read('skills/spec-code-review/references/finish-review.md');

@@ -10,6 +10,12 @@ argument-hint: "[Plan doc path or description of work. Blank to auto use latest 
 
 Graph candidates may orient implementation or affected-surface inspection, but they are never implementation basis or completion evidence by themselves. Re-ground changes and completion claims in the settled plan, current source, tests, logs, contracts, and owner evidence; direct reads are valid and empty results have no negative authority. Provider failure falls back without blocking ordinary work.
 
+Execute work efficiently while maintaining quality and finishing features.
+
+## Introduction
+
+This command takes a work document (plan or specification) or a bare prompt describing the work, and executes it systematically. The focus is on **shipping complete features** by understanding requirements quickly, following existing patterns, and maintaining quality throughout.
+
 ## Workflow Contract Summary
 
 - **Inputs:** settled implementation-ready code plan, validated task pack, explicit knowledge-work plan, or concrete bounded implementation prompt.
@@ -18,28 +24,30 @@ Graph candidates may orient implementation or affected-surface inspection, but t
 - **Ownership:** scripts prepare deterministic facts; LLMs judge semantic fit. Canonical source is modified; generated runtime mirrors are never source fixes. Local mutation, commit, landing, lifecycle, and durable evidence are separate exits.
 - **Consumers:** `spec-code-review`, caller-owned LFG/goal flows, commit/PR/release workflows, `spec-compound`, and human reviewers.
 
+**Code closeout boundary:** Skipping simplify or independent review does not waive evidence closeout. After local changes and verification, follow `references/shipping-workflow.md`: record `verification-run-summary`, run `honest-closeout`, then let the owning workflow decide whether `plan-status complete` is eligible. Mechanical or one-line changes do not waive that order. Historical completion closes only the valid successor, never rewrites the historical plan. Read-only review, already-complete no-change checks, and `execution: knowledge-work` retain their own scope.
+
 ## Phase Reads
 
-Read each required owner in full when entering its phase; a read made before that phase does not satisfy it. A terminal owner must be read again at its step even when already in context. Paths resolve from this skill's root. If a required owner is unreadable, preserve artifacts and changed state, return blocked with the missing owner and recovery path, and do not infer completion from existing files.
+Read each required owner in full when entering its phase; a read made before that phase does not satisfy it. A terminal owner must be read again at its step even when already in context. Resolve references from this skill's root. If a required owner is unreadable, preserve artifacts and changed state, return blocked with the missing owner and recovery path, and do not infer completion from existing files.
 
 ## Reference Trigger Map
 
 | Reference | Trigger | If unread/unavailable |
 | --- | --- | --- |
-| [Input triage](references/input-triage.md) | Phase 0, before classification. | Block execution. |
-| [Workspace setup](references/workspace-setup.md) | Phase 1, before task derivation. | Block dependent actions. |
-| [Work intake](references/work-intake.md) | Bare prompt or bounded plan read. | No task derivation. |
-| [Work intake and task pack](references/work-intake-and-task-pack.md) | Metadata says `type: task-pack`. | Return validation/regeneration handoff. |
-| [Non-code execution](references/non-code-execution.md) | `execution: knowledge-work`. | No code lifecycle. |
-| [Execution strategy](references/execution-strategy.md) | Before write/test/dispatch/commit. | Block the dependent action. |
-| [Execution engines](references/execution-engines.md) | Non-default engine is relevant. | No non-default execution. |
-| [Implementation loop](references/implementation-loop.md) | Before implementation, even trivial. | No write or completion. |
-| [Feedback and tests](references/feedback-and-tests.md) | Before behavior change/test design. | No coverage claim. |
-| [Implementation quality](references/implementation-quality.md) | Before durable-surface mutation. | No new durable surface. |
-| [Shipping workflow](references/shipping-workflow.md) | Standalone quality/closeout. | No completion/commit/landing. |
-| [Review findings followup](references/review-findings-followup.md) | Review returns actionable findings. | Preserve findings. |
-| [Tracker defer](references/tracker-defer.md) | Explicit external deferral. | Return `no_sink`. |
+| [Input triage](references/input-triage.md) | Phase 0, before classification. | Block execution and preserve state. |
+| [Workspace setup](references/workspace-setup.md) | Phase 1, before task derivation. | Block dependent actions and preserve state. |
 | [Return to caller](references/return-to-caller.md) | Immediately before caller return. | Minimum blocked recovery only. |
+| [Work intake](references/work-intake.md) | Before bare-prompt discovery or bounded plan reading. | No implementation task derivation until scope is clear. |
+| [Implementation loop](references/implementation-loop.md) | Before any implementation write, including trivial work. | Keep execution and completion open. |
+| [Work intake and task pack](references/work-intake-and-task-pack.md) | Shallow metadata says `type: task-pack`. | Do not execute the pack; return validation/regeneration handoff. |
+| [Non-code execution](references/non-code-execution.md) | Metadata says `execution: knowledge-work`. | Do not enter code/shipping lifecycle; report the missing production route. |
+| [Execution strategy](references/execution-strategy.md) | Before first write/test/review-fix, task tracking, worker dispatch, commit, or landing. | Block dependent execution actions; preserve state and return the missing owner. |
+| [Execution engines](references/execution-engines.md) | A structured plan/task pack or explicit request makes goal/dynamic/worker engine selection relevant. | Use inline; do not infer a callable non-default engine. |
+| [Feedback and tests](references/feedback-and-tests.md) | Before behavior mutation, test design, or verification coverage claim. | Run the narrowest known check and do not claim system-wide coverage. |
+| [Implementation quality](references/implementation-quality.md) | Before durable-surface mutation or phase-boundary simplification. | Do not add a new durable surface; return to the plan owner if current source fit is unresolved. |
+| [Shipping workflow](references/shipping-workflow.md) | All implementation tasks are accounted for and quality/closeout begins. | No completion/lifecycle/commit/landing claim. |
+| [Review findings followup](references/review-findings-followup.md) | A completed review returned actionable caller-owned findings. | Preserve in-band findings/limitations; do not rerun or silently drop them. |
+| [Tracker defer](references/tracker-defer.md) | Residual gate explicitly selects external tracker deferral. | Return structured `no_sink`; do not lose residuals or infer external authority. |
 
 ## Scenario Capability
 
@@ -58,47 +66,60 @@ Overrides: high-risk
 
 ### Phase 0: Input Triage
 
-Read `references/input-triage.md` now. Parse caller mode before metadata and classify task packs before unified plans. Requirements-only, invalid metadata, task-pack drift, or non-active source plans cannot enter implementation. Historical completion continues only through the plan owner's verified active successor; preserve historical plans and pins. Knowledge-work uses its own route. Missing required intake blocks execution.
-
-The classification order is `mode token -> file metadata -> task pack -> unified plan -> legacy plan / knowledge-work -> bare prompt`. Do not read the full task-pack body before this classification. A task-pack metadata read must not load its full body before this classification. The triage owner preserves `mode:return-to-caller`, `caller:lfg`, `type: task-pack`, and the blank/bare-prompt rules.
+Read `references/input-triage.md` in full now before classifying the invocation. It owns mode parsing, metadata-first task-pack/unified/legacy classification, historical continuation, and blank/bare-prompt routing. Invalid metadata, non-active source plans, and requirements-only artifacts cannot enter implementation. If this required owner is unavailable, preserve state and return blocked.
 
 ### Phase 1: Quick Start
 
-Read `references/workspace-setup.md` now for bounded plan intake, execution boundaries, task derivation, and engine selection. Read `references/work-intake.md` before reading implementation units. Follow `references/execution-strategy.md` before the first write, behavior-bearing test, review fix, dispatch, or commit.
+Read `references/workspace-setup.md` in full now for bounded plan reading, execution boundaries, task derivation, and engine selection. It invokes the work-intake and execution-strategy owners at their acting steps.
 
-Hard anchors remain here:
+Resolve an explicit `target_repo`, protect pre-existing dirty overlap, and modify canonical source rather than generated runtime. A scope-changing discovery returns to the plan owner. Local implementation does not imply `commit_authorization`; commit does not imply `landing_authorization`. Missing worker authorization uses inline/serial with `dispatch_authorization_missing`, `capability_probe: not_applicable`, and unknown capability, without worker discovery. Unknown isolation follows shared-directory rules.
 
-- Resolve one Git root and an explicit `target_repo` in a parent workspace. Artifact `--repo` is not mutation authority.
-- Record pre-existing dirty paths; preserve overlapping user-owned hunks under an explicit bounded strategy.
-- Modify canonical source; generated runtime mirrors are not source fixes.
-- Scope-changing acceptance, architecture, provider/repo, or source-owner discoveries return to `spec-plan`/task regeneration.
-- A scope-changing discovery is a hard stop; preserve the current state and return to the plan owner.
-- Missing worker authorization uses inline/serial with `dispatch_authorization_missing`, `capability_probe: not_applicable`, and unknown capability. Do not discover workers without authorization; unknown isolation follows shared-directory rules.
-- Local implementation does not imply `commit_authorization`; commit does not imply `landing_authorization`. Never pull/switch/create/rename branches or worktrees merely because a plan exists. Default-branch commit needs explicit authority.
+After bounded plan intake and task derivation, resolve any applicable non-default engine before selecting a unit, writing, dispatching, or committing. Inline remains the portable default. Task-pack checkpoints, source authority, and tail ownership remain unchanged.
 
-After bounded intake and task derivation, resolve any applicable non-default engine through `references/execution-engines.md` before selecting a unit, writing, dispatching, or committing. Inline is the portable default. Engine choice never changes task-pack checkpoints or tail ownership.
+Before the first behavior-bearing mutation, read `references/feedback-and-tests.md`; before durable-surface mutation, read `references/implementation-quality.md`. Record `worker_capability_unproven` when capability discovery is unavailable or ambiguous. Requirements-only artifacts route back to `spec-plan <plan-path>` for enrichment.
+
+## Anti-Rationalization Red Flags
+
+| Rationalization | Response |
+| --- | --- |
+| "Tests probably pass; call it complete." | Run verification appropriate to the slice, read exit/log evidence, and report passed or a concrete not-run reason. |
+| "The plan says new wrapper; just build it." | Read current source and recheck `reuse / extend / compose / new`; do not add a wrapper without a translation, sequencing, safety, or evidence responsibility. |
+| "Clean up nearby code while here." | Recheck active scope and changed paths; unnecessary debt belongs in the existing residual/defer sink. |
+| "Temporary or orphaned files do not matter." | Clean up this run\'s orphaned source, tests, references, logs, and runtime artifacts, then rerun the affected feedback loop. |
+
+These are attention reminders, not additional gates or substitutes for judgment.
 
 ### Phase 2: Execute
 
-Before the first implementation write, including a trivial route without tasks, read `references/implementation-loop.md`. It owns task execution, targeted verification, pattern reuse, simplification, UI checks, progress, and commit checkpoints. Read `references/feedback-and-tests.md` before behavior changes and `references/implementation-quality.md` before durable-surface changes.
+Before the first implementation write, including a trivial route without tasks, read `references/implementation-loop.md`. It owns task execution, targeted verification, pattern reuse, simplification, UI checks, progress, and commit checkpoints. Follow `references/feedback-and-tests.md` before behavior changes and `references/implementation-quality.md` before durable-surface changes.
 
-Only the orchestrator may stage and commit an authorized, verified logical unit. Preserve pre-existing staged and unstaged work; never commit another task's index entries or whole-file changes merely because paths overlap.
+One commit boundary remains unconditional: only the orchestrator may stage and commit an authorized, verified logical unit. Preserve pre-existing staged and unstaged work; never commit another task's index entries or whole-file changes merely because paths overlap.
 
 ### Phase 3-4: Quality Check and Finishing Work
 
-Standalone only: read `references/shipping-workflow.md` now when all implementation tasks are accounted for. Run the portable `spec-code-review` path or record its honest unavailable/manual fallback; dedicated review can be skipped only for purely mechanical diffs. Its orchestrated `mode:agent` is report-only. Read `references/review-findings-followup.md` before applying findings; the shipping owner then resolves residuals.
+Standalone only; Return-to-Caller skips this phase. When all Phase 2 tasks are complete and execution transitions to quality check, you must read `references/shipping-workflow.md` for the full shipping workflow. Do not skip this.
 
-Skipping simplify or independent review does not waive evidence closeout. Record `verification-run-summary`, run `honest-closeout`, then let the owning workflow decide `plan-status complete` eligibility. Historical completion closes only the valid successor. Commit and landing remain separately authorized.
+**Code review: one portable path.** Review with `spec-code-review`, which self-sizes (lite roster for small low-risk code-only diffs, full roster otherwise). No harness-native review detection and no escalation tiers — the size/sensitive-surface judgment lives inside `spec-code-review`. Skip dedicated review only for a purely mechanical diff (formatting, dep-bumps, lint-only, generated). Full rules (autonomous Residual Gate, infra fallback) in `shipping-workflow.md`.
+
+**Review is two steps — review, then fix.** spec-work's `mode:agent` invocation is report-only: it returns JSON findings and does not edit the checkout, commit, or apply fixes. This statement is scoped to the orchestrated invocation below; other explicit `spec-code-review` entry modes retain their own contract.
+
+1. **Review** — Invoke the `spec-code-review` skill (invocation command in `references/review-findings-followup.md` § Fallback). Use `mode:agent` in orchestrated workflows; pass `plan:<path>` when you have a plan, `base:<ref>` when the merge base is known, and `depth:full` when a deep/thorough review was explicitly requested.
+2. **Apply fixes** — Load `references/review-findings-followup.md`. Filter eligibility on JSON only and batch by file. Use authorized fix workers or inline fallback; the orchestrator integrates and tests. Commit only with `commit_authorization: authorized`.
+3. **Residual Work Gate** — Only after followup; unresolved actionable findings go through the gate in `shipping-workflow.md` (autonomous sessions continue in-scope repairs and record blocked residuals — headless mode never auto-accepts risk; interactive sessions ask only decisions not covered by existing authorization).
 
 ## Return-to-Caller Mode
 
-Return-to-Caller Mode performs implementation and local verification only. It must not enter Phase 3-4 or run final simplify, full review, PR creation, CI watching, or lifecycle completion; the caller owns those gates.
+Return-to-Caller Mode performs implementation and local verification only. It must not enter Phase 3-4 or run final simplify, full review, PR creation, CI watching, or plan lifecycle completion; the caller owns those gates. Local structured verification closeout still applies.
 
-Immediately before emitting any result, read `references/return-to-caller.md` again. It alone owns the complete envelope, evidence gate, idempotent verification, and `standalone_shipping_skipped: true`. Do not reconstruct a complete return from this entrypoint.
+Immediately before emitting any result, read `references/return-to-caller.md` again. It alone owns the complete envelope, evidence gate, idempotent re-verification, and `standalone_shipping_skipped: true`. Do not reconstruct a complete return from this entrypoint.
 
 If that read fails, preserve every changed file, commit, and workspace. Return only this minimum blocked recovery envelope: `status: blocked`, `plan_path`, `changed_state`, `blockers` naming the missing owner, and `recovery_path`. Unknown facts stay unknown. Never erase state, report success, or fall into the standalone tail.
 
-The terminal owner validates the complete return fields: `status`, `plan_path`, `task_pack_path`, `task_pack_digest`, `changed_files`, `u_ids_attempted`, `u_ids_completed`, `verification_results`, `verification_evidence`, `verification_run_summary_ref`, `verified_worktree_fingerprint`, `honest_closeout_verdict`, `run_artifact_path`, `run_artifact_reason_code`, `claim_limitations`, `blockers`, `behavior_change`, `commit_authorization`, `landing_authorization`, `plan_status_completion_candidate`, `plan_status_completion_degraded_reason`, and `standalone_shipping_skipped`.
+## Compact Principles And Pitfalls
 
-The `verified_worktree_fingerprint` uses `spec-work-working-tree-fingerprint/v1`; a later caller-owned mutation requires a fresh verification run and fresh fingerprint before any completion claim.
-The fingerprint is produced by `scripts/working-tree-fingerprint.cjs` from the skill directory and is refreshed after final verification.
+- Execute settled scope from current source; ask once only when repo/docs cannot resolve a material ambiguity.
+- Reuse the correct owner and keep slices observable. Do not trade evidence, safety, accessibility, observability, or required verification for speed or lower LOC.
+- Track actual task/unit evidence and blockers; commits and plan status are not progress proof.
+- Finish every in-scope unit and required review/verification before a completion claim. Keep failed/not-run/degraded limitations explicit.
+- Do not widen work into adjacent cleanup, imagined future abstractions, human-time “session phases,” or a new private decomposition. Return scope-changing discoveries to the plan/task owner.
+- Review every non-mechanical diff through the portable review path or record the honest unavailable/manual fallback. Commit and landing remain separately authorized.

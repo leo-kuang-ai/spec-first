@@ -1,6 +1,6 @@
 # Output Mode And Artifact Paths
 
-This owner controls prompt tokens, output/config precedence, renderer selection, and point-of-use path resolution. Read it in full at Phase 0.0 and re-read it where pending values become necessary. Resolve reference paths from the `spec-plan` skill root.
+This owner controls prompt tokens, output/config precedence, renderer selection, and point-of-use path resolution. Read it in full at Phase 0.0 and re-read it where pending values become necessary. Resolve reference paths from the `spec-plan` skill root. Resolve `<repo-root>` at runtime with `git rev-parse --show-toplevel` only when repository-backed config or an artifact path is needed.
 
 Plans use `docs/plans/`; learnings use `docs/solutions/`. Resolve the target repository only when first composing one of these paths, including a learnings read. An explicit supplied plan path can be inspected without Git discovery. Preserve fixed local paths and `.spec-first/config.local.yaml`; no foreign artifact-root configuration is introduced. File references inside plans are repo-relative; paths printed to the user are absolute.
 

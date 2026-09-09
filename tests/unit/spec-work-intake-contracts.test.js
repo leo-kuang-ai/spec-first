@@ -10,7 +10,7 @@ function read(relativePath) {
 }
 
 describe('spec-work task-pack intake contracts', () => {
-  const skill = read('skills/spec-work/SKILL.md');
+  const skill = read('skills/spec-work/references/input-triage.md');
   const intake = read('skills/spec-work/references/work-intake-and-task-pack.md');
   const engines = read('skills/spec-work/references/execution-engines.md');
   const quality = read('skills/spec-write-tasks/references/task-quality-guide.md');
