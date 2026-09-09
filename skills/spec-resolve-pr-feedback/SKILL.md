@@ -63,15 +63,15 @@ thread-resolution steps. The token is not authorization.
 
 | Argument | Mode |
 |----------|------|
-| No argument | **Full** -- all unresolved threads on the current branch's PR |
-| PR number (e.g., `123`) | **Full** -- all unresolved threads on that PR |
+| No argument | **Full** -- all unresolved feedback on the current branch's PR |
+| PR number (e.g., `123`) | **Full** -- all unresolved feedback on that PR |
 | Comment/thread URL | **Targeted** -- only that specific thread |
 
 **Targeted mode**: When a URL is provided, ONLY address that feedback. Do not fetch or process other threads.
 
 After determining mode, read the matching reference and follow it. Each reference is self-contained for that mode's flow:
 
-- **Full Mode** -> [references/full-mode.md](references/full-mode.md) (fetch, triage, plan, dispatch or sequential implementation, validate, commit/push, reply/resolve, verify, summary)
+- **Full Mode** -> [references/full-mode.md](references/full-mode.md) -- evaluates inline threads, review bodies, and top-level PR comments; only reply/resolve mechanics differ (fetch, triage, plan, dispatch or sequential implementation, validate, commit/push, reply/resolve, verify, summary)
 - **Targeted Mode** -> [references/targeted-mode.md](references/targeted-mode.md) (extract one thread from a URL, then handle it through the same mutation, validation, reply, and resolution pipeline)
 - **Evaluation Rubric** -> [references/evaluation-rubric.md](references/evaluation-rubric.md) (the orchestrator reads this before any resolver dispatch to decide fix/reply/human verdicts)
 - **Pipeline Return** -> [references/pipeline-return.md](references/pipeline-return.md) (bounded non-interactive return to an outer caller; no nested landing tail)
@@ -110,7 +110,7 @@ worker_bounded_parallelism: supported | unsupported | unknown
 
 ## Success Criteria
 
-- All unresolved review threads evaluated
+- Every unresolved item evaluated across inline threads, review bodies, and top-level comments
 - 获得 `local_fix_authorization` 的有效 finding 已修复并验证；缺授权时只形成明确的待执行清单
 - 只有分别获得 `commit_authorization` 与 `push_authorization` 时才 commit/push
 - 只有获得 `reply_authorization` 时才以引用上下文回复

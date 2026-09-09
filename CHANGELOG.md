@@ -7361,3 +7361,5 @@
 - v1.8.2 2026-09-09: fix(spec-debug): 区分本地已修复但未推送与已推送的 pipeline 返回状态
 
 - v1.8.2 2026-09-09: feat(spec-resolve-pr-feedback): 吸收 CE pipeline 模式的无人值守升级与非收敛判断边界
+
+- v1.8.2 2026-09-09: fix(spec-resolve-pr-feedback): 保留作者顶层 PR 反馈并统一三类反馈面语义判断

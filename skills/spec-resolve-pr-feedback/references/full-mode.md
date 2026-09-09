@@ -22,8 +22,9 @@ Returns a JSON object with these keys:
 |-----|----------|---------------|-------------|
 | `pending_review` | Viewer-owned unsubmitted review id, or null; a non-null value blocks replies because GitHub may hide them in the draft | No | No |
 | `review_threads` | Unresolved inline code review threads, edge-wrapped as `{ node: ... }`; includes outdated threads and preserves each `isOutdated` flag so the resolver can account for line drift | Yes | Yes (GraphQL) |
-| `pr_comments` | Top-level PR conversation comments after source-level author and CI/status bot filtering | No | No |
-| `review_bodies` | Review submission bodies with non-empty text after source-level author and CI/status bot filtering | No | No |
+| `pr_comments` | Top-level PR conversation comments with non-empty bodies | No | No |
+| `review_bodies` | Review submission bodies with non-empty text | No | No |
+| `pr_author` / `viewer` | The PR author and acting account, used as evidence during semantic judgment | No | No |
 | `fetch_warnings` | Deterministic warnings such as truncated nested thread comments; these mean missing nested comments are incomplete evidence, not confirmed absence | No | No |
 
 When `pending_review` is non-null, stop before the reply loop. Do not interpret
@@ -45,12 +46,12 @@ Before processing, classify each piece of feedback as **new** or **already handl
 
 **PR comments and review bodies**: These have no resolve mechanism, so they reappear on every run. Apply two filters in order:
 
-1. **Actionability**: Skip items that contain no actionable feedback or questions to answer. Examples: review wrapper text ("Here are some automated review suggestions..."), approvals ("this looks great!"), status badges ("Validated"), CI summaries with no follow-up asks. If there is nothing to fix, answer, or decide, it is not actionable; drop it from the count entirely.
+1. **Actionability**: An item is an open request to fix, answer, or decide. This judgment is content-aware and includes the PR author's own request; identity never makes feedback disappear. A reply already posted by this run or an earlier run is evidence of handling, not a fresh request. Review wrappers, approvals, status badges, and CI summaries with no follow-up ask are non-actionable and dropped from the count.
 2. **Already replied**: For actionable items, check the PR conversation for an existing reply that quotes and addresses the feedback. If a reply already exists, skip. If not, it is new.
 
 The distinction is about content, not who posted it. A deferral from a teammate, a previous skill run, or a manual reply all count. Similarly, actionability is about content: bot feedback that requests a specific code change is actionable; a bot's boilerplate header wrapping those requests is not.
 
-**Silent drop.** Non-actionable items are dropped without narration. Do not announce, list, or count dropped items in conversation, the task list, or the step 9 summary. Review-bot wrappers from CodeRabbit, Codex, Gemini Code Assist, and Copilot commonly appear here; recognize them by their boilerplate content and drop them silently. Only CI/status bot summaries such as Codecov are pre-filtered at the script level; everything else relies on this content-aware check so bot format changes cannot silently hide actionable findings.
+**Silent drop.** Non-actionable items are dropped without narration. Do not announce, list, or count dropped items in conversation, the task list, or the step 9 summary. Review-bot wrappers from CodeRabbit, Codex, Gemini Code Assist, and Copilot commonly appear here; recognize them by their boilerplate content and drop them silently. The fetch layer excludes only blank bodies; content, identity, and surface remain semantic evidence for this step.
 
 If `fetch_warnings` reports `thread_comments_truncated`, do not treat a missing nested comment as confirmed absence. Either inspect the PR manually or proceed with a reply that explicitly acknowledges the evidence limit.
 

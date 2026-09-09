@@ -106,6 +106,19 @@ describe('spec-resolve-pr-feedback contracts', () => {
     expect(fullMode).toContain('When a `trajectory` is present, apply the non-convergence check');
   });
 
+  test('fetch keeps author feedback visible and leaves actionability to semantic judgment', () => {
+    const entrypoint = read('skills/spec-resolve-pr-feedback/SKILL.md');
+    const fullMode = read('skills/spec-resolve-pr-feedback/references/full-mode.md');
+    const getComments = read('skills/spec-resolve-pr-feedback/scripts/get-pr-comments');
+
+    expect(getComments).toContain('pr_author: ($author.login // null)');
+    expect(getComments).toContain('viewer: ($viewer // null)');
+    expect(getComments).not.toContain('select(.author.login != $author.login)');
+    expect(getComments).toContain('excludes only blank bodies');
+    expect(fullMode).toContain('identity never makes feedback disappear');
+    expect(entrypoint).toContain('Every unresolved item evaluated across inline threads, review bodies, and top-level comments');
+  });
+
   test('helper scripts preserve friendly owner repo fallback under set -e', () => {
     const getComments = read('skills/spec-resolve-pr-feedback/scripts/get-pr-comments');
     const getThread = read('skills/spec-resolve-pr-feedback/scripts/get-thread-for-comment');
