@@ -1,4 +1,13 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 087-bc26f23a；本地已有等价约束或无对应 consumer。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 088-c9c10f8c；本地已有等价约束或无对应 consumer。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 089-7f455932；本地已有等价约束或无对应 consumer。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 090-b361909d；本地已有等价约束或无对应 consumer。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 091-c7e3c14a；本地已有等价约束或无对应 consumer。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 092-42c6c709；本地已有等价约束或无对应 consumer。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 093-1b170d26；本地已有等价约束或无对应 consumer。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 094-fe02f790；本地已有等价约束或无对应 consumer。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 095-01249621；本地已有等价约束或无对应 consumer。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 081-ba4468fa；本地已有等价约束或无对应 consumer。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 082-debd05a0；本地已有等价约束或无对应 consumer。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 083-78fd3dab；本地已有等价约束或无对应 consumer。 (user-visible)
