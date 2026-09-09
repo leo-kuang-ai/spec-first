@@ -7,7 +7,7 @@ Analyze the document to determine which conditional personas to activate. Use th
 
 | Persona | Activate when the document... |
 |---------|------------------------------|
-| product-lens | Stakes a challengeable claim about what to build and why, OR carries strategic weight beyond the immediate problem |
+| product-lens | Stakes an unsettled product position about what to build, why, or priority that the origin did not settle, OR carries strategic weight beyond the immediate problem |
 | design-lens | References UI/UX, frontend components, user flows, wireframes, interaction descriptions, responsive behavior, or accessibility |
 | security-lens | Mentions auth/authorization, login/session flows, externally exposed API endpoints, or sensitive data (PII, payments, tokens, credentials, secrets, encryption) and third-party trust-boundary changes; ordinary internal data handling alone is not a trigger |
 | scope-guardian | Has multiple priority tiers (P0/P1/P2), >8 requirements/units, stretch goals, or scope-goal misalignment signals |
