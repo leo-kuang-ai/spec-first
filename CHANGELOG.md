@@ -1,4 +1,10 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 081-ba4468fa；本地已有等价约束或无对应 consumer。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 082-debd05a0；本地已有等价约束或无对应 consumer。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 083-78fd3dab；本地已有等价约束或无对应 consumer。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 084-a79582c3；本地已有等价约束或无对应 consumer。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 085-5f5bc6b9；本地已有等价约束或无对应 consumer。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 086-fbfcd1d5；本地已有等价约束或无对应 consumer。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 075-f76d3096；判定为 reference-only 或本地已有等价约束。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 076-f6c301ca；判定为 reference-only 或本地已有等价约束。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 077-cbd32913；判定为 reference-only 或本地已有等价约束。 (user-visible)
