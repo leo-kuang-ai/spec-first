@@ -20,6 +20,7 @@ function readJson(relativePath) {
 
 describe('spec-plan quality integration contracts', () => {
   const skill = read('SKILL.md');
+  const contract = require('../helpers/plan-contract').readPlanContract();
   const sections = read('references/plan-sections.md');
   const synthesis = read('references/synthesis-summary.md');
   const deepening = read('references/deepening-workflow.md');
@@ -93,7 +94,7 @@ describe('spec-plan quality integration contracts', () => {
       'verification focus',
       'largest risk or boundary',
     ]) {
-      expect(skill).toContain(anchor);
+      expect(contract).toContain(anchor);
       expect(sections).toContain(anchor);
     }
     expect(sections).toMatch(/first-screen\s+orientation/);
@@ -103,10 +104,10 @@ describe('spec-plan quality integration contracts', () => {
 
   test('restores evidence, source-runtime, composition/ownership, surface, and high-risk lenses conditionally', () => {
     expect(skill).toContain('references/planning-evidence-boundaries.md');
-    expect(skill).toContain('references/high-risk-plan-lens.md');
-    expect(skill).toContain('references/interface-and-evolution-lens.md');
-    expect(skill).toContain('references/frontend-engineering-lens.md');
-    expect(skill).toContain(
+    expect(contract).toContain('references/high-risk-plan-lens.md');
+    expect(contract).toContain('references/interface-and-evolution-lens.md');
+    expect(contract).toContain('references/frontend-engineering-lens.md');
+    expect(contract).toContain(
       'token-value-only changes that do not affect contrast, focus, layout, responsive behavior, motion, or state expression',
     );
     expect(evidence).toContain('advisory');
@@ -179,8 +180,8 @@ describe('spec-plan quality integration contracts', () => {
   });
 
   test('makes composition-first architecture a prompt-level judgment without banning justified new boundaries', () => {
-    expect(skill).toContain('Inventory before invention');
-    expect(skill).toContain('reuse / extend / compose / new');
+    expect(contract).toContain('Inventory before invention');
+    expect(contract).toContain('reuse / extend / compose / new');
     expect(evidence).toContain('## Existing Capability / Composition / Source Ownership Lens');
     expect(evidence).toContain('Thin glue may own only');
     expect(evidence).toContain('contract or representation translation');
@@ -199,16 +200,16 @@ describe('spec-plan quality integration contracts', () => {
   });
 
   test('requires explicit dispatch authorization and preserves inline completion', () => {
-    expect(skill).toContain('A public `spec-plan` invocation authorizes this workflow, not subagents');
+    expect(contract).toContain('A public `spec-plan` invocation authorizes this workflow, not subagents');
     expect(skill).toContain('dispatch_authorization_missing');
-    expect(skill).toContain('apply them inline or serially');
+    expect(contract).toContain('apply them inline or serially');
     expect(deepening).toContain('Plan generation and deepening must still complete through this inline fallback');
   });
 
   test('inline fallback uses bounded semantic lenses instead of preloading worker prompt assets', () => {
-    expect(skill).toContain('worker seed material, not a mandatory inline dependency');
-    expect(skill).toContain('Do not read a worker prompt asset merely because inline fallback is active');
-    expect(skill).toContain('apply the concise scope in this file directly');
+    expect(contract).toContain('worker seed material, not a mandatory inline dependency');
+    expect(contract).toContain('Do not read a worker prompt asset merely because inline fallback is active');
+    expect(contract).toContain('apply the concise scope in this file directly');
 
     expect(deepening).toContain('Conditional Section-to-Specialist Candidate Map');
     expect(deepening).toContain('Selecting a section never selects a prompt asset by itself');
@@ -239,7 +240,7 @@ describe('spec-plan quality integration contracts', () => {
   });
 
   test('reviews HTML plans report-only and keeps producer-owned recompose bounded', () => {
-    expect(skill).toMatch(/HTML.*report-only review/is);
+    expect(contract).toMatch(/HTML.*report-only review/is);
     expect(skill).not.toContain('skipped_reason: output_format_html');
     expect(handoff).toContain('mutation_policy: report-only');
     expect(handoff).toContain('producer-fix candidates');
@@ -261,7 +262,7 @@ describe('spec-plan quality integration contracts', () => {
     expect(handoff).toContain('independent_review: not_run');
     expect(handoff).toContain('must not be described as `Review complete` or `Doc review clean`');
     expect(handoff).toContain('return control to the pipeline caller immediately');
-    expect(skill).toContain(
+    expect(contract).toContain(
       'Do not preload `references/deepening-workflow.md` or `references/plan-handoff.md` before the initial plan write',
     );
     expect(skill).toContain('the explicit degraded fallback completed');

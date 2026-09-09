@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-09 18:13:00 codex: refactor(spec-plan): 融合 CE 312943d4，缩减配置重复解释，将 scoping 与 goal 细节归回实际 owner；质量测试跟随阶段规则迁移，保留入口安全与目标责任断言。 (user-visible)
 - v1.15.3 2026-09-09 18:09:23 codex: refactor(spec-plan): 融合 CE 3568cd94 的五阶段按需加载，入口与新增 references 使用英文；保留 Product Contract 原字节、历史接续、产品阻断和格式审查边界，修正缓存画像引用并补齐消费者测试。 (user-visible)
 - v1.15.3 2026-09-09 18:20:00 codex: refactor(spec-work): 融合 CE cb230f14，将计划读取和实施循环迁入按需 references，保留任务包与收尾证据边界；入口和新增 references 使用英文，补齐提交前全 index 核对及重叠 hunk 保护。 (user-visible)
 - v1.15.3 2026-09-09 18:10:00 codex: refactor(spec-compound): 融合 CE 26f38961 的按阶段加载结构，Skill 与新增 references 使用英文，保留候选验证后发布、独立授权与原子写入边界，补齐 Lightweight 依赖和部分发布报告。 (user-visible)
