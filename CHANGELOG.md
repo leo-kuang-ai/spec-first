@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 180fcd21 的 blocking question capability 文案与宿主测试；本地已无固定宿主探测文案，reference-only。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE f293ca43 的 README front door、安装/开发文档与演示资产改版；判定为 CE 产品文档与发布测试范围，reference-only，不迁移到 spec-first。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(spec-optimize): 融合 CE 6dda2038 的多目标比较、分阶段采样和中止退出语义；确认与集成后才记 kept，拒绝无效协议与伪造配对样本，保留现有测量授权边界。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(skills): 融合 CE 66ccf579 的启动前参数修正、容量背压与 owner 级失败处理，禁止本地多 lens 冒充独立佐证；语料审计保留独立提案/反驳要求。 (user-visible)
