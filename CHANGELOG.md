@@ -7512,3 +7512,4 @@
 - v1.15.3 2026-09-10 codex: refactor(skills): 核对并融合 CE bcd86d04 的阶段引用按需加载、旧产物阻断和完整返回字段约束；补齐 spec-plan/spec-work/LFG owner 边界与英文 Skill 内容。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 91070079 的 cross-model 单测超时调整，判定为上游测试参数证据，无同构生产行为需同步。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 28ac8322 的 provider-qualified Codex model id 修复；本地无对应 override 配置消费者，判定为 reference-only。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE f7efe886 的 Agent Plugins 8KB 上限归属说明；本地无对应宿主 loader，不引入伪造硬门禁。 (user-visible)
