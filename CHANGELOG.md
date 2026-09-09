@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 09:30:00 codex: docs(sync): 核对 CE d181ae0e 的 host-CLI skill-eval catalog；判定为 CE 专属评测基础设施，reference-only，不引入第二套评测框架。 (user-visible)
 - v1.15.3 2026-09-10 09:20:00 codex: docs(sync): 核对 CE 67cc7dc7，为上游 Skill 设计学习文档；判定为 reference-only，无需同步 canonical source。 (user-visible)
 - v1.15.3 2026-09-10 09:10:00 codex: refactor(spec-lfg): 完成 CE 956087b3 的 required-read 迁移，收敛入口与 references 的职责并补齐消费者读取路径；Skill 内容使用英文。 (user-visible)
 - v1.15.3 2026-09-10 09:10:00 codex: refactor(spec-lfg): 完成 CE 956087b3 的 required-read 迁移，收敛入口与 references 的职责并补齐消费者读取路径；Skill 内容使用英文。 (user-visible)
