@@ -7389,3 +7389,4 @@
 - v1.15.3 2026-09-09 17:10:00 codex: fix(spec-code-review): 补齐 CE 4df5f99d 的 intent、mode/output 与 scope 阶段 reference。 (user-visible)
 - v1.15.3 2026-09-09 17:20:00 codex: docs(sync): 完成 CE 26f38961 固定窗口提交的 owner 对账与 spec-first 边界核对。 (user-visible)
 - v1.15.3 2026-09-09 17:20:00 codex: docs(sync): 完成 CE cb230f14 固定窗口提交的 owner 对账与 spec-first 边界核对。 (user-visible)
+- v1.15.3 2026-09-09 17:20:00 codex: docs(sync): 完成 CE 3568cd94 固定窗口提交的 owner 对账与 spec-first 边界核对。 (user-visible)
