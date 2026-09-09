@@ -7387,3 +7387,4 @@
 - v1.15.3 2026-09-09 16:50:00 codex: docs(sync): 核对 CE cf098d23 的 debug pipeline 枚举，确认 spec-first source 已覆盖 fixed-not-pushed，无需重复行为改动。 (user-visible)
 - v1.15.3 2026-09-09 17:00:00 codex: fix(spec-test-browser): 将端口解析收敛为 bundled resolver，复用共享 project resolver 并支持 pipeline 空闲端口扫描。 (user-visible)
 - v1.15.3 2026-09-09 17:10:00 codex: fix(spec-code-review): 补齐 CE 4df5f99d 的 intent、mode/output 与 scope 阶段 reference。 (user-visible)
+- v1.15.3 2026-09-09 17:20:00 codex: docs(sync): 完成 CE 26f38961 固定窗口提交的 owner 对账与 spec-first 边界核对。 (user-visible)
