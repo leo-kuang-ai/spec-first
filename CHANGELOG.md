@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-09 14:20:00 codex: fix(spec-compound-refresh): 将 CE refresh 的模式、范围、调查、分类、词汇、报告、提交和 discoverability 阶段拆分为 required-read references，保留 spec-first 授权与当前源证据边界。 (user-visible)
 - v1.15.3 2026-09-09 14:10:00 codex: fix(spec-commit-push-pr): 将 CE commit/push/PR 的上下文探针、非零状态语义、显式路径暂存和描述组合门禁收敛到 required-read references，保留 spec-first 授权边界。 (user-visible)
 - v1.15.3 2026-09-09 14:00:00 codex: fix(spec-optimize): 将 CE retune 的测量、噪声基线、独立审计和失败归因机制融合到优化循环 reference，保留 spec-first 的 admission 与 owner 边界。 (user-visible)
 - v1.15.3 2026-09-09 13:40:00 codex: fix(spec-debug): 将回归测试选择与失败假设失效流程迁移到 required-read reference，保留入口触发 pin 与因果链验证边界。 (user-visible)
