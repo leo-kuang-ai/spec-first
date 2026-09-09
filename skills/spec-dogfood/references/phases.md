@@ -18,7 +18,7 @@ Parse the invocation arguments supplied by the current host: a PR number, a bran
 
 This workflow is designed to be interrupted and resumed. Two pieces of state make that safe:
 
-- **The task list** (the harness's task tool — `TaskCreate`/`TaskUpdate` on Claude Code, `update_plan` on Codex, or the equivalent elsewhere) is the live to-do — one task per matrix scenario. Mark each `in_progress` when you start it and `completed` only when it genuinely passes.
+- **The scenario ledger** maintained by the active workflow host is the live progress record — one entry per matrix scenario. Mark each `in_progress` when you start it and `completed` only when it genuinely passes.
 - **The report doc** at `docs/dogfood-reports/<YYYY-MM-DD>-<branch-slug>-dogfood.md` is the durable checkpoint that survives across sessions. `<branch-slug>` is the branch name lowercased with every run of non-alphanumeric characters (slashes included) collapsed to a single `-` (e.g. `feature/Foo_Bar` -> `feature-foo-bar`). **Create it as soon as the matrix exists (end of Phase 2) by instantiating `references/dogfood-report-template.md`** (read that template now if you haven't) so the checkpoint carries the template-owned section shape from the start — then fill in every scenario at `Pending`, and **update it incrementally** after each scenario judgment and each verified fix/commit-status change, not only at the end. An interrupted run must leave a template-shaped checkpoint, not a bare matrix.
 
 Because tasks are session-scoped but the report doc is on disk, the report is the source of truth for resuming. Always keep the two in sync so a later run (or a teammate) can pick up exactly where this one stopped.
@@ -86,7 +86,7 @@ Walk each flowchart and turn every node and branch into one or more test scenari
 
 Map changed files to concrete routes (views -> their pages, components -> pages rendering them, layouts -> all pages, stylesheets -> visual regression on key pages) and attach those routes to the flows that exercise them.
 
-**Load the matrix as a task list** (the harness's task tool, as above), one task per scenario, so progress is tracked and nothing is skipped. Order tasks by flow, following the flowcharts, not by file.
+**Load the matrix as a scenario ledger** in the active workflow host, one entry per scenario, so progress is tracked and nothing is skipped. Order entries by flow, following the flowcharts, not by file.
 
 ### Phase 3: Detect Port and Start the Dev Server
 

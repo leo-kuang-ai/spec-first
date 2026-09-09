@@ -7484,3 +7484,4 @@
 - v1.15.3 2026-09-09 17:20:00 codex: docs(sync): 完成 CE b8866a1d 固定窗口提交的 owner 对账与 spec-first 边界核对。 (user-visible)
 - v1.15.3 2026-09-09 17:20:00 codex: docs(sync): 完成 CE fe74844c 固定窗口提交的 owner 对账与 spec-first 边界核对。 (user-visible)
 - v1.15.3 2026-09-09 17:20:00 codex: docs(sync): 完成 CE 153e605e 固定窗口提交的 owner 对账与 spec-first 边界核对。 (user-visible)
+- v1.15.3 2026-09-09 18:00:00 codex: fix(spec-dogfood): 调整 phases reference 的进度记录措辞，避免宿主原生 task primitive 泄漏并保持 scenario ledger 语义。 (user-visible)
