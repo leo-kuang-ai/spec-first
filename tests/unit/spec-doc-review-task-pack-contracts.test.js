@@ -10,7 +10,11 @@ function read(relativePath) {
 }
 
 describe('spec-doc-review task-pack consumer contract', () => {
-  const skill = read('skills/spec-doc-review/SKILL.md');
+  const skill = [
+    read('skills/spec-doc-review/SKILL.md'),
+    read('skills/spec-doc-review/references/modes.md'),
+    read('skills/spec-doc-review/references/document-intake.md'),
+  ].join('\n');
   const synthesis = read('skills/spec-doc-review/references/synthesis-and-presentation.md');
   const writeTasks = read('skills/spec-write-tasks/SKILL.md');
   const handoff = read('skills/spec-write-tasks/references/execution-handoff-contract.md');

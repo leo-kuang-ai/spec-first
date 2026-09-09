@@ -27,9 +27,12 @@ worker_dispatch_capability: available | missing | unknown
 worker_context_isolation: isolated | inherited | unknown
 worker_model_override: supported | unsupported | unknown
 worker_bounded_parallelism: supported | unsupported | unknown
+worker_dispatch_outcome: <record the live result>
 ```
 
-`workflow invocation does not authorize dispatch`。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发。缺授权时不得探测 tool schema，固定为 `capability_probe: not_applicable` + `worker_dispatch_capability: unknown`，改走 bounded inline/serial grounding 并记录 `dispatch_authorization_missing`；inline 不得声称独立 scout coverage、fresh-context skepticism 或 multi-agent evidence。授权后仍需以 live facts 判断 isolation、model override、parallelism 和 provider receipt，缺失时降级并记录 `worker_dispatch_outcome`。
+`workflow invocation does not authorize dispatch`。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发。缺授权时不得探测 tool schema，固定为 `capability_probe: not_applicable` + `worker_dispatch_capability: unknown`，改走 bounded inline/serial grounding 并记录 `dispatch_authorization_missing`；inline **must not claim independent scout coverage**, fresh-context skepticism 或 multi-agent evidence。授权后仍需以 live facts 判断 isolation、model override、parallelism 和 provider receipt，缺失时降级并记录 `worker_dispatch_outcome`。
+
+Capability discovery is `provider_untrusted` until confirmed. If no usable worker surface is found, record `subagent_capability_missing`; if the probe is unavailable or ambiguous, record `worker_capability_unproven` and keep the grounding path bounded inline/serial.
 
 ## Execution Flow
 

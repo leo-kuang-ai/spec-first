@@ -295,7 +295,7 @@ These are pipeline artifacts and must not be flagged for removal.
 
 **Headless mode or `mutation_policy: report-only` with `output_mode: text`:** Return "Review complete" immediately after the structured text envelope. Do not ask questions and do not enter any mutation-oriented next-action flow.
 
-**Interactive `markdown-write` mode:** fire the terminal question using the platform's blocking question tool. In Claude Code the tool should already be loaded from the Interactive-mode pre-load step in `SKILL.md` — if it isn't, call `ToolSearch` with `select:AskUserQuestion` now. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors.
+**Interactive `markdown-write` mode:** fire the terminal question using the platform's blocking question tool. In Claude Code the tool should already be loaded from the Interactive-mode pre-load step in `references/modes.md` — if it isn't, call `ToolSearch` with `select:AskUserQuestion` now. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors.
 
 **Stem:** `Apply decisions and what next?`
 

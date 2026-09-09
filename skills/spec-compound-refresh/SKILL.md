@@ -17,7 +17,7 @@ Maintain the quality of `docs/solutions/` over time. This workflow reviews exist
 - **输入：** `docs/solutions/`、`CONCEPTS.md`、可选 scope hint，以及当前 source/test/doc evidence。
 - **输出：** Keep/Update/Consolidate/Replace/Delete/Stale 分类、已应用的知识维护变更和完整 Applied/Recommended 报告。
 - **硬出口：** source truth、目标 repo、写入范围或语义分类无法确认时不得把猜测写成 current knowledge；headless 只能把歧义标 stale。
-- **Worker boundary:** record `worker_dispatch_authorization` and related capability facts before any dispatch; investigation workers are read-only and never write a tracked successor, stage, or commit. Inline fallback must not claim independent investigation coverage.
+- **Worker boundary:** record `worker_dispatch_authorization` and related capability facts before any dispatch; investigation workers are read-only and never write a tracked successor, stage, or commit. Inline fallback must not claim independent investigation coverage. Missing authorization is recorded as `dispatch_authorization_missing`; an unavailable worker surface is `subagent_capability_missing` or `worker_capability_unproven` according to the dispatch evidence.
 
 ```yaml
 worker_dispatch_authorization: authorized | missing
@@ -151,4 +151,3 @@ Use **Consolidate** proactively when the document set has grown organically and 
 ## Discoverability Check
 
 Read `references/discoverability.md` after the report. It owns the semantic `docs/solutions/` and optional `CONCEPTS.md` discoverability check, mode-specific edit boundary, and same-authority commit handling.
-

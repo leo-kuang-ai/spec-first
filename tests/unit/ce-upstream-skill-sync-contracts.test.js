@@ -64,12 +64,17 @@ describe('CE upstream skill sync contracts', () => {
   });
 
   test('fails document review before persona dispatch when paths are unreadable', () => {
-    const review = read('skills/spec-doc-review/SKILL.md');
+    const review = [
+      read('skills/spec-doc-review/SKILL.md'),
+      read('skills/spec-doc-review/references/document-intake.md'),
+      read('skills/spec-doc-review/references/dispatch.md'),
+    ].join('\n');
 
     expect(review).toContain('**Missing-document gate — verify before any dispatch.**');
     expect(review).toContain('If any path is unreadable, do not dispatch personas');
     expect(review).toContain('Review failed: document(s) not found on disk: <paths>');
     expect(review).toContain('`security-lens-reviewer`, `feasibility-reviewer`, `product-lens-reviewer`, `adversarial-document-reviewer`: inherit the parent model');
+    expect(review).toContain('`{settled_ktds}`');
   });
 
   test('sizes PR descriptions by reviewer decision cost and runtime purpose', () => {

@@ -255,7 +255,9 @@ function walkMarkdownFiles(root) {
 }
 
 function packageBoundarySource(entry) {
-  return read(entry.boundarySource);
+  return [...new Set([entry.boundarySource, ...entry.sources])]
+    .map(read)
+    .join('\n');
 }
 
 function matchPrimitiveLeakage(line) {

@@ -3,7 +3,12 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const skill = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/SKILL.md'), 'utf8');
+const skillEntrypoint = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/SKILL.md'), 'utf8');
+const modes = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/modes.md'), 'utf8');
+const documentIntake = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/document-intake.md'), 'utf8');
+const personaSelection = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/persona-selection.md'), 'utf8');
+const dispatch = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/dispatch.md'), 'utf8');
+const skill = [skillEntrypoint, modes, documentIntake, personaSelection, dispatch].join('\n');
 const subagentTemplate = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/subagent-template.md'), 'utf8');
 const synthesis = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/synthesis-and-presentation.md'), 'utf8');
 const walkthrough = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/walkthrough.md'), 'utf8');
@@ -167,7 +172,7 @@ describe('spec-doc-review current contracts', () => {
 
   test('does not infer document kind from path alone', () => {
     expect(skill).toMatch(/content shape.*not its file path/);
-    expect(skill).toMatch(/Path is a tie-breaker hint/);
+    expect(skill).toMatch(/path location never disambiguates/i);
   });
 
   // --- U1: Subagent template spine structure ---
