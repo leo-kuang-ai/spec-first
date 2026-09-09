@@ -6,6 +6,10 @@ argument-hint: "[issue reference, error message, test path, or description of br
 
 # Debug and Fix
 
+## Project Intelligence Evidence Boundary
+
+`project-graph`/`code-graph` paths are `provider_untrusted` hypotheses, not root cause or impact evidence. Confirm the causal chain in reproductions, source, tests, logs, contracts, or owner evidence before a root-cause or fix claim; empty results do not prove absence. Use bounded direct reads when the provider is missing, stale, unknown, failed, or disabled.
+
 Find root causes, then fix them. This skill investigates bugs systematically — tracing the full causal chain before proposing a fix — and optionally implements the fix with test-first discipline.
 
 ## Workflow Contract Summary

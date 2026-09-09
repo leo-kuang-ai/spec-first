@@ -7343,3 +7343,7 @@
 - v1.8.2 2026-09-09: feat(spec-write-skill): 吸收 CE 3eb0c7a3 的 Skill 瘦身原则，要求保持 plain prose、优先迁移结构并保留字节余量
 
 - v1.8.2 2026-09-09: feat(spec-strategy): 吸收 CE strategy 的 grounding、边界和文档形状保护规则
+
+- v1.8.2 2026-09-09: feat(spec-debug): 强化可重复复现门槛与调试证据脱敏规则
+
+- v1.8.2 2026-09-09: feat(spec-debug): 强化调试证据脱敏规则
