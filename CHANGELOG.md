@@ -7363,3 +7363,7 @@
 - v1.8.2 2026-09-09: feat(spec-resolve-pr-feedback): 吸收 CE pipeline 模式的无人值守升级与非收敛判断边界
 
 - v1.8.2 2026-09-09: fix(spec-resolve-pr-feedback): 保留作者顶层 PR 反馈并统一三类反馈面语义判断
+
+- v1.8.2 2026-09-09: refactor(spec-pov): 将 grounding、follow-up 与跨模型参与披露规则下沉为 required-read references
+
+- v1.8.2 2026-09-09: feat(skill-sync): 增量吸收 CE 的 review、POV、compound、optimize、dogfood、pulse、ideate 与 browser 阶段引用及边界

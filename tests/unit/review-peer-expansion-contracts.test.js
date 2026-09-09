@@ -45,6 +45,20 @@ describe('review peer expansion contracts', () => {
     expect(panel).toContain('starts no peer process');
   });
 
+  test('POV loads grounding/follow-up references and discloses summoned participation', () => {
+    const skill = read('skills/spec-pov/SKILL.md');
+    const grounding = read('skills/spec-pov/references/grounding.md');
+    const followup = read('skills/spec-pov/references/followup.md');
+    const panel = read('skills/spec-pov/references/cross-model-panel.md');
+
+    expect(skill).toContain('Read `references/grounding.md` before grounding');
+    expect(skill).toContain('Read `references/followup.md` before follow-up decisions');
+    expect(grounding).toContain('provenance buckets');
+    expect(followup).toContain('Any implementation is outside this read-only contract');
+    expect(panel).toContain('A summons is an **affirmative** request');
+    expect(panel).toContain('which peers ran');
+  });
+
   test.each([
     'skills/spec-doc-review/scripts/cross-model-doc-review.sh',
     'skills/spec-pov/scripts/cross-model-pov.sh',

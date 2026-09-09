@@ -47,6 +47,8 @@ worker_bounded_parallelism: supported | unsupported | unknown
 
 ## Execution Flow
 
+Read `references/grounding.md` before grounding and `references/followup.md` before follow-up decisions.
+
 ### Phase 0: Frame and Classify
 
 **Output mode:** by default `spec-pov` writes no document — the verdict is a compact chat block. An optional full write-up and a durable `spec-compound` capture are available on request at Phase 4. Do not resolve an `OUTPUT_FORMAT` or load a rendering reference up front.
