@@ -4,6 +4,8 @@ Read after all dispatched review results return. Inline fallback executes only i
 
 ### Stage 5: Merge findings
 
+Local project-standards review and synthesis own scoped-rule coverage. The external adversarial peer is corroborative; accept its candidates only when compatible with every applicable scoped rule established locally. Any replacement candidate needs independent local evidence. Retain `adversarial-review-constraints.md` only as private run scratch under the existing cleanup policy.
+
 Read `references/action-class-rubric.md` before routing findings or assigning severity. It owns the detailed P0–P3 and action-routing definitions.
 
 Convert multiple reviewer JSON returns into one deduplicated, confidence-gated finding set. The normal compact returns contain merge-tier fields (title, severity, file, line, confidence, autofix_class, owner, requires_verification, pre_existing) plus the optional suggested_fix. Detail-tier fields (`why_it_matters`, `evidence`) normally live in per-agent artifact files; when `REVIEW_ARTIFACT_DIR` was unavailable or a write failed, a reviewer may return the full schema in band, and synthesis must preserve those detail fields instead of requiring a re-run.

@@ -131,6 +131,8 @@ Host capability probes remain host-owned. A sandboxed worker's `EPERM`, missing 
 
 CE's standalone cross-model work runner is intentionally not absorbed. `spec-work` composes only the active host's authorized dispatch primitive and preserves its live capability/isolation facts. A file-based `provider-serving-receipt/v2` is `degraded/unverified`; without an authenticated host producer channel, set `worker_dispatch_outcome: inline-fallback`, return `provider_serving_receipt_unverified`, start no peer subprocess, and claim no independent or cross-model coverage.
 
+Never broaden host permissions merely to reach a write- or shell-capable implementation route. Use the current permitted inline path when it satisfies the resolved task; preserve an explicit must-use model or engine constraint as a blocker for dependent work unless existing user authorization already allows fallback. A preferred route may fall back with requested-versus-actual disclosure. A started attempt must be authoritatively terminal and reconciled before fallback begins.
+
 Private scratch roots are resolved once per run through the host's native temporary-directory API (`TMPDIR`/`TEMP` on supported hosts), canonicalized, owner-checked, non-symlink, size-bounded, and cleaned on success or failure. Never reconstruct a root from a hard-coded `/tmp` path, a worker label, or a later invocation. On native Windows, record when POSIX no-follow or mode-bit checks are unavailable rather than claiming equivalent enforcement.
 
 ## 8. Integrate From Actual Facts

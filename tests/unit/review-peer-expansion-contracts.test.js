@@ -10,8 +10,10 @@ describe('review peer expansion contracts', () => {
     const skill = read('skills/spec-doc-review/SKILL.md');
     const peer = read('skills/spec-doc-review/references/personas/whole-doc-reviewer.md');
     const floor = read('skills/spec-doc-review/references/rendering-floor.md');
-    expect(skill).toContain('exactly one report-only whole-document peer');
-    expect(skill).toContain('never carries `safe_auto` or mutation authority');
+    const dispatch = read('skills/spec-doc-review/references/dispatch.md');
+    expect(skill).toContain('Read `references/dispatch.md` before dispatch or inline review');
+    expect(dispatch).toContain('exactly one report-only whole-document peer');
+    expect(dispatch).toContain('never carries `safe_auto` or mutation authority');
     expect(peer).toContain('entire document');
     expect(floor).toContain('Decision-first field order');
     for (const file of [

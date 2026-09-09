@@ -14,6 +14,10 @@ Named peers do not override these gates. Never infer authority from `oracle`, si
 
 ## Independent round
 
+Treat `CODEX_SANDBOX_NETWORK_DISABLED` as positive evidence of host network restriction; unsetting it does not change sandbox policy. DNS or authentication text alone does not establish that restriction. Installed routes are candidates; do not reject one based on restricted-context authentication probes. Attribute account failure and recommend credential remediation only after provider-capable dispatch is positively established by launch evidence or a provider response. Otherwise describe the peer execution-context failure without claiming account logout.
+
+After all admission gates pass, any host-supported permission request belongs only to the exact read-only `start` call for the fixed recipient. When escalation is forbidden, denied, or unavailable, create no job and continue with the surviving panel or local POV. Disclose that the detached worker inherits the launch context for its lifetime; adapter tool restrictions must still hold. Keep `status`, `wait`, `result`, and `reap` within ordinary permissions. Once a job id exists, follow started-job recovery; authentication failure is lost peer coverage, never a reason to silently replace a recipient.
+
 Resolve the host provider and one fixed peer provider/model before egress. The peer provider must differ from the host provider for an independence claim. Current file-based `provider-serving-receipt/v2` is explicitly `degraded/unverified`; without an authenticated host producer channel, return `provider_serving_receipt_unverified` before publishing a packet or starting a peer and use the in-process fallback. Missing receipt returns `provider_serving_receipt_unavailable`. Announce the intended recipient and content scope before any future authenticated launch when the active interaction mode requires disclosure.
 
 Use `references/agents/pov-peer.md` and `references/pov-schema.json` to build one `peer-task-packet/v1` per admitted peer. The packet contains:
