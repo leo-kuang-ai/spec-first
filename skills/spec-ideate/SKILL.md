@@ -307,7 +307,7 @@ External research, issue-tracker access, and provider calls are opt-in evidence 
 
    > **Run-local orientation handling (read first):** if a current-tree orientation is supplied at the end of this prompt, its agnostic shape and source identity were established for this run; confirm the identity still matches before using it, then run the question-specific slice. If the identity changed or no orientation is supplied, derive the full shape from current sources as described below.
    >
-   > Read the project's root agent-instruction file for this harness (e.g., `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, or `.cursor/rules`) and `README.md` when present, then discover the top-level directory layout using the native file-search/glob tool (e.g., `Glob` with pattern `*` or `*/*` in Claude Code). Also read `STRATEGY.md` if it exists — it captures the product's target problem, approach, persona, metrics, and tracks.
+   > Read the project's root agent-instruction file for this harness (e.g., `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, or `.cursor/rules`) and `README.md` when present, then discover the top-level directory layout using the native file-search/glob tool (e.g., `Glob` with pattern `*` or `*/*` in Claude Code). Also read `STRATEGY.md` as the shared project strategy document if it exists — it captures the product's target problem, approach, persona, metrics, and tracks.
    >
    > **Two paths for other root-level `*.md` files**, depending on whether the focus hint names them:
    >

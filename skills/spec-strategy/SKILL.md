@@ -8,7 +8,7 @@ argument-hint: "[optional: section to revisit, e.g. 'metrics' or 'approach']"
 
 Note: Use the current date from the active host context. Use this when weighting external sources and dating artifacts.
 
-`spec-strategy` produces and maintains `STRATEGY.md` - a short, durable anchor document that captures what the product is, who it serves, how it succeeds, and where the team is investing. It lives at the repo root as a canonical, well-known file (peer of `README.md`). Downstream skills (`spec-ideate`, `spec-brainstorm`, `spec-plan`) read it as grounding when it exists.
+`spec-strategy` writes and maintains its owned sections in the shared `STRATEGY.md` project document - a short, durable anchor document that captures what the product is, who it serves, how it succeeds, and where the team is investing. It lives at the repo root as a canonical, well-known file (peer of `README.md`). Downstream skills (`spec-ideate`, `spec-brainstorm`, `spec-plan`) read it as grounding when it exists.
 
 The document is short and structured on purpose. Good answers to a handful of sharp questions produce a better strategy than any amount of prose. This skill asks those questions, pushes back on weak answers, and writes the doc.
 

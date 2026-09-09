@@ -6,6 +6,10 @@ argument-hint: "[optional: feature description, requirements doc path, plan path
 
 # Create Technical Plan
 
+## Project Intelligence Evidence Boundary
+
+Graph candidates may narrow the next source read for broad planning, but they cannot set scope, affected surface, dependency, ownership, or implementation basis. Re-ground plan claims in current source, tests, docs, contracts, logs, or owner evidence; direct reads are valid and empty results have no negative authority. Provider failure is never-blocking for ordinary planning.
+
 Note: Use the current date from the active host context. Use this when weighting external sources and dating artifacts.
 
 `spec-brainstorm` defines **WHAT** to build by creating a requirements-only unified plan. `spec-plan` enriches that same artifact with **HOW** to build it. `spec-work` executes implementation-ready plans. A prior brainstorm is useful context but never required — `spec-plan` works from any input: a requirements-only unified plan, a legacy requirements doc, a bug report, a feature idea, or a rough description.

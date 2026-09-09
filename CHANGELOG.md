@@ -7351,3 +7351,5 @@
 - v1.8.2 2026-09-09: feat(spec-debug): 强化调试证据脱敏规则
 
 - v1.8.2 2026-09-09: fix(spec-write-skill): 补齐重构前 contract pin 核对、迁移优先和 fresh reader 语义检查
+
+- v1.8.2 2026-09-09: fix(strategy-consumers): 将 STRATEGY.md 明确为共享项目策略文档并统一下游消费口径

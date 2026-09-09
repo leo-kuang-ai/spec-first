@@ -44,7 +44,7 @@ Apply a **15-minute trailing buffer** to the window's upper bound. Many analytic
 4. **Parallel where safe, serial where it matters.** Analytics and tracing queries run in parallel. Database queries run serially to avoid load.
 5. **Memory through saved reports.** Every run writes to `docs/pulse-reports/` so past pulses are browseable as a timeline.
 6. **Read-only database access only.** If a database is used as a data source, the connection must be read-only. The interview refuses to accept read-write credentials. Database access is optional - many products complete the pulse with analytics and tracing alone.
-7. **Strategy-seeded when available.** If `STRATEGY.md` exists, the interview reads it before asking questions and carries forward the product name and key metrics as seeds. The goal of data-source setup is to wire up whatever connections are needed to actually measure those metrics.
+7. **Strategy-seeded when available.** The interview reads the shared project strategy document `STRATEGY.md` before asking questions and carries forward the product name and key metrics as seeds; if it is absent, it reports that no strategy seed is available rather than silently deriving one from legacy docs. The goal of data-source setup is to wire up whatever connections are needed to actually measure those metrics.
 
 ## Execution Flow
 
