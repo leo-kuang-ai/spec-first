@@ -1,4 +1,10 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 075-f76d3096；判定为 reference-only 或本地已有等价约束。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 076-f6c301ca；判定为 reference-only 或本地已有等价约束。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 077-cbd32913；判定为 reference-only 或本地已有等价约束。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 078-aaf04931；判定为 reference-only 或本地已有等价约束。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 079-a1f601f1；判定为 reference-only 或本地已有等价约束。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 080-0e758b60；判定为 reference-only 或本地已有等价约束。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 5ac4c01a 的异步 reviewer 收集语义；本地已有等价 terminal collection contract。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 871996c4 release metadata；reference-only。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE b20c29d7 cross-model heartbeat 生命周期；本地已有 peer runner/cleanup contract。 (user-visible)
