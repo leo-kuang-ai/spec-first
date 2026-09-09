@@ -101,7 +101,9 @@ describe('spec-resolve-pr-feedback contracts', () => {
 
     expect(entrypoint).toContain('Read `references/pipeline-mode.md` when pipeline mode is selected.');
     expect(pipelineMode).toContain('Never call the blocking-question tool');
-    expect(pipelineMode).toContain('open thread is the escalation ledger');
+    expect(pipelineMode).toContain('Return the exact typed residual');
+    expect(pipelineMode).toContain('Only with existing reply authorization');
+    expect(pipelineMode).toContain('Leave every covered thread open');
     expect(pipelineMode).toContain('demonstrated non-converging approach');
     expect(fullMode).toContain('When a `trajectory` is present, apply the non-convergence check');
   });

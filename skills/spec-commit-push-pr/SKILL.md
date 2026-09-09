@@ -231,6 +231,8 @@ The new commits are already on the PR from Step 5. Report the PR URL, then ask w
 
 Output the PR URL.
 
+Before reporting success, render every inherited or returned typed `needs-human` residual under `## Needs your decision` and return the exact objects unchanged to the top-level caller. Include quoted_feedback, investigation, decision_reason, every option/tradeoff, non-null recommendation, and all thread_urls. A watch opt-out, description-only mode, or skipped rewrite does not suppress a known decision. A non-empty set is a decision handoff, not overall completion; leave covered threads open. This helper does not create a decision store or gain additional remote-write authority.
+
 For an authorized full-workflow `mode:pipeline` landing, also return:
 
 ```yaml

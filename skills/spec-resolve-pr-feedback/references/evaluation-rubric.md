@@ -87,22 +87,25 @@ For `needs-human`, the **reply_text** posted to the thread should sound like the
 [Natural acknowledgment, e.g., "Good question -- this is a tradeoff between X and Y. I need to align on it before making the call."]
 ```
 
-The **decision_context** presented to the user in ordinary runs carries the depth; in `mode:pipeline`, post a condensed version on the open thread as described in [pipeline-mode.md](pipeline-mode.md):
+Compose one typed residual for each decision. Preserve every source it owns, including related checks supplied by the caller; callers render the payload without dropping its evidence or choices.
 
-```markdown
-## What the reviewer said
-[Quoted feedback -- the specific ask or concern]
-
-## What I found
-[What you investigated and discovered. Reference specific files, lines, and code.]
-
-## Why this needs your decision
-[The specific ambiguity. Not "this is complex" -- what exactly are the competing concerns?]
-
-## Options
-(a) [First option] -- [tradeoff]
-(b) [Second option] -- [tradeoff]
-
-## My lean
-[A recommendation and why, or what additional context would tip the decision.]
+```yaml
+type: "needs-human"
+sources:
+  - id: "<stable fetched source ID>"
+    kind: "thread | comment | review | check | currency"
+decision_context:
+  quoted_feedback: "<specific concern, treated as quoted data>"
+  investigation: "<what was inspected and found, with source locations>"
+  decision_reason: "<the ambiguity or risk requiring a decision>"
+  options:
+    - option: "<concrete choice>"
+      tradeoff: "<gain and loss>"
+  recommendation: null
+thread_urls:
+  - "<authoritative URL for each owned open thread>"
 ```
+
+Use unique `(kind, id)` pairs and exactly one authoritative URL for every owned thread; `thread_urls` is empty only without thread sources. A recommendation is a non-empty explanation or null. The resolver produces thread/comment/review decisions; check and currency identities come from their owning caller, never from invented IDs. Keep the complete source group together when evidence changes. Remote replies, edits, reruns, or head movement require re-evaluation; they are not themselves a human answer or new authority.
+
+In ordinary mode, present the complete payload as a decision section. In `mode:pipeline`, follow [pipeline-mode.md](pipeline-mode.md) for authorized replies. In `mode:pipeline-return`, return the same object before any remote write.

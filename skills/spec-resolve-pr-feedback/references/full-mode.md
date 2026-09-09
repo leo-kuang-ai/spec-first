@@ -308,6 +308,6 @@ Declined (count): [what was declined and the harm cited]
 Validation: [one line; omit when no code changes were committed]
 ```
 
-If any agent returned `needs-human`, append a decisions section using the returned `decision_context`. If there are pending decisions from a previous run, surface them after the new work.
+If any item remains `needs-human`, render the complete typed residual under `## Needs your decision`: quoted_feedback, investigation, decision_reason, every option/tradeoff, recommendation when non-null, and every thread_urls link. Return the same objects unchanged to a caller. Include still-current decisions from previous runs; do not report them as resolved or replace their payloads with counts.
 
 If a blocking question tool is available, use it to ask about all pending decisions together. Use `AskUserQuestion` in Claude Code or `request_user_input` in Codex. Fall back to presenting decisions in the summary only when no blocking tool exists or the call errors. Never silently skip.

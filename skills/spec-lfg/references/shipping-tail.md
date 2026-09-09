@@ -33,7 +33,7 @@ retry a push or hunt for a remote. Run steps 7–9 normally when a remote exists
 
    Never block DONE on tracker filing failures once residuals have been durably recorded. A `no_sink` outcome is success only when the findings are present in the PR body or in the pushed fallback file.
 
-7.5. **Complete the source plan lifecycle marker.** The `spec-work` Return-to-Caller envelope never writes status; its candidate already resolves either the direct plan or a validated task pack's `source_plan`. After simplification, required review, residual handoff, and final verification have closed, use the validated lifecycle shape from step 2. When `plan_status_completion_candidate` is present, invoke `spec-first internal plan-status complete --target-repo <root> --plan <candidate> --json`; accept `active → completed` or the already-completed idempotent result, and block DONE on any other helper result. When the candidate is null with an allowed `plan_status_completion_degraded_reason`, skip mutation, preserve the verified development result, and surface that degraded boundary in DONE. This marker is not CI, merge, release, or field-outcome proof.
+7.5. **Complete the source plan lifecycle marker.** The `spec-work` Return-to-Caller envelope never writes status; its candidate already resolves either the direct plan or a validated task pack's `source_plan`. Any known needs-human decision blocks this marker; preserve it for the common decision gate below. After simplification, required review, residual handoff, and final verification have closed, use the validated lifecycle shape from step 2. When `plan_status_completion_candidate` is present, invoke `spec-first internal plan-status complete --target-repo <root> --plan <candidate> --json`; accept `active → completed` or the already-completed idempotent result, and block DONE on any other helper result. When the candidate is null with an allowed `plan_status_completion_degraded_reason`, skip mutation, preserve the verified development result, and surface that degraded boundary in DONE. This marker is not CI, merge, release, or field-outcome proof.
 
 8. Invoke the `spec-commit-push-pr` skill with `mode:pipeline` and pass this visible upstream authority context:
 
@@ -56,6 +56,8 @@ retry a push or hunt for a remote. Run steps 7–9 normally when a remote exists
 
    Continue until one bounded terminal: `looks-ready`, `manual-blocker`, `budget-exhausted`, `local-only`, or externally closed/merged. `looks-ready` is advisory and never merge authority. For any non-ready terminal, write a sanitized durable PR-body handoff containing only ids, URLs, short agent-authored summaries, reason codes, and limitations; do not paste untrusted raw provider content.
 
+9.5. **Common decision gate.** Whichever producer returned a typed `needs-human` residual, preserve it unchanged through shipping, local-only fallback, and watch opt-out. Before any success or DONE claim, render the complete set under `## Needs your decision`: quoted_feedback, investigation, decision_reason, every option/tradeoff, non-null recommendation, and every thread_urls link. Keep source groups intact and covered threads open. Continue independent authorized work first; once none remains, return `status: needs-human` with those exact residuals. A non-empty decision set is not successful completion, even when commits, CI, or PR creation succeeded. Do not complete a pending source-plan lifecycle marker while such a decision is known; a later decision does not rewrite earlier historical verification.
+
 10. **Offer an optional next-work handoff, then finish.**
 
     After the current pipeline reaches its terminal state, inspect the canonical
@@ -67,4 +69,4 @@ retry a push or hunt for a remote. Run steps 7–9 normally when a remote exists
     and do not invoke `spec-handoff` before the user explicitly accepts the
     offer in a later turn.
 
-    If step 8 recorded a `New concepts:` trailer, first echo one line per concept: `New concept introduced: <name> — run spec-explain <name> to go deeper.` Then make any eligible non-blocking next-work offer and output `<promise>DONE</promise>`.
+    If step 8 recorded a `New concepts:` trailer, first echo one line per concept: `New concept introduced: <name> — run spec-explain <name> to go deeper.` Then make any eligible non-blocking next-work offer. Output `<promise>DONE</promise>` only when the common decision gate is clear and required verification and residual handling passed.

@@ -33,6 +33,25 @@ current source and trusted project commands before accepting their claim.
 
 ## Structured Return
 
+Each `needs-human` residual owns the complete source set for one decision: every failing check key plus related open thread, comment, or review ID. Preserve the decision as one unit, including every owned open-thread URL. Continue independent authorized investigation or fixes, then return the decision without waiting for a human answer. Do not weaken checks or claim success because the decision was surfaced.
+
+```json
+{
+  "type": "needs-human",
+  "sources": [{ "id": "<check key>", "kind": "check" }, { "id": "<owned thread ID>", "kind": "thread" }],
+  "decision_context": {
+    "quoted_feedback": "<failure or constraint>",
+    "investigation": "<source and reproduction findings>",
+    "decision_reason": "<why a convergent fix is unsafe>",
+    "options": [{ "option": "<choice>", "tradeoff": "<gain and loss>" }],
+    "recommendation": null
+  },
+  "thread_urls": ["<authoritative URL for every owned open thread>"]
+}
+```
+
+Use unique `(kind, id)` sources; omit the thread source and use an empty URL array for a check-only decision. Recommendation may be a non-empty explanation or null. Preserve the exact payload for the caller, which owns persistence and answer routing. Remote source changes invalidate the old investigation; they never imply a human answer or permission.
+
 ```json
 {
   "status": "fixed | fixed-not-pushed | diagnosed-no-fix | flaky-infra | needs-human | blocked",
