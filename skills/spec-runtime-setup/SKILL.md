@@ -60,9 +60,9 @@ Project-local setup has two separate surfaces:
 1. Setup-owned facts: `.spec-first/config/tool-facts.json`, `.spec-first/config/runtime-capabilities.json`, and when applicable `.spec-first/workspace/scenario-fingerprint-setup.json`.
 2. Local config bootstrap: `.spec-first/config.local.example.yaml`, local override state for `.spec-first/config.local.yaml`, and `.gitignore` coverage for `.spec-first/*.local.yaml`. Missing local override means `defaults-active`，不是“未处理的可选项”。
 
-The readiness ledger and runtime capabilities include `generated_runtime_manifest.status` (`current`, `stale`, `missing`, or `unknown`) based only on `state.manifestVersion` versus the bundled manifest version; this is a deterministic freshness fact, not proof that generated prose is semantically correct. Missing/stale remediation is emitted as structured `next_action_command={cwd,command,args}` plus `next_action_headless_command`; `next_action` is explanation only and must never contain an executable `cd ... && ...` compound string. Scenario fingerprint wrapper failures are warn-and-continue: report `scenario_fingerprint_setup` status and keep the rest of setup actionable instead of blocking ordinary direct-evidence workflows.
-
 Local config bootstrap is a first-class Runtime Setup capability, but it remains project-local and local-only. It checks and can explicitly refresh `.spec-first/config.local.example.yaml`, explicitly create `.spec-first/config.local.yaml`, and explicitly ensure `.spec-first/*.local.yaml` is ignored. It reports legacy project config signals for manual review, but it does not copy legacy files, translate old key names, or treat old defaults as spec-first truth.
+
+Before any project-local write, read `references/project-config.md`. Project-local config actions never install providers or edit host config; host/provider actions never migrate local config keys.
 
 ## Three-Stage Setup Flow
 
