@@ -1,6 +1,6 @@
 ---
 name: spec-optimize
-description: "Run metric-driven iterative optimization loops. Define a measurable goal, build measurement scaffolding, then run parallel experiments that try many approaches, measure each against hard gates and/or LLM-as-judge quality scores, keep improvements, and converge toward the best solution. Use when optimizing clustering quality, search relevance, build performance, prompt quality, or any measurable outcome that benefits from systematic experimentation. Inspired by Karpathy's autoresearch, generalized for multi-file code changes and non-ML domains."
+description: "Run metric-driven optimization loops. Use when improving a measurable outcome through experiments."
 argument-hint: "[path to optimization spec YAML, or describe the optimization goal]"
 ---
 

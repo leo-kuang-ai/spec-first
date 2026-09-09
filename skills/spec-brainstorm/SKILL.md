@@ -1,6 +1,6 @@
 ---
 name: spec-brainstorm
-description: 'Explore vague or ambitious ideas into a right-sized requirements-only unified plan. Use when the user wants to brainstorm, think through scope, decide what to build, or needs collaborative product framing before planning. Also use when the user must scope work in territory they say they do not know ("I know nothing about X but need to...") or asks for a blindspot pass — mapping the decision surface before questions begin. Not for executing already-specified work — direct implementation, debugging, or code review where no product scope is left to decide. Not for a decisive verdict on whether to adopt or switch to a specific external technology, library, or platform — brainstorming scopes what to build, not whether to commit to an outside option; route those verdict questions to spec-pov.'
+description: "Explore ideas into a requirements-only unified plan. Use to brainstorm, scope what to build, frame unfamiliar territory, or check product blindspots before planning. Not for settled implementation, debugging, or code review; use spec-pov for a verdict on adopting a named external candidate."
 argument-hint: "[feature idea or problem to explore] [output:html]"
 ---
 

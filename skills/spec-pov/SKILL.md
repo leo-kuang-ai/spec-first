@@ -1,6 +1,6 @@
 ---
 name: spec-pov
-description: "Give a decisive, project-grounded verdict on an external input — judged against the current project, not in the abstract. Use to decide whether to adopt, switch to, or revisit a technology, library, pattern, platform, or architecture; to compare a candidate against what the project already uses; to judge whether an external change (a CVE, a deprecation, an ecosystem shift) actually affects this project; or for a mid-session second opinion. Always returns a project-specific verdict, so it is not for neutral explainers or generating options."
+description: "Give a project-grounded verdict on an external candidate or change. Use to decide whether to adopt, switch, revisit, or compare a technology or approach, assess the impact of an external change, or get a second opinion. Not for neutral explanation or generating options."
 argument-hint: "[the external thing to judge, plus any links] — or invoke bare mid-session for a second opinion"
 ---
 

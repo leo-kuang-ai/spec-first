@@ -1,6 +1,6 @@
 ---
 name: spec-code-review
-description: "Structured code review for bugs, regressions, tests, and standards. Report-only by default; apply fixes only when the current user or upstream caller explicitly requests review-and-fix. mode:agent is always report-only."
+description: "Review code for bugs, regressions, tests, and standards. Use for a code review or to apply its findings locally when explicitly requested. Report-only by default; mode:agent is always report-only. For feedback already left on a PR, use spec-resolve-pr-feedback."
 argument-hint: "[mode:agent] [base:<ref>] [plan:<path>] [task-pack:<path> task:<id> task-context:<path>] [blank to review current branch, or provide PR link]"
 ---
 

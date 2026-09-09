@@ -1,6 +1,6 @@
 ---
 name: spec-resolve-pr-feedback
-description: Resolve PR review feedback by evaluating validity and fixing issues with conflict-aware resolver dispatch. Use when addressing PR review comments, resolving review threads, or fixing code review feedback.
+description: "Evaluate and resolve feedback already left on a PR. Use when addressing PR review comments or threads. For a new code review or applying findings from that review, use spec-code-review."
 argument-hint: "[PR number, comment URL, or blank for current branch's PR] [mode:pipeline-return]"
 disable-model-invocation: true
 allowed-tools:
