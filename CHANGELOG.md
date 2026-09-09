@@ -1,4 +1,10 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 5ac4c01a 的异步 reviewer 收集语义；本地已有等价 terminal collection contract。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 871996c4 release metadata；reference-only。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE b20c29d7 cross-model heartbeat 生命周期；本地已有 peer runner/cleanup contract。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 2ca1f81c Objective anchoring；本地 Goal Capsule/Objective 约束已覆盖。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE fb47ec03 solutions/CONCEPTS 文档；reference-only。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 5259c92c skill-work shape 行为分类；本地已有独立行为变化合同。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 5d5b7843 的 managed-stack trunk drift 处理；spec-first 无对应 babysit-pr owner，reference-only。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(spec-lfg): 融合 CE d05e3951，明确从 host catalog 的 listed path 调用 spec-code-review，避免误读宿主 review skill；补齐 cold-caller fallback 文案。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 180fcd21 的 blocking question capability 文案与宿主测试；本地已无固定宿主探测文案，reference-only。 (user-visible)
