@@ -7521,3 +7521,4 @@
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 3ce5855f 的 Grok Build host attestation；本地保持现有宿主与 cross-model receipt 边界，不新增 Grok 宿主产品面。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(spec-doc-review): 融合 CE 2d77dee3 的 product-lens 触发边界，仅对来源未解决的产品立场或新增战略权重启用。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 56cb13aa 的按决策定尺寸评测说明，确认本地 feedback-and-tests 已有最小回路约束。 (user-visible)
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 2e105089 的 peer retry/outcome classifier；本地共享 supervisor 已有超时与失败收口，保留更严格的无自动换路边界，不引入第二套 route state machine。 (user-visible)
