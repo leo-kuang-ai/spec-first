@@ -13,6 +13,7 @@ const subagentTemplate = fs.readFileSync(path.resolve(__dirname, '../../skills/s
 const synthesis = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/synthesis-and-presentation.md'), 'utf8');
 const walkthrough = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/walkthrough.md'), 'utf8');
 const bulkPreview = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/bulk-preview.md'), 'utf8');
+const classificationSignals = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/document-classification-signals.md'), 'utf8');
 const openQuestions = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/open-questions-defer.md'), 'utf8');
 const reportOnlyCases = JSON.parse(fs.readFileSync(
   path.resolve(__dirname, '../../skills/spec-doc-review/evals/report-only-cases.json'),
@@ -173,6 +174,13 @@ describe('spec-doc-review current contracts', () => {
   test('does not infer document kind from path alone', () => {
     expect(skill).toMatch(/content shape.*not its file path/);
     expect(skill).toMatch(/path location never disambiguates/i);
+    expect(classificationSignals).toMatch(/path location never resolves/i);
+    expect(classificationSignals).not.toMatch(/fall back to path/i);
+  });
+
+  test('passes session-settled decisions through the reviewer context', () => {
+    expect(dispatch).toContain('`{settled_ktds}`');
+    expect(subagentTemplate).toContain('Settled decisions: {settled_ktds}');
   });
 
   // --- U1: Subagent template spine structure ---
