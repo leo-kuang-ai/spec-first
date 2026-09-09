@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(spec-write-skill): 融合 CE d181ae0e 的 fresh-source 场景证据与非空评估规则；按场景判断必读引用，区分自述、实际动作和受限环境证据。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(spec-write-skill): 纠正 CE 67cc7dc7 仅文档裁决，补齐测试 pin 溯源、按执行步骤迁移及风险匹配评估规则，清除一条重复记录。 (user-visible)
 - v1.15.3 2026-09-10 09:30:00 codex: docs(sync): 核对 CE d181ae0e 的 host-CLI skill-eval catalog；判定为 CE 专属评测基础设施，reference-only，不引入第二套评测框架。 (user-visible)
 - v1.15.3 2026-09-10 09:20:00 codex: docs(sync): 核对 CE 67cc7dc7，为上游 Skill 设计学习文档；判定为 reference-only，无需同步 canonical source。 (user-visible)

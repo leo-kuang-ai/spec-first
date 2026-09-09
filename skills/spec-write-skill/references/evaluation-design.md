@@ -25,6 +25,12 @@ closeout 分开报告 deterministic checks、eval adequacy、五轴 readiness、
 
 ## Restructure Coverage
 
+Evaluate current on-disk source in fresh context. Give the subject a realistic request and raw inputs without the diagnosis, intended fix, or expected answer. Keep the grader's rubric separate. A cached Skill invocation, matching version label, or committed snapshot that omits the working-tree edit does not prove that the candidate ran. Do not patch runtime caches to force a reload. Reuse the project's actual evaluation tools; an optional installed helper is not a repository capability.
+
+Require read evidence only when the scenario's decision depends on a reference the body requires at that step. A body-owned refusal may correctly stop without opening a procedure reference. Pair it with a complementary case that exercises the reference-owned path. Extra authorized reads are not failures; never add a must-not-read rule merely to enforce an extraction target.
+
+Grade observable decisions and surviving artifacts. Mentioning a forbidden command to explain a refusal is not executing it, while a failed command attempt still counts as an attempt. A read-only sandbox makes forbidden writes impossible, so restraint alone is not a behavioral pass: require a meaningful positive decision or output. To test voluntary restraint with writes available, use an authorized isolated subject and inspect file changes and commit history. Missing evidence, timeout, an empty selected case set, or no executed host cannot count as passing. Self-reported action/read/delegation trailers are advisory and need corroboration for execution claims.
+
 For a restructure, derive cases from the Skill's entry paths and modes, including conditional reads, early exits, and recovery. Compare before and after on the same cases. Choose available, authorized hosts and repetitions in proportion to usage and risk; disclose omitted paths and hosts instead of importing a fixed upstream matrix. Add any missed path that yields a review defect before claiming coverage of the fix.
 
 Use surviving artifacts, logs, read traces, and actual dispatch receipts as evidence. A model's account of what it did cannot establish that a file was read or a delegate ran. If delegation is the behavior under test, a dispatch-forbidden recognition case cannot verify it; live checks require current authorization and an isolated subject. Without that authorization, keep the delegation claim `not-run` and continue independent checks.
