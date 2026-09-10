@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: docs(sync): 复核 CE 12d3d8c3 的分组决策、精确答案消费和完成边界，记录 65 项验证。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 复核 CE 9f55d68a 的 REST 回复、pending review 和幂等恢复边界，记录 19 项验证。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(riffrec): 补齐 CE 15ab6f76 的 brainstorm 证据清单传递，更新 Polish 命令迁移后的契约验证。 (user-visible)
 - v1.15.3 2026-09-10 16:43:09 zcode: chore: 收纳本地未提交变更——落地此前仅记录条目的 init/doctor/quickstart 失败边界、workspace summary 回滚与 runtime-setup Provider 展示事实代码；compound 共享分类 enum v2、commit 引用 FLAG/NOTE 校验、私有候选路径解析与 CE 选择性吸收方法论及验证资产；采纳 ADR 0003 AI-enhanced SDLC harness 定位，落地 lifecycle scope、project-graph 负向权威与 H 类 skill provider_untrusted 证据上限（补齐 spec-plan/spec-work 术语）；清理已关闭 plan 文档（删除 4 份、收敛 5 份），新增变更追踪与 skill 自动进化两个纵向切片计划。 (user-visible)
