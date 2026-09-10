@@ -23,7 +23,9 @@ Use graph candidates only to locate material for a solution record. Durable know
 
 ## Preconditions And Mode
 
-Only capture reasoning that is not readily recoverable from final code, tests, or existing docs and whose loss would plausibly cause recurrence, material risk, or substantial rediscovery. A completed task, large diff, or explicit invocation does not lower that bar. If no learning qualifies, write nothing.
+Only capture reasoning that is not readily recoverable from final code, tests, or existing docs and whose loss would plausibly cause recurrence, material risk, or substantial rediscovery. Apply this counterfactual: if the learning document disappeared, would a future engineer reading the final implementation still be likely to repeat the mistake or redo substantial investigation? If not, write nothing. A completed task, large diff, or explicit invocation does not lower that bar. If no learning qualifies, write nothing and the completion report says why.
+
+An existing learning that became materially inaccurate or incomplete qualifies because leaving it would mislead: update that learning instead of creating a duplicate.
 
 Document one non-trivial solved problem per run. Process distinct learnings in separate sequential runs with fresh grounding; do not batch drafts and stitch cross-references afterward. If nothing is solved and verified, write nothing and report why.
 

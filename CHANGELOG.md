@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(compound): 补齐 CE d3c6f12d 的反事实资格测试、过时学习更新规则与提议门槛前置。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(review): 补齐 CE 52d56f2a 的紧凑返回 exact-key 条件句（notes 非字段、合并器拒绝顶替）。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(peer-runner): 补齐 CE 37eed425 的缺失产物结果命名与 absent/不可读退出码分离。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(commit-push-pr): 补齐 CE 0802b79e 的项目发布门（pre-push 要求按确切 commit 状态验证）。 (user-visible)
