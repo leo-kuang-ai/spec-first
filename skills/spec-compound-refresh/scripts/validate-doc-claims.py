@@ -2,7 +2,7 @@
 """Validate cited claims in a solution doc against the git tree.
 
 Usage:
-    python3 validate-doc-claims.py <doc-path>
+    python3 validate-doc-claims.py <doc-path> [--repo-root <repo>] [--target-path <final-path>]
 
 Exit codes:
     0 — nothing flagged
@@ -33,11 +33,14 @@ cite a path deleted by the very fix it documents. The calling agent
 decides per flag: fix, annotate as historical, or confirm intentional.
 Only the summary exit code distinguishes "clean" from "needs a look".
 
-The script never touches the network (no fetch); classification uses
-whatever refs exist locally. Run a best-effort `git fetch --quiet` first
-when freshness matters. Pure stdlib (no third-party deps).
+The script never touches the network (no fetch); classification uses local refs.
+Private candidates supply the target repo and intended final path explicitly.
+Unresolved hex tokens with explicit commit cues are flags; other tokens remain
+advisory notes. Cue detection is not a semantic judgment or proof of fabrication.
+Pure stdlib (no third-party deps).
 """
 import os
+import argparse
 import re
 import subprocess
 import sys
@@ -47,6 +50,16 @@ PLACEHOLDER_CHARS = set("<>{}*$")
 PLACEHOLDER_SUBSTRINGS = ("path/to", "...", "…")
 
 SHA_RE = re.compile(r"\b[0-9a-f]{7,40}\b")
+COMMIT_CUE_RE = re.compile(
+    r"(?:\b(?:commit|commits|revision|rev|cherry-pick|revert)\b|提交|提交哈希)"
+    r"(?:\s+(?:sha|hash))?[\s:`'\"#]*$",
+    re.IGNORECASE,
+)
+LANDING_CUE_RE = re.compile(
+    r"\b(?:fixed|landed|introduced|shipped|merged|resolved|reverted)"
+    r"\s+(?:in|by|at|with)[\s:`'\"]*$", re.IGNORECASE,
+)
+REPO_PIN_RE = re.compile(r"(?<![\w./@-])[\w.-]+/[\w.-]+@$")
 BACKTICK_RE = re.compile(r"`([^`\n]+)`")
 MD_LINK_RE = re.compile(r"\[[^\]]*\]\(([^)\s]+)\)")
 FENCE_RE = re.compile(r"^\s*(`{3,}|~{3,})(.*)$")
@@ -59,6 +72,14 @@ SCAFFOLD_RES = (
 def usage_fail(msg: str) -> "NoReturn":
     sys.stderr.write(f"validate-doc-claims: {msg}\n")
     sys.exit(2)
+
+
+def cites_a_commit(prefix: str) -> bool:
+    return bool(
+        COMMIT_CUE_RE.search(prefix)
+        or LANDING_CUE_RE.search(prefix)
+        or REPO_PIN_RE.search(prefix)
+    )
 
 
 def git(args: list[str], cwd: str) -> tuple[int, str]:
@@ -149,17 +170,26 @@ def normalize_path(token: str) -> str:
 
 
 def main(argv: list[str]) -> int:
-    if len(argv) != 2:
-        usage_fail(f"usage: {os.path.basename(argv[0])} <doc-path>")
-
-    doc_path = argv[1]
+    parser = argparse.ArgumentParser()
+    parser.add_argument('doc_path')
+    parser.add_argument('--repo-root')
+    parser.add_argument('--target-path')
+    args = parser.parse_args(argv[1:])
+    doc_path = args.doc_path
+    if args.repo_root:
+        args.repo_root = os.path.abspath(args.repo_root)
+        if not os.path.isdir(args.repo_root) or not os.access(args.repo_root, os.R_OK | os.X_OK):
+            usage_fail("explicit repo-root is not a readable directory")
     if not os.path.isfile(doc_path):
         usage_fail(f"file not found: {doc_path}")
 
     with open(doc_path, encoding="utf-8", errors="replace") as f:
         text = f.read()
 
-    doc_dir = os.path.dirname(os.path.abspath(doc_path))
+    target_path = args.target_path or doc_path
+    if args.target_path and args.repo_root and not os.path.isabs(target_path):
+        target_path = os.path.join(args.repo_root, target_path)
+    doc_dir = os.path.dirname(os.path.abspath(target_path))
     body, body_start = split_body(text)
     body_lines = body.split("\n")
 
@@ -170,10 +200,11 @@ def main(argv: list[str]) -> int:
         return ""
 
     infos: list[str] = []
+    notes: list[str] = []
     flags: list[str] = []
 
     # --- Repo context -----------------------------------------------------
-    code, repo_root = git(["rev-parse", "--show-toplevel"], doc_dir)
+    code, repo_root = git(["rev-parse", "--show-toplevel"], args.repo_root or doc_dir)
     in_git = code == 0 and bool(repo_root)
     upstream: str | None = None
     if in_git:
@@ -205,8 +236,8 @@ def main(argv: list[str]) -> int:
             )
     else:
         infos.append(
-            "INFO: not a git repository — path and SHA classification skipped "
-            "(scaffold and link checks still apply)"
+            "INFO: Git path/SHA classification unavailable — no usable Git context; "
+            "commit claims remain unverified (filesystem, scaffold and link checks still apply)"
         )
 
     def upstream_has_path(path: str) -> bool:
@@ -224,20 +255,22 @@ def main(argv: list[str]) -> int:
     # --- 1. Cited repo paths ----------------------------------------------
     checked_paths = 0
     seen_paths: set[str] = set()
-    base = repo_root if in_git else os.getcwd()
+    base = repo_root if in_git else (args.repo_root or os.getcwd())
     for raw in BACKTICK_RE.findall(body):
         token = normalize_path(raw)
+        if os.path.isabs(token):
+            relative = os.path.relpath(os.path.realpath(token), os.path.realpath(base))
+            if relative != ".." and not relative.startswith(".." + os.sep):
+                token = "./" + relative
         if not is_path_candidate(token):
             continue
         check = token
         if token.startswith("../") or "/../" in token:
             # A `../` citation is doc-relative (matching how markdown links
             # resolve), so map it to a repo-root path before checking.
-            if not in_git:
-                continue
             resolved = os.path.realpath(os.path.join(doc_dir, token))
             check = os.path.relpath(resolved, os.path.realpath(base))
-            if check.startswith(".."):
+            if check == ".." or check.startswith(".." + os.sep):
                 continue  # escapes the repo — not checkable as a repo path
         if check in seen_paths:
             continue
@@ -275,23 +308,35 @@ def main(argv: list[str]) -> int:
 
     # --- 2. Cited commit SHAs ----------------------------------------------
     checked_shas = 0
-    seen_shas: set[str] = set()
+    seen_shas: dict[str, tuple[int, bool]] = {}
     if in_git:
         for m in SHA_RE.finditer(body):
             sha = m.group(0)
-            if sha in seen_shas:
-                continue
             if not (any(c.isdigit() for c in sha) and any(c in "abcdef" for c in sha)):
                 continue  # dates and decimal ids are not SHAs
-            seen_shas.add(sha)
+            line_start = body.rfind("\n", 0, m.start()) + 1
+            cited = cites_a_commit(body[line_start:m.start()])
+            line_number = body_start + body.count("\n", 0, m.start())
+            # 同一编号后续被明确用作提交引用时，保留更强信号及其行号。
+            if sha not in seen_shas or (cited and not seen_shas[sha][1]):
+                seen_shas[sha] = (line_number, cited)
+        for sha, (line_number, cited) in seen_shas.items():
             checked_shas += 1
-            loc = loc_suffix(sha)
+            loc = f" (line {line_number})"
             code, _ = git(["cat-file", "-e", f"{sha}^{{commit}}"], repo_root)
             if code != 0:
-                flags.append(
-                    f"FLAG sha {sha}{loc} — does not resolve to a commit in this "
-                    "repository. Replace with the PR number, or drop it."
-                )
+                if cited:
+                    flags.append(
+                        f"FLAG sha {sha}{loc} — explicitly cited as a commit but "
+                        "does not resolve in this repository. Verify the citation; "
+                        "correct, soften, or drop an unsupported claim."
+                    )
+                else:
+                    notes.append(
+                        f"NOTE hex {sha}{loc} — does not resolve to a commit in this "
+                        "repository; may be a session/content identifier. Adjudicate "
+                        "whether the document actually cites a commit and verify that claim."
+                    )
                 continue
             in_head = (
                 git(["merge-base", "--is-ancestor", sha, "HEAD"], repo_root)[0] == 0
@@ -356,6 +401,8 @@ def main(argv: list[str]) -> int:
     # --- Report ---------------------------------------------------------------
     for info in infos:
         print(info)
+    for note in notes:
+        print(note)
     for flag in flags:
         print(flag)
     print(

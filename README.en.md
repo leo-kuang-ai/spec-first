@@ -4,7 +4,9 @@
 
 **Turn AI coding sessions into trusted, project-owned changes.**
 
-`spec-first` is a repository-native AI Coding Harness for Claude Code, Codex, Kiro, Qoder, Cursor, OpenCode, ZCode, and Pi. It connects intent, requirements, plans, code, review, evidence, and reusable knowledge in one inspectable engineering loop.
+`spec-first` is a repository-native AI Coding Harness for Claude Code, Codex, Kiro, Qoder, Cursor, OpenCode, ZCode, and Pi. It uses the traditional SDLC / SDD requirements-to-change path as its backbone and connects intent, requirements, plans, code, review, evidence, and reusable knowledge in one inspectable engineering loop.
+
+Its current position is an **AI-enhanced SDLC / SDD workflow harness**. It turns an AI coding session into a trusted, traceable, reusable engineering change. It is not a full AI-DLC platform covering team delivery governance, deployment orchestration, production operations, and operational feedback; those responsibilities belong to existing engineering systems or explicitly connected workflows.
 
 [![npm version](https://img.shields.io/npm/v/spec-first.svg)](https://www.npmjs.com/package/spec-first)
 [![npm monthly downloads](https://img.shields.io/npm/dm/spec-first.svg)](https://www.npmjs.com/package/spec-first)
@@ -158,7 +160,7 @@ Existing PRD -> spec-prd ----------+-> spec-plan -> [spec-write-tasks] -> spec-w
 
 `spec-prd` is the alternative entry for an existing PRD or brownfield request; `spec-doc-review` is an optional cross-stage review lane for requirements, plans, or task packs.
 
-### A minimal end-to-end path
+### A minimal change path
 
 ```text
 Rough idea

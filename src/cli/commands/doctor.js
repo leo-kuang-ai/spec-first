@@ -56,25 +56,25 @@ function runDoctor(argv) {
     const report = buildDoctorReport({ projectRoot, platforms, selectionMode });
     if (parsed.json) {
       printDoctorJson(report);
-      return report.has_error ? 3 : 0;
+      return getDoctorExitCode(report);
     }
 
     printDoctorHumanReport(report, { verbose: parsed.verbose });
     console.log('');
     console.log('未检测到宿主。');
     console.log('运行 `spec-first init`，并在交互提示中选择 Claude Code、Codex、Cursor、Kiro、Qoder、OpenCode、ZCode 和/或 Pi 进行初始化。');
-    return report.has_error ? 3 : 0;
+    return getDoctorExitCode(report);
   }
 
   const report = buildDoctorReport({ projectRoot, platforms, selectionMode });
 
   if (parsed.json) {
     printDoctorJson(report);
-    return report.has_error ? 3 : 0;
+    return getDoctorExitCode(report);
   }
 
   printDoctorHumanReport(report, { verbose: parsed.verbose });
-  return report.has_error ? 3 : 0;
+  return getDoctorExitCode(report);
 }
 
 function printDoctorHumanReport(report, options) {
@@ -1212,7 +1212,7 @@ function buildDoctorReport({ projectRoot, platforms, selectionMode = 'auto' }) {
     const adapter = getAdapter(platform);
     const assetInspection = inspectRuntimeAssetInventory(projectRoot, adapter);
     const platformCliCheck = checkPlatformCli(platform, { selectionMode });
-    const runtimeFileChecks = adapter.inspectRuntimeFiles(projectRoot);
+    const runtimeFileChecks = inspectRuntimeFilesSafely(projectRoot, adapter, platform);
     const commandChecks = adapter.hasCommands ? [checkGeneratedCommands(adapter, assetInspection)] : [];
     const hostSpecificChecks = buildHostSpecificChecks(projectRoot, adapter);
     const coreRuntimeChecks = [
@@ -1308,6 +1308,44 @@ function buildDoctorReport({ projectRoot, platforms, selectionMode = 'auto' }) {
     warnings: allChecks.filter((check) => check.level === 'WARNING'),
     has_error: allChecks.some((check) => check.level === 'ERROR'),
   };
+}
+
+function inspectRuntimeFilesSafely(projectRoot, adapter, platform) {
+  try {
+    return adapter.inspectRuntimeFiles(projectRoot);
+  } catch (error) {
+    const diagnostic = error instanceof Error ? error.message : String(error);
+    return [{
+      level: 'ERROR',
+      name: `${getPlatformDisplayName(platform)} runtime inspection`,
+      message: diagnostic,
+      reasonCode: `${platform}_runtime_inspection_failed`,
+      disposition: 'action_required',
+      fixSafety: 'manual',
+      fix: `Repair the ${platform} runtime paths or rerun \`spec-first init --${platform}\`.`,
+    }];
+  }
+}
+
+function getDoctorExitCode(report) {
+  if (report.has_error) return 3;
+  const hasBlockingActionRequired = report.selection_mode === 'explicit'
+    && report.runtime_asset_health !== 'pass'
+    && Object.entries(report.platform_checks || {}).some(([platform, checks]) => {
+      const supportState = report.host_support
+        && report.host_support[platform]
+        && report.host_support[platform].support_state;
+      if (supportState === 'preview') return false;
+      return Array.isArray(checks) && checks.some((check) => (
+        check.disposition === 'action_required'
+        && typeof check.reasonCode === 'string'
+        && check.reasonCode.startsWith(`${platform}_cli_`)
+      ));
+    });
+  if (hasBlockingActionRequired) {
+    return 3;
+  }
+  return 0;
 }
 
 function summarizeChecks(checks) {

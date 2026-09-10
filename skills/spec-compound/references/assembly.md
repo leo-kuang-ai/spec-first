@@ -21,7 +21,7 @@ The orchestrating agent (main conversation) performs these steps:
 
    The reason to update rather than create: two docs describing the same problem and solution will inevitably drift apart. The newer context is fresher and more trustworthy, so fold it into the existing doc rather than creating a second one that immediately needs consolidation.
 
-   When updating an existing doc, preserve its file path and existing frontmatter structure, but add `source_refs` and `invalidation_condition` when absent because this path materially rewrites the learning. Update the solution, code examples, prevention tips, and any stale references. Add a `last_updated: YYYY-MM-DD` field to the frontmatter. Do not change the title unless the problem framing has materially shifted.
+   When materially rewriting an existing doc, preserve its file path and unrelated metadata, re-evaluate all classification fields under Classification Contract v2 against current evidence, and add `source_refs` and `invalidation_condition` when absent. Update the solution, code examples, prevention tips, and any stale references. Add a `last_updated: YYYY-MM-DD` field to the frontmatter. Do not change the title unless the problem framing has materially shifted.
 
 3. **Incorporate session history findings** (if available). When the internal session-history flow returned relevant prior-session context:
    - Fold investigation dead ends and failed approaches into the **What Didn't Work** section (bug track) or **Context** section (knowledge track)
@@ -70,9 +70,9 @@ Then, applying those criteria, scan the learning candidate **and** the surroundi
 
 > Shared domain vocabulary for this project — entities, named processes, and status concepts with project-specific meaning. Seeded with core domain vocabulary, then accretes as spec-compound and spec-compound-refresh process learnings; direct edits are fine. Glossary only, not a spec or catch-all.
 
-**Refresh the coherence neighborhood of any entry you touch.** When adding or editing an entry, also inspect its *coherence neighborhood* — its cluster siblings and the terms it cross-references or that reference it. Within that neighborhood, do two things: fix glossary violations (implementation specifics — file paths, class names, function signatures, current-config values), and refresh entries the learning's own evidence shows have drifted. Bounds: neighborhood only, never a full-file audit; refresh only on evidence already in hand; if judging a neighbor would require investigation this learning did not do, flag it for `spec-compound-refresh` rather than editing on a guess. The test: after the edit, would a reader find the touched entry's siblings or referenced terms inconsistent with it? Broader audit is `spec-compound-refresh`'s job.
+**Refresh the coherence neighborhood of the investigated area.** Apply the Mutation And Evidence Contract in `references/concepts-vocabulary.md`, including when no new term qualifies. Prepare additions, refinements, synonym folds, and scrubs only in the private candidate. Use evidence already in hand; broader investigation and removal without a surviving entry belong to a scoped `spec-compound-refresh`. Report every change, not just newly added terms.
 
-If no terms qualified after applying the reference's criteria, record that outcome explicitly in the success output (e.g., "Vocabulary capture: scanned, no qualifying terms"). Do not silently skip — the visible scan-and-no-result record is the audit signal that the reference was consulted.
+Report "Vocabulary capture: scanned, no qualifying terms" only when the vocabulary file remains unchanged. Any addition, refinement, fold, or scrub must be reported even when no new term qualified.
 
 **Prepare the vocabulary candidate silently in every mode — no user prompt in interactive, lightweight, or headless.** Vocabulary capture is a declared side effect of compounding, not a separate decision per run; the durable write still waits for the shared promotion decision and target-hash recheck. Lightweight mode reaches this through its own single-pass step (see Lightweight Mode), and runs an **update-only** version — it refines an existing `CONCEPTS.md` but defers creation/seeding to a Full run.
 
@@ -84,7 +84,7 @@ The candidate (and any `CONCEPTS.md` candidate entries from Phase 2.4) may becom
 
    ```bash
    SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read>"
-   bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/validate-doc-claims.py" <candidate-path>
+   bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/validate-doc-claims.py" <candidate-path> --repo-root <target-repo> --target-path <final-learning-path>
    ```
 
    Exit 0 means nothing flagged. Exit 1 means flags to **adjudicate, not auto-fix** — each flagged path, SHA, link, or scaffold pattern is fixed, annotated as historical, or confirmed intentional per the reference's adjudication table. A doc may legitimately cite a path deleted by the very fix it documents; a flag is a question, not a failure. If the script cannot be resolved on this platform, apply the reference's manual checklist and say so in the output — never silently skip.

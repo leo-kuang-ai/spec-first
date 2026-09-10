@@ -730,6 +730,9 @@ function buildInitApplyHostDetails(plan, result, messages) {
   } else if (plan.platform === 'codex' && hasInitDiagnostic(plan, 'codex_home_hook_write_skipped')) {
     details.push(messages.applyHookSkippedCompact);
   }
+  if (result.exit_code !== 0 && result.reason_code) {
+    details.push(`reason_code=${result.reason_code}`);
+  }
   if (result.exit_code !== 0 && result.error) {
     details.push(String(result.error));
   }

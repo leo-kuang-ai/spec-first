@@ -46,6 +46,16 @@ Default project-graph use is appropriate for architecture relationships, cross-f
 
 Default project-graph use is not appropriate for simple factual Q&A, current conversation or current-context summaries, user-provided single-document summarization/editing, or already-scoped file reads. In those cases, answer directly, use bounded source reads, or use baseline search tools first. A workflow may still use project-graph later if the request expands into architecture or impact analysis.
 
+## Project Intelligence Delivery Boundaries
+
+The full semantic contract lives in this document. `using-spec-first` may load a conditional summary when the task shape warrants project intelligence; it does not create a second owner or a mandatory call sequence. High-authority consumers may carry a short local claim ceiling so direct invocation remains safe, but they must not copy this contract's readiness tables or provider commands.
+
+Root instructions and SessionStart hooks are entry pointers and drift diagnostics only. They must not inject the full relay contract, provider commands, readiness snapshots, or a `project-graph -> code-graph -> source` workflow. Provider-native, PreToolUse, and Git hooks may report mechanical readiness, refresh, safety, or guard facts only; hook success never proves a relationship, finding, root cause, plan claim, knowledge promotion, or completion claim.
+
+## Negative Authority And Direct Source Validity
+
+An empty, partial, stale, unmapped, failed, or unavailable graph result has no negative authority: it cannot prove that a call, owner, dependency, affected test, impact, or relationship does not exist. A workflow may begin with direct source, `rg`, ast-grep, or a verbatim current source snippet returned by a native code-graph surface when file and line references are available. Derived graph relationships still require direct confirmation before entering a conclusion-tier claim.
+
 ## Readiness Gate
 
 Availability is anchored in setup-facts, not artifact presence:

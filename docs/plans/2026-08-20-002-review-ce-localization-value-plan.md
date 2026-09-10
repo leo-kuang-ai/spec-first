@@ -1,7 +1,7 @@
 ---
 title: "CE 增量本地化与全量 Skill 研发效能审查方案"
 type: review
-status: active
+status: completed
 date: 2026-08-20
 sequence: 002
 topic: ce-localization-value-review

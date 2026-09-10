@@ -6,7 +6,6 @@ Resolve all `references/...` paths from the `spec-work` skill root.
 
 Mode parsing, metadata-first classification, historical continuation, and blank or bare-prompt routing.
 
-The optional typed caller binding has exactly four fields: `mode`, `target`, `model`, and `source`. `mode` is `prefer` or `require`; `model` is a string pin or `null`; `source` is a non-empty caller-visible provenance string. Fully validate and normalize both before any workspace action. Reject malformed JSON, missing/extra fields, invalid field types or values, unsafe run ids, or duplicate carriers.
 
 ## Not Owned
 
@@ -20,7 +19,7 @@ Read in full at Phase 0 before classifying the invocation.
 
 If this owner cannot be read, preserve state and return blocked before execution.
 
-**First, parse a leading mode token.** If `<input_document>` begins with `mode:return-to-caller` (or the legacy aliases `mode:caller-owned-tail` / `caller:lfg`), strip that token before anything else: the remainder of the string is the plan path, and this run executes in **Return-to-Caller Mode** (see § Return-to-Caller Mode) — implement and locally verify only, then return the structured envelope instead of running the standalone shipping tail. Classify the stripped plan path with the rules below. A mode token with no following path is an error: report it rather than treating `mode:return-to-caller` as a bare prompt.
+**First, parse a leading mode token.** If `<input_document>` begins with `mode:return-to-caller` (or the legacy aliases `mode:caller-owned-tail` / `caller:lfg`), strip that token before anything else: the remainder of the string is the plan path, and this run executes in **Return-to-Caller Mode** (see `references/return-to-caller.md`) — implement and locally verify only, then return the structured envelope instead of running the standalone shipping tail. Classify the stripped plan path with the rules below. A mode token with no following path is an error: report it rather than treating `mode:return-to-caller` as a bare prompt.
 
 Determine how to proceed based on what was provided in `<input_document>` (after any mode token is stripped).
 
@@ -38,7 +37,7 @@ When the current user explicitly requests completion of the historical plan, ret
 
 - If it carries `artifact_contract: spec-unified-plan/v1`, classify `artifact_readiness` before reading the body.
   - `artifact_readiness: requirements-only` -> stop and tell the user this Product Contract needs `spec-plan` enrichment before implementation. Offer the exact `spec-plan <plan-path>` handoff.
-  - `artifact_readiness: implementation-ready` plus `execution: code` -> continue to Phase 1 using the unified-plan reader strategy below.
+  - `artifact_readiness: implementation-ready` plus `execution: code` -> continue to Phase 1 using the bounded reader in `references/work-intake.md`.
   - Any other readiness value or any non-code/unclassified execution mode -> do not auto-execute as code. Route `execution: knowledge-work` to the non-code carve-out; otherwise ask the user to return to `spec-plan` to produce an implementation-ready code plan.
   - Progress-like values (`active`, `in_progress`, `completed`, `done`) are invalid readiness values. Stop and ask for plan repair rather than guessing.
 - If it carries `execution: knowledge-work`, this is a **non-code plan** — read `references/non-code-execution.md` and follow that carve-out instead of the rest of this workflow.

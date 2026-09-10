@@ -1,7 +1,7 @@
 ---
 title: "spec-first 优化执行序列与计划收口 - Plan"
 type: refactor
-status: active
+status: completed
 date: 2026-08-11
 deepened: 2026-08-11
 artifact_contract: spec-unified-plan/v1

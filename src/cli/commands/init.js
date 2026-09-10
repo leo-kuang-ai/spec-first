@@ -195,12 +195,26 @@ async function runInit(argv, promptOverrides = {}) {
     };
     const results = [];
     for (const plan of plans) {
-      const result = applyInitPlan(
-        plan.mode === 'all-repos' ? plan.workspaceRoot : plan.projectRoot,
-        plan,
-        applyContext,
-      );
-      results.push(result);
+      try {
+        const result = applyInitPlan(
+          plan.mode === 'all-repos' ? plan.workspaceRoot : plan.projectRoot,
+          plan,
+          applyContext,
+        );
+        results.push(result);
+      } catch (error) {
+        // 保留已完成宿主的结果，并把当前宿主的异常转成 run-level receipt；
+        // 这样多宿主 init 不会因一个 runtime 失败而丢失 partial 状态。
+        results.push({
+          exit_code: 1,
+          overall_status: 'action-required',
+          reason_code: 'init-exception',
+          diagnostic: error instanceof Error ? error.message : String(error),
+          error: error instanceof Error ? error.message : String(error),
+          rollback_status: error && error.runtimeRollback ? error.runtimeRollback : null,
+          globalDeveloperWriteResult,
+        });
+      }
     }
 
     const userLanguageSyncResult = applyUserLanguageSyncPlan(userLanguageSyncPlan);

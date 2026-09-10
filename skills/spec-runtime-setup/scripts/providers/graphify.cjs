@@ -497,7 +497,11 @@ function apply(context = {}, actionPlan = plan(context)) {
   const generationAction = (actionPlan.actions || []).find(
     (action) => ['first-generation', 'refresh'].includes(action.kind),
   );
-  if (!mutationFailure && generationAction && hasArtifact) {
+  const hookTarget = resolveGraphifyHookTarget(repoRoot, context.targetKind);
+  const hookOutcome = !mutationFailure
+    ? applyGraphifyHookCapability(repoRoot, runtimeContext, hookTarget, pythonProvider)
+    : defaultGraphifyHookOutcome(hookTarget);
+  if (!mutationFailure && generationAction && currentArtifactRefs(repoRoot, actionPlan.artifact_root || path.join(repoRoot, CURRENT_ARTIFACT_ROOT)).length > 0) {
     const receiptWrite = writeGraphifyScopeProvenance(
       repoRoot,
       actionPlan.artifact_root || path.join(repoRoot, CURRENT_ARTIFACT_ROOT),
@@ -513,10 +517,6 @@ function apply(context = {}, actionPlan = plan(context)) {
   );
   const firstGeneration = graphifyFirstGenerationFacts(hasArtifact, scopeProvenance);
   const scopeReadinessBlocked = graphifyScopeReadinessBlocked(scopeProvenance);
-  const hookTarget = resolveGraphifyHookTarget(repoRoot, context.targetKind);
-  const hookOutcome = !mutationFailure
-    ? applyGraphifyHookCapability(repoRoot, runtimeContext, hookTarget, pythonProvider)
-    : defaultGraphifyHookOutcome(hookTarget);
   const generatedThisRun = !mutationFailure && (actionPlan.actions || []).some(
     (action) => ['first-generation', 'refresh'].includes(action.kind),
   );

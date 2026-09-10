@@ -6,6 +6,10 @@ argument-hint: "[optional: brief context] [mode:headless] "
 
 # spec-compound
 
+## Project Intelligence Evidence Boundary
+
+Use graph candidates only to locate material for a solution record. Durable knowledge promotion requires current source, tests, logs, docs, contracts, or owner evidence; `provider_untrusted` candidates, empty results, and handoff artifacts cannot become confirmed knowledge. Fall back to bounded direct reads when providers are unavailable.
+
 **Outcome:** one solved problem becomes a source-grounded, reusable learning under `docs/solutions/`.
 **Done:** the approved candidate is published, applicable validations pass, vocabulary capture is recorded (including no qualifying terms), and the mode's truthful completion report is emitted.
 
@@ -18,6 +22,8 @@ argument-hint: "[optional: brief context] [mode:headless] "
 - **Consumers:** `spec-plan`, `spec-work`, `spec-debug`, `spec-code-review`, and project maintainers.
 
 ## Preconditions And Mode
+
+Only capture reasoning that is not readily recoverable from final code, tests, or existing docs and whose loss would plausibly cause recurrence, material risk, or substantial rediscovery. A completed task, large diff, or explicit invocation does not lower that bar. If no learning qualifies, write nothing.
 
 Document one non-trivial solved problem per run. Process distinct learnings in separate sequential runs with fresh grounding; do not batch drafts and stitch cross-references afterward. If nothing is solved and verified, write nothing and report why.
 

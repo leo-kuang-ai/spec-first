@@ -58,8 +58,10 @@ async function collectInitInput({
   const existingGlobal = readDeveloperFile(getGlobalDeveloperPath());
   const hasGlobalProfile = Boolean(existingGlobal && existingGlobal.name);
   const hasExplicitIdentity = Boolean(parsed.name) || Boolean(parsed.lang);
+  const existingGlobalLang = normalizeSupportedLang(existingGlobal && existingGlobal.lang);
   // 全局 profile 已存在且未显式覆盖时,默认沿用,不再无条件先弹语言/名字提问。
-  const reuseGlobalProfile = hasGlobalProfile && !parsed.yes && !hasExplicitIdentity;
+  const reuseGlobalProfile = hasGlobalProfile && Boolean(existingGlobalLang)
+    && !parsed.yes && !hasExplicitIdentity;
 
   const promptLang = async () => promptApi.select(initMessages.languageSelect, [
     { label: 'Chinese / 中文 (zh)', value: 'zh' },

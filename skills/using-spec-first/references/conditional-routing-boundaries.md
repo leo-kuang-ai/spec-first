@@ -2,6 +2,13 @@
 
 Read this file only when the selected route touches runtime maintenance, existing scenario fingerprints, worker dispatch, the Codex startup reminder, handoff/context reset, knowledge promotion, ordinary-context exclusions, or any write, test, autofix, or commit in a parent multi-repo workspace. Apply only the matching section.
 
+## Project Intelligence
+
+- Read `docs/contracts/project-graph-consumption.md` when the task involves architecture relationships, cross-file impact, broad navigation, or another question where a project map could shrink the next read. This is a task-shaped option, not a mandatory first step or fixed `project-graph -> code-graph -> source` sequence.
+- `project-graph` and `code-graph` output are `provider_untrusted` candidates. Re-ground relationship, ownership, impact, affected-test, root-cause, review, plan, implementation, knowledge, and completion claims in current source, tests, logs, docs, contracts, or owner evidence. Empty results have no negative authority.
+- Simple facts, current context, one user-provided document, and already-scoped files may use direct source, `rg`, or ast-grep immediately. Missing, stale, unknown, unverified, failed, disabled, or unsafe providers are never-blocking for ordinary workflows; use bounded direct reads and record the limitation.
+- Root instructions and SessionStart are short entry pointers. Provider, PreToolUse, and Git hooks provide mechanical readiness/guard facts only; their success cannot prove semantic adequacy or a workflow conclusion.
+
 ## Runtime Maintenance
 
 - Source of truth lives in `skills/`, `templates/`, `src/cli/`, `docs/`, and other checked-in source surfaces. Managed assets under `.claude/`, `.codex/`, `.agents/skills/`, `.cursor/`, `.kiro/`, and `.qoder/` are generated runtime, not source fixes.

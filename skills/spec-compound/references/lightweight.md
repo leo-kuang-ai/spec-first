@@ -2,6 +2,8 @@
 
 Before preparing candidates, read the private-scratch setup in `references/research.md`, candidate validation in `references/assembly.md`, and the shared publication rules in `references/promotion.md`. Read only those named sections; this does not activate Full research, session history, enhancement, or independent validation.
 
+Vocabulary maintenance follows the shared Mutation And Evidence Contract: add, refine, fold, or scrub only an existing file in the investigated neighborhood, through the private candidate. No creation, seeding, or unrelated audit. Report all changes.
+
 ### Lightweight Mode
 
 <critical_requirement>
@@ -31,7 +33,7 @@ The orchestrator (main conversation) performs ALL of the following in one sequen
      echo "Bundled validate-frontmatter.py not resolvable on this platform; applying the parser-safety and promotion checklist manually."
    fi
    ```
-6. **Mechanical claims check**: run `scripts/validate-doc-claims.py` against the candidate exactly as in Phase 2.45 step 1 (same `SKILL_DIR` anchor, same adjudicate-not-auto-fix rule — read `references/grounding-validation.md` for the adjudication table when it flags anything).
+6. **Mechanical claims check**: run `scripts/validate-doc-claims.py` against the candidate with explicit `--repo-root <target-repo> --target-path <final-learning-path>` exactly as in Phase 2.45 step 1. Read `references/grounding-validation.md` for FLAG, NOTE, or unavailable Git classification results, even on exit 0. Adjudicate cited commits; ordinary IDs need no correction. Record missing Git evidence as degraded, never as verified. Keep the same `SKILL_DIR` anchor and adjudicate-not-auto-fix rule.
 7. **Semantic promotion decision and publication**: apply Phase 2.47 inline. Reconfirm that the learning remains low-risk, resolved, source-grounded, and backed by verification evidence; judge source relevance and invalidation adequacy rather than treating mechanical validation as semantic approval. Only a `promote` decision may publish the candidate through the per-target atomic boundary. Any failed pre-publication check, target drift, or unresolved contradiction leaves final paths unchanged and emits `Documentation skipped`. A failure after the first successful publication must report the exact partial publication as incomplete; never claim all targets stayed unchanged or emit `Documentation complete`.
 8. **Skip optional candidate enhancement** (Phase 2.46) and the separate semantic grounding validator (Phase 2.45 step 2) to conserve context. This does not skip the orchestrator's semantic promotion decision.
 

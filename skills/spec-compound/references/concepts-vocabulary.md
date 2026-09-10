@@ -2,6 +2,15 @@
 
 `CONCEPTS.md` defines the words that mean something specific in this codebase — substrate that `docs/solutions/` and AGENTS.md can cite without redefinition. Lives at the repo root. Terms enter two ways — accretion and seeding (below) — and the file is created the first time either path produces a qualifying entry.
 
+## Mutation And Evidence Contract
+
+- Capture may add, refine, fold synonyms into a surviving entry, and scrub glossary violations. A fold preserves the old name as an alias and repairs in-scope cross-references.
+- Lightweight is update-only: it may perform those operations on an existing file, but never create or seed one.
+- Removal of a concept without a surviving entry belongs to an explicitly scoped refresh decision backed by positive evidence of replacement or removal. A missing class, failed search, or absent corroboration is not evidence that a domain concept ceased to exist; uncertainty leaves the entry standing.
+- Keep current vocabulary focused on active concepts. Preserve historical explanations only where an actual historical consumer needs them; do not add a routine retired-concepts catalog.
+- The coherence neighborhood is the area's cluster siblings and terms that reference one another. During capture inspect that neighborhood even if no new term qualifies, using only evidence already investigated. Broader investigation belongs to a scoped refresh.
+- Report every changed entry (added, refined, folded, scrubbed). Report "scanned, no qualifying terms" only if the file is unchanged. These semantic decisions never bypass the caller's candidate, validation, authorization, or publication rules.
+
 ## How terms enter: accretion and seeding
 
 Two paths populate the file, and they cover different gaps:
@@ -20,7 +29,7 @@ Define the core domain nouns the area's **declared domain model** exposes that m
 
 ## Be opinionated
 
-When the team uses several words for the same concept, pick the best one and retire the rest. Record retired synonyms as aliases on the entry (see "Per entry"). Settled distinctions go to the Flagged ambiguities tail. The glossary is not a record of all words the team has ever used — it is the team's agreed-upon vocabulary.
+When the team uses several words for the same concept, pick the best one and fold the synonyms into its aliases. A synonym fold is not concept retirement. Settled distinctions go to the Flagged ambiguities tail. The glossary is the team's agreed-upon vocabulary.
 
 ## The file stands on its own
 
@@ -36,13 +45,13 @@ Cross-references between entries within `CONCEPTS.md` are fine — they resolve 
 
 ## What earns a slot
 
-A term qualifies when its meaning here is precise enough that a new engineer would need it defined to follow conversations, tickets, or code. General programming vocabulary does not belong, even when used heavily.
+A term qualifies when its meaning here is precise enough that a new engineer would need it defined to follow conversations, tickets, or code, and it is a concept in its own right rather than merely a property of an existing concept. Apply the same criteria when maintaining existing headings. General programming vocabulary does not belong, even when used heavily.
 
 ## Per entry
 
 Definition is one sentence — what the term means in this domain, what makes it distinct from neighbors. A term with non-obvious behavioral rules (lifecycle, cancellation semantics, ownership invariants) earns a second paragraph for those rules — never for elaborating the definition itself.
 
-When retired synonyms exist, list them as an aliases line directly under the definition: *Avoid: Booking, appointment*. Entities typically need more depth than value types; status concepts may need transition notes.
+When folded synonyms exist, list them as an aliases line directly under the definition: *Avoid: Booking, appointment*. Entities typically need more depth than value types; status concepts may need transition notes.
 
 ## Relationships (optional)
 

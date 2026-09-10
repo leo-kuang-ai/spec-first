@@ -2,6 +2,15 @@
 
 `CONCEPTS.md` defines the words that mean something specific in this codebase — substrate that `docs/solutions/` and AGENTS.md can cite without redefinition. Lives at the repo root. Terms enter two ways — accretion and seeding (below) — and the file is created the first time either path produces a qualifying entry.
 
+## Mutation And Evidence Contract
+
+- Capture may add, refine, fold synonyms into a surviving entry, and scrub glossary violations. A fold preserves the old name as an alias and repairs in-scope cross-references.
+- Lightweight is update-only: it may perform those operations on an existing file, but never create or seed one.
+- Removal of a concept without a surviving entry belongs to an explicitly scoped refresh decision backed by positive evidence of replacement or removal. A missing class, failed search, or absent corroboration is not evidence that a domain concept ceased to exist; uncertainty leaves the entry standing.
+- Keep current vocabulary focused on active concepts. Preserve historical explanations only where an actual historical consumer needs them; do not add a routine retired-concepts catalog.
+- The coherence neighborhood is the area's cluster siblings and terms that reference one another. During capture inspect that neighborhood even if no new term qualifies, using only evidence already investigated. Broader investigation belongs to a scoped refresh.
+- Report every changed entry (added, refined, folded, scrubbed). Report "scanned, no qualifying terms" only if the file is unchanged. These semantic decisions never bypass the caller's candidate, validation, authorization, or publication rules.
+
 ## How terms enter: accretion and seeding
 
 Two paths populate the file, and they cover different gaps:
@@ -20,7 +29,7 @@ Define the core domain nouns the area's **declared domain model** exposes that m
 
 ## Be opinionated
 
-When the team uses several words for the same concept, pick the best one and retire the rest. Record retired synonyms as aliases on the entry (see "Per entry"). Settled distinctions go to the Flagged ambiguities tail. The glossary is not a record of all words the team has ever used — it is the team's agreed-upon vocabulary.
+When the team uses several words for the same concept, pick the best one and fold the synonyms into its aliases. A synonym fold is not concept retirement. Settled distinctions go to the Flagged ambiguities tail. The glossary is the team's agreed-upon vocabulary.
 
 ## The file stands on its own
 
@@ -36,13 +45,13 @@ Cross-references between entries within `CONCEPTS.md` are fine — they resolve 
 
 ## What earns a slot
 
-A term qualifies when its meaning here is precise enough that a new engineer would need it defined to follow conversations, tickets, or code. General programming vocabulary does not belong, even when used heavily.
+A term qualifies when its meaning here is precise enough that a new engineer would need it defined to follow conversations, tickets, or code, and it is a concept in its own right rather than merely a property of an existing concept. Apply the same criteria when maintaining existing headings. General programming vocabulary does not belong, even when used heavily.
 
 ## Per entry
 
 Definition is one sentence — what the term means in this domain, what makes it distinct from neighbors. A term with non-obvious behavioral rules (lifecycle, cancellation semantics, ownership invariants) earns a second paragraph for those rules — never for elaborating the definition itself.
 
-When retired synonyms exist, list them as an aliases line directly under the definition: *Avoid: Booking, appointment*. Entities typically need more depth than value types; status concepts may need transition notes.
+When folded synonyms exist, list them as an aliases line directly under the definition: *Avoid: Booking, appointment*. Entities typically need more depth than value types; status concepts may need transition notes.
 
 ## Relationships (optional)
 
@@ -79,7 +88,7 @@ The act of placing a Party at a Table once the Party arrives. A Reservation has 
 
 ## Vocabulary capture during a refresh
 
-After the per-learning actions execute, aggregate the domain terms flagged across Phase 1's Vocabulary dimension and reconcile them with `CONCEPTS.md`.
+After preparing per-learning actions, aggregate domain terms flagged during investigation and reconcile them in a private candidate for `CONCEPTS.md`. Record the target's existence/SHA-256 and read `references/publication.md`; no durable glossary edit occurs before validation and semantic approval. The explicit repo-wide bootstrap uses the same publication path.
 
 **First, read `references/concepts-vocabulary.md`.** This is unconditional. Do not pre-judge from memory which Phase 1 signals qualify — the reference's criteria are non-obvious and a "nothing qualifies" judgment without reading is a shortcut, not a result.
 
@@ -94,11 +103,10 @@ After the per-learning actions execute, aggregate the domain terms flagged acros
    > Shared domain vocabulary for this project — entities, named processes, and status concepts with project-specific meaning. Seeded with core domain vocabulary, then accretes as spec-compound and spec-compound-refresh process learnings; direct edits are fine. Glossary only, not a spec or catch-all.
 
    Then add entries. Let term count drive shape: 1-4 terms → flat headings, more → cluster by domain relationship per the rules in `references/concepts-vocabulary.md`.
-6. **Scrub violations.** Scan existing entries for content that violates `references/concepts-vocabulary.md` criteria — implementation specifics (file paths, class names, function signatures, code references), current-config values (thresholds, counts, enum values that will drift), status/owner/date metadata, duplicates of terms covered under a different name, or entries that lean on an undefined project-specific sibling (add the sibling or rephrase). Rewrite or consolidate. The full sweep is appropriate here because refresh is an audit; spec-compound's same-named phase scopes corrections to the coherence neighborhood of entries being touched.
+6. **Scrub within scope.** Inspect the investigated area's entries and the coherence neighborhood needed to understand them. Correct glossary violations using evidence already gathered: implementation specifics, volatile configuration, duplicate synonyms, or undefined project-specific siblings. Leave out-of-scope entries unchanged and report broader cleanup separately. A full glossary sweep requires an explicitly repo-wide vocabulary maintenance scope; a broad learning refresh alone does not grant it. Concept retirement additionally needs positive removal/replacement evidence and preservation of any substantive references; synonym folding preserves the surviving entry and aliases.
 
-If no Phase 1 signals qualified after applying the reference's criteria, record that outcome explicitly in the report's `CONCEPTS.md` line (e.g., "scanned, no qualifying terms"). Do not silently skip — the visible scan-and-no-result record is the audit signal that the reference was consulted.
+Report actual published additions, refinements, folds, scrubs, and authorized retirements in the report's `CONCEPTS.md` line; distinguish unpublished candidates and recommendations. Use "scanned, no qualifying terms" only when no change qualifies, not when a qualifying candidate failed publication. Zero new terms does not mean zero changes.
 
-Note: if this run **creates** `CONCEPTS.md` from scratch, the Discoverability Check below also surfaces it so future agents can discover it — by editing `AGENTS.md`/`CLAUDE.md` in interactive mode (with consent), or, in headless mode, by emitting a "Discoverability recommendation" line in the report rather than editing instruction files (per the headless boundary in step 4c — headless does doc maintenance, not project config). Either way the created file is surfaced or flagged for surfacing; subsequent runs skip this because the instruction file is already current or the recommendation was already reported.
+After successful vocabulary publication, run the mode-aware Discoverability Check. A prior recommendation does not prove the instruction file was updated: later runs recheck the actual source before considering discovery covered. Failed publication never reports a newly created glossary as available.
 
-**Apply edits silently — no user prompt in any mode.** Vocabulary capture is a side effect of refreshing, not a decision the user makes per run.
-
+**Prepare candidates silently within the authorized scope.** Vocabulary capture is a declared refresh side effect, not a new approval per term. Durable publication still follows `references/publication.md`; a scoped refresh never silently acquires repo-wide vocabulary authority.

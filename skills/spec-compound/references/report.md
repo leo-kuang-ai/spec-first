@@ -57,7 +57,7 @@ Auto memory: 2 relevant entries used as supplementary evidence
 Execution: <dispatched | inline-serial (`dispatch_authorization_missing` | `subagent_capability_missing` | `worker_capability_unproven`)>
 
 Research Results:
-  ✓ Context Analyzer: Identified performance_issue in brief_system, category: performance-issues/
+  ✓ Context Analyzer: Identified performance_issue in runtime, category: performance-issues/
   ✓ Solution Extractor: 3 code fixes, prevention strategies
   ✓ Related Docs Finder: 2 related issues
   ✓ Session History: 3 prior sessions on same branch, 2 failed approaches surfaced

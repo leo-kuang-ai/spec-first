@@ -78,6 +78,8 @@ Ask one question at a time. Options should include a recommended answer when def
 
 Follows `docs/contracts/project-graph-consumption.md`: `capability-class` candidates such as `code-graph` or `project-graph` are advisory only. Check `readiness_status` before use; PRD conclusions must be re-grounded in source, and a candidate must never decide scope authority. Record used candidates as `provider_untrusted`, never-block on availability, keep setup-side `lifecycle.fallback_used` separate; fall back to direct source reads on missing/`unknown`/`unverified`/failure/disabled.
 
+Direct invocation retains the same ceiling: graph candidates cannot become confirmed product scope or current-state behavior without source, tests, docs, contracts, or owner evidence.
+
 ## Core Principles
 
 1. **Brownfield first** - Establish the current system snapshot before writing new behavior.

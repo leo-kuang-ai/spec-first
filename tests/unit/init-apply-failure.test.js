@@ -308,6 +308,32 @@ describe('init run-level global developer prerequisite', () => {
     expect(thrown.message).toContain('spec-first init 已把受管 runtime 回滚到本次写入前状态');
   });
 
+  test('regular-path rollback removes directories created by ensure_dir', () => {
+    const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-init-rollback-dir-'));
+    const createdDir = path.join(projectRoot, 'new-managed-dir');
+    const blockedTarget = path.join(projectRoot, 'blocked-target');
+    fs.mkdirSync(blockedTarget);
+    const { applyProjectInitPlan } = loadInitApplyWithDeveloper({
+      writeGlobalDeveloperFile: jest.fn(),
+    });
+
+    let thrown;
+    try {
+      applyProjectInitPlan(projectRoot, makeProjectPlan(projectRoot, makeGlobalWrite(), {
+        writePlan: emptyOperationPlan([
+          { kind: 'ensure_dir', path: 'new-managed-dir' },
+          { kind: 'write_file', path: 'blocked-target', contents: 'never written\n' },
+        ]),
+      }));
+    } catch (caught) {
+      thrown = caught;
+    }
+
+    expect(thrown).toMatchObject({ code: 'EISDIR', runtimeRollback: 'restored' });
+    expect(fs.existsSync(createdDir)).toBe(false);
+    expect(fs.statSync(blockedTarget).isDirectory()).toBe(true);
+  });
+
   test('write failure rolls back files removed by preSync and preserves the old state manifest', () => {
     const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-init-presync-'));
     const obsoleteAsset = path.join(projectRoot, 'obsolete-asset.md');

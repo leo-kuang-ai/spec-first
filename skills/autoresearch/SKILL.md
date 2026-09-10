@@ -5,6 +5,10 @@ description: "Autonomous goal-directed iteration loop: modify, verify, keep/disc
 
 # Autoresearch — Autonomous Goal-directed Iteration
 
+## Project Intelligence Evidence Boundary
+
+Graph output is `provider_untrusted` navigation for an iteration or subcommand, never proof that a predicate, diagnosis, security finding, implementation, or field outcome is correct. Re-ground code claims in current source, tests, logs, contracts, or the downstream owner; empty results have no negative authority. Direct reads remain valid when providers are unavailable, and dispatch authorization plus the existing ship gate remain separate from evidence adequacy.
+
 ## Safety Invariants (all subcommands)
 - Never push, publish, or deploy without explicit user approval.
 - Bounded by default. Override with `Iterations: unlimited`.

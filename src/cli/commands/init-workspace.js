@@ -298,18 +298,40 @@ function applyWorkspaceInitPlan(workspaceRoot, plan, context = {}) {
   });
 
   if (!plan.dryRun) {
-    const writeResult = writeWorkspaceInitSummaryFiles(normalizedWorkspaceRoot, summary);
-    if (!writeResult.ok) {
+    try {
+      const writeResult = writeWorkspaceInitSummaryFiles(normalizedWorkspaceRoot, summary);
+      if (!writeResult.ok) {
+        summary.summary_write_status = 'failed';
+        summary.summary_write_reason_code = writeResult.reason_code;
+        return {
+          exit_code: 1,
+          workspace_summary: summary,
+          workspace_summary_paths: [],
+          globalDeveloperWriteResult: prerequisite.globalDeveloperWriteResult,
+          error: `workspace init summary path is unsafe (${writeResult.reason_code})`,
+        };
+      }
+      summary.workspace_summary_index = writeResult.index_summary || null;
+      summary.workspace_summary_paths = writeResult.paths;
+      summary.summary_write_status = 'ready';
+      summary.summary_write_reason_code = null;
+    } catch (error) {
+      const reasonCode = 'workspace-summary-write-failed';
+      summary.summary_write_status = 'failed';
+      summary.summary_write_reason_code = reasonCode;
+      summary.summary_write_diagnostic = error instanceof Error ? error.message : String(error);
+      summary.summary_write_rollback_status = error.workspaceSummaryRollback || 'unknown';
       return {
         exit_code: 1,
         workspace_summary: summary,
         workspace_summary_paths: [],
         globalDeveloperWriteResult: prerequisite.globalDeveloperWriteResult,
-        error: `workspace init summary path is unsafe (${writeResult.reason_code})`,
+        summary_write_status: 'failed',
+        summary_write_reason_code: reasonCode,
+        summary_write_rollback_status: summary.summary_write_rollback_status,
+        error: `${reasonCode}: ${summary.summary_write_diagnostic}`,
       };
     }
-    summary.workspace_summary_index = writeResult.index_summary || null;
-    summary.workspace_summary_paths = writeResult.paths;
   }
 
   const actionRequiredCount = summary.counts.action_required + summary.counts.parent_runtime_action_required;
@@ -381,8 +403,26 @@ function persistWorkspaceUserLanguageSyncSummaries(plans, results, userLanguageS
       return;
     }
     result.workspace_summary.user_language_sync = summary;
-    const writeResult = writeWorkspaceInitSummaryFiles(plan.workspaceRoot, result.workspace_summary);
+    let writeResult;
+    try {
+      writeResult = writeWorkspaceInitSummaryFiles(plan.workspaceRoot, result.workspace_summary);
+    } catch (error) {
+      const reasonCode = 'workspace-summary-write-failed';
+      result.workspace_summary.summary_write_status = 'failed';
+      result.workspace_summary.summary_write_reason_code = reasonCode;
+      result.workspace_summary.summary_write_diagnostic = error instanceof Error ? error.message : String(error);
+      result.workspace_summary.summary_write_rollback_status = error.workspaceSummaryRollback || 'unknown';
+      failures.push({
+        platform: plan.platform,
+        reason_code: reasonCode,
+        diagnostic: result.workspace_summary.summary_write_diagnostic,
+        rollback_status: result.workspace_summary.summary_write_rollback_status,
+      });
+      return;
+    }
     if (!writeResult.ok) {
+      result.workspace_summary.summary_write_status = 'failed';
+      result.workspace_summary.summary_write_reason_code = writeResult.reason_code;
       failures.push({
         platform: plan.platform,
         reason_code: writeResult.reason_code,
@@ -443,13 +483,26 @@ function writeWorkspaceInitSummaryFiles(workspaceRoot, summary) {
     }
   }
 
-  writeJsonFileAtomic(platformSummaryPath, summary);
+  const snapshots = [platformSummaryPath, summaryPath].map(snapshotWorkspaceSummaryTarget);
+  summary.summary_write_status = 'ready';
+  summary.summary_write_reason_code = null;
+  try {
+    writeJsonFileAtomic(platformSummaryPath, summary);
+  } catch (error) {
+    attachWorkspaceSummaryRollback(error, restoreWorkspaceSummaryTargets(snapshots));
+    throw error;
+  }
   const platformRelativePath = toWorkspaceRelativePath(platformSummaryPath, workspaceRoot);
   const multiPlatform = (Array.isArray(summary.platforms) && summary.platforms.length > 1)
     || (Number.isInteger(summary.platform_count) && summary.platform_count > 1);
 
   if (!multiPlatform) {
-    writeJsonFileAtomic(summaryPath, summary);
+    try {
+      writeJsonFileAtomic(summaryPath, summary);
+    } catch (error) {
+      attachWorkspaceSummaryRollback(error, restoreWorkspaceSummaryTargets(snapshots));
+      throw error;
+    }
     return {
       ok: true,
       paths: [
@@ -466,7 +519,12 @@ function writeWorkspaceInitSummaryFiles(workspaceRoot, summary) {
     currentSummary: summary,
     currentSummaryRelativePath: platformRelativePath,
   });
-  writeJsonFileAtomic(summaryPath, indexSummary);
+  try {
+    writeJsonFileAtomic(summaryPath, indexSummary);
+  } catch (error) {
+    attachWorkspaceSummaryRollback(error, restoreWorkspaceSummaryTargets(snapshots));
+    throw error;
+  }
   return {
     ok: true,
     paths: [
@@ -475,6 +533,70 @@ function writeWorkspaceInitSummaryFiles(workspaceRoot, summary) {
     ],
     index_summary: indexSummary,
   };
+}
+
+function snapshotWorkspaceSummaryTarget(filePath) {
+  try {
+    const stat = fs.lstatSync(filePath);
+    if (!stat.isFile()) {
+      return { filePath, exists: true, regularFile: false };
+    }
+    return {
+      filePath,
+      exists: true,
+      regularFile: true,
+      contents: fs.readFileSync(filePath),
+      mode: stat.mode & 0o777,
+    };
+  } catch (error) {
+    if (error && error.code === 'ENOENT') {
+      return { filePath, exists: false, regularFile: false };
+    }
+    throw error;
+  }
+}
+
+function restoreWorkspaceSummaryTargets(snapshots) {
+  const failures = [];
+  for (const snapshot of [...snapshots].reverse()) {
+    try {
+      let current;
+      try {
+        current = fs.lstatSync(snapshot.filePath);
+      } catch (error) {
+        if (error && error.code === 'ENOENT') current = null;
+        else throw error;
+      }
+
+      if (snapshot.exists && !snapshot.regularFile) {
+        // Existing directories/special files were not replaced by writeFileAtomic;
+        // leave them untouched rather than making rollback destructive.
+        continue;
+      }
+
+      if (current && (current.isSymbolicLink() || !current.isFile())) {
+        failures.push({
+          filePath: snapshot.filePath,
+          error: new Error('workspace summary rollback target changed type'),
+        });
+        continue;
+      }
+      if (current) fs.unlinkSync(snapshot.filePath);
+      if (!snapshot.exists) continue;
+
+      writeFileAtomic(snapshot.filePath, snapshot.contents);
+      if (typeof snapshot.mode === 'number') fs.chmodSync(snapshot.filePath, snapshot.mode);
+    } catch (error) {
+      failures.push({ filePath: snapshot.filePath, error });
+    }
+  }
+  return failures;
+}
+
+function attachWorkspaceSummaryRollback(error, failures) {
+  if (!error || typeof error !== 'object') return;
+  error.workspaceSummaryRollback = failures.length === 0 ? 'restored' : 'restore-failed';
+  if (failures.length > 0) error.workspaceSummaryRollbackFailures = failures;
 }
 
 function workspaceInitSummaryFileName(platform) {

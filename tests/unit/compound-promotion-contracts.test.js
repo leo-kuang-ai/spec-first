@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
+const yaml = require('js-yaml');
 
 const PACKAGE_ROOTS = [
   'skills/spec-compound',
@@ -62,6 +63,25 @@ function markdownSection(text, heading, nextHeading) {
 }
 
 describe('compound knowledge-promotion contract', () => {
+  test.each(PACKAGE_ROOTS)('%s classifies harness responsibilities with shared closed enums', (packageRoot) => {
+    const schema = yaml.safeLoad(read(`${packageRoot}/references/schema.yaml`));
+    const components = schema.required_fields.component;
+    expect(components.type).toBe('enum');
+    expect(components.values).toEqual([
+      'cli', 'workflow', 'skill', 'runtime', 'provider', 'contract',
+      'verification', 'knowledge', 'governance', 'application_code',
+      'development_workflow', 'testing_framework', 'documentation', 'tooling',
+    ]);
+    const causes = schema.track_rules.bug.required.root_cause;
+    expect(causes.type).toBe('enum');
+    expect(causes.values).toEqual(schema.track_rules.knowledge.optional.root_cause.values);
+    expect(causes.values).toEqual(expect.arrayContaining([
+      'contract_drift', 'source_runtime_drift', 'stale_context', 'ownership_violation',
+    ]));
+    expect(schema.bug_optional_fields.framework_version.type).toBe('string');
+    expect(schema.bug_optional_fields.rails_version).toBeUndefined();
+  });
+
   test.each(PACKAGE_ROOTS)('%s schema and template require provenance plus invalidation for promotion', (packageRoot) => {
     const schema = read(`${packageRoot}/references/schema.yaml`);
     const yamlGuide = read(`${packageRoot}/references/yaml-schema.md`);
@@ -79,6 +99,7 @@ describe('compound knowledge-promotion contract', () => {
   test('compound and refresh workflows invoke the same promotion validation mode', () => {
     const compound = read('skills/spec-compound/SKILL.md');
     const refresh = read('skills/spec-compound-refresh/references/per-action-flows.md');
+    const refreshPublication = read('skills/spec-compound-refresh/references/publication.md');
 
     const compoundFull = markdownSection(compound, '### Phase 2: Assembly & Candidate Validation', '### Phase 2.4:');
     const compoundLightweight = read('skills/spec-compound/references/lightweight.md');
@@ -90,14 +111,18 @@ describe('compound knowledge-promotion contract', () => {
       expect(section).toContain('source_refs');
       expect(section).toContain('invalidation_condition');
     }
-    expect(refreshConsolidate).toContain('validate-frontmatter.py" --promotion <canonical-learning-path>');
+    expect(refreshConsolidate).toContain('references/publication.md');
     expect(refreshConsolidate).toContain('source_refs');
     expect(refreshConsolidate).toContain('invalidation_condition');
-    expect(refreshConsolidate.indexOf('validate-frontmatter.py" --promotion <canonical-learning-path>'))
-      .toBeLessThan(refreshConsolidate.indexOf('Delete the subsumed doc only after'));
-    expect(refreshReplace).toContain('validate-frontmatter.py" --promotion <new-learning-path>');
+    expect(refreshConsolidate.indexOf('Validate through'))
+      .toBeLessThan(refreshConsolidate.indexOf('then delete subsumed paths'));
+    expect(refreshReplace).toContain('references/publication.md');
     expect(refreshReplace).toContain('source_refs');
     expect(refreshReplace).toContain('invalidation_condition');
+    expect(refreshPublication).toContain('validate-frontmatter.py" --promotion <candidate-path>');
+    expect(refreshPublication.indexOf('## Validate Candidates'))
+      .toBeLessThan(refreshPublication.indexOf('## Publish'));
+    expect(refreshPublication).toContain('--repo-root <target-repo> --target-path <final-learning-path>');
   });
 
   test('knowledge harness describes the deterministic floor without claiming semantic automation', () => {

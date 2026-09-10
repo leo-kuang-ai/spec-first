@@ -5,6 +5,10 @@ description: "Use this standalone skill when the user asks to mine a repo's exis
 
 # Spec Rule Miner
 
+## Project Intelligence Evidence Boundary
+
+`project-graph`/`code-graph` results are `provider_untrusted` advisory candidates for where to inspect. Each mined rule must return to current source evidence and its sampling limits; candidates, empty results, and provider success cannot become confirmed project policy. Fall back to bounded source reads when readiness is unknown or unavailable.
+
 ## Purpose
 
 `spec-rule-miner` 从目标仓库的真实代码中提炼项目级 AI 编码规则，把完整规则写入独立规则文件，并让 `AGENTS.md` / `CLAUDE.md` 这类 host 入口文件引用该文件。它是 standalone skill，不是 `spec-*` public workflow。

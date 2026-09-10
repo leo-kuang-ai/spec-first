@@ -5,6 +5,16 @@ const { phaseFiles } = require('../helpers/compound-contract');
 const read = file => fs.readFileSync(`skills/spec-compound/${file}`, 'utf8');
 
 describe('compound phase reference migration', () => {
+  test('vocabulary-only maintenance is reported and retains private publication', () => {
+    const assembly = read('references/assembly.md');
+    const vocabulary = read('references/concepts-vocabulary.md');
+    expect(assembly).toContain('even when no new term qualified');
+    expect(assembly).toContain('only in the private candidate');
+    expect(vocabulary).toContain('A synonym fold is not concept retirement');
+    expect(vocabulary).toContain('uncertainty leaves the entry standing');
+    expect(read('references/yaml-schema.md')).toContain('Every material rewrite re-evaluates all classification fields');
+  });
+
   test('entrypoint routes every phase while retaining publication and mode boundaries', () => {
     const entry = read('SKILL.md');
     for (const file of phaseFiles) {

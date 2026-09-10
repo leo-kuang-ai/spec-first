@@ -6,10 +6,10 @@ const path = require('node:path');
 
 jest.mock('../../src/cli/external-command', () => ({
   isCommandTimeout: () => false,
-  spawnSyncWithTimeout: (command) => ({
+  spawnSyncWithTimeout: jest.fn((command) => ({
     status: 0,
     stdout: `${command} test-version\n`,
-  }),
+  })),
 }));
 
 jest.mock('../../src/cli/plugin', () => {
@@ -32,6 +32,7 @@ jest.mock('../../src/cli/plugin', () => {
 const { getAdapter } = require('../../src/cli/adapters');
 const { runDoctor } = require('../../src/cli/commands/doctor');
 const { syncSkills } = require('../../src/cli/plugin');
+const { spawnSyncWithTimeout } = require('../../src/cli/external-command');
 
 describe('doctor runtime asset inventory', () => {
   test('passes a missing agents directory when the bundled agent inventory is empty', () => {
@@ -109,6 +110,60 @@ describe('doctor runtime asset inventory', () => {
     } finally {
       Object.defineProperty(process, 'version', previousVersion);
       process.chdir(previousCwd);
+      log.mockRestore();
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('returns structured JSON when a runtime root is a file instead of a directory', () => {
+    const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-doctor-malformed-runtime-'));
+    const previousCwd = process.cwd();
+    fs.mkdirSync(path.join(projectRoot, '.claude', 'agents'), { recursive: true });
+    fs.writeFileSync(path.join(projectRoot, '.claude', 'skills'), 'blocked\n', 'utf8');
+    const log = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+    try {
+      process.chdir(projectRoot);
+      expect(runDoctor(['--claude', '--json'])).toBe(3);
+      const report = JSON.parse(log.mock.calls.at(-1)[0]);
+      expect(report.checks).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          level: 'ERROR',
+          reasonCode: 'claude_runtime_inspection_failed',
+        }),
+      ]));
+    } finally {
+      process.chdir(previousCwd);
+      log.mockRestore();
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('returns exit code 3 for an explicitly selected host CLI missing from PATH', () => {
+    const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-doctor-cli-missing-'));
+    const previousCwd = process.cwd();
+    const log = jest.spyOn(console, 'log').mockImplementation(() => {});
+    spawnSyncWithTimeout.mockImplementation((command) => command === 'claude'
+      ? { status: -1, stdout: '', error: { code: 'ENOENT' } }
+      : { status: 0, stdout: `${command} test-version\n` });
+
+    try {
+      process.chdir(projectRoot);
+      expect(runDoctor(['--claude', '--json'])).toBe(3);
+      const report = JSON.parse(log.mock.calls.at(-1)[0]);
+      expect(report.platform_checks.claude).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          reasonCode: 'claude_cli_not_found',
+          disposition: 'action_required',
+        }),
+      ]));
+    } finally {
+      process.chdir(previousCwd);
+      spawnSyncWithTimeout.mockReset();
+      spawnSyncWithTimeout.mockImplementation((command) => ({
+        status: 0,
+        stdout: `${command} test-version\n`,
+      }));
       log.mockRestore();
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }

@@ -8,7 +8,7 @@ argument-hint: "[Plan doc path or description of work. Blank to auto use latest 
 
 ## Project Intelligence Evidence Boundary
 
-Graph candidates may orient implementation or affected-surface inspection, but they are never implementation basis or completion evidence by themselves. Re-ground changes and completion claims in the settled plan, current source, tests, logs, contracts, and owner evidence; direct reads are valid and empty results have no negative authority. Provider failure falls back without blocking ordinary work.
+Graph candidates are `provider_untrusted` navigation that may orient implementation or affected-surface inspection, but they are never implementation basis or completion evidence by themselves. Re-ground changes and completion claims in the settled plan, current source, tests, logs, contracts, and owner evidence; direct reads are valid and empty results have no negative authority. Provider failure falls back without blocking ordinary work.
 
 Execute work efficiently while maintaining quality and finishing features.
 

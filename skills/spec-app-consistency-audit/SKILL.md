@@ -6,6 +6,10 @@ argument-hint: "[mode:headless|mode:report-only] [base:<ref>] [source:<path>] [p
 
 # App Consistency Audit
 
+## Project Intelligence Evidence Boundary
+
+Use `project-graph`/`code-graph` only as `provider_untrusted` navigation candidates when the audit expands beyond a bounded screen or source surface. Confirm every impact, ownership, or inconsistency finding in current source, PRD, design, tests, or owner evidence; an empty graph result has no negative authority. Provider unavailability falls back to bounded direct reads and does not block the audit.
+
 Run a static-first consistency audit for mobile App work before simulator, real-device, or package validation.
 
 ## Routing Gate — read before doing anything

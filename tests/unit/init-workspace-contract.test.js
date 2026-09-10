@@ -336,6 +336,13 @@ describe('init workspace contract', () => {
       '.spec-first/workspace/init-summary.json',
       '.spec-first/workspace/init-summary-codex.json',
     ]);
+    expect(JSON.parse(fs.readFileSync(
+      path.join(workspaceRoot, '.spec-first', 'workspace', 'init-summary-codex.json'),
+      'utf8',
+    ))).toMatchObject({
+      summary_write_status: 'ready',
+      summary_write_reason_code: null,
+    });
     for (const targetRoot of [workspaceRoot, childRoot]) {
       for (const relativePath of [
         'AGENTS.md',
@@ -434,6 +441,36 @@ describe('init workspace contract', () => {
     });
     expect(writer).toHaveBeenCalledTimes(1);
     expect(fs.readdirSync(outsideRoot)).toEqual([]);
+  });
+
+  test('captures an atomic summary writer failure after runtime apply', () => {
+    const { workspaceRoot, childRoot } = createWorkspace();
+    fs.mkdirSync(path.join(workspaceRoot, '.spec-first', 'workspace'), { recursive: true });
+    fs.mkdirSync(path.join(workspaceRoot, '.spec-first', 'workspace', 'init-summary.json'));
+    const plan = buildCodexWorkspacePlan(workspaceRoot, childRoot, { dryRun: false });
+    const resolvedPath = path.join(workspaceRoot, 'home', '.spec-first', '.developer');
+    const result = applyWorkspaceInitPlan(workspaceRoot, plan, {
+      effectiveGlobalDeveloperWrite: effectiveGlobalWrite(resolvedPath),
+      getGlobalDeveloperPath: () => resolvedPath,
+      writeGlobalDeveloperFile: jest.fn(),
+    });
+
+    expect(result).toMatchObject({
+      exit_code: 1,
+      summary_write_status: 'failed',
+      summary_write_reason_code: 'workspace-summary-write-failed',
+      summary_write_rollback_status: 'restored',
+      workspace_summary: {
+        summary_write_status: 'failed',
+        summary_write_reason_code: 'workspace-summary-write-failed',
+        summary_write_rollback_status: 'restored',
+      },
+    });
+    expect(result.error).toContain('EISDIR');
+    expect(fs.existsSync(path.join(workspaceRoot, '.spec-first', 'workspace', 'init-summary-codex.json'))).toBe(false);
+    expect(fs.statSync(path.join(workspaceRoot, '.spec-first', 'workspace', 'init-summary.json')).isDirectory()).toBe(true);
+    expect(fs.existsSync(path.join(workspaceRoot, 'AGENTS.md'))).toBe(true);
+    expect(fs.existsSync(path.join(childRoot, 'AGENTS.md'))).toBe(true);
   });
 
   test('uses workspace bootstrap language in preview, help, and current user contracts', () => {
