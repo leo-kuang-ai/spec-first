@@ -78,7 +78,7 @@ Load only selected prompt assets. Resolve any path placeholders to the verified 
 4. PR metadata: title, body, and URL when reviewing a PR (empty string otherwise). Passed in a `<pr-context>` block so reviewers can verify code against stated intent
 5. Review context: intent summary, file list, diff, scope mode (`local-aligned` | `pr-remote` | `branch-remote`), and remote head ref (`PR_HEAD_REF` or `<branch-head-ref>`) when set
 6. Run ID and reviewer name for the artifact file path
-7. **For `project-standards` only:** the standards file path list from Stage 3b, wrapped in a `<standards-paths>` block appended to the review context
+7. **For `project-standards` only:** the Stage 3b criteria mapping — each standards file with the changed files it governs — wrapped in a `<standards-paths>` block appended to the review context
 8. **For `data-migration` only:** the resolved review base ref from Stage 1 (`BASE:` marker), wrapped in `<review-base>` inside the review context so schema drift checks never assume `main`
 9. **For task mode:** the selected Task Card, `review_focus`, expected/observed task-pack digest, source plan, `source_plan_section_titles`, `plan_context_mode`, work-run base, declared and delta files, included task-owned/excluded pre-existing untracked files, per-file isolation, aggregate `task_diff_isolation`, `required_gate_eligible`, and limitations. With `plan_context_mode: live-plan`, reviewers re-read only the named current sections; with `diff-only`, they do not claim plan-aware coverage. Reviewers inspect only this bundle and must not reinterpret a cumulative file as an isolated task patch.
 

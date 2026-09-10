@@ -75,12 +75,12 @@ This is progress reporting, not a blocking confirmation.
 
 ### Stage 3b: Discover project standards paths
 
-Before spawning sub-agents, find the file paths (not contents) of all relevant standards files for the `project-standards` persona. Use the native file-search/glob tool to locate:
+Before spawning sub-agents, produce the criteria mapping (paths, not contents) for the `project-standards` persona: each standards file paired with the changed files it governs. Use the native file-search/glob tool to locate:
 
-1. Use the native file-search tool (e.g., Glob in Claude Code) to find all `**/CLAUDE.md` and `**/AGENTS.md` in the repo.
-2. Filter to those whose directory is an ancestor of at least one changed file. A standards file governs all files below it (e.g., `AGENTS.md` at the repo root applies to the whole checkout, while `skills/AGENTS.md` would apply to everything under `skills/`).
+1. Use the native file-search tool to find all `**/CLAUDE.md` and `**/AGENTS.md` in the repo.
+2. For each changed file, pair it with the standards files in its ancestor directories up to the repo root. A standards file governs all files below it (e.g., `AGENTS.md` at the repo root applies to the whole checkout, while `skills/AGENTS.md` would apply to everything under `skills/`).
 
-Pass the resulting path list to the `project-standards` persona inside a `<standards-paths>` block in its review context (see Stage 4). The persona reads the files itself, targeting only the sections relevant to the changed file types. This keeps the orchestrator's work cheap (path discovery only) and avoids bloating the subagent prompt with content the reviewer may not fully need.
+Pass the resulting mapping to the `project-standards` persona inside a `<standards-paths>` block in its review context (see Stage 4): each standards file with the changed files it governs. The persona reads the files itself and judges each changed file only against its paired criteria. This keeps the orchestrator's work cheap (path discovery only) and avoids bloating the subagent prompt with content the reviewer may not fully need. In `pr-remote`/`branch-remote` scope the working tree is not the reviewed head — the persona must read criteria files from the reviewed head (e.g., `git show <head>:<path>`), never from the workspace copy, because an unchanged-looking file can still differ from the reviewed head.
 
 ### Stage 3c: Small-diff fast path (reduce the roster for trivial, low-risk diffs)
 
