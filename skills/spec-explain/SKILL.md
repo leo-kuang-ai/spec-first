@@ -74,7 +74,7 @@ echo "$RUN_DIR"
 
 ### Phase 3: Check-in gate — before anything is revealed
 
-Judge whether the material warrants a check-in (a routine recap does not; a gnarly diff or a hard concept does), then offer it with the blocking question tool. The user can always decline, and declining is never re-litigated. Read `references/check-in.md` for the warrant test, the prediction protocol, and exercise design.
+Read `references/check-in.md` before deciding whether to offer a check-in. It owns the warrant test, offer wording, prediction protocol, and exercise design. Judge whether the material warrants a check-in (a routine recap does not; a gnarly diff or a hard concept does), then offer it with the blocking question tool. The user can always decline, and declining is never re-litigated.
 
 Record the exact choice: **Just the explainer** (the recommended default) or **Quiz me**. Only **Quiz me** enables prediction and exercises; acceptance of the explainer itself is not check-in consent. A skipped offer enables neither mechanic. In diff mode, the offer must not reveal the change's purpose or interpretation.
 
