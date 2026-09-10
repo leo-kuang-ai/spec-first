@@ -26,4 +26,16 @@ describe('peer job runner source parity', () => {
       ))).toBe(false);
     }
   });
+
+  test('Windows reap carries the PID-reuse identity guard', () => {
+    const runner = fs.readFileSync(path.join(repoRoot, runners[0]), 'utf8');
+    expect(runner).toContain('def _win_process_identity(');
+    expect(runner).toContain('def _win_process_identity_matches(');
+    expect(runner).toContain('def _pre_reuse_descendant_pids(');
+    expect(runner).toContain('worker_identity');
+    expect(runner).toContain('expected_identity');
+    // Never terminate this process or a pid whose recorded identity differs.
+    expect(runner).toMatch(/if pid <= 0 or pid == os\.getpid\(\):\s*return False/);
+    expect(runner).toMatch(/_win_process_identity_matches\(\s*root_pid, expected_identity/);
+  });
 });
