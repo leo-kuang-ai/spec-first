@@ -372,6 +372,16 @@ describe('spec-doc-review current contracts', () => {
     expect(matrix).toContain('product_contract_source: spec-plan-bootstrap');
   });
 
+  test('product-lens activates on an unsettled product position, not on plausible alternatives', () => {
+    const matrix = fs.readFileSync(path.join(refsDir, 'persona-activation-matrix.md'), 'utf8');
+    const block = matrix.slice(matrix.indexOf('## product-lens'), matrix.indexOf('## design-lens'));
+    expect(block).toMatch(/Unsettled product position/);
+    expect(block).toMatch(/origin did not already settle/);
+    expect(block).toMatch(/implementation decision, not a product position/);
+    expect(block).not.toMatch(/alternatives plausibly exist/);
+    expect(block).toMatch(/Strategic weight/);
+  });
+
 
   // --- Roster budget + cost-shape (002) ---
 
