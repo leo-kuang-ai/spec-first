@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(work): 补齐 CE 01249621/98932f16 的 repo 外完成判定与隔离工作区快照保真验证。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(work): 补齐 CE 42c6c709 的不可用审查回退证据限定（仅顶层终态或定义加载失败）。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(debug): 补齐 CE 7f455932 的慢行为入口、secrets-in-evidence 门、假设竞争解释与原始场景复现重跑。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(work): 补齐 CE bc26f23a 的共享工作区 wave contract 五条件与隔离升级定位。 (user-visible)

@@ -93,7 +93,7 @@ workspace_isolation: isolated | shared-directory | unknown
 - `worker_dispatch_capability: available` means only one semantically eligible candidate is available to attempt. It does not prove permission, capacity, execution, isolation, output, mutation, or support.
 - `supportsAgents` is a static bundled agent-profile projection flag only. It is not session dispatch capability, loader readiness, isolation, model override, or support evidence.
 - `worker_context_isolation`, `worker_model_override`, and `worker_bounded_parallelism` come from live schema/response facts rather than host identity. Required isolation unmet keeps dependent gates open; model unknown inherits; parallelism unknown serializes.
-- `workspace_isolation` is isolated only when the current primitive supplies an inspectable independent workspace/diff handoff. Unknown isolation is treated as a shared directory.
+- `workspace_isolation` is isolated only when the current primitive supplies an inspectable independent workspace/diff handoff. Unknown isolation is treated as a shared directory. An isolated workspace is not automatically a faithful snapshot of the current tree: when the session itself runs inside a managed worktree, the harness may cut the worker's copy from the primary checkout or its default branch, and uncommitted state never survives isolation. Dispatch each isolated worker with the intended base commit SHA; the worker verifies its copy's HEAD equals that SHA before its first write and stops to report on mismatch — the orchestrator then runs that unit on the shared workspace under the wave contract or serially. A unit whose work depends on uncommitted state cannot use the isolated route.
 
 Fallback reason codes:
 
