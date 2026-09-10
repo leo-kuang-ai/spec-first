@@ -66,11 +66,11 @@ describe('pipeline mode contracts', () => {
     const pipelineReference = read('skills/spec-test-browser/references/pipeline-orchestration.md');
 
     expect(skill).toContain('argument-hint: "[PR number, branch name, \'current\'] [mode:pipeline] [target-origin:<origin>]"');
-    expect(pipelineReference).toContain('不暂停等待');
+    expect(pipelineReference).toContain('Do not pause');
     expect(pipelineReference).toContain('failure-handling prompt');
     expect(pipelineReference).toContain('caller-owned server');
     expect(pipelineReference).toContain('target-origin-missing');
-    expect(pipelineReference).toContain('navigation/interaction subprocess 为 0');
+    expect(pipelineReference).toContain('zero navigation/interaction subprocesses');
     expect(pipelineReference).toContain('browser-mutation-authorization-required');
     expect(pipelineReference).not.toMatch(/Starting dev server|bin\/dev >|rails server -p|npm run dev >/);
     expect(skill).not.toMatch(/Starting dev server|Auto-start in pipeline|bin\/dev >|rails server -p|npm run dev >/);

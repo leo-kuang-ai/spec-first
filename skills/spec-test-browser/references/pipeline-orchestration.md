@@ -1,20 +1,20 @@
 # Pipeline-Mode Browser Orchestration
 
-仅当 `spec-test-browser` 被 `spec-lfg` 或其他 automated caller 以 `mode:pipeline` 调用时读取。Pipeline 无人值守，但不代表拥有项目 mutation、project command 或 browser effect 授权。
+Read when `spec-lfg` or another automated caller invokes `spec-test-browser` with `mode:pipeline`. Unattended execution grants no project mutation, project-command, or browser-effect authority.
 
 ## Exact Origin And Caller-Owned Server
 
-- Browser applicable 时必须提供一个 explicit exact loopback `target-origin:<origin>`。缺失时返回 `not_run` / `target-origin-missing`；非法值返回 `not_run` / `target-origin-invalid`。
-- 不读 runtime profile，不自行解析 package script、cwd 或 env，不做 origin 改写或 server 启动；端口由 `scripts/resolve-port.sh --free` 在同一 caller shell 中解析并扫描。caller-owned server 在运行前后都保持 caller-owned，不被 wrapper 信号、关闭或清理。
-- 先调用 `node "$SKILL_DIR/scripts/agent-browser-run-context.cjs" probe`。Probe 为当前 binary identity 现场运行独立的 controlled conformance producer，不读取外部 receipt；只有返回 `execution_readiness: ready`、`conformance_status: passed` 且 `capabilities.exact_origin_confirmed: true` 才能执行。缺少参数、只有 help marker、provider/caller 自报、identity 无法绑定、producer 异常/超时/畸形输出、正向控制失败或任一负向场景失败都返回 `not_supported`，navigation/interaction subprocess 为 0。static/provider evidence 不等于 conformance，capability probe 也不等于本次 browser field outcome。
+- Applicable browser verification requires one explicit exact loopback `target-origin:<origin>`. Missing input returns `not_run` / `target-origin-missing`; invalid input returns `not_run` / `target-origin-invalid`.
+- Do not read runtime profiles, derive an origin from package scripts/cwd/env, scan ports, rewrite origins, or start servers. The caller-owned server remains caller-owned before and after testing; the wrapper never signals, stops, or cleans it up.
+- Invoke `node "$SKILL_DIR/scripts/agent-browser-run-context.cjs" probe` first. The probe runs an independent controlled conformance producer for the current binary identity, without external receipts. Proceed only with `execution_readiness: ready`, `conformance_status: passed`, and `capabilities.exact_origin_confirmed: true`. Missing flags, help-only evidence, provider/caller claims, unbound identity, producer errors/timeouts/malformed output, failed positive controls, or any failed negative case return `not_supported` with zero navigation/interaction subprocesses. Static/provider evidence is not conformance; a capability probe is not this run's browser field outcome.
 
 ## Effect Gate And Browser Execution
 
-- 不暂停等待 headed/headless、人工验证或 failure-handling prompt。OAuth、email、payment、SMS 等人工 flow 记录为 `Skip` 及 limitation。
-- 对删除、发布、发送、购买、权限变更或其他 durable/external effect，包括通过 `open` 或 keyboard action 可触发的 effect，返回 `not_run` / `browser-mutation-authorization-required`，不将该 step 写入 test plan。这是 workflow-level semantic gate，不声称 wrapper 能从 action 字符串确定业务 effect。
-- 仅通过唯一 wrapper 执行 prepare/run/cleanup。首个 `open` 是 availability evidence；任何 page-context action 不得位于它之前，其失败后不运行后续 action。
-- wrapper 或 browser cleanup 的 `not_supported`、`not_run`、`failed`、missing 或 indeterminate 均是该 applicable 流程的 blocker；不得让 passed route/step 覆盖 cleanup failure，也不得因此将流程改写为 `not_applicable`。
+- Do not pause for headed/headless selection, human verification, or a failure-handling prompt. Record human OAuth/email/payment/SMS flows as `Skip` with a limitation.
+- Missing authority for deletion, publication, sending, purchases, permission changes, or other durable/external effects returns `not_run` / `browser-mutation-authorization-required` before writing the step. This includes effects triggered by `open` or keyboard actions. Effect classification is a workflow-level semantic gate; the wrapper does not infer business effects from action strings.
+- Execute prepare/run/cleanup only through the unique wrapper. The first `open` supplies availability evidence; no page-context action precedes it or runs after its failure.
+- Wrapper or browser-cleanup `not_supported`, `not_run`, `failed`, missing, or indeterminate outcomes block the applicable flow. Passed routes/steps cannot hide cleanup failure or convert the flow into `not_applicable`. Preserve unexecuted routes as Skip with reasons rather than dropping them.
 
 ## Claim Ceiling
 
-输出 target-origin provenance、wrapper probe/capability、route/step 结果、`action_process_calls`、browser cleanup、private evidence refs 和 limitations。证据最高只支持在 caller-authorized exact origin 上的观察，不证明 server 对应当前 branch、由 spec-first 启动或被 spec-first 清理。
+Report target-origin provenance, wrapper probe/capability, every route/step result, `action_process_calls`, browser cleanup, private evidence refs, and limitations per `references/route-and-report.md`. A preflight stop still reports its blocker and how to clear it. Evidence supports only observations at the caller-authorized exact origin, not server branch identity or spec-first server startup/cleanup.
