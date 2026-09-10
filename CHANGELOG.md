@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: docs(review): 补齐 CE 52d56f2a 的紧凑返回 exact-key 条件句（notes 非字段、合并器拒绝顶替）。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(peer-runner): 补齐 CE 37eed425 的缺失产物结果命名与 absent/不可读退出码分离。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(commit-push-pr): 补齐 CE 0802b79e 的项目发布门（pre-push 要求按确切 commit 状态验证）。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(work): 补齐 CE 01249621/98932f16 的 repo 外完成判定与隔离工作区快照保真验证。 (user-visible)
