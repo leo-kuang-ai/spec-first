@@ -15,6 +15,63 @@ task_ledger: /Users/kuang/xiaobu/compound-engineering-plugin/docs/git-pull-commi
 
 # CE pull 129 提交同步执行口径
 
+## Goal Capsule
+
+逐项核对固定 CE 窗口中的 129 个真实 patch，把适用增量归入现有 spec-first source owner，并以目标源码、实际验证和逐项提交证明闭环。采用串行 `reuse / extend / compose`，不新增中心同步 runner。
+
+当前任务表是顺序与身份来源，历史完成状态只是待验证线索。最大风险是通用记录、错位链接与批量提交制造完成假象。执行目标为本仓库；相邻 CE 仓库只读 Git 历史，仅允许回写指定任务表。最新任务目标直接调用 `spec-work`，由它负责逐项执行与证据收尾；既有授权仅覆盖本计划范围。
+
+## Product Contract
+
+- R1. 完整范围、顺序、产品排除和融合边界由下文原有执行口径定义，不扩大到旧 168 提交窗口。
+- R2. 每项适用行为必须有当前目标源码、具体核对记录和适用验证，不能从上游标题或历史完成声明推导。
+- R3. 保留用户已有修改和历史提交；每项独立提交要求不得通过重写历史补造。
+- R4. 只有全部任务与最终组合验证完成后，才可关闭整体计划；缺失证据保持可见。
+
+## Planning Contract
+
+### Key Technical Decisions
+
+- KTD1. 以任务表行号加完整 CE SHA 绑定身份。使用 Git objects 校验 129 项集合，Markdown 链接相对任务表文件所在目录解析。脚本只提供集合、路径、hash 和提交事实，LLM 逐点判断行为与 owner fit。
+- KTD2. 按表格顺序串行重核；旧证据可复用其已证实部分，不能跳过完整 patch 和当前 owner 对照。编号错位记录保留历史来源，当前记录必须回到正确行号。新增修正提交，不改写已有历史。
+- KTD3. 既有 dirty 文件使用逐 hunk 保留策略；开始每项时记录基线，仅暂存本次拥有的增量。无关 dirty 路径不参与 simplify、提交或 PR 变更。
+- KTD4. 当前 `spec-lfg` 调用授权最终提交、push、PR 和一次独立代码审查；不包含 release、merge、tracker filing 或外部产品效果验证。
+
+### Evidence & Limitations
+
+2026-09-10 规划期读取本地 HEAD `25772bc4`、指定任务表、固定 Git 窗口和历史核对记录，确认如下事实：
+
+- 任务表有 129 行、129 个唯一 SHA、每行五列；与 `bbf995a4..153e605e` 集合完全一致。
+- 21 行仍标记待重新核对；其余历史状态未在本轮得到语义验证。
+- 第 75 至 129 行共 55 个证据文件编号与任务表顺序不同；80 个 Markdown 链接按文件相对路径解析不可访问。
+- 8 组历史提交被多个任务共用，包括 `102d40ce`、`93a4fb9e` 和后续六个批次提交，未满足逐项独立提交条件。
+- `001-3eb0c7a3.md` 没有完整路径清单、明确命令退出码与完成提交引用；第一项真实 patch 已完整读取，当前 `skills/spec-write-skill/` 存在对应 prose、pin 与 fresh-reader 规则，仍需实施阶段验证。
+- 本地有既有未提交源码和文档修改。未运行实现测试；上述事实仅证明记录与 Git 状态，不证明同步完成。
+- Graphify 新旧根目录同时存在；本轮使用限定文件直接读取，未选择任何图作为当前事实，也未执行 runtime 迁移。
+
+### Execution Ownership
+
+2026-09-10 最新目标直接指定 `spec-work <本计划>`，不带 Return-to-Caller 参数，因此按原逐项闭环执行：每项验证后独立提交，再进入下一项。此前由 LFG 调用方式产生的提交时序冲突不再阻塞。该选择来自当前执行目标，不表示用户已验收任何任务或验证结果。既有最终 push、PR 与一次独立审查授权仍限于本计划范围，须在全部本地验收后执行。
+
+## Implementation Units
+
+U1 至 U129 分别对应任务表第 1 至 129 行，不以 Git 拓扑排序或旧证据编号重新编号。每个 U<N> 依赖前一项按选定提交时序达到允许继续的边界。每项的完整约束是下文“逐提交核对规则”“核对粒度与增量判断”和“每项必须留下的证据”。
+
+- 目标文件：当前项对应的 `skills/`、`src/cli/`、`templates/`、既有 tests，以及 `docs/validation/ce-pull-2026-09-09/<序号>-<CE SHA>.md` 和 `CHANGELOG.md`；具体 owner 必须先回源确认。
+- U1 的已发现 source：`skills/spec-write-skill/SKILL.md`、`skills/spec-write-skill/references/authoring-method.md`、`skills/spec-write-skill/references/evaluation-design.md`。适用测试：`tests/unit/spec-write-skill-contracts.test.js`。核验 plain prose、重写前 pin 审计、引用迁移和 fresh-reader 的触发与失败边界；测试通过不能替代语义对照。
+- 后续项的测试路径在读取对应 patch 与当前 source 后发现，作为逐项核对记录的一部分；不得预填不存在的路径或统一假定无需测试。
+- 每项场景：适用且缺行为时补齐；已有等价实现时给逐点源码依据；纯证据/产品排除时给具体理由；引用丢失、未知 owner、测试失败或证据缺失时保持未完成。
+
+## Verification Contract
+
+先按每项实际 owner 执行 focused checks；全部项完成后执行 `npm run typecheck`、`npm run lint:skill-entrypoints`、`npm run test:unit`、`npm run test:smoke`、`npm run test:integration` 和 `npm run build`。跨 Skill/CLI 同步使这些仓库级检查全部适用。现有失败须有隔离基线或等价直接证据归因。
+
+最终逐行核验 Git 集合、记录身份、全部路径与行为点、source/test 引用可达性、真实独立提交及 task-ledger 回写。审查组合后的 required-read、producer/consumer 和失败语义。独立代码审查与最终工作树 fingerprint/verification summary 由当前 `spec-work` 收尾承接；本地 source 行为验证不能冒充真实模型、provider 或 CI 成功。
+
+## Definition of Done
+
+129 项全部具备可回源记录、适用 source 融合或有据排除、实际验证和逐项独立提交；任务表状态与证据一致，链接可访问。全部必要最终检查通过，独立审查问题完成处理，临时试验无遗留。已授权的 PR/CI 尾部须达到有界终态并披露限制；计划 status 不替代任何验证结果。
+
 ## 目标
 
 以 CE 项目本次 `git pull` 产生的 129 个提交为唯一任务范围，逐提交检查真实 diff，将适用于 spec-first 的 Skill、脚本和行为机制融合到 spec-first 当前 canonical owner，完成逐项验证和可追踪收口。
@@ -69,7 +126,7 @@ task_ledger: /Users/kuang/xiaobu/compound-engineering-plugin/docs/git-pull-commi
 7. 回写 CE 任务表对应行的“优化核对进度状态”，至少标记为“已完成核对”；状态统一写为“已完成核对”，裁决类型和依据保存在逐项核对记录中；不得用笼统的“无需同步”替代结论。
 8. 再进入下一条提交任务。
 
-提交授权沿用当前会话对本次逐项同步的明确授权；不执行 push、PR、release 或其他外部 landing。
+提交、push 和 PR 授权沿用本会话明确调用 `spec-lfg` 的范围，仅覆盖本计划拥有的变更和当前分支 PR；最新直接 `spec-work` 目标按逐项验证后提交执行。不得执行 release、merge 或其他未授权外部动作。
 
 ## 全局验收
 
@@ -87,7 +144,7 @@ task_ledger: /Users/kuang/xiaobu/compound-engineering-plugin/docs/git-pull-commi
 - 不扩展到既有全量方案之外的其他 CE 提交或路径。
 - 不机械复制 CE 文档和测试。
 - 不手改 generated runtime mirror。
-- 不执行外部 provider、GitHub PR/CI、浏览器/Xcode、生产发布或现场效果验证。
+- 不将外部 provider、浏览器/Xcode、生产发布或现场效果验证纳入本次 source 同步。GitHub PR/CI 仅作为当前用户授权的 LFG 交付尾部，不证明同步机制之外的产品效果。
 
 ## 重执行修订：纠正此前完成声明
 

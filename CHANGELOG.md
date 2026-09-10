@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: docs(plan): 补充 CE 129 项同步的证据缺口和验收合同；按最新 spec-work 目标执行逐项验证与独立提交，未声明整体完成。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 120-e322bdac；本地已有等价约束或无对应 consumer。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 121-5c148e16；本地已有等价约束或无对应 consumer。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 122-26bf5b1e；本地已有等价约束或无对应 consumer。 (user-visible)
