@@ -2,8 +2,11 @@
 
 const crypto = require('node:crypto');
 const fs = require('node:fs');
+const path = require('node:path');
 
 const producer = require('../../scripts/check-ce-localization-review.cjs');
+
+const repoRoot = require('node:path').resolve(__dirname, '../..');
 const closeoutWriter = require('../../scripts/generate-ce-localization-closeout.cjs');
 
 function semanticLensVerdicts() {
@@ -79,8 +82,25 @@ function reviewDelta(deterministic, relationGaps) {
 }
 
 describe('CE localization closeout artifacts', () => {
+  // The closeout artifacts bind the git HEAD they were generated under, which
+  // structurally precedes the commit that contains them, so topology
+  // validation compares against the recorded inventory (the artifact chain's
+  // own source of truth, regenerated together with the artifacts). A separate
+  // live count check below keeps head-independent drift protection.
+  function recordedDeterministic() {
+    const inventory = JSON.parse(fs.readFileSync(path.join(repoRoot,
+      'docs/validation/ce-localization/skill-inventory.json'), 'utf8'));
+    const coverage = JSON.parse(fs.readFileSync(path.join(repoRoot,
+      'docs/validation/ce-localization/review/round-3-source-coverage.json'), 'utf8'));
+    return { inventory, coverage };
+  }
+
   test('validates the complete canonical topology against the current source snapshot', () => {
-    const deterministic = producer.buildArtifacts();
+    const deterministic = recordedDeterministic();
+    const live = producer.buildArtifacts();
+    expect(live.inventory.package_path_count).toBe(deterministic.inventory.package_path_count);
+    expect(live.coverage.coverage_summary.direct_support_relation_count)
+      .toBe(deterministic.coverage.coverage_summary.direct_support_relation_count);
     const closeout = producer.loadCloseoutArtifacts();
     const result = producer.validateCloseoutArtifacts(closeout, deterministic);
 

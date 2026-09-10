@@ -4,12 +4,12 @@
   "producer": "scripts/check-ce-localization-review.cjs",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "19d3f6d8a06f3088d4e392a8718dac47aefa8587",
+    "head": "7ad2336e3a5606b7b73d64ac7fdce709ff65e646",
     "dirty": false,
     "dirty_paths": [],
     "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "source_tree_hash": "5c75c9adfc8f24f7c377d833cc4683c9abc049fb9348e4178ae9db54b068d95e",
-    "inventory_hash": "3d2c3266db961c90c358e4d824687e879530eadc612e3e24e0f936659c39aa58",
+    "inventory_hash": "38c1225e4c15ae8a16719018cc10aa877fad7f4700e9fc964ed8e534b1118976",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",

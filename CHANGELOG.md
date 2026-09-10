@@ -1,3 +1,4 @@
+- v1.15.3 2026-09-10 21:38:00 zcode: test(localization): closeout 拓扑校验改用录制 inventory 基线并保留活体计数守卫，解除结构上不可能的提交后 HEAD 绑定。 (user-visible)
 - v1.15.3 2026-09-10 21:11:18 claude: chore(runtime-setup): Graphify provider pin 升级配套——setup 子进程统一注入 GRAPHIFY_NO_BACKUP=1，providers/graphify.cjs 适配 0.9.57 版本探测与 defensive probes 更新（init 工具链自动写入）。 (user-visible)
 # Changelog
 - v1.15.3 2026-09-10 20:49:02 claude: feat(runtime-setup): setup 发起的 Graphify 子进程统一注入 `GRAPHIFY_NO_BACKUP=1`，关闭 Provider 对 curated/semantic 图的 `graphify-out/<日期>/` 按天快照，`graphify-out/` 保持唯一 current artifact；新增 unit 斋试覆盖注入不可被 additions 关闭，并同步 SKILL.md 契约描述。 (user-visible)
