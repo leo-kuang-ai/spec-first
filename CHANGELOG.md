@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(pov): 补齐 CE 090e7b2a 的 Tier 3 双来源与 persona 读取，修正先例路径及迁移后的 grounding 测试读取位置。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 纠正 CE d181ae0e 整项排除误记，恢复评估规则已融合、中心 runner 不复制的边界，并记录实际重跑的 80 项合同验证。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE d181ae0e 的 skill-eval-cell 宿主评测资产，按产品边界不引入第二套评测 runner，保留现有 Skill eval owners。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 67cc7dc7 的 size-driven skill restructuring guidance，确认当前 authoring owner 已有等价约束。 (user-visible)
