@@ -100,3 +100,48 @@ test('private candidates use the target repository and final link location', () 
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('an absolute citation inside the repo is checked as a repo path', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'compound-claims-'));
+  const repo = path.join(root, 'repo');
+  const candidate = path.join(root, 'candidate.md');
+  fs.mkdirSync(repo);
+  try {
+    expect(spawnSync('git', ['init', repo]).status).toBe(0);
+    fs.mkdirSync(path.join(repo, 'src'));
+    fs.writeFileSync(path.join(repo, 'src', 'index.js'), 'module.exports = {};');
+    fs.writeFileSync(candidate, '`' + path.join(repo, 'src', 'index.js') + '`');
+    const result = spawnSync('python3', [
+      path.resolve('skills/spec-compound/scripts/validate-doc-claims.py'), candidate,
+      '--repo-root', repo,
+      '--target-path', 'docs/solutions/learning.md',
+    ], { encoding: 'utf8', cwd: root });
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain('checked 1 paths');
+    expect(result.stdout).not.toContain('FLAG path');
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('an absolute citation outside the repo stays advisory', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'compound-claims-'));
+  const repo = path.join(root, 'repo');
+  const candidate = path.join(root, 'candidate.md');
+  fs.mkdirSync(repo);
+  try {
+    expect(spawnSync('git', ['init', repo]).status).toBe(0);
+    fs.writeFileSync(path.join(root, 'outside.txt'), 'x');
+    fs.writeFileSync(candidate, '`' + path.join(root, 'outside.txt') + '`');
+    const result = spawnSync('python3', [
+      path.resolve('skills/spec-compound/scripts/validate-doc-claims.py'), candidate,
+      '--repo-root', repo,
+      '--target-path', 'docs/solutions/learning.md',
+    ], { encoding: 'utf8', cwd: root });
+    expect(result.status).toBe(0);
+    expect(result.stdout).not.toContain('FLAG path');
+    expect(result.stdout).toContain('checked 0 paths');
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
