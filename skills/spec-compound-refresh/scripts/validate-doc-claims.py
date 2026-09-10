@@ -261,7 +261,9 @@ def main(argv: list[str]) -> int:
         if os.path.isabs(token):
             relative = os.path.relpath(os.path.realpath(token), os.path.realpath(base))
             if relative != ".." and not relative.startswith(".." + os.sep):
-                token = "./" + relative
+                # Slash-normalize so a Windows relpath (backslashes) stays a
+                # path candidate for the "/" membership check below.
+                token = "./" + relative.replace(os.sep, "/")
         if not is_path_candidate(token):
             continue
         check = token

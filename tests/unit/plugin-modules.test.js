@@ -172,8 +172,8 @@ describe('plugin module facade and governance', () => {
     fs.writeFileSync(
       reviewSkillPath,
       fs.readFileSync(reviewSkillPath, 'utf8').replace(
-        'Plan discovery (requirements verification)',
-        'Plan requirements check',
+        /Actionable Findings/g,
+        'Findings you can act on',
       ),
       'utf8',
     );
@@ -183,7 +183,7 @@ describe('plugin module facade and governance', () => {
       expect.objectContaining({
         skillName: 'spec-code-review',
         issues: expect.arrayContaining([
-          'missing_anchor:Plan discovery (requirements verification)',
+          'missing_anchor:Actionable Findings',
           'content_mismatch',
         ]),
       }),
@@ -840,6 +840,10 @@ describe('plugin module facade and governance', () => {
         }
 
         const planSkill = operations.get(path.posix.join(runtimeRoot, 'spec-plan/SKILL.md'));
+        const planIntake = operations.get(path.posix.join(
+          runtimeRoot,
+          'spec-plan/references/intake.md',
+        ));
         const evidence = operations.get(path.posix.join(
           runtimeRoot,
           'spec-plan/references/planning-evidence-boundaries.md',
@@ -862,7 +866,7 @@ describe('plugin module facade and governance', () => {
           runtimeRoot,
           'spec-work/references/shipping-workflow.md',
         ));
-        expect(planSkill.contents).toContain('Inventory before invention');
+        expect(planIntake.contents).toContain('Inventory before invention');
         expect(planSkill.contents).toContain('reuse / extend / compose / new');
         expect(evidence.contents).toContain('Thin glue may own only');
         expect(reviewSkill.contents).toContain('mutation_policy');
@@ -870,7 +874,8 @@ describe('plugin module facade and governance', () => {
         expect(lfgTracker).toBeDefined();
         expect(workTracker).toBeDefined();
         expect(lfgTracker.contents).toBe(workTracker.contents);
-        expect(workSkill.contents).toContain('Duplicate critical metadata');
+        expect(workTracker).toBeDefined();
+        expect(operations.get(path.posix.join(runtimeRoot, 'spec-work/references/input-triage.md')).contents).toContain('Duplicate critical metadata');
         expect(workStrategy.contents).toContain('worker_dispatch_authorization');
         expect(workStrategy.contents).toContain('supportsAgents');
         expect(workStrategy.contents).toContain('static bundled agent-profile projection');

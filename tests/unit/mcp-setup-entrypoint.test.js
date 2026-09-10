@@ -189,10 +189,10 @@ function fakeRunner(command, args, options = {}) {
     timeout: false,
     stdout: /^python(?:3(?:\.\d+)?)?$/.test(path.basename(command)) && args[0] === '-c'
       ? (String(args[1]).includes('importlib.metadata')
-        ? JSON.stringify({ version: '0.9.29', packages: [['graphifyy', '0.9.29']] })
+        ? JSON.stringify({ version: '0.9.57', packages: [['graphifyy', '0.9.57']] })
         : '3.12.1')
       : (graphifyCommand && args[0] === '--version'
-        ? 'graphify 0.9.29'
+        ? 'graphify 0.9.57'
         : (command === 'uv' && args.join(' ') === 'tool dir --bin'
           ? path.join((options.env && options.env.HOME) || os.homedir(), '.local', 'bin')
           : (args[0] === 'status' ? 'ready' : 'ok'))),
@@ -509,7 +509,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     const homeBefore = snapshot(homeDir);
     const runner = (command, args, options) => {
       if (command === 'codegraph' && args[0] === '--version') {
-        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.5.0' };
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
       }
       if (command === 'codegraph' && args[0] === 'status') {
         return { ...fakeRunner(command, args, options), stdout: 'index ready' };
@@ -1117,7 +1117,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     fs.mkdirSync(nested, { recursive: true });
     const runner = (command, args, options) => {
       if (command === 'codegraph' && args[0] === '--version') {
-        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.5.0' };
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
       }
       if (command === 'codegraph' && args[0] === 'init') {
         fs.mkdirSync(path.join(nested, '.codegraph'), { recursive: true });
@@ -1263,7 +1263,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     const runner = (command, args, options) => {
       calls.push([command, ...args]);
       if (command === 'codegraph' && args[0] === '--version') {
-        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.5.0' };
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
       }
       if (command === 'codegraph' && args[0] === 'init') {
         fs.mkdirSync(path.join(folder, '.codegraph'), { recursive: true });
@@ -1929,7 +1929,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     const runner = (command, args, options = {}) => {
       calls.push({ command, args: [...args], env: { ...(options.env || {}) } });
       if (command === 'codegraph' && args[0] === '--version') {
-        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.5.0' };
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
       }
       if (command === 'codegraph' && args[0] === 'init') {
         fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
@@ -1996,7 +1996,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     const target = tempRepo('codegraph-configured');
     const runner = (command, args, options) => {
       if (command === 'codegraph' && args[0] === '--version') {
-        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.5.0' };
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
       }
       if (command === 'codegraph' && args[0] === 'init') {
         fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });

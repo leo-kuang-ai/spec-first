@@ -70,7 +70,7 @@ const TIER_BC_FAMILIES = {
     'skills/spec-plan/references/agents': 'b6315cb0deec7c85346b88d3b30b9547feb36e1a8c058b4248f91e9c326b6ddb',
   },
   'deployment-verification-agent.md': {
-    'skills/spec-code-review/references/personas': '04d8a5e5dad6c84955ab841aa2e2362f58a6b1f2111e88caaa4ca96ca2b65e8a',
+    'skills/spec-code-review/references/personas': 'a85fae19283d7cb82d2d4a34c5fd286d2bb10d5e632b1642be9d3757fef7ad23',
     'skills/spec-plan/references/agents': 'e90eaab26736715c6ae4eaebf3aa05331f1c371b2dbb546ff057643377d07ea6',
   },
 };

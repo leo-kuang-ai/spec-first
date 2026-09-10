@@ -222,10 +222,10 @@ describe('spec-runtime-setup active Node consumers', () => {
     const dependency = {
       ecosystem: 'pypi',
       package: 'graphifyy',
-      version: '0.9.29',
+      version: '0.9.57',
       distribution: {
-        wheel_url: 'https://files.pythonhosted.org/packages/f1/b1/0cbe4738ca9784850d40aae0d71c34547230e0445e52067f98b8d0b6c070/graphifyy-0.9.29-py3-none-any.whl',
-        sha256: '143f4002f40d5c302ae43bd58487ad604191f2d0ac8216429894c6a913ecf27b',
+        wheel_url: 'https://files.pythonhosted.org/packages/c8/c2/d1ce4a567a5bf4c36054cede2c70f745a239ed5080b70d7934c5c738b583/graphifyy-0.9.57-py3-none-any.whl',
+        sha256: 'f35c86410e7d92ace69a50ac8dbed568903c880482c656f43437ca657fee8c37',
         index_url: 'https://pypi.org/simple',
       },
     };

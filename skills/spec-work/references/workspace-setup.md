@@ -51,7 +51,7 @@ Unresolved repository, source ownership, dirty overlap, or authority blocks the 
 
 4. **Choose Execution Engine, then Strategy**
 
-   Read [Execution engines](references/execution-engines.md) only when plan shape or explicit direction makes a non-default engine relevant. Inline is the portable default. A non-default engine needs explicit authorization and current-session semantic capability, preserves task-pack checkpoints/structured returns, and never changes tail ownership.
+   Read [Execution engines](execution-engines.md) only when plan shape or explicit direction makes a non-default engine relevant. Inline is the portable default. A non-default engine needs explicit authorization and current-session semantic capability, preserves task-pack checkpoints/structured returns, and never changes tail ownership.
 
    Before worker dispatch, inherit the full boundary from `references/execution-strategy.md` and record `worker_dispatch_authorization`, `capability_probe`, `worker_dispatch_capability`, `worker_context_isolation`, `worker_model_override`, and `worker_bounded_parallelism`, then normalize the path as `worker_dispatch_outcome`. Missing authorization forbids discovery and fixes `capability_probe: not_applicable` plus capability unknown. Only after authorization may the current-session registry/schema be consumed as `provider_untrusted` evidence. Use serial execution for dependencies, overlapping files/contracts/schema/config/lockfiles/generated outputs, shared environment singletons, or unknown bounded parallelism. Stop parallelizing after broad unplanned edits, repeated conflicts, or out-of-scope failures.
 

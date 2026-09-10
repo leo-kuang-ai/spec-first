@@ -81,7 +81,7 @@ Reference files (loaded on demand):
 - `references/dev-server-sveltekit.md` — SvelteKit dev-server defaults
 - `references/dev-server-procfile.md` — Procfile-based dev-server defaults
 
-Scripts (invoked via `bash "$SKILL_DIR/scripts/<name>"` — see `references/run.md` for `SKILL_DIR`):
+The Bash tool's working directory is the user's project, not the skill directory, so a bare `scripts/<name>` path will not resolve — invoke each by the skill's own absolute path via `SKILL_DIR` (see `references/run.md`). Scripts:
 - `scripts/read-launch-json.sh` — launch.json reader
 - `scripts/detect-project-type.sh` — project-type classifier
 - `scripts/resolve-package-manager.sh` — lockfile-based package-manager resolver

@@ -205,7 +205,7 @@ describe('CodeGraph provider', () => {
     const calls = [];
     const runner = (command, args) => {
       calls.push([command, ...args]);
-      if (args[0] === '--version') return success('codegraph 1.5.0');
+      if (args[0] === '--version') return success('codegraph 1.6.0');
       if (args[0] === 'init') {
         fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
         fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
@@ -220,7 +220,7 @@ describe('CodeGraph provider', () => {
       probeDependency: true,
       configured: true,
       repoRoot: target,
-      dependency: { package: '@colbymchenry/codegraph', version: '1.5.0' },
+      dependency: { package: '@colbymchenry/codegraph', version: '1.6.0' },
       runner,
     };
 
@@ -253,7 +253,7 @@ describe('CodeGraph provider', () => {
     const executable = path.join(binRoot, process.platform === 'win32' ? 'codegraph.cmd' : 'codegraph');
     fs.writeFileSync(executable, process.platform === 'win32' ? '@exit /b 0\r\n' : '#!/bin/sh\nexit 0\n');
     fs.chmodSync(executable, 0o755);
-    const runner = jest.fn(() => success('codegraph 1.5.0'));
+    const runner = jest.fn(() => success('codegraph 1.6.0'));
 
     const resolved = provider.resolveCodegraphCommand({
       repoRoot: target,
@@ -262,7 +262,7 @@ describe('CodeGraph provider', () => {
         PATH: binRoot,
         PATHEXT: '.CMD;.EXE',
       },
-      dependency: { version: '1.5.0' },
+      dependency: { version: '1.6.0' },
     }, target);
 
     expect(resolved).toMatchObject({ ok: true, command: executable });
@@ -288,7 +288,7 @@ describe('CodeGraph provider', () => {
     let statusCount = 0;
     const runner = (command, args) => {
       calls.push([command, ...args]);
-      if (args[0] === '--version') return success('codegraph 1.5.0');
+      if (args[0] === '--version') return success('codegraph 1.6.0');
       if (args[0] === 'init') {
         fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
         fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
@@ -307,7 +307,7 @@ describe('CodeGraph provider', () => {
     const plan = provider.plan({
       selected: true,
       repoRoot: target,
-      dependency: { package: '@colbymchenry/codegraph', version: '1.5.0' },
+      dependency: { package: '@colbymchenry/codegraph', version: '1.6.0' },
     });
     expect(plan).toMatchObject({ mutation: true, blocked: false, provider: 'codegraph' });
 
@@ -331,7 +331,7 @@ describe('CodeGraph provider', () => {
     const calls = [];
     const runner = (command, args) => {
       calls.push([command, ...args]);
-      if (args[0] === '--version') return success('codegraph 1.5.0');
+      if (args[0] === '--version') return success('codegraph 1.6.0');
       if (args[0] === 'init') {
         fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
         fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
@@ -345,7 +345,7 @@ describe('CodeGraph provider', () => {
     const plan = provider.plan({
       selected: true,
       repoRoot: target,
-      dependency: { package: '@colbymchenry/codegraph', version: '1.5.0' },
+      dependency: { package: '@colbymchenry/codegraph', version: '1.6.0' },
     });
     const result = provider.apply({ repoRoot: target, runner, configured: true }, plan);
 
@@ -365,7 +365,7 @@ describe('CodeGraph provider', () => {
     fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
     fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
     const runner = (_command, args) => {
-      if (args[0] === '--version') return success('codegraph 1.5.0');
+      if (args[0] === '--version') return success('codegraph 1.6.0');
       if (args[0] === 'status') return success('index ready');
       if (args[0] === 'query') return success('{}');
       return success();
@@ -375,7 +375,7 @@ describe('CodeGraph provider', () => {
       repoRoot: target,
       runner,
       configured,
-      dependency: { version: '1.5.0' },
+      dependency: { version: '1.6.0' },
     });
 
     expect(result.readiness_status).toBe(expected);
@@ -414,7 +414,7 @@ describe('CodeGraph provider', () => {
     fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
     fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
     const runner = (_command, args) => {
-      if (args[0] === '--version') return success('codegraph 1.5.0');
+      if (args[0] === '--version') return success('codegraph 1.6.0');
       if (args[0] === 'status') return success('pending changes; run codegraph sync');
       return success();
     };
@@ -423,7 +423,7 @@ describe('CodeGraph provider', () => {
       repoRoot: target,
       runner,
       configured: true,
-      dependency: { version: '1.5.0' },
+      dependency: { version: '1.6.0' },
     });
 
     expect(result.readiness_status).toBe('degraded');
@@ -438,7 +438,7 @@ describe('CodeGraph provider', () => {
     fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
     fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
     const runner = (_command, args) => {
-      if (args[0] === '--version') return success('codegraph 1.5.0');
+      if (args[0] === '--version') return success('codegraph 1.6.0');
       if (args[0] === 'status') return success('index ready');
       if (args[0] === 'query') return failure('query failed');
       return success();
@@ -446,7 +446,7 @@ describe('CodeGraph provider', () => {
     const context = {
       selected: true,
       repoRoot: target,
-      dependency: { package: '@colbymchenry/codegraph', version: '1.5.0' },
+      dependency: { package: '@colbymchenry/codegraph', version: '1.6.0' },
       runner,
     };
 
@@ -495,7 +495,7 @@ describe('CodeGraph provider', () => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
     const target = tempRepo(`codegraph-residual-${reasonCode}`);
     const runner = (command, args) => {
-      if (args[0] === '--version') return success('codegraph 1.5.0');
+      if (args[0] === '--version') return success('codegraph 1.6.0');
       if (args[0] === 'init') {
         fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
         fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
@@ -507,7 +507,7 @@ describe('CodeGraph provider', () => {
     const plan = provider.plan({
       selected: true,
       repoRoot: target,
-      dependency: { package: '@colbymchenry/codegraph', version: '1.5.0' },
+      dependency: { package: '@colbymchenry/codegraph', version: '1.6.0' },
     });
     const result = provider.apply({ repoRoot: target, runner }, plan);
     expect(result.readiness_status).toBe('degraded');
@@ -521,12 +521,12 @@ describe('CodeGraph provider', () => {
     fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
     fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
     const runner = (_command, args) => signalTermination(
-      args[0] === '--version' ? 'codegraph 1.5.0' : 'index ready',
+      args[0] === '--version' ? 'codegraph 1.6.0' : 'index ready',
     );
 
     const result = provider.verify({
       repoRoot: target,
-      dependency: { version: '1.5.0' },
+      dependency: { version: '1.6.0' },
       runner,
     });
 

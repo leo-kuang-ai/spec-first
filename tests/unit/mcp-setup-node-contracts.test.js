@@ -119,10 +119,10 @@ function parityRunner(calls) {
       timeout: false,
       stdout: /^python(?:3(?:\.\d+)?)?$/.test(path.basename(command)) && args[0] === '-c'
         ? (String(args[1]).includes('importlib.metadata')
-          ? JSON.stringify({ version: '0.9.29', packages: [['graphifyy', '0.9.29']] })
+          ? JSON.stringify({ version: '0.9.57', packages: [['graphifyy', '0.9.57']] })
           : '3.12.1')
         : (graphifyCommand && args[0] === '--version'
-          ? 'graphify 0.9.29'
+          ? 'graphify 0.9.57'
           : (command === 'uv' && args.join(' ') === 'tool dir --bin'
             ? path.join(options.env.HOME, '.local', 'bin')
             : (args[0] === 'status' ? 'ready' : 'ok'))),

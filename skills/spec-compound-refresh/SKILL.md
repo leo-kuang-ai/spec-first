@@ -43,6 +43,8 @@ landing_authorization: authorized | missing
 
 ## Mode Detection
 
+Parse the invocation arguments supplied by the current host per `references/modes.md`: strip only the recognized `mode:` flags while preserving the remainder, quoted paths/tokens, and token order as the scope hint.
+
 Read `references/modes.md` before resolving mode, authority, blocking questions, or a standalone `CONCEPTS.md` bootstrap request. It owns the `mode:non-interactive`/`mode:headless` parsing, conservative unattended behavior, and the mutation/commit/landing separation.
 
 ## Optional Worth Audit

@@ -9,7 +9,6 @@ function read(filePath) {
 describe('CE upstream skill sync contracts', () => {
   test('keeps pre-resolved git commands shell-portable', () => {
     const files = [
-      'skills/spec-ideate/SKILL.md',
       'skills/spec-sweep/SKILL.md',
     ];
 
@@ -31,7 +30,10 @@ describe('CE upstream skill sync contracts', () => {
     const brainstorm = read('skills/spec-brainstorm/references/output-mode.md');
     expect(brainstorm).toContain('Resolve `<repo-root>` at runtime');
     expect(brainstorm).not.toContain('!`git rev-parse');
-    const plan = read('skills/spec-plan/SKILL.md');
+    const ideateOutput = read('skills/spec-ideate/references/output-mode.md');
+    expect(ideateOutput).toContain('Resolve `<repo-root>` at runtime');
+    expect(ideateOutput).not.toContain('!`git rev-parse');
+    const plan = read('skills/spec-plan/references/output-mode.md');
     expect(plan).toContain('Resolve `<repo-root>` at runtime');
     expect(plan).not.toContain('!`git rev-parse');
     const commit = read('skills/spec-commit/SKILL.md');
