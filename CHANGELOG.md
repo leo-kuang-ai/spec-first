@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(debug): 补齐 CE 7f455932 的慢行为入口、secrets-in-evidence 门、假设竞争解释与原始场景复现重跑。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(work): 补齐 CE bc26f23a 的共享工作区 wave contract 五条件与隔离升级定位。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(debug): 补齐 CE fbfcd1d5 的 learning 捕获改为完成检查点触发与 commit 可达 deadline。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(commit-push-pr): 补齐 CE a79582c3 的机制形伞判据、示例对与 Step H 首查项。 (user-visible)

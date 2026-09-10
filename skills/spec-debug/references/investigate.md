@@ -34,7 +34,7 @@ These phrases mark mode-drift toward symptom patches, not progress on the root c
 
 **Assumption audit (before hypothesis formation):** List the concrete "this must be true" beliefs your understanding depends on — the framework behaves as expected here, this function returns what its name implies, the config loads before this runs, the caller passes a non-null value, the database is in the state the test implies. For each, mark *verified* (you read the code, checked state, or ran it) or *assumed*. Assumptions are the most common source of stuck debugging. Many "wrong hypotheses" are actually correct hypotheses tested against a wrong assumption.
 
-**Form hypotheses** ranked by likelihood. For each, state:
+**Form hypotheses** ranked by likelihood. Before testing the top one, name at least one competing explanation for the same symptom and why it ranks lower — a single-candidate list anchors on the first plausible idea, and the cheapest moment to catch that is before any probe runs. In interactive mode, include the ranking in what the user sees as findings develop; their domain knowledge often re-ranks it instantly. Each hypothesis states:
 - What is wrong and where (file:line)
 - **At least one concrete observation that supports it** — a runtime variable value, a log line, an instrumented boundary capture, a behavior delta against a working comparison case, or a specific code reference. "X seems off" is not evidence; "X equals null at line 42 because Y was never initialized in the constructor path that runs under condition Z" is. Hypotheses without grounding observations are theorizing — go back to Phase 1 and instrument.
 - The causal chain: how the trigger leads to the observed symptom, step by step

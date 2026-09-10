@@ -1,6 +1,6 @@
 ---
 name: spec-debug
-description: "Diagnose bugs, errors, regressions, and failing tests. Use when asked to debug or fix failing behavior, including a stalled investigation. For settled plans or feature implementation, use spec-work."
+description: "Diagnose bugs, errors, regressions, and failing tests. Use when asked to debug or fix failing or slow behavior, including a stalled investigation. For settled plans or feature implementation, use spec-work."
 argument-hint: "[issue reference, error message, test path, or description of broken behavior]"
 ---
 
@@ -42,6 +42,10 @@ Overrides: high-risk
 - `foreign-residual-workspace` -> `blocked-action-required`: stop before fix mutation, root-cause-confirmed claims that depend on suspect local artifacts, commits, or PR-ready handoff until the named cleanup/init action runs or the user explicitly accepts degraded evidence.
 - optional external-tool evidence unavailable -> `fallback-only`: continue with bounded direct source, test, log, runtime-probe, and user-provided evidence; disclose the missing capability and do not extend root-cause or blast-radius claims beyond that evidence.
 - `non-git-build-workspace` coverage gaps -> `partial`: keep investigation/fixes inside the explicit `target_repo` or inspected build surface and directly inspect uncovered modules before claiming they are unaffected.
+
+## Secrets in evidence
+
+Debugging surfaces raw output constantly — command results, captured payloads, log excerpts — and the harness may render a command's output the moment it runs, so the gate fires when you construct the command, not afterward. Keep credentials in env vars rather than on the command line; when a command's output may carry a secret (verbose HTTP traces, dumped headers, config or environment prints), capture it to a file and surface only sanitized excerpts, writing `<REDACTED>` in place of each secret. No secret (credential, token, auth header, connection string) appears in anything shown, written, or committed. If sanitizing removes what the diagnosis needs, say so and ask the user rather than un-redacting.
 
 ## Core Principles
 
