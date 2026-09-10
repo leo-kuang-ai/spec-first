@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: docs(sync): 逐点核对 CE a200496f 的 Proof API/流程拆分，按明确产品排除保留证据，确认未引入 spec-proof 或远程写入。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(pr): 融合 CE 6876b964，PR 起草先写完整范围与 program placement 摘要，再用它核对标题和开头，避免最初事件遮蔽同等重要成果。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(skill): 融合 CE 2ca8e81c，补齐 live delegation 评测的 payload/receipt/synthesis 证据与跨宿主环境清理；当前 evaluation reference 统一英文。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(strategy): 融合 CE 2a52bfa9，区分共享文档作者边界，统一 pulse 来源与语义指标读取，补齐 planning consumers 的 legacy fallback；按用户要求统一当前 strategy/pulse Skill 增量为英文。 (user-visible)
