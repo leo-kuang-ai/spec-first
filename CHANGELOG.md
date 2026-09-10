@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE cb230f14 的 work intake、execution strategy 与 implementation loop，确认当前 spec-work owner 已具备对应阶段引用和 caller-owned closeout 边界。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(pr-feedback): 纠正 CE 8bbcc197 复核遗漏，补齐 whole-PR/issue-comment 路由、空白正文过滤和 watch loop 作者反馈可见性。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 26f38961 的 compound 阶段 references 与 headless/lightweight/promotion 边界，确认当前 source owner 已完整承载。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 4df5f99d 的 code-review 阶段 references、scope/intent/select-route 与 finish/action rubric，确认当前 owner 已完整承载。 (user-visible)
