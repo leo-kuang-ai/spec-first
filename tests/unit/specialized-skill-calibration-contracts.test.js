@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('node:fs');
+const { spawnSync } = require('node:child_process');
 
 function read(filePath) {
   return fs.readFileSync(filePath, 'utf8');
@@ -47,11 +48,24 @@ describe('specialized CE calibration contracts', () => {
     }
   });
 
-  test('polish uses flattened-shell-safe SKILL_DIR assignments', () => {
+  test('polish startup reference keeps each bundled command self-contained', () => {
     const skill = read('skills/spec-polish/SKILL.md');
-    const assignments = skill.match(/SKILL_DIR="<absolute path of the directory containing this SKILL\.md>";/g) || [];
-    expect(assignments).toHaveLength(4);
-    expect(skill).not.toMatch(/SKILL_DIR="<absolute path of the directory containing this SKILL\.md>"\n/);
+    expect(skill).toContain('(references/run.md)');
+    const run = read('skills/spec-polish/references/run.md');
+    const blocks = [...run.matchAll(/```bash\n([\s\S]*?)```/g)].map(match => match[1]);
+    const scripts = [];
+    for (const block of blocks) {
+      expect(block).toMatch(/^SKILL_DIR="[^"\n]+"[;\n]/);
+      expect(spawnSync('bash', ['-n'], { input: block, encoding: 'utf8' }).status).toBe(0);
+      for (const match of block.matchAll(/"\$SKILL_DIR\/scripts\/([^"\n]+)"/g)) {
+        expect(fs.existsSync(`skills/spec-polish/scripts/${match[1]}`)).toBe(true);
+        scripts.push(match[1]);
+      }
+    }
+    expect(scripts.sort()).toEqual([
+      'detect-project-type.sh', 'read-launch-json.sh',
+      'resolve-package-manager.sh', 'resolve-port.sh',
+    ]);
   });
 
   test('product pulse stays host-neutral and preserves its fixed report owner', () => {
