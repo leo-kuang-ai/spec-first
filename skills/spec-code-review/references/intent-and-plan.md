@@ -54,6 +54,8 @@ with a flat-rate computation. Must not regress edge cases in tax-exempt handling
 
 Pass this to every reviewer in their spawn prompt. Intent shapes *how hard each reviewer looks*, not which reviewers are selected.
 
+Keep `session-settled:` decision annotations out of the intent summary and every independent reviewer bundle, including peer briefs. Retain their decision, class (`user-directed` or `user-approved`), and rejected alternative in orchestrator context for final triage. This isolates a prior preference from fresh reasoning; it does not remove applicable project instructions, product requirements, or authorization limits from reviewer inputs.
+
 **When intent is ambiguous:** Infer from branch name, commits, PR title/body, diff, `plan:`, and conversation. Write the best-effort intent summary and note uncertainty in Coverage — never block on a clarifying question.
 
 ### Stage 2b: Plan discovery (requirements verification)

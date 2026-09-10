@@ -11,21 +11,21 @@
     {
       "id": "safe-additive-migration-does-not-dispatch",
       "kind": "negative-owner",
-      "input": "Diff 新增一个 nullable column；包含 migration artifact，但没有 backfill、drop、rename、destructive DDL 或 NOT NULL tightening。",
-      "expected": "Stage 3 可以选择 data-migration reviewer，但不得把 deployment-verification-agent 加入 selected_local_prompt_assets；Stage 4 不 dispatch，也不生成 Deployment Notes。",
+      "input": "The diff adds a nullable column and includes a migration artifact, but no backfill, drop, rename, destructive DDL, or NOT NULL tightening.",
+      "expected": "Stage 3 may select the data-migration reviewer but must not add deployment-verification-agent to selected_local_prompt_assets; Stage 4 does not dispatch it or generate Deployment Notes.",
       "forbidden": [
-        "仅因存在 migration 文件就 dispatch deployment verification",
-        "把 safe additive migration 描述成 risky gate 已通过"
+        "Dispatch deployment verification merely because a migration file exists",
+        "Describe a safe additive migration as passing the risky-change gate"
       ]
     },
     {
       "id": "risky-migration-dispatches-deployment-verification",
       "kind": "positive",
-      "input": "Diff 包含 db/migrate/20260721_backfill_accounts.rb，并执行 backfill 后把 account_id 改为 NOT NULL without default。",
-      "expected": "Stage 3 选择 deployment-verification-agent，记录 artifact path 与 backfill/NOT NULL risky operation；Stage 4 只消费该选择并 dispatch。",
+      "input": "The diff includes db/migrate/20260721_backfill_accounts.rb and runs a backfill before changing account_id to NOT NULL without default.",
+      "expected": "Stage 3 selects deployment-verification-agent and records the artifact path and risky backfill/NOT NULL operation; Stage 4 only consumes that selection and dispatches it.",
       "forbidden": [
-        "只派发 data-migration reviewer 而漏掉 deployment verification",
-        "applicability reason 只列 migration 文件名而不列 risky operation"
+        "Dispatch only the data-migration reviewer and omit deployment verification",
+        "List only the migration filename in the applicability reason without the risky operation"
       ]
     }
   ]

@@ -56,6 +56,8 @@ When a finding qualifies:
 10. **Collect coverage data.** Union residual_risks and testing_gaps across reviewers.
 11. **Preserve spec-first local-prompt artifacts.** Keep the learnings, agent-native, and deployment-verification outputs alongside the merged finding set. Do not drop unstructured output just because it does not match the persona JSON schema. Schema drift from `data-migration` is already in the merged finding set.
 
+Before finalizing findings, compare recommendations with the retained `session-settled:` decisions. A recommendation that merely repeats an explicitly rejected alternative is a settlement conflict to explain, not an automatic fix. Keep source-backed correctness, safety, and contract defects actionable even when they challenge a settled choice; name the new evidence and the decision that needs reconsideration. An annotation is context, never authority to suppress a defect or mutate source.
+
 ### Stage 5b: Validation pass (optional quality gate)
 
 Independent verification gate. Spawn one validator sub-agent per surviving finding using `references/validator-template.md`. Findings the validator rejects are dropped; confirmed findings flow through unchanged.

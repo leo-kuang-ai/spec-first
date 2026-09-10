@@ -88,8 +88,8 @@ describe('Skill-flow 剩余 P2 关闭合同', () => {
   test('SF-21 maintainability 不能用 P1 anchor-50 绕过 synthesis', () => {
     const prompt = read('skills/spec-code-review/references/personas/maintainability-reviewer.md');
 
-    expect(prompt).toContain('Anchor 50 — suppress');
-    expect(prompt).toContain('提升为 anchor 75');
+    expect(prompt).toContain('Anchor 50 - suppress');
+    expect(prompt).toContain('raise confidence to anchor 75');
     expect(prompt).not.toContain('suppress unless severity is P1');
   });
 
@@ -132,7 +132,7 @@ describe('Skill-flow 剩余 P2 关闭合同', () => {
     ]) {
       expect(resolver).toContain(authority);
     }
-    expect(resolver).toContain('workflow invocation 不授权这些副作用');
+    expect(resolver).toContain('workflow invocation does not authorize these effects');
     expect(xcode).toMatch(/^disable-model-invocation:\s*true$/m);
     expect(xcode).not.toContain('## Integration with spec-code-review');
   });
