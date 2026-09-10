@@ -188,7 +188,7 @@ Lead with the point, then the mechanism, then the caveat. Dense is good; long is
 
 Articulate the PR's narrative frame:
 
-Use Step A's written umbrella and material clusters as the frame. Represent peer outcomes at parity instead of making the initiating incident the main story and treating equally material results as extras. When program context exists, include concise placement where it helps the reviewer understand this contribution; do not crowd the opening with already-visible mechanisms or a second description of the same outcome.
+Use Step A's written umbrella and material clusters as the frame. Represent peer outcomes at parity instead of making the initiating incident the main story and treating equally material results as extras. When program context exists, decide what the opening's one idea must include: usually the local outcome by itself, with concise placement in a short block after the opening; but when the program is what gives the local outcome its shape or its point, the connection to the program is part of the one idea and belongs in the opening — either half may lead, whichever reads better for this change, and naming which part of the program this PR delivers keeps that opening honest. Never crowd the opening with already-visible mechanisms or a second description of the same outcome; everything the one idea does not need goes in the block after it.
 
 1. **Before**: What was broken, limited, or impossible? (One sentence.)
 2. **After**: What's now possible or improved? (One sentence.)
