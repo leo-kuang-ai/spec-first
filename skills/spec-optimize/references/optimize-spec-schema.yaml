@@ -341,7 +341,7 @@ required_fields:
             type: string
             pattern: "^(?:[a-f0-9]{40}|sha256:[a-f0-9]{64})$"
             required_when: "measurement.calibration.mode == 'measurement-only'"
-            description: "Immutable source ref or content hash for the baseline arm"
+            description: "Immutable source ref or content hash for the baseline arm. The value must uniquely identify the measured reference bytes: a revision is enough when it names those bytes; a HEAD shared by different uncommitted trees is not."
           candidate_identity:
             type: string
             pattern: "^(?:[a-f0-9]{40}|sha256:[a-f0-9]{64})$"

@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(optimize): 补齐 CE 098ccdb8 的机制化描述与负向路由、attribute 意图与 schema 身份唯一性警示。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(explain): 补齐 CE 57e409e5 的 check-in 改为 artifact 内静态 Check yourself 节，删除阻塞式 quiz 机制。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(compound): 补齐 CE d3c6f12d 的反事实资格测试、过时学习更新规则与提议门槛前置。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(review): 补齐 CE 52d56f2a 的紧凑返回 exact-key 条件句（notes 非字段、合并器拒绝顶替）。 (user-visible)

@@ -1,12 +1,12 @@
 ---
 name: spec-optimize
-description: "Run metric-driven optimization loops. Use when improving a measurable outcome through experiments."
+description: "Optimize a working system against a measurable target. Use when a named workload's cost should drop and the change is not already known, or when several variants must be scored and kept. Not for diagnosing failing or slow behavior (spec-debug), and not for implementing a change you already know (spec-work)."
 argument-hint: "[path to optimization spec YAML, or describe the optimization goal]"
 ---
 
 # Iterative Optimization Loop
 
-Run metric-driven iterative optimization. Define a goal, build measurement scaffolding, then run parallel experiments that converge toward the best solution.
+Run metric-driven iterative optimization. Define a goal, build measurement scaffolding, then run parallel experiments that converge toward the best solution. The next action is the cheapest step that would change what gets implemented: attribute the cost of the named workload before searching implementations, and search and keep a scored variant space without requiring a profile. Stop as soon as a stopping criterion holds — do not grind to the iteration cap after the target is met.
 
 Use `scripts/decide.cjs` for numeric multi-objective eligibility, comparison thresholds, and measurement-ladder steps. A required-objective win can be kept even when the primary is unchanged; confirmation and integration must finish before recording `kept`. Completion requires every declared required target or another explicit stop, a verified final log, and an honest account of blocked or unfinished work. `references/example-expensive-benchmark-spec.yaml` illustrates multiple required targets and staged sampling.
 
