@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(work): 补齐 CE 67550d1c 的隔离证明下并行默认、单响应 wave 派发与冷启动定价；spec-lfg 增加叙事与完成纪律。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(peer-runner): 移植 CE 118633f1 的 Windows reap PID 重用身份防护到三份 peer-job-runner，新增 parity 存在性断言。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(skill-authoring): 采纳 CE 5259c92c 的移除具体形态视为行为变化与排除句后无竞争裁决规则，落位 authoring-method。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(plan): 补齐 CE 2ca1f81c 的 Goal Capsule objective 组件外锚定规则与 approach/Means 区分。 (user-visible)

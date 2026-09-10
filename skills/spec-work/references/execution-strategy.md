@@ -113,8 +113,12 @@ Map real dependencies and contention before a batch:
 - same-file edits, shared types/APIs, migrations, generated clients, lockfiles, snapshots, shared config/schema, and an environment singleton such as one dev server/port, database, browser session, package install, or rate-limited provider are contention;
 - without dispatch authorization or capability, run inline;
 - with authorization and capability but shared-directory/unknown isolation, same-file or otherwise contending tasks run serially; disjoint write sets may use bounded parallel only when workers do not stage, commit, or run shared/full-suite commands;
-- with proven isolation, independent disjoint tasks may use bounded parallel; contending tasks remain serial by default unless the returned merge contract is explicit and the merge cost is demonstrably small;
+- with proven isolation, parallel dispatch of each dependency layer's independent units is the default, not an optimization to opt into: serialize only the units the dependency graph or a surviving contention actually chains. Resolve contention uncertainty by inspection — read the actual files and contracts in question — not by defaulting to serial. When contention survives inspection, decline parallelism for exactly the contending units and dispatch the rest of the layer in parallel; uncertainty about one unit never serializes its whole layer, and safety still beats speed for the units that genuinely contend;
 - abort parallelism after broad unplanned edits, an out-of-scope delta, repeated conflicts, or shared-environment interference.
+
+Price the cold-start tax before decomposing: every dispatched worker pays a context ramp-up before its first write. A unit too small to outweigh its own ramp-up belongs batched with related small units into one worker's packet — or done inline — rather than dispatched alone; per-unit ceremony is overhead, not rigor.
+
+Dispatch a wave in one response. When a dependency layer clears its dependency/contention mapping, list every dispatch-ready unit, then issue every worker dispatch that does not depend on another's result in that single response, never one per turn. Apply the same batching to independent read-only calls throughout the run: file reads, pattern searches, and test discovery that do not depend on one another go out together. Only the write-and-verify steps are inherently sequential.
 
 Bound concurrency to the host's real accepted capacity. Capacity backpressure is not task failure; keep work queued or fall back to serial/inline.
 
