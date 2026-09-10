@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 2767cc74 的 explain Phase 6 close，确认 destinations、artifact preservation、公开发布确认与 improvement routing 已由现有 references 承载。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(pov): 融合 CE 090e7b2a 的 intake/grounding/follow-up 引用边界，统一 Skill 英文 dispatch 约束，保留只读判断与 owner-only scratch 纪律。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 8bbcc197 的 top-level PR comment 可见性；确认现有 resolver 已按内容判断、保留作者反馈与身份事实，排除 CE babysit 专属 owner。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(pr-feedback): 融合 CE 1444dfcc 的 pipeline 引用与集中裁决边界，补齐 GHE host 传递、needs-human 分析回复和非收敛根因判断，保留 pipeline-return 的本地只读出口。 (user-visible)
