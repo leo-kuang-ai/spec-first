@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 22:29:59 zcode: docs(plan): CE-129 同步计划收尾——status completed，边界与待决策项显式保留。 (user-visible)
 - v1.15.3 2026-09-10 22:16:14 zcode: test(setup): Windows 路径段不可含换行——structured-action 用例按平台替换该字符（既有 Windows CI 债务的最小明确修复）。 (user-visible)
 - v1.15.3 2026-09-10 22:03:13 zcode: docs(sync): CE-129 补审最终验证记录——129 行审计、六项组合验证全绿、独立审查修复、已知边界与 fingerprint。 (user-visible)
 - v1.15.3 2026-09-10 21:54:56 zcode: fix(review): 独立审查修复——spec-explain 静态自测节四个矛盾点对齐、CHANGELOG 头部位移、doctor 退出码武装矩阵测试与 persona 示例笔误。 (user-visible)

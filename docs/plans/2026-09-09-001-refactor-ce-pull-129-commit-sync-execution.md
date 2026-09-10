@@ -1,7 +1,7 @@
 ---
 title: "CE pull 129 提交同步执行口径"
 type: refactor
-status: active
+status: completed
 date: 2026-09-09
 sequence: 001
 topic: ce-pull-129-commit-sync
@@ -198,3 +198,8 @@ U1 至 U129 分别对应任务表第 1 至 129 行，不以 Git 拓扑排序或�
 4. 按风险运行 focused tests 和 fresh-source 语义检查。测试文件先发现再执行，不能编造路径；typecheck 或静态字符串测试不证明 Skill 行为充分性。
 5. 执行上述仓库级检查并保留最终结果。已有失败必须通过隔离基线或等价证据归因，不能未经比较就宣布与本次无关；不得改历史 review receipt 的 hash 来伪造新的审查通过。
 6. 全面审查发现的问题完成修复和相关复验。缺失或失败的必要证据保持整体未完成，不以表格全填满、三次提交或窄测试通过宣称目标完成。
+
+
+## 2026-09-10 收尾
+
+129 项全部完成逐项补审、独立提交与任务表回写；最终组合验证与一次独立只读审查已完成（详见 `docs/validation/ce-pull-2026-09-09/final-verification-2026-09-10.md`）。已推送并以 PR #55 收口。保留的显式未完成/边界：ce-bakeoff 与 ce-noslop 产品面待决策（117/119 证据）、Windows Compatibility CI 的既有 workspace-graph 编排债务（此前所有 HEAD 相同，与本批无关，已在 PR 描述与最终记录披露）、ce-localization closeout 为 inline 非独立评审天花板。
