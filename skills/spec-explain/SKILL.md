@@ -1,6 +1,6 @@
 ---
 name: spec-explain
-description: "Create a durable, visual teaching artifact for a concept, diff, idea, or recent-work window, with an optional check-in that makes it stick. Use when the user asks to be taught or wants a deep explainer; not for ordinary Q&A, brief why-followups, diagnosis, status updates, or concise trade-off answers."
+description: "Create a durable, visual teaching artifact for a concept, diff, idea, or recent-work window, with an optional Check Yourself section that makes it stick. Use when the user asks to be taught or wants a deep explainer; not for ordinary Q&A, brief why-followups, diagnosis, status updates, or concise trade-off answers."
 argument-hint: "[a concept, a diff ref, an idea, or 'what happened this week?'] — or invoke bare to be asked"
 ---
 
@@ -10,7 +10,7 @@ Teach the user one thing well: a concept, a change, an idea, or a window of thei
 
 Use the user's current request from the conversation as the explainer input.
 
-**Done:** the artifact exists at a recoverable reported path, has been presented to the user, and the selected destination and accepted check-in have been handled. Direct answers under the operational-question gate and confirmed empty recap windows may finish without an artifact; missing required user input remains an explicit pending boundary.
+**Done:** the artifact exists at a recoverable reported path, has been presented to the user, and the selected destination has been honored. Direct answers under the operational-question gate and confirmed empty recap windows may finish without an artifact; missing required user input remains an explicit pending boundary.
 
 Note: Use the current date from the active host context. Use this when weighting external sources and dating artifacts.
 
@@ -72,23 +72,11 @@ echo "$RUN_DIR"
 - **External concepts** (no footprint in this repo): skip repo grounding entirely — do not force repo context into the output. Research with whatever web tools are reachable. When none are, you may explain from model knowledge, but the artifact must label that content **Unverified — from model knowledge, not checked against current sources** in its metadata header.
 - **Idea mode:** the idea is a fixed given. Explain its implications, mechanics, and trade-offs for the user's understanding. Never scope it (`spec-brainstorm`'s job), never generate and rank alternatives (`spec-ideate`'s job).
 
-### Phase 3: Check-in gate — before anything is revealed
+### Phase 3: Compose the explainer
 
-Read `references/check-in.md` before deciding whether to offer a check-in. It owns the warrant test, offer wording, prediction protocol, and exercise design. Judge whether the material warrants a check-in (a routine recap does not; a gnarly diff or a hard concept does), then offer it with the blocking question tool. The user can always decline, and declining is never re-litigated.
+Read the rendering reference for the resolved format **now**, not earlier: `references/explainer-html.md` (default) or `references/explainer-markdown.md` (when intake resolved `output:md`). Compose per its contract — visible metadata header, show-n-tell form matched to the material, ~70ch measure, single self-contained file — and read `references/check-in.md` with it: it owns whether the artifact ends with a `Check yourself` section and that section's shape. The run never blocks on the check-in — no offer, no prediction turn, no exercise posed in chat; the section is static text the reader works through alone, so a user who switches away never comes back to a waiting question. Write the artifact to `$RUN_DIR/explainer.html` (or `$RUN_DIR/explainer.md` when intake resolved `output:md`) before anything else happens with it. Display it to the user (inline summary plus the file path; open locally per Phase 4 when chosen). The artifact exists at that stable path from this moment — a declined destination ask never loses it.
 
-Record the exact choice: **Just the explainer** (the recommended default) or **Quiz me**. Only **Quiz me** enables prediction and exercises; acceptance of the explainer itself is not check-in consent. A skipped offer enables neither mechanic. In diff mode, the offer must not reveal the change's purpose or interpretation.
-
-**Diff mode with check-in accepted — hard ordering rule.** No interpretive content — explanation, annotation, diagram, or surfaced opportunity — may be shown before the user's prediction turn ends. Show only the raw change reference (the diff or its stat summary), ask for the prediction ("What do you think this change does, and why was it made?"), and **end the turn there**. When no blocking tool exists, ask in chat and stop — never print the reveal in the same message as the prediction prompt. Compose the explainer only after the prediction lands; the reveal names the gaps between the prediction and what the change actually does.
-
-### Phase 4: Compose the explainer
-
-Read the rendering reference for the resolved format **now**, not earlier: `references/explainer-html.md` (default) or `references/explainer-markdown.md` (when intake resolved `output:md`). Compose per its contract — visible metadata header, show-n-tell form matched to the material, ~70ch measure, single self-contained file — and write the artifact to `$RUN_DIR/explainer.html` (or `$RUN_DIR/explainer.md` when intake resolved `output:md`) before anything else happens with it. Display it to the user (inline summary plus the file path; open locally per Phase 6 when chosen). The artifact exists at that stable path from this moment — a declined destination ask never loses it.
-
-### Phase 5: Exercises (when warranted)
-
-Only when the recorded choice is **Quiz me**, pose the exercises from `references/check-in.md` in chat, one at a time, using the blocking question tool where its option shape fits and free chat where the answer is narrative. Check each answer, correct it, and name the gap it exposed. Do not put exercises inside the artifact. **Just the explainer** proceeds directly to the destination phase.
-
-### Phase 6: Destination ask and close
+### Phase 4: Destination ask and close
 
 **Required read before you render anything in this phase: `references/destinations.md`.** It owns capability detection, the destination menu, per-option actions, audience re-render ordering, consent gates, and improvement observations. Read it now; do not render the menu or act on a selection without it.
 
@@ -101,4 +89,4 @@ Publishing is never headless or inferred. A public destination requires its full
 - **Not a verdict.** "Should we adopt X?" is `spec-pov`. spec-explain teaches what X is and how it works.
 - **Not repo memory.** Documenting a solved problem for future work is `spec-compound`. spec-explain teaches the human, not the repo.
 - **Not ideation or scoping.** An idea input is explained as given — implications and trade-offs — never expanded into options or a requirements dialogue.
-- **The check-in is never headless.** It exists to exercise the human; automating the answers deletes the product.
+- **The check-in never blocks the run.** It is a `Check yourself` section of the artifact for the human reader; the run poses no question and waits on nothing.
