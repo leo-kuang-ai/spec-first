@@ -15,11 +15,11 @@ Detect destinations from the current session's tools and context. Missing binari
 
 Artifact surface and Thinkroom may expose the artifact to other readers. Before sending a personally-composed artifact to such a destination, offer once to re-render for the requested audience using the compose-time rendering reference. Take the answer and proceed either way; never re-render unasked. Complete this offer before any destination-specific consent gate.
 
-Publishing is never headless or inferred. If a destination is public or its capability contract requires confirmation, show the full warning first and obtain explicit confirmation in a separate ask; naming the destination is not confirmation. If confirmation cannot be obtained, do not publish; preserve the canonical artifact and report its local `$RUN_DIR/explainer.html` (or `.md`) path.
+Publishing is never headless or inferred. If a destination is public or its capability contract requires confirmation, show the full warning first and obtain explicit confirmation in a separate ask; naming the destination is not confirmation. If confirmation cannot be obtained, do not publish; use the entrypoint's non-interactive preservation path and report the recoverable artifact location.
 
 ## Improvement observations
 
-Once the destination is settled — sent, declined, or stopped at an unanswered consent gate — offer surfaced improvements, never auto-fire them while an ask remains open:
+Once the destination is sent or declined, offer surfaced improvements. An unanswered consent gate or unavailable interaction ends the run after artifact preservation; skip these offers. Never auto-fire improvements or raise them while an ask remains open:
 
 - **New-capability ideas** — on acceptance invoke `spec-ideate` through the skill-invocation primitive with the observations as seed context.
 - **Code-clarity findings** — on acceptance invoke `spec-simplify-code` through the skill-invocation primitive with the observations and files.

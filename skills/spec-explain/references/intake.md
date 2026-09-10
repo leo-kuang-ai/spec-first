@@ -29,3 +29,11 @@ Classify the remaining text by shape:
 **Tiebreak — concept vs diff:** when the request is plausibly both (a repo topic that also names an identifiable recent change, e.g. "explain the retry logic we just added"), a concretely resolvable change wins: diff mode, with the concept as framing context. A topic with no resolvable change is a concept.
 
 **Repo footprint check (concept mode):** a concept grounds in the repo only when it actually touches it. An external subject (a language feature, an interview topic, a paper) gets no repo grounding — do not force it.
+
+## Audience
+
+Default to the user as reader. An explicit request for a version the team or another audience will read changes voice and orientation, not depth: drop second person, name people only from evidence or the user's supplied names, and otherwise stay impersonal. Add only enough context for that reader to follow the same technical explanation. Meeting preparation and "so I can explain it" still teach the user. Do not silently turn an explainer into a terse status update or deck; route an explicit request for that different deliverable to its owner.
+
+## Operational-question gate
+
+When an inferred concept request is really an ordinary question about current behavior, configuration, status, or diagnosis, answer it directly in chat. Do not create a run directory or teaching artifact. Offer a durable visual explainer only when a substantial underlying concept is present and the user plausibly wants to learn it. Explicit teaching language, or a `diff:`/`since:` token, enters the full flow directly. A question with a colon in ordinary prose is not by itself a teaching or token signal.
