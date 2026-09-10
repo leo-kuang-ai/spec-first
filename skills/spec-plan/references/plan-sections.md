@@ -178,9 +178,17 @@ present. They carry the contracts downstream consumers depend on.
   refactor work has such an objective too: what that component's behavior
   cost the people the system serves. When a request supplies only an
   approach, that approach is the recommended-approach line, and the objective
-  is the outcome it serves, derived from the request's motivation or asked
-  for — never the approach restated. Test: if the implementation changed,
-  would the objective still be the goal?
+  is the outcome it serves, derived from the request's motivation, the
+  project's stated problem, or asked for — never the approach restated. The
+  objective must be holdable on its own: a reader who has not read the rest
+  of the plan must be able to hold it as the goal — could a colleague who
+  was not in the session say what this work is after the objective alone?
+  Remaining-true constraints live on their owning R-IDs, not as extra
+  objective clauses; user-checkable is not a license to pack them onto the
+  objective. An objective only understandable after later sections is not
+  yet the objective. Tests: if the implementation changed, would the
+  objective still be the goal? And can it be held without the rest of the
+  plan?
 - **Product Contract** — product scope and behavior. Contains Summary, Problem
   Frame, Requirements with stable R-IDs, and any material Actors, Flows,
   Acceptance Examples, Success Criteria, Scope Boundaries, Dependencies,
