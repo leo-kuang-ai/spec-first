@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(review): 补齐 CE 78fd3dab 的 persona 经典框架锚定——Google merge bar、Ousterhout/Fowler 具名、Nygard 稳定词汇与 OWASP/CWE 标识。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(commit-push-pr): 补齐 CE debd05a0 的 PR 开头按条件承载 program 动机规则。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(plan): 补齐 CE ba4468fa 的 Goal Capsule objective 可持有性要求与 coherence 不可持有信号。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(lfg): 补齐 CE 0e758b60 的 residual checklist 形态与 resolve-pr-feedback tick-only 规则。 (user-visible)
