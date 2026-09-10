@@ -553,7 +553,9 @@ describe('generic dispatch authorization matrix', () => {
     expect(sweep).toMatch(/mode:headless.*scheduled run.*do not authorize dispatch/is);
     expect(sweep).toMatch(/sensitive.*delegated handling/is);
     expect(refresh).toMatch(/never write.*tracked successor/is);
-    expect(refresh).toMatch(/must not write.*stage.*commit/is);
+    expect(refresh).toMatch(/investigation workers are read-only and never write a tracked successor, stage, or commit/i);
+    expect(read('skills/spec-compound-refresh/references/investigate.md'))
+      .toContain('They never write tracked files, stage, commit, or delete.');
     expect(resolver).toContain('Resolver workers never stage, commit, push, reply, or resolve threads');
   });
 
