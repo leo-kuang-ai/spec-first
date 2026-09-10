@@ -1,6 +1,8 @@
 # Persona Activation Matrix
 
-This is a **lazy reference** for SKILL.md. Load when the quick-reference activation table in the spine doesn't resolve whether to activate a conditional persona. The table in the spine covers typical trigger signals; this file contains the full decision logic with two-leg activations, suppression rules, and edge cases.
+This is a **lazy reference** for `references/persona-selection.md`. Load when
+its quick-reference activation table does not resolve a conditional persona.
+This file supplies the full two-leg activations, suppression rules, and edge cases.
 
 ---
 

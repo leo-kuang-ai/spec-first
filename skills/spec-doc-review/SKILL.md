@@ -1,6 +1,6 @@
 ---
 name: spec-doc-review
-description: 使用角色化 lens 审查 requirements、plans、task packs 或 specs。适用于改进既有规划与执行文档；默认 standard roster（≤3 reviewers），完整条件 roster 使用 roster:full。
+description: Review requirements, plans, task packs, or specs through reviewer personas. Use to assess existing planning and execution documents; standard roster uses at most 3 reviewers, while roster:full selects every qualifying lens.
 argument-hint: "[mode:headless] [mutation:report-only|mutation:apply-fixes] [output:json] [roster:lite|standard|full] [path/to/document.md]"
 ---
 
@@ -10,9 +10,9 @@ Review requirements or plan documents through multi-persona analysis. Task packs
 
 ## Workflow Contract Summary
 
-- **输入：** requirements、统一计划、legacy plan、task pack 或其他可读 spec artifact，及可选 roster/output/mutation 参数。
-- **输出：** 默认 report-only 的结构化文档 findings、coverage、改进建议与可选 JSON envelope；只有显式 apply 授权才可修改 Markdown。
-- **硬出口：** 文档不可读、flag 冲突、task-pack/source-plan 漂移、format/source owner 不明确，或 mutation authority 缺失时不得写入文档。
+- **Inputs:** requirements, unified or legacy plans, task packs, or readable spec artifacts, with optional roster/output/mutation flags.
+- **Outputs:** report-only findings by default, coverage, recommendations, and optional JSON. Markdown fixes require explicit apply authority.
+- **Hard exits:** unreadable documents, conflicting flags, task-pack/source-plan drift, ambiguous format/source ownership, or missing mutation authority block writes.
 - **Dispatch boundary:** `worker_dispatch_authorization`, `capability_probe`, `worker_dispatch_capability`, `worker_capability_unproven`, `provider_untrusted`, `dispatch_authorization_missing`, and `subagent_capability_missing` are recorded before dispatch; direct invocation does not authorize workers, and inline fallback never claims independent persona coverage.
 
 ```yaml
@@ -22,8 +22,8 @@ worker_bounded_parallelism: supported | unsupported | unknown
 worker_dispatch_outcome: <record the live result>
 ```
 - **Mutation boundary:** `mode:headless` / `mode:non-interactive` only change delivery; `requested_mutation: default-report-only` remains the default. Without `mutation:apply-fixes`, ordinary writable Markdown resolves to `report-only`; commit and landing remain unauthorized.
-- **权威：** 原文和 source refs 提供事实，persona/LLM 判断语义充分性；producer 拥有 derived artifact 修复，review 不继承 commit/landing authority。
-- **消费者：** 文档 owner、`spec-brainstorm`、`spec-plan`、`spec-write-tasks`、`spec-work` 与人工 reviewer。
+- **Authority:** the document and source refs supply facts; personas/LLMs judge semantic adequacy. Producers own derived-artifact repair; review inherits no commit or landing authority.
+- **Consumers:** document owners, `spec-brainstorm`, `spec-plan`, `spec-write-tasks`, `spec-work`, and human reviewers.
 
 ## Interactive mode rules
 
@@ -59,7 +59,7 @@ Only when `delivery_mode: interactive` **and** `mutation_policy: markdown-write`
 
 ### Task Pack Review Lens
 
-仅当 Phase 1 分类为 `task-pack` 时读取 [Task Pack Review Lens](references/task-pack-review-lens.md)。
+Read [Task Pack Review Lens](references/task-pack-review-lens.md) only when Phase 1 classifies the input as `task-pack`.
 
 ### Subagent Template
 

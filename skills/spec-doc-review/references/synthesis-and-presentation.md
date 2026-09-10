@@ -129,7 +129,7 @@ Sort findings for presentation: P0 → P1 → P2 → P3, then by finding type (e
 
 ### Enforce Mutation Policy
 
-Apply the run-local `mutation_policy` resolved in `SKILL.md` before any write-capable path:
+Apply the run-local `mutation_policy` resolved in `references/document-intake.md` before any write-capable path:
 
 - **`markdown-write`:** apply only `safe_auto` findings at confidence anchor `100` to the document in a single pass. Edit inline with the platform's edit tool, track each change for the rendered summary, and never silent-apply anchor `75` or `50` findings.
 - **`report-only`:** do not edit the document, append Open Questions, enter the walkthrough, or invoke bulk Apply/Defer mechanics. Set `fixes_applied: 0`. Reclassify confidence-100 `safe_auto` findings as `producer_fix_candidates` in the envelope so an owning producer can decide whether to regenerate the artifact. Keep `gated_auto`, `manual`, FYI, residual, deferred, Coverage, and limitation surfaces intact.

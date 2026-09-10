@@ -183,6 +183,15 @@ describe('spec-doc-review current contracts', () => {
     expect(subagentTemplate).toContain('Settled decisions: {settled_ktds}');
   });
 
+  test('intake prepares provenance and native-format candidates without self-invocation', () => {
+    expect(documentIntake).toContain('Expected arguments: mode:non-interactive <path>');
+    expect(documentIntake).not.toContain('Re-invoke with: Skill');
+    expect(documentIntake).toContain('Always fill both slots');
+    expect(documentIntake).toContain('(`user-directed` or `user-approved`)');
+    expect(documentIntake).toContain('ID-bearing HTML producer-fix candidate');
+    expect(documentIntake).toContain('anchor convention and visible ID text');
+  });
+
   // --- U1: Subagent template spine structure ---
 
   test('U1: subagent template spine contains schema hard constraints', () => {
