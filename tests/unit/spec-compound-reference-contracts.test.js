@@ -44,4 +44,16 @@ describe('compound phase reference migration', () => {
     expect(history).toContain('Skip branch filtering on detached HEAD');
     expect(history).not.toContain('!`git');
   });
+
+  test('Lightweight preserves collision, reduced coverage, and partial-publication boundaries', () => {
+    const lightweight = read('references/lightweight.md');
+    expect(lightweight).toContain('same artifact type, reduced research and validation');
+    expect(lightweight).not.toContain('same documentation, fewer tokens');
+    expect(lightweight).toContain('if it exists, read it and update only when it covers the same problem');
+    expect(lightweight).toContain('choose a distinct descriptive filename and recheck that exact path');
+    expect(lightweight).toContain('Do not reopen, offer to edit, or edit instruction files');
+    expect(lightweight).toContain('not applicable - no active project instructions');
+    expect(lightweight).toContain('failure after the first successful publication must report the exact partial publication');
+    expect(lightweight).toContain('only after every intended publication succeeds');
+  });
 });
