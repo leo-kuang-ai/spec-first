@@ -12,7 +12,7 @@
 
 | 维度 | 结果 |
 |---|---|
-| target HEAD | `50f22ac9e9bd7d5e946ae19be19833ce5fce4efd` |
+| target HEAD | `19d3f6d8a06f3088d4e392a8718dac47aefa8587` |
 | canonical Skill | 38/38 |
 | package path | 1122/1122 |
 | package bytes | 6,624,923 |
@@ -20,7 +20,7 @@
 | direct-support relations | 424 |
 | unique direct-support paths | 208 |
 | source-tree hash | `5c75c9adfc8f24f7c377d833cc4683c9abc049fb9348e4178ae9db54b068d95e`，见 inventory/coverage artifact |
-| inventory hash | `3eb357b9f10a510b1c20a3473b7c6b9bd50cac1606f3ec214f386021e098ac56`，见 inventory snapshot |
+| inventory hash | `3d2c3266db961c90c358e4d824687e879530eadc612e3e24e0f936659c39aa58`，见 inventory snapshot |
 | dirty manifest | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`，计算时排除 `docs/validation/ce-localization/**` derived artifacts |
 | excluded | `skills/autoresearch` tracked symlink，host-owned/local-only，不计入 36 |
 

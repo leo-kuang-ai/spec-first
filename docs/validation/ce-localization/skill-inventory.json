@@ -4,25 +4,12 @@
   "producer": "scripts/check-ce-localization-review.cjs",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "638800b926c81010ed527f7fcbc52d549bfc2a1f",
-    "dirty": true,
-    "dirty_paths": [
-      "docs/catalog/runtime-capabilities.md",
-      "skills/spec-compound-refresh/SKILL.md",
-      "skills/spec-compound-refresh/scripts/validate-doc-claims.py",
-      "skills/spec-dogfood/SKILL.md",
-      "skills/spec-optimize/SKILL.md",
-      "skills/spec-polish/SKILL.md",
-      "skills/spec-runtime-setup/SKILL.md",
-      "skills/spec-work/references/implementation-loop.md",
-      "skills/spec-work/references/workspace-setup.md",
-      "src/cli/plugin-sync.js",
-      "tests/unit/agent-persona-template-drift.test.js",
-      "tests/unit/plugin-modules.test.js"
-    ],
-    "dirty_path_manifest_sha256": "e62a78f6b5a8e165ce5623e06df6926b81b1738049c1c4054127b9e665f7b7c9",
-    "source_tree_hash": "edf9c56d1f283ed1548a099b2175e3209985548653ae3d72d070b0c8f3875e7b",
-    "inventory_hash": "8b2c5e1a7396be7ee7c8bdbfd69cbe224c33b948764886bb8b2bf81049f7f0f7",
+    "head": "19d3f6d8a06f3088d4e392a8718dac47aefa8587",
+    "dirty": false,
+    "dirty_paths": [],
+    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source_tree_hash": "5c75c9adfc8f24f7c377d833cc4683c9abc049fb9348e4178ae9db54b068d95e",
+    "inventory_hash": "3d2c3266db961c90c358e4d824687e879530eadc612e3e24e0f936659c39aa58",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -62,8 +49,8 @@
   "excluded_paths": [],
   "skill_count": 38,
   "package_path_count": 1122,
-  "package_bytes": 6624128,
-  "package_manifest_sha256": "565c9c1df63aa69a5a8fc614b0dd4e9c6c79973ad97ab4c621166b577857890d",
+  "package_bytes": 6624923,
+  "package_manifest_sha256": "03298f96182e742f8ebfe1b13b6683017e7248d8d679206b6009476e1af8cdb9",
   "skills": [
     {
       "skill_id": "autoresearch",
@@ -12362,9 +12349,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
-      "sha256": "a21e1b37a1210af8253787c41fe34541cdcd698ce744472f3a7eb84276fba5c2",
-      "bytes": 113894,
-      "line_count": 2486,
+      "sha256": "1cb971217524d52ee66ee8ede273fd8ad47997347c364c7ff136dc81efcd0f4d",
+      "bytes": 114158,
+      "line_count": 2489,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -12428,7 +12415,7 @@
     },
     {
       "path": "skills/spec-runtime-setup/setup-registry.json",
-      "sha256": "3a743340d015ddd2088f66c74d9414b0e4478300057459ec33241075c6e987f1",
+      "sha256": "b0e9b22fcb9cfb4103037f62b62d2cc91af2b7467aa268fff344544573a83637",
       "bytes": 59362,
       "line_count": 2032,
       "skill_id": "spec-runtime-setup",
@@ -12450,8 +12437,8 @@
     },
     {
       "path": "skills/spec-runtime-setup/SKILL.md",
-      "sha256": "c321aa8f6cd3ffcd9850d7640fd61c9915d3d27573c8c2a5de43e9bb7a6154da",
-      "bytes": 54859,
+      "sha256": "bd42f0807e65109423d681af14701d0d3fdc80fdb4890c169f843cd7c03613c7",
+      "bytes": 55200,
       "line_count": 361,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
@@ -13528,8 +13515,8 @@
     },
     {
       "path": "skills/spec-work/references/execution-strategy.md",
-      "sha256": "b80b9fd72031ef706e59067a68e8e7e9ed2209b37023baeb6d6b9728d2a96c9c",
-      "bytes": 25046,
+      "sha256": "a6a8c34fdf9fab9c6f888a657e6bb9b86c34dd2a0bfab1f6e0d2f6576b9f8d9b",
+      "bytes": 25236,
       "line_count": 199,
       "skill_id": "spec-work",
       "owning_skill": "spec-work",

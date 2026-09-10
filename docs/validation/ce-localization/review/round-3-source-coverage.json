@@ -4,25 +4,12 @@
   "producer": "scripts/check-ce-localization-review.cjs",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "638800b926c81010ed527f7fcbc52d549bfc2a1f",
-    "dirty": true,
-    "dirty_paths": [
-      "docs/catalog/runtime-capabilities.md",
-      "skills/spec-compound-refresh/SKILL.md",
-      "skills/spec-compound-refresh/scripts/validate-doc-claims.py",
-      "skills/spec-dogfood/SKILL.md",
-      "skills/spec-optimize/SKILL.md",
-      "skills/spec-polish/SKILL.md",
-      "skills/spec-runtime-setup/SKILL.md",
-      "skills/spec-work/references/implementation-loop.md",
-      "skills/spec-work/references/workspace-setup.md",
-      "src/cli/plugin-sync.js",
-      "tests/unit/agent-persona-template-drift.test.js",
-      "tests/unit/plugin-modules.test.js"
-    ],
-    "dirty_path_manifest_sha256": "e62a78f6b5a8e165ce5623e06df6926b81b1738049c1c4054127b9e665f7b7c9",
-    "source_tree_hash": "edf9c56d1f283ed1548a099b2175e3209985548653ae3d72d070b0c8f3875e7b",
-    "inventory_hash": "8b2c5e1a7396be7ee7c8bdbfd69cbe224c33b948764886bb8b2bf81049f7f0f7",
+    "head": "19d3f6d8a06f3088d4e392a8718dac47aefa8587",
+    "dirty": false,
+    "dirty_paths": [],
+    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source_tree_hash": "5c75c9adfc8f24f7c377d833cc4683c9abc049fb9348e4178ae9db54b068d95e",
+    "inventory_hash": "3d2c3266db961c90c358e4d824687e879530eadc612e3e24e0f936659c39aa58",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -57,17 +44,17 @@
     }
   },
   "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
-  "inventory_sha256": "eed18f45d5da1da2c6c843ceb23ae61491afd3b2d012834cc18a587742285d6a",
+  "inventory_sha256": "af887520669a32a1374e8b321f5824679da5779e6a91e0176204e6c497cd1e4d",
   "review_input": {
-    "inventory_sha256": "eed18f45d5da1da2c6c843ceb23ae61491afd3b2d012834cc18a587742285d6a",
-    "package_manifest_sha256": "565c9c1df63aa69a5a8fc614b0dd4e9c6c79973ad97ab4c621166b577857890d",
-    "direct_support_manifest_sha256": "ccf0562d0ddf678653183bfded8fdd8c44e4150d14b0757b9a95bc4950012508",
-    "relation_manifest_sha256": "d7c2de5ad64366297c4a7692977dee5f48beae373ec9828017d1091ddf012cc5"
+    "inventory_sha256": "af887520669a32a1374e8b321f5824679da5779e6a91e0176204e6c497cd1e4d",
+    "package_manifest_sha256": "03298f96182e742f8ebfe1b13b6683017e7248d8d679206b6009476e1af8cdb9",
+    "direct_support_manifest_sha256": "e42ee5d58a550d72e9c8629703269f2aa84faaa136d95eb7a8a3090b9abf83f9",
+    "relation_manifest_sha256": "fca692154aa9f83aeb0239356807bc342f8447c0b4201e48ff9b9d9916a1a620"
   },
   "coverage_summary": {
     "skill_count": 38,
     "package_path_count": 1122,
-    "package_bytes": 6624128,
+    "package_bytes": 6624923,
     "direct_support_unique_path_count": 208,
     "direct_support_relation_count": 424,
     "excluded_path_count": 0,
@@ -12382,9 +12369,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
-      "sha256": "a21e1b37a1210af8253787c41fe34541cdcd698ce744472f3a7eb84276fba5c2",
-      "bytes": 113894,
-      "line_count": 2486,
+      "sha256": "1cb971217524d52ee66ee8ede273fd8ad47997347c364c7ff136dc81efcd0f4d",
+      "bytes": 114158,
+      "line_count": 2489,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -12448,7 +12435,7 @@
     },
     {
       "path": "skills/spec-runtime-setup/setup-registry.json",
-      "sha256": "3a743340d015ddd2088f66c74d9414b0e4478300057459ec33241075c6e987f1",
+      "sha256": "b0e9b22fcb9cfb4103037f62b62d2cc91af2b7467aa268fff344544573a83637",
       "bytes": 59362,
       "line_count": 2032,
       "skill_id": "spec-runtime-setup",
@@ -12470,8 +12457,8 @@
     },
     {
       "path": "skills/spec-runtime-setup/SKILL.md",
-      "sha256": "c321aa8f6cd3ffcd9850d7640fd61c9915d3d27573c8c2a5de43e9bb7a6154da",
-      "bytes": 54859,
+      "sha256": "bd42f0807e65109423d681af14701d0d3fdc80fdb4890c169f843cd7c03613c7",
+      "bytes": 55200,
       "line_count": 361,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
@@ -13548,8 +13535,8 @@
     },
     {
       "path": "skills/spec-work/references/execution-strategy.md",
-      "sha256": "b80b9fd72031ef706e59067a68e8e7e9ed2209b37023baeb6d6b9728d2a96c9c",
-      "bytes": 25046,
+      "sha256": "a6a8c34fdf9fab9c6f888a657e6bb9b86c34dd2a0bfab1f6e0d2f6576b9f8d9b",
+      "bytes": 25236,
       "line_count": 199,
       "skill_id": "spec-work",
       "owning_skill": "spec-work",
@@ -14420,8 +14407,8 @@
       "skill_id": "autoresearch",
       "owning_skill": "autoresearch",
       "path": "tests/unit/ce-localization-review-contracts.test.js",
-      "sha256": "bebe7b8ca69fa4f5f5cfef27a6c41525674c5bd796a1abb358b075812a456b75",
-      "bytes": 5927,
+      "sha256": "d545890b80b12e2e9b85d96f1618726dde3bbf9eca563a0a00f87394aa66ff07",
+      "bytes": 5960,
       "line_count": 109,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
@@ -14432,8 +14419,8 @@
       "evidence": [
         {
           "source_path": "tests/unit/ce-localization-review-contracts.test.js",
-          "line": 21,
-          "excerpt": "// 1029 = 692 + autoresearch 收编为 canonical skill 源（2026-09-04 批次，01fad369，+337 包路径）"
+          "line": 31,
+          "excerpt": "// 2026-09-04（01fad369）：autoresearch 从 host-owned 排除清单收编进 canonical"
         }
       ]
     },
@@ -14699,9 +14686,9 @@
       "skill_id": "spec-brainstorm",
       "owning_skill": "spec-brainstorm",
       "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-      "sha256": "569a0a172b0235c64d8cd3e1a5942b9925db111d40a818ce61c1b4c33f6b46a8",
-      "bytes": 7886,
-      "line_count": 143,
+      "sha256": "cf4e246b46b36b488b5aa492da0b25151c96d7221c6fa548438e281668e4c3cf",
+      "bytes": 8076,
+      "line_count": 145,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -14711,7 +14698,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-          "line": 31,
+          "line": 30,
           "excerpt": "const brainstorm = read('skills/spec-brainstorm/references/output-mode.md');"
         }
       ]
@@ -14762,7 +14749,7 @@
       "skill_id": "spec-brainstorm",
       "owning_skill": "spec-brainstorm",
       "path": "tests/unit/mcp-setup-config-consumers.test.js",
-      "sha256": "9738ad74447325bfe6c7ed61e4d7a5587eddf85b17cebe1e98ae4002aee4a161",
+      "sha256": "d006ec7e094449f00d1822c702e065b1dacab4a3b2ef159320a239e5e78a415f",
       "bytes": 12827,
       "line_count": 271,
       "path_role": "evaluation",
@@ -15119,9 +15106,9 @@
       "skill_id": "spec-code-review",
       "owning_skill": "spec-code-review",
       "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-      "sha256": "569a0a172b0235c64d8cd3e1a5942b9925db111d40a818ce61c1b4c33f6b46a8",
-      "bytes": 7886,
-      "line_count": 143,
+      "sha256": "cf4e246b46b36b488b5aa492da0b25151c96d7221c6fa548438e281668e4c3cf",
+      "bytes": 8076,
+      "line_count": 145,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -15131,7 +15118,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-          "line": 99,
+          "line": 101,
           "excerpt": "'skills/spec-code-review/references/personas/deployment-verification-agent.md',"
         }
       ]
@@ -15455,9 +15442,9 @@
       "skill_id": "spec-commit-push-pr",
       "owning_skill": "spec-commit-push-pr",
       "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-      "sha256": "569a0a172b0235c64d8cd3e1a5942b9925db111d40a818ce61c1b4c33f6b46a8",
-      "bytes": 7886,
-      "line_count": 143,
+      "sha256": "cf4e246b46b36b488b5aa492da0b25151c96d7221c6fa548438e281668e4c3cf",
+      "bytes": 8076,
+      "line_count": 145,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -15467,7 +15454,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-          "line": 44,
+          "line": 46,
           "excerpt": "expect(read('skills/spec-commit-push-pr/SKILL.md')).toContain('Read `references/context.md` before Step 1');"
         }
       ]
@@ -15581,9 +15568,9 @@
       "skill_id": "spec-commit",
       "owning_skill": "spec-commit",
       "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-      "sha256": "569a0a172b0235c64d8cd3e1a5942b9925db111d40a818ce61c1b4c33f6b46a8",
-      "bytes": 7886,
-      "line_count": 143,
+      "sha256": "cf4e246b46b36b488b5aa492da0b25151c96d7221c6fa548438e281668e4c3cf",
+      "bytes": 8076,
+      "line_count": 145,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -15593,7 +15580,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-          "line": 37,
+          "line": 39,
           "excerpt": "const commit = read('skills/spec-commit/SKILL.md');"
         }
       ]
@@ -16022,9 +16009,9 @@
       "skill_id": "spec-compound",
       "owning_skill": "spec-compound",
       "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-      "sha256": "569a0a172b0235c64d8cd3e1a5942b9925db111d40a818ce61c1b4c33f6b46a8",
-      "bytes": 7886,
-      "line_count": 143,
+      "sha256": "cf4e246b46b36b488b5aa492da0b25151c96d7221c6fa548438e281668e4c3cf",
+      "bytes": 8076,
+      "line_count": 145,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -16034,7 +16021,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-          "line": 109,
+          "line": 111,
           "excerpt": "expect(read('skills/spec-compound/references/agents/best-practices-researcher.md')).toContain('Return only guidance that changes implementation, sequencing, or validation');"
         }
       ]
@@ -16694,9 +16681,9 @@
       "skill_id": "spec-doc-review",
       "owning_skill": "spec-doc-review",
       "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-      "sha256": "569a0a172b0235c64d8cd3e1a5942b9925db111d40a818ce61c1b4c33f6b46a8",
-      "bytes": 7886,
-      "line_count": 143,
+      "sha256": "cf4e246b46b36b488b5aa492da0b25151c96d7221c6fa548438e281668e4c3cf",
+      "bytes": 8076,
+      "line_count": 145,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -16706,7 +16693,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-          "line": 71,
+          "line": 73,
           "excerpt": "read('skills/spec-doc-review/SKILL.md'),"
         }
       ]
@@ -17261,9 +17248,9 @@
       "skill_id": "spec-ideate",
       "owning_skill": "spec-ideate",
       "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-      "sha256": "569a0a172b0235c64d8cd3e1a5942b9925db111d40a818ce61c1b4c33f6b46a8",
-      "bytes": 7886,
-      "line_count": 143,
+      "sha256": "cf4e246b46b36b488b5aa492da0b25151c96d7221c6fa548438e281668e4c3cf",
+      "bytes": 8076,
+      "line_count": 145,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -17273,8 +17260,8 @@
       "evidence": [
         {
           "source_path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-          "line": 12,
-          "excerpt": "'skills/spec-ideate/SKILL.md',"
+          "line": 33,
+          "excerpt": "const ideateOutput = read('skills/spec-ideate/references/output-mode.md');"
         }
       ]
     },
@@ -17324,7 +17311,7 @@
       "skill_id": "spec-ideate",
       "owning_skill": "spec-ideate",
       "path": "tests/unit/mcp-setup-config-consumers.test.js",
-      "sha256": "9738ad74447325bfe6c7ed61e4d7a5587eddf85b17cebe1e98ae4002aee4a161",
+      "sha256": "d006ec7e094449f00d1822c702e065b1dacab4a3b2ef159320a239e5e78a415f",
       "bytes": 12827,
       "line_count": 271,
       "path_role": "evaluation",
@@ -18191,9 +18178,9 @@
       "skill_id": "spec-plan",
       "owning_skill": "spec-plan",
       "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-      "sha256": "569a0a172b0235c64d8cd3e1a5942b9925db111d40a818ce61c1b4c33f6b46a8",
-      "bytes": 7886,
-      "line_count": 143,
+      "sha256": "cf4e246b46b36b488b5aa492da0b25151c96d7221c6fa548438e281668e4c3cf",
+      "bytes": 8076,
+      "line_count": 145,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -18203,8 +18190,8 @@
       "evidence": [
         {
           "source_path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-          "line": 34,
-          "excerpt": "const plan = read('skills/spec-plan/SKILL.md');"
+          "line": 36,
+          "excerpt": "const plan = read('skills/spec-plan/references/output-mode.md');"
         }
       ]
     },
@@ -18275,7 +18262,7 @@
       "skill_id": "spec-plan",
       "owning_skill": "spec-plan",
       "path": "tests/unit/mcp-setup-config-consumers.test.js",
-      "sha256": "9738ad74447325bfe6c7ed61e4d7a5587eddf85b17cebe1e98ae4002aee4a161",
+      "sha256": "d006ec7e094449f00d1822c702e065b1dacab4a3b2ef159320a239e5e78a415f",
       "bytes": 12827,
       "line_count": 271,
       "path_role": "evaluation",
@@ -18825,7 +18812,7 @@
       "skill_id": "spec-prd",
       "owning_skill": "spec-prd",
       "path": "docs/contracts/project-graph-consumption.md",
-      "sha256": "3816dfc3252415a79056300a64cc7cb790cc54f27b8ff4d73c6e36a3618c2b4f",
+      "sha256": "f4e24e45dc961ee400fa5e64367508ca45c14fb2461848e3d19893e440b3d4c4",
       "bytes": 20230,
       "line_count": 135,
       "path_role": "reference-contract",
@@ -19434,9 +19421,9 @@
       "skill_id": "spec-product-pulse",
       "owning_skill": "spec-product-pulse",
       "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-      "sha256": "569a0a172b0235c64d8cd3e1a5942b9925db111d40a818ce61c1b4c33f6b46a8",
-      "bytes": 7886,
-      "line_count": 143,
+      "sha256": "cf4e246b46b36b488b5aa492da0b25151c96d7221c6fa548438e281668e4c3cf",
+      "bytes": 8076,
+      "line_count": 145,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -19446,7 +19433,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-          "line": 38,
+          "line": 40,
           "excerpt": "const pulse = read('skills/spec-product-pulse/SKILL.md');"
         }
       ]
@@ -19455,7 +19442,7 @@
       "skill_id": "spec-product-pulse",
       "owning_skill": "spec-product-pulse",
       "path": "tests/unit/mcp-setup-config-consumers.test.js",
-      "sha256": "9738ad74447325bfe6c7ed61e4d7a5587eddf85b17cebe1e98ae4002aee4a161",
+      "sha256": "d006ec7e094449f00d1822c702e065b1dacab4a3b2ef159320a239e5e78a415f",
       "bytes": 12827,
       "line_count": 271,
       "path_role": "evaluation",
@@ -19518,7 +19505,7 @@
       "skill_id": "spec-project-rules",
       "owning_skill": "spec-project-rules",
       "path": "docs/contracts/project-graph-consumption.md",
-      "sha256": "3816dfc3252415a79056300a64cc7cb790cc54f27b8ff4d73c6e36a3618c2b4f",
+      "sha256": "f4e24e45dc961ee400fa5e64367508ca45c14fb2461848e3d19893e440b3d4c4",
       "bytes": 20230,
       "line_count": 135,
       "path_role": "reference-contract",
@@ -20043,7 +20030,7 @@
       "skill_id": "spec-rule-miner",
       "owning_skill": "spec-rule-miner",
       "path": "docs/contracts/project-graph-consumption.md",
-      "sha256": "3816dfc3252415a79056300a64cc7cb790cc54f27b8ff4d73c6e36a3618c2b4f",
+      "sha256": "f4e24e45dc961ee400fa5e64367508ca45c14fb2461848e3d19893e440b3d4c4",
       "bytes": 20230,
       "line_count": 135,
       "path_role": "reference-contract",
@@ -20085,7 +20072,7 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "docs/contracts/project-graph-consumption.md",
-      "sha256": "3816dfc3252415a79056300a64cc7cb790cc54f27b8ff4d73c6e36a3618c2b4f",
+      "sha256": "f4e24e45dc961ee400fa5e64367508ca45c14fb2461848e3d19893e440b3d4c4",
       "bytes": 20230,
       "line_count": 135,
       "path_role": "reference-contract",
@@ -20097,7 +20084,7 @@
       "evidence": [
         {
           "source_path": "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
-          "line": 1990,
+          "line": 1993,
           "excerpt": "'- 普通 workflow 不会在代码变更后刷新 project graph。按 `docs/contracts/project-graph-consumption.md` 将 freshness 作为 setup/readiness advisory；需要显式刷新时运行 `spec-runtime-setup --only graphify --refresh`。',"
         }
       ]
@@ -20237,7 +20224,7 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/fixtures/mcp-setup/legacy-parity/replay-runtime-contracts.cjs",
-      "sha256": "6bec9ea463a39bba23d1a0467da2618389cde4496a9df2badb8f66255a68c2f6",
+      "sha256": "f7c9a22c54b53e53bcef4e74d2c4349d76905960736a232ebd4181443626494d",
       "bytes": 29695,
       "line_count": 659,
       "path_role": "evaluation",
@@ -20321,7 +20308,7 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/integration/workspace-graph-auto-refresh.integration.test.js",
-      "sha256": "48af2b0dd00a014967957813445e89cbbe6ad97db2d84edc7fa33ce5fb499de5",
+      "sha256": "67d64289179889b6b08d5ff3a33150055195ce63510027dd646e6f04b9d53742",
       "bytes": 26990,
       "line_count": 575,
       "path_role": "evaluation",
@@ -20384,9 +20371,9 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-      "sha256": "569a0a172b0235c64d8cd3e1a5942b9925db111d40a818ce61c1b4c33f6b46a8",
-      "bytes": 7886,
-      "line_count": 143,
+      "sha256": "cf4e246b46b36b488b5aa492da0b25151c96d7221c6fa548438e281668e4c3cf",
+      "bytes": 8076,
+      "line_count": 145,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -20396,7 +20383,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-          "line": 133,
+          "line": 135,
           "excerpt": "const setup = read('skills/spec-runtime-setup/references/config-template.yaml');"
         }
       ]
@@ -20405,9 +20392,9 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/unit/graphify-defensive-probes.test.js",
-      "sha256": "325584136a121c68b2b7b3aa5464f30f54741329ee0586065c2134a585f746d4",
-      "bytes": 2182,
-      "line_count": 56,
+      "sha256": "79c76bec14c429def5a7553eb54dc6a203dcbbdd32a23d0bef320408eafd74bd",
+      "bytes": 2616,
+      "line_count": 66,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -20426,7 +20413,7 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/unit/mcp-setup-config-consumers.test.js",
-      "sha256": "9738ad74447325bfe6c7ed61e4d7a5587eddf85b17cebe1e98ae4002aee4a161",
+      "sha256": "d006ec7e094449f00d1822c702e065b1dacab4a3b2ef159320a239e5e78a415f",
       "bytes": 12827,
       "line_count": 271,
       "path_role": "evaluation",
@@ -20474,7 +20461,7 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/unit/mcp-setup-entrypoint.test.js",
-      "sha256": "b4d1d13143c85d77632e2bbf64ed7498ba2a7ddfee147109cc2ea76628741dee",
+      "sha256": "14ec939751f3ac35d0dea8a0ad049c81b77b47a2a6419944ae45302d3b839563",
       "bytes": 122903,
       "line_count": 2975,
       "path_role": "evaluation",
@@ -20558,7 +20545,7 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/unit/mcp-setup-node-contracts.test.js",
-      "sha256": "cb4de87da9b1da59e66bb252c3629f23e74e20137cdd8a58bea0446c45399afe",
+      "sha256": "19387a7b44d739a9991a0555ac3894b6770ba5bca726fc4ad51d3d68326042ee",
       "bytes": 33560,
       "line_count": 718,
       "path_role": "evaluation",
@@ -20663,7 +20650,7 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/unit/mcp-setup-providers.test.js",
-      "sha256": "36a84c782785774ddf27bc8f36c6923e881640c1df1bd2baf0ce0f485b1f454d",
+      "sha256": "8a47fd8a27a02bfc71ca334b63ff42c89badb63bb5bf7d9d43b1b040253c2afd",
       "bytes": 85490,
       "line_count": 1834,
       "path_role": "evaluation",
@@ -20684,7 +20671,7 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/unit/mcp-setup-registry.test.js",
-      "sha256": "6939abe46b4f47f4f5a81e3755d146df408e88cbe67dc12e1ada0763af03510b",
+      "sha256": "bf9827aa12d0514bddad3bdfe8082ab30e0782629c9ce57b78223197fafb95d9",
       "bytes": 14600,
       "line_count": 375,
       "path_role": "evaluation",
@@ -21314,9 +21301,9 @@
       "skill_id": "spec-sweep",
       "owning_skill": "spec-sweep",
       "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-      "sha256": "569a0a172b0235c64d8cd3e1a5942b9925db111d40a818ce61c1b4c33f6b46a8",
-      "bytes": 7886,
-      "line_count": 143,
+      "sha256": "cf4e246b46b36b488b5aa492da0b25151c96d7221c6fa548438e281668e4c3cf",
+      "bytes": 8076,
+      "line_count": 145,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -21326,7 +21313,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-          "line": 13,
+          "line": 12,
           "excerpt": "'skills/spec-sweep/SKILL.md',"
         }
       ]
@@ -21886,9 +21873,9 @@
       "skill_id": "spec-work",
       "owning_skill": "spec-work",
       "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-      "sha256": "569a0a172b0235c64d8cd3e1a5942b9925db111d40a818ce61c1b4c33f6b46a8",
-      "bytes": 7886,
-      "line_count": 143,
+      "sha256": "cf4e246b46b36b488b5aa492da0b25151c96d7221c6fa548438e281668e4c3cf",
+      "bytes": 8076,
+      "line_count": 145,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -21898,7 +21885,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-          "line": 50,
+          "line": 52,
           "excerpt": "test('routes plan execution through spec-work as the recommended layered entry', () => {"
         }
       ]
@@ -23139,7 +23126,7 @@
       "skill_id": "using-spec-first",
       "owning_skill": "using-spec-first",
       "path": "docs/contracts/project-graph-consumption.md",
-      "sha256": "3816dfc3252415a79056300a64cc7cb790cc54f27b8ff4d73c6e36a3618c2b4f",
+      "sha256": "f4e24e45dc961ee400fa5e64367508ca45c14fb2461848e3d19893e440b3d4c4",
       "bytes": 20230,
       "line_count": 135,
       "path_role": "reference-contract",

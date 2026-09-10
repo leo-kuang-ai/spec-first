@@ -12,12 +12,12 @@
   "producer": "role-simulated OpenAI skill-engineering lens using current local source only",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "50f22ac9e9bd7d5e946ae19be19833ce5fce4efd",
+    "head": "19d3f6d8a06f3088d4e392a8718dac47aefa8587",
     "dirty": false,
     "dirty_paths": [],
     "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "source_tree_hash": "5c75c9adfc8f24f7c377d833cc4683c9abc049fb9348e4178ae9db54b068d95e",
-    "inventory_hash": "3eb357b9f10a510b1c20a3473b7c6b9bd50cac1606f3ec214f386021e098ac56",
+    "inventory_hash": "3d2c3266db961c90c358e4d824687e879530eadc612e3e24e0f936659c39aa58",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -51,8 +51,8 @@
       "version": "canonical-source-manifest-v1"
     }
   },
-  "inventory_hash": "3eb357b9f10a510b1c20a3473b7c6b9bd50cac1606f3ec214f386021e098ac56",
-  "inventory_artifact_sha256": "29b1947591ccf301338449cf30d8d1a3c7ebda1761417fdca41b85ee5093e3a9",
+  "inventory_hash": "3d2c3266db961c90c358e4d824687e879530eadc612e3e24e0f936659c39aa58",
+  "inventory_artifact_sha256": "af887520669a32a1374e8b321f5824679da5779e6a91e0176204e6c497cd1e4d",
   "input_artifacts": [
     {
       "path": "docs/validation/ce-localization/skill-inventory.json",
@@ -79,7 +79,7 @@
     "dirty_path_manifest_sha256": "4c0c78000acf7fae68fdff3eb8e523956af2a2fbb9bb6d48b6a9c4996283fee8",
     "inventory_hash": "7897d3b4a38f689cfa2e44bf66e511544710579472825938473b32495bbe1021"
   },
-  "review_input_hash": "06a16aac6f495e4db393f27428f5cb6eb3db5f63b14689fc7e75fcf8fe8dc467",
+  "review_input_hash": "5a829bc6886459b253a50265895151f3b12cc36f91166e759ee1293ccf2674da",
   "review_input_hash_algorithm": "sha256(JSON.stringify(coverage.review_input, null, 2) + newline)",
   "chunk_manifest_hash": "81ee775aaf2f0f63ec0315e26f8984d13419969523498fa2a7cf1ca8e4056f25",
   "chunk_manifest": [
@@ -34887,7 +34887,7 @@
     {
       "review_run_id": "ce-129-sync-supplemental-20260910",
       "artifact_ref": "docs/validation/ce-localization/review/deltas/ce-129-sync-20260910.json",
-      "artifact_sha256": "be5151b1fdede0103f95238299576467ee02249237465819f15047de8d21a210",
+      "artifact_sha256": "00d5033dac1d04f10770ad1bc63199171a7e41453a72d50f33497e573431bfe8",
       "reviewed_at": "2026-09-10T13:13:59.565Z",
       "review_method": "inline-same-context",
       "independent": false,

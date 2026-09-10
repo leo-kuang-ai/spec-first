@@ -15,12 +15,12 @@
   },
   "target_source_snapshot": {
     "repository": "spec-first",
-    "head": "50f22ac9e9bd7d5e946ae19be19833ce5fce4efd",
+    "head": "19d3f6d8a06f3088d4e392a8718dac47aefa8587",
     "dirty": false,
     "dirty_paths": [],
     "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "source_tree_hash": "5c75c9adfc8f24f7c377d833cc4683c9abc049fb9348e4178ae9db54b068d95e",
-    "inventory_hash": "3eb357b9f10a510b1c20a3473b7c6b9bd50cac1606f3ec214f386021e098ac56",
+    "inventory_hash": "3d2c3266db961c90c358e4d824687e879530eadc612e3e24e0f936659c39aa58",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -54,7 +54,7 @@
       "version": "canonical-source-manifest-v1"
     }
   },
-  "input_artifact_sha256": "ae0a6fab4f7fd5c61ea428c0a6428faf8b45debc5f26222d28f9c6c6d1923180",
+  "input_artifact_sha256": "4b48b71a0f71902fb6f14db7d325cfa21e2e860e519880c7296a2e2e02d1f72f",
   "records": [
     {
       "audit_id": "A001",

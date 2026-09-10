@@ -5,12 +5,12 @@
   "single_writer": "ce-localization-baseline-writer",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "50f22ac9e9bd7d5e946ae19be19833ce5fce4efd",
+    "head": "19d3f6d8a06f3088d4e392a8718dac47aefa8587",
     "dirty": false,
     "dirty_paths": [],
     "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "source_tree_hash": "5c75c9adfc8f24f7c377d833cc4683c9abc049fb9348e4178ae9db54b068d95e",
-    "inventory_hash": "3eb357b9f10a510b1c20a3473b7c6b9bd50cac1606f3ec214f386021e098ac56",
+    "inventory_hash": "3d2c3266db961c90c358e4d824687e879530eadc612e3e24e0f936659c39aa58",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -45,7 +45,7 @@
     }
   },
   "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
-  "inventory_sha256": "29b1947591ccf301338449cf30d8d1a3c7ebda1761417fdca41b85ee5093e3a9",
+  "inventory_sha256": "af887520669a32a1374e8b321f5824679da5779e6a91e0176204e6c497cd1e4d",
   "skill_id": "spec-commit",
   "source_refs": [
     "skills/spec-commit/evals/cases/fresh-tree-logical-grouping.yaml",
@@ -70,12 +70,12 @@
   ],
   "candidate_snapshot": {
     "repository": "spec-first",
-    "head": "50f22ac9e9bd7d5e946ae19be19833ce5fce4efd",
+    "head": "19d3f6d8a06f3088d4e392a8718dac47aefa8587",
     "dirty": false,
     "dirty_paths": [],
     "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "source_tree_hash": "5c75c9adfc8f24f7c377d833cc4683c9abc049fb9348e4178ae9db54b068d95e",
-    "inventory_hash": "3eb357b9f10a510b1c20a3473b7c6b9bd50cac1606f3ec214f386021e098ac56",
+    "inventory_hash": "3d2c3266db961c90c358e4d824687e879530eadc612e3e24e0f936659c39aa58",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
