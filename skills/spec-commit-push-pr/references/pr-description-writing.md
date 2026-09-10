@@ -10,10 +10,12 @@ Step Pre-A resolves the commit range, diff, and (for existing PRs) the current P
 
 The diff is already visible on GitHub. The description exists to explain what the diff cannot show: what was impossible before and is now possible, what was broken and is now fixed, and which shape changed. Cut any sentence a reader could reconstruct from the diff itself.
 
-- Bad: "Adds `branch-creation.md`, modifies `spec-commit-push-pr/SKILL.md`, and updates contract tests."
+- Bad (lists what was edited): "Adds `branch-creation.md`, modifies `spec-commit-push-pr/SKILL.md`, and updates contract tests."
 - Good: "Default-branch shipping now verifies a fresh base before any PR work touches the branch."
+- Bad (states how the work was done): "The shipping reference now anchors branch verification to a named checklist."
+- Good: "Shipping to the default branch now catches a stale base before any PR work touches the branch."
 
-If the lead sentence describes what was moved, renamed, or added rather than what is now possible or fixed, rewrite it. This applies to every section, not just the opening. Restating the diff is the default failure mode this reference exists to prevent.
+If the lead sentence describes what was edited rather than what is now different for someone using this, rewrite it — this applies to every section, not just the opening, and restating the diff is the default failure mode this reference exists to prevent. A mechanism written in an outcome's grammar is judged by the same condition: "now anchors its checks to a named framework" is how the work was done, while a mechanism that *is* what the reader gets stays.
 
 For user-facing bugs, run an extra before/after pass before writing the mechanism: name what the user would have seen before and what they now see instead. Only then mention the technical cause or fix, and only if it helps the reviewer understand risk.
 
@@ -115,7 +117,7 @@ Build a compact **scope map** from the complete oneline commit list and final th
 
 Check program placement using only context already available: the user request, a known plan, existing PR body, commit messages, or explicit series language. If this is part of a program, name the program outcome, this PR's contribution, and known preceding or follow-on work. Do not invent a series or scan all open PRs just for this check.
 
-Before composing, write the finished map as a short run-local working note: umbrella outcome; clusters and their material claims; program placement or `none`. Keep it to three or four lines. This is drafting context, not another section to publish in the PR body. Step H audits the title and opening against this written map rather than memory.
+Before composing, write the finished map as a short run-local working note: umbrella outcome; clusters and their material claims; program placement or `none`. State the umbrella as what is now different for someone using this, never as the mechanism that produced it — the title and the opening both inherit the map's altitude, so a mechanism-shaped umbrella is not something a later step can correct. Keep it to three or four lines. This is drafting context, not another section to publish in the PR body. Step H audits the title and opening against this written map rather than memory.
 
 ---
 
@@ -341,6 +343,7 @@ The footer contains no externally loaded image and does not publish the harness 
 
 Before applying, audit the body against the material claims from Step D:
 
+- Is the umbrella itself an outcome — what is now different for someone using this — rather than the mechanism that produced it? Check this before the two questions below: both compare against the umbrella, so both pass just as readily when it is mechanism-shaped.
 - Does the title express Step A's umbrella outcome instead of one cluster or mechanism?
 - Does the opening express that same umbrella, covering every peer outcome at parity? If one outcome leads while peers appear only as "also" or "comes with", rewrite from the written map.
 - Does the map record program placement or `none`? Include known program context when relevant, and remove any invented series when none is supported.
