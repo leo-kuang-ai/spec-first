@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: docs(skill): 融合 CE 2ca8e81c，补齐 live delegation 评测的 payload/receipt/synthesis 证据与跨宿主环境清理；当前 evaluation reference 统一英文。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(strategy): 融合 CE 2a52bfa9，区分共享文档作者边界，统一 pulse 来源与语义指标读取，补齐 planning consumers 的 legacy fallback；按用户要求统一当前 strategy/pulse Skill 增量为英文。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(strategy): 融合 CE 801590ce，补齐 grounding/update 必读引用、作者保护与漂移候选流程；新增回归测试并验证八宿主 support-file 投射。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 重新核对 CE 3eb0c7a3，记录 plain prose、pin 审计与 fresh-reader 的逐点源码依据及实际验证；本项无需重复修改已有实现。 (user-visible)
