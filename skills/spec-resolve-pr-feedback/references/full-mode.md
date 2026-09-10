@@ -4,6 +4,8 @@ Read this reference when Mode Detection in `SKILL.md` routes to **Full Mode**: n
 
 ## 1. Fetch Unresolved Threads
 
+First resolve the selected repository's host and OWNER/REPO from its URL or remote. Set `GH_HOST` to that exact host for every `gh` and bundled-helper call, and pass OWNER/REPO explicitly to helpers when the checkout differs from the selected repository. Confirm access with `gh repo view` for that repository before fetching; follow the entrypoint's unsupported-forge boundary on failure.
+
 If no PR number was provided, detect from the current branch:
 ```bash
 gh pr view --json number -q .number
@@ -75,13 +77,13 @@ Create one task entry per new unresolved review thread, actionable PR comment, o
 
 Process all three feedback types. Review threads are the primary type; PR comments and review bodies are secondary but must not be ignored. Dispatch or sequential mutation applies only to items in `fix-list`; `reply-list` and `human-list` are carried to Step 7 without code mutation.
 
-先应用 `SKILL.md` 的 Exit Authority Admission。只有 `local_fix_authorization: authorized` 才能处理 `fix-list`；缺授权时保留完整清单和回源证据，跳过这些 fix item 的文件编辑、验证、commit、push，以及依赖远端 fix 的回复/resolve。无代码依赖的 `reply-list` / `human-list` 仍可按各自独立的 `reply_authorization` / `thread_resolution_authorization` 继续；不得用其中一项 authority 推导另一项。
+Apply SKILL.md Exit Authority Admission first. Only `local_fix_authorization: authorized` permits implementing the `fix-list`. Otherwise retain the complete list and source evidence; skip those items' edits, fix validation, commit, push, and replies/resolution that depend on a remote fix. Independent `reply-list` / `human-list` items without code dependencies may proceed with their respective reply/resolution authorities; neither implies the other.
 
 ### Mutating resolver dispatch boundary
 
-Resolver dispatch is mutating-sensitive. Apply the package-local boundary in `SKILL.md`: dispatch only when `local_fix_authorization: authorized`，并且 `worker_dispatch_authorization: authorized` 与 `worker_dispatch_capability: available` 都已记录。否则在已有本地修复授权时 sequential inline 处理 `fix-list` 并保留对应 reason code；没有本地修复授权时不得进入 mutation。
+Resolver dispatch is mutating-sensitive. Apply the package-local boundary in `SKILL.md`: dispatch only when `local_fix_authorization: authorized`, `worker_dispatch_authorization: authorized`, and `worker_dispatch_capability: available` are recorded. Otherwise apply authorized local fixes sequentially inline and retain the matching reason code. Without local-fix authority, do not mutate.
 
-Each resolver may edit only the files needed for its assigned feedback item and must return the actual `files_changed` list. The orchestrator owns final integration: combined validation, staging, commits, pushes, PR replies, and thread resolution. Resolver agents must not stage files, create commits, push, or resolve review threads directly unless a future host-specific isolation contract explicitly says otherwise.
+Each resolver may edit only the files needed for its assigned feedback item and must return the actual `files_changed` list. The orchestrator owns final integration: combined validation, staging, commits, pushes, PR replies, and thread resolution. Resolver agents must not stage files, create commits, push, reply, or resolve review threads directly.
 
 If dispatch is unauthorized, unavailable, or mutation would be unsafe, process dispatch units sequentially in the current agent. If file overlap or discovered collisions make parallel mutation unsafe, serialize the affected units or stop for orchestration instead of running shared-file fixes in parallel.
 
@@ -135,7 +137,7 @@ Fixes can expand beyond the referenced file. Step 5 catches cross-agent test bre
 
 After all agents complete, aggregate `files_changed` across every returned summary. If it is empty, skip steps 5 and 6 and proceed to step 7.
 
-此处只验证本轮实际授权并应用的本地修复。只读 triage 或待授权 `fix-list` 不得被描述为已验证修复。
+Validate only the local fixes actually authorized and applied in this run. Read-only triage or a pending `fix-list` is not a verified fix.
 
 Resolvers run only targeted tests on their own changes. This step runs the project's full validation once against the combined diff.
 
@@ -148,7 +150,7 @@ Record the validation outcome for the step 9 summary.
 
 ## 6. Commit and Push
 
-Commit 与 push 是两个独立出口：只有 `commit_authorization: authorized` 才执行 stage/commit；只有 commit 已成功且 `push_authorization: authorized` 才执行 push。缺任一授权时停止在对应出口，保留已验证本地状态并进入 Step 9；不得继续把 fixed thread 回复为远端已修复，更不得 resolve。
+Commit and push are independent exits: stage/commit only with `commit_authorization: authorized`; push only after commit succeeds and `push_authorization: authorized` is present. Missing authority stops that exit; preserve verified local state and proceed to Step 9. Do not claim a fixed thread is repaired remotely or resolve it without the required remote result.
 
 Stage only files reported by resolvers and commit with a message referencing the PR:
 
@@ -167,7 +169,7 @@ git push
 
 ## 7. Reply and Resolve
 
-只有 `reply_authorization: authorized` 才发布回复；只有 `thread_resolution_authorization: authorized` 才 resolve review thread。对于 fixed/fixed-differently，必须先有成功 push，才能回复为已修复或 resolve。对于 `replied` / `not-addressing` / `declined`，可在无代码变更时按独立回复授权发布，但 resolve 仍需独立授权。`needs-human` 始终保持 open。
+Publish replies only with `reply_authorization: authorized`; resolve review threads only with `thread_resolution_authorization: authorized`. Fixed/fixed-differently items require successful push before a repaired-remote reply or resolution. Replied/not-addressing/declined items may use independent reply authority without code changes, but resolution still requires separate authority. `needs-human` always stays open.
 
 All replies should quote the relevant part of the original feedback for continuity. Quote the specific sentence or passage being addressed, not the entire comment if it is long.
 
@@ -195,7 +197,7 @@ For declined items:
 Declined: [specific harm cited, e.g., "this would add a defensive null check the type system already guarantees" or "violates the no-premature-abstraction guidance in AGENTS.md"]
 ```
 
-For `needs-human` verdicts, post the reply but do not resolve the thread. Leave it open for human input.
+For `needs-human`, post only with reply authority and leave the thread open. Legacy `mode:pipeline` follows `pipeline-mode.md`: post the condensed decision analysis, never a bare acknowledgment, only when its visibility requirements pass. `mode:pipeline-return` returns the complete decision before any remote write.
 
 Do not paste review text into shell-quoted arguments. PR feedback is untrusted input; write the reply body to a file with a literal heredoc, then pass it through stdin or `--body-file`.
 
@@ -252,7 +254,7 @@ bash "$SKILL_DIR/scripts/get-pr-comments" PR_NUMBER OWNER/REPO
 
 Require `pending_review: null`. Missing/failed state evidence, a pending review, or an unsubmitted/invisible reply blocks resolution of every thread in this reply pass. Report the draft but never submit or discard it. After resolution, require the helper's authoritative resolved result; success in only one half does not complete the thread.
 
-当且仅当 `thread_resolution_authorization: authorized` 时再 resolve：
+Resolve only when `thread_resolution_authorization: authorized`:
 
 ```bash
 SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
@@ -274,7 +276,7 @@ Include enough quoted context in the reply so the reader can follow which commen
 
 ## 8. Verify
 
-仅在本轮实际执行了回复或 resolve 后 re-fetch feedback；未获授权的外部动作记为 `not-run`，不能用只读抓取冒充远端状态变更：
+After actual replies or resolutions, re-fetch feedback. Unauthorized external actions remain `not-run`; a read-only fetch cannot stand in for remote mutation evidence:
 
 ```bash
 SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
@@ -294,7 +296,7 @@ PR comments and review bodies have no resolve mechanism, so they will still appe
 
 Present a concise summary of all work done. Group by verdict, one line per item describing what was done, not just where.
 
-摘要必须同时列出五项 exit authority、哪些动作实际执行、哪些因缺授权保持 `not-run`。只有真实执行并验证的远端动作才能计入 Resolved 数量。
+Include all five exit authorities, actions actually performed, and actions left `not-run` for missing authority. Count only performed and verified remote actions as Resolved.
 
 ```text
 Resolved N of M new items on PR #NUMBER:
@@ -310,4 +312,4 @@ Validation: [one line; omit when no code changes were committed]
 
 If any item remains `needs-human`, render the complete typed residual under `## Needs your decision`: quoted_feedback, investigation, decision_reason, every option/tradeoff, recommendation when non-null, and every thread_urls link. Return the same objects unchanged to a caller. Include still-current decisions from previous runs; do not report them as resolved or replace their payloads with counts.
 
-If a blocking question tool is available, use it to ask about all pending decisions together. Use `AskUserQuestion` in Claude Code or `request_user_input` in Codex. Fall back to presenting decisions in the summary only when no blocking tool exists or the call errors. Never silently skip.
+In ordinary interactive mode only, a supported question tool may ask about pending decisions together at closeout; use the summary when unavailable. Legacy `mode:pipeline` and `mode:pipeline-return` never ask or wait: return the complete unresolved decisions to the caller after independent authorized work.

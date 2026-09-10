@@ -554,7 +554,7 @@ describe('generic dispatch authorization matrix', () => {
     expect(sweep).toMatch(/sensitive.*delegated handling/is);
     expect(refresh).toMatch(/never write.*tracked successor/is);
     expect(refresh).toMatch(/must not write.*stage.*commit/is);
-    expect(resolver).toContain('Resolver worker 永远不得 stage、commit、push');
+    expect(resolver).toContain('Resolver workers never stage, commit, push, reply, or resolve threads');
   });
 
   test('inline fallback labels stay honest in downstream workflow text', () => {
