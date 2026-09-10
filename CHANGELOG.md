@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 26f38961 的 compound 阶段 references 与 headless/lightweight/promotion 边界，确认当前 source owner 已完整承载。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 4df5f99d 的 code-review 阶段 references、scope/intent/select-route 与 finish/action rubric，确认当前 owner 已完整承载。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 734dd2c8 的 debug regression-test provenance 迁移，确认当前 fix reference 已承载完整 test-first 规则，入口只保留选择条件。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 2767cc74 的 explain Phase 6 close，确认 destinations、artifact preservation、公开发布确认与 improvement routing 已由现有 references 承载。 (user-visible)
