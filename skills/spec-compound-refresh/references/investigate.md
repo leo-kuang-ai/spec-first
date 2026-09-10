@@ -21,7 +21,7 @@ Match investigation depth to the learning's specificity — a learning referenci
 The critical distinction is whether the drift is **cosmetic** (references moved but the solution is the same) or **substantive** (the solution itself changed):
 
 - **Update territory** — file paths moved, classes renamed, links broke, metadata drifted, but the core recommended approach is still how the code works. `spec-compound-refresh` fixes these directly.
-- **Replace territory** — the recommended solution conflicts with current code, the architectural approach changed, or the pattern is no longer the preferred way. This means a new learning needs to be written. An authorized replacement subagent may draft the successor following `spec-compound`'s document format, using the investigation evidence already gathered, but it never writes the tracked successor. Without authorized dispatch, the orchestrator composes the replacement inline or serially. In every path the orchestrator is the sole tracked-file writer, and the successor must pass the same `source_refs` / `invalidation_condition` promotion gate as a new `spec-compound` learning.
+- **Potential Replace territory** — the recommendation conflicts with current code or the architecture changed. First apply `references/classify.md`'s descriptive-drift/implementation-conflict distinction: a still-governing rule may expose a product regression. Only evidence that the old recommendation no longer governs permits a successor. An authorized read-only worker or the orchestrator may draft that successor in private scratch; `references/publication.md` owns all durable writes and the shared `source_refs` / `invalidation_condition` promotion gate.
 
 **The boundary:** if you find yourself rewriting the solution section or changing what the learning recommends, stop — that is Replace, not Update.
 
@@ -30,13 +30,13 @@ The critical distinction is whether the drift is **cosmetic** (references moved 
 - Prompt deeper investigation when codebase evidence is borderline
 - Add context to the evidence report ("(auto memory [claude]) notes suggest approach X may have changed since this learning was written")
 
-In headless mode, memory-only drift (no codebase corroboration) should result in stale-marking, not action.
+Memory-only drift without corroborating current evidence is a verification gap in every mode. Preserve the learning and report the gap; stale-mark only when independent evidence establishes drift, as `references/classify.md` requires.
 
 ### Judgment Guidelines
 
 Three guidelines that are easy to get wrong:
 
-1. **Contradiction = strong Replace signal.** If the learning's recommendation conflicts with current code patterns or a recently verified fix, that is not a minor drift — the learning is actively misleading. Classify as Replace.
+1. **Contradiction requires an authority check.** Compare current mechanics and independently supported guidance before classifying. A verified successor may justify Replace; an implementation that violates a still-valid rule is a potential implementation regression to report while preserving the rule.
 2. **Age alone is not a stale signal.** A 2-year-old learning that still matches current code is fine. Only use age as a prompt to inspect more carefully.
 3. **Check for successors before deleting.** Before recommending Replace or Delete, look for newer learnings, pattern docs, PRs, or issues covering the same problem space. If successor evidence exists, prefer Replace over Delete so readers are directed to the newer guidance.
 
@@ -154,7 +154,7 @@ There are two subagent roles:
 1. **Investigation subagents** — read-only. They must not edit files, create successors, or delete anything. Each returns: file path, evidence, recommended action, confidence, and open questions. These can run in parallel when artifacts are independent.
 2. **Replacement subagents** — draft one candidate successor and return its content or a run-local scratch reference. They never write tracked files, stage, commit, or delete. These run **one at a time, sequentially**; the orchestrator validates the draft and performs the tracked successor write, deletion, and metadata updates.
 
-The orchestrator merges investigation results, detects contradictions, coordinates replacement subagents, and performs all deletions/metadata edits centrally. In interactive mode, it asks the user questions on ambiguous cases. In headless mode, it marks ambiguous cases as stale instead. If two artifacts overlap or discuss the same root issue, investigate them together rather than parallelizing.
+The orchestrator merges investigation results, detects contradictions, coordinates replacement drafts, and owns publication centrally. In interactive mode, ask for missing material decisions; in headless mode, preserve uncertain claims and prepare stale annotations only for independently evidenced drift. If artifacts overlap or discuss the same root issue, investigate them together rather than parallelizing.
 
 
 ### Required investigation prompt clauses
@@ -166,3 +166,8 @@ When an authorized investigation subagent is used, its prompt must also state:
 Apply the same named-guidance comparison during inline investigation. Record
 unrelated themes within a category or nearly empty categories as report-only
 observations; do not restructure directories or create categories.
+
+If worth audit is selected, also pass its claim-by-claim recovery task to each
+authorized worker, or perform it inline. Its explicitly scoped recovery search
+may read otherwise unnamed guidance, but never edit it. Report code/guidance
+conflicts separately from recoverability; a related topic is not quoted coverage.

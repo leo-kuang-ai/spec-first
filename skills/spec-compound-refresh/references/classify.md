@@ -6,6 +6,10 @@ After gathering evidence, assign one recommended action.
 
 ## Evidence Limits And Scope
 
+**Descriptive drift is different from implementation conflict.** A statement about current mechanics follows verified current code. For normative guidance, first check independent evidence that it still governs: a current contract, owner decision, test assertion, or verified incident reasoning. Code contradiction alone does not invalidate that guidance. Preserve supported guidance and report the conflicting code path as a **potential implementation regression** under Recommended; do not adjudicate or fix product code here. Without independent support, investigate before choosing Update, Replace, or a stale annotation.
+
+Replace requires evidence that the old recommendation no longer governs and that the successor is trustworthy. Follow these rules even when a later shorthand says that a changed implementation is a Replace signal.
+
 **Unverifiable is not false.** Operational practices, environment behavior, or
 external schema facts may have no in-repo witness. Never delete, strip during
 consolidation, or stale-mark a plausible claim solely because the repo cannot
@@ -16,8 +20,10 @@ For a knowledge-track learning that names a conflicting guidance file, report
 both quotes and which side current code supports. If the learning is supported
 and the guidance is wrong, recommend that guidance path under Recommended;
 never edit a skill, runbook, or root instruction file to reconcile the conflict.
-If code witnesses neither side, preserve the uncertainty and apply the mode's
-decision path. Do not search for unnamed guidance.
+If code witnesses neither side, use independent guidance evidence where available;
+otherwise preserve the uncertainty and apply the mode's decision path. Do not
+search for unnamed guidance in an ordinary accuracy refresh. An explicitly
+selected worth audit may search for recovery evidence under its own reference.
 
 Relocation is an Update variant, not permission to redesign categories. In
 non-interactive mode, all four conditions must hold: frontmatter and directory
@@ -36,7 +42,7 @@ The learning is still accurate and useful. Do not edit the file — report that 
 
 ### Update
 
-The core solution is still valid but references have drifted (paths, class names, links, code snippets, metadata). Apply the fixes directly.
+The core solution is still valid but references have drifted (paths, class names, links, code snippets, metadata). Prepare fixes without an additional question when already authorized; publish through `references/publication.md`.
 
 ### Consolidate
 
@@ -60,7 +66,7 @@ The Consolidate action is: merge unique content from the subsumed doc into the c
 
 ### Replace
 
-Choose **Replace** when the learning's core guidance is now misleading — the recommended fix changed materially, the root cause or architecture shifted, or the preferred pattern is different.
+Choose **Replace** when evidence shows the learning's core guidance no longer governs and a trustworthy successor can be written. Changed mechanics, architecture, or patterns are investigation signals, not proof that independently supported guidance is wrong.
 
 The user may have invoked the refresh months after the original learning was written. Do not ask them for replacement context they are unlikely to have — use agent intelligence to investigate the codebase and synthesize the replacement.
 
@@ -70,7 +76,7 @@ By the time you identify a Replace candidate, Phase 1 investigation has already 
 
 - **Sufficient evidence** — you understand both what the old learning recommended AND what the current approach is. The investigation found the current code patterns, the new file locations, the changed architecture. → Proceed to write the replacement (see Phase 4 Replace Flow).
 - **Insufficient evidence** — the drift is so fundamental that you cannot confidently document the current approach. The entire subsystem was replaced, or the new architecture is too complex to understand from a file scan alone. → Mark as stale in place:
-   - Add `status: stale`, `stale_reason: [what you found]`, `stale_date: YYYY-MM-DD` to the frontmatter
+   - Prepare a candidate adding `status: stale`, `stale_reason: [what you found]`, `stale_date: YYYY-MM-DD`; publish only through `references/publication.md`
    - Report what evidence you found and what is missing
    - Recommend the user run `spec-compound` after their next encounter with that area, when they have fresh problem-solving context
 
@@ -83,8 +89,7 @@ Choose **Delete** when:
 - The learning is fully redundant with another doc (use Consolidate if there is unique content to merge first)
 - There is no meaningful successor evidence suggesting it should be replaced instead
 
-Action: delete the file. No archival directory, no metadata — just delete it. Git history preserves every deleted file if recovery is ever needed.
-
+Action: schedule deletion after the evidence gate and citation cleanup; `references/publication.md` performs the final freshness and recovery checks. Do not create an archival directory or treat a planned deletion as applied.
 ### Before deleting: check if the problem domain is still active
 
 When a learning's referenced files are gone, that is strong evidence — but only that the **implementation** is gone. Before deleting, reason about whether the **problem the learning solves** is still a concern in the codebase:
@@ -110,12 +115,14 @@ Classify each citation by what it does in its citing context:
 
 - **Decorative** — principle stated inline, citation is a "see also" pointer or bare attribution. Delete is fine; clean up citations in the same refresh change set.
 - **Substantive** — citing doc relies on the cited doc to provide content not stated inline (e.g., "see X for details on Y" with no inline Y). Signal Replace — write a successor at the same path, or **Keep with narrowed scope** if the doc's actual content is broader than its title implies.
-- **Mixed or unclear** — stale-mark.
+- **Mixed or unclear** — preserve the document and report the unresolved citation;
+  add a stale annotation only if independent evidence also establishes drift.
 
 In headless mode, Delete + decorative cleanup is allowed only under the gate
 below. A substantive citation redirects to Replace or narrowed Keep; a verified
 successor may be written under the same evidence and promotion gates as other
-Replace candidates. Genuine ambiguity remains stale-marked, never deleted.
+Replace candidates. Genuine ambiguity never authorizes deletion; use a stale
+annotation only when the evidence limits above permit it.
 
 **Auto-delete only when all three hold:**
 
@@ -144,11 +151,13 @@ Apply the same five outcomes (Keep, Update, Consolidate, Replace, Delete) to pat
 
 ### Headless mode
 
-**Skip this entire phase. Do not ask any questions. Do not present options. Do not wait for input.** Proceed directly to Phase 4 and execute all actions based on the classifications from Phase 2:
+**Skip all questions.** Proceed to Phase 4 to prepare authorized actions, then
+validate and publish through `references/publication.md`:
 
-- Unambiguous Keep, Update, Consolidate, auto-Delete, and Replace (with sufficient evidence) → execute directly
-- Ambiguous cases → mark as stale
-- Then generate the report (see Output Format)
+- Unambiguous Keep, Update, Consolidate, auto-Delete, and Replace with sufficient evidence: prepare without another approval.
+- Independently evidenced drift with an uncertain successor: prepare a stale annotation. Missing evidence or uncertain citation meaning alone: preserve and report the gap.
+- Worth-based changes and splits remain recommend-only under their references.
+- Generate the report from actual publication results, not proposed actions.
 
 ### Interactive mode
 
@@ -209,8 +218,8 @@ For several learnings:
 
 Ask for confirmation in stages:
 
-1. Confirm grouped Keep/Update recommendations
-2. Then handle Consolidate groups (present the canonical doc and what gets merged)
+1. Report grouped Keep/Update decisions; prepare authorized unambiguous changes without another approval
+2. Then handle Consolidate groups (present the canonical doc and what gets merged; ask only if the choice is ambiguous)
 3. Then handle Replace one at a time
 4. Then handle Delete one at a time unless the deletion is unambiguous and safe to auto-apply
 

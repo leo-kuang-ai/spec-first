@@ -10,6 +10,7 @@ After processing the selected scope, output the following report:
 Compound Refresh Summary
 ========================
 Scanned: N learnings
+Worth lens: off | audit-only | authorized | recommended-only
 
 Kept: X
 Updated: Y
@@ -19,7 +20,7 @@ Deleted: W
 Skipped: V
 Marked stale: S
 
-CONCEPTS.md: <scanned, no qualifying terms | created with N entries (M seeded) | updated — N added, N refined, N reconciled, N scrubbed | repo-wide map created with N entries>
+CONCEPTS.md: <scanned, no qualifying terms | created with N entries (M seeded) | updated — N added, N refined, N folded, N scrubbed, N retired | repo-wide map created with N entries | changes recommended, not published | partial publication>
 ```
 
 Then for EVERY file processed, list:
@@ -28,6 +29,10 @@ Then for EVERY file processed, list:
 - What evidence was found -- tag any memory-sourced findings with "(auto memory [claude])" to distinguish them from codebase-sourced evidence
 - What action was taken (or recommended)
 - For Consolidate: which doc was canonical, what unique content was merged, what was deleted
+- For worth-based actions: affected claims and recovering artifacts with quoted reasoning; distinguish accuracy repairs from worth-based cuts
+- For implementation conflicts: the still-governing evidence and conflicting implementation path, reported as a potential regression without claiming a code fix
+
+Applied means verified durable publication, not candidate preparation or a successful scratch write. For partial publication, list exact published/deleted/unchanged/pending paths, verification gaps, and retained recovery material. Keep the dependent action incomplete; do not count it as a completed replacement, consolidation, or split. Identify whether validation used tools or a disclosed manual fallback and whether semantic review was inline or independent.
 
 For **Keep** outcomes, list them under a reviewed-without-edits section so the result is visible without creating git churn.
 
@@ -47,6 +52,7 @@ Split actions into two sections:
 **Recommended** (actions that could not be written — e.g., permission denied):
 - Same detail as above, but framed as recommendations for a human to apply
 - Include enough context that the user can apply the change manually or re-run the skill interactively
+- Include worth audit actions without cut authority, all non-interactive worth actions, validation failures, and concurrent target drift even when no write was attempted
 
 Also include recommend-only work even when all attempted writes succeeded:
 relocations with the target and failed gate condition, split boundaries,

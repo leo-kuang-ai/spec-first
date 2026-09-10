@@ -1,7 +1,7 @@
 ---
 name: spec-compound-refresh
 description: Refresh docs/solutions learnings against the current codebase. Use when auditing stale, overlapping, superseded, or drifted learnings; avoid general refactor, debugging, or code review unless docs/solutions is explicit.
-argument-hint: "[optional: scope hint — directory, filename, module, or keyword] [mode:headless] "
+argument-hint: "[optional: scope hint — directory, filename, module, or keyword] [mode:non-interactive]"
 ---
 
 # Compound Refresh
@@ -17,6 +17,7 @@ Maintain the quality of `docs/solutions/` over time. This workflow reviews exist
 - **Inputs:** `docs/solutions/`, `CONCEPTS.md`, an optional scope hint, and current source/test/doc evidence.
 - **Outputs:** Keep/Update/Consolidate/Replace/Delete/Stale classifications, applied maintenance, and a complete Applied/Recommended report.
 - **Hard exits:** unresolved source truth, target repo, write scope, or classification cannot become confirmed current knowledge. In headless mode, record uncertainty as stale only under the classification reference's evidence rules.
+- **Publication:** prepare owner-private candidates; validate and make the semantic promotion decision before changing durable targets. `references/publication.md` owns target identity, freshness checks, ordered publication, and partial results for every mutation.
 - **Worker boundary:** record `worker_dispatch_authorization` and related capability facts before any dispatch; investigation workers are read-only and never write a tracked successor, stage, or commit. Inline fallback must not claim independent investigation coverage. Missing authorization is recorded as `dispatch_authorization_missing`; an unavailable worker surface is `subagent_capability_missing` or `worker_capability_unproven` according to the dispatch evidence.
 
 ```yaml
@@ -43,6 +44,10 @@ landing_authorization: authorized | missing
 ## Mode Detection
 
 Read `references/modes.md` before resolving mode, authority, blocking questions, or a standalone `CONCEPTS.md` bootstrap request. It owns the `mode:non-interactive`/`mode:headless` parsing, conservative unattended behavior, and the mutation/commit/landing separation.
+
+## Optional Worth Audit
+
+Ordinary refresh checks accuracy and duplication between learnings. When the user asks whether accurate learnings still earn their place, or asks to prune content already recoverable elsewhere, read `references/worth-audit.md` before investigation. It owns intent resolution, quoted recovery evidence, and the separate authority for worth-based cuts. A generic drift refresh never enables this lens. An ambiguous cleanup request may produce recommendations but does not authorize deleting accurate content.
 
 ## Interaction Principles
 
@@ -90,8 +95,8 @@ For each candidate artifact, classify it into one of five outcomes:
 
 1. **Evidence informs judgment.** The signals below are inputs, not a mechanical scorecard. Use engineering judgment to decide whether the artifact is still trustworthy.
 2. **Prefer no-write Keep.** Do not update a doc just to leave a review breadcrumb.
-3. **Match docs to reality, not the reverse.** When current code differs from a learning, update the learning to reflect the current code. The skill's job is doc accuracy, not code review — do not ask the user whether code changes were "intentional" or "a regression." If the code changed, the doc should match. If the user thinks the code is wrong, that is a separate concern outside this workflow.
-4. **Be decisive, minimize questions.** When evidence is clear (file renamed, class moved, reference broken), apply the update. In interactive mode, only ask the user when the right action is genuinely ambiguous. In headless mode, mark ambiguous cases as stale instead of asking. The goal is automated maintenance with human oversight on judgment calls, not a question for every finding.
+3. **Separate descriptive drift from implementation conflict.** Descriptions of current mechanics follow verified implementation evidence. Independently supported guidance does not become false merely because code stopped following it. Apply `references/classify.md` before changing recommendations; report potential implementation regressions without modifying product code or the governing guidance file.
+4. **Be decisive within evidence and authority.** Prepare unambiguous authorized updates without another question. Ask only for missing material decisions in interactive mode. In headless mode preserve uncertain claims; stale annotations require independent evidence of drift. Every durable mutation still passes the publication boundary.
 5. **Avoid low-value churn.** Do not edit a doc just to fix a typo, polish wording, or make cosmetic changes that do not materially improve accuracy or usability.
 6. **Use Update only for meaningful, evidence-backed drift.** Paths, module names, related links, category metadata, code snippets, and clearly stale wording are fair game when fixing them materially improves accuracy.
 7. **Use Replace only when there is a real replacement.** That means either:
@@ -115,21 +120,25 @@ Read `references/investigate.md` before reading or dispatching investigation wor
 
 Read `references/classify.md` after evidence collection and before assigning Keep, Update, Consolidate, Replace, Delete, or Stale. It owns the Update/Replace boundary, deletion and relocation gates, pattern guidance, and interactive decisions.
 
-## Phase 4: Execute the Chosen Action
+## Phase 4: Prepare the Chosen Action
 
-For each candidate, execute the flow that matches its classification from `references/classify.md`. Read `references/per-action-flows.md` and follow the matching section:
+For each candidate, prepare the flow that matches its classification from `references/classify.md`. Read `references/per-action-flows.md` and `references/publication.md` before preparing mutations. No durable write occurs in this phase:
 
 - **Keep** — no file edit by default; summarize why the learning remains trustworthy.
-- **Update** — in-place edits when the solution is still substantively correct (path renames, link refreshes, module renames).
-- **Consolidate** — merge overlapping docs into a canonical doc, apply the same promotion exit to the materially rewritten canonical doc (and every new split successor), then update cross-references and delete subsumed docs. The orchestrator handles consolidation directly.
-- **Replace** — obtain a successor draft through an authorized subagent or inline/serial fallback, then let the orchestrator write the tracked successor, validate parser safety plus the `source_refs` / `invalidation_condition` promotion exit, validate cited claims, and only then delete the old. When evidence is insufficient, mark stale instead.
-- **Delete** — final inbound-link check, then remove. Reclassify if late-discovered substantive citations surface.
+- **Update** — candidate edits for meaningful reference drift, preserving the valid solution.
+- **Consolidate** — prepare the canonical candidate, retain unique content, and map citations and catalog entries before scheduling subsumed paths for deletion. An authorized split prepares independently useful successors under the same publication boundary.
+- **Replace** — obtain a private successor draft through an authorized read-only worker or inline fallback. Preserve same-path identity; schedule old-path deletion only for a different-path successor. When proven drift lacks sufficient successor evidence, prepare a stale annotation instead.
+- **Delete** — establish the evidence gate and prepare citation cleanup; recheck before deletion at publication.
 
 Only one flow runs per candidate; the reference contains the per-action criteria, examples, and step-by-step instructions.
 
 ## Phase 4.5: Vocabulary Capture
 
 Read `references/concepts-vocabulary.md` unconditionally after per-document actions. It owns qualifying terms, scoped seeding, reconciliation, scrub rules, and silent vocabulary edits.
+
+## Phase 4.75: Validate And Publish
+
+Follow `references/publication.md` after learning, citation, catalog, and vocabulary candidates are ready. Publish only approved dependency groups. Failed validation leaves final targets unchanged; a partial publication remains incomplete and reports exact changed and pending paths. A candidate is never an Applied result.
 
 ## Output Format
 
@@ -146,7 +155,7 @@ Read `references/commit.md` after the report and only when verified refresh-owne
 
 Use **Replace** only when the refresh process has enough real evidence to write a trustworthy successor. When evidence is insufficient, mark as stale and recommend `spec-compound` for when the user next encounters that problem area.
 
-Use **Consolidate** proactively when the document set has grown organically and redundancy has crept in. Every `spec-compound` invocation adds a new doc — over time, multiple docs may cover the same problem from slightly different angles. Periodic consolidation keeps the document set lean and authoritative.
+Use **Consolidate** when accumulated learnings overlap without independent retrieval value. `spec-compound` may create, update, or skip a learning; refresh maintains the resulting set. Worth audit optionally applies the capture bar to accurate existing content without turning ordinary refresh into a pruning run.
 
 ## Discoverability Check
 

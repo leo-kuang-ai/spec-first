@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(compound-refresh): 完成候选发布与 worth audit 引用落地，统一实现回归、非交互词汇 bootstrap 和部分发布报告边界；聚焦合同与共享消费者验证通过。 (user-visible)
 - v1.15.3 2026-09-10 codex: test(sync): 复核 CE 66ccf579 的 owner 派发与独立性规则，更新 Compound Refresh 禁写断言，98 项验证通过。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 复核 CE dedf3013 的临近生成模型选择与配置消费者边界，记录 18 项验证。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 复核 CE 3c049544 的 peer 启动权限、可信约束和必选模型边界，记录 19 项验证。 (user-visible)

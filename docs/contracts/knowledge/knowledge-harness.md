@@ -65,6 +65,8 @@ Full、Headless 和 Lightweight 都遵循上述 publication boundary；它们的
 
 独立 semantic reviewer 不是所有普通 learning 的普遍硬要求：有明确 dispatch authorization/capability 时可作为高风险复核增强；否则 Full/Headless 使用同一 validator prompt inline 并标记非独立，Lightweight 由 orchestrator 作显式语义 promotion decision。无论哪种路径，脚本都不判断问题是否真的解决、引用是否相关或 learning 是否值得复用；只有语义判断通过后才能发布。
 
+Refresh 的本地执行引用为 `skills/spec-compound-refresh/references/publication.md`：Replace、Consolidate、Split 及实质性缩写均先准备私有候选，连同入链、目录和词汇变更验证后再发布；同路径 Replace 不删除存续路径，异路径删除必须等待 successor 与引用迁移验证。工具提供 hash、路径、校验及实际写入事实，LLM 裁决指导是否仍有效与内容是否可恢复；当前没有独立事务式 runtime gate，不把 hash 复查表述为并发锁或跨文件原子保证。普通 refresh 不因实现偏离就改写仍有独立证据支持的规范；可选 worth audit 要逐 claim 给出存续材料的原文证据，并按实际授权决定是否删减，非交互模式仅建议 worth-based 操作。
+
 ## Open Questions / Resolved
 
 - OQ-1 summary-first expand-on-trigger：使用语义触发而不是行数阈值。summary 缺少下游所需的 requirement/task/finding/evidence detail、reviewer 需要精确 prose/line reference、或互依赖任务需要具体实现细节时，consumer 展开 full artifact 并记录 `full_artifact_read_reason`。
