@@ -169,7 +169,18 @@ present. They carry the contracts downstream consumers depend on.
 - **Goal Capsule** — objective, recommended approach, authority hierarchy,
   decision focus, verification focus, largest risk or scope boundary, stop
   conditions, execution profile, and tail ownership. It is the first-screen
-  orientation for both human reviewers and executors.
+  orientation for both human reviewers and executors. The objective is always
+  the outcome — what is true for users or operators afterwards, anchored
+  above the component being changed: an outcome someone outside that
+  component can verify without knowing its internals is a valid objective
+  even when that component is what changed, while one only its internals can
+  settle is not, however outcome-shaped its wording. Infrastructure and
+  refactor work has such an objective too: what that component's behavior
+  cost the people the system serves. When a request supplies only an
+  approach, that approach is the recommended-approach line, and the objective
+  is the outcome it serves, derived from the request's motivation or asked
+  for — never the approach restated. Test: if the implementation changed,
+  would the objective still be the goal?
 - **Product Contract** — product scope and behavior. Contains Summary, Problem
   Frame, Requirements with stable R-IDs, and any material Actors, Flows,
   Acceptance Examples, Success Criteria, Scope Boundaries, Dependencies,

@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(plan): 补齐 CE 2ca1f81c 的 Goal Capsule objective 组件外锚定规则与 approach/Means 区分。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(review): 补齐 CE 5ac4c01a 的异步收集纪律——launch receipt 不等于 reviewer return、slot 关闭与无可靠收集失败路径，validator 批次同分类。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(work): 补齐 CE d05e3951 的 shipping 审查 catalog 路径澄清，去除 `/review` 斜杠示例歧义。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(skills): 补齐 CE 180fcd21 的阻塞提问能力匹配措辞，36 个 skill 文件的宿主专名枚举改为当前工具列表按能力匹配并经发现原语加载。 (user-visible)
