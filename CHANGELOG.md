@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(handoff): 融合 CE b800e4b2，明确区分用户决定、作者推断和作者自主决定，对归因不明且难以撤销的后果只确认新增缺口。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(handoff): 融合 CE 278d4c43，严格限制发现阶段元数据读取，保留未索引候选并支持显式目录；补齐 create/resume 引用和八宿主投射验证，当前 Skill 正文统一英文。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(skill): 融合 CE 8b2a7d2d 的迁移失败经验，补齐重复 gate 清理、相邻规则前提复核和 shared-block 大小下限说明。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 逐点核对 CE a200496f 的 Proof API/流程拆分，按明确产品排除保留证据，确认未引入 spec-proof 或远程写入。 (user-visible)
