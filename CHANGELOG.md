@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: docs(skill): 融合 CE 8b2a7d2d 的迁移失败经验，补齐重复 gate 清理、相邻规则前提复核和 shared-block 大小下限说明。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 逐点核对 CE a200496f 的 Proof API/流程拆分，按明确产品排除保留证据，确认未引入 spec-proof 或远程写入。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(pr): 融合 CE 6876b964，PR 起草先写完整范围与 program placement 摘要，再用它核对标题和开头，避免最初事件遮蔽同等重要成果。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(skill): 融合 CE 2ca8e81c，补齐 live delegation 评测的 payload/receipt/synthesis 证据与跨宿主环境清理；当前 evaluation reference 统一英文。 (user-visible)

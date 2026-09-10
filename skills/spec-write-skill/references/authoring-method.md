@@ -153,3 +153,9 @@ Run the existing contract tests before rewriting and audit each verbatim pin by 
 - Restate incidental wording as the condition it protects, or remove an unsupported assertion with a reason in the test comment. Missing provenance does not by itself justify removing a safety rule.
 
 Read what each assertion measures. A search-window ceiling is not a required section size or a minimum body size. Relocate coherent blocks before deleting them; do not compress prose to satisfy a numeric target. For placement and evaluation, follow the workbench and evaluation references required by the current apply branch.
+
+After verbatim relocation, compare each reference with the body before evaluation. Remove the reference's duplicate of any gate, condition, or confirmation still owned by the body; preserve the body copy that must act before a read. The reference should state the facts or procedure it supplies to that gate. Relocation is incomplete while the same decision is independently prescribed twice, even if both copies agree today.
+
+Read moved rules against their new neighbors. A rule that was safe inside a phase can appear to override a nearby boundary after extraction. State its actual precondition where it now appears. If a shortened sentence needs a second corrective qualification, stop shortening the proxy and state the underlying condition. For example, protecting completed checkpoints must still allow a recovery scan for missing result markers; an absolute ban on entering earlier phases would lose that recovery path.
+
+When shared mandatory blocks prevent meeting a size ceiling, measure their combined floor and identify the owning shared contract that would need to change. Disclose the remaining limit rather than removing pinned safety behavior or claiming that prose compression can solve it. Keep any change to that shared contract within its own authorized scope.
