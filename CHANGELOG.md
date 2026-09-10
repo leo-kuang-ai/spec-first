@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(sweep): 融合 CE 4235cba4，将阶段细节迁入 run 引用，补齐状态失败停止外写、媒体失败降级、游标缺口与安全 fix-ref 传参；保留既有独立授权及状态所有权。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(prototype): 融合 CE bf840092，补齐 scoping/build 引用、窄宽比较与决策 capsule，修正 craft-floor 指针和 preview 单次目录声明；保留人工体验和隔离源码边界。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(debug): 融合 CE 85de911e，迁移调查细节至必读引用，补齐 issue-of-record、dirty-tree 隔离对照与先展示诊断再提问边界；保留现有授权和验证出口。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(explain): 融合 CE 1e15f9a6，补实 orchestration/intake 引用、空范围与 recap 证据顺序、明确 check-in 选择和受众适配；统一英文 Skill 内容，保留本地派发与持久化边界。 (user-visible)

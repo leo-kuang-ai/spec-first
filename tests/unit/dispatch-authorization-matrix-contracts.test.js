@@ -550,7 +550,7 @@ describe('generic dispatch authorization matrix', () => {
     expect(optimize).toMatch(/Approved optimization spec.*都不是派发授权/is);
     expect(optimize).toMatch(/judge sub-agents.*Otherwise evaluate.*serially inline/is);
     expect(optimize).toMatch(/Codex failure cascade.*authorization.*serial inline\/local/is);
-    expect(sweep).toMatch(/mode:headless.*scheduled run.*都不构成派发授权/is);
+    expect(sweep).toMatch(/mode:headless.*scheduled run.*do not authorize dispatch/is);
     expect(sweep).toMatch(/sensitive.*delegated handling/is);
     expect(refresh).toMatch(/never write.*tracked successor/is);
     expect(refresh).toMatch(/must not write.*stage.*commit/is);
