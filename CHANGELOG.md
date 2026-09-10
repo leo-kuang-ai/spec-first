@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: docs(sync): 复核 CE 3c049544 的 peer 启动权限、可信约束和必选模型边界，记录 19 项验证。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 复核 CE 12d3d8c3 的分组决策、精确答案消费和完成边界，记录 65 项验证。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 复核 CE 9f55d68a 的 REST 回复、pending review 和幂等恢复边界，记录 19 项验证。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(riffrec): 补齐 CE 15ab6f76 的 brainstorm 证据清单传递，更新 Polish 命令迁移后的契约验证。 (user-visible)
