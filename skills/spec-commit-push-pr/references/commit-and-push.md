@@ -38,8 +38,7 @@ groups small.
 When exactly one plan unit is already known for a commit, append its U-ID,
 such as `(U3)`. Do not hunt for a plan or label a mixed-unit commit as one unit.
 
-Re-check the current branch, remote, and existing PR immediately before pushing. Push the
-live `HEAD` only after the caller's landing gate is still satisfied:
+Re-check the current branch, remote, and existing PR immediately before pushing. **Project publishing gate:** before the push, resolve every applicable pre-push or review-ready requirement from the project's active instructions and conventions already in context, plus any scoped instructions governing the committed paths; only evidence valid for the exact commit state being sent satisfies them — a check that passed an earlier tree does not carry over. Stop before the external write and report what is missing or failing; if no requirement applies, proceed. Push the live `HEAD` only after the caller's landing gate is still satisfied:
 
 ```bash
 git push -u origin HEAD
