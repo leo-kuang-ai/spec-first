@@ -16,7 +16,7 @@ The document is short and structured on purpose. Good answers to a handful of sh
 
 - Strategy is an anchor, not a plan; features, schedules, and implementation plans belong to their owning workflows.
 - The repository grounds questions but never fills in the user's answers.
-- Preserve the existing document's shape and meaning; update only the targeted section.
+- 保留既有文档的形状和意义，只更新目标章节。带 `author-approved` 标记的章节和用户不拥有的文档不修改，报告冲突或在已获授权的独立文件中引用它；编辑既有文件前必须读取 `references/update-run.md`。
 - Keep the document short and leave room for future changes.
 
 ## Interaction Method
@@ -27,11 +27,11 @@ Ask one question at a time. Prefer free-form responses for the substantive secti
 
 ## Grounding
 
-Before the first question, read `references/grounding.md`, build a bounded repo model from `STRATEGY.md`, README, `CONCEPTS.md`, relevant docs, code structure, and recent history, then show the model and invite correction.
+开始 Phase 0、建立 repo model 之前必须读取 `references/grounding.md`。它定义来源、近期活动与产品意图的区别、空仓库路径，以及首个问题之前的有据摘要。
 
 ## Focus Hint
 
-Interpret the user's current request as an optional focus: a section name to revisit (`metrics`, `approach`, `tracks`) or a scope hint. With no focus, proceed open-ended and let the file state decide the path.
+用户或上游 caller 传入的参数都是可选 focus hint：章节名或范围。按意义将 `positioning`/`approach` 对应 Our approach、`users`/`who it's for` 对应 Who it's for、`boundaries` 对应 Not working on；不因此重命名文档。没有 focus 时由文件状态决定路径。
 
 ## Core Principles
 
@@ -48,7 +48,7 @@ Read `STRATEGY.md` using the native file-read tool.
 
 - **File does not exist** -> First run. Go to Phase 1.
 - **File exists and argument names a specific section** -> Targeted update. Go to Phase 2.
-- **File exists, no argument** -> Ask which section(s) to revisit, then Phase 2.
+- **File exists, no argument** -> Phase 2；由 update reference 在漂移摘要之后确定目标章节。
 
 Announce the path in one line: "Strategy doc not found - let's write it." or "Found existing strategy - let's review and update."
 
@@ -56,37 +56,25 @@ Announce the path in one line: "Strategy doc not found - let's write it." or "Fo
 
 Read `references/interview.md`. This load is non-optional - the pushback rules, anti-pattern examples, and quality bar for each section live there. Improvising from memory produces a passive transcription instead of a strategy doc.
 
-Run the interview in the section order of the final document:
+按以下顺序访谈；最终文档仍使用本地模板的章节顺序：
 
 1. Target problem
 2. Our approach
 3. Who it's for
 4. Key metrics
 5. Tracks
-6. Milestones (optional)
-7. Not working on (optional)
-8. Marketing (optional)
+6. Stress test（访谈检查，不生成新章节）
+7. Not working on（新建 house-format 文档必填）
+8. Milestones (optional)
+9. Marketing (optional)
 
 For each section, ask the opening question, apply the pushback rules, and capture the final answer in the user's own language. Do not skip the pushback step - it is the core of the skill. Two rounds of pushback per section maximum; capture what the user has given after that and note the section is worth revisiting on the next run.
 
-When all required sections (1-5) are captured, read `references/strategy-template.md`, fill it in, and present the full draft in chat before writing. Offer one round of edits. Then write to `STRATEGY.md`.
+前五项、stress test 和 Not working on 已有答案后，读取 `references/strategy-template.md`，按模板既有标题与顺序写草稿，展示并给一次编辑机会；当前明确授权覆盖草稿写入时可直接完成，不把可选反馈变成等待门。用户两轮后仍无法明确的部分照实记录并提示复访，不编造答案或阻塞整个访谈。
 
 ### Phase 2: Update Run
 
-Read the existing `STRATEGY.md` thoroughly. Summarize current state in 3-5 lines so the user sees what is on file.
-
-If the argument named a specific section, jump to that section in `references/interview.md`. Preserve all other sections exactly. Apply pushback as if this were a first run - do not rubber-stamp existing weak content just because it is already written.
-
-If no specific target, ask the user which section to revisit using the blocking question tool. Options:
-
-- "Target problem"
-- "Our approach"
-- "Who it's for"
-- "Metrics, tracks, or other"
-
-For each revisited section, re-interview with full pushback. For sections the user confirms are still accurate, leave them untouched. Update the `last_updated` value in the YAML frontmatter to today's ISO date.
-
-Write the updated doc back to `STRATEGY.md`.
+在摘要、漂移检查或提问之前，必须读取 `references/update-run.md`。它拥有文档形状、作者保护、漂移候选、目标选择和日期更新边界；未读不得编辑既有文件。所选章节的问题与最多两轮追问仍由 `references/interview.md` 提供。
 
 ### Phase 3: Downstream Handoff
 

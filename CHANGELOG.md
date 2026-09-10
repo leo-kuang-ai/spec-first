@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(strategy): 融合 CE 801590ce，补齐 grounding/update 必读引用、作者保护与漂移候选流程；新增回归测试并验证八宿主 support-file 投射。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 重新核对 CE 3eb0c7a3，记录 plain prose、pin 审计与 fresh-reader 的逐点源码依据及实际验证；本项无需重复修改已有实现。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(plan): 补充 CE 129 项同步的证据缺口和验收合同；按最新 spec-work 目标执行逐项验证与独立提交，未声明整体完成。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 120-e322bdac；本地已有等价约束或无对应 consumer。 (user-visible)

@@ -7,7 +7,7 @@ Loaded by `SKILL.md` after the interview is complete. Fill it in using the captu
 - Use the user's own language where possible. Do not paraphrase into generic PM-speak.
 - Each section stays compact. The whole doc should read in under 5 minutes.
 - Section order is locked. Do not add new top-level sections.
-- Optional sections: delete entirely if unused. Do not leave empty headers.
+- 可选 Milestones 和 Marketing 无内容时删除，不留空标题。新建文档的 Not working on 必填；尚无排除事项时如实注明。
 - Set `last_updated` in the YAML frontmatter to today's ISO date (YYYY-MM-DD). Do not duplicate the date in prose.
 - Set `name` in the frontmatter to the product or initiative name (the same value used in the H1 title).
 
@@ -65,7 +65,7 @@ _Why it serves the approach:_ {{one line}}
 
 - {{one line per item}}
 
-<!-- Optional. Delete the section if unused. Use only for things the team keeps being tempted by. -->
+<!-- 新建文档必填。只记录用户明确排除的事项；尚未明确时照实说明，不替用户编造。 -->
 
 ## Marketing
 

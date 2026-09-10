@@ -556,6 +556,14 @@ describe('plugin module facade and governance', () => {
   test('preserves support-file identity, metadata, and cross-host semantics across every host projection path', () => {
     const supportCases = [
       {
+        suffix: '/spec-strategy/references/grounding.md',
+        marker: '# Strategy Grounding',
+      },
+      {
+        suffix: '/spec-strategy/references/update-run.md',
+        marker: '# Strategy Update Run',
+      },
+      {
         suffix: '/spec-strategy/references/strategy-template.md',
         marker: 'name: {{product_name}}',
       },
