@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: docs(skill-authoring): 采纳 CE 5259c92c 的移除具体形态视为行为变化与排除句后无竞争裁决规则，落位 authoring-method。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(plan): 补齐 CE 2ca1f81c 的 Goal Capsule objective 组件外锚定规则与 approach/Means 区分。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(review): 补齐 CE 5ac4c01a 的异步收集纪律——launch receipt 不等于 reviewer return、slot 关闭与无可靠收集失败路径，validator 批次同分类。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(work): 补齐 CE d05e3951 的 shipping 审查 catalog 路径澄清，去除 `/review` 斜杠示例歧义。 (user-visible)
