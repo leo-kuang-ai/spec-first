@@ -39,6 +39,7 @@ describe('mutation authority baseline contracts', () => {
 
   test('spec-dogfood can fix without forcing checkout or commit', () => {
     const skill = read('skills/spec-dogfood/SKILL.md');
+    const phases = read('skills/spec-dogfood/references/phases.md');
     const reportTemplate = read('skills/spec-dogfood/references/dogfood-report-template.md');
 
     for (const fact of [
@@ -53,8 +54,15 @@ describe('mutation authority baseline contracts', () => {
     expect(skill).toContain('fix_authorization_missing');
     expect(skill).toContain('commit_authorization_missing');
     expect(skill).toMatch(/without landing authorization.*do not push.*do not open a PR/is);
-    expect(skill).toContain('The three `Blocked` states are **not** auto-runnable');
-    expect(skill).toMatch(/terminal `Blocked` state.*fix authorization.*human decision.*needs human verify/is);
+    expect(phases).toContain('The three `Blocked` states are **not** auto-runnable');
+    expect(phases).toMatch(/terminal `Blocked` state.*fix authorization.*human decision.*needs human verify/is);
+    expect(skill).toContain('Read `references/phases.md` before Phase 0');
+    expect(phases).toContain('never substitute the repository default branch for the PR base');
+    expect(phases).not.toContain('TRUNK=${TRUNK:-main}');
+    expect(phases).toContain('`PRODUCT.md` (its "Users" section)');
+    expect(phases).toContain('do not expand this run into repairing unrelated suite failures');
+    expect(phases).toContain('by instantiating `references/dogfood-report-template.md`');
+    expect(phases).toContain('update it incrementally');
     expect(reportTemplate).toContain('<commit-or-uncommitted>');
     expect(reportTemplate).toContain('uncommitted');
   });

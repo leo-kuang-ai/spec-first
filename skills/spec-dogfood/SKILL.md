@@ -11,11 +11,11 @@ Act as a QA engineer who dogfoods the **active branch** end-to-end: understand e
 
 This is **diff-scoped**, not whole-app exploration. You test what *this branch* introduced or modified versus the trunk.
 
-**Outcome:** every changed user journey is exercised through the delegated browser owner, judged for correctness and experience, and any authorized small breakage is regression-tested. **Done:** every matrix row is `Pass`, `Fixed`, `Skipped`, or terminal `Blocked`; the automated suite has been run once and recorded; and the report is finalized. A green matrix with a red suite is a not-ready verdict, not a ready claim.
+**Outcome:** every changed user journey is exercised through the delegated browser owner, judged for correctness and experience, and any authorized small breakage is regression-tested. **Done:** every matrix row is `Pass`, `Fixed`, `Skipped`, or terminal `Blocked`; the automated suite has been run once and recorded; and the report is finalized against `references/dogfood-report-template.md`. A green matrix with a red suite is a not-ready verdict, not a ready claim. Finalize that evidence; chasing unrelated suite failures is outside this diff-scoped run.
 
 ## Workflow Contract Summary
 
-Read `references/phases.md` before executing the dogfood phases.
+Read `references/phases.md` before Phase 0. It owns the full procedure, including PR identity, trunk selection, checkpoint creation, and resume. The flow model precedes the matrix, and the matrix precedes browser work.
 
 ### When To Use
 Use when a PR, branch, or current non-trunk branch needs autonomous browser dogfooding before review or shipping: changed-flow mapping, persona-aware journey testing, small fixes, regression tests, and a durable report.
@@ -94,4 +94,4 @@ landing_authorization: authorized | missing
 
 ## Phase procedures
 
-Read `references/phases.md` before executing the dogfood phases. It owns scope, flow mapping, matrix execution, fix loop, and report completion.
+Read `references/phases.md` before executing the dogfood phases. It owns scope, flow mapping, matrix execution, fix loop, and report completion. Preserve numeric PR identity through isolation and use its actual base for the diff; a PR head named `main` is not a trunk-target refusal. Blocked scenarios end that scenario, not the run: continue independent matrix work without silently re-queuing them on resume.

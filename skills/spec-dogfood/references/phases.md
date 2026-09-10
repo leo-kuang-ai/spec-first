@@ -1,5 +1,7 @@
 # Dogfood phases
 
+Required read before Phase 0. The entry owns authority and the browser owner; this reference owns procedure. A completed report may honestly conclude not-ready.
+
 ### Phase 0: Scope and Get on the Right Branch
 
 Parse the invocation arguments supplied by the current host: a PR number, a branch name, or blank (use current branch). Preserve quoted paths/tokens while stripping a recognized `--port PORT` pair if present.
@@ -25,7 +27,9 @@ Because tasks are session-scoped but the report doc is on disk, the report is th
 
 ### Phase 1: Analyze Changes
 
-Derive the trunk ref once, then pull the full diff against it and read it. Do not hard-code `main` — a repo whose default branch is `master` (or anything else) would fail with `fatal: ambiguous argument 'main...HEAD'`.
+For a PR target, resolve its actual `baseRefName`, `baseRefOid`, and `headRefOid` with `gh pr view <number> --json baseRefName,baseRefOid,headRefOid`. Verify the selected checkout matches the intended head and the base commit is locally available. If not, resolve the recorded PR repository/ref or stop with the concrete missing evidence; never substitute the repository default branch for the PR base. Diff that verified base against the selected head and record both identities in the report.
+
+For branch or blank targets only, derive the trunk ref once, then pull the full diff against it and read it. Do not hard-code `main` — a repo whose default branch is `master` (or anything else) would fail with `fatal: ambiguous argument 'main...HEAD'`. The following fallback applies only to branch/blank targets:
 
 ```bash
 # Resolve the trunk to a ref that actually exists. Start from the detected
@@ -46,7 +50,10 @@ for cand in "$DEFAULT" main master; do
     TRUNK="origin/$cand"; break
   fi
 done
-TRUNK=${TRUNK:-main}
+if [ -z "$TRUNK" ]; then
+  echo "No verified trunk ref; stop and resolve the base before dogfooding." >&2
+  exit 1
+fi
 
 git diff --name-only "$TRUNK...HEAD"   # what changed
 git diff "$TRUNK...HEAD"               # how it changed
@@ -54,7 +61,7 @@ git diff "$TRUNK...HEAD"               # how it changed
 
 Build a mental model of every change: new features, modified behavior, new routes/views/components, touched data flows. Note anything that produces user-visible behavior — that is what the matrix must cover.
 
-**Ground in the product's personas and vision.** Look for persona and vision context so flows can be judged from real users' eyes, not just "does it work." Check, in order: `STRATEGY.md` (its "Who it's for" section names the primary persona and their job-to-be-done), `VISION.md`, and any persona docs (e.g. `docs/personas/`, `PERSONAS.md`). Capture the 1-3 primary personas and what each cares about. If none exist, infer a reasonable primary persona from the product and the diff, and say so in the report.
+**Ground in the product's personas and vision.** Look for persona and vision context so flows can be judged from real users' eyes, not just "does it work." Check, in order: `STRATEGY.md` (its "Users" section, or "Who it's for" in older files, names the primary persona and their job-to-be-done), `PRODUCT.md` (its "Users" section), `VISION.md`, and any persona docs (e.g. `docs/personas/`, `PERSONAS.md`). Capture the 1-3 primary personas and what each cares about. If none exist, infer a reasonable primary persona from the product and the diff, and say so in the report.
 
 ### Phase 2: Map the Flows, Then Build the Matrix
 
@@ -126,7 +133,7 @@ When `local_fix_authorization: missing`, do not touch product source. Record the
 
 Keep iterating until every task is `completed` or in a terminal `Blocked` state — `Blocked (fix authorization)`, `Blocked (human decision)`, or `Blocked (needs human verify)`. All three wait on a person, so do not re-queue them. Re-test anything a fix might have affected.
 
-**Before declaring the branch ready, run the project's automated test suite once** (the new regression tests plus everything that already exists). Discover the test command from the project's active instructions and conventions already in your context — do not assume a specific runner. Record the result in the report; a green matrix with a red suite is not "ready."
+**Before declaring the branch ready, run the project's automated test suite once** (the new regression tests plus everything that already exists). Discover the test command from the project's active instructions and conventions already in your context — do not assume a specific runner. Record the result in the report; a green matrix with a red suite is not "ready." Finalize a not-ready report with the failure evidence; do not expand this run into repairing unrelated suite failures. A failed or unavailable suite is never recorded as passed.
 
 ### Phase 6: Write the Report Artifact
 

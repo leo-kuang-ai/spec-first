@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(dogfood): 融合 CE 248f7eb8 的阶段引用约束，补齐实际 PR base、persona 来源、写前检查点和红色 suite 的 not-ready 收尾，修正迁移后的测试读取位置。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE fd86e364 的 setup 引用迁移；验证现有 project-config 必读、显式动作与配置保护，排除 CE 专属团队配置和重复入口。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(optimize): 融合 CE 3ef049a3 的阶段引用与恢复约束，补齐 spec 冻结、恢复授权证据、独立 judge 不可用时禁止评分，以及继续实验前不得终结 CP-5；保留测量阶梯、多目标判定和本地权限边界。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(doc-review): 融合 CE a6e53e07，补齐 intake 来源与已决策字段、消除错误提示自调用、修正引用指针；保留只读 HTML/task-pack、显式 mutation 与本地 reviewer 预算。 (user-visible)
