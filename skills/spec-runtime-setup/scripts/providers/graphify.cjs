@@ -1672,6 +1672,9 @@ function graphifyProcessEnv(context, additions = {}) {
       env[key] = value;
     }
   }
+  // Provider 的 backup_if_protected 会在覆盖前把 curated/semantic 图快照到 graphify-out/<日期>/。
+  // setup 管理的运行以 graphify-out/ 为唯一 current artifact，关闭按天备份避免逐日镜像堆积。
+  env.GRAPHIFY_NO_BACKUP = '1';
   return env;
 }
 

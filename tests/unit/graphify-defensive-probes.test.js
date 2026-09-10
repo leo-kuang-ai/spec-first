@@ -53,4 +53,14 @@ describe('Graphify defensive probes', () => {
       .toEqual({ version: '0.9.12' });
     expect(provider.parseJsonStdout({ stdout: 'not json', stderr: '{"version":"0.9.12"}' })).toBeNull();
   });
+
+  test('setup-invoked graphify processes disable provider dated backups', () => {
+    const env = provider.graphifyProcessEnv({ env: { HOME: '/home/a', PATH: '/usr/bin' } });
+    expect(env.GRAPHIFY_NO_BACKUP).toBe('1');
+    const withAdditions = provider.graphifyProcessEnv(
+      { env: { HOME: '/home/a', PATH: '/usr/bin' } },
+      { GRAPHIFY_NO_BACKUP: '' },
+    );
+    expect(withAdditions.GRAPHIFY_NO_BACKUP).toBe('1');
+  });
 });
