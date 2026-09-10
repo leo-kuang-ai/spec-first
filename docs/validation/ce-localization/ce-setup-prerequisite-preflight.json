@@ -4,18 +4,12 @@
   "producer": "scripts/check-ce-localization-review.cjs",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "443c074230a800a965f58f5be43a2268212378ec",
-    "dirty": true,
-    "dirty_paths": [
-      "CHANGELOG.md",
-      "skills/spec-runtime-setup/SKILL.md",
-      "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
-      "src/cli/commands/doctor.js",
-      "tests/unit/graphify-defensive-probes.test.js"
-    ],
-    "dirty_path_manifest_sha256": "36bddbe78d71e45a18b60a06cab2caa36a448345c709b5829387a88c9b870d2e",
-    "source_tree_hash": "f4835111713f02313c1a3415a7bab76c385def7d229965b5e848583ef04caaac",
-    "inventory_hash": "83faa5ca37ffc5a9449b818de8558cb97f7f243c7b16c7eb5dac690f3cf8d7c9",
+    "head": "50f22ac9e9bd7d5e946ae19be19833ce5fce4efd",
+    "dirty": false,
+    "dirty_paths": [],
+    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source_tree_hash": "5c75c9adfc8f24f7c377d833cc4683c9abc049fb9348e4178ae9db54b068d95e",
+    "inventory_hash": "3eb357b9f10a510b1c20a3473b7c6b9bd50cac1606f3ec214f386021e098ac56",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",

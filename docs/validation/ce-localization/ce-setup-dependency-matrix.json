@@ -5,18 +5,12 @@
   "public_entrypoint_disposition": "reuse-spec-runtime-setup-only",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "443c074230a800a965f58f5be43a2268212378ec",
-    "dirty": true,
-    "dirty_paths": [
-      "CHANGELOG.md",
-      "skills/spec-runtime-setup/SKILL.md",
-      "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
-      "src/cli/commands/doctor.js",
-      "tests/unit/graphify-defensive-probes.test.js"
-    ],
-    "dirty_path_manifest_sha256": "36bddbe78d71e45a18b60a06cab2caa36a448345c709b5829387a88c9b870d2e",
-    "source_tree_hash": "f4835111713f02313c1a3415a7bab76c385def7d229965b5e848583ef04caaac",
-    "inventory_hash": "83faa5ca37ffc5a9449b818de8558cb97f7f243c7b16c7eb5dac690f3cf8d7c9",
+    "head": "50f22ac9e9bd7d5e946ae19be19833ce5fce4efd",
+    "dirty": false,
+    "dirty_paths": [],
+    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source_tree_hash": "5c75c9adfc8f24f7c377d833cc4683c9abc049fb9348e4178ae9db54b068d95e",
+    "inventory_hash": "3eb357b9f10a510b1c20a3473b7c6b9bd50cac1606f3ec214f386021e098ac56",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -51,9 +45,9 @@
     }
   },
   "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
-  "inventory_sha256": "e353af3e572ff5d72321fe2c4ce518eb9b174dbf980d7d65214566ef1cf999c1",
+  "inventory_sha256": "29b1947591ccf301338449cf30d8d1a3c7ebda1761417fdca41b85ee5093e3a9",
   "preflight_ref": "docs/validation/ce-localization/ce-setup-prerequisite-preflight.json",
-  "preflight_sha256": "87ed44c24d0c426b5b6cbcb0a503dd03ee707f9935a3dc10a5abd1331246dd2f",
+  "preflight_sha256": "6a66c57fa60ea5ffea6a7ec790f84a23638b2a011aa081ddcd4420aa2e5739e9",
   "ce_tool_dispositions": [
     {
       "tool_id": "agent-browser",
