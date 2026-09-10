@@ -111,6 +111,12 @@ Scan the commit list and classify each commit:
 
 When sizing the description, mentally subtract fix-up commits: a branch with 12 commits but 9 fix-ups is a 3-commit PR.
 
+Build a compact **scope map** from the complete oneline commit list and final three-dot diff resolved in Pre-A. Use subjects for full-range coverage, then use the final diff to merge overlapping work, remove fix-up-only outcomes, and correct stale subjects. Read fuller messages only when a subject remains unclear or contradicts the diff. Group material outcomes into clusters, identify each cluster's claims, and name one umbrella outcome covering them. Never derive that umbrella from the latest commit, tracker title, branch name, original request, or opening incident alone. The story of how work started is one cluster's origin, not the whole change.
+
+Check program placement using only context already available: the user request, a known plan, existing PR body, commit messages, or explicit series language. If this is part of a program, name the program outcome, this PR's contribution, and known preceding or follow-on work. Do not invent a series or scan all open PRs just for this check.
+
+Before composing, write the finished map as a short run-local working note: umbrella outcome; clusters and their material claims; program placement or `none`. Keep it to three or four lines. This is drafting context, not another section to publish in the PR body. Step H audits the title and opening against this written map rather than memory.
+
 ---
 
 ## Step B: Decide on evidence
@@ -181,6 +187,8 @@ Lead with the point, then the mechanism, then the caveat. Dense is good; long is
 ## Step C: Frame the narrative
 
 Articulate the PR's narrative frame:
+
+Use Step A's written umbrella and material clusters as the frame. Represent peer outcomes at parity instead of making the initiating incident the main story and treating equally material results as extras. When program context exists, include concise placement where it helps the reviewer understand this contribution; do not crowd the opening with already-visible mechanisms or a second description of the same outcome.
 
 1. **Before**: What was broken, limited, or impossible? (One sentence.)
 2. **After**: What's now possible or improved? (One sentence.)
@@ -332,6 +340,10 @@ The footer contains no externally loaded image and does not publish the harness 
 ## Step H: Compression pass
 
 Before applying, audit the body against the material claims from Step D:
+
+- Does the title express Step A's umbrella outcome instead of one cluster or mechanism?
+- Does the opening express that same umbrella, covering every peer outcome at parity? If one outcome leads while peers appear only as "also" or "comes with", rewrite from the written map.
+- Does the map record program placement or `none`? Include known program context when relevant, and remove any invented series when none is supported.
 
 - Is every claim the diff cannot establish present, and is any claim the diff does show restated needlessly?
 - Is decision-changing evidence stated as a result rather than collapsed into an unexplained "tests passed"?
