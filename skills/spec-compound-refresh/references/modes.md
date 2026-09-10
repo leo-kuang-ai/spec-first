@@ -29,6 +29,13 @@ A direct request to refresh or maintain `docs/solutions/` authorizes only the bo
 - **Mark as stale when uncertain.** If classification is genuinely ambiguous (Update vs Replace vs Consolidate vs Delete) or Replace evidence is insufficient, mark as stale with `status: stale`, `stale_reason`, and `stale_date` in the frontmatter. If even the stale-marking write fails, include it as a recommendation.
 - **Use conservative confidence.** In interactive mode, borderline cases get a user question. In headless mode, borderline cases get marked stale. Err toward stale-marking over incorrect action.
 - **Always generate a report.** The report is the primary deliverable. It has two sections: **Applied** (actions that were successfully written) and **Recommended** (actions that could not be written, with full rationale so a human can apply them or run the skill interactively). The report structure is the same regardless of what permissions were granted — the only difference is which section each action lands in.
+- Relocations require the four-condition gate in `references/classify.md`.
+  Splits are always recommend-only in non-interactive mode.
+- A failed prerequisite write blocks dependent deletion or metadata cleanup.
+  Record partial results accurately and continue independent candidates; a
+  failed successor write never permits deleting the original.
+- Missing corroboration alone is a verification gap, not staleness. Apply the
+  classification reference's unverifiable-is-not-false rule before stale-marking.
 
 ## CONCEPTS.md bootstrap requests
 

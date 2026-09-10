@@ -4,7 +4,7 @@
 
 After the refresh report is generated, check whether the project's instruction files would lead an agent to discover and search `docs/solutions/` before starting work in a documented area. This runs every time — the knowledge store only compounds value when agents can find it. If this check produces edits, they stay under the same Phase 5 commit and landing authority facts — see step 6 below.
 
-1. Identify which root-level instruction files exist (AGENTS.md, CLAUDE.md, or both). Read the file(s) and determine which holds the substantive content — one file may just be a shim that `@`-includes the other (e.g., `CLAUDE.md` containing only `@AGENTS.md`, or vice versa). The substantive file is the assessment and edit target; ignore shims. If neither file exists, skip this check entirely.
+1. Identify the project's root instruction surface: AGENTS.md, CLAUDE.md, GEMINI.md, or the equivalent it actually uses. Read it and identify the substantive source; ignore include-only shims. If none exists, skip this check. A generated managed block is not a direct edit target: recommend its owning source and generator instead.
 2. Assess whether an agent reading the instruction files would learn three things:
    - That a searchable knowledge store of documented solutions exists
    - Enough about its structure to search effectively (category organization, YAML frontmatter fields like `module`, `tags`, `problem_type`)

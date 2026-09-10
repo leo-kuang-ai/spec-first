@@ -48,7 +48,13 @@ Split actions into two sections:
 - Same detail as above, but framed as recommendations for a human to apply
 - Include enough context that the user can apply the change manually or re-run the skill interactively
 
-If all writes succeed, the Recommended section is empty. If no writes succeed (e.g., read-only invocation), all actions appear under Recommended — the report becomes a maintenance plan.
+Also include recommend-only work even when all attempted writes succeeded:
+relocations with the target and failed gate condition, split boundaries,
+category-shape observations, named guidance conflicts, discoverability changes,
+and unverifiable claims with their verification gaps. A successful write does
+not close these recommendations. If no writes succeed (e.g., read-only
+invocation), all proposed mutations appear under Recommended and the report
+becomes a maintenance plan. Keep partial actions distinct from completed ones.
 
 **Legacy cleanup** (if `docs/solutions/_archived/` exists):
 - List archived files found and recommend disposition: restore (if still relevant), delete (if truly obsolete), or consolidate (if overlapping with active docs)

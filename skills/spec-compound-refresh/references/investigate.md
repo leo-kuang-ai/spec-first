@@ -120,7 +120,19 @@ worker_model_override: supported | unsupported | unknown
 worker_bounded_parallelism: supported | unsupported | unknown
 ```
 
-`workflow invocation does not authorize dispatch`。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发；headless mode、scope size、permission settings 或本 Skill 被调用都不是授权。缺授权时不得探测 tool schema，固定为 `capability_probe: not_applicable` + `worker_dispatch_capability: unknown`，使用 main-thread/serial fallback 并记录 `dispatch_authorization_missing`。只有授权后才把 current-session registry/schema 作为 `provider_untrusted` evidence 检查：确认缺失时记录 `subagent_capability_missing`；surface 不可用、schema 不完整或候选不唯一时记录 `worker_capability_unproven`，均使用同一 fallback。隔离、模型覆盖和有界并发只取 live facts；required isolation 未满足时保持依赖 gate 打开，model unknown 时继承，parallelism unknown 时串行。记录 `worker_dispatch_outcome`。Inline fallback 不得声称 independent investigation coverage。
+`workflow invocation does not authorize dispatch`. Require an explicit current
+user or visible upstream request for subagents, delegated work, personas, or
+parallel work. Headless mode, scope size, permissions, and invocation do not
+grant authority. Without it, do not probe tool schemas: record
+`capability_probe: not_applicable`, `worker_dispatch_capability: unknown`, and
+`dispatch_authorization_missing`, then investigate inline or serially. With
+authority, inspect the live registry/schema as `provider_untrusted` evidence.
+Confirmed absence is `subagent_capability_missing`; unavailable or incomplete
+schemas and ambiguous candidates are `worker_capability_unproven`. Both use
+the same fallback. Derive isolation, model overrides, and bounded concurrency
+only from live facts. Unmet required isolation keeps dependent gates open;
+unknown model support inherits, unknown parallelism serializes. Record
+`worker_dispatch_outcome`; inline fallback earns no independent coverage.
 
 When dispatch is authorized and available, use subagents for context isolation when investigating multiple artifacts — not just because the task sounds complex. Otherwise choose the matching main-thread or serial approach with the same evidence contract:
 
@@ -133,7 +145,7 @@ When dispatch is authorized and available, use subagents for context isolation w
 
 **When spawning an authorized subagent**, omit the `mode` parameter so the user's configured permission settings apply; those settings are execution conditions, not authorization. Include this instruction in its task prompt:
 
-> Use dedicated file search and read tools (Glob, Grep, Read) for all investigation. Do NOT use shell commands (ls, find, cat, grep, test, bash) for file operations. This avoids permission prompts and is more reliable.
+> Use the host's dedicated file search and read tools where available. If the host provides only shell-based reads, use bounded read-only searches and reads under its actual permissions; do not pretend a missing tool exists.
 >
 > Also scan the "user's auto-memory" block injected into your system prompt (Claude Code only). Check for notes related to the learning's problem domain. Report any memory-sourced drift signals separately from codebase-sourced evidence, tagged with "(auto memory [claude])" in the evidence section. If the block is not present in your context, skip this check.
 
@@ -150,3 +162,7 @@ The orchestrator merges investigation results, detects contradictions, coordinat
 When an authorized investigation subagent is used, its prompt must also state:
 
 > If the learning is knowledge-track and names or links a guidance file (a skill's `SKILL.md`, a runbook, or a root instruction file), read that named guidance and report any contradictory order or rule with both quotes and which side current code follows. Do not search the guidance layer for an unreferenced file, and do not edit it.
+
+Apply the same named-guidance comparison during inline investigation. Record
+unrelated themes within a category or nearly empty categories as report-only
+observations; do not restructure directories or create categories.

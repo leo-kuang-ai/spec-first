@@ -11,6 +11,11 @@ Exclude:
 
 Find all `.md` files under `docs/solutions/`, excluding `README.md` files and anything under `_archived/`. If an `_archived/` directory exists, note it in the report as a legacy artifact that should be cleaned up (files either restored or deleted).
 
+READMEs are excluded only as review candidates. When an action deletes,
+renames, moves, consolidates, or replaces a listed doc, update the catalog
+README rows mechanically in the same scoped cleanup. Do not classify the
+catalog as a learning or silently leave broken pointers.
+
 If invocation arguments remain, use them to narrow scope before proceeding. Try these matching strategies in order, stopping at the first that produces results:
 
 1. **Directory match** — check if the argument matches a subdirectory name under `docs/solutions/` (e.g., `performance-issues`, `database-issues`)

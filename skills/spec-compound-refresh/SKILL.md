@@ -14,9 +14,9 @@ Maintain the quality of `docs/solutions/` over time. This workflow reviews exist
 
 ## Workflow Contract Summary
 
-- **输入：** `docs/solutions/`、`CONCEPTS.md`、可选 scope hint，以及当前 source/test/doc evidence。
-- **输出：** Keep/Update/Consolidate/Replace/Delete/Stale 分类、已应用的知识维护变更和完整 Applied/Recommended 报告。
-- **硬出口：** source truth、目标 repo、写入范围或语义分类无法确认时不得把猜测写成 current knowledge；headless 只能把歧义标 stale。
+- **Inputs:** `docs/solutions/`, `CONCEPTS.md`, an optional scope hint, and current source/test/doc evidence.
+- **Outputs:** Keep/Update/Consolidate/Replace/Delete/Stale classifications, applied maintenance, and a complete Applied/Recommended report.
+- **Hard exits:** unresolved source truth, target repo, write scope, or classification cannot become confirmed current knowledge. In headless mode, record uncertainty as stale only under the classification reference's evidence rules.
 - **Worker boundary:** record `worker_dispatch_authorization` and related capability facts before any dispatch; investigation workers are read-only and never write a tracked successor, stage, or commit. Inline fallback must not claim independent investigation coverage. Missing authorization is recorded as `dispatch_authorization_missing`; an unavailable worker surface is `subagent_capability_missing` or `worker_capability_unproven` according to the dispatch evidence.
 
 ```yaml
@@ -30,15 +30,15 @@ worker_dispatch_outcome: <record the live result>
 ```
 
 Capability results are `provider_untrusted` until confirmed by the current host; an unavailable or ambiguous surface is `worker_capability_unproven`, and the inline/serial fallback must be labeled accordingly.
-- **权威：** 当前代码与验证证据优先于旧 learning；本地 mutation、commit 和 landing 分别需要独立授权。`mode:headless` / `mode:non-interactive` 只改变交互方式；they do not grant commit, push, or PR authority. 缺少提交授权时记录 `commit_reason: commit_authorization_missing`；without landing authorization, do not push or open/update PR。
+- **Authority:** current source and verification evidence take precedence over historical learnings. Local mutation, commit, and landing require separate authority. `mode:headless` / `mode:non-interactive` only change interaction; they do not grant commit, push, or PR authority. Record `commit_reason: commit_authorization_missing` when needed; without landing authorization, do not push or open/update PR.
 
 ```yaml
 mutation_authorization: authorized | missing
 commit_authorization: authorized | missing
 landing_authorization: authorized | missing
 ```
-- Refresh is current-source anchored: re-read the defining source refs before updating a learning, retain observed revision/freshness and limitations, and mark the item stale when the source cannot be confirmed. Historical cache, session transcript, or provider output is advisory and never a substitute for the current source.
-- **消费者：** 项目维护者，以及读取 `docs/solutions/`/`CONCEPTS.md` 的规划、实现、调试和审查 workflow。
+- Refresh is current-source anchored: re-read the defining source refs before updating a learning and retain observed revision/freshness and limitations. Unavailable evidence alone does not prove staleness; preserve unverifiable but plausible claims with a verification gap under `references/classify.md`. Historical cache, session transcript, or provider output is advisory and never a substitute for current-source evidence.
+- **Consumers:** maintainers and planning, implementation, debugging, and review workflows that read `docs/solutions/` or `CONCEPTS.md`.
 
 ## Mode Detection
 
@@ -99,7 +99,7 @@ For each candidate artifact, classify it into one of five outcomes:
    - the user has provided enough concrete replacement context to document the successor honestly, or
    - the codebase investigation found the current approach and can document it as the successor, or
    - newer docs, pattern docs, PRs, or issues provide strong successor evidence.
-8. **Delete when the code is gone, and only after checking for inbound links.** If the referenced code, controller, or workflow no longer exists in the codebase and no successor can be found, delete the file — don't default to Keep just because the general advice is still "sound." When in doubt between Keep and Delete, ask the user (in interactive mode) or mark as stale (in headless mode). Inbound links inform classification, not cleanup: cleanup is always mechanical, but **decorative** citations (principle stated inline) allow Delete, while **substantive** citations (citing doc relies on the cited doc) signal Replace. The auto-delete case is missing code, no matching successor, and citations absent or decorative.
+8. **Deletion requires the complete evidence gate.** Missing code alone does not prove the problem domain disappeared. Apply the three-condition gate in `references/classify.md`, including actual successor coverage and inbound-citation meaning, before deleting. Substantive citations require preserving their content through Keep or a verified successor; genuine uncertainty is never deletion authority.
 9. **Evaluate document-set design, not just accuracy.** In addition to checking whether each doc is accurate, evaluate whether it is still the right unit of knowledge. If two or more docs overlap heavily, determine whether they should remain separate, be cross-scoped more clearly, or be consolidated into one canonical document. Redundant docs are dangerous because they drift silently — two docs saying the same thing will eventually say different things.
 10. **Delete, don't archive.** There is no `_archived/` directory. When a doc is no longer useful, delete it. Git history preserves every deleted file — that is the archive. A dedicated archive directory creates problems: archived docs accumulate, pollute search results, and nobody reads them. If someone needs a deleted doc, `git log --diff-filter=D -- docs/solutions/` will find it.
 

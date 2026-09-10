@@ -4,6 +4,32 @@
 
 After gathering evidence, assign one recommended action.
 
+## Evidence Limits And Scope
+
+**Unverifiable is not false.** Operational practices, environment behavior, or
+external schema facts may have no in-repo witness. Never delete, strip during
+consolidation, or stale-mark a plausible claim solely because the repo cannot
+confirm it. Preserve it and report the verification gap. Contradiction or
+independent evidence of drift is required before treating it as stale.
+
+For a knowledge-track learning that names a conflicting guidance file, report
+both quotes and which side current code supports. If the learning is supported
+and the guidance is wrong, recommend that guidance path under Recommended;
+never edit a skill, runbook, or root instruction file to reconcile the conflict.
+If code witnesses neither side, preserve the uncertainty and apply the mode's
+decision path. Do not search for unnamed guidance.
+
+Relocation is an Update variant, not permission to redesign categories. In
+non-interactive mode, all four conditions must hold: frontmatter and directory
+disagree under the category mapping; content unambiguously proves the directory
+is wrong; the target category already exists; and every inbound citation is
+in-repo and mechanically rewritable. Otherwise recommend the target and name
+the failed condition. A mismatch alone cannot choose which side is wrong.
+
+Splits are always recommend-only in non-interactive mode. Recommend independent
+retrieval units and their boundaries; length alone never justifies a split.
+An authorized split must validate every successor before removing the original.
+
 ### Keep
 
 The learning is still accurate and useful. Do not edit the file — report that it was reviewed and remains trustworthy. Only add `last_refreshed` if you are already making a meaningful update for another reason.
@@ -86,15 +112,23 @@ Classify each citation by what it does in its citing context:
 - **Substantive** — citing doc relies on the cited doc to provide content not stated inline (e.g., "see X for details on Y" with no inline Y). Signal Replace — write a successor at the same path, or **Keep with narrowed scope** if the doc's actual content is broader than its title implies.
 - **Mixed or unclear** — stale-mark.
 
-In headless mode, Delete + decorative cleanup is fine. Any substantive citation, or any genuine ambiguity, downgrades to stale-marking — writing a Replace successor is judgment-heavy and should not happen unattended.
+In headless mode, Delete + decorative cleanup is allowed only under the gate
+below. A substantive citation redirects to Replace or narrowed Keep; a verified
+successor may be written under the same evidence and promotion gates as other
+Replace candidates. Genuine ambiguity remains stale-marked, never deleted.
 
 **Auto-delete only when all three hold:**
 
-- The implementation is gone (or fully superseded by a clearly better successor, or the doc is plainly redundant).
-- The problem domain is gone — the app no longer deals with what the learning addresses.
+- The implementation once existed in this repo and is gone, or the doc is fully superseded or plainly redundant.
+- The problem domain is gone, or the surviving canonical doc already contains every specific piece of the superseded/redundant guidance. Topical overlap is not coverage.
 - Inbound links are absent or unambiguously decorative.
 
-If any condition fails, classify as Replace, Update, Consolidate, or stale-mark per the rules above. Do not delete a learning whose problem domain is still active or whose principles are cited substantively — fill the gap with a replacement instead.
+If any condition fails, classify as Replace, Update, Consolidate, or stale-mark
+per the evidence rules above. Missing implementation alone never authorizes
+deletion while the problem domain remains active. A doc that never referenced
+in-repo implementation cannot satisfy the implementation-gone case.
+Consolidate deletion follows its validated merge and citation cleanup; it does
+not need to pretend the still-active problem domain disappeared.
 
 ## Pattern Guidance
 

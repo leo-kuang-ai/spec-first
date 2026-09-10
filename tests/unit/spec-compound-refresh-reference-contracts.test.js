@@ -27,6 +27,21 @@ describe('spec-compound-refresh CE reference migration contracts', () => {
     expect(skill).toContain('without landing authorization');
   });
 
+  test('preserves evidence gaps and blocks dependent destructive work', () => {
+    const classify = read('skills/spec-compound-refresh/references/classify.md');
+    const modes = read('skills/spec-compound-refresh/references/modes.md');
+    const report = read('skills/spec-compound-refresh/references/report.md');
+    const scope = read('skills/spec-compound-refresh/references/scope.md');
+    expect(classify).toContain('Unverifiable is not false');
+    expect(classify).toContain('Topical overlap is not coverage');
+    expect(classify).toContain('never edit a skill, runbook, or root instruction file');
+    expect(classify).toContain('all four conditions must hold');
+    expect(modes).toContain('Splits are always recommend-only');
+    expect(modes).toMatch(/failed successor write never permits deleting the original/);
+    expect(report).toContain('recommend-only work even when all attempted writes succeeded');
+    expect(scope).toMatch(/READMEs are excluded only as review candidates/);
+  });
+
   test('migrated references preserve current-source and safety boundaries', () => {
     const modes = read('skills/spec-compound-refresh/references/modes.md');
     const investigate = read('skills/spec-compound-refresh/references/investigate.md');

@@ -26,7 +26,14 @@ Examples that should **not** be in-place updates:
 - The system architecture changed enough that the old guidance is misleading
 - The troubleshooting path is materially different
 
-Those cases require **Replace**, not Update.
+Cosmetic-only cases remain no-write **Keep**. A changed substantive
+recommendation requires **Replace**, not Update.
+
+For an authorized relocation, apply `classify.md`'s four-condition gate before
+moving. Move only into the confirmed existing category, update frontmatter
+and every in-repo inbound link including catalog rows, then verify targets and
+links. If a prerequisite write fails, stop the dependent move/cleanup and
+report the actual partial state.
 
 ## Consolidate Flow
 
