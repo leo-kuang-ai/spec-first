@@ -32,7 +32,7 @@ If unavailable, stop before deriving implementation tasks; preserve the entrypoi
    |-----------|---------|--------|
    | **Trivial** | 1-2 files, no behavioral change (typo, config, rename) | Proceed to Phase 1 step 2 (execution boundary), then implement directly — no task list, no execution loop. Apply Test Discovery if the change touches behavior-bearing code |
    | **Small / Medium** | Clear scope, under ~10 files | Build a task list from discovery. Proceed to Phase 1 step 2 |
-   | **Large** | Cross-cutting, architectural decisions, 10+ files, touches auth/payments/migrations | Inform the user this would benefit from `spec-brainstorm` or `spec-plan` to surface edge cases and scope boundaries. Honor their choice. If proceeding, build a task list and continue to Phase 1 step 2 |
+   | **Large** | Cross-cutting, architectural decisions, 10+ files, touches auth/payments/migrations | Unless `spec-plan` already sized this prompt in this session, inform the user this would benefit from `spec-brainstorm` or `spec-plan` to surface edge cases and scope boundaries, and honor their choice. When proceeding, build a task list and continue to Phase 1 step 2. When implementation surfaces a decision the user would weigh, stop before the write and ask or report the finding — never route back to planning for a choice the user can settle here |
 
 1. **Read Plan and Clarify** _(skip if arriving from Phase 0 with a bare prompt)_
 

@@ -23,6 +23,8 @@ If this owner cannot be read, preserve state and return blocked before execution
 
 Determine how to proceed based on what was provided in `<input_document>` (after any mode token is stripped).
 
+**Resolve a session-carried planning result before blank or bare-prompt classification.** When the current request is continuation language such as "proceed" and the conversation identifies exactly one current planning result for this work — a plan/spec path, or an in-conversation chat-tier result from `spec-plan` — treat that result as the input: a path enters as a file document below, and an in-conversation brief enters as a bare prompt whose work description is that brief. If multiple session planning results are plausible, ask which one; do not choose by recency. Do not replace a concrete new work request with an unrelated earlier result. This rule depends only on visible conversation state, never on whether invocation was explicit or automatic.
+
 The classification order is `mode token -> file metadata -> task pack -> unified plan -> legacy plan / knowledge-work -> bare prompt`. Do not classify by filename alone.
 
 **File document** (input is a path to an existing plan, specification, or task pack): read only the metadata first — YAML frontmatter for Markdown, or visible header metadata for HTML.

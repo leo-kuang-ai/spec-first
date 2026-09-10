@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(plan): 补齐 CE 6f6c5779 的 chat-tier 输出契约、proceed 交接与 spec-work session-carried brief 接受，修正 brainstorm chat 路径 handoff 条件句。 (user-visible)
 - v1.15.3 2026-09-10 codex: test(sync): 补齐 CE dfeae095 的审查模板大内容占位符唯一性回归断言。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 复核 CE bcd86d04 的阶段 owner 按需读取、blocked 优先与 LFG 门禁边界，记录 46 项验证。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 复核 CE 6dda2038 的多目标比较、分级采样和集成完成门，记录 105 项验证。 (user-visible)
