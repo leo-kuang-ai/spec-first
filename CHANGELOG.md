@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 8bbcc197 的 top-level PR comment 可见性；确认现有 resolver 已按内容判断、保留作者反馈与身份事实，排除 CE babysit 专属 owner。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(pr-feedback): 融合 CE 1444dfcc 的 pipeline 引用与集中裁决边界，补齐 GHE host 传递、needs-human 分析回复和非收敛根因判断，保留 pipeline-return 的本地只读出口。 (user-visible)
 - v1.15.3 2026-09-10 codex: refactor(browser): 核对 CE db164786，将端口解析保留在已有 spec-polish caller，移除无 consumer 的 browser resolver，消除跨 Skill 依赖及旧 inline cascade 文案。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE cf098d23 的 debug 状态枚举；入口单一引用与 producer/LFG consumer 已支持 fixed-not-pushed，保留本地验证及 caller-owned commit/push 语义。 (user-visible)
