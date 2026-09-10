@@ -56,3 +56,12 @@ test('bounded execution retains decision owners without duplicating product trut
   expect(structure).toContain('Product Contract `### Success Criteria`');
   expect(structure).toContain('never appear here as well');
 });
+
+test('goal composition belongs to the handoff and carries linked product decisions', () => {
+  const handoff = read('references/plan-handoff.md');
+  expect(entry).toContain('Do not reconstruct a second objective in this entrypoint');
+  expect(handoff).toContain('whose exact `Governs R...` links name that unit\'s cited R-IDs');
+  expect(handoff).toContain('**Deletion test:**');
+  expect(handoff).toContain('`spec-work` does **not** also run');
+  expect(read('references/output-mode.md')).toContain('Commented template examples are not settings');
+});
