@@ -1,6 +1,6 @@
 # Strategy Interview
 
-由 `SKILL.md` 在 Phase 1 开始时读取，Phase 2 按目标章节复用。下列编号问题对应 `strategy-template.md` 的章节；Stress Test 只用于访谈检验，不新增文档章节。
+Read by `SKILL.md` at the start of Phase 1 and reused for the target section in Phase 2. The numbered questions correspond to `strategy-template.md`; Stress Test checks the interview and does not add a document section.
 
 For each section: ask the opening question, evaluate the answer against the quality bar, push back when it falls into a named anti-pattern, and capture the final answer in the user's own language.
 
@@ -126,7 +126,7 @@ Default is to skip. Do not push the user to invent milestones. If they name some
 
 **Opening question:** "Is there anything you've explicitly decided *not* to do right now that's worth naming? This is for things the team keeps being tempted by."
 
-这是战略边界，不是问题清单。新建 house-format 文档必填；用户尚未明确排除事项时，照实写“暂未明确”，不能替用户发明禁区。已有其他格式文档按 update-run 的局部修改与归属规则处理。每项一句，不鼓励长列表。
+These are strategic boundaries, not an issue list. This section is required in a new house-format document. If the user has named no exclusions, write "Nothing named yet" rather than inventing restrictions. For existing documents in other formats, follow update-run's minimal-edit and ownership rules. Use one sentence per item and resist long lists.
 
 ---
 
@@ -140,10 +140,10 @@ Skip by default. Keep to 2-3 lines if present.
 
 ## After the Interview
 
-前五项完成后先进行下面的 stress test，再收集 Not working on 和用户实际需要的可选章节。读取 `strategy-template.md`，保留本地模板标题及顺序，使用用户自己的表述。展示草稿并给一次编辑机会；当前授权已覆盖本地写入时可继续，缺关键战略答案时仅询问当前依赖的问题。
+After the first five sections, run the stress test below, then capture Not working on and any optional sections the user needs. Read `strategy-template.md`, retain local template headings and order, and use the user's own words. Show the draft with one edit opportunity; proceed when current authorization covers the local write, asking only for critical strategic answers still needed.
 
 ## Stress Test
 
-用草稿实际存在的冲突或取舍构造少量具体提案，逐个让用户判断。现有战略能决定的提案用于确认；无法决定的提案用于澄清 Our approach 或 Tracks；用户明确拒绝的提案可成为 Not working on 的候选。不要用代码活动替用户作这些选择，也不把检查写成新的战略章节。
+Build a few concrete proposals from actual tensions or tradeoffs in the draft and ask the user to judge them one at a time. Proposals the strategy already resolves confirm it; unresolved proposals sharpen Our approach or Tracks; explicitly rejected proposals can seed Not working on. Do not substitute code activity for these choices or write the check as a new strategy section.
 
-提问时利用 repo model 和用户原话指出具体矛盾，每节最多两轮；仍无法进一步明确时记录现有答案并提示复访。已有章节复访使用同样标准，不因为文字已存在而自动认可。
+Use the repo model and the user's words to name concrete contradictions, with two rounds maximum per section. If answers remain unclear, record what is available and suggest revisiting. Apply the same bar to existing sections; written content is not automatically accepted.

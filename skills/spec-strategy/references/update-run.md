@@ -1,18 +1,21 @@
 # Strategy Update Run
 
-编辑任何既有 `STRATEGY.md` 前，以及更新摘要、漂移检查、目标提问之前必读。此 reference 只拥有 strategy 更新，不更新 tracker、排期或实现计划。
+Required read before editing any existing `STRATEGY.md`, including before the update summary, drift check, or target question. This reference owns strategy updates, not trackers, schedules, or implementation plans.
 
-## 文档形状与归属
+## Document Shape and Ownership
 
-先完整读取现有文档，按意义识别章节。仅在可确认文件由本 Skill 按 house format 维护时，使用 `strategy-template.md` 的当前标题；需要兼容旧版 house 标题时仅重命名标题，正文不变并说明。证据不足时视为其他作者格式，不自动套模板，不新增 frontmatter、重复语义章节或改变其行文结构。
+Read the whole document, identify sections by meaning, and determine its maintenance shape from the current file. Git history alone cannot establish a section's author or grant write authority.
 
-带 `author-approved` 标记的章节，标题与正文均不得修改。用户不拥有的文档整体不编辑；报告冲突，或在另行已授权的文件中引用原文。未被选中的其他章节的内容和位置保持不变；不能把漂移候选当作这些章节的写权限。
+- **solely-owned**: at least one `##` heading comes from the local template, every `##` heading belongs to that set (Target problem, Our approach, Who it's for, Not working on, Key metrics, Tracks, Milestones, Marketing) or an equivalent house heading (Purpose, Positioning, Users, Boundaries, Brand), and no other tool's HTML-comment marker appears anywhere. `name`, `last_updated`, and a Strategy H1 corroborate but are not required. A handwritten file using exactly this shape follows the same path; a prose-only file without template headings does not. On an authorized write, align owned headings to the local template, use its section order, and offer missing required meanings; preserve untargeted body content. Do not freeze an old format merely because STRATEGY is a shared filename.
+- **multi-writer**: any other `##` heading or another tool's marker means do not reorder any section or rewrite or shorten foreign content. Only headings attributable to this skill may be aligned to the local template. When a foreign section already carries the meaning, merge into it without renaming it or adding a duplicate. Missing owned sections may be contributed within authorization, using template headings without moving other sections. With insufficient evidence or a prose-only file, make minimal edits in its own idiom: do not impose the template, add frontmatter, or restructure.
 
-## 更新顺序
+For a section marked `author-approved`, preserve both heading and body and do not move it. Do not edit a document the user does not own; report the conflict or reference it in a separately authorized file. In a multi-writer file, preserve untargeted sections' content and position. In a solely-owned file, only the heading and ordering maintenance above is allowed outside the target; body content stays unchanged. Neither drift candidates nor shape classification grant write authority over other content.
 
-1. 用三至五行总结文件现状，再对照 repo model 的 stated intent、结构、相关 docs 与近期历史检查各章节。不能只看 `last_updated` 之后的提交，因为定向更新不会审查其他章节。
-2. 用具体证据列出可能过时的章节作为候选，不得当作战略已经改变。近期工作只证明近期注意力，不足以改写 Purpose、做法或用户。
-3. 有 focus hint 时直接复访对应章节；没有时询问用户要更新哪个章节。漂移候选列在前面供选择，仍允许选择任一章节。
-4. 先读 `interview.md` 的对应问题，以现有答案和 repo 证据追问，最多两轮；用户确认仍有效的内容保持不变。不要因答案已写在文档里而跳过必要追问。
-5. House-format 文档缺少 Not working on 的语义时，提出补齐；已有其他标题承载同一意思则不重复。只有当前授权已覆盖该项新增时才写入，其他格式不强制新增章节。
-6. 有 YAML frontmatter 时仅将 `last_updated` 更新为当前日期；没有 frontmatter 就不新增，读者沿用原文件日期。检查目标差异、作者保护和其他章节未变后写回。
+## Update Sequence
+
+1. Summarize the current file in three to five lines, then compare every section against the repo model's stated intent, structure, relevant docs, and recent history. Do not restrict the check to commits since `last_updated`: a targeted update does not review other sections.
+2. Name potentially stale sections with specific evidence as candidates, never as a verdict that strategy has changed. Recent activity shows attention, not permission to rewrite purpose, approach, or users.
+3. With a focus hint, revisit that section directly. Otherwise ask which section to update, listing drift candidates first while allowing any section.
+4. Read the corresponding questions in `interview.md`; challenge existing answers using repo evidence, with two rounds maximum. Preserve content the user confirms is still accurate. Do not skip necessary pushback merely because an answer is already written.
+5. Offer to add the meaning of Not working on when a house-format document lacks it; do not duplicate an equivalent section. Write the addition only within current authorization and do not force new sections onto other formats.
+6. If YAML frontmatter exists, update only `last_updated` to the current date. Do not add frontmatter when absent; readers use the file's own date. Check the target diff, author protection, and preservation of other content before writing back.

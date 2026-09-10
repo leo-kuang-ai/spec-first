@@ -19,7 +19,7 @@ Model tiering lives in this caller, not in prompt assets. Local prompt files hav
 Prepare a concise planning context summary (a paragraph or two) to pass as input to the research agents:
 - If an origin document exists, summarize the problem frame, requirements, and key decisions from that document
 - Otherwise use the feature description directly
-- If `STRATEGY.md` exists, read it and include the relevant pieces (target problem, approach, active tracks) in the summary so downstream research and planning decisions are anchored to product strategy
+- Prefer root `STRATEGY.md`; read legacy `PRODUCT.md` / `VISION.md` only when it is absent or lacks a needed meaning. Include the target problem, approach, active tracks, and boundaries by meaning, without requiring exact headings. Name actual sources and do not override the project's explicit authority.
 - If `CONCEPTS.md` exists at repo root, read it as an advisory calibration source for domain entities, named processes, and status concepts. Reuse a term when it fits the Product Contract; when it conflicts with current-user or origin meaning, surface the conflict and preserve the plan-local meaning instead of silently overriding it.
 
 **Resolve current project orientation first.** Derive stack, dependencies, conventions, and structure from the current target repo/worktree for this run. Record current git identity and dirty state, read root plus applicable scoped instructions directly, and carry direct source refs. Never persist or reuse this orientation across runs, branches, or worktrees. Pass it to `repo-research-analyst` so the analyst can focus on question-specific patterns while still confirming any consequential fact against current source. If git or a required source cannot be read, record the concrete degraded fact and narrow the plan's evidence claims; do not substitute a profile from another source identity.
@@ -44,7 +44,7 @@ Collect:
 - Implementation patterns, relevant files, modules, and tests
 - AGENTS.md guidance that materially affects the plan, with CLAUDE.md used only as compatibility fallback when present
 - Institutional learnings from `docs/solutions/`
-- Product strategy context when `STRATEGY.md` is present — flag any plan decisions that pull away from the active tracks or the stated approach
+- Product strategy context from the sources above: flag plan decisions that pull away from active tracks or the approach, or touch stated boundaries.
 - Agent-native planning findings when the conditional triage dispatched: action/context parity decisions, tool/workspace/execution-lifecycle choices, scope boundaries, and verification scenarios
 
 **Slack context** (opt-in) — never auto-dispatch. Route by condition:

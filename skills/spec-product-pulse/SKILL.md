@@ -46,7 +46,7 @@ Apply a **15-minute trailing buffer** to the window's upper bound. Many analytic
 4. **Parallel where safe, serial where it matters.** Analytics and tracing queries run in parallel. Database queries run serially to avoid load.
 5. **Memory through saved reports.** Every run writes to `docs/pulse-reports/` so past pulses are browseable as a timeline.
 6. **Read-only database access only.** If a database is used as a data source, the connection must be read-only. The interview refuses to accept read-write credentials. Database access is optional - many products complete the pulse with analytics and tracing alone.
-7. **Strategy-seeded when available.** The interview reads the shared project strategy document `STRATEGY.md` before asking questions and carries forward the product name and key metrics as seeds; if it is absent, it reports that no strategy seed is available rather than silently deriving one from legacy docs. The goal of data-source setup is to wire up whatever connections are needed to actually measure those metrics.
+7. **Strategy-seeded when available.** Setup and every report resolve current files using `references/strategy-source.md`: prefer STRATEGY, then VISION and PRODUCT when it is absent; read metrics by meaning and follow explicit legacy delegation. Product names and metrics seed measurement-source setup without rewriting strategy documents.
 
 ## Execution Flow
 
@@ -60,7 +60,7 @@ The active keys include `pulse_product_name`, `pulse_lookback_default`, `pulse_p
 
 ### Phase 1: First-Run Interview
 
-Read `references/setup.md`, which requires `references/interview.md`. It owns strategy seeding from `STRATEGY.md`, the SMART interview bar, read-write database refusal, preserving non-pulse keys in `.spec-first/config.local.yaml`, and the explicit scheduling handoff.
+Read `references/setup.md`, which requires `references/interview.md` and `references/strategy-source.md`. It owns strategy seeding, the SMART interview bar, read-write database refusal, preserving non-pulse keys in `.spec-first/config.local.yaml`, and the explicit scheduling handoff.
 
 ### Phase 2: Run the Pulse
 

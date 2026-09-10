@@ -1,11 +1,20 @@
 # Strategy Grounding
 
-开始 Phase 0、建立 repo model 之前必读。缺失时报告来源不足，不凭记忆补造 repo model。
+Required read before Phase 0 and before building the repo model. If unavailable, report the missing source; do not invent a repo model from memory.
 
-读取存在的 `STRATEGY.md`，再限定到“产品是什么、服务谁”读取 README、`CONCEPTS.md`、相关 `docs/`、产品文档及代码结构。`PRODUCT.md` 或 `VISION.md` 可提供 stated intent 线索，不成为新的 strategy 写入目标，也不覆盖项目指定的权威来源。
+Read `STRATEGY.md` when present, then bound reads of README, `CONCEPTS.md`, relevant `docs/`, product documents, and code structure to what the product is and whom it serves. `PRODUCT.md` or `VISION.md` can supply stated-intent evidence; neither becomes a new strategy write target or overrides the project's designated authority.
 
-区分两类证据：产品意图与结构用于问题、做法和用户的提问；近期提交只说明注意力，用于 Tracks 和更新时的漂移候选。近期工作与 stated intent 不同，应问“这是长期投入、临时推进还是无关工作”，不得当作产品已转向。
+Distinguish two kinds of evidence: product intent and structure ground questions about the problem, approach, and users; recent commits show attention only, informing Tracks and update drift candidates. When activity differs from stated intent, ask whether it is lasting investment, temporary work, or unrelated activity; do not conclude that the product has changed direction.
 
-首次提问之前，用三至五行说明产品、用户与近期关注点，每点标明来源并允许纠正。证据只使问题更具体，不替用户回答战略。名称仍无法确认时才询问产品名，用于模板 frontmatter 和标题。
+Before the first question, show three to five lines about the product, users, and recent attention, naming each source and inviting correction. Evidence sharpens questions; it does not answer strategy for the user. Ask for the product name only if it remains unknown, for the template frontmatter and title.
 
-空仓库或没有实质资料是正常路径：说明缺少 grounding，继续无背景访谈，不制造结论。首次运行完成完整访谈；已有文档只复访 Phase 2 选定章节。
+An empty repository or no substantive material is a normal path: state that grounding is unavailable and continue an ungrounded interview without inventing conclusions. A first run completes the full interview; an existing document revisits only the section selected in Phase 2.
+
+## Legacy Sibling Without STRATEGY
+
+When `STRATEGY.md` is absent but `VISION.md` or `PRODUCT.md` exists, explain the two integration options before the interview and follow the user's stated intent. Without a preference, default to the reversible link option; legacy migration is not a mandatory gate.
+
+- **fold**: create STRATEGY and merge this run's contribution with legacy content carrying the same meaning into one section, preserving the author's words. Put contradictions to the user; do not overwrite unresolved intent. Carry meanings outside this skill's contribution unchanged under their own headings, so the resulting file receives multi-writer protection. Explain that the old file is redundant and leave its removal to the user. Do not add a delegation link after a complete fold.
+- **link**: leave the legacy file in place and reference it from the template's sibling line. Explicitly defer repeated meanings to it, writing only content specific to this strategy contribution.
+
+Neither option edits or deletes the legacy file or overrides the project's designated source of truth. Downstream readers prefer STRATEGY and consult legacy files only for missing meanings. Explicitly linked meanings count as carried, not missing.

@@ -5,14 +5,7 @@ Read this on a first run or an explicit `setup`/`reconfigure`/`edit config` requ
 
 #### 1.0 Seed from strategy (if available)
 
-Before asking any questions, read `STRATEGY.md` using the native file-read tool. If the file exists, extract:
-
-- The product name from the `name` key in the YAML frontmatter, falling back to the H1 title (stripping the trailing ` Strategy` suffix, e.g., `# Spiral Strategy` -> `Spiral`) if frontmatter is missing
-- The list of key metrics from the `## Key metrics` section, one per line. If that exact heading is absent, use the section that semantically lists measurable success metrics; do not invent metrics from unrelated prose.
-
-Open the interview by surfacing what was extracted: announce that a strategy doc was found, show the seeded product name and the list of key metrics that will be carried into event/data setup, and invite the user to correct any of it before continuing.
-
-If `STRATEGY.md` does not exist, note that explicitly in chat: no strategy doc on file, running setup from scratch, and mention that `spec-strategy` can seed pulse later if run first.
+Before asking questions, read `references/strategy-source.md`, resolve the product name and metrics from current files, and show the actual source and candidates. It owns STRATEGY precedence, legacy fallback, semantic extraction, and the no-source path; reports use the same rule.
 
 #### 1.1 Interview
 

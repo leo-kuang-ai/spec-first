@@ -24,20 +24,20 @@ describe('strategy source contracts', () => {
     const update = entry.split('### Phase 2:')[1].split('### Phase 3:')[0];
     expect(phaseZero).not.toMatch(/Ask which section/i);
     expect(update).toContain('references/update-run.md');
-    expect(update).toMatch(/摘要、漂移检查或提问之前/);
-    expect(read('references/grounding.md')).toContain('近期提交只说明注意力');
-    expect(read('references/grounding.md')).toContain('正常路径');
+    expect(update).toContain('Before the summary, drift check, or questions');
+    expect(read('references/grounding.md')).toContain('recent commits show attention only');
+    expect(read('references/grounding.md')).toContain('normal path');
   });
 
   test('updates preserve author protection, foreign document shape, and untargeted content', () => {
     const update = read('references/update-run.md');
     expect(update).toContain('author-approved');
-    expect(update).toContain('标题与正文均不得修改');
-    expect(update).toContain('不自动套模板');
-    expect(update).toContain('其他章节的内容和位置保持不变');
-    expect(update).toContain('没有 frontmatter 就不新增');
-    expect(update).toContain('候选');
-    expect(update).toContain('不得当作战略已经改变');
+    expect(update).toContain('preserve both heading and body');
+    expect(update).toContain('do not impose the template');
+    expect(update).toContain("preserve untargeted sections' content and position");
+    expect(update).toContain('Do not add frontmatter when absent');
+    expect(update).toContain('candidates');
+    expect(update).toContain('never as a verdict that strategy has changed');
   });
 
   test('interview and template agree on strategy boundaries without renaming local consumers', () => {
@@ -46,11 +46,40 @@ describe('strategy source contracts', () => {
     const template = read('references/strategy-template.md');
     expect(entry).toContain('Stress test');
     expect(interview).toContain('## Stress Test');
-    expect(interview).toContain('最多两轮');
+    expect(interview).toContain('two rounds maximum');
     expect(template).toContain('## Not working on');
-    expect(template).toContain('必填');
+    expect(template).toContain('required in a new document');
     expect(template).toContain('## Target problem');
     expect(template).toContain('## Our approach');
     expect(template).toContain("## Who it's for");
+  });
+
+  test('shared document maintenance distinguishes ownership and preserves legacy sources', () => {
+    const update = read('references/update-run.md');
+    const grounding = read('references/grounding.md');
+    expect(update).toContain('solely-owned');
+    expect(update).toContain('multi-writer');
+    expect(update).toContain('at least one');
+    expect(update).toContain('do not reorder');
+    expect(grounding).toContain('fold');
+    expect(grounding).toContain('link');
+    expect(grounding).toContain('Neither option edits or deletes the legacy file');
+    const template = read('references/strategy-template.md').split('~~~markdown')[1];
+    expect(template.indexOf('## Not working on')).toBeLessThan(template.indexOf('## Key metrics'));
+  });
+
+  test('pulse setup and reports consume the same current strategy source contract', () => {
+    const pulse = path.resolve(root, '../spec-product-pulse');
+    for (const file of ['references/setup.md', 'references/report-template.md']) {
+      const content = fs.readFileSync(path.join(pulse, file), 'utf8');
+      expect(content).toContain('strategy-source.md');
+    }
+    const source = fs.readFileSync(path.join(pulse, 'references/strategy-source.md'), 'utf8');
+    expect(source).toContain('STRATEGY.md');
+    expect(source.indexOf('VISION.md')).toBeLessThan(source.indexOf('PRODUCT.md'));
+    expect(source).toContain('every run');
+    expect(source).toContain('by meaning');
+    expect(source).toContain('explicitly');
+    expect(source).toContain('never rewrites');
   });
 });

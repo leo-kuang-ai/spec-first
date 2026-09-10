@@ -55,7 +55,7 @@ External research, issue-tracker access, and provider calls are opt-in evidence 
    > - notable patterns or conventions
    > - obvious pain points or gaps
    > - likely leverage points for improvement
-   > - product strategy summary, if `STRATEGY.md` was present — include the approach and active tracks verbatim so ideation can weight toward strategy-aligned directions
+   > - Product strategy summary: prefer STRATEGY; read legacy `PRODUCT.md` / `VISION.md` only when `STRATEGY.md` is absent or lacks a needed meaning. Extract the target problem, approach, users, metrics, tracks, and boundaries by meaning. Preserve the approach and active tracks verbatim with their actual sources; require no exact headings and do not override explicit project authority.
    > - `User-named references` section (when the focus hint named root-level `*.md` files)
    > - `Additional context` section (when other root-level `*.md` files exist that the focus did not name)
    >
