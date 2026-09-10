@@ -17,6 +17,7 @@ const TARGETS = [
   {
     skill: 'spec-debug',
     filePath: 'skills/spec-debug/SKILL.md',
+    reminder: 'These are attention reminders, not additional gates or substitutes for judgment.',
     minRows: 3,
   },
   {

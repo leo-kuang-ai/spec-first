@@ -13,3 +13,5 @@ Read this before writing the Phase 2 recommendation or editing any file in Phase
 7. Retain real command evidence for each check (`ran`, exit code, status, required/missing tools, reason code, and a bounded secret-stripped log). Planned commands, dry runs, or natural-language “passed” statements are not confirmed evidence.
 
 If a fix fails, return to Phase 2, explicitly invalidate the current hypothesis with the evidence that ruled it out, and form a new hypothesis with its own grounding observation and prediction. Three failed fix attempts trigger smart escalation; do not retry variants of the same theory.
+
+The entrypoint owns branch safety, pre-fix scope, and the final quality tail; do not repeat their decisions here. When the same root-cause pattern occurs in at least three other files or would be catastrophic in production, read `references/defense-in-depth.md` and choose applicable layers. For a production incident or a pattern in at least three locations, examine how it was introduced and escaped detection; carry any reusable finding to the handoff's learning decision.
