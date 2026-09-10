@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 22:30:15 zcode: chore: 移除误收入提交的 graphify 临时探测文件。 (user-visible)
 - v1.15.3 2026-09-10 22:29:59 zcode: docs(plan): CE-129 同步计划收尾——status completed，边界与待决策项显式保留。 (user-visible)
 - v1.15.3 2026-09-10 22:16:14 zcode: test(setup): Windows 路径段不可含换行——structured-action 用例按平台替换该字符（既有 Windows CI 债务的最小明确修复）。 (user-visible)
 - v1.15.3 2026-09-10 22:03:13 zcode: docs(sync): CE-129 补审最终验证记录——129 行审计、六项组合验证全绿、独立审查修复、已知边界与 fingerprint。 (user-visible)
