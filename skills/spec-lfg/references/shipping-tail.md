@@ -15,8 +15,8 @@ retry a push or hunt for a remote. Run steps 7–9 normally when a remote exists
    2. Collect or construct the structured return: `{ filed: [...], failed: [...], no_sink: [...] }`.
    3. Compose a `## Residual Review Findings` markdown section from the structured return:
       - For each item in `filed`: a bullet with severity, file:line, title, and a link to the tracker ticket URL.
-      - For each item in `failed`: a bullet with severity, file:line, title, and the failure reason (e.g., `Defer failed: gh returned 401 — tracker unavailable`).
-      - For each item in `no_sink`: a bullet with severity, file:line, and title inlined verbatim so the PR body or fallback file is the durable record.
+      - For each item in `failed`: a checklist item `- [ ] <severity> — <file:line> — <title>` plus the failure reason (e.g., `Defer failed: gh returned 401 — tracker unavailable`) so the reviewer can decide it in place.
+      - For each item in `no_sink`: a checklist item `- [ ] <severity> — <file:line> — <title>` inlined verbatim so the PR body or fallback file is the durable record and the reviewer can tick what a later fix closed.
    4. Detect the current branch's open PR without prompting:
 
       ```bash

@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(lfg): 补齐 CE 0e758b60 的 residual checklist 形态与 resolve-pr-feedback tick-only 规则。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(review): 补齐 CE f6c301ca 的 project-standards criteria 配对评判、content-is-contract、pr-remote 读取与狩猎清单降级为示例。 (user-visible)
 - v1.15.3 2026-09-10 codex: test(compound): 补齐 CE 84bdf8c5 的绝对路径引用用例并规范化 Windows 斜杠改写。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(work): 补齐 CE 67550d1c 的隔离证明下并行默认、单响应 wave 派发与冷启动定价；spec-lfg 增加叙事与完成纪律。 (user-visible)
