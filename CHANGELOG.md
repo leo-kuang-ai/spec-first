@@ -1,4 +1,6 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: refactor(browser): 核对 CE db164786，保留 spec-polish 作为端口解析 owner，移除无 consumer 的 browser resolver 与跨 Skill cascade。 (user-visible)
+- v1.15.3 2026-09-10 codex: refactor(browser): 核对 CE db164786，将端口解析保留在已有 spec-polish caller，移除无 consumer 的 browser resolver，消除跨 Skill 依赖及旧 inline cascade 文案。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE cf098d23 的 debug 状态枚举；入口单一引用与 producer/LFG consumer 已支持 fixed-not-pushed，保留本地验证及 caller-owned commit/push 语义。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(browser): 融合 CE 1ee62446 的路由与报告引用，清理旧端口/监听与内联修复指令，补齐逐路由结果和 preflight 阻塞交付，保持 exact-origin、caller-owned server 与唯一 wrapper 边界。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(ideate): 融合 CE 7db168ba 的阶段引用，归一输出与恢复 owner，补齐 tactical 预算、真实成本计数、研究分流及 issue 扫描/聚类顺序，保留独立授权与 run-local 证据边界。 (user-visible)

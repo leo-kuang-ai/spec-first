@@ -419,6 +419,7 @@ test('workflow keeps a caller-owned server boundary around the unique browser wr
 
 test('retires managed-server and runtime-profile surfaces without a compatibility layer', () => {
   for (const relativePath of [
+    'skills/spec-test-browser/scripts/resolve-port.sh',
     'skills/spec-test-browser/scripts/dev-server-run-context.cjs',
     'skills/spec-test-browser/references/browser-runtime-profile.schema.json',
     'skills/spec-test-browser/references/browser-runtime-profile.example.json',
