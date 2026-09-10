@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 22:16:14 zcode: test(setup): Windows 路径段不可含换行——structured-action 用例按平台替换该字符（既有 Windows CI 债务的最小明确修复）。 (user-visible)
 - v1.15.3 2026-09-10 22:03:13 zcode: docs(sync): CE-129 补审最终验证记录——129 行审计、六项组合验证全绿、独立审查修复、已知边界与 fingerprint。 (user-visible)
 - v1.15.3 2026-09-10 21:54:56 zcode: fix(review): 独立审查修复——spec-explain 静态自测节四个矛盾点对齐、CHANGELOG 头部位移、doctor 退出码武装矩阵测试与 persona 示例笔误。 (user-visible)
 - v1.15.3 2026-09-10 21:38:00 zcode: test(localization): closeout 拓扑校验改用录制 inventory 基线并保留活体计数守卫，解除结构上不可能的提交后 HEAD 绑定。 (user-visible)

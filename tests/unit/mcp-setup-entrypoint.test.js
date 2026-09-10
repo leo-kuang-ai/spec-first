@@ -1228,7 +1228,11 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
   test('keeps special folder paths as structured cwd data instead of shell source', () => {
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const base = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-structured-action-'));
-    const folder = path.join(base, "space ' $(touch injected) `touch injected2`\nline");
+    // Windows path segments cannot contain newline characters; keep the shell
+    // metacharacters (the property under test) and substitute a space there.
+    const folder = path.join(base, process.platform === 'win32'
+      ? "space ' $(touch injected) `touch injected2` line"
+      : "space ' $(touch injected) `touch injected2`\nline");
     fs.mkdirSync(folder, { recursive: true });
 
     const result = runSetup({
