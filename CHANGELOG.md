@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(brainstorm): 补齐 CE ff4d21b8 的覆盖与范围判断、无仓库恢复、已定决策关联和写后四项检查。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(plan): 补齐 CE 312943d4 的 goal objective 产品决策反查，验证入口委托与输出配置来源边界。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(plan): 补齐 CE 3568cd94 的单元已定决策引用与产品/运维指标边界，完成阶段引用补审核验。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(work): 补齐 CE cb230f14 的单任务 worker 上下文、关联决策传递和简化阈值，修正迁移后消费者读取与 worktree index 说明。 (user-visible)

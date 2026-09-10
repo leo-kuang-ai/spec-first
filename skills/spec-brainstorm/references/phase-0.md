@@ -1,5 +1,7 @@
 #### 0.1 Resume Existing Work When Appropriate
 
+An explicit document path is readable without repository discovery. Otherwise discover candidates only in a resolved target repo; if no repo is available, skip discovery and continue domain routing instead of blocking non-software work.
+
 If the user references an existing brainstorm topic or document, or there is an obvious recent matching unified plan in `docs/plans/` with `artifact_contract: spec-unified-plan/v1`, `artifact_readiness: requirements-only`, and `product_contract_source: spec-brainstorm`:
 - Read the document
 - Confirm with the user before resuming: "Found an existing requirements-only plan for [topic]. Should I continue from this, or start fresh?"
@@ -54,6 +56,8 @@ Use the feature description plus a light repo scan to classify the work:
 - **Deep** - cross-cutting, strategic, or highly ambiguous
 
 If the scope is unclear, ask one targeted question to disambiguate and then proceed.
+
+**Coherent-work check.** Before deep exploration, distinguish independently useful outcomes from coverage of one outcome. When outcomes have separate user value and acceptance boundaries, carry forward the user's chosen focus or resolve the one scope choice that matters. Only that focus supplies active Requirements, Flows, and Acceptance Examples. Preserve surrounding work and supported dependencies as contextual candidates, with tentative relationships labeled; do not turn them into a roadmap or active scope. Keep outcomes together when separating them would lose shared behavior or make them unusable or unverifiable independently. State the chosen boundary in the Goal Capsule.
 
 **Deep sub-mode: feature vs product.** For Deep scope, also classify whether the brainstorm must establish product shape or inherit it:
 

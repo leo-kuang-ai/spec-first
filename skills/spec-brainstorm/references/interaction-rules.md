@@ -7,6 +7,7 @@
 5. **Right-size the artifact** - Simple work gets a compact requirements-only unified plan or brief alignment. Larger work gets a fuller Product Contract. Do not add ceremony that does not help planning.
 6. **Apply YAGNI to carrying cost, not coding effort** - Prefer the simplest approach that delivers meaningful value. Avoid speculative complexity and hypothetical future-proofing, but low-cost polish or delight is worth including when its ongoing cost is small and easy to maintain.
 7. **Keep product confirmation singular** - The current conversation user is the only human product confirmer. Ask one highest-impact independent product question at a time; specialist material is evidence, not a second confirmation route.
+8. **Coverage is not decomposition** - Named devices, providers, and data sources are coverage requirements, not automatically separate workstreams. Split only when a shared access path cannot satisfy a requirement; planning owns connector selection unless it changes product behavior or scope.
 
 ## Interaction Rules
 
