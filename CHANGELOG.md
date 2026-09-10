@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(debug): 补齐 CE 734dd2c8 的测试归属指令检查，修正 pipeline 返回状态合同断言并重跑现有 debug 测试。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(explain): 将 CE 2767cc74 的 check-in 必需读取移至判断和提问之前，纠正旧复核的无行为增量结论。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(pov): 补齐 CE 090e7b2a 的 Tier 3 双来源与 persona 读取，修正先例路径及迁移后的 grounding 测试读取位置。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 纠正 CE d181ae0e 整项排除误记，恢复评估规则已融合、中心 runner 不复制的边界，并记录实际重跑的 80 项合同验证。 (user-visible)
