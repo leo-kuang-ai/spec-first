@@ -69,9 +69,13 @@ GitHub and GitHub Enterprise are supported. Resolve the selected PR's host and O
 |----------|------|
 | No argument | **Full** -- all unresolved feedback on the current branch's PR |
 | PR number (e.g., `123`) | **Full** -- all unresolved feedback on that PR |
-| Comment/thread URL | **Targeted** -- only that specific thread |
+| PR URL without a fragment | **Full** -- parse HOST, OWNER/REPO, and PR number from the URL |
+| PR URL with `#issuecomment-...` | **Full** -- top-level conversation feedback has no review thread |
+| Review-comment URL with `#discussion_r...` | **Targeted** -- only that specific review thread |
 
-**Targeted mode**: When a URL is provided, ONLY address that feedback. Do not fetch or process other threads.
+Only `#discussion_r` selects Targeted mode. Never send an `#issuecomment-` ID to the review-comment endpoint; that endpoint cannot fetch top-level conversation comments. Preserve the URL's host and base repository even when the checkout is a fork.
+
+**Targeted mode**: When a review-comment URL is provided, ONLY address that feedback. Do not fetch or process other threads.
 
 After determining mode, read the matching reference and follow it. Each reference is self-contained for that mode's flow:
 

@@ -125,6 +125,10 @@ describe('spec-resolve-pr-feedback contracts', () => {
     expect(getComments).toContain('viewer: ($viewer // null)');
     expect(getComments).not.toContain('select(.author.login != $author.login)');
     expect(getComments).toContain('excludes only blank bodies');
+    expect(entrypoint).toContain('| PR URL without a fragment | **Full**');
+    expect(entrypoint).toContain('| PR URL with `#issuecomment-...` | **Full**');
+    expect(entrypoint).toContain('| Review-comment URL with `#discussion_r...` | **Targeted**');
+    expect(read('skills/spec-lfg/references/pr-watch-loop.md')).toContain('Identity never excludes a candidate');
     expect(fullMode).toContain('identity never makes feedback disappear');
     expect(entrypoint).toContain('Every unresolved item evaluated across inline threads, review bodies, and top-level comments');
   });

@@ -105,6 +105,27 @@ test('fetch carries root REST IDs across pages without dropping threads whose ID
   expect(threads.map(item => item.node.id)).toEqual(['first', 'second', 'missing-url']);
 });
 
+test.each(['comments', 'reviews'])('fetch preserves every identity and excludes null or blank %s bodies', connection => {
+  seedPages();
+  const file = path.join(root, 'pages.json');
+  const pages = JSON.parse(fs.readFileSync(file, 'utf8'));
+  pages[connection][0].data.repository.pullRequest[connection].nodes = [
+    { id: 'author-request', author: { login: 'author' }, body: 'Please rename check_id.' },
+    { id: 'viewer-request', author: { login: 'me' }, body: 'Please add coverage.' },
+    { id: 'unknown-request', author: null, body: 'Please retain this request.' },
+    { id: 'empty', body: '' },
+    { id: 'whitespace', body: ' \n\t ' },
+    { id: 'null', body: null },
+  ];
+  fs.writeFileSync(file, JSON.stringify(pages));
+  const result = run('get-pr-comments', ['42', 'o/r']);
+  expect(result.status).toBe(0);
+  const payload = JSON.parse(result.stdout);
+  expect(payload[connection === 'comments' ? 'pr_comments' : 'review_bodies'].map(item => item.id))
+    .toEqual(['author-request', 'viewer-request', 'unknown-request']);
+  expect(payload).toMatchObject({ pr_author: 'author', viewer: 'me' });
+});
+
 test('thread lookup returns authoritative GraphQL and root REST identities from later pages', () => {
   seedPages();
   const result = run('get-thread-for-comment', ['42', 'comment-second', 'o/r']);

@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(pr-feedback): 纠正 CE 8bbcc197 复核遗漏，补齐 whole-PR/issue-comment 路由、空白正文过滤和 watch loop 作者反馈可见性。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 26f38961 的 compound 阶段 references 与 headless/lightweight/promotion 边界，确认当前 source owner 已完整承载。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 4df5f99d 的 code-review 阶段 references、scope/intent/select-route 与 finish/action rubric，确认当前 owner 已完整承载。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 734dd2c8 的 debug regression-test provenance 迁移，确认当前 fix reference 已承载完整 test-first 规则，入口只保留选择条件。 (user-visible)

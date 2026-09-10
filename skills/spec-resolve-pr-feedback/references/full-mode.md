@@ -1,6 +1,6 @@
 # Full Mode
 
-Read this reference when Mode Detection in `SKILL.md` routes to **Full Mode**: no argument was given, or a PR number was provided. Full mode processes all unresolved threads and actionable PR-level feedback on the PR.
+Read this reference when Mode Detection in `SKILL.md` routes to **Full Mode**: no argument, a PR number, a whole-PR URL, or a top-level `#issuecomment-` URL. Full mode processes all unresolved threads and actionable PR-level feedback on the selected PR.
 
 ## 1. Fetch Unresolved Threads
 

@@ -170,10 +170,9 @@ jq -n \
       | tonumber) catch null) // null)
   }],
   pr_comments: [$all_comments[]
-    | select(.body | test("^\\s*$") | not)],
+    | select((.body // "") | test("^\\s*$") | not)],
   review_bodies: [$all_reviews[]
-    | select(.body != null and .body != "")
-    ],
+    | select((.body // "") | test("^\\s*$") | not)],
   pr_author: ($author.login // null),
   viewer: ($viewer // null),
   fetch_warnings: (
