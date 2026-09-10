@@ -1329,8 +1329,24 @@ function inspectRuntimeFilesSafely(projectRoot, adapter, platform) {
 
 function getDoctorExitCode(report) {
   if (report.has_error) return 3;
+  // Arm the missing-CLI block only when the selected host was never
+  // initialized (its state file is missing) or its assets are actually broken
+  // ('error'). Initialized-but-drifted assets ('warn' with a recorded state)
+  // keep the CLI absence diagnostic: the drift report is the actionable output.
+  const platformNeverInitialized = Object.entries(report.platform_checks || {})
+    .filter(([platform]) => {
+      const supportState = report.host_support
+        && report.host_support[platform]
+        && report.host_support[platform].support_state;
+      return supportState !== 'preview';
+    })
+    .some(([, checks]) => Array.isArray(checks) && checks.some((check) => (
+      typeof check.name === 'string'
+      && check.name.endsWith('/state.json')
+      && check.message === 'missing'
+    )));
   const hasBlockingActionRequired = report.selection_mode === 'explicit'
-    && report.runtime_asset_health !== 'pass'
+    && (report.runtime_asset_health === 'error' || platformNeverInitialized)
     && Object.entries(report.platform_checks || {}).some(([platform, checks]) => {
       const supportState = report.host_support
         && report.host_support[platform]

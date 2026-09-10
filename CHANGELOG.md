@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 20:49:02 claude: feat(runtime-setup): setup 发起的 Graphify 子进程统一注入 `GRAPHIFY_NO_BACKUP=1`，关闭 Provider 对 curated/semantic 图的 `graphify-out/<日期>/` 按天快照，`graphify-out/` 保持唯一 current artifact；新增 unit 斋试覆盖注入不可被 additions 关闭，并同步 SKILL.md 契约描述。 (user-visible)
 - v1.15.3 2026-09-10 20:36:56 claude: chore(runtime-setup): 升级 provider pin——Graphify `graphifyy` 0.9.29→0.9.57（新 wheel URL + SHA-256）、CodeGraph `@colbymchenry/codegraph` 1.5.0→1.6.0；沙箱验证 0.9.57 保留 `extract --code-only`/`update`/`merge-graphs`/`hook-guard`/`hook-check`、1.6.0 保留 `index`/`sync`/`serve --mcp`，同步 SKILL.md、project-graph-consumption contract 与相关 unit/integration 测试的版本引用。(user-visible)
 - v1.15.3 2026-09-10 19:47:06 codex: docs(skill-authoring): 采纳 CE caa3b231 的机制先行描述契约（独特机制句首、可观测触发、sibling 路由、引语反模式）。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(optimize): 补齐 CE 098ccdb8 的机制化描述与负向路由、attribute 意图与 schema 身份唯一性警示。 (user-visible)
