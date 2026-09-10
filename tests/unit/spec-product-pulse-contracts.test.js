@@ -14,6 +14,24 @@ function section(text, startHeading, endHeading) {
 }
 
 describe('spec-product-pulse system performance contract', () => {
+  test('loads phase owners and closes every report through the scheduling boundary', () => {
+    const skill = read('skills/spec-product-pulse/SKILL.md');
+    const setup = read('skills/spec-product-pulse/references/setup.md');
+    const run = read('skills/spec-product-pulse/references/run.md');
+    const interview = read('skills/spec-product-pulse/references/interview.md');
+
+    expect(skill).toContain('before parsing the window');
+    expect(skill).toContain('Every completed report proceeds here');
+    expect(skill).toContain('do not repeat that offer in the same run');
+    expect(skill).toContain('Any scheduling handoff requires explicit confirmation');
+    expect(setup).toContain('Read `references/interview.md`');
+    expect(interview).toContain('Loaded by `references/setup.md`');
+    expect(run).toContain('`setup`/`reconfigure`/`edit config`');
+    expect(run).toContain('Read `references/config.md` when interpreting values');
+    expect(run).toContain('Then return to `SKILL.md` Phase 3');
+    expect(run).toContain('explicit `pulse_db_enabled === true` gate');
+  });
+
   test('keeps top 5 and latency percentiles fixed instead of inventing config', () => {
     const skill = read('skills/spec-product-pulse/SKILL.md');
     const interview = read('skills/spec-product-pulse/references/interview.md');

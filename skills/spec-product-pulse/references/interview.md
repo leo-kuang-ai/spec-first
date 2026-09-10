@@ -1,6 +1,6 @@
 # Product Pulse First-Run Interview
 
-Loaded by `SKILL.md` at the start of Phase 1. Captures the configuration that will be merged into `.spec-first/config.local.yaml` (the unified spec-first local config, gitignored, machine-local) as `pulse_*` keys and re-read on every subsequent run.
+Loaded by `references/setup.md` at the start of Phase 1. Captures the configuration that will be merged into `.spec-first/config.local.yaml` (the unified spec-first local config, gitignored, machine-local) as `pulse_*` keys and re-read on every subsequent run.
 
 For each section: ask the opening question, evaluate the answer against the quality bar, push back when it falls into a named anti-pattern, and capture the final answer in the user's own language.
 
@@ -254,7 +254,7 @@ pulse_schedule: {{daily | weekly | manual | ask-again-after-3-runs}}  # include 
 
 - **Strategy metrics carried forward**: display them in the report, not as stored config; re-read current strategy metrics on every run using `references/strategy-source.md`.
 - **Per-source connection details** (URLs, API keys, query specifics): live with the user's MCP configuration, not in this config.
-- **Hardcoded operational settings** (15-minute trailing buffer, top-N error count, p50/p95/p99 latencies, "no PII in reports", "parallel analytics + tracing, serial DB"): these are skill behavior, not user config; they live in `SKILL.md` and stay constant.
+- **Hardcoded operational settings** (15-minute trailing buffer, top-N error count, p50/p95/p99 latencies, "no PII in reports", "parallel analytics + tracing, serial DB"): these are skill behavior, not user config; they live in `SKILL.md` and `references/run.md` and stay constant.
 - **Tracing top-N count and latency on/off**: not configurable in this version. The report always includes top 5 errors and full p50/p95/p99 latency. Add config keys later if a real need surfaces.
 
 After writing, surface the resulting `pulse_*` block to the user in chat. Offer one round of edits. Then return to SKILL.md Phase 2.

@@ -3,7 +3,7 @@
 Read this before dispatching any query.
 
 
-If Phase 1 ran (first run, or `setup`/`reconfigure` argument), re-read `.spec-first/config.local.yaml` from the repo root using the native file-read tool to pick up any edits accepted during the Phase 1 review step. Otherwise, use the `pulse_*` values already extracted in Phase 0. Apply hard defaults for any unset settings (see Phase 0 "Config keys").
+If Phase 1 ran (first run, or `setup`/`reconfigure`/`edit config` argument), re-read `.spec-first/config.local.yaml` from the repo root using the native file-read tool to pick up any edits accepted during the Phase 1 review step. Otherwise, use the `pulse_*` values already extracted in Phase 0. Read `references/config.md` when interpreting values and apply its documented defaults for unset or invalid settings.
 
 #### 2.1 Dispatch Queries
 
@@ -59,3 +59,5 @@ Keep the total to 30-40 lines. If a section is thin, leave it thin; do not pad.
 Save to `docs/pulse-reports/YYYY-MM-DD_HH-MM.md` using the local time of the run. Create `docs/pulse-reports/` if it does not exist.
 
 Surface the Headlines and top Followup in chat. Provide the full file path so the user can open the saved report.
+
+Then return to `SKILL.md` Phase 3 for the scheduling re-surface rule. Reaching that phase does not authorize scheduling or require another offer when setup already made it.

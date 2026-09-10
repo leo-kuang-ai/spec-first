@@ -16,6 +16,8 @@ allowed-tools:
 
 `spec-product-pulse` queries the product's data sources for a given time window and produces a compact, single-page report covering usage, performance, errors, and followups. The report is saved to `docs/pulse-reports/` and the key points are surfaced in chat.
 
+**Done:** the 30-40 line report exists at `docs/pulse-reports/YYYY-MM-DD_HH-MM.md`, its Headlines and top Followup are surfaced in chat, and Phase 3 has been considered. Missing-source receipts and limitations remain visible; report completion is not proof that every source was available.
+
 The skill does not mutate the product, the database, or any external system. Its only writes are pulse settings appended to `.spec-first/config.local.yaml` (the unified spec-first local config, gitignored, machine-local) and the report file (`docs/pulse-reports/...`). MCP and other data-source tools are invoked read-only; if a tool offers write modes, do not use them.
 
 The fixed `docs/pulse-reports/` contract always renders latency (p50/p95/p99) and top 5 errors by count when system performance data is available. Quality scoring requires provider-side projection; if unavailable, record `not-run` with `quality-source-minimization-unavailable` and do not attempt local redaction after content enters context.
@@ -33,6 +35,8 @@ Interpret the user's current request as a time window when one is provided. Comm
 - `24h`, `48h`, `72h` - trailing hours
 - `7d`, `30d` - trailing days
 - `1h` - short-window (useful during launches)
+
+Recognize `setup`, `reconfigure`, `edit config`, `daily`, `hourly`, and `weekly` as routing or scheduling keywords before parsing the window. They are not malformed durations and do not create a schedule. When no explicit duration accompanies them, use the configured lookback or `24h` default.
 
 If the argument is empty, default to `pulse_lookback_default` from config (resolved in Phase 0); if that is also unset, fall through to the hard default of `24h`. If the argument is unparseable, ask the user to clarify.
 
@@ -68,7 +72,7 @@ Read `references/run.md` before dispatching queries. Re-read local config after 
 
 ### Phase 3: Routine Hook
 
-First-run setup already offered scheduling (see Phase 1.1 end). Phase 3 is a lighter re-surface for ad-hoc runs:
+Every completed report proceeds here, including first-run and reconfigured reports. First-run setup already offered scheduling through `references/setup.md`; do not repeat that offer in the same run. Phase 3 is a lighter re-surface for later ad-hoc runs:
 
 - If the argument was a known schedule keyword (`daily`, `hourly`, `weekly`), note that this run is ad-hoc and suggest scheduling via the harness's available primitive, or a platform-native option when no scheduling primitive is available.
 - If no schedule is on file and this is the third or later pulse run the user has done, mention once that scheduling is available. Don't nag on every run.
