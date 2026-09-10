@@ -139,6 +139,26 @@ describe('doctor runtime asset inventory', () => {
     }
   });
 
+test('exit-code arming: missing host CLI blocks only when never initialized or assets broken', () => {
+  const reportFor = (health, stateMessage) => ({
+    selection_mode: 'explicit',
+    runtime_asset_health: health,
+    host_support: { kiro: { support_state: 'supported' } },
+    platform_checks: {
+      kiro: [
+        { disposition: 'action_required', reasonCode: 'kiro_cli_not_found' },
+        { name: '.kiro/spec-first/state.json', message: stateMessage },
+      ],
+    },
+  });
+  const { getDoctorExitCode } = require('../../src/cli/commands/doctor');
+  expect(getDoctorExitCode(reportFor('pass', 'recorded 21 skills'))).toBe(0);
+  expect(getDoctorExitCode(reportFor('warn', 'recorded 21 skills'))).toBe(0);
+  expect(getDoctorExitCode(reportFor('warn', 'missing'))).toBe(3);
+  expect(getDoctorExitCode(reportFor('error', 'recorded 21 skills'))).toBe(3);
+  expect(getDoctorExitCode({ ...reportFor('warn', 'missing'), has_error: true })).toBe(3);
+});
+
   test('returns exit code 3 for an explicitly selected host CLI missing from PATH', () => {
     const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-doctor-cli-missing-'));
     const previousCwd = process.cwd();

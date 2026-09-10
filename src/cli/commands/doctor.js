@@ -2068,6 +2068,7 @@ function tryReadRawManagedState(projectRoot, adapter) {
 
 module.exports = {
   runDoctor,
+  getDoctorExitCode,
   detectPlatforms,
   checkWorkspaceGraphStatus,
   buildWorkspaceReadinessView,

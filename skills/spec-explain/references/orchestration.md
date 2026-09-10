@@ -1,6 +1,6 @@
 # Orchestration
 
-Read before the first blocking question, dispatch, or run-directory creation. This reference owns interaction and model tiers; the entrypoint owns dispatch authority, scratch creation, grounding, and reveal ordering. Phase 6 capability detection, menu sizing, actions, and closeout live in `references/destinations.md`.
+Read before the first blocking question, dispatch, or run-directory creation. This reference owns interaction and model tiers; the entrypoint owns dispatch authority, scratch creation, and grounding. Phase 4 capability detection, menu sizing, actions, and closeout live in `references/destinations.md`.
 
 ## Interaction
 

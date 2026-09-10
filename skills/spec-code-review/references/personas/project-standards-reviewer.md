@@ -26,7 +26,7 @@ The shapes below are examples of how a written rule gets violated, drawn from an
 
 - **Reference file inclusion mistakes** -- markdown links to skill-local reference files used where the criteria require backtick paths or `@` inline inclusion. Backtick paths used for files the criteria say should be `@`-inlined (small structural files under ~150 lines). `@` includes used for files the criteria say should be backtick paths (large files, executable scripts). The criteria file specifies which mode to use and why; cite the relevant rule.
 
-- **Broken cross-references** -- agent names that are not fully qualified (e.g., `learnings-researcher` instead of `learnings-researcher`). Skill-to-skill references using slash syntax inside a SKILL.md where the criteria say to use semantic wording. References to tools by platform-specific names without naming the capability class.
+- **Broken cross-references** -- agent names that are not fully qualified (e.g., a bare `researcher` instead of the fully qualified `learnings-researcher`). Skill-to-skill references using slash syntax inside a SKILL.md where the criteria say to use semantic wording. References to tools by platform-specific names without naming the capability class.
 
 - **Cross-platform portability violations** -- platform-specific tool names used without equivalents (e.g., `TodoWrite` instead of `TaskCreate`/`TaskUpdate`/`TaskList`). Slash references in pass-through SKILL.md files that won't be remapped. Assumptions about tool availability that break on other platforms.
 
