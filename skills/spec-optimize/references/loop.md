@@ -174,14 +174,15 @@ For each completed experiment, **immediately**:
    - If ANY gate fails: mark outcome as `degenerate`, skip judge evaluation, save money
 
 5. **If gates pass AND primary type is `judge`**:
+   - Check independence before dispatch: judges must not author the hypothesis, run the experiment they score, or see other judges' results. If authorized, isolated judges are unavailable, mark this experiment `error` with the concrete dispatch or isolation reason. Skip scoring and comparison, then persist and verify the error at CP-3. It has no judge metrics, cannot become `best`, and is unmeasured rather than poor-scoring. Report the blocker at the batch summary.
    - Read the experiment's output (cluster assignments, search results, etc.)
    - Apply stratified sampling per `metric.judge.stratification` config (using `sample_seed`)
    - Group samples into batches of `metric.judge.batch_size`
    - Fill the judge prompt template (`references/judge-prompt-template.md`) for each batch
-   - When the package-local dispatch boundary is satisfied, dispatch the `ceil(sample_size / batch_size)` judge sub-agents using the same bounded scheduler as Phase 3.2. Otherwise evaluate the same batches serially inline, record the matching fallback reason, and do not claim independent judge coverage. Judge work is a separate budget from experiment worktrees in either path.
-   - Each dispatched sub-agent or inline judge batch returns structured JSON scores
+   - When the package-local dispatch and independence boundaries are satisfied, dispatch the `ceil(sample_size / batch_size)` judge sub-agents using the same bounded scheduler as Phase 3.2. Capacity errors queue the batch until a slot frees; they do not justify inline scoring. Judge work is a separate budget from experiment worktrees.
+   - Each dispatched judge batch returns structured JSON scores
    - Aggregate scores: compute the configured primary judge field from `metric.judge.scoring.primary` (which should match `metric.primary.name`) plus any `scoring.secondary` values
-   - If `singleton_sample > 0`: evaluate singleton batches through the same authorized-dispatch or serial-inline path
+   - If `singleton_sample > 0`: evaluate singleton batches through the same authorized, isolated judge path
 
 6. **Compare with `decide.cjs`.** Invoke it only after gates pass and the payload holds every required objective value — hard metrics from measurement, and judge scores when those were collected. The payload is the spec as loaded plus the baseline and candidate snapshots. The script reads the nested spec (`metric`, `measurement.stability`) and owns eligibility, noise, and the ladder next step. Do not reconstruct a flattened payload, and do not re-derive the threshold in prose.
    ```bash
@@ -264,7 +265,7 @@ Stop the loop if ANY of these are true:
 - **Judge budget exhausted**: cumulative judge spend >= `metric.judge.max_total_cost_usd` (if set)
 - **Plateau**: no improvement for `stopping.plateau_iterations` consecutive experiments
 - **Manual stop**: user interrupts (save state and proceed to Phase 4)
-- **Empty backlog**: no hypotheses remain and no new ones can be generated
+- **No runnable hypothesis left**: no hypotheses remain and no new ones can be generated, or every remaining hypothesis is blocked or awaiting approval
 
 If no stopping criterion is met, proceed to the next batch (step 3.1).
 

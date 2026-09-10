@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(optimize): 融合 CE 3ef049a3 的阶段引用与恢复约束，补齐 spec 冻结、恢复授权证据、独立 judge 不可用时禁止评分，以及继续实验前不得终结 CP-5；保留测量阶梯、多目标判定和本地权限边界。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(doc-review): 融合 CE a6e53e07，补齐 intake 来源与已决策字段、消除错误提示自调用、修正引用指针；保留只读 HTML/task-pack、显式 mutation 与本地 reviewer 预算。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(compound-refresh): 融合 CE 74a04093 的引用迁移约束，补齐无法验证不等于错误、删除与搬迁 gate、命名指导冲突及完整建议报告，保留 promotion 和独立授权边界。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(pr): 融合 CE 393c91fb，将 landing 细节归入 required-read 引用，统一 PR 身份与未知状态、提交隔离、归档权限及 body read-back；保留本地 standalone 和 LFG watch 边界。 (user-visible)

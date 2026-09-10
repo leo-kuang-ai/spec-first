@@ -17,7 +17,7 @@ git rev-parse --verify "optimize/<spec-name>" 2>/dev/null
 **If branch exists**, check for an existing experiment log at `.spec-first/workflows/spec-optimize/<spec-name>/experiment-log.yaml`.
 
 Present the user with a choice via the platform question tool:
-- **Resume**: read ALL state from the experiment log on disk (do not rely on any in-memory context from a prior session). Recover any measured-but-unlogged experiments by scanning worktree directories for `result.yaml` markers. Continue from the last iteration number in the log.
+- **Resume**: read ALL state from the experiment log on disk (do not rely on any in-memory context from a prior session). Recover any measured-but-unlogged experiments by scanning worktree directories for `result.yaml` markers. Follow the entry's resume rule: skip only proven work, re-enter unproven gates, and preserve the existing spec and baseline. A checkpoint or iteration number is not approval evidence.
 - **Fresh start**: archive the old branch to `optimize-archive/<spec-name>/archived-<timestamp>`, clear the experiment log, start from scratch
 
 ### 0.5 Create Optimization Branch and Scratch Space
@@ -125,7 +125,7 @@ baseline:
     ...
 ```
 
-If primary type is `judge`, also run the judge evaluation on baseline output to establish the starting judge score.
+If primary type is `judge`, also run the judge evaluation on baseline output to establish the starting judge score. Apply the entry's independence and dispatch boundaries before scoring: if authorized, isolated judges are unavailable, record the concrete blocker and stop Phase 1 without an inline substitute or invented baseline score.
 
 ### 1.4 Parallelism Readiness Probe
 
@@ -174,7 +174,7 @@ Present to the user via the platform question tool:
 
 **Options:**
 1. **Proceed** -- approve baseline and parallel config, move to Phase 2
-2. **Adjust spec** -- modify spec settings before proceeding
+2. **Adjust spec** -- available only while both the hypothesis backlog and experiments are empty. Save and verify the revised spec, invalidate the old baseline, and rerun Phase 1 so measurement and approval match the new spec. Reauthorize any changed execution envelope before running it. Once derived state exists, the spec is frozen for this run; a changed protocol requires a separate run with the old evidence preserved.
 3. **Fix issues** -- user needs to resolve blockers first
 
 Do NOT proceed to Phase 2 until the user explicitly approves.

@@ -547,8 +547,8 @@ describe('generic dispatch authorization matrix', () => {
     ].join('\n');
     const resolver = read('skills/spec-resolve-pr-feedback/SKILL.md');
 
-    expect(optimize).toMatch(/Approved optimization spec.*都不是派发授权/is);
-    expect(optimize).toMatch(/judge sub-agents.*Otherwise evaluate.*serially inline/is);
+    expect(optimize).toMatch(/Approved optimization spec.*do not authorize dispatch/is);
+    expect(optimize).toMatch(/judge sub-agents.*If independent judging is unavailable, do not score inline/is);
     expect(optimize).toMatch(/Codex failure cascade.*authorization.*serial inline\/local/is);
     expect(sweep).toMatch(/mode:headless.*scheduled run.*do not authorize dispatch/is);
     expect(sweep).toMatch(/sensitive.*delegated handling/is);

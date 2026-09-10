@@ -59,6 +59,8 @@ Present post-completion options via the platform question tool:
 
 ### 4.4 Cleanup
 
+First resolve the selected next step. Continue or approval of deferred dependencies returns to Phase 3 after re-reading state; do not finalize CP-5 or clean up state needed for that continuation. For a next step that does not return to Phase 3, write and read back the final experiment log at CP-5 before cleanup. A still-pending choice leaves the run resumable, not final.
+
 Clean up scratch space:
 ```bash
 # Keep the experiment log for local resume/audit on this machine

@@ -42,7 +42,7 @@ Validate the spec and budget, establish the baseline, run bounded experiments, m
 
 ### Downstream Consumers
 
-Code review、benchmark maintainer、在性能/相关性变更时参与的 release reviewer，以及检查 experiment logs 的人工审查者。
+Code review, benchmark maintainers, release reviewers for performance or relevance changes, and human reviewers inspecting experiment logs.
 
 ## Scenario Capability
 
@@ -147,7 +147,7 @@ worker_model_override: supported | unsupported | unknown
 worker_bounded_parallelism: supported | unsupported | unknown
 ```
 
-`workflow invocation does not authorize dispatch`。Approved optimization spec、baseline approval、`execution.mode: parallel`、预算、权限设置或 runtime readiness 都不是派发授权。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发。缺授权时不得探测 tool schema，固定为 `capability_probe: not_applicable` + `worker_dispatch_capability: unknown`，强制采用 serial inline/local execution 并记录 `dispatch_authorization_missing`。只有授权后才把 current-session registry/schema 作为 `provider_untrusted` evidence 检查：确认缺失时记录 `subagent_capability_missing`；surface 不可用、schema 不完整或候选不唯一时记录 `worker_capability_unproven`，均同样降级。隔离、模型覆盖和有界并发只取 live facts；required isolation 未满足时保持依赖 gate 打开，model unknown 时继承，parallelism unknown 时串行。记录 `worker_dispatch_outcome`。Fallback 可以继续使用串行 worktree，但不得声称 parallel experiment 或 independent worker coverage。
+`workflow invocation does not authorize dispatch`. Approved optimization spec, baseline approval, `execution.mode: parallel`, budgets, permission settings, and runtime readiness do not authorize dispatch. Dispatch only when the current user or a visible upstream handoff explicitly requests subagents, delegated work, personas, or parallel work. Without authorization, do not probe tool schemas: record `capability_probe: not_applicable`, `worker_dispatch_capability: unknown`, and `dispatch_authorization_missing`, then use serial inline/local execution where independence is not required. After authorization, inspect the current-session registry/schema as `provider_untrusted` evidence: confirmed absence records `subagent_capability_missing`; an unavailable surface, incomplete schema, or ambiguous candidate records `worker_capability_unproven`. Derive isolation, model override, and bounded parallelism only from live facts. Unsatisfied required isolation blocks its dependent gate; inherit when the model is unknown and run serially when parallelism is unknown. Record `worker_dispatch_outcome`. Serial worktree fallback must not claim parallel experiment or independent worker coverage.
 
 Parallel experiments additionally require both dispatch facts above, explicit `execution.mode`, bounded `execution.max_concurrent`, clean mutable/immutable scope, and the worktree readiness probes below. Worktree-backed mutation happens in experiment worktrees; Codex delegation must fall back after repeated failures when the serial/local path can continue. The orchestrator owns final integration: selecting kept experiments, merging or cherry-picking winners, reverting non-winners, cleaning worktrees, updating experiment logs, and presenting post-completion actions. Workers never stage, commit, merge, push, or mutate the authoritative experiment log.
 
@@ -161,14 +161,16 @@ Load the phase reference before entering that phase; these files are the canonic
 - Phases 2-3 hypotheses and optimization loop: `references/loop.md`
 - Phase 4 deferred work, summary, and cleanup: `references/wrap-up.md`
 
-The top-level skill owns the workflow contract, admission and budget gates, runtime context exclusion, evidence boundary, and dispatch authority. Phase references own detailed execution procedures. Use judge sub-agents using the same bounded scheduler as Phase 3.2. Otherwise evaluate the same batches serially inline and record the fallback. Judge work is a separate budget from experiment worktrees in either path. For capacity errors, treat it as backpressure. Codex failure cascade after authorization or capability failure falls back to serial inline/local execution. The strategy digest is derived, reconstructable state; the experiment log remains the canonical resume and audit source. Wrap-up may run `spec-code-review` and `spec-compound`; the **Mechanical-apply bar:** apply any finding with a concrete `suggested_fix`. Do not commit or push from this step. A phase reference may strengthen a boundary but cannot grant mutation, measurement, dispatch, commit, or landing authority.
+The top-level skill owns the workflow contract, admission and budget gates, runtime context exclusion, evidence boundary, and dispatch authority. Phase references own detailed execution procedures. Use authorized, isolated judge sub-agents using the same bounded scheduler as Phase 3.2. Judges must neither author the hypothesis nor run the experiment they score, and must not see other judges' results. If independent judging is unavailable, do not score inline: baseline judging blocks Phase 1; a candidate becomes an unmeasured `error`, is logged, and cannot become `best`. Judge work is a separate budget from experiment worktrees. For capacity errors, treat it as backpressure. Codex failure cascade after authorization or capability failure falls back to serial inline/local execution only for work that does not require independence. The strategy digest is derived, reconstructable state; the experiment log remains the canonical resume and audit source. Wrap-up may run `spec-code-review` and `spec-compound`; the **Mechanical-apply bar:** apply any finding with a concrete `suggested_fix`. Do not commit or push from this step. A phase reference may strengthen a boundary but cannot grant mutation, measurement, dispatch, commit, or landing authority.
 
 ## Workflow sequence
 
-1. Read `references/spec.md` and save or validate the optimization spec.
-2. Read `references/persistence.md` before creating or resuming run state.
+1. Read `references/persistence.md` before Phase 0 or any run-state write. Checkpoints CP-0 through CP-5 require write-then-read verification; a checkpoint proves persisted work, never a user decision.
+2. Read `references/spec.md` and save or validate the optimization spec. On resume, first detect the existing run and recover markers; do not overwrite its spec or baseline.
 3. Read `references/measurement.md` and clear measurement authorization, baseline, and approval gates.
 4. Read `references/loop.md` for bounded hypothesis and experiment execution.
 5. Read `references/wrap-up.md` to close with evidence, deferred items, and durable local state.
 
-Read `references/loop.md` before the optimization loop.
+On resume, skip only work that current disk evidence proves complete. Re-enter any gate whose clearance is absent from visible user or upstream authorization; do not ask again when that evidence already covers the unchanged scope. An iteration number alone cannot prove baseline approval. See `references/persistence.md` for recovery and `references/measurement.md` for spec adjustment before derived state exists.
+
+CP-5 finalizes the log only when the selected next step does not return to Phase 3. Continue or approved deferred dependencies leave the run resumable; `references/wrap-up.md` owns that decision and cleanup.

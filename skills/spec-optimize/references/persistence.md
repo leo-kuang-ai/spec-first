@@ -38,7 +38,7 @@ These are non-negotiable write-then-verify steps. At each checkpoint, the agent 
 | CP-2: Hypothesis backlog saved | `experiment-log.yaml` (hypothesis_backlog section) | Phase 2, after hypothesis generation |
 | CP-3: Each experiment result | `experiment-log.yaml` (append first result; update same entry after further samples) | Phase 3.3, immediately after each measurement |
 | CP-4: Batch summary | `experiment-log.yaml` (outcomes + best) + `strategy-digest.md` | Phase 3.5, after batch evaluation |
-| CP-5: Final summary | `experiment-log.yaml` (final state) | Phase 4, at wrap-up |
+| CP-5: Final summary | `experiment-log.yaml` (final state) | Phase 4, after selecting a next step that does not return to Phase 3 |
 
 **Format of a verification step:**
 1. Write the file using the native file-write tool
@@ -50,7 +50,7 @@ These are non-negotiable write-then-verify steps. At each checkpoint, the agent 
 
 | File | Purpose | Written When |
 |------|---------|-------------|
-| `spec.yaml` | Optimization spec (immutable during run) | Phase 0 (CP-0) |
+| `spec.yaml` | Optimization spec (frozen once backlog or experiments exist; earlier adjustment reruns Phase 1) | Phase 0 (CP-0) |
 | `experiment-log.yaml` | Full history of all experiments | Initialized at CP-1, appended at first CP-3, updated on later samples and at CP-4 |
 | `strategy-digest.md` | Compressed learnings for hypothesis generation | Written at CP-4 after each batch |
 | `<worktree>/result.yaml` | Per-experiment crash-recovery marker | Immediately after measurement, before CP-3 |
@@ -61,6 +61,7 @@ When Phase 0.4 detects an existing run:
 1. Read the experiment log from disk — this is the ground truth
 2. Scan worktree directories for `result.yaml` markers not yet in the log
 3. Recover any measured-but-unlogged experiments and merge later samples into their existing entry by experiment and measured source identity; never duplicate a hypothesis or combine samples from different source snapshots
-4. Continue from where the log left off
+4. Skip only work whose completion the recovered log proves. Re-enter any gate not cleared by visible user or upstream authorization covering the unchanged scope. Checkpoints prove persisted work, not user decisions; never infer approval from CP-1 or an iteration number.
+5. Preserve the saved spec and baseline on resume. Spec adjustment is limited to an empty backlog and no experiments and reruns Phase 1; otherwise preserve this run and use a separate run for a changed protocol.
 
 ---

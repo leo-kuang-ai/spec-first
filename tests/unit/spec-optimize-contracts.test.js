@@ -153,9 +153,10 @@ describe('spec-optimize contracts', () => {
     const judgePrompt = read('skills/spec-optimize/references/judge-prompt-template.md');
 
     expect(skill).toContain('judge sub-agents using the same bounded scheduler as Phase 3.2');
-    expect(skill).toContain('Otherwise evaluate the same batches serially inline');
+    expect(skill).toContain('If independent judging is unavailable, do not score inline');
+    expect(skill).toContain('baseline judging blocks Phase 1');
     expect(skill).toContain('treat it as backpressure');
-    expect(skill).toContain('Judge work is a separate budget from experiment worktrees in either path.');
+    expect(skill).toContain('Judge work is a separate budget from experiment worktrees.');
     expect(skill).toContain('**Mechanical-apply bar:** apply any finding with a concrete `suggested_fix`');
     expect(skill).toContain('Do not commit or push from this step');
     expect(skill).toContain('spec-code-review');
