@@ -44,3 +44,15 @@ test('pipeline invalidation stops the write without inventing a replacement deci
   expect(review).toContain('do not write the plan or silently choose a replacement');
   expect(review).toContain('only after the product-blocker checks have cleared');
 });
+
+test('bounded execution retains decision owners without duplicating product truth', () => {
+  const review = read('references/final-review.md');
+  const structure = read('references/structure.md');
+  expect(review).toContain('Reverse-resolve its `Governs R...` links');
+  expect(review).toContain('`KTD<N>` for a planning decision');
+  expect(review).toContain('do not mirror it into a KTD');
+  expect(review).toContain('missing links are a producer-owned gap');
+  expect(structure).toContain('cite governing R-IDs and KTD-IDs');
+  expect(structure).toContain('Product Contract `### Success Criteria`');
+  expect(structure).toContain('never appear here as well');
+});

@@ -21,6 +21,7 @@ Before finalizing, check:
 - Test scenarios name specific inputs, actions, and expected outcomes without becoming test code
 - Feature-bearing units with blank or missing test scenarios are flagged as incomplete — feature-bearing units must have actual test scenarios, not just an annotation. The `Test expectation: none -- [reason]` annotation is only valid for non-feature-bearing units (pure config, scaffolding, styling)
 - Deferred items are explicit and not hidden as fake certainty
+- Each unit implementing a session-settled decision cites its owner in Requirements or Approach: `KTD<N>` for a planning decision, or the R-IDs governed by the Product Contract Key Decision. Reverse-resolve its `Governs R...` links so bounded execution receives the decision label; missing links are a producer-owned gap, not permission to rewrite the Product Contract.
 - Multi-surface work names every materially-considered client, service/backend, API/schema/event contract, data, operational/rollout, verification/test, and agent/tool surface as in-scope, out-of-scope with a reason, or deferred with an owner/trigger; irrelevant surfaces are omitted
 - When a high-risk trigger applies, the plan satisfies `references/high-risk-plan-lens.md` through concrete decisions or explicit Open Questions/deferments; a launch-blocking risk gap prevents `artifact_readiness: implementation-ready`
 - When the interface/evolution trigger applies, follow `references/interface-and-evolution-lens.md` to record the shared contract core and a greenfield or evolution posture, then land the canonical artifact, consumers, compatibility, and verification owner in `### Interface Contracts`; `parser_unavailable` must include a reason, owner, and unblock condition
@@ -95,6 +96,8 @@ Write the unified plan artifact according to `references/plan-sections.md`.
 - Do not write a launch prompt into the doc. Generate it at handoff from the plan's current content and the host's observed goal interface: an available tool or an exact documented user command. It points to Goal Capsule, Verification Contract, Definition of Done, and U-IDs rather than duplicating them; do not select an interface by host name.
 
 **HTML composition timing.** When `OUTPUT_FORMAT=html`, Phase 5.3 deepening runs before this write completes its final form. Phase 5.3.8 then runs headless report-only review. The review itself is byte-preserving; only `spec-plan` may perform a bounded full recompose for uniquely determined producer-fix candidates, followed by another report-only review.
+
+**Session-settled decisions at plan-write.** Record a settled planning decision once as a numbered Key Technical Decision with the annotation defined in `references/settled-decisions.md`. A settled product decision stays in the byte-preserved Product Contract; do not mirror it into a KTD. A distinct how-level KTD implementing that choice cites its governed R-IDs and carries the applicable settled label. Preserve provenance; never label an unexamined assertion as user-approved.
 
 Confirm (use absolute path so the reference is clickable in modern terminals):
 

@@ -92,7 +92,7 @@ For each unit, include:
 - **Requirements** - which requirements or success criteria it advances (cite R-IDs, and A/F/AE IDs when origin supplies them)
 - **Dependencies** - what must exist first (cite by U-ID, e.g., "U1, U3")
 - **Files** - repo-relative file paths to create, modify, or test (never absolute paths)
-- **Approach** - key decisions, data flow, component boundaries, or integration notes
+- **Approach** - key decisions, data flow, component boundaries, or integration notes. Keep content unit-local: cite governing R-IDs and KTD-IDs instead of restating product or protocol rules. Use an ordered list for sequenced steps and a separate list item for each test scenario.
 - **Execution note** - optional natural-language direction, only when the unit benefits from non-default sequencing or proof. Do not treat this as an enum; phrase the evidence the implementer should seek.
 - **Technical design** - optional pseudo-code or diagram when the unit's approach is non-obvious and prose alone would leave it ambiguous. Frame explicitly as directional guidance, not implementation specification
 - **Patterns to follow** - existing code or conventions to mirror
@@ -157,7 +157,7 @@ Use one planning philosophy across all depths. Change the amount of detail, not 
 
 For sufficiently large, risky, or cross-cutting work, add the sections that genuinely help:
 - **Alternative Approaches Considered**
-- **Success Metrics**
+- **Success Metrics** - operational instrumentation such as dashboards, error budgets, alert thresholds, and rollout telemetry. Product-outcome thresholds belong to Product Contract `### Success Criteria` and never appear here as well; include only what Success Criteria does not already state.
 - **Dependencies / Prerequisites**
 - **Risk Analysis & Mitigation**
 - **Phased Delivery**
