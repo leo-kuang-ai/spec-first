@@ -288,6 +288,20 @@ describe('spec-code-review current contracts', () => {
     expect(fs.existsSync(path.join(repoRoot, 'agents/spec-pr-comment-resolver.agent.md'))).toBe(false);
   });
 
+  test('reviewer template embeds large-content placeholders exactly once', () => {
+    const fenced = subagentTemplate.match(/^```\n[\s\S]*?^```\n\n## Variable Reference/m)?.[0];
+    expect(fenced).toBeDefined();
+    const counts = new Map();
+    for (const m of fenced.matchAll(/\{([a-z_]+)\}/g)) {
+      counts.set(m[1], (counts.get(m[1]) || 0) + 1);
+    }
+    // A placeholder named in template prose gets filled like a slot, re-emitting the
+    // whole diff/file list into every reviewer prompt; short identifiers such as
+    // reviewer_name may appear in both the write-path instruction and review-context.
+    expect(counts.get('file_list')).toBe(1);
+    expect(counts.get('diff')).toBe(1);
+  });
+
   test('task review context is paired, digest-pinned, and honestly scoped', () => {
     expect(skill).toContain('`task-pack:<path>`');
     expect(skill).toContain('`task:<task_id>`');
