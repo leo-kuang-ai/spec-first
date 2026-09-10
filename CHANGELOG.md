@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: docs(sync): 复核 CE 6d2e6b41 的入口描述与本地产品边界，记录 72 项验证及逐项恢复点。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 复核 CE 67cc7dc7 的重组规则与评测边界，纠正不存在的本地 owner 引用并记录 26 项实际验证。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(lfg): 补齐 CE 956087b3 的决策简报、结构约束、冲突残留传递和项目交付流程边界。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(brainstorm): 补齐 CE ff4d21b8 的覆盖与范围判断、无仓库恢复、已定决策关联和写后四项检查。 (user-visible)
