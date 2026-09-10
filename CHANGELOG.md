@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE d181ae0e 的 skill-eval-cell 宿主评测资产，按产品边界不引入第二套评测 runner，保留现有 Skill eval owners。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 67cc7dc7 的 size-driven skill restructuring guidance，确认当前 authoring owner 已有等价约束。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 956087b3 的 LFG plan-brief、stage-routing、work-return 与 shipping-tail 引用迁移，确认当前 spec-lfg owner 已完整承载。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE ff4d21b8 的 brainstorm 阶段 references 与输出/对话/方案路由，确认当前 spec-brainstorm 已具备等价 owner。 (user-visible)
