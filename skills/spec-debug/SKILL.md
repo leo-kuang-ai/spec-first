@@ -347,7 +347,9 @@ Resolve two independent facts from the current user request or a visible upstrea
 - With landing authorization, run only the requested landing action after review/residual/re-verification gates close. When the entry came from an issue tracker, include the appropriate auto-close syntax only in the explicitly authorized commit/PR surface.
 - Never stage unrelated pre-existing dirty paths. If safe file ownership cannot be isolated, leave the fix uncommitted and report the blocker even when general commit authorization exists.
 
-#### After an explicitly authorized PR is open: consider offering learning capture
+#### At the completion checkpoint: consider offering learning capture
+
+Offer when the unit of work completes — not at a PR event: a PR can open early, so a trigger pegged to PR creation is already past by the time the work finishes. The deadline is only that the learning can still be committed to the PR that produced it (not open yet, draft, or under review); capture at the checkpoint rather than deferring to that deadline.
 
 Most bugs are localized mechanical fixes (typo, missed null check, missing import) where the only "lesson" is the bug itself. Compounding those clutters `docs/solutions/` without adding value. Decide which path applies:
 
