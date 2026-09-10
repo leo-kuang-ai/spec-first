@@ -7,7 +7,7 @@ called for below, but skip every push, PR create/edit, and CI-watch action in
 steps 7–9. A missing remote is a terminal local-only state, not an error: never
 retry a push or hunt for a remote. Run steps 7–9 normally when a remote exists.
 
-7. **Autonomous residual handoff** (only when step 4 reported one or more actionable `downstream-resolver` findings not applied in step 5; skip when it reported `Actionable findings: none.`)
+7. **Autonomous residual handoff** runs for unapplied actionable findings, report-only settled-decision conflicts from review, or proceeded-under-flag decision conflicts from implementation. Skip only when all three sets are empty; an empty `actionable_findings` list alone is insufficient. Preserve each decision owner, direct evidence, and routing outcome in the durable record, without turning a preference conflict into an auto-fix.
 
    Do not prompt the user. This step embraces the autopilot contract: residuals must become durable before DONE, but the agent never stops to ask.
 
@@ -36,6 +36,10 @@ retry a push or hunt for a remote. Run steps 7–9 normally when a remote exists
 7.5. **Complete the source plan lifecycle marker.** The `spec-work` Return-to-Caller envelope never writes status; its candidate already resolves either the direct plan or a validated task pack's `source_plan`. Any known needs-human decision blocks this marker; preserve it for the common decision gate below. After simplification, required review, residual handoff, and final verification have closed, use the validated lifecycle shape from step 2. When `plan_status_completion_candidate` is present, invoke `spec-first internal plan-status complete --target-repo <root> --plan <candidate> --json`; accept `active → completed` or the already-completed idempotent result, and block DONE on any other helper result. When the candidate is null with an allowed `plan_status_completion_degraded_reason`, skip mutation, preserve the verified development result, and surface that degraded boundary in DONE. This marker is not CI, merge, release, or field-outcome proof.
 
 8. Invoke the `spec-commit-push-pr` skill with `mode:pipeline` and pass this visible upstream authority context:
+
+   Include the recorded plan path and any proceeded-under-flag decision conflicts as landing context, so the PR preserves their provenance and limitations.
+
+   If active project instructions explicitly name a shipping process, use it instead of the default helper within the same authorization, owned-path, and verification boundaries. A skill directory or title convention alone is not such an instruction. Require evidence that the owned changes were pushed and are included in the reported open PR; an unavailable process, unmet headless requirement, or partial result is a named blocker, never permission to bypass it with the default. With no remote, skip both external shipping paths and use the local-only behavior below. Stack, merge, or history-rewrite side effects require their own authorization.
 
    ```yaml
    commit_authorization: authorized

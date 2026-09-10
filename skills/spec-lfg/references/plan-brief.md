@@ -1,5 +1,9 @@
 # Plan Input And Readiness (Step 1)
 
+When the invoking conversation carries settled product or planning decisions, provide a separate transient brief alongside the unchanged `forwarded_arguments`: direction, each decision's provenance class (`user-directed` or `user-approved`), rejected alternative, one-line reason, open areas, and a standing instruction to report contradictory evidence. Include only decisions relevant to this task. Demote an entry with no examined alternative to a directive or open area; omit the brief entirely when none qualify. A retry reuses the same brief verbatim. Once the plan is written, its labeled decision owners are canonical. Model/harness routing instructions are execution context, never settled product decisions.
+
+A blocked result carrying `settled-decision-invalidated` must retain that reason and its evidence; never retry it as a missing-plan case.
+
 Invoke the `spec-plan` skill with the exact `forwarded_arguments` payload. When
    `spec-brainstorm` invoked LFG, this payload is the absolute requirements-only
    unified plan path, so `spec-plan` recognizes it as an explicit Product Contract

@@ -24,6 +24,19 @@ const nextWorkHandoff = fs.readFileSync(
 );
 
 describe('spec-lfg current contracts', () => {
+  test('retains settled decision provenance through planning, simplification, and residual landing', () => {
+    expect(skill).toContain('A retry reuses the same brief verbatim');
+    expect(skill).toContain('settled-decision-invalidated');
+    expect(skill).toContain('never retry it as a missing-plan case');
+    expect(reviewFollowup).toContain('Pass the plan path as decision context');
+    expect(reviewFollowup).toContain('Settlement never suppresses a defect');
+    expect(skill).toContain('producer\'s `claim_limitations`');
+    expect(skill).toContain('Skip only when all three sets are empty');
+    expect(skill).toContain('an empty `actionable_findings` list alone is insufficient');
+    expect(skill).toContain('PR preserves their provenance and limitations');
+    expect(skill).toContain('active project instructions explicitly name a shipping process');
+    expect(skill).toContain('never permission to bypass it with the default');
+  });
   test('requires every relocated stage before execution and keeps its content out of the entry', () => {
     for (const file of phaseFiles) {
       expect(entry).toContain(`references/${file}`);
