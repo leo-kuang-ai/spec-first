@@ -41,14 +41,14 @@ describe('spec-handoff contracts', () => {
   test('distinguishes orientation from explicitly authorized continuation', () => {
     const skill = read('skills/spec-handoff/SKILL.md');
     const evals = JSON.parse(read('skills/spec-handoff/evals/examples.json'));
-    expect(skill).toContain('当前用户明确要求继续完成指定任务');
+    expect(skill).toContain('current user explicitly requests completion of the selected task');
     expect(skill).toContain('source-plan-non-active');
-    expect(skill).toContain('核验目标仓库、当前 HEAD/dirty、任务范围、source refs 和已有完成证据');
+    expect(skill).toContain('verify the target repo, current HEAD/dirty state, task scope, source refs, and existing completion evidence');
     expect(skill).not.toContain('Then **stop without acting** until the user chooses.');
     expect(evals.cases.some((entry) => entry.id === 'explicit-resume-and-continue')).toBe(true);
     expect(evals.cases.some((entry) => entry.id === 'continue-does-not-reopen-stale-plan')).toBe(true);
-    expect(skill).toContain('只读恢复遇到同类问题时仅报告问题和建议，不调用修订或执行 owner');
-    expect(skill).toContain('明确来源不可达时报告缺失，不把该路径降级为关键词搜索');
+    expect(skill).toContain('During read-only resume, report these issues and recommendations without invoking revision or execution owners');
+    expect(skill).toContain('Report an unreachable explicit source; never turn that path into a keyword search');
     expect(evals.cases.find((entry) => entry.id === 'continue-unreachable-source').must_not)
       .toContain('不得调用 discovery，也不得把指定路径转换为关键词搜索');
     expect(evals.cases.find((entry) => entry.id === 'continue-stale-completion-and-dirty-tree').must_not)
@@ -152,6 +152,92 @@ describe('spec-handoff contracts', () => {
     }
   });
 
+  test('discovery stops reading at metadata boundaries and retains unindexed candidates', () => {
+    const target = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-handoff-metadata-'));
+    const input = path.join(target, 'payload.json');
+    try {
+      fs.writeFileSync(input, JSON.stringify(payload(target)));
+      const written = handoffArtifact.writeArtifact({ inputPath: input, targetRepo: target });
+      const directory = path.dirname(path.join(target, written.artifact_path));
+      fs.rmSync(path.join(target, written.artifact_path));
+      const prefixes = {
+        'plain.md': '# Plain handoff\n',
+        'indexed.md': '---\ntitle: "Indexed"\n---\n',
+        'crlf.md': '---\r\ntitle: "CRLF"\r\n---\r\n',
+        'yaml.md': '---\ntitle: Bare YAML\n---\n',
+        'long.md': `---\n${'title: "Long"\n'.repeat(63)}`,
+        'bytes.md': `---\n${'x'.repeat(16 * 1024 - 4)}`,
+      };
+      for (const [name, prefix] of Object.entries(prefixes)) {
+        fs.writeFileSync(path.join(directory, name), `${prefix}PRIVATE_BODY_SENTINEL\n`);
+      }
+      const originalRead = fs.readSync;
+      const readChunks = [];
+      const spy = jest.spyOn(fs, 'readSync').mockImplementation((fd, buffer, offset, length, position) => {
+        const count = originalRead(fd, buffer, offset, length, position);
+        readChunks.push(buffer.subarray(offset, offset + count).toString());
+        return count;
+      });
+      let result;
+      try {
+        result = handoffArtifact.discoverArtifacts({ targetRepo: target, limit: 10 });
+      } finally {
+        spy.mockRestore();
+      }
+      expect(readChunks.join('')).not.toContain('PRIVATE_BODY_SENTINEL');
+      expect(result.candidates).toHaveLength(6);
+      expect(result.candidates.find((entry) => entry.title === 'Indexed').indexed).toBe(true);
+      expect(result.candidates.find((entry) => entry.title === 'CRLF').indexed).toBe(true);
+      for (const name of ['plain.md', 'long.md', 'bytes.md', 'yaml.md']) {
+        expect(result.candidates.find((entry) => entry.artifact_path.endsWith(name)).indexed).toBe(false);
+      }
+      expect(result.candidates.every((entry) => !Object.hasOwn(entry, 'body'))).toBe(true);
+    } finally {
+      fs.rmSync(target, { recursive: true, force: true });
+    }
+  });
+
+  test('an explicit discovery folder is bounded and never follows symlink candidates', () => {
+    const target = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-handoff-folder-'));
+    const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-handoff-foreign-'));
+    try {
+      fs.writeFileSync(path.join(outside, 'selected-notes.md'), '# Untyped notes\nprivate body');
+      fs.symlinkSync(path.join(outside, 'selected-notes.md'), path.join(outside, 'linked.md'));
+      const result = handoffArtifact.run(['discover', '--target-repo', target, '--source-dir', outside, '--keywords', 'selected']);
+      expect(result.status).toBe('discovered');
+      expect(result.candidates).toEqual([expect.objectContaining({
+        artifact_path: path.join(outside, 'selected-notes.md'),
+        indexed: false,
+      })]);
+      expect(result.searched_root).toBe(outside);
+      expect(fs.existsSync(path.join(target, '.spec-first'))).toBe(false);
+      expect(handoffArtifact.run(['discover', '--target-repo', target, '--source-dir']).status).toBe('rejected');
+      expect(handoffArtifact.run(['write', '--target-repo', target, '--source-dir', outside]).status).toBe('rejected');
+      const linkedRoot = path.join(target, 'linked-root');
+      fs.symlinkSync(outside, linkedRoot);
+      expect(handoffArtifact.run(['discover', '--target-repo', target, '--source-dir', linkedRoot]).reason_code).toBe('source-directory-unsafe');
+    } finally {
+      fs.rmSync(target, { recursive: true, force: true });
+      fs.rmSync(outside, { recursive: true, force: true });
+    }
+  });
+
+  test('discovery reports an entry cap without reading beyond it', () => {
+    const target = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-handoff-cap-'));
+    try {
+      for (let index = 0; index < 205; index += 1) {
+        fs.writeFileSync(path.join(target, `${index}.md`), '# Notes\n');
+      }
+      const result = handoffArtifact.discoverArtifacts({ targetRepo: target, sourceDir: target, limit: 1000 });
+      expect(result.scanned_entries).toBe(200);
+      expect(result.scan_truncated).toBe(true);
+      expect(result.candidates).toHaveLength(20);
+      expect(result.candidates.every((entry) => entry.indexed === false)).toBe(true);
+    } finally {
+      fs.rmSync(target, { recursive: true, force: true });
+    }
+  });
+
   test('projects the complete standalone package to every supported host', () => {
     for (const platform of getSupportedPlatforms()) {
       const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), `spec-handoff-${platform}-`));
@@ -161,6 +247,8 @@ describe('spec-handoff contracts', () => {
         const expectedPaths = [
           'SKILL.md',
           'references/artifact-contract.md',
+          'references/create.md',
+          'references/resume.md',
           'scripts/handoff-artifact.cjs',
         ].map((relativePath) => path.posix.join(
           adapter.skillsRoot.replace(/\\/g, '/'),
