@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(work): 补齐 CE cb230f14 的单任务 worker 上下文、关联决策传递和简化阈值，修正迁移后消费者读取与 worktree index 说明。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(compound): 补齐 CE 26f38961 的 Lightweight 同名目标检查、覆盖降级与只读可发现性边界，修正部分发布失败报告。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(review): 补齐 CE 4df5f99d 的 adversarial 触发与已定决策隔离，统一审查 persona 和评测用例英文，校正迁移后的合同断言。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(debug): 补齐 CE 734dd2c8 的测试归属指令检查，修正 pipeline 返回状态合同断言并重跑现有 debug 测试。 (user-visible)

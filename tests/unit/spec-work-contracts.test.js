@@ -3,7 +3,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const skill = ['SKILL.md', 'references/work-intake.md', 'references/implementation-loop.md']
+const skill = ['SKILL.md', 'references/input-triage.md', 'references/workspace-setup.md', 'references/work-intake.md', 'references/implementation-loop.md', 'references/return-to-caller.md']
   .map(file => fs.readFileSync(path.resolve(__dirname, '../../skills/spec-work', file), 'utf8')).join('\n');
 const shipping = fs.readFileSync(
   path.resolve(__dirname, '../../skills/spec-work/references/shipping-workflow.md'),

@@ -92,4 +92,16 @@ describe('spec-work execution strategy contracts', () => {
     expect(shipping).toMatch(/no commit authorization.*uncommitted/is);
     expect(shipping).toMatch(/no landing authorization.*do not push.*do not open a PR/is);
   });
+
+  test('bounded implementation packets retain decisions and isolate unit context', () => {
+    const intake = read('skills/spec-work/references/work-intake.md');
+    const loop = read('skills/spec-work/references/implementation-loop.md');
+    expect(intake).toContain('`Governs R` links name the active unit');
+    expect(strategy).toContain('same-unit recovery may reuse it, but a different unit requires a new context');
+    expect(strategy).toContain('never broaden them');
+    expect(strategy).toContain('reporting concrete defects at full severity');
+    expect(strategy).toContain('Add parser coverage (U3)');
+    expect(loop).toContain('>=30 substantive human-authored code lines');
+    expect(loop).toContain('test-fixture volume alone does not trigger this threshold');
+  });
 });

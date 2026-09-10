@@ -54,7 +54,7 @@ Do not implement or declare completion without the loop's scope and evidence che
 
    At a behavior-cluster/dependency-wave boundary, read `references/implementation-quality.md` § Simplification At Phase Boundaries. Classify findings as `remove-now`, `minimality-debt`, `protected`, or `architecture-mismatch`; do not default to extract-helper, delete security/data-integrity/a11y/observability/required-verification code for lower LOC, or widen scope to pay unrelated debt.
 
-   If **`spec-simplify-code`** is available, invoke it at phase boundaries (especially before Phase 3 when the diff is >=30 lines) with the same classification and protected-surface constraints. Otherwise, perform the bounded pass inline. Rerun the same feedback loop for every `remove-now` or authorized architecture correction.
+   If **`spec-simplify-code`** is available, invoke it at phase boundaries (especially before Phase 3 when the cluster has >=30 substantive human-authored code lines). Generated, mechanical, configuration-only, or test-fixture volume alone does not trigger this threshold. Preserve the same classification and protected-surface constraints. Pass relevant settled decisions as structure constraints, not as an expansion of the simplification scope; concrete defect evidence still requires resolution. Otherwise, perform the bounded pass inline. Rerun the same feedback loop for every `remove-now` or authorized architecture correction.
 
 6. **Figma Design Sync** (if applicable)
 
