@@ -81,7 +81,7 @@ This ranked list doubles as the index the user references when choosing an idea 
 
 ## Phase 5: Next Steps
 
-Ask what to do next using the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question. Free-text answers are accepted.
+Ask what to do next using the platform's blocking question tool: the host's blocking question tool already in the current tool list, matched by capability (if a matching tool is listed but unloaded, load it through the host's tool-discovery primitive). Fall back to numbered options in chat only when no such tool is in the list or a real question call errors. Never silently skip the question. Free-text answers are accepted.
 
 The deliverable already exists (Phase 4), so the menu is purely *what next* — there is no "save" step.
 

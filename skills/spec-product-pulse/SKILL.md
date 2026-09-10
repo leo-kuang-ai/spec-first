@@ -24,7 +24,7 @@ The fixed `docs/pulse-reports/` contract always renders latency (p50/p95/p99) an
 
 ## Interaction Method
 
-Default to the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
+Default to the platform's blocking question tool: the host's blocking question tool already in the current tool list, matched by capability (if a matching tool is listed but unloaded, load it through the host's tool-discovery primitive). Fall back to numbered options in chat only when no such tool is in the list or a real question call errors. Never silently skip the question.
 
 Ask one question at a time. Reserve multi-select for first-run configuration only.
 

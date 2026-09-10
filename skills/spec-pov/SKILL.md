@@ -14,7 +14,7 @@ Return a decisive, **graded verdict** on something from the outside world — ju
 
 ## Interaction Method
 
-When a question is required, use the host's blocking question tool (`AskUserQuestion`, `request_user_input`, `ask_question`, or `ask_user`) one question at a time. Fall back to numbered chat options only when no blocking tool exists or the call errors; never silently skip the question.
+When a question is required, use the host's blocking question tool already in the current tool list, matched by capability, one question at a time. Fall back to numbered chat options only when no such tool is in the list or a real question call errors; never silently skip the question.
 
 ## Dispatch Authorization Boundary
 

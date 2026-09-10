@@ -15,7 +15,7 @@ This is an internal-only helper. A public workflow may delegate the full commit/
 
 Description-only generation remains non-mutating, but applying a description with `gh pr edit` is a landing mutation and still requires explicit landing authority. This helper never broadens the caller's run-owned file scope or absorbs unrelated dirty paths.
 
-**Asking the user:** When this skill says "ask the user", use the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded) or `request_user_input` in Codex. Fall back to presenting the question in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
+**Asking the user:** When this skill says "ask the user", use the platform's blocking question tool: the host's blocking question tool already in the current tool list, matched by capability (if a matching tool is listed but unloaded, load it through the host's tool-discovery primitive). Fall back to presenting the question in chat only when no such tool is in the list or a real question call errors. Never silently skip the question.
 
 ## Mode detection
 

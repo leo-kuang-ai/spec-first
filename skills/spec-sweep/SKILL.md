@@ -26,7 +26,7 @@ allowed-tools:
 
 Read `references/run.md` before executing sweep phases.
 
-Default to the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex. Never silently skip a question you owe the user; if no blocking tool exists in the harness, the run is headless (see Mode). Ask one question at a time — the decision round (2h) may group by category but still asks one blocking question per category.
+Default to the platform's blocking question tool: the host's blocking question tool already in the current tool list, matched by capability (if a matching tool is listed but unloaded, load it through the host's tool-discovery primitive). Never silently skip a question you owe the user; if no blocking tool exists in the harness, the run is headless (see Mode). Ask one question at a time — the decision round (2h) may group by category but still asks one blocking question per category.
 
 ## Mode
 

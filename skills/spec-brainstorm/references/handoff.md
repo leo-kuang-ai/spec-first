@@ -21,7 +21,7 @@ whether the browser option renders and the document-review mutation policy, unre
 for non-software brainstorms (`execution` other than `code`). Count the visible
 options for the current state and choose the rendering mode accordingly:
 
-- **Visible count fits the current platform's option cap:** use the platform's blocking question tool (`AskUserQuestion` in Claude Code — call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded; `request_user_input` in Codex). Claude Code `AskUserQuestion` supports up to 4 explicit options, and Codex `request_user_input` supports only 2-3 explicit options.
+- **Visible count fits the current platform's option cap:** use the host's blocking question tool already in the current tool list, matched by capability (if it is listed but unloaded, load it through the host's tool-discovery primitive). Some hosts cap explicit options (e.g., up to 4 on Claude Code, 2-3 on Codex); count the visible options for the current state and render within that cap.
 - **Visible count exceeds the current platform's option cap:** render as a numbered list in chat. This is the narrow option-overflow fallback; trimming would hide legitimate choices (plan, ship, review, browser, refine are all distinct destinations). Include a hint that free-form input is accepted ("Pick a number or describe what you want.") so the numbered list retains the blocking tool's open-endedness.
 
 Never silently skip the question.
