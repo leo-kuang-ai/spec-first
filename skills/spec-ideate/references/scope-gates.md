@@ -6,56 +6,7 @@
 
 When the subject, mode, and format are already clear from the prompt, resolve this phase in one pass and move on — the gates below exist for ambiguity, not ceremony.
 
-#### 0.0 Resolve Output Mode
-
-Determine `OUTPUT_FORMAT` for the ideation artifact this run might persist. Output mode is **exclusive** — the ideation doc is written as either HTML (`.html`) OR markdown (`.md`), never both. Precedence: in-prompt request > user-stated preference > config > default (`html`), with a hard pipeline-mode override.
-
-Unlike `spec-plan` and `spec-brainstorm` (which default to `md`), spec-ideate defaults to **`html`** — ideation artifacts are read mainly by humans weighing candidate directions, and a rich self-contained HTML file (with illustrative diagrams for the top candidates) makes the ideas easier to approach.
-
-**Read config.** The repo root is pre-resolved at skill load:
-!`git rev-parse --show-toplevel`
-
-If the line above is an absolute path, use it as `<repo-root>`. If it is empty, shows an error, or still shows a backtick command string (a harness that did not run the pre-resolution), resolve `<repo-root>` at runtime by running `git rev-parse --show-toplevel` with the shell tool. Then read `<repo-root>/.spec-first/config.local.yaml` with the native file-read tool. If the root cannot be resolved (not a git repo) or the file does not exist, fall through to the defaults below.
-
-Resolution steps:
-
-1. **In-prompt request.** Reason over the user's prompt for this run for a request about *this document's* output format, expressed either as the `output:` shorthand or in plain language ("give me this as markdown", "I want a webpage"). On an explicit format, match it case-insensitively to `md`/`html`, and ignore the `output:` shorthand token when reading the rest of the prompt as the focus hint. Distinguish a request about the document's format from a format named as subject matter: "ideate on an HTML export feature" is the work, not a doc-format request — do not switch on it.
-   - `output:` alone (no value) → no-op, fall through to step 2.
-   - `output:<unknown>` (e.g., `output:pdf`) → drop the token, fall through to step 2, and remember to emit a one-line note above the post-ideation menu after final resolution: `Ignored unknown output: value '<value>' — using <resolved_format> instead.` where `<resolved_format>` is the value `OUTPUT_FORMAT` actually resolved to after the remaining precedence steps. Do not hardcode a format in the note — that misleads users when config or the default differs from what you assume.
-2. **User-stated preference.** If this prompt holds no format request, honor an output-format preference (markdown vs HTML) the user established earlier — earlier in this session, in your memory, or written into their active instructions — that is already in your context (match `md`/`html` case-insensitively). A remembered preference is more current than the rarely-edited config, so it **overrides** the config in step 3. Do not open or search instruction files to find it — act only on a preference already present in your context; if none is, fall through to the config.
-3. **Config.** If steps 1-2 did not resolve and the config file read above has an **active (non-commented)** `ideate_output:` key whose value matches `md` or `html` (case-insensitive), use it. Missing, invalid, or commented values fall through silently. Critical: lines starting with `#` are YAML comments and must be ignored — the shipped config template includes a commented example like `# ideate_output: md` to document the option, and matching that as an active setting would silently override the default on every run without the user having opted in.
-4. **Default.** Otherwise `OUTPUT_FORMAT=html`.
-5. **Pipeline override.** When invoked from any pipeline or `disable-model-invocation` context, force `OUTPUT_FORMAT=md` regardless of steps 1-4 — automated downstream consumers parse markdown reliably and HTML in pipeline runs is unnecessary friction.
-
-**Token-parsing convention:** only literal-prefix flag tokens (`output:`, `mode:` where applicable) are consumed and stripped. Other `<word>:<word>` tokens — including conventional commit prefixes like `feat:`, `fix:`, `chore:` that may appear inside a focus hint — pass through verbatim.
-
-**Defer loading the format-rendering reference.** The deliverable is written at Phase 4 (after generation), so `references/ideation-sections.md` and the format-rendering references (`markdown-rendering.md` / `html-rendering.md`) are only needed then — loading them at Phase 0.0 would carry them through the entire grounding and ideation dispatch for no benefit. Resolve `OUTPUT_FORMAT` now, but load the section contract and the matching rendering reference at write time (see `references/post-ideation-workflow.md` §4.1).
-
-The `output:` preference does NOT auto-propagate to `spec-brainstorm` on handoff (Phase 5) — spec-brainstorm re-resolves its own `brainstorm_output` config independently. Asymmetric output (`ideation.html` + unified-plan markdown) is acceptable; users who want HTML for both set both keys in `.spec-first/config.local.yaml`.
-
-#### 0.1 Check for Recent Ideation Work
-
-Look in `docs/ideation/` for ideation documents (`*.md` or `*.html`) created within the last 30 days.
-
-Treat a prior ideation doc as relevant when:
-
-- the topic matches the requested focus
-- the path or subsystem overlaps the requested focus
-- the request is open-ended and there is an obvious recent open ideation doc
-- the issue-grounded status matches: do not offer to resume a non-issue ideation when the current argument indicates issue-tracker intent, or vice versa — treat these as distinct topics
-
-If a relevant doc exists, ask whether to:
-
-1. continue from it
-2. start fresh
-
-If continuing:
-
-- read the document
-- summarize what has already been explored
-- preserve the previous ideas and rejection summary
-- update the existing file instead of creating a duplicate
-- **write the update back in the existing file's format**, overriding the Phase 0.0 baseline: resuming a `.html` doc rewrites HTML, a `.md` doc rewrites markdown. Format precedence on resume is: explicit `output:` arg this run > resumed file's extension > config > default (`html`); a pipeline/`disable-model-invocation` run still forces `md` per Phase 0.0. An explicit `output:` arg that differs from the existing file switches the artifact's format (write the new-format file; leave the original in place).
+Output resolution and resume are owned by `references/output-mode.md`; read it before this phase.
 
 #### 0.2 Subject-Identification Gate
 
@@ -167,7 +118,11 @@ Honor clear overrides such as:
 
 **Depth override.** `go deep` (or equivalent) opts into maximum depth deliberately: every ideation agent moves to the ceiling tier, the Phase 2 verification read budget doubles, and Phase 3 adds a second critic. The default is the mixed-tier fleet — users opt into top-tier cost explicitly rather than inheriting it from whichever model the conversation happens to run on.
 
-**Tactical scope detection.** Parse the focus hint (and any intake answers from 0.2 specify path) for tactical signals: `polish`, `typo`, `typos`, `quick wins`, `small improvements`, `cleanup`, `small fixes`. When present, lower the Phase 2 ambition floor — the user has explicitly opted into tactical scope. Default otherwise is step-function (see Phase 2 meeting-test floor).
+**Tactical scope detection.** Parse the focus hint and intake for `polish`, `typo`, `typos`, `quick wins`, `small improvements`, `cleanup`, or `small fixes`. Resolve collisions before any downstream budget or waiver: `go deep` suppresses tactical scope entirely, even when a tactical signal was detected. Preserve this resolved state on fallback; do not re-derive it from raw prompt words.
+
+**Tactical's dials:** 3-4 ideas per frame; 2-3 verification reads per agent; at most 3 axes and one scout per axis (at most 3); meeting-test waived in both the generator and verifier payloads. Keep basis verification. Tactical changes no fleet size, frame set, or model tier, and never packs extra frames into one worker: the read budget is per agent, not per frame. Issue themes, Surprise me, or universal depth still own their respective surface and fleet; tactical supplies only these dials unless suppressed by `go deep`.
+
+An explicit raw candidate total controls the per-frame split across the resolved frame set; an explicit survivor count controls the final cut. Preserve both on issue fallback and recompute only the fleet and per-frame split for the new surface.
 
 Use reasonable interpretation rather than formal parsing.
 
@@ -175,53 +130,10 @@ Use reasonable interpretation rather than formal parsing.
 
 Before Phase 1, derive and record `external_research_authorization: authorized | missing`. It is `authorized` only when the current user or visible upstream handoff explicitly requests web/external/provider research or issue-tracker evidence for this run. General ideation, `go deep`, surprise-me mode, tool availability, and a prior run do not grant it. Missing or explicitly denied authority records `external_research_authorization_missing` and removes web research and issue intelligence without weakening current-source grounding. Every authorized external result carries provenance, freshness, and limitations and remains advisory until its cited source is rechecked.
 
-Then surface the execution count and cost shape in one short line. When dispatch is authorized and capable, report the actual agent count using the calculation below. Otherwise report the number of role lenses that will run inline/serial and the applicable fallback reason; do not describe them as agents. Compute the count from the actual execution decision: 1 grounding-context role + 1 learnings role (skip in elsewhere-non-software) + an authorized web researcher + evidence roles (repo mode only, one per Phase 1.5 axis, max 5) + user-research distillers + the ideation fleet (5 roles default; 6 in surprise-me or `go deep`; 4 in issue-tracker mode) + 1 basis verifier. Add issue intelligence only when issue-tracker intent and external research authority are both present; add opt-in Slack roles when applicable. Phase 2 may add up to 2 recovery roles when axis coverage requires it.
+Surface one short cost line from actual execution decisions, never a memorized total. Name grounding roles from references/grounding.md, scouts from references/decomposition.md, software frames from references/divergent-ideation.md, and universal depth from references/universal-ideation.md. Count only a decision already resolved; otherwise name the leg as conditional.
 
-Authorized-dispatch examples below assume `external_research_authorization: authorized`, with no skips or additional opt-ins. When external research authority is missing, omit web research from the role set and subtract it from the displayed count; dispatch authority never substitutes for research authority.
+Include only authorized external research; skip phrases remove it even when tools or a cache exist. Include issue SCAN plus a conditional CLUSTER call, opt-in Slack, one distiller per large research artifact (small artifacts add no worker), and up to two conditional recovery roles. Cache reuse, eligible issue signal, actual axes, and universal depth may be unknown before Phase 1: do not pre-subtract them or substitute the default software fleet. Quick/Standard universal generation has no ideation workers. Include a second critic when go deep is active.
 
-- **Repo mode, specified subject:** "Will dispatch ~12 agents by default, most on cheap tiers: codebase scan + learnings + up to 5 evidence scouts (cheap) + 5 ideation (3 mid-tier, 2 top-tier) + 1 basis verifier (mid-tier). With external research authorization, add the web researcher. Skip phrases: 'no external research', 'no slack'."
-- **Repo mode, surprise-me:** "Will dispatch ~9 agents by default (surprise-me mode: deeper exploration per agent): codebase scan + learnings + 6 ideation (top-tier) + 1 basis verifier. With external research authorization, add the web researcher. Skip phrases: 'no external research', 'no slack'."
-- **Repo mode, issue-tracker intent:** "Will dispatch ~12 agents by default: codebase scan + learnings + issue intelligence only when separately authorized + up to 5 evidence scouts + 4 ideation + 1 basis verifier. With external research authorization, add the web researcher. Skip phrases: 'no external research', 'no slack'." If issue intelligence returns insufficient signal (see Phase 1), ideation falls back to the default 5-agent fleet.
-- **Elsewhere-software:** "Will dispatch ~8 agents by default: context synthesis + learnings + 5 ideation + 1 basis verifier. With external research authorization, add the web researcher. Skip phrases: 'no external research'."
-- **Elsewhere-non-software:** "Will dispatch ~7 agents by default: context synthesis + 5 ideation + 1 basis verifier. With external research authorization, add the web researcher. Skip phrases: 'no external research'."
-
-Inline fallback uses the same computed role count but says, for example: `Will run ~13 role lenses inline/serial (dispatch_authorization_missing); independent agent diversity and fresh-context verification are not available.`
+Authorized-dispatch examples name only derived legs, for example: codebase scan + learnings + conditional evidence scouts + the resolved ideation fleet + basis verification. When authorization or capability is missing, describe role lenses inline/serial with dispatch_authorization_missing, subagent_capability_missing, or worker_capability_unproven as applicable, not agents; no independent diversity or fresh-context claim. Dispatch authority never substitutes for external research authority.
 
 The line is informational; users do not need to acknowledge it.
-
-
-
-### Phase 1.5: Topic-Surface Decomposition
-
-Before dispatching frame agents in Phase 2, decompose the topic into 3-5 orthogonal **axes** that name *what aspects of the subject to think about*. Phase 2 frames determine *how to think* (the lens); axes determine *what to think on* (the surface). Without an explicit axis list, parallel frames tend to converge on whichever interpretation of the subject is most salient at first read — other parts of the surface go unexamined regardless of how many frames run. Lens diversity alone does not produce surface coverage.
-
-The axis analysis itself is a single orchestrator-side pass against the grounding summary already in context — no additional grounding read, no user-facing question. The evidence scouts below are the only dispatch in this phase.
-
-**Axis criteria:**
-
-- **3-5 axes.** Fewer than 3 means the topic is atomic — skip per the rule below. More than 5 fragments dispatch and produces thin coverage on each.
-- **Orthogonal.** A single idea should naturally fall on one axis, not span multiple. Merge axes that overlap heavily.
-- **Derived from grounding.** The grounding summary contains the substance the axes name; do not pick axes from a generic template (e.g., "discovery / engagement / retention" applied to every topic).
-- **At the same level.** Don't mix "the entire pricing page" with "the $9.99 tier copy" in the same list.
-- **Named in the topic's language.** "Send mechanics" beats "outbound flow optimization." Use words a reader of the topic would recognize, not meta-language about ideation.
-
-**Worked examples (illustrative, not a template — derive from actual grounding):**
-
-| Topic | Axes |
-|---|---|
-| Social sharing of crossfire and convergence pages | Send mechanics; discovery (receive side); arrival/dwell experience; compounding over time; actor types (first-party, expert, reader) |
-| Improve our authentication system | Sign-in flow; session management; account recovery; permissions; identity providers |
-| Dark mode for our app | Visual surfaces; toggle UX; system-preference detection; asset variants; edge cases (third-party content) |
-| Cache invalidation in the data layer | Trigger surfaces; coordination across replicas; staleness tolerance per data class; observability of invalidation events |
-
-**Skip condition.** Some subjects are atomic and resist meaningful decomposition — a single string output (a name, a tagline), a narrowly-scoped tactical fix ("the typo on line 47 of README"), or a topic where the candidate axes *are* the deliverable (e.g., "what surface should the API expose?"). When 3+ orthogonal axes that pass the criteria above cannot be generated, skip decomposition. Note `Decomposition skipped — atomic subject` in the grounding summary so the artifact records the choice.
-
-**Surprise-me skip.** In surprise-me mode there is no settled subject to decompose — different frames will surface different subjects in Phase 2, and the cross-cutting synthesis step there serves the analogous coverage role. Skip Phase 1.5 in surprise-me mode and note `Decomposition skipped — surprise-me mode` in the grounding summary.
-
-**Evidence scouts (repo mode, when axes exist).** Decomposition names what to look at; scouts gather what is actually there. The Phase 1 scan is an orientation gist — too thin for ideation agents to quote from — so dispatch one extraction-tier sub-agent per axis (max 5) in parallel. Pass each scout the absolute `<scratch-dir>` path from Phase 1 and a kebab-case slug for its axis, with this prompt:
-
-> Gather evidence about **{axis}** in this repo, scoped to {focus/subject}. Search first with the native file-search and content-search tools, then read targeted sections — budget ~20 reads, preferring ranges over whole files. Write an **evidence dossier** to `{scratch-dir}/evidence-{axis-slug}.md`: at most 150 lines of verbatim quotes and short code snippets, each with a `file:line` pointer, covering pain points, workarounds, TODO/FIXME markers, surprising patterns, and leverage points on this axis. Extraction only — quote what the repo says; do not interpret, theme, or propose ideas. If the axis has little footprint, write less rather than padding. Return only a gist: 3-5 lines summarizing what the dossier holds, plus its absolute path and entry count.
-
-Append the returned gists (with dossier paths) — not the dossier contents — to the consolidated grounding summary under `Evidence: <axis>`. The dossier files are the evidence layer Phase 2 agents read and cite from; keeping their bulk out of the orchestrator's context is the point of the file handoff, so do not read them into the main session. Skip scouts when decomposition was skipped (atomic subjects rarely need deep evidence — Phase 2 verification reads cover them), in surprise-me mode, and in elsewhere modes (no repo to scout; user-supplied context and web research are the grounding there).
-
-Append the axis list (or skip-reason) to the consolidated grounding summary under a section labeled `Topic axes`. Phase 2 reads this section to thread axes into sub-agent prompts; Phase 3 uses it for axis-spread scoring; the Phase 4 artifact includes it under Grounding Context (per `references/ideation-sections.md`).

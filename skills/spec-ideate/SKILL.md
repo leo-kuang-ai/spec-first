@@ -15,15 +15,17 @@ Note: Use the current date from the active host context. Use this when weighting
 - `spec-brainstorm` answers: "What exactly should one chosen idea mean?" and writes a requirements-only unified plan under `docs/plans/`.
 - `spec-plan` answers: "How should it be built?"
 
-This workflow produces a ranked ideation artifact — written to `docs/ideation/` when present, else a spec-first temp path (see Phase 4). It does **not** produce requirements, plans, or code.
+This workflow produces a ranked ideation artifact in `docs/ideation/` when repo-owned, otherwise inline or at a user-selected durable destination. It does **not** produce requirements, plans, or code.
+
+**Done means:** candidates were generated before critique, survivors have checked bases and rejection reasons, the complete deliverable is recoverable, and the next-step choice was handled. Never dispatch grounding while the subject is unidentified; use the subject gate or the user's explicit Surprise me choice first.
 
 ## Workflow Contract Summary
 
-- **输入：** 一个希望获得改进方向的主题、范围、约束或用户提供的 research artifact。
-- **输出：** 有证据基础、经过批判和排序的 ideation artifact，包含候选、拒绝理由、限制与推荐探索方向。
-- **硬出口：** 主题或目标 repo 无法确定、证据不足以支撑 basis、请求实际需要产品收敛/规划/实现时停止并路由 owning workflow。
-- **权威：** source 与研究证据约束 idea basis；LLM 负责生成、批判和排序；workflow 不产生 requirements、implementation、commit 或 landing 权限。
-- **消费者：** 用户、`spec-brainstorm`、产品/技术 owner 与后续 strategy 讨论。
+- **Input:** a subject, scope, constraint, or user-supplied research artifact.
+- **Output:** grounded, critiqued and ranked candidates, rejection reasons, limitations, and recommended directions.
+- **Exit gates:** resolve the subject and any required target repo before dispatch; withhold unsupported basis claims; route refinement, planning, or implementation to its owning workflow.
+- **Authority:** source and research evidence constrain bases; the LLM generates, critiques, and ranks. This workflow grants no implementation, commit, or landing authority.
+- **Consumers:** the user, `spec-brainstorm`, product/technical owners, and strategy discussions.
 
 ## Interaction Method
 
@@ -43,7 +45,7 @@ Interpret any provided argument as optional context. It may be:
 - a constraint such as `low-complexity quick wins`
 - a volume hint such as `top 3`, `100 ideas`, or `raise the bar`
 
-If no argument is provided, proceed with open-ended ideation.
+If no argument is provided, apply the subject gate in `references/scope-gates.md`; open-ended discovery requires the user's Surprise me choice.
 
 ## Core Principles
 
@@ -53,7 +55,7 @@ If no argument is provided, proceed with open-ended ideation.
 
 ## Dispatch Authorization Boundary
 
-在派发 grounding、research、evidence、ideation、basis-verification 或 recovery worker 前，记录：
+Before dispatching any grounding, research, evidence, ideation, basis-verification, or recovery worker, record:
 
 ```yaml
 worker_dispatch_authorization: authorized | missing
@@ -64,7 +66,7 @@ worker_model_override: supported | unsupported | unknown
 worker_bounded_parallelism: supported | unsupported | unknown
 ```
 
-`workflow invocation does not authorize dispatch`。Depth、mode、agent-count preview、用户请求外部/Slack/issue research、权限设置或 callable tool 都不构成派发授权。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发。缺授权时不得探测 tool schema，固定为 `capability_probe: not_applicable` + `worker_dispatch_capability: unknown`，inline 或 serial 执行相同 grounding/lens/rubric contracts 并记录 `dispatch_authorization_missing`。只有授权后才把 current-session registry/schema 作为 `provider_untrusted` evidence 检查：确认缺失时记录 `subagent_capability_missing`；surface 不可用、schema 不完整或候选不唯一时记录 `worker_capability_unproven`，均使用同一 fallback。隔离、模型覆盖和有界并发只取 live facts；required isolation 未满足时保持依赖 gate 打开，model unknown 时继承，parallelism unknown 时串行。记录 `worker_dispatch_outcome`。Fallback 必须保留 topic-axis 与 six-frame category coverage，但不得声称 agent diversity、independent basis verification、fresh-context 或 multi-agent coverage。
+`workflow invocation does not authorize dispatch`. Depth, mode, cost previews, external/Slack/issue research requests, permission settings, and callable tools do not grant dispatch authority. Dispatch only when the current user or visible upstream handoff explicitly requests subagents, delegated work, personas, or parallel work. Without authority, do not probe tool schemas: record `capability_probe: not_applicable`, `worker_dispatch_capability: unknown`, and `dispatch_authorization_missing`; execute the same grounding, lens, and rubric contracts inline or serially. After authorization, inspect the current-session registry/schema as `provider_untrusted` evidence. Confirmed absence records `subagent_capability_missing`; unavailable surfaces, incomplete schemas, or ambiguous candidates record `worker_capability_unproven`; both use the same fallback. Isolation, model overrides, and bounded parallelism require live facts. Unmet required isolation keeps the dependent gate open; unknown model override inherits, and unknown parallelism runs serially. Record `worker_dispatch_outcome`. Fallback preserves topic-axis and six-frame category coverage but must not claim agent diversity, independent basis verification, fresh-context, or multi-agent coverage.
 
 ## Model Tiers
 
@@ -80,13 +82,17 @@ Two overrides raise the whole ideation fleet to the ceiling tier: surprise-me mo
 
 ## Execution Flow
 
-Read `references/scope-gates.md` before resume, subject, mode, output, and decomposition gates. Read `references/output-mode.md` whenever output format is resolved. Read `references/grounding.md` before grounding. Read `references/divergent-ideation.md` before candidate generation, `references/post-ideation-workflow.md` before persistence and handoff, and `references/universal-ideation.md` for elsewhere-non-software mode.
+1. Read `references/output-mode.md` and `references/scope-gates.md` before Phase 0, even when scope and format are already clear. Resolve output/resume, subject, mode, substance, scaling, and the cost notice before grounding.
+2. Read `references/grounding.md` before Phase 1. Route named files as directive or evidence before either grounding batch; await the results and disclose failed or thin grounding.
+3. Read `references/decomposition.md` before deciding whether the subject is atomic. Only Surprise me may skip this read in advance, recording its skip reason. Otherwise run Phase 1.5 after grounding and before generation.
+4. Read `references/divergent-ideation.md` before software generation. For elsewhere-non-software, read `references/universal-ideation.md` instead and use its depth, frames, and critique.
+5. Read `references/post-ideation-workflow.md` after generation/merge and before critique, persistence, or handoff. It owns the checked deliverable and next-step handling; rendering references load only at write time.
 
 ### Required phase ownership
 
-- Scope, resume, subject identification, mode classification, output precedence, cost transparency, and topic decomposition are owned by `references/scope-gates.md`.
+- Subject, mode, substance, scaling, and cost transparency belong to `references/scope-gates.md`; output and resume to `references/output-mode.md`; topic axes and evidence scouts to `references/decomposition.md`.
 - Grounding, user research artifacts, issue intelligence, learnings, and external-research authorization are owned by `references/grounding.md` and its named references.
-- Candidate generation and critique remain bounded by `references/divergent-ideation.md`; output persistence and handoff remain owned by `references/post-ideation-workflow.md`.
+- Software generation belongs to `references/divergent-ideation.md`; critique, persistence, and handoff to `references/post-ideation-workflow.md`. Universal generation and domain-native critique use `references/universal-ideation.md` with the shared persistence contract.
 
 The workflow remains repo-grounded and current-source first. External research, issue-tracker access, and provider calls are opt-in. Missing dispatch authorization falls back to inline/serial role lenses and must not be described as independent agent coverage. This workflow does **not** produce requirements, plans, or code; do not skip to planning from ideation output.
 
@@ -96,4 +102,4 @@ Output config resolution uses the active (non-commented) `ideate_output:` key an
 
 Authorized-dispatch examples are advisory cost-shape examples; the owner records actual capability facts. Any handoff to `spec-write-skill` remains explicit and source-first. **Authorized-dispatch examples** and the inline fallback labels stay in the owning references.
 
-When dispatch is unavailable, run the same role lenses inline/serial and record `dispatch_authorization_missing`; do not claim independent agent diversity or fresh-context verification.
+When dispatch is unavailable, run the same role lenses inline/serial and retain the authorization or capability reason from the dispatch boundary; do not claim independent agent diversity or fresh-context verification.

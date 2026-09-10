@@ -572,7 +572,9 @@ describe('generic dispatch authorization matrix', () => {
     expect(dogfood).not.toContain('Fix Loop (Autonomous)');
     expect(dogfood).not.toMatch(/Auto-fix when/i);
     expect(ideate).toContain('Authorized-dispatch examples');
-    expect(ideate).toMatch(/role lenses inline\/serial.*dispatch_authorization_missing/is);
+    expect(ideate).toContain('role lenses inline/serial');
+    expect(ideate).toContain('dispatch_authorization_missing');
+    expect(ideate).toContain('retain the authorization or capability reason');
     const ideatePost = read('skills/spec-ideate/references/post-ideation-workflow.md');
     const ideateUniversal = read('skills/spec-ideate/references/universal-ideation.md');
     expect(ideatePost).toMatch(/dispatch.*only.*worker_dispatch_authorization.*worker_dispatch_capability/is);

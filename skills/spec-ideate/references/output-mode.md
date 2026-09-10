@@ -1,15 +1,14 @@
 # Ideate output mode
 
+Required read before Phase 0, including before any artifact resume or write.
+
 #### 0.0 Resolve Output Mode
 
 Determine `OUTPUT_FORMAT` for the ideation artifact this run might persist. Output mode is **exclusive** — the ideation doc is written as either HTML (`.html`) OR markdown (`.md`), never both. Precedence: in-prompt request > user-stated preference > config > default (`html`), with a hard pipeline-mode override.
 
 Unlike `spec-plan` and `spec-brainstorm` (which default to `md`), spec-ideate defaults to **`html`** — ideation artifacts are read mainly by humans weighing candidate directions, and a rich self-contained HTML file (with illustrative diagrams for the top candidates) makes the ideas easier to approach.
 
-**Read config.** The repo root is pre-resolved at skill load:
-!`git rev-parse --show-toplevel`
-
-If the line above is an absolute path, use it as `<repo-root>`. If it is empty, shows an error, or still shows a backtick command string (a harness that did not run the pre-resolution), resolve `<repo-root>` at runtime by running `git rev-parse --show-toplevel` with the shell tool. Then read `<repo-root>/.spec-first/config.local.yaml` with the native file-read tool. If the root cannot be resolved (not a git repo) or the file does not exist, fall through to the defaults below.
+**Read config.** Resolve `<repo-root>` at runtime with `git rev-parse --show-toplevel`, then read `<repo-root>/.spec-first/config.local.yaml`. If there is no git root or no file, use the defaults below. Do not depend on host pre-execution or load a second config hierarchy.
 
 Resolution steps:
 
@@ -26,3 +25,27 @@ Resolution steps:
 **Defer loading the format-rendering reference.** The deliverable is written at Phase 4 (after generation), so `references/ideation-sections.md` and the format-rendering references (`markdown-rendering.md` / `html-rendering.md`) are only needed then — loading them at Phase 0.0 would carry them through the entire grounding and ideation dispatch for no benefit. Resolve `OUTPUT_FORMAT` now, but load the section contract and the matching rendering reference at write time (see `references/post-ideation-workflow.md` §4.1).
 
 The `output:` preference does NOT auto-propagate to `spec-brainstorm` on handoff (Phase 5) — spec-brainstorm re-resolves its own `brainstorm_output` config independently. Asymmetric output (`ideation.html` + unified-plan markdown) is acceptable; users who want HTML for both set both keys in `.spec-first/config.local.yaml`.
+
+#### 0.1 Check for Recent Ideation Work
+
+When a git root exists, look in `<repo-root>/docs/ideation/` for ideation documents (`*.md` or `*.html`) created within the last 30 days.
+
+If no git root or ideation directory exists, skip the resume scan. Treat a prior ideation doc as relevant when:
+
+- the topic matches the requested focus
+- the path or subsystem overlaps the requested focus
+- the request is open-ended and there is an obvious recent open ideation doc
+- the issue-grounded status matches: do not offer to resume a non-issue ideation when the current argument indicates issue-tracker intent, or vice versa — treat these as distinct topics
+
+If a relevant doc exists, ask whether to:
+
+1. continue from it
+2. start fresh
+
+If continuing:
+
+- read the document
+- summarize what has already been explored
+- preserve the previous ideas and rejection summary
+- update the existing file instead of creating a duplicate
+- **write the update back in the existing file's format**, overriding the Phase 0.0 baseline: resuming a `.html` doc rewrites HTML, a `.md` doc rewrites markdown. Format precedence on resume is: explicit `output:` arg this run > resumed file's extension > config > default (`html`); a pipeline/`disable-model-invocation` run still forces `md` per Phase 0.0. An explicit `output:` arg that differs from the existing file switches the artifact's format (write the new-format file; leave the original in place).

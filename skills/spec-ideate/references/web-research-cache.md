@@ -18,11 +18,11 @@ Read this when checking the V15 cache before dispatching `web-researcher`, or wh
 ]
 ```
 
-Files live under `<scratch-dir>/web-research-cache.json`, where `<scratch-dir>` is the owner-only run-local directory resolved once in SKILL.md Phase 1. It is never reused by another invocation.
+Files live under `<scratch-dir>/web-research-cache.json`, where `<scratch-dir>` is the owner-only run-local directory resolved once in `references/grounding.md` Phase 1. It is never reused by another invocation.
 
 ## Reuse check
 
-Before dispatching `web-researcher`, resolve the scratch root (the parent of `<scratch-dir>`) in bash and list sibling run-id directories — refinement loops within a session may legitimately reuse another run's cache by topic, not run-id:
+Before authorized web research, inspect only this run's private scratch directory. Refinements in this invocation may reuse matching entries; never inspect sibling run directories or another invocation's cache:
 
 ```bash
 SCRATCH_ROOT="<private-scratch-dir-for-this-run>"
@@ -37,13 +37,13 @@ On `re-research` override, delete the matching entry and dispatch fresh.
 
 ## Append after fresh dispatch
 
-After a fresh dispatch, append the new result to the current run's cache file at `<scratch-dir>/web-research-cache.json` using the absolute path from Phase 1 (create directory and file if needed). The next invocation in the session can reuse it via the `find` listing above.
+After a fresh dispatch, append the new result to the current run's cache file at `<scratch-dir>/web-research-cache.json` using the absolute path from Phase 1 (create directory and file if needed). A refinement in this same invocation can reuse it; subsequent invocations cannot.
 
 ## Topic surface hash
 
 The topic surface is the user-supplied content the web research is grounded on:
 - **Elsewhere modes (`elsewhere-software`, `elsewhere-non-software`):** the user's topic prompt plus any Phase 0.4 intake answers (the actual subject the agent is researching). The two sub-modes are keyed separately — a reclassification between software and non-software for the same topic hash must force a fresh dispatch, since the research domain differs.
-- **Repo mode:** the focus hint plus a stable repo discriminator. This keeps the cache key meaningful when focus is empty — two bare-prompt invocations in the same repo legitimately share research, but the key still differentiates repos. Since cache files from every repo's runs now live under the shared OS-temp root, a bare basename like `app` or `frontend` would collide across unrelated repos. Resolve the discriminator with this fallback chain and hash the result (first 8 hex chars of sha256 is sufficient):
+- **Repo mode:** the focus hint plus a stable repo discriminator. This keeps the cache key meaningful when focus is empty — refinements in this run may share research, but the key still differentiates repos. A bare basename like `app` or `frontend` is not a reliable source identity. Resolve the discriminator with this fallback chain and hash the result (first 8 hex chars of sha256 is sufficient):
     1. `git remote get-url origin` — stable across machines, correct for collaborators on the same remote.
     2. `git rev-parse --show-toplevel` — absolute repo path; machine-local but always available in a git checkout.
     3. The current working directory's absolute path — last resort when not in a git repo.
@@ -52,4 +52,4 @@ Normalize before hashing: lowercase, collapse whitespace. (The repo discriminato
 
 ## Degradation
 
-If the cache file is unreachable across invocations on the current platform (filesystem isolation, sandboxing, ephemeral working directory), degrade to "no reuse, dispatch every time." Surface the limitation in the consolidated grounding summary and proceed without reuse rather than inventing a capability the platform may not have.
+If this run's cache is unreadable, degrade to no reuse and perform only authorized research. Surface the limitation in the consolidated grounding summary and proceed without reuse rather than inventing a capability the platform may not have.

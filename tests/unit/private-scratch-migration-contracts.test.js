@@ -9,7 +9,7 @@ const deletedOwners = [
   'spec-ideate', 'spec-optimize', 'spec-plan', 'spec-pov',
 ];
 const durable = [
-  'skills/spec-ideate/SKILL.md',
+  'skills/spec-ideate/references/grounding.md',
   'skills/spec-ideate/references/post-ideation-workflow.md',
   'skills/spec-ideate/references/universal-ideation.md',
   'skills/spec-ideate/references/web-research-cache.md',

@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(ideate): 融合 CE 7db168ba 的阶段引用，归一输出与恢复 owner，补齐 tactical 预算、真实成本计数、研究分流及 issue 扫描/聚类顺序，保留独立授权与 run-local 证据边界。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(pulse): 融合 CE 3fa7a5fd 的配置与运行引用，修正旧指针、控制关键词解析及每次报告的调度收尾，保留来源 receipt、provider-side 隐私最小化与只读数据库边界。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(dogfood): 融合 CE 248f7eb8 的阶段引用约束，补齐实际 PR base、persona 来源、写前检查点和红色 suite 的 not-ready 收尾，修正迁移后的测试读取位置。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE fd86e364 的 setup 引用迁移；验证现有 project-config 必读、显式动作与配置保护，排除 CE 专属团队配置和重复入口。 (user-visible)
