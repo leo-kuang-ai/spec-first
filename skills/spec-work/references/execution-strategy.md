@@ -112,11 +112,19 @@ Map real dependencies and contention before a batch:
 
 - same-file edits, shared types/APIs, migrations, generated clients, lockfiles, snapshots, shared config/schema, and an environment singleton such as one dev server/port, database, browser session, package install, or rate-limited provider are contention;
 - without dispatch authorization or capability, run inline;
-- with authorization and capability but shared-directory/unknown isolation, same-file or otherwise contending tasks run serially; disjoint write sets may use bounded parallel only when workers do not stage, commit, or run shared/full-suite commands;
+- with authorization and capability but shared-directory/unknown isolation, same-file or otherwise contending tasks run serially; disjoint write sets may use bounded parallel only as a shared-workspace wave that meets the wave contract below — workspace isolation is escalation for units that cannot meet it, not an entry fee every concurrent worker must pay;
 - with proven isolation, parallel dispatch of each dependency layer's independent units is the default, not an optimization to opt into: serialize only the units the dependency graph or a surviving contention actually chains. Resolve contention uncertainty by inspection — read the actual files and contracts in question — not by defaulting to serial. When contention survives inspection, decline parallelism for exactly the contending units and dispatch the rest of the layer in parallel; uncertainty about one unit never serializes its whole layer, and safety still beats speed for the units that genuinely contend;
 - abort parallelism after broad unplanned edits, an out-of-scope delta, repeated conflicts, or shared-environment interference.
 
-Price the cold-start tax before decomposing: every dispatched worker pays a context ramp-up before its first write. A unit too small to outweigh its own ramp-up belongs batched with related small units into one worker's packet — or done inline — rather than dispatched alone; per-unit ceremony is overhead, not rigor.
+Price the cold-start tax before decomposing: every dispatched worker pays a context ramp-up before its first write. A unit too small to outweigh its own ramp-up belongs batched with related small units into one worker's packet — or done inline — rather than dispatched alone.
+
+**Shared-workspace wave contract** — a parallel wave in a shared working directory is permitted only while all of these hold; a unit that cannot meet one serializes or gets isolation:
+
+- **Clean committed baseline.** Dispatch the wave from a committed tree, so each worker's output is attributable and revertible by its file set and an aborted wave restores to the baseline.
+- **Exclusive ownership, including hidden write surfaces.** Beyond the disjoint declared files the dependency/contention mapping already verified, every hidden write surface — lockfiles, generated artifacts, snapshots, formatter sweeps, package manifests — is either excluded from all workers or assigned to exactly one.
+- **No worker Git operations.** Workers must not `git add`, commit, or otherwise write the index — concurrent index writes corrupt the shared index. The orchestrator stages and commits after the batch.
+- **Orchestrator-owned verification.** Workers run no mutating verification (full suites, installs, builds that write shared state); a worker may run a single focused unit test only if it touches no shared state. The authoritative run happens after the wave on the integrated tree.
+- **Abort on unowned writes.** A write outside every worker's exclusive set aborts the wave and disables further shared-workspace waves for the run. Restore to the baseline only changes attributable to a worker; a change no worker accounts for may be the user's — preserve it and stop for reconciliation rather than discarding it.
 
 Dispatch a wave in one response. When a dependency layer clears its dependency/contention mapping, list every dispatch-ready unit, then issue every worker dispatch that does not depend on another's result in that single response, never one per turn. Apply the same batching to independent read-only calls throughout the run: file reads, pattern searches, and test discovery that do not depend on one another go out together. Only the write-and-verify steps are inherently sequential.
 

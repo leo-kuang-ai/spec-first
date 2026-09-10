@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(work): 补齐 CE bc26f23a 的共享工作区 wave contract 五条件与隔离升级定位。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(debug): 补齐 CE fbfcd1d5 的 learning 捕获改为完成检查点触发与 commit 可达 deadline。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(commit-push-pr): 补齐 CE a79582c3 的机制形伞判据、示例对与 Step H 首查项。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(review): 补齐 CE 78fd3dab 的 persona 经典框架锚定——Google merge bar、Ousterhout/Fowler 具名、Nygard 稳定词汇与 OWASP/CWE 标识。 (user-visible)
