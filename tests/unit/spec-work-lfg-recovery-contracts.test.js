@@ -54,4 +54,17 @@ describe('spec-work and LFG recovery contracts', () => {
     expect(landing).toContain('This handoff lets the pipeline owner');
     expect(landing).toContain('it grants no new authority');
   });
+
+  test('keeps debug local outcomes distinct from caller commit and push evidence', () => {
+    const debug = read('skills/spec-debug/references/pipeline-return.md');
+    expect(debug).toContain('Emit `fixed-not-pushed`');
+    expect(debug).toContain('Keep `fixed` as a legacy input alias');
+    expect(debug).toContain('do not invent a fix commit SHA');
+    expect(debug).toContain('Failed or not-run required verification cannot return `fixed-not-pushed` or `fixed`');
+    expect(watch).toContain('Debug `fixed-not-pushed` (or legacy `fixed`)');
+    expect(watch).toContain('do not mark remote checks green');
+    expect(watch).toMatch(/push is unavailable or rejected, preserve the\s+local commit/);
+    expect(watch).toContain('record its actual SHA and failure reason');
+    expect(watch).toMatch(/Do not rerun debug\s+to recreate that same fix/);
+  });
 });
