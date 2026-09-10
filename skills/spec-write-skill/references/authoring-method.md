@@ -67,6 +67,8 @@ Frontmatter `description` 必须同时表达：
 
 避免尖括号占位符、同义词堆叠和只在正文出现的触发规则。先用 positive、negative、near-neighbor 样例检查 route，再扩展 package。
 
+Mechanism-led ordering (from the CE authoring pass): sentence 1 names the distinctive mechanism — what a sibling skill would not produce — front-loading the word that should fire it in prompts; a category opener without the mechanism fails. Write each "Use when…" trigger as an observable work-state, not a phrasing. Prefer routing a sibling's job as "Use <sibling> for <that job>", and keep "Not for" only when the same words would fire both skills. Never stuff quoted utterances or `/name` aliases into a model-invoked description — they belong only on a user-invoked or `disable-model-invocation` skill, after the mechanism.
+
 ### Branch-First Information Hierarchy
 
 先列只有在输入、步骤、输出或验证不同才成立的 branch，再放置资源：
