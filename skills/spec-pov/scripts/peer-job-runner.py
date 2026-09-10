@@ -1938,9 +1938,15 @@ def cmd_result(args) -> int:
         except Unreadable as exc:
             sys.stderr.write(f"peer-job-runner: unreadable: {exc}\n")
             return 4
-        except OSError as exc:
-            sys.stderr.write(f"peer-job-runner: file missing or unreadable: {exc}\n")
+        except FileNotFoundError:
+            # An absent --path artifact is an outcome, not a read error: a peer
+            # whose gate is not met writes nothing, so "settled with no artifact"
+            # stays on its own documented code (3) with outcome wording.
+            sys.stderr.write(f"peer-job-runner: no artifact at {args.path}\n")
             return 3
+        except OSError as exc:
+            sys.stderr.write(f"peer-job-runner: unreadable: {exc}\n")
+            return 4
         _emit_bytes(data)
         return 0
     job_dir = resolve_job_dir(args.job, args.skill)
