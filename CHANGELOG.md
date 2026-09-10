@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 956087b3 的 LFG plan-brief、stage-routing、work-return 与 shipping-tail 引用迁移，确认当前 spec-lfg owner 已完整承载。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE ff4d21b8 的 brainstorm 阶段 references 与输出/对话/方案路由，确认当前 spec-brainstorm 已具备等价 owner。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 312943d4 的 plan pin provenance，确认当前 spec-plan 已保留 source-bound 读取与 output-mode 约束。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 3568cd94 的 plan 阶段 references 与 required-read 顺序，确认当前 spec-plan owner 已完整承载；保留既有 consumer replay 失败基线。 (user-visible)
