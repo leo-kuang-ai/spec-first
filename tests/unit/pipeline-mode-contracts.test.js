@@ -19,17 +19,19 @@ describe('pipeline mode contracts', () => {
   test('spec-commit-push-pr produces the New concepts trailer consumed by spec-lfg', () => {
     const skill = read('skills/spec-commit-push-pr/SKILL.md');
     const writingReference = read('skills/spec-commit-push-pr/references/pr-description-writing.md');
+    const compose = read('skills/spec-commit-push-pr/references/compose.md');
+    const apply = read('skills/spec-commit-push-pr/references/apply-and-handoff.md');
     const lfg = read('skills/spec-lfg/references/shipping-tail.md');
 
     expect(lfg).toContain('If it prints a `New concepts:` trailer after the PR URL');
     expect(lfg).toContain('run spec-explain <name> to go deeper');
     expect(skill).toContain('pr_teaching_section:');
-    expect(skill).toContain('<repo-root>/.spec-first/config.local.yaml');
+    expect(compose).toContain('<repo-root>/.spec-first/config.local.yaml');
     expect(skill).toContain('pr_teaching_archive:');
-    expect(skill).toContain('archive_authorization: authorized');
-    expect(skill).toContain('config, teaching-section eligibility, commit authority, and landing authority do not');
-    expect(skill).toContain('show the exact repo-relative');
-    expect(skill).toContain('docs/explainers/YYYY-MM-DD-<concept-slug>.md');
+    expect(compose).toContain('archive_authorization: authorized');
+    expect(compose).toContain('config, teaching-section eligibility, commit authority, and landing authority do not');
+    expect(apply).toMatch(/show the exact\s+repo-relative/);
+    expect(apply).toContain('docs/explainers/YYYY-MM-DD-<concept-slug>.md');
     expect(skill).toContain('New concepts: <name>[, <name>]');
     expect(skill).toContain('Run spec-explain <name> to go deeper.');
     expect(writingReference).toContain('## Step B2: Judge new concepts');

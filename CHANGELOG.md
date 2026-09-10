@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-10 codex: fix(pr): 融合 CE 393c91fb，将 landing 细节归入 required-read 引用，统一 PR 身份与未知状态、提交隔离、归档权限及 body read-back；保留本地 standalone 和 LFG watch 边界。 (user-visible)
 - v1.15.3 2026-09-10 codex: docs(sync): 核对 CE 316692bd 的 retune 引用迁移，按产品排除保留入口边界，并验证现有 optimize 测量、审计及失败归因约束。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(debug): 融合 CE dc0a0942，统一已验证本地修复的返回与 LFG 消费语义，区分工作树、提交和推送证据，保留推送失败的真实提交及未解决状态。 (user-visible)
 - v1.15.3 2026-09-10 codex: fix(sweep): 融合 CE 4235cba4，将阶段细节迁入 run 引用，补齐状态失败停止外写、媒体失败降级、游标缺口与安全 fix-ref 传参；保留既有独立授权及状态所有权。 (user-visible)

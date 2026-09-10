@@ -88,8 +88,10 @@ describe('CE upstream skill sync contracts', () => {
     expect(writing).toContain("name the change's **material claims**");
     expect(writing).toContain('Classify files by runtime purpose, not extension.');
     expect(writing).toContain('audit the body against the material claims from Step D');
-    expect(skill).toContain('Classify by runtime purpose, not extension');
-    expect(skill).toContain('ranking/scoring logic, deployment/config behavior');
+    expect(skill).toContain('`references/compose.md`');
+    const compose = read('skills/spec-commit-push-pr/references/compose.md');
+    expect(compose).toContain('Classify by runtime purpose, not extension');
+    expect(compose).toContain('ranking/scoring logic, deployment/config behavior');
   });
 
   test('replaces generic reviewer exhortations with checkable output criteria', () => {

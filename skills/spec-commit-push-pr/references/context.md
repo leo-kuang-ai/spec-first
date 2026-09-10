@@ -27,6 +27,36 @@ remote, and PR immediately before push and immediately before `gh pr create`
 or `gh pr edit`. An unresolved PR state blocks PR mutation rather than being
 treated as "no PR".
 
+For a non-empty result, match both `headRepositoryOwner` and `headRefName`
+against the actual push destination. Do not take index 0: different forks may
+use the same branch name. Keep the matching URL and body for composition and
+application; unresolved ownership or multiple matches blocks mutation.
+
+## Branch Routing
+
+Resolve the remote default through `origin/HEAD`, then
+`gh repo view --json defaultBranchRef` against the intended repository. If
+neither resolves it, stop with an unresolved base; do not assume `main`.
+
+- Detached HEAD: within an authorized full-workflow branch scope, derive and
+  validate a non-conflicting name with `git check-ref-format --branch`, create
+  a feature branch from the current HEAD, and re-read its name. Otherwise
+  return the missing branch authorization. Never issue a PR query with an
+  empty head filter.
+- Default branch with scoped work: use `references/branch-creation.md` before
+  creating the feature branch. Its freshness and commit-ownership decisions
+  still apply. Do not repeat an already authorized branch-intent question.
+- Default branch with no scoped work: report no feature-branch work and stop.
+- Feature branch: continue. For a clean scoped tree, inspect its upstream and
+  `git log <upstream>..HEAD --oneline` before deciding whether push is needed.
+  A failed probe is unknown, not evidence of no unpushed work. No upstream
+  requires an authorized push; an already pushed branch may still need a PR
+  or an existing-PR handoff.
+
+Unborn repositories have no HEAD: a failed `git diff HEAD` alone cannot prove
+this state. Confirm it from Git facts and inspect staged, unstaged, and
+untracked paths directly before any authorized initial commit.
+
 ## Conventions
 
 Match repository instructions and recent history. For Conventional Commits,
