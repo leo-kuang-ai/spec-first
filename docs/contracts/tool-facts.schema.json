@@ -278,7 +278,10 @@
       "additionalProperties": false,
       "properties": {
         "schema_version": {
-          "const": "setup-source-snapshot.v1"
+          "enum": [
+            "setup-source-snapshot.v1",
+            "setup-source-snapshot.v2"
+          ]
         },
         "registry_sha256": {
           "type": [
@@ -336,6 +339,20 @@
           "items": {
             "type": "string"
           }
+        },
+        "source_kind": {
+          "enum": [
+            "git",
+            "folder",
+            "unknown"
+          ]
+        },
+        "source_content_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-f0-9]{64}$"
         }
       }
     },

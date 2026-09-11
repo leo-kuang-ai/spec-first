@@ -271,18 +271,21 @@ function inferReasonCode({ sourceReasonCode, dependencyStatus, configuredStatus,
 
 function compareSourceSnapshot(freshness, recorded, current) {
   if (!current || freshness.status !== 'fresh') return freshness;
-  if (current.schema_version !== 'setup-source-snapshot.v1') {
+  if (current.schema_version !== 'setup-source-snapshot.v2' || recorded?.schema_version !== 'setup-source-snapshot.v2') {
     return { ...freshness, status: 'unknown', reason_code: 'setup-facts-source-snapshot-unsupported' };
   }
-  const keys = ['schema_version', 'registry_sha256', 'host', 'platform', 'repo_root', 'source_head', 'host_config_sha256'];
+  const keys = ['schema_version', 'registry_sha256', 'host', 'platform', 'repo_root', 'source_kind', 'source_content_sha256', 'host_config_sha256'];
+  if (current.source_kind === 'git' || recorded?.source_kind === 'git') keys.push('source_head');
   if (keys.some((key) => typeof current[key] === 'string' && current[key]
     && recorded && typeof recorded[key] === 'string' && recorded[key] && recorded[key] !== current[key])) {
     return { ...freshness, status: 'stale', reason_code: 'setup-facts-source-snapshot-mismatch' };
   }
   if (keys.some((key) => typeof current[key] !== 'string' || !current[key]
     || !recorded || typeof recorded[key] !== 'string' || !recorded[key])
-    || ['registry_sha256', 'host_config_sha256'].some((key) => !/^[a-f0-9]{64}$/.test(current[key]) || !/^[a-f0-9]{64}$/.test(recorded[key]))
-    || !/^[a-f0-9]{40,64}$/.test(current.source_head) || !/^[a-f0-9]{40,64}$/.test(recorded.source_head)
+    || ['registry_sha256', 'host_config_sha256', 'source_content_sha256'].some((key) => !/^[a-f0-9]{64}$/.test(current[key]) || !/^[a-f0-9]{64}$/.test(recorded[key]))
+    || !['git', 'folder'].includes(current.source_kind)
+    || (current.source_kind === 'git' && (!/^[a-f0-9]{40,64}$/.test(current.source_head) || !/^[a-f0-9]{40,64}$/.test(recorded.source_head)))
+    || (current.source_kind === 'folder' && (current.source_head !== null || recorded.source_head !== null))
     || (Array.isArray(current.limitations) && current.limitations.length > 0)
     || (recorded && Array.isArray(recorded.limitations) && recorded.limitations.length > 0)) {
     return { ...freshness, status: 'unknown', reason_code: 'setup-facts-source-snapshot-incomplete' };
@@ -297,6 +300,8 @@ function normalizeSourceSnapshot(value) {
     schema_version: normalizeNullableString(source.schema_version),
     repo_root: normalizeNullableString(source.repo_root),
     source_head: normalizeNullableString(source.source_head),
+    source_kind: normalizeNullableString(source.source_kind),
+    source_content_sha256: normalizeNullableString(source.source_content_sha256),
     limitations: normalizeStringList(source.limitations),
     registry_sha256: typeof source.registry_sha256 === 'string' ? source.registry_sha256 : null,
     host: typeof source.host === 'string' ? source.host : null,

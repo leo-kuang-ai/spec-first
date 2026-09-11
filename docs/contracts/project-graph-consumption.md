@@ -136,11 +136,15 @@ When a project-graph provider is available through Graphify, query with domain t
 
 ### Setup facts 来源快照（增量合同）
 
-`tool-facts.v2.source_snapshot` 可携带 `setup-source-snapshot.v1`。旧 facts 保持可读；旧字段缺失或采集失败时，doctor 的当前身份校验返回 unknown/warn。当前 producer 与 doctor 共享 `source-snapshot.cjs`，从各自受信 source root 的 registry 原始字节生成 SHA-256，并绑定 target 绝对路径、Git HEAD、host、platform，以及 registry 指定的 host config/precedence guard 文件摘要。这里不哈希按需求改写的 effective registry，避免同一个 source 因调用 scope 不同而误判漂移。发布时还对照本次加载的 canonical source registry；执行期间变化记录 `registry-changed-during-setup`，旧 probe 不得借新快照获得 freshness。
+`tool-facts.v2.source_snapshot` 当前携带 `setup-source-snapshot.v2`。旧 facts 保持可读；旧字段缺失或采集失败时，doctor 的当前身份校验返回 unknown/warn。当前 producer 与 doctor 共享 `source-snapshot.cjs`，从各自受信 source root 的 registry 原始字节生成 SHA-256，并绑定 target 绝对路径、Git HEAD（folder 无 HEAD）、当前 source 内容摘要、host、platform，以及 registry 指定的 host config/precedence guard 文件摘要。这里不哈希按需求改写的 effective registry，避免同一个 source 因调用 scope 不同而误判漂移。发布时还对照本次加载的 canonical source registry；执行期间变化记录 `registry-changed-during-setup`，旧 probe 不得借新快照获得 freshness。
 
-- 当前 registry、HEAD、target、host/platform 或宿主配置发生可确认变化：`setup-facts-source-snapshot-mismatch` / stale，不等 TTL 到期。
-- 任一关键身份缺失、配置路径不安全/不可读取、无 Git HEAD：`setup-facts-source-snapshot-incomplete` / unknown。已知变化优先于其他维度缺失；TTL 过期仍为 stale。
+- 当前 registry、HEAD、source 内容/类型、target、host/platform 或宿主配置发生可确认变化：`setup-facts-source-snapshot-mismatch` / stale，不等 TTL 到期。
+- 任一关键身份缺失、配置或 source 路径不安全/不可读取、Git target 无 HEAD、内容采集超出预算：`setup-facts-source-snapshot-incomplete` / unknown。已知变化优先于其他维度缺失；TTL 过期仍为 stale。
 - 快照只记录摘要，不保存配置内容。当前路径从受信 registry 推导，不能按历史 facts 的任意路径读取文件；只读解析不产生宿主写授权。
-- 此快照尚未覆盖未提交 source diff、实际 Provider version 与图 receipt currentness；这些仍由 Provider scope/receipt 检查承担，U8 的统一联调尚未完成。doctor pass 只表示其已检查的决策输入，没有授权 graph query 或证明图的语义正确性。
+- 此快照尚未覆盖实际 Provider version 与图 receipt currentness；这些仍由 Provider scope/receipt 检查承担，U8 的统一联调尚未完成。doctor pass 只表示其已检查的决策输入，没有授权 graph query 或证明图的语义正确性。
+
+v2 的 `source_kind` 为 `git`、`folder` 或 `unknown`；`source_content_sha256` 绑定相对路径、文件 mode 与实际字节摘要。Git 范围是当前 target 内的 tracked 和非 ignored untracked 文件，并精确纳入即使被 ignore 的 `.spec-first/config.local.yaml`；删除或缺失文件也参与摘要；嵌套 target 不读取 sibling。非 Git folder 递归采集 target 内文件，排除依赖目录 `node_modules`、`.venv`、`venv`、`__pycache__`，不把未解析的 `.gitignore` 当作已应用。两者均排除 `source-snapshot.cjs` 中明确列出的 generated roots：setup facts/runtime-capabilities、setup scenario fingerprint、cache/audits/governance、图产物与 host skill/spec-first mirror；用户 local config 仍参与摘要。该范围不证明 ignored source、外部依赖或 generated runtime 当前性。
+
+读取限制为最多 20,000 个文件、单文件 32 MiB、合计 256 MiB、内容阶段约 3 秒（同步文件操作和 Git 命令超时可能使实际耗时略超预算）。symlink、hardlink、特殊文件、submodule 目录、无法读取、扫描期间变化或超限都产生 null 摘要与 `source-content-snapshot-unavailable`，consumer 不能把部分扫描提升为 fresh。采集前后核对目录清单与文件 metadata，但不宣称持有文件系统全局锁。v1 仍可解析；与 v2 当前快照比较时返回 unknown，不静默补齐旧证据。非 Git folder 在其声明的 bounded 范围内可以比较内容；检测到 `.git` 而无法获取 HEAD 时仍为 unknown。
 
 `normalizeSetupFacts` 是纯转换入口；仅有时间戳的 freshness 不等于当前磁盘身份已核对。`computeDecisionInputHealth` 在选定 host 后采集当前快照并比较；其他 consumer 需要当前身份结论时应使用该入口，不能把旧投影的时间 freshness 升为现场执行通过。

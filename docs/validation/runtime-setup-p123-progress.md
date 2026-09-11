@@ -121,3 +121,15 @@
 - 当前共享工作区回归：40 suites / 699 tests 全通过；包含上述离线集成最终版本。typecheck 261 files、skill entrypoint lint 490 files 通过；npm pack --dry-run 成功。共享工作区结果包含并发改动，不能等同仅本提交的隔离全量回归。
 - 验证边界：实际运行环境为 macOS/npm 11.16.0；未执行 native Windows 验证、真实 MCP session 或用户宿主初始化。integrity_status 只证明顶层归档，不能外推为传递依赖锁定或既有用户 npx cache 可信。
 - 本次提交范围为 npm warmup/cache、preview/facts/schema、对应文档与测试；保留并发 ZCode/registry 等改动。U7 其他 Provider 身份、U8 receipt/source freshness 联调及 U9-U12 最终闭环仍未完成；本次提交不代表完整 P123 交付。
+
+
+## U8 source 内容 freshness 闭环
+
+- `setup-source-snapshot.v2` 增加 source_kind/source_content_sha256；producer 与 doctor 使用同一受限采集 owner。Git tracked/untracked 当前内容变化、删除和新增文件会失效；非 Git folder 在明确范围内比较摘要。嵌套 target 不扫描 sibling，v1 可读但不能冒充已核对工作区内容。
+- 采集限制 20,000 文件、单文件 32 MiB、合计 256 MiB、约 3 秒；失败、symlink/hardlink/特殊文件、submodule 或扫描变化输出 null/unknown。读取使用 no-follow fd、固定大小 buffer、前后 metadata 与目录枚举校验，不宣称全局原子性。Git fsmonitor 被禁用；Git 不可用与无 Git folder 分别处理。
+- 首轮 5 个反例全部复现：tracked/untracked 修改仍 pass、local config 改变未失效、folder 无法建立内容身份、symlink 未限制 freshness。修复后 21 tests 通过，边界扩展后 25 tests 通过。
+- 独立 fresh-source 审查发现 scenario fingerprint 发布自失效、canonical ignored local config 漏出范围两项问题。新增三个反例先红，再精确排除 setup scenario 输出并显式纳入 `.spec-first/config.local.yaml`；28 tests 通过。同一 reviewer 唯一定点复核通过；只读审查没有冒充独立执行测试。
+- 完整 `runVerificationOrMutation` 发布链在临时 Git/folder 连续两次真实写入 facts、scenario fingerprint 和 host ledger，再经 doctor 检查；只隔离外部工具 probe，不 mock publisher。当前仓库内容采集约 892 ms，source digest 成功；宿主 config symlink 限制另行保留，未宣称真实 runtime ready。
+- 扩大检查 45 suites / 746 tests 通过（审查修复前）；最终审查修复后 consumer-health/entrypoint/facts-renderer 三 suites / 136 tests 全通过。typecheck 261 files、skill entrypoint lint 490 files 与 diff whitespace 检查通过。
+- bounded 简化检查采用 inline reuse/quality/efficiency 三视角；复用已有 path-safety，保留预算和重复枚举校验，不为减少行数移除保护。没有执行三个独立简化 reviewer。
+- 未覆盖 ignored 外部 source、依赖目录、generated runtime currentness、Provider 当前身份与 artifact receipt；后两项仍是 U8 后续工作。未执行真实宿主 init、graph query/refresh、native Windows 或全 P123 最终收口。

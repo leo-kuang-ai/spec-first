@@ -21,7 +21,7 @@ describe('setup facts 的真实消费出口', () => {
 });
 
 describe('setup snapshot 与当前身份比较', () => {
-  const snapshot = { schema_version: 'setup-source-snapshot.v1', registry_sha256: 'a'.repeat(64), host_config_sha256: 'b'.repeat(64), source_head: 'c'.repeat(40), repo_root: '/fixture', host: 'codex', platform: 'macos' };
+  const snapshot = { schema_version: 'setup-source-snapshot.v2', source_kind: 'git', source_content_sha256: 'd'.repeat(64), registry_sha256: 'a'.repeat(64), host_config_sha256: 'b'.repeat(64), source_head: 'c'.repeat(40), repo_root: '/fixture', host: 'codex', platform: 'macos' };
   const facts = { schema_version: 'tool-facts.v2', generated_at: '2026-09-11T00:00:00Z', items: [], source_snapshot: snapshot };
   const options = { now: new Date('2026-09-11T01:00:00Z'), currentSourceSnapshot: snapshot };
   test('当前身份一致保留 TTL freshness', () => {
@@ -62,15 +62,125 @@ describe('producer 到 doctor 的磁盘快照闭环', () => {
   afterEach(() => fs.rmSync(root, { recursive: true, force: true }));
   function produce() {
     const { toolFacts } = collectSetupFacts({ repoRoot: root, skillRoot, homeDir: root, env: {}, host: 'codex', now, registry: { tools: [], helpers: [] } });
-    const factsPath = path.join(root, 'facts.json');
+    const factsPath = path.join(root, '.spec-first', 'config', 'tool-facts.json');
+    fs.mkdirSync(path.dirname(factsPath), { recursive: true });
     fs.writeFileSync(factsPath, JSON.stringify(toolFacts));
     return factsPath;
   }
-  function health(factsPath) {
-    return computeDecisionInputHealth({ projectRoot: root, skillRoot, homeDir: root, env: {}, factsPath, platforms: ['codex'], now });
+  function health(factsPath, currentTime = now) {
+    return computeDecisionInputHealth({ projectRoot: root, skillRoot, homeDir: root, env: {}, factsPath, platforms: ['codex'], now: currentTime });
   }
   test('同一磁盘源的 producer 与 doctor 使用一致哈希', () => {
     expect(health(produce()).status).toBe('pass');
+  });
+  test.each(['tracked', 'untracked'])('%s 文件内容变化使 facts 立即失效', (kind) => {
+    const filename = path.join(root, 'source.js');
+    fs.writeFileSync(filename, 'module.exports = 1;');
+    if (kind === 'tracked') {
+      git('add', 'source.js');
+      git('-c', 'user.name=Setup Test', '-c', 'user.email=setup@example.test', 'commit', '-qm', 'source');
+    }
+    const factsPath = produce();
+    expect(health(factsPath).status).toBe('pass');
+    fs.writeFileSync(filename, 'module.exports = 2;');
+    expect(health(factsPath).status).toBe('stale');
+  });
+  test('facts 发布及 cache 更新不自失效，local config 变化仍失效', () => {
+    const factsPath = produce();
+    fs.mkdirSync(path.join(root, '.spec-first', 'cache'), { recursive: true });
+    fs.writeFileSync(path.join(root, '.spec-first', 'cache', 'receipt.json'), '{}');
+    fs.writeFileSync(path.join(root, '.spec-first', 'config', 'runtime-capabilities.json'), '{}');
+    expect(health(factsPath).status).toBe('pass');
+    fs.writeFileSync(path.join(root, '.spec-first', 'config.yaml'), 'setting: true');
+    expect(health(factsPath).status).toBe('stale');
+  });
+  test('非 Git folder 依据 bounded source 内容判断 freshness', () => {
+    fs.rmSync(path.join(root, '.git'), { recursive: true, force: true });
+    fs.writeFileSync(path.join(root, 'source.js'), 'first');
+    const factsPath = produce();
+    expect(health(factsPath).status).toBe('pass');
+    fs.writeFileSync(path.join(root, 'source.js'), 'second');
+    expect(health(factsPath).status).toBe('stale');
+  });
+  test('source symlink 不读取目标内容，也不能声称快照完整', () => {
+    fs.symlinkSync(os.tmpdir(), path.join(root, 'external'));
+    const factsPath = produce();
+    expect(health(factsPath).status).toBe('warn');
+  });
+  test('删除 tracked 文件与新增文件均改变内容摘要', () => {
+    fs.writeFileSync(path.join(root, 'source.js'), 'first');
+    git('add', 'source.js');
+    git('-c', 'user.name=Setup Test', '-c', 'user.email=setup@example.test', 'commit', '-qm', 'source');
+    const factsPath = produce();
+    fs.unlinkSync(path.join(root, 'source.js'));
+    expect(health(factsPath).status).toBe('stale');
+    const deletedBaseline = produce();
+    expect(health(deletedBaseline).status).toBe('pass');
+    fs.writeFileSync(path.join(root, 'new.js'), 'new');
+    expect(health(deletedBaseline).status).toBe('stale');
+  });
+  test('nested folder 只采集自身 source，不混入同仓 sibling', () => {
+    const { captureSourceSnapshot } = require('../../skills/spec-runtime-setup/scripts/lib/source-snapshot.cjs');
+    const nested = path.join(root, 'nested');
+    fs.mkdirSync(nested);
+    fs.writeFileSync(path.join(nested, 'source.js'), 'first');
+    const capture = () => captureSourceSnapshot({ repoRoot: nested, skillRoot, homeDir: root, env: {}, host: 'codex', now });
+    const before = capture();
+    expect(before.source_content_sha256).toMatch(/^[a-f0-9]{64}$/);
+    fs.writeFileSync(path.join(root, 'sibling.js'), 'outside-target');
+    expect(capture().source_content_sha256).toBe(before.source_content_sha256);
+    fs.writeFileSync(path.join(nested, 'source.js'), 'second');
+    expect(capture().source_content_sha256).not.toBe(before.source_content_sha256);
+  });
+  test('旧 v1 快照保持可读，但不证明已核对当前工作区内容', () => {
+    const factsPath = produce();
+    const facts = JSON.parse(fs.readFileSync(factsPath));
+    facts.source_snapshot.schema_version = 'setup-source-snapshot.v1';
+    delete facts.source_snapshot.source_content_sha256;
+    delete facts.source_snapshot.source_kind;
+    fs.writeFileSync(factsPath, JSON.stringify(facts));
+    expect(health(factsPath).status).toBe('warn');
+  });
+  test('超出文件大小预算不输出部分摘要或假 fresh', () => {
+    const fd = fs.openSync(path.join(root, 'large-source.bin'), 'w');
+    fs.ftruncateSync(fd, 32 * 1024 * 1024 + 1);
+    fs.closeSync(fd);
+    const factsPath = produce();
+    const facts = JSON.parse(fs.readFileSync(factsPath));
+    expect(facts.source_snapshot.source_content_sha256).toBeNull();
+    expect(facts.source_snapshot.limitations).toContain('source-content-snapshot-unavailable');
+    expect(health(factsPath).status).toBe('warn');
+  });
+  test('canonical local config 即使被 Git ignore 仍参与快照', () => {
+    fs.writeFileSync(path.join(root, '.gitignore'), '.spec-first/config.local.yaml\n');
+    fs.mkdirSync(path.join(root, '.spec-first'), { recursive: true });
+    const local = path.join(root, '.spec-first', 'config.local.yaml');
+    fs.writeFileSync(local, 'verification_profile: minimal');
+    const factsPath = produce();
+    expect(health(factsPath).status).toBe('pass');
+    fs.writeFileSync(local, 'verification_profile: strict');
+    expect(health(factsPath).status).toBe('stale');
+  });
+  test.each(['git', 'folder'])('%s 完整发布链不会因 scenario fingerprint 自失效', (kind) => {
+    const { runVerificationOrMutation } = require('../../skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs');
+    if (kind === 'folder') fs.rmSync(path.join(root, '.git'), { recursive: true, force: true });
+    const context = {
+      skillRoot, setupScriptDir: path.resolve(__dirname, '../../skills/spec-runtime-setup/scripts'),
+      homeDir: root, env: {}, host: 'codex', platform: process.platform === 'win32' ? 'windows' : process.platform === 'darwin' ? 'macos' : 'linux',
+      registry: JSON.parse(fs.readFileSync(path.join(skillRoot, 'setup-registry.json'))),
+      effectiveRegistry: { tools: [], helpers: [], providers: [] },
+      actionPlan: { mode: 'verify', selected_ids: [], args: { installationOnly: true }, capabilities: ['write-setup-facts'] },
+      target: { repo_status: kind === 'git' ? 'git-repo' : 'not-git-repo', target_root: root },
+      runner: () => ({ exit_code: 0, stdout: '', stderr: '' }),
+    };
+    const factsPath = path.join(root, '.spec-first', 'config', 'tool-facts.json');
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const result = runVerificationOrMutation(context, root);
+      expect(result.exit_code).toBe(0);
+      expect(fs.existsSync(path.join(root, '.spec-first', 'workspace', 'scenario-fingerprint-setup.json'))).toBe(true);
+      expect(result.payload.tool_facts.source_snapshot.source_content_sha256).toMatch(/^[a-f0-9]{64}$/);
+      expect(health(factsPath, new Date()).status).toBe('pass');
+    }
   });
   test('registry 修改立即失效，无需等 TTL', () => {
     const factsPath = produce();
