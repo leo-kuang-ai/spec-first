@@ -93,8 +93,10 @@ function closedResult(fields) {
   }
 }
 
+const AGGREGATION_METHODS = ["mean", "median", "min", "max"]
+
 function configuredAggregation(value) {
-  return value === "mean" || value === "min" || value === "max" ? value : "median"
+  return AGGREGATION_METHODS.includes(value) ? value : "median"
 }
 
 function aggregateSamples(samples, method) {
@@ -150,7 +152,17 @@ function normalizeSpec(spec) {
     comparison,
     ladder: spec.ladder ?? stability.ladder ?? {},
     stability_mode: spec.stability_mode ?? stability.mode,
-    aggregation: configuredAggregation(spec.aggregation ?? stability.aggregation),
+    // aggregation 的唯一校验点：非法原始值在此显式拒绝（stability 已含 measurement.stability 链），
+    // configuredAggregation 只负责把缺省归一为 median，不再静默改写非法值。
+    aggregation: (() => {
+      const rawAggregation = spec.aggregation
+        ?? spec.stability?.aggregation
+        ?? spec.measurement?.stability?.aggregation
+      if (rawAggregation != null && !AGGREGATION_METHODS.includes(rawAggregation)) {
+        throw new Error("invalid aggregation")
+      }
+      return configuredAggregation(rawAggregation)
+    })(),
     repeat_count: spec.repeat_count ?? stability.repeat_count,
     noise_threshold: spec.noise_threshold ?? stability.noise_threshold,
     minimum_improvement:
@@ -389,13 +401,10 @@ function validateComparisonSpec(spec) {
 }
 
 function decide(input) {
-  const spec = normalizeSpec(input.spec ?? {})
+  let spec
   try {
+    spec = normalizeSpec(input.spec ?? {})
     validateComparisonSpec(spec)
-    const rawAggregation = input.spec?.aggregation ?? input.spec?.stability?.aggregation ?? input.spec?.measurement?.stability?.aggregation
-    if (rawAggregation != null && !["mean", "median", "min", "max"].includes(rawAggregation)) {
-      throw new Error("invalid aggregation")
-    }
   } catch (error) {
     return closedResult({ decision: "error", reason: error.message })
   }
@@ -432,7 +441,7 @@ function decide(input) {
   const missing = []
   const candidateBundles = {}
   const baselineBundles = {}
-  const aggregation = spec.aggregation ?? "median"
+  const aggregation = spec.aggregation
 
   for (const objective of required) {
     const base = metricBundle(baseline, objective.name, aggregation, objective.type)

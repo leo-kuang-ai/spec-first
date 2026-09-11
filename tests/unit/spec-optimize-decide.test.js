@@ -42,6 +42,20 @@ describe('local evidence boundaries', () => {
     expect(result.eligible).toBe(false);
   });
 
+  test('rejects invalid nested aggregation even when an empty stability object shadows measurement stability', () => {
+    const result = decide({
+      spec: hardSpec({
+        stability: {},
+        measurement: { stability: { aggregation: 'unknown' } },
+      }),
+      baseline: snapshot(10),
+      candidate: snapshot(9),
+    });
+    expect(result.decision).toBe('error');
+    expect(result.eligible).toBe(false);
+    expect(result.reason).toBe('invalid aggregation');
+  });
+
   test('does not claim keep or reached target while smoke is outstanding', () => {
     const result = decide({
       spec: hardSpec({

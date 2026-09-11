@@ -1,4 +1,22 @@
 # Changelog
+- v1.15.3 2026-09-11: fix(optimize): 校验完整 aggregation 配置链，避免空 stability 对象遮蔽 measurement.stability 中的非法值。(user-visible)
+- v1.15.3 2026-09-11 11:12:18 claude: test(eval): 评测落盘守卫端到端永久测试（六场景：仅话术/真修复/越权 commit/仅 stage/无基线弱守卫两分支）；测试隔离机器级全局 git hook，并修复弱守卫将未跟踪杂物（如宿主 hook 生成的 graphify-out/）误判为落盘证据的缺陷（--untracked-files=no，与基线分支 git diff HEAD 口径一致）。(user-visible)
+- v1.15.3 2026-09-11 11:12:18 claude: test(contracts): plugin-sync 锚点别名契约（锁定单一事实源形态、禁止回退双字面量表）；peer-runner parity 补 D1 语义防回退断言（not recorded→return False 精确匹配 + supervisor 门调用点）；ce-localization 漂移消息助手可测化并补合成输入单测。(user-visible)
+
+- v1.15.3 2026-09-11 09:43:46 claude: test(mirror): 新增自动发现式 skill 镜像脚本 parity 测试——按 basename 跨 skill 分组强制字节一致，锁住此前零覆盖的 run-python.sh×5、working-tree-fingerprint×2、validate-frontmatter×2 并自动纳管未来镜像，allowlist 防陈旧。(user-visible)
+- v1.15.3 2026-09-11 09:43:46 claude: test(localization): ce-localization 两处计数断言升级为自解释漂移错误——失配时列出相对冻结 inventory 的路径差集与 remediation（CE adjudication 批次或回退拓扑变更），已用探针文件实证错误输出。(user-visible)
+- v1.15.3 2026-09-11 09:43:46 claude: docs(solutions): 沉淀 peer-job-runner Windows 拆分蓝图（边界/13 回灌名字/v2 设计：参数传递+__file__ 相对 importlib、验证清单、anti-patterns、invalidation condition）；CE sync 方法论新增"skills/ 拓扑变更与 adjudication 宇宙"节。(user-visible)
+- v1.15.3 2026-09-11 09:43:46 claude: fix(peer-runner): Windows 身份匹配对"无记录身份"由 fail-open 改为 fail-closed——未证明（可能已回收）的 pid 不再被判为 ours 而 TERM 无关进程，代价是升级前在途 job 失去优雅 supervisor 信令、归类 died-without-result，清理仍由 job object+Toolhelp 清扫保证；parity 测试补防回退断言。(user-visible)
+- v1.15.3 2026-09-11 09:43:46 claude: docs(peer-runner): serving-receipt 死通道显式化——常量处记录重估条件（翻转常量本身不解除任何门），不可达 packet 校验段标注为未来启用路径，消除能力-实现无声漂移。(user-visible)
+- v1.15.3 2026-09-11 09:43:46 claude: fix(review): 评测落盘证据守卫补基线机制——prepare-review-fixture.sh 记录 HEAD 与 diff 哈希到 .git/ 内部，check-r2-preset-applied-fix.sh 改为相对基线判别（仅话术/越权 commit/仅 stage 三场景均正确判负），消除永真守卫与自比较空操作。(user-visible)
+- v1.15.3 2026-09-11 claude: fix(runtime-setup): GRAPHIFY_NO_BACKUP 注入改为 curated/semantic 门控（与 Provider backup_if_protected 同构判定：.graphify_semantic_marker 或非默认社区标签，判定失败保守保留备份），恢复 curated 图覆盖前快照回滚通道；同步 SKILL.md 契约与 defensive-probes 测试。(user-visible)
+- v1.15.3 2026-09-11 claude: fix(lfg): pr-watch-state 决策工件缺失/不可读时输出结构化 decision-invalid 拒绝而非裸 ENOENT 崩溃，新增删除工件后 snapshot 行为测试。(user-visible)
+- v1.15.3 2026-09-11 claude: fix(handoff): discover --source-dir 指向不存在目录时按 source-directory-unsafe 结构化拒绝，对齐 symlink 分支，补测试用例。(user-visible)
+- v1.15.3 2026-09-11 claude: fix(brand): banner TAGLINE 从 getSupportedPlatforms() 派生（原手写 6 宿主漏 ZCode/Pi 与 usage 行矛盾），新增 registry 派生 drift-guard 测试。(user-visible)
+- v1.15.3 2026-09-11 claude: refactor(cli): plugin-sync 双份逐字节相同锚点表合一为单一常量；init-workspace 三重相同 rollback catch 收敛为 writeWithRollback helper；spec-optimize decide.cjs 删除不可达 aggregation fallback 并将校验收敛到 normalizeSpec 单点。(user-visible)
+- v1.15.3 2026-09-11 claude: test(review): 补齐四类契约/行为测试——peer-job-runner pre-reuse kill-set 纯函数行为测试（三副本 importlib）、result 子命令 3/4 退出码用例、platform registry detection 描述符完整性断言与 kiro runtime-paths 行为测试。(user-visible)
+- v1.15.3 2026-09-11 claude: docs(peer-runner): 记录 2.2k 行三副本的 Windows 块拆分重估条件（原型已完成并回退——新增包路径进入冻结 CE-localization inventory 需随下一次 CE 同步/adjudication 批次执行，脚本不得代答重绑）。(user-visible)
+
 - v1.15.3 2026-09-10 22:30:15 zcode: chore: 移除误收入提交的 graphify 临时探测文件。 (user-visible)
 - v1.15.3 2026-09-10 22:29:59 zcode: docs(plan): CE-129 同步计划收尾——status completed，边界与待决策项显式保留。 (user-visible)
 - v1.15.3 2026-09-10 22:16:14 zcode: test(setup): Windows 路径段不可含换行——structured-action 用例按平台替换该字符（既有 Windows CI 债务的最小明确修复）。 (user-visible)
