@@ -20,11 +20,37 @@
     "usage_note"
   ],
   "properties": {
-    "schema_version": { "const": "provider-readiness.v2" },
-    "provider": { "type": "string" },
-    "kind": { "enum": ["code-structure", "project-graph", "memory", "generic"] },
-    "profile": { "enum": ["minimal", "optional", "recommended", "platform"] },
-    "readiness_status": { "enum": ["fresh", "stale", "degraded", "not-run", "unknown"] },
+    "schema_version": {
+      "const": "provider-readiness.v2"
+    },
+    "provider": {
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "code-structure",
+        "project-graph",
+        "memory",
+        "generic"
+      ]
+    },
+    "profile": {
+      "enum": [
+        "minimal",
+        "optional",
+        "recommended",
+        "platform"
+      ]
+    },
+    "readiness_status": {
+      "enum": [
+        "fresh",
+        "stale",
+        "degraded",
+        "not-run",
+        "unknown"
+      ]
+    },
     "lifecycle": {
       "type": "object",
       "required": [
@@ -38,47 +64,91 @@
         "fallback_used"
       ],
       "properties": {
-        "installed": { "type": "boolean" },
-        "configured": { "type": "boolean" },
-        "initialized": { "type": "boolean" },
-        "indexed": { "type": "boolean" },
-        "server_reachable": { "type": "boolean" },
-        "artifact_exists": { "type": "boolean" },
-        "query_verified": { "type": "boolean" },
-        "fallback_used": { "type": "boolean" }
+        "installed": {
+          "type": "boolean"
+        },
+        "configured": {
+          "type": "boolean"
+        },
+        "initialized": {
+          "type": "boolean"
+        },
+        "indexed": {
+          "type": "boolean"
+        },
+        "server_reachable": {
+          "type": "boolean"
+        },
+        "artifact_exists": {
+          "type": "boolean"
+        },
+        "query_verified": {
+          "type": "boolean"
+        },
+        "fallback_used": {
+          "type": "boolean"
+        }
       },
       "additionalProperties": false
     },
-    "repo_aligned": { "enum": ["yes", "no", "unknown", "not-applicable"] },
+    "repo_aligned": {
+      "enum": [
+        "yes",
+        "no",
+        "unknown",
+        "not-applicable"
+      ]
+    },
     "capabilities": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "limitations": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
-    "source_read_required": { "type": "boolean" },
+    "source_read_required": {
+      "type": "boolean"
+    },
     "fallback": {
       "type": "object",
-      "required": ["available", "methods", "reason_code"],
+      "required": [
+        "available",
+        "methods",
+        "reason_code"
+      ],
       "properties": {
-        "available": { "type": "boolean" },
+        "available": {
+          "type": "boolean"
+        },
         "methods": {
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
-        "reason_code": { "type": "string" }
+        "reason_code": {
+          "type": "string"
+        }
       },
       "additionalProperties": false
     },
     "next_actions": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "native_interfaces": {
       "type": "array",
-      "items": { "type": "string", "minLength": 1 }
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
     },
     "first_generation": {
       "type": "object",
@@ -91,17 +161,61 @@
         "artifact_root"
       ],
       "properties": {
-        "owner": { "enum": ["runtime-setup", "provider-native", "user", "none", "unknown"] },
-        "status": { "enum": ["completed", "not-run", "failed", "skipped", "unknown"] },
-        "scope": { "enum": ["project", "run-scoped-workspace", "user-specified", "not-applicable", "unknown"] },
-        "requires_explicit_gate": { "type": "boolean" },
-        "requirement_workspace_path": { "type": ["string", "null"] },
-        "artifact_root": { "type": ["string", "null"] },
+        "owner": {
+          "enum": [
+            "runtime-setup",
+            "provider-native",
+            "user",
+            "none",
+            "unknown"
+          ]
+        },
+        "status": {
+          "enum": [
+            "completed",
+            "not-run",
+            "failed",
+            "skipped",
+            "unknown"
+          ]
+        },
+        "scope": {
+          "enum": [
+            "project",
+            "run-scoped-workspace",
+            "user-specified",
+            "not-applicable",
+            "unknown"
+          ]
+        },
+        "requires_explicit_gate": {
+          "type": "boolean"
+        },
+        "requirement_workspace_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "artifact_root": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "artifact_refs": {
           "type": "array",
-          "items": { "type": "string", "minLength": 1 }
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         },
-        "next_action": { "type": ["string", "null"] },
+        "next_action": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "scope_provenance": {
           "type": "object",
           "required": [
@@ -112,11 +226,39 @@
             "receipt_ref"
           ],
           "properties": {
-            "status": { "enum": ["verified", "missing", "mismatch", "invalid", "unknown"] },
-            "reason_code": { "type": ["string", "null"] },
-            "requested_requirement_workspace_path": { "type": ["string", "null"] },
-            "verified_requirement_workspace_path": { "type": ["string", "null"] },
-            "receipt_ref": { "type": ["string", "null"] }
+            "status": {
+              "enum": [
+                "verified",
+                "missing",
+                "mismatch",
+                "invalid",
+                "unknown"
+              ]
+            },
+            "reason_code": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "requested_requirement_workspace_path": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "verified_requirement_workspace_path": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "receipt_ref": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
           },
           "additionalProperties": false
         }
@@ -125,21 +267,80 @@
     },
     "steady_state": {
       "type": "object",
-      "required": ["refresh_owner", "refresh_mode", "hook_default", "usage_owner"],
+      "required": [
+        "refresh_owner",
+        "refresh_mode",
+        "hook_default",
+        "usage_owner"
+      ],
       "properties": {
-        "refresh_owner": { "enum": ["provider-native", "runtime-setup", "user", "none", "unknown"] },
-        "refresh_mode": { "enum": ["watcher", "skill-cli-hook-on-demand", "cli-mcp-hook-on-demand", "commit-hook-external-verified", "commit-hook-spec-first-async", "manual-only", "none", "unknown"] },
-        "hook_default": { "type": "boolean" },
-        "usage_owner": { "enum": ["downstream-skill", "provider-native", "user", "none", "unknown"] },
-        "hook_installed": { "type": "boolean" },
-        "hook_verified": { "type": "boolean" },
-        "hook_status": { "enum": ["verified", "verified-external", "installed", "failed", "blocked", "skipped", "unknown"] },
-        "hook_skipped_reason": { "type": ["string", "null"] }
+        "refresh_owner": {
+          "enum": [
+            "provider-native",
+            "runtime-setup",
+            "user",
+            "none",
+            "unknown"
+          ]
+        },
+        "refresh_mode": {
+          "enum": [
+            "watcher",
+            "skill-cli-hook-on-demand",
+            "cli-mcp-hook-on-demand",
+            "commit-hook-external-verified",
+            "commit-hook-spec-first-async",
+            "manual-only",
+            "none",
+            "unknown"
+          ]
+        },
+        "hook_default": {
+          "type": "boolean"
+        },
+        "usage_owner": {
+          "enum": [
+            "downstream-skill",
+            "provider-native",
+            "user",
+            "none",
+            "unknown"
+          ]
+        },
+        "hook_installed": {
+          "type": "boolean"
+        },
+        "hook_verified": {
+          "type": "boolean"
+        },
+        "hook_status": {
+          "enum": [
+            "verified",
+            "verified-external",
+            "installed",
+            "failed",
+            "blocked",
+            "skipped",
+            "unknown"
+          ]
+        },
+        "hook_skipped_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       },
       "additionalProperties": false
     },
     "usage_note": {
       "type": "string"
+    },
+    "readiness_scope": {
+      "enum": [
+        "installation",
+        "artifact"
+      ]
     }
   },
   "additionalProperties": false

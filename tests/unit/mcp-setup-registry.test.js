@@ -68,7 +68,7 @@ function expectRegistryError(mutator, code) {
   }
 }
 
-describe('spec-runtime-setup registry v9', () => {
+describe('spec-runtime-setup registry v11', () => {
   test('detects WSL from the real Linux runtime signals', () => {
     expect(detectRuntimePlatform({
       platform: 'linux',
@@ -87,10 +87,32 @@ describe('spec-runtime-setup registry v9', () => {
     })).toBe('linux');
   });
 
+  test('兼容 v10 旧 registry，保留未知条目的旧阻断语义', () => {
+    const fixture = withRegistryMutation((registry) => {
+      registry.schema_version = 'setup-registry.v10';
+      for (const entry of [...registry.tools, ...registry.helpers]) delete entry.readiness_policy;
+      registry.helpers.find((entry) => entry.id === 'gh').baseline_blocking = true;
+    });
+    try {
+      const registry = loadRegistry({ skillRoot: fixture.tempRoot });
+      const { applyReadinessPolicy } = require('../../skills/spec-runtime-setup/scripts/lib/baseline-policy.cjs');
+      const effective = applyReadinessPolicy(getEffectiveRegistry(registry, { host: 'codex', platform: 'linux' }));
+      expect(effective.helpers.find((entry) => entry.id === 'gh')).toMatchObject({
+        required: true, baseline_blocking: true,
+        demand: { migration_warning: 'legacy-readiness-policy' },
+      });
+    } finally { fixture.cleanup(); }
+  });
+
+  test('v11 禁止遗漏 readiness policy 或写入未知 enum', () => {
+    expectRegistryError((registry) => { delete registry.helpers[0].readiness_policy; }, 'registry_readiness_policy_missing');
+    expectRegistryError((registry) => { registry.helpers[0].readiness_policy = 'maybe'; }, 'registry_schema_invalid');
+  });
+
   test('matches the captured legacy inventory while retiring the jq helper', () => {
     const registry = loadRegistry({ skillRoot });
 
-    expect(registry.schema_version).toBe('setup-registry.v10');
+    expect(registry.schema_version).toBe('setup-registry.v11');
     expect(registry.install_mirrors).toEqual({
       npm: {
         endpoint: 'https://registry.npmmirror.com',
@@ -186,6 +208,46 @@ describe('spec-runtime-setup registry v9', () => {
       expect(artifact.producer).toEqual(expect.any(String));
       expect(artifact.consumers.length).toBeGreaterThan(0);
     }
+  });
+
+  test('covers every declared host with a buildable server command for host-config entries', () => {
+    const registry = loadRegistry({ skillRoot });
+    for (const host of Object.keys(registry.hosts)) {
+      const effective = getEffectiveRegistry(registry, { host, platform: 'macos' });
+      for (const tool of effective.tools) {
+        if (tool.host_config_required === false) continue;
+        expect(tool.host_config.command).toEqual(expect.any(String));
+        expect(tool.host_config.command.length).toBeGreaterThan(0);
+      }
+      expect(byId(effective.providers).codegraph.host_config.command).toBe('codegraph');
+    }
+    const zcode = getEffectiveRegistry(registry, { host: 'zcode', platform: 'macos' });
+    expect(zcode.host_definition.host_config).toMatchObject({
+      scope: 'workspace',
+      json_container_path: ['mcp', 'servers'],
+    });
+    expect(byId(zcode.tools)['sequential-thinking'].host_config).toMatchObject({
+      command: 'npx',
+      args: ['-y', '@modelcontextprotocol/server-sequential-thinking@latest'],
+      json_container_path: ['mcp', 'servers'],
+    });
+    expect(byId(zcode.tools).context7.host_config).toMatchObject({
+      command: 'npx',
+      args: ['-y', '@upstash/context7-mcp@latest'],
+    });
+    expect(byId(zcode.tools).codegraph.host_config).toMatchObject({
+      command: 'codegraph',
+      args: ['serve', '--mcp'],
+    });
+  });
+
+  test('fails closed when a declared host lacks a host override command', () => {
+    expectRegistryError((registry) => {
+      delete registry.tools.find((tool) => tool.id === 'sequential-thinking').host_overrides.zcode;
+    }, 'registry_host_override_missing');
+    expectRegistryError((registry) => {
+      delete registry.providers.find((provider) => provider.id === 'codegraph').host_overrides.zcode;
+    }, 'registry_host_override_missing');
   });
 
   test('matches the captured legacy effective queries for every host and platform', () => {

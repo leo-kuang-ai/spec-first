@@ -289,6 +289,7 @@ function normalizeProviderReadiness(entries) {
   return entries.map((entry) => ({
     schema_version: 'provider-readiness.v2',
     provider: entry.provider || 'unknown',
+    readiness_scope: entry.readiness_scope === 'installation' ? 'installation' : 'artifact',
     kind: normalizeProviderKind(entry.kind),
     profile: normalizeProviderProfile(entry.profile),
     readiness_status: normalizeProviderStatus(entry.readiness_status),
@@ -505,6 +506,9 @@ function computeDecisionInputHealth({ projectRoot, platforms = [], factsPath, no
   if (projection.counts.required_action > 0 || projection.configured_dependency_counts.action_required > 0) {
     return buildDecisionResult('error', 'required-runtime-action-required', projection, { requestedPlatforms: platforms });
   }
+  if (projection.freshness.status !== 'fresh') {
+    return buildDecisionResult('warn', 'setup-facts-freshness-unknown', projection, { requestedPlatforms: platforms });
+  }
   // configured dependency scan 失败是诚实降级(丢失 undeclared 可见性),非确定 blocker:
   // 映射成 warn,reason_code 专用以与「真有 degraded helper」区分,不静默 pass。
   if (projection.configured_scan_status === 'scan-failed') {
@@ -555,6 +559,9 @@ function decisionInputNextAction(reasonCode, requestedPlatforms = []) {
   }
   if (reasonCode === 'setup-facts-missing') {
     return `Run \`${command}\` from ${hostLabel} to create setup facts.`;
+  }
+  if (reasonCode === 'setup-facts-freshness-unknown') {
+    return `通过 ${command} --verify-only 刷新当前 host 的 setup facts；缺少可信时间不能证明 readiness。`;
   }
   if (reasonCode === 'setup-facts-stale') {
     return `Rerun \`${command}\` from ${hostLabel} to refresh stale setup facts.`;

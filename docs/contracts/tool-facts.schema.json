@@ -1,34 +1,87 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "required": ["schema_version", "generated_at", "repo_root", "items", "configured_dependencies", "schema_capabilities"],
+  "required": [
+    "schema_version",
+    "generated_at",
+    "repo_root",
+    "items",
+    "configured_dependencies",
+    "schema_capabilities"
+  ],
   "properties": {
-    "schema_version": { "const": "tool-facts.v2" },
-    "generated_at": { "type": "string" },
-    "repo_root": { "type": "string" },
-    "host": { "type": ["string", "null"] },
-    "platform": { "type": ["string", "null"] },
-    "profile": { "enum": ["minimal", "recommended", "platform"] },
-    "tools": { "type": "object", "additionalProperties": true },
-    "helper_tools": { "type": "object", "additionalProperties": true },
+    "schema_version": {
+      "const": "tool-facts.v2"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "repo_root": {
+      "type": "string"
+    },
+    "host": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "platform": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "profile": {
+      "enum": [
+        "minimal",
+        "recommended",
+        "platform"
+      ]
+    },
+    "tools": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "helper_tools": {
+      "type": "object",
+      "additionalProperties": true
+    },
     "provider_readiness": {
       "type": "array",
-      "items": { "type": "object", "additionalProperties": true }
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
     },
     "items": {
       "type": "array",
-      "items": { "$ref": "#/$defs/item" }
+      "items": {
+        "$ref": "#/$defs/item"
+      }
     },
     "configured_dependencies": {
       "type": "array",
-      "items": { "$ref": "#/$defs/configuredDependency" }
+      "items": {
+        "$ref": "#/$defs/configuredDependency"
+      }
     },
     "schema_capabilities": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
-    "target": { "type": ["object", "null"], "additionalProperties": true },
-    "source": { "type": "object", "additionalProperties": true }
+    "target": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": true
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": true
+    }
   },
   "additionalProperties": true,
   "$defs": {
@@ -48,24 +101,114 @@
         "missing_dependency_reason"
       ],
       "properties": {
-        "id": { "type": "string" },
-        "kind": { "type": "string" },
-        "profile": { "enum": ["minimal", "recommended", "platform"] },
-        "required": { "type": "boolean" },
-        "baseline_blocking": { "type": "boolean" },
-        "dependency_status": { "type": "string" },
-        "configured_status": { "type": "string" },
-        "result": { "type": "string" },
-        "reason_code": { "type": "string" },
-        "installed": { "type": "boolean" },
-        "missing_dependency_reason": { "type": ["string", "null"] },
-        "next_action": { "type": "string" },
-        "capability_status": { "type": "string" },
-        "execution_readiness": { "type": "string" },
-        "conformance_status": { "type": "string" },
-        "repair_scope": { "type": "string" },
-        "capabilities": { "type": "object", "additionalProperties": true },
-        "provider_version": { "type": ["string", "null"] }
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "profile": {
+          "enum": [
+            "minimal",
+            "recommended",
+            "platform"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "baseline_blocking": {
+          "type": "boolean"
+        },
+        "dependency_status": {
+          "type": "string"
+        },
+        "configured_status": {
+          "type": "string"
+        },
+        "result": {
+          "type": "string"
+        },
+        "reason_code": {
+          "type": "string"
+        },
+        "installed": {
+          "type": "boolean"
+        },
+        "missing_dependency_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "next_action": {
+          "type": "string"
+        },
+        "capability_status": {
+          "type": "string"
+        },
+        "execution_readiness": {
+          "type": "string"
+        },
+        "conformance_status": {
+          "type": "string"
+        },
+        "repair_scope": {
+          "type": "string"
+        },
+        "capabilities": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "provider_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "demand": {
+          "type": "object",
+          "required": [
+            "blocking",
+            "demand_source",
+            "matched_rule",
+            "reason_code",
+            "migration_warning"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "blocking": {
+              "type": "boolean"
+            },
+            "demand_source": {
+              "enum": [
+                "explicit-selection",
+                "workflow",
+                "baseline",
+                "legacy",
+                "not-requested"
+              ]
+            },
+            "matched_rule": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "reason_code": {
+              "enum": [
+                "capability-required-for-scope",
+                "capability-not-requested"
+              ]
+            },
+            "migration_warning": {
+              "enum": [
+                null,
+                "legacy-readiness-policy"
+              ]
+            }
+          }
+        }
       },
       "additionalProperties": true
     },
@@ -85,17 +228,42 @@
         "reason_code"
       ],
       "properties": {
-        "id": { "type": "string" },
-        "kind": { "type": "string" },
-        "source_path": { "type": "string" },
-        "command": { "type": "string" },
-        "args_shape": { "type": "string" },
-        "declared_tool_id": { "type": ["string", "null"] },
-        "declared_status": { "type": "string" },
-        "dependency_status": { "type": "string" },
-        "configured_status": { "type": "string" },
-        "result": { "type": "string" },
-        "reason_code": { "type": "string" }
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "source_path": {
+          "type": "string"
+        },
+        "command": {
+          "type": "string"
+        },
+        "args_shape": {
+          "type": "string"
+        },
+        "declared_tool_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "declared_status": {
+          "type": "string"
+        },
+        "dependency_status": {
+          "type": "string"
+        },
+        "configured_status": {
+          "type": "string"
+        },
+        "result": {
+          "type": "string"
+        },
+        "reason_code": {
+          "type": "string"
+        }
       },
       "additionalProperties": true
     }

@@ -22,6 +22,15 @@ function createRepo(root, relativePath = '.') {
   return repo;
 }
 
+test('installation-only 显式选择安装 scope，preview 和 verify 保持各自写权限', () => {
+  const { buildActionPlan } = require('../../skills/spec-runtime-setup/scripts/lib/mode-policy.cjs');
+  const defaults = { knownIds: ['codegraph', 'graphify'], defaultIds: ['codegraph', 'graphify'] };
+  expect(buildActionPlan({ ...defaults, argv: ['--installation-only'] })).toMatchObject({ mode: 'only', mutation: true, selected_ids: defaults.defaultIds });
+  expect(buildActionPlan({ ...defaults, argv: ['--installation-only', '--plan'] })).toMatchObject({ mode: 'plan', mutation: false });
+  expect(buildActionPlan({ ...defaults, argv: ['--installation-only', '--verify-only'] })).toMatchObject({ mode: 'verify' });
+  expect(buildActionPlan({ ...defaults, argv: ['--installation-only', '--only', 'graphify', '--refresh'] }).blocked).toBe(true);
+});
+
 describe('spec-runtime-setup GNU argument parsing', () => {
   test('normalizes documented flags and comma-separated selections', () => {
     const { parseArgs } = require(argsModule);

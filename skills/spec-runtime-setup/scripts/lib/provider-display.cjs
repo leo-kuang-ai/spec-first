@@ -15,7 +15,9 @@ function providerDisplayFacts(provider = {}) {
   const serverReachable = lifecycle.server_reachable === true;
   const status = provider.readiness_status || 'unknown';
   return {
-    readiness_scope: installIndexReady ? 'install-index-ready' : 'install-index-incomplete',
+    readiness_scope: provider.readiness_scope === 'installation'
+      ? (lifecycle.installed && lifecycle.configured ? 'installation-ready' : 'installation-incomplete')
+      : (installIndexReady ? 'install-index-ready' : 'install-index-incomplete'),
     probe_status: serverReachable && queryVerified
       ? 'server-and-query-verified'
       : (queryVerified ? 'query-verified' : 'query-unverified'),

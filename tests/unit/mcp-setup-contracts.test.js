@@ -64,7 +64,7 @@ describe('spec-runtime-setup runner contracts', () => {
       'utf8',
     ));
 
-    expect(skill).toContain('## Default Full Setup Flow');
+    expect(skill).toContain('## Default Diagnostic Flow');
     expect(skill).toContain('--only codegraph,graphify');
     expect(skill).toContain('defaults-active');
     expect(skill).toContain('a pure non-Git directory with no child repos becomes the single folder target');
@@ -74,24 +74,25 @@ describe('spec-runtime-setup runner contracts', () => {
     expect(skill).toContain('the folder is never passed to Git-only `init --repo`');
     expect(skill).toContain('`next_action_command={cwd,command,args}`');
     expect(skill).toContain('`first_generation.scope_provenance`');
-    expect(skill).toContain('默认 parent-workspace batch 则从 parent 运行');
+    expect(skill).toContain('无 target 时由现有 resolver 区分单目录与多仓父目录，禁止扩大 scope');
     expect(registry.providers.filter((entry) => entry.setup_required).map((entry) => entry.id).sort())
       .toEqual(['codegraph', 'graphify']);
     expect(registry.tools.find((entry) => entry.id === 'codegraph')).toMatchObject({ setup_required: true });
     expect(registry.helpers.find((entry) => entry.id === 'ffmpeg')).toMatchObject({
-      baseline_blocking: true,
+      baseline_blocking: false,
+      readiness_policy: 'workflow-required',
       detection: { args: ['-version'] },
     });
   });
 
-  test('裸完整 setup 自动修复 registry managed drift，子集修复仍需显式授权', () => {
+  test('裸调用只读诊断，配置修复需显式授权', () => {
     const skill = fs.readFileSync(
       path.join(repoRoot, 'skills', 'spec-runtime-setup', 'SKILL.md'),
       'utf8',
     );
 
-    expect(skill).toContain('Bare workflow invocation 本身已授权自动修复 selected target 中 registry 管理的 `host-config-conflict`');
-    expect(skill).toContain('自动携带 `--repair-host-config` 重新 preview 并继续 apply');
+    expect(skill).toContain('裸调用仅执行只读诊断');
+    expect(skill).not.toContain('自动携带 `--repair-host-config`');
     expect(skill).toContain('Subset / Repair Flow');
     expect(skill).toContain('Host conflict 仍需独立 `--repair-host-config` 授权');
     expect(skill).not.toContain('只有用户明确要求自动修复时，才追加 `--repair-host-config`');

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://spec-first.dev/schemas/setup-registry.v9.json",
-  "title": "spec-runtime-setup registry v9",
+  "$id": "https://spec-first.dev/schemas/setup-registry.v11.json",
+  "title": "spec-runtime-setup registry v11",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -19,7 +19,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "setup-registry.v10"
+      "const": "setup-registry.v11"
     },
     "summary_columns": {
       "type": "array",
@@ -565,6 +565,9 @@
         },
         "qoder": {
           "$ref": "#/$defs/hostOverride"
+        },
+        "zcode": {
+          "$ref": "#/$defs/hostOverride"
         }
       }
     },
@@ -641,6 +644,13 @@
         },
         "provider_readiness": {
           "$ref": "#/$defs/providerReadiness"
+        },
+        "readiness_policy": {
+          "enum": [
+            "always-required",
+            "workflow-required",
+            "advisory"
+          ]
         }
       }
     },

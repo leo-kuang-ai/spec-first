@@ -61,6 +61,9 @@ function buildActionPlan({ argv = [], knownIds = [], defaultIds = [] } = {}) {
   if (args.repo && args.allRepos) return blockedPlan('repo-and-all-repos', args);
   if (args.folder && args.allRepos) return blockedPlan('folder-and-all-repos', args);
 
+  if (args.installationOnly && (args.check || args.refresh || args.projectConfig || args.workspaceGraph || args.workspaceGraphClean || args.workspaceGraphStatus)) {
+    return blockedPlan('installation-scope-mode-conflict', args);
+  }
   const workspaceActions = [
     args.workspaceGraph && 'workspace-graph-build',
     args.workspaceGraphClean && 'workspace-graph-clean',
@@ -103,8 +106,8 @@ function buildActionPlan({ argv = [], knownIds = [], defaultIds = [] } = {}) {
     (args.verifyOnly || args.refreshFacts) && 'verify',
     args.plan && 'plan',
     args.projectConfig && 'project-config',
-    args.only.length > 0 && !args.plan && workspaceActions.length === 0 && 'only',
-    args.repairHostConfig && args.only.length === 0 && !args.plan && 'host-config-repair',
+    (args.only.length > 0 || args.installationOnly) && !args.plan && !(args.installationOnly && (args.verifyOnly || args.refreshFacts)) && workspaceActions.length === 0 && 'only',
+    args.repairHostConfig && args.only.length === 0 && !args.installationOnly && !args.plan && 'host-config-repair',
   ].filter(Boolean);
   if (new Set(selectedModes).size > 1) {
     return blockedPlan('mode-conflict', args);
@@ -146,10 +149,10 @@ function buildActionPlan({ argv = [], knownIds = [], defaultIds = [] } = {}) {
     args,
     selection_source: args.only.length > 0
       ? 'explicit-only'
-      : (['verify', 'plan'].includes(mode) ? 'default-required' : 'not-selected'),
+      : ((['verify', 'plan'].includes(mode) || args.installationOnly) ? 'default-required' : 'not-selected'),
     selected_ids: args.only.length > 0
       ? [...args.only]
-      : (['verify', 'plan'].includes(mode) ? [...defaultIds] : []),
+      : ((['verify', 'plan'].includes(mode) || args.installationOnly) ? [...defaultIds] : []),
   };
 }
 

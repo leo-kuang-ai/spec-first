@@ -285,16 +285,12 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       expect(result.payload.planned_operations.map((entry) => entry.kind)).toEqual(expect.arrayContaining([
         'warmup-tool',
         'write-host-config',
-        'verify-helper',
-        'install-helper',
         'install-project-skill',
         'write-setup-facts',
       ]));
       expect(result.payload.safety.map((entry) => entry.id)).toEqual(expect.arrayContaining([
         'context7',
         'sequential-thinking',
-        'gh',
-        'ast-grep-skill',
         'graphify',
       ]));
     }
@@ -634,7 +630,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       capabilities: ['write-setup-facts'],
     });
     expect(audit.violations).toEqual([]);
-    expect(result).toMatchObject({ exit_code: 1, reason_code: 'missing_dependency' });
+    expect(result).toMatchObject({ exit_code: 1, reason_code: 'host-config-missing' });
     expect(fs.existsSync(path.join(target, '.spec-first', 'config', 'tool-facts.json'))).toBe(true);
     expect(fs.existsSync(path.join(target, '.spec-first', 'config', 'runtime-capabilities.json'))).toBe(true);
     expect(fs.existsSync(path.join(target, '.qoder', 'settings.local.json'))).toBe(false);
@@ -2030,6 +2026,49 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       });
   });
 
+  test('installation-only 安装并接线，缺图不阻断，且不执行构图或 query', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const target = tempRepo('installation-scope');
+    const calls = [];
+    const result = runSetup({
+      argv: ['--installation-only'], cwd: target, skillRoot,
+      runner: (command, args, options) => { calls.push([command, ...args]);
+        if (command === 'codegraph' && args[0] === '--version') return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
+        return fakeRunner(command, args, options); },
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-install-home-')),
+      bundledVersion: '1.13.2',
+    });
+    expect({ exit_code: result.exit_code, reason_code: result.reason_code }).toEqual({ exit_code: 0, reason_code: 'setup-facts-written' });
+    expect(fs.existsSync(path.join(target, '.codegraph'))).toBe(false);
+    expect(fs.existsSync(path.join(target, 'graphify-out'))).toBe(false);
+    expect(calls.filter(([command]) => ['codegraph', 'graphify'].includes(path.basename(command)))
+      .some(([, action]) => ['init', 'index', 'sync', 'extract', 'update', 'query'].includes(action))).toBe(false);
+    for (const provider of result.payload.tool_facts.provider_readiness) {
+      expect(provider).toMatchObject({ readiness_scope: 'installation', lifecycle: { installed: true, configured: true, query_verified: false, artifact_exists: false } });
+    }
+  });
+
+  test('显式 gh 选择只验证 helper scope，不伪造 Provider 结果或生成图', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const target = tempRepo('only-gh');
+    const calls = [];
+    const result = runSetup({
+      argv: ['--only', 'gh'], cwd: target, skillRoot,
+      runner: (command, args, options) => { calls.push([command, ...args]); return fakeRunner(command, args, options); },
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-gh-home-')),
+      bundledVersion: '1.13.2',
+    });
+    expect(result.exit_code).toBe(0);
+    expect(result.payload.tool_facts.items.find((entry) => entry.id === 'gh')).toMatchObject({
+      required: true, baseline_blocking: true,
+      demand: { blocking: true, demand_source: 'explicit-selection', matched_rule: 'gh' },
+    });
+    expect(fs.existsSync(path.join(target, 'graphify-out'))).toBe(false);
+    expect(calls.some(([command, action]) => command === 'graphify' && ['install', 'extract', 'update'].includes(action))).toBe(false);
+  });
+
   test('repairs a missing baseline helper through structured argv operations before provider setup', () => {
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('helper-repair');
@@ -2051,7 +2090,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     };
 
     const result = runSetup({
-      argv: ['--only', 'graphify'],
+      argv: ['--only', 'graphify', '--workflow', 'spec-commit-push-pr'],
       cwd: target,
       skillRoot,
       runner,
@@ -2085,7 +2124,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     };
 
     const result = runSetup({
-      argv: ['--only', 'graphify'],
+      argv: ['--only', 'graphify', '--workflow', 'spec-commit-push-pr'],
       cwd: target,
       skillRoot,
       runner,
@@ -2178,7 +2217,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     };
 
     const result = runSetup({
-      argv: ['--only', 'graphify'],
+      argv: ['--only', 'graphify', '--workflow', 'structural-search'],
       cwd: target,
       skillRoot,
       runner,
@@ -2386,7 +2425,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(result.payload.results).toEqual(expect.arrayContaining([
       expect.objectContaining({
         overall_status: 'action-required',
-        reason_code: 'missing_dependency',
+        reason_code: 'host-config-missing',
       }),
     ]));
     expect(fs.existsSync(path.join(first, '.spec-first', 'config', 'tool-facts.json'))).toBe(true);

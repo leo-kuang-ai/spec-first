@@ -5,7 +5,7 @@ const path = require('node:path');
 
 const REGISTRY_FILE = 'setup-registry.json';
 const SCHEMA_FILE = 'setup-registry.schema.json';
-const REGISTRY_SCHEMA_VERSION = 'setup-registry.v10';
+const REGISTRY_SCHEMA_VERSION = 'setup-registry.v11';
 const HOST_IDS = Object.freeze(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder', 'zcode']);
 const PLATFORM_IDS = Object.freeze(['macos', 'linux', 'wsl', 'windows']);
 const KIND_COLLECTIONS = Object.freeze({
@@ -426,6 +426,34 @@ function assertOverrideKeys(registry) {
   }
 }
 
+function overrideServerCommand(override) {
+  const hostConfig = override && isPlainObject(override.host_config) ? override.host_config : null;
+  if (!hostConfig) return null;
+  const source = isPlainObject(hostConfig.server) ? hostConfig.server : hostConfig;
+  return typeof source.command === 'string' && source.command.length > 0 ? source.command : null;
+}
+
+function assertHostOverrideCoverage(registry) {
+  const coverage = [
+    ['tools', (entry) => entry.host_config_required !== false],
+    ['providers', (entry) => Object.keys(entry.host_overrides || {}).length > 0],
+  ];
+  for (const [collection, requiresCoverage] of coverage) {
+    for (const entry of registry[collection]) {
+      if (!requiresCoverage(entry)) continue;
+      for (const hostId of HOST_IDS) {
+        if (!overrideServerCommand(entry.host_overrides && entry.host_overrides[hostId])) {
+          throw new RegistryError(
+            'registry_host_override_missing',
+            `${collection}.${entry.id} 缺少 ${hostId} 的 host override command，该宿主 setup 将 fail closed。`,
+            { collection, id: entry.id, host: hostId },
+          );
+        }
+      }
+    }
+  }
+}
+
 function assertOpenCodePermissionPolicyOwnership(registry) {
   const openCodePolicy = registry.hosts.opencode.defaults.tool.host_config.permission_policy;
   if (!openCodePolicy || openCodePolicy.kind !== 'opencode-governed-assets-v1') {
@@ -478,7 +506,10 @@ function canonicalizeRegistry(registry) {
 function validateRegistry(registry, schema) {
   assertNoIllegalNull(registry);
   try {
-    validateSchemaValue(registry, schema, schema);
+    const compatibleSchema = registry.schema_version === 'setup-registry.v10'
+      ? { ...schema, properties: { ...schema.properties, schema_version: { const: 'setup-registry.v10' } } }
+      : schema;
+    validateSchemaValue(registry, compatibleSchema, compatibleSchema);
   } catch (error) {
     if (!(error instanceof SchemaValidationError)) throw error;
     throw new RegistryError(
@@ -487,11 +518,16 @@ function validateRegistry(registry, schema) {
       { location: error.location },
     );
   }
-  if (registry.schema_version !== REGISTRY_SCHEMA_VERSION) {
+  if (![REGISTRY_SCHEMA_VERSION, 'setup-registry.v10'].includes(registry.schema_version)) {
     throw new RegistryError(
       'registry_schema_invalid',
       `预期 ${REGISTRY_SCHEMA_VERSION}，实际为 ${registry.schema_version}。`,
     );
+  }
+  if (registry.schema_version === REGISTRY_SCHEMA_VERSION) {
+    for (const entry of [...registry.tools, ...registry.helpers]) {
+      if (!entry.readiness_policy) throw new RegistryError('registry_readiness_policy_missing', `缺少 ${entry.id} 的 readiness_policy`);
+    }
   }
   for (const [collection, entries] of [
     ['external_dependencies', registry.external_dependencies],
@@ -512,6 +548,7 @@ function validateRegistry(registry, schema) {
   }
   assertNoDuplicateHostTargets(registry);
   assertOverrideKeys(registry);
+  assertHostOverrideCoverage(registry);
   assertOpenCodePermissionPolicyOwnership(registry);
 }
 

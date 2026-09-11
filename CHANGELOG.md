@@ -1,4 +1,11 @@
 # Changelog
+- v1.15.3 2026-09-11 claude: fix(runtime-setup): 修复 zcode 宿主 MCP setup fail-closed 阻塞——`setup-registry.json` 为三个 tool（sequential-thinking/context7/codegraph）与 providers.codegraph 补齐 zcode host_overrides（tool 级仅 command/args，容器路径沿用 hosts.zcode defaults；provider 级含 `mcp.servers` 容器完整 host_config），schema `hostOverrides` 放行 zcode 键；registry 校验新增 `registry_host_override_missing` 不变量，要求 host_config_required 的 tool 与声明了 host_overrides 的 provider 对全部七宿主提供非空 command，同类数据缺口在 registry 加载阶段拦截。验证：`npx jest tests/unit/mcp-setup-registry.test.js` 15/15（新增全宿主覆盖断言与篡改负例）；`resolveHostConfigTarget` 端到端探针下三 tool 均从 `host-config-entry-invalid` 反转为 `host-config-target-resolved`（`.zcode/config.json`）；`npm run test:mcp-setup` 674/679（5 个失败均为并发 v10→v11 readiness policy 演进中途态：host-runtime-projection×4 与 plugin-modules×1 期望旧 v10 文案，先于本次改动存在）；`npm run typecheck` 通过。(user-visible)
+- v1.15.3 2026-09-11 codex: feat(runtime-setup): 增加 installation-only scope，安装/接线与构图/query/hook 分离，保留显式图能力路径并将安装结果标记为 partial scope。(user-visible)
+- v1.15.3 2026-09-11 codex: feat(runtime-setup): registry v11 引入按 scope 的 readiness policy，支持显式 helper/tool 选择与 workflow 需求，输出 demand provenance 并保留 v10 兼容读取。(user-visible)
+- v1.15.3 2026-09-11 codex: fix(runtime-setup): doctor 决策输入拒绝将缺失或非法时间戳的 facts 汇总为 pass，保留 warn 与刷新建议，不阻断可直接读取源码的 workflow。(user-visible)
+- v1.15.3 2026-09-11 codex: docs(runtime-setup): 补齐已登记的 sweep 权限 key 注释示例，校验模板与 consumer 清单，并覆盖刷新模板保留用户 override 和 ignore 范围的行为。
+- v1.15.3 2026-09-11 codex: fix(runtime-setup): 统一 registry schema ID、title 和引用文档为 v10，新增对外 metadata 一致性回归检查。
+- v1.15.3 2026-09-11 codex: fix(runtime-setup): 将 bare skill 契约统一为 Node 已实现的只读诊断，移除隐式安装和 host conflict 自动修复指令，保留显式 subset/repair 权限边界。(user-visible)
 - v1.15.3 2026-09-11 codex: docs(runtime-setup): 完善 P1-P3 方案中的 CE 机制采纳、配置 consumer 与 facts 消费闭环，保留固定 artifact 路径并明确迁移和验证边界；本次未实施运行时变更。
 - v1.15.3 2026-09-11: fix(runtime-setup): 仅对未保护的 Graphify artifact 注入 GRAPHIFY_NO_BACKUP，保留 curated/semantic 图覆盖前备份。(user-visible)
 - v1.15.3 2026-09-11: fix(optimize): 校验完整 aggregation 配置链，避免空 stability 对象遮蔽 measurement.stability 中的非法值。(user-visible)

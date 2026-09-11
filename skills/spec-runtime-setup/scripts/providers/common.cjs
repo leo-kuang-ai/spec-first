@@ -53,6 +53,7 @@ function providerResult(metadata, options = {}) {
   const steadyState = metadata.steady_state || {};
   return {
     schema_version: 'provider-readiness.v2',
+    readiness_scope: options.readinessScope || 'artifact',
     provider: metadata.id,
     kind: metadata.kind || 'generic',
     profile: metadata.profile || 'optional',

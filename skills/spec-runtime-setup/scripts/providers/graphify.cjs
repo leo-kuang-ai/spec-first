@@ -210,7 +210,9 @@ function plan(context = {}) {
     existing_artifact: hasCurrent,
     legacy_artifact: legacyRootExists,
     hook_target: publicGraphifyHookTarget(hookTarget),
-    actions,
+    actions: context.installationOnly
+      ? actions.filter((action) => ['install-dependency', 'install-project-skill', 'install-qoder-adapter'].includes(action.kind))
+      : actions,
     non_actions: nonActions,
   };
 }
@@ -256,6 +258,13 @@ function verify(context = {}) {
     }
     : context;
   const installed = resolvedCommand.ok;
+  if (context.installationOnly) return providerResult(METADATA, {
+    installed,
+    configured: isSpecFirstSourceRepo(repoRoot) || (installed && pythonHostIntegrationConfigured(repoRoot, context.host, runtimeContext).ok),
+    readinessStatus: installed ? 'unknown' : 'not-run',
+    readinessScope: 'installation', firstGenerationStatus: 'not-run',
+    nextActions: installed ? [] : ['运行显式 installation-only setup 安装 Graphify。'],
+  });
   const currentRootExists = Boolean(lstatOrNull(resolved.artifact_root));
   const legacyArtifactRoot = path.join(repoRoot, LEGACY_ARTIFACT_ROOT);
   const legacyRootEntry = lstatOrNull(legacyArtifactRoot);
@@ -340,7 +349,7 @@ function verify(context = {}) {
 function apply(context = {}, actionPlan = plan(context)) {
   if (!actionPlan || actionPlan.blocked || !actionPlan.mutation) return verify(context);
   const repoRoot = path.resolve(context.repoRoot || actionPlan.repo_root || process.cwd());
-  const recovery = recoverGraphifyMigration(repoRoot);
+  const recovery = context.installationOnly ? { ok: true } : recoverGraphifyMigration(repoRoot);
   if (!recovery.ok) return unsafeReadiness(context, repoRoot, recovery.reason_code);
   if (recovery.recovered) {
     actionPlan = plan({ ...context, selected: true, refresh: actionPlan.refresh === true });
@@ -404,6 +413,7 @@ function apply(context = {}, actionPlan = plan(context)) {
   }
 
   for (const action of actionPlan.actions || []) {
+    if (context.installationOnly && !['install-dependency', 'install-project-skill', 'install-qoder-adapter'].includes(action.kind)) continue;
     try {
       assertGraphifyMutationSurfaces(repoRoot, context.host, actionPlan.artifact_root || path.join(repoRoot, CURRENT_ARTIFACT_ROOT), context.dependency && context.dependency.ecosystem);
     } catch (error) {
@@ -477,6 +487,10 @@ function apply(context = {}, actionPlan = plan(context)) {
     if (mutationFailure) break;
   }
 
+  if (context.installationOnly) {
+    if (mutationFailure) return unsafeReadiness(context, repoRoot, mutationFailure);
+    return verify(runtimeContext);
+  }
   let queryVerified = false;
   try {
     assertGraphifyMutationSurfaces(repoRoot, context.host, actionPlan.artifact_root || path.join(repoRoot, CURRENT_ARTIFACT_ROOT), context.dependency && context.dependency.ecosystem);

@@ -28,6 +28,11 @@
 # sweep_ack_cap: 25
 # sweep_lease_ttl_minutes: 60
 # sweep_shared_branch: false
+# 以下是 spec-sweep 消费的独立权限记录；示例不授予权限，只有真实授权后
+# 才由对应 workflow 写入。Runtime Setup 不替用户设置为 true。
+# sweep_commit_approved: false
+# sweep_branch_mutation_approved: false
+# sweep_landing_approved: false
 
 # --- Product pulse ---
 # Active consumer: spec-product-pulse reads these keys. Its first-run

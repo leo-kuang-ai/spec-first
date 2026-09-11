@@ -28,3 +28,7 @@ Do not write semantic trust fields such as `advisory`, `evidence_candidate`, or 
 - Graphify mutation setup检测到npm incumbent时，只有Python package/artifact/query/current-host integration与双Git hook全部verified后才可默认cleanup。Cleanup必须先验证全局package identity、npm root和launcher realpath ownership，再卸载`@sentropic/graphify`；旧`~/.local/bin/graphify*`仅在仍为symlink、target未变化且原realpath属于该npm package时删除。Diagnostic、plan、verify-only、未知command、普通文件或其他symlink不得触发该副作用。
 - Graphify Provider只接受`ecosystem=pypi`；其他dependency输入以`graphify-python-provider-required` fail closed。失败恢复使用pinned wheel重装、contained artifact backup恢复与Python readiness复验。
 - `lifecycle.artifact_exists=true` is not enough to imply runtime usability. A project may have Provider-native `graphify-out/graph.json` while `lifecycle.configured=false` or while the CLI is not manually visible; consumers must keep using direct source evidence and surface the setup repair action instead of treating the graph artifact as a complete install. Current `graphify-out` 若已存在但不是非 symlink 真实目录，Runtime Setup 必须以 `graphify-artifact-root-unsafe` 在 host/runtime mutation 前 fail closed。Legacy `.graphify/graph.json` is migration-only evidence; Runtime Setup atomically renames it when it is the sole root and fails closed when both roots exist.
+
+## 安装范围增量字段
+
+`provider-readiness.v2` 增加可选 `readiness_scope=installation|artifact`。缺字段保留旧 artifact 消费规则，不提升 readiness。installation 只验证 package/launcher/host 接线，不执行图生成、query 或 hook；缺图不阻断该 scope。下游仍须依据 artifact scope 与 freshness 判断导航可用性，安装完成不构成图或任务完成。

@@ -370,11 +370,11 @@ describe('spec-runtime-setup unified Node contract', () => {
     }
   });
 
-  test('loads one schema v9 registry without jq', () => {
+  test('loads one schema v11 registry without jq', () => {
     const { loadRegistry } = require('../../skills/spec-runtime-setup/scripts/lib/registry.cjs');
     const registry = loadRegistry({ skillRoot });
 
-    expect(registry.schema_version).toBe('setup-registry.v10');
+    expect(registry.schema_version).toBe('setup-registry.v11');
     expect(registry.tools.map((entry) => entry.id)).toEqual(
       expect.arrayContaining(['sequential-thinking', 'context7', 'codegraph']),
     );

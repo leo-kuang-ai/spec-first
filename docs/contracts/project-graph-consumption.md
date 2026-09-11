@@ -62,7 +62,7 @@ Availability is anchored in setup-facts, not artifact presence:
 
 1. Read the setup-facts artifact that carries `provider_readiness[]`.
 2. Confirm the artifact has trustworthy top-level freshness metadata, including `generated_at`. If setup facts are missing, stale, missing `generated_at`, or otherwise freshness-untrusted, record project-graph availability as unknown and fall back to bounded direct source reads, `rg`, and ast-grep.
-3. Consume the single provider entry whose capability class you intend to use. Do not transfer readiness from another provider.
+3. 若 entry 的 `readiness_scope=installation`，本次只证明安装/接线，图可用性仍为 unknown；使用 direct-source fallback，不能由安装成功推断图 currentness。Consume the single provider entry whose capability class you intend to use. Do not transfer readiness from another provider.
 4. Interpret `readiness_status` at the provider-entry level:
    - `fresh`: exploration-tier orientation may use the provider; conclusion-tier claims still require source/test/log/doc confirmation.
    - `stale`: exploration-tier orientation may use the provider when you annotate that the graph lags HEAD; it must not directly support conclusion-tier claims, which must be re-grounded regardless.

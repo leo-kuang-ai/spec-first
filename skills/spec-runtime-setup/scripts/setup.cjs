@@ -3,13 +3,14 @@
 
 const os = require('node:os');
 const path = require('node:path');
-const { parseEntrypointOptions } = require('./lib/args.cjs');
+const { parseEntrypointOptions, helpResult } = require('./lib/args.cjs');
 const { isAbsolutePath } = require('./lib/path-safety.cjs');
 const {
   buildActionPlan,
 } = require('./lib/mode-policy.cjs');
 const {
   isBaselineBlocking,
+  applyReadinessPolicy,
 } = require('./lib/baseline-policy.cjs');
 const {
   resolveHostAuthority,
@@ -117,7 +118,7 @@ function runSetup(input = {}) {
   } catch (error) {
     return failedResult('registry-load-failed', error, 2);
   }
-  const knownIds = registry.providers.map((entry) => entry.id);
+  const knownIds = [...new Set([...registry.providers, ...registry.tools, ...registry.helpers].map((entry) => entry.id))];
   const defaultIds = registry.providers
     .filter((entry) => entry.setup_required === true)
     .map((entry) => entry.id);
@@ -180,9 +181,12 @@ function runSetup(input = {}) {
   }
 
   const host = authority.host || candidates[0] || null;
-  const effectiveRegistry = host
+  const effectiveRegistry = applyReadinessPolicy(host
     ? getEffectiveRegistry(registry, { host, platform })
-    : getDiagnosticRegistry(registry, { platform });
+    : getDiagnosticRegistry(registry, { platform }), {
+    selectedIds: actionPlan.args.only,
+    workflows: actionPlan.args.workflows,
+  });
   const needsBundledVersion = mutationNeedsHost || actionPlan.mode === 'workspace-graph-status';
   const context = {
     ...input,
@@ -834,23 +838,6 @@ function renderProjectConfig(result) {
   ].join('\n');
 }
 
-function helpResult() {
-  const human = [
-    '用法：node <loaded-skill-root>/scripts/setup.cjs [options]',
-    '',
-    '模式：--check | --verify-only | --refresh-facts | --plan | --project-config | --only <ids> | --repair-host-config',
-    'Graphify 刷新：--only graphify --refresh',
-    '目标：--repo <path> | --folder <path> | --all-repos',
-    '  --repo 仅接受精确 Git root；--folder 接受精确逻辑目录且不要求 Git。',
-    '  folder 内的 Provider artifact/facts 不会提升到父 Git root；仅 generated runtime 可复用父 root。',
-    'Workspace 双层图构建：--only codegraph,graphify --workspace-graph [--repos <a,b>]',
-    'Workspace 双层图状态：--workspace-graph-status [--repos <a,b>]',
-    'Workspace 双层图清理：--workspace-graph-clean [--repos <a,b>]',
-    '约束：workspace-graph action 互斥，且不可与 --all-repos 组合；contained child Git 事件异步刷新，hook 不可用、失败或需即时刷新时显式重跑。',
-    '',
-  ].join('\n');
-  return { exit_code: 0, mode: 'help', reason_code: 'help', payload: { help: human }, human, target: null };
-}
 
 function failedResult(reasonCode, error, exitCode = 1, extra = {}) {
   return {

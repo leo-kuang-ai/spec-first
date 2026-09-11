@@ -182,6 +182,7 @@ function normalizeItem(entry, observed = null, kind) {
     required,
     setup_required: entry.setup_required === true,
     baseline_blocking: baselineBlocking,
+    ...(entry.demand ? { demand: entry.demand } : {}),
     dependency_status: installed
       ? 'ready'
       : (observedDependencyStatus || (observedStatus === 'missing' ? 'missing' : 'unknown')),

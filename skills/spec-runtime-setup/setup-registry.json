@@ -1,5 +1,5 @@
 {
-  "schema_version": "setup-registry.v10",
+  "schema_version": "setup-registry.v11",
   "summary_columns": [
     "tool",
     "type",
@@ -399,6 +399,15 @@
               "@modelcontextprotocol/server-sequential-thinking@latest"
             ]
           }
+        },
+        "zcode": {
+          "host_config": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@modelcontextprotocol/server-sequential-thinking@latest"
+            ]
+          }
         }
       },
       "platform_overrides": {
@@ -442,7 +451,8 @@
             ]
           }
         }
-      }
+      },
+      "readiness_policy": "always-required"
     },
     {
       "id": "context7",
@@ -522,6 +532,15 @@
               "@upstash/context7-mcp@latest"
             ]
           }
+        },
+        "zcode": {
+          "host_config": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@upstash/context7-mcp@latest"
+            ]
+          }
         }
       },
       "platform_overrides": {
@@ -565,7 +584,8 @@
             ]
           }
         }
-      }
+      },
+      "readiness_policy": "always-required"
     },
     {
       "id": "codegraph",
@@ -715,6 +735,15 @@
               "--mcp"
             ]
           }
+        },
+        "zcode": {
+          "host_config": {
+            "command": "codegraph",
+            "args": [
+              "serve",
+              "--mcp"
+            ]
+          }
         }
       },
       "platform_overrides": {
@@ -794,7 +823,8 @@
             ]
           }
         }
-      }
+      },
+      "readiness_policy": "advisory"
     }
   ],
   "helpers": [
@@ -811,7 +841,9 @@
       "required": true,
       "baseline_blocking": false,
       "required_for": [
-        "surface-ui"
+        "spec-test-browser",
+        "spec-dogfood",
+        "spec-polish"
       ],
       "recommended_for": [
         "browser automation",
@@ -887,7 +919,8 @@
             "npx"
           ]
         }
-      }
+      },
+      "readiness_policy": "workflow-required"
     },
     {
       "id": "gh",
@@ -899,9 +932,11 @@
       ],
       "surface_overlays": [],
       "required": true,
-      "baseline_blocking": true,
+      "baseline_blocking": false,
       "required_for": [
-        "github issue and pull request workflows"
+        "spec-commit-push-pr",
+        "spec-resolve-pr-feedback",
+        "spec-lfg"
       ],
       "recommended_for": [
         "spec-code-review",
@@ -976,7 +1011,8 @@
           },
           "platform_required_tools": []
         }
-      }
+      },
+      "readiness_policy": "workflow-required"
     },
     {
       "id": "vhs",
@@ -1040,7 +1076,8 @@
           },
           "platform_required_tools": []
         }
-      }
+      },
+      "readiness_policy": "advisory"
     },
     {
       "id": "silicon",
@@ -1104,7 +1141,8 @@
           },
           "platform_required_tools": []
         }
-      }
+      },
+      "readiness_policy": "advisory"
     },
     {
       "id": "ffmpeg",
@@ -1115,8 +1153,10 @@
       ],
       "surface_overlays": [],
       "required": true,
-      "baseline_blocking": true,
-      "required_for": [],
+      "baseline_blocking": false,
+      "required_for": [
+        "video"
+      ],
       "recommended_for": [
         "video composition"
       ],
@@ -1195,7 +1235,8 @@
           },
           "platform_required_tools": []
         }
-      }
+      },
+      "readiness_policy": "workflow-required"
     },
     {
       "id": "ast-grep",
@@ -1209,7 +1250,7 @@
       "required": true,
       "baseline_blocking": false,
       "required_for": [
-        "structural code search"
+        "structural-search"
       ],
       "recommended_for": [
         "spec-code-review",
@@ -1265,7 +1306,8 @@
           },
           "platform_required_tools": []
         }
-      }
+      },
+      "readiness_policy": "workflow-required"
     },
     {
       "id": "ast-grep-skill",
@@ -1277,9 +1319,9 @@
       ],
       "surface_overlays": [],
       "required": true,
-      "baseline_blocking": true,
+      "baseline_blocking": false,
       "required_for": [
-        "ast-grep usage guidance"
+        "structural-search"
       ],
       "recommended_for": [
         "structural search guidance"
@@ -1396,7 +1438,8 @@
             "npx"
           ]
         }
-      }
+      },
+      "readiness_policy": "workflow-required"
     }
   ],
   "providers": [
@@ -1699,6 +1742,34 @@
             "uninstall_targets": [
               "project",
               "user"
+            ]
+          }
+        },
+        "zcode": {
+          "host_config": {
+            "command": "codegraph",
+            "args": [
+              "serve",
+              "--mcp"
+            ],
+            "scope": "workspace",
+            "json_container_path": [
+              "mcp",
+              "servers"
+            ],
+            "targets": {
+              "workspace": {
+                "config_path": ".zcode/config.json",
+                "config_format": "json",
+                "precedence": 50,
+                "writable_check": "parent-or-file"
+              }
+            },
+            "fallback_order": [
+              "workspace"
+            ],
+            "uninstall_targets": [
+              "workspace"
             ]
           }
         }

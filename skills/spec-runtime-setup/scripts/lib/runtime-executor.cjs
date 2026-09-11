@@ -56,7 +56,7 @@ const {
 } = require('../providers/common.cjs');
 
 function runVerificationOrMutation(context, repoRoot) {
-  const selectedIds = context.actionPlan.selected_ids;
+  const selectedIds = context.actionPlan.selected_ids.filter((id) => providers[id]);
   const applyInstallMutation = ['only', 'graphify-refresh'].includes(context.actionPlan.mode);
   const applyHostConfigMutation = applyInstallMutation || context.actionPlan.mode === 'host-config-repair';
   let installResults = new Map();
@@ -264,8 +264,9 @@ function buildExecutionSummary({ context, failedOutcome } = {}) {
     : [];
   const mode = context && context.actionPlan ? context.actionPlan.mode : 'unknown';
   const coversRequiredProviders = requiredProviderIds.every((id) => selectedIds.includes(id));
-  const partialScope = ['only', 'graphify-refresh', 'host-config-repair'].includes(mode)
-    && !coversRequiredProviders;
+  const installationOnly = context && context.actionPlan && context.actionPlan.args.installationOnly === true;
+  const partialScope = installationOnly || (['only', 'graphify-refresh', 'host-config-repair'].includes(mode)
+    && !coversRequiredProviders);
   const overallStatus = failedOutcome
     ? 'action-required'
     : (partialScope ? 'partial' : 'ready');
@@ -274,7 +275,7 @@ function buildExecutionSummary({ context, failedOutcome } = {}) {
     reason_code: failedOutcome && failedOutcome.reason_code
       ? failedOutcome.reason_code
       : (partialScope ? 'subset-setup-complete' : 'setup-ready'),
-    scope: partialScope ? 'subset' : 'full',
+    scope: installationOnly ? 'installation' : (partialScope ? 'subset' : 'full'),
     selected_ids: selectedIds,
     required_provider_ids: requiredProviderIds,
   };
@@ -291,7 +292,7 @@ function reduceExecutionOutcome({
 }) {
   const tools = new Map((probes.toolResults || []).map((entry) => [entry.id, entry]));
   const helpers = new Map((probes.helperResults || []).map((entry) => [entry.id, entry]));
-  const selectedIds = context.actionPlan.selected_ids || [];
+  const selectedIds = (context.actionPlan.selected_ids || []).filter((id) => providers[id]);
 
   for (const entry of context.effectiveRegistry.tools || []) {
     if (!isBaselineBlocking(entry)) continue;
@@ -329,6 +330,7 @@ function reduceExecutionOutcome({
   }
 
   const selectedProviderFailure = firstSelectedProviderFailure(providerResults, selectedIds, {
+    installationOnly: context.actionPlan.args.installationOnly === true,
     requireConfigured: false,
   });
   if (selectedProviderFailure) return selectedProviderFailure;
@@ -381,7 +383,7 @@ function firstSelectedProviderFailure(providerResults, selectedIds, options = {}
       && ['failed', 'blocked'].includes(readiness.first_generation.status)) {
       return failureOutcome(providerFailureReason(readiness, 'first-generation'));
     }
-    for (const field of ['installed', 'initialized', 'indexed', 'artifact_exists']) {
+    for (const field of (options.installationOnly ? ['installed'] : ['installed', 'initialized', 'indexed', 'artifact_exists'])) {
       if (lifecycle[field] !== true) {
         return failureOutcome(providerFailureReason(readiness, field));
       }
@@ -809,6 +811,7 @@ function providerContext(context, repoRoot, id, extra = {}) {
     registryEntry: entry,
     dependency: dependencyFor(context, dependencyRef),
     probeDependency: true,
+    installationOnly: context.actionPlan.args.installationOnly === true,
     requirementWorkspace: context.actionPlan.args.requirementWorkspace || '',
     targetKind: context.target && context.target.target_kind ? context.target.target_kind : '',
     ...extra,

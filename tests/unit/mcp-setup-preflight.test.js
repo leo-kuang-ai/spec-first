@@ -82,8 +82,8 @@ describe('spec-runtime-setup preflight v2 projection', () => {
       id: 'ast-grep-skill',
       skill_name: 'ast-grep',
       dependency_status: 'missing',
-      result: 'action-required',
-      reason_code: 'required-runtime-action-required',
+      result: 'degraded',
+      reason_code: 'optional-capability-degraded',
     });
     expect(preflight.tools.find((entry) => entry.id === 'agent-browser')).toMatchObject({
       required: true,
@@ -102,9 +102,9 @@ describe('spec-runtime-setup preflight v2 projection', () => {
       next_action: '缺少 ast-grep；回退到 rg',
     });
     expect(preflight.tools.find((entry) => entry.id === 'gh')).toMatchObject({
-      baseline_blocking: true,
+      baseline_blocking: false,
       dependency_status: 'missing',
-      result: 'action-required',
+      result: 'degraded',
       install_command: 'brew install gh',
     });
     expect(preflight.tools.find((entry) => entry.id === 'vhs')).toMatchObject({

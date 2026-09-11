@@ -57,6 +57,13 @@ describe('spec-runtime-setup active config consumers', () => {
     }
   });
 
+  test('每个已注册 local key 都有注释示例且模板不激活设置', () => {
+    const template = read('skills/spec-runtime-setup/references/config-template.yaml');
+    const documented = [...template.matchAll(/^# ([a-z][a-z0-9_]*):/gm)].map((match) => match[1]);
+    expect([...new Set(documented)].sort()).toEqual(Object.keys(LOCAL_CONFIG_CONSUMERS).sort());
+    expect(template).not.toMatch(/^[a-z][a-z0-9_]*:/m);
+  });
+
   test('documents every active Product Pulse scheduling key', () => {
     const template = read('skills/spec-runtime-setup/references/config-template.yaml');
     const pulse = read('skills/spec-product-pulse/SKILL.md');
@@ -101,13 +108,13 @@ describe('spec-runtime-setup active config consumers', () => {
 });
 
 describe('spec-runtime-setup active Node consumers', () => {
-  test('loads helper metadata from setup-registry v9 without jq', () => {
+  test('loads helper metadata from setup-registry v11 without jq', () => {
     const registry = loadRegistry({ skillRoot: path.join(repoRoot, 'skills', 'spec-runtime-setup') });
-    expect(registry.schema_version).toBe('setup-registry.v10');
+    expect(registry.schema_version).toBe('setup-registry.v11');
     expect(registry.helpers.map((entry) => entry.id)).not.toContain('jq');
 
     const helpers = new Map(registry.helpers.map((entry) => [entry.id, entry]));
-    expect(helpers.get('gh')).toMatchObject({ id: 'gh', baseline_blocking: true });
+    expect(helpers.get('gh')).toMatchObject({ id: 'gh', baseline_blocking: false, readiness_policy: 'workflow-required' });
     for (const platform of ['macos', 'linux', 'windows']) {
       expect(getEffectiveEntry(registry, {
         kind: 'helper',
