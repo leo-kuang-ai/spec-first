@@ -31,6 +31,22 @@ const HOOK_ARTIFACT_BLOCK_END = '# spec-first graphify artifact env end';
 const HOOK_CREDENTIAL_BLOCK_START = '# spec-first graphify credential isolation start';
 const HOOK_CREDENTIAL_BLOCK_END = '# spec-first graphify credential isolation end';
 const GRAPHIFY_HOOK_MARKER = 'Installed by: graphify hook install';
+// Graphify 0.9.57 无 zcode 平台，zcode 映射 Provider 原生 agents 平台；pi 虽有原生
+// 平台但它写 .pi/agent/skills/——不在 Pi 官方项目级发现路径（.pi/skills、.agents/skills）
+// 内，故同样映射 agents 平台写入共享 .agents/skills/ 投影根。
+const GRAPHIFY_PROJECT_PLATFORM_BY_HOST = Object.freeze({ zcode: 'agents', pi: 'agents' });
+// 各宿主 Python Provider project integration 的 required surface 清单，
+// 被 verify/configured/mutation-guard 三处共用；新增宿主时必须三处一致。
+const GRAPHIFY_PYTHON_HOST_SURFACES = Object.freeze({
+  claude: ['.claude/skills/graphify/SKILL.md', '.claude/CLAUDE.md', 'CLAUDE.md', '.claude/settings.json'],
+  codex: ['.codex/skills/graphify/SKILL.md', 'AGENTS.md', '.codex/hooks.json'],
+  opencode: ['.opencode/skills/graphify/SKILL.md', '.opencode/plugins/graphify.js', '.opencode/opencode.json'],
+  cursor: ['.cursor/rules/graphify.mdc'],
+  kiro: ['.kiro/skills/graphify/SKILL.md', '.kiro/steering/graphify.md'],
+  qoder: ['.qoder/rules/spec-first.md'],
+  zcode: ['.agents/skills/graphify/SKILL.md'],
+  pi: ['.agents/skills/graphify/SKILL.md'],
+});
 const PYTHON_HOOK_MARKERS = {
   'post-commit': ['# graphify-hook-start', '# graphify-hook-end'],
   'post-checkout': ['# graphify-checkout-hook-start', '# graphify-checkout-hook-end'],
@@ -109,7 +125,8 @@ function plan(context = {}) {
     actions.push(installAction.action);
   }
   if (!isSpecFirstSourceRepo(repoRoot) && context.host !== 'qoder') {
-    actions.push({ kind: 'install-project-skill', command: 'graphify', args: ['install', '--project', '--platform', context.host || 'codex'] });
+    const platform = GRAPHIFY_PROJECT_PLATFORM_BY_HOST[context.host] || context.host || 'codex';
+    actions.push({ kind: 'install-project-skill', command: 'graphify', args: ['install', '--project', '--platform', platform] });
   } else if (!isSpecFirstSourceRepo(repoRoot) && context.host === 'qoder') {
     actions.push({ kind: 'install-qoder-adapter', command: null, args: [] });
   }
@@ -1974,13 +1991,8 @@ function assertGraphifyMutationSurfaces(repoRoot, host, artifactRoot, ecosystem)
 
 function projectMutationSurfaces(repoRoot, host, ecosystem) {
   if (ecosystem === 'pypi') {
-    const pythonPaths = {
-      claude: ['.claude/skills/graphify/SKILL.md', '.claude/CLAUDE.md', 'CLAUDE.md', '.claude/settings.json'],
-      codex: ['.codex/skills/graphify/SKILL.md', 'AGENTS.md', '.codex/hooks.json'],
-      cursor: ['.cursor/rules/graphify.mdc'],
-      kiro: ['.kiro/skills/graphify/SKILL.md', '.kiro/steering/graphify.md'],
-      qoder: ['.qoder/rules/spec-first.md'],
-    }[host] || ['.codex/skills/graphify/SKILL.md', 'AGENTS.md', '.codex/hooks.json'];
+    const pythonPaths = GRAPHIFY_PYTHON_HOST_SURFACES[host]
+      || ['.codex/skills/graphify/SKILL.md', 'AGENTS.md', '.codex/hooks.json'];
     return pythonPaths.map((relativePath) => path.join(repoRoot, relativePath));
   }
   const instruction = host === 'claude' ? 'CLAUDE.md' : 'AGENTS.md';
@@ -1996,13 +2008,8 @@ function projectMutationSurfaces(repoRoot, host, ecosystem) {
 function projectSkillConfigured(repoRoot, host, ecosystem) {
   if (isSpecFirstSourceRepo(repoRoot)) return true;
   if (ecosystem === 'pypi') {
-    const required = {
-      claude: ['.claude/skills/graphify/SKILL.md', '.claude/CLAUDE.md', 'CLAUDE.md', '.claude/settings.json'],
-      codex: ['.codex/skills/graphify/SKILL.md', 'AGENTS.md', '.codex/hooks.json'],
-      cursor: ['.cursor/rules/graphify.mdc'],
-      kiro: ['.kiro/skills/graphify/SKILL.md', '.kiro/steering/graphify.md'],
-      qoder: ['.qoder/rules/spec-first.md'],
-    }[host] || ['.codex/skills/graphify/SKILL.md', 'AGENTS.md', '.codex/hooks.json'];
+    const required = GRAPHIFY_PYTHON_HOST_SURFACES[host]
+      || ['.codex/skills/graphify/SKILL.md', 'AGENTS.md', '.codex/hooks.json'];
     return required.every((relativePath) => fs.existsSync(path.join(repoRoot, relativePath)));
   }
   const candidates = {
@@ -2105,8 +2112,11 @@ function normalizePythonHostIntegration(repoRoot, host, runtimeContext) {
   const providerOwnedSurfaces = {
     claude: ['.claude/skills/graphify', '.claude/CLAUDE.md'],
     codex: ['.codex/skills/graphify'],
+    opencode: ['.opencode/skills/graphify', '.opencode/plugins/graphify.js', '.opencode/opencode.json'],
     cursor: ['.cursor/rules/graphify.mdc'],
     kiro: ['.kiro/skills/graphify', '.kiro/steering/graphify.md'],
+    zcode: ['.agents/skills/graphify'],
+    pi: ['.agents/skills/graphify'],
   }[host] || [];
   for (const relativePath of providerOwnedSurfaces) {
     const surface = path.join(repoRoot, relativePath);
@@ -2248,12 +2258,7 @@ function pythonHostIntegrationConfigured(repoRoot, host, runtimeContext) {
       ? { ok: true, mode: 'spec-first-adapter' }
       : { ok: false, reason_code: 'graphify-qoder-adapter-invalid' };
   }
-  const required = {
-    claude: ['.claude/skills/graphify/SKILL.md', '.claude/CLAUDE.md', 'CLAUDE.md', '.claude/settings.json'],
-    codex: ['.codex/skills/graphify/SKILL.md', 'AGENTS.md', '.codex/hooks.json'],
-    cursor: ['.cursor/rules/graphify.mdc'],
-    kiro: ['.kiro/skills/graphify/SKILL.md', '.kiro/steering/graphify.md'],
-  }[host] || [];
+  const required = GRAPHIFY_PYTHON_HOST_SURFACES[host] || [];
   if (required.length === 0 || required.some((relativePath) => !fs.existsSync(path.join(repoRoot, relativePath)))) {
     return { ok: false, reason_code: 'graphify-project-integration-missing' };
   }

@@ -173,11 +173,14 @@ describe('spec-runtime-setup active Node consumers', () => {
       expect(effective.tools.find((entry) => entry.id === 'context7').host_config.targets)
         .toBeDefined();
     }
-    // setup-registry 覆盖面是受支持宿主的有意子集：pi 无原生 MCP 支持，
-    // MCP_SETUP_HOST=pi 保持不支持，registry 不得新增 pi 定义（计划 KTD5；
-    // 仅当 pi MCP 官方化时重评）。
+    // setup-registry 覆盖面与受支持宿主一致。pi 曾按 pi-host-support 计划 KTD5
+    // （2026-09-04）被有意排除——当时 MCP 仅 extension 生态且配置面未文档化；
+    // 2026-09-11 owner 决策推翻 KTD5 接入 pi：pi.dev 官方 registry 的
+    // pi-mcp-extension 已文档化 `.pi/mcp.json`（项目）/`~/.pi/agent/mcp.json`
+    // （全局）配置面与 `mcpServers` 容器，setup 据此写入（扩展未装时配置 inert，
+    // 见 SKILL.md 前置说明）。pi 核心原生 MCP 出现时按原生面重评。
     expect(getSupportedPlatforms().filter((platform) => !registryHosts.includes(platform)))
-      .toEqual(['pi']);
+      .toEqual([]);
     // 反向：setup 侧手工宿主清单不得出现 registry 已退役/拼错的宿主（⊆ 关系）。
     // pi 的排除是 KTD5 的有意子集，只约束方向不强制全集。
     const { CANONICAL_HOSTS } = require('../../skills/spec-runtime-setup/scripts/lib/host-authority.cjs');
@@ -208,14 +211,14 @@ describe('spec-runtime-setup active Node consumers', () => {
       }
     }
 
-    // 共享面语义：.agents/skills 同时确认 codex 与 zcode。
+    // 共享面语义：.agents/skills 同时确认 codex、zcode 与 pi。
     const sharedRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-surface-guard-'));
     const sharedSkillRoot = path.join(sharedRoot, '.agents', 'skills', 'spec-runtime-setup');
     fs.mkdirSync(sharedSkillRoot, { recursive: true });
     const loaded = resolveLoadedHostSurface(sharedSkillRoot);
     expect(loaded).toMatchObject({
       surface_id: '.agents/skills',
-      hosts: ['codex', 'zcode'],
+      hosts: ['codex', 'zcode', 'pi'],
     });
 
     // receipt schema 的 host enum 必须与 CANONICAL_HOSTS 同步
@@ -251,9 +254,10 @@ describe('spec-runtime-setup active Node consumers', () => {
         continue;
       }
       const installSkill = plan.actions.find((entry) => entry.kind === 'install-project-skill');
+      const expectedPlatform = host === 'zcode' || host === 'pi' ? 'agents' : host;
       expect(installSkill).toMatchObject({
         command: 'graphify',
-        args: ['install', '--project', '--platform', host],
+        args: ['install', '--project', '--platform', expectedPlatform],
       });
     }
   });

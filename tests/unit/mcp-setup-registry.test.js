@@ -104,6 +104,22 @@ describe('spec-runtime-setup registry v11', () => {
     } finally { fixture.cleanup(); }
   });
 
+  test('v10 兼容读取不触发 host override 覆盖不变量（真实 v10 形态）', () => {
+    const fixture = withRegistryMutation((registry) => {
+      registry.schema_version = 'setup-registry.v10';
+      for (const entry of [...registry.tools, ...registry.helpers]) delete entry.readiness_policy;
+      for (const entry of registry.tools) delete entry.host_overrides.zcode;
+      delete registry.providers.find((provider) => provider.id === 'codegraph').host_overrides.zcode;
+    });
+    try {
+      const registry = loadRegistry({ skillRoot: fixture.tempRoot });
+      expect(registry.schema_version).toBe('setup-registry.v10');
+      expect(byId(registry.tools)['sequential-thinking'].host_overrides.zcode).toBeUndefined();
+    } finally {
+      fixture.cleanup();
+    }
+  });
+
   test('v11 禁止遗漏 readiness policy 或写入未知 enum', () => {
     expectRegistryError((registry) => { delete registry.helpers[0].readiness_policy; }, 'registry_readiness_policy_missing');
     expectRegistryError((registry) => { registry.helpers[0].readiness_policy = 'maybe'; }, 'registry_schema_invalid');
@@ -184,7 +200,7 @@ describe('spec-runtime-setup registry v11', () => {
 
   test('keeps complete host and artifact contracts at the top level', () => {
     const registry = loadRegistry({ skillRoot });
-    expect(Object.keys(registry.hosts)).toEqual(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder', 'zcode']);
+    expect(Object.keys(registry.hosts)).toEqual(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'pi', 'qoder', 'zcode']);
     for (const host of Object.values(registry.hosts)) {
       expect(host.defaults.tool.host_config.targets).toBeDefined();
       expect(host.defaults.tool.host_config.fallback_order).toBeDefined();
@@ -240,6 +256,25 @@ describe('spec-runtime-setup registry v11', () => {
     expect(byId(zcode.tools).codegraph.host_config).toMatchObject({
       command: 'codegraph',
       args: ['serve', '--mcp'],
+    });
+    const pi = getEffectiveRegistry(registry, { host: 'pi', platform: 'macos' });
+    expect(pi.host_definition.host_config).toMatchObject({
+      scope: 'project',
+      json_container_path: ['mcpServers'],
+    });
+    expect(byId(pi.tools)['sequential-thinking'].host_config).toMatchObject({
+      command: 'npx',
+      json_container_path: ['mcpServers'],
+    });
+    expect(byId(pi.tools).context7.host_config).toMatchObject({
+      command: 'npx',
+      json_container_path: ['mcpServers'],
+    });
+    expect(byId(pi.providers).codegraph.host_config).toMatchObject({
+      command: 'codegraph',
+      args: ['serve', '--mcp'],
+      json_container_path: ['mcpServers'],
+      targets: { project: { config_path: '.pi/mcp.json' } },
     });
   });
 

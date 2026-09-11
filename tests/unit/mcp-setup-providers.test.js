@@ -50,10 +50,20 @@ function materializeGraphifyProjectSkill(target, args) {
     cursor: '.cursor/skills/graphify',
     kiro: '.kiro/skills/graphify',
     qoder: '.qoder/skills/graphify',
+    opencode: '.opencode/skills/graphify',
+    agents: '.agents/skills/graphify',
   };
   const skillDir = path.join(target, roots[platform] || '.codex/skills/graphify');
   fs.mkdirSync(skillDir, { recursive: true });
   fs.writeFileSync(path.join(skillDir, 'SKILL.md'), '# Graphify\n');
+  if (platform === 'opencode') {
+    fs.mkdirSync(path.join(target, '.opencode', 'plugins'), { recursive: true });
+    fs.writeFileSync(path.join(target, '.opencode', 'plugins', 'graphify.js'), '// graphify plugin\n');
+    fs.writeFileSync(
+      path.join(target, '.opencode', 'opencode.json'),
+      JSON.stringify({ plugin: ['.opencode/plugins/graphify.js'] }, null, 2),
+    );
+  }
 }
 
 function materializePythonGraphifyHooks(
@@ -122,6 +132,10 @@ function createGraphifyApplyFixture(label) {
     }
     if (command === launcher && args[0] === '--version') return success('graphify 0.9.12');
     if (command === launcher) graphifyCalls.push({ args: [...args], env: { ...(options.env || {}) } });
+    if (command === launcher && args[0] === 'install') {
+      materializeGraphifyProjectSkill(target, args);
+      return success('installed');
+    }
     if (command === launcher && args[0] === 'extract') {
       fs.mkdirSync(path.join(target, 'graphify-out'), { recursive: true });
       fs.writeFileSync(path.join(target, 'graphify-out', 'graph.json'), JSON.stringify({ nodes: [{ id: 'fixture' }], links: [] }));
@@ -543,6 +557,67 @@ describe('CodeGraph provider', () => {
 });
 
 describe('Graphify provider', () => {
+  test('maps the zcode host onto the graphify agents platform end to end', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('zcode-agents-platform');
+    fixture.context.host = 'zcode';
+
+    const plan = provider.plan(fixture.context);
+    const installAction = (plan.actions || []).find((action) => action.kind === 'install-project-skill');
+    expect(installAction.args).toEqual(['install', '--project', '--platform', 'agents']);
+
+    const result = provider.apply(fixture.context, plan);
+    expect(result).toMatchObject({
+      readiness_status: 'fresh',
+      lifecycle: { initialized: true, indexed: true, query_verified: true },
+    });
+    expect(fs.existsSync(path.join(fixture.target, '.agents', 'skills', 'graphify', 'SKILL.md'))).toBe(true);
+    expect(fixture.graphifyCalls.some((call) => call.args.join(' ') === 'install --project --platform agents')).toBe(true);
+    expect(provider.verify({ ...fixture.context, repoRoot: fixture.target })).toMatchObject({
+      lifecycle: expect.objectContaining({ configured: true }),
+    });
+  });
+
+  test('maps the pi host onto the graphify agents platform end to end', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('pi-agents-platform');
+    fixture.context.host = 'pi';
+
+    const plan = provider.plan(fixture.context);
+    const installAction = (plan.actions || []).find((action) => action.kind === 'install-project-skill');
+    expect(installAction.args).toEqual(['install', '--project', '--platform', 'agents']);
+
+    const result = provider.apply(fixture.context, plan);
+    expect(result).toMatchObject({
+      readiness_status: 'fresh',
+      lifecycle: { initialized: true, indexed: true, query_verified: true },
+    });
+    expect(fs.existsSync(path.join(fixture.target, '.agents', 'skills', 'graphify', 'SKILL.md'))).toBe(true);
+    expect(provider.verify({ ...fixture.context, repoRoot: fixture.target })).toMatchObject({
+      lifecycle: expect.objectContaining({ configured: true }),
+    });
+  });
+
+  test('verifies the opencode host against its native graphify platform surfaces', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('opencode-native-platform');
+    fixture.context.host = 'opencode';
+
+    const plan = provider.plan(fixture.context);
+    const installAction = (plan.actions || []).find((action) => action.kind === 'install-project-skill');
+    expect(installAction.args).toEqual(['install', '--project', '--platform', 'opencode']);
+
+    const result = provider.apply(fixture.context, plan);
+    expect(result).toMatchObject({
+      readiness_status: 'fresh',
+      lifecycle: { initialized: true, indexed: true, query_verified: true },
+    });
+    expect(fs.existsSync(path.join(fixture.target, '.opencode', 'skills', 'graphify', 'SKILL.md'))).toBe(true);
+    expect(provider.verify({ ...fixture.context, repoRoot: fixture.target })).toMatchObject({
+      lifecycle: expect.objectContaining({ configured: true }),
+    });
+  });
+
   test('generates a graph in a standalone non-Git folder and skips only Git hook automation', () => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const fixture = createGraphifyApplyFixture('non-git-folder');

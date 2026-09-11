@@ -6,7 +6,7 @@ const path = require('node:path');
 const REGISTRY_FILE = 'setup-registry.json';
 const SCHEMA_FILE = 'setup-registry.schema.json';
 const REGISTRY_SCHEMA_VERSION = 'setup-registry.v11';
-const HOST_IDS = Object.freeze(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder', 'zcode']);
+const HOST_IDS = Object.freeze(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder', 'zcode', 'pi']);
 const PLATFORM_IDS = Object.freeze(['macos', 'linux', 'wsl', 'windows']);
 const KIND_COLLECTIONS = Object.freeze({
   tool: 'tools',
@@ -528,6 +528,9 @@ function validateRegistry(registry, schema) {
     for (const entry of [...registry.tools, ...registry.helpers]) {
       if (!entry.readiness_policy) throw new RegistryError('registry_readiness_policy_missing', `缺少 ${entry.id} 的 readiness_policy`);
     }
+    // 覆盖不变量只约束 v11：真实 v10 registry（如 npm 1.15.3）没有 zcode override，
+    // 混合加载时按原始语义在 setup 阶段 fail closed，而不是在加载期拒绝兼容读取。
+    assertHostOverrideCoverage(registry);
   }
   for (const [collection, entries] of [
     ['external_dependencies', registry.external_dependencies],
@@ -548,7 +551,6 @@ function validateRegistry(registry, schema) {
   }
   assertNoDuplicateHostTargets(registry);
   assertOverrideKeys(registry);
-  assertHostOverrideCoverage(registry);
   assertOpenCodePermissionPolicyOwnership(registry);
 }
 

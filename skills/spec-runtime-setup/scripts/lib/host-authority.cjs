@@ -4,7 +4,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const CANONICAL_HOSTS = Object.freeze(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder', 'zcode']);
+const CANONICAL_HOSTS = Object.freeze(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder', 'zcode', 'pi']);
 const CANONICAL_HOST_SET = new Set(CANONICAL_HOSTS);
 // 每个宿主登记 spec-runtime-setup 的全部 generated 投射根（相对 repo 根的正斜杠路径）。
 // Claude 以 workflow_command 投射到 managed workflows 根；其余宿主 workflow 根即
@@ -21,6 +21,9 @@ const HOST_SKILL_SURFACES = Object.freeze({
   // projects to; resolveLoadedHostSurface returns every host bound to the
   // matched surface so a zcode pin confirms against the shared root.
   zcode: Object.freeze(['.agents/skills']),
+  // Pi 的官方项目级 skills 发现根同样包含共享 .agents/skills（cwd 与祖先目录），
+  // 因此 pi pin 与 codex/zcode 一样经共享根确认。
+  pi: Object.freeze(['.agents/skills']),
 });
 
 function resolveHostAuthority({

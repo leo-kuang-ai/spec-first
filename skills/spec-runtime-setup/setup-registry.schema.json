@@ -51,7 +51,8 @@
         "kiro",
         "opencode",
         "qoder",
-        "zcode"
+        "zcode",
+        "pi"
       ],
       "properties": {
         "claude": {
@@ -73,6 +74,9 @@
           "$ref": "#/$defs/hostDefinition"
         },
         "zcode": {
+          "$ref": "#/$defs/hostDefinition"
+        },
+        "pi": {
           "$ref": "#/$defs/hostDefinition"
         }
       }
@@ -575,6 +579,9 @@
           "$ref": "#/$defs/hostOverride"
         },
         "zcode": {
+          "$ref": "#/$defs/hostOverride"
+        },
+        "pi": {
           "$ref": "#/$defs/hostOverride"
         }
       }

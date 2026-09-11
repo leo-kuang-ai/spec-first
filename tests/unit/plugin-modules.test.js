@@ -30,6 +30,18 @@ describe('plugin module facade and governance', () => {
     expect(pluginSyncSource).toContain('adapter.supportsAgents === false');
   });
 
+  test('high-value anchor tables stay a single source of truth', () => {
+    // command 完整性检查与 skill 检查共享同一份锚点：历史上两份逐字相同的字面量表
+    // 只改其一会让两条完整性路径静默分叉且无测试失败。锁定别名形态，禁止回退为
+    // 第二份字面量表。
+    const source = fs.readFileSync(
+      path.join(__dirname, '../../src/cli/plugin-sync.js'),
+      'utf8',
+    );
+    expect(source).toContain('const HIGH_VALUE_COMMAND_ANCHORS = HIGH_VALUE_SKILL_ANCHORS;');
+    expect(source.match(/const HIGH_VALUE_(?:SKILL|COMMAND)_ANCHORS = \{/g) || []).toHaveLength(1);
+  });
+
   test('ships the deterministic host preflight validator without adding dispatch execution', () => {
     const validatorSource = fs.readFileSync(
       path.join(__dirname, '../../src/contracts/worker-dispatch-host-preflight-validator.js'),
@@ -778,7 +790,7 @@ describe('plugin module facade and governance', () => {
         );
         expect(setupSkill).toBeDefined();
         expect(setupSkill.contents).toContain(
-          'Canonical package source-of-truth 是 `skills/spec-runtime-setup/setup-registry.json`，由共置的 `setup-registry.schema.json` 校验，schema version 为 `setup-registry.v10`。',
+          'Canonical package source-of-truth 是 `skills/spec-runtime-setup/setup-registry.json`，由共置的 `setup-registry.schema.json` 校验，schema version 为 `setup-registry.v11`。',
         );
         expect(setupSkill.contents).toContain(
           'Generated host runtime mirrors and host-local MCP config files are projections or outputs, not source.',

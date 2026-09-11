@@ -29,6 +29,7 @@ const HOST_ENTRY_FILE = Object.freeze({
   opencode: 'AGENTS.md',
   qoder: 'AGENTS.md',
   zcode: 'AGENTS.md',
+  pi: 'AGENTS.md',
 });
 
 function entryFilesForHosts(hosts) {
