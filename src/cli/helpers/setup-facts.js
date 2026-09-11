@@ -2,7 +2,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { captureSourceSnapshot } = require('../../../skills/spec-runtime-setup/scripts/lib/source-snapshot.cjs');
+const { captureSourceSnapshot, sourceContentIdentity } = require('../../../skills/spec-runtime-setup/scripts/lib/source-snapshot.cjs');
 const { isVerifiedNpmArchiveIdentity } = require('../../../skills/spec-runtime-setup/scripts/lib/npm-warmup.cjs');
 
 const SETUP_FACTS_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
@@ -447,6 +447,9 @@ function normalizeScopeProvenance(source) {
     result[key] = normalizeNullableString(source[key]);
   }
   if (typeof source.graph_sha256 === 'string' && /^[a-f0-9]{64}$/.test(source.graph_sha256)) result.graph_sha256 = source.graph_sha256;
+  const sourceSnapshot = sourceContentIdentity(source.source_snapshot);
+  if (sourceSnapshot) result.source_snapshot = sourceSnapshot;
+  if (['graphify-source-changed-during-generation', 'graphify-source-snapshot-unavailable'].includes(source.source_reason_code)) result.source_reason_code = source.source_reason_code;
   return result;
 }
 
@@ -595,7 +598,7 @@ function compareCurrentGraphifyIdentity(projection, context) {
   }
 }
 
-function compareCurrentGraphifyReceipt(projection, repoRoot) {
+function compareCurrentGraphifyReceipt(projection, repoRoot, currentSourceSnapshot) {
   if (projection.freshness.status !== 'fresh') return;
   const entries = projection.provider_readiness.filter((entry) => entry.provider === 'graphify' && entry.readiness_scope === 'artifact');
   for (const entry of entries) {
@@ -606,9 +609,15 @@ function compareCurrentGraphifyReceipt(projection, repoRoot) {
       && recorded.verified_requirement_workspace_path === scope && entry.first_generation.artifact_root === 'graphify-out';
     const mismatch = ['graphify-scope-provenance-artifact-mismatch', 'graphify-scope-provenance-mismatch'].includes(current.reason_code)
       || (current.status === 'verified' && recordedVerified && recorded.graph_sha256 !== current.graph_sha256);
-    if (!mismatch && current.status === 'verified' && recordedVerified) continue;
-    const status = mismatch ? 'stale' : 'unknown';
-    const reason = current.reason_code || (mismatch ? 'graphify-scope-provenance-artifact-mismatch' : 'graphify-scope-provenance-recorded-evidence-missing');
+    const snapshots = [sourceContentIdentity(recorded?.source_snapshot), sourceContentIdentity(current.source_snapshot), sourceContentIdentity(currentSourceSnapshot)];
+    const knownSources = snapshots.filter(Boolean).map((snapshot) => JSON.stringify(snapshot));
+    const sourceChangedDuringGeneration = current.source_reason_code === 'graphify-source-changed-during-generation';
+    const sourceMismatch = sourceChangedDuringGeneration || new Set(knownSources).size > 1;
+    if (!mismatch && !sourceMismatch && snapshots.every(Boolean) && current.status === 'verified' && recordedVerified) continue;
+    const status = mismatch || sourceMismatch ? 'stale' : 'unknown';
+    const reason = current.reason_code || (mismatch ? 'graphify-scope-provenance-artifact-mismatch'
+      : sourceChangedDuringGeneration ? current.source_reason_code
+        : sourceMismatch ? 'graphify-source-snapshot-mismatch' : 'graphify-scope-provenance-recorded-evidence-missing');
     if (projection.freshness.status !== 'stale') projection.freshness = { ...projection.freshness, status, reason_code: reason };
     if (entry.readiness_status === 'fresh') entry.readiness_status = status;
     entry.limitations = [...entry.limitations, `${reason}: 当前图与历史 scope/query 证据未闭合。`];
@@ -632,7 +641,7 @@ function computeDecisionInputHealth({ projectRoot, platforms = [], factsPath, no
     const current = captureSourceSnapshot({ repoRoot: projectRoot, skillRoot, homeDir, env, host: projection.host, now });
     projection.freshness = compareSourceSnapshot(projection.freshness, projection.raw.source_snapshot, current);
     compareCurrentGraphifyIdentity(projection, { repoRoot: projectRoot, skillRoot, homeDir, env, host: projection.host });
-    compareCurrentGraphifyReceipt(projection, projectRoot);
+    compareCurrentGraphifyReceipt(projection, projectRoot, current);
   }
   if (projection.status === 'missing') {
     return buildDecisionResult('missing', 'setup-facts-missing', projection, { requestedPlatforms: platforms });

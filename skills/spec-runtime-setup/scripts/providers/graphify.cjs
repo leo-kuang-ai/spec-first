@@ -12,6 +12,7 @@ const {
   reasonError,
 } = require('../lib/path-safety.cjs');
 const { resolveGitPath } = require('../lib/git-path.cjs');
+const { captureSourceSnapshot, sourceContentIdentity } = require('../lib/source-snapshot.cjs');
 const {
   isSpecFirstSourceRepo,
   providerLimitation,
@@ -390,6 +391,7 @@ function apply(context = {}, actionPlan = plan(context)) {
   }
   let fallbackUsed = false;
   let mutationFailure = null;
+  let generationSource = null;
   const pythonProvider = true;
   const pathRepair = { status: 'report-only', reason_code: null };
   let runtimeContext = actionPlan.resolved_graphify_command
@@ -486,6 +488,7 @@ function apply(context = {}, actionPlan = plan(context)) {
         }
       }
     } else if (action.kind === 'first-generation') {
+      generationSource = sourceContentIdentity(captureSourceSnapshot({ ...context, repoRoot }));
       const extract = runGraphify(runtimeContext, action.args, {
         cwd: repoRoot,
         timeoutMs: 120000,
@@ -501,6 +504,7 @@ function apply(context = {}, actionPlan = plan(context)) {
         mutationFailure = 'graphify-first-generation-failed';
       }
     } else if (action.kind === 'refresh') {
+      generationSource = sourceContentIdentity(captureSourceSnapshot({ ...context, repoRoot }));
       const refresh = runGraphify(runtimeContext, action.args, {
         cwd: repoRoot,
         timeoutMs: 120000,
@@ -540,11 +544,18 @@ function apply(context = {}, actionPlan = plan(context)) {
     ? applyGraphifyHookCapability(repoRoot, runtimeContext, hookTarget, pythonProvider)
     : defaultGraphifyHookOutcome(hookTarget);
   if (!mutationFailure && generationAction && currentArtifactRefs(repoRoot, actionPlan.artifact_root || path.join(repoRoot, CURRENT_ARTIFACT_ROOT)).length > 0) {
+    const currentSource = sourceContentIdentity(captureSourceSnapshot({ ...context, repoRoot }));
+    const stableSource = generationSource && currentSource && JSON.stringify(generationSource) === JSON.stringify(currentSource)
+      ? generationSource : null;
+    const sourceReason = stableSource ? null : (generationSource && currentSource
+      ? 'graphify-source-changed-during-generation' : 'graphify-source-snapshot-unavailable');
     const receiptWrite = writeGraphifyScopeProvenance(
       repoRoot,
       actionPlan.artifact_root || path.join(repoRoot, CURRENT_ARTIFACT_ROOT),
       actionPlan.requirement_workspace_path || '.',
       generationAction.kind,
+      stableSource,
+      sourceReason,
     );
     if (!receiptWrite.ok) mutationFailure = receiptWrite.reason_code;
   }
@@ -601,7 +612,7 @@ function apply(context = {}, actionPlan = plan(context)) {
     artifactExists: hasArtifact,
     queryVerified,
     fallbackUsed,
-    readinessStatus: degraded ? 'degraded' : (generatedThisRun ? 'fresh' : 'unknown'),
+    readinessStatus: degraded ? 'degraded' : (generatedThisRun && scopeProvenance.source_snapshot ? 'fresh' : 'unknown'),
     repoAligned: 'unknown',
     firstGenerationStatus: mutationFailure && !hasArtifact ? 'failed' : firstGeneration.status,
     firstGenerationScope: firstGeneration.scope,
@@ -1094,7 +1105,11 @@ function readGraphifyScopeProvenance(repoRoot, artifactRoot, requestedPath, read
         'graphify-scope-provenance-mismatch',
       );
     }
-    return { ...scopeProvenanceResult('verified', requestedPath, verifiedPath, receiptRef), graph_sha256: receipt.graph_sha256 };
+    const sourceSnapshot = receipt.source_reason_code == null ? sourceContentIdentity(receipt.source_snapshot) : null;
+    return { ...scopeProvenanceResult('verified', requestedPath, verifiedPath, receiptRef), graph_sha256: receipt.graph_sha256,
+      ...(sourceSnapshot ? { source_snapshot: sourceSnapshot } : {}),
+      ...(['graphify-source-changed-during-generation', 'graphify-source-snapshot-unavailable'].includes(receipt.source_reason_code)
+        ? { source_reason_code: receipt.source_reason_code } : {}) };
   } catch (error) {
     return scopeProvenanceResult(
       'invalid',
@@ -1106,7 +1121,7 @@ function readGraphifyScopeProvenance(repoRoot, artifactRoot, requestedPath, read
   }
 }
 
-function writeGraphifyScopeProvenance(repoRoot, artifactRoot, requirementWorkspacePath, operation) {
+function writeGraphifyScopeProvenance(repoRoot, artifactRoot, requirementWorkspacePath, operation, sourceSnapshot = null, sourceReason = null) {
   const receiptPath = path.join(artifactRoot, GRAPHIFY_SCOPE_RECEIPT);
   const temporaryPath = path.join(
     artifactRoot,
@@ -1128,6 +1143,8 @@ function writeGraphifyScopeProvenance(repoRoot, artifactRoot, requirementWorkspa
       requirement_workspace_path: requirementWorkspacePath || '.',
       operation,
       graph_sha256: graphArtifactSha256(repoRoot, artifactRoot),
+      source_snapshot: sourceSnapshot,
+      source_reason_code: sourceReason,
     };
     fs.writeFileSync(temporaryPath, `${JSON.stringify(payload, null, 2)}\n`, { flag: 'wx', mode: 0o600 });
     const current = lstatOrNull(receiptPath);
@@ -1171,10 +1188,17 @@ function graphifyFirstGenerationFacts(artifactExists, scopeProvenance) {
 
 function graphifyScopeReadinessBlocked(scopeProvenance) {
   return Boolean(scopeProvenance
-    && ['mismatch', 'invalid'].includes(scopeProvenance.status));
+    && (['mismatch', 'invalid'].includes(scopeProvenance.status)
+      || scopeProvenance.source_reason_code === 'graphify-source-changed-during-generation'));
 }
 
 function graphifyScopeNextActions(scopeProvenance) {
+  if (scopeProvenance?.source_reason_code === 'graphify-source-changed-during-generation') {
+    return ['构图期间源码发生变化；在源码稳定后显式运行 Graphify refresh，再验证当前图。'];
+  }
+  if (scopeProvenance?.source_reason_code === 'graphify-source-snapshot-unavailable') {
+    return ['构图未取得完整源码快照；检查源码路径/采集预算后显式 refresh，当前图仅作 advisory candidate。'];
+  }
   if (!scopeProvenance || scopeProvenance.status === 'verified') return [];
   if (scopeProvenance.status === 'mismatch') {
     return ['requested Graphify scope 与 artifact scope provenance 不匹配；运行显式 --only graphify --refresh --requirement-workspace <scope> 后重新 verify。'];
@@ -1607,6 +1631,9 @@ function graphifyProviderLimitations(
   scopeProvenance = null,
 ) {
   const limitations = pythonProviderLimitations(runtimeContext, graphIntegrity, incumbentCleanup) || [];
+  if (scopeProvenance?.source_reason_code) {
+    limitations.push(providerLimitation('degraded', scopeProvenance.source_reason_code, '当前图未绑定稳定的构图源码快照。'));
+  }
   if (readinessFailureReason) {
     limitations.push(providerLimitation(
       'degraded',

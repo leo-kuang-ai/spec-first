@@ -195,4 +195,11 @@ function fileSignature(stat) {
   return JSON.stringify([stat.dev, stat.ino, stat.size, stat.mode, stat.nlink, stat.mtimeMs, stat.ctimeMs]);
 }
 
-module.exports = { captureSourceSnapshot };
+function sourceContentIdentity(snapshot) {
+  if (!snapshot || snapshot.schema_version !== 'setup-source-snapshot.v2'
+    || !['git', 'folder'].includes(snapshot.source_kind)
+    || typeof snapshot.source_content_sha256 !== 'string' || !/^[a-f0-9]{64}$/.test(snapshot.source_content_sha256)) return null;
+  return { schema_version: snapshot.schema_version, source_kind: snapshot.source_kind, source_content_sha256: snapshot.source_content_sha256 };
+}
+
+module.exports = { captureSourceSnapshot, sourceContentIdentity };

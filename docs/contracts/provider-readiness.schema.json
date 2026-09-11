@@ -243,6 +243,19 @@
               "type": "string",
               "pattern": "^[a-f0-9]{64}$"
             },
+            "source_snapshot": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["schema_version", "source_kind", "source_content_sha256"],
+              "properties": {
+                "schema_version": { "const": "setup-source-snapshot.v2" },
+                "source_kind": { "enum": ["git", "folder"] },
+                "source_content_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+              }
+            },
+            "source_reason_code": {
+              "enum": ["graphify-source-changed-during-generation", "graphify-source-snapshot-unavailable"]
+            },
             "status": {
               "enum": [
                 "verified",

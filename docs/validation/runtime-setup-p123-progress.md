@@ -199,3 +199,16 @@
 - 不证明图语义、跨文件原子性或严格墙钟上限；当前 scope receipt 仍未绑定图生成时的 source content snapshot，CodeGraph 当前身份及 U9–U12 整体收口仍待处理。整个 P123 计划未完成。
 
 - 本切片最终验证：npm run test:mcp-setup 33 suites / 695 tests 通过；最后收紧历史 artifact root 后，两套 identity/consumer suites / 39 tests 通过；typecheck 262 files、入口 lint 490 files、diff check 通过。完整回归运行于共享工作区，不外推为本提交的隔离全仓测试。
+
+
+## U8 构图源码内容绑定
+
+- 红测试证明源码改变后只重新发布 tool facts，旧图仍可 fresh。Graphify generation/refresh 前后复用既有 source snapshot 有界采集，仅一致且完整的内容身份写入现有 receipt 的 source_snapshot 三字段；normalizer/schema/doctor 共同消费，不新建 durable 文件。
+- doctor 比较历史绑定、当前 receipt 与当前源码；缺绑定为 unknown，已知内容不同为 stale。构图期间源码变化时清除绑定、记录专用 source_reason_code，Provider degraded；前后快照不可得时 unknown，保留真实图/query lifecycle。
+- 首轮独立审查发现无 HEAD 时虽写 snapshot=null，apply 仍 fresh。真实临时 Git fixture 复现并修复，增加稳定源码 fresh、构图期间变化 degraded、无 HEAD unknown 三个场景。11 个旧 Provider fixture 和三个 entrypoint fixture 未建立 HEAD，更新其 freshness 预期；不改变其安装、query 或 hook 断言，也不修改 CodeGraph 的预期。
+- 三个聚焦 suites / 104 tests 通过；typecheck 262 files、入口 lint 490 files 通过。独立 reviewer 唯一 follow-up 定点复核通过，未独立执行测试。
+- 共享工作区完整 setup 回归首次为 683/698：三项为本轮旧 entrypoint freshness 预期（已更新），另十二项来自并发 registry.cjs 改动删除 getDiagnosticRegistry 导出。该并发改动不属于本切片，未覆盖或纳入提交；使用基线 33f09024 加本切片的独立 checkout 继续验证。
+- 前后采样不证明过程中没有短暂变化；内容身份按整个执行 repo/folder 的既定 source 范围计算，未知/不安全/超预算采集不伪装成绑定。旧 receipt 需显式生成/refresh，不通过 verify 补造。CodeGraph 当前身份与 P123 最终整体验收仍未完成。
+
+- 最终隔离验证：基线 33f09024 + 本切片，两个 consumer/identity suites / 39 tests 通过；完整 mcp-setup 32 suites 通过、1 suite 失败。唯一失败为已在 HEAD 中存在的 plugin-modules 锚点别名断言：HEAD 的 plugin-sync.js 仍有两份字面量表，而 HEAD 测试要求别名（直接 git show 核实）；该文件的并发工作区修复未纳入本切片，不能声明本提交整仓全绿。
+- 共享 registry 的 getDiagnosticRegistry 导出随后由并发工作恢复；再次运行 entrypoint/registry 两 suites / 88 tests 全通过。隔离 checkout 与待提交的七个 production/schema/test 路径逐字节一致，验证副本已在检查完成后清理；不把其他 dirty source 的成功当作本提交证据。

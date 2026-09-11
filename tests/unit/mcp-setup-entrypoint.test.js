@@ -1679,7 +1679,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(fs.existsSync(path.join(target, 'graphify-out', 'graph.json'))).toBe(true);
     const facts = JSON.parse(fs.readFileSync(path.join(target, '.spec-first', 'config', 'tool-facts.json'), 'utf8'));
     expect(facts.provider_readiness.find((entry) => entry.provider === 'graphify')).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       lifecycle: { query_verified: true },
     });
     const scenarioFingerprintPath = path.join(target, '.spec-first', 'workspace', 'scenario-fingerprint-setup.json');
@@ -1972,7 +1972,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(calls.filter((call) => path.basename(call.command) === 'graphify' && call.args[0] === 'hook')).toEqual([]);
     expect(snapshot(outsideHooks)).toEqual(before);
     expect(result.payload.tool_facts.provider_readiness.find((entry) => entry.provider === 'graphify')).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       lifecycle: {
         configured: true,
         initialized: true,
@@ -2389,7 +2389,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       });
     }
     expect(facts.provider_readiness.find((entry) => entry.provider === 'graphify')).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       install_source: 'official',
       mirror_used: false,
       attempts: [

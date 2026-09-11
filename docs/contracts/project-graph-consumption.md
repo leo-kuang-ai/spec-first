@@ -83,7 +83,7 @@ Graphify scope completion is provenance-bound. Setup-owned generation or explici
 
 ## Trust Tiers
 
-Graphify 的 `first_generation.scope_provenance.graph_sha256` 是已验证 receipt 的历史图摘要。doctor 在 source/TTL 与当前 Provider 身份检查通过后，比较该摘要、当前 receipt 和当前 graph.json；图或 scope 不符使历史 facts 失效，图和 receipt 同时更新也不能沿用旧 query 证据。旧 facts 缺摘要或 scope、当前 receipt 缺失/无效/超出读取上限时，当前性为 unknown。`readiness_scope=installation` 不执行图校验；这些结果仍不证明图语义或构图时源码快照。
+Graphify 的 `first_generation.scope_provenance.graph_sha256` 是已验证 receipt 的历史图摘要，`source_snapshot` 是构图前后确认稳定的有界源码内容身份。doctor 在 source/TTL 与当前 Provider 身份检查通过后，比较历史摘要、当前 receipt、当前 graph.json 与当前源码；图、scope 或源码不符使历史 facts 失效，仅重新发布 facts 不能更新图的源码绑定。旧 facts/receipt 缺摘要、scope 或源码绑定，以及当前 receipt 缺失/无效/超出读取上限时，当前性为 unknown；旧绑定需显式生成/refresh，verify 不补造。`readiness_scope=installation` 不执行图校验；这些结果仍不证明图语义或跨文件原子快照。
 
 Exploration-tier navigation may use project-graph candidates directly to decide where to inspect next.
 

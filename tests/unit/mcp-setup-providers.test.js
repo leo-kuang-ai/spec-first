@@ -568,7 +568,7 @@ describe('Graphify provider', () => {
 
     const result = provider.apply(fixture.context, plan);
     expect(result).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       lifecycle: { initialized: true, indexed: true, query_verified: true },
     });
     expect(fs.existsSync(path.join(fixture.target, '.agents', 'skills', 'graphify', 'SKILL.md'))).toBe(true);
@@ -589,7 +589,7 @@ describe('Graphify provider', () => {
 
     const result = provider.apply(fixture.context, plan);
     expect(result).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       lifecycle: { initialized: true, indexed: true, query_verified: true },
     });
     expect(fs.existsSync(path.join(fixture.target, '.agents', 'skills', 'graphify', 'SKILL.md'))).toBe(true);
@@ -609,7 +609,7 @@ describe('Graphify provider', () => {
 
     const result = provider.apply(fixture.context, plan);
     expect(result).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       lifecycle: { initialized: true, indexed: true, query_verified: true },
     });
     expect(fs.existsSync(path.join(fixture.target, '.opencode', 'skills', 'graphify', 'SKILL.md'))).toBe(true);
@@ -742,7 +742,7 @@ describe('Graphify provider', () => {
     expect(hookCalls).toEqual([]);
     expect(fs.readdirSync(outsideHooks).map((name) => [name, fs.readFileSync(path.join(outsideHooks, name), 'utf8')])).toEqual(before);
     expect(result).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       lifecycle: {
         configured: true,
         initialized: true,
@@ -774,6 +774,7 @@ describe('Graphify provider', () => {
     });
     expect(verified.next_actions).toEqual([
       expect.stringContaining('可选 commit-time 自动刷新未检测到'),
+      expect.stringContaining('构图未取得完整源码快照'),
     ]);
     expect(verified.next_actions.join('\n')).toContain('也不写入外部 hook');
     expect(verified.next_actions.join('\n')).not.toContain('执行显式 incremental refresh');
@@ -1021,6 +1022,51 @@ describe('Graphify provider', () => {
     });
   });
 
+  test.each([false, true])('构图前后源码绑定只接受稳定内容，构图期间变化=%s', (changeSource) => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('generation-source-binding');
+    try {
+      fs.rmSync(path.join(fixture.target, '.git'), { recursive: true, force: true });
+      fs.writeFileSync(path.join(fixture.target, 'main.js'), 'module.exports = 1;');
+      const context = { ...fixture.context, targetKind: 'non-git-folder', runner: (command, args, options) => {
+        const result = fixture.context.runner(command, args, options);
+        if (changeSource && command === fixture.launcher && args[0] === 'extract') {
+          fs.writeFileSync(path.join(fixture.target, 'main.js'), 'module.exports = 2;');
+        }
+        return result;
+      } };
+      const result = provider.apply(context, provider.plan(context));
+      const receipt = JSON.parse(fs.readFileSync(path.join(fixture.target, 'graphify-out', 'spec-first-graph-scope.json')));
+      if (changeSource) {
+        expect(receipt.source_snapshot).toBeNull();
+        expect(result.first_generation.scope_provenance.source_reason_code).toBe('graphify-source-changed-during-generation');
+        expect(result.readiness_status).toBe('degraded');
+      } else {
+        expect(result.readiness_status).toBe('fresh');
+        expect(receipt.source_snapshot).toMatchObject({ schema_version: 'setup-source-snapshot.v2', source_kind: 'folder', source_content_sha256: expect.stringMatching(/^[a-f0-9]{64}$/) });
+        expect(result.first_generation.scope_provenance.source_snapshot).toEqual(receipt.source_snapshot);
+      }
+      expect(validateAgainstSchema(providerSchema, result).valid).toBe(true);
+    } finally {
+      fs.rmSync(fixture.target, { recursive: true, force: true });
+      fs.rmSync(fixture.homeDir, { recursive: true, force: true });
+    }
+  });
+
+  test('无 HEAD 的 Git 目录无法采集源码身份，成功构图也保持 unknown', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('generation-source-unavailable');
+    try {
+      const result = provider.apply(fixture.context, provider.plan(fixture.context));
+      expect(result.first_generation.scope_provenance.source_reason_code).toBe('graphify-source-snapshot-unavailable');
+      expect(result.lifecycle.query_verified).toBe(true);
+      expect(result.readiness_status).toBe('unknown');
+    } finally {
+      fs.rmSync(fixture.target, { recursive: true, force: true });
+      fs.rmSync(fixture.homeDir, { recursive: true, force: true });
+    }
+  });
+
   test('does not follow a symlinked Graphify scope receipt', () => {
     if (process.platform === 'win32') return;
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
@@ -1073,7 +1119,7 @@ describe('Graphify provider', () => {
 
     const result = provider.refresh(refreshContext, actionPlan);
     expect(result).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       lifecycle: { artifact_exists: true, query_verified: true },
       steady_state: {
         refresh_mode: 'manual-only',
@@ -1161,7 +1207,7 @@ describe('Graphify provider', () => {
 
     const result = provider.apply(fixture.context, actionPlan);
     expect(result).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       lifecycle: { artifact_exists: true, query_verified: true },
     });
     expect(fs.existsSync(path.join(fixture.target, '.graphify'))).toBe(false);
@@ -1265,7 +1311,7 @@ describe('Graphify provider', () => {
       env: expect.objectContaining({ GRAPHIFY_OUT: path.join('..', '..', 'graphify-out') }),
     });
     expect(result).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       lifecycle: { artifact_exists: true, query_verified: true },
       first_generation: {
         scope: 'user-specified',
@@ -1315,7 +1361,7 @@ describe('Graphify provider', () => {
     expect(fs.existsSync(path.join(customHooks, 'post-commit'))).toBe(true);
     expect(fs.existsSync(path.join(fixture.target, '.git', 'hooks', 'post-commit'))).toBe(false);
     expect(result).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       steady_state: {
         refresh_mode: 'skill-cli-hook-on-demand',
         hook_installed: true,
@@ -1399,7 +1445,7 @@ describe('Graphify provider', () => {
     const result = provider.apply(fixture.context, actionPlan);
     expect(fixture.hookCalls).toEqual([]);
     expect(result).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       steady_state: {
         refresh_mode: 'manual-only',
         hook_status: 'blocked',
@@ -1424,7 +1470,7 @@ describe('Graphify provider', () => {
     expect(fixture.hookCalls.map((call) => call.args.join(' '))).toEqual(['hook status', 'hook install']);
     expect(fs.readFileSync(path.join(customHooks, 'post-commit'), 'utf8')).not.toContain('# spec-first graphify artifact env start');
     expect(result).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       steady_state: {
         refresh_mode: 'manual-only',
         hook_verified: false,
@@ -1453,7 +1499,7 @@ describe('Graphify provider', () => {
     expect(fixture.hookCalls).toEqual([]);
     expect(fs.readFileSync(path.join(outsideHooks, 'sentinel'), 'utf8')).toBe('preserve\n');
     expect(result).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       steady_state: {
         refresh_mode: 'manual-only',
         hook_status: 'blocked',

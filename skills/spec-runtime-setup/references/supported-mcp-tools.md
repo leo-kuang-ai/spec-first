@@ -80,4 +80,8 @@ Graphify 的 `provider-readiness.v2.provider_identity` 保留已解析的 packag
 
 Graphify artifact scope 的 doctor 检查复用既有 `graphify-scope-provenance.v1` reader。`provider-readiness.v2.first_generation.scope_provenance` 兼容增加可选 `graph_sha256`，记录已验证 receipt 中的摘要；normalizer 保留该证据。doctor 比较历史摘要、当前 receipt 与当前 graph.json，图单独变化或图与 receipt 同时变化均不能沿用历史 query 证据。旧 facts 缺摘要、缺 scope 或旧/缺失 receipt 降为 unknown；已知图/scope 不符为 stale。installation scope 不查图。
 
-doctor 的 receipt/graph 读取使用 no-follow/nonblocking fd、普通单链接文件检查、读前后身份复核和实际读取上限（receipt 64 KiB、graph 64 MiB）；超限或读取期间变化均保留 unknown。此限制不改变现有安装/构图路径的文件读取策略，也不证明图语义或源文件与图生成时刻的绑定。
+doctor 的 receipt/graph 读取使用 no-follow/nonblocking fd、普通单链接文件检查、读前后身份复核和实际读取上限（receipt 64 KiB、graph 64 MiB）；超限或读取期间变化均保留 unknown。此限制不改变现有安装/构图路径的文件读取策略，也不证明图语义。
+
+构图/refresh 前后复用 setup source snapshot 的有界内容采集；仅当两次完整内容身份一致，既有 receipt 才保存 `source_snapshot`（v2 的 schema_version/source_kind/source_content_sha256 三字段）。该身份覆盖整个执行 repo/folder 的既定 source 范围，而非猜测图实际读取了哪些文件。host/registry/root 仍由 tool-facts 的完整快照校验。
+
+旧 receipt 没有源码绑定时，verify 只能保留 unknown；必须显式生成/refresh 才能写入新绑定，不能通过重新发布 facts 补造。无 HEAD、超预算或不安全源码导致无法采集时，即使图/query 成功也保持 unknown；已确认构图期间源码变化则记录 `graphify-source-changed-during-generation` 并降为 degraded。doctor 比较历史绑定、当前 receipt 和当前源码，源码变化后的旧图不能因 facts 更新时间较新而变 fresh。前后采样仍非原子快照，不保证期间没有短暂变化。

@@ -122,10 +122,19 @@ describe('producer 到 doctor 的磁盘快照闭环', () => {
     fs.writeFileSync(receiptPath, JSON.stringify(receipt));
     const factsPath = produce();
     const facts = JSON.parse(fs.readFileSync(factsPath));
-    facts.provider_readiness = [{ provider: 'graphify', readiness_scope: 'artifact', readiness_status: 'fresh', provider_identity: identity, first_generation: { requirement_workspace_path: '.', artifact_root: 'graphify-out', scope_provenance: { status: 'verified', verified_requirement_workspace_path: '.', graph_sha256: receipt.graph_sha256 } } }];
+    receipt.source_snapshot = require('../../skills/spec-runtime-setup/scripts/lib/source-snapshot.cjs').sourceContentIdentity(facts.source_snapshot);
+    fs.writeFileSync(receiptPath, JSON.stringify(receipt));
+    facts.provider_readiness = [{ provider: 'graphify', readiness_scope: 'artifact', readiness_status: 'fresh', provider_identity: identity, first_generation: { requirement_workspace_path: '.', artifact_root: 'graphify-out', scope_provenance: { status: 'verified', verified_requirement_workspace_path: '.', graph_sha256: receipt.graph_sha256, source_snapshot: receipt.source_snapshot } } }];
     fs.writeFileSync(factsPath, JSON.stringify(facts));
     try {
       expect(health(factsPath).status).toBe('pass');
+      fs.writeFileSync(path.join(root, 'new-source.js'), 'module.exports = 2;');
+      const refreshed = JSON.parse(fs.readFileSync(produce()));
+      refreshed.provider_readiness = facts.provider_readiness;
+      fs.writeFileSync(factsPath, JSON.stringify(refreshed));
+      expect(health(factsPath).normalized.freshness).toMatchObject({ status: 'stale', reason_code: 'graphify-source-snapshot-mismatch' });
+      fs.unlinkSync(path.join(root, 'new-source.js'));
+      fs.writeFileSync(factsPath, JSON.stringify(facts));
       fs.writeFileSync(graphPath, '{"nodes":[{}]}');
       expect(health(factsPath).normalized.freshness).toMatchObject({ status: 'stale', reason_code: 'graphify-scope-provenance-artifact-mismatch' });
       expect(health(factsPath).normalized.provider_counts).toMatchObject({ fresh: 0, stale: 1 });
@@ -136,6 +145,8 @@ describe('producer 到 doctor 的磁盘快照闭环', () => {
       fs.unlinkSync(receiptPath);
       expect(health(factsPath).normalized.freshness.status).toBe('unknown');
       fs.writeFileSync(receiptPath, JSON.stringify({ ...receipt, schema_version: 'legacy' }));
+      expect(health(factsPath).normalized.freshness.status).toBe('unknown');
+      fs.writeFileSync(receiptPath, JSON.stringify({ ...receipt, source_snapshot: null }));
       expect(health(factsPath).normalized.freshness.status).toBe('unknown');
       fs.writeFileSync(receiptPath, JSON.stringify(receipt));
       delete facts.provider_readiness[0].first_generation.scope_provenance.graph_sha256;

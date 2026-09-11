@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-11 codex: fix(runtime-setup): Graphify receipt 绑定构图前后稳定的源码内容身份；仅重发 facts 不再洗掉旧图漂移，无完整源码快照保持 unknown，构图期间源码变化降为 degraded。(user-visible)
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): doctor 回读 Graphify scope receipt 并比较历史图摘要，图变化不再沿用旧 query 证据；旧/缺失证据降为 unknown，实际读取使用有界 fd 并检查并发替换。(user-visible)
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): doctor 复用 Graphify 只读身份探针，安装身份变化使历史 facts 失效，缺证据降为 unknown，同步降级 Provider fresh 计数；不触发安装或构图。
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): Graphify 在安装与图验证后发布实际 Provider identity 与有界 inventory 摘要，CLI/schema 保留受限字段并拒绝旧或混合身份。
