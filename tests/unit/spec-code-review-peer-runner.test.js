@@ -305,4 +305,24 @@ describe('spec-code-review peer runner', () => {
     expect(result.stderr).toContain('provider_serving_receipt_unavailable');
     expect(fs.existsSync(path.join(root, 'peer-task-claude.json'))).toBe(false);
   });
+
+  test('result --path exits 3 for an absent artifact and 4 for an unreadable one', () => {
+    const absent = spawnSync('python3', [RUNNER, 'result', '--path', path.join(root, 'never-written.json')], {
+      cwd: REPO_ROOT,
+      env: runnerEnv(root),
+      encoding: 'utf8',
+    });
+    expect(absent.status).toBe(3);
+    expect(absent.stderr).toContain('no artifact at');
+
+    const notRegular = path.join(root, 'a-directory');
+    fs.mkdirSync(notRegular);
+    const unreadable = spawnSync('python3', [RUNNER, 'result', '--path', notRegular], {
+      cwd: REPO_ROOT,
+      env: runnerEnv(root),
+      encoding: 'utf8',
+    });
+    expect(unreadable.status).toBe(4);
+    expect(unreadable.stderr).toContain('unreadable');
+  });
 });

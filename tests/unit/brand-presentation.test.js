@@ -137,4 +137,14 @@ describe('brand presentation contract', () => {
       capture.restore();
     }
   });
+
+  test('banner tagline lists every registered host (registry-derived, no stale literals)', () => {
+    // tagline 从 getSupportedPlatforms() 派生：新增宿主时 banner 自动扩展。
+    // 该断言防止 tagline 退回手写字面量后与 usage 行宿主面自相矛盾。
+    const { getSupportedPlatforms, getPlatformDisplayName } = require('../../src/cli/adapters');
+    const art = require('../../src/cli/brand').renderFullArt('0.0.0-test', { useColor: false });
+    for (const platform of getSupportedPlatforms()) {
+      expect(art).toContain(getPlatformDisplayName(platform));
+    }
+  });
 });

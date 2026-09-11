@@ -455,21 +455,25 @@ function assertHostOverrideCoverage(registry) {
 }
 
 function assertOpenCodePermissionPolicyOwnership(registry) {
-  const openCodePolicy = registry.hosts.opencode.defaults.tool.host_config.permission_policy;
-  if (!openCodePolicy || openCodePolicy.kind !== 'opencode-governed-assets-v1') {
-    throw new RegistryError(
-      'registry_opencode_permission_policy_invalid_owner',
-      'OpenCode host config 必须声明 opencode-governed-assets-v1 permission policy。',
-    );
-  }
-  for (const hostId of HOST_IDS) {
-    if (hostId === 'opencode') continue;
-    if (registry.hosts[hostId].defaults.tool.host_config.permission_policy !== undefined) {
+  for (const kind of ['tool', 'provider']) {
+    const openCodePolicy = registry.hosts.opencode.defaults[kind].host_config
+      && registry.hosts.opencode.defaults[kind].host_config.permission_policy;
+    if (!openCodePolicy || openCodePolicy.kind !== 'opencode-governed-assets-v1') {
       throw new RegistryError(
         'registry_opencode_permission_policy_invalid_owner',
-        `Host ${hostId} 不得声明 OpenCode permission policy。`,
-        { host: hostId },
+        `OpenCode ${kind} host config 必须声明 opencode-governed-assets-v1 permission policy。`,
       );
+    }
+    for (const hostId of HOST_IDS) {
+      if (hostId === 'opencode') continue;
+      const defaultsConfig = registry.hosts[hostId].defaults[kind].host_config;
+      if (defaultsConfig && defaultsConfig.permission_policy !== undefined) {
+        throw new RegistryError(
+          'registry_opencode_permission_policy_invalid_owner',
+          `Host ${hostId} 不得声明 OpenCode permission policy。`,
+          { host: hostId },
+        );
+      }
     }
   }
   for (const collection of Object.values(KIND_COLLECTIONS)) {
@@ -692,6 +696,7 @@ module.exports = {
   getDiagnosticRegistry,
   getEffectiveEntry,
   getEffectiveRegistry,
+  HOST_IDS,
   loadRegistry,
   mergeLayers,
   validateSchemaValue,

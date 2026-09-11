@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-11 codex: chore: 提交当前工作区全部变更，收口宿主枚举、CE localization 工件、peer-runner 与 runtime-setup 合同更新。(user-visible)
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): 为 CodeGraph artifact readiness 增加版本化 DB/WAL/journal/source/identity 证据；verify-only 与 doctor 只回读并比较既有证据，不执行可能恢复数据库的 status/query；缺证据或采样漂移保持 unknown/degraded。(user-visible)
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): CodeGraph 改用原生 status --json，校验索引状态、待处理引用/文件和工作树路径；不完整或未知响应不能因退出 0 被判为 indexed，显式 apply 可重建 partial/旧 null 状态并复验。(user-visible)
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): 将真实 Provider SIGINT/SIGTERM 与子进程超时传播为 workspace 停止原因；最终 state 写入后复核预算并纠正 partial，纠正写入失败保留 lease，防止 consumer 误认残留 complete。(user-visible)

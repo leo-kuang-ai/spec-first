@@ -108,7 +108,17 @@ POSIX path is behaviorally unchanged:
             user temp dir), owner-private, since there is no shared /tmp.
 
 Pure stdlib. No third-party dependencies.
+
+Size/re-split note (2026-09-11, code-review finding): this file crossed 2.2k
+lines across three byte-identical copies. A clean split of the Windows ctypes
+security/process block (~lines 424-905) into a sibling peer_job_win.py was
+prototyped and reverted: new package paths enter the frozen CE-localization
+inventory (1122->1125) and the closeout artifacts bind it via an LLM
+adjudication that scripts must not rebind. Re-evaluate the split as part of
+the next CE sync/adjudication batch; until then keep changes lockstep in all
+three copies (spec-code-review / spec-doc-review / spec-pov).
 """
+
 import argparse
 import datetime
 import glob
@@ -164,6 +174,9 @@ PAYLOAD_READ_CAP = 2 * 1024 * 1024
 SERVING_RECEIPT_READ_CAP = 32 * 1024
 # 跨模型 serving receipt 的认证 producer 通道尚未建成；关闭期间 start 对任何
 # receipt 形状一律 fail-closed（含 degraded 形状），禁止把自述 receipt 当信任根。
+# 重估条件（翻转本常量本身不解除任何门）：建成经认证的 host producer channel、
+# 为 receipt 增加防伪签名、重写 freshness/identity/allowlist 校验并补正向测试后，
+# 在下一次跨模型 peer 能力批次中整体评估是否解除；在此之前保持 False。
 SERVING_RECEIPT_PRODUCER_CHANNEL_ENABLED = False
 SERVING_RECEIPT_MAX_TTL_SECS = 15 * 60
 SERVING_RECEIPT_CLOCK_SKEW_SECS = 30
@@ -361,6 +374,8 @@ def validate_start_authority(args, worker_argv):
             ' (authenticated producer channel disabled)')
     raise RunnerError('provider_serving_receipt_unverified')
 
+    # 通道关闭期间，上一行是本函数的必然终点：以下 packet 校验属于未来启用路径，
+    # 当前不可达（能力与实现的已知漂移，重估见 SERVING_RECEIPT_PRODUCER_CHANNEL_ENABLED）。
     payload_raw, payload = _load_owned_json(args.payload_ref, PAYLOAD_READ_CAP, 'peer task packet')
     _require_sha256(args.payload_sha256, '--payload-sha256')
     if sha256_bytes(payload_raw) != args.payload_sha256:
@@ -640,8 +655,15 @@ if IS_WINDOWS:
             _kernel32.CloseHandle(handle)
 
     def _win_process_identity_matches(pid: int, recorded) -> bool:
+        # Fail closed on a MISSING identity too, not just a mismatched one:
+        # pre-upgrade job dirs and start-time probe failures carry no recorded
+        # identity, and a live pid there is unproven -- possibly recycled.
+        # Treating it as a match let cmd_reap terminate an unrelated process.
+        # Consequence: unproven jobs lose graceful supervisor signaling and
+        # classify as died-without-result; cleanup is still guaranteed via the
+        # named job object plus the Toolhelp sweep.
         if not recorded:
-            return True
+            return False
         current = _win_process_identity(pid)
         return current is not None and current == recorded
 
@@ -866,7 +888,9 @@ if IS_WINDOWS:
         Windows recycles PIDs, and cmd_reap is often the next python.exe after
         the worker exits. Never terminate this process, and never terminate a
         live pid whose GetProcessTimes identity does not match the recorded
-        worker. Stale-PPID orphans still show the dead leader as parent. When
+        worker, or whose identity was never recorded (unproven, possibly
+        recycled: fail closed). Stale-PPID orphans still show the dead leader
+        as parent. When
         the pid was reused, the start-time cutoff applies only to *direct*
         children of that pid (the new process's own children vs stale-PPID
         orphans). A pre-reuse child's full subtree is still original-tree work,

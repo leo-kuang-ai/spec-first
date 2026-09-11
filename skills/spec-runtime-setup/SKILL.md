@@ -47,7 +47,7 @@ Generated host runtime mirrors and host-local MCP config files are projections o
 node "$SKILL_DIR/scripts/setup.cjs" <mode-and-target-arguments>
 ```
 
-绝不能从项目 cwd 或 source checkout 路径解析该命令。Generated command surface 使用其 companion support root 作为 `SKILL_DIR`。进入支持 mutation 的 mode 前，通过执行工具的 per-call environment overlay 传入 `MCP_SETUP_HOST=claude|codex|cursor|kiro|opencode|qoder|zcode|pi`；只读诊断可以报告 advisory host candidate，但不能把它们转换为 write authority。
+绝不能从项目 cwd 或 source checkout 路径解析该命令。Generated command surface 使用其 companion support root 作为 `SKILL_DIR`。进入支持 mutation 的 mode 前，通过执行工具的 per-call environment overlay 传入 `MCP_SETUP_HOST=<host>`（合法宿主枚举见下文 canonical `MCP_SETUP_HOST` 定义）；只读诊断可以报告 advisory host candidate，但不能把它们转换为 write authority。
 
 `scripts/check-health` 是带 Node shebang 的 compatibility shim，委托给 `setup.cjs --check`。Windows 直接调用 `node <loaded-skill-root>/scripts/setup.cjs --check`，不存在 platform-specific companion entry。
 
@@ -152,7 +152,7 @@ If setup later reports project convention facts, they must be deterministic exis
 - `--repo <path>` must resolve to the exact Git repository root. A nested path is invalid and fails closed instead of being promoted to an ancestor root; use `--folder` when the nested directory is the intended logical project.
 - `--folder <path>` selects the exact logical project directory and does not require Git. CodeGraph writes `.codegraph/`, Graphify writes `graphify-out/`, and setup writes `.spec-first/config/` under that folder. If it is nested inside a Git repository, generated spec-first runtime readiness is checked at the enclosing Git root so setup does not request a duplicate child `.agents/skills`; a standalone non-Git folder uses itself as the runtime projection root. Missing/stale runtime returns a structured interactive action rooted at that projection plus a headless variant containing `-y -u <name> --lang <zh|en>`, emitted as structured `next_action_command={cwd,command,args}` plus `next_action_headless_command`, with `next_action` as explanation only and never an executable `cd ... && ...` compound string; the folder is never passed to Git-only `init --repo`. Git health remains an additional fact and never rewrites the folder target. Graphify commit hooks and Git HEAD baselines are skipped as `not-applicable` for `target_kind=non-git-folder`, including a nested folder whose parent is a Git repo, while first generation, query, explicit refresh, and CodeGraph indexing remain supported.
 - `--user-scope`：Kiro/Qoder/Cursor/OpenCode/Pi 写入 user-level MCP config 的 opt-in。缺少该 flag 时，即使由 generated host skill/command 间接调用，setup 也只为 Kiro 写 workspace `.kiro/settings/mcp.json`、为 Qoder 写 local `.qoder/settings.local.json`、为 Cursor 写 project `.cursor/mcp.json`、为 OpenCode 写 project `opencode.json`，或为 Pi 写 project `.pi/mcp.json`。OpenCode user scope 解析 `${XDG_CONFIG_HOME}/opencode/opencode.json`；Pi user scope 解析 `$HOME/.pi/agent/mcp.json`；project/user scope 任一存在更高优先级 JSONC sibling 时都以 `host-config-jsonc-precedence-blocked` 阻断 JSON mutation。
-- Pi 的 MCP 消费经由 `pi-mcp-extension`（`pi install npm:pi-mcp-extension`）：setup 写入的 `.pi/mcp.json`（`mcpServers` 容器，stdio 条目省略 `transport`）只有该扩展安装后才生效，未安装时配置 inert；`host-config-current` 证明配置写入与格式正确，不证明 Pi 会话已装载工具。
+Pi 的 MCP 消费经由 `pi-mcp-extension`（`pi install npm:pi-mcp-extension`）：setup 写入的 `.pi/mcp.json`（`mcpServers` 容器，stdio 条目省略 `transport`）只有该扩展安装后才生效，未安装时配置 inert；`host-config-current` 证明配置写入与格式正确，不证明 Pi 会话已装载工具。
 
 OpenCode host config mutation 把 MCP entry 与 `opencode-governed-assets-v1` permission policy 视为同一 bounded transaction。Permission policy 只允许当前 projected runtime state 中的精确 governed skill names，禁止 wildcard/global allow，并让 `bash`、`edit`、`task`、`webfetch`、`websearch` 等危险工具保持 `ask`；遇到 conflicting user rule、unsafe last-match ordering 或 post-write verification failure 时 fail closed / rollback。Uninstall 只删除仍与 expected value 精确匹配的 managed entries，不删除整份 `opencode.json`，也不覆盖 unrelated user fields。
 
@@ -219,7 +219,7 @@ CodeGraph 1.6.0 的 MCP watcher 只绑定 server 默认项目，通过 `projectP
 
 仓集来源是 `需求文件夹/.spec-first/workspace.yaml` manifest 与 `--repos <a,b>` 的并集；manifest 先处理，同仓重复声明时保留 manifest alias/entry，CLI 只增补其他 confirmed 仓。自动发现仅作候选，需确认后才建。自动发现只扫描需求根的直接子目录；重复 alias 或嵌套仓根会返回 `workspace-targets-ambiguous` 并阻止 build/clean，必须先由 owner 消除歧义。
 
-`workspace.yaml` 是为六宿主 projected runtime 保持零依赖的**严格 YAML 子集**，不是通用 YAML：支持顶层 `schema_version`、`repos`、`exclusions`，2 空格列表缩进、`repos` 下 4 空格的 `path`/可选 `alias`、普通或单/双引号字符串和行尾注释。禁止 tab、flow collection (`[]`/`{}`)、anchor/tag、block scalar、多行值及未声明字段；不符合时返回 `workspace-manifest-unparseable` 或 `workspace-manifest-schema-invalid`，不得猜测或静默忽略。可用格式：
+`workspace.yaml` 是为全部受支持宿主 projected runtime 保持零依赖的**严格 YAML 子集**，不是通用 YAML：支持顶层 `schema_version`、`repos`、`exclusions`，2 空格列表缩进、`repos` 下 4 空格的 `path`/可选 `alias`、普通或单/双引号字符串和行尾注释。禁止 tab、flow collection (`[]`/`{}`)、anchor/tag、block scalar、多行值及未声明字段；不符合时返回 `workspace-manifest-unparseable` 或 `workspace-manifest-schema-invalid`，不得猜测或静默忽略。可用格式：
 
 ```yaml
 schema_version: workspace-manifest.v1
@@ -235,7 +235,7 @@ exclusions:
 
 | Flag | 作用 |
 | --- | --- |
-| `--workspace-graph` | 在 child projection current 后，一次性建双层图 + 写 state receipt + 安装 contained child async refresh hook + 注入六宿主入口路由块；hook 不可用、非 Git 变化或需即时刷新时显式重跑 |
+| `--workspace-graph` | 在 child projection current 后，一次性建双层图 + 写 state receipt + 安装 contained child async refresh hook + 注入受支持宿主入口路由块；hook 不可用、非 Git 变化或需即时刷新时显式重跑 |
 | `--workspace-graph-status` | 只读汇总各 child/workspace 图状态、state/source freshness、hook digest/runtime/version/执行位、merged artifact containment/SHA-256、default `projectPath` containment(advisory)、路由块是否已注入;不调用 provider 二进制 |
 | `--workspace-graph-clean` | 幂等清理:先独占 lifecycle lease；busy 时零 mutation 返回失败。成功持锁后删子仓 `.codegraph/`、只移除 spec-first managed exclude/hook 块、删需求父目录的 current `graphify-out/` 与 legacy `.graphify/`、剥离路由 managed block；任一 child/routing 清理失败时保留两个 workspace graph root 供重试，不强制 kill CodeGraph daemon。宿主级等价入口:`spec-first clean --workspace-graph [--repos a,b] [--dry-run]`(不碰 host runtime mirror) |
 

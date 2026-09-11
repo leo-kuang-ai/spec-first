@@ -263,8 +263,18 @@ function discoverArtifacts({ targetRepo, workspaceSlug, sourceDir, keywords, lim
   const outputRoot = sourceDir ? path.resolve(sourceDir)
     : path.join(root, '.spec-first', 'workflows', 'spec-handoff', slugify(workspaceSlug || path.basename(root), 'workspace'));
   const containmentRoot = sourceDir ? outputRoot : root;
-  if (sourceDir && (!fs.lstatSync(outputRoot).isDirectory() || fs.lstatSync(outputRoot).isSymbolicLink())) {
-    throw reasonError('source-directory-unsafe', 'Discovery source must be a real non-symlink directory.');
+  if (sourceDir) {
+    // 不存在的 --source-dir（拼写错误/已被清理）与 symlink/非目录一样按
+    // source-directory-structured 拒绝，而不是裸 ENOENT 被兜底 catch 掩盖为通用错误。
+    let stat = null;
+    try {
+      stat = fs.lstatSync(outputRoot);
+    } catch (_error) {
+      stat = null;
+    }
+    if (!stat || !stat.isDirectory() || stat.isSymbolicLink()) {
+      throw reasonError('source-directory-unsafe', 'Discovery source must be an existing real non-symlink directory.');
+    }
   }
   assertNoSymlinkSegments(containmentRoot, outputRoot);
   if (!fs.existsSync(outputRoot)) return { status: 'discovered', reason_code: 'no-managed-root', candidates: [], searched_root: toPosix(path.relative(root, outputRoot)) };

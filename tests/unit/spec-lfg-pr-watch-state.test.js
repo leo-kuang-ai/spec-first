@@ -372,4 +372,31 @@ describe('spec-lfg PR watch state helper', () => {
     expect(rejectedPermissions.status).toBe(1);
     expect(JSON.parse(rejectedPermissions.stdout).reason_code).toBe('state-path-unsafe');
   });
+
+  test('a recorded decision whose artifact was deleted rejects structurally instead of crashing', () => {
+    let current = append(decisionSnapshot(), run(['read', '--state-dir', stateDir]));
+    const ref = decisionFile(decision());
+    current = append(decisionSnapshot({
+      decision_residuals: [ref],
+      review_items: [...decisionSnapshot().review_items, { id: 'I2', kind: 'comment', updated_at: 'v1' }],
+    }), current);
+    expect(current.terminal).toBe('watching');
+
+    // private-scratch 清理/会话重启后工件可能消失：下一次 snapshot 必须输出结构化
+    // rejected（reason_code=decision-invalid），而不是裸 ENOENT 堆栈使 watch 循环不可解析。
+    fs.rmSync(ref.path);
+    const raw = spawnSync(process.execPath, [helper,
+      'snapshot',
+      '--input', writeInput(root, `input-${current.generation + 1}.json`, decisionSnapshot()),
+      '--state-dir', stateDir,
+      '--expected-generation', String(current.generation),
+      '--expected-sha256', current.snapshot_sha256,
+      '--budget-seconds', '10800',
+    ], { encoding: 'utf8' });
+    expect(raw.status).toBe(1);
+    const parsed = JSON.parse(raw.stdout);
+    expect(parsed.status).toBe('rejected');
+    expect(parsed.reason_code).toBe('decision-invalid');
+    expect(parsed.errors[0]).toContain('decision artifact missing or unreadable');
+  });
 });

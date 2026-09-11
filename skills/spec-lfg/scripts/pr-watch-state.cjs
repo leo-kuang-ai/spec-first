@@ -198,8 +198,15 @@ function readDecisionArtifact(ref) {
   if (!ref || typeof ref.path !== 'string' || !path.isAbsolute(ref.path)
     || !/^[a-f0-9]{64}$/.test(ref.sha256 || '')) decisionError('private artifact path and SHA-256 required');
   inspectPrivateDirectory(path.dirname(ref.path), 'decision artifact parent');
-  inspectPrivateFile(ref.path);
-  const raw = fs.readFileSync(ref.path, 'utf8');
+  let raw;
+  try {
+    inspectPrivateFile(ref.path);
+    raw = fs.readFileSync(ref.path, 'utf8');
+  } catch (error) {
+    // 引用工件被删除或不可读（private-scratch 清理、会话重启、tmp 清空）是可预期输入，
+    // 必须走结构化 decision 拒绝，而不是裸 ENOENT 堆栈使 watch 循环不可解析。
+    decisionError(`decision artifact missing or unreadable: ${error.code || error.message}`);
+  }
   if (sha256(raw) !== ref.sha256) decisionError('artifact hash mismatch');
   try { return JSON.parse(raw); } catch (_error) { decisionError('artifact must be JSON'); }
 }

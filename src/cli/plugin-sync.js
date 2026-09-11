@@ -70,26 +70,9 @@ const HIGH_VALUE_SKILL_ANCHORS = {
     'Actionable Findings',
   ],
 };
-const HIGH_VALUE_COMMAND_ANCHORS = {
-  'spec-plan': [
-    'Implementation Units',
-    'objective',
-    'references/plan-sections.md',
-    'universal-planning.md',
-  ],
-  'spec-work': [
-    'Reference Trigger Map',
-    'work-intake-and-task-pack.md',
-    'references/feedback-and-tests.md',
-    'references/implementation-quality.md',
-    'references/shipping-workflow.md',
-    'Residual Work Gate',
-  ],
-  'spec-code-review': [
-    'references/intent-and-plan.md',
-    'Actionable Findings',
-  ],
-};
+// command 完整性检查与 skill 检查共享同一份锚点事实源（两者锚点集合始终一致），
+// 单一常量避免两份逐字相同的表只改其一造成的静默漂移。
+const HIGH_VALUE_COMMAND_ANCHORS = HIGH_VALUE_SKILL_ANCHORS;
 
 function syncBundledAssets(projectRoot, adapter) {
   const filteredAssetSet = buildFilteredAssetSet(adapter);

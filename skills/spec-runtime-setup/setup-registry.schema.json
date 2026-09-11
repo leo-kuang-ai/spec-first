@@ -151,7 +151,12 @@
         },
         "provider": {
           "type": "object",
-          "additionalProperties": true
+          "additionalProperties": true,
+          "properties": {
+            "host_config": {
+              "$ref": "#/$defs/hostConfig"
+            }
+          }
         }
       }
     },

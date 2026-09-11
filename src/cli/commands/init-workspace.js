@@ -484,25 +484,25 @@ function writeWorkspaceInitSummaryFiles(workspaceRoot, summary) {
   }
 
   const snapshots = [platformSummaryPath, summaryPath].map(snapshotWorkspaceSummaryTarget);
+  // 三条写路径的失败回滚语义完全一致：attach 快照恢复后重抛，收敛为单一 helper，
+  // 避免回滚语义演进时漏改其中一处导致 platform/single/index 三路失败行为分叉。
+  const writeWithRollback = (targetPath, value) => {
+    try {
+      writeJsonFileAtomic(targetPath, value);
+    } catch (error) {
+      attachWorkspaceSummaryRollback(error, restoreWorkspaceSummaryTargets(snapshots));
+      throw error;
+    }
+  };
   summary.summary_write_status = 'ready';
   summary.summary_write_reason_code = null;
-  try {
-    writeJsonFileAtomic(platformSummaryPath, summary);
-  } catch (error) {
-    attachWorkspaceSummaryRollback(error, restoreWorkspaceSummaryTargets(snapshots));
-    throw error;
-  }
+  writeWithRollback(platformSummaryPath, summary);
   const platformRelativePath = toWorkspaceRelativePath(platformSummaryPath, workspaceRoot);
   const multiPlatform = (Array.isArray(summary.platforms) && summary.platforms.length > 1)
     || (Number.isInteger(summary.platform_count) && summary.platform_count > 1);
 
   if (!multiPlatform) {
-    try {
-      writeJsonFileAtomic(summaryPath, summary);
-    } catch (error) {
-      attachWorkspaceSummaryRollback(error, restoreWorkspaceSummaryTargets(snapshots));
-      throw error;
-    }
+    writeWithRollback(summaryPath, summary);
     return {
       ok: true,
       paths: [
@@ -519,12 +519,7 @@ function writeWorkspaceInitSummaryFiles(workspaceRoot, summary) {
     currentSummary: summary,
     currentSummaryRelativePath: platformRelativePath,
   });
-  try {
-    writeJsonFileAtomic(summaryPath, indexSummary);
-  } catch (error) {
-    attachWorkspaceSummaryRollback(error, restoreWorkspaceSummaryTargets(snapshots));
-    throw error;
-  }
+  writeWithRollback(summaryPath, indexSummary);
   return {
     ok: true,
     paths: [

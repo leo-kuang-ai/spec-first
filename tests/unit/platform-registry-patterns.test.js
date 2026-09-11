@@ -413,3 +413,63 @@ describe('platform registry runtime path consumer', () => {
     }
   });
 });
+
+describe('platform registry detection descriptors', () => {
+  const { getAdapter, getSupportedPlatforms } = require('../../src/cli/adapters');
+  const { detectPlatforms } = require('../../src/cli/commands/doctor');
+  const fs = require('node:fs');
+  const os = require('node:os');
+  const path = require('node:path');
+
+  const ALLOWED_DETECTION = ['runtime-root', 'state-file', 'runtime-paths'];
+
+  test('every registry entry declares a recognized detection descriptor', () => {
+    // detection 缺失/拼错会静默回退到裸 runtime-root 判定，对 state-file 宿主
+    // 重新引入「宿主客户端自建目录被误判为已安装」——完整性在这里被钉死。
+    for (const [platformId, config] of Object.entries(PLATFORM_REGISTRY)) {
+      expect([platformId, config.detection]).toEqual([
+        platformId,
+        expect.any(String),
+      ]);
+      expect(ALLOWED_DETECTION).toContain(config.detection);
+    }
+  });
+
+  test('each detection descriptor has the adapter fields its dispatch requires', () => {
+    for (const platform of getSupportedPlatforms()) {
+      const adapter = getAdapter(platform);
+      const detection = PLATFORM_REGISTRY[platform].detection;
+      if (detection === 'state-file') {
+        expect(adapter.stateFile).toEqual(expect.any(String));
+      }
+      if (detection === 'runtime-paths') {
+        expect(adapter.stateFile).toEqual(expect.any(String));
+        expect(adapter.skillsRoot).toEqual(expect.any(String));
+        expect(adapter.agentsRoot).toEqual(expect.any(String));
+      }
+      if (detection === 'runtime-root') {
+        expect(adapter.runtimeRoot).toEqual(expect.any(String));
+      }
+    }
+  });
+
+  test('kiro runtime-paths detection ignores a bare runtime dir and shared agents projection', () => {
+    const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'kiro-detect-'));
+    try {
+      // 宿主客户端可自建裸 .kiro/：不构成 spec-first 安装证据。
+      fs.mkdirSync(path.join(projectRoot, '.kiro'), { recursive: true });
+      expect(detectPlatforms(projectRoot)).not.toContain('kiro');
+
+      // 共享 .agents/skills 投影不是 kiro 的 runtime path（kiro 用 .kiro/skills）。
+      fs.mkdirSync(path.join(projectRoot, '.agents', 'skills', 'spec-work'), { recursive: true });
+      expect(detectPlatforms(projectRoot)).not.toContain('kiro');
+
+      // 受管 state file 或 kiro 专属 runtime path 才检测为已安装。
+      fs.mkdirSync(path.join(projectRoot, '.kiro', 'spec-first'), { recursive: true });
+      fs.writeFileSync(path.join(projectRoot, '.kiro', 'spec-first', 'state.json'), '{}\n');
+      expect(detectPlatforms(projectRoot)).toContain('kiro');
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+});

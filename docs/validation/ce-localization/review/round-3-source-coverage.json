@@ -4,12 +4,55 @@
   "producer": "scripts/check-ce-localization-review.cjs",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "19d3f6d8a06f3088d4e392a8718dac47aefa8587",
-    "dirty": false,
-    "dirty_paths": [],
-    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "5c75c9adfc8f24f7c377d833cc4683c9abc049fb9348e4178ae9db54b068d95e",
-    "inventory_hash": "3d2c3266db961c90c358e4d824687e879530eadc612e3e24e0f936659c39aa58",
+    "head": "cfb59c968ffdea8d56c75066d607293b266402d5",
+    "dirty": true,
+    "dirty_paths": [
+      "CHANGELOG.md",
+      "docs/catalog/runtime-capabilities.md",
+      "docs/contracts/provider-readiness.schema.json",
+      "docs/solutions/architecture-patterns/peer-job-runner-windows-split-blueprint-2026-09-11.md",
+      "docs/solutions/architecture-patterns/upstream-ce-sync-upgrade-methodology-2026-04-26.md",
+      "docs/validation/runtime-setup-p123-progress.md",
+      "scripts/check-ce-upstream-reconciliation.cjs",
+      "scripts/generate-runtime-capability-catalog.js",
+      "skills/spec-code-review/evals/fixtures/repos/tenant-orders/prepare-review-fixture.sh",
+      "skills/spec-code-review/evals/fixtures/scripts/check-r2-preset-applied-fix.sh",
+      "skills/spec-code-review/scripts/peer-job-runner.py",
+      "skills/spec-doc-review/scripts/peer-job-runner.py",
+      "skills/spec-handoff/scripts/handoff-artifact.cjs",
+      "skills/spec-lfg/scripts/pr-watch-state.cjs",
+      "skills/spec-pov/scripts/peer-job-runner.py",
+      "skills/spec-runtime-setup/SKILL.md",
+      "skills/spec-runtime-setup/references/supported-mcp-tools.md",
+      "skills/spec-runtime-setup/scripts/lib/registry.cjs",
+      "skills/spec-runtime-setup/scripts/providers/codegraph-artifact-evidence.cjs",
+      "skills/spec-runtime-setup/scripts/providers/codegraph.cjs",
+      "skills/spec-runtime-setup/scripts/providers/common.cjs",
+      "skills/spec-runtime-setup/setup-registry.json",
+      "skills/spec-runtime-setup/setup-registry.schema.json",
+      "src/cli/brand.js",
+      "src/cli/commands/init-workspace.js",
+      "src/cli/helpers/setup-facts.js",
+      "src/cli/plugin-sync.js",
+      "tests/integration/eval-disk-evidence-guard.integration.test.js",
+      "tests/unit/brand-presentation.test.js",
+      "tests/unit/ce-localization-closeout-contracts.test.js",
+      "tests/unit/ce-localization-review-contracts.test.js",
+      "tests/unit/host-enumeration-drift-guard.test.js",
+      "tests/unit/mcp-setup-providers.test.js",
+      "tests/unit/peer-job-runner-killset.test.js",
+      "tests/unit/peer-job-runner-parity.test.js",
+      "tests/unit/platform-registry-patterns.test.js",
+      "tests/unit/runtime-setup-codegraph-evidence.test.js",
+      "tests/unit/runtime-setup-codegraph-launcher.test.js",
+      "tests/unit/skill-script-mirror-parity.test.js",
+      "tests/unit/spec-code-review-peer-runner.test.js",
+      "tests/unit/spec-handoff-contracts.test.js",
+      "tests/unit/spec-lfg-pr-watch-state.test.js"
+    ],
+    "dirty_path_manifest_sha256": "488f564895de281c2d93df5c02531a06f7f46fe5278ed8e268a798b84bca1081",
+    "source_tree_hash": "a905f510fe5efab708f891849a74c7b74b120770d91ff5995645ec118a63f5b6",
+    "inventory_hash": "7ab344f048517952bc2bd9d0d10a1da267c81f4ed86963e2a9da65c4357cb6ee",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -44,19 +87,19 @@
     }
   },
   "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
-  "inventory_sha256": "af887520669a32a1374e8b321f5824679da5779e6a91e0176204e6c497cd1e4d",
+  "inventory_sha256": "e0652e40208e78a919a6d6c7598565bcfa11a78d3986d5a09f6404b82bc8d9cd",
   "review_input": {
-    "inventory_sha256": "af887520669a32a1374e8b321f5824679da5779e6a91e0176204e6c497cd1e4d",
-    "package_manifest_sha256": "03298f96182e742f8ebfe1b13b6683017e7248d8d679206b6009476e1af8cdb9",
-    "direct_support_manifest_sha256": "e42ee5d58a550d72e9c8629703269f2aa84faaa136d95eb7a8a3090b9abf83f9",
-    "relation_manifest_sha256": "fca692154aa9f83aeb0239356807bc342f8447c0b4201e48ff9b9d9916a1a620"
+    "inventory_sha256": "e0652e40208e78a919a6d6c7598565bcfa11a78d3986d5a09f6404b82bc8d9cd",
+    "package_manifest_sha256": "e65c27f924f265085fd7894c9fb4f214e58888af308677dd39158d6b4c293571",
+    "direct_support_manifest_sha256": "a24cc31d77e3298925e8ad47be573c7b5b4c69600755ec6e1009c561c029fcfb",
+    "relation_manifest_sha256": "ed591224e272e4b9d4b101b382e3b1f86e414a6484682f1f2e7b15cf6696e150"
   },
   "coverage_summary": {
     "skill_count": 38,
-    "package_path_count": 1122,
-    "package_bytes": 6624923,
-    "direct_support_unique_path_count": 208,
-    "direct_support_relation_count": 424,
+    "package_path_count": 1126,
+    "package_bytes": 6718480,
+    "direct_support_unique_path_count": 221,
+    "direct_support_relation_count": 437,
     "excluded_path_count": 0,
     "missing_path_count": 0,
     "hash_mismatch_count": 0
@@ -1513,8 +1556,8 @@
       "skill_id": "spec-runtime-setup",
       "package_root": "skills/spec-runtime-setup",
       "entry_path": "skills/spec-runtime-setup/SKILL.md",
-      "package_path_count": 77,
-      "direct_support_path_count": 50,
+      "package_path_count": 81,
+      "direct_support_path_count": 63,
       "package_paths": [
         "skills/spec-runtime-setup/evals/cases/semantic-question-not-setup.yaml",
         "skills/spec-runtime-setup/evals/cases/verify-only-readonly.yaml",
@@ -1543,6 +1586,7 @@
         "skills/spec-runtime-setup/scripts/lib/human-output.cjs",
         "skills/spec-runtime-setup/scripts/lib/installation-executor.cjs",
         "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
+        "skills/spec-runtime-setup/scripts/lib/npm-warmup.cjs",
         "skills/spec-runtime-setup/scripts/lib/opencode-permissions.cjs",
         "skills/spec-runtime-setup/scripts/lib/path-safety.cjs",
         "skills/spec-runtime-setup/scripts/lib/preflight.cjs",
@@ -1558,6 +1602,7 @@
         "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
         "skills/spec-runtime-setup/scripts/lib/runtime-remediation.cjs",
         "skills/spec-runtime-setup/scripts/lib/scenario-fingerprint.cjs",
+        "skills/spec-runtime-setup/scripts/lib/source-snapshot.cjs",
         "skills/spec-runtime-setup/scripts/lib/toml-section-editor.cjs",
         "skills/spec-runtime-setup/scripts/lib/workspace-async-refresh.cjs",
         "skills/spec-runtime-setup/scripts/lib/workspace-child-hook.cjs",
@@ -1582,6 +1627,8 @@
         "skills/spec-runtime-setup/scripts/lib/workspace-runtime-preflight.cjs",
         "skills/spec-runtime-setup/scripts/lib/workspace-target.cjs",
         "skills/spec-runtime-setup/scripts/lib/worktree-health.cjs",
+        "skills/spec-runtime-setup/scripts/providers/codegraph-artifact-evidence.cjs",
+        "skills/spec-runtime-setup/scripts/providers/codegraph-launcher.cjs",
         "skills/spec-runtime-setup/scripts/providers/codegraph.cjs",
         "skills/spec-runtime-setup/scripts/providers/common.cjs",
         "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
@@ -1606,11 +1653,14 @@
         "tests/fixtures/mcp-setup/legacy-parity/windows/runtime-contracts.json",
         "tests/fixtures/mcp-setup/repair-worktree/posix.json",
         "tests/fixtures/mcp-setup/repair-worktree/windows.json",
+        "tests/integration/runtime-setup-codegraph-launcher.integration.test.js",
+        "tests/integration/runtime-setup-npm-archive.integration.test.js",
         "tests/integration/workspace-graph-auto-refresh.integration.test.js",
         "tests/integration/workspace-graph-lifecycle.integration.test.js",
         "tests/unit/ce-localization-round-1-remediation-contracts.test.js",
         "tests/unit/ce-upstream-skill-sync-contracts.test.js",
         "tests/unit/graphify-defensive-probes.test.js",
+        "tests/unit/host-enumeration-drift-guard.test.js",
         "tests/unit/mcp-setup-config-consumers.test.js",
         "tests/unit/mcp-setup-contracts.test.js",
         "tests/unit/mcp-setup-entrypoint.test.js",
@@ -1643,6 +1693,16 @@
         "tests/unit/mcp-setup-workspace-target.test.js",
         "tests/unit/pi-adapter.test.js",
         "tests/unit/plugin-modules.test.js",
+        "tests/unit/runtime-setup-codegraph-evidence.test.js",
+        "tests/unit/runtime-setup-codegraph-install-integrity.test.js",
+        "tests/unit/runtime-setup-codegraph-launcher.test.js",
+        "tests/unit/runtime-setup-consumer-health.test.js",
+        "tests/unit/runtime-setup-demand-policy.test.js",
+        "tests/unit/runtime-setup-npm-integrity.test.js",
+        "tests/unit/runtime-setup-provider-identity.test.js",
+        "tests/unit/runtime-setup-registry-metadata.test.js",
+        "tests/unit/runtime-setup-warmup-identity.test.js",
+        "tests/unit/runtime-setup-workspace-loading.test.js",
         "tests/unit/sync-instruction-files.test.js",
         "tests/unit/zcode-adapter.test.js"
       ]
@@ -3822,9 +3882,9 @@
     },
     {
       "path": "skills/spec-code-review/evals/fixtures/repos/tenant-orders/prepare-review-fixture.sh",
-      "sha256": "1bec15a4056e617692ad571768e4fb964ac60b28bc48fccd23cf0055b1e5846f",
-      "bytes": 195,
-      "line_count": 6,
+      "sha256": "2e77d7eb1a4f1441920827cf6ebf10b8bae2890062b76aa372dd466ff0a9394b",
+      "bytes": 548,
+      "line_count": 12,
       "skill_id": "spec-code-review",
       "owning_skill": "spec-code-review",
       "path_role": "evaluation",
@@ -3888,9 +3948,9 @@
     },
     {
       "path": "skills/spec-code-review/evals/fixtures/scripts/check-r2-preset-applied-fix.sh",
-      "sha256": "961576309ddf14b2e6283acff57e557e9122cd12b3c0aeaa67f8c0a1866d129e",
-      "bytes": 1714,
-      "line_count": 32,
+      "sha256": "448d0bb39805acc0ad3c42a8ffce4530163e4a32980e61b86928db503f8cc3a8",
+      "bytes": 2783,
+      "line_count": 49,
       "skill_id": "spec-code-review",
       "owning_skill": "spec-code-review",
       "path_role": "deterministic-helper",
@@ -4207,8 +4267,8 @@
     },
     {
       "path": "skills/spec-code-review/references/personas/project-standards-reviewer.md",
-      "sha256": "765e80598b3ad53093a6266afa7247dfa9279c0bcfe4f27c266b5abe02f952ba",
-      "bytes": 7767,
+      "sha256": "02d33c8b35160e5c3623a7c4afa4450a4783888fdcb9e875b7b3ec3d7c08c5d5",
+      "bytes": 7784,
       "line_count": 81,
       "skill_id": "spec-code-review",
       "owning_skill": "spec-code-review",
@@ -4339,9 +4399,9 @@
     },
     {
       "path": "skills/spec-code-review/scripts/peer-job-runner.py",
-      "sha256": "9d7cdcb582bda9b22b11d6ef7cb9d0e9ace21edf55b660ad1cfd106d4287b76c",
-      "bytes": 97621,
-      "line_count": 2220,
+      "sha256": "22a8bf6f1bd96fa0c49244b8ede26f28382bdf09d46968d94b21ec536d9926ba",
+      "bytes": 99361,
+      "line_count": 2244,
       "skill_id": "spec-code-review",
       "owning_skill": "spec-code-review",
       "path_role": "deterministic-helper",
@@ -6110,9 +6170,9 @@
     },
     {
       "path": "skills/spec-doc-review/scripts/peer-job-runner.py",
-      "sha256": "9d7cdcb582bda9b22b11d6ef7cb9d0e9ace21edf55b660ad1cfd106d4287b76c",
-      "bytes": 97621,
-      "line_count": 2220,
+      "sha256": "22a8bf6f1bd96fa0c49244b8ede26f28382bdf09d46968d94b21ec536d9926ba",
+      "bytes": 99361,
+      "line_count": 2244,
       "skill_id": "spec-doc-review",
       "owning_skill": "spec-doc-review",
       "path_role": "deterministic-helper",
@@ -6407,8 +6467,8 @@
     },
     {
       "path": "skills/spec-explain/references/explainer-html.md",
-      "sha256": "c0ea2bce10e12516786e74b1707e3cfab20c1b8f5996643a2be6178bae43d451",
-      "bytes": 3442,
+      "sha256": "2cbce1a153b53a13667c7a5cca142ab7285cb60060320bf7ec52e55bbb03e4f9",
+      "bytes": 3506,
       "line_count": 40,
       "skill_id": "spec-explain",
       "owning_skill": "spec-explain",
@@ -6418,8 +6478,8 @@
     },
     {
       "path": "skills/spec-explain/references/explainer-markdown.md",
-      "sha256": "d6486b167d61e69cd9a8070908bb5b2921d9dac2e7c528b787abd8af837bda9a",
-      "bytes": 2009,
+      "sha256": "5254ccc55027f96121921052d1c845c33e8563449c7923a1301e5d8859157432",
+      "bytes": 2093,
       "line_count": 33,
       "skill_id": "spec-explain",
       "owning_skill": "spec-explain",
@@ -6440,8 +6500,8 @@
     },
     {
       "path": "skills/spec-explain/references/orchestration.md",
-      "sha256": "70829bd20e652ff1a43a951a68b495b8ee0ceeaca41f0e5b9fa3e17760da1a44",
-      "bytes": 2667,
+      "sha256": "9169c807d875dda6aeb56a21b86e62aa5618c2a1ad0d60a7ebaa8825707167a4",
+      "bytes": 2650,
       "line_count": 20,
       "skill_id": "spec-explain",
       "owning_skill": "spec-explain",
@@ -6451,8 +6511,8 @@
     },
     {
       "path": "skills/spec-explain/SKILL.md",
-      "sha256": "3e778133237d0042dca3e98197d6685fc9396f6c53a78a44985559729df571aa",
-      "bytes": 10756,
+      "sha256": "bd82dcd441b82fd5336f3ea26bc22c5e382baf1d5dfc52ccb734719db4c6e39e",
+      "bytes": 10799,
       "line_count": 92,
       "skill_id": "spec-explain",
       "owning_skill": "spec-explain",
@@ -6583,9 +6643,9 @@
     },
     {
       "path": "skills/spec-handoff/scripts/handoff-artifact.cjs",
-      "sha256": "5f54a8a645fefaeda05b1548c4e2041e23e3af24810370a15f2c0c2cea0620c4",
-      "bytes": 16054,
-      "line_count": 370,
+      "sha256": "7875e4d8a4350de177d6eb28af88af7bf0f97ebe12721330b5d0a0383dfbc21d",
+      "bytes": 16364,
+      "line_count": 380,
       "skill_id": "spec-handoff",
       "owning_skill": "spec-handoff",
       "path_role": "deterministic-helper",
@@ -7166,9 +7226,9 @@
     },
     {
       "path": "skills/spec-lfg/scripts/pr-watch-state.cjs",
-      "sha256": "79d4a594f67efa9b4c4b9e19603910a365c657d67b34149eddcb674775d78acf",
-      "bytes": 23605,
-      "line_count": 492,
+      "sha256": "94907726f236c3c72e99989ce4d8551d96a2f37e2bcfc5d08493fa6eca2bf33b",
+      "bytes": 23960,
+      "line_count": 499,
       "skill_id": "spec-lfg",
       "owning_skill": "spec-lfg",
       "path_role": "deterministic-helper",
@@ -7540,9 +7600,9 @@
     },
     {
       "path": "skills/spec-optimize/scripts/decide.cjs",
-      "sha256": "d24c1573910293b80981349fbc6e6baa4d46fcb9795547dc6556eaed7caee966",
-      "bytes": 21384,
-      "line_count": 579,
+      "sha256": "435f0451a2cad84c1b8a4cb462ae587166c0802e274fb30502abbc5ce64ec4a8",
+      "bytes": 21638,
+      "line_count": 588,
       "skill_id": "spec-optimize",
       "owning_skill": "spec-optimize",
       "path_role": "deterministic-helper",
@@ -8992,9 +9052,9 @@
     },
     {
       "path": "skills/spec-pov/scripts/peer-job-runner.py",
-      "sha256": "9d7cdcb582bda9b22b11d6ef7cb9d0e9ace21edf55b660ad1cfd106d4287b76c",
-      "bytes": 97621,
-      "line_count": 2220,
+      "sha256": "22a8bf6f1bd96fa0c49244b8ede26f28382bdf09d46968d94b21ec536d9926ba",
+      "bytes": 99361,
+      "line_count": 2244,
       "skill_id": "spec-pov",
       "owning_skill": "spec-pov",
       "path_role": "deterministic-helper",
@@ -11742,9 +11802,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/references/config-template.yaml",
-      "sha256": "abe9ddc8b18a8bd01e8a3c61711e446b4f804627f0db92a9d7a6e9dfff4c891a",
-      "bytes": 3310,
-      "line_count": 79,
+      "sha256": "0a084752eeaae10fe6e6a0d70ee2e79b21ed2e20a928359b72b7a6acc095869f",
+      "bytes": 3589,
+      "line_count": 84,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "reference-contract",
@@ -11764,9 +11824,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/references/supported-mcp-tools.md",
-      "sha256": "3181c4a22b52573ce39805b07849860d387b99647199bf26d11df22956a58e1d",
-      "bytes": 3718,
-      "line_count": 53,
+      "sha256": "dad174f75eb08ca928ccab339d65f8e79ad5c52aaa2d507627e6de8250605f21",
+      "bytes": 15924,
+      "line_count": 124,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "reference-contract",
@@ -11808,9 +11868,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/args.cjs",
-      "sha256": "f2059baef3a7d53d51c9c1f0774db556ad88a0eae52054664316c78b40b0ec85",
-      "bytes": 4513,
-      "line_count": 163,
+      "sha256": "ede64b7665430fd2d6fa8fba7005df635a9eefc2cdd422a69a311eb34ba3fa0b",
+      "bytes": 6262,
+      "line_count": 189,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -11819,9 +11879,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/baseline-policy.cjs",
-      "sha256": "56bc330dce96fc185e4bcc897ae093958e085806e87ac3277287f3483f0f03c1",
-      "bytes": 225,
-      "line_count": 10,
+      "sha256": "6d56cfbac4cd625dcaf54b9bee87fe8074aefb295201d4798dbebc7513100917",
+      "bytes": 1949,
+      "line_count": 57,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -11841,9 +11901,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/facts.cjs",
-      "sha256": "5924db30d6dfd07a2a1287a15405359d10ca44dba14edb1a1766600c2acb5a52",
-      "bytes": 29205,
-      "line_count": 760,
+      "sha256": "a40a073a8b2e81ac321533b7c77d185bcbee3e23ed5634058c5601a8f9e3693d",
+      "bytes": 29628,
+      "line_count": 766,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -11863,9 +11923,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/host-authority.cjs",
-      "sha256": "785e07eccaa5470ba6ef2e6af41983980d90a7bfb9f1ca624ba9e5d1d073c9c0",
-      "bytes": 7587,
-      "line_count": 217,
+      "sha256": "104ddcf0a14d47a2d89aa0d258b70babd8a23beb943b14bdd4fb2926670bfd83",
+      "bytes": 7802,
+      "line_count": 220,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -11874,9 +11934,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
-      "sha256": "5812d058d2dd40443270fb504a5e80cef259be493419ce34e85952338aabc648",
-      "bytes": 53311,
-      "line_count": 1472,
+      "sha256": "f24240fbcc0e2f09ad5590346b1822b9b3ee9512a5d6d27f3d177b1415269801",
+      "bytes": 53901,
+      "line_count": 1483,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -11896,9 +11956,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/installation-executor.cjs",
-      "sha256": "9431408280bf48920e43998b94fb1ec33b551204f0616a6dfe8a4922a5f36a28",
-      "bytes": 20060,
-      "line_count": 522,
+      "sha256": "a7da03d10e4fd17fd04c6c2c3c04c9f6db4fb741703c88b2953f852662c73998",
+      "bytes": 23265,
+      "line_count": 575,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -11907,9 +11967,20 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
-      "sha256": "3c7109c853995dad5dc696bcaf7854670a4fcc880eb70b37a7980745bd731bbb",
-      "bytes": 5833,
-      "line_count": 176,
+      "sha256": "c8224ff5094de5bb1a8a8730888bbba48234ad5b108916e6824c0473b49b46a8",
+      "bytes": 6374,
+      "line_count": 182,
+      "skill_id": "spec-runtime-setup",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "deterministic-helper",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "included-canonical-skill-source"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/npm-warmup.cjs",
+      "sha256": "36802e5627572af9f2263c490489880e470d3b4729a7fa08b618450faf31f069",
+      "bytes": 6400,
+      "line_count": 117,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -11951,9 +12022,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/process-runner.cjs",
-      "sha256": "04aad38cb71720f7e239ff0423b23066d9fb80dfc69b117ca690e3eca63a0c0d",
-      "bytes": 16693,
-      "line_count": 467,
+      "sha256": "e63b3e9a15433e42c57530c6eb0eaecc8f0b02f9b811b418538719fd7aa214e8",
+      "bytes": 17704,
+      "line_count": 478,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -11995,9 +12066,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/provider-display.cjs",
-      "sha256": "d94b14f271fa4397018c6ceed36548691954fa8c4617005eac55842b62090533",
-      "bytes": 1054,
-      "line_count": 30,
+      "sha256": "29a28e9e8801f20d004f1ddd81252c80e4a30bc269761b5b25cb5dd76144d9c7",
+      "bytes": 1213,
+      "line_count": 32,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -12006,9 +12077,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/registry.cjs",
-      "sha256": "276e0141d09d76e60861c9d8fa5d125ae31130e753d44276c828f509c01a8b87",
-      "bytes": 23396,
-      "line_count": 658,
+      "sha256": "f7bc6cc0249831c329c756025d58bf48a62e8ba2444e069491c8bc9c2a4e6189",
+      "bytes": 25608,
+      "line_count": 703,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -12039,9 +12110,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/renderer.cjs",
-      "sha256": "060d58f7ed3f64d549d0bf34fc651574b649c0c17079a2328aa2f0c54fac2456",
-      "bytes": 14355,
-      "line_count": 326,
+      "sha256": "eb2d78c7b58ee08db9f47ee118aae91d82aeb96f849aa3e760c583693fdcc91b",
+      "bytes": 14447,
+      "line_count": 327,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -12050,9 +12121,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
-      "sha256": "f5f53f509f00ce4df726d178e35976494fdc118a4ecf414d950bf3d876b7f04d",
-      "bytes": 35819,
-      "line_count": 926,
+      "sha256": "d47d5dd56992ee721ed83274d5de35e0fde24b302be698b197b46274a3a9a130",
+      "bytes": 37699,
+      "line_count": 956,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -12075,6 +12146,17 @@
       "sha256": "b8898a9f9c7948d3f820b7c963bbe55ddf6a49c01bef2d187b2eae51a991e985",
       "bytes": 8166,
       "line_count": 229,
+      "skill_id": "spec-runtime-setup",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "deterministic-helper",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "included-canonical-skill-source"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/source-snapshot.cjs",
+      "sha256": "bcb2995930b587be59d3c8440e07feed25866333da390d28176cb7ae59f48d3f",
+      "bytes": 9882,
+      "line_count": 205,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -12116,9 +12198,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-exec.cjs",
-      "sha256": "e3b1c5ca246c159778d9447e3ea57186646f26f50999167f9a9caacc3d4872e7",
-      "bytes": 618,
-      "line_count": 24,
+      "sha256": "3655fb48bffaf29da6c62eca1f59c02cf3b43a723271744de44dfa857e5a8717",
+      "bytes": 1097,
+      "line_count": 29,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -12160,9 +12242,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-build.cjs",
-      "sha256": "47ad0de6894550b5b0b08dc6e46d8f6c5bea4a5c214f4e37291189ea966747f6",
-      "bytes": 22735,
-      "line_count": 593,
+      "sha256": "3f4ea2b448432f750b9a5a76e2a0095a155a57427899adb2ccfe06a8a5c07b97",
+      "bytes": 23445,
+      "line_count": 615,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -12182,9 +12264,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-executor.cjs",
-      "sha256": "633681f084c629741763be14f810e9a1294ca504033690717aa15d6cf49f048f",
-      "bytes": 13549,
-      "line_count": 417,
+      "sha256": "bd37b82bb0a8e6d9994cbe2c3c520db50b94c78633bad7714c633af0af989874",
+      "bytes": 16237,
+      "line_count": 472,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -12270,8 +12352,8 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs",
-      "sha256": "38099c6c8622e72561387957cf9e4d6069dd5aef17b20932135c6a97ea1a8e48",
-      "bytes": 3155,
+      "sha256": "3dd739e9d4d19ef2ffefc22cffba9db66b506849b910540152441fb890507f4c",
+      "bytes": 3381,
       "line_count": 84,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
@@ -12292,9 +12374,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-routing-inject.cjs",
-      "sha256": "be0951032a9af87fc7f55d5e530d6e2dd858683c1c25129e4ae10b5c6484371d",
-      "bytes": 5207,
-      "line_count": 162,
+      "sha256": "6e0d2d9011777ee20e90f2f56356c8b4a0bb01ce21dafa10c0544544db7bb223",
+      "bytes": 5226,
+      "line_count": 163,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -12346,10 +12428,32 @@
       "terminal_disposition": "included-canonical-skill-source"
     },
     {
+      "path": "skills/spec-runtime-setup/scripts/providers/codegraph-artifact-evidence.cjs",
+      "sha256": "cbbb1cd90feddcc67ab3eacf5443e51a975957237d7f019aca89b66360d50737",
+      "bytes": 7567,
+      "line_count": 121,
+      "skill_id": "spec-runtime-setup",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "deterministic-helper",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "included-canonical-skill-source"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/providers/codegraph-launcher.cjs",
+      "sha256": "0e0f1ce146e806f0adf6a32e8fedd10456d0e26e8a7b2aaa2375dbc953830cb7",
+      "bytes": 5529,
+      "line_count": 100,
+      "skill_id": "spec-runtime-setup",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "deterministic-helper",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "included-canonical-skill-source"
+    },
+    {
       "path": "skills/spec-runtime-setup/scripts/providers/codegraph.cjs",
-      "sha256": "599fe5e08307eba39d2440d800bb8709042f307f5f95f0ce979427c30ab6087d",
-      "bytes": 16608,
-      "line_count": 445,
+      "sha256": "92cd0a0791e13906fa398e62a4e01f888a2f72f165be463cb369b94d40713554",
+      "bytes": 24482,
+      "line_count": 555,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -12358,9 +12462,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/providers/common.cjs",
-      "sha256": "a8ac27dc2c9122fea3c6da25d63aba1cc4272896e73455478c3d18a8d781edbb",
-      "bytes": 5259,
-      "line_count": 133,
+      "sha256": "b50df264d67950433c821fa7e28f56cd59c067b3c30e042cebcaead6c0328cf5",
+      "bytes": 5498,
+      "line_count": 136,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -12369,9 +12473,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
-      "sha256": "1cb971217524d52ee66ee8ede273fd8ad47997347c364c7ff136dc81efcd0f4d",
-      "bytes": 114158,
-      "line_count": 2489,
+      "sha256": "06eba117e3dc8e10e4a115416d89336af9a957e5acfe6497c5289973663d8a8b",
+      "bytes": 125231,
+      "line_count": 2673,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -12391,9 +12495,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/setup.cjs",
-      "sha256": "5ed8fcbb044655f1e5ec29e85f2c788b4c17247abf654f247046260e7d64e8d6",
-      "bytes": 33783,
-      "line_count": 897,
+      "sha256": "036b483f6a077a3f89e297953184c7459a6dfeddfda6cd0cd4834637e2793d18",
+      "bytes": 33618,
+      "line_count": 886,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -12435,9 +12539,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/setup-registry.json",
-      "sha256": "b0e9b22fcb9cfb4103037f62b62d2cc91af2b7467aa268fff344544573a83637",
-      "bytes": 59362,
-      "line_count": 2032,
+      "sha256": "9e54f85b4dcc985471b77b6036f1b9fde5405c30eb8b23e3a3ea02e68d5ad75d",
+      "bytes": 65244,
+      "line_count": 2243,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "support-asset",
@@ -12446,9 +12550,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/setup-registry.schema.json",
-      "sha256": "7485f0c40219462e175f0ba3285e9c70940e2b28d88434d991984f416609e2fd",
-      "bytes": 16987,
-      "line_count": 755,
+      "sha256": "52d7201af9dc6b17ec5b43cf8ff5f008f2b55b9870a25d3b15d1a76ee3f7d315",
+      "bytes": 18379,
+      "line_count": 813,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "machine-contract",
@@ -12457,9 +12561,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/SKILL.md",
-      "sha256": "bd42f0807e65109423d681af14701d0d3fdc80fdb4890c169f843cd7c03613c7",
-      "bytes": 55200,
-      "line_count": 361,
+      "sha256": "9e23a3ccedb99b5c052a42e0b21a9881a7c4f00f1431a7f40a7aaac15c7adb6e",
+      "bytes": 54924,
+      "line_count": 368,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "entry-contract",
@@ -14407,9 +14511,9 @@
       "skill_id": "autoresearch",
       "owning_skill": "autoresearch",
       "path": "tests/unit/ce-localization-review-contracts.test.js",
-      "sha256": "d545890b80b12e2e9b85d96f1618726dde3bbf9eca563a0a00f87394aa66ff07",
-      "bytes": 5960,
-      "line_count": 109,
+      "sha256": "846125ffe2ee84c02df5ba7d2debdf37bffa5d497f68af87c9dfc54a6c0f6db6",
+      "bytes": 8740,
+      "line_count": 158,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -14419,7 +14523,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/ce-localization-review-contracts.test.js",
-          "line": 31,
+          "line": 80,
           "excerpt": "// 2026-09-04（01fad369）：autoresearch 从 host-owned 排除清单收编进 canonical"
         }
       ]
@@ -14512,9 +14616,9 @@
       "skill_id": "spec-app-consistency-audit",
       "owning_skill": "spec-app-consistency-audit",
       "path": "tests/unit/plugin-modules.test.js",
-      "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-      "bytes": 38311,
-      "line_count": 905,
+      "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+      "bytes": 38963,
+      "line_count": 917,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -14524,7 +14628,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/plugin-modules.test.js",
-          "line": 485,
+          "line": 497,
           "excerpt": "'.cursor/skills/spec-app-consistency-audit/README.md',"
         }
       ]
@@ -14749,9 +14853,9 @@
       "skill_id": "spec-brainstorm",
       "owning_skill": "spec-brainstorm",
       "path": "tests/unit/mcp-setup-config-consumers.test.js",
-      "sha256": "d006ec7e094449f00d1822c702e065b1dacab4a3b2ef159320a239e5e78a415f",
-      "bytes": 12827,
-      "line_count": 271,
+      "sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea",
+      "bytes": 13735,
+      "line_count": 282,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -14761,7 +14865,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/mcp-setup-config-consumers.test.js",
-          "line": 73,
+          "line": 80,
           "excerpt": "const brainstorm = read('skills/spec-brainstorm/references/output-mode.md');"
         }
       ]
@@ -14770,9 +14874,9 @@
       "skill_id": "spec-brainstorm",
       "owning_skill": "spec-brainstorm",
       "path": "tests/unit/plugin-modules.test.js",
-      "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-      "bytes": 38311,
-      "line_count": 905,
+      "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+      "bytes": 38963,
+      "line_count": 917,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -14782,7 +14886,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/plugin-modules.test.js",
-          "line": 406,
+          "line": 418,
           "excerpt": "'skills/spec-brainstorm/references/handoff.md',"
         }
       ]
@@ -15190,9 +15294,9 @@
       "skill_id": "spec-code-review",
       "owning_skill": "spec-code-review",
       "path": "tests/unit/peer-job-runner-parity.test.js",
-      "sha256": "8a769329f2d572ee4bae9d8d3f8caa5805a64a9e5a4c2ee0bfbd079ca09ee18f",
-      "bytes": 1623,
-      "line_count": 41,
+      "sha256": "5eec7320d067cc665ed3b7f56a978874ab0faed869538ecef33b34412ea4f559",
+      "bytes": 2298,
+      "line_count": 50,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -15337,9 +15441,9 @@
       "skill_id": "spec-code-review",
       "owning_skill": "spec-code-review",
       "path": "tests/unit/spec-code-review-peer-runner.test.js",
-      "sha256": "47d7aa07bf8f716f925543bef3cfe927a0e345246aa29389e47af0821abc7d75",
-      "bytes": 12369,
-      "line_count": 308,
+      "sha256": "d9eca7f2ca9364ed173b558758f0c39d57cf37ffc7d97aa730f7b080dc920024",
+      "bytes": 13100,
+      "line_count": 328,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -15967,9 +16071,9 @@
       "skill_id": "spec-compound",
       "owning_skill": "spec-compound",
       "path": "tests/unit/ce-localization-closeout-contracts.test.js",
-      "sha256": "17a441ca49c7a0b371bbed8eb22e93734beda1e04f47570f4ca9ad47e5cac3e2",
-      "bytes": 15896,
-      "line_count": 380,
+      "sha256": "693c108ddb8eecf4991f4d01f8e98d3fffd52a10d0db0a08b35e1230b20937fc",
+      "bytes": 18146,
+      "line_count": 413,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -15979,7 +16083,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/ce-localization-closeout-contracts.test.js",
-          "line": 186,
+          "line": 219,
           "excerpt": "const skillReview = review.skill_reviews.find((entry) => entry.skill_id === 'spec-compound');"
         }
       ]
@@ -16765,9 +16869,9 @@
       "skill_id": "spec-doc-review",
       "owning_skill": "spec-doc-review",
       "path": "tests/unit/peer-job-runner-parity.test.js",
-      "sha256": "8a769329f2d572ee4bae9d8d3f8caa5805a64a9e5a4c2ee0bfbd079ca09ee18f",
-      "bytes": 1623,
-      "line_count": 41,
+      "sha256": "5eec7320d067cc665ed3b7f56a978874ab0faed869538ecef33b34412ea4f559",
+      "bytes": 2298,
+      "line_count": 50,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -16954,9 +17058,9 @@
       "skill_id": "spec-dogfood",
       "owning_skill": "spec-dogfood",
       "path": "tests/unit/plugin-modules.test.js",
-      "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-      "bytes": 38311,
-      "line_count": 905,
+      "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+      "bytes": 38963,
+      "line_count": 917,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -16966,7 +17070,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/plugin-modules.test.js",
-          "line": 355,
+          "line": 367,
           "excerpt": "['skills/spec-dogfood/SKILL.md', 'spec-commit'],"
         }
       ]
@@ -17038,9 +17142,9 @@
       "skill_id": "spec-explain",
       "owning_skill": "spec-explain",
       "path": "tests/unit/plugin-modules.test.js",
-      "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-      "bytes": 38311,
-      "line_count": 905,
+      "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+      "bytes": 38963,
+      "line_count": 917,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -17050,7 +17154,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/plugin-modules.test.js",
-          "line": 410,
+          "line": 422,
           "excerpt": "'skills/spec-explain/SKILL.md',"
         }
       ]
@@ -17122,9 +17226,9 @@
       "skill_id": "spec-handoff",
       "owning_skill": "spec-handoff",
       "path": "tests/unit/spec-handoff-contracts.test.js",
-      "sha256": "58f1e2b85186f82aba85340c0e1924a17b1d5828d24d01ceabc98df7eaf5b314",
-      "bytes": 13584,
-      "line_count": 272,
+      "sha256": "eee4e526b8567703a2151af788ad11b63c2c5adf331c2a5751b1a2b8d08c6597",
+      "bytes": 13903,
+      "line_count": 276,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -17311,9 +17415,9 @@
       "skill_id": "spec-ideate",
       "owning_skill": "spec-ideate",
       "path": "tests/unit/mcp-setup-config-consumers.test.js",
-      "sha256": "d006ec7e094449f00d1822c702e065b1dacab4a3b2ef159320a239e5e78a415f",
-      "bytes": 12827,
-      "line_count": 271,
+      "sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea",
+      "bytes": 13735,
+      "line_count": 282,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -17323,7 +17427,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/mcp-setup-config-consumers.test.js",
-          "line": 74,
+          "line": 81,
           "excerpt": "const ideate = read('skills/spec-ideate/references/output-mode.md');"
         }
       ]
@@ -17332,9 +17436,9 @@
       "skill_id": "spec-ideate",
       "owning_skill": "spec-ideate",
       "path": "tests/unit/plugin-modules.test.js",
-      "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-      "bytes": 38311,
-      "line_count": 905,
+      "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+      "bytes": 38963,
+      "line_count": 917,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -17344,7 +17448,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/plugin-modules.test.js",
-          "line": 408,
+          "line": 420,
           "excerpt": "'skills/spec-ideate/references/post-ideation-workflow.md',"
         }
       ]
@@ -17563,9 +17667,9 @@
       "skill_id": "spec-lfg",
       "owning_skill": "spec-lfg",
       "path": "tests/unit/plugin-modules.test.js",
-      "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-      "bytes": 38311,
-      "line_count": 905,
+      "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+      "bytes": 38963,
+      "line_count": 917,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -17575,7 +17679,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/plugin-modules.test.js",
-          "line": 353,
+          "line": 365,
           "excerpt": "['skills/spec-lfg/SKILL.md', 'spec-test-browser'],"
         }
       ]
@@ -17626,9 +17730,9 @@
       "skill_id": "spec-lfg",
       "owning_skill": "spec-lfg",
       "path": "tests/unit/spec-lfg-pr-watch-state.test.js",
-      "sha256": "182de666b1fd31a7dcc03cd876e2b9bfacfad5e644ec853086b1cf06fba600c8",
-      "bytes": 17442,
-      "line_count": 375,
+      "sha256": "af3de5fdb71bb8a44cd4e5ab673ad2c9f38f92a32544c69744c4356005bd7c71",
+      "bytes": 18803,
+      "line_count": 402,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -17989,9 +18093,9 @@
       "skill_id": "spec-optimize",
       "owning_skill": "spec-optimize",
       "path": "tests/unit/spec-optimize-decide.test.js",
-      "sha256": "3e3f89fabea3df622d0f96fce92573b7b2c2d1cf40a197c1024ac9ab236992df",
-      "bytes": 52891,
-      "line_count": 1499,
+      "sha256": "1c215e2b6e0264f3b45ec48e9728828e25fb5f753c96dda460c81a31f62d7f62",
+      "bytes": 53372,
+      "line_count": 1513,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -18262,9 +18366,9 @@
       "skill_id": "spec-plan",
       "owning_skill": "spec-plan",
       "path": "tests/unit/mcp-setup-config-consumers.test.js",
-      "sha256": "d006ec7e094449f00d1822c702e065b1dacab4a3b2ef159320a239e5e78a415f",
-      "bytes": 12827,
-      "line_count": 271,
+      "sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea",
+      "bytes": 13735,
+      "line_count": 282,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -18274,7 +18378,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/mcp-setup-config-consumers.test.js",
-          "line": 72,
+          "line": 79,
           "excerpt": "const plan = read('skills/spec-plan/references/output-mode.md');"
         }
       ]
@@ -18283,9 +18387,9 @@
       "skill_id": "spec-plan",
       "owning_skill": "spec-plan",
       "path": "tests/unit/plugin-modules.test.js",
-      "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-      "bytes": 38311,
-      "line_count": 905,
+      "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+      "bytes": 38963,
+      "line_count": 917,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -18295,7 +18399,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/plugin-modules.test.js",
-          "line": 403,
+          "line": 415,
           "excerpt": "'skills/spec-plan/SKILL.md',"
         }
       ]
@@ -18682,9 +18786,9 @@
       "skill_id": "spec-pov",
       "owning_skill": "spec-pov",
       "path": "tests/unit/peer-job-runner-parity.test.js",
-      "sha256": "8a769329f2d572ee4bae9d8d3f8caa5805a64a9e5a4c2ee0bfbd079ca09ee18f",
-      "bytes": 1623,
-      "line_count": 41,
+      "sha256": "5eec7320d067cc665ed3b7f56a978874ab0faed869538ecef33b34412ea4f559",
+      "bytes": 2298,
+      "line_count": 50,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -18703,9 +18807,9 @@
       "skill_id": "spec-pov",
       "owning_skill": "spec-pov",
       "path": "tests/unit/plugin-modules.test.js",
-      "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-      "bytes": 38311,
-      "line_count": 905,
+      "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+      "bytes": 38963,
+      "line_count": 917,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -18715,7 +18819,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/plugin-modules.test.js",
-          "line": 412,
+          "line": 424,
           "excerpt": "'skills/spec-pov/references/report.md',"
         }
       ]
@@ -18812,9 +18916,9 @@
       "skill_id": "spec-prd",
       "owning_skill": "spec-prd",
       "path": "docs/contracts/project-graph-consumption.md",
-      "sha256": "f4e24e45dc961ee400fa5e64367508ca45c14fb2461848e3d19893e440b3d4c4",
-      "bytes": 20230,
-      "line_count": 135,
+      "sha256": "b16b3960b52b3ddbda7ae8f1dca7e2514dde4efaa5671e961783a4d34aa6bf04",
+      "bytes": 24774,
+      "line_count": 152,
       "path_role": "reference-contract",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -19085,9 +19189,9 @@
       "skill_id": "spec-prd",
       "owning_skill": "spec-prd",
       "path": "tests/unit/plugin-modules.test.js",
-      "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-      "bytes": 38311,
-      "line_count": 905,
+      "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+      "bytes": 38963,
+      "line_count": 917,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -19097,7 +19201,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/plugin-modules.test.js",
-          "line": 434,
+          "line": 446,
           "excerpt": "'.cursor/skills/spec-prd/evals/stale-runtime-fixture.json',"
         }
       ]
@@ -19442,9 +19546,9 @@
       "skill_id": "spec-product-pulse",
       "owning_skill": "spec-product-pulse",
       "path": "tests/unit/mcp-setup-config-consumers.test.js",
-      "sha256": "d006ec7e094449f00d1822c702e065b1dacab4a3b2ef159320a239e5e78a415f",
-      "bytes": 12827,
-      "line_count": 271,
+      "sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea",
+      "bytes": 13735,
+      "line_count": 282,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -19454,7 +19558,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/mcp-setup-config-consumers.test.js",
-          "line": 62,
+          "line": 69,
           "excerpt": "const pulse = read('skills/spec-product-pulse/SKILL.md');"
         }
       ]
@@ -19505,9 +19609,9 @@
       "skill_id": "spec-project-rules",
       "owning_skill": "spec-project-rules",
       "path": "docs/contracts/project-graph-consumption.md",
-      "sha256": "f4e24e45dc961ee400fa5e64367508ca45c14fb2461848e3d19893e440b3d4c4",
-      "bytes": 20230,
-      "line_count": 135,
+      "sha256": "b16b3960b52b3ddbda7ae8f1dca7e2514dde4efaa5671e961783a4d34aa6bf04",
+      "bytes": 24774,
+      "line_count": 152,
       "path_role": "reference-contract",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -19757,9 +19861,9 @@
       "skill_id": "spec-resolve-pr-feedback",
       "owning_skill": "spec-resolve-pr-feedback",
       "path": "tests/unit/plugin-modules.test.js",
-      "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-      "bytes": 38311,
-      "line_count": 905,
+      "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+      "bytes": 38963,
+      "line_count": 917,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -19769,7 +19873,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/plugin-modules.test.js",
-          "line": 105,
+          "line": 117,
           "excerpt": "'spec-resolve-pr-feedback',"
         }
       ]
@@ -20030,9 +20134,9 @@
       "skill_id": "spec-rule-miner",
       "owning_skill": "spec-rule-miner",
       "path": "docs/contracts/project-graph-consumption.md",
-      "sha256": "f4e24e45dc961ee400fa5e64367508ca45c14fb2461848e3d19893e440b3d4c4",
-      "bytes": 20230,
-      "line_count": 135,
+      "sha256": "b16b3960b52b3ddbda7ae8f1dca7e2514dde4efaa5671e961783a4d34aa6bf04",
+      "bytes": 24774,
+      "line_count": 152,
       "path_role": "reference-contract",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -20072,9 +20176,9 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "docs/contracts/project-graph-consumption.md",
-      "sha256": "f4e24e45dc961ee400fa5e64367508ca45c14fb2461848e3d19893e440b3d4c4",
-      "bytes": 20230,
-      "line_count": 135,
+      "sha256": "b16b3960b52b3ddbda7ae8f1dca7e2514dde4efaa5671e961783a4d34aa6bf04",
+      "bytes": 24774,
+      "line_count": 152,
       "path_role": "reference-contract",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -20084,7 +20188,7 @@
       "evidence": [
         {
           "source_path": "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
-          "line": 1993,
+          "line": 2177,
           "excerpt": "'- 普通 workflow 不会在代码变更后刷新 project graph。按 `docs/contracts/project-graph-consumption.md` 将 freshness 作为 setup/readiness advisory；需要显式刷新时运行 `spec-runtime-setup --only graphify --refresh`。',"
         }
       ]
@@ -20307,6 +20411,48 @@
     {
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
+      "path": "tests/integration/runtime-setup-codegraph-launcher.integration.test.js",
+      "sha256": "cb665300c498b9edf3a69dc8f2a35c624e85b40924e18065a999173a1bd5888f",
+      "bytes": 5450,
+      "line_count": 91,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-explicit-source-ref"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/integration/runtime-setup-codegraph-launcher.integration.test.js",
+          "line": 7,
+          "excerpt": "const { runProcess, runProcessSync } = require('../../skills/spec-runtime-setup/scripts/lib/process-runner.cjs');"
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-runtime-setup",
+      "owning_skill": "spec-runtime-setup",
+      "path": "tests/integration/runtime-setup-npm-archive.integration.test.js",
+      "sha256": "edb9160ac97e683ce7c4943ecf156166cdaef70439f001a482b82ebdcabe10aa",
+      "bytes": 7709,
+      "line_count": 104,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-explicit-source-ref"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/integration/runtime-setup-npm-archive.integration.test.js",
+          "line": 6,
+          "excerpt": "const { runCommandSync } = require('../../skills/spec-runtime-setup/scripts/lib/process-runner.cjs');"
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-runtime-setup",
+      "owning_skill": "spec-runtime-setup",
       "path": "tests/integration/workspace-graph-auto-refresh.integration.test.js",
       "sha256": "67d64289179889b6b08d5ff3a33150055195ce63510027dd646e6f04b9d53742",
       "bytes": 26990,
@@ -20392,9 +20538,9 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/unit/graphify-defensive-probes.test.js",
-      "sha256": "79c76bec14c429def5a7553eb54dc6a203dcbbdd32a23d0bef320408eafd74bd",
-      "bytes": 2616,
-      "line_count": 66,
+      "sha256": "e86ef7866f5577f0f0ed62852bad5090da3c8ae3d5bb50eecbefe4a3857d59c3",
+      "bytes": 4639,
+      "line_count": 102,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -20412,10 +20558,31 @@
     {
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
+      "path": "tests/unit/host-enumeration-drift-guard.test.js",
+      "sha256": "fa4395e4dc9d94c7b253b802783891b720d2dc944217077507e0594760c6ec09",
+      "bytes": 3030,
+      "line_count": 59,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-explicit-source-ref"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/unit/host-enumeration-drift-guard.test.js",
+          "line": 8,
+          "excerpt": "const { loadRegistry, HOST_IDS } = require('../../skills/spec-runtime-setup/scripts/lib/registry.cjs');"
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-runtime-setup",
+      "owning_skill": "spec-runtime-setup",
       "path": "tests/unit/mcp-setup-config-consumers.test.js",
-      "sha256": "d006ec7e094449f00d1822c702e065b1dacab4a3b2ef159320a239e5e78a415f",
-      "bytes": 12827,
-      "line_count": 271,
+      "sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea",
+      "bytes": 13735,
+      "line_count": 282,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -20440,9 +20607,9 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/unit/mcp-setup-contracts.test.js",
-      "sha256": "e8ab1c9e3261617c36fd8e7877d1e1e6da775fd21445d87de1f521375ef9ccef",
-      "bytes": 8124,
-      "line_count": 140,
+      "sha256": "9132607737cf3dc6ce226067ba5ff0fb60212eb1abc4403afaca91c0acec8bcb",
+      "bytes": 8063,
+      "line_count": 141,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -20461,9 +20628,9 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/unit/mcp-setup-entrypoint.test.js",
-      "sha256": "14ec939751f3ac35d0dea8a0ad049c81b77b47a2a6419944ae45302d3b839563",
-      "bytes": 122903,
-      "line_count": 2975,
+      "sha256": "548755b8a84c7bbb10c71ae86df3bbb51d614107a733b8e6c416c28ac812ae9b",
+      "bytes": 137459,
+      "line_count": 3189,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -20473,7 +20640,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/mcp-setup-entrypoint.test.js",
-          "line": 9,
+          "line": 11,
           "excerpt": "const skillRoot = path.join(repoRoot, 'skills', 'spec-runtime-setup');"
         }
       ]
@@ -20524,9 +20691,9 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/unit/mcp-setup-mode-target.test.js",
-      "sha256": "f5f43f9bdd33fa093e116d4de68c1cf195481ab306d677694c6bcaca52d4471a",
-      "bytes": 22036,
-      "line_count": 602,
+      "sha256": "d82b33fd136650691888c7c87aa4d7c1cd2bd1e5de9473b8f0b08f6a88b83c88",
+      "bytes": 24038,
+      "line_count": 631,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -20545,9 +20712,9 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/unit/mcp-setup-node-contracts.test.js",
-      "sha256": "19387a7b44d739a9991a0555ac3894b6770ba5bca726fc4ad51d3d68326042ee",
-      "bytes": 33560,
-      "line_count": 718,
+      "sha256": "a86963f16e70c6ddd6eaeaa119e5a339592a93ec75ee022eaf9dc108fcc4942f",
+      "bytes": 33703,
+      "line_count": 720,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -20587,8 +20754,8 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/unit/mcp-setup-preflight.test.js",
-      "sha256": "126b826191b8d07ccef441add5176e43142ecc98ec976c1e321f7c638ff9034a",
-      "bytes": 7589,
+      "sha256": "b3b1950bf09c0341dcd325ca61b815f772fbd81a18efa6746f0453bf8bd2d2a0",
+      "bytes": 7572,
       "line_count": 202,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
@@ -20629,9 +20796,9 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/unit/mcp-setup-project-config.test.js",
-      "sha256": "212af16be67ebd14ef2267c3111e1e9d0f8394f9770a9c99a7c10404f509f493",
-      "bytes": 19986,
-      "line_count": 461,
+      "sha256": "951eeb2774b82ec1828e16fcbb09d3c5bbaf0e5178e8d0d86f6367a8e214cb5e",
+      "bytes": 21371,
+      "line_count": 482,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -20650,9 +20817,9 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/unit/mcp-setup-providers.test.js",
-      "sha256": "8a47fd8a27a02bfc71ca334b63ff42c89badb63bb5bf7d9d43b1b040253c2afd",
-      "bytes": 85490,
-      "line_count": 1834,
+      "sha256": "0061b3db7755155b4791c1dd64661713b54d37850e272eddd8c7177b74f14f3c",
+      "bytes": 101258,
+      "line_count": 2119,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -20662,7 +20829,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/mcp-setup-providers.test.js",
-          "line": 186,
+          "line": 202,
           "excerpt": "describe('spec-runtime-setup provider registry', () => {"
         }
       ]
@@ -20671,9 +20838,9 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/unit/mcp-setup-registry.test.js",
-      "sha256": "bf9827aa12d0514bddad3bdfe8082ab30e0782629c9ce57b78223197fafb95d9",
-      "bytes": 14600,
-      "line_count": 375,
+      "sha256": "32e6c1fab865794c2cd73047aa153316978daef5df670933d9c5196301b920d5",
+      "bytes": 19406,
+      "line_count": 474,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -20839,9 +21006,9 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/unit/mcp-setup-workspace-graph-executor.test.js",
-      "sha256": "6ed74296ca53f77a435344bbaa46f2e459055b5bdb4b92e464143480eba6d2b5",
-      "bytes": 39007,
-      "line_count": 1073,
+      "sha256": "f1899bc5ca0369b331e3db468be693dfbb17afccb042bdee5b723c90a7a79df3",
+      "bytes": 48046,
+      "line_count": 1234,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -20965,9 +21132,9 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/unit/mcp-setup-workspace-provider-runners.test.js",
-      "sha256": "394c233044aa7fa7e745fd7f1d94032d4c7598382286cfd6c82022f657f3ce2b",
-      "bytes": 6269,
-      "line_count": 133,
+      "sha256": "836388b733c5769d9e33a17cb942fc70e4ed79cf4014d8dc08fd67bd1edef830",
+      "bytes": 6584,
+      "line_count": 140,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -21070,9 +21237,9 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/unit/plugin-modules.test.js",
-      "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-      "bytes": 38311,
-      "line_count": 905,
+      "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+      "bytes": 38963,
+      "line_count": 917,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -21082,8 +21249,218 @@
       "evidence": [
         {
           "source_path": "tests/unit/plugin-modules.test.js",
-          "line": 438,
+          "line": 450,
           "excerpt": "'.cursor/skills/spec-runtime-setup/evals/stale-runtime-fixture.json',"
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-runtime-setup",
+      "owning_skill": "spec-runtime-setup",
+      "path": "tests/unit/runtime-setup-codegraph-evidence.test.js",
+      "sha256": "b2818bfa4fed26283e5ebd0d3a32f797853139c10bcacf4e1cb1596e5e82fcf6",
+      "bytes": 6833,
+      "line_count": 116,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-explicit-source-ref"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/unit/runtime-setup-codegraph-evidence.test.js",
+          "line": 6,
+          "excerpt": "const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');"
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-runtime-setup",
+      "owning_skill": "spec-runtime-setup",
+      "path": "tests/unit/runtime-setup-codegraph-install-integrity.test.js",
+      "sha256": "396d5e576c488591155c03d9beb4215152090b07d0f00f1aee13bb11fe735521",
+      "bytes": 3992,
+      "line_count": 69,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-explicit-source-ref"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/unit/runtime-setup-codegraph-install-integrity.test.js",
+          "line": 7,
+          "excerpt": "const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');"
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-runtime-setup",
+      "owning_skill": "spec-runtime-setup",
+      "path": "tests/unit/runtime-setup-codegraph-launcher.test.js",
+      "sha256": "7e0997612f7786344a937775abf7b1e7badf5b2cf9ed16c12c921c8ac767cc4a",
+      "bytes": 10880,
+      "line_count": 144,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-explicit-source-ref"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/unit/runtime-setup-codegraph-launcher.test.js",
+          "line": 5,
+          "excerpt": "const { prepareCodegraphLaunch } = require('../../skills/spec-runtime-setup/scripts/providers/codegraph-launcher.cjs');"
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-runtime-setup",
+      "owning_skill": "spec-runtime-setup",
+      "path": "tests/unit/runtime-setup-consumer-health.test.js",
+      "sha256": "0f7ea603a2b1fefdd539a66754939f80f44f84f4913bd3f1d015dd4812f8c8ca",
+      "bytes": 21968,
+      "line_count": 346,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-explicit-source-ref"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/unit/runtime-setup-consumer-health.test.js",
+          "line": 19,
+          "excerpt": "expect(result.basis.next_action).toContain('spec-runtime-setup');"
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-runtime-setup",
+      "owning_skill": "spec-runtime-setup",
+      "path": "tests/unit/runtime-setup-demand-policy.test.js",
+      "sha256": "e552f865ccca4f977018893e92e7cb239a3164dc06455f51fee2c639079b1f07",
+      "bytes": 2013,
+      "line_count": 29,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-explicit-source-ref"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/unit/runtime-setup-demand-policy.test.js",
+          "line": 3,
+          "excerpt": "const { resolveReadinessPolicy, applyReadinessPolicy } = require('../../skills/spec-runtime-setup/scripts/lib/baseline-policy.cjs');"
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-runtime-setup",
+      "owning_skill": "spec-runtime-setup",
+      "path": "tests/unit/runtime-setup-npm-integrity.test.js",
+      "sha256": "0b8c84c3d5248bfdcd29a10cde7aae14b9a3a352c6883152839a6cee6c65ea89",
+      "bytes": 6253,
+      "line_count": 103,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-explicit-source-ref"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/unit/runtime-setup-npm-integrity.test.js",
+          "line": 6,
+          "excerpt": "const { installBaselineTools } = require('../../skills/spec-runtime-setup/scripts/lib/installation-executor.cjs');"
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-runtime-setup",
+      "owning_skill": "spec-runtime-setup",
+      "path": "tests/unit/runtime-setup-provider-identity.test.js",
+      "sha256": "9d60bfbb9546132f04f1db40ffad0b3e9e71d53a458e485fff2f2f216b9c18f6",
+      "bytes": 9934,
+      "line_count": 174,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-explicit-source-ref"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/unit/runtime-setup-provider-identity.test.js",
+          "line": 6,
+          "excerpt": "const graphify = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');"
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-runtime-setup",
+      "owning_skill": "spec-runtime-setup",
+      "path": "tests/unit/runtime-setup-registry-metadata.test.js",
+      "sha256": "8aad259d700f6a19e768307539376f2f18ec1fdaa70446f7f67a840a49592b11",
+      "bytes": 930,
+      "line_count": 17,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-explicit-source-ref"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/unit/runtime-setup-registry-metadata.test.js",
+          "line": 5,
+          "excerpt": "const { loadRegistry } = require('../../skills/spec-runtime-setup/scripts/lib/registry.cjs');"
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-runtime-setup",
+      "owning_skill": "spec-runtime-setup",
+      "path": "tests/unit/runtime-setup-warmup-identity.test.js",
+      "sha256": "ff7bd68a8554e4e517f56c7520c841303fe4f4538a3a8c872dca23aa2fbbf5b2",
+      "bytes": 5402,
+      "line_count": 104,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-explicit-source-ref"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/unit/runtime-setup-warmup-identity.test.js",
+          "line": 9,
+          "excerpt": "const { installBaselineTools, warmupCacheHit } = require('../../skills/spec-runtime-setup/scripts/lib/installation-executor.cjs');"
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-runtime-setup",
+      "owning_skill": "spec-runtime-setup",
+      "path": "tests/unit/runtime-setup-workspace-loading.test.js",
+      "sha256": "e938e82600e08dfbb9581a1d84e986df04d99a19406f5aa83aa4034386ea7a0a",
+      "bytes": 1385,
+      "line_count": 25,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-explicit-source-ref"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/unit/runtime-setup-workspace-loading.test.js",
+          "line": 8,
+          "excerpt": "const entrypoint = path.resolve(__dirname, '../../skills/spec-runtime-setup/scripts/setup.cjs');"
         }
       ]
     },
@@ -21915,7 +22292,7 @@
       "skill_id": "spec-work",
       "owning_skill": "spec-work",
       "path": "tests/unit/host-runtime-projection-contracts.test.js",
-      "sha256": "1f3c43c364870c58c1d5b4ad02214e445d0095c593e40ae1a59cf7f154233cdb",
+      "sha256": "1b47846a95968f039ce6c8067aa6237ef2091bf5eaa5b0065cfa8dc3ed30999b",
       "bytes": 11817,
       "line_count": 311,
       "path_role": "evaluation",
@@ -21957,9 +22334,9 @@
       "skill_id": "spec-work",
       "owning_skill": "spec-work",
       "path": "tests/unit/platform-registry-patterns.test.js",
-      "sha256": "2df6caaf12c4d617d130ce9aaa716f77431682baad9108bc2c7611207d85ab9f",
-      "bytes": 15906,
-      "line_count": 415,
+      "sha256": "4a5089b3b7a91747b8f669d39aafc33c0735762792498e07674a1061fe6e3dbb",
+      "bytes": 18685,
+      "line_count": 475,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -21978,9 +22355,9 @@
       "skill_id": "spec-work",
       "owning_skill": "spec-work",
       "path": "tests/unit/plugin-modules.test.js",
-      "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-      "bytes": 38311,
-      "line_count": 905,
+      "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+      "bytes": 38963,
+      "line_count": 917,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -21990,7 +22367,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/plugin-modules.test.js",
-          "line": 97,
+          "line": 109,
           "excerpt": "expect(claude.workflowSkills).toContain('spec-work');"
         }
       ]
@@ -22662,9 +23039,9 @@
       "skill_id": "spec-write-skill",
       "owning_skill": "spec-write-skill",
       "path": "tests/unit/plugin-modules.test.js",
-      "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-      "bytes": 38311,
-      "line_count": 905,
+      "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+      "bytes": 38963,
+      "line_count": 917,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -22680,7 +23057,7 @@
         },
         {
           "source_path": "tests/unit/plugin-modules.test.js",
-          "line": 465,
+          "line": 477,
           "excerpt": "'.cursor/skills/spec-write-skill/agents/openai.yaml',"
         }
       ]
@@ -23126,9 +23503,9 @@
       "skill_id": "using-spec-first",
       "owning_skill": "using-spec-first",
       "path": "docs/contracts/project-graph-consumption.md",
-      "sha256": "f4e24e45dc961ee400fa5e64367508ca45c14fb2461848e3d19893e440b3d4c4",
-      "bytes": 20230,
-      "line_count": 135,
+      "sha256": "b16b3960b52b3ddbda7ae8f1dca7e2514dde4efaa5671e961783a4d34aa6bf04",
+      "bytes": 24774,
+      "line_count": 152,
       "path_role": "reference-contract",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -23336,9 +23713,9 @@
       "skill_id": "using-spec-first",
       "owning_skill": "using-spec-first",
       "path": "tests/unit/spec-handoff-contracts.test.js",
-      "sha256": "58f1e2b85186f82aba85340c0e1924a17b1d5828d24d01ceabc98df7eaf5b314",
-      "bytes": 13584,
-      "line_count": 272,
+      "sha256": "eee4e526b8567703a2151af788ad11b63c2c5adf331c2a5751b1a2b8d08c6597",
+      "bytes": 13903,
+      "line_count": 276,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",

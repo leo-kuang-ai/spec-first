@@ -216,6 +216,10 @@ describe('spec-handoff contracts', () => {
       const linkedRoot = path.join(target, 'linked-root');
       fs.symlinkSync(outside, linkedRoot);
       expect(handoffArtifact.run(['discover', '--target-repo', target, '--source-dir', linkedRoot]).reason_code).toBe('source-directory-unsafe');
+      // 不存在的 --source-dir（拼写错误/已被清理）同样按 source-directory-structured 拒绝，而非裸 ENOENT。
+      expect(handoffArtifact.run([
+        'discover', '--target-repo', target, '--source-dir', path.join(target, 'never-existed'),
+      ]).reason_code).toBe('source-directory-unsafe');
     } finally {
       fs.rmSync(target, { recursive: true, force: true });
       fs.rmSync(outside, { recursive: true, force: true });
