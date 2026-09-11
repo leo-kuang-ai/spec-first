@@ -67,3 +67,9 @@ CodeGraph 1.6.0 的顶层 npm 归档在 source registry 固定 SHA-512 和来源
 官方 1.6.0 npm shim 在平台包缺失时会 self-heal 下载；即使设置 CODEGRAPH_NO_DOWNLOAD，命中历史 bundle 后仍会清理旧 cache。Runtime Setup 的普通真实 runner（含 sync worker）和 workspace 默认 runner 通过 Provider-owned `codegraph-launcher.cjs` 解析已安装、版本匹配的平台包，直接运行其入口；Windows 使用平台 node.exe 与独立 argv prefix，避免执行 npm .cmd wrapper。缺包或身份不符返回结构化失败和显式安装修复指引，不回退 shim 或 self-heal cache。异步 workspace 记录的绝对命令也在实际启动时重新解析。
 
 该检查只识别 npm 已知安装布局，保留非 npm native launcher 与非 CodeGraph 命令的既有行为；它不是任意 shell/JS 的副作用沙箱。DI runner 的替身测试不证明真实启动边界；独立隔离执行覆盖默认 runner。manifest/version 匹配不等于归档字节校验，平台包及传递依赖的供应链证明不能由此推导。
+
+### Provider 安装身份的证据范围
+
+Graphify 的 `provider-readiness.v2.provider_identity` 保留已解析的 package/version、command/interpreter、installer 及 `inventory_sha256`。清单按稳定顺序计算摘要，不输出完整包列表；空、非法或超出 10000 项的清单为 null。图 apply 发布前重新检查实际 interpreter 的 distribution 身份，版本不符降为 degraded。CLI 保留该兼容增量字段，不用 plan 中的 pin 补造观测。
+
+这些字段说明此次 probe 观察到的安装环境；它们不是安装字节完整性证明，也不单独证明当前图、scope receipt 或宿主 MCP 会话可用。doctor 的当前 Provider 身份与 receipt 比较仍待 U8 后续接线；不能以有 identity 字段代替该验证。

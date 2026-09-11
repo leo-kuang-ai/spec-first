@@ -1252,6 +1252,66 @@ describe('Graphify provider', () => {
     expect(validateAgainstSchema(providerSchema, result)).toEqual({ valid: true, errors: [] });
   });
 
+  test('Graphify 图操作后发布当前安装身份，并拒绝执行期间的版本漂移', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    for (const changedVersion of [false, true]) {
+      const fixture = createGraphifyApplyFixture('identity-after-apply');
+      const actionPlan = provider.plan(fixture.context);
+      const original = fixture.context.runner;
+      let queried = false;
+      fixture.context.runner = (command, args, options) => {
+        if (command === fixture.launcher && args[0] === 'query') queried = true;
+        if (queried && changedVersion && command === fixture.interpreter && args[0] === '-c') {
+          return success(JSON.stringify({ version: '9.9.9', packages: [['graphifyy', '9.9.9']] }));
+        }
+        return original(command, args, options);
+      };
+      try {
+        const result = provider.apply(fixture.context, actionPlan);
+        if (changedVersion) {
+          expect(result.readiness_status).toBe('degraded');
+          expect(result).not.toHaveProperty('provider_identity');
+          expect(result.limitations.join(' ')).toContain('graphify-package-version-mismatch');
+        } else {
+          expect(result.provider_identity).toMatchObject({ package: 'graphifyy', version: '0.9.12', installer: 'uv' });
+        }
+      } finally {
+        fs.rmSync(fixture.target, { recursive: true, force: true });
+        fs.rmSync(fixture.homeDir, { recursive: true, force: true });
+      }
+    }
+  });
+
+  test('执行期间 launcher 更换 interpreter 时不混用旧身份', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('identity-interpreter-drift');
+    const second = path.join(fixture.homeDir, '.local', 'share', 'uv', 'tools', 'graphifyy', 'other-python');
+    fs.writeFileSync(second, '#!/bin/sh\n');
+    fs.chmodSync(second, 0o755);
+    const original = fixture.context.runner;
+    let switched = false;
+    fixture.context.runner = (command, args, options) => {
+      if (command === fixture.launcher && args[0] === 'query' && !switched) {
+        fs.writeFileSync(fixture.launcher, `#!${second}\n`);
+        switched = true;
+      }
+      if (command === second && args[0] === '-c') return success(JSON.stringify({ version: '0.9.12', packages: [['graphifyy', '0.9.12'], ['different', '1.0.0']] }));
+      return original(command, args, options);
+    };
+    try {
+      const result = provider.apply(fixture.context, provider.plan(fixture.context));
+      expect(result.provider_identity.interpreter).toBe(second);
+      expect(result.provider_identity.inventory_sha256).toBe(
+        require('node:crypto').createHash('sha256')
+          .update(JSON.stringify([['graphifyy', '0.9.12'], ['different', '1.0.0']].map((entry) => JSON.stringify(entry)).sort()))
+          .digest('hex'),
+      );
+    } finally {
+      fs.rmSync(fixture.target, { recursive: true, force: true });
+      fs.rmSync(fixture.homeDir, { recursive: true, force: true });
+    }
+  });
+
   test('re-resolves a stale plan before hook mutation and blocks a newly external target', () => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const fixture = createGraphifyApplyFixture('plan-apply-drift');

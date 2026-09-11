@@ -26,6 +26,19 @@
     "provider": {
       "type": "string"
     },
+    "provider_identity": {
+      "type": "object",
+      "required": ["package", "version", "command"],
+      "properties": {
+        "package": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "command": { "type": "string", "minLength": 1 },
+        "interpreter": { "type": ["string", "null"] },
+        "installer": { "type": ["string", "null"] },
+        "inventory_sha256": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" }
+      },
+      "additionalProperties": false
+    },
     "kind": {
       "enum": [
         "code-structure",

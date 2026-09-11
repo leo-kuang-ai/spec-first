@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-11 codex: fix(runtime-setup): Graphify 在安装与图验证后发布实际 Provider identity 与有界 inventory 摘要，CLI/schema 保留受限字段并拒绝旧或混合身份。
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): CodeGraph 安装统一由 Provider 执行并共用实际 npm 归档校验，固定顶层包 SHA-512，安装同一 file 归档并向 Provider facts 与 CLI 传递限定范围的安装证据。
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): 在真实 process/workspace 启动边界绕过 CodeGraph npm shim 的隐式下载与 cache 清理，解析已安装 pinned 平台入口；缺平台包直接返回修复指引，Windows argv prefix 不经 shell 拼接。
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): setup source snapshot 升级 v2，绑定 Git 工作区与非 Git folder 的有界内容摘要；未提交改动使 doctor facts 失效，排除自身生成证据，旧快照或不安全/超预算采集保持 unknown。

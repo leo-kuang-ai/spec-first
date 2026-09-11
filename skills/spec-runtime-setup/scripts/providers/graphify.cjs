@@ -268,6 +268,7 @@ function verify(context = {}) {
     readinessStatus: installed ? 'unknown' : 'not-run',
     readinessScope: 'installation', firstGenerationStatus: 'not-run',
     nextActions: installed ? [] : ['运行显式 installation-only setup 安装 Graphify。'],
+    providerIdentity: graphifyIdentity(resolvedCommand),
   });
   const currentRootExists = Boolean(lstatOrNull(resolved.artifact_root));
   const legacyArtifactRoot = path.join(repoRoot, LEGACY_ARTIFACT_ROOT);
@@ -317,6 +318,7 @@ function verify(context = {}) {
   const degraded = installed && (legacyRootUnsafe || rootConflict || !configured || (hasCurrent && !graphIntegrity.ok)
     || (artifactUsable && !queryVerified) || scopeReadinessBlocked);
   return providerResult(METADATA, {
+    providerIdentity: graphifyIdentity(resolvedCommand),
     installed,
     configured,
     initialized: artifactUsable,
@@ -555,6 +557,13 @@ function apply(context = {}, actionPlan = plan(context)) {
     if (!incumbentCleanup.ok) mutationFailure = incumbentCleanup.reason_code;
     else runtimeContext = { ...runtimeContext, graphifyCollisionState: 'none', graphifyOriginalPathCommand: null };
   }
+  // 发布前核对实际执行环境，不能把 plan 的历史 pin 当作当前安装身份。
+  const finalIdentity = runtimeContext.graphifyCommand
+    ? probePythonDistributionIdentity(runtimeContext, repoRoot, runtimeContext.graphifyCommand,
+      context.dependency, runtimeContext.graphifyInterpreter) : null;
+  if (!mutationFailure && (!finalIdentity || !finalIdentity.ok)) {
+    mutationFailure = (finalIdentity && finalIdentity.reason_code) || 'graphify-package-identity-unverified';
+  }
   const degraded = Boolean(mutationFailure) || !hasArtifact || !queryVerified || scopeReadinessBlocked;
   const nextActions = [];
   if (mutationFailure) nextActions.push(`检查 ${mutationFailure} 的 Graphify diagnostic，并重新运行显式 setup。`);
@@ -564,6 +573,10 @@ function apply(context = {}, actionPlan = plan(context)) {
   const pathVisibilityAction = graphifyPathVisibilityAction(runtimeContext, pathRepair);
   if (pathVisibilityAction) nextActions.push(pathVisibilityAction);
   return providerResult(METADATA, {
+    providerIdentity: graphifyIdentity({ ok: finalIdentity && finalIdentity.ok,
+      package_identity: finalIdentity, command: runtimeContext.graphifyCommand,
+      interpreter: finalIdentity && finalIdentity.interpreter,
+      installer: runtimeContext.graphifyInstaller }),
     installed: !mutationFailure || hasArtifact,
     configured,
     initialized: hasArtifact,
@@ -1171,6 +1184,24 @@ function graphifyHookNextActions(outcome) {
     return ['当前目录没有可用的 project-local Git hook；Graphify 稳态刷新使用显式 --refresh。'];
   }
   return ['Project-local Graphify 自动刷新未验证；如需该增强可重新运行显式 setup，核心图查询不受影响。'];
+}
+
+function graphifyIdentity(resolved) {
+  if (!resolved || !resolved.ok || !resolved.package_identity) return null;
+  const identity = resolved.package_identity;
+  const packages = identity.inventory && identity.inventory.packages;
+  const validInventory = Array.isArray(packages) && packages.length > 0 && packages.length <= 10000
+    && packages.every((entry) => Array.isArray(entry) && entry.length === 2
+      && entry.every((value) => typeof value === 'string' && value.length > 0));
+  return {
+    package: identity.package,
+    version: identity.version,
+    command: resolved.command,
+    interpreter: resolved.interpreter,
+    installer: resolved.installer,
+    inventory_sha256: validInventory
+      ? crypto.createHash('sha256').update(JSON.stringify(packages.map((entry) => JSON.stringify(entry)).sort())).digest('hex') : null,
+  };
 }
 
 function resolveGraphifyCommand(context, repoRoot) {

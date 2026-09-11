@@ -55,6 +55,7 @@ function providerResult(metadata, options = {}) {
     schema_version: 'provider-readiness.v2',
     readiness_scope: options.readinessScope || 'artifact',
     provider: metadata.id,
+    ...(options.providerIdentity ? { provider_identity: options.providerIdentity } : {}),
     kind: metadata.kind || 'generic',
     profile: metadata.profile || 'optional',
     readiness_status: options.readinessStatus || (installed ? 'unknown' : 'not-run'),

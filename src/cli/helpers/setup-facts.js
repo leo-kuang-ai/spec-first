@@ -342,6 +342,9 @@ function normalizeProviderReadiness(entries) {
     kind: normalizeProviderKind(entry.kind),
     profile: normalizeProviderProfile(entry.profile),
     readiness_status: normalizeProviderStatus(entry.readiness_status),
+    ...(entry.provider_identity && typeof entry.provider_identity === 'object' && !Array.isArray(entry.provider_identity)
+      && ['package', 'version', 'command'].every((key) => typeof entry.provider_identity[key] === 'string' && entry.provider_identity[key].length > 0)
+      ? { provider_identity: normalizeProviderIdentity(entry.provider_identity) } : {}),
     ...(isVerifiedNpmArchiveIdentity(entry.dependency_identity, entry.dependency_identity, ['npm-pack+npx', 'npm-pack+npm-install'])
       ? { dependency_identity: { ...entry.dependency_identity } } : {}),
     lifecycle: {
@@ -365,6 +368,20 @@ function normalizeProviderReadiness(entries) {
     steady_state: normalizeSteadyState(entry.steady_state),
     usage_note: typeof entry.usage_note === 'string' ? entry.usage_note : '',
   }));
+}
+
+function normalizeProviderIdentity(identity) {
+  const result = {};
+  for (const key of ['package', 'version', 'interpreter', 'installer', 'command']) {
+    if (typeof identity[key] === 'string' && identity[key].length > 0) result[key] = identity[key];
+  }
+  for (const key of ['interpreter', 'installer']) {
+    if (identity[key] === null) result[key] = null;
+  }
+  if (Object.hasOwn(identity, 'inventory_sha256')) {
+    result.inventory_sha256 = /^[a-f0-9]{64}$/.test(identity.inventory_sha256 || '') ? identity.inventory_sha256 : null;
+  }
+  return result;
 }
 
 function normalizeProfile(value) {

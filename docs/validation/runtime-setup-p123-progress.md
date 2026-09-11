@@ -168,3 +168,13 @@
 - 第二次共享大回归 42 suites / 728 tests 中 726 通过；新预览测试误读 actions 字段（实际为 planned_operations），另一失败证实失败汇总会把 Provider digest 错误覆盖为 missing_dependency。修正测试字段，并让 tool probe 合并实际 Provider dependency 安装结果，保留原始原因和安装证据。
 - 最终九 suites / 244 tests 全通过，覆盖完整 entrypoint、Provider、registry、facts、CLI consumer health、warmup/cache/integrity 与真实离线安装。该结果是修复后的针对性回归；不将此前大回归的两个失败改写为全绿。
 - typecheck 262 files、skill entrypoint lint 490 files 与 staged diff whitespace 检查通过。独立暂存范围只纳入本轮增量，排除 Pi/ZCode/Graphify 与其他任务的已有修改；验证来自共享工作树，不等同本提交的独立全量快照验证。未执行真实用户宿主 install/init、native Windows、push 或 PR。
+
+
+## U8 Provider 当前身份生产与消费
+
+- Graphify 复用既有 `resolvePythonGraphifyCommand` / `probePythonDistributionIdentity`，在 installation 与 artifact verify 两个 scope 发布 `provider_identity`：package、version、实际 command/interpreter、installer 和有界 installed inventory 的 `inventory_sha256`。不输出完整包清单；空/非法清单摘要为 null。
+- apply 在图操作完成后重新 probe 实际 launcher/interpreter，再发布身份；不把 plan 中的历史 pin 或旧解析器身份当作当前事实。新增版本漂移与同版本更换 interpreter 反例，分别证明降级和避免 interpreter/hash 混用。
+- `provider-readiness.v2` 增加受限 identity 对象；CLI `normalizeSetupFacts` 仅保留必需字符串和合法摘要。facts 及 schema 验证保持兼容，未知或不完整身份不升级为 confirmed。
+- 首轮审查发现 apply 可能发布旧 interpreter 与新 inventory 的混合身份（P2）；修复为使用 final probe 的 interpreter，并补反例。独立 follow-up 定点复核通过。
+- 本批审查修复前聚焦 4 suites / 164 tests 通过，修复后定点复跑 2 suites / 65 tests 通过；typecheck 262 files、入口 lint 490 files、diff check 通过。
+- 当前仍未把 provider identity 纳入 doctor freshness 比较，也未把 Graphify scope receipt 的 graph hash 与 identity 统一为一个 durable truth；CodeGraph 已有顶层 npm archive identity，平台 bundle/传递依赖仍明确不在证明范围。
