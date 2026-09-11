@@ -1,0 +1,18 @@
+{
+  "paths": [
+    "skills/spec-runtime-setup/scripts/providers/codegraph-artifact-evidence.cjs",
+    "skills/spec-runtime-setup/scripts/providers/codegraph-launcher.cjs",
+    "skills/spec-runtime-setup/scripts/providers/codegraph.cjs",
+    "skills/spec-runtime-setup/scripts/providers/common.cjs",
+    "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
+    "tests/integration/runtime-setup-codegraph-launcher.integration.test.js",
+    "tests/unit/graphify-defensive-probes.test.js",
+    "tests/unit/mcp-setup-providers.test.js",
+    "tests/unit/runtime-setup-codegraph-evidence.test.js",
+    "tests/unit/runtime-setup-codegraph-install-integrity.test.js",
+    "tests/unit/runtime-setup-codegraph-launcher.test.js",
+    "tests/unit/runtime-setup-consumer-health.test.js",
+    "tests/unit/runtime-setup-provider-identity.test.js"
+  ],
+  "head": "9b3f37177412ad51293f118fe613243ba85d7fd0"
+}

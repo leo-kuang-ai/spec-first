@@ -75,6 +75,67 @@ test('没有历史证据时 verify 不能运行 status/query 或回填 fresh', (
   expect(runner.mock.calls.every(([, args]) => args.includes('--version'))).toBe(true);
 });
 
+test('facts 在 stat 后增长时仍按初始大小有界读取并拒绝漂移', () => {
+  const applied = provider.apply(context, plan);
+  const { filename } = publish(applied);
+  const original = fs.readFileSync;
+  const readAll = jest.spyOn(fs, 'readFileSync').mockImplementation((target, ...args) => {
+    if (typeof target === 'number') throw new Error('unbounded descriptor read');
+    return original(target, ...args);
+  });
+  try { expect(evidenceOwner.readRecordedEvidence(context)).toEqual(applied.artifact_evidence); }
+  finally { readAll.mockRestore(); }
+  const size = fs.statSync(filename).size;
+  const read = fs.readSync;
+  let requested = 0;
+  const probe = jest.spyOn(fs, 'readSync').mockImplementation((fd, buffer, offset, length, position) => {
+    if (requested === 0) fs.appendFileSync(filename, ' '.repeat(5 * 1024 * 1024));
+    requested += length;
+    return read(fd, buffer, offset, length, position);
+  });
+  try {
+    expect(evidenceOwner.readRecordedEvidence(context)).toBeNull();
+    expect(requested).toBeGreaterThan(0);
+    expect(requested).toBeLessThanOrEqual(size + 1);
+  } finally { probe.mockRestore(); }
+});
+
+test.each(['root', 'source_snapshot', 'provider_identity', 'file'])('拒绝 schema 不接受的 %s 额外字段', (at) => {
+  const applied = provider.apply(context, plan);
+  const evidence = applied.artifact_evidence;
+  const target = at === 'root' ? evidence : at === 'file' ? evidence.files['codegraph.db'] : evidence[at];
+  target.unexpected = true;
+  expect(require('../../src/contracts/schema-validator').validateAgainstSchema(require('../../docs/contracts/provider-readiness.schema.json'), applied).valid).toBe(false);
+  expect(evidenceOwner.validEvidence(evidence)).toBe(false);
+  expect(normalizeSetupFacts(publish(applied).toolFacts).provider_readiness[0].artifact_evidence).toBeUndefined();
+});
+
+test('doctor 消费原证据，DB 改变或旧证据缺失撤销 fresh 计数', () => {
+  const skillRoot = path.join(root, 'skill');
+  fs.mkdirSync(skillRoot);
+  const registry = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../skills/spec-runtime-setup/setup-registry.json')));
+  registry.hosts.codex.defaults.tool.host_config.targets.system.config_path = path.join(root, 'system.toml');
+  fs.writeFileSync(path.join(skillRoot, 'setup-registry.json'), JSON.stringify(registry));
+  context.skillRoot = skillRoot;
+  const applied = provider.apply(context, plan);
+  // Provider 使用 Windows launcher fixture；doctor 的平台事实来自实际宿主。
+  delete context.platform;
+  expect(publish(applied).toolFacts.source_snapshot.limitations).toEqual([]);
+  const identity = jest.spyOn(provider, 'readCurrentIdentity').mockReturnValue({ status: 'confirmed', identity: applied.provider_identity });
+  const health = () => computeDecisionInputHealth({ projectRoot: root, skillRoot, platforms: ['codex'], homeDir: root, env: context.env, now });
+  try {
+    expect(health().normalized.freshness.status).toBe('fresh');
+    expect(health().normalized.provider_counts).toMatchObject({ fresh: 1, unknown: 0, stale: 0 });
+    fs.writeFileSync(path.join(root, '.codegraph', 'codegraph.db-wal'), 'changed');
+    const changed = health();
+    expect(changed.normalized.provider_counts).toMatchObject({ fresh: 0, stale: 1 });
+    expect(changed.normalized.freshness.status).toBe('stale');
+    delete applied.artifact_evidence;
+    publish(applied);
+    expect(health().normalized.provider_counts).toMatchObject({ fresh: 0, unknown: 1 });
+  } finally { identity.mockRestore(); }
+});
+
 test.each(['source', 'database'])('query 期间 %s 变化不发布新证据', (changed) => {
   onQuery = () => fs.writeFileSync(path.join(root, changed === 'source' ? 'source.js' : '.codegraph/codegraph.db'), 'changed');
   const result = provider.apply(context, plan);

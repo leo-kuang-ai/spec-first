@@ -4,7 +4,7 @@
   "producer": {
     "kind": "llm-adjudication",
     "model": "codex-current-session",
-    "status": "confirmed",
+    "status": "degraded",
     "adjudication_scope": "2026-09-08 自主收尾差量承接：固定窗口 517 条 records、upstream 与 deterministic_facts 与既有输入逐字段相同。新增 spec-work 机械修改仍需证据收尾的澄清、共享清理 ownership 修复及实验记录；不改变既有上游 owner/action/unit，不重审未变条目。"
   },
   "upstream": {
@@ -15,12 +15,12 @@
   },
   "target_source_snapshot": {
     "repository": "spec-first",
-    "head": "19d3f6d8a06f3088d4e392a8718dac47aefa8587",
+    "head": "9b3f37177412ad51293f118fe613243ba85d7fd0",
     "dirty": false,
     "dirty_paths": [],
     "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "5c75c9adfc8f24f7c377d833cc4683c9abc049fb9348e4178ae9db54b068d95e",
-    "inventory_hash": "3d2c3266db961c90c358e4d824687e879530eadc612e3e24e0f936659c39aa58",
+    "source_tree_hash": "e3d03a4ff2887cfa07e6962a84c749233d49008e8704c94328390217a1349cbd",
+    "inventory_hash": "a5a97074a0f516506e90482b3f0eb95ffd588b56044aa5214827fc8118b447a6",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -54,7 +54,7 @@
       "version": "canonical-source-manifest-v1"
     }
   },
-  "input_artifact_sha256": "4b48b71a0f71902fb6f14db7d325cfa21e2e860e519880c7296a2e2e02d1f72f",
+  "input_artifact_sha256": "37aa90f58eed225705816943652e4dd2b29d4147ce43ac4c7c8f2762ce526db8",
   "records": [
     {
       "audit_id": "A001",
@@ -14793,9 +14793,9 @@
     }
   ],
   "review_context": {
-    "continuation_review": "CE-129 提交同步补审批次（2026-09-10）后的源快照重绑：上游 517 项事实与本轮输入一致，逐项沿用既有 canonical_owner/implementation_unit/target_action 决策；本轮已对受影响的本地 owner（peer-job-runner、execution-strategy、plan-sections、pr-description-writing、validate-doc-claims、runtime-setup provider 面）做逐项源码核对，未发现需要改判的记录。不声明独立双模型复审。",
-    "reviewed_at": "2026-09-10",
-    "reviewer": "current ZCode session",
-    "method": "deterministic carry-over after CE-129 sync batch source snapshot rebind"
+    "continuation_review": "当前 source snapshot refresh 后的 deterministic carry-over；517 条 upstream record facts 与 input 完全一致，引用可回源检查完成；本轮语义增量审查以 review delta 绑定新增/变化本地 owner 文件，未把脚本刷新误报为独立双模型裁决。",
+    "reviewed_at": "2026-09-11",
+    "reviewer": "spec-first current session",
+    "method": "deterministic carry-over plus source-bound incremental fresh review; no external provider claim"
   }
 }

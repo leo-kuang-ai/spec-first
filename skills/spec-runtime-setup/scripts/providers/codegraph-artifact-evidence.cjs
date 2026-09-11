@@ -64,15 +64,17 @@ function captureDatabaseSnapshot(repoRoot, { maxBytes = 256 * 1024 * 1024, budge
 }
 
 function validEvidence(evidence) {
-  return Boolean(evidence && evidence.schema_version === SCHEMA && evidence.query_verified === true
+  const exact = (value, keys) => value && !Array.isArray(value) && Object.keys(value).every((key) => keys.includes(key));
+  return Boolean(evidence && exact(evidence, ['schema_version', 'verified_at', 'repo_root', 'query_verified', 'source_snapshot', 'provider_identity', 'files']) && evidence.schema_version === SCHEMA && evidence.query_verified === true
     && typeof evidence.verified_at === 'string' && Number.isFinite(Date.parse(evidence.verified_at))
     && typeof evidence.repo_root === 'string' && path.isAbsolute(evidence.repo_root)
-    && sourceContentIdentity(evidence.source_snapshot)
-    && evidence.provider_identity && IDENTITY_KEYS.every((key) => typeof evidence.provider_identity[key] === 'string' && evidence.provider_identity[key].length > 0)
+    && exact(evidence.source_snapshot, ['schema_version', 'source_kind', 'source_content_sha256']) && sourceContentIdentity(evidence.source_snapshot)
+    && exact(evidence.provider_identity, [...IDENTITY_KEYS, 'interpreter']) && IDENTITY_KEYS.every((key) => typeof evidence.provider_identity[key] === 'string' && evidence.provider_identity[key].length > 0)
+    && (evidence.provider_identity.interpreter === undefined || evidence.provider_identity.interpreter === null || typeof evidence.provider_identity.interpreter === 'string')
     && evidence.provider_identity.installer === 'npm'
     && /^[a-f0-9]{64}$/.test(evidence.provider_identity.inventory_sha256)
-    && evidence.files && !Array.isArray(evidence.files) && Object.keys(evidence.files).length === FILES.length
-    && FILES.every((name) => evidence.files[name] === null || (evidence.files[name]
+    && evidence.files && exact(evidence.files, FILES) && Object.keys(evidence.files).length === FILES.length
+    && FILES.every((name) => evidence.files[name] === null || (exact(evidence.files[name], ['size_bytes', 'sha256'])
       && Number.isSafeInteger(evidence.files[name].size_bytes) && evidence.files[name].size_bytes >= 0
       && /^[a-f0-9]{64}$/.test(evidence.files[name].sha256)))
     && evidence.files['codegraph.db'] && evidence.files['codegraph.db'].size_bytes > 0);
@@ -110,7 +112,20 @@ function readRecordedEvidence(context) {
   const root = path.resolve(context.repoRoot);
   const result = readStableRegularFile(path.join(root, '.spec-first', 'config', 'tool-facts.json'), {
     rootPath: root,
-    read: (fd, stat) => stat.size <= 4 * 1024 * 1024 ? JSON.parse(fs.readFileSync(fd, 'utf8')) : null,
+    read: (fd, stat) => {
+      const limit = 4 * 1024 * 1024;
+      if (stat.size > limit) return null;
+      const chunks = [];
+      const buffer = Buffer.allocUnsafe(128 * 1024);
+      let offset = 0;
+      while (offset < stat.size) {
+        const count = fs.readSync(fd, buffer, 0, Math.min(buffer.length, stat.size - offset), offset);
+        if (!count) throw new Error('short-read');
+        chunks.push(Buffer.from(buffer.subarray(0, count)));
+        offset += count;
+      }
+      return JSON.parse(Buffer.concat(chunks).toString('utf8'));
+    },
   });
   const facts = result.ok ? result.value : null;
   if (!facts || facts.schema_version !== 'tool-facts.v2' || facts.repo_root !== root || facts.host !== (context.host || null)) return null;
