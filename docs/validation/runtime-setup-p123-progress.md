@@ -275,3 +275,12 @@
 - 真实 probe 已按最终 source hash 重跑并补旧 marker 故障注入：在一次性 SQLite 删除 index_state 后，实际 status 依次观测 complete → null → null → complete；显式 apply 原生重建和 query 成功，13 次实际命令均保留在同一证据 JSON。
 - 最终验证：完整 npm run test:mcp-setup 33 suites / 724 tests 通过；最终 null 修复的 Provider 定点 80/80 通过，typecheck 262 files、入口 lint 490 files 与 diff check 通过。完整回归运行于共享工作区，期间收敛了 null 分支；不外推为隔离提交的整仓测试或 readonly gate 已通过。
 - spec-simplify-code 仅对本次 parser 执行 inline reuse/quality/efficiency 三个 lens（未另行授权三个 simplify workers，dispatch_authorization_missing）。复用现有 succeeded/path/Provider owner，移除的旧文本 helpers 无剩余引用；无额外可保持行为的修改，三个维度应用修复均为 0。字段校验、路径边界和重建后复验为 protected，不为行数继续抽象。
+
+
+## U8 CodeGraph artifact evidence 只读闭环
+
+- 新增 `codegraph-artifact-evidence.v1`，复用 stable regular-file reader 和 source snapshot；文件集固定为 `codegraph.db`、`codegraph.db-wal`、`codegraph.db-journal`，逐文件 bounded SHA-256，前后 inventory/目录 identity 不一致则不发布。空、缺失、symlink、超预算和并发变化 fail closed。
+- apply 在 status/query 后采集 source、安装 identity 和数据库文件证据；任一采样或 identity 不可确认时不附 artifact evidence，readiness 降为 unknown/degraded。facts normalizer 与 provider schema 保存该字段。
+- verify/doctor 通过既有 facts root 只读获取唯一 CodeGraph artifact evidence，校验 TTL、repo root、当前 identity、source snapshot 和 DB/WAL/journal bytes；不执行原生 status/query，避免其 open 触发 migration/heal。配置 reconciliation 只有完整 evidence 才能把 unknown 升回 fresh。
+- 9 个 evidence 反例覆盖无证据禁止 query、source/DB/WAL/journal 漂移、TTL、旧/非法证据、采样竞态和 symlink；真实隔离 apply 及旧 marker 恢复探针保留在前述 JSON evidence。Provider/launcher/evidence 三套定点 104 tests 通过。
+- 独立首审与修复复审：首审提出合法 `state:null` 重建，已在上一切片修复；本切片未新增 reviewer 阻断。未扩展为语义图正确性、MCP server 或 Windows 真实验证。主 setup SIGINT/Windows 信号、refresh 原位恢复与 P123 最终收口仍未完成。

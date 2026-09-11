@@ -3,6 +3,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { captureSourceSnapshot, sourceContentIdentity } = require('../../../skills/spec-runtime-setup/scripts/lib/source-snapshot.cjs');
+const codegraphEvidence = require('../../../skills/spec-runtime-setup/scripts/providers/codegraph-artifact-evidence.cjs');
 const { isVerifiedNpmArchiveIdentity } = require('../../../skills/spec-runtime-setup/scripts/lib/npm-warmup.cjs');
 
 const SETUP_FACTS_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
@@ -342,6 +343,8 @@ function normalizeProviderReadiness(entries) {
     kind: normalizeProviderKind(entry.kind),
     profile: normalizeProviderProfile(entry.profile),
     readiness_status: normalizeProviderStatus(entry.readiness_status),
+    ...(codegraphEvidence.validEvidence(entry.artifact_evidence)
+      ? { artifact_evidence: entry.artifact_evidence } : {}),
     ...(entry.provider_identity && typeof entry.provider_identity === 'object' && !Array.isArray(entry.provider_identity)
       && ['package', 'version', 'command'].every((key) => typeof entry.provider_identity[key] === 'string' && entry.provider_identity[key].length > 0)
       ? { provider_identity: normalizeProviderIdentity(entry.provider_identity) } : {}),
@@ -600,6 +603,7 @@ function compareCurrentProviderIdentity(projection, context, provider) {
     }
     projection.provider_counts = computeProviderCounts(projection.provider_readiness);
   }
+  return current;
 }
 
 function compareCurrentGraphifyReceipt(projection, repoRoot, currentSourceSnapshot) {
@@ -629,6 +633,18 @@ function compareCurrentGraphifyReceipt(projection, repoRoot, currentSourceSnapsh
   projection.provider_counts = computeProviderCounts(projection.provider_readiness);
 }
 
+function compareCurrentCodegraphEvidence(projection, context, identity, source) {
+  if (projection.freshness.status !== 'fresh') return;
+  for (const entry of projection.provider_readiness.filter((item) => item.provider === 'codegraph' && item.readiness_scope === 'artifact')) {
+    const compared = codegraphEvidence.compareEvidence(context, entry.artifact_evidence, identity, source);
+    if (compared.status === 'confirmed') continue;
+    projection.freshness = { ...projection.freshness, status: compared.status, reason_code: compared.reason_code };
+    if (entry.readiness_status === 'fresh') entry.readiness_status = compared.status;
+    entry.limitations = [...entry.limitations, `${compared.reason_code}: 当前数据库与原 query 证据未闭合。`];
+  }
+  projection.provider_counts = computeProviderCounts(projection.provider_readiness);
+}
+
 function computeDecisionInputHealth({ projectRoot, platforms = [], factsPath, now, skillRoot, homeDir, env } = {}) {
   if (!Array.isArray(platforms) || platforms.length === 0) {
     const projection = buildUnavailableProjection({
@@ -644,9 +660,12 @@ function computeDecisionInputHealth({ projectRoot, platforms = [], factsPath, no
   if (projection.status === 'ready' && platforms.includes(projection.host)) {
     const current = captureSourceSnapshot({ repoRoot: projectRoot, skillRoot, homeDir, env, host: projection.host, now });
     projection.freshness = compareSourceSnapshot(projection.freshness, projection.raw.source_snapshot, current);
+    let codegraphIdentity;
     for (const provider of ['graphify', 'codegraph']) {
-      compareCurrentProviderIdentity(projection, { repoRoot: projectRoot, skillRoot, homeDir, env, host: projection.host }, provider);
+      const identity = compareCurrentProviderIdentity(projection, { repoRoot: projectRoot, skillRoot, homeDir, env, host: projection.host }, provider);
+      if (provider === 'codegraph') codegraphIdentity = identity;
     }
+    compareCurrentCodegraphEvidence(projection, { repoRoot: projectRoot, now }, codegraphIdentity, current);
     compareCurrentGraphifyReceipt(projection, projectRoot, current);
   }
   if (projection.status === 'missing') {

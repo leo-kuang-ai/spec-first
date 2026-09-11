@@ -115,3 +115,10 @@ Provider 的路径与 action-plan 预检先于 baseline 安装、host 配置和 
 索引状态使用原生 `status --json`，要求 initialized、version、projectPath/indexPath、worktreeMismatch、pendingChanges 和 index 字段有效。只有 `index.state=complete`、无待解析引用/待处理文件、不建议重建且路径吻合时，才进入 query 验证。旧 `state:null` 不直接支持 ready；显式 apply 使用原生 `index -f` 重建并再次验证。字段缺失、未知文本、非法 JSON 和工作树错配均不支持 indexed。
 
 此项只修复状态误判，不使原生 status/query 变为只读：CodeGraph 1.6.0 打开数据库时可能执行恢复和迁移。只读 artifact verify 路径仍待迁移到绑定源码、安装身份及 DB/WAL 的证据回读；当前不能声明这一边界已完成。
+
+
+### CodeGraph artifact evidence（只读消费）
+
+显式 artifact apply 在 status/query 完成后发布 `codegraph-artifact-evidence.v1`，绑定当前 source snapshot、npm 安装 identity、`.codegraph/codegraph.db` 及 WAL/journal sidecar 的稳定 SHA-256 和 `query_verified`。`--verify-only` 与 doctor 不调用原生 status/query：只读取 facts 中唯一历史证据，重新采样文件集、源码和安装 identity，并校验 TTL、根路径和字节一致性。缺证据、sidecar 漂移、并发采样、身份/源码变化和过期分别降级为 unknown/stale；不能通过重新写 facts 创造证据。
+
+该证据限制了 CodeGraph 数据库 currentness claim，但不证明语义图正确性、MCP server 可达性或跨宿主现场收益。

@@ -26,6 +26,139 @@
     "provider": {
       "type": "string"
     },
+    "artifact_evidence": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "verified_at",
+        "repo_root",
+        "query_verified",
+        "source_snapshot",
+        "provider_identity",
+        "files"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "codegraph-artifact-evidence.v1"
+        },
+        "verified_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repo_root": {
+          "type": "string",
+          "minLength": 1
+        },
+        "query_verified": {
+          "const": true
+        },
+        "source_snapshot": {
+          "$ref": "#/properties/first_generation/properties/scope_provenance/properties/source_snapshot"
+        },
+        "provider_identity": {
+          "allOf": [
+            {
+              "$ref": "#/properties/provider_identity"
+            },
+            {
+              "required": [
+                "installer",
+                "inventory_sha256"
+              ],
+              "properties": {
+                "installer": {
+                  "const": "npm"
+                },
+                "inventory_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              }
+            }
+          ]
+        },
+        "files": {
+          "type": "object",
+          "required": [
+            "codegraph.db",
+            "codegraph.db-wal",
+            "codegraph.db-journal"
+          ],
+          "properties": {
+            "codegraph.db": {
+              "type": "object",
+              "required": [
+                "size_bytes",
+                "sha256"
+              ],
+              "properties": {
+                "size_bytes": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              },
+              "additionalProperties": false
+            },
+            "codegraph.db-wal": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "size_bytes",
+                    "sha256"
+                  ],
+                  "properties": {
+                    "size_bytes": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "sha256": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "codegraph.db-journal": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "size_bytes",
+                    "sha256"
+                  ],
+                  "properties": {
+                    "size_bytes": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "sha256": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
     "provider_identity": {
       "type": "object",
       "required": ["package", "version", "command"],

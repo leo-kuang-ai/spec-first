@@ -64,7 +64,10 @@ describe('CodeGraph Windows launcher 解析合同（不执行 Windows 二进制�
       : { exit_code: 0, stdout: 'codegraph 1.6.0' };
     const context = { repoRoot: root, platform: 'windows', arch: 'x64', env: { PATH: root }, runner, configured: true, dependency: { version: '1.6.0' } };
     const expected = { confirmed: 'fresh', failed: 'unknown', mismatch: 'degraded', missing: 'unknown' }[outcome];
-    for (const result of [codegraph.verify(context), codegraph.apply(context, { mutation: true, dependency_version: '1.6.0', actions: [] })]) {
+    const unverified = codegraph.verify(context);
+    expect(unverified.readiness_status).toBe(outcome === 'mismatch' ? 'degraded' : 'unknown');
+    expect(unverified.lifecycle.query_verified).toBe(false);
+    for (const result of [codegraph.apply(context, { mutation: true, dependency_version: '1.6.0', actions: [] })]) {
       expect(result.readiness_status).toBe(expected);
       expect(result.lifecycle.query_verified).toBe(true);
       expect(codegraph.reconcileConfigured(result, { configured_status: 'ready' }).readiness_status).toBe(expected);

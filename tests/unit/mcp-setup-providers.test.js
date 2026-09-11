@@ -451,7 +451,9 @@ describe('CodeGraph provider', () => {
       dependency: { version: '1.6.0' },
     });
 
-    expect(result.readiness_status).toBe('degraded');
+    expect(result.readiness_status).toBe('unknown');
+    expect(result.lifecycle.query_verified).toBe(false);
+    expect(result.limitations).toContain('codegraph-artifact-evidence-missing');
     expect(result.next_actions).toContain(
       '运行 spec-runtime-setup --only codegraph，修复 CodeGraph index/query readiness。',
     );
