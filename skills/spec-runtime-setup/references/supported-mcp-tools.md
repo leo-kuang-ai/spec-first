@@ -72,4 +72,8 @@ CodeGraph 1.6.0 的顶层 npm 归档在 source registry 固定 SHA-512 和来源
 
 Graphify 的 `provider-readiness.v2.provider_identity` 保留已解析的 package/version、command/interpreter、installer 及 `inventory_sha256`。清单按稳定顺序计算摘要，不输出完整包列表；空、非法或超出 10000 项的清单为 null。图 apply 发布前重新检查实际 interpreter 的 distribution 身份，版本不符降为 degraded。CLI 保留该兼容增量字段，不用 plan 中的 pin 补造观测。
 
-这些字段说明此次 probe 观察到的安装环境；它们不是安装字节完整性证明，也不单独证明当前图、scope receipt 或宿主 MCP 会话可用。doctor 的当前 Provider 身份与 receipt 比较仍待 U8 后续接线；不能以有 identity 字段代替该验证。
+这些字段说明此次 probe 观察到的安装环境；它们不是安装字节完整性证明，也不单独证明当前图、scope receipt 或宿主 MCP 会话可用。doctor 在 source snapshot 与 TTL 通过后，复用 Provider 只读 resolver 核对当前 Graphify 身份；已知字段变化或实际版本不符标为 stale，缺身份、缺 inventory 摘要或 probe 失败标为 unknown。探测不安装、不构图、不 query，也不执行 facts 中记录的 command。普通 normalizer 只保留历史观测，不自行启动探针。
+
+当前 doctor 比较尚未覆盖 CodeGraph 当前安装身份及图 scope receipt；不能以 Graphify 安装身份通过代替完整 U8 验证。Provider 身份与 source snapshot 均为分步观测，不是跨文件和进程的原子快照。
+
+当前身份探测共享 5 秒命令预算，超限为 unknown；进程终止开销及同步文件读取不属于严格墙钟上限。探针跳过 npm collision 诊断并禁止 Python bytecode 写入；隔离真实 Python 导入测试验证 HOME/package 树无新增文件，该约束不是任意第三方程序的副作用沙箱。launcher 启动失败或超时为 unknown，只有成功输出版本不符等已知身份变化才标为 stale。

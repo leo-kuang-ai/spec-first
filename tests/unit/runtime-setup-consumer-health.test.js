@@ -73,6 +73,40 @@ describe('producer 到 doctor 的磁盘快照闭环', () => {
   test('同一磁盘源的 producer 与 doctor 使用一致哈希', () => {
     expect(health(produce()).status).toBe('pass');
   });
+  test('doctor 比较当前 Provider 身份，失败和旧 facts 不冒充 fresh', () => {
+    const graphify = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const identity = { package: 'graphifyy', version: '0.9.57', command: '/managed/graphify', interpreter: '/managed/python', installer: 'uv', inventory_sha256: 'a'.repeat(64) };
+    const probe = jest.spyOn(graphify, 'readCurrentIdentity');
+    const factsPath = produce();
+    const facts = JSON.parse(fs.readFileSync(factsPath));
+    facts.provider_readiness = [{ provider: 'graphify', readiness_status: 'fresh', provider_identity: identity }];
+    fs.writeFileSync(factsPath, JSON.stringify(facts));
+    try {
+      probe.mockReturnValue({ status: 'confirmed', identity });
+      expect(health(factsPath).status).toBe('pass');
+      for (const key of ['command', 'interpreter', 'installer', 'inventory_sha256', 'version']) {
+        probe.mockReturnValue({ status: 'confirmed', identity: { ...identity, [key]: 'changed' } });
+        expect(health(factsPath).normalized.freshness).toMatchObject({ status: 'stale', reason_code: 'setup-facts-provider-identity-mismatch' });
+      }
+      probe.mockReturnValue({ status: 'unknown', reason_code: 'graphify-package-identity-unverified' });
+      expect(health(factsPath).status).toBe('warn');
+      expect(health(factsPath).normalized.provider_counts).toMatchObject({ fresh: 0, unknown: 1 });
+      probe.mockReturnValue({ status: 'confirmed', identity: { ...identity, inventory_sha256: null } });
+      expect(health(factsPath).normalized.freshness.status).toBe('unknown');
+      probe.mockReturnValue({ status: 'stale', reason_code: 'graphify-package-version-mismatch' });
+      expect(health(factsPath).status).toBe('stale');
+      delete facts.provider_readiness[0].provider_identity;
+      fs.writeFileSync(factsPath, JSON.stringify(facts));
+      probe.mockReturnValue({ status: 'confirmed', identity });
+      expect(health(factsPath).normalized.freshness.status).toBe('unknown');
+      probe.mockClear();
+      fs.writeFileSync(path.join(root, 'changed.js'), 'changed');
+      expect(health(factsPath).status).toBe('stale');
+      expect(probe).not.toHaveBeenCalled();
+    } finally {
+      probe.mockRestore();
+    }
+  });
   test.each(['tracked', 'untracked'])('%s 文件内容变化使 facts 立即失效', (kind) => {
     const filename = path.join(root, 'source.js');
     fs.writeFileSync(filename, 'module.exports = 1;');

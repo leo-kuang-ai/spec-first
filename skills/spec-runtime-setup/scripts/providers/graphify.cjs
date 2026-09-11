@@ -1203,6 +1203,35 @@ function graphifyHookNextActions(outcome) {
   return ['Project-local Graphify 自动刷新未验证；如需该增强可重新运行显式 setup，核心图查询不受影响。'];
 }
 
+function readCurrentIdentity(context = {}) {
+  if (!context.dependency || context.dependency.ecosystem !== 'pypi') {
+    return { status: 'unknown', reason_code: 'graphify-python-provider-required' };
+  }
+  const deadline = performance.now() + 5000;
+  const remaining = () => {
+    const budget = Math.floor(deadline - performance.now());
+    if (budget <= 0) throw reasonError('graphify-identity-probe-timeout');
+    return budget;
+  };
+  const probeContext = { ...context, identityOnly: true, runner(command, args, options) {
+    const result = run(context, command, args, { ...options,
+      env: { ...options.env, PYTHONDONTWRITEBYTECODE: '1' },
+      timeoutMs: Math.min(options.timeoutMs || 5000, remaining()) });
+    remaining();
+    return result;
+  } };
+  try {
+    const resolved = resolveGraphifyCommand(probeContext, path.resolve(context.repoRoot || process.cwd()));
+    if (!resolved.ok) return {
+      status: resolved.reason_code === 'graphify-package-version-mismatch' ? 'stale' : 'unknown',
+      reason_code: resolved.reason_code,
+    };
+    return { status: 'confirmed', identity: graphifyIdentity(resolved) };
+  } catch (error) {
+    return { status: 'unknown', reason_code: error.reason_code === 'graphify-identity-probe-timeout' ? error.reason_code : 'graphify-package-identity-unverified' };
+  }
+}
+
 function graphifyIdentity(resolved) {
   if (!resolved || !resolved.ok || !resolved.package_identity) return null;
   const identity = resolved.package_identity;
@@ -1234,7 +1263,7 @@ function resolvePythonGraphifyCommand(context, repoRoot, dependency) {
   const windows = context.platform === 'windows' || process.platform === 'win32';
   const originalPath = providerOriginalPath(context);
   const originalPathCommand = commandFromSearchPath('graphify', originalPath, windows, context.env || {});
-  const collisionState = originalPathCommand
+  const collisionState = originalPathCommand && !context.identityOnly
     ? classifyOriginalGraphifyCommand(context, repoRoot, originalPathCommand)
     : 'none';
   const candidateNames = windows ? ['graphify.exe', 'graphify.cmd', 'graphify'] : ['graphify'];
@@ -1271,7 +1300,8 @@ function resolvePythonGraphifyCommand(context, repoRoot, dependency) {
       env: graphifyProcessEnv(context),
       inheritEnv: false,
     });
-    if (!succeeded(versionResult) || !versionOutputMatches(text(versionResult), dependency.version)) {
+    if (!succeeded(versionResult)) continue;
+    if (!versionOutputMatches(text(versionResult), dependency.version)) {
       mismatch = true;
       continue;
     }
@@ -2547,6 +2577,7 @@ function unsafeReadiness(context, repoRoot, reasonCode) {
 }
 
 module.exports = {
+  readCurrentIdentity,
   apply,
   cleanupNpmGraphifyIncumbent,
   graphifyProcessEnv,

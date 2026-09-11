@@ -178,3 +178,13 @@
 - 首轮审查发现 apply 可能发布旧 interpreter 与新 inventory 的混合身份（P2）；修复为使用 final probe 的 interpreter，并补反例。独立 follow-up 定点复核通过。
 - 本批审查修复前聚焦 4 suites / 164 tests 通过，修复后定点复跑 2 suites / 65 tests 通过；typecheck 262 files、入口 lint 490 files、diff check 通过。
 - 当前仍未把 provider identity 纳入 doctor freshness 比较，也未把 Graphify scope receipt 的 graph hash 与 identity 统一为一个 durable truth；CodeGraph 已有顶层 npm archive identity，平台 bundle/传递依赖仍明确不在证明范围。
+
+
+## U8 Graphify 当前身份消费切片
+
+- doctor 在 source snapshot/TTL 通过后，复用 Graphify readCurrentIdentity 与既有 resolver，比对 package/version/command/interpreter/installer/inventory_sha256；不读取 facts 中的命令作为执行目标，不安装、不构图、不 query。
+- 已观察红测试：当前 command 变化时 doctor 仍返回 fresh；接线后身份不符返回 stale，探测失败、旧 facts 或缺 inventory 返回 unknown。同步撤销 Provider fresh 状态及计数，保留原始 facts；source 已失效时不再运行身份探针。
+- 验证：三个相关 suites / 95 tests 通过；随后增加计数降级与缺摘要检查，两个 suites / 33 tests 通过。npm run typecheck 262 files 通过；最后一处 limitations 数组改为拷贝，node --check 与 diff --check 通过。
+- 独立 fresh-source 审查指出真实 Python import 可产生 bytecode，launcher 非零/超时被误判为版本漂移。新增隔离真实 Python launcher/import 测试观察到 __pycache__ 新增；两个 launcher 失败测试也观察到 stale 误判。修正 identity runner 强制 PYTHONDONTWRITEBYTECODE=1、跳过 npm collision classification，并拆分 version 命令执行失败与版本不符。
+- 所有 identity 子命令共享单调时钟 5 秒预算，超限 unknown 并给出 graphify-identity-probe-timeout；测试证明预算耗尽后不启动后续候选。预算不含同步文件读取与进程终止开销，不是严格墙钟或任意程序副作用沙箱。
+- 最终三个相关 suites / 99 tests 通过；lint:skill-entrypoints 490 files 通过。独立 reviewer 的唯一 follow-up 定点复核通过，无本切片新增阻断；reviewer 只读审查，未独立执行测试。CodeGraph 当前身份、既有 graph scope receipt 的 consumer 联调以及 U9–U12 最终收口仍待完成，整体计划未完成。

@@ -59,6 +59,67 @@ describe('Graphify 当前安装身份的发布与消费', () => {
     expect(graphify.verify(context).provider_identity.inventory_sha256).not.toBe(first.inventory_sha256);
   });
 
+  test('独立当前身份探测复用 Provider resolver，不执行构图或安装', () => {
+    const runner = jest.fn(context.runner);
+    const result = graphify.readCurrentIdentity({ ...context, runner });
+    expect(result.status).toBe('confirmed');
+    expect(result.identity).toEqual(graphify.verify(context).provider_identity);
+    expect(runner.mock.calls.some(([, args]) => args.some((arg) => ['install', 'update', 'refresh', 'query'].includes(arg)))).toBe(false);
+    version = '9.9.9';
+    expect(graphify.readCurrentIdentity(context)).toMatchObject({ status: 'stale', reason_code: 'graphify-package-version-mismatch' });
+  });
+
+  test('当前身份解析共享总预算，不能对每个候选重新累计十秒', () => {
+    jest.useFakeTimers();
+    const runner = jest.fn((_command, _args, options) => {
+      expect(options.timeoutMs).toBeLessThanOrEqual(5000);
+      jest.advanceTimersByTime(5001);
+      return { exit_code: 1, stdout: '', stderr: '', timed_out: true };
+    });
+    try {
+      expect(graphify.readCurrentIdentity({ ...context, runner })).toMatchObject({ status: 'unknown', reason_code: 'graphify-identity-probe-timeout' });
+      expect(runner).toHaveBeenCalledTimes(1);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  test.each([{ exit_code: 1 }, { exit_code: 0, timed_out: true }])('launcher 失败不等于实际版本漂移 %j', (failure) => {
+    const result = graphify.readCurrentIdentity({ ...context, runner: (command, args, options) => {
+      if (command.endsWith('/graphify') && args[0] === '--version') return { stdout: '', stderr: '', ...failure };
+      return context.runner(command, args, options);
+    } });
+    expect(result.status).toBe('unknown');
+  });
+
+  test('隔离真实 Python 导入不向 HOME 或 package 目录写入字节码', () => {
+    const { spawnSync } = require('node:child_process');
+    const pythonProbe = spawnSync('python3', ['-I', '-c', 'import sys; print(sys.executable)'], { encoding: 'utf8' });
+    expect(pythonProbe.status).toBe(0);
+    const python = pythonProbe.stdout.trim();
+    const bin = path.join(root, '.local/bin');
+    const launcher = path.join(bin, 'graphify');
+    fs.writeFileSync(launcher, `#!${python}\nimport probe_dependency\nprint("graphify 0.9.57")\n`);
+    fs.writeFileSync(path.join(bin, 'probe_dependency.py'), 'value = 1\n');
+    const metadata = path.join(root, 'graphifyy-0.9.57.dist-info');
+    fs.mkdirSync(metadata);
+    fs.writeFileSync(path.join(metadata, 'METADATA'), 'Metadata-Version: 2.1\nName: graphifyy\nVersion: 0.9.57\n');
+    const snapshot = () => fs.readdirSync(root, { recursive: true }).sort().map((relative) => {
+      const file = path.join(root, relative);
+      return [relative, fs.statSync(file).isFile() ? fs.readFileSync(file).toString('base64') : null];
+    });
+    const before = snapshot();
+    const runner = jest.fn((command, args, options) => {
+      if (command === 'uv') return context.runner(command, args, options);
+      const result = spawnSync(command, args, { cwd: options.cwd, env: options.env, timeout: options.timeoutMs, encoding: 'utf8' });
+      return { exit_code: result.status, stdout: result.stdout, stderr: result.stderr, error: result.error, signal: result.signal };
+    });
+    const result = graphify.readCurrentIdentity({ ...context, pythonCommand: python, runner });
+    expect(result.status).toBe('confirmed');
+    expect(runner.mock.calls.some(([command]) => command === 'npm')).toBe(false);
+    expect(snapshot()).toEqual(before);
+  });
+
   test('版本不符不伪造 pin 身份；空 inventory 不伪造已知摘要', () => {
     version = '9.9.9';
     expect(graphify.verify(context)).not.toHaveProperty('provider_identity');

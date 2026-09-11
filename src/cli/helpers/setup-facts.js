@@ -547,6 +547,41 @@ function isRequiredAction(item) {
   return item.baseline_blocking !== false || item.required === true;
 }
 
+function compareCurrentGraphifyIdentity(projection, context) {
+  const entries = projection.provider_readiness.filter((entry) => entry.provider === 'graphify');
+  if (!entries.length || projection.freshness.status !== 'fresh') return;
+  let current;
+  try {
+    const registryPath = path.join(context.skillRoot || path.resolve(__dirname, '../../../skills/spec-runtime-setup'), 'setup-registry.json');
+    const registry = readJsonFile(registryPath);
+    const dependency = registry.external_dependencies.find((entry) => entry.id === 'graphify');
+    current = require('../../../skills/spec-runtime-setup/scripts/providers/graphify.cjs').readCurrentIdentity({ ...context, dependency });
+  } catch (_error) {
+    current = { status: 'unknown' };
+  }
+  const keys = ['package', 'version', 'command', 'interpreter', 'installer', 'inventory_sha256'];
+  const mismatch = current.status === 'stale' || (current.status === 'confirmed' && entries.some((entry) => keys.some((key) => {
+    const recordedValue = entry.provider_identity?.[key];
+    const currentValue = current.identity?.[key];
+    return typeof recordedValue === 'string' && recordedValue.length > 0
+      && typeof currentValue === 'string' && currentValue.length > 0 && recordedValue !== currentValue;
+  })));
+  const complete = (identity) => identity && keys.every((key) => typeof identity[key] === 'string' && identity[key].length > 0)
+    && /^[a-f0-9]{64}$/.test(identity.inventory_sha256);
+  if (mismatch) {
+    projection.freshness = { ...projection.freshness, status: 'stale', reason_code: 'setup-facts-provider-identity-mismatch' };
+  } else if (current.status !== 'confirmed' || !complete(current.identity) || entries.some((entry) => !complete(entry.provider_identity))) {
+    projection.freshness = { ...projection.freshness, status: 'unknown', reason_code: 'setup-facts-provider-identity-unverified' };
+  }
+  if (projection.freshness.status !== 'fresh') {
+    for (const entry of entries) {
+      if (entry.readiness_status === 'fresh') entry.readiness_status = projection.freshness.status;
+      entry.limitations = [...entry.limitations, `${projection.freshness.reason_code}: 当前安装身份不能支持历史 readiness。`];
+    }
+    projection.provider_counts = computeProviderCounts(projection.provider_readiness);
+  }
+}
+
 function computeDecisionInputHealth({ projectRoot, platforms = [], factsPath, now, skillRoot, homeDir, env } = {}) {
   if (!Array.isArray(platforms) || platforms.length === 0) {
     const projection = buildUnavailableProjection({
@@ -562,6 +597,7 @@ function computeDecisionInputHealth({ projectRoot, platforms = [], factsPath, no
   if (projection.status === 'ready' && platforms.includes(projection.host)) {
     const current = captureSourceSnapshot({ repoRoot: projectRoot, skillRoot, homeDir, env, host: projection.host, now });
     projection.freshness = compareSourceSnapshot(projection.freshness, projection.raw.source_snapshot, current);
+    compareCurrentGraphifyIdentity(projection, { repoRoot: projectRoot, skillRoot, homeDir, env, host: projection.host });
   }
   if (projection.status === 'missing') {
     return buildDecisionResult('missing', 'setup-facts-missing', projection, { requestedPlatforms: platforms });
