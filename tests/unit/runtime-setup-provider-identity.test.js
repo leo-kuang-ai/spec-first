@@ -59,6 +59,50 @@ describe('Graphify 当前安装身份的发布与消费', () => {
     expect(graphify.verify(context).provider_identity.inventory_sha256).not.toBe(first.inventory_sha256);
   });
 
+  test('既有 scope receipt 的摘要通过 Provider/facts/schema/normalizer，当前读取不执行命令', () => {
+    const crypto = require('node:crypto');
+    const out = path.join(root, 'graphify-out');
+    fs.mkdirSync(out);
+    const graph = '{"nodes":[],"edges":[]}';
+    fs.writeFileSync(path.join(out, 'graph.json'), graph);
+    const digest = crypto.createHash('sha256').update(graph).digest('hex');
+    const receipt = { schema_version: 'graphify-scope-provenance.v1', provider: 'graphify', artifact_root: 'graphify-out', requirement_workspace_path: '.', operation: 'first-generation', graph_sha256: digest };
+    fs.writeFileSync(path.join(out, 'spec-first-graph-scope.json'), JSON.stringify(receipt));
+    const readiness = graphify.verify({ ...context, installationOnly: false });
+    expect(readiness.first_generation.scope_provenance).toMatchObject({ status: 'verified', graph_sha256: digest });
+    expect(validateAgainstSchema(schema, readiness).valid).toBe(true);
+    const { toolFacts } = collectSetupFacts({ ...context, registry: {}, providerResults: [{ readiness, verified: true, source: 'read-only-probe' }] });
+    expect(normalizeSetupFacts(toolFacts).provider_readiness[0].first_generation.scope_provenance).toEqual(readiness.first_generation.scope_provenance);
+    const runner = jest.fn(() => { throw new Error('receipt reader must not execute commands'); });
+    expect(graphify.readCurrentScopeProvenance({ ...context, requirementWorkspace: '.', runner })).toMatchObject({ status: 'verified', graph_sha256: digest });
+    expect(runner).not.toHaveBeenCalled();
+    const receiptPath = path.join(out, 'spec-first-graph-scope.json');
+    const other = path.join(root, 'other-receipt.json');
+    fs.writeFileSync(other, JSON.stringify(receipt));
+    for (const change of ['grow', 'replace-link']) {
+      const open = fs.openSync;
+      let injected = false;
+      const spy = jest.spyOn(fs, 'openSync').mockImplementation((filename, ...args) => {
+        if (!injected && filename === receiptPath) {
+          injected = true;
+          if (change === 'grow') fs.appendFileSync(receiptPath, ' '.repeat(65537));
+          else { fs.unlinkSync(receiptPath); fs.symlinkSync(other, receiptPath); }
+        }
+        return open(filename, ...args);
+      });
+      try {
+        expect(graphify.readCurrentScopeProvenance({ ...context, requirementWorkspace: '.' }).status).toBe('invalid');
+        expect(injected).toBe(true);
+      } finally {
+        spy.mockRestore();
+        fs.unlinkSync(receiptPath);
+        fs.writeFileSync(receiptPath, JSON.stringify(receipt));
+      }
+    }
+    fs.truncateSync(path.join(out, 'spec-first-graph-scope.json'), 65537);
+    expect(graphify.readCurrentScopeProvenance({ ...context, requirementWorkspace: '.' }).reason_code).toBe('graphify-scope-provenance-size-limit');
+  });
+
   test('独立当前身份探测复用 Provider resolver，不执行构图或安装', () => {
     const runner = jest.fn(context.runner);
     const result = graphify.readCurrentIdentity({ ...context, runner });

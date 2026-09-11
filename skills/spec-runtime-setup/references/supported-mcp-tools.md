@@ -74,6 +74,10 @@ Graphify 的 `provider-readiness.v2.provider_identity` 保留已解析的 packag
 
 这些字段说明此次 probe 观察到的安装环境；它们不是安装字节完整性证明，也不单独证明当前图、scope receipt 或宿主 MCP 会话可用。doctor 在 source snapshot 与 TTL 通过后，复用 Provider 只读 resolver 核对当前 Graphify 身份；已知字段变化或实际版本不符标为 stale，缺身份、缺 inventory 摘要或 probe 失败标为 unknown。探测不安装、不构图、不 query，也不执行 facts 中记录的 command。普通 normalizer 只保留历史观测，不自行启动探针。
 
-当前 doctor 比较尚未覆盖 CodeGraph 当前安装身份及图 scope receipt；不能以 Graphify 安装身份通过代替完整 U8 验证。Provider 身份与 source snapshot 均为分步观测，不是跨文件和进程的原子快照。
+当前 doctor 比较尚未覆盖 CodeGraph 当前安装身份；不能以 Graphify 校验通过代替完整 U8 验证。Provider 身份与 source snapshot 均为分步观测，不是跨文件和进程的原子快照。
 
 当前身份探测共享 5 秒命令预算，超限为 unknown；进程终止开销及同步文件读取不属于严格墙钟上限。探针跳过 npm collision 诊断并禁止 Python bytecode 写入；隔离真实 Python 导入测试验证 HOME/package 树无新增文件，该约束不是任意第三方程序的副作用沙箱。launcher 启动失败或超时为 unknown，只有成功输出版本不符等已知身份变化才标为 stale。
+
+Graphify artifact scope 的 doctor 检查复用既有 `graphify-scope-provenance.v1` reader。`provider-readiness.v2.first_generation.scope_provenance` 兼容增加可选 `graph_sha256`，记录已验证 receipt 中的摘要；normalizer 保留该证据。doctor 比较历史摘要、当前 receipt 与当前 graph.json，图单独变化或图与 receipt 同时变化均不能沿用历史 query 证据。旧 facts 缺摘要、缺 scope 或旧/缺失 receipt 降为 unknown；已知图/scope 不符为 stale。installation scope 不查图。
+
+doctor 的 receipt/graph 读取使用 no-follow/nonblocking fd、普通单链接文件检查、读前后身份复核和实际读取上限（receipt 64 KiB、graph 64 MiB）；超限或读取期间变化均保留 unknown。此限制不改变现有安装/构图路径的文件读取策略，也不证明图语义或源文件与图生成时刻的绑定。

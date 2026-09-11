@@ -188,3 +188,14 @@
 - 独立 fresh-source 审查指出真实 Python import 可产生 bytecode，launcher 非零/超时被误判为版本漂移。新增隔离真实 Python launcher/import 测试观察到 __pycache__ 新增；两个 launcher 失败测试也观察到 stale 误判。修正 identity runner 强制 PYTHONDONTWRITEBYTECODE=1、跳过 npm collision classification，并拆分 version 命令执行失败与版本不符。
 - 所有 identity 子命令共享单调时钟 5 秒预算，超限 unknown 并给出 graphify-identity-probe-timeout；测试证明预算耗尽后不启动后续候选。预算不含同步文件读取与进程终止开销，不是严格墙钟或任意程序副作用沙箱。
 - 最终三个相关 suites / 99 tests 通过；lint:skill-entrypoints 490 files 通过。独立 reviewer 的唯一 follow-up 定点复核通过，无本切片新增阻断；reviewer 只读审查，未独立执行测试。CodeGraph 当前身份、既有 graph scope receipt 的 consumer 联调以及 U9–U12 最终收口仍待完成，整体计划未完成。
+
+
+## U8 Graphify receipt 消费闭环
+
+- 红测试观察到 graph.json 改变后 doctor 仍 fresh。复用既有 scope provenance reader，在已验证结果中传递既有 graph_sha256；schema 增加兼容可选字段，normalizer 不再丢弃 scope_provenance。没有新建 durable receipt。
+- doctor artifact scope 核对历史摘要、当前 receipt 和当前图。覆盖仅图变化、图和 receipt 同时更新、旧/缺 receipt、旧 facts 缺摘要及缺 scope；后两者不猜测当前范围。installation scope 跳过图检查。当前 identity/source 已 unknown/stale 时不再扩大读取，保持保守降级。
+- 首轮独立审查发现大小预检后仍用路径无限读取的并发漏洞。按现有 source snapshot 模式改为 fd 读取，O_NOFOLLOW/O_NONBLOCK、单链接普通文件检查、实际 size+1 上限与读后 fd/path/containment 复核；receipt 64 KiB、图 64 MiB。注入测试覆盖 open 前增长与替换 symlink，均 invalid。
+- 三个相关 suites / 101 tests 通过；包含真实临时图/receipt 的 producer-facts-schema-normalizer-doctor 链路，Provider 命令仍使用既有 stub，receipt reader 不执行命令。独立 reviewer 唯一 follow-up 定点复核通过，未独立运行测试。
+- 不证明图语义、跨文件原子性或严格墙钟上限；当前 scope receipt 仍未绑定图生成时的 source content snapshot，CodeGraph 当前身份及 U9–U12 整体收口仍待处理。整个 P123 计划未完成。
+
+- 本切片最终验证：npm run test:mcp-setup 33 suites / 695 tests 通过；最后收紧历史 artifact root 后，两套 identity/consumer suites / 39 tests 通过；typecheck 262 files、入口 lint 490 files、diff check 通过。完整回归运行于共享工作区，不外推为本提交的隔离全仓测试。

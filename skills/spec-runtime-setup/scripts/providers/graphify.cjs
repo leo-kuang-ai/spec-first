@@ -955,7 +955,7 @@ function graphifyScopeReceiptRef(repoRoot, artifactRoot) {
   return relativeRef(repoRoot, path.join(artifactRoot, GRAPHIFY_SCOPE_RECEIPT));
 }
 
-function graphArtifactSha256(repoRoot, artifactRoot) {
+function graphArtifactSha256(repoRoot, artifactRoot, readFile = fs.readFileSync) {
   const graphPath = assertContainedPath(repoRoot, path.join(artifactRoot, 'graph.json'), {
     reasonCode: 'graphify-scope-provenance-graph-unsafe',
   });
@@ -963,7 +963,34 @@ function graphArtifactSha256(repoRoot, artifactRoot) {
   if (!graphEntry || graphEntry.isSymbolicLink() || !graphEntry.isFile()) {
     throw reasonError('graphify-scope-provenance-graph-unsafe', 'Graphify scope receipt 只能绑定真实 graph.json 文件');
   }
-  return crypto.createHash('sha256').update(fs.readFileSync(graphPath)).digest('hex');
+  return crypto.createHash('sha256').update(readFile(graphPath)).digest('hex');
+}
+
+function readBoundedScopeFile(repoRoot, filename, encoding) {
+  const maxBytes = path.basename(filename) === GRAPHIFY_SCOPE_RECEIPT ? 65536 : 64 * 1024 * 1024;
+  const signature = (stat) => JSON.stringify([stat.dev, stat.ino, stat.size, stat.mode, stat.nlink, stat.mtimeMs, stat.ctimeMs]);
+  assertContainedPath(repoRoot, filename, { reasonCode: 'graphify-scope-provenance-unsafe' });
+  const stat = fs.lstatSync(filename);
+  if (!stat.isFile() || stat.isSymbolicLink() || stat.nlink !== 1) throw reasonError('graphify-scope-provenance-unsafe');
+  if (stat.size > maxBytes) throw reasonError('graphify-scope-provenance-size-limit');
+  const fd = fs.openSync(filename, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0) | (fs.constants.O_NONBLOCK || 0));
+  try {
+    if (signature(fs.fstatSync(fd)) !== signature(stat)) throw reasonError('graphify-scope-provenance-changed-during-read');
+    const bytes = Buffer.alloc(stat.size + 1);
+    let size = 0;
+    while (size < bytes.length) {
+      const count = fs.readSync(fd, bytes, size, bytes.length - size, null);
+      if (!count) break;
+      size += count;
+    }
+    assertContainedPath(repoRoot, filename, { reasonCode: 'graphify-scope-provenance-unsafe' });
+    if (size !== stat.size || signature(fs.fstatSync(fd)) !== signature(stat)
+      || signature(fs.lstatSync(filename)) !== signature(stat)) throw reasonError('graphify-scope-provenance-changed-during-read');
+    const result = bytes.subarray(0, size);
+    return encoding ? result.toString(encoding) : result;
+  } finally {
+    fs.closeSync(fd);
+  }
 }
 
 function scopeProvenanceResult(status, requestedPath, verifiedPath, receiptRef, reasonCode = null) {
@@ -976,7 +1003,26 @@ function scopeProvenanceResult(status, requestedPath, verifiedPath, receiptRef, 
   };
 }
 
-function readGraphifyScopeProvenance(repoRoot, artifactRoot, requestedPath) {
+function readCurrentScopeProvenance(context = {}) {
+  const repoRoot = path.resolve(context.repoRoot || process.cwd());
+  if (typeof context.requirementWorkspace !== 'string' || !context.requirementWorkspace) {
+    return scopeProvenanceResult('unknown', null, null, null, 'graphify-scope-provenance-scope-unknown');
+  }
+  try {
+    const resolved = resolveProviderPaths({ requirementWorkspace: context.requirementWorkspace }, repoRoot);
+    if (!resolved.ok) return scopeProvenanceResult('invalid', context.requirementWorkspace, null, null, resolved.reason_code);
+    if (lstatOrNull(path.join(repoRoot, LEGACY_ARTIFACT_ROOT))) {
+      throw reasonError('graphify-artifact-root-conflict');
+    }
+    assertGraphifyArtifactSurface(repoRoot, resolved.artifact_root);
+    return readGraphifyScopeProvenance(repoRoot, resolved.artifact_root, resolved.workspace_relative,
+      (filename, encoding) => readBoundedScopeFile(repoRoot, filename, encoding));
+  } catch (error) {
+    return scopeProvenanceResult('invalid', context.requirementWorkspace, null, null, error.reason_code || 'graphify-scope-provenance-invalid');
+  }
+}
+
+function readGraphifyScopeProvenance(repoRoot, artifactRoot, requestedPath, readFile = fs.readFileSync) {
   const receiptRef = graphifyScopeReceiptRef(repoRoot, artifactRoot);
   const receiptPath = path.join(artifactRoot, GRAPHIFY_SCOPE_RECEIPT);
   try {
@@ -1000,7 +1046,7 @@ function readGraphifyScopeProvenance(repoRoot, artifactRoot, requestedPath) {
         'graphify-scope-provenance-unsafe',
       );
     }
-    const receipt = JSON.parse(fs.readFileSync(receiptPath, 'utf8'));
+    const receipt = JSON.parse(readFile(receiptPath, 'utf8'));
     const receiptWorkspacePath = receipt && typeof receipt.requirement_workspace_path === 'string'
       && receipt.requirement_workspace_path.length > 0
       ? receipt.requirement_workspace_path
@@ -1030,7 +1076,7 @@ function readGraphifyScopeProvenance(repoRoot, artifactRoot, requestedPath) {
         'graphify-scope-provenance-invalid',
       );
     }
-    if (receipt.graph_sha256 !== graphArtifactSha256(repoRoot, artifactRoot)) {
+    if (receipt.graph_sha256 !== graphArtifactSha256(repoRoot, artifactRoot, readFile)) {
       return scopeProvenanceResult(
         'invalid',
         requestedPath,
@@ -1048,7 +1094,7 @@ function readGraphifyScopeProvenance(repoRoot, artifactRoot, requestedPath) {
         'graphify-scope-provenance-mismatch',
       );
     }
-    return scopeProvenanceResult('verified', requestedPath, verifiedPath, receiptRef);
+    return { ...scopeProvenanceResult('verified', requestedPath, verifiedPath, receiptRef), graph_sha256: receipt.graph_sha256 };
   } catch (error) {
     return scopeProvenanceResult(
       'invalid',
@@ -2577,6 +2623,7 @@ function unsafeReadiness(context, repoRoot, reasonCode) {
 }
 
 module.exports = {
+  readCurrentScopeProvenance,
   readCurrentIdentity,
   apply,
   cleanupNpmGraphifyIncumbent,

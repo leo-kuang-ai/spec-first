@@ -434,7 +434,20 @@ function normalizeFirstGeneration(value) {
     artifact_root: normalizeNullableString(source.artifact_root),
     artifact_refs: normalizeStringList(source.artifact_refs),
     next_action: normalizeNullableString(source.next_action),
+    ...(source.scope_provenance && typeof source.scope_provenance === 'object' && !Array.isArray(source.scope_provenance)
+      ? { scope_provenance: normalizeScopeProvenance(source.scope_provenance) } : {}),
   };
+}
+
+function normalizeScopeProvenance(source) {
+  const result = {
+    status: ['verified', 'missing', 'mismatch', 'invalid', 'unknown'].includes(source.status) ? source.status : 'unknown',
+  };
+  for (const key of ['reason_code', 'requested_requirement_workspace_path', 'verified_requirement_workspace_path', 'receipt_ref']) {
+    result[key] = normalizeNullableString(source[key]);
+  }
+  if (typeof source.graph_sha256 === 'string' && /^[a-f0-9]{64}$/.test(source.graph_sha256)) result.graph_sha256 = source.graph_sha256;
+  return result;
 }
 
 function normalizeSteadyState(value) {
@@ -582,6 +595,27 @@ function compareCurrentGraphifyIdentity(projection, context) {
   }
 }
 
+function compareCurrentGraphifyReceipt(projection, repoRoot) {
+  if (projection.freshness.status !== 'fresh') return;
+  const entries = projection.provider_readiness.filter((entry) => entry.provider === 'graphify' && entry.readiness_scope === 'artifact');
+  for (const entry of entries) {
+    const recorded = entry.first_generation.scope_provenance;
+    const scope = entry.first_generation.requirement_workspace_path;
+    const current = require('../../../skills/spec-runtime-setup/scripts/providers/graphify.cjs').readCurrentScopeProvenance({ repoRoot, requirementWorkspace: scope });
+    const recordedVerified = recorded?.status === 'verified' && recorded.graph_sha256
+      && recorded.verified_requirement_workspace_path === scope && entry.first_generation.artifact_root === 'graphify-out';
+    const mismatch = ['graphify-scope-provenance-artifact-mismatch', 'graphify-scope-provenance-mismatch'].includes(current.reason_code)
+      || (current.status === 'verified' && recordedVerified && recorded.graph_sha256 !== current.graph_sha256);
+    if (!mismatch && current.status === 'verified' && recordedVerified) continue;
+    const status = mismatch ? 'stale' : 'unknown';
+    const reason = current.reason_code || (mismatch ? 'graphify-scope-provenance-artifact-mismatch' : 'graphify-scope-provenance-recorded-evidence-missing');
+    if (projection.freshness.status !== 'stale') projection.freshness = { ...projection.freshness, status, reason_code: reason };
+    if (entry.readiness_status === 'fresh') entry.readiness_status = status;
+    entry.limitations = [...entry.limitations, `${reason}: 当前图与历史 scope/query 证据未闭合。`];
+  }
+  projection.provider_counts = computeProviderCounts(projection.provider_readiness);
+}
+
 function computeDecisionInputHealth({ projectRoot, platforms = [], factsPath, now, skillRoot, homeDir, env } = {}) {
   if (!Array.isArray(platforms) || platforms.length === 0) {
     const projection = buildUnavailableProjection({
@@ -598,6 +632,7 @@ function computeDecisionInputHealth({ projectRoot, platforms = [], factsPath, no
     const current = captureSourceSnapshot({ repoRoot: projectRoot, skillRoot, homeDir, env, host: projection.host, now });
     projection.freshness = compareSourceSnapshot(projection.freshness, projection.raw.source_snapshot, current);
     compareCurrentGraphifyIdentity(projection, { repoRoot: projectRoot, skillRoot, homeDir, env, host: projection.host });
+    compareCurrentGraphifyReceipt(projection, projectRoot);
   }
   if (projection.status === 'missing') {
     return buildDecisionResult('missing', 'setup-facts-missing', projection, { requestedPlatforms: platforms });

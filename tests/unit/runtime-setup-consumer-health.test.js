@@ -79,7 +79,7 @@ describe('producer 到 doctor 的磁盘快照闭环', () => {
     const probe = jest.spyOn(graphify, 'readCurrentIdentity');
     const factsPath = produce();
     const facts = JSON.parse(fs.readFileSync(factsPath));
-    facts.provider_readiness = [{ provider: 'graphify', readiness_status: 'fresh', provider_identity: identity }];
+    facts.provider_readiness = [{ provider: 'graphify', readiness_scope: 'installation', readiness_status: 'fresh', provider_identity: identity }];
     fs.writeFileSync(factsPath, JSON.stringify(facts));
     try {
       probe.mockReturnValue({ status: 'confirmed', identity });
@@ -103,6 +103,47 @@ describe('producer 到 doctor 的磁盘快照闭环', () => {
       fs.writeFileSync(path.join(root, 'changed.js'), 'changed');
       expect(health(factsPath).status).toBe('stale');
       expect(probe).not.toHaveBeenCalled();
+    } finally {
+      probe.mockRestore();
+    }
+  });
+  test('doctor 回读既有 Graphify scope receipt，拒绝图变化和缺失证据', () => {
+    const crypto = require('node:crypto');
+    const graphify = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const identity = { package: 'graphifyy', version: '0.9.57', command: '/managed/graphify', interpreter: '/managed/python', installer: 'uv', inventory_sha256: 'a'.repeat(64) };
+    const probe = jest.spyOn(graphify, 'readCurrentIdentity').mockReturnValue({ status: 'confirmed', identity });
+    const artifactRoot = path.join(root, 'graphify-out');
+    fs.mkdirSync(artifactRoot);
+    const graphPath = path.join(artifactRoot, 'graph.json');
+    const receiptPath = path.join(artifactRoot, 'spec-first-graph-scope.json');
+    const graph = '{"nodes":[],"edges":[]}';
+    fs.writeFileSync(graphPath, graph);
+    const receipt = { schema_version: 'graphify-scope-provenance.v1', provider: 'graphify', artifact_root: 'graphify-out', requirement_workspace_path: '.', operation: 'first-generation', graph_sha256: crypto.createHash('sha256').update(graph).digest('hex') };
+    fs.writeFileSync(receiptPath, JSON.stringify(receipt));
+    const factsPath = produce();
+    const facts = JSON.parse(fs.readFileSync(factsPath));
+    facts.provider_readiness = [{ provider: 'graphify', readiness_scope: 'artifact', readiness_status: 'fresh', provider_identity: identity, first_generation: { requirement_workspace_path: '.', artifact_root: 'graphify-out', scope_provenance: { status: 'verified', verified_requirement_workspace_path: '.', graph_sha256: receipt.graph_sha256 } } }];
+    fs.writeFileSync(factsPath, JSON.stringify(facts));
+    try {
+      expect(health(factsPath).status).toBe('pass');
+      fs.writeFileSync(graphPath, '{"nodes":[{}]}');
+      expect(health(factsPath).normalized.freshness).toMatchObject({ status: 'stale', reason_code: 'graphify-scope-provenance-artifact-mismatch' });
+      expect(health(factsPath).normalized.provider_counts).toMatchObject({ fresh: 0, stale: 1 });
+      const changedHash = crypto.createHash('sha256').update(fs.readFileSync(graphPath)).digest('hex');
+      fs.writeFileSync(receiptPath, JSON.stringify({ ...receipt, graph_sha256: changedHash }));
+      expect(health(factsPath).normalized.freshness.status).toBe('stale');
+      fs.writeFileSync(graphPath, graph);
+      fs.unlinkSync(receiptPath);
+      expect(health(factsPath).normalized.freshness.status).toBe('unknown');
+      fs.writeFileSync(receiptPath, JSON.stringify({ ...receipt, schema_version: 'legacy' }));
+      expect(health(factsPath).normalized.freshness.status).toBe('unknown');
+      fs.writeFileSync(receiptPath, JSON.stringify(receipt));
+      delete facts.provider_readiness[0].first_generation.scope_provenance.graph_sha256;
+      fs.writeFileSync(factsPath, JSON.stringify(facts));
+      expect(health(factsPath).normalized.freshness.status).toBe('unknown');
+      facts.provider_readiness[0].first_generation.requirement_workspace_path = null;
+      fs.writeFileSync(factsPath, JSON.stringify(facts));
+      expect(health(factsPath).normalized.freshness.status).toBe('unknown');
     } finally {
       probe.mockRestore();
     }
