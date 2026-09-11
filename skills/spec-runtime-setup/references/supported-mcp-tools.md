@@ -53,3 +53,9 @@ After setup:
 - If any row is `action-required`, fix that row and rerun setup.
 - If a parent workspace target is ambiguous, choose a child repo and rerun with `--repo <child>`.
 - If required runtime is ready, continue to the workflow that matches the user intent: plan, work, review, debug, or docs.
+
+### CodeGraph npm launcher 的只读边界
+
+官方 1.6.0 npm shim 在平台包缺失时会 self-heal 下载；即使设置 CODEGRAPH_NO_DOWNLOAD，命中历史 bundle 后仍会清理旧 cache。Runtime Setup 的普通真实 runner（含 sync worker）和 workspace 默认 runner 通过 Provider-owned `codegraph-launcher.cjs` 解析已安装、版本匹配的平台包，直接运行其入口；Windows 使用平台 node.exe 与独立 argv prefix，避免执行 npm .cmd wrapper。缺包或身份不符返回结构化失败和显式安装修复指引，不回退 shim 或 self-heal cache。异步 workspace 记录的绝对命令也在实际启动时重新解析。
+
+该检查只识别 npm 已知安装布局，保留非 npm native launcher 与非 CodeGraph 命令的既有行为；它不是任意 shell/JS 的副作用沙箱。DI runner 的替身测试不证明真实启动边界；独立隔离执行覆盖默认 runner。manifest/version 匹配不等于归档字节校验，平台包及传递依赖的供应链证明不能由此推导。

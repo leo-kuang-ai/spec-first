@@ -133,3 +133,19 @@
 - 扩大检查 45 suites / 746 tests 通过（审查修复前）；最终审查修复后 consumer-health/entrypoint/facts-renderer 三 suites / 136 tests 全通过。typecheck 261 files、skill entrypoint lint 490 files 与 diff whitespace 检查通过。
 - bounded 简化检查采用 inline reuse/quality/efficiency 三视角；复用已有 path-safety，保留预算和重复枚举校验，不为减少行数移除保护。没有执行三个独立简化 reviewer。
 - 未覆盖 ignored 外部 source、依赖目录、generated runtime currentness、Provider 当前身份与 artifact receipt；后两项仍是 U8 后续工作。未执行真实宿主 init、graph query/refresh、native Windows 或全 P123 最终收口。
+
+
+### U7 后续风险验证：CodeGraph npm shim 隐式副作用（初始发现）
+
+- 只读读取 npm 官方 `@colbymchenry/codegraph@1.6.0` metadata 及归档，实际 267196 bytes，SHA-512 为 `nCN40MqmYxF7gH1QTKqlxJ1d2mzwhw3fzSdGV2wjnQKsymjM3JZnH/5rpGqhBkcUEom0qWq0WjDRvOZh2t8mFA==`（integrity 前缀为 sha512-）。package 将六种平台 bundle pin 到 1.6.0，但 shim 的 fallback 会从 GitHub 下载，并允许缺失 checksum。
+- 在隔离临时 HOME 中实际运行该官方 shim 的 `--version`；设置 `CODEGRAPH_NO_DOWNLOAD=1`，只提供本地 benign 1.6.0 cached launcher 及旧 1.5.0 cache。结果 exit 0、stdout 1.6.0，同时旧 cache 被 `pruneOldBundles` 删除。隔离目录已清理，没有触及用户 runtime。
+- 因此单加 `CODEGRAPH_NO_DOWNLOAD` 不足以证明 bare/verify 只读；需在 Provider-owned launcher 边界避开 npm shim 的 self-heal/cache cleanup。下一增量同时核对 baseline probe、Provider probe 与 workspace launcher 路径，不仅处理 --version 的一个调用点。本节记录发现时状态；后续 launcher 修复见下文，R10 完整安装证据与整体 P123 仍不可关闭。
+
+
+### CodeGraph launcher 副作用修复与复核
+
+- 新增 Provider-owned 纯文件 resolver `codegraph-launcher.cjs`，普通异步 process runner（sync worker 复用同一路径）和 workspace 默认 runner 在实际启动前统一调用。识别 npm Unix shim/global Windows wrapper/local .bin wrapper，核对 main/platform manifest 的 pinned name/version，直接运行已安装平台入口；缺 bundle 不进入 shim 或 self-heal cache。Windows 使用 node.exe 与独立 argv prefix，不扩大 hook receipt 为第二套 launcher truth。
+- 官方原始 shim 夹具被固定为 1.6.0 归档；真实隔离 async PATH/absolute、sync、workspace 四反例先观察 cache 被删除，再修到结构化失败且旧 cache 保留。已安装 benign 平台包可以执行。额外真实子进程覆盖 Provider 无 DI 与 registry dependency probe，未用 fake runner 代替真实启动边界。
+- 初始 Windows parser 2 项失败是 macOS /var 与 /private/var 的 fixture 期望不一致，已使用 canonical fixture root；不改生产路径校验去迎合测试。独立审查另发现标准 local .bin 布局漏检，PATH/absolute 两反例先红，修复后证明存在 bundle 返回 node.exe、缺 bundle 阻断。同一 reviewer 唯一定点复核通过。
+- 修复后的三 suites / 18 tests 通过。共享 setup/runtime 大回归 40 suites / 718 tests 中 717 通过，唯一失败为并发 Pi 接入期间 host-invocation-receipt.schema.json 的 host enum 缺 pi；未将该失败改写为通过，最终 P123 收口需重验。typecheck 262 files、entrypoint lint 490 files 通过；npm pack dry-run 证实包含新 resolver、不发布测试归档。
+- 该 guard 只处理已知 npm 布局；保留 native launcher 与其他命令的既有行为，不是任意程序副作用沙箱，也不保证并发文件替换下的全局原子性。Windows 仅做解析合同验证，没有运行 Windows 二进制。manifest/version 与直接入口检查不证明归档实际 digest；CodeGraph 安装 provenance、U8 Provider identity/receipt 与剩余最终收口仍待完成。

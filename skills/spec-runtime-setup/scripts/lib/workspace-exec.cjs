@@ -5,7 +5,9 @@ const { spawnSync } = require('node:child_process');
 function defaultWorkspaceExec(command, args, opts = {}) {
   const env = { ...process.env, ...(opts.env || {}) };
   for (const name of opts.unsetEnv || []) delete env[name];
-  const result = spawnSync(command, args, {
+  const launch = require('../providers/codegraph-launcher.cjs').prepareCodegraphLaunch({ command, args, env, cwd: opts.cwd });
+  if (!launch.ok) return { status: 1, stdout: '', stderr: launch.reason_code, reason_code: launch.reason_code, next_action: launch.next_action };
+  const result = spawnSync(launch.command, launch.args, {
     cwd: opts.cwd,
     env,
     encoding: 'utf8',

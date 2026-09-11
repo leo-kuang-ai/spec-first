@@ -273,13 +273,24 @@ function runProcess(options = {}) {
     });
   }
 
+  const launch = require('../providers/codegraph-launcher.cjs').prepareCodegraphLaunch({ command, args, env: effectiveEnv, cwd: options.cwd, platform: options.platform });
+  if (!launch.ok) return Promise.resolve({
+    command: redactText(command, secrets), argv: args.map((arg) => redactText(arg, secrets)),
+    cwd: redactText(options.cwd || process.cwd(), secrets), env_overlay: redactEnvOverlay(envOverlay, secrets),
+    exit_code: 1, signal: null, timed_out: false, stdout: '', stderr: launch.reason_code,
+    stdout_truncated: false, stderr_truncated: false, stdout_bytes: 0, stderr_bytes: Buffer.byteLength(launch.reason_code), duration_ms: 0,
+    invocation_source: redactText(options.invocationSource || 'direct', secrets), mirror_attempted: Boolean(options.mirrorAttempt),
+    termination: { attempted: false, method: null, graceful_signal: null, forced_signal: null, error: null },
+    error: null, reason_code: launch.reason_code, next_action: launch.next_action,
+  });
+
   return new Promise((resolve) => {
     let settled = false;
     let spawnError = null;
     let timedOut = false;
     let termination = { attempted: false, method: null, graceful_signal: null, forced_signal: null, error: null };
     let terminationCompletion = Promise.resolve();
-    const child = spawn(command, args, {
+    const child = spawn(launch.command, launch.args, {
       cwd: options.cwd || process.cwd(),
       env: effectiveEnv,
       shell: false,
@@ -320,8 +331,8 @@ function runProcess(options = {}) {
       const stdout = finalizeOutput(stdoutState, maxOutputBytes, secrets);
       const stderr = finalizeOutput(stderrState, maxOutputBytes, secrets);
       resolve({
-        command: redactText(command, secrets),
-        argv: args.map((arg) => redactText(arg, secrets)),
+        command: redactText(launch.command, secrets),
+        argv: launch.args.map((arg) => redactText(arg, secrets)),
         cwd: redactText(options.cwd || process.cwd(), secrets),
         env_overlay: redactEnvOverlay(envOverlay, secrets),
         exit_code: spawnError ? null : (Number.isInteger(code) ? code : null),

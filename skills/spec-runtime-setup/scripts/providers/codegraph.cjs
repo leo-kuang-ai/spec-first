@@ -124,7 +124,8 @@ function verify(context = {}) {
     installed, configured: context.configured === true,
     readinessStatus: installed ? 'unknown' : 'not-run',
     readinessScope: 'installation', firstGenerationStatus: 'not-run',
-    nextActions: installed ? [] : ['运行显式 installation-only setup 安装 CodeGraph。'],
+    nextActions: installed ? [] : [versionResult.next_action || '运行显式 installation-only setup 安装 CodeGraph。'],
+    ...(versionResult.reason_code ? { limitations: [providerLimitation('failed', versionResult.reason_code, '未启动未经确认的 CodeGraph launcher。')] } : {}),
   });
   const artifactPath = path.join(repoRoot, '.codegraph', 'codegraph.db');
   const hasArtifact = fs.existsSync(artifactPath);

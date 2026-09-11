@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-11 codex: fix(runtime-setup): 在真实 process/workspace 启动边界绕过 CodeGraph npm shim 的隐式下载与 cache 清理，解析已安装 pinned 平台入口；缺平台包直接返回修复指引，Windows argv prefix 不经 shell 拼接。
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): setup source snapshot 升级 v2，绑定 Git 工作区与非 Git folder 的有界内容摘要；未提交改动使 doctor facts 失效，排除自身生成证据，旧快照或不安全/超预算采集保持 unknown。
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): required npm warmup 校验实际归档 SHA-512 与包身份后执行 file: 归档，preview/facts 同步公布限定范围的 integrity 证据；强制重试前失效旧成功缓存，防止失败被历史 ready 掩盖。
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): warmup 缓存升级为 v2，绑定依赖身份并保留安装来源，拒绝旧格式和未来/非法时间戳，避免 digest 漂移后误用历史缓存。
