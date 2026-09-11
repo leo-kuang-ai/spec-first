@@ -143,7 +143,7 @@ When a project-graph provider is available through Graphify, query with domain t
 - 当前 registry、HEAD、source 内容/类型、target、host/platform 或宿主配置发生可确认变化：`setup-facts-source-snapshot-mismatch` / stale，不等 TTL 到期。
 - 任一关键身份缺失、配置或 source 路径不安全/不可读取、Git target 无 HEAD、内容采集超出预算：`setup-facts-source-snapshot-incomplete` / unknown。已知变化优先于其他维度缺失；TTL 过期仍为 stale。
 - 快照只记录摘要，不保存配置内容。当前路径从受信 registry 推导，不能按历史 facts 的任意路径读取文件；只读解析不产生宿主写授权。
-- 此快照尚未覆盖实际 Provider version 与图 receipt currentness；这些仍由 Provider scope/receipt 检查承担，U8 的统一联调尚未完成。doctor pass 只表示其已检查的决策输入，没有授权 graph query 或证明图的语义正确性。
+- 该源码快照本身不覆盖 Provider 或图；doctor 已独立接通 Graphify/CodeGraph 当前安装身份与 Graphify receipt/source 比对，CodeGraph database currentness 的闭环仍未完成。doctor pass 只表示其已检查的决策输入，没有授权 graph query 或证明图的语义正确性。
 
 v2 的 `source_kind` 为 `git`、`folder` 或 `unknown`；`source_content_sha256` 绑定相对路径、文件 mode 与实际字节摘要。Git 范围是当前 target 内的 tracked 和非 ignored untracked 文件，并精确纳入即使被 ignore 的 `.spec-first/config.local.yaml`；删除或缺失文件也参与摘要；嵌套 target 不读取 sibling。非 Git folder 递归采集 target 内文件，排除依赖目录 `node_modules`、`.venv`、`venv`、`__pycache__`，不把未解析的 `.gitignore` 当作已应用。两者均排除 `source-snapshot.cjs` 中明确列出的 generated roots：setup facts/runtime-capabilities、setup scenario fingerprint、cache/audits/governance、图产物与 host skill/spec-first mirror；用户 local config 仍参与摘要。该范围不证明 ignored source、外部依赖或 generated runtime 当前性。
 

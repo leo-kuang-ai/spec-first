@@ -234,6 +234,7 @@ describe('CodeGraph provider', () => {
       probeDependency: true,
       configured: true,
       repoRoot: target,
+      env: {},
       dependency: { package: '@colbymchenry/codegraph', version: '1.6.0' },
       runner,
     };
@@ -247,7 +248,7 @@ describe('CodeGraph provider', () => {
       artifact_root_relative: '.codegraph',
     });
     expect(result).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       lifecycle: {
         initialized: true,
         indexed: true,
@@ -321,15 +322,16 @@ describe('CodeGraph provider', () => {
     const plan = provider.plan({
       selected: true,
       repoRoot: target,
+      env: {},
       probeDependency: true,
       runner,
       dependency: { package: '@colbymchenry/codegraph', version: '1.6.0' },
     });
     expect(plan).toMatchObject({ mutation: true, blocked: false, provider: 'codegraph' });
 
-    const result = provider.apply({ repoRoot: target, runner, configured: true }, plan);
+    const result = provider.apply({ repoRoot: target, env: {}, runner, configured: true }, plan);
     expect(validateAgainstSchema(providerSchema, result)).toEqual({ valid: true, errors: [] });
-    expect(result.readiness_status).toBe('fresh');
+    expect(result.readiness_status).toBe('unknown');
     expect(result.lifecycle).toMatchObject({
       installed: true,
       initialized: true,
@@ -361,11 +363,12 @@ describe('CodeGraph provider', () => {
     const plan = provider.plan({
       selected: true,
       repoRoot: target,
+      env: {},
       probeDependency: true,
       runner,
       dependency: { package: '@colbymchenry/codegraph', version: '1.6.0' },
     });
-    const result = provider.apply({ repoRoot: target, runner, configured: true }, plan);
+    const result = provider.apply({ repoRoot: target, env: {}, runner, configured: true }, plan);
 
     expect(result.readiness_status).toBe('degraded');
     expect(result.limitations).toContain('failed: codegraph-sync-stack-overflow. CodeGraph setup 失败。');
@@ -376,7 +379,7 @@ describe('CodeGraph provider', () => {
   test.each([
     ['unknown', undefined, 'unknown'],
     ['not configured', false, 'degraded'],
-    ['configured', true, 'fresh'],
+    ['configured', true, 'unknown'],
   ])('reports indexed CLI readiness as %s when host configuration is %s', (_label, configured, expected) => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
     const target = tempRepo(`codegraph-config-${expected}`);
@@ -391,6 +394,7 @@ describe('CodeGraph provider', () => {
 
     const result = provider.verify({
       repoRoot: target,
+      env: {},
       runner,
       configured,
       dependency: { version: '1.6.0' },
@@ -439,6 +443,7 @@ describe('CodeGraph provider', () => {
 
     const result = provider.verify({
       repoRoot: target,
+      env: {},
       runner,
       configured: true,
       dependency: { version: '1.6.0' },
@@ -464,6 +469,7 @@ describe('CodeGraph provider', () => {
     const context = {
       selected: true,
       repoRoot: target,
+      env: {},
       probeDependency: true,
       runner,
       dependency: { package: '@colbymchenry/codegraph', version: '1.6.0' },
@@ -488,7 +494,7 @@ describe('CodeGraph provider', () => {
       blocked: true,
       reason_code: 'codegraph-artifact-symlink-escape',
     });
-    const result = provider.apply({ selected: true, repoRoot: target, runner });
+    const result = provider.apply({ selected: true, repoRoot: target, env: {}, runner });
     expect(result.readiness_status).toBe('degraded');
     expect(fs.readdirSync(outside)).toEqual([]);
     expect(runner).toHaveBeenCalledTimes(1);
@@ -526,11 +532,12 @@ describe('CodeGraph provider', () => {
     const plan = provider.plan({
       selected: true,
       repoRoot: target,
+      env: {},
       probeDependency: true,
       runner,
       dependency: { package: '@colbymchenry/codegraph', version: '1.6.0' },
     });
-    const result = provider.apply({ repoRoot: target, runner }, plan);
+    const result = provider.apply({ repoRoot: target, env: {}, runner }, plan);
     expect(result.readiness_status).toBe('degraded');
     expect(result.limitations).toContain(`failed: ${reasonCode}. CodeGraph setup 失败。`);
     expect(result.lifecycle.indexed).toBe(false);
@@ -547,6 +554,7 @@ describe('CodeGraph provider', () => {
 
     const result = provider.verify({
       repoRoot: target,
+      env: {},
       dependency: { version: '1.6.0' },
       runner,
     });

@@ -2,6 +2,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { prepareCodegraphLaunch } = require('./codegraph-launcher.cjs');
 const { verifiedNpmInstall } = require('../lib/npm-warmup.cjs');
 const { executeInstallWithMirror, applyInstallProvenance, combinedInstallProvenance } = require('../lib/installation-executor.cjs');
 const {
@@ -117,7 +118,53 @@ function plan(context = {}) {
   };
 }
 
+function readCurrentIdentity(context = {}) {
+  try {
+    const launchOptions = { command: 'codegraph', args: ['--version'],
+      env: context.env || process.env, cwd: context.repoRoot || process.cwd(),
+      platform: context.platform === 'macos' ? 'darwin' : context.platform,
+      arch: context.arch,
+    };
+    const launch = prepareCodegraphLaunch(launchOptions);
+    if (!launch.ok || !launch.provider_identity) return {
+      status: ['codegraph-version-pin-mismatch', 'codegraph-platform-version-mismatch'].includes(launch.reason_code) ? 'stale' : 'unknown',
+      reason_code: launch.reason_code || 'codegraph-installation-identity-unverified',
+    };
+    const result = run(context, launch.command, launch.args, {
+      cwd: path.resolve(context.repoRoot || process.cwd()), env: context.env || process.env, timeoutMs: 5000,
+    });
+    if (!succeeded(result)) return { status: 'unknown', reason_code: 'codegraph-identity-probe-failed' };
+    if (!versionReady(result, launch.provider_identity.version)) return { status: 'stale', reason_code: 'codegraph-version-pin-mismatch' };
+    const after = prepareCodegraphLaunch(launchOptions);
+    if (!after.ok || !after.provider_identity) return {
+      status: ['codegraph-version-pin-mismatch', 'codegraph-platform-version-mismatch'].includes(after.reason_code) ? 'stale' : 'unknown',
+      reason_code: after.reason_code || 'codegraph-installation-identity-unverified',
+    };
+    if (after.provider_identity.inventory_sha256 !== launch.provider_identity.inventory_sha256) {
+      return { status: 'stale', reason_code: 'codegraph-identity-changed-during-probe' };
+    }
+    return { status: 'confirmed', identity: after.provider_identity };
+  } catch (_error) {
+    return { status: 'unknown', reason_code: 'codegraph-installation-identity-unverified' };
+  }
+}
+
+function attachCurrentIdentity(context, readiness) {
+  if (!readiness.lifecycle.installed || readiness.first_generation.status === 'failed') return readiness;
+  const current = readCurrentIdentity(context);
+  if (current.status === 'confirmed') readiness.provider_identity = current.identity;
+  else {
+    if (['fresh', 'unknown'].includes(readiness.readiness_status)) readiness.readiness_status = current.status === 'stale' ? 'degraded' : 'unknown';
+    readiness.limitations.push(`${current.reason_code}: 当前安装身份未经确认，不能支持历史 readiness freshness。`);
+  }
+  return readiness;
+}
+
 function verify(context = {}) {
+  return attachCurrentIdentity(context, verifyReadiness(context));
+}
+
+function verifyReadiness(context = {}) {
   const repoRoot = path.resolve(context.repoRoot || process.cwd());
   try {
     assertCodegraphArtifactRoot(repoRoot);
@@ -200,11 +247,11 @@ function apply(context = {}, actionPlan = plan(context)) {
   const installations = [];
   const result = applyActions(context, actionPlan, installations);
   applyInstallProvenance(result, combinedInstallProvenance(installations));
-  return result;
+  return attachCurrentIdentity(context, result);
 }
 
 function applyActions(context, actionPlan, installations) {
-  if (!actionPlan || actionPlan.blocked || !actionPlan.mutation) return verify(context);
+  if (!actionPlan || actionPlan.blocked || !actionPlan.mutation) return verifyReadiness(context);
   const repoRoot = path.resolve(context.repoRoot || actionPlan.repo_root || process.cwd());
   try {
     assertCodegraphArtifactRoot(repoRoot);
@@ -228,7 +275,7 @@ function applyActions(context, actionPlan, installations) {
       }
     }
   }
-  if (context.installationOnly) return verify(context);
+  if (context.installationOnly) return verifyReadiness(context);
   const artifactPath = path.join(repoRoot, '.codegraph', 'codegraph.db');
   if (!fs.existsSync(artifactPath)) {
     try {
@@ -351,6 +398,7 @@ function reconcileConfigured(readiness, hostResult = {}) {
   }
   const lifecycle = readiness.lifecycle;
   if (readiness.readiness_status === 'unknown'
+    && readiness.provider_identity
     && lifecycle.installed
     && lifecycle.initialized
     && lifecycle.indexed
@@ -476,6 +524,7 @@ module.exports = {
   installDependency,
   plan,
   reconcileConfigured,
+  readCurrentIdentity,
   resolveCodegraphCommand,
   refresh,
   uninstall,

@@ -1,4 +1,8 @@
 # Changelog
+- v1.15.3 2026-09-11 codex: fix(runtime-setup): workspace 构图增加默认 32 仓上限与 15 分钟共享命令预算，传播取消和超时原因并停止后续 Provider、routing、hook；保留失败恢复与 lease 清理，不宣称同步 IO 硬截止或真实 SIGINT 恢复已验证。(user-visible)
+- v1.15.3 2026-09-11 codex: fix(runtime-setup): 所选 Provider 的路径/action-plan 预检提前到首次 baseline 安装之前，非法 requirement workspace 通过原始 reason 零写入退出；补真实 CodeGraph 故障索引 status 写入探针，记录其不能用作只读 freshness 检查的证据。(user-visible)
+- v1.15.3 2026-09-11 codex: fix(runtime-setup): canonical facts 第二次发布失败时返回非零退出码与 failed write result，不再沿用首次成功；保留 Provider 主失败和已有 artifact，scenario 生成本身仍按 advisory 处理。(user-visible)
+- v1.15.3 2026-09-11 codex: fix(runtime-setup): 复用 CodeGraph npm launcher 发布当前安装元数据身份并接通 doctor 比对；最终探针失败或身份漂移立即降级，旧 facts/native 未确认身份不再支持 fresh，保留实际 query lifecycle，不外推为安装后二进制完整性。(user-visible)
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): Graphify receipt 绑定构图前后稳定的源码内容身份；仅重发 facts 不再洗掉旧图漂移，无完整源码快照保持 unknown，构图期间源码变化降为 degraded。(user-visible)
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): doctor 回读 Graphify scope receipt 并比较历史图摘要，图变化不再沿用旧 query 证据；旧/缺失证据降为 unknown，实际读取使用有界 fd 并检查并发替换。(user-visible)
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): doctor 复用 Graphify 只读身份探针，安装身份变化使历史 facts 失效，缺证据降为 unknown，同步降级 Provider fresh 计数；不触发安装或构图。

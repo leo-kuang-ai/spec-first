@@ -50,6 +50,56 @@ function fakeExec(command, args) {
 }
 
 describe('runWorkspaceGraphBuild — composed capability', () => {
+  test('repo 数超过预算时不获取 lease、不执行 Provider 或写 state', () => {
+    const ws = mkWorkspace();
+    initRepo(ws, 'api'); initRepo(ws, 'web');
+    const exec = jest.fn(fakeExec);
+    const result = runWorkspaceGraphBuild({ cwd: ws, repos: ['api', 'web'], allowDiscovery: false, maxRepos: 1, exec });
+    expect(result).toMatchObject({ status: 'failed', reason_code: 'workspace-repo-limit-exceeded', build: null });
+    expect(exec).not.toHaveBeenCalled();
+    expect(fs.existsSync(path.join(ws, 'graphify-out'))).toBe(false);
+    expect(fs.existsSync(path.join(ws, '.spec-first'))).toBe(false);
+    fs.rmSync(ws, { recursive: true, force: true });
+  });
+
+  test('所有 Provider 命令共用总预算，耗尽后不启动后续步骤或安装 hook', () => {
+    const ws = mkWorkspace(); initRepo(ws, 'api'); initRepo(ws, 'web');
+    let clock = 0;
+    const exec = jest.fn((command, args, options) => {
+      expect(options.timeoutMs).toBe(100);
+      clock = 101;
+      return fakeExec(command, args);
+    });
+    const result = runWorkspaceGraphBuild({ cwd: ws, repos: ['api', 'web'], allowDiscovery: false, executionBudgetMs: 100, executionClock: () => clock, exec });
+    expect(result.reason_code).toBe('workspace-build-timeout');
+    expect(result.status).not.toBe('complete');
+    expect(exec).toHaveBeenCalledTimes(1);
+    expect(result.routing).toBeNull();
+    expect(result.hooks).toBeNull();
+    expect(result.build.state.state.operation_status).not.toBe('complete');
+    expect(result.build.state.state.reason_code).toBe('workspace-build-timeout');
+    expect(result.lifecycle_release.ok).toBe(true);
+    fs.rmSync(ws, { recursive: true, force: true });
+  });
+
+  test('步骤内取消后恢复旧 CodeGraph，不执行下一仓，保留取消原因供重试', () => {
+    const ws = mkWorkspace(); const api = initRepo(ws, 'api'); initRepo(ws, 'web');
+    fs.mkdirSync(path.join(api, '.codegraph')); fs.writeFileSync(path.join(api, '.codegraph', 'codegraph.db'), 'previous');
+    const controller = new AbortController();
+    const exec = jest.fn((command, args) => {
+      const result = fakeExec(command, args);
+      if (args[0] === 'init') controller.abort();
+      return result;
+    });
+    const result = runWorkspaceGraphBuild({ cwd: ws, repos: ['api', 'web'], allowDiscovery: false, signal: controller.signal, exec });
+    expect(result.reason_code).toBe('workspace-build-cancelled');
+    expect(exec).toHaveBeenCalledTimes(2);
+    expect(fs.readFileSync(path.join(api, '.codegraph', 'codegraph.db'), 'utf8')).toBe('previous');
+    expect(fs.existsSync(path.join(ws, 'web', '.codegraph'))).toBe(false);
+    expect(result.lifecycle_release.ok).toBe(true);
+    fs.rmSync(ws, { recursive: true, force: true });
+  });
+
   test('manifest-declared repos build to complete; git stays clean; merged graph exists', () => {
     const ws = mkWorkspace();
     initRepo(ws, 'api');

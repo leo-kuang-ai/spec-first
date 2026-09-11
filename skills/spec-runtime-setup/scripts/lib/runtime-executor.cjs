@@ -62,6 +62,19 @@ function runVerificationOrMutation(context, repoRoot) {
   let installResults = new Map();
   let helperInstallResults = new Map();
   if (applyInstallMutation) {
+    // Provider 自有的路径/计划约束必须早于任何 baseline、host 或证据写入。
+    for (const id of selectedIds) {
+      const plan = providers[id].plan(providerContext(context, repoRoot, id, {
+        selected: true,
+        probeDependency: false,
+        refresh: context.actionPlan.mode === 'graphify-refresh',
+      }));
+      if (plan.blocked) {
+        const error = new Error(plan.reason_code || `${id}-provider-plan-blocked`);
+        error.reason_code = plan.reason_code || `${id}-provider-plan-blocked`;
+        throw error;
+      }
+    }
     requireCapability(context, 'install-tools');
     installResults = installBaselineTools(context, repoRoot, selectedIds);
     helperInstallResults = installBaselineHelpers(context, repoRoot);
@@ -205,8 +218,9 @@ function runVerificationOrMutation(context, repoRoot) {
   if (hostLedgerPreparation) {
     hostLedgerPreparation.hostLedger.scenario_fingerprint_setup = scenarioFingerprintSetup;
   }
+  let scenarioLedgerWrite = null;
   if (writeResult.status === 'ready') {
-    const scenarioLedgerWrite = writeSetupFacts({ repoRoot, ...bundle, writer: context.factsWriter });
+    scenarioLedgerWrite = writeSetupFacts({ repoRoot, ...bundle, writer: context.factsWriter });
     if (scenarioLedgerWrite.status !== 'ready') {
       const ledgerFailure = scenarioFingerprintFailure(
         'scenario-fingerprint-ledger-update-failed',
@@ -224,16 +238,19 @@ function runVerificationOrMutation(context, repoRoot) {
       });
     }
   }
-  const writeFailure = writeResult.status === 'ready'
+  const finalFactsWriteResult = scenarioLedgerWrite || writeResult;
+  const writeFailure = finalFactsWriteResult.status === 'ready'
     ? null
-    : { reason_code: writeResult.reason_code || 'setup-facts-write-failed' };
+    : { reason_code: scenarioLedgerWrite
+      ? 'scenario-fingerprint-ledger-update-failed'
+      : finalFactsWriteResult.reason_code || 'setup-facts-write-failed' };
   const hostLedgerFailure = hostLedgerWriteResult && hostLedgerWriteResult.status !== 'ready'
     ? { reason_code: hostLedgerWriteResult.reason_code || 'host-readiness-ledger-write-failed' }
     : null;
   const failedOutcome = hostLedgerFailure || executionOutcome || writeFailure;
   const effectiveWriteResult = hostLedgerFailure
-    ? { ...writeResult, complete: false }
-    : writeResult;
+    ? { ...finalFactsWriteResult, complete: false }
+    : finalFactsWriteResult;
   const executionSummary = buildExecutionSummary({ context, failedOutcome });
   return {
     exit_code: failedOutcome ? 1 : 0,

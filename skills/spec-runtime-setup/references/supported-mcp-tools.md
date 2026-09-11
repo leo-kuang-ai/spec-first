@@ -74,7 +74,7 @@ Graphify 的 `provider-readiness.v2.provider_identity` 保留已解析的 packag
 
 这些字段说明此次 probe 观察到的安装环境；它们不是安装字节完整性证明，也不单独证明当前图、scope receipt 或宿主 MCP 会话可用。doctor 在 source snapshot 与 TTL 通过后，复用 Provider 只读 resolver 核对当前 Graphify 身份；已知字段变化或实际版本不符标为 stale，缺身份、缺 inventory 摘要或 probe 失败标为 unknown。探测不安装、不构图、不 query，也不执行 facts 中记录的 command。普通 normalizer 只保留历史观测，不自行启动探针。
 
-当前 doctor 比较尚未覆盖 CodeGraph 当前安装身份；不能以 Graphify 校验通过代替完整 U8 验证。Provider 身份与 source snapshot 均为分步观测，不是跨文件和进程的原子快照。
+doctor 同样核对 CodeGraph 当前安装身份；该检查不证明 CodeGraph database 已绑定构建时源码，不能代替完整 U8 验证。Provider 身份与 source snapshot 均为分步观测，不是跨文件和进程的原子快照。
 
 当前身份探测共享 5 秒命令预算，超限为 unknown；进程终止开销及同步文件读取不属于严格墙钟上限。探针跳过 npm collision 诊断并禁止 Python bytecode 写入；隔离真实 Python 导入测试验证 HOME/package 树无新增文件，该约束不是任意第三方程序的副作用沙箱。launcher 启动失败或超时为 unknown，只有成功输出版本不符等已知身份变化才标为 stale。
 
@@ -85,3 +85,19 @@ doctor 的 receipt/graph 读取使用 no-follow/nonblocking fd、普通单链接
 构图/refresh 前后复用 setup source snapshot 的有界内容采集；仅当两次完整内容身份一致，既有 receipt 才保存 `source_snapshot`（v2 的 schema_version/source_kind/source_content_sha256 三字段）。该身份覆盖整个执行 repo/folder 的既定 source 范围，而非猜测图实际读取了哪些文件。host/registry/root 仍由 tool-facts 的完整快照校验。
 
 旧 receipt 没有源码绑定时，verify 只能保留 unknown；必须显式生成/refresh 才能写入新绑定，不能通过重新发布 facts 补造。无 HEAD、超预算或不安全源码导致无法采集时，即使图/query 成功也保持 unknown；已确认构图期间源码变化则记录 `graphify-source-changed-during-generation` 并降为 degraded。doctor 比较历史绑定、当前 receipt 和当前源码，源码变化后的旧图不能因 facts 更新时间较新而变 fresh。前后采样仍非原子快照，不保证期间没有短暂变化。
+
+### CodeGraph 当前安装身份
+
+`provider-readiness.v2.provider_identity` 复用同一兼容字段，记录 npm resolver 实际解析的 package/version/installer/command 与 `inventory_sha256`。摘要只覆盖主包和平台包的路径、名称、版本，以及实际入口与固定启动参数；不包含业务 argv，不证明安装后二进制、传递依赖或数据库内容完整性。它与 `dependency_identity` 的顶层下载归档校验是两种不同证据。
+
+Provider 在前序 version/status/query 后，通过安全平台入口执行一次最多 5 秒的 `--version`，前后重新解析安装元数据。身份确认后才发布；已知版本/身份变化降为 degraded，未识别 native 安装、缺包或探针失败降为 unknown，原有失败不被覆盖，保留实际 lifecycle。后续 host 配置确认不能把缺少身份的 unknown 升回 fresh。5 秒是子进程预算，不是同步文件读取或任意程序副作用的沙箱保证。
+
+doctor 只从当前环境解析命令，不执行历史 facts 中的 command。当前已知身份变化为 stale，旧 facts 缺身份或当前无法确认则 unknown；source/TTL 或前一个 Provider 已失效时停止后续比较，不能据此声称逐个 Provider 都完成了当前探测。非 npm native 安装继续保留使用路径，但没有可确认的安装身份时不能支持历史 fresh。
+
+### Evidence 发布失败
+
+`write_result` 表达最后一次 canonical facts 发布结果。首次 facts 写入成功后，回填 scenario 状态的第二次写入仍是实际发布：失败时 `complete=false`、退出码非零，`execution_summary.overall_status=action-required`；无更早的 Provider/baseline 主失败时 reason 为 `scenario-fingerprint-ledger-update-failed`。已存在的主失败保留在顶层，发布失败仍由 `write_result` 和 scenario limitation 表达。host ledger 只在最终 facts 发布成功后写入。
+
+scenario fingerprint 的生成失败仍是 advisory；如果其失败状态成功写入 canonical facts，不因此阻断 setup。默认 writer 对成对 facts 的写入失败执行既有 best-effort 恢复；失败返回不声称事务回滚已获全局原子保证。
+
+Provider 的路径与 action-plan 预检先于 baseline 安装、host 配置和 facts 写入。被阻止时沿用既有 setup error envelope，保留原始 reason，不生成一份看似已执行的 Provider facts。preflight 不作为安装后的执行计划缓存；依赖变化后仍由对应 Provider 重新规划。

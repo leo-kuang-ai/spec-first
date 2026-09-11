@@ -2,6 +2,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { createHash } = require('node:crypto');
 const { createRequire } = require('node:module');
 const { assertContainedPath } = require('../lib/path-safety.cjs');
 
@@ -47,7 +48,15 @@ function prepareCodegraphLaunch({ command, args = [], env = process.env, cwd = p
     const prefix = windows
       ? ['--liftoff-only', '--disable-warning=ExperimentalWarning', safeFile(bundleRoot, 'lib/dist/bin/codegraph.js')]
       : [];
-    return { ok: true, command: executablePath, args: [...prefix, ...args] };
+    // 仅绑定已解析包元数据与入口路径；不声称验证安装后二进制或传递依赖字节。
+    const inventory = [packageRoot, manifest.name, manifest.version, bundleRoot, bundle.name, bundle.version, executablePath, prefix];
+    return { ok: true, command: executablePath, args: [...prefix, ...args], provider_identity: {
+      package: manifest.name,
+      version: manifest.version,
+      installer: 'npm',
+      command: executablePath,
+      inventory_sha256: createHash('sha256').update(JSON.stringify(inventory)).digest('hex'),
+    } };
   } catch (_error) {
     return blocked('codegraph-launcher-identity-unavailable');
   }

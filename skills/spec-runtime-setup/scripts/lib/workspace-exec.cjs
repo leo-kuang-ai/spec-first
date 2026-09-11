@@ -18,6 +18,9 @@ function defaultWorkspaceExec(command, args, opts = {}) {
     status: typeof result.status === 'number' ? result.status : 1,
     stdout: String(result.stdout || ''),
     stderr: String(result.stderr || ''),
+    signal: result.signal || null,
+    error: result.error ? result.error.code || 'workspace-command-failed' : null,
+    timed_out: Boolean(result.error && result.error.code === 'ETIMEDOUT'),
   };
 }
 

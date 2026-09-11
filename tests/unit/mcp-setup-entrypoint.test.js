@@ -832,32 +832,43 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(fs.readdirSync(outside)).toEqual([]);
   });
 
-  test('keeps the primary outcome when the scenario status ledger rewrite fails', () => {
+  test.each([[3, false], [4, false], [4, true]])('fails canonical facts rewrite at rename %s while preserving provider failure %s', (failureAt, providerFailed) => {
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('scenario-ledger-failure');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
+    const rename = fs.renameSync;
     let writes = 0;
-    const factsWriter = (filePath, payload) => {
-      writes += 1;
-      if (writes > 2) throw new Error('injected scenario ledger rewrite failure');
-      fs.mkdirSync(path.dirname(filePath), { recursive: true });
-      fs.writeFileSync(filePath, payload);
-    };
-
-    const result = runSetup({
-      argv: ['--only', 'graphify'],
-      cwd: target,
-      skillRoot,
-      runner: fakeRunner,
-      env: { MCP_SETUP_HOST: 'qoder' },
-      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
-      bundledVersion: '1.13.2',
-      factsWriter,
+    const spy = jest.spyOn(fs, 'renameSync').mockImplementation((source, destination) => {
+      if (path.dirname(destination) === path.join(target, '.spec-first', 'config')
+        && ['tool-facts.json', 'runtime-capabilities.json'].includes(path.basename(destination))) {
+        writes += 1;
+        if (writes === failureAt) throw new Error('injected scenario ledger rewrite failure');
+      }
+      return rename(source, destination);
     });
+    let result;
+    try {
+      result = runSetup({
+        argv: ['--only', 'graphify'],
+        cwd: target,
+        skillRoot,
+        runner: (command, args, options) => providerFailed && path.basename(command) === 'graphify' && args[0] === 'query'
+          ? { exit_code: 1, stdout: '', stderr: 'injected query failure' }
+          : fakeRunner(command, args, options),
+        env: { MCP_SETUP_HOST: 'qoder' },
+        homeDir,
+        bundledVersion: '1.13.2',
+      });
+    } finally { spy.mockRestore(); }
+    const primaryReason = providerFailed ? 'graphify-query-verification-failed' : 'scenario-fingerprint-ledger-update-failed';
 
     expect(result).toMatchObject({
-      exit_code: 0,
-      reason_code: 'setup-facts-written',
+      exit_code: 1,
+      reason_code: primaryReason,
       payload: {
+        write_result: { status: 'failed', complete: false },
+        execution_summary: { overall_status: 'action-required', reason_code: primaryReason },
+        host_ledger_write_result: null,
         tool_facts: {
           scenario_fingerprint_setup: {
             status: 'failed',
@@ -875,6 +886,11 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(fs.existsSync(path.join(target, '.spec-first', 'workspace', 'scenario-fingerprint-setup.json'))).toBe(true);
     const persisted = JSON.parse(fs.readFileSync(path.join(target, '.spec-first', 'config', 'runtime-capabilities.json'), 'utf8'));
     expect(persisted.scenario_fingerprint_setup).toBeUndefined();
+    const persistedTools = JSON.parse(fs.readFileSync(path.join(target, '.spec-first', 'config', 'tool-facts.json'), 'utf8'));
+    expect(persistedTools.scenario_fingerprint_setup).toBeUndefined();
+    expect(result.payload.tool_facts.provider_readiness.find((entry) => entry.provider === 'graphify').lifecycle.query_verified).toBe(!providerFailed);
+    fs.rmSync(target, { recursive: true, force: true });
+    fs.rmSync(homeDir, { recursive: true, force: true });
   });
 
   test('project-config writes only project-local config surfaces without host authority', () => {
@@ -2021,11 +2037,12 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       bundledVersion: '1.13.2',
     });
 
+    // 仅有命令 stub，没有可确认的 npm 安装；配置成功不补造身份。
     const hostConfig = JSON.parse(fs.readFileSync(path.join(target, '.qoder', 'settings.local.json'), 'utf8'));
     expect(hostConfig.mcpServers.codegraph).toMatchObject({ command: 'codegraph', args: ['serve', '--mcp'] });
     expect(result.payload.tool_facts.provider_readiness.find((entry) => entry.provider === 'codegraph'))
       .toMatchObject({
-        readiness_status: 'fresh',
+        readiness_status: 'unknown',
         lifecycle: { installed: true, configured: true, initialized: true, indexed: true },
       });
   });
@@ -3074,13 +3091,16 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(snapshot(previewTarget)).toEqual(previewBefore);
 
     const applyTarget = tempRepo('blocked-provider-apply');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-blocked-provider-home-'));
+    const before = snapshot(applyTarget);
+    const audit = createReadOnlyAuditRunner();
     const applied = runSetup({
       argv: ['--only', 'graphify', '--requirement-workspace', '../outside'],
       cwd: applyTarget,
       skillRoot,
-      runner: fakeRunner,
+      runner: audit.runner,
       env: { MCP_SETUP_HOST: 'qoder' },
-      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+      homeDir,
       bundledVersion: '1.13.2',
     });
     expect(fs.existsSync(path.join(applyTarget, 'graphify-out'))).toBe(false);
@@ -3088,11 +3108,10 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       exit_code: 1,
       reason_code: 'requirement-workspace-escape',
     });
-    expect(applied.payload.tool_facts.provider_readiness.find((entry) => entry.provider === 'graphify'))
-      .toMatchObject({
-        readiness_status: 'degraded',
-        first_generation: { status: 'failed' },
-      });
+    expect(applied.payload.schema_version).toBe('spec-runtime-setup-error.v1');
+    expect(audit.violations).toEqual([]);
+    expect(snapshot(applyTarget)).toEqual(before);
+    expect(snapshot(homeDir)).toEqual([]);
   });
 
   test('stops dependent host and provider mutations after a baseline install failure', () => {

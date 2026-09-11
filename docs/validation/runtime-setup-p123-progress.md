@@ -212,3 +212,45 @@
 
 - 最终隔离验证：基线 33f09024 + 本切片，两个 consumer/identity suites / 39 tests 通过；完整 mcp-setup 32 suites 通过、1 suite 失败。唯一失败为已在 HEAD 中存在的 plugin-modules 锚点别名断言：HEAD 的 plugin-sync.js 仍有两份字面量表，而 HEAD 测试要求别名（直接 git show 核实）；该文件的并发工作区修复未纳入本切片，不能声明本提交整仓全绿。
 - 共享 registry 的 getDiagnosticRegistry 导出随后由并发工作恢复；再次运行 entrypoint/registry 两 suites / 88 tests 全通过。隔离 checkout 与待提交的七个 production/schema/test 路径逐字节一致，验证副本已在检查完成后清理；不把其他 dirty source 的成功当作本提交证据。
+
+## U8 CodeGraph 当前安装身份闭环
+
+- 复用既有 npm launcher resolver 发布 package/version/installer/command/inventory_sha256；摘要绑定解析出的主包与平台包名称、版本、目录、真实入口及固定 prefix，不含业务 argv。未另造 resolver 或 durable receipt，provider/facts/schema/normalizer 使用现有兼容身份字段。
+- doctor 复用 Provider 的 readCurrentIdentity，从当前环境定位命令，不执行历史 facts command。版本/身份不符 stale；旧 facts 缺字段、native 未识别、探针失败 unknown；source/TTL 或前一 Provider 已失效时停止后续比较，保留尚未逐一探测的限制。
+- 首轮独立 fresh-source 审查发现 producer 在前序 version/status/query 成功后，最终身份探针失败仍 fresh。三个反例已先观察到失败，再修复 unknown/degraded 分界；verify/apply/configuration reconciliation 均覆盖，保留实际 lifecycle，配置成功不能洗掉缺失身份。另一个红测覆盖探针期间平台 manifest 改变，改为前后 resolver 核对，不发布旧身份。
+- 新 Windows fixture 覆盖解析、producer/facts/schema/normalizer，实际命令由 DI runner 替代。独立复审确认原 P1 闭合，另指出 Unix 默认 runner 测试缺 Windows skip；已按平台限定执行，保留 Windows 解析合同。Unix 测试真实调用默认 process runner 与隔离 shell fixture，npm shim 的 exit 99 不执行；前后比较目录、mode、文件字节和 symlink 目标，未观察到写入。此验证不是真实 Windows 二进制或生产 CodeGraph 任务。
+- 修复旧测试对本机 npm 安装的意外依赖：CodeGraph provider fixture 显式空 env；三个缺安装身份的 fresh 预期改 unknown，同时保留全部 lifecycle/sync/query 断言。有效 npm fixture 的 producer 正例仍要求 fresh。entrypoint 同类纯命令 stub 更新为 unknown，仍要求实际 host 配置和 lifecycle 成功。
+- 验证：三套 identity/consumer suites 55 tests 通过；Windows skip 与字节比较增强后，launcher suite 15 tests 通过；typecheck 262 files 与入口 lint 490 files 通过。共享工作区完整 mcp-setup 首轮 697/698，通过 32 suites，唯一失败是上面的 entrypoint 旧 fresh 预期，已修正，定点复跑结果另记。
+- inline simplify 按 reuse/quality/efficiency 三个 lens 检查：复用 launcher 与 CLI 身份比较 owner；前后解析、失败降级和配置阻断为 protected；apply 内部用 verifyReadiness 避免重复附加身份。没有额外派发 simplify workers，不声称三个独立审查。
+- 元数据与版本前后观测不是原子快照，不能证明同版本二进制/传递依赖字节完整性；5 秒仅限制身份子进程，不包括同步文件解析。CodeGraph database/source currentness、U1–U12 逐项最终验收和 structured closeout 仍未完成，本轮不关闭整体计划。
+- 定点复跑结果：entrypoint/provider 两套共 137 tests 通过；本轮完整 suite 的历史失败保留，不重写为全绿。完整回归运行于共享 dirty 工作区，不外推为独立提交的全仓证明。
+- 本轮暂未提交：并发 owner 已暂存八个宿主治理文件并占用 CHANGELOG 的另一条记录。保留其 index 和 working tree，本轮十个 owned 路径仅留工作区；待交叠收敛后按精确路径提交，不执行裸 commit、不 push。
+
+## U5 发布失败与前置 scope 校验
+
+- 已复现第二次 canonical facts 发布失败仍返回 exit 0、write_result.ready/complete=true。runtime-executor 现在以最终发布结果计算退出：第二次失败保留 scenario-fingerprint-ledger-update-failed；已有 Provider/baseline 主失败保持顶层优先级，write_result 仍揭示发布失败，host ledger 未写则保持 null。
+- 强化既有测试为默认 writer 的真实 rename 故障注入：第二次发布的第一个/第二个文件分别失败，旧成对 facts 均恢复；叠加 Graphify query 失败时保留 graphify-query-verification-failed。scenario artifact 自身失败而其状态成功发布仍 advisory。该批 entrypoint/facts 两套 112 tests 通过；独立 reviewer 无阻断发现，提出的组合回归已补。
+- 独立 U5/U6 审计发现 requirement workspace containment 直到 baseline 安装后才检查。强化既有非法 scope 测试后，先观察到 npm-warmup-path-or-io-failed 而非原始 scope reason，证实进入了安装链。现复用选中 Provider 自有 plan，在首次安装前用 probeDependency=false 预检；blocked 通过既有 setup error envelope 退出，不发布伪 facts。执行期仍重算 Provider plan，不复用预检计划。
+- 独立定点复审确认该 finding 闭合；entrypoint/node-contracts/facts 三套 127 tests 通过。非法 scope 反例检查零 mutation 调用、target/HOME 内容不变。源码语法与 diff check 通过；没有按模块数量重拆 orchestrator。
+
+## U8/U9 CodeGraph 原生状态探针证据
+
+- 当前已安装 CodeGraph 1.6.0 的 status 实现调用 CodeGraph.open；DB open 包含 migration、healBulkNodeLoad、healBulkSecondaryIndexes 和 healOversizedWal。status JSON 暴露 index.state/pendingRefs/pendingChanges/worktreeMismatch；退出 0 不等于完整/current 索引。
+- `docs/validation/runtime-setup-codegraph-status-probe.json`：健康单文件 folder，真实 init/status 成功，未观察到持久化文件变化；该次未关闭默认遥测，原始 stderr 已保留，不能宣称无网络活动。
+- `docs/validation/runtime-setup-codegraph-recovery-probe.json`：后续显式 CODEGRAPH_TELEMETRY=0、CODEGRAPH_NO_WATCH=1，隔离 HOME/XDG/TMPDIR。删除三个原生 FTS trigger 模拟中断 bulk-load，并设置 project_metadata.index_state=partial；真实 status 退出 0 但仍报告 partial，同时恢复 trigger、改变 DB 内容并清理 WAL/SHM。一次早期 fault injection 使用错误表名 metadata，在 status 前终止并清理；按当前源码改用 project_metadata 后得到本报告，不把失败尝试计作通过。
+- 这改变下一步方案：doctor/verify 的只读 currentness 不能直接跑原生 status/query，也不能只哈希主 DB。须用明确绑定源码、安装身份和 DB/WAL 状态的已验证证据，且不能从旧 facts 重新造 fresh。当前代码仍有待修复的原生 artifact verify 路径，不能关闭 U8；探针没有操作用户项目或宿主 runtime。
+
+## U5/U6 剩余验收审计
+
+- U5 大部分 owner/reason 传播与 L0/L5 已有实现和聚焦回归；L2 failure 保留 L1 facts、L4 failure 不污染 L3 facts 的更直接组合断言仍需在最终验收中补齐或给出等价证据。
+- U6 默认 bare/check 延迟加载、显式 confirmed repo set、alias/nested/escape 拒绝和多数 lease/recovery 机制已有 source/test 覆盖。独立只读审计发现真实缺口：缺 repo 数上限、前台 build 共享总 deadline/取消传播，以及实际 SIGINT 后重入恢复证据。单命令 300 秒与 async wrapper timeout 不替代前台总预算；下一批复用现有 workspace owners 补齐，不建立通用流程引擎。
+- 提交交叠未变化：另一 owner 暂存了八个宿主治理路径和独立 CHANGELOG 行。本任务未操作其 index、未混合提交或 push；U5/U8 本地改动和真实探针均保留。整体 P123 与最终 structured closeout 保持未完成。
+
+
+## U6 有界执行切片与提交检查
+
+- workspace executor 在 lease/mutation 前检查 confirmed repo 数，默认上限 32；使用单调时钟维护默认 15 分钟共享预算，下游命令 timeout 取剩余预算与原单命令预算的较小值。取消/超时原因跨 runner 传播，后续 Provider、routing 和 hook 不再启动，失败状态与 lease 清理仍执行。
+- 三个先失败的回归覆盖超仓数零 mutation、首命令耗尽总预算后停止、CodeGraph init 后取消并恢复旧数据库且不启动下一仓。最终 workspace executor/build/provider-runners 三套 73 tests 通过。该取消测试使用 AbortController 与注入 runner，不等于真实 SIGINT、子进程树清理或同步 IO 的严格墙钟上限；这些仍属 U6/U9 未完成项。
+- 本次提交保留 U5 发布失败与 scope preflight、U8 安装身份、U6 预算切片及两个真实 CodeGraph 探针。P123 整体、CodeGraph 原生 artifact verify 的只读缺口与最终整体验收仍未完成。提交不改变计划完成状态，也不推送远程。
+- 本次语法检查 262 files 与 git diff --check 通过；测试运行于共享工作区，不能外推为隔离提交的全仓验证。并发宿主治理的八个暂存路径及 CHANGELOG 独立记录排除在本提交外。
+- 提交前追加定点验证：CodeGraph launcher、consumer-health、Provider、entrypoint 四套 185 tests 全部通过；连同 workspace 三套，共七套 258 tests 通过。未重跑全仓测试。

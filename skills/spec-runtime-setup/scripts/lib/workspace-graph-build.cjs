@@ -44,6 +44,7 @@ function buildWorkspaceGraphs({
   refreshMode = 'explicit',
   refreshHook = null,
   deferFinalState = false,
+  executionGuard = () => null,
 } = {}) {
   const graphifyOut = path.join(workspaceRoot, GRAPHIFY_OUT_DIRNAME);
   assertContainedPath(workspaceRoot, graphifyOut, { reasonCode: 'graphify-out-escapes-workspace' });
@@ -81,7 +82,7 @@ function buildWorkspaceGraphs({
     skipped: true,
     reason_code: refreshOnly ? 'workspace-refresh-only' : null,
   };
-  if (!refreshOnly && typeof runners.codegraphInstallGlobal === 'function') {
+  if (!executionGuard() && !refreshOnly && typeof runners.codegraphInstallGlobal === 'function') {
     globalInstall = safe(() => runners.codegraphInstallGlobal()) || { ok: false, reason_code: 'codegraph-install-threw' };
   }
 
@@ -101,6 +102,12 @@ function buildWorkspaceGraphs({
       reason_code: '',
     };
 
+    if (executionGuard()) {
+      repoResult.reason_code = executionGuard();
+      repoResults.push(repoResult);
+      continue;
+    }
+
     if (refreshOnly) {
       const preserved = preservedCodegraphState(previousRepos.get(repo.repo_id));
       const cg = syncExistingCodegraph(
@@ -118,10 +125,22 @@ function buildWorkspaceGraphs({
       repoResult.codegraph_status = cg.ok ? 'ready' : 'failed';
       if (!cg.ok) repoResult.reason_code = cg.reason_code || 'codegraph-init-failed';
 
+      if (executionGuard()) {
+        repoResult.reason_code = executionGuard();
+        repoResults.push(repoResult);
+        continue;
+      }
+
       // 2. Managed exclude (only meaningful once .codegraph/ can exist; still safe to add first).
       const excl = safe(() => excludeWriter(repo.git_root, workspaceRoot)) || { ok: false, reason_code: 'exclude-threw' };
       repoResult.exclude_status = excl.ok ? 'applied' : 'failed';
       if (!excl.ok && !repoResult.reason_code) repoResult.reason_code = excl.reason_code || 'exclude-failed';
+    }
+
+    if (executionGuard()) {
+      repoResult.reason_code = executionGuard();
+      repoResults.push(repoResult);
+      continue;
     }
 
     // 3. Graphify per-child subgraph, out-of-tree.
@@ -139,7 +158,7 @@ function buildWorkspaceGraphs({
       if (!repoResult.reason_code) repoResult.reason_code = 'graphify-subgraph-escapes-workspace';
     } else {
       const gf = runProvider(runners.graphifyExtract, repo.git_root, outDir);
-      if (gf.ok) {
+      if (gf.ok && !executionGuard()) {
         const subgraphPath = gf.graphPath || path.join(outDir, GRAPHIFY_OUT_DIRNAME, 'graph.json');
         try {
           assertContainedPath(workspaceRoot, subgraphPath, { reasonCode: 'graphify-subgraph-escapes-workspace' });
@@ -181,7 +200,9 @@ function buildWorkspaceGraphs({
   const stagedMergedPath = path.join(stagingRoot, MERGED_GRAPH_BASENAME);
   let merge;
   let mergePromotion = null;
-  if (subgraphs.length === 0) {
+  if (executionGuard()) {
+    merge = { status: 'failed', reason_code: executionGuard(), merged_graph_path: null };
+  } else if (subgraphs.length === 0) {
     merge = { status: 'not-applicable', reason_code: 'no-eligible-subgraphs', merged_graph_path: null };
   } else if (subgraphs.length === 1) {
     mergePromotion = promoteMerge(runners.graphifyMerge, subgraphs, stagedMergedPath, mergedPath, workspaceRoot);
@@ -210,6 +231,7 @@ function buildWorkspaceGraphs({
     globalInstall,
     refreshOnly,
   });
+  if (executionGuard()) { outcome.status = 'partial'; outcome.reason_code = executionGuard(); }
   const sourceSnapshotCheck = inspectSourceSnapshots(initialState, repos);
   if (outcome.status === 'complete' && !sourceSnapshotCheck.stable) {
     outcome.status = 'partial';

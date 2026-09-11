@@ -563,19 +563,23 @@ function isRequiredAction(item) {
   return item.baseline_blocking !== false || item.required === true;
 }
 
-function compareCurrentGraphifyIdentity(projection, context) {
-  const entries = projection.provider_readiness.filter((entry) => entry.provider === 'graphify');
+function compareCurrentProviderIdentity(projection, context, provider) {
+  const entries = projection.provider_readiness.filter((entry) => entry.provider === provider);
   if (!entries.length || projection.freshness.status !== 'fresh') return;
   let current;
   try {
     const registryPath = path.join(context.skillRoot || path.resolve(__dirname, '../../../skills/spec-runtime-setup'), 'setup-registry.json');
     const registry = readJsonFile(registryPath);
-    const dependency = registry.external_dependencies.find((entry) => entry.id === 'graphify');
-    current = require('../../../skills/spec-runtime-setup/scripts/providers/graphify.cjs').readCurrentIdentity({ ...context, dependency });
+    const dependency = registry.external_dependencies.find((entry) => entry.id === provider);
+    const owner = provider === 'codegraph'
+      ? require('../../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs')
+      : require('../../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    current = owner.readCurrentIdentity({ ...context, dependency });
   } catch (_error) {
     current = { status: 'unknown' };
   }
-  const keys = ['package', 'version', 'command', 'interpreter', 'installer', 'inventory_sha256'];
+  const keys = ['package', 'version', 'command', 'installer', 'inventory_sha256'];
+  if (provider === 'graphify') keys.push('interpreter');
   const mismatch = current.status === 'stale' || (current.status === 'confirmed' && entries.some((entry) => keys.some((key) => {
     const recordedValue = entry.provider_identity?.[key];
     const currentValue = current.identity?.[key];
@@ -640,7 +644,9 @@ function computeDecisionInputHealth({ projectRoot, platforms = [], factsPath, no
   if (projection.status === 'ready' && platforms.includes(projection.host)) {
     const current = captureSourceSnapshot({ repoRoot: projectRoot, skillRoot, homeDir, env, host: projection.host, now });
     projection.freshness = compareSourceSnapshot(projection.freshness, projection.raw.source_snapshot, current);
-    compareCurrentGraphifyIdentity(projection, { repoRoot: projectRoot, skillRoot, homeDir, env, host: projection.host });
+    for (const provider of ['graphify', 'codegraph']) {
+      compareCurrentProviderIdentity(projection, { repoRoot: projectRoot, skillRoot, homeDir, env, host: projection.host }, provider);
+    }
     compareCurrentGraphifyReceipt(projection, projectRoot, current);
   }
   if (projection.status === 'missing') {

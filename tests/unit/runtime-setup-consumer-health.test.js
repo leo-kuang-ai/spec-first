@@ -73,6 +73,29 @@ describe('producer 到 doctor 的磁盘快照闭环', () => {
   test('同一磁盘源的 producer 与 doctor 使用一致哈希', () => {
     expect(health(produce()).status).toBe('pass');
   });
+  test('doctor 核对 CodeGraph 当前身份，旧记录与探针失败不支持 fresh', () => {
+    const codegraph = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
+    const identity = { package: '@colbymchenry/codegraph', version: '1.6.0', command: '/managed/codegraph', installer: 'npm', inventory_sha256: 'a'.repeat(64) };
+    const probe = jest.spyOn(codegraph, 'readCurrentIdentity');
+    const factsPath = produce();
+    const facts = JSON.parse(fs.readFileSync(factsPath));
+    facts.provider_readiness = [{ provider: 'codegraph', readiness_scope: 'installation', readiness_status: 'fresh', provider_identity: identity }];
+    fs.writeFileSync(factsPath, JSON.stringify(facts));
+    try {
+      probe.mockReturnValue({ status: 'confirmed', identity });
+      expect(health(factsPath).status).toBe('pass');
+      for (const key of ['command', 'inventory_sha256', 'version']) {
+        probe.mockReturnValue({ status: 'confirmed', identity: { ...identity, [key]: 'changed' } });
+        expect(health(factsPath).normalized.freshness.status).toBe('stale');
+      }
+      probe.mockReturnValue({ status: 'unknown' });
+      expect(health(factsPath).normalized.provider_counts).toMatchObject({ fresh: 0, unknown: 1 });
+      probe.mockReturnValue({ status: 'confirmed', identity });
+      delete facts.provider_readiness[0].provider_identity;
+      fs.writeFileSync(factsPath, JSON.stringify(facts));
+      expect(health(factsPath).normalized.freshness.status).toBe('unknown');
+    } finally { probe.mockRestore(); }
+  });
   test('doctor 比较当前 Provider 身份，失败和旧 facts 不冒充 fresh', () => {
     const graphify = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const identity = { package: 'graphifyy', version: '0.9.57', command: '/managed/graphify', interpreter: '/managed/python', installer: 'uv', inventory_sha256: 'a'.repeat(64) };
