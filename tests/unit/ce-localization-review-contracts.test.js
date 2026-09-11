@@ -19,7 +19,8 @@ describe('CE localization deterministic review producer', () => {
     expect(inventory.skill_count).toBe(38);
     // 692 = 676 + spec-ideate/using-spec-first eval 资产与断言脚本进入 inventory 源集（2026-08-31 批次）
     // 1122 = 1029 + CE-129 提交同步补审批次（2026-09-10，peer-runner 扩展/优化脚本/模板与新增校验资产，+93 包路径）
-    expect(inventory.package_path_count).toBe(1122);
+    // Runtime Setup 新增 npm warmup、source snapshot、CodeGraph launcher 与 artifact evidence 四个 owner。
+    expect(inventory.package_path_count).toBe(1126);
     expect(inventory.files).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',
@@ -65,8 +66,8 @@ describe('CE localization deterministic review producer', () => {
     // 2026-09-08: 193 -> 194 / 407 -> 408 — the deterministic governance JSON
     // test fixture in this file grew an explicit dual-host relation row for the
     // canonical standalone iteration skill during its lane-refresh batch.
-    expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(208);
-    expect(coverage.coverage_summary.direct_support_relation_count).toBe(424);
+    expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(221);
+    expect(coverage.coverage_summary.direct_support_relation_count).toBe(437);
     expect(coverage.direct_support).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',
@@ -91,13 +92,17 @@ describe('CE localization deterministic review producer', () => {
     const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ce-localization-review-'));
     const inventoryPath = path.join(tempRoot, 'skill-inventory.json');
     const coveragePath = path.join(tempRoot, 'source-coverage.json');
+    const preflightPath = path.join(tempRoot, 'preflight.json');
+    const matrixPath = path.join(tempRoot, 'matrix.json');
     const stdout = jest.spyOn(process.stdout, 'write').mockImplementation(() => true);
     try {
       expect(producer.main([
         '--refresh', '--inventory', inventoryPath, '--coverage', coveragePath,
+        '--preflight', preflightPath, '--matrix', matrixPath,
       ])).toBe(0);
       expect(producer.main([
         '--inventory', inventoryPath, '--coverage', coveragePath,
+        '--preflight', preflightPath, '--matrix', matrixPath,
       ])).toBe(0);
       const inventory = JSON.parse(fs.readFileSync(inventoryPath, 'utf8'));
       expect(inventory.producer).toBe('scripts/check-ce-localization-review.cjs');
