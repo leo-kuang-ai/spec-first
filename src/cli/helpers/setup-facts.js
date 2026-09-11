@@ -97,6 +97,7 @@ function normalizeSetupFacts(facts, options = {}) {
     },
     artifact_refs: artifactRefs,
     generated_at: generatedAt,
+    source_snapshot: normalizeSourceSnapshot(facts.source_snapshot),
     freshness,
     profile: normalizeProfile(facts.profile),
     repo_root: typeof facts.repo_root === 'string' ? facts.repo_root : null,
@@ -261,6 +262,17 @@ function inferReasonCode({ sourceReasonCode, dependencyStatus, configuredStatus,
   }
   if (result === 'action-required') return 'required-runtime-action-required';
   return sourceReasonCode || 'unknown';
+}
+
+function normalizeSourceSnapshot(value) {
+  const source = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+  return {
+    registry_sha256: typeof source.registry_sha256 === 'string' ? source.registry_sha256 : null,
+    host: typeof source.host === 'string' ? source.host : null,
+    platform: typeof source.platform === 'string' ? source.platform : null,
+    captured_at: typeof source.captured_at === 'string' ? source.captured_at : null,
+    invalidation: normalizeStringList(source.invalidation),
+  };
 }
 
 function normalizeConfiguredScanStatus(value) {
