@@ -20,7 +20,7 @@ const CONFIRMED_SOURCES = new Set([
   'confirmed-local-state',
 ]);
 const { captureSourceSnapshot } = require('./source-snapshot.cjs');
-const CANONICAL_HOSTS = new Set(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder', 'zcode']);
+const CANONICAL_HOSTS = new Set(require('./host-authority.cjs').CANONICAL_HOSTS);
 
 function collectSetupFacts(options = {}) {
   const registry = options.registry || {};

@@ -1129,6 +1129,33 @@ describe('Graphify provider', () => {
     }
   });
 
+  test.each(['query-graph', 'hook-graph'])('Graphify %s 漂移不能绑定未验证的对象', (change) => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('query-evidence-drift');
+    try {
+      fs.rmSync(path.join(fixture.target, '.git'), { recursive: true, force: true });
+      fs.writeFileSync(path.join(fixture.target, 'main.js'), 'module.exports = 1;');
+      let queried = false;
+      const context = { ...fixture.context, targetKind: 'non-git-folder', runner: (command, args, options) => {
+        const result = fixture.context.runner(command, args, options);
+        if (command === fixture.launcher && args[0] === 'query') {
+          queried = true;
+          if (change !== 'query-identity') fs.writeFileSync(path.join(fixture.target, 'graphify-out', 'graph.json'), JSON.stringify({ nodes: [{ id: 'replaced' }], links: [] }));
+        }
+        if (queried && change === 'query-identity' && command === fixture.interpreter && args[0] === '-c') {
+          return success(JSON.stringify({ version: '0.9.12', packages: [['graphifyy', '0.9.12'], ['changed', '1']] }));
+        }
+        return result;
+      } };
+      const result = provider.apply(context, provider.plan(context));
+      expect(result.readiness_status).toBe('degraded');
+      expect(result.limitations.join(' ')).toMatch(/graphify-(artifact|identity)-changed-during-verification/);
+    } finally {
+      fs.rmSync(fixture.target, { recursive: true, force: true });
+      fs.rmSync(fixture.homeDir, { recursive: true, force: true });
+    }
+  });
+
   test('无 HEAD 的 Git 目录无法采集源码身份，成功构图也保持 unknown', () => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const fixture = createGraphifyApplyFixture('generation-source-unavailable');

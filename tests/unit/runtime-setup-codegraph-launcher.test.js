@@ -52,6 +52,22 @@ describe('CodeGraph Windows launcher 解析合同（不执行 Windows 二进制�
     runner.mockReturnValue({ exit_code: 0, stdout: 'codegraph 9.9.9' });
     expect(codegraph.readCurrentIdentity(context).status).toBe('stale');
   });
+  test('manifest 在 stat 后增长仍有界读取并拒绝身份', () => {
+    const filename = path.join(root, 'node_modules', '@colbymchenry', 'codegraph', 'package.json');
+    const before = fs.statSync(filename).size;
+    const original = fs.readSync;
+    let requested = 0;
+    const read = jest.spyOn(fs, 'readSync').mockImplementation((fd, buffer, offset, length, position) => {
+      if (requested === 0) fs.appendFileSync(filename, ' '.repeat(128 * 1024));
+      requested += length;
+      return original(fd, buffer, offset, length, position);
+    });
+    try {
+      expect(resolve(wrapper).ok).toBe(false);
+      expect(requested).toBeGreaterThan(0);
+      expect(requested).toBeLessThanOrEqual(before + 1);
+    } finally { read.mockRestore(); }
+  });
   test.each(['confirmed', 'failed', 'mismatch', 'missing'])('前序 query 成功后最终身份 %s 决定 producer freshness', (outcome) => {
     const codegraph = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
     fs.mkdirSync(path.join(root, '.codegraph'));

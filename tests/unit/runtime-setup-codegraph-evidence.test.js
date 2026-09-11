@@ -175,3 +175,16 @@ test('目录/sidecar symlink、采样期间变动和超字节预算不确认快�
   fs.symlinkSync(path.join(root, 'source.js'), path.join(root, '.codegraph', 'codegraph.db-wal'), 'file');
   expect(evidenceOwner.captureDatabaseSnapshot(root).status).toBe('unknown');
 });
+
+(process.platform === 'win32' ? test.skip : test)('只读 facts 是 FIFO 时不等待 writer', () => {
+  const { spawnSync } = require('node:child_process');
+  const filename = path.join(root, '.spec-first', 'config', 'tool-facts.json');
+  fs.mkdirSync(path.dirname(filename), { recursive: true });
+  expect(spawnSync('mkfifo', [filename]).status).toBe(0);
+  const owner = require.resolve('../../skills/spec-runtime-setup/scripts/providers/codegraph-artifact-evidence.cjs');
+  const script = 'const o=require(process.argv[1]);process.stdout.write(JSON.stringify(o.readRecordedEvidence({repoRoot:process.argv[2],host:"codex"})));';
+  const result = spawnSync(process.execPath, ['-e', script, owner, root], { encoding: 'utf8', timeout: 2000 });
+  expect(result.error).toBeUndefined();
+  expect(result.status).toBe(0);
+  expect(result.stdout).toBe('null');
+});

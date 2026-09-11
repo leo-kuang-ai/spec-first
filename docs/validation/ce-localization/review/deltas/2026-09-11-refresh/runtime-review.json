@@ -1,0 +1,864 @@
+{
+  "schema_version": "ce-runtime-fresh-source-review-checkpoint.v1",
+  "artifact_type": "advisory",
+  "review_status": "incomplete-checkpoint",
+  "generated_at": "2026-09-11T16:34:32.849830+00:00",
+  "scope_ref": "docs/validation/ce-localization/review/deltas/2026-09-11-refresh/runtime-scope.json",
+  "scope_head": "9b3f37177412ad51293f118fe613243ba85d7fd0",
+  "reviewer": {
+    "kind": "independent-fresh-source-subagent",
+    "task": "/root/ce_runtime_review",
+    "lens_names": [
+      "openai-skill-engineering",
+      "anthropic-skill-craft-safety"
+    ],
+    "lens_model_claim": "两个 lens 为同一独立 reviewer 的审查视角，不代表调用 OpenAI/Anthropic 两个外部模型。"
+  },
+  "source_baseline": [
+    "docs/10-prompt/结构化项目角色契约.md",
+    ".agents/skills/using-spec-first/SKILL.md"
+  ],
+  "summary": {
+    "scope_file_count": 44,
+    "full_file_count": 12,
+    "partial_file_count": 2,
+    "unreviewed_file_count": 30,
+    "all_files_reviewed": false,
+    "closeout_admissible": false,
+    "reason": "主 agent 因 429 恢复安排要求停止新增读取并保存真实覆盖 checkpoint。"
+  },
+  "files": [
+    {
+      "path": "tests/unit/mcp-setup-config-consumers.test.js",
+      "sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea",
+      "bytes": 13735,
+      "line_count": 282,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "skills/spec-runtime-setup/references/config-template.yaml",
+      "sha256": "0a084752eeaae10fe6e6a0d70ee2e79b21ed2e20a928359b72b7a6acc095869f",
+      "bytes": 3589,
+      "line_count": 84,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "0a084752eeaae10fe6e6a0d70ee2e79b21ed2e20a928359b72b7a6acc095869f",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "skills/spec-runtime-setup/references/supported-mcp-tools.md",
+      "sha256": "dad174f75eb08ca928ccab339d65f8e79ad5c52aaa2d507627e6de8250605f21",
+      "bytes": 15924,
+      "line_count": 124,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "dad174f75eb08ca928ccab339d65f8e79ad5c52aaa2d507627e6de8250605f21",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/args.cjs",
+      "sha256": "ede64b7665430fd2d6fa8fba7005df635a9eefc2cdd422a69a311eb34ba3fa0b",
+      "bytes": 6262,
+      "line_count": 189,
+      "coverage_status": "full",
+      "reviewed_current_sha256_matches": true,
+      "current_sha256": "ede64b7665430fd2d6fa8fba7005df635a9eefc2cdd422a69a311eb34ba3fa0b",
+      "covered_line_ranges": [
+        [
+          1,
+          189
+        ]
+      ],
+      "lens_notes": {
+        "openai-skill-engineering": "精确解析 workflow/only 与模式；未知参数和空选择保留 reason_code，不把自由文本交给 shell。",
+        "anthropic-skill-craft-safety": "参数解析只形成计划；help 清楚区分 verify facts 写入、安装接线与显式构图，未创造授权。"
+      },
+      "verdict": "static-reviewed-with-limitations"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/baseline-policy.cjs",
+      "sha256": "6d56cfbac4cd625dcaf54b9bee87fe8074aefb295201d4798dbebc7513100917",
+      "bytes": 1949,
+      "line_count": 57,
+      "coverage_status": "full",
+      "reviewed_current_sha256_matches": true,
+      "current_sha256": "6d56cfbac4cd625dcaf54b9bee87fe8074aefb295201d4798dbebc7513100917",
+      "covered_line_ranges": [
+        [
+          1,
+          57
+        ]
+      ],
+      "lens_notes": {
+        "openai-skill-engineering": "readiness policy 用 exact selectedIds/required_for 判断确定性需求，并保留 demand_source/matched_rule；不做任务语义推断。",
+        "anthropic-skill-craft-safety": "advisory 缺失不阻断未依赖的工作；显式选择升级本 scope 的 blocking，legacy 兼容带 migration_warning。"
+      },
+      "verdict": "static-reviewed-with-limitations"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/facts.cjs",
+      "sha256": "a40a073a8b2e81ac321533b7c77d185bcbee3e23ed5634058c5601a8f9e3693d",
+      "bytes": 29628,
+      "line_count": 766,
+      "coverage_status": "partial",
+      "reviewed_current_sha256_matches": true,
+      "current_sha256": "a40a073a8b2e81ac321533b7c77d185bcbee3e23ed5634058c5601a8f9e3693d",
+      "covered_line_ranges": [
+        [
+          1,
+          520
+        ]
+      ],
+      "lens_notes": {
+        "openai-skill-engineering": "已读范围中 normalizeItem/normalizeProviderResult 将未确认 ready/fresh 降级，区分安装、配置、项目和 provider 状态；剩余写入/快照逻辑尚未完成全文复核。",
+        "anthropic-skill-craft-safety": "已读 host ledger 入口存在 pi 枚举缺口（见 RUNTIME-001）；写 ledger 的 backupCaptured 避免未备份即回滚误删，但后半文件未审查。"
+      },
+      "verdict": "incomplete"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/host-authority.cjs",
+      "sha256": "104ddcf0a14d47a2d89aa0d258b70babd8a23beb943b14bdd4fb2926670bfd83",
+      "bytes": 7802,
+      "line_count": 220,
+      "coverage_status": "full",
+      "reviewed_current_sha256_matches": true,
+      "current_sha256": "104ddcf0a14d47a2d89aa0d258b70babd8a23beb943b14bdd4fb2926670bfd83",
+      "covered_line_ranges": [
+        [
+          1,
+          220
+        ]
+      ],
+      "lens_notes": {
+        "openai-skill-engineering": "loaded realpath 与 canonical surfaces 绑定，shared root 显式返回多个 host；receipt 含目标、时间与 hash。",
+        "anthropic-skill-craft-safety": "目录发现只做 advisory；mutation 需 pin 与 loaded-root 绑定。receipt 证明调用来源约束，不应被消费者当作用户 consent。"
+      },
+      "verdict": "static-reviewed-with-limitations"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
+      "sha256": "f24240fbcc0e2f09ad5590346b1822b9b3ee9512a5d6d27f3d177b1415269801",
+      "bytes": 53901,
+      "line_count": 1483,
+      "coverage_status": "partial",
+      "reviewed_current_sha256_matches": true,
+      "current_sha256": "f24240fbcc0e2f09ad5590346b1822b9b3ee9512a5d6d27f3d177b1415269801",
+      "covered_line_ranges": [
+        [
+          361,
+          760
+        ]
+      ],
+      "lens_notes": {
+        "openai-skill-engineering": "已读范围覆盖 target 返回、JSON/TOML 比较、精确 drift 和 precedence inspection；authority、锁与 mutation/rollback 前后文仍待读。",
+        "anthropic-skill-craft-safety": "已读部分拒绝明文 secret 字段、未知 JSON 结构以及高优先级冲突/不可读配置；不足以认定完整写入或回滚边界通过。"
+      },
+      "verdict": "incomplete"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/installation-executor.cjs",
+      "sha256": "a7da03d10e4fd17fd04c6c2c3c04c9f6db4fb741703c88b2953f852662c73998",
+      "bytes": 23265,
+      "line_count": 575,
+      "coverage_status": "full",
+      "reviewed_current_sha256_matches": true,
+      "current_sha256": "a7da03d10e4fd17fd04c6c2c3c04c9f6db4fb741703c88b2953f852662c73998",
+      "covered_line_ranges": [
+        [
+          1,
+          575
+        ]
+      ],
+      "lens_notes": {
+        "openai-skill-engineering": "安装 owner 对 registry tools、helpers 与 provider 分离；warmup cache v2 绑定 command hash、依赖身份、host/platform 和成功时间；已验归档身份才能命中受保护缓存。",
+        "anthropic-skill-craft-safety": "显式 provider 选择与 baseline blocking 控制安装，镜像保留 attempts/provenance；browser 依赖存在不等于 exact-origin execution ready，cache 写失败只作 advisory。"
+      },
+      "verdict": "static-reviewed-with-limitations"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
+      "sha256": "c8224ff5094de5bb1a8a8730888bbba48234ad5b108916e6824c0473b49b46a8",
+      "bytes": 6374,
+      "line_count": 182,
+      "coverage_status": "full",
+      "reviewed_current_sha256_matches": true,
+      "current_sha256": "c8224ff5094de5bb1a8a8730888bbba48234ad5b108916e6824c0473b49b46a8",
+      "covered_line_ranges": [
+        [
+          1,
+          182
+        ]
+      ],
+      "lens_notes": {
+        "openai-skill-engineering": "action map 把 read-only、facts write、host repair 和 provider mutation 分离；冲突先返回 blocked plan。",
+        "anthropic-skill-craft-safety": "workspace target 与 mode 冲突在副作用前拒绝，默认 plan/verify 仅 installation；capabilities 是动作事实而不是用户授权。"
+      },
+      "verdict": "static-reviewed-with-limitations"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/npm-warmup.cjs",
+      "sha256": "36802e5627572af9f2263c490489880e470d3b4729a7fa08b618450faf31f069",
+      "bytes": 6400,
+      "line_count": 117,
+      "coverage_status": "full",
+      "reviewed_current_sha256_matches": true,
+      "current_sha256": "36802e5627572af9f2263c490489880e470d3b4729a7fa08b618450faf31f069",
+      "covered_line_ranges": [
+        [
+          1,
+          117
+        ]
+      ],
+      "lens_notes": {
+        "openai-skill-engineering": "固定 package/version/source/integrity 后 pack 并校验 archive metadata，执行 file: 已验顶层归档；scope 不夸大到传递依赖。",
+        "anthropic-skill-craft-safety": "无 scripts 的 fetch、路径包含性、单链 regular file、nlink 与大小检查后才执行；失败清理临时归档并报告 limitations。"
+      },
+      "verdict": "static-reviewed-with-limitations"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/process-runner.cjs",
+      "sha256": "e63b3e9a15433e42c57530c6eb0eaecc8f0b02f9b811b418538719fd7aa214e8",
+      "bytes": 17704,
+      "line_count": 478,
+      "coverage_status": "full",
+      "reviewed_current_sha256_matches": true,
+      "current_sha256": "e63b3e9a15433e42c57530c6eb0eaecc8f0b02f9b811b418538719fd7aa214e8",
+      "covered_line_ranges": [
+        [
+          1,
+          478
+        ]
+      ],
+      "lens_notes": {
+        "openai-skill-engineering": "统一 spawn argv、bounded output、exit/signal/timeout/error 与 attempts facts；commandSucceeded 拒绝 signal 的伪零退出。",
+        "anthropic-skill-craft-safety": "shell:false、敏感参数和环境脱敏、POSIX group 终止与 Windows taskkill 边界明确；静态审查不能证明真实信号或 Windows 行为。"
+      },
+      "verdict": "static-reviewed-with-limitations"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/provider-display.cjs",
+      "sha256": "29a28e9e8801f20d004f1ddd81252c80e4a30bc269761b5b25cb5dd76144d9c7",
+      "bytes": 1213,
+      "line_count": 32,
+      "coverage_status": "full",
+      "reviewed_current_sha256_matches": true,
+      "current_sha256": "29a28e9e8801f20d004f1ddd81252c80e4a30bc269761b5b25cb5dd76144d9c7",
+      "covered_line_ranges": [
+        [
+          1,
+          32
+        ]
+      ],
+      "lens_notes": {
+        "openai-skill-engineering": "显示 installation/index readiness、query probe、currentness 三种维度，避免 artifact 存在推出当前 fresh。",
+        "anthropic-skill-craft-safety": "unknown 和 query-unverified 明示 claim 上限；纯投影函数无 mutation 或语义裁决。"
+      },
+      "verdict": "static-reviewed-with-limitations"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/registry.cjs",
+      "sha256": "f7bc6cc0249831c329c756025d58bf48a62e8ba2444e069491c8bc9c2a4e6189",
+      "bytes": 25608,
+      "line_count": 703,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "f7bc6cc0249831c329c756025d58bf48a62e8ba2444e069491c8bc9c2a4e6189",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/renderer.cjs",
+      "sha256": "eb2d78c7b58ee08db9f47ee118aae91d82aeb96f849aa3e760c583693fdcc91b",
+      "bytes": 14447,
+      "line_count": 327,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "eb2d78c7b58ee08db9f47ee118aae91d82aeb96f849aa3e760c583693fdcc91b",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
+      "sha256": "d47d5dd56992ee721ed83274d5de35e0fde24b302be698b197b46274a3a9a130",
+      "bytes": 37699,
+      "line_count": 956,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "d47d5dd56992ee721ed83274d5de35e0fde24b302be698b197b46274a3a9a130",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/source-snapshot.cjs",
+      "sha256": "bcb2995930b587be59d3c8440e07feed25866333da390d28176cb7ae59f48d3f",
+      "bytes": 9882,
+      "line_count": 205,
+      "coverage_status": "full",
+      "reviewed_current_sha256_matches": true,
+      "current_sha256": "bcb2995930b587be59d3c8440e07feed25866333da390d28176cb7ae59f48d3f",
+      "covered_line_ranges": [
+        [
+          1,
+          205
+        ]
+      ],
+      "lens_notes": {
+        "openai-skill-engineering": "registry、host config、source kind/head/content 构成带 invalidation 的事实；生成 cache/facts 被排除，local config 仍参与。",
+        "anthropic-skill-craft-safety": "Git 定位变量清理；源文件大小/数量/时间预算、链接拒绝与前后 signature 检查失败时降级，不把 hash 缺失当 freshness。"
+      },
+      "verdict": "static-reviewed-with-limitations"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-exec.cjs",
+      "sha256": "3655fb48bffaf29da6c62eca1f59c02cf3b43a723271744de44dfa857e5a8717",
+      "bytes": 1097,
+      "line_count": 29,
+      "coverage_status": "full",
+      "reviewed_current_sha256_matches": true,
+      "current_sha256": "3655fb48bffaf29da6c62eca1f59c02cf3b43a723271744de44dfa857e5a8717",
+      "covered_line_ranges": [
+        [
+          1,
+          29
+        ]
+      ],
+      "lens_notes": {
+        "openai-skill-engineering": "薄 argv executor 保留 status/signal/error/timed_out，并复用 codegraph launcher；可注入单测。",
+        "anthropic-skill-craft-safety": "默认 spawnSync timeout 只约束直接进程且返回 stderr 未经统一脱敏；需结合上层 consumer 判断是否形成新安全 gap。"
+      },
+      "verdict": "static-reviewed-with-limitations"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-build.cjs",
+      "sha256": "3f4ea2b448432f750b9a5a76e2a0095a155a57427899adb2ccfe06a8a5c07b97",
+      "bytes": 23445,
+      "line_count": 615,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "3f4ea2b448432f750b9a5a76e2a0095a155a57427899adb2ccfe06a8a5c07b97",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-executor.cjs",
+      "sha256": "bd37b82bb0a8e6d9994cbe2c3c520db50b94c78633bad7714c633af0af989874",
+      "bytes": 16237,
+      "line_count": 472,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "bd37b82bb0a8e6d9994cbe2c3c520db50b94c78633bad7714c633af0af989874",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs",
+      "sha256": "3dd739e9d4d19ef2ffefc22cffba9db66b506849b910540152441fb890507f4c",
+      "bytes": 3381,
+      "line_count": 84,
+      "coverage_status": "full",
+      "reviewed_current_sha256_matches": true,
+      "current_sha256": "3dd739e9d4d19ef2ffefc22cffba9db66b506849b910540152441fb890507f4c",
+      "covered_line_ranges": [
+        [
+          1,
+          84
+        ]
+      ],
+      "lens_notes": {
+        "openai-skill-engineering": "provider-native argv 与返回映射构成薄适配，Graphify extract/merge 明确 native graph 路径。",
+        "anthropic-skill-craft-safety": "清理 GRAPHIFY_OUT，signal/error/timeout 不能被 status 0 覆盖；安装/init/sync 边界依赖调用者授权。"
+      },
+      "verdict": "static-reviewed-with-limitations"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-routing-inject.cjs",
+      "sha256": "6e0d2d9011777ee20e90f2f56356c8b4a0bb01ce21dafa10c0544544db7bb223",
+      "bytes": 5226,
+      "line_count": 163,
+      "coverage_status": "full",
+      "reviewed_current_sha256_matches": true,
+      "current_sha256": "6e0d2d9011777ee20e90f2f56356c8b4a0bb01ce21dafa10c0544544db7bb223",
+      "covered_line_ranges": [
+        [
+          1,
+          163
+        ]
+      ],
+      "lens_notes": {
+        "openai-skill-engineering": "canonical hosts 映射到 owning entry 文件，共享 AGENTS 合并 hosts；只 upsert/strip managed block。",
+        "anthropic-skill-craft-safety": "包含性检查拒绝越界，异常逐 entry 降级，clean 保留用户文件；writeFile 并发/中断原子性非本函数保证。"
+      },
+      "verdict": "static-reviewed-with-limitations"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/setup.cjs",
+      "sha256": "036b483f6a077a3f89e297953184c7459a6dfeddfda6cd0cd4834637e2793d18",
+      "bytes": 33618,
+      "line_count": 886,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "036b483f6a077a3f89e297953184c7459a6dfeddfda6cd0cd4834637e2793d18",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "skills/spec-runtime-setup/setup-registry.json",
+      "sha256": "9e54f85b4dcc985471b77b6036f1b9fde5405c30eb8b23e3a3ea02e68d5ad75d",
+      "bytes": 65244,
+      "line_count": 2243,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "9e54f85b4dcc985471b77b6036f1b9fde5405c30eb8b23e3a3ea02e68d5ad75d",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "skills/spec-runtime-setup/setup-registry.schema.json",
+      "sha256": "52d7201af9dc6b17ec5b43cf8ff5f008f2b55b9870a25d3b15d1a76ee3f7d315",
+      "bytes": 18379,
+      "line_count": 813,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "52d7201af9dc6b17ec5b43cf8ff5f008f2b55b9870a25d3b15d1a76ee3f7d315",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "skills/spec-runtime-setup/SKILL.md",
+      "sha256": "9e23a3ccedb99b5c052a42e0b21a9881a7c4f00f1431a7f40a7aaac15c7adb6e",
+      "bytes": 54924,
+      "line_count": 368,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "9e23a3ccedb99b5c052a42e0b21a9881a7c4f00f1431a7f40a7aaac15c7adb6e",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "tests/integration/runtime-setup-npm-archive.integration.test.js",
+      "sha256": "edb9160ac97e683ce7c4943ecf156166cdaef70439f001a482b82ebdcabe10aa",
+      "bytes": 7709,
+      "line_count": 104,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "edb9160ac97e683ce7c4943ecf156166cdaef70439f001a482b82ebdcabe10aa",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "tests/unit/host-enumeration-drift-guard.test.js",
+      "sha256": "fa4395e4dc9d94c7b253b802783891b720d2dc944217077507e0594760c6ec09",
+      "bytes": 3030,
+      "line_count": 59,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "fa4395e4dc9d94c7b253b802783891b720d2dc944217077507e0594760c6ec09",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "tests/unit/mcp-setup-contracts.test.js",
+      "sha256": "9132607737cf3dc6ce226067ba5ff0fb60212eb1abc4403afaca91c0acec8bcb",
+      "bytes": 8063,
+      "line_count": 141,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "9132607737cf3dc6ce226067ba5ff0fb60212eb1abc4403afaca91c0acec8bcb",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "tests/unit/mcp-setup-entrypoint.test.js",
+      "sha256": "548755b8a84c7bbb10c71ae86df3bbb51d614107a733b8e6c416c28ac812ae9b",
+      "bytes": 137459,
+      "line_count": 3189,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "548755b8a84c7bbb10c71ae86df3bbb51d614107a733b8e6c416c28ac812ae9b",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "tests/unit/mcp-setup-mode-target.test.js",
+      "sha256": "d82b33fd136650691888c7c87aa4d7c1cd2bd1e5de9473b8f0b08f6a88b83c88",
+      "bytes": 24038,
+      "line_count": 631,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "d82b33fd136650691888c7c87aa4d7c1cd2bd1e5de9473b8f0b08f6a88b83c88",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "tests/unit/mcp-setup-node-contracts.test.js",
+      "sha256": "a86963f16e70c6ddd6eaeaa119e5a339592a93ec75ee022eaf9dc108fcc4942f",
+      "bytes": 33703,
+      "line_count": 720,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "a86963f16e70c6ddd6eaeaa119e5a339592a93ec75ee022eaf9dc108fcc4942f",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "tests/unit/mcp-setup-preflight.test.js",
+      "sha256": "b3b1950bf09c0341dcd325ca61b815f772fbd81a18efa6746f0453bf8bd2d2a0",
+      "bytes": 7572,
+      "line_count": 202,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "b3b1950bf09c0341dcd325ca61b815f772fbd81a18efa6746f0453bf8bd2d2a0",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "tests/unit/mcp-setup-project-config.test.js",
+      "sha256": "951eeb2774b82ec1828e16fcbb09d3c5bbaf0e5178e8d0d86f6367a8e214cb5e",
+      "bytes": 21371,
+      "line_count": 482,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "951eeb2774b82ec1828e16fcbb09d3c5bbaf0e5178e8d0d86f6367a8e214cb5e",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "tests/unit/mcp-setup-registry.test.js",
+      "sha256": "32e6c1fab865794c2cd73047aa153316978daef5df670933d9c5196301b920d5",
+      "bytes": 19406,
+      "line_count": 474,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "32e6c1fab865794c2cd73047aa153316978daef5df670933d9c5196301b920d5",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "tests/unit/mcp-setup-workspace-graph-executor.test.js",
+      "sha256": "f1899bc5ca0369b331e3db468be693dfbb17afccb042bdee5b723c90a7a79df3",
+      "bytes": 48046,
+      "line_count": 1234,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "f1899bc5ca0369b331e3db468be693dfbb17afccb042bdee5b723c90a7a79df3",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "tests/unit/mcp-setup-workspace-provider-runners.test.js",
+      "sha256": "836388b733c5769d9e33a17cb942fc70e4ed79cf4014d8dc08fd67bd1edef830",
+      "bytes": 6584,
+      "line_count": 140,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "836388b733c5769d9e33a17cb942fc70e4ed79cf4014d8dc08fd67bd1edef830",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "tests/unit/runtime-setup-demand-policy.test.js",
+      "sha256": "e552f865ccca4f977018893e92e7cb239a3164dc06455f51fee2c639079b1f07",
+      "bytes": 2013,
+      "line_count": 29,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "e552f865ccca4f977018893e92e7cb239a3164dc06455f51fee2c639079b1f07",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "tests/unit/runtime-setup-npm-integrity.test.js",
+      "sha256": "0b8c84c3d5248bfdcd29a10cde7aae14b9a3a352c6883152839a6cee6c65ea89",
+      "bytes": 6253,
+      "line_count": 103,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "0b8c84c3d5248bfdcd29a10cde7aae14b9a3a352c6883152839a6cee6c65ea89",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "tests/unit/runtime-setup-registry-metadata.test.js",
+      "sha256": "8aad259d700f6a19e768307539376f2f18ec1fdaa70446f7f67a840a49592b11",
+      "bytes": 930,
+      "line_count": 17,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "8aad259d700f6a19e768307539376f2f18ec1fdaa70446f7f67a840a49592b11",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "tests/unit/runtime-setup-warmup-identity.test.js",
+      "sha256": "ff7bd68a8554e4e517f56c7520c841303fe4f4538a3a8c872dca23aa2fbbf5b2",
+      "bytes": 5402,
+      "line_count": 104,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "ff7bd68a8554e4e517f56c7520c841303fe4f4538a3a8c872dca23aa2fbbf5b2",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "tests/unit/runtime-setup-workspace-loading.test.js",
+      "sha256": "e938e82600e08dfbb9581a1d84e986df04d99a19406f5aa83aa4034386ea7a0a",
+      "bytes": 1385,
+      "line_count": 25,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "e938e82600e08dfbb9581a1d84e986df04d99a19406f5aa83aa4034386ea7a0a",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "tests/unit/host-runtime-projection-contracts.test.js",
+      "sha256": "1b47846a95968f039ce6c8067aa6237ef2091bf5eaa5b0065cfa8dc3ed30999b",
+      "bytes": 11817,
+      "line_count": 311,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "1b47846a95968f039ce6c8067aa6237ef2091bf5eaa5b0065cfa8dc3ed30999b",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    },
+    {
+      "path": "tests/unit/platform-registry-patterns.test.js",
+      "sha256": "4a5089b3b7a91747b8f669d39aafc33c0735762792498e07674a1061fe6e3dbb",
+      "bytes": 18685,
+      "line_count": 475,
+      "coverage_status": "unreviewed",
+      "reviewed_current_sha256_matches": null,
+      "current_sha256": "4a5089b3b7a91747b8f669d39aafc33c0735762792498e07674a1061fe6e3dbb",
+      "covered_line_ranges": [],
+      "lens_notes": {
+        "openai-skill-engineering": "未审查。",
+        "anthropic-skill-craft-safety": "未审查。"
+      },
+      "verdict": "not-reviewed"
+    }
+  ],
+  "findings": [
+    {
+      "id": "RUNTIME-001",
+      "severity": "P1",
+      "status": "owner-confirmation-required",
+      "path": "skills/spec-runtime-setup/scripts/lib/facts.cjs",
+      "line": 23,
+      "related_lines": [
+        281,
+        385
+      ],
+      "title": "Pi host 未进入 facts 的 canonical host 集合",
+      "evidence": "已全文读取的 host-authority.cjs 接受 pi；facts.cjs 的 CANONICAL_HOSTS 仅包含 claude/codex/cursor/kiro/opencode/qoder/zcode，prepareHostReadinessLedger 在集合不含 host 时抛出 host-readiness-ledger-host-unsupported。registry 的 pi 条目已由定点检索确认，未全文审查 registry。",
+      "impact": "调用 Pi 的 ledger 准备入口会被静态 guard 拒绝；整体 setup 调用链尚待 owner 复核，不能据此声称已真实复现 Pi runtime。",
+      "suggestion": "复用 host-authority 的 canonical host source，补所有已支持 host 的 ledger 范围回归。",
+      "validation": "static-source-only；错误尝试调用未导出的 resolveHostReadinessLedgerPath 得到 is not a function，不能作为本 finding 的运行复现。",
+      "reported_to_parent": true
+    }
+  ],
+  "observations": [
+    {
+      "id": "RUNTIME-OBS-001",
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-exec.cjs",
+      "note": "defaultWorkspaceExec 使用直接 spawnSync timeout 且原样返回 stderr；与 process-runner 的 process-group termination 和脱敏边界不同。上层消费链未读完，暂不作为已确认漏洞。"
+    }
+  ],
+  "verification": [
+    {
+      "command": "npx jest --runInBand tests/unit/runtime-setup-demand-policy.test.js tests/unit/runtime-setup-npm-integrity.test.js tests/unit/mcp-setup-preflight.test.js tests/unit/mcp-setup-node-contracts.test.js tests/unit/host-runtime-projection-contracts.test.js",
+      "status": "passed",
+      "suites_passed": 5,
+      "tests_passed": 61,
+      "claim_scope": "本机 focused test 输出；不是上述 test 文件已被全文审查的证据，也不证明外部 provider、真实信号或 Windows runtime。"
+    }
+  ],
+  "limitations": [
+    "仅 12 个文件完整阅读；2 个文件部分阅读；30 个文件未审查，不能用于 44 文件全文 closeout。",
+    "facts.cjs/host-config.cjs 的早期组合输出曾被 functions 汇总截断；只记录可以确认实际展示过的连续范围，缺口必须补读。",
+    "未安装工具、修改用户 runtime、网络调用或执行 Git mutation；未修改生产源码或测试。",
+    "未验证真实 Provider、真实宿主、Windows 行为、进程信号处理或 field outcome。",
+    "未审查 scope 外依赖的完整调用链；测试通过不能补足语义阅读覆盖。",
+    "lens notes 是独立子 agent 静态判断，不能当作外部模型评价或真实运行 outcome。",
+    "已知 CE 证据链过期由主 agent 刷新，不作为本报告新 finding。"
+  ],
+  "resume": {
+    "next_action": "继续补读 partial 文件未覆盖行，再全文读取 unreviewed 文件；每次读取控制输出上限以避免截断。",
+    "unreviewed_paths": [
+      "tests/unit/mcp-setup-config-consumers.test.js",
+      "skills/spec-runtime-setup/references/config-template.yaml",
+      "skills/spec-runtime-setup/references/supported-mcp-tools.md",
+      "skills/spec-runtime-setup/scripts/lib/registry.cjs",
+      "skills/spec-runtime-setup/scripts/lib/renderer.cjs",
+      "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
+      "skills/spec-runtime-setup/scripts/lib/workspace-graph-build.cjs",
+      "skills/spec-runtime-setup/scripts/lib/workspace-graph-executor.cjs",
+      "skills/spec-runtime-setup/scripts/setup.cjs",
+      "skills/spec-runtime-setup/setup-registry.json",
+      "skills/spec-runtime-setup/setup-registry.schema.json",
+      "skills/spec-runtime-setup/SKILL.md",
+      "tests/integration/runtime-setup-npm-archive.integration.test.js",
+      "tests/unit/host-enumeration-drift-guard.test.js",
+      "tests/unit/mcp-setup-contracts.test.js",
+      "tests/unit/mcp-setup-entrypoint.test.js",
+      "tests/unit/mcp-setup-mode-target.test.js",
+      "tests/unit/mcp-setup-node-contracts.test.js",
+      "tests/unit/mcp-setup-preflight.test.js",
+      "tests/unit/mcp-setup-project-config.test.js",
+      "tests/unit/mcp-setup-registry.test.js",
+      "tests/unit/mcp-setup-workspace-graph-executor.test.js",
+      "tests/unit/mcp-setup-workspace-provider-runners.test.js",
+      "tests/unit/runtime-setup-demand-policy.test.js",
+      "tests/unit/runtime-setup-npm-integrity.test.js",
+      "tests/unit/runtime-setup-registry-metadata.test.js",
+      "tests/unit/runtime-setup-warmup-identity.test.js",
+      "tests/unit/runtime-setup-workspace-loading.test.js",
+      "tests/unit/host-runtime-projection-contracts.test.js",
+      "tests/unit/platform-registry-patterns.test.js"
+    ],
+    "partial_paths": [
+      {
+        "path": "skills/spec-runtime-setup/scripts/lib/facts.cjs",
+        "covered_line_ranges": [
+          [
+            1,
+            520
+          ]
+        ],
+        "line_count": 766
+      },
+      {
+        "path": "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
+        "covered_line_ranges": [
+          [
+            361,
+            760
+          ]
+        ],
+        "line_count": 1483
+      }
+    ],
+    "invalidation": "已审文件 sha256 变化时，对变更后的文件重新阅读并更新 notes；元数据读取/哈希计算不算语义 review。"
+  }
+}

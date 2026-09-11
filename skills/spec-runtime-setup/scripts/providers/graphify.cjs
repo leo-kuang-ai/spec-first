@@ -533,7 +533,14 @@ function apply(context = {}, actionPlan = plan(context)) {
     if (!graphIntegrity.ok) mutationFailure = graphIntegrity.reason_code;
   }
   if (!mutationFailure && artifactRefs.length > 0) {
+    let graphBeforeQuery = null;
+    try { graphBeforeQuery = graphArtifactSha256(repoRoot, actionPlan.artifact_root || path.join(repoRoot, CURRENT_ARTIFACT_ROOT)); } catch (_error) { graphBeforeQuery = null; }
     queryVerified = succeeded(runGraphify(runtimeContext, ['query', 'main'], { cwd: repoRoot, timeoutMs: 30000 }));
+    if (queryVerified && graphBeforeQuery) {
+      try {
+        if (graphBeforeQuery !== graphArtifactSha256(repoRoot, actionPlan.artifact_root || path.join(repoRoot, CURRENT_ARTIFACT_ROOT))) mutationFailure = 'graphify-artifact-changed-during-verification';
+      } catch (_error) { mutationFailure = 'graphify-artifact-changed-during-verification'; }
+    }
   }
   const hasArtifact = artifactRefs.length > 0;
   const generationAction = (actionPlan.actions || []).find(

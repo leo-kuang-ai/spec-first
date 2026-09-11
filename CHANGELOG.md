@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-12 12:30:00 codex: fix(runtime-setup): 收紧 CodeGraph manifest/FIFO 读取并绑定 Graphify query 前后图摘要；补齐 Pi host readiness ledger。(user-visible)
 - v1.15.3 2026-09-12 12:00:00 codex: fix(runtime-setup): 收紧 CodeGraph artifact evidence 的嵌套字段与有界读取，并刷新 CE source-bound 快照输入。(user-visible)
 - v1.15.3 2026-09-11 12:10:00 codex: refresh: 重生成 CE localization deterministic inventory、coverage 与 setup artifacts，绑定当前 1126 路径源快照；历史语义 adjudication 仍需独立复核。(user-visible)
 - v1.15.3 2026-09-11 12:00:00 codex: 提交当前工作区全部变更，收口宿主枚举、CE localization 工件、peer-runner 与 runtime-setup 合同更新。(user-visible)

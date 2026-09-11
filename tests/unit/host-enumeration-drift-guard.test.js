@@ -11,6 +11,7 @@ const {
   HOST_SKILL_SURFACES,
 } = require('../../skills/spec-runtime-setup/scripts/lib/host-authority.cjs');
 const { HOST_ENTRY_FILE } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-routing-inject.cjs');
+const { prepareHostReadinessLedger } = require('../../skills/spec-runtime-setup/scripts/lib/facts.cjs');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 
@@ -55,5 +56,9 @@ describe('host enumeration drift guard', () => {
 
     const receiptSchema = readJson('docs/contracts/verification/host-invocation-receipt.schema.json');
     expect(sorted(receiptSchema.properties.host.enum)).toEqual(expected);
+    for (const host of expected) {
+      const prepared = prepareHostReadinessLedger({ repoRoot, homeDir: repoRoot, host, previousRuntimeCapabilities: {} });
+      expect(prepared.hostLedger.host).toBe(host);
+    }
   });
 });

@@ -5,6 +5,7 @@ const path = require('node:path');
 const { createHash } = require('node:crypto');
 const { createRequire } = require('node:module');
 const { assertContainedPath } = require('../lib/path-safety.cjs');
+const { readStableRegularFile } = require('../lib/regular-file-snapshot.cjs');
 
 const PACKAGE = '@colbymchenry/codegraph';
 
@@ -75,8 +76,23 @@ function safeFile(root, relative) {
 
 function readManifest(root) {
   const filename = safeFile(root, 'package.json');
-  if (fs.statSync(filename).size > 64 * 1024) throw new Error('codegraph-package-manifest-invalid');
-  return JSON.parse(fs.readFileSync(filename, 'utf8'));
+  const result = readStableRegularFile(filename, {
+    rootPath: root,
+    read: (fd, stat) => {
+      if (stat.size > 64 * 1024) throw new Error('codegraph-package-manifest-invalid');
+      const bytes = Buffer.alloc(stat.size + 1);
+      let offset = 0;
+      while (offset < bytes.length) {
+        const count = fs.readSync(fd, bytes, offset, bytes.length - offset, offset);
+        if (!count) break;
+        offset += count;
+      }
+      if (offset !== stat.size) throw new Error('codegraph-package-manifest-unstable');
+      return JSON.parse(bytes.subarray(0, offset).toString('utf8'));
+    },
+  });
+  if (!result.ok) throw new Error('codegraph-package-manifest-unstable');
+  return result.value;
 }
 
 function resolveExecutable(command, env, cwd, windows) {

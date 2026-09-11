@@ -16,7 +16,7 @@ function readStableRegularFile(filePath, {
   }
   let descriptor = null;
   try {
-    const flags = fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0);
+    const flags = fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0) | (fs.constants.O_NONBLOCK || 0);
     descriptor = fs.openSync(filePath, flags);
   } catch (error) {
     return failedOpen(error);
