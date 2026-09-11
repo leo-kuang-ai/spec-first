@@ -4,55 +4,12 @@
   "producer": "scripts/check-ce-localization-review.cjs",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "cfb59c968ffdea8d56c75066d607293b266402d5",
-    "dirty": true,
-    "dirty_paths": [
-      "CHANGELOG.md",
-      "docs/catalog/runtime-capabilities.md",
-      "docs/contracts/provider-readiness.schema.json",
-      "docs/solutions/architecture-patterns/peer-job-runner-windows-split-blueprint-2026-09-11.md",
-      "docs/solutions/architecture-patterns/upstream-ce-sync-upgrade-methodology-2026-04-26.md",
-      "docs/validation/runtime-setup-p123-progress.md",
-      "scripts/check-ce-upstream-reconciliation.cjs",
-      "scripts/generate-runtime-capability-catalog.js",
-      "skills/spec-code-review/evals/fixtures/repos/tenant-orders/prepare-review-fixture.sh",
-      "skills/spec-code-review/evals/fixtures/scripts/check-r2-preset-applied-fix.sh",
-      "skills/spec-code-review/scripts/peer-job-runner.py",
-      "skills/spec-doc-review/scripts/peer-job-runner.py",
-      "skills/spec-handoff/scripts/handoff-artifact.cjs",
-      "skills/spec-lfg/scripts/pr-watch-state.cjs",
-      "skills/spec-pov/scripts/peer-job-runner.py",
-      "skills/spec-runtime-setup/SKILL.md",
-      "skills/spec-runtime-setup/references/supported-mcp-tools.md",
-      "skills/spec-runtime-setup/scripts/lib/registry.cjs",
-      "skills/spec-runtime-setup/scripts/providers/codegraph-artifact-evidence.cjs",
-      "skills/spec-runtime-setup/scripts/providers/codegraph.cjs",
-      "skills/spec-runtime-setup/scripts/providers/common.cjs",
-      "skills/spec-runtime-setup/setup-registry.json",
-      "skills/spec-runtime-setup/setup-registry.schema.json",
-      "src/cli/brand.js",
-      "src/cli/commands/init-workspace.js",
-      "src/cli/helpers/setup-facts.js",
-      "src/cli/plugin-sync.js",
-      "tests/integration/eval-disk-evidence-guard.integration.test.js",
-      "tests/unit/brand-presentation.test.js",
-      "tests/unit/ce-localization-closeout-contracts.test.js",
-      "tests/unit/ce-localization-review-contracts.test.js",
-      "tests/unit/host-enumeration-drift-guard.test.js",
-      "tests/unit/mcp-setup-providers.test.js",
-      "tests/unit/peer-job-runner-killset.test.js",
-      "tests/unit/peer-job-runner-parity.test.js",
-      "tests/unit/platform-registry-patterns.test.js",
-      "tests/unit/runtime-setup-codegraph-evidence.test.js",
-      "tests/unit/runtime-setup-codegraph-launcher.test.js",
-      "tests/unit/skill-script-mirror-parity.test.js",
-      "tests/unit/spec-code-review-peer-runner.test.js",
-      "tests/unit/spec-handoff-contracts.test.js",
-      "tests/unit/spec-lfg-pr-watch-state.test.js"
-    ],
-    "dirty_path_manifest_sha256": "488f564895de281c2d93df5c02531a06f7f46fe5278ed8e268a798b84bca1081",
-    "source_tree_hash": "a905f510fe5efab708f891849a74c7b74b120770d91ff5995645ec118a63f5b6",
-    "inventory_hash": "7ab344f048517952bc2bd9d0d10a1da267c81f4ed86963e2a9da65c4357cb6ee",
+    "head": "12e675d3b6cca6e018833b01ae5bc5984733317c",
+    "dirty": false,
+    "dirty_paths": [],
+    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source_tree_hash": "8d2fbbf1c102a46c8b2e302dc23b136148f5a9b18fdb7978c1effcbf2a43fd13",
+    "inventory_hash": "ca66c3d8d27bae7faedaca0ff703cbf68f183028551564ea571c3c78a4cee0b4",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -87,12 +44,12 @@
     }
   },
   "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
-  "inventory_sha256": "e0652e40208e78a919a6d6c7598565bcfa11a78d3986d5a09f6404b82bc8d9cd",
+  "inventory_sha256": "190df50f7476e2fac51a1112f07c7c7948def5cf6d710896332de71cbe8a0318",
   "review_input": {
-    "inventory_sha256": "e0652e40208e78a919a6d6c7598565bcfa11a78d3986d5a09f6404b82bc8d9cd",
+    "inventory_sha256": "190df50f7476e2fac51a1112f07c7c7948def5cf6d710896332de71cbe8a0318",
     "package_manifest_sha256": "e65c27f924f265085fd7894c9fb4f214e58888af308677dd39158d6b4c293571",
-    "direct_support_manifest_sha256": "a24cc31d77e3298925e8ad47be573c7b5b4c69600755ec6e1009c561c029fcfb",
-    "relation_manifest_sha256": "ed591224e272e4b9d4b101b382e3b1f86e414a6484682f1f2e7b15cf6696e150"
+    "direct_support_manifest_sha256": "e89e4a88860abea9333dd831ff4d1410a5d388f6fdf3820b7832729771719f25",
+    "relation_manifest_sha256": "a901b36efb0db7ca0cd34f40c41ee7afa6888b88561e3b4a9f4a5f4c9deefbb7"
   },
   "coverage_summary": {
     "skill_count": 38,
@@ -14511,9 +14468,9 @@
       "skill_id": "autoresearch",
       "owning_skill": "autoresearch",
       "path": "tests/unit/ce-localization-review-contracts.test.js",
-      "sha256": "846125ffe2ee84c02df5ba7d2debdf37bffa5d497f68af87c9dfc54a6c0f6db6",
-      "bytes": 8740,
-      "line_count": 158,
+      "sha256": "d545890b80b12e2e9b85d96f1618726dde3bbf9eca563a0a00f87394aa66ff07",
+      "bytes": 5960,
+      "line_count": 109,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -14523,7 +14480,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/ce-localization-review-contracts.test.js",
-          "line": 80,
+          "line": 31,
           "excerpt": "// 2026-09-04（01fad369）：autoresearch 从 host-owned 排除清单收编进 canonical"
         }
       ]
@@ -16071,9 +16028,9 @@
       "skill_id": "spec-compound",
       "owning_skill": "spec-compound",
       "path": "tests/unit/ce-localization-closeout-contracts.test.js",
-      "sha256": "693c108ddb8eecf4991f4d01f8e98d3fffd52a10d0db0a08b35e1230b20937fc",
-      "bytes": 18146,
-      "line_count": 413,
+      "sha256": "6530597bf31292b255169227cb2621e56b7ccdc388227e9bd6583a5f4ca64ca1",
+      "bytes": 17045,
+      "line_count": 400,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -16083,7 +16040,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/ce-localization-closeout-contracts.test.js",
-          "line": 219,
+          "line": 206,
           "excerpt": "const skillReview = review.skill_reviews.find((entry) => entry.skill_id === 'spec-compound');"
         }
       ]

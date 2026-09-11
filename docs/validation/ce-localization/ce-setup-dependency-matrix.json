@@ -5,12 +5,12 @@
   "public_entrypoint_disposition": "reuse-spec-runtime-setup-only",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "00f01d6c2de110b17294bc1dab49b89c6ed12a8c",
+    "head": "12e675d3b6cca6e018833b01ae5bc5984733317c",
     "dirty": false,
     "dirty_paths": [],
     "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "dd49cfc2071c5c8e269b5cd94915ddc0dac1719a484da4c2259d884b8892eb00",
-    "inventory_hash": "11d271acca10737bcfa997d24bf66c26d02fede0d87e07be8ad24b9327a798be",
+    "source_tree_hash": "8d2fbbf1c102a46c8b2e302dc23b136148f5a9b18fdb7978c1effcbf2a43fd13",
+    "inventory_hash": "ca66c3d8d27bae7faedaca0ff703cbf68f183028551564ea571c3c78a4cee0b4",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -45,9 +45,9 @@
     }
   },
   "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
-  "inventory_sha256": "1a8ccfd13f8eb93ddb4409a18faa1f2f83b975c252ea72e8d3a656f6a43d2331",
+  "inventory_sha256": "190df50f7476e2fac51a1112f07c7c7948def5cf6d710896332de71cbe8a0318",
   "preflight_ref": "docs/validation/ce-localization/ce-setup-prerequisite-preflight.json",
-  "preflight_sha256": "96e831b75d560ec766f526d1f0055c3cdf807248c45078a06107bdc5d0e0f42a",
+  "preflight_sha256": "fa43403710fc622c6e21e0cae33d0ffe34a8f9469730133a91966b87fb051040",
   "ce_tool_dispositions": [
     {
       "tool_id": "agent-browser",
@@ -75,7 +75,7 @@
       "reason_code": "local-required-baseline",
       "local_registry_kind": "helper",
       "local_required": true,
-      "baseline_blocking": true,
+      "baseline_blocking": false,
       "source_ref": "skills/spec-runtime-setup/setup-registry.json",
       "status_authority": "plan-settled-and-source-checked"
     },
@@ -85,7 +85,7 @@
       "reason_code": "local-promoted-required",
       "local_registry_kind": "helper",
       "local_required": true,
-      "baseline_blocking": true,
+      "baseline_blocking": false,
       "source_ref": "skills/spec-runtime-setup/setup-registry.json",
       "status_authority": "plan-settled-and-source-checked"
     },
@@ -95,7 +95,7 @@
       "reason_code": "local-promoted-required",
       "local_registry_kind": "helper",
       "local_required": true,
-      "baseline_blocking": true,
+      "baseline_blocking": false,
       "source_ref": "skills/spec-runtime-setup/setup-registry.json",
       "status_authority": "plan-settled-and-source-checked"
     },

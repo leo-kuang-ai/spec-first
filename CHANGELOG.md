@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-11 12:10:00 codex: refresh: 重生成 CE localization deterministic inventory、coverage 与 setup artifacts，绑定当前 1126 路径源快照；历史语义 adjudication 仍需独立复核。(user-visible)
 - v1.15.3 2026-09-11 12:00:00 codex: 提交当前工作区全部变更，收口宿主枚举、CE localization 工件、peer-runner 与 runtime-setup 合同更新。(user-visible)
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): 为 CodeGraph artifact readiness 增加版本化 DB/WAL/journal/source/identity 证据；verify-only 与 doctor 只回读并比较既有证据，不执行可能恢复数据库的 status/query；缺证据或采样漂移保持 unknown/degraded。(user-visible)
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): CodeGraph 改用原生 status --json，校验索引状态、待处理引用/文件和工作树路径；不完整或未知响应不能因退出 0 被判为 indexed，显式 apply 可重建 partial/旧 null 状态并复验。(user-visible)
