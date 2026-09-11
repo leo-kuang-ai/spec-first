@@ -131,9 +131,13 @@ function runVerificationOrMutation(context, repoRoot) {
   const factsNow = new Date();
   const baseFactInputs = {
     repoRoot,
+    skillRoot: context.skillRoot,
+    homeDir: context.homeDir,
+    env: context.env,
     host: context.host,
     platform: context.platform,
     registry: context.effectiveRegistry,
+    sourceRegistry: context.registry,
     toolResults: probes.toolResults,
     helperResults: probes.helperResults,
     providerResults: providerResults.map((readiness) => ({

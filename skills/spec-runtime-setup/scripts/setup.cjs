@@ -58,15 +58,6 @@ const {
   resolveRuntimeProjectionTargets,
 } = require('./lib/workspace-runtime-preflight.cjs');
 const {
-  runWorkspaceGraphBuild,
-} = require('./lib/workspace-graph-executor.cjs');
-const {
-  runWorkspaceGraphClean,
-} = require('./lib/workspace-graph-clean.cjs');
-const {
-  runWorkspaceGraphStatus,
-} = require('./lib/workspace-graph-status.cjs');
-const {
   INTERNAL_CODEGRAPH_COMMAND_ENV,
   INTERNAL_GRAPHIFY_COMMAND_ENV,
   INTERNAL_REFRESH_ONLY_ENV,
@@ -74,10 +65,6 @@ const {
 const {
   workspaceGraphLifecycleCredentialFromEnv,
 } = require('./lib/workspace-graph-lifecycle-lease.cjs');
-const {
-  buildParentWorkspaceDiagnostic,
-  renderParentWorkspaceDiagnosticHuman,
-} = require('./lib/workspace-parent-diagnostic.cjs');
 const {
   dependencyFor,
   interpolateArgs,
@@ -284,6 +271,7 @@ function blockedRuntimeProjectionResult(context, payload) {
 }
 
 function runParentWorkspaceDiagnostic(context) {
+  const { buildParentWorkspaceDiagnostic, renderParentWorkspaceDiagnosticHuman } = require('./lib/workspace-parent-diagnostic.cjs');
   const { actionPlan, cwd, target, host } = context;
   const payload = buildParentWorkspaceDiagnostic({
     cwd,
@@ -302,6 +290,7 @@ function runParentWorkspaceDiagnostic(context) {
 }
 
 function runWorkspaceGraphSetup(context, runtimeProjectionSelection) {
+  const { runWorkspaceGraphBuild } = require('./lib/workspace-graph-executor.cjs');
   const { actionPlan, cwd, target } = context;
   const workspaceGraphTargets = runtimeProjectionSelection
     ? runtimeProjectionSelection.workspaceGraphTargets
@@ -453,6 +442,7 @@ function workspaceMutationExitCode(status) {
 }
 
 function runWorkspaceGraphCleanSetup(context) {
+  const { runWorkspaceGraphClean } = require('./lib/workspace-graph-clean.cjs');
   const { actionPlan, cwd, target } = context;
   const result = runWorkspaceGraphClean({
     cwd,
@@ -472,6 +462,7 @@ function runWorkspaceGraphCleanSetup(context) {
 }
 
 function runWorkspaceGraphStatusSetup(context) {
+  const { runWorkspaceGraphStatus } = require('./lib/workspace-graph-status.cjs');
   const { actionPlan, cwd, target, bundledVersion } = context;
   const result = runWorkspaceGraphStatus({
     cwd,

@@ -457,9 +457,9 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(updated).toContain('[mcp_servers.unrelated]');
     expect(updated).toContain('command = "keep-me"');
     expect(updated).toContain('[mcp_servers.context7]');
-    expect(updated).toContain('@upstash/context7-mcp@latest');
+    expect(updated).toContain('@upstash/context7-mcp@4.0.7');
     expect(updated).toContain('[mcp_servers.sequential-thinking]');
-    expect(updated).toContain('@modelcontextprotocol/server-sequential-thinking@latest');
+    expect(updated).toContain('@modelcontextprotocol/server-sequential-thinking@2026.8.31');
     expect(updated).not.toContain('command = "user-owned"');
   });
 
@@ -1812,7 +1812,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(Object.keys(config.mcp).sort()).toEqual(['context7', 'sequential-thinking']);
     expect(config.mcp.context7).toEqual({
       type: 'local',
-      command: ['npx', '-y', '@upstash/context7-mcp@latest'],
+      command: ['npx', '-y', '@upstash/context7-mcp@4.0.7'],
     });
     expect(config.permission.skill['using-spec-first']).toBe('allow');
     expect(config.permission.skill['spec-work']).toBe('allow');

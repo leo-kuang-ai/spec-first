@@ -19,6 +19,7 @@ const CONFIRMED_SOURCES = new Set([
   'read-only-probe',
   'confirmed-local-state',
 ]);
+const { captureSourceSnapshot } = require('./source-snapshot.cjs');
 const CANONICAL_HOSTS = new Set(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder', 'zcode']);
 
 function collectSetupFacts(options = {}) {
@@ -44,14 +45,9 @@ function collectSetupFacts(options = {}) {
   const configuredDependencies = (options.configuredDependencies || []).map(normalizeConfiguredDependency);
   const generatedAt = (options.now || new Date()).toISOString();
   const repoRoot = path.resolve(options.repoRoot || process.cwd());
-  const registrySnapshot = options.registry ? crypto.createHash('sha256').update(JSON.stringify(options.registry)).digest('hex') : null;
-  const sourceSnapshot = {
-    registry_sha256: registrySnapshot,
-    host: options.host || null,
-    platform: options.platform || null,
-    captured_at: generatedAt,
-    invalidation: ['registry-change', 'host-config-change', 'provider-identity-change'],
-  };
+  const sourceSnapshot = captureSourceSnapshot({
+    repoRoot, sourceRegistry: options.sourceRegistry, skillRoot: options.skillRoot, homeDir: options.homeDir, env: options.env, host: options.host, platform: options.platform, now: options.now || new Date(),
+  });
   const baselineReady = items
     .filter((item) => item.required && item.baseline_blocking)
     .every((item) => item.result === 'ready');

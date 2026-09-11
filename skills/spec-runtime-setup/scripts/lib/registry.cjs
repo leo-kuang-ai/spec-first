@@ -685,6 +685,7 @@ function getDiagnosticRegistry(registry, { platform }) {
 
 module.exports = {
   canonicalize,
+  canonicalizeRegistry,
   detectRuntimePlatform,
   getDiagnosticRegistry,
   getEffectiveEntry,

@@ -306,6 +306,16 @@ function resolveTargetRecord(scope, target, context) {
   return resolved;
 }
 
+function resolveReadOnlyHostConfigTargets({ entry, repoRoot, homeDir = os.homedir(), env = process.env } = {}) {
+  const hostConfig = hostConfigForEntry(entry);
+  if (!hostConfig || !isObject(hostConfig.targets)) return [];
+  const context = {
+    repoRoot: path.resolve(repoRoot), homeDir: path.resolve(homeDir),
+    env: configPathEnvironment(homeDir, env), defaultFormat: hostConfig.config_format || '', requireWritable: false,
+  };
+  return Object.entries(hostConfig.targets).map(([scope, target]) => resolveTargetRecord(scope, target, context));
+}
+
 function resolveHostConfigTarget(options = {}) {
   const entry = options.entry;
   const host = options.host;
@@ -1469,4 +1479,5 @@ module.exports = {
   applyHostConfig,
   inspectHostConfig,
   resolveHostConfigTarget,
+  resolveReadOnlyHostConfigTargets,
 };

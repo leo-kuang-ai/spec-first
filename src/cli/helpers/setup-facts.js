@@ -2,6 +2,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { captureSourceSnapshot } = require('../../../skills/spec-runtime-setup/scripts/lib/source-snapshot.cjs');
 
 const SETUP_FACTS_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 const READY_CONFIGURED_STATUSES = new Set(['ready', 'not-applicable', 'not-required', 'fallback-active']);
@@ -82,7 +83,11 @@ function normalizeSetupFacts(facts, options = {}) {
   const configuredDependencies = normalizeConfiguredDependencies(facts.configured_dependencies);
   const providerReadiness = normalizeProviderReadiness(facts.provider_readiness);
   const generatedAt = typeof facts.generated_at === 'string' ? facts.generated_at : null;
-  const freshness = computeFreshness(generatedAt, options.now || new Date(), options.maxAgeMs || SETUP_FACTS_MAX_AGE_MS);
+  const freshness = compareSourceSnapshot(
+    computeFreshness(generatedAt, options.now || new Date(), options.maxAgeMs || SETUP_FACTS_MAX_AGE_MS),
+    facts.source_snapshot,
+    options.currentSourceSnapshot,
+  );
 
   const counts = computeCounts(items);
   const configuredDependencyCounts = computeConfiguredDependencyCounts(configuredDependencies);
@@ -264,9 +269,35 @@ function inferReasonCode({ sourceReasonCode, dependencyStatus, configuredStatus,
   return sourceReasonCode || 'unknown';
 }
 
+function compareSourceSnapshot(freshness, recorded, current) {
+  if (!current || freshness.status !== 'fresh') return freshness;
+  if (current.schema_version !== 'setup-source-snapshot.v1') {
+    return { ...freshness, status: 'unknown', reason_code: 'setup-facts-source-snapshot-unsupported' };
+  }
+  const keys = ['schema_version', 'registry_sha256', 'host', 'platform', 'repo_root', 'source_head', 'host_config_sha256'];
+  if (keys.some((key) => typeof current[key] === 'string' && current[key]
+    && recorded && typeof recorded[key] === 'string' && recorded[key] && recorded[key] !== current[key])) {
+    return { ...freshness, status: 'stale', reason_code: 'setup-facts-source-snapshot-mismatch' };
+  }
+  if (keys.some((key) => typeof current[key] !== 'string' || !current[key]
+    || !recorded || typeof recorded[key] !== 'string' || !recorded[key])
+    || ['registry_sha256', 'host_config_sha256'].some((key) => !/^[a-f0-9]{64}$/.test(current[key]) || !/^[a-f0-9]{64}$/.test(recorded[key]))
+    || !/^[a-f0-9]{40,64}$/.test(current.source_head) || !/^[a-f0-9]{40,64}$/.test(recorded.source_head)
+    || (Array.isArray(current.limitations) && current.limitations.length > 0)
+    || (recorded && Array.isArray(recorded.limitations) && recorded.limitations.length > 0)) {
+    return { ...freshness, status: 'unknown', reason_code: 'setup-facts-source-snapshot-incomplete' };
+  }
+  return freshness;
+}
+
 function normalizeSourceSnapshot(value) {
   const source = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
   return {
+    host_config_sha256: normalizeNullableString(source.host_config_sha256),
+    schema_version: normalizeNullableString(source.schema_version),
+    repo_root: normalizeNullableString(source.repo_root),
+    source_head: normalizeNullableString(source.source_head),
+    limitations: normalizeStringList(source.limitations),
     registry_sha256: typeof source.registry_sha256 === 'string' ? source.registry_sha256 : null,
     host: typeof source.host === 'string' ? source.host : null,
     platform: typeof source.platform === 'string' ? source.platform : null,
@@ -428,7 +459,10 @@ function computeFreshness(generatedAt, now, maxAgeMs) {
     };
   }
   const nowTime = now instanceof Date ? now.getTime() : Date.parse(now);
-  const ageMs = Math.max(0, nowTime - generatedTime);
+  if (!Number.isFinite(nowTime) || generatedTime > nowTime) {
+    return { status: 'unknown', generated_at: generatedAt, age_ms: null, max_age_ms: maxAgeMs, reason_code: 'setup-facts-clock-invalid' };
+  }
+  const ageMs = nowTime - generatedTime;
   if (ageMs > maxAgeMs) {
     return {
       status: 'stale',
@@ -488,7 +522,7 @@ function isRequiredAction(item) {
   return item.baseline_blocking !== false || item.required === true;
 }
 
-function computeDecisionInputHealth({ projectRoot, platforms = [], factsPath, now } = {}) {
+function computeDecisionInputHealth({ projectRoot, platforms = [], factsPath, now, skillRoot, homeDir, env } = {}) {
   if (!Array.isArray(platforms) || platforms.length === 0) {
     const projection = buildUnavailableProjection({
       status: 'not_checked',
@@ -500,6 +534,10 @@ function computeDecisionInputHealth({ projectRoot, platforms = [], factsPath, no
 
   const resolvedFactsPath = factsPath || path.join(projectRoot, '.spec-first', 'config', 'tool-facts.json');
   const projection = normalizeSetupFactsFile(resolvedFactsPath, { now });
+  if (projection.status === 'ready' && platforms.includes(projection.host)) {
+    const current = captureSourceSnapshot({ repoRoot: projectRoot, skillRoot, homeDir, env, host: projection.host, now });
+    projection.freshness = compareSourceSnapshot(projection.freshness, projection.raw.source_snapshot, current);
+  }
   if (projection.status === 'missing') {
     return buildDecisionResult('missing', 'setup-facts-missing', projection, { requestedPlatforms: platforms });
   }
@@ -573,7 +611,7 @@ function decisionInputNextAction(reasonCode, requestedPlatforms = []) {
     return `Run \`${command}\` from ${hostLabel} to create setup facts.`;
   }
   if (reasonCode === 'setup-facts-freshness-unknown') {
-    return `通过 ${command} --verify-only 刷新当前 host 的 setup facts；缺少可信时间不能证明 readiness。`;
+    return `通过 ${command} --verify-only 刷新当前 host 的 setup facts；时间或来源身份不完整，不能证明当前 readiness。`;
   }
   if (reasonCode === 'setup-facts-stale') {
     return `Rerun \`${command}\` from ${hostLabel} to refresh stale setup facts.`;
