@@ -835,6 +835,34 @@ describe('spec-runtime-setup renderer', () => {
     expect(actions.some((action) => action.includes('--verify-only'))).toBe(false);
   });
 
+  test('explains core-ready unknown as missing currentness evidence while retaining query probe status', () => {
+    const { renderHumanSummary } = require('../../skills/spec-runtime-setup/scripts/lib/renderer.cjs');
+    const text = renderHumanSummary({
+      toolFacts: {
+        provider_readiness: [{
+          provider: 'graphify',
+          readiness_status: 'unknown',
+          lifecycle: {
+            installed: true,
+            configured: true,
+            initialized: true,
+            indexed: true,
+            artifact_exists: true,
+            query_verified: true,
+            server_reachable: false,
+          },
+          steady_state: { hook_status: 'verified', refresh_mode: 'skill-cli-hook-on-demand' },
+        }],
+        items: [],
+        configured_dependencies: [],
+      },
+      runtimeCapabilities: { setup_summary: { baseline_ready: true, host_runtime_ready: true, generated_runtime_manifest: { status: 'current' } } },
+    }, { executionSummary: { overall_status: 'ready', reason_code: 'setup-ready', scope: 'full', selected_ids: [], required_provider_ids: ['graphify'] } });
+
+    expect(text).toContain('graphify: unknown (currentness-not-verified-in-read-only-check)');
+    expect(text).toContain('readiness_scope: install-index-ready; probe_status: query-verified');
+  });
+
   test('diagnostic does not treat unknown freshness as core-ready when the query probe is unverified', () => {
     const { diagnosticNextActions } = require('../../skills/spec-runtime-setup/scripts/lib/human-output.cjs');
     const actions = diagnosticNextActions({

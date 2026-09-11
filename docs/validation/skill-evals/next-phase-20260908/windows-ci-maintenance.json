@@ -1,0 +1,18 @@
+{
+  "artifact_type": "advisory",
+  "source": "PR #55 GitHub Actions Windows Compatibility",
+  "failed_runs": ["windows-latest / Node 20", "windows-latest / Node 22"],
+  "observed_root_cause": "Windows runner returned a short 8.3 path (RUNNER~1) while source used the long path (runneradmin); exact receipt path assertions failed and containment-dependent workspace tests cascaded.",
+  "fix": {
+    "path": "skills/spec-runtime-setup/scripts/lib/host-authority.cjs",
+    "change": "Use Node realpathSync platform spelling for the loaded skill root receipt.",
+    "preserved": ["path containment", "symlink escape rejection", "existing reason codes"]
+  },
+  "verification": {
+    "command": "npx --no-install jest tests/unit/mcp-setup-workspace-git-exclude.test.js tests/unit/mcp-setup-mode-target.test.js tests/unit/mcp-setup-workspace-child-hook.test.js tests/unit/mcp-setup-workspace-graph-executor.test.js tests/unit/mcp-setup-workspace-graph-build.test.js tests/unit/mcp-setup-workspace-graph-status.test.js tests/unit/mcp-setup-workspace-graph-clean.test.js tests/unit/mcp-setup-workspace-provider-runners.test.js --runInBand",
+    "passed": 203,
+    "failed": 0,
+    "scope": "local Darwin; Windows CI reproduction evidence is historical, so Windows rerun remains not-run"
+  },
+  "limitations": ["GitHub Actions Windows workflow was not rerun from this uncommitted branch.", "No claim of complete Windows compatibility beyond the covered tests."]
+}

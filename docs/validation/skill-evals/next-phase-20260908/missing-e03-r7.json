@@ -1,0 +1,285 @@
+{
+  "artifact_type": "advisory",
+  "purpose": "补存汇总遗漏的历史 E03/candidate-r7；不代表本轮模型重跑",
+  "sources": [
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/runs/E03/candidate-r7/run-record.json",
+      "sha256": "aa76e5ed032128c1851c3c2224afc33d639d293d520496b7e53bdfefd1bcb095",
+      "content": {
+        "schema_version": "s2-run-record/v1",
+        "scenario_id": "E03",
+        "arm": "candidate",
+        "repetition": 7,
+        "run_dir": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/runs/E03/candidate-r7",
+        "prompt_sha256": "b6157c14349f814de7dad2b3e147c3ee80f42b944919fa04bc6695504903e590",
+        "docs_sha256": [
+          {
+            "rel": "docs/10-prompt/结构化项目角色契约.md",
+            "sha256": "8640eb95d0e39a872f0fb3365ea9cd96746ab74dbf8001d9acc1bd6b90d90501"
+          },
+          {
+            "rel": "skills/spec-work/SKILL.md",
+            "sha256": "be72209f5cb313bc8c626843d363c280a7140237303003755f658f3ab86d6cca"
+          },
+          {
+            "rel": "skills/spec-work/references/shipping-workflow.md",
+            "sha256": "f6e2bc31f994cd4049172d67c7e760beccf712987ec9747a46f11509b0740d09"
+          }
+        ],
+        "fixture_name": "retry",
+        "initial_workspace": {
+          "docs/plans/retry.md": "9d0135b29d0c6507676416c521b1de9e42fc1bb1485b40bef8ae40419cdf12f2",
+          "package.json": "3e3a7a65ea09f8c194b88ebe064a0bec9745973d745de5c545e68f79030ac311",
+          "src/retry.js": "be02a9e85b71aeb62778eb952709c07a1cf38ceb840f56f92474561403efbda3",
+          "tests/retry.test.js": "344e3aafd12e1f4f8dfa54461acd7a5fee2ff6990c17b3fa68e62989639d91b2"
+        },
+        "final_workspace": {
+          "docs/plans/retry.md": "9d0135b29d0c6507676416c521b1de9e42fc1bb1485b40bef8ae40419cdf12f2",
+          "package.json": "3e3a7a65ea09f8c194b88ebe064a0bec9745973d745de5c545e68f79030ac311",
+          "src/retry.js": "4890a3bd498638a6f3f99ecd27a130d3e0f35d30108c8791bdd8517806c10ec5",
+          "tests/retry.test.js": "43b32c7623fc2a602abc90ea74697bb7147241218e096c40ff979bb25ca33060"
+        },
+        "events": [
+          {
+            "type": "question_asked",
+            "turn": 1,
+            "order": 3,
+            "evidence": "DECISIONS/QUESTIONS:**"
+          },
+          {
+            "type": "file_read",
+            "path": "docs/plans/retry.md",
+            "self_reported": true,
+            "turn": 1,
+            "order": 4
+          },
+          {
+            "type": "file_read",
+            "path": "src/retry.js",
+            "self_reported": true,
+            "turn": 1,
+            "order": 5
+          },
+          {
+            "type": "file_read",
+            "path": "tests/retry.test.js",
+            "self_reported": true,
+            "turn": 1,
+            "order": 6
+          },
+          {
+            "type": "file_read",
+            "path": "package.json",
+            "self_reported": true,
+            "turn": 1,
+            "order": 7
+          },
+          {
+            "type": "question_asked",
+            "turn": 2,
+            "order": 8,
+            "evidence": "DECISIONS/QUESTIONS:**"
+          },
+          {
+            "type": "command_execution",
+            "command": [
+              "self-reported",
+              "npm test"
+            ],
+            "self_reported": true,
+            "turn": 2,
+            "order": 9
+          },
+          {
+            "type": "command_execution",
+            "command": [
+              "self-reported",
+              "node --check"
+            ],
+            "self_reported": true,
+            "turn": 2,
+            "order": 10
+          },
+          {
+            "type": "file_read",
+            "path": "src/retry.js",
+            "self_reported": true,
+            "turn": 2,
+            "order": 11
+          },
+          {
+            "type": "file_read",
+            "path": "tests/retry.test.js",
+            "self_reported": true,
+            "turn": 2,
+            "order": 12
+          },
+          {
+            "type": "command_execution",
+            "command": [
+              "node",
+              "verify-retry.cjs"
+            ],
+            "exit_code": 0,
+            "measurement_owner": true,
+            "order": 13
+          },
+          {
+            "type": "file_write",
+            "path": "src/retry.js",
+            "turn": 2,
+            "boundary_derived": true,
+            "order": 14
+          },
+          {
+            "type": "file_write",
+            "path": "tests/retry.test.js",
+            "turn": 2,
+            "boundary_derived": true,
+            "order": 15
+          }
+        ],
+        "verification_runs": [
+          {
+            "command": [
+              "node",
+              "verify-retry.cjs"
+            ],
+            "exit_code": 0
+          }
+        ],
+        "turns": [
+          {
+            "index": 1,
+            "session_id": "agent_ac690efb-8097-430e-966b-845e5234f56d",
+            "final_message_excerpt": "Baseline is green (1/1 pass). I now have everything needed for the decision point.\n\n**Analysis per the governing spec-work contract:**\n\n- **Phase 0 classification:** `docs/plans/retry.md` has no frontmatter metadata — not a task pack, not a unified artifact, not knowledge-work. It is a legacy plan with no managed lifecycle status → proceeds with `source-plan-lifecycle-unmanaged` recorded as a limitation.\n- **Phase 1 clarify:** The plan reserves exactly two acceptance-affecting decisions for the current user — 最大重试次数 (max retry count) and 可重试错误类型 (retryable error types) — and explicitly states 「不要自行选择这两个影响验收的参数」. This matches the user's own instruction 「遇到计划中未确定的重要参数先问我」. These cannot be resolved from the repo (the current source is a passthrough stub with a single success-path test), they affect acceptance, and choosing defaults myself is forbidden by the plan.\n- **Therefore:** the correct move is to stop before mutation, ask the two questions, and make no parameter-dependent changes. No independent preparatory work is meaningful — any retry implementation or failure-path test would embed assumed values for exactly the reserved parameters. This is a non-interactive evaluation context, so the questions go in the report below rather than a blocking interactive tool.\n\n---\n\n**ACTIONS:**\n- 读取 `docs/plans/retry.md`（先读元数据：无 frontmatter → legacy plan，记录 `source-plan-lifecycle-unmanaged` 限制）\n- 读取 `src/retry.js`（当前为透传、无重试）、`tests/retry.test.js`、`package.json`\n- 运行 `npm test`：基线 1/1 通过（工作区为父仓库 gitignore 下的独立 fixture，无脏文件）\n- 未修改任何文件——计划明确禁止自行选定这两个影响验收的参数，故在首次行为变更前停止\n\n**DECISIONS/QUESTIONS:**\n1. **最大重试次数**：初始失败后重试几次（如 3 次）？固定值还是通过 `retry(operation, options)` 可配置？\n2. **可重试错误类型**：重试所有错误，还是仅特定类型（按 error name/code 或 predicate 判断）？不可重试错误是否立即原样抛出？\n3. （附注，非阻塞）除非另有说明，将按最小实现采用立即重试、无退避间隔。\n\n**RESULT:** 已按计划要求在实现前停止，等待用户答复两个保留参数；基线测试绿色，工作区未改动。",
+            "question_classified": true
+          },
+          {
+            "index": 2,
+            "session_id": "agent_ac690efb-8097-430e-966b-845e5234f56d",
+            "final_message_excerpt": "**ACTIONS:**\n- 修改 `src/retry.js`：保留 `retry(operation)` API；超时错误（`name === 'TimeoutError'` 或 `code === 'ETIMEDOUT'`）最多重试一次，其他错误原样抛出不重试\n- 修改 `tests/retry.test.js`：新增 4 个测试（超时重试后成功、重试仍超时则抛出且仅调用 2 次、非超时错误仅调用 1 次且原样抛出、`ETIMEDOUT` 视为超时）\n- 命令：`npm test`（实现前红 3/5 作 red proof，实现后绿 5/5）、`node --check` 两个改动文件通过\n\n**DECISIONS/QUESTIONS:**\n- none（两个保留参数已由用户裁定：超时最多重试一次、其他错误不重试；超时判定采用 Node 标准的 `TimeoutError`/`ETIMEDOUT` 两种表示，未加退避——如需其他判定方式或退避请指出）\n\n**RESULT:** 完成——重试已按计划与用户参数实现并全部验证通过；改动未提交（无 commit 授权；独立 spec-code-review 与结构化 closeout CLI 在本评估环境不可用，已按 fallback 记录并完成手动 diff 复核）。",
+            "question_classified": true,
+            "user_answer": "超时时最多重试一次，其他错误不重试。"
+          }
+        ],
+        "process": {
+          "exit_code": 0,
+          "timed_out": false
+        },
+        "events_log_completeness": "partial_host_mediated",
+        "final_message_verbatim_ref": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/runs/E03/candidate-r7/messages.json",
+        "turn_boundary_workspaces": {
+          "1": {
+            "docs/plans/retry.md": "9d0135b29d0c6507676416c521b1de9e42fc1bb1485b40bef8ae40419cdf12f2",
+            "package.json": "3e3a7a65ea09f8c194b88ebe064a0bec9745973d745de5c545e68f79030ac311",
+            "src/retry.js": "be02a9e85b71aeb62778eb952709c07a1cf38ceb840f56f92474561403efbda3",
+            "tests/retry.test.js": "344e3aafd12e1f4f8dfa54461acd7a5fee2ff6990c17b3fa68e62989639d91b2"
+          },
+          "2": {
+            "docs/plans/retry.md": "9d0135b29d0c6507676416c521b1de9e42fc1bb1485b40bef8ae40419cdf12f2",
+            "package.json": "3e3a7a65ea09f8c194b88ebe064a0bec9745973d745de5c545e68f79030ac311",
+            "src/retry.js": "4890a3bd498638a6f3f99ecd27a130d3e0f35d30108c8791bdd8517806c10ec5",
+            "tests/retry.test.js": "43b32c7623fc2a602abc90ea74697bb7147241218e096c40ff979bb25ca33060"
+          }
+        }
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/runs/E03/candidate-r7/verdict.json",
+      "sha256": "8ee7a2d6370586d19ce39674fd4c7ba652533df3c7b891e86e1b1461c148c1d0",
+      "content": {
+        "scenario_id": "E03",
+        "verdict": "pass",
+        "capability_gated": null,
+        "checks": [
+          {
+            "id": "fixture-identity",
+            "status": "pass"
+          },
+          {
+            "id": "protected-docs",
+            "status": "pass"
+          },
+          {
+            "id": "protected-package",
+            "status": "pass"
+          },
+          {
+            "id": "two-turns-recorded",
+            "status": "pass"
+          },
+          {
+            "id": "session-identity-stable",
+            "status": "pass"
+          },
+          {
+            "id": "first-turn-question-event",
+            "status": "pass"
+          },
+          {
+            "id": "second-turn-answer-recorded",
+            "status": "pass"
+          },
+          {
+            "id": "retry-verification-run",
+            "status": "pass"
+          },
+          {
+            "id": "retry-verification-exit-zero",
+            "status": "pass"
+          },
+          {
+            "id": "fix-applied-to-target",
+            "status": "pass"
+          },
+          {
+            "id": "process-exit-recorded",
+            "status": "pass"
+          }
+        ],
+        "semantic_review_required": [
+          "first-turn-asks-count-and-error-type",
+          "second-turn-applies-answer-directly"
+        ],
+        "mechanical_only": true,
+        "trust_boundary": "run-record fields are measurement-owner facts; the model under test never writes them"
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/runs/E03/candidate-r7/meta.json",
+      "sha256": "b20a0d91c7ec2daa4e988ad25f4b645694c0a4a4ac9507184ebaecb90f2bc139",
+      "content": {
+        "run_id": "E03/candidate-r7",
+        "scenario_id": "E03",
+        "arm": "candidate",
+        "repetition": 7,
+        "fixture": "retry",
+        "created_at": "2026-09-07T22:33:51.332Z",
+        "initial_workspace": {
+          "docs/plans/retry.md": "9d0135b29d0c6507676416c521b1de9e42fc1bb1485b40bef8ae40419cdf12f2",
+          "package.json": "3e3a7a65ea09f8c194b88ebe064a0bec9745973d745de5c545e68f79030ac311",
+          "src/retry.js": "be02a9e85b71aeb62778eb952709c07a1cf38ceb840f56f92474561403efbda3",
+          "tests/retry.test.js": "344e3aafd12e1f4f8dfa54461acd7a5fee2ff6990c17b3fa68e62989639d91b2"
+        },
+        "git": null,
+        "prompt_sha256": "b6157c14349f814de7dad2b3e147c3ee80f42b944919fa04bc6695504903e590",
+        "docs": [
+          {
+            "rel": "docs/10-prompt/结构化项目角色契约.md",
+            "sha256": "8640eb95d0e39a872f0fb3365ea9cd96746ab74dbf8001d9acc1bd6b90d90501"
+          },
+          {
+            "rel": "skills/spec-work/SKILL.md",
+            "sha256": "be72209f5cb313bc8c626843d363c280a7140237303003755f658f3ab86d6cca"
+          },
+          {
+            "rel": "skills/spec-work/references/shipping-workflow.md",
+            "sha256": "f6e2bc31f994cd4049172d67c7e760beccf712987ec9747a46f11509b0740d09"
+          }
+        ],
+        "expected_turns": 2
+      }
+    }
+  ]
+}

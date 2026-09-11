@@ -16,6 +16,7 @@ const QUICKSTART_MESSAGES = {
     exactlyOneHost: (host) => `检测到唯一宿主：${host}。继续执行 \`spec-first init --${host}\`。`,
     noHostFallback: '未能在 PATH 上自动检测到宿主 CLI，回退到交互式 `spec-first init` 由你选择。',
     multiHostFallback: (count, hosts) => `检测到 ${count} 个宿主（${hosts}），回退到交互式 \`spec-first init\` 由你选择要初始化的宿主。`,
+    yesRequiresHost: '检测到的宿主不是唯一值；`--yes` 不能安全决定初始化目标。请改用 `spec-first quickstart` 进行交互选择，或显式运行 `spec-first init --<host> --yes`。',
   },
   en: {
     checking: 'Checking your environment...',
@@ -23,6 +24,7 @@ const QUICKSTART_MESSAGES = {
     exactlyOneHost: (host) => `Detected exactly one host: ${host}. Continuing with \`spec-first init --${host}\`.`,
     noHostFallback: 'Could not auto-detect a host CLI on PATH. Falling back to interactive `spec-first init` so you can pick one.',
     multiHostFallback: (count, hosts) => `Detected ${count} hosts (${hosts}). Falling back to interactive \`spec-first init\` so you can pick which to set up.`,
+    yesRequiresHost: 'The detected hosts are not unique; `--yes` cannot safely choose an initialization target. Run `spec-first quickstart` for interactive selection, or explicitly run `spec-first init --<host> --yes`.',
   },
 };
 
@@ -93,8 +95,12 @@ async function runQuickstart(argv, promptOverrides = {}, deps = {}) {
   } else {
     console.log(messages.multiHostFallback(detected.length, detected.join(', ')));
   }
+  if (yes) {
+    console.error(messages.yesRequiresHost);
+    return 2;
+  }
   console.log('');
-  return runInit(yes ? ['-y'] : [], promptOverrides);
+  return runInit([], promptOverrides);
 }
 
 function printProbeLine(check) {
@@ -112,6 +118,7 @@ function printHelp() {
     'Detects Node.js, Git, and installed host CLIs, then hands off to `spec-first init`:',
     '  - Exactly one host detected  -> runs `spec-first init --<host>` directly.',
     '  - Zero or multiple detected  -> falls back to interactive `spec-first init` host selection.',
+    '  - With `--yes`, zero or multiple detected hosts fail with exit code 2; pass an explicit host to `init`.',
     '',
     'This command only wraps `doctor` probes and `init`\'s existing apply path. It does not run any',
     'host-session spec-* workflow itself — those run inside the host session after you restart it.',

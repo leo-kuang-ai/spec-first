@@ -66,7 +66,7 @@ This is a workflow orchestrator, not an agent type. Use the current host's PRD w
 
 ## Interaction Method
 
-When asking any owner question or confirmation, including no-input target request, Pre-PRD Clarification, Domain Grill, split confirmation, readiness `ask-owner`, and `grill-with-docs`, use the platform's blocking question tool: `AskUserQuestion` in Claude Code or `request_user_input` in Codex when available. In Claude Code, call `ToolSearch` with query `select:AskUserQuestion` before the first owner question if the schema is not loaded.
+When asking any owner question or confirmation, including no-input target request, Pre-PRD Clarification, Domain Grill, split confirmation, readiness `ask-owner`, and `grill-with-docs`, use the host's blocking question tool already in the current tool list, matched by capability; if it is listed but unloaded, load it through the host's tool-discovery primitive before the first owner question.
 
 Fall back to numbered options in chat only when the harness genuinely lacks a blocking question tool, the tool call explicitly fails, or the runtime mode does not expose it. In fallback, set `question_delivery=chat-fallback`, state the degraded path, present the current source-backed blocking question, and wait for the user's reply. A blocking question tool unavailable does not mean true headless.
 
@@ -77,6 +77,8 @@ Ask one question at a time. Options should include a recommended answer when def
 ## Capability-Class Evidence Boundary
 
 Follows `docs/contracts/project-graph-consumption.md`: `capability-class` candidates such as `code-graph` or `project-graph` are advisory only. Check `readiness_status` before use; PRD conclusions must be re-grounded in source, and a candidate must never decide scope authority. Record used candidates as `provider_untrusted`, never-block on availability, keep setup-side `lifecycle.fallback_used` separate; fall back to direct source reads on missing/`unknown`/`unverified`/failure/disabled.
+
+Direct invocation retains the same ceiling: graph candidates cannot become confirmed product scope or current-state behavior without source, tests, docs, contracts, or owner evidence.
 
 ## Core Principles
 

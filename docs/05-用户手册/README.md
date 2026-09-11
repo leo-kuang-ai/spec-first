@@ -4,6 +4,8 @@
 
 `spec-first` 是面向 Claude Code、Codex、Cursor、Kiro 与 Qoder 的 **AI Coding Harness**：它把一次性的 AI coding 对话，变成可治理、可验证、可复用的工程闭环。AI 写代码很快，真正会丢失的是塑造代码的判断——需求、计划、评审结论和经验常常随对话窗口一起消失。`spec-first` 把这些工作作为持久 artifact 留在你的仓库里：**脚本产出可信事实，LLM 做语义判断，证据留在仓库**，让下一次会话、reviewer 和同事直接继承上下文，而不是从零开始。Kiro 与 Qoder 当前都是 opt-in preview 宿主，Cursor 当前是 opt-in generated-runtime preview。
 
+**定位边界：** 当前产品是 AI-enhanced SDLC / SDD workflow harness，核心是需求到可信变更的工程闭环。它不等同于覆盖团队交付治理、部署编排、生产运维和运营反馈的完整 AI-DLC；需要这些能力时，应接入现有工程系统或明确的外部 workflow。
+
 落到 CLI，它通过 `doctor / init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [-y] / update / clean (--claude|--codex|--cursor|--kiro|--qoder)` 把统一的 `spec-*` workflow 入口投射到各宿主 runtime assets，并同步 workflow skills、agents、agent support files 和受管状态。开发者偏好单独保存在全局 `~/.spec-first/.developer`。
 
 完成 `doctor`、`init` 和宿主重启后，首次进入业务 workflow 前先运行 `spec-runtime-setup`，准备 required harness runtime、MCP/helper readiness 与 setup facts。后续普通 plan/work/debug/review 不需要每次重复 setup，继续使用 bounded direct source reads、`rg`、ast-grep、git diff、tests、logs 和用户提供证据；宿主、provider、helper 配置或 setup facts 变化时再重跑。
@@ -69,9 +71,9 @@ Plan lifecycle audit 的边界：
 - 一份 workflow 产物目录，说明每类文档和 generated runtime assets 的生成者、读取方与 Git 边界
 - 一份 [source/runtime/provider customization boundary](../contracts/source-runtime-customization-boundary.md)，说明 source-of-truth、generated runtime mirrors、workflow artifacts、provider/tool facts、raw output safety 和 credential boundary
 
-## 当前工程闭环
+## 当前变更闭环
 
-主链路可以从 `Ideate -> Brainstorm -> Plan -> Work -> Review -> Compound` 理解，但当前用户手册覆盖的是更完整的工程闭环：
+主链路可以从 `Ideate -> Brainstorm -> Plan -> Work -> Review -> Compound` 理解；当前用户手册覆盖的是需求到可信变更的完整变更闭环：
 
 ```text
 using-spec-first（入口路由，可选）

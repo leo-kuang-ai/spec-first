@@ -64,7 +64,8 @@ function hasConfirmedLoadedRootReceipt(authority, targetIdentity) {
     || receipt.verification_status !== 'confirmed'
     || receipt.reason_code !== 'host-authority-loaded-root-bound'
     || receipt.host !== authority.host
-    || receipt.loaded_host !== authority.host
+    || !(receipt.loaded_host === authority.host
+      || (Array.isArray(receipt.surface_hosts) && receipt.surface_hosts.includes(authority.host)))
     || receipt.canonical_entry_name !== 'spec-runtime-setup'
     || path.resolve(receipt.target_identity) !== path.resolve(targetIdentity)
     || receipt.enforcement_status !== 'loaded-root-checked') {

@@ -42,10 +42,10 @@ function getSupportedPlatforms() {
 }
 
 /**
- * Get the human-facing display name declared by the platform registry.
- * Registry-driven so adding a host cannot leave a second hardcoded name list stale.
- * @param {string} platformId - Platform identifier
- * @returns {string} Display name, falling back to the raw platform ID
+ * 取 registry 声明的宿主显示名。registry 派生，新增宿主不会留下第二份
+ * 硬编码名单失同步。
+ * @param {string} platformId - 平台标识
+ * @returns {string} 显示名，缺失时回退原始平台 ID
  */
 function getPlatformDisplayName(platformId) {
   const entry = PLATFORM_REGISTRY[platformId];
@@ -53,10 +53,10 @@ function getPlatformDisplayName(platformId) {
 }
 
 /**
- * Hosts whose sessions can invoke `spec-first startup-reminder`: exactly the
- * platforms whose registry capabilities declare a session-start hook (confirmed
- * or degraded). Derived, not duplicated, so a new host opts in via the registry.
- * @returns {string[]} Array of platform IDs
+ * 会话可调用 `spec-first startup-reminder` 的宿主：恰为 registry capabilities
+ * 声明了 session-start hook（confirmed 或 degraded）的平台。派生而非复制，
+ * 新宿主经 registry 自动加入。
+ * @returns {string[]} 平台 ID 数组
  */
 function getStartupReminderHosts() {
   return getSupportedPlatforms().filter((platformId) => {

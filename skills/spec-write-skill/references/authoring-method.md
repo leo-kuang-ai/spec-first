@@ -67,6 +67,8 @@ Frontmatter `description` 必须同时表达：
 
 避免尖括号占位符、同义词堆叠和只在正文出现的触发规则。先用 positive、negative、near-neighbor 样例检查 route，再扩展 package。
 
+Mechanism-led ordering (from the CE authoring pass): sentence 1 names the distinctive mechanism — what a sibling skill would not produce — front-loading the word that should fire it in prompts; a category opener without the mechanism fails. Write each "Use when…" trigger as an observable work-state, not a phrasing. Prefer routing a sibling's job as "Use <sibling> for <that job>", and keep "Not for" only when the same words would fire both skills. Never stuff quoted utterances or `/name` aliases into a model-invoked description — they belong only on a user-invoked or `disable-model-invocation` skill, after the mechanism.
+
 ### Branch-First Information Hierarchy
 
 先列只有在输入、步骤、输出或验证不同才成立的 branch，再放置资源：
@@ -133,3 +135,33 @@ Same-repo migration 对每个非 portable 文件给出 disposition：
 - Description 不使用 `<placeholder>`；需要占位时用自然语言或 `{placeholder}`。
 - 新增脚本必须有实际运行和零意外写入证据。
 - Forward testing 只传 raw artifact 和真实用户请求，不泄漏预期答案或 intended fix。
+
+### Plain prose during size restructuring
+
+Keep one idea per sentence in ordinary language. Do not fuse clauses, drop articles, or pack several rules into a compressed sentence merely to meet a byte ceiling. When a body is too large, move a coherent block to a reference named at its point of use or remove genuine redundancy. Leave headroom for later fixes; readability and preserved safety meaning take priority over squeezing bytes.
+
+## Size restructure checkpoints
+
+Classify the current body and consumers before extracting, even below a size ceiling. A procedure without references may need phase owners; a compact router may need only a shared invocation reference. Audit frontmatter as its own always-loaded activation contract. Read public product documentation before changing behavior, including whether completion promises a local commit or a separate shipping handoff.
+
+Trace every moved reference from its executing step. Delete a reference that loses all callers unless an independent consumer or provenance requires retention. A green baseline supports a no-regression comparison, not a claim that behavior improved; validate any claimed improvement separately.
+
+Before rewriting for a size limit, identify the constraint's source and the shipping path it governs. Distinguish observed truncation from a future packaging target; neither a target nor an upstream incident proves that the current host truncates this Skill. Preserve required behavior even when the body cannot meet the target, and record the remaining constraint.
+
+Run the existing contract tests before rewriting and audit each verbatim pin by the failure it protects. Check the test comment or introducing commit, not the author's identity or the pin's age:
+
+- Keep incident-backed rules that must act before any reference read in the body. Preserve exact wording only when wording is the contract, such as an invocation or status token.
+- Check artifact invariants over the reachable body and references when they need not act at load time. Do not turn every body assertion into a corpus search.
+- Restate incidental wording as the condition it protects, or remove an unsupported assertion with a reason in the test comment. Missing provenance does not by itself justify removing a safety rule.
+
+Read what each assertion measures. A search-window ceiling is not a required section size or a minimum body size. Relocate coherent blocks before deleting them; do not compress prose to satisfy a numeric target. For placement and evaluation, follow the workbench and evaluation references required by the current apply branch.
+
+Treat a removed concrete shape as a behavior change. A concrete form — a known-good fragile command, or the failing shape a rule names — may be what the most literal host in the shipping matrix actually matches on, so removing it is a behavior change however the block reads afterward. Decide whether a host needs the shape by running that host, not by re-reading the block; when it needs one, keep a single example subordinated under the condition it illustrates (it rules on nothing) rather than choosing between condition and case list. The same test governs generalizing an enumeration into its condition. A removal or generalization still gets the behavioral eval whenever the removed text could have been carrying a literal reader — which is not the same as having recorded provenance.
+
+Let nothing compete with an exclusion. Literal readers act on whatever follows an exclusion when it offers a competing decision: an illustration subordinated to the exclusion is fine because it decides nothing, a qualification goes before it, and an alternative destination is delegated to the section that owns it rather than listed inline as somewhere else to land.
+
+After verbatim relocation, compare each reference with the body before evaluation. Remove the reference's duplicate of any gate, condition, or confirmation still owned by the body; preserve the body copy that must act before a read. The reference should state the facts or procedure it supplies to that gate. Relocation is incomplete while the same decision is independently prescribed twice, even if both copies agree today.
+
+Read moved rules against their new neighbors. A rule that was safe inside a phase can appear to override a nearby boundary after extraction. State its actual precondition where it now appears. If a shortened sentence needs a second corrective qualification, stop shortening the proxy and state the underlying condition. For example, protecting completed checkpoints must still allow a recovery scan for missing result markers; an absolute ban on entering earlier phases would lose that recovery path.
+
+When shared mandatory blocks prevent meeting a size ceiling, measure their combined floor and identify the owning shared contract that would need to change. Disclose the remaining limit rather than removing pinned safety behavior or claiming that prose compression can solve it. Keep any change to that shared contract within its own authorized scope.

@@ -108,7 +108,7 @@ function installFakeProviders({ binRoot, homeRoot }) {
     `const activeRoot = ${JSON.stringify(activeRoot)};`,
     `const delayControl = ${JSON.stringify(delayControl)};`,
     `const failControl = ${JSON.stringify(failControl)};`,
-    "if (args[0] === '--version') { process.stdout.write('graphify 0.9.29\\n'); process.exit(0); }",
+    "if (args[0] === '--version') { process.stdout.write('graphify 0.9.57\\n'); process.exit(0); }",
     "const leakedKeys = ['REVIEW_SENTINEL_SECRET', 'OPENAI_API_KEY', 'SPEC_FIRST_INTERNAL_WORKSPACE_GRAPH_REFRESH_ONLY', 'SPEC_FIRST_INTERNAL_WORKSPACE_CODEGRAPH_COMMAND', 'SPEC_FIRST_INTERNAL_WORKSPACE_GRAPHIFY_COMMAND', 'SPEC_FIRST_INTERNAL_WORKSPACE_GRAPH_LEASE_TOKEN', 'SPEC_FIRST_INTERNAL_WORKSPACE_GRAPH_LEASE_PID', 'SPEC_FIRST_INTERNAL_WORKSPACE_GRAPH_LEASE_START'];",
     'const leakedEnv = Object.fromEntries(leakedKeys.filter((key) => process.env[key] !== undefined).map((key) => [key, process.env[key]]));',
     'const invocation = `${process.pid}-${Date.now()}-${crypto.randomUUID()}`;',

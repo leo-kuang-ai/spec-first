@@ -13,14 +13,21 @@ Before running the script, optionally run `git fetch --quiet` (best-effort — s
 
 ## Step 1: Adjudicate the mechanical flags
 
-The script reports flags; you decide each one. Three resolutions — **fix**, **annotate**, or **confirm intentional** — never an automatic rewrite and never an automatic pass:
+The script reports flags and advisory NOTE hex identifiers; you decide each one. A NOTE does not change the exit code and is not proof of a false citation. Verify any identifier actually used as a commit claim before promotion. Three resolutions — **fix**, **annotate**, or **confirm intentional** — never an automatic rewrite and never an automatic pass:
+
+For a private candidate, pass `--repo-root <target-repo> --target-path <final-learning-path>`: read content from scratch, check Git facts against the selected repository, and resolve relative links from the intended final location. A zero exit only means no mechanical flags; it does not approve semantic claims.
+
+An invalid or unreadable explicit directory is a usage error. A valid project directory without usable Git context retains filesystem, relative-link, and scaffold checks; report Git path/SHA classification as unavailable and commit claims as unverified. Never treat that degraded zero exit as proof of Git or merge state.
+
+Explicit commit/revision cues, landing phrases, and repository pins make unresolved hashes FLAGs. Other hex identifiers remain NOTEs. This bounded cue detector only prioritizes evidence for adjudication; it does not classify every natural-language citation. Review NOTE items too, including in Lightweight mode.
 
 | Flag | Likely meaning | Resolution |
 |------|----------------|------------|
 | path not found anywhere | Typo, or drafted from memory | Fix the citation or remove the claim |
 | path missing here, exists at upstream | Stale checkout | Verify the claim against upstream; annotate if the doc implies the file is present locally |
 | path deliberately gone (doc says removed/renamed) | Historical citation | Confirm the surrounding prose marks it as historical ("removed by this fix", "pre-fix state"); add that marker if absent |
-| SHA does not resolve | Fabricated or from another repo | Replace with the PR number, or drop |
+| FLAG sha does not resolve with an explicit commit cue | Commit reference unsupported by this checkout | Verify the citation; correct, soften, or drop unsupported claims |
+| NOTE hex does not resolve | May be a session ID, digest, or unverified commit | Determine its actual use; verify commit claims or soften/drop them |
 | SHA reachable from HEAD only | Local-only commit; SHA will change on rebase/squash merge | Replace with the PR number |
 | SHA reachable from upstream only | Checkout predates the merge | Keep, with a temporal qualifier; verify the landed claim via `gh` |
 | SHA exists but unreachable | Rebased-away commit | Replace with the PR number |

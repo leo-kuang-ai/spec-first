@@ -1,0 +1,29 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "ce-129-sync-supplemental-20260910",
+  "producer": "ZCode session (CE-129 sync supplemental audit)",
+  "reviewed_at": "2026-09-10T13:13:59.565Z",
+  "source_binding": {
+    "head": "19d3f6d8a06f3088d4e392a8718dac47aefa8587",
+    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source_tree_hash": "5c75c9adfc8f24f7c377d833cc4683c9abc049fb9348e4178ae9db54b068d95e",
+    "inventory_hash": "3d2c3266db961c90c358e4d824687e879530eadc612e3e24e0f936659c39aa58",
+    "inventory_artifact_sha256": "af887520669a32a1374e8b321f5824679da5779e6a91e0176204e6c497cd1e4d",
+    "review_input_hash": "5a829bc6886459b253a50265895151f3b12cc36f91166e759ee1293ccf2674da"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "not-used",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "reviewed_paths": [],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "Inline same-context review by the implementing session; verdicts rest on the per-item evidence records in docs/validation/ce-pull-2026-09-09/, not on an independent provider re-read.",
+    "Coverage is limited to relations whose receipt hashes changed since the last review round; unchanged relations carry over their prior review."
+  ],
+  "claim_ceiling": "confirms source-read coverage and the absence of newly identified actionable findings by the implementing session; does not claim independent dual-provider review, field behavioral verification, or host-portability proof"
+}

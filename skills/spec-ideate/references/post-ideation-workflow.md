@@ -10,6 +10,8 @@ Review every candidate idea critically. Critique has two roles — basis verific
 
 2. **Orchestrator arbitration.** The orchestrator makes the final cut, weighing verifier verdicts without being bound by them — overrule a verdict when evidence in context contradicts it, and say so in the rejection reason.
 
+**Carry the resolved floor into both payloads.** When tactical scope is active, explicitly tell generators and the basis verifier that the meeting-test floor is waived; verify basis integrity anyway. A detected tactical signal suppressed by `go deep` grants no waiver. Do not expect a verifier without generation history to infer the active floor.
+
 If an authorized verifier dispatch fails, fall back to orchestrator-only filtering, record the capability/failure reason, and note the degradation in the rejection summary.
 
 Do not generate replacement ideas in this phase unless explicitly refining.
@@ -26,7 +28,7 @@ Rejection criteria:
 - interesting but better handled as a brainstorm variant, not a product improvement
 - **unjustified — no articulated basis** (sub-agent failed to provide `direct:`, `external:`, or `reasoned:` justification, or the stated basis does not actually support the claimed move)
 - **basis refuted by verification** (the verifier found a cited quote absent, prior art mischaracterized, or a reasoned argument unsound — and the orchestrator concurs)
-- **below ambition floor** (fails the meeting-test: would not warrant team discussion — except when Phase 0.5 detected tactical focus signals, in which case this criterion is waived)
+- **below ambition floor** (fails the meeting-test: would not warrant team discussion — except when Phase 0.5 resolved tactical scope as active, in which case this criterion is waived)
 - **subject-replacement** (abandons or replaces the subject of ideation rather than operating on it — e.g., "pivot to an unrelated domain," "become a different organization")
 - **scope overrun** (expands beyond the asked scope rather than ideating within it — e.g., proposes changes to the whole product when the user asked about one flow, stage, or section). Allowed only when the basis explicitly justifies the expansion; default is reject or downgrade.
 
@@ -47,7 +49,7 @@ The ideation artifact is produced **automatically** — persistence is not opt-i
 
 ### 4.1 Write the Deliverable (automatic, both modes)
 
-`OUTPUT_FORMAT` (resolved in SKILL.md Phase 0.0; default `html`) sets the extension. Write the file every run — do not wait for the user to ask.
+`OUTPUT_FORMAT` (resolved in `references/output-mode.md` Phase 0.0; default `html`) sets the extension. Write the file every run — do not wait for the user to ask.
 
 1. **Resolve the target directory and extension.**
    - Extension follows `OUTPUT_FORMAT` (`.html` default, `.md` on override).
@@ -59,7 +61,7 @@ The ideation artifact is produced **automatically** — persistence is not opt-i
 4. **Write the document** per those references. `ideation-sections.md` defines the section contract (metadata, Grounding Context, Topic Axes, Ranked Ideas with per-idea fields, Rejection Summary); the rendering reference defines how the resolved format presents it. Content is identical across formats; only presentation differs.
    - **On write failure** (no writable path, permissions): announce the failure and offer a custom path (validate writable; create parent dirs). Never lose the survivors silently.
 
-**Resume:** update the existing file in place, in its existing format (per SKILL.md Phase 0.1 format precedence); carry the prior ideas and rejection summary forward, adding to them rather than overwriting.
+**Resume:** update the existing file in place, in its existing format (per `references/output-mode.md` Phase 0.1 format precedence); carry the prior ideas and rejection summary forward, adding to them rather than overwriting.
 
 ### 4.2 Present a Concise Summary (not the full deliverable)
 
@@ -79,7 +81,7 @@ This ranked list doubles as the index the user references when choosing an idea 
 
 ## Phase 5: Next Steps
 
-Ask what to do next using the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question. Free-text answers are accepted.
+Ask what to do next using the platform's blocking question tool: the host's blocking question tool already in the current tool list, matched by capability (if a matching tool is listed but unloaded, load it through the host's tool-discovery primitive). Fall back to numbered options in chat only when no such tool is in the list or a real question call errors. Never silently skip the question. Free-text answers are accepted.
 
 The deliverable already exists (Phase 4), so the menu is purely *what next* — there is no "save" step.
 
@@ -147,7 +149,7 @@ Before finishing, check:
 - the idea set is grounded in the stated context (codebase in repo mode; user-supplied context in elsewhere mode)
 - **every surviving idea has an articulated basis** (`direct:`, `external:`, or `reasoned:`) that actually supports the claimed move — speculation dressed as ambition was rejected, with reasons
 - load-bearing `direct:` bases were verified against the repo (or the supplied context) — by the generating agent's verification reads or the Phase 3 verifier — not taken on faith
-- **every surviving idea passes the meeting-test** unless Phase 0.5 detected tactical focus signals that waived the floor
+- **every surviving idea passes the meeting-test** unless Phase 0.5 resolved tactical scope as active that waived the floor
 - **no surviving idea replaces the subject** rather than operating on it
 - when Phase 1.5 produced an axis list, the survivor set spreads across axes rather than clustering on one — and any axis with zero survivors is noted as a deliberate gap in the rejection summary, not silently absent
 - the candidate list was generated before filtering
@@ -155,6 +157,6 @@ Before finishing, check:
 - if sub-agents were used, they improved diversity without replacing the core workflow
 - every rejected idea has a reason
 - survivors are materially better than a naive "give me ideas" list
-- the deliverable was written automatically in both modes (Phase 4) — to `docs/ideation/` when present, else the spec-first temp area, never the user's CWD
+- the deliverable was written automatically in both modes (Phase 4) — to a repo-owned ideation directory or user-selected durable destination, otherwise returned completely inline
 - the session showed a concise summary, not a reproduction of the full deliverable
 - acting on an idea routes to `spec-brainstorm` (with a substance seed, not the whole file), not directly to implementation

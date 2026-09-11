@@ -10,7 +10,11 @@ function read(relativePath) {
 }
 
 describe('spec-doc-review task-pack consumer contract', () => {
-  const skill = read('skills/spec-doc-review/SKILL.md');
+  const skill = [
+    read('skills/spec-doc-review/SKILL.md'),
+    read('skills/spec-doc-review/references/modes.md'),
+    read('skills/spec-doc-review/references/document-intake.md'),
+  ].join('\n');
   const synthesis = read('skills/spec-doc-review/references/synthesis-and-presentation.md');
   const writeTasks = read('skills/spec-write-tasks/SKILL.md');
   const handoff = read('skills/spec-write-tasks/references/execution-handoff-contract.md');
@@ -22,13 +26,13 @@ describe('spec-doc-review task-pack consumer contract', () => {
     : { cases: [] };
 
   test('classifies task packs before generic requirements or plan signals', () => {
-    expect(skill).toContain('`type: task-pack` → classify as `task-pack`');
-    expect(skill).toContain('`task-pack` 分类优先于 unified requirements/plan 与通用 content-shape 分类');
+    expect(skill).toContain('`type: task-pack` -> classify as `task-pack`');
+    expect(skill).toMatch(/`task-pack` classification precedes\s+unified requirements\/plan/);
     expect(skill).toContain('references/task-pack-review-lens.md');
   });
 
   test('keeps derived task packs report-only under producer ownership', () => {
-    expect(skill).toContain('`task-pack` 强制使用 `report-only`');
+    expect(skill).toContain('`task-pack` always requires `report-only`');
     expect(skill).toContain('mutation_reason: task-pack-derived-artifact');
     expect(synthesis).toContain('task-pack-derived-artifact');
   });

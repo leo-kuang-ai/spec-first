@@ -169,7 +169,26 @@ present. They carry the contracts downstream consumers depend on.
 - **Goal Capsule** — objective, recommended approach, authority hierarchy,
   decision focus, verification focus, largest risk or scope boundary, stop
   conditions, execution profile, and tail ownership. It is the first-screen
-  orientation for both human reviewers and executors.
+  orientation for both human reviewers and executors. The objective is always
+  the outcome — what is true for users or operators afterwards, anchored
+  above the component being changed: an outcome someone outside that
+  component can verify without knowing its internals is a valid objective
+  even when that component is what changed, while one only its internals can
+  settle is not, however outcome-shaped its wording. Infrastructure and
+  refactor work has such an objective too: what that component's behavior
+  cost the people the system serves. When a request supplies only an
+  approach, that approach is the recommended-approach line, and the objective
+  is the outcome it serves, derived from the request's motivation, the
+  project's stated problem, or asked for — never the approach restated. The
+  objective must be holdable on its own: a reader who has not read the rest
+  of the plan must be able to hold it as the goal — could a colleague who
+  was not in the session say what this work is after the objective alone?
+  Remaining-true constraints live on their owning R-IDs, not as extra
+  objective clauses; user-checkable is not a license to pack them onto the
+  objective. An objective only understandable after later sections is not
+  yet the objective. Tests: if the implementation changed, would the
+  objective still be the goal? And can it be held without the rest of the
+  plan?
 - **Product Contract** — product scope and behavior. Contains Summary, Problem
   Frame, Requirements with stable R-IDs, and any material Actors, Flows,
   Acceptance Examples, Success Criteria, Scope Boundaries, Dependencies,
@@ -383,6 +402,8 @@ silent lifecycle reset: do not turn `completed`, `partially-shipped`, or
 metadata blocks enrichment for repair. Whether a non-`active` source later
 enters execution remains the existing consumer's decision; this producer does
 not add an intake gate.
+
+当前用户明确要求补完非活跃历史计划时，按 `SKILL.md` Phase 0.1 核验并复用有效后继，或创建仅覆盖已确认剩余范围的新计划。旧计划原文、状态与旧 task-pack pins 保持不变；新计划正文记录历史来源、替代关系、当前证据和验收边界。只读审阅不触发新计划生产，历史完成声明不替代当前验证。
 
 HTML plans do not carry `status`. Likewise, knowledge-work,
 universal-planning, answer-seeking, and approach-plan outputs do not carry

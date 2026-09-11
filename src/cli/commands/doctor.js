@@ -4,7 +4,9 @@ const { inspectInstalledAssets, listBundledCommands, loadPluginManifest } = requ
 const { readDeveloperFile, getGlobalDeveloperPath } = require('../developer');
 const { isCommandTimeout, spawnSyncWithTimeout } = require('../external-command');
 const { isLegacyManagedState, readState, readStateFileRaw } = require('../state');
-const { getAdapter, getSupportedPlatforms } = require('../adapters');
+const { getAdapter, getPlatformDisplayName, getSupportedPlatforms } = require('../adapters');
+const { PLATFORM_REGISTRY } = require('../adapters/platform-registry');
+const { formatSupportedHostFlags } = require('../helpers/supported-host-flags');
 const { inspectInstructionBootstrap } = require('../instruction-bootstrap');
 const { formatInitGuidance } = require('../init-guidance');
 const { inspectManagedClaudeHooks } = require('../claude-settings');
@@ -35,7 +37,7 @@ function runDoctor(argv) {
   }
 
   if (parsed.unknown.length > 0) {
-    console.error('Usage: spec-first doctor [--claude|--codex|--cursor|--kiro|--qoder|--opencode|--zcode|--pi] [--json] [--verbose]');
+    console.error(`Usage: spec-first doctor ${formatSupportedHostFlags('pipe')} [--json] [--verbose]`);
     return 2;
   }
 
@@ -51,25 +53,28 @@ function runDoctor(argv) {
   }
 
   if (platforms.length === 0) {
+    const report = buildDoctorReport({ projectRoot, platforms, selectionMode });
     if (parsed.json) {
-      printDoctorJson(buildDoctorReport({ projectRoot, platforms, selectionMode }));
-      return 0;
+      printDoctorJson(report);
+      return getDoctorExitCode(report);
     }
 
-    console.log('No spec-first platform detected in this project.');
-    console.log('Run `spec-first init` and select Claude Code, Codex, Cursor, Kiro, Qoder, and/or OpenCode when prompted to initialize.');
-    return 0;
+    printDoctorHumanReport(report, { verbose: parsed.verbose });
+    console.log('');
+    console.log('未检测到宿主。');
+    console.log('运行 `spec-first init`，并在交互提示中选择 Claude Code、Codex、Cursor、Kiro、Qoder、OpenCode、ZCode 和/或 Pi 进行初始化。');
+    return getDoctorExitCode(report);
   }
 
   const report = buildDoctorReport({ projectRoot, platforms, selectionMode });
 
   if (parsed.json) {
     printDoctorJson(report);
-    return report.has_error ? 3 : 0;
+    return getDoctorExitCode(report);
   }
 
   printDoctorHumanReport(report, { verbose: parsed.verbose });
-  return report.has_error ? 3 : 0;
+  return getDoctorExitCode(report);
 }
 
 function printDoctorHumanReport(report, options) {
@@ -143,6 +148,7 @@ function formatDoctorHumanReport(report, { verbose = false } = {}) {
 
   if (!verbose) return lines;
 
+  appendDoctorEvidenceSummary(lines, report);
   lines.push('', '详细检查：');
   appendDoctorCheckDetails(lines, '通用环境', commonChecks, { selectionMode });
   for (const platform of platforms) {
@@ -151,6 +157,25 @@ function formatDoctorHumanReport(report, { verbose = false } = {}) {
     });
   }
   return lines;
+}
+
+function appendDoctorEvidenceSummary(lines, report) {
+  const hasDecisionInput = typeof report.decision_input_health === 'string';
+  const hasWorkflowRunnability = typeof report.workflow_runnability === 'string';
+  if (!hasDecisionInput && !hasWorkflowRunnability) return;
+
+  lines.push('', '证据维度：');
+  if (hasDecisionInput) {
+    const basis = report.decision_input_health_basis || {};
+    const reason = basis.reason_code ? ` (reason=${basis.reason_code})` : '';
+    lines.push(`  decision_input_health: ${report.decision_input_health}${reason}`);
+  }
+  if (hasWorkflowRunnability) {
+    const basis = report.workflow_runnability_basis || {};
+    const reason = basis.fallback_reason || basis.reason_code;
+    const suffix = reason ? ` (reason=${reason})` : '';
+    lines.push(`  workflow_runnability: ${report.workflow_runnability}${suffix}`);
+  }
 }
 
 function isDoctorAttentionCheck(check) {
@@ -250,8 +275,11 @@ function appendDoctorAttentionSection(lines, title, items, kind) {
       else lines.push(`    说明：${kind === 'degraded' ? '能力已降级，当前结论受限。' : '本项尚未执行，不能作为完成证据。'}`);
       continue;
     }
-    if (check.fix) {
+    if (check.fix && check.fixSafety === 'safe') {
       lines.push(`    修复：${check.fix}`);
+    } else if (check.fix) {
+      lines.push(`    需要人工处理：${check.fix}`);
+      lines.push('    说明：producer 未声明该建议可安全自动执行；请先确认所有权、覆盖和删除影响。');
     } else {
       lines.push('    需要人工处理：此检查未提供可安全执行的修复建议；请根据诊断谨慎处理用户拥有的配置。');
     }
@@ -293,8 +321,13 @@ function appendDoctorCheckDetails(lines, scope, checks, { selectionMode = 'auto'
           ? '验证建议'
           : ['degraded', 'not-run'].includes(disposition)
             ? '下一步'
-          : '修复';
+          : check.fixSafety === 'safe'
+            ? '修复'
+            : '需要人工处理';
       lines.push(`             ${actionLabel}：${check.fix}`);
+      if (actionLabel === '需要人工处理') {
+        lines.push('             说明：producer 未声明该建议可安全自动执行；请先确认所有权、覆盖和删除影响。');
+      }
     } else if (buildRuntimeStatusProjection(check, { scope, selectionMode }).disposition === 'known-limitation') {
       lines.push('             说明：当前为已知限制，无需手工修改用户配置。');
     }
@@ -343,20 +376,20 @@ function checkGit() {
   };
 }
 
-// doctor 探测的宿主 CLI 命令与显示名；未列出的宿主回退 claude/Claude Code。
-const PLATFORM_CLI_PROBES = {
-  opencode: { command: 'opencode', displayName: 'OpenCode' },
-  codex: { command: 'codex', displayName: 'Codex' },
-  cursor: { command: 'agent', displayName: 'Cursor CLI' },
-  kiro: { command: 'kiro', displayName: 'Kiro' },
-  qoder: { command: 'qodercli', displayName: 'Qoder' },
-  zcode: { command: 'zcode', displayName: 'ZCode' },
-  pi: { command: 'pi', displayName: 'Pi' },
+// doctor 探测的宿主 CLI 命令名（探测命令与宿主 id 不同名时才登记）；
+// 显示名一律从 registry 派生，避免第二份硬编码名单漂移。
+const PLATFORM_CLI_PROBE_COMMANDS = {
+  cursor: 'agent',
+  qoder: 'qodercli',
+};
+const PLATFORM_CLI_DISPLAY_NAME_OVERRIDES = {
+  cursor: 'Cursor CLI',
 };
 
 function checkPlatformCli(platform, options = {}) {
-  const { command, displayName } = PLATFORM_CLI_PROBES[platform]
-    || { command: 'claude', displayName: 'Claude Code' };
+  const command = PLATFORM_CLI_PROBE_COMMANDS[platform] || platform;
+  const displayName = PLATFORM_CLI_DISPLAY_NAME_OVERRIDES[platform]
+    || getPlatformDisplayName(platform);
   // Note: Codex CLI may not be available yet - this is expected during MVP phase
   const runner = options.runner || spawnSyncWithTimeout;
   const isWindows = options.platform === 'win32' || (options.platform === undefined && process.platform === 'win32');
@@ -383,6 +416,7 @@ function checkPlatformCli(platform, options = {}) {
       message: 'version check timed out',
       reasonCode: `${platform}_cli_version_check_timeout`,
       disposition: options.selectionMode === 'explicit' ? 'action_required' : 'optional',
+      fixSafety: 'safe',
       fix: `Run \`${command} --version\` manually and inspect PATH or shell startup scripts.`,
     };
   }
@@ -394,6 +428,7 @@ function checkPlatformCli(platform, options = {}) {
       message: 'not found on PATH',
       reasonCode: `${platform}_cli_not_found`,
       disposition: options.selectionMode === 'explicit' ? 'action_required' : 'optional',
+      fixSafety: 'safe',
       fix: `Install ${displayName} and restart your shell.`,
     };
   }
@@ -404,6 +439,7 @@ function checkPlatformCli(platform, options = {}) {
     message: 'could not verify version',
     reasonCode: `${platform}_cli_version_check_failed`,
     disposition: options.selectionMode === 'explicit' ? 'action_required' : 'optional',
+    fixSafety: 'safe',
     fix: `Run \`${command} --version\` manually to confirm the CLI works.`,
   };
 }
@@ -1176,7 +1212,7 @@ function buildDoctorReport({ projectRoot, platforms, selectionMode = 'auto' }) {
     const adapter = getAdapter(platform);
     const assetInspection = inspectRuntimeAssetInventory(projectRoot, adapter);
     const platformCliCheck = checkPlatformCli(platform, { selectionMode });
-    const runtimeFileChecks = adapter.inspectRuntimeFiles(projectRoot);
+    const runtimeFileChecks = inspectRuntimeFilesSafely(projectRoot, adapter, platform);
     const commandChecks = adapter.hasCommands ? [checkGeneratedCommands(adapter, assetInspection)] : [];
     const hostSpecificChecks = buildHostSpecificChecks(projectRoot, adapter);
     const coreRuntimeChecks = [
@@ -1272,6 +1308,60 @@ function buildDoctorReport({ projectRoot, platforms, selectionMode = 'auto' }) {
     warnings: allChecks.filter((check) => check.level === 'WARNING'),
     has_error: allChecks.some((check) => check.level === 'ERROR'),
   };
+}
+
+function inspectRuntimeFilesSafely(projectRoot, adapter, platform) {
+  try {
+    return adapter.inspectRuntimeFiles(projectRoot);
+  } catch (error) {
+    const diagnostic = error instanceof Error ? error.message : String(error);
+    return [{
+      level: 'ERROR',
+      name: `${getPlatformDisplayName(platform)} runtime inspection`,
+      message: diagnostic,
+      reasonCode: `${platform}_runtime_inspection_failed`,
+      disposition: 'action_required',
+      fixSafety: 'manual',
+      fix: `Repair the ${platform} runtime paths or rerun \`spec-first init --${platform}\`.`,
+    }];
+  }
+}
+
+function getDoctorExitCode(report) {
+  if (report.has_error) return 3;
+  // Arm the missing-CLI block only when the selected host was never
+  // initialized (its state file is missing) or its assets are actually broken
+  // ('error'). Initialized-but-drifted assets ('warn' with a recorded state)
+  // keep the CLI absence diagnostic: the drift report is the actionable output.
+  const platformNeverInitialized = Object.entries(report.platform_checks || {})
+    .filter(([platform]) => {
+      const supportState = report.host_support
+        && report.host_support[platform]
+        && report.host_support[platform].support_state;
+      return supportState !== 'preview';
+    })
+    .some(([, checks]) => Array.isArray(checks) && checks.some((check) => (
+      typeof check.name === 'string'
+      && check.name.endsWith('/state.json')
+      && check.message === 'missing'
+    )));
+  const hasBlockingActionRequired = report.selection_mode === 'explicit'
+    && (report.runtime_asset_health === 'error' || platformNeverInitialized)
+    && Object.entries(report.platform_checks || {}).some(([platform, checks]) => {
+      const supportState = report.host_support
+        && report.host_support[platform]
+        && report.host_support[platform].support_state;
+      if (supportState === 'preview') return false;
+      return Array.isArray(checks) && checks.some((check) => (
+        check.disposition === 'action_required'
+        && typeof check.reasonCode === 'string'
+        && check.reasonCode.startsWith(`${platform}_cli_`)
+      ));
+    });
+  if (hasBlockingActionRequired) {
+    return 3;
+  }
+  return 0;
 }
 
 function summarizeChecks(checks) {
@@ -1875,7 +1965,7 @@ function printHelp() {
     '🩺 spec-first doctor',
     '',
 	    '📘 Usage:',
-	    '  spec-first doctor [--claude|--codex|--cursor|--kiro|--qoder|--opencode|--zcode|--pi] [--json] [--verbose]',
+	    `  spec-first doctor ${formatSupportedHostFlags('pipe')} [--json] [--verbose]`,
 	    '  --verbose  在简明总览后显示所有检查明细。',
 	    '',
 	    '📊 JSON status fields:',
@@ -1913,25 +2003,27 @@ function detectPlatforms(projectRoot) {
   });
 }
 
+// 安装态判定按 registry 的 detection 描述符分派（唯一事实源）：
+// state-file 宿主的裸 runtime 目录可能是宿主客户端自建内容（settings、prompts、
+// extensions），只有受管 state file 能证明 spec-first 已安装——此前两份平行手写
+// 宿主清单漏改任一份即产生误判。
 function isPlatformRuntimeDetected(projectRoot, adapter) {
-  // ZCode/Pi 按受管 state file 判定而非裸 runtime 目录：宿主客户端可能自建
-  // 项目级 `.zcode/`/`.pi/` 内容（settings、prompts、extensions）而 spec-first
-  // 并未安装。
-  if (!['kiro', 'qoder', 'cursor', 'opencode', 'zcode', 'pi'].includes(adapter.id)) {
-    return fs.existsSync(path.join(projectRoot, adapter.runtimeRoot));
-  }
+  const entry = PLATFORM_REGISTRY[adapter.id];
+  const detection = entry && entry.detection;
 
-  if (adapter.id === 'qoder' || adapter.id === 'cursor' || adapter.id === 'opencode' || adapter.id === 'zcode' || adapter.id === 'pi') {
+  if (detection === 'state-file') {
     return fs.existsSync(path.join(projectRoot, adapter.stateFile));
   }
 
-  const runtimePaths = [
-    adapter.stateFile,
-    adapter.skillsRoot,
-    adapter.agentsRoot,
-  ];
+  if (detection === 'runtime-paths') {
+    return [
+      adapter.stateFile,
+      adapter.skillsRoot,
+      adapter.agentsRoot,
+    ].some((runtimePath) => fs.existsSync(path.join(projectRoot, runtimePath)));
+  }
 
-  return runtimePaths.some((runtimePath) => fs.existsSync(path.join(projectRoot, runtimePath)));
+  return fs.existsSync(path.join(projectRoot, adapter.runtimeRoot));
 }
 
 // 宿主 flag 集合从 registry 派生：新增宿主时 doctor 的解析面随 getSupportedPlatforms() 自动扩展。
@@ -1976,6 +2068,7 @@ function tryReadRawManagedState(projectRoot, adapter) {
 
 module.exports = {
   runDoctor,
+  getDoctorExitCode,
   detectPlatforms,
   checkWorkspaceGraphStatus,
   buildWorkspaceReadinessView,

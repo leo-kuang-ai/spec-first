@@ -8,7 +8,7 @@ const visualServer = 'skills/spec-brainstorm/scripts/visual-probe-server.js';
 
 describe('spec-brainstorm visual helper retirement', () => {
   test('removes the visual helper source surface', () => {
-    const brainstorm = fs.readFileSync(brainstormPath, 'utf8');
+    const brainstorm = require('../helpers/brainstorm-contract').readBrainstormContract();
 
     expect(fs.existsSync(visualReference)).toBe(false);
     expect(fs.existsSync(visualServer)).toBe(false);
@@ -18,7 +18,7 @@ describe('spec-brainstorm visual helper retirement', () => {
   });
 
   test('keeps visual decisions in the conversation-native main path', () => {
-    const brainstorm = fs.readFileSync(brainstormPath, 'utf8');
+    const brainstorm = require('../helpers/brainstorm-contract').readBrainstormContract();
 
     expect(brainstorm).toContain('comparison table, state sequence, ASCII wireframe, or read-only source screenshot');
     expect(brainstorm).toContain('close the affected Requirement, Acceptance Example, or Scope blocker normally');

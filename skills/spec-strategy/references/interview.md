@@ -1,6 +1,6 @@
 # Strategy Interview
 
-Loaded by `SKILL.md` at the start of Phase 1 and revisited per-section in Phase 2. Every section below maps one-to-one to a section in `strategy-template.md`.
+Read by `SKILL.md` at the start of Phase 1 and reused for the target section in Phase 2. The numbered questions correspond to `strategy-template.md`; Stress Test checks the interview and does not add a document section.
 
 For each section: ask the opening question, evaluate the answer against the quality bar, push back when it falls into a named anti-pattern, and capture the final answer in the user's own language.
 
@@ -122,11 +122,11 @@ Default is to skip. Do not push the user to invent milestones. If they name some
 
 ---
 
-## 7. Not Working On (optional)
+## 7. Not Working On
 
 **Opening question:** "Is there anything you've explicitly decided *not* to do right now that's worth naming? This is for things the team keeps being tempted by."
 
-Clarity tool, not a blocker list. Skip by default. If the user names items, one sentence each. Do not encourage a long list.
+These are strategic boundaries, not an issue list. This section is required in a new house-format document. If the user has named no exclusions, write "Nothing named yet" rather than inventing restrictions. For existing documents in other formats, follow update-run's minimal-edit and ownership rules. Use one sentence per item and resist long lists.
 
 ---
 
@@ -140,4 +140,10 @@ Skip by default. Keep to 2-3 lines if present.
 
 ## After the Interview
 
-Once sections 1-5 are captured (and any optional sections the user engaged with), read `strategy-template.md` and fill it in. Present the full draft in chat before writing. Offer one edit round. Then write to `STRATEGY.md`.
+After the first five sections, run the stress test below, then capture Not working on and any optional sections the user needs. Read `strategy-template.md`, retain local template headings and order, and use the user's own words. Show the draft with one edit opportunity; proceed when current authorization covers the local write, asking only for critical strategic answers still needed.
+
+## Stress Test
+
+Build a few concrete proposals from actual tensions or tradeoffs in the draft and ask the user to judge them one at a time. Proposals the strategy already resolves confirm it; unresolved proposals sharpen Our approach or Tracks; explicitly rejected proposals can seed Not working on. Do not substitute code activity for these choices or write the check as a new strategy section.
+
+Use the repo model and the user's words to name concrete contradictions, with two rounds maximum per section. If answers remain unclear, record what is available and suggest revisiting. Apply the same bar to existing sections; written content is not automatically accepted.

@@ -35,11 +35,11 @@ If `status` is `failed`, stop shipping and surface `reason`. If `degraded`, note
 
 If `artifact_path` is null, missing, or unreadable, use the complete in-band JSON already returned by the review and record `review-artifact-unavailable`. Do not re-run the review just to recover an artifact. Detail that exists only in a missing per-reviewer file remains a limitation; never invent `why_it_matters` or evidence.
 
-### Fallback — invoke review only for cold callers
+### Fallback — invoke `spec-code-review` only for cold callers
 
 Only when the caller reached this file **without** already running review (no review output in hand): invoke `spec-code-review` once, then proceed to apply. Do not invoke when the caller already ran review (e.g., spec-work shipping step 3a).
 
-Invoke the skill explicitly — do not treat a casual "review my changes" prompt as a substitute unless the harness routed it to `spec-code-review`.
+Invoke `spec-code-review` explicitly — do not treat a casual "review my changes" prompt as a substitute unless the harness routed it to that skill.
 
 ```
 spec-code-review mode:agent plan:<plan-path> base:<merge-base-or-ref>

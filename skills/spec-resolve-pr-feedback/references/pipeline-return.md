@@ -23,6 +23,8 @@ limitations and return control to the caller.
 
 ## Return Contract
 
+Populate `residuals` with the exact typed objects from [evaluation-rubric.md](evaluation-rubric.md), retaining all owned source IDs/kinds, the complete decision_context, and every open thread URL. Continue independent authorized work; return `partial` when decisions remain. Neither a reply acknowledgment nor a count/PR link substitutes for the decision payload. Leave every covered thread open, and return before any remote write.
+
 ```json
 {
   "status": "complete | partial | blocked",

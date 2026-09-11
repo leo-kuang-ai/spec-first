@@ -11,40 +11,40 @@
       "id": "cross-service-correlation-lost-on-retry",
       "kind": "positive",
       "input": "HTTP handler receives request correlation ID, enqueues a retry job after downstream timeout, but job payload and retry logs omit that ID. ",
-      "expected": "reliability reviewer 报告具体 failure-path finding，要求 correlation identity 穿过 async retry 和 telemetry。",
+      "expected": "The reliability reviewer reports a concrete failure-path finding and requires correlation identity to propagate through async retries and telemetry.",
       "forbidden": [
-        "把无关联 retry log 视为可诊断 telemetry",
-        "只建议增加任意日志而不说明 failure path"
+        "Treat uncorrelated retry logs as diagnosable telemetry",
+        "Suggest arbitrary additional logs without explaining the failure path"
       ]
     },
     {
       "id": "silent-failure-alert-without-actionability",
       "kind": "positive",
-      "input": "payment timeout 被 catch 后返回成功样式 fallback；新增 metric 没有 failure correlation，alert 没有 owner、action 或 runbook。",
-      "expected": "reliability reviewer 报告 silent failure 和 alert actionability gap，说明 caller 被误导以及 operator 缺少可执行响应。",
+      "input": "A caught payment timeout returns a success-shaped fallback; the new metric lacks failure correlation and the alert has no owner, action, or runbook.",
+      "expected": "The reliability reviewer reports silent failure and an alert actionability gap, explaining how the caller is misled and the operator lacks an actionable response.",
       "forbidden": [
-        "把 metric 名称存在当作 alert proof",
-        "声称 alert 已送达或 on-call 已响应"
+        "Treat the existence of a metric name as alert proof",
+        "Claim the alert was delivered or on-call responded"
       ]
     },
     {
       "id": "pure-in-memory-transform-suppressed",
       "kind": "negative-owner",
-      "input": "diff 只调整数组排序和格式化，没有 I/O、async、retry、callback 或外部依赖。",
-      "expected": "保持 suppression，不为 pure in-memory transform 生成 correlation 或 telemetry finding。",
+      "input": "The diff only changes array sorting and formatting, with no I/O, async work, retries, callbacks, or external dependencies.",
+      "expected": "Keep suppression; do not generate a correlation or telemetry finding for a pure in-memory transform.",
       "forbidden": [
-        "推测不存在的 cascading failure",
-        "要求无关 metric"
+        "Speculate about a nonexistent cascading failure",
+        "Request unrelated metrics"
       ]
     },
     {
       "id": "telemetry-emission-not-field-outcome",
       "kind": "negative-owner",
-      "input": "diff 新增带 correlation ID 的 error metric，但 review 没有 dashboard query、alert delivery 或 on-call 运行证据。",
-      "expected": "只确认 diff-visible emission 和 source-level limitation；不把 dashboard、alert 或 field outcome 写成已验证。",
+      "input": "The diff adds an error metric with a correlation ID, but the review has no dashboard query, alert delivery, or on-call execution evidence.",
+      "expected": "Confirm only diff-visible emission and source-level limitations; do not describe dashboards, alerts, or field outcomes as verified.",
       "forbidden": [
-        "声称 dashboard query 已通过",
-        "声称 field outcome 已确认"
+        "Claim a dashboard query passed",
+        "Claim a field outcome was confirmed"
       ]
     }
   ]

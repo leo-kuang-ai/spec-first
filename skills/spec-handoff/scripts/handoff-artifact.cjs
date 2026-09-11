@@ -8,7 +8,9 @@ const path = require('node:path');
 const CONTRACT = 'spec-handoff/v1';
 const MAX_INPUT_BYTES = 256 * 1024;
 const MAX_FRONTMATTER_BYTES = 16 * 1024;
+const MAX_FRONTMATTER_LINES = 64;
 const MAX_DISCOVERY_LIMIT = 20;
+const MAX_DISCOVERY_ENTRIES = 200;
 
 function toPosix(value) {
   return value.split(path.sep).join('/');
@@ -221,73 +223,118 @@ function writeArtifact({ inputPath, targetRepo, workspaceSlug }) {
 function parseFrontmatter(filePath) {
   const stat = fs.lstatSync(filePath);
   if (!stat.isFile() || stat.isSymbolicLink()) return null;
-  const fd = fs.openSync(filePath, 'r');
-  const buffer = Buffer.alloc(Math.min(stat.size, MAX_FRONTMATTER_BYTES));
-  try { fs.readSync(fd, buffer, 0, buffer.length, 0); } finally { fs.closeSync(fd); }
-  const source = buffer.toString('utf8');
-  if (!source.startsWith('---\n')) return null;
-  const end = source.indexOf('\n---\n', 4);
-  if (end < 0) return null;
-  const metadata = {};
-  for (const line of source.slice(4, end).split('\n')) {
+  const fd = fs.openSync(filePath, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0));
+  const buffer = Buffer.alloc(MAX_FRONTMATTER_BYTES);
+  const lines = [];
+  let closed = false;
+  try {
+    const opened = fs.fstatSync(fd);
+    if (!opened.isFile() || opened.dev !== stat.dev || opened.ino !== stat.ino) return null;
+    let start = 0;
+    for (let offset = 0; offset < buffer.length; offset += 1) {
+      if (fs.readSync(fd, buffer, offset, 1, offset) === 0) break;
+      if (buffer[offset] !== 10) continue;
+      const line = buffer.subarray(start, offset).toString('utf8').replace(/\r$/, '');
+      start = offset + 1;
+      if (lines.length === 0 && line !== '---') return null;
+      if (lines.length > 0 && line === '---') {
+        closed = true;
+        break;
+      }
+      lines.push(line);
+      if (lines.length >= MAX_FRONTMATTER_LINES) break;
+    }
+  } finally {
+    fs.closeSync(fd);
+  }
+  if (!closed) return null;
+  const metadata = Object.create(null);
+  for (const line of lines.slice(1)) {
+    if (!line.trim()) continue;
     const match = line.match(/^([a-z_]+):\s*(.+)$/);
-    if (!match) continue;
+    if (!match) return null;
     try { metadata[match[1]] = JSON.parse(match[2]); } catch { return null; }
   }
   return metadata;
 }
 
-function discoverArtifacts({ targetRepo, workspaceSlug, keywords, limit }) {
+function discoverArtifacts({ targetRepo, workspaceSlug, sourceDir, keywords, limit }) {
   const root = resolveTargetRoot(targetRepo);
-  const outputRoot = path.join(root, '.spec-first', 'workflows', 'spec-handoff', slugify(workspaceSlug || path.basename(root), 'workspace'));
-  assertNoSymlinkSegments(root, outputRoot);
+  const outputRoot = sourceDir ? path.resolve(sourceDir)
+    : path.join(root, '.spec-first', 'workflows', 'spec-handoff', slugify(workspaceSlug || path.basename(root), 'workspace'));
+  const containmentRoot = sourceDir ? outputRoot : root;
+  if (sourceDir && (!fs.lstatSync(outputRoot).isDirectory() || fs.lstatSync(outputRoot).isSymbolicLink())) {
+    throw reasonError('source-directory-unsafe', 'Discovery source must be a real non-symlink directory.');
+  }
+  assertNoSymlinkSegments(containmentRoot, outputRoot);
   if (!fs.existsSync(outputRoot)) return { status: 'discovered', reason_code: 'no-managed-root', candidates: [], searched_root: toPosix(path.relative(root, outputRoot)) };
   const terms = String(keywords || '').toLowerCase().split(/\s+/).filter(Boolean);
   const safeLimit = Math.max(1, Math.min(Number(limit) || 5, MAX_DISCOVERY_LIMIT));
   const candidates = [];
-  for (const entry of fs.readdirSync(outputRoot, { withFileTypes: true })) {
-    if (!entry.isFile() || entry.isSymbolicLink() || !entry.name.endsWith('.md')) continue;
-    const filePath = path.join(outputRoot, entry.name);
-    assertNoSymlinkSegments(root, filePath);
-    const metadata = parseFrontmatter(filePath);
-    if (!metadata) continue;
-    const haystack = [metadata.title, metadata.summary, ...(Array.isArray(metadata.keywords) ? metadata.keywords : [])].filter(Boolean).join(' ').toLowerCase();
-    const score = terms.reduce((total, term) => total + (haystack.includes(term) ? 1 : 0), 0);
-    if (terms.length > 0 && score === 0) continue;
-    candidates.push({
-      artifact_path: toPosix(path.relative(root, filePath)),
-      title: metadata.title || entry.name,
-      summary: metadata.summary || '',
-      created_at: metadata.created_at || null,
-      resume_focus: metadata.resume_focus || '',
-      score,
-      mtime_ms: fs.statSync(filePath).mtimeMs,
-    });
+  let scannedEntries = 0;
+  let scanTruncated = false;
+  const directory = fs.opendirSync(outputRoot);
+  try {
+    for (let entry = directory.readSync(); entry; entry = directory.readSync()) {
+      if (scannedEntries >= MAX_DISCOVERY_ENTRIES) {
+        scanTruncated = true;
+        break;
+      }
+      scannedEntries += 1;
+      if (!entry.isFile() || entry.isSymbolicLink() || !entry.name.endsWith('.md')) continue;
+      const filePath = path.join(outputRoot, entry.name);
+      assertNoSymlinkSegments(containmentRoot, filePath);
+      const metadata = parseFrontmatter(filePath);
+      const fields = metadata || {};
+      const textField = (name) => typeof fields[name] === 'string' ? fields[name] : '';
+      const haystack = [entry.name, textField('title'), textField('summary'), ...(Array.isArray(fields.keywords) ? fields.keywords.filter((value) => typeof value === 'string') : [])].join(' ').toLowerCase();
+      const score = terms.reduce((total, term) => total + (haystack.includes(term) ? 1 : 0), 0);
+      if (terms.length > 0 && score === 0) continue;
+      candidates.push({
+        artifact_path: toPosix(sourceDir ? filePath : path.relative(root, filePath)),
+        indexed: metadata !== null,
+        title: textField('title') || entry.name,
+        summary: textField('summary'),
+        created_at: textField('created_at') || null,
+        resume_focus: textField('resume_focus'),
+        score,
+        mtime_ms: fs.statSync(filePath).mtimeMs,
+      });
+    }
+  } finally {
+    directory.closeSync();
   }
   candidates.sort((left, right) => right.score - left.score || right.mtime_ms - left.mtime_ms || left.artifact_path.localeCompare(right.artifact_path));
   return {
     status: 'discovered',
     reason_code: candidates.length > 0 ? 'candidates-found' : 'no-candidates',
-    candidates: candidates.slice(0, safeLimit).map(({ mtime_ms: _mtime, ...candidate }) => candidate),
-    searched_root: toPosix(path.relative(root, outputRoot)),
+    candidates: candidates.slice(0, safeLimit),
+    searched_root: toPosix(sourceDir ? outputRoot : path.relative(root, outputRoot)),
+    scanned_entries: scannedEntries,
+    scan_truncated: scanTruncated,
   };
 }
 
 function parseArgs(argv) {
   const command = argv[0];
-  const options = { command, inputPath: null, targetRepo: null, workspaceSlug: null, keywords: '', limit: 5, json: false };
+  const options = { command, inputPath: null, targetRepo: null, workspaceSlug: null, sourceDir: null, keywords: '', limit: 5, json: false };
   for (let index = 1; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === '--json') options.json = true;
     else if (arg === '--input') options.inputPath = argv[++index] || null;
     else if (arg === '--target-repo') options.targetRepo = argv[++index] || null;
     else if (arg === '--workspace-slug') options.workspaceSlug = argv[++index] || null;
-    else if (arg === '--keywords') options.keywords = argv[++index] || '';
+    else if (arg === '--source-dir') {
+      options.sourceDir = argv[++index];
+      if (command !== 'discover' || !options.sourceDir || options.sourceDir.startsWith('--')) {
+        throw reasonError('invalid-arguments', '--source-dir requires a directory and is supported only for discover.');
+      }
+    } else if (arg === '--keywords') options.keywords = argv[++index] || '';
     else if (arg === '--limit') options.limit = argv[++index] || 5;
     else throw reasonError('invalid-arguments', `Unknown or incomplete argument: ${arg}`);
   }
   if (!['write', 'discover'].includes(command) || !options.targetRepo || (command === 'write' && !options.inputPath)) {
-    throw reasonError('invalid-arguments', 'Usage: handoff-artifact.cjs <write|discover> --target-repo <root> [--input <payload.json>] [--workspace-slug <slug>] [--keywords <terms>] [--limit <n>] [--json]');
+    throw reasonError('invalid-arguments', 'Usage: handoff-artifact.cjs <write|discover> --target-repo <root> [--input <payload.json>] [--workspace-slug <slug>] [--source-dir <directory>] [--keywords <terms>] [--limit <n>] [--json]');
   }
   return options;
 }

@@ -68,6 +68,8 @@ Overrides: none
 
 ## Input Paths
 
+当前用户明确要求补完非活跃历史计划时，将 `source_plan_non_active`、已核验来源和剩余范围线索交给 `spec-plan` Phase 0.1。旧计划与旧 task-pack pins 保持不变；owner 返回有效后继后才按本 skill 正常生成和校验新任务包。仅拆分历史材料或只读请求不产生实施授权。
+
 - Source plan path: read the source plan frontmatter and focused sections: Requirements, Scope Boundaries, Technical Approach, Implementation Units, Files, Test Scenarios, Verification, and Deferred to Implementation.
 - Existing task-pack path: read the task pack, source plan, and `Task Pack Contract`; validate identity/freshness/structure before treating it as executable.
 - Bare task-splitting request: resolve exactly one local source plan; if resolution is ambiguous, ask for the path.

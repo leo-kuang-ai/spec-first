@@ -5,6 +5,10 @@ description: "Use this standalone skill to build or update a project architectur
 
 # Spec Project Rules
 
+## Project Intelligence Evidence Boundary
+
+Use graph output only to locate candidate architectural patterns. Rules and architecture knowledge written back to project-owned files require current source and owner evidence; `provider_untrusted`, empty, or stale results cannot establish a rule or prove a pattern is absent. Direct bounded reads are valid whenever provider readiness is unavailable.
+
 ## Purpose
 
 把多端 monorepo 中 AI 每次会话都要重新猜的边界知识——归属、依赖方向、复用契约、高价值隐式约定——写成有证据的、会被装载的持久资产（`docs/architecture.md` 单文件），让 AGENTS.md/CLAUDE.md 指向它。

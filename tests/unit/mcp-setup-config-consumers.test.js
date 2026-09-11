@@ -69,9 +69,9 @@ describe('spec-runtime-setup active config consumers', () => {
   test('classifies every document rendering output key by its active workflow consumer', () => {
     const setup = read('skills/spec-runtime-setup/SKILL.md');
     const template = read('skills/spec-runtime-setup/references/config-template.yaml');
-    const plan = read('skills/spec-plan/SKILL.md');
-    const brainstorm = read('skills/spec-brainstorm/SKILL.md');
-    const ideate = read('skills/spec-ideate/SKILL.md');
+    const plan = read('skills/spec-plan/references/output-mode.md');
+    const brainstorm = read('skills/spec-brainstorm/references/output-mode.md');
+    const ideate = read('skills/spec-ideate/references/output-mode.md');
 
     expect(plan).toContain('active (non-commented)** `plan_output:`');
     expect(brainstorm).toContain('active (non-commented)** `brainstorm_output:`');
@@ -171,6 +171,10 @@ describe('spec-runtime-setup active Node consumers', () => {
     // 仅当 pi MCP 官方化时重评）。
     expect(getSupportedPlatforms().filter((platform) => !registryHosts.includes(platform)))
       .toEqual(['pi']);
+    // 反向：setup 侧手工宿主清单不得出现 registry 已退役/拼错的宿主（⊆ 关系）。
+    // pi 的排除是 KTD5 的有意子集，只约束方向不强制全集。
+    const { CANONICAL_HOSTS } = require('../../skills/spec-runtime-setup/scripts/lib/host-authority.cjs');
+    expect(CANONICAL_HOSTS.filter((host) => !getSupportedPlatforms().includes(host))).toEqual([]);
   });
 
   test('host-authority surfaces stay bound to every setup host projection root', () => {
@@ -218,10 +222,10 @@ describe('spec-runtime-setup active Node consumers', () => {
     const dependency = {
       ecosystem: 'pypi',
       package: 'graphifyy',
-      version: '0.9.29',
+      version: '0.9.57',
       distribution: {
-        wheel_url: 'https://files.pythonhosted.org/packages/f1/b1/0cbe4738ca9784850d40aae0d71c34547230e0445e52067f98b8d0b6c070/graphifyy-0.9.29-py3-none-any.whl',
-        sha256: '143f4002f40d5c302ae43bd58487ad604191f2d0ac8216429894c6a913ecf27b',
+        wheel_url: 'https://files.pythonhosted.org/packages/c8/c2/d1ce4a567a5bf4c36054cede2c70f745a239ed5080b70d7934c5c738b583/graphifyy-0.9.57-py3-none-any.whl',
+        sha256: 'f35c86410e7d92ace69a50ac8dbed568903c880482c656f43437ca657fee8c37',
         index_url: 'https://pypi.org/simple',
       },
     };

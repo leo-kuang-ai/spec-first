@@ -2,9 +2,11 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { readCodeReviewContract, phaseFiles } = require('../helpers/code-review-contract');
 
 const repoRoot = path.resolve(__dirname, '../..');
-const skill = fs.readFileSync(path.join(repoRoot, 'skills/spec-code-review/SKILL.md'), 'utf8');
+const skillEntry = fs.readFileSync(path.join(repoRoot, 'skills/spec-code-review/SKILL.md'), 'utf8');
+const skill = readCodeReviewContract();
 const deploymentPrompt = fs.readFileSync(
   path.join(repoRoot, 'skills/spec-code-review/references/personas/deployment-verification-agent.md'),
   'utf8',
@@ -91,6 +93,33 @@ const deploymentVerificationActivationCases = JSON.parse(fs.readFileSync(
 ));
 
 describe('spec-code-review current contracts', () => {
+  test('入口在行为执行前连接实际阶段 owner，过程不复制回入口', () => {
+    for (const file of phaseFiles) {
+      expect(skillEntry).toContain(`references/${file}`);
+    }
+    expect(skillEntry).not.toContain('### Stage 1: Determine scope');
+    expect(skillEntry).not.toContain('### Stage 5: Merge findings');
+    expect(skillEntry).toContain('**Report-only by default; never land.**');
+    expect(skillEntry).toContain('In **`mode:agent`** it never mutates the tree');
+    const modes = fs.readFileSync(path.join(repoRoot, 'skills/spec-code-review/references/modes-and-output.md'), 'utf8');
+    const intent = fs.readFileSync(path.join(repoRoot, 'skills/spec-code-review/references/intent-and-plan.md'), 'utf8');
+    const finish = fs.readFileSync(path.join(repoRoot, 'skills/spec-code-review/references/finish-review.md'), 'utf8');
+    expect(modes).toContain('### Phase 0a: Freeze effective mode before any tool call');
+    expect(intent).toContain('### Stage 2: Intent discovery');
+    expect(intent).not.toContain('## Argument Parsing');
+    expect(finish).toContain('scripts/findings-mechanics.py');
+    expect(finish).toContain('reviewer_mutation_detected');
+    expect(finish).toContain('metadata.json');
+    const scope = fs.readFileSync(path.join(repoRoot, 'skills/spec-code-review/references/scope.md'), 'utf8');
+    const snapshot = scope.split('### Stage 1a: Freeze the reviewed local scope')[1].split('### Stage 1b:')[0];
+    const endpointAssignment = snapshot.indexOf('DIFF_A="$BASE"');
+    const snapshotCapture = snapshot.indexOf('SCOPE_ARGS=(--base "$DIFF_A"');
+    expect(endpointAssignment).toBeGreaterThanOrEqual(0);
+    expect(snapshotCapture).toBeGreaterThanOrEqual(0);
+    expect(endpointAssignment).toBeLessThan(snapshotCapture);
+    expect(snapshot).toContain('DIFF_B=""');
+  });
+
   test('mode:agent is JSON report-only and never applies fixes', () => {
     expect(skill).toContain('**Report-only**: return **JSON**');
     expect(skill).toContain('In **`mode:agent`** it never mutates the tree');
@@ -132,7 +161,7 @@ describe('spec-code-review current contracts', () => {
     expect(skill).toContain('Inline fallback output contract');
     expect(skill).toContain('`reviewers: ["inline-fallback"]`');
     expect(skill).toContain('`verdict: Not ready`');
-    expect(skill).toMatch(/resolve the Stage 4 Run ID.*before synthesis/is);
+    expect(skill).toMatch(/reuse the Phase 0a Run ID.*before synthesis/is);
   });
 
   test('high-risk scenario posture limits review claims before dispatch or apply', () => {
@@ -161,8 +190,8 @@ describe('spec-code-review current contracts', () => {
     expect(skill).toContain('derive only from the fetched reviewed refs/diff');
     expect(skill).toContain('Do not persist or reuse this orientation');
     expect(skill).toContain('record the exact degraded fact');
-    expect(maintainabilityPrompt).toContain('Anchor 50 — suppress');
-    expect(maintainabilityPrompt).toContain('提升为 anchor 75');
+    expect(maintainabilityPrompt).toContain('Anchor 50 - suppress');
+    expect(maintainabilityPrompt).toContain('raise confidence to anchor 75');
     expect(maintainabilityPrompt).not.toContain('suppress unless severity is P1');
   });
 
@@ -203,14 +232,14 @@ describe('spec-code-review current contracts', () => {
   });
 
   test('existing review personas consume assurance evidence without inventing execution history', () => {
-    expect(testingPrompt).toMatch(/mutation testing.*equivalent mutant.*survivor/is);
-    expect(testingPrompt).toMatch(/changed-line coverage.*does not prove|changed-line coverage.*不等于/is);
+    expect(testingPrompt).toMatch(/mutation testing.*equivalent[- ]mutant.*survivor/is);
+    expect(testingPrompt).toMatch(/changed-line coverage proves execution reach, not meaningful assertions or correct behavior/is);
     expect(testingPrompt).toContain('`transcribed`');
     expect(testingPrompt).toContain('`provider-confirmed`');
     expect(testingPrompt).toContain('`source-bound`');
     expect(testingPrompt).toMatch(/required-proof reconciliation.*omitted/is);
     expect(reliabilityPrompt).toMatch(/pre-existing baseline.*task-introduced/is);
-    expect(adversarialPrompt).toMatch(/false-green.*required proof|required proof.*false-green/is);
+    expect(adversarialPrompt).toMatch(/false-green.*required[- ]proof|required[- ]proof.*false-green/is);
   });
 
   test('deployment verification activation mirrors the orchestrator risk gate and cannot self-invoke', () => {
@@ -218,7 +247,7 @@ describe('spec-code-review current contracts', () => {
     const stage3 = skill.match(/### Stage 3: Select reviewers([\s\S]*?)### Stage 4:/)?.[1] || '';
     const stage4 = skill.match(/### Stage 4:([\s\S]*?)### Stage 5:/)?.[1] || '';
 
-    expect(skill).toContain('只有 orchestrator 能应用该 gate');
+    expect(skill).toContain('Only the orchestrator applies this gate');
     expect(stage3).toContain('Only when both conditions pass');
     expect(stage3).toContain('selected_local_prompt_assets');
     expect(stage3).toContain('artifact path and the concrete risky operation');
@@ -227,36 +256,50 @@ describe('spec-code-review current contracts', () => {
     expect(stage4).toContain('safe additive migration');
     expect(stage4).toContain('does not authorize Stage 4 dispatch');
     expect(whenToUse).not.toBe('');
-    expect(whenToUse).toContain('只能由 `spec-code-review` orchestrator 调用');
-    expect(whenToUse).toContain('必须同时满足');
-    expect(whenToUse).toContain('migration 或 schema artifact');
+    expect(whenToUse).toContain('Only the `spec-code-review` orchestrator may invoke');
+    expect(whenToUse).toContain('Both conditions must hold');
+    expect(whenToUse).toContain('migration or schema artifact');
     expect(whenToUse).toContain('destructive DDL');
     expect(whenToUse).toContain('NOT NULL without default');
     expect(whenToUse).toContain('column rename/drop');
-    expect(whenToUse).toContain('普通 data-processing logic');
-    expect(whenToUse).toContain('不能单独授权调用');
+    expect(whenToUse).toContain('ordinary data-processing logic');
+    expect(whenToUse).toContain('cannot independently authorize invocation');
     expect(whenToUse).not.toContain('PR modifies data processing logic');
     expect(whenToUse).not.toContain('Any change that could silently corrupt/lose data');
 
     const cases = new Map(deploymentVerificationActivationCases.cases.map((entry) => [entry.id, entry]));
     expect(cases.get('safe-additive-migration-does-not-dispatch')).toMatchObject({ kind: 'negative-owner' });
-    expect(cases.get('safe-additive-migration-does-not-dispatch').expected).toContain('不得把 deployment-verification-agent 加入 selected_local_prompt_assets');
+    expect(cases.get('safe-additive-migration-does-not-dispatch').expected).toContain('must not add deployment-verification-agent to selected_local_prompt_assets');
     expect(cases.get('risky-migration-dispatches-deployment-verification')).toMatchObject({ kind: 'positive' });
-    expect(cases.get('risky-migration-dispatches-deployment-verification').expected).toContain('artifact path 与 backfill/NOT NULL risky operation');
+    expect(cases.get('risky-migration-dispatches-deployment-verification').expected).toContain('artifact path and risky backfill/NOT NULL operation');
   });
 
   test('validator treats why_it_matters as optional context exactly like Stage 5b', () => {
     expect(skill).toContain('`why_it_matters` when available');
-    expect(validatorTemplate).toContain('该字段是可选上下文');
-    expect(validatorTemplate).toContain('缺失时 validator 继续依据 diff 与 cited code 验证');
-    expect(validatorTemplate).toContain('该字段可能为空；为空时直接依据 diff 与 cited code 验证');
-    expect(validatorTemplate).toContain('不得因缺少 reviewer framing 而拒绝或确认 finding');
+    expect(validatorTemplate).toContain('This context is optional');
+    expect(validatorTemplate).toContain('when absent, validate against the diff and cited code');
+    expect(validatorTemplate).toContain('This field may be empty');
+    expect(validatorTemplate).toContain('missing reviewer framing neither rejects nor confirms a finding');
     expect(validatorTemplate).not.toContain('required for the validator to understand the finding');
   });
 
   test('prompt assets are skill-local', () => {
     expect(skill).toContain('Read the prompt file from `references/personas/`');
     expect(fs.existsSync(path.join(repoRoot, 'agents/spec-pr-comment-resolver.agent.md'))).toBe(false);
+  });
+
+  test('reviewer template embeds large-content placeholders exactly once', () => {
+    const fenced = subagentTemplate.match(/^```\n[\s\S]*?^```\n\n## Variable Reference/m)?.[0];
+    expect(fenced).toBeDefined();
+    const counts = new Map();
+    for (const m of fenced.matchAll(/\{([a-z_]+)\}/g)) {
+      counts.set(m[1], (counts.get(m[1]) || 0) + 1);
+    }
+    // A placeholder named in template prose gets filled like a slot, re-emitting the
+    // whole diff/file list into every reviewer prompt; short identifiers such as
+    // reviewer_name may appear in both the write-path instruction and review-context.
+    expect(counts.get('file_list')).toBe(1);
+    expect(counts.get('diff')).toBe(1);
   });
 
   test('task review context is paired, digest-pinned, and honestly scoped', () => {
@@ -316,11 +359,11 @@ describe('spec-code-review current contracts', () => {
   test('API reviewer checks canonical drift and consumer evolution without owning API design', () => {
     expect(apiContractPrompt).toContain('### Interface Contracts');
     expect(apiContractPrompt).toContain('canonical artifact');
-    expect(apiContractPrompt).toContain('schema、error shape、nullability、pagination、idempotency、compatibility');
-    expect(apiContractPrompt).toContain('replacement、deprecation 或 removal');
+    expect(apiContractPrompt).toContain('schema, error shape, nullability, pagination, idempotency, and compatibility');
+    expect(apiContractPrompt).toContain('replacement, deprecation, or removal');
     expect(apiContractPrompt).toContain('zero-use evidence');
-    expect(apiContractPrompt).toContain('单次搜索没有命中不是充分证明');
-    expect(apiContractPrompt).toContain('不把 review 变成接口设计');
+    expect(apiContractPrompt).toContain('one empty search is insufficient');
+    expect(apiContractPrompt).toContain('without turning review into interface design');
     expect(apiContractPrompt).toContain('tenant/resource authorization');
     expect(apiContractPrompt).toContain('security reviewer');
     expect(apiContractPrompt).toContain('diff-only');
@@ -344,16 +387,16 @@ describe('spec-code-review current contracts', () => {
     expect(fieldRemoval).toMatchObject({ kind: 'positive' });
     expect(fieldRemoval.input).toContain('required `display_name`');
     expect(fieldRemoval.expected).toContain('breaking-drift finding');
-    expect(fieldRemoval.forbidden).toContain('把删除当作 private refactor');
+    expect(fieldRemoval.forbidden).toContain('Treat the removal as a private refactor');
     expect(endpointRemoval).toMatchObject({ kind: 'positive' });
     expect(endpointRemoval.expected).toContain('zero-use evidence');
-    expect(endpointRemoval.forbidden).toContain('假定没有搜索结果就等于 zero-use');
+    expect(endpointRemoval.forbidden).toContain('Assume no search results means zero use');
     expect(additive).toMatchObject({ kind: 'negative-owner' });
-    expect(additive.expected).toContain('保持 suppression');
-    expect(additive.forbidden).toContain('把 additive optional field 标为 breaking');
+    expect(additive.expected).toContain('Keep suppression');
+    expect(additive.forbidden).toContain('Mark an additive optional field as breaking');
     expect(privateRefactor).toMatchObject({ kind: 'negative-owner' });
-    expect(privateRefactor.expected).toContain('交给 security reviewer');
-    expect(privateRefactor.forbidden).toContain('为 private helper rename 生成 API finding');
+    expect(privateRefactor.expected).toContain('to the security reviewer');
+    expect(privateRefactor.forbidden).toContain('Generate an API finding for a private helper rename');
   });
 
   test('security reviewer selects concrete agent-native attack paths without taking API drift', () => {
@@ -362,12 +405,12 @@ describe('spec-code-review current contracts', () => {
     expect(skill).toContain('tenant/resource authorization');
     expect(skill).toContain('an unreachable dependency advisory or generic hardening idea is not a security finding');
     expect(personaCatalog).toContain('untrusted model/tool/web outputs crossing into a reachable dangerous sink');
-    expect(securityPrompt).toContain('完整 attack path');
-    expect(securityPrompt).toContain('tenant/resource access');
+    expect(securityPrompt).toContain('full attack path');
+    expect(securityPrompt).toContain('tenant/resource authorization');
     expect(securityPrompt).toContain('plan_context_mode: live-plan');
     expect(securityPrompt).toContain('dependency advisory');
-    expect(securityPrompt).toContain('schema/error/nullability/pagination/idempotency/compatibility drift 由 API reviewer 持有');
-    expect(securityPrompt).toContain('不得发明计划中的 authorization intent');
+    expect(securityPrompt).toContain('Schema/error/nullability/pagination/idempotency/compatibility drift belongs to the API reviewer');
+    expect(securityPrompt).toContain('Do not invent authorization intent');
   });
 
   test('security capability cases protect trusted-input, reachability, and owner boundaries', () => {
@@ -385,26 +428,26 @@ describe('spec-code-review current contracts', () => {
     const schemaOnly = cases.get('schema-only-drift-owned-by-api-reviewer');
 
     expect(shellSink).toMatchObject({ kind: 'positive' });
-    expect(shellSink.expected).toContain('完整 attack path');
-    expect(shellSink.forbidden).toContain('把 tool result 当成可信 command');
+    expect(shellSink.expected).toContain('complete attack path');
+    expect(shellSink.forbidden).toContain('Treat the tool result as a trusted command');
     expect(tenantGap).toMatchObject({ kind: 'positive' });
-    expect(tenantGap.expected).toContain('只有 security reviewer');
-    expect(tenantGap.forbidden).toContain('由 API compatibility reviewer 重复报告');
+    expect(tenantGap.expected).toContain('Only the security reviewer');
+    expect(tenantGap.forbidden).toContain('Duplicate the finding in the API compatibility review');
     expect(unreachableDependency).toMatchObject({ kind: 'negative-owner' });
-    expect(unreachableDependency.expected).toContain('保持 suppression');
-    expect(unreachableDependency.forbidden).toContain('仅凭 lockfile 名称报告 exploitable vulnerability');
+    expect(unreachableDependency.expected).toContain('Keep suppression');
+    expect(unreachableDependency.forbidden).toContain('Report an exploitable vulnerability based only on a lockfile name');
     expect(schemaOnly).toMatchObject({ kind: 'negative-owner' });
-    expect(schemaOnly.expected).toContain('留给 API reviewer');
-    expect(schemaOnly.forbidden).toContain('以 security finding 重复报告 pagination drift');
+    expect(schemaOnly.expected).toContain('to the API reviewer');
+    expect(schemaOnly.forbidden).toContain('Duplicate pagination drift as a security finding');
   });
 
   test('testing reviewer distinguishes observable proof, contract interactions, and execution history', () => {
     expect(testingPrompt).toContain('DAMP');
-    expect(testingPrompt).toContain('state/behavior outcome');
-    expect(testingPrompt).toContain('interaction 本身确实是公开 contract 时例外成立');
+    expect(testingPrompt).toContain('state and behavior outcomes');
+    expect(testingPrompt).toContain('interaction itself is the public contract');
     expect(testingPrompt).toContain('real implementation -> high-fidelity fake -> stub -> mock');
-    expect(testingPrompt).toContain('serialization、middleware、callback、permission、retry 或 error translation');
-    expect(testingPrompt).toContain('不能从最终绿测或 production/test 同时出现的 diff 推断“没有做 TDD”');
+    expect(testingPrompt).toContain('serialization, middleware, callbacks, permissions, retries, or error translation');
+    expect(testingPrompt).toContain('Final green tests or simultaneous production/test edits do not establish that TDD was skipped');
     expect(testingPrompt).toContain('spec-work` run-local evidence');
     expect(testingPrompt).toContain('Unobserved TDD history');
   });
@@ -425,24 +468,24 @@ describe('spec-code-review current contracts', () => {
 
     expect(mockOnly).toMatchObject({ kind: 'positive' });
     expect(mockOnly.expected).toContain('state/behavior outcome proof');
-    expect(mockOnly.forbidden).toContain('把 mock call count 当成完整行为验证');
+    expect(mockOnly.forbidden).toContain('Treat mock call count as complete behavior verification');
     expect(weakDouble).toMatchObject({ kind: 'positive' });
     expect(weakDouble.expected).toContain('double fidelity gap');
-    expect(weakDouble.forbidden).toContain('把跳过关键 seam 的 fake 视为 integration proof');
+    expect(weakDouble.forbidden).toContain('Treat a fake that bypasses critical boundaries as integration proof');
     expect(interactionContract).toMatchObject({ kind: 'negative-owner' });
-    expect(interactionContract.expected).toContain('interaction 本身是 contract');
-    expect(interactionContract.forbidden).toContain('把公开 protocol interaction 报为 brittle implementation coupling');
+    expect(interactionContract.expected).toContain('interaction itself is the contract');
+    expect(interactionContract.forbidden).toContain('Report a public protocol interaction as brittle implementation coupling');
     expect(noHistory).toMatchObject({ kind: 'negative-owner' });
-    expect(noHistory.expected).toContain('不推断开发者未做 TDD');
-    expect(noHistory.forbidden).toContain('从最终 diff 报告未做 TDD');
+    expect(noHistory.expected).toContain('Do not infer that the developer skipped TDD');
+    expect(noHistory.forbidden).toContain('Report missing TDD from the final diff');
   });
 
   test('reliability reviewer connects failure paths to correlation and actionable telemetry', () => {
     expect(reliabilityPrompt).toContain('Correlation, telemetry, and operational actionability');
     expect(reliabilityPrompt).toContain('correlation/request/trace identity');
     expect(reliabilityPrompt).toContain('silent failure');
-    expect(reliabilityPrompt).toContain('alert config 是否声明 owner、action 和 runbook');
-    expect(reliabilityPrompt).toContain('不能证明 dashboard query、alert delivery、on-call response 或 field outcome 已发生');
+    expect(reliabilityPrompt).toContain('alert configuration naming an owner, action, and runbook');
+    expect(reliabilityPrompt).toContain('cannot prove dashboard queries, alert delivery, on-call response, or field outcomes occurred');
     expect(reliabilityPrompt).toContain('pure in-memory transform');
     expect(personaCatalog).toContain('correlation propagation, telemetry emission, alert owner/action/runbook');
   });
@@ -463,16 +506,16 @@ describe('spec-code-review current contracts', () => {
 
     expect(lostCorrelation).toMatchObject({ kind: 'positive' });
     expect(lostCorrelation.expected).toContain('correlation identity');
-    expect(lostCorrelation.forbidden).toContain('把无关联 retry log 视为可诊断 telemetry');
+    expect(lostCorrelation.forbidden).toContain('Treat uncorrelated retry logs as diagnosable telemetry');
     expect(silentFailure).toMatchObject({ kind: 'positive' });
     expect(silentFailure.expected).toContain('alert actionability gap');
-    expect(silentFailure.forbidden).toContain('把 metric 名称存在当作 alert proof');
+    expect(silentFailure.forbidden).toContain('Treat the existence of a metric name as alert proof');
     expect(pureTransform).toMatchObject({ kind: 'negative-owner' });
-    expect(pureTransform.expected).toContain('保持 suppression');
-    expect(pureTransform.forbidden).toContain('推测不存在的 cascading failure');
+    expect(pureTransform.expected).toContain('Keep suppression');
+    expect(pureTransform.forbidden).toContain('Speculate about a nonexistent cascading failure');
     expect(fieldOutcome).toMatchObject({ kind: 'negative-owner' });
     expect(fieldOutcome.expected).toContain('source-level limitation');
-    expect(fieldOutcome.forbidden).toContain('声称 field outcome 已确认');
+    expect(fieldOutcome.forbidden).toContain('Claim a field outcome was confirmed');
   });
 
   test('frontend-quality stays internal, semantic, and separated from adjacent reviewers', () => {
@@ -484,11 +527,11 @@ describe('spec-code-review current contracts', () => {
     expect(skill).toContain('timing/race findings remain `julik-frontend-races`');
     expect(personaCatalog).toContain('## Conditional (8 personas)');
     expect(personaCatalog).toContain('Internal-only diff review');
-    expect(frontendQualityPrompt).toContain('状态完整性');
-    expect(frontendQualityPrompt).toContain('语义和键盘可用性');
-    expect(frontendQualityPrompt).toContain('可读性和 responsive');
+    expect(frontendQualityPrompt).toContain('State completeness');
+    expect(frontendQualityPrompt).toContain('Semantics and keyboard access');
+    expect(frontendQualityPrompt).toContain('Readability and responsiveness');
     expect(frontendQualityPrompt).toContain('julik-frontend-races-reviewer');
-    expect(frontendQualityPrompt).toContain('不能声称浏览器验证已通过');
+    expect(frontendQualityPrompt).toContain('cannot claim browser verification passed');
     expect(skill).not.toContain('spec-frontend');
   });
 
@@ -510,25 +553,25 @@ describe('spec-code-review current contracts', () => {
     const structuralComplexity = cases.get('structural-complexity-owned-by-maintainability');
 
     expect(asyncForm).toMatchObject({ kind: 'positive' });
-    expect(asyncForm.expected).toContain('状态完整性和 keyboard/focus finding');
-    expect(asyncForm.forbidden).toContain('只检查 happy path spinner');
+    expect(asyncForm.expected).toContain('state completeness and keyboard/focus findings');
+    expect(asyncForm.forbidden).toContain('Check only the happy-path spinner');
     expect(cssRegression).toMatchObject({ kind: 'positive' });
-    expect(cssRegression.expected).toContain('focus、contrast 和 responsive regression');
-    expect(cssRegression.forbidden).toContain('因为只有 CSS 文件而跳过 reviewer');
+    expect(cssRegression.expected).toContain('focus, contrast, and responsive regressions');
+    expect(cssRegression.forbidden).toContain('Skip the reviewer because only CSS files changed');
     expect(noVisibleChange).toMatchObject({ kind: 'negative-owner' });
-    expect(noVisibleChange.expected).toContain('不启用');
-    expect(noVisibleChange.forbidden).toContain('仅按文件扩展名假定前端风险');
+    expect(noVisibleChange.expected).toContain('does not activate');
+    expect(noVisibleChange.forbidden).toContain('Assume frontend risk solely from file extensions');
     expect(raceOnly).toMatchObject({ kind: 'negative-owner' });
     expect(raceOnly.expected).toContain('julik-frontend-races reviewer');
-    expect(raceOnly.forbidden).toContain('以 frontend-quality finding 重复报告 stale response race');
+    expect(raceOnly.forbidden).toContain('Duplicate a stale response race as a frontend-quality finding');
     expect(unsafeRendering).toMatchObject({ kind: 'negative-owner' });
-    expect(unsafeRendering.expected).toContain('security reviewer 作为 canonical owner');
-    expect(unsafeRendering.forbidden).toContain('以 frontend-quality finding 重复报告同一 unsafe rendering sink');
+    expect(unsafeRendering.expected).toContain('security reviewer reports the unsafe rendering finding as its canonical owner');
+    expect(unsafeRendering.forbidden).toContain('Duplicate the same unsafe rendering sink as a frontend-quality finding');
     expect(testSufficiency).toMatchObject({ kind: 'negative-owner' });
-    expect(testSufficiency.expected).toContain('testing reviewer 作为 canonical owner');
-    expect(testSufficiency.forbidden).toContain('把测试充分性重复写成 frontend-quality finding');
+    expect(testSufficiency.expected).toContain('testing reviewer reports the proof sufficiency gap as its canonical owner');
+    expect(testSufficiency.forbidden).toContain('Duplicate test sufficiency as a frontend-quality finding');
     expect(structuralComplexity).toMatchObject({ kind: 'negative-owner' });
-    expect(structuralComplexity.expected).toContain('maintainability reviewer 作为 canonical owner');
-    expect(structuralComplexity.forbidden).toContain('以 frontend-quality finding 重复报告纯结构复杂度');
+    expect(structuralComplexity.expected).toContain('maintainability reviewer reports structural complexity as its canonical owner');
+    expect(structuralComplexity.forbidden).toContain('Duplicate pure structural complexity as a frontend-quality finding');
   });
 });

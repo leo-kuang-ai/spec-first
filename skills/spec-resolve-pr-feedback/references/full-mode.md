@@ -1,8 +1,10 @@
 # Full Mode
 
-Read this reference when Mode Detection in `SKILL.md` routes to **Full Mode**: no argument was given, or a PR number was provided. Full mode processes all unresolved threads and actionable PR-level feedback on the PR.
+Read this reference when Mode Detection in `SKILL.md` routes to **Full Mode**: no argument, a PR number, a whole-PR URL, or a top-level `#issuecomment-` URL. Full mode processes all unresolved threads and actionable PR-level feedback on the selected PR.
 
 ## 1. Fetch Unresolved Threads
+
+First resolve the selected repository's host and OWNER/REPO from its URL or remote. Set `GH_HOST` to that exact host for every `gh` and bundled-helper call, and pass OWNER/REPO explicitly to helpers when the checkout differs from the selected repository. Confirm access with `gh repo view` for that repository before fetching; follow the entrypoint's unsupported-forge boundary on failure.
 
 If no PR number was provided, detect from the current branch:
 ```bash
@@ -21,9 +23,10 @@ Returns a JSON object with these keys:
 | Key | Contents | Has file/line? | Resolvable? |
 |-----|----------|---------------|-------------|
 | `pending_review` | Viewer-owned unsubmitted review id, or null; a non-null value blocks replies because GitHub may hide them in the draft | No | No |
-| `review_threads` | Unresolved inline code review threads, edge-wrapped as `{ node: ... }`; includes outdated threads and preserves each `isOutdated` flag so the resolver can account for line drift | Yes | Yes (GraphQL) |
-| `pr_comments` | Top-level PR conversation comments after source-level author and CI/status bot filtering | No | No |
-| `review_bodies` | Review submission bodies with non-empty text after source-level author and CI/status bot filtering | No | No |
+| `review_threads` | Unresolved inline threads as `{ node, root_comment_id }`; the node retains GraphQL thread identity and `isOutdated`, while the numeric root ID addresses REST replies. A null root ID requires lookup before replying | Yes | Yes (GraphQL) |
+| `pr_comments` | Top-level PR conversation comments with non-empty bodies | No | No |
+| `review_bodies` | Review submission bodies with non-empty text | No | No |
+| `pr_author` / `viewer` | The PR author and acting account, used as evidence during semantic judgment | No | No |
 | `fetch_warnings` | Deterministic warnings such as truncated nested thread comments; these mean missing nested comments are incomplete evidence, not confirmed absence | No | No |
 
 When `pending_review` is non-null, stop before the reply loop. Do not interpret
@@ -39,26 +42,26 @@ gh api repos/{owner}/{repo}/pulls/PR_NUMBER/comments
 
 ## 2. Triage: Separate New from Pending
 
-Before processing, classify each piece of feedback as **new** or **already handled**.
+Before processing, reconcile visible submitted replies and authoritative resolution independently.
 
-**Review threads**: Read the thread's comments. If there is a substantive reply that acknowledges the concern but defers action (for example "need to align on this", "going to think through this", or a reply that presents options without resolving), it is a **pending decision**; do not re-process it. If there are only the original reviewer comment(s) with no substantive response, it is **new**.
+**Review threads**: Ordinary completion requires a visible, submitted substantive reply plus authoritative thread resolution. A reply explicitly deferring a human decision remains **pending decision**: leave the thread open and do not repeat the work. A completed-fix or reply verdict already posted on an open thread is **resolution-pending**: do not repost or reapply the fix; carry the existing reply IDs to step 7 to verify and complete only resolution. With no substantive response, the thread is **new**. An incomplete fetch or unknown submission state does not prove either condition; inspect the missing evidence before acting.
 
 **PR comments and review bodies**: These have no resolve mechanism, so they reappear on every run. Apply two filters in order:
 
-1. **Actionability**: Skip items that contain no actionable feedback or questions to answer. Examples: review wrapper text ("Here are some automated review suggestions..."), approvals ("this looks great!"), status badges ("Validated"), CI summaries with no follow-up asks. If there is nothing to fix, answer, or decide, it is not actionable; drop it from the count entirely.
+1. **Actionability**: An item is an open request to fix, answer, or decide. This judgment is content-aware and includes the PR author's own request; identity never makes feedback disappear. A reply already posted by this run or an earlier run is evidence of handling, not a fresh request. Review wrappers, approvals, status badges, and CI summaries with no follow-up ask are non-actionable and dropped from the count.
 2. **Already replied**: For actionable items, check the PR conversation for an existing reply that quotes and addresses the feedback. If a reply already exists, skip. If not, it is new.
 
 The distinction is about content, not who posted it. A deferral from a teammate, a previous skill run, or a manual reply all count. Similarly, actionability is about content: bot feedback that requests a specific code change is actionable; a bot's boilerplate header wrapping those requests is not.
 
-**Silent drop.** Non-actionable items are dropped without narration. Do not announce, list, or count dropped items in conversation, the task list, or the step 9 summary. Review-bot wrappers from CodeRabbit, Codex, Gemini Code Assist, and Copilot commonly appear here; recognize them by their boilerplate content and drop them silently. Only CI/status bot summaries such as Codecov are pre-filtered at the script level; everything else relies on this content-aware check so bot format changes cannot silently hide actionable findings.
+**Silent drop.** Non-actionable items are dropped without narration. Do not announce, list, or count dropped items in conversation, the task list, or the step 9 summary. Review-bot wrappers from CodeRabbit, Codex, Gemini Code Assist, and Copilot commonly appear here; recognize them by their boilerplate content and drop them silently. The fetch layer excludes only blank bodies; content, identity, and surface remain semantic evidence for this step.
 
 If `fetch_warnings` reports `thread_comments_truncated`, do not treat a missing nested comment as confirmed absence. Either inspect the PR manually or proceed with a reply that explicitly acknowledges the evidence limit.
 
-If there are no new items across all feedback types, skip steps 3-8 and go straight to step 9.
+If there are no new or resolution-pending items, skip steps 3-8 and go straight to step 9. If only resolution-pending threads remain, skip steps 3-6 and go to step 7; do not repeat judgment, fixes, validation, commits, or replies.
 
 ## 3. Judge And Plan
 
-Read [evaluation-rubric.md](evaluation-rubric.md) now and apply it across the whole batch before any resolver dispatch. This is the legitimacy gate. The orchestrator holds every new thread, actionable PR comment, and actionable review body at once, so it can dedup reads by file, catch repeated bad assumptions, and separate items that need code from items that only need a reply or human decision.
+Read [evaluation-rubric.md](evaluation-rubric.md) now and apply it across the whole batch before any resolver dispatch. This is the legitimacy gate. The orchestrator holds every new thread, actionable PR comment, and actionable review body at once, so it can dedup reads by file, catch repeated bad assumptions, and separate items that need code from items that only need a reply or human decision. When a `trajectory` is present, apply the non-convergence check in [pipeline-mode.md](pipeline-mode.md) before dispatching fixes.
 
 If the batch is large enough that judging every item inline would overflow context, process the central judgment in file-clustered groups of about 8-10 items and emit the three lists incrementally. Do not fan out the judgment to resolver agents to save context; batch the central judgment instead.
 
@@ -74,19 +77,19 @@ Create one task entry per new unresolved review thread, actionable PR comment, o
 
 Process all three feedback types. Review threads are the primary type; PR comments and review bodies are secondary but must not be ignored. Dispatch or sequential mutation applies only to items in `fix-list`; `reply-list` and `human-list` are carried to Step 7 without code mutation.
 
-先应用 `SKILL.md` 的 Exit Authority Admission。只有 `local_fix_authorization: authorized` 才能处理 `fix-list`；缺授权时保留完整清单和回源证据，跳过这些 fix item 的文件编辑、验证、commit、push，以及依赖远端 fix 的回复/resolve。无代码依赖的 `reply-list` / `human-list` 仍可按各自独立的 `reply_authorization` / `thread_resolution_authorization` 继续；不得用其中一项 authority 推导另一项。
+Apply SKILL.md Exit Authority Admission first. Only `local_fix_authorization: authorized` permits implementing the `fix-list`. Otherwise retain the complete list and source evidence; skip those items' edits, fix validation, commit, push, and replies/resolution that depend on a remote fix. Independent `reply-list` / `human-list` items without code dependencies may proceed with their respective reply/resolution authorities; neither implies the other.
 
 ### Mutating resolver dispatch boundary
 
-Resolver dispatch is mutating-sensitive. Apply the package-local boundary in `SKILL.md`: dispatch only when `local_fix_authorization: authorized`，并且 `worker_dispatch_authorization: authorized` 与 `worker_dispatch_capability: available` 都已记录。否则在已有本地修复授权时 sequential inline 处理 `fix-list` 并保留对应 reason code；没有本地修复授权时不得进入 mutation。
+Resolver dispatch is mutating-sensitive. Apply the package-local boundary in `SKILL.md`: dispatch only when `local_fix_authorization: authorized`, `worker_dispatch_authorization: authorized`, and `worker_dispatch_capability: available` are recorded. Otherwise apply authorized local fixes sequentially inline and retain the matching reason code. Without local-fix authority, do not mutate.
 
-Each resolver may edit only the files needed for its assigned feedback item and must return the actual `files_changed` list. The orchestrator owns final integration: combined validation, staging, commits, pushes, PR replies, and thread resolution. Resolver agents must not stage files, create commits, push, or resolve review threads directly unless a future host-specific isolation contract explicitly says otherwise.
+Each resolver may edit only the files needed for its assigned feedback item and must return the actual `files_changed` list. The orchestrator owns final integration: combined validation, staging, commits, pushes, PR replies, and thread resolution. Resolver agents must not stage files, create commits, push, reply, or resolve review threads directly.
 
 If dispatch is unauthorized, unavailable, or mutation would be unsafe, process dispatch units sequentially in the current agent. If file overlap or discovered collisions make parallel mutation unsafe, serialize the affected units or stop for orchestration instead of running shared-file fixes in parallel.
 
 ### Dispatch inputs
 
-Only `fix-list` items from new review threads, actionable PR comments, and actionable review bodies are dispatch inputs. Resolved threads are not returned by `get-pr-comments`; if a previously resolved or already replied item appears during manual inspection, use it as background only and do not dispatch, reply to, or resolve it again.
+Only `fix-list` items from new review threads, actionable PR comments, and actionable review bodies are dispatch inputs. Resolved threads are not returned by `get-pr-comments`; do not act on them again. An already replied open thread is not a fix/dispatch input: reconcile it as pending decision or resolution-pending and complete only its unsatisfied authorized condition.
 
 ### Individual dispatch
 
@@ -134,7 +137,7 @@ Fixes can expand beyond the referenced file. Step 5 catches cross-agent test bre
 
 After all agents complete, aggregate `files_changed` across every returned summary. If it is empty, skip steps 5 and 6 and proceed to step 7.
 
-此处只验证本轮实际授权并应用的本地修复。只读 triage 或待授权 `fix-list` 不得被描述为已验证修复。
+Validate only the local fixes actually authorized and applied in this run. Read-only triage or a pending `fix-list` is not a verified fix.
 
 Resolvers run only targeted tests on their own changes. This step runs the project's full validation once against the combined diff.
 
@@ -147,7 +150,7 @@ Record the validation outcome for the step 9 summary.
 
 ## 6. Commit and Push
 
-Commit 与 push 是两个独立出口：只有 `commit_authorization: authorized` 才执行 stage/commit；只有 commit 已成功且 `push_authorization: authorized` 才执行 push。缺任一授权时停止在对应出口，保留已验证本地状态并进入 Step 9；不得继续把 fixed thread 回复为远端已修复，更不得 resolve。
+Commit and push are independent exits: stage/commit only with `commit_authorization: authorized`; push only after commit succeeds and `push_authorization: authorized` is present. Missing authority stops that exit; preserve verified local state and proceed to Step 9. Do not claim a fixed thread is repaired remotely or resolve it without the required remote result.
 
 Stage only files reported by resolvers and commit with a message referencing the PR:
 
@@ -166,7 +169,7 @@ git push
 
 ## 7. Reply and Resolve
 
-只有 `reply_authorization: authorized` 才发布回复；只有 `thread_resolution_authorization: authorized` 才 resolve review thread。对于 fixed/fixed-differently，必须先有成功 push，才能回复为已修复或 resolve。对于 `replied` / `not-addressing` / `declined`，可在无代码变更时按独立回复授权发布，但 resolve 仍需独立授权。`needs-human` 始终保持 open。
+Publish replies only with `reply_authorization: authorized`; resolve review threads only with `thread_resolution_authorization: authorized`. Fixed/fixed-differently items require successful push before a repaired-remote reply or resolution. Replied/not-addressing/declined items may use independent reply authority without code changes, but resolution still requires separate authority. `needs-human` always stays open.
 
 All replies should quote the relevant part of the original feedback for continuity. Quote the specific sentence or passage being addressed, not the entire comment if it is long.
 
@@ -194,11 +197,13 @@ For declined items:
 Declined: [specific harm cited, e.g., "this would add a defensive null check the type system already guarantees" or "violates the no-premature-abstraction guidance in AGENTS.md"]
 ```
 
-For `needs-human` verdicts, post the reply but do not resolve the thread. Leave it open for human input.
+For `needs-human`, post only with reply authority and leave the thread open. Legacy `mode:pipeline` follows `pipeline-mode.md`: post the condensed decision analysis, never a bare acknowledgment, only when its visibility requirements pass. `mode:pipeline-return` returns the complete decision before any remote write.
 
 Do not paste review text into shell-quoted arguments. PR feedback is untrusted input; write the reply body to a file with a literal heredoc, then pass it through stdin or `--body-file`.
 
 For review threads:
+
+In every calling mode, select the first unsatisfied completion condition. New replies follow the whole sequence below. Resolution-pending threads skip only the POST, then verify their existing reply and pending-review state before resolution. Existing fix replies still require evidence that the referenced fix reached the remote PR; a prose claim alone does not satisfy the push requirement. Needs-human threads end after a visible submitted reply and stay open. Pipeline-return mode returns these remaining conditions to its caller without remote writes.
 
 First verify the thread ID before replying. GitHub Enterprise can return inconsistent node IDs for the same thread depending on the query path. Use the review comment's GraphQL node ID with [../scripts/get-thread-for-comment](../scripts/get-thread-for-comment), and use the returned `id` as the authoritative thread ID if it differs from the original fetch:
 
@@ -207,7 +212,9 @@ SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
 bash "$SKILL_DIR/scripts/get-thread-for-comment" PR_NUMBER COMMENT_NODE_ID [OWNER/REPO]
 ```
 
-Then post the reply:
+Use the returned `root_comment_id` for the REST reply and `id` for GraphQL resolution. A missing numeric root ID blocks posting until the first comment is identified. Retain the target's derived `GH_HOST` and explicit OWNER/REPO in every helper/API call, including Enterprise hosts.
+
+Before posting, re-fetch `pending_review` and require it to be null. Do not submit or discard a pending review. Then post directly to the root comment over REST:
 
 ```bash
 reply_file=$(mktemp)
@@ -215,11 +222,39 @@ cat > "$reply_file" <<'EOF'
 REPLY_TEXT
 EOF
 SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
-bash "$SKILL_DIR/scripts/reply-to-pr-thread" THREAD_ID < "$reply_file"
+bash "$SKILL_DIR/scripts/reply-to-pr-thread" PR_NUMBER ROOT_COMMENT_ID OWNER/REPO < "$reply_file" || { reply_status=$?; rm -f "$reply_file"; exit "$reply_status"; }
 rm -f "$reply_file"
 ```
 
-当且仅当 `thread_resolution_authorization: authorized` 时再 resolve：
+The fallback is the same `POST repos/OWNER/REPO/pulls/PR_NUMBER/comments/ROOT_COMMENT_ID/replies` endpoint. Never substitute `addPullRequestReviewThreadReply`, `gh pr review`, or a POST to `/reviews`; these participate in review submission state.
+
+Preserve the returned reply ID and URL even if the helper exits nonzero after posting. It rechecks pending reviews and exits 2 when one appears. Stop without resolving on any error. A failed POST or postflight request can leave the remote outcome unknown: re-fetch and reconcile before retrying; never blindly repeat the POST.
+
+Verify that the returned comment URL belongs to the selected host, OWNER/REPO, and PR. Read back the stored reply body and optional review ID:
+
+```bash
+gh api repos/OWNER/REPO/pulls/comments/REPLY_COMMENT_ID --jq .body
+gh api repos/OWNER/REPO/pulls/comments/REPLY_COMMENT_ID --jq '.pull_request_review_id // empty'
+```
+
+The decoded body must preserve the intended Markdown and real line breaks. Literal escaped `\n` or `\n\n` replacing those line breaks blocks resolution. Correct the same comment with a structured body file and PATCH, then re-read it; do not create another reply.
+
+If a review ID is present, verify that its state is not PENDING:
+
+```bash
+gh api repos/OWNER/REPO/pulls/PR_NUMBER/reviews/REVIEW_ID --jq .state
+```
+
+Re-fetch pending-review state after posting or reconciling an existing reply and before resolving:
+
+```bash
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+bash "$SKILL_DIR/scripts/get-pr-comments" PR_NUMBER OWNER/REPO
+```
+
+Require `pending_review: null`. Missing/failed state evidence, a pending review, or an unsubmitted/invisible reply blocks resolution of every thread in this reply pass. Report the draft but never submit or discard it. After resolution, require the helper's authoritative resolved result; success in only one half does not complete the thread.
+
+Resolve only when `thread_resolution_authorization: authorized`:
 
 ```bash
 SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
@@ -241,7 +276,7 @@ Include enough quoted context in the reply so the reader can follow which commen
 
 ## 8. Verify
 
-仅在本轮实际执行了回复或 resolve 后 re-fetch feedback；未获授权的外部动作记为 `not-run`，不能用只读抓取冒充远端状态变更：
+After actual replies or resolutions, re-fetch feedback. Unauthorized external actions remain `not-run`; a read-only fetch cannot stand in for remote mutation evidence:
 
 ```bash
 SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
@@ -261,7 +296,7 @@ PR comments and review bodies have no resolve mechanism, so they will still appe
 
 Present a concise summary of all work done. Group by verdict, one line per item describing what was done, not just where.
 
-摘要必须同时列出五项 exit authority、哪些动作实际执行、哪些因缺授权保持 `not-run`。只有真实执行并验证的远端动作才能计入 Resolved 数量。
+Include all five exit authorities, actions actually performed, and actions left `not-run` for missing authority. Count only performed and verified remote actions as Resolved.
 
 ```text
 Resolved N of M new items on PR #NUMBER:
@@ -275,6 +310,6 @@ Declined (count): [what was declined and the harm cited]
 Validation: [one line; omit when no code changes were committed]
 ```
 
-If any agent returned `needs-human`, append a decisions section using the returned `decision_context`. If there are pending decisions from a previous run, surface them after the new work.
+If any item remains `needs-human`, render the complete typed residual under `## Needs your decision`: quoted_feedback, investigation, decision_reason, every option/tradeoff, recommendation when non-null, and every thread_urls link. Return the same objects unchanged to a caller. Include still-current decisions from previous runs; do not report them as resolved or replace their payloads with counts.
 
-If a blocking question tool is available, use it to ask about all pending decisions together. Use `AskUserQuestion` in Claude Code or `request_user_input` in Codex. Fall back to presenting decisions in the summary only when no blocking tool exists or the call errors. Never silently skip.
+In ordinary interactive mode only, a supported question tool may ask about pending decisions together at closeout; use the summary when unavailable. Legacy `mode:pipeline` and `mode:pipeline-return` never ask or wait: return the complete unresolved decisions to the caller after independent authorized work.

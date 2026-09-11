@@ -6,8 +6,8 @@ function read(filePath) {
   return fs.readFileSync(filePath, 'utf8');
 }
 
-const brainstorm = read('skills/spec-brainstorm/SKILL.md');
-const plan = read('skills/spec-plan/SKILL.md');
+const brainstorm = require('../helpers/brainstorm-contract').readBrainstormContract();
+const plan = require('../helpers/plan-contract').readPlanContract();
 const prd = read('skills/spec-prd/SKILL.md');
 const domain = read('skills/spec-prd/references/domain-language-and-decision-ledger.md');
 const grill = read('skills/spec-prd/references/grill-with-docs-integration.md');

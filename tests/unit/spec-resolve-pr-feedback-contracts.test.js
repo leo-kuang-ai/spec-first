@@ -26,12 +26,12 @@ describe('spec-resolve-pr-feedback contracts', () => {
     ]) {
       expect(entrypoint).toContain(authority);
     }
-    expect(entrypoint).toContain('workflow invocation 不授权这些副作用');
-    expect(entrypoint).toContain('缺授权只阻断该出口及依赖它的 downstream 动作');
-    expect(fullMode).toMatch(/Commit 与 push 是两个独立出口/);
-    expect(fullMode).toMatch(/只有 `reply_authorization: authorized` 才发布回复/);
-    expect(fullMode).toMatch(/无代码依赖的 `reply-list` \/ `human-list` 仍可/);
-    expect(targetedMode).toMatch(/五项 Exit Authority Admission/);
+    expect(entrypoint).toContain('workflow invocation does not authorize these effects');
+    expect(entrypoint).toContain('missing authority blocks only that exit and dependent downstream actions');
+    expect(fullMode).toContain('Commit and push are independent exits');
+    expect(fullMode).toContain('Publish replies only with `reply_authorization: authorized`');
+    expect(fullMode).toContain('Independent `reply-list` / `human-list` items without code dependencies');
+    expect(targetedMode).toContain('all five Exit Authority Admission');
   });
 
   test('helper scripts resolve through the loaded skill directory, not runtime mirror paths', () => {
@@ -51,9 +51,11 @@ describe('spec-resolve-pr-feedback contracts', () => {
     }
 
     expect(fullMode).toMatch(/SKILL_DIR="<absolute path of the directory containing this SKILL\.md>"\n\s*bash "\$SKILL_DIR\/scripts\/get-pr-comments" PR_NUMBER/);
-    expect(fullMode).toMatch(/SKILL_DIR="<absolute path of the directory containing this SKILL\.md>"\n\s*bash "\$SKILL_DIR\/scripts\/reply-to-pr-thread" THREAD_ID < "\$reply_file"/);
+    expect(fullMode).toMatch(/SKILL_DIR="<absolute path of the directory containing this SKILL\.md>"\n\s*bash "\$SKILL_DIR\/scripts\/reply-to-pr-thread" PR_NUMBER ROOT_COMMENT_ID OWNER\/REPO < "\$reply_file"/);
     expect(fullMode).toMatch(/SKILL_DIR="<absolute path of the directory containing this SKILL\.md>"\n\s*bash "\$SKILL_DIR\/scripts\/resolve-pr-thread" THREAD_ID/);
-    expect(targetedMode).toMatch(/SKILL_DIR="<absolute path of the directory containing this SKILL\.md>"\n\s*bash "\$SKILL_DIR\/scripts\/get-thread-for-comment" PR_NUMBER COMMENT_NODE_ID \[OWNER\/REPO\]/);
+    expect(targetedMode).toMatch(/SKILL_DIR="<absolute path of the directory containing this SKILL\.md>"\n\s*bash "\$SKILL_DIR\/scripts\/get-thread-for-comment" PR_NUMBER COMMENT_NODE_ID OWNER\/REPO/);
+    expect(targetedMode).toContain('Set `GH_HOST` to that exact HOST');
+    expect(fullMode).toContain('Set `GH_HOST` to that exact host');
 
     expect(combined).not.toContain('bash skills/spec-resolve-pr-feedback/scripts/');
     expect(combined).not.toContain('.claude/skills/');
@@ -94,6 +96,43 @@ describe('spec-resolve-pr-feedback contracts', () => {
     expect(fullMode).toMatch(/bash "\$SKILL_DIR\/scripts\/get-thread-for-comment" PR_NUMBER COMMENT_NODE_ID \[OWNER\/REPO\]/);
   });
 
+  test('pipeline mode keeps unattended escalation and convergence rules explicit', () => {
+    const entrypoint = read('skills/spec-resolve-pr-feedback/SKILL.md');
+    const fullMode = read('skills/spec-resolve-pr-feedback/references/full-mode.md');
+    const pipelineMode = read('skills/spec-resolve-pr-feedback/references/pipeline-mode.md');
+
+    expect(entrypoint).toContain('exact legacy token `mode:pipeline`');
+    expect(entrypoint).toContain('read `references/pipeline-mode.md` before acting');
+    expect(entrypoint).toContain('Do not treat `mode:pipeline-return` as this token');
+    expect(pipelineMode).toContain('Never call the blocking-question tool');
+    expect(pipelineMode).toContain('Return the exact typed residual');
+    expect(pipelineMode).toContain('Only with existing reply authorization');
+    expect(pipelineMode).toContain('Leave every covered thread open');
+    expect(pipelineMode).toContain('demonstrated non-converging approach');
+    expect(fullMode).toContain('When a `trajectory` is present, apply the non-convergence check');
+    expect(pipelineMode).toContain('never merely to announce that the thread remains open');
+    expect(pipelineMode).toContain('A single batch or reviewer identity alone proves neither pattern');
+    expect(fullMode).toContain('`mode:pipeline-return` never ask or wait');
+    expect(entrypoint + fullMode + pipelineMode).not.toMatch(/[\u3400-\u9fff]/u);
+  });
+
+  test('fetch keeps author feedback visible and leaves actionability to semantic judgment', () => {
+    const entrypoint = read('skills/spec-resolve-pr-feedback/SKILL.md');
+    const fullMode = read('skills/spec-resolve-pr-feedback/references/full-mode.md');
+    const getComments = read('skills/spec-resolve-pr-feedback/scripts/get-pr-comments');
+
+    expect(getComments).toContain('pr_author: ($author.login // null)');
+    expect(getComments).toContain('viewer: ($viewer // null)');
+    expect(getComments).not.toContain('select(.author.login != $author.login)');
+    expect(getComments).toContain('excludes only blank bodies');
+    expect(entrypoint).toContain('| PR URL without a fragment | **Full**');
+    expect(entrypoint).toContain('| PR URL with `#issuecomment-...` | **Full**');
+    expect(entrypoint).toContain('| Review-comment URL with `#discussion_r...` | **Targeted**');
+    expect(read('skills/spec-lfg/references/pr-watch-loop.md')).toContain('Identity never excludes a candidate');
+    expect(fullMode).toContain('identity never makes feedback disappear');
+    expect(entrypoint).toContain('Every unresolved item evaluated across inline threads, review bodies, and top-level comments');
+  });
+
   test('helper scripts preserve friendly owner repo fallback under set -e', () => {
     const getComments = read('skills/spec-resolve-pr-feedback/scripts/get-pr-comments');
     const getThread = read('skills/spec-resolve-pr-feedback/scripts/get-thread-for-comment');
@@ -122,7 +161,7 @@ describe('spec-resolve-pr-feedback contracts', () => {
     expect(getComments).toContain('--slurpfile threads');
     expect(getComments).toContain('pending_review:');
     expect(getComments).toContain('data.viewer.login');
-    expect(reply).toContain("pending_review field");
+    expect(reply).toContain('select(.state == "PENDING")');
     expect(fullMode).toContain('pending-review-visible-reply-blocked');
     expect(entrypoint).toContain('mode:pipeline-return');
     expect(pipeline).toMatch(/Failed,\s+not-run/);

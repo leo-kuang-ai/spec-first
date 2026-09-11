@@ -5,7 +5,9 @@
 # identifier on stdout.
 #
 # Usage:
-#   detect-project-type.sh
+#   detect-project-type.sh [project-root]
+#   Relative paths resolve from the caller's working directory. Output paths
+#   are relative to the selected root, which must remain inside the repository.
 #
 # Output grammar (one line on stdout):
 #
@@ -47,7 +49,18 @@ if [ -z "$REPO_ROOT" ]; then
   exit 1
 fi
 
-cd "$REPO_ROOT" || { echo "ERROR: cannot cd to repo root" >&2; exit 1; }
+REPO_ROOT=$(cd "$REPO_ROOT" && pwd -P) || exit 1
+PROJECT_ROOT="${1:-$REPO_ROOT}"
+if [ "$#" -gt 1 ] || [ ! -d "$PROJECT_ROOT" ]; then
+  echo "ERROR: expected one existing project directory" >&2
+  exit 1
+fi
+PROJECT_ROOT=$(cd "$PROJECT_ROOT" && pwd -P) || exit 1
+case "$PROJECT_ROOT" in
+  "$REPO_ROOT"|"$REPO_ROOT"/*) ;;
+  *) echo "ERROR: project root must be inside the repository" >&2; exit 1 ;;
+esac
+cd "$PROJECT_ROOT" || { echo "ERROR: cannot cd to project root" >&2; exit 1; }
 
 MATCHES=()
 

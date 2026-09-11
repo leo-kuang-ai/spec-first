@@ -1,6 +1,6 @@
 # Product Pulse First-Run Interview
 
-Loaded by `SKILL.md` at the start of Phase 1. Captures the configuration that will be merged into `.spec-first/config.local.yaml` (the unified spec-first local config, gitignored, machine-local) as `pulse_*` keys and re-read on every subsequent run.
+Loaded by `references/setup.md` at the start of Phase 1. Captures the configuration that will be merged into `.spec-first/config.local.yaml` (the unified spec-first local config, gitignored, machine-local) as `pulse_*` keys and re-read on every subsequent run.
 
 For each section: ask the opening question, evaluate the answer against the quality bar, push back when it falls into a named anti-pattern, and capture the final answer in the user's own language.
 
@@ -9,7 +9,7 @@ For each section: ask the opening question, evaluate the answer against the qual
 1. **Push back, but don't spiral.** One round of pushback per section max. If the second answer still isn't usable, capture what the user gave, flag it in the config as `needs-review`, and move on.
 2. **Name events in the user's own words.** The config will be readable by the whole team - use the terms they actually use, not a generic template.
 3. **Ask about tools, not credentials.** The interview captures *which* tool and *what shape of query*. It does not collect API keys, tokens, or database passwords. Those stay in the user's environment.
-4. **Honor strategy seeds.** If `SKILL.md` Phase 1.0 surfaced a product name or a list of key metrics from `STRATEGY.md`, start with those as defaults and let the user edit. Do not re-ask questions that the strategy doc already answered unambiguously.
+4. **Honor strategy seeds.** Use the product name and metrics from the STRATEGY or legacy source that setup read under `references/strategy-source.md` as defaults for correction. Do not re-ask questions the document already answered unambiguously.
 5. **Evaluate metrics against the SMART bar.** Every event, metric, and signal the user proposes should be:
    - **Specific** - a named event or a named metric, not a category. `message_sent` passes; "engagement" does not.
    - **Measurable** - you can point to the tool and query that returns a number. "Users like it" does not pass; "NPS score from Delighted" does.
@@ -252,9 +252,9 @@ pulse_schedule: {{daily | weekly | manual | ask-again-after-3-runs}}  # include 
 
 **Notes on what is NOT persisted in config:**
 
-- **Strategy metrics carried forward**: surfaced in the report, not stored as config — they live in `STRATEGY.md` and are re-read each run from there.
+- **Strategy metrics carried forward**: display them in the report, not as stored config; re-read current strategy metrics on every run using `references/strategy-source.md`.
 - **Per-source connection details** (URLs, API keys, query specifics): live with the user's MCP configuration, not in this config.
-- **Hardcoded operational settings** (15-minute trailing buffer, top-N error count, p50/p95/p99 latencies, "no PII in reports", "parallel analytics + tracing, serial DB"): these are skill behavior, not user config; they live in `SKILL.md` and stay constant.
+- **Hardcoded operational settings** (15-minute trailing buffer, top-N error count, p50/p95/p99 latencies, "no PII in reports", "parallel analytics + tracing, serial DB"): these are skill behavior, not user config; they live in `SKILL.md` and `references/run.md` and stay constant.
 - **Tracing top-N count and latency on/off**: not configurable in this version. The report always includes top 5 errors and full p50/p95/p99 latency. Add config keys later if a real need surfaces.
 
 After writing, surface the resulting `pulse_*` block to the user in chat. Offer one round of edits. Then return to SKILL.md Phase 2.

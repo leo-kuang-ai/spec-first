@@ -18,8 +18,8 @@ describe('CE localization deterministic review producer', () => {
 
     expect(inventory.skill_count).toBe(38);
     // 692 = 676 + spec-ideate/using-spec-first eval 资产与断言脚本进入 inventory 源集（2026-08-31 批次）
-    // 1029 = 692 + autoresearch 收编为 canonical skill 源（2026-09-04 批次，01fad369，+337 包路径）
-    expect(inventory.package_path_count).toBe(1029);
+    // 1122 = 1029 + CE-129 提交同步补审批次（2026-09-10，peer-runner 扩展/优化脚本/模板与新增校验资产，+93 包路径）
+    expect(inventory.package_path_count).toBe(1122);
     expect(inventory.files).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',
@@ -62,8 +62,11 @@ describe('CE localization deterministic review producer', () => {
     // is the pi adapter test file itself (its runtime-setup transform fixture's
     // frontmatter names that skill, incidentally matching the focused-test
     // relation); the adapter source file carries no relation of its own.
-    expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(193);
-    expect(coverage.coverage_summary.direct_support_relation_count).toBe(407);
+    // 2026-09-08: 193 -> 194 / 407 -> 408 — the deterministic governance JSON
+    // test fixture in this file grew an explicit dual-host relation row for the
+    // canonical standalone iteration skill during its lane-refresh batch.
+    expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(208);
+    expect(coverage.coverage_summary.direct_support_relation_count).toBe(424);
     expect(coverage.direct_support).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',

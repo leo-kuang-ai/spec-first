@@ -5,7 +5,7 @@
     "kind": "llm-adjudication",
     "model": "codex-current-session",
     "status": "confirmed",
-    "adjudication_scope": "reconfirmed all 517 owner/action/unit/limitation decisions against the current deterministic input after formatting-only review-plan cleanup and a concurrent changelog-only update; the deterministic 517-record digest remains unchanged, no upstream join or semantic ownership map changed, and no provider, runtime-adoption, or field-outcome claim is made"
+    "adjudication_scope": "2026-09-08 自主收尾差量承接：固定窗口 517 条 records、upstream 与 deterministic_facts 与既有输入逐字段相同。新增 spec-work 机械修改仍需证据收尾的澄清、共享清理 ownership 修复及实验记录；不改变既有上游 owner/action/unit，不重审未变条目。"
   },
   "upstream": {
     "repository": "compound-engineering-plugin",
@@ -15,46 +15,12 @@
   },
   "target_source_snapshot": {
     "repository": "spec-first",
-    "head": "4f2095725c4b503b0ea62cc16a9ce4631c4ede76",
-    "dirty": true,
-    "dirty_paths": [
-      "CHANGELOG.md",
-      "docs/contracts/workflows/ce-localization-regeneration-sequence.md",
-      "docs/validation/skill-evals/2026-08-30-skill-inventory.md",
-      "docs/validation/skill-evals/README.md",
-      "docs/validation/skill-evals/_template.md",
-      "docs/validation/skill-evals/results.tsv",
-      "docs/validation/skill-evals/using-spec-first.md",
-      "skills/spec-ideate/evals/cases/non-software-mode-no-label-leak.yaml",
-      "skills/spec-ideate/evals/cases/refine-own-idea-routes-to-brainstorm.yaml",
-      "skills/spec-ideate/evals/cases/repo-grounded-e2e-writes-artifact.yaml",
-      "skills/spec-ideate/evals/cases/surprise-me-no-repo-needs-substance.yaml",
-      "skills/spec-ideate/evals/cases/vague-subject-gate-asks.yaml",
-      "skills/spec-ideate/evals/eval.yaml",
-      "skills/spec-ideate/evals/fixtures/repos/mini-ledger/README.md",
-      "skills/spec-ideate/evals/fixtures/repos/mini-ledger/package.json",
-      "skills/spec-ideate/evals/fixtures/repos/mini-ledger/src/server.js",
-      "skills/spec-ideate/evals/fixtures/scripts/asks-a-question.sh",
-      "skills/spec-project-rules/SKILL.md",
-      "skills/spec-project-rules/evals/README.md",
-      "skills/spec-project-rules/references/knowledge-format.md",
-      "skills/spec-project-rules/references/mining-method.md",
-      "skills/spec-project-rules/scripts/extract-deps.cjs",
-      "skills/using-spec-first/SKILL.md",
-      "skills/using-spec-first/evals/cases/direct-lane-simple-howto.yaml",
-      "skills/using-spec-first/evals/cases/failure-priority-single-entry.yaml",
-      "skills/using-spec-first/evals/cases/recommendation-only-format.yaml",
-      "skills/using-spec-first/evals/cases/route-failure-to-spec-debug.yaml",
-      "skills/using-spec-first/evals/cases/route-vague-idea-to-spec-brainstorm.yaml",
-      "skills/using-spec-first/evals/eval.yaml",
-      "tests/unit/ce-localization-review-contracts.test.js",
-      "tests/unit/spec-project-rules-contracts.test.js",
-      "tests/unit/spec-project-rules-scripts.test.js",
-      "tests/unit/using-spec-first-contracts.test.js"
-    ],
-    "dirty_path_manifest_sha256": "bbc7b9dcb60366a9d6a3178f2c227db2f0e4608ff453360c3b65c2d958059849",
-    "source_tree_hash": "be29eca636cd722fb90acecf19a63a74e320e0251b003b81e16ba167cea3e761",
-    "inventory_hash": "8048c355d99c8dc6af15e5da9caab06fa4a8e987a121147ac210f77a31607295",
+    "head": "19d3f6d8a06f3088d4e392a8718dac47aefa8587",
+    "dirty": false,
+    "dirty_paths": [],
+    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source_tree_hash": "5c75c9adfc8f24f7c377d833cc4683c9abc049fb9348e4178ae9db54b068d95e",
+    "inventory_hash": "3d2c3266db961c90c358e4d824687e879530eadc612e3e24e0f936659c39aa58",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -88,7 +54,7 @@
       "version": "canonical-source-manifest-v1"
     }
   },
-  "input_artifact_sha256": "d19e953bd3ffb7ea6b541e549db8d46a668498c857a10549c12eac3c3e0ac8e4",
+  "input_artifact_sha256": "4b48b71a0f71902fb6f14db7d325cfa21e2e860e519880c7296a2e2e02d1f72f",
   "records": [
     {
       "audit_id": "A001",
@@ -14827,26 +14793,9 @@
     }
   ],
   "review_context": {
-    "reviewed_at": "2026-08-28",
-    "basis": [
-      "current deterministic adjudication input and SHA-256 binding",
-      "zero deterministic classification mismatches across all 517 path joins",
-      "current scripts/check-ce-upstream-reconciliation.cjs owner/unit/action maps",
-      "current canonical Skill, shared-reference, benchmark-gate, and focused regression changes",
-      "current source snapshot excludes evidence run outputs outside canonical source roots"
-    ],
-    "path_join_reconfirmed": true,
-    "source_snapshot_change": "target HEAD unchanged (4f209572) and canonical snapshot changed only additively (new eval fixtures: skills/spec-ideate/evals, skills/using-spec-first/evals; docs/validation/skill-evals; using-spec-first checkpoint markers; spec-project-rules freshness-scanner fixes and focused tests); upstream path set, deterministic classifications, and all 517 semantic owner/action/unit/limitation decisions remain applicable",
-    "limitations": [
-      "provider-authenticated receipt not available",
-      "independent OpenAI and Anthropic provider review not established",
-      "fresh generated runtime adoption and real host loading not established",
-      "enterprise field outcome and knowledge promotion not established"
-    ],
-    "readjudicated_at": "2026-08-30",
-    "method": "fresh-source verification-based carry-over (re-stamped after using-spec-first/spec-ideate eval assets + spec-project-rules scanner-fix canonical edits; upstream window byte-identical, shared record fields 0 mismatches, no local ref deletions)",
-    "verified_record_count": 517,
-    "stale_flipped_count": 0,
-    "restamped_at": "2026-08-31"
+    "continuation_review": "CE-129 提交同步补审批次（2026-09-10）后的源快照重绑：上游 517 项事实与本轮输入一致，逐项沿用既有 canonical_owner/implementation_unit/target_action 决策；本轮已对受影响的本地 owner（peer-job-runner、execution-strategy、plan-sections、pr-description-writing、validate-doc-claims、runtime-setup provider 面）做逐项源码核对，未发现需要改判的记录。不声明独立双模型复审。",
+    "reviewed_at": "2026-09-10",
+    "reviewer": "current ZCode session",
+    "method": "deterministic carry-over after CE-129 sync batch source snapshot rebind"
   }
 }

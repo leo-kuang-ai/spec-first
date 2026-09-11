@@ -16,12 +16,14 @@ const packages = [
   {
     name: 'spec-brainstorm',
     boundarySource: 'skills/spec-brainstorm/SKILL.md',
-    sources: ['skills/spec-brainstorm/SKILL.md'],
+    sources: ['skills/spec-brainstorm/SKILL.md', ...require('../helpers/brainstorm-contract').phaseFiles
+      .map(file => `skills/spec-brainstorm/references/${file}`)],
   },
   {
     name: 'spec-compound',
-    boundarySource: 'skills/spec-compound/SKILL.md',
-    sources: ['skills/spec-compound/SKILL.md'],
+    boundarySource: 'skills/spec-compound/references/modes.md',
+    sources: ['skills/spec-compound/SKILL.md', ...require('../helpers/compound-contract').phaseFiles
+      .map(file => `skills/spec-compound/references/${file}`)],
   },
   {
     name: 'spec-compound-refresh',
@@ -84,8 +86,16 @@ const packages = [
 const existingQualifiedPackages = [
   {
     name: 'spec-code-review',
-    boundarySource: 'skills/spec-code-review/SKILL.md',
-    sources: ['skills/spec-code-review/SKILL.md'],
+    boundarySource: 'skills/spec-code-review/references/modes-and-output.md',
+    sources: [
+      'skills/spec-code-review/SKILL.md',
+      'skills/spec-code-review/references/modes-and-output.md',
+      'skills/spec-code-review/references/scope.md',
+      'skills/spec-code-review/references/intent-and-plan.md',
+      'skills/spec-code-review/references/select-and-route.md',
+      'skills/spec-code-review/references/dispatch-reviewers.md',
+      'skills/spec-code-review/references/finish-review.md',
+    ],
   },
   {
     name: 'spec-debug',
@@ -99,9 +109,10 @@ const existingQualifiedPackages = [
   },
   {
     name: 'spec-plan',
-    boundarySource: 'skills/spec-plan/SKILL.md',
+    boundarySource: 'skills/spec-plan/references/research.md',
     sources: [
       'skills/spec-plan/SKILL.md',
+      'skills/spec-plan/references/research.md',
       'skills/spec-plan/references/deepening-workflow.md',
       'skills/spec-plan/references/universal-planning.md',
     ],
@@ -116,6 +127,7 @@ const existingQualifiedPackages = [
     boundarySource: 'skills/spec-work/SKILL.md',
     sources: [
       'skills/spec-work/SKILL.md',
+      'skills/spec-work/references/implementation-loop.md',
       'skills/spec-work/references/execution-strategy.md',
       'skills/spec-work/references/execution-engines.md',
       'skills/spec-work/references/review-findings-followup.md',
@@ -194,7 +206,7 @@ const dispatchSourceContracts = [
     ],
   },
   {
-    path: 'skills/spec-compound/SKILL.md',
+    path: 'skills/spec-compound/references/report.md',
     requiredPatterns: [
       /Execution:[^\n]*dispatch_authorization_missing[^\n]*subagent_capability_missing[^\n]*worker_capability_unproven/,
     ],
@@ -255,7 +267,9 @@ function walkMarkdownFiles(root) {
 }
 
 function packageBoundarySource(entry) {
-  return read(entry.boundarySource);
+  return [...new Set([entry.boundarySource, ...entry.sources])]
+    .map(read)
+    .join('\n');
 }
 
 function matchPrimitiveLeakage(line) {
@@ -490,7 +504,7 @@ describe('generic dispatch authorization matrix', () => {
   });
 
   test('code review keeps pre-roster trivial-PR classification inline and behind no hidden dispatch', () => {
-    const source = read('skills/spec-code-review/SKILL.md');
+    const source = require('../helpers/code-review-contract').readCodeReviewContract();
     const trivialPrSection = source.match(/\*\*Trivial-PR judgment\*\*:[\s\S]*?(?=\n\nWhen any skip rule fires)/);
     const dispatchGateIndex = source.indexOf('### Stage 1c: Dispatch gate and inline fallback');
     const orientationIndex = source.indexOf('### Stage 2c: Resolve current-tree orientation');
@@ -533,19 +547,21 @@ describe('generic dispatch authorization matrix', () => {
     ].join('\n');
     const resolver = read('skills/spec-resolve-pr-feedback/SKILL.md');
 
-    expect(optimize).toMatch(/Approved optimization spec.*都不是派发授权/is);
-    expect(optimize).toMatch(/judge sub-agents.*Otherwise evaluate.*serially inline/is);
+    expect(optimize).toMatch(/Approved optimization spec.*do not authorize dispatch/is);
+    expect(optimize).toMatch(/judge sub-agents.*If independent judging is unavailable, do not score inline/is);
     expect(optimize).toMatch(/Codex failure cascade.*authorization.*serial inline\/local/is);
-    expect(sweep).toMatch(/mode:headless.*scheduled run.*都不构成派发授权/is);
+    expect(sweep).toMatch(/mode:headless.*scheduled run.*do not authorize dispatch/is);
     expect(sweep).toMatch(/sensitive.*delegated handling/is);
     expect(refresh).toMatch(/never write.*tracked successor/is);
-    expect(refresh).toMatch(/must not write.*stage.*commit/is);
-    expect(resolver).toContain('Resolver worker 永远不得 stage、commit、push');
+    expect(refresh).toMatch(/investigation workers are read-only and never write a tracked successor, stage, or commit/i);
+    expect(read('skills/spec-compound-refresh/references/investigate.md'))
+      .toContain('They never write tracked files, stage, commit, or delete.');
+    expect(resolver).toContain('Resolver workers never stage, commit, push, reply, or resolve threads');
   });
 
   test('inline fallback labels stay honest in downstream workflow text', () => {
-    const brainstorm = read('skills/spec-brainstorm/SKILL.md');
-    const compound = read('skills/spec-compound/SKILL.md');
+    const brainstorm = require('../helpers/brainstorm-contract').readBrainstormContract();
+    const compound = read('skills/spec-compound/references/report.md');
     const dogfood = read('skills/spec-dogfood/SKILL.md');
     const ideate = read('skills/spec-ideate/SKILL.md');
 
@@ -558,7 +574,9 @@ describe('generic dispatch authorization matrix', () => {
     expect(dogfood).not.toContain('Fix Loop (Autonomous)');
     expect(dogfood).not.toMatch(/Auto-fix when/i);
     expect(ideate).toContain('Authorized-dispatch examples');
-    expect(ideate).toMatch(/role lenses inline\/serial.*dispatch_authorization_missing/is);
+    expect(ideate).toContain('role lenses inline/serial');
+    expect(ideate).toContain('dispatch_authorization_missing');
+    expect(ideate).toContain('retain the authorization or capability reason');
     const ideatePost = read('skills/spec-ideate/references/post-ideation-workflow.md');
     const ideateUniversal = read('skills/spec-ideate/references/universal-ideation.md');
     expect(ideatePost).toMatch(/dispatch.*only.*worker_dispatch_authorization.*worker_dispatch_capability/is);

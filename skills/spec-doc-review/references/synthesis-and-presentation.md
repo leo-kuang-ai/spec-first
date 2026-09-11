@@ -46,7 +46,7 @@ When fingerprints match across personas:
 
 ### 3.4 Cross-Persona Agreement Promotion
 
-When 2+ independent personas flagged the same merged finding (from 3.3), promote the merged finding's anchor by one step: `50 → 75`, `75 → 100`. Anchor `100` does not promote further (already at the ceiling). Findings at anchors `0` or `25` do not reach this step (they were dropped in 3.2).
+When 2+ independent personas flagged the same merged finding (from 3.3), promote the merged finding's anchor by one step: `50 → 75`, `75 → 100`. Anchor `100` does not promote further (already at the ceiling). Findings at anchors `0` or `25` do not reach this step (they were dropped in 3.2). Independence requires separate dispatched contexts with observed results; parent-context lenses remain attributed evidence but cannot count toward promotion. Coverage names the lost independence.
 
 Independent corroboration is strong signal — multiple reviewers converging on the same issue is more reliable than any single reviewer's anchor. Promoting by one anchor step is semantically meaningful (a "verified but nitpick" finding that two personas independently surface is plausibly "will hit in practice").
 
@@ -129,7 +129,7 @@ Sort findings for presentation: P0 → P1 → P2 → P3, then by finding type (e
 
 ### Enforce Mutation Policy
 
-Apply the run-local `mutation_policy` resolved in `SKILL.md` before any write-capable path:
+Apply the run-local `mutation_policy` resolved in `references/document-intake.md` before any write-capable path:
 
 - **`markdown-write`:** apply only `safe_auto` findings at confidence anchor `100` to the document in a single pass. Edit inline with the platform's edit tool, track each change for the rendered summary, and never silent-apply anchor `75` or `50` findings.
 - **`report-only`:** do not edit the document, append Open Questions, enter the walkthrough, or invoke bulk Apply/Defer mechanics. Set `fixes_applied: 0`. Reclassify confidence-100 `safe_auto` findings as `producer_fix_candidates` in the envelope so an owning producer can decide whether to regenerate the artifact. Keep `gated_auto`, `manual`, FYI, residual, deferred, Coverage, and limitation surfaces intact.
@@ -295,7 +295,7 @@ These are pipeline artifacts and must not be flagged for removal.
 
 **Headless mode or `mutation_policy: report-only` with `output_mode: text`:** Return "Review complete" immediately after the structured text envelope. Do not ask questions and do not enter any mutation-oriented next-action flow.
 
-**Interactive `markdown-write` mode:** fire the terminal question using the platform's blocking question tool. In Claude Code the tool should already be loaded from the Interactive-mode pre-load step in `SKILL.md` — if it isn't, call `ToolSearch` with `select:AskUserQuestion` now. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors.
+**Interactive `markdown-write` mode:** fire the terminal question using the host's blocking question tool already in the current tool list, matched by capability; if it is listed but unloaded, follow the pre-load step in `references/modes.md`. Fall back to numbered options in chat only when no such tool is in the list or a real question call errors.
 
 **Stem:** `Apply decisions and what next?`
 

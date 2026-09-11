@@ -8,19 +8,30 @@ argument-hint: "[optional: section to revisit, e.g. 'metrics' or 'approach']"
 
 Note: Use the current date from the active host context. Use this when weighting external sources and dating artifacts.
 
-`spec-strategy` produces and maintains `STRATEGY.md` - a short, durable anchor document that captures what the product is, who it serves, how it succeeds, and where the team is investing. It lives at the repo root as a canonical, well-known file (peer of `README.md`). Downstream skills (`spec-ideate`, `spec-brainstorm`, `spec-plan`) read it as grounding when it exists.
+`spec-strategy` writes and maintains its owned sections in the shared `STRATEGY.md` project document - a short, durable anchor document that captures what the product is, who it serves, how it succeeds, and where the team is investing. It lives at the repo root as a canonical, well-known file (peer of `README.md`). Downstream skills (`spec-ideate`, `spec-brainstorm`, `spec-plan`) read it as grounding when it exists.
 
 The document is short and structured on purpose. Good answers to a handful of sharp questions produce a better strategy than any amount of prose. This skill asks those questions, pushes back on weak answers, and writes the doc.
 
+## Boundaries
+
+- Strategy is an anchor, not a plan; features, schedules, and implementation plans belong to their owning workflows.
+- The repository grounds questions but never fills in the user's answers.
+- Update only the target section's content. Before editing an existing file, read `references/update-run.md`: maintain local template headings and order in a solely-owned file; preserve shape and order in a multi-writer file. Do not edit `author-approved` sections or documents the user does not own; report conflicts or reference them in a separately authorized file.
+- Keep the document short and leave room for future changes.
+
 ## Interaction Method
 
-Default to the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
+Default to the platform's blocking question tool: the host's blocking question tool already in the current tool list, matched by capability (if a matching tool is listed but unloaded, load it through the host's tool-discovery primitive). Fall back to numbered options in chat only when no such tool is in the list or a real question call errors. Never silently skip the question.
 
 Ask one question at a time. Prefer free-form responses for the substantive sections (problem, approach, persona); reserve single-select for routing decisions (which section to revisit). Each option label must be self-contained.
 
+## Grounding
+
+Before Phase 0 and before building the repo model, read `references/grounding.md`. It owns source selection, the distinction between recent activity and product intent, the empty-repository path, and the grounded summary before the first question.
+
 ## Focus Hint
 
-Interpret the user's current request as an optional focus: a section name to revisit (`metrics`, `approach`, `tracks`) or a scope hint. With no focus, proceed open-ended and let the file state decide the path.
+Arguments from the user or upstream caller are optional focus hints naming a section or scope. Map `positioning`/`approach` to Our approach, `users`/`who it's for` to Who it's for, and `boundaries` to Not working on by meaning; the hint itself does not rename the document. Without a focus, file state determines the route.
 
 ## Core Principles
 
@@ -35,9 +46,9 @@ Interpret the user's current request as an optional focus: a section name to rev
 
 Read `STRATEGY.md` using the native file-read tool.
 
-- **File does not exist** -> First run. Go to Phase 1.
+- **File does not exist** -> First run. Apply the grounding reference's legacy sibling fold/link path before Phase 1.
 - **File exists and argument names a specific section** -> Targeted update. Go to Phase 2.
-- **File exists, no argument** -> Ask which section(s) to revisit, then Phase 2.
+- **File exists, no argument** -> Phase 2. The update reference selects the target section after the drift summary.
 
 Announce the path in one line: "Strategy doc not found - let's write it." or "Found existing strategy - let's review and update."
 
@@ -45,37 +56,25 @@ Announce the path in one line: "Strategy doc not found - let's write it." or "Fo
 
 Read `references/interview.md`. This load is non-optional - the pushback rules, anti-pattern examples, and quality bar for each section live there. Improvising from memory produces a passive transcription instead of a strategy doc.
 
-Run the interview in the section order of the final document:
+Interview in this order; the final document follows the local template's section order:
 
 1. Target problem
 2. Our approach
 3. Who it's for
 4. Key metrics
 5. Tracks
-6. Milestones (optional)
-7. Not working on (optional)
-8. Marketing (optional)
+6. Stress test (an interview check, not a new document section)
+7. Not working on (required in a new house-format document)
+8. Milestones (optional)
+9. Marketing (optional)
 
 For each section, ask the opening question, apply the pushback rules, and capture the final answer in the user's own language. Do not skip the pushback step - it is the core of the skill. Two rounds of pushback per section maximum; capture what the user has given after that and note the section is worth revisiting on the next run.
 
-When all required sections (1-5) are captured, read `references/strategy-template.md`, fill it in, and present the full draft in chat before writing. Offer one round of edits. Then write to `STRATEGY.md`.
+Once the first five sections, stress test, and Not working on have answers, read `references/strategy-template.md`, draft with its headings and order, and show the draft with one edit opportunity. When current explicit authorization covers writing the draft, proceed without turning optional feedback into a waiting gate. After two rounds, record unresolved answers as given and suggest revisiting them; do not invent answers or block the whole interview.
 
 ### Phase 2: Update Run
 
-Read the existing `STRATEGY.md` thoroughly. Summarize current state in 3-5 lines so the user sees what is on file.
-
-If the argument named a specific section, jump to that section in `references/interview.md`. Preserve all other sections exactly. Apply pushback as if this were a first run - do not rubber-stamp existing weak content just because it is already written.
-
-If no specific target, ask the user which section to revisit using the blocking question tool. Options:
-
-- "Target problem"
-- "Our approach"
-- "Who it's for"
-- "Metrics, tracks, or other"
-
-For each revisited section, re-interview with full pushback. For sections the user confirms are still accurate, leave them untouched. Update the `last_updated` value in the YAML frontmatter to today's ISO date.
-
-Write the updated doc back to `STRATEGY.md`.
+Before the summary, drift check, or questions, read `references/update-run.md`. It owns document shape, author protection, drift candidates, target selection, and date updates; do not edit an existing file without reading it. `references/interview.md` still supplies the selected section's questions and two-round pushback cap.
 
 ### Phase 3: Downstream Handoff
 

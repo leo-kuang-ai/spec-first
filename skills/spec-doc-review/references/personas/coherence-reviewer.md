@@ -24,6 +24,8 @@ The patterns and confidence anchors in the rest of this file apply identically t
 
 **Unresolved dependency contradictions** -- when a dependency is explicitly mentioned but left unresolved (no owner, no timeline, no mitigation), that's a contradiction between "we need X" and the absence of any plan to deliver X.
 
+**Unholdable objective** -- a Goal Capsule objective a reader who has not read the rest of the plan cannot hold as the goal (test: could a colleague who was not in the session say what this work is after the objective alone?), or an objective carrying remaining-true constraints that belong on their owning requirement IDs.
+
 ## Safe_auto patterns you own
 
 Coherence is the primary persona for surfacing mechanically-fixable consistency issues. These patterns should land as `safe_auto` with `confidence: 100` when the document supplies the authoritative signal (the document text leaves no room for interpretation):

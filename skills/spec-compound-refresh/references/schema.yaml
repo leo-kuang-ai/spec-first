@@ -1,4 +1,5 @@
 # Documentation schema for learnings written by spec-compound
+# Classification contract v2: responsibility-based enums; legacy docs remain readable.
 # Treat this as the canonical frontmatter contract for docs/solutions/.
 #
 # The schema has two tracks based on problem_type:
@@ -70,19 +71,16 @@ required_fields:
   component:
     type: enum
     values:
-      - rails_model
-      - rails_controller
-      - rails_view
-      - service_object
-      - background_job
-      - database
-      - frontend_stimulus
-      - hotwire_turbo
-      - email_processing
-      - brief_system
-      - assistant
-      - authentication
-      - payments
+      - cli
+      - workflow
+      - skill
+      - runtime
+      - provider
+      - contract
+      - verification
+      - knowledge
+      - governance
+      - application_code
       - development_workflow
       - testing_framework
       - documentation
@@ -125,12 +123,13 @@ track_rules:
       root_cause:
         type: enum
         values:
-          - missing_association
-          - missing_include
-          - missing_index
+          - contract_drift
+          - source_runtime_drift
+          - stale_context
           - wrong_api
-          - scope_issue
-          - thread_violation
+          - ownership_violation
+          - concurrency
+          - data_integrity
           - async_timing
           - memory_leak
           - config_error
@@ -171,12 +170,13 @@ track_rules:
       root_cause:
         type: enum
         values:
-          - missing_association
-          - missing_include
-          - missing_index
+          - contract_drift
+          - source_runtime_drift
+          - stale_context
           - wrong_api
-          - scope_issue
-          - thread_violation
+          - ownership_violation
+          - concurrency
+          - data_integrity
           - async_timing
           - memory_leak
           - config_error
@@ -217,10 +217,9 @@ optional_fields:
 
 # --- Fields optional for bug track only -------------------------------------
 bug_optional_fields:
-  rails_version:
+  framework_version:
     type: string
-    pattern: '^\d+\.\d+\.\d+$'
-    description: "Rails version in X.Y.Z format. Only relevant for bug-track docs."
+    description: "Framework or runtime and observed version, e.g. node 22.4.0. Only relevant for bug-track docs."
 
 # --- Backward compatibility --------------------------------------------------
 # Docs created before the track system was introduced may have bug-track
@@ -244,6 +243,6 @@ validation_rules:
   - "Enum fields must match allowed values exactly"
   - "Array fields must respect min_items/max_items when specified"
   - "date must match YYYY-MM-DD format"
-  - "rails_version, if provided, must match X.Y.Z format and only applies to bug-track docs"
+  - "framework_version, if provided, names the observed framework or runtime; preserve legacy rails_version when reading old docs"
   - "tags should be lowercase and hyphen-separated"
   - "Array-of-strings frontmatter items (source_refs, symptoms, applies_when, tags, related_components, or any future array field) must be wrapped in double quotes when the value starts with a YAML reserved indicator (`, [, *, &, !, |, >, %, @, ?) or contains the substring `: ` — otherwise strict YAML parsers reject the file"

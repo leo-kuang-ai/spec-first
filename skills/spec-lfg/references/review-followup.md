@@ -5,11 +5,25 @@ verified review fix in the working tree until the browser and cleanup gates
 close. During the PR watch loop, `spec-resolve-pr-feedback` owns the bounded
 pipeline-return journey described below.
 
-## Step 4 — Invoke Review
+## Step 3 - Simplify Before Review
+
+Pass the plan path as decision context, not as simplification scope. Preserve `session-settled:` structural decisions, including deliberate duplication; the branch diff remains the scope.
+
+   This runs before review so the code-review in step 4 covers the simplified code. **Skip** this step when the change is docs-only (only markdown/docs paths changed) or trivial (roughly under 10 changed lines). Otherwise let `spec-simplify-code` resolve the branch-diff scope itself: it preserves behavior, runs full-project typecheck/lint, and defaults to changed-path scoped tests; broaden scope only when impact is clearly wide or the runner cannot narrow it. This step provides only a behavior-preservation signal; the final verification gate owns complete closeout truth.
+
+   Do not commit in this step. `spec-simplify-code` leaves its changes in the working tree; step 4's review scopes the working tree (uncommitted changes included), and step 8's `spec-commit-push-pr` commits whatever remains. Committing here would sweep any still-uncommitted `spec-work` edits into a misleading `refactor` commit and could stall on a tree that never goes clean.
+
+## Step 4 — Invoke `spec-code-review`
+
+Load `spec-code-review` from the host catalog's listed path. A host skill named `review` is not this step; do not invent `skills/review/SKILL.md` under this skill package.
 
 ```text
 spec-code-review mode:agent plan:<plan-path-from-step-1>
 ```
+
+Pass step 1's plan path so `spec-code-review` can check requirements completeness. `mode:agent` is report-only by design: it returns findings and never edits the working tree; LFG applies eligible fixes in step 5.
+
+If a source-backed finding invalidates a settled decision as infeasible, wrong-task, or destructive, stop before apply or shipping and return the decision and evidence. A workable preference conflict remains report-only and must reach the residual record even when no actionable fix exists. Settlement never suppresses a defect's severity or weakens verification.
 
 Do not pass `mode:autofix`. Consume only the returned JSON object, not a
 Markdown Actionable Findings summary. Extract `status`, `actionable_findings`,

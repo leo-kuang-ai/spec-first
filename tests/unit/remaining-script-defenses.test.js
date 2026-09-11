@@ -21,7 +21,7 @@ describe('remaining script failure-path defenses', () => {
       const result = spawnSync('python3', [validateClaims, doc], { cwd: root, encoding: 'utf8' });
       expect(result.status).toBe(0);
       expect(result.stderr).toBe('');
-      expect(result.stdout).toContain('not a git repository');
+      expect(result.stdout).toContain('Git path/SHA classification unavailable');
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }

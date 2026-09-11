@@ -1,0 +1,204 @@
+{
+  "schema_version": "ce-localization-skill-baseline/v1",
+  "artifact_kind": "source-bound-skill-baseline",
+  "producer": "skill-owner:autoresearch",
+  "single_writer": "ce-localization-baseline-writer",
+  "source_snapshot": {
+    "repository": "spec-first",
+    "head": "19d3f6d8a06f3088d4e392a8718dac47aefa8587",
+    "dirty": false,
+    "dirty_paths": [],
+    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source_tree_hash": "5c75c9adfc8f24f7c377d833cc4683c9abc049fb9348e4178ae9db54b068d95e",
+    "inventory_hash": "3d2c3266db961c90c358e4d824687e879530eadc612e3e24e0f936659c39aa58",
+    "scope_contract": {
+      "source_roots": [
+        "CLAUDE.md",
+        "AGENTS.md",
+        "skills",
+        "templates",
+        "src",
+        "scripts",
+        "tests",
+        "docs",
+        "README.md",
+        "README.en.md",
+        "README.zh-CN.md",
+        "CHANGELOG.md",
+        "package.json"
+      ],
+      "excluded_run_outputs": [
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-name-status.md",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication-input.json",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.md",
+        "docs/validation/2026-08-19-spec-first-current-skill-package-inventory-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-evidence-exceptions.json",
+        "docs/validation/2026-08-19-ce-post-3-20-ledger-patches/**",
+        "docs/validation/ce-localization/**"
+      ]
+    },
+    "hash_algorithm": {
+      "name": "sha256",
+      "version": "canonical-source-manifest-v1"
+    }
+  },
+  "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
+  "inventory_sha256": "af887520669a32a1374e8b321f5824679da5779e6a91e0176204e6c497cd1e4d",
+  "skill_id": "autoresearch",
+  "source_refs": [
+    "skills/autoresearch/agents/openai.yaml",
+    "skills/autoresearch/autoresearch.md",
+    "skills/autoresearch/debug.md",
+    "skills/autoresearch/evals.md",
+    "skills/autoresearch/evals/cases/dispatch-classic-mode.yaml",
+    "skills/autoresearch/evals/cases/screen-cmd-refuses-unsafe-predicate.yaml",
+    "skills/autoresearch/evals/cases/ship-never-auto-approves.yaml",
+    "skills/autoresearch/evals/eval.yaml",
+    "skills/autoresearch/evals/fixtures/repos/empty-repo/README.md",
+    "skills/autoresearch/evals/fixtures/scripts/check-classic-banner.sh",
+    "skills/autoresearch/evals/fixtures/scripts/check-screen-refusal.sh",
+    "skills/autoresearch/evals/fixtures/scripts/check-ship-gate.sh",
+    "skills/autoresearch/fix.md",
+    "skills/autoresearch/improve.md",
+    "skills/autoresearch/learn.md",
+    "skills/autoresearch/plan.md",
+    "skills/autoresearch/predict.md",
+    "skills/autoresearch/probe.md",
+    "skills/autoresearch/reason.md",
+    "skills/autoresearch/references/orchestrator-routing.md",
+    "skills/autoresearch/references/predict-personas.md",
+    "skills/autoresearch/references/reason-judge-protocol.md",
+    "skills/autoresearch/references/security-checklist.md",
+    "skills/autoresearch/regression.md",
+    "skills/autoresearch/scenario.md",
+    "skills/autoresearch/scripts/orchestrate.sh",
+    "skills/autoresearch/scripts/score-regression.sh",
+    "skills/autoresearch/security.md",
+    "skills/autoresearch/ship.md",
+    "skills/autoresearch/SKILL.md"
+  ],
+  "before_state": "Current canonical autoresearch source is the baseline; semantic improvement is not assumed from CE coverage.",
+  "target_state": "A source-bound Skill contract that preserves authorization, evidence and owner boundaries while improving the declared user task.",
+  "known_limitations": [
+    "No field task or provider outcome has been executed in this closeout."
+  ],
+  "invalidation_conditions": [
+    "target source snapshot drift",
+    "owner contract changes",
+    "new counterexample or field regression"
+  ],
+  "candidate_snapshot": {
+    "repository": "spec-first",
+    "head": "19d3f6d8a06f3088d4e392a8718dac47aefa8587",
+    "dirty": false,
+    "dirty_paths": [],
+    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source_tree_hash": "5c75c9adfc8f24f7c377d833cc4683c9abc049fb9348e4178ae9db54b068d95e",
+    "inventory_hash": "3d2c3266db961c90c358e4d824687e879530eadc612e3e24e0f936659c39aa58",
+    "scope_contract": {
+      "source_roots": [
+        "CLAUDE.md",
+        "AGENTS.md",
+        "skills",
+        "templates",
+        "src",
+        "scripts",
+        "tests",
+        "docs",
+        "README.md",
+        "README.en.md",
+        "README.zh-CN.md",
+        "CHANGELOG.md",
+        "package.json"
+      ],
+      "excluded_run_outputs": [
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-name-status.md",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication-input.json",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.md",
+        "docs/validation/2026-08-19-spec-first-current-skill-package-inventory-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-evidence-exceptions.json",
+        "docs/validation/2026-08-19-ce-post-3-20-ledger-patches/**",
+        "docs/validation/ce-localization/**"
+      ]
+    },
+    "hash_algorithm": {
+      "name": "sha256",
+      "version": "canonical-source-manifest-v1"
+    }
+  },
+  "candidate_diff_ref": "not-run: no candidate mutation is claimed by this artifact",
+  "improvement_contract": {
+    "frozen_at": "2026-08-20T00:00:00.000Z",
+    "metric_owner": "skills/spec-optimize",
+    "metric_contract_ref": "skills/spec-optimize/references/experiment-log-schema.yaml",
+    "metric_contract_sha256": "cd117ea87e6b8588896b5823369e0dba4532bb060d85253fd9fdd9d1934d0116",
+    "noise_floor": "not observed; field protocol must establish before comparison",
+    "budget": "one bounded validation cohort before any promotion decision",
+    "measurement_artifact_refs": [
+      "docs/validation/ce-localization/field-validation/protocol.json"
+    ],
+    "primary_metric": {
+      "metric_id": "autoresearch.trusted-change-gate",
+      "metric_type": "binary-gate",
+      "direction": "pass",
+      "instrumentation_ref": "docs/contracts/ai-coding-harness.md#quality-adjusted-throughput",
+      "numerator": "runs satisfying the declared source, authorization and verification gates",
+      "denominator": "eligible runs in the declared validation window",
+      "measurement_window": "field validation window; not-run until protocol is executed",
+      "missing_data_policy": "retain not-run and do not impute success"
+    },
+    "secondary_metrics": [],
+    "minimum_detectable_improvement": "predeclare an effect and uncertainty threshold before candidate results",
+    "acceptable_regression": "no critical safety, authorization, correctness or required-verification regression",
+    "sample_requirement": "at least three paired tasks for exploratory evidence; independent replication for confirmed improvement",
+    "decision_rule": "not-run or degraded remains incomplete; only predeclared thresholds can support confirmed claims"
+  },
+  "improvement_contract_sha256": "3d320a2069930fdb7d6c0a0dc98fdf8346be22ed65f88c6edc24155906a1182c",
+  "evidence_axes": {
+    "structure_contract": {
+      "state": "confirmed",
+      "evidence_refs": [
+        "skills/autoresearch/agents/openai.yaml",
+        "skills/autoresearch/autoresearch.md",
+        "skills/autoresearch/debug.md"
+      ],
+      "limitations": []
+    },
+    "behavior_quality": {
+      "state": "partial",
+      "evidence_refs": [],
+      "limitations": [
+        "Fresh semantic eval and owner re-review are not represented by this baseline alone."
+      ]
+    },
+    "runtime_cost": {
+      "state": "not-run",
+      "evidence_refs": [],
+      "limitations": [
+        "No paired token/latency/correction measurement."
+      ]
+    },
+    "field_outcome": {
+      "state": "not-run",
+      "evidence_refs": [],
+      "limitations": [
+        "No representative baseline/candidate task cohort."
+      ]
+    }
+  },
+  "final_status": "degraded-or-partial",
+  "consumers": [
+    "U4",
+    "U5",
+    "U6",
+    "U7",
+    "U8",
+    "U9",
+    "U10"
+  ],
+  "claim_ceiling": "Source-bound baseline and frozen measurement contract only; does not prove behavior improvement, runtime savings or field value."
+}

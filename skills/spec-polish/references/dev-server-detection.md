@@ -2,7 +2,7 @@
 
 Port resolution runs via `scripts/resolve-port.sh`. This document explains the probe order, framework defaults, and the script's intentional parsing choices.
 
-This cascade runs **only when** `.claude/launch.json` is absent or has no `port` field for the resolved configuration. When `launch.json` specifies a port, use it verbatim and skip this cascade entirely.
+Run this cascade only while the port remains unresolved. Preserve a selected usable numeric port and all other startup facts. Resolve against the selected project directory. The table's Unknown fallback is a script default, not authority to start an unclassified project; unresolved classification still requires the user's startup facts. The resolved port seeds a URL candidate, while server output and attributed reachability determine the actual handoff URL.
 
 ## Priority order
 
@@ -37,4 +37,4 @@ This cascade runs **only when** `.claude/launch.json` is absent or has no `port`
 
 **(b) Comment stripping on `.env` values.** Truncates at `#` after trimming whitespace (so `PORT=3001 # dev only` resolves to `3001`), because inline comments are common.
 
-**(c) No instruction-file port grep.** Neither `resolve-port.sh` nor the `spec-test-browser` inline cascade scans `AGENTS.md` / `CLAUDE.md` for port references by default. Instruction files carry natural language that may mention ports in contexts unrelated to the dev server (documentation, examples, troubleshooting), producing false positives that are hard to debug; the filename is also harness-specific. Framework config files and `.env` are the reliable sources of truth. The agent may still honor already-loaded project guidance only when it explicitly declares the active dev-server port, but the script does not shell-grep named instruction files.
+**(c) No instruction-file port grep.** `resolve-port.sh` does not scan `AGENTS.md` / `CLAUDE.md` for port references. Instruction files may mention ports in unrelated examples or troubleshooting. Framework configuration and `.env` supply startup facts for the `spec-polish` caller; already-loaded guidance may provide an explicit override. `spec-test-browser` consumes a caller-supplied exact origin and performs no port resolution or listener scan.

@@ -26,9 +26,11 @@ Job directory (durable state, the source of truth):
                 source/payload identity, start time, result/log refs, and
                 limitations (written at start, before detach; never worker argv)
     pid         supervisor pid + worker pid (written by the supervisor before
-                start returns; its presence marks "detached"). Two fields are
-                platform-conditional, so consumers must use .get(): POSIX adds
-                supervisor_pgid, Windows adds job_name (its job object).
+                start returns; its presence marks "detached"). Platform-
+                conditional fields — consumers must use .get(): POSIX adds
+                supervisor_pgid; Windows adds job_name (its job object) and
+                supervisor_identity / worker_identity (GetProcessTimes guards
+                so a recycled pid is not treated as the original process).
     out.log     worker's combined stdout+stderr (byte growth = liveness)
     reason      terminal detail, written before the status rename so the
                 status file is always the LAST record to land
@@ -160,6 +162,9 @@ STATUS_READ_CAP = 256
 META_READ_CAP = 64 * 1024
 PAYLOAD_READ_CAP = 2 * 1024 * 1024
 SERVING_RECEIPT_READ_CAP = 32 * 1024
+# 跨模型 serving receipt 的认证 producer 通道尚未建成；关闭期间 start 对任何
+# receipt 形状一律 fail-closed（含 degraded 形状），禁止把自述 receipt 当信任根。
+SERVING_RECEIPT_PRODUCER_CHANNEL_ENABLED = False
 SERVING_RECEIPT_MAX_TTL_SECS = 15 * 60
 SERVING_RECEIPT_CLOCK_SKEW_SECS = 30
 SECRET_VALUE_PATTERNS = (
@@ -347,42 +352,14 @@ def validate_start_authority(args, worker_argv):
             or serving.get('reason_code')
             != 'authenticated-producer-unavailable'):
         raise RunnerError('provider_serving_receipt_unverified')
-    raise RunnerError('provider_serving_receipt_unverified')
-    try:
-        captured_epoch = datetime.datetime.fromisoformat(
-            serving.get('captured_at', '').replace('Z', '+00:00')
-        ).timestamp()
-        serving_expires_epoch = datetime.datetime.fromisoformat(
-            serving.get('freshness_expires_at', '').replace('Z', '+00:00')
-        ).timestamp()
-    except (AttributeError, TypeError, ValueError, OverflowError):
-        raise RunnerError('provider_serving_receipt_freshness_invalid')
-    now_epoch = time.time()
-    if serving_expires_epoch <= now_epoch:
-        raise RunnerError('provider_serving_receipt_stale')
-    if (captured_epoch > now_epoch + SERVING_RECEIPT_CLOCK_SKEW_SECS
-            or captured_epoch > serving_expires_epoch
-            or serving_expires_epoch - captured_epoch
-            > SERVING_RECEIPT_MAX_TTL_SECS):
-        raise RunnerError('provider_serving_receipt_freshness_invalid')
-    if serving.get('semantic_request_sha256') != semantic_sha:
-        raise RunnerError('provider_serving_receipt_source_mismatch')
-    if serving.get('source_identity') != args.source_identity:
-        raise RunnerError('provider_serving_receipt_source_mismatch')
-    if serving.get('provider_trust_domain') != args.provider_trust_domain:
-        raise RunnerError('provider_serving_receipt_trust_domain_mismatch')
-    if (serving.get('requested_provider') != args.requested_provider
-            or serving.get('requested_model') != args.requested_model):
-        raise RunnerError('provider_serving_receipt_requested_identity_mismatch')
-    if (serving.get('actual_provider') != args.actual_provider
-            or serving.get('actual_model') != args.actual_model):
-        raise RunnerError('provider_serving_receipt_actual_identity_mismatch')
-    credential_allowlist = serving.get('credential_env_allowlist')
-    if (not isinstance(credential_allowlist, list)
-            or credential_allowlist
-            != list(dict.fromkeys(args.credential_env))):
+    if not SERVING_RECEIPT_PRODUCER_CHANNEL_ENABLED:
+        # 通道关闭是设计状态：file-based receipt 可自伪造，不能作为信任根。
+        # 解除条件：存在经认证的 host producer channel 并为 receipt 增加防伪
+        # 签名后，重写 freshness/identity/allowlist 校验并补正向测试。
         raise RunnerError(
-            'provider_serving_receipt_credential_allowlist_mismatch')
+            'provider_serving_receipt_unverified'
+            ' (authenticated producer channel disabled)')
+    raise RunnerError('provider_serving_receipt_unverified')
 
     payload_raw, payload = _load_owned_json(args.payload_ref, PAYLOAD_READ_CAP, 'peer task packet')
     _require_sha256(args.payload_sha256, '--payload-sha256')
@@ -425,7 +402,7 @@ def validate_start_authority(args, worker_argv):
         'receipt_sha256': args.authorization_receipt_sha256,
         'serving_receipt_ref': os.path.abspath(args.serving_receipt),
         'serving_receipt_sha256': args.serving_receipt_sha256,
-        'serving_receipt_producer': producer,
+        'serving_receipt_producer': f"degraded:{serving.get('reason_code', 'unknown')}",
         'payload_bytes': len(payload_raw),
         'payload_sha256': args.payload_sha256,
         'credential_env': list(dict.fromkeys(args.credential_env)),
@@ -500,6 +477,18 @@ if IS_WINDOWS:
     _kernel32.OpenProcess.argtypes = [
         wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
     _kernel32.OpenProcess.restype = wintypes.HANDLE
+    _kernel32.GetProcessTimes.argtypes = [
+        wintypes.HANDLE,
+        ctypes.POINTER(wintypes.FILETIME),
+        ctypes.POINTER(wintypes.FILETIME),
+        ctypes.POINTER(wintypes.FILETIME),
+        ctypes.POINTER(wintypes.FILETIME),
+    ]
+    _kernel32.GetProcessTimes.restype = wintypes.BOOL
+    _kernel32.QueryFullProcessImageNameW.argtypes = [
+        wintypes.HANDLE, wintypes.DWORD, wintypes.LPWSTR,
+        ctypes.POINTER(wintypes.DWORD)]
+    _kernel32.QueryFullProcessImageNameW.restype = wintypes.BOOL
     _kernel32.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
     _kernel32.WaitForSingleObject.restype = wintypes.DWORD
     _kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
@@ -574,15 +563,11 @@ if IS_WINDOWS:
     _kernel32.TerminateProcess.argtypes = [wintypes.HANDLE, wintypes.UINT]
     _kernel32.TerminateProcess.restype = wintypes.BOOL
 
-    def _win_descendants_deepest_first(root_pid: int):
-        """Children before parents, via a process snapshot. This is the direct
-        analog of the POSIX `ps`-based walk and carries the same pid-reuse
-        exposure. It works on an EXITED leader because Windows never reparents
-        orphans: a dead pid still appears as th32ParentProcessID on its live
-        children (unlike POSIX, where orphans are reparented to init)."""
+    def _win_process_children_map():
+        """th32ParentProcessID -> [child pids] from one Toolhelp snapshot."""
         snap = _kernel32.CreateToolhelp32Snapshot(_TH32CS_SNAPPROCESS, 0)
         if not snap or snap == ctypes.c_void_p(-1).value:
-            return []
+            return {}
         children = {}
         try:
             entry = _PROCESSENTRY32W()
@@ -594,6 +579,16 @@ if IS_WINDOWS:
                 more = _kernel32.Process32NextW(snap, ctypes.byref(entry))
         finally:
             _kernel32.CloseHandle(ctypes.c_void_p(snap))
+        return children
+
+    def _win_descendants_deepest_first(root_pid: int, children=None):
+        """Children before parents, via a process snapshot. This is the direct
+        analog of the POSIX `ps`-based walk and carries the same pid-reuse
+        exposure. It works on an EXITED leader because Windows never reparents
+        orphans: a dead pid still appears as th32ParentProcessID on its live
+        children (unlike POSIX, where orphans are reparented to init)."""
+        if children is None:
+            children = _win_process_children_map()
         order, queue = [], [root_pid]
         while queue:
             for child in children.get(queue.pop(0), []):
@@ -601,7 +596,58 @@ if IS_WINDOWS:
                 queue.append(child)
         return list(reversed(order))
 
+    def _win_process_identity(pid: int):
+        """Creation time plus image path — analog of `ps -o lstart= -o command=`.
+
+        Creation time is the PID-reuse guard: Windows recycles PIDs aggressively,
+        and a recycled pid always carries a later FILETIME than the worker we
+        recorded. None means unproven (gone or unopenable)."""
+        handle = _kernel32.OpenProcess(
+            _PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+        if not handle:
+            return None
+        try:
+            created, exited, kernel, user = (wintypes.FILETIME() for _ in range(4))
+            if not _kernel32.GetProcessTimes(
+                    handle, ctypes.byref(created), ctypes.byref(exited),
+                    ctypes.byref(kernel), ctypes.byref(user)):
+                return None
+            started = (created.dwHighDateTime << 32) | created.dwLowDateTime
+            if not started:
+                return None
+            size = wintypes.DWORD(32768)
+            buf = ctypes.create_unicode_buffer(size.value)
+            image = (buf.value if _kernel32.QueryFullProcessImageNameW(
+                handle, 0, buf, ctypes.byref(size)) else "")
+        finally:
+            _kernel32.CloseHandle(handle)
+        return "{} {}".format(started, image)
+
+    def _win_process_start_time(pid: int):
+        handle = _kernel32.OpenProcess(
+            _PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+        if not handle:
+            return None
+        try:
+            created, exited, kernel, user = (wintypes.FILETIME() for _ in range(4))
+            if not _kernel32.GetProcessTimes(
+                    handle, ctypes.byref(created), ctypes.byref(exited),
+                    ctypes.byref(kernel), ctypes.byref(user)):
+                return None
+            started = (created.dwHighDateTime << 32) | created.dwLowDateTime
+            return started or None
+        finally:
+            _kernel32.CloseHandle(handle)
+
+    def _win_process_identity_matches(pid: int, recorded) -> bool:
+        if not recorded:
+            return True
+        current = _win_process_identity(pid)
+        return current is not None and current == recorded
+
     def _win_terminate_pid(pid: int) -> bool:
+        if pid <= 0 or pid == os.getpid():
+            return False
         handle = _kernel32.OpenProcess(_PROCESS_TERMINATE, False, pid)
         if not handle:
             return False
@@ -790,7 +836,9 @@ if IS_WINDOWS:
         finally:
             _kernel32.CloseHandle(handle)
 
-    def _win_kill_tree(root_pid: int, grace: float, job_name=None) -> bool:
+    def _win_kill_tree(
+        root_pid: int, grace: float, job_name=None, expected_identity=None,
+    ) -> bool:
         """Terminate the worker tree (KTD3). Returns whether the LEADER was
         alive when the kill began -- the reap classification signal -- which is
         independent of how much of the tree we then sweep.
@@ -812,19 +860,49 @@ if IS_WINDOWS:
         fails with ERROR_FILE_NOT_FOUND). So a cmd_reap running after the
         supervisor died cannot use it, and falls back to the snapshot walk --
         which is exactly the dead-leader case, hence deepest-first descendants
-        BEFORE the leader, and never gated on leader liveness."""
-        alive = _win_pid_alive(root_pid)
+        BEFORE the leader, and never gated on leader liveness.
+
+        A live pid at root_pid is not automatically the original leader:
+        Windows recycles PIDs, and cmd_reap is often the next python.exe after
+        the worker exits. Never terminate this process, and never terminate a
+        live pid whose GetProcessTimes identity does not match the recorded
+        worker. Stale-PPID orphans still show the dead leader as parent. When
+        the pid was reused, the start-time cutoff applies only to *direct*
+        children of that pid (the new process's own children vs stale-PPID
+        orphans). A pre-reuse child's full subtree is still original-tree work,
+        including descendants spawned after reuse."""
+        self_pid = os.getpid()
+        is_self = root_pid == self_pid
+        alive = (not is_self) and _win_pid_alive(root_pid)
+        recorded_leader = alive and _win_process_identity_matches(
+            root_pid, expected_identity)
         if job_name:
             _win_terminate_job(job_name)
         # Always Toolhelp-sweep after (or without) the job terminate: children
         # that raced outside the job before AssignProcessToJobObject completed
         # are not members, and TerminateJobObject alone would leave them.
         # CREATE_SUSPENDED closes that spawn race; this remains the belt.
-        for pid in _win_descendants_deepest_first(root_pid):
+        children_map = _win_process_children_map()
+        reuse_cutoff = None
+        if not recorded_leader and (is_self or alive):
+            reuse_cutoff = _win_process_start_time(root_pid)
+        if reuse_cutoff is not None:
+            def _predates_reuse(pid):
+                started = _win_process_start_time(pid)
+                return started is None or started < reuse_cutoff
+            kill_set = _pre_reuse_descendant_pids(
+                root_pid, children_map, _predates_reuse, self_pid)
+        else:
+            kill_set = None
+        for pid in _win_descendants_deepest_first(root_pid, children_map):
+            if pid == self_pid:
+                continue
+            if kill_set is not None and pid not in kill_set:
+                continue
             _win_terminate_pid(pid)
-        if alive:
+        if recorded_leader:
             _win_terminate_pid(root_pid)
-        return alive
+        return recorded_leader
 
 
 # --- hardened I/O primitives --------------------------------------------------
@@ -1125,14 +1203,45 @@ def _signal_group_or_tree(pid: int, sig: int) -> None:
         _kill_quiet(pid, sig)
 
 
-def kill_tree(root_pid: int, grace: float, job_name=None) -> bool:
+def _pre_reuse_descendant_pids(root_pid, children, predates_reuse, skip_pid=None):
+    """Direct children that predate a recycled leader pid, plus each of those
+    children's full subtree.
+
+    Toolhelp still lists the original tree under a dead pid as parent, mixed
+    with the new process's own children. The start-time cutoff applies only to
+    direct children. A pre-reuse child's later descendants stay original-tree
+    work even if they started after the reuse.
+    """
+    keep = set()
+    queue = []
+    for child in children.get(root_pid, []):
+        if skip_pid is not None and child == skip_pid:
+            continue
+        if not predates_reuse(child):
+            continue
+        queue.append(child)
+    while queue:
+        pid = queue.pop(0)
+        if skip_pid is not None and pid == skip_pid:
+            continue
+        if pid in keep:
+            continue
+        keep.add(pid)
+        queue.extend(children.get(pid, []))
+    return keep
+
+
+def kill_tree(root_pid: int, grace: float, job_name=None,
+              expected_identity=None) -> bool:
     """TERM the pid's process group (workers are started as group leaders),
     falling back to a deepest-first tree walk; grace, then KILL survivors.
 
     `job_name` is Windows-only (the worker's job object, the pgid analog) and
-    is ignored on POSIX, where the pgid is derived from the pid itself."""
+    is ignored on POSIX, where the pgid is derived from the pid itself.
+    `expected_identity` is Windows-only (GetProcessTimes identity recorded at
+    start) and is ignored on POSIX."""
     if IS_WINDOWS:
-        return _win_kill_tree(root_pid, grace, job_name)
+        return _win_kill_tree(root_pid, grace, job_name, expected_identity)
     # Do NOT early-return just because the leader pid is dead: killpg targets
     # the pgid, which persists while any group member lives even after the
     # leader exits, so a dead leader can still front a live group we must sweep.
@@ -1368,6 +1477,12 @@ def supervise(job_dir: str, argv, result_path, conf: dict, ack_fd: int) -> None:
             "worker_pid": proc.pid,
         }
         if IS_WINDOWS:
+            sup_ident = _win_process_identity(os.getpid())
+            worker_ident = _win_process_identity(proc.pid)
+            if sup_ident:
+                pid_doc["supervisor_identity"] = sup_ident
+            if worker_ident:
+                pid_doc["worker_identity"] = worker_ident
             # Assign while still suspended, then resume. Record the job only
             # once the worker is actually a member, so a later reap never trusts
             # a name that owns nothing. If assignment fails (job creation denied,
@@ -1716,7 +1831,7 @@ def cmd_start(args, worker_argv) -> int:
         "provider_serving_receipt_ref": authority['serving_receipt_ref'],
         "provider_serving_receipt_sha256": authority['serving_receipt_sha256'],
         "provider_serving_receipt_producer": authority['serving_receipt_producer'],
-        "serving_identity_status": "verified",
+        "serving_identity_status": "channel-disabled-unverified",
         "requested_provider": args.requested_provider,
         "actual_provider": args.actual_provider,
         "requested_model": args.requested_model,
@@ -1823,9 +1938,15 @@ def cmd_result(args) -> int:
         except Unreadable as exc:
             sys.stderr.write(f"peer-job-runner: unreadable: {exc}\n")
             return 4
-        except OSError as exc:
-            sys.stderr.write(f"peer-job-runner: file missing or unreadable: {exc}\n")
+        except FileNotFoundError:
+            # An absent --path artifact is an outcome, not a read error: a peer
+            # whose gate is not met writes nothing, so "settled with no artifact"
+            # stays on its own documented code (3) with outcome wording.
+            sys.stderr.write(f"peer-job-runner: no artifact at {args.path}\n")
             return 3
+        except OSError as exc:
+            sys.stderr.write(f"peer-job-runner: unreadable: {exc}\n")
+            return 4
         _emit_bytes(data)
         return 0
     job_dir = resolve_job_dir(args.job, args.skill)
@@ -1882,15 +2003,28 @@ def cmd_reap(args) -> int:
         pid_doc = json.loads(read_owned(os.path.join(job_dir, "pid"), META_READ_CAP))
     except (Unreadable, OSError, ValueError):
         pid_doc = None
-    sup_pid = pid_doc.get("supervisor_pid") if isinstance(pid_doc, dict) else None
-    sup_pgid = pid_doc.get("supervisor_pgid") if isinstance(pid_doc, dict) else None
-    worker_pid = pid_doc.get("worker_pid") if isinstance(pid_doc, dict) else None
+    if not isinstance(pid_doc, dict):
+        pid_doc = {}
+    sup_pid = pid_doc.get("supervisor_pid")
+    sup_pgid = pid_doc.get("supervisor_pgid")
+    worker_pid = pid_doc.get("worker_pid")
     # Windows-only: the worker tree's job object. Named precisely so this
     # process -- which never held the supervisor's handle -- can reopen and
     # terminate the tree even after the worker leader has exited.
-    job_name = pid_doc.get("job_name") if isinstance(pid_doc, dict) else None
+    job_name = pid_doc.get("job_name")
+    worker_identity = pid_doc.get("worker_identity")
+    supervisor_identity = pid_doc.get("supervisor_identity")
 
-    if isinstance(sup_pid, int) and _pid_alive(sup_pid):
+    supervisor_ours = (
+        isinstance(sup_pid, int)
+        and not (IS_WINDOWS and sup_pid == os.getpid())
+        and _pid_alive(sup_pid)
+        and (
+            not IS_WINDOWS
+            or _win_process_identity_matches(sup_pid, supervisor_identity)
+        )
+    )
+    if supervisor_ours:
         # The supervisor owns TERM-grace-KILL and the terminal classification.
         # POSIX signals it (SIGTERM to the group or pid); Windows drops the
         # `.reap` marker the supervisor's loop polls for.
@@ -1929,7 +2063,7 @@ def cmd_reap(args) -> int:
     worker_leader_alive = False
     if isinstance(worker_pid, int):
         worker_leader_alive = kill_tree(
-            worker_pid, min(conf["grace"], 1.0), job_name)
+            worker_pid, min(conf["grace"], 1.0), job_name, worker_identity)
     # A worker can publish its declared result and exit before this fallback runs
     # (e.g. the supervisor died mid-run, then the worker completed cleanly). Honor
     # that result instead of discarding it as died-without-result: read the

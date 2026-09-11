@@ -6,6 +6,7 @@ const {
 const {
   commandSucceeded,
 } = require('./process-runner.cjs');
+const { providerDisplayFacts } = require('./provider-display.cjs');
 
 const RUNTIME_MARKERS = Object.freeze([
   ['codex', ['CODEX_CI', 'CODEX_MANAGED_BY_NPM', 'CODEX_THREAD_ID', 'CODEX_SANDBOX']],
@@ -152,7 +153,9 @@ function renderDiagnosticHuman(payload, pluginVersion) {
     lines.push('- 暂无已确认的 required Provider 就绪事实；运行标准 Runtime Setup 完成 CodeGraph/Graphify 准备。');
   } else {
     for (const provider of payload.provider_readiness) {
-      lines.push(`- ${provider.provider || provider.id || 'unknown'}: ${provider.readiness_status || 'unknown'} (${provider.reason_code || 'not-reported'})`);
+      const display = providerDisplayFacts(provider);
+      lines.push(`- ${provider.provider || provider.id || 'unknown'}: ${display.currentness_status} (${display.reason_code})`);
+      lines.push(`  readiness_scope: ${display.readiness_scope}; probe_status: ${display.probe_status}`);
     }
   }
 

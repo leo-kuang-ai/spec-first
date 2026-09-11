@@ -10,10 +10,12 @@ Step Pre-A resolves the commit range, diff, and (for existing PRs) the current P
 
 The diff is already visible on GitHub. The description exists to explain what the diff cannot show: what was impossible before and is now possible, what was broken and is now fixed, and which shape changed. Cut any sentence a reader could reconstruct from the diff itself.
 
-- Bad: "Adds `branch-creation.md`, modifies `spec-commit-push-pr/SKILL.md`, and updates contract tests."
+- Bad (lists what was edited): "Adds `branch-creation.md`, modifies `spec-commit-push-pr/SKILL.md`, and updates contract tests."
 - Good: "Default-branch shipping now verifies a fresh base before any PR work touches the branch."
+- Bad (states how the work was done): "The shipping reference now anchors branch verification to a named checklist."
+- Good: "Shipping to the default branch now catches a stale base before any PR work touches the branch."
 
-If the lead sentence describes what was moved, renamed, or added rather than what is now possible or fixed, rewrite it. This applies to every section, not just the opening. Restating the diff is the default failure mode this reference exists to prevent.
+If the lead sentence describes what was edited rather than what is now different for someone using this, rewrite it — this applies to every section, not just the opening, and restating the diff is the default failure mode this reference exists to prevent. A mechanism written in an outcome's grammar is judged by the same condition: "now anchors its checks to a named framework" is how the work was done, while a mechanism that *is* what the reader gets stays.
 
 For user-facing bugs, run an extra before/after pass before writing the mechanism: name what the user would have seen before and what they now see instead. Only then mention the technical cause or fix, and only if it helps the reviewer understand risk.
 
@@ -111,6 +113,12 @@ Scan the commit list and classify each commit:
 
 When sizing the description, mentally subtract fix-up commits: a branch with 12 commits but 9 fix-ups is a 3-commit PR.
 
+Build a compact **scope map** from the complete oneline commit list and final three-dot diff resolved in Pre-A. Use subjects for full-range coverage, then use the final diff to merge overlapping work, remove fix-up-only outcomes, and correct stale subjects. Read fuller messages only when a subject remains unclear or contradicts the diff. Group material outcomes into clusters, identify each cluster's claims, and name one umbrella outcome covering them. Never derive that umbrella from the latest commit, tracker title, branch name, original request, or opening incident alone. The story of how work started is one cluster's origin, not the whole change.
+
+Check program placement using only context already available: the user request, a known plan, existing PR body, commit messages, or explicit series language. If this is part of a program, name the program outcome, this PR's contribution, and known preceding or follow-on work. Do not invent a series or scan all open PRs just for this check.
+
+Before composing, write the finished map as a short run-local working note: umbrella outcome; clusters and their material claims; program placement or `none`. State the umbrella as what is now different for someone using this, never as the mechanism that produced it — the title and the opening both inherit the map's altitude, so a mechanism-shaped umbrella is not something a later step can correct. Keep it to three or four lines. This is drafting context, not another section to publish in the PR body. Step H audits the title and opening against this written map rather than memory.
+
 ---
 
 ## Step B: Decide on evidence
@@ -181,6 +189,8 @@ Lead with the point, then the mechanism, then the caveat. Dense is good; long is
 ## Step C: Frame the narrative
 
 Articulate the PR's narrative frame:
+
+Use Step A's written umbrella and material clusters as the frame. Represent peer outcomes at parity instead of making the initiating incident the main story and treating equally material results as extras. When program context exists, decide what the opening's one idea must include: usually the local outcome by itself, with concise placement in a short block after the opening; but when the program is what gives the local outcome its shape or its point, the connection to the program is part of the one idea and belongs in the opening — either half may lead, whichever reads better for this change, and naming which part of the program this PR delivers keeps that opening honest. Never crowd the opening with already-visible mechanisms or a second description of the same outcome; everything the one idea does not need goes in the block after it.
 
 1. **Before**: What was broken, limited, or impossible? (One sentence.)
 2. **After**: What's now possible or improved? (One sentence.)
@@ -332,6 +342,11 @@ The footer contains no externally loaded image and does not publish the harness 
 ## Step H: Compression pass
 
 Before applying, audit the body against the material claims from Step D:
+
+- Is the umbrella itself an outcome — what is now different for someone using this — rather than the mechanism that produced it? Check this before the two questions below: both compare against the umbrella, so both pass just as readily when it is mechanism-shaped.
+- Does the title express Step A's umbrella outcome instead of one cluster or mechanism?
+- Does the opening express that same umbrella, covering every peer outcome at parity? If one outcome leads while peers appear only as "also" or "comes with", rewrite from the written map.
+- Does the map record program placement or `none`? Include known program context when relevant, and remove any invented series when none is supported.
 
 - Is every claim the diff cannot establish present, and is any claim the diff does show restated needlessly?
 - Is decision-changing evidence stated as a result rather than collapsed into an unexplained "tests passed"?

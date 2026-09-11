@@ -14,6 +14,7 @@ const {
   summarizeOperationPlan,
 } = require('../state');
 const { getAdapter, getPlatformDisplayName, getSupportedPlatforms } = require('../adapters');
+const { formatSupportedHostFlags } = require('../helpers/supported-host-flags');
 const { resolveUserLanguage } = require('../cli-lang');
 
 // 用户旅程文案双语；usage/help、legacy state 与 workspace-graph 等技术诊断输出保留英文。
@@ -88,7 +89,7 @@ function runClean(argv, deps = {}) {
   const selectedPlatforms = selectedHostPlatforms(parsed);
   const platformSelected = selectedPlatforms.length > 0;
   if (!platformSelected || parsed.unknown.length > 0) {
-    console.error('Usage: spec-first clean (--claude|--codex|--cursor|--kiro|--qoder|--opencode|--zcode|--pi) [--dry-run]');
+    console.error(`Usage: spec-first clean ${formatSupportedHostFlags('paren')} [--dry-run]`);
     console.error('   or: spec-first clean --workspace-graph [--repos a,b] [--dry-run]');
     return 2;
   }
@@ -547,7 +548,7 @@ function printHelp() {
     '🧹 spec-first clean',
     '',
     '📘 Usage:',
-    '  spec-first clean (--claude|--codex|--cursor|--kiro|--qoder|--opencode|--zcode|--pi) [--dry-run]',
+    `  spec-first clean ${formatSupportedHostFlags('paren')} [--dry-run]`,
     '  spec-first clean --workspace-orphans [--confirm]',
     '  spec-first clean --workspace-graph [--repos a,b] [--dry-run]',
     '',
@@ -632,13 +633,13 @@ function classifySharedInstructionConsumers(projectRoot, adapter) {
     .filter((platform) => platform !== adapter.id)
     .map((platform) => getAdapter(platform))
     .filter((candidate) => candidate.instructionFile === adapter.instructionFile)
-    .map((candidate) => classifyInstructionConsumer(projectRoot, candidate));
+    .map((candidate) => classifyInstructionConsumer(projectRoot, candidate, adapter));
 }
 
-function classifyInstructionConsumer(projectRoot, adapter) {
+function classifyInstructionConsumer(projectRoot, adapter, cleaningAdapter) {
   const statePath = path.join(projectRoot, adapter.stateFile);
   if (!fs.existsSync(statePath)) {
-    if (hasManagedRuntimeSurface(projectRoot, adapter)) {
+    if (hasManagedRuntimeSurface(projectRoot, adapter, cleaningAdapter)) {
       return {
         platform: adapter.id,
         status: 'uncertain',
@@ -667,14 +668,22 @@ function classifyInstructionConsumer(projectRoot, adapter) {
   }
 }
 
-function hasManagedRuntimeSurface(projectRoot, adapter) {
+function managedRuntimeRoots(adapter) {
   return [...new Set([
     adapter.managedRoot,
     adapter.commandRoot,
     adapter.skillsRoot,
     adapter.workflowsRoot,
     adapter.agentsRoot,
-  ].filter(Boolean))].some((relativePath) => fs.existsSync(path.join(projectRoot, relativePath)));
+  ].filter(Boolean))];
+}
+
+function hasManagedRuntimeSurface(projectRoot, adapter, cleaningAdapter) {
+  const cleaningRoots = new Set(managedRuntimeRoots(cleaningAdapter));
+  // 当前宿主共享的目录不能单独证明另一个无状态宿主仍已安装。
+  return managedRuntimeRoots(adapter)
+    .filter((relativePath) => !cleaningRoots.has(relativePath))
+    .some((relativePath) => fs.existsSync(path.join(projectRoot, relativePath)));
 }
 
 function buildSharedInstructionDiagnostics(adapter, consumers) {

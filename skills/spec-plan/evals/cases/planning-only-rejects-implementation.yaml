@@ -1,8 +1,9 @@
 id: planning-only-rejects-implementation
-title: 直接调用即使夹带实现要求也必须停留在规划阶段
+title: A pipeline planner returns implementation ownership to its caller
 description: |
-  验证 spec-plan 面对“规划并顺手实现”的混合措辞时只创建计划，不修改 src、tests 或 package.json，
-  并把实现留给后续明确 handoff。
+  Verify that the pipeline planner creates only the plan and preserves src,
+  tests, and package.json. The caller retains implementation ownership even
+  when the overall request includes implementation.
 
 input:
   prompt: |

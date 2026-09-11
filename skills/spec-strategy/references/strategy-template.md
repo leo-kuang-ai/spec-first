@@ -5,9 +5,9 @@ Loaded by `SKILL.md` after the interview is complete. Fill it in using the captu
 ## Rules for filling in
 
 - Use the user's own language where possible. Do not paraphrase into generic PM-speak.
-- Each section stays compact. The whole doc should read in under 5 minutes.
-- Section order is locked. Do not add new top-level sections.
-- Optional sections: delete entirely if unused. Do not leave empty headers.
+- This skill's sections together should read in under five minutes; do not shorten other writers' content to meet that bound.
+- New or solely-owned files follow the order below. For an existing multi-writer file, follow `update-run.md` without moving other sections. Do not invent sections beyond the template; preserve legacy content carried in by a fold.
+- Omit unused optional Milestones and Marketing sections instead of leaving empty headings. Not working on is required in a new document; state explicitly when no exclusions have been named.
 - Set `last_updated` in the YAML frontmatter to today's ISO date (YYYY-MM-DD). Do not duplicate the date in prose.
 - Set `name` in the frontmatter to the product or initiative name (the same value used in the H1 title).
 
@@ -23,6 +23,8 @@ last_updated: {{YYYY-MM-DD}}
 
 # {{product_name}} Strategy
 
+{{Only when link was selected and a legacy VISION.md/PRODUCT.md still carries deferred meanings, add a one-line reference and make the deferral explicit in the relevant sections. After a complete fold, add no pointer and do not duplicate legacy content.}}
+
 ## Target problem
 
 {{1-2 sentence diagnosis. Names the user situation and the crux that makes it hard. No solution language.}}
@@ -36,6 +38,12 @@ last_updated: {{YYYY-MM-DD}}
 **Primary:** {{Persona name}} - {{one-sentence JTBD, e.g. "They're hiring {{product_name}} to..."}}
 
 <!-- Duplicate the block above for additional personas only if truly necessary. Fewer is better. -->
+
+## Not working on
+
+- {{one line per item}}
+
+<!-- Required in a new document. Record only the user's explicit exclusions; say when none are named rather than inventing them. -->
 
 ## Key metrics
 
@@ -61,12 +69,6 @@ _Why it serves the approach:_ {{one line}}
 
 <!-- Optional. Delete the section if unused. Only externally visible milestones: launches, fundraises, conferences, renewals. -->
 
-## Not working on
-
-- {{one line per item}}
-
-<!-- Optional. Delete the section if unused. Use only for things the team keeps being tempted by. -->
-
 ## Marketing
 
 **One-liner:** {{single-sentence pitch}}
@@ -82,8 +84,8 @@ Before confirming the write, scan the draft for:
 
 - [ ] Frontmatter present at the top with `name` and `last_updated` keys.
 - [ ] `last_updated` carries today's date in ISO format (YYYY-MM-DD).
-- [ ] No section has more than 4 sentences except Tracks (where each track has its own short block).
+- [ ] Each section this skill wrote has at most four sentences, except Tracks, where each track has a short block. Do not apply this limit to other writers.
 - [ ] No placeholders remain (`{{...}}`).
 - [ ] Optional sections with no content have been deleted, not left empty.
-- [ ] Metric count is between 3 and 5. Track count is between 2 and 4.
+- [ ] This skill's metric count is 3-5 and track count is 2-4. Count meanings explicitly deferred to a linked legacy document as carried there, not missing. Other writers' content, headings, and positions satisfy update-run's protection rules.
 - [ ] Target problem and Our approach are connected - one clearly responds to the other.

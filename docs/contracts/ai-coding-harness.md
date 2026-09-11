@@ -4,6 +4,18 @@
 
 本文不是新的 workflow、command、state machine、universal schema，也不替代 `docs/10-prompt/结构化项目角色契约.md`。角色契约仍是系统演化判断基线；本文只映射实现、审查和后续 contract 变更需要遵守的 durable contract surface。
 
+## Lifecycle scope
+
+`spec-first` 当前属于 **AI-enhanced SDLC / SDD workflow harness**。它以需求到可信变更为核心，覆盖意图、规格、计划、任务、代码、审查和知识沉淀；它不是完整的 AI-DLC 生命周期平台。
+
+当前核心链路不承诺统一负责：
+
+- 团队组建、跨团队交付治理和发布排期；
+- 基础设施部署编排、生产环境变更和回滚；
+- SLO、错误预算、事故响应和持续运营反馈。
+
+这些能力可以由现有 DevOps / SRE / 产品系统或显式接入的外部 workflow 承担。新增能力若要扩大到这些范围，必须先有明确 consumer、ownership、artifact contract、授权边界和现场验证，不得仅通过改名把 supporting workflow 描述成完整 AI-DLC。
+
 ## 核心链路
 
 ```text

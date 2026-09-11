@@ -7,7 +7,9 @@ const path = require('node:path');
 const { getAdapter, getSupportedPlatforms } = require('../../src/cli/adapters');
 const plugin = require('../../src/cli/plugin');
 
-const skill = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-lfg/SKILL.md'), 'utf8');
+const entry = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-lfg/SKILL.md'), 'utf8');
+const { readLfgContract, phaseFiles } = require('../helpers/lfg-contract');
+const skill = readLfgContract();
 const simplifySkill = fs.readFileSync(
   path.resolve(__dirname, '../../skills/spec-simplify-code/SKILL.md'),
   'utf8',
@@ -22,6 +24,43 @@ const nextWorkHandoff = fs.readFileSync(
 );
 
 describe('spec-lfg current contracts', () => {
+  test('retains settled decision provenance through planning, simplification, and residual landing', () => {
+    expect(skill).toContain('A retry reuses the same brief verbatim');
+    expect(skill).toContain('settled-decision-invalidated');
+    expect(skill).toContain('never retry it as a missing-plan case');
+    expect(reviewFollowup).toContain('Pass the plan path as decision context');
+    expect(reviewFollowup).toContain('Settlement never suppresses a defect');
+    expect(skill).toContain('producer\'s `claim_limitations`');
+    expect(skill).toContain('Skip only when all three sets are empty');
+    expect(skill).toContain('an empty `actionable_findings` list alone is insufficient');
+    expect(skill).toContain('PR preserves their provenance and limitations');
+    expect(skill).toContain('active project instructions explicitly name a shipping process');
+    expect(skill).toContain('never permission to bypass it with the default');
+  });
+  test('requires every relocated stage before execution and keeps its content out of the entry', () => {
+    for (const file of phaseFiles) {
+      expect(entry).toContain(`references/${file}`);
+      expect(fs.existsSync(path.resolve(__dirname, '../../skills/spec-lfg/references', file))).toBe(true);
+    }
+    expect(entry).toContain('Read the named reference before executing each stage');
+    expect(entry).toContain('mode:agent plan:<plan-path-from-step-1>');
+    expect(entry).not.toContain('verification_run_summary_ref');
+    expect(entry).not.toContain('gh pr edit PR_NUMBER');
+    expect(entry).not.toContain('capabilities.exact_origin_confirmed');
+    expect(entry).not.toMatch(/[\u3400-\u9fff]/);
+    for (const file of phaseFiles) {
+      const source = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-lfg/references', file), 'utf8');
+      expect(source).not.toMatch(/[\u3400-\u9fff]/);
+    }
+  });
+
+  test('gives child skills the task view and restores the remaining pipeline after return', () => {
+    const tasks = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-lfg/references/task-visibility.md'), 'utf8');
+    expect(tasks).toMatch(/replace or clear LFG's view.*only the child skill's task surface/s);
+    expect(tasks).toMatch(/after it returns, recreate or refresh LFG's remaining work/);
+    expect(tasks).toContain('without simulating a task list in chat');
+  });
+
   test('owns plan completion after return-to-caller gates close', () => {
     expect(skill).toContain('plan_status_completion_candidate');
     expect(skill).toContain('internal plan-status complete');
@@ -39,10 +78,10 @@ describe('spec-lfg current contracts', () => {
   });
 
   test('describes Simplify verification scope without claiming an unconditional full test suite', () => {
-    expect(skill).toContain('全项目 typecheck/lint');
-    expect(skill).toContain('默认运行 changed-path scoped tests');
-    expect(skill).toContain('影响面明显扩大或 runner 无法缩小时才扩大测试范围');
-    expect(skill).toContain('最终 verification gate 仍拥有完整 closeout truth');
+    expect(skill).toContain('full-project typecheck/lint');
+    expect(skill).toContain('defaults to changed-path scoped tests');
+    expect(skill).toContain('broaden scope only when impact is clearly wide or the runner cannot narrow it');
+    expect(skill).toContain('final verification gate owns complete closeout truth');
     expect(skill).not.toContain('it preserves behavior and runs the test suite');
     expect(simplifySkill).toContain('Run typecheck and lint over the full project');
     expect(simplifySkill).toContain('Run tests scoped to the changed paths');
@@ -51,14 +90,14 @@ describe('spec-lfg current contracts', () => {
   });
 
   test('uses the explicit LFG request as a scoped independent-review dispatch authorization', () => {
-    expect(skill).toContain('委派独立代码审查副作用');
+    expect(skill).toContain('delegated independent review side effects');
     expect(skill).toContain('worker_dispatch_authorization: authorized');
     expect(skill).not.toContain('review_dispatch_authorization');
     expect(skill).toContain('authorization_source: current-user-explicit-spec-lfg');
     expect(skill).toContain('one delegated read-only independent code review');
     expect(skill).toContain('coverage.dispatch_reason_code');
     expect(skill).toMatch(/status: complete[\s\S]*inline-fallback/is);
-    expect(skill).toMatch(/`failed`、`degraded`、`skipped`[\s\S]*副作用前停止/is);
+    expect(entry).toMatch(/`failed`, `degraded`, `skipped`[\s\S]*stops before step 5/is);
     expect(reviewFollowup).toContain('Consume only the returned JSON object');
     expect(reviewFollowup).toContain('coverage.dispatch_reason_code');
     expect(reviewFollowup).toMatch(/`failed`, `degraded`,\s+`skipped`/);
@@ -90,6 +129,7 @@ describe('spec-lfg current contracts', () => {
   });
 
   test('closes browser and cleanup gates before every durable or outward shipping side effect', () => {
+    const skill = entry;
     const reviewIndex = skill.indexOf('5. **Apply review fixes locally**');
     const browserIndex = skill.indexOf('6. **Decide browser applicability');
     const finalVerificationIndex = skill.indexOf('6.5. **Final working-tree verification**');

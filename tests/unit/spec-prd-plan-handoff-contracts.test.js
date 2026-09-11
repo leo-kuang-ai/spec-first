@@ -14,7 +14,7 @@ const EVAL_CASES = new Map(
 
 describe('spec-prd to spec-plan handoff contracts', () => {
   test('keeps docs/brainstorms requirements as user-selected legacy plan input', () => {
-    const plan = read('skills/spec-plan/SKILL.md');
+    const plan = read('skills/spec-plan/references/intake.md');
 
     expect(plan).toContain('If it is a legacy `docs/brainstorms/*-requirements.{md,html}` file, use it as a legacy origin');
     expect(plan).toContain('These remain readable historical inputs; do not migrate or rewrite them.');
@@ -56,7 +56,7 @@ describe('spec-prd to spec-plan handoff contracts', () => {
   });
 
   test('keeps legacy PRD checkpoints under current-user control', () => {
-    const plan = read('skills/spec-plan/SKILL.md');
+    const plan = read('skills/spec-plan/references/intake.md');
 
     expect(plan).toContain('checkpoint-prd');
     expect(plan).toContain('can_enter_spec_plan: no');

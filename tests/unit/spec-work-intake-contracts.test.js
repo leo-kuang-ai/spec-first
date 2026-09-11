@@ -10,7 +10,7 @@ function read(relativePath) {
 }
 
 describe('spec-work task-pack intake contracts', () => {
-  const skill = read('skills/spec-work/SKILL.md');
+  const skill = read('skills/spec-work/references/input-triage.md');
   const intake = read('skills/spec-work/references/work-intake-and-task-pack.md');
   const engines = read('skills/spec-work/references/execution-engines.md');
   const quality = read('skills/spec-write-tasks/references/task-quality-guide.md');
@@ -72,8 +72,9 @@ describe('spec-work task-pack intake contracts', () => {
 
   test('keeps task pack optional for direct implementation-ready plans', () => {
     expect(intake).toContain('optional derived execution index');
-    expect(skill).toContain('suggest `spec-write-tasks`');
-    expect(skill).toMatch(/never auto-compile/i);
+    const planIntake = read('skills/spec-work/references/work-intake.md');
+    expect(planIntake).toContain('suggest `spec-write-tasks`');
+    expect(planIntake).toMatch(/never auto-compile/i);
     expect(quality).toContain('Downstream `spec-work` intake');
   });
 

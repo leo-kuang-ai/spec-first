@@ -14,7 +14,7 @@ function readJson(relativePath) {
 }
 
 describe('spec-work feedback and implementation quality contracts', () => {
-  const skill = read('skills/spec-work/SKILL.md');
+  const skill = read('skills/spec-work/SKILL.md') + '\n' + read('skills/spec-work/references/workspace-setup.md');
   const feedback = read('skills/spec-work/references/feedback-and-tests.md');
   const quality = read('skills/spec-work/references/implementation-quality.md');
 

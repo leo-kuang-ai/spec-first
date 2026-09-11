@@ -497,7 +497,11 @@ function apply(context = {}, actionPlan = plan(context)) {
   const generationAction = (actionPlan.actions || []).find(
     (action) => ['first-generation', 'refresh'].includes(action.kind),
   );
-  if (!mutationFailure && generationAction && hasArtifact) {
+  const hookTarget = resolveGraphifyHookTarget(repoRoot, context.targetKind);
+  const hookOutcome = !mutationFailure
+    ? applyGraphifyHookCapability(repoRoot, runtimeContext, hookTarget, pythonProvider)
+    : defaultGraphifyHookOutcome(hookTarget);
+  if (!mutationFailure && generationAction && currentArtifactRefs(repoRoot, actionPlan.artifact_root || path.join(repoRoot, CURRENT_ARTIFACT_ROOT)).length > 0) {
     const receiptWrite = writeGraphifyScopeProvenance(
       repoRoot,
       actionPlan.artifact_root || path.join(repoRoot, CURRENT_ARTIFACT_ROOT),
@@ -513,10 +517,6 @@ function apply(context = {}, actionPlan = plan(context)) {
   );
   const firstGeneration = graphifyFirstGenerationFacts(hasArtifact, scopeProvenance);
   const scopeReadinessBlocked = graphifyScopeReadinessBlocked(scopeProvenance);
-  const hookTarget = resolveGraphifyHookTarget(repoRoot, context.targetKind);
-  const hookOutcome = !mutationFailure
-    ? applyGraphifyHookCapability(repoRoot, runtimeContext, hookTarget, pythonProvider)
-    : defaultGraphifyHookOutcome(hookTarget);
   const generatedThisRun = !mutationFailure && (actionPlan.actions || []).some(
     (action) => ['first-generation', 'refresh'].includes(action.kind),
   );
@@ -1648,6 +1648,27 @@ function parseJsonStdout(result) {
   }
 }
 
+function graphifyArtifactIsProtected(repoRoot) {
+  // 与 Provider backup_if_protected（graphifyy 0.9.x export.py）同构的触发判定：
+  // graph.json 存在，且 .graphify_semantic_marker 存在，或 .graphify_labels.json
+  // 含任一非默认（非 "Community N"）社区标签。判定失败时保守视为受保护。
+  try {
+    const outDir = path.join(repoRoot, CURRENT_ARTIFACT_ROOT);
+    if (!fs.existsSync(path.join(outDir, 'graph.json'))) return false;
+    if (fs.existsSync(path.join(outDir, '.graphify_semantic_marker'))) return true;
+    const labelsPath = path.join(outDir, '.graphify_labels.json');
+    if (fs.existsSync(labelsPath)) {
+      const labels = JSON.parse(fs.readFileSync(labelsPath, 'utf8'));
+      if (labels && typeof labels === 'object' && !Array.isArray(labels)) {
+        return Object.entries(labels).some(([key, value]) => value !== `Community ${key}`);
+      }
+    }
+  } catch (error) {
+    return true;
+  }
+  return false;
+}
+
 function graphifyProcessEnv(context, additions = {}) {
   const source = context.env && typeof context.env === 'object' ? context.env : process.env;
   const allowed = [
@@ -1671,6 +1692,12 @@ function graphifyProcessEnv(context, additions = {}) {
       || /^GIT_CONFIG_(?:KEY|VALUE)_\d+$/.test(key)) {
       env[key] = value;
     }
+  }
+  // Provider 的 backup_if_protected 会在覆盖前把 curated/semantic 图快照到 graphify-out/<日期>/。
+  // 非 curated 的 setup 管理图关闭按天备份避免逐日镜像堆积；curated/semantic 图保留该快照
+  // 作为覆盖前唯一回滚通道（判定与 backup_if_protected 同构，判定失败时保守保留备份）。
+  if (!graphifyArtifactIsProtected(path.resolve(context.repoRoot || process.cwd()))) {
+    env.GRAPHIFY_NO_BACKUP = '1';
   }
   return env;
 }

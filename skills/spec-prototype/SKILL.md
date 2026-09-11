@@ -6,13 +6,15 @@ argument-hint: "[question, brainstorm path, or plan path]"
 
 # Prototype
 
-Build the smallest runnable artifact that can honestly answer the named question, then hand the decision to the person who will use it.
+Build a runnable artifact sized to the uncertainty that can honestly answer the named question, then hand the decision to the person who will use it.
 
 Do not fake the dimension being tested. Modality, fidelity, and medium follow from that rule. A behavior question is settled by driving the artifact; a visual question is settled by seeing the rendered result. For visual questions, read `references/craft-floor.md`; a behavior question does not load that floor.
 
 This is a throwaway exploration, never the production implementation. The web is the default substrate regardless of the product stack. Do not start when there is no human available to experience the result, when the question is undefined, or in unattended/pipeline mode; return `blocked-human-experience-required`. A direction-exploration request ("explore directions", "what should we build next") is product discovery, not an undefined prototype question: name `spec-ideate` or `spec-brainstorm` as the destination and route out instead of interviewing for a testable question.
 
 ## Run-Local Phases
+
+Read `references/scoping.md` before asking scoping questions or inspecting the repo, and read both `references/build.md` and `references/preview.md` before writing the throwaway artifact. The preview reference claims the run root once; do not create a second directory for the screens or decision capsule.
 
 These labels describe the current invocation and its allowed exit; they are not a persisted workflow state machine.
 
@@ -35,6 +37,7 @@ These labels describe the current invocation and its allowed exit; they are not 
 - Preview may bind only to `127.0.0.1` or `::1`. CSP blocks external loads/connects; a stop request signals a process only after its PID, root, script and instance identity all match, otherwise it returns a blocked reason.
 - After the user experiences the artifact, write `decisions.md` only when a choice is actually made. Include the question, prototype path, winner, rejected options, adjustments, and open questions.
 - On apply, hand off to the existing `spec-brainstorm` or `spec-plan` owner. Do not create `spec-proof`, upload an external document, or write production code.
+- Read `decisions.md` before the next related question and reassess what remains unresolved. Stay with this run while related questions need an artifact; stop when the user applies or changes the product goal. A directly related supplied plan remains the owning source; load `references/write-back.md` for the handoff. Without one, return a recap and artifact paths rather than choosing an unrelated plan or creating a third note.
 
 ## Output
 

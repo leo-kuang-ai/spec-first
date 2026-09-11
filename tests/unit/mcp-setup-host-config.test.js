@@ -605,6 +605,7 @@ describe('host config resolution, inspection, and transaction', () => {
     // 不是 skills 根（旧表用 .claude/skills 与实际投射不符，掩盖了 surface drift）。
     ['claude', '.claude/spec-first/workflows'],
     ['codex', '.agents/skills'],
+    ['zcode', '.agents/skills'],
     ['cursor', '.cursor/skills'],
     ['kiro', '.kiro/skills'],
     ['qoder', '.qoder/skills'],

@@ -88,19 +88,26 @@ describe('host flag parsing stays registry-driven', () => {
     }
   });
 
-  test('usage strings mention a flag for every supported platform', () => {
-    // 解析面随 registry 扩展后，usage/help 文本是最后一份静态宿主清单；
-    // 锁定同步关系，防止新宿主"parser 认识但 help 不提"。
+  test('usage strings derive host flags from the registry (no static host lists)', () => {
+    // usage/help 文案现已全部经 formatSupportedHostFlags() 派生（新增宿主零手工
+    // 同步点）。守卫升级为两端锁定：源码必须使用派生助手，且运行时派生串必须
+    // 覆盖每个受支持宿主的 flag。
     const usageSurfaces = [
       'src/cli/commands/clean.js',
       'src/cli/commands/doctor.js',
       'src/cli/commands/init.js',
+      'src/cli/commands/init-output.js',
       'src/cli/index.js',
     ];
     for (const surface of usageSurfaces) {
       const source = readSource(surface);
+      expect(source).toContain('formatSupportedHostFlags(');
+    }
+    const { formatSupportedHostFlags } = require('../../src/cli/helpers/supported-host-flags');
+    for (const style of ['each', 'pipe', 'paren', 'slash', 'plain', 'slashpipe']) {
+      const rendered = formatSupportedHostFlags(style);
       for (const platform of getSupportedPlatforms()) {
-        expect(source).toContain(`--${platform}`);
+        expect(rendered).toContain(`--${platform}`);
       }
     }
   });

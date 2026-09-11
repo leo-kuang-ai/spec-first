@@ -1,38 +1,50 @@
 #!/usr/bin/env bash
 
-# Replies to a PR review thread. Body is read from stdin to avoid
-# shell escaping issues with markdown (quotes, newlines, etc.).
-#
-# This GraphQL helper consumes the PRRT_ thread ids returned by
-# get-pr-comments. Omitting pullRequestReviewId means GitHub can absorb the
-# reply into the viewer's PENDING review. Callers must check the fetcher's
-# pending_review field and stop before invoking this helper when it is non-null.
+# REST replies are immediately submitted; GraphQL thread replies may enter a
+# pending review. Read the body from stdin to preserve literal Markdown.
+set -euo pipefail
 
-set -e
-
-if [ $# -lt 1 ]; then
-    echo "Usage: echo 'reply body' | reply-to-pr-thread THREAD_ID"
-    echo "Example: echo 'Addressed: added null check' | reply-to-pr-thread PRRT_kwDOABC123"
+if [ "$#" -lt 2 ] || [ "$#" -gt 3 ]; then
+    echo "Usage: reply-to-pr-thread PR_NUMBER ROOT_COMMENT_ID [OWNER/REPO] < reply-body.md" >&2
     exit 1
 fi
 
-THREAD_ID=$1
+PR_NUMBER=$1
+ROOT_COMMENT_ID=$2
+case "$PR_NUMBER" in
+    ''|*[!0-9]*) echo "Error: PR_NUMBER must be numeric." >&2; exit 1 ;;
+esac
+case "$ROOT_COMMENT_ID" in
+    ''|*[!0-9]*) echo "Error: ROOT_COMMENT_ID must be numeric." >&2; exit 1 ;;
+esac
+
+if [ -n "${3:-}" ]; then
+    OWNER=${3%%/*}
+    REPO=${3#*/}
+else
+    OWNER=$(gh repo view --json owner -q .owner.login 2>/dev/null || true)
+    REPO=$(gh repo view --json name -q .name 2>/dev/null || true)
+fi
+if [[ ! "$OWNER" =~ ^[A-Za-z0-9_.-]+$ ]] || [[ ! "$REPO" =~ ^[A-Za-z0-9_.-]+$ ]] || [ "${3:-}" = "$OWNER" ]; then
+    echo "Error: could not resolve owner/repo. Pass OWNER/REPO as the third argument." >&2
+    exit 1
+fi
+
 BODY=$(cat)
-
-if [ -z "$BODY" ]; then
-    echo "Error: No body provided on stdin."
+if [ -z "${BODY//[[:space:]]/}" ]; then
+    echo "Error: No body provided on stdin." >&2
     exit 1
 fi
 
-gh api graphql -f threadId="$THREAD_ID" -f body="$BODY" -f query='
-mutation ReplyToReviewThread($threadId: ID!, $body: String!) {
-  addPullRequestReviewThreadReply(input: {
-    pullRequestReviewThreadId: $threadId
-    body: $body
-  }) {
-    comment {
-      id
-      url
-    }
-  }
-}'
+gh api --method POST \
+  "repos/$OWNER/$REPO/pulls/$PR_NUMBER/comments/$ROOT_COMMENT_ID/replies" \
+  -f body="$BODY"
+
+# The receipt above remains on stdout even when this postflight check blocks.
+PENDING_REVIEW=$(gh api --paginate \
+  "repos/$OWNER/$REPO/pulls/$PR_NUMBER/reviews" \
+  --jq '.[] | select(.state == "PENDING") | .id')
+if [ -n "$PENDING_REVIEW" ]; then
+    echo "Error: a pending review appeared after posting. Stop without resolving; do not submit or discard it. Reconcile the returned reply before any retry." >&2
+    exit 2
+fi

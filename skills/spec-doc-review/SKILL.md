@@ -1,6 +1,6 @@
 ---
 name: spec-doc-review
-description: 使用角色化 lens 审查 requirements、plans、task packs 或 specs。适用于改进既有规划与执行文档；默认 standard roster（≤3 reviewers），完整条件 roster 使用 roster:full。
+description: Review requirements, plans, task packs, or specs through reviewer personas. Use to assess existing planning and execution documents; standard roster uses at most 3 reviewers, while roster:full selects every qualifying lens.
 argument-hint: "[mode:headless] [mutation:report-only|mutation:apply-fixes] [output:json] [roster:lite|standard|full] [path/to/document.md]"
 ---
 
@@ -10,163 +10,40 @@ Review requirements or plan documents through multi-persona analysis. Task packs
 
 ## Workflow Contract Summary
 
-- **输入：** requirements、统一计划、legacy plan、task pack 或其他可读 spec artifact，及可选 roster/output/mutation 参数。
-- **输出：** 默认 report-only 的结构化文档 findings、coverage、改进建议与可选 JSON envelope；只有显式 apply 授权才可修改 Markdown。
-- **硬出口：** 文档不可读、flag 冲突、task-pack/source-plan 漂移、format/source owner 不明确，或 mutation authority 缺失时不得写入文档。
-- **权威：** 原文和 source refs 提供事实，persona/LLM 判断语义充分性；producer 拥有 derived artifact 修复，review 不继承 commit/landing authority。
-- **消费者：** 文档 owner、`spec-brainstorm`、`spec-plan`、`spec-write-tasks`、`spec-work` 与人工 reviewer。
+- **Inputs:** requirements, unified or legacy plans, task packs, or readable spec artifacts, with optional roster/output/mutation flags.
+- **Outputs:** report-only findings by default, coverage, recommendations, and optional JSON. Markdown fixes require explicit apply authority.
+- **Hard exits:** unreadable documents, conflicting flags, task-pack/source-plan drift, ambiguous format/source ownership, or missing mutation authority block writes.
+- **Dispatch boundary:** `worker_dispatch_authorization`, `capability_probe`, `worker_dispatch_capability`, `worker_capability_unproven`, `provider_untrusted`, `dispatch_authorization_missing`, and `subagent_capability_missing` are recorded before dispatch; direct invocation does not authorize workers, and inline fallback never claims independent persona coverage.
+
+```yaml
+worker_context_isolation: isolated | inherited | unknown
+worker_model_override: supported | unsupported | unknown
+worker_bounded_parallelism: supported | unsupported | unknown
+worker_dispatch_outcome: <record the live result>
+```
+- **Mutation boundary:** `mode:headless` / `mode:non-interactive` only change delivery; `requested_mutation: default-report-only` remains the default. Without `mutation:apply-fixes`, ordinary writable Markdown resolves to `report-only`; commit and landing remain unauthorized.
+- **Authority:** the document and source refs supply facts; personas/LLMs judge semantic adequacy. Producers own derived-artifact repair; review inherits no commit or landing authority.
+- **Consumers:** document owners, `spec-brainstorm`, `spec-plan`, `spec-write-tasks`, `spec-work`, and human reviewers.
 
 ## Interactive mode rules
-- **Pre-load the platform question tool before any question fires.** In Claude Code, `AskUserQuestion` is deferred — call `ToolSearch` with `select:AskUserQuestion` once, eagerly, at the top of Interactive-mode work (before the routing question, walk-through, bulk-preview, and Phase 5 terminal question) rather than at the first question site. Other hosts don't need this preload.
-- **The numbered-list fallback applies only when the harness genuinely lacks a blocking question tool** (`ToolSearch` no match, the call fails, or the mode doesn't expose it, e.g. Codex edit modes). A pending schema load is not a fallback trigger. In genuine-fallback cases present options as a numbered list and wait. Rendering a question as narrative text because the tool feels inconvenient, the model is mid-report, or the instruction was buried is a bug — a question that calls for a user decision must either fire the tool or fall back loudly, never slip past as prose.
+
+Read `references/modes.md` before parsing delivery, mutation, and output flags or firing any interactive question. It owns the eager question-tool preload, non-interactive alias, and delivery-only semantics.
 
 ## Phase 0: Detect Mode
-Check the skill arguments for flags and a document path. Tokens matching `mode:*`, `mutation:*`, `output:*`, `roster:*`, or `depth:*` are flags, not file paths — strip every recognized flag before resolving the remaining document path for Phase 1.
 
-| Flag | Meaning |
-|------|---------|
-| `mode:headless` | Headless delivery (no interactive routing) |
-| `mutation:report-only` | Caller-requested zero-write review; valid for Markdown, HTML, and ambiguous/unwritable inputs |
-| `mutation:apply-fixes` | Explicitly authorizes bounded reviewer-owned Markdown fixes for this run; does not authorize commit or landing |
-| `output:json` | Render the existing structured envelope as one JSON object |
-| `roster:lite` / `roster:standard` / `roster:full` | Reviewer budget profile (default **`standard`**) |
-| `depth:full` / `depth:lite` | Aliases of `roster:full` / `roster:lite` |
-
-If both `roster:` and `depth:` appear, **`roster:` wins**. If neither appears, profile = **`standard`**.
-
-`mutation:` and `output:` tokens are exact-token contracts. Fixed failure strings in this skill (flag-conflict, headless-missing-path, missing-document) are machine-facing exact contracts: emit them verbatim — never translated, localized, or rephrased. Accept only `mutation:report-only`, `mutation:apply-fixes`, and `output:json`. A duplicate token, multiple `mutation:*` tokens, multiple `output:*` tokens, or any unsupported `mutation:*` / `output:*` value fails closed before document read or reviewer dispatch. Return `Review failed: flag-conflict-or-unsupported` with the conflicting token names; do not guess precedence and do not treat those tokens as a path.
-
-Set run-local `requested_mutation` to `report-only` or `apply-fixes` only when the matching exact token is present; otherwise `default-report-only`. Set `output_mode` to `json` only when `output:json` is present; otherwise `text`. Output mode changes rendering only — it does not grant mutation, dispatch, producer, commit, or lifecycle authority.
-
-Set run-local `delivery_mode` to `headless` when `mode:headless` is present, otherwise `interactive`. Headless changes delivery, not mutation authority: it never upgrades `default-report-only` to a write policy. Only an explicit `requested_mutation: apply-fixes` may resolve to `markdown-write`; under `report-only`, no document write occurs in either delivery mode. `output_mode` is a third orthogonal choice. Headless never uses blocking prompts or interactive routing and Phase 5 returns immediately with "Review complete". Invoke a producer-owned write review via `Skill("spec-doc-review", "mode:headless mutation:apply-fixes docs/plans/my-plan.md")`; omit the mutation token for ordinary report-only review. Interactive references are eligible only after Phase 1 resolves `mutation_policy: markdown-write`.
+Read `references/modes.md` before resolving flags. Then read `references/document-intake.md` before reading or classifying the document.
 
 ## Phase 1: Get and Analyze Document
 
-**If a document path is provided:** Read it, then proceed; if the read fails, apply the missing-document gate below. **If no document is specified (interactive mode):** Ask which document to review, or find the most recent in `docs/brainstorms/` or `docs/plans/`. **If no document is specified (headless mode):** Output this exact string, verbatim (machine-facing contract, do not localize): "Review failed: headless mode requires a document path. Re-invoke with: Skill(\"spec-doc-review\", \"mode:headless <path>\")" without dispatching agents.
-
-**Missing-document gate — verify before any dispatch.** Some persona reviewers lack shell access and cannot recover a path that only exists on an un-checked-out ref. Before Phase 2, confirm every resolved path is readable on disk (location doesn't matter — an absolute path outside the checkout or another worktree is valid). If any path is unreadable, do not dispatch personas: **interactive** — "Document(s) not found on disk: <paths>. If they only exist on another branch, check it out (or use a worktree) and re-invoke; otherwise correct the path(s)."; **headless** — "Review failed: document(s) not found on disk: <paths>. Check out the branch containing them (or pass paths to files on disk) and re-invoke."
-
-### Classify Document Type
-Classify by reading its **content shape**, not its file path. Path is a tie-breaker hint, not the primary signal.
-
-首先检查 task-pack identity：frontmatter 含 `type: task-pack` 时，`type: task-pack` → classify as `task-pack`。`source_plan`、`source_plan_hash` 与 `Task Pack Contract` shape 用于后续 deterministic intake，不是 classification 前置条件；malformed pack 也不能降级解释成普通 plan。`task-pack` 分类优先于 unified requirements/plan 与通用 content-shape 分类。
-
-First check the unified artifact contract: `artifact_contract: spec-unified-plan/v1` plus `artifact_readiness: requirements-only` -> classify as `unified-requirements` (review Product Contract only; absent Planning Contract/Units/Verification/DoD is expected). Same contract plus `artifact_readiness: implementation-ready` -> classify as `unified-plan` (review Product Contract and Planning Contract with different lenses, then Implementation Units/Verification/DoD for execution completeness). Invalid progress-like readiness values (`active`, `in_progress`, `completed`, `done`) are a document-contract finding, not an execution state to honor.
-
-**STOP. 当 classification 为 `task-pack` 时，立即读取 `references/task-pack-review-lens.md`，完成 deterministic intake、current source-plan read、task-pack-specific semantic lens 与 terminal-owner mapping；这些步骤必须在 persona selection/dispatch 前完成。**
-
-### Resolve Mutation Policy
-
-After reading and classifying the document, set exactly one run-local `mutation_policy`, independently from `delivery_mode`:
-
-- `report-only` — `task-pack` 强制使用 `report-only`，并记录 `mutation_reason: task-pack-derived-artifact`。Task pack 由 `spec-write-tasks` 生成且 JSON contract / human-readable mirror 必须同源；reviewer 只能返回 producer fix candidates，不得直接 patch derived artifact。显式 `mutation:report-only` 不覆盖这个更具体的 mandatory reason。
-- `markdown-write` — only when `requested_mutation: apply-fixes`, the document is confirmed writable Markdown, and no mandatory report-only reason applies. Record `mutation_reason: caller-requested-apply-fixes`. Markdown `safe_auto`, walkthrough Apply, bulk Apply, and Open Questions append paths remain available; commit and landing remain unauthorized.
-- `report-only` — when `requested_mutation: report-only` and the document is confirmed writable Markdown. Record `mutation_reason: caller-requested-report-only` and keep the file byte-preserving.
-- `report-only` — when `requested_mutation: default-report-only` and the document is confirmed writable Markdown. Record `mutation_reason: default-review-report-only`; ordinary review never acquires write authority from file format or host capability.
-- `report-only` — mandatory for HTML content or a `.html` artifact. Run the same reviewer roster, schema validation, confidence gate, deduplication, severity routing, Coverage, and limitations reporting, but do not invoke any document mutation path.
-- `report-only` — also mandatory when the document is confirmed Markdown but the platform cannot write it. Record `mutation_reason: write-unavailable`; keep the full review and finding envelope, but do not imply that Markdown mutation was attempted.
-- If extension, declared format, and content shape conflict, or the format remains ambiguous, fail closed to `report-only` and record `mutation_reason: format-conflict-or-ambiguous` in the envelope. Never guess Markdown write eligibility from the path alone.
-
-For ordinary HTML use `mutation_reason: html-artifact`. A report-only request is valid in both headless and interactive delivery; interactive delivery still returns the structured report-only envelope and does not offer a mutation walkthrough.
-
-Existing mandatory reasons retain their diagnostic meaning: task packs remain `task-pack-derived-artifact`, HTML remains `html-artifact`, write-unavailable Markdown remains `write-unavailable`, and format conflict/ambiguity remains `format-conflict-or-ambiguous` even when the caller requested apply. `caller-requested-apply-fixes` applies only to otherwise writable, unambiguous Markdown that is not a task pack. Without `mutation:apply-fixes`, ordinary writable Markdown resolves to `report-only`; delivery mode, JSON output, file writability, or permission settings cannot supply missing mutation authority.
-
-**Core classification rules (apply these first):**
-
-- **`task-pack`**: Frontmatter `type: task-pack`; derived metadata such as `generated_by: spec-write-tasks`、`mode: derived`、`source_plan`、`source_plan_hash`; headings `Task Pack Contract`、`Execution Waves`、`Task Cards`。Task-pack identity 优先，不因正文含 U-ID、files 或 verification 而归类成 `plan`。
-- **`requirements`**: Frontmatter fields like `actors:`, `flows:`, `acceptance_examples:`; headings like `Acceptance Examples`, `Actors`, `Key Flows`; IDs like `R1`, `A1`, `F1`, `AE1`; prose focused on user/business problem and scope. No implementation units, per-unit file lists, or test scenarios.
-- **`plan`**: Frontmatter fields like `type: feat|fix|refactor`, `origin:`, `product_contract_source:`; headings like `Implementation Units`, `Key Technical Decisions`, `Risks & Dependencies`; IDs like `U1`, `U2`; per-unit `Goal`, `Files`, `Approach`, `Test scenarios`, `Verification`; repo-relative paths.
-- **Tie-breaker:** Content shape is authoritative over path. Mixed/sparse signals → fall back to path: `docs/brainstorms/` → `requirements`, `docs/plans/` → `plan`. Neither applies → default to `requirements` (more conservative).
-
-**STOP. If classification is genuinely ambiguous after applying the core rules above, read `references/document-classification-signals.md` for the full signal lists before proceeding to persona selection.**
-
-Pass the classification result to each persona via the `{document_type}` slot in the subagent template.
-
-### Select Conditional Personas
-Analyze the document to determine which conditional personas to activate. Use the quick-reference table first; if unresolved, read the full activation matrix.
-
-**Activation quick-reference (apply these signals first):**
-
-| Persona | Activate when the document... |
-|---------|------------------------------|
-| product-lens | Stakes a challengeable claim about what to build and why, OR carries strategic weight beyond the immediate problem |
-| design-lens | References UI/UX, frontend components, user flows, wireframes, interaction descriptions, responsive behavior, or accessibility |
-| security-lens | Mentions auth/authorization, login flows, API endpoints, PII, payments, tokens, credentials, encryption, or third-party trust boundaries |
-| scope-guardian | Has multiple priority tiers (P0/P1/P2), >8 requirements/units, stretch goals, or scope-goal misalignment signals |
-| adversarial | Touches high-stakes domains (auth/payments/data migrations/external integrations), proposes new abstractions/architectural patterns, is a greenfield plan with no validated upstream, OR has explicit alternatives sections. Do NOT activate on routine plans with validated upstream Product Contract |
-
-**STOP. If the quick-reference table does not resolve whether to activate a conditional persona for this document, read `references/persona-activation-matrix.md` before finalizing the reviewer list.**
-
-### Apply Roster Budget (profile)
-The quick-reference table produces a **candidate set**. Apply the profile budget **before** Phase 2 dispatch — never merge personas, only skip candidates that exceed budget.
-
-| Profile | Always-on | Conditional budget | Typical N |
-|---------|-----------|--------------------|-----------|
-| `lite` | coherence + feasibility | **0** conditional | 2 |
-| `standard` (default) | coherence + feasibility | **at most 1** conditional | ≤3 |
-| `full` | coherence + feasibility | all candidates that qualify | 2–7 |
-
-**Selecting the single conditional under `standard`** (first match wins when multiple qualify): 1. `security-lens` — auth/API/PII/payments/credentials/trust boundaries; 2. `adversarial` — high-stakes domain, new abstractions, greenfield without validated upstream, explicit alternatives; 3. `design-lens` — UI/UX/frontend/interaction; 4. `product-lens` — challengeable product/strategy claims; 5. `scope-guardian` — multi-priority / large unit count / stretch goals.
-
-Record skipped candidates for the cost-shape line (`skipped_conditional=… reason=budget`). Under `lite`, skip **all** conditionals (`reason=lite`); under `full`, keep the full set (no budget skip). **Escape hatch:** user may name personas explicitly (e.g. "also run adversarial") — honor explicit names even under `standard`/`lite`, and note `override=user` on cost-shape.
-
-### Emit cost-shape (advisory, required)
-
-**After** the reviewer list is fixed and **before** any dispatch, prepare exactly one advisory line (do not block on it). For ordinary text output, print it as shown below. When `output_mode: json`, do not print this line or any other user-visible prose outside the final JSON object; retain the same cost-shape facts inside the envelope's structured `coverage` metadata instead:
-
-```text
-cost-shape: profile={lite|standard|full} N={count} personas=[{comma-separated short names}] skipped_conditional=[{name:reason},…] doc_bytes={utf8_bytes_or_unknown} slices={unified|full|mixed} isolation={min|degraded_inherited}
-```
-
-`doc_bytes` is the on-disk byte length when known, else `unknown`. `slices` is `unified` if every leaf gets a section slice, `full` if every leaf gets the full document, `mixed` otherwise. Task-pack review normally uses `mixed`: full task pack + focused current source-plan sections + compact deterministic receipt. `isolation` is set in Phase 2 Dispatch below. This line is **advisory measurement**, not a hard gate.
+Read `references/document-intake.md` for path, missing-document, classification, and mutation-policy gates.
 
 ## Phase 2: Announce and Dispatch Personas
 
-For ordinary text output, tell the user which personas will review and why (justify conditionals), including the `cost-shape:` line from Phase 1 in the same announcement block. When `output_mode: json`, suppress this announcement and every other object-external status/terminal line; record selected/skipped personas, cost shape, isolation, and reviewer outcomes in the final JSON `coverage` and `limitations` fields. JSON mode's machine-readable single-object contract overrides the normal announcement requirement.
-
-**Build agent list.** Always include `coherence-reviewer` and `feasibility-reviewer`. Add **budget-filtered** conditional personas only (`product-lens-reviewer`, `design-lens-reviewer`, `security-lens-reviewer`, `scope-guardian-reviewer`, `adversarial-document-reviewer`) — do **not** re-expand to "all conditionals that could match" after budget filtering unless `profile=full` or user override.
+Read `references/persona-selection.md` to select and budget the roster, including the required `cost-shape:` line.
 
 ### Dispatch
 
-Before reviewer dispatch, record `worker_dispatch_authorization`, `capability_probe`, `worker_dispatch_capability`, `worker_context_isolation`, `worker_model_override`, and `worker_bounded_parallelism`, then normalize the result as `worker_dispatch_outcome`.
-
-**Dispatch authorization gate.** A direct invocation of `spec-doc-review` authorizes this document-review workflow, not worker dispatch. Dispatch only when the user or an upstream handoff explicitly authorized subagents, personas, delegated review, or parallel-agent work for this run. Missing authorization forbids schema discovery and fixes `capability_probe: not_applicable` + `worker_dispatch_capability: unknown`; record `dispatch_authorization_missing`, set `isolation=degraded_inherited`, and apply the same selected persona prompt assets inline or serially. Only after authorization may current-session registry/schema be inspected as `provider_untrusted` evidence: confirmed absence records `subagent_capability_missing`; unavailable/incomplete/ambiguous discovery records `worker_capability_unproven`. Do not claim independent persona coverage or context isolation. This dispatch fallback is orthogonal to `mutation_policy`: only explicit `mutation:apply-fixes` can enable Markdown writes; HTML and all ordinary reviews remain non-mutating.
-
-When the semantic probe yields one eligible generic worker candidate, dispatch bounded reviewer packets with **bounded parallelism** only when live facts support it; otherwise serialize and record `parallelism_unproven_serialized`. Permission settings govern whether a call may execute; they are not dispatch authorization. Respect the active-worker limit: queue selected reviewers, dispatch as many as accepted, fill freed slots as reviewers complete. Treat capacity-limit errors as backpressure, not failure — leave the reviewer queued and retry after a slot frees; record `dispatch_backpressure_exhausted` only after the bounded retry policy is exhausted, and `worker_dispatch_failed` after an accepted dispatch fails or for a non-capacity reason.
-
-**Context isolation (required intent):** each reviewer prompt is self-contained (persona + schema + document slice + primer). Prefer **minimum parent-context inheritance** when `worker_context_isolation: isolated`. Do not rely on the worker inheriting the orchestrator's full skill text or chat history — if isolation is inherited or unknown, set `isolation=degraded_inherited` on the cost-shape line and proceed only where independent isolation is preferred rather than required; never claim isolation that did not happen.
-
-For each selected reviewer, read the matching skill-local prompt asset at `references/personas/<reviewer-name>.md` and pass its full content as `{persona_file}`. Do not dispatch standalone agents by type/name or rely on platform-level custom-agent registration.
-
-**Model tiering** (omit override if the platform has no known tier; inherit parent model otherwise): coherence gets the cheapest capable tier; design-lens/scope-guardian get the platform mid-tier; `security-lens-reviewer`, `feasibility-reviewer`, `product-lens-reviewer`, `adversarial-document-reviewer`: inherit the parent model (or a high-capability review tier if established).
-
-Each subagent's prompt fills these template variables: `{persona_file}` — full content of the selected persona asset; `{schema}` — the findings schema below; `{document_type}` — the Phase 1 classification; `{document_path}` — the document path; `{origin_path}` — upstream provenance (prefer `origin:` frontmatter, else `product_contract_source:<value>`, else `none`; product-lens/adversarial/scope-guardian read this slot rather than re-parsing frontmatter); `{document_content}` — metadata, Goal Capsule, and the reviewer-specific section slice (unified artifacts: product-lens/adversarial/scope get Product Contract, feasibility/coherence also get Planning Contract and active Implementation Units/Verification/DoD when implementation-ready; task packs get the full task pack plus `task-pack-review-lens.md`, compact deterministic receipt, and focused current source-plan sections; legacy documents get the full document); `{decision_primer}` — cumulative prior-round decisions, or an empty block on round 1.
-
-For legacy documents pass the **full document** (`slices=full`); for unified artifacts, default to section slices (`slices=unified`) and escalate to a broader slice only when a reviewer needs cross-section traceability the initial slice can't assess. For `task-pack`, set `slices=mixed` and wrap the four inputs separately as `<task-pack-review-lens>`、`<deterministic-intake>`、`<task-pack>` 与 `<source-plan>`，避免把 validator facts、derived tasks 与 canonical plan 混成同一 authority。**Anti-waste rule:** the orchestrator may read the full document once for classification and roster selection, but after slices are built do not also inject the full document into every leaf "for safety" — mark `slices=mixed` or `full` on cost-shape if a leaf must escalate.
-
-When dispatch is explicitly authorized and at least one normal review lens is active, read `references/cross-model-review.md` and evaluate its independent external-data gates. If every gate passes, start exactly one report-only whole-document peer using `references/personas/whole-doc-reviewer.md` and the Skill-local adapter/runner lifecycle. The peer sweep reads the full document once; it does not multiply by persona and it never replaces the always-on reviewers. Missing authorization, receipt, data authority, redaction, allowlisted document ref, source identity, peer independence, or cleanup evidence means zero peer processes and no cross-model claim. A completed return may corroborate findings but never carries `safe_auto` or mutation authority.
-
-### Decision primer
-
-On round 1, set `{decision_primer}` to `<prior-decisions>Round 1 — no prior decisions.</prior-decisions>`. On round 2+, accumulate prior-round decisions:
-
-```
-<prior-decisions>
-Round 1 — applied (N entries):
-- {section}: "{title}" ({reviewer}, {confidence})
-  Evidence: "{evidence_snippet}"
-Round 1 — rejected (M entries):
-- {section}: "{title}" — {one of: Skipped|Deferred to Open Questions|Acknowledged without applying} because {reason}
-  Evidence: "{evidence_snippet}"
-Round 2 — applied (N entries): ...
-</prior-decisions>
-```
-
-Each entry carries an `Evidence:` line because R29/R30 (`references/synthesis-and-presentation.md`) use an evidence-substring overlap check to match findings across rounds — without it, the orchestrator falls back to fingerprint-only matching, which re-surfaces rejected findings or over-suppresses. `{evidence_snippet}` is the finding's first evidence quote, truncated to ~120 characters at a word boundary with internal quotes escaped.
-
-Accumulate across all rounds in the session. Skip, Defer, and Acknowledge all count as "rejected" for suppression purposes. Applied findings stay on the list so later rounds can verify fixes landed (R30). Cross-session persistence is out of scope — a new invocation starts fresh even if a prior session deferred findings into Open Questions.
-
-**Error handling:** if a subagent fails or times out, proceed with completed findings and note the failure in Coverage — do not block the review on one reviewer. If both always-on reviewers (`coherence` and `feasibility`) return no valid result, attempt one equivalent inline review using their already-selected prompt assets and document slices. If that equivalent inline review also does not complete, set `review_status: incomplete`, record `mandatory_review_coverage_missing`, and suppress any clean verdict or execution handoff. Never describe partial roster coverage as complete. **Dispatch limit:** even at maximum (7 agents), use bounded parallel dispatch; queue and launch the remainder as active reviewers complete.
+Read `references/dispatch.md` before dispatch or inline review. It owns authorization, provider/capability facts, context slices, backpressure, model defaults, and failure semantics.
 
 ## Phases 3-5: Synthesis, Presentation, and Next Action
 
@@ -182,7 +59,7 @@ Only when `delivery_mode: interactive` **and** `mutation_policy: markdown-write`
 
 ### Task Pack Review Lens
 
-仅当 Phase 1 分类为 `task-pack` 时读取 [Task Pack Review Lens](references/task-pack-review-lens.md)。
+Read [Task Pack Review Lens](references/task-pack-review-lens.md) only when Phase 1 classifies the input as `task-pack`.
 
 ### Subagent Template
 
@@ -193,3 +70,5 @@ Only when `delivery_mode: interactive` **and** `mutation_policy: markdown-write`
 @./references/findings-schema.json
 
 Selected reviewer prompt assets live under `references/personas/`. Read only the prompt files selected for the current review.
+
+Read `references/dispatch.md` before dispatch or inline review.

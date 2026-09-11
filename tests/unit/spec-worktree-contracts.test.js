@@ -37,7 +37,7 @@ function initRepo() {
 describe('spec-worktree existing-ref isolation contracts', () => {
   test('source documents caller-owned isolation for spec-dogfood and spec-work', () => {
     const skill = fs.readFileSync(path.join(repoRoot, 'skills/spec-worktree/SKILL.md'), 'utf8');
-    const dogfood = fs.readFileSync(path.join(repoRoot, 'skills/spec-dogfood/SKILL.md'), 'utf8');
+    const dogfood = fs.readFileSync(path.join(repoRoot, 'skills/spec-dogfood/references/phases.md'), 'utf8');
 
     expect(skill).toContain('isolate [--copy-env] <target-ref|pr:<number>|#<number>> [worktree-slug]');
     expect(skill).toContain('already_checked_out branch=<name> path=<path>');

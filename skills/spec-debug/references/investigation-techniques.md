@@ -1,3 +1,7 @@
+## Reproduction and performance
+
+For slow or timeout symptoms, establish a numeric baseline and repeat the same measurement after the fix. For intermittent behavior, record attempts and observed rate. Minimize a reliable reproducer before broad tracing.
+
 # Investigation Techniques
 
 Techniques for deeper investigation when standard code tracing is not enough. Load this when a bug does not reproduce reliably, involves timing or concurrency, or requires framework-specific tracing.

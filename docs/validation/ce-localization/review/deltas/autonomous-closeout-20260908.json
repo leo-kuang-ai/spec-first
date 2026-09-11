@@ -1,0 +1,148 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "autonomous-closeout-20260908",
+  "producer": "当前 Codex owner",
+  "reviewed_at": "2026-09-08T11:08:28.421Z",
+  "source_binding": {
+    "head": "b557f8bc6f884f0fef460108e6279b31227c50fb",
+    "dirty_path_manifest_sha256": "3efc1bae7249a09840133502a3dd0c121e551a9493f7bd9fbe8cc08cc5e8ac8b",
+    "source_tree_hash": "1b47dda873a7b6b35819c9815ab32a54c4924ff52ff8511ea6ba0cae4250799b",
+    "inventory_hash": "0a97d94f9751b2fb46157c68775962fbcf9d554c8bc8ba4868cc932042531dfd",
+    "inventory_artifact_sha256": "f7bd2a74966b3dd8094f4836552e78ea84a084810758de3fb5206a5ac1afbe07",
+    "review_input_hash": "09cfc211891deb3f886f209de7fb346758350ee54443f27481dd68d36eff47f2"
+  },
+  "reviewed_paths": [
+    {
+      "path": "skills/spec-work/evals/examples.json",
+      "skill_ids": [
+        "spec-work"
+      ],
+      "sha256": "edcb99e764bdc608eedd9092f0855041a9c6b59bb62c291d34e8b9a1e8ea171f",
+      "bytes": 11081,
+      "line_count": 172,
+      "covered_line_ranges": [
+        [
+          1,
+          172
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "已全文回读 172 行。新增机械修改场景绑定 summary/closeout/lifecycle 顺序，与既有 docs-only/no-test 和 knowledge-work 例外相容。场景资产本身不充当真实宿主通过证据。"
+          ],
+          "limitations": [
+            "本收据由当前 owner 内联双维度回源审查，非两个独立模型。独立新会话审查与宿主运行的各自证据及限制另见 autonomous-closeout.json。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "禁止提前完成、省略 summary 和只读强制后继；其他权限、状态漂移、任务包及 required review 保护场景未删除。"
+          ],
+          "limitations": [
+            "本收据由当前 owner 内联双维度回源审查，非两个独立模型。独立新会话审查与宿主运行的各自证据及限制另见 autonomous-closeout.json。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-work/SKILL.md",
+      "skill_ids": [
+        "spec-work"
+      ],
+      "sha256": "d213191ded6b6e9c958851f43b62abd305ec7ae9e36bec2c823b6daf45d9050e",
+      "bytes": 39315,
+      "line_count": 298,
+      "covered_line_ranges": [
+        [
+          1,
+          298
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "已全文回读 298 行。入口提醒与 return-to-caller 明确区分审查/免测例外和证据义务，summary 与 honest-closeout 先于 owning lifecycle；既有 shipping owner、知识工作、只读检查、历史后继 intake 边界保持一致。"
+          ],
+          "limitations": [
+            "本收据由当前 owner 内联双维度回源审查，非两个独立模型。独立新会话审查与宿主运行的各自证据及限制另见 autonomous-closeout.json。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "授权继续不允许改写旧计划或伪造验证；只读和无需改动的完成检查不触发后继。独立 fresh-source 复核纠正过于含混的非行为例外后无新增实质问题。"
+          ],
+          "limitations": [
+            "本收据由当前 owner 内联双维度回源审查，非两个独立模型。独立新会话审查与宿主运行的各自证据及限制另见 autonomous-closeout.json。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/spec-work-contracts.test.js",
+      "skill_ids": [
+        "spec-work",
+        "spec-write-tasks"
+      ],
+      "sha256": "1db65776c9beede07062e8755143b4fd662dbdc911598cc1b68ac02a53eb40eb",
+      "bytes": 8053,
+      "line_count": 142,
+      "covered_line_ranges": [
+        [
+          1,
+          142
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "已全文回读 142 行。新增入口早期约束与免测例外断言，保留 spec-write-tasks 的 source-plan/pins consumer 约束；聚焦单测已通过。"
+          ],
+          "limitations": [
+            "本收据由当前 owner 内联双维度回源审查，非两个独立模型。独立新会话审查与宿主运行的各自证据及限制另见 autonomous-closeout.json。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "字符串断言仅证明合同存在；真实 Claude/Codex 后继复用顺序、旧文件保护和早期失败另见自主收尾证据，不以绿测试冒充语义或模型身份确认。"
+          ],
+          "limitations": [
+            "本收据由当前 owner 内联双维度回源审查，非两个独立模型。独立新会话审查与宿主运行的各自证据及限制另见 autonomous-closeout.json。"
+          ]
+        }
+      ]
+    }
+  ],
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "unverified",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "本次已修复发现：机械修改被误当证据豁免；回源与真实消费者复验见 docs/validation/skill-evals/next-phase-20260908/autonomous-closeout.json。",
+    "仅补变化的三条路径与四个消费者关系；其余内容绑定沿用已有记录。"
+  ],
+  "claim_ceiling": "当前 source 语义与选定实际消费者一致；未声明 Astra 身份、完整现场验收或普遍收益。"
+}

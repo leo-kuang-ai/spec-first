@@ -80,4 +80,9 @@ echo "$threads_pages" | jq -e --arg cid "$COMMENT_NODE_ID" '
   else
     error("No thread found for comment \($cid)")
   end
+  | . + {
+      root_comment_id: ((try (.comments.nodes[0].url
+        | capture("#discussion_r(?<id>[0-9]+)$").id
+        | tonumber) catch null) // null)
+    }
 '

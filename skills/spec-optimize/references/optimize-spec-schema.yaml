@@ -63,7 +63,7 @@ required_fields:
           target:
             type: number
             default: null
-            description: "Optional target value. Loop stops when this is reached."
+            description: "Optional target value. Loop stops when this is reached. When metric.objectives is set, target_reached instead requires every required objective that declares a target."
             example: 4.2
 
       degenerate_gates:
@@ -86,6 +86,58 @@ required_fields:
               description: "Human-readable explanation of what this gate catches"
 
     optional_children:
+
+      objectives:
+        type: array
+        default: []
+        description: >
+          Additional required or secondary hard targets. The primary is always
+          a required comparison, even when this list omits it. An experiment is
+          eligible when it improves at least one required objective beyond the
+          comparison threshold and does not violate any other required
+          objective. Completion via target_reached requires every declared
+          required target. A spec without metric.objectives keeps single-primary
+          acceptance: the primary is the only required objective.
+        items:
+          type: object
+          required_children:
+            name:
+              type: string
+              description: "Metric name — must match a key in the measurement command's JSON output"
+            direction:
+              type: enum
+              values:
+                - maximize
+                - minimize
+          optional_children:
+            role:
+              type: enum
+              values:
+                - required
+                - secondary
+              default: required
+              description: "required objectives participate in eligibility and completion; secondary objectives are logged only"
+            type:
+              type: enum
+              values:
+                - hard
+              default: hard
+              description: "Always hard. Additional objectives come from the measurement command."
+            target:
+              type: number
+              default: null
+              description: "Declared success value for this objective. target_reached requires every required objective that sets this."
+            max_regression:
+              type: object
+              description: "Optional explicit violation bound. When set, violation uses this bound rather than the comparison threshold, including when the bound is looser. When unset, a comparison-threshold regression is a violation."
+              required_children:
+                type:
+                  type: enum
+                  values:
+                    - relative
+                    - absolute
+                value:
+                  type: number
 
       diagnostics:
         type: array
@@ -208,12 +260,13 @@ required_fields:
             values:
               - stable   # run once, trust the result
               - repeat   # run N times, aggregate
+              - ladder   # smoke, one paired exploratory sample, adaptive extras, full protocol only before keep
             default: stable
         optional_children:
           repeat_count:
             type: integer
             default: 5
-            description: "Number of times to run the harness when mode is 'repeat'"
+            description: "Number of times to run the harness when mode is 'repeat', and the confirmation sample count when mode is 'ladder'"
           aggregation:
             type: enum
             values:
@@ -226,7 +279,53 @@ required_fields:
           noise_threshold:
             type: number
             default: 0.02
-            description: "Minimum improvement that must exceed this value to count as a real improvement (not noise). Applied to hard metrics only."
+            description: "Absolute improvement that must be exceeded when comparison.method is absolute (the default). Applied to hard metrics only."
+          comparison:
+            type: object
+            default: { method: "absolute" }
+            description: "How to decide keep / revert / inconclusive. Unset method preserves the legacy absolute noise_threshold rule."
+            required_children:
+              method:
+                type: enum
+                values:
+                  - absolute
+                  - relative
+                  - paired
+                default: absolute
+                description: "absolute uses noise_threshold; relative uses relative_threshold; paired uses sample ranges / paired diffs and may return inconclusive"
+            optional_children:
+              relative_threshold:
+                type: number
+                default: 0.05
+                description: "Fraction of the current-best value that counts as a real change when method is relative or paired"
+          ladder:
+            type: object
+            description: "Cost-aware measurement stages. Used when mode is ladder; ignored otherwise."
+            optional_children:
+              smoke_command:
+                type: string
+                default: null
+                description: "Cheap correctness check. Failure is degenerate and skips timed measurement."
+              exploratory_pairs:
+                type: integer
+                default: 1
+                description: "Paired exploratory samples before deciding whether to spend more. Must be a positive integer."
+              confirmation_repeats:
+                type: integer
+                default: null
+                description: "Full protocol sample count before keep. Defaults to repeat_count. Must be a positive integer at least as large as exploratory_pairs."
+              futility:
+                type: object
+                description: "Predeclared abort bound for a clearly noncompetitive live run"
+                optional_children:
+                  worse_factor:
+                    type: number
+                    default: 1.2
+                    description: "Censor after the first sample if the candidate is this multiple worse than the current best (minimize: candidate >= best * factor)"
+                  after_elapsed_seconds:
+                    type: number
+                    default: null
+                    description: "Censor a still-noncompetitive live run once elapsed time reaches this bound. When set, must be a positive number."
       calibration:
         type: object
         description: "Optional frozen-arm measurement-only calibration. When enabled, the measurement-only reference owns the sequence and this run cannot mutate or integrate either arm."
@@ -242,7 +341,7 @@ required_fields:
             type: string
             pattern: "^(?:[a-f0-9]{40}|sha256:[a-f0-9]{64})$"
             required_when: "measurement.calibration.mode == 'measurement-only'"
-            description: "Immutable source ref or content hash for the baseline arm"
+            description: "Immutable source ref or content hash for the baseline arm. The value must uniquely identify the measured reference bytes: a revision is enough when it names those bytes; a HEAD shared by different uncommitted trees is not."
           candidate_identity:
             type: string
             pattern: "^(?:[a-f0-9]{40}|sha256:[a-f0-9]{64})$"
@@ -448,7 +547,7 @@ optional_fields:
       target_reached:
         type: boolean
         default: true
-        description: "Stop when the primary metric reaches the target value (if set)"
+        description: "Stop when every declared required target is met on the confirmed current-best snapshot"
 
   max_runner_up_merges_per_batch:
     type: integer
@@ -460,6 +559,8 @@ optional_fields:
 # ============================================================================
 
 validation_rules:
+  - "Reject unknown directions, roles, comparison/aggregation modes, duplicate objective names, nonfinite targets, negative thresholds, and invalid regression bounds; do not silently change the approved protocol"
+  - "Paired comparison requires an observed baseline for each candidate sample in the same order; missing pairs cannot be synthesized or replaced by aggregate judge scores"
   - "All required fields must be present"
   - "name must be lowercase kebab-case (`^[a-z0-9]+(?:-[a-z0-9]+)*$`)"
   - "metric.primary.type must be 'hard' or 'judge'"
@@ -477,3 +578,10 @@ validation_rules:
   - "If metric.judge.singleton_sample > 0, metric.judge.singleton_rubric must be present"
   - "If metric.primary.type is 'judge' and metric.judge.max_total_cost_usd is null, the user should explicitly approve uncapped spend"
   - "stopping must have at least one non-default criterion or use defaults"
+  - "If metric.objectives is set, each additional objective is a hard metric whose name is unique and matches a measurement JSON key"
+  - "The primary is always a required comparison, including when metric.objectives omits it"
+  - "If measurement.stability.mode is 'ladder', comparison.method should be relative or paired unless the user explicitly keeps absolute"
+  - "A spec without metric.objectives keeps single-primary acceptance"
+  - "comparison.method, when set, must be one of: absolute, relative, paired"
+  - "If measurement.stability.mode is 'ladder', exploratory_pairs and confirmation_repeats (or repeat_count) must be positive integers, and confirmation must be at least exploratory_pairs"
+  - "futility.after_elapsed_seconds, when set, must be a positive number"

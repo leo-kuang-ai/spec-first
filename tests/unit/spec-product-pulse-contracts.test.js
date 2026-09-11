@@ -14,9 +14,28 @@ function section(text, startHeading, endHeading) {
 }
 
 describe('spec-product-pulse system performance contract', () => {
+  test('loads phase owners and closes every report through the scheduling boundary', () => {
+    const skill = read('skills/spec-product-pulse/SKILL.md');
+    const setup = read('skills/spec-product-pulse/references/setup.md');
+    const run = read('skills/spec-product-pulse/references/run.md');
+    const interview = read('skills/spec-product-pulse/references/interview.md');
+
+    expect(skill).toContain('before parsing the window');
+    expect(skill).toContain('Every completed report proceeds here');
+    expect(skill).toContain('do not repeat that offer in the same run');
+    expect(skill).toContain('Any scheduling handoff requires explicit confirmation');
+    expect(setup).toContain('Read `references/interview.md`');
+    expect(interview).toContain('Loaded by `references/setup.md`');
+    expect(run).toContain('`setup`/`reconfigure`/`edit config`');
+    expect(run).toContain('Read `references/config.md` when interpreting values');
+    expect(run).toContain('Then return to `SKILL.md` Phase 3');
+    expect(run).toContain('explicit `pulse_db_enabled === true` gate');
+  });
+
   test('keeps top 5 and latency percentiles fixed instead of inventing config', () => {
     const skill = read('skills/spec-product-pulse/SKILL.md');
     const interview = read('skills/spec-product-pulse/references/interview.md');
+    const run = read('skills/spec-product-pulse/references/run.md');
     const reportTemplate = read('skills/spec-product-pulse/references/report-template.md');
     const performanceInterview = section(interview, '## 7. System Performance', '## 8. Default Lookback Window');
 
@@ -37,12 +56,13 @@ describe('spec-product-pulse system performance contract', () => {
   test('minimizes quality-scoring content before it enters the agent context', () => {
     const skill = read('skills/spec-product-pulse/SKILL.md');
     const interview = read('skills/spec-product-pulse/references/interview.md');
+    const run = read('skills/spec-product-pulse/references/run.md');
     const reportTemplate = read('skills/spec-product-pulse/references/report-template.md');
 
     expect(interview).toContain('enters the current agent/model context');
     expect(skill).toContain('provider-side projection');
     expect(skill).toContain('quality-source-minimization-unavailable');
-    expect(skill).toContain('do not attempt local redaction after the content has already entered context');
+    expect(run).toContain('do not attempt local redaction after the content has already entered context');
     expect(reportTemplate).toContain('Quality scoring blocked before access is `not-run`');
   });
 });

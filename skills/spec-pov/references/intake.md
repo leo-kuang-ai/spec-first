@@ -1,6 +1,12 @@
 # Establish the Frame Before Grounding
 
-Load this when the frame isn't clear from the prompt — a bare link, a bare topic, or a warm invocation with no stated question (SKILL.md Phase 0). The job is to figure out what POV the user actually wants *before* spending the scout fan-out, by orienting on what they gave you and proposing — **never guessing**.
+Load this at every `spec-pov` Phase 0, before grounding. The job is to settle the output mode, invocation context, subject, intent, candidate set, and effort tier before spending the scout fan-out. Orient on what the user gave you and propose when needed — **never guessing**.
+
+## Output mode and invocation context
+
+By default `spec-pov` writes no document: the compact chat verdict is the deliverable. A full write-up and a durable `spec-compound` capture are opt-in at follow-up; do not resolve a format or load report rendering rules during intake.
+
+Detect cold versus warm. Cold starts with an explicit external question and runs the full method at the warranted tier. Warm is a mid-session second opinion where the question is in the surrounding conversation or absent. Warm takes only the question and claims-to-verify from the conversation; all claims remain unverified until a scout or bounded authoritative read corroborates them. Warm output stays a guest verdict and does not offer capture or handoff unless the user asks. For the remaining warm provenance and adversarial rules, read `references/invocation.md`.
 
 ## Why this gate exists
 
@@ -37,3 +43,17 @@ The subject is usually recoverable; the **intent** is the ambiguous part. Classi
 ## Warm invocations
 
 A warm invocation with no clear question is this same gate — the conversation is the material you orient on. Infer the decision from it, propose/confirm it, then proceed. For the rest of the warm contract (guest output, provenance buckets), see `references/invocation.md`.
+
+## Selection, candidate set, and reversibility tier
+
+Apply the selection escape hatch to every invocation. A selection over a bounded field (roughly five or fewer real candidates with knowable criteria) can be judged here. If the field cannot be bounded without inventing options, return Hold and route to `spec-ideate`; if criteria are unclear, return Hold and route to `spec-brainstorm`. A product-design question owned by this project routes to `spec-brainstorm` (WHAT) or `spec-plan` (HOW), never to a POV verdict. Read `references/boundaries.md` when the fit is uncertain.
+
+Before grounding, freeze the complete approach set: every user-supplied candidate, the status quo when relevant, and the explicit option to reject the framing or all candidates. Preserve it through grounding, peer checks, and the final verdict. Every approach ends as recommended, rejected with a reason, deferred for missing evidence, or framing-rejected; omission is not a disposition.
+
+Classify reversibility from project signals and state the tier in the verdict:
+
+- **Tier 1 — two-way door:** dependency, lint rule, or config; one-screen verdict, a combined grounding pass, and no reversal trigger.
+- **Tier 2 — one-way but bounded:** data store, internal API/contract, or bounded migration; full grounding fleet and alternatives pass.
+- **Tier 3 — one-way and high-stakes:** security, legal, privacy, public contract, or irreversible migration; deep external research, precedent search, and durable-record offer.
+
+Do not run a Tier-3 workup for a trivially reversible change or give a high-stakes decision a shallow Tier-2 treatment.

@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const { getAdapter, getSupportedPlatforms } = require('../adapters');
+const { formatSupportedHostFlags } = require('../helpers/supported-host-flags');
 const { getInitMessages } = require('../init-i18n');
 const {
   BrandColors,
@@ -729,6 +730,9 @@ function buildInitApplyHostDetails(plan, result, messages) {
   } else if (plan.platform === 'codex' && hasInitDiagnostic(plan, 'codex_home_hook_write_skipped')) {
     details.push(messages.applyHookSkippedCompact);
   }
+  if (result.exit_code !== 0 && result.reason_code) {
+    details.push(`reason_code=${result.reason_code}`);
+  }
   if (result.exit_code !== 0 && result.error) {
     details.push(String(result.error));
   }
@@ -954,7 +958,7 @@ function printHelp() {
     '🚀 spec-first init',
     '',
     '📘 Usage:',
-    '  spec-first init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [--opencode] [--zcode] [--pi] [-y] [--all-repos|--repo <path>] [-u <name>] [--lang <zh|en>] [--sync-user-language|--no-sync-user-language]',
+    `  spec-first init ${formatSupportedHostFlags('each')} [-y] [--all-repos|--repo <path>] [-u <name>] [--lang <zh|en>] [--sync-user-language|--no-sync-user-language]`,
     '',
     'Host selection:',
     '  spec-first init                         Select one or more host runtimes interactively',
@@ -963,7 +967,7 @@ function printHelp() {
     '  spec-first init --kiro                  Initialize only Kiro after the remaining prompts',
     '  spec-first init --qoder                 Initialize only Qoder after the remaining prompts',
     '  spec-first init --opencode               Initialize only OpenCode preview runtime after the remaining prompts',
-    '  spec-first init --claude --codex --cursor --kiro --qoder --opencode --zcode --pi Initialize all supported hosts',
+    `  spec-first init ${formatSupportedHostFlags('plain')} Initialize all supported hosts`,
     '  spec-first init -y -u <name> --lang zh  Skip prompts and initialize default hosts (Claude Code + Codex; Cursor/Kiro/Qoder/OpenCode require explicit flags)',
     '  spec-first init --cursor -y -u <name> --lang zh',
     '  spec-first init --qoder -y -u <name> --lang zh',
@@ -988,7 +992,7 @@ function printHelp() {
     'Non-interactive usage:',
     '  Use -y/--yes to skip prompts. Without -y, init requires an interactive terminal and exits 2 in CI/non-TTY environments.',
     '  Fresh machines without a global developer profile or git user.name must pass -u <name>.',
-    '  Explicit --claude/--codex/--cursor/--kiro/--qoder/--opencode/--zcode/--pi flags override the default host set.',
+    `  Explicit ${formatSupportedHostFlags('slashpipe')} flags override the default host set.`,
     '  Use --dry-run to preview writes without changing runtime assets.',
     '  Use --sync-user-language to opt in to user-level language sync; use --no-sync-user-language to disable it and remove spec-first user-language blocks from supported hosts.',
     '',

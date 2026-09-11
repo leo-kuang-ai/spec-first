@@ -12,12 +12,23 @@ function read(relativePath) {
 }
 
 describe('spec-work structured shipping and shared verification contracts', () => {
-  const workSkill = read('skills/spec-work/SKILL.md');
+  const workSkill = read('skills/spec-work/references/return-to-caller.md');
   const shipping = read('skills/spec-work/references/shipping-workflow.md');
   const debug = read('skills/spec-debug/SKILL.md');
-  const review = read('skills/spec-code-review/SKILL.md');
+  const review = read('skills/spec-code-review/references/finish-review.md');
   const reviewOutput = read('skills/spec-code-review/references/review-output-template.md');
   const catalog = read('docs/catalog/runtime-capabilities.md');
+
+  test('headless residual disposition cannot accept serious findings or required failures by default', () => {
+    const residual = shipping.split('4. **Residual Work Gate**')[1].split('4.5 **Source Plan')[0];
+    expect(residual).toContain('Headless mode does not authorize risk acceptance');
+    expect(residual).toContain('P0/P1');
+    expect(residual).toContain('required verification for this task');
+    expect(residual).toContain('Only existing explicit risk acceptance');
+    expect(residual).toContain('record missing dependencies as pending, never fabricate accepted');
+    expect(residual).toContain('inline/manual review');
+    expect(residual).not.toContain('take the `Accept and proceed` path automatically');
+  });
 
   test('spec-work runs checks before recording a structured summary and honest closeout', () => {
     expect(shipping).toContain('verification-profile load');
@@ -146,4 +157,12 @@ describe('spec-work structured shipping and shared verification contracts', () =
       'tests/integration/spec-work-closeout-producer.test.js',
     ]));
   });
+});
+
+test('SKILL.md residual-gate summary stays aligned with no-auto-accept shipping rule', () => {
+  const skill = read('skills/spec-work/SKILL.md');
+  const summary = skill.split('\n').find((line) => line.includes('**Residual Work Gate**')) || '';
+  expect(summary).not.toMatch(/auto-accept(?!s risk)/i);
+  expect(summary).toMatch(/never auto-accepts risk/);
+  expect(read('skills/spec-work/references/shipping-workflow.md')).toContain('Headless mode does not authorize risk acceptance');
 });

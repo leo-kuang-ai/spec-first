@@ -3,11 +3,17 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const skill = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/SKILL.md'), 'utf8');
+const skillEntrypoint = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/SKILL.md'), 'utf8');
+const modes = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/modes.md'), 'utf8');
+const documentIntake = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/document-intake.md'), 'utf8');
+const personaSelection = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/persona-selection.md'), 'utf8');
+const dispatch = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/dispatch.md'), 'utf8');
+const skill = [skillEntrypoint, modes, documentIntake, personaSelection, dispatch].join('\n');
 const subagentTemplate = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/subagent-template.md'), 'utf8');
 const synthesis = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/synthesis-and-presentation.md'), 'utf8');
 const walkthrough = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/walkthrough.md'), 'utf8');
 const bulkPreview = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/bulk-preview.md'), 'utf8');
+const classificationSignals = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/document-classification-signals.md'), 'utf8');
 const openQuestions = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/open-questions-defer.md'), 'utf8');
 const reportOnlyCases = JSON.parse(fs.readFileSync(
   path.resolve(__dirname, '../../skills/spec-doc-review/evals/report-only-cases.json'),
@@ -167,7 +173,23 @@ describe('spec-doc-review current contracts', () => {
 
   test('does not infer document kind from path alone', () => {
     expect(skill).toMatch(/content shape.*not its file path/);
-    expect(skill).toMatch(/Path is a tie-breaker hint/);
+    expect(skill).toMatch(/path location never disambiguates/i);
+    expect(classificationSignals).toMatch(/path location never resolves/i);
+    expect(classificationSignals).not.toMatch(/fall back to path/i);
+  });
+
+  test('passes session-settled decisions through the reviewer context', () => {
+    expect(dispatch).toContain('`{settled_ktds}`');
+    expect(subagentTemplate).toContain('Settled decisions: {settled_ktds}');
+  });
+
+  test('intake prepares provenance and native-format candidates without self-invocation', () => {
+    expect(documentIntake).toContain('Expected arguments: mode:non-interactive <path>');
+    expect(documentIntake).not.toContain('Re-invoke with: Skill');
+    expect(documentIntake).toContain('Always fill both slots');
+    expect(documentIntake).toContain('(`user-directed` or `user-approved`)');
+    expect(documentIntake).toContain('ID-bearing HTML producer-fix candidate');
+    expect(documentIntake).toContain('anchor convention and visible ID text');
   });
 
   // --- U1: Subagent template spine structure ---
@@ -348,6 +370,16 @@ describe('spec-doc-review current contracts', () => {
     expect(matrix).toContain('## adversarial');
     expect(matrix).toContain('high-stakes domain');
     expect(matrix).toContain('product_contract_source: spec-plan-bootstrap');
+  });
+
+  test('product-lens activates on an unsettled product position, not on plausible alternatives', () => {
+    const matrix = fs.readFileSync(path.join(refsDir, 'persona-activation-matrix.md'), 'utf8');
+    const block = matrix.slice(matrix.indexOf('## product-lens'), matrix.indexOf('## design-lens'));
+    expect(block).toMatch(/Unsettled product position/);
+    expect(block).toMatch(/origin did not already settle/);
+    expect(block).toMatch(/implementation decision, not a product position/);
+    expect(block).not.toMatch(/alternatives plausibly exist/);
+    expect(block).toMatch(/Strategic weight/);
   });
 
 

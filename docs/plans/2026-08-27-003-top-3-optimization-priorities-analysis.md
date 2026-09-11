@@ -1,7 +1,7 @@
 ---
 title: "Top 3 优化优先级分析"
 type: strategy
-status: proposed
+status: completed
 date: 2026-08-27
 plan_depth: standard
 related:
@@ -16,6 +16,8 @@ owner_decision_required: true
 ---
 
 # Top 3 优化优先级分析
+
+> 2026-09-09 收口：按用户明确指令将本方案状态更新为 `completed`，作为计划生命周期关闭。此状态不代表 Top 1 E2E、Top 2 pilot 或 Top 3 field trial 已全部通过验收；原分析与验证声明作为历史记录保留，不新增验证通过声明，也不代替 §4 的具体技术裁决。
 
 ## Goal Capsule
 

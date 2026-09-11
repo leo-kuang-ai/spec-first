@@ -29,15 +29,16 @@ if [ -z "$OWNER" ] || [ -z "$REPO" ]; then
     exit 1
 fi
 
-# Output is a JSON object with five keys:
+# Output is a JSON object with these keys:
 #   pending_review   - viewer-owned PENDING review id or null. Replies can be
 #                      absorbed into this draft and remain invisible, so
 #                      consumers must stop before replying when it is non-null.
-#   review_threads   - unresolved inline review threads, edge-wrapped as
-#                      [{ node: { id, isResolved, isOutdated, path, line, ...,
-#                                 comments: { nodes: [...], pageInfo: ... } } }]
-#   pr_comments      - top-level PR conversation comments (excludes PR author and known review bots)
-#   review_bodies    - review submissions with non-empty body text (excludes PR author and known review bots)
+#   review_threads   - unresolved threads as { node, root_comment_id }; the
+#                      numeric root REST ID is null if its URL is unavailable.
+#   pr_comments      - top-level PR conversation comments with non-empty bodies
+#   review_bodies    - review submissions with non-empty bodies
+#   pr_author        - the PR author's login, or null
+#   viewer           - the acting account's login, or null
 #   fetch_warnings   - deterministic warnings about incomplete nested data,
 #                      such as per-thread comments beyond the fetched first 100.
 #
@@ -51,18 +52,10 @@ fi
 # more comments, the output carries fetch_warnings so the resolver treats
 # absence as incomplete evidence rather than confirmed absence.
 #
-# Bot filtering: only CI/status bots (codecov, etc.) are filtered at the source.
-# Their output is structurally never actionable -- coverage numbers, build
-# summaries, deploy status -- and that holds regardless of format changes.
-# AI review bots (coderabbitai, codex, gemini, copilot) are NOT filtered here.
-# Historically their top-level comments were assumed to always be wrappers, but
-# that turned out to be wrong: Codex sometimes posts actionable findings as
-# top-level PR comments with no inline thread counterpart. Any source-level
-# heuristic to separate wrapper from actionable for these bots is brittle (one
-# bot format change away from silently dropping feedback). SKILL.md step 2
-# has a content-aware actionability check and Silent Drop rule that handles
-# wrappers correctly, so we trust that layer instead. Add new logins to the CI
-# list only if their output is structurally non-actionable like codecov's.
+# Content, identity, and surface are evidence for the resolver, not deterministic
+# actionability decisions. The fetch layer excludes only blank bodies. The
+# resolver owns content-aware filtering and loop prevention, so an author's own
+# top-level request remains visible to the skill.
 tmp_threads=$(mktemp "${TMPDIR:-/tmp}/spec-pr-threads.XXXXXX")
 tmp_comments=$(mktemp "${TMPDIR:-/tmp}/spec-pr-comments.XXXXXX")
 tmp_reviews=$(mktemp "${TMPDIR:-/tmp}/spec-pr-reviews.XXXXXX")
@@ -150,8 +143,6 @@ jq -n \
   [$comments[0][].data.repository.pullRequest.comments.nodes[]] as $all_comments |
   [$reviews[0][].data.repository.pullRequest.reviews.nodes[]] as $all_reviews |
   ($reviews[0][0].data.viewer.login) as $viewer |
-  # Structurally non-actionable bot output; always dropped.
-  ["codecov"] as $ci_bot_logins |
   [$all_threads[]
     | select(.comments.pageInfo.hasNextPage == true)
     | {
@@ -172,19 +163,18 @@ jq -n \
     | select(.state == "PENDING")
     | select(($viewer == null) or (.author.login == $viewer))
     | .id) // null),
-  review_threads: [$unresolved[] | { node: . }],
+  review_threads: [$unresolved[] | {
+    node: .,
+    root_comment_id: ((try (.comments.nodes[0].url
+      | capture("#discussion_r(?<id>[0-9]+)$").id
+      | tonumber) catch null) // null)
+  }],
   pr_comments: [$all_comments[]
-    | select(.author.login != $author.login)
-    | select(
-        .author.login as $l | $ci_bot_logins | index($l) | not
-      )
-    | select(.body | test("^\\s*$") | not)],
+    | select((.body // "") | test("^\\s*$") | not)],
   review_bodies: [$all_reviews[]
-    | select(.body != null and .body != "")
-    | select(.author.login != $author.login)
-    | select(
-        .author.login as $l | $ci_bot_logins | index($l) | not
-      )],
+    | select((.body // "") | test("^\\s*$") | not)],
+  pr_author: ($author.login // null),
+  viewer: ($viewer // null),
   fetch_warnings: (
     if ($truncated_threads | length) > 0 then
       [{

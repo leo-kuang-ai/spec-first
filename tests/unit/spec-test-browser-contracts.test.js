@@ -13,10 +13,7 @@ const pipelineSource = fs.readFileSync(
   path.resolve(__dirname, '../../skills/spec-test-browser/references/pipeline-orchestration.md'),
   'utf8',
 );
-const lfgSource = fs.readFileSync(
-  path.resolve(__dirname, '../../skills/spec-lfg/SKILL.md'),
-  'utf8',
-);
+const lfgSource = require('../helpers/lfg-contract').readLfgContract();
 const testSuiteSource = fs.readFileSync(
   path.resolve(__dirname, '../../scripts/run-test-suite.cjs'),
   'utf8',
@@ -399,18 +396,18 @@ test('workflow keeps a caller-owned server boundary around the unique browser wr
   expect(skillSource).toContain('execution_readiness: ready');
   expect(skillSource).not.toContain('`capabilities --json`');
   expect(skillSource).toContain('Spec-First controlled conformance');
-  expect(skillSource).toContain('当前已加载的 `spec-test-browser/SKILL.md` 所在目录解析 `SKILL_DIR`');
+  expect(skillSource).toContain('Resolve `SKILL_DIR` from the directory of the currently loaded `spec-test-browser/SKILL.md`');
   expect(skillSource).not.toContain('node skills/spec-test-browser/scripts/agent-browser-run-context.cjs');
-  expect(skillSource).toContain('所有 browser subprocess 只能由唯一 wrapper');
+  expect(skillSource).toContain('All browser subprocesses use the unique wrapper');
   expect(skillSource).toContain('caller-owned server');
-  expect(skillSource).toContain('第一个 browser `open`');
+  expect(skillSource).toContain('first browser `open`');
   expect(skillSource).toContain('browser-mutation-authorization-required');
   expect(skillSource).not.toContain('dev-server-run-context.cjs');
   expect(skillSource).not.toContain('browser_runtime_profile_path');
   expect(skillSource).not.toContain('--server-command-approved');
   expect(skillSource).not.toContain('server-runtime-worktree-drift');
-  expect(skillSource).toContain('已有目录一律 `not_run`');
-  expect(skillSource).toContain('调用方传入的 capability 声明不能代替该 probe');
+  expect(skillSource).toContain('existing directories return `not_run`');
+  expect(skillSource).toContain('Caller capability claims cannot replace the probe');
   expect(skillSource).not.toMatch(/^agent-browser\s/m);
   expect(pipelineSource).toContain('caller-owned server');
   expect(pipelineSource).toContain('target-origin-missing');
@@ -422,6 +419,7 @@ test('workflow keeps a caller-owned server boundary around the unique browser wr
 
 test('retires managed-server and runtime-profile surfaces without a compatibility layer', () => {
   for (const relativePath of [
+    'skills/spec-test-browser/scripts/resolve-port.sh',
     'skills/spec-test-browser/scripts/dev-server-run-context.cjs',
     'skills/spec-test-browser/references/browser-runtime-profile.schema.json',
     'skills/spec-test-browser/references/browser-runtime-profile.example.json',
@@ -440,13 +438,29 @@ test('parses an explicit target-origin override before resolving browser scope',
   expect(lfgSource).toContain('mode:pipeline target-origin:<origin>');
   expect(skillSource).toContain('[target-origin:<origin>]');
   expect(skillSource).toContain('whitespace-delimited exact token `target-origin:<origin>`');
-  expect(skillSource).toMatch(/先把这个 modifier 从 scope selector 中剥离，再解析 PR\/branch\/`current`/);
-  expect(skillSource).toMatch(/空值、重复 token、多个 `target-origin:\*` token[\s\S]*`target-origin-invalid`/);
-  expect(skillSource).toMatch(/credential、非根 path、query、fragment/);
-  expect(skillSource).toContain('不得静默选择第一个、规范化或把非法 token 当 branch');
+  expect(skillSource).toContain('Remove this modifier before parsing PR/branch/`current`');
+  expect(skillSource).toMatch(/empty values, repeated tokens, multiple `target-origin:\*` tokens[\s\S]*`target-origin-invalid`/);
+  expect(skillSource).toContain('Reject credentials, non-root paths, queries, fragments');
+  expect(skillSource).toContain('Never silently choose the first token, normalize it, or treat invalid input as a branch');
   expect(skillSource).toContain('loud convention');
   expect(skillSource).toContain('resolved scalar');
-  expect(skillSource).toContain('不得从 redirect、page content、ambient browser state、free-port scan');
+  expect(skillSource).toContain('Never derive origin from redirects, page content, ambient browser state, free-port scans');
+});
+
+test('route reference preserves complete reporting and the current execution owner', () => {
+  const routes = fs.readFileSync(path.resolve(__dirname,
+    '../../skills/spec-test-browser/references/route-and-report.md'), 'utf8');
+  expect(skillSource).toContain('before preparing routes or reports');
+  expect(skillSource).toContain('Never drop an unreachable route');
+  expect(routes).toContain('Each Skip has a reason; tested failures remain Fail');
+  expect(routes).toContain('condition needed to clear it');
+  expect(routes).toContain('Action subprocess calls: <action_process_calls>');
+  expect(routes).toContain('Do not hardcode `main`');
+  expect(routes).toMatch(/Do not guess selectors, reuse stale references, or mutate an already prepared\/hash-bound plan/);
+  expect(routes).toContain('diagnosis through `spec-debug`');
+  expect(routes).not.toMatch(/lsof|resolve-port\.sh|localhost:\$\{PORT\}|SKILL\.md step 6/);
+  expect(pipelineSource).not.toContain('resolve-port.sh');
+  expect(skillSource + pipelineSource + routes).not.toMatch(/[\u3400-\u9fff]/u);
 });
 
 test('validates loopback origins, first-open ordering, routes, actions, locators, and synthetic values', () => {

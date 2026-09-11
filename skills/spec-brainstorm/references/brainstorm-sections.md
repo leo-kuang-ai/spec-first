@@ -81,6 +81,17 @@ Conversely, a brainstorm about a multi-actor feature with contested scope
 and several behavioral conditions probably does need a doc — the planning
 agent needs the structured content the dialogue produced.
 
+## Ready for Planning Check
+
+Check the written artifact, not the author's recollection:
+
+- **Complete:** applicable product decisions, scope, acceptance signals, and material unresolved questions are present; confirmed source claims retain reachable evidence and limitations.
+- **Consistent:** requirements, flows, examples, and decision links agree; assumptions are not presented as confirmed behavior.
+- **Focused:** the active outcome is coherent; surrounding opportunities remain contextual or deferred, and named source coverage does not create arbitrary workstreams.
+- **Usable by planning:** the planner can decide HOW without inventing load-bearing WHAT. Missing behavior or success criteria remain named blockers rather than implied permission to choose.
+
+These are semantic checks, not a script-owned readiness classifier. Record failures and repair only within the producer's authority; a saved draft is not proof that these checks passed.
+
 ## Match depth to content
 
 When a doc IS warranted, depth matches what the dialogue produced. A

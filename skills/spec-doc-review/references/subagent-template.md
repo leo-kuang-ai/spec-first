@@ -59,6 +59,7 @@ For advanced `suggested_fix` patterns (single vs multi-facet vs composite with w
 Document type: {document_type}
 Document path: {document_path}
 Origin: {origin_path}
+Settled decisions: {settled_ktds}
 {decision_primer}
 Document content:
 {document_content}

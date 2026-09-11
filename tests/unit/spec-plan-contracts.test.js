@@ -3,7 +3,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const skill = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-plan/SKILL.md'), 'utf8');
+const { readPlanContract } = require('../helpers/plan-contract');
+const skill = readPlanContract();
 const sections = fs.readFileSync(
   path.resolve(__dirname, '../../skills/spec-plan/references/plan-sections.md'),
   'utf8',
@@ -34,6 +35,19 @@ function sectionBetween(source, start, end) {
 }
 
 describe('spec-plan current contracts', () => {
+  test('continues historical plans through an evidence-scoped successor without resetting history', () => {
+    const resume = sectionBetween(skill, '#### 0.1 Resume', '#### 0.2');
+    expect(resume).toContain('current user explicitly requests completion');
+    expect(resume).toContain('Read-only review, explanation, or document deepening does not trigger');
+    expect(resume).toContain('Preserve the old plan text, status, and old task-pack pins');
+    expect(resume).toContain('existing active successor named by the user or linked through explicit provenance');
+    expect(resume).toContain('Missing provenance or materially conflicting successor scope');
+    expect(resume).toContain('no reusable successor exists and unfinished scope is confirmed');
+    expect(resume).toContain('normal planning, readiness, and review');
+    expect(resume).toContain('If no remaining scope exists');
+    expect(sections).toContain('只读审阅不触发新计划生产');
+  });
+
   test('enriches requirements-only unified plans in place', () => {
     expect(skill).toContain('planning should enrich it in place');
     expect(skill).toContain('artifact_readiness: implementation-ready');
@@ -206,4 +220,11 @@ describe('spec-plan current contracts', () => {
     expect(universal).not.toContain('spec-proof');
     expect(handoff).toContain('**Open in browser**');
   });
+});
+
+test('completion contract stays scope-based: no mandatory menu completion, no stale heading', () => {
+  const skillText = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-plan/SKILL.md'), 'utf8');
+  expect(skillText).not.toContain('Mandatory Completion Contract');
+  expect(skillText).toContain('the menu is not a completion requirement');
+  expect(skillText).not.toMatch(/renders the post-generation menu, captures the user's selection/);
 });

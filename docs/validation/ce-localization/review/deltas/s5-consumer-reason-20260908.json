@@ -1,0 +1,69 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "s5-consumer-reason-20260908",
+  "producer": "当前 Codex owner",
+  "reviewed_at": "2026-09-08T08:23:58.516Z",
+  "source_binding": {
+    "head": "b557f8bc6f884f0fef460108e6279b31227c50fb",
+    "dirty_path_manifest_sha256": "0b9be109fe13e16cd5cbace9457b79aa32436350e8b082677591199252a04f94",
+    "source_tree_hash": "47c3eff6f19e44ea4d0e0d6556284a1d5bb9abe5284ac7a7a01d5103109ffd4c",
+    "inventory_hash": "34ff47158f6923701242dd88f5fb8984949e7369e7b133e872eb6295579bd326",
+    "inventory_artifact_sha256": "53007d0e4f2bd5e46a36bf3d1d740e3c0d0618c6b20434143c180f2209eb2bc8",
+    "review_input_hash": "9bf5229a77093abb15b7f6f05f06dcb146db55fee99918fd336d2faf4d1d5210"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "unverified",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "reviewed_paths": [
+    {
+      "path": "docs/contracts/verification/verification-run-summary.md",
+      "skill_ids": [
+        "spec-code-review",
+        "spec-debug"
+      ],
+      "sha256": "4babcad70ffdddb6a987297cf2838e711c2e7cc404bf7442a2a494379068e40b",
+      "bytes": 3395,
+      "line_count": 36,
+      "covered_line_ranges": [
+        [
+          1,
+          36
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "全文回读 36 行，与 helper、schema 及状态冲突测试对照：新增说明准确表达 reason_code 为字符串与保留原因的特殊状态约束；没有新增 schema 枚举或 producer。"
+          ],
+          "limitations": [
+            "当前 owner 内联复核；不代表新独立 reviewer 或说明追加后的模型效果复测。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "全文核对证据可信度与消费者边界：not-run 示例不伪造通过，实际执行须有日志与退出码，帮助解释不解除真实性、脱敏或 workflow ownership 门。"
+          ],
+          "limitations": [
+            "两个 lens 是审查维度，不是两个模型；31 项测试仅证明已覆盖合同。"
+          ]
+        }
+      ]
+    }
+  ],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "本轮仅对变化合同的两个 skill 关系补充收据，其他收据承接已有内容绑定。"
+  ],
+  "claim_ceiling": "当前合同与帮助及校验器约束一致；没有全量模型或收益结论。"
+}

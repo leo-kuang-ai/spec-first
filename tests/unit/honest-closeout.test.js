@@ -95,6 +95,25 @@ function captureStdout(fn) {
 }
 
 describe('honest closeout contract and validator', () => {
+  test.each([['--help'], ['validate', '--help']])('help supplies a usable example while keeping unrun checks unverified: %j', (...args) => {
+    const result = captureStdout(() => runInternal(['honest-closeout', ...args]));
+    expect(result.code).toBe(0);
+    const help = JSON.parse(result.stdout);
+    expect(help.status).toBe('help');
+    const summaryHelp = captureStdout(() => runInternal(['verification-run-summary', '--help']));
+    const repo = makeRepo();
+    try {
+      const inputPath = writeJson(path.join(repo, 'summary-input.json'), JSON.parse(summaryHelp.stdout).input_example);
+      const summary = writeVerificationRunSummary({ inputPath, runId: 'help-example', targetRepo: repo });
+      expect(summary.exitCode).toBe(0);
+      const claims = { ...help.input_example, run_summary_ref: summary.output.run_summary_ref };
+      const claimsPath = writeJson(path.join(repo, 'claims.json'), claims);
+      const validated = captureStdout(() => runInternal(['honest-closeout', 'validate', '--input', claimsPath, '--target-repo', repo]));
+      expect(validated.code).toBe(0);
+      expect(JSON.parse(validated.stdout)).toMatchObject({ overall: 'degraded', claims: [{ verdict: 'degraded', reason_code: 'validation-not-verified' }] });
+    } finally { fs.rmSync(repo, { recursive: true, force: true }); }
+  });
+
   test('schema validates consistent closeout output', () => {
     const schema = JSON.parse(fs.readFileSync(SCHEMA_PATH, 'utf8'));
     const output = {

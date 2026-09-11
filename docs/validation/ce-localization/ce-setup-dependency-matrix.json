@@ -5,12 +5,12 @@
   "public_entrypoint_disposition": "reuse-spec-runtime-setup-only",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "e4e667176516ad08e6ca36439f2e02f8db31b2a8",
+    "head": "00f01d6c2de110b17294bc1dab49b89c6ed12a8c",
     "dirty": false,
     "dirty_paths": [],
     "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "d3ac3c993f255d3149854f40664468ef4e27a6a3b3f7fcea127b4c1367bf6f03",
-    "inventory_hash": "fbd548868fd472bc8748c727dcc79f1785995844f9fb451db7839b4c41dbf29d",
+    "source_tree_hash": "dd49cfc2071c5c8e269b5cd94915ddc0dac1719a484da4c2259d884b8892eb00",
+    "inventory_hash": "11d271acca10737bcfa997d24bf66c26d02fede0d87e07be8ad24b9327a798be",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -45,9 +45,9 @@
     }
   },
   "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
-  "inventory_sha256": "ac55468a93c9614c8afcf2ad3ba69a9375cdc18c67665a42b40b176c1d72227b",
+  "inventory_sha256": "1a8ccfd13f8eb93ddb4409a18faa1f2f83b975c252ea72e8d3a656f6a43d2331",
   "preflight_ref": "docs/validation/ce-localization/ce-setup-prerequisite-preflight.json",
-  "preflight_sha256": "e39835e9ecf8e25dd6d4c27b16d844346fabc0a944e93fcebee173f3f095703c",
+  "preflight_sha256": "96e831b75d560ec766f526d1f0055c3cdf807248c45078a06107bdc5d0e0f42a",
   "ce_tool_dispositions": [
     {
       "tool_id": "agent-browser",

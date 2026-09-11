@@ -1,5 +1,7 @@
 'use strict';
 
+const { providerDisplayFacts } = require('./provider-display.cjs');
+
 const REVIEW_RISK_FLAGS = new Set([
   'unpinned-npx',
   'global-npx-execution',
@@ -237,9 +239,9 @@ function renderHumanSummary(
   }
   lines.push('', 'Provider 工具');
   for (const provider of toolFacts.provider_readiness || []) {
-    const status = provider.readiness_status || 'unknown';
-    const reasonCode = provider.reason_code || (status === 'fresh' ? 'ready' : 'unknown');
-    lines.push(`- ${provider.provider || provider.id}: ${status} (${reasonCode})`);
+    const display = providerDisplayFacts(provider);
+    lines.push(`- ${provider.provider || provider.id}: ${display.currentness_status} (${display.reason_code})`);
+    lines.push(`  readiness_scope: ${display.readiness_scope}; probe_status: ${display.probe_status}`);
     const steadyState = provider.steady_state || {};
     if (steadyState.hook_status) {
       if (steadyState.hook_status === 'blocked') {

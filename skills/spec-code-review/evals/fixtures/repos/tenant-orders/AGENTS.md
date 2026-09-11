@@ -1,4 +1,4 @@
-# 项目审查规则
+# Project Review Rules
 
-- 所有资源读取必须校验当前用户所属租户。
-- 审查默认只读，除非用户明确要求修改。
+- Every resource read must verify the current user's tenant.
+- Review is read-only unless the user explicitly requests changes.
