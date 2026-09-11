@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-11: fix(runtime-setup): 仅对未保护的 Graphify artifact 注入 GRAPHIFY_NO_BACKUP，保留 curated/semantic 图覆盖前备份。(user-visible)
 - v1.15.3 2026-09-11: fix(optimize): 校验完整 aggregation 配置链，避免空 stability 对象遮蔽 measurement.stability 中的非法值。(user-visible)
 - v1.15.3 2026-09-11 11:12:18 claude: test(eval): 评测落盘守卫端到端永久测试（六场景：仅话术/真修复/越权 commit/仅 stage/无基线弱守卫两分支）；测试隔离机器级全局 git hook，并修复弱守卫将未跟踪杂物（如宿主 hook 生成的 graphify-out/）误判为落盘证据的缺陷（--untracked-files=no，与基线分支 git diff HEAD 口径一致）。(user-visible)
 - v1.15.3 2026-09-11 11:12:18 claude: test(contracts): plugin-sync 锚点别名契约（锁定单一事实源形态、禁止回退双字面量表）；peer-runner parity 补 D1 语义防回退断言（not recorded→return False 精确匹配 + supervisor 门调用点）；ce-localization 漂移消息助手可测化并补合成输入单测。(user-visible)
