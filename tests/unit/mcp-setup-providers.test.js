@@ -1129,7 +1129,7 @@ describe('Graphify provider', () => {
     }
   });
 
-  test.each(['query-graph', 'hook-graph'])('Graphify %s 漂移不能绑定未验证的对象', (change) => {
+  test.each(['query-graph', 'final-probe-graph', 'query-identity'])('Graphify %s 漂移不能绑定未验证的对象', (change) => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const fixture = createGraphifyApplyFixture('query-evidence-drift');
     try {
@@ -1140,8 +1140,9 @@ describe('Graphify provider', () => {
         const result = fixture.context.runner(command, args, options);
         if (command === fixture.launcher && args[0] === 'query') {
           queried = true;
-          if (change !== 'query-identity') fs.writeFileSync(path.join(fixture.target, 'graphify-out', 'graph.json'), JSON.stringify({ nodes: [{ id: 'replaced' }], links: [] }));
+          if (change === 'query-graph') fs.writeFileSync(path.join(fixture.target, 'graphify-out', 'graph.json'), JSON.stringify({ nodes: [{ id: 'replaced' }], links: [] }));
         }
+        if (queried && change === 'final-probe-graph' && command === fixture.interpreter && args[0] === '-c') fs.writeFileSync(path.join(fixture.target, 'graphify-out', 'graph.json'), JSON.stringify({ nodes: [{ id: 'replaced' }], links: [] }));
         if (queried && change === 'query-identity' && command === fixture.interpreter && args[0] === '-c') {
           return success(JSON.stringify({ version: '0.9.12', packages: [['graphifyy', '0.9.12'], ['changed', '1']] }));
         }

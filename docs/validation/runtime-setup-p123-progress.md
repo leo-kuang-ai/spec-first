@@ -284,3 +284,12 @@
 - verify/doctor 通过既有 facts root 只读获取唯一 CodeGraph artifact evidence，校验 TTL、repo root、当前 identity、source snapshot 和 DB/WAL/journal bytes；不执行原生 status/query，避免其 open 触发 migration/heal。配置 reconciliation 只有完整 evidence 才能把 unknown 升回 fresh。
 - 9 个 evidence 反例覆盖无证据禁止 query、source/DB/WAL/journal 漂移、TTL、旧/非法证据、采样竞态和 symlink；真实隔离 apply 及旧 marker 恢复探针保留在前述 JSON evidence。Provider/launcher/evidence 三套定点 104 tests 通过。
 - 独立首审与修复复审：首审提出合法 `state:null` 重建，已在上一切片修复；本切片未新增 reviewer 阻断。未扩展为语义图正确性、MCP server 或 Windows 真实验证。主 setup SIGINT/Windows 信号、refresh 原位恢复与 P123 最终收口仍未完成。
+
+
+## 2026-09-12 当前收口增量
+
+- CodeGraph artifact evidence：修复 `readRecordedEvidence` 的 descriptor 有界读取与 `O_NONBLOCK`，`validEvidence` 现在严格拒绝 root/source/provider/files 的额外字段；新增增长竞态、FIFO、嵌套字段回归。
+- Graphify：query 前后比较 graph.json 摘要，并比较构图、query、final probe 的 provider identity；漂移降级，不发布未绑定对象。
+- 宿主：`pi` 已接入 facts readiness ledger 与 runtime state path，宿主枚举漂移测试通过。
+- 当前聚焦验证：provider/host/evidence 84 tests passed；typecheck 263 files passed。
+- CE localization 增量 review：provider 报告已保存但其余 30+ 文件因 reviewer provider 429 仅部分覆盖，未声称全量独立审查；历史 semantic adjudication 保留 `degraded` claim ceiling。

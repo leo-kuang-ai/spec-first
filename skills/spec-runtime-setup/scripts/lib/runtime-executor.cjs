@@ -914,6 +914,7 @@ function runtimeStatePath(host, repoRoot) {
     opencode: '.opencode/spec-first/state.json',
     qoder: '.qoder/spec-first/state.json',
     zcode: '.zcode/spec-first/state.json',
+    pi: '.pi/spec-first/state.json',
   };
   return roots[host] ? path.join(repoRoot, roots[host]) : null;
 }

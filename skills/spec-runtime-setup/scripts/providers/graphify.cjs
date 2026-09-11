@@ -392,6 +392,9 @@ function apply(context = {}, actionPlan = plan(context)) {
   let fallbackUsed = false;
   let mutationFailure = null;
   let generationSource = null;
+  let generationIdentity = null;
+  let queryIdentity = null;
+  let queryGraph = null;
   const pythonProvider = true;
   const pathRepair = { status: 'report-only', reason_code: null };
   let runtimeContext = actionPlan.resolved_graphify_command
@@ -421,6 +424,18 @@ function apply(context = {}, actionPlan = plan(context)) {
       graphifyOnOriginalPath: resolved.on_original_path || pathRepair.status === 'repaired',
       graphifyOriginalPathCommand: resolved.original_path_command || null,
     };
+  }
+
+  function currentExecutionIdentity() {
+    const identity = probePythonDistributionIdentity(runtimeContext, repoRoot, runtimeContext.graphifyCommand,
+      context.dependency, runtimeContext.graphifyInterpreter);
+    return graphifyIdentity({ ok: identity.ok, package_identity: identity, command: runtimeContext.graphifyCommand,
+      interpreter: identity.interpreter, installer: runtimeContext.graphifyInstaller });
+  }
+
+  function currentGraphHash() {
+    return graphArtifactSha256(repoRoot, actionPlan.artifact_root || path.join(repoRoot, CURRENT_ARTIFACT_ROOT),
+      (filename) => readBoundedScopeFile(repoRoot, filename));
   }
 
   if (actionPlan.resolved_graphify_command) {
@@ -488,6 +503,7 @@ function apply(context = {}, actionPlan = plan(context)) {
         }
       }
     } else if (action.kind === 'first-generation') {
+      generationIdentity = currentExecutionIdentity();
       generationSource = sourceContentIdentity(captureSourceSnapshot({ ...context, repoRoot }));
       const extract = runGraphify(runtimeContext, action.args, {
         cwd: repoRoot,
@@ -504,6 +520,7 @@ function apply(context = {}, actionPlan = plan(context)) {
         mutationFailure = 'graphify-first-generation-failed';
       }
     } else if (action.kind === 'refresh') {
+      generationIdentity = currentExecutionIdentity();
       generationSource = sourceContentIdentity(captureSourceSnapshot({ ...context, repoRoot }));
       const refresh = runGraphify(runtimeContext, action.args, {
         cwd: repoRoot,
@@ -533,13 +550,13 @@ function apply(context = {}, actionPlan = plan(context)) {
     if (!graphIntegrity.ok) mutationFailure = graphIntegrity.reason_code;
   }
   if (!mutationFailure && artifactRefs.length > 0) {
-    let graphBeforeQuery = null;
-    try { graphBeforeQuery = graphArtifactSha256(repoRoot, actionPlan.artifact_root || path.join(repoRoot, CURRENT_ARTIFACT_ROOT)); } catch (_error) { graphBeforeQuery = null; }
-    queryVerified = succeeded(runGraphify(runtimeContext, ['query', 'main'], { cwd: repoRoot, timeoutMs: 30000 }));
-    if (queryVerified && graphBeforeQuery) {
-      try {
-        if (graphBeforeQuery !== graphArtifactSha256(repoRoot, actionPlan.artifact_root || path.join(repoRoot, CURRENT_ARTIFACT_ROOT))) mutationFailure = 'graphify-artifact-changed-during-verification';
-      } catch (_error) { mutationFailure = 'graphify-artifact-changed-during-verification'; }
+    queryIdentity = currentExecutionIdentity();
+    try {
+      queryGraph = currentGraphHash();
+      queryVerified = succeeded(runGraphify(runtimeContext, ['query', 'main'], { cwd: repoRoot, timeoutMs: 30000 }));
+      if (queryGraph !== currentGraphHash()) mutationFailure = 'graphify-artifact-changed-during-verification';
+    } catch (_error) {
+      mutationFailure = 'graphify-artifact-changed-during-verification';
     }
   }
   const hasArtifact = artifactRefs.length > 0;
@@ -598,6 +615,17 @@ function apply(context = {}, actionPlan = plan(context)) {
       context.dependency, runtimeContext.graphifyInterpreter) : null;
   if (!mutationFailure && (!finalIdentity || !finalIdentity.ok)) {
     mutationFailure = (finalIdentity && finalIdentity.reason_code) || 'graphify-package-identity-unverified';
+  }
+  const publishedIdentity = graphifyIdentity({ ok: finalIdentity && finalIdentity.ok, package_identity: finalIdentity,
+    command: runtimeContext.graphifyCommand, interpreter: finalIdentity && finalIdentity.interpreter,
+    installer: runtimeContext.graphifyInstaller });
+  if (!mutationFailure && queryVerified) {
+    const identities = [queryIdentity, publishedIdentity, ...(generationAction ? [generationIdentity] : [])];
+    if (identities.some((identity) => !identity || !identity.inventory_sha256)) mutationFailure = 'graphify-package-identity-unverified';
+    else if (new Set(identities.map((identity) => JSON.stringify(identity))).size !== 1) mutationFailure = 'graphify-identity-changed-during-verification';
+    try {
+      if (queryGraph !== currentGraphHash()) mutationFailure = mutationFailure || 'graphify-artifact-changed-during-verification';
+    } catch (_error) { mutationFailure = mutationFailure || 'graphify-artifact-changed-during-verification'; }
   }
   const degraded = Boolean(mutationFailure) || !hasArtifact || !queryVerified || scopeReadinessBlocked;
   const nextActions = [];
