@@ -100,6 +100,117 @@ describe('runWorkspaceGraphBuild — composed capability', () => {
     fs.rmSync(ws, { recursive: true, force: true });
   });
 
+  test.each(['timeout', 'cancel'])('最终 state 发布期间发生 %s，必须落盘 partial', (stop) => {
+    const ws = mkWorkspace();
+    let spy;
+    try {
+      initRepo(ws, 'api');
+      let clock = 0;
+      const controller = new AbortController();
+      const original = fs.writeFileSync;
+      spy = jest.spyOn(fs, 'writeFileSync').mockImplementation((file, data, ...args) => {
+        const result = original.call(fs, file, data, ...args);
+        if (String(file).includes('workspace-graph-state.json.tmp-') && JSON.parse(String(data)).operation_status === 'complete') {
+          if (stop === 'timeout') clock = 101;
+          else controller.abort();
+        }
+        return result;
+      });
+      const result = runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec,
+        executionBudgetMs: 100, executionClock: () => clock, signal: controller.signal });
+      const reason = stop === 'timeout' ? 'workspace-build-timeout' : 'workspace-build-cancelled';
+      expect(result).toMatchObject({ status: 'partial', reason_code: reason });
+      expect(result.build.state.state).toMatchObject({ operation_status: 'partial', reason_code: reason });
+      expect(JSON.parse(fs.readFileSync(result.build.state.path, 'utf8'))).toMatchObject({ operation_status: 'partial', reason_code: reason });
+      expect(result.lifecycle_release.ok).toBe(true);
+    } finally {
+      if (spy) spy.mockRestore();
+      fs.rmSync(ws, { recursive: true, force: true });
+    }
+  });
+
+  test('超时纠正 state 写入失败时保留 lease，status 不将旧 complete 当作 ready', () => {
+    const ws = mkWorkspace();
+    let spy;
+    try {
+      initRepo(ws, 'api');
+      let clock = 0;
+      const original = fs.writeFileSync;
+      spy = jest.spyOn(fs, 'writeFileSync').mockImplementation((file, data, ...args) => {
+        if (String(file).includes('workspace-graph-state.json.tmp-')) {
+          const payload = JSON.parse(String(data));
+          if (payload.reason_code === 'workspace-build-timeout') throw Object.assign(new Error('correction failed'), { code: 'EIO' });
+          if (payload.operation_status === 'complete') clock = 101;
+        }
+        return original.call(fs, file, data, ...args);
+      });
+      const result = runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec,
+        executionBudgetMs: 100, executionClock: () => clock });
+      expect(result).toMatchObject({ status: 'partial', reason_code: 'workspace-state-write-failed' });
+      expect(result.build.state.ok).toBe(false);
+      expect(result.lifecycle_release).toMatchObject({ ok: false, status: 'retained', ownership_retained: true });
+      expect(result.lifecycle_release_retry).toBeUndefined();
+      const status = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-status.cjs')
+        .runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false });
+      expect(status.status).not.toBe('ready');
+      expect(status.workspace.lifecycle.status).not.toBe('none');
+    } finally {
+      if (spy) spy.mockRestore();
+      fs.rmSync(ws, { recursive: true, force: true });
+    }
+  });
+
+  test('底层命令提前超时也停止全局执行，不依赖总预算时钟耗尽', () => {
+    const ws = mkWorkspace();
+    try {
+      initRepo(ws, 'api'); initRepo(ws, 'web');
+      const exec = jest.fn(() => ({ status: 1, signal: 'SIGTERM', error: 'ETIMEDOUT', timed_out: true }));
+      const result = runWorkspaceGraphBuild({ cwd: ws, repos: ['api', 'web'], allowDiscovery: false, executionClock: () => 0, exec });
+      expect(result.reason_code).toBe('workspace-build-timeout');
+      expect(result.build.state.state.reason_code).toBe('workspace-build-timeout');
+      expect(exec).toHaveBeenCalledTimes(1);
+      expect(result.routing).toBeNull(); expect(result.hooks).toBeNull();
+      expect(result.lifecycle_release.ok).toBe(true);
+    } finally {
+      fs.rmSync(ws, { recursive: true, force: true });
+    }
+  });
+
+  (process.platform === 'win32' ? test.skip : test)('真实 Provider SIGINT 停止后续仓并恢复数据库，下一次构图可以重入', () => {
+    const ws = mkWorkspace();
+    try {
+      const api = initRepo(ws, 'api'); initRepo(ws, 'web');
+      const database = path.join(api, '.codegraph', 'codegraph.db');
+      fs.mkdirSync(path.dirname(database)); fs.writeFileSync(database, 'previous');
+      fs.appendFileSync(path.join(api, '.git', 'info', 'exclude'), '\n.codegraph/\n');
+      const command = path.join(ws, 'interrupt-provider');
+      const calls = path.join(ws, 'provider-calls.jsonl');
+      fs.writeFileSync(command, `#!${process.execPath}\n` + [
+        "const fs = require('node:fs'); const path = require('node:path');",
+        `fs.appendFileSync(${JSON.stringify(calls)}, JSON.stringify(process.argv.slice(2)) + '\\n');`,
+        "if (process.argv[2] === 'init') {",
+        "  const dir = path.join(process.argv[3], '.codegraph');",
+        "  fs.mkdirSync(dir, {recursive:true}); fs.writeFileSync(path.join(dir, 'codegraph.db'), 'interrupted');",
+        "  process.kill(process.pid, 'SIGINT');",
+        "}",
+      ].join('\n'), { mode: 0o755 });
+      const result = runWorkspaceGraphBuild({ cwd: ws, repos: ['api', 'web'], allowDiscovery: false, codegraphCommand: command, graphifyCommand: command });
+      expect(result.reason_code).toBe('workspace-build-cancelled');
+      expect(result.status).not.toBe('complete');
+      expect(result.build.state.state.reason_code).toBe('workspace-build-cancelled');
+      expect(result.routing).toBeNull(); expect(result.hooks).toBeNull();
+      expect(fs.readFileSync(database, 'utf8')).toBe('previous');
+      expect(fs.existsSync(path.join(ws, 'web', '.codegraph'))).toBe(false);
+      expect(fs.readFileSync(calls, 'utf8').trim().split('\n')).toHaveLength(2);
+      expect(result.lifecycle_release.ok).toBe(true);
+      const retry = runWorkspaceGraphBuild({ cwd: ws, repos: ['api', 'web'], allowDiscovery: false, exec: fakeExec });
+      expect({ status: retry.status, reason_code: retry.reason_code }).toEqual({ status: 'complete', reason_code: '' });
+      expect(retry.lifecycle_release.ok).toBe(true);
+    } finally {
+      fs.rmSync(ws, { recursive: true, force: true });
+    }
+  });
+
   test('manifest-declared repos build to complete; git stays clean; merged graph exists', () => {
     const ws = mkWorkspace();
     initRepo(ws, 'api');

@@ -101,3 +101,10 @@ doctor 只从当前环境解析命令，不执行历史 facts 中的 command。�
 scenario fingerprint 的生成失败仍是 advisory；如果其失败状态成功写入 canonical facts，不因此阻断 setup。默认 writer 对成对 facts 的写入失败执行既有 best-effort 恢复；失败返回不声称事务回滚已获全局原子保证。
 
 Provider 的路径与 action-plan 预检先于 baseline 安装、host 配置和 facts 写入。被阻止时沿用既有 setup error envelope，保留原始 reason，不生成一份看似已执行的 Provider facts。preflight 不作为安装后的执行计划缓存；依赖变化后仍由对应 Provider 重新规划。
+
+
+### Workspace 构图预算与中断
+
+显式 workspace graph build 默认最多处理 32 个 confirmed repos，并共用 15 分钟命令预算；每个子进程 timeout 不超过剩余预算。Provider 子进程 SIGINT/SIGTERM 传播为 `workspace-build-cancelled`，进程超时优先为 `workspace-build-timeout`，不会继续启动后续 Provider、merge、routing 或 hook。失败恢复与 lease 清理仍允许运行，预算不是同步文件 IO 或进程终止开销的严格墙钟沙箱。
+
+最终 state 写入后仍在 lease 内复核预算/取消，已写出的 complete 必须纠正为 partial。纠正写入失败时返回 failed write result 并保留自有 lease，让 status 识别未收口；不把内存中的 partial 当作已成功落盘。正常纠正和 Provider init 回滚成功后释放 lease，允许重试。原位 refresh 不具备 init 的整库备份回滚保证；整个 setup 进程直接收到 SIGINT、Windows 信号行为和子进程树清理尚需独立验证。

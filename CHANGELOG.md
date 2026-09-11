@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-11 codex: fix(runtime-setup): 将真实 Provider SIGINT/SIGTERM 与子进程超时传播为 workspace 停止原因；最终 state 写入后复核预算并纠正 partial，纠正写入失败保留 lease，防止 consumer 误认残留 complete。(user-visible)
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): workspace 构图增加默认 32 仓上限与 15 分钟共享命令预算，传播取消和超时原因并停止后续 Provider、routing、hook；保留失败恢复与 lease 清理，不宣称同步 IO 硬截止或真实 SIGINT 恢复已验证。(user-visible)
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): 所选 Provider 的路径/action-plan 预检提前到首次 baseline 安装之前，非法 requirement workspace 通过原始 reason 零写入退出；补真实 CodeGraph 故障索引 status 写入探针，记录其不能用作只读 freshness 检查的证据。(user-visible)
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): canonical facts 第二次发布失败时返回非零退出码与 failed write result，不再沿用首次成功；保留 Provider 主失败和已有 artifact，scenario 生成本身仍按 advisory 处理。(user-visible)

@@ -133,7 +133,9 @@ function runWorkspaceGraphBuild({
     if (executionGuard()) return failure();
     const remaining = Math.max(1, Math.ceil(executionBudgetMs - (executionClock() - startedAt)));
     const result = exec(command, args, { ...options, timeoutMs: Math.min(options.timeoutMs || 300000, remaining) });
-    return executionGuard() ? failure() : result;
+    if (result && result.timed_out) stoppedReason = 'workspace-build-timeout';
+    else if (result && ['SIGINT', 'SIGTERM'].includes(result.signal)) stoppedReason = 'workspace-build-cancelled';
+    return executionGuard() ? { ...result, ...failure() } : result;
   };
   if (executionGuard()) return failedBeforeWorkspaceBuild({ targets, pendingConfirm, reasonCode: stoppedReason });
 
@@ -209,7 +211,13 @@ function runWorkspaceGraphBuild({
       refreshHookContract,
     });
   } finally {
-    if (!lifecycle.inherited) release = lifecycle.release();
+    if (!lifecycle.inherited) {
+      if (result && executionGuard() && result.build && result.build.state && !result.build.state.ok) {
+        release = { ok: false, status: 'retained', ownership_retained: true, reason_code: 'workspace-state-write-failed' };
+      } else {
+        release = lifecycle.release();
+      }
+    }
   }
   if (release && !release.ok) {
     const reasonCode = release.reason_code || 'workspace-graph-lifecycle-release-failed';
@@ -374,7 +382,7 @@ function runWorkspaceGraphBuildOwned({
 
   if (executionGuard()) { status = 'partial'; reasonCode = executionGuard(); }
   lifecycle.assertOwned('before-state-write');
-  const finalState = writeExecutorState({
+  let finalState = writeExecutorState({
     targets,
     build,
     refresh,
@@ -383,6 +391,20 @@ function runWorkspaceGraphBuildOwned({
     refreshHook,
     expectedRepos: build.expected_repos,
   });
+  if (executionGuard() && finalState.ok && finalState.state.operation_status === 'complete') {
+    status = 'partial';
+    reasonCode = executionGuard();
+    lifecycle.assertOwned('before-interrupted-state-correction');
+    finalState = writeExecutorState({
+      targets,
+      build,
+      refresh,
+      operationStatus: status,
+      reasonCode,
+      refreshHook,
+      expectedRepos: build.expected_repos,
+    });
+  }
   build.state = finalState;
   if (finalState.ok && finalState.state.operation_status !== status) {
     status = finalState.state.operation_status;

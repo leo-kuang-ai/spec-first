@@ -254,3 +254,12 @@
 - 本次提交保留 U5 发布失败与 scope preflight、U8 安装身份、U6 预算切片及两个真实 CodeGraph 探针。P123 整体、CodeGraph 原生 artifact verify 的只读缺口与最终整体验收仍未完成。提交不改变计划完成状态，也不推送远程。
 - 本次语法检查 262 files 与 git diff --check 通过；测试运行于共享工作区，不能外推为隔离提交的全仓验证。并发宿主治理的八个暂存路径及 CHANGELOG 独立记录排除在本提交外。
 - 提交前追加定点验证：CodeGraph launcher、consumer-health、Provider、entrypoint 四套 185 tests 全部通过；连同 workspace 三套，共七套 258 tests 通过。未重跑全仓测试。
+
+
+## U6/U9 子进程中断与最终发布出口
+
+- 真实隔离 Node Provider fixture 在 init 修改临时 DB 后自发 SIGINT，默认 spawnSync runner 返回真实 signal。修改前观察到 workspace-build-failed，未传播取消；现将 SIGINT/SIGTERM 与 timed_out 转换为共享停止原因，后续步骤停止。测试验证旧 DB 恢复、下一仓不运行、lease 释放，并用 fixture runner 重试完成。重试首次因 fixture 未排除既有 DB 而被 source-change guard 合法降级，修正 fixture 的已有 .git/info/exclude 后通过，未削弱生产检查。
+- 默认 runner 另有真实子进程 timeout 测试；注入时钟不前进的反例检查底层 timed_out 仍触发全局停止。SIGINT 测试在 Windows 显式跳过，不能外推为 Windows 信号或主 setup 进程 SIGINT 证据。
+- 独立首审发现最终 state 写入期间预算耗尽仍 complete。两个回归分别在实际临时 state 写入时触发 timeout/cancel，先观察到 complete，再修为 lease 内写后复核并发布 partial。纠正写入 EIO 则保留自有 lease、返回 partial/state.ok=false；真实 status reader 将残留 complete 降级。独立唯一修复复审确认原 P2 及此失败分支闭合，reviewer 未执行测试。
+- 复用既有 executor、state writer、lifecycle owner 与 status reader；没有新增 durable schema 或通用执行引擎。回滚、lease 留存与失败证据属于 protected 行为。主 setup 进程直接 SIGINT、子进程树清理和原位 refresh 的恢复范围仍待验证，CodeGraph 只读 currentness 与最终 P123 收口仍未完成。
+- 本切片最终验证：workspace executor/build/provider-runners 三套 79 tests 全部通过；typecheck 262 files 与 git diff --check 通过。测试在共享工作区执行，未声称隔离提交全仓通过；本轮不改 generated runtime、不 push。
