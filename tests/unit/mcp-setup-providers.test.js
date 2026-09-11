@@ -1832,3 +1832,24 @@ describe('Graphify provider', () => {
     expect(runner).not.toHaveBeenCalled();
   });
 });
+
+test.each([false, true])('Graphify refresh 缺少 graph.json 时拒绝首次构图（仅报告=%s）', (reportOnly) => {
+  const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+  const fixture = createGraphifyApplyFixture('refresh-missing-artifact');
+  try {
+    if (reportOnly) {
+      fs.mkdirSync(path.join(fixture.target, 'graphify-out'));
+      fs.writeFileSync(path.join(fixture.target, 'graphify-out', 'GRAPH_REPORT.md'), 'old report');
+    }
+    const context = { ...fixture.context, refresh: true };
+    const plan = provider.plan(context);
+    expect(plan).toMatchObject({ blocked: true, reason_code: 'graphify-refresh-artifact-missing', actions: [] });
+    const result = provider.apply(context, plan);
+    expect(result.readiness_status).toBe('degraded');
+    expect(fixture.graphifyCalls.some((args) => args.includes('extract') || args.includes('update'))).toBe(false);
+    expect(fs.existsSync(path.join(fixture.target, 'graphify-out', 'graph.json'))).toBe(false);
+  } finally {
+    fs.rmSync(fixture.target, { recursive: true, force: true });
+    fs.rmSync(fixture.homeDir, { recursive: true, force: true });
+  }
+});

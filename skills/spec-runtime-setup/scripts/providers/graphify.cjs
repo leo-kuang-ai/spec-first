@@ -127,6 +127,10 @@ function plan(context = {}) {
   }
   const hasCurrent = currentArtifactRefs(repoRoot, currentArtifactRoot).length > 0;
   const hasLegacy = currentArtifactRefs(repoRoot, legacyArtifactRoot).length > 0;
+  if (context.refresh && ![currentArtifactRoot, legacyArtifactRoot].some((root) => {
+    const graph = lstatOrNull(path.join(root, 'graph.json'));
+    return graph && graph.isFile() && !graph.isSymbolicLink();
+  })) return blockedPlan(repoRoot, 'graphify-refresh-artifact-missing');
   const pythonProvider = true;
   if (!currentRootExists && legacyRootExists) {
     actions.push({
@@ -347,7 +351,8 @@ function verify(context = {}) {
 }
 
 function apply(context = {}, actionPlan = plan(context)) {
-  if (!actionPlan || actionPlan.blocked || !actionPlan.mutation) return verify(context);
+  if (actionPlan && actionPlan.blocked) return unsafeReadiness(context, path.resolve(context.repoRoot || actionPlan.repo_root || process.cwd()), actionPlan.reason_code);
+  if (!actionPlan || !actionPlan.mutation) return verify(context);
   const repoRoot = path.resolve(context.repoRoot || actionPlan.repo_root || process.cwd());
   const recovery = context.installationOnly ? { ok: true } : recoverGraphifyMigration(repoRoot);
   if (!recovery.ok) return unsafeReadiness(context, repoRoot, recovery.reason_code);

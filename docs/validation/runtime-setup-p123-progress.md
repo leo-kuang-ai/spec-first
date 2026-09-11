@@ -85,3 +85,19 @@
 - 已做 inline report-only 自审，未派发独立 reviewer。审查期间 mutation guard 返回 `mutation_detected: false`；guard 覆盖 tracked diff，不包含未跟踪文件，新模块另由实现阶段直接源码检查和行为测试覆盖。
 - 自审 F1：发布时重新读 registry 会让旧 probe 绑定新快照。由 spec-work 通过 `sourceRegistry` 对照修复；执行期间 registry 改变增加 `registry-changed-during-setup` limitation，doctor 不把该快照视为 fresh。反例先失败，修复后 consumer/entrypoint/registry/facts 四 suites、138 tests 通过。
 - F1 修复后的 138 tests 是针对性复跑；不宣称此前 699 tests 覆盖了后加的反例。整体计划与最终 review/verification closeout 仍保持未完成。
+
+## U4 默认行为矩阵复核
+
+- 先前只有 `--installation-only` 开关，并未实现方案要求的默认 plan/verify scope；本批将无显式图需求的 plan/verify/refresh-facts 统一为 installation。
+- 新增 `--verify-only --only <graph-id>` 的显式图验证路径，仍只有 write-setup-facts 权限；保留 refresh 与 verify 的互斥。repair 建议保留 installation-only，防止配置修复扩大为构图。
+- Graphify refresh 缺图曾隐式转 first generation，仅有报告也会执行 update；两种反例复现后修为 graphify-refresh-artifact-missing。blocked provider plan 不再通过 verify 掩盖原因。
+- 默认 plan/安装/默认 verify 走真实 Node orchestration fixture，检查无 init/index/sync/extract/update/query/status 图命令、旧 graph.json 与 canonical scope receipt 字节保持不变；fixture 的 host config 和目录均隔离。
+- 首批 provider/entrypoint/mode/facts 四 suites、216 tests 通过；进一步 repair-scope 用例和全量回归另记。本批无真实 Provider 安装，无 fresh-source 模型行为评测；prompt 消费仍需要最终 U10/U12 验证。
+
+### U4 提交前审查与验证
+
+- 独立 fresh-source reviewer 报告三个问题：未选 Provider 仍可能 query、默认 verify 被误称为完整验证、通用 Workflow 步骤越过 mode 边界。现已修复；同一 reviewer 只读定点复核三项通过。这是静态语义审查，不是实际 Provider 行为评测。
+- 未选 Provider 的普通 verify、安装失败补充检查和 apply 后复核均使用 installation scope；bare/check 不再推断 query 和 hook 状态。两个旧断言已按安装 scope 更新，保留 configured 与只读检查。
+- 修复前 37 suites / 671 tests 通过；修复后共享工作区首次回归 668/671，通过之外包含两个 scope 旧断言和一项并发 ZCode 改动失败。修正断言后相关四 suites / 217 tests 通过（含并发任务新增的一例）。
+- 暂存范围排除了并发 ZCode 变更。隔离快照的四 suites / 216 tests 通过；config-consumers 因临时仓库缺 HEAD 首次失败，补齐临时 Git 基线后 12 tests 通过。初次隔离曾混入并发未完成的常量引用，已修正暂存内容，未将该失败计为通过。
+- typecheck（260 files）、skill entrypoint lint（490 files）及 staged diff whitespace 检查通过。未执行真实 Provider install/query/refresh、宿主 init、push 或 PR；完整 P123 计划仍未完成。

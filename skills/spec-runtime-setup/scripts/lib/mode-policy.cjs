@@ -106,7 +106,7 @@ function buildActionPlan({ argv = [], knownIds = [], defaultIds = [] } = {}) {
     (args.verifyOnly || args.refreshFacts) && 'verify',
     args.plan && 'plan',
     args.projectConfig && 'project-config',
-    (args.only.length > 0 || args.installationOnly) && !args.plan && !(args.installationOnly && (args.verifyOnly || args.refreshFacts)) && workspaceActions.length === 0 && 'only',
+    (args.only.length > 0 || args.installationOnly) && !args.plan && !((args.verifyOnly || args.refreshFacts) && !args.refresh) && workspaceActions.length === 0 && 'only',
     args.repairHostConfig && args.only.length === 0 && !args.installationOnly && !args.plan && 'host-config-repair',
   ].filter(Boolean);
   if (new Set(selectedModes).size > 1) {
@@ -134,6 +134,9 @@ function buildActionPlan({ argv = [], knownIds = [], defaultIds = [] } = {}) {
 
   let mode = selectedModes[0] || 'bare';
   if (args.refresh && !args.plan) mode = 'graphify-refresh';
+  if (['plan', 'verify'].includes(mode) && args.only.length === 0 && !args.requirementWorkspace) {
+    args.installationOnly = true;
+  }
   const actions = ACTIONS_BY_MODE[mode].map((entry) => ({ ...entry }));
   const capabilities = actions
     .filter((entry) => entry.mutation)

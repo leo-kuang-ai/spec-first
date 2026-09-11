@@ -609,3 +609,23 @@ describe('spec-runtime-setup project target resolution', () => {
     });
   });
 });
+
+describe('Provider 默认 installation 与显式 artifact 行为矩阵', () => {
+  const defaults = { knownIds: ['codegraph', 'graphify'], defaultIds: ['codegraph', 'graphify'] };
+  const { buildActionPlan } = require(modePolicyModule);
+  test.each([['--plan'], ['--verify-only'], ['--refresh-facts']])('%s 默认只有 installation scope', (flag) => {
+    expect(buildActionPlan({ ...defaults, argv: [flag] })).toMatchObject({
+      blocked: false, args: { installationOnly: true }, selected_ids: defaults.defaultIds,
+    });
+  });
+  test('显式图 verify 只允许 facts 写入，不授权安装或刷新', () => {
+    expect(buildActionPlan({ ...defaults, argv: ['--verify-only', '--only', 'graphify'] })).toMatchObject({
+      blocked: false, mode: 'verify', args: { installationOnly: false }, selected_ids: ['graphify'], capabilities: ['write-setup-facts'],
+    });
+  });
+  test('显式图 plan 保留图生命周期预览', () => {
+    expect(buildActionPlan({ ...defaults, argv: ['--plan', '--only', 'graphify'] })).toMatchObject({
+      blocked: false, mode: 'plan', mutation: false, args: { installationOnly: false },
+    });
+  });
+});

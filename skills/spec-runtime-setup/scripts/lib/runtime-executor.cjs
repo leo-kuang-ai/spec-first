@@ -269,7 +269,7 @@ function buildExecutionSummary({ context, failedOutcome } = {}) {
   const mode = context && context.actionPlan ? context.actionPlan.mode : 'unknown';
   const coversRequiredProviders = requiredProviderIds.every((id) => selectedIds.includes(id));
   const installationOnly = context && context.actionPlan && context.actionPlan.args.installationOnly === true;
-  const partialScope = installationOnly || (['only', 'graphify-refresh', 'host-config-repair'].includes(mode)
+  const partialScope = installationOnly || (['only', 'verify', 'graphify-refresh', 'host-config-repair'].includes(mode)
     && !coversRequiredProviders);
   const overallStatus = failedOutcome
     ? 'action-required'
@@ -607,6 +607,7 @@ function buildHostConfigReceipt(hostConfigResults) {
 
 function hostConfigRepairCommand(context) {
   const args = ['spec-runtime-setup'];
+  if (context.actionPlan.args.installationOnly) args.push('--installation-only');
   if (context.actionPlan.selected_ids.length > 0) {
     args.push('--only', context.actionPlan.selected_ids.join(','));
   }
@@ -719,7 +720,7 @@ function blockedSelectedProviders(context, repoRoot, selectedIds, reasonCode) {
   const selectedSet = new Set(selectedIds);
   for (const entry of context.effectiveRegistry.providers || []) {
     if (!selectedSet.has(entry.id) && providers[entry.id]) {
-      selected.push(providers[entry.id].verify(providerContext(context, repoRoot, entry.id, { selected: false })));
+      selected.push(providers[entry.id].verify(providerContext(context, repoRoot, entry.id, { selected: false, installationOnly: true })));
     }
   }
   return selected;
@@ -749,6 +750,7 @@ function verifyProviders(context, repoRoot, selectedIds) {
     if (!module) continue;
     results.push(module.verify(providerContext(context, repoRoot, id, {
       selected: selectedIds.includes(id),
+      installationOnly: context.actionPlan.args.installationOnly === true || !selectedIds.includes(id),
     })));
   }
   return results;
@@ -778,7 +780,7 @@ function applySelectedProviders(context, repoRoot, selectedIds) {
   }
   for (const entry of context.effectiveRegistry.providers || []) {
     if (!selectedIds.includes(entry.id) && providers[entry.id]) {
-      results.push(providers[entry.id].verify(providerContext(context, repoRoot, entry.id, { selected: false })));
+      results.push(providers[entry.id].verify(providerContext(context, repoRoot, entry.id, { selected: false, installationOnly: true })));
     }
   }
   return results;

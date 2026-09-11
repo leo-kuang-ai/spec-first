@@ -26,6 +26,7 @@ function renderInstallPlan(plan = {}) {
     overall_status: plan.overall_status || (blocked ? 'action-required' : 'ready'),
     reason_code: plan.reason_code || null,
     mode: plan.mode || 'plan',
+    readiness_scope: plan.args && plan.args.installationOnly ? 'installation' : 'artifact',
     optional_provider_selection: normalizeOptionalProviderSelection(plan, selectedIds, blocked),
     provider_selection: providerSelection,
     planned_operations: plannedOperations,

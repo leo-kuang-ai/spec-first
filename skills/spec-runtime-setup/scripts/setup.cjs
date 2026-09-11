@@ -599,7 +599,9 @@ function runPlan(context, repoRoot) {
       ? '修复被阻止的 Provider 目标或路径，然后重新运行 plan。'
       : hostConfigBlock
         ? hostConfigBlock.next_action || '修复 Host 配置冲突，然后重新运行 plan。'
-      : '审查计划中的 mutation，然后使用相同选择且不带 --plan 重新运行。',
+      : context.actionPlan.args.installationOnly
+        ? '审查安装与接线计划后，使用 --installation-only 并保留相同 target、scope 和 repair 选项执行。'
+        : '审查计划中的 mutation，然后使用相同选择且不带 --plan 重新运行。',
   });
   return {
     exit_code: blockedEntry ? 2 : 0,
@@ -711,6 +713,7 @@ function buildInstallPreviewActions(context, repoRoot, providerPlans) {
 
 function hostConfigRepairCommand(context) {
   const args = ['spec-runtime-setup'];
+  if (context.actionPlan.args.installationOnly) args.push('--installation-only');
   if (context.actionPlan.selected_ids.length > 0) {
     args.push('--only', context.actionPlan.selected_ids.join(','));
   }

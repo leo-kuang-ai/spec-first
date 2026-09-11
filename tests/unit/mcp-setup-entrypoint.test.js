@@ -524,8 +524,9 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
 
     expect(result.payload.provider_readiness.find((entry) => entry.provider === 'codegraph'))
       .toMatchObject({
-        readiness_status: 'fresh',
-        lifecycle: { configured: true, query_verified: true },
+        readiness_scope: 'installation',
+        readiness_status: 'unknown',
+        lifecycle: { configured: true, query_verified: false },
       });
     expect(result.payload.mcp_servers.find((entry) => entry.id === 'codegraph')).toMatchObject({
       dependency_status: 'ready',
@@ -658,7 +659,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(result.payload).toMatchObject({
       execution_summary: {
         overall_status: 'action-required',
-        scope: 'full',
+        scope: 'installation',
         selected_ids: ['codegraph', 'graphify'],
         required_provider_ids: ['codegraph', 'graphify'],
       },
@@ -1749,7 +1750,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       });
   });
 
-  test('keeps an enclosing Git hook not applicable for a nested non-Git folder at the entrypoint', () => {
+  test('安装范围诊断不推断嵌套非 Git 目录的 enclosing hook 状态', () => {
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const parent = tempRepo('nested-folder-parent-hook');
     const folder = path.join(parent, 'vibops');
@@ -1780,12 +1781,13 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       target_root: folder,
       enclosing_git_root: parent,
     });
+    expect(graphify.readiness_scope).toBe('installation');
     expect(graphify.steady_state).toMatchObject({
-      refresh_mode: 'manual-only',
+      refresh_mode: 'skill-cli-hook-on-demand',
       hook_installed: false,
       hook_verified: false,
-      hook_status: 'skipped',
-      hook_skipped_reason: 'graphify-hook-not-applicable-non-git-folder',
+      hook_status: 'unknown',
+      hook_skipped_reason: null,
     });
   });
 
@@ -2046,6 +2048,68 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       .some(([, action]) => ['init', 'index', 'sync', 'extract', 'update', 'query'].includes(action))).toBe(false);
     for (const provider of result.payload.tool_facts.provider_readiness) {
       expect(provider).toMatchObject({ readiness_scope: 'installation', lifecycle: { installed: true, configured: true, query_verified: false, artifact_exists: false } });
+    }
+  });
+
+  test('默认 plan 不预览图生成，安装后默认 verify 不运行图 probe 或改写旧图', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const target = tempRepo('default-installation');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-default-home-'));
+    try {
+      const calls = [];
+      const context = { cwd: target, skillRoot, homeDir, env: { MCP_SETUP_HOST: 'qoder' }, bundledVersion: '1.13.2',
+        runner: (command, args, options) => {
+          calls.push([command, ...args]);
+          if (command === 'codegraph' && args[0] === '--version') return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
+          return fakeRunner(command, args, options);
+        },
+      };
+      const plan = runSetup({ ...context, argv: ['--plan'] });
+      expect(plan.exit_code).toBe(0);
+      expect(plan.payload.readiness_scope).toBe('installation');
+      expect(plan.payload.next_action).toContain('--installation-only');
+      const graphKinds = ['initialize-if-missing', 'verify-status', 'first-generation', 'verify-query', 'refresh', 'ensure-hook', 'migrate-artifact-root'];
+      expect(plan.payload.planned_operations.filter((entry) => graphKinds.includes(entry.kind))).toEqual([]);
+      expect(runSetup({ ...context, argv: ['--installation-only'] }).exit_code).toBe(0);
+      const graphRoot = path.join(target, 'graphify-out');
+      fs.mkdirSync(graphRoot);
+      fs.writeFileSync(path.join(graphRoot, 'graph.json'), 'existing-graph-bytes');
+      fs.writeFileSync(path.join(graphRoot, 'spec-first-graph-scope.json'), 'existing-receipt-bytes');
+      const before = snapshot(graphRoot);
+      calls.length = 0;
+      const verify = runSetup({ ...context, argv: ['--verify-only'] });
+      expect(verify.exit_code).toBe(0);
+      expect(verify.payload.execution_summary).toMatchObject({ overall_status: 'partial', scope: 'installation' });
+      expect(verify.payload.tool_facts.provider_readiness.every((entry) => entry.readiness_scope === 'installation')).toBe(true);
+      expect(calls.filter(([command]) => ['codegraph', 'graphify'].includes(path.basename(command)))
+        .some(([, action]) => ['init', 'index', 'sync', 'extract', 'update', 'query', 'status'].includes(action))).toBe(false);
+      expect(snapshot(graphRoot)).toEqual(before);
+      expect(fs.existsSync(path.join(target, '.codegraph'))).toBe(false);
+      const graphifyProvider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+      const verifySpy = jest.spyOn(graphifyProvider, 'verify');
+      try {
+        for (const argv of [[], ['--check'], ['--only', 'gh'], ['--verify-only', '--only', 'codegraph']]) {
+          calls.length = 0;
+          verifySpy.mockClear();
+          runSetup({ ...context, argv });
+          expect(verifySpy).toHaveBeenCalled();
+          expect(verifySpy.mock.calls.every(([providerContext]) => providerContext.installationOnly === true)).toBe(true);
+          expect(calls.filter(([command]) => path.basename(command) === 'graphify')
+            .some(([, action]) => ['extract', 'update', 'query'].includes(action))).toBe(false);
+          expect(snapshot(graphRoot)).toEqual(before);
+        }
+      } finally { verifySpy.mockRestore(); }
+      const configPath = path.join(target, '.qoder', 'settings.local.json');
+      const config = JSON.parse(fs.readFileSync(configPath));
+      config.mcpServers.context7.command = 'user-owned';
+      fs.writeFileSync(configPath, JSON.stringify(config));
+      const repairPlan = runSetup({ ...context, argv: ['--plan'] });
+      expect(repairPlan).toMatchObject({ exit_code: 2, reason_code: 'host-config-conflict' });
+      expect(repairPlan.payload.next_action).toContain('--installation-only');
+      expect(repairPlan.payload.next_action).toContain('--repair-host-config');
+    } finally {
+      fs.rmSync(target, { recursive: true, force: true });
+      fs.rmSync(homeDir, { recursive: true, force: true });
     }
   });
 

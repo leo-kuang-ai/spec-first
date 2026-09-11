@@ -13,11 +13,11 @@
 
 ## Setup Rules
 
-- Standard Runtime Setup includes CodeGraph and Graphify；`--only` narrows execution for advanced subset repair，不代表这些 Provider 在完整 setup 中可选。
+- 默认 setup 覆盖 CodeGraph/Graphify 安装与 host 接线；普通 plan/verify 使用 installation scope，显式 `--only <graph-id>` 才进入图产物路径。
 - 统一 registry 区分 `tools`、`helpers` 与 `providers`，同时集中管理 dependency pin、host target、platform override、install safety 与 artifact contract。
 - MCP tools must define deterministic install, host config, detection, summary, and uninstall metadata.
-- Package-backed setup paths normally request latest versions through `@latest`.
-- Warmup cache lives under `$HOME/.spec-first/cache/mcp-warmup/` unless `SPEC_FIRST_WARMUP_CACHE_DIR` overrides it.
+- always-required MCP 使用 registry 固定版本；可选 helper 仍可按已登记策略保留 latest，不能据此宣称所有依赖可复现。
+- Warmup cache 位于 target 的 `.spec-first/cache/mcp-warmup/<host>/<platform>/`；按实际 command hash 判断缓存命中。
 - `--verify-only` / `--refresh-facts` 会重新验证并刷新 setup-owned facts，但不执行安装或 host config 写入。
 - Supported host MCP config targets:
   - Claude Code: managed/user JSON `mcpServers`.

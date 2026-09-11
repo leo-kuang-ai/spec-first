@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-11 codex: fix(runtime-setup): 默认 plan/verify 采用 installation scope，显式图 verify 保留 facts-only 权限；repair 建议保留安装 scope，Graphify refresh 缺图时拒绝隐式首次构图。旧默认图验证请迁移至 --verify-only --only codegraph,graphify。(user-visible)
 - v1.15.3 2026-09-11 codex: refactor(runtime-setup): workspace build/clean/status 按显式 action 延迟加载，普通 bare/check 不加载高级图生命周期实现。
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): 接通 producer 与 doctor 的当前磁盘快照比对，registry/HEAD/target/host/platform/host config 变化立即失效，旧快照与不安全路径降为 unknown；Provider/receipt 联调仍在实施。
 - v1.15.3 2026-09-11 codex: fix(runtime-setup): normalizer 保留 setup source snapshot，供下游按 registry 与宿主身份审查 freshness。
