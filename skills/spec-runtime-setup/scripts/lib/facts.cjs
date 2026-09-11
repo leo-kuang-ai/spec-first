@@ -44,6 +44,14 @@ function collectSetupFacts(options = {}) {
   const configuredDependencies = (options.configuredDependencies || []).map(normalizeConfiguredDependency);
   const generatedAt = (options.now || new Date()).toISOString();
   const repoRoot = path.resolve(options.repoRoot || process.cwd());
+  const registrySnapshot = options.registry ? crypto.createHash('sha256').update(JSON.stringify(options.registry)).digest('hex') : null;
+  const sourceSnapshot = {
+    registry_sha256: registrySnapshot,
+    host: options.host || null,
+    platform: options.platform || null,
+    captured_at: generatedAt,
+    invalidation: ['registry-change', 'host-config-change', 'provider-identity-change'],
+  };
   const baselineReady = items
     .filter((item) => item.required && item.baseline_blocking)
     .every((item) => item.result === 'ready');
@@ -73,6 +81,7 @@ function collectSetupFacts(options = {}) {
       'provider-readiness-generic',
     ],
     target: options.target || null,
+    source_snapshot: sourceSnapshot,
     source: {
       repo_status: options.repoStatus || 'git-repo',
       authority_level: 'confirmed-local-state',
