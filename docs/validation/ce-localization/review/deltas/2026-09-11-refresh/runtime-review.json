@@ -2,7 +2,7 @@
   "schema_version": "ce-runtime-fresh-source-review-checkpoint.v1",
   "artifact_type": "advisory",
   "review_status": "incomplete-checkpoint",
-  "generated_at": "2026-09-11T16:34:32.849830+00:00",
+  "generated_at": "2026-09-11T16:43:18.902776+00:00",
   "scope_ref": "docs/validation/ce-localization/review/deltas/2026-09-11-refresh/runtime-scope.json",
   "scope_head": "9b3f37177412ad51293f118fe613243ba85d7fd0",
   "reviewer": {
@@ -20,12 +20,12 @@
   ],
   "summary": {
     "scope_file_count": 44,
-    "full_file_count": 12,
-    "partial_file_count": 2,
-    "unreviewed_file_count": 30,
+    "full_file_count": 22,
+    "partial_file_count": 0,
+    "unreviewed_file_count": 22,
     "all_files_reviewed": false,
     "closeout_admissible": false,
-    "reason": "主 agent 因 429 恢复安排要求停止新增读取并保存真实覆盖 checkpoint。"
+    "reason": "增量审查继续进行；新增 10 文件全文覆盖 checkpoint。"
   },
   "files": [
     {
@@ -48,30 +48,40 @@
       "sha256": "0a084752eeaae10fe6e6a0d70ee2e79b21ed2e20a928359b72b7a6acc095869f",
       "bytes": 3589,
       "line_count": 84,
-      "coverage_status": "unreviewed",
-      "reviewed_current_sha256_matches": null,
+      "coverage_status": "full",
+      "reviewed_current_sha256_matches": true,
       "current_sha256": "0a084752eeaae10fe6e6a0d70ee2e79b21ed2e20a928359b72b7a6acc095869f",
-      "covered_line_ranges": [],
+      "covered_line_ranges": [
+        [
+          1,
+          84
+        ]
+      ],
       "lens_notes": {
-        "openai-skill-engineering": "未审查。",
-        "anthropic-skill-craft-safety": "未审查。"
+        "openai-skill-engineering": "每项配置附真实 downstream consumer，local-only overrides 与 team source 分开；rendering 与 pulse/sweep 参数不变成 setup 自有流程。",
+        "anthropic-skill-craft-safety": "授权相关 sweep 值仅注释示例，禁止填 secrets/source bodies；setup 不替用户置 true 或用规划偏好跳过确认。"
       },
-      "verdict": "not-reviewed"
+      "verdict": "static-reviewed-with-limitations"
     },
     {
       "path": "skills/spec-runtime-setup/references/supported-mcp-tools.md",
       "sha256": "dad174f75eb08ca928ccab339d65f8e79ad5c52aaa2d507627e6de8250605f21",
       "bytes": 15924,
       "line_count": 124,
-      "coverage_status": "unreviewed",
-      "reviewed_current_sha256_matches": null,
+      "coverage_status": "full",
+      "reviewed_current_sha256_matches": true,
       "current_sha256": "dad174f75eb08ca928ccab339d65f8e79ad5c52aaa2d507627e6de8250605f21",
-      "covered_line_ranges": [],
+      "covered_line_ranges": [
+        [
+          1,
+          124
+        ]
+      ],
       "lens_notes": {
-        "openai-skill-engineering": "未审查。",
-        "anthropic-skill-craft-safety": "未审查。"
+        "openai-skill-engineering": "说明 registry 作为 machine source、runtime loaded-root 投影、安装 scope、verified top-level archive、cache identity 及 source-bound artifact evidence。",
+        "anthropic-skill-craft-safety": "明确传递依赖、MCP 会话、Windows 信号、同步 IO 和 field outcome 上限；verify 不把发布 facts 当造新图证据，发布失败非成功。"
       },
-      "verdict": "not-reviewed"
+      "verdict": "static-reviewed-with-limitations"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/args.cjs",
@@ -115,23 +125,23 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/facts.cjs",
-      "sha256": "a40a073a8b2e81ac321533b7c77d185bcbee3e23ed5634058c5601a8f9e3693d",
-      "bytes": 29628,
+      "sha256": "7218e2d00ff273568f420d58f963087b29a7bba8505bcbc2242c478f323be337",
+      "bytes": 29608,
       "line_count": 766,
-      "coverage_status": "partial",
+      "coverage_status": "full",
       "reviewed_current_sha256_matches": true,
-      "current_sha256": "a40a073a8b2e81ac321533b7c77d185bcbee3e23ed5634058c5601a8f9e3693d",
+      "current_sha256": "7218e2d00ff273568f420d58f963087b29a7bba8505bcbc2242c478f323be337",
       "covered_line_ranges": [
         [
           1,
-          520
+          766
         ]
       ],
       "lens_notes": {
-        "openai-skill-engineering": "已读范围中 normalizeItem/normalizeProviderResult 将未确认 ready/fresh 降级，区分安装、配置、项目和 provider 状态；剩余写入/快照逻辑尚未完成全文复核。",
-        "anthropic-skill-craft-safety": "已读 host ledger 入口存在 pi 枚举缺口（见 RUNTIME-001）；写 ledger 的 backupCaptured 避免未备份即回滚误删，但后半文件未审查。"
+        "openai-skill-engineering": "confirmed source 与 verified 共同控制 ready/fresh，required demand 与安装/配置分开；setup-owned snapshots、paired facts、host ledger 和 quarantine 均保留来源。",
+        "anthropic-skill-craft-safety": "Pi 集合已在当前源码补齐；写入失败返回 complete=false，备份恢复为 best effort，parent artifact quarantine 仅 advisory，不自动删除。"
       },
-      "verdict": "incomplete"
+      "verdict": "static-reviewed-with-limitations"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/host-authority.cjs",
@@ -158,20 +168,20 @@
       "sha256": "f24240fbcc0e2f09ad5590346b1822b9b3ee9512a5d6d27f3d177b1415269801",
       "bytes": 53901,
       "line_count": 1483,
-      "coverage_status": "partial",
+      "coverage_status": "full",
       "reviewed_current_sha256_matches": true,
       "current_sha256": "f24240fbcc0e2f09ad5590346b1822b9b3ee9512a5d6d27f3d177b1415269801",
       "covered_line_ranges": [
         [
-          361,
-          760
+          1,
+          1483
         ]
       ],
       "lens_notes": {
-        "openai-skill-engineering": "已读范围覆盖 target 返回、JSON/TOML 比较、精确 drift 和 precedence inspection；authority、锁与 mutation/rollback 前后文仍待读。",
-        "anthropic-skill-craft-safety": "已读部分拒绝明文 secret 字段、未知 JSON 结构以及高优先级冲突/不可读配置；不足以认定完整写入或回滚边界通过。"
+        "openai-skill-engineering": "集中 target/precedence/JSON-TOML 比较与 mutation owner，支持 host shape；锁内复查、临时文件、post-write verify 和 exact uninstall 防止未知 entry 被误删。",
+        "anthropic-skill-craft-safety": "loaded-root receipt 绑定 target；明文 secret 拒绝、symlink containment、token-owned 锁、stale lock quarantine 和恢复备份保留；Windows retry 为代码路径而非现场通过。"
       },
-      "verdict": "incomplete"
+      "verdict": "static-reviewed-with-limitations"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/installation-executor.cjs",
@@ -278,45 +288,60 @@
       "sha256": "f7bc6cc0249831c329c756025d58bf48a62e8ba2444e069491c8bc9c2a4e6189",
       "bytes": 25608,
       "line_count": 703,
-      "coverage_status": "unreviewed",
-      "reviewed_current_sha256_matches": null,
+      "coverage_status": "full",
+      "reviewed_current_sha256_matches": true,
       "current_sha256": "f7bc6cc0249831c329c756025d58bf48a62e8ba2444e069491c8bc9c2a4e6189",
-      "covered_line_ranges": [],
+      "covered_line_ranges": [
+        [
+          1,
+          703
+        ]
+      ],
       "lens_notes": {
-        "openai-skill-engineering": "未审查。",
-        "anthropic-skill-craft-safety": "未审查。"
+        "openai-skill-engineering": "registry v11 将 host/platform 分层 merge 与 exact IDs 纳入确定性 floor；v10 兼容读取，v11 要求 readiness policy 和 host override 覆盖。",
+        "anthropic-skill-craft-safety": "null、未知 host/target、重复 ID、越 host permission policy fail closed；自有 schema validator 只实现部分 JSON Schema 关键词，不能当作完整标准 validator。"
       },
-      "verdict": "not-reviewed"
+      "verdict": "static-reviewed-with-limitations"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/renderer.cjs",
       "sha256": "eb2d78c7b58ee08db9f47ee118aae91d82aeb96f849aa3e760c583693fdcc91b",
       "bytes": 14447,
       "line_count": 327,
-      "coverage_status": "unreviewed",
-      "reviewed_current_sha256_matches": null,
+      "coverage_status": "full",
+      "reviewed_current_sha256_matches": true,
       "current_sha256": "eb2d78c7b58ee08db9f47ee118aae91d82aeb96f849aa3e760c583693fdcc91b",
-      "covered_line_ranges": [],
+      "covered_line_ranges": [
+        [
+          1,
+          327
+        ]
+      ],
       "lens_notes": {
-        "openai-skill-engineering": "未审查。",
-        "anthropic-skill-craft-safety": "未审查。"
+        "openai-skill-engineering": "只投影 action plan/safety/readiness；selected subset、installation、artifact、query/currentness 分开，动作 reason 与 safety reason 保留。",
+        "anthropic-skill-craft-safety": "plan mutation=false；hook structure verified 与 external execution unverified 明示。显示安全分类依赖 registry facts，不能替代用户授权或执行证据。"
       },
-      "verdict": "not-reviewed"
+      "verdict": "static-reviewed-with-limitations"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
       "sha256": "d47d5dd56992ee721ed83274d5de35e0fde24b302be698b197b46274a3a9a130",
       "bytes": 37699,
       "line_count": 956,
-      "coverage_status": "unreviewed",
-      "reviewed_current_sha256_matches": null,
+      "coverage_status": "full",
+      "reviewed_current_sha256_matches": true,
       "current_sha256": "d47d5dd56992ee721ed83274d5de35e0fde24b302be698b197b46274a3a9a130",
-      "covered_line_ranges": [],
+      "covered_line_ranges": [
+        [
+          1,
+          956
+        ]
+      ],
       "lens_notes": {
-        "openai-skill-engineering": "未审查。",
-        "anthropic-skill-craft-safety": "未审查。"
+        "openai-skill-engineering": "Provider plan 在 baseline/host/facts mutation 前预检，安装 owner 去重、只对 selected scope apply；最终 facts 二次写结果决定完成，scenario 生成失败独立 advisory。",
+        "anthropic-skill-craft-safety": "host config 权限/precedence/repair 与 capability map 分离；provider 身份失败不被配置成功覆盖。runtimeStatePath 遗漏 Pi 已上报 RUNTIME-002；其余静态流程不证明真实宿主。"
       },
-      "verdict": "not-reviewed"
+      "verdict": "static-reviewed-with-limitations"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/source-snapshot.cjs",
@@ -363,30 +388,40 @@
       "sha256": "3f4ea2b448432f750b9a5a76e2a0095a155a57427899adb2ccfe06a8a5c07b97",
       "bytes": 23445,
       "line_count": 615,
-      "coverage_status": "unreviewed",
-      "reviewed_current_sha256_matches": null,
+      "coverage_status": "full",
+      "reviewed_current_sha256_matches": true,
       "current_sha256": "3f4ea2b448432f750b9a5a76e2a0095a155a57427899adb2ccfe06a8a5c07b97",
-      "covered_line_ranges": [],
+      "covered_line_ranges": [
+        [
+          1,
+          615
+        ]
+      ],
       "lens_notes": {
-        "openai-skill-engineering": "未审查。",
-        "anthropic-skill-craft-safety": "未审查。"
+        "openai-skill-engineering": "复用 provider runners，按 repo 隔离失败并合并 artifact；source before/after、receipt、final state 构成确定性事实，不评判图语义。",
+        "anthropic-skill-craft-safety": "staging/promote 身份检查、备份/quarantine 回滚、cleanup pending 降为 partial；execution guard 阻断后续 provider。原位 sync 没有 init 的整库回滚保证。"
       },
-      "verdict": "not-reviewed"
+      "verdict": "static-reviewed-with-limitations"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-executor.cjs",
       "sha256": "bd37b82bb0a8e6d9994cbe2c3c520db50b94c78633bad7714c633af0af989874",
       "bytes": 16237,
       "line_count": 472,
-      "coverage_status": "unreviewed",
-      "reviewed_current_sha256_matches": null,
+      "coverage_status": "full",
+      "reviewed_current_sha256_matches": true,
       "current_sha256": "bd37b82bb0a8e6d9994cbe2c3c520db50b94c78633bad7714c633af0af989874",
-      "covered_line_ranges": [],
+      "covered_line_ranges": [
+        [
+          1,
+          472
+        ]
+      ],
       "lens_notes": {
-        "openai-skill-engineering": "未审查。",
-        "anthropic-skill-craft-safety": "未审查。"
+        "openai-skill-engineering": "confirmed targets、maxRepos/共享时间预算、lease owner、构图/路由/hook/state 顺序明确；末次写入后再次检查取消/超时并修正 complete。",
+        "anthropic-skill-craft-safety": "不构建待确认候选；refresh 需 credential/absolute launchers/baseline。取消后的纠正写失败保留 lease，不能把内存 partial 当已落盘。"
       },
-      "verdict": "not-reviewed"
+      "verdict": "static-reviewed-with-limitations"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs",
@@ -463,15 +498,20 @@
       "sha256": "52d7201af9dc6b17ec5b43cf8ff5f008f2b55b9870a25d3b15d1a76ee3f7d315",
       "bytes": 18379,
       "line_count": 813,
-      "coverage_status": "unreviewed",
-      "reviewed_current_sha256_matches": null,
+      "coverage_status": "full",
+      "reviewed_current_sha256_matches": true,
       "current_sha256": "52d7201af9dc6b17ec5b43cf8ff5f008f2b55b9870a25d3b15d1a76ee3f7d315",
-      "covered_line_ranges": [],
+      "covered_line_ranges": [
+        [
+          1,
+          813
+        ]
+      ],
       "lens_notes": {
-        "openai-skill-engineering": "未审查。",
-        "anthropic-skill-craft-safety": "未审查。"
+        "openai-skill-engineering": "v11 定义八 host、四 platform、entry/readiness/dependency/artifact 核心 shape；额外 entry fields 保持轻合同，不编码任务语义。",
+        "anthropic-skill-craft-safety": "environment secret 字段不是值证明；PyPI wheel/hash/installer policy 有声明但须由实际 resolver 约束。自有 validator 对 if/then/maxItems/prefixItems 的执行能力需独立注意。"
       },
-      "verdict": "not-reviewed"
+      "verdict": "static-reviewed-with-limitations"
     },
     {
       "path": "skills/spec-runtime-setup/SKILL.md",
@@ -763,7 +803,7 @@
     {
       "id": "RUNTIME-001",
       "severity": "P1",
-      "status": "owner-confirmation-required",
+      "status": "source-fixed-static-confirmed",
       "path": "skills/spec-runtime-setup/scripts/lib/facts.cjs",
       "line": 23,
       "related_lines": [
@@ -775,7 +815,20 @@
       "impact": "调用 Pi 的 ledger 准备入口会被静态 guard 拒绝；整体 setup 调用链尚待 owner 复核，不能据此声称已真实复现 Pi runtime。",
       "suggestion": "复用 host-authority 的 canonical host source，补所有已支持 host 的 ledger 范围回归。",
       "validation": "static-source-only；错误尝试调用未导出的 resolveHostReadinessLedgerPath 得到 is not a function，不能作为本 finding 的运行复现。",
-      "reported_to_parent": true
+      "reported_to_parent": true,
+      "resolution": "Pi 已加入 facts CANONICAL_HOSTS，已全文读取修后 source；测试由主 agent 执行。"
+    },
+    {
+      "id": "RUNTIME-002",
+      "severity": "P2",
+      "status": "owner-confirmation-required",
+      "path": "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
+      "line": 908,
+      "title": "Pi runtime state 路径映射遗漏",
+      "evidence": "runtimeStatePath roots 只到 zcode，Pi statePath 为 null；computeGeneratedRuntimeManifestHealth 因此返回 unknown / missing-host-or-target-root。",
+      "suggestion": "以 Pi adapter source 确认 state 路径并补枚举回归。",
+      "reported_to_parent": true,
+      "validation": "static-source-only"
     }
   ],
   "observations": [
