@@ -96,7 +96,7 @@ function plan(context = {}) {
   }
   if (!context.installationOnly) actions.push(
     { kind: 'initialize-if-missing', command: 'codegraph', args: ['init'] },
-    { kind: 'verify-status', command: 'codegraph', args: ['status'] },
+    { kind: 'verify-status', command: 'codegraph', args: ['status', '--json'] },
     {
       kind: 'verify-query',
       command: 'codegraph',
@@ -185,13 +185,10 @@ function verifyReadiness(context = {}) {
   const artifactPath = path.join(repoRoot, '.codegraph', 'codegraph.db');
   const hasArtifact = fs.existsSync(artifactPath);
   const statusResult = installed && hasArtifact
-    ? run(context, 'codegraph', ['status'], { cwd: repoRoot })
+    ? run(context, 'codegraph', ['status', '--json'], { cwd: repoRoot })
     : null;
-  const statusOutput = statusResult ? text(statusResult) : '';
-  const indexed = Boolean(statusResult
-    && succeeded(statusResult)
-    && !statusNeedsSync(statusOutput)
-    && !statusNeedsReindex(statusOutput));
+  const status = readStatusFacts(statusResult, repoRoot, context.dependency && context.dependency.version);
+  const indexed = status.ready;
   const queryResult = indexed
     ? run(context, 'codegraph', ['query', '__spec_first_readiness_probe__', '--limit', '1', '--json'], {
       cwd: repoRoot,
@@ -289,9 +286,9 @@ function applyActions(context, actionPlan, installations) {
     if (!succeeded(initResult)) return degraded(context, repoRoot, 'codegraph-init-failed');
   }
 
-  let statusResult = run(context, 'codegraph', ['status'], { cwd: repoRoot });
-  let statusText = text(statusResult);
-  if (succeeded(statusResult) && statusNeedsSync(statusText)) {
+  let statusResult = run(context, 'codegraph', ['status', '--json'], { cwd: repoRoot });
+  let status = readStatusFacts(statusResult, repoRoot, actionPlan.dependency_version);
+  if (status.needsSync) {
     const syncResult = run(context, 'codegraph', ['sync'], { cwd: repoRoot, timeoutMs: 120000 });
     if (!succeeded(syncResult)) {
       const reasonCode = /maximum call stack size exceeded/i.test(text(syncResult))
@@ -299,21 +296,19 @@ function applyActions(context, actionPlan, installations) {
         : 'codegraph-sync-failed';
       return degraded(context, repoRoot, reasonCode);
     }
-    statusResult = run(context, 'codegraph', ['status'], { cwd: repoRoot });
-    statusText = text(statusResult);
+    statusResult = run(context, 'codegraph', ['status', '--json'], { cwd: repoRoot });
+    status = readStatusFacts(statusResult, repoRoot, actionPlan.dependency_version);
   }
-  if (succeeded(statusResult) && statusNeedsSync(statusText)) {
+  if (status.needsSync) {
     return degraded(context, repoRoot, 'codegraph-sync-incomplete');
   }
-  if (succeeded(statusResult) && statusNeedsReindex(statusText)) {
+  if (status.needsReindex) {
     const indexResult = run(context, 'codegraph', ['index', '-f'], { cwd: repoRoot, timeoutMs: 120000 });
     if (!succeeded(indexResult)) return degraded(context, repoRoot, 'codegraph-reindex-failed');
-    statusResult = run(context, 'codegraph', ['status'], { cwd: repoRoot });
-    statusText = text(statusResult);
+    statusResult = run(context, 'codegraph', ['status', '--json'], { cwd: repoRoot });
+    status = readStatusFacts(statusResult, repoRoot, actionPlan.dependency_version);
   }
-  if (!succeeded(statusResult)
-    || statusNeedsSync(statusText)
-    || statusNeedsReindex(statusText)
+  if (!status.ready
     || !fs.existsSync(artifactPath)) {
     return degraded(context, repoRoot, 'codegraph-post-mutation-probe-failed');
   }
@@ -511,12 +506,30 @@ function commandFromSearchPath(command, searchPath, windows, env = {}) {
   return null;
 }
 
-function statusNeedsSync(output) {
-  return /pending changes|run\s+codegraph\s+sync/i.test(String(output || ''));
-}
-
-function statusNeedsReindex(output) {
-  return /full rebuild|index\s+-f/i.test(String(output || ''));
+function readStatusFacts(result, repoRoot, expectedVersion) {
+  const unavailable = { ready: false, needsSync: false, needsReindex: false };
+  if (!result || !succeeded(result)) return unavailable;
+  let payload;
+  try { payload = JSON.parse(result.stdout); } catch (_error) { return unavailable; }
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)
+    || payload.initialized !== true
+    || typeof payload.version !== 'string'
+    || (expectedVersion && payload.version !== expectedVersion)
+    || typeof payload.projectPath !== 'string' || !path.isAbsolute(payload.projectPath)
+    || path.resolve(payload.projectPath) !== repoRoot
+    || typeof payload.indexPath !== 'string' || !path.isAbsolute(payload.indexPath)
+    || path.resolve(payload.indexPath) !== path.join(repoRoot, '.codegraph')
+    || payload.worktreeMismatch !== null) return unavailable;
+  const pending = payload.pendingChanges;
+  const index = payload.index;
+  if (!pending || !index || Array.isArray(pending) || Array.isArray(index)
+    || !['added', 'modified', 'removed'].every((key) => Number.isSafeInteger(pending[key]) && pending[key] >= 0)
+    || !Number.isSafeInteger(index.pendingRefs) || index.pendingRefs < 0
+    || typeof index.reindexRecommended !== 'boolean'
+    || ![null, 'complete', 'partial', 'indexing', 'failed'].includes(index.state)) return unavailable;
+  const needsSync = pending.added > 0 || pending.modified > 0 || pending.removed > 0 || index.pendingRefs > 0;
+  const needsReindex = index.reindexRecommended || index.state !== 'complete';
+  return { ready: !needsSync && !needsReindex, needsSync, needsReindex };
 }
 
 module.exports = {

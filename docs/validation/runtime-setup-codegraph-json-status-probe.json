@@ -1,0 +1,304 @@
+{
+  "scope": "已安装 CodeGraph 1.6.0 / macOS arm64，隔离 folder/HOME/XDG/TMPDIR，禁用 telemetry/watcher；无安装、无宿主接线",
+  "source_sha256": "291ff5af101457388896d8aae2c38b196dde46d91559e0fd3a140bec961c4916",
+  "fault": "在一次性 SQLite 中删除 index_state marker，真实 status 确认为 null 后执行 apply 恢复",
+  "calls": [
+    {
+      "command": "codegraph",
+      "args": [
+        "init"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "┌  Initializing CodeGraph\n│\n◆  Initialized in <fixture>/project\n│\nScanning files...\nParsing code...\nResolving refs...\nLinking dynamic dispatch...\n│\n◆  Indexed 1 files\n│\n●  2 nodes, 1 edges in 153ms\n│\n▲  Live file watching is disabled here — CODEGRAPH_NO_WATCH=1 is set.\n│\n●  Until you re-sync, the CodeGraph index stays frozen — it will not pick up edits on its own.\n│\n●  Run `codegraph sync` after changing files to refresh the index.\n│\n└  Done\n\n",
+      "stderr": ""
+    },
+    {
+      "command": "codegraph",
+      "args": [
+        "status",
+        "--json"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "{\"initialized\":true,\"version\":\"1.6.0\",\"projectPath\":\"<fixture>/project\",\"indexPath\":\"<fixture>/project/.codegraph\",\"lastIndexed\":\"2026-09-11T10:08:08.280Z\",\"fileCount\":1,\"nodeCount\":2,\"edgeCount\":1,\"dbSizeBytes\":163840,\"walSizeBytes\":0,\"backend\":\"node-sqlite\",\"journalMode\":\"wal\",\"nodesByKind\":{\"file\":1,\"function\":1},\"languages\":[\"javascript\"],\"pendingChanges\":{\"added\":0,\"modified\":0,\"removed\":0},\"worktreeMismatch\":null,\"index\":{\"builtWithVersion\":\"1.6.0\",\"builtWithExtractionVersion\":25,\"currentExtractionVersion\":25,\"reindexRecommended\":false,\"state\":\"complete\",\"pendingRefs\":0}}\n",
+      "stderr": ""
+    },
+    {
+      "command": "codegraph",
+      "args": [
+        "--version"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "1.6.0\n",
+      "stderr": ""
+    },
+    {
+      "command": "codegraph",
+      "args": [
+        "query",
+        "__spec_first_readiness_probe__",
+        "--limit",
+        "1",
+        "--json"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "[]\n",
+      "stderr": ""
+    },
+    {
+      "command": "/opt/homebrew/lib/node_modules/@colbymchenry/codegraph/node_modules/@colbymchenry/codegraph-darwin-arm64/bin/codegraph",
+      "args": [
+        "--version"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "1.6.0\n",
+      "stderr": ""
+    },
+    {
+      "command": "/usr/bin/python3",
+      "args": [
+        "-c",
+        "import sqlite3,sys\nc=sqlite3.connect(sys.argv[1])\nc.execute(\"DELETE FROM project_metadata WHERE key = ?\", (\"index_state\",))\nc.commit()\nc.close()",
+        "<fixture>/project/.codegraph/codegraph.db"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "codegraph",
+      "args": [
+        "status",
+        "--json"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "{\"initialized\":true,\"version\":\"1.6.0\",\"projectPath\":\"<fixture>/project\",\"indexPath\":\"<fixture>/project/.codegraph\",\"lastIndexed\":\"2026-09-11T10:08:08.280Z\",\"fileCount\":1,\"nodeCount\":2,\"edgeCount\":1,\"dbSizeBytes\":163840,\"walSizeBytes\":0,\"backend\":\"node-sqlite\",\"journalMode\":\"wal\",\"nodesByKind\":{\"file\":1,\"function\":1},\"languages\":[\"javascript\"],\"pendingChanges\":{\"added\":0,\"modified\":0,\"removed\":0},\"worktreeMismatch\":null,\"index\":{\"builtWithVersion\":\"1.6.0\",\"builtWithExtractionVersion\":25,\"currentExtractionVersion\":25,\"reindexRecommended\":false,\"state\":null,\"pendingRefs\":0}}\n",
+      "stderr": ""
+    },
+    {
+      "command": "codegraph",
+      "args": [
+        "status",
+        "--json"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "{\"initialized\":true,\"version\":\"1.6.0\",\"projectPath\":\"<fixture>/project\",\"indexPath\":\"<fixture>/project/.codegraph\",\"lastIndexed\":\"2026-09-11T10:08:08.280Z\",\"fileCount\":1,\"nodeCount\":2,\"edgeCount\":1,\"dbSizeBytes\":163840,\"walSizeBytes\":0,\"backend\":\"node-sqlite\",\"journalMode\":\"wal\",\"nodesByKind\":{\"file\":1,\"function\":1},\"languages\":[\"javascript\"],\"pendingChanges\":{\"added\":0,\"modified\":0,\"removed\":0},\"worktreeMismatch\":null,\"index\":{\"builtWithVersion\":\"1.6.0\",\"builtWithExtractionVersion\":25,\"currentExtractionVersion\":25,\"reindexRecommended\":false,\"state\":null,\"pendingRefs\":0}}\n",
+      "stderr": ""
+    },
+    {
+      "command": "codegraph",
+      "args": [
+        "index",
+        "-f"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "┌  Indexing project\n│\nScanning files...\nParsing code...\nResolving refs...\nLinking dynamic dispatch...\n│\n◆  Indexed 1 files\n│\n●  2 nodes, 1 edges in 94ms\n│\n└  Done\n\n",
+      "stderr": ""
+    },
+    {
+      "command": "codegraph",
+      "args": [
+        "status",
+        "--json"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "{\"initialized\":true,\"version\":\"1.6.0\",\"projectPath\":\"<fixture>/project\",\"indexPath\":\"<fixture>/project/.codegraph\",\"lastIndexed\":\"2026-09-11T10:08:09.543Z\",\"fileCount\":1,\"nodeCount\":2,\"edgeCount\":1,\"dbSizeBytes\":163840,\"walSizeBytes\":0,\"backend\":\"node-sqlite\",\"journalMode\":\"wal\",\"nodesByKind\":{\"file\":1,\"function\":1},\"languages\":[\"javascript\"],\"pendingChanges\":{\"added\":0,\"modified\":0,\"removed\":0},\"worktreeMismatch\":null,\"index\":{\"builtWithVersion\":\"1.6.0\",\"builtWithExtractionVersion\":25,\"currentExtractionVersion\":25,\"reindexRecommended\":false,\"state\":\"complete\",\"pendingRefs\":0}}\n",
+      "stderr": ""
+    },
+    {
+      "command": "codegraph",
+      "args": [
+        "--version"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "1.6.0\n",
+      "stderr": ""
+    },
+    {
+      "command": "codegraph",
+      "args": [
+        "query",
+        "__spec_first_readiness_probe__",
+        "--limit",
+        "1",
+        "--json"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "[]\n",
+      "stderr": ""
+    },
+    {
+      "command": "/opt/homebrew/lib/node_modules/@colbymchenry/codegraph/node_modules/@colbymchenry/codegraph-darwin-arm64/bin/codegraph",
+      "args": [
+        "--version"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "1.6.0\n",
+      "stderr": ""
+    }
+  ],
+  "initial_readiness": {
+    "schema_version": "provider-readiness.v2",
+    "readiness_scope": "artifact",
+    "provider": "codegraph",
+    "kind": "code-structure",
+    "profile": "minimal",
+    "readiness_status": "unknown",
+    "lifecycle": {
+      "installed": true,
+      "configured": false,
+      "initialized": true,
+      "indexed": true,
+      "server_reachable": false,
+      "artifact_exists": true,
+      "query_verified": true,
+      "fallback_used": false
+    },
+    "repo_aligned": "unknown",
+    "capabilities": [
+      "code-graph",
+      "impact-candidates",
+      "affected-tests-candidates"
+    ],
+    "limitations": [
+      "Provider candidate 仅为 advisory，必须通过 source、test、log、contract 或 owner evidence 确认。"
+    ],
+    "source_read_required": true,
+    "fallback": {
+      "available": true,
+      "methods": [
+        "rg",
+        "ast-grep",
+        "direct-source-read"
+      ],
+      "reason_code": "code-graph-provider-unavailable"
+    },
+    "next_actions": [
+      "通过当前 host 的 spec-runtime-setup --verify-only 确认 CodeGraph MCP 配置。"
+    ],
+    "native_interfaces": [
+      "mcp",
+      "cli"
+    ],
+    "first_generation": {
+      "owner": "runtime-setup",
+      "status": "completed",
+      "scope": "project",
+      "requires_explicit_gate": false,
+      "requirement_workspace_path": null,
+      "artifact_root": ".codegraph",
+      "artifact_refs": [
+        ".codegraph/codegraph.db"
+      ],
+      "next_action": null
+    },
+    "steady_state": {
+      "refresh_owner": "provider-native",
+      "refresh_mode": "watcher",
+      "hook_default": false,
+      "usage_owner": "downstream-skill",
+      "hook_installed": false,
+      "hook_verified": false,
+      "hook_status": "unknown",
+      "hook_skipped_reason": null
+    },
+    "usage_note": "使用 CodeGraph MCP 工具获取 impact/call graph candidate。`codegraph serve --mcp` 只为 server 默认项目提供 provider-native watcher；从非 Git parent 打开的其他 `projectPath` 子仓由 spec-first workspace hook 执行 bounded `codegraph sync`。结论需由 source/test/log/contract/user evidence 确认。",
+    "provider_identity": {
+      "package": "@colbymchenry/codegraph",
+      "version": "1.6.0",
+      "installer": "npm",
+      "command": "/opt/homebrew/lib/node_modules/@colbymchenry/codegraph/node_modules/@colbymchenry/codegraph-darwin-arm64/bin/codegraph",
+      "inventory_sha256": "84c58510e0a199d13a0476d15949d0a8ade7dee8b82de0b4010c6811ef9bd4d0"
+    }
+  },
+  "repaired_readiness": {
+    "schema_version": "provider-readiness.v2",
+    "readiness_scope": "artifact",
+    "provider": "codegraph",
+    "kind": "code-structure",
+    "profile": "minimal",
+    "readiness_status": "unknown",
+    "lifecycle": {
+      "installed": true,
+      "configured": false,
+      "initialized": true,
+      "indexed": true,
+      "server_reachable": false,
+      "artifact_exists": true,
+      "query_verified": true,
+      "fallback_used": false
+    },
+    "repo_aligned": "unknown",
+    "capabilities": [
+      "code-graph",
+      "impact-candidates",
+      "affected-tests-candidates"
+    ],
+    "limitations": [
+      "Provider candidate 仅为 advisory，必须通过 source、test、log、contract 或 owner evidence 确认。"
+    ],
+    "source_read_required": true,
+    "fallback": {
+      "available": true,
+      "methods": [
+        "rg",
+        "ast-grep",
+        "direct-source-read"
+      ],
+      "reason_code": "code-graph-provider-unavailable"
+    },
+    "next_actions": [
+      "通过当前 host 的 spec-runtime-setup --verify-only 确认 CodeGraph MCP 配置。"
+    ],
+    "native_interfaces": [
+      "mcp",
+      "cli"
+    ],
+    "first_generation": {
+      "owner": "runtime-setup",
+      "status": "completed",
+      "scope": "project",
+      "requires_explicit_gate": false,
+      "requirement_workspace_path": null,
+      "artifact_root": ".codegraph",
+      "artifact_refs": [
+        ".codegraph/codegraph.db"
+      ],
+      "next_action": null
+    },
+    "steady_state": {
+      "refresh_owner": "provider-native",
+      "refresh_mode": "watcher",
+      "hook_default": false,
+      "usage_owner": "downstream-skill",
+      "hook_installed": false,
+      "hook_verified": false,
+      "hook_status": "unknown",
+      "hook_skipped_reason": null
+    },
+    "usage_note": "使用 CodeGraph MCP 工具获取 impact/call graph candidate。`codegraph serve --mcp` 只为 server 默认项目提供 provider-native watcher；从非 Git parent 打开的其他 `projectPath` 子仓由 spec-first workspace hook 执行 bounded `codegraph sync`。结论需由 source/test/log/contract/user evidence 确认。",
+    "provider_identity": {
+      "package": "@colbymchenry/codegraph",
+      "version": "1.6.0",
+      "installer": "npm",
+      "command": "/opt/homebrew/lib/node_modules/@colbymchenry/codegraph/node_modules/@colbymchenry/codegraph-darwin-arm64/bin/codegraph",
+      "inventory_sha256": "84c58510e0a199d13a0476d15949d0a8ade7dee8b82de0b4010c6811ef9bd4d0"
+    }
+  },
+  "limitations": [
+    "不是只读验证证据；apply 允许创建、重建和查询索引。",
+    "未验证实际 MCP server 或真实 Windows；configured/server_reachable 保持 false。"
+  ]
+}

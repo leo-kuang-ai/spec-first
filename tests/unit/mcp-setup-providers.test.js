@@ -6,6 +6,8 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const { validateAgainstSchema } = require('../../src/contracts/schema-validator');
 
+const codegraphStatus = require('../fixtures/mcp-setup/codegraph-status.cjs');
+
 const repoRoot = path.resolve(__dirname, '..', '..');
 const providerSchema = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs', 'contracts', 'provider-readiness.schema.json'), 'utf8'));
 
@@ -225,7 +227,7 @@ describe('CodeGraph provider', () => {
         fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
         return success();
       }
-      if (args[0] === 'status') return success('index ready');
+      if (args[0] === 'status') return success(codegraphStatus(target));
       if (args[0] === 'query') return success('{}');
       return failure(`unexpected ${command} ${args.join(' ')}`);
     };
@@ -311,9 +313,9 @@ describe('CodeGraph provider', () => {
       }
       if (args[0] === 'status') {
         statusCount += 1;
-        if (statusCount === 1) return success('pending changes; run codegraph sync');
-        if (statusCount === 2) return success('full rebuild recommended; run codegraph index -f');
-        return success('index ready');
+        if (statusCount === 1) return success(codegraphStatus(target, { pendingChanges: { added: 1, modified: 0, removed: 0 } }));
+        if (statusCount === 2) return success(codegraphStatus(target, { index: { state: 'complete', pendingRefs: 0, reindexRecommended: true } }));
+        return success(codegraphStatus(target));
       }
       return success();
     };
@@ -355,7 +357,7 @@ describe('CodeGraph provider', () => {
         fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
         return success();
       }
-      if (args[0] === 'status') return success('pending changes; run codegraph sync');
+      if (args[0] === 'status') return success(codegraphStatus(target, { pendingChanges: { added: 1, modified: 0, removed: 0 } }));
       if (args[0] === 'sync') return { ...failure(''), stdout: 'Maximum call stack size exceeded' };
       return success();
     };
@@ -387,7 +389,7 @@ describe('CodeGraph provider', () => {
     fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
     const runner = (_command, args) => {
       if (args[0] === '--version') return success('codegraph 1.6.0');
-      if (args[0] === 'status') return success('index ready');
+      if (args[0] === 'status') return success(codegraphStatus(target));
       if (args[0] === 'query') return success('{}');
       return success();
     };
@@ -437,7 +439,7 @@ describe('CodeGraph provider', () => {
     fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
     const runner = (_command, args) => {
       if (args[0] === '--version') return success('codegraph 1.6.0');
-      if (args[0] === 'status') return success('pending changes; run codegraph sync');
+      if (args[0] === 'status') return success(codegraphStatus(target, { pendingChanges: { added: 1, modified: 0, removed: 0 } }));
       return success();
     };
 
@@ -462,7 +464,7 @@ describe('CodeGraph provider', () => {
     fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
     const runner = (_command, args) => {
       if (args[0] === '--version') return success('codegraph 1.6.0');
-      if (args[0] === 'status') return success('index ready');
+      if (args[0] === 'status') return success(codegraphStatus(target));
       if (args[0] === 'query') return failure('query failed');
       return success();
     };
@@ -514,8 +516,72 @@ describe('CodeGraph provider', () => {
   });
 
   test.each([
-    ['pending changes remain after sync', 'pending changes; run codegraph sync', 'codegraph-sync-incomplete'],
-    ['full rebuild remains after reindex', 'full rebuild recommended; run codegraph index -f', 'codegraph-post-mutation-probe-failed'],
+    ['partial', { index: { state: 'partial', pendingRefs: 0, reindexRecommended: false } }],
+    ['indexing', { index: { state: 'indexing', pendingRefs: 0, reindexRecommended: false } }],
+    ['failed', { index: { state: 'failed', pendingRefs: 0, reindexRecommended: false } }],
+    ['missing-state', { index: { pendingRefs: 0, reindexRecommended: false } }],
+    ['pending-refs', { index: { state: 'complete', pendingRefs: 2, reindexRecommended: false } }],
+    ['pending-files', { pendingChanges: { added: 1, modified: 0, removed: 0 } }],
+    ['worktree-mismatch', { worktreeMismatch: { worktreeRoot: '/other', indexRoot: '/old' } }],
+    ['wrong-root', { projectPath: '/other' }],
+    ['missing-pending', { pendingChanges: null }],
+  ])('CodeGraph JSON %s 不能仅因退出 0 成为 indexed 或执行 query', (_label, overrides) => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
+    const target = tempRepo('codegraph-json');
+    try {
+      fs.mkdirSync(path.join(target, '.codegraph')); fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
+      const runner = jest.fn((_command, args) => success(args[0] === '--version' ? 'codegraph 1.6.0' : codegraphStatus(target, overrides)));
+      const context = { repoRoot: target, env: {}, runner, configured: true, dependency: { version: '1.6.0' } };
+      const result = provider.apply(context, { mutation: true, dependency_version: '1.6.0', actions: [] });
+      expect(result.readiness_status).toBe('degraded');
+      expect(result.lifecycle.indexed).toBe(false);
+      expect(runner.mock.calls.some(([, args]) => args[0] === 'query')).toBe(false);
+    } finally {
+      fs.rmSync(target, { recursive: true, force: true });
+    }
+  });
+
+  test.each(['index ready', '{}', '{broken', 'null'])('CodeGraph 未识别 status %s 不执行 query', (output) => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
+    const target = tempRepo('codegraph-unrecognized-status');
+    try {
+      fs.mkdirSync(path.join(target, '.codegraph')); fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
+      const runner = jest.fn((_command, args) => success(args[0] === '--version' ? 'codegraph 1.6.0' : output));
+      const result = provider.apply({ repoRoot: target, env: {}, runner }, { mutation: true, dependency_version: '1.6.0', actions: [] });
+      expect(result.readiness_status).toBe('degraded');
+      expect(runner.mock.calls.some(([, args]) => args[0] === 'query')).toBe(false);
+    } finally {
+      fs.rmSync(target, { recursive: true, force: true });
+    }
+  });
+
+  test.each(['partial', null])('CodeGraph %s 经原生重建成为 complete 后允许 query', (initialState) => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
+    const target = tempRepo('codegraph-json-repair');
+    try {
+      fs.mkdirSync(path.join(target, '.codegraph')); fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
+      let rebuilt = false;
+      const runner = jest.fn((_command, args) => {
+        if (args[0] === '--version') return success('codegraph 1.6.0');
+        if (args[0] === 'index') { rebuilt = true; return success(); }
+        if (args[0] === 'status') {
+          expect(args).toEqual(['status', '--json']);
+          return success(codegraphStatus(target, { index: { state: rebuilt ? 'complete' : initialState, pendingRefs: 0, reindexRecommended: !rebuilt && initialState === null } }));
+        }
+        return success('[]');
+      });
+      const result = provider.apply({ repoRoot: target, env: {}, runner }, { mutation: true, dependency_version: '1.6.0', actions: [] });
+      expect(result.lifecycle.indexed).toBe(true);
+      expect(result.lifecycle.query_verified).toBe(true);
+      expect(runner.mock.calls.filter(([, args]) => args[0] === 'index')).toHaveLength(1);
+    } finally {
+      fs.rmSync(target, { recursive: true, force: true });
+    }
+  });
+
+  test.each([
+    ['pending changes remain after sync', { pendingChanges: { added: 1, modified: 0, removed: 0 } }, 'codegraph-sync-incomplete'],
+    ['full rebuild remains after reindex', { index: { state: 'complete', pendingRefs: 0, reindexRecommended: true } }, 'codegraph-post-mutation-probe-failed'],
   ])('degrades when %s', (_label, statusOutput, reasonCode) => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
     const target = tempRepo(`codegraph-residual-${reasonCode}`);
@@ -526,7 +592,7 @@ describe('CodeGraph provider', () => {
         fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
         return success();
       }
-      if (args[0] === 'status') return success(statusOutput);
+      if (args[0] === 'status') return success(codegraphStatus(target, statusOutput));
       return success();
     };
     const plan = provider.plan({

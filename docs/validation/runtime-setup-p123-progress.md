@@ -263,3 +263,15 @@
 - 独立首审发现最终 state 写入期间预算耗尽仍 complete。两个回归分别在实际临时 state 写入时触发 timeout/cancel，先观察到 complete，再修为 lease 内写后复核并发布 partial。纠正写入 EIO 则保留自有 lease、返回 partial/state.ok=false；真实 status reader 将残留 complete 降级。独立唯一修复复审确认原 P2 及此失败分支闭合，reviewer 未执行测试。
 - 复用既有 executor、state writer、lifecycle owner 与 status reader；没有新增 durable schema 或通用执行引擎。回滚、lease 留存与失败证据属于 protected 行为。主 setup 进程直接 SIGINT、子进程树清理和原位 refresh 的恢复范围仍待验证，CodeGraph 只读 currentness 与最终 P123 收口仍未完成。
 - 本切片最终验证：workspace executor/build/provider-runners 三套 79 tests 全部通过；typecheck 262 files 与 git diff --check 通过。测试在共享工作区执行，未声称隔离提交全仓通过；本轮不改 generated runtime、不 push。
+
+
+## U8 CodeGraph 原生 JSON 完整性
+
+- 直接检查已安装 1.6.0 CLI status 源码及两份真实 status probe，确认原人类文本排除法会漏掉 partial/indexing/failed、待解析引用和 worktree mismatch。九个 apply 反例先观察到错误放行后才改生产；现使用 `status --json` 并在 Provider owner 内验证字段和目标路径。未另造 schema 或复制 Provider SQL。
+- 缺字段、非法 JSON/文本和错误路径不执行 query；pending 文件/引用走原生 sync，partial/indexing/failed 与推荐重建走 index -f；每次修复后重新读取，不能因 mutation 退出 0 即升级 indexed。
+- 独立首审发现官方合法 state:null（旧 marker）被误作非法而不重建。参数化反例先观察到失败，随后显式接受 null 但保持 needsReindex，缺失 undefined 仍 invalid。唯一修复复审确认闭合，reviewer 未运行测试。
+- `runtime-setup-codegraph-json-status-probe.json` 保存当前真实 apply 证据：隔离 folder/HOME/XDG/TMPDIR，显式禁用遥测和 watcher，使用现有 process runner/launcher，init → status --json → version/query/identity 成功。没有安装或接线，configured/server_reachable=false、readiness unknown 如实保留。该证据不是只读验证、MCP server 或 Windows 证明。
+- 测试 fixture 从 index ready 文本改成官方 JSON；两个 entrypoint 初次失败源于 fixture 返回父目录而不是 options.cwd，修正后 74/74 通过。Provider suite 最终 80/80 通过；launcher 在三套首轮通过。原生 artifact verify 的写副作用、DB/WAL/source 证据回读、主进程中断恢复和 P123 最终收口仍未完成。
+- 真实 probe 已按最终 source hash 重跑并补旧 marker 故障注入：在一次性 SQLite 删除 index_state 后，实际 status 依次观测 complete → null → null → complete；显式 apply 原生重建和 query 成功，13 次实际命令均保留在同一证据 JSON。
+- 最终验证：完整 npm run test:mcp-setup 33 suites / 724 tests 通过；最终 null 修复的 Provider 定点 80/80 通过，typecheck 262 files、入口 lint 490 files 与 diff check 通过。完整回归运行于共享工作区，期间收敛了 null 分支；不外推为隔离提交的整仓测试或 readonly gate 已通过。
+- spec-simplify-code 仅对本次 parser 执行 inline reuse/quality/efficiency 三个 lens（未另行授权三个 simplify workers，dispatch_authorization_missing）。复用现有 succeeded/path/Provider owner，移除的旧文本 helpers 无剩余引用；无额外可保持行为的修改，三个维度应用修复均为 0。字段校验、路径边界和重建后复验为 protected，不为行数继续抽象。

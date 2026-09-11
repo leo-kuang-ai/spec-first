@@ -57,7 +57,9 @@ describe('CodeGraph Windows launcher 解析合同（不执行 Windows 二进制�
     fs.mkdirSync(path.join(root, '.codegraph'));
     fs.writeFileSync(path.join(root, '.codegraph', 'codegraph.db'), 'fixture');
     if (outcome === 'missing') fs.unlinkSync(wrapper);
-    const runner = (command) => command === path.join(bundleRoot, 'node.exe')
+    const runner = (command, args) => args[0] === 'status'
+      ? { exit_code: 0, stdout: require('../fixtures/mcp-setup/codegraph-status.cjs')(root) }
+      : command === path.join(bundleRoot, 'node.exe')
       ? { exit_code: outcome === 'failed' ? 1 : 0, stdout: outcome === 'mismatch' ? 'codegraph 9.9.9' : 'codegraph 1.6.0' }
       : { exit_code: 0, stdout: 'codegraph 1.6.0' };
     const context = { repoRoot: root, platform: 'windows', arch: 'x64', env: { PATH: root }, runner, configured: true, dependency: { version: '1.6.0' } };

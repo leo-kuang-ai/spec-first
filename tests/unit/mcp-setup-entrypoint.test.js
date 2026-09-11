@@ -5,6 +5,8 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
+const codegraphStatus = require('../fixtures/mcp-setup/codegraph-status.cjs');
+
 const repoRoot = path.resolve(__dirname, '..', '..');
 const skillRoot = path.join(repoRoot, 'skills', 'spec-runtime-setup');
 const {
@@ -510,7 +512,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
         return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
       }
       if (command === 'codegraph' && args[0] === 'status') {
-        return { ...fakeRunner(command, args, options), stdout: 'index ready' };
+        return { ...fakeRunner(command, args, options), stdout: codegraphStatus(options.cwd) };
       }
       return fakeRunner(command, args, options);
     };
@@ -1139,7 +1141,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
         fs.writeFileSync(path.join(nested, '.codegraph', 'codegraph.db'), 'db');
       }
       if (command === 'codegraph' && args[0] === 'status') {
-        return { ...fakeRunner(command, args, options), stdout: 'index ready' };
+        return { ...fakeRunner(command, args, options), stdout: codegraphStatus(options.cwd) };
       }
       return fakeRunner(command, args, options);
     };
@@ -1289,7 +1291,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
         fs.writeFileSync(path.join(folder, '.codegraph', 'codegraph.db'), 'db');
       }
       if (command === 'codegraph' && args[0] === 'status') {
-        return { ...fakeRunner(command, args, options), stdout: 'index ready' };
+        return { ...fakeRunner(command, args, options), stdout: codegraphStatus(options.cwd) };
       }
       return fakeRunner(command, args, options);
     };
@@ -1957,7 +1959,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
         return fakeRunner(command, args, options);
       }
       if (command === 'codegraph' && args[0] === 'status') {
-        return { ...fakeRunner(command, args, options), stdout: 'index ready' };
+        return { ...fakeRunner(command, args, options), stdout: codegraphStatus(options.cwd) };
       }
       return fakeRunner(command, args, options);
     };
@@ -2023,7 +2025,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
         fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
       }
       if (command === 'codegraph' && args[0] === 'status') {
-        return { ...fakeRunner(command, args, options), stdout: 'index ready' };
+        return { ...fakeRunner(command, args, options), stdout: codegraphStatus(options.cwd) };
       }
       return fakeRunner(command, args, options);
     };

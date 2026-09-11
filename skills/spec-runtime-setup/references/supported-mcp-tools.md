@@ -108,3 +108,10 @@ Provider 的路径与 action-plan 预检先于 baseline 安装、host 配置和 
 显式 workspace graph build 默认最多处理 32 个 confirmed repos，并共用 15 分钟命令预算；每个子进程 timeout 不超过剩余预算。Provider 子进程 SIGINT/SIGTERM 传播为 `workspace-build-cancelled`，进程超时优先为 `workspace-build-timeout`，不会继续启动后续 Provider、merge、routing 或 hook。失败恢复与 lease 清理仍允许运行，预算不是同步文件 IO 或进程终止开销的严格墙钟沙箱。
 
 最终 state 写入后仍在 lease 内复核预算/取消，已写出的 complete 必须纠正为 partial。纠正写入失败时返回 failed write result 并保留自有 lease，让 status 识别未收口；不把内存中的 partial 当作已成功落盘。正常纠正和 Provider init 回滚成功后释放 lease，允许重试。原位 refresh 不具备 init 的整库备份回滚保证；整个 setup 进程直接收到 SIGINT、Windows 信号行为和子进程树清理尚需独立验证。
+
+
+### CodeGraph 索引完整性
+
+索引状态使用原生 `status --json`，要求 initialized、version、projectPath/indexPath、worktreeMismatch、pendingChanges 和 index 字段有效。只有 `index.state=complete`、无待解析引用/待处理文件、不建议重建且路径吻合时，才进入 query 验证。旧 `state:null` 不直接支持 ready；显式 apply 使用原生 `index -f` 重建并再次验证。字段缺失、未知文本、非法 JSON 和工作树错配均不支持 indexed。
+
+此项只修复状态误判，不使原生 status/query 变为只读：CodeGraph 1.6.0 打开数据库时可能执行恢复和迁移。只读 artifact verify 路径仍待迁移到绑定源码、安装身份及 DB/WAL 的证据回读；当前不能声明这一边界已完成。
