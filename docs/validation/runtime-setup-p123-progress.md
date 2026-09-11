@@ -101,3 +101,23 @@
 - 修复前 37 suites / 671 tests 通过；修复后共享工作区首次回归 668/671，通过之外包含两个 scope 旧断言和一项并发 ZCode 改动失败。修正断言后相关四 suites / 217 tests 通过（含并发任务新增的一例）。
 - 暂存范围排除了并发 ZCode 变更。隔离快照的四 suites / 216 tests 通过；config-consumers 因临时仓库缺 HEAD 首次失败，补齐临时 Git 基线后 12 tests 通过。初次隔离曾混入并发未完成的常量引用，已修正暂存内容，未将该失败计为通过。
 - typecheck（260 files）、skill entrypoint lint（490 files）及 staged diff whitespace 检查通过。未执行真实 Provider install/query/refresh、宿主 init、push 或 PR；完整 P123 计划仍未完成。
+
+## U7 warmup 缓存身份增量（首轮记录）
+
+- 目标仓库仍为 spec-first，基线 783eddd4；本批只修改 installation-executor、supported-mcp-tools、entrypoint 的缓存断言、新 warmup identity 测试、CHANGELOG 与本进度记录。既有 ZCode/registry、peer runner 等并发改动不属于本批。实现 inline，未派发实现或独立代码审查 worker。
+- 8 个反例先失败，覆盖依赖 integrity/source/version 变化、旧 receipt、未来/非法时间和镜像来源丢失。缓存改为 v2，绑定声明身份，旧格式只在下一次显式安装时重新 warmup；读取直接返回已验证的 receipt，避免缓存判定与来源读取分两次产生不一致。
+- 增加 latest TTL/force 回归，以及真实 Node orchestration 的 cache -> install provenance -> facts 断言。78 项首次聚焦通过；扩展后 129 项中 128 通过，唯一失败仍是并发 ZCode 平台映射的旧 config-consumer 断言，不计为全绿。node --check 和入口 lint（490 files）通过。
+- bounded inline report-only 自审无新增代码 finding，但标准全工作树 mutation guard 返回 true；五个限定被审文件（包括未跟踪测试）逐文件摘要均未变。按 review owner 约定本次审查状态 failed，不能声称通过或独立覆盖；完整复核留待稳定/隔离 source snapshot。
+- review artifact: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/runtime-warmup-review-k6dovcg2/review.json。该 artifact 仅记录本次限定增量和审查限制。
+- 尚未校验下载字节、npm 实际 resolved version 或当前 MCP 会话，缓存身份摘要不是供应链完整性证明。U7、U8 Provider/receipt 联调、U9/U10/U11/U12 全链路审计及最终收口仍未完成。
+
+
+### U7 实际归档校验与提交前复核
+
+- required npm warmup 先执行 `npm pack --ignore-scripts --json`，校验归档实际 SHA-512、manifest 的包名/版本/文件名/integrity，再以 `npx -y file:<archive> --help` 执行同一归档。拒绝缺失归档、摘要不符、身份不符、symlink/hardlink/目录等输入；finally 清理隔离下载目录。
+- preview 公布归档验证动作；tool-facts.v2 增量提供七字段 dependency_identity。缓存 v2 保留安装来源，并严格校验完整身份；实际重试前先删除旧成功 receipt，删除失败即阻断，避免 force 失败后普通重试误命中历史成功。
+- 独立 fresh-source reviewer 首轮发现旧成功缓存失效缺口及身份字段校验不完整；均增加反例并修复，同一 reviewer 只读定点复核通过，无本次范围内剩余阻断。该结论不替代先前全工作树 mutation guard 的失败记录，也不覆盖整个 P123。
+- 真实离线集成使用本地无依赖测试包、真实 npm pack 与真实 npx，隔离 HOME/cache/prefix，并放置同名 local/global bin 干扰。裸绝对 tgz 曾真实失败（exit 126），改用 file: 后通过。测试验证归档 marker，拒绝 local/global collision marker；官方 MCP 归档夹具只复制及 hash，不执行其包代码。
+- 当前共享工作区回归：40 suites / 699 tests 全通过；包含上述离线集成最终版本。typecheck 261 files、skill entrypoint lint 490 files 通过；npm pack --dry-run 成功。共享工作区结果包含并发改动，不能等同仅本提交的隔离全量回归。
+- 验证边界：实际运行环境为 macOS/npm 11.16.0；未执行 native Windows 验证、真实 MCP session 或用户宿主初始化。integrity_status 只证明顶层归档，不能外推为传递依赖锁定或既有用户 npx cache 可信。
+- 本次提交范围为 npm warmup/cache、preview/facts/schema、对应文档与测试；保留并发 ZCode/registry 等改动。U7 其他 Provider 身份、U8 receipt/source freshness 联调及 U9-U12 最终闭环仍未完成；本次提交不代表完整 P123 交付。

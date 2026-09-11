@@ -211,6 +211,9 @@
               ]
             }
           }
+        },
+        "dependency_identity": {
+          "$ref": "#/$defs/npmArchiveIdentity"
         }
       },
       "additionalProperties": true
@@ -333,6 +336,46 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "npmArchiveIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "package",
+        "version",
+        "source",
+        "integrity",
+        "installer",
+        "integrity_status",
+        "verification_scope"
+      ],
+      "properties": {
+        "package": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[a-zA-Z0-9.-]+)?$"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "integrity": {
+          "type": "string",
+          "pattern": "^sha512-[A-Za-z0-9+/]{86}==$"
+        },
+        "installer": {
+          "const": "npm-pack+npx"
+        },
+        "integrity_status": {
+          "const": "verified"
+        },
+        "verification_scope": {
+          "const": "top-level-package-archive"
         }
       }
     }

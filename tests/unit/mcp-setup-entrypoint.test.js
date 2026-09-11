@@ -111,6 +111,8 @@ function createReadOnlyAuditRunner() {
 }
 
 function fakeRunner(command, args, options = {}) {
+  const packed = require('../fixtures/mcp-setup/npm-archives/runner.cjs').materializeNpmPack(command, args);
+  if (packed) return packed;
   const cwd = options.cwd || process.cwd();
   const graphifyCommand = path.basename(command).replace(/\.(?:exe|cmd)$/i, '') === 'graphify';
   if (command === 'uv' && args[0] === 'tool' && args[1] === 'install') {
@@ -2067,6 +2069,8 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       const plan = runSetup({ ...context, argv: ['--plan'] });
       expect(plan.exit_code).toBe(0);
       expect(plan.payload.readiness_scope).toBe('installation');
+      expect(plan.payload.planned_operations.find((operation) => operation.tool === 'context7' && operation.kind === 'warmup-tool').archive_verification)
+        .toMatchObject({ command: 'npm', execution_scope: 'verified-local-archive' });
       expect(plan.payload.next_action).toContain('--installation-only');
       const graphKinds = ['initialize-if-missing', 'verify-status', 'first-generation', 'verify-query', 'refresh', 'ensure-hook', 'migrate-artifact-root'];
       expect(plan.payload.planned_operations.filter((entry) => graphKinds.includes(entry.kind))).toEqual([]);
@@ -2227,15 +2231,23 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
 
     expect(runSetup(input).exit_code).toBe(0);
     const warmupsAfterFirst = calls.filter((call) =>
-      call[0] === 'npx' && call.some((arg) => String(arg).includes('@modelcontextprotocol/server-sequential-thinking')
-        || String(arg).includes('@upstash/context7-mcp'))
+      call[0] === 'npx' && call.some((arg) => String(arg).includes('server-sequential-thinking')
+        || String(arg).includes('context7-mcp'))
     ).length;
     expect(warmupsAfterFirst).toBe(2);
 
-    expect(runSetup(input).exit_code).toBe(0);
+    const cachedRun = runSetup(input);
+    expect(cachedRun.exit_code).toBe(0);
+    expect(cachedRun.payload.tool_facts.items.find((entry) => entry.id === 'context7')).toMatchObject({
+      install_source: 'official', mirror_used: false, attempts: [],
+      dependency_identity: { package: '@upstash/context7-mcp', version: '4.0.7', integrity_status: 'verified', verification_scope: 'top-level-package-archive' },
+    });
+    const normalized = require('../../src/cli/helpers/setup-facts').normalizeSetupFacts(cachedRun.payload.tool_facts);
+    expect(normalized.items.find((entry) => entry.id === 'context7').dependency_identity)
+      .toEqual(cachedRun.payload.tool_facts.items.find((entry) => entry.id === 'context7').dependency_identity);
     const warmupsAfterSecond = calls.filter((call) =>
-      call[0] === 'npx' && call.some((arg) => String(arg).includes('@modelcontextprotocol/server-sequential-thinking')
-        || String(arg).includes('@upstash/context7-mcp'))
+      call[0] === 'npx' && call.some((arg) => String(arg).includes('server-sequential-thinking')
+        || String(arg).includes('context7-mcp'))
     ).length;
     expect(warmupsAfterSecond).toBe(2);
     expect(fs.existsSync(path.join(
@@ -2272,7 +2284,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       const mirror = env.NPM_CONFIG_REGISTRY === 'https://registry.npmmirror.com'
         && env.npm_config_registry === 'https://registry.npmmirror.com';
       const context7Install = command === 'npx'
-        && args.some((arg) => String(arg).includes('@upstash/context7-mcp'));
+        && args.some((arg) => String(arg).includes('context7-mcp'));
       const skillInstall = command === 'npx' && args.includes('ast-grep/agent-skill');
       if ((context7Install || skillInstall) && !mirror) {
         return failed(command, args, 'injected primary registry failure');
@@ -2297,7 +2309,11 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
         result: 'ready',
         install_source: 'mirror',
         mirror_used: true,
-        attempts: [
+        attempts: id === 'context7' ? [
+          expect.objectContaining({ command: 'npm', exit_code: 0 }),
+          expect.objectContaining({ command: 'npx', exit_code: 1 }),
+          expect.objectContaining({ command: 'npx', exit_code: 0 }),
+        ] : [
           expect.objectContaining({ exit_code: 1 }),
           expect.objectContaining({ exit_code: 0 }),
         ],
@@ -2313,7 +2329,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       ],
     });
     const retriedInstalls = calls.filter((call) => (
-      (call.command === 'npx' && call.args.some((arg) => String(arg).includes('@upstash/context7-mcp')))
+      (call.command === 'npx' && call.args.some((arg) => String(arg).includes('context7-mcp')))
       || (call.command === 'npx' && call.args.includes('ast-grep/agent-skill'))
     ));
     expect(retriedInstalls).toHaveLength(4);
@@ -2339,7 +2355,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     installGlobalSkill(homeDir, 'ast-grep');
     const attempts = [];
     const runner = (command, args, options = {}) => {
-      if (command === 'npx' && args.some((arg) => String(arg).includes('@upstash/context7-mcp'))) {
+      if (command === 'npx' && args.some((arg) => String(arg).includes('context7-mcp'))) {
         attempts.push({ env: { ...(options.env || {}) } });
         return {
           command,
@@ -2379,6 +2395,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       install_source: 'both-failed',
       mirror_used: true,
       attempts: [
+        expect.objectContaining({ command: 'npm', exit_code: 0 }),
         expect.objectContaining({ exit_code: 1 }),
         expect.objectContaining({ exit_code: 1 }),
       ],
@@ -2393,7 +2410,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     installGlobalSkill(homeDir, 'ast-grep');
     const attempts = [];
     const runner = (command, args, options = {}) => {
-      if (command === 'npx' && args.some((arg) => String(arg).includes('@upstash/context7-mcp'))) {
+      if (command === 'npx' && args.some((arg) => String(arg).includes('context7-mcp'))) {
         attempts.push({ ...options });
         if (attempts.length === 1) {
           return {
@@ -2439,6 +2456,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       install_source: 'mirror',
       mirror_used: true,
       attempts: [
+        expect.objectContaining({ command: 'npm', exit_code: 0 }),
         expect.objectContaining({ exit_code: null, signal: 'SIGTERM' }),
         expect.objectContaining({ exit_code: 0 }),
       ],
@@ -3015,7 +3033,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     const calls = [];
     const runner = (command, args, options) => {
       calls.push([command, ...args]);
-      if (command === 'npx' && args.some((arg) => String(arg).includes('@upstash/context7-mcp'))) {
+      if (command === 'npx' && args.some((arg) => String(arg).includes('context7-mcp'))) {
         return {
           command,
           argv: args,

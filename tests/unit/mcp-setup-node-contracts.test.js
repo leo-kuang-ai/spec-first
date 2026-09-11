@@ -74,6 +74,8 @@ function changedPaths(before, after) {
 function parityRunner(calls) {
   return (command, args, options = {}) => {
     calls.push([command, ...args]);
+    const packed = require('../fixtures/mcp-setup/npm-archives/runner.cjs').materializeNpmPack(command, args);
+    if (packed) return packed;
     const cwd = options.cwd || process.cwd();
     const graphifyCommand = path.basename(command).replace(/\.(?:exe|cmd)$/i, '') === 'graphify';
     if (command === 'uv' && args[0] === 'tool' && args[1] === 'install') {

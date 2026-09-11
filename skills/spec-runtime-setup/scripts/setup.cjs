@@ -626,6 +626,13 @@ function buildInstallPreviewActions(context, repoRoot, providerPlans) {
         tool: entry.id,
         command: installation.command,
         args,
+        ...(installation.kind === 'warmup' && entry.resolved_dependency ? {
+          archive_verification: {
+            command: 'npm', args: ['pack', '--ignore-scripts', '--json', `${entry.resolved_dependency.package}@${entry.resolved_dependency.version}`],
+            expected_integrity: entry.resolved_dependency.integrity,
+            execution_scope: 'verified-local-archive',
+          },
+        } : {}),
         planned: !context.host
           || !warmupCacheHit(context, repoRoot, entry, installation.command, args),
       });

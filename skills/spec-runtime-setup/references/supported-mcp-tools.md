@@ -17,7 +17,9 @@
 - 统一 registry 区分 `tools`、`helpers` 与 `providers`，同时集中管理 dependency pin、host target、platform override、install safety 与 artifact contract。
 - MCP tools must define deterministic install, host config, detection, summary, and uninstall metadata.
 - always-required MCP 使用 registry 固定版本；可选 helper 仍可按已登记策略保留 latest，不能据此宣称所有依赖可复现。
-- Warmup cache 位于 target 的 `.spec-first/cache/mcp-warmup/<host>/<platform>/`；按实际 command hash 判断缓存命中。
+- required npm warmup 先运行 `npm pack --ignore-scripts --json`，校验实际归档 SHA-512，并核对 npm 返回的 name/version/filename/integrity；通过后以 `npx -y file:<已校验归档> --help` 执行。摘要、版本或归档结构不符均阻断执行；不使用镜像重试掩盖完整性错误。下载和执行失败仍保留原有来源与重试 facts。
+- Warmup cache 位于 target 的 `.spec-first/cache/mcp-warmup/<host>/<platform>/`。`mcp-warmup-cache.v2` 绑定 command hash 与 registry 的 package/version/integrity/source 摘要，保留成功来源及完整 dependency_identity；旧格式、异常时间或身份不匹配不复用。实际重试前移除旧成功 receipt，失败/中断不能回退为旧 ready。缓存命中 attempts 为空，不冒充本次重新执行。
+- `tool-facts.v2.items[].dependency_identity` 是兼容增量，`integrity_status=verified` 仅覆盖 `verification_scope=top-level-package-archive`。缓存的 dependency_sha256 只是声明身份摘要；归档实际校验依据是 identity.integrity。以上不证明传递依赖已锁定、用户现有 npx 缓存可信、宿主 MCP 会话可调用或业务任务完成。
 - `--verify-only` / `--refresh-facts` 会重新验证并刷新 setup-owned facts，但不执行安装或 host config 写入。
 - Supported host MCP config targets:
   - Claude Code: managed/user JSON `mcpServers`.
