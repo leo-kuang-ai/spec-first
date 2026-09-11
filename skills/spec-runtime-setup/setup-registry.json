@@ -350,7 +350,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest"
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
             ]
           }
         },
@@ -359,7 +359,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest"
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
             ]
           }
         },
@@ -368,7 +368,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest"
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
             ]
           }
         },
@@ -377,7 +377,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest"
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
             ]
           }
         },
@@ -386,7 +386,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest"
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
             ]
           }
         },
@@ -396,7 +396,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest"
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
             ]
           }
         },
@@ -405,7 +405,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest"
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
             ]
           }
         }
@@ -416,7 +416,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest",
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
               "--help"
             ]
           }
@@ -426,7 +426,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest",
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
               "--help"
             ]
           }
@@ -436,7 +436,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest",
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
               "--help"
             ]
           }
@@ -446,13 +446,19 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest",
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
               "--help"
             ]
           }
         }
       },
-      "readiness_policy": "always-required"
+      "readiness_policy": "always-required",
+      "resolved_dependency": {
+        "package": "@modelcontextprotocol/server-sequential-thinking",
+        "version": "2026.8.31",
+        "integrity": "sha512-/EMH++1j2e+VmHwpibw1IUPHxA0tcQY09Yo5/OIPwW/8irEKLAufJNGSZQhCK18n8TUvV6WwZyQOuaDKxe/CeQ==",
+        "source": "npmjs"
+      }
     },
     {
       "id": "context7",
@@ -483,7 +489,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest"
+              "@upstash/context7-mcp@4.0.7"
             ]
           }
         },
@@ -492,7 +498,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest"
+              "@upstash/context7-mcp@4.0.7"
             ]
           }
         },
@@ -501,7 +507,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest"
+              "@upstash/context7-mcp@4.0.7"
             ]
           }
         },
@@ -510,7 +516,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest"
+              "@upstash/context7-mcp@4.0.7"
             ]
           }
         },
@@ -519,7 +525,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest"
+              "@upstash/context7-mcp@4.0.7"
             ]
           }
         },
@@ -529,7 +535,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest"
+              "@upstash/context7-mcp@4.0.7"
             ]
           }
         },
@@ -538,7 +544,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest"
+              "@upstash/context7-mcp@4.0.7"
             ]
           }
         }
@@ -549,7 +555,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest",
+              "@upstash/context7-mcp@4.0.7",
               "--help"
             ]
           }
@@ -559,7 +565,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest",
+              "@upstash/context7-mcp@4.0.7",
               "--help"
             ]
           }
@@ -569,7 +575,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest",
+              "@upstash/context7-mcp@4.0.7",
               "--help"
             ]
           }
@@ -579,13 +585,19 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest",
+              "@upstash/context7-mcp@4.0.7",
               "--help"
             ]
           }
         }
       },
-      "readiness_policy": "always-required"
+      "readiness_policy": "always-required",
+      "resolved_dependency": {
+        "package": "@upstash/context7-mcp",
+        "version": "4.0.7",
+        "integrity": "sha512-56+UVpy1Mwe7IE5ehRuvuqAdyCBRHEAOHh/ztFnlH1ZYkVVrp7ptWMAVhbdSZplD0rKC7byYsBYXyrqbMJHWmA==",
+        "source": "npmjs"
+      }
     },
     {
       "id": "codegraph",

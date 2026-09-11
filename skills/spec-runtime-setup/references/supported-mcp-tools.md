@@ -6,8 +6,8 @@
 
 | Tool | Required | Category | Host config | Command |
 | --- | --- | --- | --- | --- |
-| Sequential Thinking | Yes | `mcp` | Yes | `npx -y @modelcontextprotocol/server-sequential-thinking@latest` |
-| Context7 | Yes | `mcp` | Yes | `npx -y @upstash/context7-mcp@latest` |
+| Sequential Thinking | Yes | `mcp` | Yes | `npx -y @modelcontextprotocol/server-sequential-thinking@2026.8.31` |
+| Context7 | Yes | `mcp` | Yes | `npx -y @upstash/context7-mcp@4.0.7` |
 | CodeGraph | Yes, standard setup | `mcp` | Yes | `codegraph serve --mcp` |
 | Graphify | Yes, standard setup | `provider-cli` | Project skill/hook | `graphify` |
 

@@ -39,7 +39,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@latest"
+            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
           ],
           "scope": "managed",
           "targets": {
@@ -69,7 +69,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@latest"
+            "@upstash/context7-mcp@4.0.7"
           ],
           "scope": "managed",
           "targets": {
@@ -160,7 +160,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@latest"
+            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
           ],
           "scope": "managed",
           "targets": {
@@ -190,7 +190,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@latest"
+            "@upstash/context7-mcp@4.0.7"
           ],
           "scope": "managed",
           "targets": {
@@ -281,7 +281,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@latest"
+            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
           ],
           "scope": "managed",
           "targets": {
@@ -311,7 +311,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@latest"
+            "@upstash/context7-mcp@4.0.7"
           ],
           "scope": "managed",
           "targets": {
@@ -402,7 +402,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@latest"
+            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
           ],
           "scope": "managed",
           "targets": {
@@ -432,7 +432,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@latest"
+            "@upstash/context7-mcp@4.0.7"
           ],
           "scope": "managed",
           "targets": {
@@ -522,7 +522,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@latest"
+            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
           ],
           "scope": "user",
           "targets": {
@@ -551,7 +551,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@latest"
+            "@upstash/context7-mcp@4.0.7"
           ],
           "scope": "user",
           "targets": {
@@ -639,7 +639,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@latest"
+            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
           ],
           "scope": "user",
           "targets": {
@@ -668,7 +668,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@latest"
+            "@upstash/context7-mcp@4.0.7"
           ],
           "scope": "user",
           "targets": {
@@ -756,7 +756,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@latest"
+            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
           ],
           "scope": "user",
           "targets": {
@@ -785,7 +785,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@latest"
+            "@upstash/context7-mcp@4.0.7"
           ],
           "scope": "user",
           "targets": {
@@ -873,7 +873,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@latest"
+            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
           ],
           "scope": "user",
           "targets": {
@@ -902,7 +902,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@latest"
+            "@upstash/context7-mcp@4.0.7"
           ],
           "scope": "user",
           "targets": {
@@ -992,7 +992,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@latest"
+            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
           ],
           "scope": "project",
           "targets": {
@@ -1023,7 +1023,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@latest"
+            "@upstash/context7-mcp@4.0.7"
           ],
           "scope": "project",
           "targets": {
@@ -1116,7 +1116,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@latest"
+            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
           ],
           "scope": "project",
           "targets": {
@@ -1147,7 +1147,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@latest"
+            "@upstash/context7-mcp@4.0.7"
           ],
           "scope": "project",
           "targets": {
@@ -1240,7 +1240,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@latest"
+            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
           ],
           "scope": "project",
           "targets": {
@@ -1271,7 +1271,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@latest"
+            "@upstash/context7-mcp@4.0.7"
           ],
           "scope": "project",
           "targets": {
@@ -1364,7 +1364,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@latest"
+            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
           ],
           "scope": "project",
           "targets": {
@@ -1395,7 +1395,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@latest"
+            "@upstash/context7-mcp@4.0.7"
           ],
           "scope": "project",
           "targets": {
@@ -1487,7 +1487,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@latest"
+            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
           ],
           "scope": "workspace",
           "targets": {
@@ -1517,7 +1517,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@latest"
+            "@upstash/context7-mcp@4.0.7"
           ],
           "scope": "workspace",
           "targets": {
@@ -1608,7 +1608,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@latest"
+            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
           ],
           "scope": "workspace",
           "targets": {
@@ -1638,7 +1638,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@latest"
+            "@upstash/context7-mcp@4.0.7"
           ],
           "scope": "workspace",
           "targets": {
@@ -1729,7 +1729,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@latest"
+            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
           ],
           "scope": "workspace",
           "targets": {
@@ -1759,7 +1759,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@latest"
+            "@upstash/context7-mcp@4.0.7"
           ],
           "scope": "workspace",
           "targets": {
@@ -1850,7 +1850,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@latest"
+            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
           ],
           "scope": "workspace",
           "targets": {
@@ -1880,7 +1880,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@latest"
+            "@upstash/context7-mcp@4.0.7"
           ],
           "scope": "workspace",
           "targets": {
@@ -1971,7 +1971,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@latest"
+            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
           ],
           "scope": "local",
           "targets": {
@@ -2001,7 +2001,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@latest"
+            "@upstash/context7-mcp@4.0.7"
           ],
           "scope": "local",
           "targets": {
@@ -2092,7 +2092,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@latest"
+            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
           ],
           "scope": "local",
           "targets": {
@@ -2122,7 +2122,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@latest"
+            "@upstash/context7-mcp@4.0.7"
           ],
           "scope": "local",
           "targets": {
@@ -2213,7 +2213,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@latest"
+            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
           ],
           "scope": "local",
           "targets": {
@@ -2243,7 +2243,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@latest"
+            "@upstash/context7-mcp@4.0.7"
           ],
           "scope": "local",
           "targets": {
@@ -2334,7 +2334,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@latest"
+            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
           ],
           "scope": "local",
           "targets": {
@@ -2364,7 +2364,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@latest"
+            "@upstash/context7-mcp@4.0.7"
           ],
           "scope": "local",
           "targets": {
@@ -2433,7 +2433,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest",
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
               "--help"
             ]
           },
@@ -2448,7 +2448,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest",
+              "@upstash/context7-mcp@4.0.7",
               "--help"
             ]
           },
@@ -2613,7 +2613,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest",
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
               "--help"
             ]
           },
@@ -2628,7 +2628,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest",
+              "@upstash/context7-mcp@4.0.7",
               "--help"
             ]
           },
@@ -2793,7 +2793,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest",
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
               "--help"
             ]
           },
@@ -2808,7 +2808,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest",
+              "@upstash/context7-mcp@4.0.7",
               "--help"
             ]
           },
@@ -2973,7 +2973,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest",
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
               "--help"
             ]
           },
@@ -2988,7 +2988,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest",
+              "@upstash/context7-mcp@4.0.7",
               "--help"
             ]
           },

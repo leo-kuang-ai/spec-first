@@ -228,12 +228,12 @@ describe('spec-runtime-setup registry v11', () => {
     });
     expect(byId(zcode.tools)['sequential-thinking'].host_config).toMatchObject({
       command: 'npx',
-      args: ['-y', '@modelcontextprotocol/server-sequential-thinking@latest'],
+      args: ['-y', '@modelcontextprotocol/server-sequential-thinking@2026.8.31'],
       json_container_path: ['mcp', 'servers'],
     });
     expect(byId(zcode.tools).context7.host_config).toMatchObject({
       command: 'npx',
-      args: ['-y', '@upstash/context7-mcp@latest'],
+      args: ['-y', '@upstash/context7-mcp@4.0.7'],
     });
     expect(byId(zcode.tools).codegraph.host_config).toMatchObject({
       command: 'codegraph',
@@ -317,7 +317,7 @@ describe('spec-runtime-setup registry v11', () => {
     });
     expect(context7.host_config).toMatchObject({
       command: 'npx',
-      args: ['-y', '@upstash/context7-mcp@latest'],
+      args: ['-y', '@upstash/context7-mcp@4.0.7'],
       json_container_path: ['mcp'],
       server_representation: 'opencode-local',
       permission_policy: { kind: 'opencode-governed-assets-v1' },
