@@ -104,7 +104,7 @@ function runVerificationOrMutation(context, repoRoot) {
   reconcileProviderHostConfig(providerResults, hostConfigResults);
   const probes = probeRegistry(context, repoRoot, { selectedIds });
   for (const result of probes.toolResults) {
-    const installResult = installResults.get(result.id);
+    const installResult = installResults.get(result.id) || providerDependencyResults.get(result.id);
     if (installResult && installResult.status !== 'ready') Object.assign(result, installResult);
     else {
       applyInstallProvenance(result, installResult);
@@ -644,15 +644,19 @@ function installSelectedProviderDependencies(context, repoRoot, selectedIds) {
     let failedReason = null;
     const actionResults = [];
     for (const action of dependencyActions) {
-      const result = executeInstallWithMirror(context, action.command, action.args, {
+      const executeInstall = (command, args, options) => executeInstallWithMirror(context, command, args, {
         cwd: repoRoot,
         timeoutMs: 120000,
         env: action.env,
         inheritEnv: action.inheritEnv,
+        ...options,
       });
+      const result = typeof module.installDependency === 'function'
+        ? module.installDependency(providerCtx, action, executeInstall)
+        : executeInstall(action.command, action.args);
       actionResults.push(result);
       if (!commandSucceeded(result)) {
-        failedReason = `${id}-install-failed`;
+        failedReason = result.reason_code || `${id}-install-failed`;
         break;
       }
     }

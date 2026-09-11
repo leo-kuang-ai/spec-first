@@ -149,3 +149,22 @@
 - 初始 Windows parser 2 项失败是 macOS /var 与 /private/var 的 fixture 期望不一致，已使用 canonical fixture root；不改生产路径校验去迎合测试。独立审查另发现标准 local .bin 布局漏检，PATH/absolute 两反例先红，修复后证明存在 bundle 返回 node.exe、缺 bundle 阻断。同一 reviewer 唯一定点复核通过。
 - 修复后的三 suites / 18 tests 通过。共享 setup/runtime 大回归 40 suites / 718 tests 中 717 通过，唯一失败为并发 Pi 接入期间 host-invocation-receipt.schema.json 的 host enum 缺 pi；未将该失败改写为通过，最终 P123 收口需重验。typecheck 262 files、entrypoint lint 490 files 通过；npm pack dry-run 证实包含新 resolver、不发布测试归档。
 - 该 guard 只处理已知 npm 布局；保留 native launcher 与其他命令的既有行为，不是任意程序副作用沙箱，也不保证并发文件替换下的全局原子性。Windows 仅做解析合同验证，没有运行 Windows 二进制。manifest/version 与直接入口检查不证明归档实际 digest；CodeGraph 安装 provenance、U8 Provider identity/receipt 与剩余最终收口仍待完成。
+
+
+## U7 CodeGraph 安装归档与证据传递
+
+- 扩展现有 npm archive 验证 owner，共用实际 SHA-512、manifest identity、contained scratch 与清理逻辑；warmup 保留 npx 路径，CodeGraph 使用 npm install -g file:<已校验归档>。registry 固定 1.6.0 顶层归档 integrity/source，直接 apply 和统一 Provider dependency 阶段都保留安装后版本复核。
+- 首批三个测试失败，其中直接 apply 真实观察到错误 digest 仍进入 npm install；修正后聚焦 27 tests 通过。图专用旧测试改为明确已有依赖，仅测试 sync/reindex/query 原场景；安装本身由新增归档测试承接。
+- 真实离线测试使用隔离 HOME/cache/prefix、本地无依赖包、真实 npm pack 与 npm install，证明全局安装消费已校验归档并替换旧包；不安装真实 CodeGraph 平台二进制，不触及用户 runtime。先前 warmup 的真实 npx collision 用例保留。
+- 首轮独立源码审查没有发现问题，但后续 runSetup 联调发现其未覆盖的第三条旁路：applyReadinessPolicy 将显式 tool 标为 required，baseline installer 按 effective host registry 先运行 npm install，adapter 因版本已就绪跳过校验。原调用证据为首条命令按包名安装，Provider identity 缺失。修复后 baseline/preview 通过同一 providerOwnsInstallation 判断归还安装 ownership，保留 host-config 步骤，Provider action 明示 archive_verification。
+- 独立 reviewer 唯一 follow-up 确认上述旁路、失败传播与预览一致性修复；两轮均为只读源码审查，未独立执行测试，前轮结论不冒充覆盖第三条旁路。
+- tool-facts.v2 的 Provider dependency_identity 是兼容增量，新增 installer=npm-pack+npm-install；CLI 保留七字段有效身份，拒绝扩大的 verification_scope。warmup cache 仍只接受原 npm-pack+npx；旧 facts/已安装且本次未安装的 Provider 不补造安装证据。
+- 本轮 inline 完成 spec-simplify-code 的 reuse/quality/efficiency 三视角：共用 archive owner，baseline 与 preview 共用 ownership 判断；没有为减少行数移除校验或引入新安装缓存。未派发三个独立简化 reviewer。
+- 首次共享回归 42 suites / 727 tests 中 726 通过，唯一失败是本轮统一入口缺 identity 的真实旁路；修复后的最终回归结果另记。过程中另有 fixture 版本输出不符与错误预期 reason_code，均按实际 command contract 修正，未削弱生产版本校验。
+- 验证范围仍是顶层 npm 归档；不外推为 optional 平台包、传递依赖或安装后文件完整性。U7 的 Provider 探测身份发布、U8 当前 identity/receipt 比较及 U9–U12 最终收口仍需核对，整体计划保持未完成。
+
+### 本批最终定点验证
+
+- 第二次共享大回归 42 suites / 728 tests 中 726 通过；新预览测试误读 actions 字段（实际为 planned_operations），另一失败证实失败汇总会把 Provider digest 错误覆盖为 missing_dependency。修正测试字段，并让 tool probe 合并实际 Provider dependency 安装结果，保留原始原因和安装证据。
+- 最终九 suites / 244 tests 全通过，覆盖完整 entrypoint、Provider、registry、facts、CLI consumer health、warmup/cache/integrity 与真实离线安装。该结果是修复后的针对性回归；不将此前大回归的两个失败改写为全绿。
+- typecheck 262 files、skill entrypoint lint 490 files 与 staged diff whitespace 检查通过。独立暂存范围只纳入本轮增量，排除 Pi/ZCode/Graphify 与其他任务的已有修改；验证来自共享工作树，不等同本提交的独立全量快照验证。未执行真实用户宿主 install/init、native Windows、push 或 PR。

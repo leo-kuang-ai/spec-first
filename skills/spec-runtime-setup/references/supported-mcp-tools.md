@@ -54,6 +54,14 @@ After setup:
 - If a parent workspace target is ambiguous, choose a child repo and rerun with `--repo <child>`.
 - If required runtime is ready, continue to the workflow that matches the user intent: plan, work, review, debug, or docs.
 
+### CodeGraph 安装归档证据
+
+CodeGraph 1.6.0 的顶层 npm 归档在 source registry 固定 SHA-512 和来源标识。baseline 阶段跳过由 registry Provider 拥有的 package 安装，统一 setup dependency 阶段与直接 Provider apply 共用 required npm warmup 的归档验证 owner：先 `npm pack --ignore-scripts --json`，核对实际字节和 name/version，再将同一 `file:<archive>` 交给 `npm install -g`；校验错误不会进入安装。安装后仍检查实际命令版本，不能以 npm 退出码 0 代替 readiness。
+
+`tool-facts.v2.provider_readiness[].dependency_identity` 保留 package/version/source/integrity、`installer=npm-pack+npm-install`、`integrity_status=verified` 与 `verification_scope=top-level-package-archive`；CLI normalizer 保留有效身份，拒绝扩大后的范围。该字段是兼容增量，旧 facts 或已安装且本次未安装的 Provider 不补造历史安装证据。原 warmup cache 仍只接受 `npm-pack+npx`。临时归档在成功或失败后清理；不会产生 Provider 安装成功缓存。
+
+这一证据只覆盖顶层 shim 包，不证明 optional 平台包、传递依赖、安装后文件或当前宿主 MCP 会话可信；实际下载/重试来源另由 install_source、mirror_used 和 attempts 记录。平台 bundle 的完整性与当前身份验证继续按计划单独闭环。
+
 ### CodeGraph npm launcher 的只读边界
 
 官方 1.6.0 npm shim 在平台包缺失时会 self-heal 下载；即使设置 CODEGRAPH_NO_DOWNLOAD，命中历史 bundle 后仍会清理旧 cache。Runtime Setup 的普通真实 runner（含 sync worker）和 workspace 默认 runner 通过 Provider-owned `codegraph-launcher.cjs` 解析已安装、版本匹配的平台包，直接运行其入口；Windows 使用平台 node.exe 与独立 argv prefix，避免执行 npm .cmd wrapper。缺包或身份不符返回结构化失败和显式安装修复指引，不回退 shim 或 self-heal cache。异步 workspace 记录的绝对命令也在实际启动时重新解析。

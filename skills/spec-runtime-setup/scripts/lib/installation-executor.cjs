@@ -213,6 +213,8 @@ function helperProbe(entry, status, reasonCode, details = {}) {
 function installBaselineTools(context, repoRoot, selectedIds = []) {
   const results = new Map();
   for (const entry of context.effectiveRegistry.tools || []) {
+    // Provider 的安装与复核归其 adapter 所有，避免 baseline 提前绕过校验。
+    if (providerOwnsInstallation(context.effectiveRegistry, entry.id)) continue;
     if (entry.required === false) continue;
     if (entry.setup_required === true && !selectedIds.includes(entry.id)) continue;
     const installation = resolveInstallation(entry, context.platform);
@@ -441,6 +443,10 @@ function dependencyFor(context, id) {
   return (context.effectiveRegistry.external_dependencies || []).find((entry) => entry.id === id) || null;
 }
 
+function providerOwnsInstallation(registry, id) {
+  return (registry.providers || []).some((entry) => entry.id === id);
+}
+
 function resolveInstallation(entry, platform) {
   const installation = entry.installation || {};
   if (installation.command) return installation;
@@ -526,12 +532,14 @@ function combinedInstallProvenance(results) {
   if (completed.length === 0) return {};
   const mirrorUsed = completed.some((result) => result.mirror_used === true);
   const bothFailed = completed.some((result) => result.install_source === INSTALL_SOURCE.BOTH_FAILED);
+  const identities = completed.filter((result) => result.dependency_identity).map((result) => result.dependency_identity);
   return {
     attempts: completed.flatMap((result) => result.attempts.map((attempt) => ({ ...attempt }))),
     install_source: bothFailed
       ? INSTALL_SOURCE.BOTH_FAILED
       : (mirrorUsed ? INSTALL_SOURCE.MIRROR : INSTALL_SOURCE.OFFICIAL),
     mirror_used: mirrorUsed,
+    ...(identities.length === 1 ? { dependency_identity: identities[0] } : {}),
   };
 }
 
@@ -560,6 +568,7 @@ module.exports = {
   interpolateArgs,
   probeHelper,
   probeRegistry,
+  providerOwnsInstallation,
   resolveAgentBrowserProbePath,
   resolveInstallation,
   warmupCacheHit,

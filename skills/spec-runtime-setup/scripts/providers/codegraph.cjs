@@ -2,6 +2,8 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { verifiedNpmInstall } = require('../lib/npm-warmup.cjs');
+const { executeInstallWithMirror, applyInstallProvenance, combinedInstallProvenance } = require('../lib/installation-executor.cjs');
 const {
   assertContainedPath,
 } = require('../lib/path-safety.cjs');
@@ -83,6 +85,12 @@ function plan(context = {}) {
       kind: 'install-dependency',
       command: 'npm',
       args: ['install', '-g', `${context.dependency.package}@${context.dependency.version}`, '--no-audit', '--no-fund', '--loglevel=error'],
+      archive_verification: {
+        command: 'npm',
+        args: ['pack', '--ignore-scripts', '--json', `${context.dependency.package}@${context.dependency.version}`],
+        expected_integrity: context.dependency.integrity || null,
+        execution_scope: 'verified-local-archive',
+      },
     });
   }
   if (!context.installationOnly) actions.push(
@@ -175,7 +183,27 @@ function verify(context = {}) {
   });
 }
 
+function installDependency(context, action, executeInstall) {
+  return verifiedNpmInstall({
+    context,
+    repoRoot: path.resolve(context.repoRoot || process.cwd()),
+    identity: context.dependency,
+    command: action.command,
+    args: action.args,
+    executeInstall: executeInstall || ((command, args, options) => executeInstallWithMirror({
+      ...context, runner: (cmd, argv, opts) => run(context, cmd, argv, opts),
+    }, command, args, options)),
+  });
+}
+
 function apply(context = {}, actionPlan = plan(context)) {
+  const installations = [];
+  const result = applyActions(context, actionPlan, installations);
+  applyInstallProvenance(result, combinedInstallProvenance(installations));
+  return result;
+}
+
+function applyActions(context, actionPlan, installations) {
   if (!actionPlan || actionPlan.blocked || !actionPlan.mutation) return verify(context);
   const repoRoot = path.resolve(context.repoRoot || actionPlan.repo_root || process.cwd());
   try {
@@ -187,8 +215,9 @@ function apply(context = {}, actionPlan = plan(context)) {
   }
   for (const action of actionPlan.actions || []) {
     if (action.kind === 'install-dependency') {
-      const result = run(context, action.command, action.args, { cwd: repoRoot, timeoutMs: 120000 });
-      if (!succeeded(result)) return degraded(context, repoRoot, 'codegraph-install-failed', {
+      const result = installDependency(context, action);
+      installations.push(result);
+      if (!succeeded(result)) return degraded(context, repoRoot, result.reason_code || 'codegraph-install-failed', {
         versionPin: actionPlan.dependency_version,
       });
       const installed = run(context, 'codegraph', ['--version'], { cwd: repoRoot, timeoutMs: 10000 });
@@ -444,6 +473,7 @@ function statusNeedsReindex(output) {
 
 module.exports = {
   apply,
+  installDependency,
   plan,
   reconcileConfigured,
   resolveCodegraphCommand,

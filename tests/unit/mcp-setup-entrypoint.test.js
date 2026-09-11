@@ -2261,6 +2261,74 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     ))).toBe(true);
   });
 
+  test('CodeGraph 安装经实际归档校验发布身份，CLI normalizer 保留限定证据', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const { normalizeSetupFacts } = require('../../src/cli/helpers/setup-facts');
+    const target = tempRepo('codegraph-install-identity');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'codegraph-install-home-'));
+    let installed = false;
+    const calls = [];
+    const runner = (command, args, options) => {
+      calls.push([command, ...args]);
+      if (command === 'codegraph' && args[0] === '--version') {
+        return installed ? { exit_code: 0, stdout: 'codegraph 1.6.0', stderr: '' }
+          : { exit_code: 1, stdout: '', stderr: 'missing' };
+      }
+      if (command === 'npm' && args[0] === 'install') installed = true;
+      return fakeRunner(command, args, options);
+    };
+    try {
+      const preview = runSetup({ argv: ['--plan', '--only', 'codegraph', '--installation-only'],
+        cwd: target, skillRoot, runner, env: { MCP_SETUP_HOST: 'qoder' }, homeDir, bundledVersion: '1.13.2' });
+      expect(preview.payload.planned_operations.filter((entry) => entry.kind === 'install-tool' && entry.tool === 'codegraph')).toEqual([]);
+      expect(preview.payload.planned_operations.find((entry) => entry.kind === 'install-dependency' && entry.provider === 'codegraph'))
+        .toMatchObject({ archive_verification: { execution_scope: 'verified-local-archive' } });
+      const result = runSetup({ argv: ['--only', 'codegraph', '--installation-only'],
+        cwd: target, skillRoot, runner, env: { MCP_SETUP_HOST: 'qoder' }, homeDir, bundledVersion: '1.13.2' });
+      expect({ exit_code: result.exit_code, reason: result.reason_code }).toEqual({ exit_code: 0, reason: 'setup-facts-written' });
+      const facts = result.payload.tool_facts;
+      const readiness = facts.provider_readiness.find((entry) => entry.provider === 'codegraph');
+      expect(readiness.dependency_identity).toMatchObject({
+        package: '@colbymchenry/codegraph', version: '1.6.0', installer: 'npm-pack+npm-install',
+        integrity_status: 'verified', verification_scope: 'top-level-package-archive',
+      });
+      expect(calls.some(([command, verb, ...args]) => command === 'npm' && verb === 'install'
+        && args.some((arg) => arg.startsWith('file:')))).toBe(true);
+      expect(calls.some(([command, verb]) => command === 'codegraph' && ['init', 'index', 'query', 'sync'].includes(verb))).toBe(false);
+      const normalized = normalizeSetupFacts(facts);
+      expect(normalized.provider_readiness.find((entry) => entry.provider === 'codegraph').dependency_identity)
+        .toEqual(readiness.dependency_identity);
+    } finally {
+      fs.rmSync(target, { recursive: true, force: true });
+      fs.rmSync(homeDir, { recursive: true, force: true });
+    }
+  });
+
+  test('统一 setup 的 CodeGraph digest 不符在安装前阻断且保留具体原因', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const registry = JSON.parse(fs.readFileSync(path.join(skillRoot, 'setup-registry.json')));
+    registry.external_dependencies.find((entry) => entry.id === 'codegraph').integrity = `sha512-${Buffer.alloc(64).toString('base64')}`;
+    const target = tempRepo('codegraph-digest-block');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'codegraph-digest-home-'));
+    const installs = [];
+    const runner = (command, args, options) => {
+      if (command === 'codegraph' && args[0] === '--version') return { exit_code: 1, stdout: '', stderr: 'missing' };
+      if (command === 'npm' && args[0] === 'install') installs.push(args);
+      return fakeRunner(command, args, options);
+    };
+    try {
+      const result = runSetup({ argv: ['--only', 'codegraph', '--installation-only'], registry,
+        cwd: target, skillRoot, runner, env: { MCP_SETUP_HOST: 'qoder' }, homeDir, bundledVersion: '1.13.2' });
+      expect(result).toMatchObject({ exit_code: 1, reason_code: 'npm-archive-integrity-mismatch' });
+      expect(installs).toEqual([]);
+      expect(result.payload.tool_facts.provider_readiness.find((entry) => entry.provider === 'codegraph'))
+        .toMatchObject({ readiness_status: 'degraded', lifecycle: { installed: false } });
+    } finally {
+      fs.rmSync(target, { recursive: true, force: true });
+      fs.rmSync(homeDir, { recursive: true, force: true });
+    }
+  });
+
   test('uses the npm mirror only after primary install failures and persists install provenance', () => {
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('mirror-success');

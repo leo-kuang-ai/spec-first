@@ -67,6 +67,7 @@ const {
 } = require('./lib/workspace-graph-lifecycle-lease.cjs');
 const {
   dependencyFor,
+  providerOwnsInstallation,
   interpolateArgs,
   probeHelper,
   probeRegistry,
@@ -619,7 +620,7 @@ function buildInstallPreviewActions(context, repoRoot, providerPlans) {
     if (entry.setup_required === true && !context.actionPlan.selected_ids.includes(entry.id)) continue;
     if (entry.required === false && !context.actionPlan.selected_ids.includes(entry.id)) continue;
     const installation = resolveInstallation(entry, context.platform);
-    if (installation && installation.command) {
+    if (installation && installation.command && !providerOwnsInstallation(context.effectiveRegistry, entry.id)) {
       const args = interpolateArgs(installation.args || [], dependencyFor(context, entry.dependency_ref));
       actions.push({
         kind: installation.kind === 'warmup' ? 'warmup-tool' : 'install-tool',

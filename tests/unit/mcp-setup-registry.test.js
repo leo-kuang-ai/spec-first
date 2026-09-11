@@ -128,6 +128,8 @@ describe('spec-runtime-setup registry v11', () => {
         ecosystem: 'npm',
         package: '@colbymchenry/codegraph',
         version: '1.6.0',
+        integrity: 'sha512-nCN40MqmYxF7gH1QTKqlxJ1d2mzwhw3fzSdGV2wjnQKsymjM3JZnH/5rpGqhBkcUEom0qWq0WjDRvOZh2t8mFA==',
+        source: 'npmjs',
         command: 'codegraph',
       },
       {

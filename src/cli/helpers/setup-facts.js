@@ -3,6 +3,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { captureSourceSnapshot } = require('../../../skills/spec-runtime-setup/scripts/lib/source-snapshot.cjs');
+const { isVerifiedNpmArchiveIdentity } = require('../../../skills/spec-runtime-setup/scripts/lib/npm-warmup.cjs');
 
 const SETUP_FACTS_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 const READY_CONFIGURED_STATUSES = new Set(['ready', 'not-applicable', 'not-required', 'fallback-active']);
@@ -341,6 +342,8 @@ function normalizeProviderReadiness(entries) {
     kind: normalizeProviderKind(entry.kind),
     profile: normalizeProviderProfile(entry.profile),
     readiness_status: normalizeProviderStatus(entry.readiness_status),
+    ...(isVerifiedNpmArchiveIdentity(entry.dependency_identity, entry.dependency_identity, ['npm-pack+npx', 'npm-pack+npm-install'])
+      ? { dependency_identity: { ...entry.dependency_identity } } : {}),
     lifecycle: {
       installed: Boolean(entry.lifecycle && entry.lifecycle.installed),
       configured: Boolean(entry.lifecycle && entry.lifecycle.configured),

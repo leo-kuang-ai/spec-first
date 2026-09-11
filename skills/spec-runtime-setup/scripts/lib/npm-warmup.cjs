@@ -7,14 +7,24 @@ const { assertContainedPath, ensureContainedDirectory } = require('./path-safety
 const { commandSucceeded } = require('./process-runner.cjs');
 
 function verifiedNpmWarmup({ context, repoRoot, entry, command, args, executeInstall }) {
-  const identity = entry.resolved_dependency || {};
+  return verifiedNpmExecution({ context, repoRoot, identity: entry.resolved_dependency || {}, command, args, executeInstall, mode: 'warmup' });
+}
+
+function verifiedNpmInstall(options) {
+  return verifiedNpmExecution({ ...options, mode: 'install' });
+}
+
+function verifiedNpmExecution({ context, repoRoot, identity = {}, command, args, executeInstall, mode }) {
   const spec = `${identity.package}@${identity.version}`;
   const validIdentity = typeof identity.package === 'string'
     && /^(?:@[a-z0-9._-]+\/)?[a-z0-9._-]+$/i.test(identity.package)
     && /^\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?$/i.test(identity.version || '')
     && typeof identity.source === 'string' && identity.source.length > 0
     && /^sha512-[A-Za-z0-9+/]{86}==$/.test(identity.integrity || '');
-  if (!validIdentity || path.basename(command).replace(/\.(cmd|exe)$/i, '') !== 'npx'
+  const executable = path.basename(command).replace(/\.(cmd|exe)$/i, '').toLowerCase();
+  const validCommand = mode === 'warmup' ? executable === 'npx'
+    : executable === 'npm' && args[0] === 'install' && args.includes('-g');
+  if (!validIdentity || !validCommand
     || args.filter((arg) => arg === spec).length !== 1) {
     return failure('npm-package-identity-invalid');
   }
@@ -22,7 +32,7 @@ function verifiedNpmWarmup({ context, repoRoot, entry, command, args, executeIns
   let result;
   const operations = [];
   try {
-    const parent = ensureContainedDirectory(repoRoot, path.join(repoRoot, '.spec-first', 'cache', 'mcp-warmup', context.host, context.platform), { mode: 0o700, reasonCode: 'npm-warmup-path-unsafe' });
+    const parent = ensureContainedDirectory(repoRoot, path.join(repoRoot, '.spec-first', 'cache', 'mcp-warmup', context.host || 'standalone', context.platform || process.platform), { mode: 0o700, reasonCode: 'npm-warmup-path-unsafe' });
     scratch = fs.mkdtempSync(path.join(parent, '.archive-'));
     const packed = executeInstall('npm', ['pack', '--ignore-scripts', '--json', '--pack-destination', scratch, spec], { cwd: repoRoot, timeoutMs: 120000 });
     operations.push(packed);
@@ -59,7 +69,7 @@ function verifiedNpmWarmup({ context, repoRoot, entry, command, args, executeIns
         ...launched,
         dependency_identity: {
           package: identity.package, version: identity.version, source: identity.source,
-          integrity, installer: 'npm-pack+npx', integrity_status: 'verified',
+          integrity, installer: mode === 'warmup' ? 'npm-pack+npx' : 'npm-pack+npm-install', integrity_status: 'verified',
           verification_scope: 'top-level-package-archive',
         },
       };
@@ -92,14 +102,16 @@ function failure(reason) {
   return { exit_code: 1, status: 'failed', reason_code: reason, stdout: '', stderr: reason };
 }
 
-function isVerifiedNpmArchiveIdentity(value, expected) {
+function isVerifiedNpmArchiveIdentity(value, expected, installers = ['npm-pack+npx']) {
   if (!value || !expected || typeof value !== 'object' || Array.isArray(value)) return false;
   const keys = ['package', 'version', 'source', 'integrity', 'installer', 'integrity_status', 'verification_scope'];
   return Object.keys(value).length === keys.length && keys.every((key) => Object.hasOwn(value, key))
+    && ['package', 'version', 'source'].every((key) => typeof value[key] === 'string' && value[key].length > 0)
+    && /^\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?$/i.test(value.version)
     && ['package', 'version', 'source', 'integrity'].every((key) => value[key] === expected[key])
     && /^sha512-[A-Za-z0-9+/]{86}==$/.test(value.integrity || '')
-    && value.installer === 'npm-pack+npx' && value.integrity_status === 'verified'
+    && installers.includes(value.installer) && value.integrity_status === 'verified'
     && value.verification_scope === 'top-level-package-archive';
 }
 
-module.exports = { verifiedNpmWarmup, isVerifiedNpmArchiveIdentity };
+module.exports = { verifiedNpmWarmup, verifiedNpmInstall, isVerifiedNpmArchiveIdentity };

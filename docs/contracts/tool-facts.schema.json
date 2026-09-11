@@ -386,7 +386,7 @@
           "pattern": "^sha512-[A-Za-z0-9+/]{86}==$"
         },
         "installer": {
-          "const": "npm-pack+npx"
+          "enum": ["npm-pack+npx", "npm-pack+npm-install"]
         },
         "integrity_status": {
           "const": "verified"

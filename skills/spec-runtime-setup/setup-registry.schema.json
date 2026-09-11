@@ -404,6 +404,14 @@
           "type": "string",
           "minLength": 1
         },
+        "integrity": {
+          "type": "string",
+          "pattern": "^sha512-[A-Za-z0-9+/]{86}==$"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
         "python": {
           "$ref": "#/$defs/pythonToolCandidate/properties/python"
         },

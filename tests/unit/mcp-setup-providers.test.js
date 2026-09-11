@@ -307,6 +307,8 @@ describe('CodeGraph provider', () => {
     const plan = provider.plan({
       selected: true,
       repoRoot: target,
+      probeDependency: true,
+      runner,
       dependency: { package: '@colbymchenry/codegraph', version: '1.6.0' },
     });
     expect(plan).toMatchObject({ mutation: true, blocked: false, provider: 'codegraph' });
@@ -345,6 +347,8 @@ describe('CodeGraph provider', () => {
     const plan = provider.plan({
       selected: true,
       repoRoot: target,
+      probeDependency: true,
+      runner,
       dependency: { package: '@colbymchenry/codegraph', version: '1.6.0' },
     });
     const result = provider.apply({ repoRoot: target, runner, configured: true }, plan);
@@ -446,8 +450,9 @@ describe('CodeGraph provider', () => {
     const context = {
       selected: true,
       repoRoot: target,
-      dependency: { package: '@colbymchenry/codegraph', version: '1.6.0' },
+      probeDependency: true,
       runner,
+      dependency: { package: '@colbymchenry/codegraph', version: '1.6.0' },
     };
 
     const result = provider.apply(context, provider.plan(context));
@@ -507,6 +512,8 @@ describe('CodeGraph provider', () => {
     const plan = provider.plan({
       selected: true,
       repoRoot: target,
+      probeDependency: true,
+      runner,
       dependency: { package: '@colbymchenry/codegraph', version: '1.6.0' },
     });
     const result = provider.apply({ repoRoot: target, runner }, plan);
