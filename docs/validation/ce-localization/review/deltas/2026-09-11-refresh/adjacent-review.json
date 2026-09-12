@@ -1,0 +1,729 @@
+{
+  "schema_version": "ce-adjacent-review/v1",
+  "artifact_type": "advisory",
+  "reviewer": "fresh-source subagent /root/ce_adjacent_review",
+  "lens_identity": "同一个独立 reviewer 应用两个 lens；不是外部 OpenAI/Anthropic 模型互审。",
+  "scope_head": "9b3f37177412ad51293f118fe613243ba85d7fd0",
+  "generated_at": "2026-09-11T17:20:50.575947+00:00",
+  "method": "按固定 adjacent-scope.json 对当前磁盘源文件逐文件进行两个 lens 的全文语义审查；输出截断部分已分块补读。代表 peer-job-runner.py 已完整读取 1-2244 行，其他两个副本通过实际 read_bytes() equality 复用同一文本审查；hash 扫描仅验证身份，不作为全文审查证据。",
+  "files": [
+    {
+      "path": "tests/unit/plugin-modules.test.js",
+      "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+      "bytes": 38963,
+      "line_count": 917,
+      "review_status": "full",
+      "covered_line_ranges": [
+        [
+          1,
+          917
+        ]
+      ],
+      "lenses": {
+        "openai-skill-engineering": {
+          "status": "reviewed",
+          "notes": [
+            "L33-43 固定 command/skill anchor 的唯一来源；全文覆盖 projection-only adapters、多宿主资产筛选和 source/runtime 生成契约。"
+          ]
+        },
+        "anthropic-skill-craft-safety": {
+          "status": "reviewed",
+          "notes": [
+            "断言治理边界及无 dispatch 副作用，隔离临时项目并清理；这些本地契约不能证明 Provider 或真实宿主运行结果。"
+          ]
+        }
+      },
+      "findings": [],
+      "limitations": []
+    },
+    {
+      "path": "skills/spec-code-review/evals/fixtures/repos/tenant-orders/prepare-review-fixture.sh",
+      "sha256": "2e77d7eb1a4f1441920827cf6ebf10b8bae2890062b76aa372dd466ff0a9394b",
+      "bytes": 548,
+      "line_count": 12,
+      "review_status": "full",
+      "covered_line_ranges": [
+        [
+          1,
+          12
+        ]
+      ],
+      "lenses": {
+        "openai-skill-engineering": {
+          "status": "reviewed",
+          "notes": [
+            "L4-12 把 fixture 基线 HEAD 与初始 dirty diff 分开记录；judge 有对应 consumer，.git 内 metadata 不污染被审 patch。"
+          ]
+        },
+        "anthropic-skill-craft-safety": {
+          "status": "reviewed",
+          "notes": [
+            "基线 commit/apply 属于 fixture 准备；它不是被测 agent 的提交授权。未执行隔离 fixture 行为评测。"
+          ]
+        }
+      },
+      "findings": [],
+      "limitations": []
+    },
+    {
+      "path": "skills/spec-code-review/evals/fixtures/scripts/check-r2-preset-applied-fix.sh",
+      "sha256": "448d0bb39805acc0ad3c42a8ffce4530163e4a32980e61b86928db503f8cc3a8",
+      "bytes": 2783,
+      "line_count": 49,
+      "review_status": "full",
+      "covered_line_ranges": [
+        [
+          1,
+          49
+        ]
+      ],
+      "lenses": {
+        "openai-skill-engineering": {
+          "status": "reviewed",
+          "notes": [
+            "L25-39 比较 HEAD 与 diff 身份，避免把 fixture 自带 dirty patch 当成模型修复。最终文本语义与落盘事实各有检查。"
+          ]
+        },
+        "anthropic-skill-craft-safety": {
+          "status": "reviewed",
+          "notes": [
+            "L40-47 缺基线仅有弱守卫，不能独立证明真实修复；脚本注释已说明退化，需 consumer 保持该 claim ceiling。未新增确认 bug。"
+          ]
+        }
+      },
+      "findings": [],
+      "limitations": []
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/project-standards-reviewer.md",
+      "sha256": "02d33c8b35160e5c3623a7c4afa4450a4783888fdcb9e875b7b3ec3d7c08c5d5",
+      "bytes": 7784,
+      "line_count": 81,
+      "review_status": "full",
+      "covered_line_ranges": [
+        [
+          1,
+          81
+        ]
+      ],
+      "lenses": {
+        "openai-skill-engineering": {
+          "status": "reviewed",
+          "notes": [
+            "L7-19 按 criteria/changed-path 配对；remote scope 必须读 reviewed head，owner 与 source 身份明确。L61-68 强制规则与违规双引用。"
+          ]
+        },
+        "anthropic-skill-craft-safety": {
+          "status": "reviewed",
+          "notes": [
+            "L23 明确例子不是契约；L53-59 抑制不适用规则、pre-existing 和通用偏好，未扩大修改授权。"
+          ]
+        }
+      },
+      "findings": [],
+      "limitations": []
+    },
+    {
+      "path": "skills/spec-code-review/scripts/peer-job-runner.py",
+      "sha256": "22a8bf6f1bd96fa0c49244b8ede26f28382bdf09d46968d94b21ec536d9926ba",
+      "bytes": 99361,
+      "line_count": 2244,
+      "review_status": "full",
+      "covered_line_ranges": [
+        [
+          1,
+          2244
+        ]
+      ],
+      "lenses": {
+        "openai-skill-engineering": {
+          "status": "reviewed",
+          "notes": [
+            "完整读取代表 runner，并对三个 owner-local 副本实际比较字节；L303-424 绑定请求与授权身份且在 serving producer channel 关闭时拒绝 start。全文覆盖 Windows identity、owner/no-follow 有界读取、进程生命周期、原子 terminal record、stale sweep、result/reap 和 CLI。"
+          ]
+        },
+        "anthropic-skill-craft-safety": {
+          "status": "reviewed",
+          "notes": [
+            "缺 recorded identity 时拒绝匹配是必要防护，但 L1344、L1582、L1692 的实际 Popen cleanup callers 未传 expected_identity；没有可用 Job Object 时存在清理漏杀的静态路径。当前 public start 关闭且未执行 Windows 实机验证，按潜在回归记录。"
+          ]
+        }
+      },
+      "findings": [
+        {
+          "id": "WIN-CLEANUP-IDENTITY-001",
+          "severity": "P2",
+          "evidence_level": "source-static",
+          "issue": "Windows 的 Popen 清理调用未传 expected_identity；Job Object assignment fallback 或 detach 超时路径可能发布 timeout/reap 结果后仍留下进程。",
+          "source_refs": [
+            "skills/spec-code-review/scripts/peer-job-runner.py:368",
+            "skills/spec-code-review/scripts/peer-job-runner.py:657",
+            "skills/spec-code-review/scripts/peer-job-runner.py:861",
+            "skills/spec-code-review/scripts/peer-job-runner.py:901",
+            "skills/spec-code-review/scripts/peer-job-runner.py:911",
+            "skills/spec-code-review/scripts/peer-job-runner.py:927",
+            "skills/spec-code-review/scripts/peer-job-runner.py:1344",
+            "skills/spec-code-review/scripts/peer-job-runner.py:1515",
+            "skills/spec-code-review/scripts/peer-job-runner.py:1582",
+            "skills/spec-code-review/scripts/peer-job-runner.py:1692"
+          ],
+          "repro": "源码调用链：_win_process_identity_matches(pid, None) 返回 False。_win_kill_tree 在 expected_identity=None 且无可用 Job Object 时令 recorded_leader=False；仍存活的原始根进程创建时间被用作 reuse_cutoff，真实子进程通常晚于该时间而被过滤，根进程也不会在末尾被终止。_reap_worker 随后忽略等待超时，supervise 仍可写入 terminal record。detach 超时调用同样未提供 identity。",
+          "reachability": "当前 public start 在 validate_start_authority 中必然以 provider_serving_receipt_unverified 拒绝，不能据此声称当前跨模型 Provider 已运行并泄漏；风险位于现存 Windows lifecycle 实现，启用或单独使用该路径前需修复。",
+          "recommendation": "保留 missing identity 的 fail-closed 规则；由持有实际 Popen 的清理调用者传入创建时记录的 identity，并覆盖 Job Object assignment fallback 与 detach 超时。",
+          "limitations": [
+            "未在 Windows 实机执行；这是源码可达条件分析。"
+          ]
+        }
+      ],
+      "limitations": [
+        "未执行 Windows ACL 或进程生命周期验证；未调用真实 Provider。"
+      ]
+    },
+    {
+      "path": "tests/unit/peer-job-runner-parity.test.js",
+      "sha256": "5eec7320d067cc665ed3b7f56a978874ab0faed869538ecef33b34412ea4f559",
+      "bytes": 2298,
+      "line_count": 50,
+      "review_status": "full",
+      "covered_line_ranges": [
+        [
+          1,
+          50
+        ]
+      ],
+      "lenses": {
+        "openai-skill-engineering": {
+          "status": "reviewed",
+          "notes": [
+            "L12-16 使用 Buffer.equals 保持三个 owner-local copies 一致，L18-27 防止无 consumer runner 扩散。"
+          ]
+        },
+        "anthropic-skill-craft-safety": {
+          "status": "reviewed",
+          "notes": [
+            "L30-49 固定 Windows identity missing 的 fail-closed 文案和两个 consumer；这是源码结构回归，不是 Windows 实机结果。"
+          ]
+        }
+      },
+      "findings": [],
+      "limitations": []
+    },
+    {
+      "path": "tests/unit/spec-code-review-peer-runner.test.js",
+      "sha256": "d9eca7f2ca9364ed173b558758f0c39d57cf37ffc7d97aa730f7b080dc920024",
+      "bytes": 13100,
+      "line_count": 328,
+      "review_status": "full",
+      "covered_line_ranges": [
+        [
+          1,
+          328
+        ]
+      ],
+      "lenses": {
+        "openai-skill-engineering": {
+          "status": "reviewed",
+          "notes": [
+            "L154-188 覆盖 worker 约束隔离与工具安全标志；L190-307 覆盖 serving receipt 拒绝路径；L309-327 覆盖 result 状态码，consumer 与 runner 契约相符。"
+          ]
+        },
+        "anthropic-skill-craft-safety": {
+          "status": "reviewed",
+          "notes": [
+            "fixture 使用本地假二进制和临时目录，自声明 receipt 预期被拒绝；不能据此证明真实 Provider 身份或 Windows 进程清理。"
+          ]
+        }
+      },
+      "findings": [],
+      "limitations": []
+    },
+    {
+      "path": "tests/unit/ce-localization-closeout-contracts.test.js",
+      "sha256": "6530597bf31292b255169227cb2621e56b7ccdc388227e9bd6583a5f4ca64ca1",
+      "bytes": 17045,
+      "line_count": 400,
+      "review_status": "full",
+      "covered_line_ranges": [
+        [
+          1,
+          400
+        ]
+      ],
+      "lenses": {
+        "openai-skill-engineering": {
+          "status": "reviewed",
+          "notes": [
+            "全文覆盖当前 inventory、source hash、Round 3 receipt 与 lane 汇总绑定；L197-398 检查语义 delta、Skill/path 关系、共享路径的独立刷新/退役及上游 adjudication 的失效规则。"
+          ]
+        },
+        "anthropic-skill-craft-safety": {
+          "status": "reviewed",
+          "notes": [
+            "拒绝把 inline 审查包装为独立覆盖，拒绝无 field evidence 的知识提升；刷新 source receipt 仍需 LLM-owned 语义工件。既有冻结链漂移失败不当作本次新增实现 bug。"
+          ]
+        }
+      },
+      "findings": [],
+      "limitations": []
+    },
+    {
+      "path": "skills/spec-doc-review/scripts/peer-job-runner.py",
+      "sha256": "22a8bf6f1bd96fa0c49244b8ede26f28382bdf09d46968d94b21ec536d9926ba",
+      "bytes": 99361,
+      "line_count": 2244,
+      "review_status": "full",
+      "covered_line_ranges": [
+        [
+          1,
+          2244
+        ]
+      ],
+      "lenses": {
+        "openai-skill-engineering": {
+          "status": "reviewed",
+          "notes": [
+            "完整读取代表 runner，并对三个 owner-local 副本实际比较字节；L303-424 绑定请求与授权身份且在 serving producer channel 关闭时拒绝 start。全文覆盖 Windows identity、owner/no-follow 有界读取、进程生命周期、原子 terminal record、stale sweep、result/reap 和 CLI。"
+          ]
+        },
+        "anthropic-skill-craft-safety": {
+          "status": "reviewed",
+          "notes": [
+            "缺 recorded identity 时拒绝匹配是必要防护，但 L1344、L1582、L1692 的实际 Popen cleanup callers 未传 expected_identity；没有可用 Job Object 时存在清理漏杀的静态路径。当前 public start 关闭且未执行 Windows 实机验证，按潜在回归记录。"
+          ]
+        }
+      },
+      "findings": [
+        {
+          "id": "WIN-CLEANUP-IDENTITY-001",
+          "severity": "P2",
+          "evidence_level": "source-static",
+          "issue": "Windows 的 Popen 清理调用未传 expected_identity；Job Object assignment fallback 或 detach 超时路径可能发布 timeout/reap 结果后仍留下进程。",
+          "source_refs": [
+            "skills/spec-doc-review/scripts/peer-job-runner.py:368",
+            "skills/spec-doc-review/scripts/peer-job-runner.py:657",
+            "skills/spec-doc-review/scripts/peer-job-runner.py:861",
+            "skills/spec-doc-review/scripts/peer-job-runner.py:901",
+            "skills/spec-doc-review/scripts/peer-job-runner.py:911",
+            "skills/spec-doc-review/scripts/peer-job-runner.py:927",
+            "skills/spec-doc-review/scripts/peer-job-runner.py:1344",
+            "skills/spec-doc-review/scripts/peer-job-runner.py:1515",
+            "skills/spec-doc-review/scripts/peer-job-runner.py:1582",
+            "skills/spec-doc-review/scripts/peer-job-runner.py:1692"
+          ],
+          "repro": "源码调用链：_win_process_identity_matches(pid, None) 返回 False。_win_kill_tree 在 expected_identity=None 且无可用 Job Object 时令 recorded_leader=False；仍存活的原始根进程创建时间被用作 reuse_cutoff，真实子进程通常晚于该时间而被过滤，根进程也不会在末尾被终止。_reap_worker 随后忽略等待超时，supervise 仍可写入 terminal record。detach 超时调用同样未提供 identity。",
+          "reachability": "当前 public start 在 validate_start_authority 中必然以 provider_serving_receipt_unverified 拒绝，不能据此声称当前跨模型 Provider 已运行并泄漏；风险位于现存 Windows lifecycle 实现，启用或单独使用该路径前需修复。",
+          "recommendation": "保留 missing identity 的 fail-closed 规则；由持有实际 Popen 的清理调用者传入创建时记录的 identity，并覆盖 Job Object assignment fallback 与 detach 超时。",
+          "limitations": [
+            "未在 Windows 实机执行；这是源码可达条件分析。"
+          ],
+          "duplicate_of": "skills/spec-code-review/scripts/peer-job-runner.py:WIN-CLEANUP-IDENTITY-001"
+        }
+      ],
+      "limitations": [
+        "未执行 Windows ACL 或进程生命周期验证；未调用真实 Provider。"
+      ]
+    },
+    {
+      "path": "skills/spec-explain/references/explainer-html.md",
+      "sha256": "2cbce1a153b53a13667c7a5cca142ab7285cb60060320bf7ec52e55bbb03e4f9",
+      "bytes": 3506,
+      "line_count": 40,
+      "review_status": "full",
+      "covered_line_ranges": [
+        [
+          1,
+          40
+        ]
+      ],
+      "lenses": {
+        "openai-skill-engineering": {
+          "status": "reviewed",
+          "notes": [
+            "L7-15 自包含 HTML、可见 metadata、静态 Check yourself 与合成标记相容。L19-36 要求视觉与全文解释互补。"
+          ]
+        },
+        "anthropic-skill-craft-safety": {
+          "status": "reviewed",
+          "notes": [
+            "无脚本/外部请求/隐藏身份泄漏；静态回忆提示不再与禁止 quiz 文案矛盾。尚未浏览器渲染。"
+          ]
+        }
+      },
+      "findings": [],
+      "limitations": []
+    },
+    {
+      "path": "skills/spec-explain/references/explainer-markdown.md",
+      "sha256": "5254ccc55027f96121921052d1c845c33e8563449c7923a1301e5d8859157432",
+      "bytes": 2093,
+      "line_count": 33,
+      "review_status": "full",
+      "covered_line_ranges": [
+        [
+          1,
+          33
+        ]
+      ],
+      "lenses": {
+        "openai-skill-engineering": {
+          "status": "reviewed",
+          "notes": [
+            "L7-13 YAML provenance、repo-relative refs、纯 Markdown fallback consumer 清楚；L19-33 保留证据代码与可读图示。"
+          ]
+        },
+        "anthropic-skill-craft-safety": {
+          "status": "reviewed",
+          "notes": [
+            "静态 Check yourself 不引入交互或外发；不显示 scratch/token/receipt。未运行产物行为评测。"
+          ]
+        }
+      },
+      "findings": [],
+      "limitations": []
+    },
+    {
+      "path": "skills/spec-explain/references/orchestration.md",
+      "sha256": "9169c807d875dda6aeb56a21b86e62aa5618c2a1ad0d60a7ebaa8825707167a4",
+      "bytes": 2650,
+      "line_count": 20,
+      "review_status": "full",
+      "covered_line_ranges": [
+        [
+          1,
+          20
+        ]
+      ],
+      "lenses": {
+        "openai-skill-engineering": {
+          "status": "reviewed",
+          "notes": [
+            "L3 入口/交互/目的地责任分离；L11-18 evidence scouts 与 composition 权责分离，回退保留预算。"
+          ]
+        },
+        "anthropic-skill-craft-safety": {
+          "status": "reviewed",
+          "notes": [
+            "L7 不把沉默当答案且已委托常规选择不重复批准；L14 inline 不冒充独立覆盖，L20 目的地不增加无关外部动作授权。"
+          ]
+        }
+      },
+      "findings": [],
+      "limitations": []
+    },
+    {
+      "path": "skills/spec-explain/SKILL.md",
+      "sha256": "bd82dcd441b82fd5336f3ea26bc22c5e382baf1d5dfc52ccb734719db4c6e39e",
+      "bytes": 10799,
+      "line_count": 92,
+      "review_status": "full",
+      "covered_line_ranges": [
+        [
+          1,
+          92
+        ]
+      ],
+      "lenses": {
+        "openai-skill-engineering": {
+          "status": "reviewed",
+          "notes": [
+            "全文区分 concept/diff/idea/recap 输入、直接问答出口、fresh grounding、按需加载 rendering reference 和可恢复交付；静态 Check yourself 与 HTML/Markdown 引用一致。"
+          ]
+        },
+        "anthropic-skill-craft-safety": {
+          "status": "reviewed",
+          "notes": [
+            "L27-42 明确 dispatch 授权和能力分离，inline 不声明独立覆盖；L59-66 使用私有 scratch 并限制 symlink，L83-85 将外部发布授权与本地保留分开。未运行浏览器渲染或产物行为评测。"
+          ]
+        }
+      },
+      "findings": [],
+      "limitations": []
+    },
+    {
+      "path": "skills/spec-handoff/scripts/handoff-artifact.cjs",
+      "sha256": "7875e4d8a4350de177d6eb28af88af7bf0f97ebe12721330b5d0a0383dfbc21d",
+      "bytes": 16364,
+      "line_count": 380,
+      "review_status": "full",
+      "covered_line_ranges": [
+        [
+          1,
+          380
+        ]
+      ],
+      "lenses": {
+        "openai-skill-engineering": {
+          "status": "reviewed",
+          "notes": [
+            "L115-167 确定性 payload/metadata 渲染，L190-220 wx immutable 本地工件，L261-325 有界 discovery；语义内容由调用者提供。"
+          ]
+        },
+        "anthropic-skill-craft-safety": {
+          "status": "reviewed",
+          "notes": [
+            "L266-277 对不存在/非目录/symlink source-dir 统一结构化拒绝。source_refs 禁止 traversal；metadata frontmatter 有读取上限，结果保留 machine-local 限制。"
+          ]
+        }
+      },
+      "findings": [],
+      "limitations": []
+    },
+    {
+      "path": "tests/unit/spec-handoff-contracts.test.js",
+      "sha256": "eee4e526b8567703a2151af788ad11b63c2c5adf331c2a5751b1a2b8d08c6597",
+      "bytes": 13903,
+      "line_count": 276,
+      "review_status": "full",
+      "covered_line_ranges": [
+        [
+          1,
+          276
+        ]
+      ],
+      "lenses": {
+        "openai-skill-engineering": {
+          "status": "reviewed",
+          "notes": [
+            "L40-83 覆盖 resume/authority 边界；L85-198 覆盖不可变 metadata 与有界 frontmatter；L200-243 覆盖 source-dir、symlink 和数量上限；L245-276 覆盖多宿主投影。"
+          ]
+        },
+        "anthropic-skill-craft-safety": {
+          "status": "reviewed",
+          "notes": [
+            "L127-152 拒绝 traversal/symlink 写入，L200-225 对不安全或不存在的 source-dir 无副作用拒绝；这些是本地契约断言，不能当成外部发布证据。"
+          ]
+        }
+      },
+      "findings": [],
+      "limitations": []
+    },
+    {
+      "path": "skills/spec-lfg/scripts/pr-watch-state.cjs",
+      "sha256": "94907726f236c3c72e99989ce4d8551d96a2f37e2bcfc5d08493fa6eca2bf33b",
+      "bytes": 23960,
+      "line_count": 499,
+      "review_status": "full",
+      "covered_line_ranges": [
+        [
+          1,
+          499
+        ]
+      ],
+      "lenses": {
+        "openai-skill-engineering": {
+          "status": "reviewed",
+          "notes": [
+            "L269-357 hash-bound decision refs 与 journal 连续世代，L440-447 compare-and-swap 身份守卫；helper 只派生 facts，无 gh 外发。"
+          ]
+        },
+        "anthropic-skill-craft-safety": {
+          "status": "reviewed",
+          "notes": [
+            "L197-211 丢失工件结构化 decision-invalid；needs-human source 必须绑定具体 observation。looks-ready 不是 merge 授权，实时 GitHub watch 未执行。"
+          ]
+        }
+      },
+      "findings": [],
+      "limitations": []
+    },
+    {
+      "path": "tests/unit/spec-lfg-pr-watch-state.test.js",
+      "sha256": "af3de5fdb71bb8a44cd4e5ab673ad2c9f38f92a32544c69744c4356005bd7c71",
+      "bytes": 18803,
+      "line_count": 402,
+      "review_status": "full",
+      "covered_line_ranges": [
+        [
+          1,
+          402
+        ]
+      ],
+      "lenses": {
+        "openai-skill-engineering": {
+          "status": "reviewed",
+          "notes": [
+            "L86-201 覆盖分组 decisions、失效及 typed residual/hash 语义；L203-293 覆盖 green window/base currency；L295-401 覆盖 URL、隐私、symlink 与被删除工件的结构化拒绝。"
+          ]
+        },
+        "anthropic-skill-craft-safety": {
+          "status": "reviewed",
+          "notes": [
+            "测试防止 prose/injection 持久化及无效输入生成新状态；未执行真实 GitHub watch、网络请求或 merge 副作用。"
+          ]
+        }
+      },
+      "findings": [],
+      "limitations": []
+    },
+    {
+      "path": "skills/spec-optimize/scripts/decide.cjs",
+      "sha256": "435f0451a2cad84c1b8a4cb462ae587166c0802e274fb30502abbc5ce64ec4a8",
+      "bytes": 21638,
+      "line_count": 588,
+      "review_status": "full",
+      "covered_line_ranges": [
+        [
+          1,
+          588
+        ]
+      ],
+      "lenses": {
+        "openai-skill-engineering": {
+          "status": "reviewed",
+          "notes": [
+            "全文覆盖 spec 归一化、有限数值/布尔 gate 区分、aggregation 校验、真实样本配对、主/required objectives 比较、噪声与确认预算；smoke 未完成时不产生 keep 或 reached-target。"
+          ]
+        },
+        "anthropic-skill-craft-safety": {
+          "status": "reviewed",
+          "notes": [
+            "缺证据、无效协议、非有限数值与未满足 gate 均保留拒绝或 inconclusive 结果；helper 只计算确定性比较并输出 JSON，不执行 revert/commit 或替代目标选择的语义判断。"
+          ]
+        }
+      },
+      "findings": [],
+      "limitations": []
+    },
+    {
+      "path": "tests/unit/spec-optimize-decide.test.js",
+      "sha256": "1c215e2b6e0264f3b45ec48e9728828e25fb5f753c96dda460c81a31f62d7f62",
+      "bytes": 53372,
+      "line_count": 1513,
+      "review_status": "full",
+      "covered_line_ranges": [
+        [
+          1,
+          1513
+        ]
+      ],
+      "lenses": {
+        "openai-skill-engineering": {
+          "status": "reviewed",
+          "notes": [
+            "全文覆盖不伪造 baseline 配对、布尔 objective 拒绝、嵌套 aggregation、smoke 等待、CLI 非零退出、hard timeout/censor、噪声阈值、required objectives、judge floor 与完整确认样本。"
+          ]
+        },
+        "anthropic-skill-craft-safety": {
+          "status": "reviewed",
+          "notes": [
+            "隔离临时文件且执行有界本地子进程；明确区分真正 deadline censor 与命令自行退出 124/125，并防止 sample_count 绕过实际样本。此处没有真实模型收益或现场优化效果证据。"
+          ]
+        }
+      },
+      "findings": [],
+      "limitations": []
+    },
+    {
+      "path": "skills/spec-pov/scripts/peer-job-runner.py",
+      "sha256": "22a8bf6f1bd96fa0c49244b8ede26f28382bdf09d46968d94b21ec536d9926ba",
+      "bytes": 99361,
+      "line_count": 2244,
+      "review_status": "full",
+      "covered_line_ranges": [
+        [
+          1,
+          2244
+        ]
+      ],
+      "lenses": {
+        "openai-skill-engineering": {
+          "status": "reviewed",
+          "notes": [
+            "完整读取代表 runner，并对三个 owner-local 副本实际比较字节；L303-424 绑定请求与授权身份且在 serving producer channel 关闭时拒绝 start。全文覆盖 Windows identity、owner/no-follow 有界读取、进程生命周期、原子 terminal record、stale sweep、result/reap 和 CLI。"
+          ]
+        },
+        "anthropic-skill-craft-safety": {
+          "status": "reviewed",
+          "notes": [
+            "缺 recorded identity 时拒绝匹配是必要防护，但 L1344、L1582、L1692 的实际 Popen cleanup callers 未传 expected_identity；没有可用 Job Object 时存在清理漏杀的静态路径。当前 public start 关闭且未执行 Windows 实机验证，按潜在回归记录。"
+          ]
+        }
+      },
+      "findings": [
+        {
+          "id": "WIN-CLEANUP-IDENTITY-001",
+          "severity": "P2",
+          "evidence_level": "source-static",
+          "issue": "Windows 的 Popen 清理调用未传 expected_identity；Job Object assignment fallback 或 detach 超时路径可能发布 timeout/reap 结果后仍留下进程。",
+          "source_refs": [
+            "skills/spec-pov/scripts/peer-job-runner.py:368",
+            "skills/spec-pov/scripts/peer-job-runner.py:657",
+            "skills/spec-pov/scripts/peer-job-runner.py:861",
+            "skills/spec-pov/scripts/peer-job-runner.py:901",
+            "skills/spec-pov/scripts/peer-job-runner.py:911",
+            "skills/spec-pov/scripts/peer-job-runner.py:927",
+            "skills/spec-pov/scripts/peer-job-runner.py:1344",
+            "skills/spec-pov/scripts/peer-job-runner.py:1515",
+            "skills/spec-pov/scripts/peer-job-runner.py:1582",
+            "skills/spec-pov/scripts/peer-job-runner.py:1692"
+          ],
+          "repro": "源码调用链：_win_process_identity_matches(pid, None) 返回 False。_win_kill_tree 在 expected_identity=None 且无可用 Job Object 时令 recorded_leader=False；仍存活的原始根进程创建时间被用作 reuse_cutoff，真实子进程通常晚于该时间而被过滤，根进程也不会在末尾被终止。_reap_worker 随后忽略等待超时，supervise 仍可写入 terminal record。detach 超时调用同样未提供 identity。",
+          "reachability": "当前 public start 在 validate_start_authority 中必然以 provider_serving_receipt_unverified 拒绝，不能据此声称当前跨模型 Provider 已运行并泄漏；风险位于现存 Windows lifecycle 实现，启用或单独使用该路径前需修复。",
+          "recommendation": "保留 missing identity 的 fail-closed 规则；由持有实际 Popen 的清理调用者传入创建时记录的 identity，并覆盖 Job Object assignment fallback 与 detach 超时。",
+          "limitations": [
+            "未在 Windows 实机执行；这是源码可达条件分析。"
+          ],
+          "duplicate_of": "skills/spec-code-review/scripts/peer-job-runner.py:WIN-CLEANUP-IDENTITY-001"
+        }
+      ],
+      "limitations": [
+        "未执行 Windows ACL 或进程生命周期验证；未调用真实 Provider。"
+      ]
+    },
+    {
+      "path": "docs/contracts/project-graph-consumption.md",
+      "sha256": "b16b3960b52b3ddbda7ae8f1dca7e2514dde4efaa5671e961783a4d34aa6bf04",
+      "bytes": 24774,
+      "line_count": 152,
+      "review_status": "full",
+      "covered_line_ranges": [
+        [
+          1,
+          152
+        ]
+      ],
+      "lenses": {
+        "openai-skill-engineering": {
+          "status": "reviewed",
+          "notes": [
+            "全文定义 Graphify/CodeGraph 的发现、owner、consumer、查询与直接源码复核规则；将安装 readiness、图 currentness 和语义正确性分别处理，图仅提供定向线索。"
+          ]
+        },
+        "anthropic-skill-craft-safety": {
+          "status": "reviewed",
+          "notes": [
+            "provider_untrusted 输出不能提升为 confirmed truth；缺能力/证据时记录明确 degraded reason，禁止以存在 artifact 冒充 runtime readiness，普通 workflow 不静默刷新图或扩大 provider 内部契约。"
+          ]
+        }
+      },
+      "findings": [],
+      "limitations": []
+    }
+  ],
+  "overall": {
+    "status": "complete_with_concerns",
+    "expected_files": 21,
+    "full_files": 21,
+    "partial_files": 0,
+    "new_confirmed_findings": 1,
+    "unique_finding_ids": [
+      "WIN-CLEANUP-IDENTITY-001"
+    ],
+    "finding_file_occurrences": 3,
+    "runtime_confirmed_findings": 0
+  },
+  "limitations": [
+    "两个 lens 来自同一个独立 fresh-source reviewer，不能当作外部 OpenAI/Anthropic 模型互审。",
+    "CE 冻结链刷新前失败由主 Agent 负责收口，不作为新增实现 bug。",
+    "无外部 Provider/网络调用，无 Windows 实机、GitHub watch、真实模型或 field outcome 证据。",
+    "先前 npm test 包装器未透传路径，意外执行 unit 全套：232 suites passed / 2 CE drift failed；后续 focused closeout 为 13 passed / 1 同类 drift failed。报告不据此声明最终全绿，本次收口未重跑源码测试。",
+    "Windows cleanup finding 为 source-static P2，三个相同副本合计一个问题；当前 public start 因 authenticated producer channel disabled 而关闭。"
+  ],
+  "identity_verification": {
+    "scope_paths_match": true,
+    "all_current_file_identities_match": true,
+    "runner_copies_byte_equal": true,
+    "runner_bytes": 99361,
+    "runner_sha256": "22a8bf6f1bd96fa0c49244b8ede26f28382bdf09d46968d94b21ec536d9926ba"
+  }
+}

@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-09-12 15:00:00 codex: chore: 完成 runtime-setup P123 收尾审计，刷新 CE localization deterministic chain 并记录剩余真实验证边界。(user-visible)
 - v1.15.3 2026-09-12 14:00:00 codex: test: 更新 CE localization inventory/coverage 断言至当前 1126 路径与 437 relations，并补齐 setup artifact 临时路径验证。(user-visible)
 - v1.15.3 2026-09-12 13:00:00 codex: fix(runtime-setup): 收紧 CodeGraph/Graphify 证据边界、补齐 Pi readiness ledger，并记录 CE 增量审查限制。(user-visible)
 - v1.15.3 2026-09-12 12:30:00 codex: fix(runtime-setup): 收紧 CodeGraph manifest/FIFO 读取并绑定 Graphify query 前后图摘要；补齐 Pi host readiness ledger。(user-visible)

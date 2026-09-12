@@ -4,12 +4,12 @@
   "producer": "scripts/check-ce-localization-review.cjs",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "24da2eadc68d0ef6742dab155e0ee9331398aba7",
+    "head": "54ca34249351ed95cc6c896da795cf937733ce40",
     "dirty": false,
     "dirty_paths": [],
     "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "9f6d75327f8a6897cdb9b48a52a1e50be770ac2d4b394ff003405b2193f20d23",
-    "inventory_hash": "b279e660dd0f217b0754649a3e61ed4a7d60c09339c69c8dfec307b8b2accd46",
+    "source_tree_hash": "269c353fb09cda5db3eece78278b985b54c803c1a300834632fd9e78f29abf1d",
+    "inventory_hash": "415b5fd44d1d00e39112f65176156869a8ec7f406f3a346018728106e7defe51",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -44,12 +44,12 @@
     }
   },
   "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
-  "inventory_sha256": "732d201ae85b0afcbb2ca1d3e4a94993efc5e0de21dcac32777fc01a9f0e54a3",
+  "inventory_sha256": "08a87865a90497cd9644fc9e67ab4ef6d92042e092aee3c9c8d3fbf5053aae20",
   "review_input": {
-    "inventory_sha256": "732d201ae85b0afcbb2ca1d3e4a94993efc5e0de21dcac32777fc01a9f0e54a3",
+    "inventory_sha256": "08a87865a90497cd9644fc9e67ab4ef6d92042e092aee3c9c8d3fbf5053aae20",
     "package_manifest_sha256": "65b0dd3a18523d14b422def53db796f32fa4f265105c6cfca431ff9485b8b312",
-    "direct_support_manifest_sha256": "72de43248a597c2100ddfb013d47fc9b83054d771b4f586899e6efc5cb934792",
-    "relation_manifest_sha256": "17b6d8f888a23a9abc95d39c52e214002ef3f2bf1bee1bf21a07ea59cbdc3f01"
+    "direct_support_manifest_sha256": "946d0d69e3220256c92b9835a08d9c3785fca9c4799091d6c374cd9318c64347",
+    "relation_manifest_sha256": "829897bd4ea2dd5beaec2c8f3a0bf86197e9a84d6af783be9048fb85715b4b84"
   },
   "coverage_summary": {
     "skill_count": 38,
@@ -14468,9 +14468,9 @@
       "skill_id": "autoresearch",
       "owning_skill": "autoresearch",
       "path": "tests/unit/ce-localization-review-contracts.test.js",
-      "sha256": "d545890b80b12e2e9b85d96f1618726dde3bbf9eca563a0a00f87394aa66ff07",
-      "bytes": 5960,
-      "line_count": 109,
+      "sha256": "b727424ff1a9bb130c21780f2bbae2a939efbd78f8201208d2dba743c27efdf5",
+      "bytes": 6324,
+      "line_count": 114,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -14480,7 +14480,7 @@
       "evidence": [
         {
           "source_path": "tests/unit/ce-localization-review-contracts.test.js",
-          "line": 31,
+          "line": 32,
           "excerpt": "// 2026-09-04（01fad369）：autoresearch 从 host-owned 排除清单收编进 canonical"
         }
       ]

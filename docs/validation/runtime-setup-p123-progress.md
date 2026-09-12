@@ -293,3 +293,11 @@
 - 宿主：`pi` 已接入 facts readiness ledger 与 runtime state path，宿主枚举漂移测试通过。
 - 当前聚焦验证：provider/host/evidence 84 tests passed；typecheck 263 files passed。
 - CE localization 增量 review：provider 报告已保存但其余 30+ 文件因 reviewer provider 429 仅部分覆盖，未声称全量独立审查；历史 semantic adjudication 保留 `degraded` claim ceiling。
+
+
+## 最终收尾审计（2026-09-12）
+
+- deterministic CE localization chain 已按当前 source snapshot 重生成并 verify-only 复核：38 skills、1126 package paths、221 direct-support paths、437 relations，缺失/哈希漂移为 0。
+- `npm run typecheck` 通过（263 files）；`npm run lint:skill-entrypoints` 通过（490 files）。
+- CE setup preflight 为 `confirmed`，dependency matrix 为 `degraded`；该 degraded 状态来自历史语义 adjudication/可选依赖证据，不是 deterministic inventory 失败。
+- P123 仍不标记为 complete：真实 Windows/跨宿主/field outcome、主进程 SIGINT 恢复、refresh-only 整库回滚、U11/U12 全量 fresh-source consumer 证据仍未具备。

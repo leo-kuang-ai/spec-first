@@ -3,12 +3,17 @@
   "artifact_kind": "source-bound-semantic-review-delta",
   "review_run_id": "ce-localization-provider-review-2026-09-11-refresh",
   "producer": "独立 fresh-source reviewer /root/ce_provider_review",
-  "reviewed_at": "2026-09-11T15:45:16.689347+00:00",
+  "reviewed_at": "2026-09-12T01:00:38+08:00",
   "source_binding": {
     "scope_path": "docs/validation/ce-localization/review/deltas/2026-09-11-refresh/providers-scope.json",
     "scope_sha256": "71f6a2cfcb2f478482f318329ad7d3b8bc51616b2c9374b3f491459f71b223e9",
     "scope_head": "9b3f37177412ad51293f118fe613243ba85d7fd0",
-    "observed_head": "9b3f37177412ad51293f118fe613243ba85d7fd0"
+    "observed_head": "54ca34249351ed95cc6c896da795cf937733ce40",
+    "repair_commits": [
+      "d487cf02b993267b66531058d65976c6ed83ba9d",
+      "10b2460c3e47d69ae0f5dec1a670352e670860c3",
+      "24da2eadc68d0ef6742dab155e0ee9331398aba7"
+    ]
   },
   "execution_context": {
     "review_method": "independent-fresh-source-agent",
@@ -22,16 +27,16 @@
   "reviewed_paths": [
     {
       "path": "skills/spec-runtime-setup/scripts/providers/codegraph-artifact-evidence.cjs",
-      "sha256": "cbbb1cd90feddcc67ab3eacf5443e51a975957237d7f019aca89b66360d50737",
-      "bytes": 7567,
-      "line_count": 121,
+      "sha256": "6e3c81e0e09d4b0c05d72478ac0c59583dabc79905d4afcb0631dd0a8e43aed2",
+      "bytes": 8623,
+      "line_count": 136,
       "covered_line_ranges": [
         [
           1,
-          121
+          136
         ]
       ],
-      "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+      "read_method": "本轮全文直接重读，并核对完整修复差异；原轮 receipt 保存在 prior_review。",
       "finding_ids": [
         "PROV-01",
         "PROV-02",
@@ -41,9 +46,9 @@
         {
           "review_lens": "openai-skill-engineering",
           "review_status": "complete",
-          "verdict": "actionable-findings",
+          "verdict": "no-new-actionable-finding",
           "notes": [
-            "逐行核对 DB、WAL、journal 的存在状态与字节摘要、源码内容身份、provider identity、原始 verified_at 和 TTL；compareEvidence 不以新 facts 时间重置原 query 证据。"
+            "DB/WAL/journal、源码内容、provider identity 和原 verified_at/TTL 的既有绑定保持；recorded facts 改为初始大小内的分块读取。"
           ],
           "limitations": [
             "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
@@ -52,9 +57,9 @@
         {
           "review_lens": "anthropic-skill-craft-safety",
           "review_status": "complete",
-          "verdict": "actionable-findings",
+          "verdict": "no-new-actionable-finding",
           "notes": [
-            "发现 stat 后无界 fd 读取、validEvidence 与 schema 对额外字段的分歧，以及底层 helper 打开 FIFO 可阻塞；当前 hash 仍存在这些缺口。"
+            "PROV-01/02/05 已静态闭合：有界 fd 读取、拒绝额外字段与数组、底层非阻塞打开均已回源确认。helper 的更严格日期/路径/DB 大小检查不等于与 schema 完全等价。"
           ],
           "limitations": [
             "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
@@ -64,16 +69,16 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/providers/codegraph-launcher.cjs",
-      "sha256": "0e0f1ce146e806f0adf6a32e8fedd10456d0e26e8a7b2aaa2375dbc953830cb7",
-      "bytes": 5529,
-      "line_count": 100,
+      "sha256": "a316a555ad699b4fdb0e8c25cfc2a0ba2fc5eb9b33207ca4023ba58aa3e3e712",
+      "bytes": 6157,
+      "line_count": 116,
       "covered_line_ranges": [
         [
           1,
-          100
+          116
         ]
       ],
-      "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+      "read_method": "本轮全文直接重读，并核对完整修复差异；原轮 receipt 保存在 prior_review。",
       "finding_ids": [
         "PROV-04"
       ],
@@ -81,9 +86,9 @@
         {
           "review_lens": "openai-skill-engineering",
           "review_status": "complete",
-          "verdict": "actionable-findings",
+          "verdict": "no-new-actionable-finding",
           "notes": [
-            "解析 npm global/local .bin 与 Unix symlink 布局，固定 platform package/version，保留 argv 并绕过会 self-heal 的 npm shim；identity 摘要明确只覆盖包元数据与入口路径。"
+            "npm global/local .bin 与 Unix symlink 解析、固定平台包版本、保留 argv 和绕过 self-heal shim 的既有行为保持。"
           ],
           "limitations": [
             "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
@@ -92,9 +97,9 @@
         {
           "review_lens": "anthropic-skill-craft-safety",
           "review_status": "complete",
-          "verdict": "actionable-findings",
+          "verdict": "no-new-actionable-finding",
           "notes": [
-            "manifest 采用 stat 后 readFileSync(path)，64 KiB 限制未覆盖增长或换链窗口；不应把此身份解释为安装后二进制或所有依赖字节校验。"
+            "PROV-04 已静态闭合：manifest 使用 stable regular fd、64 KiB 限制和 stat.size+1 读取，目录链与代际前后校验拒绝漂移；identity 仍只绑定元数据与入口路径。"
           ],
           "limitations": [
             "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
@@ -113,7 +118,7 @@
           555
         ]
       ],
-      "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+      "read_method": "本轮 SHA-256 与原轮全文 receipt 一致，沿用原全文审查；未重复读取未变化内容。",
       "finding_ids": [],
       "lens_verdicts": [
         {
@@ -151,7 +156,7 @@
           136
         ]
       ],
-      "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+      "read_method": "本轮 SHA-256 与原轮全文 receipt 一致，沿用原全文审查；未重复读取未变化内容。",
       "finding_ids": [],
       "lens_verdicts": [
         {
@@ -180,16 +185,16 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
-      "sha256": "06eba117e3dc8e10e4a115416d89336af9a957e5acfe6497c5289973663d8a8b",
-      "bytes": 125231,
-      "line_count": 2673,
+      "sha256": "90e04e7171b11e4dec74168f0f0affe3b27a70ef75e727da1697877098f7f53f",
+      "bytes": 127353,
+      "line_count": 2708,
       "covered_line_ranges": [
         [
-          1,
-          2673
+          390,
+          668
         ]
       ],
-      "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+      "read_method": "原轮全文审查 + 本轮完整修复差异 + 当前受影响 apply 函数 390–668 行直接复核；不声称本轮全文重读 2708 行。",
       "finding_ids": [
         "PROV-03"
       ],
@@ -197,9 +202,9 @@
         {
           "review_lens": "openai-skill-engineering",
           "review_status": "complete",
-          "verdict": "actionable-findings",
+          "verdict": "no-new-actionable-finding",
           "notes": [
-            "全文核对源码前后快照、scope receipt、固定 graph digest、当前 identity 专用只读探测、doctor current receipt 路径；无 HEAD/source 不完整保持 unknown。发现 apply 的 query 与最终 graph/identity 缺少稳定性关联。"
+            "PROV-03 已静态闭合：generation/query/final provider identity 以及 query 前后/发布前 graph digest 必须一致，漂移将 mutationFailure 传至 degraded 分支。"
           ],
           "limitations": [
             "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
@@ -208,9 +213,9 @@
         {
           "review_lens": "anthropic-skill-craft-safety",
           "review_status": "complete",
-          "verdict": "actionable-findings",
+          "verdict": "no-new-actionable-finding",
           "notes": [
-            "当前 receipt 专用读取使用 no-follow/nonblocking fd、stat.size+1、前后 fstat/lstat；host mutation、外部 hook 与 legacy root 的边界有明确分支，但不能据此外推所有旧辅助读取都有有界保证。"
+            "既有当前 receipt 路径、host mutation、外部 hook 与 legacy root 边界保持；本次闭合只支持 fresh 绑定，不外推所有旧辅助读取或全面原子事务安全。"
           ],
           "limitations": [
             "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
@@ -229,7 +234,7 @@
           91
         ]
       ],
-      "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+      "read_method": "本轮 SHA-256 与原轮全文 receipt 一致，沿用原全文审查；未重复读取未变化内容。",
       "finding_ids": [],
       "lens_verdicts": [
         {
@@ -267,7 +272,7 @@
           102
         ]
       ],
-      "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+      "read_method": "本轮 SHA-256 与原轮全文 receipt 一致，沿用原全文审查；未重复读取未变化内容。",
       "finding_ids": [],
       "lens_verdicts": [
         {
@@ -296,16 +301,16 @@
     },
     {
       "path": "tests/unit/mcp-setup-providers.test.js",
-      "sha256": "0061b3db7755155b4791c1dd64661713b54d37850e272eddd8c7177b74f14f3c",
-      "bytes": 101258,
-      "line_count": 2119,
+      "sha256": "eab93f4b2c69cb04d381c01c238d41e724c99d7800f49392a5abb579f4416b3f",
+      "bytes": 103149,
+      "line_count": 2147,
       "covered_line_ranges": [
         [
-          1,
-          2119
+          1080,
+          1195
         ]
       ],
-      "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+      "read_method": "原轮全文审查 + 本轮完整修复差异 + 当前受影响回归 1080–1195 行直接复核；不声称本轮全文重读 2147 行。",
       "finding_ids": [
         "PROV-03"
       ],
@@ -313,9 +318,9 @@
         {
           "review_lens": "openai-skill-engineering",
           "review_status": "complete",
-          "verdict": "actionable-findings",
+          "verdict": "no-new-actionable-finding",
           "notes": [
-            "完整读取全部 CodeGraph status/sync/reindex 与 Graphify migration、scope、source binding、host、hook、identity 回归；现有 source-change 测试有效区分 fresh/degraded/unknown。"
+            "新增 query-graph/final-probe-graph/query-identity 三类漂移回归使用稳定 folder source，要求 degraded 和对应 reason；正常 source binding 案例仍断言 fresh。"
           ],
           "limitations": [
             "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
@@ -324,9 +329,9 @@
         {
           "review_lens": "anthropic-skill-craft-safety",
           "review_status": "complete",
-          "verdict": "actionable-findings",
+          "verdict": "no-new-actionable-finding",
           "notes": [
-            "发现 interpreter 在 query 期间替换用例接受新身份且 fixture 无 HEAD，使 fresh 关联缺口没有被测试暴露；外部 hook 和 credentials 测试只能证明各自 fixture 的保留/隔离。"
+            "旧 interpreter 漂移 fixture 不再作为 fresh 关联的唯一覆盖依据；新增负例与正常 fresh 阳性对照共同覆盖 PROV-03。测试执行状态仅引用主 Agent 报告。"
           ],
           "limitations": [
             "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
@@ -336,27 +341,28 @@
     },
     {
       "path": "tests/unit/runtime-setup-codegraph-evidence.test.js",
-      "sha256": "6251868bee83dc8b49ab6b981b77417ce1fd187b5e6b6d07faa9bb3b81fc9f07",
-      "bytes": 9684,
-      "line_count": 168,
+      "sha256": "18627c29de920929d1b1bce1ccfd52e8e380d8a69add2fce10fa33c9707f5343",
+      "bytes": 11230,
+      "line_count": 190,
       "covered_line_ranges": [
         [
           1,
-          168
+          190
         ]
       ],
-      "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+      "read_method": "本轮全文直接重读，并核对完整修复差异；原轮 receipt 保存在 prior_review。",
       "finding_ids": [
         "PROV-01",
-        "PROV-02"
+        "PROV-02",
+        "PROV-05"
       ],
       "lens_verdicts": [
         {
           "review_lens": "openai-skill-engineering",
           "review_status": "complete",
-          "verdict": "actionable-findings",
+          "verdict": "no-new-actionable-finding",
           "notes": [
-            "完整读取当前新增测试，覆盖原证据复用、DB sidecar、源码与 TTL 漂移；新增 fd/额外字段案例在当前旧实现上出现预期红灯。"
+            "新增有界 fd、额外字段与 POSIX FIFO 回归的断言覆盖 PROV-01/02/05；原证据复用、DB sidecar、源码与 TTL 测试保持。"
           ],
           "limitations": [
             "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
@@ -365,9 +371,9 @@
         {
           "review_lens": "anthropic-skill-craft-safety",
           "review_status": "complete",
-          "verdict": "actionable-findings",
+          "verdict": "no-new-actionable-finding",
           "notes": [
-            "新增 doctor 案例使用 Windows producer snapshot 对当前 macOS consumer，第一轮未断言 pass；source mismatch 可短路 artifact compare，需修 fixture 后再证明新分支。"
+            "doctor fixture 已消除 producer/consumer platform 造成的 source 短路，先断言 fresh 与 fresh=1，再断言 WAL 变化 stale 与缺证据 unknown；fixture gap 已静态闭合。"
           ],
           "limitations": [
             "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
@@ -386,7 +392,7 @@
           69
         ]
       ],
-      "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+      "read_method": "本轮 SHA-256 与原轮全文 receipt 一致，沿用原全文审查；未重复读取未变化内容。",
       "finding_ids": [],
       "lens_verdicts": [
         {
@@ -415,24 +421,26 @@
     },
     {
       "path": "tests/unit/runtime-setup-codegraph-launcher.test.js",
-      "sha256": "7e0997612f7786344a937775abf7b1e7badf5b2cf9ed16c12c921c8ac767cc4a",
-      "bytes": 10880,
-      "line_count": 144,
+      "sha256": "062d12910dbe8979916f97bca7078cb3b76bc95e2897fdb24c4cf62c80cafc6f",
+      "bytes": 11645,
+      "line_count": 160,
       "covered_line_ranges": [
         [
           1,
-          144
+          160
         ]
       ],
-      "read_method": "全文直接读取；输出截断的段落已分段重新读取",
-      "finding_ids": [],
+      "read_method": "本轮全文直接重读，并核对完整修复差异；原轮 receipt 保存在 prior_review。",
+      "finding_ids": [
+        "PROV-04"
+      ],
       "lens_verdicts": [
         {
           "review_lens": "openai-skill-engineering",
           "review_status": "complete",
           "verdict": "no-new-actionable-finding",
           "notes": [
-            "完整读取 Windows argv/path fixture、版本漂移、local .bin 缺 bundle、Unix 默认 runner fixture；最终身份失败不允许 reconcileConfigured 升 fresh。"
+            "完整重读 160 行；新增 manifest 在 stat 后增长的回归，断言解析失败且请求读取字节不超过初始大小+1。"
           ],
           "limitations": [
             "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
@@ -443,7 +451,7 @@
           "review_status": "complete",
           "verdict": "no-new-actionable-finding",
           "notes": [
-            "Windows 测试明确不执行二进制；query_verified 与 freshness 分层已有显式测试，保留历史 probe 布尔本身不作为新 finding。"
+            "Windows fixture 不执行 Windows 引擎；POSIX 默认 runner fixture 与 query/final identity 分层断言保持。新增用例的实际执行结果未由本 reviewer 重跑。"
           ],
           "limitations": [
             "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
@@ -462,7 +470,7 @@
           346
         ]
       ],
-      "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+      "read_method": "本轮 SHA-256 与原轮全文 receipt 一致，沿用原全文审查；未重复读取未变化内容。",
       "finding_ids": [],
       "lens_verdicts": [
         {
@@ -481,7 +489,7 @@
           "review_status": "complete",
           "verdict": "no-new-actionable-finding",
           "notes": [
-            "Graphify 测试构造的 receipt 没有 query 与 identity 绑定字段，不能补足 producer 的关联缺口；多数实例采用受控 fixture/mock，不能升级为真实宿主收益证据。"
+            "这些 consumer fixture 证明各自的 receipt 消费与降级路径；PROV-03 的 generation/query/final 关联修复由 provider 源码和 mcp-setup-providers 新增回归支撑，不能由此升级为真实宿主收益证据。"
           ],
           "limitations": [
             "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
@@ -500,7 +508,7 @@
           174
         ]
       ],
-      "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+      "read_method": "本轮 SHA-256 与原轮全文 receipt 一致，沿用原全文审查；未重复读取未变化内容。",
       "finding_ids": [],
       "lens_verdicts": [
         {
@@ -540,7 +548,7 @@
           775
         ]
       ],
-      "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+      "read_method": "本轮 SHA-256 与原轮全文 receipt 一致，沿用原全文审查；未重复读取未变化内容。",
       "finding_ids": [
         "PROV-02"
       ],
@@ -548,9 +556,9 @@
         {
           "review_lens": "openai-skill-engineering",
           "review_status": "complete",
-          "verdict": "actionable-findings",
+          "verdict": "no-new-actionable-finding",
           "notes": [
-            "全文追踪 normalizer 与 doctor 的 source、provider identity、CodeGraph evidence、Graphify receipt 消费；freshness 不成立时后续检查短路，计数更新需命中对应分支。"
+            "consumer 文件 hash 未变化，沿用原全文审查；normalizer/doctor 的 source、identity、evidence 和计数消费由更新后的有效 fixture 覆盖。"
           ],
           "limitations": [
             "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
@@ -559,9 +567,9 @@
         {
           "review_lens": "anthropic-skill-craft-safety",
           "review_status": "complete",
-          "verdict": "actionable-findings",
+          "verdict": "no-new-actionable-finding",
           "notes": [
-            "不重新生成 receipt、不运行原生 query/update；normalizer 必须与 evidence schema 一致，且 provider_counts 中历史 fresh 不可被单独解释为当前全局 fresh。"
+            "normalizer 依赖的 validEvidence 现拒绝额外字段；consumer 不重新生成 receipt、不运行 query/update，历史 fresh 计数仍不能单独表示当前全局 fresh。"
           ],
           "limitations": [
             "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
@@ -580,7 +588,7 @@
           510
         ]
       ],
-      "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+      "read_method": "本轮 SHA-256 与原轮全文 receipt 一致，沿用原全文审查；未重复读取未变化内容。",
       "finding_ids": [
         "PROV-02"
       ],
@@ -588,9 +596,9 @@
         {
           "review_lens": "openai-skill-engineering",
           "review_status": "complete",
-          "verdict": "actionable-findings",
+          "verdict": "no-new-actionable-finding",
           "notes": [
-            "完整读取 provider-readiness.v2 schema：artifact_evidence 为可选增量字段，限定 CodeGraph evidence 结构、三类 DB 文件、source content identity 和 npm identity。"
+            "schema 文件 hash 未变化，沿用原全文审查；artifact_evidence 的结构、三类 DB 文件、source content identity 和 npm identity 合同保持。"
           ],
           "limitations": [
             "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
@@ -599,9 +607,9 @@
         {
           "review_lens": "anthropic-skill-craft-safety",
           "review_status": "complete",
-          "verdict": "actionable-findings",
+          "verdict": "no-new-actionable-finding",
           "notes": [
-            "additionalProperties=false 与当前 validEvidence 的宽松字段接纳不一致；schema 的非负 DB size 与 helper 的正数要求也不是等价语义，需要严格 runtime validator 保底。"
+            "PROV-02 所述额外字段接纳差异已在 owning validator 修复；helper 对日期、绝对路径和 DB 正数大小更严格，不能据此声称与 schema 全面等价。"
           ],
           "limitations": [
             "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
@@ -611,8 +619,8 @@
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/regular-file-snapshot.cjs",
-      "sha256": "581aae6be3402874addb43047a87e80aa5af0b2cb7b308a62cb4918d114e7283",
-      "bytes": 4161,
+      "sha256": "0bafa3a681a9501691132072bdac87d9d01a9d255381bf82afe6404e60d8d5ba",
+      "bytes": 4194,
       "line_count": 139,
       "covered_line_ranges": [
         [
@@ -620,7 +628,7 @@
           139
         ]
       ],
-      "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+      "read_method": "本轮全文直接重读，并核对完整修复差异；原轮 receipt 保存在 prior_review。",
       "finding_ids": [
         "PROV-05"
       ],
@@ -628,9 +636,9 @@
         {
           "review_lens": "openai-skill-engineering",
           "review_status": "complete",
-          "verdict": "actionable-findings",
+          "verdict": "no-new-actionable-finding",
           "notes": [
-            "全文核对 stable descriptor 与目录链前后身份检查；它本身不限制 read callback 的长度。"
+            "stable descriptor、目录链、代际前后检查保持；读取长度仍由 caller 的 read callback 负责。"
           ],
           "limitations": [
             "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
@@ -639,9 +647,9 @@
         {
           "review_lens": "anthropic-skill-craft-safety",
           "review_status": "complete",
-          "verdict": "actionable-findings",
+          "verdict": "no-new-actionable-finding",
           "notes": [
-            "openSync 缺 O_NONBLOCK，FIFO 可在 fstat regular-file 拒绝前阻塞；只有检查完成后的稳定性，不等于从打开动作开始有界。"
+            "PROV-05 已静态闭合：openSync 的 flags 新增 O_NONBLOCK，fstat 继续拒绝特殊文件；POSIX FIFO 子进程回归具备 2 秒超时和 null 输出断言。"
           ],
           "limitations": [
             "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
@@ -660,7 +668,7 @@
           205
         ]
       ],
-      "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+      "read_method": "本轮 SHA-256 与原轮全文 receipt 一致，沿用原全文审查；未重复读取未变化内容。",
       "finding_ids": [],
       "lens_verdicts": [
         {
@@ -692,7 +700,7 @@
     {
       "id": "PROV-01",
       "priority": "P2",
-      "status": "open",
+      "status": "resolved",
       "title": "Recorded CodeGraph facts 的读取上限仅检查 stat，未限制实际读取",
       "locations": [
         {
@@ -705,12 +713,39 @@
       ],
       "evidence": "readRecordedEvidence 在 stat.size <= 4 MiB 后使用 fs.readFileSync(fd, utf8)，增长窗口内可越过预算；底层后验 drift 检查只能拒绝结果，不能撤销已发生的大读取。",
       "requested_change": "使用固定长度 fd 读取并检测额外字节；保留前后稳定性拒绝。",
-      "validation": "主 agent 新增回归已读，当前旧实现在误触发 unit 运行中失败；修复后由主 agent 完成 focused 验证。"
+      "validation": "主 agent 新增回归已读，当前旧实现在误触发 unit 运行中失败；修复后由主 agent 完成 focused 验证。",
+      "original_status": "open",
+      "resolved_at": "2026-09-12T01:00:38+08:00",
+      "resolution_evidence": {
+        "summary": "readRecordedEvidence 现在通过 stable regular fd，以初始 stat.size 为严格上限分块读取，拒绝增长/代际漂移；未再使用无界 fs.readFileSync(fd)。",
+        "source_refs": [
+          {
+            "path": "skills/spec-runtime-setup/scripts/providers/codegraph-artifact-evidence.cjs",
+            "lines": [
+              111,
+              133
+            ],
+            "sha256": "6e3c81e0e09d4b0c05d72478ac0c59583dabc79905d4afcb0631dd0a8e43aed2"
+          }
+        ],
+        "test_refs": [
+          {
+            "path": "tests/unit/runtime-setup-codegraph-evidence.test.js",
+            "lines": [
+              78,
+              100
+            ],
+            "sha256": "18627c29de920929d1b1bce1ccfd52e8e380d8a69add2fce10fa33c9707f5343"
+          }
+        ],
+        "commit": "d487cf02b993267b66531058d65976c6ed83ba9d",
+        "review_basis": "本轮独立 fresh-source 静态复审；未由本 reviewer 重跑测试。"
+      }
     },
     {
       "id": "PROV-02",
       "priority": "P2",
-      "status": "open",
+      "status": "resolved",
       "title": "validEvidence 接受 schema 明确拒绝的额外字段",
       "locations": [
         {
@@ -737,12 +772,55 @@
       ],
       "evidence": "root/source_snapshot/provider_identity/单个 file record 的额外字段未被 runtime validator 拒绝，normalizer 会保留 artifact_evidence，但 schema additionalProperties=false 拒绝这些对象。",
       "requested_change": "在 owning validator 严格检查对象类型、own keys 和嵌套字段，并与 schema 边界对齐。",
-      "validation": "主 agent 新增四类 extra-field 回归已读；当前实现在中止前测试输出中四例均失败。"
+      "validation": "主 agent 新增四类 extra-field 回归已读；当前实现在中止前测试输出中四例均失败。",
+      "original_status": "open",
+      "resolved_at": "2026-09-12T01:00:38+08:00",
+      "resolution_evidence": {
+        "summary": "validEvidence 对 root/source_snapshot/provider_identity/files/file record 做 exact own-key 与对象/数组约束；schema 仍是独立消费者。helper 对日期、绝对路径、DB 正数大小可更严格，不能声称与 schema 完全等价。",
+        "source_refs": [
+          {
+            "path": "skills/spec-runtime-setup/scripts/providers/codegraph-artifact-evidence.cjs",
+            "lines": [
+              66,
+              80
+            ],
+            "sha256": "6e3c81e0e09d4b0c05d72478ac0c59583dabc79905d4afcb0631dd0a8e43aed2"
+          },
+          {
+            "path": "docs/contracts/provider-readiness.schema.json",
+            "lines": [
+              29,
+              161
+            ],
+            "sha256": "f60bca148b2a1acfa4142f43be0238601ec856cb4241879fc5cd445949a9116d"
+          },
+          {
+            "path": "src/cli/helpers/setup-facts.js",
+            "lines": [
+              337,
+              347
+            ],
+            "sha256": "31cad2f021655323cae4b98afb72ff93a3255a2f404355c446023acaf665adf7"
+          }
+        ],
+        "test_refs": [
+          {
+            "path": "tests/unit/runtime-setup-codegraph-evidence.test.js",
+            "lines": [
+              103,
+              110
+            ],
+            "sha256": "18627c29de920929d1b1bce1ccfd52e8e380d8a69add2fce10fa33c9707f5343"
+          }
+        ],
+        "commit": "d487cf02b993267b66531058d65976c6ed83ba9d",
+        "review_basis": "本轮独立 fresh-source 静态复审；未由本 reviewer 重跑测试。"
+      }
     },
     {
       "id": "PROV-03",
       "priority": "P2",
-      "status": "open",
+      "status": "resolved",
       "title": "Graphify fresh 把 query 结果关联到事后 graph 与 identity",
       "locations": [
         {
@@ -762,12 +840,71 @@
       ],
       "evidence": "query 退出后才写当前 graph digest，未比较 query 前后 artifact；最终 identity 只要求版本正确，未与构图/query 前身份比较。源码稳定时图或 interpreter/inventory 变化仍可发布 fresh。现有 interpreter 漂移 fixture 接受新身份且无 HEAD，未覆盖 fresh 分支。",
       "requested_change": "将构图/query 所用的 provider identity 与 query 前后 graph 内容绑定；发现任一漂移不得发布 fresh 或把新对象当作已验证对象。",
-      "validation": "静态完整调用流与现有测试可复核；本 reviewer 未运行专用新复现，已立即交主 agent 补回归。"
+      "validation": "静态完整调用流与现有测试可复核；本 reviewer 未运行专用新复现，已立即交主 agent 补回归。",
+      "original_status": "open",
+      "resolved_at": "2026-09-12T01:00:38+08:00",
+      "resolution_evidence": {
+        "summary": "Graphify 保存 generation/query identity 与 query 前 graph hash，在 query 后、最终 probe 后再次比较；任一 graph/identity 漂移或缺失均设置 mutationFailure，degraded 不能 fresh。",
+        "source_refs": [
+          {
+            "path": "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
+            "lines": [
+              395,
+              397
+            ],
+            "sha256": "90e04e7171b11e4dec74168f0f0affe3b27a70ef75e727da1697877098f7f53f"
+          },
+          {
+            "path": "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
+            "lines": [
+              429,
+              438
+            ],
+            "sha256": "90e04e7171b11e4dec74168f0f0affe3b27a70ef75e727da1697877098f7f53f"
+          },
+          {
+            "path": "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
+            "lines": [
+              506,
+              560
+            ],
+            "sha256": "90e04e7171b11e4dec74168f0f0affe3b27a70ef75e727da1697877098f7f53f"
+          },
+          {
+            "path": "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
+            "lines": [
+              612,
+              630
+            ],
+            "sha256": "90e04e7171b11e4dec74168f0f0affe3b27a70ef75e727da1697877098f7f53f"
+          }
+        ],
+        "test_refs": [
+          {
+            "path": "tests/unit/mcp-setup-providers.test.js",
+            "lines": [
+              1101,
+              1158
+            ],
+            "sha256": "eab93f4b2c69cb04d381c01c238d41e724c99d7800f49392a5abb579f4416b3f"
+          },
+          {
+            "path": "tests/unit/runtime-setup-codegraph-launcher.test.js",
+            "lines": [
+              71,
+              90
+            ],
+            "sha256": "062d12910dbe8979916f97bca7078cb3b76bc95e2897fdb24c4cf62c80cafc6f"
+          }
+        ],
+        "commit": "24da2eadc68d0ef6742dab155e0ee9331398aba7",
+        "review_basis": "本轮独立 fresh-source 静态复审；未由本 reviewer 重跑测试。"
+      }
     },
     {
       "id": "PROV-04",
       "priority": "P2",
-      "status": "open",
+      "status": "resolved",
       "title": "CodeGraph manifest 的 64 KiB 与安全文件检查存在换链/增长窗口",
       "locations": [
         {
@@ -780,12 +917,39 @@
       ],
       "evidence": "safeFile lstat 与 readManifest stat/readFileSync(path) 分离，解析时未绑定检查过的 descriptor；文件可在 stat 后增长或替换。",
       "requested_change": "复用 stable regular fd 并按初始大小严格有界读取 manifest，任何类型/路径/代际变化拒绝身份。",
-      "validation": "源码机制直接确认；未执行竞态新复现。"
+      "validation": "源码机制直接确认；未执行竞态新复现。",
+      "original_status": "open",
+      "resolved_at": "2026-09-12T01:00:38+08:00",
+      "resolution_evidence": {
+        "summary": "manifest 复用 readStableRegularFile，绑定 rootPath 目录链，限制 64 KiB，按 stat.size+1 读取并执行最终稳定检查；增长或换链导致身份拒绝。",
+        "source_refs": [
+          {
+            "path": "skills/spec-runtime-setup/scripts/providers/codegraph-launcher.cjs",
+            "lines": [
+              70,
+              95
+            ],
+            "sha256": "a316a555ad699b4fdb0e8c25cfc2a0ba2fc5eb9b33207ca4023ba58aa3e3e712"
+          }
+        ],
+        "test_refs": [
+          {
+            "path": "tests/unit/runtime-setup-codegraph-launcher.test.js",
+            "lines": [
+              55,
+              69
+            ],
+            "sha256": "062d12910dbe8979916f97bca7078cb3b76bc95e2897fdb24c4cf62c80cafc6f"
+          }
+        ],
+        "commit": "10b2460c3e47d69ae0f5dec1a670352e670860c3",
+        "review_basis": "本轮独立 fresh-source 静态复审；未由本 reviewer 重跑测试。"
+      }
     },
     {
       "id": "PROV-05",
       "priority": "P2",
-      "status": "open",
+      "status": "resolved",
       "title": "Stable-file helper 可在 FIFO 打开时越过采样时限",
       "locations": [
         {
@@ -805,7 +969,34 @@
       ],
       "evidence": "openSync 使用 O_RDONLY|O_NOFOLLOW，regular-file 检查在 open 之后；无 writer 的 FIFO 或 inventory 到 open 的 FIFO 换入会阻塞，预算检查无法执行。",
       "requested_change": "为只读采样加入 O_NONBLOCK 或等价不会等待特殊文件的打开机制，并保留 fstat/type/stability 检查。",
-      "validation": "静态 syscall 顺序确认；未执行会阻塞的 FIFO 复现。"
+      "validation": "静态 syscall 顺序确认；未执行会阻塞的 FIFO 复现。",
+      "original_status": "open",
+      "resolved_at": "2026-09-12T01:00:38+08:00",
+      "resolution_evidence": {
+        "summary": "readStableRegularFile 使用 O_NONBLOCK 后再 open，随后 fstat 拒绝特殊文件；保留 nofollow、代际与目录链稳定检查，FIFO 不再在打开阶段等待 writer。",
+        "source_refs": [
+          {
+            "path": "skills/spec-runtime-setup/scripts/lib/regular-file-snapshot.cjs",
+            "lines": [
+              17,
+              28
+            ],
+            "sha256": "0bafa3a681a9501691132072bdac87d9d01a9d255381bf82afe6404e60d8d5ba"
+          }
+        ],
+        "test_refs": [
+          {
+            "path": "tests/unit/runtime-setup-codegraph-evidence.test.js",
+            "lines": [
+              179,
+              190
+            ],
+            "sha256": "18627c29de920929d1b1bce1ccfd52e8e380d8a69add2fce10fa33c9707f5343"
+          }
+        ],
+        "commit": "10b2460c3e47d69ae0f5dec1a670352e670860c3",
+        "review_basis": "本轮独立 fresh-source 静态复审；未由本 reviewer 重跑测试。"
+      }
     }
   ],
   "testing_gaps": [
@@ -815,8 +1006,22 @@
         113,
         128
       ],
-      "status": "open",
-      "note": "doctor 新增场景的 producer platform=windows 与 macOS consumer snapshot 不一致，首轮需先断言 pass；否则 artifact compare 被 source stale 短路，不能证明新分支。"
+      "status": "resolved",
+      "note": "doctor 新增场景的 producer platform=windows 与 macOS consumer snapshot 不一致，首轮需先断言 pass；否则 artifact compare 被 source stale 短路，不能证明新分支。",
+      "original_status": "open",
+      "resolution_evidence": {
+        "source_refs": [
+          {
+            "path": "tests/unit/runtime-setup-codegraph-evidence.test.js",
+            "lines": [
+              113,
+              136
+            ],
+            "sha256": "18627c29de920929d1b1bce1ccfd52e8e380d8a69add2fce10fa33c9707f5343"
+          }
+        ],
+        "summary": "fixture 将 producer 的 Windows launcher 身份固定到 applied.provider_identity，随后删除 context.platform 让 doctor 使用当前宿主事实；source limitations 为空，fresh/stale/unknown 计数均有断言。"
+      }
     }
   ],
   "validation_attempts": [
@@ -824,14 +1029,842 @@
       "command": "npm test -- --runInBand tests/unit/runtime-setup-codegraph-evidence.test.js tests/unit/runtime-setup-consumer-health.test.js tests/unit/runtime-setup-provider-identity.test.js tests/unit/graphify-defensive-probes.test.js",
       "status": "interrupted",
       "note": "命令错误地经 wrapper 进入全部 unit，发现后按确切 PID 终止；无完整 suite 结果，不计通过。中止前观察到新增 CodeGraph tests 红灯和既有 closeout/inventory 漂移失败。"
+    },
+    {
+      "command": "主 Agent 报告的 focused validation（本 reviewer 未执行，未读取 raw log）",
+      "status": "reported-passed",
+      "note": "evidence 16 passed；provider 83 passed；host guard 1 passed；合计 100 passed；typecheck 263。该条仅记录主 Agent 报告，不构成本 reviewer 的独立执行证据。"
+    },
+    {
+      "command": "JSON.parse + SHA-256/bytes/line_count receipt check（17 paths）",
+      "status": "passed",
+      "note": "本 reviewer 实际执行：报告 JSON 可解析，17 个当前 receipt 与磁盘一致，5 个原始 finding 的 evidence 保留且历史 status=open。未执行 canonical schema 校验。"
     }
   ],
   "limitations": [
-    "结论仅绑定本报告逐文件 hash；主 agent 修复后的文件必须重新读取更新，不沿用前切片的 verdict。",
-    "已全文读取 scope 13 文件以及 4 个直接依赖/consumer 文件；其他模块未据此宣称完成审查。",
+    "结论绑定本轮更新后的 reviewed_paths hash；原轮 finding、receipt 与 lens 记录保存在 prior_review，便于追溯。",
+    "本轮复审覆盖原 scope 13 文件、4 supporting files，并对 7 个变化文件复核修复差异和受影响函数；未扩大到其他模块。",
     "此 worker 为独立源码审查；两个 named lens 不代表真实 OpenAI/Anthropic 双模型或厂商背书。",
-    "完整 focused tests、真实 provider/host behavior、生产环境和 field outcome 由主 agent 负责；本报告不声明其通过。",
-    "Graphify 当前安装 identity 只绑定元数据清单摘要，CodeGraph identity 只绑定已解析包元数据与入口；均不能推导全部已安装字节安全。"
+    "focused validation 与 typecheck 仅为主 Agent 报告，本 reviewer 未重跑且未读取 raw logs；真实 provider、Windows 引擎、用户 runtime、生产环境和 field outcome 未验证。",
+    "Graphify 当前安装 identity 只绑定元数据清单摘要，CodeGraph identity 只绑定已解析包元数据与入口；均不能推导全部已安装字节安全。",
+    "本 worker 报告沿用历史扩展格式；若进入 canonical ce-localization-review-delta ingestion，仍需由父 Agent 转换为 canonical schema。"
   ],
-  "claim_ceiling": "当前 hash 的 provider 证据闭环源码审查；存在 5 项可执行修复 finding，不能作为整体完成或真实 runtime 成功证明。"
+  "claim_ceiling": "五项 PROV finding 的修复已通过当前源码与新增回归的静态复审，doctor fixture gap 已闭合；主 Agent 报告 focused validation 通过但未由本 reviewer 独立执行。结论不能外推为真实 Provider、Windows 引擎、用户 runtime、生产环境或 field outcome 成功。",
+  "prior_review": {
+    "reviewed_at": "2026-09-11T15:45:16.689347+00:00",
+    "source_binding": {
+      "scope_path": "docs/validation/ce-localization/review/deltas/2026-09-11-refresh/providers-scope.json",
+      "scope_sha256": "71f6a2cfcb2f478482f318329ad7d3b8bc51616b2c9374b3f491459f71b223e9",
+      "scope_head": "9b3f37177412ad51293f118fe613243ba85d7fd0",
+      "observed_head": "9b3f37177412ad51293f118fe613243ba85d7fd0"
+    },
+    "reviewed_paths": [
+      {
+        "path": "skills/spec-runtime-setup/scripts/providers/codegraph-artifact-evidence.cjs",
+        "sha256": "cbbb1cd90feddcc67ab3eacf5443e51a975957237d7f019aca89b66360d50737",
+        "bytes": 7567,
+        "line_count": 121,
+        "covered_line_ranges": [
+          [
+            1,
+            121
+          ]
+        ],
+        "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+        "finding_ids": [
+          "PROV-01",
+          "PROV-02",
+          "PROV-05"
+        ],
+        "lens_verdicts": [
+          {
+            "review_lens": "openai-skill-engineering",
+            "review_status": "complete",
+            "verdict": "actionable-findings",
+            "notes": [
+              "逐行核对 DB、WAL、journal 的存在状态与字节摘要、源码内容身份、provider identity、原始 verified_at 和 TTL；compareEvidence 不以新 facts 时间重置原 query 证据。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          },
+          {
+            "review_lens": "anthropic-skill-craft-safety",
+            "review_status": "complete",
+            "verdict": "actionable-findings",
+            "notes": [
+              "发现 stat 后无界 fd 读取、validEvidence 与 schema 对额外字段的分歧，以及底层 helper 打开 FIFO 可阻塞；当前 hash 仍存在这些缺口。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          }
+        ]
+      },
+      {
+        "path": "skills/spec-runtime-setup/scripts/providers/codegraph-launcher.cjs",
+        "sha256": "0e0f1ce146e806f0adf6a32e8fedd10456d0e26e8a7b2aaa2375dbc953830cb7",
+        "bytes": 5529,
+        "line_count": 100,
+        "covered_line_ranges": [
+          [
+            1,
+            100
+          ]
+        ],
+        "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+        "finding_ids": [
+          "PROV-04"
+        ],
+        "lens_verdicts": [
+          {
+            "review_lens": "openai-skill-engineering",
+            "review_status": "complete",
+            "verdict": "actionable-findings",
+            "notes": [
+              "解析 npm global/local .bin 与 Unix symlink 布局，固定 platform package/version，保留 argv 并绕过会 self-heal 的 npm shim；identity 摘要明确只覆盖包元数据与入口路径。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          },
+          {
+            "review_lens": "anthropic-skill-craft-safety",
+            "review_status": "complete",
+            "verdict": "actionable-findings",
+            "notes": [
+              "manifest 采用 stat 后 readFileSync(path)，64 KiB 限制未覆盖增长或换链窗口；不应把此身份解释为安装后二进制或所有依赖字节校验。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          }
+        ]
+      },
+      {
+        "path": "skills/spec-runtime-setup/scripts/providers/codegraph.cjs",
+        "sha256": "92cd0a0791e13906fa398e62a4e01f888a2f72f165be463cb369b94d40713554",
+        "bytes": 24482,
+        "line_count": 555,
+        "covered_line_ranges": [
+          [
+            1,
+            555
+          ]
+        ],
+        "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+        "finding_ids": [],
+        "lens_verdicts": [
+          {
+            "review_lens": "openai-skill-engineering",
+            "review_status": "complete",
+            "verdict": "no-new-actionable-finding",
+            "notes": [
+              "全文追踪 plan/apply/verify/reconcileConfigured：apply 在 status/root/index 合同通过后才 query；新 evidence 关联 query 前后 DB/source/identity；verify 仅回读证据并保留原验证时间。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          },
+          {
+            "review_lens": "anthropic-skill-craft-safety",
+            "review_status": "complete",
+            "verdict": "no-new-actionable-finding",
+            "notes": [
+              "身份失败或漂移会删除 artifact_evidence 并阻止 fresh；query_verified 表示本次 probe 退出成功，不单独证明当前 artifact freshness；source runtime 修改不属于本次 reviewer 操作。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          }
+        ]
+      },
+      {
+        "path": "skills/spec-runtime-setup/scripts/providers/common.cjs",
+        "sha256": "b50df264d67950433c821fa7e28f56cd59c067b3c30e042cebcaead6c0328cf5",
+        "bytes": 5498,
+        "line_count": 136,
+        "covered_line_ranges": [
+          [
+            1,
+            136
+          ]
+        ],
+        "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+        "finding_ids": [],
+        "lens_verdicts": [
+          {
+            "review_lens": "openai-skill-engineering",
+            "review_status": "complete",
+            "verdict": "no-new-actionable-finding",
+            "notes": [
+              "providerResult 只装配明确 options，新增 artifact_evidence 不重新计算或提升验证权威；成功判断同时核对退出码、signal、error 与 timeout。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          },
+          {
+            "review_lens": "anthropic-skill-craft-safety",
+            "review_status": "complete",
+            "verdict": "no-new-actionable-finding",
+            "notes": [
+              "runner 保留参数数组，默认 source_read_required=true、advisory fallback；它不负责验证 caller 传入的 artifact evidence，验证责任仍在 owning provider。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          }
+        ]
+      },
+      {
+        "path": "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
+        "sha256": "06eba117e3dc8e10e4a115416d89336af9a957e5acfe6497c5289973663d8a8b",
+        "bytes": 125231,
+        "line_count": 2673,
+        "covered_line_ranges": [
+          [
+            1,
+            2673
+          ]
+        ],
+        "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+        "finding_ids": [
+          "PROV-03"
+        ],
+        "lens_verdicts": [
+          {
+            "review_lens": "openai-skill-engineering",
+            "review_status": "complete",
+            "verdict": "actionable-findings",
+            "notes": [
+              "全文核对源码前后快照、scope receipt、固定 graph digest、当前 identity 专用只读探测、doctor current receipt 路径；无 HEAD/source 不完整保持 unknown。发现 apply 的 query 与最终 graph/identity 缺少稳定性关联。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          },
+          {
+            "review_lens": "anthropic-skill-craft-safety",
+            "review_status": "complete",
+            "verdict": "actionable-findings",
+            "notes": [
+              "当前 receipt 专用读取使用 no-follow/nonblocking fd、stat.size+1、前后 fstat/lstat；host mutation、外部 hook 与 legacy root 的边界有明确分支，但不能据此外推所有旧辅助读取都有有界保证。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          }
+        ]
+      },
+      {
+        "path": "tests/integration/runtime-setup-codegraph-launcher.integration.test.js",
+        "sha256": "cb665300c498b9edf3a69dc8f2a35c624e85b40924e18065a999173a1bd5888f",
+        "bytes": 5450,
+        "line_count": 91,
+        "covered_line_ranges": [
+          [
+            1,
+            91
+          ]
+        ],
+        "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+        "finding_ids": [],
+        "lens_verdicts": [
+          {
+            "review_lens": "openai-skill-engineering",
+            "review_status": "complete",
+            "verdict": "no-new-actionable-finding",
+            "notes": [
+              "完整读取真实 npm-shim archive fixture 与 async/sync/workspace/default-provider guard 测试，覆盖缺 platform bundle 时拒绝 self-heal、保留旧 cache，以及安装 bundle 的真实子进程执行。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          },
+          {
+            "review_lens": "anthropic-skill-craft-safety",
+            "review_status": "complete",
+            "verdict": "no-new-actionable-finding",
+            "notes": [
+              "测试只在临时 prefix/home 下运行 POSIX fixture，未证明真实 Windows 二进制或用户安装的 CodeGraph 引擎可用；未执行的环境必须保留边界。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          }
+        ]
+      },
+      {
+        "path": "tests/unit/graphify-defensive-probes.test.js",
+        "sha256": "e86ef7866f5577f0f0ed62852bad5090da3c8ae3d5bb50eecbefe4a3857d59c3",
+        "bytes": 4639,
+        "line_count": 102,
+        "covered_line_ranges": [
+          [
+            1,
+            102
+          ]
+        ],
+        "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+        "finding_ids": [],
+        "lens_verdicts": [
+          {
+            "review_lens": "openai-skill-engineering",
+            "review_status": "complete",
+            "verdict": "no-new-actionable-finding",
+            "notes": [
+              "完整读取未知代码扫描不等于空 corpus、stdout JSON 边界与 curated/semantic backup 保留用例。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          },
+          {
+            "review_lens": "anthropic-skill-craft-safety",
+            "review_status": "complete",
+            "verdict": "no-new-actionable-finding",
+            "notes": [
+              "异常 labels 保守保留唯一 backup；这些用例不覆盖 query 期间 graph/identity 变动，也不证明实际 Provider 更新或 field outcome。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          }
+        ]
+      },
+      {
+        "path": "tests/unit/mcp-setup-providers.test.js",
+        "sha256": "0061b3db7755155b4791c1dd64661713b54d37850e272eddd8c7177b74f14f3c",
+        "bytes": 101258,
+        "line_count": 2119,
+        "covered_line_ranges": [
+          [
+            1,
+            2119
+          ]
+        ],
+        "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+        "finding_ids": [
+          "PROV-03"
+        ],
+        "lens_verdicts": [
+          {
+            "review_lens": "openai-skill-engineering",
+            "review_status": "complete",
+            "verdict": "actionable-findings",
+            "notes": [
+              "完整读取全部 CodeGraph status/sync/reindex 与 Graphify migration、scope、source binding、host、hook、identity 回归；现有 source-change 测试有效区分 fresh/degraded/unknown。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          },
+          {
+            "review_lens": "anthropic-skill-craft-safety",
+            "review_status": "complete",
+            "verdict": "actionable-findings",
+            "notes": [
+              "发现 interpreter 在 query 期间替换用例接受新身份且 fixture 无 HEAD，使 fresh 关联缺口没有被测试暴露；外部 hook 和 credentials 测试只能证明各自 fixture 的保留/隔离。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          }
+        ]
+      },
+      {
+        "path": "tests/unit/runtime-setup-codegraph-evidence.test.js",
+        "sha256": "6251868bee83dc8b49ab6b981b77417ce1fd187b5e6b6d07faa9bb3b81fc9f07",
+        "bytes": 9684,
+        "line_count": 168,
+        "covered_line_ranges": [
+          [
+            1,
+            168
+          ]
+        ],
+        "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+        "finding_ids": [
+          "PROV-01",
+          "PROV-02"
+        ],
+        "lens_verdicts": [
+          {
+            "review_lens": "openai-skill-engineering",
+            "review_status": "complete",
+            "verdict": "actionable-findings",
+            "notes": [
+              "完整读取当前新增测试，覆盖原证据复用、DB sidecar、源码与 TTL 漂移；新增 fd/额外字段案例在当前旧实现上出现预期红灯。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          },
+          {
+            "review_lens": "anthropic-skill-craft-safety",
+            "review_status": "complete",
+            "verdict": "actionable-findings",
+            "notes": [
+              "新增 doctor 案例使用 Windows producer snapshot 对当前 macOS consumer，第一轮未断言 pass；source mismatch 可短路 artifact compare，需修 fixture 后再证明新分支。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          }
+        ]
+      },
+      {
+        "path": "tests/unit/runtime-setup-codegraph-install-integrity.test.js",
+        "sha256": "396d5e576c488591155c03d9beb4215152090b07d0f00f1aee13bb11fe735521",
+        "bytes": 3992,
+        "line_count": 69,
+        "covered_line_ranges": [
+          [
+            1,
+            69
+          ]
+        ],
+        "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+        "finding_ids": [],
+        "lens_verdicts": [
+          {
+            "review_lens": "openai-skill-engineering",
+            "review_status": "complete",
+            "verdict": "no-new-actionable-finding",
+            "notes": [
+              "完整读取 top-level archive digest 与实际 file: install 参数断言、归档清理、缺 digest 拒绝、normalizer 拒绝伪造 verification_scope。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          },
+          {
+            "review_lens": "anthropic-skill-craft-safety",
+            "review_status": "complete",
+            "verdict": "no-new-actionable-finding",
+            "notes": [
+              "归档证据范围明确限于 top-level package；mock runner 成功不能外推 platform binary、传递依赖或真实安装安全。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          }
+        ]
+      },
+      {
+        "path": "tests/unit/runtime-setup-codegraph-launcher.test.js",
+        "sha256": "7e0997612f7786344a937775abf7b1e7badf5b2cf9ed16c12c921c8ac767cc4a",
+        "bytes": 10880,
+        "line_count": 144,
+        "covered_line_ranges": [
+          [
+            1,
+            144
+          ]
+        ],
+        "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+        "finding_ids": [],
+        "lens_verdicts": [
+          {
+            "review_lens": "openai-skill-engineering",
+            "review_status": "complete",
+            "verdict": "no-new-actionable-finding",
+            "notes": [
+              "完整读取 Windows argv/path fixture、版本漂移、local .bin 缺 bundle、Unix 默认 runner fixture；最终身份失败不允许 reconcileConfigured 升 fresh。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          },
+          {
+            "review_lens": "anthropic-skill-craft-safety",
+            "review_status": "complete",
+            "verdict": "no-new-actionable-finding",
+            "notes": [
+              "Windows 测试明确不执行二进制；query_verified 与 freshness 分层已有显式测试，保留历史 probe 布尔本身不作为新 finding。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          }
+        ]
+      },
+      {
+        "path": "tests/unit/runtime-setup-consumer-health.test.js",
+        "sha256": "0f7ea603a2b1fefdd539a66754939f80f44f84f4913bd3f1d015dd4812f8c8ca",
+        "bytes": 21968,
+        "line_count": 346,
+        "covered_line_ranges": [
+          [
+            1,
+            346
+          ]
+        ],
+        "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+        "finding_ids": [],
+        "lens_verdicts": [
+          {
+            "review_lens": "openai-skill-engineering",
+            "review_status": "complete",
+            "verdict": "no-new-actionable-finding",
+            "notes": [
+              "完整读取 producer 到 doctor 的 source/identity/Graphify receipt 消费与时间失效回归；覆盖图替换、缺 receipt、旧 schema、source 变化和身份缺失。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          },
+          {
+            "review_lens": "anthropic-skill-craft-safety",
+            "review_status": "complete",
+            "verdict": "no-new-actionable-finding",
+            "notes": [
+              "Graphify 测试构造的 receipt 没有 query 与 identity 绑定字段，不能补足 producer 的关联缺口；多数实例采用受控 fixture/mock，不能升级为真实宿主收益证据。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          }
+        ]
+      },
+      {
+        "path": "tests/unit/runtime-setup-provider-identity.test.js",
+        "sha256": "9d60bfbb9546132f04f1db40ffad0b3e9e71d53a458e485fff2f2f216b9c18f6",
+        "bytes": 9934,
+        "line_count": 174,
+        "covered_line_ranges": [
+          [
+            1,
+            174
+          ]
+        ],
+        "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+        "finding_ids": [],
+        "lens_verdicts": [
+          {
+            "review_lens": "openai-skill-engineering",
+            "review_status": "complete",
+            "verdict": "no-new-actionable-finding",
+            "notes": [
+              "完整读取 Graphify identity/facts/schema/normalizer、inventory 顺序、receipt 换链/增长、5 秒共享预算和真实 Python 导入无字节码测试。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          },
+          {
+            "review_lens": "anthropic-skill-craft-safety",
+            "review_status": "complete",
+            "verdict": "no-new-actionable-finding",
+            "notes": [
+              "只读 identity 路径限制命令且注入 PYTHONDONTWRITEBYTECODE；真实 Python fixture 只证明该导入路径未写字节码，不等于所有真实 Graphify 进程完全无副作用。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          }
+        ]
+      }
+    ],
+    "supporting_reads": [
+      {
+        "path": "src/cli/helpers/setup-facts.js",
+        "sha256": "31cad2f021655323cae4b98afb72ff93a3255a2f404355c446023acaf665adf7",
+        "bytes": 36569,
+        "line_count": 775,
+        "covered_line_ranges": [
+          [
+            1,
+            775
+          ]
+        ],
+        "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+        "finding_ids": [
+          "PROV-02"
+        ],
+        "lens_verdicts": [
+          {
+            "review_lens": "openai-skill-engineering",
+            "review_status": "complete",
+            "verdict": "actionable-findings",
+            "notes": [
+              "全文追踪 normalizer 与 doctor 的 source、provider identity、CodeGraph evidence、Graphify receipt 消费；freshness 不成立时后续检查短路，计数更新需命中对应分支。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          },
+          {
+            "review_lens": "anthropic-skill-craft-safety",
+            "review_status": "complete",
+            "verdict": "actionable-findings",
+            "notes": [
+              "不重新生成 receipt、不运行原生 query/update；normalizer 必须与 evidence schema 一致，且 provider_counts 中历史 fresh 不可被单独解释为当前全局 fresh。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          }
+        ]
+      },
+      {
+        "path": "docs/contracts/provider-readiness.schema.json",
+        "sha256": "f60bca148b2a1acfa4142f43be0238601ec856cb4241879fc5cd445949a9116d",
+        "bytes": 12102,
+        "line_count": 510,
+        "covered_line_ranges": [
+          [
+            1,
+            510
+          ]
+        ],
+        "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+        "finding_ids": [
+          "PROV-02"
+        ],
+        "lens_verdicts": [
+          {
+            "review_lens": "openai-skill-engineering",
+            "review_status": "complete",
+            "verdict": "actionable-findings",
+            "notes": [
+              "完整读取 provider-readiness.v2 schema：artifact_evidence 为可选增量字段，限定 CodeGraph evidence 结构、三类 DB 文件、source content identity 和 npm identity。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          },
+          {
+            "review_lens": "anthropic-skill-craft-safety",
+            "review_status": "complete",
+            "verdict": "actionable-findings",
+            "notes": [
+              "additionalProperties=false 与当前 validEvidence 的宽松字段接纳不一致；schema 的非负 DB size 与 helper 的正数要求也不是等价语义，需要严格 runtime validator 保底。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          }
+        ]
+      },
+      {
+        "path": "skills/spec-runtime-setup/scripts/lib/regular-file-snapshot.cjs",
+        "sha256": "581aae6be3402874addb43047a87e80aa5af0b2cb7b308a62cb4918d114e7283",
+        "bytes": 4161,
+        "line_count": 139,
+        "covered_line_ranges": [
+          [
+            1,
+            139
+          ]
+        ],
+        "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+        "finding_ids": [
+          "PROV-05"
+        ],
+        "lens_verdicts": [
+          {
+            "review_lens": "openai-skill-engineering",
+            "review_status": "complete",
+            "verdict": "actionable-findings",
+            "notes": [
+              "全文核对 stable descriptor 与目录链前后身份检查；它本身不限制 read callback 的长度。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          },
+          {
+            "review_lens": "anthropic-skill-craft-safety",
+            "review_status": "complete",
+            "verdict": "actionable-findings",
+            "notes": [
+              "openSync 缺 O_NONBLOCK，FIFO 可在 fstat regular-file 拒绝前阻塞；只有检查完成后的稳定性，不等于从打开动作开始有界。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          }
+        ]
+      },
+      {
+        "path": "skills/spec-runtime-setup/scripts/lib/source-snapshot.cjs",
+        "sha256": "bcb2995930b587be59d3c8440e07feed25866333da390d28176cb7ae59f48d3f",
+        "bytes": 9882,
+        "line_count": 205,
+        "covered_line_ranges": [
+          [
+            1,
+            205
+          ]
+        ],
+        "read_method": "全文直接读取；输出截断的段落已分段重新读取",
+        "finding_ids": [],
+        "lens_verdicts": [
+          {
+            "review_lens": "openai-skill-engineering",
+            "review_status": "complete",
+            "verdict": "no-new-actionable-finding",
+            "notes": [
+              "全文核对 sourceContentIdentity 只保留 schema/source_kind/content digest，以及 Git/folder 内容枚举、generated 路径排除和 budget。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          },
+          {
+            "review_lens": "anthropic-skill-craft-safety",
+            "review_status": "complete",
+            "verdict": "no-new-actionable-finding",
+            "notes": [
+              "源码内容采用 no-follow/nonblocking bounded fd；host-config/registry 的其他读取未在本轮专项闭环中重构，不能声称所有输入均具备同等竞态保证。"
+            ],
+            "limitations": [
+              "本 lens 为同一独立 reviewer 的分析视角，不代表对应厂商或真实跨模型执行。"
+            ]
+          }
+        ]
+      }
+    ],
+    "findings": [
+      {
+        "id": "PROV-01",
+        "priority": "P2",
+        "status": "open",
+        "title": "Recorded CodeGraph facts 的读取上限仅检查 stat，未限制实际读取",
+        "locations": [
+          {
+            "path": "skills/spec-runtime-setup/scripts/providers/codegraph-artifact-evidence.cjs",
+            "lines": [
+              109,
+              118
+            ]
+          }
+        ],
+        "evidence": "readRecordedEvidence 在 stat.size <= 4 MiB 后使用 fs.readFileSync(fd, utf8)，增长窗口内可越过预算；底层后验 drift 检查只能拒绝结果，不能撤销已发生的大读取。",
+        "requested_change": "使用固定长度 fd 读取并检测额外字节；保留前后稳定性拒绝。",
+        "validation": "主 agent 新增回归已读，当前旧实现在误触发 unit 运行中失败；修复后由主 agent 完成 focused 验证。"
+      },
+      {
+        "id": "PROV-02",
+        "priority": "P2",
+        "status": "open",
+        "title": "validEvidence 接受 schema 明确拒绝的额外字段",
+        "locations": [
+          {
+            "path": "skills/spec-runtime-setup/scripts/providers/codegraph-artifact-evidence.cjs",
+            "lines": [
+              66,
+              78
+            ]
+          },
+          {
+            "path": "docs/contracts/provider-readiness.schema.json",
+            "lines": [
+              29,
+              161
+            ]
+          },
+          {
+            "path": "src/cli/helpers/setup-facts.js",
+            "lines": [
+              337,
+              347
+            ]
+          }
+        ],
+        "evidence": "root/source_snapshot/provider_identity/单个 file record 的额外字段未被 runtime validator 拒绝，normalizer 会保留 artifact_evidence，但 schema additionalProperties=false 拒绝这些对象。",
+        "requested_change": "在 owning validator 严格检查对象类型、own keys 和嵌套字段，并与 schema 边界对齐。",
+        "validation": "主 agent 新增四类 extra-field 回归已读；当前实现在中止前测试输出中四例均失败。"
+      },
+      {
+        "id": "PROV-03",
+        "priority": "P2",
+        "status": "open",
+        "title": "Graphify fresh 把 query 结果关联到事后 graph 与 identity",
+        "locations": [
+          {
+            "path": "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
+            "lines": [
+              535,
+              615
+            ]
+          },
+          {
+            "path": "tests/unit/mcp-setup-providers.test.js",
+            "lines": [
+              1483,
+              1517
+            ]
+          }
+        ],
+        "evidence": "query 退出后才写当前 graph digest，未比较 query 前后 artifact；最终 identity 只要求版本正确，未与构图/query 前身份比较。源码稳定时图或 interpreter/inventory 变化仍可发布 fresh。现有 interpreter 漂移 fixture 接受新身份且无 HEAD，未覆盖 fresh 分支。",
+        "requested_change": "将构图/query 所用的 provider identity 与 query 前后 graph 内容绑定；发现任一漂移不得发布 fresh 或把新对象当作已验证对象。",
+        "validation": "静态完整调用流与现有测试可复核；本 reviewer 未运行专用新复现，已立即交主 agent 补回归。"
+      },
+      {
+        "id": "PROV-04",
+        "priority": "P2",
+        "status": "open",
+        "title": "CodeGraph manifest 的 64 KiB 与安全文件检查存在换链/增长窗口",
+        "locations": [
+          {
+            "path": "skills/spec-runtime-setup/scripts/providers/codegraph-launcher.cjs",
+            "lines": [
+              69,
+              79
+            ]
+          }
+        ],
+        "evidence": "safeFile lstat 与 readManifest stat/readFileSync(path) 分离，解析时未绑定检查过的 descriptor；文件可在 stat 后增长或替换。",
+        "requested_change": "复用 stable regular fd 并按初始大小严格有界读取 manifest，任何类型/路径/代际变化拒绝身份。",
+        "validation": "源码机制直接确认；未执行竞态新复现。"
+      },
+      {
+        "id": "PROV-05",
+        "priority": "P2",
+        "status": "open",
+        "title": "Stable-file helper 可在 FIFO 打开时越过采样时限",
+        "locations": [
+          {
+            "path": "skills/spec-runtime-setup/scripts/lib/regular-file-snapshot.cjs",
+            "lines": [
+              18,
+              29
+            ]
+          },
+          {
+            "path": "skills/spec-runtime-setup/scripts/providers/codegraph-artifact-evidence.cjs",
+            "lines": [
+              39,
+              56
+            ]
+          }
+        ],
+        "evidence": "openSync 使用 O_RDONLY|O_NOFOLLOW，regular-file 检查在 open 之后；无 writer 的 FIFO 或 inventory 到 open 的 FIFO 换入会阻塞，预算检查无法执行。",
+        "requested_change": "为只读采样加入 O_NONBLOCK 或等价不会等待特殊文件的打开机制，并保留 fstat/type/stability 检查。",
+        "validation": "静态 syscall 顺序确认；未执行会阻塞的 FIFO 复现。"
+      }
+    ],
+    "testing_gaps": [
+      {
+        "path": "tests/unit/runtime-setup-codegraph-evidence.test.js",
+        "lines": [
+          113,
+          128
+        ],
+        "status": "open",
+        "note": "doctor 新增场景的 producer platform=windows 与 macOS consumer snapshot 不一致，首轮需先断言 pass；否则 artifact compare 被 source stale 短路，不能证明新分支。"
+      }
+    ],
+    "limitations": [
+      "结论仅绑定本报告逐文件 hash；主 agent 修复后的文件必须重新读取更新，不沿用前切片的 verdict。",
+      "已全文读取 scope 13 文件以及 4 个直接依赖/consumer 文件；其他模块未据此宣称完成审查。",
+      "此 worker 为独立源码审查；两个 named lens 不代表真实 OpenAI/Anthropic 双模型或厂商背书。",
+      "完整 focused tests、真实 provider/host behavior、生产环境和 field outcome 由主 agent 负责；本报告不声明其通过。",
+      "Graphify 当前安装 identity 只绑定元数据清单摘要，CodeGraph identity 只绑定已解析包元数据与入口；均不能推导全部已安装字节安全。"
+    ],
+    "claim_ceiling": "当前 hash 的 provider 证据闭环源码审查；存在 5 项可执行修复 finding，不能作为整体完成或真实 runtime 成功证明。"
+  }
 }
