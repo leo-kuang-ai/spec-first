@@ -1,9 +1,9 @@
 {
   "schema_version": "spec-first-current-skill-package-inventory/v2",
-  "source_head": "9b3f37177412ad51293f118fe613243ba85d7fd0",
-  "skills_tree_oid": "7a222f2c7e52fe7a40032bfde1d932fbae9ed5b8",
+  "source_head": "7c6bdd66d78616be769d8c78fc9e81340c004cda",
+  "skills_tree_oid": "f162e8b4090ec34c8e401fb25992a03e68888807",
   "source_mode": "working-tree",
-  "manifest_sha256": "b76de496500dcc002980fe158d8cdccdd1c5e7f1e585eb7ca4d4e3239b739202",
+  "manifest_sha256": "cfc55d220d8a3f08529568733622bdabea1462f35cbebc987890261470e18d7c",
   "skill_count": 38,
   "file_count": 1133,
   "per_skill_counts": {
@@ -6337,8 +6337,8 @@
       "path": "skills/spec-runtime-setup/scripts/lib/facts.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 29628,
-      "sha256": "a40a073a8b2e81ac321533b7c77d185bcbee3e23ed5634058c5601a8f9e3693d"
+      "bytes": 29608,
+      "sha256": "7218e2d00ff273568f420d58f963087b29a7bba8505bcbc2242c478f323be337"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/git-path.cjs",
@@ -6463,8 +6463,8 @@
       "path": "skills/spec-runtime-setup/scripts/lib/regular-file-snapshot.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 4161,
-      "sha256": "581aae6be3402874addb43047a87e80aa5af0b2cb7b308a62cb4918d114e7283"
+      "bytes": 4194,
+      "sha256": "0bafa3a681a9501691132072bdac87d9d01a9d255381bf82afe6404e60d8d5ba"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/renderer.cjs",
@@ -6477,8 +6477,8 @@
       "path": "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 37699,
-      "sha256": "d47d5dd56992ee721ed83274d5de35e0fde24b302be698b197b46274a3a9a130"
+      "bytes": 37736,
+      "sha256": "0d20ffba630f559e19c539e2ab2ae0e602c7b61754b1665d697ef4b9551251db"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/runtime-remediation.cjs",
@@ -6673,15 +6673,15 @@
       "path": "skills/spec-runtime-setup/scripts/providers/codegraph-artifact-evidence.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 7567,
-      "sha256": "cbbb1cd90feddcc67ab3eacf5443e51a975957237d7f019aca89b66360d50737"
+      "bytes": 8623,
+      "sha256": "6e3c81e0e09d4b0c05d72478ac0c59583dabc79905d4afcb0631dd0a8e43aed2"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/providers/codegraph-launcher.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 5529,
-      "sha256": "0e0f1ce146e806f0adf6a32e8fedd10456d0e26e8a7b2aaa2375dbc953830cb7"
+      "bytes": 6157,
+      "sha256": "a316a555ad699b4fdb0e8c25cfc2a0ba2fc5eb9b33207ca4023ba58aa3e3e712"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/providers/codegraph.cjs",
@@ -6701,8 +6701,8 @@
       "path": "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 125231,
-      "sha256": "06eba117e3dc8e10e4a115416d89336af9a957e5acfe6497c5289973663d8a8b"
+      "bytes": 127353,
+      "sha256": "90e04e7171b11e4dec74168f0f0affe3b27a70ef75e727da1697877098f7f53f"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/providers/registry.cjs",

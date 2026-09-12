@@ -14,12 +14,12 @@
   },
   "target_source_snapshot": {
     "repository": "spec-first",
-    "head": "9b3f37177412ad51293f118fe613243ba85d7fd0",
+    "head": "7c6bdd66d78616be769d8c78fc9e81340c004cda",
     "dirty": false,
     "dirty_paths": [],
     "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "e3d03a4ff2887cfa07e6962a84c749233d49008e8704c94328390217a1349cbd",
-    "inventory_hash": "a5a97074a0f516506e90482b3f0eb95ffd588b56044aa5214827fc8118b447a6",
+    "source_tree_hash": "a0f2c85899f7ae6a5ac455dcdeb13e80e61b6c0ce92dd5b5f2012e49cb0f2b54",
+    "inventory_hash": "161cf1f8cacbc63adb0d05faab7a8b16b9d3ba008b3de759da54004b86b0ba6e",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
