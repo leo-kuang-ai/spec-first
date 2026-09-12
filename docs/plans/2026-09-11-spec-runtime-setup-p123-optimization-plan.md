@@ -7,7 +7,7 @@ product_contract_source: spec-plan-bootstrap
 artifact_contract: spec-unified-plan/v1
 artifact_readiness: implementation-ready
 execution: code
-implementation_status: not-started
+implementation_status: partial-with-evidence
 ---
 
 ## Goal Capsule

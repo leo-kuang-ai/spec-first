@@ -301,3 +301,11 @@
 - `npm run typecheck` 通过（263 files）；`npm run lint:skill-entrypoints` 通过（490 files）。
 - CE setup preflight 为 `confirmed`，dependency matrix 为 `degraded`；该 degraded 状态来自历史语义 adjudication/可选依赖证据，不是 deterministic inventory 失败。
 - P123 仍不标记为 complete：真实 Windows/跨宿主/field outcome、主进程 SIGINT 恢复、refresh-only 整库回滚、U11/U12 全量 fresh-source consumer 证据仍未具备。
+
+
+## 2026-09-12 收口增量
+
+- 顶层 setup SIGINT 隔离探针已提交（`bb4f0219`）：真实子进程收到 SIGINT 后退出，不发布 `status: complete`，同一隔离目录可重入；该探针不外推 Windows 信号行为。
+- 八宿主隔离 `spec-first init` 已执行并记录（`1502a75c`）：Claude/Codex/Cursor/Kiro/Qoder/OpenCode/ZCode/Pi 均返回 exit code 0；Cursor/Qoder/OpenCode/Pi 的宿主加载限制保留为 warning。
+- U11 配置消费者与 Provider identity 聚焦测试 21/21 通过；尚未完成核心 skill fresh-source 真实会话联调。
+- P123 计划状态更新为 `partial-with-evidence`，仍不标记 complete；CE 517 条语义复核、Windows/offline/mirror/field outcome 与最终 closeout 继续保持未决。
