@@ -54,10 +54,11 @@ const {
   providerLimitation,
   providerResult,
 } = require('../providers/common.cjs');
+const { runBoundedRepairLoop } = require('./repair-loop.cjs');
 
 function runVerificationOrMutation(context, repoRoot) {
   const selectedIds = context.actionPlan.selected_ids.filter((id) => providers[id]);
-  const applyInstallMutation = ['only', 'graphify-refresh'].includes(context.actionPlan.mode);
+  const applyInstallMutation = ['bare', 'only', 'graphify-refresh'].includes(context.actionPlan.mode);
   const applyHostConfigMutation = applyInstallMutation || context.actionPlan.mode === 'host-config-repair';
   let installResults = new Map();
   let helperInstallResults = new Map();
@@ -109,6 +110,20 @@ function runVerificationOrMutation(context, repoRoot) {
       );
     } else {
       providerResults = applySelectedProviders(context, repoRoot, selectedIds);
+      // 首次 mutation 后对已知可修复的 Graphify provenance 漂移自动刷新并复探针。
+      const graphify = providerResults.find((entry) => entry.provider === 'graphify');
+      const graphifyReason = graphify && providerFailureReason(graphify);
+      if (graphify && graphifyReason === 'graphify-scope-provenance-artifact-mismatch'
+        && selectedIds.includes('graphify')) {
+        const refreshContext = {
+          ...context,
+          actionPlan: { ...context.actionPlan, mode: 'graphify-refresh' },
+        };
+        const refreshed = applySelectedProviders(refreshContext, repoRoot, ['graphify']);
+        providerResults = providerResults.map((entry) => entry.provider === 'graphify'
+          ? (refreshed.find((candidate) => candidate.provider === 'graphify') || entry)
+          : entry);
+      }
     }
   }
   for (const readiness of providerResults) {
@@ -452,6 +467,12 @@ function failureOutcome(reasonCode, fallback = 'setup-action-required') {
   return { reason_code: reasonCode || fallback };
 }
 
+// 暴露给宿主/测试的统一 repair seam；具体 Provider action 必须由 registry
+// 显式提供，未知 reason 不得由模型即兴执行命令。
+function runProviderRepairLoop(options = {}) {
+  return runBoundedRepairLoop(options);
+}
+
 function hostConfigPrecedenceBlocked(reasonCode) {
   return reasonCode === 'host-config-higher-precedence-conflict'
     || reasonCode === 'host-config-jsonc-precedence-blocked';
@@ -622,22 +643,9 @@ function buildHostConfigReceipt(hostConfigResults) {
   }));
 }
 
+// 单一实现抽取至 lib/host-config-repair-command.cjs(lane finding DR-015)。
 function hostConfigRepairCommand(context) {
-  const args = ['spec-runtime-setup'];
-  if (context.actionPlan.args.installationOnly) args.push('--installation-only');
-  if (context.actionPlan.selected_ids.length > 0) {
-    args.push('--only', context.actionPlan.selected_ids.join(','));
-  }
-  if (context.actionPlan.mode === 'graphify-refresh' || context.actionPlan.args.refresh) args.push('--refresh');
-  if (context.actionPlan.args.repo) args.push('--repo', context.actionPlan.args.repo);
-  if (context.actionPlan.args.folder) args.push('--folder', context.actionPlan.args.folder);
-  if (context.actionPlan.args.allRepos) args.push('--all-repos');
-  if (context.actionPlan.args.userScope) args.push('--user-scope');
-  if (context.actionPlan.args.requirementWorkspace) {
-    args.push('--requirement-workspace', context.actionPlan.args.requirementWorkspace);
-  }
-  args.push('--repair-host-config');
-  return args.join(' ');
+  return require('./host-config-repair-command.cjs').hostConfigRepairCommand(context);
 }
 
 function installSelectedProviderDependencies(context, repoRoot, selectedIds) {
@@ -953,5 +961,6 @@ module.exports = {
   requireCapability,
   resolveBundledVersion,
   runVerificationOrMutation,
+  runProviderRepairLoop,
   verifyProviders,
 };

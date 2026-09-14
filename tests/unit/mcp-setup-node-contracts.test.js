@@ -508,6 +508,9 @@ describe('spec-runtime-setup unified Node contract', () => {
     const { buildActionPlan } = require('../../skills/spec-runtime-setup/scripts/lib/mode-policy.cjs');
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const fixture = readFixture(`legacy-parity/${platform}/runtime-contracts.json`);
+    // 与 runModeCharacterization 对称:invalid 用例同样注入隔离 homeDir 并快照,
+    // fail-open 回归若写 HOME 侧文件会在此暴露,且不会污染进程真实 HOME。
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-parity-home-'));
 
     for (const contract of fixture.invalid) {
       expect(contract.runtime_capture).toMatchObject({
@@ -525,12 +528,15 @@ describe('spec-runtime-setup unified Node contract', () => {
       });
       const target = tempRepo(`invalid-${platform}-${contract.id}`);
       const before = fileSnapshot(target);
-      const result = runSetup({ argv: contract.argv, cwd: target, skillRoot, runner: parityRunner([]), env: {} });
+      const homeBefore = fileSnapshot(homeDir);
+      const result = runSetup({ argv: contract.argv, cwd: target, skillRoot, runner: parityRunner([]), env: {}, homeDir });
       expect(result).toMatchObject({ exit_code: contract.exit_code, reason_code: contract.reason_code });
       expect(result.payload.schema_version).toBe(contract.artifact_schema);
       expectFields(result.payload, fixture.artifacts[contract.artifact_schema]);
       expect(changedPaths(before, fileSnapshot(target))).toEqual(contract.side_effect_categories);
+      expect(changedPaths(homeBefore, fileSnapshot(homeDir))).toEqual([]);
     }
+    fs.rmSync(homeDir, { recursive: true, force: true });
   });
 
   (process.platform === 'win32' ? test.skip : test)('materializes and executes the baseline POSIX canonical owners', () => {
@@ -579,6 +585,16 @@ describe('spec-runtime-setup unified Node contract', () => {
       .filter((entry) => Array.isArray(entry.confirmed_mismatches)
         && (!Array.isArray(entry.platforms) || entry.platforms.includes('posix')));
     expect(adjudications).toEqual([
+      expect.objectContaining({
+        id: 'bare-baseline-converge',
+        classification: 'intentional-divergence',
+        confirmed_mismatches: [
+          'bare:exit_code:0!=1',
+          'bare:artifact_schema:spec-mcp-setup-preflight.v2!=spec-runtime-setup-execution.v1',
+          'bare:side_effect_categories:[]',
+        ],
+        canonical_expected_result: expect.stringContaining('基线收敛'),
+      }),
       expect.objectContaining({
         id: 'verify-readiness-exit-code',
         classification: 'legacy-defect',
@@ -641,7 +657,9 @@ describe('spec-runtime-setup unified Node contract', () => {
   test('consumes every recorded artifact field set against a Node producer', () => {
     const fixture = readFixture('legacy-parity/posix/runtime-contracts.json');
     const samples = {};
-    for (const mode of ['bare', 'plan', 'verify', 'project-config']) {
+    // bare 自 2026-09-13 起为基线收敛 mutation(execution.v1),不再产 preflight.v2/
+    // diagnostic-snapshot.v1;check 仍是只读诊断生产者,加入以维持两个字段集的消费闭环。
+    for (const mode of ['bare', 'check', 'plan', 'verify', 'project-config']) {
       const observed = runModeCharacterization('posix', fixture.modes[mode]);
       samples[observed.result.payload.schema_version] = observed.result.payload;
       if (observed.result.payload.runtime) {

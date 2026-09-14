@@ -835,6 +835,38 @@ describe('spec-runtime-setup renderer', () => {
     expect(actions.some((action) => action.includes('--verify-only'))).toBe(false);
   });
 
+  test('external Graphify hook does not block core-ready setup', () => {
+    const { renderHumanSummary } = require('../../skills/spec-runtime-setup/scripts/lib/renderer.cjs');
+    const text = renderHumanSummary({
+      toolFacts: { provider_readiness: [{
+        provider: 'graphify', readiness_status: 'degraded',
+        lifecycle: { installed: true, configured: true, initialized: true, indexed: true, artifact_exists: true, query_verified: true },
+        steady_state: { hook_status: 'blocked' },
+      }] },
+      runtimeCapabilities: { setup_summary: { baseline_ready: true, host_runtime_ready: true, generated_runtime_manifest: { status: 'current' } } },
+    });
+    expect(text).toContain('整体状态：ready');
+  });
+
+  test('defaults-active without config example does not create a blocking action', () => {
+    const { renderHumanSummary } = require('../../skills/spec-runtime-setup/scripts/lib/renderer.cjs');
+    const text = renderHumanSummary({
+      toolFacts: { provider_readiness: [] },
+      runtimeCapabilities: {
+        host: 'codex',
+        repo_root: '/tmp/evoflow',
+        setup_summary: {
+          baseline_ready: true,
+          host_runtime_ready: true,
+          generated_runtime_manifest: { status: 'current' },
+          project_local_config: { local_config: { status: 'defaults-active' }, example_config: { status: 'missing' } },
+        },
+      },
+    }, { executionSummary: { overall_status: 'ready', reason_code: 'setup-ready', scope: 'full', selected_ids: [], required_provider_ids: [] } });
+    expect(text).toContain('整体状态：ready');
+    expect(text).not.toContain('--project-config');
+  });
+
   test('explains core-ready unknown as missing currentness evidence while retaining query probe status', () => {
     const { renderHumanSummary } = require('../../skills/spec-runtime-setup/scripts/lib/renderer.cjs');
     const text = renderHumanSummary({

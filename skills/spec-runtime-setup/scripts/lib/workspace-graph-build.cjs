@@ -82,8 +82,15 @@ function buildWorkspaceGraphs({
     skipped: true,
     reason_code: refreshOnly ? 'workspace-refresh-only' : null,
   };
-  if (!executionGuard() && !refreshOnly && typeof runners.codegraphInstallGlobal === 'function') {
-    globalInstall = safe(() => runners.codegraphInstallGlobal()) || { ok: false, reason_code: 'codegraph-install-threw' };
+  if (!executionGuard() && !refreshOnly) {
+    // 与 runProvider/runMerge 的 runner-missing 契约对齐(lane finding DR-018):
+    // 非 refresh 路径缺少全局安装 runner 时显式失败,不再静默视为 ready,
+    // 否则 build 可在缺少该步骤的情况下 complete,削弱可测试性保证。
+    if (typeof runners.codegraphInstallGlobal !== 'function') {
+      globalInstall = { ok: false, reason_code: 'codegraph-install-runner-missing' };
+    } else {
+      globalInstall = safe(() => runners.codegraphInstallGlobal()) || { ok: false, reason_code: 'codegraph-install-threw' };
+    }
   }
 
   const repoResults = [];

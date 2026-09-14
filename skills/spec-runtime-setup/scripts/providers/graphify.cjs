@@ -807,7 +807,11 @@ function probeExternalGraphifyHookMarker(hooksRoot) {
     try {
       const stat = fs.lstatSync(file);
       if (!stat.isFile()) continue;
-      const contents = fs.readFileSync(file, 'utf8');
+      // 外部 hooks root 不在本仓 containment 内,不能用 readBoundedScopeFile;此处以
+      // O_NOFOLLOW + 1MiB 前缀读取封顶(lane finding DR-005:旧版无上限读入用户可控
+      // hook 文件)。超限文件仅在前缀内探测 marker——探测是 advisory 检测,不证明全文。
+      const contents = readHookFilePrefix(file, 1024 * 1024);
+      if (contents == null) continue;
       if (contents.includes(GRAPHIFY_HOOK_MARKER)) {
         if (name === 'post-commit') detected.post_commit = true;
         else if (name === 'post-checkout') detected.post_checkout = true;
@@ -818,6 +822,24 @@ function probeExternalGraphifyHookMarker(hooksRoot) {
     }
   }
   return detected;
+}
+
+function readHookFilePrefix(file, maxBytes) {
+  const fd = fs.openSync(file, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0));
+  try {
+    const stat = fs.fstatSync(fd);
+    if (!stat.isFile()) return null;
+    const bytes = Buffer.alloc(Math.min(stat.size, maxBytes));
+    let size = 0;
+    while (size < bytes.length) {
+      const count = fs.readSync(fd, bytes, size, bytes.length - size, null);
+      if (!count) break;
+      size += count;
+    }
+    return bytes.subarray(0, size).toString('utf8');
+  } finally {
+    fs.closeSync(fd);
+  }
 }
 
 function usesLegacyGraphifyArtifactOverride(contents) {
@@ -1582,7 +1604,10 @@ function inspectGraphIntegrity(artifactRoot, supportedCodeFact = { status: 'pres
   }
   const supportedCodePresent = sourceFact.status === 'present';
   try {
-    const graph = JSON.parse(fs.readFileSync(graphPath, 'utf8'));
+    // 经 readBoundedScopeFile 读取:containment + 读取前后稳定性复核 + 64MiB 合同上限,
+    // 取代旧版无上限 readFileSync(lane finding DR-005);超限/读取期变化与解析失败
+    // 同路返回 artifact 合同不满足。
+    const graph = JSON.parse(readBoundedScopeFile(artifactRoot, graphPath, 'utf8'));
     const nodes = Array.isArray(graph.nodes) ? graph.nodes.length : null;
     if (nodes === null) return { ok: false, reason_code: 'graphify-artifact-contract-mismatch' };
     if (nodes === 0 && supportedCodePresent) return { ok: false, reason_code: 'graphify-extract-integrity-failed' };
@@ -1833,7 +1858,22 @@ function probePythonDistributionIdentity(context, repoRoot, launcher, dependency
 function launcherInterpreter(launcher) {
   if (path.extname(launcher).toLowerCase() === '.exe') return null;
   try {
-    const firstLine = fs.readFileSync(launcher, 'utf8').split(/\r?\n/, 1)[0];
+    // 只读首 4KiB 取 shebang,不再整文件读入(lane finding DR-005)。
+    const fd = fs.openSync(launcher, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0));
+    let prefix = '';
+    try {
+      const bytes = Buffer.alloc(4096);
+      let size = 0;
+      while (size < bytes.length) {
+        const count = fs.readSync(fd, bytes, size, bytes.length - size, null);
+        if (!count) break;
+        size += count;
+      }
+      prefix = bytes.subarray(0, size).toString('utf8');
+    } finally {
+      fs.closeSync(fd);
+    }
+    const firstLine = prefix.split(/\r?\n/, 1)[0];
     const match = firstLine.match(/^#!\s*(\S+)/);
     return match && (path.isAbsolute(match[1]) || path.win32.isAbsolute(match[1])) ? match[1] : null;
   } catch (_error) {

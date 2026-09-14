@@ -21,7 +21,28 @@ if [[ $# -lt 2 || "$1" != "verdict" ]]; then
   exit 2
 fi
 
-exec python3 - "$2" <<'PYEOF'
+# 与 spec-riffrec run-python.sh 同型的解释器探测(orchestrate.sh 同)。
+resolve_python() {
+  local candidate
+  for candidate in python3 python; do
+    if command -v "$candidate" >/dev/null 2>&1 && "$candidate" -c 'import sys; raise SystemExit(0 if sys.version_info.major == 3 else 1)' >/dev/null 2>&1; then
+      PYTHON_CMD=("$candidate")
+      return 0
+    fi
+  done
+  if command -v py >/dev/null 2>&1 && py -3 -c 'import sys; raise SystemExit(0 if sys.version_info.major == 3 else 1)' >/dev/null 2>&1; then
+    PYTHON_CMD=(py -3)
+    return 0
+  fi
+  return 1
+}
+
+if ! resolve_python; then
+  echo 'score-regression.sh: no runnable Python 3 interpreter found (tried python3, python, py -3)' >&2
+  exit 127
+fi
+
+exec "${PYTHON_CMD[@]}" - "$2" <<'PYEOF'
 import os
 import sys
 

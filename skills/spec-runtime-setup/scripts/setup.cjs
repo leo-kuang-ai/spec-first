@@ -142,7 +142,7 @@ function runSetup(input = {}) {
     };
   }
 
-  const mutationNeedsHost = ['verify', 'only', 'graphify-refresh', 'host-config-repair', 'workspace-graph-build'].includes(actionPlan.mode);
+  const mutationNeedsHost = ['bare', 'verify', 'only', 'graphify-refresh', 'host-config-repair', 'workspace-graph-build'].includes(actionPlan.mode);
   const runner = input.runner || runCommandSync;
   const candidates = advisoryHostCandidates({ env, runner });
   const internalWorkspaceRefresh = isInternalWorkspaceGraphRefreshInvocation({ actionPlan, env });
@@ -539,7 +539,7 @@ function runSingleTarget(context, repoRoot) {
   const { actionPlan } = context;
   if (actionPlan.mode === 'project-config') return runProjectConfig(context, repoRoot);
   if (actionPlan.mode === 'plan') return runPlan(context, repoRoot);
-  if (actionPlan.mode === 'bare' || actionPlan.mode === 'check') return runDiagnostic(context, repoRoot);
+  if (actionPlan.mode === 'check') return runDiagnostic(context, repoRoot);
   return runVerificationOrMutation(context, repoRoot);
 }
 
@@ -719,22 +719,9 @@ function buildInstallPreviewActions(context, repoRoot, providerPlans) {
   return actions;
 }
 
+// 单一实现抽取至 lib/host-config-repair-command.cjs(lane finding DR-015)。
 function hostConfigRepairCommand(context) {
-  const args = ['spec-runtime-setup'];
-  if (context.actionPlan.args.installationOnly) args.push('--installation-only');
-  if (context.actionPlan.selected_ids.length > 0) {
-    args.push('--only', context.actionPlan.selected_ids.join(','));
-  }
-  if (context.actionPlan.mode === 'graphify-refresh' || context.actionPlan.args.refresh) args.push('--refresh');
-  if (context.actionPlan.args.repo) args.push('--repo', context.actionPlan.args.repo);
-  if (context.actionPlan.args.folder) args.push('--folder', context.actionPlan.args.folder);
-  if (context.actionPlan.args.allRepos) args.push('--all-repos');
-  if (context.actionPlan.args.userScope) args.push('--user-scope');
-  if (context.actionPlan.args.requirementWorkspace) {
-    args.push('--requirement-workspace', context.actionPlan.args.requirementWorkspace);
-  }
-  args.push('--repair-host-config');
-  return args.join(' ');
+  return require('./lib/host-config-repair-command.cjs').hostConfigRepairCommand(context);
 }
 
 function previewSafety(context) {

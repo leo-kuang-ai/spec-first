@@ -176,6 +176,23 @@ function validateSchemaValue(value, schema, rootSchema, location = '$') {
     });
     if (!matches) throw new SchemaValidationError(location, '不匹配任何允许的 schema');
   }
+  // if/then(/else):条件应用——前提不匹配时静默跳过(2026-09-13 补实现;
+  // 此前被静默忽略,使 pypi 条件必填形同虚设,lane finding DR-017)。
+  if (isPlainObject(schema.if)) {
+    let preconditionHolds = true;
+    try {
+      validateSchemaValue(value, schema.if, rootSchema, location);
+    } catch (error) {
+      if (error instanceof SchemaValidationError) preconditionHolds = false;
+      else throw error;
+    }
+    if (preconditionHolds && isPlainObject(schema.then)) {
+      validateSchemaValue(value, schema.then, rootSchema, location);
+    }
+    if (!preconditionHolds && isPlainObject(schema.else)) {
+      validateSchemaValue(value, schema.else, rootSchema, location);
+    }
+  }
   if (schema.const !== undefined && value !== schema.const) {
     throw new SchemaValidationError(location, `必须等于 ${JSON.stringify(schema.const)}`);
   }
@@ -200,16 +217,32 @@ function validateSchemaValue(value, schema, rootSchema, location = '$') {
     if (schema.minItems !== undefined && value.length < schema.minItems) {
       throw new SchemaValidationError(location, `至少必须包含 ${schema.minItems} 项`);
     }
+    // maxItems/prefixItems(2026-09-13 补实现,此前被静默忽略)。
+    if (schema.maxItems !== undefined && value.length > schema.maxItems) {
+      throw new SchemaValidationError(location, `最多只能包含 ${schema.maxItems} 项`);
+    }
     if (schema.uniqueItems) {
       const serialized = value.map((item) => JSON.stringify(canonicalize(item)));
       if (new Set(serialized).size !== serialized.length) {
         throw new SchemaValidationError(location, '必须只包含唯一项');
       }
     }
-    if (schema.items) {
-      value.forEach((item, index) => {
-        validateSchemaValue(item, schema.items, rootSchema, `${location}[${index}]`);
-      });
+    const prefixItems = Array.isArray(schema.prefixItems) ? schema.prefixItems : [];
+    prefixItems.forEach((itemSchema, index) => {
+      if (index < value.length) {
+        validateSchemaValue(value[index], itemSchema, rootSchema, `${location}[${index}]`);
+      }
+    });
+    if (schema.items !== undefined) {
+      if (schema.items === false) {
+        if (value.length > prefixItems.length) {
+          throw new SchemaValidationError(location, `最多只能包含 ${prefixItems.length} 项(prefixItems 之外不允许额外项)`);
+        }
+      } else {
+        for (let index = prefixItems.length; index < value.length; index += 1) {
+          validateSchemaValue(value[index], schema.items, rootSchema, `${location}[${index}]`);
+        }
+      }
     }
   }
   if (isPlainObject(value)) {
@@ -507,8 +540,7 @@ function canonicalizeRegistry(registry) {
   });
 }
 
-function validateRegistry(registry, schema) {
-  assertNoIllegalNull(registry);
+function validateRegistry(registry, schema) {  assertNoIllegalNull(registry);
   try {
     const compatibleSchema = registry.schema_version === 'setup-registry.v10'
       ? { ...schema, properties: { ...schema.properties, schema_version: { const: 'setup-registry.v10' } } }
@@ -556,6 +588,93 @@ function validateRegistry(registry, schema) {
   assertNoDuplicateHostTargets(registry);
   assertOverrideKeys(registry);
   assertOpenCodePermissionPolicyOwnership(registry);
+  assertProviderReadinessMirrorsProvider(registry);
+}
+
+// tools[].provider_readiness 与 providers[] 同 id 条目之间存在有意冗余的共享元数据
+// (lane finding DR-001:双 canonical 段任一单独更新即漂移)。加载期断言共享字段
+// 逐字一致,使漂移在 registry 加载阶段 fail-closed,而不是静默进入运行时。
+function assertProviderReadinessMirrorsProvider(registry) {
+  const providersById = new Map((registry.providers || []).map((entry) => [entry.id, entry]));
+  for (const tool of registry.tools || []) {
+    const readiness = tool.provider_readiness;
+    if (!readiness || typeof readiness.provider !== 'string') continue;
+    const provider = providersById.get(readiness.provider);
+    if (!provider) continue;
+    const shared = [
+      ['usage_note', 'usage_note'],
+      ['first_generation', 'first_generation'],
+      ['steady_state', 'steady_state'],
+      ['fallback_methods', 'fallback.methods'],
+    ];
+    for (const [readinessPath, providerPath] of shared) {
+      const providerValue = providerPath.split('.').reduce((value, key) => (
+        value && typeof value === 'object' ? value[key] : undefined
+      ), provider);
+      const readinessValue = readinessPath.split('.').reduce((value, key) => (
+        value && typeof value === 'object' ? value[key] : undefined
+      ), readiness);
+      if (JSON.stringify(readinessValue) !== JSON.stringify(providerValue)) {
+        throw new RegistryError(
+          'registry_provider_metadata_drift',
+          `tools.${tool.id}.provider_readiness.${readinessPath} 与 providers.${readiness.provider}.${providerPath} 漂移;两段共享元数据必须同批更新。`,
+          { tool: tool.id, provider: readiness.provider, readinessPath, providerPath },
+        );
+      }
+    }
+  }
+}
+
+// validator 方言白名单(lane finding DR-017):schema 演化引入 validator 不认识的
+// 关键字时,校验强度会静默下降。加载期对整个 schema(含 $defs)做关键字审计,
+// 出现白名单之外的关键字即 fail-closed,迫使「扩展 schema」与「扩展 validator」同批。
+const SCHEMA_DIALECT_KEYWORDS = new Set([
+  '$schema', '$id', '$ref', 'title', 'description',
+  'type', 'const', 'enum',
+  'allOf', 'anyOf', 'if', 'then', 'else',
+  'properties', 'required', 'additionalProperties', 'minProperties',
+  'items', 'prefixItems', 'minItems', 'maxItems', 'uniqueItems',
+  'minLength', 'pattern',
+]);
+
+function assertSchemaDialect(schema) {
+  const unknown = new Set();
+  const visit = (node) => {
+    if (Array.isArray(node)) {
+      node.forEach(visit);
+      return;
+    }
+    if (!isPlainObject(node)) return;
+    for (const [key, value] of Object.entries(node)) {
+      if (key === '$defs') {
+        for (const def of Object.values(value || {})) visit(def);
+        continue;
+      }
+      if (key === 'properties' || key === 'additionalProperties') {
+        // properties 的键是数据字段名而非方言关键字;遍历其 schema 值。
+        if (isPlainObject(value)) for (const child of Object.values(value)) visit(child);
+        else if (value !== undefined && value !== false && value !== true) visit(value);
+        continue;
+      }
+      if (key === 'items' || key === 'prefixItems' || key === 'if' || key === 'then' || key === 'else') {
+        visit(value);
+        continue;
+      }
+      if (key === 'allOf' || key === 'anyOf') {
+        visit(value);
+        continue;
+      }
+      if (!SCHEMA_DIALECT_KEYWORDS.has(key)) unknown.add(key);
+    }
+  };
+  visit(schema);
+  if (unknown.size > 0) {
+    throw new RegistryError(
+      'registry_schema_dialect_keyword_unsupported',
+      `setup-registry.schema.json 使用了 validator 方言之外的关键字：${[...unknown].sort().join(', ')}。扩展 schema 必须同批扩展 validateSchemaValue 与 SCHEMA_DIALECT_KEYWORDS。`,
+      { unknownKeywords: [...unknown].sort() },
+    );
+  }
 }
 
 function loadRegistry({ skillRoot }) {
@@ -566,6 +685,7 @@ function loadRegistry({ skillRoot }) {
   const schemaPath = path.join(skillRoot, SCHEMA_FILE);
   const schema = readJsonFile(schemaPath, 'registry_schema_unreadable');
   const registry = readJsonFile(registryPath, 'registry_unreadable');
+  assertSchemaDialect(schema);
   validateRegistry(registry, schema);
   return canonicalizeRegistry(registry);
 }

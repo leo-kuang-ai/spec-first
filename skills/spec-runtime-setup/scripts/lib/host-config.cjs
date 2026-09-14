@@ -227,7 +227,10 @@ function containmentRootForTarget(rawPath, scope, target, { repoRoot, homeDir, e
   if (/^(?:~|\$HOME|\$\{HOME\})/.test(rawPath) || scope === 'user') {
     return path.resolve(homeDir);
   }
-  if (path.isAbsolute(rawPath)) return path.parse(path.resolve(rawPath)).root;
+  // 绝对路径不再退化为文件系统根(lane finding DR-014:那会使 isPathWithin 恒真,
+  // containment 防线静默失效)。未显式声明 containment_root 的绝对 config_path 一律
+  // 拒绝;确需绝对路径的 target 必须显式申报 containment_root(见函数首分支)。
+  if (path.isAbsolute(rawPath)) return null;
   return path.resolve(repoRoot);
 }
 

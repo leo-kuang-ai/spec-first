@@ -318,14 +318,22 @@ function applyActions(context, actionPlan, installations) {
     return degraded(context, repoRoot, 'codegraph-post-mutation-version-probe-failed');
   }
   const databaseBefore = captureDatabaseSnapshot(repoRoot);
-  const queryResult = run(
+  let queryResult = run(
     context,
     'codegraph',
     ['query', '__spec_first_readiness_probe__', '--limit', '1', '--json'],
     { cwd: repoRoot, timeoutMs: 10000 },
   );
   if (!succeeded(queryResult)) {
-    return degraded(context, repoRoot, 'codegraph-query-probe-failed');
+    // bounded autonomous recovery: the Provider may transiently miss the
+    // freshly indexed database; retry the same real probe once before fail.
+    queryResult = run(
+      context,
+      'codegraph',
+      ['query', '__spec_first_readiness_probe__', '--limit', '1', '--json'],
+      { cwd: repoRoot, timeoutMs: 10000 },
+    );
+    if (!succeeded(queryResult)) return degraded(context, repoRoot, 'codegraph-query-probe-failed');
   }
   const evidenceIdentity = readCurrentIdentity(context);
   const sourceAfter = sourceContentIdentity(captureSourceSnapshot({ ...context, repoRoot }));

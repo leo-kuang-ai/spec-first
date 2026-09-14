@@ -5,12 +5,58 @@
   "single_writer": "ce-localization-scenario-writer",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "19d3f6d8a06f3088d4e392a8718dac47aefa8587",
-    "dirty": false,
-    "dirty_paths": [],
-    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "5c75c9adfc8f24f7c377d833cc4683c9abc049fb9348e4178ae9db54b068d95e",
-    "inventory_hash": "3d2c3266db961c90c358e4d824687e879530eadc612e3e24e0f936659c39aa58",
+    "head": "c0803ab5d2e80edde9ca67771c6d204b775bb354",
+    "dirty": true,
+    "dirty_paths": [
+      "CHANGELOG.md",
+      "docs/validation/2026-09-13-full-system-audit-plan-v2.md",
+      "scripts/check-ce-upstream-reconciliation.cjs",
+      "skills/autoresearch/scripts/orchestrate.sh",
+      "skills/autoresearch/scripts/score-regression.sh",
+      "skills/spec-code-review/evals/fixtures/repos/tenant-orders/prepare-review-fixture.sh",
+      "skills/spec-code-review/evals/fixtures/scripts/check-r2-preset-applied-fix.sh",
+      "skills/spec-code-review/scripts/peer-job-runner.py",
+      "skills/spec-doc-review/scripts/peer-job-runner.py",
+      "skills/spec-explain/references/explainer-html.md",
+      "skills/spec-explain/references/explainer-markdown.md",
+      "skills/spec-lfg/scripts/pr-watch-state.cjs",
+      "skills/spec-pov/scripts/peer-job-runner.py",
+      "skills/spec-runtime-setup/SKILL.md",
+      "skills/spec-runtime-setup/scripts/lib/host-config-repair-command.cjs",
+      "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
+      "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
+      "skills/spec-runtime-setup/scripts/lib/provider-display.cjs",
+      "skills/spec-runtime-setup/scripts/lib/registry.cjs",
+      "skills/spec-runtime-setup/scripts/lib/renderer.cjs",
+      "skills/spec-runtime-setup/scripts/lib/repair-loop.cjs",
+      "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
+      "skills/spec-runtime-setup/scripts/lib/workspace-graph-build.cjs",
+      "skills/spec-runtime-setup/scripts/lib/workspace-routing-inject.cjs",
+      "skills/spec-runtime-setup/scripts/providers/codegraph.cjs",
+      "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
+      "skills/spec-runtime-setup/scripts/setup.cjs",
+      "skills/spec-runtime-setup/setup-registry.json",
+      "skills/spec-runtime-setup/setup-registry.schema.json",
+      "tests/fixtures/mcp-setup/legacy-parity/posix/runtime-contracts.json",
+      "tests/fixtures/mcp-setup/legacy-parity/windows/runtime-contracts.json",
+      "tests/fixtures/mcp-setup/platform-differences.json",
+      "tests/integration/runtime-setup-sigint-recovery.integration.test.js",
+      "tests/unit/ce-localization-closeout-contracts.test.js",
+      "tests/unit/ce-localization-review-contracts.test.js",
+      "tests/unit/host-runtime-projection-contracts.test.js",
+      "tests/unit/mcp-setup-contracts.test.js",
+      "tests/unit/mcp-setup-entrypoint.test.js",
+      "tests/unit/mcp-setup-facts-renderer.test.js",
+      "tests/unit/mcp-setup-mode-target.test.js",
+      "tests/unit/mcp-setup-node-contracts.test.js",
+      "tests/unit/mcp-setup-registry.test.js",
+      "tests/unit/runtime-setup-provider-identity.test.js",
+      "tests/unit/runtime-setup-repair-loop.test.js",
+      "tests/unit/spec-lfg-pr-watch-state.test.js"
+    ],
+    "dirty_path_manifest_sha256": "7af829a1f316c8385378e61aa37da56e9af518b01e12bcc22b12a396cf5a7802",
+    "source_tree_hash": "30e23af473d58352a8fa72dc84b1826f65072fc27dbb80a97569744d092dc85a",
+    "inventory_hash": "01b3a8d60125adc6604b439dc3ebffdd834a5337030e5da02318c2bb23f666ff",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -45,7 +91,7 @@
     }
   },
   "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
-  "inventory_sha256": "af887520669a32a1374e8b321f5824679da5779e6a91e0176204e6c497cd1e4d",
+  "inventory_sha256": "463bbf35aa0b431ae0cabea527bbbafc1834aefd7995dd35b1cb79ed1952f3c0",
   "scenario_fingerprint_contract_ref": "docs/contracts/workflows/scenario-capability-matrix.md",
   "scenarios": [
     {
@@ -2119,7 +2165,7 @@
       "scenario_ids": [
         "SCN-AUTORESEARCH"
       ],
-      "source_sha256": "ece1680cabcefd68ef10c954a244b5d9619c051a98c7841473e75c4ea6cbdcab"
+      "source_sha256": "a7dae8a4ec05fd6557cfe1611091398763a6ae83acc37232daf51cd1b7ad3221"
     },
     {
       "path": "skills/autoresearch/scripts/score-regression.sh",
@@ -2130,7 +2176,7 @@
       "scenario_ids": [
         "SCN-AUTORESEARCH"
       ],
-      "source_sha256": "d6652ecbfd4e38325ccf9f9ecd05ca0bd093ac5d704624b9667241be3b1e9722"
+      "source_sha256": "290d1627c5f6f42e212966a056f3a0cbe25bc6c4c708e520e92496f8b6ee0955"
     },
     {
       "path": "skills/autoresearch/security.md",
@@ -3626,7 +3672,7 @@
       "scenario_ids": [
         "SCN-SPEC-CODE-REVIEW"
       ],
-      "source_sha256": "1bec15a4056e617692ad571768e4fb964ac60b28bc48fccd23cf0055b1e5846f"
+      "source_sha256": "c76730781ddc60de65e29b376ccfd5e9ba365ae6091c1eda4a20b5198355067f"
     },
     {
       "path": "skills/spec-code-review/evals/fixtures/repos/tenant-orders/src/orders.js",
@@ -3692,7 +3738,7 @@
       "scenario_ids": [
         "SCN-SPEC-CODE-REVIEW"
       ],
-      "source_sha256": "961576309ddf14b2e6283acff57e557e9122cd12b3c0aeaa67f8c0a1866d129e"
+      "source_sha256": "7213bfcfb5186984ac7dac664fc7c8d6bc9e9f0de3bd8847fcb44df5fe11b85f"
     },
     {
       "path": "skills/spec-code-review/evals/fixtures/scripts/check-report-only-tenant-bypass.sh",
@@ -4011,7 +4057,7 @@
       "scenario_ids": [
         "SCN-SPEC-CODE-REVIEW"
       ],
-      "source_sha256": "765e80598b3ad53093a6266afa7247dfa9279c0bcfe4f27c266b5abe02f952ba"
+      "source_sha256": "02d33c8b35160e5c3623a7c4afa4450a4783888fdcb9e875b7b3ec3d7c08c5d5"
     },
     {
       "path": "skills/spec-code-review/references/personas/reliability-reviewer.md",
@@ -4143,7 +4189,7 @@
       "scenario_ids": [
         "SCN-SPEC-CODE-REVIEW"
       ],
-      "source_sha256": "9d7cdcb582bda9b22b11d6ef7cb9d0e9ace21edf55b660ad1cfd106d4287b76c"
+      "source_sha256": "db8fcf60a8cc1297ccfa200c55956a9691ce7b8eee8dcacebb751bb3a437863c"
     },
     {
       "path": "skills/spec-code-review/scripts/review-scope.py",
@@ -5914,7 +5960,7 @@
       "scenario_ids": [
         "SCN-SPEC-DOC-REVIEW"
       ],
-      "source_sha256": "9d7cdcb582bda9b22b11d6ef7cb9d0e9ace21edf55b660ad1cfd106d4287b76c"
+      "source_sha256": "db8fcf60a8cc1297ccfa200c55956a9691ce7b8eee8dcacebb751bb3a437863c"
     },
     {
       "path": "skills/spec-doc-review/SKILL.md",
@@ -6211,7 +6257,7 @@
       "scenario_ids": [
         "SCN-SPEC-EXPLAIN"
       ],
-      "source_sha256": "c0ea2bce10e12516786e74b1707e3cfab20c1b8f5996643a2be6178bae43d451"
+      "source_sha256": "4be63b834a32548f9faca4184510ce5fbf3d50e88d76e6dd9ad43d201430a741"
     },
     {
       "path": "skills/spec-explain/references/explainer-markdown.md",
@@ -6222,7 +6268,7 @@
       "scenario_ids": [
         "SCN-SPEC-EXPLAIN"
       ],
-      "source_sha256": "d6486b167d61e69cd9a8070908bb5b2921d9dac2e7c528b787abd8af837bda9a"
+      "source_sha256": "f07b75d232a3f1796fd98824ecae92e68406d6c8eda2bdab9602292bc9b7900f"
     },
     {
       "path": "skills/spec-explain/references/intake.md",
@@ -6244,7 +6290,7 @@
       "scenario_ids": [
         "SCN-SPEC-EXPLAIN"
       ],
-      "source_sha256": "70829bd20e652ff1a43a951a68b495b8ee0ceeaca41f0e5b9fa3e17760da1a44"
+      "source_sha256": "9169c807d875dda6aeb56a21b86e62aa5618c2a1ad0d60a7ebaa8825707167a4"
     },
     {
       "path": "skills/spec-explain/SKILL.md",
@@ -6255,7 +6301,7 @@
       "scenario_ids": [
         "SCN-SPEC-EXPLAIN"
       ],
-      "source_sha256": "3e778133237d0042dca3e98197d6685fc9396f6c53a78a44985559729df571aa"
+      "source_sha256": "bd82dcd441b82fd5336f3ea26bc22c5e382baf1d5dfc52ccb734719db4c6e39e"
     },
     {
       "path": "skills/spec-handoff/evals/cases/ordinary-continuation-not-triggered.yaml",
@@ -6387,7 +6433,7 @@
       "scenario_ids": [
         "SCN-SPEC-HANDOFF"
       ],
-      "source_sha256": "5f54a8a645fefaeda05b1548c4e2041e23e3af24810370a15f2c0c2cea0620c4"
+      "source_sha256": "7875e4d8a4350de177d6eb28af88af7bf0f97ebe12721330b5d0a0383dfbc21d"
     },
     {
       "path": "skills/spec-handoff/SKILL.md",
@@ -6970,7 +7016,7 @@
       "scenario_ids": [
         "SCN-SPEC-LFG"
       ],
-      "source_sha256": "79d4a594f67efa9b4c4b9e19603910a365c657d67b34149eddcb674775d78acf"
+      "source_sha256": "5600214530ecb03c5644213884666de7978b03a298d4f61bed0e2b402461e0cc"
     },
     {
       "path": "skills/spec-lfg/scripts/working-tree-fingerprint.cjs",
@@ -7344,7 +7390,7 @@
       "scenario_ids": [
         "SCN-SPEC-OPTIMIZE"
       ],
-      "source_sha256": "d24c1573910293b80981349fbc6e6baa4d46fcb9795547dc6556eaed7caee966"
+      "source_sha256": "435f0451a2cad84c1b8a4cb462ae587166c0802e274fb30502abbc5ce64ec4a8"
     },
     {
       "path": "skills/spec-optimize/scripts/experiment-worktree.sh",
@@ -8796,7 +8842,7 @@
       "scenario_ids": [
         "SCN-SPEC-POV"
       ],
-      "source_sha256": "9d7cdcb582bda9b22b11d6ef7cb9d0e9ace21edf55b660ad1cfd106d4287b76c"
+      "source_sha256": "db8fcf60a8cc1297ccfa200c55956a9691ce7b8eee8dcacebb751bb3a437863c"
     },
     {
       "path": "skills/spec-pov/SKILL.md",
@@ -11546,7 +11592,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "abe9ddc8b18a8bd01e8a3c61711e446b4f804627f0db92a9d7a6e9dfff4c891a"
+      "source_sha256": "0a084752eeaae10fe6e6a0d70ee2e79b21ed2e20a928359b72b7a6acc095869f"
     },
     {
       "path": "skills/spec-runtime-setup/references/project-config.md",
@@ -11568,7 +11614,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "3181c4a22b52573ce39805b07849860d387b99647199bf26d11df22956a58e1d"
+      "source_sha256": "dad174f75eb08ca928ccab339d65f8e79ad5c52aaa2d507627e6de8250605f21"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/check-health",
@@ -11612,7 +11658,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "f2059baef3a7d53d51c9c1f0774db556ad88a0eae52054664316c78b40b0ec85"
+      "source_sha256": "ede64b7665430fd2d6fa8fba7005df635a9eefc2cdd422a69a311eb34ba3fa0b"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/baseline-policy.cjs",
@@ -11623,7 +11669,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "56bc330dce96fc185e4bcc897ae093958e085806e87ac3277287f3483f0f03c1"
+      "source_sha256": "6d56cfbac4cd625dcaf54b9bee87fe8074aefb295201d4798dbebc7513100917"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/configured-dependencies.cjs",
@@ -11645,7 +11691,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "5924db30d6dfd07a2a1287a15405359d10ca44dba14edb1a1766600c2acb5a52"
+      "source_sha256": "7218e2d00ff273568f420d58f963087b29a7bba8505bcbc2242c478f323be337"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/git-path.cjs",
@@ -11667,7 +11713,18 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "785e07eccaa5470ba6ef2e6af41983980d90a7bfb9f1ca624ba9e5d1d073c9c0"
+      "source_sha256": "104ddcf0a14d47a2d89aa0d258b70babd8a23beb943b14bdd4fb2926670bfd83"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/host-config-repair-command.cjs",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "deterministic-helper",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "1e2ae8a812a9614bf07f30276be9cb44b3e17b678f0855b4d5bbe69458f4bdd2"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
@@ -11678,7 +11735,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "5812d058d2dd40443270fb504a5e80cef259be493419ce34e85952338aabc648"
+      "source_sha256": "3b6d1ec8901ac2558818d117a2d5e85b2466b5907f46b2e0a8587203ae6e45ee"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/human-output.cjs",
@@ -11700,7 +11757,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "9431408280bf48920e43998b94fb1ec33b551204f0616a6dfe8a4922a5f36a28"
+      "source_sha256": "a7da03d10e4fd17fd04c6c2c3c04c9f6db4fb741703c88b2953f852662c73998"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
@@ -11711,7 +11768,18 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "3c7109c853995dad5dc696bcaf7854670a4fcc880eb70b37a7980745bd731bbb"
+      "source_sha256": "23328a6ea3a1188f2bea2ea6a022de168b3fab05631774ad159468e4dad8339c"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/npm-warmup.cjs",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "deterministic-helper",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "36802e5627572af9f2263c490489880e470d3b4729a7fa08b618450faf31f069"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/opencode-permissions.cjs",
@@ -11755,7 +11823,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "04aad38cb71720f7e239ff0423b23066d9fb80dfc69b117ca690e3eca63a0c0d"
+      "source_sha256": "e63b3e9a15433e42c57530c6eb0eaecc8f0b02f9b811b418538719fd7aa214e8"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/process-utils.cjs",
@@ -11799,7 +11867,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "d94b14f271fa4397018c6ceed36548691954fa8c4617005eac55842b62090533"
+      "source_sha256": "c2f0da819d935aac8067b10affda612066b730e1b0e2f4aa95bcb4f1445ef50d"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/registry.cjs",
@@ -11810,7 +11878,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "276e0141d09d76e60861c9d8fa5d125ae31130e753d44276c828f509c01a8b87"
+      "source_sha256": "656b8a0dbb5e306e89ad6c28e1ab4eb397cdf754c44e35b7c3b0944788eab689"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/regular-file-publication.cjs",
@@ -11832,7 +11900,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "581aae6be3402874addb43047a87e80aa5af0b2cb7b308a62cb4918d114e7283"
+      "source_sha256": "0bafa3a681a9501691132072bdac87d9d01a9d255381bf82afe6404e60d8d5ba"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/renderer.cjs",
@@ -11843,7 +11911,18 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "060d58f7ed3f64d549d0bf34fc651574b649c0c17079a2328aa2f0c54fac2456"
+      "source_sha256": "fdbeaff9aeddb6377b21dc8d4cd6cbc1e5620d6fab814476d6a67f340e2ff319"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/repair-loop.cjs",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "deterministic-helper",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "749f4cb611098ccb2a63a92a20df774f19e7328104898786506ef7c1b2ad65f7"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
@@ -11854,7 +11933,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "f5f53f509f00ce4df726d178e35976494fdc118a4ecf414d950bf3d876b7f04d"
+      "source_sha256": "bb6c313249dc9964b0df0229d35435d4b438e1afe2597259d7a47bee0d7601da"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/runtime-remediation.cjs",
@@ -11877,6 +11956,17 @@
         "SCN-SPEC-RUNTIME-SETUP"
       ],
       "source_sha256": "b8898a9f9c7948d3f820b7c963bbe55ddf6a49c01bef2d187b2eae51a991e985"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/source-snapshot.cjs",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "deterministic-helper",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "bcb2995930b587be59d3c8440e07feed25866333da390d28176cb7ae59f48d3f"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/toml-section-editor.cjs",
@@ -11920,7 +12010,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "e3b1c5ca246c159778d9447e3ea57186646f26f50999167f9a9caacc3d4872e7"
+      "source_sha256": "3655fb48bffaf29da6c62eca1f59c02cf3b43a723271744de44dfa857e5a8717"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-executor.cjs",
@@ -11964,7 +12054,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "47ad0de6894550b5b0b08dc6e46d8f6c5bea4a5c214f4e37291189ea966747f6"
+      "source_sha256": "e0d1b5d346d794ff8de20b083e9e4c7411286c404ed1915f823f8fb8c002bd9d"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-clean.cjs",
@@ -11986,7 +12076,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "633681f084c629741763be14f810e9a1294ca504033690717aa15d6cf49f048f"
+      "source_sha256": "bd37b82bb0a8e6d9994cbe2c3c520db50b94c78633bad7714c633af0af989874"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-lifecycle-lease.cjs",
@@ -12074,7 +12164,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "38099c6c8622e72561387957cf9e4d6069dd5aef17b20932135c6a97ea1a8e48"
+      "source_sha256": "3dd739e9d4d19ef2ffefc22cffba9db66b506849b910540152441fb890507f4c"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-refresh-contract.cjs",
@@ -12096,7 +12186,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "be0951032a9af87fc7f55d5e530d6e2dd858683c1c25129e4ae10b5c6484371d"
+      "source_sha256": "658b1b6f5e33c1cae895bc341cf6e846cb4fd2a487f684ae8874b24c852ff748"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-routing-instruction.cjs",
@@ -12143,6 +12233,28 @@
       "source_sha256": "4d7045451fd27caff57721410d44beb44f4a24ea52c2069e6eedafb8d0854a16"
     },
     {
+      "path": "skills/spec-runtime-setup/scripts/providers/codegraph-artifact-evidence.cjs",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "deterministic-helper",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "6e3c81e0e09d4b0c05d72478ac0c59583dabc79905d4afcb0631dd0a8e43aed2"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/providers/codegraph-launcher.cjs",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "deterministic-helper",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "a316a555ad699b4fdb0e8c25cfc2a0ba2fc5eb9b33207ca4023ba58aa3e3e712"
+    },
+    {
       "path": "skills/spec-runtime-setup/scripts/providers/codegraph.cjs",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -12151,7 +12263,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "599fe5e08307eba39d2440d800bb8709042f307f5f95f0ce979427c30ab6087d"
+      "source_sha256": "332cce29ff1731ebe34be4e5d1d3e456fd0c0990bc90ba6645a5ba92052ea515"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/providers/common.cjs",
@@ -12162,7 +12274,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "a8ac27dc2c9122fea3c6da25d63aba1cc4272896e73455478c3d18a8d781edbb"
+      "source_sha256": "b50df264d67950433c821fa7e28f56cd59c067b3c30e042cebcaead6c0328cf5"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
@@ -12173,7 +12285,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "1cb971217524d52ee66ee8ede273fd8ad47997347c364c7ff136dc81efcd0f4d"
+      "source_sha256": "e943dd2130b536d57bd52bc9c991e4b205cb4971c3e2cd5ed9910fd15e65c8d9"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/providers/registry.cjs",
@@ -12195,7 +12307,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "5ed8fcbb044655f1e5ec29e85f2c788b4c17247abf654f247046260e7d64e8d6"
+      "source_sha256": "3fa166402a6978c20f746e87c1e1413aab5e9d80e2ae248cce8c11ef1d9dc7f6"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/vendor/js-yaml-3.15.1.min.js",
@@ -12239,7 +12351,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "b0e9b22fcb9cfb4103037f62b62d2cc91af2b7467aa268fff344544573a83637"
+      "source_sha256": "be15a661ed39a67fa0d071719e80c3a7dcb503278986a50d6f2ac7f2c503f9bf"
     },
     {
       "path": "skills/spec-runtime-setup/setup-registry.schema.json",
@@ -12250,7 +12362,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "7485f0c40219462e175f0ba3285e9c70940e2b28d88434d991984f416609e2fd"
+      "source_sha256": "34ceb9a41a048ca0009e0159205df3d6a4d0d4cdd8c7a30505fb1f11f8132f33"
     },
     {
       "path": "skills/spec-runtime-setup/SKILL.md",
@@ -12261,7 +12373,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "bd42f0807e65109423d681af14701d0d3fdc80fdb4890c169f843cd7c03613c7"
+      "source_sha256": "892434da474d5b0d58f1b89628351552f6782e8136a896b79e56d78795de73ad"
     },
     {
       "path": "skills/spec-simplify-code/evals/cases/bug-request-routes-debug.yaml",
@@ -14197,7 +14309,7 @@
       "scenario_ids": [
         "SCN-AUTORESEARCH"
       ],
-      "source_sha256": "d545890b80b12e2e9b85d96f1618726dde3bbf9eca563a0a00f87394aa66ff07"
+      "source_sha256": "f40c8f707b0e2caa0ad9843f92a065e48e146d6a0d6e981ffeb990b181e46ea8"
     },
     {
       "path": "docs/contracts/workflows/scenario-capability-matrix.md",
@@ -14252,7 +14364,7 @@
       "scenario_ids": [
         "SCN-SPEC-APP-CONSISTENCY-AUDIT"
       ],
-      "source_sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915"
+      "source_sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e"
     },
     {
       "path": "tests/unit/skill-flow-p2-closure-contracts.test.js",
@@ -14373,7 +14485,7 @@
       "scenario_ids": [
         "SCN-SPEC-BRAINSTORM"
       ],
-      "source_sha256": "d006ec7e094449f00d1822c702e065b1dacab4a3b2ef159320a239e5e78a415f"
+      "source_sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea"
     },
     {
       "path": "tests/unit/plugin-modules.test.js",
@@ -14384,7 +14496,7 @@
       "scenario_ids": [
         "SCN-SPEC-BRAINSTORM"
       ],
-      "source_sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915"
+      "source_sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e"
     },
     {
       "path": "tests/unit/private-scratch-migration-contracts.test.js",
@@ -14604,7 +14716,7 @@
       "scenario_ids": [
         "SCN-SPEC-CODE-REVIEW"
       ],
-      "source_sha256": "8a769329f2d572ee4bae9d8d3f8caa5805a64a9e5a4c2ee0bfbd079ca09ee18f"
+      "source_sha256": "5eec7320d067cc665ed3b7f56a978874ab0faed869538ecef33b34412ea4f559"
     },
     {
       "path": "tests/unit/python-runtime-resolution-contracts.test.js",
@@ -14681,7 +14793,7 @@
       "scenario_ids": [
         "SCN-SPEC-CODE-REVIEW"
       ],
-      "source_sha256": "47d7aa07bf8f716f925543bef3cfe927a0e345246aa29389e47af0821abc7d75"
+      "source_sha256": "d9eca7f2ca9364ed173b558758f0c39d57cf37ffc7d97aa730f7b080dc920024"
     },
     {
       "path": "tests/unit/spec-work-implementation-quality-contracts.test.js",
@@ -15011,7 +15123,7 @@
       "scenario_ids": [
         "SCN-SPEC-COMPOUND"
       ],
-      "source_sha256": "17a441ca49c7a0b371bbed8eb22e93734beda1e04f47570f4ca9ad47e5cac3e2"
+      "source_sha256": "f3f6b491bc49b8b9eee736cc49815acdee36b649144e19bc4286a680834469d8"
     },
     {
       "path": "tests/unit/ce-post-3-20-calibration-contracts.test.js",
@@ -15429,7 +15541,7 @@
       "scenario_ids": [
         "SCN-SPEC-DOC-REVIEW"
       ],
-      "source_sha256": "8a769329f2d572ee4bae9d8d3f8caa5805a64a9e5a4c2ee0bfbd079ca09ee18f"
+      "source_sha256": "5eec7320d067cc665ed3b7f56a978874ab0faed869538ecef33b34412ea4f559"
     },
     {
       "path": "tests/unit/review-peer-expansion-contracts.test.js",
@@ -15528,7 +15640,7 @@
       "scenario_ids": [
         "SCN-SPEC-DOGFOOD"
       ],
-      "source_sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915"
+      "source_sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e"
     },
     {
       "path": "tests/unit/spec-worktree-contracts.test.js",
@@ -15572,7 +15684,7 @@
       "scenario_ids": [
         "SCN-SPEC-EXPLAIN"
       ],
-      "source_sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915"
+      "source_sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e"
     },
     {
       "path": "tests/unit/private-scratch-migration-contracts.test.js",
@@ -15616,7 +15728,7 @@
       "scenario_ids": [
         "SCN-SPEC-HANDOFF"
       ],
-      "source_sha256": "58f1e2b85186f82aba85340c0e1924a17b1d5828d24d01ceabc98df7eaf5b314"
+      "source_sha256": "eee4e526b8567703a2151af788ad11b63c2c5adf331c2a5751b1a2b8d08c6597"
     },
     {
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
@@ -15715,7 +15827,7 @@
       "scenario_ids": [
         "SCN-SPEC-IDEATE"
       ],
-      "source_sha256": "d006ec7e094449f00d1822c702e065b1dacab4a3b2ef159320a239e5e78a415f"
+      "source_sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea"
     },
     {
       "path": "tests/unit/plugin-modules.test.js",
@@ -15726,7 +15838,7 @@
       "scenario_ids": [
         "SCN-SPEC-IDEATE"
       ],
-      "source_sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915"
+      "source_sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e"
     },
     {
       "path": "tests/unit/private-scratch-migration-contracts.test.js",
@@ -15847,7 +15959,7 @@
       "scenario_ids": [
         "SCN-SPEC-LFG"
       ],
-      "source_sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915"
+      "source_sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e"
     },
     {
       "path": "tests/unit/spec-brainstorm-clarification-contracts.test.js",
@@ -15880,7 +15992,7 @@
       "scenario_ids": [
         "SCN-SPEC-LFG"
       ],
-      "source_sha256": "182de666b1fd31a7dcc03cd876e2b9bfacfad5e644ec853086b1cf06fba600c8"
+      "source_sha256": "fe529b2ae10371f370d5de4061657fd58edaf967a28e513d7e6bb4d83fae53c8"
     },
     {
       "path": "tests/unit/spec-resolve-pr-feedback-contracts.test.js",
@@ -16067,7 +16179,7 @@
       "scenario_ids": [
         "SCN-SPEC-OPTIMIZE"
       ],
-      "source_sha256": "3e3f89fabea3df622d0f96fce92573b7b2c2d1cf40a197c1024ac9ab236992df"
+      "source_sha256": "1c215e2b6e0264f3b45ec48e9728828e25fb5f753c96dda460c81a31f62d7f62"
     },
     {
       "path": "tests/unit/spec-optimize-loop-contracts.test.js",
@@ -16210,7 +16322,7 @@
       "scenario_ids": [
         "SCN-SPEC-PLAN"
       ],
-      "source_sha256": "d006ec7e094449f00d1822c702e065b1dacab4a3b2ef159320a239e5e78a415f"
+      "source_sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea"
     },
     {
       "path": "tests/unit/plugin-modules.test.js",
@@ -16221,7 +16333,7 @@
       "scenario_ids": [
         "SCN-SPEC-PLAN"
       ],
-      "source_sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915"
+      "source_sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e"
     },
     {
       "path": "tests/unit/private-scratch-migration-contracts.test.js",
@@ -16430,7 +16542,7 @@
       "scenario_ids": [
         "SCN-SPEC-POV"
       ],
-      "source_sha256": "8a769329f2d572ee4bae9d8d3f8caa5805a64a9e5a4c2ee0bfbd079ca09ee18f"
+      "source_sha256": "5eec7320d067cc665ed3b7f56a978874ab0faed869538ecef33b34412ea4f559"
     },
     {
       "path": "tests/unit/plugin-modules.test.js",
@@ -16441,7 +16553,7 @@
       "scenario_ids": [
         "SCN-SPEC-POV"
       ],
-      "source_sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915"
+      "source_sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e"
     },
     {
       "path": "tests/unit/private-scratch-migration-contracts.test.js",
@@ -16485,7 +16597,7 @@
       "scenario_ids": [
         "SCN-SPEC-PRD"
       ],
-      "source_sha256": "f4e24e45dc961ee400fa5e64367508ca45c14fb2461848e3d19893e440b3d4c4"
+      "source_sha256": "b16b3960b52b3ddbda7ae8f1dca7e2514dde4efaa5671e961783a4d34aa6bf04"
     },
     {
       "path": "docs/contracts/workflows/scenario-capability-matrix.md",
@@ -16628,7 +16740,7 @@
       "scenario_ids": [
         "SCN-SPEC-PRD"
       ],
-      "source_sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915"
+      "source_sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e"
     },
     {
       "path": "tests/unit/requirements-language-promotion-contracts.test.js",
@@ -16815,7 +16927,7 @@
       "scenario_ids": [
         "SCN-SPEC-PRODUCT-PULSE"
       ],
-      "source_sha256": "d006ec7e094449f00d1822c702e065b1dacab4a3b2ef159320a239e5e78a415f"
+      "source_sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea"
     },
     {
       "path": "tests/unit/spec-product-pulse-contracts.test.js",
@@ -16848,7 +16960,7 @@
       "scenario_ids": [
         "SCN-SPEC-PROJECT-RULES"
       ],
-      "source_sha256": "f4e24e45dc961ee400fa5e64367508ca45c14fb2461848e3d19893e440b3d4c4"
+      "source_sha256": "b16b3960b52b3ddbda7ae8f1dca7e2514dde4efaa5671e961783a4d34aa6bf04"
     },
     {
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
@@ -16980,7 +17092,7 @@
       "scenario_ids": [
         "SCN-SPEC-RESOLVE-PR-FEEDBACK"
       ],
-      "source_sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915"
+      "source_sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e"
     },
     {
       "path": "tests/unit/skill-flow-p2-closure-contracts.test.js",
@@ -17123,7 +17235,7 @@
       "scenario_ids": [
         "SCN-SPEC-RULE-MINER"
       ],
-      "source_sha256": "f4e24e45dc961ee400fa5e64367508ca45c14fb2461848e3d19893e440b3d4c4"
+      "source_sha256": "b16b3960b52b3ddbda7ae8f1dca7e2514dde4efaa5671e961783a4d34aa6bf04"
     },
     {
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
@@ -17145,7 +17257,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "f4e24e45dc961ee400fa5e64367508ca45c14fb2461848e3d19893e440b3d4c4"
+      "source_sha256": "b16b3960b52b3ddbda7ae8f1dca7e2514dde4efaa5671e961783a4d34aa6bf04"
     },
     {
       "path": "docs/contracts/workflows/scenario-capability-matrix.md",
@@ -17211,7 +17323,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "f635126a485dfa5cfc0b26253e0a0698b0a0b0c15a3343bd6a61e455d1cdbdf3"
+      "source_sha256": "a5372fae024fd2e0ede08428c83d9ce17217bf975193c93198495f002ffe3f4d"
     },
     {
       "path": "tests/fixtures/mcp-setup/legacy-parity/replay-runtime-contracts.cjs",
@@ -17233,7 +17345,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "f6a62fd8d2f452dd3e7dfb0518c5a23d99a644923e849b42d80215a9152d3231"
+      "source_sha256": "458744d88fc5ca09d74c2a856acd530f14598fc9de5c8c1e5678380f743b592d"
     },
     {
       "path": "tests/fixtures/mcp-setup/repair-worktree/posix.json",
@@ -17256,6 +17368,39 @@
         "SCN-SPEC-RUNTIME-SETUP"
       ],
       "source_sha256": "1bc43b83db535c5c5a7578a5b25535db0371c196fe30410ba5e4e45a64cd4449"
+    },
+    {
+      "path": "tests/integration/runtime-setup-codegraph-launcher.integration.test.js",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "cb665300c498b9edf3a69dc8f2a35c624e85b40924e18065a999173a1bd5888f"
+    },
+    {
+      "path": "tests/integration/runtime-setup-npm-archive.integration.test.js",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "edb9160ac97e683ce7c4943ecf156166cdaef70439f001a482b82ebdcabe10aa"
+    },
+    {
+      "path": "tests/integration/runtime-setup-sigint-recovery.integration.test.js",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "8a75a58ece0a849568785e0a088d868ab18fbf22075c806d30ece14fe52c2d60"
     },
     {
       "path": "tests/integration/workspace-graph-auto-refresh.integration.test.js",
@@ -17310,7 +17455,18 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "79c76bec14c429def5a7553eb54dc6a203dcbbdd32a23d0bef320408eafd74bd"
+      "source_sha256": "e86ef7866f5577f0f0ed62852bad5090da3c8ae3d5bb50eecbefe4a3857d59c3"
+    },
+    {
+      "path": "tests/unit/host-enumeration-drift-guard.test.js",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "21d1bafcdefad49d75716598137ac99261221366b858ac2ad3fe678678734702"
     },
     {
       "path": "tests/unit/mcp-setup-config-consumers.test.js",
@@ -17321,7 +17477,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "d006ec7e094449f00d1822c702e065b1dacab4a3b2ef159320a239e5e78a415f"
+      "source_sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea"
     },
     {
       "path": "tests/unit/mcp-setup-contracts.test.js",
@@ -17332,7 +17488,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "e8ab1c9e3261617c36fd8e7877d1e1e6da775fd21445d87de1f521375ef9ccef"
+      "source_sha256": "b0a77ff35311ada63e26dde089575200dd84ce4d3899fcfe6f69fe70a80e0d27"
     },
     {
       "path": "tests/unit/mcp-setup-entrypoint.test.js",
@@ -17343,7 +17499,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "14ec939751f3ac35d0dea8a0ad049c81b77b47a2a6419944ae45302d3b839563"
+      "source_sha256": "dc5d9f6f8988c9d080683bb097dc7bb94f7926bf50a534ef4c5e3fbb3b2ca6d1"
     },
     {
       "path": "tests/unit/mcp-setup-facts-renderer.test.js",
@@ -17354,7 +17510,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "c9e7eabbfb83540097449b372a33e9259c6e93e29cc1f1401c84bcd15cac1853"
+      "source_sha256": "a8f0cec2f2f08d412420b721be7fc52bb3fa21e6ff7a0b4191af4d56e49f7fc9"
     },
     {
       "path": "tests/unit/mcp-setup-host-config.test.js",
@@ -17376,7 +17532,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "f5f43f9bdd33fa093e116d4de68c1cf195481ab306d677694c6bcaca52d4471a"
+      "source_sha256": "4b8aebb34e44dfd616e9a3e43f99958107ca1e5c79685a5828404fc280a36a69"
     },
     {
       "path": "tests/unit/mcp-setup-node-contracts.test.js",
@@ -17387,7 +17543,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "19387a7b44d739a9991a0555ac3894b6770ba5bca726fc4ad51d3d68326042ee"
+      "source_sha256": "12dada591d6c9e9c8bcd9da8f9381005bf01ed6abf510ea616bd5790ed0d2ee6"
     },
     {
       "path": "tests/unit/mcp-setup-opencode-permissions.test.js",
@@ -17409,7 +17565,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "126b826191b8d07ccef441add5176e43142ecc98ec976c1e321f7c638ff9034a"
+      "source_sha256": "b3b1950bf09c0341dcd325ca61b815f772fbd81a18efa6746f0453bf8bd2d2a0"
     },
     {
       "path": "tests/unit/mcp-setup-process-runner.test.js",
@@ -17431,7 +17587,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "212af16be67ebd14ef2267c3111e1e9d0f8394f9770a9c99a7c10404f509f493"
+      "source_sha256": "951eeb2774b82ec1828e16fcbb09d3c5bbaf0e5178e8d0d86f6367a8e214cb5e"
     },
     {
       "path": "tests/unit/mcp-setup-providers.test.js",
@@ -17442,7 +17598,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "8a47fd8a27a02bfc71ca334b63ff42c89badb63bb5bf7d9d43b1b040253c2afd"
+      "source_sha256": "eab93f4b2c69cb04d381c01c238d41e724c99d7800f49392a5abb579f4416b3f"
     },
     {
       "path": "tests/unit/mcp-setup-registry.test.js",
@@ -17453,7 +17609,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "bf9827aa12d0514bddad3bdfe8082ab30e0782629c9ce57b78223197fafb95d9"
+      "source_sha256": "c1486f354ff2097460df6d6dd38fee87ed0733529c705174fc84eb9628b39173"
     },
     {
       "path": "tests/unit/mcp-setup-workspace-async-refresh.test.js",
@@ -17541,7 +17697,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "6ed74296ca53f77a435344bbaa46f2e459055b5bdb4b92e464143480eba6d2b5"
+      "source_sha256": "f1899bc5ca0369b331e3db468be693dfbb17afccb042bdee5b723c90a7a79df3"
     },
     {
       "path": "tests/unit/mcp-setup-workspace-graph-refresh.test.js",
@@ -17607,7 +17763,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "394c233044aa7fa7e745fd7f1d94032d4c7598382286cfd6c82022f657f3ce2b"
+      "source_sha256": "836388b733c5769d9e33a17cb942fc70e4ed79cf4014d8dc08fd67bd1edef830"
     },
     {
       "path": "tests/unit/mcp-setup-workspace-routing-inject.test.js",
@@ -17662,7 +17818,128 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915"
+      "source_sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e"
+    },
+    {
+      "path": "tests/unit/runtime-setup-codegraph-evidence.test.js",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "18627c29de920929d1b1bce1ccfd52e8e380d8a69add2fce10fa33c9707f5343"
+    },
+    {
+      "path": "tests/unit/runtime-setup-codegraph-install-integrity.test.js",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "396d5e576c488591155c03d9beb4215152090b07d0f00f1aee13bb11fe735521"
+    },
+    {
+      "path": "tests/unit/runtime-setup-codegraph-launcher.test.js",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "062d12910dbe8979916f97bca7078cb3b76bc95e2897fdb24c4cf62c80cafc6f"
+    },
+    {
+      "path": "tests/unit/runtime-setup-consumer-health.test.js",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "0f7ea603a2b1fefdd539a66754939f80f44f84f4913bd3f1d015dd4812f8c8ca"
+    },
+    {
+      "path": "tests/unit/runtime-setup-demand-policy.test.js",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "e552f865ccca4f977018893e92e7cb239a3164dc06455f51fee2c639079b1f07"
+    },
+    {
+      "path": "tests/unit/runtime-setup-npm-integrity.test.js",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "0b8c84c3d5248bfdcd29a10cde7aae14b9a3a352c6883152839a6cee6c65ea89"
+    },
+    {
+      "path": "tests/unit/runtime-setup-provider-identity.test.js",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "1148c8c9efa484e25f5304a0a1b62b3130275aa3e181b2de2ed4292667c3ee4d"
+    },
+    {
+      "path": "tests/unit/runtime-setup-registry-metadata.test.js",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "8aad259d700f6a19e768307539376f2f18ec1fdaa70446f7f67a840a49592b11"
+    },
+    {
+      "path": "tests/unit/runtime-setup-repair-loop.test.js",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "124898480d70b49f6b40c97a4550ab5f5a8ce8c77099239ccad1554382748f52"
+    },
+    {
+      "path": "tests/unit/runtime-setup-warmup-identity.test.js",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "ff7bd68a8554e4e517f56c7520c841303fe4f4538a3a8c872dca23aa2fbbf5b2"
+    },
+    {
+      "path": "tests/unit/runtime-setup-workspace-loading.test.js",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "e938e82600e08dfbb9581a1d84e986df04d99a19406f5aa83aa4034386ea7a0a"
     },
     {
       "path": "tests/unit/sync-instruction-files.test.js",
@@ -18102,7 +18379,7 @@
       "scenario_ids": [
         "SCN-SPEC-WORK"
       ],
-      "source_sha256": "1f3c43c364870c58c1d5b4ad02214e445d0095c593e40ae1a59cf7f154233cdb"
+      "source_sha256": "15a5bb548d826b676dd205c222ea6ce9d3ef5cf3b92997f3b320dcf3ff97abf8"
     },
     {
       "path": "tests/unit/opencode-adapter.test.js",
@@ -18124,7 +18401,7 @@
       "scenario_ids": [
         "SCN-SPEC-WORK"
       ],
-      "source_sha256": "2df6caaf12c4d617d130ce9aaa716f77431682baad9108bc2c7611207d85ab9f"
+      "source_sha256": "4a5089b3b7a91747b8f669d39aafc33c0735762792498e07674a1061fe6e3dbb"
     },
     {
       "path": "tests/unit/plugin-modules.test.js",
@@ -18135,7 +18412,7 @@
       "scenario_ids": [
         "SCN-SPEC-WORK"
       ],
-      "source_sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915"
+      "source_sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e"
     },
     {
       "path": "tests/unit/scenario-capability-matrix-contracts.test.js",
@@ -18487,7 +18764,7 @@
       "scenario_ids": [
         "SCN-SPEC-WRITE-SKILL"
       ],
-      "source_sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915"
+      "source_sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e"
     },
     {
       "path": "tests/unit/spec-write-skill-authoring-preview.test.js",
@@ -18718,7 +18995,7 @@
       "scenario_ids": [
         "SCN-USING-SPEC-FIRST"
       ],
-      "source_sha256": "f4e24e45dc961ee400fa5e64367508ca45c14fb2461848e3d19893e440b3d4c4"
+      "source_sha256": "b16b3960b52b3ddbda7ae8f1dca7e2514dde4efaa5671e961783a4d34aa6bf04"
     },
     {
       "path": "docs/contracts/workflows/worker-dispatch-capability.md",
@@ -18828,7 +19105,7 @@
       "scenario_ids": [
         "SCN-USING-SPEC-FIRST"
       ],
-      "source_sha256": "58f1e2b85186f82aba85340c0e1924a17b1d5828d24d01ceabc98df7eaf5b314"
+      "source_sha256": "eee4e526b8567703a2151af788ad11b63c2c5adf331c2a5751b1a2b8d08c6597"
     },
     {
       "path": "tests/unit/using-spec-first-contracts.test.js",

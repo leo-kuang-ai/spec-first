@@ -281,13 +281,18 @@ describe('CE localization closeout artifacts', () => {
     const closeout = producer.loadCloseoutArtifacts();
     const review = JSON.parse(JSON.stringify(closeout.reviews.round3Openai));
     const sourceDelta = JSON.parse(fs.readFileSync(
-      'docs/validation/ce-localization/review/deltas/2026-08-20-current-source-final-v2-inline-review.json',
+      require('node:path').join(repoRoot, 'docs/validation/ce-localization/review/deltas/2026-08-20-current-source-final-v2-inline-review.json'),
       'utf8',
     ));
     sourceDelta.source_binding.source_tree_hash = '0'.repeat(64);
+    // prune 合同(assertReviewDeltaPath)要求 delta artifact 位于 review/deltas/ 目录内,
+    // 故不能改用 os.tmpdir;此处以 repoRoot 绝对路径写入,修复旧版 cwd 相对路径在
+    // jest cwd ≠ 仓库根时的 ENOENT/错位问题。文件位于 chain-excluded 目录,硬杀残留
+    // 不影响 inventory;pid 后缀降低并发碰撞。
     const artifactRef = `docs/validation/ce-localization/review/deltas/.test-stale-${process.pid}.json`;
+    const artifactAbsPath = require('node:path').join(repoRoot, artifactRef);
     const artifactBytes = Buffer.from(`${JSON.stringify(sourceDelta, null, 2)}\n`);
-    fs.writeFileSync(artifactRef, artifactBytes);
+    fs.writeFileSync(artifactAbsPath, artifactBytes);
     review.review_status = 'complete-with-incremental-review';
     review.coverage_status = 'complete-current-source-with-incremental-review';
     review.review_deltas = [{
@@ -303,7 +308,7 @@ describe('CE localization closeout artifacts', () => {
       expect(review.review_status).toBe('complete-current-source');
       expect(review.coverage_status).toBe('complete-current-source');
     } finally {
-      fs.rmSync(artifactRef, { force: true });
+      fs.rmSync(artifactAbsPath, { force: true });
     }
   });
 

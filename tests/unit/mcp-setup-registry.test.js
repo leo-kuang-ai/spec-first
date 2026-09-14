@@ -443,6 +443,79 @@ describe('spec-runtime-setup registry v11', () => {
     }, 'registry_schema_invalid');
   });
 
+  test('rejects precedence-guard duplicates and fallback/uninstall references to unknown targets', () => {    // guard-vs-target:target user 的 guard 与 target project 在同一路径指纹上重复。
+    expectRegistryError((registry) => {
+      registry.hosts.cursor.defaults.tool.host_config.targets.user.precedence_guards = [{
+        config_path: '.cursor/mcp.json',
+        config_format: 'jsonc',
+        precedence: 10,
+        reason_code: 'higher-priority-user-config',
+      }];
+    }, 'registry_duplicate_host_target');
+    // guard-vs-guard:同一 target 上两个 guard 解析到同一路径。
+    expectRegistryError((registry) => {
+      registry.hosts.cursor.defaults.tool.host_config.targets.user.precedence_guards = [
+        {
+          config_path: '$HOME/.cursor/rules/x.jsonc',
+          config_format: 'jsonc',
+          precedence: 10,
+          reason_code: 'higher-priority-user-config',
+        },
+        {
+          config_path: '$HOME/.cursor/rules/x.jsonc',
+          config_format: 'jsonc',
+          precedence: 20,
+          reason_code: 'higher-priority-user-config',
+        },
+      ];
+    }, 'registry_duplicate_host_target');
+    // fallback_order 引用未声明 target。
+    expectRegistryError((registry) => {
+      registry.hosts.cursor.defaults.tool.host_config.fallback_order = ['project', 'undeclared-target'];
+    }, 'registry_unknown_host_target');
+    // uninstall_targets 引用未声明 target。
+    expectRegistryError((registry) => {
+      registry.hosts.cursor.defaults.tool.host_config.uninstall_targets = ['project', 'user', 'undeclared-target'];
+    }, 'registry_unknown_host_target');
+  });
+
+  test('rejects provider_readiness metadata drifting from its provider entry', () => {
+    // tools[].provider_readiness 与 providers[] 同 id 条目的共享元数据必须同批更新
+    // (lane finding DR-001);单独改任一段在加载期 fail-closed。
+    expectRegistryError((registry) => {
+      const codegraphTool = registry.tools.find((entry) => entry.id === 'codegraph');
+      codegraphTool.provider_readiness.usage_note = codegraphTool.provider_readiness.usage_note + ' drifted';
+    }, 'registry_provider_metadata_drift');
+    expectRegistryError((registry) => {
+      const codegraphTool = registry.tools.find((entry) => entry.id === 'codegraph');
+      codegraphTool.provider_readiness.fallback_methods = ['rg'];
+    }, 'registry_provider_metadata_drift');
+    expectRegistryError((registry) => {
+      const codegraphProvider = registry.providers.find((entry) => entry.id === 'codegraph');
+      codegraphProvider.first_generation = { ...codegraphProvider.first_generation, extra: true };
+    }, 'registry_provider_metadata_drift');
+  });
+
+  test('rejects schema keywords outside the validator dialect', () => {
+    // validator 只实现方言白名单内的关键字;schema 引入未实现关键字会在加载期
+    // fail-closed,防止校验强度静默下降(lane finding DR-017)。
+    const fixture = withRegistryMutation(() => {});
+    try {
+      const schemaPath = path.join(fixture.tempRoot, 'setup-registry.schema.json');
+      const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+      schema.$defs.installationSpec.properties.kind.maximum = 5;
+      fs.writeFileSync(schemaPath, `${JSON.stringify(schema, null, 2)}\n`);
+      expect(() => loadRegistry({ skillRoot: fixture.tempRoot })).toThrow();
+      try {
+        loadRegistry({ skillRoot: fixture.tempRoot });
+      } catch (error) {
+        expect(error.code).toBe('registry_schema_dialect_keyword_unsupported');
+      }
+    } finally {
+      fixture.cleanup();
+    }
+  });
+
   test('allows only schema-declared nullable provider workspace paths', () => {
     const registry = loadRegistry({ skillRoot });
     expect(getEffectiveEntry(registry, {

@@ -65,6 +65,9 @@ const CLI_RUNTIME_PATHS = new Set([
 ]);
 
 const SUPPORT_PATHS = new Set([
+  // config.example.yaml 是窗口内 R069 重命名后的 tracked 团队默认示例;
+  // config.local.example.yaml 是重命名前路径,保留以兼容 legacy 窗口分类。
+  '.compound-engineering/config.example.yaml',
   '.compound-engineering/config.local.example.yaml',
   '.gitattributes',
   'package.json',

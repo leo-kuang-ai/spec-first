@@ -1,0 +1,754 @@
+{
+  "schema_version": "ce-lane-refresh-findings-evidence.v1",
+  "generated_at": "2026-09-12",
+  "artifact_kind": "durable-review-evidence",
+  "context": "CE 517 语义复核收口的 lane 复核债请偿:83 条唯一路径(212 条 skill-path 关系)全文通读,双 lens(openai-skill-engineering + anthropic-skill-craft-safety)判定。83 路径中 2 条为本流采纳变更(autoresearch),81 条为 P123 累积既有漂移。findings 曾随 83 路径 delta 进入 2026-09-12 第一次 closeout(83 路径 receipts 已合并进 round-3 lane 工件、合同测试 16/16 绿);后因冻结数测试注释编辑触发链重绑,第二次 closeout 的 1 路径 delta 覆盖了原 delta 文件与 round-3-findings.json 的 DR 条目,故以本文件作为 29 条 findings 的持久证据(全量 summary 保留)。",
+  "method": "Orchestrator(ZCode 会话)编排 6 个并行只读 fresh-source reviewer 分包全文通读 + 4 条路径 orchestrator 补读;peer-job-runner 三镜像按一份通读+shasum 字节一致验证;双 lens 判定同源(同一 reviewer 上下文),非外部 OpenAI/Anthropic 模型互审;无 runtime/field 证据。",
+  "binding": "判定针对 2026-09-12 工作树(HEAD c0803ab5 + 本流 dirty);receipts 哈希已随 lane 合并绑定 round-3 工件。",
+  "reviewed_paths": [
+    {
+      "path": "skills/spec-optimize/scripts/decide.cjs",
+      "read_status": "full",
+      "method": "Orchestrator 本轮全文通读(589 行)"
+    },
+    {
+      "path": "skills/spec-runtime-setup/references/config-template.yaml",
+      "read_status": "full",
+      "method": "Orchestrator 本轮全文通读(84 行)"
+    },
+    {
+      "path": "skills/spec-runtime-setup/references/supported-mcp-tools.md",
+      "read_status": "full",
+      "method": "Orchestrator 本轮全文通读(124 行)"
+    },
+    {
+      "path": "tests/unit/graphify-defensive-probes.test.js",
+      "read_status": "full",
+      "method": "Orchestrator 本轮全文通读(102 行)"
+    },
+    {
+      "path": "tests/unit/mcp-setup-entrypoint.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读(3189 行分两段读完)"
+    },
+    {
+      "path": "skills/spec-runtime-setup/setup-registry.json",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读(2243 行分两段读完)"
+    },
+    {
+      "path": "tests/unit/spec-optimize-decide.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/mcp-setup-workspace-graph-executor.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/spec-lfg-pr-watch-state.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-lfg/scripts/pr-watch-state.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读(2708 行分段读完并 grep 复核引用)"
+    },
+    {
+      "path": "tests/unit/mcp-setup-providers.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读(2147 行分段读完)"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/providers/codegraph.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/runtime-setup-codegraph-launcher.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/runtime-setup-codegraph-evidence.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/integration/runtime-setup-codegraph-launcher.integration.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/providers/codegraph-artifact-evidence.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/providers/codegraph-launcher.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/runtime-setup-codegraph-install-integrity.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/providers/common.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-code-review/scripts/peer-job-runner.py",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读(2244 行两段覆盖无跳读;grep 验证 SERVING_RECEIPT 常量全仓引用)"
+    },
+    {
+      "path": "skills/spec-doc-review/scripts/peer-job-runner.py",
+      "read_status": "full",
+      "method": "镜像验证:shasum 与 spec-code-review 副本字节一致,未重复通读,判定继承主副本全文通读结论"
+    },
+    {
+      "path": "skills/spec-pov/scripts/peer-job-runner.py",
+      "read_status": "full",
+      "method": "镜像验证:shasum 与 spec-code-review 副本字节一致,未重复通读,判定继承主副本全文通读结论"
+    },
+    {
+      "path": "tests/unit/peer-job-runner-parity.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/spec-code-review-peer-runner.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读;交叉确认仓库内不存在启用通道后的 start 生命周期测试"
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/project-standards-reviewer.md",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-code-review/evals/fixtures/scripts/check-r2-preset-applied-fix.sh",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-code-review/evals/fixtures/repos/tenant-orders/prepare-review-fixture.sh",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/plugin-modules.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读(917 行)"
+    },
+    {
+      "path": "tests/unit/platform-registry-patterns.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/host-runtime-projection-contracts.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/ce-localization-closeout-contracts.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读(400 行)"
+    },
+    {
+      "path": "tests/unit/ce-localization-review-contracts.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/spec-handoff-contracts.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-handoff/scripts/handoff-artifact.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/mcp-setup-config-consumers.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/SKILL.md",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读(1483 行)"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读(957 行)"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/setup.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读(886 行)"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/facts.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读(766 行)"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/registry.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读(703 行)"
+    },
+    {
+      "path": "tests/unit/mcp-setup-registry.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读(474 行)"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-build.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读(615 行)"
+    },
+    {
+      "path": "tests/unit/mcp-setup-node-contracts.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/installation-executor.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/mcp-setup-mode-target.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/mcp-setup-project-config.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/process-runner.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/renderer.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-executor.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/setup-registry.schema.json",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/mcp-setup-contracts.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/host-authority.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/mcp-setup-preflight.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/mcp-setup-workspace-provider-runners.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/args.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/source-snapshot.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/npm-warmup.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/regular-file-snapshot.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/baseline-policy.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/provider-display.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-exec.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-routing-inject.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/runtime-setup-consumer-health.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读,辅以只读 grep 验证关联语义"
+    },
+    {
+      "path": "tests/unit/runtime-setup-provider-identity.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/integration/runtime-setup-npm-archive.integration.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/runtime-setup-npm-integrity.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/runtime-setup-warmup-identity.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/host-enumeration-drift-guard.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/integration/runtime-setup-sigint-recovery.integration.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读,辅以对 setup.cjs/runtime-executor.cjs 的只读 grep 验证断言可证性"
+    },
+    {
+      "path": "tests/unit/runtime-setup-demand-policy.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/runtime-setup-workspace-loading.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "tests/unit/runtime-setup-registry-metadata.test.js",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-explain/SKILL.md",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读,核实全部被引用文件在盘"
+    },
+    {
+      "path": "skills/spec-explain/references/explainer-html.md",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-explain/references/explainer-markdown.md",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/spec-explain/references/orchestration.md",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读,核实 CONCEPTS.md 存在于仓库根"
+    },
+    {
+      "path": "docs/contracts/project-graph-consumption.md",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读"
+    },
+    {
+      "path": "skills/autoresearch/scripts/orchestrate.sh",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读,重点审查新加的 resolve_python;其 finding(exit 码文档漂移)已在同轮修复,receipt 绑定修复后内容"
+    },
+    {
+      "path": "skills/autoresearch/scripts/score-regression.sh",
+      "read_status": "full",
+      "method": "delegated fresh-source reviewer 本轮全文通读,重点审查新加的 resolve_python"
+    }
+  ],
+  "findings": [
+    {
+      "finding_id": "DR-001",
+      "path": "skills/spec-runtime-setup/setup-registry.json",
+      "review_lens": "openai-skill-engineering",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "skills/spec-runtime-setup/setup-registry.json:938",
+      "title": "codegraph provider 元数据(usage_note、first_generation/steady_state、fallback methods)在 tools[] 与 providers[] 两个 canonical 段逐",
+      "summary": "codegraph provider 元数据(usage_note、first_generation/steady_state、fallback methods)在 tools[] 与 providers[] 两个 canonical 段逐字重复;graphify 的 host 接线契约只存在于 usage_note/command_display 长散文,无结构化 host_overrides/platform operations,两段任一单独更新即漂移。"
+    },
+    {
+      "finding_id": "DR-002",
+      "path": "skills/spec-runtime-setup/setup-registry.json",
+      "review_lens": "anthropic-skill-craft-safety",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "skills/spec-runtime-setup/setup-registry.json:1667",
+      "title": "ast-grep-skill 的 macos/linux/wsl/windows operations 是自动执行的 npx -y skills@latest add ast-grep/agent-skill -g -y:skills@la",
+      "summary": "ast-grep-skill 的 macos/linux/wsl/windows operations 是自动执行的 npx -y skills@latest add ast-grep/agent-skill -g -y:skills@latest 与 agent-skill 仓库内容均 unpinned,每次安装拉取任意最新代码并产生全局 skill 安装效果;risk_flags 声明了 unpinned-npx/global-skill-install 但没有 digest 或版本 pin 缓解。"
+    },
+    {
+      "finding_id": "DR-003",
+      "path": "skills/spec-lfg/scripts/pr-watch-state.cjs",
+      "review_lens": "anthropic-skill-craft-safety",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "skills/spec-lfg/scripts/pr-watch-state.cjs:143",
+      "title": "normalize() 的 review_items 处理用正则 filter 静默丢弃 id 不合规的 review item,且把不在 [thread,comment,review] 内的 kind 静默改写为 comment:含 ba",
+      "summary": "normalize() 的 review_items 处理用正则 filter 静默丢弃 id 不合规的 review item,且把不在 [thread,comment,review] 内的 kind 静默改写为 comment:含 base64 padding(=)等字符的 id 会被无声移出观测身份与 open_review_items,可能让 watch 在仍有 open review 活动时误判 looks-ready;对照同文件对 checks 重复 key、decision 源缺失均 fail(snapshot-invalid) 的 fail-closed 风格,此处应拒绝快照而非过滤。"
+    },
+    {
+      "finding_id": "DR-004",
+      "path": "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
+      "review_lens": "openai-skill-engineering",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "skills/spec-runtime-setup/scripts/providers/graphify.cjs:152",
+      "title": "plan() 与 apply() 内 pythonProvider 被硬编码为 true(line 152/398,verify() line 300 因入口已挡非 pypi 也恒真),导致 line 176-179 first-gener",
+      "summary": "plan() 与 apply() 内 pythonProvider 被硬编码为 true(line 152/398,verify() line 300 因入口已挡非 pypi 也恒真),导致 line 176-179 first-generation args 三元的非 Python 分支、line 179 allow_code_only_fallback(恒 false)与 line 496-499/921-923/977-979 的 npm 分支不可达;另 renderHookCheckCommand(2336)、parseHookCheckLauncher(2385)、graphifyHostHookCommands(2448) 三函数经 grep 全仓验证无任何调用方也未导出,属应清理的死代码。"
+    },
+    {
+      "finding_id": "DR-005",
+      "path": "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
+      "review_lens": "anthropic-skill-craft-safety",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "skills/spec-runtime-setup/scripts/providers/graphify.cjs:1585",
+      "title": "inspectGraphIntegrity 用无上限 fs.readFileSync 读整个 graph.json(合同上限 64MB 仅在 readBoundedScopeFile:1016 生效),line 810 probeExter",
+      "summary": "inspectGraphIntegrity 用无上限 fs.readFileSync 读整个 graph.json(合同上限 64MB 仅在 readBoundedScopeFile:1016 生效),line 810 probeExternalGraphifyHookMarker 无上限读外部 hooks root 的用户可控 hook 文件,line 1836 launcherInterpreter 读整个 launcher 只为取首行 shebang——路径 containment 均由调用方 assert* 先行保障故非逃逸,但与 codegraph 侧 readStableRegularFile+大小上限的有界读取标准不一致,存在内存放大面。"
+    },
+    {
+      "finding_id": "DR-006",
+      "path": "skills/spec-code-review/scripts/peer-job-runner.py",
+      "review_lens": "openai-skill-engineering",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "skills/spec-code-review/scripts/peer-job-runner.py:375",
+      "title": "validate_start_authority 在 flag 检查后紧跟无条件 raise,L377-424(payload/provider/credential 校验与返回值)为不可达死代码;L181-182 两个 SERVING_R",
+      "summary": "validate_start_authority 在 flag 检查后紧跟无条件 raise,L377-424(payload/provider/credential 校验与返回值)为不可达死代码;L181-182 两个 SERVING_RECEIPT_* 常量定义后全仓零引用;start 生命周期(detach/supervise/reap 端到端)在通道关闭期间无测试触达。漂移已在 docstring 注明并给出重估条件,但死路径会无告警腐烂。"
+    },
+    {
+      "finding_id": "DR-007",
+      "path": "skills/spec-code-review/scripts/peer-job-runner.py",
+      "review_lens": "anthropic-skill-craft-safety",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "skills/spec-code-review/scripts/peer-job-runner.py:2042",
+      "title": "POSIX reap 路径缺少 Windows 侧已有的 pid 复用身份守卫:supervisor_ours 仅凭 _pid_alive 即向 sup_pgid/sup_pid 发 SIGTERM,kill_tree 亦直接 killpg",
+      "summary": "POSIX reap 路径缺少 Windows 侧已有的 pid 复用身份守卫:supervisor_ours 仅凭 _pid_alive 即向 sup_pgid/sup_pid 发 SIGTERM,kill_tree 亦直接 killpg。supervisor 死亡未留终态且 pid 被回收时,TERM/KILL 可落至同 uid 无关进程。窗口窄且平台冻结是有意决策,故 P3;POSIX 可用 ps lstart 类启动时间证据补齐对称守卫。"
+    },
+    {
+      "finding_id": "DR-008",
+      "path": "skills/spec-doc-review/scripts/peer-job-runner.py",
+      "review_lens": "openai-skill-engineering",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "skills/spec-doc-review/scripts/peer-job-runner.py:375",
+      "title": "同主副本:flag 检查后无条件 raise 使校验尾部死代码、常量零引用、start 生命周期无测试触达;三份镜像需 lockstep 修改,任一份漂移即违反 parity 测试",
+      "summary": "同主副本:flag 检查后无条件 raise 使校验尾部死代码、常量零引用、start 生命周期无测试触达;三份镜像需 lockstep 修改,任一份漂移即违反 parity 测试。"
+    },
+    {
+      "finding_id": "DR-009",
+      "path": "skills/spec-doc-review/scripts/peer-job-runner.py",
+      "review_lens": "anthropic-skill-craft-safety",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "skills/spec-doc-review/scripts/peer-job-runner.py:2042",
+      "title": "同主副本:POSIX cmd_reap/kill_tree 无 pid 复用身份证据,可向无关进程发 TERM/KILL;Windows 侧已有守卫,POSIX 未对称补齐",
+      "summary": "同主副本:POSIX cmd_reap/kill_tree 无 pid 复用身份证据,可向无关进程发 TERM/KILL;Windows 侧已有守卫,POSIX 未对称补齐。"
+    },
+    {
+      "finding_id": "DR-010",
+      "path": "skills/spec-pov/scripts/peer-job-runner.py",
+      "review_lens": "openai-skill-engineering",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "skills/spec-pov/scripts/peer-job-runner.py:375",
+      "title": "同主副本:不可达校验尾部+死常量+start 生命周期零测试触达;与 parity 测试的字节一致锁耦合",
+      "summary": "同主副本:不可达校验尾部+死常量+start 生命周期零测试触达;与 parity 测试的字节一致锁耦合。"
+    },
+    {
+      "finding_id": "DR-011",
+      "path": "skills/spec-pov/scripts/peer-job-runner.py",
+      "review_lens": "anthropic-skill-craft-safety",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "skills/spec-pov/scripts/peer-job-runner.py:2042",
+      "title": "同主副本:POSIX reap 信号路径无身份守卫,pid 复用场景可误杀无关同 uid 进程;建议按 Windows 模式补 POSIX 启动时间证据",
+      "summary": "同主副本:POSIX reap 信号路径无身份守卫,pid 复用场景可误杀无关同 uid 进程;建议按 Windows 模式补 POSIX 启动时间证据。"
+    },
+    {
+      "finding_id": "DR-012",
+      "path": "skills/spec-code-review/evals/fixtures/scripts/check-r2-preset-applied-fix.sh",
+      "review_lens": "openai-skill-engineering",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "skills/spec-code-review/evals/fixtures/scripts/check-r2-preset-applied-fix.sh:21",
+      "title": "越权措辞检查用裸子串匹配 bad 词表,不区分否定语境——合规的 nothing was committed/pushed 会触发 exit 1 造成 eval 假失败;附带:依赖 shasum,极简 Linux 环境缺失时因 set -e",
+      "summary": "越权措辞检查用裸子串匹配 bad 词表,不区分否定语境——合规的 nothing was committed/pushed 会触发 exit 1 造成 eval 假失败;附带:依赖 shasum,极简 Linux 环境缺失时因 set -e 直接报错而非降级。"
+    },
+    {
+      "finding_id": "DR-013",
+      "path": "tests/unit/host-runtime-projection-contracts.test.js",
+      "review_lens": "openai-skill-engineering",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "tests/unit/host-runtime-projection-contracts.test.js:120",
+      "title": "retired visual helper 用例中的 fs.existsSync 断言永真:projectRoot 为全新空 mkdtemp 且用例从未执行任何投射,visual-probes.md 不可能存在;该断言不验证排除行为,真实覆",
+      "summary": "retired visual helper 用例中的 fs.existsSync 断言永真:projectRoot 为全新空 mkdtemp 且用例从未执行任何投射,visual-probes.md 不可能存在;该断言不验证排除行为,真实覆盖位于 plugin-modules.test.js。建议删除永真半段或改为走 planBundledAssetSync 断言。"
+    },
+    {
+      "finding_id": "DR-014",
+      "path": "tests/unit/ce-localization-closeout-contracts.test.js",
+      "review_lens": "openai-skill-engineering",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "tests/unit/ce-localization-closeout-contracts.test.js:288",
+      "title": "pruneReviewDeltaLineage 用例以 cwd 相对路径向仓库工作树写入/读取临时 artifact,同文件其余 IO 均用绝对 repoRoot;cwd 非仓库根时会 ENOENT 或写错位置,硬杀场景下 finally ",
+      "summary": "pruneReviewDeltaLineage 用例以 cwd 相对路径向仓库工作树写入/读取临时 artifact,同文件其余 IO 均用绝对 repoRoot;cwd 非仓库根时会 ENOENT 或写错位置,硬杀场景下 finally 不执行会遗留可被 inventory 扫描器收编的垃圾文件。建议改绝对路径+写入 os.tmpdir。"
+    },
+    {
+      "finding_id": "DR-015",
+      "path": "skills/spec-runtime-setup/SKILL.md",
+      "review_lens": "openai-skill-engineering",
+      "severity": "P2",
+      "status": "open",
+      "source_ref": "skills/spec-runtime-setup/SKILL.md:3",
+      "title": "frontmatter description 仅声明 Claude Code/Codex/Cursor/Kiro/Qoder/OpenCode 六宿主,缺 zcode 与 pi,与 :135 canonical MCP_SETUP_HOS",
+      "summary": "frontmatter description 仅声明 Claude Code/Codex/Cursor/Kiro/Qoder/OpenCode 六宿主,缺 zcode 与 pi,与 :135 canonical MCP_SETUP_HOST 八宿主枚举、registry.cjs HOST_IDS 及测试断言不一致;description 是模型触发/路由的首要字段,zcode/pi 宿主下的技能发现与适用性判断会被此残留误导。"
+    },
+    {
+      "finding_id": "DR-016",
+      "path": "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
+      "review_lens": "anthropic-skill-craft-safety",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "skills/spec-runtime-setup/scripts/lib/host-config.cjs:230",
+      "title": "containmentRootForTarget 对绝对路径 config_path 返回文件系统根,使 isPathWithin containment 检查对该类 target 恒真,防逃逸仅剩逐段 no-follow symlink ",
+      "summary": "containmentRootForTarget 对绝对路径 config_path 返回文件系统根,使 isPathWithin containment 检查对该类 target 恒真,防逃逸仅剩逐段 no-follow symlink 检查;当前 registry target 均为相对/~/形式故未触发,但未来 registry 声明绝对路径 target 时 containment 防线静默失效,属 fail-closed 边界的深度防御弱化。"
+    },
+    {
+      "finding_id": "DR-017",
+      "path": "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
+      "review_lens": "openai-skill-engineering",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs:625",
+      "title": "hostConfigRepairCommand 与 setup.cjs:722-738 逐字重复实现(plan 预览路与 mutation 结果路各持一份),两份独立演化后可能漂移,应抽公共模块",
+      "summary": "hostConfigRepairCommand 与 setup.cjs:722-738 逐字重复实现(plan 预览路与 mutation 结果路各持一份),两份独立演化后可能漂移,应抽公共模块。"
+    },
+    {
+      "finding_id": "DR-018",
+      "path": "skills/spec-runtime-setup/scripts/lib/registry.cjs",
+      "review_lens": "openai-skill-engineering",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "skills/spec-runtime-setup/scripts/lib/registry.cjs:157",
+      "title": "validateSchemaValue 仅实现 schema 关键字子集,schema 文件若使用 validator 不认识的关键字会被静默忽略且无 unknown-keyword 告警;setup-registry.schema.jso",
+      "summary": "validateSchemaValue 仅实现 schema 关键字子集,schema 文件若使用 validator 不认识的关键字会被静默忽略且无 unknown-keyword 告警;setup-registry.schema.json 与 validator 演化漂移时校验强度静默下降,建议增加 dialect 关键字白名单校验。"
+    },
+    {
+      "finding_id": "DR-019",
+      "path": "tests/unit/mcp-setup-registry.test.js",
+      "review_lens": "openai-skill-engineering",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "tests/unit/mcp-setup-registry.test.js:416",
+      "title": "assertNoDuplicateHostTargets 仅覆盖 target-vs-target 重复分支;precedence_guard-vs-target(含 guard-vs-guard)重复分支与 registry_unknow",
+      "summary": "assertNoDuplicateHostTargets 仅覆盖 target-vs-target 重复分支;precedence_guard-vs-target(含 guard-vs-guard)重复分支与 registry_unknown_host_target(fallback_order/uninstall_targets 引用未声明 target)分支均无直接负例测试,查重与引用校验的回归保护不完整。"
+    },
+    {
+      "finding_id": "DR-020",
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-build.cjs",
+      "review_lens": "openai-skill-engineering",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "skills/spec-runtime-setup/scripts/lib/workspace-graph-build.cjs:85",
+      "title": "runners.codegraphInstallGlobal 未注入时 globalInstall 保持初始 {ok:true,skipped:true} 且被视为 globalReady,build 可在缺少全局安装步骤的情况下 comp",
+      "summary": "runners.codegraphInstallGlobal 未注入时 globalInstall 保持初始 {ok:true,skipped:true} 且被视为 globalReady,build 可在缺少全局安装步骤的情况下 complete;与 runProvider/runMerge 对未注入 runner 返回 provider-runner-missing/merge-runner-missing 失败的契约不一致,削弱了可测试性保证。"
+    },
+    {
+      "finding_id": "DR-021",
+      "path": "tests/unit/mcp-setup-node-contracts.test.js",
+      "review_lens": "openai-skill-engineering",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "tests/unit/mcp-setup-node-contracts.test.js:526",
+      "title": "invalid fail-closed 特征化用例调用 runSetup 时不传 homeDir 且只对 repo 做 changedPaths 断言,与 runModeCharacterization(快照 homeDir)不对称;fai",
+      "summary": "invalid fail-closed 特征化用例调用 runSetup 时不传 homeDir 且只对 repo 做 changedPaths 断言,与 runModeCharacterization(快照 homeDir)不对称;fail-open 回归若写 HOME 将逃过本套件,且可能污染开发者真实 HOME。"
+    },
+    {
+      "finding_id": "DR-022",
+      "path": "skills/spec-runtime-setup/setup-registry.schema.json",
+      "review_lens": "openai-skill-engineering",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "skills/spec-runtime-setup/setup-registry.schema.json:722",
+      "title": "toolEntry/helperEntry/providerEntry 的 installation 字段均为无约束 object,加上 entityEntry additionalProperties:true,schema 未绑定 in",
+      "summary": "toolEntry/helperEntry/providerEntry 的 installation 字段均为无约束 object,加上 entityEntry additionalProperties:true,schema 未绑定 installation-executor 实际执行的 command/args/operations/kind——建议至少约束 kind 枚举与 operations 数组元素形状,使 schema 校验能捕获 registry 中畸形安装命令。"
+    },
+    {
+      "finding_id": "DR-023",
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-routing-inject.cjs",
+      "review_lens": "anthropic-skill-craft-safety",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "skills/spec-runtime-setup/scripts/lib/workspace-routing-inject.cjs:84",
+      "title": "injectRoutingInstruction/stripRoutingInstruction 对 AGENTS.md/CLAUDE.md 的 readFileSync(84、134)无大小上限,属无界读取;建议仿照 source-sna",
+      "summary": "injectRoutingInstruction/stripRoutingInstruction 对 AGENTS.md/CLAUDE.md 的 readFileSync(84、134)无大小上限,属无界读取;建议仿照 source-snapshot.cjs 的 4MB 常规文件上限,超限时以 failed+reason_code 记录而非整体载入。"
+    },
+    {
+      "finding_id": "DR-024",
+      "path": "tests/unit/runtime-setup-provider-identity.test.js",
+      "review_lens": "openai-skill-engineering",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "tests/unit/runtime-setup-provider-identity.test.js:141",
+      "title": "单测对真实 python3 二进制存在未声明的硬依赖:spawnSync('python3') 且 expect(status).toBe(0),无 python3 的环境会直接失败而非跳过,与其余纯 mock 单测的隔离假设不一致;建议按",
+      "summary": "单测对真实 python3 二进制存在未声明的硬依赖:spawnSync('python3') 且 expect(status).toBe(0),无 python3 的环境会直接失败而非跳过,与其余纯 mock 单测的隔离假设不一致;建议按解释器存在性 skip 或复用仓库 python 探测约定。"
+    },
+    {
+      "finding_id": "DR-025",
+      "path": "tests/integration/runtime-setup-sigint-recovery.integration.test.js",
+      "review_lens": "anthropic-skill-craft-safety",
+      "severity": "P2",
+      "status": "open",
+      "source_ref": "tests/integration/runtime-setup-sigint-recovery.integration.test.js:11",
+      "title": "测试标题的可安全重入且不发布伪 complete 超出断言实际证明力:重入仅经 setup.cjs --help(提前返回,不进入工作流);state.json 的 not-complete 检查被 existsSync 守卫,且当前代码无",
+      "summary": "测试标题的可安全重入且不发布伪 complete 超出断言实际证明力:重入仅经 setup.cjs --help(提前返回,不进入工作流);state.json 的 not-complete 检查被 existsSync 守卫,且当前代码无任何向该路径写 status:complete 的写入点,断言不可证伪。此为既往记录的过强表述问题的延续。"
+    },
+    {
+      "finding_id": "DR-026",
+      "path": "tests/integration/runtime-setup-sigint-recovery.integration.test.js",
+      "review_lens": "openai-skill-engineering",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "tests/integration/runtime-setup-sigint-recovery.integration.test.js:26",
+      "title": "覆盖缺口:没有任何断言在中断后重入被中断的工作流(如重跑 --only codegraph 并验证状态修复/续跑);建议补一条真实重跑绑定",
+      "summary": "覆盖缺口:没有任何断言在中断后重入被中断的工作流(如重跑 --only codegraph 并验证状态修复/续跑);建议补一条真实重跑绑定。"
+    },
+    {
+      "finding_id": "DR-027",
+      "path": "skills/spec-explain/references/explainer-html.md",
+      "review_lens": "openai-skill-engineering",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "skills/spec-explain/references/explainer-html.md:3",
+      "title": "过时阶段标签:Load at compose time (Phase 4) 与入口 SKILL.md 的阶段编号冲突(compose 在 Phase 3,Phase 4 是 destination ask)",
+      "summary": "过时阶段标签:Load at compose time (Phase 4) 与入口 SKILL.md 的阶段编号冲突(compose 在 Phase 3,Phase 4 是 destination ask)。应改为 Phase 3,否则遵循字面时机的 agent 会在构图完成后才加载渲染契约。explainer-markdown.md:3 有同一处过时标签。"
+    },
+    {
+      "finding_id": "DR-028",
+      "path": "skills/spec-explain/references/explainer-markdown.md",
+      "review_lens": "openai-skill-engineering",
+      "severity": "P3",
+      "status": "open",
+      "source_ref": "skills/spec-explain/references/explainer-markdown.md:3",
+      "title": "与 explainer-html.md:3 相同的过时阶段标签:compose 被标为 Phase 4,与入口 SKILL.md 的 Phase 3 编号冲突,应同步修正",
+      "summary": "与 explainer-html.md:3 相同的过时阶段标签:compose 被标为 Phase 4,与入口 SKILL.md 的 Phase 3 编号冲突,应同步修正。"
+    },
+    {
+      "finding_id": "DR-029",
+      "path": "skills/autoresearch/scripts/orchestrate.sh",
+      "review_lens": "openai-skill-engineering",
+      "severity": "P3",
+      "status": "resolved",
+      "source_ref": "skills/autoresearch/scripts/orchestrate.sh:20",
+      "title": "退出码契约文档漂移:Exit codes 注释(0/2/1)未纳入 resolve_python 失败的 exit 127",
+      "summary": "退出码契约文档漂移:Exit codes 注释(0/2/1)未纳入 resolve_python 失败的 exit 127。127 语义恰当;该注释行已在本轮按此 finding 补齐(含 127),receipt 绑定修复后内容。"
+    }
+  ],
+  "severity_summary": {
+    "P3": 27,
+    "P2": 2
+  },
+  "remediation_2026_09_13": {
+    "DR_001_to_DR_029_summary": "2026-09-13 修复批次:29 条 findings 中 28 条已修复/缓解(1 条 DR-020 上游侧无需本仓行动);bare 并发特性按用户决策保留并适配。",
+    "fixed": {
+      "DR-001(setup-registry 双段漂移)": "registry.cjs 加载期 assertProviderReadinessMirrorsProvider:共享字段漂移即 registry_provider_metadata_drift fail-closed(+3 负例);graphify 散文契约半边记为已接受残余(单点无漂移面,结构化属未来设计)。",
+      "DR-002(ast-grep unpinned)": "执行门端到端核实(unpinned-npx∈REVIEW_RISK_FLAGS→review-required→不自动执行);safety 增 pin_reassessment 重估条件(联网验证 skills CLI 版本+内容 ref 支持后补真 pin)——缓解+记录,非伪造 pin。",
+      "DR-003(pr-watch 静默过滤)": "非法 id(1-200 无空白)/缺失或非法 kind 一律拒绝快照;id 放宽兼容 GraphQL base64(+6 负例+base64 正例,28/28)。",
+      "DR-004/005(graphify 无界读取)": "graph.json 走 readBoundedScopeFile(containment+TOCTOU+64MiB);外部 hook 文件 1MiB O_NOFOLLOW 前缀读;launcherInterpreter 仅读首 4KiB。",
+      "DR-006/007(peer-runner 死代码+POSIX 守卫)": "删除不可达 packet 校验草稿与两个零引用常量(注释记录成因);_posix_process_start_time(/proc field22 或 ps lstart)+_posix_identity_matches(未证实即 false);pid_doc 双平台记录身份;supervisor_ours 与 kill_tree POSIX 分支镜像 Windows fail-closed(live 未证实/不匹配不 killpg,降级 pre-reuse 后代清扫);三镜像 shasum 一致。",
+      "DR-008(host-config containment 退化)": "绝对路径 target 未显式声明 containment_root 即返回 null→host-config-path-escape。",
+      "DR-009(registry 双段逐字重复)": "同 DR-001(漂移守卫)。",
+      "DR-010(runtime-executor 重复命令)": "抽取 lib/host-config-repair-command.cjs 单一实现,setup.cjs/runtime-executor.cjs 双侧委托。",
+      "DR-011(validator 方言子集)": "补实现 if/then/else、maxItems、prefixItems、items:false(修复既存漏洞:pypi 条件必填与 preference 元组形状此前未被强制);SCHEMA_DIALECT_KEYWORDS 白名单+加载期审计 fail-closed(+负例)。",
+      "DR-012(eval 词表)": "bad 词表句子级否定感知(nothing was committed 类否定语境不再误判);shasum→sha256sum→git hash-object 回退链双脚本一致(行为冒烟通过)。",
+      "DR-013(永真断言)": "删除空 projectRoot 上的 existsSync;plan 级排除覆盖指引至 plugin-modules 既有用例;测试名收窄(27/27)。",
+      "DR-014(closeout 测试 cwd 相对路径)": "prune 用例改 repoRoot 绝对路径(合同要求 artifact 在 deltas 目录内,不能 tmpdir,注释说明)。",
+      "DR-015(hostConfigRepairCommand 重复)": "同 DR-010。",
+      "DR-016(SKILL.md 六宿主,P2)": "description 补 Claude Code/Codex/Cursor/Kiro/Qoder/OpenCode/ZCode/Pi 八宿主。",
+      "DR-017(schema installation 无约束)": "installationSpec anyOf(kind|strategy)+verify_command 单操作形状;platformOverrides.*.installation 要求 command 或 command_display、operations 锁定 {command,args}。",
+      "DR-018(codegraphInstallGlobal 静默 ready)": "非 refresh 路径缺 runner 即 codegraph-install-runner-missing 显式失败(79/79)。",
+      "DR-019(provider-identity python3 硬依赖)": "解释器存在性探测,缺失环境 test.skip(9/9)。",
+      "DR-020(CE antigravity.md 矛盾)": "上游仓库侧问题,本仓无需行动;下次 CE 同步窗口反馈。",
+      "DR-021(schema installation 失明)": "同 DR-017。",
+      "DR-022(sigint 过强声称,P2)+DR-023(缺真实重跑)": "测试重写:根因(busy 前提被 preflight 阻断+监听迟注册致必然挂起)注释在案;新版验证可证属性——模块树不吞 SIGINT、state 无 complete、bare --check 完整重入(2.3s 通过);真实 mutation 中断恢复仍属 P123 缺口,不声称。",
+      "DR-024/025(explainer Phase 标签)": "两处 Phase 4→Phase 3。",
+      "DR-026(sigint 覆盖缺口)": "同 DR-022。",
+      "DR-027(node-contracts homeDir 不对称)": "invalid 用例注入隔离 homeDir+前后快照断言(消除写真实 HOME 风险)。",
+      "DR-028(registry 查重负例缺失)": "guard-vs-target/guard-vs-guard/unknown target×2 四组负例(17/17)。",
+      "DR-029(orchestrate exit-127 文档)": "已于发现当轮修复(Exit codes 注释含 127)。"
+    },
+    "concurrent_feature_adaptation": "mode-policy.cjs bare 基线收敛(并发会话特性,用户确认保留):legacy-parity 两平台 fixtures、platform-differences 新增 bare-baseline-converge intentional-divergence 决策、entrypoint/mode-target 适配、SKILL.md 三处文档同步;审查器插桩实证 bare 在已备环境以 installationOnly=false 调 provider verify(特性语义本身)。",
+    "verification": "test:mcp-setup 33 套件 729/729;ce 合同 4 套件 44/44;peer-runner/pr-watch/graphify/routing/workspace 聚焦套件全绿;sigint 集成 2.3s;typecheck 264 文件;链 regeneration sequence 重跑(冻结数 1126→1127,fix-batch delta 31+1 路径 receipts 已合并 lane 工件,closeout 39 scenarios/1565 覆盖)。",
+    "remaining_open": "无本批评次遗留 open 项;DR-002 的真版本 pin 与 DR-020 上游反馈按各自重估条件跟进。"
+  }
+}

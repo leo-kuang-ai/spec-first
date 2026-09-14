@@ -12,12 +12,58 @@
   "coverage_status": "complete-current-source-with-incremental-review",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "19d3f6d8a06f3088d4e392a8718dac47aefa8587",
-    "dirty": false,
-    "dirty_paths": [],
-    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "5c75c9adfc8f24f7c377d833cc4683c9abc049fb9348e4178ae9db54b068d95e",
-    "inventory_hash": "3d2c3266db961c90c358e4d824687e879530eadc612e3e24e0f936659c39aa58",
+    "head": "c0803ab5d2e80edde9ca67771c6d204b775bb354",
+    "dirty": true,
+    "dirty_paths": [
+      "CHANGELOG.md",
+      "docs/validation/2026-09-13-full-system-audit-plan-v2.md",
+      "scripts/check-ce-upstream-reconciliation.cjs",
+      "skills/autoresearch/scripts/orchestrate.sh",
+      "skills/autoresearch/scripts/score-regression.sh",
+      "skills/spec-code-review/evals/fixtures/repos/tenant-orders/prepare-review-fixture.sh",
+      "skills/spec-code-review/evals/fixtures/scripts/check-r2-preset-applied-fix.sh",
+      "skills/spec-code-review/scripts/peer-job-runner.py",
+      "skills/spec-doc-review/scripts/peer-job-runner.py",
+      "skills/spec-explain/references/explainer-html.md",
+      "skills/spec-explain/references/explainer-markdown.md",
+      "skills/spec-lfg/scripts/pr-watch-state.cjs",
+      "skills/spec-pov/scripts/peer-job-runner.py",
+      "skills/spec-runtime-setup/SKILL.md",
+      "skills/spec-runtime-setup/scripts/lib/host-config-repair-command.cjs",
+      "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
+      "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
+      "skills/spec-runtime-setup/scripts/lib/provider-display.cjs",
+      "skills/spec-runtime-setup/scripts/lib/registry.cjs",
+      "skills/spec-runtime-setup/scripts/lib/renderer.cjs",
+      "skills/spec-runtime-setup/scripts/lib/repair-loop.cjs",
+      "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
+      "skills/spec-runtime-setup/scripts/lib/workspace-graph-build.cjs",
+      "skills/spec-runtime-setup/scripts/lib/workspace-routing-inject.cjs",
+      "skills/spec-runtime-setup/scripts/providers/codegraph.cjs",
+      "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
+      "skills/spec-runtime-setup/scripts/setup.cjs",
+      "skills/spec-runtime-setup/setup-registry.json",
+      "skills/spec-runtime-setup/setup-registry.schema.json",
+      "tests/fixtures/mcp-setup/legacy-parity/posix/runtime-contracts.json",
+      "tests/fixtures/mcp-setup/legacy-parity/windows/runtime-contracts.json",
+      "tests/fixtures/mcp-setup/platform-differences.json",
+      "tests/integration/runtime-setup-sigint-recovery.integration.test.js",
+      "tests/unit/ce-localization-closeout-contracts.test.js",
+      "tests/unit/ce-localization-review-contracts.test.js",
+      "tests/unit/host-runtime-projection-contracts.test.js",
+      "tests/unit/mcp-setup-contracts.test.js",
+      "tests/unit/mcp-setup-entrypoint.test.js",
+      "tests/unit/mcp-setup-facts-renderer.test.js",
+      "tests/unit/mcp-setup-mode-target.test.js",
+      "tests/unit/mcp-setup-node-contracts.test.js",
+      "tests/unit/mcp-setup-registry.test.js",
+      "tests/unit/runtime-setup-provider-identity.test.js",
+      "tests/unit/runtime-setup-repair-loop.test.js",
+      "tests/unit/spec-lfg-pr-watch-state.test.js"
+    ],
+    "dirty_path_manifest_sha256": "7af829a1f316c8385378e61aa37da56e9af518b01e12bcc22b12a396cf5a7802",
+    "source_tree_hash": "30e23af473d58352a8fa72dc84b1826f65072fc27dbb80a97569744d092dc85a",
+    "inventory_hash": "01b3a8d60125adc6604b439dc3ebffdd834a5337030e5da02318c2bb23f666ff",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -99,21 +145,21 @@
       "sha256": "0a18d51978a03a3c2d330950be7d81f0e20415993b6dcdf0fc30a4a9ecbff8a2"
     }
   ],
-  "inventory_hash": "3d2c3266db961c90c358e4d824687e879530eadc612e3e24e0f936659c39aa58",
-  "inventory_artifact_sha256": "af887520669a32a1374e8b321f5824679da5779e6a91e0176204e6c497cd1e4d",
+  "inventory_hash": "01b3a8d60125adc6604b439dc3ebffdd834a5337030e5da02318c2bb23f666ff",
+  "inventory_artifact_sha256": "463bbf35aa0b431ae0cabea527bbbafc1834aefd7995dd35b1cb79ed1952f3c0",
   "package_manifest_sha256": "7e91561f57bdee5fc0d014651a14cff141e9bdb4cc39b0b6a7bbc01b6726031e",
   "direct_support_manifest_sha256": "8b7e968aef897b43123d279a1080939fc96ecca3b593d54086fef95b7b523612",
   "relation_manifest_sha256": "807319b1e686537190a85b44149d4dd9b5faacc8fb412e210b5c6ecb6b6d59de",
   "review_input_hash_algorithm": "sha256(stable-json(coverage.review_input))",
-  "review_input_hash": "5a829bc6886459b253a50265895151f3b12cc36f91166e759ee1293ccf2674da",
+  "review_input_hash": "5b5c31849bdca4e14f4ab83161f6d094e2146d69a7c02c3507b52afe45324293",
   "expected_skill_count": 38,
   "reviewed_skill_count": 38,
-  "expected_package_path_count": 1122,
-  "reviewed_package_path_count": 1122,
-  "expected_direct_support_path_count": 208,
-  "reviewed_direct_support_path_count": 208,
-  "expected_direct_support_relation_count": 424,
-  "reviewed_direct_support_relation_count": 424,
+  "expected_package_path_count": 1128,
+  "reviewed_package_path_count": 1128,
+  "expected_direct_support_path_count": 223,
+  "reviewed_direct_support_path_count": 223,
+  "expected_direct_support_relation_count": 439,
+  "reviewed_direct_support_relation_count": 439,
   "reviewed_unique_source_path_count": 806,
   "expected_receipt_count": 1019,
   "reviewed_receipt_count": 1019,
@@ -125,7 +171,7 @@
     "receipt_binding": "chunk ids are listed by source_read_receipts",
     "limitation": "packet identity/range only; not equal semantic attention"
   },
-  "chunk_manifest_hash": "81ee775aaf2f0f63ec0315e26f8984d13419969523498fa2a7cf1ca8e4056f25",
+  "chunk_manifest_hash": "9eb40bff97ce5984b8d350898604def0c7f48f27d4911d8bc050b1fbadb136f3",
   "finding_summary": {
     "review_area_count": 13,
     "open_count": 0,
@@ -245,7 +291,17 @@
     "仅补变化的三条路径与四个消费者关系；其余内容绑定沿用已有记录。",
     "Bounded review covers the one changed source path after the Windows path normalization fix; it does not establish Windows CI rerun or field outcome.",
     "Inline same-context review by the implementing session; verdicts rest on the per-item evidence records in docs/validation/ce-pull-2026-09-09/, not on an independent provider re-read.",
-    "Coverage is limited to relations whose receipt hashes changed since the last review round; unchanged relations carry over their prior review."
+    "Coverage is limited to relations whose receipt hashes changed since the last review round; unchanged relations carry over their prior review.",
+    "双 lens 判定来自同一 Orchestrator 编排的并行只读 fresh-source reviewer(非外部 OpenAI/Anthropic 模型互审);reviewer 只读不写。",
+    "本 delta 覆盖 83 条唯一路径/212 条 skill-path 关系,其中 2 条(autoresearch)为本流 CE 517 复核采纳变更,其余 81 条为 P123 工作累积的既有 lane 漂移。",
+    "全部路径 reviewer 报告 full 通读(镜像文件按一份通读+字节一致验证)。",
+    "无 runtime/field 证据;判定为语义审读,不替代测试运行(测试证据见各会话 CHANGELOG 记录)。",
+    "双 lens 判定来自修复批次的 orchestrator(作者即复核者,inline 同上下文),非独立 reviewer;每条路径的验证证据为当轮聚焦测试套件(结果记于各 read_method 注释)。",
+    "本 delta 覆盖 2026-09-13 修复批次(28 项 lane findings 的修复)与用户确认保留的 bare 基线收敛特性适配;修复对应关系见 docs/validation/ce-localization/review/lane-refresh-findings-2026-09-12.json 的 remediation 记录。",
+    "无 runtime/field 证据;peer-job-runner 三镜像按一份实现+字节一致验证。",
+    "本 delta 由当前会话(zcode)inline 同上下文复核;repair-loop 批次作者为并发 codex 会话,非作者自证亦非独立 provider 证据。",
+    "每路径证据为全文 diff 通读 + 当轮聚焦测试套件全绿(计数测试文件为本会话自改,其断言由当轮 --refresh 产物直接证实);无 runtime/field 证据,repair-loop 模块未在真实宿主上观察全链路。",
+    "上游 517 条 per-record adjudication 判定不变,本 delta 仅覆盖目标侧增量路径。"
   ],
   "claim_ceiling": "只支持冻结 working-tree canonical package/direct-support source 的 role-simulated Anthropic skill-craft/safety 静态合同结论；不证明 Anthropic/provider 身份、reviewer independence、等强度逐行注意、runtime/browser/provider/Git/CI 或 field outcome。",
   "skill_reviews": [
@@ -793,17 +849,17 @@
           "source_kind": "skill-package",
           "owning_skill": "autoresearch",
           "shared_consumers": [],
-          "sha256": "ece1680cabcefd68ef10c954a244b5d9619c051a98c7841473e75c4ea6cbdcab",
-          "bytes": 12523,
-          "line_count": 304,
+          "sha256": "a7dae8a4ec05fd6557cfe1611091398763a6ae83acc37232daf51cd1b7ad3221",
+          "bytes": 13400,
+          "line_count": 327,
           "covered_line_ranges": [
             [
               1,
-              304
+              327
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-anthropic-skill-craft-safety-ece1680cabce"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-a7dae8a4ec05"
           ],
           "read_status": "full"
         },
@@ -813,17 +869,17 @@
           "source_kind": "skill-package",
           "owning_skill": "autoresearch",
           "shared_consumers": [],
-          "sha256": "d6652ecbfd4e38325ccf9f9ecd05ca0bd093ac5d704624b9667241be3b1e9722",
-          "bytes": 3798,
-          "line_count": 104,
+          "sha256": "290d1627c5f6f42e212966a056f3a0cbe25bc6c4c708e520e92496f8b6ee0955",
+          "bytes": 4527,
+          "line_count": 125,
           "covered_line_ranges": [
             [
               1,
-              104
+              125
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-anthropic-skill-craft-safety-d6652ecbfd4e"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-290d1627c5f6"
           ],
           "read_status": "full"
         },
@@ -913,17 +969,17 @@
           "source_kind": "direct-support",
           "owning_skill": "autoresearch",
           "shared_consumers": [],
-          "sha256": "d545890b80b12e2e9b85d96f1618726dde3bbf9eca563a0a00f87394aa66ff07",
-          "bytes": 5960,
-          "line_count": 109,
+          "sha256": "f40c8f707b0e2caa0ad9843f92a065e48e146d6a0d6e981ffeb990b181e46ea8",
+          "bytes": 7149,
+          "line_count": 123,
           "covered_line_ranges": [
             [
               1,
-              109
+              123
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-d545890b80b1"
+            "ce-localization-lane-refresh-2026-09-14-repair-loop-anthropic-skill-craft-safety-f40c8f707b0e"
           ],
           "read_status": "full"
         }
@@ -2841,17 +2897,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-app-consistency-audit",
           "shared_consumers": [],
-          "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-          "bytes": 38311,
-          "line_count": 905,
+          "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+          "bytes": 38963,
+          "line_count": 917,
           "covered_line_ranges": [
             [
               1,
-              905
+              917
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-e3dc0706cfdd"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-af94db81cf63"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -3779,17 +3835,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-brainstorm",
           "shared_consumers": [],
-          "sha256": "d006ec7e094449f00d1822c702e065b1dacab4a3b2ef159320a239e5e78a415f",
-          "bytes": 12827,
-          "line_count": 271,
+          "sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea",
+          "bytes": 13735,
+          "line_count": 282,
           "covered_line_ranges": [
             [
               1,
-              271
+              282
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-d006ec7e0944"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-b930486bc558"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -3799,17 +3855,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-brainstorm",
           "shared_consumers": [],
-          "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-          "bytes": 38311,
-          "line_count": 905,
+          "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+          "bytes": 38963,
+          "line_count": 917,
           "covered_line_ranges": [
             [
               1,
-              905
+              917
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-e3dc0706cfdd"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-af94db81cf63"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -4330,19 +4386,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-code-review",
           "shared_consumers": [],
-          "sha256": "1bec15a4056e617692ad571768e4fb964ac60b28bc48fccd23cf0055b1e5846f",
-          "bytes": 195,
-          "line_count": 6,
+          "sha256": "c76730781ddc60de65e29b376ccfd5e9ba365ae6091c1eda4a20b5198355067f",
+          "bytes": 877,
+          "line_count": 20,
           "covered_line_ranges": [
             [
               1,
-              6
+              20
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-code-review-a04195f7"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-c76730781ddc"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-code-review/evals/fixtures/repos/tenant-orders/src/orders.js",
@@ -4445,17 +4502,17 @@
           "source_kind": "skill-package",
           "owning_skill": "spec-code-review",
           "shared_consumers": [],
-          "sha256": "961576309ddf14b2e6283acff57e557e9122cd12b3c0aeaa67f8c0a1866d129e",
-          "bytes": 1714,
-          "line_count": 32,
+          "sha256": "7213bfcfb5186984ac7dac664fc7c8d6bc9e9f0de3bd8847fcb44df5fe11b85f",
+          "bytes": 3843,
+          "line_count": 68,
           "covered_line_ranges": [
             [
               1,
-              32
+              68
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-anthropic-skill-craft-safety-961576309ddf"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-7213bfcfb518"
           ],
           "read_status": "full"
         },
@@ -5011,8 +5068,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-code-review",
           "shared_consumers": [],
-          "sha256": "765e80598b3ad53093a6266afa7247dfa9279c0bcfe4f27c266b5abe02f952ba",
-          "bytes": 7767,
+          "sha256": "02d33c8b35160e5c3623a7c4afa4450a4783888fdcb9e875b7b3ec3d7c08c5d5",
+          "bytes": 7784,
           "line_count": 81,
           "covered_line_ranges": [
             [
@@ -5021,7 +5078,7 @@
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-765e80598b3a"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-02d33c8b3516"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -5249,17 +5306,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-code-review",
           "shared_consumers": [],
-          "sha256": "9d7cdcb582bda9b22b11d6ef7cb9d0e9ace21edf55b660ad1cfd106d4287b76c",
-          "bytes": 97621,
-          "line_count": 2220,
+          "sha256": "db8fcf60a8cc1297ccfa200c55956a9691ce7b8eee8dcacebb751bb3a437863c",
+          "bytes": 100272,
+          "line_count": 2272,
           "covered_line_ranges": [
             [
               1,
-              2220
+              2272
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-9d7cdcb582bd"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-db8fcf60a8cc"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -5505,17 +5562,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-code-review",
           "shared_consumers": [],
-          "sha256": "8a769329f2d572ee4bae9d8d3f8caa5805a64a9e5a4c2ee0bfbd079ca09ee18f",
-          "bytes": 1623,
-          "line_count": 41,
+          "sha256": "5eec7320d067cc665ed3b7f56a978874ab0faed869538ecef33b34412ea4f559",
+          "bytes": 2298,
+          "line_count": 50,
           "covered_line_ranges": [
             [
               1,
-              41
+              50
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-8a769329f2d5"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-5eec7320d067"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -5641,17 +5698,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-code-review",
           "shared_consumers": [],
-          "sha256": "47d7aa07bf8f716f925543bef3cfe927a0e345246aa29389e47af0821abc7d75",
-          "bytes": 12369,
-          "line_count": 308,
+          "sha256": "d9eca7f2ca9364ed173b558758f0c39d57cf37ffc7d97aa730f7b080dc920024",
+          "bytes": 13100,
+          "line_count": 328,
           "covered_line_ranges": [
             [
               1,
-              308
+              328
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-47d7aa07bf8f"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-d9eca7f2ca93"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -7526,17 +7583,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-compound",
           "shared_consumers": [],
-          "sha256": "17a441ca49c7a0b371bbed8eb22e93734beda1e04f47570f4ca9ad47e5cac3e2",
-          "bytes": 15896,
-          "line_count": 380,
+          "sha256": "f3f6b491bc49b8b9eee736cc49815acdee36b649144e19bc4286a680834469d8",
+          "bytes": 17534,
+          "line_count": 405,
           "covered_line_ranges": [
             [
               1,
-              380
+              405
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-countfreeze-rebind-delta-anthropic-skill-craft-safety-17a441ca49c7"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-f3f6b491bc49"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -10529,17 +10586,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-doc-review",
           "shared_consumers": [],
-          "sha256": "9d7cdcb582bda9b22b11d6ef7cb9d0e9ace21edf55b660ad1cfd106d4287b76c",
-          "bytes": 97621,
-          "line_count": 2220,
+          "sha256": "db8fcf60a8cc1297ccfa200c55956a9691ce7b8eee8dcacebb751bb3a437863c",
+          "bytes": 100272,
+          "line_count": 2272,
           "covered_line_ranges": [
             [
               1,
-              2220
+              2272
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-9d7cdcb582bd"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-db8fcf60a8cc"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -10687,17 +10744,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-doc-review",
           "shared_consumers": [],
-          "sha256": "8a769329f2d572ee4bae9d8d3f8caa5805a64a9e5a4c2ee0bfbd079ca09ee18f",
-          "bytes": 1623,
-          "line_count": 41,
+          "sha256": "5eec7320d067cc665ed3b7f56a978874ab0faed869538ecef33b34412ea4f559",
+          "bytes": 2298,
+          "line_count": 50,
           "covered_line_ranges": [
             [
               1,
-              41
+              50
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-8a769329f2d5"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-5eec7320d067"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -11221,17 +11278,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-dogfood",
           "shared_consumers": [],
-          "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-          "bytes": 38311,
-          "line_count": 905,
+          "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+          "bytes": 38963,
+          "line_count": 917,
           "covered_line_ranges": [
             [
               1,
-              905
+              917
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-e3dc0706cfdd"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-af94db81cf63"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -11531,8 +11588,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-explain",
           "shared_consumers": [],
-          "sha256": "c0ea2bce10e12516786e74b1707e3cfab20c1b8f5996643a2be6178bae43d451",
-          "bytes": 3442,
+          "sha256": "4be63b834a32548f9faca4184510ce5fbf3d50e88d76e6dd9ad43d201430a741",
+          "bytes": 3506,
           "line_count": 40,
           "covered_line_ranges": [
             [
@@ -11541,17 +11598,18 @@
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-explain-370b35fd"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-4be63b834a32"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-explain/references/explainer-markdown.md",
           "path_role": "skill-package",
           "owning_skill": "spec-explain",
           "shared_consumers": [],
-          "sha256": "d6486b167d61e69cd9a8070908bb5b2921d9dac2e7c528b787abd8af837bda9a",
-          "bytes": 2009,
+          "sha256": "f07b75d232a3f1796fd98824ecae92e68406d6c8eda2bdab9602292bc9b7900f",
+          "bytes": 2093,
           "line_count": 33,
           "covered_line_ranges": [
             [
@@ -11560,9 +11618,10 @@
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-explain-c89a212a"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-f07b75d232a3"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-explain/references/intake.md",
@@ -11590,8 +11649,8 @@
           "source_kind": "skill-package",
           "owning_skill": "spec-explain",
           "shared_consumers": [],
-          "sha256": "70829bd20e652ff1a43a951a68b495b8ee0ceeaca41f0e5b9fa3e17760da1a44",
-          "bytes": 2667,
+          "sha256": "9169c807d875dda6aeb56a21b86e62aa5618c2a1ad0d60a7ebaa8825707167a4",
+          "bytes": 2650,
           "line_count": 20,
           "covered_line_ranges": [
             [
@@ -11600,7 +11659,7 @@
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-70829bd20e65"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-9169c807d875"
           ],
           "read_status": "full"
         },
@@ -11609,8 +11668,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-explain",
           "shared_consumers": [],
-          "sha256": "3e778133237d0042dca3e98197d6685fc9396f6c53a78a44985559729df571aa",
-          "bytes": 10756,
+          "sha256": "bd82dcd441b82fd5336f3ea26bc22c5e382baf1d5dfc52ccb734719db4c6e39e",
+          "bytes": 10799,
           "line_count": 92,
           "covered_line_ranges": [
             [
@@ -11619,7 +11678,7 @@
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-3e778133237d"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-bd82dcd441b8"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -11669,17 +11728,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-explain",
           "shared_consumers": [],
-          "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-          "bytes": 38311,
-          "line_count": 905,
+          "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+          "bytes": 38963,
+          "line_count": 917,
           "covered_line_ranges": [
             [
               1,
-              905
+              917
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-e3dc0706cfdd"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-af94db81cf63"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -12001,17 +12060,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-handoff",
           "shared_consumers": [],
-          "sha256": "5f54a8a645fefaeda05b1548c4e2041e23e3af24810370a15f2c0c2cea0620c4",
-          "bytes": 16054,
-          "line_count": 370,
+          "sha256": "7875e4d8a4350de177d6eb28af88af7bf0f97ebe12721330b5d0a0383dfbc21d",
+          "bytes": 16364,
+          "line_count": 380,
           "covered_line_ranges": [
             [
               1,
-              370
+              380
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-5f54a8a645fe"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-7875e4d8a435"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -12061,17 +12120,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-handoff",
           "shared_consumers": [],
-          "sha256": "58f1e2b85186f82aba85340c0e1924a17b1d5828d24d01ceabc98df7eaf5b314",
-          "bytes": 13584,
-          "line_count": 272,
+          "sha256": "eee4e526b8567703a2151af788ad11b63c2c5adf331c2a5751b1a2b8d08c6597",
+          "bytes": 13903,
+          "line_count": 276,
           "covered_line_ranges": [
             [
               1,
-              272
+              276
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-58f1e2b85186"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-eee4e526b856"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -12904,17 +12963,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-ideate",
           "shared_consumers": [],
-          "sha256": "d006ec7e094449f00d1822c702e065b1dacab4a3b2ef159320a239e5e78a415f",
-          "bytes": 12827,
-          "line_count": 271,
+          "sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea",
+          "bytes": 13735,
+          "line_count": 282,
           "covered_line_ranges": [
             [
               1,
-              271
+              282
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-d006ec7e0944"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-b930486bc558"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -12924,17 +12983,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-ideate",
           "shared_consumers": [],
-          "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-          "bytes": 38311,
-          "line_count": 905,
+          "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+          "bytes": 38963,
+          "line_count": 917,
           "covered_line_ranges": [
             [
               1,
-              905
+              917
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-e3dc0706cfdd"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-af94db81cf63"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -13625,17 +13684,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-lfg",
           "shared_consumers": [],
-          "sha256": "79d4a594f67efa9b4c4b9e19603910a365c657d67b34149eddcb674775d78acf",
-          "bytes": 23605,
-          "line_count": 492,
+          "sha256": "5600214530ecb03c5644213884666de7978b03a298d4f61bed0e2b402461e0cc",
+          "bytes": 24846,
+          "line_count": 513,
           "covered_line_ranges": [
             [
               1,
-              492
+              513
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-79d4a594f67e"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-5600214530ec"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -13783,17 +13842,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-lfg",
           "shared_consumers": [],
-          "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-          "bytes": 38311,
-          "line_count": 905,
+          "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+          "bytes": 38963,
+          "line_count": 917,
           "covered_line_ranges": [
             [
               1,
-              905
+              917
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-e3dc0706cfdd"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-af94db81cf63"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -13843,17 +13902,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-lfg",
           "shared_consumers": [],
-          "sha256": "182de666b1fd31a7dcc03cd876e2b9bfacfad5e644ec853086b1cf06fba600c8",
-          "bytes": 17442,
-          "line_count": 375,
+          "sha256": "fe529b2ae10371f370d5de4061657fd58edaf967a28e513d7e6bb4d83fae53c8",
+          "bytes": 20374,
+          "line_count": 436,
           "covered_line_ranges": [
             [
               1,
-              375
+              436
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-182de666b1fd"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-fe529b2ae103"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -14663,17 +14722,17 @@
           "source_kind": "skill-package",
           "owning_skill": "spec-optimize",
           "shared_consumers": [],
-          "sha256": "d24c1573910293b80981349fbc6e6baa4d46fcb9795547dc6556eaed7caee966",
-          "bytes": 21384,
-          "line_count": 579,
+          "sha256": "435f0451a2cad84c1b8a4cb462ae587166c0802e274fb30502abbc5ce64ec4a8",
+          "bytes": 21638,
+          "line_count": 588,
           "covered_line_ranges": [
             [
               1,
-              579
+              588
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-d24c15739102"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-435f0451a2ca"
           ],
           "read_status": "full"
         },
@@ -14997,17 +15056,17 @@
           "source_kind": "direct-support",
           "owning_skill": "spec-optimize",
           "shared_consumers": [],
-          "sha256": "3e3f89fabea3df622d0f96fce92573b7b2c2d1cf40a197c1024ac9ab236992df",
-          "bytes": 52891,
-          "line_count": 1499,
+          "sha256": "1c215e2b6e0264f3b45ec48e9728828e25fb5f753c96dda460c81a31f62d7f62",
+          "bytes": 53372,
+          "line_count": 1513,
           "covered_line_ranges": [
             [
               1,
-              1499
+              1513
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-3e3f89fabea3"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-1c215e2b6e02"
           ],
           "read_status": "full"
         },
@@ -16973,17 +17032,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-plan",
           "shared_consumers": [],
-          "sha256": "d006ec7e094449f00d1822c702e065b1dacab4a3b2ef159320a239e5e78a415f",
-          "bytes": 12827,
-          "line_count": 271,
+          "sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea",
+          "bytes": 13735,
+          "line_count": 282,
           "covered_line_ranges": [
             [
               1,
-              271
+              282
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-d006ec7e0944"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-b930486bc558"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -16993,17 +17052,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-plan",
           "shared_consumers": [],
-          "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-          "bytes": 38311,
-          "line_count": 905,
+          "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+          "bytes": 38963,
+          "line_count": 917,
           "covered_line_ranges": [
             [
               1,
-              905
+              917
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-e3dc0706cfdd"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-af94db81cf63"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -18396,17 +18455,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-pov",
           "shared_consumers": [],
-          "sha256": "9d7cdcb582bda9b22b11d6ef7cb9d0e9ace21edf55b660ad1cfd106d4287b76c",
-          "bytes": 97621,
-          "line_count": 2220,
+          "sha256": "db8fcf60a8cc1297ccfa200c55956a9691ce7b8eee8dcacebb751bb3a437863c",
+          "bytes": 100272,
+          "line_count": 2272,
           "covered_line_ranges": [
             [
               1,
-              2220
+              2272
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-9d7cdcb582bd"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-db8fcf60a8cc"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -18476,17 +18535,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-pov",
           "shared_consumers": [],
-          "sha256": "8a769329f2d572ee4bae9d8d3f8caa5805a64a9e5a4c2ee0bfbd079ca09ee18f",
-          "bytes": 1623,
-          "line_count": 41,
+          "sha256": "5eec7320d067cc665ed3b7f56a978874ab0faed869538ecef33b34412ea4f559",
+          "bytes": 2298,
+          "line_count": 50,
           "covered_line_ranges": [
             [
               1,
-              41
+              50
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-8a769329f2d5"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-5eec7320d067"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -18496,17 +18555,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-pov",
           "shared_consumers": [],
-          "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-          "bytes": 38311,
-          "line_count": 905,
+          "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+          "bytes": 38963,
+          "line_count": 917,
           "covered_line_ranges": [
             [
               1,
-              905
+              917
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-e3dc0706cfdd"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-af94db81cf63"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -18683,17 +18742,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-prd",
           "shared_consumers": [],
-          "sha256": "f4e24e45dc961ee400fa5e64367508ca45c14fb2461848e3d19893e440b3d4c4",
-          "bytes": 20230,
-          "line_count": 135,
+          "sha256": "b16b3960b52b3ddbda7ae8f1dca7e2514dde4efaa5671e961783a4d34aa6bf04",
+          "bytes": 24774,
+          "line_count": 152,
           "covered_line_ranges": [
             [
               1,
-              135
+              152
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-f4e24e45dc96"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-b16b3960b52b"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -19860,17 +19919,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-prd",
           "shared_consumers": [],
-          "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-          "bytes": 38311,
-          "line_count": 905,
+          "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+          "bytes": 38963,
+          "line_count": 917,
           "covered_line_ranges": [
             [
               1,
-              905
+              917
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-e3dc0706cfdd"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-af94db81cf63"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -20504,17 +20563,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-product-pulse",
           "shared_consumers": [],
-          "sha256": "d006ec7e094449f00d1822c702e065b1dacab4a3b2ef159320a239e5e78a415f",
-          "bytes": 12827,
-          "line_count": 271,
+          "sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea",
+          "bytes": 13735,
+          "line_count": 282,
           "covered_line_ranges": [
             [
               1,
-              271
+              282
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-d006ec7e0944"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-b930486bc558"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -20715,17 +20774,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "f4e24e45dc961ee400fa5e64367508ca45c14fb2461848e3d19893e440b3d4c4",
-          "bytes": 20230,
-          "line_count": 135,
+          "sha256": "b16b3960b52b3ddbda7ae8f1dca7e2514dde4efaa5671e961783a4d34aa6bf04",
+          "bytes": 24774,
+          "line_count": 152,
           "covered_line_ranges": [
             [
               1,
-              135
+              152
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-f4e24e45dc96"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-b16b3960b52b"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -24217,17 +24276,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-resolve-pr-feedback",
           "shared_consumers": [],
-          "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-          "bytes": 38311,
-          "line_count": 905,
+          "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+          "bytes": 38963,
+          "line_count": 917,
           "covered_line_ranges": [
             [
               1,
-              905
+              917
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-e3dc0706cfdd"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-af94db81cf63"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -24915,17 +24974,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-rule-miner",
           "shared_consumers": [],
-          "sha256": "f4e24e45dc961ee400fa5e64367508ca45c14fb2461848e3d19893e440b3d4c4",
-          "bytes": 20230,
-          "line_count": 135,
+          "sha256": "b16b3960b52b3ddbda7ae8f1dca7e2514dde4efaa5671e961783a4d34aa6bf04",
+          "bytes": 24774,
+          "line_count": 152,
           "covered_line_ranges": [
             [
               1,
-              135
+              152
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-f4e24e45dc96"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-b16b3960b52b"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -25352,17 +25411,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "f4e24e45dc961ee400fa5e64367508ca45c14fb2461848e3d19893e440b3d4c4",
-          "bytes": 20230,
-          "line_count": 135,
+          "sha256": "b16b3960b52b3ddbda7ae8f1dca7e2514dde4efaa5671e961783a4d34aa6bf04",
+          "bytes": 24774,
+          "line_count": 152,
           "covered_line_ranges": [
             [
               1,
-              135
+              152
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-f4e24e45dc96"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-b16b3960b52b"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -25609,19 +25668,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "abe9ddc8b18a8bd01e8a3c61711e446b4f804627f0db92a9d7a6e9dfff4c891a",
-          "bytes": 3310,
-          "line_count": 79,
+          "sha256": "0a084752eeaae10fe6e6a0d70ee2e79b21ed2e20a928359b72b7a6acc095869f",
+          "bytes": 3589,
+          "line_count": 84,
           "covered_line_ranges": [
             [
               1,
-              79
+              84
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-afbf0dd2"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-0a084752eeaa"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-runtime-setup/references/project-config.md",
@@ -25648,19 +25708,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "3181c4a22b52573ce39805b07849860d387b99647199bf26d11df22956a58e1d",
-          "bytes": 3718,
-          "line_count": 53,
+          "sha256": "dad174f75eb08ca928ccab339d65f8e79ad5c52aaa2d507627e6de8250605f21",
+          "bytes": 15924,
+          "line_count": 124,
           "covered_line_ranges": [
             [
               1,
-              53
+              124
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-bcfec254"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-dad174f75eb0"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-runtime-setup/scripts/check-health",
@@ -25724,38 +25785,40 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "f2059baef3a7d53d51c9c1f0774db556ad88a0eae52054664316c78b40b0ec85",
-          "bytes": 4513,
-          "line_count": 163,
+          "sha256": "ede64b7665430fd2d6fa8fba7005df635a9eefc2cdd422a69a311eb34ba3fa0b",
+          "bytes": 6262,
+          "line_count": 189,
           "covered_line_ranges": [
             [
               1,
-              163
+              189
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-1ff7d669"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-ede64b766543"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-runtime-setup/scripts/lib/baseline-policy.cjs",
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "56bc330dce96fc185e4bcc897ae093958e085806e87ac3277287f3483f0f03c1",
-          "bytes": 225,
-          "line_count": 10,
+          "sha256": "6d56cfbac4cd625dcaf54b9bee87fe8074aefb295201d4798dbebc7513100917",
+          "bytes": 1949,
+          "line_count": 57,
           "covered_line_ranges": [
             [
               1,
-              10
+              57
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-6e7dd7e5"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-6d56cfbac4cd"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-runtime-setup/scripts/lib/configured-dependencies.cjs",
@@ -25781,17 +25844,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "5924db30d6dfd07a2a1287a15405359d10ca44dba14edb1a1766600c2acb5a52",
-          "bytes": 29205,
-          "line_count": 760,
+          "sha256": "7218e2d00ff273568f420d58f963087b29a7bba8505bcbc2242c478f323be337",
+          "bytes": 29608,
+          "line_count": 766,
           "covered_line_ranges": [
             [
               1,
-              760
+              766
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-anthropic-skill-craft-safety-5924db30d6df"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-7218e2d00ff2"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -25820,37 +25883,57 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "785e07eccaa5470ba6ef2e6af41983980d90a7bfb9f1ca624ba9e5d1d073c9c0",
-          "bytes": 7587,
-          "line_count": 217,
+          "sha256": "104ddcf0a14d47a2d89aa0d258b70babd8a23beb943b14bdd4fb2926670bfd83",
+          "bytes": 7802,
+          "line_count": 220,
           "covered_line_ranges": [
             [
               1,
-              217
+              220
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-host-authority-path-normalization-delta-anthropic-skill-craft-safety-785e07eccaa5"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-104ddcf0a14d"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
+        },
+        {
+          "path": "skills/spec-runtime-setup/scripts/lib/host-config-repair-command.cjs",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "1e2ae8a812a9614bf07f30276be9cb44b3e17b678f0855b4d5bbe69458f4bdd2",
+          "bytes": 1275,
+          "line_count": 24,
+          "covered_line_ranges": [
+            [
+              1,
+              24
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-1e2ae8a812a9"
+          ],
+          "read_status": "full"
         },
         {
           "path": "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "5812d058d2dd40443270fb504a5e80cef259be493419ce34e85952338aabc648",
-          "bytes": 53311,
-          "line_count": 1472,
+          "sha256": "3b6d1ec8901ac2558818d117a2d5e85b2466b5907f46b2e0a8587203ae6e45ee",
+          "bytes": 54167,
+          "line_count": 1486,
           "covered_line_ranges": [
             [
               1,
-              1472
+              1486
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-anthropic-skill-craft-safety-5812d058d2dd"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-3b6d1ec8901a"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -25880,36 +25963,58 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "9431408280bf48920e43998b94fb1ec33b551204f0616a6dfe8a4922a5f36a28",
-          "bytes": 20060,
-          "line_count": 522,
+          "sha256": "a7da03d10e4fd17fd04c6c2c3c04c9f6db4fb741703c88b2953f852662c73998",
+          "bytes": 23265,
+          "line_count": 575,
           "covered_line_ranges": [
             [
               1,
-              522
+              575
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-2af69bf3"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-a7da03d10e4f"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "3c7109c853995dad5dc696bcaf7854670a4fcc880eb70b37a7980745bd731bbb",
-          "bytes": 5833,
-          "line_count": 176,
+          "sha256": "23328a6ea3a1188f2bea2ea6a022de168b3fab05631774ad159468e4dad8339c",
+          "bytes": 6730,
+          "line_count": 188,
           "covered_line_ranges": [
             [
               1,
-              176
+              188
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-946bd5cf"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-23328a6ea3a1"
+          ],
+          "read_status": "full",
+          "source_kind": "skill-package"
+        },
+        {
+          "path": "skills/spec-runtime-setup/scripts/lib/npm-warmup.cjs",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "36802e5627572af9f2263c490489880e470d3b4729a7fa08b618450faf31f069",
+          "bytes": 6400,
+          "line_count": 117,
+          "covered_line_ranges": [
+            [
+              1,
+              117
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-36802e562757"
           ],
           "read_status": "full"
         },
@@ -25975,19 +26080,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "04aad38cb71720f7e239ff0423b23066d9fb80dfc69b117ca690e3eca63a0c0d",
-          "bytes": 16693,
-          "line_count": 467,
+          "sha256": "e63b3e9a15433e42c57530c6eb0eaecc8f0b02f9b811b418538719fd7aa214e8",
+          "bytes": 17704,
+          "line_count": 478,
           "covered_line_ranges": [
             [
               1,
-              467
+              478
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-dd312981"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-e63b3e9a1543"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-runtime-setup/scripts/lib/process-utils.cjs",
@@ -26053,17 +26159,17 @@
           "source_kind": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "d94b14f271fa4397018c6ceed36548691954fa8c4617005eac55842b62090533",
-          "bytes": 1054,
-          "line_count": 30,
+          "sha256": "c2f0da819d935aac8067b10affda612066b730e1b0e2f4aa95bcb4f1445ef50d",
+          "bytes": 1605,
+          "line_count": 39,
           "covered_line_ranges": [
             [
               1,
-              30
+              39
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-d94b14f271fa"
+            "ce-localization-lane-refresh-2026-09-14-repair-loop-anthropic-skill-craft-safety-c2f0da819d93"
           ],
           "read_status": "full"
         },
@@ -26072,17 +26178,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "276e0141d09d76e60861c9d8fa5d125ae31130e753d44276c828f509c01a8b87",
-          "bytes": 23396,
-          "line_count": 658,
+          "sha256": "656b8a0dbb5e306e89ad6c28e1ab4eb397cdf754c44e35b7c3b0944788eab689",
+          "bytes": 31107,
+          "line_count": 823,
           "covered_line_ranges": [
             [
               1,
-              658
+              823
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-anthropic-skill-craft-safety-276e0141d09d"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-656b8a0dbb5e"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -26111,8 +26217,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "581aae6be3402874addb43047a87e80aa5af0b2cb7b308a62cb4918d114e7283",
-          "bytes": 4161,
+          "sha256": "0bafa3a681a9501691132072bdac87d9d01a9d255381bf82afe6404e60d8d5ba",
+          "bytes": 4194,
           "line_count": 139,
           "covered_line_ranges": [
             [
@@ -26121,46 +26227,67 @@
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-ad9948e4"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-0bafa3a681a9"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-runtime-setup/scripts/lib/renderer.cjs",
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "060d58f7ed3f64d549d0bf34fc651574b649c0c17079a2328aa2f0c54fac2456",
-          "bytes": 14355,
-          "line_count": 326,
+          "sha256": "fdbeaff9aeddb6377b21dc8d4cd6cbc1e5620d6fab814476d6a67f340e2ff319",
+          "bytes": 15564,
+          "line_count": 340,
           "covered_line_ranges": [
             [
               1,
-              326
+              340
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-060d58f7ed3f"
+            "ce-localization-lane-refresh-2026-09-14-repair-loop-anthropic-skill-craft-safety-fdbeaff9aedd"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
+        },
+        {
+          "path": "skills/spec-runtime-setup/scripts/lib/repair-loop.cjs",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "749f4cb611098ccb2a63a92a20df774f19e7328104898786506ef7c1b2ad65f7",
+          "bytes": 1916,
+          "line_count": 44,
+          "covered_line_ranges": [
+            [
+              1,
+              44
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-lane-refresh-2026-09-14-repair-loop-anthropic-skill-craft-safety-749f4cb61109"
+          ],
+          "read_status": "full"
         },
         {
           "path": "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "f5f53f509f00ce4df726d178e35976494fdc118a4ecf414d950bf3d876b7f04d",
-          "bytes": 35819,
-          "line_count": 926,
+          "sha256": "bb6c313249dc9964b0df0229d35435d4b438e1afe2597259d7a47bee0d7601da",
+          "bytes": 38206,
+          "line_count": 966,
           "covered_line_ranges": [
             [
               1,
-              926
+              966
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-anthropic-skill-craft-safety-f5f53f509f00"
+            "ce-localization-lane-refresh-2026-09-14-repair-loop-anthropic-skill-craft-safety-bb6c313249dc"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -26200,6 +26327,26 @@
           ],
           "review_chunk_ids": [
             "anthropic-r3-final-spec-runtime-setup-9edaf219"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-runtime-setup/scripts/lib/source-snapshot.cjs",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "bcb2995930b587be59d3c8440e07feed25866333da390d28176cb7ae59f48d3f",
+          "bytes": 9882,
+          "line_count": 205,
+          "covered_line_ranges": [
+            [
+              1,
+              205
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-bcb2995930b5"
           ],
           "read_status": "full"
         },
@@ -26265,19 +26412,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "e3b1c5ca246c159778d9447e3ea57186646f26f50999167f9a9caacc3d4872e7",
-          "bytes": 618,
-          "line_count": 24,
+          "sha256": "3655fb48bffaf29da6c62eca1f59c02cf3b43a723271744de44dfa857e5a8717",
+          "bytes": 1097,
+          "line_count": 29,
           "covered_line_ranges": [
             [
               1,
-              24
+              29
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-f1b28270"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-3655fb48bffa"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-runtime-setup/scripts/lib/workspace-executor.cjs",
@@ -26341,19 +26489,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "47ad0de6894550b5b0b08dc6e46d8f6c5bea4a5c214f4e37291189ea966747f6",
-          "bytes": 22735,
-          "line_count": 593,
+          "sha256": "e0d1b5d346d794ff8de20b083e9e4c7411286c404ed1915f823f8fb8c002bd9d",
+          "bytes": 23830,
+          "line_count": 622,
           "covered_line_ranges": [
             [
               1,
-              593
+              622
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-74c014a9"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-e0d1b5d346d7"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-clean.cjs",
@@ -26379,19 +26528,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "633681f084c629741763be14f810e9a1294ca504033690717aa15d6cf49f048f",
-          "bytes": 13549,
-          "line_count": 417,
+          "sha256": "bd37b82bb0a8e6d9994cbe2c3c520db50b94c78633bad7714c633af0af989874",
+          "bytes": 16237,
+          "line_count": 472,
           "covered_line_ranges": [
             [
               1,
-              417
+              472
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-6ea6d3e2"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-bd37b82bb0a8"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-lifecycle-lease.cjs",
@@ -26532,8 +26682,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "38099c6c8622e72561387957cf9e4d6069dd5aef17b20932135c6a97ea1a8e48",
-          "bytes": 3155,
+          "sha256": "3dd739e9d4d19ef2ffefc22cffba9db66b506849b910540152441fb890507f4c",
+          "bytes": 3381,
           "line_count": 84,
           "covered_line_ranges": [
             [
@@ -26542,9 +26692,10 @@
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-7f848f0f"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-3dd739e9d4d1"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-runtime-setup/scripts/lib/workspace-refresh-contract.cjs",
@@ -26570,17 +26721,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "be0951032a9af87fc7f55d5e530d6e2dd858683c1c25129e4ae10b5c6484371d",
-          "bytes": 5207,
-          "line_count": 162,
+          "sha256": "658b1b6f5e33c1cae895bc341cf6e846cb4fd2a487f684ae8874b24c852ff748",
+          "bytes": 5851,
+          "line_count": 176,
           "covered_line_ranges": [
             [
               1,
-              162
+              176
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-anthropic-skill-craft-safety-be0951032a9a"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-658b1b6f5e33"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -26662,59 +26813,101 @@
           "read_status": "full"
         },
         {
+          "path": "skills/spec-runtime-setup/scripts/providers/codegraph-artifact-evidence.cjs",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "6e3c81e0e09d4b0c05d72478ac0c59583dabc79905d4afcb0631dd0a8e43aed2",
+          "bytes": 8623,
+          "line_count": 136,
+          "covered_line_ranges": [
+            [
+              1,
+              136
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-6e3c81e0e09d"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-runtime-setup/scripts/providers/codegraph-launcher.cjs",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "a316a555ad699b4fdb0e8c25cfc2a0ba2fc5eb9b33207ca4023ba58aa3e3e712",
+          "bytes": 6157,
+          "line_count": 116,
+          "covered_line_ranges": [
+            [
+              1,
+              116
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-a316a555ad69"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/spec-runtime-setup/scripts/providers/codegraph.cjs",
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "599fe5e08307eba39d2440d800bb8709042f307f5f95f0ce979427c30ab6087d",
-          "bytes": 16608,
-          "line_count": 445,
+          "sha256": "332cce29ff1731ebe34be4e5d1d3e456fd0c0990bc90ba6645a5ba92052ea515",
+          "bytes": 24844,
+          "line_count": 563,
           "covered_line_ranges": [
             [
               1,
-              445
+              563
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-a510d235"
+            "ce-localization-lane-refresh-2026-09-14-repair-loop-anthropic-skill-craft-safety-332cce29ff17"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-runtime-setup/scripts/providers/common.cjs",
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "a8ac27dc2c9122fea3c6da25d63aba1cc4272896e73455478c3d18a8d781edbb",
-          "bytes": 5259,
-          "line_count": 133,
+          "sha256": "b50df264d67950433c821fa7e28f56cd59c067b3c30e042cebcaead6c0328cf5",
+          "bytes": 5498,
+          "line_count": 136,
           "covered_line_ranges": [
             [
               1,
-              133
+              136
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-25307d54"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-b50df264d679"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "1cb971217524d52ee66ee8ede273fd8ad47997347c364c7ff136dc81efcd0f4d",
-          "bytes": 114158,
-          "line_count": 2489,
+          "sha256": "e943dd2130b536d57bd52bc9c991e4b205cb4971c3e2cd5ed9910fd15e65c8d9",
+          "bytes": 129050,
+          "line_count": 2748,
           "covered_line_ranges": [
             [
               1,
-              2489
+              2748
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-1cb971217524"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-e943dd2130b5"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -26743,19 +26936,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "5ed8fcbb044655f1e5ec29e85f2c788b4c17247abf654f247046260e7d64e8d6",
-          "bytes": 33783,
-          "line_count": 897,
+          "sha256": "3fa166402a6978c20f746e87c1e1413aab5e9d80e2ae248cce8c11ef1d9dc7f6",
+          "bytes": 32891,
+          "line_count": 873,
           "covered_line_ranges": [
             [
               1,
-              897
+              873
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-f1cf7690"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-3fa166402a69"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-runtime-setup/scripts/vendor/js-yaml-3.15.1.min.js",
@@ -26819,17 +27013,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "b0e9b22fcb9cfb4103037f62b62d2cc91af2b7467aa268fff344544573a83637",
-          "bytes": 59362,
-          "line_count": 2032,
+          "sha256": "be15a661ed39a67fa0d071719e80c3a7dcb503278986a50d6f2ac7f2c503f9bf",
+          "bytes": 65688,
+          "line_count": 2244,
           "covered_line_ranges": [
             [
               1,
-              2032
+              2244
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-b0e9b22fcb9c"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-be15a661ed39"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -26839,17 +27033,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "7485f0c40219462e175f0ba3285e9c70940e2b28d88434d991984f416609e2fd",
-          "bytes": 16987,
-          "line_count": 755,
+          "sha256": "34ceb9a41a048ca0009e0159205df3d6a4d0d4cdd8c7a30505fb1f11f8132f33",
+          "bytes": 24236,
+          "line_count": 1005,
           "covered_line_ranges": [
             [
               1,
-              755
+              1005
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-anthropic-skill-craft-safety-7485f0c40219"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-34ceb9a41a04"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -26859,17 +27053,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "bd42f0807e65109423d681af14701d0d3fdc80fdb4890c169f843cd7c03613c7",
-          "bytes": 55200,
-          "line_count": 361,
+          "sha256": "892434da474d5b0d58f1b89628351552f6782e8136a896b79e56d78795de73ad",
+          "bytes": 55598,
+          "line_count": 368,
           "covered_line_ranges": [
             [
               1,
-              361
+              368
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-bd42f0807e65"
+            "ce-localization-lane-refresh-2026-09-14-repair-loop-anthropic-skill-craft-safety-892434da474d"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -26956,19 +27150,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "f635126a485dfa5cfc0b26253e0a0698b0a0b0c15a3343bd6a61e455d1cdbdf3",
-          "bytes": 11396,
-          "line_count": 59,
+          "sha256": "a5372fae024fd2e0ede08428c83d9ce17217bf975193c93198495f002ffe3f4d",
+          "bytes": 14614,
+          "line_count": 495,
           "covered_line_ranges": [
             [
               1,
-              59
+              495
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-40b36ba9"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-a5372fae024f"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/fixtures/mcp-setup/legacy-parity/replay-runtime-contracts.cjs",
@@ -26995,19 +27190,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "f6a62fd8d2f452dd3e7dfb0518c5a23d99a644923e849b42d80215a9152d3231",
-          "bytes": 13038,
-          "line_count": 72,
+          "sha256": "458744d88fc5ca09d74c2a856acd530f14598fc9de5c8c1e5678380f743b592d",
+          "bytes": 16386,
+          "line_count": 527,
           "covered_line_ranges": [
             [
               1,
-              72
+              527
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-c13ac127"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-458744d88fc5"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/fixtures/mcp-setup/repair-worktree/posix.json",
@@ -27044,6 +27240,66 @@
           ],
           "review_chunk_ids": [
             "anthropic-r3-final-spec-runtime-setup-f6eef3c2"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "tests/integration/runtime-setup-codegraph-launcher.integration.test.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "cb665300c498b9edf3a69dc8f2a35c624e85b40924e18065a999173a1bd5888f",
+          "bytes": 5450,
+          "line_count": 91,
+          "covered_line_ranges": [
+            [
+              1,
+              91
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-cb665300c498"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "tests/integration/runtime-setup-npm-archive.integration.test.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "edb9160ac97e683ce7c4943ecf156166cdaef70439f001a482b82ebdcabe10aa",
+          "bytes": 7709,
+          "line_count": 104,
+          "covered_line_ranges": [
+            [
+              1,
+              104
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-edb9160ac97e"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "tests/integration/runtime-setup-sigint-recovery.integration.test.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "8a75a58ece0a849568785e0a088d868ab18fbf22075c806d30ece14fe52c2d60",
+          "bytes": 3355,
+          "line_count": 62,
+          "covered_line_ranges": [
+            [
+              1,
+              62
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-8a75a58ece0a"
           ],
           "read_status": "full"
         },
@@ -27131,37 +27387,57 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "79c76bec14c429def5a7553eb54dc6a203dcbbdd32a23d0bef320408eafd74bd",
-          "bytes": 2616,
-          "line_count": 66,
+          "sha256": "e86ef7866f5577f0f0ed62852bad5090da3c8ae3d5bb50eecbefe4a3857d59c3",
+          "bytes": 4639,
+          "line_count": 102,
           "covered_line_ranges": [
             [
               1,
-              66
+              102
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-79c76bec14c4"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-e86ef7866f55"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
+        },
+        {
+          "path": "tests/unit/host-enumeration-drift-guard.test.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "21d1bafcdefad49d75716598137ac99261221366b858ac2ad3fe678678734702",
+          "bytes": 3350,
+          "line_count": 64,
+          "covered_line_ranges": [
+            [
+              1,
+              64
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-21d1bafcdefa"
+          ],
+          "read_status": "full"
         },
         {
           "path": "tests/unit/mcp-setup-config-consumers.test.js",
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "d006ec7e094449f00d1822c702e065b1dacab4a3b2ef159320a239e5e78a415f",
-          "bytes": 12827,
-          "line_count": 271,
+          "sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea",
+          "bytes": 13735,
+          "line_count": 282,
           "covered_line_ranges": [
             [
               1,
-              271
+              282
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-d006ec7e0944"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-b930486bc558"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -27171,36 +27447,37 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "e8ab1c9e3261617c36fd8e7877d1e1e6da775fd21445d87de1f521375ef9ccef",
-          "bytes": 8124,
-          "line_count": 140,
+          "sha256": "b0a77ff35311ada63e26dde089575200dd84ce4d3899fcfe6f69fe70a80e0d27",
+          "bytes": 8073,
+          "line_count": 141,
           "covered_line_ranges": [
             [
               1,
-              140
+              141
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-7db6e0c2"
+            "ce-localization-lane-refresh-2026-09-14-repair-loop-anthropic-skill-craft-safety-b0a77ff35311"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/mcp-setup-entrypoint.test.js",
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "14ec939751f3ac35d0dea8a0ad049c81b77b47a2a6419944ae45302d3b839563",
-          "bytes": 122903,
-          "line_count": 2975,
+          "sha256": "dc5d9f6f8988c9d080683bb097dc7bb94f7926bf50a534ef4c5e3fbb3b2ca6d1",
+          "bytes": 137955,
+          "line_count": 3193,
           "covered_line_ranges": [
             [
               1,
-              2975
+              3193
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-14ec939751f3"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-dc5d9f6f8988"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -27210,17 +27487,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "c9e7eabbfb83540097449b372a33e9259c6e93e29cc1f1401c84bcd15cac1853",
-          "bytes": 40838,
-          "line_count": 1064,
+          "sha256": "a8f0cec2f2f08d412420b721be7fc52bb3fa21e6ff7a0b4191af4d56e49f7fc9",
+          "bytes": 42487,
+          "line_count": 1096,
           "covered_line_ranges": [
             [
               1,
-              1064
+              1096
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-c9e7eabbfb83"
+            "ce-localization-lane-refresh-2026-09-14-repair-loop-anthropic-skill-craft-safety-a8f0cec2f2f0"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -27250,17 +27527,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "f5f43f9bdd33fa093e116d4de68c1cf195481ab306d677694c6bcaca52d4471a",
-          "bytes": 22036,
-          "line_count": 602,
+          "sha256": "4b8aebb34e44dfd616e9a3e43f99958107ca1e5c79685a5828404fc280a36a69",
+          "bytes": 24785,
+          "line_count": 643,
           "covered_line_ranges": [
             [
               1,
-              602
+              643
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-anthropic-skill-craft-safety-f5f43f9bdd33"
+            "ce-localization-lane-refresh-2026-09-14-repair-loop-anthropic-skill-craft-safety-4b8aebb34e44"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -27270,17 +27547,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "19387a7b44d739a9991a0555ac3894b6770ba5bca726fc4ad51d3d68326042ee",
-          "bytes": 33560,
-          "line_count": 718,
+          "sha256": "12dada591d6c9e9c8bcd9da8f9381005bf01ed6abf510ea616bd5790ed0d2ee6",
+          "bytes": 34806,
+          "line_count": 738,
           "covered_line_ranges": [
             [
               1,
-              718
+              738
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-19387a7b44d7"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-12dada591d6c"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -27309,8 +27586,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "126b826191b8d07ccef441add5176e43142ecc98ec976c1e321f7c638ff9034a",
-          "bytes": 7589,
+          "sha256": "b3b1950bf09c0341dcd325ca61b815f772fbd81a18efa6746f0453bf8bd2d2a0",
+          "bytes": 7572,
           "line_count": 202,
           "covered_line_ranges": [
             [
@@ -27319,9 +27596,10 @@
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-8611090b"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-b3b1950bf09c"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/mcp-setup-process-runner.test.js",
@@ -27347,36 +27625,37 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "212af16be67ebd14ef2267c3111e1e9d0f8394f9770a9c99a7c10404f509f493",
-          "bytes": 19986,
-          "line_count": 461,
+          "sha256": "951eeb2774b82ec1828e16fcbb09d3c5bbaf0e5178e8d0d86f6367a8e214cb5e",
+          "bytes": 21371,
+          "line_count": 482,
           "covered_line_ranges": [
             [
               1,
-              461
+              482
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-1025f2c1"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-951eeb2774b8"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/mcp-setup-providers.test.js",
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "8a47fd8a27a02bfc71ca334b63ff42c89badb63bb5bf7d9d43b1b040253c2afd",
-          "bytes": 85490,
-          "line_count": 1834,
+          "sha256": "eab93f4b2c69cb04d381c01c238d41e724c99d7800f49392a5abb579f4416b3f",
+          "bytes": 103149,
+          "line_count": 2147,
           "covered_line_ranges": [
             [
               1,
-              1834
+              2147
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-8a47fd8a27a0"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-eab93f4b2c69"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -27386,17 +27665,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "bf9827aa12d0514bddad3bdfe8082ab30e0782629c9ce57b78223197fafb95d9",
-          "bytes": 14600,
-          "line_count": 375,
+          "sha256": "c1486f354ff2097460df6d6dd38fee87ed0733529c705174fc84eb9628b39173",
+          "bytes": 23042,
+          "line_count": 547,
           "covered_line_ranges": [
             [
               1,
-              375
+              547
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-bf9827aa12d0"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-c1486f354ff2"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -27539,19 +27818,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "6ed74296ca53f77a435344bbaa46f2e459055b5bdb4b92e464143480eba6d2b5",
-          "bytes": 39007,
-          "line_count": 1073,
+          "sha256": "f1899bc5ca0369b331e3db468be693dfbb17afccb042bdee5b723c90a7a79df3",
+          "bytes": 48046,
+          "line_count": 1234,
           "covered_line_ranges": [
             [
               1,
-              1073
+              1234
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-c0f771bf"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-f1899bc5ca03"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/mcp-setup-workspace-graph-refresh.test.js",
@@ -27653,19 +27933,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "394c233044aa7fa7e745fd7f1d94032d4c7598382286cfd6c82022f657f3ce2b",
-          "bytes": 6269,
-          "line_count": 133,
+          "sha256": "836388b733c5769d9e33a17cb942fc70e4ed79cf4014d8dc08fd67bd1edef830",
+          "bytes": 6584,
+          "line_count": 140,
           "covered_line_ranges": [
             [
               1,
-              133
+              140
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-930fb8ba"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-836388b733c5"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/mcp-setup-workspace-routing-inject.test.js",
@@ -27749,20 +28030,240 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-          "bytes": 38311,
-          "line_count": 905,
+          "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+          "bytes": 38963,
+          "line_count": 917,
           "covered_line_ranges": [
             [
               1,
-              905
+              917
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-e3dc0706cfdd"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-af94db81cf63"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
+        },
+        {
+          "path": "tests/unit/runtime-setup-codegraph-evidence.test.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "18627c29de920929d1b1bce1ccfd52e8e380d8a69add2fce10fa33c9707f5343",
+          "bytes": 11230,
+          "line_count": 190,
+          "covered_line_ranges": [
+            [
+              1,
+              190
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-18627c29de92"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "tests/unit/runtime-setup-codegraph-install-integrity.test.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "396d5e576c488591155c03d9beb4215152090b07d0f00f1aee13bb11fe735521",
+          "bytes": 3992,
+          "line_count": 69,
+          "covered_line_ranges": [
+            [
+              1,
+              69
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-396d5e576c48"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "tests/unit/runtime-setup-codegraph-launcher.test.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "062d12910dbe8979916f97bca7078cb3b76bc95e2897fdb24c4cf62c80cafc6f",
+          "bytes": 11645,
+          "line_count": 160,
+          "covered_line_ranges": [
+            [
+              1,
+              160
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-062d12910dbe"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "tests/unit/runtime-setup-consumer-health.test.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "0f7ea603a2b1fefdd539a66754939f80f44f84f4913bd3f1d015dd4812f8c8ca",
+          "bytes": 21968,
+          "line_count": 346,
+          "covered_line_ranges": [
+            [
+              1,
+              346
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-0f7ea603a2b1"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "tests/unit/runtime-setup-demand-policy.test.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "e552f865ccca4f977018893e92e7cb239a3164dc06455f51fee2c639079b1f07",
+          "bytes": 2013,
+          "line_count": 29,
+          "covered_line_ranges": [
+            [
+              1,
+              29
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-e552f865ccca"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "tests/unit/runtime-setup-npm-integrity.test.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "0b8c84c3d5248bfdcd29a10cde7aae14b9a3a352c6883152839a6cee6c65ea89",
+          "bytes": 6253,
+          "line_count": 103,
+          "covered_line_ranges": [
+            [
+              1,
+              103
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-0b8c84c3d524"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "tests/unit/runtime-setup-provider-identity.test.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "1148c8c9efa484e25f5304a0a1b62b3130275aa3e181b2de2ed4292667c3ee4d",
+          "bytes": 10305,
+          "line_count": 184,
+          "covered_line_ranges": [
+            [
+              1,
+              184
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-1148c8c9efa4"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "tests/unit/runtime-setup-registry-metadata.test.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "8aad259d700f6a19e768307539376f2f18ec1fdaa70446f7f67a840a49592b11",
+          "bytes": 930,
+          "line_count": 17,
+          "covered_line_ranges": [
+            [
+              1,
+              17
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-8aad259d700f"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "tests/unit/runtime-setup-repair-loop.test.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "124898480d70b49f6b40c97a4550ab5f5a8ce8c77099239ccad1554382748f52",
+          "bytes": 1168,
+          "line_count": 28,
+          "covered_line_ranges": [
+            [
+              1,
+              28
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-lane-refresh-2026-09-14-repair-loop-anthropic-skill-craft-safety-124898480d70"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "tests/unit/runtime-setup-warmup-identity.test.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "ff7bd68a8554e4e517f56c7520c841303fe4f4538a3a8c872dca23aa2fbbf5b2",
+          "bytes": 5402,
+          "line_count": 104,
+          "covered_line_ranges": [
+            [
+              1,
+              104
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-ff7bd68a8554"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "tests/unit/runtime-setup-workspace-loading.test.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "e938e82600e08dfbb9581a1d84e986df04d99a19406f5aa83aa4034386ea7a0a",
+          "bytes": 1385,
+          "line_count": 25,
+          "covered_line_ranges": [
+            [
+              1,
+              25
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-e938e82600e0"
+          ],
+          "read_status": "full"
         },
         {
           "path": "tests/unit/sync-instruction-files.test.js",
@@ -31341,17 +31842,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-work",
           "shared_consumers": [],
-          "sha256": "1f3c43c364870c58c1d5b4ad02214e445d0095c593e40ae1a59cf7f154233cdb",
-          "bytes": 11817,
-          "line_count": 311,
+          "sha256": "15a5bb548d826b676dd205c222ea6ce9d3ef5cf3b92997f3b320dcf3ff97abf8",
+          "bytes": 11908,
+          "line_count": 307,
           "covered_line_ranges": [
             [
               1,
-              311
+              307
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-anthropic-skill-craft-safety-1f3c43c36487"
+            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-15a5bb548d82"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -31381,36 +31882,37 @@
           "path_role": "skill-package",
           "owning_skill": "spec-work",
           "shared_consumers": [],
-          "sha256": "2df6caaf12c4d617d130ce9aaa716f77431682baad9108bc2c7611207d85ab9f",
-          "bytes": 15906,
-          "line_count": 415,
+          "sha256": "4a5089b3b7a91747b8f669d39aafc33c0735762792498e07674a1061fe6e3dbb",
+          "bytes": 18685,
+          "line_count": 475,
           "covered_line_ranges": [
             [
               1,
-              415
+              475
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-work-d49ae01f"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-4a5089b3b7a9"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "skill-package",
           "owning_skill": "spec-work",
           "shared_consumers": [],
-          "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-          "bytes": 38311,
-          "line_count": 905,
+          "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+          "bytes": 38963,
+          "line_count": 917,
           "covered_line_ranges": [
             [
               1,
-              905
+              917
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-e3dc0706cfdd"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-af94db81cf63"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -32851,17 +33353,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-write-skill",
           "shared_consumers": [],
-          "sha256": "e3dc0706cfdd0b7783cf847dbb5269e6d0251afafad5a8a554c95d4d15df6915",
-          "bytes": 38311,
-          "line_count": 905,
+          "sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+          "bytes": 38963,
+          "line_count": 917,
           "covered_line_ranges": [
             [
               1,
-              905
+              917
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-e3dc0706cfdd"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-af94db81cf63"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -33839,17 +34341,17 @@
           "source_kind": "direct-support",
           "owning_skill": "using-spec-first",
           "shared_consumers": [],
-          "sha256": "f4e24e45dc961ee400fa5e64367508ca45c14fb2461848e3d19893e440b3d4c4",
-          "bytes": 20230,
-          "line_count": 135,
+          "sha256": "b16b3960b52b3ddbda7ae8f1dca7e2514dde4efaa5671e961783a4d34aa6bf04",
+          "bytes": 24774,
+          "line_count": 152,
           "covered_line_ranges": [
             [
               1,
-              135
+              152
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-f4e24e45dc96"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-b16b3960b52b"
           ],
           "read_status": "full"
         },
@@ -34254,17 +34756,17 @@
           "path_role": "skill-package",
           "owning_skill": "using-spec-first",
           "shared_consumers": [],
-          "sha256": "58f1e2b85186f82aba85340c0e1924a17b1d5828d24d01ceabc98df7eaf5b314",
-          "bytes": 13584,
-          "line_count": 272,
+          "sha256": "eee4e526b8567703a2151af788ad11b63c2c5adf331c2a5751b1a2b8d08c6597",
+          "bytes": 13903,
+          "line_count": 276,
           "covered_line_ranges": [
             [
               1,
-              272
+              276
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-58f1e2b85186"
+            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-eee4e526b856"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -34327,19 +34829,19 @@
       ]
     }
   ],
-  "generated_at": "2026-09-10T13:13:59.565Z",
+  "generated_at": "2026-09-14T07:13:14.000Z",
   "reviewed_expected_path_relation_count": 1019,
   "review_deltas": [
     {
-      "review_run_id": "ce-129-sync-supplemental-20260910",
-      "artifact_ref": "docs/validation/ce-localization/review/deltas/ce-129-sync-20260910.json",
-      "artifact_sha256": "00d5033dac1d04f10770ad1bc63199171a7e41453a72d50f33497e573431bfe8",
-      "reviewed_at": "2026-09-10T13:13:59.565Z",
+      "review_run_id": "ce-localization-lane-refresh-2026-09-14-repair-loop",
+      "artifact_ref": "docs/validation/ce-localization/review/deltas/2026-09-14-repair-loop.json",
+      "artifact_sha256": "579c23375be3f75a9e159ea55e03c2f743d2ddd7d7f219fbab56be5166bbeb45",
+      "reviewed_at": "2026-09-14T07:13:14.000Z",
       "review_method": "inline-same-context",
       "independent": false,
-      "provider_identity": "not-used",
+      "provider_identity": "unverified",
       "worker_context_isolation": "degraded_inherited",
-      "claim_ceiling": "confirms source-read coverage and the absence of newly identified actionable findings by the implementing session; does not claim independent dual-provider review, field behavioral verification, or host-portability proof"
+      "claim_ceiling": "current-session inline review of a concurrent-session batch; focused test evidence only; no runtime or field outcome claims"
     }
   ],
   "review_delta_findings": []

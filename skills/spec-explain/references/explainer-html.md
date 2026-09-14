@@ -1,6 +1,6 @@
 # Explainer HTML Rendering
 
-How an explainer renders as HTML. Load at compose time (Phase 4), not earlier. The explainer is a personal teaching artifact — these rules keep it self-contained, readable, and honest about its own provenance. It is not a plan artifact: no navigation region, no R/U-ID anchors, no contract sections.
+How an explainer renders as HTML. Load at compose time (Phase 3), not earlier. The explainer is a personal teaching artifact — these rules keep it self-contained, readable, and honest about its own provenance. It is not a plan artifact: no navigation region, no R/U-ID anchors, no contract sections.
 
 ## Hard invariants
 

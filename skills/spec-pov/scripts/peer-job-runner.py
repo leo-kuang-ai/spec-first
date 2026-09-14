@@ -28,9 +28,11 @@ Job directory (durable state, the source of truth):
     pid         supervisor pid + worker pid (written by the supervisor before
                 start returns; its presence marks "detached"). Platform-
                 conditional fields — consumers must use .get(): POSIX adds
-                supervisor_pgid; Windows adds job_name (its job object) and
-                supervisor_identity / worker_identity (GetProcessTimes guards
-                so a recycled pid is not treated as the original process).
+                supervisor_pgid and supervisor_identity / worker_identity
+                (/proc starttime or ps lstart); Windows adds job_name (its
+                job object) and supervisor_identity / worker_identity
+                (GetProcessTimes). Both platforms' identities are pid-reuse
+                guards so a recycled pid is not treated as the original.
     out.log     worker's combined stdout+stderr (byte growth = liveness)
     reason      terminal detail, written before the status rename so the
                 status file is always the LAST record to land
@@ -178,8 +180,6 @@ SERVING_RECEIPT_READ_CAP = 32 * 1024
 # 为 receipt 增加防伪签名、重写 freshness/identity/allowlist 校验并补正向测试后，
 # 在下一次跨模型 peer 能力批次中整体评估是否解除；在此之前保持 False。
 SERVING_RECEIPT_PRODUCER_CHANNEL_ENABLED = False
-SERVING_RECEIPT_MAX_TTL_SECS = 15 * 60
-SERVING_RECEIPT_CLOCK_SKEW_SECS = 30
 SECRET_VALUE_PATTERNS = (
     re.compile(r'\b(?:api[_-]?key|access[_-]?token|password|secret)\s*[:=]\s*["\']?[A-Za-z0-9_./+\-=]{8,}', re.I),
     re.compile(r'\bsk-[A-Za-z0-9]{8,}\b'),
@@ -373,55 +373,9 @@ def validate_start_authority(args, worker_argv):
             'provider_serving_receipt_unverified'
             ' (authenticated producer channel disabled)')
     raise RunnerError('provider_serving_receipt_unverified')
-
-    # 通道关闭期间，上一行是本函数的必然终点：以下 packet 校验属于未来启用路径，
-    # 当前不可达（能力与实现的已知漂移，重估见 SERVING_RECEIPT_PRODUCER_CHANNEL_ENABLED）。
-    payload_raw, payload = _load_owned_json(args.payload_ref, PAYLOAD_READ_CAP, 'peer task packet')
-    _require_sha256(args.payload_sha256, '--payload-sha256')
-    if sha256_bytes(payload_raw) != args.payload_sha256:
-        raise RunnerError('peer task packet SHA-256 mismatch')
-    if args.payload_redaction_status != 'passed':
-        raise RunnerError('peer task packet redaction did not pass')
-    if payload.get('schema_version') != 'peer-task-packet/v1':
-        raise RunnerError('peer task packet schema version is unsupported')
-    if payload.get('source_identity') != args.source_identity:
-        raise RunnerError('peer task packet source identity mismatch')
-    packet_refs = payload.get('input_refs')
-    request_refs = request.get('input_refs')
-    if not isinstance(packet_refs, list) or not packet_refs or packet_refs != request_refs:
-        raise RunnerError('peer task packet input_refs do not match the canonical request')
-    if any(not isinstance(ref, str) or not ref for ref in packet_refs):
-        raise RunnerError('peer task packet contains an invalid input ref')
-    prompt = payload.get('prompt')
-    if not isinstance(prompt, str) or not prompt.strip():
-        raise RunnerError('peer task packet requires a non-empty prompt')
-    if _contains_secret(prompt):
-        raise RunnerError('peer task packet contains a secret-like value')
-    if any(_contains_secret(value) for value in worker_argv):
-        raise RunnerError('worker argv contains a secret-like value')
-
-    if args.host_provider == args.requested_provider:
-        raise RunnerError('requested peer provider matches the host provider')
-    if args.actual_provider != args.requested_provider:
-        raise RunnerError('actual provider does not match the requested provider')
-    if args.actual_model != args.requested_model:
-        raise RunnerError('actual model does not match the requested model')
-    if args.credential_env and receipt.get('credential_use_authorization') != 'authorized':
-        raise RunnerError('credential environment requested without credential authorization')
-    for name in args.credential_env:
-        if not re.fullmatch(r'[A-Z][A-Z0-9_]{1,127}', name):
-            raise RunnerError(f'invalid credential environment name: {name!r}')
-
-    return {
-        'receipt_ref': os.path.abspath(args.authorization_receipt),
-        'receipt_sha256': args.authorization_receipt_sha256,
-        'serving_receipt_ref': os.path.abspath(args.serving_receipt),
-        'serving_receipt_sha256': args.serving_receipt_sha256,
-        'serving_receipt_producer': f"degraded:{serving.get('reason_code', 'unknown')}",
-        'payload_bytes': len(payload_raw),
-        'payload_sha256': args.payload_sha256,
-        'credential_env': list(dict.fromkeys(args.credential_env)),
-    }
+    # 通道关闭期间，上一行是本函数的必然终点。曾有版本在其后保留一整段
+    # 不可达的 packet 校验草稿(lane finding DR-006):通道建成时校验本就要求
+    # 按新 receipt 合同整体重写,保留草稿只会无告警腐烂,已删除。
 
 
 # --- Windows security + process primitives ------------------------------------
@@ -1183,6 +1137,40 @@ def _kill_quiet(pid: int, sig: int) -> bool:
         return False
 
 
+def _posix_process_start_time(pid: int):
+    """POSIX pid-reuse identity, the analog of the Windows GetProcessTimes
+    guard (lane finding DR-007): Linux reads /proc/<pid>/stat field 22
+    (starttime, jiffies); macOS/BSD fall back to `ps -o lstart=`. None means
+    unproven (unreadable), which must fail closed exactly like the Windows
+    path -- an unproven live pid is possibly recycled."""
+    try:
+        with open(f"/proc/{pid}/stat", "rb") as f:
+            data = f.read(4096)
+        # comm may contain spaces/parens; fields resume after the last ')'.
+        tail = data[data.rindex(b")") + 2:].split()
+        return int(tail[19])
+    except (OSError, ValueError, IndexError):
+        pass
+    try:
+        out = subprocess.run(
+            ["ps", "-o", "lstart=", "-p", str(pid)],
+            capture_output=True, text=True, check=False, timeout=5,
+        ).stdout.strip()
+        return out or None
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
+def _posix_identity_matches(pid: int, recorded) -> bool:
+    # Fail closed on a MISSING identity too, mirroring
+    # _win_process_identity_matches: pre-change job dirs and probe failures
+    # carry no recorded identity, and a live pid there is unproven -- possibly
+    # recycled. Signaling it let cmd_reap TERMinate an unrelated process.
+    if not recorded:
+        return False
+    return _posix_process_start_time(pid) == recorded
+
+
 def _killpg_quiet(pgid: int, sig: int) -> bool:
     try:
         os.killpg(pgid, sig)
@@ -1262,8 +1250,11 @@ def kill_tree(root_pid: int, grace: float, job_name=None,
 
     `job_name` is Windows-only (the worker's job object, the pgid analog) and
     is ignored on POSIX, where the pgid is derived from the pid itself.
-    `expected_identity` is Windows-only (GetProcessTimes identity recorded at
-    start) and is ignored on POSIX."""
+    `expected_identity` is the pid-reuse guard recorded at start: GetProcessTimes
+    identity on Windows, /proc starttime (or ps lstart) on POSIX. A live root_pid
+    whose identity is missing (unproven) or mismatched (recycled) is never
+    signaled directly on either platform (lane finding DR-007); cleanup falls
+    back to a pre-reuse descendant sweep."""
     if IS_WINDOWS:
         return _win_kill_tree(root_pid, grace, job_name, expected_identity)
     # Do NOT early-return just because the leader pid is dead: killpg targets
@@ -1274,10 +1265,39 @@ def kill_tree(root_pid: int, grace: float, job_name=None,
     # that as alive would misclassify the reap as timeout instead of
     # died-without-result (and make the dead-leader sweep test timing-dependent).
     leader_alive = _pid_running(root_pid)
+    # pid-reuse guard, symmetric with _win_kill_tree: a LIVE leader whose recorded
+    # start-time identity is unproven or mismatched must not receive killpg
+    # TERM/KILL -- the recycled process (and its innocent group) would take the
+    # signal. A dead leader cannot be recycled into this branch's killpg target
+    # in practice (the pgid only survives while original group members live), so
+    # the dead-leader sweep keeps its historical behavior.
+    leader_unproven = leader_alive and not _posix_identity_matches(
+        root_pid, expected_identity)
     # Snapshot the descendant set BEFORE any KILL: once the group leader is
     # reaped its children reparent to init and drop out of the tree, so a set
     # enumerated after the kill would miss them and leak orphans.
     survivors = _descendants_deepest_first(root_pid)
+    if leader_unproven:
+        # Mirror of the Windows reuse cutoff: only descendants that predate the
+        # current occupant of root_pid are original-tree work. A start time we
+        # cannot read counts as predating (kill), matching _win_kill_tree.
+        cutoff = _posix_process_start_time(root_pid)
+        if cutoff is not None:
+            survivors = [
+                pid for pid in survivors
+                if _posix_process_start_time(pid) is None
+                or _posix_process_start_time(pid) < cutoff
+            ]
+        else:
+            survivors = []
+        for pid in survivors:
+            _kill_quiet(pid, signal.SIGTERM)
+        deadline = time.monotonic() + grace
+        while time.monotonic() < deadline:
+            time.sleep(0.1)
+        for pid in survivors:
+            _kill_quiet(pid, signal.SIGKILL)
+        return leader_alive
     _signal_group_or_tree(root_pid, signal.SIGTERM)
     deadline = time.monotonic() + grace
     while time.monotonic() < deadline:
@@ -1500,13 +1520,20 @@ def supervise(job_dir: str, argv, result_path, conf: dict, ack_fd: int) -> None:
             "supervisor_pid": os.getpid(),
             "worker_pid": proc.pid,
         }
+        # pid 复用身份在双平台记录(Windows: GetProcessTimes;POSIX: /proc
+        # starttime 或 ps lstart),供 cmd_reap/kill_tree 的 fail-closed 守卫
+        # 消费(lane finding DR-007)。记录失败时不写字段,消费侧按未证实处理。
         if IS_WINDOWS:
             sup_ident = _win_process_identity(os.getpid())
             worker_ident = _win_process_identity(proc.pid)
-            if sup_ident:
-                pid_doc["supervisor_identity"] = sup_ident
-            if worker_ident:
-                pid_doc["worker_identity"] = worker_ident
+        else:
+            sup_ident = _posix_process_start_time(os.getpid())
+            worker_ident = _posix_process_start_time(proc.pid)
+        if sup_ident:
+            pid_doc["supervisor_identity"] = sup_ident
+        if worker_ident:
+            pid_doc["worker_identity"] = worker_ident
+        if IS_WINDOWS:
             # Assign while still suspended, then resume. Record the job only
             # once the worker is actually a member, so a later reap never trusts
             # a name that owns nothing. If assignment fails (job creation denied,
@@ -2044,8 +2071,9 @@ def cmd_reap(args) -> int:
         and not (IS_WINDOWS and sup_pid == os.getpid())
         and _pid_alive(sup_pid)
         and (
-            not IS_WINDOWS
-            or _win_process_identity_matches(sup_pid, supervisor_identity)
+            _win_process_identity_matches(sup_pid, supervisor_identity)
+            if IS_WINDOWS
+            else _posix_identity_matches(sup_pid, supervisor_identity)
         )
     )
     if supervisor_ours:

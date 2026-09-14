@@ -49,7 +49,16 @@
     }
   },
   "records": 517,
-  "existing_semantic_decisions": 62,
+  "existing_semantic_decisions": {
+    "count": 517,
+    "source": "docs/validation/2026-08-19-ce-post-3-20-adjudication.json",
+    "producer_status": "degraded",
+    "producer_method": "deterministic carry-over plus source-bound incremental fresh review; no external provider claim",
+    "fresh_source_reviewed_count": 517,
+    "fresh_source_reviewed_batches": ["G06", "G04", "G05", "G02", "G03", "G01"],
+    "correction": "2026-09-12 修正：原值 62 是 adjudication 输入 semantic_decisions 省略标记字符串的长度（62 字符），不是判定数量；count 按当前 adjudication 记录实际计数。"
+  },
+  "updated_at": "2026-09-12",
   "batches": [
     {
       "batch": 1,
@@ -72,7 +81,8 @@
         "A021",
         "A121"
       ],
-      "status": "pending-fresh-source-review",
+      "status": "fresh-source-reviewed",
+      "results_ref": "semantic-review-results-g05-2026-09-12.json",
       "required_fields": [
         "current_owner",
         "action",
@@ -386,7 +396,8 @@
         "A412",
         "A413"
       ],
-      "status": "pending-fresh-source-review",
+      "status": "fresh-source-reviewed",
+      "results_ref": "semantic-review-results-g01-2026-09-12.json",
       "required_fields": [
         "current_owner",
         "action",
@@ -407,7 +418,8 @@
         "A024",
         "A120"
       ],
-      "status": "pending-fresh-source-review",
+      "status": "fresh-source-reviewed",
+      "results_ref": "semantic-review-results-g06-2026-09-12.json",
       "required_fields": [
         "current_owner",
         "action",
@@ -518,7 +530,8 @@
         "A118",
         "A119"
       ],
-      "status": "pending-fresh-source-review",
+      "status": "fresh-source-reviewed",
+      "results_ref": "semantic-review-results-g02-2026-09-12.json",
       "required_fields": [
         "current_owner",
         "action",
@@ -540,7 +553,8 @@
         "A418",
         "A419"
       ],
-      "status": "pending-fresh-source-review",
+      "status": "fresh-source-reviewed",
+      "results_ref": "semantic-review-results-g04-2026-09-12.json",
       "required_fields": [
         "current_owner",
         "action",
@@ -654,7 +668,8 @@
         "A516",
         "A517"
       ],
-      "status": "pending-fresh-source-review",
+      "status": "fresh-source-reviewed",
+      "results_ref": "semantic-review-results-g03-2026-09-12.json",
       "required_fields": [
         "current_owner",
         "action",

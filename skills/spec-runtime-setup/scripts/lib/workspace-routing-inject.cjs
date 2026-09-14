@@ -19,6 +19,19 @@ const {
   stripRoutingBlock,
 } = require('./workspace-routing-instruction.cjs');
 
+// entry doc(AGENTS.md/CLAUDE.md)读取上限,对齐 source-snapshot 的 4MiB 常规文件上限
+// (lane finding DR-023):超限按 failed + reason_code 记录,不整体载入做字符串 upsert。
+const MAX_ENTRY_DOC_BYTES = 4 * 1024 * 1024;
+
+function readEntryDoc(abs) {
+  const stat = fs.lstatSync(abs);
+  if (!stat.isFile()) throw Object.assign(new Error('entry doc is not a regular file'), { reason_code: 'routing-entry-not-regular-file' });
+  if (stat.size > MAX_ENTRY_DOC_BYTES) {
+    throw Object.assign(new Error('entry doc exceeds 4MiB limit'), { reason_code: 'routing-entry-size-limit' });
+  }
+  return fs.readFileSync(abs, 'utf8');
+}
+
 // Host → workspace-root entry file. Claude reads CLAUDE.md; the others read the
 // shared AGENTS.md. Both are written when hosts span the two families.
 const HOST_ENTRY_FILE = Object.freeze({
@@ -81,7 +94,7 @@ function injectRoutingInstruction({
         results.push(entry);
         continue;
       }
-      const existing = exists ? fs.readFileSync(abs, 'utf8') : '';
+      const existing = exists ? readEntryDoc(abs) : '';
       const next = upsertRoutingBlock(existing, block);
       if (next !== existing) {
         fs.writeFileSync(abs, next, 'utf8');
@@ -131,7 +144,7 @@ function stripRoutingInstruction({
       continue;
     }
     try {
-      const existing = fs.readFileSync(abs, 'utf8');
+      const existing = readEntryDoc(abs);
       const next = stripRoutingBlock(existing);
       if (next !== existing) {
         fs.writeFileSync(abs, next, 'utf8');

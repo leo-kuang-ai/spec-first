@@ -103,9 +103,8 @@ describe('host runtime projection contracts', () => {
   );
 
   test.each(ADAPTER_CASES)(
-    '$id keeps retired brainstorm visual helper assets out of projection',
-    ({ adapter, skillsRoot }) => {
-      const projectRoot = tempProject('visual-retirement');
+    '$id drops retired brainstorm visual helper references from transformed content',
+    ({ adapter }) => {
       const brainstormSource = fs.readFileSync(
         path.join(REPO_ROOT, 'skills', 'spec-brainstorm', 'SKILL.md'),
         'utf8',
@@ -117,13 +116,10 @@ describe('host runtime projection contracts', () => {
       });
 
       expect(transformed).not.toMatch(/visual-probe|visual-probes|text-vs-visual/i);
-      expect(fs.existsSync(path.join(
-        projectRoot,
-        skillsRoot,
-        'spec-brainstorm',
-        'references',
-        'visual-probes.md',
-      ))).toBe(false);
+      // plan 级排除(visual-probes.md / visual-probe-server.js 不进任何宿主的投射
+      // operations)由 tests/unit/plugin-modules.test.js 的
+      // "does not project the retired brainstorm visual helper to any supported host"
+      // 覆盖;这里旧版对空 projectRoot 的 existsSync 断言恒真,已移除。
     },
   );
 

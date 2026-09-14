@@ -260,6 +260,15 @@ function renderHumanSummary(
   }
   lines.push('', '后续步骤');
   const nextActions = [];
+  const providerNeedsInit = (toolFacts.provider_readiness || []).some((provider) => {
+    const lifecycle = provider.lifecycle || {};
+    return lifecycle.installed === true && (lifecycle.initialized !== true || lifecycle.artifact_exists !== true);
+  });
+  const repoRoot = runtimeCapabilities.repo_root || (runtimeCapabilities.target && runtimeCapabilities.target.target_root);
+  if (execution.overall_status === 'action-required' && providerNeedsInit && repoRoot) {
+    nextActions.push(`推荐：执行完整项目级 setup：MCP_SETUP_HOST=${runtimeCapabilities.host || '<host>'} spec-runtime-setup --only codegraph,graphify --repo "${repoRoot}"`);
+    nextActions.push('仅需生成 setup facts 时使用 --verify-only；仅需本地配置覆盖时使用 --project-config。');
+  }
   if (manifest.status === 'stale' || manifest.status === 'missing') {
     nextActions.push('对所选 topology 运行 spec-first init，然后重新运行 spec-runtime-setup --verify-only。');
   }
@@ -287,9 +296,13 @@ function renderHumanSummary(
 
 function deriveExecutionSummary({ toolFacts, summary, manifest }) {
   const itemActionRequired = (toolFacts.items || []).some((item) => item.result === 'action-required');
-  const providerActionRequired = (toolFacts.provider_readiness || []).some((provider) => (
-    ['degraded', 'failed', 'blocked'].includes(provider.readiness_status)
-  ));
+  const providerActionRequired = (toolFacts.provider_readiness || []).some((provider) => {
+    const hookStatus = provider.steady_state && provider.steady_state.hook_status;
+    // 外部/不可接管 hook 是可选稳态能力，不得覆盖已通过的核心 Provider readiness。
+    if (provider.provider === 'graphify'
+      && ['blocked', 'verified-external', 'skipped'].includes(hookStatus)) return false;
+    return ['degraded', 'failed', 'blocked'].includes(provider.readiness_status);
+  });
   const actionRequired = summary.baseline_ready !== true
     || summary.host_runtime_ready !== true
     || ['stale', 'missing'].includes(manifest.status)

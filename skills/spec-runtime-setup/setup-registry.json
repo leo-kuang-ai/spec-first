@@ -1654,7 +1654,8 @@
           "pin_status": "latest"
         },
         "review_required": true,
-        "install_effect": "global skill"
+        "install_effect": "global skill",
+        "pin_reassessment": "版本 pin 的重估条件(lane finding DR-002,2026-09-13):需先在联网环境确认 skills CLI 的稳定版本号并验证其支持内容 ref 钉扎(如 ast-grep/agent-skill@<ref>),再以 verified 版本替换 skills@latest 并补 archive 校验;在此之前执行面已由 unpinned-npx(review-required 集合成员)+ review_required 闸住,plan 输出 review-required 且不自动执行,不会静默安装。"
       },
       "runner_kind": "cross-platform",
       "installation": {

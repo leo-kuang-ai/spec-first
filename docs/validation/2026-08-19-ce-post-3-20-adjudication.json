@@ -3,9 +3,9 @@
   "join_key": "path+upstream+target-source",
   "producer": {
     "kind": "llm-adjudication",
-    "model": "codex-current-session",
+    "model": "zcode-current-session",
     "status": "degraded",
-    "adjudication_scope": "2026-09-08 自主收尾差量承接：固定窗口 517 条 records、upstream 与 deterministic_facts 与既有输入逐字段相同。新增 spec-work 机械修改仍需证据收尾的澄清、共享清理 ownership 修复及实验记录；不改变既有上游 owner/action/unit，不重审未变条目。"
+    "adjudication_scope": "2026-09-14 repair-loop 批次链重跑重绑:固定窗口 517 条 per-record 判定不变(0 重审、0 翻转),本会话仅将 adjudication input/output 的 target_source_snapshot 重绑至当前确定性快照(冻结数 1127→1128,direct support 222/438→223/439)。该批次的语义复核以独立 delta 工件落盘(review/deltas/2026-09-14-repair-loop.json,10 路径双 lens,inline 同上下文)。degraded 依据:单会话单模型,非独立 provider,无 runtime/field 佐证。"
   },
   "upstream": {
     "repository": "compound-engineering-plugin",
@@ -15,12 +15,58 @@
   },
   "target_source_snapshot": {
     "repository": "spec-first",
-    "head": "9b3f37177412ad51293f118fe613243ba85d7fd0",
-    "dirty": false,
-    "dirty_paths": [],
-    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "e3d03a4ff2887cfa07e6962a84c749233d49008e8704c94328390217a1349cbd",
-    "inventory_hash": "a5a97074a0f516506e90482b3f0eb95ffd588b56044aa5214827fc8118b447a6",
+    "head": "c0803ab5d2e80edde9ca67771c6d204b775bb354",
+    "dirty": true,
+    "dirty_paths": [
+      "CHANGELOG.md",
+      "docs/validation/2026-09-13-full-system-audit-plan-v2.md",
+      "scripts/check-ce-upstream-reconciliation.cjs",
+      "skills/autoresearch/scripts/orchestrate.sh",
+      "skills/autoresearch/scripts/score-regression.sh",
+      "skills/spec-code-review/evals/fixtures/repos/tenant-orders/prepare-review-fixture.sh",
+      "skills/spec-code-review/evals/fixtures/scripts/check-r2-preset-applied-fix.sh",
+      "skills/spec-code-review/scripts/peer-job-runner.py",
+      "skills/spec-doc-review/scripts/peer-job-runner.py",
+      "skills/spec-explain/references/explainer-html.md",
+      "skills/spec-explain/references/explainer-markdown.md",
+      "skills/spec-lfg/scripts/pr-watch-state.cjs",
+      "skills/spec-pov/scripts/peer-job-runner.py",
+      "skills/spec-runtime-setup/SKILL.md",
+      "skills/spec-runtime-setup/scripts/lib/host-config-repair-command.cjs",
+      "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
+      "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
+      "skills/spec-runtime-setup/scripts/lib/provider-display.cjs",
+      "skills/spec-runtime-setup/scripts/lib/registry.cjs",
+      "skills/spec-runtime-setup/scripts/lib/renderer.cjs",
+      "skills/spec-runtime-setup/scripts/lib/repair-loop.cjs",
+      "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
+      "skills/spec-runtime-setup/scripts/lib/workspace-graph-build.cjs",
+      "skills/spec-runtime-setup/scripts/lib/workspace-routing-inject.cjs",
+      "skills/spec-runtime-setup/scripts/providers/codegraph.cjs",
+      "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
+      "skills/spec-runtime-setup/scripts/setup.cjs",
+      "skills/spec-runtime-setup/setup-registry.json",
+      "skills/spec-runtime-setup/setup-registry.schema.json",
+      "tests/fixtures/mcp-setup/legacy-parity/posix/runtime-contracts.json",
+      "tests/fixtures/mcp-setup/legacy-parity/windows/runtime-contracts.json",
+      "tests/fixtures/mcp-setup/platform-differences.json",
+      "tests/integration/runtime-setup-sigint-recovery.integration.test.js",
+      "tests/unit/ce-localization-closeout-contracts.test.js",
+      "tests/unit/ce-localization-review-contracts.test.js",
+      "tests/unit/host-runtime-projection-contracts.test.js",
+      "tests/unit/mcp-setup-contracts.test.js",
+      "tests/unit/mcp-setup-entrypoint.test.js",
+      "tests/unit/mcp-setup-facts-renderer.test.js",
+      "tests/unit/mcp-setup-mode-target.test.js",
+      "tests/unit/mcp-setup-node-contracts.test.js",
+      "tests/unit/mcp-setup-registry.test.js",
+      "tests/unit/runtime-setup-provider-identity.test.js",
+      "tests/unit/runtime-setup-repair-loop.test.js",
+      "tests/unit/spec-lfg-pr-watch-state.test.js"
+    ],
+    "dirty_path_manifest_sha256": "7af829a1f316c8385378e61aa37da56e9af518b01e12bcc22b12a396cf5a7802",
+    "source_tree_hash": "30e23af473d58352a8fa72dc84b1826f65072fc27dbb80a97569744d092dc85a",
+    "inventory_hash": "01b3a8d60125adc6604b439dc3ebffdd834a5337030e5da02318c2bb23f666ff",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -54,7 +100,7 @@
       "version": "canonical-source-manifest-v1"
     }
   },
-  "input_artifact_sha256": "37aa90f58eed225705816943652e4dd2b29d4147ce43ac4c7c8f2762ce526db8",
+  "input_artifact_sha256": "e4fe9c7f5ebf408de4dc16ff7d57901618b768f643d3fcaecc4c6894061cd1a1",
   "records": [
     {
       "audit_id": "A001",
@@ -352,7 +398,7 @@
       "old_path": ".compound-engineering/config.local.example.yaml",
       "group_id": "G06",
       "package_id": null,
-      "surface": "metadata-governance",
+      "surface": "support",
       "role": "config-rename-evidence",
       "canonical_owner": "scripts/check-ce-upstream-reconciliation.cjs",
       "implementation_unit": "U8",
@@ -14793,9 +14839,9 @@
     }
   ],
   "review_context": {
-    "continuation_review": "当前 source snapshot refresh 后的 deterministic carry-over；517 条 upstream record facts 与 input 完全一致，引用可回源检查完成；本轮语义增量审查以 review delta 绑定新增/变化本地 owner 文件，未把脚本刷新误报为独立双模型裁决。",
-    "reviewed_at": "2026-09-11",
-    "reviewer": "spec-first current session",
-    "method": "deterministic carry-over plus source-bound incremental fresh review; no external provider claim"
+    "continuation_review": "承接 2026-09-11 deterministic carry-over:本轮完成全部 517 条 fresh-source 决策复核(A011 surface 随 SUPPORT_PATHS 修复同步为 support),逐批证据见 semantic-review-results-*.json;判定无翻转,决策字段原样 carry-over。",
+    "reviewed_at": "2026-09-12",
+    "reviewer": "spec-first current session (ZCode)",
+    "method": "per-batch fresh-source semantic review (six batches, evidence files on disk); deterministic facts script-prepared, decisions LLM-verified; no external provider claim"
   }
 }

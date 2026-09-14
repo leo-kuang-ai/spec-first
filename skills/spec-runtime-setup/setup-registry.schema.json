@@ -606,19 +606,147 @@
       "properties": {
         "macos": {
           "type": "object",
-          "additionalProperties": true
+          "additionalProperties": true,
+          "properties": {
+            "installation": {
+              "type": "object",
+              "additionalProperties": true,
+              "description": "平台安装面:registry 拥有的执行定义用 command(+operations 形状锁定);Provider 自有代码拥有的执行面用 command_display 散文契约(如 graphify)。二者必居其一。",
+              "anyOf": [
+                {
+                  "required": [
+                    "command"
+                  ]
+                },
+                {
+                  "required": [
+                    "command_display"
+                  ]
+                }
+              ],
+              "properties": {
+                "command": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "command_display": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "operations": {
+                  "$ref": "#/$defs/installationOperations"
+                }
+              }
+            }
+          }
         },
         "linux": {
           "type": "object",
-          "additionalProperties": true
+          "additionalProperties": true,
+          "properties": {
+            "installation": {
+              "type": "object",
+              "additionalProperties": true,
+              "description": "平台安装面:registry 拥有的执行定义用 command(+operations 形状锁定);Provider 自有代码拥有的执行面用 command_display 散文契约(如 graphify)。二者必居其一。",
+              "anyOf": [
+                {
+                  "required": [
+                    "command"
+                  ]
+                },
+                {
+                  "required": [
+                    "command_display"
+                  ]
+                }
+              ],
+              "properties": {
+                "command": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "command_display": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "operations": {
+                  "$ref": "#/$defs/installationOperations"
+                }
+              }
+            }
+          }
         },
         "wsl": {
           "type": "object",
-          "additionalProperties": true
+          "additionalProperties": true,
+          "properties": {
+            "installation": {
+              "type": "object",
+              "additionalProperties": true,
+              "description": "平台安装面:registry 拥有的执行定义用 command(+operations 形状锁定);Provider 自有代码拥有的执行面用 command_display 散文契约(如 graphify)。二者必居其一。",
+              "anyOf": [
+                {
+                  "required": [
+                    "command"
+                  ]
+                },
+                {
+                  "required": [
+                    "command_display"
+                  ]
+                }
+              ],
+              "properties": {
+                "command": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "command_display": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "operations": {
+                  "$ref": "#/$defs/installationOperations"
+                }
+              }
+            }
+          }
         },
         "windows": {
           "type": "object",
-          "additionalProperties": true
+          "additionalProperties": true,
+          "properties": {
+            "installation": {
+              "type": "object",
+              "additionalProperties": true,
+              "description": "平台安装面:registry 拥有的执行定义用 command(+operations 形状锁定);Provider 自有代码拥有的执行面用 command_display 散文契约(如 graphify)。二者必居其一。",
+              "anyOf": [
+                {
+                  "required": [
+                    "command"
+                  ]
+                },
+                {
+                  "required": [
+                    "command_display"
+                  ]
+                }
+              ],
+              "properties": {
+                "command": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "command_display": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "operations": {
+                  "$ref": "#/$defs/installationOperations"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -720,7 +848,7 @@
               "type": "boolean"
             },
             "installation": {
-              "type": "object"
+              "$ref": "#/$defs/installationSpec"
             }
           }
         }
@@ -747,7 +875,7 @@
               "type": "boolean"
             },
             "installation": {
-              "type": "object"
+              "$ref": "#/$defs/installationSpec"
             }
           }
         }
@@ -767,7 +895,7 @@
           ],
           "properties": {
             "installation": {
-              "type": "object"
+              "$ref": "#/$defs/installationSpec"
             }
           }
         }
@@ -805,6 +933,70 @@
           "items": {
             "type": "string",
             "minLength": 1
+          }
+        }
+      }
+    },
+    "installationOperations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/installationOperation"
+      }
+    },
+    "installationSpec": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "顶层 installation 为声明性元数据;实际执行面在 platform_overrides.<platform>.installation。至少声明 kind(tools/providers)或 strategy(helpers)之一(lane finding DR-021:schema 不再对安装元数据面失明)。",
+      "anyOf": [
+        {
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "required": [
+            "strategy"
+          ]
+        }
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "strategy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "next_action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dependency_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verify_command": {
+          "$ref": "#/$defs/installationOperation"
+        }
+      }
+    },
+    "installationOperation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "command",
+        "args"
+      ],
+      "properties": {
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "args": {
+          "type": "array",
+          "items": {
+            "type": "string"
           }
         }
       }

@@ -1,6 +1,6 @@
 # Explainer Markdown Rendering
 
-How an explainer renders as markdown — the fallback format when intake resolved `output:md`. Load at compose time (Phase 4), not earlier. Content rules match the HTML reference; only the presentation medium differs.
+How an explainer renders as markdown — the fallback format when intake resolved `output:md`. Load at compose time (Phase 3), not earlier. Content rules match the HTML reference; only the presentation medium differs.
 
 ## Hard invariants
 

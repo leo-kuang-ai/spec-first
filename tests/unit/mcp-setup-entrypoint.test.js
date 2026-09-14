@@ -253,8 +253,9 @@ function visibleHostRunner(visibleHost) {
 }
 
 describe('spec-runtime-setup unified Node entrypoint', () => {
+  // bare 自 2026-09-13 起为基线收敛 mutation(需显式宿主 authority),不再属于只读面;
+  // 其无 authority 时 fail-closed 的行为由 mode-target/entrypoint 阻断用例覆盖。
   test.each([
-    [[], 'bare'],
     [['--check'], 'check'],
     [['--plan', '--only', 'graphify'], 'plan'],
   ])('%j is read-only', (argv, expectedMode) => {
@@ -470,8 +471,9 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
   test('default diagnostic output exposes actionable tools, skills, project, setup, providers, and public next actions', () => {
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('human-diagnostic');
+    // 诊断输出来自 --check(bare 已改为基线收敛 mutation,不再是诊断面)。
     const result = runSetup({
-      argv: [],
+      argv: ['--check'],
       cwd: target,
       skillRoot,
       runner: visibleHostRunner('codex'),
@@ -591,7 +593,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
   test('uses a uniquely visible host CLI as advisory evidence for bare diagnostics', () => {
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('advisory-cli');
-    const result = runSetup({ argv: [], cwd: target, skillRoot, runner: visibleHostRunner('claude'), env: {} });
+    const result = runSetup({ argv: ['--check'], cwd: target, skillRoot, runner: visibleHostRunner('claude'), env: {} });
     expect(result).toMatchObject({ exit_code: 0, payload: { host: { host: 'claude', authority: 'advisory' } } });
   });
 
@@ -2111,7 +2113,9 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       const graphifyProvider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
       const verifySpy = jest.spyOn(graphifyProvider, 'verify');
       try {
-        for (const argv of [[], ['--check'], ['--only', 'gh'], ['--verify-only', '--only', 'codegraph']]) {
+        // bare 已是全量收敛 mutation(verify 上下文 installationOnly=false),其图行为
+        // 需在成功收敛环境单独断言;本测试守卫的是只读/installation-only 面不动图。
+        for (const argv of [['--check'], ['--only', 'gh'], ['--verify-only', '--only', 'codegraph']]) {
           calls.length = 0;
           verifySpy.mockClear();
           runSetup({ ...context, argv });

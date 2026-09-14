@@ -1,0 +1,30 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "ce-localization-lane-refresh-2026-09-13-fix-batch",
+  "producer": "zcode-current-session (orchestrator; fix-batch author review)",
+  "reviewed_at": "2026-09-13T17:30:00.000Z",
+  "source_binding": {
+    "head": "c0803ab5d2e80edde9ca67771c6d204b775bb354",
+    "dirty_path_manifest_sha256": "8247c08a2a14fcbe6d81a653fc4b03e593b0966d92ee526f53dc0a6f312e9875",
+    "source_tree_hash": "b5832f51e47e6c53b56cb105be37afee7b672cb24488946a4bbecb18fc1e1376",
+    "inventory_hash": "b1cea4d873427a9fb611f23e66b301e48daea8c30e0cd1465980bd284d644b20",
+    "inventory_artifact_sha256": "5fe338b1313a8f6c2ec9f3f0dc2bd3630a9d207f030523282cd624c2da7b97a7",
+    "review_input_hash": "ccc011e45d3e9f7598f43f2bed774f9d58760c4d559fea1949a2f539a2eeba48"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "unverified",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "reviewed_paths": [],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "双 lens 判定来自修复批次的 orchestrator(作者即复核者,inline 同上下文),非独立 reviewer;每条路径的验证证据为当轮聚焦测试套件(结果记于各 read_method 注释)。",
+    "本 delta 覆盖 2026-09-13 修复批次(28 项 lane findings 的修复)与用户确认保留的 bare 基线收敛特性适配;修复对应关系见 docs/validation/ce-localization/review/lane-refresh-findings-2026-09-12.json 的 remediation 记录。",
+    "无 runtime/field 证据;peer-job-runner 三镜像按一份实现+字节一致验证。"
+  ],
+  "claim_ceiling": "author-verified fix batch; focused test evidence only; no runtime or field outcome claims"
+}

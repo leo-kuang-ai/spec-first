@@ -20,7 +20,9 @@ describe('CE localization deterministic review producer', () => {
     // 692 = 676 + spec-ideate/using-spec-first eval 资产与断言脚本进入 inventory 源集（2026-08-31 批次）
     // 1122 = 1029 + CE-129 提交同步补审批次（2026-09-10，peer-runner 扩展/优化脚本/模板与新增校验资产，+93 包路径）
     // Runtime Setup 新增 npm warmup、source snapshot、CodeGraph launcher 与 artifact evidence 四个 owner。
-    expect(inventory.package_path_count).toBe(1126);
+    // 1127 = 1126 + 2026-09-13 修复批次抽取 lib/host-config-repair-command.cjs 单一实现（DR-015 去重）。
+    // 1128 = 1127 + 2026-09-13 repair-loop 批次新增有界修复循环单一实现（动作由 registry 提供，不合成命令）。
+    expect(inventory.package_path_count).toBe(1128);
     expect(inventory.files).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',
@@ -66,8 +68,15 @@ describe('CE localization deterministic review producer', () => {
     // 2026-09-08: 193 -> 194 / 407 -> 408 — the deterministic governance JSON
     // test fixture in this file grew an explicit dual-host relation row for the
     // canonical standalone iteration skill during its lane-refresh batch.
-    expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(221);
-    expect(coverage.coverage_summary.direct_support_relation_count).toBe(437);
+    // 2026-09-12: 221 -> 222 / 437 -> 438 — tests/integration/runtime-setup-sigint-recovery
+    // .integration.test.js (bb4f0219, top-level SIGINT reentry probe) joined the
+    // window with a focused-test-explicit-source-ref relation to spec-runtime-setup;
+    // reconciled during the G01-G06 517-record semantic-review closeout refresh.
+    // 2026-09-14: 222 -> 223 / 438 -> 439 — the repair-loop focused unit test joined
+    // the window with one focused-test-explicit-source-ref relation; reconciled
+    // during the repair-loop batch chain refresh.
+    expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(223);
+    expect(coverage.coverage_summary.direct_support_relation_count).toBe(439);
     expect(coverage.direct_support).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',

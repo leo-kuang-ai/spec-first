@@ -31,6 +31,15 @@ test('installation-only 显式选择安装 scope，preview 和 verify 保持各�
   expect(buildActionPlan({ ...defaults, argv: ['--installation-only', '--only', 'graphify', '--refresh'] }).blocked).toBe(true);
 });
 
+test('裸调用默认收敛 baseline，而不是只读诊断', () => {
+  const { buildActionPlan } = require(modePolicyModule);
+  const plan = buildActionPlan({ knownIds: ['codegraph', 'graphify'], defaultIds: ['codegraph', 'graphify'], argv: [] });
+  expect(plan).toMatchObject({ mode: 'bare', mutation: true, selected_ids: ['codegraph', 'graphify'] });
+  expect(plan.actions.map((action) => action.id)).toEqual([
+    'install-tools', 'write-host-config', 'provider-mutation', 'write-setup-facts',
+  ]);
+});
+
 describe('spec-runtime-setup GNU argument parsing', () => {
   test('normalizes documented flags and comma-separated selections', () => {
     const { parseArgs } = require(argsModule);
@@ -148,13 +157,16 @@ describe('spec-runtime-setup action policy', () => {
     });
   });
 
-  test('selects required providers by default for plan and verify while keeping bare Node mode diagnostic', () => {
+  test('selects required providers by default for bare/plan/verify (bare converges the baseline)', () => {
     const { buildActionPlan } = require(modePolicyModule);
     const input = { knownIds: ['codegraph', 'graphify'], defaultIds: ['codegraph', 'graphify'] };
 
+    // 2026-09-13 起裸调用收敛 registry 声明的基线:默认选择 required providers,
+    // 按 only 模式动作集执行(既有安全门仍拒绝不安全路径与更高优先级冲突)。
     expect(buildActionPlan({ ...input, argv: [] })).toMatchObject({
       mode: 'bare',
-      selected_ids: [],
+      mutation: true,
+      selected_ids: ['codegraph', 'graphify'],
     });
     expect(buildActionPlan({ ...input, argv: ['--plan'] })).toMatchObject({
       mode: 'plan',

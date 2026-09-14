@@ -17,7 +17,8 @@
 #   orchestrate.sh validate-state <orchestrator-state.json>
 #   orchestrate.sh screen-state-predicate <orchestrator-state.json>
 #
-# Exit codes: 0 = allow/ok, 2 = refuse/invalid/usage, 1 = unexpected error.
+# Exit codes: 0 = allow/ok, 2 = refuse/invalid/usage, 1 = unexpected error,
+#             127 = no runnable Python 3 interpreter (tried python3, python, py -3).
 set -euo pipefail
 
 if [[ $# -lt 1 ]]; then
@@ -27,9 +28,31 @@ fi
 
 cmd="$1"; shift
 
+# 与 spec-riffrec run-python.sh 同型的解释器探测:名字在 PATH 上不代表可运行,
+# Windows 下 python3 常是 Microsoft Store stub。
+resolve_python() {
+  local candidate
+  for candidate in python3 python; do
+    if command -v "$candidate" >/dev/null 2>&1 && "$candidate" -c 'import sys; raise SystemExit(0 if sys.version_info.major == 3 else 1)' >/dev/null 2>&1; then
+      PYTHON_CMD=("$candidate")
+      return 0
+    fi
+  done
+  if command -v py >/dev/null 2>&1 && py -3 -c 'import sys; raise SystemExit(0 if sys.version_info.major == 3 else 1)' >/dev/null 2>&1; then
+    PYTHON_CMD=(py -3)
+    return 0
+  fi
+  return 1
+}
+
+if ! resolve_python; then
+  echo 'orchestrate.sh: no runnable Python 3 interpreter found (tried python3, python, py -3)' >&2
+  exit 127
+fi
+
 case "$cmd" in
   classify|next-hop|units|plateau|screen-cmd|verdict|validate-state|screen-state-predicate)
-    exec python3 - "$cmd" "$@" <<'PYEOF'
+    exec "${PYTHON_CMD[@]}" - "$cmd" "$@" <<'PYEOF'
 import json
 import re
 import sys

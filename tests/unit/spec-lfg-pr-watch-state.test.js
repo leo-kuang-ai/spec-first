@@ -311,6 +311,40 @@ describe('spec-lfg PR watch state helper', () => {
     expect(fs.existsSync(stateDir)).toBe(false);
   });
 
+  test('fails closed on malformed review item identity instead of silently narrowing the open set', () => {
+    const initial = run(['read', '--state-dir', stateDir]);
+    const attempt = (reviewItems) => spawnSync(process.execPath, [
+      helper,
+      'snapshot',
+      '--input', writeInput(root, 'bad-review-item.json', snapshot({ review_items: reviewItems })),
+      '--state-dir', stateDir,
+      '--expected-generation', String(initial.generation),
+      '--expected-sha256', initial.snapshot_sha256,
+    ], { encoding: 'utf8' });
+
+    // 缺失/空白/超长 id 与缺失/非法 kind 一律拒绝快照,而非过滤或改写为 comment
+    // (旧版会把 open review 无声移出观测集,lane finding DR-003)。
+    for (const items of [
+      [{ id: '', kind: 'comment' }],
+      [{ id: 'has space', kind: 'comment' }],
+      [{ id: 'x'.repeat(201), kind: 'comment' }],
+      [{ kind: 'comment' }],
+      [{ id: 'T1' }],
+      [{ id: 'T1', kind: 'note' }],
+    ]) {
+      const rejected = attempt(items);
+      expect(rejected.status).toBe(1);
+      expect(JSON.parse(rejected.stdout).reason_code).toBe('snapshot-invalid');
+    }
+    expect(fs.existsSync(stateDir)).toBe(false);
+
+    // GraphQL base64 节点 id(含 '+' 与 '=' padding)是合法不透明身份,必须进入观测。
+    const current = append(snapshot({ review_items: [{
+      id: 'DISCUSSION+node-id==', kind: 'thread', updated_at: 'v1', url: snapshot().pr_url,
+    }] }), run(['read', '--state-dir', stateDir]));
+    expect(current.events.review).toEqual(['DISCUSSION+node-id==']);
+  });
+
   test('fails closed on credential-bearing or non-private persisted state', () => {
     let current = run(['read', '--state-dir', stateDir]);
     current = append(snapshot(), current);

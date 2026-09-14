@@ -139,16 +139,30 @@ function normalize(input) {
     completed_at: identityText(check.completed_at),
     details_url: normalizePrUrl(check.details_url),
   })).sort((a, b) => a.key.localeCompare(b.key));
+  // review item 的 id 是不透明源身份(REST 数字或 GraphQL base64 节点 id,后者可含
+  // '+'/'='),仅用于等值/去重与回显输出,不进 shell。旧版静默过滤非法 id、把非法
+  // kind 改写为 comment,会让 open review 无声退出观测(lane finding DR-003);现在
+  // 对缺失/超长/含空白的 id 与缺失/非法 kind 一律拒绝快照,与 checks 的 fail-closed
+  // 风格对齐。空/未知输入不能证明没有反馈残留,宁可拒绝也不静默收窄 open 集。
   const reviewItems = (Array.isArray(input.review_items) ? input.review_items : [])
-    .filter((item) => item && /^[A-Za-z0-9][A-Za-z0-9._-]{0,120}$/.test(String(item.id || '')))
-    .map((item) => ({
-      id: String(item.id),
-      kind: ['thread', 'comment', 'review'].includes(item.kind) ? item.kind : 'comment',
-      updated_at: typeof item.updated_at === 'string' ? item.updated_at : null,
-      last_comment_id: item.last_comment_id == null ? null : String(item.last_comment_id),
-      url: normalizePrUrl(item.url),
-      disposition: 'open',
-    }))
+    .map((item) => {
+      if (!item || typeof item !== 'object') fail('snapshot-invalid', ['review item must be an object']);
+      const id = item.id == null ? '' : String(item.id);
+      if (id.length < 1 || id.length > 200 || /\s/.test(id)) {
+        fail('snapshot-invalid', ['review item id must be 1-200 non-whitespace characters']);
+      }
+      if (!['thread', 'comment', 'review'].includes(item.kind)) {
+        fail('snapshot-invalid', ['review item kind must be thread|comment|review, got: ' + String(item.kind)]);
+      }
+      return {
+        id,
+        kind: item.kind,
+        updated_at: typeof item.updated_at === 'string' ? item.updated_at : null,
+        last_comment_id: item.last_comment_id == null ? null : String(item.last_comment_id),
+        url: normalizePrUrl(item.url),
+        disposition: 'open',
+      };
+    })
     .sort((a, b) => a.id.localeCompare(b.id));
   if (new Set(checks.map(check => check.key)).size !== checks.length
     || new Set(reviewItems.map(sourceKey)).size !== reviewItems.length) {

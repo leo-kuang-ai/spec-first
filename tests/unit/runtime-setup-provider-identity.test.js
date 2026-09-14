@@ -136,7 +136,17 @@ describe('Graphify 当前安装身份的发布与消费', () => {
     expect(result.status).toBe('unknown');
   });
 
-  test('隔离真实 Python 导入不向 HOME 或 package 目录写入字节码', () => {
+  // python3 存在性是环境假设而非被测契约:缺失(如精简 Windows CI)时跳过而非失败。
+  const python3Available = (() => {
+    try {
+      return require('node:child_process')
+        .spawnSync('python3', ['-I', '-c', 'import sys'], { timeout: 5000 }).status === 0;
+    } catch {
+      return false;
+    }
+  })();
+
+  (python3Available ? test : test.skip)('隔离真实 Python 导入不向 HOME 或 package 目录写入字节码', () => {
     const { spawnSync } = require('node:child_process');
     const pythonProbe = spawnSync('python3', ['-I', '-c', 'import sys; print(sys.executable)'], { encoding: 'utf8' });
     expect(pythonProbe.status).toBe(0);

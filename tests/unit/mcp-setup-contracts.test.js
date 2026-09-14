@@ -91,7 +91,7 @@ describe('spec-runtime-setup runner contracts', () => {
       'utf8',
     );
 
-    expect(skill).toContain('裸调用仅执行只读诊断');
+    expect(skill).toContain('裸调用收敛 registry 声明的基线');
     expect(skill).not.toContain('自动携带 `--repair-host-config`');
     expect(skill).toContain('Subset / Repair Flow');
     expect(skill).toContain('Host conflict 仍需独立 `--repair-host-config` 授权');
