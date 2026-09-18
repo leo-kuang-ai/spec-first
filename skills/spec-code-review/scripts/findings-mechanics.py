@@ -23,7 +23,7 @@ REQUIRED_FINDING = {
     "title": str,
     "severity": str,
     "file": str,
-    "line": (int, str),
+    "line": int,
     "confidence": int,
     "autofix_class": str,
     "owner": str,
@@ -52,9 +52,7 @@ def valid_finding(value: Any) -> bool:
     if "first_evidence" in value and not nonempty_string(value["first_evidence"]):
         return False
     line = value["line"]
-    line_valid = (type(line) is int and line > 0) or (
-        isinstance(line, str) and bool(line.strip())
-    )
+    line_valid = type(line) is int and line > 0
     return (
         value["severity"] in SEVERITIES
         and value["confidence"] in CONFIDENCES
@@ -250,4 +248,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

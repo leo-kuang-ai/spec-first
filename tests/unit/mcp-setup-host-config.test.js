@@ -1571,3 +1571,28 @@ describe('host config resolution, inspection, and transaction', () => {
     expect(fs.readdirSync(outside)).toEqual([]);
   });
 });
+
+
+test.each([[], ['--repo', '.']])('默认策略经过真实配置写入口仍保留冲突配置 %j', (...argv) => {
+  const { buildActionPlan } = require('../../skills/spec-runtime-setup/scripts/lib/mode-policy.cjs');
+  const { configureOrInspectHost } = require('../../skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs');
+  const repoRoot = tempDir('bare-policy-repo');
+  const homeDir = tempDir('bare-policy-home');
+  try {
+    const configPath = path.join(homeDir, '.codex', 'config.toml');
+    fs.mkdirSync(path.dirname(configPath), { recursive: true });
+    const before = '[mcp_servers.context7]\ncommand = "user-owned"\nargs = []\n';
+    fs.writeFileSync(configPath, before);
+    const env = { MCP_SETUP_HOST: 'codex' };
+    const result = configureOrInspectHost({
+      actionPlan: buildActionPlan({ argv }), host: 'codex', homeDir, env,
+      authority: resolveHostAuthority({ env, mutationRequested: true }),
+      effectiveRegistry: { tools: [codexEntry()] },
+    }, repoRoot, { applyMutation: true, selectedIds: [], providerResults: [], installResults: new Map() });
+    expect(result.get('context7')).toMatchObject({ reason_code: 'host-config-conflict', repair_authorized: false });
+    expect(fs.readFileSync(configPath, 'utf8')).toBe(before);
+  } finally {
+    fs.rmSync(repoRoot, { recursive: true, force: true });
+    fs.rmSync(homeDir, { recursive: true, force: true });
+  }
+});

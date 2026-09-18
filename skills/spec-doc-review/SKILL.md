@@ -1,7 +1,7 @@
 ---
 name: spec-doc-review
 description: Review requirements, plans, task packs, or specs through reviewer personas. Use to assess existing planning and execution documents; standard roster uses at most 3 reviewers, while roster:full selects every qualifying lens.
-argument-hint: "[mode:headless] [mutation:report-only|mutation:apply-fixes] [output:json] [roster:lite|standard|full] [path/to/document.md]"
+argument-hint: "[mode:non-interactive] [mutation:report-only|mutation:apply-fixes] [output:json] [roster:lite|standard|full] [path/to/document.md]"
 ---
 
 # Document Review
@@ -63,11 +63,11 @@ Read [Task Pack Review Lens](references/task-pack-review-lens.md) only when Phas
 
 ### Subagent Template
 
-@./references/subagent-template.md
+准备已授权的 reviewer dispatch 时读取 [Subagent Template](references/subagent-template.md)；inline 审查不因模板存在而分派。
 
 ### Findings Schema
 
-@./references/findings-schema.json
+构造或校验 findings envelope 前读取 [Findings Schema](references/findings-schema.json)。
 
 Selected reviewer prompt assets live under `references/personas/`. Read only the prompt files selected for the current review.
 

@@ -6,7 +6,7 @@ argument-hint: "[bare baseline converge] [--installation-only] [--check|--verify
 
 # Runtime Setup
 
-`spec-runtime-setup` is the canonical runnable entrypoint for the Runtime Setup workflow across supported hosts (Claude/Qoder command spelling `runtime-setup`). Host-specific setup spellings are not separate products. Runtime Setup prepares deterministic host/runtime facts for spec-first workflows. It installs or verifies required MCP servers and baseline helper tooling, diagnoses manual helpers such as `agent-browser`, writes setup-owned project facts, and reports concrete next actions. It does not provide code-understanding authority; downstream workflows use bounded direct source reads, `rg`, ast-grep, git diff, tests/logs, and user-provided evidence.
+`spec-runtime-setup` is the canonical runnable entrypoint for the Runtime Setup workflow across supported hosts (Claude/Qoder/OpenCode 的 command 名为 `runtime-setup`，投射为 `spec-runtime-setup.md`，公开调用为 `/spec-runtime-setup`). Host-specific setup spellings are not separate products. Runtime Setup prepares deterministic host/runtime facts for spec-first workflows. It installs or verifies required MCP servers and baseline helper tooling, diagnoses manual helpers such as `agent-browser`, writes setup-owned project facts, and reports concrete next actions. It does not provide code-understanding authority; downstream workflows use bounded direct source reads, `rg`, ast-grep, git diff, tests/logs, and user-provided evidence.
 
 ## Contract Summary
 
@@ -111,7 +111,7 @@ Runtime Setup 按当前 mode 的副作用边界执行；裸调用是项目 basel
 
 1. **Explore** host, target repo, generated runtime manifest, existing setup facts, `.spec-first/config.local.yaml`, verification profile visibility, provider artifacts, and project instructions.
 2. **Present & Decide**:
-   - **Bare invocation**：读取并展示当前诊断和 next action，然后返回。不得自行追加 apply、repair、project-config 或 facts refresh。
+   - **Bare invocation**：诊断后按 registry baseline 安装/验证缺少的 required 能力并刷新 setup-owned facts；范围参数只收窄目标，不把 bare 降为只读。保持显式 host authority、路径与冲突保护，不自动追加 `--repair-host-config` 或 `--project-config`。仅需诊断时使用 `--check`。
    - **Explicit modes**: `--check` and `--plan` are read-only. `--verify-only` is a facts-only mutation mode: it may write setup-owned facts, scenario fingerprints, and ledgers only, without requesting confirmation for those bounded writes.
    - **Subset repairs** (`--only ...`, `--refresh`): Execute the narrowed scope immediately after exploration; subset authorization is implicit in the flag itself.
 3. **Decide** only where the runtime setup workflow has authority: install/verify helper tools, configure host MCP/runtime wiring, refresh setup-owned facts, or choose a documented degraded path. Team workflow conventions and semantic project decisions remain LLM/owner judgment in downstream workflows.
@@ -132,7 +132,7 @@ If setup later reports project convention facts, they must be deterministic exis
 
 ## Host Authority And Write Safety
 
-当前唯一公开入口是 `spec-runtime-setup`（Claude/Qoder 命令拼写 `runtime-setup`）；不提供 `spec-mcp-setup` / `mcp-setup` 兼容别名。调用它的 host runtime surface 是权威 host evidence。Generated host-specific runtime surface 必须在调用支持 mutation 的 Node mode 前，通过 per-call environment 固定 `MCP_SETUP_HOST=<host>`。缺少显式 canonical `MCP_SETUP_HOST=claude|codex|cursor|kiro|opencode|qoder|zcode|pi` 时，`setup.cjs` 必须 fail closed；不得根据 `PATH`、generated runtime 目录、旧 `.spec-first/config/*` facts 或其他平台的 host config 文件推断 mutation target。只读诊断可以展示 advisory host candidate，但这些 candidate 不具备 write authority。
+当前唯一公开入口是 `spec-runtime-setup`（Claude/Qoder/OpenCode 的 command 名为 `runtime-setup`，投射为 `spec-runtime-setup.md`，公开调用为 `/spec-runtime-setup`）；不提供 `spec-mcp-setup` / `mcp-setup` 兼容别名。调用它的 host runtime surface 是权威 host evidence。Generated host-specific runtime surface 必须在调用支持 mutation 的 Node mode 前，通过 per-call environment 固定 `MCP_SETUP_HOST=<host>`。缺少显式 canonical `MCP_SETUP_HOST=claude|codex|cursor|kiro|opencode|qoder|zcode|pi` 时，`setup.cjs` 必须 fail closed；不得根据 `PATH`、generated runtime 目录、旧 `.spec-first/config/*` facts 或其他平台的 host config 文件推断 mutation target。只读诊断可以展示 advisory host candidate，但这些 candidate 不具备 write authority。
 
 在写入任何 host config 或刷新 setup-owned facts 前，workflow 必须让 `setup.cjs` 从显式 entrypoint host pin 解析 host authority 与 effective registry target。旧 setup facts 只能作为 drift comparison evidence：若其与当前 entrypoint host 不一致，应报告 host-marker drift，并为当前 host 刷新 setup-owned facts，不得把旧 host 当作当前 host。绝不能仅依据 prose 手动选择 `.kiro/settings/mcp.json`、`.qoder/settings.local.json`、`.cursor/mcp.json`、Codex TOML 或 Claude managed/user config。
 

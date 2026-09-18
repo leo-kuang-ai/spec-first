@@ -6,7 +6,7 @@ Runbook contract for regenerating the CE localization source-bound chain after c
 
 Any change to files under **canonical source roots** dirties the deterministic snapshot and stales the chain: `skills/**`, `tests/**`, `scripts/**`, `src/**`, `templates/**`, root `CLAUDE.md`/`AGENTS.md`/`README*`/`CHANGELOG.md`/`package.json`, `docs/**` (canonical but see exclusions below). The closeout topology test (`tests/unit/ce-localization-closeout-contracts.test.js`) goes red until the chain is re-run.
 
-**Not** sensitive: everything under `docs/validation/**` (explicitly excluded by `scope_contract.excluded_run_outputs`, including the chain's own artifacts) — writing adjudication/delta/closeout files never re-stales the chain.
+**排除范围：** 以 `scripts/check-ce-upstream-reconciliation.cjs` 的 `isRunOutput()` 和快照内的 `scope_contract.excluded_run_outputs` 为准：仅列出的 V2 工件、`docs/validation/2026-08-19-ce-post-3-20-ledger-patches/**` 与 `docs/validation/ce-localization/**` 被排除。其他 `docs/validation/**`（包括 FSA2 报告和评测清单）仍进入快照，须在最后一次重建链前写完；不能笼统认定整个 validation 目录不会使快照过期。
 
 ## Hard ordering rule
 

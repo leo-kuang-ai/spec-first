@@ -1,11 +1,8 @@
 #!/bin/bash
 # autoresearch orchestrator — deterministic seam.
 #
-# Ownership: goal classification, next-hop routing, units reporting, plateau
-# detection, command safety screening (incl. anchored DB-URL allowlist),
-# orchestrator-state validation, and the final run verdict. Routing semantics
-# are documented in references/orchestrator-routing.md; this script is the
-# authoritative implementation, the reference is documentation.
+# 职责：提取目标关键词候选、按状态确定 next-hop、计算指标及校验安全出口。
+# 目标语义分类由 LLM 负责；classify 输出不是执行路由或副作用授权。
 #
 # Usage:
 #   orchestrate.sh classify "<goal>"
@@ -61,7 +58,7 @@ cmd, args = sys.argv[1], sys.argv[2:]
 
 # --- classify -------------------------------------------------------------
 
-# (archetype, mode, keywords); rank = specificity precedence (lower first).
+# 候选词表只提供匹配事实，顺序不表示语义优先级。
 ARCHETYPES = [
     ("ship-ready", "loop", ["ship", "release", "deploy", "publish", "production-ready", "merge"]),
     ("fix-broken", "loop", ["fix", "broken", "failing", "error", "crash", "bug", "can't run", "tests fail"]),
@@ -76,18 +73,14 @@ ARCHETYPES = [
 
 def cmd_classify(goal):
     text = goal.lower()
-    hits = [(rank, name, mode) for rank, (name, mode, kws) in enumerate(ARCHETYPES)
-            if any(kw in text for kw in kws)]
-    if not hits:
-        print("explore\tloop")
-        print("candidates: (none matched; defaulting to explore — confirm archetype with the user)")
-        return 0
-    hits.sort()
-    primary = hits[0]
-    print(f"{primary[1]}\t{primary[2]}")
-    if len(hits) > 1:
-        names = [h[1] for h in hits[:2]]
-        print(f"candidates: {', '.join(names)}")
+    candidates = []
+    for name, mode, keywords in ARCHETYPES:
+        matched = [keyword for keyword in keywords if keyword in text]
+        if matched:
+            candidates.append({"archetype": name, "mode": mode, "matched_keywords": matched})
+    print(json.dumps({"schema_version": 1, "status": "advisory",
+                      "requires_semantic_judgment": True,
+                      "candidates": candidates}, ensure_ascii=False))
     return 0
 
 # --- state helpers ---------------------------------------------------------
@@ -122,25 +115,30 @@ def is_plateau(state):
 
 # --- next-hop --------------------------------------------------------------
 
-def cmd_next_hop(state):
+def unresolved_hop(state):
     lh = state.get("last_handoff") or {}
     if int(lh.get("errors") or 0) > 0:
-        print("fix"); return 0
+        return "fix"
     if lh.get("verdict") == "UNSTABLE":
-        print("regression"); return 0
+        return "regression"
     if lh.get("untested_gaps"):
-        print("debug"); return 0
-    # Unknown-units backstop: repeated unknown invalidates progress signals.
+        return "debug"
     if consecutive_unknown(state) >= 3:
-        print("BLOCKED"); return 0
+        return "BLOCKED"
     if state.get("pending_verify"):
-        print("verify"); return 0
-    if state.get("predicate_met"):
-        print("DONE"); return 0
+        return "verify"
     hop_log = state.get("hop_log") or []
     last = hop_log[-1] if hop_log else {}
-    if last.get("outcome") in ("blocked", "failed") and not last.get("retry_route"):
-        print("BLOCKED"); return 0
+    if last.get("outcome") in ("blocked", "failed"):
+        return last.get("retry_route") or "BLOCKED"
+    return None
+
+def cmd_next_hop(state):
+    pending = unresolved_hop(state)
+    if pending:
+        print(pending); return 0
+    if state.get("predicate_met"):
+        print("DONE"); return 0
     if is_plateau(state):
         print("PLATEAU"); return 0
     pipeline = state.get("pipeline") or []
@@ -210,7 +208,7 @@ def screen_command(command):
     for match in DB_URL.finditer(command):
         allowed, detail = db_url_allowed(match.group(0))
         if not allowed:
-            return f"refuse: DB URL {match.group(0)} — {detail}"
+            return "refuse: db-url-not-allowed (requires an allowed local/service host or *_test/*_ci database)"
     return "allow"
 
 def cmd_screen_cmd(command):
@@ -230,7 +228,10 @@ def cmd_verdict(state):
     first = known[0] if known else "?"
     last = known[-1] if known else "?"
     outcome_summary = " ".join(f"{k}={v}" for k, v in sorted(outcomes.items())) or "none"
-    if state.get("stop_reason"):
+    pending = unresolved_hop(state)
+    if pending:
+        verdict = {"verify": "PENDING-VERIFY", "BLOCKED": "BLOCKED"}.get(pending, "INCOMPLETE")
+    elif state.get("stop_reason"):
         verdict = state["stop_reason"]
     elif state.get("predicate_met"):
         pipeline = state.get("pipeline") or []

@@ -190,6 +190,8 @@ The returned `changed_files`, `files_changed`, and `diff_sha256` are immutable s
 
 If the helper, snapshot write, or artifact root is unavailable, keep `source_mutation_gate: closed`, record `mutation_guard_unavailable`, and do not emit a successful/complete machine handoff. Do not replace the deterministic snapshot with remembered prose or a later `git diff`.
 
+**空 diff 提前返回（仅普通本地变更审查）。** standalone / `base:` 已成功解析并冻结范围，确定性结果为 `status=complete`、`files_changed=0`，且调用方没有要求计划/任务完成度审查时，无需选择或 dispatch reviewer。先复验冻结 snapshot 未漂移，再返回 `status=skipped`、`reason=no-changes-to-review`、空 findings/reviewers，并在 Coverage 列出被排除的 untracked 文件；`required_gate_eligible=false`，不能声明独立审查通过或 Ready to merge。任务上下文、显式 plan 或完成度审查仍走对应语义检查；解析失败、未知计数、丢失 diff 和失效快照绝不能按空变更处理。
+
 ### Stage 1b: Compute scope signals (cheap, deterministic)
 
 Derive deterministic signals from the resolved diff once, so reviewer selection (Stage 3) and the small-diff fast path (Stage 3c) do not each re-reason over the whole diff. **These signals only ever shrink the roster via Stage 3c, and that gate fails closed (Stage 3c) — so any failure here (unresolved base, count failure, an uncounted file type) must surface as `UNKNOWN`/non-zero `UNCOUNTED_FILES`, never as a silent `0` that reads as "trivial."**

@@ -1,0 +1,13 @@
+{
+  "baseline_source_snapshot": "e806f0ee3d06f9ddc761a8feb9e3b4d3dec3bdb3b0748ffc49dd3d6b8f2cd9e7",
+  "repair_overlay_snapshot": "22a66be116a3ce1854e0b0af0ad4226a817688ae5b6e533de141d86fa34f332e",
+  "files": {
+    "skills/spec-commit/SKILL.md": "f1cf7b8801e7d25f706af168a2acd54a864e1df4b893ff474305d415230de8b8",
+    "skills/autoresearch/SKILL.md": "5eb75fa36f3f61fe3eae56dc548fba125780bba174853a86f9e64cc558030c5a",
+    "skills/autoresearch/references/orchestrator-routing.md": "829530b3ee2b47d9b42e1794f43c4b2e4649d5a04d1b4e685afcce7cba3cfc91",
+    "skills/autoresearch/scripts/orchestrate.sh": "eb9efb1e6bf91a148373582aa20c6cd35c740b1b30866e918fd2db33cda6dec8",
+    "tests/unit/autoresearch-orchestrator-regression.test.js": "796b359fd63276ca1ea4cb044b27f0815e63dd0914792f77015fe0c7d7d6f8f4",
+    "tests/unit/spec-commit-scope-regression.test.js": "10f82f2dbce11fb87c6406a85a9f3fb0cfe213c2e496ed866f0a33047a5122be"
+  },
+  "scope": "baseline disposable worktree plus six repaired source/test files; delivery docs excluded"
+}

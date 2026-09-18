@@ -15,6 +15,7 @@ describe('spec-compound-refresh CE reference migration contracts', () => {
       'investigate.md',
       'classify.md',
       'concepts-vocabulary.md',
+      'vocabulary-refresh.md',
       'publication.md',
       'report.md',
       'commit.md',
@@ -47,7 +48,7 @@ describe('spec-compound-refresh CE reference migration contracts', () => {
     const modes = read('skills/spec-compound-refresh/references/modes.md');
     const investigate = read('skills/spec-compound-refresh/references/investigate.md');
     const classify = read('skills/spec-compound-refresh/references/classify.md');
-    const concepts = read('skills/spec-compound-refresh/references/concepts-vocabulary.md');
+    const concepts = read('skills/spec-compound-refresh/references/vocabulary-refresh.md');
     const report = read('skills/spec-compound-refresh/references/report.md');
     const commit = read('skills/spec-compound-refresh/references/commit.md');
     const discoverability = read('skills/spec-compound-refresh/references/discoverability.md');
@@ -100,7 +101,7 @@ describe('spec-compound-refresh CE reference migration contracts', () => {
   });
 
   test('scoped vocabulary maintenance cannot become a full sweep or hide folds', () => {
-    const concepts = read('skills/spec-compound-refresh/references/concepts-vocabulary.md');
+    const concepts = read('skills/spec-compound-refresh/references/vocabulary-refresh.md');
     const report = read('skills/spec-compound-refresh/references/report.md');
     expect(concepts).not.toContain('The full sweep is appropriate here because refresh is an audit');
     expect(concepts).toContain('private candidate');

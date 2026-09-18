@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
+const { getAdapter, getSupportedPlatforms } = require('../../src/cli/adapters');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 const cliPath = path.join(repoRoot, 'bin', 'spec-first.js');
@@ -171,7 +172,7 @@ describe('CLI smoke checks', () => {
     expect(fs.existsSync(path.join(sandbox.projectRoot, '.gitignore'))).toBe(false);
     expect(fs.existsSync(path.join(sandbox.projectRoot, 'CHANGELOG.md'))).toBe(false);
   });
-  test('packed tarball initializes a coherent six-host runtime', () => {
+  test('发布包为 registry 的全部宿主生成一致 runtime', () => {
     const sandbox = tempSandbox('spec-first-smoke-package-');
     const packRoot = path.join(sandbox.projectRoot, 'pack');
     const consumerRoot = path.join(sandbox.projectRoot, 'consumer');
@@ -224,12 +225,7 @@ describe('CLI smoke checks', () => {
     const init = runCommand(process.execPath, [
       packagedCli,
       'init',
-      '--claude',
-      '--codex',
-      '--cursor',
-      '--kiro',
-      '--qoder',
-      '--opencode',
+      ...getSupportedPlatforms().map((host) => `--${host}`),
       '-y',
       '-u',
       'package-smoke',
@@ -243,14 +239,8 @@ describe('CLI smoke checks', () => {
     });
     expect(init.status).toBe(0);
 
-    const runtimeRoots = {
-      claude: '.claude/spec-first/workflows',
-      codex: '.agents/skills',
-      cursor: '.cursor/skills',
-      kiro: '.kiro/skills',
-      qoder: '.qoder/skills',
-      opencode: '.opencode/skills',
-    };
+    const runtimeRoots = Object.fromEntries(getSupportedPlatforms()
+      .map((host) => [host, getAdapter(host).workflowsRoot]));
     const requiredDoctorChecks = {
       claude: [
         '.claude/spec-first/state.json',
@@ -285,7 +275,10 @@ describe('CLI smoke checks', () => {
         '.opencode/commands',
         '.opencode/skills',
       ],
+      zcode: ['.zcode/spec-first/state.json', 'AGENTS.md workflow entry guidance', '.agents/skills'],
+      pi: ['.pi/spec-first/state.json', 'AGENTS.md workflow entry guidance', '.agents/skills'],
     };
+    expect(Object.keys(requiredDoctorChecks).sort()).toEqual(getSupportedPlatforms().sort());
     const registrySource = fs.readFileSync(
       path.join(packagedRoot, 'skills', 'spec-runtime-setup', 'setup-registry.json'),
       'utf8',

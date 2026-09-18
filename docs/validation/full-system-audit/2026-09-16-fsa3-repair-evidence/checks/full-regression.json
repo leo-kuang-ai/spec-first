@@ -1,0 +1,18 @@
+{
+  "id": "full-regression",
+  "command": [
+    "npm",
+    "test"
+  ],
+  "cwd": ".",
+  "started_at": "2026-09-16T07:48:40.559840+00:00",
+  "duration_s": 221.07,
+  "exit_code": 1,
+  "ran": true,
+  "status": "failed",
+  "reason_code": "nonzero-exit",
+  "log_path": "logs/full-regression.log",
+  "redaction_status": "none-required",
+  "source_snapshot": "22a66be116a3ce1854e0b0af0ad4226a817688ae5b6e533de141d86fa34f332e",
+  "claim_ceiling": "C1"
+}

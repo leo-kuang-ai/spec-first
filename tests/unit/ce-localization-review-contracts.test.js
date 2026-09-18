@@ -22,7 +22,8 @@ describe('CE localization deterministic review producer', () => {
     // Runtime Setup 新增 npm warmup、source snapshot、CodeGraph launcher 与 artifact evidence 四个 owner。
     // 1127 = 1126 + 2026-09-13 修复批次抽取 lib/host-config-repair-command.cjs 单一实现（DR-015 去重）。
     // 1128 = 1127 + 2026-09-13 repair-loop 批次新增有界修复循环单一实现（动作由 registry 提供，不合成命令）。
-    expect(inventory.package_path_count).toBe(1128);
+    // 2026-09-15 FSA2：refresh 专属词汇流程新增一个包文件；只读 case 更名不改变数量。
+    expect(inventory.package_path_count).toBe(1129);
     expect(inventory.files).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',
@@ -75,8 +76,10 @@ describe('CE localization deterministic review producer', () => {
     // 2026-09-14: 222 -> 223 / 438 -> 439 — the repair-loop focused unit test joined
     // the window with one focused-test-explicit-source-ref relation; reconciled
     // during the repair-loop batch chain refresh.
-    expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(223);
-    expect(coverage.coverage_summary.direct_support_relation_count).toBe(439);
+    // FSA2：共享同步、mutation 合同、只读 Judge 校准新增 3 路径 / 5 个 owner 关系。
+    // FSA3：新增两个针对性回归文件，各增加一个直接支撑关系。
+    expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(228);
+    expect(coverage.coverage_summary.direct_support_relation_count).toBe(446);
     expect(coverage.direct_support).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',

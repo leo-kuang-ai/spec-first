@@ -1,0 +1,113 @@
+ M CHANGELOG.md
+ M "docs/05-\347\224\250\346\210\267\346\211\213\345\206\214/24-\345\205\254\345\274\200\345\205\245\345\217\243\344\270\216Skill\347\233\256\345\275\225.md"
+ M "docs/05-\347\224\250\346\210\267\346\211\213\345\206\214/README.md"
+ M docs/contracts/artifact-summary.md
+ M docs/contracts/dual-host-governance/README.md
+ M docs/contracts/workflows/ce-localization-regeneration-sequence.md
+ M docs/validation/2026-08-01-full-system-audit-plan.md
+ M docs/validation/2026-08-19-ce-post-3-20-adjudication-input.json
+ M docs/validation/2026-08-19-ce-post-3-20-adjudication.json
+ M docs/validation/2026-08-19-spec-first-current-skill-package-inventory-v2.json
+ M docs/validation/ce-localization/baseline/autoresearch.json
+ M docs/validation/ce-localization/baseline/spec-app-consistency-audit.json
+ M docs/validation/ce-localization/baseline/spec-brainstorm.json
+ M docs/validation/ce-localization/baseline/spec-code-review.json
+ M docs/validation/ce-localization/baseline/spec-commit-push-pr.json
+ M docs/validation/ce-localization/baseline/spec-commit.json
+ M docs/validation/ce-localization/baseline/spec-compound-refresh.json
+ M docs/validation/ce-localization/baseline/spec-compound.json
+ M docs/validation/ce-localization/baseline/spec-debug.json
+ M docs/validation/ce-localization/baseline/spec-doc-review.json
+ M docs/validation/ce-localization/baseline/spec-dogfood.json
+ M docs/validation/ce-localization/baseline/spec-explain.json
+ M docs/validation/ce-localization/baseline/spec-handoff.json
+ M docs/validation/ce-localization/baseline/spec-ideate.json
+ M docs/validation/ce-localization/baseline/spec-lfg.json
+ M docs/validation/ce-localization/baseline/spec-optimize.json
+ M docs/validation/ce-localization/baseline/spec-plan.json
+ M docs/validation/ce-localization/baseline/spec-polish.json
+ M docs/validation/ce-localization/baseline/spec-pov.json
+ M docs/validation/ce-localization/baseline/spec-prd.json
+ M docs/validation/ce-localization/baseline/spec-product-pulse.json
+ M docs/validation/ce-localization/baseline/spec-project-rules.json
+ M docs/validation/ce-localization/baseline/spec-promote.json
+ M docs/validation/ce-localization/baseline/spec-prototype.json
+ M docs/validation/ce-localization/baseline/spec-resolve-pr-feedback.json
+ M docs/validation/ce-localization/baseline/spec-riffrec-feedback-analysis.json
+ M docs/validation/ce-localization/baseline/spec-rule-miner.json
+ M docs/validation/ce-localization/baseline/spec-runtime-setup.json
+ M docs/validation/ce-localization/baseline/spec-simplify-code.json
+ M docs/validation/ce-localization/baseline/spec-strategy.json
+ M docs/validation/ce-localization/baseline/spec-sweep.json
+ M docs/validation/ce-localization/baseline/spec-test-browser.json
+ M docs/validation/ce-localization/baseline/spec-test-xcode.json
+ M docs/validation/ce-localization/baseline/spec-work.json
+ M docs/validation/ce-localization/baseline/spec-worktree.json
+ M docs/validation/ce-localization/baseline/spec-write-skill.json
+ M docs/validation/ce-localization/baseline/spec-write-tasks.json
+ M docs/validation/ce-localization/baseline/using-spec-first.json
+ M docs/validation/ce-localization/ce-setup-dependency-matrix.json
+ M docs/validation/ce-localization/ce-setup-prerequisite-preflight.json
+ M docs/validation/ce-localization/field-validation/protocol.json
+ M docs/validation/ce-localization/field-validation/results.json
+ M docs/validation/ce-localization/field-validation/task-pairs.json
+ M docs/validation/ce-localization/knowledge-promotion/promotion-ledger.json
+ M docs/validation/ce-localization/localization-ledger.json
+ M docs/validation/ce-localization/reports/2026-08-20-ce-localization-full-skill-review.md
+ M docs/validation/ce-localization/review/round-3-anthropic-skill-lens-final.json
+ M docs/validation/ce-localization/review/round-3-findings.json
+ M docs/validation/ce-localization/review/round-3-openai-skill-lens-final.json
+ M docs/validation/ce-localization/review/round-3-source-coverage.json
+ M docs/validation/ce-localization/skill-inventory.json
+ M docs/validation/ce-localization/skill-scenarios.json
+ M docs/validation/skill-evals/README.md
+ M skills/_shared/references/concepts-vocabulary.md
+ M skills/_shared/references/settled-decisions.md
+ M skills/_shared/references/yaml-schema.md
+ M skills/spec-brainstorm/references/settled-decisions.md
+ M skills/spec-code-review/SKILL.md
+ M skills/spec-code-review/references/cross-model-review.md
+ M skills/spec-code-review/references/scope.md
+ M skills/spec-code-review/scripts/findings-mechanics.py
+ M skills/spec-compound-refresh/SKILL.md
+ M skills/spec-compound-refresh/references/concepts-vocabulary.md
+ M skills/spec-doc-review/SKILL.md
+ M skills/spec-plan/references/plan-handoff.md
+ M skills/spec-plan/references/settled-decisions.md
+ M skills/spec-prd/SKILL.md
+ M skills/spec-runtime-setup/SKILL.md
+ M skills/spec-runtime-setup/evals/README.md
+ D skills/spec-runtime-setup/evals/cases/verify-only-readonly.yaml
+ M skills/spec-runtime-setup/evals/eval.yaml
+ M skills/spec-runtime-setup/evals/fixtures/scripts/check-readonly-verify.sh
+ M skills/spec-runtime-setup/scripts/lib/mode-policy.cjs
+ M skills/spec-work/references/shipping-workflow.md
+ M skills/spec-write-tasks/evals/README.md
+ M src/cli/adapters/kiro.js
+ M templates/claude/commands/spec/doc-review.md
+ M tests/smoke/cli-smoke.test.js
+ M tests/unit/ce-localization-review-contracts.test.js
+ M tests/unit/command-resource-path-rewrite.test.js
+ M tests/unit/doctor-platform-cli.test.js
+ M tests/unit/mcp-setup-host-config.test.js
+ M tests/unit/mcp-setup-mode-target.test.js
+ M tests/unit/runtime-setup-codegraph-evidence.test.js
+ M tests/unit/runtime-setup-consumer-health.test.js
+ M tests/unit/spec-code-review-mechanics.test.js
+ M tests/unit/spec-compound-refresh-reference-contracts.test.js
+ M tests/unit/spec-prd-hook-contracts.test.js
+ M tests/unit/using-spec-first-contracts.test.js
+?? docs/contracts/workflows/mutation-enforcement.md
+?? docs/validation/ce-localization/fsa2-repair-2026-09-15/honest-closeout.json
+?? docs/validation/ce-localization/fsa2-repair-2026-09-15/log-manifest.json
+?? docs/validation/ce-localization/fsa2-repair-2026-09-15/verification-result.json
+?? docs/validation/ce-localization/fsa2-repair-2026-09-15/verification-run-summary.json
+?? docs/validation/ce-localization/review/deltas/2026-09-15-fsa2-repair-final.json
+?? docs/validation/ce-localization/review/deltas/2026-09-15-fsa2-repair-regression.json
+?? docs/validation/ce-localization/review/deltas/2026-09-15-fsa2-repair.json
+?? docs/validation/ce-localization/review/deltas/2026-09-15-fsa2-upstream-ref-facts.json
+?? docs/validation/full-system-audit/2026-09-14-fsa2-report.md
+?? docs/validation/full-system-audit/2026-09-15-fsa2-eval-inventory.json
+?? skills/spec-compound-refresh/references/vocabulary-refresh.md
+?? skills/spec-runtime-setup/evals/cases/check-readonly.yaml
+?? tests/unit/runtime-setup-eval-judge.test.js

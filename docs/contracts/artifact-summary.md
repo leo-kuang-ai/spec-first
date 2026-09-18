@@ -70,3 +70,4 @@
 4. 如果缺少 summary，标记 `summary_missing`，并读取最小可用 status、manifest 或 explicit path。
 5. Direct/session evidence summary 是 advisory handoff；consumer 必须回到 `evidence_paths` 或 `source_reads_required` 做 source/test/contract confirmation。
 6. 如果展开 full artifact，记录 `full_artifact_read_reason`，其值应对应 `full_artifact_read_triggers` 中的具体触发原因。
+7. 摘要存在但缺少本次决策必需的 source、范围、时间/新鲜度、证据或限制时，同样触发有界回源；在补齐前不能据摘要声明验证通过或完成。等价自然语言段落承担相同义务，不以字段齐全替代语义充分性，也不要求另建通用 schema。

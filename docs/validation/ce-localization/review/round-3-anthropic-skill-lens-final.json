@@ -12,58 +12,186 @@
   "coverage_status": "complete-current-source-with-incremental-review",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "c0803ab5d2e80edde9ca67771c6d204b775bb354",
+    "head": "66b0e0c6c83c1e75d2e9634132586bfce5581ff3",
     "dirty": true,
     "dirty_paths": [
       "CHANGELOG.md",
-      "docs/validation/2026-09-13-full-system-audit-plan-v2.md",
-      "scripts/check-ce-upstream-reconciliation.cjs",
+      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/24-\\345\\205\\254\\345\\274\\200\\345\\205\\245\\345\\217\\243\\344\\270\\216Skill\\347\\233\\256\\345\\275\\225.md",
+      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/README.md",
+      "docs/contracts/artifact-summary.md",
+      "docs/contracts/dual-host-governance/README.md",
+      "docs/contracts/workflows/ce-localization-regeneration-sequence.md",
+      "docs/contracts/workflows/mutation-enforcement.md",
+      "docs/validation/2026-08-01-full-system-audit-plan.md",
+      "docs/validation/full-system-audit/2026-09-14-fsa2-report.md",
+      "docs/validation/full-system-audit/2026-09-15-fsa2-eval-inventory.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/build.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-autoresearch.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-app-consistency-audit.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-brainstorm.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-code-review.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-commit-push-pr.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-commit.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-compound-refresh.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-compound.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-debug.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-doc-review.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-dogfood.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-explain.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-handoff.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-ideate.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-lfg.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-optimize.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-plan.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-polish.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-pov.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-prd.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-product-pulse.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-project-rules.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-promote.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-prototype.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-resolve-pr-feedback.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-riffrec-feedback-analysis.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-rule-miner.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-runtime-setup.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-simplify-code.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-strategy.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-sweep.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-test-browser.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-test-xcode.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-work.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-write-skill.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-write-tasks.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-using-spec-first.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-autoresearch.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-app-consistency-audit.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-brainstorm.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-code-review.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-commit-push-pr.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-commit.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-compound-refresh.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-compound.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-debug.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-doc-review.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-dogfood.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-explain.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-handoff.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-ideate.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-lfg.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-optimize.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-plan.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-polish.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-pov.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-prd.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-product-pulse.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-project-rules.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-promote.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-prototype.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-resolve-pr-feedback.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-riffrec-feedback-analysis.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-rule-miner.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-runtime-setup.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-simplify-code.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-strategy.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-sweep.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-test-browser.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-test-xcode.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-work.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-write-skill.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-write-tasks.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-using-spec-first.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/install-matrix.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/lint-entrypoints.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/npm-test.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/probe-autoresearch.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/probe-commit-index.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/probe-setup-plan.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/shared-references.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/sync-instructions.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/typecheck.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/initial-status.txt",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/install/summary.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/link-candidates.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/manifest.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/plan.md",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/probes/autoresearch.py",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/probes/commit-index.py",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/probes/setup-plan.cjs",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/reads.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/redaction-canary.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/skill-inventory.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/skill-receipts.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/source-manifest.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/source-stability.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-findings.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/build.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/ce-focused-final.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/eval-autoresearch.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/eval-spec-commit.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/full-regression-final.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/full-regression.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/lint.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/shared-references.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/sync-instructions.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/typecheck.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/fresh-source-review.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/manifest.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/regression-after.log",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/regression-before.log",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/repair-final-source.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/repair-source.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-report.md",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-run-plan.md",
+      "docs/validation/skill-evals/README.md",
+      "skills/_shared/references/concepts-vocabulary.md",
+      "skills/_shared/references/settled-decisions.md",
+      "skills/_shared/references/yaml-schema.md",
+      "skills/autoresearch/SKILL.md",
+      "skills/autoresearch/references/orchestrator-routing.md",
       "skills/autoresearch/scripts/orchestrate.sh",
-      "skills/autoresearch/scripts/score-regression.sh",
-      "skills/spec-code-review/evals/fixtures/repos/tenant-orders/prepare-review-fixture.sh",
-      "skills/spec-code-review/evals/fixtures/scripts/check-r2-preset-applied-fix.sh",
-      "skills/spec-code-review/scripts/peer-job-runner.py",
-      "skills/spec-doc-review/scripts/peer-job-runner.py",
-      "skills/spec-explain/references/explainer-html.md",
-      "skills/spec-explain/references/explainer-markdown.md",
-      "skills/spec-lfg/scripts/pr-watch-state.cjs",
-      "skills/spec-pov/scripts/peer-job-runner.py",
+      "skills/spec-brainstorm/references/settled-decisions.md",
+      "skills/spec-code-review/SKILL.md",
+      "skills/spec-code-review/references/cross-model-review.md",
+      "skills/spec-code-review/references/scope.md",
+      "skills/spec-code-review/scripts/findings-mechanics.py",
+      "skills/spec-commit/SKILL.md",
+      "skills/spec-compound-refresh/SKILL.md",
+      "skills/spec-compound-refresh/references/concepts-vocabulary.md",
+      "skills/spec-compound-refresh/references/vocabulary-refresh.md",
+      "skills/spec-doc-review/SKILL.md",
+      "skills/spec-plan/references/plan-handoff.md",
+      "skills/spec-plan/references/settled-decisions.md",
+      "skills/spec-prd/SKILL.md",
       "skills/spec-runtime-setup/SKILL.md",
-      "skills/spec-runtime-setup/scripts/lib/host-config-repair-command.cjs",
-      "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
+      "skills/spec-runtime-setup/evals/README.md",
+      "skills/spec-runtime-setup/evals/cases/check-readonly.yaml",
+      "skills/spec-runtime-setup/evals/cases/verify-only-readonly.yaml",
+      "skills/spec-runtime-setup/evals/eval.yaml",
+      "skills/spec-runtime-setup/evals/fixtures/scripts/check-readonly-verify.sh",
       "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
-      "skills/spec-runtime-setup/scripts/lib/provider-display.cjs",
-      "skills/spec-runtime-setup/scripts/lib/registry.cjs",
-      "skills/spec-runtime-setup/scripts/lib/renderer.cjs",
-      "skills/spec-runtime-setup/scripts/lib/repair-loop.cjs",
-      "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
-      "skills/spec-runtime-setup/scripts/lib/workspace-graph-build.cjs",
-      "skills/spec-runtime-setup/scripts/lib/workspace-routing-inject.cjs",
-      "skills/spec-runtime-setup/scripts/providers/codegraph.cjs",
-      "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
-      "skills/spec-runtime-setup/scripts/setup.cjs",
-      "skills/spec-runtime-setup/setup-registry.json",
-      "skills/spec-runtime-setup/setup-registry.schema.json",
-      "tests/fixtures/mcp-setup/legacy-parity/posix/runtime-contracts.json",
-      "tests/fixtures/mcp-setup/legacy-parity/windows/runtime-contracts.json",
-      "tests/fixtures/mcp-setup/platform-differences.json",
-      "tests/integration/runtime-setup-sigint-recovery.integration.test.js",
-      "tests/unit/ce-localization-closeout-contracts.test.js",
+      "skills/spec-work/references/shipping-workflow.md",
+      "skills/spec-write-tasks/evals/README.md",
+      "src/cli/adapters/kiro.js",
+      "templates/claude/commands/spec/doc-review.md",
+      "tests/smoke/cli-smoke.test.js",
+      "tests/unit/autoresearch-orchestrator-regression.test.js",
       "tests/unit/ce-localization-review-contracts.test.js",
-      "tests/unit/host-runtime-projection-contracts.test.js",
-      "tests/unit/mcp-setup-contracts.test.js",
-      "tests/unit/mcp-setup-entrypoint.test.js",
-      "tests/unit/mcp-setup-facts-renderer.test.js",
+      "tests/unit/command-resource-path-rewrite.test.js",
+      "tests/unit/doctor-platform-cli.test.js",
+      "tests/unit/mcp-setup-host-config.test.js",
       "tests/unit/mcp-setup-mode-target.test.js",
-      "tests/unit/mcp-setup-node-contracts.test.js",
-      "tests/unit/mcp-setup-registry.test.js",
-      "tests/unit/runtime-setup-provider-identity.test.js",
-      "tests/unit/runtime-setup-repair-loop.test.js",
-      "tests/unit/spec-lfg-pr-watch-state.test.js"
+      "tests/unit/runtime-setup-codegraph-evidence.test.js",
+      "tests/unit/runtime-setup-consumer-health.test.js",
+      "tests/unit/runtime-setup-eval-judge.test.js",
+      "tests/unit/spec-code-review-mechanics.test.js",
+      "tests/unit/spec-commit-scope-regression.test.js",
+      "tests/unit/spec-compound-refresh-reference-contracts.test.js",
+      "tests/unit/spec-prd-hook-contracts.test.js",
+      "tests/unit/using-spec-first-contracts.test.js"
     ],
-    "dirty_path_manifest_sha256": "7af829a1f316c8385378e61aa37da56e9af518b01e12bcc22b12a396cf5a7802",
-    "source_tree_hash": "30e23af473d58352a8fa72dc84b1826f65072fc27dbb80a97569744d092dc85a",
-    "inventory_hash": "01b3a8d60125adc6604b439dc3ebffdd834a5337030e5da02318c2bb23f666ff",
+    "dirty_path_manifest_sha256": "6c37436d8a5bdcb5f20a84726d997a2df9f95077119542111829edc11b61883b",
+    "source_tree_hash": "956b6ec3ed0883e3148062e373757f65ed8526785ebfbeb229d9488a8f1d40c0",
+    "inventory_hash": "ad15fb5a24e316debe0a2cf0301c04d84bee854568061f5745bff2adc8fdaade",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -145,21 +273,21 @@
       "sha256": "0a18d51978a03a3c2d330950be7d81f0e20415993b6dcdf0fc30a4a9ecbff8a2"
     }
   ],
-  "inventory_hash": "01b3a8d60125adc6604b439dc3ebffdd834a5337030e5da02318c2bb23f666ff",
-  "inventory_artifact_sha256": "463bbf35aa0b431ae0cabea527bbbafc1834aefd7995dd35b1cb79ed1952f3c0",
+  "inventory_hash": "ad15fb5a24e316debe0a2cf0301c04d84bee854568061f5745bff2adc8fdaade",
+  "inventory_artifact_sha256": "322ceb430284aa35078f7a02fdbc1f48acf9cd7c472cb4017c1c7c0501ef2d04",
   "package_manifest_sha256": "7e91561f57bdee5fc0d014651a14cff141e9bdb4cc39b0b6a7bbc01b6726031e",
   "direct_support_manifest_sha256": "8b7e968aef897b43123d279a1080939fc96ecca3b593d54086fef95b7b523612",
   "relation_manifest_sha256": "807319b1e686537190a85b44149d4dd9b5faacc8fb412e210b5c6ecb6b6d59de",
   "review_input_hash_algorithm": "sha256(stable-json(coverage.review_input))",
-  "review_input_hash": "5b5c31849bdca4e14f4ab83161f6d094e2146d69a7c02c3507b52afe45324293",
+  "review_input_hash": "c6df1c9b29dd6e89000ac797f46a396c7ee736f4a33d757f6a4e25f7dcd30e6f",
   "expected_skill_count": 38,
   "reviewed_skill_count": 38,
-  "expected_package_path_count": 1128,
-  "reviewed_package_path_count": 1128,
-  "expected_direct_support_path_count": 223,
-  "reviewed_direct_support_path_count": 223,
-  "expected_direct_support_relation_count": 439,
-  "reviewed_direct_support_relation_count": 439,
+  "expected_package_path_count": 1129,
+  "reviewed_package_path_count": 1129,
+  "expected_direct_support_path_count": 228,
+  "reviewed_direct_support_path_count": 228,
+  "expected_direct_support_relation_count": 446,
+  "reviewed_direct_support_relation_count": 446,
   "reviewed_unique_source_path_count": 806,
   "expected_receipt_count": 1019,
   "reviewed_receipt_count": 1019,
@@ -171,7 +299,7 @@
     "receipt_binding": "chunk ids are listed by source_read_receipts",
     "limitation": "packet identity/range only; not equal semantic attention"
   },
-  "chunk_manifest_hash": "9eb40bff97ce5984b8d350898604def0c7f48f27d4911d8bc050b1fbadb136f3",
+  "chunk_manifest_hash": "d79b4b0887475b066d4ddd6ffaeed5734c3c395443b43a0569fe5469ddb7a9cf",
   "finding_summary": {
     "review_area_count": 13,
     "open_count": 0,
@@ -301,7 +429,12 @@
     "无 runtime/field 证据;peer-job-runner 三镜像按一份实现+字节一致验证。",
     "本 delta 由当前会话(zcode)inline 同上下文复核;repair-loop 批次作者为并发 codex 会话,非作者自证亦非独立 provider 证据。",
     "每路径证据为全文 diff 通读 + 当轮聚焦测试套件全绿(计数测试文件为本会话自改,其断言由当轮 --refresh 产物直接证实);无 runtime/field 证据,repair-loop 模块未在真实宿主上观察全链路。",
-    "上游 517 条 per-record adjudication 判定不变,本 delta 仅覆盖目标侧增量路径。"
+    "上游 517 条 per-record adjudication 判定不变,本 delta 仅覆盖目标侧增量路径。",
+    "作者同上下文增量复核，保留历史未变区域的覆盖，不重建历史独立审查。",
+    "FSA2 模型/宿主/现场/原审计证据缺口仍开放，见 FSA2 报告第 13 节。",
+    "本轮作者增量语义复核与未变历史 receipt 合成覆盖；双 lens 非独立 provider。",
+    "真实宿主/模型/现场收益不在本轮通过范围。",
+    "仅收口报告/日志更新后重绑，7个源码/测试的既有增量裁决未改变；不重复宣称语义重审。"
   ],
   "claim_ceiling": "只支持冻结 working-tree canonical package/direct-support source 的 role-simulated Anthropic skill-craft/safety 静态合同结论；不证明 Anthropic/provider 身份、reviewer independence、等强度逐行注意、runtime/browser/provider/Git/CI 或 field outcome。",
   "skill_reviews": [
@@ -729,17 +862,17 @@
           "source_kind": "skill-package",
           "owning_skill": "autoresearch",
           "shared_consumers": [],
-          "sha256": "53ec4f48e88318812d7e2ddc51b993c44d9843000972c0e68aa24fb36158d240",
-          "bytes": 6989,
-          "line_count": 89,
+          "sha256": "829530b3ee2b47d9b42e1794f43c4b2e4649d5a04d1b4e685afcce7cba3cfc91",
+          "bytes": 7848,
+          "line_count": 95,
           "covered_line_ranges": [
             [
               1,
-              89
+              95
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-anthropic-skill-craft-safety-53ec4f48e883"
+            "ce-localization-fsa3-repair-2026-09-16-anthropic-skill-craft-safety-829530b3ee2b"
           ],
           "read_status": "full"
         },
@@ -849,17 +982,17 @@
           "source_kind": "skill-package",
           "owning_skill": "autoresearch",
           "shared_consumers": [],
-          "sha256": "a7dae8a4ec05fd6557cfe1611091398763a6ae83acc37232daf51cd1b7ad3221",
-          "bytes": 13400,
-          "line_count": 327,
+          "sha256": "eb9efb1e6bf91a148373582aa20c6cd35c740b1b30866e918fd2db33cda6dec8",
+          "bytes": 13362,
+          "line_count": 328,
           "covered_line_ranges": [
             [
               1,
-              327
+              328
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-a7dae8a4ec05"
+            "ce-localization-fsa3-repair-2026-09-16-anthropic-skill-craft-safety-eb9efb1e6bf9"
           ],
           "read_status": "full"
         },
@@ -929,8 +1062,8 @@
           "source_kind": "skill-package",
           "owning_skill": "autoresearch",
           "shared_consumers": [],
-          "sha256": "15a44442b661389f0036a587ba32d289f748e428c5c16152059410a568cb6219",
-          "bytes": 9297,
+          "sha256": "d51a75af36a3a41095d50a775197635c48238ed24ed6ad3eda1ef24e50f43136",
+          "bytes": 9653,
           "line_count": 108,
           "covered_line_ranges": [
             [
@@ -939,7 +1072,7 @@
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-15a44442b661"
+            "ce-localization-fsa3-repair-2026-09-16-anthropic-skill-craft-safety-d51a75af36a3"
           ],
           "read_status": "full"
         },
@@ -964,22 +1097,42 @@
           "read_status": "full"
         },
         {
+          "path": "tests/unit/autoresearch-orchestrator-regression.test.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "autoresearch",
+          "shared_consumers": [],
+          "sha256": "796b359fd63276ca1ea4cb044b27f0815e63dd0914792f77015fe0c7d7d6f8f4",
+          "bytes": 4476,
+          "line_count": 91,
+          "covered_line_ranges": [
+            [
+              1,
+              91
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-fsa3-repair-2026-09-16-anthropic-skill-craft-safety-796b359fd632"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "tests/unit/ce-localization-review-contracts.test.js",
           "path_role": "direct-support",
           "source_kind": "direct-support",
           "owning_skill": "autoresearch",
           "shared_consumers": [],
-          "sha256": "f40c8f707b0e2caa0ad9843f92a065e48e146d6a0d6e981ffeb990b181e46ea8",
-          "bytes": 7149,
-          "line_count": 123,
+          "sha256": "96e6694946357851d9ca39fa6c4297c1463d9c7f10375f65abb885acad8aade6",
+          "bytes": 7454,
+          "line_count": 126,
           "covered_line_ranges": [
             [
               1,
-              123
+              126
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-lane-refresh-2026-09-14-repair-loop-anthropic-skill-craft-safety-f40c8f707b0e"
+            "ce-localization-fsa3-repair-2026-09-16-anthropic-skill-craft-safety-96e669494635"
           ],
           "read_status": "full"
         }
@@ -3042,6 +3195,26 @@
       ],
       "source_read_receipts": [
         {
+          "path": "scripts/sync-shared-references.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-brainstorm",
+          "shared_consumers": [],
+          "sha256": "f14244816b4bd98c233b71c3f2c053ec79613209bf91ad87cf9e8728ded5f53d",
+          "bytes": 3548,
+          "line_count": 111,
+          "covered_line_ranges": [
+            [
+              1,
+              111
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-f14244816b4b"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/spec-brainstorm/evals/cases/clear-req-writes-plan.yaml",
           "path_role": "skill-package",
           "source_kind": "skill-package",
@@ -3581,8 +3754,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-brainstorm",
           "shared_consumers": [],
-          "sha256": "a9e4f0e64dba0ec0526756bd8e8aa0a27a57ba8ee6ac35b5abc99488264e4ab0",
-          "bytes": 4950,
+          "sha256": "5b36b0da843bdd2ca18dae80c2cd6b53d3489ff9e2336a26ec07f75221a60937",
+          "bytes": 4944,
           "line_count": 45,
           "covered_line_ranges": [
             [
@@ -3591,9 +3764,10 @@
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-brainstorm-20070ed8"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-5b36b0da843b"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-brainstorm/references/synthesis-summary.md",
@@ -4678,17 +4852,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-code-review",
           "shared_consumers": [],
-          "sha256": "c9d20d836fb887f7e80cd0deb9e19b6de592936904a63fec9dbcc35d6d0a0938",
-          "bytes": 5950,
-          "line_count": 52,
+          "sha256": "1783d4e2527a24332faa890c6fb91f1ae350d8ec500acadfef02f54b093397ff",
+          "bytes": 6667,
+          "line_count": 58,
           "covered_line_ranges": [
             [
               1,
-              52
+              58
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-c9d20d836fb8"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-1783d4e2527a"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -5188,17 +5362,17 @@
           "source_kind": "skill-package",
           "owning_skill": "spec-code-review",
           "shared_consumers": [],
-          "sha256": "326c7d55e4c0e2ca13fad7f53c47cafc020fd8e5401dadeadca46e28335387e1",
-          "bytes": 24031,
-          "line_count": 230,
+          "sha256": "acc0e68f87ec07a4b00af41ed9b9234e933033999c7ac7f07b0f708ad59e485b",
+          "bytes": 24725,
+          "line_count": 232,
           "covered_line_ranges": [
             [
               1,
-              230
+              232
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-326c7d55e4c0"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-acc0e68f87ec"
           ],
           "read_status": "full"
         },
@@ -5287,19 +5461,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-code-review",
           "shared_consumers": [],
-          "sha256": "b025d98df3fc5f571451a3a43673362fc010c43c4adb2a9be581cec600af345e",
-          "bytes": 8934,
-          "line_count": 253,
+          "sha256": "a40e7166c72b151d0da1158256c6775a75f8ac78b8ad3df6a5768829fa308231",
+          "bytes": 8860,
+          "line_count": 250,
           "covered_line_ranges": [
             [
               1,
-              253
+              250
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-code-review-cf6fbf37"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-a40e7166c72b"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-code-review/scripts/peer-job-runner.py",
@@ -5364,8 +5539,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-code-review",
           "shared_consumers": [],
-          "sha256": "4b8c5e3ea2e9a838e82d191e97676e193f8d16005c17b9e93b07e4cb7f24732a",
-          "bytes": 8074,
+          "sha256": "78a117cff4a12d5e9af6606d358a64d099833858716104eecdd33080e6b50dea",
+          "bytes": 8204,
           "line_count": 75,
           "covered_line_ranges": [
             [
@@ -5374,7 +5549,7 @@
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-4b8c5e3ea2e9"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-78a117cff4a1"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -5679,19 +5854,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-code-review",
           "shared_consumers": [],
-          "sha256": "ce6d36e3a88ead3167b9c302f76a21ae704a64967d925ef892c33c99ca8e86cf",
-          "bytes": 6771,
-          "line_count": 167,
+          "sha256": "673ab2389164d94a53558b8a82d6143ad7224c3ac6cce1eb03523edb91c188dc",
+          "bytes": 7137,
+          "line_count": 175,
           "covered_line_ranges": [
             [
               1,
-              167
+              175
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-code-review-1d24af57"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-673ab2389164"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/spec-code-review-peer-runner.test.js",
@@ -5989,17 +6165,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-commit",
           "shared_consumers": [],
-          "sha256": "7dcb1fa0029116e5854aa0af04c6449f2146d46d86b4c6071c65c18929474dcf",
-          "bytes": 8295,
-          "line_count": 119,
+          "sha256": "f1cf7b8801e7d25f706af168a2acd54a864e1df4b893ff474305d415230de8b8",
+          "bytes": 8761,
+          "line_count": 121,
           "covered_line_ranges": [
             [
               1,
-              119
+              121
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-7dcb1fa00291"
+            "ce-localization-fsa3-repair-2026-09-16-anthropic-skill-craft-safety-f1cf7b8801e7"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -6085,6 +6261,26 @@
           "read_status": "full"
         },
         {
+          "path": "tests/unit/spec-commit-scope-regression.test.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-commit",
+          "shared_consumers": [],
+          "sha256": "10f82f2dbce11fb87c6406a85a9f3fb0cfe213c2e496ed866f0a33047a5122be",
+          "bytes": 1667,
+          "line_count": 30,
+          "covered_line_ranges": [
+            [
+              1,
+              30
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-fsa3-repair-2026-09-16-anthropic-skill-craft-safety-10f82f2dbce1"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "tests/unit/specialized-skill-calibration-contracts.test.js",
           "path_role": "skill-package",
           "owning_skill": "spec-commit",
@@ -6109,17 +6305,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-commit",
           "shared_consumers": [],
-          "sha256": "10f7549d3d678850410fdd9aed8e34029320142de15760d1489964f5303bd253",
-          "bytes": 8183,
-          "line_count": 160,
+          "sha256": "e087cecc4fbfd81c566ae85dba68e775de05592874e45ca312587709075bbdf4",
+          "bytes": 8256,
+          "line_count": 162,
           "covered_line_ranges": [
             [
               1,
-              160
+              162
             ]
           ],
           "review_chunk_ids": [
-            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-10f7549d3d67"
+            "ce-localization-fsa2-repair-2026-09-15-regression-anthropic-skill-craft-safety-e087cecc4fbf"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -7859,17 +8055,17 @@
           "source_kind": "direct-support",
           "owning_skill": "spec-compound",
           "shared_consumers": [],
-          "sha256": "e228e0b02f5c045404e786dd993d6fe5a3da774421098770b196693b425aed60",
-          "bytes": 7213,
-          "line_count": 131,
+          "sha256": "fa95f8547d58a89c8caf16aee54c9b1876be0ed8707ee747bc87fcbd373be3c7",
+          "bytes": 7242,
+          "line_count": 132,
           "covered_line_ranges": [
             [
               1,
-              131
+              132
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-e228e0b02f5c"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-fa95f8547d58"
           ],
           "read_status": "full"
         },
@@ -8142,17 +8338,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-compound-refresh",
           "shared_consumers": [],
-          "sha256": "cd71ab5d7ecbc6f54f454b4d7d8c2edf6616e3ecdc40e67932d9cc548e1b66eb",
-          "bytes": 12792,
-          "line_count": 112,
+          "sha256": "5bdbdfa6166cfd8ad2ffb76262f4ee805dc2ebaec7195d1a57cfc5530f3b2312",
+          "bytes": 7745,
+          "line_count": 87,
           "covered_line_ranges": [
             [
               1,
-              112
+              87
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-cd71ab5d7ecb"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-5bdbdfa6166c"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -8318,6 +8514,26 @@
           "read_status": "full"
         },
         {
+          "path": "skills/spec-compound-refresh/references/vocabulary-refresh.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-compound-refresh",
+          "shared_consumers": [],
+          "sha256": "0a3b03caf0b84190ec0fe8e742641e5bc63503580f4366dfad9159a3d29a5d9a",
+          "bytes": 5045,
+          "line_count": 24,
+          "covered_line_ranges": [
+            [
+              1,
+              24
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-0a3b03caf0b8"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/spec-compound-refresh/references/worth-audit.md",
           "path_role": "skill-package",
           "source_kind": "skill-package",
@@ -8420,8 +8636,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-compound-refresh",
           "shared_consumers": [],
-          "sha256": "9e5a18312b11d9ff0c36e47029b37ab8960fcd86697f9eb714a59840b1c3c765",
-          "bytes": 14606,
+          "sha256": "f91c111735d8140d21baac0ef836523d2051bce2d52b7a6787e52cad2577ca3e",
+          "bytes": 14609,
           "line_count": 164,
           "covered_line_ranges": [
             [
@@ -8430,7 +8646,7 @@
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-9e5a18312b11"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-f91c111735d8"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -8636,17 +8852,17 @@
           "source_kind": "direct-support",
           "owning_skill": "spec-compound-refresh",
           "shared_consumers": [],
-          "sha256": "e228e0b02f5c045404e786dd993d6fe5a3da774421098770b196693b425aed60",
-          "bytes": 7213,
-          "line_count": 131,
+          "sha256": "fa95f8547d58a89c8caf16aee54c9b1876be0ed8707ee747bc87fcbd373be3c7",
+          "bytes": 7242,
+          "line_count": 132,
           "covered_line_ranges": [
             [
               1,
-              131
+              132
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-e228e0b02f5c"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-fa95f8547d58"
           ],
           "read_status": "full"
         }
@@ -10606,8 +10822,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-doc-review",
           "shared_consumers": [],
-          "sha256": "5910a29d69f49c5846617bbd525e4b5debccdd5738b6428a9c38d8338b58d257",
-          "bytes": 5173,
+          "sha256": "c96d48de5841a1d3c2692232e54107a5eaccdf0337817dc024c2af6d958eaab0",
+          "bytes": 5354,
           "line_count": 74,
           "covered_line_ranges": [
             [
@@ -10616,7 +10832,7 @@
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-5910a29d69f4"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-c96d48de5841"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -10646,8 +10862,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-doc-review",
           "shared_consumers": [],
-          "sha256": "4b7fde706674bbab8435072dfb17e2803bac3f3937457b6283e23206771a477b",
-          "bytes": 428,
+          "sha256": "8ea76ec11156bc9d4bed69b75818719051aa12339d9e6b5707d80e147709c814",
+          "bytes": 435,
           "line_count": 12,
           "covered_line_ranges": [
             [
@@ -10656,9 +10872,10 @@
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-doc-review-86971e45"
+            "ce-localization-fsa2-repair-2026-09-15-regression-anthropic-skill-craft-safety-8ea76ec11156"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
@@ -10685,19 +10902,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-doc-review",
           "shared_consumers": [],
-          "sha256": "929d5b6047663a46f908d724beac570c50d8580352b377d8feb9b5ad2afb8f81",
-          "bytes": 11199,
-          "line_count": 246,
+          "sha256": "0ebb26de711bc2a62ec42aa8d1b0eef275140169ff8a3db8a30b99159ce66801",
+          "bytes": 11323,
+          "line_count": 247,
           "covered_line_ranges": [
             [
               1,
-              246
+              247
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-doc-review-8983f7c7"
+            "ce-localization-fsa2-repair-2026-09-15-regression-anthropic-skill-craft-safety-0ebb26de711b"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/dispatch-authorization-matrix-contracts.test.js",
@@ -15284,6 +15502,26 @@
           "source_kind": "direct-support"
         },
         {
+          "path": "scripts/sync-shared-references.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-plan",
+          "shared_consumers": [],
+          "sha256": "f14244816b4bd98c233b71c3f2c053ec79613209bf91ad87cf9e8728ded5f53d",
+          "bytes": 3548,
+          "line_count": 111,
+          "covered_line_ranges": [
+            [
+              1,
+              111
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-f14244816b4b"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/spec-plan/evals/cases/always-plan-unclear-input.yaml",
           "path_role": "skill-package",
           "source_kind": "skill-package",
@@ -16658,17 +16896,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-plan",
           "shared_consumers": [],
-          "sha256": "957a4f8e57fd46fdd88971f72c0b92720e90a14500aff85ee5e007a853fc8a77",
-          "bytes": 25025,
-          "line_count": 124,
+          "sha256": "103e4d205215a2b4fdfd05118c782bc497feec5b680dd57204184519f020ebc8",
+          "bytes": 25437,
+          "line_count": 126,
           "covered_line_ranges": [
             [
               1,
-              124
+              126
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-957a4f8e57fd"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-103e4d205215"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -16757,8 +16995,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-plan",
           "shared_consumers": [],
-          "sha256": "a9e4f0e64dba0ec0526756bd8e8aa0a27a57ba8ee6ac35b5abc99488264e4ab0",
-          "bytes": 4950,
+          "sha256": "5b36b0da843bdd2ca18dae80c2cd6b53d3489ff9e2336a26ec07f75221a60937",
+          "bytes": 4944,
           "line_count": 45,
           "covered_line_ranges": [
             [
@@ -16767,9 +17005,10 @@
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-plan-79f5cefe"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-5b36b0da843b"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-plan/references/structure.md",
@@ -18758,6 +18997,26 @@
           "source_kind": "direct-support"
         },
         {
+          "path": "docs/contracts/workflows/mutation-enforcement.md",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-prd",
+          "shared_consumers": [],
+          "sha256": "049156fba398641b3e1ecb1a9c8b872b3414a056b2fc05987e9fa6a0e8376b4b",
+          "bytes": 3237,
+          "line_count": 25,
+          "covered_line_ranges": [
+            [
+              1,
+              25
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-049156fba398"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "docs/contracts/workflows/scenario-capability-matrix.md",
           "path_role": "skill-package",
           "owning_skill": "spec-prd",
@@ -19688,17 +19947,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-prd",
           "shared_consumers": [],
-          "sha256": "3b7b33f0eb9d69601cf43596f1098b3a30b27e8283a12a3ded210d12597ee443",
-          "bytes": 66423,
-          "line_count": 342,
+          "sha256": "25cc60f639d886c024a61b462c84cb101f6b95a6098984a879f2a750292e230a",
+          "bytes": 67157,
+          "line_count": 345,
           "covered_line_ranges": [
             [
               1,
-              342
+              345
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-3b7b33f0eb9d"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-25cc60f639d8"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -19861,19 +20120,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-prd",
           "shared_consumers": [],
-          "sha256": "929d5b6047663a46f908d724beac570c50d8580352b377d8feb9b5ad2afb8f81",
-          "bytes": 11199,
-          "line_count": 246,
+          "sha256": "0ebb26de711bc2a62ec42aa8d1b0eef275140169ff8a3db8a30b99159ce66801",
+          "bytes": 11323,
+          "line_count": 247,
           "covered_line_ranges": [
             [
               1,
-              246
+              247
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-prd-8983f7c7"
+            "ce-localization-fsa2-repair-2026-09-15-regression-anthropic-skill-craft-safety-0ebb26de711b"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/dispatch-authorization-matrix-contracts.test.js",
@@ -20092,19 +20352,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-prd",
           "shared_consumers": [],
-          "sha256": "07a975108a3357e7ae8ecef926c863b0da603d06dca4bd29fd8faabb9d37ce08",
-          "bytes": 13148,
-          "line_count": 352,
+          "sha256": "ecd2e10d2bd84ee132f552f90f474cb854972ecdc87d25206c5cf1299659c432",
+          "bytes": 13205,
+          "line_count": 353,
           "covered_line_ranges": [
             [
               1,
-              352
+              353
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-prd-4e42c00a"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-ecd2e10d2bd8"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/spec-prd-lite-profile-contracts.test.js",
@@ -25446,6 +25707,26 @@
           "read_status": "full"
         },
         {
+          "path": "skills/spec-runtime-setup/evals/cases/check-readonly.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "a3487762e9a7f19a74011b711524685b3198885801aeec01185cbfc4fefd56c6",
+          "bytes": 940,
+          "line_count": 28,
+          "covered_line_ranges": [
+            [
+              1,
+              28
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-a3487762e9a7"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/spec-runtime-setup/evals/cases/semantic-question-not-setup.yaml",
           "path_role": "skill-package",
           "source_kind": "skill-package",
@@ -25466,33 +25747,13 @@
           "read_status": "full"
         },
         {
-          "path": "skills/spec-runtime-setup/evals/cases/verify-only-readonly.yaml",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-runtime-setup",
-          "shared_consumers": [],
-          "sha256": "bfa92b3cd1663a5d4039e728b8dda647bbe79fff8bc5c25b4855cf84b40eb09f",
-          "bytes": 763,
-          "line_count": 22,
-          "covered_line_ranges": [
-            [
-              1,
-              22
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-anthropic-skill-craft-safety-bfa92b3cd166"
-          ],
-          "read_status": "full"
-        },
-        {
           "path": "skills/spec-runtime-setup/evals/eval.yaml",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "9660883a84fdff754dfb8b4d5cb3d23639696408ea14799338646a45deeb6013",
-          "bytes": 368,
+          "sha256": "7d599dd2d2c3050f398dc718ea8f7a941b0dc3096c4d09c4fa1dc858d944e444",
+          "bytes": 362,
           "line_count": 24,
           "covered_line_ranges": [
             [
@@ -25501,7 +25762,7 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-anthropic-skill-craft-safety-9660883a84fd"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-7d599dd2d2c3"
           ],
           "read_status": "full"
         },
@@ -25630,17 +25891,17 @@
           "source_kind": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "aa04755d1beccdf297f6d941d2d4dea00453faff21e038b76f6035d67bcc821c",
-          "bytes": 696,
-          "line_count": 15,
+          "sha256": "bc2b8e3d185800b49bf9dbb8106a3fc3a095aeb84af3f34a407f50dbb2d0c424",
+          "bytes": 1607,
+          "line_count": 28,
           "covered_line_ranges": [
             [
               1,
-              15
+              28
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-anthropic-skill-craft-safety-aa04755d1bec"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-bc2b8e3d1858"
           ],
           "read_status": "full"
         },
@@ -25649,19 +25910,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "4d45452e642cff2002574983e0410d20550f913750f524f0d90c7929a33a34e5",
-          "bytes": 401,
-          "line_count": 6,
+          "sha256": "3fa14bbff07035ebd111403be38fa81208c5ab93079e1f03e372c41236532d81",
+          "bytes": 761,
+          "line_count": 8,
           "covered_line_ranges": [
             [
               1,
-              6
+              8
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-cb64d07d"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-3fa14bbff070"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-runtime-setup/references/config-template.yaml",
@@ -25983,17 +26245,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "23328a6ea3a1188f2bea2ea6a022de168b3fab05631774ad159468e4dad8339c",
-          "bytes": 6730,
-          "line_count": 188,
+          "sha256": "30a0c5b91747cad8676e1d11040dde45b63ce4fc6450a2d5fa7c402472aa6ab8",
+          "bytes": 6630,
+          "line_count": 185,
           "covered_line_ranges": [
             [
               1,
-              188
+              185
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-lane-refresh-2026-09-13-fix-batch-anthropic-skill-craft-safety-23328a6ea3a1"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-30a0c5b91747"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -27053,8 +27315,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "892434da474d5b0d58f1b89628351552f6782e8136a896b79e56d78795de73ad",
-          "bytes": 55598,
+          "sha256": "c9bb4ae019db0fcbfcc89772a405e0df4fa9f4b0ba404813c330ff4d502de41a",
+          "bytes": 55953,
           "line_count": 368,
           "covered_line_ranges": [
             [
@@ -27063,7 +27325,7 @@
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-lane-refresh-2026-09-14-repair-loop-anthropic-skill-craft-safety-892434da474d"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-c9bb4ae019db"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -27507,17 +27769,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "e3337758b5a1e968a51cce65f44f3bb6ef8ae1fa7d3dc7980ebdade98dd0d892",
-          "bytes": 53976,
-          "line_count": 1573,
+          "sha256": "40b6db436b6e15ed7d5dd23878e193e1e29e3ba534ae92029acfbbc4b80fce10",
+          "bytes": 55383,
+          "line_count": 1598,
           "covered_line_ranges": [
             [
               1,
-              1573
+              1598
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-anthropic-skill-craft-safety-e3337758b5a1"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-40b6db436b6e"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -27527,17 +27789,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "4b8aebb34e44dfd616e9a3e43f99958107ca1e5c79685a5828404fc280a36a69",
-          "bytes": 24785,
-          "line_count": 643,
+          "sha256": "889b3976082ec0d00e1928dd35500f82b9b9abbec56c1de31a3b3da4dcebc80e",
+          "bytes": 26459,
+          "line_count": 677,
           "covered_line_ranges": [
             [
               1,
-              643
+              677
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-lane-refresh-2026-09-14-repair-loop-anthropic-skill-craft-safety-4b8aebb34e44"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-889b3976082e"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -28051,17 +28313,17 @@
           "source_kind": "direct-support",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "18627c29de920929d1b1bce1ccfd52e8e380d8a69add2fce10fa33c9707f5343",
-          "bytes": 11230,
-          "line_count": 190,
+          "sha256": "dd54c36ad9f74d7401b3069b5f2e77ce11b1a868c61f8c06b2375a0225b9f746",
+          "bytes": 11319,
+          "line_count": 191,
           "covered_line_ranges": [
             [
               1,
-              190
+              191
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-18627c29de92"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-dd54c36ad9f7"
           ],
           "read_status": "full"
         },
@@ -28111,17 +28373,17 @@
           "source_kind": "direct-support",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "0f7ea603a2b1fefdd539a66754939f80f44f84f4913bd3f1d015dd4812f8c8ca",
-          "bytes": 21968,
-          "line_count": 346,
+          "sha256": "52a4871d2dcab364c3c97ffb6a8530c443e08300be2edf5b410ee6a8fb697973",
+          "bytes": 22059,
+          "line_count": 347,
           "covered_line_ranges": [
             [
               1,
-              346
+              347
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-0f7ea603a2b1"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-52a4871d2dca"
           ],
           "read_status": "full"
         },
@@ -28142,6 +28404,26 @@
           ],
           "review_chunk_ids": [
             "ce-localization-lane-refresh-2026-09-12-g517-closeout-anthropic-skill-craft-safety-e552f865ccca"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "tests/unit/runtime-setup-eval-judge.test.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "1c7cbdddb6ee2411785873e5fdf7f0fd93a6fad0c1761d5f48cc188f9554cd13",
+          "bytes": 2012,
+          "line_count": 47,
+          "covered_line_ranges": [
+            [
+              1,
+              47
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-1c7cbdddb6ee"
           ],
           "read_status": "full"
         },
@@ -30690,6 +30972,26 @@
       ],
       "source_read_receipts": [
         {
+          "path": "docs/contracts/workflows/mutation-enforcement.md",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-work",
+          "shared_consumers": [],
+          "sha256": "049156fba398641b3e1ecb1a9c8b872b3414a056b2fc05987e9fa6a0e8376b4b",
+          "bytes": 3237,
+          "line_count": 25,
+          "covered_line_ranges": [
+            [
+              1,
+              25
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-049156fba398"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "docs/contracts/workflows/scenario-capability-matrix.md",
           "path_role": "skill-package",
           "owning_skill": "spec-work",
@@ -31489,17 +31791,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-work",
           "shared_consumers": [],
-          "sha256": "9ce3fb3cc9059ebe757707235d36a2e80bf26536587d3919677a1fe979c1aaac",
-          "bytes": 31293,
-          "line_count": 273,
+          "sha256": "1d77e52ff8c894552d5515b7b75a514a2e384a4c5d4a3c3bc8478088bff825e9",
+          "bytes": 31450,
+          "line_count": 275,
           "covered_line_ranges": [
             [
               1,
-              273
+              275
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-anthropic-skill-craft-safety-9ce3fb3cc905"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-1d77e52ff8c8"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -33277,19 +33579,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-write-skill",
           "shared_consumers": [],
-          "sha256": "d98cf8bb068e4d2f1bf62faf61251069510b7c4156471600f940cb78b5a9f99b",
-          "bytes": 13482,
-          "line_count": 404,
+          "sha256": "6f412c5a8e3091dc59b0294dbcf6e811df726173551c50153511b70ea34a7c18",
+          "bytes": 13707,
+          "line_count": 397,
           "covered_line_ranges": [
             [
               1,
-              404
+              397
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-write-skill-3744262e"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-6f412c5a8e30"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/ce-post-3-20-calibration-contracts.test.js",
@@ -33733,19 +34036,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-write-tasks",
           "shared_consumers": [],
-          "sha256": "e6456a3506ca9dff2b246c2133e2c0fc75be7e132b4da5a0245573155cc61435",
-          "bytes": 2697,
-          "line_count": 20,
+          "sha256": "7ecd9227a4cc500abcd84256a6da0250832ed96be3100ed0501a7af18501ccc2",
+          "bytes": 3172,
+          "line_count": 24,
           "covered_line_ranges": [
             [
               1,
-              20
+              24
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-write-tasks-920ff69f"
+            "ce-localization-fsa2-repair-2026-09-15-anthropic-skill-craft-safety-7ecd9227a4cc"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-write-tasks/evals/semantic_config.json",
@@ -34776,17 +35080,17 @@
           "path_role": "skill-package",
           "owning_skill": "using-spec-first",
           "shared_consumers": [],
-          "sha256": "10f7549d3d678850410fdd9aed8e34029320142de15760d1489964f5303bd253",
-          "bytes": 8183,
-          "line_count": 160,
+          "sha256": "e087cecc4fbfd81c566ae85dba68e775de05592874e45ca312587709075bbdf4",
+          "bytes": 8256,
+          "line_count": 162,
           "covered_line_ranges": [
             [
               1,
-              160
+              162
             ]
           ],
           "review_chunk_ids": [
-            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-10f7549d3d67"
+            "ce-localization-fsa2-repair-2026-09-15-regression-anthropic-skill-craft-safety-e087cecc4fbf"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -34829,19 +35133,19 @@
       ]
     }
   ],
-  "generated_at": "2026-09-14T07:13:14.000Z",
+  "generated_at": "2026-09-16T08:06:51.974Z",
   "reviewed_expected_path_relation_count": 1019,
   "review_deltas": [
     {
-      "review_run_id": "ce-localization-lane-refresh-2026-09-14-repair-loop",
-      "artifact_ref": "docs/validation/ce-localization/review/deltas/2026-09-14-repair-loop.json",
-      "artifact_sha256": "579c23375be3f75a9e159ea55e03c2f743d2ddd7d7f219fbab56be5166bbeb45",
-      "reviewed_at": "2026-09-14T07:13:14.000Z",
+      "review_run_id": "ce-localization-fsa3-repair-2026-09-16-final",
+      "artifact_ref": "docs/validation/ce-localization/review/deltas/2026-09-16-fsa3-repair-final.json",
+      "artifact_sha256": "a40d4f6a4656ac12e99fca232c88b664854284a2643b7cf319f19e18b236cac1",
+      "reviewed_at": "2026-09-16T08:06:51.974Z",
       "review_method": "inline-same-context",
       "independent": false,
-      "provider_identity": "unverified",
+      "provider_identity": "not-used",
       "worker_context_isolation": "degraded_inherited",
-      "claim_ceiling": "current-session inline review of a concurrent-session batch; focused test evidence only; no runtime or field outcome claims"
+      "claim_ceiling": "本地源码与确定性回归"
     }
   ],
   "review_delta_findings": []

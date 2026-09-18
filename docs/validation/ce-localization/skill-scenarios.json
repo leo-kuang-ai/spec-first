@@ -5,58 +5,186 @@
   "single_writer": "ce-localization-scenario-writer",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "c0803ab5d2e80edde9ca67771c6d204b775bb354",
+    "head": "66b0e0c6c83c1e75d2e9634132586bfce5581ff3",
     "dirty": true,
     "dirty_paths": [
       "CHANGELOG.md",
-      "docs/validation/2026-09-13-full-system-audit-plan-v2.md",
-      "scripts/check-ce-upstream-reconciliation.cjs",
+      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/24-\\345\\205\\254\\345\\274\\200\\345\\205\\245\\345\\217\\243\\344\\270\\216Skill\\347\\233\\256\\345\\275\\225.md",
+      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/README.md",
+      "docs/contracts/artifact-summary.md",
+      "docs/contracts/dual-host-governance/README.md",
+      "docs/contracts/workflows/ce-localization-regeneration-sequence.md",
+      "docs/contracts/workflows/mutation-enforcement.md",
+      "docs/validation/2026-08-01-full-system-audit-plan.md",
+      "docs/validation/full-system-audit/2026-09-14-fsa2-report.md",
+      "docs/validation/full-system-audit/2026-09-15-fsa2-eval-inventory.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/build.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-autoresearch.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-app-consistency-audit.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-brainstorm.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-code-review.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-commit-push-pr.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-commit.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-compound-refresh.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-compound.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-debug.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-doc-review.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-dogfood.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-explain.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-handoff.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-ideate.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-lfg.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-optimize.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-plan.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-polish.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-pov.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-prd.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-product-pulse.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-project-rules.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-promote.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-prototype.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-resolve-pr-feedback.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-riffrec-feedback-analysis.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-rule-miner.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-runtime-setup.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-simplify-code.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-strategy.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-sweep.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-test-browser.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-test-xcode.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-work.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-write-skill.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-write-tasks.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-using-spec-first.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-autoresearch.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-app-consistency-audit.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-brainstorm.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-code-review.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-commit-push-pr.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-commit.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-compound-refresh.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-compound.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-debug.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-doc-review.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-dogfood.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-explain.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-handoff.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-ideate.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-lfg.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-optimize.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-plan.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-polish.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-pov.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-prd.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-product-pulse.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-project-rules.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-promote.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-prototype.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-resolve-pr-feedback.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-riffrec-feedback-analysis.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-rule-miner.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-runtime-setup.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-simplify-code.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-strategy.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-sweep.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-test-browser.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-test-xcode.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-work.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-write-skill.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-write-tasks.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-using-spec-first.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/install-matrix.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/lint-entrypoints.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/npm-test.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/probe-autoresearch.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/probe-commit-index.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/probe-setup-plan.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/shared-references.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/sync-instructions.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/typecheck.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/initial-status.txt",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/install/summary.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/link-candidates.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/manifest.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/plan.md",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/probes/autoresearch.py",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/probes/commit-index.py",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/probes/setup-plan.cjs",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/reads.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/redaction-canary.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/skill-inventory.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/skill-receipts.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/source-manifest.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/source-stability.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-findings.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/build.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/ce-focused-final.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/eval-autoresearch.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/eval-spec-commit.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/full-regression-final.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/full-regression.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/lint.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/shared-references.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/sync-instructions.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/typecheck.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/fresh-source-review.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/manifest.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/regression-after.log",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/regression-before.log",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/repair-final-source.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/repair-source.json",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-report.md",
+      "docs/validation/full-system-audit/2026-09-16-fsa3-run-plan.md",
+      "docs/validation/skill-evals/README.md",
+      "skills/_shared/references/concepts-vocabulary.md",
+      "skills/_shared/references/settled-decisions.md",
+      "skills/_shared/references/yaml-schema.md",
+      "skills/autoresearch/SKILL.md",
+      "skills/autoresearch/references/orchestrator-routing.md",
       "skills/autoresearch/scripts/orchestrate.sh",
-      "skills/autoresearch/scripts/score-regression.sh",
-      "skills/spec-code-review/evals/fixtures/repos/tenant-orders/prepare-review-fixture.sh",
-      "skills/spec-code-review/evals/fixtures/scripts/check-r2-preset-applied-fix.sh",
-      "skills/spec-code-review/scripts/peer-job-runner.py",
-      "skills/spec-doc-review/scripts/peer-job-runner.py",
-      "skills/spec-explain/references/explainer-html.md",
-      "skills/spec-explain/references/explainer-markdown.md",
-      "skills/spec-lfg/scripts/pr-watch-state.cjs",
-      "skills/spec-pov/scripts/peer-job-runner.py",
+      "skills/spec-brainstorm/references/settled-decisions.md",
+      "skills/spec-code-review/SKILL.md",
+      "skills/spec-code-review/references/cross-model-review.md",
+      "skills/spec-code-review/references/scope.md",
+      "skills/spec-code-review/scripts/findings-mechanics.py",
+      "skills/spec-commit/SKILL.md",
+      "skills/spec-compound-refresh/SKILL.md",
+      "skills/spec-compound-refresh/references/concepts-vocabulary.md",
+      "skills/spec-compound-refresh/references/vocabulary-refresh.md",
+      "skills/spec-doc-review/SKILL.md",
+      "skills/spec-plan/references/plan-handoff.md",
+      "skills/spec-plan/references/settled-decisions.md",
+      "skills/spec-prd/SKILL.md",
       "skills/spec-runtime-setup/SKILL.md",
-      "skills/spec-runtime-setup/scripts/lib/host-config-repair-command.cjs",
-      "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
+      "skills/spec-runtime-setup/evals/README.md",
+      "skills/spec-runtime-setup/evals/cases/check-readonly.yaml",
+      "skills/spec-runtime-setup/evals/cases/verify-only-readonly.yaml",
+      "skills/spec-runtime-setup/evals/eval.yaml",
+      "skills/spec-runtime-setup/evals/fixtures/scripts/check-readonly-verify.sh",
       "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
-      "skills/spec-runtime-setup/scripts/lib/provider-display.cjs",
-      "skills/spec-runtime-setup/scripts/lib/registry.cjs",
-      "skills/spec-runtime-setup/scripts/lib/renderer.cjs",
-      "skills/spec-runtime-setup/scripts/lib/repair-loop.cjs",
-      "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
-      "skills/spec-runtime-setup/scripts/lib/workspace-graph-build.cjs",
-      "skills/spec-runtime-setup/scripts/lib/workspace-routing-inject.cjs",
-      "skills/spec-runtime-setup/scripts/providers/codegraph.cjs",
-      "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
-      "skills/spec-runtime-setup/scripts/setup.cjs",
-      "skills/spec-runtime-setup/setup-registry.json",
-      "skills/spec-runtime-setup/setup-registry.schema.json",
-      "tests/fixtures/mcp-setup/legacy-parity/posix/runtime-contracts.json",
-      "tests/fixtures/mcp-setup/legacy-parity/windows/runtime-contracts.json",
-      "tests/fixtures/mcp-setup/platform-differences.json",
-      "tests/integration/runtime-setup-sigint-recovery.integration.test.js",
-      "tests/unit/ce-localization-closeout-contracts.test.js",
+      "skills/spec-work/references/shipping-workflow.md",
+      "skills/spec-write-tasks/evals/README.md",
+      "src/cli/adapters/kiro.js",
+      "templates/claude/commands/spec/doc-review.md",
+      "tests/smoke/cli-smoke.test.js",
+      "tests/unit/autoresearch-orchestrator-regression.test.js",
       "tests/unit/ce-localization-review-contracts.test.js",
-      "tests/unit/host-runtime-projection-contracts.test.js",
-      "tests/unit/mcp-setup-contracts.test.js",
-      "tests/unit/mcp-setup-entrypoint.test.js",
-      "tests/unit/mcp-setup-facts-renderer.test.js",
+      "tests/unit/command-resource-path-rewrite.test.js",
+      "tests/unit/doctor-platform-cli.test.js",
+      "tests/unit/mcp-setup-host-config.test.js",
       "tests/unit/mcp-setup-mode-target.test.js",
-      "tests/unit/mcp-setup-node-contracts.test.js",
-      "tests/unit/mcp-setup-registry.test.js",
-      "tests/unit/runtime-setup-provider-identity.test.js",
-      "tests/unit/runtime-setup-repair-loop.test.js",
-      "tests/unit/spec-lfg-pr-watch-state.test.js"
+      "tests/unit/runtime-setup-codegraph-evidence.test.js",
+      "tests/unit/runtime-setup-consumer-health.test.js",
+      "tests/unit/runtime-setup-eval-judge.test.js",
+      "tests/unit/spec-code-review-mechanics.test.js",
+      "tests/unit/spec-commit-scope-regression.test.js",
+      "tests/unit/spec-compound-refresh-reference-contracts.test.js",
+      "tests/unit/spec-prd-hook-contracts.test.js",
+      "tests/unit/using-spec-first-contracts.test.js"
     ],
-    "dirty_path_manifest_sha256": "7af829a1f316c8385378e61aa37da56e9af518b01e12bcc22b12a396cf5a7802",
-    "source_tree_hash": "30e23af473d58352a8fa72dc84b1826f65072fc27dbb80a97569744d092dc85a",
-    "inventory_hash": "01b3a8d60125adc6604b439dc3ebffdd834a5337030e5da02318c2bb23f666ff",
+    "dirty_path_manifest_sha256": "6c37436d8a5bdcb5f20a84726d997a2df9f95077119542111829edc11b61883b",
+    "source_tree_hash": "956b6ec3ed0883e3148062e373757f65ed8526785ebfbeb229d9488a8f1d40c0",
+    "inventory_hash": "ad15fb5a24e316debe0a2cf0301c04d84bee854568061f5745bff2adc8fdaade",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -91,7 +219,7 @@
     }
   },
   "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
-  "inventory_sha256": "463bbf35aa0b431ae0cabea527bbbafc1834aefd7995dd35b1cb79ed1952f3c0",
+  "inventory_sha256": "322ceb430284aa35078f7a02fdbc1f48acf9cd7c472cb4017c1c7c0501ef2d04",
   "scenario_fingerprint_contract_ref": "docs/contracts/workflows/scenario-capability-matrix.md",
   "scenarios": [
     {
@@ -2099,7 +2227,7 @@
       "scenario_ids": [
         "SCN-AUTORESEARCH"
       ],
-      "source_sha256": "53ec4f48e88318812d7e2ddc51b993c44d9843000972c0e68aa24fb36158d240"
+      "source_sha256": "829530b3ee2b47d9b42e1794f43c4b2e4649d5a04d1b4e685afcce7cba3cfc91"
     },
     {
       "path": "skills/autoresearch/references/predict-personas.md",
@@ -2165,7 +2293,7 @@
       "scenario_ids": [
         "SCN-AUTORESEARCH"
       ],
-      "source_sha256": "a7dae8a4ec05fd6557cfe1611091398763a6ae83acc37232daf51cd1b7ad3221"
+      "source_sha256": "eb9efb1e6bf91a148373582aa20c6cd35c740b1b30866e918fd2db33cda6dec8"
     },
     {
       "path": "skills/autoresearch/scripts/score-regression.sh",
@@ -2209,7 +2337,7 @@
       "scenario_ids": [
         "SCN-AUTORESEARCH"
       ],
-      "source_sha256": "15a44442b661389f0036a587ba32d289f748e428c5c16152059410a568cb6219"
+      "source_sha256": "d51a75af36a3a41095d50a775197635c48238ed24ed6ad3eda1ef24e50f43136"
     },
     {
       "path": "skills/spec-app-consistency-audit/evals/cases/code-review-routes-out.yaml",
@@ -3507,7 +3635,7 @@
       "scenario_ids": [
         "SCN-SPEC-BRAINSTORM"
       ],
-      "source_sha256": "a9e4f0e64dba0ec0526756bd8e8aa0a27a57ba8ee6ac35b5abc99488264e4ab0"
+      "source_sha256": "5b36b0da843bdd2ca18dae80c2cd6b53d3489ff9e2336a26ec07f75221a60937"
     },
     {
       "path": "skills/spec-brainstorm/references/synthesis-summary.md",
@@ -3837,7 +3965,7 @@
       "scenario_ids": [
         "SCN-SPEC-CODE-REVIEW"
       ],
-      "source_sha256": "c9d20d836fb887f7e80cd0deb9e19b6de592936904a63fec9dbcc35d6d0a0938"
+      "source_sha256": "1783d4e2527a24332faa890c6fb91f1ae350d8ec500acadfef02f54b093397ff"
     },
     {
       "path": "skills/spec-code-review/references/diff-scope.md",
@@ -4123,7 +4251,7 @@
       "scenario_ids": [
         "SCN-SPEC-CODE-REVIEW"
       ],
-      "source_sha256": "326c7d55e4c0e2ca13fad7f53c47cafc020fd8e5401dadeadca46e28335387e1"
+      "source_sha256": "acc0e68f87ec07a4b00af41ed9b9234e933033999c7ac7f07b0f708ad59e485b"
     },
     {
       "path": "skills/spec-code-review/references/select-and-route.md",
@@ -4178,7 +4306,7 @@
       "scenario_ids": [
         "SCN-SPEC-CODE-REVIEW"
       ],
-      "source_sha256": "b025d98df3fc5f571451a3a43673362fc010c43c4adb2a9be581cec600af345e"
+      "source_sha256": "a40e7166c72b151d0da1158256c6775a75f8ac78b8ad3df6a5768829fa308231"
     },
     {
       "path": "skills/spec-code-review/scripts/peer-job-runner.py",
@@ -4222,7 +4350,7 @@
       "scenario_ids": [
         "SCN-SPEC-CODE-REVIEW"
       ],
-      "source_sha256": "4b8c5e3ea2e9a838e82d191e97676e193f8d16005c17b9e93b07e4cb7f24732a"
+      "source_sha256": "78a117cff4a12d5e9af6606d358a64d099833858716104eecdd33080e6b50dea"
     },
     {
       "path": "skills/spec-commit-push-pr/evals/cases/description-only-non-mutating.yaml",
@@ -4486,7 +4614,7 @@
       "scenario_ids": [
         "SCN-SPEC-COMMIT"
       ],
-      "source_sha256": "7dcb1fa0029116e5854aa0af04c6449f2146d46d86b4c6071c65c18929474dcf"
+      "source_sha256": "f1cf7b8801e7d25f706af168a2acd54a864e1df4b893ff474305d415230de8b8"
     },
     {
       "path": "skills/spec-compound-refresh/assets/resolution-template.md",
@@ -4596,7 +4724,7 @@
       "scenario_ids": [
         "SCN-SPEC-COMPOUND-REFRESH"
       ],
-      "source_sha256": "cd71ab5d7ecbc6f54f454b4d7d8c2edf6616e3ecdc40e67932d9cc548e1b66eb"
+      "source_sha256": "5bdbdfa6166cfd8ad2ffb76262f4ee805dc2ebaec7195d1a57cfc5530f3b2312"
     },
     {
       "path": "skills/spec-compound-refresh/references/discoverability.md",
@@ -4687,6 +4815,17 @@
       "source_sha256": "952dcba67b9fceee15986c83313e6104587e20064902b343a9d2b4b4564ca08c"
     },
     {
+      "path": "skills/spec-compound-refresh/references/vocabulary-refresh.md",
+      "owning_skill": "spec-compound-refresh",
+      "path_role": "reference-contract",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-COMPOUND-REFRESH"
+      ],
+      "source_sha256": "0a3b03caf0b84190ec0fe8e742641e5bc63503580f4366dfad9159a3d29a5d9a"
+    },
+    {
       "path": "skills/spec-compound-refresh/references/worth-audit.md",
       "owning_skill": "spec-compound-refresh",
       "path_role": "reference-contract",
@@ -4750,7 +4889,7 @@
       "scenario_ids": [
         "SCN-SPEC-COMPOUND-REFRESH"
       ],
-      "source_sha256": "9e5a18312b11d9ff0c36e47029b37ab8960fcd86697f9eb714a59840b1c3c765"
+      "source_sha256": "f91c111735d8140d21baac0ef836523d2051bce2d52b7a6787e52cad2577ca3e"
     },
     {
       "path": "skills/spec-compound/assets/resolution-template.md",
@@ -5971,7 +6110,7 @@
       "scenario_ids": [
         "SCN-SPEC-DOC-REVIEW"
       ],
-      "source_sha256": "5910a29d69f49c5846617bbd525e4b5debccdd5738b6428a9c38d8338b58d257"
+      "source_sha256": "c96d48de5841a1d3c2692232e54107a5eaccdf0337817dc024c2af6d958eaab0"
     },
     {
       "path": "skills/spec-dogfood/evals/cases/owner-unavailable-stops.yaml",
@@ -8237,7 +8376,7 @@
       "scenario_ids": [
         "SCN-SPEC-PLAN"
       ],
-      "source_sha256": "957a4f8e57fd46fdd88971f72c0b92720e90a14500aff85ee5e007a853fc8a77"
+      "source_sha256": "103e4d205215a2b4fdfd05118c782bc497feec5b680dd57204184519f020ebc8"
     },
     {
       "path": "skills/spec-plan/references/plan-sections.md",
@@ -8292,7 +8431,7 @@
       "scenario_ids": [
         "SCN-SPEC-PLAN"
       ],
-      "source_sha256": "a9e4f0e64dba0ec0526756bd8e8aa0a27a57ba8ee6ac35b5abc99488264e4ab0"
+      "source_sha256": "5b36b0da843bdd2ca18dae80c2cd6b53d3489ff9e2336a26ec07f75221a60937"
     },
     {
       "path": "skills/spec-plan/references/structure.md",
@@ -9381,7 +9520,7 @@
       "scenario_ids": [
         "SCN-SPEC-PRD"
       ],
-      "source_sha256": "3b7b33f0eb9d69601cf43596f1098b3a30b27e8283a12a3ded210d12597ee443"
+      "source_sha256": "25cc60f639d886c024a61b462c84cb101f6b95a6098984a879f2a750292e230a"
     },
     {
       "path": "skills/spec-product-pulse/evals/cases/unconfigured-guides-setup.yaml",
@@ -11463,6 +11602,17 @@
       "source_sha256": "306fc3e4cbe1a067434807b7eed1c765213fa6be357d2e3d16960f79abe434d1"
     },
     {
+      "path": "skills/spec-runtime-setup/evals/cases/check-readonly.yaml",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "a3487762e9a7f19a74011b711524685b3198885801aeec01185cbfc4fefd56c6"
+    },
+    {
       "path": "skills/spec-runtime-setup/evals/cases/semantic-question-not-setup.yaml",
       "owning_skill": "spec-runtime-setup",
       "path_role": "evaluation",
@@ -11474,17 +11624,6 @@
       "source_sha256": "46f3f0381e1032361c88c12e3bea4c85eecedc02e49557a956acaf03bee059a4"
     },
     {
-      "path": "skills/spec-runtime-setup/evals/cases/verify-only-readonly.yaml",
-      "owning_skill": "spec-runtime-setup",
-      "path_role": "evaluation",
-      "evidence_role": "behavior-eval",
-      "terminal_disposition": "scenario-bound",
-      "scenario_ids": [
-        "SCN-SPEC-RUNTIME-SETUP"
-      ],
-      "source_sha256": "bfa92b3cd1663a5d4039e728b8dda647bbe79fff8bc5c25b4855cf84b40eb09f"
-    },
-    {
       "path": "skills/spec-runtime-setup/evals/eval.yaml",
       "owning_skill": "spec-runtime-setup",
       "path_role": "evaluation",
@@ -11493,7 +11632,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "9660883a84fdff754dfb8b4d5cb3d23639696408ea14799338646a45deeb6013"
+      "source_sha256": "7d599dd2d2c3050f398dc718ea8f7a941b0dc3096c4d09c4fa1dc858d944e444"
     },
     {
       "path": "skills/spec-runtime-setup/evals/examples.json",
@@ -11570,7 +11709,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "aa04755d1beccdf297f6d941d2d4dea00453faff21e038b76f6035d67bcc821c"
+      "source_sha256": "bc2b8e3d185800b49bf9dbb8106a3fc3a095aeb84af3f34a407f50dbb2d0c424"
     },
     {
       "path": "skills/spec-runtime-setup/evals/README.md",
@@ -11581,7 +11720,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "4d45452e642cff2002574983e0410d20550f913750f524f0d90c7929a33a34e5"
+      "source_sha256": "3fa14bbff07035ebd111403be38fa81208c5ab93079e1f03e372c41236532d81"
     },
     {
       "path": "skills/spec-runtime-setup/references/config-template.yaml",
@@ -11768,7 +11907,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "23328a6ea3a1188f2bea2ea6a022de168b3fab05631774ad159468e4dad8339c"
+      "source_sha256": "30a0c5b91747cad8676e1d11040dde45b63ce4fc6450a2d5fa7c402472aa6ab8"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/npm-warmup.cjs",
@@ -12373,7 +12512,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "892434da474d5b0d58f1b89628351552f6782e8136a896b79e56d78795de73ad"
+      "source_sha256": "c9bb4ae019db0fcbfcc89772a405e0df4fa9f4b0ba404813c330ff4d502de41a"
     },
     {
       "path": "skills/spec-simplify-code/evals/cases/bug-request-routes-debug.yaml",
@@ -13539,7 +13678,7 @@
       "scenario_ids": [
         "SCN-SPEC-WORK"
       ],
-      "source_sha256": "9ce3fb3cc9059ebe757707235d36a2e80bf26536587d3919677a1fe979c1aaac"
+      "source_sha256": "1d77e52ff8c894552d5515b7b75a514a2e384a4c5d4a3c3bc8478088bff825e9"
     },
     {
       "path": "skills/spec-work/references/tracker-defer.md",
@@ -14001,7 +14140,7 @@
       "scenario_ids": [
         "SCN-SPEC-WRITE-TASKS"
       ],
-      "source_sha256": "e6456a3506ca9dff2b246c2133e2c0fc75be7e132b4da5a0245573155cc61435"
+      "source_sha256": "7ecd9227a4cc500abcd84256a6da0250832ed96be3100ed0501a7af18501ccc2"
     },
     {
       "path": "skills/spec-write-tasks/evals/semantic_config.json",
@@ -14301,6 +14440,17 @@
       "source_sha256": "4f08c3cb3aa21d3f858a08f6d9a474e5cbbdacf49d4e6555f4382d3ba9809154"
     },
     {
+      "path": "tests/unit/autoresearch-orchestrator-regression.test.js",
+      "owning_skill": "autoresearch",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-AUTORESEARCH"
+      ],
+      "source_sha256": "796b359fd63276ca1ea4cb044b27f0815e63dd0914792f77015fe0c7d7d6f8f4"
+    },
+    {
       "path": "tests/unit/ce-localization-review-contracts.test.js",
       "owning_skill": "autoresearch",
       "path_role": "evaluation",
@@ -14309,7 +14459,7 @@
       "scenario_ids": [
         "SCN-AUTORESEARCH"
       ],
-      "source_sha256": "f40c8f707b0e2caa0ad9843f92a065e48e146d6a0d6e981ffeb990b181e46ea8"
+      "source_sha256": "96e6694946357851d9ca39fa6c4297c1463d9c7f10375f65abb885acad8aade6"
     },
     {
       "path": "docs/contracts/workflows/scenario-capability-matrix.md",
@@ -14387,6 +14537,17 @@
         "SCN-SPEC-APP-CONSISTENCY-AUDIT"
       ],
       "source_sha256": "5bf7a628be3e1db2feba167f4bbb49cb345b4bf95d5f01fc3614023f8bbf1539"
+    },
+    {
+      "path": "scripts/sync-shared-references.js",
+      "owning_skill": "spec-brainstorm",
+      "path_role": "support-asset",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-BRAINSTORM"
+      ],
+      "source_sha256": "f14244816b4bd98c233b71c3f2c053ec79613209bf91ad87cf9e8728ded5f53d"
     },
     {
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
@@ -14782,7 +14943,7 @@
       "scenario_ids": [
         "SCN-SPEC-CODE-REVIEW"
       ],
-      "source_sha256": "ce6d36e3a88ead3167b9c302f76a21ae704a64967d925ef892c33c99ca8e86cf"
+      "source_sha256": "673ab2389164d94a53558b8a82d6143ad7224c3ac6cce1eb03523edb91c188dc"
     },
     {
       "path": "tests/unit/spec-code-review-peer-runner.test.js",
@@ -14928,6 +15089,17 @@
       "source_sha256": "ea5e43dc16dc58ddffd6c13749a91551c353076e7378a639955260b59f638c73"
     },
     {
+      "path": "tests/unit/spec-commit-scope-regression.test.js",
+      "owning_skill": "spec-commit",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-COMMIT"
+      ],
+      "source_sha256": "10f82f2dbce11fb87c6406a85a9f3fb0cfe213c2e496ed866f0a33047a5122be"
+    },
+    {
       "path": "tests/unit/specialized-skill-calibration-contracts.test.js",
       "owning_skill": "spec-commit",
       "path_role": "evaluation",
@@ -14947,7 +15119,7 @@
       "scenario_ids": [
         "SCN-SPEC-COMMIT"
       ],
-      "source_sha256": "10f7549d3d678850410fdd9aed8e34029320142de15760d1489964f5303bd253"
+      "source_sha256": "e087cecc4fbfd81c566ae85dba68e775de05592874e45ca312587709075bbdf4"
     },
     {
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
@@ -15068,7 +15240,7 @@
       "scenario_ids": [
         "SCN-SPEC-COMPOUND-REFRESH"
       ],
-      "source_sha256": "e228e0b02f5c045404e786dd993d6fe5a3da774421098770b196693b425aed60"
+      "source_sha256": "fa95f8547d58a89c8caf16aee54c9b1876be0ed8707ee747bc87fcbd373be3c7"
     },
     {
       "path": "docs/contracts/knowledge/knowledge-harness.md",
@@ -15277,7 +15449,7 @@
       "scenario_ids": [
         "SCN-SPEC-COMPOUND"
       ],
-      "source_sha256": "e228e0b02f5c045404e786dd993d6fe5a3da774421098770b196693b425aed60"
+      "source_sha256": "fa95f8547d58a89c8caf16aee54c9b1876be0ed8707ee747bc87fcbd373be3c7"
     },
     {
       "path": "tests/unit/specialized-skill-calibration-contracts.test.js",
@@ -15486,7 +15658,7 @@
       "scenario_ids": [
         "SCN-SPEC-DOC-REVIEW"
       ],
-      "source_sha256": "4b7fde706674bbab8435072dfb17e2803bac3f3937457b6283e23206771a477b"
+      "source_sha256": "8ea76ec11156bc9d4bed69b75818719051aa12339d9e6b5707d80e147709c814"
     },
     {
       "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
@@ -15508,7 +15680,7 @@
       "scenario_ids": [
         "SCN-SPEC-DOC-REVIEW"
       ],
-      "source_sha256": "929d5b6047663a46f908d724beac570c50d8580352b377d8feb9b5ad2afb8f81"
+      "source_sha256": "0ebb26de711bc2a62ec42aa8d1b0eef275140169ff8a3db8a30b99159ce66801"
     },
     {
       "path": "tests/unit/dispatch-authorization-matrix-contracts.test.js",
@@ -16215,6 +16387,17 @@
       "source_sha256": "077346486662b0e3a57e9261ed810d0c23400dbc32c0f406cd22ff29101770f9"
     },
     {
+      "path": "scripts/sync-shared-references.js",
+      "owning_skill": "spec-plan",
+      "path_role": "support-asset",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-PLAN"
+      ],
+      "source_sha256": "f14244816b4bd98c233b71c3f2c053ec79613209bf91ad87cf9e8728ded5f53d"
+    },
+    {
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
       "owning_skill": "spec-plan",
       "path_role": "support-asset",
@@ -16600,6 +16783,17 @@
       "source_sha256": "b16b3960b52b3ddbda7ae8f1dca7e2514dde4efaa5671e961783a4d34aa6bf04"
     },
     {
+      "path": "docs/contracts/workflows/mutation-enforcement.md",
+      "owning_skill": "spec-prd",
+      "path_role": "reference-contract",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-PRD"
+      ],
+      "source_sha256": "049156fba398641b3e1ecb1a9c8b872b3414a056b2fc05987e9fa6a0e8376b4b"
+    },
+    {
       "path": "docs/contracts/workflows/scenario-capability-matrix.md",
       "owning_skill": "spec-prd",
       "path_role": "reference-contract",
@@ -16707,7 +16901,7 @@
       "scenario_ids": [
         "SCN-SPEC-PRD"
       ],
-      "source_sha256": "929d5b6047663a46f908d724beac570c50d8580352b377d8feb9b5ad2afb8f81"
+      "source_sha256": "0ebb26de711bc2a62ec42aa8d1b0eef275140169ff8a3db8a30b99159ce66801"
     },
     {
       "path": "tests/unit/dispatch-authorization-matrix-contracts.test.js",
@@ -16839,7 +17033,7 @@
       "scenario_ids": [
         "SCN-SPEC-PRD"
       ],
-      "source_sha256": "07a975108a3357e7ae8ecef926c863b0da603d06dca4bd29fd8faabb9d37ce08"
+      "source_sha256": "ecd2e10d2bd84ee132f552f90f474cb854972ecdc87d25206c5cf1299659c432"
     },
     {
       "path": "tests/unit/spec-prd-lite-profile-contracts.test.js",
@@ -17521,7 +17715,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "e3337758b5a1e968a51cce65f44f3bb6ef8ae1fa7d3dc7980ebdade98dd0d892"
+      "source_sha256": "40b6db436b6e15ed7d5dd23878e193e1e29e3ba534ae92029acfbbc4b80fce10"
     },
     {
       "path": "tests/unit/mcp-setup-mode-target.test.js",
@@ -17532,7 +17726,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "4b8aebb34e44dfd616e9a3e43f99958107ca1e5c79685a5828404fc280a36a69"
+      "source_sha256": "889b3976082ec0d00e1928dd35500f82b9b9abbec56c1de31a3b3da4dcebc80e"
     },
     {
       "path": "tests/unit/mcp-setup-node-contracts.test.js",
@@ -17829,7 +18023,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "18627c29de920929d1b1bce1ccfd52e8e380d8a69add2fce10fa33c9707f5343"
+      "source_sha256": "dd54c36ad9f74d7401b3069b5f2e77ce11b1a868c61f8c06b2375a0225b9f746"
     },
     {
       "path": "tests/unit/runtime-setup-codegraph-install-integrity.test.js",
@@ -17862,7 +18056,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "0f7ea603a2b1fefdd539a66754939f80f44f84f4913bd3f1d015dd4812f8c8ca"
+      "source_sha256": "52a4871d2dcab364c3c97ffb6a8530c443e08300be2edf5b410ee6a8fb697973"
     },
     {
       "path": "tests/unit/runtime-setup-demand-policy.test.js",
@@ -17874,6 +18068,17 @@
         "SCN-SPEC-RUNTIME-SETUP"
       ],
       "source_sha256": "e552f865ccca4f977018893e92e7cb239a3164dc06455f51fee2c639079b1f07"
+    },
+    {
+      "path": "tests/unit/runtime-setup-eval-judge.test.js",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "1c7cbdddb6ee2411785873e5fdf7f0fd93a6fad0c1761d5f48cc188f9554cd13"
     },
     {
       "path": "tests/unit/runtime-setup-npm-integrity.test.js",
@@ -18248,6 +18453,17 @@
         "SCN-SPEC-TEST-XCODE"
       ],
       "source_sha256": "9c6759820e0598ddb551a0f159056cd9246b54fd25e54b30a6b608fe1cbcbe27"
+    },
+    {
+      "path": "docs/contracts/workflows/mutation-enforcement.md",
+      "owning_skill": "spec-work",
+      "path_role": "reference-contract",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-WORK"
+      ],
+      "source_sha256": "049156fba398641b3e1ecb1a9c8b872b3414a056b2fc05987e9fa6a0e8376b4b"
     },
     {
       "path": "docs/contracts/workflows/scenario-capability-matrix.md",
@@ -18720,7 +18936,7 @@
       "scenario_ids": [
         "SCN-SPEC-WRITE-SKILL"
       ],
-      "source_sha256": "d98cf8bb068e4d2f1bf62faf61251069510b7c4156471600f940cb78b5a9f99b"
+      "source_sha256": "6f412c5a8e3091dc59b0294dbcf6e811df726173551c50153511b70ea34a7c18"
     },
     {
       "path": "tests/unit/ce-post-3-20-calibration-contracts.test.js",
@@ -19116,7 +19332,7 @@
       "scenario_ids": [
         "SCN-USING-SPEC-FIRST"
       ],
-      "source_sha256": "10f7549d3d678850410fdd9aed8e34029320142de15760d1489964f5303bd253"
+      "source_sha256": "e087cecc4fbfd81c566ae85dba68e775de05592874e45ca312587709075bbdf4"
     }
   ],
   "handoff_contracts": [

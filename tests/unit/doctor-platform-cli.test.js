@@ -7,6 +7,18 @@ const {
 } = require('../../src/cli/commands/doctor');
 
 describe('doctor host CLI version probes', () => {
+  test('Kiro 投影检查明确提示缺少 loader 证据，不把 active 当验证通过', () => {
+    const adapter = getAdapter('kiro');
+    const checks = adapter.inspectRuntimeFiles(require('node:os').tmpdir());
+    expect(checks).toEqual(expect.arrayContaining([
+      expect.objectContaining({ reasonCode: 'kiro_generated_runtime_loader_unverified',
+        level: 'WARNING', drift: false, disposition: 'known_limitation' }),
+    ]));
+    expect(buildHostSupportView(adapter, { detectedVersion: 'fixture-version' }, checks))
+      .toMatchObject({ support_state: 'active', loader_evidence: false,
+        reason_codes: expect.arrayContaining(['kiro_generated_runtime_loader_unverified']) });
+  });
+
   test('uses cmd.exe only for Windows fixed-command version probes', () => {
     const calls = [];
     const result = checkPlatformCli('codex', {

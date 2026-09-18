@@ -115,6 +115,7 @@ test('doctor 消费原证据，DB 改变或旧证据缺失撤销 fresh 计数', 
   fs.mkdirSync(skillRoot);
   const registry = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../skills/spec-runtime-setup/setup-registry.json')));
   registry.hosts.codex.defaults.tool.host_config.targets.system.config_path = path.join(root, 'system.toml');
+  registry.hosts.codex.defaults.tool.host_config.targets.system.containment_root = root;
   fs.writeFileSync(path.join(skillRoot, 'setup-registry.json'), JSON.stringify(registry));
   context.skillRoot = skillRoot;
   const applied = provider.apply(context, plan);

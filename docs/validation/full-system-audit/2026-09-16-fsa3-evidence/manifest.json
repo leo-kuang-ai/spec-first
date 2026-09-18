@@ -1,0 +1,12 @@
+{
+  "run_id": "2026-09-16-fsa3",
+  "source": "/Users/kuang/xiaobu/spec-first",
+  "worktree": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first-fsa3-9x793ebm/spec-first",
+  "evidence": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first-fsa3-9x793ebm/evidence",
+  "base": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first-fsa3-9x793ebm",
+  "source_snapshot": "e806f0ee3d06f9ddc761a8feb9e3b4d3dec3bdb3b0748ffc49dd3d6b8f2cd9e7",
+  "head": "66b0e0c6c83c1e75d2e9634132586bfce5581ff3",
+  "created_at": "2026-09-16T06:21:26.879069+00:00",
+  "files": 5191,
+  "scope": "HEAD plus all tracked and untracked non-ignored input; node_modules reused via symlink"
+}

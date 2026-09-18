@@ -1,6 +1,6 @@
 # Session-Settled Decisions
 
-Protocol and schema for carrying decisions the user already made in the invoking conversation, so this skill augments them instead of re-litigating them. This file is byte-duplicated between `spec-plan` and `spec-brainstorm` (skills cannot share files); any edit must land in both copies and is guarded by `tests/settled-decisions-parity.test.ts`.
+本协议携带当前对话中用户已作出的决策，避免再次讨论已定事项。维护源为 `skills/_shared/references/settled-decisions.md`；修改后运行 `node scripts/sync-shared-references.js`，生成 spec-plan 与 spec-brainstorm 的独立分发副本。回归检查为 `tests/unit/settled-decisions-contracts.test.js`。
 
 ## The settlement test
 

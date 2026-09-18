@@ -4,9 +4,9 @@
 
 - `src/cli/contracts/dual-host-governance/skills-governance.json`（`entry_surface` / 宿主投递）
 - `skills/*/SKILL.md`（触发条件、边界、产物）
-- `.agents/skills/using-spec-first/SKILL.md` 或源码 `skills/using-spec-first/SKILL.md`（入口路由语义）
+- `skills/using-spec-first/SKILL.md`（入口路由语义；宿主内的安装副本仅为投射）
 
-撰写时以 `package.json` / `spec-first -v` 的版本为准（当前为 `1.13.2`）。入口有增减时优先改 governance 与 skill source，再同步本页。
+撰写时以 `package.json` / `spec-first -v` 的版本为准（当前为 `1.15.3`）。入口有增减时优先改 governance 与 skill source，再同步本页。
 
 ## 1. 怎么选入口
 
@@ -38,7 +38,7 @@
 
 ## 3. 公开 workflow 命令（`entry_surface: workflow_command`）
 
-宿主侧统一写作 `spec-*`。Claude 常见为 slash / command；Codex / Cursor / Kiro / Qoder 以各宿主 skill discovery 为准。
+宿主侧统一写作 `spec-*`。Claude / Qoder / OpenCode 投射 command 与对应 Skill；Codex / Cursor / Kiro / ZCode / Pi 通过 Skill discovery。具体调用形式与能力限制以宿主版本和当前投射为准。
 
 | 入口 | 一句话用途 | 何时用 / 不用 |
 | --- | --- | --- |
@@ -68,6 +68,8 @@
 | 入口 | 一句话用途 |
 | --- | --- |
 | `using-spec-first` | 入口治理：选一个下一步入口，不创建 artifact |
+| `autoresearch` | 围绕可检查目标开展有界迭代，保留验证与停止条件 |
+| `spec-prototype` | 为尚未确定的产品行为或体验制作可丢弃原型 |
 | `spec-explain` | 把概念 / diff / 想法 / 近期工作做成面向你的 dense explainer |
 | `spec-handoff` | **仅在用户明确要求跨会话延续时**创建 immutable 本地 handoff，或从用户选定 source 恢复只读上下文；恢复后必须停下等待用户选择 |
 | `spec-pov` | 对外部输入给出**项目语境下的**采纳 / 否决 verdict |

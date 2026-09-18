@@ -1,0 +1,305 @@
+FAIL tests/unit/autoresearch-orchestrator-regression.test.js
+  ● refusal output contains no user-supplied URL components: postgresql://FAKE_USER:FAKE_PASSWORD@remote.example/prod?token=FAKE_QUERY
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "db-url-not-allowed"
+    Received string:    "refuse: DB URL postgresql://FAKE_USER:FAKE_PASSWORD@remote.example/prod?token=FAKE_QUERY — host=remote.example dbname=prod fails the anchored allowlist (exact localhost/127.0.0.1/::1 or single-label service hostname, or dbname *_test/*_ci suffix; bare substrings do not qualify)
+    "
+
+      28 |   const result = run('screen-cmd', `db-client ${url}`);
+      29 |   expect(result.status).toBe(2);
+    > 30 |   expect(result.stdout).toContain('db-url-not-allowed');
+         |                         ^
+      31 |   expect(result.stdout + result.stderr).not.toMatch(/FAKE_|remote\.example/);
+      32 | });
+      33 |
+
+      at toContain (tests/unit/autoresearch-orchestrator-regression.test.js:30:25)
+
+  ● refusal output contains no user-supplied URL components: mysql://FAKE_USER:FAKE_PASSWORD@remote.example/FAKE_PATH#FAKE_FRAGMENT
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "db-url-not-allowed"
+    Received string:    "refuse: DB URL mysql://FAKE_USER:FAKE_PASSWORD@remote.example/FAKE_PATH#FAKE_FRAGMENT — host=remote.example dbname=FAKE_PATH fails the anchored allowlist (exact localhost/127.0.0.1/::1 or single-label service hostname, or dbname *_test/*_ci suffix; bare substrings do not qualify)
+    "
+
+      28 |   const result = run('screen-cmd', `db-client ${url}`);
+      29 |   expect(result.status).toBe(2);
+    > 30 |   expect(result.stdout).toContain('db-url-not-allowed');
+         |                         ^
+      31 |   expect(result.stdout + result.stderr).not.toMatch(/FAKE_|remote\.example/);
+      32 | });
+      33 |
+
+      at toContain (tests/unit/autoresearch-orchestrator-regression.test.js:30:25)
+
+  ● refusal output contains no user-supplied URL components: postgres://FAKE_HOST.example/FAKE_PATH
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "db-url-not-allowed"
+    Received string:    "refuse: DB URL postgres://FAKE_HOST.example/FAKE_PATH — host=fake_host.example dbname=FAKE_PATH fails the anchored allowlist (exact localhost/127.0.0.1/::1 or single-label service hostname, or dbname *_test/*_ci suffix; bare substrings do not qualify)
+    "
+
+      28 |   const result = run('screen-cmd', `db-client ${url}`);
+      29 |   expect(result.status).toBe(2);
+    > 30 |   expect(result.stdout).toContain('db-url-not-allowed');
+         |                         ^
+      31 |   expect(result.stdout + result.stderr).not.toMatch(/FAKE_|remote\.example/);
+      32 | });
+      33 |
+
+      at toContain (tests/unit/autoresearch-orchestrator-regression.test.js:30:25)
+
+  ● resumed predicates use the same redacted refusal
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "db-url-not-allowed"
+    Received string:    "refuse: DB URL postgres://FAKE_USER:FAKE_PASSWORD@remote.example/prod — host=remote.example dbname=prod fails the anchored allowlist (exact localhost/127.0.0.1/::1 or single-label service hostname, or dbname *_test/*_ci suffix; bare substrings do not qualify)
+    "
+
+      37 |   });
+      38 |   expect(result.status).toBe(2);
+    > 39 |   expect(result.stdout).toContain('db-url-not-allowed');
+         |                         ^
+      40 |   expect(result.stdout + result.stderr).not.toMatch(/FAKE_|remote\.example/);
+      41 | });
+      42 |
+
+      at Object.toContain (tests/unit/autoresearch-orchestrator-regression.test.js:39:25)
+
+  ● unresolved evidence cannot converge: {"pending_verify":true}
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "PENDING-VERIFY"
+    Received: "CONVERGED"
+
+      61 |   const result = stateRun('verdict', state);
+      62 |   expect(result.status).toBe(0);
+    > 63 |   expect(result.stdout.split('\n')[0]).toBe(verdict);
+         |                                        ^
+      64 | });
+      65 |
+      66 | test('verified recovery can converge after an older failed hop', () => {
+
+      at toBe (tests/unit/autoresearch-orchestrator-regression.test.js:63:40)
+
+  ● unresolved evidence cannot converge: {"hop_log":[{"outcome":"failed"}]}
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+        "status": 0,
+    -   "stdout": "BLOCKED
+    +   "stdout": "DONE
+      ",
+      }
+
+      58 | ])('unresolved evidence cannot converge: %j', (state, hop, verdict) => {
+      59 |   expect(stateRun('validate-state', state).status).toBe(0);
+    > 60 |   expect(stateRun('next-hop', state)).toMatchObject({ status: 0, stdout: `${hop}\n` });
+         |                                       ^
+      61 |   const result = stateRun('verdict', state);
+      62 |   expect(result.status).toBe(0);
+      63 |   expect(result.stdout.split('\n')[0]).toBe(verdict);
+
+      at toMatchObject (tests/unit/autoresearch-orchestrator-regression.test.js:60:39)
+
+  ● unresolved evidence cannot converge: {"hop_log":[{"outcome":"blocked"}]}
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+        "status": 0,
+    -   "stdout": "BLOCKED
+    +   "stdout": "DONE
+      ",
+      }
+
+      58 | ])('unresolved evidence cannot converge: %j', (state, hop, verdict) => {
+      59 |   expect(stateRun('validate-state', state).status).toBe(0);
+    > 60 |   expect(stateRun('next-hop', state)).toMatchObject({ status: 0, stdout: `${hop}\n` });
+         |                                       ^
+      61 |   const result = stateRun('verdict', state);
+      62 |   expect(result.status).toBe(0);
+      63 |   expect(result.stdout.split('\n')[0]).toBe(verdict);
+
+      at toMatchObject (tests/unit/autoresearch-orchestrator-regression.test.js:60:39)
+
+  ● unresolved evidence cannot converge: {"hop_log":[{"outcome":"failed","retry_route":"fix"}]}
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+        "status": 0,
+    -   "stdout": "fix
+    +   "stdout": "DONE
+      ",
+      }
+
+      58 | ])('unresolved evidence cannot converge: %j', (state, hop, verdict) => {
+      59 |   expect(stateRun('validate-state', state).status).toBe(0);
+    > 60 |   expect(stateRun('next-hop', state)).toMatchObject({ status: 0, stdout: `${hop}\n` });
+         |                                       ^
+      61 |   const result = stateRun('verdict', state);
+      62 |   expect(result.status).toBe(0);
+      63 |   expect(result.stdout.split('\n')[0]).toBe(verdict);
+
+      at toMatchObject (tests/unit/autoresearch-orchestrator-regression.test.js:60:39)
+
+  ● unresolved evidence cannot converge: {"last_handoff":{"errors":1}}
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "INCOMPLETE"
+    Received: "CONVERGED"
+
+      61 |   const result = stateRun('verdict', state);
+      62 |   expect(result.status).toBe(0);
+    > 63 |   expect(result.stdout.split('\n')[0]).toBe(verdict);
+         |                                        ^
+      64 | });
+      65 |
+      66 | test('verified recovery can converge after an older failed hop', () => {
+
+      at toBe (tests/unit/autoresearch-orchestrator-regression.test.js:63:40)
+
+  ● unresolved evidence cannot converge: {"last_handoff":{"verdict":"UNSTABLE"}}
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "INCOMPLETE"
+    Received: "CONVERGED"
+
+      61 |   const result = stateRun('verdict', state);
+      62 |   expect(result.status).toBe(0);
+    > 63 |   expect(result.stdout.split('\n')[0]).toBe(verdict);
+         |                                        ^
+      64 | });
+      65 |
+      66 | test('verified recovery can converge after an older failed hop', () => {
+
+      at toBe (tests/unit/autoresearch-orchestrator-regression.test.js:63:40)
+
+  ● unresolved evidence cannot converge: {"last_handoff":{"untested_gaps":true}}
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "INCOMPLETE"
+    Received: "CONVERGED"
+
+      61 |   const result = stateRun('verdict', state);
+      62 |   expect(result.status).toBe(0);
+    > 63 |   expect(result.stdout.split('\n')[0]).toBe(verdict);
+         |                                        ^
+      64 | });
+      65 |
+      66 | test('verified recovery can converge after an older failed hop', () => {
+
+      at toBe (tests/unit/autoresearch-orchestrator-regression.test.js:63:40)
+
+  ● unresolved evidence cannot converge: {"units_remaining":[null,null,null]}
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "BLOCKED"
+    Received: "CONVERGED"
+
+      61 |   const result = stateRun('verdict', state);
+      62 |   expect(result.status).toBe(0);
+    > 63 |   expect(result.stdout.split('\n')[0]).toBe(verdict);
+         |                                        ^
+      64 | });
+      65 |
+      66 | test('verified recovery can converge after an older failed hop', () => {
+
+      at toBe (tests/unit/autoresearch-orchestrator-regression.test.js:63:40)
+
+  ● classification supplies advisory candidates without selecting a route: what should I build next?
+
+    SyntaxError: Unexpected token 'b', "build-feat"... is not valid JSON
+        at JSON.parse (<anonymous>)
+
+      79 |     const result = run('classify', goal);
+      80 |     expect(result.status).toBe(0);
+    > 81 |     const facts = JSON.parse(result.stdout);
+         |                        ^
+      82 |     expect(facts).toMatchObject({ schema_version: 1, status: 'advisory', requires_semantic_judgment: true });
+      83 |     expect(facts).not.toHaveProperty('archetype');
+      84 |     expect(facts).not.toHaveProperty('mode');
+
+      at parse (tests/unit/autoresearch-orchestrator-regression.test.js:81:24)
+
+  ● classification supplies advisory candidates without selecting a route: document the release process; do not deploy
+
+    SyntaxError: Unexpected token 's', "ship-ready"... is not valid JSON
+        at JSON.parse (<anonymous>)
+
+      79 |     const result = run('classify', goal);
+      80 |     expect(result.status).toBe(0);
+    > 81 |     const facts = JSON.parse(result.stdout);
+         |                        ^
+      82 |     expect(facts).toMatchObject({ schema_version: 1, status: 'advisory', requires_semantic_judgment: true });
+      83 |     expect(facts).not.toHaveProperty('archetype');
+      84 |     expect(facts).not.toHaveProperty('mode');
+
+      at parse (tests/unit/autoresearch-orchestrator-regression.test.js:81:24)
+
+  ● classification supplies advisory candidates without selecting a route: 修复测试失败
+
+    SyntaxError: Unexpected token 'e', "explore	lo"... is not valid JSON
+        at JSON.parse (<anonymous>)
+
+      79 |     const result = run('classify', goal);
+      80 |     expect(result.status).toBe(0);
+    > 81 |     const facts = JSON.parse(result.stdout);
+         |                        ^
+      82 |     expect(facts).toMatchObject({ schema_version: 1, status: 'advisory', requires_semantic_judgment: true });
+      83 |     expect(facts).not.toHaveProperty('archetype');
+      84 |     expect(facts).not.toHaveProperty('mode');
+
+      at parse (tests/unit/autoresearch-orchestrator-regression.test.js:81:24)
+
+FAIL tests/unit/spec-commit-scope-regression.test.js
+  ● canonical commit recipe preserves unrelated staged content outside the commit
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 1
+
+      Array [
+        "file1",
+        "file2",
+        "file3",
+    +   "unrelated.txt",
+      ]
+
+      22 |     const result = spawnSync('bash', ['-eu', '-c', recipe], { cwd: dir, env: { ...env, TMPDIR: dir }, encoding: 'utf8' });
+      23 |     expect(result.status).toBe(0);
+    > 24 |     expect(git('diff-tree', '--no-commit-id', '--name-only', '-r', 'HEAD').trim().split('\n')).toEqual(['file1', 'file2', 'file3']);
+         |                                                                                                ^
+      25 |     expect(git('diff', '--cached', '--name-only')).toBe('unrelated.txt\n');
+      26 |     expect(fs.readFileSync(path.join(dir, 'unrelated.txt'), 'utf8')).toBe('unrelated.txt\n');
+      27 |   } finally {
+
+      at Object.toEqual (tests/unit/spec-commit-scope-regression.test.js:24:96)
+
+Test Suites: 2 failed, 2 total
+Tests:       16 failed, 5 passed, 21 total
+Snapshots:   0 total
+Time:        1.478 s, estimated 2 s
+Ran all test suites within paths "tests/unit/autoresearch-orchestrator-regression.test.js", "tests/unit/spec-commit-scope-regression.test.js".

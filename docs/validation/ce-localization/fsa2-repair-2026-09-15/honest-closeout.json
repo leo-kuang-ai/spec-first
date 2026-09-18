@@ -1,0 +1,134 @@
+{
+  "schema_version": "honest-closeout.v1",
+  "generated_at": "2026-09-15T06:45:04.830Z",
+  "overall": "degraded",
+  "overall_reason_code": "degraded-claim",
+  "claims": [
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:npm-test-final"
+      ],
+      "verdict": "degraded",
+      "reason_code": "run-summary-checks-uncovered"
+    },
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:typecheck"
+      ],
+      "verdict": "degraded",
+      "reason_code": "run-summary-checks-uncovered"
+    },
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:lint-entrypoints"
+      ],
+      "verdict": "degraded",
+      "reason_code": "run-summary-checks-uncovered"
+    },
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:shared-references"
+      ],
+      "verdict": "degraded",
+      "reason_code": "run-summary-checks-uncovered"
+    },
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:sync-instructions"
+      ],
+      "verdict": "degraded",
+      "reason_code": "run-summary-checks-uncovered"
+    },
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:build"
+      ],
+      "verdict": "degraded",
+      "reason_code": "run-summary-checks-uncovered"
+    },
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:changelog"
+      ],
+      "verdict": "degraded",
+      "reason_code": "run-summary-checks-uncovered"
+    },
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:ce-contracts"
+      ],
+      "verdict": "degraded",
+      "reason_code": "run-summary-checks-uncovered"
+    },
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:docs-integrity"
+      ],
+      "verdict": "degraded",
+      "reason_code": "run-summary-checks-uncovered"
+    },
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:eval-configs"
+      ],
+      "verdict": "degraded",
+      "reason_code": "run-summary-checks-uncovered"
+    },
+    {
+      "claim_type": "validation",
+      "asserted_status": "not-run",
+      "evidence_refs": [
+        "verification-run-summary:model-behavior"
+      ],
+      "verdict": "degraded",
+      "reason_code": "validation-not-verified"
+    },
+    {
+      "claim_type": "validation",
+      "asserted_status": "not-run",
+      "evidence_refs": [
+        "verification-run-summary:host-invocation"
+      ],
+      "verdict": "degraded",
+      "reason_code": "validation-not-verified"
+    },
+    {
+      "claim_type": "validation",
+      "asserted_status": "not-run",
+      "evidence_refs": [
+        "verification-run-summary:graphify-real-dogfood"
+      ],
+      "verdict": "degraded",
+      "reason_code": "validation-not-verified"
+    },
+    {
+      "claim_type": "validation",
+      "asserted_status": "not-run",
+      "evidence_refs": [
+        "verification-run-summary:field-outcome"
+      ],
+      "verdict": "degraded",
+      "reason_code": "validation-not-verified"
+    }
+  ]
+}

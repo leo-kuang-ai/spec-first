@@ -1,0 +1,29 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "ce-localization-fsa2-repair-2026-09-15-final",
+  "producer": "codex-current-session author self-review",
+  "reviewed_at": "2026-09-15T06:42:08.232Z",
+  "source_binding": {
+    "head": "66b0e0c6c83c1e75d2e9634132586bfce5581ff3",
+    "dirty_path_manifest_sha256": "d3f8c48a64512a26ee1acac4d74c924ecbf2701a77af3d4cd5c59e00a79a9751",
+    "source_tree_hash": "b3e093564dbf206a847853906aebde15643e3db44d9ac3b2fed0ce50cb4e4144",
+    "inventory_hash": "c2e85c9446ff735d8525521caeeab807436058117e2eea9f78badcdad3233ca7",
+    "inventory_artifact_sha256": "01c6f50eb48847ae708678f23513cf1f75c585d716ec8956c5459e9d9d239874",
+    "review_input_hash": "8480312f306e97eb60ebf73d5f1d4e7589b1c2df174ee5133dddef2496bedb79"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "not-used",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "reviewed_paths": [],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "作者同上下文增量复核，保留历史未变区域的覆盖，不重建历史独立审查。",
+    "FSA2 模型/宿主/现场/原审计证据缺口仍开放，见 FSA2 报告第 13 节。"
+  ],
+  "claim_ceiling": "当前本地源码修复与确定性证据链；非完整系统审查或独立模型行为验收。"
+}

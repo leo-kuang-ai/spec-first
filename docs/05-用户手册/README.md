@@ -1,12 +1,12 @@
 # Spec-First 用户手册
 
-这套手册对应当前 `spec-first` npm CLI 模型。
+这套手册对应当前 `spec-first` npm CLI 模型。`<host>` 取值由 `getSupportedPlatforms()` 决定，当前为 `claude`、`codex`、`cursor`、`kiro`、`qoder`、`opencode`、`zcode`、`pi`。
 
-`spec-first` 是面向 Claude Code、Codex、Cursor、Kiro 与 Qoder 的 **AI Coding Harness**：它把一次性的 AI coding 对话，变成可治理、可验证、可复用的工程闭环。AI 写代码很快，真正会丢失的是塑造代码的判断——需求、计划、评审结论和经验常常随对话窗口一起消失。`spec-first` 把这些工作作为持久 artifact 留在你的仓库里：**脚本产出可信事实，LLM 做语义判断，证据留在仓库**，让下一次会话、reviewer 和同事直接继承上下文，而不是从零开始。Kiro 与 Qoder 当前都是 opt-in preview 宿主，Cursor 当前是 opt-in generated-runtime preview。
+`spec-first` 是面向 Claude Code、Codex、Cursor、Kiro、Qoder、OpenCode、ZCode 与 Pi 的 **AI Coding Harness**：它把一次性的 AI coding 对话，变成可治理、可验证、可复用的工程闭环。AI 写代码很快，真正会丢失的是塑造代码的判断——需求、计划、评审结论和经验常常随对话窗口一起消失。`spec-first` 把这些工作作为持久 artifact 留在你的仓库里：**脚本产出可信事实，LLM 做语义判断，证据留在仓库**，让下一次会话、reviewer 和同事直接继承上下文，而不是从零开始。适配器维护状态为：Claude/Codex/Kiro/Qoder 为 active，Cursor/OpenCode/ZCode/Pi 为 preview；维护状态不代表当前版本的加载或模型调用已经验证，实际限制以 `doctor --<host>` 为准。
 
 **定位边界：** 当前产品是 AI-enhanced SDLC / SDD workflow harness，核心是需求到可信变更的工程闭环。它不等同于覆盖团队交付治理、部署编排、生产运维和运营反馈的完整 AI-DLC；需要这些能力时，应接入现有工程系统或明确的外部 workflow。
 
-落到 CLI，它通过 `doctor / init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [-y] / update / clean (--claude|--codex|--cursor|--kiro|--qoder)` 把统一的 `spec-*` workflow 入口投射到各宿主 runtime assets，并同步 workflow skills、agents、agent support files 和受管状态。开发者偏好单独保存在全局 `~/.spec-first/.developer`。
+落到 CLI，它通过 `doctor / init [--<host> ...] [-y] / update / clean --<host>` 把统一的 `spec-*` workflow 入口投射到各宿主 runtime assets，并同步 workflow skills、agents、agent support files 和受管状态。开发者偏好单独保存在全局 `~/.spec-first/.developer`。
 
 完成 `doctor`、`init` 和宿主重启后，首次进入业务 workflow 前先运行 `spec-runtime-setup`，准备 required harness runtime、MCP/helper readiness 与 setup facts。后续普通 plan/work/debug/review 不需要每次重复 setup，继续使用 bounded direct source reads、`rg`、ast-grep、git diff、tests、logs 和用户提供证据；宿主、provider、helper 配置或 setup facts 变化时再重跑。
 
@@ -22,10 +22,10 @@
 
 当前功能状态：
 
-- `spec-first init [--claude] [--codex] [--kiro] [--qoder] [-y]`：已支持；无平台 flag 时交互式多选，显式平台 flag 会覆盖默认宿主集合；`-y` 默认只安装 Claude Code + Codex，Kiro/Qoder 需要显式 flag
-- `spec-first doctor`：支持自动检测，也支持 `--claude` / `--codex` / `--kiro` / `--qoder`
+- `spec-first init [--<host> ...] [-y]`：已支持；无平台 flag 时交互式多选，显式平台 flag 会覆盖默认宿主集合；`-y` 默认只安装 Claude Code + Codex，其他宿主使用显式 flag 或交互选择
+- `spec-first doctor`：支持自动检测，也支持 `--claude` / `--codex` / `--cursor` / `--kiro` / `--qoder` / `--opencode` / `--zcode` / `--pi`
 - `spec-first update`：已支持；升级 npm 包到 `@latest`，成功后自动启动 fresh `spec-first init` 刷新本地 runtime；刷新失败或 scope 不明时输出可复制 fallback
-- `spec-first clean --claude / --codex / --kiro / --qoder`：已支持
+- `spec-first clean --<host>`：已支持
 - `spec-first repair-worktree`：已支持；预览失效 worktree pointer 的修复指引（`--dry-run` 仅预览）
 - `spec-first tasks <subcommand>` / `spec-first session <subcommand>`：派生 task pack 的确定性校验入口，以及 opt-in 多 actor 会话 advisory
 - `spec-first plans audit [--status <active|partially-shipped|completed|superseded>] [--json]`：只读扫描当前仓库 `docs/plans/*.md` 的直接普通文件，盘点 unified code plan 和兼容的 legacy `feat|fix|refactor` plan；历史 missing/closed/invalid 是 advisory，不改变成功退出码。
@@ -41,7 +41,7 @@ Plan lifecycle audit 的边界：
 - `completed` 只表示 plan 文件的 lifecycle marker；它不证明 tests、CI、merge、release 或 field outcome 已完成。
 - Internal helper 的 expected-old-status 与 temp-file + rename 不是跨进程 CAS；shipping-tail 单写者是未硬强制的 loud convention。
 
-`init` 支持在交互式引导中选择开发者姓名和语言；`-y` 会使用默认宿主集合和默认身份/语言，显式 `--claude` / `--codex` / `--kiro` / `--qoder` 会覆盖默认宿主集合。如果没有传用户名，它会优先回退到全局 `~/.spec-first/.developer`，再回退到 `git config user.name`。
+`init` 支持在交互式引导中选择开发者姓名和语言；`-y` 会使用默认宿主集合和默认身份/语言，显式 `--claude` / `--codex` / `--cursor` / `--kiro` / `--qoder` / `--opencode` / `--zcode` / `--pi` 会覆盖默认宿主集合。如果没有传用户名，它会优先回退到全局 `~/.spec-first/.developer`，再回退到 `git config user.name`。
 
 关于升级：
 

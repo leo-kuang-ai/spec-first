@@ -42,7 +42,7 @@ Overrides: high-risk
 Read each reference before executing its step; the entry summary does not replace the procedure. All paths use the same run identity and resolved scope.
 
 1. First read `references/modes-and-output.md`, parse arguments, and freeze mode, mutation, commit, and dispatch policy. `mode:agent` is always report-only.
-2. At Stage 1 read `references/scope.md` to resolve the diff, task attribution, and local scope snapshot. Missing dispatch authorization or capability selects its inline fallback with explicit degraded coverage and required-gate limitations.
+2. At Stage 1 read `references/scope.md` to resolve the diff, task attribution, and local scope snapshot. Missing dispatch authorization or capability selects its inline fallback with explicit degraded coverage and required-gate limitations. 普通本地空 diff 按该引用的条件提前返回 skipped；未知范围或计划/任务完成度审查不能走此分支。
 3. At Stage 2 read `references/intent-and-plan.md` to establish intent and the current plan/task completeness scope.
 4. When dispatch is authorized, at Stage 3 read `references/persona-catalog.md` and `references/select-and-route.md` to select the roster, standards, and risk paths. Peer admission remains subject to the actual receipts, egress authorization, and provider limits in `references/cross-model-review.md`.
 5. At Stage 4 read `references/dispatch-reviewers.md`, load the selected prompt assets, and dispatch within available capacity. Collect every started reviewer's result before merging; a pending return is not an empty finding set.

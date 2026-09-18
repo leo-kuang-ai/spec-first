@@ -85,28 +85,3 @@ A physical seating unit with fixed capacity. Tables are shared resources — the
 ### Seating
 The act of placing a Party at a Table once the Party arrives. A Reservation has at most one Seating; a Table accumulates many Seatings across its lifetime.
 ```
-
-## Vocabulary capture during a refresh
-
-After preparing per-learning actions, aggregate domain terms flagged during investigation and reconcile them in a private candidate for `CONCEPTS.md`. Record the target's existence/SHA-256 and read `references/publication.md`; no durable glossary edit occurs before validation and semantic approval. The explicit repo-wide bootstrap uses the same publication path.
-
-**First, read `references/concepts-vocabulary.md`.** This is unconditional. Do not pre-judge from memory which Phase 1 signals qualify — the reference's criteria are non-obvious and a "nothing qualifies" judgment without reading is a shortcut, not a result.
-
-**Procedure:**
-
-1. **Aggregate.** Collect qualifying terms surfaced across the learnings in scope, applying the reference's criteria. If the same term surfaced in multiple learnings with different shades of precision, **union the shades into one entry** — not three entries, not most-recent-wins.
-2. **If `CONCEPTS.md` exists**, add missing terms and refine existing entries when the corpus surfaced new precision. Do not duplicate entries already present. **Then reconcile the in-scope core nouns:** re-derive the core domain nouns of the area in scope from its declared model (per the **Seed goal** in the reference) and backfill any that are central but missing. This is the every-run safety net for stable-central terms that friction never surfaces — bounded to the area in scope, defining only terms investigated this run, never a repo-wide sweep.
-3. **If `CONCEPTS.md` does not exist** and at least one qualifying term was surfaced, **bootstrap it — and seed, don't write a single term.** Alongside the surfaced term(s), seed the core domain nouns of the area in scope per the reference's **Seed goal**, so the file is anchored from creation rather than a lone peripheral entry (and so captured terms don't dangle against undefined siblings). The seed stays scoped to the area in scope — a repo-wide concept map comes only from the explicit bootstrap path above, not from a scoped refresh. **At creation, hold the qualifying bar conservatively for borderline terms** — a borderline term or a class/table/file name dressed up as an entity defers to a later run; clear core nouns are seeded, borderline ones wait. The conservatism is about quality, not count; updates to an existing file follow normal criteria.
-4. **Scope discipline and citation hygiene.** Bootstrap, seed, and reconcile reflect only the area in scope — do not expand to other categories, and do not retroactively inject `(see CONCEPTS.md)` pointers into existing learnings. (The repo-wide bootstrap path above is the deliberate exception — it intentionally covers the whole declared model.) The report should note that additional entries are likely from refresh runs on other scopes.
-5. **Initial structure.** When bootstrapping, start the file with this preamble under the `# Concepts` heading:
-
-   > Shared domain vocabulary for this project — entities, named processes, and status concepts with project-specific meaning. Seeded with core domain vocabulary, then accretes as spec-compound and spec-compound-refresh process learnings; direct edits are fine. Glossary only, not a spec or catch-all.
-
-   Then add entries. Let term count drive shape: 1-4 terms → flat headings, more → cluster by domain relationship per the rules in `references/concepts-vocabulary.md`.
-6. **Scrub within scope.** Inspect the investigated area's entries and the coherence neighborhood needed to understand them. Correct glossary violations using evidence already gathered: implementation specifics, volatile configuration, duplicate synonyms, or undefined project-specific siblings. Leave out-of-scope entries unchanged and report broader cleanup separately. A full glossary sweep requires an explicitly repo-wide vocabulary maintenance scope; a broad learning refresh alone does not grant it. Concept retirement additionally needs positive removal/replacement evidence and preservation of any substantive references; synonym folding preserves the surviving entry and aliases.
-
-Report actual published additions, refinements, folds, scrubs, and authorized retirements in the report's `CONCEPTS.md` line; distinguish unpublished candidates and recommendations. Use "scanned, no qualifying terms" only when no change qualifies, not when a qualifying candidate failed publication. Zero new terms does not mean zero changes.
-
-After successful vocabulary publication, run the mode-aware Discoverability Check. A prior recommendation does not prove the instruction file was updated: later runs recheck the actual source before considering discovery covered. Failed publication never reports a newly created glossary as available.
-
-**Prepare candidates silently within the authorized scope.** Vocabulary capture is a declared refresh side effect, not a new approval per term. Durable publication still follows `references/publication.md`; a scoped refresh never silently acquires repo-wide vocabulary authority.

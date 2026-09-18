@@ -12,7 +12,7 @@ engine:
 
 cases:
   files:
-    - evals/cases/verify-only-readonly.yaml
+    - evals/cases/check-readonly.yaml
     - evals/cases/semantic-question-not-setup.yaml
   defaults:
     timeout_seconds: 600

@@ -271,3 +271,5 @@ Single portable path: **`spec-code-review`** self-sizes (lite roster for small l
 **Two steps — review is not fix.** (3a) Review-only via `mode:agent`; add `depth:full` when the plan/task/user explicitly asked for a deep review. (3b) Batched fix subagents per `references/review-findings-followup.md`; residuals → Residual Work Gate.
 
 **If `spec-code-review` can't run** (no subagent dispatch): interactive → harness-native review if present, fix inline; non-interactive → skip-with-note + manual diff scan in Final Validation. Never silently ship a non-mechanical change unreviewed.
+
+涉及 mutation 安全保证的 closeout，按 `docs/contracts/workflows/mutation-enforcement.md` 记录实际宿主强制范围、旁路与未验证项。

@@ -1,0 +1,1443 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "ce-localization-fsa2-repair-2026-09-15",
+  "producer": "codex-current-session author self-review",
+  "reviewed_at": "2026-09-15T06:26:33.271Z",
+  "source_binding": {
+    "head": "66b0e0c6c83c1e75d2e9634132586bfce5581ff3",
+    "dirty_path_manifest_sha256": "0018473ea855a216adc43df9836487abd41e56166d9fbc8ea4a7374ba84e660e",
+    "source_tree_hash": "392cbf69e6f973a0e89c075a208412638a5b1fa3057f39579bf0ee1ed6926ff8",
+    "inventory_hash": "c2e85c9446ff735d8525521caeeab807436058117e2eea9f78badcdad3233ca7",
+    "inventory_artifact_sha256": "feafa87384ddb3c5a71a772db864d9a3ce18b76f1791f324259e486e866d2439",
+    "review_input_hash": "495261d00e88f8f16dcfeb9033953a75bd821327d9bf4e4d0eb8f4b5b28076e2"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "not-used",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "reviewed_paths": [
+    {
+      "path": "tests/unit/ce-localization-review-contracts.test.js",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "051e916341d49f20c881999420f86dcdd91cad3a6b7cee0711207dc2b661dae5",
+      "bytes": 7367,
+      "line_count": 125,
+      "covered_line_ranges": [
+        [
+          1,
+          125
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "冻结数按实际新增一个包文件、三条支撑路径及五条关系更新；未删 drift/拓扑断言。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "冻结数按实际新增一个包文件、三条支撑路径及五条关系更新；未删 drift/拓扑断言。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-brainstorm/references/settled-decisions.md",
+      "skill_ids": [
+        "spec-brainstorm"
+      ],
+      "sha256": "5b36b0da843bdd2ca18dae80c2cd6b53d3489ff9e2336a26ec07f75221a60937",
+      "bytes": 4944,
+      "line_count": 45,
+      "covered_line_ranges": [
+        [
+          1,
+          45
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "共享源与同步命令现在可回源；用户已定决策的携带规则保留，无重复访谈或新权限。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "共享源与同步命令现在可回源；用户已定决策的携带规则保留，无重复访谈或新权限。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "scripts/sync-shared-references.js",
+      "skill_ids": [
+        "spec-brainstorm",
+        "spec-plan"
+      ],
+      "sha256": "f14244816b4bd98c233b71c3f2c053ec79613209bf91ad87cf9e8728ded5f53d",
+      "bytes": 3548,
+      "line_count": 111,
+      "covered_line_ranges": [
+        [
+          1,
+          111
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "新增消费关系复用现有 source-to-copy 映射；check 只报告漂移，写模式仅同步列出的 source 副本。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "新增消费关系复用现有 source-to-copy 映射；check 只报告漂移，写模式仅同步列出的 source 副本。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-code-review/references/cross-model-review.md",
+      "skill_ids": [
+        "spec-code-review"
+      ],
+      "sha256": "1783d4e2527a24332faa890c6fb91f1ae350d8ec500acadfef02f54b093397ff",
+      "bytes": 6667,
+      "line_count": 58,
+      "covered_line_ranges": [
+        [
+          1,
+          58
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "dormant 原因与激活/退役条件明确，认证/数据授权 gate 保留，未把可见 CLI 当独立覆盖。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "dormant 原因与激活/退役条件明确，认证/数据授权 gate 保留，未把可见 CLI 当独立覆盖。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-code-review/references/scope.md",
+      "skill_ids": [
+        "spec-code-review"
+      ],
+      "sha256": "acc0e68f87ec07a4b00af41ed9b9234e933033999c7ac7f07b0f708ad59e485b",
+      "bytes": 24725,
+      "line_count": 232,
+      "covered_line_ranges": [
+        [
+          1,
+          232
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "空 diff 须 snapshot_written 且可复验，排除任务完成度，skipped 不取得 required gate 资格。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "空 diff 须 snapshot_written 且可复验，排除任务完成度，skipped 不取得 required gate 资格。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-code-review/scripts/findings-mechanics.py",
+      "skill_ids": [
+        "spec-code-review"
+      ],
+      "sha256": "a40e7166c72b151d0da1158256c6775a75f8ac78b8ad3df6a5768829fa308231",
+      "bytes": 8860,
+      "line_count": 250,
+      "covered_line_ranges": [
+        [
+          1,
+          250
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "line 仅允许正整数，显式拒绝 bool；与 finding schema 对齐，语义有效性继续回源。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "line 仅允许正整数，显式拒绝 bool；与 finding schema 对齐，语义有效性继续回源。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-code-review/SKILL.md",
+      "skill_ids": [
+        "spec-code-review"
+      ],
+      "sha256": "78a117cff4a12d5e9af6606d358a64d099833858716104eecdd33080e6b50dea",
+      "bytes": 8204,
+      "line_count": 75,
+      "covered_line_ranges": [
+        [
+          1,
+          75
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "入口消费 scope 的空 diff 快速分支；调用前冻结和证据要求未被零 diff 绕过。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "入口消费 scope 的空 diff 快速分支；调用前冻结和证据要求未被零 diff 绕过。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/spec-code-review-mechanics.test.js",
+      "skill_ids": [
+        "spec-code-review"
+      ],
+      "sha256": "673ab2389164d94a53558b8a82d6143ad7224c3ac6cce1eb03523edb91c188dc",
+      "bytes": 7137,
+      "line_count": 175,
+      "covered_line_ranges": [
+        [
+          1,
+          175
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "负例覆盖字符串、布尔、非正数和小数；捕获旧实现误接纳，不修改正常 finding 语义。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "负例覆盖字符串、布尔、非正数和小数；捕获旧实现误接纳，不修改正常 finding 语义。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/spec-compound-refresh-reference-contracts.test.js",
+      "skill_ids": [
+        "spec-compound",
+        "spec-compound-refresh"
+      ],
+      "sha256": "fa95f8547d58a89c8caf16aee54c9b1876be0ed8707ee747bc87fcbd373be3c7",
+      "bytes": 7242,
+      "line_count": 132,
+      "covered_line_ranges": [
+        [
+          1,
+          132
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "将专属流程断言迁到新文件，保留授权/范围/publication 字段检查；未删除功能断言。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "将专属流程断言迁到新文件，保留授权/范围/publication 字段检查；未删除功能断言。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-compound-refresh/references/concepts-vocabulary.md",
+      "skill_ids": [
+        "spec-compound-refresh"
+      ],
+      "sha256": "5bdbdfa6166cfd8ad2ffb76262f4ee805dc2ebaec7195d1a57cfc5530f3b2312",
+      "bytes": 7745,
+      "line_count": 87,
+      "covered_line_ranges": [
+        [
+          1,
+          87
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "与共享词汇源一致；专属 refresh 过程移至明确引用，不被同步覆盖或与 capture 混用。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "与共享词汇源一致；专属 refresh 过程移至明确引用，不被同步覆盖或与 capture 混用。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-compound-refresh/references/vocabulary-refresh.md",
+      "skill_ids": [
+        "spec-compound-refresh"
+      ],
+      "sha256": "0a3b03caf0b84190ec0fe8e742641e5bc63503580f4366dfad9159a3d29a5d9a",
+      "bytes": 5045,
+      "line_count": 24,
+      "covered_line_ranges": [
+        [
+          1,
+          24
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "迁入原 refresh 过程，候选、验证、批准、范围与 retirement 证据约束保留；不扩张 durable 写入。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "迁入原 refresh 过程，候选、验证、批准、范围与 retirement 证据约束保留；不扩张 durable 写入。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-compound-refresh/SKILL.md",
+      "skill_ids": [
+        "spec-compound-refresh"
+      ],
+      "sha256": "f91c111735d8140d21baac0ef836523d2051bce2d52b7a6787e52cad2577ca3e",
+      "bytes": 14609,
+      "line_count": 164,
+      "covered_line_ranges": [
+        [
+          1,
+          164
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "步骤索引指向新专属引用，后者先读共享词汇规则，依赖链完整。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "步骤索引指向新专属引用，后者先读共享词汇规则，依赖链完整。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-doc-review/SKILL.md",
+      "skill_ids": [
+        "spec-doc-review"
+      ],
+      "sha256": "c96d48de5841a1d3c2692232e54107a5eaccdf0337817dc024c2af6d958eaab0",
+      "bytes": 5354,
+      "line_count": 74,
+      "covered_line_ranges": [
+        [
+          1,
+          74
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "argument-hint 与 modes 主 token 对齐；模板/schema 改成显式触发读取，不暗示授权 dispatch。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "argument-hint 与 modes 主 token 对齐；模板/schema 改成显式触发读取，不暗示授权 dispatch。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-plan/references/plan-handoff.md",
+      "skill_ids": [
+        "spec-plan"
+      ],
+      "sha256": "103e4d205215a2b4fdfd05118c782bc497feec5b680dd57204184519f020ebc8",
+      "bytes": 25437,
+      "line_count": 126,
+      "covered_line_ranges": [
+        [
+          1,
+          126
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fallback 来源为 producer-self-review；degraded 优先于零 finding clean，不冒充独立审查。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fallback 来源为 producer-self-review；degraded 优先于零 finding clean，不冒充独立审查。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-plan/references/settled-decisions.md",
+      "skill_ids": [
+        "spec-plan"
+      ],
+      "sha256": "5b36b0da843bdd2ca18dae80c2cd6b53d3489ff9e2336a26ec07f75221a60937",
+      "bytes": 4944,
+      "line_count": 45,
+      "covered_line_ranges": [
+        [
+          1,
+          45
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "与共享源同步，测试路径真实存在；既有用户决定的继承规则未改。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "与共享源同步，测试路径真实存在；既有用户决定的继承规则未改。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-prd/SKILL.md",
+      "skill_ids": [
+        "spec-prd"
+      ],
+      "sha256": "25cc60f639d886c024a61b462c84cb101f6b95a6098984a879f2a750292e230a",
+      "bytes": 67157,
+      "line_count": 345,
+      "covered_line_ranges": [
+        [
+          1,
+          345
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "暴露已有 Lite token，限定 hook 的工具/路径与证据强度；finalizer 所有权和 ready 出口保持。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "暴露已有 Lite token，限定 hook 的工具/路径与证据强度；finalizer 所有权和 ready 出口保持。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "docs/contracts/workflows/mutation-enforcement.md",
+      "skill_ids": [
+        "spec-prd",
+        "spec-work"
+      ],
+      "sha256": "049156fba398641b3e1ecb1a9c8b872b3414a056b2fc05987e9fa6a0e8376b4b",
+      "bytes": 3237,
+      "line_count": 25,
+      "covered_line_ranges": [
+        [
+          1,
+          25
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "八宿主 source 机制与真实运行证据分开，明确 Bash 旁路；新增说明不是新硬 gate 或权限引擎。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "八宿主 source 机制与真实运行证据分开，明确 Bash 旁路；新增说明不是新硬 gate 或权限引擎。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/spec-prd-hook-contracts.test.js",
+      "skill_ids": [
+        "spec-prd"
+      ],
+      "sha256": "ecd2e10d2bd84ee132f552f90f474cb854972ecdc87d25206c5cf1299659c432",
+      "bytes": 13205,
+      "line_count": 353,
+      "covered_line_ranges": [
+        [
+          1,
+          353
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "更新强度声明断言，保留写前字段保护/Stop 失效路径的行为负例。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "更新强度声明断言，保留写前字段保护/Stop 失效路径的行为负例。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-runtime-setup/evals/cases/check-readonly.yaml",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "a3487762e9a7f19a74011b711524685b3198885801aeec01185cbfc4fefd56c6",
+      "bytes": 940,
+      "line_count": 28,
+      "covered_line_ranges": [
+        [
+          1,
+          28
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "严格只读改用 --check，配置哨兵与 judge 契约对应；明确外部/瞬时副作用未覆盖。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "严格只读改用 --check，配置哨兵与 judge 契约对应；明确外部/瞬时副作用未覆盖。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-runtime-setup/evals/eval.yaml",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "7d599dd2d2c3050f398dc718ea8f7a941b0dc3096c4d09c4fa1dc858d944e444",
+      "bytes": 362,
+      "line_count": 24,
+      "covered_line_ranges": [
+        [
+          1,
+          24
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "配置引用更名后的 case，仍为两个用例、串行执行；未更换 engine 或隐式运行模型。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "配置引用更名后的 case，仍为两个用例、串行执行；未更换 engine 或隐式运行模型。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-runtime-setup/evals/fixtures/scripts/check-readonly-verify.sh",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "bc2b8e3d185800b49bf9dbb8106a3fc3a095aeb84af3f34a407f50dbb2d0c424",
+      "bytes": 1607,
+      "line_count": 28,
+      "covered_line_ranges": [
+        [
+          1,
+          28
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "按真实 EVAL_EXIT_CODE、受保护文件 hash、配置字节和 facts 目录检查；自述关键词只为辅助信号。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "按真实 EVAL_EXIT_CODE、受保护文件 hash、配置字节和 facts 目录检查；自述关键词只为辅助信号。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-runtime-setup/evals/README.md",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "3fa14bbff07035ebd111403be38fa81208c5ab93079e1f03e372c41236532d81",
+      "bytes": 761,
+      "line_count": 8,
+      "covered_line_ranges": [
+        [
+          1,
+          8
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "区分 --check 与 verify-only facts 写入，明确 Judge 覆盖和未验证范围。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "区分 --check 与 verify-only facts 写入，明确 Judge 覆盖和未验证范围。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "30a0c5b91747cad8676e1d11040dde45b63ce4fc6450a2d5fa7c402472aa6ab8",
+      "bytes": 6630,
+      "line_count": 185,
+      "covered_line_ranges": [
+        [
+          1,
+          185
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "以最终 bare mode 继承默认能力；显式 check/plan/verify 不获安装权限，repairHostConfig 不再隐式置真。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "以最终 bare mode 继承默认能力；显式 check/plan/verify 不获安装权限，repairHostConfig 不再隐式置真。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-runtime-setup/SKILL.md",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "c9bb4ae019db0fcbfcc89772a405e0df4fa9f4b0ba404813c330ff4d502de41a",
+      "bytes": 55953,
+      "line_count": 368,
+      "covered_line_ranges": [
+        [
+          1,
+          368
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "修正 bare 只诊断残句与命令宿主清单；保持 host authority、冲突与 source/runtime 写边界。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "修正 bare 只诊断残句与命令宿主清单；保持 host authority、冲突与 source/runtime 写边界。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/mcp-setup-host-config.test.js",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "40b6db436b6e15ed7d5dd23878e193e1e29e3ba534ae92029acfbbc4b80fce10",
+      "bytes": 55383,
+      "line_count": 1598,
+      "covered_line_ranges": [
+        [
+          1,
+          1598
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "默认策略连到真实 configureOrInspectHost，临时 TOML 冲突字节不变；不访问真实用户配置。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "默认策略连到真实 configureOrInspectHost，临时 TOML 冲突字节不变；不访问真实用户配置。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/mcp-setup-mode-target.test.js",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "889b3976082ec0d00e1928dd35500f82b9b9abbec56c1de31a3b3da4dcebc80e",
+      "bytes": 26459,
+      "line_count": 677,
+      "covered_line_ranges": [
+        [
+          1,
+          677
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "新增目标/范围正例和显式诊断负例，验证能力与 repair 授权而非仅字符串。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "新增目标/范围正例和显式诊断负例，验证能力与 repair 授权而非仅字符串。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/runtime-setup-codegraph-evidence.test.js",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "dd54c36ad9f74d7401b3069b5f2e77ce11b1a868c61f8c06b2375a0225b9f746",
+      "bytes": 11319,
+      "line_count": 191,
+      "covered_line_ranges": [
+        [
+          1,
+          191
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fixture 绝对 system config 明确 containment_root，生产安全约束保持。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fixture 绝对 system config 明确 containment_root，生产安全约束保持。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/runtime-setup-consumer-health.test.js",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "52a4871d2dcab364c3c97ffb6a8530c443e08300be2edf5b410ee6a8fb697973",
+      "bytes": 22059,
+      "line_count": 347,
+      "covered_line_ranges": [
+        [
+          1,
+          347
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fixture 同样补临时 root，恢复 producer→doctor 隔离回归；未放松运行时校验。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fixture 同样补临时 root，恢复 producer→doctor 隔离回归；未放松运行时校验。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/runtime-setup-eval-judge.test.js",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "1c7cbdddb6ee2411785873e5fdf7f0fd93a6fad0c1761d5f48cc188f9554cd13",
+      "bytes": 2012,
+      "line_count": 47,
+      "covered_line_ranges": [
+        [
+          1,
+          47
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "校准实际写入、失败引擎及符号链接负例，修前 7 项失败修后通过，不等同模型执行。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "校准实际写入、失败引擎及符号链接负例，修前 7 项失败修后通过，不等同模型执行。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-work/references/shipping-workflow.md",
+      "skill_ids": [
+        "spec-work"
+      ],
+      "sha256": "1d77e52ff8c894552d5515b7b75a514a2e384a4c5d4a3c3bc8478088bff825e9",
+      "bytes": 31450,
+      "line_count": 275,
+      "covered_line_ranges": [
+        [
+          1,
+          275
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "closeout 引用宿主强制矩阵，保留现有 review/verification owner，无重复机制。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "closeout 引用宿主强制矩阵，保留现有 review/verification owner，无重复机制。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/smoke/cli-smoke.test.js",
+      "skill_ids": [
+        "spec-write-skill"
+      ],
+      "sha256": "6f412c5a8e3091dc59b0294dbcf6e811df726173551c50153511b70ea34a7c18",
+      "bytes": 13707,
+      "line_count": 397,
+      "covered_line_ranges": [
+        [
+          1,
+          397
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "用 registry 枚举 8 宿主与 runtime root；doctor 预期集防止未来漏 host，仅在临时发布包运行。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "用 registry 枚举 8 宿主与 runtime root；doctor 预期集防止未来漏 host，仅在临时发布包运行。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/README.md",
+      "skill_ids": [
+        "spec-write-tasks"
+      ],
+      "sha256": "7ecd9227a4cc500abcd84256a6da0250832ed96be3100ed0501a7af18501ccc2",
+      "bytes": 3172,
+      "line_count": 24,
+      "covered_line_ranges": [
+        [
+          1,
+          24
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "区分模型 eval.yaml 与确定性 JSON/repo runner，消除未来才有 eval 的误述。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "区分模型 eval.yaml 与确定性 JSON/repo runner，消除未来才有 eval 的误述。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    }
+  ],
+  "retired_relations": [
+    {
+      "skill_id": "spec-runtime-setup",
+      "path": "skills/spec-runtime-setup/evals/cases/verify-only-readonly.yaml",
+      "prior_sha256": "bfa92b3cd1663a5d4039e728b8dda647bbe79fff8bc5c25b4855cf84b40eb09f",
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "旧 verify-only-readonly 用例退役，替换为 check-readonly；模式边界和真实文件判据已校准。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "旧 verify-only-readonly 用例退役，替换为 check-readonly；模式边界和真实文件判据已校准。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    }
+  ],
+  "findings": [],
+  "limitations": [
+    "作者同上下文增量复核，保留历史未变区域的覆盖，不重建历史独立审查。",
+    "FSA2 模型/宿主/现场/原审计证据缺口仍开放，见 FSA2 报告第 13 节。"
+  ],
+  "claim_ceiling": "当前本地源码修复与确定性证据链；非完整系统审查或独立模型行为验收。"
+}

@@ -110,9 +110,11 @@ type(scope): subject line here
 Optional body explaining why this change was made,
 not just what changed.
 EOF
-git add file1 file2 file3
-git commit -F "$COMMIT_MSG"
+git add -- file1 file2 file3
+git commit -F "$COMMIT_MSG" -- file1 file2 file3
 ```
+
+提交前核对 owned paths 与已暂存内容。显式路径提交保留其他文件的暂存状态，但会提交这些路径的工作树内容，不保留文件内的 hunk 选择。若同一文件混有其他任务或用户修改，必须使用调用方已验证的 hunk/index 隔离方案，或停止该组提交。不得 reset/stash 用户暂存区；遵循 `skills/spec-commit-push-pr/references/commit-and-push.md` 的同一边界。
 
 ### Step 5: Confirm
 

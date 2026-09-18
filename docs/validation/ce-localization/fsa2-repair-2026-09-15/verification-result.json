@@ -1,0 +1,496 @@
+{
+  "artifact_kind": "fsa2-local-repair-verification",
+  "run_id": "2026-09-15-fsa2-repair",
+  "generated_at": "2026-09-15T06:46:31.821859+00:00",
+  "report_ref": "docs/validation/full-system-audit/2026-09-14-fsa2-report.md",
+  "local_repair_status": "verified-with-external-evidence-pending",
+  "original_audit_status": "incomplete",
+  "claim_ceiling": "C1",
+  "source_binding": {
+    "valid": true,
+    "errors": [],
+    "head": "66b0e0c6c83c1e75d2e9634132586bfce5581ff3",
+    "source_tree_hash": "b3e093564dbf206a847853906aebde15643e3db44d9ac3b2fed0ce50cb4e4144",
+    "inventory_hash": "c2e85c9446ff735d8525521caeeab807436058117e2eea9f78badcdad3233ca7"
+  },
+  "issue_counts": {
+    "total": 36,
+    "fixed_or_clarified": 26,
+    "no_change_required": 8,
+    "pending": 2
+  },
+  "issues": [
+    {
+      "id": "F-16",
+      "status": "已修复",
+      "evidence": "`mode-policy.cjs` 按最终动作模式识别 bare，范围参数不再丢失安装能力与 required provider；7 个参数正例修前失败、修后通过，3 个显式模式负例保持权限边界。`node node_modules/jest/bin/jest.js --runTestsByPath tests/unit/mcp-setup-mode-target.test.js tests/unit/mcp-setup-entrypoint.test.js tests/unit/mcp-setup-workspace-parent-diagnostic.test.js tests/unit/runtime-setup-workspace-loading.test.js --runInBand --silent`：exit 0，4 套件 / 140 测试通过",
+      "limitations": "单元与隔离入口验证；未执行真实安装或宿主配置写入"
+    },
+    {
+      "id": "F-17",
+      "status": "已修复",
+      "evidence": "移除 `mode-policy.cjs` 对 `repairHostConfig` 的隐式赋值；默认安装与冲突替换权限分离，沿用 SKILL 明示的显式 repair 边界。策略负例修前失败；策略到真实配置写入口的隔离测试确认冲突 TOML 内容不变。`node node_modules/jest/bin/jest.js --runTestsByPath tests/unit/mcp-setup-host-config.test.js tests/unit/mcp-setup-mode-target.test.js --runInBand --silent`：exit 0，2 套件 / 107 测试通过",
+      "limitations": "验证配置保护，不声明真实宿主安装通过；默认安装仍可执行授权范围内的其他动作"
+    },
+    {
+      "id": "F-1",
+      "status": "已修复",
+      "evidence": "将副本已有的词汇保护与 classification v2 规则合并到 `skills/_shared/references/`，refresh 专属流程原文迁入 `references/vocabulary-refresh.md` 并更新入口及测试；共享副本重新同步。`node scripts/sync-shared-references.js --check`：exit 0（修前 4 DRIFT）；compound-reference、compound-refresh-reference、compound-promotion 三套件：exit 0，60 测试通过",
+      "limitations": "规则保留与静态合同已验证；fresh-source 模型行为评测未执行（本轮串行，无 delegated-worker 授权）；未刷新 host runtime"
+    },
+    {
+      "id": "F-2",
+      "status": "已修复",
+      "evidence": "本轮复现 consumer-health 12 项、codegraph-evidence 1 项失败；根因是 fixture 的绝对 system config 路径未声明 containment_root，并非原报告推测的 platform。仅补两处夹具的 `containment_root=root`，不放松生产路径校验。`node node_modules/jest/bin/jest.js --runTestsByPath tests/unit/runtime-setup-consumer-health.test.js tests/unit/runtime-setup-codegraph-evidence.test.js --runInBand --silent`：exit 0，47 测试通过",
+      "limitations": "修复本轮已复现的两套失败，不恢复原运行日志；另有 CE 快照漂移已在本轮重建并复验，见 §13.2"
+    },
+    {
+      "id": "F-3",
+      "status": "无需修复（当前未复现）",
+      "evidence": "`node node_modules/jest/bin/jest.js --runTestsByPath tests/unit/changelog-format.test.js --runInBand --silent`：exit 0，2 测试通过；本轮新增记录符合现行格式",
+      "limitations": "原失败行号/日志已删除，不能声称修复了无法定位的历史错误"
+    },
+    {
+      "id": "F-4",
+      "status": "已修复（降级提示）",
+      "evidence": "Kiro adapter 新增 `kiro_generated_runtime_loader_unverified`，doctor 明示 active 为维护状态、loader 尚未验证；不标记 runtime drift。新增负例修前失败，doctor-platform-cli/output/runtime-assets：exit 0，28 测试通过",
+      "limitations": "未执行真实 Kiro loader journey，loader_evidence 仍为 false"
+    },
+    {
+      "id": "F-5",
+      "status": "无需修复（命名与范围一致）",
+      "evidence": "回读 `init-preview.test.js`、`init-apply-failure.test.js`、`mcp-setup-workspace-routing-inject.test.js`，三处 six-host 测试均显式选择六宿主子集；名称未冒充全宿主支持。全宿主发布 smoke 的遗漏另由 F-7 处理",
+      "limitations": "子集测试不承担全宿主覆盖，不能据 six-host 文本命中认定功能缺陷"
+    },
+    {
+      "id": "F-7",
+      "status": "已修复",
+      "evidence": "发布包 smoke 改用 `getSupportedPlatforms()` 生成全部 host flags 与 runtime roots，补 ZCode/Pi doctor 检查，要求检查表与 registry 集合一致。`npm run test:smoke`：exit 0，5 测试通过，实际验证 8 宿主 init/doctor 与包内 Setup 源码投射",
+      "limitations": "隔离的发布包/CLI 投影检查，不证明 8 宿主模型调用通过"
+    },
+    {
+      "id": "F-6",
+      "status": "部分完成，待模型行为验证",
+      "evidence": "已用 skill-up 0.10.0 逐包 validate，37 个 eval.yaml 全部 exit 0，覆盖 132 个 case；配置、命令结果与 source/eval 摘要见 `2026-09-15-fsa2-eval-inventory.json`。现有 CI 执行 `test:eval-fixtures`，不等同模型回归；复用既有工具，无新增 runner",
+      "limitations": "真实 engine 运行与 CI 模型结果仍 not-run；须确定宿主/模型、隔离目标与调用预算后执行高风险子集，再扩展；配置可加载不证明行为通过"
+    },
+    {
+      "id": "F-8",
+      "status": "已修复（强度声明）",
+      "evidence": "新增八宿主 `docs/contracts/workflows/mutation-enforcement.md`，work/PRD 按需消费；区分 PRD 工具/路径匹配、OpenCode ask 配置、原生权限与真实运行，不再笼统断言其他宿主无能力。PRD hook 与 OpenCode 权限两套件：exit 0，53 测试通过",
+      "limitations": "仅确认 source/配置机制及声明；逐宿主实际强制负例仍未运行，不宣称全局 shell 防护"
+    },
+    {
+      "id": "F-9",
+      "status": "无需修复（未发现误消费）",
+      "evidence": "回源确认 work 的 shipping-workflow 与 LFG shipping-tail 均先要求验证/审查/残余任务关闭，再调用进度 helper，并明确 completed 不证明 CI/发布/现场效果。plan-status-helper、honest-closeout、spec-work-contracts、spec-work-shipping-contracts：exit 0，50 测试通过",
+      "limitations": "helper 只负责进度标记，不新增第二个验证 gate；完整宿主行为仍受 F-6/U8 证据限制"
+    },
+    {
+      "id": "F-10",
+      "status": "无需修复（结构化结果为准）",
+      "evidence": "`spec-work-run-artifact.js` 的 notWritten 返回 `status=not-written`、`workflow_integrated=false` 与具体 reason；shipping-workflow 已要求原样进入 handoff，成功退出不等于成功物化。producer 聚焦套件：exit 0，29 测试通过，包含无目标、重复及写入失败分支",
+      "limitations": "未发现只凭 exit 0 声明 artifact 成功的当前 consumer；不为此更改既有退出码合同"
+    },
+    {
+      "id": "F-11",
+      "status": "已澄清，无需新增 schema",
+      "evidence": "`artifact-summary.md` 保留等价摘要，补充摘要存在但缺关键 source/范围/新鲜度/证据/限制时的有界回源义务；未虚构具体 consumer 失败。handoff 合同测试 exit 0，8 项通过",
+      "limitations": "语义充分性仍由消费者判断；没有证据要求新增通用 schema 或强状态机"
+    },
+    {
+      "id": "F-12",
+      "status": "已修复",
+      "evidence": "governance README 的目标/枚举/owner_host/filtered asset 与 ZCode/Pi delivery 对齐 8 宿主；Node 断言通过：schema host enum 等于 getSupportedPlatforms，ZCode/Pi workflowsRoot 均为 .agents/skills；完整回归暴露六宿主旧断言，现改为 registry 动态集合，相关两套件 16 项通过",
+      "limitations": "compatibility 目录名不改；分发能力不等于真实宿主验证"
+    },
+    {
+      "id": "F-13",
+      "status": "已修复",
+      "evidence": "v1 方案标记 status=superseded，补 superseded_by 与当前 v2 相对链接；核对 v2 的反向 supersedes 一致且文件存在",
+      "limitations": "保留历史审查范围与正文，不将其改写成当前结果"
+    },
+    {
+      "id": "F-14",
+      "status": "已修复（索引与新鲜度）",
+      "evidence": "skill-evals README 改为历史结果索引，当前分母按 registry 为 38，autoresearch 纳入 canonical；修复 eval 资产的相对链接，关联当前 37 配置/132 case 清单，全部本地链接可解析",
+      "limitations": "历史通过不升级为当前行为通过；新模型运行由 F-6 跟踪"
+    },
+    {
+      "id": "F-15",
+      "status": "已修复",
+      "evidence": "用户手册入口对齐 8 宿主 flags 与 adapter 维护状态，移除 Kiro/Qoder preview 误述；公开入口目录更新为 1.15.3、补 autoresearch/prototype、明确 source 与投射边界；按 registry 断言 38 个 Skill 均在目录表中",
+      "limitations": "loader/模型能力不由手册状态推定；未重写所有历史教程"
+    },
+    {
+      "id": "F-18",
+      "status": "待宿主调用验证",
+      "evidence": "只读调用 8 个 adapter 的 transformSkillContent，均保留 explicit-invocation flag；LFG/PR-feedback 合同测试 exit 0，26 项通过。投射事实不证明实际调用被拒绝，保留显式调用与继承授权边界",
+      "limitations": "缺逐宿主实际调用与版本证据；不删除保护 flag、不伪造冲突、不先行重写流程"
+    },
+    {
+      "id": "R-1",
+      "status": "已修复（暂缓与激活路径）",
+      "evidence": "cross-model-review 明确 dormant 原因、维护 owner、认证通道/真实任务需求的重评触发、最小隔离验证与成本收益条件；现有 review 合同测试 exit 0，28 项通过",
+      "limitations": "当前仍 dormant，不启用外部 peer、不冒充独立覆盖"
+    },
+    {
+      "id": "R-2",
+      "status": "已修复",
+      "evidence": "findings-mechanics 的 line 与 schema 对齐，仅接受正整数，拒绝数字字符串、任意字符串、布尔、零、负数和小数；2 个原先误接纳的负例转绿。mechanics/contracts 两套件 exit 0，41 测试通过",
+      "limitations": "精确位置有效性仍须回源；类型校验不代替 finding 的语义判断"
+    },
+    {
+      "id": "R-3",
+      "status": "已修复（空 diff 分支）",
+      "evidence": "scope/入口新增已冻结且可复验的普通本地空 diff 提前返回 skipped；排除任务/计划完成度审查，不赋予 required gate 资格。隔离 Git 探针（含 untracked）确认 files_changed=0/snapshot_written=true，review 合同 28 项通过",
+      "limitations": "未运行新模型行为；不能把 skipped 当独立审查通过"
+    },
+    {
+      "id": "R-4",
+      "status": "已修复（降级来源与输出）",
+      "evidence": "plan-handoff 的 fallback 明示 review_source=producer-self-review；消费者先区分 producer 自审与独立 doc-review，degraded 优先输出且禁止误入零 finding 的 clean/complete 分支。spec-plan-quality-contracts：exit 0，17 项通过",
+      "limitations": "未运行独立审查或真实模型；空 findings 不代表独立审查通过"
+    },
+    {
+      "id": "R-5",
+      "status": "已修复",
+      "evidence": "PRD frontmatter 补 argument-hint，暴露既有精确 token analysis_profile=contract-reset-lite 与输入描述/路径；未新增参数。lite-profile 合同 exit 0，5 项通过",
+      "limitations": "仅修复入口可发现性；未执行模型调用"
+    },
+    {
+      "id": "R-6",
+      "status": "已修复（入口声明）",
+      "evidence": "PRD 入口移除 Claude 全局 confirmed hard enforcement 表述，明确 Write/Edit/MultiEdit、规范路径、Bash/外部进程旁路与版本绑定的真实运行证据；沿用 F-8 八宿主矩阵。hook 套件 exit 0，37 项通过",
+      "limitations": "关闭声明问题，真实宿主阻断仍待验证"
+    },
+    {
+      "id": "R-7",
+      "status": "无需扩大 hook（有意的规范路径边界）",
+      "evidence": "Claude/Qoder guard 均限定 docs/brainstorms/*-requirements.md，与 PRD default artifact invariant 一致；F-8/R-6 已明确非规范路径与工具旁路，相关 37 项 hook 检查通过",
+      "limitations": "任意 Markdown 不承诺有 PRD 保护；若未来扩大规范产物范围，须同步调整 guard 与负例"
+    },
+    {
+      "id": "R-8",
+      "status": "已修复",
+      "evidence": "doc-review argument-hint 使用主 token mode:non-interactive，modes 保留 mode:headless 兼容别名及 delivery-only 语义；Claude command metadata 同步主 token。合同 exit 0，42 项通过，命令投射补验通过",
+      "limitations": "不改变调用权限或返回 envelope 兼容字段"
+    },
+    {
+      "id": "R-9",
+      "status": "已修复（显式按需读取）",
+      "evidence": "doc-review 将两处 @ 引用改为带触发条件的 Markdown 引用，分别在授权 dispatch 与 findings envelope 构造前读取；文件均存在，合同 exit 0，42 项通过；完整回归发现路径测试仍写死 @，改为验证实际 Markdown 引用，另保留通用 @ 重写用例，两套补验 16 项通过",
+      "limitations": "未证明原 @ 在所有宿主自动展开，也不声明 token/延迟收益"
+    },
+    {
+      "id": "R-10",
+      "status": "无需修复（入口 owner 已分流）",
+      "evidence": "using-spec-first/references/public-route-map.md 明确 0-1 发散进入 ideate、已有想法但用户/成功标准未定进入 brainstorm；brainstorm 缺少邻居名称不构成路由缺陷，不增加重复路由层",
+      "limitations": "当前为源码反证；模型路由正反例运行仍由 F-6 跟踪"
+    },
+    {
+      "id": "R-11",
+      "status": "已修复",
+      "evidence": "settled-decisions 共享源纠正不存在的 .ts 测试路径，明确共享源与同步命令；通过同步脚本更新两份分发副本。shared check exit 0，settled-decisions 合同 exit 0，3 项通过",
+      "limitations": "未手改 generated runtime"
+    },
+    {
+      "id": "R-12",
+      "status": "已修复",
+      "evidence": "write-tasks eval README 区分现有 skill-up 模型入口与 JSON/repo runner 的确定性职责，删除 future-only 误述，给出包内 validate 命令。skill-up validate exit 0，4 case 可加载",
+      "limitations": "配置与文档验证，模型运行未执行"
+    },
+    {
+      "id": "R-13",
+      "status": "无需拆分（尚无行为缺陷证据）",
+      "evidence": "当前 spec-debug 入口为 364 行，调查、修复、pipeline 等专属细节已按阶段引用；长度本身不能证明加载成本或流程失败。本轮不为行数再拆文件",
+      "limitations": "维护性观察保留；若出现真实遗漏或测得开销，再按热点优化"
+    },
+    {
+      "id": "R-14",
+      "status": "无需新增跳转",
+      "evidence": "PR-feedback evaluation-rubric 已要求对争议项回读 caller/invariant/test；full-mode §5 具有本地 diagnose-and-fix 及复验，统一入口禁止重路由已活跃 owner。无 debug 名称引用不足以认定缺陷",
+      "limitations": "未实跑外部 PR 操作；不增加反复切换 workflow 的负担"
+    },
+    {
+      "id": "R-15",
+      "status": "已修复（模式与 Judge）",
+      "evidence": "只读用例改为 check-readonly/--check，明确 verify-only 允许 facts 写入；Judge 从关键词自述改为引擎退出、夹具字节、host 配置哨兵和 facts 目录检查。7 个校准用例修前失败、修后通过；skill-up validate exit 0，2 case 可加载",
+      "limitations": "有界本地判据；不证明真实模型、用户级安装/配置、瞬时写入或全局无副作用"
+    },
+    {
+      "id": "R-16",
+      "status": "已修复",
+      "evidence": "Setup 两处命令宿主清单补 OpenCode，并区分 internal command 名 runtime-setup、投射文件 spec-runtime-setup.md 与公开调用；与三个 adapter 的 commandFilename 一致。entrypoint exit 0，73 项通过",
+      "limitations": "未声明 OpenCode loader 已通过"
+    },
+    {
+      "id": "R-17",
+      "status": "已修复",
+      "evidence": "回源发现 Setup Posture 仍残留 bare 只诊断的旧说明，与 F-16 的最终 mode 策略及入口其他段落冲突；改为 baseline 收敛并保留 host/conflict/repair 边界。mode-target exit 0，聚焦合同通过",
+      "limitations": "文案对齐既有行为，未增加安装权限或执行真实安装"
+    },
+    {
+      "id": "R-18",
+      "status": "已修复（快照说明）",
+      "evidence": "实测 source snapshot 仍包含 FSA2 报告，回源确认 CE runbook 将整个 docs/validation 误写为排除项；按 isRunOutput()/scope_contract 改为具名 V2 工件与 CE 子目录，避免结尾改报告使证据失效",
+      "limitations": "未扩大 snapshot 排除范围；本轮最终报告完成后再冻结链"
+    }
+  ],
+  "final_npm_test": {
+    "exit_code": 0,
+    "unit": {
+      "suites_passed": 236,
+      "tests_passed": 2947
+    },
+    "smoke": {
+      "suites_passed": 1,
+      "tests_passed": 5
+    },
+    "integration": {
+      "suites_passed": 17,
+      "suites_skipped": 1,
+      "tests_passed": 84,
+      "tests_skipped": 2
+    },
+    "skip_reason": "SPEC_FIRST_REAL_GRAPHIFY_DOGFOOD 未显式启用；两个真实 Graphify 测试未运行。",
+    "log_path": "docs/validation/ce-localization/fsa2-repair-2026-09-15/logs/npm-test-final.log"
+  },
+  "previous_npm_test": {
+    "exit_code": 1,
+    "unit_suites_passed": 234,
+    "unit_suites_failed": 2,
+    "tests_passed": 2944,
+    "tests_failed": 3,
+    "smoke": "not-run",
+    "integration": "not-run",
+    "cause": "F-12/R-9 的旧断言未同步，后已修复；另补齐 R-8 command metadata。",
+    "log_path": "docs/validation/ce-localization/fsa2-repair-2026-09-15/logs/npm-test.log"
+  },
+  "checks": [
+    {
+      "id": "npm-test-final",
+      "service": "spec-first",
+      "command": "npm test",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm"
+      ],
+      "missing_tools": [],
+      "log_path": "docs/validation/ce-localization/fsa2-repair-2026-09-15/logs/npm-test-final.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "typecheck",
+      "service": "spec-first",
+      "command": "npm run typecheck",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm"
+      ],
+      "missing_tools": [],
+      "log_path": "docs/validation/ce-localization/fsa2-repair-2026-09-15/logs/typecheck.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "lint-entrypoints",
+      "service": "spec-first",
+      "command": "npm run lint:skill-entrypoints",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm"
+      ],
+      "missing_tools": [],
+      "log_path": "docs/validation/ce-localization/fsa2-repair-2026-09-15/logs/lint-entrypoints-final.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "shared-references",
+      "service": "spec-first",
+      "command": "npm run check:shared-references",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm"
+      ],
+      "missing_tools": [],
+      "log_path": "docs/validation/ce-localization/fsa2-repair-2026-09-15/logs/shared-references.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "sync-instructions",
+      "service": "spec-first",
+      "command": "npm run sync:instructions",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm"
+      ],
+      "missing_tools": [],
+      "log_path": "docs/validation/ce-localization/fsa2-repair-2026-09-15/logs/sync-instructions.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "build",
+      "service": "spec-first",
+      "command": "npm run build",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm"
+      ],
+      "missing_tools": [],
+      "log_path": "docs/validation/ce-localization/fsa2-repair-2026-09-15/logs/build-final.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "changelog",
+      "service": "spec-first",
+      "command": "node node_modules/jest/bin/jest.js --runTestsByPath tests/unit/changelog-format.test.js --runInBand --silent",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm"
+      ],
+      "missing_tools": [],
+      "log_path": "docs/validation/ce-localization/fsa2-repair-2026-09-15/logs/changelog-final.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "ce-contracts",
+      "service": "spec-first",
+      "command": "node node_modules/jest/bin/jest.js --runTestsByPath tests/unit/ce-localization-closeout-contracts.test.js tests/unit/ce-localization-review-contracts.test.js --runInBand --silent",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm"
+      ],
+      "missing_tools": [],
+      "log_path": "docs/validation/ce-localization/fsa2-repair-2026-09-15/logs/ce-contracts-final.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "docs-integrity",
+      "service": "spec-first",
+      "command": "git diff --check",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "git"
+      ],
+      "missing_tools": [],
+      "log_path": "docs/validation/ce-localization/fsa2-repair-2026-09-15/logs/docs-final.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "eval-configs",
+      "service": "skill-up-37-packages",
+      "command": "skill-up validate evals/eval.yaml",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "skill-up"
+      ],
+      "missing_tools": [],
+      "log_path": "docs/validation/ce-localization/fsa2-repair-2026-09-15/logs/eval-configs.log",
+      "reason_code": "all-37-configs-loaded-132-cases",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "model-behavior",
+      "service": "spec-first",
+      "command": "skill-up run evals/eval.yaml",
+      "status": "not-run",
+      "exit_code": null,
+      "ran": false,
+      "required_tools": [],
+      "missing_tools": [],
+      "log_path": null,
+      "reason_code": "fresh-model-behavior-not-executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "host-invocation",
+      "service": "spec-first",
+      "command": "未选择：按 U8 确定当前版本宿主的调用命令",
+      "status": "not-run",
+      "exit_code": null,
+      "ran": false,
+      "required_tools": [],
+      "missing_tools": [],
+      "log_path": null,
+      "reason_code": "real-host-journey-not-executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "graphify-real-dogfood",
+      "service": "spec-first",
+      "command": "SPEC_FIRST_REAL_GRAPHIFY_DOGFOOD=1 node node_modules/jest/bin/jest.js --runTestsByPath tests/integration/runtime-setup-graphify-hook-boundary.integration.test.js --runInBand",
+      "status": "not-run",
+      "exit_code": null,
+      "ran": false,
+      "required_tools": [],
+      "missing_tools": [],
+      "log_path": null,
+      "reason_code": "explicit-real-provider-dogfood-not-enabled",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "field-outcome",
+      "service": "spec-first",
+      "command": "未选择：按 U10/field 协议确定真实任务与采样命令",
+      "status": "not-run",
+      "exit_code": null,
+      "ran": false,
+      "required_tools": [],
+      "missing_tools": [],
+      "log_path": null,
+      "reason_code": "field-data-not-collected",
+      "redaction_status": "none-required"
+    }
+  ],
+  "workflow_receipts": {
+    "verification_run_summary": "docs/validation/ce-localization/fsa2-repair-2026-09-15/verification-run-summary.json",
+    "honest_closeout": "docs/validation/ce-localization/fsa2-repair-2026-09-15/honest-closeout.json",
+    "overall": "degraded",
+    "overall_reason_code": "degraded-claim",
+    "interpretation": "run-level 聚合包含 4 项 not-run，因此通过检查的 closeout 声明也降级为 run-summary-checks-uncovered；实际退出码和已执行状态仍见 checks，不删未运行项以制造 verified。",
+    "portable_log_mapping": "回执保持原 .spec-first 日志路径；可移交副本按本 JSON checks.log_path 与 log-manifest.json 读取。"
+  },
+  "limits": [
+    "本轮为作者同上下文增量回源，不是独立 provider/model 评审。",
+    "未修改或刷新真实宿主 generated runtime；未 commit/push/PR/发布。",
+    "37 个配置/132 case validate 通过不代表模型行为通过；F-6/F-18、定位/收益和原证据缺失仍未闭环。",
+    "typecheck/shared-references 日志为已执行工具返回摘要；其他最终 gate 保留命令输出。"
+  ]
+}

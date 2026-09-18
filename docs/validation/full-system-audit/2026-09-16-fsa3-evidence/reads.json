@@ -1,0 +1,513 @@
+[
+  {
+    "path": "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
+    "start": 1,
+    "end": 185,
+    "total_lines": 185,
+    "sha256": "30a0c5b91747cad8676e1d11040dde45b63ce4fc6450a2d5fa7c402472aa6ab8"
+  },
+  {
+    "path": "skills/spec-work/SKILL.md",
+    "start": 1,
+    "end": 125,
+    "total_lines": 125,
+    "sha256": "23b93489ad342412d484bc6a438d3eba2322e857d807daefe940cedac5a85451"
+  },
+  {
+    "path": "docs/contracts/workflows/mutation-enforcement.md",
+    "start": 1,
+    "end": 25,
+    "total_lines": 25,
+    "sha256": "049156fba398641b3e1ecb1a9c8b872b3414a056b2fc05987e9fa6a0e8376b4b"
+  },
+  {
+    "path": "skills/spec-plan/SKILL.md",
+    "start": 1,
+    "end": 123,
+    "total_lines": 123,
+    "sha256": "bcc0e89dd04b3199a09ac16ee74a75a418fe609bd6cf6324f5c78a9d0bc9b416"
+  },
+  {
+    "path": "skills/spec-plan/references/plan-handoff.md",
+    "start": 1,
+    "end": 126,
+    "total_lines": 126,
+    "sha256": "103e4d205215a2b4fdfd05118c782bc497feec5b680dd57204184519f020ebc8"
+  },
+  {
+    "path": "skills/spec-doc-review/SKILL.md",
+    "start": 1,
+    "end": 74,
+    "total_lines": 74,
+    "sha256": "c96d48de5841a1d3c2692232e54107a5eaccdf0337817dc024c2af6d958eaab0"
+  },
+  {
+    "path": "skills/spec-plan/references/plan-handoff.md",
+    "start": 1,
+    "end": 63,
+    "total_lines": 126,
+    "sha256": "103e4d205215a2b4fdfd05118c782bc497feec5b680dd57204184519f020ebc8"
+  },
+  {
+    "path": "skills/spec-work/references/return-to-caller.md",
+    "start": 1,
+    "end": 65,
+    "total_lines": 65,
+    "sha256": "85dd95cdf84f8e814c17231950c9720c1d99516701290fbfed695fe12fde1d0c"
+  },
+  {
+    "path": "skills/spec-lfg/references/work-return.md",
+    "start": 1,
+    "end": 32,
+    "total_lines": 32,
+    "sha256": "27fd6cfed628aaa678061f513b778a8c9b9c67634fb982d92afafe83c69135eb"
+  },
+  {
+    "path": "skills/spec-compound/SKILL.md",
+    "start": 1,
+    "end": 61,
+    "total_lines": 61,
+    "sha256": "32a1da0107adaf31f116e3e05ed146b4dfd3935b9a89cb4c7e9dd95ed26c63e5"
+  },
+  {
+    "path": "skills/spec-compound-refresh/SKILL.md",
+    "start": 1,
+    "end": 164,
+    "total_lines": 164,
+    "sha256": "f91c111735d8140d21baac0ef836523d2051bce2d52b7a6787e52cad2577ca3e"
+  },
+  {
+    "path": "skills/spec-compound-refresh/references/vocabulary-refresh.md",
+    "start": 1,
+    "end": 24,
+    "total_lines": 24,
+    "sha256": "0a3b03caf0b84190ec0fe8e742641e5bc63503580f4366dfad9159a3d29a5d9a"
+  },
+  {
+    "path": "skills/spec-ideate/SKILL.md",
+    "start": 1,
+    "end": 105,
+    "total_lines": 105,
+    "sha256": "dd427fca3e50bce7dc0fc7bc573633217e696c2f8583a1215c5e571c9665f733"
+  },
+  {
+    "path": "skills/spec-brainstorm/SKILL.md",
+    "start": 1,
+    "end": 78,
+    "total_lines": 78,
+    "sha256": "d3df96643040bebb4cc003ff75f9fdb3f3dac34461abb031eab7808f82167861"
+  },
+  {
+    "path": "skills/spec-write-tasks/SKILL.md",
+    "start": 1,
+    "end": 141,
+    "total_lines": 141,
+    "sha256": "ad4decabc11124b24bfe45b850ba1f4e959f86340159bb5ebdbd90bc8e04c8e2"
+  },
+  {
+    "path": "skills/spec-runtime-setup/SKILL.md",
+    "start": 1,
+    "end": 65,
+    "total_lines": 368,
+    "sha256": "c9bb4ae019db0fcbfcc89772a405e0df4fa9f4b0ba404813c330ff4d502de41a"
+  },
+  {
+    "path": "skills/spec-runtime-setup/SKILL.md",
+    "start": 115,
+    "end": 190,
+    "total_lines": 368,
+    "sha256": "c9bb4ae019db0fcbfcc89772a405e0df4fa9f4b0ba404813c330ff4d502de41a"
+  },
+  {
+    "path": "skills/spec-runtime-setup/SKILL.md",
+    "start": 280,
+    "end": 368,
+    "total_lines": 368,
+    "sha256": "c9bb4ae019db0fcbfcc89772a405e0df4fa9f4b0ba404813c330ff4d502de41a"
+  },
+  {
+    "path": "skills/spec-prd/SKILL.md",
+    "start": 1,
+    "end": 95,
+    "total_lines": 345,
+    "sha256": "25cc60f639d886c024a61b462c84cb101f6b95a6098984a879f2a750292e230a"
+  },
+  {
+    "path": "skills/spec-prd/SKILL.md",
+    "start": 195,
+    "end": 265,
+    "total_lines": 345,
+    "sha256": "25cc60f639d886c024a61b462c84cb101f6b95a6098984a879f2a750292e230a"
+  },
+  {
+    "path": "skills/spec-debug/SKILL.md",
+    "start": 1,
+    "end": 115,
+    "total_lines": 364,
+    "sha256": "6c40fadd87dce2ad56bcf5556366a796ed1583a00c5bf53110b98164a3e2daf7"
+  },
+  {
+    "path": "skills/spec-debug/SKILL.md",
+    "start": 285,
+    "end": 364,
+    "total_lines": 364,
+    "sha256": "6c40fadd87dce2ad56bcf5556366a796ed1583a00c5bf53110b98164a3e2daf7"
+  },
+  {
+    "path": "skills/spec-pov/SKILL.md",
+    "start": 1,
+    "end": 59,
+    "total_lines": 59,
+    "sha256": "cd51d624dfcd1d697921d740d3e9e6f9ade13d1d40e0b3be60ca6e51b37a58f9"
+  },
+  {
+    "path": "skills/spec-resolve-pr-feedback/SKILL.md",
+    "start": 1,
+    "end": 126,
+    "total_lines": 126,
+    "sha256": "594de7ca1be76c76a462c281879e4a0837f6e4c433d7949432e2f5e8a30c580d"
+  },
+  {
+    "path": "skills/spec-commit/SKILL.md",
+    "start": 1,
+    "end": 119,
+    "total_lines": 119,
+    "sha256": "7dcb1fa0029116e5854aa0af04c6449f2146d46d86b4c6071c65c18929474dcf"
+  },
+  {
+    "path": "skills/spec-commit-push-pr/SKILL.md",
+    "start": 1,
+    "end": 132,
+    "total_lines": 132,
+    "sha256": "caf7ac9387d1ba3355499fd8a008743d3f78322a6ecf1c4eaefbde4f0919cf93"
+  },
+  {
+    "path": "skills/spec-worktree/SKILL.md",
+    "start": 1,
+    "end": 93,
+    "total_lines": 152,
+    "sha256": "ed13432eec8bb6d5c4d73431ff8db16f918b07b70c01d886be09f0d6443a37e2"
+  },
+  {
+    "path": "skills/spec-commit-push-pr/references/commit-and-push.md",
+    "start": 1,
+    "end": 50,
+    "total_lines": 50,
+    "sha256": "39f8ce3145cebb2074297cdcdfc5386711e3062c701ca88d20a392aa4f67b60e"
+  },
+  {
+    "path": "skills/spec-worktree/SKILL.md",
+    "start": 94,
+    "end": 152,
+    "total_lines": 152,
+    "sha256": "ed13432eec8bb6d5c4d73431ff8db16f918b07b70c01d886be09f0d6443a37e2"
+  },
+  {
+    "path": "skills/spec-strategy/SKILL.md",
+    "start": 1,
+    "end": 94,
+    "total_lines": 94,
+    "sha256": "edfd4866fadfb26582068a2195f86a8c65f32626156a0f5bbce10afd265bb0f6"
+  },
+  {
+    "path": "skills/spec-prototype/SKILL.md",
+    "start": 1,
+    "end": 44,
+    "total_lines": 44,
+    "sha256": "51ee1bf5c37d0ea8bbcb3a3d228ae402de6caede717b4f88700a42582562cb22"
+  },
+  {
+    "path": "skills/spec-explain/SKILL.md",
+    "start": 1,
+    "end": 92,
+    "total_lines": 92,
+    "sha256": "bd82dcd441b82fd5336f3ea26bc22c5e382baf1d5dfc52ccb734719db4c6e39e"
+  },
+  {
+    "path": "skills/spec-test-browser/SKILL.md",
+    "start": 1,
+    "end": 90,
+    "total_lines": 90,
+    "sha256": "bfe3cdc6e9648c6cec96bbe221a8cdd37cddb322d5b489eb1eb861fab329c4db"
+  },
+  {
+    "path": "skills/spec-test-xcode/SKILL.md",
+    "start": 1,
+    "end": 31,
+    "total_lines": 31,
+    "sha256": "e9397a88ddba0144200a6595bf353d8676ab3919dceb56d77360390b5317069b"
+  },
+  {
+    "path": "skills/spec-dogfood/SKILL.md",
+    "start": 1,
+    "end": 99,
+    "total_lines": 99,
+    "sha256": "9e5057e8670a5a9073b27e8051c0a669d759065ec1997a371d618719b2023a88"
+  },
+  {
+    "path": "skills/spec-optimize/SKILL.md",
+    "start": 1,
+    "end": 85,
+    "total_lines": 178,
+    "sha256": "b4a87c4520835b45cf3a8d1e0c5344267020d48ec6541542d714d68451fb0a84"
+  },
+  {
+    "path": "skills/spec-optimize/SKILL.md",
+    "start": 130,
+    "end": 178,
+    "total_lines": 178,
+    "sha256": "b4a87c4520835b45cf3a8d1e0c5344267020d48ec6541542d714d68451fb0a84"
+  },
+  {
+    "path": "skills/spec-simplify-code/SKILL.md",
+    "start": 1,
+    "end": 90,
+    "total_lines": 90,
+    "sha256": "6c23d2047993297e95b17880f2f1c0135538e86900425db646e103f9fc101b23"
+  },
+  {
+    "path": "skills/autoresearch/SKILL.md",
+    "start": 1,
+    "end": 65,
+    "total_lines": 108,
+    "sha256": "15a44442b661389f0036a587ba32d289f748e428c5c16152059410a568cb6219"
+  },
+  {
+    "path": "skills/autoresearch/SKILL.md",
+    "start": 66,
+    "end": 108,
+    "total_lines": 108,
+    "sha256": "15a44442b661389f0036a587ba32d289f748e428c5c16152059410a568cb6219"
+  },
+  {
+    "path": "skills/spec-polish/SKILL.md",
+    "start": 1,
+    "end": 88,
+    "total_lines": 88,
+    "sha256": "193735fb6913a7851160b6072d898e958f15b5bdcf211009d9ce70d5f574bd55"
+  },
+  {
+    "path": "skills/spec-promote/SKILL.md",
+    "start": 1,
+    "end": 80,
+    "total_lines": 140,
+    "sha256": "e9f2145d1f6aacc60ed1a753bdd11789350ffbf919704e540bd29a04872a26eb"
+  },
+  {
+    "path": "skills/spec-promote/SKILL.md",
+    "start": 115,
+    "end": 140,
+    "total_lines": 140,
+    "sha256": "e9f2145d1f6aacc60ed1a753bdd11789350ffbf919704e540bd29a04872a26eb"
+  },
+  {
+    "path": "skills/autoresearch/scripts/orchestrate.sh",
+    "start": 1,
+    "end": 170,
+    "total_lines": 327,
+    "sha256": "a7dae8a4ec05fd6557cfe1611091398763a6ae83acc37232daf51cd1b7ad3221"
+  },
+  {
+    "path": "skills/spec-promote/SKILL.md",
+    "start": 80,
+    "end": 114,
+    "total_lines": 140,
+    "sha256": "e9f2145d1f6aacc60ed1a753bdd11789350ffbf919704e540bd29a04872a26eb"
+  },
+  {
+    "path": "skills/autoresearch/scripts/orchestrate.sh",
+    "start": 170,
+    "end": 327,
+    "total_lines": 327,
+    "sha256": "a7dae8a4ec05fd6557cfe1611091398763a6ae83acc37232daf51cd1b7ad3221"
+  },
+  {
+    "path": "skills/autoresearch/references/orchestrator-routing.md",
+    "start": 1,
+    "end": 89,
+    "total_lines": 89,
+    "sha256": "53ec4f48e88318812d7e2ddc51b993c44d9843000972c0e68aa24fb36158d240"
+  },
+  {
+    "path": "skills/spec-project-rules/SKILL.md",
+    "start": 1,
+    "end": 122,
+    "total_lines": 122,
+    "sha256": "6a980fd52f58649626bd327202d95c210d245184b0cd7f58f9fe5779e6000f87"
+  },
+  {
+    "path": "skills/spec-rule-miner/SKILL.md",
+    "start": 1,
+    "end": 77,
+    "total_lines": 77,
+    "sha256": "306fc3e4cbe1a067434807b7eed1c765213fa6be357d2e3d16960f79abe434d1"
+  },
+  {
+    "path": "skills/spec-write-skill/SKILL.md",
+    "start": 1,
+    "end": 62,
+    "total_lines": 62,
+    "sha256": "73f6e1a06661d3a1b2a172800b25abca9888681d61f8abf6457fbb769c1f668d"
+  },
+  {
+    "path": "skills/spec-product-pulse/SKILL.md",
+    "start": 1,
+    "end": 92,
+    "total_lines": 92,
+    "sha256": "4957802c1c1c12e74fec8257207e5e137a5b87c0a4cbfac6f38acf7caa8d597a"
+  },
+  {
+    "path": "skills/spec-sweep/SKILL.md",
+    "start": 1,
+    "end": 124,
+    "total_lines": 124,
+    "sha256": "b2a87ee7f920913986c8a0a80a4f3aec988025cf25cb794f941af7570bd9d484"
+  },
+  {
+    "path": "skills/spec-riffrec-feedback-analysis/SKILL.md",
+    "start": 1,
+    "end": 47,
+    "total_lines": 47,
+    "sha256": "d577685081c41c9f6b9bdcc7eee3644b116e19dbd82ad3bef9e9f3844b304bb8"
+  },
+  {
+    "path": "skills/spec-app-consistency-audit/SKILL.md",
+    "start": 1,
+    "end": 95,
+    "total_lines": 307,
+    "sha256": "0fe3e99ecba65f49ec62c1fa0bbd870f926760df966f5e68724e75b07ed0f1b4"
+  },
+  {
+    "path": "skills/spec-app-consistency-audit/SKILL.md",
+    "start": 225,
+    "end": 307,
+    "total_lines": 307,
+    "sha256": "0fe3e99ecba65f49ec62c1fa0bbd870f926760df966f5e68724e75b07ed0f1b4"
+  },
+  {
+    "path": "src/cli/adapters/index.js",
+    "start": 1,
+    "end": 75,
+    "total_lines": 75,
+    "sha256": "53632213161930348150812667e9c4977c5ab507d10124f1c875c8c588c99714"
+  },
+  {
+    "path": "scripts/npm-install-matrix-smoke.cjs",
+    "start": 86,
+    "end": 134,
+    "total_lines": 134,
+    "sha256": "37d7d6dc49e93145007883022662cf002f3d831efdde9c722340c365fc507fc9"
+  },
+  {
+    "path": "tests/smoke/cli-smoke.test.js",
+    "start": 1,
+    "end": 115,
+    "total_lines": 397,
+    "sha256": "6f412c5a8e3091dc59b0294dbcf6e811df726173551c50153511b70ea34a7c18"
+  },
+  {
+    "path": "skills/spec-compound/references/promotion.md",
+    "start": 1,
+    "end": 12,
+    "total_lines": 12,
+    "sha256": "50a855b206118e1c621fe080f3d3c4d670cffe21e7362648f79b0d3c9c62d788"
+  },
+  {
+    "path": "skills/spec-handoff/references/artifact-contract.md",
+    "start": 1,
+    "end": 90,
+    "total_lines": 90,
+    "sha256": "57ad1f8fdb1587cf8b212e23fb0c069b2d51a01b36511a78378272471f934aa7"
+  },
+  {
+    "path": "skills/spec-runtime-setup/scripts/setup.cjs",
+    "start": 560,
+    "end": 630,
+    "total_lines": 873,
+    "sha256": "3fa166402a6978c20f746e87c1e1413aab5e9d80e2ae248cce8c11ef1d9dc7f6"
+  },
+  {
+    "path": "src/cli/helpers/honest-closeout.js",
+    "start": 1,
+    "end": 180,
+    "total_lines": 391,
+    "sha256": "f876c18d5c925d52b228b9c8820756f7f3c7737533008f14a334ccbd16d823b7"
+  },
+  {
+    "path": "src/cli/helpers/verification-run-summary.js",
+    "start": 1,
+    "end": 150,
+    "total_lines": 733,
+    "sha256": "f889a193d61174db1d55e950929cc7957a3d67cbad2d1776df53ddba8ef44df3"
+  },
+  {
+    "path": "skills/spec-app-consistency-audit/SKILL.md",
+    "start": 96,
+    "end": 224,
+    "total_lines": 307,
+    "sha256": "0fe3e99ecba65f49ec62c1fa0bbd870f926760df966f5e68724e75b07ed0f1b4"
+  },
+  {
+    "path": "skills/spec-optimize/SKILL.md",
+    "start": 86,
+    "end": 129,
+    "total_lines": 178,
+    "sha256": "b4a87c4520835b45cf3a8d1e0c5344267020d48ec6541542d714d68451fb0a84"
+  },
+  {
+    "path": "skills/spec-plan/SKILL.md",
+    "start": 80,
+    "end": 123,
+    "total_lines": 123,
+    "sha256": "bcc0e89dd04b3199a09ac16ee74a75a418fe609bd6cf6324f5c78a9d0bc9b416"
+  },
+  {
+    "path": "skills/spec-write-tasks/references/execution-handoff-contract.md",
+    "start": 1,
+    "end": 115,
+    "total_lines": 139,
+    "sha256": "543d4a4bcea92d1127dd615cf72ffda2125ae5ae6645d3d1531d59d3cc65ec1b"
+  },
+  {
+    "path": "skills/spec-doc-review/references/dispatch.md",
+    "start": 1,
+    "end": 52,
+    "total_lines": 52,
+    "sha256": "33a1d8c6346e2d6541255f4709d214f1fa5c63aa88cf9e65b32693283d12bdf2"
+  },
+  {
+    "path": "skills/spec-pov/references/method.md",
+    "start": 1,
+    "end": 53,
+    "total_lines": 53,
+    "sha256": "b8d3042047162c6288d7bffdbe9f0cc589160c8710b907462a1059ffcb83d349"
+  },
+  {
+    "path": "README.md",
+    "start": 28,
+    "end": 94,
+    "total_lines": 283,
+    "sha256": "8f21ca4fd767dca5c80084c3ab9c8ac7c363db46418bbf5588ed60d61f54c68c"
+  },
+  {
+    "path": "README.md",
+    "start": 204,
+    "end": 245,
+    "total_lines": 283,
+    "sha256": "8f21ca4fd767dca5c80084c3ab9c8ac7c363db46418bbf5588ed60d61f54c68c"
+  },
+  {
+    "path": "docs/validation/2026-09-13-full-system-audit-plan-v2.md",
+    "start": 89,
+    "end": 104,
+    "total_lines": 568,
+    "sha256": "3503b2f9e69643bfcd1be91653fede5df02f0fa6b896cd1552c0c82a9f9e0929"
+  },
+  {
+    "path": "docs/validation/ce-localization/field-validation/results.json",
+    "start": 99,
+    "end": 111,
+    "total_lines": 111,
+    "sha256": "c1f39aa7b027fa0c5f7aba1b0b54881f3a52269ab8c4f87d01e130db557c7432"
+  }
+]

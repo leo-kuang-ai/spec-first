@@ -1,0 +1,161 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "ce-localization-fsa2-repair-2026-09-15-regression",
+  "producer": "codex-current-session author self-review",
+  "reviewed_at": "2026-09-15T06:33:37.931Z",
+  "source_binding": {
+    "head": "66b0e0c6c83c1e75d2e9634132586bfce5581ff3",
+    "dirty_path_manifest_sha256": "d3f8c48a64512a26ee1acac4d74c924ecbf2701a77af3d4cd5c59e00a79a9751",
+    "source_tree_hash": "d1389c6ca997185e652d5e7a483abd2e54842f7da7b17e4d2fc73fe54823a81f",
+    "inventory_hash": "c2e85c9446ff735d8525521caeeab807436058117e2eea9f78badcdad3233ca7",
+    "inventory_artifact_sha256": "94fc61b2430b67620f5374f762546ae01bc9b29f41798664b49b3c2c7c8d9f80",
+    "review_input_hash": "16261b209379735de67ed39042655b25a3b48d5eee934e45169420a28d6dded6"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "not-used",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "reviewed_paths": [
+    {
+      "path": "tests/unit/using-spec-first-contracts.test.js",
+      "skill_ids": [
+        "spec-commit",
+        "using-spec-first"
+      ],
+      "sha256": "e087cecc4fbfd81c566ae85dba68e775de05592874e45ca312587709075bbdf4",
+      "bytes": 8256,
+      "line_count": 162,
+      "covered_line_ranges": [
+        [
+          1,
+          162
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "治理宿主集合直接来自 registry；不继续写死六宿主，也不削弱具体 host_delivery 断言。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "治理宿主集合直接来自 registry；不继续写死六宿主，也不削弱具体 host_delivery 断言。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "templates/claude/commands/spec/doc-review.md",
+      "skill_ids": [
+        "spec-doc-review"
+      ],
+      "sha256": "8ea76ec11156bc9d4bed69b75818719051aa12339d9e6b5707d80e147709c814",
+      "bytes": 435,
+      "line_count": 12,
+      "covered_line_ranges": [
+        [
+          1,
+          12
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "command metadata 使用主 token non-interactive，与 Skill 入口一致，headless alias 仍由 modes 接受。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "command metadata 使用主 token non-interactive，与 Skill 入口一致，headless alias 仍由 modes 接受。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/command-resource-path-rewrite.test.js",
+      "skill_ids": [
+        "spec-doc-review",
+        "spec-prd"
+      ],
+      "sha256": "0ebb26de711bc2a62ec42aa8d1b0eef275140169ff8a3db8a30b99159ce66801",
+      "bytes": 11323,
+      "line_count": 247,
+      "covered_line_ranges": [
+        [
+          1,
+          247
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "资源断言跟随实际 Markdown 引用；通用 @ 重写负例仍保留，所有 command 物理资源可达性与 drift 校验未删除。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "资源断言跟随实际 Markdown 引用；通用 @ 重写负例仍保留，所有 command 物理资源可达性与 drift 校验未删除。"
+          ],
+          "limitations": [
+            "同一作者、同上下文增量回读；两个 lens 是观察维度，不是独立 provider。",
+            "完整覆盖区间由历史 receipt 的未变部分与本轮改动复核合成；不声称本轮逐行重读所有未变字节。",
+            "真实模型/宿主/现场效果未验证。"
+          ]
+        }
+      ]
+    }
+  ],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "作者同上下文增量复核，保留历史未变区域的覆盖，不重建历史独立审查。",
+    "FSA2 模型/宿主/现场/原审计证据缺口仍开放，见 FSA2 报告第 13 节。"
+  ],
+  "claim_ceiling": "当前本地源码修复与确定性证据链；非完整系统审查或独立模型行为验收。"
+}

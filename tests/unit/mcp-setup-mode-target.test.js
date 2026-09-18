@@ -77,6 +77,34 @@ describe('spec-runtime-setup GNU argument parsing', () => {
 });
 
 describe('spec-runtime-setup action policy', () => {
+  test.each([
+    ['--repo', 'child'],
+    ['--folder=child'],
+    ['--user-scope'],
+    ['--requirement-workspace', 'packages/api'],
+    ['--workflow', 'spec-work'],
+    ['--all-repos'],
+    ['--repo', 'child', '--user-scope', '--workflow', 'spec-work'],
+  ])('范围参数 %j 不改变默认安装模式的能力', (...argv) => {
+    const { buildActionPlan } = require(modePolicyModule);
+    const { requireCapability } = require('../../skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs');
+    const plan = buildActionPlan({ argv, knownIds: ['codegraph'], defaultIds: ['codegraph'] });
+    expect(plan).toMatchObject({
+      blocked: false, mode: 'bare', mutation: true,
+      selected_ids: ['codegraph'], selection_source: 'default-required',
+    });
+    expect(() => requireCapability({ actionPlan: plan }, 'install-tools')).not.toThrow();
+  });
+
+  test.each(['--check', '--plan', '--verify-only'])('范围参数不使 %s 获得安装或修复权限', (flag) => {
+    const { buildActionPlan } = require(modePolicyModule);
+    const plan = buildActionPlan({ argv: [flag, '--repo', 'child'], defaultIds: ['codegraph'] });
+    expect(plan.blocked).toBe(false);
+    expect(plan.capabilities).not.toContain('install-tools');
+    expect(plan.capabilities).not.toContain('write-host-config');
+    expect(plan.args.repairHostConfig).toBe(false);
+  });
+
   test('binds every action to an explicit capability', () => {
     const { buildActionPlan } = require(modePolicyModule);
     const plan = buildActionPlan({
@@ -196,6 +224,12 @@ describe('spec-runtime-setup action policy', () => {
       selected_ids: ['codegraph'],
       args: { repairHostConfig: true },
     });
+  });
+
+  test.each([[], ['--repo', '.']])('默认 setup 不隐式授权替换冲突配置 %j', (...argv) => {
+    const { buildActionPlan } = require(modePolicyModule);
+    const plan = buildActionPlan({ argv });
+    expect(plan).toMatchObject({ mode: 'bare', mutation: true, args: { repairHostConfig: false } });
   });
 
   test.each([

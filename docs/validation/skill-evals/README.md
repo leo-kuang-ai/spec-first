@@ -1,58 +1,60 @@
 # Skill 测评目录
 
-本目录用于对 spec-first 自有的 37 个 skill 逐个开展行为测评,并跟踪进度。基线清点见 [2026-08-30-skill-inventory.md](./2026-08-30-skill-inventory.md)。
+本目录保存按日期与 source 基线绑定的历史行为测评。当前治理注册表收录 **38 个 canonical Skill**；2026-08-30 的 37 包清点是历史快照，不能作为当前分母。
+
+2026-09-15 已复核 37 组 `eval.yaml`、132 个 case 配置可加载，见 [FSA2 配置验证清单](../full-system-audit/2026-09-15-fsa2-eval-inventory.json)。这是配置证据，当前模型行为仍为 `not-run`；本页下方“通过”仅表示原记录，不代表修改后的 source 通过。当前执行优先复用各包的 `skill-up` 入口，并按源码变化重跑相关 case。
 
 ## 文件约定
 
 - 每个 skill 一份测评文件,命名为 `<skill-name>.md`(如 `spec-plan.md`),从 [_template.md](./_template.md) 复制起稿。
 - 测评完成后在下方索引表更新状态与文件链接。
 - 行为语义测评优先使用 fresh-source eval(把磁盘上的 skill 源文件注入全新通用 subagent 评估),checklist 见 `docs/contracts/workflows/fresh-source-eval-checklist.md`;无法执行时必须在测评文件中记录原因,不得声称通过。
-- 清点口径:治理注册表 `src/cli/contracts/dual-host-governance/skills-governance.json` 收录的 37 个 skill。`skills/autoresearch` 是指向 generated runtime 的第三方 symlink、`_shared/` 是共享参考契约、`spec-project-rules-workspace/` 是开发期 eval 工作区,均不在测评范围。
+- 当前范围以 `src/cli/contracts/dual-host-governance/skills-governance.json` 为准；`skills/autoresearch` 已是 canonical source，纳入当前范围。`_shared/` 为共享资产，不单独计为 Skill；历史开发工作区不作为注册包。
 - `results.tsv` 是 darwin 优化循环日志(baseline / keep / revert / regression);commit 列 `wt@<hash>` 表示改动基于该 HEAD 的未提交 working tree,commit 后可替换为真实 hash。
 
-## 测评进度索引
+## 历史测评进度索引
 
 状态取值:`待测评` / `进行中` / `通过` / `需改进` / `失败`。
 
-| # | Skill | 级别 | 分组 | 状态 | 测评文件 | evals 资产 |
+| # | Skill | 级别 | 分组 | 历史状态 | 测评文件 | evals 资产 |
 |---|---|---|---|---|---|---|
-| 1 | using-spec-first | S | 入口与路由 | 通过 | [using-spec-first.md](./using-spec-first.md) | [evals/](../../skills/using-spec-first/evals/eval.yaml) |
-| 2 | spec-ideate | W | 需求与规划 | 通过 | [spec-ideate.md](./spec-ideate.md) | [evals/](../../skills/spec-ideate/evals/eval.yaml) |
-| 3 | spec-brainstorm | W | 需求与规划 | 通过 | [spec-brainstorm.md](./spec-brainstorm.md) | [evals/](../../skills/spec-brainstorm/evals/eval.yaml) |
-| 4 | spec-prd | W | 需求与规划 | 通过 | [spec-prd.md](./spec-prd.md) | [evals/](../../skills/spec-prd/evals/eval.yaml) |
-| 5 | spec-doc-review | W | 需求与规划 | 通过 | [spec-doc-review.md](./spec-doc-review.md) | [evals/](../../skills/spec-doc-review/evals/eval.yaml) |
-| 6 | spec-strategy | S | 需求与规划 | 通过 | [spec-strategy.md](./spec-strategy.md) | [evals/](../../skills/spec-strategy/evals/eval.yaml) |
-| 7 | spec-prototype | S | 需求与规划 | 通过 | [spec-prototype.md](./spec-prototype.md) | [evals/](../../skills/spec-prototype/evals/eval.yaml) |
-| 8 | spec-plan | W | 计划与任务 | 通过 | [spec-plan.md](./spec-plan.md) | [evals/](../../skills/spec-plan/evals/eval.yaml) |
-| 9 | spec-write-tasks | W | 计划与任务 | 通过 | [spec-write-tasks.md](./spec-write-tasks.md) | [evals/](../../skills/spec-write-tasks/evals/eval.yaml) |
-| 10 | spec-work | W | 执行与交付 | 通过 | [spec-work.md](./spec-work.md) | [evals/](../../skills/spec-work/evals/eval.yaml) |
-| 11 | spec-lfg | S | 执行与交付 | 通过(带条件) | [spec-lfg.md](./spec-lfg.md) | [evals/](../../skills/spec-lfg/evals/eval.yaml) |
-| 12 | spec-resolve-pr-feedback | S | 执行与交付 | 通过 | [spec-resolve-pr-feedback.md](./spec-resolve-pr-feedback.md) | [evals/](../../skills/spec-resolve-pr-feedback/evals/eval.yaml) |
-| 13 | spec-commit | I | 执行与交付 | 通过 | [spec-internal-helpers.md](./spec-internal-helpers.md) | [evals/](../../skills/spec-commit/evals/eval.yaml) |
-| 14 | spec-commit-push-pr | I | 执行与交付 | 通过 | [spec-internal-helpers.md](./spec-internal-helpers.md) | [evals/](../../skills/spec-commit-push-pr/evals/eval.yaml) |
+| 1 | using-spec-first | S | 入口与路由 | 通过 | [using-spec-first.md](./using-spec-first.md) | [evals/](../../../skills/using-spec-first/evals/eval.yaml) |
+| 2 | spec-ideate | W | 需求与规划 | 通过 | [spec-ideate.md](./spec-ideate.md) | [evals/](../../../skills/spec-ideate/evals/eval.yaml) |
+| 3 | spec-brainstorm | W | 需求与规划 | 通过 | [spec-brainstorm.md](./spec-brainstorm.md) | [evals/](../../../skills/spec-brainstorm/evals/eval.yaml) |
+| 4 | spec-prd | W | 需求与规划 | 通过 | [spec-prd.md](./spec-prd.md) | [evals/](../../../skills/spec-prd/evals/eval.yaml) |
+| 5 | spec-doc-review | W | 需求与规划 | 通过 | [spec-doc-review.md](./spec-doc-review.md) | [evals/](../../../skills/spec-doc-review/evals/eval.yaml) |
+| 6 | spec-strategy | S | 需求与规划 | 通过 | [spec-strategy.md](./spec-strategy.md) | [evals/](../../../skills/spec-strategy/evals/eval.yaml) |
+| 7 | spec-prototype | S | 需求与规划 | 通过 | [spec-prototype.md](./spec-prototype.md) | [evals/](../../../skills/spec-prototype/evals/eval.yaml) |
+| 8 | spec-plan | W | 计划与任务 | 通过 | [spec-plan.md](./spec-plan.md) | [evals/](../../../skills/spec-plan/evals/eval.yaml) |
+| 9 | spec-write-tasks | W | 计划与任务 | 通过 | [spec-write-tasks.md](./spec-write-tasks.md) | [evals/](../../../skills/spec-write-tasks/evals/eval.yaml) |
+| 10 | spec-work | W | 执行与交付 | 通过 | [spec-work.md](./spec-work.md) | [evals/](../../../skills/spec-work/evals/eval.yaml) |
+| 11 | spec-lfg | S | 执行与交付 | 通过(带条件) | [spec-lfg.md](./spec-lfg.md) | [evals/](../../../skills/spec-lfg/evals/eval.yaml) |
+| 12 | spec-resolve-pr-feedback | S | 执行与交付 | 通过 | [spec-resolve-pr-feedback.md](./spec-resolve-pr-feedback.md) | [evals/](../../../skills/spec-resolve-pr-feedback/evals/eval.yaml) |
+| 13 | spec-commit | I | 执行与交付 | 通过 | [spec-internal-helpers.md](./spec-internal-helpers.md) | [evals/](../../../skills/spec-commit/evals/eval.yaml) |
+| 14 | spec-commit-push-pr | I | 执行与交付 | 通过 | [spec-internal-helpers.md](./spec-internal-helpers.md) | [evals/](../../../skills/spec-commit-push-pr/evals/eval.yaml) |
 | 15 | spec-worktree | I | 执行与交付 | 通过 | [spec-internal-helpers.md](./spec-internal-helpers.md) | 确定性脚本测试(见测评文档) |
-| 16 | spec-debug | W | 调试与质量 | 通过 | [spec-debug.md](./spec-debug.md) | [evals/](../../skills/spec-debug/evals/eval.yaml) |
-| 17 | spec-code-review | W | 调试与质量 | 通过 | [spec-code-review.md](./spec-code-review.md) | [evals/](../../skills/spec-code-review/evals/eval.yaml) |
-| 18 | spec-optimize | W | 调试与质量 | 通过 | [spec-optimize.md](./spec-optimize.md) | [evals/](../../skills/spec-optimize/evals/eval.yaml) |
-| 19 | spec-simplify-code | S | 调试与质量 | 通过 | [spec-simplify-code.md](./spec-simplify-code.md) | [evals/](../../skills/spec-simplify-code/evals/eval.yaml) |
-| 20 | spec-dogfood | W | 调试与质量 | 通过(带条件) | [spec-dogfood.md](./spec-dogfood.md) | [evals/](../../skills/spec-dogfood/evals/eval.yaml) |
-| 21 | spec-app-consistency-audit | W | 调试与质量 | 通过(带条件) | [spec-app-consistency-audit.md](./spec-app-consistency-audit.md) | [evals/](../../skills/spec-app-consistency-audit/evals/eval.yaml) |
-| 22 | spec-runtime-setup | W | 运行时与设备验证 | 通过 | [spec-runtime-setup.md](./spec-runtime-setup.md) | [evals/](../../skills/spec-runtime-setup/evals/eval.yaml) |
-| 23 | spec-test-browser | I | 运行时与设备验证 | 通过 | [spec-test-browser-xcode.md](./spec-test-browser-xcode.md) | [evals/](../../skills/spec-test-browser/evals/eval.yaml) |
-| 24 | spec-test-xcode | S | 运行时与设备验证 | 通过 | [spec-test-browser-xcode.md](./spec-test-browser-xcode.md) | [evals/](../../skills/spec-test-xcode/evals/eval.yaml) |
-| 25 | spec-compound | W | 知识与规则沉淀 | 通过 | [spec-compound-pair.md](./spec-compound-pair.md) | [evals/](../../skills/spec-compound/evals/eval.yaml) |
-| 26 | spec-compound-refresh | W | 知识与规则沉淀 | 通过 | [spec-compound-pair.md](./spec-compound-pair.md) | [evals/](../../skills/spec-compound-refresh/evals/eval.yaml) |
-| 27 | spec-project-rules | S | 知识与规则沉淀 | 通过 | [spec-project-rules-pair.md](./spec-project-rules-pair.md) | [evals/](../../skills/spec-project-rules/evals/eval.yaml) |
-| 28 | spec-rule-miner | S | 知识与规则沉淀 | 通过(带条件) | [spec-project-rules-pair.md](./spec-project-rules-pair.md) | [evals/](../../skills/spec-rule-miner/evals/eval.yaml) |
-| 29 | spec-product-pulse | S | 产品信号与反馈 | 通过 | [spec-signal-group.md](./spec-signal-group.md) | [evals/](../../skills/spec-product-pulse/evals/eval.yaml) |
-| 30 | spec-sweep | S | 产品信号与反馈 | 通过 | [spec-signal-group.md](./spec-signal-group.md) | [evals/](../../skills/spec-sweep/evals/eval.yaml) |
-| 31 | spec-riffrec-feedback-analysis | S | 产品信号与反馈 | 通过 | [spec-signal-group.md](./spec-signal-group.md) | [evals/](../../skills/spec-riffrec-feedback-analysis/evals/eval.yaml) |
-| 32 | spec-polish | W | 产品信号与反馈 | 通过 | [spec-signal-group.md](./spec-signal-group.md) | [evals/](../../skills/spec-polish/evals/eval.yaml) |
-| 33 | spec-explain | S | 会话连续性与解释 | 通过 | [spec-session-group.md](./spec-session-group.md) | [evals/](../../skills/spec-explain/evals/eval.yaml) |
-| 34 | spec-handoff | S | 会话连续性与解释 | 通过 | [spec-session-group.md](./spec-session-group.md) | [evals/](../../skills/spec-handoff/evals/eval.yaml) |
-| 35 | spec-pov | S | 会话连续性与解释 | 通过(带条件) | [spec-session-group.md](./spec-session-group.md) | [evals/](../../skills/spec-pov/evals/eval.yaml) |
-| 36 | spec-write-skill | W | 治理与元能力 | 通过 | [spec-final-pair.md](./spec-final-pair.md) | [evals/](../../skills/spec-write-skill/evals/eval.yaml) |
-| 37 | spec-promote | S | 发布 | 通过 | [spec-final-pair.md](./spec-final-pair.md) | [evals/](../../skills/spec-promote/evals/eval.yaml) |
+| 16 | spec-debug | W | 调试与质量 | 通过 | [spec-debug.md](./spec-debug.md) | [evals/](../../../skills/spec-debug/evals/eval.yaml) |
+| 17 | spec-code-review | W | 调试与质量 | 通过 | [spec-code-review.md](./spec-code-review.md) | [evals/](../../../skills/spec-code-review/evals/eval.yaml) |
+| 18 | spec-optimize | W | 调试与质量 | 通过 | [spec-optimize.md](./spec-optimize.md) | [evals/](../../../skills/spec-optimize/evals/eval.yaml) |
+| 19 | spec-simplify-code | S | 调试与质量 | 通过 | [spec-simplify-code.md](./spec-simplify-code.md) | [evals/](../../../skills/spec-simplify-code/evals/eval.yaml) |
+| 20 | spec-dogfood | W | 调试与质量 | 通过(带条件) | [spec-dogfood.md](./spec-dogfood.md) | [evals/](../../../skills/spec-dogfood/evals/eval.yaml) |
+| 21 | spec-app-consistency-audit | W | 调试与质量 | 通过(带条件) | [spec-app-consistency-audit.md](./spec-app-consistency-audit.md) | [evals/](../../../skills/spec-app-consistency-audit/evals/eval.yaml) |
+| 22 | spec-runtime-setup | W | 运行时与设备验证 | 通过 | [spec-runtime-setup.md](./spec-runtime-setup.md) | [evals/](../../../skills/spec-runtime-setup/evals/eval.yaml) |
+| 23 | spec-test-browser | I | 运行时与设备验证 | 通过 | [spec-test-browser-xcode.md](./spec-test-browser-xcode.md) | [evals/](../../../skills/spec-test-browser/evals/eval.yaml) |
+| 24 | spec-test-xcode | S | 运行时与设备验证 | 通过 | [spec-test-browser-xcode.md](./spec-test-browser-xcode.md) | [evals/](../../../skills/spec-test-xcode/evals/eval.yaml) |
+| 25 | spec-compound | W | 知识与规则沉淀 | 通过 | [spec-compound-pair.md](./spec-compound-pair.md) | [evals/](../../../skills/spec-compound/evals/eval.yaml) |
+| 26 | spec-compound-refresh | W | 知识与规则沉淀 | 通过 | [spec-compound-pair.md](./spec-compound-pair.md) | [evals/](../../../skills/spec-compound-refresh/evals/eval.yaml) |
+| 27 | spec-project-rules | S | 知识与规则沉淀 | 通过 | [spec-project-rules-pair.md](./spec-project-rules-pair.md) | [evals/](../../../skills/spec-project-rules/evals/eval.yaml) |
+| 28 | spec-rule-miner | S | 知识与规则沉淀 | 通过(带条件) | [spec-project-rules-pair.md](./spec-project-rules-pair.md) | [evals/](../../../skills/spec-rule-miner/evals/eval.yaml) |
+| 29 | spec-product-pulse | S | 产品信号与反馈 | 通过 | [spec-signal-group.md](./spec-signal-group.md) | [evals/](../../../skills/spec-product-pulse/evals/eval.yaml) |
+| 30 | spec-sweep | S | 产品信号与反馈 | 通过 | [spec-signal-group.md](./spec-signal-group.md) | [evals/](../../../skills/spec-sweep/evals/eval.yaml) |
+| 31 | spec-riffrec-feedback-analysis | S | 产品信号与反馈 | 通过 | [spec-signal-group.md](./spec-signal-group.md) | [evals/](../../../skills/spec-riffrec-feedback-analysis/evals/eval.yaml) |
+| 32 | spec-polish | W | 产品信号与反馈 | 通过 | [spec-signal-group.md](./spec-signal-group.md) | [evals/](../../../skills/spec-polish/evals/eval.yaml) |
+| 33 | spec-explain | S | 会话连续性与解释 | 通过 | [spec-session-group.md](./spec-session-group.md) | [evals/](../../../skills/spec-explain/evals/eval.yaml) |
+| 34 | spec-handoff | S | 会话连续性与解释 | 通过 | [spec-session-group.md](./spec-session-group.md) | [evals/](../../../skills/spec-handoff/evals/eval.yaml) |
+| 35 | spec-pov | S | 会话连续性与解释 | 通过(带条件) | [spec-session-group.md](./spec-session-group.md) | [evals/](../../../skills/spec-pov/evals/eval.yaml) |
+| 36 | spec-write-skill | W | 治理与元能力 | 通过 | [spec-final-pair.md](./spec-final-pair.md) | [evals/](../../../skills/spec-write-skill/evals/eval.yaml) |
+| 37 | spec-promote | S | 发布 | 通过 | [spec-final-pair.md](./spec-final-pair.md) | [evals/](../../../skills/spec-promote/evals/eval.yaml) |
 
 级别说明:**W** = 公开 workflow(workflow_command),**S** = standalone skill,**I** = internal helper(internal_only,非用户入口,测评时经其 governed caller 的派发契约触发)。
 

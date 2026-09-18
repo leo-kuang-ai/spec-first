@@ -1,0 +1,317 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "ce-localization-fsa3-repair-2026-09-16",
+  "producer": "codex-current-session author self-review",
+  "reviewed_at": "2026-09-16T07:59:17.331Z",
+  "source_binding": {
+    "head": "66b0e0c6c83c1e75d2e9634132586bfce5581ff3",
+    "dirty_path_manifest_sha256": "1497d3eadb3019aba5d0696807cd6146b19c445e9bb78e42f037e76cf7bf8a17",
+    "source_tree_hash": "5453b3cb782f084e8a4a57a4ec8df85d46b027716f127d0fa23f5f1ac4a49444",
+    "inventory_hash": "ad15fb5a24e316debe0a2cf0301c04d84bee854568061f5745bff2adc8fdaade",
+    "inventory_artifact_sha256": "edb2354fbba80c51638f39656d28d937d0ce056be6d45b113563cbd1ece68e84",
+    "review_input_hash": "2d3b3af2b273bfda8ad37f5351a8db797b803701b438e469bc5170bdbd4d0537"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "not-used",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "reviewed_paths": [
+    {
+      "path": "skills/autoresearch/references/orchestrator-routing.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "829530b3ee2b47d9b42e1794f43c4b2e4649d5a04d1b4e685afcce7cba3cfc91",
+      "bytes": 7848,
+      "line_count": 95,
+      "covered_line_ranges": [
+        [
+          1,
+          95
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "v1 输出迁移与 consumer、待解决状态排序明确，不把关键词候选升级为决定。"
+          ],
+          "limitations": [
+            "本轮作者增量语义复核与未变历史 receipt 合成覆盖；双 lens 非独立 provider。",
+            "真实宿主/模型/现场收益不在本轮通过范围。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "v1 输出迁移与 consumer、待解决状态排序明确，不把关键词候选升级为决定。"
+          ],
+          "limitations": [
+            "本轮作者增量语义复核与未变历史 receipt 合成覆盖；双 lens 非独立 provider。",
+            "真实宿主/模型/现场收益不在本轮通过范围。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/scripts/orchestrate.sh",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "eb9efb1e6bf91a148373582aa20c6cd35c740b1b30866e918fd2db33cda6dec8",
+      "bytes": 13362,
+      "line_count": 328,
+      "covered_line_ranges": [
+        [
+          1,
+          328
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "拒绝消息去掉 URL 输入；next-hop/verdict 共用 unresolved；恢复不受历史失败永久阻断；classify 不再选择首项。"
+          ],
+          "limitations": [
+            "本轮作者增量语义复核与未变历史 receipt 合成覆盖；双 lens 非独立 provider。",
+            "真实宿主/模型/现场收益不在本轮通过范围。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "拒绝消息去掉 URL 输入；next-hop/verdict 共用 unresolved；恢复不受历史失败永久阻断；classify 不再选择首项。"
+          ],
+          "limitations": [
+            "本轮作者增量语义复核与未变历史 receipt 合成覆盖；双 lens 非独立 provider。",
+            "真实宿主/模型/现场收益不在本轮通过范围。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/SKILL.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "d51a75af36a3a41095d50a775197635c48238ed24ed6ad3eda1ef24e50f43136",
+      "bytes": 9653,
+      "line_count": 108,
+      "covered_line_ranges": [
+        [
+          1,
+          108
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "只消费候选事实，语义归 LLM；收敛边界与 pending/failed/连续unknown 的脚本判定一致。"
+          ],
+          "limitations": [
+            "本轮作者增量语义复核与未变历史 receipt 合成覆盖；双 lens 非独立 provider。",
+            "真实宿主/模型/现场收益不在本轮通过范围。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "只消费候选事实，语义归 LLM；收敛边界与 pending/failed/连续unknown 的脚本判定一致。"
+          ],
+          "limitations": [
+            "本轮作者增量语义复核与未变历史 receipt 合成覆盖；双 lens 非独立 provider。",
+            "真实宿主/模型/现场收益不在本轮通过范围。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/autoresearch-orchestrator-regression.test.js",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "796b359fd63276ca1ea4cb044b27f0815e63dd0914792f77015fe0c7d7d6f8f4",
+      "bytes": 4476,
+      "line_count": 91,
+      "covered_line_ranges": [
+        [
+          1,
+          91
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "20项真实脚本调用覆盖拒绝输出、resume、正例allowlist、状态组合与分类事实接口。"
+          ],
+          "limitations": [
+            "本轮作者增量语义复核与未变历史 receipt 合成覆盖；双 lens 非独立 provider。",
+            "真实宿主/模型/现场收益不在本轮通过范围。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "20项真实脚本调用覆盖拒绝输出、resume、正例allowlist、状态组合与分类事实接口。"
+          ],
+          "limitations": [
+            "本轮作者增量语义复核与未变历史 receipt 合成覆盖；双 lens 非独立 provider。",
+            "真实宿主/模型/现场收益不在本轮通过范围。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/ce-localization-review-contracts.test.js",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "96e6694946357851d9ca39fa6c4297c1463d9c7f10375f65abb885acad8aade6",
+      "bytes": 7454,
+      "line_count": 126,
+      "covered_line_ranges": [
+        [
+          1,
+          126
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "冻结计数按两个新增测试增量更新，保留严格 drift 断言。"
+          ],
+          "limitations": [
+            "本轮作者增量语义复核与未变历史 receipt 合成覆盖；双 lens 非独立 provider。",
+            "真实宿主/模型/现场收益不在本轮通过范围。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "冻结计数按两个新增测试增量更新，保留严格 drift 断言。"
+          ],
+          "limitations": [
+            "本轮作者增量语义复核与未变历史 receipt 合成覆盖；双 lens 非独立 provider。",
+            "真实宿主/模型/现场收益不在本轮通过范围。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-commit/SKILL.md",
+      "skill_ids": [
+        "spec-commit"
+      ],
+      "sha256": "f1cf7b8801e7d25f706af168a2acd54a864e1df4b893ff474305d415230de8b8",
+      "bytes": 8761,
+      "line_count": 121,
+      "covered_line_ranges": [
+        [
+          1,
+          121
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "显式路径提交保留无关 index，文件内混合修改隔离/停止，Git fixture 验证。"
+          ],
+          "limitations": [
+            "本轮作者增量语义复核与未变历史 receipt 合成覆盖；双 lens 非独立 provider。",
+            "真实宿主/模型/现场收益不在本轮通过范围。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "显式路径提交保留无关 index，文件内混合修改隔离/停止，Git fixture 验证。"
+          ],
+          "limitations": [
+            "本轮作者增量语义复核与未变历史 receipt 合成覆盖；双 lens 非独立 provider。",
+            "真实宿主/模型/现场收益不在本轮通过范围。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/spec-commit-scope-regression.test.js",
+      "skill_ids": [
+        "spec-commit"
+      ],
+      "sha256": "10f82f2dbce11fb87c6406a85a9f3fb0cfe213c2e496ed866f0a33047a5122be",
+      "bytes": 1667,
+      "line_count": 30,
+      "covered_line_ranges": [
+        [
+          1,
+          30
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "隔离Git执行源码 recipe，验证真实 commit 路径与无关 index 保留。"
+          ],
+          "limitations": [
+            "本轮作者增量语义复核与未变历史 receipt 合成覆盖；双 lens 非独立 provider。",
+            "真实宿主/模型/现场收益不在本轮通过范围。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "隔离Git执行源码 recipe，验证真实 commit 路径与无关 index 保留。"
+          ],
+          "limitations": [
+            "本轮作者增量语义复核与未变历史 receipt 合成覆盖；双 lens 非独立 provider。",
+            "真实宿主/模型/现场收益不在本轮通过范围。"
+          ]
+        }
+      ]
+    }
+  ],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "本轮作者增量语义复核与未变历史 receipt 合成覆盖；双 lens 非独立 provider。",
+    "真实宿主/模型/现场收益不在本轮通过范围。"
+  ],
+  "claim_ceiling": "本地源码与确定性回归"
+}

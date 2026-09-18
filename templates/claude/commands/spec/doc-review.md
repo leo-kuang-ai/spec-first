@@ -1,6 +1,6 @@
 ---
 description: "Run the Spec-First document review workflow"
-argument-hint: "[mode:headless] [path/to/document.md]"
+argument-hint: "[mode:non-interactive] [path/to/document.md]"
 ---
 
 # Spec-First Document Review

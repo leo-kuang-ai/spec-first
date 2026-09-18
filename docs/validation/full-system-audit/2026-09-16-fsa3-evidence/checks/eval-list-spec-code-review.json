@@ -1,0 +1,19 @@
+{
+  "id": "eval-list-spec-code-review",
+  "command": [
+    "/Users/kuang/.local/bin/skill-up",
+    "list-cases",
+    "evals/eval.yaml"
+  ],
+  "cwd": "skills/spec-code-review",
+  "started_at": "2026-09-16T06:29:03.542139+00:00",
+  "duration_s": 0.01,
+  "exit_code": 0,
+  "ran": true,
+  "status": "passed",
+  "reason_code": "exit-code-zero",
+  "log_path": "logs/eval-list-spec-code-review.log",
+  "redaction_status": "none-required",
+  "source_snapshot": "e806f0ee3d06f9ddc761a8feb9e3b4d3dec3bdb3b0748ffc49dd3d6b8f2cd9e7",
+  "claim_ceiling": "C1"
+}

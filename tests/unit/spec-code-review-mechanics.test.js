@@ -125,6 +125,14 @@ describe('spec-code-review mechanical floor', () => {
     expect(output.findings).toHaveLength(0);
     expect(output.suppressed_by_confidence).toEqual({ '50': 1 });
   });
+
+  test.each(['42', 'unknown', '', 0, -1, true, 1.5])('finding 行号 %j 不能冒充正整数', (line) => {
+    const source = finding();
+    source.findings[0].line = line;
+    const result = runPython(findingsMechanics, [], { input: JSON.stringify([source]) });
+    expect(result.status).toBe(0);
+    expect(JSON.parse(result.stdout).findings).toEqual([]);
+  });
 });
 
 function finding(overrides = {}) {

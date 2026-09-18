@@ -1,0 +1,157 @@
+{
+  "schema_version": "full-system-audit-finding-ledger/v1",
+  "run_id": "2026-09-16-fsa3",
+  "source_snapshot": "e806f0ee3d06f9ddc761a8feb9e3b4d3dec3bdb3b0748ffc49dd3d6b8f2cd9e7",
+  "findings": [
+    {
+      "id": "FSA3-001",
+      "severity": "P1",
+      "evidence_status": "confirmed",
+      "category": "mutation",
+      "title": "spec-commit 的示例提交会吸收既有暂存区文件",
+      "source_refs": [
+        "skills/spec-commit/SKILL.md:103-114"
+      ],
+      "direct_evidence": "隔离 Git 夹具先暂存 unrelated.txt，再按 SKILL 的 git add owned.txt + git commit -F recipe 执行；实际 HEAD commit 同时包含 owned.txt 与 unrelated.txt。",
+      "impact": "用户授权的 commit 可能越界提交其他任务或敏感暂存内容。",
+      "owner": "spec-commit source owner",
+      "action": "显式 path-limited commit 并保留无关暂存内容；混合文件必须停止或使用已验证 hunk isolation。",
+      "verification": "2026-09-16-fsa3-evidence/logs/probe-commit-index.log",
+      "claim_ceiling": "C1",
+      "status": "fixed",
+      "fix_refs": [
+        "skills/spec-commit/SKILL.md",
+        "tests/unit/spec-commit-scope-regression.test.js"
+      ],
+      "fix_summary": "显式 path-limited commit；保留无关 index；混合 hunk 须隔离或停止。",
+      "fix_verification": {
+        "status": "passed",
+        "before_log": "2026-09-16-fsa3-repair-evidence/regression-before.log",
+        "after_log": "2026-09-16-fsa3-repair-evidence/regression-after.log",
+        "scope": "21 项确定性回归；不证明真实模型行为",
+        "full_regression": "passed",
+        "full_regression_receipt": "2026-09-16-fsa3-repair-evidence/checks/full-regression-final.json",
+        "counts": {
+          "unit_passed": 2968,
+          "smoke_passed": 5,
+          "integration_passed": 84,
+          "integration_skipped": 2
+        }
+      }
+    },
+    {
+      "id": "FSA3-002",
+      "severity": "P1",
+      "evidence_status": "confirmed",
+      "category": "security",
+      "title": "autoresearch 的命令拒绝输出会原样回显凭证型 DB URL",
+      "source_refs": [
+        "skills/autoresearch/scripts/orchestrate.sh:206-219"
+      ],
+      "direct_evidence": "screen_command 对拒绝的 DB URL 返回包含 match.group(0)，命令行输出完整 URL；fixture probe 证明用户名、密码和主机均回显。",
+      "impact": "上游命令、日志或 handoff 若包含带密码的连接串，会泄露凭据。",
+      "owner": "autoresearch source owner",
+      "action": "拒绝结果只输出固定 reason_code；覆盖 URL 各组件及 resume 输出的泄露负例。",
+      "verification": "2026-09-16-fsa3-evidence/logs/probe-autoresearch.log",
+      "claim_ceiling": "C1",
+      "status": "fixed",
+      "fix_refs": [
+        "skills/autoresearch/scripts/orchestrate.sh",
+        "tests/unit/autoresearch-orchestrator-regression.test.js"
+      ],
+      "fix_summary": "拒绝输出使用固定 reason_code，不回显任何 URL 组件；resume 共用筛查路径。",
+      "fix_verification": {
+        "status": "passed",
+        "before_log": "2026-09-16-fsa3-repair-evidence/regression-before.log",
+        "after_log": "2026-09-16-fsa3-repair-evidence/regression-after.log",
+        "scope": "21 项确定性回归；不证明真实模型行为",
+        "full_regression": "passed",
+        "full_regression_receipt": "2026-09-16-fsa3-repair-evidence/checks/full-regression-final.json",
+        "counts": {
+          "unit_passed": 2968,
+          "smoke_passed": 5,
+          "integration_passed": 84,
+          "integration_skipped": 2
+        }
+      }
+    },
+    {
+      "id": "FSA3-003",
+      "severity": "P2",
+      "evidence_status": "confirmed",
+      "category": "verification",
+      "title": "autoresearch verdict 未把 pending_verify 或失败 hop 纳入收口判断",
+      "source_refs": [
+        "skills/autoresearch/scripts/orchestrate.sh:223-245",
+        "skills/autoresearch/SKILL.md:101-107"
+      ],
+      "direct_evidence": "state 同时含 predicate_met=true、pending_verify=true 时 verdict 输出 CONVERGED；last hop outcome=failed 且 predicate_met=true 时 next-hop 输出 DONE、verdict 仍 CONVERGED。",
+      "impact": "直接调用 verdict 或下游读取 verdict 时，可能在独立验证未完成或上一 hop 失败时显示收敛。",
+      "owner": "autoresearch source owner",
+      "action": "verdict 与 next-hop 共用 pending_verify/failed/blocked 优先级；仅在 verify 通过后允许 CONVERGED，并补状态组合负例。",
+      "verification": "2026-09-16-fsa3-evidence/logs/probe-autoresearch.log",
+      "claim_ceiling": "C1",
+      "status": "fixed",
+      "fix_refs": [
+        "skills/autoresearch/scripts/orchestrate.sh",
+        "skills/autoresearch/references/orchestrator-routing.md",
+        "tests/unit/autoresearch-orchestrator-regression.test.js"
+      ],
+      "fix_summary": "next-hop/verdict 共用未解决信号；pending verify/failed/blocked/unknown/errors 阻断收敛，恢复成功后允许收敛。",
+      "fix_verification": {
+        "status": "passed",
+        "before_log": "2026-09-16-fsa3-repair-evidence/regression-before.log",
+        "after_log": "2026-09-16-fsa3-repair-evidence/regression-after.log",
+        "scope": "21 项确定性回归；不证明真实模型行为",
+        "full_regression": "passed",
+        "full_regression_receipt": "2026-09-16-fsa3-repair-evidence/checks/full-regression-final.json",
+        "counts": {
+          "unit_passed": 2968,
+          "smoke_passed": 5,
+          "integration_passed": 84,
+          "integration_skipped": 2
+        }
+      }
+    },
+    {
+      "id": "FSA3-004",
+      "severity": "P2",
+      "evidence_status": "candidate",
+      "category": "routing",
+      "title": "autoresearch 目标分类器可能把语义目标路由到错误 archetype",
+      "source_refs": [
+        "skills/autoresearch/scripts/orchestrate.sh:64-91",
+        "skills/autoresearch/references/orchestrator-routing.md:5-17"
+      ],
+      "direct_evidence": "固定英文 substring/rank 对“what should I build next?”输出 build-feature/loop，对“修复测试失败”无匹配而默认 explore/loop；这些结果与 routing reference 中的 dispatch/loop 语义存在候选映射差异。",
+      "impact": "将目标送入错误 loop/dispatch 入口会增加用户确认和后续 workflow 偏差；当前证据未证明一定绕过确认或造成外部副作用。",
+      "owner": "autoresearch source owner",
+      "action": "把脚本输出收窄为候选事实，交由 LLM/用户确认语义 archetype；补中英文、否定句、同义词和歧义目标的 routing contract。",
+      "verification": "2026-09-16-fsa3-evidence/logs/probe-autoresearch.log",
+      "claim_ceiling": "C1",
+      "status": "fixed",
+      "fix_refs": [
+        "skills/autoresearch/scripts/orchestrate.sh",
+        "skills/autoresearch/SKILL.md",
+        "skills/autoresearch/references/orchestrator-routing.md",
+        "tests/unit/autoresearch-orchestrator-regression.test.js"
+      ],
+      "fix_summary": "classify 改为 v1 advisory JSON 候选事实；完整语义由 LLM 判断，无匹配不默认路由。",
+      "fix_verification": {
+        "status": "passed",
+        "before_log": "2026-09-16-fsa3-repair-evidence/regression-before.log",
+        "after_log": "2026-09-16-fsa3-repair-evidence/regression-after.log",
+        "scope": "21 项确定性回归；不证明真实模型行为",
+        "full_regression": "passed",
+        "full_regression_receipt": "2026-09-16-fsa3-repair-evidence/checks/full-regression-final.json",
+        "counts": {
+          "unit_passed": 2968,
+          "smoke_passed": 5,
+          "integration_passed": 84,
+          "integration_skipped": 2
+        }
+      },
+      "resolution": "已修复候选事实被误当执行分类的接口；未将历史候选升级为实际越权 confirmed。"
+    }
+  ]
+}

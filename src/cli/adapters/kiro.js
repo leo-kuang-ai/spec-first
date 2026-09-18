@@ -120,7 +120,16 @@ class KiroAdapter extends PointerBasedAdapter {
   }
 
   inspectRuntimeFiles(projectRoot) {
-    const checks = [];
+    const checks = [{
+      level: 'WARNING',
+      name: 'Kiro loader evidence',
+      message: 'Kiro 投影可用性不代表当前宿主已成功加载或调用 Skill；尚无版本绑定的 loader 证据。',
+      drift: false,
+      degradedByDesign: true,
+      disposition: 'known_limitation',
+      reasonCode: 'kiro_generated_runtime_loader_unverified',
+      fix: '使用当前 Kiro 版本执行加载与调用验证并保留证据；active 仅表示适配器维护状态。',
+    }];
     const skillsRoot = path.join(projectRoot, this.skillsRoot);
     const agentsRoot = path.join(projectRoot, this.agentsRoot);
 

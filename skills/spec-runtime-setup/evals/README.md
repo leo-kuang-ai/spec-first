@@ -4,3 +4,5 @@ This directory is source-only maintainer evidence and is intentionally excluded 
 
 - `examples.json` provides examples-as-context for editing, reviewing, or fresh-source evaluation of setup posture.
 - These examples are not a deterministic router, runtime-readiness gate, or substitute for LLM judgment during ordinary setup runs.
+
+- `eval.yaml` 中 `check-readonly` 使用 `--check`，校验固定文件与 host 配置哨兵、setup facts 未产生；`--verify-only` 允许写 setup-owned facts，不能冒充严格只读。Judge 的本地正反校准见 `tests/unit/runtime-setup-eval-judge.test.js`；未运行模型、用户级配置/安装/瞬时副作用不在该判据覆盖范围。

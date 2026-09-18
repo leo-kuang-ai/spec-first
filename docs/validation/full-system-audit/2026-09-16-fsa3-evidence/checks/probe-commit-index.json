@@ -1,0 +1,18 @@
+{
+  "id": "probe-commit-index",
+  "command": [
+    "python3",
+    "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first-fsa3-9x793ebm/evidence/probes/commit-index.py"
+  ],
+  "cwd": ".",
+  "started_at": "2026-09-16T06:29:04.779398+00:00",
+  "duration_s": 0.13,
+  "exit_code": 0,
+  "ran": true,
+  "status": "passed",
+  "reason_code": "exit-code-zero",
+  "log_path": "logs/probe-commit-index.log",
+  "redaction_status": "none-required",
+  "source_snapshot": "e806f0ee3d06f9ddc761a8feb9e3b4d3dec3bdb3b0748ffc49dd3d6b8f2cd9e7",
+  "claim_ceiling": "C1"
+}

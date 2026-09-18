@@ -2,6 +2,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { getSupportedPlatforms } = require('../../src/cli/adapters');
 
 const repoRoot = path.resolve(__dirname, '../..');
 const skillPath = path.join(repoRoot, 'skills/using-spec-first/SKILL.md');
@@ -146,10 +147,11 @@ describe('using-spec-first entry-governor contracts', () => {
   });
 
   test('supported-host governance follows the current adapter registry', () => {
+    const hosts = getSupportedPlatforms();
     expect(governanceReadme).toContain(
-      'Accepted supported hosts 由 canonical adapter registry 枚举，当前为 `claude`、`codex`、`cursor`、`kiro`、`qoder`、`opencode`',
+      `Accepted supported hosts 由 canonical adapter registry 枚举，当前为 ${hosts.map((host) => `\`${host}\``).join('、')}`,
     );
-    expect(governanceReadme).toContain('目标平台：canonical adapter registry 当前枚举的 `claude | codex | cursor | kiro | qoder | opencode`');
+    expect(governanceReadme).toContain(`目标平台：canonical adapter registry 当前枚举的 \`${hosts.join(' | ')}\``);
     expect(governanceReadme).toContain('host_delivery.cursor = skill');
     expect(governanceReadme).toContain('host_delivery.opencode = command');
   });

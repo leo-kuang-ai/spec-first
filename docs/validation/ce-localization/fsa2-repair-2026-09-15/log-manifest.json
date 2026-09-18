@@ -1,0 +1,108 @@
+{
+  "status": "complete",
+  "files": [
+    {
+      "path": "logs/build-final.log",
+      "sha256": "1a4649168de8a1554c0679bf1ae9970700a8b439e42ec2339421e9927619e3d8",
+      "bytes": 589002
+    },
+    {
+      "path": "logs/build.log",
+      "sha256": "69ca2204b0f19f6e349be115eed342d1d7be4b51a6a7234add5a6241dabd4ed1",
+      "bytes": 589002
+    },
+    {
+      "path": "logs/ce-chain-final.log",
+      "sha256": "02c9e9d53c7722976491a2d86790c6724c173fec3fab2c66312c504b30199d53",
+      "bytes": 4795
+    },
+    {
+      "path": "logs/ce-chain-initial.log",
+      "sha256": "5000b6d6ee033a01244033b85c60fa29fac43d5a24a2b8531a4ad5aa5eb2d1d5",
+      "bytes": 4644
+    },
+    {
+      "path": "logs/ce-chain-regression.log",
+      "sha256": "afaa84e966072c7debc96bae606c0b1d1a71a02196d26f13f2fd72794c39953b",
+      "bytes": 4800
+    },
+    {
+      "path": "logs/ce-contracts-final.log",
+      "sha256": "afb1e143da1aab5740a55e765702ce8a02914a69fc27c9b8345a33ea4eded608",
+      "bytes": 235
+    },
+    {
+      "path": "logs/changelog-final.log",
+      "sha256": "d0d7f817b16035d5fa075a28e9c2d399555309214e781c8fe02574283e3ff96d",
+      "bytes": 161
+    },
+    {
+      "path": "logs/docs-final.log",
+      "sha256": "8f121fed44b13f1688fecff9ce9a601edd9a3caa7c2e7968ad1d6f4c56b82f87",
+      "bytes": 199
+    },
+    {
+      "path": "logs/eval-configs.log",
+      "sha256": "c4f6f5d14a4b45e5308913230dc134ab57a60a3e12d37763e8a087c66d466183",
+      "bytes": 4353
+    },
+    {
+      "path": "logs/intermediate-spec-first-fsa2-smoke.log",
+      "sha256": "6eaac41eba9cceb14ec719e4695827f16a08d93d8c948ebe91ca5bbe14d30cfd",
+      "bytes": 683
+    },
+    {
+      "path": "logs/intermediate-spec-first-fsa2-unit-baseline.json",
+      "sha256": "6e15491b229670b08924ead174ca5acd2cbfbcbcfcf818680a915ea4138bf6e9",
+      "bytes": 1263394
+    },
+    {
+      "path": "logs/intermediate-spec-first-fsa2-unit-baseline.log",
+      "sha256": "33fe6849f9b8103f1e40c5b0238128527f1d48217dddac6553f53c00a2908e49",
+      "bytes": 36600
+    },
+    {
+      "path": "logs/lint-entrypoints-final.log",
+      "sha256": "f84b1d4816a08461f50053434364d1c907f345edc2986068d8c24f5884cd3216",
+      "bytes": 135
+    },
+    {
+      "path": "logs/lint-entrypoints.log",
+      "sha256": "fbc0d849f26776f75803499afdecabece140fef957ce129284c4fa07e62d875a",
+      "bytes": 140
+    },
+    {
+      "path": "logs/live-snapshot-final.json",
+      "sha256": "42756a6ae265bd7924b5850af22ca919ee67fa2423ef76ea761b84ab734230fa",
+      "bytes": 268
+    },
+    {
+      "path": "logs/npm-test-final.log",
+      "sha256": "273d9df86fab1c75077254619611a11a21cc7c55fc41b9e8fbcb4052b8aee432",
+      "bytes": 27163
+    },
+    {
+      "path": "logs/npm-test.log",
+      "sha256": "e8391e23359028d3064e99e779de4294498294b670a02f2ff2340f8a21e41a2d",
+      "bytes": 83171
+    },
+    {
+      "path": "logs/shared-references.log",
+      "sha256": "c7b32fcf775e8e39391ca39aad7c873c6ddf07cdd4572dd1456db68b32feb026",
+      "bytes": 136
+    },
+    {
+      "path": "logs/sync-instructions.log",
+      "sha256": "265d4b8bede29c6fd0f3db409f660c02eb48b5afbf44a58f6384a11e1c2b3e56",
+      "bytes": 137
+    },
+    {
+      "path": "logs/typecheck.log",
+      "sha256": "57b819141e1a570e566aad15a87efebf9e0cc514e24a4a18249fb29386c3fa03",
+      "bytes": 115
+    }
+  ],
+  "limitations": [
+    "intermediate 文件仅属于逐项修复中的现场；最新结果以 npm-test-final、CE final 与 verification-result 为准。"
+  ]
+}
