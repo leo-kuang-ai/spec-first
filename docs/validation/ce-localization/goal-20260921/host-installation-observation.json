@@ -1,0 +1,85 @@
+{
+  "captured_at": "2026-09-21T18:24:45.004728+08:00",
+  "cli": {
+    "claude": {
+      "path": "/opt/homebrew/bin/claude",
+      "visible": true,
+      "exit_code": 0,
+      "version": "2.1.278 (Claude Code)"
+    },
+    "codex": {
+      "path": "/opt/homebrew/bin/codex",
+      "visible": true,
+      "exit_code": 0,
+      "version": "codex-cli 0.155.1"
+    },
+    "cursor": {
+      "path": null,
+      "visible": false
+    },
+    "kiro": {
+      "path": null,
+      "visible": false
+    },
+    "qodercli": {
+      "path": "/Users/kuang/.local/bin/qodercli",
+      "visible": true,
+      "exit_code": 0,
+      "version": "1.0.41"
+    },
+    "opencode": {
+      "path": "/opt/homebrew/bin/opencode",
+      "visible": true,
+      "exit_code": 0,
+      "version": "1.18.9"
+    },
+    "zcode": {
+      "path": null,
+      "visible": false
+    },
+    "pi": {
+      "path": "/opt/homebrew/bin/pi",
+      "visible": true,
+      "exit_code": 0,
+      "version": "0.85.0"
+    },
+    "skill-up": {
+      "path": "/Users/kuang/.local/bin/skill-up",
+      "visible": true,
+      "exit_code": 0,
+      "version": "skill-up version 0.12.0"
+    }
+  },
+  "gui": {
+    "Cursor": {
+      "path": "/Applications/Cursor.app",
+      "installed": true,
+      "version": "3.19.7",
+      "bundle_id": "com.todesktop.230313mzl4w4u92"
+    },
+    "Kiro": {
+      "path": "/Applications/Kiro.app",
+      "installed": true,
+      "version": "1.1.14",
+      "bundle_id": "dev.kiro.desktop"
+    },
+    "Qoder": {
+      "path": "/Applications/Qoder.app",
+      "installed": true,
+      "version": "1.20.1",
+      "bundle_id": "com.qoder.ide"
+    },
+    "Qoder CN": {
+      "path": "/Applications/Qoder CN.app",
+      "installed": true,
+      "version": "1.6.0",
+      "bundle_id": "com.aliyun.lingma.ide"
+    },
+    "ZCode": {
+      "path": "/Applications/ZCode.app",
+      "installed": true,
+      "version": "3.11.2",
+      "bundle_id": "dev.zcode.app"
+    }
+  }
+}

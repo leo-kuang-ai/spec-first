@@ -12,13 +12,16 @@ engine:
 
 cases:
   files:
-    - evals/skillup/cases/requirements-only-stops.yaml
-    - evals/skillup/cases/non-active-rejects.yaml
-    - evals/skillup/cases/drifted-pack-rejects.yaml
-    - evals/skillup/cases/trivial-bare-prompt-executes.yaml
-    - evals/skillup/cases/open-ended-routes-debug.yaml
-    - evals/skillup/cases/r2-reverse-mismatch.yaml
-    - evals/skillup/cases/r2-open-ended-500.yaml
+    - evals/cases/requirements-only-stops.yaml
+    - evals/cases/non-active-rejects.yaml
+    - evals/cases/drifted-pack-rejects.yaml
+    - evals/cases/trivial-bare-prompt-executes.yaml
+    - evals/cases/open-ended-routes-debug.yaml
+    - evals/cases/r2-reverse-mismatch.yaml
+    - evals/cases/r2-open-ended-500.yaml
+    - evals/cases/return-to-caller-envelope.yaml
+    - evals/cases/no-commit-auth-stays-uncommitted.yaml
+    - evals/cases/standalone-closeout-order.yaml
   defaults:
     timeout_seconds: 600
     max_turns: 20

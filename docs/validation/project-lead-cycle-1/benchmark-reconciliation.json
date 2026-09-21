@@ -1,0 +1,64 @@
+{
+  "captured_at": "2026-09-20T03:00:14.756708+00:00",
+  "method": "对报告列明的四个现存 results.json 的 results 数组逐行复算；correct != null 为 valid；不恢复原始筛选集，不重跑模型",
+  "runs": [
+    {
+      "path": "benchmarks/agentic/runs/20260820-173746/results.json",
+      "sha256": "e822b152e0c0449a03997a55e713344577e2a5c97153010ab8b28768f445747f",
+      "rescored": true,
+      "attempted": 12,
+      "valid": 11,
+      "excluded": 1
+    },
+    {
+      "path": "benchmarks/agentic/runs/20260820-174459/results.json",
+      "sha256": "6051e9dff41c8c524b8ba0a5229683c6e2cd14b79cf62c6e010045fe771af221",
+      "rescored": true,
+      "attempted": 12,
+      "valid": 12,
+      "excluded": 0
+    },
+    {
+      "path": "benchmarks/agentic/runs/20260820-185556/results.json",
+      "sha256": "df9dc83fd3438dc72ed93b0625a6ee10e61b4623d8e17512c03d143aa6b396f3",
+      "rescored": false,
+      "attempted": 18,
+      "valid": 16,
+      "excluded": 2
+    },
+    {
+      "path": "benchmarks/agentic/runs/20260820-190610/results.json",
+      "sha256": "e3dec1f2a46dc7f9e5890720c58b27365156dd2a6a02e660ec416665068d7093",
+      "rescored": false,
+      "attempted": 18,
+      "valid": 16,
+      "excluded": 2
+    }
+  ],
+  "arms": {
+    "baseline": {
+      "attempted": 24,
+      "valid": 21,
+      "excluded": 3,
+      "correct": 21
+    },
+    "spec-debug": {
+      "attempted": 24,
+      "valid": 22,
+      "excluded": 2,
+      "correct": 19
+    },
+    "spec-work": {
+      "attempted": 12,
+      "valid": 12,
+      "excluded": 0,
+      "correct": 12
+    }
+  },
+  "claim_ceiling": "C0；文件算术事实，不能升级为重新执行结果或统计显著性",
+  "limitations": [
+    "现存文件包含 rescored 结果；未恢复历史最终样本筛选规则。",
+    "cache pilot/confirm 混合，四 run 汇总不直接取代原报告总体效应。",
+    "请求 model 字符串不是实际 serving identity 证明。"
+  ]
+}

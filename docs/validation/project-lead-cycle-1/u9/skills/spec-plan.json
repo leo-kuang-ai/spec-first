@@ -1,0 +1,180 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "generated_at": "2026-09-20T07:35:36.158199+00:00",
+  "skill_name": "spec-plan",
+  "source_snapshot": "source-manifest.json",
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "source_paths": [
+    "skills/spec-plan/SKILL.md",
+    "skills/spec-plan/references/plan-handoff.md",
+    "skills/spec-plan/references/intake.md"
+  ],
+  "source_read_ranges": {
+    "skills/spec-plan/SKILL.md": "1-123",
+    "skills/spec-plan/references/plan-handoff.md": "1-69",
+    "skills/spec-plan/references/intake.md": "126-147"
+  },
+  "source_hashes": {
+    "skills/spec-plan/SKILL.md": "bcc0e89dd04b3199a09ac16ee74a75a418fe609bd6cf6324f5c78a9d0bc9b416",
+    "skills/spec-plan/references/plan-handoff.md": "103e4d205215a2b4fdfd05118c782bc497feec5b680dd57204184519f020ebc8",
+    "skills/spec-plan/references/intake.md": "9e0d0e9a808cb116db84e2ca9406e1ae206da6230f7c095532a297e9f92fe6e0"
+  },
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "entry_surface": "workflow_command",
+  "batch": "B",
+  "closure_tier": "L",
+  "closure_observed": {
+    "files": 81,
+    "bytes": 563609,
+    "read_package_files_at_least_partially": 3,
+    "read_supporting_files_at_least_partially": 0,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "coverage_commitment": "committed",
+  "dependency_closure": "partial",
+  "status": "degraded",
+  "reason_codes": [
+    "bounded_source_review",
+    "dependency_closure_partial",
+    "workflow_not_run"
+  ],
+  "command_or_method": [
+    "只读reviewer逐包阅读冻结source并判断五分支；主owner整合与回源裁决，不是盲评或workflow执行。"
+  ],
+  "ran": true,
+  "exit_code": null,
+  "evidence_paths": [
+    "reviewer-returns/b.json"
+  ],
+  "source_refs": [
+    "skills/spec-plan/SKILL.md",
+    "skills/spec-plan/references/plan-handoff.md",
+    "skills/spec-plan/references/intake.md"
+  ],
+  "owner": "project-lead-cycle-1",
+  "consumers": [
+    "周期1主审查",
+    "对应上游/下游workflow（以SKILL文档声明为准）"
+  ],
+  "branches": [
+    {
+      "id": "entry_positive",
+      "status": "source-covered",
+      "judgment": "目标已足够明确时进入规划；保持 Product Contract 对 WHAT 的权威，细化 HOW，不执行实现修改。",
+      "source_refs": [
+        "skills/spec-plan/SKILL.md:15-19",
+        "skills/spec-plan/SKILL.md:25-38"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "near_neighbor_negative",
+      "status": "source-covered",
+      "judgment": "未决 WHAT 转 spec-brainstorm，现存失败转 spec-debug，实现转 spec-work；排除 generated runtime mirror 修改。",
+      "source_refs": [
+        "skills/spec-plan/SKILL.md:3",
+        "skills/spec-plan/SKILL.md:27-31"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "output_consumer",
+      "status": "source-covered",
+      "judgment": "输出可执行统一计划，或 blocked/producer handoff，供 spec-work、spec-write-tasks、spec-doc-review 和调用方消费；只请求计划时可以完成交付，无须选择后续菜单。",
+      "source_refs": [
+        "skills/spec-plan/SKILL.md:21-31",
+        "skills/spec-plan/SKILL.md:40-46",
+        "skills/spec-plan/SKILL.md:96-112"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "critical_error_stop",
+      "status": "source-covered",
+      "judgment": "缺目标/source owner、承重决策、有效元数据或必需引用时，阻止计划晋级及实现交接。",
+      "source_refs": [
+        "skills/spec-plan/SKILL.md:27-38",
+        "skills/spec-plan/SKILL.md:64-68"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "degraded_recovery_handoff",
+      "status": "source-covered",
+      "judgment": "Provider 失败时退为有界直接读取；blocked envelope 保留产物路径、阶段、阻塞及恢复路径。",
+      "source_refs": [
+        "skills/spec-plan/SKILL.md:9-11",
+        "skills/spec-plan/SKILL.md:64-68"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    }
+  ],
+  "findings": [],
+  "fresh_source_eval": "not-run",
+  "claim_ceiling": "C0",
+  "limitations": [
+    "research/structure/eval 与下游命令闭包未完整阅读。",
+    "tests、runtime 和 fresh invocation 均未运行。",
+    "原机械占位结论已撤销；source-covered仅证明已读范围可追踪，不证明运行通过。",
+    "未确认读取范围不计覆盖；哈希只证明字节。"
+  ],
+  "recovery_point": "主 owner 可按需补读未确认引用并执行 source/eval 验证；当前未确认其他逻辑 finding。",
+  "timing": {
+    "active_seconds": null,
+    "limitation": "逐包主动时间不可可靠恢复，未用工具墙钟估算。"
+  },
+  "record_correction": {
+    "at": "2026-09-20T05:55:01.021462+00:00",
+    "invalidated": "2026-09-20T05:24 的机械占位结论",
+    "replaced_by_actual_review_at": "2026-09-20T07:35:36.158199+00:00"
+  },
+  "supporting_read_ranges": {},
+  "unconfirmed_read_ranges": [
+    "skills/spec-plan/references/research.md",
+    "skills/spec-plan/references/structure.md",
+    "tests/unit/spec-plan-*.test.js（精确阅读范围未确认）",
+    "skills/spec-plan/references/planning-evidence-boundaries.md（曾审阅但精确行段不可恢复，不计确认覆盖）",
+    "skills/spec-plan/references/intake.md（曾审阅但精确行段不可恢复，不计确认覆盖）",
+    "skills/spec-plan/references/final-review.md（曾审阅但精确行段不可恢复，不计确认覆盖）",
+    "skills/spec-plan/references/plan-handoff.md（曾审阅但精确行段不可恢复，不计确认覆盖）",
+    "skills/spec-plan/references/resume.md（曾审阅但精确行段不可恢复，不计确认覆盖）"
+  ],
+  "reviewer_provenance": {
+    "reviewer": "cycle1_a_exit",
+    "kind": "read-only-source-review",
+    "fresh_per_package_context": false,
+    "raw_return": "reviewer-returns/b.json",
+    "raw_return_sha256": "74c86ff4af0bab17fbeb82f390cf57eb33590df5a24910b9823d19382480563c"
+  },
+  "execution": {
+    "source_semantic_review": "ran",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "not-run"
+  },
+  "additional_owner_review": {
+    "reviewer": "root",
+    "kind": "owner-self-review",
+    "source_read_ranges": {
+      "skills/spec-plan/references/plan-handoff.md": "1-69",
+      "skills/spec-plan/references/intake.md": "126-147"
+    },
+    "timing": "压缩前实际显示，未记录精确时间",
+    "limitations": [
+      "只读主owner补审，未执行workflow或脚本；不是独立reviewer范围。"
+    ],
+    "judgments": [
+      "plan-handoff明确Product Contract字节保持、MD apply与HTML report-only、reviewer不可用时自审降级及plan-only直接交付边界。",
+      "intake 126-147约束product blockers与headless WHAT权威；其余引用未全读。"
+    ]
+  }
+}

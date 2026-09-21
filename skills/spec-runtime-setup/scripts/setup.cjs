@@ -7,6 +7,7 @@ const { parseEntrypointOptions, helpResult } = require('./lib/args.cjs');
 const { isAbsolutePath } = require('./lib/path-safety.cjs');
 const {
   buildActionPlan,
+  planExecutionAdvice,
 } = require('./lib/mode-policy.cjs');
 const {
   isBaselineBlocking,
@@ -203,6 +204,10 @@ function runSetup(input = {}) {
     if (actionPlan.args.workspaceGraphStatus) {
       return runWorkspaceGraphStatusSetup(context);
     }
+    // 父目录 bare/check 仅诊断；不得因子仓缺投射阻断只读路径。
+    if (target.mode === 'workspace-all-repos' && ['bare', 'check'].includes(actionPlan.mode)) {
+      return runParentWorkspaceDiagnostic(context);
+    }
     const runtimeProjectionSelection = requiresRuntimeProjectionPreflight(actionPlan)
       ? resolveRuntimeProjectionTargets(context)
       : null;
@@ -223,10 +228,6 @@ function runSetup(input = {}) {
       }
       if (!['bare', 'check'].includes(actionPlan.mode)) {
         return runWorkspaceBatch(context, { runSingleTarget });
-      }
-      // bare/check on a requirement parent: dual-path diagnostic (not single-repo facts).
-      if (actionPlan.mode === 'bare' || actionPlan.mode === 'check') {
-        return runParentWorkspaceDiagnostic(context);
       }
     }
     return runSingleTarget(context, target.target_root || cwd);
@@ -600,9 +601,7 @@ function runPlan(context, repoRoot) {
       ? '修复被阻止的 Provider 目标或路径，然后重新运行 plan。'
       : hostConfigBlock
         ? hostConfigBlock.next_action || '修复 Host 配置冲突，然后重新运行 plan。'
-      : context.actionPlan.args.installationOnly
-        ? '审查安装与接线计划后，使用 --installation-only 并保留相同 target、scope 和 repair 选项执行。'
-        : '审查计划中的 mutation，然后使用相同选择且不带 --plan 重新运行。',
+      : planExecutionAdvice(context.actionPlan),
   });
   return {
     exit_code: blockedEntry ? 2 : 0,

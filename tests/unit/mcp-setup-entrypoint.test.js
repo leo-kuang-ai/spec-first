@@ -1418,6 +1418,42 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(fs.existsSync(path.join(child, '.spec-first', 'config', 'tool-facts.json'))).toBe(false);
   });
 
+  test.each(['missing', 'stale', 'current'])('bare 写前 projection 为 %s 时遵守同一 gate', (health) => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const target = tempRepo(`bare-preflight-${health}`);
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-bare-preflight-home-'));
+    try {
+      if (health === 'missing') fs.rmSync(path.join(target, '.codex', 'spec-first', 'state.json'));
+      if (health === 'stale') writeRuntimeState(target, 'codex', '0.0.1');
+      const before = snapshot(target);
+      const homeBefore = snapshot(homeDir);
+      const audit = createReadOnlyAuditRunner();
+      const mutationCalls = [];
+      const result = runSetup({
+        argv: [], cwd: target, skillRoot, homeDir, bundledVersion: '1.13.2',
+        runner: health === 'current' ? (command, args, options) => {
+          mutationCalls.push([command, ...args]);
+          return fakeRunner(command, args, options);
+        } : audit.runner,
+        env: { MCP_SETUP_HOST: 'codex' },
+      });
+      if (health === 'current') {
+        expect(result.mode).toBe('bare');
+        expect(result.reason_code).not.toBe('generated-runtime-projection-preflight-blocked');
+        expect(mutationCalls.some(([command, action]) => command === 'npm' && ['pack', 'install'].includes(action))).toBe(true);
+      } else {
+        expect(result).toMatchObject({ exit_code: 2, reason_code: 'generated-runtime-projection-preflight-blocked' });
+        expect(result.payload.results[0].next_action_command).toMatchObject({ cwd: target, command: 'spec-first', args: ['init', '--codex'] });
+        expect(audit.violations).toEqual([]);
+        expect(snapshot(target)).toEqual(before);
+        expect(snapshot(homeDir)).toEqual(homeBefore);
+      }
+    } finally {
+      fs.rmSync(target, { recursive: true, force: true });
+      fs.rmSync(homeDir, { recursive: true, force: true });
+    }
+  });
+
   test('blocks the all-repos mutation before any child provider or facts write when one child projection is missing', () => {
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-preflight-batch-'));
@@ -2670,18 +2706,23 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(fs.existsSync(path.join(workspace, '.spec-first', 'workspace', 'parent-artifact-quarantine.json'))).toBe(false);
   });
 
-  test('parent --plan previews every selected child without writing workspace receipts, facts, host config, or provider artifacts', () => {
+  test.each([
+    [[], '--installation-only', 'installation'],
+    [['--only', 'graphify'], '--only graphify', 'artifact'],
+    [['--requirement-workspace', 'feature'], '--only codegraph,graphify', 'artifact'],
+  ])('parent --plan preserves execution scope %j and stays read-only', (selection, requiredFlag, scope) => {
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-workspace-plan-'));
     const first = childRepo(workspace, 'apps/first');
     const second = childRepo(workspace, 'packages/second');
+    for (const root of [first, second]) fs.mkdirSync(path.join(root, 'feature'));
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
     const before = snapshot(workspace);
     const homeBefore = snapshot(homeDir);
     const audit = createReadOnlyAuditRunner();
 
     const result = runSetup({
-      argv: ['--plan', '--only', 'graphify', '--all-repos'],
+      argv: ['--plan', ...selection, '--all-repos'],
       cwd: workspace,
       skillRoot,
       runner: audit.runner,
@@ -2711,6 +2752,12 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
         result: expect.objectContaining({ schema_version: 'setup-install-plan.v1' }),
       }),
     ]));
+    expect(result.payload.next_action).toContain(requiredFlag);
+    expect(result.payload.next_action).toContain('target、scope、selection、repair 和 refresh');
+    for (const child of result.payload.results) {
+      expect(child.result.readiness_scope).toBe(scope);
+      expect(child.result.next_action).toBe(result.payload.next_action);
+    }
     expect(audit.violations).toEqual([]);
     expect(snapshot(workspace)).toEqual(before);
     expect(snapshot(homeDir)).toEqual(homeBefore);

@@ -2,6 +2,8 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const os = require('node:os');
+const { spawnSync } = require('node:child_process');
 
 const skillEntrypoint = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/SKILL.md'), 'utf8');
 const modes = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/modes.md'), 'utf8');
@@ -37,6 +39,33 @@ const lazyRefs = [
 
 const refsDir = path.resolve(__dirname, '../../skills/spec-doc-review/references');
 const executionSpines = `${skill}\n${subagentTemplate}\n${synthesis}`;
+
+describe('report-only 评测的文档完整性', () => {
+  test.each([
+    ['plan', 'plan-repo', '2026-09-01-monthly-summary-plan.md'],
+    ['html', 'html-repo', '2026-09-01-monthly-summary-plan.html'],
+    ['taskpack', 'taskpack-repo', '2026-09-01-monthly-summary-tasks.md'],
+  ])('%s judge 拒绝保留 MARKER 的文档篡改', (kind, fixture, filename) => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-review-judge-'));
+    const fixtures = path.resolve(__dirname, '../../skills/spec-doc-review/evals/fixtures');
+    try {
+      fs.cpSync(path.join(fixtures, 'repos', fixture), root, { recursive: true });
+      const target = path.join(root, 'docs/plans', filename);
+      const judge = () => spawnSync('bash', [path.join(fixtures, 'scripts', `check-${kind}-marker.sh`)], {
+        cwd: root,
+        encoding: 'utf8',
+        env: { ...process.env, EVAL_FINAL_MESSAGE: 'review findings：建议补充边界。' },
+      });
+      expect(judge().status).toBe(0);
+      fs.appendFileSync(target, '\n未授权的文档修改\n');
+      expect(judge().status).not.toBe(0);
+      fs.rmSync(target);
+      expect(judge().status).not.toBe(0);
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+});
 
 describe('spec-doc-review current contracts', () => {
   // --- Existing assertions (preserved) ---

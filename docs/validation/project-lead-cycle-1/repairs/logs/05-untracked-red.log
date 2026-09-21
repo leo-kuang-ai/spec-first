@@ -1,0 +1,147 @@
+FAIL tests/unit/spec-code-review-mechanics.test.js
+  spec-code-review mechanical floor
+    ✕ 任务未跟踪文件快照：modify (135 ms)
+    ✕ 任务未跟踪文件快照：delete (126 ms)
+    ✕ 任务未跟踪文件快照：add (121 ms)
+    ✕ 任务未跟踪文件快照：stage (118 ms)
+    ✕ 任务未跟踪文件快照：outside (119 ms)
+    ✕ 任务未跟踪文件快照：symlink (123 ms)
+    ✕ 任务未跟踪文件快照：directory (142 ms)
+    ✓ scope helper fails closed for an invalid endpoint (80 ms)
+    ✓ scope helper distinguishes a small code-only diff from uncounted prose (296 ms)
+    ✓ scope helper freezes the reviewed diff and detects reviewer mutation (371 ms)
+    ✓ findings helper rejects malformed input and applies exact deterministic mechanics (41 ms)
+    ✓ findings helper does not promote fast-pass or unverified peer independence (40 ms)
+    ✓ findings helper demotes high confidence without first evidence (41 ms)
+    ✓ finding 行号 "42" 不能冒充正整数 (40 ms)
+    ✓ finding 行号 "unknown" 不能冒充正整数 (45 ms)
+    ✓ finding 行号 "" 不能冒充正整数 (40 ms)
+    ✓ finding 行号 0 不能冒充正整数 (40 ms)
+    ✓ finding 行号 -1 不能冒充正整数 (42 ms)
+    ✓ finding 行号 true 不能冒充正整数 (39 ms)
+    ✓ finding 行号 1.5 不能冒充正整数 (38 ms)
+
+  ● spec-code-review mechanical floor › 任务未跟踪文件快照：modify
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 2
+
+      27 |       const snapshot = path.join(root, 'snapshot.json');
+      28 |       const captured = runPython(reviewScope, ['--base', base, '--include-untracked', 'owned file.js', '--snapshot-out', snapshot], { cwd: root });
+    > 29 |       expect(captured.status).toBe(0);
+         |                               ^
+      30 |       expect(JSON.parse(captured.stdout)).toMatchObject({ status: 'complete', snapshot_written: true, lite_eligible: false });
+      31 |       if (action === 'modify' || action === 'add') fs.writeFileSync(owned, 'module.exports = 2;\n');
+      32 |       if (action === 'delete') fs.unlinkSync(owned);
+
+      at toBe (tests/unit/spec-code-review-mechanics.test.js:29:31)
+
+  ● spec-code-review mechanical floor › 任务未跟踪文件快照：delete
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 2
+
+      27 |       const snapshot = path.join(root, 'snapshot.json');
+      28 |       const captured = runPython(reviewScope, ['--base', base, '--include-untracked', 'owned file.js', '--snapshot-out', snapshot], { cwd: root });
+    > 29 |       expect(captured.status).toBe(0);
+         |                               ^
+      30 |       expect(JSON.parse(captured.stdout)).toMatchObject({ status: 'complete', snapshot_written: true, lite_eligible: false });
+      31 |       if (action === 'modify' || action === 'add') fs.writeFileSync(owned, 'module.exports = 2;\n');
+      32 |       if (action === 'delete') fs.unlinkSync(owned);
+
+      at toBe (tests/unit/spec-code-review-mechanics.test.js:29:31)
+
+  ● spec-code-review mechanical floor › 任务未跟踪文件快照：add
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 2
+
+      27 |       const snapshot = path.join(root, 'snapshot.json');
+      28 |       const captured = runPython(reviewScope, ['--base', base, '--include-untracked', 'owned file.js', '--snapshot-out', snapshot], { cwd: root });
+    > 29 |       expect(captured.status).toBe(0);
+         |                               ^
+      30 |       expect(JSON.parse(captured.stdout)).toMatchObject({ status: 'complete', snapshot_written: true, lite_eligible: false });
+      31 |       if (action === 'modify' || action === 'add') fs.writeFileSync(owned, 'module.exports = 2;\n');
+      32 |       if (action === 'delete') fs.unlinkSync(owned);
+
+      at toBe (tests/unit/spec-code-review-mechanics.test.js:29:31)
+
+  ● spec-code-review mechanical floor › 任务未跟踪文件快照：stage
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 2
+
+      27 |       const snapshot = path.join(root, 'snapshot.json');
+      28 |       const captured = runPython(reviewScope, ['--base', base, '--include-untracked', 'owned file.js', '--snapshot-out', snapshot], { cwd: root });
+    > 29 |       expect(captured.status).toBe(0);
+         |                               ^
+      30 |       expect(JSON.parse(captured.stdout)).toMatchObject({ status: 'complete', snapshot_written: true, lite_eligible: false });
+      31 |       if (action === 'modify' || action === 'add') fs.writeFileSync(owned, 'module.exports = 2;\n');
+      32 |       if (action === 'delete') fs.unlinkSync(owned);
+
+      at toBe (tests/unit/spec-code-review-mechanics.test.js:29:31)
+
+  ● spec-code-review mechanical floor › 任务未跟踪文件快照：outside
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 2
+
+      27 |       const snapshot = path.join(root, 'snapshot.json');
+      28 |       const captured = runPython(reviewScope, ['--base', base, '--include-untracked', 'owned file.js', '--snapshot-out', snapshot], { cwd: root });
+    > 29 |       expect(captured.status).toBe(0);
+         |                               ^
+      30 |       expect(JSON.parse(captured.stdout)).toMatchObject({ status: 'complete', snapshot_written: true, lite_eligible: false });
+      31 |       if (action === 'modify' || action === 'add') fs.writeFileSync(owned, 'module.exports = 2;\n');
+      32 |       if (action === 'delete') fs.unlinkSync(owned);
+
+      at toBe (tests/unit/spec-code-review-mechanics.test.js:29:31)
+
+  ● spec-code-review mechanical floor › 任务未跟踪文件快照：symlink
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 2
+
+      27 |       const snapshot = path.join(root, 'snapshot.json');
+      28 |       const captured = runPython(reviewScope, ['--base', base, '--include-untracked', 'owned file.js', '--snapshot-out', snapshot], { cwd: root });
+    > 29 |       expect(captured.status).toBe(0);
+         |                               ^
+      30 |       expect(JSON.parse(captured.stdout)).toMatchObject({ status: 'complete', snapshot_written: true, lite_eligible: false });
+      31 |       if (action === 'modify' || action === 'add') fs.writeFileSync(owned, 'module.exports = 2;\n');
+      32 |       if (action === 'delete') fs.unlinkSync(owned);
+
+      at toBe (tests/unit/spec-code-review-mechanics.test.js:29:31)
+
+  ● spec-code-review mechanical floor › 任务未跟踪文件快照：directory
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 2
+
+      27 |       const snapshot = path.join(root, 'snapshot.json');
+      28 |       const captured = runPython(reviewScope, ['--base', base, '--include-untracked', 'owned file.js', '--snapshot-out', snapshot], { cwd: root });
+    > 29 |       expect(captured.status).toBe(0);
+         |                               ^
+      30 |       expect(JSON.parse(captured.stdout)).toMatchObject({ status: 'complete', snapshot_written: true, lite_eligible: false });
+      31 |       if (action === 'modify' || action === 'add') fs.writeFileSync(owned, 'module.exports = 2;\n');
+      32 |       if (action === 'delete') fs.unlinkSync(owned);
+
+      at toBe (tests/unit/spec-code-review-mechanics.test.js:29:31)
+
+Test Suites: 1 failed, 1 total
+Tests:       7 failed, 13 passed, 20 total
+Snapshots:   0 total
+Time:        2.221 s
+Ran all test suites matching /tests\/unit\/spec-code-review-mechanics.test.js/i.

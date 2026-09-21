@@ -1,0 +1,8 @@
+{
+  "source_files": 22,
+  "fixed_findings": 8,
+  "markdown_files": 17,
+  "link_targets_checked": 68,
+  "anchor_validation": "not-run",
+  "errors": []
+}

@@ -1,0 +1,17 @@
+
+> spec-first@1.15.3 test:smoke
+> node scripts/run-test-suite.cjs smoke
+
+PASS tests/smoke/cli-smoke.test.js (29.637 s)
+  CLI smoke checks
+    ✓ prints top-level help (85 ms)
+    ✓ previews Qoder init without writing project or user runtime files (251 ms)
+    ✓ writes and reports one global profile for a multi-host apply (644 ms)
+    ✓ global profile failure stops before project bootstrap and preserves raw evidence (178 ms)
+    ✓ 发布包为 registry 的全部宿主生成一致 runtime (28295 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        29.676 s
+Ran all test suites matching /tests\/smoke\/cli-smoke.test.js/i.

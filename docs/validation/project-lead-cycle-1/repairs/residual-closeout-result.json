@@ -1,0 +1,33 @@
+{
+  "schema_version": "honest-closeout.v1",
+  "generated_at": "2026-09-21T10:13:04.422Z",
+  "overall": "verified",
+  "overall_reason_code": "all-claims-consistent",
+  "claims": [
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:20-full-regression",
+        "verification-run-summary:21-typecheck",
+        "verification-run-summary:21-entrypoint-lint",
+        "verification-run-summary:21-changelog",
+        "verification-run-summary:22-ce-strengthened",
+        "verification-run-summary:23-current-gate-negative",
+        "verification-run-summary:24-final-delivery",
+        "verification-run-summary:24-final-whitespace"
+      ],
+      "verdict": "consistent",
+      "reason_code": "validation-evidence-consistent"
+    },
+    {
+      "claim_type": "review",
+      "asserted_status": "source-contract-reviewed",
+      "evidence_refs": [
+        "docs/validation/project-lead-cycle-1/repairs/ce-residual-review.md"
+      ],
+      "verdict": "consistent",
+      "reason_code": "review-evidence-present"
+    }
+  ]
+}

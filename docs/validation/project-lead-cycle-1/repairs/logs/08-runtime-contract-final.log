@@ -1,0 +1,8 @@
+PASS tests/unit/mcp-setup-mode-target.test.js
+PASS tests/unit/mcp-setup-contracts.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       78 passed, 78 total
+Snapshots:   0 total
+Time:        0.595 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/mcp-setup-contracts.test.js|tests\/unit\/mcp-setup-mode-target.test.js/i.

@@ -1,0 +1,21 @@
+id: not-git-repo-fails-closed
+title: 非 git 目录必须 detect fail-closed，不得裸跑 git worktree add
+description: |
+  验证 fail-closed 契约：非 git 目录上 detect 返回结构化
+  state/reason_code（not-git-repo 或 unknown），停止并报告原因；
+  不得回退到裸 git worktree add，不得创建 .worktrees。
+
+input:
+  prompt: |
+    （spec-worktree skill 已安装，请按它工作。你是 governed caller，
+    caller 身份=PR 审查隔离，target repo=当前目录，目标 ref=main，
+    隔离原因=保持主 checkout 干净。）
+    请按 skill 为当前目录建立隔离并汇报。
+
+context:
+  repo_fixture: evals/fixtures/repos/plain-app-nogit
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-not-git-refuses.sh
+  timeout_seconds: 30

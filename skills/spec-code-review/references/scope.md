@@ -108,7 +108,7 @@ When any skip rule fires, stop without dispatching reviewers. **Default mode:** 
 If no skip rule fires, fetch PR metadata **without checkout**:
 
 ```
-gh pr view <number-or-url> --json title,body,baseRefName,headRefName,headRefOid,isCrossRepository,url,files,reviews,comments --jq '{title, body, baseRefName, headRefName, headRefOid, isCrossRepository, url, files: [.files[].path], hasPriorComments: ((.reviews | map(select(.state != "APPROVED" or .body != "")) | length) > 0 or (.comments | length) > 0)}'
+gh pr view <number-or-url> --json number,title,body,baseRefName,baseRefOid,headRefName,headRefOid,isCrossRepository,url,files,reviews,comments --jq '{number, title, body, baseRefName, baseRefOid, headRefName, headRefOid, isCrossRepository, url, files: [.files[].path], hasPriorComments: ((.reviews | map(select(.state != "APPROVED" or .body != "")) | length) > 0 or (.comments | length) > 0)}'
 ```
 
 Set `BASE:` to `pr:<number-or-url>` (logical marker — not a git SHA). Set `UNTRACKED:` from `git ls-files --others --exclude-standard` on the **current** checkout (usually empty during PR-remote review).
@@ -129,10 +129,23 @@ Set `BASE:` to `pr:<number-or-url>` (logical marker — not a git SHA). Set `UNT
 
 When **`pr-remote`**, before Stage 4:
 
-1. Best-effort fetch PR head without checkout: `git fetch --no-tags origin <headRefName>:refs/review/pr-<number>-head` (substitute PR number from metadata).
-2. When fetch succeeds, set `PR_HEAD_REF=refs/review/pr-<number>-head` for reviewers and validators. When fetch fails, omit `PR_HEAD_REF` and note in Coverage — reviewers must rely on diff hunks only.
-3. Best-effort fetch the PR base without checkout: `git fetch --no-tags origin <baseRefName>`. When it succeeds, resolve a concrete ref with `git rev-parse FETCH_HEAD` and set `PR_BASE_REF` to that SHA — a **real git base ref** reviewers and validators use for file-level git diffs (e.g. `data-migration-reviewer` runs `git diff <PR_BASE_REF> -- db/schema.rb`/`structure.sql`). The `pr:<number-or-url>` logical marker in `BASE:` stays the scope marker; `PR_BASE_REF` is the diffable base. When the fetch fails, omit `PR_BASE_REF` and note in Coverage — schema-drift and other git-diff checks fall back to diff hunks only and must **not** assume `main`.
-4. Include `<pr-scope-mode>pr-remote</pr-scope-mode>` and, when set, `<pr-head-ref>...</pr-head-ref>` and `<pr-base-ref>...</pr-base-ref>` in the Stage 4 review context bundle.
+1. Resolve the PR's base repository from its canonical `url` (exact host/owner/repo), and its fetch URL as `PR_REPO_URL`. Do not assume that local `origin` is that repository. Set `PR_NUMBER` and `PR_HEAD_OID` from the captured metadata. Fetch the base repository's PR ref, which also identifies fork PRs; never substitute a same-named branch.
+
+```bash
+unset PR_HEAD_REF
+[[ "$PR_NUMBER" =~ ^[1-9][0-9]*$ && "$PR_HEAD_OID" =~ ^[0-9a-f]{40}$ ]] || { echo "pr_head_metadata_invalid" >&2; exit 1; }
+if git fetch --no-tags -- "$PR_REPO_URL" "refs/pull/$PR_NUMBER/head"; then
+  FETCHED_PR_HEAD=$(git rev-parse --verify 'FETCH_HEAD^{commit}') || exit 1
+  [ "$FETCHED_PR_HEAD" = "$PR_HEAD_OID" ] || { echo "pr_head_identity_mismatch" >&2; exit 1; }
+  PR_HEAD_REF="$PR_HEAD_OID"
+else
+  echo "pr_head_fetch_unavailable: diff-only coverage" >&2
+fi
+```
+
+2. Only a matching SHA may become `PR_HEAD_REF`; pass the immutable SHA, not a mutable local ref. A mismatch stops this review and requires a fresh metadata/diff snapshot. Fetch failure may retain diff-only coverage with `PR_HEAD_REF` absent; it never permits a fallback to `origin/<headRefName>` or a previous run's ref.
+3. Fetch the captured `baseRefOid` from the same `PR_REPO_URL` without checkout. Set `PR_BASE_REF` only after the fetched commit equals that metadata SHA. A mismatch stops; an unavailable fetch omits the ref and degrades to diff hunks. Do not assume `main`, the local base branch, or local `origin`. The `pr:<number-or-url>` logical marker stays the scope marker; `PR_BASE_REF` is the verified, diffable base SHA.
+4. Re-read `headRefOid` and `baseRefOid` from the same PR after obtaining its diff and refs. If either changed, discard this mixed snapshot and re-resolve before review. Include `<pr-scope-mode>pr-remote</pr-scope-mode>` and only verified immutable head/base refs in the Stage 4 bundle.
 
 Reviewers and Stage 5b validators in **`pr-remote`** mode must **not** Read/Grep workspace paths for files in `FILES:`. Inspect via `git show <PR_HEAD_REF>:<path>` when `PR_HEAD_REF` is set, otherwise use only the provided diff hunks. **`local-aligned`** uses normal workspace inspection.
 
@@ -183,10 +196,14 @@ DIFF_A="$BASE"
 DIFF_B=""
 SCOPE_ARGS=(--base "$DIFF_A" --snapshot-out "$SCOPE_SNAPSHOT")
 [ -n "${DIFF_B:-}" ] && SCOPE_ARGS+=(--head "$DIFF_B")
+# 仅填入已验证的任务所属路径；普通审查保持该数组为空。
+for owned_path in "${TASK_OWNED_UNTRACKED_FILES[@]}"; do
+  SCOPE_ARGS+=(--include-untracked "$owned_path")
+done
 bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/review-scope.py" "${SCOPE_ARGS[@]}"
 ```
 
-The returned `changed_files`, `files_changed`, and `diff_sha256` are immutable scope facts for the rest of the run. `mode:agent` JSON must use the frozen `files_changed`; never recompute it after tests or inspection. For task mode, the task-attributed bundle remains the semantic review scope, while the whole local base-to-working-tree snapshot is only the mutation detector. Remote-only PR/branch review has no reviewed local tree and records the guard as not applicable.
+The returned `changed_files`, `files_changed`, and `diff_sha256` are immutable scope facts for the rest of the run. `mode:agent` JSON must use the frozen `files_changed`; never recompute it after tests or inspection. For task mode, populate `TASK_OWNED_UNTRACKED_FILES` from the already validated caller context before this command; ordinary local reviews explicitly set it to an empty array. Never glob all untracked paths or add the snapshot artifact itself. The task-attributed bundle remains the semantic review scope; the whole local tracked diff plus these explicit paths is the mutation detector. Snapshot v2 binds each included path's bytes, existence and file mode. Missing files can be frozen as absent; unreadable paths, symlinks and directories fail closed. Verification reuses the frozen path set, so additions/deletions cannot disappear from the guard. Old v1 snapshots are invalid: restart scope capture before review, never regenerate a baseline after a suspected mutation. Remote-only PR/branch review has no reviewed local tree and records the guard as not applicable.
 
 If the helper, snapshot write, or artifact root is unavailable, keep `source_mutation_gate: closed`, record `mutation_guard_unavailable`, and do not emit a successful/complete machine handoff. Do not replace the deterministic snapshot with remembered prose or a later `git diff`.
 

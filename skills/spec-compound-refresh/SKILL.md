@@ -1,6 +1,6 @@
 ---
 name: spec-compound-refresh
-description: Refresh docs/solutions learnings against the current codebase. Use when auditing stale, overlapping, superseded, or drifted learnings; avoid general refactor, debugging, or code review unless docs/solutions is explicit.
+description: Refresh docs/solutions learnings and bootstrap or maintain CONCEPTS.md vocabulary against the current codebase. Use when auditing stale, overlapping, superseded, or drifted learnings, or when asked to bootstrap or cross-document maintain CONCEPTS.md; avoid general refactor, debugging, or code review unless docs/solutions is explicit.
 argument-hint: "[optional: scope hint — directory, filename, module, or keyword] [mode:non-interactive]"
 ---
 

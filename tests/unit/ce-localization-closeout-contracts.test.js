@@ -82,11 +82,7 @@ function reviewDelta(deterministic, relationGaps) {
 }
 
 describe('CE localization closeout artifacts', () => {
-  // The closeout artifacts bind the git HEAD they were generated under, which
-  // structurally precedes the commit that contains them, so topology
-  // validation compares against the recorded inventory (the artifact chain's
-  // own source of truth, regenerated together with the artifacts). A separate
-  // live count check below keeps head-independent drift protection.
+  // 历史闭环按其记录的 source binding 校验；当前适用性由显式 current gate 判断。
   function recordedDeterministic() {
     const inventory = JSON.parse(fs.readFileSync(path.join(repoRoot,
       'docs/validation/ce-localization/skill-inventory.json'), 'utf8'));
@@ -95,12 +91,8 @@ describe('CE localization closeout artifacts', () => {
     return { inventory, coverage };
   }
 
-  test('validates the complete canonical topology against the current source snapshot', () => {
+  test('历史闭环在其记录的 source snapshot 内保持完整', () => {
     const deterministic = recordedDeterministic();
-    const live = producer.buildArtifacts();
-    expect(live.inventory.package_path_count).toBe(deterministic.inventory.package_path_count);
-    expect(live.coverage.coverage_summary.direct_support_relation_count)
-      .toBe(deterministic.coverage.coverage_summary.direct_support_relation_count);
     const closeout = producer.loadCloseoutArtifacts();
     const result = producer.validateCloseoutArtifacts(closeout, deterministic);
 
@@ -121,8 +113,19 @@ describe('CE localization closeout artifacts', () => {
     expect(closeout.knowledgePromotion.overall_status).toBe('not-run');
   });
 
+  test('数量不变的 source binding 漂移仍拒绝历史 closeout', () => {
+    const deterministic = recordedDeterministic();
+    const closeout = producer.loadCloseoutArtifacts();
+    expect(producer.validateCloseoutArtifacts(closeout, deterministic).valid).toBe(true);
+    deterministic.inventory.source_snapshot.source_tree_hash = '0'.repeat(64);
+    expect(producer.validateCloseoutArtifacts(closeout, deterministic)).toMatchObject({
+      valid: false,
+      errors: expect.arrayContaining([expect.stringContaining('snapshot')]),
+    });
+  });
+
   test('rejects a semantic artifact that drifts from the deterministic inventory', () => {
-    const deterministic = producer.buildArtifacts();
+    const deterministic = recordedDeterministic();
     const closeout = producer.loadCloseoutArtifacts();
     closeout.scenarios.scenarios[0].skill_id = 'not-a-current-skill';
 
@@ -133,7 +136,7 @@ describe('CE localization closeout artifacts', () => {
   });
 
   test('rejects path hash drift and knowledge promotion without field evidence', () => {
-    const deterministic = producer.buildArtifacts();
+    const deterministic = recordedDeterministic();
     const closeout = producer.loadCloseoutArtifacts();
     closeout.scenarios.path_coverage[0].source_sha256 = '0'.repeat(64);
     closeout.knowledgePromotion.overall_status = 'promoted';
@@ -148,7 +151,7 @@ describe('CE localization closeout artifacts', () => {
   });
 
   test('rejects stale Round 3 source receipts even when top-level counts match', () => {
-    const deterministic = producer.buildArtifacts();
+    const deterministic = recordedDeterministic();
     const closeout = producer.loadCloseoutArtifacts();
     closeout.reviews.round3Openai.skill_reviews[0].source_read_receipts[0].sha256 = '0'.repeat(64);
 
@@ -159,7 +162,7 @@ describe('CE localization closeout artifacts', () => {
   });
 
   test('rejects a stale Round 3 lane finding summary', () => {
-    const deterministic = producer.buildArtifacts();
+    const deterministic = recordedDeterministic();
     const closeout = producer.loadCloseoutArtifacts();
     closeout.reviews.round3Anthropic.finding_summary.open_count = 99;
 
@@ -172,7 +175,7 @@ describe('CE localization closeout artifacts', () => {
   });
 
   test('rejects a report that still carries a stale snapshot warning', () => {
-    const deterministic = producer.buildArtifacts();
+    const deterministic = recordedDeterministic();
     const closeout = producer.loadCloseoutArtifacts();
     closeout.report = `> **当前快照失效**: old snapshot\n\n${closeout.report}`;
 

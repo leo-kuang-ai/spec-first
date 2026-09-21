@@ -1,0 +1,59 @@
+FAIL tests/unit/spec-code-review-pr-head.test.js
+  PR 审查 head 身份绑定
+    ✕ fork 只使用与 metadata 一致的 PR head (1 ms)
+    ✕ same-repo 只使用与 metadata 一致的 PR head (1 ms)
+    ✕ mismatch 只使用与 metadata 一致的 PR head
+
+  ● PR 审查 head 身份绑定 › fork 只使用与 metadata 一致的 PR head
+
+    expect(received).toBeDefined()
+
+    Received: undefined
+
+      10 |     const doc = fs.readFileSync('skills/spec-code-review/references/scope.md', 'utf8');
+      11 |     const block = [...doc.matchAll(/```bash\n([\s\S]*?)```/g)].map((m) => m[1]).find((s) => s.includes('PR_HEAD_OID'));
+    > 12 |     expect(block).toBeDefined();
+         |                   ^
+      13 |     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-pr-head-'));
+      14 |     const base = path.join(root, 'base');
+      15 |     const review = path.join(root, 'review');
+
+      at toBeDefined (tests/unit/spec-code-review-pr-head.test.js:12:19)
+
+  ● PR 审查 head 身份绑定 › same-repo 只使用与 metadata 一致的 PR head
+
+    expect(received).toBeDefined()
+
+    Received: undefined
+
+      10 |     const doc = fs.readFileSync('skills/spec-code-review/references/scope.md', 'utf8');
+      11 |     const block = [...doc.matchAll(/```bash\n([\s\S]*?)```/g)].map((m) => m[1]).find((s) => s.includes('PR_HEAD_OID'));
+    > 12 |     expect(block).toBeDefined();
+         |                   ^
+      13 |     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-pr-head-'));
+      14 |     const base = path.join(root, 'base');
+      15 |     const review = path.join(root, 'review');
+
+      at toBeDefined (tests/unit/spec-code-review-pr-head.test.js:12:19)
+
+  ● PR 审查 head 身份绑定 › mismatch 只使用与 metadata 一致的 PR head
+
+    expect(received).toBeDefined()
+
+    Received: undefined
+
+      10 |     const doc = fs.readFileSync('skills/spec-code-review/references/scope.md', 'utf8');
+      11 |     const block = [...doc.matchAll(/```bash\n([\s\S]*?)```/g)].map((m) => m[1]).find((s) => s.includes('PR_HEAD_OID'));
+    > 12 |     expect(block).toBeDefined();
+         |                   ^
+      13 |     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-pr-head-'));
+      14 |     const base = path.join(root, 'base');
+      15 |     const review = path.join(root, 'review');
+
+      at toBeDefined (tests/unit/spec-code-review-pr-head.test.js:12:19)
+
+Test Suites: 1 failed, 1 total
+Tests:       3 failed, 3 total
+Snapshots:   0 total
+Time:        0.166 s
+Ran all test suites matching /tests\/unit\/spec-code-review-pr-head.test.js/i.

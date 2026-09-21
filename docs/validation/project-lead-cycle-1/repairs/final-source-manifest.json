@@ -1,0 +1,30 @@
+{
+  "schema_version": "cycle1-repair-source-manifest/v1",
+  "captured_at": "2026-09-21T09:27:04.356368+00:00",
+  "head": "36d19d95c3a79df2d1278083c959bb34eadbde8c",
+  "claim_scope": "本轮22个source/test文件字节，不覆盖并行任务或真实runtime",
+  "source_hashes": {
+    "skills/spec-resolve-pr-feedback/references/full-mode.md": "866cb4f06438e019c9a3c9257a3748e9382ae6c341d8716ee9fbcd145d1c77af",
+    "skills/spec-resolve-pr-feedback/references/targeted-mode.md": "d46bf86ec40b234b2e922d1d2f2d67105569a43d5726e4d866733ac7546ffc8d",
+    "skills/spec-resolve-pr-feedback/references/pipeline-return.md": "9a297df7d0ab487e07127b19789365727a04c1036f18634722540fee48f7f5fe",
+    "skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md": "c86844a7544f776ff7622ec818a341be7031133435e122ac3d3a69f7c5a667b1",
+    "skills/spec-commit-push-pr/references/branch-creation.md": "58f164e92dd749076e5902787391c448dc4a2f0627d94ec504815a166285333c",
+    "skills/spec-code-review/references/scope.md": "245cc4fc3a26ab71730ad5db22dbfb00bd83dab8b9689063a624e11596b10d9e",
+    "skills/spec-code-review/scripts/review-scope.py": "cfb3034d57d27bce485f167dfc05207e710674e534c33ce0df8f8bd977bd49a6",
+    "skills/spec-runtime-setup/SKILL.md": "cb04249d533bb6c92581cbc8c90d9ab84383d045c495fe62f8902093515b6795",
+    "skills/spec-runtime-setup/references/supported-mcp-tools.md": "9394b742edfdf9843c7e47fe4e38bf44e9028bf4152d66ab8e70cc2309899cc1",
+    "docs/contracts/provider-readiness.md": "49c5d8bf9c1a8dfa01885127d186d29e7154ff270991d3f64fc86adcd56f44ea",
+    "skills/spec-runtime-setup/scripts/setup.cjs": "40e3ebe91b0eda2a7d03840afe7a35d211d1d0774fdade483ab56aabd5ad30fa",
+    "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs": "eb22b73dddb9eb1d0eeb7bba56e49f135f0a5f110ffb46817878ae9f1ddf9403",
+    "skills/spec-runtime-setup/scripts/lib/workspace-executor.cjs": "c9756b9aff8d68e98b8be7d2e571aa98ac3bdf5b72348b6fa2c207305b29f5cf",
+    "skills/spec-runtime-setup/scripts/lib/workspace-runtime-preflight.cjs": "b6dd6cdd497ccaf12c116392c77d1145e141faa496dc72a735b3397dc35980f7",
+    "tests/unit/spec-resolve-pr-feedback-contracts.test.js": "1e6bbc09834cf77fc4a49fabf3ddd25752a4086965768556bb56fcf1bcc279a4",
+    "tests/unit/spec-commit-push-pr-context-contracts.test.js": "e9f8af0ae6ad6fdf8ef6d9f970271fd0c734afd2a5d25ad7d296422c80cdd452",
+    "tests/unit/spec-code-review-pr-head.test.js": "30835f71cafe2f5c793c9dad0d1a9275a2d0fc5e46e04b53d97d38f790b45c33",
+    "tests/unit/spec-code-review-mechanics.test.js": "b58f289ccbe7482eb723229376c3e40280d7e24d55cf4e8426b7c8878483ea4a",
+    "tests/unit/mcp-setup-entrypoint.test.js": "48c95d71718d6de319672405509a02612f43972b17439ff9a34c72868ceb3e3b",
+    "tests/unit/mcp-setup-mode-target.test.js": "85027c83ba763fb412fc3a6e1b60335e01b8b0754be85a8f513890483424825c",
+    "tests/unit/mcp-setup-contracts.test.js": "803549c3b33ad925343a0d79e3349993945355bd86adf1a3c7991d5b7311bbd5",
+    "tests/unit/mcp-setup-workspace-parent-diagnostic.test.js": "7708129643effa44a5669ff2f8e6c709ef3a027bad0180308da5b7cc4a2a8515"
+  }
+}

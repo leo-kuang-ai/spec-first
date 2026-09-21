@@ -675,3 +675,32 @@ describe('Provider 默认 installation 与显式 artifact 行为矩阵', () => {
     });
   });
 });
+
+
+describe('plan 执行建议保持已预览范围', () => {
+  test.each([
+    [],
+    ['--all-repos'],
+    ['--repo', '/tmp/example', '--repair-host-config'],
+    ['--folder', '/tmp/example'],
+    ['--only', 'graphify', '--all-repos'],
+    ['--requirement-workspace', 'feature', '--all-repos'],
+    ['--only', 'graphify', '--refresh'],
+    ['--only', 'graphify', '--installation-only'],
+  ])('计划转执行参数等价 %j', (...selection) => {
+    const { buildActionPlan, planExecutionAdvice } = require(modePolicyModule);
+    const defaults = { knownIds: ['codegraph', 'graphify'], defaultIds: ['codegraph', 'graphify'] };
+    const plan = buildActionPlan({ ...defaults, argv: ['--plan', ...selection] });
+    expect(plan.blocked).toBe(false);
+    const advice = planExecutionAdvice(plan);
+    const explicitScope = advice.match(/显式使用 ([^，]+)/)[1].split(' ');
+    const execution = buildActionPlan({ ...defaults, argv: [...selection, ...explicitScope] });
+    expect(execution.blocked).toBe(false);
+    expect(execution.mode).not.toBe('bare');
+    expect(execution.mutation).toBe(true);
+    expect(execution.selected_ids).toEqual(plan.selected_ids);
+    for (const key of ['installationOnly', 'repo', 'folder', 'allRepos', 'requirementWorkspace', 'repairHostConfig', 'refresh']) {
+      expect(execution.args[key]).toEqual(plan.args[key]);
+    }
+  });
+});

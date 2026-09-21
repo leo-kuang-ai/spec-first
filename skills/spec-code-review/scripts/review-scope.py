@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 import re
+import stat
 import subprocess
 import tempfile
 from pathlib import Path
@@ -117,10 +118,53 @@ def resolve_diff_args(base: str, head: str | None) -> tuple[list[str] | None, st
     return [merge_base, head_sha], None
 
 
-def compute_scope(base: str, head: str | None) -> tuple[dict[str, object] | None, str | None]:
+def capture_owned_files(paths: list[str]) -> dict[str, object]:
+    root = repo_root()
+    captured = {}
+    for value in paths:
+        relative = Path(value)
+        if (not value or relative.is_absolute() or "\\" in value
+                or ".." in relative.parts or ".git" in relative.parts
+                or relative.as_posix() != value or value in captured):
+            raise ValueError("included path must be a unique repo-relative file")
+        target = root / relative
+        cursor = root
+        for part in relative.parts:
+            cursor = cursor / part
+            if cursor.is_symlink():
+                raise ValueError("included path must not traverse a symlink")
+        try:
+            before = target.lstat()
+        except FileNotFoundError:
+            captured[value] = {"kind": "absent"}
+            continue
+        if not stat.S_ISREG(before.st_mode):
+            raise ValueError("included path must be a regular file or absent")
+        flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_BINARY", 0)
+        with os.fdopen(os.open(target, flags), "rb") as handle:
+            opened = os.fstat(handle.fileno())
+            if not stat.S_ISREG(opened.st_mode):
+                raise ValueError("included path changed file type")
+            digest = hashlib.sha256(handle.read()).hexdigest()
+            after = os.fstat(handle.fileno())
+        # 检查打开对象和当前路径，避免把读取中的变化当成稳定快照。
+        signature = lambda s: (s.st_dev, s.st_ino, s.st_size, s.st_mtime_ns, s.st_ctime_ns, s.st_mode)
+        if not (signature(before) == signature(opened) == signature(after) == signature(target.lstat())):
+            raise ValueError("included file changed during capture")
+        captured[value] = {"kind": "file", "sha256": digest, "mode": stat.S_IMODE(after.st_mode)}
+    return captured
+
+
+def compute_scope(base: str, head: str | None, included_paths: list[str] | None = None) -> tuple[dict[str, object] | None, str | None]:
     diff_args, reason = resolve_diff_args(base, head)
     if diff_args is None:
         return None, reason
+    if head is not None and included_paths:
+        return None, "included local files are invalid for remote commit scope"
+    try:
+        included = capture_owned_files(included_paths or [])
+    except (OSError, ValueError) as error:
+        return None, f"included file capture failed: {error}"
 
     names = git("diff", "--name-only", *diff_args)
     numstat = git("diff", "--numstat", *diff_args)
@@ -128,7 +172,11 @@ def compute_scope(base: str, head: str | None) -> tuple[dict[str, object] | None
     if names.returncode != 0 or numstat.returncode != 0 or patch.returncode != 0:
         return None, "git diff failed"
 
-    files = sorted(line for line in names.stdout.splitlines() if line)
+    files = sorted(set(line for line in names.stdout.splitlines() if line)
+                   | {p for p, fact in included.items() if fact["kind"] == "file"})
+    digest_bytes = patch.stdout
+    if included:
+        digest_bytes += b"\0" + json.dumps(included, sort_keys=True).encode("utf-8")
     return {
         "base": diff_args[0],
         "head": diff_args[1] if len(diff_args) == 2 else None,
@@ -136,7 +184,8 @@ def compute_scope(base: str, head: str | None) -> tuple[dict[str, object] | None
         "changed_files": files,
         "files_changed": len(files),
         "numstat": numstat.stdout,
-        "diff_sha256": "sha256:" + hashlib.sha256(patch.stdout).hexdigest(),
+        "diff_sha256": "sha256:" + hashlib.sha256(digest_bytes).hexdigest(),
+        "included_untracked": included,
     }, None
 
 
@@ -151,12 +200,13 @@ def write_snapshot(path_value: str, scope: dict[str, object]) -> None:
     if target.exists() and target.is_symlink():
         raise ValueError("snapshot target must not be a symlink")
     payload = {
-        "schema_version": "spec-code-review-scope-snapshot/v1",
+        "schema_version": "spec-code-review-scope-snapshot/v2",
         "base": scope["base"],
         "head": scope["head"],
         "diff_sha256": scope["diff_sha256"],
         "changed_files": scope["changed_files"],
         "files_changed": scope["files_changed"],
+        "included_untracked": scope["included_untracked"],
     }
     with tempfile.NamedTemporaryFile(
         mode="w", encoding="utf-8", dir=target.parent, delete=False
@@ -167,11 +217,44 @@ def write_snapshot(path_value: str, scope: dict[str, object]) -> None:
     os.replace(temp_path, target)
 
 
+def valid_snapshot(snapshot: object) -> bool:
+    if not isinstance(snapshot, dict) or snapshot.get("schema_version") != "spec-code-review-scope-snapshot/v2":
+        return False
+    oid = lambda value: isinstance(value, str) and re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", value) is not None
+    if not oid(snapshot.get("base")) or "head" not in snapshot:
+        return False
+    if snapshot["head"] is not None and not oid(snapshot["head"]):
+        return False
+    digest = snapshot.get("diff_sha256")
+    if not isinstance(digest, str) or not re.fullmatch(r"sha256:[0-9a-f]{64}", digest):
+        return False
+    files = snapshot.get("changed_files")
+    if (not isinstance(files, list) or any(not isinstance(p, str) or not p for p in files)
+            or len(set(files)) != len(files)
+            or type(snapshot.get("files_changed")) is not int
+            or snapshot["files_changed"] != len(files)):
+        return False
+    included = snapshot.get("included_untracked")
+    if not isinstance(included, dict) or (snapshot["head"] is not None and included):
+        return False
+    for fact in included.values():
+        if not isinstance(fact, dict):
+            return False
+        if fact == {"kind": "absent"}:
+            continue
+        if (set(fact) != {"kind", "sha256", "mode"} or fact["kind"] != "file"
+                or not isinstance(fact["sha256"], str)
+                or not re.fullmatch(r"[0-9a-f]{64}", fact["sha256"])
+                or type(fact["mode"]) is not int or not 0 <= fact["mode"] <= 0o7777):
+            return False
+    return True
+
+
 def verify_snapshot(path_value: str) -> dict[str, object]:
-    path = Path(path_value).expanduser().resolve()
     try:
+        path = Path(path_value).expanduser().resolve()
         snapshot = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as error:
+    except (OSError, ValueError, UnicodeError, RuntimeError) as error:
         return {
             "status": "unknown",
             "reason_code": "scope_snapshot_unreadable",
@@ -179,15 +262,15 @@ def verify_snapshot(path_value: str) -> dict[str, object]:
             "mutation_detected": None,
             "mutated_paths": [],
         }
-    if snapshot.get("schema_version") != "spec-code-review-scope-snapshot/v1":
+    if not valid_snapshot(snapshot):
         return {
             "status": "unknown",
             "reason_code": "scope_snapshot_invalid",
-            "reason": "unsupported scope snapshot schema",
+            "reason": "unsupported or malformed scope snapshot",
             "mutation_detected": None,
             "mutated_paths": [],
         }
-    scope, reason = compute_scope(snapshot.get("base"), snapshot.get("head"))
+    scope, reason = compute_scope(snapshot.get("base"), snapshot.get("head"), list(snapshot["included_untracked"]))
     if scope is None:
         return {
             "status": "unknown",
@@ -201,6 +284,7 @@ def verify_snapshot(path_value: str) -> dict[str, object]:
     mutation_detected = (
         snapshot.get("diff_sha256") != scope["diff_sha256"]
         or expected_files != observed_files
+        or snapshot["included_untracked"] != scope["included_untracked"]
     )
     mutated_paths = sorted(set(expected_files) | set(observed_files)) if mutation_detected else []
     return {
@@ -221,6 +305,7 @@ def main() -> int:
     parser.add_argument("--head")
     parser.add_argument("--snapshot-out")
     parser.add_argument("--verify-snapshot")
+    parser.add_argument("--include-untracked", action="append", default=[])
     args = parser.parse_args()
 
     if args.verify_snapshot:
@@ -231,7 +316,7 @@ def main() -> int:
     if not args.base:
         print(json.dumps(fail_closed("base endpoint required", learnings_corpus), sort_keys=True))
         return 0
-    scope, reason = compute_scope(args.base, args.head)
+    scope, reason = compute_scope(args.base, args.head, args.include_untracked)
     if scope is None:
         print(json.dumps(fail_closed(reason or "scope computation failed", learnings_corpus), sort_keys=True))
         return 0
@@ -250,6 +335,7 @@ def main() -> int:
 
     uncounted = sum(
         1 for file in files if Path(file).suffix.lower() not in CODE_EXTENSIONS
+        or file in scope["included_untracked"]
     )
     signals = [
         name

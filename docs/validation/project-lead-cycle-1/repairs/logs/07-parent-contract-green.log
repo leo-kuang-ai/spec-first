@@ -1,0 +1,8 @@
+PASS tests/unit/mcp-setup-contracts.test.js
+PASS tests/unit/mcp-setup-workspace-parent-diagnostic.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       11 passed, 11 total
+Snapshots:   0 total
+Time:        0.478 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/mcp-setup-contracts.test.js|tests\/unit\/mcp-setup-workspace-parent-diagnostic.test.js/i.

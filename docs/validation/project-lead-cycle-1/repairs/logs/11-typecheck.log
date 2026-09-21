@@ -1,0 +1,5 @@
+
+> spec-first@1.15.3 typecheck
+> node scripts/typecheck-js.js
+
+typecheck passed (268 files checked)

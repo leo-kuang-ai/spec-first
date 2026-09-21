@@ -1,0 +1,30 @@
+{
+  "status": "open",
+  "scope": "本轮8项定向修复之外的全仓收口条件",
+  "items": [
+    {
+      "id": "CE-TOPOLOGY-DRIFT",
+      "status": "open",
+      "failed_tests": [
+        "ce-localization-review-contracts.test.js",
+        "ce-localization-closeout-contracts.test.js"
+      ],
+      "evidence": "ce-topology-delta.json",
+      "impact": "全套unit不通过；当前source与旧CE审查快照未同源",
+      "repair_owner": "CE source inventory / semantic coverage closeout",
+      "next_action": "按当前文件与support差异实际复核后对齐证据链及合同；不可只改计数或直接重写旧审查通过结论。"
+    },
+    {
+      "id": "EVAL-TSV-WHITESPACE",
+      "status": "open",
+      "path": "docs/validation/skill-evals/results.tsv",
+      "lines": [
+        75,
+        77,
+        79
+      ],
+      "impact": "全仓git diff --check失败，本轮fix-owned范围检查通过",
+      "next_action": "由评测记录owner核对拆行语义并修正；本轮保留其他任务内容。"
+    }
+  ]
+}

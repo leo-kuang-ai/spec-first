@@ -470,6 +470,24 @@ function apply(context = {}, actionPlan = plan(context)) {
       }
       adoptResolvedCommand(resolved);
     }
+    if (['first-generation', 'refresh'].includes(action.kind)) {
+      // Project-contained hook installation is a setup-managed mutation. Perform it
+      // before taking the generation source snapshot so the snapshot measures the
+      // user's source rather than the hook files/config that setup just owns.
+      const preGenerationHookTarget = resolveGraphifyHookTarget(repoRoot, context.targetKind);
+      if (preGenerationHookTarget.classification === 'project-contained') {
+        const preGenerationHook = applyGraphifyHookCapability(
+          repoRoot,
+          runtimeContext,
+          preGenerationHookTarget,
+          pythonProvider,
+        );
+        if (['failed', 'blocked'].includes(preGenerationHook.status)) {
+          mutationFailure = preGenerationHook.reason_code || 'graphify-hook-install-failed';
+          break;
+        }
+      }
+    }
     if (action.kind === 'install-dependency') {
       const result = run(context, action.command, action.args, {
         cwd: repoRoot,

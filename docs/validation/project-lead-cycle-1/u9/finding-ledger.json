@@ -1,0 +1,359 @@
+{
+  "schema_version": "cycle1-finding-ledger/v1",
+  "run_id": "2026-09-20-cycle1-u9",
+  "updated_at": "2026-09-21T10:12:39.167137+00:00",
+  "findings": [
+    {
+      "id": "C1-CR-01",
+      "aliases": [
+        "A-EXIT-CR-01"
+      ],
+      "skill_name": "spec-code-review",
+      "severity": "P2",
+      "title": "fork PR head ref 混源",
+      "trigger": "base 与 fork 存在同名 head 分支，但 SHA 不同",
+      "impact": "scope 的 fetch 固定 origin/headRefName，未绑定 gh 元数据 headRefOid；git show 可能读取 base 分支而 gh pr diff 来自 fork。",
+      "status": "fixed",
+      "evidence_status": "confirmed",
+      "evidence_level": "confirmed-by-isolated-fixture",
+      "source_refs": [
+        "skills/spec-code-review/references/scope.md:111-137"
+      ],
+      "source_hashes": {
+        "skills/spec-code-review/references/scope.md": "acc0e68f87ec07a4b00af41ed9b9234e933033999c7ac7f07b0f708ad59e485b"
+      },
+      "receipt": "skills/spec-code-review.json",
+      "probe_refs": [
+        "review-fork-ref-probe.json"
+      ],
+      "owner": "skills/spec-code-review",
+      "minimal_fix": "按 PR 的真实 head SHA 获取只读 ref，核对 headRefOid；不匹配阻断审查，不能静默回退 origin 同名分支。",
+      "acceptance": "纯本地 base/fork 同名不同 SHA：必须读到 metadata SHA 或 fail-closed；新增非fork正例与 SHA mismatch 负例。",
+      "validation_status": "新增身份门旧源码3红；本地fork同名分支/同仓正例/SHA mismatch三场景3/3通过，工作树与HEAD保持。",
+      "fix_status": "fixed",
+      "next_action": "本轮源码修复与本地回归证据见repairs修复报告；真实宿主/模型/field需另行绑定证据，source变更后重验。",
+      "reevaluate_when": "修复或source/consumer变化后重跑反例；同source仅重复写报告不升级状态",
+      "limitations": [
+        "仅支持所引 source/fixture 的问题判断；未执行真实宿主、模型或远端PR。"
+      ],
+      "fixed_at": "2026-09-20T08:14:20.188844+00:00",
+      "repair": "从PR真实base仓取refs/pull/N/head并核对headRefOid，传不可变SHA；base同源校验，diff取证后重验PR身份，不回退origin同名分支。",
+      "repair_evidence": [
+        "../repairs/logs/04-pr-head-red.log",
+        "../repairs/logs/04-pr-head-green.log"
+      ]
+    },
+    {
+      "id": "C1-CR-02",
+      "aliases": [
+        "A-EXIT-CR-02"
+      ],
+      "skill_name": "spec-code-review",
+      "severity": "P2",
+      "title": "task-owned untracked mutation 未被 snapshot 检出",
+      "trigger": "review scope 包含未跟踪文件，reviewer 修改其字节",
+      "impact": "scope 纳入 untracked，snapshot 却只比较 tracked diff，修改未跟踪文件后 mutation_detected 仍 false。",
+      "status": "fixed",
+      "evidence_status": "confirmed",
+      "evidence_level": "confirmed-by-isolated-fixture",
+      "source_refs": [
+        "skills/spec-code-review/references/scope.md:65-72",
+        "skills/spec-code-review/scripts/review-scope.py:125-139",
+        "skills/spec-code-review/scripts/review-scope.py:199-204"
+      ],
+      "source_hashes": {
+        "skills/spec-code-review/references/scope.md": "acc0e68f87ec07a4b00af41ed9b9234e933033999c7ac7f07b0f708ad59e485b",
+        "skills/spec-code-review/scripts/review-scope.py": "ba359514ba60020b18381b1b1cf9268d16056e539f2bdd8e9c109ff1b8c8cc52"
+      },
+      "receipt": "skills/spec-code-review.json",
+      "probe_refs": [
+        "review-untracked-probe.json"
+      ],
+      "owner": "skills/spec-code-review",
+      "minimal_fix": "snapshot 同时绑定 scope 内 untracked 文件的存在性与内容摘要；范围外文件不自动纳入，缺读/消失按明确失败处理。",
+      "acceptance": "未跟踪文件修改/新增/删除均可检出，tracked 对照保持；不将新 hash 当旧基线。",
+      "validation_status": "新增7个实际Git/Python场景旧实现失败，修复后20/20通过，覆盖增改删、转staged、范围外与文件类型变化及v1拒绝。",
+      "fix_status": "fixed",
+      "next_action": "本轮源码修复与本地回归证据见repairs修复报告；真实宿主/模型/field需另行绑定证据，source变更后重验。",
+      "reevaluate_when": "修复或source/consumer变化后重跑反例；同source仅重复写报告不升级状态",
+      "limitations": [
+        "仅支持所引 source/fixture 的问题判断；未执行真实宿主、模型或远端PR。"
+      ],
+      "fixed_at": "2026-09-20T08:17:28.668188+00:00",
+      "repair": "snapshot v2显式绑定task-owned untracked路径、存在性、字节和mode；verify复用冻结路径，拒绝旧v1/软链/目录；普通未跟踪文件仍不纳入。",
+      "repair_evidence": [
+        "../repairs/logs/05-untracked-red.log",
+        "../repairs/logs/05-untracked-green.log",
+        "../repairs/logs/10-review-followup-red.log",
+        "../repairs/logs/10-review-followup-green.log"
+      ],
+      "review_followup": "非法snapshot结构/编码fail closed；补充完整index归属检查，无关暂存或不明hunk阻断commit。对应新增反例2红→32项通过。"
+    },
+    {
+      "id": "C1-U9-RUNTIME-001",
+      "aliases": [],
+      "skill_name": "spec-runtime-setup",
+      "severity": "P2",
+      "title": "bare mutation 漏 runtime projection preflight",
+      "trigger": "缺失或过期 projection 的单仓 bare setup",
+      "impact": "bare 具备 mutation 能力但 preflight modes 未包含 bare，安装/host/provider 操作位于末尾 manifest 检查之前。",
+      "status": "fixed",
+      "evidence_status": "confirmed",
+      "evidence_level": "confirmed-source-and-pure-function",
+      "source_refs": [
+        "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs:137-161",
+        "skills/spec-runtime-setup/scripts/lib/workspace-runtime-preflight.cjs:10-18",
+        "skills/spec-runtime-setup/scripts/setup.cjs:206-211",
+        "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs:59-112",
+        "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs:153-157"
+      ],
+      "source_hashes": {
+        "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs": "30a0c5b91747cad8676e1d11040dde45b63ce4fc6450a2d5fa7c402472aa6ab8",
+        "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs": "bb6c313249dc9964b0df0229d35435d4b438e1afe2597259d7a47bee0d7601da",
+        "skills/spec-runtime-setup/scripts/lib/workspace-runtime-preflight.cjs": "ab020827f87efd6648a03c68905523825dab70dfd0ef70c1f1023bc487b2ff22",
+        "skills/spec-runtime-setup/scripts/setup.cjs": "3fa166402a6978c20f746e87c1e1413aab5e9d80e2ae248cce8c11ef1d9dc7f6"
+      },
+      "receipt": "skills/spec-runtime-setup.json",
+      "probe_refs": [
+        "runtime-setup-preflight-probe.json"
+      ],
+      "owner": "skills/spec-runtime-setup",
+      "minimal_fix": "由 owning mode/preflight 边界统一 bare 与同能力 explicit-only 的写前约束，不靠末尾诊断补 gate。",
+      "acceptance": "bare × missing/stale/current 的无副作用 sentinel 用例；missing/stale 在安装/host/provider/facts 写前阻断，check 保持只读。",
+      "validation_status": "修正测试夹具后旧实现missing/stale两红、current正例通过；修复后bare/parent 13项通过，缺失/过期target与home字节无变化。",
+      "fix_status": "fixed",
+      "next_action": "本轮源码修复与本地回归证据见repairs修复报告；真实宿主/模型/field需另行绑定证据，source变更后重验。",
+      "reevaluate_when": "修复或source/consumer变化后重跑反例；同source仅重复写报告不升级状态",
+      "limitations": [
+        "仅支持所引 source/fixture 的问题判断；未执行真实宿主、模型或远端PR。"
+      ],
+      "fixed_at": "2026-09-21T09:14:59.843189+00:00",
+      "repair": "bare纳入projection写前gate；父目录bare/check只读诊断在该gate前分流，仍保留target/host authority检查。",
+      "repair_evidence": [
+        "../repairs/logs/06-runtime-preflight-red-refined.log",
+        "../repairs/logs/06-runtime-preflight-green.log"
+      ]
+    },
+    {
+      "id": "C1-U9-RUNTIME-002",
+      "aliases": [],
+      "skill_name": "spec-runtime-setup",
+      "severity": "P2",
+      "title": "多仓父目录 bare 入口承诺与执行分支分歧",
+      "trigger": "非 Git 父目录发现多个子仓，bare 调用",
+      "impact": "SKILL 承诺 all-repos baseline 收敛，setup 将 bare/check 返回 parent diagnostic，测试固定旧诊断语义。",
+      "status": "fixed",
+      "evidence_status": "confirmed",
+      "evidence_level": "confirmed-source-contract",
+      "source_refs": [
+        "skills/spec-runtime-setup/SKILL.md:73",
+        "skills/spec-runtime-setup/SKILL.md:147",
+        "skills/spec-runtime-setup/SKILL.md:258-264",
+        "skills/spec-runtime-setup/scripts/setup.cjs:213-229",
+        "tests/unit/mcp-setup-workspace-parent-diagnostic.test.js:62-79"
+      ],
+      "source_hashes": {
+        "skills/spec-runtime-setup/SKILL.md": "c9bb4ae019db0fcbfcc89772a405e0df4fa9f4b0ba404813c330ff4d502de41a",
+        "skills/spec-runtime-setup/scripts/setup.cjs": "3fa166402a6978c20f746e87c1e1413aab5e9d80e2ae248cce8c11ef1d9dc7f6",
+        "tests/unit/mcp-setup-workspace-parent-diagnostic.test.js": "32b8c2ae452986bb1271026ccfa5229040972e8b3772b80ee312b93130817fbf"
+      },
+      "receipt": "skills/spec-runtime-setup.json",
+      "probe_refs": [],
+      "owner": "skills/spec-runtime-setup",
+      "minimal_fix": "先统一 bare 父目录产品范围，再同步 SKILL、分支及测试；check 只读合同保持。",
+      "acceptance": "多子仓 fixture 验证实际每仓动作/隔离失败聚合与scope；check 没有子仓写入。",
+      "validation_status": "文案合同旧源码1红；修复后11/11通过。bare、bare --all-repos、check在缺失child projection时均返回诊断，workspace/home字节不变且不调用provider runner。",
+      "fix_status": "fixed",
+      "next_action": "本轮源码修复与本地回归证据见repairs修复报告；真实宿主/模型/field需另行绑定证据，source变更后重验。",
+      "reevaluate_when": "修复或source/consumer变化后重跑反例；同source仅重复写报告不升级状态",
+      "limitations": [
+        "仅支持所引 source/fixture 的问题判断；未执行真实宿主、模型或远端PR。"
+      ],
+      "fixed_at": "2026-09-21T09:19:47.721536+00:00",
+      "repair": "保留父目录bare/check只读诊断；修正入口、流程与子仓batch说明，显式installation-only/only才批量写入。不扩大默认写权限。",
+      "repair_evidence": [
+        "../repairs/logs/07-parent-contract-red.log",
+        "../repairs/logs/07-parent-contract-green.log"
+      ],
+      "acceptance_resolution": "原验收设想每仓mutation；产品裁决保留既有只读默认，以文案一致性与零副作用验证收口，显式batch沿用原测试。"
+    },
+    {
+      "id": "C1-U9-RUNTIME-003",
+      "aliases": [],
+      "skill_name": "spec-runtime-setup",
+      "severity": "P2",
+      "title": "默认 graph scope 的文案与模式矩阵冲突",
+      "trigger": "按照普通 --plan 建议去掉计划参数执行 bare",
+      "impact": "入口同时说默认不构图和 bare 完整构图；plan 默认 installation-only，bare 非 installation-only，建议可能扩大scope。",
+      "status": "fixed",
+      "evidence_status": "confirmed",
+      "evidence_level": "confirmed-source-contract",
+      "source_refs": [
+        "skills/spec-runtime-setup/SKILL.md:32",
+        "skills/spec-runtime-setup/SKILL.md:147",
+        "skills/spec-runtime-setup/SKILL.md:179-181",
+        "skills/spec-runtime-setup/SKILL.md:262",
+        "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs:137-161",
+        "tests/unit/mcp-setup-entrypoint.test.js:2089-2125"
+      ],
+      "source_hashes": {
+        "skills/spec-runtime-setup/SKILL.md": "c9bb4ae019db0fcbfcc89772a405e0df4fa9f4b0ba404813c330ff4d502de41a",
+        "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs": "30a0c5b91747cad8676e1d11040dde45b63ce4fc6450a2d5fa7c402472aa6ab8",
+        "tests/unit/mcp-setup-entrypoint.test.js": "dc5d9f6f8988c9d080683bb097dc7bb94f7926bf50a534ef4c5e3fbb3b2ca6d1"
+      },
+      "receipt": "skills/spec-runtime-setup.json",
+      "probe_refs": [
+        "runtime-setup-preflight-probe.json"
+      ],
+      "owner": "skills/spec-runtime-setup",
+      "minimal_fix": "以唯一模式矩阵定义 bare/plan/verify/installation-only/explicit graph，并让 plan 的执行建议保存同一选择范围。",
+      "acceptance": "plan→execution selection 等价用例；显式 graph 与 installation-only 区分；fresh-source 负例验证不因去参数扩大scope。",
+      "validation_status": "workspace计划建议旧源码3红；修复后12项聚焦通过，8组plan/apply参数等价；完整mode/contract 78项通过。",
+      "fix_status": "fixed",
+      "next_action": "本轮源码修复与本地回归证据见repairs修复报告；真实宿主/模型/field需另行绑定证据，source变更后重验。",
+      "reevaluate_when": "修复或source/consumer变化后重跑反例；同source仅重复写报告不升级状态",
+      "limitations": [
+        "仅支持所引 source/fixture 的问题判断；未执行真实宿主、模型或远端PR。"
+      ],
+      "fixed_at": "2026-09-21T09:21:50.897987+00:00",
+      "repair": "单项目与workspace plan共用范围保持建议；installation显式带installation-only，artifact显式带selected_ids，并保留target/requirement/repair/refresh。统一入口与provider文档模式矩阵。",
+      "repair_evidence": [
+        "../repairs/logs/08-plan-scope-red.log",
+        "../repairs/logs/08-plan-scope-green.log",
+        "../repairs/logs/08-runtime-contract-final.log"
+      ]
+    },
+    {
+      "id": "C1-COMMITPR-001",
+      "aliases": [],
+      "skill_name": "spec-commit-push-pr",
+      "severity": "P2",
+      "title": "checkout collision 的 stash/pop 改变用户暂存选择",
+      "trigger": "从默认分支按目标base建分支时 dirty 修改阻止checkout，另有不属于当前任务的 staged 文件",
+      "impact": "恢复指令执行全仓 stash -u 与无 --index 的 pop。隔离fixture中 pop 成功、内容保留，但 unrelated.txt 从 staged 变 unstaged。",
+      "status": "fixed",
+      "evidence_status": "confirmed",
+      "evidence_level": "confirmed-by-isolated-fixture",
+      "source_refs": [
+        "skills/spec-commit-push-pr/references/branch-creation.md:55-66",
+        "skills/spec-commit-push-pr/references/commit-and-push.md:8-19"
+      ],
+      "source_hashes": {
+        "skills/spec-commit-push-pr/references/branch-creation.md": "5cb38eb8314ad50a1d4f2a892081e6bc802d7fcd23080b8bcd198987d60c97ef",
+        "skills/spec-commit-push-pr/references/commit-and-push.md": "39f8ce3145cebb2074297cdcdfc5386711e3062c701ca88d20a392aa4f67b60e"
+      },
+      "receipt": "skills/spec-commit-push-pr.json",
+      "probe_refs": [
+        "commit-pr-stash-probe.json"
+      ],
+      "owner": "skills/spec-commit-push-pr",
+      "minimal_fix": "避免自动吸纳无关 dirty/index；优先保留工作树并返回明确恢复选项；确需stash则限定授权、保存index语义并处理未知结果/冲突，不仅机械追加 --index。",
+      "acceptance": "多文件部分暂存+无关staged+untracked 的checkout collision；前后字节/index/owned scope保持，冲突不吞状态。",
+      "validation_status": "真实本地Git fixture：旧指令丢失暂存状态，修复后混合暂存/无关staged/untracked及branch状态保持；3/3通过。",
+      "fix_status": "fixed",
+      "next_action": "本轮源码修复与本地回归证据见repairs修复报告；真实宿主/模型/field需另行绑定证据，source变更后重验。",
+      "reevaluate_when": "修复或source/consumer变化后重跑反例；同source仅重复写报告不升级状态",
+      "limitations": [
+        "仅支持所引 source/fixture 的问题判断；未执行真实宿主、模型或远端PR。"
+      ],
+      "fixed_at": "2026-09-20T08:11:56.967268+00:00",
+      "repair": "取消checkout collision后的自动全仓stash/pop；保留现场、核验index与内容并返回blocked及有界恢复选项。",
+      "repair_evidence": [
+        "../repairs/logs/03-commit-index-red.log",
+        "../repairs/logs/03-commit-index-green.log"
+      ]
+    },
+    {
+      "id": "C1-PRFEEDBACK-001",
+      "aliases": [],
+      "skill_name": "spec-resolve-pr-feedback",
+      "severity": "P1",
+      "title": "按失败文件未修改直接放行新的跨文件回归",
+      "trigger": "resolver 修改共享模块/API，未修改的 consumer 或测试随之失败",
+      "impact": "full-mode 将只落在未改文件的失败认作 pre-existing 并继续 commit/push；文件集合不是因果或历史基线证据。",
+      "status": "fixed",
+      "evidence_status": "confirmed",
+      "evidence_level": "confirmed-source-semantic",
+      "source_refs": [
+        "skills/spec-resolve-pr-feedback/references/full-mode.md:136-147"
+      ],
+      "source_hashes": {
+        "skills/spec-resolve-pr-feedback/references/full-mode.md": "1c0278e94a39c6d346853da27ed2b6cec6ad6182ad8ec935ee576482241b7049"
+      },
+      "receipt": "skills/spec-resolve-pr-feedback.json",
+      "probe_refs": [],
+      "owner": "skills/spec-resolve-pr-feedback",
+      "minimal_fix": "移除按路径直接归因；需同环境基线复现或可核验证据支持 pre-existing，归因不明保留failed并阻断完成/发布出口。",
+      "acceptance": "共享模块变化导致未改测试红时不得进入commit/push；有真实基线同失败时单独记录既存问题，不伪造green。",
+      "validation_status": "源码合同回归：旧源码1红，修复后9/9通过；fresh-source复核待批次终验。",
+      "fix_status": "fixed",
+      "next_action": "本轮源码修复与本地回归证据见repairs修复报告；真实宿主/模型/field需另行绑定证据，source变更后重验。",
+      "reevaluate_when": "修复或source/consumer变化后重跑反例；同source仅重复写报告不升级状态",
+      "limitations": [
+        "仅支持所引 source/fixture 的问题判断；未执行真实宿主、模型或远端PR。"
+      ],
+      "fixed_at": "2026-09-20T08:08:46.423918+00:00",
+      "repair": "移除按文件集合认定历史失败的规则；要求基线/因果证据并保留required failure出口阻断。",
+      "repair_evidence": [
+        "../repairs/logs/01-prfeedback-attribution-red.log",
+        "../repairs/logs/01-prfeedback-attribution-green.log"
+      ]
+    },
+    {
+      "id": "C1-PRFEEDBACK-002",
+      "aliases": [],
+      "skill_name": "spec-resolve-pr-feedback",
+      "severity": "P2",
+      "title": "blocked resolver 的空变更清单可隐藏已写修改",
+      "trigger": "resolver 先实施，再被caller/test反证而返回blocked",
+      "impact": "agent允许实施后blocked但要求files_changed为空；父级按该字段汇总，全部为空可跳过联合验证，未要求回滚或实际diff复核。",
+      "status": "fixed",
+      "evidence_status": "confirmed",
+      "evidence_level": "confirmed-source-contract",
+      "source_refs": [
+        "skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md:18-20",
+        "skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md:37-50",
+        "skills/spec-resolve-pr-feedback/references/full-mode.md:109-138"
+      ],
+      "source_hashes": {
+        "skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md": "ed587f3ee7ca0f98034c9d68557c5fab2cea2c90ca074338e644f0a886ac7b7a",
+        "skills/spec-resolve-pr-feedback/references/full-mode.md": "1c0278e94a39c6d346853da27ed2b6cec6ad6182ad8ec935ee576482241b7049"
+      },
+      "receipt": "skills/spec-resolve-pr-feedback.json",
+      "probe_refs": [],
+      "owner": "skills/spec-resolve-pr-feedback",
+      "minimal_fix": "blocked 也报告实际已写/剩余diff和检查状态；父owner独立读取实际树，不能依赖空清单跳过验证；回滚须限定自身变更。",
+      "acceptance": "模拟写入后targeted test红/blocked返回，父级必须看见dirty delta并保留未完成；仅未写入的blocked才能报告空。",
+      "validation_status": "源码合同回归：旧源码1红，修复后10/10通过；fresh-source待批次终验。",
+      "fix_status": "fixed",
+      "next_action": "本轮源码修复与本地回归证据见repairs修复报告；真实宿主/模型/field需另行绑定证据，source变更后重验。",
+      "reevaluate_when": "修复或source/consumer变化后重跑反例；同source仅重复写报告不升级状态",
+      "limitations": [
+        "仅支持所引 source/fixture 的问题判断；未执行真实宿主、模型或远端PR。"
+      ],
+      "fixed_at": "2026-09-20T08:10:02.221952+00:00",
+      "repair": "blocked保留实际残留diff及验证结果；父级以写前基线独立核对tracked/index/task-owned untracked，空返回不能跳过验证；同步targeted/pipeline消费。",
+      "repair_evidence": [
+        "../repairs/logs/02-prfeedback-delta-red.log",
+        "../repairs/logs/02-prfeedback-delta-green.log",
+        "../repairs/logs/10-review-followup-red.log",
+        "../repairs/logs/10-review-followup-green.log"
+      ],
+      "review_followup": "非法snapshot结构/编码fail closed；补充完整index归属检查，无关暂存或不明hunk阻断commit。对应新增反例2红→32项通过。"
+    }
+  ],
+  "limitations": [
+    "原 A-EXIT-CR-01/02 并入 C1-CR-01/02，不重复计数。",
+    "severity 为主owner根据出口影响裁决，非脚本自动分类。",
+    "原审查快照另存repairs/finding-ledger-before-repairs.json；当前状态按各项修复验证更新，历史审查hash不代表修复后source。"
+  ],
+  "repair_validation": {
+    "targeted_status": "passed",
+    "finding_fixed_count": 8,
+    "broader_status": "passed",
+    "honest_closeout_verdict": "verified-local-regression-only",
+    "report": "../repairs/2026-09-21-residual-regression-report.md",
+    "limitations": "本轮8项及后续回归阻断问题已修复；npm test exit0，2项real Graphify dogfood条件跳过；历史CE current binding仍stale，真实宿主/模型/field未由本轮证明。",
+    "honest_closeout_result": "../repairs/residual-closeout-result.json"
+  }
+}

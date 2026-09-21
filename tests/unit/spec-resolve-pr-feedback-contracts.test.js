@@ -8,6 +8,41 @@ function read(filePath) {
 }
 
 describe('spec-resolve-pr-feedback contracts', () => {
+  test('resolver 写入后 blocked 仍报告变更且父级独立核对实际状态', () => {
+    const fullMode = read('skills/spec-resolve-pr-feedback/references/full-mode.md');
+    const resolver = read('skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md');
+    const targeted = read('skills/spec-resolve-pr-feedback/references/targeted-mode.md');
+
+    expect(fullMode + resolver).not.toContain('empty if blocked');
+    expect(resolver).toContain('including blocked');
+    expect(resolver).toContain('tracked, staged, and task-owned untracked');
+    expect(resolver).toContain('verification:');
+    expect(fullMode).toContain('pre-dispatch baseline');
+    expect(fullMode).toContain('independently inspect the actual');
+    expect(fullMode).toContain('empty summary alone never skips validation');
+    expect(targeted).toContain('including a blocked resolver');
+  });
+
+  test('提交前阻断不属于本轮的暂存内容', () => {
+    const commit = read('skills/spec-resolve-pr-feedback/references/full-mode.md').split('## 6. Commit and Push')[1].split('## 7. Reply and Resolve')[0];
+    expect(commit).toContain('Before staging, inspect the complete index');
+    expect(commit).toContain('unrelated staged content or uncertain hunk ownership blocks this exit');
+    expect(commit).toContain('Re-read the entire staged diff');
+    expect(commit).not.toContain('git add [validated run-owned paths');
+  });
+
+  test('未修改的 consumer 失败不能按文件集合归为历史失败并放行提交', () => {
+    const fullMode = read('skills/spec-resolve-pr-feedback/references/full-mode.md');
+    const validation = fullMode.split('## 5. Validate Combined State')[1].split('## 6. Commit and Push')[0];
+
+    expect(validation).not.toContain('failures touch only files no resolver changed -> treat as pre-existing');
+    expect(validation).toContain('same command and comparable environment');
+    expect(validation).toContain('shared-module changes can break unchanged consumers');
+    expect(validation).toContain('Unknown attribution remains failed');
+    expect(validation).toContain('do not proceed to commit or push');
+    expect(validation).toContain('A confirmed pre-existing failure is still failed');
+  });
+
   test('逐项独立准入 mutating 与 external exit', () => {
     const entrypoint = read('skills/spec-resolve-pr-feedback/SKILL.md');
     const fullMode = read('skills/spec-resolve-pr-feedback/references/full-mode.md');

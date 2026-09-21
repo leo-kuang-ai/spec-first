@@ -68,7 +68,8 @@ describe('spec-runtime-setup runner contracts', () => {
     expect(skill).toContain('--only codegraph,graphify');
     expect(skill).toContain('defaults-active');
     expect(skill).toContain('a pure non-Git directory with no child repos becomes the single folder target');
-    expect(skill).toContain('a non-Git parent with discovered child repos keeps the bounded all-repos behavior');
+    expect(skill).toContain('父目录 bare / bare --all-repos / --check 均只读诊断');
+    expect(skill).toContain('--installation-only --all-repos');
     expect(skill).toContain('`--folder <path>` selects the exact logical project directory and does not require Git');
     expect(skill).toContain('`--repo <path>` must resolve to the exact Git repository root');
     expect(skill).toContain('the folder is never passed to Git-only `init --repo`');
@@ -85,7 +86,7 @@ describe('spec-runtime-setup runner contracts', () => {
     });
   });
 
-  test('裸调用只读诊断，配置修复需显式授权', () => {
+  test('单项目裸调用收敛基线，父目录诊断，配置修复需显式授权', () => {
     const skill = fs.readFileSync(
       path.join(repoRoot, 'skills', 'spec-runtime-setup', 'SKILL.md'),
       'utf8',

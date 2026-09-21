@@ -1,0 +1,33 @@
+id: positive-publish-produces-solution
+title: 已解决并验证的问题正向发布为含失效条件的 learning
+description: |
+  验证唯一显式 Done 判据的正向路径：solved+verified 且不可从最终
+  代码直接恢复的问题被沉淀为 docs/solutions/ 下的 learning，
+  frontmatter 含 problem_type/source_refs/invalidation_condition
+  等核心字段，完成汇报含发布语义。
+
+input:
+  prompt: |
+    （spec-compound skill 已安装，请按它工作。）
+    沉淀一个刚解决并验证过的问题：本仓库 POST /entries 曾接受字符串
+    amount，存成 NaN 金额且静默返回 ok——线上对账才发现。根因不是
+    单点缺校验，而是 JSON.parse 后直接解构 + 原测试只覆盖 happy
+    path + 无效输入也走 200 的三重组合，从最终代码看不出当初的
+    排查路径。修复已落在 src/server.js 的 parseEntry 类型守卫，
+    回归测试 test/entries.test.js 断言字符串 amount 被拒，
+    `npm test` 已通过。请把这个 learning 沉淀下来。
+
+context:
+  repo_fixture: evals/fixtures/repos/solved-ledger
+  git:
+    init: true
+    checkout: main
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 25
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-solution-published.sh
+  timeout_seconds: 30

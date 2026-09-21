@@ -1,0 +1,166 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "generated_at": "2026-09-20T07:06:40.683772+00:00",
+  "skill_name": "spec-app-consistency-audit",
+  "source_snapshot": "source-manifest.json",
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "source_paths": [
+    "skills/spec-app-consistency-audit/SKILL.md",
+    "skills/spec-app-consistency-audit/references/headless-runner.md",
+    "skills/spec-app-consistency-audit/references/mode-output-contract.md",
+    "skills/spec-app-consistency-audit/scripts/run-audit.js",
+    "skills/spec-app-consistency-audit/scripts/preflight.js"
+  ],
+  "source_read_ranges": {
+    "skills/spec-app-consistency-audit/SKILL.md": "1-307",
+    "skills/spec-app-consistency-audit/references/headless-runner.md": "1-95",
+    "skills/spec-app-consistency-audit/references/mode-output-contract.md": "1-200",
+    "skills/spec-app-consistency-audit/scripts/run-audit.js": "70-102,222-320,495-625",
+    "skills/spec-app-consistency-audit/scripts/preflight.js": "1-40,180-184,554-564"
+  },
+  "source_hashes": {
+    "skills/spec-app-consistency-audit/SKILL.md": "0fe3e99ecba65f49ec62c1fa0bbd870f926760df966f5e68724e75b07ed0f1b4",
+    "skills/spec-app-consistency-audit/references/headless-runner.md": "dc2b0402da9cde3563a19d227f062ae1f65fb60274b0475a75366a1d2e858325",
+    "skills/spec-app-consistency-audit/references/mode-output-contract.md": "2bda3e1c716bc4a7a1dd06058604824ba6d0c02f6f1a3c2a955cbaad4ff7415c",
+    "skills/spec-app-consistency-audit/scripts/run-audit.js": "32ca9eb7f6a1598cd3a1ff40aed21c84565c3aa3cea2076b58b6dd038ebb429a",
+    "skills/spec-app-consistency-audit/scripts/preflight.js": "39f44117a67b9f24e24b1be1aa5dbff59c365c7b26cf223f4ab96a306720a265"
+  },
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "entry_surface": "workflow_command",
+  "batch": "C1",
+  "closure_tier": "L",
+  "closure_observed": {
+    "files": 90,
+    "bytes": 415367,
+    "read_package_files_at_least_partially": 5,
+    "read_supporting_files_at_least_partially": 0,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "coverage_commitment": "committed",
+  "dependency_closure": "partial",
+  "status": "degraded",
+  "reason_codes": [
+    "bounded_dependency_closure",
+    "tests_not_run",
+    "host_projection_not_run"
+  ],
+  "command_or_method": [
+    "独立于被审源码作者的只读reviewer逐包阅读实际source并判断五分支；主owner回源裁决finding，非盲评或真实workflow运行。"
+  ],
+  "ran": true,
+  "exit_code": null,
+  "evidence_paths": [
+    "reviewer-returns/c1.json"
+  ],
+  "source_refs": [
+    "skills/spec-app-consistency-audit/SKILL.md",
+    "skills/spec-app-consistency-audit/references/headless-runner.md",
+    "skills/spec-app-consistency-audit/references/mode-output-contract.md",
+    "skills/spec-app-consistency-audit/scripts/run-audit.js",
+    "skills/spec-app-consistency-audit/scripts/preflight.js"
+  ],
+  "owner": "project-lead-cycle-1",
+  "consumers": [
+    "周期1主审查",
+    "对应上游/下游workflow（以SKILL文档声明为准）"
+  ],
+  "branches": [
+    {
+      "id": "entry_positive",
+      "status": "source-covered",
+      "judgment": "输入 PRD、Figma 与本地代码的 App 一致性审查采用静态优先；Figma 被界定为 reference-only，run artifact lifecycle 与 issue synthesis 分开，LLM 负责语义问题判断。",
+      "source_refs": [
+        "skills/spec-app-consistency-audit/SKILL.md:1-307",
+        "skills/spec-app-consistency-audit/scripts/run-audit.js:222-320"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "near_neighbor_negative",
+      "status": "source-covered",
+      "judgment": "通用 code review、单纯测试和 R2 实施不属于该审查入口。v1 runner 只接受 mode:headless；mode:report-only 虽有 workflow 语义定义，但当前 runner 明确返回 mode_unsupported，不能声称存在可执行等价路径。",
+      "source_refs": [
+        "skills/spec-app-consistency-audit/SKILL.md:1-307",
+        "skills/spec-app-consistency-audit/scripts/run-audit.js:70-102",
+        "skills/spec-app-consistency-audit/references/headless-runner.md:1-95"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "output_consumer",
+      "status": "source-covered",
+      "judgment": "输出合同包含 run 级 artifacts、报告与 evidence gate；issue synthesis 不能把静态线索直接当成已验证视觉/运行时缺陷，消费者需保留 mode 和 limitations。",
+      "source_refs": [
+        "skills/spec-app-consistency-audit/references/mode-output-contract.md:1-200",
+        "skills/spec-app-consistency-audit/scripts/run-audit.js:495-625"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "failure_stop",
+      "status": "source-covered",
+      "judgment": "preflight 和 run 分支对不可用输入/不支持 mode 记录失败；证据不足不能升级为完整一致性通过。preflight 仅局部读取，尚不能确认所有无输入、失效路径、失败清理组合。",
+      "source_refs": [
+        "skills/spec-app-consistency-audit/scripts/preflight.js:1-40",
+        "skills/spec-app-consistency-audit/scripts/preflight.js:180-184",
+        "skills/spec-app-consistency-audit/scripts/preflight.js:554-564",
+        "skills/spec-app-consistency-audit/scripts/run-audit.js:70-102"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "recovery_handoff_closeout",
+      "status": "source-covered",
+      "judgment": "mode 输出合同描述 degraded 与报告限制，run 生命周期有汇总出口；未执行 runner、未完成所有 schema/rule-pack/prompt 闭包，不能从文档完整性推出真实 App 或 Figma 审查可靠。",
+      "source_refs": [
+        "skills/spec-app-consistency-audit/references/mode-output-contract.md:1-200",
+        "skills/spec-app-consistency-audit/references/headless-runner.md:1-95"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    }
+  ],
+  "findings": [],
+  "fresh_source_eval": "not-run",
+  "claim_ceiling": "C0",
+  "limitations": [
+    "全部 scripts、schemas、prompts、rule-packs、tests 未完成依赖闭包。",
+    "未执行 headless runner、Figma provider、浏览器或真实 App；report-only runner 路径当前不支持。",
+    "本 worker 仅进行有界 source review；未执行被审 workflow、真实模型、真实宿主、安装、浏览器或外部写入。",
+    "source-read 不等于完整依赖闭包或行为评测通过；完整包 status 由主 owner 结合 findings 裁决。"
+  ],
+  "recovery_point": "补读 runner/preflight 未读分支及关键 artifact schema；用静态 fixture 分别验证 headless 正例、mode_unsupported、缺输入和 evidence 不充分出口，再单独做真实 App/宿主证据。",
+  "timing": {
+    "active_seconds": null,
+    "limitation": "恢复前未记录可靠的逐包审查耗时；不以工具墙钟时间伪造语义审查耗时。"
+  },
+  "record_correction": {
+    "at": "2026-09-20T05:55:01.016686+00:00",
+    "invalidated": "2026-09-20T05:24 的机械占位结论",
+    "replaced_by_actual_review_at": "2026-09-20T07:06:40.683772+00:00"
+  },
+  "reviewer_provenance": {
+    "reviewer": "cycle1_a_readiness",
+    "kind": "read-only-source-review",
+    "fresh_per_package_context": false,
+    "raw_return": "reviewer-returns/c1.json",
+    "raw_return_sha256": "02822623ed4eb85628acd1969fb484a13ee4e04be4367e5a660cd80b82f99e09"
+  },
+  "execution": {
+    "source_semantic_review": "ran",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "not-run",
+    "owner_probe_refs": []
+  },
+  "supporting_read_ranges": {},
+  "unconfirmed_read_ranges": []
+}

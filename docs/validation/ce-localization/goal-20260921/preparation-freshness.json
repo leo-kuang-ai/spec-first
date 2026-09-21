@@ -1,0 +1,94 @@
+{
+  "checked_at": "2026-09-21T10:28:33.775Z",
+  "recorded_source_binding": {
+    "head": "36d19d95c3a79df2d1278083c959bb34eadbde8c",
+    "dirty_path_manifest_sha256": "a8da405af0e4802b8cd33f4d5bf1a20e0ac2f25c4512819c3a5ec68da8038ac4",
+    "source_tree_hash": "07f432acaa8fe81c4ee938a00c97c6d7971c68d23e8136a6c36116ddba7400d7",
+    "inventory_hash": "7c89b7d03efe786abe6cfe6835aa812d7445527be928d180503a0c1ba07e07dc",
+    "inventory_artifact_sha256": "ea1ed38c4cf90f7c715d31d280a80d28eeddc6d3c0cdb1c0fa7e73a5025f57ed",
+    "review_input_hash": "244a150911cd4d7d6c10abe00b43ecb19b2413fa70d6fedc892af9ab90fd0664"
+  },
+  "current_source_binding": {
+    "head": "36d19d95c3a79df2d1278083c959bb34eadbde8c",
+    "dirty_path_manifest_sha256": "a8da405af0e4802b8cd33f4d5bf1a20e0ac2f25c4512819c3a5ec68da8038ac4",
+    "source_tree_hash": "52a93ab5db47299b45817db8dd3c9a8380ff72b01502dfb4d741bd906e2725e7",
+    "inventory_hash": "7c89b7d03efe786abe6cfe6835aa812d7445527be928d180503a0c1ba07e07dc",
+    "inventory_artifact_sha256": "235b1f9a24eb19f6d46ac0fad9b08ce6bae64e587031025eba41f3422cef30a2",
+    "review_input_hash": "a7d1609391c7e77773378503d1fe9ee05310b3b22f2ffa9b55a0d0e1ac83a5a6"
+  },
+  "binding_matches": false,
+  "changed_binding_fields": [
+    "source_tree_hash",
+    "inventory_artifact_sha256",
+    "review_input_hash"
+  ],
+  "reviewed_handoff_paths": [
+    {
+      "path": "skills/spec-handoff/evals/cases/create-produces-gate-fields.yaml",
+      "recorded_sha256": "174f8c1f56c45494d326183188da86821e7da6f0ee34c79c043c202814447546",
+      "current_sha256": "174f8c1f56c45494d326183188da86821e7da6f0ee34c79c043c202814447546"
+    },
+    {
+      "path": "skills/spec-handoff/evals/cases/resume-explicit-source-stops-without-acting.yaml",
+      "recorded_sha256": "985ba52b2479bf78ab5c87bb30fad7c92905d03f9d940187ee909ac3e9f1cc94",
+      "current_sha256": "985ba52b2479bf78ab5c87bb30fad7c92905d03f9d940187ee909ac3e9f1cc94"
+    },
+    {
+      "path": "skills/spec-handoff/evals/cases/resume-sparse-source-degraded-orientation.yaml",
+      "recorded_sha256": "8bc2922bab317dcc3ae399dbbcd9abfe8a9f7145344bc2169a666ed5750be9f1",
+      "current_sha256": "8bc2922bab317dcc3ae399dbbcd9abfe8a9f7145344bc2169a666ed5750be9f1"
+    },
+    {
+      "path": "skills/spec-handoff/evals/eval.yaml",
+      "recorded_sha256": "7e00141aae930f25300c517e65729afb5e2ac46c26c7c9f698676502658563c1",
+      "current_sha256": "7e00141aae930f25300c517e65729afb5e2ac46c26c7c9f698676502658563c1"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/docs/notes/2026-09-19-session.md",
+      "recorded_sha256": "89be9fd4002c4a782b583a6512750800ce33856336d9a3e4776df89ccf006272",
+      "current_sha256": "89be9fd4002c4a782b583a6512750800ce33856336d9a3e4776df89ccf006272"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/docs/notes/vague-progress.md",
+      "recorded_sha256": "6eef75dd77e37c6b4d4995b2fcbf53b16e374e2744331b6f2de9c97b28c3b1fc",
+      "current_sha256": "6eef75dd77e37c6b4d4995b2fcbf53b16e374e2744331b6f2de9c97b28c3b1fc"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/package.json",
+      "recorded_sha256": "03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b",
+      "current_sha256": "03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/README.md",
+      "recorded_sha256": "4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855",
+      "current_sha256": "4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/src/server.js",
+      "recorded_sha256": "ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34",
+      "current_sha256": "ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/scripts/check-create-artifact.sh",
+      "recorded_sha256": "661a25dcf207ddbdbfa032d1446abc9a324ce3d2dc48dfb1617be40ae303edbf",
+      "current_sha256": "661a25dcf207ddbdbfa032d1446abc9a324ce3d2dc48dfb1617be40ae303edbf"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/scripts/check-degraded-orientation.sh",
+      "recorded_sha256": "c4126bb8e20570011a881489b5b6aac9d0bb9ed54efc1afd80dde1bd6eb839ea",
+      "current_sha256": "c4126bb8e20570011a881489b5b6aac9d0bb9ed54efc1afd80dde1bd6eb839ea"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/scripts/check-resume-no-side-effects.sh",
+      "recorded_sha256": "62240c7fefb9005ca7913414957d9e82b1570b3f006a0fe12d7f7a1777a88c7f",
+      "current_sha256": "62240c7fefb9005ca7913414957d9e82b1570b3f006a0fe12d7f7a1777a88c7f"
+    },
+    {
+      "path": "skills/spec-handoff/SKILL.md",
+      "recorded_sha256": "4bc4a2e1da3aa5caa1e547c9f9d59410099823fa315c77f56c8e71ac7a5b6d6c",
+      "current_sha256": "4bc4a2e1da3aa5caa1e547c9f9d59410099823fa315c77f56c8e71ac7a5b6d6c"
+    }
+  ],
+  "changed_packet_paths": [],
+  "claim_ceiling": "本结果只证明采样时的hash新鲜度；不重绑既有语义判断。"
+}

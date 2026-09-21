@@ -11,6 +11,74 @@ const reviewScope = path.join(repoRoot, 'skills/spec-code-review/scripts/review-
 const findingsMechanics = path.join(repoRoot, 'skills/spec-code-review/scripts/findings-mechanics.py');
 
 describe('spec-code-review mechanical floor', () => {
+  test.each(['modify', 'delete', 'add', 'stage', 'outside', 'symlink', 'directory'])('任务未跟踪文件快照：%s', (action) => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-review-untracked-'));
+    try {
+      git(root, ['init', '-q']);
+      git(root, ['config', 'user.email', 'test@example.invalid']);
+      git(root, ['config', 'user.name', 'Fixture']);
+      git(root, ['config', 'core.hooksPath', '/dev/null']);
+      git(root, ['config', 'commit.gpgsign', 'false']);
+      fs.writeFileSync(path.join(root, 'base.js'), 'module.exports = 0;\n');
+      git(root, ['add', 'base.js']); git(root, ['commit', '-qm', 'base']);
+      const base = git(root, ['rev-parse', 'HEAD']).stdout.trim();
+      const owned = path.join(root, 'owned file.js');
+      if (action !== 'add') fs.writeFileSync(owned, 'module.exports = 1;\n');
+      const snapshot = path.join(root, 'snapshot.json');
+      const captured = runPython(reviewScope, ['--base', base, '--include-untracked', 'owned file.js', '--snapshot-out', snapshot], { cwd: root });
+      expect(captured.status).toBe(0);
+      expect(JSON.parse(captured.stdout)).toMatchObject({ status: 'complete', snapshot_written: true, lite_eligible: false });
+      if (action === 'modify' || action === 'add') fs.writeFileSync(owned, 'module.exports = 2;\n');
+      if (action === 'delete') fs.unlinkSync(owned);
+      if (action === 'stage') git(root, ['add', 'owned file.js']);
+      if (action === 'outside') fs.writeFileSync(path.join(root, 'unrelated.js'), 'outside\n');
+      if (action === 'symlink' || action === 'directory') {
+        fs.unlinkSync(owned);
+        if (action === 'symlink') fs.symlinkSync(path.join(root, 'base.js'), owned);
+        else fs.mkdirSync(owned);
+      }
+      const verified = JSON.parse(runPython(reviewScope, ['--verify-snapshot', snapshot], { cwd: root }).stdout);
+      if (action === 'symlink' || action === 'directory') {
+        expect(verified).toMatchObject({ status: 'unknown', mutation_detected: null });
+      } else {
+        expect(verified).toMatchObject({ status: 'complete', mutation_detected: action !== 'outside' });
+        if (action !== 'outside') expect(verified.mutated_paths).toContain('owned file.js');
+      }
+      const legacy = JSON.parse(fs.readFileSync(snapshot, 'utf8'));
+      legacy.schema_version = 'spec-code-review-scope-snapshot/v1';
+      fs.writeFileSync(snapshot, JSON.stringify(legacy));
+      expect(JSON.parse(runPython(reviewScope, ['--verify-snapshot', snapshot], { cwd: root }).stdout)).toMatchObject({ status: 'unknown', reason_code: 'scope_snapshot_invalid' });
+    } finally { fs.rmSync(root, { recursive: true, force: true }); }
+  });
+
+  test('非法 snapshot 结构与编码必须结构化 fail closed', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-invalid-snapshot-'));
+    try {
+      git(root, ['init', '-q']);
+      git(root, ['config', 'user.email', 'test@example.invalid']);
+      git(root, ['config', 'user.name', 'Fixture']);
+      git(root, ['-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false', 'commit', '--allow-empty', '-qm', 'base']);
+      const snapshot = path.join(root, 'snapshot.json');
+      expect(runPython(reviewScope, ['--base', 'HEAD', '--snapshot-out', snapshot], { cwd: root }).status).toBe(0);
+      const valid = JSON.parse(fs.readFileSync(snapshot, 'utf8'));
+      for (const patch of [
+        { changed_files: 1 }, { changed_files: ['x', 1] }, { changed_files: ['x', 'x'], files_changed: 2 },
+        { files_changed: -1 }, { files_changed: undefined }, { files_changed: false },
+        { base: [] }, { base: 'HEAD' }, { head: undefined }, { diff_sha256: 'bad' },
+        { included_untracked: undefined }, { included_untracked: { x: { kind: 'file', sha256: 'bad', mode: 420 } } },
+      ]) {
+        fs.writeFileSync(snapshot, JSON.stringify({ ...valid, ...patch }));
+        const result = runPython(reviewScope, ['--verify-snapshot', snapshot], { cwd: root });
+        expect(result.status).toBe(0);
+        expect(JSON.parse(result.stdout)).toMatchObject({ status: 'unknown', mutation_detected: null, reason_code: 'scope_snapshot_invalid' });
+      }
+      fs.writeFileSync(snapshot, Buffer.from([0xff]));
+      const result = runPython(reviewScope, ['--verify-snapshot', snapshot], { cwd: root });
+      expect(result.status).toBe(0);
+      expect(JSON.parse(result.stdout)).toMatchObject({ status: 'unknown', mutation_detected: null, reason_code: 'scope_snapshot_unreadable' });
+    } finally { fs.rmSync(root, { recursive: true, force: true }); }
+  });
+
   test('scope helper fails closed for an invalid endpoint', () => {
     const result = runPython(reviewScope, ['--base', 'definitely-missing-ref'], { cwd: repoRoot });
     expect(result.status).toBe(0);

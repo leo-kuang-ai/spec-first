@@ -1,0 +1,232 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "source_snapshot": "source-manifest.json",
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "coverage_commitment": "committed",
+  "dependency_closure": "partial",
+  "ran": true,
+  "exit_code": null,
+  "command_or_method": [
+    "冻结source的分支级人工语义审查；不是workflow执行"
+  ],
+  "claim_ceiling": "C0",
+  "owner": "project-lead-cycle-1",
+  "fresh_source_eval": "concerns",
+  "tests": "not-run",
+  "host_projection": "not-run",
+  "live_invocation": "not-run",
+  "redaction_status": "none-required",
+  "generated_at": "2026-09-20T03:07:08.791766+00:00",
+  "skill_name": "spec-work",
+  "entry_surface": "workflow_command",
+  "batch": "A",
+  "closure_tier": "L",
+  "closure_observed": {
+    "files": 47,
+    "bytes": 226651,
+    "read_package_files_at_least_partially": 12,
+    "read_supporting_files_at_least_partially": 3,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "status": "degraded",
+  "reason_codes": [
+    "dependency_closure_partial",
+    "live_execution_not_run"
+  ],
+  "source_paths": [
+    "skills/spec-work/SKILL.md",
+    "skills/spec-work/references/input-triage.md",
+    "skills/spec-work/references/workspace-setup.md",
+    "skills/spec-work/references/work-intake.md",
+    "skills/spec-work/references/non-code-execution.md",
+    "skills/spec-work/references/return-to-caller.md",
+    "skills/spec-work/references/implementation-loop.md",
+    "skills/spec-work/references/shipping-workflow.md",
+    "skills/spec-work/references/execution-strategy.md",
+    "skills/spec-work/references/review-findings-followup.md",
+    "skills/spec-work/scripts/source-plan-file-hash.cjs",
+    "skills/spec-work/scripts/working-tree-fingerprint.cjs",
+    "skills/spec-lfg/references/work-return.md",
+    "tests/unit/spec-work-front-controller-contracts.test.js",
+    "tests/unit/spec-work-consumer-chain-contracts.test.js"
+  ],
+  "source_read_ranges": {
+    "skills/spec-work/SKILL.md": "1-125",
+    "skills/spec-work/references/input-triage.md": "1-50",
+    "skills/spec-work/references/workspace-setup.md": "1-58",
+    "skills/spec-work/references/work-intake.md": "1-53",
+    "skills/spec-work/references/non-code-execution.md": "1-41",
+    "skills/spec-work/references/return-to-caller.md": "1-65",
+    "skills/spec-work/references/implementation-loop.md": "1-81",
+    "skills/spec-work/references/shipping-workflow.md": "1-275",
+    "skills/spec-work/references/execution-strategy.md": "1-115",
+    "skills/spec-work/references/review-findings-followup.md": "1-88",
+    "skills/spec-work/scripts/source-plan-file-hash.cjs": "1-91",
+    "skills/spec-work/scripts/working-tree-fingerprint.cjs": "1-122"
+  },
+  "source_hashes": {
+    "skills/spec-work/SKILL.md": "23b93489ad342412d484bc6a438d3eba2322e857d807daefe940cedac5a85451",
+    "skills/spec-work/references/input-triage.md": "d266b7d84db8bbe5c62d3cf93694486a700f0e813bf210788db01770dbabe3b6",
+    "skills/spec-work/references/workspace-setup.md": "7572e216f2d0abde44174f7a409ea9fda471894bc3a53c2315a61dc84171bfcf",
+    "skills/spec-work/references/work-intake.md": "28c1314a19b5f2d1ac661a3b47382e7a812c8e02d3a09532c1b0d80c3883c88a",
+    "skills/spec-work/references/non-code-execution.md": "6b6c4c7776258333c8d6be1e432f714a1c6b02b1677f0dec194355d758c49000",
+    "skills/spec-work/references/return-to-caller.md": "85dd95cdf84f8e814c17231950c9720c1d99516701290fbfed695fe12fde1d0c",
+    "skills/spec-work/references/implementation-loop.md": "79fda88492a2d04a82b5ca2f4ccba08720da2c9e5f10cada1baeb29482b344e4",
+    "skills/spec-work/references/shipping-workflow.md": "1d77e52ff8c894552d5515b7b75a514a2e384a4c5d4a3c3bc8478088bff825e9",
+    "skills/spec-work/references/execution-strategy.md": "a6a8c34fdf9fab9c6f888a657e6bb9b86c34dd2a0bfab1f6e0d2f6576b9f8d9b",
+    "skills/spec-work/references/review-findings-followup.md": "15484ad697e0a894becde3ac0a81d50197c5467f42ed7dfd99f69a43412cf9d4",
+    "skills/spec-work/scripts/source-plan-file-hash.cjs": "84f9febee7627cc267b46e555ad25baf7795edae7df54c2790b2553b7931a586",
+    "skills/spec-work/scripts/working-tree-fingerprint.cjs": "62c6d6a47d6fde296225a6d9063bac841e630b13bc0e44f5a24c491ef8658cb3",
+    "skills/spec-lfg/references/work-return.md": "27fd6cfed628aaa678061f513b778a8c9b9c67634fb982d92afafe83c69135eb",
+    "tests/unit/spec-work-front-controller-contracts.test.js": "6b32ddf0ed20c4af31675333080438eb47a7a1e69af5da17350c11b7f7b3381e",
+    "tests/unit/spec-work-consumer-chain-contracts.test.js": "23177bc229354a500859730d23d65cbd9cff07a45e044d0a1fb6386769958e9c"
+  },
+  "source_refs": [
+    "skills/spec-work/SKILL.md",
+    "skills/spec-work/references/input-triage.md",
+    "skills/spec-work/references/workspace-setup.md",
+    "skills/spec-work/references/work-intake.md",
+    "skills/spec-work/references/non-code-execution.md",
+    "skills/spec-work/references/return-to-caller.md",
+    "skills/spec-work/references/implementation-loop.md",
+    "skills/spec-work/references/shipping-workflow.md",
+    "skills/spec-work/references/execution-strategy.md",
+    "skills/spec-work/references/review-findings-followup.md",
+    "skills/spec-work/scripts/source-plan-file-hash.cjs",
+    "skills/spec-work/scripts/working-tree-fingerprint.cjs",
+    "skills/spec-lfg/references/work-return.md",
+    "tests/unit/spec-work-front-controller-contracts.test.js",
+    "tests/unit/spec-work-consumer-chain-contracts.test.js"
+  ],
+  "evidence_paths": [
+    "skills/spec-work/SKILL.md",
+    "skills/spec-work/references/input-triage.md",
+    "skills/spec-work/references/workspace-setup.md",
+    "skills/spec-work/references/work-intake.md",
+    "skills/spec-work/references/non-code-execution.md",
+    "skills/spec-work/references/return-to-caller.md",
+    "skills/spec-work/references/implementation-loop.md",
+    "skills/spec-work/references/shipping-workflow.md",
+    "skills/spec-work/references/execution-strategy.md",
+    "skills/spec-work/references/review-findings-followup.md",
+    "skills/spec-work/scripts/source-plan-file-hash.cjs",
+    "skills/spec-work/scripts/working-tree-fingerprint.cjs",
+    "skills/spec-lfg/references/work-return.md",
+    "tests/unit/spec-work-front-controller-contracts.test.js",
+    "tests/unit/spec-work-consumer-chain-contracts.test.js"
+  ],
+  "branches": [
+    {
+      "id": "B1",
+      "trigger": "positive",
+      "owner": "skills/spec-work",
+      "expected_output": "active/readiness/dirty/owner明确后执行",
+      "source_ref": "skills/spec-work/references/input-triage.md:28-46",
+      "status": "source-covered",
+      "negative_paths": [
+        "缺输入/权限/验证则诚实停止或降级"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "B2",
+      "trigger": "negative",
+      "owner": "skills/spec-work",
+      "expected_output": "requirements-only/non-active交回plan；症状进入debug",
+      "source_ref": "skills/spec-work/references/work-intake.md:19-35",
+      "status": "source-covered",
+      "negative_paths": [
+        "缺输入/权限/验证则诚实停止或降级"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "B3",
+      "trigger": "output",
+      "owner": "skills/spec-work",
+      "expected_output": "完整envelope供LFG校验status/summary/fingerprint",
+      "source_ref": "skills/spec-work/references/return-to-caller.md:29-65",
+      "status": "source-covered",
+      "negative_paths": [
+        "缺输入/权限/验证则诚实停止或降级"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "B4",
+      "trigger": "stop",
+      "owner": "skills/spec-work",
+      "expected_output": "required proof失败/遗漏不complete",
+      "source_ref": "skills/spec-work/references/shipping-workflow.md:128-200",
+      "status": "source-covered",
+      "negative_paths": [
+        "缺输入/权限/验证则诚实停止或降级"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "B5",
+      "trigger": "recovery",
+      "owner": "skills/spec-work",
+      "expected_output": "inline降级；恢复重验当前树；commit/landing独立",
+      "source_ref": "skills/spec-work/references/execution-strategy.md:27-115",
+      "status": "source-covered",
+      "negative_paths": [
+        "缺输入/权限/验证则诚实停止或降级"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    }
+  ],
+  "consumers": [
+    "spec-lfg",
+    "spec-work"
+  ],
+  "findings": [],
+  "limitations": [
+    "Task Pack/engine/feedback/quality/tracker/Figma引用及CLI producer未全读",
+    "测试仅阅读，runtime与真实caller恢复未运行",
+    "branch passed仅指所列源码语义连通，不是运行通过。"
+  ],
+  "recovery_point": "Task Pack/engine/feedback/quality/tracker/Figma引用及CLI producer未全读",
+  "reviewer": "cycle1_a_exit",
+  "reviewer_adjudication": "主owner确认分支与consumer引证；闭包缺口保留。",
+  "budget_minutes": [
+    60,
+    90
+  ],
+  "timing": {
+    "started_at": "2026-09-20T01:17:27Z",
+    "ended_at": "2026-09-20T03:00:05Z",
+    "batch_wall_seconds": 6158,
+    "per_skill_active_seconds": null,
+    "limitation": "429暂停且交叉阅读；不作单包主动耗时校准。"
+  },
+  "execution": {
+    "source_semantic_review": "ran",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "not-run"
+  },
+  "reviewer_provenance": {
+    "reviewer": "cycle1_a_exit",
+    "kind": "read-only-source-review",
+    "independent_of_product_source_author": true,
+    "limitation": "有界源码审查；不是每包新建盲评上下文，也不证明宿主行为"
+  },
+  "supporting_read_ranges": {
+    "skills/spec-lfg/references/work-return.md": "1-32",
+    "tests/unit/spec-work-front-controller-contracts.test.js": "1-111",
+    "tests/unit/spec-work-consumer-chain-contracts.test.js": "1-65"
+  },
+  "unconfirmed_read_ranges": []
+}

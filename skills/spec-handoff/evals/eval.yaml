@@ -9,6 +9,9 @@ engine:
 cases:
   files:
     - evals/cases/ordinary-continuation-not-triggered.yaml
+    - evals/cases/create-produces-gate-fields.yaml
+    - evals/cases/resume-explicit-source-stops-without-acting.yaml
+    - evals/cases/resume-sparse-source-degraded-orientation.yaml
 defaults:
   timeout_seconds: 480
   max_turns: 12

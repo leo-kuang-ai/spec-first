@@ -48,3 +48,7 @@ caller-authorized local change, and passed required verification. Failed,
 not-run, stale-head, incomplete pagination, or missing-source evidence cannot
 be upgraded to a successful fix. The outer caller owns final verification,
 fingerprinting, commit, push, durable handoff, and another watch snapshot.
+
+If implementation became blocked after writing, retain the actual modified paths
+and failed/not-run checks in a `needs-human` fix entry and the typed residual.
+Do not replace a remaining local diff with an empty `changed_files` array.

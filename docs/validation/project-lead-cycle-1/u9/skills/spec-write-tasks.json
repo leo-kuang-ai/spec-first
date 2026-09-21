@@ -1,0 +1,169 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "generated_at": "2026-09-20T07:35:36.158199+00:00",
+  "skill_name": "spec-write-tasks",
+  "source_snapshot": "source-manifest.json",
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "source_paths": [
+    "skills/spec-write-tasks/SKILL.md",
+    "skills/spec-write-tasks/references/task-pack-schema.md",
+    "skills/spec-write-tasks/references/task-quality-guide.md",
+    "skills/spec-write-tasks/references/execution-handoff-contract.md",
+    "tests/unit/spec-write-tasks-contracts.test.js",
+    "skills/spec-work/references/work-intake-and-task-pack.md"
+  ],
+  "source_read_ranges": {
+    "skills/spec-write-tasks/SKILL.md": "1-141",
+    "skills/spec-write-tasks/references/task-pack-schema.md": "1-345",
+    "skills/spec-write-tasks/references/task-quality-guide.md": "1-125",
+    "skills/spec-write-tasks/references/execution-handoff-contract.md": "1-139"
+  },
+  "source_hashes": {
+    "skills/spec-write-tasks/SKILL.md": "ad4decabc11124b24bfe45b850ba1f4e959f86340159bb5ebdbd90bc8e04c8e2",
+    "skills/spec-write-tasks/references/task-pack-schema.md": "328f458f4493b5f5a99e00bcb8cf283a4e22c4d1ac07b03bbbba7d9c40a96644",
+    "skills/spec-write-tasks/references/task-quality-guide.md": "034a3d3a5aac53aa22a7149467c9724d6a7f882e15cf3cbe51597e1637bd4f96",
+    "skills/spec-write-tasks/references/execution-handoff-contract.md": "543d4a4bcea92d1127dd615cf72ffda2125ae5ae6645d3d1531d59d3cc65ec1b",
+    "tests/unit/spec-write-tasks-contracts.test.js": "02aca7b8683ae271611359ba0f4449f05b0720af94ccb451c838560c71171c40",
+    "skills/spec-work/references/work-intake-and-task-pack.md": "57db393caa33fd44d5f7fe27c762758fe1d4ee42207aa1e806bbe5702bb54303"
+  },
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "entry_surface": "workflow_command",
+  "batch": "B",
+  "closure_tier": "M",
+  "closure_observed": {
+    "files": 23,
+    "bytes": 102605,
+    "read_package_files_at_least_partially": 4,
+    "read_supporting_files_at_least_partially": 2,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "coverage_commitment": "committed",
+  "dependency_closure": "partial",
+  "status": "degraded",
+  "reason_codes": [
+    "bounded_source_review",
+    "dependency_closure_partial",
+    "workflow_not_run"
+  ],
+  "command_or_method": [
+    "只读reviewer逐包阅读冻结source并判断五分支；主owner整合与回源裁决，不是盲评或workflow执行。"
+  ],
+  "ran": true,
+  "exit_code": null,
+  "evidence_paths": [
+    "reviewer-returns/b.json"
+  ],
+  "source_refs": [
+    "skills/spec-write-tasks/SKILL.md",
+    "skills/spec-write-tasks/references/task-pack-schema.md",
+    "skills/spec-write-tasks/references/task-quality-guide.md",
+    "skills/spec-write-tasks/references/execution-handoff-contract.md",
+    "tests/unit/spec-write-tasks-contracts.test.js",
+    "skills/spec-work/references/work-intake-and-task-pack.md"
+  ],
+  "owner": "project-lead-cycle-1",
+  "consumers": [
+    "周期1主审查",
+    "对应上游/下游workflow（以SKILL文档声明为准）"
+  ],
+  "branches": [
+    {
+      "id": "entry_positive",
+      "status": "source-covered",
+      "judgment": "已收敛本地 plan 或 task pack 验证进入可选派生层；plan 保持唯一源，不执行代码。",
+      "source_refs": [
+        "skills/spec-write-tasks/SKILL.md:8-20",
+        "skills/spec-write-tasks/SKILL.md:56-67"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "near_neighbor_negative",
+      "status": "source-covered",
+      "judgment": "未决范围返回 spec-plan；小计划可以跳过；拒绝 generated runtime mirror、通用任务清单和远程任务列表。",
+      "source_refs": [
+        "skills/spec-write-tasks/SKILL.md:18-32",
+        "skills/spec-write-tasks/SKILL.md:128-135"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "output_consumer",
+      "status": "source-covered",
+      "judgment": "compile/validate envelope 交给 spec-work；高风险包建议有界 report-only spec-doc-review，并消费结构化 task_pack_outcome。",
+      "source_refs": [
+        "skills/spec-write-tasks/SKILL.md:89-120",
+        "skills/spec-write-tasks/references/execution-handoff-contract.md:42-95",
+        "skills/spec-work/references/work-intake-and-task-pack.md:1-31"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "critical_error_stop",
+      "status": "source-covered",
+      "judgment": "非 active plan、陈旧/错误链/不可验证 hash、无效合同或缺 repo scope 时，阻止可执行交接；需要 CLI 证据。",
+      "source_refs": [
+        "skills/spec-write-tasks/SKILL.md:38-44",
+        "skills/spec-write-tasks/SKILL.md:67-68",
+        "skills/spec-write-tasks/references/execution-handoff-contract.md:53-78"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "degraded_recovery_handoff",
+      "status": "source-covered",
+      "judgment": "CLI 不可用时降为 draft-only；语义质量归 LLM；无效或陈旧包返回 producer 或 plan owner，不推测任务。",
+      "source_refs": [
+        "skills/spec-write-tasks/references/execution-handoff-contract.md:47-78",
+        "skills/spec-work/references/work-intake-and-task-pack.md:25-33"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    }
+  ],
+  "findings": [],
+  "fresh_source_eval": "not-run",
+  "claim_ceiling": "C0",
+  "limitations": [
+    "task-quality-guide 126 行以后未读；task-pack CLI 实现、命令测试及 eval 未完成闭包。",
+    "tests、host projection、fresh-source eval 和 live invocation 均为 not-run。",
+    "原机械占位结论已撤销；source-covered仅证明已读范围可追踪，不证明运行通过。",
+    "未确认读取范围不计覆盖；哈希只证明字节。"
+  ],
+  "recovery_point": "在具备对应授权的独立验证阶段运行 tasks validate/hash 和 spec-work intake tests。",
+  "timing": {
+    "active_seconds": null,
+    "limitation": "逐包主动时间不可可靠恢复，未用工具墙钟估算。"
+  },
+  "record_correction": {
+    "at": "2026-09-20T05:55:01.024752+00:00",
+    "invalidated": "2026-09-20T05:24 的机械占位结论",
+    "replaced_by_actual_review_at": "2026-09-20T07:35:36.158199+00:00"
+  },
+  "supporting_read_ranges": {
+    "tests/unit/spec-write-tasks-contracts.test.js": "1-85",
+    "skills/spec-work/references/work-intake-and-task-pack.md": "1-90"
+  },
+  "unconfirmed_read_ranges": [],
+  "reviewer_provenance": {
+    "reviewer": "cycle1_a_exit",
+    "kind": "read-only-source-review",
+    "fresh_per_package_context": false,
+    "raw_return": "reviewer-returns/b.json",
+    "raw_return_sha256": "74c86ff4af0bab17fbeb82f390cf57eb33590df5a24910b9823d19382480563c"
+  },
+  "execution": {
+    "source_semantic_review": "ran",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "not-run"
+  }
+}

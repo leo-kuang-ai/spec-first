@@ -1,0 +1,160 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "generated_at": "2026-09-20T07:06:40.683772+00:00",
+  "skill_name": "spec-dogfood",
+  "source_snapshot": "source-manifest.json",
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "source_paths": [
+    "skills/spec-dogfood/SKILL.md",
+    "skills/spec-dogfood/references/phases.md",
+    "skills/spec-dogfood/references/dogfood-report-template.md",
+    "skills/spec-dogfood/references/test-matrix-taxonomy.md"
+  ],
+  "source_read_ranges": {
+    "skills/spec-dogfood/SKILL.md": "1-99",
+    "skills/spec-dogfood/references/phases.md": "1-142",
+    "skills/spec-dogfood/references/dogfood-report-template.md": "1-81",
+    "skills/spec-dogfood/references/test-matrix-taxonomy.md": "1-62"
+  },
+  "source_hashes": {
+    "skills/spec-dogfood/SKILL.md": "9e5057e8670a5a9073b27e8051c0a669d759065ec1997a371d618719b2023a88",
+    "skills/spec-dogfood/references/phases.md": "20ae144c6b187477aafa1c4c7a2706436b19ff77702dcbf6a5e150560a7fbb45",
+    "skills/spec-dogfood/references/dogfood-report-template.md": "a7bbe4918c5c8b818e90e2061ed92f6c256bb0383b177b857213b649057402fc",
+    "skills/spec-dogfood/references/test-matrix-taxonomy.md": "dbb9951a04279575dd7a6bfcf62a53626fdd6a4bcac98e5f5706f837a3ae357d"
+  },
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "entry_surface": "workflow_command",
+  "batch": "C1",
+  "closure_tier": "S",
+  "closure_observed": {
+    "files": 15,
+    "bytes": 41664,
+    "read_package_files_at_least_partially": 4,
+    "read_supporting_files_at_least_partially": 0,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "coverage_commitment": "committed",
+  "dependency_closure": "partial",
+  "status": "degraded",
+  "reason_codes": [
+    "bounded_dependency_closure",
+    "tests_not_run",
+    "host_projection_not_run"
+  ],
+  "command_or_method": [
+    "独立于被审源码作者的只读reviewer逐包阅读实际source并判断五分支；主owner回源裁决finding，非盲评或真实workflow运行。"
+  ],
+  "ran": true,
+  "exit_code": null,
+  "evidence_paths": [
+    "reviewer-returns/c1.json"
+  ],
+  "source_refs": [
+    "skills/spec-dogfood/SKILL.md",
+    "skills/spec-dogfood/references/phases.md",
+    "skills/spec-dogfood/references/dogfood-report-template.md",
+    "skills/spec-dogfood/references/test-matrix-taxonomy.md"
+  ],
+  "owner": "project-lead-cycle-1",
+  "consumers": [
+    "周期1主审查",
+    "对应上游/下游workflow（以SKILL文档声明为准）"
+  ],
+  "branches": [
+    {
+      "id": "entry_positive",
+      "status": "source-covered",
+      "judgment": "dogfood 按 diff 选择影响流，flow-first 的 scenario ledger 与 test matrix 使探索范围有来源；hands-off 执行仍需保持精确任务和浏览器 origin scope。",
+      "source_refs": [
+        "skills/spec-dogfood/SKILL.md:1-99",
+        "skills/spec-dogfood/references/phases.md:1-142",
+        "skills/spec-dogfood/references/test-matrix-taxonomy.md:1-62"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "near_neighbor_negative",
+      "status": "source-covered",
+      "judgment": "浏览器可用、页面可打开或发现问题本身，不赋予超出 origin 的浏览器操作或源码修复权限；effect authorization 与 fix authorization 分开表达。",
+      "source_refs": [
+        "skills/spec-dogfood/SKILL.md:1-99",
+        "skills/spec-dogfood/references/phases.md:1-142"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "output_consumer",
+      "status": "source-covered",
+      "judgment": "report template 保存覆盖 scenario、发现、证据与限制，给上游实施/审查 workflow 消费；探索命中和未跑路径应分开，不能以截图或页面启动成功替代流程验收。",
+      "source_refs": [
+        "skills/spec-dogfood/references/dogfood-report-template.md:1-81",
+        "skills/spec-dogfood/references/test-matrix-taxonomy.md:1-62"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "failure_stop",
+      "status": "source-covered",
+      "judgment": "exact-origin browser owner、effect/fix authorization 和 automated suite gate 共同限制副作用与 closeout；已读合同没有要求在权限或验证缺口时自动放行。未执行 browser owner 依赖闭包。",
+      "source_refs": [
+        "skills/spec-dogfood/references/phases.md:1-142",
+        "skills/spec-dogfood/SKILL.md:1-99"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "recovery_handoff_closeout",
+      "status": "source-covered",
+      "judgment": "resume checkpoint 允许恢复已知 scenario 进展，最终仍需自动化测试与报告限制相符。没有运行 server/browser/worktree，当前无法判断视觉表现、实际用户流程或复现稳定性。",
+      "source_refs": [
+        "skills/spec-dogfood/references/phases.md:1-142",
+        "skills/spec-dogfood/references/dogfood-report-template.md:1-81"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    }
+  ],
+  "findings": [],
+  "fresh_source_eval": "not-run",
+  "claim_ceiling": "C0",
+  "limitations": [
+    "全部 browser dependency、其余 reference 与测试闭包未完整审查。",
+    "未执行 server/browser/worktree/Git mutation，也无真实 UI/视觉证据。",
+    "本 worker 仅进行有界 source review；未执行被审 workflow、真实模型、真实宿主、安装、浏览器或外部写入。",
+    "source-read 不等于完整依赖闭包或行为评测通过；完整包 status 由主 owner 结合 findings 裁决。"
+  ],
+  "recovery_point": "补齐 exact-origin owner 和 resume/closeout 下游引用；用可控本地 App 验证只读浏览、需 effect 授权的动作、未授权 fix 停止及 checkpoint 恢复，再独立运行自动化 suite。",
+  "timing": {
+    "active_seconds": null,
+    "limitation": "恢复前未记录可靠的逐包审查耗时；不以工具墙钟时间伪造语义审查耗时。"
+  },
+  "record_correction": {
+    "at": "2026-09-20T05:55:01.019963+00:00",
+    "invalidated": "2026-09-20T05:24 的机械占位结论",
+    "replaced_by_actual_review_at": "2026-09-20T07:06:40.683772+00:00"
+  },
+  "reviewer_provenance": {
+    "reviewer": "cycle1_a_readiness",
+    "kind": "read-only-source-review",
+    "fresh_per_package_context": false,
+    "raw_return": "reviewer-returns/c1.json",
+    "raw_return_sha256": "02822623ed4eb85628acd1969fb484a13ee4e04be4367e5a660cd80b82f99e09"
+  },
+  "execution": {
+    "source_semantic_review": "ran",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "not-run",
+    "owner_probe_refs": []
+  },
+  "supporting_read_ranges": {},
+  "unconfirmed_read_ranges": []
+}

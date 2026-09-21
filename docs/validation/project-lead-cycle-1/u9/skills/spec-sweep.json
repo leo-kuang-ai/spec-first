@@ -1,0 +1,166 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "generated_at": "2026-09-20T07:06:40.683772+00:00",
+  "skill_name": "spec-sweep",
+  "source_snapshot": "source-manifest.json",
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "source_paths": [
+    "skills/spec-sweep/SKILL.md",
+    "skills/spec-sweep/references/run.md",
+    "skills/spec-sweep/references/state-schema.md",
+    "skills/spec-sweep/references/plan-template.md",
+    "skills/spec-sweep/scripts/sweep-state.py"
+  ],
+  "source_read_ranges": {
+    "skills/spec-sweep/SKILL.md": "1-124",
+    "skills/spec-sweep/references/run.md": "1-90",
+    "skills/spec-sweep/references/state-schema.md": "1-212",
+    "skills/spec-sweep/references/plan-template.md": "1-63",
+    "skills/spec-sweep/scripts/sweep-state.py": "1-70,270-350,391-565,770-814"
+  },
+  "source_hashes": {
+    "skills/spec-sweep/SKILL.md": "b2a87ee7f920913986c8a0a80a4f3aec988025cf25cb794f941af7570bd9d484",
+    "skills/spec-sweep/references/run.md": "78c3660046d6cd3c578fe4591ebf3f7f1173bb119b347a3ed2edab1429d97d0b",
+    "skills/spec-sweep/references/state-schema.md": "6631b3b20c0ef2f49b676ecc2cb2e08b548df5c870640130e4669585da0828e8",
+    "skills/spec-sweep/references/plan-template.md": "c750e1b29a304abee10d4eabddb33bb973f2163ca6f9196cfd21a83179c3ef52",
+    "skills/spec-sweep/scripts/sweep-state.py": "dfeb18f5bdec0b38d9658ce57bf9cbd2b90b4cebd18e09e852a526a0c56a64d0"
+  },
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "entry_surface": "standalone_skill",
+  "batch": "C1",
+  "closure_tier": "M",
+  "closure_observed": {
+    "files": 20,
+    "bytes": 173699,
+    "read_package_files_at_least_partially": 5,
+    "read_supporting_files_at_least_partially": 0,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "coverage_commitment": "committed",
+  "dependency_closure": "partial",
+  "status": "degraded",
+  "reason_codes": [
+    "bounded_dependency_closure",
+    "tests_not_run",
+    "host_projection_not_run"
+  ],
+  "command_or_method": [
+    "独立于被审源码作者的只读reviewer逐包阅读实际source并判断五分支；主owner回源裁决finding，非盲评或真实workflow运行。"
+  ],
+  "ran": true,
+  "exit_code": null,
+  "evidence_paths": [
+    "reviewer-returns/c1.json"
+  ],
+  "source_refs": [
+    "skills/spec-sweep/SKILL.md",
+    "skills/spec-sweep/references/run.md",
+    "skills/spec-sweep/references/state-schema.md",
+    "skills/spec-sweep/references/plan-template.md",
+    "skills/spec-sweep/scripts/sweep-state.py"
+  ],
+  "owner": "project-lead-cycle-1",
+  "consumers": [
+    "周期1主审查",
+    "对应上游/下游workflow（以SKILL文档声明为准）"
+  ],
+  "branches": [
+    {
+      "id": "entry_positive",
+      "status": "source-covered",
+      "judgment": "入口依据已配置反馈源收集增量反馈，state engine 负责 lease、cursor 和去重等确定性状态；计划与任务判断由 workflow 语义层处理。",
+      "source_refs": [
+        "skills/spec-sweep/SKILL.md:1-124",
+        "skills/spec-sweep/references/run.md:1-90",
+        "skills/spec-sweep/scripts/sweep-state.py:270-350"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "near_neighbor_negative",
+      "status": "source-covered",
+      "judgment": "未配置来源、缺少外部读写授权或超出 sweep scope 的材料不能静默纳入；shared branch 的写入和 landing 有独立 gate，反馈接入本身不授予提交权限。",
+      "source_refs": [
+        "skills/spec-sweep/SKILL.md:1-124",
+        "skills/spec-sweep/references/run.md:1-90",
+        "skills/spec-sweep/references/plan-template.md:1-63"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "output_consumer",
+      "status": "source-covered",
+      "judgment": "state schema 显式保存来源、cursor/ack 与处理状态；敏感信息需脱敏，计划与 close evidence 为后续执行和复核提供可回源输出。",
+      "source_refs": [
+        "skills/spec-sweep/references/state-schema.md:1-212",
+        "skills/spec-sweep/references/plan-template.md:1-63"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "failure_stop",
+      "status": "source-covered",
+      "judgment": "已读状态逻辑体现 lease、顺序化 ack/cursor 与 close evidence 边界，避免反馈尚未完成时提前承诺已处理。未读完整脚本，不能把局部路径审查外推为并发与 crash recovery 已通过。",
+      "source_refs": [
+        "skills/spec-sweep/scripts/sweep-state.py:391-565",
+        "skills/spec-sweep/scripts/sweep-state.py:770-814",
+        "skills/spec-sweep/references/state-schema.md:1-212"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "recovery_handoff_closeout",
+      "status": "source-covered",
+      "judgment": "恢复依赖持久化 state 与 lease/close evidence，而非对话口头声明；本轮没有调用 Slack/GitHub/email、媒体分析或转录，因此外部来源失败、重复投递及真实关闭顺序仍需验证。",
+      "source_refs": [
+        "skills/spec-sweep/references/run.md:1-90",
+        "skills/spec-sweep/references/state-schema.md:1-212"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    }
+  ],
+  "findings": [],
+  "fresh_source_eval": "not-run",
+  "claim_ceiling": "C0",
+  "limitations": [
+    "sweep-state.py 未读区间和全部 tests 未完成。",
+    "Slack/GitHub/email、media analyzer、transcription、commit/push 均未执行。",
+    "本 worker 仅进行有界 source review；未执行被审 workflow、真实模型、真实宿主、安装、浏览器或外部写入。",
+    "source-read 不等于完整依赖闭包或行为评测通过；完整包 status 由主 owner 结合 findings 裁决。"
+  ],
+  "recovery_point": "补齐 lease/cursor/ack 的未读实现，用并发 fixture 与中断恢复用例验证不丢事件和不提前 ack；真实外部来源验证需独立保留授权与结果证据。",
+  "timing": {
+    "active_seconds": null,
+    "limitation": "恢复前未记录可靠的逐包审查耗时；不以工具墙钟时间伪造语义审查耗时。"
+  },
+  "record_correction": {
+    "at": "2026-09-20T05:55:01.023656+00:00",
+    "invalidated": "2026-09-20T05:24 的机械占位结论",
+    "replaced_by_actual_review_at": "2026-09-20T07:06:40.683772+00:00"
+  },
+  "reviewer_provenance": {
+    "reviewer": "cycle1_a_readiness",
+    "kind": "read-only-source-review",
+    "fresh_per_package_context": false,
+    "raw_return": "reviewer-returns/c1.json",
+    "raw_return_sha256": "02822623ed4eb85628acd1969fb484a13ee4e04be4367e5a660cd80b82f99e09"
+  },
+  "execution": {
+    "source_semantic_review": "ran",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "not-run",
+    "owner_probe_refs": []
+  },
+  "supporting_read_ranges": {},
+  "unconfirmed_read_ranges": []
+}

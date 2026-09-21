@@ -1,0 +1,61 @@
+{
+  "checked_at": "2026-09-21",
+  "legacy_reproduction": {
+    "old_resume_accepted_modified_file": true,
+    "old_degraded_accepted_modified_file": true,
+    "old_create_accepted_fake_receipt": true
+  },
+  "new_cases": {
+    "resume_clean": {
+      "code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "resume_modified": {
+      "code": 1,
+      "stdout": "fixture file changed: README.md",
+      "stderr": ""
+    },
+    "resume_extra": {
+      "code": 1,
+      "stdout": "resume 产生了额外或缺失文件",
+      "stderr": ""
+    },
+    "resume_index": {
+      "code": 1,
+      "stdout": "resume 修改了 git index",
+      "stderr": ""
+    },
+    "resume_commit": {
+      "code": 1,
+      "stdout": "resume 产生了提交",
+      "stderr": ""
+    },
+    "degraded_clean": {
+      "code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "degraded_modified": {
+      "code": 1,
+      "stdout": "fixture file changed: src/server.js",
+      "stderr": ""
+    },
+    "create_valid": {
+      "code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "create_fake_digest": {
+      "code": 1,
+      "stdout": "",
+      "stderr": "汇报未包含实际 artifact SHA-256"
+    },
+    "create_wrong_invocation": {
+      "code": 1,
+      "stdout": "",
+      "stderr": "汇报未包含指向实际 artifact 的精确 resume 调用"
+    }
+  },
+  "claim_ceiling": "本证据只覆盖脚本在固定 fixture 上的确定性断言；未运行真实模型、宿主或 field task。"
+}

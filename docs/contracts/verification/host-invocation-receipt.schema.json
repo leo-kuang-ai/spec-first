@@ -27,6 +27,13 @@
     "reason_code": { "type": "string", "minLength": 1 },
     "host": { "enum": ["claude", "codex", "cursor", "kiro", "qoder", "opencode", "zcode", "pi"] },
     "loaded_host": { "type": ["string", "null"] },
+    "surface_hosts": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": ["claude", "codex", "cursor", "kiro", "qoder", "opencode", "zcode", "pi"]
+      }
+    },
     "surface_id": { "type": ["string", "null"] },
     "skill_root": { "type": "string", "minLength": 1 },
     "canonical_entry_name": { "const": "spec-runtime-setup" },

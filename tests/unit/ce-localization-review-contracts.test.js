@@ -3,6 +3,9 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const crypto = require('node:crypto');
+const { execFileSync } = require('node:child_process');
+const repoRoot = path.resolve(__dirname, '../..');
 
 const producer = require('../../scripts/check-ce-localization-review.cjs');
 
@@ -16,14 +19,25 @@ describe('CE localization deterministic review producer', () => {
       'check-spiral-auth.cjs',
     ].join('/');
 
-    expect(inventory.skill_count).toBe(38);
-    // 692 = 676 + spec-ideate/using-spec-first eval 资产与断言脚本进入 inventory 源集（2026-08-31 批次）
-    // 1122 = 1029 + CE-129 提交同步补审批次（2026-09-10，peer-runner 扩展/优化脚本/模板与新增校验资产，+93 包路径）
-    // Runtime Setup 新增 npm warmup、source snapshot、CodeGraph launcher 与 artifact evidence 四个 owner。
-    // 1127 = 1126 + 2026-09-13 修复批次抽取 lib/host-config-repair-command.cjs 单一实现（DR-015 去重）。
-    // 1128 = 1127 + 2026-09-13 repair-loop 批次新增有界修复循环单一实现（动作由 registry 提供，不合成命令）。
-    // 2026-09-15 FSA2：refresh 专属词汇流程新增一个包文件；只读 case 更名不改变数量。
-    expect(inventory.package_path_count).toBe(1129);
+    // 独立枚举 Git 可见的正规 package 文件；不以 producer 自报数量证明完整性。
+    const candidates = [...new Set(execFileSync('git', [
+      '-C', repoRoot, 'ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', 'skills',
+    ], { encoding: 'utf8' }).split('\0').filter(Boolean))].filter((name) => {
+      try { return fs.lstatSync(path.join(repoRoot, name)).isFile(); } catch { return false; }
+    });
+    const skills = candidates.filter((name) => /^skills\/[^/]+\/SKILL\.md$/.test(name))
+      .map((name) => name.split('/')[1]).sort();
+    const expectedPaths = candidates.filter((name) => skills.includes(name.split('/')[1])).sort();
+    expect(inventory.skills.map((entry) => entry.skill_id).sort()).toEqual(skills);
+    expect(inventory.skill_count).toBe(skills.length);
+    expect(inventory.files.map((entry) => entry.path).sort()).toEqual(expectedPaths);
+    expect(inventory.package_path_count).toBe(expectedPaths.length);
+    for (const entry of inventory.files) {
+      const bytes = fs.readFileSync(path.join(repoRoot, entry.path));
+      expect(entry.owning_skill).toBe(entry.path.split('/')[1]);
+      expect(entry.sha256).toBe(crypto.createHash('sha256').update(bytes).digest('hex'));
+      expect(entry.bytes).toBe(bytes.length);
+    }
     expect(inventory.files).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',
@@ -41,45 +55,47 @@ describe('CE localization deterministic review producer', () => {
       terminal_disposition: 'included-canonical-skill-source',
     }));
     expect(coverage.coverage_summary.missing_path_count).toBe(0);
-    // 2026-08-21: 186 -> 187 / 392 -> 393 after adding
-    // tests/unit/spec-prd-finding-schema-freeze.test.js, which the coverage
-    // producer picks up as one additional spec-prd `focused-test-name` relation.
-    // 2026-08-28: 187 -> 189 / 393 -> 402 after adding skills/spec-project-rules
-    // (new focused test + shared governance/project-graph relations);
-    // 189 -> 190 / 402 -> 403 after adding its deterministic scripts test.
-    // 2026-08-29: 575 -> 617 after adding skill-up eval assets; 617 -> 616 after v2 removed verify-deps.cjs
-    // (eval.yaml + 3 cases + 2 fixture repos + 3 judge scripts); 616 -> 612 after the review-hardening
-    // pass retired the five-file fixture KB into single-file docs/architecture.md (net -4);
-    // 612 -> 650 after the darwin/governance rounds expanded behavior evals to 9 cases
-    // (+6 case yamls, +6 judge scripts, single-end fixture, generated large-repo fixture,
-    // multi-end-embedded fixture, evals/README);
-    // 650 -> 676 after committing exposed previously-untracked sources to the
-    // inventory (2 plans, 3 review deltas, spec-project-rules validation reports).
-    // 2026-09-04 (01fad369): 190 -> 191 / 403 -> 405 after adopting autoresearch
-    // into the canonical inventory (its package + eval relations);
-    // 191 -> 192 / 405 -> 406 after this fix batch added the explicit autoresearch
-    // source refs below (a new direct-support path: this very test file, carrying
-    // two focused-test-explicit-source-ref relations). Note: the extractor scans
-    // quoted skill paths anywhere in this file, comments included — do not cite
-    // skill paths in comments here or the frozen count drifts.
-    // 2026-09-05 (pi host): 192 -> 193 / 406 -> 407 — the new direct-support path
-    // is the pi adapter test file itself (its runtime-setup transform fixture's
-    // frontmatter names that skill, incidentally matching the focused-test
-    // relation); the adapter source file carries no relation of its own.
-    // 2026-09-08: 193 -> 194 / 407 -> 408 — the deterministic governance JSON
-    // test fixture in this file grew an explicit dual-host relation row for the
-    // canonical standalone iteration skill during its lane-refresh batch.
-    // 2026-09-12: 221 -> 222 / 437 -> 438 — tests/integration/runtime-setup-sigint-recovery
-    // .integration.test.js (bb4f0219, top-level SIGINT reentry probe) joined the
-    // window with a focused-test-explicit-source-ref relation to spec-runtime-setup;
-    // reconciled during the G01-G06 517-record semantic-review closeout refresh.
-    // 2026-09-14: 222 -> 223 / 438 -> 439 — the repair-loop focused unit test joined
-    // the window with one focused-test-explicit-source-ref relation; reconciled
-    // during the repair-loop batch chain refresh.
-    // FSA2：共享同步、mutation 合同、只读 Judge 校准新增 3 路径 / 5 个 owner 关系。
-    // FSA3：新增两个针对性回归文件，各增加一个直接支撑关系。
-    expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(228);
-    expect(coverage.coverage_summary.direct_support_relation_count).toBe(446);
+    const relations = coverage.direct_support.map((entry) => `${entry.skill_id}:${entry.path}`);
+    expect(new Set(relations).size).toBe(relations.length);
+    expect(coverage.coverage_summary.direct_support_relation_count).toBe(relations.length);
+    expect(coverage.coverage_summary.direct_support_unique_path_count)
+      .toBe(new Set(coverage.direct_support.map((entry) => entry.path)).size);
+    const testPaths = execFileSync('git', [
+      '-C', repoRoot, 'ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', 'tests',
+    ], { encoding: 'utf8' }).split('\0').filter((name) => name.endsWith('.test.js') && fs.existsSync(path.join(repoRoot, name)));
+    const governance = JSON.parse(fs.readFileSync(path.join(repoRoot,
+      'src/cli/contracts/dual-host-governance/skills-governance.json'), 'utf8'));
+    for (const skill of skills) {
+      expect(relations).toContain(`${skill}:src/cli/contracts/dual-host-governance/skills-governance.json`);
+      const command = governance.skills.find((entry) => entry.skill_name === skill).command_name;
+      if (command) expect(relations).toContain(`${skill}:templates/claude/commands/spec/${command}.md`);
+      for (const testPath of testPaths) {
+        const content = fs.readFileSync(path.join(repoRoot, testPath), 'utf8');
+        if (path.basename(testPath).startsWith(`${skill}-`) || content.includes(`skills/${skill}/`)) {
+          expect(relations).toContain(`${skill}:${testPath}`);
+        }
+      }
+    }
+    // 独立检查所有正文中的明确跨包 root 路径，防止只验证 producer 返回的剩余关系。
+    for (const name of expectedPaths.filter((entry) => entry.endsWith('.md'))) {
+      const content = fs.readFileSync(path.join(repoRoot, name), 'utf8');
+      const owner = name.split('/')[1];
+      for (const match of content.matchAll(/(?:src|scripts|templates|tests|docs\/contracts)\/[A-Za-z0-9_./@-]+/g)) {
+        const target = match[0].replace(/[.,;]+$/, '');
+        try {
+          if (!fs.lstatSync(path.join(repoRoot, target)).isFile()) continue;
+        } catch { continue; }
+        expect(relations).toContain(`${owner}:${target}`);
+      }
+    }
+    for (const entry of coverage.direct_support) {
+      expect(skills).toContain(entry.skill_id);
+      expect(entry.owning_skill).toBe(entry.skill_id);
+      expect(entry.relation_types.length).toBeGreaterThan(0);
+      expect(entry.evidence.length).toBeGreaterThan(0);
+      const bytes = fs.readFileSync(path.join(repoRoot, entry.path));
+      expect(entry.sha256).toBe(crypto.createHash('sha256').update(bytes).digest('hex'));
+    }
     expect(coverage.direct_support).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',

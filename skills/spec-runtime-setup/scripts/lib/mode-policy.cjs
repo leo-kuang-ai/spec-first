@@ -162,6 +162,11 @@ function buildActionPlan({ argv = [], knownIds = [], defaultIds = [] } = {}) {
   };
 }
 
+function planExecutionAdvice(actionPlan) {
+  const scope = actionPlan.args.installationOnly ? '--installation-only' : `--only ${actionPlan.selected_ids.join(',')}`;
+  return `审查计划后移除 --plan，显式使用 ${scope}，并保留原 target、scope、selection、repair 和 refresh 选项；不得扩大已授权范围。`;
+}
+
 function hasWorkspaceProviders(ids) {
   return ids.length === 2 && ids.includes('codegraph') && ids.includes('graphify');
 }
@@ -182,4 +187,5 @@ function blockedPlan(reasonCode, args, extra = {}) {
 
 module.exports = {
   buildActionPlan,
+  planExecutionAdvice,
 };

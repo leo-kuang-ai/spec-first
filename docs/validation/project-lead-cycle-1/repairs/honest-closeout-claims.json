@@ -1,0 +1,49 @@
+{
+  "run_summary_ref": ".spec-first/workflows/spec-debug/spec-first/cycle1-eight-fixes-20260921/verification-run-summary.json",
+  "claims": [
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:03-commit-index-green",
+        "verification-run-summary:04-pr-head-green",
+        "verification-run-summary:06-runtime-preflight-green",
+        "verification-run-summary:07-parent-contract-green",
+        "verification-run-summary:08-plan-scope-green",
+        "verification-run-summary:09-runtime-suite",
+        "verification-run-summary:11-typecheck",
+        "verification-run-summary:11-entrypoint-lint",
+        "verification-run-summary:13-instruction-sync",
+        "verification-run-summary:13-shared-references",
+        "verification-run-summary:13-changelog",
+        "verification-run-summary:14-exit-regression",
+        "verification-run-summary:14-delivery-check",
+        "verification-run-summary:15-smoke",
+        "verification-run-summary:15-integration"
+      ]
+    },
+    {
+      "claim_type": "validation",
+      "asserted_status": "failed",
+      "evidence_refs": [
+        "verification-run-summary:12-full-regression",
+        "verification-run-summary:13-diff-check"
+      ]
+    },
+    {
+      "claim_type": "validation",
+      "asserted_status": "not-run",
+      "evidence_refs": [
+        "verification-run-summary:real-graphify-dogfood"
+      ]
+    },
+    {
+      "claim_type": "review",
+      "asserted_status": "fresh-source-reviewed",
+      "evidence_refs": [
+        "docs/validation/project-lead-cycle-1/repairs/fresh-source-exit-review.md",
+        "docs/validation/project-lead-cycle-1/repairs/fresh-source-runtime-review.md"
+      ]
+    }
+  ]
+}

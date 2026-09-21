@@ -18,6 +18,10 @@ context:
     init: true
     checkout: main
 
+constraints:
+  timeout_seconds: 600
+  max_turns: 20
+
 judge:
   type: script
   script_path: evals/fixtures/scripts/check-r2-preset-applied-fix.sh

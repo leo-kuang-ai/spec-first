@@ -1,0 +1,53 @@
+FAIL tests/unit/spec-code-review-mechanics.test.js
+  ● spec-code-review mechanical floor › 非法 snapshot 结构与编码必须结构化 fail closed
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 1
+
+      70 |         fs.writeFileSync(snapshot, JSON.stringify({ ...valid, ...patch }));
+      71 |         const result = runPython(reviewScope, ['--verify-snapshot', snapshot], { cwd: root });
+    > 72 |         expect(result.status).toBe(0);
+         |                               ^
+      73 |         expect(JSON.parse(result.stdout)).toMatchObject({ status: 'unknown', mutation_detected: null, reason_code: 'scope_snapshot_invalid' });
+      74 |       }
+      75 |       fs.writeFileSync(snapshot, Buffer.from([0xff]));
+
+      at Object.toBe (tests/unit/spec-code-review-mechanics.test.js:72:31)
+
+FAIL tests/unit/spec-resolve-pr-feedback-contracts.test.js
+  ● spec-resolve-pr-feedback contracts › 提交前阻断不属于本轮的暂存内容
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "Before staging, inspect the complete index"
+    Received string:    "·
+    Commit and push are independent exits: stage/commit only with `commit_authorization: authorized`; push only after commit succeeds and `push_authorization: authorized` is present. Missing authority stops that exit; preserve verified local state and proceed to Step 9. Do not claim a fixed thread is repaired remotely or resolve it without the required remote result.·
+    Stage only the validated run-owned changes reconciled in step 5. Preserve unrelated staged content and partial-file ownership; a reported filename is not permission to stage an entire mixed file. Commit with a message referencing the PR:·
+    ```bash
+    git add [validated run-owned paths or hunks from step 5]
+    git commit -m \"Address PR review feedback (#PR_NUMBER)·
+    - [list changes from agent summaries]\"
+    ```·
+    Push to remote:·
+    ```bash
+    git push
+    ```·
+    "
+
+      26 |   test('提交前阻断不属于本轮的暂存内容', () => {
+      27 |     const commit = read('skills/spec-resolve-pr-feedback/references/full-mode.md').split('## 6. Commit and Push')[1].split('## 7. Reply and Resolve')[0];
+    > 28 |     expect(commit).toContain('Before staging, inspect the complete index');
+         |                    ^
+      29 |     expect(commit).toContain('unrelated staged content or uncertain hunk ownership blocks this exit');
+      30 |     expect(commit).toContain('Re-read the entire staged diff');
+      31 |     expect(commit).not.toContain('git add [validated run-owned paths');
+
+      at Object.toContain (tests/unit/spec-resolve-pr-feedback-contracts.test.js:28:20)
+
+Test Suites: 2 failed, 2 total
+Tests:       2 failed, 30 passed, 32 total
+Snapshots:   0 total
+Time:        3.777 s, estimated 4 s
+Ran all test suites matching /tests\/unit\/spec-code-review-mechanics.test.js|tests\/unit\/spec-resolve-pr-feedback-contracts.test.js/i.

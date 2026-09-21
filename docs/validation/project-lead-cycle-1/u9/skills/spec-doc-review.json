@@ -1,0 +1,186 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "generated_at": "2026-09-20T07:35:36.158199+00:00",
+  "skill_name": "spec-doc-review",
+  "source_snapshot": "source-manifest.json",
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "source_paths": [
+    "skills/spec-doc-review/SKILL.md",
+    "skills/spec-doc-review/references/modes.md",
+    "skills/spec-doc-review/references/document-intake.md",
+    "skills/spec-doc-review/references/dispatch.md",
+    "skills/spec-doc-review/references/persona-selection.md",
+    "skills/spec-doc-review/references/rendering-floor.md",
+    "skills/spec-doc-review/references/synthesis-and-presentation.md",
+    "skills/spec-doc-review/references/task-pack-review-lens.md",
+    "skills/spec-doc-review/references/findings-schema.json",
+    "tests/unit/spec-doc-review-task-pack-contracts.test.js"
+  ],
+  "source_read_ranges": {
+    "skills/spec-doc-review/SKILL.md": "1-74",
+    "skills/spec-doc-review/references/modes.md": "1-25",
+    "skills/spec-doc-review/references/document-intake.md": "1-73",
+    "skills/spec-doc-review/references/dispatch.md": "1-52",
+    "skills/spec-doc-review/references/persona-selection.md": "1-46",
+    "skills/spec-doc-review/references/rendering-floor.md": "1-96",
+    "skills/spec-doc-review/references/synthesis-and-presentation.md": "1-100,102-339",
+    "skills/spec-doc-review/references/task-pack-review-lens.md": "1-85",
+    "skills/spec-doc-review/references/findings-schema.json": "1-85"
+  },
+  "source_hashes": {
+    "skills/spec-doc-review/SKILL.md": "c96d48de5841a1d3c2692232e54107a5eaccdf0337817dc024c2af6d958eaab0",
+    "skills/spec-doc-review/references/modes.md": "bb5a34fbb749559b644fcc8e8e142217ab41b7150abf333083424aabbaff16cd",
+    "skills/spec-doc-review/references/document-intake.md": "cad697e126a661a4eea11e59562a803efe26ec2f437f20d27b8054ea0ba7aa4c",
+    "skills/spec-doc-review/references/dispatch.md": "33a1d8c6346e2d6541255f4709d214f1fa5c63aa88cf9e65b32693283d12bdf2",
+    "skills/spec-doc-review/references/persona-selection.md": "67d9a435a5d83b85804b19348bfe80912e5e63120e83c6f24ba5fedc8c82c8f4",
+    "skills/spec-doc-review/references/rendering-floor.md": "810870373cf8a2621fccc3486ea3642b07fad359f5ffa13e75edc203d836560f",
+    "skills/spec-doc-review/references/synthesis-and-presentation.md": "1fa37b945c957071ce2134247a2ddcb3b884bc83436d5e9600f9f272a3396223",
+    "skills/spec-doc-review/references/task-pack-review-lens.md": "8a1db7a96f948d6be2f2c97c56556799d23f7da8c8c69181bf6562647bad55cf",
+    "skills/spec-doc-review/references/findings-schema.json": "d20a74985ed53841a717472783f44ded059aac0f4ceb78cedcf53437ed2fbfb7",
+    "tests/unit/spec-doc-review-task-pack-contracts.test.js": "047789d4a05173b513e302290ce8bb5d455ecec18dec9c428854459e06895beb"
+  },
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "entry_surface": "workflow_command",
+  "batch": "B",
+  "closure_tier": "L",
+  "closure_observed": {
+    "files": 52,
+    "bytes": 376615,
+    "read_package_files_at_least_partially": 9,
+    "read_supporting_files_at_least_partially": 1,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "coverage_commitment": "committed",
+  "dependency_closure": "partial",
+  "status": "degraded",
+  "reason_codes": [
+    "bounded_source_review",
+    "dependency_closure_partial",
+    "workflow_not_run"
+  ],
+  "command_or_method": [
+    "只读reviewer逐包阅读冻结source并判断五分支；主owner整合与回源裁决，不是盲评或workflow执行。"
+  ],
+  "ran": true,
+  "exit_code": null,
+  "evidence_paths": [
+    "reviewer-returns/b.json"
+  ],
+  "source_refs": [
+    "skills/spec-doc-review/SKILL.md",
+    "skills/spec-doc-review/references/modes.md",
+    "skills/spec-doc-review/references/document-intake.md",
+    "skills/spec-doc-review/references/dispatch.md",
+    "skills/spec-doc-review/references/persona-selection.md",
+    "skills/spec-doc-review/references/rendering-floor.md",
+    "skills/spec-doc-review/references/synthesis-and-presentation.md",
+    "skills/spec-doc-review/references/task-pack-review-lens.md",
+    "skills/spec-doc-review/references/findings-schema.json",
+    "tests/unit/spec-doc-review-task-pack-contracts.test.js"
+  ],
+  "owner": "project-lead-cycle-1",
+  "consumers": [
+    "周期1主审查",
+    "对应上游/下游workflow（以SKILL文档声明为准）"
+  ],
+  "branches": [
+    {
+      "id": "entry_positive",
+      "status": "source-covered",
+      "judgment": "根据内容形态识别需求、计划和 task pack，选择 persona，并将确定性事实交由语义综合。",
+      "source_refs": [
+        "skills/spec-doc-review/SKILL.md:7-26",
+        "skills/spec-doc-review/references/document-intake.md:17-30"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "near_neighbor_negative",
+      "status": "source-covered",
+      "judgment": "task pack 是 derived 且 report-only 的 producer 输入；review 不替代 producer、plan、implementation 或 runtime owner。",
+      "source_refs": [
+        "skills/spec-doc-review/SKILL.md:9-16",
+        "skills/spec-doc-review/references/task-pack-review-lens.md:5-10"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "output_consumer",
+      "status": "source-covered",
+      "judgment": "结构化文本/JSON envelope 输出 findings、coverage、limitations 和 task_pack_outcome；调用方消费修复候选与下一 owner。",
+      "source_refs": [
+        "skills/spec-doc-review/references/synthesis-and-presentation.md:149-163",
+        "skills/spec-doc-review/references/synthesis-and-presentation.md:217-263",
+        "skills/spec-doc-review/references/task-pack-review-lens.md:74-83"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "critical_error_stop",
+      "status": "source-covered",
+      "judgment": "输入不可读或冲突、task pack 确定性失败、必需覆盖缺失及 report-only 边界阻止写入或 clean/execution-ready 声明。",
+      "source_refs": [
+        "skills/spec-doc-review/references/document-intake.md:5-16",
+        "skills/spec-doc-review/references/task-pack-review-lens.md:20-38",
+        "skills/spec-doc-review/references/synthesis-and-presentation.md:215-215"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "degraded_recovery_handoff",
+      "status": "source-covered",
+      "judgment": "无 worker 权限或能力时退为 inline 并声明覆盖降级；task pack 缺陷返回 spec-write-tasks，source plan 缺口返回 spec-plan。",
+      "source_refs": [
+        "skills/spec-doc-review/references/dispatch.md:7-13",
+        "skills/spec-doc-review/references/task-pack-review-lens.md:74-85"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    }
+  ],
+  "findings": [],
+  "fresh_source_eval": "not-run",
+  "claim_ceiling": "C0",
+  "limitations": [
+    "persona/eval/dispatch 消费者闭包未完整阅读；未执行 review invocation 或测试。",
+    "原机械占位结论已撤销；source-covered仅证明已读范围可追踪，不证明运行通过。",
+    "未确认读取范围不计覆盖；哈希只证明字节。"
+  ],
+  "recovery_point": "按需补读选定 persona 资产，并执行 contract tests 和 fresh invocation。",
+  "timing": {
+    "active_seconds": null,
+    "limitation": "逐包主动时间不可可靠恢复，未用工具墙钟估算。"
+  },
+  "record_correction": {
+    "at": "2026-09-20T05:55:01.019278+00:00",
+    "invalidated": "2026-09-20T05:24 的机械占位结论",
+    "replaced_by_actual_review_at": "2026-09-20T07:35:36.158199+00:00"
+  },
+  "supporting_read_ranges": {
+    "tests/unit/spec-doc-review-task-pack-contracts.test.js": "1-117"
+  },
+  "unconfirmed_read_ranges": [
+    "其余 spec-doc-review references/personas/evals/tests（未读）"
+  ],
+  "reviewer_provenance": {
+    "reviewer": "cycle1_a_exit",
+    "kind": "read-only-source-review",
+    "fresh_per_package_context": false,
+    "raw_return": "reviewer-returns/b.json",
+    "raw_return_sha256": "74c86ff4af0bab17fbeb82f390cf57eb33590df5a24910b9823d19382480563c"
+  },
+  "execution": {
+    "source_semantic_review": "ran",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "not-run"
+  }
+}

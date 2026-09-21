@@ -116,7 +116,7 @@ The fallback is not a reason to skip caller-authorized local fixes. It is a reas
 
 **Subagent prompt (per batch):** the assigned findings only (`#`, severity, file, line, title, `suggested_fix`, `requires_verification`; add `why_it_matters` from `{reviewer}.json` under returned `artifact_path` when available and useful), plus:
 - Work through assigned `#` in severity order; at each `file:line`, skip with a one-line reason if evidence no longer matches
-- Apply the mechanical bar from § What to apply / What not to apply — skip anything that needs design judgment
+- Apply the mechanical bar from § What to apply / What to defer — skip anything that needs design judgment
 - Do not re-run `spec-code-review`
 - Shared-directory fallback: do not stage or commit — return which `#` were applied or skipped and which files changed
 

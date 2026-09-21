@@ -1,0 +1,76 @@
+FAIL tests/unit/spec-commit-push-pr-context-contracts.test.js
+  spec-commit-push-pr context reference contract
+    ✕ checkout collision 的默认恢复保留混合暂存、无关文件和未跟踪文件 (337 ms)
+    ✓ keeps context probes and consequential rechecks in a required-read reference (1 ms)
+    ✓ requires apply-time identity, body read-back, and scoped commit semantics
+
+  ● spec-commit-push-pr context reference contract › checkout collision 的默认恢复保留混合暂存、无关文件和未跟踪文件
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 18
+    + Received  +  9
+
+      Object {
+    -   "branch": "main
+    +   "branch": "feature
+    + ",
+    +   "index": "",
+    +   "stash": "",
+    +   "untracked": "user untracked
+      ",
+    -   "index": "diff --git a/shared.txt b/shared.txt
+    - index f3c2c5e..b759cfc 100644
+    +   "worktree": "diff --git a/shared.txt b/shared.txt
+    + index ae87353..c856efa 100644
+      --- a/shared.txt
+      +++ b/shared.txt
+      @@ -25,6 +25,6 @@ line 23
+       line 24
+       line 25
+       line 26
+      -line 27
+      +staged own edit
+       line 28
+    -  line 29
+    + -line 29
+    + +unstaged own edit
+      diff --git a/unrelated.txt b/unrelated.txt
+      index 4b48dee..a48e4ea 100644
+      --- a/unrelated.txt
+      +++ b/unrelated.txt
+      @@ -1 +1 @@
+      -original
+      +user staged
+    - ",
+    -   "stash": "",
+    -   "untracked": "user untracked
+    - ",
+    -   "worktree": "diff --git a/shared.txt b/shared.txt
+    - index b759cfc..08d9581 100644
+    - --- a/shared.txt
+    - +++ b/shared.txt
+    - @@ -27,4 +27,4 @@ line 25
+    -  line 26
+    -  staged own edit
+    -  line 28
+    - -line 29
+    - +unstaged own edit
+      ",
+      }
+
+      52 |         expect(result.status).toBe(0);
+      53 |       }
+    > 54 |       expect(snapshot()).toEqual(before);
+         |                          ^
+      55 |       expect(recovery).toContain('return blocked');
+      56 |       expect(recovery).not.toMatch(/git stash (push|pop)/);
+      57 |     } finally {
+
+      at Object.toEqual (tests/unit/spec-commit-push-pr-context-contracts.test.js:54:26)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 2 passed, 3 total
+Snapshots:   0 total
+Time:        0.5 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/spec-commit-push-pr-context-contracts.test.js/i.

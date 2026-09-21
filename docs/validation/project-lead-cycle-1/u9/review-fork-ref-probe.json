@@ -1,0 +1,17 @@
+{
+  "finding_id": "C1-CR-01",
+  "captured_at": "2026-09-20T03:05:33.316650+00:00",
+  "method": "三个纯本地repo模拟base/fork/reviewer；执行scope.md:132原样fetch命令形状；没有GitHub网络或模型调用",
+  "command": "git fetch --no-tags origin feature:refs/review/pr-1-head",
+  "exit_code": 0,
+  "metadata_headRefOid": "a7b1536974fedc3ba0171a6252dc52fc35b7e502",
+  "fetched_sha": "cbaf47a7abf646d781baa72a0983458bebbaa552",
+  "sha_matches": false,
+  "git_show_content": "different origin branch",
+  "verdict": "confirmed",
+  "limitations": [
+    "证明文案指令在fork同名分支情形取错来源；未执行真实PR或LLM审查。"
+  ],
+  "claim_ceiling": "C1",
+  "redaction_status": "none-required"
+}

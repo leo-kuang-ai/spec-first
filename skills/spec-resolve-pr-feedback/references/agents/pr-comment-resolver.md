@@ -41,13 +41,16 @@ verdict: [fixed | fixed-differently | blocked]
 feedback_id: [the thread ID or comment ID]
 feedback_type: [review_thread | pr_comment | review_body]
 reply_text: [the full markdown reply to post -- omit for blocked]
-files_changed: [list of files modified, empty if blocked]
+files_changed: [actual remaining modified paths relative to the received baseline, including blocked; empty only when no owned changes remain]
+verification: [targeted commands, actual status/evidence, or not-run reason]
 reason: [one-line explanation of what was done, or the contradiction for blocked]
 ```
 
 ## Bail-out (rare)
 
 You were dispatched because the finding was already judged valid -- default to implementing it. Return `blocked` ONLY if implementing it surfaces a concrete contradiction the orchestrator could not see from its judgment read: the change breaks a caller or a test you can see, or the referenced code is not what the finding described. Return the evidence in `reason` -- not unease, and not a re-argument that the fix wasn't worthwhile. The parent re-evaluates blocked items.
+
+On every exit inspect tracked, staged, and task-owned untracked changes against the received baseline. If blocking occurs after an edit, report the remaining changes and failed/not-run checks; never clear the file list merely because the verdict is blocked. Do not reset or stash shared state. Roll back only attributable own edits when authorized and safe, and verify the resulting delta; otherwise preserve the partial state for the parent.
 
 ## Principles
 

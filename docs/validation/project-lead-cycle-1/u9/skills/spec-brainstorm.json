@@ -1,0 +1,193 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "generated_at": "2026-09-20T07:35:36.158199+00:00",
+  "skill_name": "spec-brainstorm",
+  "source_snapshot": "source-manifest.json",
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "source_paths": [
+    "skills/spec-brainstorm/SKILL.md",
+    "skills/spec-brainstorm/references/phase-0.md",
+    "skills/spec-brainstorm/references/output-mode.md",
+    "skills/spec-brainstorm/references/interaction-rules.md",
+    "skills/spec-brainstorm/references/settled-decisions.md",
+    "skills/spec-brainstorm/references/dialogue.md",
+    "skills/spec-brainstorm/references/approaches.md",
+    "skills/spec-brainstorm/references/plan-write.md",
+    "skills/spec-brainstorm/references/handoff.md",
+    "skills/spec-brainstorm/references/brainstorm-sections.md",
+    "tests/unit/spec-brainstorm-contracts.test.js"
+  ],
+  "source_read_ranges": {
+    "skills/spec-brainstorm/SKILL.md": "1-78",
+    "skills/spec-brainstorm/references/phase-0.md": "1-71",
+    "skills/spec-brainstorm/references/output-mode.md": "1-21",
+    "skills/spec-brainstorm/references/interaction-rules.md": "1-29",
+    "skills/spec-brainstorm/references/settled-decisions.md": "1-45",
+    "skills/spec-brainstorm/references/dialogue.md": "1-61",
+    "skills/spec-brainstorm/references/approaches.md": "1-53",
+    "skills/spec-brainstorm/references/plan-write.md": "1-24",
+    "skills/spec-brainstorm/references/handoff.md": "1-168",
+    "skills/spec-brainstorm/references/brainstorm-sections.md": "1-110,285-387"
+  },
+  "source_hashes": {
+    "skills/spec-brainstorm/SKILL.md": "d3df96643040bebb4cc003ff75f9fdb3f3dac34461abb031eab7808f82167861",
+    "skills/spec-brainstorm/references/phase-0.md": "ad69b0bbaccfc7b3c3346e8b4956c123582c1e1ef531547aa487b9cac88f280a",
+    "skills/spec-brainstorm/references/output-mode.md": "e8fbaeb2df012a771f7c00bd56a2d5e9a90d12ae4be6b3e6019f9e7b50294f7a",
+    "skills/spec-brainstorm/references/interaction-rules.md": "7f1ea0d8a64b1ab928953b54699b73d4a28ff2d1566fa6b563fcb76171cf3767",
+    "skills/spec-brainstorm/references/settled-decisions.md": "5b36b0da843bdd2ca18dae80c2cd6b53d3489ff9e2336a26ec07f75221a60937",
+    "skills/spec-brainstorm/references/dialogue.md": "f4875ae211e393bc35fafa05d99fe8b1674f0623c0327b81caf6ea35a6830472",
+    "skills/spec-brainstorm/references/approaches.md": "beb9864913ce83bef8fa59606b23f04950cf774893875f7a4c1b0c9dc6f6be79",
+    "skills/spec-brainstorm/references/plan-write.md": "0255bbcf720d61435c3a5ae6532bd34fe0c2c3b7bb6c1c3292126010eb0a1495",
+    "skills/spec-brainstorm/references/handoff.md": "02bf09e9fd0582f6766192cdd93247e4fa1f0ef248589cba42cdb8bf084da48a",
+    "skills/spec-brainstorm/references/brainstorm-sections.md": "0f886fea1f9d4bc24dc6f3e56a1accb9aabe99e707b86698431103a2a42e1cc0",
+    "tests/unit/spec-brainstorm-contracts.test.js": "77c2f122e32ca632d4f5746661e893adb94662e643f14250f251e3e324bde0a7"
+  },
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "entry_surface": "workflow_command",
+  "batch": "B",
+  "closure_tier": "M",
+  "closure_observed": {
+    "files": 32,
+    "bytes": 206694,
+    "read_package_files_at_least_partially": 10,
+    "read_supporting_files_at_least_partially": 1,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "coverage_commitment": "committed",
+  "dependency_closure": "partial",
+  "status": "degraded",
+  "reason_codes": [
+    "bounded_source_review",
+    "dependency_closure_partial",
+    "workflow_not_run"
+  ],
+  "command_or_method": [
+    "只读reviewer逐包阅读冻结source并判断五分支；主owner整合与回源裁决，不是盲评或workflow执行。"
+  ],
+  "ran": true,
+  "exit_code": null,
+  "evidence_paths": [
+    "reviewer-returns/b.json"
+  ],
+  "source_refs": [
+    "skills/spec-brainstorm/SKILL.md",
+    "skills/spec-brainstorm/references/phase-0.md",
+    "skills/spec-brainstorm/references/output-mode.md",
+    "skills/spec-brainstorm/references/interaction-rules.md",
+    "skills/spec-brainstorm/references/settled-decisions.md",
+    "skills/spec-brainstorm/references/dialogue.md",
+    "skills/spec-brainstorm/references/approaches.md",
+    "skills/spec-brainstorm/references/plan-write.md",
+    "skills/spec-brainstorm/references/handoff.md",
+    "skills/spec-brainstorm/references/brainstorm-sections.md",
+    "tests/unit/spec-brainstorm-contracts.test.js"
+  ],
+  "owner": "project-lead-cycle-1",
+  "consumers": [
+    "周期1主审查",
+    "对应上游/下游workflow（以SKILL文档声明为准）"
+  ],
+  "branches": [
+    {
+      "id": "entry_positive",
+      "status": "source-covered",
+      "judgment": "WHAT 未收敛时进入对话、压力测试、方案比较，并形成 requirements-only 统一计划；产品确认归用户。",
+      "source_refs": [
+        "skills/spec-brainstorm/SKILL.md:11-25",
+        "skills/spec-brainstorm/references/dialogue.md:41-61"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "near_neighbor_negative",
+      "status": "source-covered",
+      "judgment": "点名外部采用、切换或替代裁决转 spec-pov；已收敛 HOW 转 spec-plan；实现、排错和代码审查保持独立。",
+      "source_refs": [
+        "skills/spec-brainstorm/SKILL.md:15-17",
+        "skills/spec-brainstorm/references/phase-0.md:30-38"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "output_consumer",
+      "status": "source-covered",
+      "judgment": "requirements-only 统一计划供 spec-plan/spec-doc-review 消费；Phase 4 交给 plan、review 或显式选择的 LFG，并保留产物路径。",
+      "source_refs": [
+        "skills/spec-brainstorm/SKILL.md:15-25",
+        "skills/spec-brainstorm/references/plan-write.md:1-24",
+        "skills/spec-brainstorm/references/handoff.md:14-123"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "critical_error_stop",
+      "status": "source-covered",
+      "judgment": "产品 blocker、未决集成问题、无依据声明及 readiness 失败阻止 planning handoff；不进行实现修改。",
+      "source_refs": [
+        "skills/spec-brainstorm/SKILL.md:21-25",
+        "skills/spec-brainstorm/references/dialogue.md:52-61",
+        "skills/spec-brainstorm/references/plan-write.md:10-18",
+        "skills/spec-brainstorm/references/brainstorm-sections.md:84-93"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "degraded_recovery_handoff",
+      "status": "source-covered",
+      "judgment": "grounding/claim verifier 失败时退为 inline 并显式声明降级；暂停时在产物中保留 blocker、source refs 和下一问题。",
+      "source_refs": [
+        "skills/spec-brainstorm/references/dialogue.md:15-21",
+        "skills/spec-brainstorm/references/approaches.md:47-51",
+        "skills/spec-brainstorm/references/plan-write.md:18-24"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    }
+  ],
+  "findings": [],
+  "fresh_source_eval": "not-run",
+  "claim_ceiling": "C0",
+  "limitations": [
+    "synthesis-summary 及若干 phase/rendering/eval 引用未读；tests 为 not-run。",
+    "原机械占位结论已撤销；source-covered仅证明已读范围可追踪，不证明运行通过。",
+    "未确认读取范围不计覆盖；哈希只证明字节。"
+  ],
+  "recovery_point": "补读 synthesis/sections/rendering/eval 后执行 fresh-source eval。",
+  "timing": {
+    "active_seconds": null,
+    "limitation": "逐包主动时间不可可靠恢复，未用工具墙钟估算。"
+  },
+  "record_correction": {
+    "at": "2026-09-20T05:55:01.017507+00:00",
+    "invalidated": "2026-09-20T05:24 的机械占位结论",
+    "replaced_by_actual_review_at": "2026-09-20T07:35:36.158199+00:00"
+  },
+  "supporting_read_ranges": {
+    "tests/unit/spec-brainstorm-contracts.test.js": "1-44"
+  },
+  "unconfirmed_read_ranges": [
+    "synthesis-summary.md",
+    "其余 brainstorm-sections/rendering/references/personas/evals/tests（未读）"
+  ],
+  "reviewer_provenance": {
+    "reviewer": "cycle1_a_exit",
+    "kind": "read-only-source-review",
+    "fresh_per_package_context": false,
+    "raw_return": "reviewer-returns/b.json",
+    "raw_return_sha256": "74c86ff4af0bab17fbeb82f390cf57eb33590df5a24910b9823d19382480563c"
+  },
+  "execution": {
+    "source_semantic_review": "ran",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "not-run"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "run_summary_ref": ".spec-first/workflows/spec-debug/spec-first/cycle1-residual-regression-20260921/verification-run-summary.json",
+  "claims": [
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:20-full-regression",
+        "verification-run-summary:21-typecheck",
+        "verification-run-summary:21-entrypoint-lint",
+        "verification-run-summary:21-changelog",
+        "verification-run-summary:22-ce-strengthened",
+        "verification-run-summary:23-current-gate-negative",
+        "verification-run-summary:24-final-delivery",
+        "verification-run-summary:24-final-whitespace"
+      ]
+    },
+    {
+      "claim_type": "review",
+      "asserted_status": "source-contract-reviewed",
+      "evidence_refs": [
+        "docs/validation/project-lead-cycle-1/repairs/ce-residual-review.md"
+      ]
+    }
+  ]
+}

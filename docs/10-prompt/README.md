@@ -7,6 +7,7 @@
 ```text
 docs/10-prompt/
   结构化项目角色契约.md        ★ 当前基线:顶层方法论与演化判断基线(测试钉死,勿移动)
+  项目负责人工作契约.md        ★ 当前角色基线:持续演进、专家协作、证据标准与交付责任
   AI-Coding-Harness演化方法论.md ★ 当前基线:面向能力演化的精练判断方法
   系统性项目审查方法.md        ★ 当前基线:系统性项目审查方法论
   skill-prompt-设计与优化方法论-v2.md ★ 当前基线(spec-first canonical):skill prompt 设计与优化方法论(含 spec-first 适配层:init 投射/source-runtime/spec-* 入口/task-pack handoff;版本演进见 CHANGELOG)
@@ -28,6 +29,7 @@ docs/10-prompt/
 ## 使用边界
 
 - 顶层四份基线（`结构化项目角色契约.md`、`AI-Coding-Harness演化方法论.md`、`系统性项目审查方法.md`、`skill-prompt-设计与优化方法论-v2.md`）是当前有效基线,不是历史快照,但也都不是具体 runtime behavior contract。`AI-Coding-Harness演化方法论.md` 提炼能力演化的判断顺序；`skill-prompt-设计与优化方法论-v2.md` 是唯一 canonical 的 skill prompt 设计与优化 playbook。三份方法论文档与角色契约冲突时,均让位于角色契约。
+- [项目负责人工作契约](./项目负责人工作契约.md)规定持续演进的职责、协作与证据边界，从属于角色契约；其现状表有明确观测时点，具体批次见所链接的周期计划。契约、计划和索引须在获授权的提交中一并核对可达性，本文档不独立授予委派或外部动作权限。
 - `spec-first-skill-prompt压缩优化组合方法论.md` 是 canonical v2 的专项 companion，负责 expected/aggregate 成本、内容 criticality、reference 可达性、multi-agent fan-out、上下文切片、validator policy、伪优化识别、partial-landing 与 quality/cost 证据晋级；它不取代 canonical，不定义 runtime behavior，与 canonical 或角色契约冲突时让位于上位文档。
 - `GPT-5.6提示工程方法论.md` 是基于 OpenAI 当前开发者文档的外部 provider companion，说明 GPT-5.6 的 prompt 契约、模型配置/Skill source/generated runtime/可选能力分层、既有 Skill 的基线评测与外科式适配、工具/审批边界和迁移方法；它不定义 spec-first runtime contract，不取代 canonical 或角色契约，外部 API/model 事实应回源到链接的官方文档复核。
 - `当前分支与远程master-Skill能力审计提示词.md` 是 report-only 操作提示词，用于冻结 `origin/master` SHA、建立逐 Skill 能力账本并输出可追溯审计 finding；它不授权实现修复，不是新的方法论 canonical，也不改变任何 Skill runtime contract。
@@ -39,6 +41,7 @@ docs/10-prompt/
 ## 当前规范优先级
 
 1. `docs/10-prompt/结构化项目角色契约.md`：顶层方法论与演化判断基线
+1a. `docs/10-prompt/项目负责人工作契约.md`：项目负责人角色的持续演进、协作、证据与交付基线；不得与角色契约冲突。
 2. `docs/10-prompt/AI-Coding-Harness演化方法论.md`：AI Coding Harness 能力演化判断方法（冲突时让位于角色契约）
 3. `docs/10-prompt/系统性项目审查方法.md`：系统性项目审查方法论基线（冲突时让位于角色契约）
 3b. `docs/10-prompt/skill-prompt-设计与优化方法论-v2.md`：skill prompt 设计与优化方法论基线（唯一 canonical；版本演进见 CHANGELOG；与审查方法平级，冲突时让位于角色契约）。前身 v1 已合并进本文件并删除。

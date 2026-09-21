@@ -1,0 +1,19 @@
+{
+  "03-commit-index-green": "original-reproducer",
+  "04-pr-head-green": "original-reproducer",
+  "06-runtime-preflight-green": "original-reproducer",
+  "07-parent-contract-green": "regression",
+  "08-plan-scope-green": "regression",
+  "09-runtime-suite": "broader",
+  "11-typecheck": "broader",
+  "11-entrypoint-lint": "broader",
+  "12-full-regression": "broader",
+  "13-diff-check": "broader",
+  "13-instruction-sync": "broader",
+  "13-shared-references": "broader",
+  "13-changelog": "broader",
+  "14-exit-regression": "regression",
+  "14-delivery-check": "broader",
+  "15-smoke": "broader",
+  "15-integration": "broader"
+}

@@ -1,5 +1,7 @@
 # spec-first 指令有效性实测报告
 
+> **2026-09-20 勘误：** 本文保留历史报告，以下原计数与“完整 36166 行指令”“零指导”“无显著差异”结论不应直接用于当前决策。对附录四个现存 `results.json` 复算为 60 attempts / 55 valid / 5 excluded；baseline 21/21、spec-work 12/12、spec-debug 19/22。前两 run 已 rescored，未恢复原最终筛选集，因此该汇总不直接取代原效应估计。`run.py` 的两个 spec arm 只追加各自 SKILL.md，全部 arm 均有 NO_RUN 约束，且未见支持显著性结论的统计检验。详见 [周期 1 复核](../../docs/validation/project-lead-cycle-1/2026-09-18-cycle-1-execution-evidence.md) §4 和 [逐 run 数据](../../docs/validation/project-lead-cycle-1/benchmark-reconciliation.json)。原始结果不改写；这些观测不能外推目标模型或团队现场收益。
+
 **日期:** 2026-08-20  
 **模型:** Claude Sonnet 5 (claude-sonnet-5)  
 **测试范围:** 4 个维度、5 个任务、45 次有效运行  

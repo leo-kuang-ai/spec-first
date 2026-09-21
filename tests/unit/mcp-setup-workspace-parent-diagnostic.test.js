@@ -12,10 +12,23 @@ const {
 const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
 const { parseArgs } = require('../../skills/spec-runtime-setup/scripts/lib/args.cjs');
 
+const temporaryRoots = [];
+afterEach(() => {
+  for (const root of temporaryRoots.splice(0)) fs.rmSync(root, { recursive: true, force: true });
+});
+function snapshot(root) {
+  return fs.readdirSync(root).sort().map((name) => {
+    const file = path.join(root, name);
+    return [name, fs.statSync(file).isDirectory() ? snapshot(file) : fs.readFileSync(file).toString('base64')];
+  });
+}
+
 const skillRoot = path.resolve(__dirname, '../../skills/spec-runtime-setup');
 
 function mkWorkspace() {
-  return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-parent-diag-')));
+  const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-parent-diag-')));
+  temporaryRoots.push(root);
+  return root;
 }
 function initRepo(root, rel) {
   const repo = path.resolve(root, rel);
@@ -59,18 +72,21 @@ describe('parent workspace diagnostic (bare/check)', () => {
     expect(human).toContain('Two paths');
   });
 
-  test('runSetup bare on non-Git multi-repo parent returns parent diagnostic, not single-repo missing facts', () => {
+  test.each([[], ['--all-repos'], ['--check']])('parent diagnostic preserves workspace and home: %j', (...argv) => {
     const ws = mkWorkspace();
     initRepo(ws, 'api');
     initRepo(ws, 'web');
-    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-parent-home-'));
+    const homeDir = mkWorkspace();
+    const before = [snapshot(ws), snapshot(homeDir)];
     const result = runSetup({
-      argv: [],
+      argv,
       cwd: ws,
       skillRoot,
       env: { MCP_SETUP_HOST: 'codex' },
       homeDir,
+      runner: (command) => { throw new Error(`parent diagnostic must not run provider/install: ${command}`); },
     });
+    expect([snapshot(ws), snapshot(homeDir)]).toEqual(before);
     expect(result.exit_code).toBe(1);
     expect(result.payload.schema_version).toBe('workspace-parent-diagnostic.v1');
     expect(result.payload.parent_repo_local_facts).toBe('not_applicable');
@@ -81,7 +97,7 @@ describe('parent workspace diagnostic (bare/check)', () => {
   test('runSetup --check on parent also uses parent diagnostic', () => {
     const ws = mkWorkspace();
     initRepo(ws, 'svc');
-    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-parent-home2-'));
+    const homeDir = mkWorkspace();
     const result = runSetup({
       argv: ['--check'],
       cwd: ws,

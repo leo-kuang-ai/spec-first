@@ -1,0 +1,8 @@
+PASS tests/unit/spec-code-review-mechanics.test.js
+PASS tests/unit/spec-resolve-pr-feedback-contracts.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       32 passed, 32 total
+Snapshots:   0 total
+Time:        4.306 s
+Ran all test suites matching /tests\/unit\/spec-code-review-mechanics.test.js|tests\/unit\/spec-resolve-pr-feedback-contracts.test.js/i.

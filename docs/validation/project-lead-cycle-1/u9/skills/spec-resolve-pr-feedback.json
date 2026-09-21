@@ -1,0 +1,221 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "generated_at": "2026-09-20T07:35:36.158199+00:00",
+  "skill_name": "spec-resolve-pr-feedback",
+  "source_snapshot": "source-manifest.json",
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "source_paths": [
+    "skills/spec-resolve-pr-feedback/SKILL.md",
+    "skills/spec-resolve-pr-feedback/references/full-mode.md",
+    "skills/spec-resolve-pr-feedback/references/targeted-mode.md",
+    "skills/spec-resolve-pr-feedback/references/evaluation-rubric.md",
+    "skills/spec-resolve-pr-feedback/references/pipeline-mode.md",
+    "skills/spec-resolve-pr-feedback/references/pipeline-return.md",
+    "skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md",
+    "skills/spec-resolve-pr-feedback/scripts/get-pr-comments",
+    "skills/spec-resolve-pr-feedback/scripts/get-thread-for-comment",
+    "skills/spec-resolve-pr-feedback/scripts/reply-to-pr-thread",
+    "skills/spec-resolve-pr-feedback/scripts/resolve-pr-thread",
+    "tests/unit/spec-resolve-pr-feedback-contracts.test.js",
+    "skills/spec-lfg/references/pr-watch-loop.md"
+  ],
+  "source_read_ranges": {
+    "skills/spec-resolve-pr-feedback/SKILL.md": "1-126",
+    "skills/spec-resolve-pr-feedback/references/full-mode.md": "1-315",
+    "skills/spec-resolve-pr-feedback/references/targeted-mode.md": "1-43",
+    "skills/spec-resolve-pr-feedback/references/evaluation-rubric.md": "1-111",
+    "skills/spec-resolve-pr-feedback/references/pipeline-mode.md": "1-17",
+    "skills/spec-resolve-pr-feedback/references/pipeline-return.md": "1-50",
+    "skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md": "1-56",
+    "skills/spec-resolve-pr-feedback/scripts/get-pr-comments": "1-187",
+    "skills/spec-resolve-pr-feedback/scripts/get-thread-for-comment": "1-88",
+    "skills/spec-resolve-pr-feedback/scripts/reply-to-pr-thread": "1-50",
+    "skills/spec-resolve-pr-feedback/scripts/resolve-pr-thread": "1-23"
+  },
+  "source_hashes": {
+    "skills/spec-resolve-pr-feedback/SKILL.md": "594de7ca1be76c76a462c281879e4a0837f6e4c433d7949432e2f5e8a30c580d",
+    "skills/spec-resolve-pr-feedback/references/full-mode.md": "1c0278e94a39c6d346853da27ed2b6cec6ad6182ad8ec935ee576482241b7049",
+    "skills/spec-resolve-pr-feedback/references/targeted-mode.md": "b654ca706a8f08b01fbe0be043fee7213b6b8c2ef520dfceda59c13ffb9ad2f5",
+    "skills/spec-resolve-pr-feedback/references/evaluation-rubric.md": "decdc6068f5fe6faff6f17922dae90b1386d18d7821b442331a1a149a94205f5",
+    "skills/spec-resolve-pr-feedback/references/pipeline-mode.md": "e790121a32bb422ba4fad14a5c1d8e9ed5a17a63052908df3d79cec2307c39c8",
+    "skills/spec-resolve-pr-feedback/references/pipeline-return.md": "88040f8b4e7c5757cfe7f000f859ef18ebb2c25cd2fa466f3acc138edbbfa9d0",
+    "skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md": "ed587f3ee7ca0f98034c9d68557c5fab2cea2c90ca074338e644f0a886ac7b7a",
+    "skills/spec-resolve-pr-feedback/scripts/get-pr-comments": "e3d0831f4423fd19e25dd618b567fbeb87e6ad51798de19e359ae63a83e03f44",
+    "skills/spec-resolve-pr-feedback/scripts/get-thread-for-comment": "5e43b7540c5bad2a35cbe9d053f31cc1fb2326e91d88320696a935620fb3fc05",
+    "skills/spec-resolve-pr-feedback/scripts/reply-to-pr-thread": "15ad29610cc97c1afd884e5f98c7d18c34ebcb8a86094280b4a0503ca20967ae",
+    "skills/spec-resolve-pr-feedback/scripts/resolve-pr-thread": "a2582a71110c49ad66e66c4954d0647d0ab0597838409e1f4896ac8f6b90d83f",
+    "tests/unit/spec-resolve-pr-feedback-contracts.test.js": "d3d0d98ac0be9f7b6ad293702bfa88372da8a3be94a1641e5fa0b520ba7d60ab",
+    "skills/spec-lfg/references/pr-watch-loop.md": "6eab53df6508e6d46fc9f7274fe89420309ca14375070a5cedd9f4c1c32d7742"
+  },
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "entry_surface": "standalone_skill",
+  "batch": "B",
+  "closure_tier": "M",
+  "closure_observed": {
+    "files": 22,
+    "bytes": 70675,
+    "read_package_files_at_least_partially": 11,
+    "read_supporting_files_at_least_partially": 2,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "coverage_commitment": "committed",
+  "dependency_closure": "partial",
+  "status": "failed",
+  "reason_codes": [
+    "confirmed_open_findings",
+    "dependency_closure_partial",
+    "workflow_not_run"
+  ],
+  "command_or_method": [
+    "只读reviewer逐包阅读冻结source并判断五分支；主owner整合与回源裁决，不是盲评或workflow执行。"
+  ],
+  "ran": true,
+  "exit_code": null,
+  "evidence_paths": [
+    "reviewer-returns/b.json"
+  ],
+  "source_refs": [
+    "skills/spec-resolve-pr-feedback/SKILL.md",
+    "skills/spec-resolve-pr-feedback/references/full-mode.md",
+    "skills/spec-resolve-pr-feedback/references/targeted-mode.md",
+    "skills/spec-resolve-pr-feedback/references/evaluation-rubric.md",
+    "skills/spec-resolve-pr-feedback/references/pipeline-mode.md",
+    "skills/spec-resolve-pr-feedback/references/pipeline-return.md",
+    "skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md",
+    "skills/spec-resolve-pr-feedback/scripts/get-pr-comments",
+    "skills/spec-resolve-pr-feedback/scripts/get-thread-for-comment",
+    "skills/spec-resolve-pr-feedback/scripts/reply-to-pr-thread",
+    "skills/spec-resolve-pr-feedback/scripts/resolve-pr-thread",
+    "tests/unit/spec-resolve-pr-feedback-contracts.test.js",
+    "skills/spec-lfg/references/pr-watch-loop.md"
+  ],
+  "owner": "project-lead-cycle-1",
+  "consumers": [
+    "周期1主审查",
+    "对应上游/下游workflow（以SKILL文档声明为准）"
+  ],
+  "branches": [
+    {
+      "id": "entry_positive",
+      "status": "source-covered",
+      "judgment": "集中评价 PR feedback，区分 Full/Targeted 及本地修复、commit、push、reply、resolve 权限；host/repo 来自权威 URL/remotes。",
+      "source_refs": [
+        "skills/spec-resolve-pr-feedback/SKILL.md:19-28",
+        "skills/spec-resolve-pr-feedback/SKILL.md:32-87"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "near_neighbor_negative",
+      "status": "source-covered",
+      "judgment": "新代码审查归 spec-code-review；只有 discussion_r 选择 Targeted；pipeline-return 禁止嵌套远端尾流程。",
+      "source_refs": [
+        "skills/spec-resolve-pr-feedback/SKILL.md:3",
+        "skills/spec-resolve-pr-feedback/SKILL.md:56-85"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "output_consumer",
+      "status": "failed",
+      "judgment": "resolver summary 聚合后进行组合验证；pipeline return 提供修复、残留与限制，LFG 负责最终 fingerprint、commit、push 和 watch。 主owner裁决：blocked强制空files_changed与修改后的残留状态冲突，聚合器可能据此跳过验证。",
+      "source_refs": [
+        "skills/spec-resolve-pr-feedback/references/full-mode.md:109-149",
+        "skills/spec-resolve-pr-feedback/references/pipeline-return.md:24-50",
+        "skills/spec-lfg/references/pr-watch-loop.md:15-30",
+        "skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md:18-50"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run",
+      "finding_refs": [
+        "C1-PRFEEDBACK-002"
+      ]
+    },
+    {
+      "id": "critical_error_stop",
+      "status": "failed",
+      "judgment": "五类权限、pending review 和远端结果未知会阻止相关出口；但组合验证用薄弱的文件集合启发式判断 pre-existing failure。",
+      "source_refs": [
+        "skills/spec-resolve-pr-feedback/SKILL.md:32-52",
+        "skills/spec-resolve-pr-feedback/references/full-mode.md:144-147",
+        "skills/spec-resolve-pr-feedback/references/full-mode.md:206-255"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run",
+      "finding_refs": [
+        "C1-PRFEEDBACK-001"
+      ]
+    },
+    {
+      "id": "degraded_recovery_handoff",
+      "status": "source-covered",
+      "judgment": "分页告警保留不完整证据；dispatch 不可用时串行处理；完整 needs-human residual 返回调用方；重复循环有停止边界。",
+      "source_refs": [
+        "skills/spec-resolve-pr-feedback/scripts/get-pr-comments:137-187",
+        "skills/spec-resolve-pr-feedback/references/full-mode.md:277-315",
+        "skills/spec-resolve-pr-feedback/references/evaluation-rubric.md:90-111"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    }
+  ],
+  "findings": [
+    {
+      "id": "C1-PRFEEDBACK-001",
+      "severity": "P1",
+      "title": "按失败文件未修改直接放行新的跨文件回归",
+      "status": "confirmed-open",
+      "ledger_ref": "finding-ledger.json"
+    },
+    {
+      "id": "C1-PRFEEDBACK-002",
+      "severity": "P2",
+      "title": "blocked resolver 的空变更清单可隐藏已写修改",
+      "status": "confirmed-open",
+      "ledger_ref": "finding-ledger.json"
+    }
+  ],
+  "fresh_source_eval": "not-run",
+  "claim_ceiling": "C1",
+  "limitations": [
+    "其余 eval fixture 与跨宿主/远端检查未运行。",
+    "helper scripts 未在 GitHub/GHE 执行。",
+    "原机械占位结论已撤销；source-covered仅证明已读范围可追踪，不证明运行通过。",
+    "未确认读取范围不计覆盖；哈希只证明字节。"
+  ],
+  "recovery_point": "按主 owner 对 P1/P2 的回源裁决进入后续修复，并补充聚焦 source/contract 测试。",
+  "timing": {
+    "active_seconds": null,
+    "limitation": "逐包主动时间不可可靠恢复，未用工具墙钟估算。"
+  },
+  "record_correction": {
+    "at": "2026-09-20T05:55:01.022802+00:00",
+    "invalidated": "2026-09-20T05:24 的机械占位结论",
+    "replaced_by_actual_review_at": "2026-09-20T07:35:36.158199+00:00"
+  },
+  "supporting_read_ranges": {
+    "tests/unit/spec-resolve-pr-feedback-contracts.test.js": "1-170",
+    "skills/spec-lfg/references/pr-watch-loop.md": "1-50"
+  },
+  "unconfirmed_read_ranges": [],
+  "reviewer_provenance": {
+    "reviewer": "cycle1_a_exit",
+    "kind": "read-only-source-review",
+    "fresh_per_package_context": false,
+    "raw_return": "reviewer-returns/b.json",
+    "raw_return_sha256": "74c86ff4af0bab17fbeb82f390cf57eb33590df5a24910b9823d19382480563c"
+  },
+  "execution": {
+    "source_semantic_review": "ran",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "not-run",
+    "owner_probe_refs": []
+  }
+}

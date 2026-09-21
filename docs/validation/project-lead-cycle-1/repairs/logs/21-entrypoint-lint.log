@@ -1,0 +1,5 @@
+
+> spec-first@1.15.3 lint:skill-entrypoints
+> node scripts/lint-skill-entrypoints.js
+
+skill entrypoint lint passed (497 files scanned)

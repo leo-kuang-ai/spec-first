@@ -1,0 +1,59 @@
+{
+  "status": "fixed",
+  "scope": "本轮8项定向修复之外的全仓收口条件",
+  "items": [
+    {
+      "id": "CE-TOPOLOGY-DRIFT",
+      "status": "fixed",
+      "failed_tests": [
+        "ce-localization-review-contracts.test.js",
+        "ce-localization-closeout-contracts.test.js"
+      ],
+      "evidence": "ce-topology-delta.json",
+      "impact": "全套unit不通过；当前source与旧CE审查快照未同源",
+      "repair_owner": "CE source inventory / semantic coverage closeout",
+      "next_action": "普通回归继续全套验证；历史CE覆盖当前版本仍需独立显式复审，未在本轮重签。",
+      "repair": "解除普通unit对历史计数的错误耦合，以独立Git集合/owner/hash验证live；历史closeout针对recorded binding验证，保留显式current gate及count-neutral漂移拒绝。",
+      "validation": "17-ce-before: 2 failed/14 passed；18-ce-after:17 passed。",
+      "current_ce_claim": "stale-not-refreshed"
+    },
+    {
+      "id": "EVAL-TSV-WHITESPACE",
+      "status": "fixed",
+      "path": "docs/validation/skill-evals/results.tsv",
+      "lines": [
+        75,
+        77,
+        79
+      ],
+      "impact": "全仓git diff --check失败，本轮fix-owned范围检查通过",
+      "next_action": "无剩余修复动作；后续新增记录仍按9列TSV写入。",
+      "repair": "把3条拆出的full_test还原为前行eval_mode，保留原始内容与随后追加行。",
+      "validation": "79行全部9列；git diff --check exit0"
+    }
+  ],
+  "updated_at": "2026-09-21T10:12:39.166638+00:00",
+  "limitations": [
+    "fixed只表示本轮全仓回归阻断原因已修复，不能升级历史CE为当前源码已审查。",
+    "19-ce-current-gate实际仍exit1 stale，属当前审查适用性事实。"
+  ],
+  "full_regression": {
+    "command": "npm test",
+    "exit_code": 0,
+    "unit": {
+      "suites": 239,
+      "passed": 2999
+    },
+    "smoke": {
+      "suites": 1,
+      "passed": 5
+    },
+    "integration": {
+      "suites_passed": 17,
+      "suites_skipped": 1,
+      "passed": 84,
+      "skipped": 2
+    },
+    "log": "logs/20-full-regression.log"
+  }
+}

@@ -1,0 +1,48 @@
+[
+  {
+    "at": "2026-09-20T03:03:28.151377+00:00",
+    "reads": [
+      {
+        "path": "skills/spec-runtime-setup/SKILL.md",
+        "ranges": [
+          [
+            1,
+            145
+          ],
+          [
+            333,
+            368
+          ]
+        ],
+        "limitation": "工具输出截断，中段不计阅读；后续需补读"
+      },
+      {
+        "path": "skills/spec-compound/references/promotion.md",
+        "ranges": [
+          [
+            1,
+            12
+          ]
+        ]
+      },
+      {
+        "path": "skills/spec-compound/references/lightweight.md",
+        "ranges": [
+          [
+            1,
+            66
+          ]
+        ]
+      },
+      {
+        "path": "skills/spec-compound/references/report.md",
+        "ranges": [
+          [
+            1,
+            96
+          ]
+        ]
+      }
+    ]
+  }
+]

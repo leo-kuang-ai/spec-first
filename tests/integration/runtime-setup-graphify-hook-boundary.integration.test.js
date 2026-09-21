@@ -44,6 +44,9 @@ function createFixture(label) {
   if (initialized.status !== 0) throw new Error(initialized.stderr || initialized.stdout);
   run('git', ['-C', project, 'config', 'user.email', 'dogfood@example.com']);
   run('git', ['-C', project, 'config', 'user.name', 'Runtime Setup Dogfood']);
+  run('git', ['-C', project, 'add', 'src/index.js']);
+  const committed = run('git', ['-C', project, 'commit', '-qm', 'baseline']);
+  if (committed.status !== 0) throw new Error(committed.stderr || committed.stdout);
   const skillDir = path.join(home, '.agents', 'skills', 'ast-grep');
   fs.mkdirSync(skillDir, { recursive: true });
   fs.writeFileSync(path.join(skillDir, 'SKILL.md'), '# ast-grep\n');
@@ -236,10 +239,6 @@ function waitFor(predicate, timeoutMs = 60000, intervalMs = 250) {
   const env = realToolEnvironment(fixture.home);
   const configured = run('git', ['-C', fixture.project, 'config', '--local', 'core.hooksPath', '.githooks'], { env });
   if (configured.status !== 0) throw new Error(configured.stderr || configured.stdout);
-  const staged = run('git', ['-C', fixture.project, 'add', 'src/index.js'], { env });
-  if (staged.status !== 0) throw new Error(staged.stderr || staged.stdout);
-  const baseline = run('git', ['-C', fixture.project, 'commit', '-m', 'test: baseline'], { env });
-  if (baseline.status !== 0) throw new Error(baseline.stderr || baseline.stdout);
   initializeRuntime(fixture, env);
 
   const result = runProjectedSetup(fixture, env, ['--only', 'graphify']);

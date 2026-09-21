@@ -74,7 +74,7 @@ bash -c 'if [ -n "${CLAUDE_SKILL_DIR:-}" ]; then exec bash "$CLAUDE_SKILL_DIR/sc
 
 After creation, switch to the worktree with `cd .worktrees/<branch-name>`.
 
-The `create` command consumes the same detection function before creating `.worktrees/<branch>` or running `git worktree add`. It refuses `linked-worktree`, `unknown`, `not-git-repo`, `git-query-failed`, and `output-contract-failed` states so this helper cannot create nested or invisible worktrees by bypassing Step 0.
+The `create` command consumes the same detection function before creating `.worktrees/<branch>` or running `git worktree add`. It refuses `linked-worktree`, `unknown`, `not-git-repo`, `git-query-failed`, and `output-contract-failed` states so this helper cannot create nested or invisible worktrees by bypassing Step 0. If the script exits non-zero for any other reason — including a base ref that does not resolve to a commit on an empty/unborn repository (`reason_code=base-ref-unresolvable`) — report the reason and stop. Do not fall back to raw `git worktree add`; a script failure is a contract failure, not permission to bypass the wrapper.
 
 ## Isolating an existing ref
 

@@ -35,8 +35,8 @@ Do not write semantic trust fields such as `advisory`, `evidence_candidate`, or 
 
 ### 默认调用迁移（U4）
 
-- bare/check：只读诊断，不构图。
-- `--plan`：默认预览 installation；JSON `setup-install-plan.v1.readiness_scope` 增量标识 installation/artifact。实际安装使用 `--installation-only`，不能把删除 `--plan` 后的 bare 当成 apply。
+- 模式统一说明见 [Runtime Setup 模式矩阵](../../skills/spec-runtime-setup/SKILL.md#安装与图能力分离)。单项目 bare 收敛完整 artifact baseline；多仓父目录 bare（包括 bare --all-repos）与所有 `--check` 只读诊断，不构图。
+- `--plan`：默认预览 installation；JSON `setup-install-plan.v1.readiness_scope` 增量标识 installation/artifact。单仓与多仓摘要共用范围保持建议：实际安装显式使用 `--installation-only`，artifact apply 显式使用 `--only <selected_ids>`；保留 target、requirement workspace、selection、repair 和 refresh，不能只删除 `--plan` 后执行 bare。
 - `--verify-only` / `--refresh-facts`：默认只验证安装与接线并写 facts；成功 summary 为 `scope=installation`、`overall_status=partial`。
 - 显式 `--only codegraph,graphify`：安装并进入图生命周期；搭配 `--plan` 为图预览，搭配 `--verify-only` 为已有图验证且只允许 facts 写入。单个图 provider 的 verify summary 为 subset，不能声称 full setup。
 - `--requirement-workspace` 保留显式 Graphify 输入范围语义。installation-only 可进一步收窄该路径的副作用。

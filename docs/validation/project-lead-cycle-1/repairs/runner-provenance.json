@@ -1,0 +1,31 @@
+{
+  "purpose": "本轮临时命令采集，不属于产品实现",
+  "script": "import sys,subprocess,json,datetime\nfrom pathlib import Path\nroot=Path('/Users/kuang/xiaobu/spec-first')\nevidence=root/'docs/validation/project-lead-cycle-1/repairs'\nname,expected,*argv=sys.argv[1:]\nstart=datetime.datetime.now(datetime.timezone.utc).isoformat()\nr=subprocess.run(argv,cwd=root,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)\nlog=evidence/'logs'/f'{name}.log'; log.write_text(r.stdout)\nrow={'check_id':name,'command_argv':argv,'started_at':start,'finished_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'exit_code':r.returncode,'expected':expected,'status':'passed' if r.returncode==0 else 'failed','log_path':str(log.relative_to(root))}\nwith (evidence/'checks.jsonl').open('a') as f: f.write(json.dumps(row,ensure_ascii=False)+'\\n')\nprint(json.dumps(row,ensure_ascii=False)); print(r.stdout[-5500:])\n",
+  "scratch": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first-cycle1-repair-h9zvzx0_",
+  "persistent_runner": "check-command.py",
+  "scratch_status": "removed-after-backup-verification",
+  "before_source_archive": "before-fix-owned-source.tar.gz",
+  "archived_paths": [
+    "skills/spec-resolve-pr-feedback/references/full-mode.md",
+    "skills/spec-resolve-pr-feedback/references/targeted-mode.md",
+    "skills/spec-resolve-pr-feedback/references/pipeline-return.md",
+    "skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md",
+    "skills/spec-commit-push-pr/references/branch-creation.md",
+    "skills/spec-code-review/references/scope.md",
+    "skills/spec-code-review/scripts/review-scope.py",
+    "skills/spec-runtime-setup/SKILL.md",
+    "skills/spec-runtime-setup/references/supported-mcp-tools.md",
+    "skills/spec-runtime-setup/scripts/setup.cjs",
+    "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
+    "skills/spec-runtime-setup/scripts/lib/workspace-executor.cjs",
+    "skills/spec-runtime-setup/scripts/lib/workspace-runtime-preflight.cjs",
+    "tests/unit/spec-resolve-pr-feedback-contracts.test.js",
+    "tests/unit/spec-commit-push-pr-context-contracts.test.js",
+    "tests/unit/spec-code-review-mechanics.test.js",
+    "tests/unit/mcp-setup-entrypoint.test.js",
+    "tests/unit/mcp-setup-mode-target.test.js",
+    "tests/unit/mcp-setup-contracts.test.js",
+    "tests/unit/mcp-setup-workspace-parent-diagnostic.test.js"
+  ],
+  "cleaned_at": "2026-09-21T09:35:26.664697+00:00"
+}

@@ -1,0 +1,28 @@
+id: standalone-closeout-order
+title: standalone 实现完成后走 closeout 链而非直接宣称完成
+description: |
+  验证 code closeout boundary：本地变更与验证后按
+  references/shipping-workflow.md 记录 verification-run-summary 并经
+  honest-closeout 收口；完成汇报绑定 closeout 语义而非裸自述。
+  commit 未授权，保持未提交。
+
+input:
+  prompt: |
+    （spec-work skill 已安装，请按它工作。）
+    把 README.md 里的标题 "Known rough edges" 改成 "Known limitations"，
+    就这一处。完成后按规范收口；不授权提交。
+
+context:
+  repo_fixture: evals/fixtures/repos/reqonly-plan
+  git:
+    init: true
+    checkout: main
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 25
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-closeout-order.sh
+  timeout_seconds: 30

@@ -1,0 +1,735 @@
+{
+  "artifact_type": "bounded-source-review-worker-results",
+  "source_head": "36d19d95c3a79df2d1278083c959bb34eadbde8c",
+  "reviewer": "cycle1_a_readiness",
+  "generated_at": "2026-09-20T06:23:57.150898+00:00",
+  "inventory_ref": "/Users/kuang/xiaobu/spec-first/docs/validation/project-lead-cycle-1/u9/skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "review_scope": "C1 八包有界只读 source review；从本 worker 压缩前已完成阅读与判断恢复，未重复执行被审 workflow。",
+  "overall_status": "degraded",
+  "claim_ceiling": "C0",
+  "range_corrections": [],
+  "receipts": [
+    {
+      "skill_name": "spec-project-rules",
+      "source_read_ranges": {
+        "skills/spec-project-rules/SKILL.md": "1-122",
+        "skills/spec-project-rules/references/knowledge-format.md": "1-151",
+        "skills/spec-project-rules/references/mining-method.md": "1-103",
+        "skills/spec-project-rules/scripts/extract-deps.cjs": "322-475,478-488,580-638"
+      },
+      "branches": [
+        {
+          "kind": "entry_positive",
+          "judgment": "项目知识挖掘的入口以当前源码及 owner evidence 为输入；规则记录区分 stack、architecture、quality、commands 与 freshness，提取脚本只准备依赖事实。已读范围未显示把依赖名称自动提升为团队规则的逻辑。",
+          "source_refs": [
+            "skills/spec-project-rules/SKILL.md:1-122",
+            "skills/spec-project-rules/scripts/extract-deps.cjs:322-475"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "near_neighbor_negative",
+          "judgment": "未受支持的布局进入有界采样并显式记录限制；无法由当前 source 证明的惯例不能仅凭推测写为已确认规则。首次 headless 嵌入与已有规则更新的边界分别存在。",
+          "source_refs": [
+            "skills/spec-project-rules/SKILL.md:1-122",
+            "skills/spec-project-rules/references/mining-method.md:1-103"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "output_consumer",
+          "judgment": "输出通过约定 marker、frontmatter 与 knowledge 格式供后续 workflow 消费；证据引用与 freshness 让消费者识别当前规则的来源和适用范围。",
+          "source_refs": [
+            "skills/spec-project-rules/references/knowledge-format.md:1-151"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "failure_stop",
+          "judgment": "已读文本保留无源码支持、marker 不匹配及未知布局的边界，不能将 sampling 结果宣传为完整仓库规则审计。实际 parser 的所有异常路径尚未覆盖。",
+          "source_refs": [
+            "skills/spec-project-rules/SKILL.md:1-122",
+            "skills/spec-project-rules/references/knowledge-format.md:1-151"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "recovery_handoff_closeout",
+          "judgment": "规则需携带 source refs 与 freshness；未读 mining-method 后半段及 host projection，因此本轮只能确认这些边界被定义，不能确认每条更新与宿主嵌入路径均执行正确。",
+          "source_refs": [
+            "skills/spec-project-rules/references/knowledge-format.md:1-151",
+            "skills/spec-project-rules/references/mining-method.md:1-103"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        }
+      ],
+      "findings": [],
+      "gaps": [
+        "mining-method.md 后半部分未读。",
+        "extract-deps.cjs 未完成全文件闭包；全部 eval/test 和 host projection 未读完或执行。"
+      ],
+      "recovery": "补读 mining-method 剩余部分及提取器异常分支，覆盖首次生成、已有 marker 更新和 unsupported layout 的最小用例；再校验真实宿主投射。",
+      "batch": "C1",
+      "status": "degraded",
+      "dependency_closure": "partial",
+      "claim_ceiling": "C0",
+      "fresh_source_eval": "not-run",
+      "package_files": 105,
+      "package_bytes": 121224,
+      "closure_tier": "L",
+      "timing": {
+        "active_seconds": null,
+        "limitation": "恢复前未记录可靠的逐包审查耗时；不以工具墙钟时间伪造语义审查耗时。"
+      },
+      "execution_limitations": [
+        "本 worker 仅进行有界 source review；未执行被审 workflow、真实模型、真实宿主、安装、浏览器或外部写入。",
+        "source-read 不等于完整依赖闭包或行为评测通过；完整包 status 由主 owner 结合 findings 裁决。"
+      ],
+      "read_files": 4,
+      "read_package_files": 4,
+      "unread_package_files": 101,
+      "denominator_limitation": "package_files 来自冻结 inventory 的包内普通文件计数；read_files 包含部分阅读及跨包引用，既不是完整文件阅读数，也不是依赖闭包完成比例。"
+    },
+    {
+      "skill_name": "spec-app-consistency-audit",
+      "source_read_ranges": {
+        "skills/spec-app-consistency-audit/SKILL.md": "1-307",
+        "skills/spec-app-consistency-audit/references/headless-runner.md": "1-95",
+        "skills/spec-app-consistency-audit/references/mode-output-contract.md": "1-200",
+        "skills/spec-app-consistency-audit/scripts/run-audit.js": "70-102,222-320,495-625",
+        "skills/spec-app-consistency-audit/scripts/preflight.js": "1-40,180-184,554-564"
+      },
+      "branches": [
+        {
+          "kind": "entry_positive",
+          "judgment": "输入 PRD、Figma 与本地代码的 App 一致性审查采用静态优先；Figma 被界定为 reference-only，run artifact lifecycle 与 issue synthesis 分开，LLM 负责语义问题判断。",
+          "source_refs": [
+            "skills/spec-app-consistency-audit/SKILL.md:1-307",
+            "skills/spec-app-consistency-audit/scripts/run-audit.js:222-320"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "near_neighbor_negative",
+          "judgment": "通用 code review、单纯测试和 R2 实施不属于该审查入口。v1 runner 只接受 mode:headless；mode:report-only 虽有 workflow 语义定义，但当前 runner 明确返回 mode_unsupported，不能声称存在可执行等价路径。",
+          "source_refs": [
+            "skills/spec-app-consistency-audit/SKILL.md:1-307",
+            "skills/spec-app-consistency-audit/scripts/run-audit.js:70-102",
+            "skills/spec-app-consistency-audit/references/headless-runner.md:1-95"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "output_consumer",
+          "judgment": "输出合同包含 run 级 artifacts、报告与 evidence gate；issue synthesis 不能把静态线索直接当成已验证视觉/运行时缺陷，消费者需保留 mode 和 limitations。",
+          "source_refs": [
+            "skills/spec-app-consistency-audit/references/mode-output-contract.md:1-200",
+            "skills/spec-app-consistency-audit/scripts/run-audit.js:495-625"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "failure_stop",
+          "judgment": "preflight 和 run 分支对不可用输入/不支持 mode 记录失败；证据不足不能升级为完整一致性通过。preflight 仅局部读取，尚不能确认所有无输入、失效路径、失败清理组合。",
+          "source_refs": [
+            "skills/spec-app-consistency-audit/scripts/preflight.js:1-40",
+            "skills/spec-app-consistency-audit/scripts/preflight.js:180-184",
+            "skills/spec-app-consistency-audit/scripts/preflight.js:554-564",
+            "skills/spec-app-consistency-audit/scripts/run-audit.js:70-102"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "recovery_handoff_closeout",
+          "judgment": "mode 输出合同描述 degraded 与报告限制，run 生命周期有汇总出口；未执行 runner、未完成所有 schema/rule-pack/prompt 闭包，不能从文档完整性推出真实 App 或 Figma 审查可靠。",
+          "source_refs": [
+            "skills/spec-app-consistency-audit/references/mode-output-contract.md:1-200",
+            "skills/spec-app-consistency-audit/references/headless-runner.md:1-95"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        }
+      ],
+      "findings": [],
+      "gaps": [
+        "全部 scripts、schemas、prompts、rule-packs、tests 未完成依赖闭包。",
+        "未执行 headless runner、Figma provider、浏览器或真实 App；report-only runner 路径当前不支持。"
+      ],
+      "recovery": "补读 runner/preflight 未读分支及关键 artifact schema；用静态 fixture 分别验证 headless 正例、mode_unsupported、缺输入和 evidence 不充分出口，再单独做真实 App/宿主证据。",
+      "batch": "C1",
+      "status": "degraded",
+      "dependency_closure": "partial",
+      "claim_ceiling": "C0",
+      "fresh_source_eval": "not-run",
+      "package_files": 90,
+      "package_bytes": 415367,
+      "closure_tier": "L",
+      "timing": {
+        "active_seconds": null,
+        "limitation": "恢复前未记录可靠的逐包审查耗时；不以工具墙钟时间伪造语义审查耗时。"
+      },
+      "execution_limitations": [
+        "本 worker 仅进行有界 source review；未执行被审 workflow、真实模型、真实宿主、安装、浏览器或外部写入。",
+        "source-read 不等于完整依赖闭包或行为评测通过；完整包 status 由主 owner 结合 findings 裁决。"
+      ],
+      "read_files": 5,
+      "read_package_files": 5,
+      "unread_package_files": 85,
+      "denominator_limitation": "package_files 来自冻结 inventory 的包内普通文件计数；read_files 包含部分阅读及跨包引用，既不是完整文件阅读数，也不是依赖闭包完成比例。"
+    },
+    {
+      "skill_name": "spec-sweep",
+      "source_read_ranges": {
+        "skills/spec-sweep/SKILL.md": "1-124",
+        "skills/spec-sweep/references/run.md": "1-90",
+        "skills/spec-sweep/references/state-schema.md": "1-212",
+        "skills/spec-sweep/references/plan-template.md": "1-63",
+        "skills/spec-sweep/scripts/sweep-state.py": "1-70,270-350,391-565,770-814"
+      },
+      "branches": [
+        {
+          "kind": "entry_positive",
+          "judgment": "入口依据已配置反馈源收集增量反馈，state engine 负责 lease、cursor 和去重等确定性状态；计划与任务判断由 workflow 语义层处理。",
+          "source_refs": [
+            "skills/spec-sweep/SKILL.md:1-124",
+            "skills/spec-sweep/references/run.md:1-90",
+            "skills/spec-sweep/scripts/sweep-state.py:270-350"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "near_neighbor_negative",
+          "judgment": "未配置来源、缺少外部读写授权或超出 sweep scope 的材料不能静默纳入；shared branch 的写入和 landing 有独立 gate，反馈接入本身不授予提交权限。",
+          "source_refs": [
+            "skills/spec-sweep/SKILL.md:1-124",
+            "skills/spec-sweep/references/run.md:1-90",
+            "skills/spec-sweep/references/plan-template.md:1-63"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "output_consumer",
+          "judgment": "state schema 显式保存来源、cursor/ack 与处理状态；敏感信息需脱敏，计划与 close evidence 为后续执行和复核提供可回源输出。",
+          "source_refs": [
+            "skills/spec-sweep/references/state-schema.md:1-212",
+            "skills/spec-sweep/references/plan-template.md:1-63"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "failure_stop",
+          "judgment": "已读状态逻辑体现 lease、顺序化 ack/cursor 与 close evidence 边界，避免反馈尚未完成时提前承诺已处理。未读完整脚本，不能把局部路径审查外推为并发与 crash recovery 已通过。",
+          "source_refs": [
+            "skills/spec-sweep/scripts/sweep-state.py:391-565",
+            "skills/spec-sweep/scripts/sweep-state.py:770-814",
+            "skills/spec-sweep/references/state-schema.md:1-212"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "recovery_handoff_closeout",
+          "judgment": "恢复依赖持久化 state 与 lease/close evidence，而非对话口头声明；本轮没有调用 Slack/GitHub/email、媒体分析或转录，因此外部来源失败、重复投递及真实关闭顺序仍需验证。",
+          "source_refs": [
+            "skills/spec-sweep/references/run.md:1-90",
+            "skills/spec-sweep/references/state-schema.md:1-212"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        }
+      ],
+      "findings": [],
+      "gaps": [
+        "sweep-state.py 未读区间和全部 tests 未完成。",
+        "Slack/GitHub/email、media analyzer、transcription、commit/push 均未执行。"
+      ],
+      "recovery": "补齐 lease/cursor/ack 的未读实现，用并发 fixture 与中断恢复用例验证不丢事件和不提前 ack；真实外部来源验证需独立保留授权与结果证据。",
+      "batch": "C1",
+      "status": "degraded",
+      "dependency_closure": "partial",
+      "claim_ceiling": "C0",
+      "fresh_source_eval": "not-run",
+      "package_files": 20,
+      "package_bytes": 173699,
+      "closure_tier": "M",
+      "timing": {
+        "active_seconds": null,
+        "limitation": "恢复前未记录可靠的逐包审查耗时；不以工具墙钟时间伪造语义审查耗时。"
+      },
+      "execution_limitations": [
+        "本 worker 仅进行有界 source review；未执行被审 workflow、真实模型、真实宿主、安装、浏览器或外部写入。",
+        "source-read 不等于完整依赖闭包或行为评测通过；完整包 status 由主 owner 结合 findings 裁决。"
+      ],
+      "read_files": 5,
+      "read_package_files": 5,
+      "unread_package_files": 15,
+      "denominator_limitation": "package_files 来自冻结 inventory 的包内普通文件计数；read_files 包含部分阅读及跨包引用，既不是完整文件阅读数，也不是依赖闭包完成比例。"
+    },
+    {
+      "skill_name": "spec-commit",
+      "source_read_ranges": {
+        "skills/spec-commit/SKILL.md": "1-121",
+        "skills/spec-commit-push-pr/references/commit-and-push.md": "1-50"
+      },
+      "branches": [
+        {
+          "kind": "entry_positive",
+          "judgment": "该 skill 是 caller-owned internal commit helper；commit authority 与 branch mutation authority 分离，commit 不自动扩展为 push/PR。",
+          "source_refs": [
+            "skills/spec-commit/SKILL.md:1-121"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "near_neighbor_negative",
+          "judgment": "对包含无关变更、mixed hunk 或不明确 ownership 的 index，不能用全仓 staging 代替范围判断；默认分支 gate 与新建/切换分支权限独立。",
+          "source_refs": [
+            "skills/spec-commit/SKILL.md:1-121",
+            "skills/spec-commit-push-pr/references/commit-and-push.md:1-50"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "output_consumer",
+          "judgment": "输出应把 commit 事实、覆盖路径和未处理变更交回 caller；helper 的局部成功不能关闭上游完整任务，也不能被当成远程 landing 证据。",
+          "source_refs": [
+            "skills/spec-commit/SKILL.md:1-121"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "failure_stop",
+          "judgment": "path-scoped staging 与 mixed-hunk stop 保留用户 index/path ownership；缺少精确授权、分支权限或提交验证证据时停止对应副作用。已读文本未发现放行这些失败的路径。",
+          "source_refs": [
+            "skills/spec-commit/SKILL.md:1-121",
+            "skills/spec-commit-push-pr/references/commit-and-push.md:1-50"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "recovery_handoff_closeout",
+          "judgment": "失败应保留当前状态并交回 caller，不扩大到 push 或自行代替整体关闭。由于未执行 Git mutation，也未读全部跨包依赖，当前只是合同层审查。",
+          "source_refs": [
+            "skills/spec-commit/SKILL.md:1-121"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        }
+      ],
+      "findings": [],
+      "gaps": [
+        "未运行 Git fixture、commit 或 tests。",
+        "共享 commit-and-push 以外的引用闭包和宿主投射未全读。"
+      ],
+      "recovery": "补齐依赖引用，用临时 Git fixture 覆盖路径选择、预先暂存无关文件、mixed hunk 和 default branch；检查 caller 收到的 commit receipt 与实际 index 一致。",
+      "batch": "C1",
+      "status": "degraded",
+      "dependency_closure": "partial",
+      "claim_ceiling": "C0",
+      "fresh_source_eval": "not-run",
+      "package_files": 9,
+      "package_bytes": 13367,
+      "closure_tier": "S",
+      "timing": {
+        "active_seconds": null,
+        "limitation": "恢复前未记录可靠的逐包审查耗时；不以工具墙钟时间伪造语义审查耗时。"
+      },
+      "execution_limitations": [
+        "本 worker 仅进行有界 source review；未执行被审 workflow、真实模型、真实宿主、安装、浏览器或外部写入。",
+        "source-read 不等于完整依赖闭包或行为评测通过；完整包 status 由主 owner 结合 findings 裁决。"
+      ],
+      "read_files": 2,
+      "read_package_files": 1,
+      "unread_package_files": 8,
+      "denominator_limitation": "package_files 来自冻结 inventory 的包内普通文件计数；read_files 包含部分阅读及跨包引用，既不是完整文件阅读数，也不是依赖闭包完成比例。"
+    },
+    {
+      "skill_name": "spec-commit-push-pr",
+      "source_read_ranges": {
+        "skills/spec-commit-push-pr/SKILL.md": "1-132",
+        "skills/spec-commit-push-pr/references/context.md": "1-65",
+        "skills/spec-commit-push-pr/references/commit-and-push.md": "1-50",
+        "skills/spec-commit-push-pr/references/apply-and-handoff.md": "1-93",
+        "skills/spec-commit-push-pr/references/branch-creation.md": "1-85"
+      },
+      "branches": [
+        {
+          "kind": "entry_positive",
+          "judgment": "caller-owned landing helper 区分 description-only、已存在 PR 和完整 commit/push/PR scope；landing authority 不由 helper 名称或已有登录态产生。",
+          "source_refs": [
+            "skills/spec-commit-push-pr/SKILL.md:1-132",
+            "skills/spec-commit-push-pr/references/context.md:1-65"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "near_neighbor_negative",
+          "judgment": "description-only 不应写远程；fork owner 与现有 PR identity 需匹配，unknown remote state 不能当作不存在后重建。已读引用明确使用 body-file 和 read-back，避免依赖 shell 插值或未核实的写入回执。",
+          "source_refs": [
+            "skills/spec-commit-push-pr/SKILL.md:1-132",
+            "skills/spec-commit-push-pr/references/apply-and-handoff.md:1-93"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "output_consumer",
+          "judgment": "apply-and-handoff 要求把实际 landing 状态、验证与未完成项交回 caller；commit/push/PR 是分别有证据的事实，不能由一个步骤成功替代后续确认。",
+          "source_refs": [
+            "skills/spec-commit-push-pr/references/apply-and-handoff.md:1-93",
+            "skills/spec-commit-push-pr/references/commit-and-push.md:1-50"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "failure_stop",
+          "judgment": "checkout collision 恢复采用 stash -u / stash pop；没有可靠恢复并验证原始 index 的动作，会保留文件内容但丢失原来 staged-vs-unstaged 选择，与后续 staging ownership 要求冲突。登记 C1-COMMITPR-001，主 owner 已用临时 Git fixture 确认。",
+          "source_refs": [
+            "skills/spec-commit-push-pr/references/branch-creation.md:55-66",
+            "skills/spec-commit-push-pr/references/commit-and-push.md:8-19"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "recovery_handoff_closeout",
+          "judgment": "远程 unknown 或 write/read-back 不一致应显式留下未完成状态。checkout collision 的当前 stash 恢复路径尚不能证明保留 index，因此本包不得升级 passed；修复后需复验预先暂存与未暂存混合情形。",
+          "source_refs": [
+            "skills/spec-commit-push-pr/references/apply-and-handoff.md:1-93",
+            "skills/spec-commit-push-pr/references/branch-creation.md:55-66"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        }
+      ],
+      "findings": [
+        {
+          "id": "C1-COMMITPR-001",
+          "severity": "P2",
+          "status": "confirmed-source-and-fixture",
+          "title": "checkout collision 的 stash 恢复没有保留原始暂存选择",
+          "source_refs": [
+            "skills/spec-commit-push-pr/references/branch-creation.md:55-66",
+            "skills/spec-commit-push-pr/references/commit-and-push.md:8-19"
+          ],
+          "trigger": "checkout 遇到本地文件冲突，并按引用执行 stash -u 后 checkout、stash pop。",
+          "impact": "文件内容可保留，但原始 staged-vs-unstaged 选择可能改变，违反显式 index/path ownership 边界；后续提交可能错误包含或遗漏原有变更。",
+          "fixture_provenance": "主 owner 已运行临时 Git fixture；该 child 未独立重跑，正式 fixture evidence 由主 owner 关联。",
+          "repair_direction": "由 owning source 明确保留并验证 index，或无法可靠恢复时停止；不能只确认文件内容仍在。",
+          "fixed": false
+        }
+      ],
+      "gaps": [
+        "compose、pr-description-writing 等完整依赖尚未读完。",
+        "未执行远程 GitHub/PR 操作、真实宿主调用或该 child 的 Git mutation。"
+      ],
+      "recovery": "先修复并回归 checkout collision 的 index preservation finding；补读其余依赖，分别验证 description-only、已有 fork PR、远程状态未知与 read-back 不一致，不触发真实外部写入。",
+      "batch": "C1",
+      "status": "degraded",
+      "dependency_closure": "partial",
+      "claim_ceiling": "C0",
+      "fresh_source_eval": "not-run",
+      "package_files": 15,
+      "package_bytes": 61637,
+      "closure_tier": "S",
+      "timing": {
+        "active_seconds": null,
+        "limitation": "恢复前未记录可靠的逐包审查耗时；不以工具墙钟时间伪造语义审查耗时。"
+      },
+      "execution_limitations": [
+        "本 worker 仅进行有界 source review；未执行被审 workflow、真实模型、真实宿主、安装、浏览器或外部写入。",
+        "source-read 不等于完整依赖闭包或行为评测通过；完整包 status 由主 owner 结合 findings 裁决。"
+      ],
+      "read_files": 5,
+      "read_package_files": 5,
+      "unread_package_files": 10,
+      "denominator_limitation": "package_files 来自冻结 inventory 的包内普通文件计数；read_files 包含部分阅读及跨包引用，既不是完整文件阅读数，也不是依赖闭包完成比例。"
+    },
+    {
+      "skill_name": "spec-worktree",
+      "source_read_ranges": {
+        "skills/spec-worktree/SKILL.md": "1-152",
+        "skills/spec-worktree/scripts/worktree-manager.sh": "115-216,268-312,470-547,549-710"
+      },
+      "branches": [
+        {
+          "kind": "entry_positive",
+          "judgment": "internal helper 区分 detect、create 与 isolate，按 caller 的任务 scope 处理 worktree 生命周期；linked worktree 情况不会继续嵌套创建。",
+          "source_refs": [
+            "skills/spec-worktree/SKILL.md:1-152",
+            "skills/spec-worktree/scripts/worktree-manager.sh:115-216"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "near_neighbor_negative",
+          "judgment": "分支 already_checked_out 与 nested-worktree 条件有明确拒绝/复用边界；环境文件复制需要 opt-in，不能把父仓信任或 .env 自动扩散到新工作区。",
+          "source_refs": [
+            "skills/spec-worktree/SKILL.md:1-152",
+            "skills/spec-worktree/scripts/worktree-manager.sh:268-312",
+            "skills/spec-worktree/scripts/worktree-manager.sh:470-547"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "output_consumer",
+          "judgment": "worktree 路径和创建/检测事实交回 caller；helper 不代替 caller 决定完整任务、运行时安装或 Git landing。trust 不自动执行使 consumer 仍持有副作用控制。",
+          "source_refs": [
+            "skills/spec-worktree/SKILL.md:1-152",
+            "skills/spec-worktree/scripts/worktree-manager.sh:549-710"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "failure_stop",
+          "judgment": "已读实现包含 already_checked_out、linked worktree 与依赖/参数失败边界，未发现为继续创建而默认清理用户改动的规则。shell 中间区间未完整阅读，不能据此宣称所有清理分支安全。",
+          "source_refs": [
+            "skills/spec-worktree/scripts/worktree-manager.sh:115-216",
+            "skills/spec-worktree/scripts/worktree-manager.sh:268-312",
+            "skills/spec-worktree/scripts/worktree-manager.sh:470-547"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "recovery_handoff_closeout",
+          "judgment": "caller 持有恢复与后续使用决策；环境复制、trust 与 mutation 的显式边界在已读内容中保留。本轮未实际创建或删除 worktree，恢复与清理路径需 fixture 验证。",
+          "source_refs": [
+            "skills/spec-worktree/SKILL.md:1-152",
+            "skills/spec-worktree/scripts/worktree-manager.sh:549-710"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        }
+      ],
+      "findings": [],
+      "gaps": [
+        "worktree-manager.sh 中间区间未完整阅读。",
+        "未执行 worktree mutation、shell tests、环境复制或 trust 设置。"
+      ],
+      "recovery": "补齐脚本未读区间，在临时 Git repo 中验证 existing linked worktree、already_checked_out、失败清理和显式 env opt-in；确认用户原工作树/index 不受影响。",
+      "batch": "C1",
+      "status": "degraded",
+      "dependency_closure": "partial",
+      "claim_ceiling": "C0",
+      "fresh_source_eval": "not-run",
+      "package_files": 2,
+      "package_bytes": 36401,
+      "closure_tier": "S",
+      "timing": {
+        "active_seconds": null,
+        "limitation": "恢复前未记录可靠的逐包审查耗时；不以工具墙钟时间伪造语义审查耗时。"
+      },
+      "execution_limitations": [
+        "本 worker 仅进行有界 source review；未执行被审 workflow、真实模型、真实宿主、安装、浏览器或外部写入。",
+        "source-read 不等于完整依赖闭包或行为评测通过；完整包 status 由主 owner 结合 findings 裁决。"
+      ],
+      "read_files": 2,
+      "read_package_files": 2,
+      "unread_package_files": 0,
+      "denominator_limitation": "package_files 来自冻结 inventory 的包内普通文件计数；read_files 包含部分阅读及跨包引用，既不是完整文件阅读数，也不是依赖闭包完成比例。"
+    },
+    {
+      "skill_name": "spec-dogfood",
+      "source_read_ranges": {
+        "skills/spec-dogfood/SKILL.md": "1-99",
+        "skills/spec-dogfood/references/phases.md": "1-142",
+        "skills/spec-dogfood/references/dogfood-report-template.md": "1-81",
+        "skills/spec-dogfood/references/test-matrix-taxonomy.md": "1-62"
+      },
+      "branches": [
+        {
+          "kind": "entry_positive",
+          "judgment": "dogfood 按 diff 选择影响流，flow-first 的 scenario ledger 与 test matrix 使探索范围有来源；hands-off 执行仍需保持精确任务和浏览器 origin scope。",
+          "source_refs": [
+            "skills/spec-dogfood/SKILL.md:1-99",
+            "skills/spec-dogfood/references/phases.md:1-142",
+            "skills/spec-dogfood/references/test-matrix-taxonomy.md:1-62"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "near_neighbor_negative",
+          "judgment": "浏览器可用、页面可打开或发现问题本身，不赋予超出 origin 的浏览器操作或源码修复权限；effect authorization 与 fix authorization 分开表达。",
+          "source_refs": [
+            "skills/spec-dogfood/SKILL.md:1-99",
+            "skills/spec-dogfood/references/phases.md:1-142"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "output_consumer",
+          "judgment": "report template 保存覆盖 scenario、发现、证据与限制，给上游实施/审查 workflow 消费；探索命中和未跑路径应分开，不能以截图或页面启动成功替代流程验收。",
+          "source_refs": [
+            "skills/spec-dogfood/references/dogfood-report-template.md:1-81",
+            "skills/spec-dogfood/references/test-matrix-taxonomy.md:1-62"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "failure_stop",
+          "judgment": "exact-origin browser owner、effect/fix authorization 和 automated suite gate 共同限制副作用与 closeout；已读合同没有要求在权限或验证缺口时自动放行。未执行 browser owner 依赖闭包。",
+          "source_refs": [
+            "skills/spec-dogfood/references/phases.md:1-142",
+            "skills/spec-dogfood/SKILL.md:1-99"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "recovery_handoff_closeout",
+          "judgment": "resume checkpoint 允许恢复已知 scenario 进展，最终仍需自动化测试与报告限制相符。没有运行 server/browser/worktree，当前无法判断视觉表现、实际用户流程或复现稳定性。",
+          "source_refs": [
+            "skills/spec-dogfood/references/phases.md:1-142",
+            "skills/spec-dogfood/references/dogfood-report-template.md:1-81"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        }
+      ],
+      "findings": [],
+      "gaps": [
+        "全部 browser dependency、其余 reference 与测试闭包未完整审查。",
+        "未执行 server/browser/worktree/Git mutation，也无真实 UI/视觉证据。"
+      ],
+      "recovery": "补齐 exact-origin owner 和 resume/closeout 下游引用；用可控本地 App 验证只读浏览、需 effect 授权的动作、未授权 fix 停止及 checkpoint 恢复，再独立运行自动化 suite。",
+      "batch": "C1",
+      "status": "degraded",
+      "dependency_closure": "partial",
+      "claim_ceiling": "C0",
+      "fresh_source_eval": "not-run",
+      "package_files": 15,
+      "package_bytes": 41664,
+      "closure_tier": "S",
+      "timing": {
+        "active_seconds": null,
+        "limitation": "恢复前未记录可靠的逐包审查耗时；不以工具墙钟时间伪造语义审查耗时。"
+      },
+      "execution_limitations": [
+        "本 worker 仅进行有界 source review；未执行被审 workflow、真实模型、真实宿主、安装、浏览器或外部写入。",
+        "source-read 不等于完整依赖闭包或行为评测通过；完整包 status 由主 owner 结合 findings 裁决。"
+      ],
+      "read_files": 4,
+      "read_package_files": 4,
+      "unread_package_files": 11,
+      "denominator_limitation": "package_files 来自冻结 inventory 的包内普通文件计数；read_files 包含部分阅读及跨包引用，既不是完整文件阅读数，也不是依赖闭包完成比例。"
+    },
+    {
+      "skill_name": "spec-test-browser",
+      "source_read_ranges": {
+        "skills/spec-test-browser/SKILL.md": "1-90",
+        "skills/spec-test-browser/references/pipeline-orchestration.md": "1-20",
+        "skills/spec-test-browser/references/route-and-report.md": "1-111",
+        "skills/spec-test-browser/scripts/agent-browser-run-context.cjs": "1-140,405-540,636-735,764-973,1035-1086"
+      },
+      "branches": [
+        {
+          "kind": "entry_positive",
+          "judgment": "浏览器测试统一通过 wrapper 承接 run context；exact-origin、binary identity 与 conformance 构成进入浏览器前的事实检查，immutable plan hash 约束执行计划。",
+          "source_refs": [
+            "skills/spec-test-browser/SKILL.md:1-90",
+            "skills/spec-test-browser/scripts/agent-browser-run-context.cjs:1-140",
+            "skills/spec-test-browser/scripts/agent-browser-run-context.cjs:405-540"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "near_neighbor_negative",
+          "judgment": "不得因裸 agent-browser 命令可运行就绕过 unique wrapper；human-only 的 Skip 不能由 agent 自批。route-and-report 将不同入口和浏览器状态分开，不用报告文案代替 first-open gate。",
+          "source_refs": [
+            "skills/spec-test-browser/SKILL.md:1-90",
+            "skills/spec-test-browser/references/route-and-report.md:1-111",
+            "skills/spec-test-browser/references/pipeline-orchestration.md:1-20"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "output_consumer",
+          "judgment": "run context 与 report 提供当前 route、计划、执行结果和 cleanup status，供上游 review/work 消费；计划 hash 与 runtime facts 是可核验输入，不自动证明页面行为正确。",
+          "source_refs": [
+            "skills/spec-test-browser/references/route-and-report.md:1-111",
+            "skills/spec-test-browser/scripts/agent-browser-run-context.cjs:636-735",
+            "skills/spec-test-browser/scripts/agent-browser-run-context.cjs:1035-1086"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "failure_stop",
+          "judgment": "first-open gate 对 origin、binary/conformance 和计划一致性施加边界，已读实现给出 cleanup 状态；关键授权不能通过 Skip 旁路。仍未读完整 wrapper，不能声明所有子命令和资源清理组合均通过。",
+          "source_refs": [
+            "skills/spec-test-browser/scripts/agent-browser-run-context.cjs:764-973",
+            "skills/spec-test-browser/scripts/agent-browser-run-context.cjs:1035-1086",
+            "skills/spec-test-browser/SKILL.md:1-90"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        },
+        {
+          "kind": "recovery_handoff_closeout",
+          "judgment": "报告显式保留未跑/被阻断和 cleanup 情况；恢复应重新核对运行身份、origin 与计划，不能只复用旧会话成功声明。本轮未运行 conformance probe、wrapper tests 或真实浏览器。",
+          "source_refs": [
+            "skills/spec-test-browser/references/route-and-report.md:1-111",
+            "skills/spec-test-browser/scripts/agent-browser-run-context.cjs:636-735",
+            "skills/spec-test-browser/scripts/agent-browser-run-context.cjs:1035-1086"
+          ],
+          "method": "source-review",
+          "execution": "not-run"
+        }
+      ],
+      "findings": [],
+      "gaps": [
+        "wrapper 其余区间、完整引用和 tests 未完成依赖闭包。",
+        "未运行 agent-browser probe、真实浏览器或 wrapper tests；没有宿主 runtime 结果。"
+      ],
+      "recovery": "补读 wrapper 未覆盖区间，在受控 fixture 中验证 origin mismatch、binary identity 变化、plan hash 变化、human-only Skip 与 cleanup failure，然后独立验证实际浏览器。",
+      "batch": "C1",
+      "status": "degraded",
+      "dependency_closure": "partial",
+      "claim_ceiling": "C0",
+      "fresh_source_eval": "not-run",
+      "package_files": 9,
+      "package_bytes": 83361,
+      "closure_tier": "S",
+      "timing": {
+        "active_seconds": null,
+        "limitation": "恢复前未记录可靠的逐包审查耗时；不以工具墙钟时间伪造语义审查耗时。"
+      },
+      "execution_limitations": [
+        "本 worker 仅进行有界 source review；未执行被审 workflow、真实模型、真实宿主、安装、浏览器或外部写入。",
+        "source-read 不等于完整依赖闭包或行为评测通过；完整包 status 由主 owner 结合 findings 裁决。"
+      ],
+      "read_files": 4,
+      "read_package_files": 4,
+      "unread_package_files": 5,
+      "denominator_limitation": "package_files 来自冻结 inventory 的包内普通文件计数；read_files 包含部分阅读及跨包引用，既不是完整文件阅读数，也不是依赖闭包完成比例。"
+    }
+  ]
+}

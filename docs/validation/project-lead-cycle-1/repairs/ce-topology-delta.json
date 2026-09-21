@@ -1,0 +1,617 @@
+{
+  "recorded_package_paths": 1129,
+  "current_package_paths": 1147,
+  "added": [
+    {
+      "path": "skills/spec-doc-review/evals/cases/default-report-only-no-write.yaml",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/cases/flag-conflict-fails-closed.yaml",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/cases/headless-no-path-fails.yaml",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/cases/html-forces-report-only.yaml",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/cases/standard-roster-budget.yaml",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/cases/task-pack-forces-report-only.yaml",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/repos/html-repo/docs/plans/2026-09-01-monthly-summary-plan.html",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/repos/plan-repo/docs/plans/2026-09-01-monthly-summary-plan.md",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/repos/taskpack-repo/docs/plans/2026-09-01-monthly-summary-tasks.md",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/scripts/check-headless-no-path.sh",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/scripts/check-html-marker.sh",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/scripts/check-plan-marker.sh",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/scripts/check-taskpack-marker.sh",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-handoff/evals/cases/create-produces-gate-fields.yaml",
+      "skill_id": "spec-handoff",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-handoff/evals/cases/resume-explicit-source-stops-without-acting.yaml",
+      "skill_id": "spec-handoff",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/docs/notes/2026-09-19-session.md",
+      "skill_id": "spec-handoff",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/package.json",
+      "skill_id": "spec-handoff",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/README.md",
+      "skill_id": "spec-handoff",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/src/server.js",
+      "skill_id": "spec-handoff",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/scripts/check-create-artifact.sh",
+      "skill_id": "spec-handoff",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/scripts/check-resume-no-side-effects.sh",
+      "skill_id": "spec-handoff",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/cases/drifted-pack-rejects.yaml",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/cases/non-active-rejects.yaml",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/cases/open-ended-routes-debug.yaml",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/cases/r2-open-ended-500.yaml",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/cases/r2-reverse-mismatch.yaml",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/cases/requirements-only-stops.yaml",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/cases/trivial-bare-prompt-executes.yaml",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/done-plan/docs/plans/2026-09-01-001-feat-month-filter-plan.md",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/done-plan/package.json",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/done-plan/README.md",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/done-plan/src/server.js",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/drifted-pack/docs/plans/2026-09-01-001-feat-month-filter-tasks.md",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/drifted-pack/package.json",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/drifted-pack/README.md",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/drifted-pack/src/server.js",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/mini-ledger-guarded2/docs/plans/2026-09-01-001-feat-month-filter-plan.md",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/mini-ledger-guarded2/package.json",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/mini-ledger-guarded2/README.md",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/mini-ledger-guarded2/src/server.js",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/reqonly-plan/docs/plans/2026-09-01-001-feat-month-filter-plan.md",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/reqonly-plan/package.json",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/reqonly-plan/README.md",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/reqonly-plan/src/server.js",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/scripts/check-no-implementation.sh",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/scripts/check-r2-reverse-mismatch.sh",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/scripts/check-readme-fixed.sh",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-worktree/evals/cases/governed-caller-create-worktree.yaml",
+      "skill_id": "spec-worktree",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-worktree/evals/cases/not-git-repo-fails-closed.yaml",
+      "skill_id": "spec-worktree",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-worktree/evals/eval.yaml",
+      "skill_id": "spec-worktree",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-worktree/evals/fixtures/repos/plain-app-nogit/package.json",
+      "skill_id": "spec-worktree",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-worktree/evals/fixtures/repos/plain-app-nogit/README.md",
+      "skill_id": "spec-worktree",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-worktree/evals/fixtures/repos/plain-app-nogit/src/server.js",
+      "skill_id": "spec-worktree",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-worktree/evals/fixtures/repos/plain-app/package.json",
+      "skill_id": "spec-worktree",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-worktree/evals/fixtures/repos/plain-app/prepare-worktree-fixture.sh",
+      "skill_id": "spec-worktree",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-worktree/evals/fixtures/repos/plain-app/README.md",
+      "skill_id": "spec-worktree",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-worktree/evals/fixtures/repos/plain-app/src/server.js",
+      "skill_id": "spec-worktree",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-worktree/evals/fixtures/scripts/check-create-worktree.sh",
+      "skill_id": "spec-worktree",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-worktree/evals/fixtures/scripts/check-not-git-refuses.sh",
+      "skill_id": "spec-worktree",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/cases/bare-request-asks-path.yaml",
+      "skill_id": "spec-write-tasks",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/cases/non-active-rejected.yaml",
+      "skill_id": "spec-write-tasks",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/cases/remote-input-rejected.yaml",
+      "skill_id": "spec-write-tasks",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/cases/small-plan-skip.yaml",
+      "skill_id": "spec-write-tasks",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/fixtures/repos/done-plan/docs/plans/2026-08-01-001-feat-old-thing-plan.md",
+      "skill_id": "spec-write-tasks",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/fixtures/repos/tiny-plan/docs/plans/2026-09-01-001-feat-month-filter-plan.md",
+      "skill_id": "spec-write-tasks",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/fixtures/scripts/asks-a-question.sh",
+      "skill_id": "spec-write-tasks",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/fixtures/scripts/rejects-remote.sh",
+      "skill_id": "spec-write-tasks",
+      "fix_owned": false
+    }
+  ],
+  "removed": [
+    {
+      "path": "skills/spec-doc-review/evals/skillup/cases/default-report-only-no-write.yaml",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/skillup/cases/flag-conflict-fails-closed.yaml",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/skillup/cases/headless-no-path-fails.yaml",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/skillup/cases/html-forces-report-only.yaml",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/skillup/cases/standard-roster-budget.yaml",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/skillup/cases/task-pack-forces-report-only.yaml",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/skillup/fixtures/repos/html-repo/docs/plans/2026-09-01-monthly-summary-plan.html",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/skillup/fixtures/repos/plan-repo/docs/plans/2026-09-01-monthly-summary-plan.md",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/skillup/fixtures/repos/taskpack-repo/docs/plans/2026-09-01-monthly-summary-tasks.md",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/skillup/fixtures/scripts/check-headless-no-path.sh",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/skillup/fixtures/scripts/check-html-marker.sh",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/skillup/fixtures/scripts/check-plan-marker.sh",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-doc-review/evals/skillup/fixtures/scripts/check-taskpack-marker.sh",
+      "skill_id": "spec-doc-review",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-runtime-setup/evals/fixtures/scripts/asks-a-question.sh",
+      "skill_id": "spec-runtime-setup",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/cases/drifted-pack-rejects.yaml",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/cases/non-active-rejects.yaml",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/cases/open-ended-routes-debug.yaml",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/cases/r2-open-ended-500.yaml",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/cases/r2-reverse-mismatch.yaml",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/cases/requirements-only-stops.yaml",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/cases/trivial-bare-prompt-executes.yaml",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/fixtures/repos/done-plan/docs/plans/2026-09-01-001-feat-month-filter-plan.md",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/fixtures/repos/done-plan/package.json",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/fixtures/repos/done-plan/README.md",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/fixtures/repos/done-plan/src/server.js",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/fixtures/repos/drifted-pack/docs/plans/2026-09-01-001-feat-month-filter-tasks.md",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/fixtures/repos/drifted-pack/package.json",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/fixtures/repos/drifted-pack/README.md",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/fixtures/repos/drifted-pack/src/server.js",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/fixtures/repos/mini-ledger-guarded2/docs/plans/2026-09-01-001-feat-month-filter-plan.md",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/fixtures/repos/mini-ledger-guarded2/package.json",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/fixtures/repos/mini-ledger-guarded2/README.md",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/fixtures/repos/mini-ledger-guarded2/src/server.js",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/fixtures/repos/reqonly-plan/docs/plans/2026-09-01-001-feat-month-filter-plan.md",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/fixtures/repos/reqonly-plan/package.json",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/fixtures/repos/reqonly-plan/README.md",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/fixtures/repos/reqonly-plan/src/server.js",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/fixtures/scripts/asks-a-question.sh",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/fixtures/scripts/check-no-implementation.sh",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/fixtures/scripts/check-r2-reverse-mismatch.sh",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-work/evals/skillup/fixtures/scripts/check-readme-fixed.sh",
+      "skill_id": "spec-work",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/skillup/cases/bare-request-asks-path.yaml",
+      "skill_id": "spec-write-tasks",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/skillup/cases/non-active-rejected.yaml",
+      "skill_id": "spec-write-tasks",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/skillup/cases/remote-input-rejected.yaml",
+      "skill_id": "spec-write-tasks",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/skillup/cases/small-plan-skip.yaml",
+      "skill_id": "spec-write-tasks",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/skillup/fixtures/repos/done-plan/docs/plans/2026-08-01-001-feat-old-thing-plan.md",
+      "skill_id": "spec-write-tasks",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/skillup/fixtures/repos/tiny-plan/docs/plans/2026-09-01-001-feat-month-filter-plan.md",
+      "skill_id": "spec-write-tasks",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/skillup/fixtures/scripts/asks-a-question.sh",
+      "skill_id": "spec-write-tasks",
+      "fix_owned": false
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/skillup/fixtures/scripts/rejects-remote.sh",
+      "skill_id": "spec-write-tasks",
+      "fix_owned": false
+    }
+  ],
+  "recorded_support_summary": {
+    "skill_count": 38,
+    "package_path_count": 1129,
+    "package_bytes": 6756313,
+    "direct_support_unique_path_count": 228,
+    "direct_support_relation_count": 446,
+    "excluded_path_count": 0,
+    "missing_path_count": 0,
+    "hash_mismatch_count": 0
+  },
+  "current_support_summary": {
+    "skill_count": 38,
+    "package_path_count": 1147,
+    "package_bytes": 6781515,
+    "direct_support_unique_path_count": 229,
+    "direct_support_relation_count": 447,
+    "excluded_path_count": 0,
+    "missing_path_count": 0,
+    "hash_mismatch_count": 0
+  },
+  "added_support": [
+    {
+      "path": "tests/unit/spec-code-review-pr-head.test.js",
+      "skill_id": "spec-code-review",
+      "fix_owned": true
+    }
+  ],
+  "removed_support": [],
+  "limitation": "只读清单差异，不能自动刷新旧语义审查证明；本轮新增PR-head测试贡献direct-support关系。"
+}

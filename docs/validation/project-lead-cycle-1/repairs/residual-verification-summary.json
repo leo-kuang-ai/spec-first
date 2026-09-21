@@ -1,0 +1,155 @@
+{
+  "schema_version": "verification-run-summary.v1",
+  "generated_at": "2026-09-21T10:13:04.330Z",
+  "profile": {
+    "source": "explicit",
+    "name": "local-regression-and-stale-rejection-only",
+    "path": null
+  },
+  "checks": [
+    {
+      "id": "20-full-regression",
+      "service": "spec-first",
+      "command": "npm test",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-residual-regression-20260921/logs/20-full-regression.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "21-typecheck",
+      "service": "spec-first",
+      "command": "npm run typecheck",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-residual-regression-20260921/logs/21-typecheck.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "21-entrypoint-lint",
+      "service": "spec-first",
+      "command": "npm run lint:skill-entrypoints",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-residual-regression-20260921/logs/21-entrypoint-lint.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "21-changelog",
+      "service": "spec-first",
+      "command": "npx jest tests/unit/changelog-format.test.js tests/unit/changelog-continuity.test.js --runInBand",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-residual-regression-20260921/logs/21-changelog.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "22-ce-strengthened",
+      "service": "spec-first",
+      "command": "npx jest tests/unit/ce-localization-review-contracts.test.js tests/unit/ce-localization-closeout-contracts.test.js --runInBand",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-residual-regression-20260921/logs/22-ce-strengthened.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "23-current-gate-negative",
+      "service": "spec-first",
+      "command": "python3 docs/validation/project-lead-cycle-1/repairs/verify-ce-current-gate.py",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-residual-regression-20260921/logs/23-current-gate-negative.log",
+      "reason_code": "negative-gate-correctly-rejected-stale",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "24-final-delivery",
+      "service": "spec-first",
+      "command": "python3 docs/validation/project-lead-cycle-1/repairs/verify-delivery.py",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-residual-regression-20260921/logs/24-final-delivery.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "24-final-whitespace",
+      "service": "spec-first",
+      "command": "git diff --check",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-residual-regression-20260921/logs/24-final-whitespace.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+PASS tests/unit/spec-code-review-mechanics.test.js
+PASS tests/unit/spec-code-review-pr-head.test.js
+PASS tests/unit/spec-commit-push-pr-context-contracts.test.js
+PASS tests/unit/spec-resolve-pr-feedback-contracts.test.js
+
+Test Suites: 4 passed, 4 total
+Tests:       38 passed, 38 total
+Snapshots:   0 total
+Time:        5.297 s
+Ran all test suites matching /tests\/unit\/spec-code-review-mechanics.test.js|tests\/unit\/spec-code-review-pr-head.test.js|tests\/unit\/spec-resolve-pr-feedback-contracts.test.js|tests\/unit\/spec-commit-push-pr-context-contracts.test.js/i.

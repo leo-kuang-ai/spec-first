@@ -1,0 +1,38 @@
+{
+  "artifact_type": "review-evidence",
+  "captured_at": "2026-09-20T07:07:24.759071+00:00",
+  "reviewer": "cycle1_a_readiness",
+  "context": "继承上下文、非作者、非盲只读复核；未复验历史日志或产品源码",
+  "reviewed_ranges_at_review": {
+    "docs/plans/2026-09-18-001-project-lead-cycle-1-plan.md": "1-269",
+    "docs/validation/project-lead-cycle-1/2026-09-18-cycle-1-execution-evidence.md": "1-245",
+    "docs/validation/project-lead-cycle-1/2026-09-20-evaluation-and-market-follow-through.md": "1-101"
+  },
+  "findings": [
+    {
+      "id": "DOC-01",
+      "severity": "P2",
+      "title": "历史测试唯一变量断言缺快照证据",
+      "status": "fixed-in-docs",
+      "change": "改为原会话记录；未重建source/environment，不声明唯一变量对照。",
+      "verification": "主owner回读对应段，撤销唯一变量断言；无第二次peer复核。"
+    },
+    {
+      "id": "DOC-02",
+      "severity": "P2",
+      "title": "GUI安装混入适配投射的定义",
+      "status": "fixed-in-docs",
+      "change": "环境安装独立记账；source-supported与projected分别依adapter/registry和generated assets。",
+      "verification": "主owner回读分层定义；不因GUI已安装声称adapter/loader通过。"
+    }
+  ],
+  "post_correction_hashes": {
+    "docs/plans/2026-09-18-001-project-lead-cycle-1-plan.md": "de31a4b4cdf5cc1c876422aadae00eee4558954765e95d2cdb73b4534760ba64",
+    "docs/validation/project-lead-cycle-1/2026-09-18-cycle-1-execution-evidence.md": "7cdaf6fe115d2f28a345e55966df8b988757aab58183cafffdb47d5daf4cc746",
+    "docs/validation/project-lead-cycle-1/2026-09-20-evaluation-and-market-follow-through.md": "5b838a2ce22c2c7205d62bf865adeb9f6ae970bd20a0eebae055dd06af321610"
+  },
+  "limitations": [
+    "此审查只覆盖三份文档；后续状态汇总若变化需结合最终checks读取。",
+    "复核者未报告P2/P8其他阻断不等于竞品调研、场外收益或全部代码逻辑通过。"
+  ]
+}

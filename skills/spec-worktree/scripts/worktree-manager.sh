@@ -506,6 +506,26 @@ create_worktree() {
   default_branch=$(get_default_branch)
   from_branch="${from_branch:-$default_branch}"
 
+  # Fetch from-branch without touching the main checkout.
+  if ! git fetch origin "$from_branch" --quiet; then
+    echo "Warning: could not fetch origin/$from_branch; using local ref" >&2
+  fi
+
+  # Prefer origin/<from> if available, else fall back to local ref.
+  local base_ref="origin/$from_branch"
+  if ! git rev-parse --verify "$base_ref" &>/dev/null; then
+    base_ref="$from_branch"
+  fi
+
+  # Empty/unborn repository: no ref resolves to a commit. Fail with a structured
+  # reason instead of surfacing an opaque `git worktree add` error or inviting a
+  # raw-wrapper fallback (eval it-1, 2026-09-21).
+  if ! git rev-parse --verify "$base_ref^{commit}" &>/dev/null; then
+    echo "Error: base ref '$base_ref' does not resolve to a commit (empty or unborn repository); make an initial commit before creating a worktree." >&2
+    echo "reason_code=base-ref-unresolvable base_ref=$base_ref" >&2
+    return 1
+  fi
+
   local worktree_path="$WORKTREE_DIR/$branch_name"
   if [[ -d "$worktree_path" ]]; then
     echo "Error: worktree already exists at $worktree_path" >&2
@@ -517,17 +537,6 @@ create_worktree() {
 
   mkdir -p "$WORKTREE_DIR"
   ensure_gitignore
-
-  # Fetch from-branch without touching the main checkout.
-  if ! git fetch origin "$from_branch" --quiet; then
-    echo "Warning: could not fetch origin/$from_branch; using local ref" >&2
-  fi
-
-  # Prefer origin/<from> if available, else fall back to local ref.
-  local base_ref="origin/$from_branch"
-  if ! git rev-parse --verify "$base_ref" &>/dev/null; then
-    base_ref="$from_branch"
-  fi
 
   git worktree add -b "$branch_name" "$worktree_path" "$base_ref"
 

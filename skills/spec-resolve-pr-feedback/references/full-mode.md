@@ -85,6 +85,8 @@ Resolver dispatch is mutating-sensitive. Apply the package-local boundary in `SK
 
 Each resolver may edit only the files needed for its assigned feedback item and must return the actual `files_changed` list. The orchestrator owns final integration: combined validation, staging, commits, pushes, PR replies, and thread resolution. Resolver agents must not stage files, create commits, push, reply, or resolve review threads directly.
 
+Before mutation, capture a pre-dispatch baseline of tracked, staged, and task-owned untracked state, including file contents/identity sufficient to distinguish existing user work from this run's changes. Give each resolver its owned scope; do not reset, stash, or absorb unrelated changes to make attribution easier.
+
 If dispatch is unauthorized, unavailable, or mutation would be unsafe, process dispatch units sequentially in the current agent. If file overlap or discovered collisions make parallel mutation unsafe, serialize the affected units or stop for orchestration instead of running shared-file fixes in parallel.
 
 ### Dispatch inputs
@@ -114,7 +116,8 @@ Each agent returns:
 - **feedback_id**: the thread ID or comment ID it handled
 - **feedback_type**: `review_thread`, `pr_comment`, or `review_body`
 - **reply_text**: the markdown reply to post; omit for `blocked`
-- **files_changed**: list of files modified, empty if blocked
+- **files_changed**: actual remaining modified paths relative to the pre-dispatch baseline, including blocked returns; empty only when no resolver-owned changes remain
+- **verification**: targeted checks actually run, their status and evidence, or a concrete not-run reason
 - **reason**: what was done, or the concrete contradiction for `blocked`
 
 Verdict meanings:
@@ -124,6 +127,8 @@ Verdict meanings:
 - `blocked` -- implementation surfaced a concrete contradiction the resolver could see, such as a caller/test breakage or code that is not what the finding described
 
 Handling `blocked`: re-evaluate the item in the orchestrator context with the returned evidence. Either re-dispatch with a corrected instruction, move it to `reply-list` as `not-addressing` or `declined`, or move it to `human-list`. Do not silently drop blocked items.
+
+A blocked verdict does not erase a partial edit. Preserve its actual remaining diff and failed/not-run verification; do not treat it as a verified fix or publish a repaired-remote reply. Any rollback must be limited to that resolver's own changes and verified against the baseline, preserving user and other workers' edits.
 
 ### Batching and conflict avoidance
 
@@ -135,7 +140,7 @@ Fixes can expand beyond the referenced file. Step 5 catches cross-agent test bre
 
 ## 5. Validate Combined State
 
-After all agents complete, aggregate `files_changed` across every returned summary. If it is empty, skip steps 5 and 6 and proceed to step 7.
+After all agents complete, aggregate `files_changed` across every returned summary, including blocked returns, and independently inspect the actual tracked, staged, and task-owned untracked state against the pre-dispatch baseline. Reconcile the observed delta with each resolver's ownership and summary. An empty summary alone never skips validation. Skip code validation and step 6 only when the observed delta and all summaries agree that no run-owned changes remain. If attribution or the baseline is unavailable, keep the result partial/blocked; do not stage or publish uncertain changes.
 
 Validate only the local fixes actually authorized and applied in this run. Read-only triage or a pending `fix-list` is not a verified fix.
 
@@ -143,8 +148,9 @@ Resolvers run only targeted tests on their own changes. This step runs the proje
 
 1. Run the project's validation command.
 2. Green -> proceed to step 6.
-3. Red and failures touch resolver-changed files -> one inline diagnose-and-fix pass. Re-run validation. If still red, escalate with `needs-human` and do not commit.
-4. Red and failures touch only files no resolver changed -> treat as pre-existing. Proceed to step 6, but add a commit footer: `Note: pre-existing failure in <test> not addressed by this PR.`
+3. Red -> investigate the failing behavior and its dependencies; shared-module changes can break unchanged consumers. File membership does not establish cause or pre-existence. Apply an in-scope correction only when supported, then re-run validation.
+4. Classify a failure as pre-existing only with a captured pre-fix baseline using the same command and comparable environment, or equivalent verifiable causal evidence. Record the source identity, command, environment differences, and matching failure. Do not reset or stash the user's tree to manufacture a baseline. Unknown attribution remains failed: preserve the local diff, report the unresolved failure, and do not proceed to commit or push.
+5. A confirmed pre-existing failure is still failed; it does not waive required verification. While a required check remains red, do not proceed to commit or push or claim a verified fix. Return the evidence and exact remaining condition to the caller; a commit footer is not a substitute for resolving that condition.
 
 Record the validation outcome for the step 9 summary.
 
@@ -152,14 +158,9 @@ Record the validation outcome for the step 9 summary.
 
 Commit and push are independent exits: stage/commit only with `commit_authorization: authorized`; push only after commit succeeds and `push_authorization: authorized` is present. Missing authority stops that exit; preserve verified local state and proceed to Step 9. Do not claim a fixed thread is repaired remotely or resolve it without the required remote result.
 
-Stage only files reported by resolvers and commit with a message referencing the PR:
+Before staging, inspect the complete index against the pre-dispatch baseline: unrelated staged content or uncertain hunk ownership blocks this exit. Preserve the index and working tree, report the exact collision, and return to Step 9; do not unstage, stash, reset, or include the user's changes to make commit possible. A separate worktree with explicitly scoped transfer is a caller-owned recovery option, not an automatic fallback.
 
-```bash
-git add [files from agent summaries]
-git commit -m "Address PR review feedback (#PR_NUMBER)
-
-- [list changes from agent summaries]"
-```
+When the index contains only validated run-owned changes (or is empty), stage only the owned paths or hunks reconciled in step 5. A reported filename is not permission to stage an entire mixed file. Re-read the entire staged diff immediately before committing and verify that every hunk is run-owned and validated; any unrelated or unknown delta stops commit and push. Only then commit with a message referencing the PR. Record the resulting commit SHA and inspect its actual diff before pushing; unexpected content blocks push and requires bounded recovery rather than silently rewriting history.
 
 Push to remote:
 

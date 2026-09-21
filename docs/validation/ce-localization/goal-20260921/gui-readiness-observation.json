@@ -1,0 +1,21 @@
+{
+  "observed_at": "2026-09-21T10:29:07.851Z",
+  "cursor": {
+    "gui_accessible": true,
+    "workflow_tested": false
+  },
+  "kiro": {
+    "gui_accessible": true,
+    "workflow_tested": false,
+    "workspace_scope": "other-project-not-used"
+  },
+  "qoder": {
+    "gui_accessible": true,
+    "workflow_tested": false
+  },
+  "zcode": {
+    "gui_accessible": true,
+    "workflow_tested": false,
+    "workspace_scope": "other-project-not-used"
+  }
+}

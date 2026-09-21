@@ -41,3 +41,5 @@ Pass the same fields full mode does, including `isOutdated` and the location fie
 For `replied`, `not-addressing`, or `declined`, compose the reply text from the rubric, skip validation/commit/push, then only post when `reply_authorization: authorized` and only resolve when `thread_resolution_authorization: authorized`. For `needs-human`, compose `decision_context`; post only with reply authority, always leave the thread open, and present the decision to the user.
 
 For fix verdicts, follow the same separately authorized validate -> commit -> push -> reply -> resolve flow as Full Mode steps 5-7 in [full-mode.md](full-mode.md). A missing exit authority stops that exit and every downstream claim that depends on it.
+
+After any local implementation attempt, including a blocked resolver, perform Full Mode step 5's baseline/delta reconciliation before deciding that validation can be skipped. A blocked partial edit remains visible and unverified; it cannot become a repaired-remote reply or resolution.

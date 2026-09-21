@@ -1,0 +1,153 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "generated_at": "2026-09-20T07:06:40.683772+00:00",
+  "skill_name": "spec-worktree",
+  "source_snapshot": "source-manifest.json",
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "source_paths": [
+    "skills/spec-worktree/SKILL.md",
+    "skills/spec-worktree/scripts/worktree-manager.sh"
+  ],
+  "source_read_ranges": {
+    "skills/spec-worktree/SKILL.md": "1-152",
+    "skills/spec-worktree/scripts/worktree-manager.sh": "115-216,268-312,470-547,549-710"
+  },
+  "source_hashes": {
+    "skills/spec-worktree/SKILL.md": "ed13432eec8bb6d5c4d73431ff8db16f918b07b70c01d886be09f0d6443a37e2",
+    "skills/spec-worktree/scripts/worktree-manager.sh": "ccad7efa98b065ef7ff68100300b4e4dd7804b3a0f581c67fe6e316ca287eaa9"
+  },
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "entry_surface": "internal_only",
+  "batch": "C1",
+  "closure_tier": "S",
+  "closure_observed": {
+    "files": 2,
+    "bytes": 36401,
+    "read_package_files_at_least_partially": 2,
+    "read_supporting_files_at_least_partially": 0,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "coverage_commitment": "committed",
+  "dependency_closure": "partial",
+  "status": "degraded",
+  "reason_codes": [
+    "bounded_dependency_closure",
+    "tests_not_run",
+    "host_projection_not_run"
+  ],
+  "command_or_method": [
+    "独立于被审源码作者的只读reviewer逐包阅读实际source并判断五分支；主owner回源裁决finding，非盲评或真实workflow运行。"
+  ],
+  "ran": true,
+  "exit_code": null,
+  "evidence_paths": [
+    "reviewer-returns/c1.json"
+  ],
+  "source_refs": [
+    "skills/spec-worktree/SKILL.md",
+    "skills/spec-worktree/scripts/worktree-manager.sh"
+  ],
+  "owner": "project-lead-cycle-1",
+  "consumers": [
+    "周期1主审查",
+    "对应上游/下游workflow（以SKILL文档声明为准）"
+  ],
+  "branches": [
+    {
+      "id": "entry_positive",
+      "status": "source-covered",
+      "judgment": "internal helper 区分 detect、create 与 isolate，按 caller 的任务 scope 处理 worktree 生命周期；linked worktree 情况不会继续嵌套创建。",
+      "source_refs": [
+        "skills/spec-worktree/SKILL.md:1-152",
+        "skills/spec-worktree/scripts/worktree-manager.sh:115-216"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "near_neighbor_negative",
+      "status": "source-covered",
+      "judgment": "分支 already_checked_out 与 nested-worktree 条件有明确拒绝/复用边界；环境文件复制需要 opt-in，不能把父仓信任或 .env 自动扩散到新工作区。",
+      "source_refs": [
+        "skills/spec-worktree/SKILL.md:1-152",
+        "skills/spec-worktree/scripts/worktree-manager.sh:268-312",
+        "skills/spec-worktree/scripts/worktree-manager.sh:470-547"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "output_consumer",
+      "status": "source-covered",
+      "judgment": "worktree 路径和创建/检测事实交回 caller；helper 不代替 caller 决定完整任务、运行时安装或 Git landing。trust 不自动执行使 consumer 仍持有副作用控制。",
+      "source_refs": [
+        "skills/spec-worktree/SKILL.md:1-152",
+        "skills/spec-worktree/scripts/worktree-manager.sh:549-710"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "failure_stop",
+      "status": "source-covered",
+      "judgment": "已读实现包含 already_checked_out、linked worktree 与依赖/参数失败边界，未发现为继续创建而默认清理用户改动的规则。shell 中间区间未完整阅读，不能据此宣称所有清理分支安全。",
+      "source_refs": [
+        "skills/spec-worktree/scripts/worktree-manager.sh:115-216",
+        "skills/spec-worktree/scripts/worktree-manager.sh:268-312",
+        "skills/spec-worktree/scripts/worktree-manager.sh:470-547"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "recovery_handoff_closeout",
+      "status": "source-covered",
+      "judgment": "caller 持有恢复与后续使用决策；环境复制、trust 与 mutation 的显式边界在已读内容中保留。本轮未实际创建或删除 worktree，恢复与清理路径需 fixture 验证。",
+      "source_refs": [
+        "skills/spec-worktree/SKILL.md:1-152",
+        "skills/spec-worktree/scripts/worktree-manager.sh:549-710"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    }
+  ],
+  "findings": [],
+  "fresh_source_eval": "not-run",
+  "claim_ceiling": "C0",
+  "limitations": [
+    "worktree-manager.sh 中间区间未完整阅读。",
+    "未执行 worktree mutation、shell tests、环境复制或 trust 设置。",
+    "本 worker 仅进行有界 source review；未执行被审 workflow、真实模型、真实宿主、安装、浏览器或外部写入。",
+    "source-read 不等于完整依赖闭包或行为评测通过；完整包 status 由主 owner 结合 findings 裁决。"
+  ],
+  "recovery_point": "补齐脚本未读区间，在临时 Git repo 中验证 existing linked worktree、already_checked_out、失败清理和显式 env opt-in；确认用户原工作树/index 不受影响。",
+  "timing": {
+    "active_seconds": null,
+    "limitation": "恢复前未记录可靠的逐包审查耗时；不以工具墙钟时间伪造语义审查耗时。"
+  },
+  "record_correction": {
+    "at": "2026-09-20T05:55:01.024462+00:00",
+    "invalidated": "2026-09-20T05:24 的机械占位结论",
+    "replaced_by_actual_review_at": "2026-09-20T07:06:40.683772+00:00"
+  },
+  "reviewer_provenance": {
+    "reviewer": "cycle1_a_readiness",
+    "kind": "read-only-source-review",
+    "fresh_per_package_context": false,
+    "raw_return": "reviewer-returns/c1.json",
+    "raw_return_sha256": "02822623ed4eb85628acd1969fb484a13ee4e04be4367e5a660cd80b82f99e09"
+  },
+  "execution": {
+    "source_semantic_review": "ran",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "not-run",
+    "owner_probe_refs": []
+  },
+  "supporting_read_ranges": {},
+  "unconfirmed_read_ranges": []
+}

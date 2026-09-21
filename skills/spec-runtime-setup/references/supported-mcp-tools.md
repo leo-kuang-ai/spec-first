@@ -13,7 +13,7 @@
 
 ## Setup Rules
 
-- 默认 setup 覆盖 CodeGraph/Graphify 安装与 host 接线；普通 plan/verify 使用 installation scope，显式 `--only <graph-id>` 才进入图产物路径。
+- 默认范围见 [模式矩阵](../SKILL.md#安装与图能力分离)：单项目 bare 覆盖完整 artifact baseline；普通 plan/verify 使用 installation scope，显式 `--only <graph-id>` 或 `--requirement-workspace` 保留图产物路径；多仓父目录 bare 只读诊断。
 - 统一 registry 区分 `tools`、`helpers` 与 `providers`，同时集中管理 dependency pin、host target、platform override、install safety 与 artifact contract。
 - MCP tools must define deterministic install, host config, detection, summary, and uninstall metadata.
 - always-required MCP 使用 registry 固定版本；可选 helper 仍可按已登记策略保留 latest，不能据此宣称所有依赖可复现。

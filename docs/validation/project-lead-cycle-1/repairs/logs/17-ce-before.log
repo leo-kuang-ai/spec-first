@@ -1,0 +1,41 @@
+FAIL tests/unit/ce-localization-closeout-contracts.test.js (18.093 s)
+  ● CE localization closeout artifacts › validates the complete canonical topology against the current source snapshot
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1129
+    Received: 1163
+
+      90 |   function recordedDeterministic() {
+      91 |     const inventory = JSON.parse(fs.readFileSync(path.join(repoRoot,
+    > 92 |       'docs/validation/ce-localization/skill-inventory.json'), 'utf8'));
+         |                                               ^
+      93 |     const coverage = JSON.parse(fs.readFileSync(path.join(repoRoot,
+      94 |       'docs/validation/ce-localization/review/round-3-source-coverage.json'), 'utf8'));
+      95 |     return { inventory, coverage };
+
+      at Object.<anonymous> (tests/unit/ce-localization-closeout-contracts.test.js:92:47)
+
+FAIL tests/unit/ce-localization-review-contracts.test.js
+  ● CE localization deterministic review producer › freezes every canonical Skill package and explicit support relation
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1129
+    Received: 1163
+
+      19 |     expect(inventory.skill_count).toBe(38);
+      20 |     // 692 = 676 + spec-ideate/using-spec-first eval 资产与断言脚本进入 inventory 源集（2026-08-31 批次）
+    > 21 |     // 1122 = 1029 + CE-129 提交同步补审批次（2026-09-10，peer-runner 扩展/优化脚本/模板与新增校验资产，+93 包路径）
+         |                                          ^
+      22 |     // Runtime Setup 新增 npm warmup、source snapshot、CodeGraph launcher 与 artifact evidence 四个 owner。
+      23 |     // 1127 = 1126 + 2026-09-13 修复批次抽取 lib/host-config-repair-command.cjs 单一实现（DR-015 去重）。
+      24 |     // 1128 = 1127 + 2026-09-13 repair-loop 批次新增有界修复循环单一实现（动作由 registry 提供，不合成命令）。
+
+      at Object.<anonymous> (tests/unit/ce-localization-review-contracts.test.js:21:42)
+
+Test Suites: 2 failed, 2 total
+Tests:       2 failed, 14 passed, 16 total
+Snapshots:   0 total
+Time:        21.387 s, estimated 23 s
+Ran all test suites matching /tests\/unit\/ce-localization-review-contracts.test.js|tests\/unit\/ce-localization-closeout-contracts.test.js/i.

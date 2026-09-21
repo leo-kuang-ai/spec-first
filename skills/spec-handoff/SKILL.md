@@ -81,7 +81,7 @@ node "$SKILL_DIR/scripts/handoff-artifact.cjs" discover \
   --json
 ```
 
-For an explicitly selected folder, add `--source-dir <directory>` and search only that folder. The helper inspects at most 200 directory entries without recursion and reads only the metadata prefix, stopping at the first non-frontmatter line, closing delimiter, 64 lines, or 16 KiB. It excludes symlinks and unsafe paths and retains files without parseable metadata as `indexed: false`. Present a short shortlist with metadata or filename match reasons, location, and freshness; disclose `scan_truncated` when true. Scores are lexical hints, not semantic relevance decisions. **Stop and ask the user to select one candidate.** Never choose a body to read on the user's behalf.
+For an explicitly selected folder, add `--source-dir <directory>` and search only that folder. The helper inspects at most 200 directory entries without recursion and reads only the metadata prefix, stopping at the first non-frontmatter line, closing delimiter, 64 lines, or 16 KiB. It excludes symlinks and unsafe paths and retains files without parseable metadata as `indexed: false`. Present a short shortlist with metadata or filename match reasons, location, and freshness; disclose `scan_truncated` when true. Scores are lexical hints, not semantic relevance decisions. **Stop and ask the user to select one candidate.** Never choose a body to read on the user's behalf. When no interactive input channel is available (headless or piped invocation), return blocked with the shortlist and require an explicit source or renewed instruction; never auto-select.
 
 If no candidate matches, state the searched boundary and invite an explicit source, different keywords, or a request to create a new handoff.
 

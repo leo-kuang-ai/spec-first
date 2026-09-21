@@ -22,6 +22,9 @@ const {
   LOCAL_CONFIG_CONSUMERS,
 } = require('../../skills/spec-runtime-setup/scripts/lib/project-config.cjs');
 const localizationProducer = require('../../scripts/check-ce-localization-review.cjs');
+const Ajv2020 = require('ajv/dist/2020');
+const addFormats = require('ajv-formats');
+const { buildInvocationReceipt } = require('../../skills/spec-runtime-setup/scripts/lib/host-authority.cjs');
 
 const repoRoot = path.resolve(__dirname, '../..');
 
@@ -260,6 +263,31 @@ describe('spec-runtime-setup active Node consumers', () => {
         args: ['install', '--project', '--platform', expectedPlatform],
       });
     }
+  });
+
+  test('validates producer receipts including shared-host surface_hosts', () => {
+    const schema = JSON.parse(read('docs/contracts/verification/host-invocation-receipt.schema.json'));
+    const ajv = new Ajv2020({ allErrors: true, strict: true });
+    addFormats(ajv);
+    const validate = ajv.compile(schema);
+    const receipt = buildInvocationReceipt({
+      host: 'pi',
+      loadedSurface: {
+        host: 'codex',
+        hosts: ['codex', 'zcode', 'pi'],
+        surface_id: '.agents/skills',
+        skill_root: '/tmp/.agents/skills/spec-runtime-setup',
+      },
+      skillRoot: '/tmp/.agents/skills/spec-runtime-setup',
+      targetIdentity: '/tmp/repo',
+      verificationStatus: 'confirmed',
+      reasonCode: 'host-authority-loaded-root-bound',
+      now: new Date('2026-09-21T10:00:00Z'),
+    });
+    expect(validate(receipt)).toBe(true);
+    expect(receipt.surface_hosts).toEqual(['codex', 'zcode', 'pi']);
+    const duplicate = { ...receipt, surface_hosts: ['codex', 'pi', 'pi'] };
+    expect(validate(duplicate)).toBe(false);
   });
 
   test('masks only the unified Node entrypoint as comparative Claude runtime prose', () => {

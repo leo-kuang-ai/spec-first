@@ -2,7 +2,12 @@
 
 ## 当前专题
 
-- [2026-09-05 开发顺序与批次执行指南](../plans/2026-09-05-002-next-phase-development-sequence.md)：后续开发入口，合并最小测量基线、Astra 核心指令、真实任务验证与条件扩展，列明全部 OPT/F 项去向、验收和回退。
+- [全链路系统审查方案 v2](../validation/2026-09-13-full-system-audit-plan-v2.md)：当前有效的审查方案（`artifact_version: 3`），定义 U1–U11 审查单元、五类退出 gate、claim ceiling C0–C4 与 `execution_isolation: disposable-worktree`；替代已标记 superseded 的 2026-08-01 方案。含 owner 于 2026-09-14 固化的 Working Positioning Baseline（全部 `hypothesis` 级）。
+- [FSA3 审查报告](../validation/full-system-audit/2026-09-16-fsa3-report.md) 与 [findings](../validation/full-system-audit/2026-09-16-fsa3-findings.json)：2026-09-16 第二轮全链路审查。四项 finding 已全部修复并有 21 项确定性回归；**审查整体仍为 `incomplete`，claim ceiling C1**，真实宿主 loader/invocation、该审查波次的真实任务与 comparator 保持 `not-run`。原审未完成独立评审；后续修复已有 [带 source hashes 的 fresh-source 复核](../validation/full-system-audit/2026-09-16-fsa3-repair-evidence/fresh-source-review.json)，仅证明修复范围的源码审查。
+- [FSA2 审查报告](../validation/full-system-audit/2026-09-14-fsa2-report.md)：2026-09-14 首轮全链路审查。`lifecycle_status: incomplete`、`mechanism_result: failed`；26 项已修复或澄清、8 项回源确认无需修改，F-6/F-18 未闭合。因原审计证据大面积不可复核，8 个单元的 passed 被降级为 degraded。
+- [项目负责人工作契约](../10-prompt/项目负责人工作契约.md)：项目负责人角色的定位、目标、工作循环、权责边界与证据标准。
+- [项目负责人周期 1 计划](../plans/2026-09-18-001-project-lead-cycle-1-plan.md)：当前周期的证据缺口闭合与语料一致性路线图，含 P1–P8 交付物地图。
+- [2026-09-05 开发顺序与批次执行指南](../plans/2026-09-05-002-next-phase-development-sequence.md)：后续开发入口，合并最小测量基线、Astra 核心指令、真实任务验证与条件扩展，列明全部 OPT/F 项去向、验收和回退。**注意：其 `status: completed` 依据 owner 线下声明，仓内证据按各批次分别核对，不另赋第二个生命周期；Astra 身份与主宿主旅程仍缺仓内运行证据。**
 - [2026-09-05 完整优化方案](../plans/2026-09-05-001-next-phase-optimization-program-plan.md)：12 个优化点的目标、源码落点、验收、依赖、交付批次、指标及回退边界。
 - [2026-09-05 Astra 指令优化方案](./2026-09-05-gpt6-astra-instruction-optimization-plan.md)：33 项发现、38 个仓库 Skill 账本、分批修订与行为验证；区分已解决入口、当前静态冲突和待验证收益。
 - [2026-09-05 下一阶段能力战略](./2026-09-05-next-phase-capability-strategy.md)：结合当前源码、Codex/Claude 官方实践、论文与业界研究，提出可信交付、任务上下文、工程知识的候选方向与验证路径。

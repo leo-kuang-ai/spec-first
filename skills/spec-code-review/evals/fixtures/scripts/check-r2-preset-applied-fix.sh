@@ -9,8 +9,9 @@ if ! python3 - "$message" <<'PYEOF'
 import sys
 text = sys.argv[1].lower()
 review = ('审查', 'review', 'finding', '发现', 'p0', '租户', 'tenant')
-fixed = ('已修复', '修复了', '已修掉', '已应用修复', '已改', 'fix applied', 'applied the fix',
-         'fixed immediately', 'now fixed', 'has been fixed', 'fixed the', 'is now fixed', '已直接修复')
+fixed = ('已修复', '修复了', '已修掉', '已应用修复', '已改', '修掉', '已应用', 'fix applied',
+         'applied the fix', 'applied', 'fixed immediately', 'now fixed', 'has been fixed',
+         'fixed the', 'is now fixed', '已直接修复')
 ok = any(w in text for w in review) and any(w in text for w in fixed)
 sys.exit(0 if ok else 1)
 PYEOF

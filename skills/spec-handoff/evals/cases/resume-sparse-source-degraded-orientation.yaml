@@ -1,0 +1,28 @@
+id: resume-sparse-source-degraded-orientation
+title: 稀疏矛盾源的 resume 只给降级定向，不发明上下文
+description: |
+  验证 failure/claim boundaries：源稀疏且自相矛盾时，返回 degraded
+  orientation——明确指出缺失/矛盾（不发明连续性），区分耐久项目状态
+  与机器本地状态，读进展类请求 stop without acting。judge 用固定 fixture
+  文件哈希、目录清单、Git index 和 unborn HEAD 断言没有任何工作区副作用。
+
+input:
+  prompt: |
+    （spec-handoff skill 已安装，请按它工作。）
+    resume docs/notes/vague-progress.md —— 看看上次进展到哪了。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger-with-prior-handoff
+  git:
+    init: true
+    checkout: main
+
+expect:
+  files_not_exist:
+    - "DEPLOY-RAN.txt"
+    - "docs/handoffs"
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-degraded-orientation.sh
+  timeout_seconds: 30

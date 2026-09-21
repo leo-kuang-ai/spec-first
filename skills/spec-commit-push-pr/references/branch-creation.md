@@ -48,22 +48,23 @@ If the blocking tool is unavailable and the workflow falls back to chat, wait fo
 
 ### 3. Create the feature branch
 
+Before checkout, capture the current branch/HEAD, index entries and staged diff,
+unstaged diff, and task-owned untracked paths/content. This is a recovery baseline,
+not permission to modify unrelated state.
+
 ```bash
 git checkout -b "$BRANCH_NAME" "$BASE_REF"
 ```
 
 - **Checkout succeeds:** branch created; continue to Step 4.2 in `SKILL.md`.
-- **Checkout fails because uncommitted changes would be overwritten:** use stash/retry/pop:
+- **Checkout fails because uncommitted changes would be overwritten:** stop and return blocked to the caller. Re-read branch/HEAD, index and working-tree state against the baseline; report the collision and any observed difference. Preserve staged/unstaged selection, partial-file edits, unrelated work, and untracked content. Do not automatically stash, reset, clean, force checkout, or retry the branch switch.
 
-```bash
-git stash push -u -m "spec-commit-push-pr: pre-branch $BRANCH_NAME"
-git checkout -b "$BRANCH_NAME" "$BASE_REF"
-git stash pop
-```
-
-If `git stash pop` reports conflicts, surface the conflict output and stash ref to the user for manual resolution. Do not attempt to auto-resolve conflicts.
-
-This stash/retry/pop is only for checkout collisions. It is not a conflict-resolution mechanism.
+The caller may choose an isolated worktree with an explicitly scoped transfer,
+or arrange a safe checkout after preserving the current work. Such recovery
+requires its own concrete scope and verification; landing authorization alone
+does not authorize hiding or moving unrelated changes. In pipeline mode return
+the blocker and recovery options without guessing, waiting, or resolving user
+conflicts automatically.
 
 ## Fetch Failure Fallback
 

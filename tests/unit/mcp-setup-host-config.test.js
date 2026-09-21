@@ -709,6 +709,31 @@ describe('host config resolution, inspection, and transaction', () => {
     })).toMatchObject({ ok: false, reason_code: 'host-authority-not-explicit' });
   });
 
+  test('accepts shared-surface zcode and pi pins only when surface_hosts includes the pin', () => {
+    const repoRoot = tempDir('shared-surface-repo');
+    const sharedSkillRoot = path.join(repoRoot, '.agents', 'skills', 'spec-runtime-setup');
+    fs.mkdirSync(sharedSkillRoot, { recursive: true });
+    for (const host of ['zcode', 'pi']) {
+      const authority = resolveHostAuthority({
+        env: { MCP_SETUP_HOST: host },
+        mutationRequested: true,
+        candidates: [host],
+        skillRoot: sharedSkillRoot,
+        targetIdentity: repoRoot,
+        enforceSurfaceBinding: true,
+      });
+      expect(authority).toMatchObject({
+        status: 'ready',
+        host,
+        invocation_receipt: {
+          loaded_host: 'codex',
+          surface_hosts: ['codex', 'zcode', 'pi'],
+        },
+      });
+      expect(authority.invocation_receipt.receipt_sha256).toMatch(/^[a-f0-9]{64}$/);
+    }
+  });
+
   test('skips an unavailable preferred target and selects the next writable fallback', () => {
     const repoRoot = tempDir('fallback-repo');
     const homeDir = tempDir('fallback-home');

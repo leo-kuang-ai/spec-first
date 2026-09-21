@@ -1,0 +1,11 @@
+PASS tests/unit/spec-code-review-pr-head.test.js
+  PR 审查 head 身份绑定
+    ✓ fork 只使用与 metadata 一致的 PR head (188 ms)
+    ✓ same-repo 只使用与 metadata 一致的 PR head (198 ms)
+    ✓ mismatch 只使用与 metadata 一致的 PR head (162 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       3 passed, 3 total
+Snapshots:   0 total
+Time:        0.64 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/spec-code-review-pr-head.test.js/i.

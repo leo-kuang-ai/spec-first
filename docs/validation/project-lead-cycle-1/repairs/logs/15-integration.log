@@ -1,0 +1,69 @@
+
+> spec-first@1.15.3 test:integration
+> node scripts/run-test-suite.cjs integration
+
+PASS tests/integration/init-six-host-lifecycle.integration.test.js (45.428 s)
+PASS tests/integration/workspace-graph-auto-refresh.integration.test.js (16.342 s)
+PASS tests/integration/workspace-graph-six-host-projection.integration.test.js (8.649 s)
+PASS tests/integration/spec-lfg-fingerprint-projection.integration.test.js (6.558 s)
+PASS tests/integration/doc-review-six-host-projection.integration.test.js
+PASS tests/integration/runtime-setup-sigint-recovery.integration.test.js
+PASS tests/integration/qoder-runtime-lifecycle.integration.test.js
+PASS tests/integration/runtime-setup-npm-archive.integration.test.js
+PASS tests/integration/workspace-graph-lifecycle.integration.test.js
+  ● Console
+
+    console.log
+      Workspace graph clean: complete
+
+      at log (src/cli/commands/clean.js:287:11)
+
+    console.log
+        root: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first-wg-integ-pzoHxQ
+
+      at log (src/cli/commands/clean.js:288:11)
+
+    console.log
+        child api: codegraph_removed=true exclude_removed=true hook=not-installed
+
+      at log (src/cli/commands/clean.js:290:13)
+
+    console.log
+        child web: codegraph_removed=true exclude_removed=true hook=not-installed
+
+      at log (src/cli/commands/clean.js:290:13)
+
+    console.log
+        workspace graphify-out removed: true
+
+      at log (src/cli/commands/clean.js:296:11)
+
+    console.log
+        routing CLAUDE.md: stripped
+
+      at log (src/cli/commands/clean.js:299:15)
+
+    console.log
+        routing AGENTS.md: stripped
+
+      at log (src/cli/commands/clean.js:299:15)
+
+    console.log
+        daemon: run `codegraph daemon` to stop any watcher bound to a removed workspace
+
+      at log (src/cli/commands/clean.js:303:13)
+
+PASS tests/integration/eval-disk-evidence-guard.integration.test.js
+PASS tests/integration/spec-prd-contract-reset-replay.integration.test.js
+PASS tests/integration/spec-prototype-human-journey.integration.test.js
+PASS tests/integration/runtime-setup-codegraph-launcher.integration.test.js
+PASS tests/integration/plan-status-closeout.integration.test.js
+PASS tests/integration/spec-work-closeout-producer.test.js
+PASS tests/integration/spec-prd-contract-reset-isolation.integration.test.js
+PASS tests/integration/spec-write-skill-authoring-preview.integration.test.js
+
+Test Suites: 1 skipped, 17 passed, 17 of 18 total
+Tests:       2 skipped, 84 passed, 86 total
+Snapshots:   0 total
+Time:        92.34 s, estimated 215 s
+Ran all test suites matching /tests\/integration\/doc-review-six-host-projection.integration.test.js|tests\/integration\/eval-disk-evidence-guard.integration.test.js|tests\/integration\/init-six-host-lifecycle.integration.test.js|tests\/integration\/plan-status-closeout.integration.test.js|tests\/integration\/qoder-runtime-lifecycle.integration.test.js|tests\/integration\/runtime-setup-codegraph-launcher.integration.test.js|tests\/integration\/runtime-setup-graphify-hook-boundary.integration.test.js|tests\/integration\/runtime-setup-npm-archive.integration.test.js|tests\/integration\/runtime-setup-sigint-recovery.integration.test.js|tests\/integration\/spec-lfg-fingerprint-projection.integration.test.js|tests\/integration\/spec-prd-contract-reset-isolation.integration.test.js|tests\/integration\/spec-prd-contract-reset-replay.integration.test.js|tests\/integration\/spec-prototype-human-journey.integration.test.js|tests\/integration\/spec-work-closeout-producer.test.js|tests\/integration\/spec-write-skill-authoring-preview.integration.test.js|tests\/integration\/workspace-graph-auto-refresh.integration.test.js|tests\/integration\/workspace-graph-lifecycle.integration.test.js|tests\/integration\/workspace-graph-six-host-projection.integration.test.js/i.

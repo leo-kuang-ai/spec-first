@@ -10,11 +10,13 @@ execution: code
 implementation_status: partial-with-evidence
 ---
 
+> **2026-09-20 契约勘误：** FSA2 F-16/F-17 后，bare 已恢复为 registry baseline 自主收敛；只读诊断使用 `--check`，`--plan` 只读预览，`--verify-only` 可写 setup-owned facts。以下 Goal/KTD2/U1/U4 已按当前 source 校正，旧“bare 只读”决定失效。其余单元不因此整体作废，保留 `status: active` / `implementation_status: partial-with-evidence`；此改动只修计划，不宣称本轮重新执行 setup。
+
 ## Goal Capsule
 
 - **目标：** 在保留 spec-first 跨宿主 runtime 能力的前提下，修复 `spec-runtime-setup` 的契约漂移，降低无需求用户的 setup 成本，并把 Provider、workspace graph 和证据状态拆成可维护、可验证的边界。
 - **推荐方案：** 统一入口不变，内部按 L0-L5 分层；先修 P1 的事实与阻断策略，再做 P2 的模块化和 freshness，最后补 P3 的真实宿主与故障恢复验证。
-- **决策焦点：** 保留 bare 只读；按需阻断与 Provider 分层必须连同真实 consumer 一起落地。CE 采用配置安全、可选工具、失效提示和诊断表达机制；保留本地固定 artifact 路径，不引入 CE 配置命名空间或执行引擎。
+- **决策焦点：** 保留 bare baseline 自主收敛与 `--check` 只读诊断的区分；按需阻断与 Provider 分层必须连同真实 consumer 一起落地。CE 采用配置安全、可选工具、失效提示和诊断表达机制；保留本地固定 artifact 路径，不引入 CE 配置命名空间或执行引擎。
 - **验证焦点：** 每项 readiness 必须能追溯到 source、host、provider、artifact 和 freshness 证据；缺能力时只能降级或阻断受影响 scope，不能把局部成功写成完整 setup。
 - **最大边界：** 不把 CE 的轻量健康检查机械复制到 spec-first，也不把 setup 扩展成语义判断、业务策略或完整交付编排系统。
 
@@ -71,7 +73,7 @@ CE `ce-setup` 是轻量健康检查与 repo-local 配置修复器，负责插件
 
 - CE source evidence：CE 仓库中的 `skills/ce-setup/SKILL.md` 定义轻量 health check、artifact root、逐项 repo-local remediation 和 optional tool posture；`skills/ce-setup/scripts/check-health` 实际只做诊断和配置事实读取。
 - Local source evidence：`skills/spec-runtime-setup/SKILL.md`、`scripts/setup.cjs`、`scripts/lib/mode-policy.cjs`、`scripts/lib/runtime-executor.cjs`、`setup-registry.json`、`setup-registry.schema.json`、providers 和 workspace lib。
-- 已确认漂移：`SKILL.md:170-178` 描述 bare 走 plan/确认/apply，而 `mode-policy.cjs:5-10` 与 `setup.cjs:542-547` 将 bare 作为 read-only diagnostic；现有 `tests/unit/mcp-setup-mode-target.test.js` 和 `tests/unit/mcp-setup-entrypoint.test.js` 支持当前只读实现。
+- 历史漂移（2026-09-11，当时只读实现已被后续修复取代）：`SKILL.md:170-178` 描述 bare 走 plan/确认/apply，而 `mode-policy.cjs:5-10` 与 `setup.cjs:542-547` 将 bare 作为 read-only diagnostic；现有 `tests/unit/mcp-setup-mode-target.test.js` 和 `tests/unit/mcp-setup-entrypoint.test.js` 支持当前只读实现。
 - 已确认 registry 问题：`setup-registry.json:893-905` 将 `gh` 标为 `required` 和 `baseline_blocking`，但只声明 GitHub workflow 需求；`setup-registry.json:1110-1122` 将没有 `required_for` 的 `ffmpeg` 标为 baseline blocker；`runtime-executor.cjs:296-319` 对 baseline-blocking 条目执行全局阻断。
 - 已确认 schema metadata 漂移：`setup-registry.json` 为 `setup-registry.v10`，但 `setup-registry.schema.json:3-4` 和 `references/supported-mcp-tools.md:3` 仍写 v9，部分测试标题也写 v9。
 - 当前工作树在计划生成前存在其他未提交 skill 改动；本计划只描述 `spec-runtime-setup` owning source，不吸收其他 skill 的变更。
@@ -80,7 +82,7 @@ CE `ce-setup` 是轻量健康检查与 repo-local 配置修复器，负责插件
 ### Key Technical Decisions
 
 - KTD1. **统一入口，分层内部 owner。** 保留 `spec-runtime-setup` 作为 public entrypoint；通过内部模块边界拆分 L0-L5，不新增第二个公开 setup 产品。这样保留 CE 的可发现性和 spec-first 的跨宿主能力，同时避免 `setup.cjs` 继续吸收所有领域逻辑。
-- KTD2. **Bare contract 采用实现优先的只读语义。** 当前已有测试和 `mode-policy` 都把 bare 定义为诊断；本计划将文案、help、示例统一改为只读诊断，并把完整写入保留给显式 `--plan` 后的授权 apply/repair 路径。若产品 owner 以后要求裸调用自动安装，另立产品决策并新增 `--full` 或等价明确入口，不在本批次隐式改变副作用。
+- KTD2. **Bare baseline 与只读入口分离。** 以当前 `skills/spec-runtime-setup/SKILL.md`、`scripts/lib/mode-policy.cjs` 和 `scripts/setup.cjs` 为准：bare 按 registry baseline 安装/验证 required 能力并刷新 setup-owned facts；`--check` 与 `--plan` 只读，`--verify-only` 仅 facts mutation。写入必须具有显式 host authority，并通过路径、冲突与验证检查；不自动追加 `--repair-host-config` / `--project-config`。禁止按旧计划把 bare 回退为只读或另造 `--full` 入口。
 - KTD3. **Demand-aware blocking。** 将阻断条件定义为 `always_required || demand_matched || explicit_selection`。未命中需求的 helper/provider 保留 `missing/degraded` 事实，但不阻断无关 workflow；显式 `--only` 仍表示用户选择了该 capability scope。
 - KTD4. **安装与 artifact 两级 readiness。** Provider package/launcher/host integration 是 installation readiness；首次生成、query probe、refresh、hook steady state 是 artifact/currentness readiness。普通 setup 默认验证安装和 host 接线，按需 capability 才生成图或刷新图。
 - KTD5. **证据状态四维化。** 机器结果分别维护 dependency、configuration、artifact、freshness；`consumer_usable` 由下游结合任务 scope 判断，setup 不宣称语义充分。
@@ -173,11 +175,11 @@ flowchart TB
 
 - **Goal：** 让入口文案、help、mode policy、测试和实际副作用保持一致。
 - **Files：** `skills/spec-runtime-setup/SKILL.md`、`skills/spec-runtime-setup/scripts/lib/mode-policy.cjs`（仅补充契约注释或兼容字段时）、`skills/spec-runtime-setup/scripts/setup.cjs`、`tests/unit/mcp-setup-mode-target.test.js`、`tests/unit/mcp-setup-entrypoint.test.js`、`tests/unit/runtime-setup-readiness-guidance.test.js`。
-- **Pattern：** 复用当前 `bare -> runDiagnostic`、`--plan`、`--verify-only` 路径；不新增隐式 confirmation 状态机。
+- **Pattern：** 复用当前 bare baseline、`--check`、`--plan`、`--verify-only` 路径；不新增隐式 confirmation 状态机。
 - **Test scenarios：**
-  - bare 在 Git repo 中只读，不安装依赖、不改 host config、不写 setup facts。
-  - bare 在非 Git folder 中仍输出 folder target 和 readiness，不调用 Git-only mutation。
-  - help、SKILL 和 human summary 明确 bare 为 diagnostic，`--plan` 为 preview，显式 mutation 才写入。
+  - `--check` / `--plan` 在 Git repo 中只读；bare 仅在显式 host authority 与 guard 通过后收敛 baseline，检查安装、host-config 和 facts 各自的真实副作用。
+  - 非 Git folder 保留 folder target 边界；只读模式不写入，bare 不因缺 Git 绕过 host/path/conflict guard，也不执行 Git-only mutation。
+  - help、SKILL 和 human summary 明确 bare 为 baseline convergence、`--check` 为 diagnostic、`--plan` 为 preview、`--verify-only` 为 facts-only mutation。
   - host config conflict 在 bare 中只报告，不自动 repair；显式 repair 路径仍保留原授权边界。
 - **Verification：** 运行入口、mode-target、facts renderer 和 runtime guidance 契约测试；检查 generated runtime drift。
 
@@ -217,7 +219,7 @@ flowchart TB
   - `--refresh` 只更新现有图，仍保留 protected artifact backup 和 scope receipt。
   - 普通 setup 不触发 first generation；首次构图、query 和 refresh 的 CLI/help/facts/退出码行为与行为矩阵一致。
   - provider 输出仍标为 advisory/provider_untrusted，不被 setup 升级成语义 confirmed。
-  - 行为矩阵固定为：bare 只读探测且不构图；默认 apply 只做安装与 host 接线；显式 graph capability 才构图/query；`--refresh` 只更新既有 artifact 并刷新 freshness。旧默认行为若不保留，必须在 CHANGELOG 和迁移说明中标记。
+  - 行为矩阵固定为：`--check` 只读探测且不构图；bare baseline 按 registry 收敛安装、host 接线与 setup-owned facts；显式 graph capability 才构图/query；`--refresh` 只更新既有 artifact 并刷新 freshness。旧默认行为若不保留，必须在 CHANGELOG 和迁移说明中标记。
 - **Verification：** provider unit tests、entrypoint integration、artifact integrity tests；补一条“普通 setup 不触发 first generation”的调用断言。
 
 ### U5. 重构 setup orchestrator 为 L0-L5 thin glue

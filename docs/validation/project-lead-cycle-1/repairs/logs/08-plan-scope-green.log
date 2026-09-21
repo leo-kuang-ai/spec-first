@@ -1,0 +1,8 @@
+PASS tests/unit/mcp-setup-entrypoint.test.js
+PASS tests/unit/mcp-setup-mode-target.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       138 skipped, 12 passed, 150 total
+Snapshots:   0 total
+Time:        0.727 s, estimated 2 s
+Ran all test suites matching /tests\/unit\/mcp-setup-entrypoint.test.js|tests\/unit\/mcp-setup-mode-target.test.js/i with tests matching "parent --plan|计划转执行".

@@ -1,5 +1,6 @@
 'use strict';
 
+const { planExecutionAdvice } = require('./mode-policy.cjs');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -232,7 +233,7 @@ function runWorkspacePlan(context, { runSingleTarget }) {
     counts,
     next_action: blocked
       ? '修复对应 child plan 的 reason_code，然后重新运行 --plan。'
-      : '审查各 child 的 mutation 计划，然后使用相同选择且不带 --plan 重新运行。',
+      : planExecutionAdvice(context.actionPlan),
   };
   return {
     exit_code: blocked ? 2 : 0,
