@@ -199,3 +199,16 @@
 - C3 `ambiguous-input-no-blocking-prompt`（spec-code-review）：模糊输入下完成审查而非阻断提问（完成锚+无索取话术+diff 保持待审）（首跑失败为 patch 与 fixture 不匹配，分型 eval-fix）。
 
 **B 型累计：8/19 绿灯**（H1/H2/W5/C4/W3/P2/H3/C3）+ W6 已升级待绿灯运行。**剩余 9 条 + W6 绿灯列下批**，推迟理由：S1/S2/S3（runtime-setup mutation 路径）需先设计沙箱内有界安装范围（真实 provider 安装网络重且副作用需约束）；S4 同属 setup.cjs 运行面；W4（closeout done signal）需 spec-first CLI 在沙箱可用的 fixture 策略；W7 需带 pre-existing staged 变更的 fixture；P3/P4/C5 属常规补建。
+
+
+## 12. 第四轮升级优化记录（2026-09-21 深夜，P3/P4/W7/W4 + blocked-env 定案）
+
+**B 型四 case 首跑全绿**：
+- P3 `counterfactual-recoverable-no-write`（spec-compound）：可从最终代码直接恢复的拼写修正不沉淀、说明理由（counterfactual bar 维度首次有 case）。
+- P4 `headless-no-qualifying-no-complete`（spec-compound）：mode:headless 无合格 learning 时 no-op 报告、不出现 `Documentation complete`（headless 完成语首次有 case）。
+- W7 `no-commit-auth-stays-uncommitted`（spec-work）：实现授权 + 无提交授权 → 真实变更 + 验证语义 + 保持未提交 + 无提交宣称（授权分离首次有 case；pre-existing staged 保护子行为因 case schema 无法预置 staged 状态，本轮显式收窄）。
+- W4 `standalone-closeout-order`（spec-work）：standalone 完成汇报绑定 closeout 链语义（verification-run-summary/honest-closeout；spec-first CLI 全局可用已确认，沙箱可走真实链）。
+
+**blocked-env 定案**：r2-reverse-mismatch（第 4 次 600s 超时）与 r2-open-ended-500（900s 超时）在引擎健康时段复跑仍系统性超时；超时前 transcript 显示 26 次工具调用的正常工作形态——判定为重对抗 case × 当前引擎延迟的组合约束，非行为失败。恢复条件：低延迟引擎/直连 API，或拆分为更轻变体。W6 升级的绿灯运行随此条件挂账。
+
+**B 型最终：12/19 绿灯**（H1/H2/W3/W4/W5/W7/C3/C4/P2/P3/P4/H3）+ W6 已升级待绿灯。**剩余 5 条**（S1-S4 runtime-setup mutation 面 + C5 capability 面）维持设计级推迟：需先解决沙箱内有界安装范围与副作用约束策略，属下批立项。

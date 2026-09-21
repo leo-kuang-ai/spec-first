@@ -57,5 +57,20 @@
       "stderr": "汇报未包含指向实际 artifact 的精确 resume 调用"
     }
   },
-  "claim_ceiling": "本证据只覆盖脚本在固定 fixture 上的确定性断言；未运行真实模型、宿主或 field task。"
+  "claim_ceiling": "本证据只覆盖脚本在固定 fixture 上的确定性断言；未运行真实模型、宿主或 field task。",
+  "diff_artifact": "docs/validation/ce-localization/goal-20260921/handoff-judge-repair-diff.txt",
+  "validation_commands": [
+    {
+      "command": "skill-up validate skills/spec-handoff/evals/eval.yaml",
+      "result": "PASS: loaded 4 case(s)"
+    },
+    {
+      "command": "bash -n skills/spec-handoff/evals/fixtures/scripts/check-*.sh",
+      "result": "PASS"
+    },
+    {
+      "command": "python3 /tmp/verify_handoff_judges.py",
+      "result": "PASS: clean cases passed; modified/extra/index/commit/fake digest/wrong invocation rejected"
+    }
+  ]
 }

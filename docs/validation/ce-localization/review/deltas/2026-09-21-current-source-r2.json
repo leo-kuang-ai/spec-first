@@ -1,0 +1,71 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "ce-current-20260921-r2",
+  "producer": "current project owner (inline same-context review)",
+  "reviewed_at": "2026-09-21T12:31:54.473Z",
+  "source_binding": {
+    "head": "6594d50786d45a2fba1972f2581a228b6211ecbb",
+    "dirty_path_manifest_sha256": "bb501bc3b457250b1c5f9486fecc4eea2a277838f0527a67213b86c47d151e1b",
+    "source_tree_hash": "1b2f4c063b0cd5bb5a823f34b0b8b480cdceb53d4a681d295cdd41b03cb50fdc",
+    "inventory_hash": "d771d0698ceba61452361598eec9fbad81c03a8d1d3d4e3c5996408a586b08df",
+    "inventory_artifact_sha256": "5c6e7152dc9e589a585ef6b394cddbbf5cd5c70662737d44a6d53d3ee2bbcd45",
+    "review_input_hash": "57fd006c6e9ad0524d75c3a48b3bdeb1a08b68b10757c92664be0aa0a7364ead"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "unverified",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "reviewed_paths": [
+    {
+      "path": "tests/unit/mcp-setup-providers.test.js",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "e739e22e7dab097a862c0dae647872de4c0d030d30d9c89d09cfcc0f8a059b7c",
+      "bytes": 103240,
+      "line_count": 2148,
+      "covered_line_ranges": [
+        [
+          1,
+          2148
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "当前源文件已全文回读；本轮同步更新 Graphify post-hook 漂移行为的测试合同，未发现新的 actionable finding。"
+          ],
+          "limitations": [
+            "本轮为同一 owner 的 inline 增量复核；两个 lens 是审查维度，不是独立 provider。",
+            "真实模型/宿主 workflow 与 field outcome 不由该 delta 证明。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "当前源文件已全文回读；本轮同步更新 Graphify post-hook 漂移行为的测试合同，未发现新的 actionable finding。"
+          ],
+          "limitations": [
+            "本轮为同一 owner 的 inline 增量复核；两个 lens 是审查维度，不是独立 provider。",
+            "真实模型/宿主 workflow 与 field outcome 不由该 delta 证明。"
+          ]
+        }
+      ]
+    }
+  ],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "本轮覆盖当前两条审查 lane 的全部 changed/missing/retired relations；每条关系均回读当前文件或确认退役。",
+    "本轮没有独立 provider/隔离 worker；真实宿主、模型任务和 field outcome 另行记录。"
+  ],
+  "claim_ceiling": "当前源码绑定的 inline 双 lens 增量语义复核；不证明独立多模型一致性、完整真实宿主 workflow 或现场收益。"
+}

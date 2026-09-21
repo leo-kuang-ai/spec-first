@@ -8,190 +8,21 @@
   "provider_identity": "unverified",
   "provider_receipt_ref": null,
   "worker_context_isolation": "degraded_inherited",
-  "generated_at": "2026-09-16T08:06:51.974Z",
+  "generated_at": "2026-09-21T12:31:54.473Z",
   "producer": "role-simulated OpenAI skill-engineering lens using current local source only",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "66b0e0c6c83c1e75d2e9634132586bfce5581ff3",
+    "head": "6594d50786d45a2fba1972f2581a228b6211ecbb",
     "dirty": true,
     "dirty_paths": [
       "CHANGELOG.md",
-      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/24-\\345\\205\\254\\345\\274\\200\\345\\205\\245\\345\\217\\243\\344\\270\\216Skill\\347\\233\\256\\345\\275\\225.md",
-      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/README.md",
-      "docs/contracts/artifact-summary.md",
-      "docs/contracts/dual-host-governance/README.md",
-      "docs/contracts/workflows/ce-localization-regeneration-sequence.md",
-      "docs/contracts/workflows/mutation-enforcement.md",
-      "docs/validation/2026-08-01-full-system-audit-plan.md",
-      "docs/validation/full-system-audit/2026-09-14-fsa2-report.md",
-      "docs/validation/full-system-audit/2026-09-15-fsa2-eval-inventory.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/build.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-autoresearch.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-app-consistency-audit.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-brainstorm.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-code-review.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-commit-push-pr.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-commit.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-compound-refresh.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-compound.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-debug.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-doc-review.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-dogfood.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-explain.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-handoff.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-ideate.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-lfg.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-optimize.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-plan.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-polish.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-pov.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-prd.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-product-pulse.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-project-rules.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-promote.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-prototype.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-resolve-pr-feedback.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-riffrec-feedback-analysis.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-rule-miner.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-runtime-setup.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-simplify-code.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-strategy.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-sweep.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-test-browser.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-test-xcode.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-work.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-write-skill.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-spec-write-tasks.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-list-using-spec-first.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-autoresearch.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-app-consistency-audit.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-brainstorm.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-code-review.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-commit-push-pr.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-commit.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-compound-refresh.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-compound.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-debug.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-doc-review.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-dogfood.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-explain.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-handoff.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-ideate.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-lfg.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-optimize.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-plan.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-polish.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-pov.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-prd.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-product-pulse.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-project-rules.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-promote.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-prototype.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-resolve-pr-feedback.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-riffrec-feedback-analysis.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-rule-miner.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-runtime-setup.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-simplify-code.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-strategy.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-sweep.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-test-browser.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-test-xcode.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-work.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-write-skill.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-spec-write-tasks.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/eval-validate-using-spec-first.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/install-matrix.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/lint-entrypoints.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/npm-test.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/probe-autoresearch.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/probe-commit-index.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/probe-setup-plan.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/shared-references.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/sync-instructions.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/checks/typecheck.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/initial-status.txt",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/install/summary.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/link-candidates.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/manifest.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/plan.md",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/probes/autoresearch.py",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/probes/commit-index.py",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/probes/setup-plan.cjs",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/reads.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/redaction-canary.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/skill-inventory.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/skill-receipts.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/source-manifest.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-evidence/source-stability.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-findings.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/build.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/ce-focused-final.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/eval-autoresearch.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/eval-spec-commit.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/full-regression-final.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/full-regression.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/lint.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/shared-references.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/sync-instructions.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/checks/typecheck.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/fresh-source-review.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/manifest.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/regression-after.log",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/regression-before.log",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/repair-final-source.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-repair-evidence/repair-source.json",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-report.md",
-      "docs/validation/full-system-audit/2026-09-16-fsa3-run-plan.md",
-      "docs/validation/skill-evals/README.md",
-      "skills/_shared/references/concepts-vocabulary.md",
-      "skills/_shared/references/settled-decisions.md",
-      "skills/_shared/references/yaml-schema.md",
-      "skills/autoresearch/SKILL.md",
-      "skills/autoresearch/references/orchestrator-routing.md",
-      "skills/autoresearch/scripts/orchestrate.sh",
-      "skills/spec-brainstorm/references/settled-decisions.md",
-      "skills/spec-code-review/SKILL.md",
-      "skills/spec-code-review/references/cross-model-review.md",
-      "skills/spec-code-review/references/scope.md",
-      "skills/spec-code-review/scripts/findings-mechanics.py",
-      "skills/spec-commit/SKILL.md",
-      "skills/spec-compound-refresh/SKILL.md",
-      "skills/spec-compound-refresh/references/concepts-vocabulary.md",
-      "skills/spec-compound-refresh/references/vocabulary-refresh.md",
-      "skills/spec-doc-review/SKILL.md",
-      "skills/spec-plan/references/plan-handoff.md",
-      "skills/spec-plan/references/settled-decisions.md",
-      "skills/spec-prd/SKILL.md",
-      "skills/spec-runtime-setup/SKILL.md",
-      "skills/spec-runtime-setup/evals/README.md",
-      "skills/spec-runtime-setup/evals/cases/check-readonly.yaml",
-      "skills/spec-runtime-setup/evals/cases/verify-only-readonly.yaml",
-      "skills/spec-runtime-setup/evals/eval.yaml",
-      "skills/spec-runtime-setup/evals/fixtures/scripts/check-readonly-verify.sh",
-      "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
-      "skills/spec-work/references/shipping-workflow.md",
-      "skills/spec-write-tasks/evals/README.md",
-      "src/cli/adapters/kiro.js",
-      "templates/claude/commands/spec/doc-review.md",
-      "tests/smoke/cli-smoke.test.js",
-      "tests/unit/autoresearch-orchestrator-regression.test.js",
-      "tests/unit/ce-localization-review-contracts.test.js",
-      "tests/unit/command-resource-path-rewrite.test.js",
-      "tests/unit/doctor-platform-cli.test.js",
-      "tests/unit/mcp-setup-host-config.test.js",
-      "tests/unit/mcp-setup-mode-target.test.js",
-      "tests/unit/runtime-setup-codegraph-evidence.test.js",
-      "tests/unit/runtime-setup-consumer-health.test.js",
-      "tests/unit/runtime-setup-eval-judge.test.js",
-      "tests/unit/spec-code-review-mechanics.test.js",
-      "tests/unit/spec-commit-scope-regression.test.js",
-      "tests/unit/spec-compound-refresh-reference-contracts.test.js",
-      "tests/unit/spec-prd-hook-contracts.test.js",
-      "tests/unit/using-spec-first-contracts.test.js"
+      "docs/validation/skill-evals/2026-09-20-tier1-multi-role-review.md",
+      "docs/validation/skill-evals/results.tsv",
+      "tests/unit/mcp-setup-providers.test.js"
     ],
-    "dirty_path_manifest_sha256": "6c37436d8a5bdcb5f20a84726d997a2df9f95077119542111829edc11b61883b",
-    "source_tree_hash": "956b6ec3ed0883e3148062e373757f65ed8526785ebfbeb229d9488a8f1d40c0",
-    "inventory_hash": "ad15fb5a24e316debe0a2cf0301c04d84bee854568061f5745bff2adc8fdaade",
+    "dirty_path_manifest_sha256": "bb501bc3b457250b1c5f9486fecc4eea2a277838f0527a67213b86c47d151e1b",
+    "source_tree_hash": "1b2f4c063b0cd5bb5a823f34b0b8b480cdceb53d4a681d295cdd41b03cb50fdc",
+    "inventory_hash": "d771d0698ceba61452361598eec9fbad81c03a8d1d3d4e3c5996408a586b08df",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -225,8 +56,8 @@
       "version": "canonical-source-manifest-v1"
     }
   },
-  "inventory_hash": "ad15fb5a24e316debe0a2cf0301c04d84bee854568061f5745bff2adc8fdaade",
-  "inventory_artifact_sha256": "322ceb430284aa35078f7a02fdbc1f48acf9cd7c472cb4017c1c7c0501ef2d04",
+  "inventory_hash": "d771d0698ceba61452361598eec9fbad81c03a8d1d3d4e3c5996408a586b08df",
+  "inventory_artifact_sha256": "5c6e7152dc9e589a585ef6b394cddbbf5cd5c70662737d44a6d53d3ee2bbcd45",
   "input_artifacts": [
     {
       "path": "docs/validation/ce-localization/skill-inventory.json",
@@ -253,9 +84,9 @@
     "dirty_path_manifest_sha256": "4c0c78000acf7fae68fdff3eb8e523956af2a2fbb9bb6d48b6a9c4996283fee8",
     "inventory_hash": "7897d3b4a38f689cfa2e44bf66e511544710579472825938473b32495bbe1021"
   },
-  "review_input_hash": "c6df1c9b29dd6e89000ac797f46a396c7ee736f4a33d757f6a4e25f7dcd30e6f",
+  "review_input_hash": "57fd006c6e9ad0524d75c3a48b3bdeb1a08b68b10757c92664be0aa0a7364ead",
   "review_input_hash_algorithm": "sha256(JSON.stringify(coverage.review_input, null, 2) + newline)",
-  "chunk_manifest_hash": "d79b4b0887475b066d4ddd6ffaeed5734c3c395443b43a0569fe5469ddb7a9cf",
+  "chunk_manifest_hash": "2cc34e946597c0d8605aeeb671103a1cfbc016518387d49cb4e90be7f23aef17",
   "chunk_manifest": [
     {
       "chunk_id": "oai-r3-final-001",
@@ -482,12 +313,12 @@
   ],
   "expected_skill_count": 38,
   "reviewed_skill_count": 38,
-  "expected_package_path_count": 1129,
-  "expected_direct_support_path_count": 228,
-  "expected_direct_support_relation_count": 446,
-  "reviewed_package_path_count": 1129,
-  "reviewed_direct_support_path_count": 228,
-  "reviewed_direct_support_relation_count": 446,
+  "expected_package_path_count": 1175,
+  "expected_direct_support_path_count": 229,
+  "expected_direct_support_relation_count": 447,
+  "reviewed_package_path_count": 1175,
+  "reviewed_direct_support_path_count": 229,
+  "reviewed_direct_support_relation_count": 447,
   "reviewed_expected_path_relation_count": 1019,
   "reviewed_unique_source_path_count": 806,
   "coverage_status": "complete-current-source-with-incremental-review",
@@ -1191,17 +1022,17 @@
           "source_kind": "direct-support",
           "owning_skill": "autoresearch",
           "shared_consumers": [],
-          "sha256": "96e6694946357851d9ca39fa6c4297c1463d9c7f10375f65abb885acad8aade6",
-          "bytes": 7454,
-          "line_count": 126,
+          "sha256": "b07f0fbdf9612b952ad1ac568d3de4603a8c570e8bea199be0f007cf97b87738",
+          "bytes": 7479,
+          "line_count": 142,
           "covered_line_ranges": [
             [
               1,
-              126
+              142
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-fsa3-repair-2026-09-16-openai-skill-engineering-96e669494635"
+            "ce-current-20260921-r1-openai-skill-engineering-b07f0fbdf961"
           ],
           "read_status": "full"
         }
@@ -4135,17 +3966,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-brainstorm",
           "shared_consumers": [],
-          "sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea",
-          "bytes": 13735,
-          "line_count": 282,
+          "sha256": "a4d0e30587e5e2519136290e5d1c2e0c76a17eca05649653b6c7fc81a6a3ee3b",
+          "bytes": 14981,
+          "line_count": 310,
           "covered_line_ranges": [
             [
               1,
-              282
+              310
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-lane-refresh-2026-09-12-g517-closeout-openai-skill-engineering-b930486bc558"
+            "ce-current-20260921-r1-openai-skill-engineering-a4d0e30587e5"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -4516,6 +4347,26 @@
           "source_kind": "evaluation"
         },
         {
+          "path": "skills/spec-code-review/evals/cases/ambiguous-input-no-blocking-prompt.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-code-review",
+          "shared_consumers": [],
+          "sha256": "fa7d014b52398587103ee783d7565e9c5f4f86d831041232d966d0af64256dda",
+          "bytes": 907,
+          "line_count": 27,
+          "covered_line_ranges": [
+            [
+              1,
+              27
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-fa7d014b5239"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/spec-code-review/evals/cases/conflicting-scope-fails-early.yaml",
           "path_role": "skill-package",
           "owning_skill": "spec-code-review",
@@ -4541,17 +4392,17 @@
           "source_kind": "skill-package",
           "owning_skill": "spec-code-review",
           "shared_consumers": [],
-          "sha256": "84f66ebfad4b0ddfb62cd85472313cdd6f0e136284d12c80dc1a1e22101c088e",
-          "bytes": 924,
-          "line_count": 24,
+          "sha256": "0782581d7c43bdf8245b241ae80370b50a02ee7250ee8ba8e9f389307fbf91d1",
+          "bytes": 977,
+          "line_count": 28,
           "covered_line_ranges": [
             [
               1,
-              24
+              28
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-84f66ebfad4b"
+            "ce-current-20260921-r1-openai-skill-engineering-0782581d7c43"
           ],
           "read_status": "full"
         },
@@ -4600,17 +4451,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-code-review",
           "shared_consumers": [],
-          "sha256": "bb224df0f35a089c0ec815abbcbc412b757a1cbb27fe8e22d326196b48b070f4",
-          "bytes": 513,
-          "line_count": 28,
+          "sha256": "96f37a0b20e994830e85411a0ed4a58993b0ce7ba74d147a5f4faddb4f1dfcdd",
+          "bytes": 571,
+          "line_count": 29,
           "covered_line_ranges": [
             [
               1,
-              28
+              29
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-bb224df0f35a"
+            "ce-current-20260921-r1-openai-skill-engineering-96f37a0b20e9"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -4634,6 +4485,26 @@
           ],
           "read_status": "full",
           "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-code-review/evals/fixtures/diffs/minor-refactor.patch",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-code-review",
+          "shared_consumers": [],
+          "sha256": "99a1d760875dae7e65eb54b6756695e52bf1cf4b03496fa5878facb825cbdefb",
+          "bytes": 473,
+          "line_count": 17,
+          "covered_line_ranges": [
+            [
+              1,
+              17
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-99a1d760875d"
+          ],
+          "read_status": "full"
         },
         {
           "path": "skills/spec-code-review/evals/fixtures/repos/tenant-orders/AGENTS.md",
@@ -4796,22 +4667,42 @@
           "source_kind": "deterministic-helper"
         },
         {
+          "path": "skills/spec-code-review/evals/fixtures/scripts/check-no-blocking-inference.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-code-review",
+          "shared_consumers": [],
+          "sha256": "74241c5b2626bb01ee946ff3a85751148475292812573fb8b6f7616a3f76763a",
+          "bytes": 1317,
+          "line_count": 30,
+          "covered_line_ranges": [
+            [
+              1,
+              30
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-74241c5b2626"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/spec-code-review/evals/fixtures/scripts/check-r2-preset-applied-fix.sh",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-code-review",
           "shared_consumers": [],
-          "sha256": "7213bfcfb5186984ac7dac664fc7c8d6bc9e9f0de3bd8847fcb44df5fe11b85f",
-          "bytes": 3843,
-          "line_count": 68,
+          "sha256": "c724fe51a44304b4633c48a8d5279a3899085a78f353ca533fc109e84bc9c794",
+          "bytes": 3886,
+          "line_count": 69,
           "covered_line_ranges": [
             [
               1,
-              68
+              69
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-lane-refresh-2026-09-13-fix-batch-openai-skill-engineering-7213bfcfb518"
+            "ce-current-20260921-r1-openai-skill-engineering-c724fe51a443"
           ],
           "read_status": "full"
         },
@@ -4820,20 +4711,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-code-review",
           "shared_consumers": [],
-          "sha256": "dc827d5904945a1a5d7c51cfb5fc565b4edb529facb3cc595f314bc421b37556",
-          "bytes": 908,
-          "line_count": 34,
+          "sha256": "02c550b8bab105c76c95bc2182c1172ac7ebcd56a34a549552aac4d36998d46f",
+          "bytes": 2008,
+          "line_count": 56,
           "covered_line_ranges": [
             [
               1,
-              34
+              56
             ]
           ],
           "review_chunk_ids": [
-            "oai-r3-final-003"
+            "ce-current-20260921-r1-openai-skill-engineering-02c550b8bab1"
           ],
           "read_status": "full",
-          "source_kind": "deterministic-helper"
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-code-review/evals/frontend-quality-capability-cases.json",
@@ -5501,17 +5392,17 @@
           "source_kind": "skill-package",
           "owning_skill": "spec-code-review",
           "shared_consumers": [],
-          "sha256": "acc0e68f87ec07a4b00af41ed9b9234e933033999c7ac7f07b0f708ad59e485b",
-          "bytes": 24725,
-          "line_count": 232,
+          "sha256": "245cc4fc3a26ab71730ad5db22dbfb00bd83dab8b9689063a624e11596b10d9e",
+          "bytes": 26240,
+          "line_count": 249,
           "covered_line_ranges": [
             [
               1,
-              232
+              249
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-fsa2-repair-2026-09-15-openai-skill-engineering-acc0e68f87ec"
+            "ce-current-20260921-r1-openai-skill-engineering-245cc4fc3a26"
           ],
           "read_status": "full"
         },
@@ -5640,20 +5531,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-code-review",
           "shared_consumers": [],
-          "sha256": "ba359514ba60020b18381b1b1cf9268d16056e539f2bdd8e9c109ff1b8c8cc52",
-          "bytes": 10118,
-          "line_count": 288,
+          "sha256": "cfb3034d57d27bce485f167dfc05207e710674e534c33ce0df8f8bd977bd49a6",
+          "bytes": 14530,
+          "line_count": 374,
           "covered_line_ranges": [
             [
               1,
-              288
+              374
             ]
           ],
           "review_chunk_ids": [
-            "oai-r3-final-003"
+            "ce-current-20260921-r1-openai-skill-engineering-cfb3034d57d2"
           ],
           "read_status": "full",
-          "source_kind": "deterministic-helper"
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-code-review/scripts/run-python.sh",
@@ -5680,17 +5571,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-code-review",
           "shared_consumers": [],
-          "sha256": "78a117cff4a12d5e9af6606d358a64d099833858716104eecdd33080e6b50dea",
-          "bytes": 8204,
-          "line_count": 75,
+          "sha256": "c6f93d057756425728ba3b3e3e2e9f2b7844e0b4b6d96859c0b8cc59c0aa8486",
+          "bytes": 8615,
+          "line_count": 76,
           "covered_line_ranges": [
             [
               1,
-              75
+              76
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-fsa2-repair-2026-09-15-openai-skill-engineering-78a117cff4a1"
+            "ce-current-20260921-r1-openai-skill-engineering-c6f93d057756"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -6000,17 +5891,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-code-review",
           "shared_consumers": [],
-          "sha256": "673ab2389164d94a53558b8a82d6143ad7224c3ac6cce1eb03523edb91c188dc",
-          "bytes": 7137,
-          "line_count": 175,
+          "sha256": "b58f289ccbe7482eb723229376c3e40280d7e24d55cf4e8426b7c8878483ea4a",
+          "bytes": 11729,
+          "line_count": 243,
           "covered_line_ranges": [
             [
               1,
-              175
+              243
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-fsa2-repair-2026-09-15-openai-skill-engineering-673ab2389164"
+            "ce-current-20260921-r1-openai-skill-engineering-b58f289ccbe7"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -6034,6 +5925,26 @@
           ],
           "read_status": "full",
           "source_kind": "direct-support"
+        },
+        {
+          "path": "tests/unit/spec-code-review-pr-head.test.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-code-review",
+          "shared_consumers": [],
+          "sha256": "30835f71cafe2f5c793c9dad0d1a9275a2d0fc5e46e04b53d97d38f790b45c33",
+          "bytes": 2625,
+          "line_count": 54,
+          "covered_line_ranges": [
+            [
+              1,
+              54
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-30835f71cafe"
+          ],
+          "read_status": "full"
         },
         {
           "path": "tests/unit/spec-work-implementation-quality-contracts.test.js",
@@ -6408,17 +6319,17 @@
           "source_kind": "direct-support",
           "owning_skill": "spec-commit",
           "shared_consumers": [],
-          "sha256": "ea5e43dc16dc58ddffd6c13749a91551c353076e7378a639955260b59f638c73",
-          "bytes": 2517,
-          "line_count": 43,
+          "sha256": "e9f8af0ae6ad6fdf8ef6d9f970271fd0c734afd2a5d25ad7d296422c80cdd452",
+          "bytes": 5387,
+          "line_count": 97,
           "covered_line_ranges": [
             [
               1,
-              43
+              97
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-openai-skill-engineering-ea5e43dc16dc"
+            "ce-current-20260921-r1-openai-skill-engineering-e9f8af0ae6ad"
           ],
           "read_status": "full"
         },
@@ -6703,20 +6614,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-commit-push-pr",
           "shared_consumers": [],
-          "sha256": "5cb38eb8314ad50a1d4f2a892081e6bc802d7fcd23080b8bcd198987d60c97ef",
-          "bytes": 4021,
-          "line_count": 85,
+          "sha256": "58f164e92dd749076e5902787391c448dc4a2f0627d94ec504815a166285333c",
+          "bytes": 4572,
+          "line_count": 86,
           "covered_line_ranges": [
             [
               1,
-              85
+              86
             ]
           ],
           "review_chunk_ids": [
-            "oai-r3-final-005"
+            "ce-current-20260921-r1-openai-skill-engineering-58f164e92dd7"
           ],
           "read_status": "full",
-          "source_kind": "reference-contract"
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-commit-push-pr/references/commit-and-push.md",
@@ -6884,17 +6795,17 @@
           "source_kind": "direct-support",
           "owning_skill": "spec-commit-push-pr",
           "shared_consumers": [],
-          "sha256": "ea5e43dc16dc58ddffd6c13749a91551c353076e7378a639955260b59f638c73",
-          "bytes": 2517,
-          "line_count": 43,
+          "sha256": "e9f8af0ae6ad6fdf8ef6d9f970271fd0c734afd2a5d25ad7d296422c80cdd452",
+          "bytes": 5387,
+          "line_count": 97,
           "covered_line_ranges": [
             [
               1,
-              43
+              97
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-openai-skill-engineering-ea5e43dc16dc"
+            "ce-current-20260921-r1-openai-skill-engineering-e9f8af0ae6ad"
           ],
           "read_status": "full"
         },
@@ -7046,6 +6957,66 @@
           "read_status": "full"
         },
         {
+          "path": "skills/spec-compound/evals/cases/counterfactual-recoverable-no-write.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-compound",
+          "shared_consumers": [],
+          "sha256": "4aaa9c5a0bde9755c39c60a6b0d6b6caf6503bd59cb33575e38bf8fe952c6232",
+          "bytes": 894,
+          "line_count": 27,
+          "covered_line_ranges": [
+            [
+              1,
+              27
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-4aaa9c5a0bde"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-compound/evals/cases/headless-no-qualifying-no-complete.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-compound",
+          "shared_consumers": [],
+          "sha256": "9e56e0f9456c0d5b4050b5c7b002e5a582a79431675b0d29589edc1402f7e0b9",
+          "bytes": 832,
+          "line_count": 27,
+          "covered_line_ranges": [
+            [
+              1,
+              27
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-9e56e0f9456c"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-compound/evals/cases/positive-publish-produces-solution.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-compound",
+          "shared_consumers": [],
+          "sha256": "943b95d6b03ef28e61ec63e57023819cecf0c857232fa52e3ec1c5425bb08e77",
+          "bytes": 1325,
+          "line_count": 33,
+          "covered_line_ranges": [
+            [
+              1,
+              33
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-943b95d6b03e"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/spec-compound/evals/cases/unsolved-no-write.yaml",
           "path_role": "skill-package",
           "source_kind": "skill-package",
@@ -7071,17 +7042,17 @@
           "source_kind": "skill-package",
           "owning_skill": "spec-compound",
           "shared_consumers": [],
-          "sha256": "225f8ccfe15076d4209c1bbb3a272ecfa9725b891908d9aefbb0a642f275c45c",
-          "bytes": 351,
-          "line_count": 19,
+          "sha256": "444d5173a0f1d1ddd77d24113a66adadefcff41265469fcf720af2e16e3254b7",
+          "bytes": 526,
+          "line_count": 22,
           "covered_line_ranges": [
             [
               1,
-              19
+              22
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-225f8ccfe150"
+            "ce-current-20260921-r1-openai-skill-engineering-444d5173a0f1"
           ],
           "read_status": "full"
         },
@@ -7166,6 +7137,206 @@
           "read_status": "full"
         },
         {
+          "path": "skills/spec-compound/evals/fixtures/repos/solved-ledger/package.json",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-compound",
+          "shared_consumers": [],
+          "sha256": "8e6041492fba50e5e04a67ed0270c887f1c8d634a746796b142dc8ca3bc587b7",
+          "bytes": 109,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-8e6041492fba"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-compound/evals/fixtures/repos/solved-ledger/README.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-compound",
+          "shared_consumers": [],
+          "sha256": "e3c387cecd55fbafe56bfc9885de8980f6714f09bea12e091b6bca9e7e9400c6",
+          "bytes": 162,
+          "line_count": 4,
+          "covered_line_ranges": [
+            [
+              1,
+              4
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-e3c387cecd55"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-compound/evals/fixtures/repos/solved-ledger/src/server.js",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-compound",
+          "shared_consumers": [],
+          "sha256": "fc62a70d3114b0312885c94ff9becda4fcac30c564bff517d5f079b2383b0231",
+          "bytes": 1023,
+          "line_count": 37,
+          "covered_line_ranges": [
+            [
+              1,
+              37
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-fc62a70d3114"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-compound/evals/fixtures/repos/solved-ledger/test/entries.test.js",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-compound",
+          "shared_consumers": [],
+          "sha256": "152395b1f15288f78c86739aa9f932459486d7d1528d0ea0f0c07c202a269bc4",
+          "bytes": 385,
+          "line_count": 11,
+          "covered_line_ranges": [
+            [
+              1,
+              11
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-152395b1f152"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-compound/evals/fixtures/repos/trivial-fix/package.json",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-compound",
+          "shared_consumers": [],
+          "sha256": "e289f9e360afe1e23fe3d2b4c03d008a1b84eea7f693feea4253408cf1b401d3",
+          "bytes": 91,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-e289f9e360af"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-compound/evals/fixtures/repos/trivial-fix/README.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-compound",
+          "shared_consumers": [],
+          "sha256": "38256ecbbac1f94733d94ae228482ecc95a4677540f6b7424b58212af0b47ca0",
+          "bytes": 141,
+          "line_count": 4,
+          "covered_line_ranges": [
+            [
+              1,
+              4
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-38256ecbbac1"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-compound/evals/fixtures/repos/trivial-fix/src/app.js",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-compound",
+          "shared_consumers": [],
+          "sha256": "d2c9c90a2139b53c58670091d4b5649ef94c29a15443f04b5a7fce53e766d1d3",
+          "bytes": 276,
+          "line_count": 4,
+          "covered_line_ranges": [
+            [
+              1,
+              4
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-d2c9c90a2139"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-compound/evals/fixtures/repos/trivial-fix/src/config-loader.js",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-compound",
+          "shared_consumers": [],
+          "sha256": "7761a677c54cca6a3544441a5bf68582c2f8658fde3178e5f6ead14cc13d6a02",
+          "bytes": 55,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-7761a677c54c"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-compound/evals/fixtures/scripts/check-counterfactual-no-write.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-compound",
+          "shared_consumers": [],
+          "sha256": "05d882ec4758c76b6c35bc92dd2d740f4d2def65e2027a6ce87b328c8ef2fea6",
+          "bytes": 830,
+          "line_count": 20,
+          "covered_line_ranges": [
+            [
+              1,
+              20
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-05d882ec4758"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-compound/evals/fixtures/scripts/check-headless-no-complete.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-compound",
+          "shared_consumers": [],
+          "sha256": "479b6cf5859194a8f13905ae2fb65fb7400499ca423076a1c1c8cbf8f914c5fe",
+          "bytes": 915,
+          "line_count": 23,
+          "covered_line_ranges": [
+            [
+              1,
+              23
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-479b6cf58591"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/spec-compound/evals/fixtures/scripts/check-refuses-unsolved.sh",
           "path_role": "skill-package",
           "source_kind": "skill-package",
@@ -7182,6 +7353,26 @@
           ],
           "review_chunk_ids": [
             "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-357251c0055d"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-compound/evals/fixtures/scripts/check-solution-published.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-compound",
+          "shared_consumers": [],
+          "sha256": "0dfa96792ec5d581b49127b35e9329b07d4edb208fec7b79df1564b60d5369dc",
+          "bytes": 1003,
+          "line_count": 20,
+          "covered_line_ranges": [
+            [
+              1,
+              20
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-0dfa96792ec5"
           ],
           "read_status": "full"
         },
@@ -7730,8 +7921,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-compound",
           "shared_consumers": [],
-          "sha256": "32a1da0107adaf31f116e3e05ed146b4dfd3935b9a89cb4c7e9dd95ed26c63e5",
-          "bytes": 6445,
+          "sha256": "ed6fd3d4f45a86c61adbfb283aad720f6adcb7aa3d20160dac5f23e54c3947cd",
+          "bytes": 6774,
           "line_count": 61,
           "covered_line_ranges": [
             [
@@ -7740,7 +7931,7 @@
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-openai-skill-engineering-32a1da0107ad"
+            "ce-current-20260921-r1-openai-skill-engineering-ed6fd3d4f45a"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -7810,17 +8001,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-compound",
           "shared_consumers": [],
-          "sha256": "f3f6b491bc49b8b9eee736cc49815acdee36b649144e19bc4286a680834469d8",
-          "bytes": 17534,
-          "line_count": 405,
+          "sha256": "d4a0c6116490e6dcb314c1eaba05cf9360f7faf156d0ab545afdfebb1bfea72d",
+          "bytes": 17494,
+          "line_count": 408,
           "covered_line_ranges": [
             [
               1,
-              405
+              408
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-lane-refresh-2026-09-13-fix-batch-openai-skill-engineering-f3f6b491bc49"
+            "ce-current-20260921-r1-openai-skill-engineering-d4a0c6116490"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -8658,8 +8849,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-compound-refresh",
           "shared_consumers": [],
-          "sha256": "f91c111735d8140d21baac0ef836523d2051bce2d52b7a6787e52cad2577ca3e",
-          "bytes": 14609,
+          "sha256": "b0a5dccac1b77e349fa4a99e0e83ea20857fbf992fa6fdd1d3aa5893db0b90e3",
+          "bytes": 14725,
           "line_count": 164,
           "covered_line_ranges": [
             [
@@ -8668,7 +8859,7 @@
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-fsa2-repair-2026-09-15-openai-skill-engineering-f91c111735d8"
+            "ce-current-20260921-r1-openai-skill-engineering-b0a5dccac1b7"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -9775,13 +9966,133 @@
       ],
       "source_read_receipts": [
         {
+          "path": "skills/spec-doc-review/evals/cases/default-report-only-no-write.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-doc-review",
+          "shared_consumers": [],
+          "sha256": "525c400306f49291ddf70b1bc0fee37e2e047f689708306a3484572c1d2d5428",
+          "bytes": 749,
+          "line_count": 26,
+          "covered_line_ranges": [
+            [
+              1,
+              26
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-525c400306f4"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-doc-review/evals/cases/flag-conflict-fails-closed.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-doc-review",
+          "shared_consumers": [],
+          "sha256": "d7a53fdb6a7acb67eec01f4b253782838710ce2e6c49e42d2e7d281f3040bc9e",
+          "bytes": 783,
+          "line_count": 27,
+          "covered_line_ranges": [
+            [
+              1,
+              27
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-d7a53fdb6a7a"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-doc-review/evals/cases/headless-no-path-fails.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-doc-review",
+          "shared_consumers": [],
+          "sha256": "01b74ab5362e42e7d2d50dca4aacb6fa35b931901069baf1194b5389eb56b682",
+          "bytes": 815,
+          "line_count": 16,
+          "covered_line_ranges": [
+            [
+              1,
+              16
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-01b74ab5362e"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-doc-review/evals/cases/html-forces-report-only.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-doc-review",
+          "shared_consumers": [],
+          "sha256": "c3ba97fbed8ae225bda332b266e9c07b4c2fe2863757fa11253e4f52f850cb47",
+          "bytes": 777,
+          "line_count": 29,
+          "covered_line_ranges": [
+            [
+              1,
+              29
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-c3ba97fbed8a"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-doc-review/evals/cases/standard-roster-budget.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-doc-review",
+          "shared_consumers": [],
+          "sha256": "3369668c25c9cd70d90ecde09cea47ecec401304336c6ab1939fe7b8834e3162",
+          "bytes": 1221,
+          "line_count": 43,
+          "covered_line_ranges": [
+            [
+              1,
+              43
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-3369668c25c9"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-doc-review/evals/cases/task-pack-forces-report-only.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-doc-review",
+          "shared_consumers": [],
+          "sha256": "ac6540058ad2b6df79fc11b009e3eded3e28f9b71f453269a43be02d83634db3",
+          "bytes": 851,
+          "line_count": 30,
+          "covered_line_ranges": [
+            [
+              1,
+              30
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-ac6540058ad2"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/spec-doc-review/evals/eval.yaml",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-doc-review",
           "shared_consumers": [],
-          "sha256": "53ad2606f37e0dd7d71eac1d3b625f915be5886d26219b31008601203173f264",
-          "bytes": 614,
+          "sha256": "152a45f386a570dfd22069d262dcf464dd3182ad0d92ab778a1076e96b2043a8",
+          "bytes": 566,
           "line_count": 28,
           "covered_line_ranges": [
             [
@@ -9790,7 +10101,147 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-53ad2606f37e"
+            "ce-current-20260921-r1-openai-skill-engineering-152a45f386a5"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-doc-review/evals/fixtures/repos/html-repo/docs/plans/2026-09-01-monthly-summary-plan.html",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-doc-review",
+          "shared_consumers": [],
+          "sha256": "3245e231d11dd6b462c51107a767fa77e720f2dc8a4fa2b38d374597237c648f",
+          "bytes": 336,
+          "line_count": 10,
+          "covered_line_ranges": [
+            [
+              1,
+              10
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-3245e231d11d"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-doc-review/evals/fixtures/repos/plan-repo/docs/plans/2026-09-01-monthly-summary-plan.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-doc-review",
+          "shared_consumers": [],
+          "sha256": "3138f615da497ebb0faf8adcec2298ec05a0c814feb3d6b2d8d577d5cb039189",
+          "bytes": 686,
+          "line_count": 27,
+          "covered_line_ranges": [
+            [
+              1,
+              27
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-3138f615da49"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-doc-review/evals/fixtures/repos/taskpack-repo/docs/plans/2026-09-01-monthly-summary-tasks.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-doc-review",
+          "shared_consumers": [],
+          "sha256": "4c55c8facdb0ab5a202ed214033255505ee5b154d76cb6db2a64b1e94451a0be",
+          "bytes": 420,
+          "line_count": 23,
+          "covered_line_ranges": [
+            [
+              1,
+              23
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-4c55c8facdb0"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-doc-review/evals/fixtures/scripts/check-headless-no-path.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-doc-review",
+          "shared_consumers": [],
+          "sha256": "9f4fe36b1998b6adad161a9d2e3000d087c01d010c4d7e332668ff572413c20a",
+          "bytes": 755,
+          "line_count": 16,
+          "covered_line_ranges": [
+            [
+              1,
+              16
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-9f4fe36b1998"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-doc-review/evals/fixtures/scripts/check-html-marker.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-doc-review",
+          "shared_consumers": [],
+          "sha256": "75656e6c4a21cbf0b04805bfb5841b0386785ef56da542b2f0ba7327829f0723",
+          "bytes": 1336,
+          "line_count": 35,
+          "covered_line_ranges": [
+            [
+              1,
+              35
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-75656e6c4a21"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-doc-review/evals/fixtures/scripts/check-plan-marker.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-doc-review",
+          "shared_consumers": [],
+          "sha256": "95d43fde6946f5095671e8eeb0c6849d403f118bdb60c615da65f29f7db1ce65",
+          "bytes": 1334,
+          "line_count": 35,
+          "covered_line_ranges": [
+            [
+              1,
+              35
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-95d43fde6946"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-doc-review/evals/fixtures/scripts/check-taskpack-marker.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-doc-review",
+          "shared_consumers": [],
+          "sha256": "9e54000e7f2df11112608f388eebf4a2cd65466c62879d8b2c5566452093cfa0",
+          "bytes": 1335,
+          "line_count": 35,
+          "covered_line_ranges": [
+            [
+              1,
+              35
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-9e54000e7f2d"
           ],
           "read_status": "full"
         },
@@ -9813,266 +10264,6 @@
           ],
           "read_status": "full",
           "source_kind": "evaluation"
-        },
-        {
-          "path": "skills/spec-doc-review/evals/skillup/cases/default-report-only-no-write.yaml",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-doc-review",
-          "shared_consumers": [],
-          "sha256": "bfde02fa3801b5e0170441658502e0a01b4cc5cb1bc592fd2b7a1afc01762bbf",
-          "bytes": 765,
-          "line_count": 26,
-          "covered_line_ranges": [
-            [
-              1,
-              26
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-bfde02fa3801"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-doc-review/evals/skillup/cases/flag-conflict-fails-closed.yaml",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-doc-review",
-          "shared_consumers": [],
-          "sha256": "62fa6ba0369c7ab1050ecff0fe96b13032890e2b3f5799121c98b5b6fbbad90b",
-          "bytes": 791,
-          "line_count": 27,
-          "covered_line_ranges": [
-            [
-              1,
-              27
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-62fa6ba0369c"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-doc-review/evals/skillup/cases/headless-no-path-fails.yaml",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-doc-review",
-          "shared_consumers": [],
-          "sha256": "b6beb54031d281920e639f012da945d7201e7f8453626b828da1facd23bdc326",
-          "bytes": 823,
-          "line_count": 16,
-          "covered_line_ranges": [
-            [
-              1,
-              16
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-b6beb54031d2"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-doc-review/evals/skillup/cases/html-forces-report-only.yaml",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-doc-review",
-          "shared_consumers": [],
-          "sha256": "0d6f863660295eead9721dc98a3f617e7411aa3ebd75f00072797d655cd61ecc",
-          "bytes": 793,
-          "line_count": 29,
-          "covered_line_ranges": [
-            [
-              1,
-              29
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-0d6f86366029"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-doc-review/evals/skillup/cases/standard-roster-budget.yaml",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-doc-review",
-          "shared_consumers": [],
-          "sha256": "3369668c25c9cd70d90ecde09cea47ecec401304336c6ab1939fe7b8834e3162",
-          "bytes": 1221,
-          "line_count": 43,
-          "covered_line_ranges": [
-            [
-              1,
-              43
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-3369668c25c9"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-doc-review/evals/skillup/cases/task-pack-forces-report-only.yaml",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-doc-review",
-          "shared_consumers": [],
-          "sha256": "97af55d8d6879eacdff33f51a3958c5e38cadc660adba8cc0661b9510959edef",
-          "bytes": 867,
-          "line_count": 30,
-          "covered_line_ranges": [
-            [
-              1,
-              30
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-97af55d8d687"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-doc-review/evals/skillup/fixtures/repos/html-repo/docs/plans/2026-09-01-monthly-summary-plan.html",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-doc-review",
-          "shared_consumers": [],
-          "sha256": "3245e231d11dd6b462c51107a767fa77e720f2dc8a4fa2b38d374597237c648f",
-          "bytes": 336,
-          "line_count": 10,
-          "covered_line_ranges": [
-            [
-              1,
-              10
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-3245e231d11d"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-doc-review/evals/skillup/fixtures/repos/plan-repo/docs/plans/2026-09-01-monthly-summary-plan.md",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-doc-review",
-          "shared_consumers": [],
-          "sha256": "3138f615da497ebb0faf8adcec2298ec05a0c814feb3d6b2d8d577d5cb039189",
-          "bytes": 686,
-          "line_count": 27,
-          "covered_line_ranges": [
-            [
-              1,
-              27
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-3138f615da49"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-doc-review/evals/skillup/fixtures/repos/taskpack-repo/docs/plans/2026-09-01-monthly-summary-tasks.md",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-doc-review",
-          "shared_consumers": [],
-          "sha256": "4c55c8facdb0ab5a202ed214033255505ee5b154d76cb6db2a64b1e94451a0be",
-          "bytes": 420,
-          "line_count": 23,
-          "covered_line_ranges": [
-            [
-              1,
-              23
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-4c55c8facdb0"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-doc-review/evals/skillup/fixtures/scripts/check-headless-no-path.sh",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-doc-review",
-          "shared_consumers": [],
-          "sha256": "9f4fe36b1998b6adad161a9d2e3000d087c01d010c4d7e332668ff572413c20a",
-          "bytes": 755,
-          "line_count": 16,
-          "covered_line_ranges": [
-            [
-              1,
-              16
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-9f4fe36b1998"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-doc-review/evals/skillup/fixtures/scripts/check-html-marker.sh",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-doc-review",
-          "shared_consumers": [],
-          "sha256": "d0405d505bc023c5ffdf8d3253b101f6a24727a1e6be92d71e0cba7f4845afc9",
-          "bytes": 1078,
-          "line_count": 32,
-          "covered_line_ranges": [
-            [
-              1,
-              32
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-d0405d505bc0"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-doc-review/evals/skillup/fixtures/scripts/check-plan-marker.sh",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-doc-review",
-          "shared_consumers": [],
-          "sha256": "52d154d2600771975b769907db01db4bbf4ce25f4104499d124b59893abd6e70",
-          "bytes": 1076,
-          "line_count": 32,
-          "covered_line_ranges": [
-            [
-              1,
-              32
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-52d154d26007"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-doc-review/evals/skillup/fixtures/scripts/check-taskpack-marker.sh",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-doc-review",
-          "shared_consumers": [],
-          "sha256": "3ddf5114bfeb64543d43d1868d04a60bc4cfe225af634c4e70d6cdb1b1e70623",
-          "bytes": 1077,
-          "line_count": 32,
-          "covered_line_ranges": [
-            [
-              1,
-              32
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-3ddf5114bfeb"
-          ],
-          "read_status": "full"
         },
         {
           "path": "skills/spec-doc-review/evals/task-pack-review-cases.json",
@@ -10979,17 +11170,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-doc-review",
           "shared_consumers": [],
-          "sha256": "638c98a709044d645407d4b3e178e4d553f83bf97b354d16dd3e6a38db7ffb00",
-          "bytes": 21649,
-          "line_count": 416,
+          "sha256": "bbe20bc9fdcdb1643a6ec3aaceb7b332274061d2c29a79aebbcc01066d055855",
+          "bytes": 22980,
+          "line_count": 445,
           "covered_line_ranges": [
             [
               1,
-              416
+              445
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-openai-skill-engineering-638c98a70904"
+            "ce-current-20260921-r1-openai-skill-engineering-bbe20bc9fdcd"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -11970,6 +12161,26 @@
       ],
       "source_read_receipts": [
         {
+          "path": "skills/spec-handoff/evals/cases/create-produces-gate-fields.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-handoff",
+          "shared_consumers": [],
+          "sha256": "08e2cd1bf4bc9f1d5e3a2271e7cc5df57bcfcfd03ff89fcb57afcde09c3c37a5",
+          "bytes": 1032,
+          "line_count": 29,
+          "covered_line_ranges": [
+            [
+              1,
+              29
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-08e2cd1bf4bc"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/spec-handoff/evals/cases/ordinary-continuation-not-triggered.yaml",
           "path_role": "skill-package",
           "source_kind": "skill-package",
@@ -11990,22 +12201,62 @@
           "read_status": "full"
         },
         {
+          "path": "skills/spec-handoff/evals/cases/resume-explicit-source-stops-without-acting.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-handoff",
+          "shared_consumers": [],
+          "sha256": "713decee1c157a777c1e57e1330ef811cbd6644a3b90999ad13406a10ea774a7",
+          "bytes": 969,
+          "line_count": 28,
+          "covered_line_ranges": [
+            [
+              1,
+              28
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-713decee1c15"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-handoff/evals/cases/resume-sparse-source-degraded-orientation.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-handoff",
+          "shared_consumers": [],
+          "sha256": "2c5e6c6d1bcd4c684226533e6fc3ac8be81d79b7e7e421745c76d05e08d60d3c",
+          "bytes": 964,
+          "line_count": 28,
+          "covered_line_ranges": [
+            [
+              1,
+              28
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-2c5e6c6d1bcd"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/spec-handoff/evals/eval.yaml",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-handoff",
           "shared_consumers": [],
-          "sha256": "08a2bdd606ffe413c4a43c7d15886da210727869f23880750fedcb11d7011cef",
-          "bytes": 321,
-          "line_count": 18,
+          "sha256": "7e00141aae930f25300c517e65729afb5e2ac46c26c7c9f698676502658563c1",
+          "bytes": 504,
+          "line_count": 21,
           "covered_line_ranges": [
             [
               1,
-              18
+              21
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-08a2bdd606ff"
+            "ce-current-20260921-r1-openai-skill-engineering-7e00141aae93"
           ],
           "read_status": "full"
         },
@@ -12028,6 +12279,106 @@
           ],
           "read_status": "full",
           "source_kind": "skill-package"
+        },
+        {
+          "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/docs/notes/2026-09-19-session.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-handoff",
+          "shared_consumers": [],
+          "sha256": "89be9fd4002c4a782b583a6512750800ce33856336d9a3e4776df89ccf006272",
+          "bytes": 968,
+          "line_count": 27,
+          "covered_line_ranges": [
+            [
+              1,
+              27
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-89be9fd4002c"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/docs/notes/vague-progress.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-handoff",
+          "shared_consumers": [],
+          "sha256": "6eef75dd77e37c6b4d4995b2fcbf53b16e374e2744331b6f2de9c97b28c3b1fc",
+          "bytes": 400,
+          "line_count": 16,
+          "covered_line_ranges": [
+            [
+              1,
+              16
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-6eef75dd77e3"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/package.json",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-handoff",
+          "shared_consumers": [],
+          "sha256": "03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b",
+          "bytes": 96,
+          "line_count": 6,
+          "covered_line_ranges": [
+            [
+              1,
+              6
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-03422077e4a5"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/README.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-handoff",
+          "shared_consumers": [],
+          "sha256": "4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855",
+          "bytes": 365,
+          "line_count": 8,
+          "covered_line_ranges": [
+            [
+              1,
+              8
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-4aac9f151312"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/src/server.js",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-handoff",
+          "shared_consumers": [],
+          "sha256": "ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34",
+          "bytes": 665,
+          "line_count": 25,
+          "covered_line_ranges": [
+            [
+              1,
+              25
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-ff9d96855c23"
+          ],
+          "read_status": "full"
         },
         {
           "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger/package.json",
@@ -12130,6 +12481,66 @@
           "read_status": "full"
         },
         {
+          "path": "skills/spec-handoff/evals/fixtures/scripts/check-create-artifact.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-handoff",
+          "shared_consumers": [],
+          "sha256": "3a9761fe952b6e00570581f3dd517778d165d4ec28180f45a67c91567ad1ba07",
+          "bytes": 2817,
+          "line_count": 55,
+          "covered_line_ranges": [
+            [
+              1,
+              55
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-3a9761fe952b"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-handoff/evals/fixtures/scripts/check-degraded-orientation.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-handoff",
+          "shared_consumers": [],
+          "sha256": "85af2563727840b3ed6dbd43188ed605480c5dd4182bf20e34bea01cf5819d13",
+          "bytes": 3043,
+          "line_count": 58,
+          "covered_line_ranges": [
+            [
+              1,
+              58
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-85af25637278"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-handoff/evals/fixtures/scripts/check-resume-no-side-effects.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-handoff",
+          "shared_consumers": [],
+          "sha256": "5dee358a212fb5add40241d9f2276d0d42172c9426762dd4f1b440871974a481",
+          "bytes": 3027,
+          "line_count": 61,
+          "covered_line_ranges": [
+            [
+              1,
+              61
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-5dee358a212f"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/spec-handoff/references/artifact-contract.md",
           "path_role": "skill-package",
           "owning_skill": "spec-handoff",
@@ -12214,8 +12625,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-handoff",
           "shared_consumers": [],
-          "sha256": "49c0da97ed86e139a977c6bf7fdc8ed77e3eacaaf7539f9d5fd343bb4d1da9d5",
-          "bytes": 9172,
+          "sha256": "4bc4a2e1da3aa5caa1e547c9f9d59410099823fa315c77f56c8e71ac7a5b6d6c",
+          "bytes": 9359,
           "line_count": 99,
           "covered_line_ranges": [
             [
@@ -12224,7 +12635,7 @@
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-openai-skill-engineering-49c0da97ed86"
+            "ce-current-20260921-r1-openai-skill-engineering-4bc4a2e1da3a"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -13089,17 +13500,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-ideate",
           "shared_consumers": [],
-          "sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea",
-          "bytes": 13735,
-          "line_count": 282,
+          "sha256": "a4d0e30587e5e2519136290e5d1c2e0c76a17eca05649653b6c7fc81a6a3ee3b",
+          "bytes": 14981,
+          "line_count": 310,
           "covered_line_ranges": [
             [
               1,
-              282
+              310
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-lane-refresh-2026-09-12-g517-closeout-openai-skill-engineering-b930486bc558"
+            "ce-current-20260921-r1-openai-skill-engineering-a4d0e30587e5"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -13938,17 +14349,17 @@
           "source_kind": "direct-support",
           "owning_skill": "spec-lfg",
           "shared_consumers": [],
-          "sha256": "d3d0d98ac0be9f7b6ad293702bfa88372da8a3be94a1641e5fa0b520ba7d60ab",
-          "bytes": 10590,
-          "line_count": 170,
+          "sha256": "1e6bbc09834cf77fc4a49fabf3ddd25752a4086965768556bb56fcf1bcc279a4",
+          "bytes": 12834,
+          "line_count": 205,
           "covered_line_ranges": [
             [
               1,
-              170
+              205
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-openai-skill-engineering-d3d0d98ac0be"
+            "ce-current-20260921-r1-openai-skill-engineering-1e6bbc09834c"
           ],
           "read_status": "full"
         },
@@ -17070,17 +17481,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-plan",
           "shared_consumers": [],
-          "sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea",
-          "bytes": 13735,
-          "line_count": 282,
+          "sha256": "a4d0e30587e5e2519136290e5d1c2e0c76a17eca05649653b6c7fc81a6a3ee3b",
+          "bytes": 14981,
+          "line_count": 310,
           "covered_line_ranges": [
             [
               1,
-              282
+              310
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-lane-refresh-2026-09-12-g517-closeout-openai-skill-engineering-b930486bc558"
+            "ce-current-20260921-r1-openai-skill-engineering-a4d0e30587e5"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -20610,17 +21021,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-product-pulse",
           "shared_consumers": [],
-          "sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea",
-          "bytes": 13735,
-          "line_count": 282,
+          "sha256": "a4d0e30587e5e2519136290e5d1c2e0c76a17eca05649653b6c7fc81a6a3ee3b",
+          "bytes": 14981,
+          "line_count": 310,
           "covered_line_ranges": [
             [
               1,
-              282
+              310
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-lane-refresh-2026-09-12-g517-closeout-openai-skill-engineering-b930486bc558"
+            "ce-current-20260921-r1-openai-skill-engineering-a4d0e30587e5"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -23884,20 +24295,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-resolve-pr-feedback",
           "shared_consumers": [],
-          "sha256": "ed587f3ee7ca0f98034c9d68557c5fab2cea2c90ca074338e644f0a886ac7b7a",
-          "bytes": 3872,
-          "line_count": 56,
+          "sha256": "c86844a7544f776ff7622ec818a341be7031133435e122ac3d3a69f7c5a667b1",
+          "bytes": 4478,
+          "line_count": 59,
           "covered_line_ranges": [
             [
               1,
-              56
+              59
             ]
           ],
           "review_chunk_ids": [
-            "oai-r3-final-023"
+            "ce-current-20260921-r1-openai-skill-engineering-c86844a7544f"
           ],
           "read_status": "full",
-          "source_kind": "reference-contract"
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-resolve-pr-feedback/references/evaluation-rubric.md",
@@ -23924,17 +24335,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-resolve-pr-feedback",
           "shared_consumers": [],
-          "sha256": "1c0278e94a39c6d346853da27ed2b6cec6ad6182ad8ec935ee576482241b7049",
-          "bytes": 21530,
-          "line_count": 315,
+          "sha256": "866cb4f06438e019c9a3c9257a3748e9382ae6c341d8716ee9fbcd145d1c77af",
+          "bytes": 24300,
+          "line_count": 316,
           "covered_line_ranges": [
             [
               1,
-              315
+              316
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-openai-skill-engineering-1c0278e94a39"
+            "ce-current-20260921-r1-openai-skill-engineering-866cb4f06438"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -23964,17 +24375,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-resolve-pr-feedback",
           "shared_consumers": [],
-          "sha256": "88040f8b4e7c5757cfe7f000f859ef18ebb2c25cd2fa466f3acc138edbbfa9d0",
-          "bytes": 2352,
-          "line_count": 50,
+          "sha256": "9a297df7d0ab487e07127b19789365727a04c1036f18634722540fee48f7f5fe",
+          "bytes": 2588,
+          "line_count": 54,
           "covered_line_ranges": [
             [
               1,
-              50
+              54
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-openai-skill-engineering-88040f8b4e7c"
+            "ce-current-20260921-r1-openai-skill-engineering-9a297df7d0ab"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -23984,17 +24395,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-resolve-pr-feedback",
           "shared_consumers": [],
-          "sha256": "b654ca706a8f08b01fbe0be043fee7213b6b8c2ef520dfceda59c13ffb9ad2f5",
-          "bytes": 3961,
-          "line_count": 43,
+          "sha256": "d46bf86ec40b234b2e922d1d2f2d67105569a43d5726e4d866733ac7546ffc8d",
+          "bytes": 4248,
+          "line_count": 45,
           "covered_line_ranges": [
             [
               1,
-              43
+              45
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-openai-skill-engineering-b654ca706a8f"
+            "ce-current-20260921-r1-openai-skill-engineering-d46bf86ec40b"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -24204,17 +24615,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-resolve-pr-feedback",
           "shared_consumers": [],
-          "sha256": "d3d0d98ac0be9f7b6ad293702bfa88372da8a3be94a1641e5fa0b520ba7d60ab",
-          "bytes": 10590,
-          "line_count": 170,
+          "sha256": "1e6bbc09834cf77fc4a49fabf3ddd25752a4086965768556bb56fcf1bcc279a4",
+          "bytes": 12834,
+          "line_count": 205,
           "covered_line_ranges": [
             [
               1,
-              170
+              205
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-openai-skill-engineering-d3d0d98ac0be"
+            "ce-current-20260921-r1-openai-skill-engineering-1e6bbc09834c"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -25322,26 +25733,6 @@
           "read_status": "full"
         },
         {
-          "path": "skills/spec-runtime-setup/evals/fixtures/scripts/asks-a-question.sh",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-runtime-setup",
-          "shared_consumers": [],
-          "sha256": "14bea02a91277a7440f671f9d6bb5cd70117d23508a03b39dc986169d64fa973",
-          "bytes": 1232,
-          "line_count": 30,
-          "covered_line_ranges": [
-            [
-              1,
-              30
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-14bea02a9127"
-          ],
-          "read_status": "full"
-        },
-        {
           "path": "skills/spec-runtime-setup/evals/fixtures/scripts/check-not-setup-scope.sh",
           "path_role": "skill-package",
           "source_kind": "skill-package",
@@ -25446,8 +25837,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "dad174f75eb08ca928ccab339d65f8e79ad5c52aaa2d507627e6de8250605f21",
-          "bytes": 15924,
+          "sha256": "9394b742edfdf9843c7e47fe4e38bf44e9028bf4152d66ab8e70cc2309899cc1",
+          "bytes": 16043,
           "line_count": 124,
           "covered_line_ranges": [
             [
@@ -25456,7 +25847,7 @@
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-lane-refresh-2026-09-12-g517-closeout-openai-skill-engineering-dad174f75eb0"
+            "ce-current-20260921-r1-openai-skill-engineering-9394b742edfd"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -25726,17 +26117,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "30a0c5b91747cad8676e1d11040dde45b63ce4fc6450a2d5fa7c402472aa6ab8",
-          "bytes": 6630,
-          "line_count": 185,
+          "sha256": "eb22b73dddb9eb1d0eeb7bba56e49f135f0a5f110ffb46817878ae9f1ddf9403",
+          "bytes": 6989,
+          "line_count": 191,
           "covered_line_ranges": [
             [
               1,
-              185
+              191
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-fsa2-repair-2026-09-15-openai-skill-engineering-30a0c5b91747"
+            "ce-current-20260921-r1-openai-skill-engineering-eb22b73dddb9"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -26186,20 +26577,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "fa3f5487bca0f305fd43dbd914687979e34b352916c04f92e7637702353087b0",
-          "bytes": 28733,
-          "line_count": 703,
+          "sha256": "c9756b9aff8d68e98b8be7d2e571aa98ac3bdf5b72348b6fa2c207305b29f5cf",
+          "bytes": 28738,
+          "line_count": 704,
           "covered_line_ranges": [
             [
               1,
-              703
+              704
             ]
           ],
           "review_chunk_ids": [
-            "oai-r3-final-026"
+            "ce-current-20260921-r1-openai-skill-engineering-c9756b9aff8d"
           ],
           "read_status": "full",
-          "source_kind": "deterministic-helper"
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-runtime-setup/scripts/lib/workspace-git-exclude.cjs",
@@ -26526,20 +26917,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "ab020827f87efd6648a03c68905523825dab70dfd0ef70c1f1023bc487b2ff22",
-          "bytes": 7151,
-          "line_count": 174,
+          "sha256": "b6dd6cdd497ccaf12c116392c77d1145e141faa496dc72a735b3397dc35980f7",
+          "bytes": 7161,
+          "line_count": 175,
           "covered_line_ranges": [
             [
               1,
-              174
+              175
             ]
           ],
           "review_chunk_ids": [
-            "oai-r3-final-026"
+            "ce-current-20260921-r1-openai-skill-engineering-b6dd6cdd497c"
           ],
           "read_status": "full",
-          "source_kind": "deterministic-helper"
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-runtime-setup/scripts/lib/workspace-target.cjs",
@@ -26666,17 +27057,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "e943dd2130b536d57bd52bc9c991e4b205cb4971c3e2cd5ed9910fd15e65c8d9",
-          "bytes": 129050,
-          "line_count": 2748,
+          "sha256": "5c5ff709b990c830e0b2eb770ced37006138db64ecffaf2beac71d5acf386efe",
+          "bytes": 129920,
+          "line_count": 2766,
           "covered_line_ranges": [
             [
               1,
-              2748
+              2766
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-lane-refresh-2026-09-13-fix-batch-openai-skill-engineering-e943dd2130b5"
+            "ce-current-20260921-r1-openai-skill-engineering-5c5ff709b990"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -26706,17 +27097,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "3fa166402a6978c20f746e87c1e1413aab5e9d80e2ae248cce8c11ef1d9dc7f6",
-          "bytes": 32891,
-          "line_count": 873,
+          "sha256": "40e3ebe91b0eda2a7d03840afe7a35d211d1d0774fdade483ab56aabd5ad30fa",
+          "bytes": 32700,
+          "line_count": 872,
           "covered_line_ranges": [
             [
               1,
-              873
+              872
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-lane-refresh-2026-09-13-fix-batch-openai-skill-engineering-3fa166402a69"
+            "ce-current-20260921-r1-openai-skill-engineering-40e3ebe91b0e"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -26826,17 +27217,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "c9bb4ae019db0fcbfcc89772a405e0df4fa9f4b0ba404813c330ff4d502de41a",
-          "bytes": 55953,
-          "line_count": 368,
+          "sha256": "cb04249d533bb6c92581cbc8c90d9ab84383d045c495fe62f8902093515b6795",
+          "bytes": 58077,
+          "line_count": 380,
           "covered_line_ranges": [
             [
               1,
-              368
+              380
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-fsa2-repair-2026-09-15-openai-skill-engineering-c9bb4ae019db"
+            "ce-current-20260921-r1-openai-skill-engineering-cb04249d533b"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -27206,17 +27597,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "b930486bc558492bae29b048b419253b27aeb94a363c448538e0f0a6d713ecea",
-          "bytes": 13735,
-          "line_count": 282,
+          "sha256": "a4d0e30587e5e2519136290e5d1c2e0c76a17eca05649653b6c7fc81a6a3ee3b",
+          "bytes": 14981,
+          "line_count": 310,
           "covered_line_ranges": [
             [
               1,
-              282
+              310
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-lane-refresh-2026-09-12-g517-closeout-openai-skill-engineering-b930486bc558"
+            "ce-current-20260921-r1-openai-skill-engineering-a4d0e30587e5"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -27226,17 +27617,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "b0a77ff35311ada63e26dde089575200dd84ce4d3899fcfe6f69fe70a80e0d27",
-          "bytes": 8073,
-          "line_count": 141,
+          "sha256": "803549c3b33ad925343a0d79e3349993945355bd86adf1a3c7991d5b7311bbd5",
+          "bytes": 8142,
+          "line_count": 142,
           "covered_line_ranges": [
             [
               1,
-              141
+              142
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-lane-refresh-2026-09-14-repair-loop-openai-skill-engineering-b0a77ff35311"
+            "ce-current-20260921-r1-openai-skill-engineering-803549c3b33a"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -27246,17 +27637,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "dc5d9f6f8988c9d080683bb097dc7bb94f7926bf50a534ef4c5e3fbb3b2ca6d1",
-          "bytes": 137955,
-          "line_count": 3193,
+          "sha256": "48c95d71718d6de319672405509a02612f43972b17439ff9a34c72868ceb3e3b",
+          "bytes": 140504,
+          "line_count": 3240,
           "covered_line_ranges": [
             [
               1,
-              3193
+              3240
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-lane-refresh-2026-09-13-fix-batch-openai-skill-engineering-dc5d9f6f8988"
+            "ce-current-20260921-r1-openai-skill-engineering-48c95d71718d"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -27286,17 +27677,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "40b6db436b6e15ed7d5dd23878e193e1e29e3ba534ae92029acfbbc4b80fce10",
-          "bytes": 55383,
-          "line_count": 1598,
+          "sha256": "a5ddbc6b21fd8506ca3fd965bbbfb0ec0c29e736c9e73e989abd213baed4faee",
+          "bytes": 56301,
+          "line_count": 1623,
           "covered_line_ranges": [
             [
               1,
-              1598
+              1623
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-fsa2-repair-2026-09-15-openai-skill-engineering-40b6db436b6e"
+            "ce-current-20260921-r1-openai-skill-engineering-a5ddbc6b21fd"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -27306,17 +27697,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "889b3976082ec0d00e1928dd35500f82b9b9abbec56c1de31a3b3da4dcebc80e",
-          "bytes": 26459,
-          "line_count": 677,
+          "sha256": "85027c83ba763fb412fc3a6e1b60335e01b8b0754be85a8f513890483424825c",
+          "bytes": 27830,
+          "line_count": 706,
           "covered_line_ranges": [
             [
               1,
-              677
+              706
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-fsa2-repair-2026-09-15-openai-skill-engineering-889b3976082e"
+            "ce-current-20260921-r1-openai-skill-engineering-85027c83ba76"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -27426,17 +27817,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "eab93f4b2c69cb04d381c01c238d41e724c99d7800f49392a5abb579f4416b3f",
-          "bytes": 103149,
-          "line_count": 2147,
+          "sha256": "e739e22e7dab097a862c0dae647872de4c0d030d30d9c89d09cfcc0f8a059b7c",
+          "bytes": 103240,
+          "line_count": 2148,
           "covered_line_ranges": [
             [
               1,
-              2147
+              2148
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-lane-refresh-2026-09-12-g517-closeout-openai-skill-engineering-eab93f4b2c69"
+            "ce-current-20260921-r2-openai-skill-engineering-e739e22e7dab"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -27706,20 +28097,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "32b8c2ae452986bb1271026ccfa5229040972e8b3772b80ee312b93130817fbf",
-          "bytes": 3729,
-          "line_count": 95,
+          "sha256": "7708129643effa44a5669ff2f8e6c709ef3a027bad0180308da5b7cc4a2a8515",
+          "bytes": 4285,
+          "line_count": 111,
           "covered_line_ranges": [
             [
               1,
-              95
+              111
             ]
           ],
           "review_chunk_ids": [
-            "oai-r3-final-026"
+            "ce-current-20260921-r1-openai-skill-engineering-7708129643ef"
           ],
           "read_status": "full",
-          "source_kind": "evaluation"
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/mcp-setup-workspace-provider-runners.test.js",
@@ -30274,13 +30665,33 @@
           "source_kind": "reference-contract"
         },
         {
-          "path": "skills/spec-work/evals/eval.yaml",
+          "path": "skills/spec-work/evals/cases/drifted-pack-rejects.yaml",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
           "shared_consumers": [],
-          "sha256": "fa4fe8654c4c105503aae289448e3be852f778b359e78a29f21f26035af8fac2",
-          "bytes": 645,
+          "sha256": "75c1e347249f3e022528b0d23c04e22d57dace3ece493349c0764f0bb34a7b8c",
+          "bytes": 667,
+          "line_count": 25,
+          "covered_line_ranges": [
+            [
+              1,
+              25
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-75c1e347249f"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-work/evals/cases/no-commit-auth-stays-uncommitted.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-work",
+          "shared_consumers": [],
+          "sha256": "cbf9e4d24ee10331f508d1d2ce9ad8fece3593336fa2d72c29d45581a868d951",
+          "bytes": 926,
           "line_count": 29,
           "covered_line_ranges": [
             [
@@ -30289,7 +30700,187 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-fa4fe8654c4c"
+            "ce-current-20260921-r1-openai-skill-engineering-cbf9e4d24ee1"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-work/evals/cases/non-active-rejects.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-work",
+          "shared_consumers": [],
+          "sha256": "342d981fdd530e3c151f45bbc1bb01bc359eb6cd15a126244e6c2eeb246b81ac",
+          "bytes": 835,
+          "line_count": 27,
+          "covered_line_ranges": [
+            [
+              1,
+              27
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-342d981fdd53"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-work/evals/cases/open-ended-routes-debug.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-work",
+          "shared_consumers": [],
+          "sha256": "019e0927f228d4f75c9c7451f475cad8285cd62e47ecd4f5a4b90e713d7bfcb1",
+          "bytes": 656,
+          "line_count": 26,
+          "covered_line_ranges": [
+            [
+              1,
+              26
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-019e0927f228"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-work/evals/cases/r2-open-ended-500.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-work",
+          "shared_consumers": [],
+          "sha256": "9d71084bcb63c955305b54d9232c1f33ad6bc621d1322157e018e1374aee4b4b",
+          "bytes": 640,
+          "line_count": 29,
+          "covered_line_ranges": [
+            [
+              1,
+              29
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-9d71084bcb63"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-work/evals/cases/r2-reverse-mismatch.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-work",
+          "shared_consumers": [],
+          "sha256": "9a2f79887d2a527aaa46fd4a35be136fbe86fd1b625c697fa044f5e8657fdd66",
+          "bytes": 887,
+          "line_count": 28,
+          "covered_line_ranges": [
+            [
+              1,
+              28
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-9a2f79887d2a"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-work/evals/cases/requirements-only-stops.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-work",
+          "shared_consumers": [],
+          "sha256": "b4a30a23f4e467ab0a20417b661b75cc2eda6a914938b609f1c426901ad9d5b4",
+          "bytes": 786,
+          "line_count": 30,
+          "covered_line_ranges": [
+            [
+              1,
+              30
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-b4a30a23f4e4"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-work/evals/cases/return-to-caller-envelope.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-work",
+          "shared_consumers": [],
+          "sha256": "2db0e6d88b60ce59f63e79053c0214d0abede969f4141c71731fa87812029161",
+          "bytes": 1134,
+          "line_count": 31,
+          "covered_line_ranges": [
+            [
+              1,
+              31
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-2db0e6d88b60"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-work/evals/cases/standalone-closeout-order.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-work",
+          "shared_consumers": [],
+          "sha256": "dfe266c61b5840e752966f8f2632d47f060d9e50290acc8e3551edb4b1c16500",
+          "bytes": 858,
+          "line_count": 28,
+          "covered_line_ranges": [
+            [
+              1,
+              28
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-dfe266c61b58"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-work/evals/cases/trivial-bare-prompt-executes.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-work",
+          "shared_consumers": [],
+          "sha256": "c3c8c3dfb2bcb109f85e4c0131a089f32bddae549c846e6b45402b6134960626",
+          "bytes": 701,
+          "line_count": 25,
+          "covered_line_ranges": [
+            [
+              1,
+              25
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-c3c8c3dfb2bc"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-work/evals/eval.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-work",
+          "shared_consumers": [],
+          "sha256": "aabbace86201c5946f837c65e6c63fe2574e5c4c6f57e2a723b335cd00782fd7",
+          "bytes": 743,
+          "line_count": 32,
+          "covered_line_ranges": [
+            [
+              1,
+              32
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-aabbace86201"
           ],
           "read_status": "full"
         },
@@ -30314,147 +30905,7 @@
           "source_kind": "skill-package"
         },
         {
-          "path": "skills/spec-work/evals/skillup/cases/drifted-pack-rejects.yaml",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-work",
-          "shared_consumers": [],
-          "sha256": "328239182bb14714ebae9e751a76f5c3f1fb84decde3fa9b32147b9c5b78bd40",
-          "bytes": 683,
-          "line_count": 25,
-          "covered_line_ranges": [
-            [
-              1,
-              25
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-328239182bb1"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-work/evals/skillup/cases/non-active-rejects.yaml",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-work",
-          "shared_consumers": [],
-          "sha256": "baad770fea91ae02cacf909be12abbd8f9421c1f121d80072df7f4a9a24d9b00",
-          "bytes": 737,
-          "line_count": 27,
-          "covered_line_ranges": [
-            [
-              1,
-              27
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-baad770fea91"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-work/evals/skillup/cases/open-ended-routes-debug.yaml",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-work",
-          "shared_consumers": [],
-          "sha256": "a54f0feea799a8deef2eb1c4beceb5e6bfb8627414af0854e7fdbc3e28c05e21",
-          "bytes": 664,
-          "line_count": 26,
-          "covered_line_ranges": [
-            [
-              1,
-              26
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-a54f0feea799"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-work/evals/skillup/cases/r2-open-ended-500.yaml",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-work",
-          "shared_consumers": [],
-          "sha256": "0185a40d765338e52804a80667615edd417f80caba559f8eb191a290283259e0",
-          "bytes": 648,
-          "line_count": 29,
-          "covered_line_ranges": [
-            [
-              1,
-              29
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-0185a40d7653"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-work/evals/skillup/cases/r2-reverse-mismatch.yaml",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-work",
-          "shared_consumers": [],
-          "sha256": "334acc72b8df4e84bbde744a29f088f4a8f9b257dd06f6d0d05b719e88c57f5b",
-          "bytes": 903,
-          "line_count": 28,
-          "covered_line_ranges": [
-            [
-              1,
-              28
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-334acc72b8df"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-work/evals/skillup/cases/requirements-only-stops.yaml",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-work",
-          "shared_consumers": [],
-          "sha256": "5616ce62ba7a5b741951c0c1505d34df5ab72e9f3c3ec43b7547e61a0713a6d1",
-          "bytes": 802,
-          "line_count": 30,
-          "covered_line_ranges": [
-            [
-              1,
-              30
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-5616ce62ba7a"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-work/evals/skillup/cases/trivial-bare-prompt-executes.yaml",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-work",
-          "shared_consumers": [],
-          "sha256": "dac8482306cedea712fd408c097541f1f647856480f58039ee305822b78e746f",
-          "bytes": 717,
-          "line_count": 25,
-          "covered_line_ranges": [
-            [
-              1,
-              25
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-dac8482306ce"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-work/evals/skillup/fixtures/repos/done-plan/docs/plans/2026-09-01-001-feat-month-filter-plan.md",
+          "path": "skills/spec-work/evals/fixtures/repos/done-plan/docs/plans/2026-09-01-001-feat-month-filter-plan.md",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
@@ -30469,12 +30920,12 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-28e700ea1a11"
+            "ce-current-20260921-r1-openai-skill-engineering-28e700ea1a11"
           ],
           "read_status": "full"
         },
         {
-          "path": "skills/spec-work/evals/skillup/fixtures/repos/done-plan/package.json",
+          "path": "skills/spec-work/evals/fixtures/repos/done-plan/package.json",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
@@ -30489,12 +30940,12 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-03422077e4a5"
+            "ce-current-20260921-r1-openai-skill-engineering-03422077e4a5"
           ],
           "read_status": "full"
         },
         {
-          "path": "skills/spec-work/evals/skillup/fixtures/repos/done-plan/README.md",
+          "path": "skills/spec-work/evals/fixtures/repos/done-plan/README.md",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
@@ -30509,12 +30960,12 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-4aac9f151312"
+            "ce-current-20260921-r1-openai-skill-engineering-4aac9f151312"
           ],
           "read_status": "full"
         },
         {
-          "path": "skills/spec-work/evals/skillup/fixtures/repos/done-plan/src/server.js",
+          "path": "skills/spec-work/evals/fixtures/repos/done-plan/src/server.js",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
@@ -30529,12 +30980,12 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-ff9d96855c23"
+            "ce-current-20260921-r1-openai-skill-engineering-ff9d96855c23"
           ],
           "read_status": "full"
         },
         {
-          "path": "skills/spec-work/evals/skillup/fixtures/repos/drifted-pack/docs/plans/2026-09-01-001-feat-month-filter-tasks.md",
+          "path": "skills/spec-work/evals/fixtures/repos/drifted-pack/docs/plans/2026-09-01-001-feat-month-filter-tasks.md",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
@@ -30549,12 +31000,12 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-7cee43cf8451"
+            "ce-current-20260921-r1-openai-skill-engineering-7cee43cf8451"
           ],
           "read_status": "full"
         },
         {
-          "path": "skills/spec-work/evals/skillup/fixtures/repos/drifted-pack/package.json",
+          "path": "skills/spec-work/evals/fixtures/repos/drifted-pack/package.json",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
@@ -30569,12 +31020,12 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-03422077e4a5"
+            "ce-current-20260921-r1-openai-skill-engineering-03422077e4a5"
           ],
           "read_status": "full"
         },
         {
-          "path": "skills/spec-work/evals/skillup/fixtures/repos/drifted-pack/README.md",
+          "path": "skills/spec-work/evals/fixtures/repos/drifted-pack/README.md",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
@@ -30589,12 +31040,12 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-4aac9f151312"
+            "ce-current-20260921-r1-openai-skill-engineering-4aac9f151312"
           ],
           "read_status": "full"
         },
         {
-          "path": "skills/spec-work/evals/skillup/fixtures/repos/drifted-pack/src/server.js",
+          "path": "skills/spec-work/evals/fixtures/repos/drifted-pack/src/server.js",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
@@ -30609,12 +31060,12 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-ff9d96855c23"
+            "ce-current-20260921-r1-openai-skill-engineering-ff9d96855c23"
           ],
           "read_status": "full"
         },
         {
-          "path": "skills/spec-work/evals/skillup/fixtures/repos/mini-ledger-guarded2/docs/plans/2026-09-01-001-feat-month-filter-plan.md",
+          "path": "skills/spec-work/evals/fixtures/repos/mini-ledger-guarded2/docs/plans/2026-09-01-001-feat-month-filter-plan.md",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
@@ -30629,12 +31080,12 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-ebe41c2e9072"
+            "ce-current-20260921-r1-openai-skill-engineering-ebe41c2e9072"
           ],
           "read_status": "full"
         },
         {
-          "path": "skills/spec-work/evals/skillup/fixtures/repos/mini-ledger-guarded2/package.json",
+          "path": "skills/spec-work/evals/fixtures/repos/mini-ledger-guarded2/package.json",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
@@ -30649,12 +31100,12 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-03422077e4a5"
+            "ce-current-20260921-r1-openai-skill-engineering-03422077e4a5"
           ],
           "read_status": "full"
         },
         {
-          "path": "skills/spec-work/evals/skillup/fixtures/repos/mini-ledger-guarded2/README.md",
+          "path": "skills/spec-work/evals/fixtures/repos/mini-ledger-guarded2/README.md",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
@@ -30669,12 +31120,12 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-4aac9f151312"
+            "ce-current-20260921-r1-openai-skill-engineering-4aac9f151312"
           ],
           "read_status": "full"
         },
         {
-          "path": "skills/spec-work/evals/skillup/fixtures/repos/mini-ledger-guarded2/src/server.js",
+          "path": "skills/spec-work/evals/fixtures/repos/mini-ledger-guarded2/src/server.js",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
@@ -30689,12 +31140,12 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-e5f46eadeb65"
+            "ce-current-20260921-r1-openai-skill-engineering-e5f46eadeb65"
           ],
           "read_status": "full"
         },
         {
-          "path": "skills/spec-work/evals/skillup/fixtures/repos/reqonly-plan/docs/plans/2026-09-01-001-feat-month-filter-plan.md",
+          "path": "skills/spec-work/evals/fixtures/repos/reqonly-plan/docs/plans/2026-09-01-001-feat-month-filter-plan.md",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
@@ -30709,12 +31160,12 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-42b23ca62d10"
+            "ce-current-20260921-r1-openai-skill-engineering-42b23ca62d10"
           ],
           "read_status": "full"
         },
         {
-          "path": "skills/spec-work/evals/skillup/fixtures/repos/reqonly-plan/package.json",
+          "path": "skills/spec-work/evals/fixtures/repos/reqonly-plan/package.json",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
@@ -30729,12 +31180,12 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-03422077e4a5"
+            "ce-current-20260921-r1-openai-skill-engineering-03422077e4a5"
           ],
           "read_status": "full"
         },
         {
-          "path": "skills/spec-work/evals/skillup/fixtures/repos/reqonly-plan/README.md",
+          "path": "skills/spec-work/evals/fixtures/repos/reqonly-plan/README.md",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
@@ -30749,12 +31200,12 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-4aac9f151312"
+            "ce-current-20260921-r1-openai-skill-engineering-4aac9f151312"
           ],
           "read_status": "full"
         },
         {
-          "path": "skills/spec-work/evals/skillup/fixtures/repos/reqonly-plan/src/server.js",
+          "path": "skills/spec-work/evals/fixtures/repos/reqonly-plan/src/server.js",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
@@ -30769,32 +31220,32 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-ff9d96855c23"
+            "ce-current-20260921-r1-openai-skill-engineering-ff9d96855c23"
           ],
           "read_status": "full"
         },
         {
-          "path": "skills/spec-work/evals/skillup/fixtures/scripts/asks-a-question.sh",
+          "path": "skills/spec-work/evals/fixtures/scripts/check-closeout-order.sh",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
           "shared_consumers": [],
-          "sha256": "14bea02a91277a7440f671f9d6bb5cd70117d23508a03b39dc986169d64fa973",
-          "bytes": 1232,
-          "line_count": 30,
+          "sha256": "daf068851d0859a4bc77c74a337cf5450a1602a7bf4892a6ef4174909ccbfed2",
+          "bytes": 860,
+          "line_count": 20,
           "covered_line_ranges": [
             [
               1,
-              30
+              20
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-14bea02a9127"
+            "ce-current-20260921-r1-openai-skill-engineering-daf068851d08"
           ],
           "read_status": "full"
         },
         {
-          "path": "skills/spec-work/evals/skillup/fixtures/scripts/check-no-implementation.sh",
+          "path": "skills/spec-work/evals/fixtures/scripts/check-no-implementation.sh",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
@@ -30809,32 +31260,32 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-94a855ca6f52"
+            "ce-current-20260921-r1-openai-skill-engineering-94a855ca6f52"
           ],
           "read_status": "full"
         },
         {
-          "path": "skills/spec-work/evals/skillup/fixtures/scripts/check-r2-reverse-mismatch.sh",
+          "path": "skills/spec-work/evals/fixtures/scripts/check-r2-reverse-mismatch.sh",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
           "shared_consumers": [],
-          "sha256": "efe1db045916fde0770ba3d43598e16642d8347abdaa6fc769e04fccd74516b6",
-          "bytes": 594,
-          "line_count": 13,
+          "sha256": "16f84c3de6ea0dc29bca590d675e36efda2b022d6facb08ca4391aa43f88e9b1",
+          "bytes": 1266,
+          "line_count": 26,
           "covered_line_ranges": [
             [
               1,
-              13
+              26
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-efe1db045916"
+            "ce-current-20260921-r1-openai-skill-engineering-16f84c3de6ea"
           ],
           "read_status": "full"
         },
         {
-          "path": "skills/spec-work/evals/skillup/fixtures/scripts/check-readme-fixed.sh",
+          "path": "skills/spec-work/evals/fixtures/scripts/check-readme-fixed.sh",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
@@ -30849,7 +31300,47 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-5925a6eef489"
+            "ce-current-20260921-r1-openai-skill-engineering-5925a6eef489"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-work/evals/fixtures/scripts/check-return-to-caller.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-work",
+          "shared_consumers": [],
+          "sha256": "16f874f2e8c289c57aab7da5bf96e88b2c64eafebbdf4718ef3b7316e0719668",
+          "bytes": 1052,
+          "line_count": 19,
+          "covered_line_ranges": [
+            [
+              1,
+              19
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-16f874f2e8c2"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-work/evals/fixtures/scripts/check-uncommitted-handback.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-work",
+          "shared_consumers": [],
+          "sha256": "f9d07c27d9a49c795409f2d86473c84ed1020f009bfc92f6a0c269ccd40a3d29",
+          "bytes": 1087,
+          "line_count": 24,
+          "covered_line_ranges": [
+            [
+              1,
+              24
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-f9d07c27d9a4"
           ],
           "read_status": "full"
         },
@@ -30979,8 +31470,8 @@
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
           "shared_consumers": [],
-          "sha256": "d266b7d84db8bbe5c62d3cf93694486a700f0e813bf210788db01770dbabe3b6",
-          "bytes": 7659,
+          "sha256": "aeb94e9aea68c0dd82c4f4a17541135beb805de3133a0f40dfdce527bf38450a",
+          "bytes": 7807,
           "line_count": 50,
           "covered_line_ranges": [
             [
@@ -30989,7 +31480,7 @@
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-openai-skill-engineering-d266b7d84db8"
+            "ce-current-20260921-r1-openai-skill-engineering-aeb94e9aea68"
           ],
           "read_status": "full"
         },
@@ -31038,8 +31529,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-work",
           "shared_consumers": [],
-          "sha256": "15484ad697e0a894becde3ac0a81d50197c5467f42ed7dfd99f69a43412cf9d4",
-          "bytes": 11685,
+          "sha256": "1fd477f9aeff8996ac38f1a5231235494e94fc20d0ce9f69ddfd3d5c6da4ccf5",
+          "bytes": 11681,
           "line_count": 140,
           "covered_line_ranges": [
             [
@@ -31048,7 +31539,7 @@
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-openai-skill-engineering-15484ad697e0"
+            "ce-current-20260921-r1-openai-skill-engineering-1fd477f9aeff"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -31198,17 +31689,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-work",
           "shared_consumers": [],
-          "sha256": "23b93489ad342412d484bc6a438d3eba2322e857d807daefe940cedac5a85451",
-          "bytes": 14204,
-          "line_count": 125,
+          "sha256": "3a192fe50952380dcf4bf18ee73435ada13b15d44110dde8a33a8c4d0557c879",
+          "bytes": 14749,
+          "line_count": 126,
           "covered_line_ranges": [
             [
               1,
-              125
+              126
             ]
           ],
           "review_chunk_ids": [
-            "ce-129-sync-supplemental-20260910-openai-skill-engineering-23b93489ad34"
+            "ce-current-20260921-r1-openai-skill-engineering-3a192fe50952"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -31890,32 +32381,312 @@
       ],
       "source_read_receipts": [
         {
+          "path": "skills/spec-worktree/evals/cases/governed-caller-create-worktree.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-worktree",
+          "shared_consumers": [],
+          "sha256": "a45f94b4b8105971b8b6673a2dfb201e734d78c874356d4b6a20889ab9e8edd8",
+          "bytes": 1300,
+          "line_count": 32,
+          "covered_line_ranges": [
+            [
+              1,
+              32
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-a45f94b4b810"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-worktree/evals/cases/not-git-repo-fails-closed.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-worktree",
+          "shared_consumers": [],
+          "sha256": "ca4cb05895d23d986cddabb4b44b237049ad86f6cf115e5b796e76c40db9902b",
+          "bytes": 801,
+          "line_count": 21,
+          "covered_line_ranges": [
+            [
+              1,
+              21
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-ca4cb05895d2"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-worktree/evals/cases/unborn-repo-create-refuses.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-worktree",
+          "shared_consumers": [],
+          "sha256": "78d821738f063ad4bea193fd2390caf413982764f5c7dff498a80ad41dee9f17",
+          "bytes": 965,
+          "line_count": 25,
+          "covered_line_ranges": [
+            [
+              1,
+              25
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-78d821738f06"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-worktree/evals/eval.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-worktree",
+          "shared_consumers": [],
+          "sha256": "2145a451d606bf0634ce6b3958eb5added5ad7e4c7c7182b01f1387a4d21964a",
+          "bytes": 427,
+          "line_count": 25,
+          "covered_line_ranges": [
+            [
+              1,
+              25
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-2145a451d606"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-worktree/evals/fixtures/repos/plain-app-nogit/package.json",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-worktree",
+          "shared_consumers": [],
+          "sha256": "3da82fc1607c7da9a60b53024c82984416af84d2fde0ba0da7879395691f182f",
+          "bytes": 61,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-3da82fc1607c"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-worktree/evals/fixtures/repos/plain-app-nogit/README.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-worktree",
+          "shared_consumers": [],
+          "sha256": "d19e9618f07783cf80650c65b42663bbfd2da89401cb1827a8d1c1ec2885c0fa",
+          "bytes": 72,
+          "line_count": 3,
+          "covered_line_ranges": [
+            [
+              1,
+              3
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-d19e9618f077"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-worktree/evals/fixtures/repos/plain-app-nogit/src/server.js",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-worktree",
+          "shared_consumers": [],
+          "sha256": "69d5d41b3e284f3bf548c19a9cec4a79b4a8e3ab751d4c45e4df449636159fb3",
+          "bytes": 91,
+          "line_count": 2,
+          "covered_line_ranges": [
+            [
+              1,
+              2
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-69d5d41b3e28"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-worktree/evals/fixtures/repos/plain-app/package.json",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-worktree",
+          "shared_consumers": [],
+          "sha256": "3da82fc1607c7da9a60b53024c82984416af84d2fde0ba0da7879395691f182f",
+          "bytes": 61,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-3da82fc1607c"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-worktree/evals/fixtures/repos/plain-app/prepare-worktree-fixture.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-worktree",
+          "shared_consumers": [],
+          "sha256": "236d8921c86ace8354c6b233a3b8d2d5665951ba59493402754fb54fdb247c91",
+          "bytes": 239,
+          "line_count": 6,
+          "covered_line_ranges": [
+            [
+              1,
+              6
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-236d8921c86a"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-worktree/evals/fixtures/repos/plain-app/README.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-worktree",
+          "shared_consumers": [],
+          "sha256": "d19e9618f07783cf80650c65b42663bbfd2da89401cb1827a8d1c1ec2885c0fa",
+          "bytes": 72,
+          "line_count": 3,
+          "covered_line_ranges": [
+            [
+              1,
+              3
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-d19e9618f077"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-worktree/evals/fixtures/repos/plain-app/src/server.js",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-worktree",
+          "shared_consumers": [],
+          "sha256": "69d5d41b3e284f3bf548c19a9cec4a79b4a8e3ab751d4c45e4df449636159fb3",
+          "bytes": 91,
+          "line_count": 2,
+          "covered_line_ranges": [
+            [
+              1,
+              2
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-69d5d41b3e28"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-worktree/evals/fixtures/scripts/check-create-worktree.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-worktree",
+          "shared_consumers": [],
+          "sha256": "973cabee9871ca5983736d4a822428dc86a12f9d8bc717d0de7ea6aed7ce47f6",
+          "bytes": 944,
+          "line_count": 17,
+          "covered_line_ranges": [
+            [
+              1,
+              17
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-973cabee9871"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-worktree/evals/fixtures/scripts/check-not-git-refuses.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-worktree",
+          "shared_consumers": [],
+          "sha256": "6e290e70ae6a1bebe04b786664b2685f1c3882270afa56521e1ceea0a8a69c32",
+          "bytes": 690,
+          "line_count": 18,
+          "covered_line_ranges": [
+            [
+              1,
+              18
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-6e290e70ae6a"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-worktree/evals/fixtures/scripts/check-unborn-refuses.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-worktree",
+          "shared_consumers": [],
+          "sha256": "21ffcbd6418611b7b5a503e3403352bae36d005d84194847eab7ab8839ecebed",
+          "bytes": 990,
+          "line_count": 25,
+          "covered_line_ranges": [
+            [
+              1,
+              25
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-21ffcbd64186"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/spec-worktree/scripts/worktree-manager.sh",
           "path_role": "skill-package",
           "owning_skill": "spec-worktree",
           "shared_consumers": [],
-          "sha256": "ccad7efa98b065ef7ff68100300b4e4dd7804b3a0f581c67fe6e316ca287eaa9",
-          "bytes": 23550,
-          "line_count": 710,
+          "sha256": "1a871490f30ee118b20b8c2e4974c6a758f7065be2799aa1f4b29e4b175110a7",
+          "bytes": 24071,
+          "line_count": 719,
           "covered_line_ranges": [
             [
               1,
-              710
+              719
             ]
           ],
           "review_chunk_ids": [
-            "oai-r3-final-033"
+            "ce-current-20260921-r1-openai-skill-engineering-1a871490f30e"
           ],
           "read_status": "full",
-          "source_kind": "deterministic-helper"
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-worktree/SKILL.md",
           "path_role": "skill-package",
           "owning_skill": "spec-worktree",
           "shared_consumers": [],
-          "sha256": "ed13432eec8bb6d5c4d73431ff8db16f918b07b70c01d886be09f0d6443a37e2",
-          "bytes": 12851,
+          "sha256": "380139d61774f908ab6ae8cf983502d178cbace6e6d8e43a4b7587ea10cfcab6",
+          "bytes": 13182,
           "line_count": 152,
           "covered_line_ranges": [
             [
@@ -31924,10 +32695,10 @@
             ]
           ],
           "review_chunk_ids": [
-            "oai-r3-final-033"
+            "ce-current-20260921-r1-openai-skill-engineering-380139d61774"
           ],
           "read_status": "full",
-          "source_kind": "entry-contract"
+          "source_kind": "skill-package"
         },
         {
           "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
@@ -33028,13 +33799,93 @@
           "source_kind": "evaluation"
         },
         {
+          "path": "skills/spec-write-tasks/evals/cases/bare-request-asks-path.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-write-tasks",
+          "shared_consumers": [],
+          "sha256": "c1198cb7355fc651c43322f965052cd8ecf88e1c2332c673158c84e29ad45274",
+          "bytes": 448,
+          "line_count": 15,
+          "covered_line_ranges": [
+            [
+              1,
+              15
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-c1198cb7355f"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-write-tasks/evals/cases/non-active-rejected.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-write-tasks",
+          "shared_consumers": [],
+          "sha256": "a45d6ab2e11ad87b728e94bd22d1012561dc88dab866101cb627bdab38cebaaa",
+          "bytes": 697,
+          "line_count": 28,
+          "covered_line_ranges": [
+            [
+              1,
+              28
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-a45d6ab2e11a"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-write-tasks/evals/cases/remote-input-rejected.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-write-tasks",
+          "shared_consumers": [],
+          "sha256": "7b1a7e5b1193ea0a8bfa774b0ceb814ea02412a79a450e6798862d41acbdf754",
+          "bytes": 555,
+          "line_count": 16,
+          "covered_line_ranges": [
+            [
+              1,
+              16
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-7b1a7e5b1193"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-write-tasks/evals/cases/small-plan-skip.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-write-tasks",
+          "shared_consumers": [],
+          "sha256": "49fd457e1dc8f2b8b8f9f26c716a01cdbde4e6e58348a9e9da98cb743727a192",
+          "bytes": 694,
+          "line_count": 27,
+          "covered_line_ranges": [
+            [
+              1,
+              27
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-49fd457e1dc8"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/spec-write-tasks/evals/eval.yaml",
           "path_role": "skill-package",
           "source_kind": "skill-package",
           "owning_skill": "spec-write-tasks",
           "shared_consumers": [],
-          "sha256": "431cdddd6bedbf0007ef310359cfc6ed6cb5f57f4dfca1a94ac124ce245a0dbf",
-          "bytes": 478,
+          "sha256": "736bf9df4d309e367ed7f925b53d167f0cc811393d91e2b12954cbcc08059453",
+          "bytes": 446,
           "line_count": 26,
           "covered_line_ranges": [
             [
@@ -33043,7 +33894,7 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-431cdddd6bed"
+            "ce-current-20260921-r1-openai-skill-engineering-736bf9df4d30"
           ],
           "read_status": "full"
         },
@@ -33086,6 +33937,86 @@
           ],
           "read_status": "full",
           "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-write-tasks/evals/fixtures/repos/done-plan/docs/plans/2026-08-01-001-feat-old-thing-plan.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-write-tasks",
+          "shared_consumers": [],
+          "sha256": "d098ab0cd8a16f2b8dc0a8c78202dc053b3fbd0f62014add5c457f3941a04c84",
+          "bytes": 178,
+          "line_count": 14,
+          "covered_line_ranges": [
+            [
+              1,
+              14
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-d098ab0cd8a1"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-write-tasks/evals/fixtures/repos/tiny-plan/docs/plans/2026-09-01-001-feat-month-filter-plan.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-write-tasks",
+          "shared_consumers": [],
+          "sha256": "9740a796154e879ff8f7adf4b4fdcb307043ea84390777216e122ac2349f6fbf",
+          "bytes": 297,
+          "line_count": 15,
+          "covered_line_ranges": [
+            [
+              1,
+              15
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-9740a796154e"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-write-tasks/evals/fixtures/scripts/asks-a-question.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-write-tasks",
+          "shared_consumers": [],
+          "sha256": "14bea02a91277a7440f671f9d6bb5cd70117d23508a03b39dc986169d64fa973",
+          "bytes": 1232,
+          "line_count": 30,
+          "covered_line_ranges": [
+            [
+              1,
+              30
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-14bea02a9127"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-write-tasks/evals/fixtures/scripts/rejects-remote.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-write-tasks",
+          "shared_consumers": [],
+          "sha256": "de9695a70c0cf289dc5294747415ea908c516d3e34c590da22d2a82c4581a370",
+          "bytes": 501,
+          "line_count": 16,
+          "covered_line_ranges": [
+            [
+              1,
+              16
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260921-r1-openai-skill-engineering-de9695a70c0c"
+          ],
+          "read_status": "full"
         },
         {
           "path": "skills/spec-write-tasks/evals/output-quality-cases.json",
@@ -33166,166 +34097,6 @@
           ],
           "read_status": "full",
           "source_kind": "evaluation"
-        },
-        {
-          "path": "skills/spec-write-tasks/evals/skillup/cases/bare-request-asks-path.yaml",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-write-tasks",
-          "shared_consumers": [],
-          "sha256": "4cdd948b25e12c2273d39d16c7b2cec4cbee904dc64695b5003f9f23e3e8d9c1",
-          "bytes": 456,
-          "line_count": 15,
-          "covered_line_ranges": [
-            [
-              1,
-              15
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-4cdd948b25e1"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-write-tasks/evals/skillup/cases/non-active-rejected.yaml",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-write-tasks",
-          "shared_consumers": [],
-          "sha256": "3bf22d3c2e422fde4f8b090d8892e427be9968dbddc9d9ae12b21e12b0ddb2eb",
-          "bytes": 705,
-          "line_count": 28,
-          "covered_line_ranges": [
-            [
-              1,
-              28
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-3bf22d3c2e42"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-write-tasks/evals/skillup/cases/remote-input-rejected.yaml",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-write-tasks",
-          "shared_consumers": [],
-          "sha256": "d231db12cba53c21da0cf16fb83265deb5b976eb6993e893fad1ab303dcce072",
-          "bytes": 563,
-          "line_count": 16,
-          "covered_line_ranges": [
-            [
-              1,
-              16
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-d231db12cba5"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-write-tasks/evals/skillup/cases/small-plan-skip.yaml",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-write-tasks",
-          "shared_consumers": [],
-          "sha256": "110fa21f3d4b9ea6233cf371d35f1ffc9655e280e5d7140e3bfacad6480a008f",
-          "bytes": 702,
-          "line_count": 27,
-          "covered_line_ranges": [
-            [
-              1,
-              27
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-110fa21f3d4b"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-write-tasks/evals/skillup/fixtures/repos/done-plan/docs/plans/2026-08-01-001-feat-old-thing-plan.md",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-write-tasks",
-          "shared_consumers": [],
-          "sha256": "d098ab0cd8a16f2b8dc0a8c78202dc053b3fbd0f62014add5c457f3941a04c84",
-          "bytes": 178,
-          "line_count": 14,
-          "covered_line_ranges": [
-            [
-              1,
-              14
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-d098ab0cd8a1"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-write-tasks/evals/skillup/fixtures/repos/tiny-plan/docs/plans/2026-09-01-001-feat-month-filter-plan.md",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-write-tasks",
-          "shared_consumers": [],
-          "sha256": "9740a796154e879ff8f7adf4b4fdcb307043ea84390777216e122ac2349f6fbf",
-          "bytes": 297,
-          "line_count": 15,
-          "covered_line_ranges": [
-            [
-              1,
-              15
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-9740a796154e"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-write-tasks/evals/skillup/fixtures/scripts/asks-a-question.sh",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-write-tasks",
-          "shared_consumers": [],
-          "sha256": "14bea02a91277a7440f671f9d6bb5cd70117d23508a03b39dc986169d64fa973",
-          "bytes": 1232,
-          "line_count": 30,
-          "covered_line_ranges": [
-            [
-              1,
-              30
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-14bea02a9127"
-          ],
-          "read_status": "full"
-        },
-        {
-          "path": "skills/spec-write-tasks/evals/skillup/fixtures/scripts/rejects-remote.sh",
-          "path_role": "skill-package",
-          "source_kind": "skill-package",
-          "owning_skill": "spec-write-tasks",
-          "shared_consumers": [],
-          "sha256": "de9695a70c0cf289dc5294747415ea908c516d3e34c590da22d2a82c4581a370",
-          "bytes": 501,
-          "line_count": 16,
-          "covered_line_ranges": [
-            [
-              1,
-              16
-            ]
-          ],
-          "review_chunk_ids": [
-            "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-de9695a70c0c"
-          ],
-          "read_status": "full"
         },
         {
           "path": "skills/spec-write-tasks/evals/trigger-cases.json",
@@ -34308,7 +35079,9 @@
     "FSA2 模型/宿主/现场/原审计证据缺口仍开放，见 FSA2 报告第 13 节。",
     "本轮作者增量语义复核与未变历史 receipt 合成覆盖；双 lens 非独立 provider。",
     "真实宿主/模型/现场收益不在本轮通过范围。",
-    "仅收口报告/日志更新后重绑，7个源码/测试的既有增量裁决未改变；不重复宣称语义重审。"
+    "仅收口报告/日志更新后重绑，7个源码/测试的既有增量裁决未改变；不重复宣称语义重审。",
+    "本轮覆盖当前两条审查 lane 的全部 changed/missing/retired relations；每条关系均回读当前文件或确认退役。",
+    "本轮没有独立 provider/隔离 worker；真实宿主、模型任务和 field outcome 另行记录。"
   ],
   "consumers": [
     "docs/validation/ce-localization/review/round-3-findings.json aggregate owner",
@@ -35654,15 +36427,26 @@
   },
   "review_deltas": [
     {
-      "review_run_id": "ce-localization-fsa3-repair-2026-09-16-final",
-      "artifact_ref": "docs/validation/ce-localization/review/deltas/2026-09-16-fsa3-repair-final.json",
-      "artifact_sha256": "a40d4f6a4656ac12e99fca232c88b664854284a2643b7cf319f19e18b236cac1",
-      "reviewed_at": "2026-09-16T08:06:51.974Z",
+      "review_run_id": "ce-current-20260921-r1",
+      "artifact_ref": "docs/validation/ce-localization/review/deltas/2026-09-21-current-source-r1.json",
+      "artifact_sha256": "62274411fff6429bcbe43545ed423220a45178d5d64e1610e0b0b718dd4587f9",
+      "reviewed_at": "2026-09-21T12:19:45.194Z",
       "review_method": "inline-same-context",
       "independent": false,
-      "provider_identity": "not-used",
+      "provider_identity": "unverified",
       "worker_context_isolation": "degraded_inherited",
-      "claim_ceiling": "本地源码与确定性回归"
+      "claim_ceiling": "当前源码绑定的 inline 双 lens 增量语义复核；不证明独立多模型一致性、完整真实宿主 workflow 或现场收益。"
+    },
+    {
+      "review_run_id": "ce-current-20260921-r2",
+      "artifact_ref": "docs/validation/ce-localization/review/deltas/2026-09-21-current-source-r2.json",
+      "artifact_sha256": "9f4c4e5e763592291bb9c53f93d7f397bcab5cc793eb8235fa806b97b67c4182",
+      "reviewed_at": "2026-09-21T12:31:54.473Z",
+      "review_method": "inline-same-context",
+      "independent": false,
+      "provider_identity": "unverified",
+      "worker_context_isolation": "degraded_inherited",
+      "claim_ceiling": "当前源码绑定的 inline 双 lens 增量语义复核；不证明独立多模型一致性、完整真实宿主 workflow 或现场收益。"
     }
   ],
   "review_delta_findings": []

@@ -1574,14 +1574,15 @@ describe('Graphify provider', () => {
     expect(fixture.hookCalls.map((call) => call.args.join(' '))).toEqual(['hook status', 'hook install']);
     expect(fs.readFileSync(path.join(customHooks, 'post-commit'), 'utf8')).not.toContain('# spec-first graphify artifact env start');
     expect(result).toMatchObject({
-      readiness_status: 'unknown',
+      readiness_status: 'degraded',
       steady_state: {
         refresh_mode: 'manual-only',
         hook_verified: false,
         hook_status: 'blocked',
-        hook_skipped_reason: 'graphify-hook-target-changed',
+        hook_skipped_reason: 'graphify-hook-path-outside-project',
       },
     });
+    expect(result.limitations.join(' ')).toContain('graphify-hook-target-changed');
   });
 
   test('blocks a contained hooks root that escapes through a symlink without reading the external target', () => {

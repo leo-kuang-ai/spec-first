@@ -82,3 +82,6 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-09-21T18:12	wt@36d19d95(dirty)	spec-compound	-	-	baseline	dim8	P2 正向发布 case 首建即 PASS(learning 含 invalidation_condition 等 frontmatter,源文件未动)	full_test
 2026-09-21T18:15	wt@36d19d95(dirty)	spec-handoff	-	-	baseline	dim8	H3 降级定向 case;首跑 judge 误报(fixture 未跟踪本性),eval-fix 后 PASS	full_test
 2026-09-21T18:18	wt@36d19d95(dirty)	spec-code-review	-	-	baseline	dim8	C3 无阻断提问 case;首跑 patch 不匹配 fixture,eval-fix 后 PASS(完成锚+diff 保持待审+无索取话术)	full_test
+2026-09-21T18:50	wt@36d19d95(dirty:tier1-remediation-r4)	spec-compound	-	-	baseline	dim8	P3 counterfactual+P4 headless 双 case 首跑 PASS(可恢复不沉淀/无合格不宣称 complete)	full_test
+2026-09-21T18:55	wt@36d19d95(dirty)	spec-work	-	-	baseline	dim8	W7 授权分离+W4 closeout 顺序双 case 首跑 PASS(未提交回交/closeout 链锚)	full_test
+2026-09-21T19:00	wt@36d19d95(dirty)	spec-work	-	-	blocked	env	r2-reverse/r2-open-ended-500 引擎健康时段复跑仍系统性超时;超时前 26 次工具调用为正常形态;恢复条件=低延迟引擎或拆轻变体	full_test

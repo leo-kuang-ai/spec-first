@@ -35,4 +35,4 @@ writer 当前会生成 not-run 的 field/knowledge 记录；真实任务/宿主/
 - `CE-PREP-HANDOFF-01`：resume judge 只查提交计数与指定哨兵，未检查未提交源码、其他文件或 index 的变化。两个 case 的 `files_not_exist` 也仅覆盖两个路径。
 - `CE-PREP-HANDOFF-02`：create judge 仅用 grep 检查 metadata 行、SHA-256/resume 关键词，未核对真实 digest、artifact identity 与精确 invocation。
 
-两项是源码可确认的断言不足，不能据此声称真实模型已经发生越权或错误生成；后续本地反例与修复验证见专项证据。
+两项是源码可确认的断言不足，不能据此声称真实模型已经发生越权或错误生成。已在 `skills/spec-handoff/evals/fixtures/scripts/` 修复，固定反例与回归证据见 `handoff-judge-repair-evidence.json`；该证据仍只覆盖确定性脚本，不构成真实模型或宿主通过。

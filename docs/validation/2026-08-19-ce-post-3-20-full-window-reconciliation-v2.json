@@ -8,50 +8,17 @@
   },
   "target_source_snapshot": {
     "repository": "spec-first",
-    "head": "c0803ab5d2e80edde9ca67771c6d204b775bb354",
+    "head": "6594d50786d45a2fba1972f2581a228b6211ecbb",
     "dirty": true,
     "dirty_paths": [
       "CHANGELOG.md",
-      "scripts/check-ce-upstream-reconciliation.cjs",
-      "skills/autoresearch/scripts/orchestrate.sh",
-      "skills/autoresearch/scripts/score-regression.sh",
-      "skills/spec-code-review/evals/fixtures/repos/tenant-orders/prepare-review-fixture.sh",
-      "skills/spec-code-review/evals/fixtures/scripts/check-r2-preset-applied-fix.sh",
-      "skills/spec-code-review/scripts/peer-job-runner.py",
-      "skills/spec-doc-review/scripts/peer-job-runner.py",
-      "skills/spec-explain/references/explainer-html.md",
-      "skills/spec-explain/references/explainer-markdown.md",
-      "skills/spec-lfg/scripts/pr-watch-state.cjs",
-      "skills/spec-pov/scripts/peer-job-runner.py",
-      "skills/spec-runtime-setup/SKILL.md",
-      "skills/spec-runtime-setup/scripts/lib/host-config-repair-command.cjs",
-      "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
-      "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
-      "skills/spec-runtime-setup/scripts/lib/registry.cjs",
-      "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
-      "skills/spec-runtime-setup/scripts/lib/workspace-graph-build.cjs",
-      "skills/spec-runtime-setup/scripts/lib/workspace-routing-inject.cjs",
-      "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
-      "skills/spec-runtime-setup/scripts/setup.cjs",
-      "skills/spec-runtime-setup/setup-registry.json",
-      "skills/spec-runtime-setup/setup-registry.schema.json",
-      "tests/fixtures/mcp-setup/legacy-parity/posix/runtime-contracts.json",
-      "tests/fixtures/mcp-setup/legacy-parity/windows/runtime-contracts.json",
-      "tests/fixtures/mcp-setup/platform-differences.json",
-      "tests/integration/runtime-setup-sigint-recovery.integration.test.js",
-      "tests/unit/ce-localization-closeout-contracts.test.js",
-      "tests/unit/ce-localization-review-contracts.test.js",
-      "tests/unit/host-runtime-projection-contracts.test.js",
-      "tests/unit/mcp-setup-entrypoint.test.js",
-      "tests/unit/mcp-setup-mode-target.test.js",
-      "tests/unit/mcp-setup-node-contracts.test.js",
-      "tests/unit/mcp-setup-registry.test.js",
-      "tests/unit/runtime-setup-provider-identity.test.js",
-      "tests/unit/spec-lfg-pr-watch-state.test.js"
+      "docs/validation/skill-evals/2026-09-20-tier1-multi-role-review.md",
+      "docs/validation/skill-evals/results.tsv",
+      "tests/unit/mcp-setup-providers.test.js"
     ],
-    "dirty_path_manifest_sha256": "8247c08a2a14fcbe6d81a653fc4b03e593b0966d92ee526f53dc0a6f312e9875",
-    "source_tree_hash": "b5832f51e47e6c53b56cb105be37afee7b672cb24488946a4bbecb18fc1e1376",
-    "inventory_hash": "b1cea4d873427a9fb611f23e66b301e48daea8c30e0cd1465980bd284d644b20",
+    "dirty_path_manifest_sha256": "bb501bc3b457250b1c5f9486fecc4eea2a277838f0527a67213b86c47d151e1b",
+    "source_tree_hash": "1b2f4c063b0cd5bb5a823f34b0b8b480cdceb53d4a681d295cdd41b03cb50fdc",
+    "inventory_hash": "d771d0698ceba61452361598eec9fbad81c03a8d1d3d4e3c5996408a586b08df",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -88,12 +55,12 @@
   "adjudication": {
     "schema_version": "ce-upstream-adjudication/v1",
     "join_key": "path+upstream+target-source",
-    "artifact_sha256": "bcbec783863367298963f09192c4835f4ce4adfcd162f4adffb070ae820f29be",
+    "artifact_sha256": "7fd8fec5bbf51fa058c51ff99b7dd6a9702faaf175fb43a4b414c5890c93461e",
     "producer": {
       "kind": "llm-adjudication",
-      "model": "zcode-current-session",
+      "model": "codex-current-session",
       "status": "degraded",
-      "adjudication_scope": "2026-09-12 全量 fresh-source 语义复核收口:固定窗口 517 条记录按六批(G01-G06)逐批复核,结果落盘 docs/validation/ce-localization/review/semantic-review-results-{g01..g06}-2026-09-12.json;517/517 维持既有判定,0 翻转,三项最小采纳(.gitattributes check-health LF 钉扎、autoresearch 解释器探测、SUPPORT_PATHS 补重命名后路径)。degraded 依据:单会话单模型复核,G01/G03 为分层抽样(全量 numstat+owner 存在性+特殊组核验+代表抽读)而非逐条全文,无独立/外部佐证;runtime/field 证据仍未运行。"
+      "adjudication_scope": "Current-source carry-over with fresh source/ref/owner/test reachability verification at pinned upstream range; semantic decisions retained only where current local and upstream references remain valid; no live behavior claim."
     }
   },
   "records": [

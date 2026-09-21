@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-09-21T10:28:33.775Z",
+  "checked_at": "2026-09-21T10:59:14.028Z",
   "recorded_source_binding": {
     "head": "36d19d95c3a79df2d1278083c959bb34eadbde8c",
     "dirty_path_manifest_sha256": "a8da405af0e4802b8cd33f4d5bf1a20e0ac2f25c4512819c3a5ec68da8038ac4",
@@ -9,34 +9,84 @@
     "review_input_hash": "244a150911cd4d7d6c10abe00b43ecb19b2413fa70d6fedc892af9ab90fd0664"
   },
   "current_source_binding": {
-    "head": "36d19d95c3a79df2d1278083c959bb34eadbde8c",
-    "dirty_path_manifest_sha256": "a8da405af0e4802b8cd33f4d5bf1a20e0ac2f25c4512819c3a5ec68da8038ac4",
-    "source_tree_hash": "52a93ab5db47299b45817db8dd3c9a8380ff72b01502dfb4d741bd906e2725e7",
-    "inventory_hash": "7c89b7d03efe786abe6cfe6835aa812d7445527be928d180503a0c1ba07e07dc",
-    "inventory_artifact_sha256": "235b1f9a24eb19f6d46ac0fad9b08ce6bae64e587031025eba41f3422cef30a2",
-    "review_input_hash": "a7d1609391c7e77773378503d1fe9ee05310b3b22f2ffa9b55a0d0e1ac83a5a6"
+    "head": "6594d50786d45a2fba1972f2581a228b6211ecbb",
+    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source_tree_hash": "bf37de901d321894e6159e4f0aa532222392df1e0682da7054a75f29c5354440",
+    "inventory_hash": "d771d0698ceba61452361598eec9fbad81c03a8d1d3d4e3c5996408a586b08df",
+    "inventory_artifact_sha256": "683532343c5796931b6011be6f195f6a437ef4b91aec24bddad11c2068851260",
+    "review_input_hash": "0da6e6e38f860c2b5fa5cc6a3e9c482bef98808deb8996b12be1793e2f33765e"
   },
   "binding_matches": false,
   "changed_binding_fields": [
+    "head",
+    "dirty_path_manifest_sha256",
     "source_tree_hash",
+    "inventory_hash",
     "inventory_artifact_sha256",
     "review_input_hash"
+  ],
+  "changed_packet_paths": [
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/scripts/check-html-marker.sh",
+      "recorded_sha256": "d0405d505bc023c5ffdf8d3253b101f6a24727a1e6be92d71e0cba7f4845afc9",
+      "current_sha256": "75656e6c4a21cbf0b04805bfb5841b0386785ef56da542b2f0ba7327829f0723"
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/scripts/check-plan-marker.sh",
+      "recorded_sha256": "52d154d2600771975b769907db01db4bbf4ce25f4104499d124b59893abd6e70",
+      "current_sha256": "95d43fde6946f5095671e8eeb0c6849d403f118bdb60c615da65f29f7db1ce65"
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/scripts/check-taskpack-marker.sh",
+      "recorded_sha256": "3ddf5114bfeb64543d43d1868d04a60bc4cfe225af634c4e70d6cdb1b1e70623",
+      "current_sha256": "9e54000e7f2df11112608f388eebf4a2cd65466c62879d8b2c5566452093cfa0"
+    },
+    {
+      "path": "skills/spec-handoff/evals/cases/create-produces-gate-fields.yaml",
+      "recorded_sha256": "174f8c1f56c45494d326183188da86821e7da6f0ee34c79c043c202814447546",
+      "current_sha256": "08e2cd1bf4bc9f1d5e3a2271e7cc5df57bcfcfd03ff89fcb57afcde09c3c37a5"
+    },
+    {
+      "path": "skills/spec-handoff/evals/cases/resume-explicit-source-stops-without-acting.yaml",
+      "recorded_sha256": "985ba52b2479bf78ab5c87bb30fad7c92905d03f9d940187ee909ac3e9f1cc94",
+      "current_sha256": "713decee1c157a777c1e57e1330ef811cbd6644a3b90999ad13406a10ea774a7"
+    },
+    {
+      "path": "skills/spec-handoff/evals/cases/resume-sparse-source-degraded-orientation.yaml",
+      "recorded_sha256": "8bc2922bab317dcc3ae399dbbcd9abfe8a9f7145344bc2169a666ed5750be9f1",
+      "current_sha256": "2c5e6c6d1bcd4c684226533e6fc3ac8be81d79b7e7e421745c76d05e08d60d3c"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/scripts/check-create-artifact.sh",
+      "recorded_sha256": "661a25dcf207ddbdbfa032d1446abc9a324ce3d2dc48dfb1617be40ae303edbf",
+      "current_sha256": "3a9761fe952b6e00570581f3dd517778d165d4ec28180f45a67c91567ad1ba07"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/scripts/check-degraded-orientation.sh",
+      "recorded_sha256": "c4126bb8e20570011a881489b5b6aac9d0bb9ed54efc1afd80dde1bd6eb839ea",
+      "current_sha256": "85af2563727840b3ed6dbd43188ed605480c5dd4182bf20e34bea01cf5819d13"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/scripts/check-resume-no-side-effects.sh",
+      "recorded_sha256": "62240c7fefb9005ca7913414957d9e82b1570b3f006a0fe12d7f7a1777a88c7f",
+      "current_sha256": "5dee358a212fb5add40241d9f2276d0d42172c9426762dd4f1b440871974a481"
+    }
   ],
   "reviewed_handoff_paths": [
     {
       "path": "skills/spec-handoff/evals/cases/create-produces-gate-fields.yaml",
       "recorded_sha256": "174f8c1f56c45494d326183188da86821e7da6f0ee34c79c043c202814447546",
-      "current_sha256": "174f8c1f56c45494d326183188da86821e7da6f0ee34c79c043c202814447546"
+      "current_sha256": "08e2cd1bf4bc9f1d5e3a2271e7cc5df57bcfcfd03ff89fcb57afcde09c3c37a5"
     },
     {
       "path": "skills/spec-handoff/evals/cases/resume-explicit-source-stops-without-acting.yaml",
       "recorded_sha256": "985ba52b2479bf78ab5c87bb30fad7c92905d03f9d940187ee909ac3e9f1cc94",
-      "current_sha256": "985ba52b2479bf78ab5c87bb30fad7c92905d03f9d940187ee909ac3e9f1cc94"
+      "current_sha256": "713decee1c157a777c1e57e1330ef811cbd6644a3b90999ad13406a10ea774a7"
     },
     {
       "path": "skills/spec-handoff/evals/cases/resume-sparse-source-degraded-orientation.yaml",
       "recorded_sha256": "8bc2922bab317dcc3ae399dbbcd9abfe8a9f7145344bc2169a666ed5750be9f1",
-      "current_sha256": "8bc2922bab317dcc3ae399dbbcd9abfe8a9f7145344bc2169a666ed5750be9f1"
+      "current_sha256": "2c5e6c6d1bcd4c684226533e6fc3ac8be81d79b7e7e421745c76d05e08d60d3c"
     },
     {
       "path": "skills/spec-handoff/evals/eval.yaml",
@@ -71,17 +121,17 @@
     {
       "path": "skills/spec-handoff/evals/fixtures/scripts/check-create-artifact.sh",
       "recorded_sha256": "661a25dcf207ddbdbfa032d1446abc9a324ce3d2dc48dfb1617be40ae303edbf",
-      "current_sha256": "661a25dcf207ddbdbfa032d1446abc9a324ce3d2dc48dfb1617be40ae303edbf"
+      "current_sha256": "3a9761fe952b6e00570581f3dd517778d165d4ec28180f45a67c91567ad1ba07"
     },
     {
       "path": "skills/spec-handoff/evals/fixtures/scripts/check-degraded-orientation.sh",
       "recorded_sha256": "c4126bb8e20570011a881489b5b6aac9d0bb9ed54efc1afd80dde1bd6eb839ea",
-      "current_sha256": "c4126bb8e20570011a881489b5b6aac9d0bb9ed54efc1afd80dde1bd6eb839ea"
+      "current_sha256": "85af2563727840b3ed6dbd43188ed605480c5dd4182bf20e34bea01cf5819d13"
     },
     {
       "path": "skills/spec-handoff/evals/fixtures/scripts/check-resume-no-side-effects.sh",
       "recorded_sha256": "62240c7fefb9005ca7913414957d9e82b1570b3f006a0fe12d7f7a1777a88c7f",
-      "current_sha256": "62240c7fefb9005ca7913414957d9e82b1570b3f006a0fe12d7f7a1777a88c7f"
+      "current_sha256": "5dee358a212fb5add40241d9f2276d0d42172c9426762dd4f1b440871974a481"
     },
     {
       "path": "skills/spec-handoff/SKILL.md",
@@ -89,6 +139,5 @@
       "current_sha256": "4bc4a2e1da3aa5caa1e547c9f9d59410099823fa315c77f56c8e71ac7a5b6d6c"
     }
   ],
-  "changed_packet_paths": [],
-  "claim_ceiling": "本结果只证明采样时的hash新鲜度；不重绑既有语义判断。"
+  "claim_ceiling": "原始 review-gaps 不因本次源码/提交变化而自动刷新；受影响路径需重新完整读取并重建 delta。"
 }

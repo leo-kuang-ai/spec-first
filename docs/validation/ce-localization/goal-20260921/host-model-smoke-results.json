@@ -1,0 +1,73 @@
+{
+  "schema_version": "host-model-smoke/v1",
+  "captured_at": "2026-09-21T11:30:27.493296+00:00",
+  "scope": "read-only synthetic prompt; no source content requested; no file mutation allowed",
+  "results": {
+    "claude": {
+      "host_surface": "CLI",
+      "version": "2.1.278",
+      "model_observed": "glm-5.3[1m] via firstParty",
+      "status": "passed",
+      "response": "CLAUDE_MODEL_READY",
+      "log": "logs/claude-live.log"
+    },
+    "codex": {
+      "host_surface": "CLI",
+      "version": "0.155.1",
+      "model_observed": "gpt-6-astra via Pioneer",
+      "status": "passed",
+      "response": "CODEX_MODEL_READY",
+      "log": "logs/codex-live.log"
+    },
+    "opencode": {
+      "host_surface": "CLI",
+      "version": "1.18.9",
+      "status": "passed",
+      "response": "OPENCODE_MODEL_READY",
+      "log": "logs/opencode-live.log"
+    },
+    "qoder": {
+      "host_surface": "CLI",
+      "version": "1.0.41",
+      "status": "blocked",
+      "reason_code": "not-logged-in",
+      "log": "logs/qoder-live.log"
+    },
+    "pi": {
+      "host_surface": "CLI",
+      "version": "0.85.0",
+      "status": "blocked",
+      "reason_code": "provider-request-forbidden-403",
+      "log": "logs/pi-live.log"
+    },
+    "cursor": {
+      "host_surface": "GUI",
+      "version": "3.19.7",
+      "status": "accessible-observation-only",
+      "workflow_invocation": "not-run",
+      "limitation": "computer-use window read timed out"
+    },
+    "kiro": {
+      "host_surface": "GUI",
+      "version": "1.1.14",
+      "status": "accessible-observation-only",
+      "workflow_invocation": "not-run",
+      "limitation": "computer-use window read timed out"
+    },
+    "qoder_gui": {
+      "host_surface": "GUI",
+      "version": "1.20.1",
+      "status": "accessible-observation-only",
+      "workflow_invocation": "not-run",
+      "limitation": "computer-use window read timed out; CLI also not logged in"
+    },
+    "zcode": {
+      "host_surface": "GUI",
+      "version": "3.11.2",
+      "status": "accessible-observation-only",
+      "workflow_invocation": "not-run",
+      "limitation": "computer-use window lookup failed after app discovery"
+    }
+  },
+  "claim_ceiling": "证明三个 CLI 宿主可完成真实模型只读 smoke；不证明 skill loader、workflow invocation、代码任务或 field outcome；五个 GUI/CLI 状态保留未完成限制。"
+}

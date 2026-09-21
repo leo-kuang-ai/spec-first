@@ -1,10 +1,10 @@
 # CE 本地化与全量 Skill 第三轮审查报告
 
-> 本报告绑定当前 target source snapshot：`source_tree_hash=956b6ec3ed0883e3148062e373757f65ed8526785ebfbeb229d9488a8f1d40c0`、`dirty_path_manifest_sha256=6c37436d8a5bdcb5f20a84726d997a2df9f95077119542111829edc11b61883b`。当前 closeout 以 deterministic validator 为准；provider、runtime adoption 和 field outcome 仍受本报告 Claim Ceiling 限制。
+> 本报告绑定当前 target source snapshot：`source_tree_hash=1b2f4c063b0cd5bb5a823f34b0b8b480cdceb53d4a681d295cdd41b03cb50fdc`、`dirty_path_manifest_sha256=bb501bc3b457250b1c5f9486fecc4eea2a277838f0527a67213b86c47d151e1b`。当前 closeout 以 deterministic validator 为准；provider、runtime adoption 和 field outcome 仍受本报告 Claim Ceiling 限制。
 
 ## 结论
 
-当前不能进入“全部 Skill 已改善”或“CE 集成已完成”的声明。第三轮已完成当前工作树的全量 source packet coverage：38 个 canonical Skill、1129 个 package path、6,756,313 bytes，文件缺失 0、inventory hash/byte mismatch 0；另有 446 条 direct-support relations、228 个 unique direct-support paths。两个角色 lane 均为内部模拟视角，`role-simulated/provider_unverified/degraded_inherited`，不是 OpenAI 或 Anthropic 公司审查，也没有真实跨模型独立性证明。
+当前不能进入“全部 Skill 已改善”或“CE 集成已完成”的声明。第三轮已完成当前工作树的全量 source packet coverage：38 个 canonical Skill、1175 个 package path、6,810,909 bytes，文件缺失 0、inventory hash/byte mismatch 0；另有 447 条 direct-support relations、229 个 unique direct-support paths。两个角色 lane 均为内部模拟视角，`role-simulated/provider_unverified/degraded_inherited`，不是 OpenAI 或 Anthropic 公司审查，也没有真实跨模型独立性证明。
 
 语义审查产物显示：当前聚合包含 13 个已完成 source-contract closure 的 P1/P2 历史 finding，以及 2 个 OpenAI lane 的 P3 `defer-pending-measurement`。`spec-ideate` 与 `spec-sweep` 的本轮 source 修复已由 Anthropic lane 回源确认并关闭；P3 只在取得 paired token/latency/quality 数据后重评。Round 3 的最高 claim 是“当前源码合同与审查范围可追溯”，不是现场价值或真实 provider 结果。
 
@@ -12,16 +12,16 @@
 
 | 维度 | 结果 |
 |---|---|
-| target HEAD | `66b0e0c6c83c1e75d2e9634132586bfce5581ff3` |
+| target HEAD | `6594d50786d45a2fba1972f2581a228b6211ecbb` |
 | canonical Skill | 38/38 |
-| package path | 1129/1129 |
-| package bytes | 6,756,313 |
+| package path | 1175/1175 |
+| package bytes | 6,810,909 |
 | package missing/hash mismatch | 0/0 |
-| direct-support relations | 446 |
-| unique direct-support paths | 228 |
-| source-tree hash | `956b6ec3ed0883e3148062e373757f65ed8526785ebfbeb229d9488a8f1d40c0`，见 inventory/coverage artifact |
-| inventory hash | `ad15fb5a24e316debe0a2cf0301c04d84bee854568061f5745bff2adc8fdaade`，见 inventory snapshot |
-| dirty manifest | `6c37436d8a5bdcb5f20a84726d997a2df9f95077119542111829edc11b61883b`，计算时排除 `docs/validation/ce-localization/**` derived artifacts |
+| direct-support relations | 447 |
+| unique direct-support paths | 229 |
+| source-tree hash | `1b2f4c063b0cd5bb5a823f34b0b8b480cdceb53d4a681d295cdd41b03cb50fdc`，见 inventory/coverage artifact |
+| inventory hash | `d771d0698ceba61452361598eec9fbad81c03a8d1d3d4e3c5996408a586b08df`，见 inventory snapshot |
+| dirty manifest | `bb501bc3b457250b1c5f9486fecc4eea2a277838f0527a67213b86c47d151e1b`，计算时排除 `docs/validation/ce-localization/**` derived artifacts |
 | excluded | `skills/autoresearch` tracked symlink，host-owned/local-only，不计入 36 |
 
 确定性产物：[round-3-source-coverage.json](/Users/kuang/xiaobu/spec-first/docs/validation/ce-localization/review/round-3-source-coverage.json)。该产物明确禁止 blanket 纳入整个 `src/**` 或 `tests/**`；当前 `unresolved_non_semantic_boundary` 为 `null`，`spec-write-tasks` 的 Claude command template 已纳入当前 source inventory。
@@ -30,8 +30,8 @@
 
 | Lane | 覆盖 | 结果 | 可信边界 |
 |---|---:|---|---|
-| OpenAI skill-engineering lens | 38 Skill / 1129 package / 228 direct-support / 446 relations | 2 个 P3 deferred；无 P1/P2 source defect | 无 provider receipt，context isolation degraded/inherited |
-| Anthropic skill-craft/safety lens | 38 Skill / 1129 package / 228 direct-support / 446 relations | 历史 P1/P2 均已 source-contract closure | 完整静态 source coverage，不等于 fixture/runtime execution；无 provider receipt |
+| OpenAI skill-engineering lens | 38 Skill / 1175 package / 229 direct-support / 447 relations | 2 个 P3 deferred；无 P1/P2 source defect | 无 provider receipt，context isolation degraded/inherited |
+| Anthropic skill-craft/safety lens | 38 Skill / 1175 package / 229 direct-support / 447 relations | 历史 P1/P2 均已 source-contract closure | 完整静态 source coverage，不等于 fixture/runtime execution；无 provider receipt |
 
 两个 lane 都重新读取当前 source；其中 OpenAI artifact 的 receipt 是结构化 packet coverage，Anthropic artifact 的 package status 是 `complete-static`。两者均没有把 hash receipt 当作“每行得到等强度语义注意”的证明。
 
