@@ -212,3 +212,15 @@
 **blocked-env 定案**：r2-reverse-mismatch（第 4 次 600s 超时）与 r2-open-ended-500（900s 超时）在引擎健康时段复跑仍系统性超时；超时前 transcript 显示 26 次工具调用的正常工作形态——判定为重对抗 case × 当前引擎延迟的组合约束，非行为失败。恢复条件：低延迟引擎/直连 API，或拆分为更轻变体。W6 升级的绿灯运行随此条件挂账。
 
 **B 型最终：12/19 绿灯**（H1/H2/W3/W4/W5/W7/C3/C4/P2/P3/P4/H3）+ W6 已升级待绿灯。**剩余 5 条**（S1-S4 runtime-setup mutation 面 + C5 capability 面）维持设计级推迟：需先解决沙箱内有界安装范围与副作用约束策略，属下批立项。
+
+## 13. 落地与收尾记录（2026-09-22 凌晨）
+
+**落地路径偏离声明**：原计划的本会话分批提交被并发会话的 `6594d507 baseline` 巨型提交（2026-09-21 18:55，324 文件）吞并——本会话全部工作（130 个 skills/ 文件、方案、报告、CHANGELOG 条目）经该提交一并入史，零丢失（抽查：N1 脚本修复/compound description/W3 case 均在 HEAD）。不重写历史拆分（破坏性且干扰活跃并发会话）。
+
+**D 型关闭**：skills/src/templates 面收敛后执行 `spec-first init -y`（8 宿主投射全部写入）。R5 发现的 spec-runtime-setup mutation 语义 drift 消除（mirror 已含 registry baseline 语义）；残余 mirror 差异核实为合法宿主投射改写（Shared Setup Host Pin 生成段、worktree 的 skills/→.agents/skills/ 路径改写）。init 零 git-tracked 变化。
+
+**T0 全量：38/38 通过**（含 spec-worktree，历史首次 38 包同机制绿灯）；`doctor --claude` 正常。
+
+**T2 codex 交叉探测 → 新增 blocked-env**：codex-cli 0.155.1 经 CC Switch 本地代理，403 预扣费额度不足（余 $0.138 < 需 $0.168）。恢复条件：代理充值/切换 provider 或改官方认证。claude_code 单引擎结论不受影响。
+
+**挂账不变**：S1-S4/C5 设计级推迟；W6 绿灯与两个 R2 blocked-env 随引擎条件；对抗话术库沉淀列下批。

@@ -85,3 +85,4 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-09-21T18:50	wt@36d19d95(dirty:tier1-remediation-r4)	spec-compound	-	-	baseline	dim8	P3 counterfactual+P4 headless 双 case 首跑 PASS(可恢复不沉淀/无合格不宣称 complete)	full_test
 2026-09-21T18:55	wt@36d19d95(dirty)	spec-work	-	-	baseline	dim8	W7 授权分离+W4 closeout 顺序双 case 首跑 PASS(未提交回交/closeout 链锚)	full_test
 2026-09-21T19:00	wt@36d19d95(dirty)	spec-work	-	-	blocked	env	r2-reverse/r2-open-ended-500 引擎健康时段复跑仍系统性超时;超时前 26 次工具调用为正常形态;恢复条件=低延迟引擎或拆轻变体	full_test
+2026-09-22T01:00	wt@96465787(post-baseline)	-	-	closeout	-	init 8 宿主完成,D 型 drift 消除;T0 38/38 首次全包绿灯;codex T2 探测 blocked-env(代理额度 403);工作经并发 baseline 提交入史(偏离已声明)	full_test
