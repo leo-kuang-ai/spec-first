@@ -12,17 +12,12 @@
   "producer": "role-simulated OpenAI skill-engineering lens using current local source only",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "6594d50786d45a2fba1972f2581a228b6211ecbb",
-    "dirty": true,
-    "dirty_paths": [
-      "CHANGELOG.md",
-      "docs/validation/skill-evals/2026-09-20-tier1-multi-role-review.md",
-      "docs/validation/skill-evals/results.tsv",
-      "tests/unit/mcp-setup-providers.test.js"
-    ],
-    "dirty_path_manifest_sha256": "bb501bc3b457250b1c5f9486fecc4eea2a277838f0527a67213b86c47d151e1b",
+    "head": "626a8d73607dca29baba4369bdb80af8f9c83889",
+    "dirty": false,
+    "dirty_paths": [],
+    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "source_tree_hash": "1b2f4c063b0cd5bb5a823f34b0b8b480cdceb53d4a681d295cdd41b03cb50fdc",
-    "inventory_hash": "d771d0698ceba61452361598eec9fbad81c03a8d1d3d4e3c5996408a586b08df",
+    "inventory_hash": "86f85d9589e857bb30f9c38213e6631e57a20be97b024d36640a12ef618092ae",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -56,8 +51,8 @@
       "version": "canonical-source-manifest-v1"
     }
   },
-  "inventory_hash": "d771d0698ceba61452361598eec9fbad81c03a8d1d3d4e3c5996408a586b08df",
-  "inventory_artifact_sha256": "5c6e7152dc9e589a585ef6b394cddbbf5cd5c70662737d44a6d53d3ee2bbcd45",
+  "inventory_hash": "86f85d9589e857bb30f9c38213e6631e57a20be97b024d36640a12ef618092ae",
+  "inventory_artifact_sha256": "e2cba2480900e543019190a68ce4092071c104bf5c2c5a473e9265a0fdb49fde",
   "input_artifacts": [
     {
       "path": "docs/validation/ce-localization/skill-inventory.json",
@@ -84,7 +79,7 @@
     "dirty_path_manifest_sha256": "4c0c78000acf7fae68fdff3eb8e523956af2a2fbb9bb6d48b6a9c4996283fee8",
     "inventory_hash": "7897d3b4a38f689cfa2e44bf66e511544710579472825938473b32495bbe1021"
   },
-  "review_input_hash": "57fd006c6e9ad0524d75c3a48b3bdeb1a08b68b10757c92664be0aa0a7364ead",
+  "review_input_hash": "aedbb2aba96125342694d68874c9fe3ab38a47a1afc7017e78de249f9fa9c188",
   "review_input_hash_algorithm": "sha256(JSON.stringify(coverage.review_input, null, 2) + newline)",
   "chunk_manifest_hash": "2cc34e946597c0d8605aeeb671103a1cfbc016518387d49cb4e90be7f23aef17",
   "chunk_manifest": [
@@ -321,8 +316,8 @@
   "reviewed_direct_support_relation_count": 447,
   "reviewed_expected_path_relation_count": 1019,
   "reviewed_unique_source_path_count": 806,
-  "coverage_status": "complete-current-source-with-incremental-review",
-  "review_status": "complete-with-incremental-review",
+  "coverage_status": "complete-current-source",
+  "review_status": "complete-current-source",
   "trust_status": "source-bound-role-simulated-provider-unverified",
   "findings_summary": {
     "current_total": 2,
@@ -36424,30 +36419,5 @@
     "open_skill_ids": [],
     "no_open_finding_skill_count": 38,
     "closure_status": "0-open-0-closed-source-contract-2-deferred"
-  },
-  "review_deltas": [
-    {
-      "review_run_id": "ce-current-20260921-r1",
-      "artifact_ref": "docs/validation/ce-localization/review/deltas/2026-09-21-current-source-r1.json",
-      "artifact_sha256": "62274411fff6429bcbe43545ed423220a45178d5d64e1610e0b0b718dd4587f9",
-      "reviewed_at": "2026-09-21T12:19:45.194Z",
-      "review_method": "inline-same-context",
-      "independent": false,
-      "provider_identity": "unverified",
-      "worker_context_isolation": "degraded_inherited",
-      "claim_ceiling": "当前源码绑定的 inline 双 lens 增量语义复核；不证明独立多模型一致性、完整真实宿主 workflow 或现场收益。"
-    },
-    {
-      "review_run_id": "ce-current-20260921-r2",
-      "artifact_ref": "docs/validation/ce-localization/review/deltas/2026-09-21-current-source-r2.json",
-      "artifact_sha256": "9f4c4e5e763592291bb9c53f93d7f397bcab5cc793eb8235fa806b97b67c4182",
-      "reviewed_at": "2026-09-21T12:31:54.473Z",
-      "review_method": "inline-same-context",
-      "independent": false,
-      "provider_identity": "unverified",
-      "worker_context_isolation": "degraded_inherited",
-      "claim_ceiling": "当前源码绑定的 inline 双 lens 增量语义复核；不证明独立多模型一致性、完整真实宿主 workflow 或现场收益。"
-    }
-  ],
-  "review_delta_findings": []
+  }
 }

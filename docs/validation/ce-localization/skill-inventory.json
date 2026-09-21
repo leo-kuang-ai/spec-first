@@ -4,17 +4,12 @@
   "producer": "scripts/check-ce-localization-review.cjs",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "6594d50786d45a2fba1972f2581a228b6211ecbb",
-    "dirty": true,
-    "dirty_paths": [
-      "CHANGELOG.md",
-      "docs/validation/skill-evals/2026-09-20-tier1-multi-role-review.md",
-      "docs/validation/skill-evals/results.tsv",
-      "tests/unit/mcp-setup-providers.test.js"
-    ],
-    "dirty_path_manifest_sha256": "bb501bc3b457250b1c5f9486fecc4eea2a277838f0527a67213b86c47d151e1b",
+    "head": "626a8d73607dca29baba4369bdb80af8f9c83889",
+    "dirty": false,
+    "dirty_paths": [],
+    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "source_tree_hash": "1b2f4c063b0cd5bb5a823f34b0b8b480cdceb53d4a681d295cdd41b03cb50fdc",
-    "inventory_hash": "d771d0698ceba61452361598eec9fbad81c03a8d1d3d4e3c5996408a586b08df",
+    "inventory_hash": "86f85d9589e857bb30f9c38213e6631e57a20be97b024d36640a12ef618092ae",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
