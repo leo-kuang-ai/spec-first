@@ -196,3 +196,21 @@ T1/T2 红灯
 **已执行（2026-09-20，本方案写作过程）**：skill-up v0.12.0 与上游最新一致；T0 全量 validate 37/37 通过（132 case 计数与 FSA2 F-6 存档一致）；spec-worktree 无套件、3 skill 路径漂移、36/37 skill 09-04 后变更、最近运行时间分布、引擎与凭据可用性均实测取证（§1 表）。
 
 **未执行**：任何 T1/T2/T3 模型运行；spec-worktree 套件补建与路径统一（P-A ②③，涉及 skills/ 源面变更，按批次执行）；npm script / hook 固化（P-D）。本方案是机制设计 + 现状基线，不构成任何 skill 当前版本的行为通过声明。
+
+## 附录 A：S1-S4 沙箱有界安装设计（2026-09-22 立项稿，status: designed）
+
+**问题**：spec-runtime-setup 的 mutation 面（S1 裸调用收敛安装、S2 Readiness Handoff、S3 fail-closed/不绕过 Node 入口、S4 workspace-graph）无 eval，直接补 case 会在沙箱触发真实 provider 下载与宿主配置写入——网络重、副作用面不清。
+
+**前置安全核实（未完成前禁止启用任何 S case）**：读 `setup.cjs` + `setup-registry.json` 确认默认（非 `--user-scope`）安装的**全部写路径都落在 cwd 内**（项目级 `.mcp.json`/`.spec-first/config`/`.gitignore`）；若存在任何写 `~` 或宿主用户级的默认路径，S1 只允许走方案 B。
+
+**三个有界方案（按优先序组合）**：
+
+- **方案 A：`--only` 最小子集 + 哨兵断言**。从 registry 选零网络/本地工具型条目（如 node/git 检查类），prompt 要求 bare 调用后以文件系统哨兵判定：`.spec-first/config/tool-facts.json` 产生、`.gitignore` 增补条目、哨兵宿主配置路径未动。S1/S2 主路径。
+- **方案 B：网络拒绝路径（失败面诚实性）**。故意让 provider 安装失败（无网/假包名），断言模型**走了 bare mutation 而非旧只读习惯**、失败按 `partial`/`reason_code` 结构化上报、不自动追加 `--repair`/`--refresh`。消费对抗库 A6/B4/C4 场景。
+- **方案 C：prepare 脚本构造拓扑（S4 专用）**。fixture 放 `prepare-workspace.sh` 由 prompt 先执行（tenant-orders 先例）：init 两个子 git 仓库构成非 git 父 workspace，然后 `--workspace-graph-status` 只读诊断，断言 JSON readiness 语义 + 子仓 `.codegraph/` 不产生、子仓 HEAD 不动。
+
+**S2 专项**：fixture 预置 stale `runtime-capabilities.json`/manifest + 就绪依赖的混合态，断言首次任务模板**不渲染**（done signal 反向形态）。
+
+**验收用例集**：直接消费对抗库 §A6/B4/C3/C4/C6/D1 七场景。
+
+**预算**：设计核实 1h + 四 case 编写与首跑校准 3-4h；启用条件=前置安全核实通过 + 下一批次排期。

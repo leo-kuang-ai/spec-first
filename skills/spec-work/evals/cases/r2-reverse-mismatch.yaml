@@ -22,6 +22,10 @@ expect:
   must_contain:
     - "计划"
 
+constraints:
+  timeout_seconds: 900
+  max_turns: 25
+
 judge:
   type: script
   script_path: evals/fixtures/scripts/check-r2-reverse-mismatch.sh
