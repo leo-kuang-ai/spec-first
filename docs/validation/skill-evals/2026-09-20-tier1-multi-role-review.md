@@ -224,3 +224,9 @@
 **T2 codex 交叉探测 → 新增 blocked-env**：codex-cli 0.155.1 经 CC Switch 本地代理，403 预扣费额度不足（余 $0.138 < 需 $0.168）。恢复条件：代理充值/切换 provider 或改官方认证。claude_code 单引擎结论不受影响。
 
 **挂账不变**：S1-S4/C5 设计级推迟；W6 绿灯与两个 R2 blocked-env 随引擎条件；对抗话术库沉淀列下批。
+
+## 14. S1 Judge 加固（2026-09-22）
+
+S1 的 fail-closed case 已完成本地判定加固：`check-bare-mutation.sh` 现在同时要求 `EVAL_EXIT_CODE=2`、最终汇报包含 `blocked`、`reason_code`、`host-invocation-surface-unverified` 三个结构化语义，并检查 `.spec-first/config/**`、setup fingerprint、`.claude/settings.json`、`.mcp.json` 及 `.eval-home` 下 readiness ledger/facts 哨兵和符号链接均未产生。新增 26 项本地 Judge 校准测试，`runtime-setup-eval-judge.test.js` 与 `eval-fixture-contracts.test.js` 全部通过；`skill-up validate` 仍为 3 case 有效。
+
+该改动只提高沙箱内安全拒绝的判定强度，S1 仍为 **verified-with-findings**：真实宿主上的成功 mutation、Provider 安装与现场收益尚未由该 case 证明。

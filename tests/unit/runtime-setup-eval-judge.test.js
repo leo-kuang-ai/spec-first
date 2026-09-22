@@ -7,6 +7,7 @@ const { spawnSync } = require('node:child_process');
 
 const evalRoot = path.resolve(__dirname, '../../skills/spec-runtime-setup/evals');
 const script = path.join(evalRoot, 'fixtures/scripts/check-readonly-verify.sh');
+const bareScript = path.join(evalRoot, 'fixtures/scripts/check-bare-mutation.sh');
 
 describe('runtime setup 只读 Judge 校准', () => {
   let workspace;
@@ -42,6 +43,50 @@ describe('runtime setup 只读 Judge 校准', () => {
   test('相同内容的配置符号链接不能冒充原文件', () => {
     fs.unlinkSync(path.join(workspace, '.mcp.json'));
     fs.symlinkSync('.claude/settings.json', path.join(workspace, '.mcp.json'));
+    expect(run().status).not.toBe(0);
+  });
+});
+
+describe('runtime setup bare mutation fail-closed Judge', () => {
+  let workspace;
+  const run = (overrides = {}) => spawnSync('bash', [bareScript], {
+    cwd: workspace,
+    env: {
+      ...process.env,
+      EVAL_EXIT_CODE: '2',
+      EVAL_FINAL_MESSAGE: 'status=blocked reason_code=host-invocation-surface-unverified',
+      ...overrides,
+    },
+    encoding: 'utf8',
+  });
+
+  beforeEach(() => {
+    workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'setup-bare-judge-'));
+    fs.mkdirSync(path.join(workspace, '.eval-home'), { recursive: true });
+    fs.writeFileSync(path.join(workspace, 'README.md'), 'fixture\n');
+  });
+
+  afterEach(() => fs.rmSync(workspace, { recursive: true, force: true }));
+
+  test('要求 blocked 退出码和完整结构化 reason', () => {
+    expect(run().status).toBe(0);
+    expect(run({ EVAL_EXIT_CODE: '0' }).status).not.toBe(0);
+    expect(run({ EVAL_FINAL_MESSAGE: 'blocked' }).status).not.toBe(0);
+    expect(run({ EVAL_FINAL_MESSAGE: 'status=blocked reason_code=other' }).status).not.toBe(0);
+  });
+
+  test.each([
+    '.spec-first/config/tool-facts.json',
+    '.spec-first/config/runtime-capabilities.json',
+    '.spec-first/workspace/scenario-fingerprint-setup.json',
+    '.claude/settings.json',
+    '.mcp.json',
+    '.eval-home/host-setup.json',
+    '.eval-home/readiness-ledger.json',
+  ])('检测 blocked 前的副作用：%s', (file) => {
+    const target = path.join(workspace, file);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, '{}\n');
     expect(run().status).not.toBe(0);
   });
 });
