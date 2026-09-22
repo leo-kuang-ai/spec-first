@@ -1,11 +1,11 @@
 {
   "schema_version": "spec-first-current-skill-package-inventory/v2",
-  "source_head": "626a8d73607dca29baba4369bdb80af8f9c83889",
-  "skills_tree_oid": "0de90e404f2b875f97b5fb958f73da728592a422",
+  "source_head": "09677f4ee3b09d0681b791af6715cc22ecd17a41",
+  "skills_tree_oid": "ff5caf8554418ef11ebb15b8cd61819b2bc54e6c",
   "source_mode": "working-tree",
-  "manifest_sha256": "19f38b10657e7a72d9221812fef8cb76c08a8e28ccd39fae94740bf5303e0d8a",
+  "manifest_sha256": "8245cbd24d90454a30cb1e5199efe7cb2db559d5c625d101078415f862ea87ae",
   "skill_count": 38,
-  "file_count": 1182,
+  "file_count": 1186,
   "per_skill_counts": {
     "autoresearch": 30,
     "spec-app-consistency-audit": 90,
@@ -34,7 +34,7 @@
     "spec-resolve-pr-feedback": 22,
     "spec-riffrec-feedback-analysis": 12,
     "spec-rule-miner": 12,
-    "spec-runtime-setup": 82,
+    "spec-runtime-setup": 86,
     "spec-simplify-code": 19,
     "spec-strategy": 13,
     "spec-sweep": 20,
@@ -6397,6 +6397,13 @@
       "sha256": "306fc3e4cbe1a067434807b7eed1c765213fa6be357d2e3d16960f79abe434d1"
     },
     {
+      "path": "skills/spec-runtime-setup/evals/cases/bare-invocation-fail-closed-on-unverified-surface.yaml",
+      "skill": "spec-runtime-setup",
+      "owner_role": "evaluation",
+      "bytes": 1352,
+      "sha256": "a118dfabc0839c5b0fe74210725147ece2e0e86fe456a5323b6fe1ff3c56e515"
+    },
+    {
       "path": "skills/spec-runtime-setup/evals/cases/check-readonly.yaml",
       "skill": "spec-runtime-setup",
       "owner_role": "evaluation",
@@ -6414,8 +6421,8 @@
       "path": "skills/spec-runtime-setup/evals/eval.yaml",
       "skill": "spec-runtime-setup",
       "owner_role": "evaluation",
-      "bytes": 362,
-      "sha256": "7d599dd2d2c3050f398dc718ea8f7a941b0dc3096c4d09c4fa1dc858d944e444"
+      "bytes": 435,
+      "sha256": "d4901e8e00c0e8d1b2dbc7cee9506671f3c9cf096ae835f954936ba86f092758"
     },
     {
       "path": "skills/spec-runtime-setup/evals/examples.json",
@@ -6444,6 +6451,27 @@
       "owner_role": "evaluation",
       "bytes": 665,
       "sha256": "ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34"
+    },
+    {
+      "path": "skills/spec-runtime-setup/evals/fixtures/repos/setup-target/package.json",
+      "skill": "spec-runtime-setup",
+      "owner_role": "evaluation",
+      "bytes": 64,
+      "sha256": "97d7e35aa9c3f8ee60adf529281a9b020b8b7ebec53848ff08785b254c0d6476"
+    },
+    {
+      "path": "skills/spec-runtime-setup/evals/fixtures/repos/setup-target/README.md",
+      "skill": "spec-runtime-setup",
+      "owner_role": "evaluation",
+      "bytes": 81,
+      "sha256": "5e8235b1c37c7a684278f3bdd1938cd9fc4925fe243b240b81139c063947e3e8"
+    },
+    {
+      "path": "skills/spec-runtime-setup/evals/fixtures/scripts/check-bare-mutation.sh",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 864,
+      "sha256": "8181a073772131ae130df78f25bd30e92a13336c78bbcd8ea9894309e5c01b78"
     },
     {
       "path": "skills/spec-runtime-setup/evals/fixtures/scripts/check-not-setup-scope.sh",
@@ -7471,8 +7499,8 @@
       "path": "skills/spec-work/evals/cases/r2-reverse-mismatch.yaml",
       "skill": "spec-work",
       "owner_role": "evaluation",
-      "bytes": 887,
-      "sha256": "9a2f79887d2a527aaa46fd4a35be136fbe86fd1b625c697fa044f5e8657fdd66"
+      "bytes": 940,
+      "sha256": "9b2b80a2a0bed5ba42e41c8481db0420105ec5ff75aa881ccfda568bbd8ebf22"
     },
     {
       "path": "skills/spec-work/evals/cases/requirements-only-stops.yaml",

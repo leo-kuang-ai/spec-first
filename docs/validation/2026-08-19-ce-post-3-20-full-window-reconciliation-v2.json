@@ -8,12 +8,12 @@
   },
   "target_source_snapshot": {
     "repository": "spec-first",
-    "head": "626a8d73607dca29baba4369bdb80af8f9c83889",
+    "head": "09677f4ee3b09d0681b791af6715cc22ecd17a41",
     "dirty": false,
     "dirty_paths": [],
     "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "1b2f4c063b0cd5bb5a823f34b0b8b480cdceb53d4a681d295cdd41b03cb50fdc",
-    "inventory_hash": "86f85d9589e857bb30f9c38213e6631e57a20be97b024d36640a12ef618092ae",
+    "source_tree_hash": "e9e7d8f40eedf65068026e4c3c67d935107e03fb019730970effa117740052ad",
+    "inventory_hash": "6444494a603015ca0e68876b5cf5abb08fe43435cd6e38814e74aab9cbb5f668",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -50,7 +50,7 @@
   "adjudication": {
     "schema_version": "ce-upstream-adjudication/v1",
     "join_key": "path+upstream+target-source",
-    "artifact_sha256": "a17abad5e4605b011901b413993b06a3fc7a1b8fc22d3daa04f79769d022fcd5",
+    "artifact_sha256": "ac903ddaf1d4dc72241aa48c605ab4c1272bb9a11354597700c7f85b7fb6590b",
     "producer": {
       "kind": "llm-adjudication",
       "model": "codex-current-session",

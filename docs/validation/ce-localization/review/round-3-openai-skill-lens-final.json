@@ -8,16 +8,16 @@
   "provider_identity": "unverified",
   "provider_receipt_ref": null,
   "worker_context_isolation": "degraded_inherited",
-  "generated_at": "2026-09-21T12:31:54.473Z",
+  "generated_at": "2026-09-22T00:00:00.000Z",
   "producer": "role-simulated OpenAI skill-engineering lens using current local source only",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "626a8d73607dca29baba4369bdb80af8f9c83889",
+    "head": "09677f4ee3b09d0681b791af6715cc22ecd17a41",
     "dirty": false,
     "dirty_paths": [],
     "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "1b2f4c063b0cd5bb5a823f34b0b8b480cdceb53d4a681d295cdd41b03cb50fdc",
-    "inventory_hash": "86f85d9589e857bb30f9c38213e6631e57a20be97b024d36640a12ef618092ae",
+    "source_tree_hash": "e9e7d8f40eedf65068026e4c3c67d935107e03fb019730970effa117740052ad",
+    "inventory_hash": "6444494a603015ca0e68876b5cf5abb08fe43435cd6e38814e74aab9cbb5f668",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -51,8 +51,8 @@
       "version": "canonical-source-manifest-v1"
     }
   },
-  "inventory_hash": "86f85d9589e857bb30f9c38213e6631e57a20be97b024d36640a12ef618092ae",
-  "inventory_artifact_sha256": "e2cba2480900e543019190a68ce4092071c104bf5c2c5a473e9265a0fdb49fde",
+  "inventory_hash": "6444494a603015ca0e68876b5cf5abb08fe43435cd6e38814e74aab9cbb5f668",
+  "inventory_artifact_sha256": "ab58c0269b4a4ddb311f1a7c9a9a1cb1316e06cc65b46cb9aab59c1a4c00485e",
   "input_artifacts": [
     {
       "path": "docs/validation/ce-localization/skill-inventory.json",
@@ -79,9 +79,9 @@
     "dirty_path_manifest_sha256": "4c0c78000acf7fae68fdff3eb8e523956af2a2fbb9bb6d48b6a9c4996283fee8",
     "inventory_hash": "7897d3b4a38f689cfa2e44bf66e511544710579472825938473b32495bbe1021"
   },
-  "review_input_hash": "aedbb2aba96125342694d68874c9fe3ab38a47a1afc7017e78de249f9fa9c188",
+  "review_input_hash": "459efeff7960e476ef33d0d94430ed005405b608a16535cf344a7bc9e4c207f8",
   "review_input_hash_algorithm": "sha256(JSON.stringify(coverage.review_input, null, 2) + newline)",
-  "chunk_manifest_hash": "2cc34e946597c0d8605aeeb671103a1cfbc016518387d49cb4e90be7f23aef17",
+  "chunk_manifest_hash": "35eae6c3b964246e0fd134bfb4b5b1fd2b993e7df9dd5ed25a19d5211ae704ee",
   "chunk_manifest": [
     {
       "chunk_id": "oai-r3-final-001",
@@ -308,16 +308,16 @@
   ],
   "expected_skill_count": 38,
   "reviewed_skill_count": 38,
-  "expected_package_path_count": 1175,
+  "expected_package_path_count": 1179,
   "expected_direct_support_path_count": 229,
   "expected_direct_support_relation_count": 447,
-  "reviewed_package_path_count": 1175,
+  "reviewed_package_path_count": 1179,
   "reviewed_direct_support_path_count": 229,
   "reviewed_direct_support_relation_count": 447,
   "reviewed_expected_path_relation_count": 1019,
   "reviewed_unique_source_path_count": 806,
-  "coverage_status": "complete-current-source",
-  "review_status": "complete-current-source",
+  "coverage_status": "complete-current-source-with-incremental-review",
+  "review_status": "complete-with-incremental-review",
   "trust_status": "source-bound-role-simulated-provider-unverified",
   "findings_summary": {
     "current_total": 2,
@@ -25588,6 +25588,26 @@
           "source_kind": "reference-contract"
         },
         {
+          "path": "skills/spec-runtime-setup/evals/cases/bare-invocation-fail-closed-on-unverified-surface.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "a118dfabc0839c5b0fe74210725147ece2e0e86fe456a5323b6fe1ff3c56e515",
+          "bytes": 1352,
+          "line_count": 34,
+          "covered_line_ranges": [
+            [
+              1,
+              34
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260922-r1-openai-skill-engineering-a118dfabc083"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/spec-runtime-setup/evals/cases/check-readonly.yaml",
           "path_role": "skill-package",
           "source_kind": "skill-package",
@@ -25633,17 +25653,17 @@
           "source_kind": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "7d599dd2d2c3050f398dc718ea8f7a941b0dc3096c4d09c4fa1dc858d944e444",
-          "bytes": 362,
-          "line_count": 24,
+          "sha256": "d4901e8e00c0e8d1b2dbc7cee9506671f3c9cf096ae835f954936ba86f092758",
+          "bytes": 435,
+          "line_count": 25,
           "covered_line_ranges": [
             [
               1,
-              24
+              25
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-fsa2-repair-2026-09-15-openai-skill-engineering-7d599dd2d2c3"
+            "ce-current-20260922-r1-openai-skill-engineering-d4901e8e00c0"
           ],
           "read_status": "full"
         },
@@ -25724,6 +25744,66 @@
           ],
           "review_chunk_ids": [
             "2026-09-08-current-source-full-lane-refresh-delta-openai-skill-engineering-ff9d96855c23"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-runtime-setup/evals/fixtures/repos/setup-target/package.json",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "97d7e35aa9c3f8ee60adf529281a9b020b8b7ebec53848ff08785b254c0d6476",
+          "bytes": 64,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260922-r1-openai-skill-engineering-97d7e35aa9c3"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-runtime-setup/evals/fixtures/repos/setup-target/README.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "5e8235b1c37c7a684278f3bdd1938cd9fc4925fe243b240b81139c063947e3e8",
+          "bytes": 81,
+          "line_count": 3,
+          "covered_line_ranges": [
+            [
+              1,
+              3
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260922-r1-openai-skill-engineering-5e8235b1c37c"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-runtime-setup/evals/fixtures/scripts/check-bare-mutation.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "8181a073772131ae130df78f25bd30e92a13336c78bbcd8ea9894309e5c01b78",
+          "bytes": 864,
+          "line_count": 23,
+          "covered_line_ranges": [
+            [
+              1,
+              23
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-current-20260922-r1-openai-skill-engineering-8181a0737721"
           ],
           "read_status": "full"
         },
@@ -30765,17 +30845,17 @@
           "source_kind": "skill-package",
           "owning_skill": "spec-work",
           "shared_consumers": [],
-          "sha256": "9a2f79887d2a527aaa46fd4a35be136fbe86fd1b625c697fa044f5e8657fdd66",
-          "bytes": 887,
-          "line_count": 28,
+          "sha256": "9b2b80a2a0bed5ba42e41c8481db0420105ec5ff75aa881ccfda568bbd8ebf22",
+          "bytes": 940,
+          "line_count": 32,
           "covered_line_ranges": [
             [
               1,
-              28
+              32
             ]
           ],
           "review_chunk_ids": [
-            "ce-current-20260921-r1-openai-skill-engineering-9a2f79887d2a"
+            "ce-current-20260922-r1-openai-skill-engineering-9b2b80a2a0be"
           ],
           "read_status": "full"
         },
@@ -35076,7 +35156,8 @@
     "真实宿主/模型/现场收益不在本轮通过范围。",
     "仅收口报告/日志更新后重绑，7个源码/测试的既有增量裁决未改变；不重复宣称语义重审。",
     "本轮覆盖当前两条审查 lane 的全部 changed/missing/retired relations；每条关系均回读当前文件或确认退役。",
-    "本轮没有独立 provider/隔离 worker；真实宿主、模型任务和 field outcome 另行记录。"
+    "本轮没有独立 provider/隔离 worker；真实宿主、模型任务和 field outcome 另行记录。",
+    "本 delta 仅覆盖当前 source receipt 的增量重读，不证明独立 provider、真实宿主或 field outcome。"
   ],
   "consumers": [
     "docs/validation/ce-localization/review/round-3-findings.json aggregate owner",
@@ -36419,5 +36500,19 @@
     "open_skill_ids": [],
     "no_open_finding_skill_count": 38,
     "closure_status": "0-open-0-closed-source-contract-2-deferred"
-  }
+  },
+  "review_deltas": [
+    {
+      "review_run_id": "ce-current-20260922-r1",
+      "artifact_ref": "docs/validation/ce-localization/review/deltas/2026-09-22-current-source-r1.json",
+      "artifact_sha256": "59f0d2b37415eb09f073e6c97005458f5714af90fee07d36a9a6905a348cc831",
+      "reviewed_at": "2026-09-22T00:00:00.000Z",
+      "review_method": "inline-same-context",
+      "independent": false,
+      "provider_identity": "unverified",
+      "worker_context_isolation": "degraded_inherited",
+      "claim_ceiling": "Current source receipt and bounded semantic review only; no independent provider, runtime adoption, or field outcome claim."
+    }
+  ],
+  "review_delta_findings": []
 }

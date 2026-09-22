@@ -5,12 +5,12 @@
   "single_writer": "ce-localization-scenario-writer",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "626a8d73607dca29baba4369bdb80af8f9c83889",
+    "head": "09677f4ee3b09d0681b791af6715cc22ecd17a41",
     "dirty": false,
     "dirty_paths": [],
     "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "1b2f4c063b0cd5bb5a823f34b0b8b480cdceb53d4a681d295cdd41b03cb50fdc",
-    "inventory_hash": "86f85d9589e857bb30f9c38213e6631e57a20be97b024d36640a12ef618092ae",
+    "source_tree_hash": "e9e7d8f40eedf65068026e4c3c67d935107e03fb019730970effa117740052ad",
+    "inventory_hash": "6444494a603015ca0e68876b5cf5abb08fe43435cd6e38814e74aab9cbb5f668",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -45,7 +45,7 @@
     }
   },
   "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
-  "inventory_sha256": "e2cba2480900e543019190a68ce4092071c104bf5c2c5a473e9265a0fdb49fde",
+  "inventory_sha256": "ab58c0269b4a4ddb311f1a7c9a9a1cb1316e06cc65b46cb9aab59c1a4c00485e",
   "scenario_fingerprint_contract_ref": "docs/contracts/workflows/scenario-capability-matrix.md",
   "scenarios": [
     {
@@ -11736,6 +11736,17 @@
       "source_sha256": "306fc3e4cbe1a067434807b7eed1c765213fa6be357d2e3d16960f79abe434d1"
     },
     {
+      "path": "skills/spec-runtime-setup/evals/cases/bare-invocation-fail-closed-on-unverified-surface.yaml",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "a118dfabc0839c5b0fe74210725147ece2e0e86fe456a5323b6fe1ff3c56e515"
+    },
+    {
       "path": "skills/spec-runtime-setup/evals/cases/check-readonly.yaml",
       "owning_skill": "spec-runtime-setup",
       "path_role": "evaluation",
@@ -11766,7 +11777,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "7d599dd2d2c3050f398dc718ea8f7a941b0dc3096c4d09c4fa1dc858d944e444"
+      "source_sha256": "d4901e8e00c0e8d1b2dbc7cee9506671f3c9cf096ae835f954936ba86f092758"
     },
     {
       "path": "skills/spec-runtime-setup/evals/examples.json",
@@ -11811,6 +11822,39 @@
         "SCN-SPEC-RUNTIME-SETUP"
       ],
       "source_sha256": "ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34"
+    },
+    {
+      "path": "skills/spec-runtime-setup/evals/fixtures/repos/setup-target/package.json",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "97d7e35aa9c3f8ee60adf529281a9b020b8b7ebec53848ff08785b254c0d6476"
+    },
+    {
+      "path": "skills/spec-runtime-setup/evals/fixtures/repos/setup-target/README.md",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "5e8235b1c37c7a684278f3bdd1938cd9fc4925fe243b240b81139c063947e3e8"
+    },
+    {
+      "path": "skills/spec-runtime-setup/evals/fixtures/scripts/check-bare-mutation.sh",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "deterministic-helper",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-RUNTIME-SETUP"
+      ],
+      "source_sha256": "8181a073772131ae130df78f25bd30e92a13336c78bbcd8ea9894309e5c01b78"
     },
     {
       "path": "skills/spec-runtime-setup/evals/fixtures/scripts/check-not-setup-scope.sh",
@@ -13427,7 +13471,7 @@
       "scenario_ids": [
         "SCN-SPEC-WORK"
       ],
-      "source_sha256": "9a2f79887d2a527aaa46fd4a35be136fbe86fd1b625c697fa044f5e8657fdd66"
+      "source_sha256": "9b2b80a2a0bed5ba42e41c8481db0420105ec5ff75aa881ccfda568bbd8ebf22"
     },
     {
       "path": "skills/spec-work/evals/cases/requirements-only-stops.yaml",

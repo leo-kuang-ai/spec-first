@@ -5,12 +5,12 @@
   "single_writer": "ce-localization-baseline-writer",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "626a8d73607dca29baba4369bdb80af8f9c83889",
+    "head": "09677f4ee3b09d0681b791af6715cc22ecd17a41",
     "dirty": false,
     "dirty_paths": [],
     "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "1b2f4c063b0cd5bb5a823f34b0b8b480cdceb53d4a681d295cdd41b03cb50fdc",
-    "inventory_hash": "86f85d9589e857bb30f9c38213e6631e57a20be97b024d36640a12ef618092ae",
+    "source_tree_hash": "e9e7d8f40eedf65068026e4c3c67d935107e03fb019730970effa117740052ad",
+    "inventory_hash": "6444494a603015ca0e68876b5cf5abb08fe43435cd6e38814e74aab9cbb5f668",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -45,9 +45,10 @@
     }
   },
   "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
-  "inventory_sha256": "e2cba2480900e543019190a68ce4092071c104bf5c2c5a473e9265a0fdb49fde",
+  "inventory_sha256": "ab58c0269b4a4ddb311f1a7c9a9a1cb1316e06cc65b46cb9aab59c1a4c00485e",
   "skill_id": "spec-runtime-setup",
   "source_refs": [
+    "skills/spec-runtime-setup/evals/cases/bare-invocation-fail-closed-on-unverified-surface.yaml",
     "skills/spec-runtime-setup/evals/cases/check-readonly.yaml",
     "skills/spec-runtime-setup/evals/cases/semantic-question-not-setup.yaml",
     "skills/spec-runtime-setup/evals/eval.yaml",
@@ -55,6 +56,9 @@
     "skills/spec-runtime-setup/evals/fixtures/repos/mini-ledger/package.json",
     "skills/spec-runtime-setup/evals/fixtures/repos/mini-ledger/README.md",
     "skills/spec-runtime-setup/evals/fixtures/repos/mini-ledger/src/server.js",
+    "skills/spec-runtime-setup/evals/fixtures/repos/setup-target/package.json",
+    "skills/spec-runtime-setup/evals/fixtures/repos/setup-target/README.md",
+    "skills/spec-runtime-setup/evals/fixtures/scripts/check-bare-mutation.sh",
     "skills/spec-runtime-setup/evals/fixtures/scripts/check-not-setup-scope.sh",
     "skills/spec-runtime-setup/evals/fixtures/scripts/check-readonly-verify.sh",
     "skills/spec-runtime-setup/evals/README.md",
@@ -143,12 +147,12 @@
   ],
   "candidate_snapshot": {
     "repository": "spec-first",
-    "head": "626a8d73607dca29baba4369bdb80af8f9c83889",
+    "head": "09677f4ee3b09d0681b791af6715cc22ecd17a41",
     "dirty": false,
     "dirty_paths": [],
     "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "1b2f4c063b0cd5bb5a823f34b0b8b480cdceb53d4a681d295cdd41b03cb50fdc",
-    "inventory_hash": "86f85d9589e857bb30f9c38213e6631e57a20be97b024d36640a12ef618092ae",
+    "source_tree_hash": "e9e7d8f40eedf65068026e4c3c67d935107e03fb019730970effa117740052ad",
+    "inventory_hash": "6444494a603015ca0e68876b5cf5abb08fe43435cd6e38814e74aab9cbb5f668",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -214,9 +218,9 @@
     "structure_contract": {
       "state": "confirmed",
       "evidence_refs": [
+        "skills/spec-runtime-setup/evals/cases/bare-invocation-fail-closed-on-unverified-surface.yaml",
         "skills/spec-runtime-setup/evals/cases/check-readonly.yaml",
-        "skills/spec-runtime-setup/evals/cases/semantic-question-not-setup.yaml",
-        "skills/spec-runtime-setup/evals/eval.yaml"
+        "skills/spec-runtime-setup/evals/cases/semantic-question-not-setup.yaml"
       ],
       "limitations": []
     },

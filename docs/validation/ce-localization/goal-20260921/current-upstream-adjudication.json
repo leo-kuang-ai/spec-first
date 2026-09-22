@@ -15,12 +15,12 @@
   },
   "target_source_snapshot": {
     "repository": "spec-first",
-    "head": "626a8d73607dca29baba4369bdb80af8f9c83889",
+    "head": "09677f4ee3b09d0681b791af6715cc22ecd17a41",
     "dirty": false,
     "dirty_paths": [],
     "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "1b2f4c063b0cd5bb5a823f34b0b8b480cdceb53d4a681d295cdd41b03cb50fdc",
-    "inventory_hash": "86f85d9589e857bb30f9c38213e6631e57a20be97b024d36640a12ef618092ae",
+    "source_tree_hash": "e9e7d8f40eedf65068026e4c3c67d935107e03fb019730970effa117740052ad",
+    "inventory_hash": "6444494a603015ca0e68876b5cf5abb08fe43435cd6e38814e74aab9cbb5f668",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -54,7 +54,7 @@
       "version": "canonical-source-manifest-v1"
     }
   },
-  "input_artifact_sha256": "603babbfe357700d4dd10da95d74c20e2878f3d5f7c38f248c33acdf41c238b5",
+  "input_artifact_sha256": "06f3ac8b3953191da06adcadd34e496956840f501a8553d1b02b7523c36a5fdb",
   "records": [
     {
       "audit_id": "A001",
@@ -14793,9 +14793,9 @@
     }
   ],
   "review_context": {
-    "reviewed_at": "2026-09-21",
+    "reviewed_at": "2026-09-22",
     "reviewer": "codex-current-session",
-    "method": "fresh-source local owner/test and pinned upstream ref verification on current snapshot; prior semantic decision retained only after source reachability check",
+    "method": "fresh-source local owner/test and pinned upstream ref verification on final clean source snapshot 09677f4e; prior semantic decision retained only after source reachability check; no live behavior claim",
     "reference_facts": "docs/validation/ce-localization/review/deltas/2026-09-16-fsa3-upstream-ref-facts.json",
     "changed_owner_assessment": [
       "A179：当前 path-limited commit 修复与 upstream 明确边界一致；分支授权与本地政策保留，compose owner/action 不变。",
@@ -14803,7 +14803,9 @@
     ],
     "limitations": [
       "semantic adequacy was reviewed as bounded carry-over; no independent second model or full runtime/field execution",
-      "real host/model smoke is recorded separately and does not prove CE semantic adequacy"
+      "real host/model smoke is recorded separately and does not prove CE semantic adequacy",
+      "Cursor GUI workflow blocked by unavailable model plan; Claude/Codex CLI workflow receipts remain separate evidence.",
+      "A045 and A507 upstream references are absent at pinned head 956087b3e1dd7ccc03df32cee9e7c044dfbe75cf; retained as unresolved historical references."
     ]
   }
 }

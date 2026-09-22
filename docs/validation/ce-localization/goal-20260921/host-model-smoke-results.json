@@ -43,9 +43,10 @@
     "cursor": {
       "host_surface": "GUI",
       "version": "3.19.7",
-      "status": "accessible-observation-only",
+      "status": "blocked",
       "workflow_invocation": "not-run",
-      "limitation": "computer-use window read timed out"
+      "limitation": "用户确认没有 Cursor 套餐；模型 provider rate limit/不可达，CLI 验证不改用 Cursor，保留为外部条件阻塞。",
+      "reason_code": "no-cursor-plan"
     },
     "kiro": {
       "host_surface": "GUI",
@@ -69,5 +70,5 @@
       "limitation": "computer-use window lookup failed after app discovery"
     }
   },
-  "claim_ceiling": "证明三个 CLI 宿主可完成真实模型只读 smoke；不证明 skill loader、workflow invocation、代码任务或 field outcome；五个 GUI/CLI 状态保留未完成限制。"
+  "claim_ceiling": "证明 Claude、Codex、OpenCode CLI 可完成真实模型只读 smoke；Cursor 因用户无套餐标记 blocked/not-applicable，其他 GUI/CLI 状态保留未完成限制；不证明 skill loader、完整代码任务或 field outcome。"
 }

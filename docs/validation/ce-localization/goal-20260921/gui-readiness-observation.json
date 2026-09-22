@@ -2,7 +2,10 @@
   "observed_at": "2026-09-21T10:29:07.851Z",
   "cursor": {
     "gui_accessible": true,
-    "workflow_tested": false
+    "workflow_tested": false,
+    "status": "blocked",
+    "reason_code": "no-cursor-plan",
+    "limitation": "用户确认没有 Cursor 套餐；不再尝试 Cursor workflow。"
   },
   "kiro": {
     "gui_accessible": true,

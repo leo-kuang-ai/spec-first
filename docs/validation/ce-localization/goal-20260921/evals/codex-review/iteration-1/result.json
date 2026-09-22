@@ -1,0 +1,41 @@
+{
+  "skill_name": "spec-code-review",
+  "schema_version": "v1alpha1",
+  "engine_name": "codex",
+  "model_name": "",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "codex",
+    "protocol": "openai"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "codex",
+    "protocol": "openai"
+  },
+  "observed_configuration": {
+    "version": "0.155.1"
+  },
+  "start_time": "2026-09-21T21:39:08.317815+08:00",
+  "end_time": "2026-09-21T21:44:08.381123+08:00",
+  "case_results": [
+    {
+      "case_id": "report-only-detects-tenant-bypass",
+      "title": "默认审查应发现跨租户授权绕过且保持只读",
+      "status": "ERROR",
+      "duration_ms": 299931,
+      "turns": 1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "agent execution failed: codex run failed: context deadline exceeded (case timeout 300s via cases.defaults.timeout_seconds)",
+      "grading": null,
+      "configuration": "with_skill",
+      "prompt": "这是一个隔离评测工作区。先运行 `bash prepare-review-fixture.sh` 建立 baseline commit 并应用待审查补丁；\n该命令仅用于准备评测环境，不属于审查修复。\n请使用 spec-code-review 审查当前工作区相对 base:HEAD 的改动。\n只需要审查报告，不要修改文件、提交、切换分支，也不要调用子代理或并行 reviewer。\n",
+      "response": "准备脚本已按要求启动，但在建立 baseline commit 时被环境权限阻断：`.git/index.lock` 无法创建（当前工作区对 `.git` 仅可读）。我会保留这个事实，继续做只读诊断，确认是否已有可用的 `base` 与补丁状态；不会绕过权限或修改仓库元数据。",
+      "observed_version": "0.155.1"
+    }
+  ],
+  "total_tokens": 0,
+  "judge_tokens": 0,
+  "overall_tokens": 0
+}

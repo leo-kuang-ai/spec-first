@@ -1,0 +1,24 @@
+{
+  "schema_version": "host-invocation-receipt/v1",
+  "host": "opencode",
+  "surface": "CLI",
+  "workflow": "spec-code-review",
+  "case_id": "report-only-detects-tenant-bypass",
+  "status": "passed",
+  "verdict": "Not ready",
+  "judge": "check-report-only-tenant-bypass.sh",
+  "judge_exit_code": 0,
+  "evidence": {
+    "events": "events.jsonl",
+    "report": "report.md",
+    "events_sha256": "f4179b79c6808a46562e8fe22f8c1b1d09bd37109fa5334170acff7012bc8afe",
+    "report_sha256": "8b6430bcc67314b79d89961489e43c2dfd2b67224f0931d7c8699456afadbdff",
+    "mutation_guard": "passed",
+    "fixture_workspace": "/tmp/spec-first-opencode-review-run.uEyieb"
+  },
+  "limitations": [
+    "host denied external temp artifact writes; receipt copied from raw JSON event payload",
+    "inline fallback; no independent reviewer dispatch"
+  ],
+  "captured_at": "2026-09-21T14:16:34.076168+00:00"
+}

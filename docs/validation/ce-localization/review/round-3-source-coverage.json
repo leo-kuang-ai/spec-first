@@ -4,12 +4,12 @@
   "producer": "scripts/check-ce-localization-review.cjs",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "626a8d73607dca29baba4369bdb80af8f9c83889",
+    "head": "09677f4ee3b09d0681b791af6715cc22ecd17a41",
     "dirty": false,
     "dirty_paths": [],
     "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "1b2f4c063b0cd5bb5a823f34b0b8b480cdceb53d4a681d295cdd41b03cb50fdc",
-    "inventory_hash": "86f85d9589e857bb30f9c38213e6631e57a20be97b024d36640a12ef618092ae",
+    "source_tree_hash": "e9e7d8f40eedf65068026e4c3c67d935107e03fb019730970effa117740052ad",
+    "inventory_hash": "6444494a603015ca0e68876b5cf5abb08fe43435cd6e38814e74aab9cbb5f668",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -44,17 +44,17 @@
     }
   },
   "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
-  "inventory_sha256": "e2cba2480900e543019190a68ce4092071c104bf5c2c5a473e9265a0fdb49fde",
+  "inventory_sha256": "ab58c0269b4a4ddb311f1a7c9a9a1cb1316e06cc65b46cb9aab59c1a4c00485e",
   "review_input": {
-    "inventory_sha256": "e2cba2480900e543019190a68ce4092071c104bf5c2c5a473e9265a0fdb49fde",
-    "package_manifest_sha256": "f1b696f48d10bff4f92b5385e7549e0d1e229350feac961b062bed56dd403506",
+    "inventory_sha256": "ab58c0269b4a4ddb311f1a7c9a9a1cb1316e06cc65b46cb9aab59c1a4c00485e",
+    "package_manifest_sha256": "8ff4f5ebf63b66e49b76f39a708c4bde9b76f17ee5b6017d37b0df3a4410aabb",
     "direct_support_manifest_sha256": "531c1e012c1c309c7d87157f26e3076b6253b8c1dee91bde55a28de6fc94c43b",
     "relation_manifest_sha256": "63a9e20072935fc9c5d5efc204f2bc83fd2af6db79c551695075c96d870b9a1e"
   },
   "coverage_summary": {
     "skill_count": 38,
-    "package_path_count": 1175,
-    "package_bytes": 6810909,
+    "package_path_count": 1179,
+    "package_bytes": 6813396,
     "direct_support_unique_path_count": 229,
     "direct_support_relation_count": 447,
     "excluded_path_count": 0,
@@ -1548,9 +1548,10 @@
       "skill_id": "spec-runtime-setup",
       "package_root": "skills/spec-runtime-setup",
       "entry_path": "skills/spec-runtime-setup/SKILL.md",
-      "package_path_count": 82,
+      "package_path_count": 86,
       "direct_support_path_count": 66,
       "package_paths": [
+        "skills/spec-runtime-setup/evals/cases/bare-invocation-fail-closed-on-unverified-surface.yaml",
         "skills/spec-runtime-setup/evals/cases/check-readonly.yaml",
         "skills/spec-runtime-setup/evals/cases/semantic-question-not-setup.yaml",
         "skills/spec-runtime-setup/evals/eval.yaml",
@@ -1558,6 +1559,9 @@
         "skills/spec-runtime-setup/evals/fixtures/repos/mini-ledger/package.json",
         "skills/spec-runtime-setup/evals/fixtures/repos/mini-ledger/README.md",
         "skills/spec-runtime-setup/evals/fixtures/repos/mini-ledger/src/server.js",
+        "skills/spec-runtime-setup/evals/fixtures/repos/setup-target/package.json",
+        "skills/spec-runtime-setup/evals/fixtures/repos/setup-target/README.md",
+        "skills/spec-runtime-setup/evals/fixtures/scripts/check-bare-mutation.sh",
         "skills/spec-runtime-setup/evals/fixtures/scripts/check-not-setup-scope.sh",
         "skills/spec-runtime-setup/evals/fixtures/scripts/check-readonly-verify.sh",
         "skills/spec-runtime-setup/evals/README.md",
@@ -12015,6 +12019,17 @@
       "terminal_disposition": "included-canonical-skill-source"
     },
     {
+      "path": "skills/spec-runtime-setup/evals/cases/bare-invocation-fail-closed-on-unverified-surface.yaml",
+      "sha256": "a118dfabc0839c5b0fe74210725147ece2e0e86fe456a5323b6fe1ff3c56e515",
+      "bytes": 1352,
+      "line_count": 34,
+      "skill_id": "spec-runtime-setup",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-canonical-skill-source"
+    },
+    {
       "path": "skills/spec-runtime-setup/evals/cases/check-readonly.yaml",
       "sha256": "a3487762e9a7f19a74011b711524685b3198885801aeec01185cbfc4fefd56c6",
       "bytes": 940,
@@ -12038,9 +12053,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/evals/eval.yaml",
-      "sha256": "7d599dd2d2c3050f398dc718ea8f7a941b0dc3096c4d09c4fa1dc858d944e444",
-      "bytes": 362,
-      "line_count": 24,
+      "sha256": "d4901e8e00c0e8d1b2dbc7cee9506671f3c9cf096ae835f954936ba86f092758",
+      "bytes": 435,
+      "line_count": 25,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "evaluation",
@@ -12089,6 +12104,39 @@
       "owning_skill": "spec-runtime-setup",
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-canonical-skill-source"
+    },
+    {
+      "path": "skills/spec-runtime-setup/evals/fixtures/repos/setup-target/package.json",
+      "sha256": "97d7e35aa9c3f8ee60adf529281a9b020b8b7ebec53848ff08785b254c0d6476",
+      "bytes": 64,
+      "line_count": 1,
+      "skill_id": "spec-runtime-setup",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-canonical-skill-source"
+    },
+    {
+      "path": "skills/spec-runtime-setup/evals/fixtures/repos/setup-target/README.md",
+      "sha256": "5e8235b1c37c7a684278f3bdd1938cd9fc4925fe243b240b81139c063947e3e8",
+      "bytes": 81,
+      "line_count": 3,
+      "skill_id": "spec-runtime-setup",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-canonical-skill-source"
+    },
+    {
+      "path": "skills/spec-runtime-setup/evals/fixtures/scripts/check-bare-mutation.sh",
+      "sha256": "8181a073772131ae130df78f25bd30e92a13336c78bbcd8ea9894309e5c01b78",
+      "bytes": 864,
+      "line_count": 23,
+      "skill_id": "spec-runtime-setup",
+      "owning_skill": "spec-runtime-setup",
+      "path_role": "deterministic-helper",
+      "evidence_role": "local-contract",
       "terminal_disposition": "included-canonical-skill-source"
     },
     {
@@ -13699,9 +13747,9 @@
     },
     {
       "path": "skills/spec-work/evals/cases/r2-reverse-mismatch.yaml",
-      "sha256": "9a2f79887d2a527aaa46fd4a35be136fbe86fd1b625c697fa044f5e8657fdd66",
-      "bytes": 887,
-      "line_count": 28,
+      "sha256": "9b2b80a2a0bed5ba42e41c8481db0420105ec5ff75aa881ccfda568bbd8ebf22",
+      "bytes": 940,
+      "line_count": 32,
       "skill_id": "spec-work",
       "owning_skill": "spec-work",
       "path_role": "evaluation",
