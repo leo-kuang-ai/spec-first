@@ -1,0 +1,34 @@
+id: bare-invocation-fail-closed-on-unverified-surface
+title: 非真实宿主表面上的裸调用必须 fail-closed 且零副作用
+description: |
+  验证 host authority fail-closed 门：skill-up 沙箱的 skill 加载面
+  不是真实宿主表面，bare mutation 调用应 blocked +
+  reason_code=host-invocation-surface-unverified + 结构化汇报，
+  且不产生任何 .spec-first/home 写入。
+  注：mutation 成功路径经此门验证为「沙箱结构性不可测」——安全门
+  恰恰阻止非真实表面的 mutation；成功路径需真实宿主 harness（记录于
+  测评方案附录 A）。
+
+input:
+  prompt: |
+    这是一个隔离评测工作区（spec-runtime-setup skill 已安装，请按它工作）。
+    环境准备说明（仅用于评测隔离，不属于被测行为）：本次运行请以
+    `HOME="$PWD/.eval-home"` 环境变量调用共置 setup 脚本，使所有
+    home 级写入落在工作区内。
+    请按 skill 对当前宿主执行 bare 调用（registry baseline，不带
+    --check/--plan），完成后汇报 readiness 结果。
+
+context:
+  repo_fixture: evals/fixtures/repos/setup-target
+  git:
+    init: true
+    checkout: main
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 25
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-bare-mutation.sh
+  timeout_seconds: 30

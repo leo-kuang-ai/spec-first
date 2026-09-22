@@ -214,3 +214,9 @@ T1/T2 红灯
 **验收用例集**：直接消费对抗库 §A6/B4/C3/C4/C6/D1 七场景。
 
 **预算**：设计核实 1h + 四 case 编写与首跑校准 3-4h；启用条件=前置安全核实通过 + 下一批次排期。
+
+**核实结论（2026-09-22 执行，status: verified-with-findings）**：
+1. 原样 gate **不通过**：bare mutation 默认写 `~/.<host>/spec-first/host-setup.json`（受控命名空间 + symlink 防护，但确在 home）；`configPathEnvironment` 会把子进程 `XDG_CONFIG_HOME` 指向 `~/.config`；默认 setup_required provider（codegraph/graphify）走真实网络安装。
+2. **HOME 重定向技术可用**（实测 `os.homedir()` 随 `HOME` 环境变量解析）——case 以 `HOME="$PWD/.eval-home"` 圈定全部 home 级写入。
+3. **结构性发现（重要）**：bare mutation 的**成功路径在 skill-up 沙箱不可测**——host-authority 表面校验正确地把沙箱 skill 加载面判为非真实宿主表面，返回 `blocked + host-invocation-surface-unverified + 零副作用`（eval 首跑实证，这本身是安全门的行为级正面证据）。成功路径需真实宿主 harness，归 field validation 轨道。
+4. **S1 已按此重构收口**：case 改为断言 fail-closed 契约（结构化 reason + 零 facts/ledger 写入），首跑 PASS。S2/S4 按方案 A/C + HOME 重定向技术继续可用。

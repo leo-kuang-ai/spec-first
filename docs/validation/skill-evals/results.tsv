@@ -87,3 +87,5 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-09-21T19:00	wt@36d19d95(dirty)	spec-work	-	-	blocked	env	r2-reverse/r2-open-ended-500 引擎健康时段复跑仍系统性超时;超时前 26 次工具调用为正常形态;恢复条件=低延迟引擎或拆轻变体	full_test
 2026-09-22T01:00	wt@96465787(post-baseline)	-	-	closeout	-	init 8 宿主完成,D 型 drift 消除;T0 38/38 首次全包绿灯;codex T2 探测 blocked-env(代理额度 403);工作经并发 baseline 提交入史(偏离已声明)	full_test
 2026-09-22T01:20	wt@00dd6273	-	-	baseline	-	对抗用例库 v1 沉淀(27 场景:7 已 eval 化,C2/B2/A3 列下批首位);S1-S4 有界安装设计立项稿入方案附录 A;r2-reverse 校准 900s 后第 5 次超时,与 r2-open-ended-500 同定为超出当前引擎能力	full_test
+2026-09-22T09:40	wt@00dd6273(dirty:s1)	spec-runtime-setup	-	-	baseline	dim8	S1 首建:原设计断言 mutation 产物,首跑实证 host-authority 把沙箱表面正确 blocked(零副作用)→重构为 fail-closed 契约 case 后 PASS;mutation 成功路径判定沙箱结构性不可测,归 field 轨道;HOME 重定向技术入附录 A
+full_test							

@@ -14,6 +14,7 @@ cases:
   files:
     - evals/cases/check-readonly.yaml
     - evals/cases/semantic-question-not-setup.yaml
+    - evals/cases/bare-invocation-fail-closed-on-unverified-surface.yaml
   defaults:
     timeout_seconds: 600
     max_turns: 20
