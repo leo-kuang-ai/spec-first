@@ -5,12 +5,12 @@
   "single_writer": "ce-localization-baseline-writer",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "09677f4ee3b09d0681b791af6715cc22ecd17a41",
+    "head": "aa40c0f3c16beaa06e492702ff68d6d4c8953271",
     "dirty": false,
     "dirty_paths": [],
     "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "e9e7d8f40eedf65068026e4c3c67d935107e03fb019730970effa117740052ad",
-    "inventory_hash": "6444494a603015ca0e68876b5cf5abb08fe43435cd6e38814e74aab9cbb5f668",
+    "source_tree_hash": "223d4b203bceb0ab828a0942ee7d7b3d9b4e9161ba87e7709c89880fc9293962",
+    "inventory_hash": "d39848f1ef49a8a8f87978eee9a971b0ecec1c768b519fd9693b6d63d20ae0fe",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -45,7 +45,7 @@
     }
   },
   "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
-  "inventory_sha256": "ab58c0269b4a4ddb311f1a7c9a9a1cb1316e06cc65b46cb9aab59c1a4c00485e",
+  "inventory_sha256": "b2611ecde0dc0d7aa15e599e8650f0739ff902d0b414d95d5b131d7d56f7b74d",
   "skill_id": "spec-pov",
   "source_refs": [
     "skills/spec-pov/evals/cases/design-question-not-verdict.yaml",
@@ -85,12 +85,12 @@
   ],
   "candidate_snapshot": {
     "repository": "spec-first",
-    "head": "09677f4ee3b09d0681b791af6715cc22ecd17a41",
+    "head": "aa40c0f3c16beaa06e492702ff68d6d4c8953271",
     "dirty": false,
     "dirty_paths": [],
     "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "e9e7d8f40eedf65068026e4c3c67d935107e03fb019730970effa117740052ad",
-    "inventory_hash": "6444494a603015ca0e68876b5cf5abb08fe43435cd6e38814e74aab9cbb5f668",
+    "source_tree_hash": "223d4b203bceb0ab828a0942ee7d7b3d9b4e9161ba87e7709c89880fc9293962",
+    "inventory_hash": "d39848f1ef49a8a8f87978eee9a971b0ecec1c768b519fd9693b6d63d20ae0fe",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",

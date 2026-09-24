@@ -1,0 +1,17 @@
+{
+  "records": 517,
+  "source_refs_checked": 1011,
+  "missing_source_refs": [
+    [
+      "docs/residual-review-findings/feat-ce-explain-skill.md",
+      "docs/residual-review-findings/feat-ce-explain-skill.md"
+    ],
+    [
+      "tests/skills/ce-work-unit-workspace.test.ts",
+      "tests/skills/ce-work-unit-workspace.test.ts"
+    ]
+  ],
+  "missing_test_refs": [],
+  "missing_owner_refs": [],
+  "upstream_head": "956087b3e1dd7ccc03df32cee9e7c044dfbe75cf"
+}

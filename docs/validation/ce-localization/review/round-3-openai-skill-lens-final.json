@@ -8,16 +8,16 @@
   "provider_identity": "unverified",
   "provider_receipt_ref": null,
   "worker_context_isolation": "degraded_inherited",
-  "generated_at": "2026-09-22T00:00:00.000Z",
+  "generated_at": "2026-09-24T00:00:00.000Z",
   "producer": "role-simulated OpenAI skill-engineering lens using current local source only",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "09677f4ee3b09d0681b791af6715cc22ecd17a41",
+    "head": "aa40c0f3c16beaa06e492702ff68d6d4c8953271",
     "dirty": false,
     "dirty_paths": [],
     "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "e9e7d8f40eedf65068026e4c3c67d935107e03fb019730970effa117740052ad",
-    "inventory_hash": "6444494a603015ca0e68876b5cf5abb08fe43435cd6e38814e74aab9cbb5f668",
+    "source_tree_hash": "223d4b203bceb0ab828a0942ee7d7b3d9b4e9161ba87e7709c89880fc9293962",
+    "inventory_hash": "d39848f1ef49a8a8f87978eee9a971b0ecec1c768b519fd9693b6d63d20ae0fe",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -51,8 +51,8 @@
       "version": "canonical-source-manifest-v1"
     }
   },
-  "inventory_hash": "6444494a603015ca0e68876b5cf5abb08fe43435cd6e38814e74aab9cbb5f668",
-  "inventory_artifact_sha256": "ab58c0269b4a4ddb311f1a7c9a9a1cb1316e06cc65b46cb9aab59c1a4c00485e",
+  "inventory_hash": "d39848f1ef49a8a8f87978eee9a971b0ecec1c768b519fd9693b6d63d20ae0fe",
+  "inventory_artifact_sha256": "b2611ecde0dc0d7aa15e599e8650f0739ff902d0b414d95d5b131d7d56f7b74d",
   "input_artifacts": [
     {
       "path": "docs/validation/ce-localization/skill-inventory.json",
@@ -79,9 +79,9 @@
     "dirty_path_manifest_sha256": "4c0c78000acf7fae68fdff3eb8e523956af2a2fbb9bb6d48b6a9c4996283fee8",
     "inventory_hash": "7897d3b4a38f689cfa2e44bf66e511544710579472825938473b32495bbe1021"
   },
-  "review_input_hash": "459efeff7960e476ef33d0d94430ed005405b608a16535cf344a7bc9e4c207f8",
+  "review_input_hash": "19ca015d1d7d78729f2d5ccad4aa1766ed8c3feaf4b1427983ae43ea2d68496a",
   "review_input_hash_algorithm": "sha256(JSON.stringify(coverage.review_input, null, 2) + newline)",
-  "chunk_manifest_hash": "35eae6c3b964246e0fd134bfb4b5b1fd2b993e7df9dd5ed25a19d5211ae704ee",
+  "chunk_manifest_hash": "5c8e876e18ae89c55682fe94086f6169257fdd219ec9c69268e9a850e310b347",
   "chunk_manifest": [
     {
       "chunk_id": "oai-r3-final-001",
@@ -25793,17 +25793,17 @@
           "source_kind": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "8181a073772131ae130df78f25bd30e92a13336c78bbcd8ea9894309e5c01b78",
-          "bytes": 864,
-          "line_count": 23,
+          "sha256": "35c00a05c4c0202133e04f225d8aeb4e57c63d09b0f19679642c2356a0c687ab",
+          "bytes": 1278,
+          "line_count": 36,
           "covered_line_ranges": [
             [
               1,
-              23
+              36
             ]
           ],
           "review_chunk_ids": [
-            "ce-current-20260922-r1-openai-skill-engineering-8181a0737721"
+            "ce-current-20260924-r1-openai-skill-engineering-35c00a05c4c0"
           ],
           "read_status": "full"
         },
@@ -25852,17 +25852,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "3fa14bbff07035ebd111403be38fa81208c5ab93079e1f03e372c41236532d81",
-          "bytes": 761,
-          "line_count": 8,
+          "sha256": "3046424d7535eb87bc570cd0e3876402850e7ac7f077956bea5fe32e93f135ee",
+          "bytes": 1189,
+          "line_count": 9,
           "covered_line_ranges": [
             [
               1,
-              8
+              9
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-fsa2-repair-2026-09-15-openai-skill-engineering-3fa14bbff070"
+            "ce-current-20260924-r1-openai-skill-engineering-3046424d7535"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -28413,17 +28413,17 @@
           "source_kind": "direct-support",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "1c7cbdddb6ee2411785873e5fdf7f0fd93a6fad0c1761d5f48cc188f9554cd13",
-          "bytes": 2012,
-          "line_count": 47,
+          "sha256": "ae23c6f89587097e1c1c1e68712f510fa2f3151e865916d4ead3d8e23fd47c08",
+          "bytes": 3676,
+          "line_count": 92,
           "covered_line_ranges": [
             [
               1,
-              47
+              92
             ]
           ],
           "review_chunk_ids": [
-            "ce-localization-fsa2-repair-2026-09-15-openai-skill-engineering-1c7cbdddb6ee"
+            "ce-current-20260924-r1-openai-skill-engineering-ae23c6f89587"
           ],
           "read_status": "full"
         },
@@ -35157,7 +35157,9 @@
     "仅收口报告/日志更新后重绑，7个源码/测试的既有增量裁决未改变；不重复宣称语义重审。",
     "本轮覆盖当前两条审查 lane 的全部 changed/missing/retired relations；每条关系均回读当前文件或确认退役。",
     "本轮没有独立 provider/隔离 worker；真实宿主、模型任务和 field outcome 另行记录。",
-    "本 delta 仅覆盖当前 source receipt 的增量重读，不证明独立 provider、真实宿主或 field outcome。"
+    "本 delta 仅覆盖当前 source receipt 的增量重读，不证明独立 provider、真实宿主或 field outcome。",
+    "本 delta 对当前 source receipt 做 fresh-source 增量复核；两个 lens 仍由同一 owner 执行，不宣称独立 provider。",
+    "真实模型/宿主 workflow 与 field outcome 不由该 delta 证明。"
   ],
   "consumers": [
     "docs/validation/ce-localization/review/round-3-findings.json aggregate owner",
@@ -36503,10 +36505,10 @@
   },
   "review_deltas": [
     {
-      "review_run_id": "ce-current-20260922-r1",
-      "artifact_ref": "docs/validation/ce-localization/review/deltas/2026-09-22-current-source-r1.json",
-      "artifact_sha256": "59f0d2b37415eb09f073e6c97005458f5714af90fee07d36a9a6905a348cc831",
-      "reviewed_at": "2026-09-22T00:00:00.000Z",
+      "review_run_id": "ce-current-20260924-r1",
+      "artifact_ref": "docs/validation/ce-localization/review/deltas/2026-09-24-current-source-r1.json",
+      "artifact_sha256": "8380288c0305063cdc9228a39700d87d05662035b15689689ff36e4149324bed",
+      "reviewed_at": "2026-09-24T00:00:00.000Z",
       "review_method": "inline-same-context",
       "independent": false,
       "provider_identity": "unverified",

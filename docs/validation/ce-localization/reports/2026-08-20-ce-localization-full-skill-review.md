@@ -1,10 +1,10 @@
 # CE 本地化与全量 Skill 第三轮审查报告
 
-> 本报告绑定当前 target source snapshot：`source_tree_hash=e9e7d8f40eedf65068026e4c3c67d935107e03fb019730970effa117740052ad`、`dirty_path_manifest_sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`。当前 closeout 以 deterministic validator 为准；provider、runtime adoption 和 field outcome 仍受本报告 Claim Ceiling 限制。
+> 本报告绑定当前 target source snapshot：`source_tree_hash=223d4b203bceb0ab828a0942ee7d7b3d9b4e9161ba87e7709c89880fc9293962`、`dirty_path_manifest_sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`。当前 closeout 以 deterministic validator 为准；provider、runtime adoption 和 field outcome 仍受本报告 Claim Ceiling 限制。
 
 ## 结论
 
-当前不能进入“全部 Skill 已改善”或“CE 集成已完成”的声明。第三轮已完成当前工作树的全量 source packet coverage：38 个 canonical Skill、1179 个 package path、6,813,396 bytes，文件缺失 0、inventory hash/byte mismatch 0；另有 447 条 direct-support relations、229 个 unique direct-support paths。两个角色 lane 均为内部模拟视角，`role-simulated/provider_unverified/degraded_inherited`，不是 OpenAI 或 Anthropic 公司审查，也没有真实跨模型独立性证明。
+当前不能进入“全部 Skill 已改善”或“CE 集成已完成”的声明。第三轮已完成当前工作树的全量 source packet coverage：38 个 canonical Skill、1179 个 package path、6,814,238 bytes，文件缺失 0、inventory hash/byte mismatch 0；另有 447 条 direct-support relations、229 个 unique direct-support paths。两个角色 lane 均为内部模拟视角，`role-simulated/provider_unverified/degraded_inherited`，不是 OpenAI 或 Anthropic 公司审查，也没有真实跨模型独立性证明。
 
 语义审查产物显示：当前聚合包含 13 个已完成 source-contract closure 的 P1/P2 历史 finding，以及 2 个 OpenAI lane 的 P3 `defer-pending-measurement`。`spec-ideate` 与 `spec-sweep` 的本轮 source 修复已由 Anthropic lane 回源确认并关闭；P3 只在取得 paired token/latency/quality 数据后重评。Round 3 的最高 claim 是“当前源码合同与审查范围可追溯”，不是现场价值或真实 provider 结果。
 
@@ -12,15 +12,15 @@
 
 | 维度 | 结果 |
 |---|---|
-| target HEAD | `09677f4ee3b09d0681b791af6715cc22ecd17a41` |
+| target HEAD | `aa40c0f3c16beaa06e492702ff68d6d4c8953271` |
 | canonical Skill | 38/38 |
 | package path | 1179/1179 |
-| package bytes | 6,813,396 |
+| package bytes | 6,814,238 |
 | package missing/hash mismatch | 0/0 |
 | direct-support relations | 447 |
 | unique direct-support paths | 229 |
-| source-tree hash | `e9e7d8f40eedf65068026e4c3c67d935107e03fb019730970effa117740052ad`，见 inventory/coverage artifact |
-| inventory hash | `6444494a603015ca0e68876b5cf5abb08fe43435cd6e38814e74aab9cbb5f668`，见 inventory snapshot |
+| source-tree hash | `223d4b203bceb0ab828a0942ee7d7b3d9b4e9161ba87e7709c89880fc9293962`，见 inventory/coverage artifact |
+| inventory hash | `d39848f1ef49a8a8f87978eee9a971b0ecec1c768b519fd9693b6d63d20ae0fe`，见 inventory snapshot |
 | dirty manifest | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`，计算时排除 `docs/validation/ce-localization/**` derived artifacts |
 | excluded | `skills/autoresearch` tracked symlink，host-owned/local-only，不计入 36 |
 

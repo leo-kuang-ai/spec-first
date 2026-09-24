@@ -1,9 +1,9 @@
 {
   "schema_version": "spec-first-current-skill-package-inventory/v2",
-  "source_head": "09677f4ee3b09d0681b791af6715cc22ecd17a41",
-  "skills_tree_oid": "ff5caf8554418ef11ebb15b8cd61819b2bc54e6c",
+  "source_head": "aa40c0f3c16beaa06e492702ff68d6d4c8953271",
+  "skills_tree_oid": "46e662c57764f8df8067dcfa993c80809893f8ce",
   "source_mode": "working-tree",
-  "manifest_sha256": "8245cbd24d90454a30cb1e5199efe7cb2db559d5c625d101078415f862ea87ae",
+  "manifest_sha256": "08a353ad0901aaaf5e3590418bd4f818e9a4f804963513f5ab090c43e1497bc5",
   "skill_count": 38,
   "file_count": 1186,
   "per_skill_counts": {
@@ -6470,8 +6470,8 @@
       "path": "skills/spec-runtime-setup/evals/fixtures/scripts/check-bare-mutation.sh",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 864,
-      "sha256": "8181a073772131ae130df78f25bd30e92a13336c78bbcd8ea9894309e5c01b78"
+      "bytes": 1278,
+      "sha256": "35c00a05c4c0202133e04f225d8aeb4e57c63d09b0f19679642c2356a0c687ab"
     },
     {
       "path": "skills/spec-runtime-setup/evals/fixtures/scripts/check-not-setup-scope.sh",
@@ -6491,8 +6491,8 @@
       "path": "skills/spec-runtime-setup/evals/README.md",
       "skill": "spec-runtime-setup",
       "owner_role": "evaluation",
-      "bytes": 761,
-      "sha256": "3fa14bbff07035ebd111403be38fa81208c5ab93079e1f03e372c41236532d81"
+      "bytes": 1189,
+      "sha256": "3046424d7535eb87bc570cd0e3876402850e7ac7f077956bea5fe32e93f135ee"
     },
     {
       "path": "skills/spec-runtime-setup/references/config-template.yaml",

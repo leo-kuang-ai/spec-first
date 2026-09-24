@@ -4,12 +4,12 @@
   "producer": "scripts/check-ce-localization-review.cjs",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "09677f4ee3b09d0681b791af6715cc22ecd17a41",
+    "head": "aa40c0f3c16beaa06e492702ff68d6d4c8953271",
     "dirty": false,
     "dirty_paths": [],
     "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "e9e7d8f40eedf65068026e4c3c67d935107e03fb019730970effa117740052ad",
-    "inventory_hash": "6444494a603015ca0e68876b5cf5abb08fe43435cd6e38814e74aab9cbb5f668",
+    "source_tree_hash": "223d4b203bceb0ab828a0942ee7d7b3d9b4e9161ba87e7709c89880fc9293962",
+    "inventory_hash": "d39848f1ef49a8a8f87978eee9a971b0ecec1c768b519fd9693b6d63d20ae0fe",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -44,17 +44,17 @@
     }
   },
   "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
-  "inventory_sha256": "ab58c0269b4a4ddb311f1a7c9a9a1cb1316e06cc65b46cb9aab59c1a4c00485e",
+  "inventory_sha256": "b2611ecde0dc0d7aa15e599e8650f0739ff902d0b414d95d5b131d7d56f7b74d",
   "review_input": {
-    "inventory_sha256": "ab58c0269b4a4ddb311f1a7c9a9a1cb1316e06cc65b46cb9aab59c1a4c00485e",
-    "package_manifest_sha256": "8ff4f5ebf63b66e49b76f39a708c4bde9b76f17ee5b6017d37b0df3a4410aabb",
-    "direct_support_manifest_sha256": "531c1e012c1c309c7d87157f26e3076b6253b8c1dee91bde55a28de6fc94c43b",
-    "relation_manifest_sha256": "63a9e20072935fc9c5d5efc204f2bc83fd2af6db79c551695075c96d870b9a1e"
+    "inventory_sha256": "b2611ecde0dc0d7aa15e599e8650f0739ff902d0b414d95d5b131d7d56f7b74d",
+    "package_manifest_sha256": "f2958b51686e563a45629ae741a78746c1691913508b74dc0abe494c1129bff8",
+    "direct_support_manifest_sha256": "731fdbab65ec1fac8caa0d897ce824faddaf611bd76c2ab5f9adfb008e065867",
+    "relation_manifest_sha256": "502d461608b8bc034c024291df664e44f5291aea839e59a2469483a366b1c4ea"
   },
   "coverage_summary": {
     "skill_count": 38,
     "package_path_count": 1179,
-    "package_bytes": 6813396,
+    "package_bytes": 6814238,
     "direct_support_unique_path_count": 229,
     "direct_support_relation_count": 447,
     "excluded_path_count": 0,
@@ -12130,9 +12130,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/evals/fixtures/scripts/check-bare-mutation.sh",
-      "sha256": "8181a073772131ae130df78f25bd30e92a13336c78bbcd8ea9894309e5c01b78",
-      "bytes": 864,
-      "line_count": 23,
+      "sha256": "35c00a05c4c0202133e04f225d8aeb4e57c63d09b0f19679642c2356a0c687ab",
+      "bytes": 1278,
+      "line_count": 36,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "deterministic-helper",
@@ -12163,9 +12163,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/evals/README.md",
-      "sha256": "3fa14bbff07035ebd111403be38fa81208c5ab93079e1f03e372c41236532d81",
-      "bytes": 761,
-      "line_count": 8,
+      "sha256": "3046424d7535eb87bc570cd0e3876402850e7ac7f077956bea5fe32e93f135ee",
+      "bytes": 1189,
+      "line_count": 9,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "evaluation",
@@ -22125,9 +22125,9 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "tests/unit/runtime-setup-eval-judge.test.js",
-      "sha256": "1c7cbdddb6ee2411785873e5fdf7f0fd93a6fad0c1761d5f48cc188f9554cd13",
-      "bytes": 2012,
-      "line_count": 47,
+      "sha256": "ae23c6f89587097e1c1c1e68712f510fa2f3151e865916d4ead3d8e23fd47c08",
+      "bytes": 3676,
+      "line_count": 92,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
