@@ -1,0 +1,26 @@
+{
+  "record_type": "skill-directory-architecture-inventory",
+  "captured_at": "2026-09-24",
+  "scope": "canonical skills/* excluding *-workspace and generated mirrors",
+  "skill_count": 38,
+  "invariants": {
+    "all_have_skill_md": true,
+    "all_have_evals": true,
+    "with_references": 36,
+    "with_scripts": 23,
+    "with_agents": 3,
+    "with_assets": 3,
+    "broken_relative_markdown_links": 0
+  },
+  "classification_rule": "D >= 30000 bytes; C >= 15000 bytes or >= 5 top-level dirs; B no references; otherwise A",
+  "classes": {
+    "D-高密度待优化": ["spec-debug", "spec-prd", "spec-runtime-setup"],
+    "C-复杂但结构可解释": ["autoresearch", "spec-app-consistency-audit", "spec-compound-refresh", "spec-doc-review", "spec-optimize", "spec-plan", "spec-work", "spec-write-skill", "spec-write-tasks"],
+    "B-轻量无引用": ["spec-commit", "spec-simplify-code", "spec-worktree"],
+    "A-标准模块化或轻量专用": ["spec-brainstorm", "spec-code-review", "spec-commit-push-pr", "spec-compound", "spec-dogfood", "spec-explain", "spec-handoff", "spec-ideate", "spec-lfg", "spec-polish", "spec-pov", "spec-product-pulse", "spec-project-rules", "spec-promote", "spec-prototype", "spec-resolve-pr-feedback", "spec-riffrec-feedback-analysis", "spec-rule-miner", "spec-strategy", "spec-sweep", "spec-test-browser", "spec-test-xcode", "using-spec-first"]
+  },
+  "limitations": [
+    "Structural inventory only; it does not prove runtime load order, semantic adequacy, or model-token cost.",
+    "Directory names and reference presence are advisory signals; specialized packages require semantic review."
+  ]
+}

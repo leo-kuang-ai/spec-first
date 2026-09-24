@@ -1,4 +1,8 @@
 # Changelog
+- v1.15.3 2026-09-24 17:19:37 tester: docs(plan): 将 Skill Prompt 优化方案调整为质量优先、成本第二；新增四层能力基线、质量硬门、非劣效与 reject/rollback 规则，禁止用 token 收益抵消关键回归。 (user-visible)
+- v1.15.3 2026-09-24 tester: docs(plan): 补充 38 个 Skill 的目录结构、架构清晰度与下一阶段审查优先级；新增结构 inventory，区分轻量包、复杂专用包与高密度待测入口，未修改 Skill/runtime。 (user-visible)
+- v1.15.3 2026-09-24 12:06:07 tester: docs(plan): 新增 Skill Prompt 长度与最新模型适配方案、38 个 Skill 源码基线及三轮 Codex/Claude 工程视角讨论；以 spec-plan 重复读取试点、行为保护和实际成本评测为下一阶段范围，未实施 Skill 或 runtime 变更。 (user-visible)
+- v1.15.3 2026-09-24 codex: docs(research): 更新最新 Codex/Claude 模型定位、官方 Prompt 最佳实践、型号差异与跨模型模板；保留官方来源和版本可变边界，不涉及 runtime 变更。 (user-visible)
 - v1.15.3 2026-09-24 10:40:32 codex: docs(research): 新增 AI Agent 趋势、Claude 官方提示词方法与 Prompt 缩减原因调研，注明来源及未做版本长度对比的证据边界；不涉及 runtime 变更。 (user-visible)
 - v1.15.3 2026-09-22 继续: fix(evals): 加固 spec-runtime-setup S1 裸调用 fail-closed Judge——要求 blocked 退出码与完整 host-invocation-surface-unverified reason，补齐 facts、ledger、host config 和符号链接零副作用哨兵及 26 项本地校准测试；仍明确不把沙箱拒绝外推为真实宿主 mutation 或现场收益。(user-visible)
 - v1.15.3 2026-09-22 09:45:00 zcode: test(evals): S1 前置安全核实与首个裸调用 case 收口——核实判定原 gate 不通过（默认写 ~/.<host>/spec-first/host-setup.json、XDG_CONFIG_HOME 指向 ~/.config、默认 provider 真实网络安装），实测确立 HOME 重定向圈定技术；首跑实证 host-authority 表面校验把 skill-up 沙箱正确 blocked（host-invocation-surface-unverified + 零副作用），据此把 S1 重构为 fail-closed 契约 case 并 PASS，mutation 成功路径判定为沙箱结构性不可测、归真实宿主 harness 轨道。B 型累计 13/19 绿灯。附录 A 更新为 verified-with-findings。 (user-visible)

@@ -375,19 +375,98 @@ Agent 执行几十分钟或数小时后，固定 Prompt 的相对作用会下降
 
 > Prompt 变短后，不能把丢失的约束伪装成模型“应该自己知道”。被删除的内容必须有明确的替代承载机制，或者经过评测证明它确实不会改变行为。
 
+## 七、最新模型与官方 Prompt 最佳实践（2026-09-24）
+
+### 最新模型定位
+
+官方文档当前将 Codex 的模型选择分为三档：GPT-6 Astra 用于最复杂的端到端工作，GPT-6 Sol 用于日常与复杂编码，GPT-6 Luna 用于明确、重复和高吞吐任务。Claude 文档建议大多数任务从 Claude Opus 5.5 开始；高难推理和长时 Agent 任务可评估 Claude Fable 5.1，速度和能力平衡可选择 Claude Sonnet 5。具体可用性仍取决于账户、客户端和 rollout。
+
+### Codex / GPT-6 官方建议
+
+OpenAI 官方 Prompt 指南的核心字段是：
+
+- **Goal**：要完成什么结果。
+- **Context**：哪些来源和背景会改变结果。
+- **Output**：格式、长度和受众。
+- **Boundaries**：哪些内容保持不变、哪些动作要避免或先确认。
+
+官方还建议从结果出发，不为模型规定每一步；对 Astra 要明确任务完成责任、授权范围和合理假设边界。Astra 更容易在信息不足时提问，因此可写明：已授权且可逆的常规工作直接推进，只有会实质改变结果或授权范围的信息缺失时才提问。
+
+模型适配建议：
+
+- 默认从较低 reasoning effort 开始，只有任务确实需要更深规划或检查时再提高。
+- 审查 `AGENTS.md`、Skills 和其他输入文件中的冲突指令；新模型会更敏感地执行这些内容。
+- 对编码任务明确完成条件和必要验证，但不要因为小改动而无条件扩大测试范围。
+- 需要多 Agent 时明确可并行的边界和委派条件，不把委派当成所有任务的默认动作。
+
+### Claude 官方建议
+
+Claude 的通用指南建议：
+
+- 清楚、直接地描述目标、输出格式和约束。
+- 解释重要约束背后的原因，帮助模型泛化。
+- 使用约 3–5 个相关、多样的例子来固定格式或判断标准。
+- 用 XML 标签或 Markdown 标题区分指令、背景、输入和样例。
+- 长文档放在前面，问题和指令放在后面；必要时先要求引用相关原文再分析。
+
+型号差异需要单独校准：
+
+- **Claude Opus 5.5**：长任务可能以文字进度汇报结束一个 turn。Agent loop 不能把文字汇报直接当作任务完成，应检查清单、后台任务和剩余阻塞。
+- **Claude Fable 5.1**：长工具链中的用户可见进度更新可能比上一代少；需要时明确要求进度。独立工具调用可提示模型批量请求，以减少轮次和延迟。
+- **Claude Fable 5.1**：低 effort 下可能更少主动检索；对时效性事实应明确要求搜索或使用检索工具。长任务压缩时应规定要保留的约束、决策和精确细节。
+- **Claude Opus 5.5**：迁移旧版“关闭 thinking”集成时，不应让模型在最终文本中复述内部推理；应使用官方支持的 summarized thinking 或相应 API 字段。
+
+### 推荐的跨模型 Prompt 方案
+
+以下是根据两家官方资料整理的可复用模板，不是任何厂商的隐藏 system prompt：
+
+```text
+目标：
+完成【具体任务】，交付【代码/文档/分析结果】。
+
+上下文：
+以【文件、源码、官方文档】为依据。
+项目特有事实：【模型无法从代码直接推断的关键事实】。
+
+范围与边界：
+允许修改【范围】。
+保持【必须不变的内容】。
+涉及外部写入、发布或不可逆动作时，先准备可审查结果，再请求新增授权。
+
+执行：
+自行决定方法和必要步骤，持续推进到交付完成。
+已授权的常规、可逆工作采用合理默认，不停在计划或阶段总结。
+只有缺失信息会实质改变结果或授权范围时才提问。
+
+验收：
+满足【可观察的成功条件】。
+运行与改动风险匹配的必要检查，并报告命令和结果。
+
+输出：
+使用【语言、格式、受众和长度】。
+最终说明已完成内容、验证证据和未完成项。
+```
+
+先用这份最小充分模板建立任务基线，再针对真实失败增加一条模型适配指令。不要把厂商指南中的所有示例原样拼进每次请求。
+
 ## 参考资料
 
 1. Anthropic, [Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
 2. Anthropic, [Building effective agents](https://www.anthropic.com/research/building-effective-agents)
 3. Claude Code, [Best practices](https://code.claude.com/docs/en/best-practices)
 4. Anthropic, [Prompt engineering overview](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview)
+5. OpenAI, [GPT-6 Prompt guidance](https://developers.openai.com/api/docs/guides/prompt-guidance)
+6. OpenAI, [Codex models](https://developers.openai.com/codex/models)
+7. Anthropic, [Claude models overview](https://platform.claude.com/docs/en/about-claude/models/overview)
+8. Anthropic, [Claude prompting best practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)
+9. Anthropic, [Prompting Claude Opus 5.5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5)
+10. Anthropic, [Prompting Claude Fable 5.1](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1)
 
 
 ## 证据限制
 
-- 本文使用 Anthropic 官方公开资料；官方文档页面部分内容会随产品版本更新。
+- 本文使用 OpenAI 和 Anthropic 官方公开资料；官方文档页面、模型名称、可用性和行为说明会随产品版本更新。
 - 本次未核验完整产品指令栈；公开提示词片段不能代表工具定义、动态注入和全部运行时指令。
 - 参考资料 1—3 已读取正文；资料 4 仅保留官方入口，本次抓取只返回 Cookie 提示，不作为正文结论证据。
 - 趋势分析以 Anthropic 的 Agent 工程资料为主，不代表对整个 AI 行业的完整调查。模型能力提升、成本与延迟是机制解释；具体缩减收益仍需实测，缓存和检索开销可能改变结果。
 - “Prompt 变短后效果更好”需要按具体任务、模型版本和上下文配置进行实测，本文给出的是官方方法与行业趋势，不是所有任务的普遍性能定律。
-
