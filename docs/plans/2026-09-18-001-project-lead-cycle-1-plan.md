@@ -3,13 +3,14 @@ artifact_type: advisory
 title: 项目负责人周期 1 - 证据缺口闭合与计划语料一致性
 type: execution-plan
 date: 2026-09-18
-status: active
+status: completed
 execution: knowledge-work
 ---
 
 # 项目负责人周期 1 - 证据缺口闭合与计划语料一致性
 
 > 本周期不新增能力。目标是把「声明与证据之间的距离」收窄，并修掉会说谎的现状描述。
+> 收口决定（2026-09-24）：按项目负责人用户裁决，本周期方案标记为 `completed`。这表示计划范围内的文档、审查、修复与本地回归已收口；外部 GUI、账号、真实参与者、真实模型和现场收益验证仍保留为后续人工验证，不提升为本周期已验证结果。
 > 依据：[`项目负责人工作契约.md`](../10-prompt/项目负责人工作契约.md) §2.3 的优先级裁决顺序。
 
 ---
@@ -232,7 +233,7 @@ owner 要求项目负责人交付八项产物。本计划是它们的**路线图
 - 涉及 source 的改动：最窄聚焦套件 + `npm run test:unit`。
 - 涉及共享引用的改动：`npm run check:shared-references`。
 
-**收口要求**（对应工作契约 §5）：每批结束时写全「已完成 / 未完成 / 为什么 / 重估触发条件」四项。整体周期不以中间产物关闭；B2 未完成前，本周期不标记 complete。
+**收口要求**（对应工作契约 §5）：每批结束时写全「已完成 / 未完成 / 为什么 / 重估触发条件」四项。本周期已按用户裁决收口为 `completed`；该生命周期状态只表示本计划范围的执行已结束，不等于所有外部验证通过。未运行的真实宿主、模型、GUI、账号、参与者与现场收益项目必须继续保留 `not-run` / `blocked` 及原因，并移交 §6 的后续人工验证 backlog。
 
 ---
 
@@ -266,7 +267,7 @@ owner 要求项目负责人交付八项产物。本计划是它们的**路线图
 
 2026-09-18 的历史单元结果为 238 suites / 2968 tests 通过；2026-09-20 已执行 typecheck 265 files、skill entrypoint lint 491 files。最终证据文件另记本轮准确 command、exit、hash 与限制。无被审产品源码改动，不为此次 docs-only 变更重跑完整模型或全部宿主链路。
 
-**整体仍为 `partial` / `active`。** 本轮文档与有界审查产物已交付，未闭合依赖、真实宿主/模型/现场结果不被局部产物覆盖；8 项代码/合同修复另见下节。最终校验与范围见执行证据及 `final-checks.json`；冻结工作树的 1654 文件无漂移，主仓存在一处已披露的 LF/CRLF 差异。本次不提交、不推送、不发布。
+**本计划现标记为 `completed`（按 2026-09-24 用户裁决）。** 本轮文档、有界审查产物、授权修复和本地回归已交付；未闭合依赖、真实宿主/模型/现场结果不被局部产物覆盖，继续以 `not-run` / `blocked` 记录并移交后续人工验证 backlog。8 项代码/合同修复另见下节。最终校验与范围见执行证据及 `final-checks.json`；冻结工作树的 1654 文件无漂移，主仓存在一处已披露的 LF/CRLF 差异。
 
 
 ### 后续授权修复阶段（2026-09-21）
@@ -275,8 +276,8 @@ owner 要求项目负责人交付八项产物。本计划是它们的**路线图
 
 已按问题顺序完成 8 项源码/合同修复、反例与定向验证，并处理 fresh-source 复核发现的两处相关缺口。当前状态以 [finding-ledger](../validation/project-lead-cycle-1/u9/finding-ledger.json) 与 [修复报告](../validation/project-lead-cycle-1/repairs/2026-09-21-repair-report.md) 为准。第 7 项选择保留父目录 bare 只读诊断并纠正文案；第 8 项保持单项目 bare 完整 artifact baseline、普通 plan/verify 默认 installation 的既有产品行为，通过共享执行建议保持计划范围。
 
-本次源码修复完成不改变周期整体 `partial` / `active`，不升级原包级 receipts、宿主 loader/invocation、模型、field 或 comparator 证据。
+本次源码修复完成后，按用户 2026-09-24 裁决将周期方案收口为 `completed`；这不升级原包级 receipts、宿主 loader/invocation、模型、field 或 comparator 证据。
 
 修复阶段最终广域回归仍为 `degraded`：CE 清单/旧审查快照两个 unit 失败，全仓另有其他任务 TSV whitespace；定向修复通过不豁免这些检查。smoke 与 integration 已在主链 unit 阻断后独立完成，详见修复报告。
 
-后续收口更新：上述回归残留已在用户继续授权后修复，完整 npm test 3088 通过 / 2 条件跳过，全仓 whitespace 通过。CE 历史完整性与 current claim 已分层，current binding 仍 stale；详见 [剩余回归报告](../validation/project-lead-cycle-1/repairs/2026-09-21-residual-regression-report.md)。周期整体仍 partial/active，本轮局部修复与本地回归已完成。
+后续收口更新：上述回归残留已在用户继续授权后修复，完整 npm test 3088 通过 / 2 条件跳过，全仓 whitespace 通过。CE 历史完整性与 current claim 已分层，current binding 仍 stale；详见 [剩余回归报告](../validation/project-lead-cycle-1/repairs/2026-09-21-residual-regression-report.md)。本轮局部修复与本地回归已完成；方案按用户裁决标记 `completed`，外部验证仍由 §6 backlog 承担。
