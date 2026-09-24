@@ -15,12 +15,15 @@
   },
   "target_source_snapshot": {
     "repository": "spec-first",
-    "head": "aa40c0f3c16beaa06e492702ff68d6d4c8953271",
-    "dirty": false,
-    "dirty_paths": [],
-    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "223d4b203bceb0ab828a0942ee7d7b3d9b4e9161ba87e7709c89880fc9293962",
-    "inventory_hash": "d39848f1ef49a8a8f87978eee9a971b0ecec1c768b519fd9693b6d63d20ae0fe",
+    "head": "f4c7a7b98ecf342e54bd3117c4d745e684532a19",
+    "dirty": true,
+    "dirty_paths": [
+      "CHANGELOG.md",
+      "docs/research/2026-09-24-ai-industry-trends-claude-prompt-shortening.md"
+    ],
+    "dirty_path_manifest_sha256": "1bb075e50a41be74a6110474cadc6e048d1a7e0ba373aedf14e1479cfdede638",
+    "source_tree_hash": "4e6dadd27c2601ee9a3f7abe1c9fe2a68ff0ac423b78373e4b217a6ad5f2a838",
+    "inventory_hash": "ed135a864893cde2a444577b62acd29af6d021dd3d34ef5d2c942caa767f4d1e",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -54,7 +57,7 @@
       "version": "canonical-source-manifest-v1"
     }
   },
-  "input_artifact_sha256": "243d687c2d4e2e368dd54c4a2ff5e5b88d580e183ee9f6acec86621471a56288",
+  "input_artifact_sha256": "600d74a0bb382f20c4113183015d0dd1e0cf81a9413019f5fdd5ad708a6e04f1",
   "records": [
     {
       "audit_id": "A001",
@@ -14795,7 +14798,7 @@
   "review_context": {
     "reviewed_at": "2026-09-24",
     "reviewer": "codex-current-session",
-    "method": "fresh-source review of all 517 records: deterministic local source/test/owner reachability and pinned upstream git-object checks, followed by semantic carry-over review against current source snapshot; two historical references remain unresolved and are explicitly retained as limitations; no live behavior claim.",
+    "method": "fresh-source review of all 517 records on pushed HEAD f4c7a7b9 with two explicitly preserved dirty paths owned by an adjacent research task; deterministic local source/test/owner reachability and pinned upstream git-object checks; semantic carry-over only; no live behavior claim.",
     "reference_facts": "docs/validation/ce-localization/goal-20260921/fresh-source-verification-20260924.json",
     "changed_owner_assessment": [
       "当前 HEAD aa40c0f3 的本轮变更未命中 517 条 upstream record 的 source_refs、test_refs 或 implementation_targets；既有 owner/action 语义保持。",
@@ -14805,7 +14808,8 @@
       "semantic adequacy was reviewed as bounded carry-over; no independent second model or full runtime/field execution",
       "real host/model smoke is recorded separately and does not prove CE semantic adequacy",
       "Cursor GUI workflow remains blocked by unavailable plan; Kiro/Qoder/ZCode GUI invocation remains not-run",
-      "A045 and A507 upstream references are absent at pinned head 956087b3e1dd7ccc03df32cee9e7c044dfbe75cf; retained as unresolved historical references."
+      "A045 and A507 upstream references are absent at pinned head 956087b3e1dd7ccc03df32cee9e7c044dfbe75cf; retained as unresolved historical references.",
+      "Current snapshot is dirty by pre-existing adjacent research paths CHANGELOG.md and docs/research/2026-09-24-ai-industry-trends-claude-prompt-shortening.md; those paths were not modified or adjudicated in this task."
     ]
   }
 }

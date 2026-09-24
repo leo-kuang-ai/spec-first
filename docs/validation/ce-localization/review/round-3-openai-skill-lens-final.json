@@ -12,12 +12,15 @@
   "producer": "role-simulated OpenAI skill-engineering lens using current local source only",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "aa40c0f3c16beaa06e492702ff68d6d4c8953271",
-    "dirty": false,
-    "dirty_paths": [],
-    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "223d4b203bceb0ab828a0942ee7d7b3d9b4e9161ba87e7709c89880fc9293962",
-    "inventory_hash": "d39848f1ef49a8a8f87978eee9a971b0ecec1c768b519fd9693b6d63d20ae0fe",
+    "head": "f4c7a7b98ecf342e54bd3117c4d745e684532a19",
+    "dirty": true,
+    "dirty_paths": [
+      "CHANGELOG.md",
+      "docs/research/2026-09-24-ai-industry-trends-claude-prompt-shortening.md"
+    ],
+    "dirty_path_manifest_sha256": "1bb075e50a41be74a6110474cadc6e048d1a7e0ba373aedf14e1479cfdede638",
+    "source_tree_hash": "4e6dadd27c2601ee9a3f7abe1c9fe2a68ff0ac423b78373e4b217a6ad5f2a838",
+    "inventory_hash": "ed135a864893cde2a444577b62acd29af6d021dd3d34ef5d2c942caa767f4d1e",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -51,8 +54,8 @@
       "version": "canonical-source-manifest-v1"
     }
   },
-  "inventory_hash": "d39848f1ef49a8a8f87978eee9a971b0ecec1c768b519fd9693b6d63d20ae0fe",
-  "inventory_artifact_sha256": "b2611ecde0dc0d7aa15e599e8650f0739ff902d0b414d95d5b131d7d56f7b74d",
+  "inventory_hash": "ed135a864893cde2a444577b62acd29af6d021dd3d34ef5d2c942caa767f4d1e",
+  "inventory_artifact_sha256": "8fb767e4e3e828f6c853c10cd29de2bccc9fbed98c6847b9c85095824b93bd80",
   "input_artifacts": [
     {
       "path": "docs/validation/ce-localization/skill-inventory.json",
@@ -79,7 +82,7 @@
     "dirty_path_manifest_sha256": "4c0c78000acf7fae68fdff3eb8e523956af2a2fbb9bb6d48b6a9c4996283fee8",
     "inventory_hash": "7897d3b4a38f689cfa2e44bf66e511544710579472825938473b32495bbe1021"
   },
-  "review_input_hash": "19ca015d1d7d78729f2d5ccad4aa1766ed8c3feaf4b1427983ae43ea2d68496a",
+  "review_input_hash": "cb30de71d396c809811ea01ea3661455a4d4593c66878d6316f9d9d379a41ebb",
   "review_input_hash_algorithm": "sha256(JSON.stringify(coverage.review_input, null, 2) + newline)",
   "chunk_manifest_hash": "5c8e876e18ae89c55682fe94086f6169257fdd219ec9c69268e9a850e310b347",
   "chunk_manifest": [
@@ -35159,7 +35162,8 @@
     "本轮没有独立 provider/隔离 worker；真实宿主、模型任务和 field outcome 另行记录。",
     "本 delta 仅覆盖当前 source receipt 的增量重读，不证明独立 provider、真实宿主或 field outcome。",
     "本 delta 对当前 source receipt 做 fresh-source 增量复核；两个 lens 仍由同一 owner 执行，不宣称独立 provider。",
-    "真实模型/宿主 workflow 与 field outcome 不由该 delta 证明。"
+    "真实模型/宿主 workflow 与 field outcome 不由该 delta 证明。",
+    "当前 dirty paths 属于相邻研究任务，本轮未修改或语义 adjudicate。"
   ],
   "consumers": [
     "docs/validation/ce-localization/review/round-3-findings.json aggregate owner",
@@ -36507,7 +36511,7 @@
     {
       "review_run_id": "ce-current-20260924-r1",
       "artifact_ref": "docs/validation/ce-localization/review/deltas/2026-09-24-current-source-r1.json",
-      "artifact_sha256": "8380288c0305063cdc9228a39700d87d05662035b15689689ff36e4149324bed",
+      "artifact_sha256": "4ec2cb9ebe0b28df9dfc9d4722bdf7f43352fbb3a0dd6ae8d3c935ac1bccc35a",
       "reviewed_at": "2026-09-24T00:00:00.000Z",
       "review_method": "inline-same-context",
       "independent": false,

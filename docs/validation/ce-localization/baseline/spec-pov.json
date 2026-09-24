@@ -5,12 +5,15 @@
   "single_writer": "ce-localization-baseline-writer",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "aa40c0f3c16beaa06e492702ff68d6d4c8953271",
-    "dirty": false,
-    "dirty_paths": [],
-    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "223d4b203bceb0ab828a0942ee7d7b3d9b4e9161ba87e7709c89880fc9293962",
-    "inventory_hash": "d39848f1ef49a8a8f87978eee9a971b0ecec1c768b519fd9693b6d63d20ae0fe",
+    "head": "f4c7a7b98ecf342e54bd3117c4d745e684532a19",
+    "dirty": true,
+    "dirty_paths": [
+      "CHANGELOG.md",
+      "docs/research/2026-09-24-ai-industry-trends-claude-prompt-shortening.md"
+    ],
+    "dirty_path_manifest_sha256": "1bb075e50a41be74a6110474cadc6e048d1a7e0ba373aedf14e1479cfdede638",
+    "source_tree_hash": "4e6dadd27c2601ee9a3f7abe1c9fe2a68ff0ac423b78373e4b217a6ad5f2a838",
+    "inventory_hash": "ed135a864893cde2a444577b62acd29af6d021dd3d34ef5d2c942caa767f4d1e",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -45,7 +48,7 @@
     }
   },
   "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
-  "inventory_sha256": "b2611ecde0dc0d7aa15e599e8650f0739ff902d0b414d95d5b131d7d56f7b74d",
+  "inventory_sha256": "8fb767e4e3e828f6c853c10cd29de2bccc9fbed98c6847b9c85095824b93bd80",
   "skill_id": "spec-pov",
   "source_refs": [
     "skills/spec-pov/evals/cases/design-question-not-verdict.yaml",
@@ -85,12 +88,15 @@
   ],
   "candidate_snapshot": {
     "repository": "spec-first",
-    "head": "aa40c0f3c16beaa06e492702ff68d6d4c8953271",
-    "dirty": false,
-    "dirty_paths": [],
-    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "223d4b203bceb0ab828a0942ee7d7b3d9b4e9161ba87e7709c89880fc9293962",
-    "inventory_hash": "d39848f1ef49a8a8f87978eee9a971b0ecec1c768b519fd9693b6d63d20ae0fe",
+    "head": "f4c7a7b98ecf342e54bd3117c4d745e684532a19",
+    "dirty": true,
+    "dirty_paths": [
+      "CHANGELOG.md",
+      "docs/research/2026-09-24-ai-industry-trends-claude-prompt-shortening.md"
+    ],
+    "dirty_path_manifest_sha256": "1bb075e50a41be74a6110474cadc6e048d1a7e0ba373aedf14e1479cfdede638",
+    "source_tree_hash": "4e6dadd27c2601ee9a3f7abe1c9fe2a68ff0ac423b78373e4b217a6ad5f2a838",
+    "inventory_hash": "ed135a864893cde2a444577b62acd29af6d021dd3d34ef5d2c942caa767f4d1e",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",

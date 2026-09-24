@@ -1,6 +1,6 @@
 {
   "schema_version": "spec-first-current-skill-package-inventory/v2",
-  "source_head": "aa40c0f3c16beaa06e492702ff68d6d4c8953271",
+  "source_head": "f4c7a7b98ecf342e54bd3117c4d745e684532a19",
   "skills_tree_oid": "46e662c57764f8df8067dcfa993c80809893f8ce",
   "source_mode": "working-tree",
   "manifest_sha256": "08a353ad0901aaaf5e3590418bd4f818e9a4f804963513f5ab090c43e1497bc5",

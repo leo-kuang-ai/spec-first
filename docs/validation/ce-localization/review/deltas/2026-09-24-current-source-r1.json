@@ -5,12 +5,12 @@
   "producer": "current project owner (fresh-source inline review)",
   "reviewed_at": "2026-09-24T00:00:00.000Z",
   "source_binding": {
-    "head": "aa40c0f3c16beaa06e492702ff68d6d4c8953271",
-    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "223d4b203bceb0ab828a0942ee7d7b3d9b4e9161ba87e7709c89880fc9293962",
-    "inventory_hash": "d39848f1ef49a8a8f87978eee9a971b0ecec1c768b519fd9693b6d63d20ae0fe",
-    "inventory_artifact_sha256": "b2611ecde0dc0d7aa15e599e8650f0739ff902d0b414d95d5b131d7d56f7b74d",
-    "review_input_hash": "19ca015d1d7d78729f2d5ccad4aa1766ed8c3feaf4b1427983ae43ea2d68496a"
+    "head": "f4c7a7b98ecf342e54bd3117c4d745e684532a19",
+    "dirty_path_manifest_sha256": "1bb075e50a41be74a6110474cadc6e048d1a7e0ba373aedf14e1479cfdede638",
+    "source_tree_hash": "4e6dadd27c2601ee9a3f7abe1c9fe2a68ff0ac423b78373e4b217a6ad5f2a838",
+    "inventory_hash": "ed135a864893cde2a444577b62acd29af6d021dd3d34ef5d2c942caa767f4d1e",
+    "inventory_artifact_sha256": "8fb767e4e3e828f6c853c10cd29de2bccc9fbed98c6847b9c85095824b93bd80",
+    "review_input_hash": "cb30de71d396c809811ea01ea3661455a4d4593c66878d6316f9d9d379a41ebb"
   },
   "execution_context": {
     "review_method": "inline-same-context",
@@ -18,136 +18,13 @@
     "provider_identity": "unverified",
     "worker_context_isolation": "degraded_inherited"
   },
-  "reviewed_paths": [
-    {
-      "path": "skills/spec-runtime-setup/evals/README.md",
-      "skill_ids": [
-        "spec-runtime-setup"
-      ],
-      "sha256": "3046424d7535eb87bc570cd0e3876402850e7ac7f077956bea5fe32e93f135ee",
-      "bytes": 1189,
-      "line_count": 9,
-      "covered_line_ranges": [
-        [
-          1,
-          9
-        ]
-      ],
-      "lens_verdicts": [
-        {
-          "review_lens": "openai-skill-engineering",
-          "review_status": "complete",
-          "verdict": "no-new-actionable-finding",
-          "notes": [
-            "已全文读取当前源文件，并对照 owning Skill contract、consumer、focused test 与 fail-closed 边界；未发现新的 actionable finding。"
-          ],
-          "limitations": [
-            "本 delta 对当前 source receipt 做 fresh-source 增量复核；两个 lens 仍由同一 owner 执行，不宣称独立 provider。",
-            "真实模型/宿主 workflow 与 field outcome 不由该 delta 证明。"
-          ]
-        },
-        {
-          "review_lens": "anthropic-skill-craft-safety",
-          "review_status": "complete",
-          "verdict": "no-new-actionable-finding",
-          "notes": [
-            "已全文读取当前源文件，并对照 owning Skill contract、consumer、focused test 与 fail-closed 边界；未发现新的 actionable finding。"
-          ],
-          "limitations": [
-            "本 delta 对当前 source receipt 做 fresh-source 增量复核；两个 lens 仍由同一 owner 执行，不宣称独立 provider。",
-            "真实模型/宿主 workflow 与 field outcome 不由该 delta 证明。"
-          ]
-        }
-      ]
-    },
-    {
-      "path": "skills/spec-runtime-setup/evals/fixtures/scripts/check-bare-mutation.sh",
-      "skill_ids": [
-        "spec-runtime-setup"
-      ],
-      "sha256": "35c00a05c4c0202133e04f225d8aeb4e57c63d09b0f19679642c2356a0c687ab",
-      "bytes": 1278,
-      "line_count": 36,
-      "covered_line_ranges": [
-        [
-          1,
-          36
-        ]
-      ],
-      "lens_verdicts": [
-        {
-          "review_lens": "openai-skill-engineering",
-          "review_status": "complete",
-          "verdict": "no-new-actionable-finding",
-          "notes": [
-            "已全文读取当前源文件，并对照 owning Skill contract、consumer、focused test 与 fail-closed 边界；未发现新的 actionable finding。"
-          ],
-          "limitations": [
-            "本 delta 对当前 source receipt 做 fresh-source 增量复核；两个 lens 仍由同一 owner 执行，不宣称独立 provider。",
-            "真实模型/宿主 workflow 与 field outcome 不由该 delta 证明。"
-          ]
-        },
-        {
-          "review_lens": "anthropic-skill-craft-safety",
-          "review_status": "complete",
-          "verdict": "no-new-actionable-finding",
-          "notes": [
-            "已全文读取当前源文件，并对照 owning Skill contract、consumer、focused test 与 fail-closed 边界；未发现新的 actionable finding。"
-          ],
-          "limitations": [
-            "本 delta 对当前 source receipt 做 fresh-source 增量复核；两个 lens 仍由同一 owner 执行，不宣称独立 provider。",
-            "真实模型/宿主 workflow 与 field outcome 不由该 delta 证明。"
-          ]
-        }
-      ]
-    },
-    {
-      "path": "tests/unit/runtime-setup-eval-judge.test.js",
-      "skill_ids": [
-        "spec-runtime-setup"
-      ],
-      "sha256": "ae23c6f89587097e1c1c1e68712f510fa2f3151e865916d4ead3d8e23fd47c08",
-      "bytes": 3676,
-      "line_count": 92,
-      "covered_line_ranges": [
-        [
-          1,
-          92
-        ]
-      ],
-      "lens_verdicts": [
-        {
-          "review_lens": "openai-skill-engineering",
-          "review_status": "complete",
-          "verdict": "no-new-actionable-finding",
-          "notes": [
-            "已全文读取当前源文件，并对照 owning Skill contract、consumer、focused test 与 fail-closed 边界；未发现新的 actionable finding。"
-          ],
-          "limitations": [
-            "本 delta 对当前 source receipt 做 fresh-source 增量复核；两个 lens 仍由同一 owner 执行，不宣称独立 provider。",
-            "真实模型/宿主 workflow 与 field outcome 不由该 delta 证明。"
-          ]
-        },
-        {
-          "review_lens": "anthropic-skill-craft-safety",
-          "review_status": "complete",
-          "verdict": "no-new-actionable-finding",
-          "notes": [
-            "已全文读取当前源文件，并对照 owning Skill contract、consumer、focused test 与 fail-closed 边界；未发现新的 actionable finding。"
-          ],
-          "limitations": [
-            "本 delta 对当前 source receipt 做 fresh-source 增量复核；两个 lens 仍由同一 owner 执行，不宣称独立 provider。",
-            "真实模型/宿主 workflow 与 field outcome 不由该 delta 证明。"
-          ]
-        }
-      ]
-    }
-  ],
+  "reviewed_paths": [],
   "retired_relations": [],
   "findings": [],
   "limitations": [
     "本 delta 对当前 source receipt 做 fresh-source 增量复核；两个 lens 仍由同一 owner 执行，不宣称独立 provider。",
-    "真实模型/宿主 workflow 与 field outcome 不由该 delta 证明。"
+    "真实模型/宿主 workflow 与 field outcome 不由该 delta 证明。",
+    "当前 dirty paths 属于相邻研究任务，本轮未修改或语义 adjudicate。"
   ],
   "claim_ceiling": "Current source receipt and bounded semantic review only; no independent provider, runtime adoption, or field outcome claim."
 }

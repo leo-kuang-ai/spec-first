@@ -1,6 +1,6 @@
 # 2026-09-24 CE 与 Runtime 续作记录
 
-本轮源码基线为 `aa40c0f3c16beaa06e492702ff68d6d4c8953271`。按 CE regeneration sequence 刷新 inventory、517 条 upstream adjudication input，逐条核对 source/test/owner refs，并对新增的 3 条 Skill receipt gap 做同一 owner 的双 lens 增量复核。两处 pinned upstream 历史引用缺失（A045、A507）保留为 limitation；此次不是独立模型语义评审。
+本轮源码基线为 `f4c7a7b98ecf342e54bd3117c4d745e684532a19`。按 CE regeneration sequence 刷新 inventory、517 条 upstream adjudication input，逐条核对 source/test/owner refs，并对新增的 3 条 Skill receipt gap 做同一 owner 的双 lens 增量复核。两处 pinned upstream 历史引用缺失（A045、A507）保留为 limitation；此次不是独立模型语义评审。
 
 - `node scripts/check-ce-localization-review.cjs --verify-closeout`：`closeout_status=valid`，38 Skill、1179 package paths、229 direct-support paths、447 relations，0 missing/hash mismatch。此结果绑定上述提交前 source snapshot；后续提交改变 HEAD 时须重新核对，不能直接声称新 HEAD 仍通过严格绑定。
 - `npm run test:jest -- --runInBand tests/unit/ce-localization-closeout-contracts.test.js tests/unit/ce-upstream-reconciliation-v2.test.js`：2 suites / 38 tests passed。
@@ -9,3 +9,5 @@
 - `npm run typecheck`：272 files passed；`git diff --check` passed。
 
 仍未完成：Cursor 无套餐；Kiro/Qoder/ZCode GUI 实际 workflow 未运行；Qoder CLI 未登录，Pi provider 403；field `task_pairs=[]`、`results=[]`、`overall_status=not-run`，缺实际研发 actor、配对任务及验收事件。Claude/Codex/OpenCode CLI 的既有真实模型 smoke 不能外推为 GUI 或 field 收益。
+
+最终回归补充：修正相邻研究条目的 CHANGELOG 时间格式后，`npm test` 全量通过（239 unit suites / 3012 tests、smoke 5/5、integration 17 suites / 84 tests，2 skipped）；真实 Graphify case 已在独立开关下 2/2 passed。最终 CE verify 绑定 `f4c7a7b9` 与当前 dirty manifest，结果 `closeout_status=valid`。

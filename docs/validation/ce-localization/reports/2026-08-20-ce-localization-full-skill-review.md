@@ -1,6 +1,6 @@
 # CE 本地化与全量 Skill 第三轮审查报告
 
-> 本报告绑定当前 target source snapshot：`source_tree_hash=223d4b203bceb0ab828a0942ee7d7b3d9b4e9161ba87e7709c89880fc9293962`、`dirty_path_manifest_sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`。当前 closeout 以 deterministic validator 为准；provider、runtime adoption 和 field outcome 仍受本报告 Claim Ceiling 限制。
+> 本报告绑定当前 target source snapshot：`source_tree_hash=4e6dadd27c2601ee9a3f7abe1c9fe2a68ff0ac423b78373e4b217a6ad5f2a838`、`dirty_path_manifest_sha256=1bb075e50a41be74a6110474cadc6e048d1a7e0ba373aedf14e1479cfdede638`。当前 closeout 以 deterministic validator 为准；provider、runtime adoption 和 field outcome 仍受本报告 Claim Ceiling 限制。
 
 ## 结论
 
@@ -12,16 +12,16 @@
 
 | 维度 | 结果 |
 |---|---|
-| target HEAD | `aa40c0f3c16beaa06e492702ff68d6d4c8953271` |
+| target HEAD | `f4c7a7b98ecf342e54bd3117c4d745e684532a19` |
 | canonical Skill | 38/38 |
 | package path | 1179/1179 |
 | package bytes | 6,814,238 |
 | package missing/hash mismatch | 0/0 |
 | direct-support relations | 447 |
 | unique direct-support paths | 229 |
-| source-tree hash | `223d4b203bceb0ab828a0942ee7d7b3d9b4e9161ba87e7709c89880fc9293962`，见 inventory/coverage artifact |
-| inventory hash | `d39848f1ef49a8a8f87978eee9a971b0ecec1c768b519fd9693b6d63d20ae0fe`，见 inventory snapshot |
-| dirty manifest | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`，计算时排除 `docs/validation/ce-localization/**` derived artifacts |
+| source-tree hash | `4e6dadd27c2601ee9a3f7abe1c9fe2a68ff0ac423b78373e4b217a6ad5f2a838`，见 inventory/coverage artifact |
+| inventory hash | `ed135a864893cde2a444577b62acd29af6d021dd3d34ef5d2c942caa767f4d1e`，见 inventory snapshot |
+| dirty manifest | `1bb075e50a41be74a6110474cadc6e048d1a7e0ba373aedf14e1479cfdede638`，计算时排除 `docs/validation/ce-localization/**` derived artifacts |
 | excluded | `skills/autoresearch` tracked symlink，host-owned/local-only，不计入 36 |
 
 确定性产物：[round-3-source-coverage.json](/Users/kuang/xiaobu/spec-first/docs/validation/ce-localization/review/round-3-source-coverage.json)。该产物明确禁止 blanket 纳入整个 `src/**` 或 `tests/**`；当前 `unresolved_non_semantic_boundary` 为 `null`，`spec-write-tasks` 的 Claude command template 已纳入当前 source inventory。
