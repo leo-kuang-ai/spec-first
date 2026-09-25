@@ -271,6 +271,8 @@ npm run build
 
 ## 相关文档
 
+- [MySpec](https://myspec.dev) — 基于 Spec 驱动开发的规格探索平台，通过交互式采访生成确定性的四文件规格包（`constitution.md`, `requirements.md`, `solution.md`, `tasks.md`）并通过 MCP 提供给编码智能体。
+
 - [用户手册](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/README.md)
 - [Runtime Capability Catalog](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/catalog/runtime-capabilities.md)
 - [项目角色契约](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/10-prompt/%E7%BB%93%E6%9E%84%E5%8C%96%E9%A1%B9%E7%9B%AE%E8%A7%92%E8%89%B2%E5%A5%91%E7%BA%A6.md)
