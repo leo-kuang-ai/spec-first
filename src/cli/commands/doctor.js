@@ -59,7 +59,7 @@ function runDoctor(argv) {
       return getDoctorExitCode(report);
     }
 
-    printDoctorHumanReport(report, { verbose: parsed.verbose });
+    printDoctorHumanReport(report, { verbose: parsed.verbose, target: projectRoot });
     console.log('');
     console.log('未检测到宿主。');
     console.log('运行 `spec-first init`，并在交互提示中选择 Claude Code、Codex、Cursor、Kiro、Qoder、OpenCode、ZCode 和/或 Pi 进行初始化。');
@@ -73,7 +73,7 @@ function runDoctor(argv) {
     return getDoctorExitCode(report);
   }
 
-  printDoctorHumanReport(report, { verbose: parsed.verbose });
+  printDoctorHumanReport(report, { verbose: parsed.verbose, target: projectRoot });
   return getDoctorExitCode(report);
 }
 
@@ -83,7 +83,7 @@ function printDoctorHumanReport(report, options) {
   }
 }
 
-function formatDoctorHumanReport(report, { verbose = false } = {}) {
+function formatDoctorHumanReport(report, { verbose = false, target } = {}) {
   const platforms = Array.isArray(report.platforms)
     ? report.platforms
     : Object.keys(report.platform_checks || {});
@@ -146,6 +146,25 @@ function formatDoctorHumanReport(report, { verbose = false } = {}) {
   appendDoctorAttentionSection(lines, '降级状态', degradedItems, 'degraded');
   appendDoctorAttentionSection(lines, '未执行', notRunItems, 'not-run');
 
+  lines.push('', '证据上限：配置检查不等于宿主已加载、任务能力已验证或首次 workflow 成功。');
+  lines.push(`恢复目录：${target || '未知（请先进入实际项目目录）'}`);
+  for (const platform of platforms) {
+    const required = requiredItems.find((item) => item.scope === platform.toUpperCase())
+      || requiredItems.find((item) => item.scope === '通用环境'
+        && !item.check.workspace_readiness_layer);
+    const skillsCheck = (platformChecks[platform] || []).find((check) => (
+      check.name === getAdapter(platform).skillsRoot && check.level === 'PASS'
+    ));
+    if (required) {
+      lines.push(`  ${platform.toUpperCase()} 主行动：先处理上述 [${required.scope}] ${required.check.name}（依据：${required.projection.reason_code}）；在此目录复查 spec-first doctor --${platform}。`);
+    } else if (target && skillsCheck) {
+      const activation = platform === 'pi' ? '打开 Pi 并完成项目信任' : `打开或新开 ${getPlatformDisplayName(platform)} 会话`;
+      lines.push(`  ${platform.toUpperCase()} 主行动：在此目录${activation}，描述真实任务（依据：${skillsCheck.name} 检查 PASS；加载与结果仍未验证）。`);
+    } else {
+      lines.push(`  ${platform.toUpperCase()} 主行动：projection 或目标目录事实不足（依据：continuation-facts-insufficient）；参见 docs/05-用户手册/01-快速开始.md 的恢复步骤。`);
+    }
+  }
+
   if (!verbose) return lines;
 
   appendDoctorEvidenceSummary(lines, report);
@@ -175,6 +194,8 @@ function appendDoctorEvidenceSummary(lines, report) {
     const reason = basis.fallback_reason || basis.reason_code;
     const suffix = reason ? ` (reason=${reason})` : '';
     lines.push(`  workflow_runnability: ${report.workflow_runnability}${suffix}`);
+    lines.push(`  项目级聚合证据：path=${basis.evidence_path || 'missing'}; freshness=${basis.evidence_freshness || 'unknown'}; source=${basis.evidence_source || 'unknown'}`);
+    lines.push('  聚合 verified / setup receipt 不证明每个宿主加载或当前任务的首个实质结果；须回源确认宿主、target、入口、时间、结果和来源。');
   }
 }
 

@@ -15,7 +15,6 @@ const {
 } = require('../brand');
 const {
   hostDisplayName,
-  hostMcpSetupCommand,
   formatInitHostFlagsForExample,
   initPlatformLabel,
 } = require('./init-args');
@@ -602,15 +601,23 @@ function printInitApplySummaries(plans, results, options = {}) {
     }
   }
   printInitTopologyHandoffs(normalizedPlans, normalizedResults, options.lang || 'zh');
+  if (normalizedResults.some((result) => result && (result.exit_code === 0
+    || (result.workspace_summary && result.workspace_summary.parent_host_runtime
+      && result.workspace_summary.parent_host_runtime.overall_status === 'ready')
+    || (result.workspace_summary && Array.isArray(result.workspace_summary.results)
+      && result.workspace_summary.results.some((child) => child.exit_code === 0 && child.overall_status === 'ready'))))) {
+    printInitTaskGuidance(options.lang || 'zh');
+  }
 }
 
 function printInitTopologyHandoffs(plans, results, lang = 'zh') {
   for (const [index, plan] of plans.entries()) {
-    const result = results[index] || {};
+    const result = results[index] || { exit_code: 1 };
     if (plan.mode === 'all-repos') {
       printAllReposInitHandoff(plan, result, lang);
       continue;
     }
+    printInitScopeHandoff(plan.platform, plan.projectRoot, result.exit_code === 0, lang);
     if (plan.gitRootTopology === 'multi-repo-workspace') {
       printParentOnlyInitHandoff(plan, lang);
     }
@@ -621,58 +628,45 @@ function printParentOnlyInitHandoff(plan, lang) {
   const hostFlags = formatInitHostFlagsForExample([plan.platform]);
   if (lang === 'en') {
     console.log('Child repo projections: pending (not covered by this init).');
-    console.log(`  All children: spec-first init ${hostFlags} --all-repos -y`);
-    console.log(`  One child: spec-first init ${hostFlags} --repo <child-path> -y`);
+    console.log(`  Only if working in a child repo: from this parent, preview spec-first init ${hostFlags} --repo <child-path>`);
     return;
   }
 
   console.log('子仓 runtime projection：pending（本次 init 未覆盖）。');
-  console.log(`  所有子仓：spec-first init ${hostFlags} --all-repos -y`);
-  console.log(`  单个子仓：spec-first init ${hostFlags} --repo <child-path> -y`);
+  console.log(`  仅当需要在子仓工作：在上述父目录预览 spec-first init ${hostFlags} --repo <child-path>`);
 }
 
 function printAllReposInitHandoff(plan, result, lang) {
   const summary = result.workspace_summary || {};
-  const counts = summary.counts || {};
   const children = Array.isArray(summary.results) ? summary.results : [];
-  const allChildrenReady = Number(counts.total) > 0
-    && Number(counts.ready) === Number(counts.total)
-    && summary.parent_host_runtime
-    && summary.parent_host_runtime.overall_status === 'ready'
-    && result.exit_code === 0;
+  const parent = summary.parent_host_runtime || {};
+  printInitScopeHandoff(plan.platform, plan.workspaceRoot, parent.overall_status === 'ready', lang);
+  for (const child of children) {
+    if (!child) continue;
+    const target = child.git_root || (child.workspace_relative_path
+      ? path.resolve(plan.workspaceRoot, child.workspace_relative_path) : null);
+    printInitScopeHandoff(plan.platform, target,
+      child.exit_code === 0 && child.overall_status === 'ready', lang);
+  }
+}
 
-  if (allChildrenReady) {
-    if (lang === 'en') {
-      console.log(`Child repo projections are ready for ${initPlatformLabel(plan.platform)}. Next: run spec-runtime-setup.`);
-    } else {
-      console.log(`所有子仓 runtime projection 已为 ${initPlatformLabel(plan.platform)} 就绪。下一步：运行 spec-runtime-setup。`);
-    }
+function printInitScopeHandoff(platform, target, written, lang) {
+  if (written && target) {
+    printInitNextSteps(platform, lang, { target, explainTask: false });
     return;
   }
-
-  const failedChild = children.find((child) => child && (
-    child.exit_code !== 0 || child.overall_status === 'action-required'
-  ));
-  const hostFlags = formatInitHostFlagsForExample([plan.platform]);
-  if (failedChild) {
-    const childPath = failedChild.workspace_relative_path || failedChild.repo_label || '<child-path>';
-    if (lang === 'en') {
-      console.log('Child repo projection is incomplete. Repair the affected child first:');
-      console.log(`  spec-first init ${hostFlags} --repo ${childPath} -y`);
-    } else {
-      console.log('子仓 runtime projection 未完成。请先修复受影响的子仓：');
-      console.log(`  spec-first init ${hostFlags} --repo ${childPath} -y`);
-    }
+  console.log(lang === 'en' ? `Target: ${target || 'unknown'}` : `目标目录：${target || '未知'}`);
+  console.log(lang === 'en'
+    ? `  ${hostDisplayName(platform)} projection incomplete or unknown; host loading and workflow execution are not verified.`
+    : `  ${hostDisplayName(platform)} projection 未完成或未知；宿主加载与 workflow 执行未验证。`);
+  if (!target) {
+    console.log(lang === 'en' ? '  Locate your actual target first; see the Quick Start recovery guide.'
+      : '  请先确认实际目标目录；参见快速开始手册的恢复步骤。');
     return;
   }
-
-  if (lang === 'en') {
-    console.log('All-repos bootstrap is incomplete. Repair the workspace projection first:');
-    console.log(`  spec-first init ${hostFlags} --all-repos -y`);
-  } else {
-    console.log('all-repos bootstrap 未完成。请先修复 workspace projection：');
-    console.log(`  spec-first init ${hostFlags} --all-repos -y`);
-  }
+  console.log(lang === 'en'
+    ? `  Repair: in this target, preview spec-first init --${platform}; then recheck spec-first doctor --${platform}.`
+    : `  修复：在此目录预览 spec-first init --${platform}；修复后复查 spec-first doctor --${platform}。`);
 }
 
 function buildInitApplyHostDetails(plan, result, messages) {
@@ -809,7 +803,7 @@ function printInitApplySuccess(plan, result, options = {}) {
 
   if (options.showNextSteps !== false) {
     console.log('');
-    printInitNextSteps(plan.platform, (plan.developer && plan.developer.lang) || 'zh');
+    printInitNextSteps(plan.platform, (plan.developer && plan.developer.lang) || 'zh', { target: plan.projectRoot });
   }
 }
 
@@ -899,58 +893,47 @@ function hasInitDiagnostic(plan, code) {
     && plan.diagnostics.some((diagnostic) => diagnostic && diagnostic.code === code);
 }
 
-function printInitNextSteps(platform, lang = 'zh') {
-  printInitNextStepsForPlatforms([platform], lang);
+function printInitNextSteps(platform, lang = 'zh', options = {}) {
+  printInitNextStepsForPlatforms([platform], lang, options);
 }
 
-function formatInitList(values, lang) {
-  if (lang !== 'en' || values.length < 2) {
-    return values.join(lang === 'en' ? '' : '、');
-  }
-  if (values.length === 2) {
-    return values.join(' and ');
-  }
-  return `${values.slice(0, -1).join(', ')}, and ${values.at(-1)}`;
-}
-
-function printInitNextStepsForPlatforms(platforms, lang = 'zh') {
+function printInitNextStepsForPlatforms(platforms, lang = 'zh', { target = process.cwd(), explainTask = true } = {}) {
   const uniquePlatforms = [...new Set(platforms)];
   if (uniquePlatforms.length === 0) {
     return;
   }
-  const hostDisplay = formatInitList(uniquePlatforms.map(hostDisplayName), lang);
-  const setupCommand = hostMcpSetupCommand(uniquePlatforms[0]);
-  const doctorCommands = formatInitList(
-    uniquePlatforms.map((platform) => `\`spec-first doctor --${platform}\``),
-    lang,
-  );
-  const multipleHosts = uniquePlatforms.length > 1;
-  // Pi 的激活门槛是项目信任而非仅重启：未信任时即使新开会话，pi 也静默
-  // 跳过项目级 .agents/skills。
-  const piSelected = uniquePlatforms.includes('pi');
-
-  if (lang === 'en') {
-    console.log('Initialization complete. Next steps:');
-    console.log(`  Status: The ${hostDisplay} runtime projection${multipleHosts ? 's were' : ' was'} written; host loading and runtime readiness are not verified yet.`);
-    console.log(multipleHosts
-      ? `  Required: Restart ${hostDisplay} or open new sessions, then run ${setupCommand} in each host you plan to use.`
-      : `  Required: Restart ${hostDisplay} or open a new session, then run ${setupCommand}.`);
-    if (piSelected) {
-      console.log('  Pi activation: run `pi` in this project and complete the trust step (confirm the trust prompt, or trust once with `pi -a`) — without project trust, pi does not load project-level .agents/skills.');
-    }
-    console.log(`  Optional: To troubleshoot or audit projection health, run ${doctorCommands}.`);
-    return;
+  for (const platform of uniquePlatforms) {
+    const host = hostDisplayName(platform);
+    const preview = ['cursor', 'opencode', 'zcode', 'pi'].includes(platform);
+    console.log(lang === 'en' ? `Target: ${target}` : `目标目录：${target}`);
+    console.log(lang === 'en'
+      ? `  ${host}: projection written; host loading, task capabilities and workflow results are not verified.${preview ? ' Support: preview.' : ''}`
+      : `  ${host}：projection 已写入；宿主加载、任务能力与 workflow 结果未验证。${preview ? '支持上限：preview。' : ''}`);
+    const activation = platform === 'pi'
+      ? (lang === 'en' ? 'open Pi and complete project trust; without trust, project skills are not loaded'
+        : '打开 Pi 并完成项目信任；未信任时不会加载项目 skill')
+      : (lang === 'en' ? `restart ${host} or open a new session` : `重启 ${host} 或新开会话`);
+    console.log(lang === 'en' ? `  Next: in this target, ${activation}.` : `  主行动：在此目录${activation}。`);
+    console.log(lang === 'en'
+      ? `  Recovery (terminal in this target): spec-first doctor --${platform} (read-only; no re-init needed).`
+      : `  恢复（此目录的终端）：spec-first doctor --${platform}（只读，无需重跑 init）。`);
   }
+  if (explainTask) printInitTaskGuidance(lang);
+}
 
-  console.log('初始化完成。下一步:');
-  console.log(`  状态：已写入 ${hostDisplay} runtime projection${multipleHosts ? 's；各宿主' : '；宿主'}加载与 runtime readiness 尚未验证。`);
-  console.log(multipleHosts
-    ? `  必做：重启 ${hostDisplay} 或分别新开会话，然后在每个计划使用的宿主中运行 ${setupCommand}。`
-    : `  必做：重启 ${hostDisplay} 或新开会话，然后运行 ${setupCommand}。`);
-  if (piSelected) {
-    console.log('  Pi 激活：在本项目运行 `pi` 并完成项目信任（确认信任提示，或用 `pi -a` 一次性信任）——项目未信任时 pi 不加载项目级 .agents/skills。');
-  }
-  console.log(`  可选：如需排查或审计 projection health，${multipleHosts ? '分别' : ''}运行 ${doctorCommands}。`);
+function printInitTaskGuidance(lang) {
+  console.log(lang === 'en'
+    ? '  Then, in the host conversation: describe your actual task. Without a task, use this example:'
+    : '  然后在宿主会话描述真实任务；没有任务时可输入示例：');
+  console.log(lang === 'en'
+    ? '    Please use spec-brainstorm: I want to reduce repeated requirements clarification; help define use cases, scope and success criteria.'
+    : '    请使用 spec-brainstorm：我想减少项目中重复出现的需求澄清，请帮我明确使用场景、范围和成功标准。');
+  console.log(lang === 'en'
+    ? '  Confirm the actual entry and a task-related first result; a greeting or recommendation is not success.'
+    : '  确认实际入口与任务相关的首个实质结果；欢迎语或推荐入口不算成功。');
+  console.log(lang === 'en'
+    ? '  Only when the selected task lacks a required capability: request spec-runtime-setup in the host conversation, then recheck that scope.'
+    : '  仅当所选任务缺少必需能力：在宿主会话请求 spec-runtime-setup，完成后复查同一范围。');
 }
 
 function printHelp() {

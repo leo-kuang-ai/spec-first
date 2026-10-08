@@ -519,8 +519,11 @@ describe('init workspace contract', () => {
 
     const output = logSpy.mock.calls.flat().join('\n');
     expect(output).toContain('Child repo projections: pending (not covered by this init).');
-    expect(output).toContain('spec-first init --codex --all-repos -y');
-    expect(output).toContain('spec-first init --codex --repo <child-path> -y');
+    expect(output).not.toContain('spec-first init --codex --all-repos');
+    expect(output).toContain('Only if working in a child repo:');
+    expect(output).toContain('spec-first init --codex --repo <child-path>');
+    expect(output).toContain(`Target: ${workspaceRoot}`);
+    expect(output.match(/Next:/g)).toHaveLength(1);
     expect(output).not.toContain('spec-mcp-setup');
     expect(output).not.toContain('mcp-setup');
   });
@@ -538,7 +541,8 @@ describe('init workspace contract', () => {
 
     expect(result.status).toBe(0);
     expect(result.stdout).toContain('Child repo projections: pending (not covered by this init).');
-    expect(result.stdout).toContain('spec-first init --codex --all-repos -y');
+    expect(result.stdout).toContain('Only if working in a child repo:');
+    expect(result.stdout.match(/Next:/g)).toHaveLength(1);
     expect(result.stdout).not.toContain('For stronger readiness, run `spec-runtime-setup`');
   });
 
@@ -558,7 +562,7 @@ describe('init workspace contract', () => {
     expect(output).not.toContain('spec-first init --codex --all-repos -y');
   });
 
-  test('recommends runtime setup only after all child projections are ready', () => {
+  test('offers scope activation and conditional setup after all-repos projection', () => {
     const { workspaceRoot, childRoot } = createWorkspace();
     const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
@@ -577,7 +581,11 @@ describe('init workspace contract', () => {
     }], { lang: 'en' });
 
     const output = logSpy.mock.calls.flat().join('\n');
-    expect(output).toContain('Child repo projections are ready for Codex. Next: run spec-runtime-setup.');
+    expect(output).toContain(`Target: ${workspaceRoot}`);
+    expect(output).toContain(`Target: ${childRoot}`);
+    expect(output.match(/Next:/g)).toHaveLength(2);
+    expect(output.match(/Only when/g)).toHaveLength(1);
+    expect(output).not.toContain('Next: run spec-runtime-setup.');
     expect(output).not.toContain('spec-mcp-setup');
     expect(output).not.toContain('mcp-setup');
   });
@@ -606,8 +614,10 @@ describe('init workspace contract', () => {
     }], { lang: 'en' });
 
     const output = logSpy.mock.calls.flat().join('\n');
-    expect(output).toContain('Child repo projection is incomplete. Repair the affected child first:');
-    expect(output).toContain('spec-first init --codex --repo child-app -y');
+    expect(output).toContain(`Target: ${childRoot}`);
+    expect(output).toContain('Repair: in this target, preview spec-first init --codex');
+    expect(output.match(/Next:/g)).toHaveLength(1);
+    expect(output).not.toContain('--all-repos');
     expect(output).not.toContain('Next: run spec-runtime-setup.');
     expect(output).not.toContain('spec-mcp-setup');
     expect(output).not.toContain('mcp-setup');

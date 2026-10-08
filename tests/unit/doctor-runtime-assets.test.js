@@ -35,6 +35,19 @@ const { syncSkills } = require('../../src/cli/plugin');
 const { spawnSyncWithTimeout } = require('../../src/cli/external-command');
 
 describe('doctor runtime asset inventory', () => {
+  test('diagnostic continuation never calls the init write owner', () => {
+    const initApply = require('../../src/cli/commands/init-apply');
+    const apply = jest.spyOn(initApply, 'applyProjectInitPlan');
+    const log = jest.spyOn(console, 'log').mockImplementation(() => {});
+    try {
+      runDoctor(['--codex']);
+      expect(apply).not.toHaveBeenCalled();
+    } finally {
+      apply.mockRestore();
+      log.mockRestore();
+    }
+  });
+
   test('passes a missing agents directory when the bundled agent inventory is empty', () => {
     const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-doctor-assets-'));
     const previousCwd = process.cwd();

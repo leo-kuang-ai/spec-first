@@ -71,19 +71,13 @@ Initialization previews managed runtime files before writing and does not stage 
 
 ### 2. Run your first workflow
 
-Run workflow entries inside the host session; they are not shell subcommands. Prepare runtime before the first workflow, then rerun when readiness or configuration changes:
+Open a new session in the selected host at the target shown by initialization and describe your real task. Workflow entries are not shell subcommands. Without a current task, try:
 
 ```text
-spec-runtime-setup
+Please use spec-brainstorm: I want to reduce repeated requirements clarification in this project. Help me define use cases, scope, and success criteria.
 ```
 
-Then create the first requirements artifact:
-
-```text
-spec-brainstorm "Improve CLI onboarding for new users"
-```
-
-This turns a rough idea into a reviewable requirements artifact, usually under:
+The first substantive result should contain a problem definition, scope, success criteria, and open questions. A greeting or entry recommendation is not success. Durable requirements artifacts usually live under:
 
 ```text
 docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
@@ -91,7 +85,9 @@ docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
 
 Use `spec-plan` when the requirements are settled and `spec-work` when the plan is ready to execute. Without durable decisions, the workflow may legitimately skip writing a document; that is not a failure.
 
-If entries are missing, run `spec-first doctor --verbose` and check host limitations in the [Runtime Capability Catalog](docs/catalog/runtime-capabilities.md).
+Request `spec-runtime-setup` inside the host only when a capability required by the current task is missing or readiness needs repair. Missing optional capabilities can be disclosed while work continues. Successful initialization proves that projections were written, not that the host loaded them or completed a task.
+
+After closing the terminal, return to the original target and run `spec-first doctor --codex` using your original host flag. This is read-only and requires no re-init. Add `--verbose` for details or `--json` for scripts. See the [Runtime Capability Catalog](docs/catalog/runtime-capabilities.md) for host limitations.
 
 ## Choose the Right Workflow
 
@@ -99,9 +95,11 @@ If entries are missing, run `spec-first doctor --verbose` and check host limitat
 
 Enter at the step that matches the current task; running every step is not required. This is a capability map. Task needs, verification results, and authorization determine what follows.
 
+For example, use `spec-brainstorm` for an idea with unsettled scope, `spec-plan` for a clear goal with an unsettled implementation, and `spec-work` to execute a ready plan. Use `spec-debug` for failing tests, `spec-doc-review` for an existing document, and `spec-compound` for verified reusable experience. A request for advice gets one recommendation; an execution request continues the authorized task.
+
 | Stage | When to use it | Skill | Main result |
 |---|---|---|---|
-| Environment | First use, missing MCP/helpers, or configuration changes | `spec-runtime-setup` | Readiness facts and setup results |
+| Environment | A task-required MCP/helper is missing or readiness needs repair | `spec-runtime-setup` | Readiness facts and setup results |
 | Exploration | Compare candidate directions | `spec-ideate` | Ranked ideas |
 | Requirements | Scope and success criteria remain unsettled | `spec-brainstorm` | Requirements-only plan |
 | PRD clarification | Clarify an existing PRD against the codebase | `spec-prd` | Planning-readiness artifact |
