@@ -522,10 +522,10 @@ describe('init run-level global developer prerequisite', () => {
 
     const output = logSpy.mock.calls.flat().join('\n');
     const lines = output.split('\n').filter(Boolean);
-    expect(lines.length).toBeLessThanOrEqual(15);
-    expect(output).toContain('Init complete: 6/6 hosts ready');
+    expect(lines.length).toBeLessThanOrEqual(40);
+    expect(output).toContain('Init complete: 6/6 host projections written');
     for (const label of ['Claude Code', 'Codex', 'Cursor', 'Kiro', 'Qoder', 'OpenCode']) {
-      expect(output.match(new RegExp(`${label}:`, 'g')) || []).toHaveLength(1);
+      expect(output.match(new RegExp(`${label}:`, 'g')) || []).toHaveLength(2);
     }
     expect(output.match(/Global developer profile:/g) || []).toHaveLength(1);
     expect(output.match(/User-level language sync:/g) || []).toHaveLength(1);
@@ -563,7 +563,7 @@ describe('init run-level global developer prerequisite', () => {
     ], { lang: 'en' });
 
     const output = logSpy.mock.calls.flat().join('\n');
-    expect(output).toContain('Init result: 1/2 hosts ready');
+    expect(output).toContain('Init result: 1/2 host projections written');
     expect(output).not.toContain('Init complete:');
     expect(output).toContain('Codex: failed');
     expect(output).toContain('managed write failed (permission-denied)');
@@ -595,8 +595,8 @@ describe('init run-level global developer prerequisite', () => {
     initOutput.printInitApplySummaries([plan], [result], { lang: 'en' });
 
     const output = logSpy.mock.calls.flat().join('\n');
-    expect(output).toContain('Init result: 0/1 hosts ready');
-    expect(output).toContain('workspace 1/2 ready');
+    expect(output).toContain('Init result: 0/1 host projections written');
+    expect(output).toContain('child projections 1/2 written');
     expect(output).toContain('all-repos-partial-or-action-required');
     expect(output).toContain('init-exception');
     expect(output).toContain('permission denied for child repo');

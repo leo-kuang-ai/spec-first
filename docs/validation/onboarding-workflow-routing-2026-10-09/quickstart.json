@@ -1,0 +1,121 @@
+{
+  "code": 0,
+  "prompts": [
+    {
+      "type": "select",
+      "message": "默认回复语言（AI 助手回复所用语言）:",
+      "answer": "zh"
+    },
+    {
+      "type": "checkbox",
+      "message": "选择本次要使用的宿主（其他宿主可稍后初始化）:",
+      "choices": [
+        {
+          "label": "Claude Code",
+          "value": "claude",
+          "checked": true
+        },
+        {
+          "label": "Codex",
+          "value": "codex",
+          "checked": true
+        },
+        {
+          "label": "Cursor",
+          "value": "cursor",
+          "checked": false
+        },
+        {
+          "label": "Kiro",
+          "value": "kiro",
+          "checked": false
+        },
+        {
+          "label": "Qoder",
+          "value": "qoder",
+          "checked": true
+        },
+        {
+          "label": "OpenCode",
+          "value": "opencode",
+          "checked": true
+        },
+        {
+          "label": "ZCode",
+          "value": "zcode",
+          "checked": false
+        },
+        {
+          "label": "Pi",
+          "value": "pi",
+          "checked": true
+        }
+      ],
+      "answer": [
+        "codex"
+      ],
+      "basis": "validation-owner-selected-installed-Codex"
+    },
+    {
+      "type": "text",
+      "message": "开发者名称（用于 CHANGELOG author 与全局 developer profile）:",
+      "answer": "Onboarding Validation"
+    },
+    {
+      "type": "confirm",
+      "message": "是否同步用户级语言偏好到 Codex/Claude 用户 instruction 文件?（首次授权后后续 init 会自动维护；默认否）",
+      "answer": true,
+      "basis": "isolated-target-write-authorized"
+    },
+    {
+      "type": "confirm",
+      "message": "应用这些更改?",
+      "answer": true,
+      "basis": "isolated-target-write-authorized"
+    }
+  ],
+  "output": [
+    "─ spec-first v1.15.3",
+    "",
+    "正在检查环境...",
+    "  ✓ Node.js: v22.22.3",
+    "  ✓ Git: git version 2.50.1 (Apple Git-155)",
+    "  ✓ Claude Code: 2.1.281 (Claude Code)",
+    "  ✓ Codex: codex-cli 0.161.0",
+    "  ⚠ Cursor CLI: not found on PATH",
+    "  ⚠ Kiro: not found on PATH",
+    "  ✓ Qoder: 1.0.41",
+    "  ✓ OpenCode: 1.18.9",
+    "  ⚠ ZCode: not found on PATH",
+    "  ✓ Pi: 0.85.0",
+    "",
+    "检测到 5 个宿主（claude, codex, qoder, opencode, pi），回退到交互式 `spec-first init` 由你选择要初始化的宿主。",
+    "",
+    "───────────────────────────────────────────────────────────────────────────────────────\n ███████╗██████╗ ███████╗ ██████╗          ███████╗██╗██████╗ ███████╗████████╗\n ██╔════╝██╔══██╗██╔════╝██╔════╝          ██╔════╝██║██╔══██╗██╔════╝╚══██╔══╝\n ███████╗██████╔╝█████╗  ██║       █████╗  █████╗  ██║██████╔╝███████╗   ██║   \n ╚════██║██╔═══╝ ██╔══╝  ██║       ╚════╝  ██╔══╝  ██║██╔══██╗╚════██║   ██║   \n ███████║██║     ███████╗╚██████╗          ██║     ██║██║  ██║███████║   ██║   \n ╚══════╝╚═╝     ╚══════╝ ╚═════╝          ╚═╝     ╚═╝╚═╝  ╚═╝╚══════╝   ╚═╝   \n Spec-First v1.15.3\n AI coding harness for Claude Code, Codex, Cursor, Kiro, Qoder, OpenCode, ZCode, and Pi\n───────────────────────────────────────────────────────────────────────────────────────",
+    "已选择宿主运行时: Codex",
+    "初始化预览: 1 个目标 · 1 个宿主",
+    "内容变更: 不变 0 · 将更新 0 · 新增 610 · 移除 0（相对当前磁盘状态）",
+    "全局 developer profile: create · $VALIDATION_ROOT/setup-home/.spec-first/.developer · Onboarding Validation (zh)",
+    "  Codex: 风险操作 0 · 关键写入 7 · 生成 743",
+    "用户级语言同步: 2 项计划变更",
+    "  - codex: create · ~/.codex/AGENTS.md",
+    "  - profile: write · ~/.spec-first/.developer",
+    "以上为预览；确认后才会修改文件。",
+    "初始化结果: 1/1 个宿主 projection 已写入",
+    "  Codex: projection 已写入 · 38 skills · hook 已更新",
+    "已更新 .gitignore managed block",
+    "selected-host runtime 保持 Git 可见；请 review 后提交（Git index 未修改）",
+    "已创建 CHANGELOG.md",
+    "全局 developer profile: create · $VALIDATION_ROOT/setup-home/.spec-first/.developer · Onboarding Validation (zh)",
+    "用户级语言同步: ready",
+    "目标目录：/private$VALIDATION_TARGET",
+    "  Codex：projection 已写入；宿主加载、任务能力与 workflow 结果未验证。",
+    "  主行动：在此目录重启 Codex 或新开会话。",
+    "  恢复（此目录的终端）：spec-first doctor --codex（只读，无需重跑 init）。",
+    "  然后在宿主会话描述真实任务；没有任务时可输入示例：",
+    "    请使用 spec-brainstorm：我想减少项目中重复出现的需求澄清，请帮我明确使用场景、范围和成功标准。",
+    "  确认实际入口与任务相关的首个实质结果；欢迎语或推荐入口不算成功。",
+    "  仅当所选任务缺少必需能力：在宿主会话请求 spec-runtime-setup，完成后复查同一范围。"
+  ],
+  "target": "$VALIDATION_TARGET"
+}

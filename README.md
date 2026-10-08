@@ -71,19 +71,13 @@ spec-first init --codex -y -u <name> --lang <zh|en>
 
 ### 2. 首次运行 workflow
 
-在宿主会话中运行（这些不是 shell 子命令）。首次 workflow 前先准备 runtime；后续在 readiness 或配置变化时重跑：
+在初始化输出的同一目录打开所选宿主的新会话，直接描述真实任务；这些入口不是 shell 子命令。没有现成任务时，可以输入：
 
 ```text
-spec-runtime-setup
+请使用 spec-brainstorm：我想减少项目中重复出现的需求澄清，请帮我明确使用场景、范围和成功标准。
 ```
 
-随后生成第一个需求产物：
-
-```text
-spec-brainstorm "改进 CLI 新用户 onboarding"
-```
-
-这会把模糊想法收敛为可审查的 requirements artifact，通常位于：
+首个实质结果应包含问题定义、范围、成功标准和待确认项；欢迎语或入口推荐不算成功。值得持久化的需求产物通常位于：
 
 ```text
 docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
@@ -91,7 +85,9 @@ docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
 
 如果需求已经明确，可直接使用 `spec-plan`；准备执行时使用 `spec-work`。如果没有值得持久化的决策，workflow 可以合法地不创建文档；这不表示运行失败。
 
-找不到入口时，先运行 `spec-first doctor` 查看简明总览；需要完整检查明细时使用 `spec-first doctor --verbose`，脚本和 CI 使用 `spec-first doctor --json`。宿主限制以 [Runtime Capability Catalog](docs/catalog/runtime-capabilities.md) 为准。
+只有当前任务缺少必需的 MCP/helper 或 readiness 需要修复时，才在宿主会话请求 `spec-runtime-setup`；可选能力缺失时可说明限制后继续。初始化成功只证明 projection 已写入，尚不证明宿主加载或任务成功。
+
+关闭终端后，回到初始化输出的 target，运行 `spec-first doctor --codex`（使用原来选择的宿主参数）；它只读检查，不需要重新 init。找不到入口时使用 `--verbose` 查看明细，脚本和 CI 使用 `--json`。宿主限制以 [Runtime Capability Catalog](docs/catalog/runtime-capabilities.md) 为准。
 
 ## 选择合适的 Workflow
 
@@ -99,9 +95,11 @@ docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
 
 按当前任务进入一项即可，不要求从头依次运行。以下是能力地图，后续步骤由当前任务、验证结果和授权决定。
 
+例如，“有想法但范围未定”进入 `spec-brainstorm`；“目标确定、实现方式未定”进入 `spec-plan`；“已有方案请实现”进入 `spec-work`。测试失败先进入 `spec-debug`，已有文档要审查进入 `spec-doc-review`，已验证经验要沉淀进入 `spec-compound`。只询问下一步时返回一个入口建议；明确请求执行时继续已授权任务。
+
 | 阶段 | 何时使用 | Skill | 主要结果 |
 |---|---|---|---|
-| 环境准备 | 首次使用、MCP/helper 缺失或配置变化 | `spec-runtime-setup` | readiness facts 与准备结果 |
+| 环境准备 | 当前任务必需的 MCP/helper 缺失或 readiness 需要修复 | `spec-runtime-setup` | readiness facts 与准备结果 |
 | 方向探索 | 比较多个候选方向 | `spec-ideate` | 排序后的方向记录 |
 | 需求定义 | 有想法，但范围和成功标准未定 | `spec-brainstorm` | requirements-only plan |
 | PRD 澄清 | 已有 PRD，需要结合代码澄清 | `spec-prd` | planning-readiness artifact |

@@ -27,6 +27,8 @@ For every request outside the fast paths, and to validate an explicit public rou
 
 For active work, announce one localized line equivalent to `Entering <entrypoint>: <one concrete reason>`, then follow the selected route. If a standalone skill is user-invoked only, recommend it and wait. For recommendation-only requests, return exactly one recommendation and wait:
 
+根据用户已有输入和希望得到的结果选择入口；不要要求用户先理解完整 workflow 清单。明确点名的入口、当前进行中的 owner 和失败信号优先按现有边界处理。只有缺少会改变入口的关键信息才问一个问题；需求到执行不自动串联。不确定环境能力时先判断当前任务是否必需，缺少可选能力允许披露限制后继续，缺少必需能力才交给 `spec-runtime-setup`。
+
 ```text
 Recommended entrypoint: <spec-*, standalone skill, or terminal command>
 Reason: <one concrete reason>
@@ -34,6 +36,10 @@ Next action: <one action the user can take now>
 ```
 
 Use the repository's configured user language. **Checkpoint — wait:** after any recommendation, stop and yield; enter the recommended entrypoint only after the user asks to continue.
+
+此等待仅适用于用户询问下一步、要求推荐或比较入口的场景。用户已明确要求执行任务时，选择入口后继续履行该任务已获授权的工作，不再把入口推荐当成一次新的审批。
+
+首次获得任务相关的实质结果后，依据可回源的宿主、target、实际入口、时间、结果和来源说明完成范围及未完成项；欢迎语、入口推荐、setup receipt 和文件存在均不能证明首次任务成功。下一入口仍按 public route map 选择恰好一项建议，由当前 owner 承接已有执行授权；不为示例强制创建文件，也不自动提交、发布或升级为已验证知识。
 
 ## Exit Boundaries
 

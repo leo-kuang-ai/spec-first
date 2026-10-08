@@ -1,7 +1,7 @@
 ---
 title: "首次上手与日常 Workflow 路由体验 - Plan"
 type: feature
-status: active
+status: completed
 date: 2026-10-08
 spec_id: 2026-10-08-onboarding-workflow-routing-ux
 artifact_contract: spec-unified-plan/v1
@@ -517,3 +517,5 @@ first-success 必须同时满足 R2.2/R2.5/R2.6。完整输出或产物可回源
 2026-10-09 LFG 规划入口复核：复用当前文件作为本轮写入的 canonical plan，确认 active、implementation-ready、execution: code 与 U1-U4 合同完整；Product Contract 保持原文。此次由 producer 作有界复核，未新增独立文档审查；不扩大产品范围，后续实现与真实宿主验证仍按 V1-V3 执行。
 
 2026-10-09 三角色隔离审查（coherence/feasibility/design-lens，feasibility 对照源码核验）与优化复盘后，落地 6 项方案修复：Implementation Commands 补入 U1 缺失的 `tests/unit/init-input-profile-validation.test.js`；U2 测试场景补「已验证经验沉淀→compound」（Product Contract 的 R3.5 措辞不动以维持字节一致，路由去向在 U2 层落地）；U2/U3 显式承接 Flow A「确认首次成功」收口时刻；U3 默认摘要新增内容设预算上限；KTD5 术语统一为「历史目录」；U1 补宽度策略并将 `tests/smoke/cli-smoke.test.js` 成功摘要断言列入迁移清单。本轮仅修订方案文本，未实现、未运行实施测试、未执行 fresh-source 或真实宿主验证。
+
+2026-10-09 LFG 最新方案入口复核：以提交 `78b2a3a9` 的修订为基线，确认 U1-U4、摘要预算、命令级恢复与 V1-V3 验证合同可进入代码执行。当前 producer 有界复核未新增独立文档审查，Product Contract 原文保持不变；报告路径为本文件，代码执行交给 `spec-work mode:return-to-caller`，提交与 PR 由 LFG 后续门禁负责。
