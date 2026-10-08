@@ -1,7 +1,7 @@
 {
   "schema_version": "onboarding-source-manifest/v1",
   "purpose": "审查修复后 canonical source；历史 V2/V3 来源仍见 source-manifest.json。",
-  "base": "78b2a3a9fd54f39c7b6835c318d608bfc1d99024",
+  "base": "a250a7d78aa587719cab004fe806a3b331f3af92",
   "excluded": [
     "docs/validation/ 证据本身",
     "docs/plans/ 后置 lifecycle 标记"
@@ -9,7 +9,7 @@
   "files": [
     {
       "file": "CHANGELOG.md",
-      "sha256": "ceebc67904807847c65bb999094e5b9c95fd7b5fc571388d7a9dbd271eccc984"
+      "sha256": "03a677f09bd2f75a0e1263412775fe1e975eb1e3b9aba69eb4a237736a0c410a"
     },
     {
       "file": "README.en.md",
@@ -26,6 +26,10 @@
     {
       "file": "docs/05-用户手册/01-快速开始.md",
       "sha256": "4bdcd065607d096ba0cce6164dac445c327f04cd6bab885452534131ab35de73"
+    },
+    {
+      "file": "scripts/check-release-continuity.cjs",
+      "sha256": "32aeb7ab69e62efee9d51d5e4192f6010effa97ee91e13f62f00f108bd446305"
     },
     {
       "file": "skills/using-spec-first/SKILL.md",
@@ -78,6 +82,10 @@
     {
       "file": "tests/unit/init-workspace-contract.test.js",
       "sha256": "8b2227426d74e7d2dc143c0c3573e6b35275e44e0815c5d8a43ce1eda61e81d0"
+    },
+    {
+      "file": "tests/unit/release-continuity-opencode.test.js",
+      "sha256": "c6ad9c75c1affe704f025b94e5a093ea01966bf469dcbf577ef231d888730356"
     }
   ]
 }

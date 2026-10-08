@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-10-09 01:15:55 codex: fix(release): 将 OpenCode 发布展示检查改为校验 registry 派生的实际品牌输出，修复已退役的硬编码 preview 字符串导致的 CI 误阻断；保留缺失宿主时的阻断并补充正负例，同步修正本轮 Changelog 记录格式。 (internal)
 - v1.15.3 2026-10-09 codex: feat(onboarding): 将 init 引导绑定实际宿主与 target，区分 projection 写入和任务成功；doctor 增加只读恢复建议与证据上限，入口路由及快速开始文档改为任务先于按需 setup；真实宿主与产品收益验证状态见本次验证报告。 (user-visible)
 - v1.15.3 2026-10-09 zcode: docs(plan): 按三角色隔离审查与优化复盘修订首次上手与 Workflow 路由方案：Implementation Commands 补入 U1 缺失测试文件、U2 补「已验证经验沉淀→compound」路由场景并显式承接 Flow A 收口、U3 默认摘要新增内容设预算上限、KTD5 术语统一为「历史目录」、U1 补宽度策略与 cli-smoke 成功摘要断言迁移清单；Product Contract 保持字节一致，仅修订方案文本，未实施或验证真实宿主与用户收益。 (user-visible)
 - v1.15.3 2026-10-08 codex: docs(plan): 将首次上手与 Workflow 路由方案深化为技术实施计划，明确 init/doctor/路由 owner、四个实施单元、多宿主 target 与证据兼容边界及分层验证；保留 Product Contract，仅完成规划，未实施或验证真实宿主与用户收益。 (user-visible)

@@ -23,6 +23,10 @@
 
 无未处理 actionable finding、settled-decision conflict 或 needs-human decision。未单独覆盖 all-repos 后每个子仓的 doctor 进程组合；现有 init topology 单测与本轮普通/父级/子级/partial continuation 覆盖不等同穷举。浏览器为 `not_applicable`：变更只涉及 CLI、workflow prose 与文档，没有网页交互。最终 gate 重新运行全部适用本地检查，并以三次工作树指纹一致确认 freshness；运行摘要保留于本地 ignored workflow 证据目录，不宣称全套测试通过。
 
+PR #57 的首次 CI 暴露基线发布检查误阻断：`brand.js` 已从 registry 动态生成宿主展示，但 release continuity 仍搜索硬编码 `OpenCode preview`。本地复现相同失败后，改为检查实际品牌输出和 registry 中的 OpenCode，并用接受动态输出、拒绝缺失输出两个正负例验证；发布前再次运行完整 release-governance 与原有聚焦检查。此处为 CI 后续修复，由 owner 回源审查，未新增独立 reviewer，也未重跑 V2/V3 模型调用。远端 CI 状态以 PR 当前提交的 Checks 为准。
+
+首次 `ai-dev-gate` 中 618 项测试有 1 项失败，为 Changelog 首条记录缺少必需的时分秒。本地复现后补齐本轮最新记录时间，并将已有 `changelog-format` 套件加入最终验证；其余 617 项在该次远端运行中通过，但不代表修复后提交已经通过 CI。
+
 隔离快照只包含 README、CLI、单测及生成的 runtime；缺少完整 docs/contracts、package.json 和原项目提交基线。因此真实任务明确未运行所规划的项目测试。这次 V3 证明该快照中的入口加载与单次首个实质结果，不证明完整仓库工作流、模型稳定性或宿主 parity。实际加载以会话命令和输出为证，结果充分性由 owner 回源判断；进程完成并不自动证明语义质量。
 
 其他宿主真实任务为 `not_run`；Pi trust、workspace、多宿主边界只有本地合同测试。V4 人工试用未执行，不宣称首次成功率、路由准确率或耗时改善。后续在完整项目按相同任务复测，再以人工试用观察澄清、误判和恢复成本。
