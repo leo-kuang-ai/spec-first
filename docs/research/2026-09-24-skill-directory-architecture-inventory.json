@@ -12,15 +12,60 @@
     "with_assets": 3,
     "broken_relative_markdown_links": 0
   },
-  "classification_rule": "D >= 30000 bytes; C >= 15000 bytes or >= 5 top-level dirs; B no references; otherwise A",
+  "classification_rule": "人工架构分组，不是可执行阈值：体积与目录数量仅为导航线索；分组不代表完整语义审查或运行时清晰度。",
   "classes": {
-    "D-高密度待优化": ["spec-debug", "spec-prd", "spec-runtime-setup"],
-    "C-复杂但结构可解释": ["autoresearch", "spec-app-consistency-audit", "spec-compound-refresh", "spec-doc-review", "spec-optimize", "spec-plan", "spec-work", "spec-write-skill", "spec-write-tasks"],
-    "B-轻量无引用": ["spec-commit", "spec-simplify-code", "spec-worktree"],
-    "A-标准模块化或轻量专用": ["spec-brainstorm", "spec-code-review", "spec-commit-push-pr", "spec-compound", "spec-dogfood", "spec-explain", "spec-handoff", "spec-ideate", "spec-lfg", "spec-polish", "spec-pov", "spec-product-pulse", "spec-project-rules", "spec-promote", "spec-prototype", "spec-resolve-pr-feedback", "spec-riffrec-feedback-analysis", "spec-rule-miner", "spec-strategy", "spec-sweep", "spec-test-browser", "spec-test-xcode", "using-spec-first"]
+    "D-高密度待优化": [
+      "spec-debug",
+      "spec-prd",
+      "spec-runtime-setup"
+    ],
+    "C-复杂但结构可解释": [
+      "autoresearch",
+      "spec-app-consistency-audit",
+      "spec-compound-refresh",
+      "spec-doc-review",
+      "spec-optimize",
+      "spec-plan",
+      "spec-work",
+      "spec-write-skill",
+      "spec-write-tasks"
+    ],
+    "B-轻量无引用": [
+      "spec-commit",
+      "spec-worktree"
+    ],
+    "A-标准模块化或轻量专用": [
+      "spec-brainstorm",
+      "spec-code-review",
+      "spec-commit-push-pr",
+      "spec-compound",
+      "spec-dogfood",
+      "spec-explain",
+      "spec-handoff",
+      "spec-ideate",
+      "spec-lfg",
+      "spec-polish",
+      "spec-pov",
+      "spec-product-pulse",
+      "spec-project-rules",
+      "spec-promote",
+      "spec-prototype",
+      "spec-resolve-pr-feedback",
+      "spec-riffrec-feedback-analysis",
+      "spec-rule-miner",
+      "spec-strategy",
+      "spec-sweep",
+      "spec-test-browser",
+      "spec-test-xcode",
+      "using-spec-first",
+      "spec-simplify-code"
+    ]
   },
   "limitations": [
     "Structural inventory only; it does not prove runtime load order, semantic adequacy, or model-token cost.",
-    "Directory names and reference presence are advisory signals; specialized packages require semantic review."
-  ]
+    "Directory names and reference presence are advisory signals; specialized packages require semantic review.",
+    "2026-09-30 仅复核分类口径与 spec-simplify-code 嵌套 personas；原 2026-09-24 数量及断链扫描不是本次重新全量扫描结果。",
+    "原 Markdown 链接检查不覆盖锚点、代码块路径、host projection 或真实 reference trigger。"
+  ],
+  "rechecked_at": "2026-09-30"
 }

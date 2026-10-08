@@ -147,7 +147,7 @@ Graphify 本次可调用，查询给出相关 helper、projection 与测试导�
 
 ### 官方指南映射：从模型特性到 Skill 决策
 
-以下事实来自本会话 2026-09-24 已读取的官方页面。它们是候选设计依据，不是 spec-first 的行为验证。
+以下为 2026-09-24 调研记录的候选映射。2026-09-30 审查未恢复资料 5—10 的正文读取凭据，具体模型行为与官方归因统一标记 pending-verification；须绑定原文后才能作为设计依据，当前也不是 spec-first 的行为验证。
 
 | 模型/产品 | 官方提醒 | 对 spec-first 的候选适配 | 不可直接推断 |
 | --- | --- | --- | --- |
@@ -159,7 +159,7 @@ Graphify 本次可调用，查询给出相关 helper、projection 与测试导�
 | Claude Fable 5.1 | 进度少、低 effort 可能少检索，独立调用可能串行 | 仅在对应失败发生时添加进度/检索/批量调用短补丁 | “每个 Skill 都需要三条新规则” |
 | Claude context engineering | 最小高信号上下文，按需读取，压缩与记忆 | 降低确定重复读取，保护冷 reference 触发与压缩后恢复 | “移入 reference 就已经省 token” |
 
-首轮核心验证层：Codex + GPT-6 Astra、Claude Code + Opus 5.5。Fable 5.1、Sol、Sonnet 5 是按账户能力与预算选择的扩展层。各层单独报告，不以一种模型的结果代表另一种。Claude Code 与 Claude API 是不同宿主环境，API 实验不能冒充 Claude Code 实测。
+首轮候选验证层（型号待准入复核）：Codex + GPT-6 Astra、Claude Code + Opus 5.5。Fable 5.1、Sol、Sonnet 5 是按账户能力与预算选择的扩展层。各层单独报告，不以一种模型的结果代表另一种。Claude Code 与 Claude API 是不同宿主环境，API 实验不能冒充 Claude Code 实测。
 
 ### 三轮双视角讨论与裁决
 
@@ -192,7 +192,7 @@ Graphify 本次可调用，查询给出相关 helper、projection 与测试导�
 - KTD8. **已有 owner 分工不变。** `spec-plan` 产方案；后续执行 owner 管理 source 改动；系统 `skill-creator` 按用户偏好辅助 authoring；`skill-upper` 承担实际评测；`spec-optimize mode:measurement-only` 测量固定双臂；项目 owner 决定推广。测量工具不选 winner、不写产品源。
 - KTD9. **按源码修复、按宿主验证。** `skills/` 正文继续唯一来源，Claude command/Codex Skill 继续现有 projection。不先加模型专属 runtime 分叉或新的 loader。
 - KTD10. **没有观测能力就收缩 claim。** 不造“模型记得”的布尔真值；看不到请求/计费就报 unavailable，量不到准确 token 就报 proxy。
-- KTD11. **质量先于成本。** 质量硬门独立于 token、成本和耗时；关键行为回归直接拒绝，普通质量按非劣效判断，只有质量门通过后才计算成本收益。
+- KTD11. **质量先于成本。** 质量硬门独立于 token、成本和耗时；关键行为回归直接拒绝，普通质量按预注册案例级零退化门判断，不作统计非劣效声明，只有质量门通过后才计算成本收益。
 
 ### 高层设计与 consumer
 
@@ -259,7 +259,7 @@ C2 跨阶段复用只作为后续候选，不属于首轮交付。它需要单�
 
 保护案例必须覆盖 plan-only、未授权写入、虚假完成、缺证据、截断、context reset/resume、scope/owner 变化、429/timeout、handoff 和 consumer replay。确定性脚本只检查身份、路径、字段、计数和已知危险模式；语义质量由盲评 judge 或人工校准判断。最终文本相似不等于能力等价。
 
-结果只允许三种推广语义：`promote`（质量硬门通过且有成本收益）、`no-change`（质量保持但成本收益不足或没有机会）、`reject/rollback`（质量门失败或证据不足）。成本收益不能抵消关键回归；无法观测上下文留存时，候选必须回到保守重读路径。
+结果只允许三种推广语义：`promote`（质量硬门通过且有成本收益）、`no-change`（质量保持但成本收益不足或没有机会）、`reject/rollback`（有确定质量失败）；证据不足另记 `inconclusive` 并禁止推广。成本收益不能抵消关键回归；无法观测上下文留存时，候选必须回到保守重读路径。
 
 ### 良好 Skill 的目标形状
 
@@ -328,6 +328,8 @@ C2 跨阶段复用只作为后续候选，不属于首轮交付。它需要单�
 **场景与验证：** 同文件重复读分别计数；无读记录时不能记零成本；部分读取按真实 payload 计；模型未知和 429 不生成成功分；无法证明 residency 的宿主走保守路径。source estimator `bytes/4` 与真实 tokenizer 明确分列。
 
 **交付：** 固定 case/rubric、source/harness/environment 身份、可用指标清单与机会分析。若没有确定重复事件，则给 no-opportunity，U3/U4 不启动。
+
+本轮已先建立测评准入草案：`docs/validation/skill-prompt-adaptation/spec-plan-baseline/case-catalog.yaml`、`quality-rubric.md`、`judge-contract.md`、`observability-probe.md` 与 `baseline-receipt.schema.json`。这些文件仍标记为 `draft-freeze-candidate` / `not-run`，必须在实际 A/A 前绑定具体 fixture、执行器和 source identity；它们不代表已完成模型测评。
 
 ### U3. 构造 spec-plan C1 候选和保护案例
 
@@ -428,7 +430,7 @@ N 不执行“去掉 Skill 却通过另一个入口自动加载”的假 no-skil
 - 每个主验证层准备至少 20 个独立任务案例：12 个 development、8 个 holdout。覆盖短计划、长计划、多文档、异常/恢复；holdout 至少各有两个上述类型案例。
 - A/A 至少两次完整 baseline 重复，先在代表性子集确认 harness 可用；最终 A/B 每个案例每臂至少 3 次。重复是同 case 的观测，不当成独立任务增加样本量。
 - 每个主验证层指一个冻结的 model ID × host version × effort × cache 策略组合；Codex 与 Claude 分层判断，不混合 token 或统计样本。首轮每层、每候选最多 200 次任务 attempts：A/A 的 20 × 2 = 40 次，冻结 A/B 的 20 × 2 × 3 = 120 次，共 160 次；余下 40 次用于预检查、校准或基础设施重试，全部计入上限。N、M、B2 不包含在本轮必需配额内，另行预注册和授权；不得挤占主比较所需样本。Judge 调用另列次数，但必须纳入同一费用上限。单次最长 900 秒，同一基础设施错误最多重试 1 次；费用上限必须在实际执行前明确，达到任一预算先停止，不自动扩容。
-- 质量是第一主目标，成本是第二主目标。每个 case 先取重复中位，先检查质量硬门，再比较配对读取降幅；质量门未通过时，不计算“成本改善成功”。质量门包括关键行为零新增回归、普通质量非劣、artifact/consumer/handoff 不断裂，以及授权、验证、恢复和 source/runtime 边界不退化。
+- 质量是第一主目标，成本是第二主目标。质量逐次判断，任何一次关键失败均阻断推广；仅对成本指标取重复中位，再比较配对读取降幅；质量门未通过时，不计算“成本改善成功”。质量门包括关键行为零新增回归、普通质量非劣、artifact/consumer/handoff 不断裂，以及授权、验证、恢复和 source/runtime 边界不退化。
 - 只有质量门通过后，才要求全部 case 的指令读取 payload 配对中位下降 ≥20%。基线为零的 case 不进入比率，单列绝对差值并检查没有新增成本。
 - A/A 按指标分别计算噪声：对 case i 的两次 baseline 值 aᵢ、a′ᵢ，取 nᵢ = |aᵢ − a′ᵢ| / ((aᵢ + a′ᵢ) / 2)，再取 case 中位数；使用绝对差避免正负抵消。两值均为零时不进相对分母，单列零成本案例；仅一个为零仍按公式计算。指令 payload、总成本与耗时的噪声中位数均须 ≤10%，否则停止 A/B。
 - A/B 每 case 每 arm 先取 3 次有效运行的中位数，改善率为 (Aᵢ − Bᵢ) / Aᵢ；非劣回归率为 (Bᵢ − Aᵢ) / Aᵢ。基线零值不进入比率：B 也必须为零，否则本次门不通过。预注册 bootstrap 调度 seed，以 case 为单位配对重采样 10,000 次，使用 percentile 95% 区间（2.5%、97.5% 分位数），不得把重复运行当独立 case。
@@ -438,7 +440,7 @@ N 不执行“去掉 Skill 却通过另一个入口自动加载”的假 no-skil
 - 候选未完成任务不能当成低成本样本。所有 attempts 先分类，基础设施 broken runs 不合成分；有效运行中的行为失败属于质量失败并阻断推广。
 - holdout 不用于调 Prompt。暴露后若需改候选，必须冻结新 treatment 并换独立 holdout；不足样本或预算耗尽，结论 inconclusive。
 
-质量门通过但 20% 未达到时，可以报告“质量保持/提升、成本目标未达”的观察；不能宣称本轮读取优化目标完成。质量门未通过时只能报告 rejected/rollback，不得用成本收益包装为部分成功。上述阈值若需变更，必须在查看对应 A/B 数据之前重新预注册，不能事后迁就结果。
+质量门通过但 20% 未达到时，可以报告“质量保持/提升、成本目标未达”的观察；不能宣称本轮读取优化目标完成。质量确定失败时报告 rejected/rollback；证据或样本不足时报告 inconclusive，不得用成本收益包装为部分成功。上述阈值若需变更，必须在查看对应 A/B 数据之前重新预注册，不能事后迁就结果。
 
 ### 保护案例矩阵
 
@@ -496,6 +498,7 @@ N 不执行“去掉 Skill 却通过另一个入口自动加载”的假 no-skil
 - 已完成 canonical source 结构清点与重点调用链阅读。
 - 已完成两种工程视角的三轮讨论，保留反驳、撤回和最终取舍。
 - 已输出可访问方案、source baseline、来源和证据边界。
+- 已建立 `spec-plan` 测评准入草案：20-case catalog、四层 quality rubric、blind judge contract、host observability probe 与 baseline receipt schema；尚未冻结执行 fixture 或运行。
 - 完成文档结构、路径和独立审查；审查结果以附录最终记录为准。
 - 不将讨论、source bytes、文档评审或计划 readiness 当作优化效果。
 
@@ -523,7 +526,7 @@ U1–U4 得到可复核结果，U5 有明确推广/不推广裁决，U6 有下�
 
 ### 全局结构结论
 
-当前 38 个 Skill 均有 `SKILL.md` 和 `evals/`；36 个有 `references/`，23 个有 `scripts/`，3 个有 `agents/`，3 个有 `assets/`。Markdown 相对链接扫描未发现断链。整体架构清晰地表达了四类职责：入口脊柱、条件引用、确定性执行、维护者回归。没有证据表明需要新增统一 `manifest.json`、全局 registry 或第二套目录协议；这与现有质量治理合同的 non-goals 一致。
+当前 38 个 Skill 均有 `SKILL.md` 和 `evals/`；36 个有 `references/`，23 个有 `scripts/`，3 个有 `agents/`，3 个有 `assets/`。原扫描未发现 Markdown 相对文件路径断链，但未覆盖锚点、代码块路径、投射或实际触发；不能称运行时可导航已通过。目录层面可识别四类职责：入口脊柱、条件引用、确定性执行、维护者回归。没有证据表明需要新增统一 `manifest.json`、全局 registry 或第二套目录协议；这与现有质量治理合同的 non-goals 一致。
 
 但“都有 evals”只证明维护资产存在，不证明每个 Skill 的 eval 覆盖真实宿主或语义结果；同样，`references/` 文件数量不是单次加载量。目录审查只能回答 ownership 和可导航性，不能替代 read trace、source binding 或行为评测。
 
@@ -559,7 +562,7 @@ U1–U4 得到可复核结果，U5 有明确推广/不推广裁决，U6 有下�
 | `spec-riffrec-feedback-analysis` | refs + scripts | 专用输入分析包，结构清楚 | 外部工具缺失时保持 degraded 事实 |
 | `spec-rule-miner` | refs + evals | 轻量模块化 | 防止 pattern reference 演变为硬编码专家系统 |
 | `spec-runtime-setup` | 3 refs + scripts，入口约 58.1 KB | 高密度待优化；registry/schema 与运行脚本形成第二复杂度轴 | 先把 setup registry、脚本、引用的读取链画清，避免把配置模板误当 Prompt 冗余 |
-| `spec-simplify-code` | 仅 evals | 轻量正文包，结构清楚但无引用拆分 | 仅在出现重复分支时再提取 reference |
+| `spec-simplify-code` | refs/personas + evals | 轻量入口，已有三类 reviewer 资产 | 核对 persona 分工与调用，不重复提取已有资产 |
 | `spec-strategy` | refs + evals | 标准模块化 | 保持战略文档与实现计划边界 |
 | `spec-sweep` | refs + scripts | 反馈批处理包，结构可解释 | 核对 state schema、脚本和外部副作用 owner |
 | `spec-test-browser` | refs + scripts | 工具型包，结构清晰 | 保持真实浏览器证据与静态合同分开 |
@@ -574,7 +577,7 @@ U1–U4 得到可复核结果，U5 有明确推广/不推广裁决，U6 有下�
 
 当前没有发现需要统一目录格式的结构性缺陷。最值得进入 Prompt 长度优化的是三个高密度入口：`spec-prd`、`spec-runtime-setup`、`spec-debug`；但它们必须先做实际读取路径和引用触发证据。第二优先级是检查复杂专用资产之间的重复（`spec-app-consistency-audit`、`spec-doc-review`、`spec-compound`/`spec-compound-refresh`、`spec-write-skill`/`spec-write-tasks`），不是把它们强行合并成共享平台。
 
-轻量包（`spec-commit`、`spec-simplify-code`、`spec-worktree`、`spec-test-xcode`、`using-spec-first`）不应因为缺少 `references/` 就被判定为设计不清；应看正文是否包含清晰 trigger、inputs、outputs、failure mode 和 done signal。结构统一的目标是让 ownership 可导航，而不是让每个目录拥有相同数量的文件。
+轻量包（`spec-commit`、`spec-simplify-code`、`spec-worktree`、`spec-test-xcode`、`using-spec-first`）不应按引用目录数量判断设计清晰度，其中 `spec-simplify-code` 已有嵌套 persona 引用；应看正文是否包含清晰 trigger、inputs、outputs、failure mode 和 done signal。结构统一的目标是让 ownership 可导航，而不是让每个目录拥有相同数量的文件。
 
 本审查仍是结构级结论。下一步对每个高密度入口至少采集：实际读取事件、引用触发命中率、重复读取、截断/恢复、下游 artifact consumer 和关键行为 case；若某个复杂入口的加载路径本身已经很窄，则保留现状。
 
@@ -617,6 +620,18 @@ U1–U4 得到可复核结果，U5 有明确推广/不推广裁决，U6 有下�
 
 本轮是计划生产，不修改 Skill、CLI、测试、角色契约或 generated runtime；没有运行模型 benchmark、实际 Skill 行为评测或现场试验。结构基线只支持 `trigger_evidence=structural_only`。
 
-两名讨论 Agent 有独立任务但继承相同会话上下文与宿主模型；三轮交叉讨论存在相关性，不能称为独立跨模型实验。另由未继承会话的 fresh reviewer 进行只读文档审查：无 P0/P1，发现 2 项 P2（运行顺序与噪声/holdout 口径）。主审已补充区组随机交错、工作区隔离、绝对噪声公式、bootstrap 算法、独立 holdout 门与最小有效样本。同一 fresh reviewer 已针对修正复核，两项 P2 均关闭，无未解决审查项。审查只证明文档缺陷已处理，不能据此宣称 Prompt 优化已完成。
+两名讨论 Agent 有独立任务但继承相同会话上下文与宿主模型；三轮交叉讨论存在相关性，不能称为独立跨模型实验。另由未继承会话的 fresh reviewer 进行只读文档审查：无 P0/P1，发现 2 项 P2（运行顺序与噪声/holdout 口径）。主审已补充区组随机交错、工作区隔离、绝对噪声公式、bootstrap 算法、独立 holdout 门与最小有效样本。同一 fresh reviewer 已针对修正复核，两项 P2 在当时的限定范围内关闭；该结论不覆盖后来新增的质量保护、目录分析及测评草案。审查只证明文档缺陷已处理，不能据此宣称 Prompt 优化已完成。
 
 本轮确定性检查：38 个 Skill 入口与 32 个选定 source SHA-256、字节/行数汇总一致；frontmatter 可解析、必需章节齐备；现有引用路径及 npm 命令存在；两个尚不存在的路径明确属于拟新增实验产物；Markdown/JSON 无行尾空白，`git diff --check` 通过。未运行实现测试，因为本轮未修改实现。
+
+### 2026-09-30 审查修订与实验准入
+
+本轮只修订方案、调研事实口径与测评合同，未改 Skill、CLI、根入口或 generated runtime。计划可用于安排 U1/U2 准备工作，不代表 A/A 已获准或 C1 可行性已证实。
+
+- 质量逐次审查，任一候选关键失败即阻断；普通质量按需求覆盖、源码依据、可操作性、可验证性四维案例级零退化判断。正文中的普通质量“非劣”均指这个有限案例门，不是统计非劣效或普遍能力不下降保证；成本非劣区间仍按原公式。
+- Runner 保存真实 arm/source/model/host；judge 仅见随机样本标签与充分的脱敏证据。单臂判断 critical_failure，解盲汇总才判断 paired regression。具体接口见 judge-contract.md。
+- baseline receipt 强制四层结果、关键失败与 trace 字段，pass 要求 confirmed 模型身份与通过证据；质量 pass 不等于成本可观测或 promotion。Schema 不证明引用真实性，执行器仍须检查路径、hash、完整性与身份映射。
+- A/A 前须绑定 20 个真实 fixture、逐层 oracle、禁止行为、runner 命令与权限/预算快照；为 holdout 映射短计划、长计划、多文档、异常恢复各 2 个案例。当前公开的 case 标签不是独立留出输入；实际 holdout 输入由独立保管方冻结，不供候选调优。
+- 先实现并运行宿主专属只读 probe，记录 trace 格式、完整读取与 residency 可观测证据。任何宿主无法证明 residency 时保守重读，允许 no-opportunity，不为实现收益扩张 C1。
+- U1 根入口 saturation 纠偏仍未实施；应保留有效样本、NO_RUN 与不可外推限制，并通过生成流程同步。旧 cross-model-eval 与当前单 peer dispatch 的契约冲突也留作源码 owner 后续处理，本轮不修改 Skill。
+- 官方资料 5—10 的原文核验、fixture/runner、host probe、judge 人工校准及真实 A/A、A/B 均未完成。以上均为实验准入前置，不能将本轮文档修订称作测评已就绪。

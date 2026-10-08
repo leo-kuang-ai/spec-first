@@ -1,4 +1,9 @@
 # Changelog
+- v1.15.3 2026-10-09 zcode: docs(plan): 按三角色隔离审查与优化复盘修订首次上手与 Workflow 路由方案：Implementation Commands 补入 U1 缺失测试文件、U2 补「已验证经验沉淀→compound」路由场景并显式承接 Flow A 收口、U3 默认摘要新增内容设预算上限、KTD5 术语统一为「历史目录」、U1 补宽度策略与 cli-smoke 成功摘要断言迁移清单；Product Contract 保持字节一致，仅修订方案文本，未实施或验证真实宿主与用户收益。 (user-visible)
+- v1.15.3 2026-10-08 codex: docs(plan): 将首次上手与 Workflow 路由方案深化为技术实施计划，明确 init/doctor/路由 owner、四个实施单元、多宿主 target 与证据兼容边界及分层验证；保留 Product Contract，仅完成规划，未实施或验证真实宿主与用户收益。 (user-visible)
+- v1.15.3 2026-10-08 codex: docs(plan): 优化首次上手与日常 Workflow 路由需求，改为独立证据维度与任务先于 setup，补充宿主探测/取消出口、审查与任务连续性、首个实质结果判据及人工试用设计；仅更新产品方案，未实施 CLI/Skill/runtime 或验证现场收益。 (user-visible)
+- v1.15.3 2026-09-30 codex: docs(plan): 按审查修订 Prompt 适配方案及测评合同，补充逐次质量门、Judge 盲化与 receipt 约束，纠正目录分类及官方资料证据状态；真实 fixture、宿主 probe 与模型评测仍未运行，不涉及 Skill/runtime 变更。 (user-visible)
+- v1.15.3 2026-09-24 17:33:29 tester: docs(validation): 细化 spec-plan Prompt 适配测评准入，新增 20-case catalog、四层质量 rubric、blind judge contract、宿主可观测性 probe 与 baseline receipt schema；未运行模型或修改 Skill/runtime。 (user-visible)
 - v1.15.3 2026-09-24 17:19:37 tester: docs(plan): 将 Skill Prompt 优化方案调整为质量优先、成本第二；新增四层能力基线、质量硬门、非劣效与 reject/rollback 规则，禁止用 token 收益抵消关键回归。 (user-visible)
 - v1.15.3 2026-09-24 tester: docs(plan): 补充 38 个 Skill 的目录结构、架构清晰度与下一阶段审查优先级；新增结构 inventory，区分轻量包、复杂专用包与高密度待测入口，未修改 Skill/runtime。 (user-visible)
 - v1.15.3 2026-09-24 12:06:07 tester: docs(plan): 新增 Skill Prompt 长度与最新模型适配方案、38 个 Skill 源码基线及三轮 Codex/Claude 工程视角讨论；以 spec-plan 重复读取试点、行为保护和实际成本评测为下一阶段范围，未实施 Skill 或 runtime 变更。 (user-visible)
