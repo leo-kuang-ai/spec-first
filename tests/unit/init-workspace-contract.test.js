@@ -526,6 +526,20 @@ describe('init workspace contract', () => {
     expect(output.match(/Next:/g)).toHaveLength(1);
     expect(output).not.toContain('spec-mcp-setup');
     expect(output).not.toContain('mcp-setup');
+
+    logSpy.mockClear();
+    printInitApplySummaries([{
+      mode: 'single-repo',
+      gitRootTopology: 'multi-repo-workspace',
+      platform: 'codex',
+      projectRoot: workspaceRoot,
+    }], [{ exit_code: 0 }], { lang: 'zh' });
+    const zhOutput = logSpy.mock.calls.flat().join('\n');
+    expect(zhOutput).toContain('子仓 runtime projection：pending（本次 init 未覆盖）。');
+    expect(zhOutput).toContain('仅当需要在子仓工作：');
+    expect(zhOutput).toContain(`目标目录：${workspaceRoot}`);
+    expect(zhOutput.match(/主行动：/g)).toHaveLength(1);
+    expect(zhOutput).not.toContain('spec-first init --codex --all-repos');
   });
 
   test('does not append the generic runtime setup recommendation after parent-only init', () => {
@@ -544,10 +558,38 @@ describe('init workspace contract', () => {
     expect(result.stdout).toContain('Only if working in a child repo:');
     expect(result.stdout.match(/Next:/g)).toHaveLength(1);
     expect(result.stdout).not.toContain('For stronger readiness, run `spec-runtime-setup`');
+
+    const zhResult = runInitCli(workspaceRoot, [
+      '--codex',
+      '-y',
+      '-u',
+      'Workspace Contract Test',
+      '--lang',
+      'zh',
+    ]);
+    expect(zhResult.status).toBe(0);
+    expect(zhResult.stdout).toContain('子仓 runtime projection：pending（本次 init 未覆盖）。');
+    expect(zhResult.stdout).toContain('仅当需要在子仓工作：');
+    expect(zhResult.stdout.match(/主行动：/g)).toHaveLength(1);
   });
 
-  test('does not add workspace child-projection handoffs to a regular Git repo', () => {
-    const { childRoot } = createWorkspace();
+  test('initializes a non-Git folder at a unicode path and binds the primary action to it', () => {
+    const nonGitRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-init-nongit-'));
+    const target = path.join(nonGitRoot, '项目 目录-α');
+    fs.mkdirSync(target, { recursive: true });
+    tempRoots.push(nonGitRoot);
+
+    const result = runInitCli(target, ['--codex', '-y', '-u', 'NonGit Unicode Test', '--lang', 'zh']);
+
+    expect(result.status).toBe(0);
+    // 子进程打印的是 cwd 的真实路径；macOS 的 /var 与 /private/var 需归一。
+    expect(result.stdout).toContain(`目标目录：${fs.realpathSync(target)}`);
+    expect(result.stdout).toMatch(/主行动：/);
+    expect(result.stdout).toContain('重启 Codex 或新开会话');
+    expect(result.stdout).not.toContain('首次成功');
+  });
+
+  test('does not add workspace child-projection handoffs to a regular Git repo', () => {    const { childRoot } = createWorkspace();
     const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
     printInitApplySummaries([{
@@ -560,6 +602,17 @@ describe('init workspace contract', () => {
     const output = logSpy.mock.calls.flat().join('\n');
     expect(output).not.toContain('Child repo projections:');
     expect(output).not.toContain('spec-first init --codex --all-repos -y');
+
+    logSpy.mockClear();
+    printInitApplySummaries([{
+      mode: 'single-repo',
+      gitRootTopology: 'single-repo',
+      platform: 'codex',
+      projectRoot: childRoot,
+    }], [{ exit_code: 0 }], { lang: 'zh' });
+    const zhOutput = logSpy.mock.calls.flat().join('\n');
+    expect(zhOutput).not.toContain('子仓 runtime projection：pending');
+    expect(zhOutput).not.toContain('--all-repos -y');
   });
 
   test('offers scope activation and conditional setup after all-repos projection', () => {
@@ -588,6 +641,26 @@ describe('init workspace contract', () => {
     expect(output).not.toContain('Next: run spec-runtime-setup.');
     expect(output).not.toContain('spec-mcp-setup');
     expect(output).not.toContain('mcp-setup');
+
+    logSpy.mockClear();
+    printInitApplySummaries([{
+      mode: 'all-repos',
+      platform: 'codex',
+      workspaceRoot,
+    }], [{
+      exit_code: 0,
+      workspace_summary: buildWorkspaceInitSummary({
+        workspaceRoot,
+        plan: buildCodexWorkspacePlan(workspaceRoot, childRoot),
+        parentRuntime: readyParentRuntime(),
+        results: [readyChildResult(childRoot)],
+      }),
+    }], { lang: 'zh' });
+    const zhOutput = logSpy.mock.calls.flat().join('\n');
+    expect(zhOutput).toContain(`目标目录：${workspaceRoot}`);
+    expect(zhOutput).toContain(`目标目录：${childRoot}`);
+    expect(zhOutput.match(/主行动：/g)).toHaveLength(2);
+    expect(zhOutput.match(/仅当所选任务缺少必需能力/g)).toHaveLength(1);
   });
 
   test('recommends the narrow failed child repair before runtime setup for partial all-repos init', () => {
@@ -621,5 +694,30 @@ describe('init workspace contract', () => {
     expect(output).not.toContain('Next: run spec-runtime-setup.');
     expect(output).not.toContain('spec-mcp-setup');
     expect(output).not.toContain('mcp-setup');
+
+    logSpy.mockClear();
+    printInitApplySummaries([{
+      mode: 'all-repos',
+      platform: 'codex',
+      workspaceRoot,
+    }], [{
+      exit_code: 1,
+      workspace_summary: buildWorkspaceInitSummary({
+        workspaceRoot,
+        plan: buildCodexWorkspacePlan(workspaceRoot, childRoot),
+        parentRuntime: readyParentRuntime(),
+        results: [{
+          ...readyChildResult(childRoot),
+          exit_code: 1,
+          overall_status: 'action-required',
+          reason_code: 'init-failed',
+        }],
+      }),
+    }], { lang: 'zh' });
+    const zhOutput = logSpy.mock.calls.flat().join('\n');
+    expect(zhOutput).toContain(`目标目录：${childRoot}`);
+    expect(zhOutput).toContain('修复：在此目录预览 spec-first init --codex');
+    expect(zhOutput.match(/主行动：/g)).toHaveLength(1);
+    expect(zhOutput).not.toContain('--all-repos');
   });
 });

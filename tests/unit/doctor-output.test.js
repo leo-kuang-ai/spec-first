@@ -75,12 +75,34 @@ describe('doctor human-readable output', () => {
       workflowRunnability: 'verified',
       workflowRunnabilityBasis: { evidence_path: '/tmp/evidence.json', evidence_freshness: 'fresh' },
     });
-    const output = formatDoctorHumanReport(report, { target: '/tmp/project with spaces' }).join('\n');
+    const lines = formatDoctorHumanReport(report, { target: '/tmp/project with spaces' });
+    const output = lines.join('\n');
     expect(output).toContain('恢复目录：/tmp/project with spaces');
     expect(output).toContain('CODEX 主行动：在此目录打开或新开 Codex 会话');
     expect(output).toContain('配置检查不等于宿主已加载');
     expect(output).not.toContain('首次成功已确认');
     expect(output.split('\n').filter((line) => line.includes('主行动：'))).toHaveLength(1);
+    // 默认摘要预算（U3）：证据上限声明一句、每 scope 一条主行动，
+    // 证据细节进 verbose；健康单宿主基线为 10 行，允许小幅排版余量。
+    expect(output.match(/证据上限：/g)).toHaveLength(1);
+    expect(output.match(/恢复目录：/g)).toHaveLength(1);
+    expect(lines.length).toBeLessThanOrEqual(12);
+  });
+
+  test('aggregated verified evidence does not spread per-host first-success or hide a failed host', () => {
+    const { getAdapter } = require('../../src/cli/adapters');
+    const output = formatDoctorHumanReport(createReport({
+      platformChecks: {
+        codex: [{ level: 'PASS', name: getAdapter('codex').skillsRoot }],
+        claude: [{ level: 'WARNING', name: '.claude/skills', reasonCode: 'skills-missing', fix: 'Run spec-first init --claude' }],
+      },
+      workflowRunnability: 'verified',
+      workflowRunnabilityBasis: { evidence_path: '/tmp/evidence.json', evidence_freshness: 'fresh' },
+    }), { target: '/tmp/aggregated' }).join('\n');
+    expect(output).toContain('CODEX 主行动：在此目录打开或新开');
+    expect(output).toContain('CLAUDE 主行动：先处理上述 [CLAUDE]');
+    expect(output).not.toContain('CLAUDE 主行动：在此目录打开或新开');
+    expect(output).not.toContain('首次成功已确认');
   });
 
   test('keeps unknown scope unknown and preserves healthy host during partial failure', () => {
@@ -104,6 +126,9 @@ describe('doctor human-readable output', () => {
     expect(output).toContain(`freshness=${freshness}`);
     expect(output).toContain('项目级聚合证据');
     expect(output).toContain('setup receipt 不证明每个宿主加载');
+    // freshness 状态不改变证据上限：任何新鲜度都不显示已验证或首次成功结论。
+    expect(output).not.toContain('首次成功');
+    expect(output).not.toMatch(/workflow runnability[:：]?\s*verified/i);
   });
 
   test('projects machine statuses without collapsing optional, degraded, known limitation, or not-run', () => {

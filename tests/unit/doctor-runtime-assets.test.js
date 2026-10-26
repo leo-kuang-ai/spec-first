@@ -35,18 +35,10 @@ const { syncSkills } = require('../../src/cli/plugin');
 const { spawnSyncWithTimeout } = require('../../src/cli/external-command');
 
 describe('doctor runtime asset inventory', () => {
-  test('diagnostic continuation never calls the init write owner', () => {
-    const initApply = require('../../src/cli/commands/init-apply');
-    const apply = jest.spyOn(initApply, 'applyProjectInitPlan');
-    const log = jest.spyOn(console, 'log').mockImplementation(() => {});
-    try {
-      runDoctor(['--codex']);
-      expect(apply).not.toHaveBeenCalled();
-    } finally {
-      apply.mockRestore();
-      log.mockRestore();
-    }
-  });
+  // doctor 的只读性没有可靠的单元层证明：全局 fs 写 API 的 spy 会被 jest
+  // 基础设施自身的调用污染，而 doctor 不引用 init-apply/atomic-write，
+  // 模块 spy 又是空转。进程级零写入的唯一 owner 是
+  // tests/integration/doctor-continuation.test.js 的 sha256 全树快照对比。
 
   test('passes a missing agents directory when the bundled agent inventory is empty', () => {
     const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-doctor-assets-'));

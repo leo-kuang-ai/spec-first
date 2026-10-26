@@ -20,10 +20,14 @@ describe('init runtime readiness guidance', () => {
     const output = lines.join('\n');
     expect(output).toContain(target);
     expect(output).toContain('Codex');
+    expect(output).toContain(lang === 'en' ? 'restart Codex or open a new session' : '重启 Codex 或新开会话');
     expect(output).toContain('spec-brainstorm');
     expect(output).toContain('spec-first doctor --codex');
     expect(output).toMatch(/未验证|not verified/);
     expect(output).toMatch(/仅当|Only when/);
+    expect(output).toContain(lang === 'en'
+      ? 'a greeting or recommendation is not success'
+      : '欢迎语或推荐入口不算成功');
     expect(output).not.toMatch(/Required:.*spec-runtime-setup|必做：.*spec-runtime-setup/);
     expect(lines.length).toBeLessThanOrEqual(9);
   });
@@ -35,6 +39,13 @@ describe('init runtime readiness guidance', () => {
     expect(output).toContain('Codex');
   });
 
+  test('binds the primary action to a target containing unicode characters', () => {
+    const target = path.resolve('/tmp/项目 目录-α');
+    const output = captureOutput(() => printInitNextSteps('codex', 'zh', { target })).join('\n');
+    expect(output).toContain(`目标目录：${target}`);
+    expect(output).toContain(`恢复（此目录的终端）：spec-first doctor --codex`);
+  });
+
   test('keeps guidance independent of historical directories', () => {
     const target = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-guidance-'));
     try {
@@ -44,12 +55,16 @@ describe('init runtime readiness guidance', () => {
     } finally { fs.rmSync(target, { recursive: true, force: true }); }
   });
 
-  test('covers all supported hosts including preview and trust limits', () => {
+  test.each(['en', 'zh'])('covers all supported hosts including preview and trust limits (%s)', (lang) => {
     for (const platform of getSupportedPlatforms()) {
-      const output = captureOutput(() => printInitNextSteps(platform, 'en')).join('\n');
+      const output = captureOutput(() => printInitNextSteps(platform, lang)).join('\n');
       expect(output).toContain(`spec-first doctor --${platform}`);
       if (['cursor', 'opencode', 'zcode', 'pi'].includes(platform)) expect(output).toContain('preview');
-      if (platform === 'pi') expect(output).toContain('trust');
+      if (platform === 'pi') {
+        expect(output).toContain(lang === 'en'
+          ? 'open Pi and complete project trust; without trust, project skills are not loaded'
+          : '打开 Pi 并完成项目信任；未信任时不会加载项目 skill');
+      }
     }
   });
 

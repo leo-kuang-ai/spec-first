@@ -40,10 +40,15 @@ describe('doctor continuation in a new process', () => {
     fs.mkdirSync(fakeBin);
     // 仅隔离 CLI 版本探测；这些 fixture 不构成真实宿主运行证据。
     for (const host of ['codex', 'claude']) {
-      fs.writeFileSync(path.join(fakeBin, host), '#!/bin/sh\necho fixture-version\n', { mode: 0o755 });
+      const windows = process.platform === 'win32';
+      fs.writeFileSync(path.join(fakeBin, windows ? `${host}.cmd` : host),
+        windows ? '@echo off\r\necho fixture-version\r\n' : '#!/bin/sh\necho fixture-version\n', { mode: 0o755 });
     }
-    env = { ...process.env, HOME: home, CODEX_HOME: path.join(home, '.codex'),
+    env = { ...process.env, HOME: home, USERPROFILE: home, CODEX_HOME: path.join(home, '.codex'),
       XDG_CONFIG_HOME: path.join(home, '.config'), PATH: `${fakeBin}${path.delimiter}${process.env.PATH}`, NO_COLOR: '1' };
+    const homeProbe = spawnSync(process.execPath, ['-p', 'require("node:os").homedir()'], { env, encoding: 'utf8' });
+    expect(homeProbe.status).toBe(0);
+    expect(fs.realpathSync(homeProbe.stdout.trim())).toBe(fs.realpathSync(home));
   });
   afterEach(() => fs.rmSync(root, { recursive: true, force: true }));
 
@@ -58,7 +63,12 @@ describe('doctor continuation in a new process', () => {
     const before = snapshot(root);
     const result = run(cwd, ['doctor', '--codex', ...flags]);
     expect(result.error).toBeUndefined();
-    expect(result.stdout).toContain(`恢复目录：${fs.realpathSync(cwd)}`);
+    // Windows 的 runner TEMP 可能给子进程返回 8.3 短路径，而 realpathSync
+    // 归一为长路径；恢复目录行接受原值、realpath 与 native realpath 三个
+    // 等价形式，避免断言绑定单一规范化路径。
+    const printedRecoveryDir = (result.stdout.match(/恢复目录：(.+)/) || [])[1];
+    expect([cwd, fs.realpathSync(cwd), fs.realpathSync.native(cwd)])
+      .toContain(printedRecoveryDir && printedRecoveryDir.trim());
     expect(result.stdout).toContain('证据上限：');
     expect(result.stdout.match(/CODEX 主行动：/g)).toHaveLength(1);
     expect(snapshot(root)).toEqual(before);
@@ -72,7 +82,11 @@ describe('doctor continuation in a new process', () => {
     const before = snapshot(root);
     const result = run(target, ['doctor', '--codex', '--json']);
     expect(result.error).toBeUndefined();
-    expect(JSON.parse(result.stdout).platforms).toEqual(['codex']);
+    const report = JSON.parse(result.stdout);
+    expect(report.platforms).toEqual(['codex']);
+    expect(report.platform_checks.codex).toEqual(expect.arrayContaining([
+      expect.objectContaining({ level: 'PASS', message: 'fixture-version' })
+    ]));
     expect(snapshot(root)).toEqual(before);
   }, 60000);
 

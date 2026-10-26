@@ -27,7 +27,7 @@ For every request outside the fast paths, and to validate an explicit public rou
 
 For active work, announce one localized line equivalent to `Entering <entrypoint>: <one concrete reason>`, then follow the selected route. If a standalone skill is user-invoked only, recommend it and wait. For recommendation-only requests, return exactly one recommendation and wait:
 
-根据用户已有输入和希望得到的结果选择入口；不要要求用户先理解完整 workflow 清单。明确点名的入口、当前进行中的 owner 和失败信号优先按现有边界处理。只有缺少会改变入口的关键信息才问一个问题；需求到执行不自动串联。不确定环境能力时先判断当前任务是否必需，缺少可选能力允许披露限制后继续，缺少必需能力才交给 `spec-runtime-setup`。
+根据用户已有输入和希望得到的结果选择入口；不要要求用户先理解完整 workflow 清单。明确点名的入口、当前进行中的 owner 和失败信号优先按现有边界处理：活跃 workflow 执行中出现的失败或报错由该 workflow 既有反馈回路处理，不重启路由；根因超出当前任务范围时才由该 owner 显式移交 `spec-debug` 并说明原因。只有缺少会改变入口的关键信息才问一个问题；需求到执行不自动串联。不确定环境能力时先判断当前任务是否必需，缺少可选能力允许披露限制后继续，缺少必需能力才交给 `spec-runtime-setup`。
 
 ```text
 Recommended entrypoint: <spec-*, standalone skill, or terminal command>

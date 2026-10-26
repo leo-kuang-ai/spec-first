@@ -30,3 +30,27 @@ PR #57 的首次 CI 暴露基线发布检查误阻断：`brand.js` 已从 regist
 隔离快照只包含 README、CLI、单测及生成的 runtime；缺少完整 docs/contracts、package.json 和原项目提交基线。因此真实任务明确未运行所规划的项目测试。这次 V3 证明该快照中的入口加载与单次首个实质结果，不证明完整仓库工作流、模型稳定性或宿主 parity。实际加载以会话命令和输出为证，结果充分性由 owner 回源判断；进程完成并不自动证明语义质量。
 
 其他宿主真实任务为 `not_run`；Pi trust、workspace、多宿主边界只有本地合同测试。V4 人工试用未执行，不宣称首次成功率、路由准确率或耗时改善。后续在完整项目按相同任务复测，再以人工试用观察澄清、误判和恢复成本。
+
+## 2026-10-09 三专家测试复核与 ZCode V2 补充评估
+
+交付后由三位独立测试专家分别从验收映射、CLI 工程测试、语义验证三个视角复核，并执行补充验证：
+
+- V1 全链路复跑：方案 Implementation Commands 六条全部通过（init/quickstart 62 项、doctor 34 项、命令级 continuation 3 项、typecheck 272 文件、入口治理 499 文件、smoke 5 项）；按专家建议补跑 integration 18 套件 87 项与全量 unit。
+- 全量 unit 暴露并修复 2 个本分支引入的断言回归（main 上均通过）：`using-spec-first-contracts` 的 front-controller 字节预算（4800→5600，advisory 4200→5000，U2 授权语义新增 677 字节，源文本绑定 V2/V3 hash 不删减）与 `readme-community-entry` 的首跑路径顺序断言（迁移至 U4 新流程：示例改用 R2.4 固定文案、`spec-runtime-setup` 条件后置、doctor 与 `--verbose` 分别断言可发现）。修复后全量 unit 240 套件 3024 项全部通过。
+- V2 补充评估（[v2-routing-zcode-followup.json](v2-routing-zcode-followup.json)）：在 ZCode 上以 fresh subagent 注入当前磁盘三源文件（sha256 与 source-manifest 一致）执行 8 场景，含上轮未覆盖的对抗组合；场景原文与 rubric 逐字落盘，S3/S5 独立 grader 盲判。结果 7 通过、1 失败：S5（活跃 spec-work 内出现失败信号）被 reroute 到 spec-debug，暴露规则文本缺口——AGENTS.md 入口硬规则与 skill owner 连续性条款在该场景字面冲突，U2 新增文本未给裁决；修复需方案 owner 授权，本轮未实施。
+- 专家复核遗留（本轮未实施，属后续测试补强）：topology/apply-summary 新文案的 zh 分支断言、doctor-runtime-assets 中对 init-apply spy 的空转问题（doctor 并不 require 该模块）。
+- 工作区未提交的 doctor-continuation Windows 修复在 macOS 复验 3/3 通过；其 Windows 分支（.cmd 探针、USERPROFILE 隔离）从未在真实 Windows 执行，唯一闭环途径是 windows-compatibility CI，且 `恢复目录:` 的 realpathSync 断言在 8.3 短路径 TEMP 下存在合理失败路径。
+- 测试环境污染发现与修复：补取消零写入回归时，通过取消测试的灵敏度验证（confirm 强制为 true 的受控变异）暴露 `brand-presentation.test.js`（既有测试，早于本分支）在每次运行时把测试身份（name=tester/hosts=codex）写进真实 `~/.spec-first/.developer`。根因是双重穿透：jest 进程内 `os.homedir()` 不跟随 `process.env.HOME`，且 `jest.doMock` spread 保留的真实 `writeGlobalDeveloperFile` 内部调用 `getGlobalDeveloperPath()` 不走模块 mock。修复为在 `node:os` 层把 `homedir` 指向沙箱（brand-presentation 与新增取消测试同法）；修复后单跑与全量均确认真实 HOME 零写入。已发生的一次性覆盖无法回滚：本轮全量运行曾把 `~/.spec-first/.developer` 覆盖为测试值（原 identity 未在任何备份中，workspace summary 不含 name），用户重新运行 `spec-first init` 即可重建；变异验证时 `~/.claude/CLAUDE.md` 曾被 user-language-sync 插入 managed block，内容与用户既有中文偏好一致、保留了原文件其余内容。
+
+## 2026-10-09 逐项优化轮（待优化清单执行）
+
+按三专家复核产出的待优化清单逐项执行，结果如下（详情与证据见 [v2-routing-zcode-followup.json](v2-routing-zcode-followup.json) 的 `s5_fix_replay` 与 `followup_scenarios`）：
+
+- **S5 裁决规则（P1#1）已修复**：SKILL.md Route Selection 与 route-map 尾注补规则（活跃 workflow 执行中失败由其反馈回路处理、不重启路由，根因超出任务范围才由 owner 显式移交 spec-debug）；入口硬规则句的 canonical source 是 `src/cli/lang-policy.js`（zh/en 两处，`sync-instruction-files` 只派生手写区、lang 块由 init 各 host 生成），已同步修改并用 `applyManagedBlock` 从 source 重新 upsert 至 CLAUDE.md 与 AGENTS.md。修复后源文件 hash：SKILL.md `21a73e2d…`、route-map `a56255d2…`（V2/V3 历史记录仍绑定修复前 hash，属预期源演化；`.agents/skills/` 等运行时镜像存在同源 drift，按边界待 owner 授权 `spec-first init` 刷新，不手改 mirror）。fresh-source 复验：同一 S5 场景由误路由 spec-debug 修正为保持 spec-work owner 连续。
+- **V2 补 2 场景（P2#11）已执行**：S9（debug 有依据诊断计首个实质结果 + 保留未完成事实 + 下一入口 spec-work）与 S10（环境阻塞不计成功 + readiness on-ramp）均通过；上轮未覆盖的 R2.6/R2.2 判定面补齐。
+- **测试补强（P1#3/P2#6-10、P3#13）已落地**：topology handoff 与 apply summary 的 zh 双语断言（parent-only/all-repos/partial/普通四分支）；doctor 默认摘要行数预算（健康单宿主 ≤12 行、证据上限与恢复目录各恰好 1 次）、聚合 verified fresh 不逐宿主扩散、per-freshness 不显示成功结论；主行动「重启宿主」文本、zh Pi trust 全句、「欢迎语不算成功」正例、非 Git 目录 + Unicode 路径的 CLI 级成功路径。
+- **P1#4 spy 空转已处置**：尝试以 fs 同步写 API spy 替换后发现 jest 基础设施自身调用污染全局 fs spy（裸 Node 进程内 doctor 零写入、jest 内 19 次拦截均为 jest 自身），单元层无法可靠证明零写入；按诚实证据原则删除空转测试并注明进程级零写入的唯一 owner 为 doctor-continuation 集成快照。
+- **P1#2 本地部分已做**：doctor-continuation 的 `恢复目录:` 断言改为接受原值/realpath/native realpath 三形式，消除 Windows 8.3 短路径假设；真实 Windows 验证仍需提交后观察 windows-compatibility CI。
+- **P1#5/P3#15-16/17a-17b 说明性处置**：工作区修改未提交（待 owner 审阅）；手造 summary 对象保留（init-workspace-contract 已有真实构造器链路覆盖同一输出面，重构测试基建的回归风险大于收益）；历史 V2/V3 记录不追溯补证据（已标注限制）；V3 其余宿主与 V4 人工试用保持 not_run。
+- **P2#12 静态护栏已落地**：using-spec-first-contracts 新增「onboarding routing semantics and mid-execution failure adjudication」测试，锁住 U2 输入物路由、推荐/执行边界、首次成功判据与本次 S5 裁决句的存在性，防止语义文本被后续编辑稀释。
+- **P3#14 printHelp 措辞已对齐**：八宿主行从「for enhanced readiness, run spec-runtime-setup」改为「run spec-runtime-setup only when a required capability is missing」，与 U1/U4 任务先于按需 setup 一致。
