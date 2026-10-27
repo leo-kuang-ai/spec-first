@@ -6,6 +6,10 @@
 
 ## 文件约定
 
+- 2026-10-27 已按用户授权删除 `skills/` 第一层的 38 个 `*-workspace/` 本地测评目录，共 5,001 个文件、225,918,001 字节（约 215.5 MiB）；逐目录清单与结构核验见 [清理记录](./2026-10-27-workspace-cleanup.json)。正式 Skill 与测评用例保持不变。
+- 历史报告中的 workspace 路径仅保留为历史来源记录：对应原始响应、评分和日志已删除，未被 Git 跟踪，不能通过 Git 恢复。报告原分数不改写，但不能再依靠这些本地路径复核，也不代表当前源码的模型行为已通过。
+- 后续测评优先使用测评工具实际支持的输出目录参数，将运行产物放到 `skills/` 外（例如已忽略的 `.spec-first/evals/`）；先检查工具帮助确认参数，不假定支持重定向。`.gitignore` 仅阻止入库，不阻止 workspace 再次生成。
+
 - 每个 skill 一份测评文件,命名为 `<skill-name>.md`(如 `spec-plan.md`),从 [_template.md](./_template.md) 复制起稿。
 - 测评完成后在下方索引表更新状态与文件链接。
 - 行为语义测评优先使用 fresh-source eval(把磁盘上的 skill 源文件注入全新通用 subagent 评估),checklist 见 `docs/contracts/workflows/fresh-source-eval-checklist.md`;无法执行时必须在测评文件中记录原因,不得声称通过。

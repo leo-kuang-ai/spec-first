@@ -1,0 +1,26 @@
+{
+  "purpose": "复现并保留新窗口输入被历史固定分母拒绝的证据；不是通过记录。",
+  "command": [
+    "node",
+    "scripts/check-ce-upstream-reconciliation.cjs",
+    "--prepare-adjudication",
+    "--refresh",
+    "--ce-repo",
+    "/Users/kuang/xiaobu/compound-engineering-plugin",
+    "--base",
+    "153e605e1622154a0d7da095fceed13edcb68bf7",
+    "--head",
+    "00d0a5bbf1300b2138b65ce724b325dd4dff77ba",
+    "--name-status",
+    "docs/validation/ce-pull-2026-10-27/legacy-name-status.md",
+    "--inventory",
+    "docs/validation/ce-pull-2026-10-27/legacy-inventory.json",
+    "--adjudication-input",
+    "docs/validation/ce-pull-2026-10-27/legacy-adjudication-input.json"
+  ],
+  "cwd": "/Users/kuang/xiaobu/spec-first",
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "full-window path count must be 517, got 1023.\n",
+  "output_files_created": []
+}
