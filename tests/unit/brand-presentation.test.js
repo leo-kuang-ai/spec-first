@@ -15,6 +15,13 @@ function makeRepo() {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-brand-'));
   const repo = path.join(home, 'repo');
   fs.mkdirSync(repo, { recursive: true });
+  // jest 进程内 os.homedir() 不跟随 process.env.HOME，且 doMock 的
+  // spread 真实实现内部调用不走 mock，因此必须在 node:os 层把 homedir
+  // 指向沙箱；否则 init apply 把测试身份写进真实 ~/.spec-first/.developer。
+  jest.doMock('node:os', () => {
+    const actual = jest.requireActual('node:os');
+    return { ...actual, homedir: () => home };
+  });
   jest.doMock('../../src/cli/developer', () => ({
     ...jest.requireActual('../../src/cli/developer'),
     getGlobalDeveloperPath: () => path.join(home, 'none-developer'),
@@ -37,6 +44,7 @@ function withCapturedLogs() {
 
 describe('brand presentation contract', () => {
   afterEach(() => {
+    jest.dontMock('node:os');
     jest.dontMock('../../src/cli/developer');
     jest.dontMock('../../src/cli/commands/doctor');
     jest.dontMock('../../src/cli/commands/init');

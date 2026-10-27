@@ -1,0 +1,38 @@
+{
+  "artifact_type": "planning-document-verification",
+  "status": "passed",
+  "checks": {
+    "candidate_count": 398,
+    "candidate_join": "exact-H5",
+    "candidate_owners_exist": true,
+    "unit_counts": {
+      "U9": 208,
+      "U7-A": 50,
+      "U2": 40,
+      "U3": 28,
+      "U5": 25,
+      "U4": 28,
+      "U6": 19
+    },
+    "unique_units": [
+      "U0",
+      "U1",
+      "U2",
+      "U3",
+      "U4",
+      "U5",
+      "U6",
+      "U7",
+      "U8",
+      "U9"
+    ],
+    "local_links": "passed",
+    "source_refs": "local-source-or-frozen-upstream",
+    "code_fences": "balanced"
+  },
+  "limitations": [
+    "候选导航不是正式逐路径裁决。",
+    "window-facts 与 --window-facts 是待实施设计，未生成或调用。",
+    "未运行产品测试、fresh-source eval、runtime projection 或远程写入。"
+  ]
+}

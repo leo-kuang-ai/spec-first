@@ -55,7 +55,6 @@ const {
   printInitApplySuccess,
   printInitBrandBanner,
   printInitDryRun,
-  printInitNextStepsForPlatforms,
   printInitPreview,
   printInitPreviews,
   printWorkspaceInitApplySuccess,
@@ -233,18 +232,6 @@ async function runInit(argv, promptOverrides = {}) {
       || summaryUpdateFailures.length > 0
       ? 1
       : 0;
-
-    const childProjectionPending = plans.some((plan) => (
-      plan.mode !== 'all-repos' && plan.gitRootTopology === 'multi-repo-workspace'
-    ));
-    if (
-      exitCode === 0
-      && !childProjectionPending
-      && (plans.length > 1 || plans[0].mode !== 'all-repos')
-    ) {
-      console.log('');
-      printInitNextStepsForPlatforms(interactiveInput.platforms, interactiveInput.lang);
-    }
 
     return exitCode;
   } catch (error) {

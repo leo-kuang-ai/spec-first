@@ -1,0 +1,46 @@
+{
+  "schema_version": "ce-upstream-sync-window-snapshot/v1",
+  "artifact_type": "confirmed",
+  "generated_at": "2026-10-27T11:34:53.005Z",
+  "target_repo": "/Users/kuang/xiaobu/spec-first",
+  "upstream_repo": "/Users/kuang/xiaobu/compound-engineering-plugin",
+  "upstream": {
+    "base": "153e605e1622154a0d7da095fceed13edcb68bf7",
+    "head": "00d0a5bbf1300b2138b65ce724b325dd4dff77ba",
+    "range": "153e605e1622154a0d7da095fceed13edcb68bf7..00d0a5bbf1300b2138b65ce724b325dd4dff77ba",
+    "base_subject": "feat(ce-noslop): add the plain-prose skill and route sibling prose through it (#1653)",
+    "head_subject": "chore: release main (#1912)",
+    "commit_count": 161,
+    "changed_path_count": 1023,
+    "status_counts": {
+      "M": 494,
+      "A": 516,
+      "D": 10,
+      "R063": 2,
+      "R076": 1
+    },
+    "name_status_sha256": "9c04f517fd188bb9b1127a1942bfdf98f3afa518e7428568548e33ef0e3aea65",
+    "commits_sha256": "ae3869e62113ffc98c3fc7d52c7dd731cf4b8cc3e8102cc4d451e62d439aadaf"
+  },
+  "target": {
+    "head": "59cb4cb130a31bb1a2335add80d570b87a8b40d4",
+    "dirty": true,
+    "dirty_paths": [
+      "CHANGELOG.md",
+      "docs/validation/skill-evals/README.md",
+      "docs/plans/2026-10-27-001-refactor-ce-upstream-sync-technical-scheme.md",
+      "docs/validation/skill-evals/2026-10-27-workspace-cleanup.json"
+    ],
+    "dirty_manifest_sha256": "2189ab8232e7c481624309e528c324f1bab1d5a7b373055f2c388c748e5953c3",
+    "source_tree_hash_algorithm": "sha256(git ls-tree -r HEAD bytes)",
+    "source_tree_sha256": "6fd1f0a64aff67c3d2f9b6ba704b38a65f84af674a25c233b30bd99b19d6123d",
+    "inventory_hash_algorithm": "sha256(git ls-files bytes)",
+    "inventory_sha256": "d97c3e408549c9a86dfbd6834e3e61df5e942376678c474ae3a2ce3ee4429ca4"
+  },
+  "limitations": [
+    "CE upstream checkout was read-only; no upstream files were modified.",
+    "Path records are deterministic inventory only; canonical_owner and target_action require semantic adjudication.",
+    "Target repository had pre-existing dirty paths; no implementation changes were made in this freeze.",
+    "No fresh-source eval, runtime projection, provider, PR/CI, or field validation was run."
+  ]
+}

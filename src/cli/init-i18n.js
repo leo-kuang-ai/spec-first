@@ -1,6 +1,6 @@
 const MESSAGES = {
   zh: {
-    selectHosts: '选择要初始化的宿主运行时:',
+    selectHosts: '选择本次要使用的宿主（其他宿主可稍后初始化）:',
     checkboxHint: '↑/↓ 移动 · 空格 选择/取消 · Enter 确认 · Ctrl+C 取消',
     selectHint: '↑/↓ 移动 · Enter 确认 · Ctrl+C 取消',
     developerName: '开发者名称（用于 CHANGELOG author 与全局 developer profile）:',
@@ -72,10 +72,10 @@ const MESSAGES = {
     applyDeveloperProfileCreate: '🪪 已写入全局 developer profile:',
     applyDeveloperProfileOverwrite: '🪪 已更新全局 developer profile:',
     applyDeveloperProfilePreserve: '🪪 已保留现有全局 developer profile:',
-    applyRunSummary: (ready, total) => `初始化结果: ${ready}/${total} 个宿主 ready`,
-    applyRunFailureSummary: (ready, total) => `初始化结果: ${ready}/${total} 个宿主 ready（存在失败）`,
+    applyRunSummary: (ready, total) => `初始化结果: ${ready}/${total} 个宿主 projection 已写入`,
+    applyRunFailureSummary: (ready, total) => `初始化结果: ${ready}/${total} 个宿主 projection 已写入（存在失败）`,
     applyHostSummary: (label, status, details) => `  ${label}: ${status}${details ? ` · ${details}` : ''}`,
-    applyStatusReady: 'ready',
+    applyStatusReady: 'projection 已写入',
     applyStatusFailed: 'failed',
     applyCommandsCount: (count) => `${count} commands`,
     applySkillsCount: (count) => `${count} skills`,
@@ -86,7 +86,7 @@ const MESSAGES = {
     applyRuntimeGitVisibleCompact: 'selected-host runtime 保持 Git 可见；请 review 后提交（Git index 未修改）',
     applyChangelogCompact: '已创建 CHANGELOG.md',
     applyAgentSupportCount: (count) => `${count} agent support`,
-    applyWorkspaceCount: (ready, total) => `workspace ${ready}/${total} ready`,
+    applyWorkspaceCount: (ready, total) => `子仓 projection ${ready}/${total} 已写入`,
     applyProfileCompact: (action, displayPath, name, lang) => (
       `全局 developer profile: ${action} · ${displayPath} · ${name} (${lang})`
     ),
@@ -102,7 +102,7 @@ const MESSAGES = {
     diagnosticPiGeneratedRuntimePreview: 'Warning [pi_generated_runtime_preview]: Pi 支持为 preview（skills 发现与 trust 门控已在 pi 0.85.0 真机验证；AGENTS.md 注入与模型中介 /skill: 调用仍为文档级验证）。激活门槛：pi 仅在项目受信任后加载项目级 .agents/skills——在本项目运行 `pi` 并确认信任提示（或用 `pi -a` 一次性信任）；未信任时项目 skills 保持静默。',
   },
   en: {
-    selectHosts: 'Select host runtimes to initialize:',
+    selectHosts: 'Select hosts for this session (others can be initialized later):',
     checkboxHint: '↑/↓ move · Space toggle · Enter confirm · Ctrl+C cancel',
     selectHint: '↑/↓ move · Enter confirm · Ctrl+C cancel',
     developerName: 'Developer name (used for CHANGELOG authorship and the global developer profile):',
@@ -174,10 +174,10 @@ const MESSAGES = {
     applyDeveloperProfileCreate: '🪪 Wrote global developer profile:',
     applyDeveloperProfileOverwrite: '🪪 Updated global developer profile:',
     applyDeveloperProfilePreserve: '🪪 Preserved existing global developer profile:',
-    applyRunSummary: (ready, total) => `Init complete: ${ready}/${total} hosts ready`,
-    applyRunFailureSummary: (ready, total) => `Init result: ${ready}/${total} hosts ready`,
+    applyRunSummary: (ready, total) => `Init complete: ${ready}/${total} host projections written`,
+    applyRunFailureSummary: (ready, total) => `Init result: ${ready}/${total} host projections written (failures present)`,
     applyHostSummary: (label, status, details) => `  ${label}: ${status}${details ? ` · ${details}` : ''}`,
-    applyStatusReady: 'ready',
+    applyStatusReady: 'projection written',
     applyStatusFailed: 'failed',
     applyCommandsCount: (count) => `${count} command${count === 1 ? '' : 's'}`,
     applySkillsCount: (count) => `${count} skill${count === 1 ? '' : 's'}`,
@@ -188,7 +188,7 @@ const MESSAGES = {
     applyRuntimeGitVisibleCompact: 'selected-host runtime remains Git-visible; review and commit it (Git index unchanged)',
     applyChangelogCompact: 'created CHANGELOG.md',
     applyAgentSupportCount: (count) => `${count} agent support file${count === 1 ? '' : 's'}`,
-    applyWorkspaceCount: (ready, total) => `workspace ${ready}/${total} ready`,
+    applyWorkspaceCount: (ready, total) => `child projections ${ready}/${total} written`,
     applyProfileCompact: (action, displayPath, name, lang) => (
       `Global developer profile: ${action} · ${displayPath} · ${name} (${lang})`
     ),

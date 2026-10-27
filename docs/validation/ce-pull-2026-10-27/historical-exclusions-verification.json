@@ -1,0 +1,19 @@
+{
+  "artifact_type": "document-scope-verification",
+  "status": "passed",
+  "checks": {
+    "inventory_join": 1023,
+    "unique_paths": 1023,
+    "product_excluded": 23,
+    "no_port_evidence": 602,
+    "applicability_candidates": 398,
+    "markdown_excluded_rows": 625,
+    "links": "passed",
+    "inventory_hash": "passed",
+    "authoring_source_and_setup_not_excluded": "passed"
+  },
+  "limitations": [
+    "仅验证历史规则映射、清单完整性和文档链接，不是正式 adjudication schema/join/closure，不代表语义审查或同步完成。",
+    "产品测试、runtime、外部 provider、commit/push 未执行。"
+  ]
+}

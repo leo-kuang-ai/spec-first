@@ -522,10 +522,10 @@ describe('init run-level global developer prerequisite', () => {
 
     const output = logSpy.mock.calls.flat().join('\n');
     const lines = output.split('\n').filter(Boolean);
-    expect(lines.length).toBeLessThanOrEqual(15);
-    expect(output).toContain('Init complete: 6/6 hosts ready');
+    expect(lines.length).toBeLessThanOrEqual(40);
+    expect(output).toContain('Init complete: 6/6 host projections written');
     for (const label of ['Claude Code', 'Codex', 'Cursor', 'Kiro', 'Qoder', 'OpenCode']) {
-      expect(output.match(new RegExp(`${label}:`, 'g')) || []).toHaveLength(1);
+      expect(output.match(new RegExp(`${label}:`, 'g')) || []).toHaveLength(2);
     }
     expect(output.match(/Global developer profile:/g) || []).toHaveLength(1);
     expect(output.match(/User-level language sync:/g) || []).toHaveLength(1);
@@ -563,7 +563,7 @@ describe('init run-level global developer prerequisite', () => {
     ], { lang: 'en' });
 
     const output = logSpy.mock.calls.flat().join('\n');
-    expect(output).toContain('Init result: 1/2 hosts ready');
+    expect(output).toContain('Init result: 1/2 host projections written');
     expect(output).not.toContain('Init complete:');
     expect(output).toContain('Codex: failed');
     expect(output).toContain('managed write failed (permission-denied)');
@@ -595,8 +595,8 @@ describe('init run-level global developer prerequisite', () => {
     initOutput.printInitApplySummaries([plan], [result], { lang: 'en' });
 
     const output = logSpy.mock.calls.flat().join('\n');
-    expect(output).toContain('Init result: 0/1 hosts ready');
-    expect(output).toContain('workspace 1/2 ready');
+    expect(output).toContain('Init result: 0/1 host projections written');
+    expect(output).toContain('child projections 1/2 written');
     expect(output).toContain('all-repos-partial-or-action-required');
     expect(output).toContain('init-exception');
     expect(output).toContain('permission denied for child repo');
@@ -621,5 +621,94 @@ describe('init run-level global developer prerequisite', () => {
     const output = logSpy.mock.calls.flat().join('\n');
     expect(output).toContain('user-language-profile-write-failed');
     expect(output).toContain('profile: ~/.spec-first/.developer · permission denied');
+  });
+});
+
+describe('init cancellation writes nothing', () => {
+  const { PromptCancelled } = require('../../src/cli/prompts');
+  const { getInitMessages } = require('../../src/cli/init-i18n');
+
+  function snapshotTree(root) {
+    const files = {};
+    const walk = (dir) => {
+      if (!fs.existsSync(dir)) return;
+      for (const name of fs.readdirSync(dir).sort()) {
+        const full = path.join(dir, name);
+        const stat = fs.lstatSync(full);
+        const rel = path.relative(root, full);
+        if (stat.isSymbolicLink()) {
+          files[rel] = `link:${fs.readlinkSync(full)}`;
+        } else if (stat.isDirectory()) {
+          files[rel] = 'dir';
+          walk(full);
+        } else {
+          files[rel] = fs.readFileSync(full, 'utf8');
+        }
+      }
+    };
+    walk(root);
+    return files;
+  }
+
+  async function runCancelledInitInSandbox(promptOverrides) {
+    jest.resetModules();
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-cancel-'));
+    const projectRoot = path.join(home, 'repo');
+    fs.mkdirSync(projectRoot, { recursive: true });
+    // jest 进程内 os.homedir() 不跟随 process.env.HOME，且 doMock spread
+    // 保留的真实写入函数内部调用不走模块 mock，所以在 node:os 层把
+    // homedir 指向沙箱：全局 profile 与用户 instruction 同步链全部隔离，
+    // 取消断言的零写入边界不依赖真实用户配置的初始状态。
+    jest.doMock('node:os', () => {
+      const actual = jest.requireActual('node:os');
+      return { ...actual, homedir: () => home };
+    });
+    let initCommand;
+    jest.isolateModules(() => {
+      initCommand = require('../../src/cli/commands/init');
+    });
+
+    const logs = [];
+    const logSpy = jest.spyOn(console, 'log').mockImplementation((line) => logs.push(String(line)));
+    const originalCwd = process.cwd();
+    const before = snapshotTree(home);
+    let exitCode;
+    try {
+      process.chdir(projectRoot);
+      exitCode = await initCommand.runInit(['--claude'], {
+        checkbox: async () => ['claude'],
+        select: async () => 'zh',
+        textInput: async () => 'cancel-tester',
+        requireTty: () => ({ ok: true }),
+        ...promptOverrides,
+      });
+    } finally {
+      process.chdir(originalCwd);
+      logSpy.mockRestore();
+      jest.dontMock('node:os');
+    }
+    return { exitCode, logs, home, before, after: snapshotTree(home) };
+  }
+
+  test('declining the apply confirmation exits 0 with the cancelled notice and zero writes', async () => {
+    const { exitCode, logs, before, after } = await runCancelledInitInSandbox({
+      confirm: async () => false,
+    });
+
+    expect(exitCode).toBe(0);
+    expect(logs.join('\n')).toContain(getInitMessages('zh').cancelled);
+    expect(after).toEqual(before);
+  });
+
+  test('a cancelled host checkbox exits 0 with the cancelled notice and zero writes', async () => {
+    const { exitCode, logs, before, after } = await runCancelledInitInSandbox({
+      checkbox: async () => {
+        throw new PromptCancelled('checkbox cancelled');
+      },
+    });
+
+    expect(exitCode).toBe(0);
+    expect(logs.join('\n')).toContain(getInitMessages('zh').cancelled);
+    expect(after).toEqual(before);
   });
 });

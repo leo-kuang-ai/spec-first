@@ -42,6 +42,95 @@ function createReport({
 }
 
 describe('doctor human-readable output', () => {
+  test('child workspace aggregation does not block a healthy current-target host', () => {
+    const { getAdapter } = require('../../src/cli/adapters');
+    const report = createReport({
+      platforms: ['codex'],
+      commonChecks: [{ level: 'WARNING', name: 'workspace projection',
+        disposition: 'action_required', reasonCode: 'runtime-projection-incomplete',
+        workspace_readiness_layer: { layer: 'projection', status: 'action_required' } }],
+      platformChecks: { codex: [{ level: 'PASS', name: getAdapter('codex').skillsRoot }] },
+    });
+    const output = formatDoctorHumanReport(report, { target: '/tmp/workspace' }).join('\n');
+    expect(output).toContain('[通用环境] workspace projection');
+    expect(output).toContain('CODEX 主行动：在此目录打开或新开');
+    expect(output).not.toContain('CODEX 主行动：先处理');
+  });
+
+  test('current-target common prerequisites still block host continuation', () => {
+    const { getAdapter } = require('../../src/cli/adapters');
+    const output = formatDoctorHumanReport(createReport({
+      platforms: ['codex'],
+      commonChecks: [{ level: 'ERROR', name: 'Node.js', reasonCode: 'node-version-unsupported' }],
+      platformChecks: { codex: [{ level: 'PASS', name: getAdapter('codex').skillsRoot }] },
+    }), { target: '/tmp/project' }).join('\n');
+    expect(output).toContain('CODEX 主行动：先处理上述 [通用环境] Node.js');
+  });
+
+  test('restores a healthy projection without treating aggregated verification as first success', () => {
+    const { getAdapter } = require('../../src/cli/adapters');
+    const report = createReport({
+      platforms: ['codex'],
+      platformChecks: { codex: [{ level: 'PASS', name: getAdapter('codex').skillsRoot }] },
+      workflowRunnability: 'verified',
+      workflowRunnabilityBasis: { evidence_path: '/tmp/evidence.json', evidence_freshness: 'fresh' },
+    });
+    const lines = formatDoctorHumanReport(report, { target: '/tmp/project with spaces' });
+    const output = lines.join('\n');
+    expect(output).toContain('恢复目录：/tmp/project with spaces');
+    expect(output).toContain('CODEX 主行动：在此目录打开或新开 Codex 会话');
+    expect(output).toContain('配置检查不等于宿主已加载');
+    expect(output).not.toContain('首次成功已确认');
+    expect(output.split('\n').filter((line) => line.includes('主行动：'))).toHaveLength(1);
+    // 默认摘要预算（U3）：证据上限声明一句、每 scope 一条主行动，
+    // 证据细节进 verbose；健康单宿主基线为 10 行，允许小幅排版余量。
+    expect(output.match(/证据上限：/g)).toHaveLength(1);
+    expect(output.match(/恢复目录：/g)).toHaveLength(1);
+    expect(lines.length).toBeLessThanOrEqual(12);
+  });
+
+  test('aggregated verified evidence does not spread per-host first-success or hide a failed host', () => {
+    const { getAdapter } = require('../../src/cli/adapters');
+    const output = formatDoctorHumanReport(createReport({
+      platformChecks: {
+        codex: [{ level: 'PASS', name: getAdapter('codex').skillsRoot }],
+        claude: [{ level: 'WARNING', name: '.claude/skills', reasonCode: 'skills-missing', fix: 'Run spec-first init --claude' }],
+      },
+      workflowRunnability: 'verified',
+      workflowRunnabilityBasis: { evidence_path: '/tmp/evidence.json', evidence_freshness: 'fresh' },
+    }), { target: '/tmp/aggregated' }).join('\n');
+    expect(output).toContain('CODEX 主行动：在此目录打开或新开');
+    expect(output).toContain('CLAUDE 主行动：先处理上述 [CLAUDE]');
+    expect(output).not.toContain('CLAUDE 主行动：在此目录打开或新开');
+    expect(output).not.toContain('首次成功已确认');
+  });
+
+  test('keeps unknown scope unknown and preserves healthy host during partial failure', () => {
+    const { getAdapter } = require('../../src/cli/adapters');
+    const report = createReport({ platformChecks: {
+      codex: [{ level: 'PASS', name: getAdapter('codex').skillsRoot }],
+      claude: [{ level: 'WARNING', name: '.claude/skills', reasonCode: 'skills-missing', fix: 'Run spec-first init --claude' }],
+    } });
+    const output = formatDoctorHumanReport(report, { target: '/tmp/partial' }).join('\n');
+    expect(output).toContain('CODEX 主行动：在此目录打开或新开');
+    expect(output).toContain('CLAUDE 主行动：先处理上述 [CLAUDE]');
+    expect(output).toContain('依据：skills-missing');
+    expect(formatDoctorHumanReport(createReport({ platforms: ['codex'] })).join('\n')).toContain('continuation-facts-insufficient');
+  });
+
+  test.each(['missing', 'invalid', 'stale', 'fresh'])('keeps %s evidence scope explicit in verbose output', (freshness) => {
+    const output = formatDoctorHumanReport(createReport({
+      workflowRunnability: 'not_verified',
+      workflowRunnabilityBasis: { evidence_freshness: freshness },
+    }), { verbose: true }).join('\n');
+    expect(output).toContain(`freshness=${freshness}`);
+    expect(output).toContain('项目级聚合证据');
+    expect(output).toContain('setup receipt 不证明每个宿主加载');
+    // freshness 状态不改变证据上限：任何新鲜度都不显示已验证或首次成功结论。
+    expect(output).not.toContain('首次成功');
+    expect(output).not.toMatch(/workflow runnability[:：]?\s*verified/i);
+  });
+
   test('projects machine statuses without collapsing optional, degraded, known limitation, or not-run', () => {
     const cases = [
       [{ level: 'PASS', reasonCode: 'ready' }, 'ready', 'ready'],

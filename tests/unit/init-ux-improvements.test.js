@@ -186,3 +186,12 @@ describe('P2-C prompt microcopy explains its purpose', () => {
     expect(getInitMessages('en').languageSelect).toContain('language');
   });
 });
+
+describe('multi-host selection copy explains the checkbox scope', () => {
+  test('selectHosts says to pick hosts for this session and that others can wait', () => {
+    expect(getInitMessages('zh').selectHosts).toContain('本次');
+    expect(getInitMessages('zh').selectHosts).toContain('稍后');
+    expect(getInitMessages('en').selectHosts).toContain('for this session');
+    expect(getInitMessages('en').selectHosts).toContain('later');
+  });
+});
