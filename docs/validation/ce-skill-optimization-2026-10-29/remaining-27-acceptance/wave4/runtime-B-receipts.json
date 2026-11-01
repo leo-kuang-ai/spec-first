@@ -1,0 +1,97 @@
+{
+  "arm": "B",
+  "source_sha256": "dbcd7256ebbcd61c89d3e78542ab3563579ffc779583b05c0aecf82fd0bfee44",
+  "cases": [
+    {
+      "case": "lawful",
+      "target_repo": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-c6e3EL/B/lawful/a",
+      "other_repo": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-c6e3EL/B/lawful/b",
+      "result": {
+        "ok": true,
+        "changed": true,
+        "target": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-c6e3EL/B/lawful/a/.git/info/exclude"
+      },
+      "sentinel_preserved": true,
+      "other_exclude_preserved": true,
+      "link_preserved": null,
+      "dangling_target_created": null,
+      "outside_entries": [
+        "sentinel"
+      ],
+      "target_exclude_content": "# git ls-files --others --exclude-from=.git/info/exclude\n# Lines that start with '#' are comments.\n# For a project mostly in C, the following would be a good set of\n# exclude patterns (uncomment them if you want to use them):\n# *.[oa]\n# *~\n# spec-first codegraph exclude start\n.codegraph/\n# spec-first codegraph exclude end\n"
+    },
+    {
+      "case": "leaf-existing",
+      "target_repo": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-c6e3EL/B/leaf-existing/a",
+      "other_repo": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-c6e3EL/B/leaf-existing/b",
+      "result": {
+        "ok": false,
+        "reason_code": "exclude-target-escapes-workspace",
+        "target": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-c6e3EL/B/leaf-existing/a/.git/info/exclude"
+      },
+      "sentinel_preserved": true,
+      "other_exclude_preserved": true,
+      "link_preserved": true,
+      "dangling_target_created": null,
+      "outside_entries": [
+        "sentinel"
+      ],
+      "target_exclude_content": "keep\n"
+    },
+    {
+      "case": "leaf-dangling",
+      "target_repo": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-c6e3EL/B/leaf-dangling/a",
+      "other_repo": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-c6e3EL/B/leaf-dangling/b",
+      "result": {
+        "ok": false,
+        "reason_code": "exclude-target-escapes-workspace",
+        "target": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-c6e3EL/B/leaf-dangling/a/.git/info/exclude"
+      },
+      "sentinel_preserved": true,
+      "other_exclude_preserved": true,
+      "link_preserved": true,
+      "dangling_target_created": false,
+      "outside_entries": [
+        "sentinel"
+      ],
+      "target_exclude_content": null
+    },
+    {
+      "case": "ancestor-dangling",
+      "target_repo": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-c6e3EL/B/ancestor-dangling/a",
+      "other_repo": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-c6e3EL/B/ancestor-dangling/b",
+      "result": {
+        "ok": false,
+        "reason_code": "exclude-target-escapes-workspace",
+        "target": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-c6e3EL/B/ancestor-dangling/a/.git/info/exclude"
+      },
+      "sentinel_preserved": true,
+      "other_exclude_preserved": true,
+      "link_preserved": true,
+      "dangling_target_created": false,
+      "outside_entries": [
+        "sentinel"
+      ],
+      "target_exclude_content": null
+    },
+    {
+      "case": "polluted-git-env",
+      "target_repo": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-c6e3EL/B/polluted-git-env/a",
+      "other_repo": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-c6e3EL/B/polluted-git-env/b",
+      "result": {
+        "ok": true,
+        "changed": true,
+        "target": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-c6e3EL/B/polluted-git-env/a/.git/info/exclude"
+      },
+      "sentinel_preserved": true,
+      "other_exclude_preserved": true,
+      "link_preserved": null,
+      "dangling_target_created": null,
+      "outside_entries": [
+        "sentinel"
+      ],
+      "target_exclude_content": "# git ls-files --others --exclude-from=.git/info/exclude\n# Lines that start with '#' are comments.\n# For a project mostly in C, the following would be a good set of\n# exclude patterns (uncomment them if you want to use them):\n# *.[oa]\n# *~\n# spec-first codegraph exclude start\n.codegraph/\n# spec-first codegraph exclude end\n"
+    }
+  ],
+  "evidence_type": "Actual parent-operated helper execution in disposable Git repositories; no host projection or global install."
+}

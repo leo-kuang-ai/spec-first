@@ -1,0 +1,139 @@
+{
+  "checks": [
+    {
+      "trial": "CEOPT-16-A1",
+      "artifact_sha256": "bfed724ef96c29616c551b2432641b9b3214ca03ef4a74c9edf05feae1fe9bc8",
+      "product_contract_exact": true,
+      "product_contract_source_sha256": "edee7e46d35be315424fbfa0678e44429dd69f23c95a63c836d615b145f7ba53",
+      "passed": true
+    },
+    {
+      "trial": "CEOPT-16-A2",
+      "artifact_sha256": "e161b60690abe27990e96ad887f4dc66e6acfae2265337d5cb9f5152496d9641",
+      "product_contract_exact": true,
+      "product_contract_source_sha256": "edee7e46d35be315424fbfa0678e44429dd69f23c95a63c836d615b145f7ba53",
+      "passed": true
+    },
+    {
+      "trial": "CEOPT-16-A3",
+      "artifact_sha256": "da4d8d4f8abe8a3ff6161f0aa9ae98f2e4c6e7722db18ea1986fac8cb2a7fd47",
+      "product_contract_exact": true,
+      "product_contract_source_sha256": "edee7e46d35be315424fbfa0678e44429dd69f23c95a63c836d615b145f7ba53",
+      "passed": true
+    },
+    {
+      "trial": "CEOPT-16-B1",
+      "status": "no-final-artifact",
+      "passed": false
+    },
+    {
+      "trial": "CEOPT-16-B2",
+      "status": "no-final-artifact",
+      "passed": false
+    },
+    {
+      "trial": "CEOPT-16-B3",
+      "artifact_sha256": "98c036039483cf022fbb43028e3e4ba279a374e80d649eb8aa00fd7255293c4e",
+      "product_contract_exact": true,
+      "product_contract_source_sha256": "edee7e46d35be315424fbfa0678e44429dd69f23c95a63c836d615b145f7ba53",
+      "passed": true
+    },
+    {
+      "trial": "CEOPT-27-A1",
+      "artifact_sha256": "a92f461be2dd8735d3410d26dca8b76dc14d551411e596cf0b87e45971d9cc89",
+      "changes": [
+        {
+          "operation": "insert",
+          "source_start": 157,
+          "source_end": 157,
+          "original": "",
+          "addition": "We decline attractive expansions, including payroll compliance, when serving them would displace our commitment to month-end reconciliation in under ten minutes for 1\u20135 person studios, even at the cost of potential upsell revenue.\n\n"
+        }
+      ],
+      "only_one_insertion": true,
+      "inside_approach": true,
+      "passed": true
+    },
+    {
+      "trial": "CEOPT-27-A2",
+      "artifact_sha256": "83327069d471c105871d701092aa286af8582b29f872055d089a1181d242f447",
+      "changes": [
+        {
+          "operation": "insert",
+          "source_start": 157,
+          "source_end": 157,
+          "original": "",
+          "addition": "Prioritize reducing month-end reconciliation to under ten minutes for 1\u20135 person studios, and reject adjacent expansion when its obligations would displace that outcome, even if it offers apparent upsell revenue.\n\n"
+        }
+      ],
+      "only_one_insertion": true,
+      "inside_approach": true,
+      "passed": true
+    },
+    {
+      "trial": "CEOPT-27-A3",
+      "artifact_sha256": "bdff68be7f83f9038d14fb80f379fc371a651e22b31bf9022bec22e20119b96d",
+      "changes": [
+        {
+          "operation": "insert",
+          "source_start": 157,
+          "source_end": 157,
+          "original": "",
+          "addition": "We reject expansion, even when it promises upsell revenue, if serving its obligations would displace our commitment to month-end reconciliation in under ten minutes for 1\u20135 person studios.\n\n"
+        }
+      ],
+      "only_one_insertion": true,
+      "inside_approach": true,
+      "passed": true
+    },
+    {
+      "trial": "CEOPT-27-B1",
+      "artifact_sha256": "bb8046529384ce0bcb20d0122be7f7e2980f607d11557e62307807c79f4dd1ed",
+      "changes": [
+        {
+          "operation": "insert",
+          "source_start": 157,
+          "source_end": 157,
+          "original": "",
+          "addition": "Resist a change when serving an adjacent need would displace the work needed to bring month-end reconciliation below ten minutes for 1\u20135 person studios, even when that change promises upsell revenue.\n\n"
+        }
+      ],
+      "only_one_insertion": true,
+      "inside_approach": true,
+      "passed": true
+    },
+    {
+      "trial": "CEOPT-27-B2",
+      "artifact_sha256": "676d0c15b37e2bdba7e6b1a4c6fa71d4d84d5e9654367c3cf501574007217e6a",
+      "changes": [
+        {
+          "operation": "insert",
+          "source_start": 157,
+          "source_end": 157,
+          "original": "",
+          "addition": "Resist an adjacent revenue opportunity when serving it would displace investment in helping 1-5 person studios reconcile their accounts in under ten minutes, even when the upsell looks attractive.\n\n"
+        }
+      ],
+      "only_one_insertion": true,
+      "inside_approach": true,
+      "passed": true
+    },
+    {
+      "trial": "CEOPT-27-B3",
+      "artifact_sha256": "fb65d8c2fb84d2019383d2da9eaf3f049678eb3fe0f549810346565d4d335661",
+      "changes": [
+        {
+          "operation": "insert",
+          "source_start": 157,
+          "source_end": 157,
+          "original": "",
+          "addition": "Resist an expansion when serving its new obligations would displace achieving month-end reconciliation in under ten minutes for 1-5 person studios, even if it offers apparent upsell revenue.\n\n"
+        }
+      ],
+      "only_one_insertion": true,
+      "inside_approach": true,
+      "passed": true
+    }
+  ],
+  "limitation": "Byte/scope checks only; no semantic acceptance or user approval. Original outputs unchanged."
+}

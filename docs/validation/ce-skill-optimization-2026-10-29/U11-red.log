@@ -1,0 +1,109 @@
+FAIL tests/unit/spec-lfg-pr-watch-state.test.js (5.417 s)
+  spec-lfg PR watch state helper
+    ✕ an unobserved 30-minute gap cannot establish quiet readiness (122 ms)
+    ✓ continuous sampling converges and a later failed check remains actionable (525 ms)
+    ✕ rejects incomplete or backward observations without publishing state: {"observed_at":"2026-07-29T23:59:59.000Z"} (119 ms)
+    ✕ rejects incomplete or backward observations without publishing state: {"review_items":null} (117 ms)
+    ✕ rejects incomplete or backward observations without publishing state: {"checks":null} (118 ms)
+    ✓ preserves a grouped decision, drains independent work, and never stores its prose in watch state (164 ms)
+    ✓ thread-change invalidates the entire decision without inventing an answer (161 ms)
+    ✓ thread-missing invalidates the entire decision without inventing an answer (162 ms)
+    ✓ check-rerun invalidates the entire decision without inventing an answer (165 ms)
+    ✓ head-change invalidates the entire decision without inventing an answer (163 ms)
+    ✓ an exact answer reactivates all sources and cannot be replaced by remote activity or re-parked (208 ms)
+    ✓ rejects missing-options without publishing a state generation (117 ms)
+    ✓ rejects wrong-thread-url without publishing a state generation (117 ms)
+    ✓ rejects duplicate-source without publishing a state generation (117 ms)
+    ✓ rejects missing-source without publishing a state generation (118 ms)
+    ✓ rejects stale-source without publishing a state generation (122 ms)
+    ✓ rejects tampered-file without publishing a state generation (115 ms)
+    ✓ rejects wrong-answer without publishing a state generation (163 ms)
+    ✓ legacy needs-human labels without a complete payload stay actionable (77 ms)
+    ✓ check-only decisions accept null recommendations and retire answers when the check clears (199 ms)
+    ✓ a currency answer preserves the repo-policy blocker and independent CI still runs (195 ms)
+    ✓ lost or altered carried decision artifacts cannot produce successful handoff (162 ms)
+    ✓ unobserved or unknown checks never become green (117 ms)
+    ✓ unobserved or unknown checks never become green (118 ms)
+    ✓ requires a quiet green window and reopens for review after green (157 ms)
+    ✓ routes CI and base currency facts without deciding fixes (118 ms)
+    ✓ enforces one writer and reports local-only and budget terminals (209 ms)
+    ✓ restarts the quiet window after remote observation recovers (196 ms)
+    ✓ rejects credential-bearing PR URLs before writing state (75 ms)
+    ✓ fails closed on malformed review item identity instead of silently narrowing the open set (345 ms)
+    ✓ fails closed on credential-bearing or non-private persisted state (155 ms)
+    ✓ rejects symlinked or non-private state parents without writing outside scratch (113 ms)
+    ✓ a recorded decision whose artifact was deleted rejects structurally instead of crashing (163 ms)
+
+  ● spec-lfg PR watch state helper › an unobserved 30-minute gap cannot establish quiet readiness
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "watching"
+    Received: "looks-ready"
+
+      63 |     let current = append(snapshot(), run(['read', '--state-dir', stateDir]));
+      64 |     current = append(snapshot({ observed_at: '2026-07-30T00:30:00.000Z' }), current);
+    > 65 |     expect(current.terminal).toBe('watching');
+         |                              ^
+      66 |     expect(current.quiet_seconds).toBe(0);
+      67 |     expect(current.observation_gap_seconds).toBe(1800);
+      68 |     expect(current.quiet_window_reset_reason).toBe('observation-gap');
+
+      at Object.toBe (tests/unit/spec-lfg-pr-watch-state.test.js:65:30)
+
+  ● spec-lfg PR watch state helper › rejects incomplete or backward observations without publishing state: {"observed_at":"2026-07-29T23:59:59.000Z"}
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      88 |     const current = append(snapshot(), run(['read', '--state-dir', stateDir]));
+      89 |     const result = spawnSync(process.execPath, [helper, 'snapshot', '--input', writeInput(root, 'invalid.json', snapshot(overrides)), '--state-dir', stateDir, '--expected-generation', String(current.generation), '--expected-sha256', current.snapshot_sha256], { encoding: 'utf8' });
+    > 90 |     expect(result.status).toBe(1);
+         |                           ^
+      91 |     expect(JSON.parse(result.stdout).reason_code).toBe('snapshot-invalid');
+      92 |     expect(run(['read', '--state-dir', stateDir]).generation).toBe(current.generation);
+      93 |   });
+
+      at toBe (tests/unit/spec-lfg-pr-watch-state.test.js:90:27)
+
+  ● spec-lfg PR watch state helper › rejects incomplete or backward observations without publishing state: {"review_items":null}
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      88 |     const current = append(snapshot(), run(['read', '--state-dir', stateDir]));
+      89 |     const result = spawnSync(process.execPath, [helper, 'snapshot', '--input', writeInput(root, 'invalid.json', snapshot(overrides)), '--state-dir', stateDir, '--expected-generation', String(current.generation), '--expected-sha256', current.snapshot_sha256], { encoding: 'utf8' });
+    > 90 |     expect(result.status).toBe(1);
+         |                           ^
+      91 |     expect(JSON.parse(result.stdout).reason_code).toBe('snapshot-invalid');
+      92 |     expect(run(['read', '--state-dir', stateDir]).generation).toBe(current.generation);
+      93 |   });
+
+      at toBe (tests/unit/spec-lfg-pr-watch-state.test.js:90:27)
+
+  ● spec-lfg PR watch state helper › rejects incomplete or backward observations without publishing state: {"checks":null}
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      88 |     const current = append(snapshot(), run(['read', '--state-dir', stateDir]));
+      89 |     const result = spawnSync(process.execPath, [helper, 'snapshot', '--input', writeInput(root, 'invalid.json', snapshot(overrides)), '--state-dir', stateDir, '--expected-generation', String(current.generation), '--expected-sha256', current.snapshot_sha256], { encoding: 'utf8' });
+    > 90 |     expect(result.status).toBe(1);
+         |                           ^
+      91 |     expect(JSON.parse(result.stdout).reason_code).toBe('snapshot-invalid');
+      92 |     expect(run(['read', '--state-dir', stateDir]).generation).toBe(current.generation);
+      93 |   });
+
+      at toBe (tests/unit/spec-lfg-pr-watch-state.test.js:90:27)
+
+Test Suites: 1 failed, 1 total
+Tests:       4 failed, 29 passed, 33 total
+Snapshots:   0 total
+Time:        5.44 s
+Ran all test suites within paths "tests/unit/spec-lfg-pr-watch-state.test.js".

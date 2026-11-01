@@ -122,7 +122,7 @@ describe('spec-runtime-setup runner contracts', () => {
 
   test('Runtime Setup docs describe Graphify commit refresh as an explicit project-owner choice', () => {
     const skill = fs.readFileSync(path.join(repoRoot, 'skills', 'spec-runtime-setup', 'SKILL.md'), 'utf8');
-    const manual = fs.readFileSync(path.join(repoRoot, 'docs', '05-用户手册', '12-gitignore参考.md'), 'utf8');
+    const manual = fs.readFileSync(path.join(repoRoot, 'docs', 'user-guide', '12-gitignore参考.md'), 'utf8');
     const boundary = fs.readFileSync(path.join(repoRoot, 'docs', 'contracts', 'source-runtime-customization-boundary.md'), 'utf8');
 
     for (const contents of [skill, manual, boundary]) {

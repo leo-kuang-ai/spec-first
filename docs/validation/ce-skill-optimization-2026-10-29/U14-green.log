@@ -1,0 +1,17 @@
+PASS tests/unit/pi-adapter.test.js
+PASS tests/unit/spec-riffrec-evidence-coverage.test.js
+PASS tests/unit/session-history-scripts.test.js
+PASS tests/unit/spec-polish-launch-json.test.js
+PASS tests/unit/spec-riffrec-snapshots.test.js
+PASS tests/unit/resolve-port-script.test.js
+PASS tests/unit/spec-riffrec-analyzer-safety.test.js
+PASS tests/unit/spec-riffrec-feedback-analysis-contracts.test.js
+PASS tests/unit/spec-polish-project-type.test.js
+PASS tests/unit/spec-product-pulse-contracts.test.js
+PASS tests/unit/spec-compound-reference-contracts.test.js
+
+Test Suites: 11 passed, 11 total
+Tests:       108 passed, 108 total
+Snapshots:   0 total
+Time:        3.148 s
+Ran all test suites matching /tests\/unit\/spec-riffrec-evidence-coverage.test.js|tests\/unit\/spec-riffrec-analyzer-safety.test.js|tests\/unit\/spec-riffrec-snapshots.test.js|tests\/unit\/spec-riffrec-feedback-analysis-contracts.test.js|tests\/unit\/resolve-port-script.test.js|tests\/unit\/spec-polish-launch-json.test.js|tests\/unit\/spec-polish-project-type.test.js|tests\/unit\/spec-product-pulse-contracts.test.js|tests\/unit\/session-history-scripts.test.js|tests\/unit\/spec-compound-reference-contracts.test.js|tests\/unit\/pi-adapter.test.js/i.

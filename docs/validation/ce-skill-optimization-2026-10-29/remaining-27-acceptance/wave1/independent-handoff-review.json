@@ -1,0 +1,107 @@
+{
+  "scenario": "CEOPT-12",
+  "verdict": "bounded-pass",
+  "full_acceptance": "not-established",
+  "comparison_scope": "Parent B helper produced all managed handoffs; fresh A/B contexts consumed them. This is not an A/B producer comparison.",
+  "refs": {
+    "base": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1",
+    "packet": "CEOPT-12-packet.json",
+    "reconciliation": "handoff-reconciliation.json",
+    "scenario": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#/scenarios",
+    "frozen_source_root": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs",
+    "frozen_sources": [
+      "A/spec-handoff/SKILL.md",
+      "A/spec-handoff/references/resume.md",
+      "A/spec-handoff/references/artifact-contract.md",
+      "B/spec-handoff/SKILL.md",
+      "B/spec-handoff/references/resume.md",
+      "B/spec-handoff/references/artifact-contract.md",
+      "B/spec-handoff/references/create.md"
+    ],
+    "per_trial_files": [
+      "trials/CEOPT-12-{trial}/artifact.md",
+      "trials/CEOPT-12-{trial}/receipt.json",
+      "trials/CEOPT-12-{trial}/tool-events.json",
+      "fixtures/handoff/{trial}/request.txt",
+      "fixtures/handoff/{trial}/before.json",
+      "fixtures/handoff/{trial}/after.json",
+      "fixtures/handoff/{trial}/{research,review}-payload.json",
+      "fixtures/handoff/{trial}/{research,review}-receipt.json",
+      "fixtures/handoff/{trial}/{research,review}-managed-artifact.md"
+    ]
+  },
+  "trials": [
+    {
+      "trial": "A1",
+      "verdict": "bounded-pass",
+      "elapsed_seconds": 107.791,
+      "deadline": "passed"
+    },
+    {
+      "trial": "A2",
+      "verdict": "bounded-pass",
+      "elapsed_seconds": 90.809,
+      "deadline": "passed"
+    },
+    {
+      "trial": "A3",
+      "verdict": "bounded-pass",
+      "elapsed_seconds": 70.452,
+      "deadline": "passed"
+    },
+    {
+      "trial": "B1",
+      "verdict": "bounded-pass",
+      "elapsed_seconds": 65.561,
+      "deadline": "passed"
+    },
+    {
+      "trial": "B2",
+      "verdict": "bounded-pass",
+      "elapsed_seconds": 68.578,
+      "deadline": "passed"
+    },
+    {
+      "trial": "B3",
+      "verdict": "bounded-pass",
+      "elapsed_seconds": 58.912,
+      "deadline": "passed"
+    }
+  ],
+  "confirmed_for_every_trial": [
+    "Read both exact managed handoffs and current source in the designated fixture.",
+    "Research retained its owner and established retryLimit = 2 from src/retry.js:1.",
+    "Review retained its owner and identified Boolean(error) at src/retry.js:2 as accepting truthy permanent errors contrary to README.md:2.",
+    "Reports distinguished static evidence from caller execution and production behavior.",
+    "Observed tool calls contain no fixes, staging, commits, new handoffs, application tests, delegation or external access.",
+    "Independent current read-only inspection matched captured HEAD, complete index entries, post-prepare status and all captured source/managed-file hashes.",
+    "Artifact and tool-trace SHA-256 values match receipts; all twelve saved managed artifacts match writer receipts.",
+    "Elapsed time recomputed from receipt timestamps agrees with recorded values and is below 300 seconds."
+  ],
+  "findings": [
+    {
+      "severity": "informational",
+      "ref": "trials/CEOPT-12-A1/artifact.md#/limitations",
+      "description": "A1 initially read frozen instructions and handoffs from the main-repository working directory before scratch-cwd clarification. All Git and application-source inspection used the correct fixture. Disclosed; no observed state impact."
+    },
+    {
+      "severity": "evidence-limitation",
+      "ref": "fixtures/handoff/B3/review-managed-artifact.md",
+      "description": "Managed handoffs capture HEAD but no historical index snapshot. Parent before.json supplies the complete index baseline; consumer-only historical index equivalence is not established. B3 explicitly discloses this."
+    },
+    {
+      "severity": "informational",
+      "ref": "trials/CEOPT-12-B2/tool-events.json",
+      "description": "B consumers explicitly inspect the managed handoff root; A consumers read the exact selected artifacts but generally report aggregate untracked-directory state. No task failure or preservation regression observed."
+    }
+  ],
+  "limitations": [
+    "Six synthetic local continuation trials establish bounded behavior only; they do not establish end-to-end model-authored handoff creation or full skill acceptance.",
+    "Serving identity is unauthenticated and filesystem isolation was not enforced.",
+    "Durable response saving was parent-mediated.",
+    "Preservation is supported by traces, parent reconciliation and independent current comparison, not continuous filesystem surveillance.",
+    "The explicit request and supplied handoffs strongly specify owners and prohibitions; results do not isolate the causal contribution of the B reference change.",
+    "No demonstrated quality improvement over A; both arms meet the bounded task.",
+    "No writes, application tests, network access or delegation were performed by this reviewer."
+  ]
+}

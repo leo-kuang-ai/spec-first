@@ -1,0 +1,7 @@
+{
+  "trial": "CEOPT-08-A1",
+  "approved_for_disposable_execution": true,
+  "candidate_sha256": "385e5f596701ee5ed2829c179a02de851688459fa7ede0fc394776f668643052",
+  "review": "Parent inspected complete candidate: only node:perf_hooks, deterministic argv-based arrays/Map and JSON stdout. No network, filesystem mutation, process spawning or extra imports. Fixed runner bounds size and environment.",
+  "scope": "Fresh disposable fixture only; this admission is parent-owned, not a worker enforcement receipt."
+}

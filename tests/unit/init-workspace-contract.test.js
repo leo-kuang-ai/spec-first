@@ -34,11 +34,11 @@ const USER_CONTRACT_PATHS = [
   'README.md',
   'README.en.md',
   'README.zh-CN.md',
-  'docs/05-用户手册/01-快速开始.md',
-  'docs/05-用户手册/02-核心概念.md',
-  'docs/05-用户手册/05-最佳实践.md',
-  'docs/05-用户手册/08-三种开发模式.md',
-  'docs/05-用户手册/12-gitignore参考.md',
+  'docs/user-guide/01-快速开始.md',
+  'docs/user-guide/02-核心概念.md',
+  'docs/user-guide/05-最佳实践.md',
+  'docs/user-guide/08-三种开发模式.md',
+  'docs/user-guide/12-gitignore参考.md',
   'docs/contracts/parent-artifact-quarantine.md',
 ];
 

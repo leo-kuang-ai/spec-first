@@ -87,6 +87,12 @@ Implementation Units, Verification Contract, or Definition of Done sections.
 implementation-ready. Implementation-ready artifacts include the full registry
 above, except Appendix remains optional.
 
+### One Rule, One Owner
+
+A product rule belongs to its R-ID; a technical choice belongs to its KTD; a unit owns only its implementation delta. Other sections, diagrams and examples cite the owning ID instead of restating a competing rule. Strengthen the owning entry with evidence and rationale. During enrichment, the Product Contract remains byte-preserved: a missing or conflicting product rule returns to its producer rather than being repaired by deduplication.
+
+Assign stable plan-local `KTD<N>` identities. Reordering does not renumber them; deletion leaves a gap; new decisions take an unused number and retired IDs are never reused. Preserve legacy unnumbered labels until an authorized edit assigns identities. Keep unit references, `Governs R...`, `Covers R...` and actual settlement provenance attached to their owners across planning, task derivation, execution and review. An assumption is not user approval.
+
 ### Wayfinding: map before reading (size-aware)
 
 The document does not carry a reading guide; consuming skills own the reading
@@ -317,7 +323,7 @@ versa.
 
 The agent also picks per artifact:
 
-- Whether Problem Frame merges into Summary
+- Whether Problem Frame merges into Summary for legacy/non-unified artifacts only; unified artifacts retain distinct sections, and upstream Product Contract bytes remain unchanged
 - Sub-groupings (Requirements by capability, KTDs by component, Units phased
   into milestones)
 - How much detail each section carries

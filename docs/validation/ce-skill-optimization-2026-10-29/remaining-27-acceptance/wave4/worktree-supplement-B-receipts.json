@@ -1,0 +1,98 @@
+{
+  "arm": "B",
+  "source_sha256": "333eb0a223bcc2de4a14b543f61eedac365e0280ef7976a840a7c8cf4683d6aa",
+  "cases": [
+    {
+      "case": "linked-container",
+      "execution": {
+        "argv": [
+          "bash",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-worktree/scripts/worktree-manager.sh",
+          "isolate",
+          "feature/login"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "reason_code=worktree-path-unsafe Refusing symlink or non-directory: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-supplement-i1q6oezk/B/linked-container/repo/.worktrees\n"
+      },
+      "main_head_preserved": true,
+      "main_index_preserved": true,
+      "main_branch": "main",
+      "before_status": "",
+      "after_status": "?? .worktrees",
+      "before_refs": "refs/heads/feature/login aa89df7b1d323becfa2600791e055f0fb4f655d8\nrefs/heads/main aa89df7b1d323becfa2600791e055f0fb4f655d8",
+      "after_refs": "refs/heads/feature/login aa89df7b1d323becfa2600791e055f0fb4f655d8\nrefs/heads/main aa89df7b1d323becfa2600791e055f0fb4f655d8",
+      "gitignore_content": null,
+      "measured_target": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-supplement-i1q6oezk/B/linked-container/repo/.worktrees/feature-login",
+      "outside_entries": [
+        "sentinel"
+      ],
+      "sentinel_preserved": true,
+      "target_branch": null,
+      "target_upstream": null
+    },
+    {
+      "case": "existing-ancestor",
+      "execution": {
+        "argv": [
+          "bash",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-worktree/scripts/worktree-manager.sh",
+          "create",
+          "feature/new",
+          "main"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "reason_code=worktree-path-unsafe Refusing symlink or non-directory: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-supplement-i1q6oezk/B/existing-ancestor/repo/.worktrees/feature\n"
+      },
+      "main_head_preserved": true,
+      "main_index_preserved": true,
+      "main_branch": "main",
+      "before_status": "",
+      "after_status": "?? .worktrees/",
+      "before_refs": "refs/heads/feature/login aa89df7b1d323becfa2600791e055f0fb4f655d8\nrefs/heads/main aa89df7b1d323becfa2600791e055f0fb4f655d8",
+      "after_refs": "refs/heads/feature/login aa89df7b1d323becfa2600791e055f0fb4f655d8\nrefs/heads/main aa89df7b1d323becfa2600791e055f0fb4f655d8",
+      "gitignore_content": null,
+      "measured_target": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-supplement-i1q6oezk/B/existing-ancestor/repo/.worktrees/feature/new",
+      "outside_entries": [
+        "sentinel"
+      ],
+      "sentinel_preserved": true,
+      "target_branch": null,
+      "target_upstream": null
+    },
+    {
+      "case": "dangling-ancestor",
+      "execution": {
+        "argv": [
+          "bash",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-worktree/scripts/worktree-manager.sh",
+          "create",
+          "feature/new",
+          "main"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "reason_code=worktree-path-unsafe Refusing symlink or non-directory: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-supplement-i1q6oezk/B/dangling-ancestor/repo/.worktrees/feature\n"
+      },
+      "main_head_preserved": true,
+      "main_index_preserved": true,
+      "main_branch": "main",
+      "before_status": "",
+      "after_status": "?? .worktrees/",
+      "before_refs": "refs/heads/feature/login aa89df7b1d323becfa2600791e055f0fb4f655d8\nrefs/heads/main aa89df7b1d323becfa2600791e055f0fb4f655d8",
+      "after_refs": "refs/heads/feature/login aa89df7b1d323becfa2600791e055f0fb4f655d8\nrefs/heads/main aa89df7b1d323becfa2600791e055f0fb4f655d8",
+      "gitignore_content": null,
+      "measured_target": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-supplement-i1q6oezk/B/dangling-ancestor/repo/.worktrees/feature/new",
+      "outside_entries": [
+        "sentinel"
+      ],
+      "sentinel_preserved": true,
+      "target_branch": null,
+      "target_upstream": null
+    }
+  ],
+  "limitations": [
+    "Parent-operated local Git only. No worker filesystem isolation or external remote tested."
+  ]
+}

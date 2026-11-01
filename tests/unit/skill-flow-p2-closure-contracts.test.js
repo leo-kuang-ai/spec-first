@@ -59,17 +59,17 @@ describe('Skill-flow 剩余 P2 关闭合同', () => {
     expect(callers).not.toContain('`spec-work` and `spec-code-review` offer this skill');
   });
 
-  test('SF-19 Figma worker 返回 authority-bounded evidence packet', () => {
+  test('SF-19 Figma worker returns an authority-bounded evidence packet', () => {
     const prompt = read('skills/spec-work/references/agents/figma-design-sync.md');
 
     expect(prompt).toContain('changed_paths');
     expect(prompt).toContain('verification_evidence');
     expect(prompt).toContain('remaining_differences_or_blockers');
-    expect(prompt).toContain('不得 stage、commit、push、创建或更新 PR');
-    expect(prompt).toContain('不得修改 lifecycle status');
-    expect(prompt).toContain('不得把 generated runtime mirror 当作 source 编辑');
-    expect(prompt).toContain('只有修复已应用并完成验证后才能确认完成');
-    expect(prompt).toContain('caller-provided run-local private screenshot/evidence ref');
+    expect(prompt).toContain('Never stage, commit, push, create/edit PRs');
+    expect(prompt).toContain('change lifecycle status');
+    expect(prompt).toContain('patch generated runtime');
+    expect(prompt).toContain('code-check success is not visual acceptance');
+    expect(prompt).toContain('caller-provided current run-local private browser evidence');
     expect(prompt).toContain('implementation-browser-evidence-missing');
     expect(prompt).not.toContain('agent-browser open');
   });

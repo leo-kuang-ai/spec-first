@@ -1,30 +1,22 @@
 id: return-to-caller-envelope
-title: Return-to-Caller 模式返回含 standalone_shipping_skipped 的 envelope
+title: Caller-owned implementation returns a complete evidence-bound envelope
 description: |
-  验证两大输出形态之一的 Return-to-Caller Mode：caller-owned 请求
-  只做实现与本地验证，不进入 shipping tail（不做最终简化/全量
-  审查/PR/CI/plan 生命周期）；返回 envelope 含
-  standalone_shipping_skipped: true，真实文件变更发生且不产生新提交。
-
+  Compare the final fixture against its explicit pre-task baseline. File bytes,
+  source inventory, HEAD and index are checked; wording alone is not outcome proof.
 input:
   prompt: |
-    （spec-work skill 已安装，请按它工作。）
-    我是上游 caller workflow，授权一次有界实现：把 README.md 里的
-    标题 "Known rough edges" 改成 "Known limitations"，就这一处。
-    只要求实现与本地验证，shipping tail（最终简化、全量审查、PR、
-    CI、plan 生命周期）由我保留；完成时按 Return-to-Caller 的
-    结构化 envelope 返回。
-
+    First run `node prepare-eval.cjs` once to prepare this isolated fixture.
+    Only that preparation may create its baseline commit; it grants no task commit authority.
+    Then use the installed spec-work skill for this request:
+    I am the upstream caller. Change only the README.md heading "Known rough edges" to "Known limitations". Perform local verification; I retain the shipping tail. Return the full Return-to-Caller envelope as a JSON object or a fenced JSON block. Use individual verification and closeout tool calls, preserving their actual results. Task commits and landing are not authorized.
 context:
   repo_fixture: evals/fixtures/repos/reqonly-plan
   git:
     init: true
     checkout: main
-
 constraints:
   timeout_seconds: 600
   max_turns: 25
-
 judge:
   type: script
   script_path: evals/fixtures/scripts/check-return-to-caller.sh

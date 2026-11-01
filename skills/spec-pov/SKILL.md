@@ -1,16 +1,16 @@
 ---
 name: spec-pov
-description: "Give a project-grounded verdict on an external candidate or change. Use to decide whether to adopt, switch, revisit, or compare a technology or approach, assess the impact of an external change, or get a second opinion. Not for neutral explanation or generating options."
-argument-hint: "[the external thing to judge, plus any links] — or invoke bare mid-session for a second opinion"
+description: "Judge an external adoption question, a supplied document direction, or a developed approach set against project evidence. Use for a grounded second opinion; use spec-doc-review for findings, spec-explain for understanding, and spec-ideate for new options."
+argument-hint: "[question, document, or developed approaches, plus any links] — or invoke bare mid-session for a second opinion"
 ---
 
 # Form a Point of View
 
-Return a decisive, **graded verdict** on something from the outside world — judged against *this project*, not in the abstract. The subject is the input in the current prompt or conversation. Stay read-only while forming and reconciling the POV; finish with the POV and its attribution, or an explicit blocker. Use the current host date when weighting source recency and dating artifacts.
+Return a project-grounded adoption verdict, holistic document take, or position among supplied approaches. The subject is the input in the current prompt or conversation. Stay read-only while forming and reconciling the POV; finish with the POV and its attribution, or an explicit blocker. Use the current host date when weighting source recency and dating artifacts.
 
 ## The one rule that is the whole moat
 
-**Do not issue a verdict you did not earn against the project's own context.** The verdict must clear the project and external floors defined by `references/method.md`; neither conversation claims nor generic research substitutes for grounded evidence.
+**Do not issue a verdict you did not earn against the project's own context.** Every subject must clear the project floor in `references/method.md`; adoption requires the full external floor, while document and approach judgments verify only their load-bearing external claims; neither conversation claims nor generic research substitutes for grounded evidence.
 
 ## Interaction Method
 

@@ -1,0 +1,141 @@
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+FAIL tests/unit/ce-outcome-judge-calibration.test.js
+  CE outcome judge counterexamples and valid controls
+    ✕ Plan check-r2-no-code.sh rejects source deletion and untracked implementation (87 ms)
+    ✕ Plan routes-to-execution.sh rejects source deletion and untracked implementation (103 ms)
+    ✕ Plan product blocker preserves the complete source inventory (115 ms)
+    ✕ PRD validation rejects body mutation even with the original marker (103 ms)
+    ✕ Simplify check-safety-preserved.sh tests behavior and permits a parsing helper (89 ms)
+    ✕ Simplify check-r2-safety-stays.sh tests behavior and permits a parsing helper (77 ms)
+    ✕ Simplify no-yield protects the real docs fixture (86 ms)
+
+  ● CE outcome judge counterexamples and valid controls › Plan check-r2-no-code.sh rejects source deletion and untracked implementation
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      31 |     const bytes = fs.readFileSync(file);
+      32 |     fs.unlinkSync(file);
+    > 33 |     expect(judge('spec-plan', script).status).toBe(1);
+         |                                               ^
+      34 |     fs.writeFileSync(file, bytes);
+      35 |     fs.writeFileSync(path.join(workspace, 'src/new.js'), 'module.exports = 1;');
+      36 |     expect(judge('spec-plan', script).status).toBe(1);
+
+      at toBe (tests/unit/ce-outcome-judge-calibration.test.js:33:47)
+
+  ● CE outcome judge counterexamples and valid controls › Plan routes-to-execution.sh rejects source deletion and untracked implementation
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      31 |     const bytes = fs.readFileSync(file);
+      32 |     fs.unlinkSync(file);
+    > 33 |     expect(judge('spec-plan', script).status).toBe(1);
+         |                                               ^
+      34 |     fs.writeFileSync(file, bytes);
+      35 |     fs.writeFileSync(path.join(workspace, 'src/new.js'), 'module.exports = 1;');
+      36 |     expect(judge('spec-plan', script).status).toBe(1);
+
+      at toBe (tests/unit/ce-outcome-judge-calibration.test.js:33:47)
+
+  ● CE outcome judge counterexamples and valid controls › Plan product blocker preserves the complete source inventory
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      41 |     expect(judge('spec-plan', 'check-product-blocker.sh').status).toBe(0);
+      42 |     fs.writeFileSync(path.join(workspace, 'src/new-implementation.js'), 'module.exports = 1;');
+    > 43 |     expect(judge('spec-plan', 'check-product-blocker.sh').status).toBe(1);
+         |                                                                   ^
+      44 |   });
+      45 |
+      46 |   test('PRD validation rejects body mutation even with the original marker', () => {
+
+      at Object.toBe (tests/unit/ce-outcome-judge-calibration.test.js:43:67)
+
+  ● CE outcome judge counterexamples and valid controls › PRD validation rejects body mutation even with the original marker
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      49 |     const file = path.join(workspace, 'docs/brainstorms/2026-09-01-expense-export-requirements.md');
+      50 |     fs.appendFileSync(file, '\nChanged the requirement without authority.\n');
+    > 51 |     expect(judge('spec-prd', 'check-validate-report-only.sh').status).toBe(1);
+         |                                                                       ^
+      52 |   });
+      53 |
+      54 |   test.each(['check-safety-preserved.sh', 'check-r2-safety-stays.sh'])('Simplify %s tests behavior and permits a parsing helper', (script) => {
+
+      at Object.toBe (tests/unit/ce-outcome-judge-calibration.test.js:51:71)
+
+  ● CE outcome judge counterexamples and valid controls › Simplify check-safety-preserved.sh tests behavior and permits a parsing helper
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 1
+
+      54 |   test.each(['check-safety-preserved.sh', 'check-r2-safety-stays.sh'])('Simplify %s tests behavior and permits a parsing helper', (script) => {
+      55 |     setup('spec-simplify-code', 'mini-ledger-guarded');
+    > 56 |     expect(judge('spec-simplify-code', script).status).toBe(0);
+         |                                                        ^
+      57 |     const file = path.join(workspace, 'src/server.js');
+      58 |     const source = fs.readFileSync(file, 'utf8');
+      59 |     fs.unlinkSync(file);
+
+      at toBe (tests/unit/ce-outcome-judge-calibration.test.js:56:56)
+
+  ● CE outcome judge counterexamples and valid controls › Simplify check-r2-safety-stays.sh tests behavior and permits a parsing helper
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      58 |     const source = fs.readFileSync(file, 'utf8');
+      59 |     fs.unlinkSync(file);
+    > 60 |     expect(judge('spec-simplify-code', script).status).toBe(1);
+         |                                                        ^
+      61 |     fs.writeFileSync(file, source.replace("typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0", 'false'));
+      62 |     expect(judge('spec-simplify-code', script).status).toBe(1);
+      63 |     fs.writeFileSync(file, source.replace("JSON.parse(body || '{}')", "require('./parse')(body)"));
+
+      at toBe (tests/unit/ce-outcome-judge-calibration.test.js:60:56)
+
+  ● CE outcome judge counterexamples and valid controls › Simplify no-yield protects the real docs fixture
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 1
+
+      69 |   test('Simplify no-yield protects the real docs fixture', () => {
+      70 |     setup('spec-simplify-code', 'mini-ledger');
+    > 71 |     expect(judge('spec-simplify-code', 'check-no-yield-scope.sh').status).toBe(0);
+         |                                                                           ^
+      72 |     fs.mkdirSync(path.join(workspace, 'docs'), { recursive: true });
+      73 |     fs.writeFileSync(path.join(workspace, 'docs/notes.md'), 'Unauthorized replacement');
+      74 |     expect(judge('spec-simplify-code', 'check-no-yield-scope.sh').status).toBe(1);
+
+      at Object.toBe (tests/unit/ce-outcome-judge-calibration.test.js:71:75)
+
+Test Suites: 1 failed, 1 total
+Tests:       7 failed, 7 total
+Snapshots:   0 total
+Time:        0.784 s
+Ran all test suites matching /tests\/unit\/ce-outcome-judge-calibration.test.js/i.

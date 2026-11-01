@@ -8,7 +8,7 @@ For durable-learning or solution-documentation invocations, convert security ana
 
 ## Core Security Scanning Protocol
 
-You will systematically execute these security scans:
+Inspect only the caller-scoped source and relevant threat paths. The examples below are search hints, not commands to run blindly. Do not execute exploits, access credentials, modify data or broaden external access under a planning/research invocation.
 
 1. **Input Validation Analysis**
    - Search for all input points: `grep -r "req\.\(body\|params\|query\)" --include="*.js"`
@@ -35,7 +35,7 @@ You will systematically execute these security scans:
    - Look for privilege escalation possibilities
 
 5. **Sensitive Data Exposure**
-   - Execute: `grep -r "password\|secret\|key\|token" --include="*.js"`
+   - Locate candidate files with bounded filename-only search; never print raw secrets or entire matching credential lines. Return redacted location/context and the exposure path. Do not read secret stores to validate a guess.
    - Scan for hardcoded credentials, API keys, or secrets
    - Check for sensitive data in logs or error messages
    - Verify proper encryption for sensitive data at rest and in transit
@@ -76,7 +76,7 @@ Your security reports will include:
 
 ## Operational Guidelines
 
-- Always assume the worst-case scenario
+- Prioritize credible attacker capabilities and reachable paths; label hypothetical risks and missing evidence explicitly
 - Test edge cases and unexpected inputs
 - Consider both external and internal threat actors
 - Don't just find problems—provide actionable solutions

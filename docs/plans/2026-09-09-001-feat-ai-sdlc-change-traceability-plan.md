@@ -2,7 +2,7 @@
 artifact_contract: spec-unified-plan/v1
 artifact_readiness: implementation-ready
 product_contract_source: docs/adr/0003-spec-first-ai-enhanced-sdlc-harness-boundary.md
-origin: docs/strategic-review/2026-09-05-next-phase-capability-strategy.md
+origin: docs/strategic-reviewss/2026-09-05-next-phase-capability-strategy.md
 spec_id: 2026-09-09-001-ai-sdlc-change-traceability
 status: active
 execution: code

@@ -40,7 +40,7 @@ tags: [competitor-analysis, skill-evolution, 80-20, conditional-enhancement, fre
 
 - 读完借鉴对象**全部**文件，不止 SKILL.md。
 - 读完本项目目标 skill 的**全部** reference / template / eval，否则会把"已有能力"误判为"待借鉴"。
-- 读**角色契约 / 边界文档**(本项目是 `docs/10-prompt/结构化项目角色契约.md`)作为"什么该拒绝"的标尺。
+- 读**角色契约 / 边界文档**(本项目是 `docs/methodology/结构化项目角色契约.md`)作为"什么该拒绝"的标尺。
 - 检索项目近期是否已对同一主题做过分析/决策(本案命中 `docs/业界分析/14`、`15` 两份竞品+业界对标)。**与既有判断对齐是硬约束**，新建议必须显式声明与它们一致或解释差异。
 
 ### 第 2 步：双重过滤逐项打分（语义判断）
@@ -105,7 +105,7 @@ US→FR双层映射                   Use Cases已覆盖           ✗砍(增cer
 
 ## Related
 
-- `docs/10-prompt/结构化项目角色契约.md` — 边界标尺(§3 核心哲学、§7 设计判断矩阵、§10 80/20)
+- `docs/methodology/结构化项目角色契约.md` — 边界标尺(§3 核心哲学、§7 设计判断矩阵、§10 80/20)
 - `docs/业界分析/14.prd-skill-竞品分析-2026-05-30.md` — 同主题既有竞品分析(差异化主线:current-state + 证据 + 工程交接;反模式:再写更长模板)
 - `docs/业界分析/15.prd-内容规范与模板-业界对标-2026-05-30.md` — 业界 PRD 骨架对标 + "有证据则填、无则入 Assumptions"调和方案
 - `docs/contracts/workflows/fresh-source-eval-checklist.md` — skill prose 变更的语义验证规范

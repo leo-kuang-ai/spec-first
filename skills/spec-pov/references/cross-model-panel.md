@@ -18,7 +18,7 @@ Treat `CODEX_SANDBOX_NETWORK_DISABLED` as positive evidence of host network rest
 
 After all admission gates pass, any host-supported permission request belongs only to the exact read-only `start` call for the fixed recipient. When escalation is forbidden, denied, or unavailable, create no job and continue with the surviving panel or local POV. Disclose that the detached worker inherits the launch context for its lifetime; adapter tool restrictions must still hold. Keep `status`, `wait`, `result`, and `reap` within ordinary permissions. Once a job id exists, follow started-job recovery; authentication failure is lost peer coverage, never a reason to silently replace a recipient.
 
-Resolve the host provider and one fixed peer provider/model before egress. The peer provider must differ from the host provider for an independence claim. Current file-based `provider-serving-receipt/v2` is explicitly `degraded/unverified`; without an authenticated host producer channel, return `provider_serving_receipt_unverified` before publishing a packet or starting a peer and use the in-process fallback. Missing receipt returns `provider_serving_receipt_unavailable`. Announce the intended recipient and content scope before any future authenticated launch when the active interaction mode requires disclosure.
+Resolve the host provider and one fixed peer provider/model before egress. The peer provider must differ from the host provider for an independence claim. Current file-based `provider-serving-receipt/v2` is explicitly `degraded/unverified`; without an authenticated host producer channel, return `provider_serving_receipt_unverified` before publishing a packet or starting a peer and use the in-process fallback. For `start`, missing required admission arguments return `provider_serving_receipt_unavailable`; an absent, unreadable, or unsupported receipt at a supplied path returns `provider_serving_receipt_invalid`. With the authenticated producer channel disabled, otherwise eligible `start` calls and all internal `__worker` calls return `provider_serving_receipt_unverified` before provider execution. Announce the intended recipient and content scope before any future authenticated launch when the active interaction mode requires disclosure.
 
 Use `references/agents/pov-peer.md` and `references/pov-schema.json` to build one `peer-task-packet/v1` per admitted peer. The packet contains:
 
@@ -29,6 +29,8 @@ Use `references/agents/pov-peer.md` and `references/pov-schema.json` to build on
 - no host verdict or peer conclusion.
 
 Start each fixed route through `scripts/cross-model-pov.sh` and the byte-identical `peer-job-runner.py`. Start admitted peers before bounded waits. Reap every unfinished job at the shared deadline, then perform one final collection pass.
+
+Both `start` and the internal `__worker` entrypoint currently fail closed before provider execution. Direct worker invocation is not an admission shortcut. Future activation must bind worker scope and receipt freshness to the runner's admitted job, enforce the same deadline and output byte caps, and test the complete result schema. The dormant implementation and local zero-call tests do not establish that activation contract or a successful provider run.
 
 ## Reconciliation and claim boundary
 

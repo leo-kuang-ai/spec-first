@@ -1,0 +1,151 @@
+{
+  "arm": "A",
+  "source_sha256": "94442c66dc5fa85ceb6641bd1b644d8a66ab7cac5e741ce0f28f152d5c1162c3",
+  "records": [
+    {
+      "command": "start",
+      "arguments": [],
+      "exit_code": 0,
+      "stdout": "{\"status\":\"started\",\"root\":\"/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prototype-2kbcooqk/A\",\"host\":\"127.0.0.1\",\"port\":59134,\"url\":\"http://127.0.0.1:59134\",\"pid\":18921,\"owner_pid\":null}\n",
+      "stderr": ""
+    },
+    {
+      "phase": "initial-get",
+      "response": {
+        "status": 200,
+        "body": "<!doctype html><h1>Throwaway total12</h1>",
+        "headers": {
+          "Content-Type": "text/html; charset=utf-8",
+          "Cache-Control": "no-store",
+          "Content-Security-Policy": "default-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+          "Referrer-Policy": "no-referrer",
+          "X-Content-Type-Options": "nosniff",
+          "Date": "Fri, 30 Oct 2026 07:12:16 GMT",
+          "Connection": "close",
+          "Transfer-Encoding": "chunked"
+        }
+      }
+    },
+    {
+      "phase": "unauthenticated-identity",
+      "response": {
+        "status": 404,
+        "body": "Not found"
+      }
+    },
+    {
+      "phase": "wrong-token-identity",
+      "response": {
+        "status": 404,
+        "body": "Not found"
+      }
+    },
+    {
+      "phase": "authenticated-identity",
+      "response": {
+        "status": 200,
+        "body": "{\"status\":\"running\",\"root\":\"/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prototype-2kbcooqk/A\",\"pid\":18921}\n",
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8",
+          "Cache-Control": "no-store",
+          "Content-Security-Policy": "default-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+          "Referrer-Policy": "no-referrer",
+          "X-Content-Type-Options": "nosniff",
+          "Date": "Fri, 30 Oct 2026 07:12:16 GMT",
+          "Connection": "close",
+          "Transfer-Encoding": "chunked"
+        }
+      }
+    },
+    {
+      "phase": "reload-current-content",
+      "response": {
+        "status": 200,
+        "body": "<!doctype html><h1>Throwaway total18</h1>",
+        "headers": {
+          "Content-Type": "text/html; charset=utf-8",
+          "Cache-Control": "no-store",
+          "Content-Security-Policy": "default-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+          "Referrer-Policy": "no-referrer",
+          "X-Content-Type-Options": "nosniff",
+          "Date": "Fri, 30 Oct 2026 07:12:16 GMT",
+          "Connection": "close",
+          "Transfer-Encoding": "chunked"
+        }
+      }
+    },
+    {
+      "command": "stop",
+      "arguments": [],
+      "exit_code": 0,
+      "stdout": "{\"status\":\"stopped\",\"root\":\"/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prototype-2kbcooqk/A\"}\n",
+      "stderr": ""
+    },
+    {
+      "phase": "after-stop-http",
+      "response": {
+        "status": "unavailable",
+        "error": "URLError"
+      }
+    },
+    {
+      "command": "status",
+      "arguments": [],
+      "exit_code": 0,
+      "stdout": "{\"status\":\"stopped\",\"root\":\"/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prototype-2kbcooqk/A\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": "start",
+      "arguments": [],
+      "exit_code": 0,
+      "stdout": "{\"status\":\"started\",\"root\":\"/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prototype-2kbcooqk/A\",\"host\":\"127.0.0.1\",\"port\":59145,\"url\":\"http://127.0.0.1:59145\",\"pid\":18925,\"owner_pid\":null}\n",
+      "stderr": ""
+    },
+    {
+      "phase": "resumed-current-content",
+      "response": {
+        "status": 200,
+        "body": "<!doctype html><h1>Throwaway total18</h1>",
+        "headers": {
+          "Content-Type": "text/html; charset=utf-8",
+          "Cache-Control": "no-store",
+          "Content-Security-Policy": "default-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+          "Referrer-Policy": "no-referrer",
+          "X-Content-Type-Options": "nosniff",
+          "Date": "Fri, 30 Oct 2026 07:12:17 GMT",
+          "Connection": "close",
+          "Transfer-Encoding": "chunked"
+        }
+      },
+      "new_pid": 18925,
+      "old_pid": 18921,
+      "token_changed": true
+    },
+    {
+      "command": "stop",
+      "arguments": [],
+      "exit_code": 0,
+      "stdout": "{\"status\":\"stopped\",\"root\":\"/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prototype-2kbcooqk/A\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": "status",
+      "arguments": [],
+      "exit_code": 0,
+      "stdout": "{\"status\":\"stopped\",\"root\":\"/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prototype-2kbcooqk/A\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": "stop",
+      "arguments": [],
+      "exit_code": 0,
+      "stdout": "{\"status\":\"stopped\",\"root\":\"/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prototype-2kbcooqk/A\"}\n",
+      "stderr": ""
+    }
+  ],
+  "limitations": [
+    "Actual parent-controlled loopback lifecycle; no human-experience acceptance or user approval.",
+    "No production files, real services or external resources used."
+  ]
+}

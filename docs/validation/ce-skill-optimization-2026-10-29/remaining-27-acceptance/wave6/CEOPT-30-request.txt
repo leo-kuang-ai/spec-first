@@ -1,0 +1,2 @@
+Assess actual xcode-readiness.json first. Separately assess the synthetic successful-tap/unchanged-screen control in xcode-tap-fixture.json. State build/install/test and navigation outcomes without inventing capability or inferring navigation from a tap receipt.
+Read only assigned-arm frozen Skill and the named evidence. Return an English artifact with per-case findings, exact evidence references, unresolved facets and responsible next action. Do not execute, mutate, contact external services or delegate.

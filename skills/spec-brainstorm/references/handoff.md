@@ -6,8 +6,7 @@
 
 **Prototype a remaining behavior or feel question** — when a decision still needs a runnable artifact and a human can experience it, invoke `spec-prototype` with the current brainstorm as its seed. Do not offer this for a visual probe that already settled the question, and do not offer Proof or any external upload.
 
-This content is loaded when Phase 4 begins — after the requirements-only
-unified plan is written.
+This content is loaded when Phase 4 begins — after the warranted document is written or brief alignment has completed without a file. If the user already chose the next destination or ended the discussion, honor that instruction without reopening the menu.
 
 ---
 
@@ -150,7 +149,7 @@ Key decisions:
 - [Decision 1]
 - [Decision 2]
 
-Recommended next step: `spec-plan <plan artifact path>`
+Recommended next step: `spec-plan <actual artifact path or concise confirmed scope>`
 ```
 
 If the user pauses with `Resolve Before Planning` still populated, display:

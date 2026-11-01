@@ -8,7 +8,8 @@
 # An optional leading comment line `# metric_direction: ...` is informational.
 #
 # Verdict math (regression.md "Verdict" section):
-#   - Any HARD regressed=true with classification=eligible -> UNSTABLE (exit 1).
+#   - Any HARD regressed=true with classification=regression-eligible blocks.
+#     Legacy eligible and visual aliases remain accepted.
 #   - Else stability_score = sum(weight * dim_subscore) renormalized over the
 #     SCORE dims that ran (flakiness .30 / performance .30 / resource .20 /
 #     visual .20); STABLE iff >= 95 (REG_THRESHOLD env override) (exit 0).
@@ -45,25 +46,66 @@ fi
 exec "${PYTHON_CMD[@]}" - "$2" <<'PYEOF'
 import os
 import sys
+import math
 
 path = sys.argv[1]
 WEIGHTS = {"flakiness": 0.30, "performance": 0.30, "resource": 0.20, "visual": 0.20}
-THRESHOLD = float(os.environ.get("REG_THRESHOLD", "95"))
 COLUMNS = ["iteration", "timestamp", "dimension", "axis", "tier", "classification",
            "baseline", "candidate", "delta", "regressed", "subscore", "severity",
            "status", "file_line", "description"]
+HARD_DIMS = {"functional", "api-contract", "data-migration", "integration-e2e"}
+CLASSIFICATIONS = {"regression-eligible", "pre-existing", "new-coverage", "flaky", "baseline-unavailable"}
+
+def invalid(message):
+    print(f"INVALID_INPUT\n{message}", file=sys.stderr)
+    sys.exit(2)
+
+try:
+    THRESHOLD = float(os.environ.get("REG_THRESHOLD", "95"))
+except ValueError:
+    invalid("REG_THRESHOLD must be a finite number from 0 through 100")
+if not math.isfinite(THRESHOLD) or not 0 <= THRESHOLD <= 100:
+    invalid("REG_THRESHOLD must be a finite number from 0 through 100")
 
 rows = []
 try:
     with open(path, "r", encoding="utf-8") as fh:
-        for line in fh:
-            line = line.rstrip("\n")
+        for number, line in enumerate(fh, 1):
+            line = line.rstrip("\r\n")
             if not line or line.startswith("#"):
                 continue
             parts = line.split("\t")
-            if len(parts) < len(COLUMNS):
-                parts += [""] * (len(COLUMNS) - len(parts))
-            rows.append(dict(zip(COLUMNS, parts)))
+            if parts == COLUMNS:
+                continue
+            if len(parts) != len(COLUMNS):
+                invalid(f"row {number}: expected {len(COLUMNS)} TSV columns")
+            row = dict(zip(COLUMNS, parts))
+            for key in ("dimension", "tier", "classification", "regressed"):
+                row[key] = row[key].strip().lower()
+            if row["dimension"] == "visual-ui":
+                row["dimension"] = "visual"
+            if row["classification"] == "eligible":
+                row["classification"] = "regression-eligible"
+            dim = row["dimension"]
+            if dim not in HARD_DIMS and dim not in WEIGHTS:
+                invalid(f"row {number}: unknown dimension")
+            if row["tier"] != ("hard" if dim in HARD_DIMS else "score"):
+                invalid(f"row {number}: tier does not match the dimension registry")
+            if row["classification"] not in CLASSIFICATIONS:
+                invalid(f"row {number}: unknown classification")
+            if row["regressed"] not in {"true", "false", "1", "0", "yes", "no"}:
+                invalid(f"row {number}: invalid regressed boolean")
+            scored = dim in WEIGHTS and (row["classification"] == "regression-eligible"
+                     or (dim == "flakiness" and row["classification"] == "flaky"))
+            if scored:
+                try:
+                    subscore = float(row["subscore"])
+                except ValueError:
+                    invalid(f"row {number}: SCORE subscore must be finite and in 0..100")
+                if not math.isfinite(subscore) or not 0 <= subscore <= 100:
+                    invalid(f"row {number}: SCORE subscore must be finite and in 0..100")
+            row["scored"] = scored
+            rows.append(row)
 except Exception as exc:
     print(f"UNAVAILABLE\ncannot read results tsv: {exc}", file=sys.stderr)
     sys.exit(1)
@@ -74,10 +116,12 @@ def truthy(value):
 blocking = [r for r in rows
             if truthy(r["regressed"])
             and r["tier"].strip().lower() == "hard"
-            and r["classification"].strip().lower() == "eligible"]
+            and r["classification"] == "regression-eligible"]
 
 per_dim = {}
 for row in rows:
+    if not row["scored"]:
+        continue
     dim = row["dimension"].strip()
     per_dim.setdefault(dim, []).append(row)
 

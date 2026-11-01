@@ -1,0 +1,25 @@
+{
+  "created_at": "2026-10-30T09:05:10.622558+00:00",
+  "scope": "Separate deterministic supplement for independently identified coverage gaps; not part of the original six model inputs.",
+  "case_hashes": {
+    "hard-canonical.tsv": "f3491c5907187b07ad2af73aefcb586d222ecc2fe206e3493c8682b990f937a7",
+    "hard-legacy.tsv": "908259b78da48476fa8d7e383fb97d89663c22bd392ea0d1d3858950f5f0adb7",
+    "visual-ui-canonical.tsv": "e592f18f08be03d7c36dc2b2ba50a0bda780b82c1b5eee1d246298a748c51760",
+    "visual-ui-legacy.tsv": "5231d09ff4122334f531aef010d5dd3c1d6ff57403013becc7d94274f165c45e",
+    "stable-canonical.tsv": "9f2c8f79f1214f54f184d680ac3b1e18669d254582e3a3e411e4ed3c3514ed31",
+    "stable-legacy.tsv": "a3715523b0bcc484616a70931392d8bc474edb0ee04992ba3473359be4110981",
+    "unknown-dimension-alone.tsv": "71f082d098d116935f1067e70de2a68b6fccccb6f267e8225b235e74c912c9a8",
+    "unknown-dimension-mixed.tsv": "49f9953c18fb435a8fdc02eb2831bd4cd8ae82ad676ef1097f99f1aa394b1da2"
+  },
+  "source_hashes": {
+    "A": "290d1627c5f6f42e212966a056f3a0cbe25bc6c4c708e520e92496f8b6ee0955",
+    "B": "ffa6c913240b72de361752f25f8d28eebffd3fde36a26e99d3ec0d2f81d6d202"
+  },
+  "expectations": {
+    "B": "Canonical/legacy pairs have identical exit/stdout/stderr, retaining HARD and visual failures plus stable positive; both unknown dimensions reject with exit2 and no stability verdict.",
+    "A": "Record actual behavior without rewriting its original source or converting incompatibility into a model failure."
+  },
+  "limitations": [
+    "Synthetic scorer process evidence only; no orchestration recovery, model interpretation rerun, or application outcome."
+  ]
+}

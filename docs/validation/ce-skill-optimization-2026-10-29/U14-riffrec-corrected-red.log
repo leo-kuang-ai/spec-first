@@ -1,0 +1,399 @@
+FAIL tests/unit/spec-riffrec-evidence-coverage.test.js
+  spec-riffrec-feedback-analysis media evidence
+    ✕ missing chunk after extraction failure is partial with exact intervals (50 ms)
+    ✕ missing chunk after provider failure is partial with exact intervals (47 ms)
+    ✕ the CLI retains an earlier sent request when chunk fallback cannot run (50 ms)
+    ✕ both transcription entry functions perform zero subprocess calls without authorization (46 ms)
+    ✕ CLI findings include late request and console failures beyond the screenshot budget (50 ms)
+    ✕ a quiet capture does not create a product requirement or button acceptance example (46 ms)
+    ✕ all text consumers show partial transcription and missing coverage (45 ms)
+  spec-sweep media evidence
+    ✕ missing chunk after extraction failure is partial with exact intervals (50 ms)
+    ✕ missing chunk after provider failure is partial with exact intervals (50 ms)
+    ✕ the CLI retains an earlier sent request when chunk fallback cannot run (53 ms)
+    ✕ both transcription entry functions perform zero subprocess calls without authorization (51 ms)
+    ✕ CLI findings include late request and console failures beyond the screenshot budget (53 ms)
+    ✕ a quiet capture does not create a product requirement or button acceptance example (50 ms)
+    ✕ all text consumers show partial transcription and missing coverage (50 ms)
+
+  ● spec-riffrec-feedback-analysis media evidence › missing chunk after extraction failure is partial with exact intervals
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 2
+    + Received  + 1
+
+      Object {
+    -   "degraded": true,
+        "provider_request_sent": true,
+    -   "status": "partial",
+    +   "status": "ok",
+      }
+
+      42 |     print(json.dumps({'result': result, 'calls': calls}))
+      43 | `);
+    > 44 |     expect(payload.result).toMatchObject({ status: 'partial', provider_request_sent: true, degraded: true });
+         |                            ^
+      45 |     expect(payload.result.covered_intervals).toEqual([{ start_seconds: 0, end_seconds: 420 }]);
+      46 |     expect(payload.result.missing_intervals).toEqual([{ start_seconds: 420, end_seconds: 600 }]);
+      47 |     expect(payload.calls.filter((c) => c === 'curl')).toHaveLength(failure === 'extraction' ? 1 : 2);
+
+      at toMatchObject (tests/unit/spec-riffrec-evidence-coverage.test.js:44:28)
+
+  ● spec-riffrec-feedback-analysis media evidence › missing chunk after provider failure is partial with exact intervals
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 2
+    + Received  + 1
+
+      Object {
+    -   "degraded": true,
+        "provider_request_sent": true,
+    -   "status": "partial",
+    +   "status": "ok",
+      }
+
+      42 |     print(json.dumps({'result': result, 'calls': calls}))
+      43 | `);
+    > 44 |     expect(payload.result).toMatchObject({ status: 'partial', provider_request_sent: true, degraded: true });
+         |                            ^
+      45 |     expect(payload.result.covered_intervals).toEqual([{ start_seconds: 0, end_seconds: 420 }]);
+      46 |     expect(payload.result.missing_intervals).toEqual([{ start_seconds: 420, end_seconds: 600 }]);
+      47 |     expect(payload.calls.filter((c) => c === 'curl')).toHaveLength(failure === 'extraction' ? 1 : 2);
+
+      at toMatchObject (tests/unit/spec-riffrec-evidence-coverage.test.js:44:28)
+
+  ● spec-riffrec-feedback-analysis media evidence › the CLI retains an earlier sent request when chunk fallback cannot run
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      65 |     expect(payload.code).toBe(0);
+      66 |     expect(payload.result.transcript.status).toBe('failed');
+    > 67 |     expect(payload.result.transcription_egress_receipt.provider_request_sent).toBe(true);
+         |                                                                               ^
+      68 |     expect(payload.result.transcript.attempts.map((a) => a.provider_request_sent)).toEqual([true, false]);
+      69 |   });
+      70 |
+
+      at Object.toBe (tests/unit/spec-riffrec-evidence-coverage.test.js:67:79)
+
+  ● spec-riffrec-feedback-analysis media evidence › both transcription entry functions perform zero subprocess calls without authorization
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  2
+    + Received  + 16
+
+      Object {
+    -   "status": 0,
+    -   "stderr": "",
+    +   "status": 1,
+    +   "stderr": "Traceback (most recent call last):
+    +   File \"<string>\", line 13, in <module>
+    +   File \"/Users/kuang/xiaobu/spec-first/skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py\", line 612, in transcribe_media_chunks
+    +     extract = subprocess.run(extract_command, capture_output=True, text=True, timeout=180)
+    +               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    +   File \"/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py\", line 1139, in __call__
+    +     return self._mock_call(*args, **kwargs)
+    +            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    +   File \"/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py\", line 1143, in _mock_call
+    +     return self._execute_mock_call(*args, **kwargs)
+    +            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    +   File \"/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py\", line 1198, in _execute_mock_call
+    +     raise effect
+    + AssertionError: unauthorized call
+    + ",
+      }
+
+      13 | ` + body;
+      14 |   const result = spawnSync('python3', ['-B', '-c', source, script], { encoding: 'utf8', timeout: 10000 });
+    > 15 |   expect({ status: result.status, stderr: result.stderr }).toEqual({ status: 0, stderr: '' });
+         |                                                            ^
+      16 |   return JSON.parse(result.stdout);
+      17 | }
+      18 |
+
+      at toEqual (tests/unit/spec-riffrec-evidence-coverage.test.js:15:60)
+      at Object.run (tests/unit/spec-riffrec-evidence-coverage.test.js:72:21)
+
+  ● spec-riffrec-feedback-analysis media evidence › CLI findings include late request and console failures beyond the screenshot budget
+
+    expect(received).toHaveLength(expected)
+
+    Matcher error: received value must have a length property whose value must be a number
+
+    Received has value: undefined
+
+      103 |     expect(payload.code).toBe(0);
+      104 |     expect(payload.result.moments).toHaveLength(12);
+    > 105 |     expect(payload.result.event_moments).toHaveLength(15);
+          |                                          ^
+      106 |     const findings = payload.result.candidate_findings;
+      107 |     expect(findings.some((f) => f.title.includes('network'))).toBe(true);
+      108 |     expect(findings.some((f) => f.title.includes('Console'))).toBe(true);
+
+      at Object.toHaveLength (tests/unit/spec-riffrec-evidence-coverage.test.js:105:42)
+
+  ● spec-riffrec-feedback-analysis media evidence › a quiet capture does not create a product requirement or button acceptance example
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  1
+    + Received  + 11
+
+    - Array []
+    + Array [
+    +   Object {
+    +     "confidence": "Low",
+    +     "evidence": Array [],
+    +     "expected": "A human should still inspect the source evidence before closing the feedback.",
+    +     "id": "F1",
+    +     "observed": "The analyzer did not find complaint cues, repeated clicks, console errors, or non-noisy failed requests.",
+    +     "severity": "P3",
+    +     "title": "No obvious failure detected automatically",
+    +   },
+    + ]
+
+      120 |     print(json.dumps({'findings': findings, 'text': target.read_text()}))
+      121 | `);
+    > 122 |     expect(payload.findings).toEqual([]);
+          |                              ^
+      123 |     expect(payload.text).toContain('No confirmed product requirements');
+      124 |     expect(payload.text).not.toMatch(/R3|button is weird|produced evidence of product friction/);
+      125 |   });
+
+      at Object.toEqual (tests/unit/spec-riffrec-evidence-coverage.test.js:122:30)
+
+  ● spec-riffrec-feedback-analysis media evidence › all text consumers show partial transcription and missing coverage
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "partial"
+    Received string:    "# Product Feedback Analysis·
+    ## Source·
+    - Source: `/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/tmpaqojv8ca/media`
+    - Source kind: `video`
+    - URL: `unknown`
+    - Started: `unknown`
+    - Duration: `unknown` seconds
+    - Browser: `unknown`
+    - Event counts: `{}`·
+    ## Transcript·
+    known words·
+    ## Selected Moments·
+    _No video moments available for this source._·
+    ## Candidate Findings·
+    ## Human Review Checklist·
+    - Open each selected screenshot and name the exact visible control or state.
+    - Tie transcript language to the closest click or visible UI state.
+    - Promote only confirmed product problems into requirements.
+    - Use repo-relative screenshot paths when moving evidence into a spec-first requirements document.
+    "
+
+      136 | `);
+      137 |     for (const content of payload) {
+    > 138 |       expect(content).toContain('partial');
+          |                       ^
+      139 |       expect(content).toContain('420');
+      140 |       expect(content).toContain('600');
+      141 |     }
+
+      at Object.toContain (tests/unit/spec-riffrec-evidence-coverage.test.js:138:23)
+
+  ● spec-sweep media evidence › missing chunk after extraction failure is partial with exact intervals
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 2
+    + Received  + 1
+
+      Object {
+    -   "degraded": true,
+        "provider_request_sent": true,
+    -   "status": "partial",
+    +   "status": "ok",
+      }
+
+      42 |     print(json.dumps({'result': result, 'calls': calls}))
+      43 | `);
+    > 44 |     expect(payload.result).toMatchObject({ status: 'partial', provider_request_sent: true, degraded: true });
+         |                            ^
+      45 |     expect(payload.result.covered_intervals).toEqual([{ start_seconds: 0, end_seconds: 420 }]);
+      46 |     expect(payload.result.missing_intervals).toEqual([{ start_seconds: 420, end_seconds: 600 }]);
+      47 |     expect(payload.calls.filter((c) => c === 'curl')).toHaveLength(failure === 'extraction' ? 1 : 2);
+
+      at toMatchObject (tests/unit/spec-riffrec-evidence-coverage.test.js:44:28)
+
+  ● spec-sweep media evidence › missing chunk after provider failure is partial with exact intervals
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 2
+    + Received  + 1
+
+      Object {
+    -   "degraded": true,
+        "provider_request_sent": true,
+    -   "status": "partial",
+    +   "status": "ok",
+      }
+
+      42 |     print(json.dumps({'result': result, 'calls': calls}))
+      43 | `);
+    > 44 |     expect(payload.result).toMatchObject({ status: 'partial', provider_request_sent: true, degraded: true });
+         |                            ^
+      45 |     expect(payload.result.covered_intervals).toEqual([{ start_seconds: 0, end_seconds: 420 }]);
+      46 |     expect(payload.result.missing_intervals).toEqual([{ start_seconds: 420, end_seconds: 600 }]);
+      47 |     expect(payload.calls.filter((c) => c === 'curl')).toHaveLength(failure === 'extraction' ? 1 : 2);
+
+      at toMatchObject (tests/unit/spec-riffrec-evidence-coverage.test.js:44:28)
+
+  ● spec-sweep media evidence › the CLI retains an earlier sent request when chunk fallback cannot run
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      65 |     expect(payload.code).toBe(0);
+      66 |     expect(payload.result.transcript.status).toBe('failed');
+    > 67 |     expect(payload.result.transcription_egress_receipt.provider_request_sent).toBe(true);
+         |                                                                               ^
+      68 |     expect(payload.result.transcript.attempts.map((a) => a.provider_request_sent)).toEqual([true, false]);
+      69 |   });
+      70 |
+
+      at Object.toBe (tests/unit/spec-riffrec-evidence-coverage.test.js:67:79)
+
+  ● spec-sweep media evidence › both transcription entry functions perform zero subprocess calls without authorization
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  2
+    + Received  + 16
+
+      Object {
+    -   "status": 0,
+    -   "stderr": "",
+    +   "status": 1,
+    +   "stderr": "Traceback (most recent call last):
+    +   File \"<string>\", line 13, in <module>
+    +   File \"/Users/kuang/xiaobu/spec-first/skills/spec-sweep/scripts/analyze_riffrec_zip.py\", line 612, in transcribe_media_chunks
+    +     extract = subprocess.run(extract_command, capture_output=True, text=True, timeout=180)
+    +               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    +   File \"/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py\", line 1139, in __call__
+    +     return self._mock_call(*args, **kwargs)
+    +            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    +   File \"/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py\", line 1143, in _mock_call
+    +     return self._execute_mock_call(*args, **kwargs)
+    +            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    +   File \"/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py\", line 1198, in _execute_mock_call
+    +     raise effect
+    + AssertionError: unauthorized call
+    + ",
+      }
+
+      13 | ` + body;
+      14 |   const result = spawnSync('python3', ['-B', '-c', source, script], { encoding: 'utf8', timeout: 10000 });
+    > 15 |   expect({ status: result.status, stderr: result.stderr }).toEqual({ status: 0, stderr: '' });
+         |                                                            ^
+      16 |   return JSON.parse(result.stdout);
+      17 | }
+      18 |
+
+      at toEqual (tests/unit/spec-riffrec-evidence-coverage.test.js:15:60)
+      at Object.run (tests/unit/spec-riffrec-evidence-coverage.test.js:72:21)
+
+  ● spec-sweep media evidence › CLI findings include late request and console failures beyond the screenshot budget
+
+    expect(received).toHaveLength(expected)
+
+    Matcher error: received value must have a length property whose value must be a number
+
+    Received has value: undefined
+
+      103 |     expect(payload.code).toBe(0);
+      104 |     expect(payload.result.moments).toHaveLength(12);
+    > 105 |     expect(payload.result.event_moments).toHaveLength(15);
+          |                                          ^
+      106 |     const findings = payload.result.candidate_findings;
+      107 |     expect(findings.some((f) => f.title.includes('network'))).toBe(true);
+      108 |     expect(findings.some((f) => f.title.includes('Console'))).toBe(true);
+
+      at Object.toHaveLength (tests/unit/spec-riffrec-evidence-coverage.test.js:105:42)
+
+  ● spec-sweep media evidence › a quiet capture does not create a product requirement or button acceptance example
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  1
+    + Received  + 11
+
+    - Array []
+    + Array [
+    +   Object {
+    +     "confidence": "Low",
+    +     "evidence": Array [],
+    +     "expected": "A human should still inspect the source evidence before closing the feedback.",
+    +     "id": "F1",
+    +     "observed": "The analyzer did not find complaint cues, repeated clicks, console errors, or non-noisy failed requests.",
+    +     "severity": "P3",
+    +     "title": "No obvious failure detected automatically",
+    +   },
+    + ]
+
+      120 |     print(json.dumps({'findings': findings, 'text': target.read_text()}))
+      121 | `);
+    > 122 |     expect(payload.findings).toEqual([]);
+          |                              ^
+      123 |     expect(payload.text).toContain('No confirmed product requirements');
+      124 |     expect(payload.text).not.toMatch(/R3|button is weird|produced evidence of product friction/);
+      125 |   });
+
+      at Object.toEqual (tests/unit/spec-riffrec-evidence-coverage.test.js:122:30)
+
+  ● spec-sweep media evidence › all text consumers show partial transcription and missing coverage
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "partial"
+    Received string:    "# Product Feedback Analysis·
+    ## Source·
+    - Source: `/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/tmpbwrfp75w/media`
+    - Source kind: `video`
+    - URL: `unknown`
+    - Started: `unknown`
+    - Duration: `unknown` seconds
+    - Browser: `unknown`
+    - Event counts: `{}`·
+    ## Transcript·
+    known words·
+    ## Selected Moments·
+    _No video moments available for this source._·
+    ## Candidate Findings·
+    ## Human Review Checklist·
+    - Open each selected screenshot and name the exact visible control or state.
+    - Tie transcript language to the closest click or visible UI state.
+    - Promote only confirmed product problems into requirements.
+    - Use repo-relative screenshot paths when moving evidence into a spec-first requirements document.
+    "
+
+      136 | `);
+      137 |     for (const content of payload) {
+    > 138 |       expect(content).toContain('partial');
+          |                       ^
+      139 |       expect(content).toContain('420');
+      140 |       expect(content).toContain('600');
+      141 |     }
+
+      at Object.toContain (tests/unit/spec-riffrec-evidence-coverage.test.js:138:23)
+
+Test Suites: 1 failed, 1 total
+Tests:       14 failed, 14 total
+Snapshots:   0 total
+Time:        0.821 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/spec-riffrec-evidence-coverage.test.js/i.

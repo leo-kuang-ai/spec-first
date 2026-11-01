@@ -1,0 +1,505 @@
+jest-haste-map: Haste module naming collision: mini-ledger
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-brainstorm/evals/fixtures/repos/mini-ledger/package.json
+    * <rootDir>/skills/spec-commit/evals/fixtures/repos/mini-ledger/package.json
+
+jest-haste-map: Haste module naming collision: shop-monorepo
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/package.json
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/package.json
+
+jest-haste-map: Haste module naming collision: plain-app
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/package.json
+    * <rootDir>/skills/spec-worktree/evals/fixtures/repos/plain-app/package.json
+
+jest-haste-map: Haste module naming collision: admin
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/admin/package.json
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/apps/admin/package.json
+
+jest-haste-map: Haste module naming collision: web
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/web/package.json
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/apps/web/package.json
+
+jest-haste-map: Haste module naming collision: @shop/api-client
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/api-client/package.json
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/packages/api-client/package.json
+
+jest-haste-map: Haste module naming collision: @shop/ui
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/packages/ui/package.json
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/ui/package.json
+
+FAIL tests/unit/task-pack-command.test.js
+  ● spec-first tasks command › rejects existing task paths that traverse a symlink
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+    [0m [90m  97 |[39m       [36mconst[39m taskPath [33m=[39m writeTaskPack(tempRoot[33m,[39m computeSourcePlanHash(planPath)[33m.[39mhash[33m,[39m [file])[33m;[39m
+     [90m  98 |[39m       [36mconst[39m result [33m=[39m runCli([[32m'tasks'[39m[33m,[39m [32m'validate'[39m[33m,[39m taskPath[33m,[39m [32m'--repo'[39m[33m,[39m tempRoot[33m,[39m [32m'--json'[39m][33m,[39m tempRoot)[33m;[39m
+    [31m[1m>[22m[39m[90m  99 |[39m       expect(result[33m.[39mstatus)[33m.[39mtoBe([35m1[39m)[33m;[39m
+     [90m     |[39m                             [31m[1m^[22m[39m
+     [90m 100 |[39m       expect([33mJSON[39m[33m.[39mparse(result[33m.[39mstdout)[33m.[39mdeterministic_handoff)[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m 101 |[39m       expect(fs[33m.[39mreaddirSync(outside))[33m.[39mtoEqual([[32m'existing.js'[39m])[33m;[39m
+     [90m 102 |[39m       expect(fs[33m.[39mreadFileSync(path[33m.[39mjoin(outside[33m,[39m [32m'existing.js'[39m)[33m,[39m [32m'utf8'[39m))[33m.[39mtoBe([32m'sentinel'[39m)[33m;[39m[0m
+
+      at toBe (tests/unit/task-pack-command.test.js:99:29)
+
+  ● spec-first tasks command › rejects future task paths that traverse a symlink
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+    [0m [90m  97 |[39m       [36mconst[39m taskPath [33m=[39m writeTaskPack(tempRoot[33m,[39m computeSourcePlanHash(planPath)[33m.[39mhash[33m,[39m [file])[33m;[39m
+     [90m  98 |[39m       [36mconst[39m result [33m=[39m runCli([[32m'tasks'[39m[33m,[39m [32m'validate'[39m[33m,[39m taskPath[33m,[39m [32m'--repo'[39m[33m,[39m tempRoot[33m,[39m [32m'--json'[39m][33m,[39m tempRoot)[33m;[39m
+    [31m[1m>[22m[39m[90m  99 |[39m       expect(result[33m.[39mstatus)[33m.[39mtoBe([35m1[39m)[33m;[39m
+     [90m     |[39m                             [31m[1m^[22m[39m
+     [90m 100 |[39m       expect([33mJSON[39m[33m.[39mparse(result[33m.[39mstdout)[33m.[39mdeterministic_handoff)[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m 101 |[39m       expect(fs[33m.[39mreaddirSync(outside))[33m.[39mtoEqual([[32m'existing.js'[39m])[33m;[39m
+     [90m 102 |[39m       expect(fs[33m.[39mreadFileSync(path[33m.[39mjoin(outside[33m,[39m [32m'existing.js'[39m)[33m,[39m [32m'utf8'[39m))[33m.[39mtoBe([32m'sentinel'[39m)[33m;[39m[0m
+
+      at toBe (tests/unit/task-pack-command.test.js:99:29)
+
+  ● spec-first tasks command › rejects dangling task paths that traverse a symlink
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+    [0m [90m  97 |[39m       [36mconst[39m taskPath [33m=[39m writeTaskPack(tempRoot[33m,[39m computeSourcePlanHash(planPath)[33m.[39mhash[33m,[39m [file])[33m;[39m
+     [90m  98 |[39m       [36mconst[39m result [33m=[39m runCli([[32m'tasks'[39m[33m,[39m [32m'validate'[39m[33m,[39m taskPath[33m,[39m [32m'--repo'[39m[33m,[39m tempRoot[33m,[39m [32m'--json'[39m][33m,[39m tempRoot)[33m;[39m
+    [31m[1m>[22m[39m[90m  99 |[39m       expect(result[33m.[39mstatus)[33m.[39mtoBe([35m1[39m)[33m;[39m
+     [90m     |[39m                             [31m[1m^[22m[39m
+     [90m 100 |[39m       expect([33mJSON[39m[33m.[39mparse(result[33m.[39mstdout)[33m.[39mdeterministic_handoff)[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m 101 |[39m       expect(fs[33m.[39mreaddirSync(outside))[33m.[39mtoEqual([[32m'existing.js'[39m])[33m;[39m
+     [90m 102 |[39m       expect(fs[33m.[39mreadFileSync(path[33m.[39mjoin(outside[33m,[39m [32m'existing.js'[39m)[33m,[39m [32m'utf8'[39m))[33m.[39mtoBe([32m'sentinel'[39m)[33m;[39m[0m
+
+      at toBe (tests/unit/task-pack-command.test.js:99:29)
+
+  ● spec-first tasks command › rejects leaf task paths that traverse a symlink
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+    [0m [90m  97 |[39m       [36mconst[39m taskPath [33m=[39m writeTaskPack(tempRoot[33m,[39m computeSourcePlanHash(planPath)[33m.[39mhash[33m,[39m [file])[33m;[39m
+     [90m  98 |[39m       [36mconst[39m result [33m=[39m runCli([[32m'tasks'[39m[33m,[39m [32m'validate'[39m[33m,[39m taskPath[33m,[39m [32m'--repo'[39m[33m,[39m tempRoot[33m,[39m [32m'--json'[39m][33m,[39m tempRoot)[33m;[39m
+    [31m[1m>[22m[39m[90m  99 |[39m       expect(result[33m.[39mstatus)[33m.[39mtoBe([35m1[39m)[33m;[39m
+     [90m     |[39m                             [31m[1m^[22m[39m
+     [90m 100 |[39m       expect([33mJSON[39m[33m.[39mparse(result[33m.[39mstdout)[33m.[39mdeterministic_handoff)[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m 101 |[39m       expect(fs[33m.[39mreaddirSync(outside))[33m.[39mtoEqual([[32m'existing.js'[39m])[33m;[39m
+     [90m 102 |[39m       expect(fs[33m.[39mreadFileSync(path[33m.[39mjoin(outside[33m,[39m [32m'existing.js'[39m)[33m,[39m [32m'utf8'[39m))[33m.[39mtoBe([32m'sentinel'[39m)[33m;[39m[0m
+
+      at toBe (tests/unit/task-pack-command.test.js:99:29)
+
+  ● spec-first tasks command › rejects Git metadata or generated runtime: .git/config
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+    [0m [90m 107 |[39m     [36mconst[39m taskPath [33m=[39m writeTaskPack(tempRoot[33m,[39m computeSourcePlanHash(planPath)[33m.[39mhash[33m,[39m [file])[33m;[39m
+     [90m 108 |[39m     [36mconst[39m result [33m=[39m runCli([[32m'tasks'[39m[33m,[39m [32m'validate'[39m[33m,[39m taskPath[33m,[39m [32m'--repo'[39m[33m,[39m tempRoot[33m,[39m [32m'--json'[39m][33m,[39m tempRoot)[33m;[39m
+    [31m[1m>[22m[39m[90m 109 |[39m     expect(result[33m.[39mstatus)[33m.[39mtoBe([35m1[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 110 |[39m     expect([33mJSON[39m[33m.[39mparse(result[33m.[39mstdout)[33m.[39mdeterministic_handoff)[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m 111 |[39m   })[33m;[39m
+     [90m 112 |[39m[0m
+
+      at toBe (tests/unit/task-pack-command.test.js:109:27)
+
+  ● spec-first tasks command › rejects Git metadata or generated runtime: .GIT/config
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+    [0m [90m 107 |[39m     [36mconst[39m taskPath [33m=[39m writeTaskPack(tempRoot[33m,[39m computeSourcePlanHash(planPath)[33m.[39mhash[33m,[39m [file])[33m;[39m
+     [90m 108 |[39m     [36mconst[39m result [33m=[39m runCli([[32m'tasks'[39m[33m,[39m [32m'validate'[39m[33m,[39m taskPath[33m,[39m [32m'--repo'[39m[33m,[39m tempRoot[33m,[39m [32m'--json'[39m][33m,[39m tempRoot)[33m;[39m
+    [31m[1m>[22m[39m[90m 109 |[39m     expect(result[33m.[39mstatus)[33m.[39mtoBe([35m1[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 110 |[39m     expect([33mJSON[39m[33m.[39mparse(result[33m.[39mstdout)[33m.[39mdeterministic_handoff)[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m 111 |[39m   })[33m;[39m
+     [90m 112 |[39m[0m
+
+      at toBe (tests/unit/task-pack-command.test.js:109:27)
+
+  ● spec-first tasks command › rejects Git metadata or generated runtime: .opencode/skills/example/SKILL.md
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+    [0m [90m 107 |[39m     [36mconst[39m taskPath [33m=[39m writeTaskPack(tempRoot[33m,[39m computeSourcePlanHash(planPath)[33m.[39mhash[33m,[39m [file])[33m;[39m
+     [90m 108 |[39m     [36mconst[39m result [33m=[39m runCli([[32m'tasks'[39m[33m,[39m [32m'validate'[39m[33m,[39m taskPath[33m,[39m [32m'--repo'[39m[33m,[39m tempRoot[33m,[39m [32m'--json'[39m][33m,[39m tempRoot)[33m;[39m
+    [31m[1m>[22m[39m[90m 109 |[39m     expect(result[33m.[39mstatus)[33m.[39mtoBe([35m1[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 110 |[39m     expect([33mJSON[39m[33m.[39mparse(result[33m.[39mstdout)[33m.[39mdeterministic_handoff)[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m 111 |[39m   })[33m;[39m
+     [90m 112 |[39m[0m
+
+      at toBe (tests/unit/task-pack-command.test.js:109:27)
+
+  ● spec-first tasks command › rejects Git metadata or generated runtime: .OpenCode/skills/example/SKILL.md
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+    [0m [90m 107 |[39m     [36mconst[39m taskPath [33m=[39m writeTaskPack(tempRoot[33m,[39m computeSourcePlanHash(planPath)[33m.[39mhash[33m,[39m [file])[33m;[39m
+     [90m 108 |[39m     [36mconst[39m result [33m=[39m runCli([[32m'tasks'[39m[33m,[39m [32m'validate'[39m[33m,[39m taskPath[33m,[39m [32m'--repo'[39m[33m,[39m tempRoot[33m,[39m [32m'--json'[39m][33m,[39m tempRoot)[33m;[39m
+    [31m[1m>[22m[39m[90m 109 |[39m     expect(result[33m.[39mstatus)[33m.[39mtoBe([35m1[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 110 |[39m     expect([33mJSON[39m[33m.[39mparse(result[33m.[39mstdout)[33m.[39mdeterministic_handoff)[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m 111 |[39m   })[33m;[39m
+     [90m 112 |[39m[0m
+
+      at toBe (tests/unit/task-pack-command.test.js:109:27)
+
+  ● spec-first tasks command › rejects Git metadata or generated runtime: .opencode/commands/spec-work.md
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+    [0m [90m 107 |[39m     [36mconst[39m taskPath [33m=[39m writeTaskPack(tempRoot[33m,[39m computeSourcePlanHash(planPath)[33m.[39mhash[33m,[39m [file])[33m;[39m
+     [90m 108 |[39m     [36mconst[39m result [33m=[39m runCli([[32m'tasks'[39m[33m,[39m [32m'validate'[39m[33m,[39m taskPath[33m,[39m [32m'--repo'[39m[33m,[39m tempRoot[33m,[39m [32m'--json'[39m][33m,[39m tempRoot)[33m;[39m
+    [31m[1m>[22m[39m[90m 109 |[39m     expect(result[33m.[39mstatus)[33m.[39mtoBe([35m1[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 110 |[39m     expect([33mJSON[39m[33m.[39mparse(result[33m.[39mstdout)[33m.[39mdeterministic_handoff)[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m 111 |[39m   })[33m;[39m
+     [90m 112 |[39m[0m
+
+      at toBe (tests/unit/task-pack-command.test.js:109:27)
+
+  ● spec-first tasks command › rejects Git metadata or generated runtime: opencode.jsonc
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+    [0m [90m 107 |[39m     [36mconst[39m taskPath [33m=[39m writeTaskPack(tempRoot[33m,[39m computeSourcePlanHash(planPath)[33m.[39mhash[33m,[39m [file])[33m;[39m
+     [90m 108 |[39m     [36mconst[39m result [33m=[39m runCli([[32m'tasks'[39m[33m,[39m [32m'validate'[39m[33m,[39m taskPath[33m,[39m [32m'--repo'[39m[33m,[39m tempRoot[33m,[39m [32m'--json'[39m][33m,[39m tempRoot)[33m;[39m
+    [31m[1m>[22m[39m[90m 109 |[39m     expect(result[33m.[39mstatus)[33m.[39mtoBe([35m1[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 110 |[39m     expect([33mJSON[39m[33m.[39mparse(result[33m.[39mstdout)[33m.[39mdeterministic_handoff)[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m 111 |[39m   })[33m;[39m
+     [90m 112 |[39m[0m
+
+      at toBe (tests/unit/task-pack-command.test.js:109:27)
+
+  ● spec-first tasks command › rejects Git metadata or generated runtime: .zcode/spec-first/state.json
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+    [0m [90m 107 |[39m     [36mconst[39m taskPath [33m=[39m writeTaskPack(tempRoot[33m,[39m computeSourcePlanHash(planPath)[33m.[39mhash[33m,[39m [file])[33m;[39m
+     [90m 108 |[39m     [36mconst[39m result [33m=[39m runCli([[32m'tasks'[39m[33m,[39m [32m'validate'[39m[33m,[39m taskPath[33m,[39m [32m'--repo'[39m[33m,[39m tempRoot[33m,[39m [32m'--json'[39m][33m,[39m tempRoot)[33m;[39m
+    [31m[1m>[22m[39m[90m 109 |[39m     expect(result[33m.[39mstatus)[33m.[39mtoBe([35m1[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 110 |[39m     expect([33mJSON[39m[33m.[39mparse(result[33m.[39mstdout)[33m.[39mdeterministic_handoff)[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m 111 |[39m   })[33m;[39m
+     [90m 112 |[39m[0m
+
+      at toBe (tests/unit/task-pack-command.test.js:109:27)
+
+  ● spec-first tasks command › rejects Git metadata or generated runtime: .zcode/hooks/session-start
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+    [0m [90m 107 |[39m     [36mconst[39m taskPath [33m=[39m writeTaskPack(tempRoot[33m,[39m computeSourcePlanHash(planPath)[33m.[39mhash[33m,[39m [file])[33m;[39m
+     [90m 108 |[39m     [36mconst[39m result [33m=[39m runCli([[32m'tasks'[39m[33m,[39m [32m'validate'[39m[33m,[39m taskPath[33m,[39m [32m'--repo'[39m[33m,[39m tempRoot[33m,[39m [32m'--json'[39m][33m,[39m tempRoot)[33m;[39m
+    [31m[1m>[22m[39m[90m 109 |[39m     expect(result[33m.[39mstatus)[33m.[39mtoBe([35m1[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 110 |[39m     expect([33mJSON[39m[33m.[39mparse(result[33m.[39mstdout)[33m.[39mdeterministic_handoff)[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m 111 |[39m   })[33m;[39m
+     [90m 112 |[39m[0m
+
+      at toBe (tests/unit/task-pack-command.test.js:109:27)
+
+  ● spec-first tasks command › rejects Git metadata or generated runtime: .pi/spec-first/state.json
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+    [0m [90m 107 |[39m     [36mconst[39m taskPath [33m=[39m writeTaskPack(tempRoot[33m,[39m computeSourcePlanHash(planPath)[33m.[39mhash[33m,[39m [file])[33m;[39m
+     [90m 108 |[39m     [36mconst[39m result [33m=[39m runCli([[32m'tasks'[39m[33m,[39m [32m'validate'[39m[33m,[39m taskPath[33m,[39m [32m'--repo'[39m[33m,[39m tempRoot[33m,[39m [32m'--json'[39m][33m,[39m tempRoot)[33m;[39m
+    [31m[1m>[22m[39m[90m 109 |[39m     expect(result[33m.[39mstatus)[33m.[39mtoBe([35m1[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 110 |[39m     expect([33mJSON[39m[33m.[39mparse(result[33m.[39mstdout)[33m.[39mdeterministic_handoff)[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m 111 |[39m   })[33m;[39m
+     [90m 112 |[39m[0m
+
+      at toBe (tests/unit/task-pack-command.test.js:109:27)
+
+  ● spec-first tasks command › checks task paths in the selected child repo rather than the artifact root
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+    [0m [90m 119 |[39m       fs[33m.[39msymlinkSync(outside[33m,[39m path[33m.[39mjoin(child[33m,[39m [32m'src'[39m)[33m,[39m [32m'dir'[39m)[33m;[39m
+     [90m 120 |[39m       [36mconst[39m taskPath [33m=[39m writeTaskPack(tempRoot[33m,[39m computeSourcePlanHash(planPath)[33m.[39mhash[33m,[39m [[32m'src/new.js'[39m][33m,[39m { taskTargetRepo[33m:[39m [32m'child'[39m })[33m;[39m
+    [31m[1m>[22m[39m[90m 121 |[39m       expect(runCli([[32m'tasks'[39m[33m,[39m [32m'validate'[39m[33m,[39m taskPath[33m,[39m [32m'--repo'[39m[33m,[39m tempRoot[33m,[39m [32m'--json'[39m][33m,[39m tempRoot)[33m.[39mstatus)[33m.[39mtoBe([35m1[39m)[33m;[39m
+     [90m     |[39m                                                                                                      [31m[1m^[22m[39m
+     [90m 122 |[39m       fs[33m.[39munlinkSync(path[33m.[39mjoin(child[33m,[39m [32m'src'[39m))[33m;[39m
+     [90m 123 |[39m       [36mconst[39m valid [33m=[39m runCli([[32m'tasks'[39m[33m,[39m [32m'validate'[39m[33m,[39m taskPath[33m,[39m [32m'--repo'[39m[33m,[39m tempRoot[33m,[39m [32m'--json'[39m][33m,[39m tempRoot)[33m;[39m
+     [90m 124 |[39m       expect(valid[33m.[39mstatus)[33m.[39mtoBe([35m0[39m)[33m;[39m[0m
+
+      at Object.toBe (tests/unit/task-pack-command.test.js:121:102)
+
+  ● spec-first tasks command › uses the pack target_repo when no task override is present
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first-task-pack-QDo92n/child"
+    Received: undefined
+
+    [0m [90m 136 |[39m     [36mconst[39m result [33m=[39m runCli([[32m'tasks'[39m[33m,[39m [32m'validate'[39m[33m,[39m taskPath[33m,[39m [32m'--repo'[39m[33m,[39m tempRoot[33m,[39m [32m'--json'[39m][33m,[39m tempRoot)[33m;[39m
+     [90m 137 |[39m     expect(result[33m.[39mstatus)[33m.[39mtoBe([35m0[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 138 |[39m     expect([33mJSON[39m[33m.[39mparse(result[33m.[39mstdout)[33m.[39mtask_pack[33m.[39mexecution_focus[[35m0[39m][33m.[39mresolved_target_repo)[33m.[39mtoBe(fs[33m.[39mrealpathSync(child))[33m;[39m
+     [90m     |[39m                                                                                         [31m[1m^[22m[39m
+     [90m 139 |[39m   })[33m;[39m
+     [90m 140 |[39m
+     [90m 141 |[39m   test([32m'hash resolves relative paths from --repo and returns portable identity fields'[39m[33m,[39m () [33m=>[39m {[0m
+
+      at toBe (tests/unit/task-pack-command.test.js:138:89)
+
+  ● spec-first tasks command › uses the source target_repo when no task override is present
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first-task-pack-Zl4TOg/child"
+    Received: undefined
+
+    [0m [90m 136 |[39m     [36mconst[39m result [33m=[39m runCli([[32m'tasks'[39m[33m,[39m [32m'validate'[39m[33m,[39m taskPath[33m,[39m [32m'--repo'[39m[33m,[39m tempRoot[33m,[39m [32m'--json'[39m][33m,[39m tempRoot)[33m;[39m
+     [90m 137 |[39m     expect(result[33m.[39mstatus)[33m.[39mtoBe([35m0[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 138 |[39m     expect([33mJSON[39m[33m.[39mparse(result[33m.[39mstdout)[33m.[39mtask_pack[33m.[39mexecution_focus[[35m0[39m][33m.[39mresolved_target_repo)[33m.[39mtoBe(fs[33m.[39mrealpathSync(child))[33m;[39m
+     [90m     |[39m                                                                                         [31m[1m^[22m[39m
+     [90m 139 |[39m   })[33m;[39m
+     [90m 140 |[39m
+     [90m 141 |[39m   test([32m'hash resolves relative paths from --repo and returns portable identity fields'[39m[33m,[39m () [33m=>[39m {[0m
+
+      at toBe (tests/unit/task-pack-command.test.js:138:89)
+
+FAIL tests/unit/mcp-setup-workspace-git-exclude.test.js
+  ● workspace-git-exclude — managed .git/info/exclude writer › dangling leaf links fail without changing the link or creating outside files
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+    [0m [90m 55 |[39m       fs[33m.[39mrmSync(link[33m,[39m { recursive[33m:[39m [36mtrue[39m[33m,[39m force[33m:[39m [36mtrue[39m })[33m;[39m
+     [90m 56 |[39m       fs[33m.[39msymlinkSync(target[33m,[39m link[33m,[39m kind [33m===[39m [32m'leaf'[39m [33m?[39m [32m'file'[39m [33m:[39m [32m'dir'[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 57 |[39m       expect(addManagedExclude(repo[33m,[39m ws)[33m.[39mok)[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m    |[39m                                              [31m[1m^[22m[39m
+     [90m 58 |[39m       expect(removeManagedExclude(repo[33m,[39m ws)[33m.[39mok)[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m 59 |[39m       expect(fs[33m.[39mexistsSync(target))[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m 60 |[39m       expect(fs[33m.[39mlstatSync(link)[33m.[39misSymbolicLink())[33m.[39mtoBe([36mtrue[39m)[33m;[39m[0m
+
+      at toBe (tests/unit/mcp-setup-workspace-git-exclude.test.js:57:46)
+
+  ● workspace-git-exclude — managed .git/info/exclude writer › dangling ancestor links fail without changing the link or creating outside files
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+    [0m [90m 56 |[39m       fs[33m.[39msymlinkSync(target[33m,[39m link[33m,[39m kind [33m===[39m [32m'leaf'[39m [33m?[39m [32m'file'[39m [33m:[39m [32m'dir'[39m)[33m;[39m
+     [90m 57 |[39m       expect(addManagedExclude(repo[33m,[39m ws)[33m.[39mok)[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 58 |[39m       expect(removeManagedExclude(repo[33m,[39m ws)[33m.[39mok)[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m    |[39m                                                 [31m[1m^[22m[39m
+     [90m 59 |[39m       expect(fs[33m.[39mexistsSync(target))[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m 60 |[39m       expect(fs[33m.[39mlstatSync(link)[33m.[39misSymbolicLink())[33m.[39mtoBe([36mtrue[39m)[33m;[39m
+     [90m 61 |[39m     } [36mfinally[39m {[0m
+
+      at toBe (tests/unit/mcp-setup-workspace-git-exclude.test.js:58:49)
+
+  ● workspace-git-exclude — managed .git/info/exclude writer › Git environment overrides cannot change exclude or snapshot repository identity
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 3
+    + Received  + 3
+
+      Object {
+    -   "head_sha": "7ffb1dd8b3087d479d02ebe15164c81189c29dca",
+    +   "head_sha": "895eae5cf57153b4b20cdaf745f065fd74cb2183",
+        "head_state": "commit",
+        "observed": true,
+        "repo_id": "a",
+    -   "worktree_clean": false,
+    -   "worktree_fingerprint": "a3f4466a07cf40af0aa61f64d581f903a894213a6aee75e6772c310980447b20",
+    +   "worktree_clean": true,
+    +   "worktree_fingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      }
+
+    [0m [90m 85 |[39m       process[33m.[39menv[33m.[39m[33mGIT_CONFIG_KEY_0[39m [33m=[39m [32m'core.bare'[39m[33m;[39m
+     [90m 86 |[39m       process[33m.[39menv[33m.[39m[33mGIT_CONFIG_VALUE_0[39m [33m=[39m [32m'true'[39m[33m;[39m
+    [31m[1m>[22m[39m[90m 87 |[39m       expect(inspectRepoSnapshot({ repo_id[33m:[39m [32m'a'[39m[33m,[39m git_root[33m:[39m a }))[33m.[39mtoEqual(before)[33m;[39m
+     [90m    |[39m                                                                  [31m[1m^[22m[39m
+     [90m 88 |[39m       expect(captureSourceSnapshot(snapshotOptions))[33m.[39mtoEqual(sourceBefore)[33m;[39m
+     [90m 89 |[39m       expect(addManagedExclude(a[33m,[39m ws))[33m.[39mtoMatchObject({ ok[33m:[39m [36mtrue[39m[33m,[39m target[33m:[39m path[33m.[39mjoin(a[33m,[39m [32m'.git/info/exclude'[39m) })[33m;[39m
+     [90m 90 |[39m       expect(fs[33m.[39mreadFileSync(path[33m.[39mjoin(b[33m,[39m [32m'.git/info/exclude'[39m)[33m,[39m [32m'utf8'[39m))[33m.[39mtoBe(excludeB)[33m;[39m[0m
+
+      at Object.toEqual (tests/unit/mcp-setup-workspace-git-exclude.test.js:87:66)
+
+FAIL tests/unit/mcp-setup-workspace-routing-inject.test.js
+  ● injectRoutingInstruction — upsert routing block into workspace entry docs › dangling entry links cannot create outside files; normal creation works after recovery
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 2
+    + Received  + 2
+
+      Object {
+    -   "reason_code": "routing-entry-escapes-workspace",
+    -   "status": "failed",
+    +   "reason_code": "",
+    +   "status": "created",
+      }
+
+    [0m [90m 72 |[39m       fs[33m.[39msymlinkSync(target[33m,[39m entry)[33m;[39m
+     [90m 73 |[39m       [36mconst[39m result [33m=[39m injectRoutingInstruction({ workspaceRoot[33m:[39m ws[33m,[39m hosts[33m:[39m [[32m'codex'[39m] })[33m;[39m
+    [31m[1m>[22m[39m[90m 74 |[39m       expect(result[33m.[39mentries[[35m0[39m])[33m.[39mtoMatchObject({ status[33m:[39m [32m'failed'[39m[33m,[39m reason_code[33m:[39m [32m'routing-entry-escapes-workspace'[39m })[33m;[39m
+     [90m    |[39m                                 [31m[1m^[22m[39m
+     [90m 75 |[39m       expect(fs[33m.[39mexistsSync(target))[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m 76 |[39m       expect(fs[33m.[39mlstatSync(entry)[33m.[39misSymbolicLink())[33m.[39mtoBe([36mtrue[39m)[33m;[39m
+     [90m 77 |[39m       fs[33m.[39munlinkSync(entry)[33m;[39m[0m
+
+      at Object.toMatchObject (tests/unit/mcp-setup-workspace-routing-inject.test.js:74:33)
+
+  ● injectRoutingInstruction — upsert routing block into workspace entry docs › atomic replacement preserves outside hardlink peers and file permissions
+
+    expect(received).toBe(expected) // Object.is equality
+
+    - Expected  -  0
+    + Received  + 15
+
+      # Original content
+
+    + <!-- spec-first:workspace-routing start -->
+    + ## Workspace code graphs (per-requirement: spec-first-wg-inject-0C5c8S)
+    +
+    + This folder is a multi-repo requirement workspace. Graphs are advisory candidates — confirm important conclusions against source.
+    +
+    + - **Tactical (per repo):** query CodeGraph with `projectPath` set to the child repo your cwd is inside. This is **best-effort routing**, not a deterministic resolver.
+    + - **Cross-repo:** for questions spanning repos, use Graphify CLI against `graphify-out/merged-graph.json` (`query` / `path` / `explain`). **Do not cat** `graph.json` or `merged-graph.json` into context (files may be tens or hundreds of MB).
+    + - **Fallback:** if launched from inside a child and `projectPath` is omitted, default to that enclosing child. If launched from the **parent root**, there is **no safe default** — pick an explicit child `projectPath` or use the merged Graphify graph for cross-repo questions. Never query the CodeGraph server root (no index).
+    + - **Isolation:** stay within this workspace; do not pass a `projectPath` pointing at another requirement folder.
+    + - **Freshness gate:** run `spec-runtime-setup --workspace-graph-status` before graph use. Use graph candidates only when status is `ready`; on `partial`/`stale`, fall back to direct source reads and refresh with `spec-runtime-setup --only codegraph,graphify --workspace-graph --repos <a,b,...>`.
+    +
+    + Child repos in this workspace:
+    +   - (none resolved yet — run workspace graph setup)
+    + <!-- spec-first:workspace-routing end -->
+    +
+
+    [0m [90m 92 |[39m       fs[33m.[39mlinkSync(target[33m,[39m entry)[33m;[39m
+     [90m 93 |[39m       expect(injectRoutingInstruction({ workspaceRoot[33m:[39m ws[33m,[39m hosts[33m:[39m [[32m'codex'[39m] })[33m.[39mentries[[35m0[39m][33m.[39mstatus)[33m.[39mtoBe([32m'updated'[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 94 |[39m       expect(fs[33m.[39mreadFileSync(target[33m,[39m [32m'utf8'[39m))[33m.[39mtoBe([32m'# Original content\n'[39m)[33m;[39m
+     [90m    |[39m                                               [31m[1m^[22m[39m
+     [90m 95 |[39m       expect(fs[33m.[39mstatSync(entry)[33m.[39mmode [33m&[39m [35m0o777[39m)[33m.[39mtoBe(fs[33m.[39mstatSync(target)[33m.[39mmode [33m&[39m [35m0o777[39m)[33m;[39m
+     [90m 96 |[39m       expect(fs[33m.[39mreaddirSync(ws))[33m.[39mtoEqual([[32m'AGENTS.md'[39m])[33m;[39m
+     [90m 97 |[39m     } [36mfinally[39m {[0m
+
+      at Object.toBe (tests/unit/mcp-setup-workspace-routing-inject.test.js:94:47)
+
+  ● injectRoutingInstruction — upsert routing block into workspace entry docs › rejects a destination replaced by a symlink after staging and removes the temporary file
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "failed"
+    Received: "updated"
+
+    [0m [90m 118 |[39m     })[33m;[39m
+     [90m 119 |[39m     [36mtry[39m {
+    [31m[1m>[22m[39m[90m 120 |[39m       expect(injectRoutingInstruction({ workspaceRoot[33m:[39m ws[33m,[39m hosts[33m:[39m [[32m'codex'[39m] })[33m.[39mentries[[35m0[39m][33m.[39mstatus)[33m.[39mtoBe([32m'failed'[39m)[33m;[39m
+     [90m     |[39m                                                                                                   [31m[1m^[22m[39m
+     [90m 121 |[39m       expect(fs[33m.[39mreadFileSync(target[33m,[39m [32m'utf8'[39m))[33m.[39mtoBe([32m'sentinel'[39m)[33m;[39m
+     [90m 122 |[39m       expect(fs[33m.[39mreaddirSync(ws))[33m.[39mtoEqual([[32m'AGENTS.md'[39m])[33m;[39m
+     [90m 123 |[39m     } [36mfinally[39m {[0m
+
+      at Object.toBe (tests/unit/mcp-setup-workspace-routing-inject.test.js:120:99)
+
+FAIL tests/unit/target-repo-containment.test.js
+  ● target repo containment helpers › denies managed roots and Skill projections for every registered host
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected value: "opencode must not point at generated runtime mirrors"
+    Received array: []
+
+    [0m [90m 26 |[39m         [36mconst[39m errors [33m=[39m [][33m;[39m
+     [90m 27 |[39m         validateRepoRelativeField(value[33m,[39m host[33m,[39m errors)[33m;[39m
+    [31m[1m>[22m[39m[90m 28 |[39m         expect(errors)[33m.[39mtoContain([32m`${host} must not point at generated runtime mirrors`[39m)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 29 |[39m       }
+     [90m 30 |[39m     }
+     [90m 31 |[39m     [36mconst[39m errors [33m=[39m [][33m;[39m[0m
+
+      at Object.toContain (tests/unit/target-repo-containment.test.js:28:24)
+
+  ● target repo containment helpers › rejects dangling ancestors and leaf links while allowing future nested files
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 0
+    Received:   0
+
+    [0m [90m 39 |[39m       fs[33m.[39msymlinkSync(path[33m.[39mjoin(outside[33m,[39m [32m'missing'[39m)[33m,[39m path[33m.[39mjoin(repo[33m,[39m [32m'dangling'[39m)[33m,[39m [32m'dir'[39m)[33m;[39m
+     [90m 40 |[39m       fs[33m.[39msymlinkSync(path[33m.[39mjoin(outside[33m,[39m [32m'missing.txt'[39m)[33m,[39m path[33m.[39mjoin(repo[33m,[39m [32m'leaf.txt'[39m))[33m;[39m
+    [31m[1m>[22m[39m[90m 41 |[39m       expect(validateOutputContainment(repo[33m,[39m path[33m.[39mjoin(repo[33m,[39m [32m'dangling/new/file.txt'[39m))[33m.[39merrors[33m.[39mlength)[33m.[39mtoBeGreaterThan([35m0[39m)[33m;[39m
+     [90m    |[39m                                                                                                       [31m[1m^[22m[39m
+     [90m 42 |[39m       expect(validateOutputContainment(repo[33m,[39m path[33m.[39mjoin(repo[33m,[39m [32m'leaf.txt'[39m)[33m,[39m { includeLeaf[33m:[39m [36mtrue[39m })[33m.[39merrors[33m.[39mlength)[33m.[39mtoBeGreaterThan([35m0[39m)[33m;[39m
+     [90m 43 |[39m       expect(validateOutputContainment(repo[33m,[39m path[33m.[39mjoin(outside[33m,[39m [32m'escaped.txt'[39m))[33m.[39merrors[33m.[39mlength)[33m.[39mtoBeGreaterThan([35m0[39m)[33m;[39m
+     [90m 44 |[39m       expect(validateOutputContainment(repo[33m,[39m path[33m.[39mjoin(repo[33m,[39m [32m'future/nested/file.txt'[39m))[33m.[39merrors)[33m.[39mtoEqual([])[33m;[39m[0m
+
+      at Object.toBeGreaterThan (tests/unit/target-repo-containment.test.js:41:103)
+
+FAIL tests/unit/spec-commit-scope-regression.test.js
+  ● canonical argv commit recipe preserves literal messages and unrelated staged content
+
+    TypeError: Cannot read properties of null (reading '1')
+
+    [0m [90m 21 |[39m     git([32m'add'[39m[33m,[39m [32m'--'[39m[33m,[39m [32m'unrelated.txt'[39m)[33m;[39m
+     [90m 22 |[39m     [36mconst[39m source [33m=[39m fs[33m.[39mreadFileSync(path[33m.[39mresolve(__dirname[33m,[39m [32m'../../skills/spec-commit/SKILL.md'[39m)[33m,[39m [32m'utf8'[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 23 |[39m     [36mconst[39m recipe [33m=[39m source[33m.[39mmatch([35m/```text\n(git add -- file1[\s\S]*?)```/[39m)[[35m1[39m][33m.[39mtrim()[33m.[39msplit([32m'\n'[39m)[33m;[39m
+     [90m    |[39m                                                                          [31m[1m^[22m[39m
+     [90m 24 |[39m     [36mconst[39m message [33m=[39m [32m'fix(fixture): preserve literal message (U3)\n\nKeep `$HOME`, $(touch injected), "double" and \'single\' quotes literal.\n\nSecond paragraph.\n'[39m[33m;[39m
+     [90m 25 |[39m     [36mconst[39m messagePath [33m=[39m path[33m.[39mjoin(scratch[33m,[39m [32m'message with spaces.txt'[39m)[33m;[39m
+     [90m 26 |[39m     fs[33m.[39mwriteFileSync(messagePath[33m,[39m message[33m,[39m { mode[33m:[39m [35m0o600[39m })[33m;[39m[0m
+
+      at Object.<anonymous> (tests/unit/spec-commit-scope-regression.test.js:23:74)
+
+Test Suites: 5 failed, 5 total
+Tests:       25 failed, 37 passed, 62 total
+Snapshots:   0 total
+Time:        4.481 s
+Ran all test suites within paths "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/A/tests/unit/spec-commit-scope-regression.test.js", "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/A/tests/unit/mcp-setup-workspace-git-exclude.test.js", "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/A/tests/unit/mcp-setup-workspace-routing-inject.test.js", "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/A/tests/unit/target-repo-containment.test.js", "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/A/tests/unit/task-pack-command.test.js".
+Test results written to: ../../../../../../../../Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/paired-mechanisms-A.json

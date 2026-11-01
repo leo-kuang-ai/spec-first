@@ -9,23 +9,19 @@ SKILL_DIR="<absolute path of the directory containing the loaded spec-promote SK
 node "$SKILL_DIR/scripts/check-spiral-auth.cjs"
 ```
 
-- **Unavailable** — `status: unavailable`. → Path 0 (offer to install + connect).
+- **Unavailable** — `status: unavailable`. → local Path B first; optional setup after delivery.
 - **Ready** — `status: ready` and `authenticated: true`. Use Path A.
-- **Not ready / unverified** — every other allowlisted status. → Path 0 when interactive, otherwise local Path B.
+- **Not ready / unverified** — every other allowlisted status. → local Path B first.
 
 The helper captures and discards raw provider stdout/stderr, parses only the JSON authentication contract, and emits allowlisted readiness fields. Do not bypass it for backward compatibility or diagnostics. Any non-JSON output, error, or timeout is unverified/not-ready; continue through the local drafting fallback rather than exposing or interpreting secret-like output.
 
 ## Path 0 — Offer setup (first run, declinable)
 
-When Spiral is unauthed or absent, offer setup once. First check the opt-out so this never nags.
+When Spiral is unauthed or absent, deliver local drafts before any optional setup offer. Enter this setup conversation only when requested. First check the opt-out so this never nags.
 
 ### Check the opt-out
 
-Read the project config (resolve the repo root, never CWD):
-
-```bash
-cat "$(git rev-parse --show-toplevel 2>/dev/null)/.spec-first/config.local.yaml" 2>/dev/null || echo '__NO_CONFIG__'
-```
+Resolve the confirmed target with a separate `git -C <target> rev-parse --show-toplevel` argv call and require success and a nonempty root. Read only `<confirmed-root>/.spec-first/config.local.yaml`; on root failure, skip config lookup and use local drafting. Never interpolate a failed root command into an absolute config path.
 
 If the contents have an **uncommented** top-level `spec_promote_spiral_optout: true` line, **skip Path 0** and go straight to Path B. **Ignore commented lines** — `spec-first setup`'s template ships a `# spec_promote_spiral_optout: true` example, and a commented line is documentation, not an opt-out (a naive substring match would wrongly suppress the offer for any project that accepted the default template). Otherwise, offer setup.
 
@@ -60,14 +56,15 @@ There is deliberately no separate "don't ask again" option: **dismissing is itse
 
 ### Record the opt-out (best-effort)
 
-Resolve the repo root, then add `spec_promote_spiral_optout: true` as a top-level key to `<root>/.spec-first/config.local.yaml`, using the native file-write/edit tool:
+Only when the current user explicitly chose the disclosed durable opt-out, resolve the repo root, then add `spec_promote_spiral_optout: true` as a top-level key to `<root>/.spec-first/config.local.yaml`, using the native file-write/edit tool. Before any write, verify the file is untracked, has safe ancestors, and can be kept ignored under the protection rule below. Stop the preference write on a failed precondition.
 
 - **File already exists:** ensure an **uncommented** `spec_promote_spiral_optout: true` line is present — add one (or uncomment the example) unless an uncommented one already exists. A commented `# spec_promote_spiral_optout: true` (from `spec-first setup`'s template) does **not** count as present; leaving only the comment would let the comment-ignoring read path re-prompt next run.
-- **File absent:** create it (and its `.spec-first/` directory) with the key, AND make sure the machine-local config won't be committed. Check whether the root-relative path `<root>/.spec-first/config.local.yaml` is already ignored (`git check-ignore -q <path>`); if it isn't, append `.spec-first/*.local.yaml` to git's **local exclude file** — resolve that file's path with `git rev-parse --git-path info/exclude` (this is correct in worktrees too, where `.git` is a *file* and `info/exclude` lives in the common git dir; do **not** hardcode `<root>/.git/info/exclude`). Use the local exclude, **not** `.gitignore`: it keeps the rule local and avoids dirtying a tracked file on what was a drafts-only action. `spec-first setup` is the canonical place that adds the shared `.gitignore` entry for teammates. Without any ignore, a user who runs `spec-promote` before `spec-first setup` could accidentally commit machine-local opt-out state.
+- **File absent:** create it (and its `.spec-first/` directory) with the key.
+- **Both existing and new files:** before writing, verify the file is untracked and the destination has no unsafe symlink ancestors. If tracked, leave it unchanged and report that the preference was not saved; ignore rules cannot hide a tracked file. Make sure the machine-local config will remain ignored. Check whether the root-relative path `<root>/.spec-first/config.local.yaml` is already ignored (`git check-ignore -q <path>`); if it isn't, append `.spec-first/*.local.yaml` to git's **local exclude file** — resolve that file's path with `git rev-parse --git-path info/exclude` (this is correct in worktrees too, where `.git` is a *file* and `info/exclude` lives in the common git dir; do **not** hardcode `<root>/.git/info/exclude`). Use the local exclude, **not** `.gitignore`: it keeps the rule local and avoids dirtying a tracked file on what was a drafts-only action. `spec-first setup` is the canonical place that adds the shared `.gitignore` entry for teammates. Without any ignore, a user who runs `spec-promote` before `spec-first setup` could accidentally commit machine-local opt-out state.
 
 If the root can't be resolved or any write fails, proceed to Path B anyway; the opt-out is a convenience, never a blocker.
 
-After recording, confirm it in one line so the write isn't silent and the user knows how to undo it — e.g. "Got it — I won't bring up Spiral here again (saved to `.spec-first/config.local.yaml`, kept out of git). Want it back later? Just ask, or remove the `spec_promote_spiral_optout` key." Keep it to a single line; don't belabor it.
+Confirm persistence and ignore protection from readback before claiming success. On failure, report the preference as unsaved or protection incomplete without exposing config contents; continue local drafting. After verified recording, confirm it in one line so the write isn't silent and the user knows how to undo it — e.g. "Got it — I won't bring up Spiral here again (saved to `.spec-first/config.local.yaml`, kept out of git). Want it back later? Just ask, or remove the `spec_promote_spiral_optout` key." Keep it to a single line; don't belabor it.
 
 ## Generate
 
@@ -95,7 +92,7 @@ JSON with (fields verified against the Spiral CLI `write` output):
     { "id": "uuid", "title": "...", "content": "markdown", "channel": "x",
       "url": "https://app.writewithspiral.com/chat/<session>?draft=<id>", "display_hint": "inline | expandable" }
   ],
-  "text": "pipeline commentary — DO NOT show the user unless drafts is empty",
+  "text": "internal pipeline commentary — never display or persist",
   "style_used": null,
   "quota_remaining": 42
 }
@@ -103,7 +100,7 @@ JSON with (fields verified against the Spiral CLI `write` output):
 
 - `channel` (lowercase) is one of `x`, `linkedin`, `email`, `newsletter`, `blog`, `instagram_tiktok`, `research`, or `null`.
 - `url` opens that draft in the Spiral web app for editing. Drafts persist to the user's account — surface `session_id` + each `url` in your output (Phase 4).
-- **Do not surface the `text` field** to the user — it's internal pipeline commentary. Only fall back to it if `drafts` is empty.
+- **Do not surface the `text` field** to the user — it's internal pipeline commentary. Empty drafts use local drafting, never this field.
 - With `--instant`, `status` should be `complete`. If it comes back `needs_input` (rare with `--instant`), don't relay Spiral's questions to the user — either answer from the context you already have via a `--session` follow-up, or fall back to Path B for that channel.
 
 If parsing fails or `drafts` is empty, fall back to direct drafting for the affected channels.

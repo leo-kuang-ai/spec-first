@@ -1,0 +1,12 @@
+{
+  "trial": "CEOPT-33-B2",
+  "at": "2026-10-31T05:37:47.914276+00:00",
+  "original_sha256": "7cbd0ec1d8faf40fb406e4b0f933b28c4da3c08ec6ea9468ad35cdf19081f5e8",
+  "source_lines_inclusive": [
+    1,
+    260
+  ],
+  "candidate_sha256": "c593599fd091c2d4e1f4e6156b64fe5a72c48c703a6c688dbbad1f16595afd59",
+  "admission": "Parent read complete original draft; exact contiguous frontmatter through Regeneration Rules including future review recommendation, excluding separate final disposition. No semantic changes or promotion.",
+  "semantic_observation": "All3 owners and dependencies preserved; exact proof/seam references and session-settled constraints retained in JSON; all inherited proof intents and missing live receipt remain bounded/unverified."
+}

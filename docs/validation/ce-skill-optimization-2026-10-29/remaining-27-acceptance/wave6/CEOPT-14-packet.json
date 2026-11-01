@@ -1,0 +1,33 @@
+{
+  "id": "CEOPT-14",
+  "skill": "spec-lfg",
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/CEOPT-14-request.txt",
+  "request_sha256": "0f42ac828e73add735017301f7299578aae828a4c50b53166b54dc95558ad06e",
+  "input_files": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/pr-recovery-fixture.json": "ed657e04804a619af384adfa73f826a635e058988fb1f1e94ba1a6fb4adab6f3"
+  },
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "deadline_seconds": 300,
+  "parent_recipe": "Save unchanged read-only response; assess against supplied actual helper receipts and explicitly synthetic fixtures. No real external operation or autonomous mutation.",
+  "status": "prepared-not-executed",
+  "limitations": [
+    "Local negative/interpretation facets only. Real external, authenticated-positive, design or human outcomes remain unavailable as specified in the plan."
+  ],
+  "arm_receipts": {
+    "A": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/lfg-A-receipts.json",
+      "sha256": "59ebf34ee2aafbe61e9e78ae86a3e283750489f994087077dfe1f79bb8fe79d5"
+    },
+    "B": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/lfg-B-receipts.json",
+      "sha256": "b9c9f1631fef4052e38e156426d60264b34c2c9f020720ca768c07886a11b255"
+    }
+  }
+}

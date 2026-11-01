@@ -1,0 +1,88 @@
+{
+  "late_failure_selection": {
+    "selected_count": 12,
+    "failure_selected": false,
+    "findings": [
+      {
+        "id": "F1",
+        "title": "No obvious failure detected automatically",
+        "severity": "P3",
+        "observed": "The analyzer did not find complaint cues, repeated clicks, console errors, or non-noisy failed requests.",
+        "expected": "A human should still inspect the source evidence before closing the feedback.",
+        "evidence": [
+          "M1",
+          "M2",
+          "M3"
+        ],
+        "confidence": "Low"
+      }
+    ]
+  },
+  "console_error_findings": {
+    "moments": [
+      {
+        "t": 1.0,
+        "reason": "console_error event",
+        "events": [
+          {
+            "type": "console_error",
+            "t": 1,
+            "message": "exception"
+          }
+        ],
+        "id": "M1"
+      }
+    ],
+    "findings": [
+      {
+        "id": "F1",
+        "title": "No obvious failure detected automatically",
+        "severity": "P3",
+        "observed": "The analyzer did not find complaint cues, repeated clicks, console errors, or non-noisy failed requests.",
+        "expected": "A human should still inspect the source evidence before closing the feedback.",
+        "evidence": [
+          "M1"
+        ],
+        "confidence": "Low"
+      }
+    ]
+  },
+  "partial_chunks": {
+    "status": "ok",
+    "text": "[00:00.00]\nfirst half",
+    "transcription_egress_authorization": "explicit-cli-flag",
+    "provider": "openai-audio-transcriptions",
+    "provider_request_sent": true,
+    "source": "chunked_media",
+    "chunk_seconds": 420,
+    "chunks": [
+      {
+        "chunk": 1,
+        "start_seconds": 0,
+        "path": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/riffrec-review-wxburb6b/chunks/audio-chunk-001-0s.mp3",
+        "status": "ok",
+        "reason": null,
+        "provider_request_sent": true
+      },
+      {
+        "chunk": 2,
+        "start_seconds": 420,
+        "path": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/riffrec-review-wxburb6b/chunks/audio-chunk-002-420s.mp3",
+        "status": "failed",
+        "reason": null,
+        "provider_request_sent": true
+      }
+    ]
+  },
+  "initial_egress_lost_on_chunk_fallback": {
+    "exit": 0,
+    "first_mock_request_sent": true,
+    "receipt": {
+      "provider": "openai-audio-transcriptions",
+      "provider_request_sent": false,
+      "transcription_egress_authorization": "explicit-cli-flag"
+    },
+    "transcript_status": "failed",
+    "reason": "ffmpeg is not installed; cannot chunk media"
+  }
+}

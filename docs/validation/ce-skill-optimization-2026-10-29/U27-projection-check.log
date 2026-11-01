@@ -1,0 +1,8 @@
+{"host":"claude","projection":"passed","source_docs_present":false,"boundaries":"self-contained","real_host_run":"not-run"}
+{"host":"codex","projection":"passed","source_docs_present":false,"boundaries":"self-contained","real_host_run":"not-run"}
+{"host":"cursor","projection":"passed","source_docs_present":false,"boundaries":"self-contained","real_host_run":"not-run"}
+{"host":"kiro","projection":"passed","source_docs_present":false,"boundaries":"self-contained","real_host_run":"not-run"}
+{"host":"qoder","projection":"passed","source_docs_present":false,"boundaries":"self-contained","real_host_run":"not-run"}
+{"host":"opencode","projection":"passed","source_docs_present":false,"boundaries":"self-contained","real_host_run":"not-run"}
+{"host":"zcode","projection":"passed","source_docs_present":false,"boundaries":"self-contained","real_host_run":"not-run"}
+{"host":"pi","projection":"passed","source_docs_present":false,"boundaries":"self-contained","real_host_run":"not-run"}

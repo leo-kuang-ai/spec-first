@@ -88,4 +88,6 @@ Return a structured list, one entry per claim checked:
 
 ## Reporting
 
+存在外部失效依赖时，一并检查候选 `invalidation_condition` 是否给出可观察变化和不修改仓库的核查方法；来源不可达则记录该条件尚未核实，不能把远端合并、发布或本地采用混为同一事实。需要改仓库的移除前验证步骤留在正文，不作为调查授权。只检查字段非空的脚本结果不证明条件语义充分。
+
 Summarize the phase in one line of the run output (headless report's `Grounding:` line; interactive success output): flags adjudicated (fixed / annotated / confirmed), claims checked, claims softened or corrected, and `degraded — merge-state claims unverified offline` when applicable.

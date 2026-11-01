@@ -1,0 +1,8 @@
+PASS tests/unit/spec-sweep-final-publication.test.js (5.623 s)
+PASS tests/unit/spec-sweep-media-admission.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       25 passed, 25 total
+Snapshots:   0 total
+Time:        6.363 s, estimated 8 s
+Ran all test suites within paths "tests/unit/spec-sweep-final-publication.test.js", "tests/unit/spec-sweep-media-admission.test.js".

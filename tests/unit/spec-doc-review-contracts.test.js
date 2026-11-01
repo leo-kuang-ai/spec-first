@@ -40,24 +40,55 @@ const lazyRefs = [
 const refsDir = path.resolve(__dirname, '../../skills/spec-doc-review/references');
 const executionSpines = `${skill}\n${subagentTemplate}\n${synthesis}`;
 
-describe('report-only 评测的文档完整性', () => {
+describe('dormant document peer output contract', () => {
+  test('normalization preserves deferred questions in schema-valid document output', () => {
+    const adapter = fs.readFileSync(path.resolve(__dirname,
+      '../../skills/spec-doc-review/scripts/cross-model-doc-review.sh'), 'utf8');
+    // Exercise the dormant jq transform without bypassing provider admission.
+    const transform = adapter.match(/jq --arg reviewer "whole-doc-\$peer" '([\s\S]*?)' "\$raw_file"/);
+    expect(transform).not.toBeNull();
+    const input = { findings: [], residual_risks: ['Rollback evidence is missing.'],
+      deferred_questions: ['Who owns the migration compatibility window?'] };
+    const result = spawnSync('jq', ['--arg', 'reviewer', 'whole-doc-fixture', transform[1]], {
+      input: JSON.stringify(input), encoding: 'utf8',
+    });
+    expect(result.status).toBe(0);
+    const output = JSON.parse(result.stdout);
+    expect(output).toEqual({ reviewer: 'whole-doc-fixture', ...input });
+    const Ajv = require('ajv');
+    const validate = new Ajv().compile(JSON.parse(fs.readFileSync(
+      path.join(refsDir, 'findings-schema.json'), 'utf8')));
+    expect(validate(output)).toBe(true);
+  });
+});
+
+describe('report-only document integrity judges', () => {
   test.each([
     ['plan', 'plan-repo', '2026-09-01-monthly-summary-plan.md'],
     ['html', 'html-repo', '2026-09-01-monthly-summary-plan.html'],
     ['taskpack', 'taskpack-repo', '2026-09-01-monthly-summary-tasks.md'],
-  ])('%s judge 拒绝保留 MARKER 的文档篡改', (kind, fixture, filename) => {
+  ])('%s judge rejects document tampering even when MARKER remains', (kind, fixture, filename) => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-review-judge-'));
     const fixtures = path.resolve(__dirname, '../../skills/spec-doc-review/evals/fixtures');
     try {
       fs.cpSync(path.join(fixtures, 'repos', fixture), root, { recursive: true });
       const target = path.join(root, 'docs/plans', filename);
+      const fixtureHome = path.join(root, 'home');
+      fs.mkdirSync(fixtureHome);
+      const env = {
+        ...Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.toUpperCase().startsWith('GIT_'))),
+        HOME: fixtureHome, USERPROFILE: fixtureHome, GIT_CONFIG_NOSYSTEM: '1',
+        EVAL_EXIT_CODE: '0', EVAL_FINAL_MESSAGE: 'Review findings: clarify the migration boundary.',
+      };
+      expect(spawnSync('git', ['init', '-q'], { cwd: root, env }).status).toBe(0);
+      expect(spawnSync(process.execPath, ['prepare-eval.cjs'], { cwd: root, env }).status).toBe(0);
       const judge = () => spawnSync('bash', [path.join(fixtures, 'scripts', `check-${kind}-marker.sh`)], {
         cwd: root,
         encoding: 'utf8',
-        env: { ...process.env, EVAL_FINAL_MESSAGE: 'review findings：建议补充边界。' },
+        env,
       });
       expect(judge().status).toBe(0);
-      fs.appendFileSync(target, '\n未授权的文档修改\n');
+      fs.appendFileSync(target, '\nUnauthorized document mutation\n');
       expect(judge().status).not.toBe(0);
       fs.rmSync(target);
       expect(judge().status).not.toBe(0);

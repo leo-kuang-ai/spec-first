@@ -8,6 +8,7 @@ topic: ce-upstream-sync
 artifact_contract: spec-unified-plan/v1
 artifact_readiness: implementation-ready
 product_contract_source: spec-plan-bootstrap
+supersedes: docs/plans/2026-08-19-003-refactor-ce-post-3-20-full-window-sync-plan.md
 execution: code
 target_repo: spec-first
 upstream_range: 153e605e1622154a0d7da095fceed13edcb68bf7..00d0a5bbf1300b2138b65ce724b325dd4dff77ba
@@ -17,7 +18,7 @@ upstream_range: 153e605e1622154a0d7da095fceed13edcb68bf7..00d0a5bbf1300b2138b65c
 
 ## Goal Capsule
 
-- **目标：** 为每一轮 Compound Engineering（CE）上游更新建立可回源、可裁决、可验证的同步闭环，将适用增量吸收到 spec-first 当前 canonical owner，同时避免复制 CE package、generated runtime、宿主专属产品或中心同步 runner。
+- **目标：** 为固定窗口 `153e605e..00d0a5bb` 建立可回源、可裁决、可验证的同步闭环，并留下可复用于后续窗口的 producer/admission/receipt 机制；本轮不承诺未验证的任意未来窗口零修改。
 - **推荐方法：** 冻结上游 Git 窗口和目标仓库快照 -> 生成逐路径确定性事实 -> 生成与脚本事实分离的语义裁决账本 -> 校验账本和 owner 映射 -> 按 owner 实施最小 source/test 变更 -> 逐项验证与证据收口。
 - **本方案定位：** 新一轮 CE 更新的技术基线和执行准入方案。它不承接 2026-08-19 方案的旧 commit range、517-path 分母、旧 ledger 或旧完成状态。
 - **决策焦点：** 每条上游变化是否适用于当前 spec-first、应由哪个 source owner 吸收、采用 `reuse / extend / compose / reference-only / product-exclusion` 中哪种裁决，以及是否需要产品负责人确认新的 public surface、宿主或 provider。
@@ -199,6 +200,36 @@ F01–F03 是已经定位到改造位置的任务，不是已实现或测试通�
 
 测试入口是需运行或按行为缺口扩展的文件，不表示全部需要修改。每组完成后输出三份精确集合：已比较的 CE 文件、已比较的本地文件、实际修改文件；实际修改集才计入同步实现变更。每条“无需改造”保留本地等价实现或排除依据。625 条不直接移植清单继续有效；本节不恢复这些文件为待实施任务。
 
+## 计划审查关闭门
+
+本轮执行前必须先满足以下可验证前置条件；它们是 U1/U7-A 的输入合同，不是实施完成声明。
+
+- **Execution baseline：** U0 重放当前工作树，生成新的 run-specific target snapshot、dirty manifest 和 canonical source content hash；历史冻结快照只作背景证据。若本地存在未授权或无法按 owner 隔离的重叠改动，保持 `blocked`，不写 canonical source。
+- **Window facts 两阶段协议：** `create-window-facts` 从只读 CE Git refs、name-status、object inventory 生成唯一版本化 `window-facts.json` 和 hash；`prepare-adjudication`/`full-window` 只读取并验证它，禁止把尚未存在的 facts 当输入，也禁止覆盖已有不同 hash 的输出。
+- **Package admission contract：** U7-A 使用 `package-admission/v1` 工作账本，绑定 window identity、input hash、精确 path subset、package/scope identity、target snapshot、review/authority refs、source refs、limitations 和 unresolved 列表。validator 只做机械校验；语义充分性由 reviewer/owner 判断。未通过 admission 的包不得改 canonical source。
+- **Owner receipt contract：** 每个 source-adjudication 单元必须生成 `owner-receipt/v1`，绑定 input/window、U-ID、affected upstream paths、前后 source snapshot、changed-file SHA-256、完整 argv、exit code、日志引用/hash、verification status、authorization scope、limitations 和 claim ceiling。单写者拒绝重复、过期、跨快照和越权 receipt。
+- **Semantic authority：** reconciler 不把 `producer.status=confirmed` 当作语义确认；产品排除和新 public surface 必须有 owner decision ref，独立审查或降级状态单列。
+- **Handoff gate：** U8 只在 `handoff/v1` 字段齐全且 validator 通过后写 lifecycle candidate；缺 summary、source refs、freshness、limitations、next owner、claim ceiling 或 snapshot binding 时保持 `incomplete`，不能 close。
+- **Host/package claim matrix：** U6 逐宿主记录 package projection、doctor/loader、真实宿主调用三层状态；OpenCode 若无已确认缺陷则 evidence-only，否则指定 `package.json`/build/install owner 与隔离加载命令。
+
+### Contract Implementation Details
+
+U1 在现有 reconciler 内扩展，不另建 runner。新增 `docs/contracts/verification/ce-upstream-sync-run.schema.json` 作为 run-local admission、owner receipt、handoff 的单一表示合同，使用 `kind` 区分三类；验证入口仍归 `scripts/check-ce-upstream-reconciliation.cjs`，不创建平行工作流。所有 envelope 共用 `schema_version=ce-upstream-sync-run/v1`、`window_sha256`、`input_sha256`、`target_snapshot`、`source_refs`、`limitations`。
+
+| kind | 附加必填字段 | 确定性拒绝条件 | 语义边界 |
+|---|---|---|---|
+| package-admission | package_id、unit_id、paths、decisions、review_ref、authority_ref、unresolved、dependency_refs | 重复/越界 paths、input/window/snapshot 不符、unresolved 非空、无引用、decision 未覆盖 subset | reviewer 自审允许但显式 degraded，不声称独立；本地可逆融合由当前任务授权，新增产品不由脚本批准 |
+| owner-receipt | admission_sha256、unit_id、paths、before_snapshot、changed_files、checks、authorization_scope、claim_ceiling | admission 不匹配、文件 hash 不符、重复 receipt、必要 check 缺失或非通过、unit/path 超出 admission | argv/exit/log/hash 证明运行，不证明模型/现场收益 |
+| handoff | summary、receipt_refs、freshness、next_owner、claim_ceiling、unresolved | 缺字段/过期引用/必要 receipt 未 join、unresolved 非空 | 完整性校验不代替语义充分性 |
+
+`checks` 每项为 argv 数组、exit_code、log_path、log_sha256、status 和 required；`changed_files` 为 repo-relative path 与 SHA-256。receipt 以 `window_sha256 + input_sha256 + unit_id + path-subset-hash` 作为 join identity；同 key 不同内容拒绝，完全相同内容重跑幂等。旧 before snapshot 保留真实值；result snapshot 上重新裁决后可引用旧 receipt，但必须核对 changed_files 和 source/test refs 当前有效，不能重签旧测试。validator 的错误使用稳定 `ce-sync-*` reason code，CLI 验证入口为 `--validate-run-artifact <json> --adjudication-input <json> --window-facts <json>`；单测须实际调用并验证失败不写输出。
+
+**发布与恢复：** producer 采用单进程单写者，不增加锁服务。所有 candidate content 在内存中构建验证；写到本次输出目录内的独立 staging 目录，最后发布 manifest（含全部文件 hash）作为 commit marker。未有 marker 或 hash 不一致的 artifact set 不可消费；失败保留 staging/log，不覆盖历史；重跑相同 hash 幂等，不同 hash 要选择新的 run 子目录，不能静默覆盖。
+
+**Facts create/verify：** `--create-window-facts --ce-repo <repo> --base <sha> --head <sha> --window-facts <new-json>` 只从 Git 生成 manifest；manifest 还包含 `schema_version=ce-upstream-window/v1`、object inventory（A: old=null，D: new=null，M/R: 双端对象，rename 绑定 old_path）、unit merge_order 和 run-owned 精确输出列表。普通 prepare/full-window 缺 facts 时只允许历史 fixture；具名 facts 必须重新查询 Git 对象验证，不能信任自报 hash。blob identity 作为新 manifest 合同的必填事实，v1 input 的开放 `source_facts` 携带同形字段；保留旧 input reader，不给历史 v1 fixture补造 blob。
+
+**宿主验证映射：** 修改共享投射时运行 `tests/unit/host-runtime-projection-contracts.test.js` 和 `tests/unit/platform-registry-patterns.test.js`；doctor 声明变化运行 `tests/unit/doctor-runtime-assets.test.js`、`tests/unit/doctor-platform-cli.test.js`；生命周期影响运行动态宿主 integration。OpenCode 已确认 package 缺陷才扩大到 `package.json`、`scripts/verify-installed-package.cjs`，运行 `node scripts/verify-installed-package.cjs package`（真实 pack/隔离 install/入口），`npm run build` 只证明包清单。八宿主真实加载保持 not-run，无 loader receipt 不声称加载成功。
+
 ## Implementation Units
 
 以下单元是可直接执行的 source-first 改造任务。每个单元完成后必须写入 owner receipt；未满足验收条件时保持 `planned` 或 `blocked`，不得顺延关闭。
@@ -218,9 +249,9 @@ F01–F03 是已经定位到改造位置的任务，不是已实现或测试通�
 
 - **Goal：** 消除 `FULL_WINDOW_FACTS=517` 等历史绑定，生成可供 adjudication 的 1,023 条事实输入，同时保留旧窗口回归。
 - **Requirements/KTD：** R2/R6/R9；KTD3/KTD7。
-- **Dependencies：** U0；先完成 U1 才能生成正式 adjudication input。
+- **Dependencies：** U0；先完成 create-window-facts、execution baseline 和 producer contract tests，再生成正式 adjudication input。
 - **Files：** `scripts/check-ce-upstream-reconciliation.cjs`；`docs/contracts/verification/ce-upstream-adjudication-input.schema.json`；`docs/contracts/verification/ce-upstream-ledger-patch.schema.json`；`docs/contracts/verification/ce-upstream-adjudication.schema.json`；`tests/unit/ce-upstream-reconciliation-v2.test.js`；`tests/unit/ce-upstream-3-20-reconciliation.test.js`。
-- **Approach：** 将窗口事实、输出目录、路径总数、hash 和 package queue 改为输入/派生值；旧 3.20 fixture 继续走兼容分支。增加 rename/delete、重复路径、端点漂移、hash mismatch、缺记录的 fail-closed 校验。脚本只生成事实，不决定 `target_action`。
+- **Approach：** 先提供独立 `create-window-facts` 阶段，再让 prepare/full-window 只读验证具名 facts、output allowlist 和 existing-output hash；将窗口事实、输出目录、路径总数、hash 和 package queue 改为输入/派生值；旧 3.20 fixture 继续走兼容分支。增加 rename/delete、重复路径、端点漂移、hash mismatch、缺记录的 fail-closed 校验。脚本只生成事实，不决定 `target_action`。
 - **Test scenarios：** 输入新窗口 1,023 条 name-status 与 commit/path join；期望生成 schema 合法 input。输入旧 517 条 fixture；期望旧测试仍通过。删除一条记录或改一条 blob OID；期望退出非零并给出 reason code，不写 passed ledger。
 - **Verification：** `node --check scripts/check-ce-upstream-reconciliation.cjs`；运行两个 reconciliation 单测文件；确认 `reconciliation-probe.json` 中的 517 错误被新参数路径替代。
 - **Execution note：** 不得只把 517 替换为 1023；必须同时覆盖动态窗口和历史兼容。
@@ -240,7 +271,7 @@ F01–F03 是已经定位到改造位置的任务，不是已实现或测试通�
 
 - **Goal：** 吸收顺序依赖 inline、parallel wave、canonical/transport commit 分离及 shared workspace index ownership；强化 ignored file 冲突时停止规则。
 - **Requirements/KTD：** R3/R7/R9；KTD2/KTD6。
-- **Dependencies：** U1；与 U2 无源码依赖，可并行审查，实施时先 work 再 PR tail。
+- **Dependencies：** U1 与本单元 `U7-A(spec-work)` 包级 admission；与 U2 无源码依赖，可并行审查，实施时先 work 再 PR tail。
 - **Files：** `skills/spec-work/references/execution-strategy.md`；`skills/spec-work/references/implementation-loop.md`；`skills/spec-work/references/shipping-workflow.md`；`skills/spec-commit-push-pr/SKILL.md`；`skills/spec-commit-push-pr/references/branch-creation.md`；`skills/spec-commit-push-pr/references/commit-and-push.md`；`skills/spec-commit/SKILL.md`；`tests/unit/spec-work-execution-strategy-contracts.test.js`；`tests/unit/spec-work-shipping-contracts.test.js`；`tests/unit/spec-commit-push-pr-context-contracts.test.js`；`tests/unit/spec-commit-scope-regression.test.js`。
 - **Approach：** 顺序依赖默认 inline，独立任务才进入 parallel wave；worker 不写 shared index；分支切换使用 `--no-overwrite-ignore`，ignored 冲突停止并报告，不 stash/remove。保留本地更强的 dirty/index 授权与 scope 保护。
 - **Test scenarios：** 输入有依赖的两个任务；期望同一执行上下文顺序完成。输入独立任务；期望可形成 wave 但 canonical commit 仍由 owner 完成。输入 ignored 文件冲突和预存 staged hunk；期望零覆盖、零静默 stash，并返回阻断原因。
@@ -251,7 +282,7 @@ F01–F03 是已经定位到改造位置的任务，不是已实现或测试通�
 
 - **Goal：** 让发布后 resume、out-of-scope feedback、local fix/commit/push/reply 权限分离，并补强已有 optimize paired baseline/holdout fail-closed 语义。
 - **Requirements/KTD：** R4/R5/R8/R9；KTD3/KTD5。
-- **Dependencies：** U3；先确认现有 pipeline-return 和 authority admission，再做增量修改。
+- **Dependencies：** U1 与本单元 U7-A；PR-feedback 子包依赖 U3，optimize 子包仅依赖自身 admission，不等待 PR-feedback。
 - **Files：** `skills/spec-resolve-pr-feedback/SKILL.md`；`skills/spec-resolve-pr-feedback/references/evaluation-rubric.md`；`skills/spec-resolve-pr-feedback/references/full-mode.md`；`skills/spec-resolve-pr-feedback/references/pipeline-return.md`；`skills/spec-optimize/SKILL.md`；`skills/spec-optimize/scripts/decide.cjs`；`skills/spec-optimize/scripts/measurement-admission.cjs`；`tests/unit/spec-resolve-pr-feedback-contracts.test.js`；`tests/unit/spec-optimize-contracts.test.js`；`tests/unit/spec-optimize-loop-contracts.test.js`；`tests/unit/spec-optimize-decide.test.js`。
 - **Approach：** out-of-scope feedback 写入后续 PR 清单，security/data-loss 走 needs-human；resume 只能消费调用方发布后的 receipt。optimize 复用本地 `decide.cjs`，补 paired baseline 缺失、immutable eval/holdout、task/proposer 分离的合同，不引入 CE `decide.mjs`、remote worker 或后台 tick。
 - **Test scenarios：** 输入发布后带新 feedback 的 resume；期望只处理 scope 内项并留下 follow-up。输入缺 baseline 或修改 holdout；期望 fail closed。输入无 push/reply 授权；期望保留本地修复并回交，不执行外发。
@@ -262,7 +293,7 @@ F01–F03 是已经定位到改造位置的任务，不是已实现或测试通�
 
 - **Goal：** 吸收 session metadata 读取窗口扩大、读取失败与无 metadata 分离、`retire_when` 失效条件，同时避免建立第二知识权威。
 - **Requirements/KTD：** R3/R8/R9；KTD3/KTD5。
-- **Dependencies：** U1；先完成 `spec-project-rules`/`spec-rule-miner`/`docs/solutions` owner 对照。
+- **Dependencies：** U1 与本单元 U7-A；先完成 `spec-project-rules`/`spec-rule-miner`/`docs/solutions` owner 对照。
 - **Files：** `skills/spec-compound/scripts/session-history/extract-metadata.py`；`skills/spec-compound/references/session-history.md`；`skills/spec-compound/references/promotion.md`；`skills/spec-compound-refresh/references/investigate.md`；`tests/unit/session-history-scripts.test.js`；`skills/spec-project-rules/SKILL.md`；`skills/spec-rule-miner/SKILL.md`；`tests/unit/spec-compound-reference-contracts.test.js`；`tests/unit/spec-compound-refresh-reference-contracts.test.js`。
 - **Approach：** 将 25 行读取扩大到 200 行并区分 error/no-metadata 计数；复用本地 `invalidation_condition`，只有缺少等价语义时才映射 `retire_when`。Packs 仅作 reference-only/compose 候选，暂不新增 durable source、远程 cache 或 CLI。
 - **Test scenarios：** 输入 metadata 位于 26-200 行；期望被发现。输入读取异常；期望 error 计数递增而非 no-metadata。输入已有 `invalidation_condition`；期望不产生重复字段或第二失效机制。
@@ -273,7 +304,7 @@ F01–F03 是已经定位到改造位置的任务，不是已实现或测试通�
 
 - **Goal：** 只吸收能映射到本地 CommonJS CLI 的 Windows absolute path、Claude model alias、OpenCode package entry 兼容修复。
 - **Requirements/KTD：** R3/R5/R7；KTD2/KTD6。
-- **Dependencies：** U3 和本包 U7-A；必须先确认当前 registry 的受支持宿主列表。
+- **Dependencies：** U1、U3 和本包 U7-A；必须先确认当前 registry 的受支持宿主列表。
 - **Files：** `src/cli/adapters/platform-registry.js`；`src/cli/adapters/kiro.js`（仅消费者审查，不默认删除）；`src/cli/claude-settings.js`；`src/cli/adapters/opencode.js`；`src/cli/adapters/claude.js`；`tests/unit/platform-registry-patterns.test.js`；`tests/unit/claude-settings-hook-paths.test.js`；`tests/unit/opencode-adapter.test.js`；`tests/unit/release-continuity-opencode.test.js`。
 - **Approach：** 先逐调用点确认是否存在与 CE 相同的路径/模型/入口缺陷；没有同型缺陷则以源码证据裁决 evidence-only，不为追平 CE 制造改动。确有缺陷时修复对应调用点并补 fixture；Windows 风格路径测试需区分 native `path` 与 `path.win32`，不能宣称 POSIX 的 `path.isAbsolute` 能识别 Windows drive。模型 alias 保留用户配置优先级；OpenCode 只调整已确认受影响的本地 adapter。保留 Kiro adapter，禁止机械同步 CE 删除。
 - **Test scenarios：** 输入 POSIX、Windows drive、UNC 和相对路径；期望绝对路径正确识别且无越界。输入旧/新 model alias；期望 canonical config 可解析。运行 package entry smoke；期望入口可加载。
@@ -286,7 +317,7 @@ F01–F03 是已经定位到改造位置的任务，不是已实现或测试通�
 - **Requirements/KTD：** R2/R4/R6/R8/R9/R10；KTD3/KTD4/KTD5。
 - **Dependencies：** U7-A 只依赖 U1，按包在 U2-U6/U9 实施前完成；U7-B 依赖对应实施单元，执行后验证 closure。任何实现单元不得跳过 U7-A。
 - **Files：** `docs/contracts/verification/ce-upstream-adjudication-input.schema.json`；`docs/contracts/verification/ce-upstream-adjudication.schema.json`；`docs/validation/ce-pull-2026-10-27/candidate-owner-map.json`；本窗口目录下 adjudication/ledger/receipts；`tests/unit/ce-upstream-reconciliation-v2.test.js`；各 owner focused fixtures。
-- **Approach：** 先生成 input 并 join 历史排除附件：H1 按产品包、H2/H3/H4 按 evidence-only 组 count/hash + rule + exception list 收口；不要求为它们生成改造任务或逐文件 source/test receipt。H5 的 398 条先判断适用性，确认差额后才映射 U2-U6/U9。每行保留合法 action/profile；source-adjudication 记录 owner/unit/targets/source/test refs，产品排除按 schema 使用 null owner/unit 与空 targets。19 条有界阅读只作 seed，不代表候选包已审完。
+- **Approach：** 先生成 input 并 join 历史排除附件：H1 按产品包、H2/H3/H4 按 evidence-only 组 count/hash + rule + exception list 收口；对 docs/tests/fixtures 净变化先做按 package/Skill 的行为承载例外筛查，例外必须进入 source-adjudication 或明确 evidence-only 记录。未被例外承载的路径不得仅凭 count/hash 关闭。H5 的 398 条先判断适用性，确认差额后才映射 U2-U6/U9。每行保留合法 action/profile；source-adjudication 记录 owner/unit/targets/source/test refs，产品排除按 schema 使用 null owner/unit 与空 targets。19 条有界阅读只作 seed，不代表候选包已审完。
 - **Test scenarios：** 输入重复 path、缺 owner、generated runtime path、deferred provider path；期望分别被拒绝、标记 unresolved、归 source/runtime boundary、进入 deferred。输入完整 ledger；期望 schema/join/hash/closure 全通过。
 - **Verification：** schema 校验、path count/hash replay、profile 分组核对；仅已采纳 source 变更要求 owner receipt join；未裁决候选有显式 `not-run`/`degraded`，已按规则关闭的证据组不伪标未实施失败。
 - **Execution note：** 这是实施准入门，不允许通过“package summary”关闭。
@@ -315,7 +346,7 @@ F01–F03 是已经定位到改造位置的任务，不是已实现或测试通�
 
 ### Execution dependency order
 
-`U0 → U1 → U7-A（按包准入）→ U2-U6/U9（按依赖实施）→ U7-B（验收）→ U8`。U2-U6/U9 各自只消费已完成 U7-A 的包；U6 保持其 U3 依赖。未审包可以继续审查，但不能实施。U7 发现 unresolved owner、产品面或授权缺口时，回退对应单元并保持未关闭。
+`U0 → U1 → 各包 U7-A → U2/U3/U5/U9；U3 后进入 U4-PR 与 U6，U4-optimize 仅依赖自身 U7-A；全部实施后 → U7-B → U8`。U2-U6/U9 各自只消费已完成自身 U7-A 的包，receipt 记录实际 dependency refs。未审包可以继续审查，但不能实施。U7 发现 unresolved owner、产品面或授权缺口时，回退对应单元并保持未关闭。
 
 ## 文件级改造设计
 
@@ -333,7 +364,7 @@ F01–F03 是已经定位到改造位置的任务，不是已实现或测试通�
 | `isRunOutput` / `canonicalSourceFiles` | 新窗口输出未登记，生成证据可能改变自己的 source snapshot | 为本窗口枚举精确 run-owned input/output/ledger/patch/log 文件与目录，纳入既有 hash scope contract；计划、schema、source/test 仍计入 hash | 重跑证据生成不产生自漂移；修改 source 或计划会失效；不能用整个 `docs/validation/**` 排除规避漂移 |
 | `validateAdjudicationArtifact` / patch merge | 全量输入 join、owner、快照和字段约束需随窗口贯通 | 所有校验函数显式接收相同 window facts、package manifest 与 scope contract；保留 owner 和 patch 可修改字段白名单 | 错 window、错 unit、越权改 action、base ledger hash 漂移均拒绝 |
 
-**Manifest 设计：** 计划在 U1 生成 `docs/validation/ce-pull-2026-10-27/window-facts.json`，包含 `repository`、完整 `base/head`、`total`、`status_counts`、`group_counts`、`name_status_sha256`、`changed_path_sha256`、package 路径集合与精确输出 allowlist。前七类事实从 Git 端点和冻结清单计算，LLM 不填计数或 hash；allowlist 只决定可写产物位置，不决定采纳范围。该文件当前尚未生成，也不能把旧自描述 snapshot 冒充它。
+**Manifest 设计：** U1 先运行 `create-window-facts` 生成，后续 producer 只读取并验证；计划在 U1 生成 `docs/validation/ce-pull-2026-10-27/window-facts.json`，包含 `repository`、完整 `base/head`、`total`、`status_counts`、`group_counts`、`name_status_sha256`、`changed_path_sha256`、package 路径集合与精确输出 allowlist。前七类事实从 Git 端点和冻结清单计算，LLM 不填计数或 hash；allowlist 只决定可写产物位置，不决定采纳范围。该文件当前尚未生成，也不能把旧自描述 snapshot 冒充它。
 
 **Schema 兼容：** input/output v1 继续保持合法 action 与 closure profile。若内部 reconciliation 包汇总的表示形状必须改变，则给该内部产物提升版本、保留旧 reader 并更新 `ce-upstream-reconciliation-v2.test.js`；不能在标记为 v2 的结果中静默改字段类型。新 package ID 是不透明字符串，只有依赖固定 P-ID 的 consumer 才需兼容迁移；G01–G06 不新增枚举。
 
@@ -399,7 +430,17 @@ F01–F03 是已经定位到改造位置的任务，不是已实现或测试通�
    npm run test:jest -- --runInBand --runTestsByPath tests/unit/ce-upstream-reconciliation-v2.test.js tests/unit/ce-upstream-3-20-reconciliation.test.js
    ```
 
-2. **U1 完成后的 prepare：** `window-facts.json` 由 U1 根据 Git 生成，不能手工拼凑。写入 producer 专属文件，不覆盖原始冻结 inventory/name-status。
+2. **U1 完成后的 facts create 与 prepare：** 先单独运行：
+
+   ```bash
+   node scripts/check-ce-upstream-reconciliation.cjs --create-window-facts \
+     --ce-repo "$CE_REPO" \
+     --base 153e605e1622154a0d7da095fceed13edcb68bf7 \
+     --head 00d0a5bbf1300b2138b65ce724b325dd4dff77ba \
+     --window-facts docs/validation/ce-pull-2026-10-27/window-facts.json
+   ```
+
+   然后执行 prepare： `window-facts.json` 由 U1 根据 Git 生成，不能手工拼凑。写入 producer 专属文件，不覆盖原始冻结 inventory/name-status。
 
    ```bash
    node scripts/check-ce-upstream-reconciliation.cjs --refresh --prepare-adjudication \
@@ -438,6 +479,9 @@ F01–F03 是已经定位到改造位置的任务，不是已实现或测试通�
 - **Source snapshot/hash：** source tree hash、inventory hash、blob OID 和 runtime projection hash 分开记录；冻结的 HEAD tree hash 不包含 dirty 内容，实施前另存实际 changed files 内容 hash 与 dirty manifest，每次 source 变化重新绑定 input/output，禁止用旧 snapshot 关闭新变更；generated runtime hash 不能作为 source 变更证明。
 - **Owner receipt（已采纳变更）：** 必须包含 changed files、source refs、命令、exit code、测试结果、limitations、授权边界和 claim ceiling；已采纳 source 变更无 receipt 不得关闭；evidence-only/product-excluded 以分组或产品依据关闭，不伪造实现 receipt。
 - **Compatibility/rollback：** 保留旧 3.20 producer fixture 和旧 schema consumer；新 producer 失败时回到 raw inventory，不覆盖旧证据。source 改动按 owner 单元回退，禁止用 runtime mirror 反向修复 source。
+- **Admission/receipt/handoff contracts：** `package-admission/v1`、`owner-receipt/v1`、`handoff/v1` 均绑定 window/input/target snapshot；validator 只确认字段、hash、路径子集、freshness、重复与权限范围，语义确认保留在 review/owner receipt。多文件产物先在 run-specific 临时目录完整生成并校验，再原子发布；已有不同 hash 或并发 writer 直接失败并保留恢复入口。
+- **Blob identity：** input `source_facts` 固定 `old_object`/`new_object`（含 mode/type/git_oid，可按 A/D/M/R 端点为 null），并绑定 inventory hash；如成为正式必填字段，提升 input schema 版本并保留 v1 reader/fixture。
+
 
 ## System-Wide Impact
 
@@ -459,7 +503,7 @@ F01–F03 是已经定位到改造位置的任务，不是已实现或测试通�
 
 - CE base/head/tag 和目标 repo HEAD 可回源；
 - `git diff --name-status -M`、路径 hash、commit/path join 和 ledger count 一致；
-- adjudication input/output 符合对应 schema；
+- window-facts、package-admission、owner-receipt、handoff、adjudication input/output 均符合对应 schema；
 - 每条记录按 source-adjudication、evidence-only、product-excluded 校验字段和允许空值，不为排除项捏造 owner/unit/test；
 - 无 generated runtime 被当作 source owner；
 - 无旧窗口 path count、hash 或完成状态混入新 ledger。
@@ -501,12 +545,13 @@ npm run typecheck
 
 - 新 CE 窗口有 immutable upstream snapshot 和 target snapshot；
 - 新 ledger 逐路径覆盖，schema、join、hash 和状态一致；
-- 所有适用路径都有当前 owner、action、source/test refs 和 limitations；
+- 所有适用路径都有当前 owner、action、source/test refs 和 limitations；docs/tests/fixture 行为承载例外已完成语义筛查；
 - source/test 变更只落在 canonical source，未手改 generated runtime；
 - 必要 focused verification 有真实命令、退出码、日志和 reason code；
 - fresh-source、runtime、provider、PR/CI 和 field 证据的未执行范围明确可见；
-- 新 handoff 可由下一个 owner 回源，不依赖会话声明或旧 workspace；
+- 新 handoff 可由下一个 owner 回源，不依赖会话声明或旧 workspace；handoff validator、receipt join 和 package admission 均通过；
 - 旧计划和历史验证不被改写；
+- U1 的 synthetic next-window fixture 证明只替换 manifest/refs 即可重跑 prepare/admission/close；若该 fixture 未实现，则目标范围明确收窄为本固定窗口的可复用基础。
 - readiness 与 lifecycle 分开：输入、范围和实施设计明确后才设 `artifact_readiness: implementation-ready`；执行与必要验证完成后才设 `status: completed`，二者不能互相替代。
 
 ## Open Questions And Execution-Time Unknowns
@@ -565,3 +610,19 @@ npm run typecheck
 2026-10-27 详细技术设计补充：增加 D1-D7 的函数级改造、逐行为保护面、命令顺序、快照自漂移处理与同步节点条件；增加 U9 承接其余已有 owner，以及 398 条完整候选路径导航。候选映射为 advisory，未声明净 patch 全部审完，未执行实现。
 
 2026-10-27 文件清单与审查补充：新增 F1-F4 的 CE→本地具体比对/修改/验证文件，补入 branch-creation 实际调用点；D1 明确 closure/profile 解耦、当前 U9 合并顺序、同快照 patch 和跨快照重新生成策略。仅修改方案，未实施相应源码与测试。
+
+## 当前实施检查点（2026-10-27）
+
+本节更新当前执行状态；前文“尚未实施/尚未运行”的设计期记录不作为当前结果。计划仍为 active，未达到 Definition Of Done。
+
+- U0：固定 Git 窗口已冻结；U1：已实现具名 facts、两端 blob 验证、当前输出白名单、排他发布、混合 package 导航及 admission/receipt/handoff 机械校验。合成新窗口完成 prepare→admission/receipt→close→重放，历史窗口回归通过；真实窗口尚无完整 adjudication/ledger/handoff。新增合同见 [运行证据合同](../contracts/verification/ce-upstream-sync-run.md)。validator 不提供宿主层 mutation 拦截，不声称已硬强制写前准入。
+- U3 首批：仅 `branch-creation.md` 两处 checkout 加 ignored 保护，真实临时 Git repo 验证碰撞拒绝、文件/index 保留。U5 首批：metadata 前 200 行、有/无元数据与 I/O error 分开计数，以及直接文档 consumer；这些均不表示整个单元完成。
+- U2 首批：仅 testing/reliability/maintainability persona 与 diff-scope 四个路径完成有界对比和融合。其余 review source、confidence promotion、depth 及 finish context 尚未闭合；普通 persona 合并与跨模型授权合同未改。
+- U4/U6/U9 及其余候选仍未完成逐包审查；已读取的 CLI/optimize 差分只是待裁决输入，不能批量标为等价。H1-H4 行为承载例外筛查仍待完成。
+- 当前验证：9 个 Jest 套件 113 项、typecheck（272）、入口 lint（499）、共享引用检查、`npm run build`（dry-run）通过，日志在本窗口 `logs/checkpoint-*.log`。未运行全量 npm test、独立 code review、fresh-source 行为测评、runtime apply、真实宿主/模型、PR/CI 或现场验证。
+
+**收口决策缺口：** D1 要求 deferred 无法形成合法正式 output 时保持整窗 incomplete；当前 ce-bakeoff/ce-noslop/wtf 仍为 deferred。需明确本轮是否以“已有 owner 适用更新、deferred 保留、不前移完整同步点”为发布验收边界，或扩展产品方案纳入新 Skill。该选择尚未获得用户答复，不能把沉默当批准。LFG 留在 work 阶段，未进入 simplify、独立审查或提交/PR；既有提交授权持续有效，不需重新申请。
+
+可恢复证据位于 `execution-state.json`、各次 `runs/*` 的不可覆盖输入、`admissions/*` 和实际测试日志。实施前的 input 已因后续 source 变化而 stale，只作为 before 证据；恢复时重新生成当前输入，不重签旧快照。
+
+2026-10-27 LFG 计划阶段回源修订：补包级准入、receipt/handoff 校验、facts create/verify、行为承载例外筛查、当前执行 baseline、依赖拆分、blob 身份和多文件失败恢复；目标限本固定窗口。规划回源不代表实现或独立行为审查已完成。

@@ -1,0 +1,128 @@
+{
+  "arm": "A",
+  "source_sha256": "97d7ef9af86caaf26b7219cd4a3d404b312f5f5ff88d93f82f9cc12a618e6e55",
+  "cases": [
+    {
+      "case": "missing",
+      "entrypoint": "start",
+      "input_receipt": null,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "[cross-model] provider_serving_receipt_invalid\n",
+      "fake_provider_called": false,
+      "result_preserved": true,
+      "jobs_created": false
+    },
+    {
+      "case": "missing",
+      "entrypoint": "__worker",
+      "input_receipt": null,
+      "exit_code": 37,
+      "stdout": "",
+      "stderr": "",
+      "fake_provider_called": true,
+      "result_preserved": true,
+      "jobs_created": false
+    },
+    {
+      "case": "weak",
+      "entrypoint": "start",
+      "input_receipt": {
+        "schema_version": "provider-serving-receipt/v2",
+        "artifact_type": "degraded",
+        "verification_status": "unverified",
+        "reason_code": "authenticated-producer-unavailable"
+      },
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "[cross-model] provider_serving_receipt_unverified\n",
+      "fake_provider_called": false,
+      "result_preserved": true,
+      "jobs_created": false
+    },
+    {
+      "case": "weak",
+      "entrypoint": "__worker",
+      "input_receipt": {
+        "schema_version": "provider-serving-receipt/v2",
+        "artifact_type": "degraded",
+        "verification_status": "unverified",
+        "reason_code": "authenticated-producer-unavailable"
+      },
+      "exit_code": 37,
+      "stdout": "",
+      "stderr": "",
+      "fake_provider_called": true,
+      "result_preserved": true,
+      "jobs_created": false
+    },
+    {
+      "case": "forged",
+      "entrypoint": "start",
+      "input_receipt": {
+        "schema_version": "provider-serving-receipt/v2",
+        "artifact_type": "confirmed",
+        "verification_status": "verified"
+      },
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "[cross-model] provider_serving_receipt_invalid\n",
+      "fake_provider_called": false,
+      "result_preserved": true,
+      "jobs_created": false
+    },
+    {
+      "case": "forged",
+      "entrypoint": "__worker",
+      "input_receipt": {
+        "schema_version": "provider-serving-receipt/v2",
+        "artifact_type": "confirmed",
+        "verification_status": "verified"
+      },
+      "exit_code": 37,
+      "stdout": "",
+      "stderr": "",
+      "fake_provider_called": true,
+      "result_preserved": true,
+      "jobs_created": false
+    },
+    {
+      "case": "expired",
+      "entrypoint": "start",
+      "input_receipt": {
+        "schema_version": "provider-serving-receipt/v2",
+        "artifact_type": "degraded",
+        "verification_status": "unverified",
+        "reason_code": "authenticated-producer-unavailable",
+        "freshness_expires_at": "2000-01-01T00:00:00Z"
+      },
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "[cross-model] provider_serving_receipt_unverified\n",
+      "fake_provider_called": false,
+      "result_preserved": true,
+      "jobs_created": false
+    },
+    {
+      "case": "expired",
+      "entrypoint": "__worker",
+      "input_receipt": {
+        "schema_version": "provider-serving-receipt/v2",
+        "artifact_type": "degraded",
+        "verification_status": "unverified",
+        "reason_code": "authenticated-producer-unavailable",
+        "freshness_expires_at": "2000-01-01T00:00:00Z"
+      },
+      "exit_code": 37,
+      "stdout": "",
+      "stderr": "",
+      "fake_provider_called": true,
+      "result_preserved": true,
+      "jobs_created": false
+    }
+  ],
+  "limitations": [
+    "Only fail-fast fake provider executables available at the front of PATH. No real external model/provider was executed.",
+    "No authenticated positive serving producer exists in this test. File-based claimed verification remains untrusted."
+  ]
+}

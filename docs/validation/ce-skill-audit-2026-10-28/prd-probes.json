@@ -1,0 +1,44 @@
+{
+  "model_invoked": false,
+  "results": [
+    {
+      "name": "control",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "mutated-body-and-fix-claim",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "refresh-inputs-hash-after-prd-body-change",
+      "first": "finalized",
+      "stale": [
+        "ready_receipt_stale"
+      ],
+      "refresh": "finalized",
+      "verified": true
+    },
+    {
+      "name": "what-keyword-on-pure-test-implementation",
+      "facts": {
+        "outstanding_question_closure_contract_present": true,
+        "outstanding_question_rows": 1,
+        "outstanding_question_missing_closure_count": 0,
+        "blocking_outstanding_question_count": 0,
+        "planning_invention_question_count": 0,
+        "unclosed_owner_question_count": 0,
+        "open_oq_without_owner_closure_count": 0,
+        "how_pushdown_touches_what_count": 1,
+        "possible_misclassified_how_pushdown_count": 0,
+        "owner_decision_trace_present": false
+      },
+      "reason_codes": [
+        "how_pushdown_touches_what"
+      ]
+    }
+  ]
+}

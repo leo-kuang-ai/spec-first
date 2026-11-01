@@ -1,0 +1,31 @@
+# spec-dogfood 逐文件对照表
+
+纳入本轮全量深审。
+
+本表从文件账生成。读取完成只表示当前 hash 对应文本全文已审读，不表示职责对照、依赖闭包或整个 Skill 完成。
+
+| 本地文件 | CE 文件 | 职责映射状态 | 本地读取 | CE 读取 | 审查结论 / 优化建议 |
+| --- | --- | --- | --- | --- | --- |
+| [@dependency/skills/spec-test-browser/SKILL.md](/Users/kuang/xiaobu/spec-first/skills/spec-test-browser/SKILL.md) | — | 职责已核对；见结论/逐项笔记 | complete | 不适用 | callee精确origin/effect/能力/cleanup与source身份claim边界全文核对 |
+| [@dependency/skills/spec-test-browser/references/pipeline-orchestration.md](/Users/kuang/xiaobu/spec-first/skills/spec-test-browser/references/pipeline-orchestration.md) | — | 职责已核对；见结论/逐项笔记 | complete | 不适用 | callee pipeline拒绝与caller-owned server全文核对 |
+| [@dependency/skills/spec-test-browser/references/route-and-report.md](/Users/kuang/xiaobu/spec-first/skills/spec-test-browser/references/route-and-report.md) | — | 职责已核对；见结论/逐项笔记 | complete | 不适用 | callee route/report和human-only边界全文核对 |
+| — | [@dependency/tests/skills/ce-dogfood-body-pins.test.ts](/Users/kuang/xiaobu/compound-engineering-plugin/tests/skills/ce-dogfood-body-pins.test.ts) | 职责已核对；见结论/逐项笔记 | 不适用 | complete | 入口/relocated procedure静态断言全文核对 |
+| — | [@dependency/tests/skills/ce-packs-resolver.test.ts](/Users/kuang/xiaobu/compound-engineering-plugin/tests/skills/ce-packs-resolver.test.ts) | 职责已核对；见结论/逐项笔记 | 不适用 | complete | 715行全文核对，含cache固定ref/错误和containment fixture；未执行 |
+| — | [@dependency/tests/skills/helpers/packs-fixtures.ts](/Users/kuang/xiaobu/compound-engineering-plugin/tests/skills/helpers/packs-fixtures.ts) | 职责已核对；见结论/逐项笔记 | 不适用 | complete | resolver test直接helper全文核对 |
+| [SKILL.md](/Users/kuang/xiaobu/spec-first/skills/spec-dogfood/SKILL.md) | [SKILL.md](/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-dogfood/SKILL.md) | 职责已核对；见结论/逐项笔记 | complete | complete | 全文核对；flow/persona/criteria/owner/resume/knowledge融合裁定见逐项笔记；CE resolver不直接导入 |
+| — | [agents/openai.yaml](/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-dogfood/agents/openai.yaml) | 职责已核对；见结论/逐项笔记 | 不适用 | complete | 全文核对；flow/persona/criteria/owner/resume/knowledge融合裁定见逐项笔记；CE resolver不直接导入 |
+| [evals/cases/owner-unavailable-stops.yaml](/Users/kuang/xiaobu/spec-first/skills/spec-dogfood/evals/cases/owner-unavailable-stops.yaml) | — | 职责已核对；见结论/逐项笔记 | complete | 不适用 | 全文核对；flow/persona/criteria/owner/resume/knowledge融合裁定见逐项笔记；CE resolver不直接导入 |
+| [evals/cases/polish-request-routes-out.yaml](/Users/kuang/xiaobu/spec-first/skills/spec-dogfood/evals/cases/polish-request-routes-out.yaml) | — | 职责已核对；见结论/逐项笔记 | complete | 不适用 | 全文核对；flow/persona/criteria/owner/resume/knowledge融合裁定见逐项笔记；CE resolver不直接导入 |
+| [evals/cases/r2-code-review-routes-out.yaml](/Users/kuang/xiaobu/spec-first/skills/spec-dogfood/evals/cases/r2-code-review-routes-out.yaml) | — | 职责已核对；见结论/逐项笔记 | complete | 不适用 | 全文核对；flow/persona/criteria/owner/resume/knowledge融合裁定见逐项笔记；CE resolver不直接导入 |
+| [evals/cases/trunk-target-rejected.yaml](/Users/kuang/xiaobu/spec-first/skills/spec-dogfood/evals/cases/trunk-target-rejected.yaml) | — | 职责已核对；见结论/逐项笔记 | complete | 不适用 | 全文核对；flow/persona/criteria/owner/resume/knowledge融合裁定见逐项笔记；CE resolver不直接导入 |
+| [evals/eval.yaml](/Users/kuang/xiaobu/spec-first/skills/spec-dogfood/evals/eval.yaml) | — | 职责已核对；见结论/逐项笔记 | complete | 不适用 | 全文核对；flow/persona/criteria/owner/resume/knowledge融合裁定见逐项笔记；CE resolver不直接导入 |
+| [evals/fixtures/repos/mini-ledger/README.md](/Users/kuang/xiaobu/spec-first/skills/spec-dogfood/evals/fixtures/repos/mini-ledger/README.md) | — | 职责已核对；见结论/逐项笔记 | complete | 不适用 | 全文核对；flow/persona/criteria/owner/resume/knowledge融合裁定见逐项笔记；CE resolver不直接导入 |
+| [evals/fixtures/repos/mini-ledger/package.json](/Users/kuang/xiaobu/spec-first/skills/spec-dogfood/evals/fixtures/repos/mini-ledger/package.json) | — | 职责已核对；见结论/逐项笔记 | complete | 不适用 | 全文核对；flow/persona/criteria/owner/resume/knowledge融合裁定见逐项笔记；CE resolver不直接导入 |
+| [evals/fixtures/repos/mini-ledger/src/server.js](/Users/kuang/xiaobu/spec-first/skills/spec-dogfood/evals/fixtures/repos/mini-ledger/src/server.js) | — | 职责已核对；见结论/逐项笔记 | complete | 不适用 | 全文核对；flow/persona/criteria/owner/resume/knowledge融合裁定见逐项笔记；CE resolver不直接导入 |
+| [evals/fixtures/scripts/asks-a-question.sh](/Users/kuang/xiaobu/spec-first/skills/spec-dogfood/evals/fixtures/scripts/asks-a-question.sh) | — | 职责已核对；见结论/逐项笔记 | complete | 不适用 | 全文核对；flow/persona/criteria/owner/resume/knowledge融合裁定见逐项笔记；CE resolver不直接导入 |
+| [evals/fixtures/scripts/check-owner-unavailable-stop.sh](/Users/kuang/xiaobu/spec-first/skills/spec-dogfood/evals/fixtures/scripts/check-owner-unavailable-stop.sh) | — | 职责已核对；见结论/逐项笔记 | complete | 不适用 | 全文核对；flow/persona/criteria/owner/resume/knowledge融合裁定见逐项笔记；CE resolver不直接导入 |
+| [evals/fixtures/scripts/check-trunk-reject.sh](/Users/kuang/xiaobu/spec-first/skills/spec-dogfood/evals/fixtures/scripts/check-trunk-reject.sh) | — | 职责已核对；见结论/逐项笔记 | complete | 不适用 | 全文核对；flow/persona/criteria/owner/resume/knowledge融合裁定见逐项笔记；CE resolver不直接导入 |
+| [references/dogfood-report-template.md](/Users/kuang/xiaobu/spec-first/skills/spec-dogfood/references/dogfood-report-template.md) | [references/dogfood-report-template.md](/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-dogfood/references/dogfood-report-template.md) | 职责已核对；见结论/逐项笔记 | complete | complete | 全文核对；flow/persona/criteria/owner/resume/knowledge融合裁定见逐项笔记；CE resolver不直接导入 |
+| [references/phases.md](/Users/kuang/xiaobu/spec-first/skills/spec-dogfood/references/phases.md) | [references/phases.md](/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-dogfood/references/phases.md) | 职责已核对；见结论/逐项笔记 | complete | complete | 全文核对；flow/persona/criteria/owner/resume/knowledge融合裁定见逐项笔记；CE resolver不直接导入 |
+| [references/test-matrix-taxonomy.md](/Users/kuang/xiaobu/spec-first/skills/spec-dogfood/references/test-matrix-taxonomy.md) | [references/test-matrix-taxonomy.md](/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-dogfood/references/test-matrix-taxonomy.md) | 职责已核对；见结论/逐项笔记 | complete | complete | 全文核对；flow/persona/criteria/owner/resume/knowledge融合裁定见逐项笔记；CE resolver不直接导入 |
+| — | [scripts/packs-resolve.py](/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-dogfood/scripts/packs-resolve.py) | 职责已核对；见结论/逐项笔记 | 不适用 | complete | 全文核对；flow/persona/criteria/owner/resume/knowledge融合裁定见逐项笔记；CE resolver不直接导入 |

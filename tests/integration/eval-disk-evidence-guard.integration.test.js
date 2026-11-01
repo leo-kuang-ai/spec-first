@@ -17,11 +17,9 @@ const judgeScript = path.join(
   'check-r2-preset-applied-fix.sh',
 );
 
-// 落盘证据守卫的端到端契约：模型宣称修复时，judge 必须依据 fixture 基线判定
-// 代码是否真实落盘。四个主场景 + 两个无基线弱守卫分支。该守卫曾在
-// 2026-09-11 审查中因「永真脏检查 + 自比较 HEAD 空操作」被判 green-while-red，
-// 修复后以本测试永久钉住判别语义。
-const PASSING_MESSAGE = '审查发现 P0 租户越权问题，已修复';
+// The judge requires a baseline and tests actual tenant isolation. Claims or
+// unrelated dirty files cannot substitute for behavior, HEAD and index evidence.
+const PASSING_MESSAGE = 'The tenant isolation issue was fixed.';
 
 function sh(command, args, options = {}) {
   const result = spawnSync(command, args, { encoding: 'utf8', ...options });
@@ -46,7 +44,7 @@ function buildFixtureRepo(label) {
 }
 
 function runJudge(repo, message = PASSING_MESSAGE) {
-  return sh('bash', [judgeScript], { cwd: repo, env: { ...process.env, EVAL_FINAL_MESSAGE: message } });
+  return sh('bash', [judgeScript], { cwd: repo, env: { ...process.env, EVAL_EXIT_CODE: '0', EVAL_FINAL_MESSAGE: message } });
 }
 
 function applyRealFix(repo) {
@@ -54,7 +52,7 @@ function applyRealFix(repo) {
   const before = fs.readFileSync(orders, 'utf8');
   fs.writeFileSync(orders, before.replace(
     'return orders.find((candidate) => candidate.id === orderId) || null;',
-    'return orders.find((candidate) => candidate.id === orderId && candidate.tenantId === currentTenantId) || null;',
+    'return orders.find((candidate) => candidate.id === orderId && candidate.tenantId === user.tenantId) || null;',
   ));
 }
 
@@ -75,7 +73,7 @@ describe('eval disk-evidence guard (r2-preset-applied-fix)', () => {
     sh('bash', [prepareScript], { cwd: repo });
     const judge = runJudge(repo);
     expect(judge.status).toBe(1);
-    expect(judge.stdout).toContain('未见落盘');
+    expect(judge.stderr).toContain('AssertionError');
   });
 
   test('a real uncommitted fix relative to the fixture baseline passes', () => {
@@ -93,7 +91,7 @@ describe('eval disk-evidence guard (r2-preset-applied-fix)', () => {
     sh('git', ['-C', repo, 'commit', '-qm', 'sneaky']);
     const judge = runJudge(repo);
     expect(judge.status).toBe(1);
-    expect(judge.stdout).toContain('HEAD 已前移');
+    expect(judge.stderr).toContain('HEAD changed');
   });
 
   test('staging the fixture patch without changing content is rejected', () => {
@@ -102,13 +100,13 @@ describe('eval disk-evidence guard (r2-preset-applied-fix)', () => {
     sh('git', ['-C', repo, 'add', '-A']);
     const judge = runJudge(repo);
     expect(judge.status).toBe(1);
-    expect(judge.stdout).toContain('未见落盘');
+    expect(judge.stderr).toContain('Index changed');
   });
 
-  test('without a baseline a clean worktree still fails the weak guard', () => {
+  test('without a baseline a clean worktree is rejected', () => {
     const repo = fixture('no-baseline-clean');
     sh('bash', [prepareScript], { cwd: repo });
-    // 模拟旧版 prepare / 基线被移除：弱守卫下完全干净的工作区没有落盘证据。
+    // Removing baseline evidence must fail closed, regardless of worktree state.
     const gitDir = sh('git', ['-C', repo, 'rev-parse', '--git-dir']).stdout.trim();
     fs.rmSync(path.join(repo, gitDir, 'eval-baseline-head'));
     fs.rmSync(path.join(repo, gitDir, 'eval-baseline-diff-sha'));
@@ -117,16 +115,18 @@ describe('eval disk-evidence guard (r2-preset-applied-fix)', () => {
     sh('git', ['-C', repo, 'commit', '-qm', 'absorb patch']);
     const judge = runJudge(repo);
     expect(judge.status).toBe(1);
-    expect(judge.stdout).toContain('无任何变更且缺少评测基线');
+    expect(judge.stderr).toContain('eval-baseline-head');
   });
 
-  test('without a baseline a genuinely changed worktree passes the weak guard', () => {
+  test('without a baseline even a behaviorally correct change is rejected', () => {
     const repo = fixture('no-baseline-dirty');
     sh('bash', [prepareScript], { cwd: repo });
     const gitDir = sh('git', ['-C', repo, 'rev-parse', '--git-dir']).stdout.trim();
     fs.rmSync(path.join(repo, gitDir, 'eval-baseline-head'));
     fs.rmSync(path.join(repo, gitDir, 'eval-baseline-diff-sha'));
     applyRealFix(repo);
-    expect(runJudge(repo).status).toBe(0);
+    const judge = runJudge(repo);
+    expect(judge.status).toBe(1);
+    expect(judge.stderr).toContain('eval-baseline-head');
   });
 });

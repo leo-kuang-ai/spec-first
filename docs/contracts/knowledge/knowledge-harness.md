@@ -19,7 +19,7 @@
 
 | Layer | 职责 | 可用 skill / artifact | v1.15 状态 | 边界 |
 | --- | --- | --- | --- | --- |
-| L1 Project Context | 保留项目角色、source/runtime 边界、host 指令和需求上下文 | `docs/10-prompt/结构化项目角色契约.md`, `AGENTS.md`, `CLAUDE.md`, `spec-prd` | L1 已由现有 `spec-prd`/host docs 覆盖 | host docs 是 source 指令，不是 workflow 状态 |
+| L1 Project Context | 保留项目角色、source/runtime 边界、host 指令和需求上下文 | `docs/methodology/结构化项目角色契约.md`, `AGENTS.md`, `CLAUDE.md`, `spec-prd` | L1 已由现有 `spec-prd`/host docs 覆盖 | host docs 是 source 指令，不是 workflow 状态 |
 | L2 Context Budget | 用最小高信号 token 集传递上游 artifact、相关路径和验证路径 | `context-bundle.v1`, `artifact-summary.v1`, `spec-plan`, `spec-work`, `spec-code-review` | L2 是 v1.15 completion gate | context budget 复用 `related_paths` / `evidence_paths` / `excluded_context` / `budget_used`，不新增 included/omitted 字段 |
 | L3 Code Intelligence | 帮助定位影响面、调用链和候选测试 | external providers, direct `rg`, ast-grep | L3 归 v1.16 capability-aware 协同 | provider 只提供 advisory navigation，不拥有 scope/finding/root-cause authority |
 | L4 Memory / Prior Decisions | 从 `docs/solutions/` 召回历史经验和已拒绝方案 | `spec-plan`, `spec-debug`, `spec-learnings-researcher`, `docs/solutions/**` | L4 是 v1.15 completion gate | recall 命中是 advisory candidate，必须回源到 source/test/doc 确认后才可升为 confirmed |

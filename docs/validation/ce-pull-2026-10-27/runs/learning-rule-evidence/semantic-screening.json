@@ -1,0 +1,96 @@
+{
+  "artifact_type": "advisory",
+  "status": "partial",
+  "entries": [
+    {
+      "path": "skills/ce-code-review/references/personas/agent-native-reviewer.md",
+      "local_owner": "skills/spec-code-review/references/personas/agent-native-reviewer.md",
+      "reading": "固定窗口完整净 diff；本地全文在续接前/本轮读取，部分本轮合并输出截断未重复计作全文",
+      "target_action": "evidence-only",
+      "decision": "仅措辞澄清或既有低置信度/P0/soft bucket 规则展开；保留当前本地 synthesis 的合法 P0 例外和更严格领域边界，无需批量同义改写",
+      "status": "source-comparison-complete-no-change"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/api-contract-reviewer.md",
+      "local_owner": "skills/spec-code-review/references/personas/api-contract-reviewer.md",
+      "reading": "固定窗口完整净 diff；本地全文在续接前/本轮读取，部分本轮合并输出截断未重复计作全文",
+      "target_action": "evidence-only",
+      "decision": "仅措辞澄清或既有低置信度/P0/soft bucket 规则展开；保留当前本地 synthesis 的合法 P0 例外和更严格领域边界，无需批量同义改写",
+      "status": "source-comparison-complete-no-change"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/data-migration-reviewer.md",
+      "local_owner": "skills/spec-code-review/references/personas/data-migration-reviewer.md",
+      "reading": "固定窗口完整净 diff；本地全文在续接前/本轮读取，部分本轮合并输出截断未重复计作全文",
+      "target_action": "evidence-only",
+      "decision": "仅措辞澄清或既有低置信度/P0/soft bucket 规则展开；保留当前本地 synthesis 的合法 P0 例外和更严格领域边界，无需批量同义改写",
+      "status": "source-comparison-complete-no-change"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/deployment-verification-agent.md",
+      "local_owner": "skills/spec-code-review/references/personas/deployment-verification-agent.md",
+      "reading": "固定窗口完整净 diff；本地全文在续接前/本轮读取，部分本轮合并输出截断未重复计作全文",
+      "target_action": "evidence-only",
+      "decision": "仅措辞澄清或既有低置信度/P0/soft bucket 规则展开；保留当前本地 synthesis 的合法 P0 例外和更严格领域边界，无需批量同义改写",
+      "status": "source-comparison-complete-no-change"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/julik-frontend-races-reviewer.md",
+      "local_owner": "skills/spec-code-review/references/personas/julik-frontend-races-reviewer.md",
+      "reading": "固定窗口完整净 diff；本地全文在续接前/本轮读取，部分本轮合并输出截断未重复计作全文",
+      "target_action": "evidence-only",
+      "decision": "仅措辞澄清或既有低置信度/P0/soft bucket 规则展开；保留当前本地 synthesis 的合法 P0 例外和更严格领域边界，无需批量同义改写",
+      "status": "source-comparison-complete-no-change"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/previous-comments-reviewer.md",
+      "local_owner": "skills/spec-code-review/references/personas/previous-comments-reviewer.md",
+      "reading": "固定窗口完整净 diff；本地全文在续接前/本轮读取，部分本轮合并输出截断未重复计作全文",
+      "target_action": "evidence-only",
+      "decision": "仅措辞澄清或既有低置信度/P0/soft bucket 规则展开；保留当前本地 synthesis 的合法 P0 例外和更严格领域边界，无需批量同义改写",
+      "status": "source-comparison-complete-no-change"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/project-standards-reviewer.md",
+      "local_owner": "skills/spec-code-review/references/personas/project-standards-reviewer.md",
+      "reading": "固定窗口完整净 diff；本地全文在续接前/本轮读取，部分本轮合并输出截断未重复计作全文",
+      "target_action": "evidence-only",
+      "decision": "仅措辞澄清或既有低置信度/P0/soft bucket 规则展开；保留当前本地 synthesis 的合法 P0 例外和更严格领域边界，无需批量同义改写",
+      "status": "source-comparison-complete-no-change"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/swift-ios-reviewer.md",
+      "local_owner": "skills/spec-code-review/references/personas/swift-ios-reviewer.md",
+      "reading": "固定窗口完整净 diff；本地全文在续接前/本轮读取，部分本轮合并输出截断未重复计作全文",
+      "target_action": "evidence-only",
+      "decision": "仅措辞澄清或既有低置信度/P0/soft bucket 规则展开；保留当前本地 synthesis 的合法 P0 例外和更严格领域边界，无需批量同义改写",
+      "status": "source-comparison-complete-no-change"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/learnings-researcher.md",
+      "local_owner": "skills/spec-code-review/references/personas/learnings-researcher.md",
+      "reading": "CE 完整窗口 diff、本地全文；源码已融合通用证据边界",
+      "target_action": "compose",
+      "decision": "采用正文非指令、条件适用与 changed/pre-existing/context 分类；保留当前 synthesis/validator；Packs roots/自动 finding 转换仍未准入",
+      "status": "partial-generic-rule-evidence-implemented"
+    }
+  ],
+  "verification": {
+    "suites": 2,
+    "tests": 66,
+    "exit_code": 0,
+    "log_ref": "docs/validation/ce-pull-2026-10-27/logs/learning-rule-consumer-tests.log"
+  },
+  "limitations": [
+    "8 个措辞路径 source 比对完成；learnings 的 Packs 联动仍 partial",
+    "结构合同与数值脚本回归不证明独立模型行为；独立 review/fresh-source 尚未执行",
+    "U2 peer deadline/run-log 已读 CE 净差分/新增全文，本地仅有界 lifecycle/metadata owner 读取，尚无最终处置"
+  ],
+  "next_admission_review": {
+    "path": "skills/ce-resolve-pr-feedback/scripts/reply-to-pr-thread",
+    "local_owner": "skills/spec-resolve-pr-feedback/scripts/reply-to-pr-thread",
+    "observation": "BODY=$(cat) 会丢弃尾随换行，既有 real helper/fake gh 测试未覆盖该输入；CE 使用 IFS/read -r -d 空字符保留尾随换行",
+    "decision": "在既有 helper 融合 stdin 读取，不改变 POST/回执/重复副作用/pending review 门禁，强化现有真实 helper payload 测试",
+    "remaining": "pending-feedback 持久化/恢复协议及其他 PR owner 尚未闭合"
+  }
+}

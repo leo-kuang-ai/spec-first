@@ -1,0 +1,49 @@
+{
+  "base": "Immutable U31 dirty working-tree snapshot, not HEAD",
+  "coverage": "Every path in execution-state.changed_files appears in exactly one primary slice. Cross-slice consumers remain eligible read-only context.",
+  "source_count": 387,
+  "slices": [
+    {
+      "slice": "definition",
+      "files": 118,
+      "diff_lines": 5544,
+      "file_list": ".spec-first/workflows/spec-work/spec-first/ce-opt-acceptance-20261029/review-input/definition-files.json",
+      "diff_path": ".spec-first/workflows/spec-work/spec-first/ce-opt-acceptance-20261029/review-input/definition.diff",
+      "diff_sha256": "b2cd82fdccac2daed44a3e29d4bfffa188d6d82e3969f166c4909d16109f1768",
+      "status": "reviewed-with-one-confirmed-finding",
+      "agent_task": "/root/review_definition"
+    },
+    {
+      "slice": "execution",
+      "files": 118,
+      "diff_lines": 8031,
+      "file_list": ".spec-first/workflows/spec-work/spec-first/ce-opt-acceptance-20261029/review-input/execution-files.json",
+      "diff_path": ".spec-first/workflows/spec-work/spec-first/ce-opt-acceptance-20261029/review-input/execution.diff",
+      "diff_sha256": "c68fcd4bc8d61b3cd9366a1d5ab2c7e56eb57e189a7eb3388363499b1964ded5",
+      "status": "reviewed-with-one-confirmed-finding",
+      "agent_task": "/root/review_execution"
+    },
+    {
+      "slice": "evidence",
+      "files": 151,
+      "diff_lines": 8582,
+      "file_list": ".spec-first/workflows/spec-work/spec-first/ce-opt-acceptance-20261029/review-input/evidence-files.json",
+      "diff_path": ".spec-first/workflows/spec-work/spec-first/ce-opt-acceptance-20261029/review-input/evidence.diff",
+      "diff_sha256": "7426c648d62a4bb07b87974b27919d3cacd57d87d13ec12c09cfbff4e6ee2788",
+      "status": "reviewed-with-one-confirmed-finding",
+      "agent_task": "/root/review_evidence"
+    }
+  ],
+  "dispatch_status": "complete; all three findings repaired and independently rechecked",
+  "worker_constraints": "Fresh read-only context; no source, Git, runtime or external writes. Return full source-cited findings and an explicit per-file coverage ledger. No self-reported cross-model independence.",
+  "dispatch_run": ".spec-first/workflows/spec-work/spec-first/ce-opt-acceptance-20261030",
+  "source_count_note": "Original review snapshot has 387 paths; later finding fixes are tracked separately.",
+  "successor": {
+    "file_list": ".spec-first/workflows/spec-work/spec-first/ce-opt-acceptance-20261030/review-input/evidence-files.json",
+    "original_paths": 151,
+    "paths": 182,
+    "purpose": "Complete evidence slice and independently recheck all changed-after-review paths."
+  },
+  "current_reviewed_source_count": 389,
+  "coverage_ref": "docs/validation/ce-skill-optimization-2026-10-29/acceptance-resume/review-coverage.json"
+}

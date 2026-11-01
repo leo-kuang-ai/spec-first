@@ -1,0 +1,77 @@
+FAIL tests/unit/spec-test-browser-contracts.test.js
+  ✓ probe rejects missing or failed cleanup despite a claimed conformance pass (1 ms)
+  ✓ probe rejects missing or failed cleanup despite a claimed conformance pass
+  ✓ probe carries the private recovery reference from failed conformance (1 ms)
+  ✓ probe rejects failed conformance with absent or malformed payload: null
+  ✓ probe rejects failed conformance with absent or malformed payload: null
+  ✓ probe rejects failed conformance with absent or malformed payload: invalid
+  ✓ probe reports blocked readiness when exact-origin is absent and does not upgrade domain allowlisting
+  ✓ probe does not treat a help marker as proof of request-time enforcement (1 ms)
+  ✓ probe becomes ready only after controlled conformance passes for the resolved binary identity
+  ✓ probe rejects false-green conformance when the positive control did not pass
+  ✓ probe fails closed when controlled conformance throws (1 ms)
+  ✓ probe fails closed when controlled conformance times out
+  ✓ probe fails closed when controlled conformance returns malformed JSON
+  ✓ probe reruns conformance when the resolved binary identity changes
+  ✓ probe recognizes the exact-origin flag token independent of help metavar shape: --exact-origin <URL> (1 ms)
+  ✓ probe recognizes the exact-origin flag token independent of help metavar shape: --exact-origin=<origin>
+  ✓ probe recognizes the exact-origin flag token independent of help metavar shape: --exact-origin
+  ✓ probe ignores provider or caller capability claims and never invokes a capabilities command
+  ✓ workflow keeps a caller-owned server boundary around the unique browser wrapper (2 ms)
+  ✓ retires managed-server and runtime-profile surfaces without a compatibility layer
+  ✓ parses an explicit target-origin override before resolving browser scope
+  ✓ route reference preserves complete reporting and the current execution owner (1 ms)
+  ✓ validates loopback origins, first-open ordering, routes, actions, locators, and synthetic values (1 ms)
+  ✕ prepare writes only owner-private run files and pins the internal test-plan hash (28 ms)
+  ✓ returns not_run without writing files when the requested run directory is a symlink
+  ✓ requires a newly created private run directory (1 ms)
+  ✓ uses the process identity rather than USERNAME when hardening Windows paths (18 ms)
+  ✓ resolves the Windows agent-browser native binary without invoking a cmd shim
+  ✓ fails closed when the Windows native agent-browser executable is unavailable (1 ms)
+  ✓ rolls back a newly created run directory when private subdirectory setup fails
+  ✓ preserves the original setup failure when run-directory rollback also fails
+  ✓ launches zero open subprocesses when exact-origin is unavailable (19 ms)
+  ✓ launches zero click subprocesses when exact-origin is unavailable (16 ms)
+  ✓ launches zero fill subprocesses when exact-origin is unavailable (18 ms)
+  ✓ launches zero type subprocesses when exact-origin is unavailable (17 ms)
+  ✓ launches zero press subprocesses when exact-origin is unavailable (18 ms)
+  ✓ launches zero select subprocesses when exact-origin is unavailable (19 ms)
+  ✓ launches zero browser actions when exact-origin is advertised but its enforcement contract is unavailable (18 ms)
+  ✓ launches zero browser actions when the conformed binary identity changes before execution (17 ms)
+  ✓ does not trust a caller-supplied exact-origin capability claim (18 ms)
+  ✓ does not expose the in-process confirmed probe seam through CLI arguments
+  ✓ detects test-plan replacement before the first action and launches no subprocess (17 ms)
+  ✓ rechecks the test-plan hash before every action and stops later subprocesses on drift (29 ms)
+  ✓ reserves each private raw-output file before launching the corresponding action (17 ms)
+  ✓ builds allowlisted argv, synthetic values, sanitized env, and private raw-output paths (33 ms)
+  ✓ stops after a failed first open and keeps later page actions private (24 ms)
+  ✓ discards a reserved raw file when the action runner throws (19 ms)
+  ✓ cleanup closes only the prepared isolated session (20 ms)
+  ✓ cleanup failure keeps diagnostics private and returns a bounded evidence ref (24 ms)
+  ✓ cleanup still attempts the close command when private diagnostics are unavailable (19 ms)
+  ✓ cleanup runner exceptions stay private and return a structured blocker (25 ms)
+  ✓ workflow contract preserves browser cleanup blockers without server ownership (1 ms)
+  ✓ source-only capability cases cover browser policy and caller-owned server boundaries (1 ms)
+
+  ● prepare writes only owner-private run files and pins the internal test-plan hash
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: ArrayContaining ["gettext", "inputvalue", "title", "url", "count", "viewport", "requests", "getbyrole", "getbylabel", "getbytestid", …]
+    Received: ["launch", "navigate", "open", "snapshot", "get", "console", "network", "vitals", "set", "screenshot", …]
+
+      585 |   expect(actionPolicy.allow).toEqual(expect.arrayContaining(['launch', 'navigate']));
+      586 |   expect(actionPolicy.allow).toContain('find');
+    > 587 |   expect(actionPolicy.allow).toEqual(expect.arrayContaining([
+          |                              ^
+      588 |     'gettext', 'inputvalue', 'title', 'url', 'count', 'viewport', 'requests',
+      589 |     'getbyrole', 'getbylabel', 'getbytestid', 'getbytext',
+      590 |   ]));
+
+      at Object.toEqual (tests/unit/spec-test-browser-contracts.test.js:587:30)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 52 passed, 53 total
+Snapshots:   0 total
+Time:        0.663 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/spec-test-browser-contracts.test.js/i.

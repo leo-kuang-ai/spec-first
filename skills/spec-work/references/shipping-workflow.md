@@ -65,6 +65,8 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
 
    Pass `plan:<path>` or a scope hint when the plan or user narrowed what changed. If the skill is unavailable on the harness, skip or do a brief manual pass for obvious duplicate/dead code — code review (step 3) still runs regardless.
 
+   At this handoff, apply `references/feedback-and-tests.md` § Preserve proof through cleanup. Pass every evidence-bound test as `proof-test:<path>` with its unit/task, test-only seams, command/log refs and current byte identity. These are protection context, not wider scope. Consume the returned preservation comparison and missing/stale limitations; rerun the original symptom and proof tests after edits before final-tree closeout.
+
 3. **Code Review**
 
    Review the diff with **`spec-code-review`** — the spec-first portable review skill — as the single path. It self-right-sizes (a lite roster for small, low-risk, code-only diffs; the full roster otherwise), so there is no "escalate to a heavier reviewer" decision and **no harness-specific review detection** — it behaves identically on every harness. (This replaces the former harness-native-review-first split: the size and sensitive-surface judgment that used to live here now lives inside `spec-code-review`'s own reviewer selection and small-diff gate.) A host catalog entry named `review` is not this step.

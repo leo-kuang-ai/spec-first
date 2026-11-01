@@ -6,7 +6,7 @@ user-invocable: false
 
 # Git Commit
 
-Create a single, well-crafted git commit from the current working tree changes.
+Create scoped logical commit(s) that explain the outcome of the authorized changes.
 
 ## Invocation And Authorization Boundary
 
@@ -19,7 +19,11 @@ branch_mutation_authorization: authorized | missing
 
 `workflow invocation does not authorize commit`; tool permission, a dirty tree, a branch name, or successful verification are execution facts, not authority. Explicit commit authorization does not imply branch mutation authorization. When any commit intent is expressed while commit authorization is missing, stop before branch mutation, staging, or commit and return `commit_authorization_missing`. When a checkout or new branch is needed but branch authority is missing, stop before that Git mutation and return `branch_mutation_authorization_missing` or obtain approval for the exact branch action. A pure status question about uncommitted changes (no commit intent expressed) does not trigger this gate: answer the query directly, mutate nothing, and do not stage or commit.
 
-This helper owns commit composition and the authorized commit checkpoint only. It does not own push, PR creation/update, plan lifecycle, or unrelated dirty paths. If branch creation would be required, obtain explicit approval for that concrete branch mutation before creating it.
+Consume the caller's owned paths, explicit `exclude:<paths>`, known unit context and verified hunk-isolation strategy. Exclusions win over an overlapping owned-path list; report them as left uncommitted. A changed-file list does not prove ownership.
+
+When no verified isolation strategy exists, you may return a concrete proposal for caller validation. Label it unverified and perform no staging or commit until its preservation checks pass. A proposed procedure is not an execution receipt; use the shared precommit and recovery boundaries in `skills/spec-commit-push-pr/references/commit-and-push.md`.
+
+This helper owns commit composition and the authorized commit checkpoint only. It does not own push, PR creation/update, plan lifecycle, or unrelated dirty paths. If branch creation is required, consume existing authority for that exact branch action; obtain approval only when it is missing.
 
 ## Context
 
@@ -53,7 +57,7 @@ The remote default branch value returns something like `origin/main`. Strip the 
 gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name'
 ```
 
-If both fail, fall back to `main`.
+If both fail, keep the default unresolved; do not assume `main`. Missing default metadata blocks an action that depends on identifying the default branch. An explicitly caller-confirmed existing non-default feature branch can remain the commit target when the immediate branch recheck matches that exact target and no checkout, branch creation or publication is requested. A feature-like name alone is not confirmation; known `main`, `master` and resolved default branches still follow Step 4. Report the unresolved metadata without inventing it. Target GitHub metadata at the confirmed repository, including its host when needed.
 
 If the git status from the context above shows a clean working tree (no staged, modified, or untracked files), report that there is nothing to commit and stop.
 
@@ -87,32 +91,33 @@ If the current branch from the context above is `main`, `master`, or the resolve
 
 Derive the branch name from the change content, validate it, and create it from the current HEAD so uncommitted work and any local-only commits stay attached to the new branch:
 
-```bash
-BRANCH_NAME="<branch-name>"
-git check-ref-format --branch "$BRANCH_NAME"
-git checkout -b "$BRANCH_NAME"
+Run these as separate argv calls, stopping on an invalid name or failed checkout:
+
+```text
+git check-ref-format --branch <branch-name>
+git checkout --no-overwrite-ignore -b <branch-name>
 git branch --show-current
 ```
 
 Use the confirmed branch name for the rest of the workflow. If the branch already exists, derive a safe unique name and retry once. If branch creation still fails, stop before staging and report the failure; do not commit on the default branch.
 
 Write the commit message:
+
+保留分支上他人已有提交的 author 与 trailers，不通过 squash 或重写把其贡献归为本次提交。若本次提交移植他人分支、PR 或 patch 的工作，且该工作不会另以原作者名义落地，则从原提交/patch 精确复制 author 和已有 `Co-authored-by` 身份，并为每人添加 `Co-authored-by: Name <email>` trailer；没有邮箱时在 body 署名，不猜测身份。语义参考、独立改写与直接移植须按实际来源区分，不因读过上游文件就伪造共同作者。此规则不授予历史重写权限。
+
 - **Subject line**: Concise, imperative mood, focused on *why* not *what*. Follow the convention determined in Step 2.
 - **Body** (when needed): Add a body separated by a blank line for non-trivial changes. Explain motivation, trade-offs, or anything a future reader would need. Omit the body for obvious single-purpose changes.
 
-For each commit group, stage specific files by name over `git add -A` or `git add .` to avoid accidentally including sensitive files (.env, credentials) or unrelated changes. Write the message to a temp file and commit with `-F` so multi-line bodies are preserved without shell interpolation:
+When exactly one implementation unit is already known and actually owns this commit, append its U-ID, such as `(U3)`. Omit it for mixed-unit or unclear scope; do not search for a plan just to invent a label.
 
-```bash
-COMMIT_MSG=$(mktemp "${TMPDIR:-/tmp}/spec-commit-message.XXXXXX")
-cat > "$COMMIT_MSG" <<'EOF'
-type(scope): subject line here
+For each group, stage specific owned files rather than `git add -A` or `git add .`. Write the full message literally with the native file-write tool into a private temporary file outside the repository. Pass its path as one argument; message content must never pass through shell interpolation. Run stage and commit as separate argv calls:
 
-Optional body explaining why this change was made,
-not just what changed.
-EOF
+```text
 git add -- file1 file2 file3
-git commit -F "$COMMIT_MSG" -- file1 file2 file3
+git commit -F <message-file> -- file1 file2 file3
 ```
+
+Git's normal message cleanup still applies. Read back the actual commit message and included paths, then remove only this run's temporary file after success or preservation of necessary failure evidence. Never silently stage an excluded path or turn mixed-hunk ownership into a whole-file commit.
 
 提交前核对 owned paths 与已暂存内容。显式路径提交保留其他文件的暂存状态，但会提交这些路径的工作树内容，不保留文件内的 hunk 选择。若同一文件混有其他任务或用户修改，必须使用调用方已验证的 hunk/index 隔离方案，或停止该组提交。不得 reset/stash 用户暂存区；遵循 `skills/spec-commit-push-pr/references/commit-and-push.md` 的同一边界。
 

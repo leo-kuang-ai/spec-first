@@ -1,0 +1,25 @@
+{
+  "arm": "B",
+  "input": {
+    "target_origin": "http://127.0.0.1:50523",
+    "routes": [
+      "/"
+    ],
+    "steps": [
+      {
+        "action": "vitals",
+        "route": "/"
+      },
+      {
+        "action": "open",
+        "route": "/"
+      }
+    ]
+  },
+  "actual_validation": {
+    "ok": false,
+    "reason_code": "test-plan-page-context-before-open",
+    "step_index": 0
+  },
+  "limitation": "Actual plan validation only; no browser started."
+}

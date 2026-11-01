@@ -1,0 +1,14 @@
+PASS tests/unit/spec-pov-worker-admission.test.js
+  POV dormant provider admission
+    ✓ direct codex worker cannot bypass serving admission (5 ms)
+    ✓ direct claude worker cannot bypass serving admission (3 ms)
+    ✓ missing receipt never starts a provider through either entrypoint (25 ms)
+    ✓ weak receipt never starts a provider through either entrypoint (22 ms)
+    ✓ forged receipt never starts a provider through either entrypoint (21 ms)
+    ✓ expired receipt never starts a provider through either entrypoint (21 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       6 passed, 6 total
+Snapshots:   0 total
+Time:        0.182 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/spec-pov-worker-admission.test.js/i.

@@ -20,7 +20,7 @@ When the input is ambiguous (e.g., a zip arrived without context), inspect the r
 ## Common rules
 
 - Keep raw recordings, audio chunks, zip contents, session dumps, and extracted screenshots local-only by default. Do not commit `raw/` or `frames/` directories unless the user explicitly asks and privacy is acceptable.
-- Text/metadata artifacts (requirements kickoff material, analysis summaries, problem analyses, source manifests) may be committed when they are needed for traceability and contain no sensitive data.
+- Analyzer outputs are local evidence by default, including manifests and JSON containing original paths or captured content. Only a separately reviewed, sanitized text subset may be shared or committed under explicit destination/commit authority; file extension and generation success do not establish privacy safety.
 - Use repo-relative screenshot paths in any committed doc so later agents can open the evidence without absolute local paths.
 
 Media transcription is a separate third-party egress. Before analyzer execution, record `transcription_egress_authorization: authorized | missing`. It is authorized only when the current user or visible upstream handoff explicitly requests third-party transcription for this recording; analysis intent, a local file, an ambient `OPENAI_API_KEY`, or worker dispatch authority does not grant it. Pass `--transcribe` only when authorized. Otherwise pass `--no-transcribe`, preserve local frames/events/notes analysis, and report the missing transcript limitation. The analyzer returns the authorization source, provider identity, and whether a provider request was sent.

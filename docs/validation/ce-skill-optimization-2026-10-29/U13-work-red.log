@@ -1,0 +1,281 @@
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+FAIL tests/unit/spec-work-outcome-judges.test.js
+  Work outcome judge calibration
+    ✓ unchanged reqonly-plan is a valid stop (104 ms)
+    ✓ unchanged done-plan is a valid stop (91 ms)
+    ✓ unchanged drifted-pack is a valid stop (90 ms)
+    ✕ stop rejects delete (87 ms)
+    ✕ stop rejects edit (90 ms)
+    ✕ stop rejects extra (90 ms)
+    ✕ stop rejects staged (107 ms)
+    ✕ stop rejects amend (111 ms)
+    ✕ stop rejects failure (91 ms)
+    ✕ reverse mismatch preserves existing implementation and plan bytes (135 ms)
+    ✕ README-only edit passes handback without vocabulary-dependent rejection (107 ms)
+    ✕ README task rejects extra-readme scope mutation (77 ms)
+    ✕ README task rejects staged scope mutation (83 ms)
+    ✕ README task rejects server scope mutation (76 ms)
+    ✕ incomplete caller envelope cannot pass even when shipping_skipped=false (96 ms)
+    ✕ incomplete caller envelope cannot pass even when shipping_skipped=true (95 ms)
+    ✕ closeout wording without artifacts and execution trace is insufficient (102 ms)
+
+  ● Work outcome judge calibration › stop rejects delete
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      47 |     if (kind === 'staged') { git('add', 'src/server.js'); git('show', 'HEAD:src/server.js'); }
+      48 |     if (kind === 'amend') git('commit', '--amend', '-qm', 'unauthorized rewrite');
+    > 49 |     expect(judge('check-no-implementation.sh', undefined, { EVAL_EXIT_CODE: kind === 'failure' ? '1' : '0' }).status).toBe(1);
+         |                                                                                                                       ^
+      50 |   });
+      51 |
+      52 |   test('reverse mismatch preserves existing implementation and plan bytes', () => {
+
+      at toBe (tests/unit/spec-work-outcome-judges.test.js:49:119)
+
+  ● Work outcome judge calibration › stop rejects edit
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      47 |     if (kind === 'staged') { git('add', 'src/server.js'); git('show', 'HEAD:src/server.js'); }
+      48 |     if (kind === 'amend') git('commit', '--amend', '-qm', 'unauthorized rewrite');
+    > 49 |     expect(judge('check-no-implementation.sh', undefined, { EVAL_EXIT_CODE: kind === 'failure' ? '1' : '0' }).status).toBe(1);
+         |                                                                                                                       ^
+      50 |   });
+      51 |
+      52 |   test('reverse mismatch preserves existing implementation and plan bytes', () => {
+
+      at toBe (tests/unit/spec-work-outcome-judges.test.js:49:119)
+
+  ● Work outcome judge calibration › stop rejects extra
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      47 |     if (kind === 'staged') { git('add', 'src/server.js'); git('show', 'HEAD:src/server.js'); }
+      48 |     if (kind === 'amend') git('commit', '--amend', '-qm', 'unauthorized rewrite');
+    > 49 |     expect(judge('check-no-implementation.sh', undefined, { EVAL_EXIT_CODE: kind === 'failure' ? '1' : '0' }).status).toBe(1);
+         |                                                                                                                       ^
+      50 |   });
+      51 |
+      52 |   test('reverse mismatch preserves existing implementation and plan bytes', () => {
+
+      at toBe (tests/unit/spec-work-outcome-judges.test.js:49:119)
+
+  ● Work outcome judge calibration › stop rejects staged
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      47 |     if (kind === 'staged') { git('add', 'src/server.js'); git('show', 'HEAD:src/server.js'); }
+      48 |     if (kind === 'amend') git('commit', '--amend', '-qm', 'unauthorized rewrite');
+    > 49 |     expect(judge('check-no-implementation.sh', undefined, { EVAL_EXIT_CODE: kind === 'failure' ? '1' : '0' }).status).toBe(1);
+         |                                                                                                                       ^
+      50 |   });
+      51 |
+      52 |   test('reverse mismatch preserves existing implementation and plan bytes', () => {
+
+      at toBe (tests/unit/spec-work-outcome-judges.test.js:49:119)
+
+  ● Work outcome judge calibration › stop rejects amend
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      47 |     if (kind === 'staged') { git('add', 'src/server.js'); git('show', 'HEAD:src/server.js'); }
+      48 |     if (kind === 'amend') git('commit', '--amend', '-qm', 'unauthorized rewrite');
+    > 49 |     expect(judge('check-no-implementation.sh', undefined, { EVAL_EXIT_CODE: kind === 'failure' ? '1' : '0' }).status).toBe(1);
+         |                                                                                                                       ^
+      50 |   });
+      51 |
+      52 |   test('reverse mismatch preserves existing implementation and plan bytes', () => {
+
+      at toBe (tests/unit/spec-work-outcome-judges.test.js:49:119)
+
+  ● Work outcome judge calibration › stop rejects failure
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      47 |     if (kind === 'staged') { git('add', 'src/server.js'); git('show', 'HEAD:src/server.js'); }
+      48 |     if (kind === 'amend') git('commit', '--amend', '-qm', 'unauthorized rewrite');
+    > 49 |     expect(judge('check-no-implementation.sh', undefined, { EVAL_EXIT_CODE: kind === 'failure' ? '1' : '0' }).status).toBe(1);
+         |                                                                                                                       ^
+      50 |   });
+      51 |
+      52 |   test('reverse mismatch preserves existing implementation and plan bytes', () => {
+
+      at toBe (tests/unit/spec-work-outcome-judges.test.js:49:119)
+
+  ● Work outcome judge calibration › reverse mismatch preserves existing implementation and plan bytes
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      54 |     expect(judge('check-r2-reverse-mismatch.sh', 'Already implemented; plan owner must resolve mismatch.').status).toBe(0);
+      55 |     fs.unlinkSync(path.join(workspace, 'src/server.js'));
+    > 56 |     expect(judge('check-r2-reverse-mismatch.sh', 'Already implemented; plan owner must resolve mismatch.').status).toBe(1);
+         |                                                                                                                    ^
+      57 |   });
+      58 |
+      59 |   test('README-only edit passes handback without vocabulary-dependent rejection', () => {
+
+      at Object.toBe (tests/unit/spec-work-outcome-judges.test.js:56:116)
+
+  ● Work outcome judge calibration › README-only edit passes handback without vocabulary-dependent rejection
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 1
+
+      59 |   test('README-only edit passes handback without vocabulary-dependent rejection', () => {
+      60 |     setup(); rename();
+    > 61 |     expect(judge('check-uncommitted-handback.sh', 'Nothing was committed. Verification succeeded.').status).toBe(0);
+         |                                                                                                             ^
+      62 |     git('commit', '--amend', '-qm', 'same-count unauthorized rewrite');
+      63 |     expect(judge('check-uncommitted-handback.sh').status).toBe(1);
+      64 |   });
+
+      at Object.toBe (tests/unit/spec-work-outcome-judges.test.js:61:109)
+
+  ● Work outcome judge calibration › README task rejects extra-readme scope mutation
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      69 |     if (kind === 'staged') git('add', 'README.md');
+      70 |     if (kind === 'server') fs.appendFileSync(path.join(workspace, 'src/server.js'), '\n// changed\n');
+    > 71 |     expect(judge('check-readme-fixed.sh').status).toBe(1);
+         |                                                   ^
+      72 |   });
+      73 |
+      74 |   test.each([false, true])('incomplete caller envelope cannot pass even when shipping_skipped=%s', (skipped) => {
+
+      at toBe (tests/unit/spec-work-outcome-judges.test.js:71:51)
+
+  ● Work outcome judge calibration › README task rejects staged scope mutation
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      69 |     if (kind === 'staged') git('add', 'README.md');
+      70 |     if (kind === 'server') fs.appendFileSync(path.join(workspace, 'src/server.js'), '\n// changed\n');
+    > 71 |     expect(judge('check-readme-fixed.sh').status).toBe(1);
+         |                                                   ^
+      72 |   });
+      73 |
+      74 |   test.each([false, true])('incomplete caller envelope cannot pass even when shipping_skipped=%s', (skipped) => {
+
+      at toBe (tests/unit/spec-work-outcome-judges.test.js:71:51)
+
+  ● Work outcome judge calibration › README task rejects server scope mutation
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      69 |     if (kind === 'staged') git('add', 'README.md');
+      70 |     if (kind === 'server') fs.appendFileSync(path.join(workspace, 'src/server.js'), '\n// changed\n');
+    > 71 |     expect(judge('check-readme-fixed.sh').status).toBe(1);
+         |                                                   ^
+      72 |   });
+      73 |
+      74 |   test.each([false, true])('incomplete caller envelope cannot pass even when shipping_skipped=%s', (skipped) => {
+
+      at toBe (tests/unit/spec-work-outcome-judges.test.js:71:51)
+
+  ● Work outcome judge calibration › incomplete caller envelope cannot pass even when shipping_skipped=false
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      74 |   test.each([false, true])('incomplete caller envelope cannot pass even when shipping_skipped=%s', (skipped) => {
+      75 |     setup(); rename();
+    > 76 |     expect(judge('check-return-to-caller.sh', JSON.stringify({ status: 'complete', standalone_shipping_skipped: skipped })).status).toBe(1);
+         |                                                                                                                                     ^
+      77 |   });
+      78 |
+      79 |   test('closeout wording without artifacts and execution trace is insufficient', () => {
+
+      at toBe (tests/unit/spec-work-outcome-judges.test.js:76:133)
+
+  ● Work outcome judge calibration › incomplete caller envelope cannot pass even when shipping_skipped=true
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      74 |   test.each([false, true])('incomplete caller envelope cannot pass even when shipping_skipped=%s', (skipped) => {
+      75 |     setup(); rename();
+    > 76 |     expect(judge('check-return-to-caller.sh', JSON.stringify({ status: 'complete', standalone_shipping_skipped: skipped })).status).toBe(1);
+         |                                                                                                                                     ^
+      77 |   });
+      78 |
+      79 |   test('closeout wording without artifacts and execution trace is insufficient', () => {
+
+      at toBe (tests/unit/spec-work-outcome-judges.test.js:76:133)
+
+  ● Work outcome judge calibration › closeout wording without artifacts and execution trace is insufficient
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      79 |   test('closeout wording without artifacts and execution trace is insufficient', () => {
+      80 |     setup(); rename();
+    > 81 |     expect(judge('check-closeout-order.sh', 'verification-run-summary honest-closeout completed.').status).toBe(1);
+         |                                                                                                            ^
+      82 |   });
+      83 | });
+      84 |
+
+      at Object.toBe (tests/unit/spec-work-outcome-judges.test.js:81:108)
+
+Test Suites: 1 failed, 1 total
+Tests:       14 failed, 3 passed, 17 total
+Snapshots:   0 total
+Time:        1.801 s
+Ran all test suites matching /tests\/unit\/spec-work-outcome-judges.test.js/i.

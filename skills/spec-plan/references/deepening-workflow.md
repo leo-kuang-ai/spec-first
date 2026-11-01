@@ -269,3 +269,9 @@ If research reveals a product-level ambiguity that should change behavior or sco
 - Do not silently decide it here
 - Record it under `Open Questions`
 - Recommend `spec-brainstorm` if the gap is truly product-defining
+
+## Integrate at the Owning Decision
+
+Treat each returned concern as a claim under `structure.md` § 3.8. Recheck its evidence, actual consequence and whether the current plan already addresses it. Deduplicate by underlying decision/failure, preserve source refs and record applied, deferred, considered-and-not-built or withdrawn with a reason. Count only current actionable findings in the handoff; dismissed or completed items must not reappear as unresolved work.
+
+Strengthen an existing KTD or unit at its owning entry and cite it elsewhere. Preserve KTD IDs and authentic settlement provenance. Never deduplicate by rewriting the upstream Product Contract, and never treat a self-check as an independent review.

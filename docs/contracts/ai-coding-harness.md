@@ -2,7 +2,7 @@
 
 `spec-first` 的定位是 **AI Coding Harness for spec-driven software engineering**。本文是 `docs/contracts/` 的轻量目录级地图：它命名 Harness 分层、主要 owner 和边界规则，让 workflow 可治理、可观察、可验证，同时避免把 spec-first 变成中心化流程引擎。
 
-本文不是新的 workflow、command、state machine、universal schema，也不替代 `docs/10-prompt/结构化项目角色契约.md`。角色契约仍是系统演化判断基线；本文只映射实现、审查和后续 contract 变更需要遵守的 durable contract surface。
+本文不是新的 workflow、command、state machine、universal schema，也不替代 `docs/methodology/结构化项目角色契约.md`。角色契约仍是系统演化判断基线；本文只映射实现、审查和后续 contract 变更需要遵守的 durable contract surface。
 
 ## Lifecycle scope
 

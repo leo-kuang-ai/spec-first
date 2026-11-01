@@ -1,24 +1,22 @@
 id: trivial-bare-prompt-executes
-title: trivial 裸任务应直接实现完成
+title: A trivial request performs the exact README change
 description: |
-  验证 bare-prompt 复杂度路由的 Trivial 分支:单文件无行为变更的文案修正
-  直接实现,不加任务列表与执行循环;文件级断言 README 已改。
-
+  Compare the final fixture against its explicit pre-task baseline. File bytes,
+  source inventory, HEAD and index are checked; wording alone is not outcome proof.
 input:
   prompt: |
-    （spec-work skill 已安装，请按它工作。）
-    把 README.md 里的标题 "Known rough edges" 改成 "Known limitations",就这一处。
-
+    First run `node prepare-eval.cjs` once to prepare this isolated fixture.
+    Only that preparation may create its baseline commit; it grants no task commit authority.
+    Then use the installed spec-work skill for this request:
+    Change only the README.md heading "Known rough edges" to "Known limitations". Task commits and landing are not authorized.
 context:
   repo_fixture: evals/fixtures/repos/reqonly-plan
   git:
     init: true
     checkout: main
-
 constraints:
   timeout_seconds: 600
   max_turns: 30
-
 judge:
   type: script
   script_path: evals/fixtures/scripts/check-readme-fixed.sh

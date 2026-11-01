@@ -1,0 +1,8 @@
+PASS tests/unit/spec-worktree-contracts.test.js (7.74 s)
+PASS tests/unit/spec-work-execution-strategy-contracts.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       24 passed, 24 total
+Snapshots:   0 total
+Time:        7.793 s
+Ran all test suites within paths "tests/unit/spec-worktree-contracts.test.js", "tests/unit/spec-work-execution-strategy-contracts.test.js".

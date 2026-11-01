@@ -1,0 +1,91 @@
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+FAIL tests/unit/ce-outcome-judge-calibration.test.js
+  CE outcome judge counterexamples and valid controls
+    ✕ spec-commit check-auth-gate.sh preserves the exact index with a real pending edit (132 ms)
+    ✕ spec-commit-push-pr check-desc-only.sh preserves the exact index with a real pending edit (98 ms)
+    ✕ spec-commit-push-pr check-landing-gate.sh preserves the exact index with a real pending edit (109 ms)
+    ✕ Commit grouping requires actual commits containing only the owned file set (41 ms)
+    ○ skipped Plan check-r2-no-code.sh rejects source deletion and untracked implementation
+    ○ skipped Plan routes-to-execution.sh rejects source deletion and untracked implementation
+    ○ skipped Plan product blocker preserves the complete source inventory
+    ○ skipped PRD validation rejects body mutation even with the original marker
+    ○ skipped Simplify check-safety-preserved.sh tests behavior and permits a parsing helper
+    ○ skipped Simplify check-r2-safety-stays.sh tests behavior and permits a parsing helper
+    ○ skipped Simplify no-yield protects the real docs fixture
+    ○ skipped Review applied-fix judge rejects comments and a deny-all implementation
+
+  ● CE outcome judge counterexamples and valid controls › spec-commit check-auth-gate.sh preserves the exact index with a real pending edit
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      103 |     expect(judge(skill, script, 'commit_authorization_missing; landing_authorization_missing.').status).toBe(0);
+      104 |     git('add', 'README.md');
+    > 105 |     expect(judge(skill, script, 'commit_authorization_missing; landing_authorization_missing.').status).toBe(1);
+          |                                                                                                         ^
+      106 |   });
+      107 |
+      108 |   test('Commit grouping requires actual commits containing only the owned file set', () => {
+
+      at toBe (tests/unit/ce-outcome-judge-calibration.test.js:105:105)
+
+  ● CE outcome judge counterexamples and valid controls › spec-commit-push-pr check-desc-only.sh preserves the exact index with a real pending edit
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      103 |     expect(judge(skill, script, 'commit_authorization_missing; landing_authorization_missing.').status).toBe(0);
+      104 |     git('add', 'README.md');
+    > 105 |     expect(judge(skill, script, 'commit_authorization_missing; landing_authorization_missing.').status).toBe(1);
+          |                                                                                                         ^
+      106 |   });
+      107 |
+      108 |   test('Commit grouping requires actual commits containing only the owned file set', () => {
+
+      at toBe (tests/unit/ce-outcome-judge-calibration.test.js:105:105)
+
+  ● CE outcome judge counterexamples and valid controls › spec-commit-push-pr check-landing-gate.sh preserves the exact index with a real pending edit
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      103 |     expect(judge(skill, script, 'commit_authorization_missing; landing_authorization_missing.').status).toBe(0);
+      104 |     git('add', 'README.md');
+    > 105 |     expect(judge(skill, script, 'commit_authorization_missing; landing_authorization_missing.').status).toBe(1);
+          |                                                                                                         ^
+      106 |   });
+      107 |
+      108 |   test('Commit grouping requires actual commits containing only the owned file set', () => {
+
+      at toBe (tests/unit/ce-outcome-judge-calibration.test.js:105:105)
+
+  ● CE outcome judge counterexamples and valid controls › Commit grouping requires actual commits containing only the owned file set
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      109 |     fs.cpSync(path.join(root, 'skills/spec-commit/evals/fixtures/repos/mini-ledger'), workspace, { recursive: true });
+      110 |     git('init', '-q'); git('config', 'user.name', 'Eval Calibration'); git('config', 'user.email', 'eval@example.invalid');
+    > 111 |     expect(judge('spec-commit', 'check-logical-grouping.sh', 'No commit, no grouping.').status).toBe(1);
+          |                                                                                                 ^
+      112 |     git('add', 'README.md', 'package.json', 'src/server.js'); git('commit', '-qm', 'feat: add ledger demo');
+      113 |     expect(judge('spec-commit', 'check-logical-grouping.sh', 'Committed the ledger files as one coherent unit.').status).toBe(0);
+      114 |     fs.writeFileSync(path.join(workspace, 'unowned.txt'), 'foreign');
+
+      at Object.toBe (tests/unit/ce-outcome-judge-calibration.test.js:111:97)
+
+Test Suites: 1 failed, 1 total
+Tests:       4 failed, 8 skipped, 12 total
+Snapshots:   0 total
+Time:        0.507 s, estimated 4 s
+Ran all test suites matching /tests\/unit\/ce-outcome-judge-calibration.test.js/i with tests matching "exact index|Commit grouping".

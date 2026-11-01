@@ -2,6 +2,14 @@
 
 Required read at Phase 0 before gathering evidence. The entrypoint owns target/source boundaries, issue-of-record identity, causal sufficiency, repair authority, dispatch, and the handoff. This reference supplies investigation facts to those decisions; it grants no additional mutation authority.
 
+## Reproduction Instrument
+
+Before a behavior fix, identify the original symptom check by a stable name, exact rerun command or observable steps, controlled input/environment, expected behavior and actual failure evidence. A suspicious line or an unrelated failing assertion is not a reproduction. Prefer the smallest repeatable check that still exercises the real trigger-to-symptom chain; retain the original scenario when minimizing it.
+
+If the symptom cannot run here, record attempted checks, missing conditions and captured source/log evidence. Those can support a working hypothesis, not an observed RED or a verified fix. For a trivial deterministic error the existing failing command can be the whole instrument; no new harness is required.
+
+For slow/timeout/regression symptoms, read the Performance Regressions section of `investigation-techniques.md` before changing behavior. Debug owns broken performance; Optimize owns relative improvement of a working system.
+
 ## Prior work (Phase 1.4)
 
 The project's institutional memory often already holds the bug, its cause, or a prior attempt at the fix. This is distinct from 1.3's live telemetry — here you are looking for recorded *human* work, not runtime evidence.

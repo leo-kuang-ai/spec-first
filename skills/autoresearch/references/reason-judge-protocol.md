@@ -5,25 +5,26 @@
 ```
 Round N:
   1. Author-A generates candidate (or incumbent from previous round)
-  2. Critic attacks candidate — MUST find weaknesses (forced adversarial)
+  2. Critic looks for evidence-supported weaknesses; none is a valid result
   3. Author-B reads task + candidate-A + critique → produces candidate-B
-  4. Synthesizer reads A + B → produces hybrid candidate-AB
-  5. Judge panel receives 3 candidates with randomized labels → picks winner
+  4. Unless debate/no-synthesis mode, synthesizer reads A + B → produces candidate-AB
+  5. Judge panel ranks only produced candidates with randomized labels
   6. Winner becomes incumbent for round N+1
 ```
 
 ## Agent Isolation Rules
 
 - Each agent (Author-A, Critic, Author-B, Synthesizer, Judges) runs COLD START
+- Separate agents require existing dispatch authorization and live capability. Otherwise apply the roles inline, disclose the shared-context limitation, and make no independence claim. A reasoning request alone does not authorize external consultation.
 - No shared session state between agents — prevents sycophancy
 - Agents receive ONLY: task description + relevant candidate(s) + critique
-- Judges receive candidates with randomized labels (Label-X, Label-Y, Label-Z)
-- Judges MUST compare and rank — "all are good" is not a valid verdict
+- Judges receive randomized labels for only the produced candidates, with the label-to-candidate identity map retained by the owner in lineage.md.
+- Judges compare on the stated criteria; ties and insufficient evidence are valid outcomes.
 
 ## Critic Protocol
 
 The critic MUST:
-1. Identify at least 3 specific weaknesses in the candidate
+1. Identify evidence-supported weaknesses without a minimum count; report none when appropriate
 2. Provide concrete evidence for each weakness
 3. Suggest what a superior candidate would do differently
 4. Rate candidate on domain-specific criteria (1-10 scale)
@@ -33,16 +34,16 @@ The critic MUST:
 
 Each judge receives:
 - Task description (identical for all judges)
-- 3 candidates with randomized labels (Label-X, Label-Y, Label-Z)
+- Two candidates (A/B), or three (A/B/AB) only when synthesis ran, with randomized labels
 - Evaluation criteria relevant to the domain
 
 Each judge MUST:
 1. Evaluate each candidate independently on all criteria
-2. Produce a ranking (1st, 2nd, 3rd) with reasoning
-3. Select a winner with one-paragraph justification
+2. Rank the actual candidate set with reasoning; allow ties or insufficient evidence
+3. Justify a supported winner, or explain why no unique winner is supported
 4. Label randomization prevents position bias
 
-Verdict: majority vote. Tie → synthesized candidate (Label-Z) wins.
+Verdict: advisory majority ranking, resolved through the recorded identity map, not label position. On a tie retain a tied incumbent; without one, report the tied set and do not increment convergence. An absent synthesized candidate cannot win. Neither agreement nor convergence substitutes for source facts, task correctness or authorization.
 
 ## Convergence Detection
 

@@ -45,6 +45,14 @@ Record pre-existing dirty tracked and untracked paths. Classify overlap with the
 
 The source of truth is the checked-in source surface named by project instructions and the plan. `.claude/`, `.codex/`, `.agents/skills/`, `.cursor/`, `.kiro/`, `.qoder/`, and other generated runtime surfaces are projections, not source. If runtime drift is the symptom, repair canonical source or generation logic first; run regeneration only when explicitly authorized. Never hand-edit a generated runtime mirror as the source fix.
 
+### Calling spec-worktree for Git fallback
+
+When isolation is required and this run selects Git fallback, Work invokes the internal `spec-worktree` helper. Ordinary inline work does not require a new worktree. Pass caller=`spec-work`, the locked target repo, base/ref or new branch, isolation reason, allowed setup side effects, env-copy authorization, and cleanup ownership. Follow the helper’s current entrypoint to run bundled `worktree-manager.sh detect --json`; inspect `state`, `reason_code`, and actual root/branch. Unknown or nonzero detection stops dependent actions; never bypass the helper with raw `git worktree add`.
+
+For ordinary-checkout/submodule, choose `create` or `isolate` from the task. Reuse an existing linked worktree; use `isolate` there only when switching the target ref is authorized and preserves dirty work. After `Worktree ready: <path>` or `already_checked_out branch=<name> path=<path>`, recheck Git root, HEAD, branch (and upstream for remote-only branches), dirty state, and index. Bind the actual path to `worktree_identity.repo_root`. An already_checked_out result proves location, not authority to overwrite work there.
+
+On failure, record actual fetch, ignore/env, and other setup effects; preserve the directory and WIP. A nonzero exit does not justify claiming zero effects, automatically recreating the worktree, or reverting to the original checkout. Work retains recovery, verification, cleanup, and commit decisions; env copying remains opt-in. This call grants neither worker dispatch nor shared Git index isolation. The authorization and `worker_git_index_enforcement_unavailable` boundaries below still apply.
+
 ## 2. Keep Scope Closed During Discovery
 
 Discovery can refine implementation mechanics without silently changing the contract.
@@ -105,6 +113,8 @@ Fallback reason codes:
 Normalize dispatch, inline, and serial paths as `worker_dispatch_outcome`. Host names and primitive identities may appear only in run-local evidence, never as the Skill's selection rule. Do not promise forked workspaces, uploaded changes, worktree branches, merge behavior, or cleanup commands unless the live response returned those facts.
 
 ## 6. Choose Inline, Serial, Or Bounded Parallel
+
+依赖链上必须顺序执行的单元优先在当前上下文 inline 完成；单独派 worker 无法缩短这段依赖等待。只有当前上下文拥挤且 fresh context 能实质帮助该单元时，才在既有授权与能力门槛满足后采用 serial worker。独立单元仍按下述依赖、争用和隔离事实选择有界并行；不因一个串行单元把整个独立层改为串行。
 
 For an authorized native dispatch, correct a pre-launch argument rejection once without changing the unit packet, isolation, or required capabilities. Capacity-limited work stays queued until a slot frees; repeated zero capacity uses the bounded inline fallback. Other launch failures execute the unit inline under the same packet and verification contract only after confirming no worker launched. Once a worker launches, reconcile its terminal outcome and actual tree before retrying or falling back.
 

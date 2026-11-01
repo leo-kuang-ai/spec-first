@@ -1,0 +1,8 @@
+PASS tests/unit/spec-prototype-contracts.test.js
+PASS tests/integration/spec-prototype-human-journey.integration.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       8 passed, 8 total
+Snapshots:   0 total
+Time:        1.077 s
+Ran all test suites matching /tests\/unit\/spec-prototype-contracts.test.js|tests\/integration\/spec-prototype-human-journey.integration.test.js/i.

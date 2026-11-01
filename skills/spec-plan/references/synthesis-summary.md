@@ -110,7 +110,7 @@ A useful test: read the call-outs aloud. If two or more sound like "and also" ex
 
 Each anti-pattern below produces a call-out that fails the affirmability test. If a candidate call-out matches one of these, it is plan-body content — cut, do not rephrase.
 
-- Names a file path or module name (`internal/artifacts/pii.go`)
+- Lists a file path or module merely to preview implementation. A module may be named when its ownership or placement is the explicit decision the user is weighing
 - Names a flag, env var, or exact env value (`--accept-redaction-list=<finding-id,...>`)
 - Specifies a JSON shape, response format, or exact data structure
 - Names HTTP status codes, event names, or exact error wording
@@ -366,7 +366,7 @@ The Assumptions routing in this section applies only after Phase 0.5 has cleared
 - **Route internal-draft content with mode- and origin-aware shape:**
   - For direct bootstrap or a new unified plan derived from a legacy origin, **Stated** content may populate Product Contract `### Requirements`, **Out-of-scope** content may populate Product Contract `### Scope Boundaries`, and **Inferred** content routes to Planning Contract `### Assumptions`.
   - For brainstorm-sourced requirements-only enrichment, **Stated** content remains byte-preserved in the existing Product Contract, **Out-of-scope** planning deductions route to Planning Contract `### Implementation Scope Boundaries`, and **Inferred** content routes to Planning Contract `### Assumptions`. Do not add a Summary, normalize IDs, or otherwise rewrite the upstream region.
-  - In headless or skipped-confirmation runs, never route Inferred items into Key Technical Decisions or Implementation Units; that would make un-validated bets indistinguishable from user-confirmed decisions.
+  - In headless or skipped-confirmation runs, keep inferred HOW choices explicitly recorded in Assumptions with source, impact and invalidation conditions. KTDs or units may cite that assumption when within authorized planning judgment, but must not relabel it user-confirmed. A true WHAT or launch-blocking architecture question remains blocking; an assumption cannot clear it.
 
 The `### Assumptions` section appears in non-interactive plans and in interactive plans where the user opted into `SKIP_SCOPING_CONFIRM` — both cases proceed without confirming Inferred bets, so those bets must stay visibly labeled. A normal interactive plan doesn't need it (Inferred bets either get user-corrected via call-outs and become Key Technical Decisions, are revised away, or were judged not-fork material by the keep test and dissolved into Implementation Units silently).
 
@@ -395,7 +395,7 @@ For direct bootstrap or a new unified plan derived from a legacy origin:
 |---|---|
 | Summary (stage 2) | Product Contract `### Summary` (1-3 lines prose, forward-looking) — rewrite to plan convention if the chat-time summary used bullets. Solo variant: scope being targeted. Brainstorm-sourced: implementation approach |
 | Stated bullets | Product Contract `### Requirements` (R-IDs) and where relevant `### Problem Frame` for narrative context |
-| Inferred bullets | Planning Contract `### Key Technical Decisions` (with rationale) and Implementation Units when the bet drives a structural choice. In non-interactive mode **or an interactive `SKIP_SCOPING_CONFIRM` skip run**, route to Planning Contract `### Assumptions` instead — both proceed without confirming the bets, so they must stay labeled; see Headless mode above. |
+| Inferred bullets | Planning Contract `### Key Technical Decisions` (with rationale) and Implementation Units when the bet drives a structural choice. In non-interactive mode **or an interactive `SKIP_SCOPING_CONFIRM` skip run**, route to Planning Contract `### Assumptions` instead — both proceed without confirming the bets, so they must stay labeled; KTDs and units may cite the assumption under the Headless mode rules above. |
 | Out-of-scope bullets | Product Contract `### Scope Boundaries` — including the `#### Deferred to Follow-Up Work` subsection when relevant |
 
 For brainstorm-sourced requirements-only enrichment:
@@ -404,7 +404,7 @@ For brainstorm-sourced requirements-only enrichment:
 |---|---|
 | Summary (stage 2) | Goal Capsule or a concise Planning Contract orientation when useful; never the upstream Product Contract |
 | Stated bullets | Remain in the byte-preserved Product Contract; reference stable IDs rather than copying or normalizing text |
-| Inferred bullets | Planning Contract `### Key Technical Decisions` and Implementation Units after normal interactive confirmation; Planning Contract `### Assumptions` in non-interactive or skipped-confirmation runs |
+| Inferred bullets | Planning Contract `### Key Technical Decisions` and Implementation Units after normal interactive confirmation; Planning Contract `### Assumptions` in non-interactive or skipped-confirmation runs, cited by dependent KTDs/units without claiming user approval |
 | Out-of-scope bullets | Planning Contract `### Implementation Scope Boundaries`; product-scope changes return to the owning producer |
 
 No italic capture-context note (e.g., "Captured at Phase 0.7..."). It would leak engineering process into an artifact whose readers do not need that signal.

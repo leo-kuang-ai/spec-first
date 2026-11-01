@@ -1,0 +1,23 @@
+{
+  "artifact_type": "producer-semantic-screening",
+  "independent_review": false,
+  "recovery": {
+    "reason": "check:shared-references exit1 发现两份yaml-schema是distribution copies，canonical owner为skills/_shared/references/yaml-schema.md",
+    "error": "首次实施未识别shared source owner；保留已有检查失败证据，不覆盖历史admissions/receipts",
+    "action": "把同段说明移到shared source，通过sync-shared-references.js同步，再复跑必要检查；无新字段或更改权限",
+    "sources": [
+      "scripts/sync-shared-references.js",
+      "skills/_shared/references/yaml-schema.md",
+      "docs/validation/ce-pull-2026-10-27/logs/resume-shared.log"
+    ]
+  },
+  "limitations": [
+    "整体同步in_progress，无独立审查/fresh-source/真实host或shipping",
+    "此前非canonical命名screening附件被source manifest纳入；保持不可变，最终snapshot重新对账，不伪装为已排除run输出"
+  ],
+  "next_actions": [
+    "继续U4 optimize剩余差额、U3 shipping/work helpers、U5 assembly/research",
+    "继续U9各包、U7-A50和H1-H4行为承载例外",
+    "最终去重/重新资格确认所有历史receipts，完整work return后才推进LFG review/shipping"
+  ]
+}

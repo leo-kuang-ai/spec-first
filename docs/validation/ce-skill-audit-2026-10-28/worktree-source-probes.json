@@ -1,0 +1,26 @@
+{
+  "cases": [
+    {
+      "case": "symlink-worktree-root",
+      "exit_code": 0,
+      "created_outside_repo": true,
+      "stdout": "Isolating feature at /private<temp>/repo/.worktrees/feature\nAdded .worktrees to .gitignore\nHEAD is now at 901a28e fixture\nEnvironment files:\n  Not copied by default. Re-run isolate with --copy-env to opt in.\nDev tool trust:\n  No installed dev-tool trust command applies.\n\nWorktree ready: /private<temp>/repo/.worktrees/feature\nSwitch with: cd /private<temp>/repo/.worktrees/feature\n",
+      "stderr": "Preparing worktree (checking out 'feature')\n"
+    },
+    {
+      "case": "linked-worktree-remote-only-ref",
+      "exit_code": 0,
+      "branch_after": "",
+      "detached": true,
+      "stdout": "Already in an isolated worktree; checking out remote-feature in place.\nWorktree ready: /private<temp>/linked\n",
+      "stderr": "Note: switching to 'origin/remote-feature'.\n\nYou are in 'detached HEAD' state. You can look around, make experimental\nchanges and commit them, and you can discard any commits you make in this\nstate without impacting any branches by switching back to a branch.\n\nIf you want to create a new branch to retain commits you create, you may\ndo so (now or later) by using -c with the switch command. Example:\n\n  git switch -c <new-branch-name>\n\nOr undo this operation with:\n\n  git switch -\n\nTurn off this advice by setting config variable advice.detachedHead to false\n\nHEAD is now at 7f5e5e8 fixture\n"
+    },
+    {
+      "case": "directory-only-ignore-rule",
+      "exit_code": 0,
+      "before": ".worktrees/\n",
+      "after": ".worktrees/\n"
+    }
+  ],
+  "boundary": "仅自动清理的本地fixture；未调用网络、未改目标repo的git/source/runtime"
+}

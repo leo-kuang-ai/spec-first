@@ -45,3 +45,10 @@
 
 1. 先看 [sdd-riper 可集成能力评估](./2026-04-19-sdd-riper-integration-ideation.md)
 2. 再看 [sdd-riper 流程与节点实现借鉴](./2026-04-19-sdd-riper-flow-node-borrowing.md)
+
+## 补充探索记录与维护边界
+
+- [公众号系列选题](./2026-05-27-spec-first-wechat-series-content-ideation.md)。
+- [Harness 架构演化探索](./2026-07-15-ai-coding-harness-architecture-evolution-ideation.html)。
+- 本目录是探索与草稿记录，不表示候选已采纳、文章已发布或方案已执行；表达成稿归入 [marketing](../marketing/README.md)，实施范围进入 [plans](../plans/README.md)。
+- [返回文档总入口](../README.md)。

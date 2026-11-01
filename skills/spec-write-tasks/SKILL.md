@@ -110,7 +110,7 @@ Every run must end with the compact envelope from [Execution Handoff Contract](r
 Required posture:
 
 - include `decision`, `reason_code`, `identity_basis`, `artifact_root`, `source_plan`, `task_pack`, `task_pack_validity`, `deterministic_handoff`, `validity_scope`, `semantic_posture`, `dispatch_authorization`, `validation`, `orientation`, and `next_action`;
-- 🔴 GATE (verification): run `spec-first tasks validate <task-pack-path> --repo <artifact-root> --json` before reporting `deterministic_handoff` or validation fields;
+- 🔴 GATE (verification): run `spec-first tasks validate <task-pack-path> --repo <artifact-root> --json` before reporting `deterministic_handoff` as true or populated validation fields; without a usable CLI result, report `deterministic_handoff: false` and `validation: null` under the reference's unperformed-validation rule;
 - run `spec-first tasks hash <plan-path> --repo <artifact-root> --json` when computing or comparing `source_plan_hash`, and copy its portable `source_plan` field rather than deriving identity from an absolute machine path;
 - 🔴 GATE (verification): never self-report `deterministic_handoff: true` without CLI JSON evidence;
 - 🔴 GATE (handoff): allow `next_action: spec-work-task-pack` only for valid deterministic handoff plus semantic posture `generated-this-run` or `reviewed-existing`;

@@ -1,10 +1,16 @@
 ---
 name: spec-simplify-code
 description: "Simplify recently changed code for clarity, reuse, quality, and efficiency while preserving behavior. Use for tidy/refactor passes; use spec-debug for bugs. Not for new features or behavior changes."
-argument-hint: "[blank to simplify current branch changes, or describe what to simplify]"
+argument-hint: "[blank to simplify current branch changes, or describe what to simplify] [proof-test:<path>]"
 ---
 
 Simplify recently changed code for clarity, reuse, quality, and efficiency while preserving exact behavior. Prioritize readable, explicit code over compact code — fewer lines is not the goal.
+
+## Proof context and caller ownership
+
+A `proof-test:<path>` token names protected verification context, never additional mutation scope. Remove these tokens before resolving scope; accept multiple paths. Paths containing whitespace may be supplied in the caller's structured evidence instead. Consume the caller's verification evidence, source/test refs, limitations and settled decisions alongside the scope. A caller-owned pass returns to that caller without a commit, landing or independent workflow tail.
+
+A request to inspect or suggest improvements is report-only: return findings and evidence without applying fixes. An explicit simplify/refactor request or caller handoff authorizes only its bounded cleanup. Do not infer file mutation from reviewer recommendations.
 
 ## Step 1: Identify scope
 
@@ -23,13 +29,17 @@ resolved scope contains no substantive human-authored code and consists only
 of documentation/Markdown, generated or vendored files, dependency/lockfiles,
 or purely mechanical formatting, lint, or mass-rename churn, stop with a
 one-line `nothing to simplify` result. On a mixed diff, narrow the scope to the
-substantive code files. This is a change-kind gate, not a size threshold, and
+substantive code and test files. This is a change-kind gate, not a size threshold, and
 it never widens beyond caller-authorized paths.
+
+Read imports, callers and nearby implementations to prove equivalence, but reading them does not add them to the mutation scope. Do not consolidate across package or runtime ownership boundaries merely because code resembles a shared helper.
 
 When the caller provides a plan as context, the plan is not additional
 simplification scope. Preserve any `session-settled:` structural decisions:
 deliberately separate implementations or duplicated package-local runtime
 assets remain separate even when consolidation would otherwise look cleaner.
+
+Before the pass, identify the tests used as proof from explicit `proof-test:` paths and the caller/session verification evidence, including unchanged regression and characterization tests. Read their test-only helpers, fixtures and seams; capture their current path and byte identity with tools. Carry the originating unit/task, observed command/log and freshness limitation. Missing or stale evidence is a limitation, not permission to drop protection: preserve all tests added/changed by the current work and their test-only seams until the caller reconciles the proof set. A missing named proof file blocks a verified preservation claim. Do not fabricate an earlier RED result or hash.
 
 ## Step 2: Run 3 review lenses
 
@@ -52,6 +62,8 @@ When authorization is present and the current-session semantic probe yields one 
 - `references/personas/code-quality-reviewer.md` — redundant state, parameter sprawl, copy-paste, leaky abstractions, stringly-typed code, dead code, over-nesting, and the over-simplification balance guard.
 - `references/personas/efficiency-reviewer.md` — unnecessary work, missed concurrency, hot-path bloat, no-op updates, memory leaks.
 
+When the resolved scope includes substantive tests or the caller requests test-quality review, read `references/test-value-lens.md` within the code-quality lens. It is conditional read-only assessment, not a fourth default reviewer, broader mutation scope or permission to weaken proof.
+
 Do not paraphrase these rubrics from memory — read each file and pass it verbatim, or the reviewer loses the gating rules that keep the pass behavior-preserving.
 
 **Bounded dispatch.** When dispatch is authorized and available, queue the three reviewers and launch only as many as the harness accepts at once; treat a concurrency/active-agent-limit error as backpressure (leave the reviewer queued and retry after a slot frees), not as reviewer failure. Inline fallback runs the lenses serially when shared context or edit overlap makes concurrency unsafe.
@@ -62,9 +74,11 @@ Do not paraphrase these rubrics from memory — read each file and pass it verba
 
 ## Step 3: Fix issues
 
-Complete all three review lenses, whether dispatched or inline. Aggregate their findings and fix each issue directly. If a finding is a false positive or not worth addressing, note it and move on. Do not argue with the finding or raise questions to the user, just skip it.
+Complete all three review lenses, whether dispatched or inline. Aggregate their findings; in report-only requests return them without edits. For authorized cleanup, fix each justified in-scope issue. If a finding is a false positive or not worth addressing, note it and move on. Do not argue with the finding or raise questions to the user, just skip it.
 
 Before applying each fix, confirm it preserves behavior: same output for every input, same error behavior, and same side effects and ordering. If a fix can't clear that test, skip it — automated checks in Step 4 don't cover every behavior.
+
+**Protect the proof.** Skip any finding that deletes, weakens, renames, moves, merges or rewrites a proof test or its test-only seam. This includes an otherwise tempting helper cleanup. Production code exercised by those tests may still be refactored within scope when behavior remains equivalent. Protection is scoped to this cleanup pass: a source-backed defect in the test or changed acceptance returns to the caller for evidence reconciliation, not silent assertion weakening. Include these constraints in every reviewer packet or inline lens.
 
 **Never simplify away a safety check.** Input validation at trust boundaries, error handling that prevents data loss, security checks (authorization, escaping, sanitization), and accessibility affordances are not removable boilerplate — preserve them even when a finding frames them as redundant or inline-able. Code that drops one of these is not simpler, it is unfinished. If a proposed simplification would thin or remove one, skip it.
 
@@ -74,8 +88,10 @@ The premise of this skill is that simplification preserves exact functionality. 
 
 **Run typecheck and lint over the full project.** They are usually fast and catch the most common simplification regressions — broken imports, unused exports, dropped type narrowings, dead code other modules still reference.
 
+Compare protected paths and bytes against the pre-pass snapshot. Report any mismatch before claiming preservation; never restore unrelated user edits wholesale. Rerun the named proof tests and the original reproducer when available, even if a changed-path heuristic would omit them. Capture actual commands/results and the current tree identity; earlier green results become stale after a production edit. The caller owns the complete final-tree verification and closeout.
+
 **Run tests:**
-- Run tests scoped to the changed paths. CI runs the full suite on PR — this local check is a fast signal, not the final guarantee. Match scope to blast radius; a 3-line simplification doesn't warrant a 20-minute test run.
+- Run tests scoped to the changed paths. Future CI remains pending until an actual result exists; this local check is a bounded signal. Match scope to blast radius; a 3-line simplification doesn't warrant a 20-minute test run.
 - Broaden scope when the change has obvious wide reach — e.g., a heavily-imported utility was rewritten, or the code-quality reviewer's consolidation/dedup fixes modified shared code. This is a judgment call about ripple risk, not a mechanical rule.
 - If the test runner has no scoping mechanism, run the full suite.
 
@@ -84,6 +100,8 @@ Surface any failure clearly with the failing check name and the relevant output.
 If no test suite, lint, or typecheck is configured, state that explicitly in the summary; do not silently skip verification.
 
 ## Step 5: Summarize
+
+Return the protected proof paths and test-only seams, byte-comparison outcome, evidence origin, rerun results and missing/stale limitations to the caller. Do not mark required proof as passed when it was unavailable.
 
 Briefly summarize what was good vs improved and fixed, including which checks were run and their results. If there were no findings to act on, confirm the code didn't require any changes.
 

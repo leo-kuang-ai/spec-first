@@ -6,20 +6,20 @@ Read `references/schema.yaml`, `references/yaml-schema.md`, and `assets/resoluti
 
 <sequential_tasks>
 
-**WAIT for all Phase 1 inputs to complete before proceeding** — the three research roles (parallel only under authorized dispatch) and, when separately authorized in Full mode, the internal session-history flow, which may stop at `no relevant prior sessions`. An authorization skip is a terminal Phase 1 fact, not an empty permission to inspect private session roots.
+**WAIT for all Phase 1 inputs to complete before proceeding** — parent classification and drafting, the inline or authorized finder result and, when separately authorized in Full mode, the internal session-history flow, which may stop at `no relevant prior sessions`. An authorization skip is a terminal Phase 1 fact, not an empty permission to inspect private session roots.
 
 The orchestrating agent (main conversation) performs these steps:
 
-1. **Collect Phase 1 results from the run artifacts.** Read `context.json`, `solution.md`, `related.json`, and `session-history.md` when that flow ran. Under authorized dispatch, fall back to the subagent's inline return only when its artifact is absent or empty. Under inline fallback, the orchestrator owns both role execution and artifact writes. The artifact is authoritative when present.
+1. **Collect Phase 1 results from the run artifacts.** Read `context.json`, `solution.md`, `related.json`, and `session-history.md` when that flow ran. Under authorized dispatch, fall back to the subagent's inline return only when its artifact is absent or empty. The parent owns classification and drafting in every execution posture. Scratch artifacts are evidence-bearing inputs, not authority above current source or observed session facts. Preserve incomplete-search limitations and inspect the cited existing documents before deciding overlap.
 2. **Check the overlap assessment** from the Related Docs Finder before deciding what to write:
 
    | Overlap | Action |
    |---------|--------|
-   | **High** — existing doc covers the same problem, root cause, and solution | **Update the existing doc** with fresher context (new code examples, updated references, additional prevention tips) rather than creating a duplicate. The existing doc's path and structure stay the same. |
+   | **High** — existing doc covers the same problem, root cause, and solution | **Prepare an update to the existing doc** with verified additions rather than creating a duplicate, if the target is within the authorized capture scope. The existing doc's path and structure stay the same. |
    | **Moderate** — same problem area but different angle, root cause, or solution | **Create the new doc** normally. Flag the overlap for Phase 2.5 to recommend consolidation review. |
    | **Low or none** | **Create the new doc** normally. |
 
-   The reason to update rather than create: two docs describing the same problem and solution will inevitably drift apart. The newer context is fresher and more trustworthy, so fold it into the existing doc rather than creating a second one that immediately needs consolidation.
+   The reason to update rather than create: two docs describing the same problem and solution will inevitably drift apart. Freshness alone does not make new context more trustworthy. Preserve independently supported guidance, unique measurements, failed alternatives and applicability caveats. If the existing corpus already covers the lesson and there is no verified addition, write nothing and report the covering source. If consolidation would require multiple tracked documents or removal of distinct knowledge, recommend scoped Refresh instead of widening capture.
 
    When materially rewriting an existing doc, preserve its file path and unrelated metadata, re-evaluate all classification fields under Classification Contract v2 against current evidence, and add `source_refs` and `invalidation_condition` when absent. Update the solution, code examples, prevention tips, and any stale references. Add a `last_updated: YYYY-MM-DD` field to the frontmatter. Do not change the title unless the problem framing has materially shifted.
 

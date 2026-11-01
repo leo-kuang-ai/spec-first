@@ -7,7 +7,7 @@
 
 ## Diff Summary
 
-<Record PR number when applicable, verified base/head identities, and what changed: new features, modified behavior, new/changed routes, views, components, data flows. 2-6 bullets.>
+<Record PR number when applicable, verified base/head and relevant dirty-file identities, served checkout/build identity or limitation, and what changed: new features, modified behavior, new/changed routes, views, components, data flows. 2-6 bullets.>
 
 ## Personas
 
@@ -37,6 +37,10 @@ flowchart TD
 | 3 |      |                    | Blocked (needs human verify) | | | |
 
 Status values: `Pending`, `Pass`, `Fixed`, `Skipped`, `Blocked (fix authorization)`, `Blocked (needs human verify)`, `Blocked (human decision)`. Start every scenario at `Pending` so this table doubles as the resume checkpoint. Use `uncommitted` when a verified fix exists but commit authorization is missing.
+
+### Applicable Criteria
+
+<For each applicable current plan/project criterion, record source, scenario, observed result and honored/contradicted/not-exercised status. Preserve stale-rule conflicts and unknown coverage without declaring the product wrong by default.>
 
 ## What Was Fixed
 

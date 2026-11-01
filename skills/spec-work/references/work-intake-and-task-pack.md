@@ -36,6 +36,8 @@ If the task pack is invalid, stale, wrong-chain, unverifiable, source-plan-missi
 
 Resolve one existing artifact root that contains the task pack and its `source_plan`. In a parent workspace, do not guess: require the caller/plan/task pack to identify the artifact root and the downstream mutation `target_repo` or per-task repo scope. The two roots may differ.
 
+Consume `execution_focus[].resolved_target_repo` from the validation receipt as a path-check fact. Reconcile it with the authorized mutation repo and current Git identity before executing the task. It must not silently replace the selected target. A changed target declaration or filesystem/link identity requires fresh validation; a missing target in a parent workspace still blocks mutation despite the validator's single-root compatibility fallback.
+
 Run the actual CLI:
 
 ```text
@@ -99,7 +101,7 @@ If the pack omitted a material unit or conflicts with scope/non-goals/KTD, retur
 
 ## 4. Create Task Tracker From The Contract
 
-Use `validation_receipt.task_pack.contract.tasks` and `execution_waves` as the executable task source. Preserve each `task_id` in the platform task subject and carry `source_unit`, `requirement_refs`, dependencies, goal, files, `test_focus`, `done_signal`, `stop_if`, review intent, and repo scope into the bounded worker packet.
+Use `validation_receipt.task_pack.contract.tasks` and `execution_waves` as the executable task source. Preserve each `task_id` in the platform task subject and carry `source_unit`, `requirement_refs`, dependencies, goal, files, `test_focus`, `done_signal`, `stop_if`, review intent, and repo scope into the bounded worker packet. Also carry `context_refs`, `notes` and `risk_note` from the full task object: the abbreviated `execution_focus` view is not a lossless task packet. Reconcile inherited proof-test/seam refs, settled decisions and external/manual done signals with the current source plan; preserve their protection intent in execution and verification evidence. Unbound or stale proof stays explicit and cannot become a synthetic passed check.
 
 Create tasks wave by wave in dependency order. Do not create a parallel task decomposition from the source plan or human-readable Task Cards. Human-readable sections may orient the executor, but they cannot override the validated JSON contract.
 

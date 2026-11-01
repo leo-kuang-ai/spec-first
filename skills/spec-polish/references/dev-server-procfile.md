@@ -9,23 +9,25 @@ Read only when classification resolves to `procfile` and the startup command is 
 
 ## Start command
 
+Select the actual file first: use an existing `Procfile.dev`; otherwise inspect `Procfile` and confirm that its `web:` command is the intended local development entry. Carry that filename as `selected_procfile` into startup, port probing, and the launch stub. A production-oriented Procfile is not automatic startup authority.
+
 Prefer `overmind` when available — it handles socket files, supports hot-restart per process, and is the community default for multi-process dev:
 
 ```bash
-overmind start -f Procfile.dev
+overmind start -f "$selected_procfile"
 ```
 
 Fallback to `foreman` when `overmind` is not installed:
 
 ```bash
-foreman start -f Procfile.dev
+foreman start -f "$selected_procfile"
 ```
 
 If both are missing, prompt the user for the start command rather than guessing.
 
 ## Port
 
-Default: `3000`. Procfile-based projects list their processes in `Procfile.dev`, so the authoritative port comes from the `web:` line:
+Default: `3000`. Procfile-based projects list their processes in the selected file, so its `web:` line supplies a port candidate:
 
 ```
 web: bundle exec puma -p 3000 -C config/puma.rb
@@ -43,14 +45,14 @@ Parse the `web:` line for `-p <n>` or `--port <n>`. If neither is present, fall 
     {
       "name": "Overmind dev",
       "runtimeExecutable": "overmind",
-      "runtimeArgs": ["start", "-f", "Procfile.dev"],
+      "runtimeArgs": ["start", "-f", "{{selected_procfile}}"],
       "port": 3000
     }
   ]
 }
 ```
 
-Substitute `foreman` if `overmind` is unavailable on the user's machine — the stub represents what the user will run, not a canonical recipe.
+Replace `{{selected_procfile}}` with the actual selected filename and `port` with the resolved candidate before writing the stub. Confirm the actual URL from attributed startup and reachability. Substitute `foreman` if `overmind` is unavailable on the user's machine — the stub represents what the user will run, not a canonical recipe.
 
 ## Common gotchas
 

@@ -1,0 +1,22 @@
+{
+  "status": "available",
+  "execution_readiness": "ready",
+  "reason_code": null,
+  "conformance_status": "passed",
+  "repair_scope": "none",
+  "next_action": "",
+  "version": "0.34.0",
+  "binary_identity": {
+    "path": "/opt/homebrew/lib/node_modules/agent-browser/bin/agent-browser-darwin-arm64",
+    "sha256": "sha256:c62c3b9c43330f1800c028bc0155589d50d19b7d2853f516757f3ffab976a179",
+    "size": 10034448
+  },
+  "capabilities": {
+    "required_flags": true,
+    "exact_origin_advertised": true,
+    "exact_origin_confirmed": true,
+    "exact_origin_evidence": "spec-first-conformance",
+    "profile_state_with_allowlist": false
+  },
+  "missing": []
+}

@@ -1,0 +1,46 @@
+{
+  "routing": {
+    "routing": {
+      "schema_version": "workspace-routing-inject.v1",
+      "workspace_root": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-runtime-audit-Y0PZpH/ws",
+      "hosts": [
+        "codex"
+      ],
+      "entries": [
+        {
+          "entry_file": "AGENTS.md",
+          "hosts": [
+            "codex"
+          ],
+          "status": "created",
+          "reason_code": ""
+        }
+      ]
+    },
+    "outside_created": true,
+    "symlink_preserved": true
+  },
+  "exclude": {
+    "result": {
+      "ok": true,
+      "changed": true,
+      "target": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-runtime-audit-Y0PZpH/ws/a/.git/info/exclude"
+    },
+    "outside_created": true
+  },
+  "git_env": {
+    "expected": "f0f6df542cf6d0b72e06490587b45ce4a19d5e47",
+    "foreign": "777d1e0525ecf5c286ce87dd0a6be377128cc7e6",
+    "actual": {
+      "repo_id": "a",
+      "head_sha": "777d1e0525ecf5c286ce87dd0a6be377128cc7e6",
+      "head_state": "commit",
+      "worktree_clean": true,
+      "worktree_fingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "observed": true
+    },
+    "foreign_head_recorded": true
+  },
+  "repair_display": "spec-runtime-setup --only graphify --folder /tmp/path with spaces --repair-host-config",
+  "temp_removed": true
+}

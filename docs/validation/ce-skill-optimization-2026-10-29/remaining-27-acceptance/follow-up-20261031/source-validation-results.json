@@ -1,0 +1,39 @@
+[
+  {
+    "id": "entrypoint-lint",
+    "command": "npm run lint:skill-entrypoints",
+    "exit_code": 0,
+    "log_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-followup-20261031/logs/entrypoint-lint.log"
+  },
+  {
+    "id": "commit-skill-shape",
+    "command": "python3 /Users/kuang/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/spec-commit",
+    "exit_code": 1,
+    "log_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-followup-20261031/logs/commit-skill-shape.log"
+  },
+  {
+    "id": "tasks-skill-shape",
+    "command": "python3 /Users/kuang/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/spec-write-tasks",
+    "exit_code": 0,
+    "log_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-followup-20261031/logs/tasks-skill-shape.log"
+  },
+  {
+    "id": "commit-skill-shape-baseline",
+    "command": "python3 /Users/kuang/.codex/skills/.system/skill-creator/scripts/quick_validate.py .spec-first/workflows/spec-work/spec-first/ce-opt-followup-20261031/before/skills/spec-commit",
+    "exit_code": 1,
+    "log_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-followup-20261031/logs/commit-skill-shape-baseline.log",
+    "disposition": "Generic Codex skill validator rejects the unchanged pre-existing internal-only user-invocable field in both baseline and candidate. Preserve the field; project entrypoint lint owns cross-host/internal skill compatibility."
+  },
+  {
+    "id": "plan-quality",
+    "command": "node node_modules/jest/bin/jest.js --runTestsByPath tests/unit/spec-plan-quality-contracts.test.js --runInBand",
+    "exit_code": 0,
+    "log_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-followup-20261031/logs/plan-quality.log"
+  },
+  {
+    "id": "entrypoint-lint-final",
+    "command": "npm run lint:skill-entrypoints",
+    "exit_code": 0,
+    "log_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-followup-20261031/logs/entrypoint-lint-final.log"
+  }
+]

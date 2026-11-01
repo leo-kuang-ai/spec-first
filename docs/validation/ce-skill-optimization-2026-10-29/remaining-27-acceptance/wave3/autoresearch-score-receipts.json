@@ -1,0 +1,155 @@
+{
+  "created_at": "2026-10-30T06:41:01.711299+00:00",
+  "results": [
+    {
+      "arm": "A",
+      "case": "hard",
+      "command": [
+        "bash",
+        ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/hard.tsv"
+      ],
+      "source_sha256": "290d1627c5f6f42e212966a056f3a0cbe25bc6c4c708e520e92496f8b6ee0955",
+      "exit_code": 0,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  visual: UNAVAILABLE (weight 0.20 renormalized out)\n  performance: subscore 100.0 over 1 cells -> contribution 100.00\nUNAVAILABLE dims: flakiness, resource, visual\nstability_score = 100.00 (threshold 95.0)\nSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "arm": "A",
+      "case": "visual-ui",
+      "command": [
+        "bash",
+        ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/visual-ui.tsv"
+      ],
+      "source_sha256": "290d1627c5f6f42e212966a056f3a0cbe25bc6c4c708e520e92496f8b6ee0955",
+      "exit_code": 0,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  visual: UNAVAILABLE (weight 0.20 renormalized out)\n  performance: subscore 100.0 over 1 cells -> contribution 100.00\nUNAVAILABLE dims: flakiness, resource, visual\nstability_score = 100.00 (threshold 95.0)\nSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "arm": "A",
+      "case": "visual",
+      "command": [
+        "bash",
+        ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/visual.tsv"
+      ],
+      "source_sha256": "290d1627c5f6f42e212966a056f3a0cbe25bc6c4c708e520e92496f8b6ee0955",
+      "exit_code": 1,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  performance: subscore 100.0 over 1 cells -> contribution 60.00\n  visual: subscore 0.0 over 1 cells -> contribution 0.00\nUNAVAILABLE dims: flakiness, resource\nstability_score = 60.00 (threshold 95.0)\nUNSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "arm": "A",
+      "case": "unknown",
+      "command": [
+        "bash",
+        ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/unknown.tsv"
+      ],
+      "source_sha256": "290d1627c5f6f42e212966a056f3a0cbe25bc6c4c708e520e92496f8b6ee0955",
+      "exit_code": 0,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  visual: UNAVAILABLE (weight 0.20 renormalized out)\n  performance: subscore 100.0 over 2 cells -> contribution 100.00\nUNAVAILABLE dims: flakiness, resource, visual\nstability_score = 100.00 (threshold 95.0)\nSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "arm": "A",
+      "case": "stable",
+      "command": [
+        "bash",
+        ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/stable.tsv"
+      ],
+      "source_sha256": "290d1627c5f6f42e212966a056f3a0cbe25bc6c4c708e520e92496f8b6ee0955",
+      "exit_code": 0,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  visual: UNAVAILABLE (weight 0.20 renormalized out)\n  performance: subscore 100.0 over 1 cells -> contribution 100.00\nUNAVAILABLE dims: flakiness, resource, visual\nstability_score = 100.00 (threshold 95.0)\nSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "arm": "B",
+      "case": "hard",
+      "command": [
+        "bash",
+        ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/hard.tsv"
+      ],
+      "source_sha256": "ffa6c913240b72de361752f25f8d28eebffd3fde36a26e99d3ec0d2f81d6d202",
+      "exit_code": 1,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  visual: UNAVAILABLE (weight 0.20 renormalized out)\n  BLOCKING: functional/diff src/app.js:1 Synthetic local fixture\nUNSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "arm": "B",
+      "case": "visual-ui",
+      "command": [
+        "bash",
+        ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/visual-ui.tsv"
+      ],
+      "source_sha256": "ffa6c913240b72de361752f25f8d28eebffd3fde36a26e99d3ec0d2f81d6d202",
+      "exit_code": 1,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  performance: subscore 100.0 over 1 cells -> contribution 60.00\n  visual: subscore 0.0 over 1 cells -> contribution 0.00\nUNAVAILABLE dims: flakiness, resource\nstability_score = 60.00 (threshold 95.0)\nUNSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "arm": "B",
+      "case": "visual",
+      "command": [
+        "bash",
+        ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/visual.tsv"
+      ],
+      "source_sha256": "ffa6c913240b72de361752f25f8d28eebffd3fde36a26e99d3ec0d2f81d6d202",
+      "exit_code": 1,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  performance: subscore 100.0 over 1 cells -> contribution 60.00\n  visual: subscore 0.0 over 1 cells -> contribution 0.00\nUNAVAILABLE dims: flakiness, resource\nstability_score = 60.00 (threshold 95.0)\nUNSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "arm": "B",
+      "case": "unknown",
+      "command": [
+        "bash",
+        ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/unknown.tsv"
+      ],
+      "source_sha256": "ffa6c913240b72de361752f25f8d28eebffd3fde36a26e99d3ec0d2f81d6d202",
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "INVALID_INPUT\nrow 2: unknown classification\n"
+    },
+    {
+      "arm": "B",
+      "case": "stable",
+      "command": [
+        "bash",
+        ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/stable.tsv"
+      ],
+      "source_sha256": "ffa6c913240b72de361752f25f8d28eebffd3fde36a26e99d3ec0d2f81d6d202",
+      "exit_code": 0,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  visual: UNAVAILABLE (weight 0.20 renormalized out)\n  performance: subscore 100.0 over 1 cells -> contribution 100.00\nUNAVAILABLE dims: flakiness, resource, visual\nstability_score = 100.00 (threshold 95.0)\nSTABLE\n",
+      "stderr": ""
+    }
+  ],
+  "input_hashes": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/stable.tsv": "9f2c8f79f1214f54f184d680ac3b1e18669d254582e3a3e411e4ed3c3514ed31",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/unknown.tsv": "b0681d4f7486c59a4eeb059449ec7eeb5305d134dda71a8f30f6cfb5977ea85f",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/visual-ui.tsv": "e592f18f08be03d7c36dc2b2ba50a0bda780b82c1b5eee1d246298a748c51760",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/visual.tsv": "74fb938a93b11b23a67518650271e9788742101cada160c67dee5c1089434c51",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/hard.tsv": "f3491c5907187b07ad2af73aefcb586d222ecc2fe206e3493c8682b990f937a7"
+  },
+  "inputs_unchanged": true,
+  "scratch_cleaned": true,
+  "limitation": "Only scorer process and input preservation exercised; orchestrator check/recovery state remains untested."
+}

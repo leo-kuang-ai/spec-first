@@ -30,7 +30,7 @@ if [[ ! "$OWNER" =~ ^[A-Za-z0-9_.-]+$ ]] || [[ ! "$REPO" =~ ^[A-Za-z0-9_.-]+$ ]]
     exit 1
 fi
 
-BODY=$(cat)
+IFS= read -r -d '' BODY || true
 if [ -z "${BODY//[[:space:]]/}" ]; then
     echo "Error: No body provided on stdin." >&2
     exit 1

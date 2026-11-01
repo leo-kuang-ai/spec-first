@@ -128,7 +128,7 @@ source_baseline: docs/research/2026-09-24-skill-prompt-source-baseline.json
 
 | ID | 当前事实 | 源码依据 | 对方案的影响 |
 | --- | --- | --- | --- |
-| E1 | 已有最小充分、五出口和职责分工原则 | `docs/10-prompt/结构化项目角色契约.md` §1、§3 | 优化不需要新哲学或新状态机 |
+| E1 | 已有最小充分、五出口和职责分工原则 | `docs/methodology/结构化项目角色契约.md` §1、§3 | 优化不需要新哲学或新状态机 |
 | E2 | 旧渐进披露计划标记 completed | `docs/plans/2026-07-30-002-refactor-skill-system-progressive-disclosure-plan.md` metadata、Goal Capsule | 不重启旧计划；仅新建当前缺口试验 |
 | E3 | spec-plan 要求每阶段全文读取，终态 owner 重读 | `skills/spec-plan/SKILL.md` “Phase Reads”、Phase 5.3.8–5.4 | 首个 read-policy 候选 |
 | E4 | spec-work 存在相同 Phase Reads，已有明确 trigger map | `skills/spec-work/SKILL.md` “Phase Reads”“Reference Trigger Map” | 首试点后再评估复用 |
@@ -138,7 +138,7 @@ source_baseline: docs/research/2026-09-24-skill-prompt-source-baseline.json
 | E8 | Claude command 内联 canonical skill body | `src/cli/adapters/claude.js` `renderCommandContent`；`src/cli/plugin-sync.js` `renderRuntimeCommandContent` | 实验检查真实入口，不先改 projection |
 | E9 | AGENTS 治理区由 CLAUDE 派生 | `scripts/sync-instruction-files.js` `deriveInstructionContents` | 未来入口改动从 source 派生，不双份手改 |
 | E10 | measurement-only 已支持身份绑定、A/A 和 A/B 准入 | `skills/spec-optimize/references/measurement-only-calibration.md`；`skills/spec-optimize/scripts/measurement-admission.cjs` | 使用当前实现，不照抄旧“尚不支持”描述 |
-| E11 | 已有明确的 prompt 分类、压缩与评测方法论 | `docs/10-prompt/skill-prompt-设计与优化方法论-v2.md`；专项 companion | 沿用 Body-L1/L2/L3，不新造 P0/P1/P2 |
+| E11 | 已有明确的 prompt 分类、压缩与评测方法论 | `docs/methodology/skill-prompt-设计与优化方法论-v2.md`；专项 companion | 沿用 Body-L1/L2/L3，不新造 P0/P1/P2 |
 | E12 | 根入口仍引用已被勘误的 saturation 结论 | `CLAUDE.md` 开头与 `benchmarks/agentic/REPORT-20260820-sonnet5-saturation.md` 首段冲突 | 先纠偏再冻结公平对照 |
 
 E12 的具体边界：报告 2026-09-20 勘误写明现存数据复算为 60 attempts / 55 valid / 5 excluded；spec arms 只追加各自 SKILL.md；所有 arms 有 NO_RUN；没有支持显著性结论的统计检验。因此不能再引用“完整 36,166 行指令与零指导无差异”作为删除理由。本方案不重写历史原始结果。
@@ -607,9 +607,9 @@ U1–U4 得到可复核结果，U5 有明确推广/不推广裁决，U6 有下�
 
 ### 复用的本地设计资料
 
-- `docs/10-prompt/结构化项目角色契约.md`：使命与权威边界。
-- `docs/10-prompt/skill-prompt-设计与优化方法论-v2.md`：唯一 canonical playbook，本方案不替代。
-- `docs/10-prompt/spec-first-skill-prompt压缩优化组合方法论.md`：四轴证据、成本/质量实验与 promotion。
+- `docs/methodology/结构化项目角色契约.md`：使命与权威边界。
+- `docs/methodology/skill-prompt-设计与优化方法论-v2.md`：唯一 canonical playbook，本方案不替代。
+- `docs/methodology/spec-first-skill-prompt压缩优化组合方法论.md`：四轴证据、成本/质量实验与 promotion。
 - `docs/plans/2026-07-30-002-refactor-skill-system-progressive-disclosure-plan.md`：历史完成计划，本轮只读，不改状态。
 - `docs/research/2026-09-24-ai-industry-trends-claude-prompt-shortening.md`：本会话官方资料调研。
 - `docs/research/2026-09-24-skill-prompt-source-baseline.json`：本次结构事实与 SHA-256。

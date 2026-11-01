@@ -1,0 +1,12 @@
+{
+  "trial": "CEOPT-33-A3",
+  "at": "2026-10-31T05:42:10.423480+00:00",
+  "original_sha256": "c52b19a74b45ad0ae4e75f503c7eeb0524139c7e3bf007c86bcade63124be37b",
+  "source_lines_inclusive": [
+    1,
+    261
+  ],
+  "candidate_sha256": "5d9b170f6edeef14506cd47fdc89bf55ff6032f2c4c31b53e69b04911308f50a",
+  "admission": "Parent reviewed complete original draft; exact contiguous original lines through Regeneration Rules, no semantic edits or executable promotion.",
+  "semantic_observation": "All3 owners preserved, protected tests/seam remain nonmutation inputs and inherited proof intents have owner tasks. Missing configured live exactoperation receipt remains blocked independently of tests/Git. Draft-only and historicalRED limits explicit."
+}

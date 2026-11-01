@@ -23,7 +23,7 @@ A branding-only delta without an explicit request for that change is also a
 no-op. Otherwise present the proposed title, its length, the first two summary
 sentences, and body line count. Apply under already established update intent;
 ask only for an unresolved decision. If the user declines, retain the current
-body. Do not apply a body composed against a different PR or stale scope.
+body. Do not apply a body composed against a different PR or stale scope. Recheck its head/base identity and current title/body against the composition snapshot; a concurrent edit requires reconciliation, not blind replacement. Re-evaluate template and closing semantics before the external write.
 
 ## Explainer Archival
 
@@ -67,15 +67,15 @@ for arbitrary body text. Pass the title as one literal argument, with proper
 shell quoting only if the tool requires a shell command.
 
 ```text
-gh pr create --title <literal-title> --body-file <private-body-file>
-gh pr edit <confirmed-pr-url> --title <literal-title> --body-file <private-body-file>
-gh pr view <confirmed-pr-url> --json title,body,url,headRefOid,baseRefName
+gh pr create --repo <host/owner/repo> --base <base-branch> --head <head-owner>:<head-branch> --title <literal-title> --body-file <private-body-file>
+gh pr edit <confirmed-pr-url> --repo <host/owner/repo> --title <literal-title> --body-file <private-body-file>
+gh pr view <confirmed-pr-url> --repo <host/owner/repo> --json title,body,url,headRefOid,headRefName,headRepository,headRepositoryOwner,baseRefName,baseRefOid
 ```
 
 These are separate calls. Keep the target base repository explicit on forks or
 enterprise hosts. Read the exit code and structured response of each call.
-After create/edit, verify that the remote title/body match the intended content;
-a returned URL alone is insufficient. If a write result is unknown, query the
+After create/edit, verify that the remote title/body match the intended content; also verify the exact base repository/branch and head repository/branch/SHA, and re-evaluate closing references if the target changed.
+A returned URL alone is insufficient. If a write result is unknown, query the
 PR state before any retry to avoid duplicate creation. Clean up only this run's
 temporary files after verification or after preserving necessary failure evidence.
 
@@ -91,3 +91,5 @@ This helper does not own a PR stack, a babysit product, or an automatic watch.
 Do not import `gh stack submit`, CE babysit flags, or merge posture. Return the
 existing `watch_handoff` to the authorized LFG owner, which owns its bounded
 watch and final completion gate.
+
+If the caller supplied pending feedback actions, carry their private handoff reference unchanged with the actual commit/publication observations. Do not paste their raw bodies into the PR, mark them completed, or infer reply/resolution authority from landing. LFG consumes them after fresh publication verification; independent no-code replies have no artificial commit prerequisite.

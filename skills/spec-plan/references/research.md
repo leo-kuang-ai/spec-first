@@ -24,7 +24,7 @@ Prepare a concise planning context summary (a paragraph or two) to pass as input
 
 **Resolve current project orientation first.** Derive stack, dependencies, conventions, and structure from the current target repo/worktree for this run. Record current git identity and dirty state, read root plus applicable scoped instructions directly, and carry direct source refs. Never persist or reuse this orientation across runs, branches, or worktrees. Pass it to `repo-research-analyst` so the analyst can focus on question-specific patterns while still confirming any consequential fact against current source. If git or a required source cannot be read, record the concrete degraded fact and narrow the plan's evidence claims; do not substitute a profile from another source identity.
 
-When dispatch is authorized, read and run these prompt assets in parallel. Under inline fallback, apply the same concise scopes sequentially from current source and keep only the strongest source-backed findings; do not preload their full worker prompts:
+For a Lightweight plan, start with bounded inline reads of the named source and tests; reclassify when the actual risk or contract surface warrants it. If `docs/solutions/` is absent or empty, record that fact and skip the learning researcher. When research dispatch is otherwise warranted and authorized, read and run these prompt assets in parallel. Under inline fallback, apply the same concise scopes sequentially from current source and keep only the strongest source-backed findings; do not preload their full worker prompts:
 
 - `references/agents/repo-research-analyst.md` — scope: **patterns** (the question-specific slice; pass the planning context summary and current-tree orientation, including its source identity and refs).
 - `references/agents/learnings-researcher.md` — pass the planning context summary.
@@ -53,6 +53,10 @@ Collect:
 - **Tools available + user asked but external access or delegation is not authorized**: Do not search. Record the authorization gap and ask only if Slack context is load-bearing to the plan.
 - **Tools available + user didn't ask**: Note in output: "Slack tools detected. Ask me to search Slack for organizational context at any point, or include it in your next prompt."
 - **No tools + user asked**: Note in output: "Slack context was requested but no Slack tools are available. Install and authenticate the Slack plugin to enable organizational context search."
+
+The parent passes the authorized data scope and current source identity into every research leaf and checks the returned refs, freshness and limitations before synthesis. Slack acknowledgments/silence are not product approval; curated skill guidance is not API truth; stale repository profiles are not current-tree facts. If a leaf suggests changing WHAT, preserve the Product Contract and return the conflict to its owner. Missing load-bearing evidence remains open; do not convert a digest into confirmed truth.
+
+**Research return size and provenance.** Prefer a short gist with direct source refs, current identity, limitations and the decision it could change. For substantial evidence, an authorized researcher may write one private run-local dossier and return its exact path plus gist; inline work can use the same shape without creating a file. Do not require a dossier for small findings or create a permanent knowledge artifact here. Read the supporting detail before relying on a consequential claim; an unreadable dossier is missing evidence. Retain durable direct citations in the plan so temporary paths do not become its sole authority. Record actual read/cost receipts when available, otherwise cost is unknown.
 
 #### 1.1b Detect Execution Direction Signals
 
@@ -158,6 +162,10 @@ If the current classification is **Lightweight** and Phase 1 research found that
 
 This ensures flow analysis (Phase 1.5) runs and the confidence check (Phase 5.3) applies critical-section bonuses. Announce the reclassification briefly: "Reclassifying to Standard — this change touches [environment variables / exported APIs / CI config] with external consumers."
 
+#### 1.4c Trace Decision-Critical Existing Behavior
+
+When a choice depends on behavior or rationale not established by pattern research, trace the trigger, state transitions, source owner, failure paths and unresolved links. Reuse sufficient current evidence. Apply `spec-explain` only if it supplies a needed capability under existing authorization; otherwise perform one bounded direct-source trace inline. Code explains current behavior, not necessarily why its original author chose it: attribute rationale to records or label it inferred. Return the trace into planning; it does not change WHAT, authorize execution or end the workflow. Skip when no decision depends on it.
+
 #### 1.5 Flow and Edge-Case Analysis (Conditional)
 
 For **Standard** or **Deep** plans, or when user flow completeness is still unclear, run through authorized dispatch or apply the concise scope below inline. Read the full prompt asset only for authorized dispatch or when the inline analysis exposes a specialized flow question that the concise scope does not cover:
@@ -167,4 +175,4 @@ For **Standard** or **Deep** plans, or when user flow completeness is still uncl
 Use the output to:
 - Identify missing edge cases, state transitions, or handoff gaps
 - Tighten requirements trace or verification strategy
-- Add only the flow details that materially improve the plan
+- Return concerns to `structure.md` § 3.8 before turning them into units; add only flow details that materially improve the plan

@@ -32,7 +32,7 @@ config, teaching-section eligibility, commit authority, and landing authority do
 the apply reference requires the exact accepted path set. Description-only and
 description-update modes never archive repository files.
 
-Use the existing plain-text Spec-First footer rules in the writing reference.
+Resolve the project PR-body contract before teaching, layout or footer choices. Use the writing reference's template precedence and existing-branding preservation rules. Exact-template restrictions suppress optional sections and archival derived solely from them.
 Do not introduce CE branding flags, badges, model slugs, or external image
 requests. Complete Pre-A and Steps A through H for every composition mode.
 The body is written to a temporary file and passed with `--body-file`; never

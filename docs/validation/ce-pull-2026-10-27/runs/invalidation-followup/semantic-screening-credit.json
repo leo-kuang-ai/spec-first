@@ -1,0 +1,20 @@
+{
+  "artifact_type": "producer-semantic-screening",
+  "independent_review": false,
+  "unit_id": "U3",
+  "path": "skills/ce-commit-push-pr/references/pr-description-writing.md",
+  "upstream_reading": "完整 pr-description-writing 净diff（本轮compose+writing输出中 config comment 有截断，writing contributor 段及末尾完整）；本地Pre-A 1-100、Step C/D、Step G/H已回源",
+  "gap": "本地 commit-and-push 已保留作者来源，但 PR body/squash merge 的 contributor credit 尚无 owner 说明",
+  "decision": "在当前 pr-description-writing 增加可回源 contributor credit，既有PR author/新PR shipping identity与Pre-A作者/已有trailers核对；不猜邮箱、不将模型bot署名当human贡献；repo squash策略可核实时末段添加准确trailers，否则仅正文保留；压缩不得删除",
+  "preserved": [
+    "internal helper授权",
+    "不重写历史",
+    "完整range/outcome描述",
+    "保留已有署名",
+    "不创建stack/babysit新产品"
+  ],
+  "limitations": [
+    "source合同修改；真实模型/PR合并效果未运行",
+    "其他U3 shipping文件的合并输出截断，不计本轮完整阅读"
+  ]
+}

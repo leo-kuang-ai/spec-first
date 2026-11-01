@@ -1,0 +1,7 @@
+{
+  "action": "vitals",
+  "exit_code": 0,
+  "stdout": "{\"_boundary\":{\"nonce\":\"12693de76a2df1f7258e203d58941103\",\"origin\":\"http://127.0.0.1:50523/\"},\"data\":{\"cls\":{\"entries\":[],\"score\":0.0},\"fcp\":40.0,\"hydratedComponents\":[],\"hydration\":null,\"inp\":null,\"lcp\":{\"element\":\"h1\",\"size\":18630,\"startTime\":40,\"url\":null},\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":8495911861322482479},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"phases\":[],\"ttfb\":0.2,\"url\":\"http://127.0.0.1:50523/\"},\"error\":null,\"success\":true}\n",
+  "stderr": "",
+  "error": null
+}

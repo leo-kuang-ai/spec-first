@@ -18,12 +18,12 @@ global configurable artifact root.
 - `pulse_value_event` -- string, the value-realization event name
 - `pulse_completion_events` -- comma-separated string of 0-3 event names
 - `pulse_quality_scoring` -- `true` or default `false` (AI products only)
-- `pulse_quality_dimension` -- string scored 1-5 when `pulse_quality_scoring` is true; ignored otherwise
+- `pulse_quality_dimension` -- dimension name and short user-defined scoring anchors in one string, scored 1-5 when `pulse_quality_scoring` is true; ignored otherwise. Legacy names without usable anchors need clarification before numeric scoring
 - `pulse_analytics_source` -- string identifying analytics provider (e.g., `posthog`, `mixpanel`, `custom`)
 - `pulse_tracing_source` -- string identifying tracing provider (e.g., `sentry`, `datadog`, `custom`)
 - `pulse_payments_source` -- string identifying payments provider (e.g., `stripe`, `custom`); omit if not used
 - `pulse_db_enabled` -- `true` or default `false`; when `true`, read-only DB access is part of the pulse
-- `pulse_metric_sources` -- comma-separated `metric=source` pairs giving per-strategy-metric source overrides (e.g., `retention_d7=posthog,nps=delighted`). Strategy metrics not listed fall back to `pulse_analytics_source` and are rendered with a `(default source)` marker so the implicit routing is visible.
+- `pulse_metric_sources` -- comma-separated `metric=source` pairs giving the canonical source for every active strategy metric, including metrics using a class default (e.g., `retention_d7=posthog,revenue=stripe,nps=delighted`). Persist the resolved source identifier rather than relying on inferred metric classes across runs. Missing or conflicting entries in a legacy config remain unresolved: recover a unique mapping only from existing explicit owner evidence, otherwise record `not-run` with `reason_code: metric-source-unresolved` and request the missing mapping. Do not silently route an unmapped revenue metric to analytics. Pending/excluded metrics retain their existing treatment.
 - `pulse_pending_metrics` -- comma-separated string of strategy-doc metric names awaiting instrumentation; rendered as `no data` in each pulse report until instrumentation lands
 - `pulse_excluded_metrics` -- comma-separated string of strategy-doc metric names intentionally excluded from the pulse; the metric stays in `STRATEGY.md` but is not surfaced in pulse reports
 - `pulse_schedule` -- `daily`, `weekly`, `manual`, or `ask-again-after-3-runs`; include time/day if applicable

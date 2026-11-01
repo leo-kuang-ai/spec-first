@@ -20,6 +20,10 @@ These rules apply to every brainstorm, including the universal (non-software) fl
 5. **Use an open-ended question only when the question is genuinely open** - Drop the blocking tool when the answer is inherently narrative, when presented options would steer a diagnostic or introspective answer, or when you cannot write 3-4 genuinely distinct, plausibly-correct options without padding. The test: if you'd be straining to fill the option slots, the question is open — ask it open-ended. Rule 1 still applies: one question per turn.
 6. **Open-ended questions earn their place only when they're specific enough to elicit a substantive answer** - Apply Rule 5 silently: just ask the question, never narrate the form choice. The question must give the user something concrete to anchor on. Good: *"What's the most concrete thing someone's already done about this — paid for it, built a workaround, quit a tool over it?"* — it names what counts as an answer. Too thin: *"What's your take?"* — nothing to bite into, and framings that imply a short answer ("briefly", yes/no) waste the open question the same way.
 
+## Recommendation Scope
+
+Recommend an unrequested addition only when the user's goal or an existing contract requires it, or evidence shows harm would occur before detection and cheap correction. Expensive-to-add-later options deserve an explicit tradeoff, not automatic inclusion. Other ideas remain non-default options or considered-and-not-built with a reason; reserve Deferred for genuinely accepted future work. Recommendations must not narrow the user's requested behavior or waive necessary safeguards.
+
 ## Facts And Decisions
 
 Before putting a question to the user, check whether the current repo, verified source excerpts, or another authorized reachable source can settle it. Look up source facts instead of asking the user to restate them. A running lookup does not block independent product questions; only dependent decisions wait for its result. Product choices remain with the current user. If a source cannot be reached, disclose the specific gap rather than inventing the answer or treating an assumption as confirmed.

@@ -1,0 +1,10 @@
+{
+  "command": [
+    "xcodebuild",
+    "-version"
+  ],
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "xcode-select: error: tool 'xcodebuild' requires Xcode, but active developer directory '/Library/Developer/CommandLineTools' is a command line tools instance\n",
+  "status": "unavailable"
+}

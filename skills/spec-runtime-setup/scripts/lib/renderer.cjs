@@ -1,5 +1,7 @@
 'use strict';
 
+const { renderCommand } = require('./command-display.cjs');
+
 const { providerDisplayFacts } = require('./provider-display.cjs');
 
 const REVIEW_RISK_FLAGS = new Set([
@@ -266,7 +268,8 @@ function renderHumanSummary(
   });
   const repoRoot = runtimeCapabilities.repo_root || (runtimeCapabilities.target && runtimeCapabilities.target.target_root);
   if (execution.overall_status === 'action-required' && providerNeedsInit && repoRoot) {
-    nextActions.push(`推荐：执行完整项目级 setup：MCP_SETUP_HOST=${runtimeCapabilities.host || '<host>'} spec-runtime-setup --only codegraph,graphify --repo "${repoRoot}"`);
+    const targetFlag = runtimeCapabilities.target && runtimeCapabilities.target.target_kind === 'non-git-folder' ? '--folder' : '--repo';
+    nextActions.push(`Run full project setup for host ${runtimeCapabilities.host || '<host>'} (select MCP_SETUP_HOST in your shell):\n${renderCommand(['spec-runtime-setup', '--only', 'codegraph,graphify', targetFlag, repoRoot])}`);
     nextActions.push('仅需生成 setup facts 时使用 --verify-only；仅需本地配置覆盖时使用 --project-config。');
   }
   if (manifest.status === 'stale' || manifest.status === 'missing') {

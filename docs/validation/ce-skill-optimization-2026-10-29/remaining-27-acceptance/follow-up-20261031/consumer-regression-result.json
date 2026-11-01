@@ -1,0 +1,5 @@
+{
+  "command": "node node_modules/jest/bin/jest.js --runTestsByPath tests/unit/spec-commit-scope-regression.test.js tests/unit/spec-write-tasks-contracts.test.js tests/unit/task-pack-command.test.js tests/unit/spec-doc-review-task-pack-contracts.test.js --runInBand",
+  "exit_code": 0,
+  "log_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-followup-20261031/logs/consumer-regression.log"
+}

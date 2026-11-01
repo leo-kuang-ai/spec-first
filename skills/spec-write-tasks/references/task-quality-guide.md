@@ -190,6 +190,10 @@ Use these field-level checks before handing a task pack to `spec-work`:
 - Unbound intent 保持 limitation，不得用占位 command 或 synthetic check 伪装成 task 已具备可执行 verification。
 - Task card 只保留计划语义和验证焦点；`transcribed`、`provider-confirmed`、`source-bound` 与最终 required-proof reconciliation 结果属于 downstream work/review evidence，不在 task pack 中伪造执行状态。
 
+When the plan names proof tests, characterization coverage or test-only seams, preserve their exact source refs in `context_refs`; carry the protection intent and `session-settled:` structural constraints in `notes`, and the expected observation in `test_focus` / `done_signal`. Include every inherited proof intent in the traceability matrix with an owner task or an explicit unbound limitation. `stop_if` names a missing/stale source binding when it prevents execution. These fields do not expand `files` or claim that any test has run. Preserve external/manual done signals as observed-state requirements rather than converting them to Git completion. No new task-pack schema is needed.
+
+Distinguish stopping implementation from withholding completion. Missing source identity, unusable proof bindings or unauthorized effects can prevent implementation; absent live completion evidence belongs in `done_signal` and `risk_note`, and must not automatically prevent implementing or testing that evidence-handling path. If `stop_if` includes a completion condition, name the affected action explicitly. Keep exact protected refs and binding limitations on each affected task, and keep human Task Cards consistent with the canonical JSON.
+
 ## Task Pack Review Checklist
 
 When reviewing a task pack, check:

@@ -35,7 +35,7 @@
 
 ## Required Helper Tools
 
-ffmpeg and ast-grep guidance are required setup helpers；ffmpeg is baseline-blocking，`agent-browser` remains report-only/non-blocking for workflows that need browser automation. Each helper is not an MCP server, has no host config write, and is reported under `"helper_tools"` in setup-owned facts.
+Helper readiness is demand-driven: ffmpeg is required only for selected media work and is not baseline-blocking. ast-grep guidance supports structural navigation; `agent-browser` remains report-only/non-blocking for ordinary workflows, and browser execution still requires its own readiness checks. Each helper is not an MCP server, has no host config write, and is reported under `"helper_tools"` in setup-owned facts.
 
 ## Project Setup Facts
 

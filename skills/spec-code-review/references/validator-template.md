@@ -52,28 +52,33 @@ Your task is to answer three questions:
 
 3. **Is the issue not handled elsewhere?** Look for guards in callers, middleware in the request chain, framework defaults, type system constraints, or parallel handlers that already address the concern. If the issue is functionally prevented by surrounding infrastructure, the finding is invalid.
 
-Return ONLY this JSON, no prose:
+## 三态裁决与敏感风险
 
-```json
-{
-  "validated": true | false,
-  "reason": "<one sentence explaining the verdict>"
-}
-```
+返回 `status: confirmed | rejected | unresolved`、`protected_subject`（下列 key 或 null）及 `reason`，不返回旧的 `validated` boolean。
 
-Examples:
+按实际声称的失败分类，读取 title、body 和影响，不以关键词分类：
+- `memory-safety`：分配、缓冲区、越界、释放后使用、无效内存或空指针。
+- `concurrency`：影响可观察行为的锁、原子性、数据竞争或顺序保证。
+- `data-loss`：删除、截断、覆盖或不可逆迁移与回填。
+- `authorization-authentication`：身份、所有权、权限、session/token 或特权边界。
+- `injection`：不可信数据跨信任边界改变 SQL、命令、模板、路径或 markup；拼接字符串本身不是漏洞证明。
+- `public-contract`：有真实外部 consumer 的响应、错误、默认值或签名兼容性；内部 export 或有意变更本身不是缺陷。
+- `secrets-exposure`：凭据、token、私钥或个人信息泄漏到源码、日志、URL、响应或构建产物。
+- `cryptography`：算法、密码散列、key/salt/IV、验证、随机性或 primitive 误用破坏安全保证。
 
-- `{ "validated": true, "reason": "Cited line is new in this diff and lacks the ownership guard used by parallel controllers." }`
-- `{ "validated": false, "reason": "Line 87 already guards user.email with .present? check; the null deref the finding describes cannot occur." }`
-- `{ "validated": false, "reason": "Cited line dates to 2024-08 (pre-existing); diff does not modify or interact with it." }`
-- `{ "validated": false, "reason": "Framework handles the timeout case via Faraday default; no application-level retry needed." }`
+只有已检查证据证明问题真实、由本 diff 引入或新暴露、且周边防护不阻止它时，才 `confirmed`。不得因缺少反证而确认。说明触发条件和可达 caller/input；发生频率未测量时说明，不能伪造 incidence。
 
-Rules:
-- Be honest. If the original reviewer was right, validate. If they were wrong, reject. Conservative bias is preferred — when in doubt, reject.
-- Do not invent new findings. Your scope is this one finding; surface anything else as a no-vote with reason.
-- Do not edit, commit, push, or modify any files. You are operationally read-only.
-- If you cannot read the cited file, return `{ "validated": false, "reason": "Could not access file path to verify." }` rather than guessing.
-- Return JSON only. No prose, no markdown, no explanation outside the JSON object.
+敏感风险只能依据具体反证 `rejected`：引用反驳 claim 的 file:line、适用版本与配置的官方保证、证明是无关既有行为的 commit provenance，或区分该 claim 的测试。测试反证须说明 reviewed revision、runtime/version、配置、触发条件、断言及实际结果；泛化的绿色 suite 或假设 framework 会处理均不是反证。缺少反证且仍不确定时返回 `unresolved`，说明缺口。命名偏好涉及 token 一词不自动受保护；分类也不能取消原始 claim 实际拥有的保护。
+
+非敏感项在充分检查后可因 claim 无依据而 `rejected`；未完成必要检查与已检查但不支持 claim 不同。任何类别无法访问文件或必要上下文、超时或预算耗尽均返回 `unresolved`，不得猜测。不要提高 severity/confidence 来保留风险，也不要新造 finding。
+
+只返回一个 JSON 对象，例如：
+
+{ "status": "confirmed", "protected_subject": "authorization-authentication", "reason": "已检查的新 handler 缺少同类 caller 的所有权校验，攻击者可到达该分支。" }
+{ "status": "rejected", "protected_subject": "memory-safety", "reason": "src/example.js:87 的显式 null guard 阻止了 claim 中的解引用。" }
+{ "status": "unresolved", "protected_subject": null, "reason": "无法访问 reviewed head 的必要文件，未能完成核查。" }
+
+禁止修改文件、应用状态、commit、push 或外发；只使用当前授权内的非变更检查。返回 JSON，不包含 Markdown 或额外说明。
 ```
 
 ## Variable Reference

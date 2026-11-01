@@ -45,6 +45,7 @@ The run-dir file remains the complete standalone document; the fragment is a re-
 
 1. Ask nothing extra if the user already named a path; otherwise accept the path from their menu answer's free-text.
 2. Copy the artifact out of the run dir to that path (`cp "$RUN_DIR/explainer.html" <path>` — or `explainer.md` for a markdown run), creating parent directories if needed.
+   For Markdown, resolve source links from the final destination; rebase and verify them when relocation changes their meaning. If the caller saves the artifact at an unknown path, retain full repo-relative source pointers as plain text.
 3. Where the platform exposes a browser-opening primitive (`open` on macOS, `xdg-open` on Linux, `start` on Windows), offer to open it; otherwise print the absolute path.
 
 ## Send to Thinkroom

@@ -752,6 +752,7 @@ function runDiagnostic(context, repoRoot) {
   const snapshot = readSetupSnapshot({ repoRoot });
   const projectStatus = inspectProjectConfig({
     repoRoot,
+    targetKind: context.target.target_kind,
     templatePath: path.join(context.skillRoot, 'references', 'config-template.yaml'),
   });
   const payload = renderDiagnostic({

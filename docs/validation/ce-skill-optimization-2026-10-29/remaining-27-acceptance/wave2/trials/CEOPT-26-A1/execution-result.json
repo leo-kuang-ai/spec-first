@@ -1,0 +1,53 @@
+{
+  "trial": "CEOPT-26-A1",
+  "recorded_at": "2026-10-31T05:08:36.843448+00:00",
+  "no_change_proposal": true,
+  "candidate_sha256": "60fcede431e7da0426edd494e69a0680e4f6b3dd786e373d942872ce7a4c0716",
+  "syntax": {
+    "argv": [
+      "node",
+      "--check",
+      "src/server.js"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "",
+    "timed_out": false
+  },
+  "proof": {
+    "argv": [
+      "node",
+      "--test",
+      "test/entries.test.cjs"
+    ],
+    "exit_code": 0,
+    "stdout": "TAP version 13\n# Subtest: invalid entries are rejected and valid entries survive without a server crash\nok 1 - invalid entries are rejected and valid entries survive without a server crash\n  ---\n  duration_ms: 99.41975\n  type: 'test'\n  ...\n1..1\n# tests 1\n# suites 0\n# pass 1\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 153.645209\n",
+    "stderr": "",
+    "timed_out": false
+  },
+  "protected_before": {
+    "prepare-eval.cjs": "0bb64e398f2c01fdbad21c92d0e3a3223d73b245e58118a4505f43794af1a69b",
+    "README.md": "4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855",
+    "package.json": "966fdf6bda7b2bf2bd70b9c42ddcbd4f2411804e4a22de7ff0ef161db16ddcad",
+    "test/entries.test.cjs": "04bc52452e6a611d0609d28002ea50937126dcf5466e5a40c22727c6726623cf",
+    "test/support/ledger-proof.cjs": "621f7beb407ab683a34577ab28393256b3736ef4f9c4cc2601ed1785a2169c05"
+  },
+  "protected_after": {
+    "prepare-eval.cjs": "0bb64e398f2c01fdbad21c92d0e3a3223d73b245e58118a4505f43794af1a69b",
+    "README.md": "4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855",
+    "package.json": "966fdf6bda7b2bf2bd70b9c42ddcbd4f2411804e4a22de7ff0ef161db16ddcad",
+    "test/entries.test.cjs": "04bc52452e6a611d0609d28002ea50937126dcf5466e5a40c22727c6726623cf",
+    "test/support/ledger-proof.cjs": "621f7beb407ab683a34577ab28393256b3736ef4f9c4cc2601ed1785a2169c05"
+  },
+  "protected_files_preserved": true,
+  "passed": true,
+  "parent_intervention": "Exact JSON candidate extracted after manual admission; fixed unchanged HTTP proof run in disposable storage. No model commands executed or candidate repairs applied.",
+  "limitations": [
+    "Parent execution does not prove autonomous mutation.",
+    "Fixture HTTP proof does not establish all behavioral equivalence; source review remains required."
+  ],
+  "cleanup": {
+    "root": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-simplify-exec-qs19qaha",
+    "removed": true
+  }
+}

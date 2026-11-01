@@ -1,0 +1,55 @@
+{
+  "reviewer": "review_evidence",
+  "findings": [],
+  "residual_risks": [
+    "The mechanical judge intentionally does not establish truthful release wording. Independent semantic evaluation remains required and is explicitly documented.",
+    "Recorded trace checks do not prove complete absence of external effects."
+  ],
+  "testing_gaps": [
+    "This reviewer performed read-only source and hash verification, without executing tests.",
+    "Real-model wording quality remains unverified; local regression results do not establish behavioral quality."
+  ],
+  "fix_disposition": {
+    "finding": "Rejects explicitly negated deployment claims",
+    "status": "resolved",
+    "basis": [
+      "The canonical source and generated judge remove only the blanket draft-content regex; no replacement semantic regex was introduced.",
+      "Structured delivery_status, provider_attempt, draft count/channel/content shape, protected fixture state, and recorded-call guards remain.",
+      "The regression includes the exact truthful fixture sentence and rejects both declared released status and a recorded Spiral call.",
+      "The case explicitly requires independent semantic review of both draft bodies against source delivery facts.",
+      "Inspected parent-produced logs record RED with 1 failed and 5 passed tests, followed by GREEN with 5 suites and 28 tests passed."
+    ]
+  },
+  "coverage": [
+    {
+      "path": "scripts/evals/ce-u28-outcomes.cjs",
+      "status": "reviewed",
+      "sha256": "5ccddf766a754132490b56775674a3d5aa1be59e34f65c59dd2a52aaec0c3325",
+      "matched": true
+    },
+    {
+      "path": "skills/spec-promote/evals/fixtures/scripts/check-unreleased-local-drafts.sh",
+      "status": "reviewed",
+      "sha256": "097d4bbe47a4c10638e8e45e5dad70947e2ec924f0a728e62757ad59efdf2039",
+      "matched": true
+    },
+    {
+      "path": "skills/spec-promote/evals/cases/check-unreleased-local-drafts.yaml",
+      "status": "reviewed",
+      "sha256": "f6889a03b17982d4fcd730be44f9c51fcd13e7f65e173fffaf4bd99219f588cd",
+      "matched": true
+    },
+    {
+      "path": "tests/unit/ce-u28-outcome-calibration.test.js",
+      "status": "reviewed",
+      "sha256": "f162270acc50dfb2a445fa85ae68d958063f4a81422f8450cca03c73b25c642a",
+      "matched": true
+    },
+    {
+      "path": "CHANGELOG.md",
+      "status": "reviewed",
+      "sha256": "8c5c469fae665d3a97532fa86ca83e7918ea262d3e3539f9da81b0a0867f5310",
+      "matched": true
+    }
+  ]
+}

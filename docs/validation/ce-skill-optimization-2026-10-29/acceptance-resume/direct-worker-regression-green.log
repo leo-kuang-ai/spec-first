@@ -1,0 +1,14 @@
+
+> spec-first@1.15.3 test:jest
+> jest --runTestsByPath tests/unit/spec-pov-worker-admission.test.js tests/unit/spec-code-review-peer-runner.test.js tests/unit/spec-doc-review-contracts.test.js tests/unit/review-peer-expansion-contracts.test.js --runInBand
+
+PASS tests/unit/spec-pov-worker-admission.test.js
+PASS tests/unit/spec-doc-review-contracts.test.js
+PASS tests/unit/spec-code-review-peer-runner.test.js
+PASS tests/unit/review-peer-expansion-contracts.test.js
+
+Test Suites: 4 passed, 4 total
+Tests:       82 passed, 82 total
+Snapshots:   0 total
+Time:        1.905 s, estimated 5 s
+Ran all test suites within paths "tests/unit/spec-pov-worker-admission.test.js", "tests/unit/spec-code-review-peer-runner.test.js", "tests/unit/spec-doc-review-contracts.test.js", "tests/unit/review-peer-expansion-contracts.test.js".

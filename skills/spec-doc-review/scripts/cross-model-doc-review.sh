@@ -8,6 +8,12 @@ umask 077
 log() { printf '[cross-model] %s\n' "$*" >&2; }
 fail() { log "$*"; exit 1; }
 
+require_authenticated_serving_channel() {
+  # File receipts cannot authenticate a provider. Keep both entrypoints closed
+  # until the runner's authenticated channel and worker-bound authority exist.
+  fail "provider_serving_receipt_unverified (authenticated producer channel disabled)"
+}
+
 resolve_python() {
   local candidate
   for candidate in python3 python; do
@@ -84,6 +90,7 @@ PY
 }
 
 worker_main() {
+  require_authenticated_serving_channel
   local peer="${1:-}" model="${2:-}" repo_root="${3:-}" packet="${4:-}" out="${5:-}"
   case "$peer" in codex|claude) ;; *) fail "unsupported peer provider" ;; esac
   [ -n "$model" ] || fail "worker model is missing"
@@ -117,14 +124,14 @@ worker_main() {
       reviewer: $reviewer,
       findings: .findings,
       residual_risks: (.residual_risks // []),
-      testing_gaps: (.testing_gaps // [])
+      deferred_questions: (.deferred_questions // [])
     } else empty end
   ' "$raw_file" >"$normalized" || fail "peer output normalization failed"
   jq -e '
     (.reviewer | type == "string") and
     (.findings | type == "array") and
     (.residual_risks | type == "array") and
-    (.testing_gaps | type == "array")
+    (.deferred_questions | type == "array")
   ' "$normalized" >/dev/null || fail "peer output failed the reviewer return contract"
   mv "$normalized" "$out"
 }
@@ -155,7 +162,7 @@ jq -e '
   .verification_status == "unverified" and
   .reason_code == "authenticated-producer-unavailable"
 ' "$SERVING_RECEIPT" >/dev/null 2>&1 || fail "provider_serving_receipt_invalid"
-fail "provider_serving_receipt_unverified"
+require_authenticated_serving_channel
 ACTUAL_PROVIDER="$(jq -er '.actual_provider | select(type == "string" and length > 0)' "$SERVING_RECEIPT")" ||
   fail "provider_serving_receipt_invalid"
 ACTUAL_MODEL="$(jq -er '.actual_model | select(type == "string" and length > 0)' "$SERVING_RECEIPT")" ||

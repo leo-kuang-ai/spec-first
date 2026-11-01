@@ -27,6 +27,14 @@ This skill runs for hours. Context windows compact, sessions crash, and agents r
 
 7. **Never present results to the user without writing them to disk first** — the pattern is: measure -> write to disk -> verify -> THEN show the user. Not the reverse.
 
+### Comparison identity and authorization provenance
+
+Use the optional `comparisons` records described in the log schema for new runs. One record identifies one reference/candidate/workload/protocol pairing. A new source, workload, rubric, environment or measurement protocol starts a distinct record; additional samples only extend the identical pairing, preserving earlier raw results. Record exact source bytes or a clean revision plus relevant input digests: a shared HEAD cannot identify two different uncommitted trees. Standalone, integrated and original-baseline-to-final results stay separate, as do selection and holdout. Record the actual measuring actor and environment; a new label, seed or process ID alone does not establish independence.
+
+Persist the original opportunity before dispatch and retain it unchanged beside results. Missing historical forecasts, identities or raw samples remain unrecorded. Never backfill them from the winning result. The numeric decider still consumes the existing baseline/candidate payload, selected from the exact comparison; it does not authenticate these provenance records.
+
+Record the actual authorization source, saved spec digest and applicable caps in the existing run evidence before work. User approval and delegated owner decisions are distinct provenance. Resume reuses authority that still covers the scope; a changed digest requires reconciliation of changed effects and protocol, not invented approval or blanket reapproval. Preserve incompatible run evidence and start a separate run when measurement semantics change.
+
 ### Mandatory Disk Checkpoints
 
 These are non-negotiable write-then-verify steps. At each checkpoint, the agent MUST write the specified file and then read it back to confirm the write succeeded.

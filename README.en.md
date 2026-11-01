@@ -15,7 +15,7 @@ Its current position is an **AI-enhanced SDLC / SDD workflow harness**. It turns
 [![license](https://img.shields.io/npm/l/spec-first.svg)](https://github.com/leo-kuang-ai/spec-first/blob/master/LICENSE)
 [![Website](https://img.shields.io/badge/website-spec--first.cn-blue)](http://spec-first.cn/)
 
-[简体中文](README.md) | [English](README.en.md) | [User Manual](docs/05-用户手册/README.md) | [Website](http://spec-first.cn/)
+[简体中文](README.md) | [English](README.en.md) | [User Manual](docs/user-guide/README.md) | [Website](http://spec-first.cn/)
 
 </div>
 
@@ -67,7 +67,7 @@ spec-first doctor
 spec-first init --codex -y -u <name> --lang <zh|en>
 ```
 
-Initialization previews managed runtime files before writing and does not stage or commit them. See the [full quick start guide](docs/05-用户手册/01-快速开始.md) for multi-host, non-Git, dry-run, and preview-host usage.
+Initialization previews managed runtime files before writing and does not stage or commit them. See the [full quick start guide](docs/user-guide/01-快速开始.md) for multi-host, non-Git, dry-run, and preview-host usage.
 
 ### 2. Run your first workflow
 
@@ -147,7 +147,7 @@ Workflows invoke these helpers with the required authorization. They are not rec
 | `spec-commit` | Scoped commits under existing commit authorization |
 | `spec-commit-push-pr` | Commit, push, and PR creation or updates under existing landing authorization |
 
-When unsure, let `using-spec-first` select one matching entrypoint. Use these Skills inside the host session, not as `spec-first` shell subcommands; invocation syntax depends on host discovery. See the [public entrypoint and Skill catalog](docs/05-用户手册/24-公开入口与Skill目录.md) for detailed boundaries.
+When unsure, let `using-spec-first` select one matching entrypoint. Use these Skills inside the host session, not as `spec-first` shell subcommands; invocation syntax depends on host discovery. See the [public entrypoint and Skill catalog](docs/user-guide/24-公开入口与Skill目录.md) for detailed boundaries.
 
 ## From Prompt to Trusted Change
 
@@ -208,7 +208,7 @@ The division is simple: **scripts prepare facts, LLMs make semantic judgments, a
 - Providers and historical artifacts are advisory inputs with provenance, freshness, and limitations until confirmed against source evidence.
 - Long-running or high-impact work needs scope, checkpoints, stop conditions, recovery points, and independent verification.
 
-See the [project role contract](docs/10-prompt/结构化项目角色契约.md), [source/runtime boundary](docs/contracts/source-runtime-customization-boundary.md), [verification summary contract](docs/contracts/verification/verification-run-summary.md), and [honest closeout contract](docs/contracts/workflows/honest-closeout.md).
+See the [project role contract](docs/methodology/结构化项目角色契约.md), [source/runtime boundary](docs/contracts/source-runtime-customization-boundary.md), [verification summary contract](docs/contracts/verification/verification-run-summary.md), and [honest closeout contract](docs/contracts/workflows/honest-closeout.md).
 
 ## Host Support
 
@@ -261,9 +261,9 @@ MIT licensed.
 
 ## Documentation
 
-- [User Manual](docs/05-用户手册/README.md)
+- [User Manual](docs/user-guide/README.md)
 - [Runtime Capability Catalog](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/catalog/runtime-capabilities.md)
-- [Project Role Contract](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/10-prompt/%E7%BB%93%E6%9E%84%E5%8C%96%E9%A1%B9%E7%9B%AE%E8%A7%92%E8%89%B2%E5%A5%91%E7%BA%A6.md)
+- [Project Role Contract](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/methodology/%E7%BB%93%E6%9E%84%E5%8C%96%E9%A1%B9%E7%9B%AE%E8%A7%92%E8%89%B2%E5%A5%91%E7%BA%A6.md)
 
 ## Community
 

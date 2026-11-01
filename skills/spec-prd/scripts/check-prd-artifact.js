@@ -98,7 +98,7 @@ const LEGAL_DISPOSITIONS = new Set([
 const SOURCE_DISPOSITIONS = new Set(['source-resolved', 'source-backed-non-what-assumption']);
 const OWNER_DISPOSITIONS = new Set(['owner-answered', 'owner-capped', 'owner-accepted-assumption']);
 
-// how-pushdown 误分类词表(冻结契约,扩展须加 fixture):命中且 claims-ready 即三重合取矛盾。
+// Vocabulary hits are advisory navigation, never proof of a WHAT/HOW contradiction.
 const WHAT_TOUCHING_KEYWORDS = [
   'interface', '接口', 'availability', '可用性', 'permission', '权限',
   'scope', '范围', 'source-of-truth', '数据权威', 'fallback', '降级',
@@ -795,13 +795,12 @@ function analyzeOutstandingQuestions(lines, headings, options) {
         facts.open_oq_without_owner_closure_count += 1;
         if (claimsReady) reasonCodes.add('open_oq_without_owner_closure');
       }
-      // how-pushdown 残余旋钮:命中 WHAT 词表
-      if (disposition === 'implementation-only-how-pushdown' && hitsWhat) {
-        if (claimsReady) {
+      if (disposition === 'implementation-only-how-pushdown') {
+        if (hitsWhat) facts.possible_misclassified_how_pushdown_count += 1;
+        // Only explicit contradictory declarations support a deterministic blocker.
+        if (claimsReady && invents === true) {
           facts.how_pushdown_touches_what_count += 1;
           reasonCodes.add('how_pushdown_touches_what');
-        } else {
-          facts.possible_misclassified_how_pushdown_count += 1;
         }
       }
     }
@@ -1270,9 +1269,11 @@ function computeFacts(structure, inputPaths, options) {
     : 0;
   const inputScan = scanInputDesignRefs(inputPaths, projectRoot);
   const inputsHash = computeInputsHash(inputPaths, { projectRoot });
-  const readyReceiptCurrent = structure.readyReceiptPresent
-    && structure.frontmatter.fields.readiness_prd_hash === structure.prdHash
+  const readyReceiptPrdCurrent = structure.readyReceiptPresent
+    && structure.frontmatter.fields.readiness_prd_hash === structure.prdHash;
+  const readyReceiptInputsCurrent = structure.readyReceiptPresent
     && structure.frontmatter.fields.readiness_inputs_hash === inputsHash;
+  const readyReceiptCurrent = readyReceiptPrdCurrent && readyReceiptInputsCurrent;
   const oqAnalysis = analyzeOutstandingQuestions(structure.lines, structure.headings, {
     claimsReady: structure.claimsReady,
     clarificationAskedOwner: structure.clarificationEvidenceValue === 'asked-owner',
@@ -1316,6 +1317,8 @@ function computeFacts(structure, inputPaths, options) {
     ready_claim_present: structure.claimsReady,
     ready_receipt_present: structure.readyReceiptPresent,
     ready_receipt_current: readyReceiptCurrent,
+    ready_receipt_prd_current: readyReceiptPrdCurrent,
+    ready_receipt_inputs_current: readyReceiptInputsCurrent,
     ready_receipt_prd_hash: structure.prdHash,
     ready_receipt_inputs_hash: inputsHash,
     // blocking_reason_codes / blocking_finding_count:由 buildReport 在 findings 收集后填入

@@ -1,0 +1,175 @@
+{
+  "status": "parent-source-review-awaiting-independent-review",
+  "A": {
+    "passed": 37,
+    "failed": 25
+  },
+  "B": {
+    "passed": 62,
+    "failed": 0
+  },
+  "failures": [
+    {
+      "suite": "task-pack-command.test.js",
+      "test": "spec-first tasks command rejects existing task paths that traverse a symlink",
+      "classification": "executed-behavior-regression",
+      "interpretation": "Actual validator/writer result differs under the same driver. Assertions after the first failure were not reached in A."
+    },
+    {
+      "suite": "task-pack-command.test.js",
+      "test": "spec-first tasks command rejects future task paths that traverse a symlink",
+      "classification": "executed-behavior-regression",
+      "interpretation": "Actual validator/writer result differs under the same driver. Assertions after the first failure were not reached in A."
+    },
+    {
+      "suite": "task-pack-command.test.js",
+      "test": "spec-first tasks command rejects dangling task paths that traverse a symlink",
+      "classification": "executed-behavior-regression",
+      "interpretation": "Actual validator/writer result differs under the same driver. Assertions after the first failure were not reached in A."
+    },
+    {
+      "suite": "task-pack-command.test.js",
+      "test": "spec-first tasks command rejects leaf task paths that traverse a symlink",
+      "classification": "executed-behavior-regression",
+      "interpretation": "Actual validator/writer result differs under the same driver. Assertions after the first failure were not reached in A."
+    },
+    {
+      "suite": "task-pack-command.test.js",
+      "test": "spec-first tasks command rejects Git metadata or generated runtime: .git/config",
+      "classification": "executed-behavior-regression",
+      "interpretation": "Actual validator/writer result differs under the same driver. Assertions after the first failure were not reached in A."
+    },
+    {
+      "suite": "task-pack-command.test.js",
+      "test": "spec-first tasks command rejects Git metadata or generated runtime: .GIT/config",
+      "classification": "executed-behavior-regression",
+      "interpretation": "Actual validator/writer result differs under the same driver. Assertions after the first failure were not reached in A."
+    },
+    {
+      "suite": "task-pack-command.test.js",
+      "test": "spec-first tasks command rejects Git metadata or generated runtime: .opencode/skills/example/SKILL.md",
+      "classification": "executed-behavior-regression",
+      "interpretation": "Actual validator/writer result differs under the same driver. Assertions after the first failure were not reached in A."
+    },
+    {
+      "suite": "task-pack-command.test.js",
+      "test": "spec-first tasks command rejects Git metadata or generated runtime: .OpenCode/skills/example/SKILL.md",
+      "classification": "executed-behavior-regression",
+      "interpretation": "Actual validator/writer result differs under the same driver. Assertions after the first failure were not reached in A."
+    },
+    {
+      "suite": "task-pack-command.test.js",
+      "test": "spec-first tasks command rejects Git metadata or generated runtime: .opencode/commands/spec-work.md",
+      "classification": "executed-behavior-regression",
+      "interpretation": "Actual validator/writer result differs under the same driver. Assertions after the first failure were not reached in A."
+    },
+    {
+      "suite": "task-pack-command.test.js",
+      "test": "spec-first tasks command rejects Git metadata or generated runtime: opencode.jsonc",
+      "classification": "executed-behavior-regression",
+      "interpretation": "Actual validator/writer result differs under the same driver. Assertions after the first failure were not reached in A."
+    },
+    {
+      "suite": "task-pack-command.test.js",
+      "test": "spec-first tasks command rejects Git metadata or generated runtime: .zcode/spec-first/state.json",
+      "classification": "executed-behavior-regression",
+      "interpretation": "Actual validator/writer result differs under the same driver. Assertions after the first failure were not reached in A."
+    },
+    {
+      "suite": "task-pack-command.test.js",
+      "test": "spec-first tasks command rejects Git metadata or generated runtime: .zcode/hooks/session-start",
+      "classification": "executed-behavior-regression",
+      "interpretation": "Actual validator/writer result differs under the same driver. Assertions after the first failure were not reached in A."
+    },
+    {
+      "suite": "task-pack-command.test.js",
+      "test": "spec-first tasks command rejects Git metadata or generated runtime: .pi/spec-first/state.json",
+      "classification": "executed-behavior-regression",
+      "interpretation": "Actual validator/writer result differs under the same driver. Assertions after the first failure were not reached in A."
+    },
+    {
+      "suite": "task-pack-command.test.js",
+      "test": "spec-first tasks command checks task paths in the selected child repo rather than the artifact root",
+      "classification": "executed-behavior-regression",
+      "interpretation": "Actual validator/writer result differs under the same driver. Assertions after the first failure were not reached in A."
+    },
+    {
+      "suite": "task-pack-command.test.js",
+      "test": "spec-first tasks command uses the pack target_repo when no task override is present",
+      "classification": "output-contract-difference",
+      "interpretation": "A exits successfully but omits new resolved_target_repo output; this assertion alone does not prove a misdirected write."
+    },
+    {
+      "suite": "task-pack-command.test.js",
+      "test": "spec-first tasks command uses the source target_repo when no task override is present",
+      "classification": "output-contract-difference",
+      "interpretation": "A exits successfully but omits new resolved_target_repo output; this assertion alone does not prove a misdirected write."
+    },
+    {
+      "suite": "mcp-setup-workspace-git-exclude.test.js",
+      "test": "workspace-git-exclude \u2014 managed .git/info/exclude writer dangling leaf links fail without changing the link or creating outside files",
+      "classification": "executed-behavior-regression",
+      "interpretation": "Actual validator/writer result differs under the same driver. Assertions after the first failure were not reached in A."
+    },
+    {
+      "suite": "mcp-setup-workspace-git-exclude.test.js",
+      "test": "workspace-git-exclude \u2014 managed .git/info/exclude writer dangling ancestor links fail without changing the link or creating outside files",
+      "classification": "executed-behavior-regression",
+      "interpretation": "Actual validator/writer result differs under the same driver. Assertions after the first failure were not reached in A."
+    },
+    {
+      "suite": "mcp-setup-workspace-git-exclude.test.js",
+      "test": "workspace-git-exclude \u2014 managed .git/info/exclude writer Git environment overrides cannot change exclude or snapshot repository identity",
+      "classification": "executed-behavior-regression",
+      "interpretation": "Actual validator/writer result differs under the same driver. Assertions after the first failure were not reached in A."
+    },
+    {
+      "suite": "mcp-setup-workspace-routing-inject.test.js",
+      "test": "injectRoutingInstruction \u2014 upsert routing block into workspace entry docs dangling entry links cannot create outside files; normal creation works after recovery",
+      "classification": "executed-behavior-regression",
+      "interpretation": "Actual validator/writer result differs under the same driver. Assertions after the first failure were not reached in A."
+    },
+    {
+      "suite": "mcp-setup-workspace-routing-inject.test.js",
+      "test": "injectRoutingInstruction \u2014 upsert routing block into workspace entry docs atomic replacement preserves outside hardlink peers and file permissions",
+      "classification": "executed-behavior-regression",
+      "interpretation": "Actual validator/writer result differs under the same driver. Assertions after the first failure were not reached in A."
+    },
+    {
+      "suite": "mcp-setup-workspace-routing-inject.test.js",
+      "test": "injectRoutingInstruction \u2014 upsert routing block into workspace entry docs rejects a destination replaced by a symlink after staging and removes the temporary file",
+      "classification": "harness-incompatible",
+      "interpretation": "Race injector triggers only on numeric file descriptors from B staging. A path-based write never triggers that injection; not a valid paired race outcome."
+    },
+    {
+      "suite": "target-repo-containment.test.js",
+      "test": "target repo containment helpers denies managed roots and Skill projections for every registered host",
+      "classification": "executed-behavior-regression",
+      "interpretation": "Actual validator/writer result differs under the same driver. Assertions after the first failure were not reached in A."
+    },
+    {
+      "suite": "target-repo-containment.test.js",
+      "test": "target repo containment helpers rejects dangling ancestors and leaf links while allowing future nested files",
+      "classification": "executed-behavior-regression",
+      "interpretation": "Actual validator/writer result differs under the same driver. Assertions after the first failure were not reached in A."
+    },
+    {
+      "suite": "spec-commit-scope-regression.test.js",
+      "test": "canonical argv commit recipe preserves literal messages and unrelated staged content",
+      "classification": "harness-incompatible",
+      "interpretation": "Regex requires the new text-fenced recipe; A extraction returns null before recipe execution. Not an A commit-task failure."
+    }
+  ],
+  "limitations": [
+    "Failure counts are not unique defects or model-quality gains.",
+    "Tests stop at first failed assertion; subsequent sentinels are not independently observed in that A test.",
+    "All evidence is deterministic local fixture execution, not full Skill acceptance."
+  ],
+  "source_refs": [
+    "tests/unit/spec-commit-scope-regression.test.js:23",
+    "tests/unit/mcp-setup-workspace-routing-inject.test.js:109",
+    "src/cli/helpers/target-repo.js",
+    "skills/spec-runtime-setup/scripts/lib/git-path.cjs",
+    "skills/spec-runtime-setup/scripts/lib/workspace-routing-inject.cjs"
+  ]
+}

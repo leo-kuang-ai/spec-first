@@ -16,7 +16,7 @@ import sys
 import json
 import os
 
-MAX_LINES = 25  # Only need first ~25 lines for metadata
+MAX_LINES = 200  # 恢复的会话可能先写入大量非消息记录，元数据探测仍保持有界。
 
 
 def json_object(line):
@@ -362,7 +362,7 @@ def process_file(filepath):
                     result["last_ts"] = last_ts
             return result, None
         else:
-            return None, filepath
+            return None, None
     except (OSError, IOError) as e:
         return None, filepath
 
@@ -398,6 +398,7 @@ if files:
     # Batch mode: process all files
     processed = 0
     parse_errors = 0
+    no_metadata = 0
     filtered = 0
     matched = 0
     for filepath in files:
@@ -425,8 +426,12 @@ if files:
             print(json.dumps(result))
         elif error:
             parse_errors += 1
+        else:
+            no_metadata += 1
 
     meta = {"_meta": True, "files_processed": processed, "parse_errors": parse_errors}
+    if no_metadata:
+        meta["files_without_metadata"] = no_metadata
     if filtered:
         meta["filtered_by_cwd"] = filtered
     if keywords:
@@ -455,4 +460,7 @@ else:
         result = extract_from_lines(lines)
         if result:
             print(json.dumps(result))
-        print(json.dumps({"_meta": True, "files_processed": 1, "parse_errors": 0 if result else 1}))
+        meta = {"_meta": True, "files_processed": 1, "parse_errors": 0}
+        if not result:
+            meta["files_without_metadata"] = 1
+        print(json.dumps(meta))

@@ -2,6 +2,10 @@
 
 Run optimization as a bounded measurement loop: freeze identity and baseline, change one treatment, measure the agreed objective, and keep multi-objective wins only when the evidence supports them. Screen expensive runs before spending them and record `not-run` or `degraded` outcomes honestly.
 
+## 独立确认边界
+
+holdout 只确认已经由 selection 选出的候选；不进入假设、实验 worker、rolling summaries、strategy digest 或排名。只向这些消费者传 selection 的诊断，确认的原始配对和判定单独留在 experiment log 供审计；确认失败不能成为下一轮针对该集合调参的素材。
+
 ## Retuning a prompt or skill corpus
 
 When the mutable surface is a prompt or Skill corpus, treat the task as a
@@ -65,7 +69,9 @@ Generate an initial set of hypotheses. Each hypothesis should have:
 
 Include user-provided hypotheses if any were given as input.
 
-Aim for 10-30 hypotheses in the initial backlog. More can be generated during the loop based on learnings.
+Do not fill a hypothesis quota. Record each opportunity before implementation: observed cost or selection-rubric failure, workload and baseline identity, expected benefit with units/range or explicit unknown, assumptions, cheapest resolving measurement, and implementation/measurement cost and risk. Priority is a judgment, not a measured benefit. Use selection failure themes, not one new rule per failed item; holdout details never feed this backlog.
+
+Prefer a cheap locating measurement (profile, query count, stage timing) when it is executable within the existing envelope and would change what is worth implementing. Attribution guides selection; the original baseline remains the scoring reference. A prompt-quality experiment need not have a performance profile. Unknown estimates may remain in the backlog; lack of evidence is not permission to invent a forecast.
 
 ### 2.3 Dependency Pre-Approval
 
@@ -109,6 +115,8 @@ Select hypotheses for this batch:
 - Otherwise, `batch_size = min(runnable_backlog_size, execution.max_concurrent)`
 - Prefer diversity: select from different categories when possible
 - Within a category, select by priority (high first)
+
+Before any research, experiment, measurement or judge launch, check remaining iteration, wall-time and applicable monetary caps, including work already in flight and the confirmation cost. Do not launch work known to exceed them. Record host-reported spend separately from estimates; missing prices do not imply zero cost or exact cap enforcement. If a required monetary cap cannot be bounded, stop the paid work with that limitation. Category diversity never outranks a better-supported opportunity or a budget boundary.
 
 If the backlog is empty and no new hypotheses can be generated, proceed to Phase 4 (wrap-up).
 If the backlog is non-empty but no runnable hypotheses remain because everything needs approval or is otherwise blocked, proceed to Phase 4 so the user can approve dependencies instead of spinning forever.
@@ -194,13 +202,19 @@ For each completed experiment, **immediately**:
    Preserve ordered sample arrays and the measured source identity in both snapshots. The comparison helper emits a nonzero exit and an `error` decision for invalid configuration or missing evidence; never replace that failure with a prose eligibility claim. Smoke and censor settings must be covered by the measurement execution envelope from Phase 1.
    If that probe finds no runtime, do not invoke an empty command: mark the experiment `error` with that reason and continue the batch. Use `decision` and `next_measurement`. Collect the requested measurement and repeat this sequence whenever `next_measurement` is not `none`. Do not keep a candidate until `next_measurement` is `none`. Record `inconclusive` and `censored` as those outcomes, not as `reverted`. Each extra sample belongs to this same experiment: write it onto the existing entry at CP-3, then decide again.
 
+   `next_measurement: holdout` 表示 selection 的完整协议已通过。此时由 orchestrator 在获授权的确认 envelope 下，对相同 source identities 收集第二组完整 `holdout: {baseline, candidate}`，再次调用同一脚本；不把确认数字覆盖 selection。judge 确认仍由获授权且独立的 judge 执行；seed 必须对应互斥 item。重复/ladder 使用完整 samples（含真实配对 baseline），smoke 事实也须绑定同一源。缺失、失败或不确认同一改善目标时不能集成；不以回填 aggregate、换目标、调阈值或重抽样直至绿来放行。
+
 7. **IMMEDIATELY persist this experiment on disk (CP-3)** — do not defer this to batch evaluation. The durable unit is one log entry per experiment at `.spec-first/workflows/spec-optimize/<spec-name>/experiment-log.yaml`. After the first measurement, append that entry. After every later ladder sample for the same experiment, write the accumulated metrics and current outcome onto that same entry. Do not append a second entry for the same hypothesis, and do not rewrite a different experiment's samples. Write a decide terminal only when `next_measurement` is `none`. Until then the entry stays nonterminal: `promising` while the keep path still needs samples, `measured` otherwise (including an inconclusive result that still wants samples). When `next_measurement` is `none`, an eligible result stays `measured` until its diff is on the optimization branch; a non-eligible result gets the decide terminal (`reverted`, `inconclusive`, `censored`, `degenerate`). `kept` and `runner_up_kept` wait until that integration. The raw metrics are on disk and safe from context compaction.
 
-8. **VERIFY the write (CP-3 verification)** — read the experiment log back from disk and confirm the entry just written is present. If verification fails, retry the write. Do NOT proceed to the next experiment until this entry is confirmed on disk.
+   Preserve the pre-implementation opportunity and add this exact pairing to the log's `comparisons` using the identity contract in `references/persistence.md`. Extra ladder samples extend that pairing; a combined runner-up or final original-baseline comparison is a different record. Do not overwrite the standalone result or leak holdout records into the strategy digest.
+
+8. **VERIFY the write (CP-3 verification)** — read the experiment log back from disk and confirm the entry just written is present. If verification fails, inspect current bytes before retrying so an unknown outcome cannot duplicate results. Do NOT proceed to the next experiment until this entry is confirmed on disk.
 
 **Why immediately + verify?** The agent's context window is NOT a durable store. Context compaction, session crashes, and restarts are expected during long runs. If results only exist in the agent's memory, they are lost. Karpathy's autoresearch writes to `results.tsv` after every single experiment — this skill must do the same with the experiment log. The verification step catches silent write failures that would otherwise lose data.
 
 ### 3.4 Evaluate Batch
+
+Before integrating any candidate, including a runner-up, inspect the actual combined diff against the task and constraints. A numeric `keep` is necessary but not sufficient: skipping required work, weakening outputs, exploiting unobserved behavior or leaking evaluation data invalidates the apparent gain. Reject that candidate with the concrete missing observation in `learnings`; preserve raw scores and the script decision. Fix the harness only in a new run, never by changing this run's frozen inputs. A gain beyond the opportunity's supported upper bound deserves an explicit countercheck, not automatic praise.
 
 After all experiments in the batch have been measured:
 
@@ -208,8 +222,10 @@ After all experiments in the batch have been measured:
 
 2. **Rank** the eligible experiments in the batch by the script's `rank_score` (primary relative gain when the primary moved; otherwise the strongest required-objective relative gain). Identify that winner as the experiment to keep. An eligible experiment may be kept even if the ranking primary did not move.
 
+   排名只消费 selection 的 `rank_score`。holdout 数值不得改变排序；配置确认时必须先完成脚本要求的确认且得到 `decision: keep`，缺确认的 `promising` 不属于可集成集合。
+
 3. **If `decide.cjs` returns `keep` for that winner: KEEP**
-   - Commit the experiment branch first so the winning diff exists as a real commit before any merge or cherry-pick
+   - Only the orchestrator, with explicit commit and integration authority, commits the verified experiment through the existing commit owner before merge or cherry-pick. Without that authority, preserve the measured candidate and report integration pending; do not label it `kept`.
    - Include only mutable-scope changes in that commit; if no eligible diff remains, treat the experiment as non-improving and revert it
    - Merge the committed experiment branch into the optimization branch
    - Use the message `optimize(<spec-name>): <hypothesis description>` for the experiment commit

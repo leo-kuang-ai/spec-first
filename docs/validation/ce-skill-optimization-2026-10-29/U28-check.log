@@ -1,0 +1,13 @@
+PASS tests/unit/spec-promote-auth-probe.test.js
+PASS tests/unit/spec-riffrec-evidence-coverage.test.js
+PASS tests/unit/spec-handoff-contracts.test.js
+PASS tests/unit/spec-riffrec-feedback-analysis-contracts.test.js
+PASS tests/unit/spec-strategy-contracts.test.js
+PASS tests/unit/ce-localization-round-1-remediation-contracts.test.js
+PASS tests/unit/spec-product-pulse-contracts.test.js
+
+Test Suites: 7 passed, 7 total
+Tests:       57 passed, 57 total
+Snapshots:   0 total
+Time:        3.368 s, estimated 4 s
+Ran all test suites matching /tests\/unit\/spec-strategy-contracts.test.js|tests\/unit\/spec-product-pulse-contracts.test.js|tests\/unit\/spec-promote-auth-probe.test.js|tests\/unit\/spec-handoff-contracts.test.js|tests\/unit\/spec-riffrec-feedback-analysis-contracts.test.js|tests\/unit\/spec-riffrec-evidence-coverage.test.js|tests\/unit\/ce-localization-round-1-remediation-contracts.test.js/i.

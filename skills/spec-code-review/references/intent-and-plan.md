@@ -31,6 +31,8 @@ that no claimed U-ID is missing from the plan.
 
 Task-mode exception: completeness scope is the selected Task Card, its `source_unit`/`requirement_refs`, and the bounded task delta only. Do not flag other plan requirements or U-IDs as unaddressed during an early task review; the final full review owns whole-plan completeness.
 
+同时执行逆向需求核对：用当前计划正文与 reviewed diff，识别未被请求、却新增了用户或 caller 可观察规则的行为，例如静默丢弃重复退款请求。此类项按 `P3`、`autofix_class: advisory`、`owner: human` 交由用户判断是否需要，不单独改变 verdict，也不自动应用；不能因实现正确就认为产品已请求。内部结构、重构或既有需求已覆盖输入的处理不属于新行为规则。task mode 仍只核对所选任务范围，没有可靠计划时不虚构未请求项。
+
 ### Stage 2: Intent discovery
 
 Understand what the change is trying to accomplish. The source of intent depends on which Stage 1 path was taken:

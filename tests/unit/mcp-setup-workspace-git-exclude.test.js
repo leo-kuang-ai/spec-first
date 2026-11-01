@@ -44,6 +44,57 @@ function status(repo) {
 }
 
 describe('workspace-git-exclude — managed .git/info/exclude writer', () => {
+  test.each(['leaf', 'ancestor'])('dangling %s links fail without changing the link or creating outside files', (kind) => {
+    const ws = mkWorkspace();
+    const outside = mkWorkspace();
+    try {
+      const repo = initRepoWithCommit(ws, 'repo');
+      const exclude = resolveExcludePath(repo).absolute;
+      const link = kind === 'leaf' ? exclude : path.dirname(exclude);
+      const target = path.join(outside, 'missing');
+      fs.rmSync(link, { recursive: true, force: true });
+      fs.symlinkSync(target, link, kind === 'leaf' ? 'file' : 'dir');
+      expect(addManagedExclude(repo, ws).ok).toBe(false);
+      expect(removeManagedExclude(repo, ws).ok).toBe(false);
+      expect(fs.existsSync(target)).toBe(false);
+      expect(fs.lstatSync(link).isSymbolicLink()).toBe(true);
+    } finally {
+      fs.rmSync(ws, { recursive: true, force: true });
+      fs.rmSync(outside, { recursive: true, force: true });
+    }
+  });
+
+  test('Git environment overrides cannot change exclude or snapshot repository identity', () => {
+    const ws = mkWorkspace();
+    const saved = { ...process.env };
+    try {
+      const a = initRepoWithCommit(ws, 'a');
+      const b = initRepoWithCommit(ws, 'b');
+      git(b, ['commit', '--allow-empty', '-qm', 'different']);
+      fs.writeFileSync(path.join(a, 'wip.txt'), 'uncommitted content in A');
+      const { inspectRepoSnapshot } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-state.cjs');
+      const before = inspectRepoSnapshot({ repo_id: 'a', git_root: a });
+      const { captureSourceSnapshot } = require('../../skills/spec-runtime-setup/scripts/lib/source-snapshot.cjs');
+      const snapshotOptions = { repoRoot: a, host: 'codex', homeDir: path.join(ws, 'home'), now: new Date('2026-10-29T00:00:00Z') };
+      const sourceBefore = captureSourceSnapshot(snapshotOptions);
+      const excludeB = fs.readFileSync(path.join(b, '.git/info/exclude'), 'utf8');
+      process.env.GIT_DIR = path.join(b, '.git');
+      process.env.GIT_WORK_TREE = b;
+      process.env.GIT_INDEX_FILE = path.join(b, '.git/index');
+      process.env.GIT_CONFIG_COUNT = '1';
+      process.env.GIT_CONFIG_KEY_0 = 'core.bare';
+      process.env.GIT_CONFIG_VALUE_0 = 'true';
+      expect(inspectRepoSnapshot({ repo_id: 'a', git_root: a })).toEqual(before);
+      expect(captureSourceSnapshot(snapshotOptions)).toEqual(sourceBefore);
+      expect(addManagedExclude(a, ws)).toMatchObject({ ok: true, target: path.join(a, '.git/info/exclude') });
+      expect(fs.readFileSync(path.join(b, '.git/info/exclude'), 'utf8')).toBe(excludeB);
+    } finally {
+      for (const key of Object.keys(process.env)) if (!(key in saved)) delete process.env[key];
+      Object.assign(process.env, saved);
+      fs.rmSync(ws, { recursive: true, force: true });
+    }
+  });
+
   test('adds .codegraph/ and keeps git status clean; idempotent', () => {
     const ws = mkWorkspace();
     const repo = initRepoWithCommit(ws, 'api');

@@ -1,0 +1,66 @@
+{
+  "artifact_type": "producer-semantic-screening",
+  "independent_review": false,
+  "unit_id": "U3",
+  "path": "skills/ce-commit-push-pr/references/pr-description-writing.md",
+  "upstream_reading": "完整 pr-description-writing 净diff（本轮compose+writing输出中 config comment 有截断，writing contributor 段及末尾完整）；本地Pre-A 1-100、Step C/D、Step G/H已回源",
+  "gap": "本地 commit-and-push 已保留作者来源，但 PR body/squash merge 的 contributor credit 尚无 owner 说明",
+  "decision": "在当前 pr-description-writing 增加可回源 contributor credit，既有PR author/新PR shipping identity与Pre-A作者/已有trailers核对；不猜邮箱、不将模型bot署名当human贡献；repo squash策略可核实时末段添加准确trailers，否则仅正文保留；压缩不得删除",
+  "preserved": [
+    "internal helper授权",
+    "不重写历史",
+    "完整range/outcome描述",
+    "保留已有署名",
+    "不创建stack/babysit新产品"
+  ],
+  "limitations": [
+    "source合同修改；真实模型/PR合并效果未运行",
+    "其他U3 shipping文件的合并输出截断，不计本轮完整阅读"
+  ],
+  "verification": "logs/pr-credit-tests.log: exit0, 1 suite/5 tests",
+  "peer_lifecycle_review": {
+    "paths": [
+      "skills/ce-code-review/scripts/peer-job-runner.py",
+      "skills/ce-code-review/scripts/run-log.py"
+    ],
+    "reading": "CE peer 完整157行净diff；run-log.py 280行分1-145/146-300完整读取；本地 cmd_wait/metadata/kill caps/cross-model owner/finish metadata 有界回源；未声称本地2272行全文阅读",
+    "decisions": [
+      {
+        "path": "skills/ce-code-review/scripts/peer-job-runner.py",
+        "target_action": "evidence-only",
+        "rationale": "CE 聚合deadline/多job reap 为新增便利API；本地已有每次wait上限、supervisor idle/hard caps和收尾reap，且真实peer启动因缺认证producer保持dormant，无当前caller需要CE新增参数。保留三份严格auth/payload/身份runner及parity，不拷贝worker argv落盘或降级安全。"
+      },
+      {
+        "path": "skills/ce-code-review/scripts/run-log.py",
+        "target_action": "evidence-only",
+        "rationale": "CE stage JSONL/elapsed/reviewer/candidate/token/bytes 是成本诊断，不是review outcome。本地finish metadata消费者无cost字段或stage log协议；当前不增加第二套持久化/环境推断host权威，亦不声称已具备CE成本遥测。"
+      }
+    ],
+    "reassessment": "spec-code-review owner在认证peer producer可用、或真实profile证明阶段耗时/批次deadline需求后，连同native host diagnostics评估最小可测接口；成本与质量分开判定",
+    "source_refs": [
+      "skills/spec-code-review/scripts/peer-job-runner.py",
+      "skills/spec-doc-review/scripts/peer-job-runner.py",
+      "skills/spec-pov/scripts/peer-job-runner.py",
+      "skills/spec-code-review/references/cross-model-review.md",
+      "skills/spec-code-review/references/finish-review.md",
+      "tests/unit/peer-job-runner-parity.test.js"
+    ],
+    "limitations": [
+      "未实现CE新增aggregate deadline/multi-reap或run-log接口，不声称功能等价",
+      "18项本地测试仅覆盖当前parity/安全拒绝/进程身份等，不证明真实跨模型执行或Windows现场"
+    ],
+    "verification": "logs/peer-lifecycle-tests.log: exit0, 3 suites / 18 tests"
+  },
+  "debug_prevention_review": {
+    "paths": [
+      "skills/ce-debug/references/defense-in-depth.md",
+      "skills/ce-debug/references/fix.md"
+    ],
+    "reading": "defense-in-depth 4行新增段完整；fix 完整8/8净diff；本地两个 reference 全文已读。CE debug SKILL/investigate 合并输出截断，不计全文",
+    "decision": "复用现有conditional defense-in-depth owner；先验证minimal fix，再判断已发现同根位置是否能通过现有共享入口/类型约束/针对性lint或test消除重复犯错空间。只在已授权sites、无public接口改变和真实收益条件满足时实施，否则Prevention follow-up；不默认抽helper或加多层guard",
+    "limitations": [
+      "不新增执行引擎或return mode，不移植CE默认自动commit",
+      "source合同回归不证明真实agent选择/现场收益"
+    ]
+  }
+}

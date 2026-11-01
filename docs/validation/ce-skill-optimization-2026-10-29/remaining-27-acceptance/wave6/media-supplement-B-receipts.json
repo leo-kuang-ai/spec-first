@@ -1,0 +1,362 @@
+{
+  "arm": "B",
+  "entrypoints": [
+    {
+      "entrypoint": "spec-riffrec-feedback-analysis",
+      "exit_code": 0,
+      "initial_request_and_fallback_calls": [
+        [
+          "curl",
+          "--config",
+          "-",
+          "-sS",
+          "https://api.openai.com/v1/audio/transcriptions",
+          "-F",
+          "file=@/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-a95jujql/media.webm",
+          "-F",
+          "model=gpt-4o-mini-transcribe",
+          "-F",
+          "response_format=json"
+        ]
+      ],
+      "result": {
+        "artifacts": {
+          "analysis_md": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-a95jujql/output/analysis.md",
+          "frames_dir": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-a95jujql/output/frames",
+          "problem_analysis_md": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-a95jujql/output/problem-analysis.md",
+          "raw_dir": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-a95jujql/output/raw",
+          "requirements_kickoff_md": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-a95jujql/output/requirements-kickoff.md",
+          "review_prompt_md": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-a95jujql/output/review-prompt.md",
+          "source_materials_md": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-a95jujql/output/source-materials.md"
+        },
+        "candidate_findings": [],
+        "event_counts": {},
+        "event_moments": [
+          {
+            "events": [],
+            "id": "M1",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 84.0
+          },
+          {
+            "events": [],
+            "id": "M2",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 252.0
+          },
+          {
+            "events": [],
+            "id": "M3",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 420.0
+          },
+          {
+            "events": [],
+            "id": "M4",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 588.0
+          },
+          {
+            "events": [],
+            "id": "M5",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 756.0
+          }
+        ],
+        "moments": [
+          {
+            "events": [],
+            "id": "M1",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 84.0
+          },
+          {
+            "events": [],
+            "id": "M2",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 252.0
+          },
+          {
+            "events": [],
+            "id": "M3",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 420.0
+          },
+          {
+            "events": [],
+            "id": "M4",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 588.0
+          },
+          {
+            "events": [],
+            "id": "M5",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 756.0
+          }
+        ],
+        "output_dir": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-a95jujql/output",
+        "session": {
+          "duration_seconds": 840
+        },
+        "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-a95jujql/media.webm",
+        "source_kind": "video",
+        "transcript": {
+          "attempts": [
+            {
+              "provider": "openai-audio-transcriptions",
+              "provider_request_sent": true,
+              "reason": "\"input_too_large\"",
+              "status": "failed",
+              "transcription_egress_authorization": "explicit-cli-flag"
+            },
+            {
+              "provider": "openai-audio-transcriptions",
+              "provider_request_sent": false,
+              "reason": "ffmpeg is not installed; cannot chunk media",
+              "status": "failed",
+              "transcription_egress_authorization": "explicit-cli-flag"
+            }
+          ],
+          "covered_intervals": [],
+          "degraded": true,
+          "missing_intervals": [
+            {
+              "end_seconds": 840,
+              "start_seconds": 0
+            }
+          ],
+          "provider": "openai-audio-transcriptions",
+          "provider_request_sent": true,
+          "reason": "ffmpeg is not installed; cannot chunk media",
+          "status": "failed",
+          "text": "",
+          "transcription_egress_authorization": "explicit-cli-flag"
+        },
+        "transcription_egress_receipt": {
+          "attempts": [
+            {
+              "provider": "openai-audio-transcriptions",
+              "provider_request_sent": true,
+              "reason": "\"input_too_large\"",
+              "status": "failed",
+              "transcription_egress_authorization": "explicit-cli-flag"
+            },
+            {
+              "provider": "openai-audio-transcriptions",
+              "provider_request_sent": false,
+              "reason": "ffmpeg is not installed; cannot chunk media",
+              "status": "failed",
+              "transcription_egress_authorization": "explicit-cli-flag"
+            }
+          ],
+          "provider": "openai-audio-transcriptions",
+          "provider_request_sent": true,
+          "transcription_egress_authorization": "explicit-cli-flag"
+        }
+      },
+      "scratch_root": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-a95jujql",
+      "actual_egress": false,
+      "scratch_removed_after_context_exit": true
+    },
+    {
+      "entrypoint": "spec-sweep",
+      "exit_code": 0,
+      "initial_request_and_fallback_calls": [
+        [
+          "curl",
+          "--config",
+          "-",
+          "-sS",
+          "https://api.openai.com/v1/audio/transcriptions",
+          "-F",
+          "file=@/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-36mhn5ql/media.webm",
+          "-F",
+          "model=gpt-4o-mini-transcribe",
+          "-F",
+          "response_format=json"
+        ]
+      ],
+      "result": {
+        "artifacts": {
+          "analysis_md": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-36mhn5ql/output/analysis.md",
+          "frames_dir": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-36mhn5ql/output/frames",
+          "problem_analysis_md": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-36mhn5ql/output/problem-analysis.md",
+          "raw_dir": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-36mhn5ql/output/raw",
+          "requirements_kickoff_md": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-36mhn5ql/output/requirements-kickoff.md",
+          "review_prompt_md": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-36mhn5ql/output/review-prompt.md",
+          "source_materials_md": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-36mhn5ql/output/source-materials.md"
+        },
+        "candidate_findings": [],
+        "event_counts": {},
+        "event_moments": [
+          {
+            "events": [],
+            "id": "M1",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 84.0
+          },
+          {
+            "events": [],
+            "id": "M2",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 252.0
+          },
+          {
+            "events": [],
+            "id": "M3",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 420.0
+          },
+          {
+            "events": [],
+            "id": "M4",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 588.0
+          },
+          {
+            "events": [],
+            "id": "M5",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 756.0
+          }
+        ],
+        "moments": [
+          {
+            "events": [],
+            "id": "M1",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 84.0
+          },
+          {
+            "events": [],
+            "id": "M2",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 252.0
+          },
+          {
+            "events": [],
+            "id": "M3",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 420.0
+          },
+          {
+            "events": [],
+            "id": "M4",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 588.0
+          },
+          {
+            "events": [],
+            "id": "M5",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 756.0
+          }
+        ],
+        "output_dir": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-36mhn5ql/output",
+        "session": {
+          "duration_seconds": 840
+        },
+        "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-36mhn5ql/media.webm",
+        "source_kind": "video",
+        "transcript": {
+          "attempts": [
+            {
+              "provider": "openai-audio-transcriptions",
+              "provider_request_sent": true,
+              "reason": "\"input_too_large\"",
+              "status": "failed",
+              "transcription_egress_authorization": "explicit-cli-flag"
+            },
+            {
+              "provider": "openai-audio-transcriptions",
+              "provider_request_sent": false,
+              "reason": "ffmpeg is not installed; cannot chunk media",
+              "status": "failed",
+              "transcription_egress_authorization": "explicit-cli-flag"
+            }
+          ],
+          "covered_intervals": [],
+          "degraded": true,
+          "missing_intervals": [
+            {
+              "end_seconds": 840,
+              "start_seconds": 0
+            }
+          ],
+          "provider": "openai-audio-transcriptions",
+          "provider_request_sent": true,
+          "reason": "ffmpeg is not installed; cannot chunk media",
+          "status": "failed",
+          "text": "",
+          "transcription_egress_authorization": "explicit-cli-flag"
+        },
+        "transcription_egress_receipt": {
+          "attempts": [
+            {
+              "provider": "openai-audio-transcriptions",
+              "provider_request_sent": true,
+              "reason": "\"input_too_large\"",
+              "status": "failed",
+              "transcription_egress_authorization": "explicit-cli-flag"
+            },
+            {
+              "provider": "openai-audio-transcriptions",
+              "provider_request_sent": false,
+              "reason": "ffmpeg is not installed; cannot chunk media",
+              "status": "failed",
+              "transcription_egress_authorization": "explicit-cli-flag"
+            }
+          ],
+          "provider": "openai-audio-transcriptions",
+          "provider_request_sent": true,
+          "transcription_egress_authorization": "explicit-cli-flag"
+        }
+      },
+      "scratch_root": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-36mhn5ql",
+      "actual_egress": false,
+      "scratch_removed_after_context_exit": true
+    }
+  ],
+  "limitation": "Actual analyzer CLI logic under mocked initial provider failure and absent ffmpeg. No decoding or external request. Tests cumulative attempt reporting, not live transcription."
+}

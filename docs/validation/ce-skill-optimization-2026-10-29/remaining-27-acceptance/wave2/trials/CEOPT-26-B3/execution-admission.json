@@ -1,0 +1,12 @@
+{
+  "trial": "CEOPT-26-B3",
+  "approved_for_disposable_execution": true,
+  "recorded_at": "2026-10-31T05:21:28.091377+00:00",
+  "proposal_sha256": "56833d3dd8b1fd7637173105d0c62411babd15a56e83a7930a1ecb15e3651a4f",
+  "candidate_sha256": "60fcede431e7da0426edd494e69a0680e4f6b3dd786e373d942872ce7a4c0716",
+  "review": "Parent read full no-change proposal. Preserves native validation/error/store/listen semantics and protected external proof seam. Scope remains one production file; response helper/policy changes rejected with concrete equivalence grounds. Fixed parent node --test invokes exactly package test script; literal npm lifecycle not claimed. Hashes recorded by runner before/after for protected assets.",
+  "limitations": [
+    "Parent execution only.",
+    "Selected HTTP proof and unchanged code, not exhaustive equivalence or real simplification benefit."
+  ]
+}

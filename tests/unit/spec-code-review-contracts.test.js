@@ -180,9 +180,9 @@ describe('spec-code-review current contracts', () => {
     expect(subagentTemplate).toContain('before/after line-count evidence');
     expect(subagentTemplate).toContain('subjective “file getting long” concern');
     expect(subagentTemplate).toContain('thin wrapper or duplicate canonical helper');
-    expect(subagentTemplate).toContain('Do not reclassify that proven persona-owned condition as advisory');
-    expect(subagentTemplate).toContain('Preserve the persona-assigned severity and confidence anchor');
-    expect(subagentTemplate).toContain('use the normal action-class rubric for its route');
+    expect(subagentTemplate).toContain('保留已证明的 persona-owned 精确结构条件及其 severity/confidence');
+    expect(subagentTemplate).toContain('继续按 action-class rubric 路由');
+    expect(subagentTemplate).toContain('不能仅因其影响是维护成本就降为 advisory');
   });
 
   test('current-tree orientation 与 maintainability confidence 对齐 shared synthesis contract', () => {
@@ -281,6 +281,40 @@ describe('spec-code-review current contracts', () => {
     expect(validatorTemplate).toContain('This field may be empty');
     expect(validatorTemplate).toContain('missing reviewer framing neither rejects nor confirms a finding');
     expect(validatorTemplate).not.toContain('required for the validator to understand the finding');
+  });
+
+  test('验证保留不确定性且不将其转成应用指令', () => {
+    const schema = JSON.parse(fs.readFileSync(path.join(repoRoot, 'skills/spec-code-review/references/findings-schema.json'), 'utf8'));
+    const fields = schema.properties.findings.items.properties;
+    expect(fields.validation_status.enum).toEqual(['confirmed', 'rejected', 'unresolved']);
+    expect(fields.protected_subject.enum).toContain('authorization-authentication');
+    expect(fields.protected_subject.enum).toContain('cryptography');
+    const validate = new (require('ajv'))({ strict: false }).compile(schema);
+    const finding = {
+      title: '权限缺口', severity: 'P1', file: 'src/handler.js', line: 1,
+      why_it_matters: '跨用户访问', autofix_class: 'advisory', owner: 'human',
+      requires_verification: true, confidence: 75, evidence: ['src/handler.js:1 read(id)'], pre_existing: false,
+    };
+    const payload = { reviewer: 'security', findings: [finding], residual_risks: [], testing_gaps: [] };
+    expect(validate(payload)).toBe(true);
+    finding.validation_status = 'unresolved';
+    expect(validate(payload)).toBe(false);
+    finding.validation_reason = '缺少 reviewed head 的 caller';
+    finding.protected_subject = 'authorization-authentication';
+    expect(validate(payload)).toBe(true);
+    finding.validation_status = 'validated';
+    expect(validate(payload)).toBe(false);
+    expect(validatorTemplate).toContain('无法访问');
+    expect(validatorTemplate).toContain('unresolved');
+    expect(validatorTemplate).not.toContain('when in doubt, reject');
+    expect(validatorTemplate).not.toContain('"validated": false');
+    expect(skill).toContain('未解决项不得进入 `actionable_findings`');
+    expect(skill).toContain('不得因缺少反证而确认');
+    expect(skill).toContain('原始 claim');
+    for (const file of ['skills/spec-code-review/references/apply-findings.md', 'skills/spec-lfg/references/review-followup.md']) {
+      expect(fs.readFileSync(path.join(repoRoot, file), 'utf8')).toContain('validation_status');
+      expect(fs.readFileSync(path.join(repoRoot, file), 'utf8')).toContain('unresolved');
+    }
   });
 
   test('prompt assets are skill-local', () => {

@@ -52,3 +52,7 @@ Routing rules:
 - **Choose the more conservative route on disagreement.** A merged finding may move from `gated_auto` to `manual`, but never widen without stronger evidence.
 - **Reject `safe_auto` and `review-fixer` if present** — drop the finding or remap to `gated_auto` / `downstream-resolver` during synthesis.
 - **`requires_verification: true` means any caller-applied fix needs targeted tests or follow-up validation.**
+
+## Protected Artifacts
+
+本地 pipeline artifact 保护范围为 repo-relative `docs/plans/`、`docs/solutions/`、legacy `docs/brainstorms/` 下的全部文件，包含嵌套分类；不得建议删除、移除或 gitignore。普通同名目录与 `skills/**/references/personas/` prompt assets 不因名称相似获得保护。当前合同使用固定 `docs/` root，不从 CE 配置引入第二 artifact root。此规则约束所有 review 路径，synthesis 丢弃违反此规则的清理 finding；对内容缺陷的正常审查仍有效。

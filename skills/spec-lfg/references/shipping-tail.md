@@ -62,6 +62,8 @@ retry a push or hunt for a remote. Run steps 7–9 normally when a remote exists
 
 9.5. **Common decision gate.** Whichever producer returned a typed `needs-human` residual, preserve it unchanged through shipping, local-only fallback, and watch opt-out. Before any success or DONE claim, render the complete set under `## Needs your decision`: quoted_feedback, investigation, decision_reason, every option/tradeoff, non-null recommendation, and every thread_urls link. Keep source groups intact and covered threads open. Continue independent authorized work first; once none remains, return `status: needs-human` with those exact residuals. A non-empty decision set is not successful completion, even when commits, CI, or PR creation succeeded. Do not complete a pending source-plan lifecycle marker while such a decision is known; a later decision does not rewrite earlier historical verification.
 
+Before DONE, also account for every `pending_conversation_actions` condition under `pr-watch-loop.md` Conversation completion. A push or successful body update does not prove a reply or thread resolution. Unmet authority, unknown write results or stale source/publication facts remain a manual-blocker handoff; do not repeatedly fix or POST the same source.
+
 10. **Offer an optional next-work handoff, then finish.**
 
     After the current pipeline reaches its terminal state, inspect the canonical

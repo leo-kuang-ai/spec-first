@@ -1,0 +1,28 @@
+{
+  "status": "not_run",
+  "reason_code": "agent-browser-action-failed",
+  "action_process_calls": 3,
+  "steps": [
+    {
+      "index": 0,
+      "action": "open",
+      "status": "passed",
+      "exit_code": 0,
+      "raw_output_path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-rcql_n2n/positive/raw/step-001.json"
+    },
+    {
+      "index": 1,
+      "action": "vitals",
+      "status": "passed",
+      "exit_code": 0,
+      "raw_output_path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-rcql_n2n/positive/raw/step-002.json"
+    },
+    {
+      "index": 2,
+      "action": "get",
+      "status": "failed",
+      "exit_code": 1,
+      "raw_output_path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-rcql_n2n/positive/raw/step-003.json"
+    }
+  ]
+}

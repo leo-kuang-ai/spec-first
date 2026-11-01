@@ -18,7 +18,7 @@ Report only observed results. Use `Documentation complete` only after every inte
 
 ### Headless mode
 
-Emit a structured terminal report and end the turn. No "What's next?" question, no blocking prompt. End with `Documentation complete` as the terminal signal so callers can detect completion.
+Emit a structured terminal report and return from this skill. An active caller retains continuation ownership; only a standalone invocation ends the turn. No "What's next?" question, no blocking prompt. End with `Documentation complete` as the terminal signal so callers can detect completion.
 
 ```
 ✓ Documentation complete (headless mode)
@@ -57,8 +57,8 @@ Auto memory: 2 relevant entries used as supplementary evidence
 Execution: <dispatched | inline-serial (`dispatch_authorization_missing` | `subagent_capability_missing` | `worker_capability_unproven`)>
 
 Research Results:
-  ✓ Context Analyzer: Identified performance_issue in runtime, category: performance-issues/
-  ✓ Solution Extractor: 3 code fixes, prevention strategies
+  ✓ Parent classification: Identified performance_issue in runtime, category: performance-issues/
+  ✓ Parent drafting: 3 code fixes, prevention strategies
   ✓ Related Docs Finder: 2 related issues
   ✓ Session History: 3 prior sessions on same branch, 2 failed approaches surfaced
 
@@ -80,7 +80,7 @@ issues occur in the Email Processing or Brief System modules.
 Refresh recommendation: none
 ```
 
-**End the turn after the summary — `spec-compound` does not present a "What's next?" menu.** The doc is written and any cross-references the workflow found are already in it. Cross-doc maintenance (fixing references in *other* docs, consolidation) is deferred to `spec-compound-refresh` via the `Refresh recommendation` line above — the skill designed for it — not auto-applied here, which would edit tracked docs beyond the one deliverable. If the user wants to view the file or take a follow-up action, they will ask. (Interactive mode only.)
+**Return to the active caller after the summary; a standalone invocation ends the turn. `spec-compound` does not present a "What's next?" menu.** The doc is written and any cross-references the workflow found are already in it. Cross-doc maintenance (fixing references in *other* docs, consolidation) is deferred to `spec-compound-refresh` via the `Refresh recommendation` line above — the skill designed for it — not auto-applied here, which would edit tracked docs beyond the one deliverable. An active caller may continue already-authorized work using this result; the report does not grant new maintenance or landing authority.
 
 **Alternate interactive output (when updating an existing doc due to high overlap):** in headless mode, this case is communicated via the `Overlap: high — existing doc updated` line of the headless terminal report above, not as a separate output block.
 

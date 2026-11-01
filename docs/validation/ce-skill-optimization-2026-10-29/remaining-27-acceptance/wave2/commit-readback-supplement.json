@@ -1,0 +1,679 @@
+{
+  "at": "2026-10-31T05:09:59.485799+00:00",
+  "kind": "parent-readback-supplement",
+  "trials": [
+    {
+      "id": "CEOPT-04-A1",
+      "head": "91c6fac7909f08062b8187f994aa6dabf14a9c4e",
+      "actual_status": " M ledger.js\nA  unrelated.txt\n",
+      "all_checks_passed": true,
+      "active_fixture_hooks": [],
+      "execution_result_sha256": "78cb9eedbacb270c8577935c12ad708703eb77031dcac4206068243c91c4797f",
+      "logs": [
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "91c6fac7909f08062b8187f994aa6dabf14a9c4e\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "status",
+            "--short"
+          ],
+          "exit_code": 0,
+          "stdout": " M ledger.js\nA  unrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "diff",
+            "--cached",
+            "--binary"
+          ],
+          "exit_code": 0,
+          "stdout": "diff --git a/unrelated.txt b/unrelated.txt\nnew file mode 100644\nindex 0000000..5d783a5\n--- /dev/null\n+++ b/unrelated.txt\n@@ -0,0 +1 @@\n+User-owned staged work.\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "ls-files",
+            "--stage"
+          ],
+          "exit_code": 0,
+          "stdout": "100644 f590887df45a507201f4873ba31a33cbef41edee 0\tREADME.md\n100644 7e6a1230f89c5ca9c87d88126a5f4b7fc686bb32 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "cat-file",
+            "commit",
+            "b3e1083bc4b684c0ca55875c4b3ca1c41aa4e776"
+          ],
+          "exit_code": 0,
+          "stdout": "tree 8b313d41d63fb68ab8869878e0759212f772d8a9\nauthor Original Author <original@example.invalid> 1793342111 +0800\ncommitter Fixture Committer <committer@example.invalid> 1793342111 +0800\n\nfeat(fixture): establish ledger\n\nCo-authored-by: Prior Contributor <prior@example.invalid>\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "log",
+            "-1",
+            "--format=%B"
+          ],
+          "exit_code": 0,
+          "stdout": "fix(ledger): reject zero amounts\n\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "show",
+            "-s",
+            "--format=%P",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "b3e1083bc4b684c0ca55875c4b3ca1c41aa4e776\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "show",
+            "--format=",
+            "--no-ext-diff",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "diff --git a/ledger.js b/ledger.js\nindex 585d6fd..7e6a123 100644\n--- a/ledger.js\n+++ b/ledger.js\n@@ -1,4 +1,4 @@\n-exports.acceptAmount = amount => amount >= 0;\n+exports.acceptAmount = amount => amount > 0;\n \n \n \n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "diff",
+            "--name-only"
+          ],
+          "exit_code": 0,
+          "stdout": "ledger.js\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "diff",
+            "--",
+            "ledger.js"
+          ],
+          "exit_code": 0,
+          "stdout": "diff --git a/ledger.js b/ledger.js\nindex 7e6a123..ddd9864 100644\n--- a/ledger.js\n+++ b/ledger.js\n@@ -11,4 +11,4 @@ exports.acceptAmount = amount => amount > 0;\n \n \n \n-exports.label = 'Ledger';\n+exports.label = 'User renamed ledger';\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "--local",
+            "--get",
+            "core.hooksPath"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "id": "CEOPT-04-B1",
+      "head": "b3e1083bc4b684c0ca55875c4b3ca1c41aa4e776",
+      "actual_status": " M ledger.js\nA  unrelated.txt\n",
+      "all_checks_passed": true,
+      "active_fixture_hooks": [],
+      "execution_result_sha256": "a1df8e22b381a7468e71463d3ddc19314f2ab61caef0caeaf1c00c0ecf39aaae",
+      "logs": [
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "b3e1083bc4b684c0ca55875c4b3ca1c41aa4e776\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "status",
+            "--short"
+          ],
+          "exit_code": 0,
+          "stdout": " M ledger.js\nA  unrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "diff",
+            "--cached",
+            "--binary"
+          ],
+          "exit_code": 0,
+          "stdout": "diff --git a/unrelated.txt b/unrelated.txt\nnew file mode 100644\nindex 0000000..5d783a5\n--- /dev/null\n+++ b/unrelated.txt\n@@ -0,0 +1 @@\n+User-owned staged work.\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "ls-files",
+            "--stage"
+          ],
+          "exit_code": 0,
+          "stdout": "100644 f590887df45a507201f4873ba31a33cbef41edee 0\tREADME.md\n100644 585d6fd16475128525c8d891bc04bf6af49e381e 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "cat-file",
+            "commit",
+            "b3e1083bc4b684c0ca55875c4b3ca1c41aa4e776"
+          ],
+          "exit_code": 0,
+          "stdout": "tree 8b313d41d63fb68ab8869878e0759212f772d8a9\nauthor Original Author <original@example.invalid> 1793342111 +0800\ncommitter Fixture Committer <committer@example.invalid> 1793342111 +0800\n\nfeat(fixture): establish ledger\n\nCo-authored-by: Prior Contributor <prior@example.invalid>\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "--local",
+            "--get",
+            "core.hooksPath"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "id": "CEOPT-04-B2",
+      "head": "b3e1083bc4b684c0ca55875c4b3ca1c41aa4e776",
+      "actual_status": " M ledger.js\nA  unrelated.txt\n",
+      "all_checks_passed": true,
+      "active_fixture_hooks": [],
+      "execution_result_sha256": "97c75cfc9dd9d459e6b86ce271b686346637b97629d2ab74e92bf161a1da8c9a",
+      "logs": [
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "b3e1083bc4b684c0ca55875c4b3ca1c41aa4e776\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "status",
+            "--short"
+          ],
+          "exit_code": 0,
+          "stdout": " M ledger.js\nA  unrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "diff",
+            "--cached",
+            "--binary"
+          ],
+          "exit_code": 0,
+          "stdout": "diff --git a/unrelated.txt b/unrelated.txt\nnew file mode 100644\nindex 0000000..5d783a5\n--- /dev/null\n+++ b/unrelated.txt\n@@ -0,0 +1 @@\n+User-owned staged work.\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "ls-files",
+            "--stage"
+          ],
+          "exit_code": 0,
+          "stdout": "100644 f590887df45a507201f4873ba31a33cbef41edee 0\tREADME.md\n100644 585d6fd16475128525c8d891bc04bf6af49e381e 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "cat-file",
+            "commit",
+            "b3e1083bc4b684c0ca55875c4b3ca1c41aa4e776"
+          ],
+          "exit_code": 0,
+          "stdout": "tree 8b313d41d63fb68ab8869878e0759212f772d8a9\nauthor Original Author <original@example.invalid> 1793342111 +0800\ncommitter Fixture Committer <committer@example.invalid> 1793342111 +0800\n\nfeat(fixture): establish ledger\n\nCo-authored-by: Prior Contributor <prior@example.invalid>\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "--local",
+            "--get",
+            "core.hooksPath"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "id": "CEOPT-04-A2",
+      "head": "e727a433f30b6c47827bd58c8a613ce32ce29819",
+      "actual_status": " M ledger.js\nA  unrelated.txt\n",
+      "all_checks_passed": true,
+      "active_fixture_hooks": [],
+      "execution_result_sha256": "689ce6322fcb8c32c53feb736f30a136544d24a18148c39866f0717ca3eb9f4f",
+      "logs": [
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "e727a433f30b6c47827bd58c8a613ce32ce29819\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "status",
+            "--short"
+          ],
+          "exit_code": 0,
+          "stdout": " M ledger.js\nA  unrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "diff",
+            "--cached",
+            "--binary"
+          ],
+          "exit_code": 0,
+          "stdout": "diff --git a/unrelated.txt b/unrelated.txt\nnew file mode 100644\nindex 0000000..5d783a5\n--- /dev/null\n+++ b/unrelated.txt\n@@ -0,0 +1 @@\n+User-owned staged work.\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "ls-files",
+            "--stage"
+          ],
+          "exit_code": 0,
+          "stdout": "100644 f590887df45a507201f4873ba31a33cbef41edee 0\tREADME.md\n100644 7e6a1230f89c5ca9c87d88126a5f4b7fc686bb32 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "cat-file",
+            "commit",
+            "b3e1083bc4b684c0ca55875c4b3ca1c41aa4e776"
+          ],
+          "exit_code": 0,
+          "stdout": "tree 8b313d41d63fb68ab8869878e0759212f772d8a9\nauthor Original Author <original@example.invalid> 1793342111 +0800\ncommitter Fixture Committer <committer@example.invalid> 1793342111 +0800\n\nfeat(fixture): establish ledger\n\nCo-authored-by: Prior Contributor <prior@example.invalid>\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "log",
+            "-1",
+            "--format=%B"
+          ],
+          "exit_code": 0,
+          "stdout": "fix(ledger): reject zero amounts\n\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "show",
+            "-s",
+            "--format=%P",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "b3e1083bc4b684c0ca55875c4b3ca1c41aa4e776\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "show",
+            "--format=",
+            "--no-ext-diff",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "diff --git a/ledger.js b/ledger.js\nindex 585d6fd..7e6a123 100644\n--- a/ledger.js\n+++ b/ledger.js\n@@ -1,4 +1,4 @@\n-exports.acceptAmount = amount => amount >= 0;\n+exports.acceptAmount = amount => amount > 0;\n \n \n \n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "diff",
+            "--name-only"
+          ],
+          "exit_code": 0,
+          "stdout": "ledger.js\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "diff",
+            "--",
+            "ledger.js"
+          ],
+          "exit_code": 0,
+          "stdout": "diff --git a/ledger.js b/ledger.js\nindex 7e6a123..ddd9864 100644\n--- a/ledger.js\n+++ b/ledger.js\n@@ -11,4 +11,4 @@ exports.acceptAmount = amount => amount > 0;\n \n \n \n-exports.label = 'Ledger';\n+exports.label = 'User renamed ledger';\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "--local",
+            "--get",
+            "core.hooksPath"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "id": "CEOPT-04-A3",
+      "head": "93ec58c34d41905a90bb5c673713e42c026c28be",
+      "actual_status": " M ledger.js\nA  unrelated.txt\n",
+      "all_checks_passed": true,
+      "active_fixture_hooks": [],
+      "execution_result_sha256": "9aea83140e06b2beed18474887d55aa01bfff298418d38458a6563cbfbc38ff6",
+      "logs": [
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "93ec58c34d41905a90bb5c673713e42c026c28be\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "status",
+            "--short"
+          ],
+          "exit_code": 0,
+          "stdout": " M ledger.js\nA  unrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "diff",
+            "--cached",
+            "--binary"
+          ],
+          "exit_code": 0,
+          "stdout": "diff --git a/unrelated.txt b/unrelated.txt\nnew file mode 100644\nindex 0000000..5d783a5\n--- /dev/null\n+++ b/unrelated.txt\n@@ -0,0 +1 @@\n+User-owned staged work.\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "ls-files",
+            "--stage"
+          ],
+          "exit_code": 0,
+          "stdout": "100644 f590887df45a507201f4873ba31a33cbef41edee 0\tREADME.md\n100644 7e6a1230f89c5ca9c87d88126a5f4b7fc686bb32 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "cat-file",
+            "commit",
+            "b3e1083bc4b684c0ca55875c4b3ca1c41aa4e776"
+          ],
+          "exit_code": 0,
+          "stdout": "tree 8b313d41d63fb68ab8869878e0759212f772d8a9\nauthor Original Author <original@example.invalid> 1793342111 +0800\ncommitter Fixture Committer <committer@example.invalid> 1793342111 +0800\n\nfeat(fixture): establish ledger\n\nCo-authored-by: Prior Contributor <prior@example.invalid>\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "log",
+            "-1",
+            "--format=%B"
+          ],
+          "exit_code": 0,
+          "stdout": "fix(ledger): reject zero amounts\n\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "show",
+            "-s",
+            "--format=%P",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "b3e1083bc4b684c0ca55875c4b3ca1c41aa4e776\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "show",
+            "--format=",
+            "--no-ext-diff",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "diff --git a/ledger.js b/ledger.js\nindex 585d6fd..7e6a123 100644\n--- a/ledger.js\n+++ b/ledger.js\n@@ -1,4 +1,4 @@\n-exports.acceptAmount = amount => amount >= 0;\n+exports.acceptAmount = amount => amount > 0;\n \n \n \n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "diff",
+            "--name-only"
+          ],
+          "exit_code": 0,
+          "stdout": "ledger.js\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "diff",
+            "--",
+            "ledger.js"
+          ],
+          "exit_code": 0,
+          "stdout": "diff --git a/ledger.js b/ledger.js\nindex 7e6a123..ddd9864 100644\n--- a/ledger.js\n+++ b/ledger.js\n@@ -11,4 +11,4 @@ exports.acceptAmount = amount => amount > 0;\n \n \n \n-exports.label = 'Ledger';\n+exports.label = 'User renamed ledger';\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "--local",
+            "--get",
+            "core.hooksPath"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "id": "CEOPT-04-B3",
+      "head": "b4fba77a2cb92435b58a1c50838854e1c7d0cce1",
+      "actual_status": " M ledger.js\nA  unrelated.txt\n",
+      "all_checks_passed": true,
+      "active_fixture_hooks": [],
+      "execution_result_sha256": "a197db6ff691f73656d62a9b0a7093039105e35b2feef1f2a129fe10f110d582",
+      "logs": [
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "b4fba77a2cb92435b58a1c50838854e1c7d0cce1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "status",
+            "--short"
+          ],
+          "exit_code": 0,
+          "stdout": " M ledger.js\nA  unrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "diff",
+            "--cached",
+            "--binary"
+          ],
+          "exit_code": 0,
+          "stdout": "diff --git a/unrelated.txt b/unrelated.txt\nnew file mode 100644\nindex 0000000..5d783a5\n--- /dev/null\n+++ b/unrelated.txt\n@@ -0,0 +1 @@\n+User-owned staged work.\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "ls-files",
+            "--stage"
+          ],
+          "exit_code": 0,
+          "stdout": "100644 f590887df45a507201f4873ba31a33cbef41edee 0\tREADME.md\n100644 7e6a1230f89c5ca9c87d88126a5f4b7fc686bb32 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "cat-file",
+            "commit",
+            "b3e1083bc4b684c0ca55875c4b3ca1c41aa4e776"
+          ],
+          "exit_code": 0,
+          "stdout": "tree 8b313d41d63fb68ab8869878e0759212f772d8a9\nauthor Original Author <original@example.invalid> 1793342111 +0800\ncommitter Fixture Committer <committer@example.invalid> 1793342111 +0800\n\nfeat(fixture): establish ledger\n\nCo-authored-by: Prior Contributor <prior@example.invalid>\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "log",
+            "-1",
+            "--format=%B"
+          ],
+          "exit_code": 0,
+          "stdout": "fix(ledger): reject zero amounts\n\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "show",
+            "-s",
+            "--format=%P",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "b3e1083bc4b684c0ca55875c4b3ca1c41aa4e776\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "show",
+            "--format=",
+            "--no-ext-diff",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "diff --git a/ledger.js b/ledger.js\nindex 585d6fd..7e6a123 100644\n--- a/ledger.js\n+++ b/ledger.js\n@@ -1,4 +1,4 @@\n-exports.acceptAmount = amount => amount >= 0;\n+exports.acceptAmount = amount => amount > 0;\n \n \n \n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "diff",
+            "--name-only"
+          ],
+          "exit_code": 0,
+          "stdout": "ledger.js\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "diff",
+            "--",
+            "ledger.js"
+          ],
+          "exit_code": 0,
+          "stdout": "diff --git a/ledger.js b/ledger.js\nindex 7e6a123..ddd9864 100644\n--- a/ledger.js\n+++ b/ledger.js\n@@ -11,4 +11,4 @@ exports.acceptAmount = amount => amount > 0;\n \n \n \n-exports.label = 'Ledger';\n+exports.label = 'User renamed ledger';\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "--local",
+            "--get",
+            "core.hooksPath"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "Post-execution readback supplements original logs; it does not retroactively prove a missing pre-mutation check.",
+    "Parent evidence, not independent review; no model commands executed.",
+    "An earlier readback attempt incorrectly counted a context-header line as a changed line and stopped without writing an artifact; this run compares only actual added/deleted lines."
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "CEOPT-01",
+  "skill": "autoresearch",
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/CEOPT-01-request.txt",
+  "request_sha256": "5759e9ee8c1a3c1cbec5eeb0c11a6b3fee7716250bdc1d7a867ffbea930b19c2",
+  "fixture_root": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch",
+  "fixture_files": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/stable.tsv": "9f2c8f79f1214f54f184d680ac3b1e18669d254582e3a3e411e4ed3c3514ed31",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/unknown.tsv": "b0681d4f7486c59a4eeb059449ec7eeb5305d134dda71a8f30f6cfb5977ea85f",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/visual-ui.tsv": "e592f18f08be03d7c36dc2b2ba50a0bda780b82c1b5eee1d246298a748c51760",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/visual.tsv": "74fb938a93b11b23a67518650271e9788742101cada160c67dee5c1089434c51",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/hard.tsv": "f3491c5907187b07ad2af73aefcb586d222ecc2fe206e3493c8682b990f937a7"
+  },
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "deadline_seconds": 300,
+  "parent_recipe": "Save final artifact unchanged; no model mutation or posthoc score correction. Independently compare claims with raw TSV and actual helper outcomes.",
+  "status": "prepared-not-executed",
+  "limitations": [
+    "Scoring interpretation only; orchestrator check/recovery still open.",
+    "Synthetic task data and unauthenticated serving model."
+  ],
+  "arm_receipts": {
+    "A": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/autoresearch-A-receipts.json",
+      "sha256": "284bbbbdcca4b039bfbb2a41fca16cbc7a2db7015f3ef3109a4118c81cf65f9f"
+    },
+    "B": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/autoresearch-B-receipts.json",
+      "sha256": "46a5a20557cdf36e2931aedd79a318dbdf52eae96545d7a08f3320c35cc1f809"
+    }
+  }
+}

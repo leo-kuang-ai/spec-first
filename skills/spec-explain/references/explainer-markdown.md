@@ -10,7 +10,7 @@ How an explainer renders as markdown — the fallback format when intake resolve
 - **No internal identifiers in reader content.** Do not render scratch paths,
   run ids, authorization tokens, provider/model receipts, or machine-specific
   identifiers in the explainer body. Report the delivery path separately.
-- **Repo-relative paths** for any file reference; never absolute paths.
+- **Repo-relative source identity; destination-relative links.** Identify source files with their full repo-relative path and line numbers. A Markdown link resolves from the delivered document's directory, not the repository root: compute its target from the known final destination and verify it resolves to the cited file. If the destination is unknown or caller-managed, use plain repo-relative `path:line` pointers instead of guessed hyperlinks. Never expose machine-specific absolute paths.
 
 ## Show-n-tell in markdown
 

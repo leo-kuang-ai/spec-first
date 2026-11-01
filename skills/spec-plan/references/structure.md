@@ -27,11 +27,11 @@ Ask the user only when the answer materially affects architecture, scope, sequen
 
 #### 3.1 Title and File Naming
 
-- Draft a clear, searchable title using conventional format such as `feat: Add user authentication` or `fix: Prevent checkout double-submit`
+- Draft a clear, searchable plain-language title such as `Add user authentication` or `Prevent checkout double-submit`; keep the conventional type in metadata and the filename, not the visible title
 - Determine the plan type: `feat`, `fix`, or `refactor`
 - Build the filename following the repository convention: `docs/plans/YYYY-MM-DD-NNN-<type>-<descriptive-name>-plan.md`
   - Create `docs/plans/` if it does not exist
-  - Check existing files for today's date to determine the next sequence number (zero-padded to 3 digits, starting at 001)
+  - Use today's files to propose the next sequence number (zero-padded to 3 digits, starting at 001), then reserve a new path with exclusive creation; on collision choose the next number and retry without overwriting. Existing-artifact updates instead recheck the read identity before writing
   - Keep the descriptive name concise (3-5 words) and kebab-cased
   - Examples: `2026-01-15-001-feat-user-authentication-flow-plan.md`, `2026-02-03-002-fix-checkout-race-condition-plan.md`
   - Avoid: missing sequence numbers, vague names like "new-feature", invalid characters (colons, spaces)
@@ -129,6 +129,14 @@ Distinct from 3.6 (which is about *unknowns* at plan time): 3.7 is about *known 
 
 This reinforces the synthesis discipline established at Phase 0.7 / Phase 5.1.5 — the user's confirmed scope is what the active plan executes; everything else is deferred. Does NOT impose architectural bias on extend-vs-invent decisions within confirmed scope — that judgment stays with the agent (and is surfaced via the Phase 5.1.5 synthesis when material). The user's explicit ask overrides this default — if the user explicitly requested a refactor, it's in-scope, not deferred.
 
+#### 3.8 Judge Concerns Before Adding Mechanisms
+
+A research or review concern is a claim to examine, not automatically implementation work. For an addition the user did not request, identify the existing contract that requires it or trace concrete harm on this system's actual path. Would the failure be detected and corrected before harm lands? Would adding the safeguard later be costly because of stored data, a shared interface, money or security? Select the smallest mechanism that closes a demonstrated gap; additional guards, modes or retries each need their own reason.
+
+Record a rejected concern as **considered and not built**, with the reason and evidence that would change the decision. It is not accepted future work and must not enter `Deferred to Follow-Up Work`. During enrichment, place this in Planning Contract `Implementation Scope Boundaries`; never edit the upstream Product Contract to record the disposition. Genuine accepted follow-up work keeps its owner and trigger under Deferred.
+
+Uncertainty is a reason for targeted research or an explicit blocking question when load-bearing, not automatic permission to build. This lens cannot trim requested scope or waive an existing safety contract. If a necessary safeguard conflicts with requested behavior, return the conflict and evidence to the owning decision-maker; do not silently narrow behavior or invent approval.
+
 ### Phase 4: Write the Plan
 
 **NEVER CODE during this skill.** Research, decide, and write the plan — do not start implementation.
@@ -188,6 +196,6 @@ Omit "include when material" sections that don't carry information for this spec
 - Do not include implementation code — no imports, exact method signatures, or framework-specific syntax
 - Pseudo-code sketches and DSL grammars are allowed in the High-Level Technical Design section and per-unit technical design fields when they communicate design direction. Frame them explicitly as directional guidance, not implementation specification
 - Mermaid diagrams are encouraged when they clarify relationships or flows that prose alone would make hard to follow — ERDs for data model changes, sequence diagrams for multi-service interactions, state diagrams for lifecycle transitions, flowcharts for complex branching logic
-- Do not include git commands, commit messages, or exact test command recipes
+- Do not include git commands, commit messages, or mechanical execution scripts. The Verification Contract may name actual repo-specific test commands and their expected evidence; units describe verification outcomes without prescribing every keystroke
 - Do not expand implementation units into micro-step `RED/GREEN/REFACTOR` instructions
 - Do not pretend an execution-time question is settled just to make the plan look complete

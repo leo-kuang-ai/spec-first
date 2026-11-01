@@ -1,0 +1,10 @@
+{
+  "protected_excluded_and_historical_files_checked": 406,
+  "violations": [],
+  "all_frozen_protected_paths_checked": 6022,
+  "unexplained_modified_paths": [],
+  "index_entries_unchanged": true,
+  "plan_body_unchanged": true,
+  "frozen_manifest_unchanged": true,
+  "head": "fe81bae9ee55ec336c85cf80c4a0460d86e3a412"
+}

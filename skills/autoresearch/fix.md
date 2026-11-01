@@ -33,6 +33,8 @@ If --from-debug → read handoff.json for scope and findings.
 
 Verify: git repo exists, clean working tree, no lock files, no detached HEAD. Fail fast on critical issues.
 
+Read `autoresearch.md` → Candidate and Git Ownership before mutation. Its run-owned delta, immutable verification inputs, explicit commit authority and exact-candidate recovery rules apply here as well. Existing WIP is preserved; unrelated changes are not grounds for resetting the workspace.
+
 ## Establish Baseline (Iteration 0)
 
 1. Run Target command → count errors (metric = error count, direction = lower_is_better)
@@ -56,23 +58,23 @@ Within category: easiest first (single-file fixes before cross-file).
 - Make ONE focused fix (atomic — addresses exactly one error)
 - Record error type and which error was fixed
 
-### Phase 4: Commit
-- Stage and commit: `experiment: fix {error_type} — {description}`
+### Phase 4: Capture Candidate
+- Record the base/candidate identity and recoverable run-owned delta. Commit only after verification through the authorized owning workflow and `spec-commit`.
 
 ### Phase 5: Verify
 - Run Target → count errors → compute delta
 - Expected: error count decreased by 1 or more
 
 ### Phase 6: Guard
-- If Guard set → run Guard. If fails → revert.
+- If Guard is set, run it. Failure uses the exact-candidate recovery rules, preserving unrelated WIP.
 
 ### Phase 7: Decide
 - **keep** — error count decreased AND guard passes
 - **keep (reworked)** — fix needed adjustment, second attempt worked
-- **discard** — error count same/increased → `git revert HEAD --no-edit`
-- **crash** — target/guard command failed → revert
+- **discard** — error count same/increased; restore only the recorded run-owned candidate delta.
+- **crash** — target/guard command failed; preserve logs and use the same scoped recovery.
 - **hook-blocked** — git hook blocked the commit
-- **metric-error** — target output not parseable → revert
+- **metric-error** — target output not parseable; preserve raw output and use the same scoped recovery.
 
 ### Phase 8: Log
 Append row: iteration, timestamp, error_type, error_fixed, commit/-, metric (error count), delta, guard, status, description

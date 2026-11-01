@@ -1,0 +1,313 @@
+{
+  "schema_version": "ce-upstream-sync-run/v1",
+  "kind": "owner-receipt",
+  "window_sha256": "3e8df2dea3d823a91f617619a43142a21019d5cc677d06fb605ca3c1f8c0825b",
+  "input_sha256": "b4d1d19ec9be1f31c8ce752b26add358be689fdee0035a981073d167691e7000",
+  "target_snapshot": {
+    "repository": "spec-first",
+    "head": "fe81bae9ee55ec336c85cf80c4a0460d86e3a412",
+    "dirty": true,
+    "dirty_paths": [
+      "CHANGELOG.md",
+      "docs/contracts/verification/ce-upstream-sync-run.md",
+      "docs/contracts/verification/ce-upstream-sync-run.schema.json",
+      "docs/plans/2026-10-27-001-refactor-ce-upstream-sync-technical-scheme.md",
+      "scripts/check-ce-upstream-reconciliation.cjs",
+      "skills/spec-code-review/references/apply-findings.md",
+      "skills/spec-code-review/references/diff-scope.md",
+      "skills/spec-code-review/references/findings-schema.json",
+      "skills/spec-code-review/references/finish-review.md",
+      "skills/spec-code-review/references/personas/adversarial-reviewer.md",
+      "skills/spec-code-review/references/personas/correctness-reviewer.md",
+      "skills/spec-code-review/references/personas/maintainability-reviewer.md",
+      "skills/spec-code-review/references/personas/reliability-reviewer.md",
+      "skills/spec-code-review/references/personas/security-reviewer.md",
+      "skills/spec-code-review/references/personas/testing-reviewer.md",
+      "skills/spec-code-review/references/scope.md",
+      "skills/spec-code-review/references/validator-template.md",
+      "skills/spec-code-review/scripts/findings-mechanics.py",
+      "skills/spec-code-review/scripts/review-scope.py",
+      "skills/spec-commit-push-pr/references/branch-creation.md",
+      "skills/spec-compound/references/session-history.md",
+      "skills/spec-compound/scripts/session-history/extract-metadata.py",
+      "skills/spec-lfg/references/review-followup.md",
+      "tests/unit/ce-upstream-reconciliation-v2.test.js",
+      "tests/unit/session-history-scripts.test.js",
+      "tests/unit/spec-code-review-contracts.test.js",
+      "tests/unit/spec-code-review-mechanics.test.js",
+      "tests/unit/spec-commit-push-pr-context-contracts.test.js",
+      "tests/unit/spec-lfg-contracts.test.js"
+    ],
+    "dirty_path_manifest_sha256": "e763d4afdbe27828dd3b510109b9ba2d90b19e845b8dadc59ea902acefc8274f",
+    "source_tree_hash": "1e101c7d57b98dd6b1729b2211a65ed3f17b186a6886b13de63de50ac43cf0b0",
+    "inventory_hash": "39d4eb3287a1d44b529ba39a36e2593208ce44c600f590eab7aa6d2395eae609",
+    "scope_contract": {
+      "source_roots": [
+        "CLAUDE.md",
+        "AGENTS.md",
+        "skills",
+        "templates",
+        "src",
+        "scripts",
+        "tests",
+        "docs",
+        "README.md",
+        "README.en.md",
+        "README.zh-CN.md",
+        "CHANGELOG.md",
+        "package.json"
+      ],
+      "excluded_run_outputs": [
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-name-status.md",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication-input.json",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.md",
+        "docs/validation/2026-08-19-spec-first-current-skill-package-inventory-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-evidence-exceptions.json",
+        "docs/validation/ce-pull-2026-10-27/window-facts.json",
+        "docs/validation/ce-pull-2026-10-27/execution-state.json",
+        "docs/validation/ce-pull-2026-10-27/execution-baseline.json",
+        "docs/validation/ce-pull-2026-10-27/producer-name-status.tsv",
+        "docs/validation/ce-pull-2026-10-27/target-source-inventory.json",
+        "docs/validation/ce-pull-2026-10-27/adjudication-input.json",
+        "docs/validation/ce-pull-2026-10-27/adjudication.json",
+        "docs/validation/ce-pull-2026-10-27/ledger.json",
+        "docs/validation/ce-pull-2026-10-27/summary.md",
+        "docs/validation/ce-pull-2026-10-27/artifact-set.json",
+        "docs/validation/ce-pull-2026-10-27/work-return.json",
+        "docs/validation/ce-pull-2026-10-27/verification-run-summary.json",
+        "docs/validation/ce-pull-2026-10-27/honest-closeout.md",
+        "docs/validation/ce-pull-2026-10-27/handoff.json",
+        "docs/validation/ce-pull-2026-10-27/semantic-screening.json",
+        "docs/validation/ce-pull-2026-10-27/plan-review.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/window-facts.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/execution-state.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/execution-baseline.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/producer-name-status.tsv",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/target-source-inventory.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/adjudication-input.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/adjudication.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/ledger.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/summary.md",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/artifact-set.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/work-return.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/verification-run-summary.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/honest-closeout.md",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/handoff.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/semantic-screening.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/plan-review.json",
+        "docs/validation/ce-pull-2026-10-27/logs/**",
+        "docs/validation/ce-pull-2026-10-27/owner-receipts/**",
+        "docs/validation/ce-pull-2026-10-27/admissions/**",
+        "docs/validation/ce-pull-2026-10-27/ledger-patches/**",
+        "docs/validation/ce-pull-2026-10-27/staging/**",
+        "docs/validation/2026-08-19-ce-post-3-20-ledger-patches/**",
+        "docs/validation/ce-localization/**"
+      ]
+    },
+    "hash_algorithm": {
+      "name": "sha256",
+      "version": "canonical-source-manifest-v1"
+    }
+  },
+  "source_refs": [
+    "docs/validation/ce-pull-2026-10-27/admissions/U2-validator.json",
+    "docs/validation/ce-pull-2026-10-27/runs/validator-before/semantic-screening.json",
+    "CHANGELOG.md",
+    "skills/spec-code-review/references/validator-template.md",
+    "skills/spec-code-review/references/findings-schema.json",
+    "skills/spec-code-review/references/finish-review.md",
+    "skills/spec-code-review/references/apply-findings.md",
+    "skills/spec-lfg/references/review-followup.md",
+    "tests/unit/spec-code-review-contracts.test.js",
+    "tests/unit/spec-lfg-contracts.test.js"
+  ],
+  "limitations": [
+    "仅三态验证/收尾输入 slice；整包其余差额未关闭",
+    "96 项 source/schema 合同回归，不是模型/宿主效果",
+    "producer 自审，独立 review 未运行"
+  ],
+  "unresolved": [],
+  "unit_id": "U2",
+  "paths": [
+    "skills/ce-code-review/references/validator-template.md",
+    "skills/ce-code-review/references/validator-batch-template.md",
+    "skills/ce-code-review/references/findings-schema.json",
+    "skills/ce-code-review/references/finish-input.md",
+    "skills/ce-code-review/references/finish-review.md"
+  ],
+  "admission_ref": "docs/validation/ce-pull-2026-10-27/admissions/U2-validator.json",
+  "admission_sha256": "cf7cf4bb726a2a0a76a921916630a8eba63e6d11b64805e0e857591e4627c091",
+  "before_snapshot": {
+    "repository": "spec-first",
+    "head": "fe81bae9ee55ec336c85cf80c4a0460d86e3a412",
+    "dirty": true,
+    "dirty_paths": [
+      "CHANGELOG.md",
+      "docs/contracts/verification/ce-upstream-sync-run.md",
+      "docs/contracts/verification/ce-upstream-sync-run.schema.json",
+      "docs/plans/2026-10-27-001-refactor-ce-upstream-sync-technical-scheme.md",
+      "scripts/check-ce-upstream-reconciliation.cjs",
+      "skills/spec-code-review/references/diff-scope.md",
+      "skills/spec-code-review/references/finish-review.md",
+      "skills/spec-code-review/references/personas/adversarial-reviewer.md",
+      "skills/spec-code-review/references/personas/correctness-reviewer.md",
+      "skills/spec-code-review/references/personas/maintainability-reviewer.md",
+      "skills/spec-code-review/references/personas/reliability-reviewer.md",
+      "skills/spec-code-review/references/personas/security-reviewer.md",
+      "skills/spec-code-review/references/personas/testing-reviewer.md",
+      "skills/spec-code-review/references/scope.md",
+      "skills/spec-code-review/scripts/findings-mechanics.py",
+      "skills/spec-code-review/scripts/review-scope.py",
+      "skills/spec-commit-push-pr/references/branch-creation.md",
+      "skills/spec-compound/references/session-history.md",
+      "skills/spec-compound/scripts/session-history/extract-metadata.py",
+      "tests/unit/ce-upstream-reconciliation-v2.test.js",
+      "tests/unit/session-history-scripts.test.js",
+      "tests/unit/spec-code-review-mechanics.test.js",
+      "tests/unit/spec-commit-push-pr-context-contracts.test.js"
+    ],
+    "dirty_path_manifest_sha256": "b83a9ba9dfed09065bc9ffc549621fbe60ac81849a39081ea0189f5bd144582a",
+    "source_tree_hash": "dab07909482d4b67b67e8affc34e494a3ba8c90e960fbb534e4fef3d225cf56b",
+    "inventory_hash": "6d3313586aa9aafeebbf0c13a7923d7bc416e7a53228a9cd7e41536dcc471005",
+    "scope_contract": {
+      "source_roots": [
+        "CLAUDE.md",
+        "AGENTS.md",
+        "skills",
+        "templates",
+        "src",
+        "scripts",
+        "tests",
+        "docs",
+        "README.md",
+        "README.en.md",
+        "README.zh-CN.md",
+        "CHANGELOG.md",
+        "package.json"
+      ],
+      "excluded_run_outputs": [
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-name-status.md",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication-input.json",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.md",
+        "docs/validation/2026-08-19-spec-first-current-skill-package-inventory-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-evidence-exceptions.json",
+        "docs/validation/ce-pull-2026-10-27/window-facts.json",
+        "docs/validation/ce-pull-2026-10-27/execution-state.json",
+        "docs/validation/ce-pull-2026-10-27/execution-baseline.json",
+        "docs/validation/ce-pull-2026-10-27/producer-name-status.tsv",
+        "docs/validation/ce-pull-2026-10-27/target-source-inventory.json",
+        "docs/validation/ce-pull-2026-10-27/adjudication-input.json",
+        "docs/validation/ce-pull-2026-10-27/adjudication.json",
+        "docs/validation/ce-pull-2026-10-27/ledger.json",
+        "docs/validation/ce-pull-2026-10-27/summary.md",
+        "docs/validation/ce-pull-2026-10-27/artifact-set.json",
+        "docs/validation/ce-pull-2026-10-27/work-return.json",
+        "docs/validation/ce-pull-2026-10-27/verification-run-summary.json",
+        "docs/validation/ce-pull-2026-10-27/honest-closeout.md",
+        "docs/validation/ce-pull-2026-10-27/handoff.json",
+        "docs/validation/ce-pull-2026-10-27/semantic-screening.json",
+        "docs/validation/ce-pull-2026-10-27/plan-review.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/window-facts.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/execution-state.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/execution-baseline.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/producer-name-status.tsv",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/target-source-inventory.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/adjudication-input.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/adjudication.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/ledger.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/summary.md",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/artifact-set.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/work-return.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/verification-run-summary.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/honest-closeout.md",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/handoff.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/semantic-screening.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/plan-review.json",
+        "docs/validation/ce-pull-2026-10-27/logs/**",
+        "docs/validation/ce-pull-2026-10-27/owner-receipts/**",
+        "docs/validation/ce-pull-2026-10-27/admissions/**",
+        "docs/validation/ce-pull-2026-10-27/ledger-patches/**",
+        "docs/validation/ce-pull-2026-10-27/staging/**",
+        "docs/validation/2026-08-19-ce-post-3-20-ledger-patches/**",
+        "docs/validation/ce-localization/**"
+      ]
+    },
+    "hash_algorithm": {
+      "name": "sha256",
+      "version": "canonical-source-manifest-v1"
+    }
+  },
+  "admission_input_ref": "docs/validation/ce-pull-2026-10-27/runs/validator-before/adjudication-input.json",
+  "admission_window_ref": "docs/validation/ce-pull-2026-10-27/runs/validator-before/window-facts.json",
+  "changed_files": [
+    {
+      "path": "CHANGELOG.md",
+      "sha256": "b530f98e8e073e531e5e007f8ab18065aea2f96a5ad2bb501665de3fc1327ef6"
+    },
+    {
+      "path": "skills/spec-code-review/references/validator-template.md",
+      "sha256": "a810d51c2e2afe6071fccb170ac779a8afd3214868d1d18d1de29149a6826e1b"
+    },
+    {
+      "path": "skills/spec-code-review/references/findings-schema.json",
+      "sha256": "c0d7cfdc86b26f96a26d2d29cb9603ad3924e7d074a5c181f60d7708df754d66"
+    },
+    {
+      "path": "skills/spec-code-review/references/finish-review.md",
+      "sha256": "184fdb0c8b0752a7547f36d6f8e6b9f9fbae2b6269731f0597385e2792c4ee01"
+    },
+    {
+      "path": "skills/spec-code-review/references/apply-findings.md",
+      "sha256": "ce2cacb01df31bbb0eb4062be54331d63447cc6984f257963859774fd13f0ff5"
+    },
+    {
+      "path": "skills/spec-lfg/references/review-followup.md",
+      "sha256": "d65b6f367d80ce03b56e1a3f334b94303cfb098f58aee9cd42d30d9070964158"
+    },
+    {
+      "path": "tests/unit/spec-code-review-contracts.test.js",
+      "sha256": "23049cd94afbcfed4f72cb2879f289148f551ac969c89d616bf405a26ce9fb04"
+    },
+    {
+      "path": "tests/unit/spec-lfg-contracts.test.js",
+      "sha256": "1d631bcd2fe00f232a8f77c6e7cca45428f09edabba45c3372b6edb78436d1e0"
+    }
+  ],
+  "checks": [
+    {
+      "argv": [
+        "npx",
+        "jest",
+        "--runTestsByPath",
+        "tests/unit/spec-code-review-contracts.test.js",
+        "tests/unit/spec-code-review-mechanics.test.js",
+        "tests/unit/spec-code-review-peer-runner.test.js",
+        "tests/unit/spec-lfg-contracts.test.js",
+        "--runInBand"
+      ],
+      "required": true,
+      "status": "passed",
+      "exit_code": 0,
+      "log_path": "docs/validation/ce-pull-2026-10-27/logs/validator-contract-green.log",
+      "log_sha256": "845458c38215ada1ca76d1fd913ed886f4f37e8e65eb8b0401412a4c703d652f"
+    },
+    {
+      "argv": [
+        "npm",
+        "run",
+        "lint:skill-entrypoints"
+      ],
+      "required": true,
+      "status": "passed",
+      "exit_code": 0,
+      "log_path": "docs/validation/ce-pull-2026-10-27/logs/validator-entrypoints.log",
+      "log_sha256": "4a91314d46d957dca12612bfa3350c3dad446069ec3f0325cda540df1f64a675"
+    }
+  ],
+  "authorization_scope": "原 session 显式 spec-lfg 的既有 owner 同步，CE 只读；不扩大外发/runtime apply",
+  "claim_ceiling": "局部 source/schema 合同与针对性回归通过，整窗仍 in_progress"
+}

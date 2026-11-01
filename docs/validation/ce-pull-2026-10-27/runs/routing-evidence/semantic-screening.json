@@ -1,0 +1,153 @@
+{
+  "artifact_type": "advisory",
+  "status": "partial",
+  "entries": [
+    {
+      "path": "skills/ce-code-review/references/select-and-route.md",
+      "local_owner": "skills/spec-code-review/references/select-and-route.md",
+      "upstream_objects": {
+        "path": "skills/ce-code-review/references/select-and-route.md",
+        "status": "M",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "563f43020563496b7806e71af85f5d293b5d33d5"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "71eb9d37c594c36aaef6d51a5d94191d29cdb3ae"
+        },
+        "current_owner_surface_candidate": "skills/spec-code-review/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "reading": "CE 当前全文与本地全文（depth-paths 无同名本地文件）",
+      "decision": "吸收具体 performance/api trigger，保留本地 full/lite roster 与本地授权/身份门；不引入 peer 替代本地 adversarial 的默认路线",
+      "status": "partial-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-code-review/references/persona-catalog.md",
+      "local_owner": "skills/spec-code-review/references/persona-catalog.md",
+      "upstream_objects": {
+        "path": "skills/ce-code-review/references/persona-catalog.md",
+        "status": "M",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "1e0240fe9d7674721e80532a83e7e505a97a4017"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "4ae152b97cb7ef10439d31706b61037561ed6f02"
+        },
+        "current_owner_surface_candidate": "skills/spec-code-review/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "reading": "CE 当前全文与本地全文（depth-paths 无同名本地文件）",
+      "decision": "同上；本轮不批量缩小 always-on roster，避免下游覆盖语义变化",
+      "status": "partial-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-code-review/references/dispatch-reviewers.md",
+      "local_owner": "skills/spec-code-review/references/dispatch-reviewers.md",
+      "upstream_objects": {
+        "path": "skills/ce-code-review/references/dispatch-reviewers.md",
+        "status": "M",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "9c5a868a3a2ec7b21af8a59efd15cfbae494b16c"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "ea90c7070b84bb235d00acab644eda00256f4a42"
+        },
+        "current_owner_surface_candidate": "skills/spec-code-review/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "reading": "CE dispatch 分段读取（部分工具输出截断，未宣告全文），local 全文",
+      "decision": "吸收 urgent preliminary、显式模型优先、source 路径交付；保留授权和终态收集，不建 finish leaves/Pack resolver/telemetry",
+      "status": "partial-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-code-review/references/subagent-template.md",
+      "local_owner": "skills/spec-code-review/references/subagent-template.md",
+      "upstream_objects": {
+        "path": "skills/ce-code-review/references/subagent-template.md",
+        "status": "M",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "efd9a903e97b9d9895f0f97039901f8686d0a8bb"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "9674fc4799b9c6decd09959fb37210de7911ee77"
+        },
+        "current_owner_surface_candidate": "skills/spec-code-review/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "reading": "CE subagent 1-105/100-143/140-207 与 local 分段（输出有截断，仍待补读）",
+      "decision": "吸收 calibration、条件 provenance、有证据 advisory、删除/重述建议和分段读取；保留本地 persona-owned 结构门槛、无 artifact 时完整 in-band fallback",
+      "status": "partial-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-code-review/references/modes-and-output.md",
+      "local_owner": "skills/spec-code-review/references/modes-and-output.md",
+      "upstream_objects": {
+        "path": "skills/ce-code-review/references/modes-and-output.md",
+        "status": "M",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "89b6eb05fdaa075e7d046667d517cb691471374a"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "fdfe4d4ef1812488dfd6026ea78dba6a4be80939"
+        },
+        "current_owner_surface_candidate": "skills/spec-code-review/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "reading": "CE 当前全文与本地全文（depth-paths 无同名本地文件）",
+      "decision": "CE depth gate/apply token/receipt telemetry 与本地已有 mode/dispatch/fallback/task bundle 不等价；保留本地契约，未宣告等价",
+      "status": "partial-reviewed-retain-local"
+    },
+    {
+      "path": "skills/ce-code-review/references/depth-paths.md",
+      "local_owner": "skills/spec-code-review/references/diff-scope.md",
+      "upstream_objects": {
+        "path": "skills/ce-code-review/references/depth-paths.md",
+        "status": "A",
+        "old_object": null,
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "513ca885baaf4ec64b9016ef5c76c83a31971c9b"
+        },
+        "current_owner_surface_candidate": "skills/spec-code-review/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "reading": "CE 当前全文与本地全文（depth-paths 无同名本地文件）",
+      "decision": "CE lite/focused 依赖新的 scope helper、peer 默认外发及 run-log；当前不引入新 topology，删除 consumer 检查由既有 diff-scope 承接",
+      "status": "partial-reviewed-retain-local"
+    }
+  ],
+  "verification": {
+    "log_ref": "docs/validation/ce-pull-2026-10-27/logs/routing-evidence-recovery-tests.log",
+    "exit_code": 0,
+    "suites": 4,
+    "tests": 96,
+    "prior_failure_log_ref": "docs/validation/ce-pull-2026-10-27/logs/routing-evidence-final-tests.log",
+    "recovery_ref": "docs/validation/ce-pull-2026-10-27/logs/routing-evidence-receipt-recovery.json"
+  },
+  "limitations": [
+    "尚未作独立模型评估，source 合同不能证明模型行为",
+    "U2 peer/run-log/其余 persona 与全窗仍 open",
+    "未引入 upstream 自动外发授权、Compound Packs 或 finish leaf"
+  ]
+}

@@ -16,6 +16,12 @@ A learning has several dimensions that can independently go stale. Surface-level
 
 Match investigation depth to the learning's specificity — a learning referencing exact file paths and code snippets needs more verification than one describing a general principle.
 
+### 核查声明的失效条件
+
+读取已有 `invalidation_condition`，按其声明的方法核对当前 source/版本或外部 issue/release 证据；外部条件由 orchestrator 检查并汇总，不能假定 investigation worker 已处理。记录检查日期、来源、观察结果和适用范围到本次报告，不向 learning 写入例行 checked-at/status。来源不可达时记录 unverified 并保留原学习，不能把无法检查当成条件未满足或已失效；缺条件的 legacy 文档只报告缺口，不反推作者未声明的退役条件。
+
+条件满足只触发重新分类和回源：issue closed 不等于修复已发布，已发布不等于当前项目已采用；仍按 classify/publication 合同判断 Update/Replace/Delete。需要删除 workaround、升级依赖或运行写入验证时留作有授权的后续实施，不在只读调查中执行。
+
 ### Drift Classification: Update vs Replace
 
 The critical distinction is whether the drift is **cosmetic** (references moved but the solution is the same) or **substantive** (the solution itself changed):

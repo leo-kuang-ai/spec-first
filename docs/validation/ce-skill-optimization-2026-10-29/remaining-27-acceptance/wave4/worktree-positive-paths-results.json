@@ -1,0 +1,1865 @@
+{
+  "id": "CEOPT-32-positive-path-parent-supplement-r2",
+  "at": "2026-10-31T08:28:21.311718+00:00",
+  "protocol_sha256": "864f24df1a7a2a42e8b5c446dff8a6c339e6bec99a9c5104677a76b2d318eac7",
+  "runner_sha256": "cda158a6d9b06b7634f85c5b286827e70b3c25c8ca1ad5509bfc3cf1f0a61465",
+  "records": [
+    {
+      "arm": "A",
+      "case": "clean-nested-create",
+      "execution": {
+        "argv": [
+          "bash",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-worktree/scripts/worktree-manager.sh",
+          "create",
+          "feature/new",
+          "main"
+        ],
+        "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo",
+        "exit_code": 0,
+        "stdout": "Creating worktree feature/new from main\nAdded .worktrees to .gitignore\nHEAD is now at 16ee127 fixture\nEnvironment files:\n  Not copied by default. Re-run create with --copy-env to opt in.\nDev tool trust:\n  No installed dev-tool trust command applies.\n\nWorktree ready: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo/.worktrees/feature/new\nSwitch with: cd /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo/.worktrees/feature/new\n",
+        "stderr": "fatal: 'origin' does not appear to be a git repository\nfatal: Could not read from remote repository.\n\nPlease make sure you have the correct access rights\nand the repository exists.\nWarning: could not fetch origin/main; using local ref\nPreparing worktree (new branch 'feature/new')\n"
+      },
+      "before": {
+        "head": "16ee127a1534f55a04a3bc38f498e968f29a0517",
+        "branch": "main",
+        "index": "57ccdc1ace375fd3c66215b93837f3802cbdb41560e24034e9c770592ae2d763",
+        "status": "",
+        "refs": "refs/heads/main 16ee127a1534f55a04a3bc38f498e968f29a0517",
+        "worktrees": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo\nHEAD 16ee127a1534f55a04a3bc38f498e968f29a0517\nbranch refs/heads/main"
+      },
+      "after": {
+        "head": "16ee127a1534f55a04a3bc38f498e968f29a0517",
+        "branch": "main",
+        "index": "57ccdc1ace375fd3c66215b93837f3802cbdb41560e24034e9c770592ae2d763",
+        "status": "?? .gitignore",
+        "refs": "refs/heads/feature/new 16ee127a1534f55a04a3bc38f498e968f29a0517\nrefs/heads/main 16ee127a1534f55a04a3bc38f498e968f29a0517",
+        "worktrees": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo\nHEAD 16ee127a1534f55a04a3bc38f498e968f29a0517\nbranch refs/heads/main\n\nworktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo/.worktrees/feature/new\nHEAD 16ee127a1534f55a04a3bc38f498e968f29a0517\nbranch refs/heads/feature/new"
+      },
+      "target": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo/.worktrees/feature/new",
+      "target_branch": "feature/new",
+      "target_head": "16ee127a1534f55a04a3bc38f498e968f29a0517",
+      "upstream": {
+        "argv": [
+          "git",
+          "rev-parse",
+          "--abbrev-ref",
+          "@{upstream}"
+        ],
+        "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo/.worktrees/feature/new",
+        "exit_code": 128,
+        "stdout": "",
+        "stderr": "fatal: no upstream configured for branch 'feature/new'\n"
+      },
+      "intended_outcome_passed": true,
+      "command_records": [
+        {
+          "argv": [
+            "git",
+            "init",
+            "-q",
+            "-b",
+            "main"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "core.hooksPath",
+            "/dev/null"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.name",
+            "Fixture"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "add",
+            "README.md"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "commit",
+            "-qm",
+            "fixture"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "16ee127a1534f55a04a3bc38f498e968f29a0517\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "branch",
+            "--show-current"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "main\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "status",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "for-each-ref",
+            "--format=%(refname) %(objectname)"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "refs/heads/main 16ee127a1534f55a04a3bc38f498e968f29a0517\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "worktree",
+            "list",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo\nHEAD 16ee127a1534f55a04a3bc38f498e968f29a0517\nbranch refs/heads/main\n\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-worktree/scripts/worktree-manager.sh",
+            "create",
+            "feature/new",
+            "main"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "Creating worktree feature/new from main\nAdded .worktrees to .gitignore\nHEAD is now at 16ee127 fixture\nEnvironment files:\n  Not copied by default. Re-run create with --copy-env to opt in.\nDev tool trust:\n  No installed dev-tool trust command applies.\n\nWorktree ready: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo/.worktrees/feature/new\nSwitch with: cd /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo/.worktrees/feature/new\n",
+          "stderr": "fatal: 'origin' does not appear to be a git repository\nfatal: Could not read from remote repository.\n\nPlease make sure you have the correct access rights\nand the repository exists.\nWarning: could not fetch origin/main; using local ref\nPreparing worktree (new branch 'feature/new')\n"
+        },
+        {
+          "argv": [
+            "git",
+            "branch",
+            "--show-current"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo/.worktrees/feature/new",
+          "exit_code": 0,
+          "stdout": "feature/new\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo/.worktrees/feature/new",
+          "exit_code": 0,
+          "stdout": "16ee127a1534f55a04a3bc38f498e968f29a0517\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "--abbrev-ref",
+            "@{upstream}"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo/.worktrees/feature/new",
+          "exit_code": 128,
+          "stdout": "",
+          "stderr": "fatal: no upstream configured for branch 'feature/new'\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "16ee127a1534f55a04a3bc38f498e968f29a0517\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "branch",
+            "--show-current"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "main\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "status",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "?? .gitignore\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "for-each-ref",
+            "--format=%(refname) %(objectname)"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "refs/heads/feature/new 16ee127a1534f55a04a3bc38f498e968f29a0517\nrefs/heads/main 16ee127a1534f55a04a3bc38f498e968f29a0517\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "worktree",
+            "list",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo\nHEAD 16ee127a1534f55a04a3bc38f498e968f29a0517\nbranch refs/heads/main\n\nworktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/clean-nested-create/repo/.worktrees/feature/new\nHEAD 16ee127a1534f55a04a3bc38f498e968f29a0517\nbranch refs/heads/feature/new\n\n",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "arm": "A",
+      "case": "linked-remote-tracking",
+      "execution": {
+        "argv": [
+          "bash",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-worktree/scripts/worktree-manager.sh",
+          "isolate",
+          "remote-feature"
+        ],
+        "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/linked",
+        "exit_code": 0,
+        "stdout": "Already in an isolated worktree; checking out remote-feature in place.\nWorktree ready: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/linked\n",
+        "stderr": "Note: switching to 'origin/remote-feature'.\n\nYou are in 'detached HEAD' state. You can look around, make experimental\nchanges and commit them, and you can discard any commits you make in this\nstate without impacting any branches by switching back to a branch.\n\nIf you want to create a new branch to retain commits you create, you may\ndo so (now or later) by using -c with the switch command. Example:\n\n  git switch -c <new-branch-name>\n\nOr undo this operation with:\n\n  git switch -\n\nTurn off this advice by setting config variable advice.detachedHead to false\n\nHEAD is now at 16ee127 fixture\n"
+      },
+      "before": {
+        "head": "16ee127a1534f55a04a3bc38f498e968f29a0517",
+        "branch": "main",
+        "index": "12394f316bd0dc9fc77f1f1c7ea1b455fc8abfbcfd82a21ac14ab001e7e10679",
+        "status": "",
+        "refs": "refs/heads/main 16ee127a1534f55a04a3bc38f498e968f29a0517\nrefs/heads/scratch 16ee127a1534f55a04a3bc38f498e968f29a0517\nrefs/remotes/origin/remote-feature 16ee127a1534f55a04a3bc38f498e968f29a0517",
+        "worktrees": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo\nHEAD 16ee127a1534f55a04a3bc38f498e968f29a0517\nbranch refs/heads/main\n\nworktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/linked\nHEAD 16ee127a1534f55a04a3bc38f498e968f29a0517\nbranch refs/heads/scratch"
+      },
+      "after": {
+        "head": "16ee127a1534f55a04a3bc38f498e968f29a0517",
+        "branch": "main",
+        "index": "12394f316bd0dc9fc77f1f1c7ea1b455fc8abfbcfd82a21ac14ab001e7e10679",
+        "status": "",
+        "refs": "refs/heads/main 16ee127a1534f55a04a3bc38f498e968f29a0517\nrefs/heads/scratch 16ee127a1534f55a04a3bc38f498e968f29a0517\nrefs/remotes/origin/remote-feature 16ee127a1534f55a04a3bc38f498e968f29a0517",
+        "worktrees": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo\nHEAD 16ee127a1534f55a04a3bc38f498e968f29a0517\nbranch refs/heads/main\n\nworktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/linked\nHEAD 16ee127a1534f55a04a3bc38f498e968f29a0517\ndetached"
+      },
+      "target": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/linked",
+      "target_branch": "",
+      "target_head": "16ee127a1534f55a04a3bc38f498e968f29a0517",
+      "upstream": {
+        "argv": [
+          "git",
+          "rev-parse",
+          "--abbrev-ref",
+          "@{upstream}"
+        ],
+        "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/linked",
+        "exit_code": 128,
+        "stdout": "",
+        "stderr": "fatal: HEAD does not point to a branch\n"
+      },
+      "intended_outcome_passed": false,
+      "command_records": [
+        {
+          "argv": [
+            "git",
+            "init",
+            "-q",
+            "-b",
+            "main"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "core.hooksPath",
+            "/dev/null"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.name",
+            "Fixture"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "add",
+            "README.md"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "commit",
+            "-qm",
+            "fixture"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "worktree",
+            "add",
+            "-q",
+            "-b",
+            "scratch",
+            "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/linked",
+            "main"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "remote",
+            "add",
+            "origin",
+            "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "branch.autoSetupMerge",
+            "false"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "update-ref",
+            "refs/remotes/origin/remote-feature",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "16ee127a1534f55a04a3bc38f498e968f29a0517\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "branch",
+            "--show-current"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "main\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "status",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "for-each-ref",
+            "--format=%(refname) %(objectname)"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "refs/heads/main 16ee127a1534f55a04a3bc38f498e968f29a0517\nrefs/heads/scratch 16ee127a1534f55a04a3bc38f498e968f29a0517\nrefs/remotes/origin/remote-feature 16ee127a1534f55a04a3bc38f498e968f29a0517\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "worktree",
+            "list",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo\nHEAD 16ee127a1534f55a04a3bc38f498e968f29a0517\nbranch refs/heads/main\n\nworktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/linked\nHEAD 16ee127a1534f55a04a3bc38f498e968f29a0517\nbranch refs/heads/scratch\n\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-worktree/scripts/worktree-manager.sh",
+            "isolate",
+            "remote-feature"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/linked",
+          "exit_code": 0,
+          "stdout": "Already in an isolated worktree; checking out remote-feature in place.\nWorktree ready: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/linked\n",
+          "stderr": "Note: switching to 'origin/remote-feature'.\n\nYou are in 'detached HEAD' state. You can look around, make experimental\nchanges and commit them, and you can discard any commits you make in this\nstate without impacting any branches by switching back to a branch.\n\nIf you want to create a new branch to retain commits you create, you may\ndo so (now or later) by using -c with the switch command. Example:\n\n  git switch -c <new-branch-name>\n\nOr undo this operation with:\n\n  git switch -\n\nTurn off this advice by setting config variable advice.detachedHead to false\n\nHEAD is now at 16ee127 fixture\n"
+        },
+        {
+          "argv": [
+            "git",
+            "branch",
+            "--show-current"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/linked",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/linked",
+          "exit_code": 0,
+          "stdout": "16ee127a1534f55a04a3bc38f498e968f29a0517\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "--abbrev-ref",
+            "@{upstream}"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/linked",
+          "exit_code": 128,
+          "stdout": "",
+          "stderr": "fatal: HEAD does not point to a branch\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "16ee127a1534f55a04a3bc38f498e968f29a0517\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "branch",
+            "--show-current"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "main\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "status",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "for-each-ref",
+            "--format=%(refname) %(objectname)"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "refs/heads/main 16ee127a1534f55a04a3bc38f498e968f29a0517\nrefs/heads/scratch 16ee127a1534f55a04a3bc38f498e968f29a0517\nrefs/remotes/origin/remote-feature 16ee127a1534f55a04a3bc38f498e968f29a0517\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "worktree",
+            "list",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/repo\nHEAD 16ee127a1534f55a04a3bc38f498e968f29a0517\nbranch refs/heads/main\n\nworktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-remote-tracking/linked\nHEAD 16ee127a1534f55a04a3bc38f498e968f29a0517\ndetached\n\n",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "arm": "A",
+      "case": "linked-detached-tag",
+      "execution": {
+        "argv": [
+          "bash",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-worktree/scripts/worktree-manager.sh",
+          "isolate",
+          "snapshot"
+        ],
+        "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/linked",
+        "exit_code": 0,
+        "stdout": "Already in an isolated worktree; checking out snapshot in place.\nWorktree ready: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/linked\n",
+        "stderr": "Note: switching to 'snapshot'.\n\nYou are in 'detached HEAD' state. You can look around, make experimental\nchanges and commit them, and you can discard any commits you make in this\nstate without impacting any branches by switching back to a branch.\n\nIf you want to create a new branch to retain commits you create, you may\ndo so (now or later) by using -c with the switch command. Example:\n\n  git switch -c <new-branch-name>\n\nOr undo this operation with:\n\n  git switch -\n\nTurn off this advice by setting config variable advice.detachedHead to false\n\nHEAD is now at 03a0bc2 fixture\n"
+      },
+      "before": {
+        "head": "03a0bc2ed0652b1ac2422c3ae6759517f58d1a59",
+        "branch": "main",
+        "index": "385e4cda9fb6ea3c4b15062e95eaaf764c1e0ec14c87c77d0fcd7c2179ff1b36",
+        "status": "",
+        "refs": "refs/heads/main 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nrefs/heads/scratch 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nrefs/tags/snapshot 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59",
+        "worktrees": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo\nHEAD 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nbranch refs/heads/main\n\nworktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/linked\nHEAD 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nbranch refs/heads/scratch"
+      },
+      "after": {
+        "head": "03a0bc2ed0652b1ac2422c3ae6759517f58d1a59",
+        "branch": "main",
+        "index": "385e4cda9fb6ea3c4b15062e95eaaf764c1e0ec14c87c77d0fcd7c2179ff1b36",
+        "status": "",
+        "refs": "refs/heads/main 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nrefs/heads/scratch 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nrefs/tags/snapshot 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59",
+        "worktrees": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo\nHEAD 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nbranch refs/heads/main\n\nworktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/linked\nHEAD 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\ndetached"
+      },
+      "target": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/linked",
+      "target_branch": "",
+      "target_head": "03a0bc2ed0652b1ac2422c3ae6759517f58d1a59",
+      "upstream": {
+        "argv": [
+          "git",
+          "rev-parse",
+          "--abbrev-ref",
+          "@{upstream}"
+        ],
+        "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/linked",
+        "exit_code": 128,
+        "stdout": "",
+        "stderr": "fatal: HEAD does not point to a branch\n"
+      },
+      "intended_outcome_passed": true,
+      "command_records": [
+        {
+          "argv": [
+            "git",
+            "init",
+            "-q",
+            "-b",
+            "main"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "core.hooksPath",
+            "/dev/null"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.name",
+            "Fixture"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "add",
+            "README.md"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "commit",
+            "-qm",
+            "fixture"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "worktree",
+            "add",
+            "-q",
+            "-b",
+            "scratch",
+            "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/linked",
+            "main"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "tag",
+            "snapshot",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "branch",
+            "--show-current"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "main\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "status",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "for-each-ref",
+            "--format=%(refname) %(objectname)"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "refs/heads/main 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nrefs/heads/scratch 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nrefs/tags/snapshot 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "worktree",
+            "list",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo\nHEAD 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nbranch refs/heads/main\n\nworktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/linked\nHEAD 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nbranch refs/heads/scratch\n\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-worktree/scripts/worktree-manager.sh",
+            "isolate",
+            "snapshot"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/linked",
+          "exit_code": 0,
+          "stdout": "Already in an isolated worktree; checking out snapshot in place.\nWorktree ready: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/linked\n",
+          "stderr": "Note: switching to 'snapshot'.\n\nYou are in 'detached HEAD' state. You can look around, make experimental\nchanges and commit them, and you can discard any commits you make in this\nstate without impacting any branches by switching back to a branch.\n\nIf you want to create a new branch to retain commits you create, you may\ndo so (now or later) by using -c with the switch command. Example:\n\n  git switch -c <new-branch-name>\n\nOr undo this operation with:\n\n  git switch -\n\nTurn off this advice by setting config variable advice.detachedHead to false\n\nHEAD is now at 03a0bc2 fixture\n"
+        },
+        {
+          "argv": [
+            "git",
+            "branch",
+            "--show-current"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/linked",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/linked",
+          "exit_code": 0,
+          "stdout": "03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "--abbrev-ref",
+            "@{upstream}"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/linked",
+          "exit_code": 128,
+          "stdout": "",
+          "stderr": "fatal: HEAD does not point to a branch\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "branch",
+            "--show-current"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "main\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "status",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "for-each-ref",
+            "--format=%(refname) %(objectname)"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "refs/heads/main 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nrefs/heads/scratch 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nrefs/tags/snapshot 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "worktree",
+            "list",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/repo\nHEAD 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nbranch refs/heads/main\n\nworktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/A/linked-detached-tag/linked\nHEAD 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\ndetached\n\n",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "arm": "B",
+      "case": "clean-nested-create",
+      "execution": {
+        "argv": [
+          "bash",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-worktree/scripts/worktree-manager.sh",
+          "create",
+          "feature/new",
+          "main"
+        ],
+        "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo",
+        "exit_code": 0,
+        "stdout": "Creating worktree feature/new from main\nAdded .worktrees to .gitignore\nHEAD is now at 03a0bc2 fixture\nEnvironment files:\n  Not copied by default. Re-run create with --copy-env to opt in.\nDev tool trust:\n  No installed dev-tool trust command applies.\n\nWorktree ready: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo/.worktrees/feature/new\nSwitch with: cd /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo/.worktrees/feature/new\n",
+        "stderr": "fatal: 'origin' does not appear to be a git repository\nfatal: Could not read from remote repository.\n\nPlease make sure you have the correct access rights\nand the repository exists.\nWarning: could not fetch origin/main; using local ref\nPreparing worktree (new branch 'feature/new')\n"
+      },
+      "before": {
+        "head": "03a0bc2ed0652b1ac2422c3ae6759517f58d1a59",
+        "branch": "main",
+        "index": "d0e73da49f71285ca4901609513a336fbddc6b281d7545f68ced8c870e28e298",
+        "status": "",
+        "refs": "refs/heads/main 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59",
+        "worktrees": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo\nHEAD 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nbranch refs/heads/main"
+      },
+      "after": {
+        "head": "03a0bc2ed0652b1ac2422c3ae6759517f58d1a59",
+        "branch": "main",
+        "index": "d0e73da49f71285ca4901609513a336fbddc6b281d7545f68ced8c870e28e298",
+        "status": "?? .gitignore",
+        "refs": "refs/heads/feature/new 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nrefs/heads/main 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59",
+        "worktrees": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo\nHEAD 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nbranch refs/heads/main\n\nworktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo/.worktrees/feature/new\nHEAD 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nbranch refs/heads/feature/new"
+      },
+      "target": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo/.worktrees/feature/new",
+      "target_branch": "feature/new",
+      "target_head": "03a0bc2ed0652b1ac2422c3ae6759517f58d1a59",
+      "upstream": {
+        "argv": [
+          "git",
+          "rev-parse",
+          "--abbrev-ref",
+          "@{upstream}"
+        ],
+        "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo/.worktrees/feature/new",
+        "exit_code": 128,
+        "stdout": "",
+        "stderr": "fatal: no upstream configured for branch 'feature/new'\n"
+      },
+      "intended_outcome_passed": true,
+      "command_records": [
+        {
+          "argv": [
+            "git",
+            "init",
+            "-q",
+            "-b",
+            "main"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "core.hooksPath",
+            "/dev/null"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.name",
+            "Fixture"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "add",
+            "README.md"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "commit",
+            "-qm",
+            "fixture"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "branch",
+            "--show-current"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "main\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "status",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "for-each-ref",
+            "--format=%(refname) %(objectname)"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "refs/heads/main 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "worktree",
+            "list",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo\nHEAD 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nbranch refs/heads/main\n\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-worktree/scripts/worktree-manager.sh",
+            "create",
+            "feature/new",
+            "main"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "Creating worktree feature/new from main\nAdded .worktrees to .gitignore\nHEAD is now at 03a0bc2 fixture\nEnvironment files:\n  Not copied by default. Re-run create with --copy-env to opt in.\nDev tool trust:\n  No installed dev-tool trust command applies.\n\nWorktree ready: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo/.worktrees/feature/new\nSwitch with: cd /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo/.worktrees/feature/new\n",
+          "stderr": "fatal: 'origin' does not appear to be a git repository\nfatal: Could not read from remote repository.\n\nPlease make sure you have the correct access rights\nand the repository exists.\nWarning: could not fetch origin/main; using local ref\nPreparing worktree (new branch 'feature/new')\n"
+        },
+        {
+          "argv": [
+            "git",
+            "branch",
+            "--show-current"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo/.worktrees/feature/new",
+          "exit_code": 0,
+          "stdout": "feature/new\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo/.worktrees/feature/new",
+          "exit_code": 0,
+          "stdout": "03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "--abbrev-ref",
+            "@{upstream}"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo/.worktrees/feature/new",
+          "exit_code": 128,
+          "stdout": "",
+          "stderr": "fatal: no upstream configured for branch 'feature/new'\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "branch",
+            "--show-current"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "main\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "status",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "?? .gitignore\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "for-each-ref",
+            "--format=%(refname) %(objectname)"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "refs/heads/feature/new 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nrefs/heads/main 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "worktree",
+            "list",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo",
+          "exit_code": 0,
+          "stdout": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo\nHEAD 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nbranch refs/heads/main\n\nworktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/clean-nested-create/repo/.worktrees/feature/new\nHEAD 03a0bc2ed0652b1ac2422c3ae6759517f58d1a59\nbranch refs/heads/feature/new\n\n",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "arm": "B",
+      "case": "linked-remote-tracking",
+      "execution": {
+        "argv": [
+          "bash",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-worktree/scripts/worktree-manager.sh",
+          "isolate",
+          "remote-feature"
+        ],
+        "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/linked",
+        "exit_code": 0,
+        "stdout": "Already in an isolated worktree; checking out remote-feature in place.\nbranch 'remote-feature' set up to track 'origin/remote-feature'.\nWorktree ready: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/linked\n",
+        "stderr": "Switched to a new branch 'remote-feature'\n"
+      },
+      "before": {
+        "head": "77d6d0626f0974605668d994e03f53ff629389b1",
+        "branch": "main",
+        "index": "b78cc06d6edb7c97ebde699b2856e2d1253ef020d19287ddc41600b1e64af3da",
+        "status": "",
+        "refs": "refs/heads/main 77d6d0626f0974605668d994e03f53ff629389b1\nrefs/heads/scratch 77d6d0626f0974605668d994e03f53ff629389b1\nrefs/remotes/origin/remote-feature 77d6d0626f0974605668d994e03f53ff629389b1",
+        "worktrees": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo\nHEAD 77d6d0626f0974605668d994e03f53ff629389b1\nbranch refs/heads/main\n\nworktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/linked\nHEAD 77d6d0626f0974605668d994e03f53ff629389b1\nbranch refs/heads/scratch"
+      },
+      "after": {
+        "head": "77d6d0626f0974605668d994e03f53ff629389b1",
+        "branch": "main",
+        "index": "b78cc06d6edb7c97ebde699b2856e2d1253ef020d19287ddc41600b1e64af3da",
+        "status": "",
+        "refs": "refs/heads/main 77d6d0626f0974605668d994e03f53ff629389b1\nrefs/heads/remote-feature 77d6d0626f0974605668d994e03f53ff629389b1\nrefs/heads/scratch 77d6d0626f0974605668d994e03f53ff629389b1\nrefs/remotes/origin/remote-feature 77d6d0626f0974605668d994e03f53ff629389b1",
+        "worktrees": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo\nHEAD 77d6d0626f0974605668d994e03f53ff629389b1\nbranch refs/heads/main\n\nworktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/linked\nHEAD 77d6d0626f0974605668d994e03f53ff629389b1\nbranch refs/heads/remote-feature"
+      },
+      "target": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/linked",
+      "target_branch": "remote-feature",
+      "target_head": "77d6d0626f0974605668d994e03f53ff629389b1",
+      "upstream": {
+        "argv": [
+          "git",
+          "rev-parse",
+          "--abbrev-ref",
+          "@{upstream}"
+        ],
+        "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/linked",
+        "exit_code": 0,
+        "stdout": "origin/remote-feature\n",
+        "stderr": ""
+      },
+      "intended_outcome_passed": true,
+      "command_records": [
+        {
+          "argv": [
+            "git",
+            "init",
+            "-q",
+            "-b",
+            "main"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "core.hooksPath",
+            "/dev/null"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.name",
+            "Fixture"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "add",
+            "README.md"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "commit",
+            "-qm",
+            "fixture"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "worktree",
+            "add",
+            "-q",
+            "-b",
+            "scratch",
+            "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/linked",
+            "main"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "remote",
+            "add",
+            "origin",
+            "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "branch.autoSetupMerge",
+            "false"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "update-ref",
+            "refs/remotes/origin/remote-feature",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "77d6d0626f0974605668d994e03f53ff629389b1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "branch",
+            "--show-current"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "main\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "status",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "for-each-ref",
+            "--format=%(refname) %(objectname)"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "refs/heads/main 77d6d0626f0974605668d994e03f53ff629389b1\nrefs/heads/scratch 77d6d0626f0974605668d994e03f53ff629389b1\nrefs/remotes/origin/remote-feature 77d6d0626f0974605668d994e03f53ff629389b1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "worktree",
+            "list",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo\nHEAD 77d6d0626f0974605668d994e03f53ff629389b1\nbranch refs/heads/main\n\nworktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/linked\nHEAD 77d6d0626f0974605668d994e03f53ff629389b1\nbranch refs/heads/scratch\n\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-worktree/scripts/worktree-manager.sh",
+            "isolate",
+            "remote-feature"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/linked",
+          "exit_code": 0,
+          "stdout": "Already in an isolated worktree; checking out remote-feature in place.\nbranch 'remote-feature' set up to track 'origin/remote-feature'.\nWorktree ready: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/linked\n",
+          "stderr": "Switched to a new branch 'remote-feature'\n"
+        },
+        {
+          "argv": [
+            "git",
+            "branch",
+            "--show-current"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/linked",
+          "exit_code": 0,
+          "stdout": "remote-feature\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/linked",
+          "exit_code": 0,
+          "stdout": "77d6d0626f0974605668d994e03f53ff629389b1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "--abbrev-ref",
+            "@{upstream}"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/linked",
+          "exit_code": 0,
+          "stdout": "origin/remote-feature\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "77d6d0626f0974605668d994e03f53ff629389b1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "branch",
+            "--show-current"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "main\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "status",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "for-each-ref",
+            "--format=%(refname) %(objectname)"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "refs/heads/main 77d6d0626f0974605668d994e03f53ff629389b1\nrefs/heads/remote-feature 77d6d0626f0974605668d994e03f53ff629389b1\nrefs/heads/scratch 77d6d0626f0974605668d994e03f53ff629389b1\nrefs/remotes/origin/remote-feature 77d6d0626f0974605668d994e03f53ff629389b1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "worktree",
+            "list",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo",
+          "exit_code": 0,
+          "stdout": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/repo\nHEAD 77d6d0626f0974605668d994e03f53ff629389b1\nbranch refs/heads/main\n\nworktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-remote-tracking/linked\nHEAD 77d6d0626f0974605668d994e03f53ff629389b1\nbranch refs/heads/remote-feature\n\n",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "arm": "B",
+      "case": "linked-detached-tag",
+      "execution": {
+        "argv": [
+          "bash",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-worktree/scripts/worktree-manager.sh",
+          "isolate",
+          "snapshot"
+        ],
+        "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/linked",
+        "exit_code": 0,
+        "stdout": "Already in an isolated worktree; checking out snapshot in place.\nWorktree ready: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/linked\n",
+        "stderr": "HEAD is now at 77d6d06 fixture\n"
+      },
+      "before": {
+        "head": "77d6d0626f0974605668d994e03f53ff629389b1",
+        "branch": "main",
+        "index": "57840235a277af617df70af4a2e9cc0da9d2af0ae710c04116db15a500bf3423",
+        "status": "",
+        "refs": "refs/heads/main 77d6d0626f0974605668d994e03f53ff629389b1\nrefs/heads/scratch 77d6d0626f0974605668d994e03f53ff629389b1\nrefs/tags/snapshot 77d6d0626f0974605668d994e03f53ff629389b1",
+        "worktrees": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo\nHEAD 77d6d0626f0974605668d994e03f53ff629389b1\nbranch refs/heads/main\n\nworktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/linked\nHEAD 77d6d0626f0974605668d994e03f53ff629389b1\nbranch refs/heads/scratch"
+      },
+      "after": {
+        "head": "77d6d0626f0974605668d994e03f53ff629389b1",
+        "branch": "main",
+        "index": "57840235a277af617df70af4a2e9cc0da9d2af0ae710c04116db15a500bf3423",
+        "status": "",
+        "refs": "refs/heads/main 77d6d0626f0974605668d994e03f53ff629389b1\nrefs/heads/scratch 77d6d0626f0974605668d994e03f53ff629389b1\nrefs/tags/snapshot 77d6d0626f0974605668d994e03f53ff629389b1",
+        "worktrees": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo\nHEAD 77d6d0626f0974605668d994e03f53ff629389b1\nbranch refs/heads/main\n\nworktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/linked\nHEAD 77d6d0626f0974605668d994e03f53ff629389b1\ndetached"
+      },
+      "target": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/linked",
+      "target_branch": "",
+      "target_head": "77d6d0626f0974605668d994e03f53ff629389b1",
+      "upstream": {
+        "argv": [
+          "git",
+          "rev-parse",
+          "--abbrev-ref",
+          "@{upstream}"
+        ],
+        "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/linked",
+        "exit_code": 128,
+        "stdout": "",
+        "stderr": "fatal: HEAD does not point to a branch\n"
+      },
+      "intended_outcome_passed": true,
+      "command_records": [
+        {
+          "argv": [
+            "git",
+            "init",
+            "-q",
+            "-b",
+            "main"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "core.hooksPath",
+            "/dev/null"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.name",
+            "Fixture"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "add",
+            "README.md"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "commit",
+            "-qm",
+            "fixture"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "worktree",
+            "add",
+            "-q",
+            "-b",
+            "scratch",
+            "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/linked",
+            "main"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "tag",
+            "snapshot",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "77d6d0626f0974605668d994e03f53ff629389b1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "branch",
+            "--show-current"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "main\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "status",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "for-each-ref",
+            "--format=%(refname) %(objectname)"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "refs/heads/main 77d6d0626f0974605668d994e03f53ff629389b1\nrefs/heads/scratch 77d6d0626f0974605668d994e03f53ff629389b1\nrefs/tags/snapshot 77d6d0626f0974605668d994e03f53ff629389b1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "worktree",
+            "list",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo\nHEAD 77d6d0626f0974605668d994e03f53ff629389b1\nbranch refs/heads/main\n\nworktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/linked\nHEAD 77d6d0626f0974605668d994e03f53ff629389b1\nbranch refs/heads/scratch\n\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-worktree/scripts/worktree-manager.sh",
+            "isolate",
+            "snapshot"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/linked",
+          "exit_code": 0,
+          "stdout": "Already in an isolated worktree; checking out snapshot in place.\nWorktree ready: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/linked\n",
+          "stderr": "HEAD is now at 77d6d06 fixture\n"
+        },
+        {
+          "argv": [
+            "git",
+            "branch",
+            "--show-current"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/linked",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/linked",
+          "exit_code": 0,
+          "stdout": "77d6d0626f0974605668d994e03f53ff629389b1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "--abbrev-ref",
+            "@{upstream}"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/linked",
+          "exit_code": 128,
+          "stdout": "",
+          "stderr": "fatal: HEAD does not point to a branch\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "77d6d0626f0974605668d994e03f53ff629389b1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "branch",
+            "--show-current"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "main\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "status",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "for-each-ref",
+            "--format=%(refname) %(objectname)"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "refs/heads/main 77d6d0626f0974605668d994e03f53ff629389b1\nrefs/heads/scratch 77d6d0626f0974605668d994e03f53ff629389b1\nrefs/tags/snapshot 77d6d0626f0974605668d994e03f53ff629389b1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "worktree",
+            "list",
+            "--porcelain"
+          ],
+          "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo",
+          "exit_code": 0,
+          "stdout": "worktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/repo\nHEAD 77d6d0626f0974605668d994e03f53ff629389b1\nbranch refs/heads/main\n\nworktree /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-positive-paths-02lkbcpv/B/linked-detached-tag/linked\nHEAD 77d6d0626f0974605668d994e03f53ff629389b1\ndetached\n\n",
+          "stderr": ""
+        }
+      ]
+    }
+  ],
+  "scratch_removed_after_context_exit": true,
+  "all_expected_observations_matched": true,
+  "A_intent_pass": 2,
+  "B_intent_pass": 3,
+  "independent_review": "pending",
+  "model_trials_added": 0,
+  "limitations": [
+    "Parent-operated disposable local Git fixtures only; remote is a local self-reference.",
+    "No arbitrary dirty-state, host permission, cross-platform, race, credential or caller-index enforcement claim.",
+    "Frozen original model inputs remain unchanged; new parent controls do not upgrade original trial facets retroactively."
+  ]
+}

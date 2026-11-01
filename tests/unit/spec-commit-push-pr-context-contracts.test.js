@@ -8,6 +8,16 @@ const { spawnSync } = require('node:child_process');
 const read = (filePath) => fs.readFileSync(filePath, 'utf8');
 
 describe('spec-commit-push-pr context reference contract', () => {
+  test('提交来源保留真实作者且不猜邮箱', () => {
+    for (const file of ['skills/spec-commit/SKILL.md', 'skills/spec-commit-push-pr/references/commit-and-push.md']) {
+      const source = read(file);
+      expect(source).toContain('Co-authored-by: Name <email>');
+      expect(source).toContain('不猜测');
+      expect(source).toContain('独立改写');
+      expect(source).toMatch(/不.*历史重写/);
+    }
+  });
+
   test('checkout collision 的默认恢复保留混合暂存、无关文件和未跟踪文件', () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-branch-collision-'));
     const git = (...args) => {
@@ -94,4 +104,28 @@ describe('spec-commit-push-pr context reference contract', () => {
     expect(apply).toContain('`spec-explain` skill and the concept as input');
     expect(apply).toContain('do not invent a command entrypoint for a standalone skill');
   });
+});
+
+
+test('branch creation executes its documented ignored-collision protection', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-ignored-collision-'));
+  const git = (...args) => {
+    const result = spawnSync('git', ['-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false', ...args], { cwd: root, encoding: 'utf8' });
+    if (result.status !== 0) throw new Error(result.stderr); return result.stdout;
+  };
+  try {
+    git('init', '-q', '-b', 'main'); git('config', 'user.name', 'Fixture'); git('config', 'user.email', 'fixture@example.invalid');
+    fs.writeFileSync(path.join(root, '.gitignore'), 'collision.txt\n'); fs.writeFileSync(path.join(root, 'kept.txt'), 'base\n');
+    git('add', '.'); git('commit', '-qm', 'base'); git('checkout', '-qb', 'target');
+    fs.writeFileSync(path.join(root, 'collision.txt'), 'tracked target\n'); git('add', '-f', 'collision.txt'); git('commit', '-qm', 'target'); git('checkout', '-q', 'main');
+    fs.writeFileSync(path.join(root, 'collision.txt'), 'local ignored\n'); fs.writeFileSync(path.join(root, 'kept.txt'), 'staged\n'); git('add', 'kept.txt');
+    fs.appendFileSync(path.join(root, 'kept.txt'), 'unstaged\n');
+    const snapshot = () => ({ head: git('rev-parse', 'HEAD'), branch: git('branch', '--show-current'), index: git('write-tree'), diff: git('diff', '--binary'), ignored: read(path.join(root, 'collision.txt')), stash: git('stash', 'list') });
+    const before = snapshot();
+    const doc = read('skills/spec-commit-push-pr/references/branch-creation.md');
+    const command = doc.match(/```text\n(git checkout[^\n]+<base-ref>)\n```/)[1];
+    const [program, ...args] = command.split(' ').map((arg) => ({ '<branch-name>': 'feature', '<base-ref>': 'target' }[arg] || arg));
+    const result = spawnSync(program, args, { cwd: root, encoding: 'utf8' });
+    expect(result.status).not.toBe(0); expect(snapshot()).toEqual(before);
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });

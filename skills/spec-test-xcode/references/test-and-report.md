@@ -4,6 +4,8 @@ Read before screen interaction, human verification, failure handling, summary, o
 
 ## Exercise The Scoped Screens
 
+Derive the relevant screens and flows from the request and changed surface. For each, record entry action, expected state/effect and material failure branch before interacting. After every action, inspect the actual resulting screen/state and relevant logs; successful tap/type/navigation tool return alone never establishes success. A direct URL workaround can test a destination while leaving the original UI gesture unverified.
+
 For each scoped screen, use `take_screenshot` with the selected simulator UUID and a descriptive filename. Inspect rendered controls, expected content, layout, and error states. Use `get_sim_logs` to check crashes, exceptions, error logs, and failed network requests. Record actual outcomes and evidence references.
 
 SwiftUI `Text` with inline `AttributedString` links may report a successful automated tap without firing the gesture. A tap return is not evidence the link opened. When no effect is visible, request a manual tap or, when the URL is known and the entrypoint's URL authority is satisfied, use `xcrun simctl openurl <device> <URL>`. Observe the resulting navigation/app state before assigning a passing outcome.

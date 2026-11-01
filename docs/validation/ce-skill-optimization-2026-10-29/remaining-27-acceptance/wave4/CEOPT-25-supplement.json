@@ -1,0 +1,20 @@
+{
+  "id": "CEOPT-25-supplement",
+  "created_at": "2026-10-30T07:33:47.943715+00:00",
+  "status": "frozen-before-any-CEOPT-25-model-trial",
+  "parent_packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/CEOPT-25-packet.json",
+  "parent_packet_sha256": "978546799842f71f119520267e42c0bd4dd924c4028b252eb0212d7d71cb2fcc",
+  "arm_receipts": {
+    "A": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/runtime-supplement-A-receipts.json",
+      "sha256": "8bbfd99538b1d480c8b38d9eafd01e107e17d32ed9c3a0142c7b30fa6076d65c"
+    },
+    "B": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/runtime-supplement-B-receipts.json",
+      "sha256": "72fd63aa3639da16e60c389fcac13e2edcedac22efa5d828f267ce93d4b82501"
+    }
+  },
+  "interpretation": "Original outside path is within the supplied workspaceRoot; it shows non-target/link-following behavior, not workspace escape. Supplement tests paths actually outside workspaceRoot and repository/source snapshots under Git overrides. Consume both original and supplement under same request.",
+  "source_revision": "Original A/B unchanged",
+  "effect_scope": "Parent-operated disposable helpers only; no host installation or external operation."
+}

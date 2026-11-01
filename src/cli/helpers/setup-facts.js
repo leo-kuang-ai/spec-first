@@ -461,13 +461,13 @@ function normalizeSteadyState(value) {
   const refreshOwner = ['provider-native', 'runtime-setup', 'user', 'none', 'unknown'].includes(source.refresh_owner)
     ? source.refresh_owner
     : 'unknown';
-  const refreshMode = ['watcher', 'skill-cli-hook-on-demand', 'cli-mcp-hook-on-demand', 'manual-only', 'none', 'unknown'].includes(source.refresh_mode)
+  const refreshMode = ['watcher', 'skill-cli-hook-on-demand', 'cli-mcp-hook-on-demand', 'commit-hook-external-verified', 'manual-only', 'none', 'unknown'].includes(source.refresh_mode)
     ? source.refresh_mode
     : 'unknown';
   const usageOwner = ['downstream-skill', 'provider-native', 'user', 'none', 'unknown'].includes(source.usage_owner)
     ? source.usage_owner
     : 'unknown';
-  const hookStatus = ['verified', 'installed', 'failed', 'skipped', 'unknown'].includes(source.hook_status)
+  const hookStatus = ['verified', 'verified-external', 'blocked', 'installed', 'failed', 'skipped', 'unknown'].includes(source.hook_status)
     ? source.hook_status
     : 'unknown';
   return {

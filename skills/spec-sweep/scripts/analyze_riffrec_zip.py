@@ -96,7 +96,10 @@ def parse_args() -> argparse.Namespace:
     )
     parser.set_defaults(transcribe=False)
     parser.add_argument("--max-moments", type=int, default=12, help="Maximum screenshots to extract")
-    return parser.parse_args()
+    args = parser.parse_args()
+    if args.max_moments < 0:
+        parser.error("--max-moments must be nonnegative")
+    return args
 
 
 def slugify(value: str) -> str:
@@ -533,7 +536,9 @@ def transcribe_media(
     if "error" in payload:
         return {**receipt, "status": "failed", "text": "", "reason": compact_text(json.dumps(payload["error"]), 500)}
 
-    text = payload.get("text", "")
+    text = payload.get("text")
+    if not isinstance(text, str):
+        return {**receipt, "status": "failed", "text": "", "reason": "transcription response is missing string text"}
     return {**receipt, "status": "ok", "text": text, "raw": payload}
 
 
@@ -552,6 +557,8 @@ def transcribe_media_chunks(
     egress_authorization: str = "missing",
     chunk_seconds: int = 420,
 ) -> dict[str, Any]:
+    if egress_authorization != "explicit-cli-flag":
+        return transcribe_media(media_path, model, egress_authorization)
     if not media_path or not media_path.exists():
         return {
             "status": "missing",
@@ -643,35 +650,59 @@ def transcribe_media_chunks(
         if chunk_transcript.get("text"):
             transcripts.append(f"[{format_time(start)}]\n{chunk_transcript['text'].strip()}")
 
-    if transcripts:
-        return {
-            "status": "ok",
-            "text": "\n\n".join(transcripts),
-            "transcription_egress_authorization": egress_authorization,
-            "provider": "openai-audio-transcriptions",
-            "provider_request_sent": any(chunk.get("provider_request_sent") is True for chunk in chunk_results),
-            "source": "chunked_media",
-            "chunk_seconds": chunk_seconds,
-            "chunks": chunk_results,
-        }
-
+    covered = []
+    missing = []
+    for chunk in chunk_results:
+        chunk["end_seconds"] = min(chunk["start_seconds"] + chunk_seconds, duration)
+        interval = {"start_seconds": chunk["start_seconds"], "end_seconds": chunk["end_seconds"]}
+        (covered if chunk["status"] == "ok" else missing).append(interval)
+    status = "ok" if not missing else ("partial" if covered else "failed")
     return {
-        "status": "failed",
-        "text": "",
+        "status": status,
+        "text": "\n\n".join(transcripts),
+        "degraded": bool(missing),
         "transcription_egress_authorization": egress_authorization,
         "provider": "openai-audio-transcriptions",
         "provider_request_sent": any(chunk.get("provider_request_sent") is True for chunk in chunk_results),
-        "reason": "No chunks transcribed successfully",
+        "reason": "One or more chunks are unavailable" if missing else None,
+        "source": "chunked_media",
+        "chunk_seconds": chunk_seconds,
+        "covered_intervals": covered,
+        "missing_intervals": missing,
         "chunks": chunk_results,
     }
+
+
+def transcribe_with_fallback(media_path: Path | None, model: str, chunks_dir: Path, duration: float) -> dict[str, Any]:
+    initial = transcribe_media(media_path, model, "explicit-cli-flag")
+    results = [initial]
+    if should_retry_transcription_in_chunks(initial):
+        results.append(transcribe_media_chunks(media_path, model, chunks_dir, duration, "explicit-cli-flag"))
+    # A fallback cannot erase a previous request attempt. Keep compact receipts,
+    # not duplicate raw provider payloads or transcript bodies.
+    final = dict(results[-1])
+    fields = ("status", "reason", "provider", "transcription_egress_authorization", "provider_request_sent", "covered_intervals", "missing_intervals", "chunks")
+    final["attempts"] = [{key: result[key] for key in fields if key in result} for result in results]
+    final["provider_request_sent"] = any(result.get("provider_request_sent") is True for result in results)
+    if final.get("status") != "ok" and "missing_intervals" not in final and duration > 0:
+        final.update(covered_intervals=[], missing_intervals=[{"start_seconds": 0, "end_seconds": duration}], degraded=True)
+    return final
+
+
+def transcript_coverage_note(transcript: dict[str, Any]) -> str:
+    return (f"Transcript status: {transcript.get('status', 'unknown')}. "
+            f"Missing intervals (seconds): {json.dumps(transcript.get('missing_intervals', 'unknown'))}. "
+            "Unavailable intervals cannot support absence-of-problem claims.")
 
 
 def select_moments(
     events: list[dict[str, Any]],
     transcript: str,
     duration: float,
-    max_moments: int,
+    max_moments: int | None,
 ) -> list[dict[str, Any]]:
+    if max_moments == 0:
+        return []
     candidates: list[dict[str, Any]] = []
     clicks_by_target: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
     has_complaint = transcript_has_complaint(transcript)
@@ -717,7 +748,7 @@ def select_moments(
 
     if duration and not candidates:
         fractions = (0.1, 0.3, 0.5, 0.7, 0.9)
-        for fraction in fractions[:max(1, min(max_moments, len(fractions)))]:
+        for fraction in fractions[:len(fractions) if max_moments is None else max(0, min(max_moments, len(fractions)))]:
             candidates.append({"t": max(0.0, duration * fraction), "reason": "representative video frame", "events": []})
 
     candidates.sort(key=lambda item: (item["t"], item["reason"]))
@@ -728,7 +759,7 @@ def select_moments(
         if any(abs(candidate["t"] - existing["t"]) < 0.45 and candidate["reason"] == existing["reason"] for existing in deduped):
             continue
         deduped.append(candidate)
-        if len(deduped) >= max_moments:
+        if max_moments is not None and len(deduped) >= max_moments:
             break
 
     for index, moment in enumerate(deduped, start=1):
@@ -847,18 +878,17 @@ def summarize_candidate_findings(moments: list[dict[str, Any]], transcript: str)
             }
         )
 
-    if not findings:
-        findings.append(
-            {
-                "id": "F1",
-                "title": "No obvious failure detected automatically",
-                "severity": "P3",
-                "observed": "The analyzer did not find complaint cues, repeated clicks, console errors, or non-noisy failed requests.",
-                "expected": "A human should still inspect the source evidence before closing the feedback.",
-                "evidence": [moment["id"] for moment in moments[:3]],
-                "confidence": "Low",
-            }
-        )
+    console_errors = [moment for moment in moments if moment.get("reason") in {"console_error event", "error event", "exception event"}]
+    if console_errors:
+        findings.append({
+            "id": f"F{len(findings) + 1}",
+            "title": "Console or exception events were recorded",
+            "severity": "Unassessed",
+            "observed": "The event log contains console_error, error, or exception events; user impact is unconfirmed.",
+            "expected": "Review the raw event and surrounding behavior before proposing a product requirement.",
+            "evidence": [moment["id"] for moment in console_errors],
+            "confidence": "Confirmed event presence; product impact unknown",
+        })
     return findings
 
 
@@ -881,6 +911,7 @@ def write_analysis_md(
     moments: list[dict[str, Any]],
     findings: list[dict[str, Any]],
     repo_root: Path,
+    event_moments: list[dict[str, Any]] | None = None,
 ) -> None:
     lines: list[str] = []
     lines.append("# Product Feedback Analysis")
@@ -896,6 +927,8 @@ def write_analysis_md(
     lines.append(f"- Event counts: `{event_counts(events)}`")
     lines.append("")
     lines.append("## Transcript")
+    lines.append("")
+    lines.append(transcript_coverage_note(transcript))
     lines.append("")
     if transcript.get("text"):
         lines.append(transcript["text"].strip())
@@ -916,8 +949,19 @@ def write_analysis_md(
     else:
         lines.append("_No video moments available for this source._")
     lines.append("")
+    lines.append("## Event Facts Beyond the Screenshot Budget")
+    lines.append("")
+    selected_ids = {moment["id"] for moment in moments}
+    for moment in event_moments or []:
+        if moment["id"] not in selected_ids:
+            labels = "; ".join(event_label(event) for event in moment.get("events", []))
+            lines.append(f"- {moment['id']} at {format_time(moment['t'])}: {moment['reason']}. {labels}. Screenshot not selected.")
+    lines.append("The screenshot limit does not limit event-log analysis. Automated candidates do not establish product impact or an exhaustive review.")
+    lines.append("")
     lines.append("## Candidate Findings")
     lines.append("")
+    if not findings:
+        lines.append("No candidate finding was produced by the automated checks. Product impact remains unassessed; this is not evidence of no problems.")
     for finding in findings:
         lines.append(f"### {finding['id']}. {finding['title']}")
         lines.append("")
@@ -967,7 +1011,7 @@ def write_requirements_kickoff(
         "",
         "## Problem Frame",
         "",
-        f"A product feedback source for `{session.get('url', 'the product surface')}` produced evidence of product friction. The raw source has been converted into transcript, selected moments when video is available, screenshots when frames can be extracted, and candidate findings so the team can decide what product behavior should change before planning implementation.",
+        f"A product feedback source for `{session.get('url', 'the product surface')}` is available for assessment. Product friction is not yet confirmed. The raw source has been converted into transcript, selected moments when video is available, screenshots when frames can be extracted, and candidate findings so the team can decide what product behavior should change before planning implementation.",
         "",
         "Source materials for brainstorm:",
         f"- Source materials manifest: `{source_materials}`",
@@ -992,7 +1036,7 @@ def write_requirements_kickoff(
         "  - **Actors:** A1, A2, A3",
         "  - **Steps:** Extract or copy the source, transcribe media or read notes, select high-signal moments when video exists, inspect screenshots when available, confirm problems, and write requirements with supporting evidence.",
         "  - **Outcome:** Confirmed product problems are represented as requirements with transcript support and screenshot support when visual evidence exists.",
-        "  - **Covered by:** R1, R2, R3",
+        "  - **Covered by:** R1, R2 (evidence handling only)",
         "",
         "---",
         "",
@@ -1005,8 +1049,9 @@ def write_requirements_kickoff(
         "**Product requirements from this session**",
     ]
 
-    for index, finding in enumerate(findings, start=3):
-        lines.append(f"- R{index}. Resolve or intentionally scope the issue described by {finding['id']}: {finding['title']}.")
+    lines.append("No confirmed product requirements. Candidate findings require source review and owner confirmation before promotion.")
+    for finding in findings:
+        lines.append(f"- Candidate {finding['id']}: {finding['title']}. Confirm impact and expected behavior before drafting a requirement.")
 
     lines.extend(
         [
@@ -1016,7 +1061,7 @@ def write_requirements_kickoff(
             "## Acceptance Examples",
             "",
             "- AE1. **Covers R1, R2.** Given a feedback source with voice, video, or notes, when the analysis is complete, each promoted issue includes source evidence rather than prose-only claims.",
-            "- AE2. **Covers R3.** Given the user reports that a button is weird or unclickable, when requirements are finalized, the requirement identifies the specific control and the expected available/unavailable behavior.",
+            "- Product acceptance examples are pending confirmed requirements; do not invent a control or expected behavior from this scaffold.",
             "",
             "---",
             "",
@@ -1067,7 +1112,7 @@ def write_requirements_kickoff(
             "",
             "## Next Steps",
             "",
-            "-> Resume `spec-brainstorm` to confirm candidate findings and replace generic R-items with product-specific requirements.",
+            "-> Resume `spec-brainstorm` to confirm candidate findings and promote only confirmed product-specific requirements.",
         ]
     )
     output_path.write_text("\n".join(lines) + "\n")
@@ -1168,6 +1213,8 @@ def write_problem_analysis(
     complaint_text = transcript.get("text") or ""
     lines = [
         "<analysis>",
+        transcript_coverage_note(transcript),
+        "Read analysis.md for full event facts beyond the screenshot budget.",
         "## 1. Visual/UI Problems",
         "",
     ]
@@ -1242,6 +1289,8 @@ def write_review_prompt(
         "",
         "Here is the transcript of the discussion that occurred during the feedback session:",
         "",
+        transcript_coverage_note(transcript),
+        "Read analysis.md for full event facts beyond the screenshot budget; do not infer absence from selected frames.",
         "<discussion_transcript>",
         transcript.get("text") or f"[Transcript unavailable: {transcript.get('reason') or transcript.get('status', 'unknown')}]",
         "</discussion_transcript>",
@@ -1330,17 +1379,10 @@ def main() -> int:
             "provider_request_sent": False,
         }
     else:
-        transcript = transcribe_media(source["transcription_path"], args.model, "explicit-cli-flag")
-        if should_retry_transcription_in_chunks(transcript):
-            transcript = transcribe_media_chunks(
-                source["transcription_path"],
-                args.model,
-                raw_dir / "transcription_chunks",
-                duration,
-                "explicit-cli-flag",
-            )
+        transcript = transcribe_with_fallback(source["transcription_path"], args.model, raw_dir / "transcription_chunks", duration)
 
-    moments = select_moments(events, transcript.get("text", ""), duration, args.max_moments)
+    event_moments = select_moments(events, transcript.get("text", ""), duration, None)
+    moments = event_moments[:args.max_moments]
     if not moments and source["recording_path"]:
         fallback_times = [0.5, 2.0, 5.0, 10.0, 15.0]
         moments = [
@@ -1352,7 +1394,7 @@ def main() -> int:
     except SourceInputError as error:
         print(f"Invalid output: {error}", file=sys.stderr)
         return 2
-    findings = summarize_candidate_findings(moments, transcript.get("text", ""))
+    findings = summarize_candidate_findings(event_moments, transcript.get("text", ""))
 
     topic = slugify(args.topic or source_path.stem)
     repo_root = Path.cwd()
@@ -1361,7 +1403,7 @@ def main() -> int:
     review_prompt_md = output_dir / "review-prompt.md"
     source_materials_md = output_dir / "source-materials.md"
     kickoff_md = output_dir / "requirements-kickoff.md"
-    write_analysis_md(analysis_md, source_path, source_kind, session, events, transcript, moments, findings, repo_root)
+    write_analysis_md(analysis_md, source_path, source_kind, session, events, transcript, moments, findings, repo_root, event_moments)
     write_problem_analysis(problem_analysis_md, transcript, moments, findings, repo_root)
     write_review_prompt(review_prompt_md, transcript, moments, repo_root)
     write_source_materials(source_materials_md, source_path, source_kind, session, transcript, moments, raw_dir, frames_dir, repo_root)
@@ -1378,8 +1420,10 @@ def main() -> int:
             "transcription_egress_authorization": transcript.get("transcription_egress_authorization"),
             "provider": transcript.get("provider"),
             "provider_request_sent": transcript.get("provider_request_sent", False),
+            "attempts": transcript.get("attempts", []),
         },
         "moments": moments,
+        "event_moments": event_moments,
         "candidate_findings": findings,
         "artifacts": {
             "analysis_md": str(analysis_md),

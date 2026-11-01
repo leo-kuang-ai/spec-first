@@ -6,6 +6,7 @@
 # Usage: Create a YAML file matching this schema and pass it to spec-optimize.
 # The agent reads this spec, validates required fields, and uses it to
 # configure the entire optimization run.
+# 兼容性：holdout 为可选增量；旧 spec 沿用单集比较，不自动升级为已确认的泛化收益。
 
 # ============================================================================
 # REQUIRED FIELDS
@@ -178,6 +179,10 @@ required_fields:
                 default: []
                 description: "Additional scoring fields to log (not optimized against)"
         optional_children:
+          confirmation_seed:
+            type: integer
+            default: null
+            description: "独立确认样本的 seed，必须为安全整数且不同于 sample_seed。仅不同 seed 不证明互斥：确认样本须来自 selection 未抽取的 item；不足时使用 measurement.holdout.command 或停止确认。"
           model:
             type: enum
             values:
@@ -250,6 +255,14 @@ required_fields:
         type: string
         default: "."
         description: "Working directory for the measurement command, relative to the repo root"
+      holdout:
+        type: object
+        default: null
+        description: "冻结且独立的确认集，仅在 selection 可 keep 后及最终确认时使用，不进入假设或排名。未配置保留旧比较；配置后决定脚本必须接收第二组 baseline/candidate。"
+        required_children:
+          command:
+            type: string
+            description: "在同一 cwd 运行并输出相同 snapshot 结构的非空确认命令；其执行 envelope 需独立授权。"
       stability:
         type: object
         default: { mode: "stable" }
@@ -381,6 +394,11 @@ required_fields:
             minimum: 2
             required_when: "measurement.calibration.mode == 'measurement-only'"
             description: "Number of baseline-vs-baseline repetitions; must be at least 2 in measurement-only mode"
+          noise_rule:
+            type: string
+            const: range-v1
+            required_when: "measurement.calibration.mode == 'measurement-only'"
+            description: "Admission v2 preregisters max(score)-min(score) over completed A/A result records; v1 admissions require fresh calibration"
           preregistered_acceptance_threshold:
             type: number
             minimum: 0
@@ -559,6 +577,9 @@ optional_fields:
 # ============================================================================
 
 validation_rules:
+  - "measurement.holdout 非空时必须有非空字符串 command；metric.judge.confirmation_seed 非空时须为不同于 sample_seed（默认 42）的安全整数，且 primary.type 为 judge"
+  - "配置 holdout 后 keep 必须由同一目标在独立确认中改善且无其他必需目标退化；重复/ladder 确认使用完整实测样本，不能用 aggregate 或 sample_count 补证"
+  - "holdout 输入、数据、harness 和 item 划分属于 scope.immutable；确认结果不得用于选候选、排名或生成假设，协议变化另起 run"
   - "Reject unknown directions, roles, comparison/aggregation modes, duplicate objective names, nonfinite targets, negative thresholds, and invalid regression bounds; do not silently change the approved protocol"
   - "Paired comparison requires an observed baseline for each candidate sample in the same order; missing pairs cannot be synthesized or replaced by aggregate judge scores"
   - "All required fields must be present"

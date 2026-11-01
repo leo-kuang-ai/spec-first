@@ -1,0 +1,13 @@
+{
+  "command": [
+    "node",
+    "node_modules/jest/bin/jest.js",
+    "--runInBand",
+    "--runTestsByPath",
+    "tests/unit/spec-debug-contracts.test.js",
+    "tests/unit/spec-debug-fix-reference-contracts.test.js",
+    "tests/unit/spec-debug-judge-calibration.test.js"
+  ],
+  "exit_code": 0,
+  "scope": "静态合同与隔离HTTP Judge正反校准，非真实模型debug eval"
+}

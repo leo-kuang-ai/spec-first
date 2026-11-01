@@ -23,7 +23,7 @@ deterministic intake, not required to recognize the type. A malformed task pack
 must not fall back to an ordinary plan. `task-pack` classification precedes
 unified requirements/plan and general content-shape classification.
 
-First check the unified artifact contract: `artifact_contract: spec-unified-plan/v1` plus `artifact_readiness: requirements-only` -> classify as `unified-requirements` (review Product Contract only; absent Planning Contract/Units/Verification/DoD is expected). Same contract plus `artifact_readiness: implementation-ready` -> classify as `unified-plan` (review Product Contract and Planning Contract with different lenses, then Implementation Units/Verification/DoD for execution completeness). Invalid progress-like readiness values (`active`, `in_progress`, `completed`, `done`) are a document-contract finding, not an execution state to honor.
+First check the unified artifact contract: `artifact_contract: spec-unified-plan/v1` plus `artifact_readiness: requirements-only` -> classify as `unified-requirements` (review Product Contract; absent Planning Contract/Units/Verification/DoD is expected, but review any HOW content actually present with the corresponding planning lens without upgrading readiness). Same contract plus `artifact_readiness: implementation-ready` -> classify as `unified-plan` (review Product Contract and Planning Contract with different lenses, then Implementation Units/Verification/DoD for execution completeness). Invalid progress-like readiness values (`active`, `in_progress`, `completed`, `done`) are a document-contract finding, not an execution state to honor.
 
 **STOP. For `task-pack`, read `references/task-pack-review-lens.md` immediately.
 Complete deterministic intake, the current source-plan read, the task-pack
@@ -71,3 +71,9 @@ HTML follows the same semantic review but remains report-only. For an
 ID-bearing HTML producer-fix candidate, describe the nearest sibling's native
 structure and preserve its anchor convention and visible ID text. Never insert
 Markdown into HTML or imply the reviewer applied that producer-owned change.
+
+## Reuse and resume
+
+Reuse a prior review only when the current document/source identity, scope, relevant referenced constraints, coverage and requested lens match, and the full findings, constituent evidence, classifications and decisions are available. A summary or clean-verdict sentence is insufficient. Re-read the current document and consequential references before reuse; changed source or constraints require re-evaluation even if a quoted paragraph is unchanged.
+
+A delivery-mode change alone does not require restarting the roster. Reuse complete matching evidence, re-render it under the current mutation policy, and inspect only unresolved or changed slices. Missing independent corroboration stays a limitation; a targeted independent check is optional only when authorized and available, and receives raw source rather than the prior conclusion. No review reuse creates execution readiness or mutation authority.

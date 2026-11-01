@@ -14,6 +14,8 @@ Review every candidate idea critically. Critique has two roles — basis verific
 
 If an authorized verifier dispatch fails, fall back to orchestrator-only filtering, record the capability/failure reason, and note the degradation in the rejection summary.
 
+For every surviving load-bearing basis, retain the actually read source/quote and verification status. A gist or generator assertion alone is insufficient. Spend remaining reads on material gaps; if the budget is exhausted, narrow the claim or mark the idea as a hypothesis with the gap visible. Do not label an unverified citation `direct:`.
+
 Do not generate replacement ideas in this phase unless explicitly refining.
 
 For each rejected idea, write a one-line reason.
@@ -37,9 +39,9 @@ Score survivors using a consistent rubric weighing: groundedness in stated conte
 **Axis coverage as a list-level concern.** When axes were defined, axis spread is evaluated across the survivor set, not per-idea. After per-idea filtering, check the survivor set: if axis coverage is uneven and stronger candidates exist on under-represented axes, prefer the spread when promoting borderline candidates. Phase 2's recovery dispatch should already have surfaced candidates for empty axes; this is a polish step on the survivor selection. If an axis ends up with zero survivors despite recovery (or because recovery hit the 2-axis cap), note it in the rejection summary as a deliberate gap rather than an oversight.
 
 Target output:
-- keep 5-7 survivors by default
-- if too many survive, run a second stricter pass
-- if fewer than 5 survive, report that honestly rather than lowering the bar
+- use the resolved explicit survivor count; otherwise keep 5-7 by default
+- if too many survive, run a second stricter pass against that target
+- if fewer meet the bar, report the shortfall honestly rather than padding
 
 ## Phase 4: Write and Present the Deliverable
 
@@ -56,16 +58,16 @@ The ideation artifact is produced **automatically** — persistence is not opt-i
    - **Repo mode:** ensure `docs/ideation/` exists (create if absent).
    - **Elsewhere mode with `docs/ideation/` already present:** use it.
    - **Otherwise (no repo, or elsewhere with no `docs/ideation/`):** return the complete deliverable inline and offer to write it only after the user selects a durable destination. Do **not** use run-local scratch as the only deliverable, write into an arbitrary current working directory, or create a `docs/ideation/` tree for a subject unrelated to the repo.
-2. **Choose the file path:** `<dir>/YYYY-MM-DD-<topic>-ideation.<ext>` (or `<dir>/YYYY-MM-DD-open-ideation.<ext>` when no focus exists).
+2. **Choose the file path:** `<dir>/YYYY-MM-DD-<topic>-ideation.<ext>` (or `<dir>/YYYY-MM-DD-open-ideation.<ext>` when no focus exists). A fresh run checks existence and chooses a unique suffix rather than overwriting a same-day artifact. Only an explicit resume updates the resolved existing document.
 3. **Load the section contract and rendering reference** (deferred from Phase 0.0): read `references/ideation-sections.md` and the format-rendering reference matching `OUTPUT_FORMAT` — `references/markdown-rendering.md` for `md`, `references/html-rendering.md` for `html`.
 4. **Write the document** per those references. `ideation-sections.md` defines the section contract (metadata, Grounding Context, Topic Axes, Ranked Ideas with per-idea fields, Rejection Summary); the rendering reference defines how the resolved format presents it. Content is identical across formats; only presentation differs.
-   - **On write failure** (no writable path, permissions): announce the failure and offer a custom path (validate writable; create parent dirs). Never lose the survivors silently.
+   - **On write failure** (no writable path, permissions): announce the failure and return the complete deliverable inline; offer a custom durable path. Never lose the survivors or claim a saved artifact. Read back a successful write before reporting its path.
 
 **Resume:** update the existing file in place, in its existing format (per `references/output-mode.md` Phase 0.1 format precedence); carry the prior ideas and rejection summary forward, adding to them rather than overwriting.
 
 ### 4.2 Present a Concise Summary (not the full deliverable)
 
-The full cards, rationale, downsides, diagrams, and the rejection table live in the file. Do **not** reproduce them in the session — reprinting the whole deliverable as chat text defeats the rich format and leads the reader through plain text before they ever see it. Show a tight orientation instead:
+When a durable file exists, the full cards, rationale, downsides, diagrams, and rejection table live there. The inline-only fallback instead returns all of them; the summary-only rule below applies to confirmed files. Do **not** reproduce them in the session — reprinting the whole deliverable as chat text defeats the rich format and leads the reader through plain text before they ever see it. Show a tight orientation instead:
 
 - One line with counts and the path: e.g. `Wrote 7 ranked ideas (36 raw, 13 cut) across 5 axes → <absolute path>`.
 - A ranked list, **one line per survivor**: `1. <Title> · <axis> · Conf <High/Med/Low> · Cx <S/M/L>`.
@@ -83,7 +85,7 @@ This ranked list doubles as the index the user references when choosing an idea 
 
 Ask what to do next using the platform's blocking question tool: the host's blocking question tool already in the current tool list, matched by capability (if a matching tool is listed but unloaded, load it through the host's tool-discovery primitive). Fall back to numbered options in chat only when no such tool is in the list or a real question call errors. Never silently skip the question. Free-text answers are accepted.
 
-The deliverable already exists (Phase 4), so the menu is purely *what next* — there is no "save" step.
+When a file was confirmed in Phase 4, the menu is only what next. For an inline-only deliverable, say it was returned inline, offer an optional durable destination, and omit open-file, commit and delete actions. Never say "saved" without a successful write/readback.
 
 **Stem:** "Your ideation is saved to `<path>`. What next?"
 

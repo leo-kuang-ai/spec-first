@@ -3,7 +3,7 @@
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
-const { execFileSync } = require('node:child_process');
+const { runGit } = require('./git-path.cjs');
 const { assertContainedPath } = require('./path-safety.cjs');
 const { resolveReadOnlyHostConfigTargets } = require('./host-config.cjs');
 const { detectRuntimePlatform, getEffectiveRegistry, canonicalizeRegistry } = require('./registry.cjs');
@@ -49,14 +49,11 @@ function captureSourceSnapshot({ repoRoot, skillRoot = path.resolve(__dirname, '
   } catch (_error) {
     limitations.push(registryHash ? 'host-config-snapshot-unavailable' : 'registry-unreadable');
   }
-  const gitEnv = { ...process.env, GIT_OPTIONAL_LOCKS: '0' };
-  // 调用者的 Git 定位变量不能把 target 的证据重定向到其他仓库。
-  for (const key of Object.keys(gitEnv)) {
-    if (key.startsWith('GIT_') && key !== 'GIT_OPTIONAL_LOCKS') delete gitEnv[key];
-  }
-  const git = (args) => execFileSync('git', ['-c', 'core.fsmonitor=false', '-C', root, ...args], {
-    env: gitEnv, encoding: 'utf8', timeout: 3000, maxBuffer: 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'],
-  }).trim();
+  const git = (args) => {
+    const result = runGit(root, args, { timeout: 3000 });
+    if (result.error || result.status !== 0) throw result.error || new Error('source-git-read-failed');
+    return result.stdout.trim();
+  };
   let sourceHead = null;
   let sourceKind = 'unknown';
   let sourceContentHash = null;

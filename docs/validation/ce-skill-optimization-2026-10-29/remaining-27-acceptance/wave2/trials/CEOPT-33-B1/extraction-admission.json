@@ -1,0 +1,12 @@
+{
+  "trial": "CEOPT-33-B1",
+  "at": "2026-10-31T05:35:42.412593+00:00",
+  "original_sha256": "78405ee60f9ab6c30a154e0573b72c74d31a1ea13f52159847b44afa76924097",
+  "source_lines_inclusive": [
+    1,
+    276
+  ],
+  "candidate_sha256": "3041c0f6679898b15dce3e7b5c9f69e8477cc5e5f19956e27cb634079bfb0bc6",
+  "admission": "Parent reviewed complete draft through Regeneration Rules and manually admits exact contiguous lines; final disposition excluded, no semantic edit/status promotion.",
+  "semantic_observation": "All3 serial owners and namedproof/seam retained, session-settled notes explicit, callback binding unknown preserved, external exact-operation receipt stillrequired. Deliberate draft-only posture retained."
+}

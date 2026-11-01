@@ -1,0 +1,52 @@
+{
+  "kind": "audit-record-and-source-preservation-check",
+  "status": "passed",
+  "included_skills": 34,
+  "source_reviews_complete": 34,
+  "direct_ce_mappings": 30,
+  "excluded_skills": [
+    "spec-app-consistency-audit",
+    "spec-project-rules",
+    "spec-rule-miner",
+    "spec-write-skill"
+  ],
+  "package_text_files": 1361,
+  "package_generated_binary_caches": [
+    "/Users/kuang/xiaobu/spec-first/skills/spec-code-review/scripts/__pycache__/peer-job-runner.cpython-312.pyc",
+    "/Users/kuang/xiaobu/spec-first/skills/spec-doc-review/scripts/__pycache__/peer-job-runner.cpython-312.pyc",
+    "/Users/kuang/xiaobu/spec-first/skills/spec-pov/scripts/__pycache__/peer-job-runner.cpython-312.pyc",
+    "/Users/kuang/xiaobu/spec-first/skills/spec-riffrec-feedback-analysis/scripts/__pycache__/analyze_riffrec_zip.cpython-312.pyc",
+    "/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-riffrec-feedback-analysis/scripts/__pycache__/analyze_riffrec_zip.cpython-312.pyc",
+    "/Users/kuang/xiaobu/spec-first/skills/spec-sweep/scripts/__pycache__/sweep-state.cpython-312.pyc"
+  ],
+  "direct_dependency_entries": 316,
+  "direct_dependency_unique_paths": 250,
+  "all_included_unique_text_paths": 1524,
+  "capability_comparisons_recorded": 338,
+  "original_dirty_files_checked": 297,
+  "original_dirty_drift": [],
+  "identity": {
+    "head": "fe81bae9ee55ec336c85cf80c4a0460d86e3a412",
+    "branch": "leo-2026-10-27-update",
+    "ce_head": "00d0a5bbf1300b2138b65ce724b325dd4dff77ba"
+  },
+  "review_scope_snapshot": {
+    "expected_diff_sha256": "sha256:1295961115f4603977e8ba23e73de0fda4e7e039b5ba50666a879c738f36107e",
+    "expected_files_changed": 71,
+    "mutated_paths": [],
+    "mutation_detected": false,
+    "observed_diff_sha256": "sha256:1295961115f4603977e8ba23e73de0fda4e7e039b5ba50666a879c738f36107e",
+    "observed_files_changed": 71,
+    "reason_code": null,
+    "status": "complete"
+  },
+  "unexpected_new_untracked": [],
+  "documents_link_checked": 75,
+  "broken_links": [],
+  "errors": [],
+  "limitations": [
+    "确定性校验只证明目录/hash/区间/台账和产物一致，不证明实际阅读、语义正确或审查质量；语义裁定由逐项笔记承担。",
+    "全文区间包含既有同hash文本阅读记录的复用；不承诺整个代码库所有递归依赖均已全文阅读。",
+    "产品建议尚未实施；无独立reviewer、fresh-model/真实宿主、视觉或field outcome验收。"
+  ]
+}

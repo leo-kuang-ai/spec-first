@@ -1,0 +1,15 @@
+PASS tests/unit/spec-sweep-media-admission.test.js
+  ✓ media authorized admission uses the actual bounded command and preserves partial evidence (54 ms)
+  ✓ media missing admission uses the actual bounded command and preserves partial evidence (54 ms)
+  ✓ media wrong-run admission uses the actual bounded command and preserves partial evidence (53 ms)
+  ✓ media wrong-item admission uses the actual bounded command and preserves partial evidence (53 ms)
+  ✓ media wrong-media admission uses the actual bounded command and preserves partial evidence (54 ms)
+  ✓ media wrong-provider admission uses the actual bounded command and preserves partial evidence (54 ms)
+  ✓ media sensitive admission uses the actual bounded command and preserves partial evidence (54 ms)
+  ✓ media unknown admission uses the actual bounded command and preserves partial evidence (53 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       8 passed, 8 total
+Snapshots:   0 total
+Time:        0.532 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/spec-sweep-media-admission.test.js/i.

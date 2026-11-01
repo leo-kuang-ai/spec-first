@@ -92,7 +92,7 @@ Before critique, read `references/post-ideation-workflow.md`. Tell the verifier 
 
 Apply adversarial critique. For each candidate, write a one-line reason if rejected. **Basis-integrity check:** reject any idea lacking an articulated basis, any idea whose stated basis does not actually support the claimed move (speculation dressed as ambition), and any idea that replaces the subject rather than operating on it. Score survivors using a consistent rubric weighing: groundedness in stated context, **basis strength** (`direct:` > `external:` > `reasoned:`; none excluded, but direct-evidence ideas score higher all else equal), expected value, novelty, pragmatism, leverage, implementation burden, overlap with stronger candidates, and **axis spread** (when axes were defined) — survivor sets that cover the topic's surface outscore sets that cluster on one axis, all else equal. Axis spread is a list-level concern, not a per-idea reject reason; apply it after per-idea filtering when choosing among comparable candidates.
 
-Target 5-7 survivors by default. If too many survive, run a second stricter pass. If fewer than five survive, report that honestly rather than lowering the bar.
+Use the resolved explicit survivor count; otherwise target 5-7. If too many survive, run a stricter pass against that target. Report a shortfall rather than lowering the bar. Carry raw-volume and effective verification-budget overrides through generation, verification and final output, including tactical or issue-signal fallback.
 
 ## When to wrap up
 

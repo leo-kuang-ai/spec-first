@@ -1,0 +1,47 @@
+{
+  "accounting": {
+    "historical_attempts": 175,
+    "historical_finals": 170,
+    "new_synthetic_plan_attempts": 6,
+    "new_synthetic_plan_finals": 6,
+    "combined_attempts": 181,
+    "combined_finals": 176,
+    "original_slots_replaced": false,
+    "review_ref": "follow-up-20261031/independent-plan-review.json"
+  },
+  "rows": {
+    "CEOPT-04": {
+      "followup_ref": "follow-up-20261031/final-report.md",
+      "followup_source_review_ref": "follow-up-20261031/independent-source-review.json",
+      "model_status": "original-block-reviewed-current-source-followup-reviewed",
+      "candidate_acceptance": "bounded-source-and-fixture-pass-full-partial",
+      "conclusion": "Original six trials retained. Current Commit source/dependencies and seven corrected parent Git controls independently reviewed; initial lost-result runner defect archived and corrected. No autonomous or arbitrary mixed-staged-hunk claim.",
+      "optimization_recommendation": "Retain caller-confirmed target, proposed-versus-validated isolation and readback-before-retry boundaries. Use the bounded procedure only when its preconditions hold.",
+      "next_action": "Broader autonomous Git/hook and mixed-staged-hunk outcomes require separately authorized exact targets; no repetition of completed local controls.",
+      "next_owner": "Task caller and Git integration owner",
+      "unblock_condition": "Exact authorized target, preservation strategy and actual autonomous/mixed-index evidence beyond the admitted fixture."
+    },
+    "CEOPT-16": {
+      "followup_ref": "follow-up-20261031/final-report.md",
+      "followup_source_review_ref": "follow-up-20261031/independent-source-review.json",
+      "model_status": "original-and-six-input3-followup-reviewed",
+      "candidate_acceptance": "synthetic-core-usable-with-findings-full-partial",
+      "conclusion": "Six separate synthetic-input plans are core-usable within600s; all preserve Product Contract. All retain old reason-code/read limitations; B2/B3 omit contract-document update ownership. Current reason-code source fix independently reviewed, not exercised by frozen trials.",
+      "optimization_recommendation": "Retain exact replay/CLI input requirements. Current fallback distinguishes prohibited, unavailable and unknown review; preserve original defects and require B2/B3 documentation responsibility before execution.",
+      "next_action": "Production/client owners supply real taxonomy/replay/CLI contracts for production acceptance. Post-fix behavioral evidence remains separate; original missing finals are not replaced.",
+      "next_owner": "Client/service and CLI owners; Plan maintainer",
+      "unblock_condition": "Actual production contract evidence and a separately bounded behavioral check if claiming post-fix model behavior."
+    },
+    "CEOPT-33": {
+      "followup_ref": "follow-up-20261031/final-report.md",
+      "followup_source_review_ref": "follow-up-20261031/independent-source-review.json",
+      "model_status": "original-block-and-current-source-followup-reviewed",
+      "candidate_acceptance": "bounded-source-consumer-pass-full-partial",
+      "conclusion": "Original drafts remain unchanged. Current Tasks false/null reporting, real negative receipt preservation, task-local proof and completion-versus-mutation semantics pass full source/consumer review; 51 related consumer tests passed.",
+      "optimization_recommendation": "Retain null only for no usable validation, preserve complete real negative CLI results, and keep task-local proof bindings. Do not block implementation solely on missing live completion evidence.",
+      "next_action": "Any executable task-pack claim still requires current CLI receipt and semantic review. Actual autonomous task generation/execution and external done-signals remain open.",
+      "next_owner": "Tasks/Work caller and real task owner",
+      "unblock_condition": "Exact executable plan/task pack, current valid CLI receipt, source-bound proof and observed external done-signals where required."
+    }
+  }
+}

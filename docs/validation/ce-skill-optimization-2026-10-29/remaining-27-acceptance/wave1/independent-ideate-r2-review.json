@@ -1,0 +1,240 @@
+{
+  "review_id": "CEOPT-13r2-independent-acceptance",
+  "scenario_id": "CEOPT-13",
+  "verdict": "bounded-acceptance-passed",
+  "full_acceptance": "partial",
+  "superiority": "not-established",
+  "evidence_root": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1",
+  "review_scope": {
+    "attempts": 7,
+    "final_model_artifacts": 6,
+    "reviewed": [
+      "CEOPT-13-r2-packet.json",
+      "CEOPT-13-request.txt",
+      "All six final dossiers in full",
+      "All seven receipts and recorded tool-call sequences",
+      "Recorded tool outputs, including their truncation limitations",
+      "All four MiniLedger fixture files",
+      "Frozen A/B spec-ideate instructions relevant to evidence, ranking, explicit survivor count, dispatch boundaries and persistence",
+      "The CEOPT-13 entry in frozen-scenarios.json",
+      "Original CEOPT-13 receipts for separate historical timing accounting"
+    ],
+    "original_reviews_or_parent_conclusions_read": false,
+    "writes_tests_network_or_delegation_performed": false
+  },
+  "integrity_checks": {
+    "request_hash_matches_packet": true,
+    "all_four_fixture_hashes_match_packet": true,
+    "all_seven_artifact_hashes_match_receipts": true,
+    "all_seven_trace_hashes_match_receipts": true,
+    "all_seven_elapsed_times_match_receipt_timestamps": true,
+    "qualification": "Matching hashes establish consistency with the saved receipts. They do not independently authenticate serving identity or prove that the parent preserved an otherwise unavailable final response byte-for-byte."
+  },
+  "common_content_findings": {
+    "requested_ranked_opportunities": 5,
+    "all_six_dossiers_have_exactly_five": true,
+    "coverage": {
+      "records": 10,
+      "unique_issue_ids": 8,
+      "eligible_unique_issues": 7,
+      "excluded_unique_issues": 1,
+      "duplicate_records": 2,
+      "analyzed_eligible_unique_issues_per_dossier": 7,
+      "excluded_id": "OLD-1",
+      "mirrored_ids": [
+        "SUP-101",
+        "SEC-9"
+      ],
+      "unknown_remainder_preserved": true
+    },
+    "observation_semantics": "All six preserve observation counts as fixture metadata rather than distinct users or production prevalence. B2's sum of 57 is arithmetically correct and explicitly qualified.",
+    "privacy_lead": "Every dossier retains SEC-9 as an unverified, potentially serious allegation requiring applicability and reproduction evidence. None treats its mirror as corroboration or claims a confirmed cross-tenant defect.",
+    "ranking": "All six explain ranking using impact, source fit, leverage and burden. UX-41's 32 cosmetic observations do not displace financial integrity, keyboard access or the privacy investigation.",
+    "source_attribution": "All six distinguish the minimal add/list server from absent import, export, receipt, tenant, workspace and UI surfaces. They explicitly avoid attributing SUP-101 to unconditional POST append as a proven root cause.",
+    "hypotheses": "Persistence, retry identity, import preview, reporting context and accessibility are justified development directions or conditional investigations, not verified deployed defects or measured benefits.",
+    "source_references": "All six provide recoverable fixture paths or explicit root-plus-alias references and named issue IDs.",
+    "execution_claims": "No final dossier fabricates delegated workers, independent verification, tracker retrieval, application execution, successful fixes or production outcomes. Recorded calls are local reads of the assigned packages, request and fixtures."
+  },
+  "trials": [
+    {
+      "id": "CEOPT-13r2-A1",
+      "evidence_directory": "trials/CEOPT-13r2-A1",
+      "elapsed_seconds": 255.649,
+      "deadline_seconds": 600,
+      "timing_acceptance": "passed",
+      "content_acceptance": "passed",
+      "bounded_acceptance": "passed",
+      "findings": [
+        "Five opportunities; all seven eligible issues receive a disposition.",
+        "Ledger continuity and retry safety rank first with direct source support.",
+        "SEC-9 remains opportunity 5 with explicit prompt-triage qualification; development rank is not treated as incident urgency.",
+        "Cosmetic preference is explicitly deferred."
+      ],
+      "nonblocking_issue": {
+        "kind": "markdown-link-portability",
+        "evidence": "artifact.md, Grounding Context / Source and evidence boundaries",
+        "detail": "Links such as repo/README.md resolve relative to the saved trial directory under standard Markdown behavior, not the declared fixture root. The explicit full fixture-root text still makes the sources recoverable, so this does not fail the recoverability facet."
+      }
+    },
+    {
+      "id": "CEOPT-13r2-B1",
+      "evidence_directory": "trials/CEOPT-13r2-B1",
+      "elapsed_seconds": 342.331,
+      "deadline_seconds": 600,
+      "timing_acceptance": "passed",
+      "content_acceptance": "passed",
+      "bounded_acceptance": "passed",
+      "findings": [
+        "Five opportunities and complete deduplicated coverage.",
+        "Entry capture ranks first; SEC-9 ranks second as applicability investigation.",
+        "Explicitly distinguishes semantic theme grouping from a demonstrated shared root cause.",
+        "Preserves source labels and acknowledges unknown lifecycle, trend and authorship."
+      ],
+      "blocking_findings": []
+    },
+    {
+      "id": "CEOPT-13r2-B2",
+      "evidence_directory": "trials/CEOPT-13r2-B2",
+      "elapsed_seconds": 301.515,
+      "deadline_seconds": 600,
+      "timing_acceptance": "passed",
+      "content_acceptance": "passed",
+      "bounded_acceptance": "passed",
+      "findings": [
+        "Five opportunities and complete deduplicated coverage.",
+        "Combines SUP-101 and SUP-102 into a conditional transfer direction without asserting a common confirmed defect.",
+        "Combines saved filters and timezone interpretation coherently.",
+        "SEC-9 remains opportunity 5 with urgent evidence gathering separate from development order.",
+        "The observation sum is correctly qualified as arithmetic over fixture fields."
+      ],
+      "blocking_findings": []
+    },
+    {
+      "id": "CEOPT-13r2-A2",
+      "evidence_directory": "trials/CEOPT-13r2-A2",
+      "elapsed_seconds": 30.981,
+      "deadline_seconds": 600,
+      "final_model_artifact_available": false,
+      "timing_acceptance": "not-assessable-infrastructure-failure",
+      "content_acceptance": "not-assessable",
+      "bounded_acceptance": "infrastructure-failed",
+      "error": "429 Too Many Requests; exceeded retry limit",
+      "findings": [
+        "artifact.md is explicitly a parent diagnostic, not a model dossier.",
+        "This attempt is retained independently of A2-retry1.",
+        "The infrastructure failure is neither a content-quality failure nor a successful timed completion."
+      ]
+    },
+    {
+      "id": "CEOPT-13r2-A2-retry1",
+      "evidence_directory": "trials/CEOPT-13r2-A2-retry1",
+      "elapsed_seconds": 353.252,
+      "deadline_seconds": 600,
+      "timing_acceptance": "passed",
+      "content_acceptance": "passed",
+      "bounded_acceptance": "passed",
+      "findings": [
+        "Exactly five ranked development opportunities; all seven eligible issues are covered.",
+        "SEC-9 is retained in a substantial separate Security Allegation Disposition with prompt investigation and conditional escalation.",
+        "Keeping the allegation outside the five ranked development directions is acceptable: the request requires five opportunities and complete eligible-sample treatment, not a ranked feature for every issue.",
+        "Explicitly distinguishes an epoch timestamp from an established timezone defect and retry behavior from the unverified export root cause."
+      ],
+      "blocking_findings": []
+    },
+    {
+      "id": "CEOPT-13r2-A3",
+      "evidence_directory": "trials/CEOPT-13r2-A3",
+      "elapsed_seconds": 343.994,
+      "deadline_seconds": 600,
+      "timing_acceptance": "passed",
+      "content_acceptance": "passed",
+      "bounded_acceptance": "passed",
+      "findings": [
+        "Five opportunities, complete sample accounting and recoverable F/S/E source aliases.",
+        "Ranks ledger continuity first and combines saved filters with period interpretation.",
+        "SEC-9 remains a conditional investigation, with prompt triage distinguished from development ranking.",
+        "The retired application is explicitly excluded, including in the rejection accounting."
+      ],
+      "blocking_findings": []
+    },
+    {
+      "id": "CEOPT-13r2-B3",
+      "evidence_directory": "trials/CEOPT-13r2-B3",
+      "elapsed_seconds": 304.299,
+      "deadline_seconds": 600,
+      "timing_acceptance": "passed",
+      "content_acceptance": "passed",
+      "bounded_acceptance": "passed",
+      "findings": [
+        "Five opportunities and complete deduplicated coverage.",
+        "Ranks transfer first, but explicitly makes that choice conditional on product attribution.",
+        "Explains why reliable capture has stronger direct source fit yet ranks fifth under the selected product judgment.",
+        "Provides a source-grounded fallback recommendation if issue-to-product attribution fails.",
+        "SEC-9 remains opportunity 4 as investigation; cosmetic preference is rejected."
+      ],
+      "blocking_findings": []
+    }
+  ],
+  "aggregate": {
+    "attempts": 7,
+    "completed_final_dossiers": 6,
+    "completed_dossiers_passing_content": 6,
+    "completed_dossiers_passing_600_second_deadline": 6,
+    "infrastructure_failures": 1,
+    "arm_A_completed_dossiers": 3,
+    "arm_A_bounded_passes": 3,
+    "arm_A_additional_infrastructure_failures": 1,
+    "arm_B_completed_dossiers": 3,
+    "arm_B_bounded_passes": 3,
+    "bounded_conclusion": "Both arms satisfy this successor's local-fixture, read-only, five-opportunity dossier contract in their three completed trials. The seven-attempt record still includes A2's infrastructure failure.",
+    "full_conclusion": "The evidence supports bounded content and timing acceptance, not full autonomous workflow or production acceptance.",
+    "comparative_conclusion": "No A/B superiority is established. Ranking variation is explained and remains within the request; these observations do not demonstrate a quality or efficiency advantage."
+  },
+  "original_300_second_history": {
+    "pooled_with_successor": false,
+    "content_rejudged": false,
+    "timing_from_original_receipts": [
+      {
+        "id": "CEOPT-13-A1",
+        "elapsed_seconds": 313.319,
+        "result": "failed-deadline"
+      },
+      {
+        "id": "CEOPT-13-B1",
+        "elapsed_seconds": 256.894,
+        "result": "passed"
+      },
+      {
+        "id": "CEOPT-13-B2",
+        "elapsed_seconds": 332.002,
+        "result": "failed-deadline"
+      },
+      {
+        "id": "CEOPT-13-A2",
+        "elapsed_seconds": 310.725,
+        "result": "failed-deadline"
+      },
+      {
+        "id": "CEOPT-13-A3",
+        "elapsed_seconds": 312.975,
+        "result": "failed-deadline"
+      },
+      {
+        "id": "CEOPT-13-B3",
+        "elapsed_seconds": 307.554,
+        "result": "failed-deadline"
+      }
+    ],
+    "conclusion": "The successor does not erase or retroactively admit the five original deadline failures."
+  },
+  "unresolved_facets": [
+    "Autonomous unique-path dossier publication, write/readback behavior and collision handling were not exercised; persistence was parent-mediated.",
+    "Live tracker access, pagination traversal, supplemental collection and provider behavior were not exercised.",
+    "Serving model identity remains unauthenticated beyond recorded metadata.",
+    "Read-only compliance is observed in tool traces, not enforced by filesystem isolation.",
+    "Recorded tool outputs contain truncation. Missing portions cannot prove complete instruction visibility or exact internal generation-before-critique sequencing.",
+    "The source-to-issue product relationship is unresolved; dossiers correctly retain it as a prerequisite rather than inventing attribution.",
+    "No application behavior, security reproduction, accessibility outcome, production benefit or downstream implementation was validated.",
+    "A1's clickable source links could be made portable by using paths appropriate to the saved artifact location; textual source recoverability already exists."
+  ]
+}

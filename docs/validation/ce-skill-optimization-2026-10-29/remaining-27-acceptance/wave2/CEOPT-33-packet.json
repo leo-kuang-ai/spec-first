@@ -1,0 +1,24 @@
+{
+  "id": "CEOPT-33",
+  "skill": "spec-write-tasks",
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/CEOPT-33-request.txt",
+  "request_sha256": "1c50eab5c7c58e0f43cf60a44bc23011ef60c5134bfbadc802ce8e0cda07addc",
+  "fixture_root": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/tasks",
+  "fixture_files": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/tasks/plan-hash-receipt.json": "da52cd2c85e9387c4af926cd48e1e1fdde501db34b5494d13702a72396029216",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/tasks/proposed-shortcut.md": "b7f196888f2217e3ee8f67a0af3f015e17ec951e5e16a9b17987a1dd520ea1fb",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/tasks/docs/plans/source.md": "88ed125c85ac44c5c1c53055a85243d97cd1199e592bfec873120cc5bc259999"
+  },
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "deadline_seconds": 300,
+  "parent_recipe": "Save exact response, extract task draft without semantic edits, run canonical tasks validate in disposable fixture preserving source plan bytes. Structural validity cannot override reverse-owner semantic errors.",
+  "scope": "Mediated task derivation; path rejection separately backed by paired mechanism tests.",
+  "status": "prepared-not-executed"
+}

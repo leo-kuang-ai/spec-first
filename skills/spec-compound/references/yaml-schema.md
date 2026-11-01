@@ -58,6 +58,8 @@ Every **new or materially rewritten learning**, in either track, must include:
 - **source_refs**: A non-empty array of verifiable references that lets a later reader recover the evidence behind the learning. Prefer repo-relative source/test/doc paths, issue or PR identifiers, and other stable evidence references. Mechanical validation checks only that this is a non-empty array of non-empty strings; the author must judge whether the references are trustworthy and sufficient.
 - **invalidation_condition**: A non-empty scalar or block string naming the concrete condition that requires the learning to be re-checked, revised, or retired. Mechanical validation checks only that content exists; the author must judge semantic adequacy.
 
+若条件依赖外部 issue、版本或依赖行为，写明哪个外部变化会使建议失效，以及 refresh 如何只读核查。移除 workaround、升级依赖再跑 CI 等修改后验证步骤写在正文，不能冒充已满足的外部条件。沿用 `invalidation_condition`，不并列增加同义退役字段；未改写的 legacy 文档不作批量迁移。
+
 Run `scripts/validate-frontmatter.py --promotion <doc-path>` after writing a new learning, materially rewriting an existing learning, or writing a replacement successor. Default validator mode remains parser-safety-only so untouched legacy docs are not forced through a bulk migration.
 
 ## Bug Track Fields

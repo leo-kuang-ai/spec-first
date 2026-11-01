@@ -1,0 +1,8 @@
+PASS tests/unit/spec-optimize-measurement-only-contracts.test.js
+PASS tests/unit/spec-optimize-loop-contracts.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       18 passed, 18 total
+Snapshots:   0 total
+Time:        1.116 s
+Ran all test suites matching /tests\/unit\/spec-optimize-measurement-only-contracts.test.js|tests\/unit\/spec-optimize-loop-contracts.test.js/i.

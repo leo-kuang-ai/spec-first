@@ -109,7 +109,7 @@ promotion_required_fields:
   invalidation_condition:
     type: string
     min_length: 1
-    description: "Concrete condition that requires the learning to be re-checked, revised, or retired"
+    description: "触发重新核查、修订或退役的具体条件。依赖外部 bug/工具版本/平台行为时，写明该外部变化及不修改仓库的检查来源或方法；移除 workaround 后重跑测试等写入验证放在正文的移除前步骤。字段形态由脚本验证，语义充分性由 owner 判断。"
 
 # --- Track-specific rules ----------------------------------------------------
 track_rules:

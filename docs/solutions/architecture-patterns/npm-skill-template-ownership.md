@@ -133,6 +133,6 @@ consumer repository
 
 ## Related
 
-- [结构化项目角色契约](../../../docs/10-prompt/结构化项目角色契约.md)
+- [结构化项目角色契约](../../../docs/methodology/结构化项目角色契约.md)
 - [PRD output contract](../../../skills/spec-prd/references/prd-output-template.md)
 - [标准需求文档模板说明](../../需求文档模版/标准模版/README.md)

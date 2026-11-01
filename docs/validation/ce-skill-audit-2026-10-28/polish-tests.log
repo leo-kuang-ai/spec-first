@@ -1,0 +1,11 @@
+PASS tests/unit/specialized-skill-calibration-contracts.test.js
+PASS tests/unit/mutation-authority-contracts.test.js
+PASS tests/unit/resolve-port-script.test.js
+PASS tests/unit/spec-polish-project-type.test.js
+
+Test Suites: 4 passed, 4 total
+Tests:       19 passed, 19 total
+Snapshots:   0 total
+Time:        0.629 s
+Ran all test suites within paths "tests/unit/resolve-port-script.test.js", "tests/unit/spec-polish-project-type.test.js", "tests/unit/mutation-authority-contracts.test.js", "tests/unit/specialized-skill-calibration-contracts.test.js".
+Test results written to: docs/validation/ce-skill-audit-2026-10-28/polish-tests.json

@@ -1,0 +1,474 @@
+[
+  {
+    "skill": "autoresearch",
+    "ce_skill": null,
+    "status": "pending",
+    "evidence": []
+  },
+  {
+    "skill": "spec-app-consistency-audit",
+    "ce_skill": null,
+    "status": "pending",
+    "evidence": []
+  },
+  {
+    "skill": "spec-brainstorm",
+    "ce_skill": "ce-brainstorm",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-brainstorm/references/brainstorm-sections.md:23",
+      "skills/spec-brainstorm/references/brainstorm-sections.md:84",
+      "skills/spec-brainstorm/references/handoff.md:19",
+      "skills/spec-plan/SKILL.md:15"
+    ],
+    "conclusion": "WHAT→requirements-only unified plan→plan 的本地合同自洽",
+    "recommendation": "保留文档充分性检查与 unresolved blocker；候选：合并重复 dispatch 说明降低阅读成本",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "单模型入口对照 + 风险导向执行引用/owner/consumer 源码核对；非独立行为评测"
+  },
+  {
+    "skill": "spec-code-review",
+    "ce_skill": "ce-code-review",
+    "status": "in_progress",
+    "evidence": [],
+    "conclusion": "入口对照已开始，执行引用与消费者尚未全部核实",
+    "recommendation": "待深审，不预判缺陷"
+  },
+  {
+    "skill": "spec-commit",
+    "ce_skill": "ce-commit",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-commit/SKILL.md:11",
+      "skills/spec-commit/SKILL.md:120",
+      "skills/spec-commit-push-pr/references/commit-and-push.md:15",
+      "skills/spec-dogfood/references/phases.md:128"
+    ],
+    "conclusion": "提交主线保留；owned paths 与 mixed-hunk 边界是必要本地适配",
+    "recommendation": "保留 index 隔离与精确路径规则；以临时仓 fixture 维护回归",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "单模型入口对照 + 风险导向执行引用/owner/consumer 源码核对；非独立行为评测"
+  },
+  {
+    "skill": "spec-commit-push-pr",
+    "ce_skill": "ce-commit-push-pr",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-commit-push-pr/references/commit-and-push.md:43",
+      "skills/spec-commit-push-pr/references/apply-and-handoff.md:28",
+      "skills/spec-commit-push-pr/references/compose.md:25",
+      "skills/spec-lfg/references/shipping-tail.md:38"
+    ],
+    "conclusion": "发布与文案主线保留；本地外写与归档边界更明确",
+    "recommendation": "保留 PR 远端读回与失败去重；不导入 CE stack/babysit 产品面",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "单模型入口对照 + 风险导向执行引用/owner/consumer 源码核对；非独立行为评测"
+  },
+  {
+    "skill": "spec-compound",
+    "ce_skill": "ce-compound",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-compound/SKILL.md:24",
+      "skills/spec-compound/references/promotion.md:10",
+      "skills/spec-compound-refresh/references/publication.md:108"
+    ],
+    "conclusion": "已解决问题→可失效知识的主线保留；发布 gate 更符合本地使命",
+    "recommendation": "保留候选→语义批准→发布与并发漂移检查；不宣称多文件事务",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "单模型入口对照 + 风险导向执行引用/owner/consumer 源码核对；非独立行为评测"
+  },
+  {
+    "skill": "spec-compound-refresh",
+    "ce_skill": "ce-compound-refresh",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-compound-refresh/references/modes.md:29",
+      "skills/spec-compound-refresh/references/publication.md:99",
+      "skills/spec-compound/references/promotion.md:14"
+    ],
+    "conclusion": "维护失效知识与分类动作保留；本地删除/改址保护更充分",
+    "recommendation": "保留 successor 发布后再删除与 unverifiable 不等于 stale；补真实非交互失败恢复演练",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "单模型入口对照 + 风险导向执行引用/owner/consumer 源码核对；非独立行为评测"
+  },
+  {
+    "skill": "spec-debug",
+    "ce_skill": "ce-debug",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-debug/SKILL.md:170",
+      "skills/spec-debug/SKILL.md:287",
+      "skills/spec-debug/references/pipeline-return.md:28"
+    ],
+    "conclusion": "复现→因果链→最小修复→最终证据主线保留",
+    "recommendation": "保留 dirty-overlap 保护和 pipeline-return；候选：入口 364 行拆分以减轻加载负担",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "单模型入口对照 + 风险导向执行引用/owner/consumer 源码核对；非独立行为评测"
+  },
+  {
+    "skill": "spec-doc-review",
+    "ce_skill": "ce-doc-review",
+    "status": "in_progress",
+    "evidence": [],
+    "conclusion": "入口对照已开始，执行引用与消费者尚未全部核实",
+    "recommendation": "待深审，不预判缺陷"
+  },
+  {
+    "skill": "spec-dogfood",
+    "ce_skill": "ce-dogfood",
+    "status": "in_progress",
+    "evidence": [],
+    "conclusion": "入口对照已开始，执行引用与消费者尚未全部核实",
+    "recommendation": "待深审，不预判缺陷"
+  },
+  {
+    "skill": "spec-explain",
+    "ce_skill": "ce-explain",
+    "status": "in_progress",
+    "evidence": [],
+    "conclusion": "入口对照已开始，执行引用与消费者尚未全部核实",
+    "recommendation": "待深审，不预判缺陷"
+  },
+  {
+    "skill": "spec-handoff",
+    "ce_skill": "ce-handoff",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-handoff/references/artifact-contract.md:41",
+      "skills/spec-handoff/references/artifact-contract.md:15",
+      "skills/spec-handoff/references/resume.md:3"
+    ],
+    "conclusion": "续会话意图保留；immutable 本地 artifact 与恢复权限边界清楚",
+    "recommendation": "跨机器使用前导出 sanitized durable copy；后续补 metadata/正文恶意指令行为回归",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "单模型入口对照 + 风险导向执行引用/owner/consumer 源码核对；非独立行为评测"
+  },
+  {
+    "skill": "spec-ideate",
+    "ce_skill": "ce-ideate",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-ideate/references/post-ideation-workflow.md:9",
+      "skills/spec-ideate/references/post-ideation-workflow.md:108",
+      "skills/spec-brainstorm/SKILL.md:3",
+      "/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-ideate/references/post-ideation-workflow.md:40"
+    ],
+    "conclusion": "生成→反驳→筛选→brainstorm 机制保留；降级不冒充独立性",
+    "recommendation": "候选：统一 count override 在 scope gate 与筛选段的措辞；不把默认 5–7 作为硬数量",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "单模型入口对照 + 风险导向执行引用/owner/consumer 源码核对；非独立行为评测"
+  },
+  {
+    "skill": "spec-lfg",
+    "ce_skill": "lfg",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-lfg/SKILL.md:54",
+      "skills/spec-lfg/references/review-followup.md:55",
+      "skills/spec-work/references/return-to-caller.md:41",
+      "skills/spec-lfg/references/shipping-tail.md:1"
+    ],
+    "conclusion": "主链 handoff 与终态约束闭合；未照搬 CE 更广自动流程",
+    "recommendation": "保留最终 fingerprint 与 unresolved 排除；后续实测无 remote/PR head 漂移/失败 watch",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "单模型入口对照 + 风险导向执行引用/owner/consumer 源码核对；非独立行为评测"
+  },
+  {
+    "skill": "spec-optimize",
+    "ce_skill": "ce-optimize",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-optimize/SKILL.md:118",
+      "skills/spec-optimize/references/measurement-only-calibration.md:25",
+      "skills/spec-optimize/references/wrap-up.md:56",
+      "skills/spec-code-review/references/finish-review.md:258",
+      "skills/spec-lfg/references/review-followup.md:55"
+    ],
+    "conclusion": "存在两处融合缺陷：measurement-only 路径示例与 review apply 合同",
+    "recommendation": "P2：统一 SKILL_DIR 示例；只从 actionable 队列应用并排除 unresolved/rejected",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "单模型入口对照 + 风险导向执行引用/owner/consumer 源码核对；非独立行为评测"
+  },
+  {
+    "skill": "spec-plan",
+    "ce_skill": "ce-plan",
+    "status": "in_progress",
+    "evidence": [],
+    "conclusion": "入口对照已开始，执行引用与消费者尚未全部核实",
+    "recommendation": "待深审，不预判缺陷"
+  },
+  {
+    "skill": "spec-polish",
+    "ce_skill": "ce-polish",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-polish/references/run.md:20",
+      "skills/spec-polish/references/run.md:51",
+      "skills/spec-test-browser/references/route-and-report.md:111"
+    ],
+    "conclusion": "人工体验迭代主线保留；未导入 CE live/voice 属产品取舍",
+    "recommendation": "保留 command/cwd/env/port 一次解析与进程归属；候选：评估是否值得吸收 CE live mode",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "单模型入口对照 + 风险导向执行引用/owner/consumer 源码核对；非独立行为评测"
+  },
+  {
+    "skill": "spec-pov",
+    "ce_skill": "ce-pov",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-pov/references/intake.md:23",
+      "skills/spec-pov/references/method.md:22",
+      "skills/spec-pov/references/followup.md:8"
+    ],
+    "conclusion": "external adoption 主路径自洽；subject-shape 泛化只同步到部分引用",
+    "recommendation": "候选：明确仅external产品面，清除或补齐Document/Approach分支，先改intake/method再改entry",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "单模型入口对照 + 风险导向执行引用/owner/consumer 源码核对；非独立行为评测"
+  },
+  {
+    "skill": "spec-prd",
+    "ce_skill": null,
+    "status": "pending",
+    "evidence": []
+  },
+  {
+    "skill": "spec-product-pulse",
+    "ce_skill": "ce-product-pulse",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-product-pulse/references/run.md:14",
+      "skills/spec-product-pulse/references/run.md:40",
+      "skills/spec-product-pulse/references/strategy-source.md:5"
+    ],
+    "conclusion": "时窗指标报告主线保留；zero/缺失/权限失败分层合理",
+    "recommendation": "候选：质量评分用实际校准样本约束默认4/5；保持内容进入模型前最小化",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "单模型入口对照 + 风险导向执行引用/owner/consumer 源码核对；非独立行为评测"
+  },
+  {
+    "skill": "spec-project-rules",
+    "ce_skill": null,
+    "status": "pending",
+    "evidence": []
+  },
+  {
+    "skill": "spec-promote",
+    "ce_skill": "ce-promote",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-promote/SKILL.md:16",
+      "skills/spec-promote/references/spiral-cli.md:74",
+      "skills/spec-promote/references/spiral-cli.md:66"
+    ],
+    "conclusion": "推广草稿主线保留；provider egress 与本地 opt-out 已分离",
+    "recommendation": "保留无 provider 可交付；候选：将 shipped claim 区分已实现、已合入、已发布",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "单模型入口对照 + 风险导向执行引用/owner/consumer 源码核对；非独立行为评测"
+  },
+  {
+    "skill": "spec-prototype",
+    "ce_skill": "ce-prototype",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-prototype/SKILL.md:17",
+      "skills/spec-prototype/references/scoping.md:20",
+      "/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-prototype/references/scoping.md:19",
+      "skills/spec-brainstorm/references/handoff.md:7"
+    ],
+    "conclusion": "体验性决策与非生产写回主线保留",
+    "recommendation": "按 capability 维护 preview 工具；无需为已有明确 build 授权重复确认",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "单模型入口对照 + 风险导向执行引用/owner/consumer 源码核对；非独立行为评测"
+  },
+  {
+    "skill": "spec-resolve-pr-feedback",
+    "ce_skill": "ce-resolve-pr-feedback",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-resolve-pr-feedback/references/full-mode.md:25",
+      "skills/spec-resolve-pr-feedback/references/full-mode.md:45",
+      "skills/spec-resolve-pr-feedback/references/pipeline-return.md:35",
+      "skills/spec-lfg/references/review-followup.md:75"
+    ],
+    "conclusion": "反馈身份→判断→本地修复→回复/解决主线保留；恢复合同更完整",
+    "recommendation": "保留pending review、visible reply与authoritative resolution分离；后续实测enterprise/fork分页",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "单模型入口对照 + 风险导向执行引用/owner/consumer 源码核对；非独立行为评测"
+  },
+  {
+    "skill": "spec-riffrec-feedback-analysis",
+    "ce_skill": "ce-riffrec-feedback-analysis",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-riffrec-feedback-analysis/references/analyzer.md:11",
+      "skills/spec-riffrec-feedback-analysis/references/analyzer.md:25",
+      "skills/spec-riffrec-feedback-analysis/SKILL.md:3"
+    ],
+    "conclusion": "Riffrec 专用分析意图保留；本地快照恢复/隐私边界合理",
+    "recommendation": "保留no-transcribe默认与同步events；后续做真实录屏/ffmpeg行为验证",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "单模型入口对照 + 风险导向执行引用/owner/consumer 源码核对；非独立行为评测"
+  },
+  {
+    "skill": "spec-rule-miner",
+    "ce_skill": null,
+    "status": "pending",
+    "evidence": []
+  },
+  {
+    "skill": "spec-runtime-setup",
+    "ce_skill": "ce-setup",
+    "status": "pending",
+    "evidence": []
+  },
+  {
+    "skill": "spec-simplify-code",
+    "ce_skill": "ce-simplify-code",
+    "status": "in_progress",
+    "evidence": [],
+    "conclusion": "入口对照已开始，执行引用与消费者尚未全部核实",
+    "recommendation": "待深审，不预判缺陷"
+  },
+  {
+    "skill": "spec-strategy",
+    "ce_skill": "ce-strategy",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-strategy/references/update-run.md:10",
+      "skills/spec-strategy/references/strategy-template.md:48",
+      "skills/spec-product-pulse/references/strategy-source.md:6"
+    ],
+    "conclusion": "策略访谈/更新主线保留；模板差异未造成已确认消费断裂",
+    "recommendation": "保留按 meaning 消费与 multi-writer 保护；不把近期提交当新战略批准",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "单模型入口对照 + 风险导向执行引用/owner/consumer 源码核对；非独立行为评测"
+  },
+  {
+    "skill": "spec-sweep",
+    "ce_skill": "ce-sweep",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-sweep/SKILL.md:61",
+      "skills/spec-sweep/references/run.md:49",
+      "skills/spec-sweep/references/run.md:58",
+      "skills/spec-sweep/references/run.md:71"
+    ],
+    "conclusion": "反馈循环与确认/游标顺序保留；本地 source/egress/Git 授权补强",
+    "recommendation": "保留ack读回与cursor不跨gap；候选：source approved 使用显式true而非仅拒绝false",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "单模型入口对照 + 风险导向执行引用/owner/consumer 源码核对；非独立行为评测"
+  },
+  {
+    "skill": "spec-test-browser",
+    "ce_skill": "ce-test-browser",
+    "status": "in_progress",
+    "evidence": [],
+    "conclusion": "入口对照已开始，执行引用与消费者尚未全部核实",
+    "recommendation": "待深审，不预判缺陷"
+  },
+  {
+    "skill": "spec-test-xcode",
+    "ce_skill": "ce-test-xcode",
+    "status": "source_review_complete",
+    "evidence": [
+      "docs/validation/ce-skill-audit-2026-10-28/skills/spec-test-xcode.md"
+    ],
+    "conclusion": "核心语义保留；source binding 与 URL 权限为合理适配",
+    "recommendation": "候选：统一具名 MCP 工具为 capability 描述并做版本验证",
+    "limitations": [
+      "未执行真实模拟器/provider"
+    ]
+  },
+  {
+    "skill": "spec-work",
+    "ce_skill": "ce-work",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-work/references/return-to-caller.md:53",
+      "skills/spec-work/references/review-findings-followup.md:31",
+      "skills/spec-work/references/return-to-caller.md:55"
+    ],
+    "conclusion": "实施 owner 与 caller-owned tail 分离正确；本地任务包与证据扩展有明确消费者",
+    "recommendation": "保留返回字段与最终工作树绑定；候选：将重复调度字段收束到 owner 引用",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "单模型入口对照 + 风险导向执行引用/owner/consumer 源码核对；非独立行为评测"
+  },
+  {
+    "skill": "spec-worktree",
+    "ce_skill": "ce-worktree",
+    "status": "in_progress",
+    "evidence": [],
+    "conclusion": "入口对照已开始，执行引用与消费者尚未全部核实",
+    "recommendation": "待深审，不预判缺陷"
+  },
+  {
+    "skill": "spec-write-skill",
+    "ce_skill": null,
+    "status": "pending",
+    "evidence": []
+  },
+  {
+    "skill": "spec-write-tasks",
+    "ce_skill": null,
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-write-tasks/SKILL.md:8",
+      "src/cli/task-pack.js:516",
+      "skills/spec-doc-review/references/task-pack-review-lens.md:74",
+      "skills/spec-work/references/return-to-caller.md:33"
+    ],
+    "conclusion": "独有的可选 derived task layer；scope 与确定性/语义分工一致",
+    "recommendation": "保留 source-plan 路径+body hash，禁止把 review 状态当 execution approval",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "单模型入口对照 + 风险导向执行引用/owner/consumer 源码核对；非独立行为评测"
+  },
+  {
+    "skill": "using-spec-first",
+    "ce_skill": null,
+    "status": "pending",
+    "evidence": []
+  }
+]

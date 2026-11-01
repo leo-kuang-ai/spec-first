@@ -47,6 +47,8 @@ After restricted-read authorization, resolve the branch with `git rev-parse --ab
 
    Pi sessions are included when present under `~/.pi/agent/sessions/`; they carry `cwd` like Codex but no git branch. If `_meta.files_processed` is `0`, return `no relevant prior sessions`. If the first pass finds no relevant branch matches, or if processing Codex or Pi sessions, derive 2-4 keywords from the topic and re-run metadata extraction with `--keyword K1,K2,...`. Keep at most 5 sessions across Claude Code, Codex, Cursor, and Pi, ranked by branch match, keyword match count, file size over 30KB, and recency. Exclude the current session.
 
+   元数据探测只读取每个文件前 200 行；`parse_errors` 记录文件读取失败，`files_without_metadata` 记录可读但未发现平台元数据的文件。后者不代表 I/O 失败，也不证明整个会话无元数据。
+
    **Escalation gate.** After restricted-read authorization, the discovery+metadata pass above is the cheap probe. Escalate to the extraction and synthesis stages below **only** when at least one retained candidate clears the relevance bar: a current-branch match, or ≥2 topic-keyword matches. If no candidate clears the bar (including the `_meta.files_processed` is `0` case), stop here, record `no relevant prior sessions` as the session-history input, and skip extraction and synthesis. This gate keeps the authorized probe cheap — the expensive synthesis is paid for only when a prior session is genuinely relevant.
 
    **Extraction pipeline.** Create `SCRATCH=$(mktemp -d "${TMPDIR:-/tmp}/spec-compound-sessions-XXXXXX")` under the same owner-private rules as `references/research.md`. For each selected session, write extracted content to scratch files:

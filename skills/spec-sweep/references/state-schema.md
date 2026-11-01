@@ -49,7 +49,7 @@ can share a file:
 | Unknown field on an item or source | Preserved on write-back. Never dropped. |
 | Unknown `status` value | Preserved and passed through. Skip-never-drop — the closed enum below is not a whitelist. |
 | File parses but has no `schema_version` | Treated as `CORRUPT`; the engine refuses to write over it. |
-| `schema_version` greater than the engine knows | Still read/written field-preservingly; the engine only *adds* rules per version, never removes fields. |
+| `schema_version` differs from the current engine version | Return `CORRUPT` and preserve the original bytes; use a compatible engine or explicit migration, never a silent downgrade. |
 
 Bump `schema_version` only for a change that a v1 reader could misinterpret;
 purely additive fields do not require a bump.
@@ -84,11 +84,9 @@ holds it to proof. An item may only remain `closed` if it carries all three:
 | `verified_merge_sha` | The merge commit SHA the fix landed on. |
 | `verified_at` | ISO timestamp the fix was verified. |
 
-`validate` scans every item and downgrades any `closed` item missing (or with a
-falsy value for) any of these back to `fix_pending`, then rewrites the file and
-returns the list of downgraded ids. This self-heals a state left inconsistent
-by a crashed run. `validate` is lease-agnostic (it is a repair, run at sweep
-start).
+Before persistence, `upsert-item` checks the merged closed item: all three fields must be nonempty strings, the SHA must be a full 40/64-character hexadecimal value, and `verified_at` must be a parseable ISO timestamp containing `T`. Failure returns `REFUSED` with `closed-evidence-invalid` and leaves state unchanged. Field shape does not prove remote merge or semantic resolution; the orchestrator still supplies direct evidence.
+
+`validate` uses the same check, downgrades invalid historical closed items to `fix_pending`, and returns their `downgraded` IDs. It remains lease-agnostic. Other writes enforce the same persistence floor and report downgraded IDs in their receipts. Legacy import preserves valid evidence; historical closed items without evidence become `fix_pending`, not verified deliveries.
 
 ## `sensitive` semantics
 
@@ -170,9 +168,9 @@ To keep it from clobbering the holder's concurrent upserts, every mutating
 subcommand holds an **OS advisory lock** (`flock` on `<state>.lock`) across its
 whole load-modify-write, so two concurrent invocations serialize their writes
 regardless of lease ownership. The lease decides *who owns the sweep*; the file
-lock decides *who is writing the file right now*. The `.lock` file is ephemeral
-and never committed (the skill's commit step adds only the state file and the
-plan, never `-A`).
+lock decides *who is writing the file right now*.
+
+The engine first creates a state directory owned by the current user, then opens a regular, single-link lock file without truncation or symlink following. It checks owner, type, and identity and holds the lock throughout the handler. The persistent `.lock` file is reused and never committed; do not delete an active lock to unlock it. Open/lock failure or unavailable fcntl/no-follow support returns `ERROR` with `state-lock-unavailable` without entering the mutation handler. Read-only commands remain available. When Windows lacks this capability, use a supported environment rather than claiming protected concurrent writes.
 
 ## Engine status words
 
@@ -188,8 +186,8 @@ misuse exits non-zero.
 | `LOCKED` | `lease-acquire`: a live lease is held by another writer | — |
 | `STALE-RECLAIMED` | `lease-acquire`: an expired lease was taken over | `{previous_writer, previous_timestamp}` |
 | `LEASE-LOST` | mutating call by a non-owner, or releasing another's lease (no write) | — |
-| `REFUSED` | `cursor-advance`: unknown `past-item`, or a cursor that would regress | — |
-| `ERROR` | unexpected internal error (defensive; still exit 0) | — |
+| `REFUSED` | Unknown `past-item`, regressing cursor, or invalid closed evidence in `upsert-item` | May include `reason_code: closed-evidence-invalid` |
+| `ERROR` | Internal error or unavailable state lock; still exit 0, so consume the status word | Lock errors include `reason_code: state-lock-unavailable` |
 
 ## YAML subset
 
@@ -210,3 +208,11 @@ only the engine writes it.
 A file that fails to parse under these rules, or that parses without a
 `schema_version`, is `CORRUPT`: the engine reports it and refuses to overwrite,
 so a hand-mangled file is never silently clobbered.
+
+State and legacy files explicitly use UTF-8. Unknown v1 fields remain preserved. Invalid encoding, duplicate keys, orphaned/invalid indentation, noninteger versions, and malformed known containers (sources/items/lease/last_run) are rejected without overwriting the input. These reader checks retain the defined valid v1 shapes and do not automatically rewrite historical receipts.
+
+## Final shared publication
+
+The final candidate must include the successful `run-record` and own `lease-release` before its commit/push. `publish-final-state.py` consumes the exact published lease commit, candidate commit, remote/branch and intended last_run identity. It validates all intervening changed paths against state and the sweep plan, reads before retry, refuses an advanced remote and verifies exact committed bytes after a normal push. The engine remains the only state writer; this helper only handles Git publication facts. Its authorization flags are caller assertions, not a host enforcement receipt.
+
+Source processing may be completed while publication remains pending. No local release, commit or attempted push proves remote cleanup. Keep the publisher's observed SHA/time, status and recovery references outside shared state when publication fails. Repo-local and committed-local topologies never invoke this shared publisher. An observed released lease is a point-in-time fact; another run may acquire a new lease afterward.

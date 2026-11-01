@@ -95,6 +95,7 @@ def fail_closed(reason: str, learnings_corpus: bool = False) -> dict[str, object
         "exec_lines": None,
         "uncounted_files": 1,
         "changed_files": [],
+        "deleted_files": [],
         "signals": [],
         "test_files_changed": False,
         "agent_surface": False,
@@ -166,13 +167,14 @@ def compute_scope(base: str, head: str | None, included_paths: list[str] | None 
     except (OSError, ValueError) as error:
         return None, f"included file capture failed: {error}"
 
-    names = git("diff", "--name-only", *diff_args)
-    numstat = git("diff", "--numstat", *diff_args)
+    names = git("diff", "--name-only", "-z", *diff_args)
+    numstat = git("diff", "--numstat", "-z", *diff_args)
+    deletions = git("diff", "--name-only", "--diff-filter=D", "-z", *diff_args)
     patch = git_bytes("diff", "--binary", "--full-index", *diff_args)
-    if names.returncode != 0 or numstat.returncode != 0 or patch.returncode != 0:
+    if any(result.returncode != 0 for result in (names, numstat, deletions, patch)):
         return None, "git diff failed"
 
-    files = sorted(set(line for line in names.stdout.splitlines() if line)
+    files = sorted(set(name for name in names.stdout.split("\0") if name)
                    | {p for p, fact in included.items() if fact["kind"] == "file"})
     digest_bytes = patch.stdout
     if included:
@@ -182,6 +184,7 @@ def compute_scope(base: str, head: str | None, included_paths: list[str] | None 
         "head": diff_args[1] if len(diff_args) == 2 else None,
         "diff_args": diff_args,
         "changed_files": files,
+        "deleted_files": sorted(name for name in deletions.stdout.split("\0") if name),
         "files_changed": len(files),
         "numstat": numstat.stdout,
         "diff_sha256": "sha256:" + hashlib.sha256(digest_bytes).hexdigest(),
@@ -299,6 +302,23 @@ def verify_snapshot(path_value: str) -> dict[str, object]:
     }
 
 
+def numstat_entries(output: str) -> dict[str, tuple[str, str]]:
+    entries = {}
+    parts = iter(output.split("\0"))
+    for entry in parts:
+        if not entry:
+            continue
+        added, deleted, name = entry.split("\t", 2)
+        if not name:
+            # -z 的 rename 记录以空路径后接旧、新路径，不解析展示用的花括号语法。
+            next(parts)
+            name = next(parts)
+        if not name or name in entries:
+            raise ValueError("invalid or duplicate numstat path")
+        entries[name] = (added, deleted)
+    return entries
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--base")
@@ -322,21 +342,21 @@ def main() -> int:
         return 0
 
     files = scope["changed_files"]
+    try:
+        counts = numstat_entries(str(scope["numstat"]))
+    except (ValueError, StopIteration):
+        print(json.dumps(fail_closed("invalid numstat output", learnings_corpus), sort_keys=True))
+        return 0
     executable_lines = 0
-    for line in str(scope["numstat"]).splitlines():
-        parts = line.split("\t")
-        if len(parts) < 3 or Path(parts[2]).suffix.lower() not in CODE_EXTENSIONS:
-            continue
-        try:
-            executable_lines += int(parts[0]) + int(parts[1])
-        except ValueError:
-            # Binary/unknown counts fail the lite gate through uncounted_files below.
-            pass
-
-    uncounted = sum(
-        1 for file in files if Path(file).suffix.lower() not in CODE_EXTENSIONS
-        or file in scope["included_untracked"]
-    )
+    uncounted = 0
+    for file in files:
+        added, deleted = counts.get(file, ("-", "-"))
+        if (Path(file).suffix.lower() not in CODE_EXTENSIONS
+                or file in scope["included_untracked"]
+                or not added.isdecimal() or not deleted.isdecimal()):
+            uncounted += 1
+        else:
+            executable_lines += int(added) + int(deleted)
     signals = [
         name
         for name, pattern in SIGNAL_PATTERNS.items()
@@ -350,6 +370,7 @@ def main() -> int:
         "exec_lines": executable_lines,
         "uncounted_files": uncounted,
         "changed_files": files,
+        "deleted_files": scope["deleted_files"],
         "files_changed": scope["files_changed"],
         "diff_sha256": scope["diff_sha256"],
         "signals": signals,

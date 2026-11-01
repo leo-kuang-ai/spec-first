@@ -1,0 +1,24 @@
+{
+  "id": "CEOPT-30",
+  "skill": "spec-test-xcode",
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/CEOPT-30-request.txt",
+  "request_sha256": "e38735fabbcc1f8790e97534046a2f14465e0628f03d6f9f22636852bde22e1e",
+  "input_files": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/xcode-readiness.json": "1987a728880313fc126767a6662d1aa29ce05c4131b86da41fe39cf83c660ee4",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/xcode-tap-fixture.json": "4dcdb533fcd793729b70cc5e4e651373d9c10984f9cdaa6381472723721c241c"
+  },
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "deadline_seconds": 300,
+  "parent_recipe": "Save unchanged read-only response; assess against supplied actual helper receipts and explicitly synthetic fixtures. No real external operation or autonomous mutation.",
+  "status": "prepared-not-executed",
+  "limitations": [
+    "Local negative/interpretation facets only. Real external, authenticated-positive, design or human outcomes remain unavailable as specified in the plan."
+  ]
+}

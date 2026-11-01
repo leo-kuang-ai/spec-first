@@ -1,0 +1,519 @@
+{
+  "kind": "audit_metadata_reconciliation",
+  "source_modified": false,
+  "changes": [
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/SKILL.md",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/agents/openai.yaml",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/autoresearch.md",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/debug.md",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/evals/cases/dispatch-classic-mode.yaml",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/evals/cases/screen-cmd-refuses-unsafe-predicate.yaml",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/evals/cases/ship-never-auto-approves.yaml",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/evals/eval.yaml",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/evals/fixtures/repos/empty-repo/README.md",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/evals/fixtures/scripts/check-classic-banner.sh",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/evals/fixtures/scripts/check-screen-refusal.sh",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/evals/fixtures/scripts/check-ship-gate.sh",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/evals.md",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/fix.md",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/improve.md",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/learn.md",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/plan.md",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/predict.md",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/probe.md",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/reason.md",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/references/orchestrator-routing.md",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/references/predict-personas.md",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/references/reason-judge-protocol.md",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/references/security-checklist.md",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/regression.md",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/scenario.md",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/scripts/orchestrate.sh",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/scripts/score-regression.sh",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/security.md",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/autoresearch/ship.md",
+      "from": "local_semantics_reviewed_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/SKILL.md",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/cases/bug-request-routes-debug.yaml",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/cases/docs-only-no-yield.yaml",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/cases/r2-elegant-refactor.yaml",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/cases/safety-check-preserved.yaml",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/eval.yaml",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/fixtures/repos/mini-ledger/README.md",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/fixtures/repos/mini-ledger/package.json",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/fixtures/repos/mini-ledger/src/server.js",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/README.md",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/package.json",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/src/server.js",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/fixtures/scripts/asks-a-question.sh",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/fixtures/scripts/check-no-yield-scope.sh",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/fixtures/scripts/check-r2-safety-stays.sh",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/fixtures/scripts/check-safety-preserved.sh",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/references/personas/code-quality-reviewer.md",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/references/personas/code-reuse-reviewer.md",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/references/personas/efficiency-reviewer.md",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-simplify-code/SKILL.md",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-simplify-code/references/personas/code-quality-reviewer.md",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-simplify-code/references/personas/code-reuse-reviewer.md",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-simplify-code/references/personas/comment-reviewer.md",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-simplify-code/references/personas/efficiency-reviewer.md",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-simplify-code/references/personas/test-value-reviewer.md",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-simplify-code/references/reviewer-dispatch.md",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-simplify-code/references/standalone-report.md",
+      "from": "capability_comparison_recorded_dependency_closure_pending",
+      "to": "source_comparison_complete"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/tests/unit/autoresearch-orchestrator-regression.test.js",
+      "from": "in_progress",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/tests/unit/ce-localization-review-contracts.test.js",
+      "from": "in_progress",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/src/cli/contracts/dual-host-governance/skills-governance.json",
+      "from": "in_progress",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "autoresearch",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/using-spec-first/references/public-route-map.md",
+      "from": "in_progress",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-work/references/implementation-loop.md",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-work/references/shipping-workflow.md",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-work/references/implementation-quality.md",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-work/references/feedback-and-tests.md",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-lfg/references/review-followup.md",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-debug/SKILL.md",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-explain/references/destinations.md",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/skills/spec-compound/references/enhancement.md",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/tests/unit/specialized-skill-calibration-contracts.test.js",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/tests/unit/dispatch-authorization-matrix-contracts.test.js",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/docs/contracts/workflows/worker-dispatch-capability.md",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/tests/fixtures/worker-dispatch/semantic-candidate-cases.json",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/tests/helpers/brainstorm-contract.js",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/tests/helpers/compound-contract.js",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/spec-first/tests/helpers/code-review-contract.js",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-work/references/implementation-loop.md",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-work/references/shipping-workflow.md",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-debug/SKILL.md",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-debug/references/post-fix-handoff.md",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/compound-engineering-plugin/skills/lfg/SKILL.md",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/compound-engineering-plugin/skills/lfg/references/review-followup.md",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/compound-engineering-plugin/skills/lfg/references/debug-return.md",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-compound/references/enhancement.md",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "/Users/kuang/xiaobu/compound-engineering-plugin/tests/skill-eval-cell/packs/ce-simplify-code-pruning.md",
+      "from": "direct_consumer_or_test_reviewed",
+      "to": "direct_contract_reviewed"
+    }
+  ],
+  "limitations": [
+    "只收束已完成语义核对对应的旧状态字段；不生成新的源码阅读或运行证据"
+  ]
+}

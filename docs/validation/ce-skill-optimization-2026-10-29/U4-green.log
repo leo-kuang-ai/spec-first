@@ -1,0 +1,8 @@
+PASS tests/unit/sweep-state-safety.test.js
+PASS tests/unit/sweep-state-legacy-import.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       20 passed, 20 total
+Snapshots:   0 total
+Time:        1.013 s, estimated 2 s
+Ran all test suites within paths "tests/unit/sweep-state-safety.test.js", "tests/unit/sweep-state-legacy-import.test.js".

@@ -1,0 +1,38 @@
+{
+  "artifact_type": "confirmed",
+  "scope": "隔离stub与judge探针；未调用真实provider",
+  "worker_without_receipt": {
+    "exit_code": 0,
+    "stub_called": true,
+    "output": {
+      "position": "",
+      "reasoning": "",
+      "evidence": [
+        {}
+      ],
+      "external_check": "unavailable",
+      "mode": "independent",
+      "movement": "initial",
+      "voice": "pov-codex",
+      "cross_model_route": "codex",
+      "cross_model_target": "codex",
+      "cross_model_harness": "codex",
+      "serving_family": "codex",
+      "model_requested": "fake-model",
+      "model_actual": "unverified",
+      "independence_verified": false
+    },
+    "stderr": ""
+  },
+  "judge_non_verdict": {
+    "input": "尚无结论，没有证据",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "dormant_persona": {
+    "configured": "references/personas/agents/pov-peer.md",
+    "configured_exists": false,
+    "actual_exists": true
+  }
+}

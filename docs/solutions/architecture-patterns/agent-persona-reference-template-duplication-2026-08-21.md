@@ -18,7 +18,7 @@ tags: [reference-duplication, agent-template, persona-template, sync-shared-refe
 
 ## Context
 
-`docs/10-prompt/spec-first代码审查方案.md` Phase 1A 检查清单第 1 项「重复消除」在 2026-08-21 用 Jaccard 行相似度扫描全部 `skills/*/references/**/*.md` 的同名文件组，发现除已被 `scripts/sync-shared-references.js` 的 `SYNC_MAP` 管理的 6 组（`html-rendering.md` 等，字节级相同）之外，还有 **11 个 agent/persona 模板家族、25 个文件、约 3536 行**，两两相似度 82%-99%：
+`docs/methodology/spec-first代码审查方案.md` Phase 1A 检查清单第 1 项「重复消除」在 2026-08-21 用 Jaccard 行相似度扫描全部 `skills/*/references/**/*.md` 的同名文件组，发现除已被 `scripts/sync-shared-references.js` 的 `SYNC_MAP` 管理的 6 组（`html-rendering.md` 等，字节级相同）之外，还有 **11 个 agent/persona 模板家族、25 个文件、约 3536 行**，两两相似度 82%-99%：
 
 | 文件名 | 副本数 | 所在 skill |
 |---|---|---|
@@ -135,6 +135,6 @@ skills/spec-plan/references/agents/learnings-researcher.md            (生成产
 
 - `skills/_shared/README.md` — 现有 `SYNC_MAP` 管理的 6 组字节级相同 reference，及本次审查修正过的"8 组已知漂移"清单（那 8 组是真分叉，不是本文档描述的模板家族）
 - `scripts/sync-shared-references.js` — 当前只支持字节级 SHA-256 parity 同步，不支持参数化模板
-- `docs/10-prompt/spec-first代码审查方案.md` Phase 1A 检查清单第 1 项、P2「Owner 正确性」（`model-tiers.md` 的同类先例判断）
+- `docs/methodology/spec-first代码审查方案.md` Phase 1A 检查清单第 1 项、P2「Owner 正确性」（`model-tiers.md` 的同类先例判断）
 - `docs/solutions/architecture-patterns/rebar-structure-skill-simplification-pattern-2026-06-04.md` — "先找承重轴，不先删文件"的通用方法论，本文档第 2 节的判断逻辑与其"边界迁到哪了"的检验方式一致
 - `docs/solutions/architecture-patterns/npm-skill-template-ownership.md` — 判断资产该放 skill 还是共享层的相邻方法论

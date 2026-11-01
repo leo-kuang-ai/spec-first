@@ -285,6 +285,6 @@ machine-readable 真源文件固定落位：
 6. 不得把 Kiro 用户入口写成 host-specific legacy spelling；用户口径是同名 `spec-*` workflow，Kiro 内部投射到 `.kiro/skills/spec-*`
 7. 不得把 OpenCode 用户入口写成宿主专属 worker primitive；用户口径是同名 `spec-*` workflow，OpenCode 内部投射到 `.opencode/commands/spec-*.md` 与 `.opencode/skills/spec-*`
 8. `Skill(...)`、`skill:`、以及其他内部调用 DSL 明确不属于“用户可见入口治理”范围
-9. `docs/10-prompt/skills/` 不再是 active contract surface、runtime mirror 或 skill source；新增或修改 skill 不得要求随 `skills/` source 改动同步更新或重新创建该目录，避免把 `skills/` 与 `docs/10-prompt/skills/` 重新变成双真相源
+9. `docs/methodology/skills/` 不再是 active contract surface、runtime mirror 或 skill source；新增或修改 skill 不得要求随 `skills/` source 改动同步更新或重新创建该目录，避免把 `skills/` 与 `docs/methodology/skills/` 重新变成双真相源
 10. 新增 lint / doctor / smoke 规则时，应优先引用 `skills-governance.json` 与 canonical adapter registry，而不是重复手写 skill 或宿主名单
 11. 运行时 machine-readable contract 必须继续落在 `src/cli/contracts/dual-host-governance/`，不得重新回放到 `docs/`

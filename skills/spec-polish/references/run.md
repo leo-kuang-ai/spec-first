@@ -57,3 +57,5 @@ Use `http://localhost:<port>` only as an initial URL candidate. Server output or
 On failure, report diagnostics for the selected instance. Show the last 20 log lines only when this run launched it and owns the log. Resolve a corrected URL/configuration or stop.
 
 On success, use an available browser-opening capability with the verified actual URL. Do not infer IDE-specific URL schemes from environment variables. If opening is unavailable or fails, print the URL and continue the human browser loop. Automated inspection still belongs to the entrypoint's `spec-test-browser` handoff.
+
+If the verified URL is outside the browser owner's supported loopback boundary, keep the page human-only and report automated inspection as unavailable for that target. Do not replace it with a guessed local URL or widen the browser owner's access. On resume, recheck project/command/cwd and checkout/build identity; an occupied port or old URL does not prove the same server is still serving this source.

@@ -1,0 +1,7 @@
+{
+  "evidence_type": "Labeled synthetic owner feedback, not an actual user message",
+  "workflow_owner": "spec-polish",
+  "feedback": "Keep the total18 value and enabled Add entry button. Review keyboard focus; do not claim it fixed from a screenshot alone.",
+  "resume_state": "Prior browser saw version A, parent replaced server with B at same origin.",
+  "browser_unavailable_counterexample": "If no browser call is available in the active worker, do not fabricate clicks or screenshots; use attributed parent receipts only."
+}

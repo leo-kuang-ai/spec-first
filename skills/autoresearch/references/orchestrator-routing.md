@@ -81,7 +81,7 @@ Presets are starting pipelines. The router adapts per cycle from observed state 
 
 ## Glossary
 
-Terms used consistently across this file, SKILL.md, and orchestrator-state.json. Definitions live in CONTEXT.md.
+Terms below are used consistently across this file, SKILL.md, and orchestrator-state.json; this section owns their routing meaning.
 
 | Term | Short meaning |
 |---|---|

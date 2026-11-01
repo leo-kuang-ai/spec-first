@@ -68,6 +68,8 @@ Use unique `(kind, id)` sources; omit the thread source and use an empty URL arr
 }
 ```
 
+Within `verification.checks`, carry exact proof-test paths, test-only seams, original reproducer, real command/log refs and current byte identity where captured. Include missing/stale evidence in `limitations`; do not invent a pre-fix observation. The caller must retain those tests and seams during cleanup, snapshot uncaptured identities before edits, and rerun the original symptom and proof tests on its final tree. This mode still does not run Simplify itself.
+
 Emit `fixed-not-pushed` when a local convergent fix is applied and every required
 verification check passed with confirmed evidence. The fix remains in the working
 tree: this mode owns neither commit nor push, so do not invent a fix commit SHA.

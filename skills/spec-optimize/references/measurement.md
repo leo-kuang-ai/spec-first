@@ -2,11 +2,22 @@
 
 Read this after the spec is saved and follow it through the approval gate.
 
+Repeated and ladder confirmation require actual sample arrays for every required
+objective on both baseline and candidate arms. A scalar or aggregate contributes
+at most one observation; `sample_count` is descriptive and cannot satisfy a repeat
+budget. Keep each observation's source, launch and raw-result provenance. The
+numeric decider checks counts and comparisons, not process independence or the
+authenticity of caller-supplied samples. Incomplete confirmation stays promising
+or inconclusive and cannot claim the target reached. Holdout retains its separate
+full-protocol confirmation obligation.
+
 ### 0.3 Search Prior Learnings
 
 Read `references/agents/learnings-researcher.md`. Dispatch a generic subagent seeded with that local prompt only when the Dispatch And Backend Boundary permits it; otherwise search inline with the same bounded scope and record the matching fallback reason. Do not dispatch a standalone agent by type/name. If relevant learnings exist, incorporate them into the approach.
 
 ### 0.4 Run Identity Detection
+
+Check both the branch and the local run directory independently before creating or writing either. A missing branch does not make an existing ledger disposable. Inspect dirty/index state and apply the scoped clean-tree gate before branch creation or any research step that writes. Do not stash, reset, clear or archive someone else's work automatically.
 
 Check if `optimize/<spec-name>` branch already exists:
 
@@ -18,7 +29,7 @@ git rev-parse --verify "optimize/<spec-name>" 2>/dev/null
 
 Present the user with a choice via the platform question tool:
 - **Resume**: read ALL state from the experiment log on disk (do not rely on any in-memory context from a prior session). Recover any measured-but-unlogged experiments by scanning worktree directories for `result.yaml` markers. Follow the entry's resume rule: skip only proven work, re-enter unproven gates, and preserve the existing spec and baseline. A checkpoint or iteration number is not approval evidence.
-- **Fresh start**: archive the old branch to `optimize-archive/<spec-name>/archived-<timestamp>`, clear the experiment log, start from scratch
+- **Fresh start**: preserve the old branch and ledger, then choose a distinct run/spec identity. Any archive or destructive cleanup needs exact authorization; a fresh run never overwrites prior measurements.
 
 ### 0.5 Create Optimization Branch and Scratch Space
 
@@ -93,6 +104,10 @@ An approved optimization spec, clean tree, executable harness, baseline approval
 4. Run it once and validate the output
 5. Present the harness and its output to the user for review
 
+评测集从已观察的失败与目标行为构建，并将数据、harness、rubric、selection/holdout 划分与 seed 纳入 `scope.immutable`。同一类别需能分别支持选择与确认，不以固定条数替代语义覆盖。holdout 数据与细节不进入 selection 命令、实验 worker 或假设上下文；不同 seed 本身不证明 item 互斥。
+
+对已有输入可运行的空输出、常量输出或已知好/坏样例做 harness 反证检查，不能让平凡捷径获得同等好分。只执行已授权的命令；缺少输入或权限时记录 `not-run`，失败则先修测量，不启动优化。结果随 baseline 留证；这些检查不替代人工标签校准或独立 judge。
+
 ### 1.3 Establish Baseline
 
 Run the measurement harness on the current code. Resolve a working Node runtime (`node` or `nodejs`) before starting an optimization run: `scripts/decide.cjs` owns numeric eligibility and the next measurement step. No runtime means a blocked prerequisite, never a guessed comparison.
@@ -127,6 +142,8 @@ baseline:
 
 If primary type is `judge`, also run the judge evaluation on baseline output to establish the starting judge score. Apply the entry's independence and dispatch boundaries before scoring: if authorized, isolated judges are unavailable, record the concrete blocker and stop Phase 1 without an inline substitute or invented baseline score.
 
+确认集 baseline 不在 Phase 1 提前打分供选择使用。配置 holdout 时，在 selection 已满足 keep 后才对精确 reference/candidate source identities 收集完整确认配对，沿用相同 gates、必需目标、阈值与样本协议；最终 integrated snapshot 再确认。确认命令另有 exact command/cwd/environment/effects envelope，已有 selection 授权不能代替它。
+
 ### 1.4 Parallelism Readiness Probe
 
 Run the parallelism probe script:
@@ -136,6 +153,8 @@ bash "$SKILL_DIR/scripts/parallel-probe.sh" "<project_directory>" "<measurement.
 ```
 
 Read the JSON output. Present any blockers to the user with suggested mitigations. Treat the probe as intentionally narrow: it should inspect the measurement command, the measurement working directory, and explicitly declared shared files, not the entire repository.
+
+An empty blocker list is heuristic readiness only. It does not prove worker dispatch capability, isolation or execution authority; serial mode needs no parallel worker claim.
 
 ### 1.5 Worktree Budget Check
 
@@ -171,6 +190,7 @@ Present to the user via the platform question tool:
 - **Clean-tree status**: confirmed clean
 - **Worktree budget**: current count and projected usage
 - **Judge budget**: estimated per-experiment judge cost and configured `max_total_cost_usd` cap (or an explicit note that spend is uncapped)
+- **确认边界**：holdout 配置与冻结身份、互斥依据、完整样本成本；未配置或无法隔离时说明 claim 仅限 selection，不伪造确认。
 
 **Options:**
 1. **Proceed** -- approve baseline and parallel config, move to Phase 2

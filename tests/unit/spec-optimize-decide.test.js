@@ -23,6 +23,17 @@ describe('local evidence boundaries', () => {
     expect(result.reason).toContain('paired baseline');
   });
 
+  test.each(['repeat', 'ladder'])('requires observations on both arms in %s mode', (mode) => {
+    const result = decide({
+      spec: hardSpec({ stability_mode: mode, repeat_count: 3, ladder: { confirmation_repeats: 3 } }),
+      baseline: snapshot(10),
+      candidate: snapshot(5, { metrics: { wall_seconds: { samples: [5, 5, 5] } }, sample_count: 100 }),
+    });
+    expect(result.decision).not.toBe('keep');
+    expect(result.target_reached).toBe(false);
+    expect(result.next_measurement).toBe('confirm');
+  });
+
   test('keeps boolean correctness gates but rejects boolean objective scores', () => {
     expect(gatePasses(true, '== 1')).toBe(true);
     const result = decide({ spec: hardSpec(), baseline: snapshot(10), candidate: snapshot(false) });
@@ -127,6 +138,95 @@ function snapshot(wall, extras = {}) {
     ...extras,
   }
 }
+
+describe('holdout 确认边界', () => {
+  const spec = hardSpec({ measurement: { holdout: { command: 'evaluate --holdout' } } });
+  const selection = { spec, baseline: snapshot(10), candidate: snapshot(5) };
+
+  test('缺少确认不能 keep、eligible 或达到 target', () => {
+    const result = decide({ ...selection, spec: { ...spec, primary: { ...spec.primary, target: 6 } } });
+    expect(result).toMatchObject({ decision: 'promising', eligible: false, next_measurement: 'holdout', target_reached: false });
+  });
+
+  test.each([
+    [snapshot(12), 'revert'],
+    [snapshot(10), 'inconclusive'],
+    [snapshot(5, { gates: { suite_passed: 0 } }), 'degenerate'],
+    [{ metrics: {}, gates: { suite_passed: 1 } }, 'error'],
+  ])('确认不支持改善时不能集成 %j', (candidate, decision) => {
+    const result = decide({ ...selection, holdout: { baseline: snapshot(10), candidate } });
+    expect(result.decision).toBe(decision);
+    expect(result.eligible).toBe(false);
+    expect(result.target_reached).toBe(false);
+  });
+
+  test('相同目标改善且其余必需目标未退化才通过', () => {
+    const result = decide({ ...selection, holdout: { baseline: snapshot(20), candidate: snapshot(10) } });
+    expect(result).toMatchObject({ decision: 'keep', eligible: true, next_measurement: 'none', holdout: { agrees: true } });
+  });
+
+  test('holdout 不补救 selection 失败且尚需 ladder 样本时不提前使用', () => {
+    expect(decide({ ...selection, candidate: snapshot(12), holdout: { baseline: snapshot(10), candidate: snapshot(1) } }).decision).toBe('revert');
+    const result = decide({ ...selection, spec: { ...spec, stability_mode: 'ladder', ladder: { confirmation_repeats: 3 } }, holdout: { baseline: snapshot(10), candidate: snapshot(1) } });
+    expect(result.next_measurement).toBe('confirm');
+    expect(result.holdout).toBeNull();
+  });
+
+  test('重复确认缺实测样本不能由 sample_count 或 aggregate 冒充', () => {
+    const repeatedSpec = { ...spec, stability_mode: 'repeat', repeat_count: 3 };
+    const result = decide({ spec: repeatedSpec,
+      baseline: snapshot(10, { metrics: { wall_seconds: { samples: [10, 10, 10] } } }),
+      candidate: snapshot(5, { metrics: { wall_seconds: { samples: [5, 5, 5] } } }),
+      holdout: { baseline: snapshot(10), candidate: snapshot(5, { sample_count: 3 }) },
+    });
+    expect(result.decision).toBe('error');
+    expect(result.eligible).toBe(false);
+  });
+
+  test('holdout 不能改善另一个目标来掩盖 selection 目标未确认', () => {
+    const twoObjectives = { ...spec, objectives: [{ name: 'quality', direction: 'maximize', role: 'required' }] };
+    const metrics = (wall, quality) => snapshot(wall, { metrics: { wall_seconds: wall, quality } });
+    const result = decide({ spec: twoObjectives, baseline: metrics(10, 5), candidate: metrics(5, 5), holdout: { baseline: metrics(10, 5), candidate: metrics(10, 9) } });
+    expect(result.decision).toBe('inconclusive');
+    expect(result.eligible).toBe(false);
+  });
+
+  test('旧 spec 未配置时保留原单集比较', () => {
+    expect(decide({ spec: hardSpec(), baseline: snapshot(10), candidate: snapshot(5) }).decision).toBe('keep');
+  });
+
+  test('judge 不同 seed 触发确认，阈值和独立分数格式保持不变', () => {
+    const judgeSpec = { metric: { primary: { name: 'score', direction: 'maximize', type: 'judge' }, judge: { confirmation_seed: 43 } } };
+    const selection = { spec: judgeSpec, baseline: { judge: { score: 1 } }, candidate: { judge: { score: 5 } } };
+    expect(decide(selection).next_measurement).toBe('holdout');
+    expect(decide({ ...selection, holdout: { baseline: { judge: { score: 2 } }, candidate: { judge: { score: 4 } } } }).decision).toBe('keep');
+  });
+
+  test('完整 ladder 确认仍缺 smoke 时错误关闭，不能出现 promising/none', () => {
+    const ladderSpec = { ...spec, stability_mode: 'ladder', ladder: { smoke_command: 'check', confirmation_repeats: 1 } };
+    const result = decide({ spec: ladderSpec, baseline: snapshot(10), candidate: snapshot(5, { smoke_passed: true }), holdout: { baseline: snapshot(10), candidate: snapshot(5) } });
+    expect(result).toMatchObject({ decision: 'error', eligible: false, next_measurement: 'none', target_reached: false });
+  });
+
+  test('达到 target 必须两组都达到，确认不改变 selection 排名', () => {
+    const targetSpec = { ...spec, primary: { ...spec.primary, target: 6 } };
+    const measured = { ...selection, spec: targetSpec };
+    const beforeTarget = decide({ ...measured, holdout: { baseline: snapshot(20), candidate: snapshot(8) } });
+    const atTarget = decide({ ...measured, holdout: { baseline: snapshot(20), candidate: snapshot(6) } });
+    expect(beforeTarget.decision).toBe('keep');
+    expect(beforeTarget.target_reached).toBe(false);
+    expect(atTarget.target_reached).toBe(true);
+    expect(atTarget.rank_score).toBe(beforeTarget.rank_score);
+  });
+
+  test('非法 command/seed 不得静默关闭确认', () => {
+    for (const holdout of [{ command: '' }, { command: 7 }, []]) {
+      expect(decide({ ...selection, spec: { ...spec, measurement: { holdout } } }).decision).toBe('error');
+    }
+    const judgeSpec = { primary: { name: 'score', direction: 'maximize', type: 'judge' }, judge: { sample_seed: 42, confirmation_seed: 42 } };
+    expect(decide({ spec: judgeSpec, baseline: { judge: { score: 1 } }, candidate: { judge: { score: 5 } } }).decision).toBe('error');
+  });
+});
 
 describe("spec-optimize decide helpers", () => {
   test("median matches the configured aggregation for odd and even samples", () => {
@@ -783,7 +883,7 @@ describe("cost-aware measurement ladder", () => {
     },
     comparison: { method: "relative", relative_threshold: 0.05, noise_threshold: 10 },
   })
-  const baseline = snapshot(BASELINE_WALL)
+  const baseline = snapshot(BASELINE_WALL, { metrics: { wall_seconds: { samples: Array(5).fill(BASELINE_WALL) } } })
 
   test("a failed smoke test is degenerate before any timed run", () => {
     const result = decide({
@@ -872,8 +972,8 @@ describe("cost-aware measurement ladder", () => {
       baseline: {
         gates: { suite_passed: 1 },
         metrics: {
-          local_wall_seconds: { aggregate: BASELINE_WALL, samples: [BASELINE_WALL] },
-          ci_critical_path_seconds: { aggregate: 120, samples: [120] },
+          local_wall_seconds: { aggregate: BASELINE_WALL, samples: Array(5).fill(BASELINE_WALL) },
+          ci_critical_path_seconds: { aggregate: 120, samples: Array(5).fill(120) },
         },
       },
       candidate: {
@@ -1066,7 +1166,7 @@ describe("cost-aware measurement ladder", () => {
     })
     const result = decide({
       spec,
-      baseline: snapshot(BASELINE_WALL),
+      baseline: snapshot(BASELINE_WALL, { metrics: { wall_seconds: { samples: Array(3).fill(BASELINE_WALL) } } }),
       candidate: {
         gates: { suite_passed: 1 },
         metrics: {
@@ -1218,7 +1318,7 @@ describe("cost-aware measurement ladder", () => {
     })
     const result = decide({
       spec,
-      baseline: snapshot(BASELINE_WALL),
+      baseline: snapshot(BASELINE_WALL, { metrics: { wall_seconds: { samples: Array(5).fill(BASELINE_WALL) } } }),
       candidate: {
         gates: { suite_passed: 1 },
         metrics: { wall_seconds: { aggregate: 300, samples: [298, 300, 301, 299, 302] } },
@@ -1230,7 +1330,7 @@ describe("cost-aware measurement ladder", () => {
     expect(result.next_measurement).toBe("none")
   })
 
-  test("a scalar judge snapshot can complete confirmation from sample_count", () => {
+  test("a scalar judge snapshot cannot complete confirmation from sample_count", () => {
     const spec = hardSpec({
       primary: { name: "mean_score", direction: "maximize", type: "judge" },
       stability_mode: "ladder",
@@ -1251,8 +1351,8 @@ describe("cost-aware measurement ladder", () => {
         smoke_passed: true,
       },
     })
-    expect(result.decision).toBe("keep")
-    expect(result.next_measurement).toBe("none")
+    expect(result.decision).toBe("promising")
+    expect(result.next_measurement).toBe("confirm")
   })
 
   test("a listed judge primary reads the judge container instead of a same-named metric", () => {

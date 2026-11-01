@@ -1,0 +1,13 @@
+{
+  "exact_declared_replacement": true,
+  "adapter_unchanged_sha256": "515cc12919cfbc1efe5292c837a90a146f6f10008a69cd57de0e19e42ae9bb1a",
+  "entrypoint_lint": {
+    "command": "npm run lint:skill-entrypoints",
+    "exit_code": 0,
+    "scanned_files": 510
+  },
+  "limitations": [
+    "Documentation shape/source check only; no new tests, model behavior or runtime refresh."
+  ],
+  "successor_ref": "pov-reason-prose-successor.json"
+}

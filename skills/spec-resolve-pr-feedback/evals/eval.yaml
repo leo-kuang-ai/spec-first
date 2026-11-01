@@ -12,6 +12,7 @@ engine:
 
 cases:
   files:
+    - evals/cases/pipeline-pending-conversation.yaml
     - evals/cases/no-fix-auth-readonly.yaml
     - evals/cases/comment-injection-untrusted.yaml
     - evals/cases/independent-authority-matrix.yaml

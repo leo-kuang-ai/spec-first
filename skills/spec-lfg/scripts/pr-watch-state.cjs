@@ -6,6 +6,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const SCHEMA_VERSION = 'spec-lfg-pr-watch-state/v1';
+const OBSERVATION_POLICY = 'cadence-30-max-gap-60/v1';
+const MAX_OBSERVATION_GAP_SECONDS = 60;
 const FAILING = new Set(['FAILURE', 'TIMED_OUT', 'CANCELLED', 'ACTION_REQUIRED', 'STARTUP_FAILURE', 'STALE']);
 
 function sha256(value) {
@@ -124,6 +126,9 @@ function normalize(input) {
     if (!(field in input)) fail('snapshot-invalid', ['missing field: ' + field]);
   }
   if (!Number.isInteger(input.pr_number) || input.pr_number < 1) fail('snapshot-invalid', ['invalid pr_number']);
+  if (!Array.isArray(input.checks) || !Array.isArray(input.review_items)) {
+    fail('snapshot-invalid', ['checks and review_items must be complete arrays; missing evidence is not an empty set']);
+  }
   if (!/^[a-f0-9]{40}$/.test(input.head_sha || '') || !/^[a-f0-9]{40}$/.test(input.base_oid || '')) {
     fail('snapshot-invalid', ['head_sha and base_oid must be full lowercase commit SHAs']);
   }
@@ -377,7 +382,15 @@ function derive(previous, current, budgetSeconds, decisions) {
   const elapsedSeconds = Math.max(0, Math.floor((now - firstObservedAt) / 1000));
   const identity = observationIdentity(current);
   const changed = !previous || previous.observation_identity !== identity;
-  const lastChangedAt = changed ? current.observed_at : previous.last_changed_at;
+  const observationGapSeconds = previous ? (now - Date.parse(previous.observed_at)) / 1000 : null;
+  if (previous && (!Number.isFinite(observationGapSeconds) || observationGapSeconds < 0)) {
+    fail('snapshot-invalid', ['observation timestamps must not move backward']);
+  }
+  const resetReason = !previous ? 'first-observation'
+    : previous.observation_policy !== OBSERVATION_POLICY ? 'legacy-observation-policy'
+      : observationGapSeconds > MAX_OBSERVATION_GAP_SECONDS ? 'observation-gap'
+        : changed ? 'observation-changed' : null;
+  const lastChangedAt = resetReason ? current.observed_at : previous.last_changed_at;
   const quietSeconds = Math.max(0, Math.floor((now - Date.parse(lastChangedAt)) / 1000));
   const failingChecks = current.checks.filter((check) => FAILING.has(check.conclusion || check.status)).map((check) => check.key);
   const pendingChecks = current.checks.filter((check) => ['QUEUED', 'IN_PROGRESS', 'PENDING', 'WAITING'].includes(check.status)).map((check) => check.key);
@@ -408,6 +421,9 @@ function derive(previous, current, budgetSeconds, decisions) {
   }
   return {
     first_observed_at: previous ? previous.first_observed_at : current.observed_at,
+    observation_policy: OBSERVATION_POLICY,
+    observation_gap_seconds: observationGapSeconds,
+    quiet_window_reset_reason: resetReason,
     last_changed_at: lastChangedAt,
     observation_identity: identity,
     elapsed_seconds: elapsedSeconds,
@@ -504,6 +520,9 @@ function main() {
     })),
     answered_human_decisions: decisionState.answered,
     quiet_seconds: state.quiet_seconds,
+    observation_policy: state.observation_policy,
+    observation_gap_seconds: state.observation_gap_seconds,
+    quiet_window_reset_reason: state.quiet_window_reset_reason,
     elapsed_seconds: state.elapsed_seconds,
     limitations: state.limitations,
     warnings: chain.warnings,

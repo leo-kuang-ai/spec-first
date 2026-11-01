@@ -1,0 +1,12 @@
+PASS tests/unit/ce-setup-localization-contracts.test.js
+PASS tests/unit/remaining-script-defenses.test.js
+PASS tests/unit/run-test-suite-contracts.test.js
+PASS tests/unit/external-evidence-closure-ledger.test.js
+PASS tests/unit/changelog-format.test.js
+PASS tests/unit/plugin-modules.test.js (46.239 s)
+
+Test Suites: 6 passed, 6 total
+Tests:       46 passed, 46 total
+Snapshots:   0 total
+Time:        52.446 s
+Ran all test suites matching /tests\/unit\/ce-setup-localization-contracts.test.js|tests\/unit\/remaining-script-defenses.test.js|tests\/unit\/run-test-suite-contracts.test.js|tests\/unit\/external-evidence-closure-ledger.test.js|tests\/unit\/changelog-format.test.js|tests\/unit\/plugin-modules.test.js/i.

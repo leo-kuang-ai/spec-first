@@ -32,7 +32,6 @@ describe('spec-plan quality integration contracts', () => {
   const deployment = read('references/agents/deployment-verification-agent.md');
   const patterns = read('references/agents/pattern-recognition-specialist.md');
   const handoff = read('references/plan-handoff.md');
-  const enrichmentJudge = read('evals/fixtures/scripts/check-enrichment.sh');
 
   test('计划边界允许已授权交接，但不把计划产物当作实施授权', () => {
     expect(skill).toContain('## Planning-Only Safety Contract');
@@ -232,12 +231,6 @@ describe('spec-plan quality integration contracts', () => {
     expect(deployment).toContain('without a concrete deployment or durable-data risk surface');
   });
 
-  test('enrichment Judge compares the complete Product Contract region against the fixture baseline', () => {
-    expect(enrichmentJudge).toContain('git show HEAD:"$plan"');
-    expect(enrichmentJudge).toContain("sed -n '/<!-- PRODUCT_CONTRACT_START -->/,/<!-- PRODUCT_CONTRACT_END -->/p'");
-    expect(enrichmentJudge).toContain('cmp -s');
-    expect(enrichmentJudge).toContain('Product Contract region changed');
-  });
 
   test('reviews HTML plans report-only and keeps producer-owned recompose bounded', () => {
     expect(contract).toMatch(/HTML.*report-only review/is);

@@ -1,0 +1,2 @@
+Evaluate work-closeout-fixture.json against the settled intent and actual referenced source/proof receipts. Decide the simplify proposal, required final-tree verification, exact-frame comparison and handback status. Give concrete next actions; do not claim implementation, Figma acceptance or clean completion.
+Read only assigned-arm frozen Skill and the named evidence. Return an English artifact with per-case findings, exact evidence references, unresolved facets and responsible next action. Do not execute, mutate, contact external services or delegate.

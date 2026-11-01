@@ -1,0 +1,20 @@
+{
+  "id": "check-source-outcomes",
+  "title": "Check source outcomes",
+  "description": "Supplemental outcome case: inspect actual fixture bytes and results. Recorded trace checks are bounded and do not prove complete absence of external effects. Not part of the frozen U31 comparison set.",
+  "input": {
+    "prompt": "First run node prepare-eval.cjs once in this isolated fixture. Preparation may create a fixture baseline commit only. Read the current installed spec-product-pulse source and follow it. Create a local pulse report for the exact window recorded in exports/payments.json and exports/analytics.json, using those exports only. Preserve failed analytics as missing, never zero. No provider calls or schedule/config writes. Return JSON with metrics [{name,source,state,value}] in revenue then active_users order, and artifact_path for the actual saved report."
+  },
+  "context": {
+    "repo_fixture": "evals/fixtures/repos/u28-outcomes",
+    "git": {
+      "init": true,
+      "checkout": "main"
+    }
+  },
+  "judge": {
+    "type": "script",
+    "script_path": "evals/fixtures/scripts/check-source-outcomes.sh",
+    "timeout_seconds": 30
+  }
+}

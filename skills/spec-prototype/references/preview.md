@@ -26,4 +26,6 @@ The preview server must receive the printed `RUN_DIR` through the `--root` argum
 
 Temporary storage offers only best-effort survival. Report that limitation and preserve kept artifacts; do not promise a lifetime or delete the directory during ordinary preview cleanup.
 
+After changing HTML or same-origin assets, explicitly refresh the same preview URL and inspect the changed state before asking for a decision. The server sends `Cache-Control: no-store`; it does not inject live reload. `/version` identifies the newest screen name, not a digest of same-name edits, so do not use that response as proof the browser displays current bytes. Keep this manual refresh path rather than adding a polling service that prolongs an unattended preview's lifetime.
+
 Start with the default `127.0.0.1` binding or explicit `--host ::1`; every other host is rejected. The server emits a CSP that permits only same-origin assets/connections plus inline prototype code, keeps an owner-private instance token out of user output, and proves lifecycle ownership through a token-bound loopback identity endpoint. Stop asks the identified server to close itself; it never sends a signal directly to a PID. A blocked stop is a limitation requiring manual owner inspection, not permission to send a broader signal.

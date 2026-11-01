@@ -1,0 +1,85 @@
+{
+  "scope": "Independent read-only review of CEOPT-11 revision B-r2; bounded mediated-production acceptance only.",
+  "reference_base": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/",
+  "source_verification": {
+    "packet": "CEOPT-11-packet.json",
+    "request": "CEOPT-11-request.txt:1",
+    "fixture_hashes": "All three supplied fixture files match packet SHA-256 values.",
+    "causal_source": "fixtures/explain/src/server.js:3-18",
+    "failure_source": "fixtures/explain/src/server.js:9-13",
+    "recovery_scope": "fixtures/explain/src/server.js:1-25",
+    "documented_context": "fixtures/explain/README.md:3-8; fixtures/explain/package.json:5"
+  },
+  "trials": [
+    {
+      "id": "CEOPT-11r2-B1",
+      "verdict": "bounded_pass",
+      "artifact": "trials/CEOPT-11r2-B1/artifact.md",
+      "facets": {
+        "trigger_order_mutation_get": "pass:33-37,78-111",
+        "ownership_and_diagram": "pass:39-74",
+        "malformed_json_not_handled": "pass:113-134",
+        "cancellation_recovery_source_limited": "pass:136-156",
+        "rationale_not_invented": "pass:158-174",
+        "durable_english_artifact": "pass: saved artifact exists",
+        "delivered_reference_recoverability": "pass:24-26 contain full repository-relative source pointers; subsequent S/R/P references resolve through that source map",
+        "no_invented_execution_or_write": "pass:16-18; recorded tools are read-only"
+      },
+      "trace": "trials/CEOPT-11r2-B1/tool-events.json: event indices 0 and 2",
+      "markdown_links": "None; no destination-relative hyperlinks require resolution.",
+      "findings": []
+    },
+    {
+      "id": "CEOPT-11r2-B2",
+      "verdict": "bounded_pass",
+      "artifact": "trials/CEOPT-11r2-B2/artifact.md",
+      "facets": {
+        "trigger_order_mutation_get": "pass:38-51,68-88",
+        "ownership_and_diagram": "pass:14-36,53-66",
+        "malformed_json_not_handled": "pass:90-108",
+        "cancellation_recovery_source_limited": "pass:110-121",
+        "rationale_not_invented": "pass:123-133",
+        "durable_english_artifact": "pass: saved artifact exists",
+        "delivered_reference_recoverability": "pass:51,66,88,108,121,127,133 provide existing repository-relative files and correct source lines",
+        "no_invented_execution_or_write": "pass:10,84; recorded tools are read-only"
+      },
+      "trace": "trials/CEOPT-11r2-B2/tool-events.json: event indices 0 and 2",
+      "markdown_links": "None; no destination-relative hyperlinks require resolution.",
+      "findings": []
+    },
+    {
+      "id": "CEOPT-11r2-B3",
+      "verdict": "bounded_pass",
+      "artifact": "trials/CEOPT-11r2-B3/artifact.md",
+      "facets": {
+        "trigger_order_mutation_get": "pass:50-76,95-105",
+        "ownership_and_diagram": "pass:22-48,78-93",
+        "malformed_json_not_handled": "pass:107-136",
+        "cancellation_recovery_source_limited": "pass:138-168",
+        "rationale_not_invented": "pass:170-189",
+        "durable_english_artifact": "pass: saved artifact exists",
+        "delivered_reference_recoverability": "pass:191-202 explicitly use caller-managed plain repository-relative pointers; numbered citations map to existing sources",
+        "no_invented_execution_or_write": "pass:16-18,95-100,167-168; recorded tools are read-only"
+      },
+      "trace": "trials/CEOPT-11r2-B3/tool-events.json: event indices 0 and 2",
+      "markdown_links": "None; no destination-relative hyperlinks require resolution.",
+      "findings": []
+    }
+  ],
+  "link_rule_review": {
+    "verdict": "sufficient_for_reviewed_failure_mode",
+    "references": [
+      "skills/spec-explain/references/explainer-markdown.md: Hard invariants / Repo-relative source identity; destination-relative links",
+      "skills/spec-explain/references/destinations.md: Local file / step 2"
+    ],
+    "assessment": "Rules correctly distinguish source identity from hyperlink resolution, require final-destination rebasing and verification, and provide a recoverable plain-pointer fallback for caller-managed destinations. All three artifacts follow that fallback without machine-specific absolute paths. No substantive regression found in the inspected rules or artifacts.",
+    "unproven": "These trials do not exercise known-destination hyperlinks or relocation/rebasing."
+  },
+  "full_acceptance": "not_established",
+  "limitations": [
+    "Mediated saving does not prove autonomous scratch creation, destination selection, preservation, or interaction fallback.",
+    "Actual serving identity is not authenticated.",
+    "Recorded read-only tool use is observation, not host enforcement.",
+    "No application execution, tests, external research, writes, or delegation were performed during this review."
+  ]
+}

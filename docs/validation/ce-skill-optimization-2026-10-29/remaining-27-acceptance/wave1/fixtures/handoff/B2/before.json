@@ -1,0 +1,18 @@
+{
+  "head": "60eae552335f6db5f4dfbf56c584b87b548338ba",
+  "index_entries": "100644 b5a282b98440a36e536e3f8ec456c7596bf5bdbc 0\tREADME.md\n100644 151f5cccd16c291719829dc8c30211a46c92423b 0\tdocs/notes/research.md\n100644 f64056e1a8df0df3e89f6529a7421a25a4bda221 0\tdocs/notes/review.md\n100644 a6dc45b474b580b0740d30d48de909c01511a0ea 0\tprepare-eval.cjs\n100644 f054c57dc3ad9551dd2a20b852f70af005b6e85f 0\tsrc/retry.js\n100644 42ecbc36371cea1ab5138012060b5c51b0b46086 0\tstaged-note.txt",
+  "status": "M README.md\nA  staged-note.txt",
+  "files": {
+    "prepare-eval.cjs": "3e9546e4bca057f8438c9c97968bba11c7c9c07db3928518a75d6e7311baa726",
+    "README.md": "7ca00e1b3c1ed428205eda54f9f4ec8a9c448a2880502fcc036a672187f1ff52",
+    "staged-note.txt": "e4d3a1817b14b4279c5f79faf5287354475f4bc0409f4eaf079b2d63d925eecb",
+    "src/retry.js": "30a0b225e4ae9fc7ef8affd062eac7f0c15c5d353c5cd046d79704f254004416",
+    "docs/notes/research.md": "e8200dbe38ca14818450457865040571ebe2cc9b095dd1f3757d57dc975af4a2",
+    "docs/notes/review.md": "f88c3e9407adc27f8b33e15800e33ce7c3d160226a4feadba017077fa20e2147"
+  },
+  "post_prepare_status": "M README.md\nA  staged-note.txt\n?? .spec-first/",
+  "managed_files": {
+    ".spec-first/workflows/spec-handoff/b2/20261030t060801z-research-continuation.md": "4cb9a4492663ce3aa4332c5db8e5fb7942c656f2337330d4f66b7693210aff34",
+    ".spec-first/workflows/spec-handoff/b2/20261030t060801z-review-continuation.md": "0be00a8c0217cd0887fc2014ba869bcbba8756558c05095af9415e8a15bfffd7"
+  }
+}

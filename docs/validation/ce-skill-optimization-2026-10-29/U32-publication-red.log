@@ -1,0 +1,162 @@
+FAIL tests/unit/spec-sweep-final-publication.test.js
+  ✕ publishes the actual final record and released lease, then resumes without another push (221 ms)
+  ✕ missing record or unreleased lease prevents publication (151 ms)
+  ✕ record failure and another writer release failure retain remote ownership (147 ms)
+  ✕ rejected push remains pending and never reports remote cleanup (212 ms)
+  ✕ a newer writer is read before recovery and never overwritten (315 ms)
+  ✕ repo-local refuses the shared publisher without remote writes (213 ms)
+  ✕ committed-local refuses the shared publisher without remote writes (213 ms)
+  ✕ unrelated committed files cannot hitchhike on the final publication (239 ms)
+  ✕ unknown push exit is reconciled from exact remote bytes before declaring success (216 ms)
+
+  ● publishes the actual final record and released lease, then resumes without another push
+
+    SyntaxError: Unexpected end of JSON input
+        at JSON.parse (<anonymous>)
+
+      30 |   const r = spawnSync('python3', ['-B', script, '--repo', repo, '--state', 'state.yml', '--remote', 'origin', '--branch', 'sweep', '--writer', 'run-1', '--timestamp', timestamp, '--outcome', 'completed', '--counts', '{"ingested":1}', '--lease-commit', lease, '--candidate-commit', candidate || git(['rev-parse', 'HEAD']), '--topology', 'pushed-shared-branch', '--branch-authorized', '--landing-authorized', ...extra], { env: { ...env(), ...extraEnv }, encoding: 'utf8', timeout: 10000 });
+      31 |   expect(r.stderr).not.toContain('Traceback');
+    > 32 |   return { code: r.status, result: JSON.parse(r.stdout) };
+         |                                         ^
+      33 | }
+      34 | beforeEach(() => {
+      35 |   root = fs.mkdtempSync(path.join(os.tmpdir(), 'sweep-publication-'));
+
+      at parse (tests/unit/spec-sweep-final-publication.test.js:32:41)
+      at Object.publish (tests/unit/spec-sweep-final-publication.test.js:50:18)
+
+  ● missing record or unreleased lease prevents publication
+
+    SyntaxError: Unexpected end of JSON input
+        at JSON.parse (<anonymous>)
+
+      30 |   const r = spawnSync('python3', ['-B', script, '--repo', repo, '--state', 'state.yml', '--remote', 'origin', '--branch', 'sweep', '--writer', 'run-1', '--timestamp', timestamp, '--outcome', 'completed', '--counts', '{"ingested":1}', '--lease-commit', lease, '--candidate-commit', candidate || git(['rev-parse', 'HEAD']), '--topology', 'pushed-shared-branch', '--branch-authorized', '--landing-authorized', ...extra], { env: { ...env(), ...extraEnv }, encoding: 'utf8', timeout: 10000 });
+      31 |   expect(r.stderr).not.toContain('Traceback');
+    > 32 |   return { code: r.status, result: JSON.parse(r.stdout) };
+         |                                         ^
+      33 | }
+      34 | beforeEach(() => {
+      35 |   root = fs.mkdtempSync(path.join(os.tmpdir(), 'sweep-publication-'));
+
+      at parse (tests/unit/spec-sweep-final-publication.test.js:32:41)
+      at Object.publish (tests/unit/spec-sweep-final-publication.test.js:59:10)
+
+  ● record failure and another writer release failure retain remote ownership
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 2
+
+      17 | function state(command, args = []) {
+      18 |   const r = spawnSync('python3', [engine, command, '--state', path.join(repo, 'state.yml'), ...args], { env: env(), encoding: 'utf8' });
+    > 19 |   expect(r.status).toBe(0);
+         |                    ^
+      20 |   return r.stdout.trim().split('\n')[0];
+      21 | }
+      22 | function finalize() {
+
+      at toBe (tests/unit/spec-sweep-final-publication.test.js:19:20)
+      at Object.state (tests/unit/spec-sweep-final-publication.test.js:67:10)
+
+  ● rejected push remains pending and never reports remote cleanup
+
+    SyntaxError: Unexpected end of JSON input
+        at JSON.parse (<anonymous>)
+
+      30 |   const r = spawnSync('python3', ['-B', script, '--repo', repo, '--state', 'state.yml', '--remote', 'origin', '--branch', 'sweep', '--writer', 'run-1', '--timestamp', timestamp, '--outcome', 'completed', '--counts', '{"ingested":1}', '--lease-commit', lease, '--candidate-commit', candidate || git(['rev-parse', 'HEAD']), '--topology', 'pushed-shared-branch', '--branch-authorized', '--landing-authorized', ...extra], { env: { ...env(), ...extraEnv }, encoding: 'utf8', timeout: 10000 });
+      31 |   expect(r.stderr).not.toContain('Traceback');
+    > 32 |   return { code: r.status, result: JSON.parse(r.stdout) };
+         |                                         ^
+      33 | }
+      34 | beforeEach(() => {
+      35 |   root = fs.mkdtempSync(path.join(os.tmpdir(), 'sweep-publication-'));
+
+      at parse (tests/unit/spec-sweep-final-publication.test.js:32:41)
+      at Object.publish (tests/unit/spec-sweep-final-publication.test.js:77:10)
+
+  ● a newer writer is read before recovery and never overwritten
+
+    SyntaxError: Unexpected end of JSON input
+        at JSON.parse (<anonymous>)
+
+      30 |   const r = spawnSync('python3', ['-B', script, '--repo', repo, '--state', 'state.yml', '--remote', 'origin', '--branch', 'sweep', '--writer', 'run-1', '--timestamp', timestamp, '--outcome', 'completed', '--counts', '{"ingested":1}', '--lease-commit', lease, '--candidate-commit', candidate || git(['rev-parse', 'HEAD']), '--topology', 'pushed-shared-branch', '--branch-authorized', '--landing-authorized', ...extra], { env: { ...env(), ...extraEnv }, encoding: 'utf8', timeout: 10000 });
+      31 |   expect(r.stderr).not.toContain('Traceback');
+    > 32 |   return { code: r.status, result: JSON.parse(r.stdout) };
+         |                                         ^
+      33 | }
+      34 | beforeEach(() => {
+      35 |   root = fs.mkdtempSync(path.join(os.tmpdir(), 'sweep-publication-'));
+
+      at parse (tests/unit/spec-sweep-final-publication.test.js:32:41)
+      at Object.publish (tests/unit/spec-sweep-final-publication.test.js:88:10)
+
+  ● repo-local refuses the shared publisher without remote writes
+
+    SyntaxError: Unexpected end of JSON input
+        at JSON.parse (<anonymous>)
+
+      30 |   const r = spawnSync('python3', ['-B', script, '--repo', repo, '--state', 'state.yml', '--remote', 'origin', '--branch', 'sweep', '--writer', 'run-1', '--timestamp', timestamp, '--outcome', 'completed', '--counts', '{"ingested":1}', '--lease-commit', lease, '--candidate-commit', candidate || git(['rev-parse', 'HEAD']), '--topology', 'pushed-shared-branch', '--branch-authorized', '--landing-authorized', ...extra], { env: { ...env(), ...extraEnv }, encoding: 'utf8', timeout: 10000 });
+      31 |   expect(r.stderr).not.toContain('Traceback');
+    > 32 |   return { code: r.status, result: JSON.parse(r.stdout) };
+         |                                         ^
+      33 | }
+      34 | beforeEach(() => {
+      35 |   root = fs.mkdtempSync(path.join(os.tmpdir(), 'sweep-publication-'));
+
+      at parse (tests/unit/spec-sweep-final-publication.test.js:32:41)
+      at publish (tests/unit/spec-sweep-final-publication.test.js:94:10)
+
+  ● committed-local refuses the shared publisher without remote writes
+
+    SyntaxError: Unexpected end of JSON input
+        at JSON.parse (<anonymous>)
+
+      30 |   const r = spawnSync('python3', ['-B', script, '--repo', repo, '--state', 'state.yml', '--remote', 'origin', '--branch', 'sweep', '--writer', 'run-1', '--timestamp', timestamp, '--outcome', 'completed', '--counts', '{"ingested":1}', '--lease-commit', lease, '--candidate-commit', candidate || git(['rev-parse', 'HEAD']), '--topology', 'pushed-shared-branch', '--branch-authorized', '--landing-authorized', ...extra], { env: { ...env(), ...extraEnv }, encoding: 'utf8', timeout: 10000 });
+      31 |   expect(r.stderr).not.toContain('Traceback');
+    > 32 |   return { code: r.status, result: JSON.parse(r.stdout) };
+         |                                         ^
+      33 | }
+      34 | beforeEach(() => {
+      35 |   root = fs.mkdtempSync(path.join(os.tmpdir(), 'sweep-publication-'));
+
+      at parse (tests/unit/spec-sweep-final-publication.test.js:32:41)
+      at publish (tests/unit/spec-sweep-final-publication.test.js:94:10)
+
+  ● unrelated committed files cannot hitchhike on the final publication
+
+    SyntaxError: Unexpected end of JSON input
+        at JSON.parse (<anonymous>)
+
+      30 |   const r = spawnSync('python3', ['-B', script, '--repo', repo, '--state', 'state.yml', '--remote', 'origin', '--branch', 'sweep', '--writer', 'run-1', '--timestamp', timestamp, '--outcome', 'completed', '--counts', '{"ingested":1}', '--lease-commit', lease, '--candidate-commit', candidate || git(['rev-parse', 'HEAD']), '--topology', 'pushed-shared-branch', '--branch-authorized', '--landing-authorized', ...extra], { env: { ...env(), ...extraEnv }, encoding: 'utf8', timeout: 10000 });
+      31 |   expect(r.stderr).not.toContain('Traceback');
+    > 32 |   return { code: r.status, result: JSON.parse(r.stdout) };
+         |                                         ^
+      33 | }
+      34 | beforeEach(() => {
+      35 |   root = fs.mkdtempSync(path.join(os.tmpdir(), 'sweep-publication-'));
+
+      at parse (tests/unit/spec-sweep-final-publication.test.js:32:41)
+      at Object.publish (tests/unit/spec-sweep-final-publication.test.js:100:10)
+
+  ● unknown push exit is reconciled from exact remote bytes before declaring success
+
+    SyntaxError: Unexpected end of JSON input
+        at JSON.parse (<anonymous>)
+
+      30 |   const r = spawnSync('python3', ['-B', script, '--repo', repo, '--state', 'state.yml', '--remote', 'origin', '--branch', 'sweep', '--writer', 'run-1', '--timestamp', timestamp, '--outcome', 'completed', '--counts', '{"ingested":1}', '--lease-commit', lease, '--candidate-commit', candidate || git(['rev-parse', 'HEAD']), '--topology', 'pushed-shared-branch', '--branch-authorized', '--landing-authorized', ...extra], { env: { ...env(), ...extraEnv }, encoding: 'utf8', timeout: 10000 });
+      31 |   expect(r.stderr).not.toContain('Traceback');
+    > 32 |   return { code: r.status, result: JSON.parse(r.stdout) };
+         |                                         ^
+      33 | }
+      34 | beforeEach(() => {
+      35 |   root = fs.mkdtempSync(path.join(os.tmpdir(), 'sweep-publication-'));
+
+      at parse (tests/unit/spec-sweep-final-publication.test.js:32:41)
+      at Object.publish (tests/unit/spec-sweep-final-publication.test.js:108:10)
+
+Test Suites: 1 failed, 1 total
+Tests:       9 failed, 9 total
+Snapshots:   0 total
+Time:        2.081 s
+Ran all test suites matching /tests\/unit\/spec-sweep-final-publication.test.js/i.

@@ -1,0 +1,88 @@
+{
+  "review_type": "bounded-reporting-correction-recheck",
+  "disposition": "accepted-within-checkpoint-scope",
+  "overall_acceptance": "incomplete",
+  "resolved_findings": [
+    {
+      "id": "F1",
+      "status": "resolved",
+      "finding": "CEOPT-11 now recognizes completed independent B-r2 source/delivery review and parent relocation controls. Future work is limited to missing model-owned destination/save, interaction, and visual evidence.",
+      "refs": [
+        "execution-state.json: CEOPT-11",
+        "coverage.md:15",
+        "acceptance-checkpoint.md:26"
+      ]
+    },
+    {
+      "id": "F2",
+      "status": "resolved",
+      "finding": "CEOPT-17 no longer instructs continuation of completed Prototype originals. Its next action names the remaining Polish evidence.",
+      "refs": [
+        "execution-state.json: CEOPT-17",
+        "coverage.md:21",
+        "acceptance-checkpoint.md:32"
+      ]
+    },
+    {
+      "id": "F3",
+      "status": "resolved",
+      "finding": "CEOPT-07 explicitly retains all six independently reviewed local catalog interruption/recovery derivatives and separates missing autonomous/native, unknown-validator, and live-consumer facets.",
+      "refs": [
+        "execution-state.json: CEOPT-07",
+        "coverage.md:12",
+        "acceptance-checkpoint.md:23"
+      ]
+    },
+    {
+      "id": "F4",
+      "status": "resolved",
+      "finding": "Accounting now uses separate review_hashes and trace_hashes counters. All 36 supplied review hashes and 33 supplied trace hashes match retained files.",
+      "ref": "accounting-checkpoint.json#/checks"
+    }
+  ],
+  "verified_counts": {
+    "attempts": 175,
+    "model_finals": 170,
+    "original_identities": 162,
+    "original_model_finals": 158,
+    "distinct_successor_recovery_attempts": 13,
+    "review_hashes": 36,
+    "trace_hashes": 33,
+    "provenance_hash_failures": 0,
+    "trial_count_change": false
+  },
+  "initial_review_preservation": {
+    "review_ref": "wave1/independent-accounting-initial-review.json",
+    "trace_ref": "wave1/independent-accounting-initial-trace.json",
+    "provenance_ref": "wave1/independent-accounting-initial-provenance.json",
+    "review_sha256": "3c0ee8afc5e118ad2cff7a118e8fe16b593ac058b9b26aca90d9d4027bc9e95c",
+    "trace_sha256": "3cbc3f3602d45fc82a70f6f4d2844237adfdfe09d16e471abdcc6837d99752e7",
+    "hashes_match": true
+  },
+  "sweep_recovery_linkage": {
+    "status": "verified",
+    "ref": "accounting-checkpoint.json#/sweep_recovery",
+    "trial_id": "CEOPT-28-A1-retry1",
+    "protocol_ref": "wave4/CEOPT-28-A1-recovery-protocol.json",
+    "review_ref": "wave4/independent-sweep-recovery-review.json",
+    "qualification": "The explicit companion linkage preserves the receipt's parent-packet attribution limitation and the predispatch recovery protocol's narrower scope. It does not repair original A1 contamination or establish original full-media acceptance."
+  },
+  "validation_scope": {
+    "status": "appropriately_bounded",
+    "ref": "acceptance-checkpoint.md:61",
+    "finding": "The checkpoint explicitly selects scoped entrypoint lint, all-record accounting, and frozen-source integrity. It identifies default profile candidates, states that a full suite rerun was not selected, and makes no full-suite claim.",
+    "verification_limit": "This recheck inspected the reporting statement; it did not execute or independently certify those validation commands."
+  },
+  "unresolved_reporting_findings": [],
+  "remaining_acceptance": "Previously recorded source/input, autonomous, provider, host, visual, human, and field facets remain open. This reporting acceptance does not close either active plan.",
+  "expected_bookkeeping": {
+    "after_saving_this_review": "A subsequent accounting rerun may report 37 review hashes and 34 trace hashes.",
+    "status": "expected-not-yet-verified",
+    "meaning": "One additional review/provenance pair, with no additional trial attempt or model-task final."
+  },
+  "limitations": [
+    "This was a focused recheck of reporting corrections and accounting linkage, not a new whole-source Skill audit, code review, or global validation.",
+    "Hash matches establish current retained-record consistency, not authenticated serving identity or historical immutability.",
+    "No project producer, helper, test, network operation, mutation, or delegation was executed."
+  ]
+}

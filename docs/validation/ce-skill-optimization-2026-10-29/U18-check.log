@@ -1,0 +1,12 @@
+PASS tests/unit/spec-plan-quality-contracts.test.js
+PASS tests/unit/spec-plan-consumer-replay-contracts.test.js
+PASS tests/unit/spec-plan-contracts.test.js
+PASS tests/unit/spec-prd-plan-handoff-contracts.test.js
+PASS tests/unit/spec-plan-reference-contracts.test.js
+PASS tests/unit/agent-persona-template-drift.test.js
+
+Test Suites: 6 passed, 6 total
+Tests:       65 passed, 65 total
+Snapshots:   0 total
+Time:        1.07 s, estimated 2 s
+Ran all test suites matching /tests\/unit\/spec-plan-contracts.test.js|tests\/unit\/spec-plan-reference-contracts.test.js|tests\/unit\/spec-plan-quality-contracts.test.js|tests\/unit\/spec-plan-consumer-replay-contracts.test.js|tests\/unit\/spec-prd-plan-handoff-contracts.test.js|tests\/unit\/agent-persona-template-drift.test.js/i.

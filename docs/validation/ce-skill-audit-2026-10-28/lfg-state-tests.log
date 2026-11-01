@@ -1,0 +1,10 @@
+PASS tests/unit/spec-lfg-pr-watch-state.test.js
+PASS tests/unit/spec-work-lfg-recovery-contracts.test.js
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+PASS tests/unit/spec-work-working-tree-fingerprint.test.js
+
+Test Suites: 3 passed, 3 total
+Tests:       34 passed, 34 total
+Snapshots:   0 total
+Time:        4.813 s
+Ran all test suites within paths "tests/unit/spec-lfg-pr-watch-state.test.js", "tests/unit/spec-work-working-tree-fingerprint.test.js", "tests/unit/spec-work-lfg-recovery-contracts.test.js".

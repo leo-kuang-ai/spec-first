@@ -129,6 +129,105 @@ describe('spec-optimize worktree registration lookup', () => {
   );
 });
 
+describe('spec-optimize experiment ownership and data protection', () => {
+  let dir;
+  beforeEach(() => { dir = initExperimentRepo('Owned Experiments'); });
+  afterEach(() => { fs.rmSync(path.dirname(dir), { recursive: true, force: true }); });
+
+  function create(index = '1') {
+    const result = runExperiment(dir, ['create', 'myspec', index, 'main']);
+    expect(result.ok).toBe(true);
+    return path.join(dir, '.worktrees', `optimize-myspec-exp-${index.padStart(3, '0')}`);
+  }
+
+  test('repeated create preserves tracked, untracked, and ignored content', () => {
+    const worktree = create();
+    fs.writeFileSync(path.join(worktree, 'README.md'), 'tracked WIP');
+    fs.writeFileSync(path.join(worktree, 'notes.txt'), 'untracked WIP');
+    fs.appendFileSync(path.join(dir, '.git/info/exclude'), '\nignored.bin\n');
+    fs.writeFileSync(path.join(worktree, 'ignored.bin'), 'ignored WIP');
+    const result = runExperiment(dir, ['create', 'myspec', '1', 'main']);
+    expect(result.ok).toBe(false);
+    expect(fs.readFileSync(path.join(worktree, 'README.md'), 'utf8')).toBe('tracked WIP');
+    expect(fs.readFileSync(path.join(worktree, 'notes.txt'), 'utf8')).toBe('untracked WIP');
+    expect(fs.readFileSync(path.join(worktree, 'ignored.bin'), 'utf8')).toBe('ignored WIP');
+  });
+
+  test('cleanup-all preserves matching ordinary directories and unowned registered worktrees', () => {
+    create();
+    const foreign = path.join(dir, '.worktrees/optimize-myspec-exp-002');
+    fs.mkdirSync(foreign);
+    fs.writeFileSync(path.join(foreign, 'sentinel'), 'KEEP');
+    const other = path.join(dir, '.worktrees/optimize-myspec-exp-003');
+    git(['worktree', 'add', '-b', 'optimize-exp/myspec/exp-003', other, 'main'], dir);
+    const result = runExperiment(dir, ['cleanup-all', '--discard', 'myspec']);
+    expect(result.ok).toBe(false);
+    expect(fs.readFileSync(path.join(foreign, 'sentinel'), 'utf8')).toBe('KEEP');
+    expect(fs.existsSync(path.join(other, '.git'))).toBe(true);
+  });
+
+  test.each(['untracked', 'ignored', 'committed'])('default cleanup preserves %s work; explicit discard only removes owned experiments', (kind) => {
+    const worktree = create();
+    if (kind === 'ignored') fs.appendFileSync(path.join(dir, '.git/info/exclude'), '\nkeep.txt\n');
+    fs.writeFileSync(path.join(worktree, 'keep.txt'), 'KEEP');
+    if (kind === 'committed') { git(['add', 'keep.txt'], worktree); git(['commit', '-m', 'experiment'], worktree); }
+    expect(runExperiment(dir, ['cleanup', 'myspec', '1']).ok).toBe(false);
+    expect(fs.readFileSync(path.join(worktree, 'keep.txt'), 'utf8')).toBe('KEEP');
+    expect(runExperiment(dir, ['cleanup', '--discard', 'myspec', '1']).ok).toBe(true);
+    expect(fs.existsSync(worktree)).toBe(false);
+  });
+
+  test('clean owned experiments support idempotent creation and cleanup', () => {
+    const worktree = create();
+    expect(runExperiment(dir, ['create', 'myspec', '1', 'main']).ok).toBe(true);
+    expect(runExperiment(dir, ['cleanup', 'myspec', '1']).ok).toBe(true);
+    expect(fs.existsSync(worktree)).toBe(false);
+    expect(runExperiment(dir, ['cleanup', 'myspec', '1']).ok).toBe(true);
+  });
+
+  test('default cleanup-all removes all clean owned experiments', () => {
+    const first = create('1');
+    const second = create('2');
+    expect(runExperiment(dir, ['cleanup-all', 'myspec']).ok).toBe(true);
+    expect(fs.existsSync(first)).toBe(false);
+    expect(fs.existsSync(second)).toBe(false);
+  });
+
+  test('preserves experiments with corrupt or symlinked ownership records', () => {
+    const worktree = create();
+    const gitDir = execFileSync('git', ['rev-parse', '--absolute-git-dir'], { cwd: worktree, encoding: 'utf8' }).trim();
+    const manifest = path.join(gitDir, 'spec-first-optimize-owner.json');
+    const original = fs.readFileSync(manifest);
+    fs.writeFileSync(manifest, '{}');
+    expect(runExperiment(dir, ['cleanup', '--discard', 'myspec', '1']).ok).toBe(false);
+    fs.unlinkSync(manifest);
+    const outside = path.join(path.dirname(dir), 'owner-copy.json');
+    fs.writeFileSync(outside, original);
+    fs.symlinkSync(outside, manifest);
+    expect(runExperiment(dir, ['cleanup', '--discard', 'myspec', '1']).ok).toBe(false);
+    expect(fs.existsSync(worktree)).toBe(true);
+    expect(fs.readFileSync(outside)).toEqual(original);
+  });
+
+  test('create does not reset an existing branch with the same name', () => {
+    git(['checkout', '-b', 'optimize-exp/myspec/exp-001'], dir);
+    fs.writeFileSync(path.join(dir, 'README.md'), 'owned branch change');
+    git(['commit', '-am', 'keep'], dir);
+    const before = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: dir, encoding: 'utf8' });
+    git(['checkout', 'main'], dir);
+    expect(runExperiment(dir, ['create', 'myspec', '1', 'main']).ok).toBe(false);
+    expect(execFileSync('git', ['rev-parse', 'optimize-exp/myspec/exp-001'], { cwd: dir, encoding: 'utf8' })).toBe(before);
+  });
+
+  test('create rejects a .worktrees symlink outside the repository', () => {
+    const outside = path.join(path.dirname(dir), 'outside');
+    fs.mkdirSync(outside);
+    fs.symlinkSync(outside, path.join(dir, '.worktrees'));
+    expect(runExperiment(dir, ['create', 'myspec', '1', 'main']).ok).toBe(false);
+    expect(fs.readdirSync(outside)).toEqual([]);
+  });
+});
+
 describe('spec-optimize contracts', () => {
   test('uses validation_rules as the full optimization spec validation source of truth', () => {
     const skill = read('skills/spec-optimize/SKILL.md');
@@ -157,7 +256,8 @@ describe('spec-optimize contracts', () => {
     expect(skill).toContain('baseline judging blocks Phase 1');
     expect(skill).toContain('treat it as backpressure');
     expect(skill).toContain('Judge work is a separate budget from experiment worktrees.');
-    expect(skill).toContain('**Mechanical-apply bar:** apply any finding with a concrete `suggested_fix`');
+    expect(skill).toContain('**Mechanical-apply bar:** apply only a confirmed, in-scope finding');
+    expect(skill).toContain('covered by existing mutation authority; defer design/product decisions');
     expect(skill).toContain('Do not commit or push from this step');
     expect(skill).toContain('spec-code-review');
     expect(skill).toContain('spec-compound');

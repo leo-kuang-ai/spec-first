@@ -48,13 +48,13 @@ Read `references/modes.md` before any action. It owns invocation arguments, quot
 
 Read each reference when its step is reached, before executing that step. Resolve skill-local paths from the directory containing this `SKILL.md`; user-repo paths remain relative to the selected repo.
 
-1. **Research:** read `references/research.md`; create verified private scratch and execute the three research roles. Read and include the actual schema, category guide, and selected prompt contents needed by each authorized worker.
+1. **Research:** read `references/research.md`; create verified private scratch. The parent classifies and drafts from the session evidence; search related docs inline, delegating only when corpus work warrants it and dispatch is authorized. Include the actual contracts needed by any worker.
 2. **Session history:** read `references/session-history.md` only for an eligible, separately authorized interactive Full run. It is a Phase 1 input; skipped, failed, or irrelevant history must be recorded, then continue to assembly.
 3. **Assembly and grounding:** wait for all started research and history inputs; read `references/assembly.md`. Assemble candidates, validate frontmatter/promotion shape, capture vocabulary, and ground claims.
 4. **Optional enhancement:** read `references/enhancement.md` only when an interactive Full candidate benefits from a specialized check. Revalidate changed candidates before promotion.
 5. **Publication:** read `references/promotion.md` and make the semantic promotion decision. Recheck targets before publishing approved candidates; report partial failures exactly.
 6. **Refresh and discoverability:** after successful publication, read `references/refresh-and-discoverability.md`. Preserve the mode's edit boundaries and keep follow-ups narrowly scoped.
-7. **Report:** read `references/report.md`; emit the actual output, checks, vocabulary result, execution limits, and refresh recommendation. Stop without a follow-up menu.
+7. **Report:** read `references/report.md`; emit the actual output, checks, vocabulary result, execution limits, and refresh recommendation. Return control to an active caller; a standalone run ends without a follow-up menu.
 
 ## Lightweight Mode
 

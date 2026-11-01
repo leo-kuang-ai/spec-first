@@ -1,0 +1,90 @@
+{
+  "artifact_type": "synthetic-evaluation-input",
+  "window": "2026-10-01/2026-10-29",
+  "fetched_records": 10,
+  "unique_issue_ids": 8,
+  "eligible_unique_issues": 7,
+  "excluded_unique_issues": 1,
+  "unknown_remainder": "Pagination incomplete; additional records unknown.",
+  "records": [
+    {
+      "id": "SUP-101",
+      "source": "support",
+      "theme": "Export re-entry duplicates",
+      "confidence": "confirmed",
+      "impact": "Users manually remove duplicate rows after retry.",
+      "observations": 8
+    },
+    {
+      "id": "SUP-102",
+      "source": "support",
+      "theme": "Import format mismatch",
+      "confidence": "confirmed",
+      "impact": "Bank import requires manual spreadsheet conversion.",
+      "observations": 5
+    },
+    {
+      "id": "SEC-9",
+      "source": "security-triage",
+      "theme": "Possible cross-tenant receipt exposure",
+      "confidence": "unverified",
+      "impact": "One ambiguous screenshot alleges another studio receipt; no reproduction or source confirmation.",
+      "observations": 1
+    },
+    {
+      "id": "UX-41",
+      "source": "feedback",
+      "theme": "Accent color disliked",
+      "confidence": "confirmed",
+      "impact": "Preference only; no blocked workflow observed.",
+      "observations": 32
+    },
+    {
+      "id": "SUP-103",
+      "source": "support",
+      "theme": "Reconciliation loses saved filter",
+      "confidence": "confirmed",
+      "impact": "Users repeat filtering each session.",
+      "observations": 6
+    },
+    {
+      "id": "UX-42",
+      "source": "feedback",
+      "theme": "Keyboard navigation focus missing",
+      "confidence": "confirmed",
+      "impact": "Keyboard-only user cannot see focused export button.",
+      "observations": 2
+    },
+    {
+      "id": "OPS-3",
+      "source": "ops",
+      "theme": "Workspace timezone absent from export",
+      "confidence": "confirmed",
+      "impact": "Month-boundary totals need manual adjustment.",
+      "observations": 3
+    },
+    {
+      "id": "SUP-101",
+      "source": "feedback-mirror",
+      "theme": "Export re-entry duplicates",
+      "confidence": "confirmed",
+      "impact": "Users manually remove duplicate rows after retry.",
+      "observations": 8
+    },
+    {
+      "id": "SEC-9",
+      "source": "support-mirror",
+      "theme": "Possible cross-tenant receipt exposure",
+      "confidence": "unverified",
+      "impact": "One ambiguous screenshot alleges another studio receipt; no reproduction or source confirmation.",
+      "observations": 1
+    },
+    {
+      "id": "OLD-1",
+      "source": "support",
+      "eligible": false,
+      "reason": "Archived request for retired application"
+    }
+  ],
+  "source_limitation": "Local evaluation export, not live tracker data. SEC-9 is an allegation requiring investigation, not a confirmed defect."
+}

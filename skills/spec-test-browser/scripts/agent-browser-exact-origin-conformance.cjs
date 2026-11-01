@@ -196,6 +196,8 @@ async function main() {
   };
 
   let positiveControlPassed = false;
+  let cleanup;
+  let executionError = null;
   try {
     let before = blockedHits;
     const initial = await openAllowed();
@@ -238,22 +240,34 @@ async function main() {
     before = blockedHits;
     const direct = await invoke(['open', `${blockedOrigin}/direct-open`]);
     record('cross-origin-direct-open', !direct.ok && BLOCKED_ERROR.test(`${direct.stdout}\n${direct.stderr}`), [direct], before);
+  } catch (error) {
+    executionError = error.message;
   } finally {
-    await invoke(['close']);
+    const closed = await invoke(['close']);
+    cleanup = { status: closed.ok ? 'passed' : 'failed', ...compactAction(closed) };
     await Promise.all([closeServer(allowedServer), closeServer(blockedServer)]);
-    fs.rmSync(runRoot, { recursive: true, force: true });
   }
 
   const result = {
     schema_version: SCHEMA_VERSION,
-    status: positiveControlPassed && blockedHits === 0 && cases.every((item) => item.status === 'passed')
+    status: !executionError && cleanup.status === 'passed' && positiveControlPassed
+      && blockedHits === 0 && cases.every((item) => item.status === 'passed')
       ? 'passed'
       : 'failed',
     binary_identity: identity,
     positive_control: { status: positiveControlPassed ? 'passed' : 'failed' },
     blocked_origin_total_hits: blockedHits,
+    cleanup,
+    error: executionError,
     cases,
   };
+  if (result.status === 'passed') {
+    fs.rmSync(runRoot, { recursive: true, force: true });
+  } else {
+    result.recovery = { run_root: runRoot, binary, session, namespace,
+      next_action: cleanup.status === 'failed' ? 'retry isolated close, then remove private diagnostics' : 'inspect private diagnostics before removal' };
+    fs.writeFileSync(path.join(runRoot, 'conformance-result.json'), `${JSON.stringify(result, null, 2)}\n`, { mode: 0o600, flag: 'wx' });
+  }
   process.stdout.write(`${JSON.stringify(result)}\n`);
   process.exitCode = result.status === 'passed' ? 0 : 1;
 }

@@ -1,14 +1,15 @@
 id: go-ahead-before-build
-title: 构建前必须请求 go-ahead
+title: Discussion-only scoping does not authorize a build
 description: |
-  验证 awaiting-go-ahead 阶段:正常原型请求在创建任何文件或启动服务器前,
-  先呈现原型问题与副作用并请求明确放行;单轮不建文件。
+  Present a bounded prototype question and proposed effects without creating
+  files or serving a preview when the user explicitly requested discussion only.
+  An explicit request to build would instead carry scoped build authority.
 
 input:
   prompt: |
-    （spec-prototype skill 已安装，请按它工作。）
-    想验证一个产品问题:记账 App 的月度报表用"图表优先"还是"数字优先"布局,
-    用户哪种消化更快?做个原型试试。
+    Use spec-prototype to scope a comparison for a ledger app's monthly report:
+    chart-first versus numbers-first. For now discuss the question and proposed
+    local side effects only. Do not create files or start a preview until I agree.
 
 expect:
   files_not_exist:

@@ -1,0 +1,148 @@
+{
+  "id": "CEOPT-07-six-draft-parent-publication",
+  "at": "2026-10-31T08:03:52.284238+00:00",
+  "input_files": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-07-A1/artifact.md": "425c581f43600d88bc9e90dcd4a374563d706bc53e3774f93960ce4ed971af9b",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-07-A1/receipt.json": "bc0a84997cd56a67f14bce6b344d32731c293ec6387e39de8cc87d4985d97ef2",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-07-A2/artifact.md": "3c054967a8c737af901ed6aaf04fa699336f6b55a8de064c204c5fe132bb310c",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-07-A2/receipt.json": "17997c52cc68f9e23cae1c552ccab880705bdceae462a2f95afb274223ef4ef0",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-07-A3/artifact.md": "05bc9d5621392eee8eb08a855888526ba46afa721175f2dc92f8df361eadf688",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-07-A3/receipt.json": "02ca808c6d854a719084dcbd06982fbb4ed7be2094443ea44a30a06903ad0d64",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-07-B1/artifact.md": "f9ca9d7d2ce98977f1a70aedffe4a072d2cd4f9d9146518a84013f4d8232425b",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-07-B1/receipt.json": "e4f30ad33b1a8f3b9524095f421cf202d5af6e3db821c34b910bd91873bc58f1",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-07-B2/artifact.md": "c93afa23970ace93e1797823e652a5c1dcfb5f0af8950d5665bfab4715d7e6b6",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-07-B2/receipt.json": "c8f3feef83080559da7ddc572da3edb9cbb95a9c19fa4f2dee985e7ea821ac9a",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-07-B3/artifact.md": "7848cdfa025fcaffd614d54f6d7762c51cdc2895a881f02741c8153e8dc0e4a0",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-07-B3/receipt.json": "8489db80b08ba5f34a1d2bd1186ef67404c21e97a25ddd796375e17ccfa4169a",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/refresh/import-v1.md": "a59647c056ce1dd4a0dddac45716da34968d573287348f32031423ab73947143",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/refresh/invalid-candidate.md": "335ff42d6323b91a91ded75141eb22646560eba738d3aaf1d6da30a42b1df427",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/refresh/learning-b.md": "3fecc19e81c22fe1efaed559d60c5faae19e0e2b6293389ec3e38c9521eab6b4",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/refresh/CONCEPTS.md": "fa7c5eb57dcbe4a606d79743219be82180f7e2774e8b87b28432e8ef93aa5caf",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/refresh/learning-a.md": "d8fdb4666ebd32e7729d21b9c4fbf5d228f7bdde8077bf4de1506728609f4e25",
+    "skills/spec-compound-refresh/references/classify.md": "cde894ffe38853b58b537e427f427c4eabbc77e3ccb5ac089a4eb7126dbf3bca",
+    "skills/spec-compound-refresh/references/publication.md": "d070209006c0b93ad92cde99dc8c263314cd86c535d6a8aacfbe1d3775d3e0cc"
+  },
+  "helpers": {
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound-refresh/scripts/validate-frontmatter.py": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound-refresh/scripts/validate-doc-claims.py": "2b00789e7f82e20f65bdd692ff6a803724e246f691acd01ff83b75f0da045801",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound-refresh/scripts/validate-frontmatter.py": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound-refresh/scripts/validate-doc-claims.py": "2b00789e7f82e20f65bdd692ff6a803724e246f691acd01ff83b75f0da045801"
+  },
+  "cases": [
+    {
+      "trial": "CEOPT-07-A1",
+      "artifact_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-07-A1/artifact.md",
+      "artifact_sha256": "425c581f43600d88bc9e90dcd4a374563d706bc53e3774f93960ce4ed971af9b",
+      "learning_lines_inclusive": [
+        101,
+        154
+      ],
+      "glossary_lines_inclusive": [
+        162,
+        171
+      ],
+      "canonical_target": "learning-b.md",
+      "delete_after_dependencies": "learning-a.md",
+      "decision_basis": "Preserve model-specific canonical and deletion choices; A2/A3 explicitly keep fixture originals as evidence."
+    },
+    {
+      "trial": "CEOPT-07-A2",
+      "artifact_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-07-A2/artifact.md",
+      "artifact_sha256": "3c054967a8c737af901ed6aaf04fa699336f6b55a8de064c204c5fe132bb310c",
+      "learning_lines_inclusive": [
+        55,
+        112
+      ],
+      "glossary_lines_inclusive": [
+        128,
+        134
+      ],
+      "canonical_target": "docs/solutions/best-practices/bank-import-validation-and-recovery.md",
+      "delete_after_dependencies": null,
+      "decision_basis": "Preserve model-specific canonical and deletion choices; A2/A3 explicitly keep fixture originals as evidence."
+    },
+    {
+      "trial": "CEOPT-07-A3",
+      "artifact_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-07-A3/artifact.md",
+      "artifact_sha256": "05bc9d5621392eee8eb08a855888526ba46afa721175f2dc92f8df361eadf688",
+      "learning_lines_inclusive": [
+        69,
+        131
+      ],
+      "glossary_lines_inclusive": [
+        145,
+        161
+      ],
+      "canonical_target": "docs/solutions/best-practices/bank-import-validation-and-recovery.md",
+      "delete_after_dependencies": null,
+      "decision_basis": "Preserve model-specific canonical and deletion choices; A2/A3 explicitly keep fixture originals as evidence."
+    },
+    {
+      "trial": "CEOPT-07-B1",
+      "artifact_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-07-B1/artifact.md",
+      "artifact_sha256": "f9ca9d7d2ce98977f1a70aedffe4a072d2cd4f9d9146518a84013f4d8232425b",
+      "learning_lines_inclusive": [
+        169,
+        214
+      ],
+      "glossary_lines_inclusive": [
+        220,
+        230
+      ],
+      "canonical_target": "learning-b.md",
+      "delete_after_dependencies": "learning-a.md",
+      "decision_basis": "Preserve model-specific canonical and deletion choices; A2/A3 explicitly keep fixture originals as evidence."
+    },
+    {
+      "trial": "CEOPT-07-B2",
+      "artifact_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-07-B2/artifact.md",
+      "artifact_sha256": "c93afa23970ace93e1797823e652a5c1dcfb5f0af8950d5665bfab4715d7e6b6",
+      "learning_lines_inclusive": [
+        48,
+        113
+      ],
+      "glossary_lines_inclusive": [
+        121,
+        130
+      ],
+      "canonical_target": "learning-a.md",
+      "delete_after_dependencies": "learning-b.md",
+      "decision_basis": "Preserve model-specific canonical and deletion choices; A2/A3 explicitly keep fixture originals as evidence."
+    },
+    {
+      "trial": "CEOPT-07-B3",
+      "artifact_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-07-B3/artifact.md",
+      "artifact_sha256": "7848cdfa025fcaffd614d54f6d7762c51cdc2895a881f02741c8153e8dc0e4a0",
+      "learning_lines_inclusive": [
+        144,
+        191
+      ],
+      "glossary_lines_inclusive": [
+        199,
+        207
+      ],
+      "canonical_target": "learning-b.md",
+      "delete_after_dependencies": "learning-a.md",
+      "decision_basis": "Preserve model-specific canonical and deletion choices; A2/A3 explicitly keep fixture originals as evidence."
+    }
+  ],
+  "write_root": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/refresh-publication-supplement",
+  "originals": "Read-only; exact candidate extractions retained separately. No historical trial changes.",
+  "derivation": "Replace only the two source_refs with actual hash-checked per-case retained copies of originals, recording exact replacements. Append a labeled parent provenance note. All other draft prose stays unchanged.",
+  "synthetic_extensions": "A recovery consumer and two-row catalog are parent-generated evaluation inputs; they are not model output or real project consumers.",
+  "sequence": [
+    "Extract all6 exact contiguous learning/glossary blocks and verify original hashes.",
+    "Materialize per-case original corpus, source backups, synthetic load-bearing consumer and catalog. Native invalid validation must leave corpus unchanged; then validate exact derived candidate with frozen assigned-arm validators.",
+    "Make parent inline semantic decision limited to preserving historically documented fixture guidance; no verified application/incident promotion.",
+    "Stage all glossary/canonical/consumer/catalog files. Publish glossary then canonical. Remove prepared catalog temp only to inject a real FileNotFoundError after consumer publication. Retain old source paths and report partial state; no deletion before dependencies close.",
+    "Verify exact partial state, restage catalog from retained bytes and resume. Validate all source refs, headings and final links.",
+    "For A1/B1/B2/B3 delete only model-selected subsumed local copy after successor, citations, catalog and recovery bytes verify; retain canonical. A2/A3 keep both original local copies.",
+    "Final native checks and exact hashes, alias consumer preservation, no missing recovery knowledge, no staged temp leftovers."
+  ],
+  "negative_controls": [
+    "Original invalid promotion returns1, all publication targets unchanged.",
+    "Actual injected catalog rename fails after earlier writes; no completion or premature old-file deletion.",
+    "Separate modified deletion target is refused by freshness recheck and retained."
+  ],
+  "claim_ceiling": "Parent execution of six Refresh draft derivatives in labeled evaluation corpora. Does not add isolated model trials, independent supplement review, transactional runtime enforcement, live import compatibility or field outcomes."
+}

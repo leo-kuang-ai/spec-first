@@ -1,0 +1,115 @@
+{
+  "status": "blocked",
+  "plan_path": "docs/plans/2026-10-27-001-refactor-ce-upstream-sync-technical-scheme.md",
+  "changed_state": {
+    "branch": "leo-2026-10-27-update",
+    "head": "fe81bae9ee55ec336c85cf80c4a0460d86e3a412",
+    "changed_files": [
+      "CHANGELOG.md",
+      "docs/plans/2026-10-27-001-refactor-ce-upstream-sync-technical-scheme.md",
+      "scripts/check-ce-upstream-reconciliation.cjs",
+      "skills/spec-code-review/references/diff-scope.md",
+      "skills/spec-code-review/references/personas/maintainability-reviewer.md",
+      "skills/spec-code-review/references/personas/reliability-reviewer.md",
+      "skills/spec-code-review/references/personas/testing-reviewer.md",
+      "skills/spec-commit-push-pr/references/branch-creation.md",
+      "skills/spec-compound/references/session-history.md",
+      "skills/spec-compound/scripts/session-history/extract-metadata.py",
+      "tests/unit/ce-upstream-reconciliation-v2.test.js",
+      "tests/unit/session-history-scripts.test.js",
+      "tests/unit/spec-commit-push-pr-context-contracts.test.js",
+      "docs/contracts/verification/ce-upstream-sync-run.schema.json",
+      "docs/contracts/verification/ce-upstream-sync-run.md"
+    ],
+    "committed": false,
+    "runtime_modified": false
+  },
+  "blockers": [
+    {
+      "reason_code": "ce_sync_closeout_scope_decision_missing",
+      "detail": "整窗关闭与 deferred 产品边界存在待决范围选择；不得自动改验收边界或伪造产品排除。"
+    },
+    {
+      "reason_code": "ce_sync_remaining_source_review_incomplete",
+      "detail": "其余候选及排除组行为承载例外尚未审完，不得以 113 项绿色测试替代。"
+    }
+  ],
+  "recovery_path": "先确认发布验收边界；在既有分支继续剩余包级准入/比对/实施，再生成新 run 的当前输入和 receipts；不得直接进入 shipping。",
+  "verification_results": [
+    {
+      "argv": [
+        "npx",
+        "jest",
+        "--runTestsByPath",
+        "tests/unit/ce-upstream-reconciliation-v2.test.js",
+        "tests/unit/ce-upstream-3-20-reconciliation.test.js",
+        "tests/unit/session-history-scripts.test.js",
+        "tests/unit/spec-commit-push-pr-context-contracts.test.js",
+        "tests/unit/spec-commit-scope-regression.test.js",
+        "tests/unit/spec-compound-reference-contracts.test.js",
+        "tests/unit/spec-compound-refresh-reference-contracts.test.js",
+        "tests/unit/spec-code-review-contracts.test.js",
+        "tests/unit/spec-code-review-mechanics.test.js",
+        "--runInBand"
+      ],
+      "exit_code": 0,
+      "log_path": "docs/validation/ce-pull-2026-10-27/logs/checkpoint-tests.log",
+      "log_sha256": "0568179b3b5309f19ac55f02c67b635afe01da9860345222fcd95eafe2b1bda7",
+      "claim_ceiling": "本地针对性验证；不证明整窗完成"
+    },
+    {
+      "argv": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "exit_code": 0,
+      "log_path": "docs/validation/ce-pull-2026-10-27/logs/checkpoint-typecheck.log",
+      "log_sha256": "f8579478bf876074b7eb76d30247db9cab827cbc57b13f63c4f9d810d27f6e8a",
+      "claim_ceiling": "本地针对性验证；不证明整窗完成"
+    },
+    {
+      "argv": [
+        "npm",
+        "run",
+        "lint:skill-entrypoints"
+      ],
+      "exit_code": 0,
+      "log_path": "docs/validation/ce-pull-2026-10-27/logs/checkpoint-entrypoints.log",
+      "log_sha256": "4a91314d46d957dca12612bfa3350c3dad446069ec3f0325cda540df1f64a675",
+      "claim_ceiling": "本地针对性验证；不证明整窗完成"
+    },
+    {
+      "argv": [
+        "npm",
+        "run",
+        "check:shared-references"
+      ],
+      "exit_code": 0,
+      "log_path": "docs/validation/ce-pull-2026-10-27/logs/checkpoint-shared.log",
+      "log_sha256": "6a53819675205b983ca2ffee10d628e421b4233543b789216db7fe66575dece1",
+      "claim_ceiling": "本地针对性验证；不证明整窗完成"
+    },
+    {
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "exit_code": 0,
+      "log_path": "docs/validation/ce-pull-2026-10-27/logs/checkpoint-build.log",
+      "log_sha256": "50915d5e820b48dd5b08dae2cc181efcd0f6402a9378b76fcadf71e6063ee65c",
+      "claim_ceiling": "本地针对性验证；不证明整窗完成"
+    }
+  ],
+  "claim_limitations": [
+    "398 候选未全部审完；7 个上游路径已实施，不等于整包闭合",
+    "H1-H4 行为承载例外未全部筛查",
+    "当前无完整 adjudication/ledger/handoff；旧输入仅保留 before 证据",
+    "尚未执行独立审查、fresh-source 行为测评、全量测试、runtime apply、真实宿主/模型、PR/CI 或现场验证"
+  ],
+  "standalone_shipping_skipped": true,
+  "commit_authorization": "missing",
+  "landing_authorization": "missing",
+  "authorization_note": "return-to-caller 不消费出口授权；上层 LFG 授权仍保留在 execution-state.json。"
+}

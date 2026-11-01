@@ -25,6 +25,9 @@
 # ============================================================================
 # TOP-LEVEL STRUCTURE
 # ============================================================================
+# Additive provenance extension: existing logs remain readable. Missing optional
+# fields mean unrecorded, never confirmed. This descriptive schema is not a
+# runtime provenance validator; decide.cjs consumes its existing numeric payload.
 
 structure:
 
@@ -42,6 +45,28 @@ structure:
     type: string
     format: "ISO 8601 timestamp"
     required: true
+
+  comparisons:
+    type: array
+    required: false
+    description: "Distinct immutable pairing identities; extend samples only within the same pairing. Final original-baseline-to-integrated and holdout pairs are separate from per-experiment selection."
+    items:
+      type: object
+      children:
+        comparison_id:
+          type: string
+        kind:
+          type: string
+          enum: [standalone, integrated, final, holdout]
+        identity:
+          type: object
+          description: "Exact reference/candidate source digests, workload/item identities, protocol/rubric digests, environment, actual measuring actor and requested/actual model identity when applicable. Unknown serving identity remains unknown."
+        observations:
+          type: array
+          description: "Ordered raw baseline/candidate pairs with launch/result references, result hashes, gates, objectives, exits and script decisions. Retain failed/partial attempts without synthetic scores."
+        limitations:
+          type: array
+          description: "Missing independence, coverage, noise or other evidence; an absent regression list is unrecorded rather than empty."
 
   baseline:
     type: object
@@ -92,8 +117,13 @@ structure:
         type: number
       aa_attempts:
         type: array
+        description: "Completed A/A attempts bind distinct run_id, result_ref and result_sha256 to baseline/admission identity, successful exit and score; broken attempts have no score"
+      noise_rule:
+        type: string
+        const: range-v1
       observed_noise_floor:
         type: number
+        description: "Validator-computed spread of completed result scores, never a caller-asserted gate input"
       ab_gate:
         type: object
         description: "Deterministic allow-ab result; A/B may run only when ab_allowed is true"
@@ -154,6 +184,9 @@ structure:
           type: array
           items:
             type: string
+        opportunity:
+          type: object
+          description: "Pre-implementation workload/baseline, observed cost or rubric evidence, expected benefit with units/range or unknown, assumptions, cheapest resolving measurement, cost and risk. Retain original forecast; never infer it from results."
 
 # ============================================================================
 # EXPERIMENT ENTRY
@@ -207,6 +240,10 @@ experiment_entry:
 
   optional_children:
 
+    holdout:
+      type: object
+      description: "可选增量：精确 source/corpus 身份、互斥 item 依据、完整 baseline/candidate 原始配对、命令/日志引用和 decide 确认结果。仅供确认与审计，不进入假设、worker、digest 或排名；旧日志缺此字段不算已确认。"
+
     changes:
       type: array
       description: "Files modified by this experiment"
@@ -258,7 +295,7 @@ experiment_entry:
 
     next_measurement:
       type: string
-      enum: [none, smoke, exploratory, add_sample, confirm]
+      enum: [none, smoke, exploratory, add_sample, confirm, holdout]
       description: "Ladder next step from decide.cjs; none when the decision is terminal"
 
     learnings:

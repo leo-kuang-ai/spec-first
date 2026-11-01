@@ -1,0 +1,40 @@
+{
+  "artifact_type": "confirmed",
+  "scope": "2026-10-28 用户指定排除四个 Skill 后的台账一致性与原始工作区保护检查",
+  "included_skills": 34,
+  "excluded_skills": [
+    "spec-app-consistency-audit",
+    "spec-project-rules",
+    "spec-rule-miner",
+    "spec-write-skill"
+  ],
+  "exclusion_status": "skipped_by_user",
+  "excluded_counted_as_complete": false,
+  "checks": {
+    "plan_coverage_ledger_file_tables_consistent": true,
+    "original_dirty_files_hashed": 297,
+    "original_dirty_file_drift": [],
+    "included_previously_read_source_hash_drift": [],
+    "original_review_scope_snapshot_status": "complete",
+    "original_review_scope_mutation_detected": false,
+    "original_review_scope_mutated_paths": [],
+    "expected_diff_sha256": "sha256:1295961115f4603977e8ba23e73de0fda4e7e039b5ba50666a879c738f36107e",
+    "observed_diff_sha256": "sha256:1295961115f4603977e8ba23e73de0fda4e7e039b5ba50666a879c738f36107e"
+  },
+  "scope_verification_invocation": {
+    "initial_direct_shell_script_exit_code": 126,
+    "initial_reason": "脚本没有可执行权限",
+    "recovery": "使用 bash 执行同一已存在脚本，未修改权限或 source",
+    "recovery_exit_code": 0
+  },
+  "included_review_status": {
+    "in_progress": 2,
+    "pending": 32,
+    "full_review_complete": 0
+  },
+  "limitations": [
+    "此记录只证明范围状态和已核对 source 的内容保护，不证明全量审查完成",
+    "spec-simplify-code 的 9 项阶段性能力对照与 6 个 judge 探针不等于真实模型或宿主评测",
+    "未修改被审 source、generated runtime，未 stage、commit、push 或创建 PR"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "target_origin": "http://127.0.0.1:50523",
+  "routes": [
+    "/"
+  ],
+  "steps": [
+    {
+      "action": "open",
+      "route": "/"
+    },
+    {
+      "action": "vitals",
+      "route": "/"
+    },
+    {
+      "action": "get",
+      "property": "title"
+    },
+    {
+      "action": "get",
+      "property": "url"
+    },
+    {
+      "action": "viewport",
+      "preset": "mobile"
+    },
+    {
+      "action": "network-metadata"
+    }
+  ]
+}

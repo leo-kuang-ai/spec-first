@@ -1,0 +1,11 @@
+# U23 parent-owned knowledge capture and historical consumers
+
+Status: mechanism verified through producer source review and local checks. Independent model behavior, real publication-failure recovery and knowledge-retention outcomes remain unverified.
+
+Compared current Compound research/assembly with CE Compound research and the shared vocabulary rules with CE Refresh historical-consumer guidance. Classification and full body drafting now stay in the parent context. Existing private scratch outputs remain compatible; Related Docs Finder is conditional on corpus workload and actual dispatch authority, with inline/empty/limited-coverage outcomes distinguished.
+
+Corpus search includes known aliases and legacy categories. Semantic overlap is judged from lesson, applicability and evidence rather than a count of matching dimensions. Assembly preserves independent guidance, measurements, failed alternatives and cross-file invariants; freshness does not authorize overwriting unique knowledge. Already-covered knowledge can result in no write. Multi-document consolidation remains a scoped Refresh recommendation.
+
+Refresh recommendations now consistently return to the caller. The report ends this skill, not an active parent task, and successful publication remains required for the completion signal. Vocabulary maintenance checks actual historical consumers and surviving definitions, distinguishing synonyms from replacements. The shared source and its two distributed copies match. Existing invalidation and candidate/publication ownership remain intact; no new retirement field, packs, storage root or runtime edit was introduced.
+
+Verification: U23-check.log records 4 suites / 90 tests passed; its requested compound-candidate-contracts path did not exist and was not executed. The corrected U23-candidate-check.log records the actual candidate-claims and category suites, 2 suites / 16 tests passed. Shared-reference and entrypoint checks passed, as did git diff --check. These checks exercise existing validators/judges and source structure; they do not prove that a model preserves unique knowledge or handles live partial publication. U29/U30 retain those obligations. No new wording-matching test was added.

@@ -1,0 +1,33 @@
+{
+  "id": "CEOPT-16",
+  "skill": "spec-plan",
+  "fixture_root": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/plan",
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-16-request.txt",
+  "input_files": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/plan/prepare-eval-fixture.sh": "85eb5293775f019b290c9787ded68d25e499e580b7940bab39026304e3e93c49",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/plan/prepare-eval.cjs": "64452fd7674015c74f53a4d22cb05ea3237cc52abc26de4c614ae60263395276",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/plan/research-return.md": "b59958d8a585c46ccbeb5615a3bc7f513ed2db8ce8a6b43d6e627de9c6b9ad0d",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/plan/package.json": "9a6bcbc365d9209312b8241f989d209c65cbb53fe786324173ae6e9e80f2cc0a",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/plan/AGENTS.md": "4a29307bd8aab00e3adef728b6442ffe985e1b553f65aaf08b15999488289cd9",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/plan/tests/order-importer.test.js": "70fb5552f686bc5332ed1ecbfd5df8cf8d063b6cc31d271e96de63fbb439bdc1",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/plan/src/order-importer.js": "db67e0a54ffc50ba0e00476190d96d72d972945649a0a7e4ceabd83b1e128125",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/plan/docs/plans/2026-07-31-001-feat-order-import-plan.md": "e2a497444666b4fda5f56325f7bc5c4941cffed48efb0b4c40d073d041429e5b"
+  },
+  "receipt_refs": [],
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "deadline_seconds": 300,
+  "execution_mode": "fresh-readonly-model-plus-parent-save",
+  "parent_recipe": "Save exact response; do not apply proposed edits/publication. Extract structured artifact only with original preserved and explicit receipt.",
+  "acceptance_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-16",
+  "limitations": [
+    "Mediated interpretation/draft only; autonomous mutation/publication is not executed.",
+    "Serving identity not authenticated; no enforced read-only isolation."
+  ]
+}

@@ -22,7 +22,7 @@ These labels describe the current invocation and its allowed exit; they are not 
 | --- | --- | --- |
 | `entry` | Resolve the named question and current owner. | Question is bounded enough to scope, otherwise `unresolved`. |
 | `scoping` | Choose behavior/visual modality, throwaway root, options and limitations. | Present the exact prototype question and requested side effects. |
-| `awaiting-go-ahead` | Ask before creating files or starting a server. | Explicit go-ahead, or `abandoned`. |
+| `awaiting-go-ahead` | Check existing authority for the scoped artifact and preview; ask only for missing or expanded effects. | Existing or newly granted explicit go-ahead, or `abandoned`. |
 | `building` | Create only the throwaway artifact; do not write production source. | Runnable focused artifact exists, or `unresolved`. |
 | `preview-running` | Serve only on explicit loopback and return the local URL. | Human can inspect it, then stop or move to decision. |
 | `awaiting-human-decision` | Report options and observed limitations without inferring a winner. | Human selects a direction, leaves it unresolved, or abandons it. |
@@ -33,8 +33,8 @@ These labels describe the current invocation and its allowed exit; they are not 
 ## Boundaries
 
 - Use an isolated directory under `.context/compound-engineering/ce-prototype/<date>-<slug>/` only when `git check-ignore` and ownership/symlink checks pass; otherwise use a private OS temporary root. Never delete a kept prototype.
-- Ask for a go-ahead before creating or serving the artifact. Keep credentials out of files, arguments, logs, and handoff artifacts.
-- Preview may bind only to `127.0.0.1` or `::1`. CSP blocks external loads/connects; a stop request signals a process only after its PID, root, script and instance identity all match, otherwise it returns a blocked reason.
+- Honor an existing explicit request to build the scoped prototype; disclose its local side effects and ask only for missing authority or materially expanded effects. A discussion-only request does not authorize file creation or serving. Keep credentials out of files, arguments, logs, and handoff artifacts.
+- Preview may bind only to `127.0.0.1` or `::1`. CSP blocks external loads/connects; stop uses the token-bound loopback endpoint to ask the identified server to close itself, never a direct signal to a PID. An unverified instance identity returns a blocked reason.
 - After the user experiences the artifact, write `decisions.md` only when a choice is actually made. Include the question, prototype path, winner, rejected options, adjustments, and open questions.
 - On apply, hand off to the existing `spec-brainstorm` or `spec-plan` owner. Do not create `spec-proof`, upload an external document, or write production code.
 - Read `decisions.md` before the next related question and reassess what remains unresolved. Stay with this run while related questions need an artifact; stop when the user applies or changes the product goal. A directly related supplied plan remains the owning source; load `references/write-back.md` for the handoff. Without one, return a recap and artifact paths rather than choosing an unrelated plan or creating a third note.

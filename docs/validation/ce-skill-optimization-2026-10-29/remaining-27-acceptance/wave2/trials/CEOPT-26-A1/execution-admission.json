@@ -1,0 +1,12 @@
+{
+  "trial": "CEOPT-26-A1",
+  "approved_for_disposable_execution": true,
+  "recorded_at": "2026-10-31T05:08:36.487147+00:00",
+  "proposal_sha256": "71a0d3307eca0e6a35920b4de7c20c12a5a3f7c933bb00255c6901a2f266198e",
+  "candidate_sha256": "60fcede431e7da0426edd494e69a0680e4f6b3dd786e373d942872ce7a4c0716",
+  "review": "Parent read complete proposal, production file and protected proof/seam. Explicit no-change recommendation is justified by this small fixture and retains all validation/error semantics; fixed runner applies no replacement and reruns the unchanged HTTP proof. No model shell commands evaluated.",
+  "limitations": [
+    "One original A trial only; B1 infrastructure failure is not a proposal.",
+    "Source review and proof do not establish full behavior equivalence."
+  ]
+}

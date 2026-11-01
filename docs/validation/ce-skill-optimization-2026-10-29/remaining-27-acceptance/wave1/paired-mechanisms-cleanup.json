@@ -1,0 +1,7 @@
+{
+  "scratch_root": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e",
+  "source_drift_before_cleanup": [],
+  "independent_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/independent-explain-mechanisms-review.json",
+  "removed": true,
+  "scope": "Parent-owned paired deterministic mechanism scratch only. Handoff scratch retained for upcoming trials."
+}

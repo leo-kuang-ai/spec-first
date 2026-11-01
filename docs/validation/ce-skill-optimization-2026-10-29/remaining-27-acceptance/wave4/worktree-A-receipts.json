@@ -1,0 +1,185 @@
+{
+  "arm": "A",
+  "source_sha256": "1a871490f30ee118b20b8c2e4974c6a758f7065be2799aa1f4b29e4b175110a7",
+  "cases": [
+    {
+      "case": "lawful-local",
+      "execution": {
+        "argv": [
+          "bash",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-worktree/scripts/worktree-manager.sh",
+          "isolate",
+          "feature/login"
+        ],
+        "exit_code": 0,
+        "stdout": "Isolating feature/login at /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-p5nt_u_7/A/lawful-local/repo/.worktrees/feature-login\nAdded .worktrees to .gitignore\nHEAD is now at d32650e fixture\nEnvironment files:\n  Not copied by default. Re-run isolate with --copy-env to opt in.\nDev tool trust:\n  No installed dev-tool trust command applies.\n\nWorktree ready: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-p5nt_u_7/A/lawful-local/repo/.worktrees/feature-login\nSwitch with: cd /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-p5nt_u_7/A/lawful-local/repo/.worktrees/feature-login\n",
+        "stderr": "Preparing worktree (checking out 'feature/login')\n"
+      },
+      "main_head_preserved": true,
+      "main_index_preserved": true,
+      "main_branch": "main",
+      "outside_entries": [
+        "sentinel"
+      ],
+      "sentinel_preserved": true,
+      "target_branch": {
+        "argv": [
+          "git",
+          "branch",
+          "--show-current"
+        ],
+        "exit_code": 0,
+        "stdout": "feature/login\n",
+        "stderr": ""
+      },
+      "target_upstream": {
+        "argv": [
+          "git",
+          "rev-parse",
+          "--abbrev-ref",
+          "@{upstream}"
+        ],
+        "exit_code": 128,
+        "stdout": "",
+        "stderr": "fatal: no upstream configured for branch 'feature/login'\n"
+      }
+    },
+    {
+      "case": "linked-container",
+      "execution": {
+        "argv": [
+          "bash",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-worktree/scripts/worktree-manager.sh",
+          "isolate",
+          "feature/login"
+        ],
+        "exit_code": 0,
+        "stdout": "Isolating feature/login at /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-p5nt_u_7/A/linked-container/repo/.worktrees/feature-login\nAdded .worktrees to .gitignore\nHEAD is now at d32650e fixture\nEnvironment files:\n  Not copied by default. Re-run isolate with --copy-env to opt in.\nDev tool trust:\n  No installed dev-tool trust command applies.\n\nWorktree ready: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-p5nt_u_7/A/linked-container/repo/.worktrees/feature-login\nSwitch with: cd /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-p5nt_u_7/A/linked-container/repo/.worktrees/feature-login\n",
+        "stderr": "Preparing worktree (checking out 'feature/login')\n"
+      },
+      "main_head_preserved": true,
+      "main_index_preserved": true,
+      "main_branch": "main",
+      "outside_entries": [
+        "feature-login",
+        "sentinel"
+      ],
+      "sentinel_preserved": true,
+      "target_branch": {
+        "argv": [
+          "git",
+          "branch",
+          "--show-current"
+        ],
+        "exit_code": 0,
+        "stdout": "feature/login\n",
+        "stderr": ""
+      },
+      "target_upstream": {
+        "argv": [
+          "git",
+          "rev-parse",
+          "--abbrev-ref",
+          "@{upstream}"
+        ],
+        "exit_code": 128,
+        "stdout": "",
+        "stderr": "fatal: no upstream configured for branch 'feature/login'\n"
+      }
+    },
+    {
+      "case": "existing-ancestor",
+      "execution": {
+        "argv": [
+          "bash",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-worktree/scripts/worktree-manager.sh",
+          "create",
+          "feature/new",
+          "main"
+        ],
+        "exit_code": 0,
+        "stdout": "Creating worktree feature/new from main\nAdded .worktrees to .gitignore\nHEAD is now at 5048428 fixture\nEnvironment files:\n  Not copied by default. Re-run create with --copy-env to opt in.\nDev tool trust:\n  No installed dev-tool trust command applies.\n\nWorktree ready: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-p5nt_u_7/A/existing-ancestor/repo/.worktrees/feature/new\nSwitch with: cd /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-p5nt_u_7/A/existing-ancestor/repo/.worktrees/feature/new\n",
+        "stderr": "fatal: 'origin' does not appear to be a git repository\nfatal: Could not read from remote repository.\n\nPlease make sure you have the correct access rights\nand the repository exists.\nWarning: could not fetch origin/main; using local ref\nPreparing worktree (new branch 'feature/new')\n"
+      },
+      "main_head_preserved": true,
+      "main_index_preserved": true,
+      "main_branch": "main",
+      "outside_entries": [
+        "new",
+        "sentinel"
+      ],
+      "sentinel_preserved": true,
+      "target_branch": null,
+      "target_upstream": null
+    },
+    {
+      "case": "dangling-ancestor",
+      "execution": {
+        "argv": [
+          "bash",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-worktree/scripts/worktree-manager.sh",
+          "create",
+          "feature/new",
+          "main"
+        ],
+        "exit_code": 128,
+        "stdout": "Creating worktree feature/new from main\nAdded .worktrees to .gitignore\n",
+        "stderr": "fatal: 'origin' does not appear to be a git repository\nfatal: Could not read from remote repository.\n\nPlease make sure you have the correct access rights\nand the repository exists.\nWarning: could not fetch origin/main; using local ref\nPreparing worktree (new branch 'feature/new')\nfatal: could not create leading directories of '/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-p5nt_u_7/A/dangling-ancestor/repo/.worktrees/feature/new/.git': No such file or directory\n"
+      },
+      "main_head_preserved": true,
+      "main_index_preserved": true,
+      "main_branch": "main",
+      "outside_entries": [
+        "sentinel"
+      ],
+      "sentinel_preserved": true,
+      "target_branch": null,
+      "target_upstream": null
+    },
+    {
+      "case": "remote-only",
+      "execution": {
+        "argv": [
+          "bash",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-worktree/scripts/worktree-manager.sh",
+          "isolate",
+          "remote-feature"
+        ],
+        "exit_code": 0,
+        "stdout": "Isolating remote-feature at /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-p5nt_u_7/A/remote-only/repo/.worktrees/remote-feature\nAdded .worktrees to .gitignore\nHEAD is now at 1ae9ee0 fixture\nEnvironment files:\n  Not copied by default. Re-run isolate with --copy-env to opt in.\nDev tool trust:\n  No installed dev-tool trust command applies.\n\nWorktree ready: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-p5nt_u_7/A/remote-only/repo/.worktrees/remote-feature\nSwitch with: cd /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-p5nt_u_7/A/remote-only/repo/.worktrees/remote-feature\n",
+        "stderr": "Preparing worktree (new branch 'remote-feature')\n"
+      },
+      "main_head_preserved": true,
+      "main_index_preserved": true,
+      "main_branch": "main",
+      "outside_entries": [
+        "sentinel"
+      ],
+      "sentinel_preserved": true,
+      "target_branch": {
+        "argv": [
+          "git",
+          "branch",
+          "--show-current"
+        ],
+        "exit_code": 0,
+        "stdout": "remote-feature\n",
+        "stderr": ""
+      },
+      "target_upstream": {
+        "argv": [
+          "git",
+          "rev-parse",
+          "--abbrev-ref",
+          "@{upstream}"
+        ],
+        "exit_code": 128,
+        "stdout": "",
+        "stderr": "fatal: no upstream configured for branch 'remote-feature'\n"
+      }
+    }
+  ],
+  "limitations": [
+    "Parent-operated local Git only. No worker filesystem isolation or external remote tested."
+  ]
+}

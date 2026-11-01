@@ -155,6 +155,8 @@ This fails because of the **box-drawing `────` separators between items*
 - **Horizontal rule** (`---`) separates findings from verdict
 - **`###` headers** for each section -- never plain text headers
 
+三态验证结果按 `finish-review.md` 展示计数与理由；`unresolved` 明确为缺失证据的验证项，保留原 severity/confidence，排除修复队列。保护 artifact 的唯一范围见 `action-class-rubric.md`，包含嵌套分类。
+
 ## Agent mode (JSON)
 
 When `mode:agent` is active, **do not** emit the markdown table report above. Emit **one parseable JSON object** as the primary response and, when the concrete `REVIEW_ARTIFACT_DIR` is writable, write the same payload to `{review_artifact_dir}/review.json`. The JSON `artifact_path` is that exact absolute directory or `null`; consumers never reconstruct it from `run_id`.

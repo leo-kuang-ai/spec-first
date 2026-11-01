@@ -1,0 +1,12 @@
+{
+  "trial": "CEOPT-33-A2",
+  "at": "2026-10-31T05:39:56.135276+00:00",
+  "original_sha256": "7ac8d4e0a9035d65e3876cd744132214c0b2fb6521f367aff6d7f264fd7b57e6",
+  "source_lines_inclusive": [
+    1,
+    265
+  ],
+  "candidate_sha256": "23e6cc9cae4e2973333068d8e167f37d10e7c567314a3071d0ff8b7503c2c64b",
+  "admission": "Parent reviewed complete draft; exact contiguous original lines through Regeneration Rules, no semantic edits/status promotion.",
+  "semantic_observation": "Three dependent sourceowners preserved, duplicate identity distinct from equalamounts, proof/seam protected in context/done/stop; real exactoperation downstream receipt required. Missing source/proof bindings and historicalRED remain unverified."
+}

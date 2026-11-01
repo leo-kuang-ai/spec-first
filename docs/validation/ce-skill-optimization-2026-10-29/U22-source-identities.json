@@ -1,0 +1,11 @@
+{
+  "skills/spec-commit/SKILL.md": "f3ed607d09ee5a4d38fe702a2c047b4394981b84fa674c534d4b79a9717596f5",
+  "skills/spec-commit-push-pr/references/context.md": "c68052ccce0a705bda3e1b3ed6867c77db8d4c16fb2bfe0010660601f40e657a",
+  "skills/spec-commit-push-pr/references/branch-creation.md": "974ec16ad783e16f72222854a5209c8e662a4adab6a7ae0caf1deae86c241cf6",
+  "skills/spec-commit-push-pr/references/commit-and-push.md": "0c1fde8b6cd881df3da2dcc1fcee2748a6f8549cd67ca17af89424a9926738fd",
+  "skills/spec-commit-push-pr/references/pr-description-writing.md": "a4a8b161532e8c4127739ac5ccedb1e910fd408117b4c0910b55a5fc86fcb12d",
+  "skills/spec-commit-push-pr/references/compose.md": "e260fb44e51cf771858f678e4214d758178724c5373d19d921af9363d62ae510",
+  "skills/spec-commit-push-pr/references/apply-and-handoff.md": "8c3d34f4f7ce05f2345448dff76195225e63dc09b365549c719f89c00f945948",
+  "tests/unit/spec-commit-scope-regression.test.js": "266ddbc678db015e0fbee44a41ed35fbfb54c6d24aa6cfe2ad68dc00dcdaf8e5",
+  "tests/unit/spec-commit-push-pr-context-contracts.test.js": "635b1ed62cb144e2f512e3b74efa419035e784ee6fec84350ffc5cc07901506e"
+}

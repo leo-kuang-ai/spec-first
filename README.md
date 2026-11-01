@@ -15,7 +15,7 @@
 [![license](https://img.shields.io/npm/l/spec-first.svg)](https://github.com/leo-kuang-ai/spec-first/blob/master/LICENSE)
 [![Website](https://img.shields.io/badge/website-spec--first.cn-blue)](http://spec-first.cn/)
 
-[English](README.en.md) | [简体中文](README.md) | [用户手册](docs/05-用户手册/README.md) | [官方网站](http://spec-first.cn/)
+[English](README.en.md) | [简体中文](README.md) | [用户手册](docs/user-guide/README.md) | [官方网站](http://spec-first.cn/)
 
 </div>
 
@@ -67,7 +67,7 @@ spec-first doctor
 spec-first init --codex -y -u <name> --lang <zh|en>
 ```
 
-初始化会在写入前预览受管 runtime 文件；它不会自动 stage 或提交文件。多宿主、非 Git 目录、dry-run 和 preview 宿主用法见[完整快速开始指南](docs/05-用户手册/01-快速开始.md)。
+初始化会在写入前预览受管 runtime 文件；它不会自动 stage 或提交文件。多宿主、非 Git 目录、dry-run 和 preview 宿主用法见[完整快速开始指南](docs/user-guide/01-快速开始.md)。
 
 ### 2. 首次运行 workflow
 
@@ -147,7 +147,7 @@ docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
 | `spec-commit` | 在已有提交授权下创建范围明确的 commit |
 | `spec-commit-push-pr` | 在已有提交与交付授权下提交、推送及创建或更新 PR |
 
-不确定从哪里开始时，由 `using-spec-first` 选择一个最匹配入口。上述 Skill 在宿主会话中使用，不是 `spec-first` 的 shell 子命令；具体调用形式以宿主发现的入口为准。完整边界见[公开入口与 Skill 目录](docs/05-用户手册/24-公开入口与Skill目录.md)。
+不确定从哪里开始时，由 `using-spec-first` 选择一个最匹配入口。上述 Skill 在宿主会话中使用，不是 `spec-first` 的 shell 子命令；具体调用形式以宿主发现的入口为准。完整边界见[公开入口与 Skill 目录](docs/user-guide/24-公开入口与Skill目录.md)。
 
 ## 从 Prompt 到可信变更
 
@@ -208,7 +208,7 @@ docs/
 - provider 和历史 artifact 默认是带 provenance、freshness 与 limitation 的 advisory input，进入结论前需要回源确认。
 - 长时或高影响工作需要 scope、checkpoint、停止条件、恢复点和独立验证。
 
-完整原则见[项目角色契约](docs/10-prompt/结构化项目角色契约.md)、[Source/Runtime 边界](docs/contracts/source-runtime-customization-boundary.md)、[Verification Summary 合同](docs/contracts/verification/verification-run-summary.md)和 [Honest Closeout 合同](docs/contracts/workflows/honest-closeout.md)。
+完整原则见[项目角色契约](docs/methodology/结构化项目角色契约.md)、[Source/Runtime 边界](docs/contracts/source-runtime-customization-boundary.md)、[Verification Summary 合同](docs/contracts/verification/verification-run-summary.md)和 [Honest Closeout 合同](docs/contracts/workflows/honest-closeout.md)。
 
 ## 宿主支持
 
@@ -271,9 +271,9 @@ npm run build
 
 ## 相关文档
 
-- [用户手册](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/README.md)
+- [用户手册](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/user-guide/README.md)
 - [Runtime Capability Catalog](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/catalog/runtime-capabilities.md)
-- [项目角色契约](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/10-prompt/%E7%BB%93%E6%9E%84%E5%8C%96%E9%A1%B9%E7%9B%AE%E8%A7%92%E8%89%B2%E5%A5%91%E7%BA%A6.md)
+- [项目角色契约](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/methodology/%E7%BB%93%E6%9E%84%E5%8C%96%E9%A1%B9%E7%9B%AE%E8%A7%92%E8%89%B2%E5%A5%91%E7%BA%A6.md)
 
 ## 加入社区
 

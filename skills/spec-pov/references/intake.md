@@ -28,6 +28,8 @@ The subject is usually recoverable; the **intent** is the ambiguous part. Classi
 - **Migrate / replace** — switch *from an incumbent* to this?
 - **Compare** — how does it stack up vs. what we have or the alternatives (no switch implied)?
 - **Exposure** — is this (a CVE, deprecation, or ecosystem change) *our problem*?
+- **Document take** — judge the supplied document's direction, strengths and risks; requests to enumerate defects belong to `spec-doc-review`.
+- **Approach set** — choose among already-developed options; do not invent or develop missing options here.
 - **Explainer** — they just want to understand it. This is **not** a verdict — handle it as a general research question (or a dedicated deep-research-style tool, *if the environment has one*), rather than forcing one.
 
 ## Step 3 — Infer, or propose; never guess
@@ -46,7 +48,7 @@ A warm invocation with no clear question is this same gate — the conversation 
 
 ## Selection, candidate set, and reversibility tier
 
-Apply the selection escape hatch to every invocation. A selection over a bounded field (roughly five or fewer real candidates with knowable criteria) can be judged here. If the field cannot be bounded without inventing options, return Hold and route to `spec-ideate`; if criteria are unclear, return Hold and route to `spec-brainstorm`. A product-design question owned by this project routes to `spec-brainstorm` (WHAT) or `spec-plan` (HOW), never to a POV verdict. Read `references/boundaries.md` when the fit is uncertain.
+Apply the selection escape hatch to every invocation. A selection over a bounded field (roughly five or fewer real candidates with knowable criteria) can be judged here. If the field cannot be bounded without inventing options, return Hold and route to `spec-ideate`; if criteria are unclear, return Hold and route to `spec-brainstorm`. Developing a product design owned by this project routes to `spec-brainstorm` (WHAT) or `spec-plan` (HOW), never to a POV verdict. Read `references/boundaries.md` when the fit is uncertain.
 
 Before grounding, freeze the complete approach set: every user-supplied candidate, the status quo when relevant, and the explicit option to reject the framing or all candidates. Preserve it through grounding, peer checks, and the final verdict. Every approach ends as recommended, rejected with a reason, deferred for missing evidence, or framing-rejected; omission is not a disposition.
 

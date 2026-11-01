@@ -1,0 +1,22 @@
+{
+  "default": "deny",
+  "allow": [
+    "launch",
+    "navigate",
+    "open",
+    "snapshot",
+    "get",
+    "console",
+    "network",
+    "vitals",
+    "set",
+    "screenshot",
+    "click",
+    "fill",
+    "type",
+    "press",
+    "select",
+    "find",
+    "close"
+  ]
+}

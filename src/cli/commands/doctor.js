@@ -161,7 +161,7 @@ function formatDoctorHumanReport(report, { verbose = false, target } = {}) {
       const activation = platform === 'pi' ? '打开 Pi 并完成项目信任' : `打开或新开 ${getPlatformDisplayName(platform)} 会话`;
       lines.push(`  ${platform.toUpperCase()} 主行动：在此目录${activation}，描述真实任务（依据：${skillsCheck.name} 检查 PASS；加载与结果仍未验证）。`);
     } else {
-      lines.push(`  ${platform.toUpperCase()} 主行动：projection 或目标目录事实不足（依据：continuation-facts-insufficient）；参见 docs/05-用户手册/01-快速开始.md 的恢复步骤。`);
+      lines.push(`  ${platform.toUpperCase()} 主行动：projection 或目标目录事实不足（依据：continuation-facts-insufficient）；参见 docs/user-guide/01-快速开始.md 的恢复步骤。`);
     }
   }
 

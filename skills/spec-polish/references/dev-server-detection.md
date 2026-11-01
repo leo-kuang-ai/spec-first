@@ -6,14 +6,16 @@ Run this cascade only while the port remains unresolved. Preserve a selected usa
 
 ## Priority order
 
-1. **Explicit `--port` flag** -- if the caller passed `--port <n>`, use it directly.
-2. **Framework config files** -- `next.config.*`, `vite.config.*`, `nuxt.config.*`, `astro.config.*` scanned with a conservative regex matching only numeric literal port values. Variable references (`process.env.PORT`, `getPort()`) are deliberately not matched.
+1. **Explicit `--port` flag** -- if the caller passed `--port <n>`, validate an integer in `1..65535` and use it directly. Missing values, unknown flags/types, and extra positional arguments fail with an `ERROR:` on stderr.
+2. **Framework config files** -- `next.config.*`, `vite.config.*`, `nuxt.config.*`, `astro.config.*` scoped to the selected framework (Vite for SvelteKit/modern Remix), then scanned lexically without executing config. Comments and string/template bodies are ignored; only literal numeric properties are candidates. Conflicting literal ports and dynamic expressions fall through. This is not JavaScript semantic evaluation: unrelated object properties or regular-expression literals may still be ambiguous; use an explicit startup fact when needed. Node is required for this optional probe.
 3. **Rails `config/puma.rb`** -- grep for `port <n>`.
-4. **`Procfile.dev`** -- web line scanned for `-p <n>` / `--port <n>` / `-p=<n>` / `--port=<n>`.
+4. **`Procfile.dev`, otherwise `Procfile`** -- web line scanned for `-p <n>` / `--port <n>` / `-p=<n>` / `--port=<n>`.
 5. **`docker-compose.yml`** -- line-anchored grep for `"<n>:<n>"` port mapping patterns. Not full YAML parsing.
 6. **`package.json`** -- `dev`/`start` scripts scanned for `--port <n>` / `-p <n>` / `--port=<n>` / `-p=<n>`.
 7. **`.env` files** -- checked in override order: `.env.local` -> `.env.development` -> `.env` (first hit wins). Parses `PORT=<n>` with quote stripping and comment truncation.
 8. **Framework default lookup table** -- see table below.
+
+All emitted ports are numeric and in `1..65535`; invalid discovered candidates are skipped. Missing or dynamic config is not evidence of the framework's actual listening port.
 
 ## Framework defaults
 

@@ -103,10 +103,10 @@ describe('plan status and review-closure taxonomy', () => {
 
   test('reports the weak closure reason code without rejecting legacy plans', () => {
     expect(validateReferencedReviews('# Legacy plan\n')).toEqual([]);
-    expect(validateReferencedReviews('---\nreferenced_reviews:\n  - path: docs/项目审查/report.md\n    role: origin\n    scope: in\n---\n'))
+    expect(validateReferencedReviews('---\nreferenced_reviews:\n  - path: docs/project-reviews/report.md\n    role: origin\n    scope: in\n---\n'))
       .toEqual([{
         reason_code: 'referenced-review-missing-finding-ids',
-        path: 'docs/项目审查/report.md',
+        path: 'docs/project-reviews/report.md',
       }]);
   });
 });

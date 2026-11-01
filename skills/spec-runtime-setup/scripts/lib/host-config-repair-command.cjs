@@ -1,9 +1,11 @@
 'use strict';
 
+const { renderCommand } = require('./command-display.cjs');
+
 // --repair-host-config 修复命令的唯一实现(lane finding DR-015:此前 setup.cjs 的
 // plan 预览路与 runtime-executor.cjs 的 mutation 结果路各持一份逐字副本,独立演化
 // 会漂移)。两侧 context 形状相同:{ actionPlan: { args, selected_ids, mode } }。
-function hostConfigRepairCommand(context) {
+function hostConfigRepairArgs(context) {
   const args = ['spec-runtime-setup'];
   if (context.actionPlan.args.installationOnly) args.push('--installation-only');
   if (context.actionPlan.selected_ids.length > 0) {
@@ -18,7 +20,11 @@ function hostConfigRepairCommand(context) {
     args.push('--requirement-workspace', context.actionPlan.args.requirementWorkspace);
   }
   args.push('--repair-host-config');
-  return args.join(' ');
+  return args;
 }
 
-module.exports = { hostConfigRepairCommand };
+function hostConfigRepairCommand(context, options) {
+  return renderCommand(hostConfigRepairArgs(context), options);
+}
+
+module.exports = { hostConfigRepairArgs, hostConfigRepairCommand };

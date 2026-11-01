@@ -9,6 +9,7 @@ const repoRoot = path.resolve(__dirname, '..');
 const DEFAULT_TEST_COMMAND_TIMEOUT_MS = 15 * 60 * 1000;
 const MCP_SETUP_TEST_PATHS = Object.freeze([
   'tests/unit/host-runtime-projection-contracts.test.js',
+  'tests/unit/mcp-setup-command-display.test.js',
   'tests/unit/mcp-setup-config-consumers.test.js',
   'tests/unit/mcp-setup-contracts.test.js',
   'tests/unit/mcp-setup-entrypoint.test.js',

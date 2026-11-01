@@ -7,6 +7,8 @@ If Phase 1 ran (first run, or `setup`/`reconfigure`/`edit config` argument), re-
 
 #### 2.1 Dispatch Queries
 
+Resolve strategy-metric routing from `pulse_metric_sources` under `references/config.md` before any query. Query each resolved metric through its canonical source, including providers outside the analytics/tracing/payments defaults; group compatible requests by source. Preserve unresolved metrics as `not-run` (`metric-source-unresolved`), while continuing independently mapped metrics. Report assembly consumes these receipts and does not silently select or query a different source.
+
 Every configured or expected source returns a per-source receipt before report synthesis:
 
 ```yaml
@@ -39,7 +41,7 @@ Quality scoring is content processing, not an aggregate metrics query. Before se
 
 If the source cannot project or de-identify before returning data, do not fetch raw sessions and do not attempt local redaction after the content has already entered context. Record the quality source as `not-run` with `reason_code: quality-source-minimization-unavailable`, omit the quality score, and preserve that limitation in the report. Provider-side projection reduces exposure but does not make the content anonymous; keep it out of durable artifacts and worker prompts.
 
-**Scoring discipline:** Default to 4 or 5 when the session looks normal. Reserve 1-3 for sessions with a clear failure mode (product gave wrong answer, user got stuck, error surfaced). If every session is scoring 3, the bar is too strict; if every session is scoring 5, the bar is too loose.
+**Scoring discipline:** Use the user-defined anchors persisted in `pulse_quality_dimension`; do not force a distribution or lower scores merely because every sample meets the top anchor. If a legacy dimension lacks enough scoring guidance, report qualitative observations without a numeric score until the anchors are clarified. Preserve sample size, window and selection limitations; a ten-session sample does not establish population quality.
 
 **No PII in the score summary.** Capture a count distribution (e.g., "8x 5, 1x 4, 1x 2") and a short anonymized note on any session scored below 4. Do not include message content or user identifiers in the saved report.
 

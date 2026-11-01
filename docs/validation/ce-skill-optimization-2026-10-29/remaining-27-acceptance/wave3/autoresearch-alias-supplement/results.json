@@ -1,0 +1,220 @@
+{
+  "at": "2026-10-30T09:05:11.197248+00:00",
+  "records": [
+    {
+      "arm": "A",
+      "case": "hard-canonical.tsv",
+      "argv": [
+        "bash",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/autoresearch-alias-supplement/hard-canonical.tsv"
+      ],
+      "exit_code": 0,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  visual: UNAVAILABLE (weight 0.20 renormalized out)\n  performance: subscore 100.0 over 1 cells -> contribution 100.00\nUNAVAILABLE dims: flakiness, resource, visual\nstability_score = 100.00 (threshold 95.0)\nSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "arm": "A",
+      "case": "hard-legacy.tsv",
+      "argv": [
+        "bash",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/autoresearch-alias-supplement/hard-legacy.tsv"
+      ],
+      "exit_code": 1,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  visual: UNAVAILABLE (weight 0.20 renormalized out)\n  BLOCKING: functional/diff src/app.js:1 Synthetic local fixture\nUNSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "arm": "A",
+      "case": "visual-ui-canonical.tsv",
+      "argv": [
+        "bash",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/autoresearch-alias-supplement/visual-ui-canonical.tsv"
+      ],
+      "exit_code": 0,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  visual: UNAVAILABLE (weight 0.20 renormalized out)\n  performance: subscore 100.0 over 1 cells -> contribution 100.00\nUNAVAILABLE dims: flakiness, resource, visual\nstability_score = 100.00 (threshold 95.0)\nSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "arm": "A",
+      "case": "visual-ui-legacy.tsv",
+      "argv": [
+        "bash",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/autoresearch-alias-supplement/visual-ui-legacy.tsv"
+      ],
+      "exit_code": 0,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  visual: UNAVAILABLE (weight 0.20 renormalized out)\n  performance: subscore 100.0 over 1 cells -> contribution 100.00\nUNAVAILABLE dims: flakiness, resource, visual\nstability_score = 100.00 (threshold 95.0)\nSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "arm": "A",
+      "case": "stable-canonical.tsv",
+      "argv": [
+        "bash",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/autoresearch-alias-supplement/stable-canonical.tsv"
+      ],
+      "exit_code": 0,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  visual: UNAVAILABLE (weight 0.20 renormalized out)\n  performance: subscore 100.0 over 1 cells -> contribution 100.00\nUNAVAILABLE dims: flakiness, resource, visual\nstability_score = 100.00 (threshold 95.0)\nSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "arm": "A",
+      "case": "stable-legacy.tsv",
+      "argv": [
+        "bash",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/autoresearch-alias-supplement/stable-legacy.tsv"
+      ],
+      "exit_code": 0,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  visual: UNAVAILABLE (weight 0.20 renormalized out)\n  performance: subscore 100.0 over 1 cells -> contribution 100.00\nUNAVAILABLE dims: flakiness, resource, visual\nstability_score = 100.00 (threshold 95.0)\nSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "arm": "A",
+      "case": "unknown-dimension-alone.tsv",
+      "argv": [
+        "bash",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/autoresearch-alias-supplement/unknown-dimension-alone.tsv"
+      ],
+      "exit_code": 1,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  performance: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  visual: UNAVAILABLE (weight 0.20 renormalized out)\nBASELINE_UNAVAILABLE (no scored dimensions ran)\n",
+      "stderr": ""
+    },
+    {
+      "arm": "A",
+      "case": "unknown-dimension-mixed.tsv",
+      "argv": [
+        "bash",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/autoresearch-alias-supplement/unknown-dimension-mixed.tsv"
+      ],
+      "exit_code": 0,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  visual: UNAVAILABLE (weight 0.20 renormalized out)\n  performance: subscore 100.0 over 1 cells -> contribution 100.00\nUNAVAILABLE dims: flakiness, resource, visual\nstability_score = 100.00 (threshold 95.0)\nSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "arm": "B",
+      "case": "hard-canonical.tsv",
+      "argv": [
+        "bash",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/autoresearch-alias-supplement/hard-canonical.tsv"
+      ],
+      "exit_code": 1,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  visual: UNAVAILABLE (weight 0.20 renormalized out)\n  BLOCKING: functional/diff src/app.js:1 Synthetic local fixture\nUNSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "arm": "B",
+      "case": "hard-legacy.tsv",
+      "argv": [
+        "bash",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/autoresearch-alias-supplement/hard-legacy.tsv"
+      ],
+      "exit_code": 1,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  visual: UNAVAILABLE (weight 0.20 renormalized out)\n  BLOCKING: functional/diff src/app.js:1 Synthetic local fixture\nUNSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "arm": "B",
+      "case": "visual-ui-canonical.tsv",
+      "argv": [
+        "bash",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/autoresearch-alias-supplement/visual-ui-canonical.tsv"
+      ],
+      "exit_code": 1,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  performance: subscore 100.0 over 1 cells -> contribution 60.00\n  visual: subscore 0.0 over 1 cells -> contribution 0.00\nUNAVAILABLE dims: flakiness, resource\nstability_score = 60.00 (threshold 95.0)\nUNSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "arm": "B",
+      "case": "visual-ui-legacy.tsv",
+      "argv": [
+        "bash",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/autoresearch-alias-supplement/visual-ui-legacy.tsv"
+      ],
+      "exit_code": 1,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  performance: subscore 100.0 over 1 cells -> contribution 60.00\n  visual: subscore 0.0 over 1 cells -> contribution 0.00\nUNAVAILABLE dims: flakiness, resource\nstability_score = 60.00 (threshold 95.0)\nUNSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "arm": "B",
+      "case": "stable-canonical.tsv",
+      "argv": [
+        "bash",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/autoresearch-alias-supplement/stable-canonical.tsv"
+      ],
+      "exit_code": 0,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  visual: UNAVAILABLE (weight 0.20 renormalized out)\n  performance: subscore 100.0 over 1 cells -> contribution 100.00\nUNAVAILABLE dims: flakiness, resource, visual\nstability_score = 100.00 (threshold 95.0)\nSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "arm": "B",
+      "case": "stable-legacy.tsv",
+      "argv": [
+        "bash",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/autoresearch-alias-supplement/stable-legacy.tsv"
+      ],
+      "exit_code": 0,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  visual: UNAVAILABLE (weight 0.20 renormalized out)\n  performance: subscore 100.0 over 1 cells -> contribution 100.00\nUNAVAILABLE dims: flakiness, resource, visual\nstability_score = 100.00 (threshold 95.0)\nSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "arm": "B",
+      "case": "unknown-dimension-alone.tsv",
+      "argv": [
+        "bash",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/autoresearch-alias-supplement/unknown-dimension-alone.tsv"
+      ],
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "INVALID_INPUT\nrow 1: unknown dimension\n"
+    },
+    {
+      "arm": "B",
+      "case": "unknown-dimension-mixed.tsv",
+      "argv": [
+        "bash",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/autoresearch/scripts/score-regression.sh",
+        "verdict",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/autoresearch-alias-supplement/unknown-dimension-mixed.tsv"
+      ],
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "INVALID_INPUT\nrow 2: unknown dimension\n"
+    }
+  ],
+  "inputs_preserved": true,
+  "sources_preserved": true,
+  "cleanup": {
+    "root": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-score-supplement-b_i0ux0y",
+    "removed": true
+  },
+  "parent_intervention": "Created separately pinned fixture derivatives before execution; only classification tokens changed for alias pairs. Fixed parent scorer invocations, no original artifact edits."
+}

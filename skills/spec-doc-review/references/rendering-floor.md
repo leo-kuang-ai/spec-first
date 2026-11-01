@@ -72,12 +72,7 @@ never by a product-specific vocabulary list:
   with raw symbols the reader cannot evaluate.
 
 **Anchor budget:** at most **two** opaque anchors in the default block. The rest are not deleted — they
-live in the on-request trace. Resolve every handle from the document already in context; the finding's
-fields carry the bare token and do not supply the handle. Re-resolve at render time so the handle stays
-accurate after an Apply has edited or renumbered the item it names. If the referenced section is no
-longer in context — a long render pass may have pushed it out — re-read it before rendering rather than
-emitting a bare identifier. Universally understood section names (`Requirements`, `Open Questions`) are
-not opaque and need no handle.
+live in the on-request trace. Keep the section/ID and document-derived handle with the finding at discovery, alongside its exact evidence. Reuse that location while source is unchanged; re-resolve after an actual rename, renumber or content change. If a needed section is no longer available, re-read it rather than inventing a handle. Universally understood section names (`Requirements`, `Open Questions`) are not opaque and need no handle.
 
 ## Code-span and block budget
 

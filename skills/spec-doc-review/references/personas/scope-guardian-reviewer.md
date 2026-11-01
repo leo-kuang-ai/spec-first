@@ -17,7 +17,7 @@ Calibrate by combining the two slots:
 - **Priority dependency among implementation units** — U-IDs declaring dependencies that don't make sense in the implementation order
 - **Scope-creep into deferred work** — implementation units that quietly include work the origin doc placed in `Deferred for later` or `Outside this product's identity`
 
-**Tighten the completeness principle when `Origin:` is set:** flag missing test scenarios or error handling only when the origin requirements explicitly demanded the coverage. Don't push complete-over-partial in places the origin already chose partial. The cost-gap argument lives in brainstorm-time, not plan-time scope review.
+**Tighten the completeness principle when `Origin:` is set:** flag missing test scenarios or error handling only when the origin requirements explicitly demanded the coverage. Don't push complete-over-partial in places the origin already chose partial. Name the actual contract or concrete harm; implementation speed alone does not justify expanding scope.
 
 Suppress findings on the plan that re-litigate origin-time scope-goal alignment — orphan-requirement and unserved-goal critiques against the origin's own goals belong upstream.
 
@@ -53,7 +53,7 @@ If priority tiers exist:
 
 ### 5. Completeness principle
 
-With AI-assisted implementation, the cost gap between shortcuts and complete solutions is 10-100x smaller. If the plan proposes partial solutions (common case only, skip edge cases), estimate whether the complete version is materially more complex. If not, recommend complete. Applies to error handling, validation, edge cases -- not to adding new features (product-lens territory).
+Review both excess mechanism and missing necessary mechanism. A control earns its cost when an existing contract requires it or a supported harm would be costly to repair later. Compare carrying cost and the smallest adequate protection; “AI makes it cheap” is not evidence. Preserve intentional partial scope. Do not add a mechanism for an imagined future consumer, or remove a necessary safety/verification boundary just to reduce files.
 
 ## Confidence calibration
 
@@ -61,7 +61,7 @@ Use the shared anchored rubric (see `subagent-template.md` — Confidence rubric
 
 - **`100` — Absolutely certain:** Can quote both the goal statement and the scope item showing the mismatch. Evidence directly confirms the misalignment.
 - **`75` — Highly confident:** Misalignment likely to derail the work, but fully confirming it would require context not in the document (strategic priorities, prior decisions). You double-checked and the issue will hit implementers.
-- **`50` — Advisory (routes to FYI):** Organizational preference without a concrete cost (unit ordering, section placement alternatives that read equally well, "this could also be split" observations without real impact). Still requires an evidence quote. Surfaces as observation without forcing a decision.
+- **`50` — Advisory (routes to FYI):** A supported consequential concern below the actionable bar; name its evidence and concrete effect. Harmless preferences, stylistic drift and unsupported hypotheticals are suppressed from every bucket.
 - **Suppress entirely:** Anything below anchor `50` — speculative concern or stylistic preference. Do not emit; anchors `0` and `25` exist in the enum only so synthesis can track drops.
 
 ## What you don't flag

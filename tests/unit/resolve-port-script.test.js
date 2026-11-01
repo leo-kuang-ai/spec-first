@@ -51,3 +51,34 @@ describe('resolve-port package script probing', () => {
     expect(resolveComposePort('services:\n  web:\n    ports:\n      - 4800:3000\n')).toBe('4800');
   });
 });
+
+describe('port input and configuration boundaries', () => {
+  let root;
+  beforeEach(() => { root = fs.mkdtempSync(path.join(os.tmpdir(), 'port-boundary-')); });
+  afterEach(() => fs.rmSync(root, { recursive: true, force: true }));
+  const run = (...args) => spawnSync('bash', [script, root, ...args], { encoding: 'utf8', timeout: 1000 });
+
+  test.each([['--port'], ['--type'], ['--port', '0'], ['--port', '65536'], ['--port', 'abc'], ['--unknown'], ['--type', 'unknown']])('invalid arguments terminate with an error: %j', (...args) => {
+    const result = run(...args);
+    expect(result.error).toBeUndefined();
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('ERROR:');
+  });
+
+  test('framework comments and another framework config cannot override the selected server', () => {
+    fs.writeFileSync(path.join(root, 'next.config.js'), 'module.exports = { port: 4998 };');
+    fs.writeFileSync(path.join(root, 'vite.config.js'), '// port: 4999\nexport default { server: { port: 4300 } };\n');
+    expect(run('--type', 'vite').stdout.trim()).toBe('4300');
+  });
+
+  test('comment and string decoys are ignored while an explicit literal is retained', () => {
+    fs.writeFileSync(path.join(root, 'vite.config.js'), '/* port: 4999 */\nconst example = "port: 4998";\nexport default { server: { port: 4300 } };');
+    expect(run('--type', 'vite').stdout.trim()).toBe('4300');
+    expect(run('--port', '4444').stdout.trim()).toBe('4444');
+  });
+
+  test('a Procfile-only project uses its actual web command port', () => {
+    fs.writeFileSync(path.join(root, 'Procfile'), 'web: node server.js --port 4500\n');
+    expect(run('--type', 'procfile').stdout.trim()).toBe('4500');
+  });
+});

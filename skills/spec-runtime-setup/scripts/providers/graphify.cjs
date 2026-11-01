@@ -4,14 +4,13 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { spawnSync } = require('node:child_process');
 const {
   assertContainedPath,
   ensureContainedDirectory,
   isPathWithin,
   reasonError,
 } = require('../lib/path-safety.cjs');
-const { resolveGitPath } = require('../lib/git-path.cjs');
+const { resolveGitPath, runGit } = require('../lib/git-path.cjs');
 const { captureSourceSnapshot, sourceContentIdentity } = require('../lib/source-snapshot.cjs');
 const {
   isSpecFirstSourceRepo,
@@ -193,7 +192,7 @@ function plan(context = {}) {
       hook_names: [...GRAPHIFY_HOOK_NAMES],
     });
   } else if (hookTarget.classification === 'external') {
-    nonActions.push('有效 Git hooks root 位于当前项目外；setup 不运行 Graphify hook 命令，也不读取或修改该目录。');
+    nonActions.push('The effective Git hooks root is outside the project; setup may inspect bounded hook markers read-only, but does not execute hook commands or modify that directory. Marker verification does not verify execution.');
   } else if (hookTarget.classification === 'unsafe') {
     nonActions.push('项目内 hooks root 未通过 no-follow containment；setup 不运行 Graphify hook 命令。');
   } else if (hookTarget.classification === 'not-applicable') {
@@ -1285,9 +1284,7 @@ function graphifyScopeNextActions(scopeProvenance) {
 }
 
 function readGitHeadSha(repoRoot) {
-  const result = spawnSync('git', ['-C', path.resolve(repoRoot), 'rev-parse', 'HEAD'], {
-    encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 5000, windowsHide: true,
-  });
+  const result = runGit(repoRoot, ['rev-parse', 'HEAD']);
   if (result.error || result.status !== 0) return null;
   return String(result.stdout || '').trim() || null;
 }

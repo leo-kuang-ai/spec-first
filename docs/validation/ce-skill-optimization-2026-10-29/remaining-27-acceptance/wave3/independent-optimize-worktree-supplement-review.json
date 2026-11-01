@@ -1,0 +1,240 @@
+{
+  "status": "bounded_mechanism_supplement_supported",
+  "summary": "Reviewed all 11 cases, 147 command records, 11 before-audit files, the producer script, and the frozen A/B helper sources. The supplement supports B's protection mechanisms and explicit-discard positive path in the listed fixtures. It does not establish full acceptance or model superiority.",
+  "paths": {
+    "evidence": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/optimize-worktree-supplement",
+    "producer": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/prepare-optimize-worktree-supplement.py",
+    "A": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-optimize/scripts/experiment-worktree.sh",
+    "B": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-optimize/scripts/experiment-worktree.sh"
+  },
+  "integrity": {
+    "protocol_sha256_verified": "db45c8610ddba6e321102b15678add5e44cddc92cccf99f62642ca0681b414c6",
+    "A_sha256_verified": "413c50424494e44bb181448a37e4bebe8fe5bcdcde2dee40212e67ecd0d3f7d8",
+    "B_sha256_verified": "ecaec4d29625d0e56609aac935f1d733726ea760fda42e750ac5fd835e286e16",
+    "source_hashes_match_protocol_and_after_receipt": true,
+    "all_11_external_before_json_match_inline_snapshots": true,
+    "all_operation_records_present_in_command_logs": true,
+    "all_native_argument_routes_match_source": true,
+    "unexpected_command_exit_codes_found": false,
+    "cleanup_receipt_removed": true,
+    "scratch_root_currently_absent": true,
+    "reviewer_mutations_or_reexecution": false
+  },
+  "case_dispositions": [
+    {
+      "case": "A-dirty-reuse",
+      "disposition": "confirmed_baseline_safety_failure",
+      "native_args": [
+        "create",
+        "acceptance",
+        "1",
+        "HEAD"
+      ],
+      "exit_codes": [
+        0,
+        0
+      ],
+      "evidence": "Both calls emitted the worktree path and reported a reset. Tracked WIP reverted to baseline content; untracked.txt and .ignored-cache disappeared. HEAD, index entries, and root HEAD remained identical, and the experiment branch remained present.",
+      "audit_retained": true
+    },
+    {
+      "case": "A-dirty-cleanup",
+      "disposition": "confirmed_baseline_safety_failure",
+      "native_args": [
+        "cleanup",
+        "acceptance",
+        "1"
+      ],
+      "exit_codes": [
+        0
+      ],
+      "evidence": "Reported cleanup and branch deletion. The worktree containing tracked, untracked, and ignored WIP was removed, and the branch was absent. Root HEAD remained identical.",
+      "audit_retained": true
+    },
+    {
+      "case": "A-unowned-prefix-cleanup",
+      "disposition": "confirmed_baseline_safety_failure",
+      "native_args": [
+        "cleanup-all",
+        "acceptance"
+      ],
+      "exit_codes": [
+        0
+      ],
+      "evidence": "Reported cleaning one directory. The unregistered prefix-matching directory and sentinel.txt were deleted. Root HEAD remained identical. This fixture had no experiment branch initially.",
+      "audit_retained": true
+    },
+    {
+      "case": "A-legacy-cleanup",
+      "disposition": "confirmed_baseline_safety_failure",
+      "native_args": [
+        "cleanup",
+        "acceptance",
+        "1"
+      ],
+      "exit_codes": [
+        0
+      ],
+      "evidence": "Deleted both the worktree created through git worktree add without an ownership manifest and its experiment branch. Root HEAD remained identical.",
+      "audit_retained": true
+    },
+    {
+      "case": "A-pristine-cleanup",
+      "disposition": "confirmed_positive_control",
+      "native_args": [
+        "cleanup",
+        "acceptance",
+        "1"
+      ],
+      "exit_codes": [
+        0
+      ],
+      "evidence": "Following successful native create, cleanup deleted the pristine worktree and branch. Root HEAD remained identical.",
+      "audit_retained": true
+    },
+    {
+      "case": "B-dirty-reuse",
+      "disposition": "confirmed_bounded_protection",
+      "native_args": [
+        "create",
+        "acceptance",
+        "1",
+        "HEAD"
+      ],
+      "exit_codes": [
+        1,
+        1
+      ],
+      "evidence": "Both calls produced empty stdout and stderr explicitly refusing an experiment containing working files. The final recorded file hashes, HEAD, index entries, and root HEAD exactly matched before; the experiment branch remained present.",
+      "audit_retained": true
+    },
+    {
+      "case": "B-dirty-cleanup",
+      "disposition": "confirmed_bounded_protection",
+      "native_args": [
+        "cleanup",
+        "acceptance",
+        "1"
+      ],
+      "exit_codes": [
+        1
+      ],
+      "evidence": "Stdout was empty; stderr explicitly required preserving changes or using explicit --discard. All recorded file hashes, HEAD, index entries, and root HEAD remained identical; the worktree and branch were retained.",
+      "audit_retained": true
+    },
+    {
+      "case": "B-unowned-prefix-cleanup",
+      "disposition": "confirmed_bounded_protection",
+      "native_args": [
+        "cleanup-all",
+        "acceptance"
+      ],
+      "exit_codes": [
+        1
+      ],
+      "evidence": "Reported an unregistered path and zero worktrees cleaned. The directory, sentinel.txt hash, and root HEAD were retained. This fixture had no experiment branch initially.",
+      "audit_retained": true
+    },
+    {
+      "case": "B-legacy-cleanup",
+      "disposition": "confirmed_bounded_protection",
+      "native_args": [
+        "cleanup",
+        "acceptance",
+        "1"
+      ],
+      "exit_codes": [
+        1
+      ],
+      "evidence": "Stderr explicitly identified a missing ownership manifest. The worktree, all recorded files, HEAD, index entries, and experiment branch were retained. Root HEAD remained identical.",
+      "audit_retained": true
+    },
+    {
+      "case": "B-pristine-cleanup",
+      "disposition": "confirmed_positive_control",
+      "native_args": [
+        "cleanup",
+        "acceptance",
+        "1"
+      ],
+      "exit_codes": [
+        0
+      ],
+      "evidence": "Following successful native create, cleanup deleted the pristine worktree and branch. Branch-deletion and cleanup messages appeared on stderr; stdout was empty. Root HEAD remained identical.",
+      "audit_retained": true
+    },
+    {
+      "case": "B-explicit-discard",
+      "disposition": "confirmed_explicit_discard_positive_control",
+      "native_args": [
+        "cleanup",
+        "--discard",
+        "acceptance",
+        "1"
+      ],
+      "exit_codes": [
+        0
+      ],
+      "evidence": "After native create, three categories of WIP were injected and an external before-audit file was written first. Explicit --discard successfully deleted the worktree and branch. Root HEAD remained identical; the external audit file still existed and matched before.",
+      "audit_retained": true,
+      "recoverable_wip_backup_proven": false
+    }
+  ],
+  "findings": [
+    {
+      "severity": "high",
+      "classification": "observed_frozen_baseline_defect",
+      "path": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-optimize/scripts/experiment-worktree.sh:89",
+      "evidence": "reset --hard and clean -fdx correspond to the tracked-WIP overwrite and disappearance of untracked/ignored files in A-dirty-reuse. This is not inferred solely from prose."
+    },
+    {
+      "severity": "high",
+      "classification": "observed_frozen_baseline_defect",
+      "path": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-optimize/scripts/experiment-worktree.sh:455",
+      "evidence": "Default cleanup forces removal and falls back to rm -rf on failure. Equivalent cleanup-all logic appears at line 495. The dirty, legacy, and unregistered-prefix-directory cases record actual deletion."
+    },
+    {
+      "severity": "medium",
+      "classification": "evidence_scope_limit",
+      "path": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/prepare-optimize-worktree-supplement.py:42",
+      "evidence": "snapshot retains file-content hashes and ls-files --stage text, rather than a complete filesystem snapshot or raw index bytes. It does not cover directories, permissions, complete Git metadata, or the root worktree/index. It cannot establish byte-for-byte preservation of all repository state."
+    },
+    {
+      "severity": "low",
+      "classification": "evidence_scope_limit",
+      "path": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/prepare-optimize-worktree-supplement.py:84",
+      "evidence": "dirty-reuse captures after only after two consecutive calls. It records both refusals and final-state preservation, but has no independent snapshot after the first call."
+    },
+    {
+      "severity": "low",
+      "classification": "audit_semantics_limit",
+      "path": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/prepare-optimize-worktree-supplement.py:82",
+      "evidence": "The producer compares the audit file's pre/post-operation SHA in memory and records a boolean without persisting that SHA. The current review independently confirms that all 11 files exist and their JSON matches before. They retain WIP hashes, not recoverable original WIP content."
+    }
+  ],
+  "limitations": [
+    "The review covers only this independent mechanism supplement executed by the parent Agent. No mutation was rerun.",
+    "The fixtures add no staged WIP and no new commit moving experiment HEAD away from base. Index preservation covers only the existing index entries recorded here.",
+    "No genuine A/A or holdout was executed. There is no cross-platform, concurrency, fault-injection, symlink, or other broad safety coverage.",
+    "The scratch directory has been deleted. Historical execution facts rely on consistency among the producer source, retained logs, and snapshots. The current independent check confirms that the directory is absent.",
+    "The original six model decisions were outside this rereview's scope. This supplement neither replaces nor upgrades those decisions and cannot independently prove that their historical files remained unchanged.",
+    "No evidence contradiction blocking the bounded mechanism conclusion was found. These limitations must remain attached to that conclusion."
+  ],
+  "supported_claims": [
+    "Current hashes of the frozen helpers and protocol match the receipt.",
+    "All 11 fixtures use native argument routes supported by their respective helpers.",
+    "A exhibits observable deletion or overwrite in the four listed protection scenarios; B refuses the corresponding scenarios and retains recorded state.",
+    "A/B pristine cleanup and B explicit --discard positive paths succeed.",
+    "All 11 external before-audit files are retained, and the temporary fixture root has been cleaned up.",
+    "This is parent-executed mechanism evidence."
+  ],
+  "unsupported_claims": [
+    "Full remaining-27 acceptance is complete.",
+    "Model B is generally superior to A, or the original six model decisions are upgraded by this supplement.",
+    "The model autonomously performed these mutations.",
+    "Genuine A/A or holdout passed.",
+    "The complete repository, raw index bytes, and all metadata were proven preserved.",
+    "A backup capable of recovering all WIP content existed before explicit discard.",
+    "B has established broad safety, real-host, or cross-platform guarantees."
+  ]
+}

@@ -92,6 +92,7 @@ Check whether the input is:
    - Which additional hard objectives are required, which are secondary, and what regression tolerances or targets are fixed before measurement?
    - For expensive runs, select `measurement.stability.mode: ladder`, declare smoke, exploratory and confirmation counts, and any justified futility bound. Use relative or paired comparison unless absolute thresholds are deliberately retained. Validate these fields before baseline spend.
    - What files can be modified? What is immutable?
+   - 冻结 selection 与 holdout 的身份及互斥 item 划分。定性 judge 目标优先配置独立确认命令，或不同 seed 且互斥 item 的确认抽样；若不配置，明确只能报告当前 selection 的结果，不能声称泛化改善。旧 run 不因恢复而改写协议。
    - Any constraints or dependencies?
    - If this is the first run: recommend `execution.mode: serial`, `execution.max_concurrent: 1`, `stopping.max_iterations: 4`, and `stopping.max_hours: 1`
    - If `type: judge`: recommend `sample_size: 10`, `batch_size: 5`, and `max_total_cost_usd: 5` until the rubric and harness are trusted

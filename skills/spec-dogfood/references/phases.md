@@ -14,7 +14,7 @@ Parse the invocation arguments supplied by the current host: a PR number, a bran
 3. **Decide isolation by what you're testing; let `spec-worktree` own the worktree mechanics.** Do not re-derive worktree detection or creation here — `spec-worktree` handles existing-isolation detection, attaching to a ref, and the "already checked out" constraint, and reports its decision back. The target remains scope until branch mutation is authorized:
    - **Blank / current-branch target:** do **not** isolate — dogfood in place. You are already on the branch under test, any separately authorized fixes belong in this checkout, and git cannot check the same branch out in a second worktree anyway. (If you happen to already be in a worktree, that is fine — you are simply dogfooding here.)
    - **A PR or a different named branch:** offer the concrete isolation/checkout choices with their side effects. Choosing an option is the authorization source for that exact action. On authorized isolation, invoke `spec-worktree` existing-ref mode through its bundled script: `isolate pr:<number>` for PR targets, or `isolate <branch>` for branch targets. It may return `already_checked_out branch=<name> path=<path>`; use that existing checkout and never switch the primary checkout. On an explicitly authorized in-place switch, use `gh pr checkout <number>` or `git checkout <branch>` after dirty-state safety checks. If no blocking interaction exists or the user declines both mutations, stop with `branch_mutation_authorization_missing`; do not silently switch the primary checkout.
-4. **Resume if a prior run exists.** Look for an existing report at `docs/dogfood-reports/*-<branch-slug>-dogfood.md` (see the branch-slug rule under Resumability). If one is found with unfinished scenarios, ask whether to resume it or start fresh. To resume, re-hydrate the task list from its matrix: `Pass`/`Fixed`/`Skipped` stay done; `Pending` and `in_progress` become the remaining auto-runnable work. The three `Blocked` states are **not** auto-runnable — `Blocked (fix authorization)`, `Blocked (needs human verify)`, and `Blocked (human decision)` all wait on a person, so surface them and ask how to proceed rather than silently re-queuing them.
+4. **Resume if a prior run exists.** Look for an existing report at `docs/dogfood-reports/*-<branch-slug>-dogfood.md` (see the branch-slug rule under Resumability). If one is found with unfinished scenarios, ask whether to resume it or start fresh. Before resume, compare recorded repo/base/head, relevant dirty-file identities and served build with current facts. Preserve unaffected verified rows; changed or unknown identity makes affected evidence stale and requires revalidation. A previous `Skipped` row is not a pass. Then re-hydrate the task list from its matrix: currently evidenced `Pass`/`Fixed` stay done; `Pending` and `in_progress` become the remaining auto-runnable work. The three `Blocked` states are **not** auto-runnable — `Blocked (fix authorization)`, `Blocked (needs human verify)`, and `Blocked (human decision)` all wait on a person, so surface them and ask how to proceed rather than silently re-queuing them.
 
 ### Resumability (stop and return at any point)
 
@@ -63,6 +63,8 @@ Build a mental model of every change: new features, modified behavior, new route
 
 **Ground in the product's personas and vision.** Look for persona and vision context so flows can be judged from real users' eyes, not just "does it work." Check, in order: `STRATEGY.md` (its "Users" section, or "Who it's for" in older files, names the primary persona and their job-to-be-done), `PRODUCT.md` (its "Users" section), `VISION.md`, and any persona docs (e.g. `docs/personas/`, `PERSONAS.md`). Capture the 1-3 primary personas and what each cares about. If none exist, infer a reasonable primary persona from the product and the diff, and say so in the report.
 
+Carry applicable acceptance criteria from the current plan, strategy and project guidance with their source refs and applicability conditions. Distinguish criteria from persona context and inferred preferences. This is bounded consumption of existing sources, not permission to author or mine project rules.
+
 ### Phase 2: Map the Flows, Then Build the Matrix
 
 Do not jump straight to a flat list of pages. First **understand the user flows the diff touches**, then derive the matrix from them. A matrix built without a flow model tests pages in isolation and misses the journey — the email that "sends" but lands in the wrong thread.
@@ -93,11 +95,13 @@ Walk each flowchart and turn every node and branch into one or more test scenari
 
 Map changed files to concrete routes (views -> their pages, components -> pages rendering them, layouts -> all pages, stylesheets -> visual regression on key pages) and attach those routes to the flows that exercise them.
 
+Bind each applicable criterion to the scenario that exercises it and the observable result. Record `honored`, `contradicted` or `not-exercised` with evidence or a reason; a page-level Pass does not prove every criterion was exercised. Keep this right-sized to the actual change.
+
 **Load the matrix as a scenario ledger** in the active workflow host, one entry per scenario, so progress is tracked and nothing is skipped. Order entries by flow, following the flowcharts, not by file.
 
 ### Phase 3: Detect Port and Start the Dev Server
 
-Determine the port (priority: explicit `--port` > a port explicitly stated in your in-context project instructions > `package.json` dev script > `.env*` `PORT=` > default `3000`). If a server is already listening on it, reuse it. Otherwise start the project's dev command (`bin/dev`, `rails server`, `npm run dev`, etc.) in the background and poll the port until it accepts connections. This skill is hands-off, so start the server automatically without asking. Freeze a credential-free exact loopback origin such as `http://127.0.0.1:${PORT}` for the owner call; do not open the browser here, accept redirects as a replacement origin, or infer browser readiness from the listener alone.
+Determine the port (priority: explicit `--port` > a port explicitly stated in your in-context project instructions > `package.json` dev script > `.env*` `PORT=` > default `3000`). Reuse a listener only when process/session evidence attributes it to the intended project, command, cwd and checkout/build. Unknown identity is a collision or an explicit source-binding limitation, not proof of current-source success. Otherwise start the project's dev command (`bin/dev`, `rails server`, `npm run dev`, etc.) in the background and poll the port until it accepts connections. This skill is hands-off, so start the server automatically without asking. Freeze a credential-free exact loopback origin such as `http://127.0.0.1:${PORT}` for the owner call; do not open the browser here, accept redirects as a replacement origin, or infer browser readiness from the listener alone.
 
 ### Phase 4: Execute the Matrix
 
@@ -110,13 +114,15 @@ Work the task list **one item at a time**. For each scenario, mark the task `in_
 4. **Walk it as each persona.** Re-run the journey in your head from each primary persona's perspective (from Phase 1) and ask where they'd feel a **paper cut** — a small friction that wouldn't fail a functional test but degrades the experience: a confusing label, an extra click, an unexpected jump, a slow-feeling step, missing feedback, copy that doesn't match how that persona thinks. A scenario can be functionally `Pass` yet still carry paper cuts. Note each paper cut, which persona feels it, and its severity.
 5. **Record** pass/fail plus any paper cuts, with specifics. Mark the task `completed` only when it genuinely passes. Paper cuts do not block a `Pass`, but a **sharp** paper cut (one severe enough to fix now) is routed into the Phase 5 fix loop just like a failure — apply the same auto-fix-vs-escalate judgment to it. Log the rest in the report.
 
-**External-interaction flows** (OAuth, real email delivery, payments, SMS) can't be fully driven headlessly — pause, ask the user to verify that leg, and mark the scenario `Blocked (needs human verify)` until they confirm. Then continue.
+**External-interaction flows** (OAuth, real email delivery, payments, SMS) require their actual effect authority and observable confirmation. If that leg needs a person, mark it `Blocked (needs human verify)` and request the exact observation while continuing independent scenarios. A pipeline return preserves the blocker; it never converts absent verification to Pass or silently Skips it.
 
 ### Phase 5: Fix Loop (Authorization-Aware)
 
 When a scenario fails — or a passing scenario carries a sharp paper cut worth fixing now — first decide whether local fix authority exists and whether the change is small enough for this workflow.
 
 **Judge the size of the fix before touching code.** A fix is eligible only when separately authorized and small, well-understood, and low-risk: a clear bug with an obvious correct fix, contained to a few files, with no schema/architecture/product trade-off. Even with local fix authority, do not implement a large or ambiguous change that requires an architectural, schema, product, or UX decision; record it for a human instead.
+
+When an observed behavior conflicts with an older criterion, compare both with the active product intent before editing. Do not reverse an intentional change merely to satisfy stale guidance, or declare the old rule obsolete without evidence. Record the conflict, source refs and owner decision needed; Dogfood does not silently rewrite product rules.
 
 **For authorized fixes:**
 
@@ -127,7 +133,7 @@ When `local_fix_authorization: missing`, do not touch product source. Record the
 3. **Add an automated regression test** that fails before the fix and passes after, so the bug can't return. This is the default for behavioral and code bugs. When an automated test is genuinely impractical — a pure copy, spacing, or visual fix with no behavioral assertion to make — substitute a documented browser-replay or screenshot check and **state in the report why no automated test was meaningful**. Do not invent a hollow test just to satisfy the step.
 4. If `commit_authorization: authorized`, commit the fix with a clear message using `spec-commit`, one logical fix per commit. Otherwise leave the verified fix uncommitted, record `commit_authorization_missing`, and use `uncommitted` in the report's Commit field.
 5. Re-run the failing scenario in the browser to confirm it now passes; then continue the matrix.
-6. If the bug carried a reusable lesson, capture it with `spec-compound`.
+6. If the fix only restores an existing rule, cite that rule. For a potentially new reusable lesson, pass its novelty, source and verification evidence to `spec-compound`; that owner decides whether capture qualifies. A paper-cut opinion alone cannot become confirmed knowledge.
 
 **For changes too big to make autonomously:** do not implement. Record it in the report's **Decisions for a human** section with: what's broken, why it's not a safe autonomous fix, the options you see (with trade-offs), and your recommendation. Mark the scenario `Blocked (human decision)` in the matrix, then continue with the rest. Never make a large, irreversible, or product-altering change just to clear a matrix item.
 

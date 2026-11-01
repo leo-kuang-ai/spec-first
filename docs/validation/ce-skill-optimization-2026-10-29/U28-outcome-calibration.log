@@ -1,0 +1,36 @@
+FAIL tests/unit/ce-u28-outcome-calibration.test.js
+  U28 supplemental outcome judge calibration
+    ✓ spec-strategy check-owned-update accepts observed controls and rejects changed evidence (329 ms)
+    ✓ spec-product-pulse check-source-outcomes accepts observed controls and rejects changed evidence (368 ms)
+    ✓ spec-promote check-unreleased-local-drafts accepts observed controls and rejects changed evidence (325 ms)
+    ✓ spec-handoff check-research-continuation accepts observed controls and rejects changed evidence (356 ms)
+    ✓ spec-handoff check-review-continuation accepts observed controls and rejects changed evidence (366 ms)
+    ✕ spec-riffrec-feedback-analysis check-local-evidence accepts observed controls and rejects changed evidence (282 ms)
+
+  ● U28 supplemental outcome judge calibration › spec-riffrec-feedback-analysis check-local-evidence accepts observed controls and rejects changed evidence
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+    -   "status": 0,
+    +   "status": 1,
+      }
+
+      53 |     });
+      54 |     const positive = check();
+    > 55 |     expect({ status: positive.status, error: positive.stderr }).toMatchObject({ status: 0 });
+         |                                                                 ^
+      56 |     if (skill === 'spec-strategy') fs.appendFileSync(path.join(workspace, 'STRATEGY.md'), '\nUnauthorized foreign-section update.');
+      57 |     else if (skill === 'spec-product-pulse') report.metrics[1] = { ...report.metrics[1], state: 'confirmed-zero', value: 0 };
+      58 |     else if (skill === 'spec-promote') {
+
+      at toMatchObject (tests/unit/ce-u28-outcome-calibration.test.js:55:65)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 5 passed, 6 total
+Snapshots:   0 total
+Time:        2.181 s
+Ran all test suites matching /tests\/unit\/ce-u28-outcome-calibration.test.js/i.

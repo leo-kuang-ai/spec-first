@@ -1,0 +1,47 @@
+{
+  "at": "2026-10-30T08:12:33.599Z",
+  "rows": [
+    {
+      "arm": "A",
+      "original_receipt": "pr-feedback-supplement-A-receipts.json",
+      "helper_sha256": null,
+      "actual": {
+        "status": "capability-absent"
+      },
+      "calls": [],
+      "matches_original_except_timestamp": true
+    },
+    {
+      "arm": "B",
+      "original_receipt": "pr-feedback-supplement-B-receipts.json",
+      "helper_sha256": "11b0320a5fc769e06dbbcc7f1df12d70a1816c0b5aad9968dfcb11dad4246ca2",
+      "actual": {
+        "verified": false,
+        "reason_code": "fix-not-proven-reachable",
+        "observed_at": "2026-10-30T08:12:33.598Z",
+        "host": "github.enterprise.example",
+        "base_repo": "upstream/project",
+        "number": 42,
+        "url": "https://github.enterprise.example/upstream/project/pull/42",
+        "head_repo": "fork/project",
+        "head_ref": "fix/review",
+        "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "fix_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "comparison_status": "behind",
+        "merge_base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "calls": [
+        {
+          "host": "github.enterprise.example",
+          "endpoint": "repos/upstream/project/pulls/42"
+        },
+        {
+          "host": "github.enterprise.example",
+          "endpoint": "repos/fork/project/compare/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      ],
+      "matches_original_except_timestamp": true
+    }
+  ],
+  "scope": "Actual pure helper executed with an in-process provider stub. No external command, hosted read, publication or reply. Original receipts remain unchanged."
+}

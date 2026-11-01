@@ -1,0 +1,32 @@
+{
+  "id": "CEOPT-07",
+  "skill": "spec-compound-refresh",
+  "fixture_root": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/refresh",
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-07-request.txt",
+  "input_files": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/refresh/import-v1.md": "a59647c056ce1dd4a0dddac45716da34968d573287348f32031423ab73947143",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/refresh/invalid-candidate.md": "335ff42d6323b91a91ded75141eb22646560eba738d3aaf1d6da30a42b1df427",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/refresh/learning-b.md": "3fecc19e81c22fe1efaed559d60c5faae19e0e2b6293389ec3e38c9521eab6b4",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/refresh/CONCEPTS.md": "fa7c5eb57dcbe4a606d79743219be82180f7e2774e8b87b28432e8ef93aa5caf",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/refresh/learning-a.md": "d8fdb4666ebd32e7729d21b9c4fbf5d228f7bdde8077bf4de1506728609f4e25"
+  },
+  "receipt_refs": [
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/refresh-validation-failure.json"
+  ],
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "deadline_seconds": 300,
+  "execution_mode": "fresh-readonly-model-plus-parent-save",
+  "parent_recipe": "Save exact response; do not apply proposed edits/publication. Extract structured artifact only with original preserved and explicit receipt.",
+  "acceptance_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-07",
+  "limitations": [
+    "Mediated interpretation/draft only; autonomous mutation/publication is not executed.",
+    "Serving identity not authenticated; no enforced read-only isolation."
+  ]
+}

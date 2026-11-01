@@ -52,7 +52,7 @@ CE_RANGE=<base-sha>..HEAD
 
 ### 0. 角色边界
 
-同步时必须先按 `docs/10-prompt/结构化项目角色契约.md` 校准：
+同步时必须先按 `docs/methodology/结构化项目角色契约.md` 校准：
 
 - **脚本做确定性流程**：列文件、取 diff、查引用、跑测试、验证格式、重建 runtime。
 - **LLM 做语义判断**：是否同步、如何适配、是否删除、是否保留分叉、是否延后 spike。
@@ -568,7 +568,7 @@ CE `4b5f28da..06a7cee0` 中，17 个 code-review reviewer agents 的真实变化
 
 ## Related
 
-- `docs/10-prompt/结构化项目角色契约.md` — spec-first 演化判断基线。
+- `docs/methodology/结构化项目角色契约.md` — spec-first 演化判断基线。
 - `docs/plans/2026-04-26-004-sync-ce-e8c118e2-workflow-updates-plan.md` — 本方法论抽取自该次 CE 同步计划。
 - `docs/plans/2026-05-04-001-sync-ce-06a7cee0-workflow-updates-plan.md` — 追加沉淀 agent 权限和 CLI readiness 删除的语义适配判断。
 - `skills/using-spec-first/SKILL.md` — 公共 workflow 路由和 internal-only skill 边界。

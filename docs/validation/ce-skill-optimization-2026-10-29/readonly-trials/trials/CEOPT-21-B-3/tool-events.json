@@ -1,0 +1,80 @@
+[
+  {
+    "timestamp": "2026-10-30T02:27:26.473Z",
+    "payload": {
+      "type": "custom_tool_call",
+      "id": "ctc_006ebef7b75b0904016ae4008cea8481938075d04f1fc29c2d",
+      "status": "completed",
+      "call_id": "call_e9e6584cf9d64b24bd8db426009070ba",
+      "name": "exec",
+      "input": "text(await tools.exec_command({cmd:\"cat /Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/spec-promote/SKILL.md\",\"max_output_tokens\":12000}));\ntext(await tools.exec_command({cmd:\"cat /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/CEOPT-21-request.txt\",\"max_output_tokens\":6000}));\n",
+      "internal_chat_message_metadata_passthrough": {
+        "turn_id": "01a18aa2-1c7c-76d3-a250-931bbc013ee2",
+        "create_time": 1793327244.9259202
+      }
+    }
+  },
+  {
+    "timestamp": "2026-10-30T02:27:26.674Z",
+    "payload": {
+      "type": "custom_tool_call_output",
+      "id": "ctco_01a18aa2-2d52-7c00-87d9-4d0eaa2b7dae",
+      "call_id": "call_e9e6584cf9d64b24bd8db426009070ba",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"2386f0\",\"wall_time_seconds\":0.000006334,\"exit_code\":0,\"original_token_count\":2673,\"output\":\"---\\nname: spec-promote\\ndescription: \\\"Draft launch or promotion copy with availability claims grounded in the supplied delivery evidence.\\\"\\ndisable-model-invocation: true\\nargument-hint: \\\"[optional: what shipped and/or channels, e.g. 'a tweet thread and a LinkedIn post']\\\"\\n---\\n\\n# spec-promote\\n\\nTurn a feature that just shipped into copy-pasteable, user-facing announcement copy \u2014 right inside the engineering workflow.\\n\\n## Purpose\\n\\nAfter you ship, the messaging shouldn't wait for a separate marketing pass. `spec-promote` figures out what shipped, picks the right channels, and drafts the copy. It is **spiral-agnostic by default**: with nothing installed it draws on a lite layer of editorial and social-media expertise to produce strong channel-specific copy. When the Spiral CLI (see `references/spiral-cli.md`) is present and authed, it uses Spiral so the drafts are voice-matched to your brand \u2014 a subtle enhancement, never a requirement.\\n\\n**The promotion output is draft-only. It never posts, publishes, commits, or opens PRs.** Posting is a human action. The only durable local preference exception is the separately disclosed and authorized Spiral opt-out write described in Path 0; it is not promotion output and must remain local-only.\\n\\n## Usage\\n\\n```bash\\nspec-promote                                   # Derive what shipped from context, draft defaults\\nspec-promote [free-form description]           # You describe what shipped\\nspec-promote a tweet thread and a LinkedIn post   # Request specific channels\\nspec-promote 3 tweet options for the new export feature\\n```\\n\\n## Phase 1 \u2014 Figure out what shipped\\n\\nIf the user gave a free-form description, preserve their intended value and attribute any unverified availability claim. Carry the caller's verified delivery state: implemented, merged, released, deployed, or unknown. An active/merged PR, commit, diff or Unreleased entry proves no deployment. Use \u201cimplemented\u201d or \u201cplanned for release\u201d when appropriate; never turn those artifacts into \u201clive now\u201d claims.\\n\\nResolve one target repository from the current request/caller and verify its root before reads. Use the confirmed PR/base identity or resolved upstream comparison; do not assume a `main` branch. If no Git root exists, draft from supplied material and skip repository/config reads.\\n\\nWhen the description lacks detail, derive it from available context:\\n\\n- **Merged/active PR** \u2014 `gh pr view <confirmed-pr> --repo <confirmed-owner/repo> --json title,body,url,baseRefName,headRefOid`. The title and body usually state the user-facing value.\\n- **The diff** \u2014 `git -C <confirmed-root> diff <confirmed-base>...HEAD --stat` and skim notable changes to ground the claim in what actually changed.\\n- **Changelog** \u2014 the top/`[Unreleased]` entry in `docs/changelog.md`, `CHANGELOG.md`, or similar.\\n- **Recent commits** \u2014 `git log --oneline -15` for the arc of the change.\\n\\nThen write a 1\u20133 sentence summary of the **user-facing value** \u2014 what a user can now do that they couldn't before, and why they'd care. Describe the outcome, not the implementation. (\\\"You can now export any report to CSV in one click\\\" \u2014 not \\\"Added a CsvSerializer and an export endpoint.\\\")\\n\\nIf you can't confidently tell what shipped, ask the user one short question rather than guessing.\\n\\n## Phase 2 \u2014 Pick channels\\n\\nDefault to a small, sensible set:\\n\\n- **An X post or short thread** (lead with the value; thread only if the change warrants it)\\n- **A one-line changelog / release blurb**\\n\\nScale to what the change warrants and to what the user asked for. If they named channels (\\\"LinkedIn\\\", \\\"email\\\", \\\"a blog intro\\\", \\\"a short demo script\\\"), draft those instead of or in addition to the defaults. A small fix needs one or two short drafts; a flagship feature can justify a cross-channel set. Don't force a fixed template.\\n\\n## Phase 3 \u2014 Draft the copy\\n\\nIf local drafting is requested, go directly to Path B with no provider probe or setup prompt. Otherwise, detect Spiral's state with the Skill-owned bounded probe. Resolve `SKILL_DIR` from the `spec-promote/SKILL.md` you loaded; do not run `spiral auth status` directly because provider stdout/stderr may contain secret-like fields:\\n\\n```bash\\nSKILL_DIR=\\\"<absolute path of the directory containing this SKILL.md>\\\"\\nnode \\\"$SKILL_DIR/scripts/check-spiral-auth.cjs\\\"\\n```\\n\\nClassify into one of three states:\\n\\n- **Unavailable** \u2014 `status: unavailable` \u2192 **Path B**, with optional Path 0 after delivery.\\n- **Ready** \u2014 `status: ready` and `authenticated: true` \u2192 **Path A** (voice-matched).\\n- **Not ready / unverified** \u2014 every other allowlisted status \u2192 **Path B**, with optional Path 0 after delivery. Treat non-JSON, timeout, non-zero, and malformed provider output as unverified without inspecting or surfacing the raw bytes.\\n\\nNever let a Spiral failure, timeout, or odd output block or slow the skill \u2014 when in doubt, treat it as not-ready and continue.\\n\\n### Path 0 \u2014 Offer Spiral setup (first run, declinable)\\n\\nWhen Spiral is not ready, complete the requested local drafts first. An optional setup offer may follow once if there is no recorded opt-out; it must not delay the deliverable. No response is not opt-in or opt-out. Enter setup only when requested, reading `references/spiral-cli.md` for installation, authentication and the separately disclosed local preference write. A plain request to draft locally grants no persistent-preference write.\\n\\n### Path A \u2014 Spiral ready (voice-matched)\\n\\nUse the Spiral CLI so drafts match the user's brand voice. **Read `references/spiral-cli.md` before composing the prompt** \u2014 multi-channel vs. single-channel-variations is phrasing-driven (channel keywords / cue words vs. `--num-drafts`) and getting it wrong silently returns the wrong number or shape of drafts. The exact phrasing rules live there; don't restate them from memory. Essentials:\\n\\nBefore sending feature context or promotion copy to Spiral, record `provider_egress_authorization: authorized | missing`. Authentication, installation, prior use, requested channels, and general drafting intent do not authorize a run-local content transfer. Display the provider, content categories being sent, persistence behavior, and local Path B alternative; proceed only when the current request or a new confirmation explicitly authorizes this transfer. Missing authority returns `provider_egress_authorization_missing` and uses Path B with zero `spiral write` calls.\\n\\n- Always pass `--instant` and `--json`. Parse `drafts[]` (each carries its own `channel`) plus `session_id`.\\n- **Present every returned draft, grouped by `channel`.** Spiral decides how many drafts per channel \u2014 multi-channel runs often return several per channel \u2014 so never assume one-per-channel or drop extras.\\n\\nIf the authorized `spiral write` call errors or returns no usable drafts, fall back to Path B for the affected channels, but do not describe the run as local-only. Return a safe provider receipt with `provider_attempt: attempted`, `delivery_status: unknown`, an allowlisted `reason_code`, `persistence_status: possible-or-unknown`, and `fallback_used: true`. Never copy raw Spiral stdout/stderr, exception text, internal commentary, or secret-like fields into chat, logs, or durable artifacts.\\n\\n### Path B \u2014 Direct drafting (lite editorial & social expertise)\\n\\nNo Spiral needed \u2014 draft strong copy directly using a compact layer of editorial and social-media fundamentals. (The Spiral path goes further: brand-voice matching, humanization, saved styles, and cross-channel campaign orchestration.)\\n\\n**Editorial fundamentals** \u2014 every channel:\\n- Lead with the user-facing outcome: what someone can now do, not how it was built.\\n- One idea per piece. Cut windup, hedges, and throat-clearing.\\n- Be concrete and specific; show the value, don't assert it.\\n- Plain, active language. Strip AI tells \u2014 \\\"thrilled/excited to announce,\\\" \\\"game-changer,\\\" \\\"in today's fast-paced world,\\\" \\\"unlock/leverage/seamless,\\\" em-dash padding.\\n- Sanity check: read it as if saying it to one user. If a person wouldn't say it, rewrite it.\\n\\n**Social fundamentals** \u2014 distributed channels:\\n- The first line is the hook and has to earn the next line (feeds truncate). No preamble.\\n- Match each channel's native shape and length; never reuse one draft verbatim across channels.\\n- One clear CTA where the channel supports it.\\n- Hashtags: 0\u20132, only where the channel expects them \u2014 never a wall of tags.\\n\\n**Per channel:**\\n- **X** \u2014 value in the first line; ~1\u20133 tight lines. Thread only when there's more than one beat worth its own line.\\n- **Changelog / release blurb** \u2014 one declarative line naming the new capability. Plain, not promotional.\\n- **LinkedIn** \u2014 a short paragraph: human angle (why it matters), then the what. Warmer than X.\\n- **Email** \u2014 benefit-stating subject + 2\u20134 sentence body + one CTA.\\n- **Blog intro** \u2014 one strong opening paragraph framing the problem and the new capability; leave the deep-dive to the author.\\n- **Demo script** \u2014 3\u20136 spoken beats: hook, problem, action, payoff.\\n\\n**Drafts per channel:** one strong draft by default; produce more only when asked (\\\"3 tweet options\\\"), capped ~3.\\n\\n## Phase 4 \u2014 Present the drafts\\n\\nShow every draft as a clean, copy-pasteable block, labeled by channel. For each:\\n\\n```\\n### X post\\n<the copy>\\n```\\n\\n- If Spiral produced them, also surface the `session_id` and each draft's `url` so the user can open and tweak them in the Spiral web app.\\n- Offer to revise (tone, length, angle, more variations, another channel).\\n- **Do not post, publish, schedule, commit, or open a PR.** End by reminding the user the drafts are theirs to ship.\\n- If Path 0 recorded the local preference exception, disclose that local-only write once and keep it separate from the draft-output claim.\\n\\n## Examples\\n\\n**Single-channel variations \u2014 \\\"3 tweet options\\\":**\\n> User: `spec-promote 3 tweet options for the new one-click CSV export`\\n> \u2192 Summarize the value. Spiral path: `spiral write \\\"3 tweet options for one-click CSV export\\\" --instant --num-drafts 3 --json` (no cue words). No-Spiral path: write 3 distinct tweets directly. Present all three.\\n\\n**Multi-channel set \u2014 \\\"a campaign across X, LinkedIn, and email\\\":**\\n> User: `spec-promote draft a launch across X, LinkedIn, and email`\\n> \u2192 Spiral path: `spiral write \\\"announcing one-click CSV export \u2014 a launch across X, LinkedIn, and email\\\" --instant --json` returns a set of drafts per channel (Spiral decides the count \u2014 often several), each carrying its `channel`. (`--num-drafts` ignored here.) No-Spiral path: draft one X post, one LinkedIn post, one email directly. Present every returned draft, grouped by channel.\\n\"}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"cf141f\",\"wall_time_seconds\":0.000007042,\"exit_code\":0,\"original_token_count\":142,\"output\":\"Using the supplied delivery evidence at /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/fixtures/delivery-facts.md, draft one X post and one short changelog blurb for monthly summaries. Draft locally in this chat only. Do not inspect a real repository, probe optional providers, install anything, save preferences, write files, post or publish. Preserve the actual delivery state in both drafts. The user-facing value is faster understanding of closed-ticket counts by month. Give the drafts now; no setup is needed.\\n\"}"
+        }
+      ],
+      "internal_chat_message_metadata_passthrough": {
+        "turn_id": "01a18aa2-124a-7320-904c-8a644efa21e1",
+        "create_time": 1793327246.674812
+      }
+    }
+  },
+  {
+    "timestamp": "2026-10-30T02:27:31.234Z",
+    "payload": {
+      "type": "custom_tool_call",
+      "id": "ctc_006ebef7b75b0904016ae400927bfc8193904fdf50a13644ee",
+      "status": "completed",
+      "call_id": "call_db1630ef75424088b008e08013f1a5f7",
+      "name": "exec",
+      "input": "text(await tools.exec_command({cmd:\"cat /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/fixtures/delivery-facts.md\",\"max_output_tokens\":6000}));\n",
+      "internal_chat_message_metadata_passthrough": {
+        "turn_id": "01a18aa2-3111-7998-81fd-3f06ef52f742",
+        "create_time": 1793327250.496517
+      }
+    }
+  },
+  {
+    "timestamp": "2026-10-30T02:27:31.372Z",
+    "payload": {
+      "type": "custom_tool_call_output",
+      "id": "ctco_01a18aa2-3fac-79b1-87a1-0eb9a3bc7fa5",
+      "call_id": "call_db1630ef75424088b008e08013f1a5f7",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"4175ee\",\"wall_time_seconds\":0.000007375,\"exit_code\":0,\"original_token_count\":151,\"output\":\"# Supplied delivery evidence\\n\\nRepository context is unavailable in this evaluation; use only these explicit excerpts, without probing a real checkout or preferences.\\n\\nREADME.md:\\nMonthly summaries are implemented locally and not released or deployed.\\n\\nCHANGELOG.md:\\n## Unreleased\\nMonthly summary endpoint implemented.\\n\\nOwner statement:\\nSupport managers can use the implemented monthly summary to inspect closed-ticket counts by month once the feature is released. No release tag, deployment receipt, merged PR or public availability date is supplied. No source exports or real customer data are included.\\n\"}"
+        }
+      ],
+      "internal_chat_message_metadata_passthrough": {
+        "turn_id": "01a18aa2-124a-7320-904c-8a644efa21e1",
+        "create_time": 1793327251.372931
+      }
+    }
+  }
+]

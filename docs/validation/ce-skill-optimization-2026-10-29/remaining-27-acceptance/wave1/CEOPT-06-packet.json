@@ -1,0 +1,34 @@
+{
+  "id": "CEOPT-06",
+  "skill": "spec-compound",
+  "fixture_root": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound",
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-06-request.txt",
+  "input_files": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/invalid-candidate.md": "335ff42d6323b91a91ded75141eb22646560eba738d3aaf1d6da30a42b1df427",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/README.md": "e3c387cecd55fbafe56bfc9885de8980f6714f09bea12e091b6bca9e7e9400c6",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/package.json": "7a420c375b02d08b14e41cd027881b96bbd734a826904c72f804acb82e4f6060",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/existing-learning.md": "3b0209d19a2050f01e9801d2ff91206dcd61d256418aa31a3861d4d07a5bfe75",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/test/entries.test.js": "152395b1f15288f78c86739aa9f932459486d7d1528d0ea0f0c07c202a269bc4",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/src/server.js": "db18861a7168c6cad9ab0ba5e0e53d3e3fe3d19e225d18e90270268103aff3b8"
+  },
+  "receipt_refs": [
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/compound-proof.json",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/compound-validation-failure.json"
+  ],
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "deadline_seconds": 300,
+  "execution_mode": "fresh-readonly-model-plus-parent-save",
+  "parent_recipe": "Save exact response; do not apply proposed edits/publication. Extract structured artifact only with original preserved and explicit receipt.",
+  "acceptance_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-06",
+  "limitations": [
+    "Mediated interpretation/draft only; autonomous mutation/publication is not executed.",
+    "Serving identity not authenticated; no enforced read-only isolation."
+  ]
+}

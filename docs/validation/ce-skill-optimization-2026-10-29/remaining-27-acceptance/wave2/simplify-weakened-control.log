@@ -1,0 +1,36 @@
+TAP version 13
+# Subtest: invalid entries are rejected and valid entries survive without a server crash
+not ok 1 - invalid entries are rejected and valid entries survive without a server crash
+  ---
+  duration_ms: 91.532834
+  type: 'test'
+  location: '/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-simplify-proof-5xiebseq/weakened-control/test/entries.test.cjs:7:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Command failed: /opt/homebrew/Cellar/node@22/22.22.3/bin/node /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-simplify-proof-5xiebseq/weakened-control/test/support/ledger-proof.cjs
+    Invalid amount must return 400
+    
+    201 !== 400
+     
+    
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    genericNodeError (node:internal/errors:983:15)
+    wrappedFn (node:internal/errors:537:14)
+    checkExecSyncError (node:child_process:916:11)
+    execFileSync (node:child_process:952:15)
+    TestContext.<anonymous> (/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-simplify-proof-5xiebseq/weakened-control/test/entries.test.cjs:8:3)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 144.666833

@@ -1,0 +1,67 @@
+{
+  "observed_at": "2026-10-30T01:05:51.015672+00:00",
+  "expected": "All dormant adapters reject direct worker before provider invocation.",
+  "results": [
+    {
+      "skill": "spec-pov",
+      "provider": "codex",
+      "entrypoint": "__worker",
+      "exit_code": 1,
+      "provider_called": false,
+      "output_preserved": true,
+      "stderr": "[cross-model] provider_serving_receipt_unverified (authenticated producer channel disabled)",
+      "fixture": "Temporary isolated directory with fake provider executables; no external model called."
+    },
+    {
+      "skill": "spec-pov",
+      "provider": "claude",
+      "entrypoint": "__worker",
+      "exit_code": 1,
+      "provider_called": false,
+      "output_preserved": true,
+      "stderr": "[cross-model] provider_serving_receipt_unverified (authenticated producer channel disabled)",
+      "fixture": "Temporary isolated directory with fake provider executables; no external model called."
+    },
+    {
+      "skill": "spec-doc-review",
+      "provider": "codex",
+      "entrypoint": "__worker",
+      "exit_code": 37,
+      "provider_called": true,
+      "output_preserved": true,
+      "stderr": "",
+      "fixture": "Temporary isolated directory with fake provider executables; no external model called."
+    },
+    {
+      "skill": "spec-doc-review",
+      "provider": "claude",
+      "entrypoint": "__worker",
+      "exit_code": 37,
+      "provider_called": true,
+      "output_preserved": true,
+      "stderr": "",
+      "fixture": "Temporary isolated directory with fake provider executables; no external model called."
+    },
+    {
+      "skill": "spec-code-review",
+      "provider": "codex",
+      "entrypoint": "__worker",
+      "exit_code": 37,
+      "provider_called": true,
+      "output_preserved": true,
+      "stderr": "",
+      "fixture": "Temporary isolated directory with fake provider executables; no external model called."
+    },
+    {
+      "skill": "spec-code-review",
+      "provider": "claude",
+      "entrypoint": "__worker",
+      "exit_code": 37,
+      "provider_called": true,
+      "output_preserved": true,
+      "stderr": "",
+      "fixture": "Temporary isolated directory with fake provider executables; no external model called."
+    }
+  ],
+  "passed": false
+}

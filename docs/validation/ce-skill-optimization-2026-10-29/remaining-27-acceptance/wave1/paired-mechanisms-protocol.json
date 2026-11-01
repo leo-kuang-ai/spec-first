@@ -1,0 +1,31 @@
+{
+  "created_at": "2026-10-30T06:09:21.111610+00:00",
+  "status": "frozen-before-execution",
+  "scratch_root": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e",
+  "owner": "orchestrator",
+  "tests": {
+    "tests/unit/spec-commit-scope-regression.test.js": "266ddbc678db015e0fbee44a41ed35fbfb54c6d24aa6cfe2ad68dc00dcdaf8e5",
+    "tests/unit/mcp-setup-workspace-git-exclude.test.js": "9d47738b891ea1058e4c11b4e1d20f8fe84d8d1a5e11f5d1f9d1c8b74f6ae25c",
+    "tests/unit/mcp-setup-workspace-routing-inject.test.js": "19618dcc139ae8e1b47840f93bcb89edc46cdd799f8521014bdcc53497f3d7dd",
+    "tests/unit/target-repo-containment.test.js": "bd50819e425276191672e60d90b3d40b34d4196e77cdda21e9e36722ed8ad297",
+    "tests/unit/task-pack-command.test.js": "d31e7d91045dfd59a02d6e3067d88e9a1696dc69be3777097c42db8e418c976b"
+  },
+  "limitations": [
+    "Current regression harness is identical in both arms; baseline failures are expected and retained.",
+    "This is deterministic source comparison, not model/task/field or external-provider evidence.",
+    "Source-level contract assertions are distinguished from executable mechanism tests.",
+    "No mutation-capable subagent is used; local disposable test fixtures are operated by the authorized parent."
+  ],
+  "arms": {
+    "A": {
+      "source_origin": "/Users/kuang/xiaobu/spec-first/.git/spec-first-ce-optimization-2026-10-29/files",
+      "source_paths": 1341,
+      "manifest_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/paired-mechanisms-input.json"
+    },
+    "B": {
+      "source_origin": "/Users/kuang/xiaobu/spec-first",
+      "source_paths": 1410,
+      "manifest_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/paired-mechanisms-input.json"
+    }
+  }
+}

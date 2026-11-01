@@ -1,0 +1,257 @@
+{
+  "schema_version": "ce-sync-execution/v1",
+  "target_repo": "/Users/kuang/xiaobu/spec-first",
+  "head": "fe81bae9ee55ec336c85cf80c4a0460d86e3a412",
+  "branch": "leo-2026-10-27-update",
+  "pre_existing_unowned": [
+    {
+      "path": ".agents/tasks/2026-10-27-ce-upstream-sync-plan-review.md",
+      "sha256": "e3c475edde3e93f22a43b6f2f20cbe9c4d18fcf7bde1584b2521aebf7627695d"
+    },
+    {
+      "path": ".agents/tasks/project-understanding-2026-10-27.md",
+      "sha256": "f519e4277e0c3220e413e2cd29f4177ea55fcec00d01a4a01cdfd5f76af056f5"
+    }
+  ],
+  "forwarded_arguments": "/Users/kuang/xiaobu/spec-first/docs/plans/2026-10-27-001-refactor-ce-upstream-sync-technical-scheme.md",
+  "caller_target_origin": null,
+  "authorization_source": "current-user-explicit-spec-lfg",
+  "commit_authorization": "authorized",
+  "landing_authorization": "authorized",
+  "worker_dispatch_authorization": "authorized",
+  "worker_dispatch_scope": "one delegated read-only independent code review",
+  "tracker_deferral_authorization": "missing",
+  "implementation_engine": "inline",
+  "u_ids": {
+    "U0": "confirmed-git-freeze",
+    "U1": "partial-implementation-tested",
+    "U2": "partial-personas-learning-rules-and-peer-lifecycle-evidence-tested",
+    "U3": "partial-work-feedback-branch-commit-and-pr-contributor-credit-tested",
+    "U4": "partial-pr-safety-inline-resume-and-optimize-holdout-tested",
+    "U5": "partial-session-metadata-external-invalidation-and-retained-workaround-classification-tested",
+    "U6": "19-paths-compared-evidence-only-await-final-snapshot-reconciliation",
+    "U7": "pending",
+    "U8": "pending",
+    "U9": "partial-debug-prevention-two-paths-tested-other-206-pending"
+  },
+  "plan_review": {
+    "review_source": "producer-self-review",
+    "review_status": "degraded",
+    "reason_code": "spec_doc_review_dispatch_authorization_missing",
+    "independent_review": "not_run",
+    "mutation_policy": "markdown-write",
+    "known_findings": "historical H1-H8/M1-M6/L1 addressed in design; implementation and semantic screening still pending"
+  },
+  "claim_limitations": [
+    "398 候选未全部审完；review personas/findings/scope 新增局部改造仍不是整包闭合",
+    "H1-H4 行为承载例外未全部筛查",
+    "当前无完整 adjudication/ledger/handoff；旧输入仅保留 before 证据",
+    "尚未执行独立审查、fresh-source 行为测评、全量测试、runtime apply、真实宿主/模型、PR/CI 或现场验证",
+    "partial receipts 属于各自历史实施快照；后续 source 变化会使旧 changed_files hash 失效，最终 handoff 必须重新资格确认并合并重复路径覆盖"
+  ],
+  "pipeline_stage": "work",
+  "status": "in_progress",
+  "reason_code": "effective_file_comparison_in_progress",
+  "pending_scope_decision": {
+    "source": "docs/plans/2026-10-27-001-refactor-ce-upstream-sync-technical-scheme.md#d1-reconciler-的动态窗口与历史兼容",
+    "deferred_packages": [
+      "skills/ce-bakeoff",
+      "skills/ce-noslop",
+      "skills/wtf"
+    ],
+    "requested_choice": "existing-owner subset without moving full sync point, or expand product plan",
+    "answer": null
+  },
+  "checkpoint_verification": [
+    {
+      "argv": [
+        "npx",
+        "jest",
+        "--runTestsByPath",
+        "tests/unit/ce-upstream-reconciliation-v2.test.js",
+        "tests/unit/ce-upstream-3-20-reconciliation.test.js",
+        "tests/unit/session-history-scripts.test.js",
+        "tests/unit/spec-commit-push-pr-context-contracts.test.js",
+        "tests/unit/spec-commit-scope-regression.test.js",
+        "tests/unit/spec-compound-reference-contracts.test.js",
+        "tests/unit/spec-compound-refresh-reference-contracts.test.js",
+        "tests/unit/spec-code-review-contracts.test.js",
+        "tests/unit/spec-code-review-mechanics.test.js",
+        "--runInBand"
+      ],
+      "exit_code": 0,
+      "log_path": "docs/validation/ce-pull-2026-10-27/logs/checkpoint-tests.log",
+      "log_sha256": "0568179b3b5309f19ac55f02c67b635afe01da9860345222fcd95eafe2b1bda7",
+      "claim_ceiling": "本地针对性验证；不证明整窗完成"
+    },
+    {
+      "argv": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "exit_code": 0,
+      "log_path": "docs/validation/ce-pull-2026-10-27/logs/checkpoint-typecheck.log",
+      "log_sha256": "f8579478bf876074b7eb76d30247db9cab827cbc57b13f63c4f9d810d27f6e8a",
+      "claim_ceiling": "本地针对性验证；不证明整窗完成"
+    },
+    {
+      "argv": [
+        "npm",
+        "run",
+        "lint:skill-entrypoints"
+      ],
+      "exit_code": 0,
+      "log_path": "docs/validation/ce-pull-2026-10-27/logs/checkpoint-entrypoints.log",
+      "log_sha256": "4a91314d46d957dca12612bfa3350c3dad446069ec3f0325cda540df1f64a675",
+      "claim_ceiling": "本地针对性验证；不证明整窗完成"
+    },
+    {
+      "argv": [
+        "npm",
+        "run",
+        "check:shared-references"
+      ],
+      "exit_code": 0,
+      "log_path": "docs/validation/ce-pull-2026-10-27/logs/checkpoint-shared.log",
+      "log_sha256": "6a53819675205b983ca2ffee10d628e421b4233543b789216db7fe66575dece1",
+      "claim_ceiling": "本地针对性验证；不证明整窗完成"
+    },
+    {
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "exit_code": 0,
+      "log_path": "docs/validation/ce-pull-2026-10-27/logs/checkpoint-build.log",
+      "log_sha256": "50915d5e820b48dd5b08dae2cc181efcd0f6402a9378b76fcadf71e6063ee65c",
+      "claim_ceiling": "本地针对性验证；不证明整窗完成"
+    }
+  ],
+  "current_input_ref": "docs/validation/ce-pull-2026-10-27/runs/shared-owner-recovery/adjudication-input.json",
+  "current_facts_ref": "docs/validation/ce-pull-2026-10-27/runs/shared-owner-recovery/window-facts.json",
+  "partial_owner_receipts": [
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U2-personas.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U3-first.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U5-first.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U2-persona-followup.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U2-scope-followup.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U2-validator.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U3-work-followup.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U3-commit-followup.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U3-push-followup.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U2-finish-detail.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U2-routing-evidence.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U5-invalidation-compound.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U5-invalidation-refresh.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U3-feedback-evidence.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U4-rubric-class.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U4-optimize-holdout.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U6-cli-evidence.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U2-learning-rule-evidence.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U2-persona-wording-evidence.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U4-reply-stdin.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U4-inline-fix.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U4-resume-safety.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U6-setup-evidence.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U5-invalidation-followup-compound.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U5-invalidation-followup-refresh.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U3-pr-credit.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U2-peer-lifecycle-evidence.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U9-debug-prevention.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U5-shared-owner-compound.json",
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U5-shared-owner-refresh.json"
+  ],
+  "latest_semantic_comparison_ref": "docs/validation/ce-pull-2026-10-27/runs/shared-owner-recovery/semantic-screening.json",
+  "resume_context": {
+    "session_id": "01a17b6c-c5fc-7573-9391-749c170097e2",
+    "source_logs": [
+      "/Users/kuang/.codex/sessions/2026/10/27/rollout-2026-10-27T11-34-48-01a17b6c-c5fc-7573-9391-749c170097e2.jsonl",
+      "/Users/kuang/.codex/sessions/2026/10/27/rollout-2026-10-27T21-45-59-01a17b6c-c5fc-7573-9391-749c170097e2_01a17d9c-550a-7f72-8638-dcb54943d982.jsonl"
+    ],
+    "scope": "沿用原固定窗口和 LFG 授权；CE 只读，原两份无关任务文档保留",
+    "next_actions": [
+      "U4 optimize剩余calibration/per-case/attribution/persistence；PR包入口/pipeline其余差额完整阅读与最终去重",
+      "U3 shipping/work helpers、U5 assembly/research等未闭合；本轮多文件长输出截断不计完整阅读",
+      "继续U9其余候选、U7-A50与H1-H4；未完成所有必要work return前不得shipping",
+      "最终对当前snapshot重新资格确认/去重所有历史receipts；保留一次LFG独立审查授权到work complete之后"
+    ]
+  },
+  "latest_checkpoint_verification": [
+    {
+      "argv": [
+        "npx",
+        "jest",
+        "--runTestsByPath",
+        "tests/unit/spec-resolve-pr-feedback-contracts.test.js",
+        "tests/unit/spec-pr-feedback-reply.test.js",
+        "tests/unit/spec-lfg-contracts.test.js",
+        "tests/unit/compound-promotion-contracts.test.js",
+        "tests/unit/spec-compound-reference-contracts.test.js",
+        "tests/unit/spec-compound-refresh-reference-contracts.test.js",
+        "tests/unit/spec-commit-push-pr-context-contracts.test.js",
+        "tests/unit/spec-debug-contracts.test.js",
+        "--runInBand"
+      ],
+      "required": true,
+      "status": "passed",
+      "exit_code": 0,
+      "log_path": "docs/validation/ce-pull-2026-10-27/logs/resume-owner-tests.log",
+      "log_sha256": "b2bbf1bac7445c7aeb327efd14470e4343450422a71cf51b3df7744502d40321"
+    },
+    {
+      "argv": [
+        "npm",
+        "run",
+        "check:shared-references"
+      ],
+      "required": true,
+      "status": "passed",
+      "exit_code": 0,
+      "log_path": "docs/validation/ce-pull-2026-10-27/logs/resume-shared-recovered.log",
+      "log_sha256": "6a53819675205b983ca2ffee10d628e421b4233543b789216db7fe66575dece1"
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "required": true,
+      "status": "passed",
+      "exit_code": 0,
+      "log_path": "docs/validation/ce-pull-2026-10-27/logs/resume-diff.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "producer_recovery": {
+    "unit_id": "U1",
+    "reason_code": "non_skill_admission_package_identity",
+    "status": "implemented-targeted-tests-passed",
+    "screening_ref": "docs/validation/ce-pull-2026-10-27/runs/u6-cli/semantic-screening.json",
+    "note": "生产者自修复沿用原 U1 任务授权；非 Skill admission 使用 null，未伪装成 Skill package；未产生完整 ledger"
+  },
+  "resume_progress": {
+    "session_id": "01a17b6c-c5fc-7573-9391-749c170097e2",
+    "status": "in_progress",
+    "implemented": [
+      "U4 inline implementation strategy",
+      "U4 resume freshness/reply reconciliation/publication evidence",
+      "U5 external invalidation format and retained workaround classification",
+      "U3 PR contributor credit",
+      "U9 debug structural prevention"
+    ],
+    "evidence_only": [
+      "U6 setup 9 paths; U6 total19 paths have applicability records",
+      "U2 peer lifecycle/run-log2 paths"
+    ],
+    "verification": "8 suites /112 tests passed; setup27 and peer18 tests separately passed; entrypoints/shared/diff passed",
+    "recovery": "shared yaml-schema owner首次识别遗漏已修复并保留失败日志；两份无关任务hash一致；CE clean；index空；未改host runtime、未commit/push/PR",
+    "limitations": [
+      "无完整ledger/handoff/current-snapshot receipt join",
+      "无fresh-source独立行为评估、真实host/model/field结果",
+      "保持原产品范围待决策状态，不将沉默视为授权"
+    ]
+  }
+}

@@ -59,6 +59,56 @@ describe('spec-lfg PR watch state helper', () => {
     ]);
   }
 
+  test('an unobserved 30-minute gap cannot establish quiet readiness', () => {
+    let current = append(snapshot(), run(['read', '--state-dir', stateDir]));
+    current = append(snapshot({ observed_at: '2026-07-30T00:30:00.000Z' }), current);
+    expect(current.terminal).toBe('watching');
+    expect(current.quiet_seconds).toBe(0);
+    expect(current.observation_gap_seconds).toBe(1800);
+    expect(current.quiet_window_reset_reason).toBe('observation-gap');
+  });
+
+  test('continuous sampling converges and a later failed check remains actionable', () => {
+    let current = append(snapshot(), run(['read', '--state-dir', stateDir]));
+    for (let seconds = 30; seconds <= 300; seconds += 30) {
+      current = append(snapshot({ observed_at: new Date(Date.parse(snapshot().observed_at) + seconds * 1000).toISOString() }), current);
+      expect(current.terminal).toBe(seconds === 300 ? 'looks-ready' : 'watching');
+    }
+    current = append(snapshot({ observed_at: '2026-07-30T00:05:30.000Z', checks: [{ key: 'ci/test', status: 'COMPLETED', conclusion: 'FAILURE' }] }), current);
+    expect(current.events.ci).toEqual(['ci/test']);
+    expect(current.terminal).toBe('watching');
+    expect(current.quiet_seconds).toBe(0);
+  });
+
+  test('legacy journals reset once and the 60-second maximum gap remains usable', () => {
+    append(snapshot(), run(['read', '--state-dir', stateDir]));
+    const file = path.join(stateDir, '000001.json');
+    const legacy = JSON.parse(fs.readFileSync(file, 'utf8'));
+    delete legacy.observation_policy;
+    fs.writeFileSync(file, `${JSON.stringify(legacy)}\n`);
+    let current = run(['read', '--state-dir', stateDir]);
+    current = append(snapshot({ observed_at: '2026-07-30T00:00:30.000Z' }), current);
+    expect(current.quiet_seconds).toBe(0);
+    expect(current.quiet_window_reset_reason).toBe('legacy-observation-policy');
+    for (let seconds = 90; seconds <= 330; seconds += 60) {
+      current = append(snapshot({ observed_at: new Date(Date.parse(snapshot().observed_at) + seconds * 1000).toISOString() }), current);
+    }
+    expect(current.terminal).toBe('looks-ready');
+    expect(current.quiet_seconds).toBe(300);
+  });
+
+  test.each([
+    { observed_at: '2026-07-29T23:59:59.000Z' },
+    { review_items: null },
+    { checks: null },
+  ])('rejects incomplete or backward observations without publishing state: %j', (overrides) => {
+    const current = append(snapshot(), run(['read', '--state-dir', stateDir]));
+    const result = spawnSync(process.execPath, [helper, 'snapshot', '--input', writeInput(root, 'invalid.json', snapshot(overrides)), '--state-dir', stateDir, '--expected-generation', String(current.generation), '--expected-sha256', current.snapshot_sha256], { encoding: 'utf8' });
+    expect(result.status).toBe(1);
+    expect(JSON.parse(result.stdout).reason_code).toBe('snapshot-invalid');
+    expect(run(['read', '--state-dir', stateDir]).generation).toBe(current.generation);
+  });
+
   function decisionFile(value, name = 'decision.json') {
     const file = writeInput(root, name, value);
     fs.chmodSync(file, 0o600);
@@ -210,7 +260,9 @@ describe('spec-lfg PR watch state helper', () => {
     let current = run(['read', '--state-dir', stateDir]);
     current = append(snapshot(), current);
     expect(current.terminal).toBe('watching');
-    current = append(snapshot({ observed_at: '2026-07-30T00:05:01.000Z' }), current);
+    for (let seconds = 30; seconds <= 300; seconds += 30) {
+      current = append(snapshot({ observed_at: new Date(Date.parse(snapshot().observed_at) + seconds * 1000).toISOString() }), current);
+    }
     expect(current.terminal).toBe('looks-ready');
     current = append(snapshot({
       observed_at: '2026-07-30T00:05:02.000Z',
@@ -288,7 +340,9 @@ describe('spec-lfg PR watch state helper', () => {
     expect(current.terminal).toBe('watching');
     expect(current.quiet_seconds).toBe(0);
 
-    current = append(snapshot({ observed_at: '2026-07-30T00:15:02.000Z' }), current);
+    for (let seconds = 30; seconds <= 300; seconds += 30) {
+      current = append(snapshot({ observed_at: new Date(Date.parse('2026-07-30T00:10:01.000Z') + seconds * 1000).toISOString() }), current);
+    }
     expect(current.terminal).toBe('looks-ready');
   });
 

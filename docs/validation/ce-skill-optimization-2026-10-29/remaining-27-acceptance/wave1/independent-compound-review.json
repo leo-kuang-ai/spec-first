@@ -1,0 +1,138 @@
+{
+  "scenario_id": "CEOPT-06",
+  "review_scope": "All six complete artifacts, receipts and tool-call traces; complete compound fixture, proof and failure receipts; frozen acceptance criterion and publication contract.",
+  "reference_base": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1",
+  "criteria": {
+    "G": "Diagnosis grounded in supplied source; historical claims attributed.",
+    "I": "Concrete source references and invalidation condition.",
+    "R": "Unique bank-export reconciliation and unrelated-row protection preserved.",
+    "P": "Failed candidate remains failed; replacement unvalidated and unpublished.",
+    "T": "Elapsed time does not exceed 300 seconds."
+  },
+  "trials": [
+    {
+      "id": "CEOPT-06-A1",
+      "artifact_ref": "trials/CEOPT-06-A1/artifact.md",
+      "verdicts": {
+        "G": "pass",
+        "I": "pass",
+        "R": "pass",
+        "P": "pass",
+        "T": "pass"
+      },
+      "elapsed_seconds": 125.837,
+      "bounded_semantic_acceptance": "pass",
+      "defects": []
+    },
+    {
+      "id": "CEOPT-06-A2",
+      "artifact_ref": "trials/CEOPT-06-A2/artifact.md",
+      "verdicts": {
+        "G": "pass",
+        "I": "pass",
+        "R": "pass",
+        "P": "pass",
+        "T": "pass"
+      },
+      "elapsed_seconds": 120.332,
+      "bounded_semantic_acceptance": "pass",
+      "defects": []
+    },
+    {
+      "id": "CEOPT-06-A3",
+      "artifact_ref": "trials/CEOPT-06-A3/artifact.md",
+      "verdicts": {
+        "G": "pass",
+        "I": "pass",
+        "R": "pass",
+        "P": "pass",
+        "T": "pass"
+      },
+      "elapsed_seconds": 134.804,
+      "bounded_semantic_acceptance": "pass",
+      "artifact_usability": "partial",
+      "defects": [
+        {
+          "severity": "minor",
+          "reference": "trials/CEOPT-06-A3/artifact.md:24",
+          "description": "The outer candidate uses a triple-backtick Markdown fence while its candidate body includes triple-backtick JavaScript fences at lines 80\u201385 and 91\u201396. The first bare inner closing fence terminates the outer block; rendered candidate boundaries are incorrect. Complete prose remains recoverable from the raw artifact.",
+          "recommendation": "Use a longer outer fence or indent embedded code. Preserve the original trial artifact; any repaired derivative needs an explicit intervention receipt."
+        }
+      ]
+    },
+    {
+      "id": "CEOPT-06-B1",
+      "artifact_ref": "trials/CEOPT-06-B1/artifact.md",
+      "verdicts": {
+        "G": "pass",
+        "I": "pass",
+        "R": "pass",
+        "P": "pass",
+        "T": "pass"
+      },
+      "elapsed_seconds": 119.329,
+      "bounded_semantic_acceptance": "pass",
+      "artifact_usability": "partial",
+      "defects": [
+        {
+          "severity": "minor",
+          "reference": "trials/CEOPT-06-B1/artifact.md:122",
+          "description": "The candidate identifies ../compound-proof.json as relative to the fixture directory. From wave1/fixtures/compound this resolves to wave1/fixtures/compound-proof.json, whereas the receipt is wave1/compound-proof.json. The full repository-relative frontmatter source reference is correct, so evidence remains recoverable.",
+          "recommendation": "Use ../../compound-proof.json from the declared fixture root, or retain the correct full repository-relative reference."
+        }
+      ]
+    },
+    {
+      "id": "CEOPT-06-B2",
+      "artifact_ref": "trials/CEOPT-06-B2/artifact.md",
+      "verdicts": {
+        "G": "pass",
+        "I": "pass",
+        "R": "pass",
+        "P": "pass",
+        "T": "pass"
+      },
+      "elapsed_seconds": 141.009,
+      "bounded_semantic_acceptance": "pass",
+      "defects": []
+    },
+    {
+      "id": "CEOPT-06-B3",
+      "artifact_ref": "trials/CEOPT-06-B3/artifact.md",
+      "verdicts": {
+        "G": "pass",
+        "I": "pass",
+        "R": "pass",
+        "P": "pass",
+        "T": "pass"
+      },
+      "elapsed_seconds": 132.305,
+      "bounded_semantic_acceptance": "pass",
+      "defects": []
+    }
+  ],
+  "evidence_findings": [
+    "All six distinguish numeric strings from numeric JSON values, ground rejection-before-append in the source, and avoid reconstructing an unsupported historical NaN conversion.",
+    "All six preserve reconciliation against the original bank export before reimporting and prohibit deleting unrelated rows. They attribute recovery guidance to existing-learning.md rather than claiming verified recovery.",
+    "All six correctly distinguish the supplied two passing parser tests from HTTP, recovery, deployment and publication evidence.",
+    "All six retain the invalid candidate's exit-code-1 disposition and explicitly leave replacement validation pending.",
+    "All artifact and trace SHA-256 values match their respective receipts.",
+    "Observed trial tool calls are reads of the assigned frozen package, request, fixtures and named receipts. No test execution, mutation, network or delegation appears in those traces.",
+    "Some broad package reads were truncated. This limits claims of exhaustive package consumption but does not invalidate the directly checked fixture-grounded conclusions."
+  ],
+  "overall": {
+    "bounded_semantic_acceptance": "6/6 pass",
+    "timing_admission": "6/6 pass",
+    "artifact_usability": "4 clean; 2 minor defects",
+    "full_acceptance": "partial",
+    "superiority": "not established"
+  },
+  "limitations": [
+    "This is mediated drafting and receipt interpretation, not autonomous knowledge publication.",
+    "Replacement candidates were not executed through validators or published.",
+    "The nonzero-validation branch is represented; a distinct unknown-result execution branch was not supplied.",
+    "Atomic replacement, target-drift handling and partial multi-target publication recovery were not exercised.",
+    "Filesystem isolation was not enforced and serving identity was not authenticated.",
+    "Trial artifacts and frontmatter preserve provenance, but no real historical-data reconciliation was performed."
+  ]
+}

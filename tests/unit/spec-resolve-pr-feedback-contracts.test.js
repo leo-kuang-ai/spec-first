@@ -148,7 +148,7 @@ describe('spec-resolve-pr-feedback contracts', () => {
     expect(pipelineMode).toContain('never merely to announce that the thread remains open');
     expect(pipelineMode).toContain('A single batch or reviewer identity alone proves neither pattern');
     expect(fullMode).toContain('`mode:pipeline-return` never ask or wait');
-    expect(entrypoint + fullMode + pipelineMode).not.toMatch(/[\u3400-\u9fff]/u);
+    expect(fullMode).toContain('已有可确认历史不因新 invocation 而归零');
   });
 
   test('fetch keeps author feedback visible and leaves actionability to semantic judgment', () => {

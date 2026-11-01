@@ -31,6 +31,8 @@ You MUST NOT modify files in these paths:
 {scope_immutable}
 
 CRITICAL: Do not modify any file outside the mutable scope. The measurement harness and evaluation data are immutable by design -- the agent cannot game the metric by changing how it is measured.
+
+确认集数据、item 身份、分数与失败细节不得作为实验输入。只使用父级提供的 selection 上下文；发现 holdout 泄漏时停止并报告，不据此改写候选。
 </scope-rules>
 
 <constraints>

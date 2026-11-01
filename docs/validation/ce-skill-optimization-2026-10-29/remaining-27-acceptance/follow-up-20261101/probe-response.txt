@@ -1,0 +1,53 @@
+[
+  {
+    "case_id": "P",
+    "review_source": "producer-self-review",
+    "review_status": "degraded",
+    "reason_code": "dispatch_authorization_missing",
+    "independent_review": "not_run",
+    "capability_status": "unknown",
+    "capability_probe": "not_run_authorization_prohibited",
+    "fixes_applied": 0,
+    "limitations": [
+      "The caller prohibits downstream independent invocation and delegation; capability was not probed.",
+      "The producer-self-review source identifies the degraded reporting owner; no draft was supplied, so substantive producer self-review was not performed.",
+      "Findings, reviewer-only counts, and review coverage remain unknown.",
+      "Plan completion is supplied context; artifact checks and execution readiness were not independently verified."
+    ],
+    "user_summary": "The plan is reported complete. Independent review did not run because invocation was prohibited; capability remains unknown. No substantive producer self-review was possible without the draft, and no fixes were applied."
+  },
+  {
+    "case_id": "M",
+    "review_source": "producer-self-review",
+    "review_status": "degraded",
+    "reason_code": "spec_doc_review_capability_unavailable",
+    "independent_review": "not_run",
+    "capability_status": "unavailable",
+    "capability_probe": "supplied_discovery_receipt_confirms_unavailable",
+    "fixes_applied": 0,
+    "limitations": [
+      "The supplied discovery receipt confirms that no usable independent review capability is available; no additional discovery was performed.",
+      "The producer-self-review source identifies the degraded reporting owner; no draft was supplied, so substantive producer self-review was not performed.",
+      "Findings, reviewer-only counts, and review coverage remain unknown.",
+      "Plan completion is supplied context; artifact checks and execution readiness were not independently verified."
+    ],
+    "user_summary": "The plan is reported complete. Independent review did not run because the supplied discovery receipt confirms capability is unavailable. No substantive producer self-review was possible without the draft, and no fixes were applied."
+  },
+  {
+    "case_id": "U",
+    "review_source": "producer-self-review",
+    "review_status": "degraded",
+    "reason_code": "worker_capability_unproven",
+    "independent_review": "not_run",
+    "capability_status": "unknown",
+    "capability_probe": "supplied_discovery_receipt_inconclusive",
+    "fixes_applied": 0,
+    "limitations": [
+      "The supplied discovery receipt is incomplete and establishes neither usable nor unavailable independent review capability; no additional discovery was performed.",
+      "The producer-self-review source identifies the degraded reporting owner; no draft was supplied, so substantive producer self-review was not performed.",
+      "Findings, reviewer-only counts, and review coverage remain unknown.",
+      "Plan completion is supplied context; artifact checks and execution readiness were not independently verified."
+    ],
+    "user_summary": "The plan is reported complete. Independent review did not run; the incomplete discovery receipt leaves capability unproven. No substantive producer self-review was possible without the draft, and no fixes were applied."
+  }
+]

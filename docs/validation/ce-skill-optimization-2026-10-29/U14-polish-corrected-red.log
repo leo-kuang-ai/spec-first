@@ -1,0 +1,276 @@
+FAIL tests/unit/resolve-port-script.test.js
+  ● port input and configuration boundaries › invalid arguments terminate with an error: "--port"
+
+    expect(received).toBeUndefined()
+
+    Received: [Error: spawnSync bash ETIMEDOUT]
+
+      61 |   test.each([['--port'], ['--type'], ['--port', '0'], ['--port', '65536'], ['--port', 'abc'], ['--unknown'], ['--type', 'unknown']])('invalid arguments terminate with an error: %j', (...args) => {
+      62 |     const result = run(...args);
+    > 63 |     expect(result.error).toBeUndefined();
+         |                          ^
+      64 |     expect(result.status).not.toBe(0);
+      65 |     expect(result.stderr).toContain('ERROR:');
+      66 |   });
+
+      at toBeUndefined (tests/unit/resolve-port-script.test.js:63:26)
+
+  ● port input and configuration boundaries › invalid arguments terminate with an error: "--type"
+
+    expect(received).toBeUndefined()
+
+    Received: [Error: spawnSync bash ETIMEDOUT]
+
+      61 |   test.each([['--port'], ['--type'], ['--port', '0'], ['--port', '65536'], ['--port', 'abc'], ['--unknown'], ['--type', 'unknown']])('invalid arguments terminate with an error: %j', (...args) => {
+      62 |     const result = run(...args);
+    > 63 |     expect(result.error).toBeUndefined();
+         |                          ^
+      64 |     expect(result.status).not.toBe(0);
+      65 |     expect(result.stderr).toContain('ERROR:');
+      66 |   });
+
+      at toBeUndefined (tests/unit/resolve-port-script.test.js:63:26)
+
+  ● port input and configuration boundaries › invalid arguments terminate with an error: "--port"
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not 0
+
+      62 |     const result = run(...args);
+      63 |     expect(result.error).toBeUndefined();
+    > 64 |     expect(result.status).not.toBe(0);
+         |                               ^
+      65 |     expect(result.stderr).toContain('ERROR:');
+      66 |   });
+      67 |
+
+      at toBe (tests/unit/resolve-port-script.test.js:64:31)
+
+  ● port input and configuration boundaries › invalid arguments terminate with an error: "--port"
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not 0
+
+      62 |     const result = run(...args);
+      63 |     expect(result.error).toBeUndefined();
+    > 64 |     expect(result.status).not.toBe(0);
+         |                               ^
+      65 |     expect(result.stderr).toContain('ERROR:');
+      66 |   });
+      67 |
+
+      at toBe (tests/unit/resolve-port-script.test.js:64:31)
+
+  ● port input and configuration boundaries › invalid arguments terminate with an error: "--port"
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not 0
+
+      62 |     const result = run(...args);
+      63 |     expect(result.error).toBeUndefined();
+    > 64 |     expect(result.status).not.toBe(0);
+         |                               ^
+      65 |     expect(result.stderr).toContain('ERROR:');
+      66 |   });
+      67 |
+
+      at toBe (tests/unit/resolve-port-script.test.js:64:31)
+
+  ● port input and configuration boundaries › invalid arguments terminate with an error: "--unknown"
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not 0
+
+      62 |     const result = run(...args);
+      63 |     expect(result.error).toBeUndefined();
+    > 64 |     expect(result.status).not.toBe(0);
+         |                               ^
+      65 |     expect(result.stderr).toContain('ERROR:');
+      66 |   });
+      67 |
+
+      at toBe (tests/unit/resolve-port-script.test.js:64:31)
+
+  ● port input and configuration boundaries › invalid arguments terminate with an error: "--type"
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not 0
+
+      62 |     const result = run(...args);
+      63 |     expect(result.error).toBeUndefined();
+    > 64 |     expect(result.status).not.toBe(0);
+         |                               ^
+      65 |     expect(result.stderr).toContain('ERROR:');
+      66 |   });
+      67 |
+
+      at toBe (tests/unit/resolve-port-script.test.js:64:31)
+
+  ● port input and configuration boundaries › framework comments and another framework config cannot override the selected server
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "4300"
+    Received: "4999"
+
+      69 |     fs.writeFileSync(path.join(root, 'next.config.js'), 'module.exports = { port: 4998 };');
+      70 |     fs.writeFileSync(path.join(root, 'vite.config.js'), '// port: 4999\nexport default { server: { port: 4300 } };\n');
+    > 71 |     expect(run('--type', 'vite').stdout.trim()).toBe('4300');
+         |                                                 ^
+      72 |   });
+      73 |
+      74 |   test('comment and string decoys are ignored while an explicit literal is retained', () => {
+
+      at Object.toBe (tests/unit/resolve-port-script.test.js:71:49)
+
+  ● port input and configuration boundaries › comment and string decoys are ignored while an explicit literal is retained
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "4300"
+    Received: "5173"
+
+      74 |   test('comment and string decoys are ignored while an explicit literal is retained', () => {
+      75 |     fs.writeFileSync(path.join(root, 'vite.config.js'), '/* port: 4999 */\nconst example = "port: 4998";\nexport default { server: { port: 4300 } };');
+    > 76 |     expect(run('--type', 'vite').stdout.trim()).toBe('4300');
+         |                                                 ^
+      77 |     expect(run('--port', '4444').stdout.trim()).toBe('4444');
+      78 |   });
+      79 |
+
+      at Object.toBe (tests/unit/resolve-port-script.test.js:76:49)
+
+  ● port input and configuration boundaries › a Procfile-only project uses its actual web command port
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "4500"
+    Received: "3000"
+
+      80 |   test('a Procfile-only project uses its actual web command port', () => {
+      81 |     fs.writeFileSync(path.join(root, 'Procfile'), 'web: node server.js --port 4500\n');
+    > 82 |     expect(run('--type', 'procfile').stdout.trim()).toBe('4500');
+         |                                                     ^
+      83 |   });
+      84 | });
+      85 |
+
+      at Object.toBe (tests/unit/resolve-port-script.test.js:82:53)
+
+FAIL tests/unit/spec-polish-launch-json.test.js
+  ● Polish launch configuration selection › an explicit missing name cannot fall back to the only configuration
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "__CONFIG_NOT_FOUND__"
+    Received: "{\"name\":\"dev\",\"port\":3000}"
+
+      20 |   };
+      21 |   test('an explicit missing name cannot fall back to the only configuration', () => {
+    > 22 |     expect(run({ configurations: [{ name: 'dev', port: 3000 }] }, 'other').stdout.trim()).toBe('__CONFIG_NOT_FOUND__');
+         |                                                                                           ^
+      23 |     expect(JSON.parse(run({ configurations: [{ name: 'dev', port: 3000 }] }, 'dev').stdout)).toMatchObject({ name: 'dev', port: 3000 });
+      24 |   });
+      25 |   test.each(['bad', {}, 12, null])('non-array configurations produce a single missing sentinel: %j', (configurations) => {
+
+      at Object.toBe (tests/unit/spec-polish-launch-json.test.js:22:91)
+
+  ● Polish launch configuration selection › non-array configurations produce a single missing sentinel: "bad"
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "__MISSING_CONFIGURATIONS__"
+    Received: "__MULTIPLE_CONFIGS__"
+
+      26 |     const result = run({ configurations });
+      27 |     expect(result.status).toBe(0);
+    > 28 |     expect(result.stdout.trim()).toBe('__MISSING_CONFIGURATIONS__');
+         |                                  ^
+      29 |     expect(result.stderr).toBe('');
+      30 |   });
+      31 |   test.each([[{ name: 'dev' }, { name: 'dev' }], [null], [{}]].map((value) => [value]))('invalid or duplicate entries never emit selected configuration JSON', (configurations) => {
+
+      at toBe (tests/unit/spec-polish-launch-json.test.js:28:34)
+
+  ● Polish launch configuration selection › non-array configurations produce a single missing sentinel: 12
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "__MISSING_CONFIGURATIONS__"
+    Received: "__MULTIPLE_CONFIGS__"
+
+      26 |     const result = run({ configurations });
+      27 |     expect(result.status).toBe(0);
+    > 28 |     expect(result.stdout.trim()).toBe('__MISSING_CONFIGURATIONS__');
+         |                                  ^
+      29 |     expect(result.stderr).toBe('');
+      30 |   });
+      31 |   test.each([[{ name: 'dev' }, { name: 'dev' }], [null], [{}]].map((value) => [value]))('invalid or duplicate entries never emit selected configuration JSON', (configurations) => {
+
+      at toBe (tests/unit/spec-polish-launch-json.test.js:28:34)
+
+  ● Polish launch configuration selection › invalid or duplicate entries never emit selected configuration JSON
+
+    expect(received).toBe(expected) // Object.is equality
+
+    - Expected  - 1
+    + Received  + 2
+
+    - __INVALID_LAUNCH_JSON__
+    + {"name":"dev"}
+    + {"name":"dev"}
+
+      32 |     const result = run({ configurations }, 'dev');
+      33 |     expect(result.status).toBe(0);
+    > 34 |     expect(result.stdout.trim()).toBe('__INVALID_LAUNCH_JSON__');
+         |                                  ^
+      35 |   });
+      36 |   test('multiple valid names retain the documented selection protocol', () => {
+      37 |     const configurations = [{ name: 'api', port: 3100 }, { name: 'web', port: 3200 }];
+
+      at toBe (tests/unit/spec-polish-launch-json.test.js:34:34)
+
+  ● Polish launch configuration selection › invalid or duplicate entries never emit selected configuration JSON
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "__INVALID_LAUNCH_JSON__"
+    Received: "null"
+
+      32 |     const result = run({ configurations }, 'dev');
+      33 |     expect(result.status).toBe(0);
+    > 34 |     expect(result.stdout.trim()).toBe('__INVALID_LAUNCH_JSON__');
+         |                                  ^
+      35 |   });
+      36 |   test('multiple valid names retain the documented selection protocol', () => {
+      37 |     const configurations = [{ name: 'api', port: 3100 }, { name: 'web', port: 3200 }];
+
+      at toBe (tests/unit/spec-polish-launch-json.test.js:34:34)
+
+  ● Polish launch configuration selection › invalid or duplicate entries never emit selected configuration JSON
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "__INVALID_LAUNCH_JSON__"
+    Received: "{}"
+
+      32 |     const result = run({ configurations }, 'dev');
+      33 |     expect(result.status).toBe(0);
+    > 34 |     expect(result.stdout.trim()).toBe('__INVALID_LAUNCH_JSON__');
+         |                                  ^
+      35 |   });
+      36 |   test('multiple valid names retain the documented selection protocol', () => {
+      37 |     const configurations = [{ name: 'api', port: 3100 }, { name: 'web', port: 3200 }];
+
+      at toBe (tests/unit/spec-polish-launch-json.test.js:34:34)
+
+Test Suites: 2 failed, 2 total
+Tests:       16 failed, 6 passed, 22 total
+Snapshots:   0 total
+Time:        2.553 s, estimated 3 s
+Ran all test suites matching /tests\/unit\/resolve-port-script.test.js|tests\/unit\/spec-polish-launch-json.test.js/i.

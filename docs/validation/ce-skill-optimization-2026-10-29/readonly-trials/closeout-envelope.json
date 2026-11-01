@@ -1,0 +1,15 @@
+{
+  "verification_run_summary_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/verification-run-summary.json",
+  "honest_closeout_verdict": "degraded",
+  "run_artifact_path": ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/run.json",
+  "run_artifact_reason_code": "trigger-not-run-validation",
+  "claim_limitations": [
+    "U6 authenticated positive provider admission remains unavailable.",
+    "U29: 24 bounded read-only task responses across four scenarios; 30 scenarios have no task trials and full frozen-comparison acceptance remains incomplete.",
+    "U30: both arms passed all bounded tasks; no causal superiority, equivalence or comparable cost/rework/time claim.",
+    "Read-only instructions and file observations are not enforced isolation. Actual serving identity is not authenticated.",
+    "CEOPT-21 preference-state and CEOPT-34 downstream execution facets remain untested.",
+    "One host 429 was retried without changing the task; timing is not comparable.",
+    "This run changes evidence and reporting only; prior product tests are preserved as historical evidence."
+  ]
+}

@@ -383,6 +383,17 @@ function validateComparisonSpec(spec) {
     }
   }
   positiveCount(spec.repeat_count, "repeat_count")
+  const holdout = spec.measurement.holdout
+  if (holdout != null && (
+    typeof holdout !== "object" || Array.isArray(holdout) ||
+    typeof holdout.command !== "string" || !holdout.command.trim()
+  )) throw new Error("invalid holdout command")
+  const confirmationSeed = spec.judge?.confirmation_seed
+  if (confirmationSeed != null && (
+    spec.primary.type !== "judge" || !Number.isSafeInteger(confirmationSeed) ||
+    !Number.isSafeInteger(spec.judge.sample_seed ?? 42) ||
+    confirmationSeed === (spec.judge.sample_seed ?? 42)
+  )) throw new Error("invalid holdout confirmation seed")
   if (spec.stability_mode === "ladder" || spec.ladder.enabled) {
     positiveCount(spec.ladder.exploratory_pairs, "exploratory_pairs")
     positiveCount(spec.ladder.confirmation_repeats, "confirmation_repeats")
@@ -400,7 +411,7 @@ function validateComparisonSpec(spec) {
   }
 }
 
-function decide(input) {
+function decideSelection(input) {
   let spec
   try {
     spec = normalizeSpec(input.spec ?? {})
@@ -488,11 +499,10 @@ function decide(input) {
     (objective) => comparisons[objective.name]?.verdict === "inconclusive",
   )
   const sampleCount = Math.min(
-    ...required.map((objective) => {
-      const fromSamples = candidateBundles[objective.name]?.samples?.length
-      if (Number.isInteger(fromSamples) && fromSamples > 0) return fromSamples
-      return positiveInteger(candidate.sample_count, 1)
-    }),
+    ...required.flatMap((objective) => [baselineBundles, candidateBundles].map((bundles) => {
+      // A scalar is at most one observation; a declared count cannot create repeats.
+      return bundles[objective.name]?.samples?.length || 1
+    })),
   )
 
   if (
@@ -547,6 +557,10 @@ function decide(input) {
       if (sampleCount < exploratoryPairs) nextMeasurement = "exploratory"
       else nextMeasurement = confirming ? "confirm" : "add_sample"
     }
+  } else if (spec.stability_mode === "repeat" && sampleCount < confirmationRepeats &&
+             (decision === "keep" || decision === "inconclusive")) {
+    if (decision === "keep") decision = "promising"
+    nextMeasurement = "confirm"
   }
 
   let reason = "no required objective improved"
@@ -569,6 +583,69 @@ function decide(input) {
     primary_delta: primaryComparison?.delta ?? null,
     rank_score: rankScore(primaryComparison, improved),
     reason,
+  }
+}
+
+function decide(input) {
+  const selection = { ...decideSelection(input), holdout: null }
+  if (selection.decision !== "keep" || selection.next_measurement !== "none") return selection
+  const spec = normalizeSpec(input.spec ?? {})
+  if (!spec.measurement.holdout && spec.judge?.confirmation_seed == null) return selection
+  if (input.holdout == null) {
+    return {
+      ...selection,
+      decision: "promising",
+      eligible: false,
+      next_measurement: "holdout",
+      target_reached: false,
+      reason: "selection comparison would keep; held-out confirmation still missing",
+    }
+  }
+
+  // 复用同一比较 owner，holdout 不选择候选，也不放宽配对、gate 或噪声规则。
+  const pair = input.holdout
+  const count = spec.stability_mode === "ladder" || spec.ladder.enabled
+    ? (spec.ladder.confirmation_repeats ?? spec.repeat_count ?? 5)
+    : spec.stability_mode === "repeat" ? (spec.repeat_count ?? 5) : 1
+  if (count > 1) {
+    for (const objective of requiredObjectives(spec)) {
+      for (const side of ["baseline", "candidate"]) {
+        const bundle = metricBundle(pair[side], objective.name, spec.aggregation, objective.type)
+        if (!bundle || bundle.samples.length < count) {
+          return {
+            ...selection,
+            decision: "error",
+            eligible: false,
+            target_reached: false,
+            rank_score: 0,
+            reason: `holdout missing full-protocol samples: ${side}.${objective.name}`,
+          }
+        }
+      }
+    }
+  }
+  const confirmation = decideSelection({ spec, baseline: pair.baseline, candidate: pair.candidate })
+  if (confirmation.next_measurement !== "none") {
+    return {
+      ...selection,
+      decision: "error",
+      eligible: false,
+      target_reached: false,
+      rank_score: 0,
+      holdout: { ...confirmation, agrees: false },
+      reason: `holdout missing full protocol: ${confirmation.next_measurement}`,
+    }
+  }
+  const agrees = confirmation.decision === "keep" && confirmation.next_measurement === "none" &&
+    confirmation.improved_objectives.some((name) => selection.improved_objectives.includes(name))
+  return {
+    ...selection,
+    decision: agrees ? "keep" : confirmation.decision === "keep" ? "inconclusive" : confirmation.decision,
+    eligible: agrees,
+    target_reached: agrees && selection.target_reached && confirmation.target_reached,
+    rank_score: agrees ? selection.rank_score : 0,
+    holdout: { ...confirmation, agrees },
+    reason: agrees ? selection.reason : `holdout did not confirm selection: ${confirmation.reason}`,
   }
 }
 

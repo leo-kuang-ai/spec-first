@@ -35,6 +35,29 @@ function codexEnd({ code, stderr = '' }) {
 }
 
 describe('session-history JSONL scripts', () => {
+  test.each([23, -9, '23', '-9'])('skeleton preserves structured Codex exit %s without legacy output', (code) => {
+    const input = JSON.stringify({ type: 'event_msg', payload: { type: 'exec_command_end', command: ['bash', '-lc', 'verify'], exit_code: code, aggregated_output: '' } });
+    expect(runScript('extract-skeleton.py', input)).toContain(`error(exit ${code})`);
+    expect(runScript('extract-errors.py', input)).toContain(`exit=${code}`);
+  });
+
+  test('skeleton distinguishes missing exit evidence from a confirmed zero', () => {
+    const event = { type: 'event_msg', payload: { type: 'exec_command_end', command: ['bash', '-lc', 'verify'], aggregated_output: '' } };
+    expect(runScript('extract-skeleton.py', JSON.stringify(event))).toContain('-> unknown');
+    event.payload.exit_code = 0;
+    expect(runScript('extract-skeleton.py', JSON.stringify(event))).toContain('-> ok');
+  });
+
+  test('collapsed Claude tools retain unknown results and reject mismatched result identities', () => {
+    const calls = { type: 'assistant', message: { content: ['a', 'b', 'c'].map((id) => ({ type: 'tool_use', id, name: 'Read', input: { file_path: id + '.md' } })) } };
+    const result = (id) => ({ type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: id, content: 'ok' }] } });
+    const output = runScript('extract-skeleton.py', [calls, result('a'), result('unrelated')].map(JSON.stringify).join('\n'));
+    expect(output).toContain('1 ok, 0 error, 2 unknown');
+    expect(output).not.toContain('all ok');
+    const all = runScript('extract-skeleton.py', [calls, result('a'), result('b'), result('c')].map(JSON.stringify).join('\n'));
+    expect(all).toContain('all ok');
+  });
+
   test('extract-errors detects Codex records after arbitrary metadata and ignores successful stderr', () => {
     const input = [
       ...Array.from({ length: 12 }, () => JSON.stringify({ type: 'metadata' })),
@@ -66,5 +89,33 @@ describe('session-history JSONL scripts', () => {
     ]);
     const output = runScript(script, input);
     expect(metadata(output)).toMatchObject({ lines: 2, parse_errors: 1 });
+  });
+});
+
+describe('metadata bounded discovery', () => {
+  const fs = require('node:fs'); const os = require('node:os');
+  let root;
+  beforeEach(() => { root = fs.mkdtempSync(path.join(os.tmpdir(), 'metadata-boundary-')); });
+  afterEach(() => fs.rmSync(root, { recursive: true, force: true }));
+  function batch(files) {
+    const result = spawnSync('python3', [path.join(scriptsRoot, 'extract-metadata.py'), ...files], { encoding: 'utf8' });
+    expect(result.status).toBe(0); return result.stdout.trim().split('\n').map(JSON.parse);
+  }
+  test.each([25, 26, 200, 201])('metadata at line %i obeys the 200-line boundary', (line) => {
+    const file = path.join(root, 'session.jsonl');
+    fs.writeFileSync(file, [...Array(line - 1).fill('{"type":"progress"}'), JSON.stringify({ type: 'user', gitBranch: 'feature', sessionId: 'fixture' })].join('\n'));
+    const rows = batch([file]);
+    if (line <= 200) expect(rows[0]).toMatchObject({ platform: 'claude', branch: 'feature' });
+    else expect(rows).toHaveLength(1);
+    expect(rows.at(-1).parse_errors).toBe(0);
+    if (line > 200) expect(rows.at(-1).files_without_metadata).toBe(1);
+  });
+  test('empty, malformed, valid and missing files keep read failures separate', () => {
+    const files = ['empty.jsonl', 'malformed.jsonl', 'valid.jsonl'].map((f) => path.join(root, f));
+    fs.writeFileSync(files[0], ''); fs.writeFileSync(files[1], 'not json\nnull\n');
+    fs.writeFileSync(files[2], '{"type":"session_meta","payload":{"cwd":"/fixture","id":"one"}}\n');
+    const rows = batch([...files, path.join(root, 'missing.jsonl')]);
+    expect(rows[0]).toMatchObject({ platform: 'codex', session: 'one' });
+    expect(rows.at(-1)).toMatchObject({ files_processed: 4, parse_errors: 1, files_without_metadata: 2 });
   });
 });

@@ -57,6 +57,7 @@ function stepForUnavailableExactOrigin(action) {
 }
 
 function pageContextStep(action) {
+  if (action === 'vitals') return { action, route: '/settings' };
   if (action === 'get') return { action, property: 'title' };
   if (action === 'press') return { action, key: 'Enter' };
   if (['fill', 'type', 'select'].includes(action)) {
@@ -172,6 +173,7 @@ function passedConformance(identity = binaryIdentity()) {
       status: 'passed',
       binary_identity: identity,
       positive_control: { status: 'passed' },
+      cleanup: { status: 'passed', exit_code: 0, timed_out: false, error: null },
       blocked_origin_total_hits: 0,
       cases: [
         'initial-open-and-frame',
@@ -189,6 +191,45 @@ function passedConformance(identity = binaryIdentity()) {
     error: null,
   };
 }
+
+test.each([null, { status: 'failed', exit_code: 9, timed_out: false, error: null }])('probe rejects missing or failed cleanup despite a claimed conformance pass', (cleanup) => {
+  const identity = binaryIdentity();
+  const conformance = passedConformance(identity);
+  const payload = JSON.parse(conformance.stdout);
+  payload.cleanup = cleanup;
+  conformance.stdout = JSON.stringify(payload);
+  const result = wrapper.probeAgentBrowser({
+    runner: probeRunner({ exactOrigin: true }), binaryIdentityResolver: () => identity,
+    conformanceRunner: () => conformance,
+  });
+  expect(result.execution_readiness).toBe('blocked');
+});
+
+test('probe carries the private recovery reference from failed conformance', () => {
+  const identity = binaryIdentity();
+  const conformance = passedConformance(identity);
+  const payload = JSON.parse(conformance.stdout);
+  payload.status = 'failed';
+  payload.cleanup = { status: 'failed', exit_code: 9, timed_out: false, error: null };
+  payload.recovery = { run_root: tempRoot() };
+  conformance.status = 1;
+  conformance.stdout = JSON.stringify(payload);
+  const result = wrapper.probeAgentBrowser({
+    runner: probeRunner({ exactOrigin: true }), binaryIdentityResolver: () => identity,
+    conformanceRunner: () => conformance,
+  });
+  expect(result.execution_readiness).toBe('blocked');
+  expect(result.conformance_recovery.evidence_ref).toBe(path.join(payload.recovery.run_root, 'conformance-result.json'));
+});
+
+test.each([null, 'null', 'invalid'])('probe rejects failed conformance with absent or malformed payload: %s', (stdout) => {
+  const result = wrapper.probeAgentBrowser({
+    runner: probeRunner({ exactOrigin: true }), binaryIdentityResolver: binaryIdentity,
+    conformanceRunner: () => ({ status: 1, stdout, stderr: '' }),
+  });
+  expect(result.execution_readiness).toBe('blocked');
+  expect(result.conformance_recovery).toBeUndefined();
+});
 
 function failedConformance() {
   return {
@@ -505,6 +546,7 @@ test('validates loopback origins, first-open ordering, routes, actions, locators
     'get',
     'console',
     'network-metadata',
+    'vitals',
     'a11y',
     'screenshot-private',
     'click',
@@ -542,6 +584,11 @@ test('prepare writes only owner-private run files and pins the internal test-pla
   expect(actionPolicy.default).toBe('deny');
   expect(actionPolicy.allow).toEqual(expect.arrayContaining(['launch', 'navigate']));
   expect(actionPolicy.allow).toContain('find');
+  expect(actionPolicy.allow).toEqual(expect.arrayContaining([
+    'gettext', 'inputvalue', 'title', 'url', 'count', 'viewport', 'requests',
+    'getbyrole', 'getbylabel', 'getbytestid', 'getbytext',
+  ]));
+  for (const forbidden of ['evaluate', 'upload']) expect(actionPolicy.allow).not.toContain(forbidden);
   expect(prepared.session).toMatch(/^sfb-[a-f0-9]{16}$/);
   expect(prepared.namespace).toMatch(/^sfb-[a-f0-9]{16}$/);
   if (process.platform !== 'win32') {

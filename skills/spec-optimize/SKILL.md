@@ -12,6 +12,8 @@ Run metric-driven iterative optimization. Define a goal, build measurement scaff
 
 Use `scripts/decide.cjs` for numeric multi-objective eligibility, comparison thresholds, and measurement-ladder steps. A required-objective win can be kept even when the primary is unchanged; confirmation and integration must finish before recording `kept`. Completion requires every declared required target or another explicit stop, a verified final log, and an honest account of blocked or unfinished work. `references/example-expensive-benchmark-spec.yaml` illustrates multiple required targets and staged sampling.
 
+可选 holdout 是独立确认集：冻结数据与协议，不用于假设、worker 输入或排名。配置后 `decide.cjs` 在 selection 通过时要求 `next_measurement: holdout`，确认缺失或不支持同一改善目标就不能 keep；详细执行与留证见 measurement、loop 和 experiment log。旧 spec/log 保持兼容，不自动提升为泛化验证。
+
 ## Workflow Contract Summary
 
 ### When To Use
@@ -113,7 +115,7 @@ a measurement artifact plus stop/defer guidance.
 
 Before the first measurement, materialize the approved frozen inputs as a
 run-local `measurement-admission-input.json`, then run
-`node scripts/measurement-admission.cjs admit --input <path>`. Persist the
+`node "<loaded-skill-dir>/scripts/measurement-admission.cjs" admit --input <path>`. Persist the
 returned normalized admission and `admission_sha256` beside the measurement
 artifact and bind every A/A and A/B attempt to that digest. A rejected admission
 stops before invoking the measurement command. After A/A, run the helper's
@@ -163,7 +165,7 @@ Load the phase reference before entering that phase; these files are the canonic
 - Phases 2-3 hypotheses and optimization loop: `references/loop.md`
 - Phase 4 deferred work, summary, and cleanup: `references/wrap-up.md`
 
-The top-level skill owns the workflow contract, admission and budget gates, runtime context exclusion, evidence boundary, and dispatch authority. Phase references own detailed execution procedures. Use authorized, isolated judge sub-agents using the same bounded scheduler as Phase 3.2. Judges must neither author the hypothesis nor run the experiment they score, and must not see other judges' results. If independent judging is unavailable, do not score inline: baseline judging blocks Phase 1; a candidate becomes an unmeasured `error`, is logged, and cannot become `best`. Judge work is a separate budget from experiment worktrees. For capacity errors, treat it as backpressure. Codex failure cascade after authorization or capability failure falls back to serial inline/local execution only for work that does not require independence. The strategy digest is derived, reconstructable state; the experiment log remains the canonical resume and audit source. Wrap-up may run `spec-code-review` and `spec-compound`; the **Mechanical-apply bar:** apply any finding with a concrete `suggested_fix`. Do not commit or push from this step. A phase reference may strengthen a boundary but cannot grant mutation, measurement, dispatch, commit, or landing authority.
+The top-level skill owns the workflow contract, admission and budget gates, runtime context exclusion, evidence boundary, and dispatch authority. Phase references own detailed execution procedures. Use authorized, isolated judge sub-agents using the same bounded scheduler as Phase 3.2. Judges must neither author the hypothesis nor run the experiment they score, and must not see other judges' results. If independent judging is unavailable, do not score inline: baseline judging blocks Phase 1; a candidate becomes an unmeasured `error`, is logged, and cannot become `best`. Judge work is a separate budget from experiment worktrees. For capacity errors, treat it as backpressure. Codex failure cascade after authorization or capability failure falls back to serial inline/local execution only for work that does not require independence. The strategy digest is derived, reconstructable state; the experiment log remains the canonical resume and audit source. Wrap-up may run `spec-code-review` and `spec-compound`; the **Mechanical-apply bar:** apply only a confirmed, in-scope finding whose concrete `suggested_fix` is clear, reversible and covered by existing mutation authority; defer design/product decisions. Do not commit or push from this step. A phase reference may strengthen a boundary but cannot grant mutation, measurement, dispatch, commit, or landing authority.
 
 ## Workflow sequence
 

@@ -1,0 +1,12 @@
+{
+  "trial": "CEOPT-26-A3",
+  "approved_for_disposable_execution": true,
+  "recorded_at": "2026-10-31T05:19:41.583996+00:00",
+  "proposal_sha256": "71577ed2b7b33cfb6e5643b28d5976b1456d87a8be3a46543503df020d90e0a7",
+  "candidate_sha256": "60fcede431e7da0426edd494e69a0680e4f6b3dd786e373d942872ce7a4c0716",
+  "review": "Parent read complete proposal: no-change justified by direct shallow routing and distinct response branches. Numeric guard, exception range, insertion order, timestamps and proof-only listening seam preserved. No speculative export/helper/resource policy. npm test maps exactly to fixed parent node --test command in package.json; parent verifies unchanged code without claiming literal npm invocation.",
+  "limitations": [
+    "Parent execution only; no autonomous save/edit.",
+    "Selected HTTP proof does not prove every observable branch."
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "skills/spec-optimize/SKILL.md": "4da027d7a55cbbe974b136e43344e77a1306491942dc1a383e8f9be24d064dce",
+  "skills/spec-optimize/references/loop.md": "74d32b83f0cde4550c3eb97f2db85095855293eafe406fd4ddbb2b988dc671a2",
+  "skills/spec-optimize/references/measurement.md": "92571942a4b5deec55fc7be8961e5a80acceead9bd539892ae6bba0f15fa0ca7",
+  "skills/spec-optimize/references/persistence.md": "b59c8760de6936fa831aecba3a83242ace9f1690160380a6cf8b3c63ce56e1bf",
+  "skills/spec-optimize/references/wrap-up.md": "b394f9219008e03c910f701a5d267691c972f3d31c9f13a5617450dbe9209dbc",
+  "skills/spec-optimize/references/judge-prompt-template.md": "7017ed4180bb15e20ee2235bc14a42b8a4e6374498b935ad053fcaa79add6d5c",
+  "skills/spec-optimize/references/experiment-log-schema.yaml": "053b5944a89b852c43263ac77ac4971ae7c1fe042c7d207c4dd0e6f4673d1891",
+  "skills/autoresearch/autoresearch.md": "b710d1c865e91e5655fa80a1cf0a3fd7c062fd9c5f42f65a4e959f739ca12862",
+  "skills/autoresearch/references/orchestrator-routing.md": "d3dc4cec445510017f373422b3434a0267028ffb7c6eb8c2ac733c6e344fe346",
+  "skills/spec-optimize/references/measurement-only-calibration.md": "2ad7e7d29e241124d40339dcc68a3908875fb2c604a57f675bf10d190db999cb",
+  "tests/unit/spec-optimize-contracts.test.js": "b6798b88bdf411d90550c04410643a17a833c364446ff9a7f7b906227017c38a",
+  "tests/unit/spec-optimize-measurement-only-contracts.test.js": "e8ff654c8c79a91b6cc5d285e255b1896ffd62e3c35bb19db5810b728e708c6c"
+}

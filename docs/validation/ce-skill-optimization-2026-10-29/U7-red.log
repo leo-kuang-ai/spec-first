@@ -1,0 +1,372 @@
+FAIL tests/unit/autoresearch-score-regression.test.js
+  autoresearch regression protocol scoring
+    ✕ regression-eligible HARD regressions block a perfect score (33 ms)
+    ✓ eligible HARD regressions block a perfect score (30 ms)
+    ✕ visual-ui contributes to the visual score (29 ms)
+    ✓ visual contributes to the visual score (28 ms)
+    ✓ documented TSV header and old aliases remain valid (30 ms)
+    ✕ invalid protocol data cannot produce a safety verdict: {"classification":"unknown"} (29 ms)
+    ✕ invalid protocol data cannot produce a safety verdict: {"dimension":"unknown"} (31 ms)
+    ✕ invalid protocol data cannot produce a safety verdict: {"tier":"unknown"} (30 ms)
+    ✕ invalid protocol data cannot produce a safety verdict: {"regressed":"unknown"} (29 ms)
+    ✕ invalid protocol data cannot produce a safety verdict: {"subscore":"NaN"} (30 ms)
+    ✕ invalid protocol data cannot produce a safety verdict: {"subscore":"Infinity"} (29 ms)
+    ✕ invalid protocol data cannot produce a safety verdict: {"subscore":"101"} (29 ms)
+    ✕ invalid protocol data cannot produce a safety verdict: {"subscore":"-1"} (29 ms)
+    ✕ invalid protocol data cannot produce a safety verdict: {"subscore":""} (29 ms)
+    ✕ invalid protocol data cannot produce a safety verdict: {"dimension":"functional","tier":"SCORE"} (28 ms)
+    ✕ rejects invalid threshold NaN (30 ms)
+    ✕ rejects invalid threshold Infinity (32 ms)
+    ✕ rejects invalid threshold 101 (30 ms)
+    ✕ rejects invalid threshold -1 (29 ms)
+    ✕ rejects invalid threshold not-a-number (29 ms)
+    ✕ malformed cells cannot be padded into evidence (29 ms)
+    ✕ excluded baseline states cannot inflate the score (28 ms)
+    ✓ historical and new failures do not become HARD regressions (28 ms)
+    ✕ an unavailable baseline cannot be scored as stable (29 ms)
+
+  ● autoresearch regression protocol scoring › regression-eligible HARD regressions block a perfect score
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      26 |   test.each(['regression-eligible', 'eligible'])('%s HARD regressions block a perfect score', (classification) => {
+      27 |     const result = score([row(), row({ dimension: 'functional', tier: 'HARD', classification, regressed: 'true', subscore: '' })]);
+    > 28 |     expect(result.status).toBe(1);
+         |                           ^
+      29 |     expect(result.stdout.trim().split('\n').pop()).toBe('UNSTABLE');
+      30 |   });
+      31 |   test.each(['visual-ui', 'visual'])('%s contributes to the visual score', (dimension) => {
+
+      at toBe (tests/unit/autoresearch-score-regression.test.js:28:27)
+
+  ● autoresearch regression protocol scoring › visual-ui contributes to the visual score
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      31 |   test.each(['visual-ui', 'visual'])('%s contributes to the visual score', (dimension) => {
+      32 |     const result = score([row(), row({ dimension, regressed: 'true', subscore: '0' })]);
+    > 33 |     expect(result.status).toBe(1);
+         |                           ^
+      34 |     expect(result.stdout).toContain('stability_score = 60.00');
+      35 |   });
+      36 |   test('documented TSV header and old aliases remain valid', () => {
+
+      at toBe (tests/unit/autoresearch-score-regression.test.js:33:27)
+
+  ● autoresearch regression protocol scoring › invalid protocol data cannot produce a safety verdict: {"classification":"unknown"}
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 0
+
+      46 |   ])('invalid protocol data cannot produce a safety verdict: %j', (overrides) => {
+      47 |     const result = score([row(), row(overrides)]);
+    > 48 |     expect(result.status).toBe(2);
+         |                           ^
+      49 |     expect(`${result.stdout}${result.stderr}`).toContain('INVALID_INPUT');
+      50 |     expect(result.stdout.trim().split('\n').pop()).not.toBe('STABLE');
+      51 |   });
+
+      at toBe (tests/unit/autoresearch-score-regression.test.js:48:27)
+
+  ● autoresearch regression protocol scoring › invalid protocol data cannot produce a safety verdict: {"dimension":"unknown"}
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 0
+
+      46 |   ])('invalid protocol data cannot produce a safety verdict: %j', (overrides) => {
+      47 |     const result = score([row(), row(overrides)]);
+    > 48 |     expect(result.status).toBe(2);
+         |                           ^
+      49 |     expect(`${result.stdout}${result.stderr}`).toContain('INVALID_INPUT');
+      50 |     expect(result.stdout.trim().split('\n').pop()).not.toBe('STABLE');
+      51 |   });
+
+      at toBe (tests/unit/autoresearch-score-regression.test.js:48:27)
+
+  ● autoresearch regression protocol scoring › invalid protocol data cannot produce a safety verdict: {"tier":"unknown"}
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 0
+
+      46 |   ])('invalid protocol data cannot produce a safety verdict: %j', (overrides) => {
+      47 |     const result = score([row(), row(overrides)]);
+    > 48 |     expect(result.status).toBe(2);
+         |                           ^
+      49 |     expect(`${result.stdout}${result.stderr}`).toContain('INVALID_INPUT');
+      50 |     expect(result.stdout.trim().split('\n').pop()).not.toBe('STABLE');
+      51 |   });
+
+      at toBe (tests/unit/autoresearch-score-regression.test.js:48:27)
+
+  ● autoresearch regression protocol scoring › invalid protocol data cannot produce a safety verdict: {"regressed":"unknown"}
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 0
+
+      46 |   ])('invalid protocol data cannot produce a safety verdict: %j', (overrides) => {
+      47 |     const result = score([row(), row(overrides)]);
+    > 48 |     expect(result.status).toBe(2);
+         |                           ^
+      49 |     expect(`${result.stdout}${result.stderr}`).toContain('INVALID_INPUT');
+      50 |     expect(result.stdout.trim().split('\n').pop()).not.toBe('STABLE');
+      51 |   });
+
+      at toBe (tests/unit/autoresearch-score-regression.test.js:48:27)
+
+  ● autoresearch regression protocol scoring › invalid protocol data cannot produce a safety verdict: {"subscore":"NaN"}
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 1
+
+      46 |   ])('invalid protocol data cannot produce a safety verdict: %j', (overrides) => {
+      47 |     const result = score([row(), row(overrides)]);
+    > 48 |     expect(result.status).toBe(2);
+         |                           ^
+      49 |     expect(`${result.stdout}${result.stderr}`).toContain('INVALID_INPUT');
+      50 |     expect(result.stdout.trim().split('\n').pop()).not.toBe('STABLE');
+      51 |   });
+
+      at toBe (tests/unit/autoresearch-score-regression.test.js:48:27)
+
+  ● autoresearch regression protocol scoring › invalid protocol data cannot produce a safety verdict: {"subscore":"Infinity"}
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 0
+
+      46 |   ])('invalid protocol data cannot produce a safety verdict: %j', (overrides) => {
+      47 |     const result = score([row(), row(overrides)]);
+    > 48 |     expect(result.status).toBe(2);
+         |                           ^
+      49 |     expect(`${result.stdout}${result.stderr}`).toContain('INVALID_INPUT');
+      50 |     expect(result.stdout.trim().split('\n').pop()).not.toBe('STABLE');
+      51 |   });
+
+      at toBe (tests/unit/autoresearch-score-regression.test.js:48:27)
+
+  ● autoresearch regression protocol scoring › invalid protocol data cannot produce a safety verdict: {"subscore":"101"}
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 0
+
+      46 |   ])('invalid protocol data cannot produce a safety verdict: %j', (overrides) => {
+      47 |     const result = score([row(), row(overrides)]);
+    > 48 |     expect(result.status).toBe(2);
+         |                           ^
+      49 |     expect(`${result.stdout}${result.stderr}`).toContain('INVALID_INPUT');
+      50 |     expect(result.stdout.trim().split('\n').pop()).not.toBe('STABLE');
+      51 |   });
+
+      at toBe (tests/unit/autoresearch-score-regression.test.js:48:27)
+
+  ● autoresearch regression protocol scoring › invalid protocol data cannot produce a safety verdict: {"subscore":"-1"}
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 1
+
+      46 |   ])('invalid protocol data cannot produce a safety verdict: %j', (overrides) => {
+      47 |     const result = score([row(), row(overrides)]);
+    > 48 |     expect(result.status).toBe(2);
+         |                           ^
+      49 |     expect(`${result.stdout}${result.stderr}`).toContain('INVALID_INPUT');
+      50 |     expect(result.stdout.trim().split('\n').pop()).not.toBe('STABLE');
+      51 |   });
+
+      at toBe (tests/unit/autoresearch-score-regression.test.js:48:27)
+
+  ● autoresearch regression protocol scoring › invalid protocol data cannot produce a safety verdict: {"subscore":""}
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 0
+
+      46 |   ])('invalid protocol data cannot produce a safety verdict: %j', (overrides) => {
+      47 |     const result = score([row(), row(overrides)]);
+    > 48 |     expect(result.status).toBe(2);
+         |                           ^
+      49 |     expect(`${result.stdout}${result.stderr}`).toContain('INVALID_INPUT');
+      50 |     expect(result.stdout.trim().split('\n').pop()).not.toBe('STABLE');
+      51 |   });
+
+      at toBe (tests/unit/autoresearch-score-regression.test.js:48:27)
+
+  ● autoresearch regression protocol scoring › invalid protocol data cannot produce a safety verdict: {"dimension":"functional","tier":"SCORE"}
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 0
+
+      46 |   ])('invalid protocol data cannot produce a safety verdict: %j', (overrides) => {
+      47 |     const result = score([row(), row(overrides)]);
+    > 48 |     expect(result.status).toBe(2);
+         |                           ^
+      49 |     expect(`${result.stdout}${result.stderr}`).toContain('INVALID_INPUT');
+      50 |     expect(result.stdout.trim().split('\n').pop()).not.toBe('STABLE');
+      51 |   });
+
+      at toBe (tests/unit/autoresearch-score-regression.test.js:48:27)
+
+  ● autoresearch regression protocol scoring › rejects invalid threshold NaN
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 1
+
+      52 |   test.each(['NaN', 'Infinity', '101', '-1', 'not-a-number'])('rejects invalid threshold %s', (threshold) => {
+      53 |     const result = score([row()], { threshold });
+    > 54 |     expect(result.status).toBe(2);
+         |                           ^
+      55 |     expect(`${result.stdout}${result.stderr}`).toContain('INVALID_INPUT');
+      56 |   });
+      57 |   test('malformed cells cannot be padded into evidence', () => {
+
+      at toBe (tests/unit/autoresearch-score-regression.test.js:54:27)
+
+  ● autoresearch regression protocol scoring › rejects invalid threshold Infinity
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 1
+
+      52 |   test.each(['NaN', 'Infinity', '101', '-1', 'not-a-number'])('rejects invalid threshold %s', (threshold) => {
+      53 |     const result = score([row()], { threshold });
+    > 54 |     expect(result.status).toBe(2);
+         |                           ^
+      55 |     expect(`${result.stdout}${result.stderr}`).toContain('INVALID_INPUT');
+      56 |   });
+      57 |   test('malformed cells cannot be padded into evidence', () => {
+
+      at toBe (tests/unit/autoresearch-score-regression.test.js:54:27)
+
+  ● autoresearch regression protocol scoring › rejects invalid threshold 101
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 1
+
+      52 |   test.each(['NaN', 'Infinity', '101', '-1', 'not-a-number'])('rejects invalid threshold %s', (threshold) => {
+      53 |     const result = score([row()], { threshold });
+    > 54 |     expect(result.status).toBe(2);
+         |                           ^
+      55 |     expect(`${result.stdout}${result.stderr}`).toContain('INVALID_INPUT');
+      56 |   });
+      57 |   test('malformed cells cannot be padded into evidence', () => {
+
+      at toBe (tests/unit/autoresearch-score-regression.test.js:54:27)
+
+  ● autoresearch regression protocol scoring › rejects invalid threshold -1
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 0
+
+      52 |   test.each(['NaN', 'Infinity', '101', '-1', 'not-a-number'])('rejects invalid threshold %s', (threshold) => {
+      53 |     const result = score([row()], { threshold });
+    > 54 |     expect(result.status).toBe(2);
+         |                           ^
+      55 |     expect(`${result.stdout}${result.stderr}`).toContain('INVALID_INPUT');
+      56 |   });
+      57 |   test('malformed cells cannot be padded into evidence', () => {
+
+      at toBe (tests/unit/autoresearch-score-regression.test.js:54:27)
+
+  ● autoresearch regression protocol scoring › rejects invalid threshold not-a-number
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 1
+
+      52 |   test.each(['NaN', 'Infinity', '101', '-1', 'not-a-number'])('rejects invalid threshold %s', (threshold) => {
+      53 |     const result = score([row()], { threshold });
+    > 54 |     expect(result.status).toBe(2);
+         |                           ^
+      55 |     expect(`${result.stdout}${result.stderr}`).toContain('INVALID_INPUT');
+      56 |   });
+      57 |   test('malformed cells cannot be padded into evidence', () => {
+
+      at toBe (tests/unit/autoresearch-score-regression.test.js:54:27)
+
+  ● autoresearch regression protocol scoring › malformed cells cannot be padded into evidence
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 0
+
+      56 |   });
+      57 |   test('malformed cells cannot be padded into evidence', () => {
+    > 58 |     expect(score([row(), '1\tmissing']).status).toBe(2);
+         |                                                 ^
+      59 |   });
+      60 |   test('excluded baseline states cannot inflate the score', () => {
+      61 |     const result = score([row({ subscore: '0' }), row({ classification: 'baseline-unavailable', subscore: '100' })], { threshold: '40' });
+
+      at Object.toBe (tests/unit/autoresearch-score-regression.test.js:58:49)
+
+  ● autoresearch regression protocol scoring › excluded baseline states cannot inflate the score
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      60 |   test('excluded baseline states cannot inflate the score', () => {
+      61 |     const result = score([row({ subscore: '0' }), row({ classification: 'baseline-unavailable', subscore: '100' })], { threshold: '40' });
+    > 62 |     expect(result.status).toBe(1);
+         |                           ^
+      63 |     expect(result.stdout).toContain('stability_score = 0.00');
+      64 |   });
+      65 |   test('historical and new failures do not become HARD regressions', () => {
+
+      at Object.toBe (tests/unit/autoresearch-score-regression.test.js:62:27)
+
+  ● autoresearch regression protocol scoring › an unavailable baseline cannot be scored as stable
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      69 |   test('an unavailable baseline cannot be scored as stable', () => {
+      70 |     const result = score([row({ classification: 'baseline-unavailable' })]);
+    > 71 |     expect(result.status).toBe(1);
+         |                           ^
+      72 |     expect(result.stdout).toContain('BASELINE_UNAVAILABLE');
+      73 |   });
+      74 | });
+
+      at Object.toBe (tests/unit/autoresearch-score-regression.test.js:71:27)
+
+Test Suites: 1 failed, 1 total
+Tests:       20 failed, 4 passed, 24 total
+Snapshots:   0 total
+Time:        0.862 s
+Ran all test suites within paths "tests/unit/autoresearch-score-regression.test.js".

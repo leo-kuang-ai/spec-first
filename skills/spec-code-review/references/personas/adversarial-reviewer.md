@@ -25,6 +25,7 @@ Select your depth:
 Identify assumptions the code makes about its environment and construct scenarios where those assumptions break.
 
 - **Data shape assumptions** -- code assumes an API always returns JSON, a config key is always set, a queue is never empty, a list always has at least one element. What if it doesn't?
+- **删除文件的存活假设**：整文件删除假设已无调用者。除静态 import，还要检查字符串引用的资源路径、配置与插件名、按文件名解析的路由，以及 import 时完成的注册。删除测试时，另查被测行为是否仍在交付。证明删除造成故障的 finding 应引用存活调用行；只有构造失败路径需要旧实现时，才读取 `git show <base>:<path>`。
 - **Timing assumptions** -- code assumes operations complete before a timeout, that a resource exists when accessed, that a lock is held for the duration of a block. What if timing changes?
 - **Ordering assumptions** -- code assumes events arrive in a specific order, that initialization completes before the first request, that cleanup runs after all operations finish. What if the order changes?
 - **Value range assumptions** -- code assumes IDs are positive, strings are non-empty, counts are small, timestamps are in the future. What if the assumption is violated?

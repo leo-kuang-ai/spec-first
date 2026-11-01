@@ -11,7 +11,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { assertContainedPath } = require('./path-safety.cjs');
+const { assertContainedPath, writeContainedFile } = require('./path-safety.cjs');
 const { CANONICAL_HOSTS } = require('./host-authority.cjs');
 const {
   renderRoutingInstruction,
@@ -97,7 +97,7 @@ function injectRoutingInstruction({
       const existing = exists ? readEntryDoc(abs) : '';
       const next = upsertRoutingBlock(existing, block);
       if (next !== existing) {
-        fs.writeFileSync(abs, next, 'utf8');
+        writeContainedFile(workspaceRoot, abs, next, { reasonCode: 'routing-entry-escapes-workspace' });
         entry.status = exists ? 'updated' : 'created';
       } else {
         entry.status = 'unchanged';
@@ -147,7 +147,7 @@ function stripRoutingInstruction({
       const existing = readEntryDoc(abs);
       const next = stripRoutingBlock(existing);
       if (next !== existing) {
-        fs.writeFileSync(abs, next, 'utf8');
+        writeContainedFile(workspaceRoot, abs, next, { reasonCode: 'routing-entry-escapes-workspace' });
         entry.status = 'stripped';
       } else {
         entry.status = 'unchanged';

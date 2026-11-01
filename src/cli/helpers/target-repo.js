@@ -28,6 +28,13 @@ const GENERATED_RUNTIME_PREFIXES = Object.freeze([
   '.qoder/hooks/prd-prewrite-guard/',
   '.qoder/hooks/prd-readiness-guard/',
   '.qoder/rules/spec-first.md',
+  '.opencode/commands/spec-',
+  '.opencode/commands/spec/',
+  '.opencode/skills/',
+  '.opencode/agents/',
+  '.opencode/spec-first/',
+  '.zcode/spec-first/',
+  '.pi/spec-first/',
 ]);
 const GENERATED_RUNTIME_ROOTS = Object.freeze([
   '.claude',
@@ -52,6 +59,16 @@ const GENERATED_RUNTIME_ROOTS = Object.freeze([
   '.qoder/rules/spec-first.md',
   '.qoder/settings.local.json',
   '.qoder/settings.json',
+  '.opencode/commands/spec',
+  '.opencode/skills',
+  '.opencode/agents',
+  '.opencode/spec-first',
+  'opencode.json',
+  'opencode.jsonc',
+  '.zcode/spec-first',
+  '.zcode/hooks/session-start',
+  '.zcode/config.json',
+  '.pi/spec-first',
 ]);
 
 function resolveTargetRepoRoot(targetRepo) {
@@ -63,9 +80,14 @@ function resolveTargetRepoRoot(targetRepo) {
     if (!fs.existsSync(root) || !fs.statSync(root).isDirectory()) {
       return { ok: false, errors: ['target repo does not exist or is not a directory'] };
     }
-    const topLevel = execFileSync('git', ['-C', root, 'rev-parse', '--show-toplevel'], {
+    const env = { ...process.env };
+    for (const key of Object.keys(env)) if (key.startsWith('GIT_')) delete env[key];
+    env.GIT_OPTIONAL_LOCKS = '0';
+    const topLevel = execFileSync('git', ['-c', 'core.fsmonitor=false', '-C', root, 'rev-parse', '--show-toplevel'], {
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
+      env,
+      timeout: 5000,
     }).trim();
     const realRoot = fs.realpathSync(root);
     const realTopLevel = fs.realpathSync(path.resolve(topLevel));
@@ -78,9 +100,15 @@ function resolveTargetRepoRoot(targetRepo) {
   return { ok: true, root };
 }
 
-function validateOutputContainment(targetRepoRoot, absoluteArtifactPath) {
+function validateOutputContainment(targetRepoRoot, absoluteArtifactPath, options = {}) {
   const errors = [];
   const rootPath = path.resolve(targetRepoRoot);
+  const candidate = path.resolve(absoluteArtifactPath);
+  const within = (root, child) => {
+    const relative = path.relative(root, child);
+    return relative !== '..' && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative);
+  };
+  if (!within(rootPath, candidate)) return { errors: ['artifact output escapes target repo'] };
   let realRepoRoot;
   try {
     realRepoRoot = fs.realpathSync(rootPath);
@@ -88,27 +116,28 @@ function validateOutputContainment(targetRepoRoot, absoluteArtifactPath) {
     return { errors: [`target repo realpath failed: ${error.message}`] };
   }
 
-  let current = path.dirname(absoluteArtifactPath);
-  while (current && path.resolve(current) !== path.dirname(path.resolve(current))) {
-    if (fs.existsSync(current)) {
-      let stat;
-      let realAncestor;
-      try {
-        stat = fs.lstatSync(current);
-        realAncestor = fs.realpathSync(current);
-      } catch (error) {
-        errors.push(`artifact output ancestor cannot be inspected: ${path.relative(rootPath, current) || '.'}`);
+  // Existing artifact consumers own leaf/type diagnostics; task ownership opts into the full path.
+  const inspectedTarget = options.includeLeaf || candidate === rootPath ? candidate : path.dirname(candidate);
+  // Inspect ancestors before descendants so dangling links cannot look absent.
+  let current = rootPath;
+  for (const segment of path.relative(rootPath, inspectedTarget).split(path.sep).filter(Boolean)) {
+    current = path.join(current, segment);
+    try {
+      const stat = fs.lstatSync(current);
+      if (stat.isSymbolicLink() || !within(realRepoRoot, fs.realpathSync(current))) {
+        errors.push(`artifact output ancestor escapes target repo: ${path.relative(rootPath, current) || '.'}`);
+        break;
       }
-      if (stat && realAncestor) {
-        const isTargetRoot = path.resolve(current) === rootPath;
-        const relative = path.relative(realRepoRoot, realAncestor);
-        if ((!isTargetRoot && stat.isSymbolicLink()) || relative.startsWith('..') || path.isAbsolute(relative)) {
-          errors.push(`artifact output ancestor escapes target repo: ${path.relative(rootPath, current) || '.'}`);
-        }
+      if (current !== candidate && !stat.isDirectory()) {
+        if (options.includeLeaf) errors.push(`artifact output ancestor is not a directory: ${path.relative(rootPath, current)}`);
+        break;
+      }
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        errors.push(`artifact output ancestor cannot be inspected: ${path.relative(rootPath, current) || '.'}`);
+        break;
       }
     }
-    if (path.resolve(current) === rootPath) break;
-    current = path.dirname(current);
   }
 
   return { errors };
@@ -121,15 +150,16 @@ function validateRepoRelativeField(value, field, errors, options = {}) {
     return;
   }
   const normalized = String(value).replace(/\\/g, '/');
-  if (normalized === '.git' || normalized.startsWith('.git/')) {
+  const portable = normalized.toLowerCase();
+  if (portable === '.git' || portable.startsWith('.git/')) {
     errors.push(`${field} must not point at Git internals`);
   }
   if (isSecretDeniedPath(normalized)) {
     errors.push(`${field} must not point at secret-denied paths`);
   }
   if (
-    GENERATED_RUNTIME_ROOTS.includes(normalized)
-    || GENERATED_RUNTIME_PREFIXES.some((prefix) => normalized.startsWith(prefix))
+    GENERATED_RUNTIME_ROOTS.includes(portable)
+    || GENERATED_RUNTIME_PREFIXES.some((prefix) => portable.startsWith(prefix))
   ) {
     errors.push(`${field} must not point at generated runtime mirrors`);
   }

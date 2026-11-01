@@ -1,0 +1,9 @@
+{
+  "workspace_snapshot": "workspace-observation-after-initial-dispatch.json",
+  "timing": "Captured after the first three trials were dispatched; not a pre-dispatch enforcement receipt.",
+  "earlier_bindings": [
+    "../acceptance-resume/source-identities.json",
+    "../acceptance-resume/protection-check.json"
+  ],
+  "claim": "Read-only tool traces and subsequent source/index comparison are observational evidence only."
+}

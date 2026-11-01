@@ -15,8 +15,10 @@ result with a pipeline or fallback string.
 | `git rev-parse --abbrev-ref origin/HEAD` | remote default branch | resolve through `gh repo view`; if still unknown, keep the base unresolved |
 | `gh pr list --head <branch> --state open --json number,url,title,body,state,isDraft,headRefName,headRepositoryOwner` | existing PR | exit-0 `[]` means none; non-zero is unknown, never none |
 
-Pass the branch name only to `gh pr list`. On a fork checkout, target the base
-repository with `-R <owner>/<repo>` when needed; do not pass
+Resolve and retain the exact repository root, hosting domain, base owner/repository, selected base branch and head owner/branch from the caller and Git/GitHub facts. Run from that root or use the tool's explicit repository argument; a subdirectory or sibling checkout cannot change the target. Match remote endpoints, not just the name origin.
+
+Pass the branch name only to `gh pr list`. Target the confirmed base
+repository with `--repo <host/owner/repo>`; do not pass
 `<owner>:<branch>`, because that can silently return an empty result. If the
 branch is detached, skip the PR query until the caller's authorized branch
 workflow resolves a branch. Branch creation and checkout remain separate
@@ -35,7 +37,7 @@ application; unresolved ownership or multiple matches blocks mutation.
 ## Branch Routing
 
 Resolve the remote default through `origin/HEAD`, then
-`gh repo view --json defaultBranchRef` against the intended repository. If
+`gh repo view <host/owner/repo> --json defaultBranchRef` against the intended repository. If
 neither resolves it, stop with an unresolved base; do not assume `main`.
 
 - Detached HEAD: within an authorized full-workflow branch scope, derive and

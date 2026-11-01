@@ -12,11 +12,11 @@
 
 ## 强制基线
 
-处理任何涉及 spec-first 演化、架构判断、prompt / workflow / contract 设计、治理规则取舍的工作前，必须先阅读 `docs/10-prompt/结构化项目角色契约.md`。
+处理任何涉及 spec-first 演化、架构判断、prompt / workflow / contract 设计、治理规则取舍的工作前，必须先阅读 `docs/methodology/结构化项目角色契约.md`。
 
 该文档是项目角色与演化判断基线的 source of truth，用于校准系统目标、脚本与 LLM 职责分工、source/runtime 边界，以及 **Light contract + Explicit boundaries + Deterministic floor, LLM semantic judgment** 的含义。
 
-如果本文件与 `docs/10-prompt/结构化项目角色契约.md` 冲突，优先按角色契约执行，再调整本文件或当前执行方案。
+如果本文件与 `docs/methodology/结构化项目角色契约.md` 冲突，优先按角色契约执行，再调整本文件或当前执行方案。
 
 ## 工作角色
 

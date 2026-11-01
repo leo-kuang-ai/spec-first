@@ -23,13 +23,15 @@ and codebase findings take priority over these notes.
 [relevant entries here]
 ```
 
-5. Pass this block as additional context to the Context Analyzer and Solution Extractor task prompts in Phase 1. If any memory notes end up in the final documentation (e.g., as part of the investigation steps or root cause analysis), tag them with "(auto memory [claude])" so their origin is clear to future readers.
+5. Use this block as supplementary input to parent-owned classification and drafting in Phase 1. If any memory notes end up in the final documentation (e.g., as part of the investigation steps or root cause analysis), tag them with "(auto memory [claude])" so their origin is clear to future readers.
 
 If no relevant entries are found, proceed to Phase 1 without passing memory context.
 
 ### Phase 1: Research
 
-Run the research roles. When the Dispatch Authorization Boundary is satisfied, launch research subagents and have each write its full output to a per-run scratch artifact. Otherwise execute Context Analyzer, Solution Extractor, and Related Docs Finder serially inline, writing their run-local scratch artifacts from the orchestrator so Phase 2 keeps the same input contract.
+The parent owns classification and body drafting because these depend on the full available session evidence, including failed attempts and why the fix worked. A fresh worker cannot recover that evidence from the final diff. Keep `context.json` and `solution.md` as parent-written scratch inputs to assembly. Missing session evidence stays an explicit gap; do not reconstruct an investigation history from the implementation.
+
+Enumerate the current corpus and perform a bounded related-doc search inline. Delegate the Related Docs Finder only when reading the candidate corpus would materially benefit from a separate context and the Dispatch Authorization Boundary is satisfied. A small corpus stays inline. An absent/empty corpus produces an explicit empty `related.json`; an unreadable or incomplete search records limited coverage, never a no-overlap conclusion.
 
 **Run ID and run dir (before dispatching any subagent):** generate a unique run identifier and create the run directory. This scopes every Phase 1 artifact file to the same directory so the orchestrator can Read them back in Phase 2.
 
@@ -48,23 +50,24 @@ Current source is the authority for code-behavior claims. Every promoted learnin
 
 **CRITICAL — glob `docs/solutions/` fresh every run.** `spec-compound` writes new learnings there, so even a run-local orientation assembled earlier cannot stand in for the live enumeration in step 3.
 
-Pass `{run_id}` and the verified `<private-scratch-dir>` into every Phase 1 subagent prompt. Recheck that the directory remains owned and non-symlink before publishing each file with same-directory temp + atomic rename. Each subagent **writes its full structured output** to its own file there, **confirms the write succeeded** (the file exists and is non-empty), and then **returns only a one-line confirmation containing the artifact path** — not the prose body inline. Artifact filenames by subagent:
+Pass `{run_id}` and the verified `<private-scratch-dir>` into every Phase 1 subagent prompt. Recheck that the directory remains owned and non-symlink before publishing each file with same-directory temp + atomic rename. Each subagent **writes its full structured output** to its own file there, **confirms the write succeeded** (the file exists and is non-empty), and then **returns only a one-line confirmation containing the artifact path** — not the prose body inline. Artifact filenames and owners:
 
-- **Context Analyzer** → `<private-scratch-dir>/context.json` (frontmatter skeleton, category path, filename, track)
-- **Solution Extractor** → `<private-scratch-dir>/solution.md` (the full doc-body prose sections)
+- **Parent classification** → `<private-scratch-dir>/context.json` (frontmatter skeleton, category path, filename, track)
+- **Parent drafting** → `<private-scratch-dir>/solution.md` (the full doc-body prose sections)
 - **Related Docs Finder** → `<private-scratch-dir>/related.json` (links, refresh candidates, overlap assessment)
 - **Session History** synthesis subagent (when run) → `<private-scratch-dir>/session-history.md` (prose findings)
 
 **Return the full output inline whenever the artifact write did not succeed.** This covers both cases where the orchestrator's Phase 2 inline fallback would otherwise have nothing to read: (a) `{run_id}` is empty or did not resolve (non-Claude-Code platforms where the pre-resolution failed), so there is no path to write to; and (b) `{run_id}` resolved but the write itself failed — tool permission denied, absolute-path writes unavailable, disk error, or the post-write existence check came back empty. In either case the subagent must return its complete structured output inline instead of a path, because the path would point at a file that does not exist. Return only the bare path when — and only when — the write is confirmed on disk. The artifact pattern is a reliability improvement, not a hard requirement; the orchestrator handles a missing artifact in Phase 2 by using the inline return.
 
 **Execution order:**
-- With authorized dispatch, launch `Context Analyzer`, `Solution Extractor`, and `Related Docs Finder` in bounded parallel. Without it, run the same roles serially inline and preserve their separate artifacts/results without presenting them as independent agents.
-- **Then**, only when explicit restricted-read authorization exists, run the internal session-history discovery/extraction/synthesis flow (see step 4 below) in Full mode — skipped in lightweight and headless. Its cheap discovery+metadata probe runs after authorization and escalates only on a relevance hit. With separately authorized background dispatch it overlaps the research roles; in inline fallback it runs after the three serial research roles so one orchestrator does not interleave several context-heavy jobs. Without restricted-read authorization, record `restricted_read_authorization_missing` and do not inspect session roots or related tool schemas.
+- Classify and draft in the parent context. A warranted, authorized finder may run alongside this work; otherwise search inline. Pass the finder the problem, observed fix, relevant paths, known terms/aliases and exact corpus scope, not a claim that it sees the conversation.
+- **Then**, only when explicit restricted-read authorization exists, run the internal session-history discovery/extraction/synthesis flow (see step 4 below) in Full mode — skipped in lightweight and headless. Its cheap discovery+metadata probe runs after authorization and escalates only on a relevance hit. With separately authorized background dispatch it overlaps the research roles; in inline fallback it runs after the parent research and corpus search so one orchestrator does not interleave several context-heavy jobs. Without restricted-read authorization, record `restricted_read_authorization_missing` and do not inspect session roots or related tool schemas.
 
 ### Research roles
 
-#### 1. **Context Analyzer**
-   - Extracts conversation history
+#### 1. **Classify in the parent context**
+   - Uses the available session evidence without inventing missing history
+   - Reads relevant existing corpus frontmatter and known domain aliases to avoid synonymous duplicates. Classification Contract v2 still owns closed enums and category mapping; preserve precise local terms in `module`/`tags`, not invented enum values.
    - Reads `references/schema.yaml` for enum validation and **track classification**
    - Determines the track (bug or knowledge) from the problem_type
    - Identifies problem type, component, and track-appropriate fields:
@@ -73,14 +76,14 @@ Pass `{run_id}` and the verified `<private-scratch-dir>` into every Phase 1 suba
    - Incorporates auto memory excerpts (if provided by the orchestrator) as supplementary evidence
    - Reads `references/yaml-schema.md` for category mapping into `docs/solutions/`
    - Suggests a filename using the pattern `[sanitized-problem-slug].md` — no date suffix, even if existing files in the target directory have one; the `date:` frontmatter field is the canonical creation date
-   - Writes to `context.json`: YAML frontmatter skeleton (must include `category:` plus the promotion exit fields `source_refs:` and `invalidation_condition:`), category directory path, suggested filename, and which track applies. Returns only the artifact path.
+   - Writes to `context.json`: YAML frontmatter skeleton (must include `category:` plus the promotion exit fields `source_refs:` and `invalidation_condition:`), category directory path, suggested filename, and which track applies. The parent retains the evidence behind the classification.
    - Does not invent enum values, categories, or frontmatter fields from memory; reads the schema and mapping files above
    - Does not force bug-track fields onto knowledge-track learnings or vice versa
 
-#### 2. **Solution Extractor**
+#### 2. **Draft the body in the parent context**
    - Reads `references/schema.yaml` for track classification (bug vs knowledge)
    - Adapts output structure based on the problem_type track
-   - **Writes the full doc-body prose** (all track-appropriate sections below) to `solution.md` and returns only the artifact path. This is the subagent most prone to the issue #956 summary-collapse, so its prose must land on disk rather than only in the inline return.
+   - **Writes the full doc-body prose** (all track-appropriate sections below) to `solution.md`. Preserve observed failed alternatives, unique measurements, cross-file invariants and the reasoning behind the fix; a recap of the final diff does not replace these facts.
    - Incorporates auto memory excerpts (if provided by the orchestrator) as supplementary evidence -- conversation history and the verified fix take priority; if memory notes contradict the conversation, note the contradiction as cautionary context
    - **Grounds code-behavior claims in source, not conversation memory.** Before asserting how code behaves (enum values, status semantics, limits, defaults), Read the defining line at the current tree and cite `file:line` alongside the claim. A claim that cannot be verified against the tree is softened or attributed ("per this session's conclusion…"), never stated as fact
    - **Writes merge-state claims for time.** Cite PR numbers rather than bare commit SHAs — SHAs are rewritten by rebase/squash merges and may not exist on other checkouts. A "fixed in X" claim requires the fix to be reachable from the current tree; otherwise phrase it as pending ("fix opened in #1608, unmerged as of this writing")
@@ -107,15 +110,12 @@ Pass `{run_id}` and the verified `<private-scratch-dir>` into every Phase 1 suba
    - Identifies cross-references and links
    - Finds related GitHub issues
    - Flags any related learning or pattern docs that may now be stale, contradicted, or overly broad
-   - **Assesses overlap** with the new doc being created across five dimensions: problem statement, root cause, solution approach, referenced files, and prevention rules. Score as:
-     - **High**: 4-5 dimensions match — essentially the same problem solved again
-     - **Moderate**: 2-3 dimensions match — same area but different angle or solution
-     - **Low**: 0-1 dimensions match — related but distinct
-   - Writes to `related.json`: Links, relationships, refresh candidates, and overlap assessment (score + which dimensions matched). Returns only the artifact path.
+   - **Assesses semantic overlap** using the problem, root cause, applicability, solution and prevention guidance. Shared paths or matching words alone do not establish duplication. High overlap means the existing document already teaches the same lesson in the same conditions; moderate overlap retains a distinct cause, condition or remedy; low overlap is only contextual. Explain the matching claims and the unique knowledge each document carries rather than counting matched dimensions.
+   - Writes to `related.json`: links, relationships, refresh candidates, overlap rationale, unique claims, and search coverage/limitations. The parent verifies the referenced documents before deciding to update or create; the finder never authorizes consolidation or deletion.
 
    **Search strategy (grep-first filtering for efficiency):**
 
-   1. Extract keywords from the problem context: module names, technical terms, error messages, component types
+   1. Extract keywords from the problem context: module names, technical terms, known aliases, error messages, component types. Search related aliases across categories before concluding no overlap; legacy classification is not proof of a distinct lesson.
    2. If the problem category is clear, narrow search to the matching `docs/solutions/<category>/` directory
    3. Use the native content-search tool (e.g., Grep in Claude Code) to pre-filter candidate files BEFORE reading any content. Run multiple searches in parallel, case-insensitive, targeting frontmatter fields. These are template patterns -- substitute actual keywords:
       - `title:.*<keyword>`

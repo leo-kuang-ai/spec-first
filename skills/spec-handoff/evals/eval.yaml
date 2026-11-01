@@ -8,6 +8,8 @@ engine:
   name: claude_code
 cases:
   files:
+    - evals/cases/check-review-continuation.yaml
+    - evals/cases/check-research-continuation.yaml
     - evals/cases/ordinary-continuation-not-triggered.yaml
     - evals/cases/create-produces-gate-fields.yaml
     - evals/cases/resume-explicit-source-stops-without-acting.yaml

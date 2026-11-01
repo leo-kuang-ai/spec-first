@@ -35,3 +35,5 @@ const server = http.createServer((req, res) => {
 if (require.main === module) {
   server.listen(3000);
 }
+
+module.exports = { parseEntry };

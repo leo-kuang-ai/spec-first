@@ -1,0 +1,135 @@
+FAIL tests/unit/spec-optimize-contracts.test.js
+  spec-optimize experiment index parsing
+    ○ skipped cleanup 010 does not retarget experiment 008
+    ○ skipped cleanup accepts the zero-padded index 008
+    ○ skipped cleanup accepts the zero-padded index 009
+    ○ skipped cleanup accepts the zero-padded index 099
+    ○ skipped rejects a non-numeric experiment index
+    ○ skipped rejects an experiment index outside the governed 0..999 range: -1
+    ○ skipped rejects an experiment index outside the governed 0..999 range: 1000
+    ○ skipped rejects an experiment index outside the governed 0..999 range: 18446744073709551616
+    ○ skipped accepts the maximum governed experiment index 999 without retargeting
+  spec-optimize worktree registration lookup
+    ○ skipped recognizes its own registered worktree under a path segment My Experiments
+    ○ skipped recognizes its own registered worktree under a path segment plain
+  spec-optimize 实验目录所有权与数据保护
+    ✕ 重复创建保留 tracked、untracked 与 ignored 内容 (160 ms)
+    ✓ cleanup-all 不删除同前缀普通目录或陌生注册 worktree (128 ms)
+    ✕ 默认清理保护 untracked 工作，显式 discard 只清理所属实验 (234 ms)
+    ✕ 默认清理保护 ignored 工作，显式 discard 只清理所属实验 (241 ms)
+    ✕ 默认清理保护 committed 工作，显式 discard 只清理所属实验 (291 ms)
+    ✓ 干净且所属的实验可幂等创建和清理 (307 ms)
+    ✕ 已有同名分支不因 create 被重置 (174 ms)
+    ✕ create 拒绝指向根外的 .worktrees 链接 (109 ms)
+  spec-optimize contracts
+    ○ skipped uses validation_rules as the full optimization spec validation source of truth
+    ○ skipped preserves CE optimization-loop dispatch and wrap-up safeguards
+    ○ skipped 只列出拥有真实 optimization artifact intake 的 downstream consumer
+
+  ● spec-optimize 实验目录所有权与数据保护 › 重复创建保留 tracked、untracked 与 ignored 内容
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      148 |     fs.writeFileSync(path.join(worktree, 'ignored.bin'), 'ignored WIP');
+      149 |     const result = runExperiment(dir, ['create', 'myspec', '1', 'main']);
+    > 150 |     expect(result.ok).toBe(false);
+          |                       ^
+      151 |     expect(fs.readFileSync(path.join(worktree, 'README.md'), 'utf8')).toBe('tracked WIP');
+      152 |     expect(fs.readFileSync(path.join(worktree, 'notes.txt'), 'utf8')).toBe('untracked WIP');
+      153 |     expect(fs.readFileSync(path.join(worktree, 'ignored.bin'), 'utf8')).toBe('ignored WIP');
+
+      at Object.toBe (tests/unit/spec-optimize-contracts.test.js:150:23)
+
+  ● spec-optimize 实验目录所有权与数据保护 › 默认清理保护 untracked 工作，显式 discard 只清理所属实验
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      172 |     fs.writeFileSync(path.join(worktree, 'keep.txt'), 'KEEP');
+      173 |     if (kind === 'committed') { git(['add', 'keep.txt'], worktree); git(['commit', '-m', 'experiment'], worktree); }
+    > 174 |     expect(runExperiment(dir, ['cleanup', 'myspec', '1']).ok).toBe(false);
+          |                                                               ^
+      175 |     expect(fs.readFileSync(path.join(worktree, 'keep.txt'), 'utf8')).toBe('KEEP');
+      176 |     expect(runExperiment(dir, ['cleanup', '--discard', 'myspec', '1']).ok).toBe(true);
+      177 |     expect(fs.existsSync(worktree)).toBe(false);
+
+      at toBe (tests/unit/spec-optimize-contracts.test.js:174:63)
+
+  ● spec-optimize 实验目录所有权与数据保护 › 默认清理保护 ignored 工作，显式 discard 只清理所属实验
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      172 |     fs.writeFileSync(path.join(worktree, 'keep.txt'), 'KEEP');
+      173 |     if (kind === 'committed') { git(['add', 'keep.txt'], worktree); git(['commit', '-m', 'experiment'], worktree); }
+    > 174 |     expect(runExperiment(dir, ['cleanup', 'myspec', '1']).ok).toBe(false);
+          |                                                               ^
+      175 |     expect(fs.readFileSync(path.join(worktree, 'keep.txt'), 'utf8')).toBe('KEEP');
+      176 |     expect(runExperiment(dir, ['cleanup', '--discard', 'myspec', '1']).ok).toBe(true);
+      177 |     expect(fs.existsSync(worktree)).toBe(false);
+
+      at toBe (tests/unit/spec-optimize-contracts.test.js:174:63)
+
+  ● spec-optimize 实验目录所有权与数据保护 › 默认清理保护 committed 工作，显式 discard 只清理所属实验
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      172 |     fs.writeFileSync(path.join(worktree, 'keep.txt'), 'KEEP');
+      173 |     if (kind === 'committed') { git(['add', 'keep.txt'], worktree); git(['commit', '-m', 'experiment'], worktree); }
+    > 174 |     expect(runExperiment(dir, ['cleanup', 'myspec', '1']).ok).toBe(false);
+          |                                                               ^
+      175 |     expect(fs.readFileSync(path.join(worktree, 'keep.txt'), 'utf8')).toBe('KEEP');
+      176 |     expect(runExperiment(dir, ['cleanup', '--discard', 'myspec', '1']).ok).toBe(true);
+      177 |     expect(fs.existsSync(worktree)).toBe(false);
+
+      at toBe (tests/unit/spec-optimize-contracts.test.js:174:63)
+
+  ● spec-optimize 实验目录所有权与数据保护 › 已有同名分支不因 create 被重置
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      192 |     const before = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: dir, encoding: 'utf8' });
+      193 |     git(['checkout', 'main'], dir);
+    > 194 |     expect(runExperiment(dir, ['create', 'myspec', '1', 'main']).ok).toBe(false);
+          |                                                                      ^
+      195 |     expect(execFileSync('git', ['rev-parse', 'optimize-exp/myspec/exp-001'], { cwd: dir, encoding: 'utf8' })).toBe(before);
+      196 |   });
+      197 |
+
+      at Object.toBe (tests/unit/spec-optimize-contracts.test.js:194:70)
+
+  ● spec-optimize 实验目录所有权与数据保护 › create 拒绝指向根外的 .worktrees 链接
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      200 |     fs.mkdirSync(outside);
+      201 |     fs.symlinkSync(outside, path.join(dir, '.worktrees'));
+    > 202 |     expect(runExperiment(dir, ['create', 'myspec', '1', 'main']).ok).toBe(false);
+          |                                                                      ^
+      203 |     expect(fs.readdirSync(outside)).toEqual([]);
+      204 |   });
+      205 | });
+
+      at Object.toBe (tests/unit/spec-optimize-contracts.test.js:202:70)
+
+Test Suites: 1 failed, 1 total
+Tests:       6 failed, 14 skipped, 2 passed, 22 total
+Snapshots:   0 total
+Time:        1.822 s
+Ran all test suites within paths "tests/unit/spec-optimize-contracts.test.js".

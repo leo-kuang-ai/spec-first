@@ -1,0 +1,34 @@
+FAIL tests/unit/spec-prd-finalize-transition.test.js
+  spec-prd final intent and receipt transition
+    ✓ check-only blocks final intent until the machine receipt exists (4 ms)
+    ✓ write mode atomically creates a receipt that the read-only verifier accepts (4 ms)
+    ✓ artifact mutation makes the receipt stale and blocks closeout (2 ms)
+    ✓ input mutation makes the receipt stale and blocks closeout (2 ms)
+    ✓ input refresh cannot re-sign changed PRD body (15 ms)
+    ✓ input refresh cannot re-sign changed PRD body-and-input (15 ms)
+    ✓ input refresh cannot re-sign changed PRD metadata (12 ms)
+    ✓ input-only refresh retains the PRD hash and restores a verified receipt (8 ms)
+    ✕ product words in implementation questions are advisory, while explicit WHAT conflicts block (1 ms)
+
+  ● spec-prd final intent and receipt transition › product words in implementation questions are advisory, while explicit WHAT conflicts block
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      173 |     const text = finalIntentPrd().replace(marker, question + marker);
+      174 |     const report = buildReport(prdPath, text, { inputs: [inputPath] });
+    > 175 |     expect(report.facts.possible_misclassified_how_pushdown_count).toBe(1);
+          |                                                                    ^
+      176 |     expect(report.facts.blocking_reason_codes).not.toContain('how_pushdown_touches_what');
+      177 |     expect(report.facts.blocking_reason_codes).not.toContain('preflight_closure_contradicted');
+      178 |     write(prdPath, text);
+
+      at Object.toBe (tests/unit/spec-prd-finalize-transition.test.js:175:68)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 8 passed, 9 total
+Snapshots:   0 total
+Time:        0.187 s, estimated 1 s
+Ran all test suites within paths "tests/unit/spec-prd-finalize-transition.test.js".

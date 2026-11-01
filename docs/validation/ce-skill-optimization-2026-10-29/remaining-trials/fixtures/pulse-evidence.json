@@ -1,0 +1,82 @@
+{
+  "product": "Support Desk",
+  "window": {
+    "start": "2026-10-29T00:00:00Z",
+    "end": "2026-10-30T00:00:00Z"
+  },
+  "config": {
+    "pulse_product_name": "Support Desk",
+    "pulse_analytics_source": "posthog",
+    "pulse_tracing_source": "sentry",
+    "pulse_payments_source": "stripe",
+    "pulse_metric_sources": "revenue=finance-ledger,active_agents=posthog",
+    "pulse_db_enabled": false,
+    "pulse_quality_scoring": true,
+    "pulse_schedule": "manual"
+  },
+  "receipts": [
+    {
+      "source": "finance-ledger",
+      "status": "confirmed-zero",
+      "values": {
+        "revenue_usd": 0
+      },
+      "reason_code": "query-succeeded",
+      "freshness": "2026-10-30T00:02:00Z"
+    },
+    {
+      "source": "posthog",
+      "status": "unavailable",
+      "reason_code": "timeout",
+      "values": null,
+      "freshness": "2026-10-30T00:03:00Z"
+    },
+    {
+      "source": "sentry",
+      "status": "confirmed-value",
+      "reason_code": "query-succeeded",
+      "values": {
+        "latency_ms": {
+          "p50": 82,
+          "p95": 240,
+          "p99": 510
+        },
+        "errors": [
+          {
+            "signature": "ExportTimeout",
+            "count": 3
+          },
+          {
+            "signature": "InvalidMonth",
+            "count": 1
+          }
+        ]
+      },
+      "freshness": "2026-10-30T00:03:00Z"
+    },
+    {
+      "source": "stripe",
+      "status": "confirmed-zero",
+      "reason_code": "query-succeeded",
+      "values": {
+        "new_customers": 0,
+        "churned_customers": 0
+      },
+      "freshness": "2026-10-30T00:02:00Z"
+    },
+    {
+      "source": "quality-sample",
+      "status": "not-run",
+      "reason_code": "quality-source-minimization-unavailable",
+      "values": null,
+      "limitations": [
+        "Provider cannot remove identity fields before returning conversation content. No raw content fetched."
+      ]
+    }
+  ],
+  "notes": [
+    "All receipts are supplied local fixture exports, not live provider observations.",
+    "Active-agent count is unknown after timeout.",
+    "The source owner explicitly maps strategy revenue to finance-ledger; Stripe is not canonical for that metric."
+  ]
+}

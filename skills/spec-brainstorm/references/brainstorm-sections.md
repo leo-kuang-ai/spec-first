@@ -39,7 +39,7 @@ artifact contract:
 A requirements-only unified plan is kept **light and standalone-readable**. It
 includes:
 
-- `## Goal Capsule` with objective, product authority, and open blockers.
+- `## Goal Capsule` with objective, product authority, and open blockers. Distinguish the desired user outcome from the chosen means: the objective remains meaningful if implementation changes; a short means line cites the owning product decision when useful, without adding HOW or a second requirement.
 - `## Product Contract` containing the brainstorm sections below.
 
 Do **not** emit a `## Goal Launch Block` or `## Reader Index`: the launch prompt
@@ -385,3 +385,7 @@ contains; rendering references are about HOW each format presents it. The
 brainstorm is written in one format — markdown OR HTML, never both — based
 on the resolved output mode. The section catalog is the same regardless of
 format.
+
+## Reference the Owning Rule
+
+Keep a settled product choice in Key Decisions with its authentic provenance and `Governs R...` links; keep its behavioral requirements at their R-IDs. Other sections and examples cite the applicable owner instead of restating thresholds, defaults or permissions that could drift. Technical implementation remains planning-owned. When work is split, preserve any actual dependency or acceptance relationship in existing scope/context sections; do not invent a roadmap or new machine marker.

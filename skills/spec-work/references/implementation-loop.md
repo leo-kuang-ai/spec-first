@@ -25,6 +25,7 @@ Do not implement or declare completion without the loop's scope and evidence che
    3. For behavior-bearing work, apply [Feedback and tests](feedback-and-tests.md): establish the smallest loop, choose proof/characterization/replacement evidence, and keep the slice vertical.
    4. Before durable-surface mutation, apply [Implementation quality](implementation-quality.md): inventory current owners, recheck `reuse / extend / compose / new`, and stop back on unapproved architecture/scope.
    5. Implement only the current slice in canonical source, update the correct existing/new tests, rerun the same loop, then run applicable system-wide/integration checks.
+      同一失败检查连续两次修复仍未通过时，先停止继续打补丁，指出两次修复共有的假设并回源核查；范围内可纠正的假设直接修正并记录证据。只有纠正会改变已定决策、需要缺失权限或只能由用户提供的信息时，才阻断对应动作，不将常规调试重新变成全流程审批。
    6. Inspect the actual changed tree against declared scope; record behavior/test/red-or-characterization/command/result/exception evidence. Do not reconstruct worker-only pre-implementation observations from the diff.
    7. For task packs, compute attributed task delta facts and close any `review_gate: required` with bounded `spec-code-review mode:agent` before dependent waves. Caller-owned fixes rerun affected verification; at most one follow-up review is allowed. Blocking/degraded round two stops; non-blocking P2/P3 remains run-local residual work.
    8. Mark complete only after scope, evidence, required review, and blockers close. Record a logical commit candidate; create it only with `commit_authorization: authorized`.
@@ -56,14 +57,17 @@ Do not implement or declare completion without the loop's scope and evidence che
 
    If **`spec-simplify-code`** is available, invoke it at phase boundaries (especially before Phase 3 when the cluster has >=30 substantive human-authored code lines). Generated, mechanical, configuration-only, or test-fixture volume alone does not trigger this threshold. Preserve the same classification and protected-surface constraints. Pass relevant settled decisions as structure constraints, not as an expansion of the simplification scope; concrete defect evidence still requires resolution. Otherwise, perform the bounded pass inline. Rerun the same feedback loop for every `remove-now` or authorized architecture correction.
 
+   At this handoff, apply `references/feedback-and-tests.md` § Preserve proof through cleanup. Pass every evidence-bound test as `proof-test:<path>` with its unit/task, test-only seams, command/log refs and current byte identity. These are protection context, not wider scope. Consume the returned preservation comparison and missing/stale limitations; rerun the original symptom and proof tests after edits before final-tree closeout.
+
 6. **Figma Design Sync** (if applicable)
 
    For UI work with Figma designs:
 
-   - Implement components following design specs
-   - Read `references/agents/figma-design-sync.md` to compare implementation against the Figma design. Dispatch a generic subagent only when `references/execution-strategy.md` permits it; otherwise apply the same prompt inline and disclose missing independent coverage.
-   - Fix visual differences identified
-   - Repeat until implementation matches design
+   - Preserve the plan's design target and project tokens; pass the exact Figma node, relevant frame widths/states and owning source paths.
+   - Obtain current private implementation screenshots through the internal `spec-test-browser` owner for the exact origin/route and matching frame widths. Pass those refs with freshness and explicit comparison-only or bounded local-mutation authority to `references/agents/figma-design-sync.md`.
+   - Dispatch a generic subagent only when `references/execution-strategy.md` permits it; otherwise apply the same comparison inline and disclose missing independent coverage. Missing Figma/browser capability or evidence blocks visual claims, not independent authorized code work.
+   - Consume the returned observations and source refs. Decide which differences are defects or intentional token/layout choices; do not let the leaf redefine WHAT, substitute generic layout rules or widen scope. Apply only authorized confirmed corrections.
+   - After edits, capture fresh caller-owned browser evidence and compare again. Record intentional differences, unobserved widths/states and unresolved intent; code checks alone cannot close visual acceptance.
 
 7. **Frontend Design Guidance** (if applicable)
 

@@ -1,0 +1,8 @@
+{
+  "session_id": "01a18b0b-0ef3-72d0-9d4d-27a1e45e9ce2",
+  "transcript_sha256": "0c08ffc82f16309a70ccf45aad1a8f1d76a44a641d60d0fad9850857028950bf",
+  "review_source": "fresh-independent-readonly-context",
+  "mutation_policy": "report-only",
+  "producer_fixes_applied": 0,
+  "limitations": "Bounded review equivalent; not a full multi-persona spec-doc-review run. Serving model identity not authenticated."
+}

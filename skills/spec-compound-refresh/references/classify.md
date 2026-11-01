@@ -10,6 +10,8 @@ After gathering evidence, assign one recommended action.
 
 Replace requires evidence that the old recommendation no longer governs and that the successor is trustworthy. Follow these rules even when a later shorthand says that a changed implementation is a Replace signal.
 
+**已核实的失效条件是重审依据，不是安全移除证明。** 当 `invalidation_condition` 的外部条件已满足，按当前证据重新分类；若 repo 仍保留文档解释的 workaround，继续保留解释现状所需的文档（Keep，或只修正失真的具体表述为 Update），在 Recommended 单列代码移除与验证建议。不能先删说明、留下仍在运行的 workaround。条件未满足不单独决定 Keep；无法检查则按下述 unverifiable 边界保留不确定性。
+
 **Unverifiable is not false.** Operational practices, environment behavior, or
 external schema facts may have no in-repo witness. Never delete, strip during
 consolidation, or stale-mark a plausible claim solely because the repo cannot

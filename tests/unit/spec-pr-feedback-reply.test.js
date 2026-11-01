@@ -45,7 +45,7 @@ function calls() {
 }
 
 test('reply posts once to the root REST endpoint and preserves multiline Markdown', () => {
-  const body = '> reviewer\n\nFixed `$foo` and $(false).';
+  const body = '> reviewer\n\nFixed `$foo`, \\literal and $(false).\n\n';
   const result = run('reply-to-pr-thread', ['42', '1001', 'o/r'], body);
   expect(result.status).toBe(0);
   expect(JSON.parse(result.stdout).id).toBe(2002);

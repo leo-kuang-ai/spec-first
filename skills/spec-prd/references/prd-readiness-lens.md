@@ -153,6 +153,20 @@ Run this pack only when the PRD includes goals/metrics, internal workflow/skill/
 
 Frontmatter `status` is machine-owned once a PRD artifact exists. The LLM may keep a document at `status: draft` / checkpoint while it is still being shaped, but it must not write `status: ready-for-planning` directly; that status requires the producer-local finalize receipt (`readiness_verified_by: check-prd-artifact.js`, current `readiness_prd_hash`, and current `readiness_inputs_hash`). Conversely, a polished document can still return `revise-prd` or `ask-owner`.
 
+The checker reports PRD and input freshness separately as
+`ready_receipt_prd_current` and `ready_receipt_inputs_current`. The optional
+`--refresh-inputs-hash` path can renew only changed input evidence while the
+receipt's PRD content hash still matches. Changed product text or non-receipt
+metadata requires the normal authorized refine/finalization path; input refresh
+must not re-sign it. Check-only remains read-only.
+
+`possible_misclassified_how_pushdown_count` is advisory: terms such as permission,
+interface or fallback also occur in legitimate implementation questions. Inspect
+the actual question, product decision and evidence before judging its owner.
+`how_pushdown_touches_what` blocks only an explicit contradiction between
+`implementation-only-how-pushdown` and `planning_would_invent_what: yes` in a
+ready claim. Other declared blockers and closure checks remain mandatory.
+
 When closing a PRD handoff or writing `Readiness Self-Check`, state `readiness_outcome` explicitly using exactly one of:
 
 - `ready-for-planning` - planning can consume the PRD without inventing WHAT.

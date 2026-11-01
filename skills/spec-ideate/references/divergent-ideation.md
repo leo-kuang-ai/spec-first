@@ -19,6 +19,8 @@ Each frame targets ~6-8 ideas (a two-frame agent targets that per frame), yieldi
 
 When tactical scope is active, use tactical's dials instead. A raw total overrides the default per-frame target and is divided across the resolved frames; a survivor count changes only the final cut. Apply the verification budget per agent, not per frame: 2-3 targeted reads under tactical scope, 5 by default, and 10 under `go deep`.
 
+When an explicit raw total exceeds the active tactical default, restore at least the default 5-read allowance; `go deep` retains 10. A larger candidate count does not establish deeper verification: disclose reduced evidence depth per idea when the fixed budget cannot cover it. Carry resolved raw total, survivor count and effective read allowance to the verifier and final cut; do not reset them on an issue-signal fallback.
+
 ## Dispatch Payload (cache-friendly, long-context ordered)
 
 Build one shared grounding block and keep it byte-identical across every ideation dispatch this run — identical prefixes let platforms with prompt caching reuse the expensive part. Longform shared material goes first; the agent-specific task goes last:
@@ -50,7 +52,7 @@ Assign each sub-agent its frame (or frame pair) as a **starting bias, not a cons
 5. **Cross-domain analogy** — generate ideas by asking how completely different fields solve a structurally analogous problem. The grounding domain is the user's topic; the analogy domain is anywhere else (other industries, biology, games, infrastructure, history). Push past the obvious analogy to non-obvious ones.
 6. **Constraint-flipping** — invert the obvious constraint to its opposite or extreme. What if the budget were 10x or 0? What if the team were 100 people or 1? What if there were no users, or 1M? Use the resulting design as a candidate even if the constraint flip itself is not realistic.
 
-**Issue-tracker mode override (repo mode only).** When issue-tracker intent is active and themes were returned by the issue intelligence agent: each high/medium-confidence theme becomes a frame. Pad with frames from the 6-frame default pool (in the order listed above) if fewer than 3 cluster-derived frames. Cap at 4 total — issue-tracker mode keeps its tighter dispatch by design. Theme frames dispatch on the generation tier (themes are evidence-driven); padded frames keep their native tier.
+**Issue-tracker mode override (repo mode only).** When issue-tracker intent is active and usable themes were returned, choose frames by expected leverage (severity, recurrence, breadth and prevalence), using confidence to distinguish similarly valuable themes. A high-impact low-confidence signal can remain a clearly labeled hypothesis needing evidence; it must not become a confirmed fact. Pad from the six default frames if fewer than 3 theme frames qualify. Cap at 4 total; theme frames use the generation tier and padded frames keep their native tier.
 
 **Axis spread instruction.** When an axis list is present, instruct each sub-agent to distribute its ideas across multiple axes — the frame's lens applies to every axis, but ideas should not all cluster on one. Each idea must be tagged with the axis it targets. The frame is a lens; the axis list is the surface map. A frame that plausibly reaches an axis should produce at least one idea there before doubling up on a different axis. When decomposition was skipped (atomic subject or surprise-me), omit the axis instruction entirely — do not invent axes at dispatch time.
 

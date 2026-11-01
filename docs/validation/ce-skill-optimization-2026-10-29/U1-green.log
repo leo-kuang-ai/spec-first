@@ -1,0 +1,8 @@
+PASS tests/unit/spec-optimize-contracts.test.js (8.978 s)
+PASS tests/unit/spec-optimize-loop-contracts.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       27 passed, 27 total
+Snapshots:   0 total
+Time:        9.023 s
+Ran all test suites within paths "tests/unit/spec-optimize-contracts.test.js", "tests/unit/spec-optimize-loop-contracts.test.js".

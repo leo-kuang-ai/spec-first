@@ -1,0 +1,94 @@
+FAIL tests/unit/mcp-setup-workspace-git-exclude.test.js
+  ● workspace-git-exclude — managed .git/info/exclude writer › 悬空 leaf 链接失败保全且不创建根外文件
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      55 |       fs.rmSync(link, { recursive: true, force: true });
+      56 |       fs.symlinkSync(target, link, kind === 'leaf' ? 'file' : 'dir');
+    > 57 |       expect(addManagedExclude(repo, ws).ok).toBe(false);
+         |                                              ^
+      58 |       expect(removeManagedExclude(repo, ws).ok).toBe(false);
+      59 |       expect(fs.existsSync(target)).toBe(false);
+      60 |       expect(fs.lstatSync(link).isSymbolicLink()).toBe(true);
+
+      at toBe (tests/unit/mcp-setup-workspace-git-exclude.test.js:57:46)
+
+  ● workspace-git-exclude — managed .git/info/exclude writer › 悬空 ancestor 链接失败保全且不创建根外文件
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      56 |       fs.symlinkSync(target, link, kind === 'leaf' ? 'file' : 'dir');
+      57 |       expect(addManagedExclude(repo, ws).ok).toBe(false);
+    > 58 |       expect(removeManagedExclude(repo, ws).ok).toBe(false);
+         |                                                 ^
+      59 |       expect(fs.existsSync(target)).toBe(false);
+      60 |       expect(fs.lstatSync(link).isSymbolicLink()).toBe(true);
+      61 |     } finally {
+
+      at toBe (tests/unit/mcp-setup-workspace-git-exclude.test.js:58:49)
+
+  ● workspace-git-exclude — managed .git/info/exclude writer › Git 定位环境不改变 exclude 和 snapshot 的仓库身份
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 3
+    + Received  + 3
+
+      Object {
+    -   "head_sha": "5bbee64b9979a1378987d8403f58c6aec4ca170e",
+    +   "head_sha": "4501d805414924c11d454a7e0c41df05b7bc2180",
+        "head_state": "commit",
+        "observed": true,
+        "repo_id": "a",
+    -   "worktree_clean": false,
+    -   "worktree_fingerprint": "3e67755fe375bf7d5eb0a4f17a4fb0cc71125b098a8a497ed6fb2f95f5f12d73",
+    +   "worktree_clean": true,
+    +   "worktree_fingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      }
+
+      82 |       process.env.GIT_CONFIG_KEY_0 = 'core.bare';
+      83 |       process.env.GIT_CONFIG_VALUE_0 = 'true';
+    > 84 |       expect(inspectRepoSnapshot({ repo_id: 'a', git_root: a })).toEqual(before);
+         |                                                                  ^
+      85 |       expect(addManagedExclude(a, ws)).toMatchObject({ ok: true, target: path.join(a, '.git/info/exclude') });
+      86 |       expect(fs.readFileSync(path.join(b, '.git/info/exclude'), 'utf8')).toBe(excludeB);
+      87 |     } finally {
+
+      at Object.toEqual (tests/unit/mcp-setup-workspace-git-exclude.test.js:84:66)
+
+FAIL tests/unit/mcp-setup-workspace-routing-inject.test.js
+  ● injectRoutingInstruction — upsert routing block into workspace entry docs › 悬空入口链接不能创建根外文件，拒绝后可恢复正常写入
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 2
+    + Received  + 2
+
+      Object {
+    -   "reason_code": "routing-entry-escapes-workspace",
+    -   "status": "failed",
+    +   "reason_code": "",
+    +   "status": "created",
+      }
+
+      72 |       fs.symlinkSync(target, entry);
+      73 |       const result = injectRoutingInstruction({ workspaceRoot: ws, hosts: ['codex'] });
+    > 74 |       expect(result.entries[0]).toMatchObject({ status: 'failed', reason_code: 'routing-entry-escapes-workspace' });
+         |                                 ^
+      75 |       expect(fs.existsSync(target)).toBe(false);
+      76 |       expect(fs.lstatSync(entry).isSymbolicLink()).toBe(true);
+      77 |       fs.unlinkSync(entry);
+
+      at Object.toMatchObject (tests/unit/mcp-setup-workspace-routing-inject.test.js:74:33)
+
+Test Suites: 2 failed, 2 total
+Tests:       4 failed, 16 passed, 20 total
+Snapshots:   0 total
+Time:        1.446 s
+Ran all test suites within paths "tests/unit/mcp-setup-workspace-routing-inject.test.js", "tests/unit/mcp-setup-workspace-git-exclude.test.js".

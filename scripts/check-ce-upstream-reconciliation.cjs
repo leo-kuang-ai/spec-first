@@ -214,6 +214,10 @@ function assertRepoPath(filePath, label) {
   if (relative === '' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
     throw new Error(`${label} 必须位于当前仓库内：${filePath}`);
   }
+  let ancestor = path.resolve(filePath);
+  while (!fs.existsSync(ancestor)) ancestor = path.dirname(ancestor);
+  const real = fs.realpathSync(ancestor);
+  if (real !== fs.realpathSync(REPO_ROOT) && !real.startsWith(`${fs.realpathSync(REPO_ROOT)}${path.sep}`)) throw new Error(`ce-sync-output-symlink-escape: ${label}`);
 }
 
 function parseArgs(argv) {
@@ -222,6 +226,10 @@ function parseArgs(argv) {
   const args = {
     ceRepo: null,
     refresh: false,
+    createWindowFacts: false,
+    windowFactsPath: null,
+    validateRunArtifactPath: null,
+    runHandoffPath: null,
     verifyLegacy: false,
     fullWindow: false,
     prepareAdjudication: false,
@@ -240,7 +248,21 @@ function parseArgs(argv) {
   };
   for (let index = 0; index < argv.length; index += 1) {
     const token = argv[index];
-    if (token === '--refresh') {
+    if (token === '--create-window-facts') {
+      args.createWindowFacts = true;
+    } else if (token === '--run-handoff') {
+      const value = argv[++index];
+      if (!value) throw new Error('--run-handoff 需要路径。');
+      args.runHandoffPath = path.resolve(value);
+    } else if (token === '--validate-run-artifact') {
+      const value = argv[++index];
+      if (!value) throw new Error('--validate-run-artifact 需要路径。');
+      args.validateRunArtifactPath = path.resolve(value);
+    } else if (token === '--window-facts') {
+      const value = argv[++index];
+      if (!value) throw new Error('--window-facts 需要路径。');
+      args.windowFactsPath = path.resolve(value);
+    } else if (token === '--refresh') {
       args.refresh = true;
     } else if (token === '--verify-legacy') {
       args.verifyLegacy = true;
@@ -297,10 +319,10 @@ function parseArgs(argv) {
   if (args.prepareAdjudication && !args.ceRepo) {
     throw new Error('--prepare-adjudication 必须提供 --ce-repo。');
   }
-  if (!args.verifyLegacy && !args.fullWindow && !args.prepareAdjudication && !args.filelistPath) {
+  if (!args.verifyLegacy && !args.fullWindow && !args.prepareAdjudication && !args.createWindowFacts && !args.validateRunArtifactPath && !args.filelistPath) {
     throw new Error('新窗口必须提供 --filelist。');
   }
-  if (!args.verifyLegacy && !args.fullWindow && !args.prepareAdjudication && !args.filelistSha256) {
+  if (!args.verifyLegacy && !args.fullWindow && !args.prepareAdjudication && !args.createWindowFacts && !args.validateRunArtifactPath && !args.filelistSha256) {
     throw new Error('新窗口必须提供 --filelist-sha256。');
   }
   if (args.filelistSha256 && !/^[a-f0-9]{64}$/i.test(args.filelistSha256)) {
@@ -687,8 +709,12 @@ function isStringArray(value, allowEmpty = true) {
     && value.every((entry) => typeof entry === 'string' && entry.length > 0);
 }
 
+const CURRENT_RUN_ROOT = 'docs/validation/ce-pull-2026-10-27';
+const CURRENT_RUN_FILES = new Set(['window-facts.json', 'execution-state.json', 'execution-baseline.json', 'producer-name-status.tsv', 'target-source-inventory.json', 'adjudication-input.json', 'adjudication.json', 'ledger.json', 'summary.md', 'artifact-set.json', 'work-return.json', 'verification-run-summary.json', 'honest-closeout.md', 'handoff.json', 'semantic-screening.json', 'plan-review.json']);
 function isRunOutput(relativePath) {
-  return V2_RUN_OUTPUTS.includes(relativePath)
+  let current = relativePath.startsWith(`${CURRENT_RUN_ROOT}/`) ? relativePath.slice(CURRENT_RUN_ROOT.length + 1) : null;
+  if (current) current = current.replace(/^runs\/[a-z0-9-]+\//, '');
+  return (current !== null && (CURRENT_RUN_FILES.has(current) || /^(logs|owner-receipts|admissions|ledger-patches|staging)\//.test(current))) || V2_RUN_OUTPUTS.includes(relativePath)
     || relativePath.startsWith(`${V2_PATCH_DIR}/`)
     || relativePath === CE_LOCALIZATION_VALIDATION_DIR
     || relativePath.startsWith(`${CE_LOCALIZATION_VALIDATION_DIR}/`);
@@ -755,6 +781,9 @@ function buildTargetSourceSnapshot(repoRoot = REPO_ROOT, inventory = null) {
       source_roots: [...CANONICAL_SOURCE_ROOTS],
       excluded_run_outputs: [
         ...V2_RUN_OUTPUTS,
+        ...[...CURRENT_RUN_FILES].map((file) => `${CURRENT_RUN_ROOT}/${file}`),
+        ...[...CURRENT_RUN_FILES].map((file) => `${CURRENT_RUN_ROOT}/runs/<run-id>/${file}`),
+        ...['logs', 'owner-receipts', 'admissions', 'ledger-patches', 'staging'].map((dir) => `${CURRENT_RUN_ROOT}/${dir}/**`),
         `${V2_PATCH_DIR}/**`,
         `${CE_LOCALIZATION_VALIDATION_DIR}/**`,
       ],
@@ -834,7 +863,7 @@ function validateAdjudicationArtifact(artifact, {
     seen.add(record.path);
     const upstreamEntry = expectedByPath.get(record.path);
     if (!upstreamEntry) throw new Error(`adjudication path is outside name-status: ${record.path}`);
-    if (record.old_path !== undefined && record.old_path !== upstreamEntry.old_path) {
+    if ((record.old_path || null) !== (upstreamEntry.old_path || null)) {
       throw new Error(`adjudication old_path mismatch: ${record.path}`);
     }
     if (!V2_GROUPS.has(record.group_id) || record.group_id !== groupFor(record.path)) {
@@ -844,8 +873,8 @@ function validateAdjudicationArtifact(artifact, {
       throw new Error(`adjudication deterministic classification mismatch: ${record.path}`);
     }
     const isG01 = record.group_id === 'G01';
-    if (isG01) {
-      const expectedPackageId = PACKAGE_BY_SURFACE[record.surface];
+    if (isG01 && packagePathFor(record.path)) {
+      const expectedPackageId = expectedPackageIds.some((id) => id.includes('/')) ? packagePathFor(record.path) : PACKAGE_BY_SURFACE[record.surface];
       if (!expectedPackageId || !expectedPackageIds.includes(expectedPackageId)
         || record.package_id !== expectedPackageId) {
         throw new Error(`G01 record package_id mismatch: ${record.path}`);
@@ -883,7 +912,7 @@ function validateAdjudicationArtifact(artifact, {
       && /^U\d+[a-z]?$/.test(record.implementation_unit);
     const expectedClosureProfile = record.target_action === 'out-of-scope-by-product-decision'
       ? 'product-excluded'
-      : (isG01 ? 'source-adjudication' : 'evidence-only');
+      : record.target_action === 'evidence-only' ? 'evidence-only' : 'source-adjudication';
     if (record.closure_profile !== expectedClosureProfile) {
       throw new Error(`closure_profile mismatch: ${record.path}`);
     }
@@ -949,6 +978,8 @@ function validateAdjudicationInput(input, { nameStatus, upstream, nameStatusSha2
       throw new Error(`adjudication input path join mismatch: ${record.path}`);
     }
     seen.add(record.path);
+    const expectedEntry = nameStatus.find((entry) => entry.path === record.path);
+    if (record.status !== expectedEntry.status || (record.old_path || null) !== (expectedEntry.old_path || null) || record.surface !== surfaceFor(record.path)) throw new Error(`adjudication input path facts mismatch: ${record.path}`);
     if (record.group_id !== groupFor(record.path) || record.role !== v2RoleFor(record.path)) {
       throw new Error(`adjudication input deterministic classification mismatch: ${record.path}`);
     }
@@ -958,6 +989,16 @@ function validateAdjudicationInput(input, { nameStatus, upstream, nameStatusSha2
 }
 
 function buildPackageSummary(records, expectedPackageIds = PACKAGE_IDS) {
+  if (expectedPackageIds.some((id) => id.includes('/'))) {
+    return expectedPackageIds.map((id) => {
+      const entries = records.filter((record) => record.package_id === id);
+      if (!entries.length) throw new Error(`package_summary missing ${id}`);
+      return { package_id: id, surface: entries[0].surface, changed_path_count: entries.length,
+        record_paths: entries.map((record) => record.path),
+        actions: countBy(entries, (record) => record.target_action),
+        closure_profiles: countBy(entries, (record) => record.closure_profile) };
+    });
+  }
   const grouped = new Map(expectedPackageIds.map((packageId) => [packageId, []]));
   for (const record of records) {
     if (record.group_id === 'G01') {
@@ -1067,6 +1108,7 @@ function buildAdjudicationInput(nameStatus, {
   targetSourceSnapshot,
   inventory,
   nameStatusContent,
+  windowFacts = null,
 } = {}) {
   if (!targetSourceSnapshot || !inventory) throw new Error('adjudication input requires target source snapshot and inventory');
   const inventoryPaths = new Set((inventory.files || []).map((entry) => entry.path));
@@ -1086,7 +1128,7 @@ function buildAdjudicationInput(nameStatus, {
     records: nameStatus.map((entry, index) => {
       const groupId = groupFor(entry.path);
       const surface = surfaceFor(entry.path);
-      const packageId = groupId === 'G01' ? PACKAGE_BY_SURFACE[surface] : null;
+      const packageId = groupId === 'G01' ? (windowFacts ? packagePathFor(entry.path) : PACKAGE_BY_SURFACE[surface]) : null;
       return {
         audit_id: `A${String(index + 1).padStart(3, '0')}`,
         path: entry.path,
@@ -1097,6 +1139,7 @@ function buildAdjudicationInput(nameStatus, {
         surface,
         role: v2RoleFor(entry.path),
         source_facts: {
+          ...(windowFacts ? windowFacts.objects.find((object) => object.path === entry.path) : {}),
           current_owner_surface_candidate: groupId === 'G01' ? OWNER_BY_SURFACE[surface] || null : null,
           owner_exists_in_inventory: Boolean(OWNER_BY_SURFACE[surface] && inventoryPaths.has(OWNER_BY_SURFACE[surface])),
         },
@@ -1148,7 +1191,7 @@ function buildV2Ledger(nameStatus, artifact, options = {}) {
   });
   const packageSummary = buildPackageSummary(records, options.expectedPackageIds || PACKAGE_IDS);
   return {
-    schema_version: V2_SCHEMA_VERSION,
+    schema_version: options.expectedPackageIds && options.expectedPackageIds.some((id) => id.includes('/')) ? 'ce-upstream-reconciliation/v3' : V2_SCHEMA_VERSION,
     upstream: { ...upstream, name_status_sha256: nameStatusSha256 },
     target_source_snapshot: targetSourceSnapshot,
     adjudication: {
@@ -1302,12 +1345,12 @@ function buildV2SummaryMarkdown(ledger, inventory, options = {}) {
     entry.package_id,
     entry.surface,
     entry.changed_path_count,
-    entry.canonical_owner || 'product-excluded',
+    entry.record_paths ? '逐路径记录' : entry.canonical_owner || 'product-excluded',
     entry.implementation_unit || 'not-applicable',
-    entry.target_action,
-    entry.evidence_status,
+    entry.actions ? Object.entries(entry.actions).map(([action, count]) => `${action}:${count}`).join(', ') : entry.target_action,
+    entry.evidence_status || '逐路径记录',
   ].join(' | '));
-  return `---\nartifact_type: confirmed-reconciliation-ledger\nschema_version: ${V2_SCHEMA_VERSION}\nupstream_range: ${base}..${head}\n---\n\n# CE post-3.20 Full-Window Reconciliation\n\n该摘要由对账器消费独立的 LLM adjudication artifact 后生成。脚本只校验 Git、path、snapshot、schema 与聚合不变量，不生成 owner、action 或 limitation 语义判断。\n\n## 冻结事实\n\n- 路径：${ledger.records.length}\n- 分组：${Object.entries(groupCounts).map(([group, count]) => `${group}=${count}`).join(', ')}\n- package：${ledger.package_summary.length}\n- G01 package 路径：${packagePathCount}\n- adjudication SHA-256：\`${ledger.adjudication.artifact_sha256}\`\n- target source HEAD：\`${ledger.target_source_snapshot.head}\`\n- target source dirty：${ledger.target_source_snapshot.dirty}\n\n## Package Summary\n\npackage_id | surface | paths | canonical_owner | implementation_unit | target_action | evidence_status\n--- | --- | ---: | --- | --- | --- | ---\n${packageRows.join('\n')}\n\n详细逐路径事实见 \`${ledgerPath}\`；当前 source inventory 见 \`${inventoryPath}\`。\n`;
+  return `---\nartifact_type: confirmed-reconciliation-ledger\nschema_version: ${ledger.schema_version}\nupstream_range: ${base}..${head}\n---\n\n# CE Full-Window Reconciliation\n\n该摘要由对账器消费独立的 LLM adjudication artifact 后生成。脚本只校验 Git、path、snapshot、schema 与聚合不变量，不生成 owner、action 或 limitation 语义判断。\n\n## 冻结事实\n\n- 路径：${ledger.records.length}\n- 分组：${Object.entries(groupCounts).map(([group, count]) => `${group}=${count}`).join(', ')}\n- package：${ledger.package_summary.length}\n- G01 package 路径：${packagePathCount}\n- adjudication SHA-256：\`${ledger.adjudication.artifact_sha256}\`\n- target source HEAD：\`${ledger.target_source_snapshot.head}\`\n- target source dirty：${ledger.target_source_snapshot.dirty}\n\n## Package Summary\n\npackage_id | surface | paths | canonical_owner | implementation_unit | target_action | evidence_status\n--- | --- | ---: | --- | --- | --- | ---\n${packageRows.join('\n')}\n\n详细逐路径事实见 \`${ledgerPath}\`；当前 source inventory 见 \`${inventoryPath}\`。\n`;
 }
 
 function loadSnapshotNameStatus(nameStatusPath = NAME_STATUS_PATH) {
@@ -1319,13 +1362,251 @@ function loadSnapshotTargetActions(ledgerPath = path.join(REPO_ROOT, LEDGER_PATH
   return new Map((snapshot.records || []).map((record) => [record.path, record.target_action]));
 }
 
+function packagePathFor(filePath) {
+  const match = filePath.match(/^(?:\.agents\/)?skills\/[^/]+(?=\/)/);
+  return match ? match[0] : null;
+}
+
+function objectAt(repo, ref, filePath, runGit = git) {
+  if (!filePath) return null;
+  const entry = runGit(repo, ['ls-tree', ref, '--', filePath]).trim();
+  if (!entry) throw new Error(`ce-sync-object-missing: ${ref}:${filePath}`);
+  const match = entry.match(/^(\d+) (blob|commit|tree) ([a-f0-9]+)\t/);
+  if (!match || match[2] !== 'blob') throw new Error(`ce-sync-object-type: ${filePath}`);
+  return { mode: match[1], type: match[2], git_oid: match[3] };
+}
+
+function createWindowFacts(repo, base, head, runGit = git, outputRoot = CURRENT_RUN_ROOT) {
+  const resolvedBase = runGit(repo, ['rev-parse', `${base}^{commit}`]).trim();
+  const resolvedHead = runGit(repo, ['rev-parse', `${head}^{commit}`]).trim();
+  if (resolvedBase !== base || resolvedHead !== head) throw new Error('ce-sync-immutable-refs-required');
+  runGit(repo, ['merge-base', '--is-ancestor', base, head]);
+  const content = runGit(repo, ['diff', '--name-status', '--find-renames', `${base}..${head}`]);
+  const entries = parseNameStatus(content);
+  if (new Set(entries.map((entry) => entry.path)).size !== entries.length) throw new Error('ce-sync-duplicate-path');
+  const objects = entries.map((entry) => ({
+    path: entry.path,
+    ...(entry.old_path ? { old_path: entry.old_path } : {}),
+    status: entry.status,
+    old_object: entry.status === 'A' ? null : objectAt(repo, base, entry.old_path || entry.path, runGit),
+    new_object: entry.status === 'D' ? null : objectAt(repo, head, entry.path, runGit),
+  }));
+  return {
+    schema_version: 'ce-upstream-window/v1',
+    repository: 'compound-engineering-plugin', base, head,
+    total: entries.length,
+    status_counts: countBy(entries, (entry) => entry.status),
+    group_counts: countBy(entries, (entry) => groupFor(entry.path)),
+    name_status_sha256: sha256(content),
+    changed_path_sha256: sha256(`${entries.map((entry) => entry.path).sort().join('\n')}\n`),
+    packages: [...new Set(entries.map((entry) => packagePathFor(entry.path)).filter(Boolean))].sort(),
+    objects,
+    object_inventory_sha256: sha256(stableJson(objects)),
+    merge_order: ['U2', 'U3', 'U4', 'U5', 'U6', 'U9', 'U7'],
+    output_files: [...CURRENT_RUN_FILES].map((file) => `${outputRoot}/${file}`).sort(),
+  };
+}
+
+function verifyWindowFacts(facts, repo, base, head, runGit = git, outputRoot = CURRENT_RUN_ROOT) {
+  const expected = createWindowFacts(repo, base, head, runGit, outputRoot);
+  if (stableJson(facts) !== stableJson(expected)) throw new Error('ce-sync-window-facts-mismatch');
+  return facts;
+}
+
+function publishArtifactSet(files, markerPath) {
+  // manifest 最后发布；消费者必须校验每个文件 hash，拒绝中断留下的混合集合。
+  const manifest = { schema_version: 'ce-upstream-artifact-set/v1', files: files.map(([file, content]) => ({ path: path.relative(REPO_ROOT, file), sha256: sha256(content) })) };
+  const stagingRoot = path.join(path.dirname(markerPath), 'staging');
+  fs.mkdirSync(stagingRoot, { recursive: true });
+  const lockPath = `${markerPath}.lock`;
+  let lock;
+  try { lock = fs.openSync(lockPath, 'wx'); } catch (error) {
+    if (error.code === 'EEXIST') throw new Error('ce-sync-publisher-busy: 使用新 run 目录或确认旧 writer 已退出');
+    throw error;
+  }
+  let staging;
+  try {
+    if (new Set(files.map(([file]) => path.resolve(file))).size !== files.length) throw new Error('ce-sync-output-duplicate');
+    for (const [file, content] of files) {
+      if (fs.existsSync(file) && fs.readFileSync(file, 'utf8') !== content) throw new Error(`ce-sync-output-collision: ${file}`);
+    }
+    staging = fs.mkdtempSync(path.join(stagingRoot, 'publish-'));
+    files.forEach(([file, content], index) => {
+      const temporary = path.join(staging, String(index));
+      fs.writeFileSync(temporary, content, { flag: 'wx' });
+      if (!fs.existsSync(file)) fs.copyFileSync(temporary, file, fs.constants.COPYFILE_EXCL);
+    });
+    const marker = path.join(staging, 'manifest.json');
+    fs.writeFileSync(marker, stableJson(manifest));
+    fs.renameSync(marker, markerPath);
+  } finally {
+    if (staging) fs.rmSync(staging, { recursive: true, force: true });
+    fs.closeSync(lock);
+    fs.unlinkSync(lockPath);
+  }
+}
+
+function verifyArtifactSet(markerPath, requiredFiles) {
+  const marker = JSON.parse(fs.readFileSync(markerPath, 'utf8'));
+  if (marker.schema_version !== 'ce-upstream-artifact-set/v1' || !Array.isArray(marker.files)) throw new Error('ce-sync-artifact-set-invalid');
+  const seen = new Set();
+  for (const file of marker.files) {
+    if (!isSafeRelativePath(file.path) || seen.has(file.path) || !isRunOutput(file.path)) throw new Error('ce-sync-artifact-set-path');
+    seen.add(file.path);
+    if (sha256(fs.readFileSync(path.join(REPO_ROOT, file.path))) !== file.sha256) throw new Error('ce-sync-artifact-set-hash');
+  }
+  if (requiredFiles.some((file) => !seen.has(path.relative(REPO_ROOT, file)))) throw new Error('ce-sync-artifact-set-incomplete');
+}
+
+let runArtifactSchemaValidator;
+function validateRunArtifact(artifact, input, windowFacts, repoRoot = REPO_ROOT, finalRecords = null) {
+  if (!runArtifactSchemaValidator) {
+    const Ajv = require('ajv/dist/2020');
+    runArtifactSchemaValidator = new Ajv({ strict: false }).compile(JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'docs/contracts/verification/ce-upstream-sync-run.schema.json'), 'utf8')));
+  }
+  if (!runArtifactSchemaValidator(artifact)) throw new Error('ce-sync-run-schema');
+  const fail = (reason) => { throw new Error(`ce-sync-${reason}`); };
+  if (!artifact || artifact.schema_version !== 'ce-upstream-sync-run/v1') fail('run-schema');
+  if (!['package-admission', 'owner-receipt', 'handoff'].includes(artifact.kind)) fail('run-kind');
+  if (artifact.window_sha256 !== sha256(stableJson(windowFacts)) || artifact.input_sha256 !== sha256(stableJson(input))) fail('run-identity');
+  assertSnapshotEqual(artifact.target_snapshot, input.target_source_snapshot);
+  for (const field of ['source_refs', 'limitations']) if (!isStringArray(artifact[field], false)) fail(`run-${field}`);
+  if (!Array.isArray(artifact.unresolved) || artifact.unresolved.length) fail('run-unresolved');
+  const readRef = (ref) => {
+    if (!isSafeRelativePath(ref)) fail('run-reference-path');
+    const target = path.resolve(repoRoot, ref);
+    if (fs.lstatSync(target).isSymbolicLink() || !fs.statSync(target).isFile()) fail('run-reference-file');
+    if (!fs.realpathSync(target).startsWith(`${fs.realpathSync(repoRoot)}${path.sep}`)) fail('run-reference-escape');
+    return fs.readFileSync(target);
+  };
+  const checkRefs = (refs) => refs.forEach((ref) => readRef(ref));
+  checkRefs(artifact.source_refs);
+  if (artifact.kind === 'handoff') {
+    for (const field of ['summary', 'freshness', 'next_owner', 'claim_ceiling']) if (typeof artifact[field] !== 'string' || !artifact[field].trim()) fail(`handoff-${field}`);
+    if (!isStringArray(artifact.receipt_refs, false)) fail('handoff-receipts');
+    const seen = new Set();
+    const covered = new Map();
+    for (const ref of artifact.receipt_refs) {
+      if (seen.has(ref)) fail('receipt-duplicate');
+      seen.add(ref);
+      const receipt = JSON.parse(readRef(ref));
+      if (receipt.kind !== 'owner-receipt') fail('handoff-receipt-kind');
+      validateRunArtifact(receipt, input, windowFacts, repoRoot);
+      const admission = JSON.parse(readRef(receipt.admission_ref));
+      for (const file of receipt.paths) {
+        if (covered.has(file)) fail('handoff-path-duplicate');
+        covered.set(file, { receipt, decision: admission.decisions.find((decision) => decision.path === file) });
+      }
+    }
+    if (finalRecords) {
+      for (const record of finalRecords) {
+        if (record.evidence_status === 'planned' || record.degraded) fail('handoff-record-unverified');
+        if (record.closure_profile === 'product-excluded') continue;
+        const evidence = covered.get(record.path);
+        if (!evidence) fail('handoff-path-missing');
+        if (evidence.receipt.unit_id !== record.implementation_unit || evidence.decision.target_action !== record.target_action) fail('handoff-decision-mismatch');
+      }
+    }
+    return true;
+  }
+  if (!/^U\d+$/.test(artifact.unit_id || '') || !isStringArray(artifact.paths, false)) fail('run-unit-paths');
+  const known = new Map(input.records.map((record) => [record.path, record]));
+  if (new Set(artifact.paths).size !== artifact.paths.length || artifact.paths.some((file) => !known.has(file))) fail('run-path-subset');
+  if (artifact.kind === 'package-admission') {
+    if (artifact.package_id !== null && (typeof artifact.package_id !== 'string' || !artifact.package_id)) fail('admission-package');
+    if (artifact.paths.some((file) => packagePathFor(file) !== artifact.package_id)) fail('admission-package-paths');
+    if (!isStringArray(artifact.dependency_refs)) fail('admission-dependencies');
+    checkRefs(artifact.dependency_refs);
+    checkRefs([artifact.review_ref, artifact.authority_ref]);
+    if (!Array.isArray(artifact.decisions) || artifact.decisions.length !== artifact.paths.length) fail('admission-decisions');
+    const seen = new Set();
+    for (const decision of artifact.decisions) {
+      if (!artifact.paths.includes(decision.path) || seen.has(decision.path) || !V2_TARGET_ACTIONS.has(decision.target_action) || typeof decision.rationale !== 'string' || !decision.rationale.trim()) fail('admission-decision');
+      seen.add(decision.path);
+    }
+    return true;
+  }
+  if (typeof artifact.admission_ref !== 'string') fail('receipt-admission');
+  const admissionBytes = readRef(artifact.admission_ref);
+  if (sha256(admissionBytes) !== artifact.admission_sha256) fail('receipt-admission-hash');
+  const admission = JSON.parse(admissionBytes);
+  if (admission.kind !== 'package-admission' || admission.unit_id !== artifact.unit_id || artifact.paths.some((file) => !admission.paths.includes(file))) fail('receipt-admission-scope');
+  if (artifact.admission_input_ref || artifact.admission_window_ref) {
+    if (!artifact.admission_input_ref || !artifact.admission_window_ref) fail('receipt-admission-input');
+    const beforeInput = JSON.parse(readRef(artifact.admission_input_ref));
+    const beforeWindow = JSON.parse(readRef(artifact.admission_window_ref));
+    if (beforeWindow.base !== windowFacts.base || beforeWindow.head !== windowFacts.head || beforeWindow.name_status_sha256 !== windowFacts.name_status_sha256) fail('receipt-admission-window');
+    assertSnapshotEqual(artifact.before_snapshot, beforeInput.target_source_snapshot);
+    validateRunArtifact(admission, beforeInput, beforeWindow, repoRoot);
+  } else {
+    assertSnapshotEqual(artifact.before_snapshot, input.target_source_snapshot);
+    validateRunArtifact(admission, input, windowFacts, repoRoot);
+  }
+  if (!artifact.before_snapshot || !artifact.before_snapshot.source_tree_hash) fail('receipt-before-snapshot');
+  if (!Array.isArray(artifact.changed_files)) fail('receipt-changed-files');
+  const seenFiles = new Set();
+  for (const file of artifact.changed_files) {
+    if (seenFiles.has(file.path) || !isCanonicalSourcePath(file.path) || isRunOutput(file.path)) fail('receipt-file-scope');
+    seenFiles.add(file.path);
+    if (sha256(readRef(file.path)) !== file.sha256) fail('receipt-file-hash');
+  }
+  if (!Array.isArray(artifact.checks) || !artifact.checks.length || !artifact.checks.some((check) => check.required === true)) fail('receipt-checks');
+  for (const check of artifact.checks) {
+    if (!isStringArray(check.argv, false) || typeof check.required !== 'boolean' || !Number.isInteger(check.exit_code) || !['passed', 'failed', 'not-applicable'].includes(check.status)) fail('receipt-check-shape');
+    if (check.required && (check.exit_code !== 0 || check.status !== 'passed')) fail('receipt-check-failed');
+    if (sha256(readRef(check.log_path)) !== check.log_sha256) fail('receipt-log-hash');
+  }
+  for (const field of ['authorization_scope', 'claim_ceiling']) if (typeof artifact[field] !== 'string' || !artifact[field].trim()) fail(`receipt-${field}`);
+  return true;
+}
+
 function main(argv = process.argv.slice(2), runtime = {}) {
   const runGit = runtime.git || git;
   const buildInventory = runtime.buildCurrentInventory || buildCurrentInventory;
   const buildSnapshot = runtime.buildTargetSourceSnapshot || buildTargetSourceSnapshot;
-  const expectedPackageIds = runtime.expectedPackageIds || PACKAGE_IDS;
-  const fullWindowFacts = runtime.fullWindowFacts || FULL_WINDOW_FACTS;
   const args = parseArgs(argv);
+  let windowFacts = null;
+  if (args.windowFactsPath) assertRepoPath(args.windowFactsPath, 'window-facts');
+  if (args.createWindowFacts) {
+    if (!args.ceRepo || !args.windowFactsPath || args.fullWindow || args.prepareAdjudication) throw new Error('ce-sync-create-window-arguments');
+    const outputRoot = path.relative(REPO_ROOT, path.dirname(args.windowFactsPath));
+    if (outputRoot !== CURRENT_RUN_ROOT && !new RegExp(`^${CURRENT_RUN_ROOT}/runs/[a-z0-9-]+$`).test(outputRoot)) throw new Error('ce-sync-window-output-scope');
+    const facts = createWindowFacts(args.ceRepo, args.base, args.head, runGit, outputRoot);
+    const relative = path.relative(REPO_ROOT, args.windowFactsPath);
+    if (path.basename(relative) !== 'window-facts.json') throw new Error('ce-sync-window-output-scope');
+    fs.mkdirSync(path.dirname(args.windowFactsPath), { recursive: true });
+    if (fs.existsSync(args.windowFactsPath)) {
+      if (fs.readFileSync(args.windowFactsPath, 'utf8') !== stableJson(facts)) throw new Error('ce-sync-window-output-collision');
+    } else fs.writeFileSync(args.windowFactsPath, stableJson(facts), { flag: 'wx' });
+    process.stdout.write(`${JSON.stringify({ ok: true, records: facts.total, window_facts: relative })}\n`);
+    return 0;
+  }
+  if (args.windowFactsPath) {
+    if (!args.ceRepo) throw new Error('ce-sync-window-repo-required');
+    windowFacts = verifyWindowFacts(JSON.parse(fs.readFileSync(args.windowFactsPath, 'utf8')), args.ceRepo, args.base, args.head, runGit, path.relative(REPO_ROOT, path.dirname(args.windowFactsPath)));
+  }
+  if (args.validateRunArtifactPath) {
+    assertRepoPath(args.validateRunArtifactPath, 'run-artifact');
+    assertRepoPath(args.adjudicationInputPath, 'adjudication-input');
+    if (!windowFacts) throw new Error('ce-sync-window-facts-required');
+    verifyArtifactSet(path.join(path.dirname(args.windowFactsPath), 'artifact-set.json'), [args.adjudicationInputPath]);
+    const input = JSON.parse(fs.readFileSync(args.adjudicationInputPath, 'utf8'));
+    const inventory = buildInventory({ schemaVersion: 'spec-first-current-skill-package-inventory/v2' });
+    assertSnapshotEqual(input.target_source_snapshot, buildSnapshot(REPO_ROOT, inventory));
+    const entries = windowFacts.objects.map((object) => ({ path: object.path, status: object.status, ...(object.old_path ? { old_path: object.old_path } : {}) }));
+    validateAdjudicationInput(input, { nameStatus: entries, upstream: windowFacts, nameStatusSha256: windowFacts.name_status_sha256, targetSourceSnapshot: input.target_source_snapshot });
+    if (input.records.some((record) => { const object = windowFacts.objects.find((entry) => entry.path === record.path); return stableJson(record.source_facts.old_object) !== stableJson(object.old_object) || stableJson(record.source_facts.new_object) !== stableJson(object.new_object); })) throw new Error('ce-sync-input-object-facts-mismatch');
+    validateRunArtifact(JSON.parse(fs.readFileSync(args.validateRunArtifactPath, 'utf8')), input, windowFacts);
+    process.stdout.write(`${JSON.stringify({ ok: true, kind: 'run-artifact-validation' })}\n`);
+    return 0;
+  }
+  const expectedPackageIds = runtime.expectedPackageIds || (windowFacts ? windowFacts.packages : PACKAGE_IDS);
+  const fullWindowFacts = runtime.fullWindowFacts || windowFacts || FULL_WINDOW_FACTS;
+  if ((args.fullWindow || args.prepareAdjudication) && !windowFacts && !runtime.fullWindowFacts && (args.base !== BASE || args.head !== HEAD)) throw new Error('ce-sync-window-facts-required');
+  if (windowFacts) {
+    const outputs = [args.nameStatusPath, args.inventoryPath, args.adjudicationInputPath, ...(args.fullWindow ? [args.ledgerPath, args.summaryPath] : [])];
+    if (outputs.some((file) => !windowFacts.output_files.includes(path.relative(REPO_ROOT, file)))) throw new Error('ce-sync-output-outside-allowlist');
+  }
   for (const [label, filePath] of [
     ['audit', args.auditPath],
     ['name-status', args.nameStatusPath],
@@ -1339,7 +1620,7 @@ function main(argv = process.argv.slice(2), runtime = {}) {
   if (args.refresh && !args.ceRepo) {
     throw new Error('--refresh 必须同时提供 --ce-repo，以固定 commit objects 为输入。');
   }
-  if (!args.verifyLegacy && !args.fullWindow && !args.prepareAdjudication && !args.filelistPath) {
+  if (!args.verifyLegacy && !args.fullWindow && !args.prepareAdjudication && !args.createWindowFacts && !args.validateRunArtifactPath && !args.filelistPath) {
     throw new Error('新窗口必须提供 --filelist。');
   }
   let nameStatusContent;
@@ -1390,14 +1671,18 @@ function main(argv = process.argv.slice(2), runtime = {}) {
       targetSourceSnapshot,
       inventory,
       nameStatusContent: fullNameStatusContent,
+      windowFacts,
     });
     const nameStatusOutput = args.nameStatusPath.endsWith('.md')
       ? formatNameStatusSnapshot(nameStatusContent, args.base, args.head)
       : nameStatusContent;
     if (args.refresh) {
-      writeGenerated(path.relative(REPO_ROOT, args.nameStatusPath), nameStatusOutput);
-      writeGenerated(path.relative(REPO_ROOT, args.adjudicationInputPath), stableJson(input));
-      writeGenerated(path.relative(REPO_ROOT, args.inventoryPath), stableJson(inventory));
+      if (windowFacts) publishArtifactSet([[args.nameStatusPath, nameStatusOutput], [args.adjudicationInputPath, stableJson(input)], [args.inventoryPath, stableJson(inventory)]], path.join(path.dirname(args.windowFactsPath), 'artifact-set.json'));
+      else {
+        writeGenerated(path.relative(REPO_ROOT, args.nameStatusPath), nameStatusOutput);
+        writeGenerated(path.relative(REPO_ROOT, args.adjudicationInputPath), stableJson(input));
+        writeGenerated(path.relative(REPO_ROOT, args.inventoryPath), stableJson(inventory));
+      }
     } else {
       validateAdjudicationInput(JSON.parse(fs.readFileSync(args.adjudicationInputPath, 'utf8')), {
         nameStatus,
@@ -1433,6 +1718,7 @@ function main(argv = process.argv.slice(2), runtime = {}) {
       base: args.base,
       head: args.head,
     };
+    if (windowFacts) verifyArtifactSet(path.join(path.dirname(args.windowFactsPath), 'artifact-set.json'), [args.adjudicationInputPath]);
     const adjudicationInput = JSON.parse(fs.readFileSync(args.adjudicationInputPath, 'utf8'));
     const adjudication = JSON.parse(fs.readFileSync(args.adjudicationPath, 'utf8'));
     assertFullWindowFacts(nameStatus, fullNameStatusContent, fullWindowFacts);
@@ -1442,8 +1728,16 @@ function main(argv = process.argv.slice(2), runtime = {}) {
       nameStatusSha256: sha256(fullNameStatusContent),
       targetSourceSnapshot,
     });
+    if (windowFacts && stableJson(adjudicationInput) !== stableJson(buildAdjudicationInput(nameStatus, { upstream, targetSourceSnapshot, inventory, nameStatusContent: fullNameStatusContent, windowFacts }))) throw new Error('ce-sync-input-object-facts-mismatch');
     if (adjudication.input_artifact_sha256 !== sha256(stableJson(adjudicationInput))) {
       throw new Error('adjudication input_artifact_sha256 mismatch');
+    }
+    let runHandoff = null;
+    if (windowFacts) {
+      if (!args.runHandoffPath) throw new Error('ce-sync-handoff-required');
+      assertRepoPath(args.runHandoffPath, 'run-handoff');
+      runHandoff = JSON.parse(fs.readFileSync(args.runHandoffPath, 'utf8'));
+      if (runHandoff.kind !== 'handoff') throw new Error('ce-sync-handoff-kind');
     }
     let v2Ledger = buildV2Ledger(nameStatus, adjudication, {
       inventory,
@@ -1457,17 +1751,21 @@ function main(argv = process.argv.slice(2), runtime = {}) {
         .filter((entry) => entry.endsWith('.json'))
         .sort((left, right) => MERGE_ORDER.indexOf(left.replace(/\.json$/, '')) - MERGE_ORDER.indexOf(right.replace(/\.json$/, '')))
         .map((entry) => JSON.parse(fs.readFileSync(path.join(args.patchDir, entry), 'utf8')));
-      v2Ledger = mergeLedgerPatches(v2Ledger, patches, { order: MERGE_ORDER, expectedPackageIds });
+      v2Ledger = mergeLedgerPatches(v2Ledger, patches, { order: windowFacts ? windowFacts.merge_order : MERGE_ORDER, expectedPackageIds });
     }
+    if (runHandoff) validateRunArtifact(runHandoff, adjudicationInput, windowFacts, REPO_ROOT, v2Ledger.records);
     const nameStatusOutput = args.nameStatusPath.endsWith('.md')
       ? formatNameStatusSnapshot(nameStatusContent, args.base, args.head)
       : nameStatusContent;
     const summaryOutput = buildV2SummaryMarkdown(v2Ledger, inventory, args);
     if (args.refresh) {
-      writeGenerated(path.relative(REPO_ROOT, args.nameStatusPath), nameStatusOutput);
-      writeGenerated(path.relative(REPO_ROOT, args.ledgerPath), stableJson(v2Ledger));
-      writeGenerated(path.relative(REPO_ROOT, args.inventoryPath), stableJson(inventory));
-      writeGenerated(path.relative(REPO_ROOT, args.summaryPath), summaryOutput);
+      if (windowFacts) publishArtifactSet([[args.adjudicationInputPath, stableJson(adjudicationInput)], [args.nameStatusPath, nameStatusOutput], [args.ledgerPath, stableJson(v2Ledger)], [args.inventoryPath, stableJson(inventory)], [args.summaryPath, summaryOutput]], path.join(path.dirname(args.windowFactsPath), 'artifact-set.json'));
+      else {
+        writeGenerated(path.relative(REPO_ROOT, args.nameStatusPath), nameStatusOutput);
+        writeGenerated(path.relative(REPO_ROOT, args.ledgerPath), stableJson(v2Ledger));
+        writeGenerated(path.relative(REPO_ROOT, args.inventoryPath), stableJson(inventory));
+        writeGenerated(path.relative(REPO_ROOT, args.summaryPath), summaryOutput);
+      }
     } else {
       for (const [filePath, expected] of [
         [args.nameStatusPath, nameStatusOutput],
@@ -1482,7 +1780,7 @@ function main(argv = process.argv.slice(2), runtime = {}) {
     }
     process.stdout.write(`${JSON.stringify({
       ok: true,
-      schema_version: V2_SCHEMA_VERSION,
+      schema_version: v2Ledger.schema_version,
       records: v2Ledger.records.length,
       packages: v2Ledger.package_summary.length,
       target_source_snapshot: targetSourceSnapshot,
@@ -1593,5 +1891,11 @@ module.exports = {
   MERGE_ORDER,
   formatNameStatusSnapshot,
   buildV2SummaryMarkdown,
+  validateRunArtifact,
+  createWindowFacts,
+  verifyWindowFacts,
+  packagePathFor,
+  publishArtifactSet,
+  verifyArtifactSet,
   main,
 };

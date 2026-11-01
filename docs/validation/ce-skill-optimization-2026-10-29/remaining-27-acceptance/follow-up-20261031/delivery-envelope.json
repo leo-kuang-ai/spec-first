@@ -1,0 +1,11 @@
+{
+  "verification_run_summary_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-followup-20261031/verification-run-summary.json",
+  "honest_closeout_verdict": "degraded",
+  "run_artifact_path": ".spec-first/workflows/spec-work/spec-first/ce-opt-followup-20261031/run.json",
+  "run_artifact_reason_code": "written",
+  "claim_limitations": [
+    "Generic Commit validator fails on unchanged internal-only field in both versions; exact failures retained.",
+    "Original production/external/autonomous required facets are not run.",
+    "Bounded follow-up is not full acceptance; no project commit, runtime installation or publication."
+  ]
+}

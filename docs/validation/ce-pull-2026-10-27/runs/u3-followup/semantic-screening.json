@@ -1,0 +1,234 @@
+{
+  "artifact_type": "advisory",
+  "status": "partial",
+  "entries": [
+    {
+      "path": "skills/ce-work/references/execution-strategy.md",
+      "local_owner": "skills/spec-work/references/execution-strategy.md",
+      "upstream_objects": {
+        "path": "skills/ce-work/references/execution-strategy.md",
+        "status": "M",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "1144ea2274c6ebde1f0709ac3c590dfca76fd787"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "495aa34e956d812f4c4eb6ef4ae0a80292841a9d"
+        },
+        "current_owner_surface_candidate": "skills/spec-work/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "local_sha256": "252663522d36965cd2ff2425d863f5e23b73a79784b62b3571ac79986f3b897f",
+      "reading": "本地全文与 CE 窗口 diff/相关正文；差额已读，CE 新正文非全文",
+      "decision": "实施顺序依赖优先 inline；本地已具 actual tree integration、独立权威验证与更严格 index enforcement，拒绝默认授权并行或 worker transport commit",
+      "status": "partial-advisory"
+    },
+    {
+      "path": "skills/ce-commit/SKILL.md",
+      "local_owner": "skills/spec-commit/SKILL.md",
+      "upstream_objects": {
+        "path": "skills/ce-commit/SKILL.md",
+        "status": "M",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "5e9ba297384f65bfa136dc1a0ca353f8cb45b15a"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "e5b4ed1b8952e921e29c0875524953f80329b8ff"
+        },
+        "current_owner_surface_candidate": "skills/spec-commit/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "local_sha256": "9ac59b9977f687e764026bd1e8ef5a57e5efc7a4f58133816c3e00986f4eaa3d",
+      "reading": "本地全文与 CE 窗口完整 diff",
+      "decision": "吸收真实 author/trailer 归属保留；保留本地 -F、明确路径/hunk/index 授权规则",
+      "status": "partial-advisory"
+    },
+    {
+      "path": "skills/ce-commit-push-pr/references/commit-and-push.md",
+      "local_owner": "skills/spec-commit-push-pr/references/commit-and-push.md",
+      "upstream_objects": {
+        "path": "skills/ce-commit-push-pr/references/commit-and-push.md",
+        "status": "M",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "4221836904f2d80633bc8e6f1ba4af25324268af"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "e176104813d90f72d480a5eb83209ea7aa1d4d2c"
+        },
+        "current_owner_surface_candidate": "skills/spec-commit-push-pr/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "local_sha256": "ff14e1de84832c49318ab836535fe922d6192bb17f15f90a0b89b6376a6db5ba",
+      "reading": "本地全文与 CE 窗口完整 diff",
+      "decision": "吸收归属保留；不复制 CE 路径列表等于精确 hunk 的错误表述",
+      "status": "partial-advisory"
+    },
+    {
+      "path": "skills/ce-work/references/non-code-execution.md",
+      "local_owner": "skills/spec-work/references/non-code-execution.md",
+      "upstream_objects": {
+        "path": "skills/ce-work/references/non-code-execution.md",
+        "status": "M",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "52b7593fff49c3a91629e047ba414ba8faad65dd"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "743d28a338bb9ce367e87d0aafb86a0aa4a22b6a"
+        },
+        "current_owner_surface_candidate": "skills/spec-work/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "local_sha256": "6b6c4c7776258333c8d6be1e432f714a1c6b02b1677f0dec194355d758c49000",
+      "reading": "本地全文与 CE 窗口完整 diff",
+      "decision": "仅 approach-level/steps/send 的措辞变化；本地 carve-out 与 code 子步骤路由等价，无需改动",
+      "status": "partial-advisory"
+    },
+    {
+      "path": "skills/ce-work/references/return-to-caller.md",
+      "local_owner": "skills/spec-work/references/return-to-caller.md",
+      "upstream_objects": {
+        "path": "skills/ce-work/references/return-to-caller.md",
+        "status": "M",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "3fb3270df0bfe14646b560a93c40a10f52dc4e79"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "7a32a66154046706062e251f177d94a37921cbe4"
+        },
+        "current_owner_surface_candidate": "skills/spec-work/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "local_sha256": "85dd95cdf84f8e814c17231950c9720c1d99516701290fbfed695fe12fde1d0c",
+      "reading": "本地全文与 CE 窗口 diff（前一批部分输出，本轮补相关完整差额）",
+      "decision": "本地现有 re-read plan/tree、完整 Verification Contract 和 fresh fingerprint 更强；不吸收 CE return 阶段增量 commit 或外部 requested_effort，因为本地无权威 controller producer",
+      "status": "partial-advisory"
+    },
+    {
+      "path": "skills/ce-work/references/input-triage.md",
+      "local_owner": "skills/spec-work/references/input-triage.md",
+      "upstream_objects": {
+        "path": "skills/ce-work/references/input-triage.md",
+        "status": "M",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "172c0a312f90b7f72b24b8476cb6410a1af300c2"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "3c8cde4903043f3d71b4a4c1c0ea82eda878c8e1"
+        },
+        "current_owner_surface_candidate": "skills/spec-work/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "local_sha256": "aeb94e9aea68c0dd82c4f4a17541135beb805de3133a0f40dfdce527bf38450a",
+      "reading": "本地全文已读；CE 窗口 diff 分段，尚有上下文未复核",
+      "decision": "CE 改成 contents sufficiency、弱化 readiness metadata 并引入 antigravity；保留本地 spec-unified-plan readiness/legacy 合同；与 U4 共享 owner 后续联合审查，不关闭",
+      "status": "partial-advisory"
+    },
+    {
+      "path": "skills/ce-work/references/work-intake.md",
+      "local_owner": "skills/spec-work/references/work-intake.md",
+      "upstream_objects": {
+        "path": "skills/ce-work/references/work-intake.md",
+        "status": "M",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "261b80143bcded403012633cc8c9b5e85825f208"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "3c738f3fe642552c66f63034d03ae4a0bdce314c"
+        },
+        "current_owner_surface_candidate": "skills/spec-work/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "local_sha256": "28c1314a19b5f2d1ac661a3b47382e7a812c8e02d3a09532c1b0d80c3883c88a",
+      "reading": "本地全文；CE 窗口 diff 部分",
+      "decision": "本地已包含 governing product decisions、deferred questions、scope/non-goals 与禁止进度改 plan；CE 大部分措辞变化，保留 pending 全差额复核",
+      "status": "partial-advisory"
+    },
+    {
+      "path": "skills/ce-work/references/workspace-setup.md",
+      "local_owner": "skills/spec-work/references/workspace-setup.md",
+      "upstream_objects": {
+        "path": "skills/ce-work/references/workspace-setup.md",
+        "status": "M",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "2960fbd3d20b5b1a33445a98ce8a36f152ed9a91"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "e6afc3c1f935bef6eff9506752b18356d9478954"
+        },
+        "current_owner_surface_candidate": "skills/spec-work/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "local_sha256": "7572e216f2d0abde44174f7a409ea9fda471894bc3a53c2315a61dc84171bfcf",
+      "reading": "本地全文；CE 窗口 diff 部分",
+      "decision": "保留本地 explicit branch authority，不吸收 CE 自动 branch mutation；全差额复核未完",
+      "status": "partial-advisory"
+    },
+    {
+      "path": "skills/ce-work/references/agents/implementation-worker.md",
+      "local_owner": "skills/spec-work/references/execution-strategy.md",
+      "upstream_objects": {
+        "path": "skills/ce-work/references/agents/implementation-worker.md",
+        "status": "M",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "0d2706b678a539e88b3055b21bd91d51038a7bd2"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "0f324cd08b41eb6f975c0344a2916b2b4ad0f346"
+        },
+        "current_owner_surface_candidate": "skills/spec-work/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "local_sha256": "252663522d36965cd2ff2425d863f5e23b73a79784b62b3571ac79986f3b897f",
+      "reading": "CE 窗口完整 diff；本地无同名文件，读实际 worker packet owner",
+      "decision": "新 safeguard 当无法判断则默认 build 会扩大 scope；本地必要 discovered file 与 stop-back owner 已覆盖合理边界，不复制独立 worker runner/agent 文件；CE 原文其余内容仍需全文比较",
+      "status": "partial-advisory"
+    }
+  ],
+  "verification": {
+    "log_ref": "docs/validation/ce-pull-2026-10-27/logs/u3-followup-tests.log",
+    "exit_code": 0,
+    "suites": 4,
+    "tests": 27
+  },
+  "limitations": [
+    "本记录不是正式裁决；部分读取保持明确，未用 diff 统计冒充全文理解",
+    "U3 source 只是依赖顺序和提交来源 slice；跨模型 runner、其他 work/PR references 仍 open",
+    "准入错误已撤回并通过 source_tree_hash 精确恢复后重新准入；见 logs/u3-admission-recovery.json",
+    "fresh-source 独立 review、真实宿主、runtime apply、PR/CI 未运行"
+  ]
+}

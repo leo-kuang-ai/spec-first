@@ -1,0 +1,10 @@
+PASS tests/unit/spec-riffrec-evidence-coverage.test.js
+PASS tests/unit/spec-riffrec-analyzer-safety.test.js
+PASS tests/unit/spec-riffrec-snapshots.test.js
+PASS tests/unit/spec-riffrec-feedback-analysis-contracts.test.js
+
+Test Suites: 4 passed, 4 total
+Tests:       33 passed, 33 total
+Snapshots:   0 total
+Time:        1.492 s, estimated 2 s
+Ran all test suites matching /tests\/unit\/spec-riffrec-evidence-coverage.test.js|tests\/unit\/spec-riffrec-analyzer-safety.test.js|tests\/unit\/spec-riffrec-snapshots.test.js|tests\/unit\/spec-riffrec-feedback-analysis-contracts.test.js/i.

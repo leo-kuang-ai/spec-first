@@ -19,11 +19,11 @@
 #
 #   1. Explicit --port flag
 #   2. Framework config files (next.config.*, vite.config.*, nuxt.config.*,
-#      astro.config.*) -- conservative regex matching only numeric literal
+#      astro.config.*) -- conservative lexical matching of numeric literal
 #      port values. Variable references like process.env.PORT or getPort()
 #      are deliberately not matched; the probe falls through.
 #   3. Rails: config/puma.rb for `port <n>`
-#   4. Procfile.dev: web line scanned for -p/-p=<n>/--port/--port=<n>
+#   4. Procfile.dev (otherwise Procfile): web line scanned for -p/-p=<n>/--port/--port=<n>
 #   5. docker-compose.yml: line-anchored grep for "- "<n>:<n>"" port mapping
 #   6. package.json: dev/start script for --port/-p flags
 #   7. .env files in override order: .env.local -> .env.development -> .env
@@ -44,6 +44,15 @@
 
 set -u
 
+fail() { echo "ERROR: $*" >&2; exit 1; }
+valid_port() {
+  [[ "$1" =~ ^[0-9]{1,5}$ ]] && (( 10#$1 >= 1 && 10#$1 <= 65535 ))
+}
+emit_port() {
+  valid_port "$1" || return 1
+  printf '%d\n' "$((10#$1))"
+}
+
 # ── Argument parsing ─────────────────────────────────────────────────────────
 
 PROJECT_ROOT=""
@@ -53,21 +62,31 @@ EXPLICIT_PORT=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --type)
-      PROJ_TYPE="${2:-}"
+      [ $# -ge 2 ] && [ -n "$2" ] || fail "--type requires a value"
+      PROJ_TYPE="$2"
       shift 2
       ;;
     --port)
-      EXPLICIT_PORT="${2:-}"
+      [ $# -ge 2 ] && valid_port "$2" || fail "--port requires an integer from 1 to 65535"
+      EXPLICIT_PORT="$2"
       shift 2
       ;;
+    --*) fail "unknown option: $1" ;;
     *)
       if [ -z "$PROJECT_ROOT" ]; then
         PROJECT_ROOT="$1"
+      else
+        fail "unexpected argument: $1"
       fi
       shift
       ;;
   esac
 done
+
+case "$PROJ_TYPE" in
+  ""|rails|next|vite|nuxt|astro|remix|sveltekit|procfile) ;;
+  *) fail "unsupported type: $PROJ_TYPE" ;;
+esac
 
 # Default to git repo root when no positional path is given.
 if [ -z "$PROJECT_ROOT" ]; then
@@ -162,7 +181,7 @@ parse_env_port() {
 # ── Probe 1: Explicit --port flag ────────────────────────────────────────────
 
 if [ -n "$EXPLICIT_PORT" ]; then
-  echo "$EXPLICIT_PORT"
+  emit_port "$EXPLICIT_PORT"
   exit 0
 fi
 
@@ -191,19 +210,15 @@ if should_probe "$PROJ_TYPE" "framework-config"; then
       continue
     fi
 
-    # Conservative regex: match "port:" + digits, then verify nothing non-numeric
-    # follows (rejects variable references like "port: process.env.PORT || 3000").
-    local_line=$(grep -E 'port:[[:space:]]*["'"'"']?[0-9]+' "$cfg" 2>/dev/null | head -1)
-    if [ -z "$local_line" ]; then continue; fi
-
-    local_port=$(printf '%s' "$local_line" | grep -Eo 'port:[[:space:]]*["'"'"']?[0-9]+["'"'"']?' | head -1 | grep -Eo '[0-9]+')
-    if [ -n "$local_port" ]; then
-      local_after=$(printf '%s' "$local_line" | sed "s/.*port:[[:space:]]*[\"']*${local_port}[\"']*//" )
-      if [ -z "$local_after" ] || printf '%s' "$local_after" | grep -qE '^[[:space:],})]*$'; then
-        echo "$local_port"
-        exit 0
-      fi
-    fi
+    # SvelteKit and modern Remix use Vite. Do not scan another framework's file.
+    framework="${cfg##*/}"
+    framework="${framework%%.config.*}"
+    selected="$PROJ_TYPE"
+    case "$selected" in sveltekit|remix) selected="vite" ;; esac
+    if [ -n "$selected" ] && [ "$framework" != "$selected" ]; then continue; fi
+    command -v node >/dev/null 2>&1 || continue
+    local_port=$(node "$(dirname "$0")/config-port.cjs" "$cfg")
+    if emit_port "$local_port"; then exit 0; fi
   done
 fi
 
@@ -213,8 +228,8 @@ if should_probe "$PROJ_TYPE" "puma"; then
   puma_file="$PROJECT_ROOT/config/puma.rb"
   if [ -f "$puma_file" ]; then
     puma_port=$(grep -Eo 'port[[:space:]]+[0-9]+' "$puma_file" 2>/dev/null | head -1 | grep -Eo '[0-9]+')
-    if [ -n "$puma_port" ]; then
-      echo "$puma_port"
+    if valid_port "$puma_port"; then
+      emit_port "$puma_port"
       exit 0
     fi
   fi
@@ -224,14 +239,15 @@ fi
 
 if should_probe "$PROJ_TYPE" "procfile"; then
   procfile="$PROJECT_ROOT/Procfile.dev"
+  if [ ! -f "$procfile" ]; then procfile="$PROJECT_ROOT/Procfile"; fi
   if [ -f "$procfile" ]; then
     # Extract the web line
     web_line=$(grep -E '^web:' "$procfile" 2>/dev/null | head -1)
     if [ -n "$web_line" ]; then
       # Match -p <n>, -p<n>, --port <n>, -p=<n>, --port=<n>
       proc_port=$(printf '%s' "$web_line" | grep -Eo '(-p[= ]*|--port[= ]+)[0-9]+' | head -1 | grep -Eo '[0-9]+')
-      if [ -n "$proc_port" ]; then
-        echo "$proc_port"
+      if valid_port "$proc_port"; then
+        emit_port "$proc_port"
         exit 0
       fi
     fi
@@ -247,8 +263,8 @@ if should_probe "$PROJ_TYPE" "docker-compose"; then
     # This avoids treating prose, image tags, or arbitrary number pairs as a port.
     compose_line=$(grep -E "^[[:space:]]*-[[:space:]]*['\"]?[0-9]+:[0-9]+['\"]?[[:space:]]*(#.*)?$" "$compose_file" 2>/dev/null | head -1)
     compose_port=$(printf '%s' "$compose_line" | grep -Eo '[0-9]+:[0-9]+' | head -1 | cut -d: -f1)
-    if [ -n "$compose_port" ]; then
-      echo "$compose_port"
+    if valid_port "$compose_port"; then
+      emit_port "$compose_port"
       exit 0
     fi
   fi
@@ -273,8 +289,8 @@ try {
   }
 } catch (_) {}
 ' "$pkg_file")
-    if [ -n "$pkg_port" ]; then
-      echo "$pkg_port"
+    if valid_port "$pkg_port"; then
+      emit_port "$pkg_port"
       exit 0
     fi
   fi
@@ -289,8 +305,8 @@ if should_probe "$PROJ_TYPE" "env"; then
     "$PROJECT_ROOT/.env" \
   ; do
     env_port=$(parse_env_port "$envfile")
-    if [ -n "$env_port" ]; then
-      echo "$env_port"
+    if valid_port "$env_port"; then
+      emit_port "$env_port"
       exit 0
     fi
   done

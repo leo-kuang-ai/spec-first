@@ -1,0 +1,7 @@
+{
+  "observed_paths": 6347,
+  "changed": [],
+  "input_drift": [],
+  "index_unchanged": true,
+  "limitation": "First workspace inventory was captured after initial dispatch. Prior source identities and native read-only call traces supplement this observation; no enforced isolation is claimed."
+}

@@ -1,0 +1,43 @@
+{
+  "fixture_files": {
+    "prepare-eval.cjs": "0bb64e398f2c01fdbad21c92d0e3a3223d73b245e58118a4505f43794af1a69b",
+    "README.md": "4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855",
+    "package.json": "966fdf6bda7b2bf2bd70b9c42ddcbd4f2411804e4a22de7ff0ef161db16ddcad",
+    "test/entries.test.cjs": "04bc52452e6a611d0609d28002ea50937126dcf5466e5a40c22727c6726623cf",
+    "src/server.js": "60fcede431e7da0426edd494e69a0680e4f6b3dd786e373d942872ce7a4c0716",
+    "test/support/ledger-proof.cjs": "621f7beb407ab683a34577ab28393256b3736ef4f9c4cc2601ed1785a2169c05"
+  },
+  "results": [
+    {
+      "variant": "baseline",
+      "started_at": "2026-10-30T06:18:43.935453+00:00",
+      "exit_code": 0,
+      "command": [
+        "node",
+        "--test",
+        "test/entries.test.cjs"
+      ],
+      "log_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/simplify-baseline.log",
+      "log_sha256": "c00d38b6117bf514193a17bffe42d8357b2600e3bf74dc07da6062620f3c2d18",
+      "protected_proof_unchanged": true,
+      "status": "observed"
+    },
+    {
+      "variant": "weakened-control",
+      "started_at": "2026-10-30T06:18:44.143848+00:00",
+      "exit_code": 1,
+      "command": [
+        "node",
+        "--test",
+        "test/entries.test.cjs"
+      ],
+      "log_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/simplify-weakened-control.log",
+      "log_sha256": "740a7d9c95333e470601ef529adc8f111b640033f752c564010c07291f568317",
+      "protected_proof_unchanged": true,
+      "status": "observed"
+    }
+  ],
+  "scratch_root": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-simplify-proof-5xiebseq",
+  "cleanup_confirmed": true,
+  "scope": "Actual local HTTP proof and deliberate weakening control; no model simplification trial yet."
+}

@@ -381,7 +381,7 @@ describe('CLI smoke checks', () => {
       'best-practices-researcher.md',
     ), 'utf8');
     expect(crossHostReference).toContain(
-      '`.claude/skills/**/SKILL.md`, `.codex/skills/**/SKILL.md`, and `.agents/skills/**/SKILL.md`',
+      "Start from the current host's supplied skill catalog and the caller's exact relevant source refs.",
     );
   }, 120000);
 });

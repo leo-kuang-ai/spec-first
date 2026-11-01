@@ -74,6 +74,8 @@ Proof-first 时，测试和实现不能在同一步同时完成；必须观察�
 
 ## Test Design Quality
 
+测试必须能在所声明的边界行为错误时失败，并在纯实现替换时保持有效；若 expected 直接由被测代码算出、mock/fixture 代替生产层提供了本应验证的结果，或只断言内部互调，则不足以证明该边界。优先通过真实入口验证返回、存储或外发结果；真实入口可驱动时，不为测试专门新增 production export、flag、wrapper 或 hook。已有明确契约 seam 的窄测试仍按其实际覆盖范围报告，不把所有内部断言一概视为无效。
+
 - 测试应保持 DAMP（descriptive and meaningful phrases）：名称、setup 与断言直接表达行为和业务状态，允许为可读性保留少量重复，不用隐藏意图的过度 helper 压缩测试。
 - 默认验证 state over interaction：优先断言调用者可观察的返回值、状态转换、持久化结果、事件或错误。只有 interaction itself is the contract（例如协议必须调用一次、顺序本身可见、禁止某个 sink）时，才把调用次数或调用顺序作为主要 proof。
 - test double 选择顺序是 `real implementation -> high-fidelity fake -> stub -> mock`。越靠后越需要解释为什么更真实的 seam 不可用，以及该 double 仍能观察当前风险。
@@ -149,3 +151,11 @@ Fallback 是最窄已知验证，不是零验证。无法确认 system-wide cove
 ## Ownership Boundary
 
 Scripts 可以记录命令、exit code、路径、hash、schema 结果和 reason_code；LLM 决定选择哪些 checks、scenario 是否语义充分、replacement evidence 是否足以支持当前 claim。不要让脚本替代 test design，也不要让自然语言声明冒充脚本事实。
+
+## Preserve proof through cleanup
+
+Before a simplify pass, carry the proof set in the existing verification evidence: originating unit/task, exact test paths (new, changed and used unchanged), test-only seams/fixtures they depend on, and the real command/log refs. Record the current file bytes or tool-computed hashes before cleanup and compare after it. Earlier RED/characterization observations remain historical evidence; do not recreate them from the final diff. Missing or stale bindings remain explicit limitations.
+
+Pass each proof test as `proof-test:<path>` or in equivalent structured context, separately from the allowed mutation paths. Preserve the tests and their test-only seams throughout cleanup while permitting equivalent production refactors. If proof ownership is unclear, preserve every test added/changed by this work. If a test itself needs a legitimate repair, return to the implementation owner, explain the evidence change and rerun the original symptom; do not silently weaken it inside Simplify.
+
+After cleanup/review mutations, the caller reruns the original reproducer, protected proof tests and all applicable final checks against the current tree. A callee's local green result does not replace final-tree reconciliation. External/manual done signals retain their original observed-state requirements; a Git diff cannot replace them.

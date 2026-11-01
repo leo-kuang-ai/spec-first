@@ -35,6 +35,8 @@ REQUIRED_FINDING = {
 def valid_return(value: Any) -> bool:
     return isinstance(value, dict) and all(
         isinstance(value.get(key), expected) for key, expected in REQUIRED_TOP.items()
+    ) and nonempty_string(value["reviewer"]) and all(
+        nonempty_string(item) for key in ("residual_risks", "testing_gaps") for item in value[key]
     )
 
 
@@ -48,6 +50,30 @@ def valid_finding(value: Any) -> bool:
     if not all(isinstance(value.get(key), expected) for key, expected in REQUIRED_FINDING.items()):
         return False
     if type(value["confidence"]) is not int:
+        return False
+    if not nonempty_string(value["title"]) or not nonempty_string(value["file"]):
+        return False
+    if "settled_conflict" in value and type(value["settled_conflict"]) is not bool:
+        return False
+    for key in ("evidence", "reviewers", "independent_reviewers"):
+        if key in value and (not isinstance(value[key], list) or
+                             any(not nonempty_string(item) for item in value[key]) or
+                             (key == "evidence" and not value[key])):
+            return False
+    if "suggested_fix" in value and value["suggested_fix"] is not None and not nonempty_string(value["suggested_fix"]):
+        return False
+    if "why_it_matters" in value and not nonempty_string(value["why_it_matters"]):
+        return False
+    if "validation_status" in value and (
+        value["validation_status"] not in ("confirmed", "rejected", "unresolved")
+        or not nonempty_string(value.get("validation_reason"))
+        or "protected_subject" not in value
+    ):
+        return False
+    if "protected_subject" in value and value["protected_subject"] not in (
+        None, "memory-safety", "concurrency", "data-loss", "authorization-authentication",
+        "injection", "public-contract", "secrets-exposure", "cryptography",
+    ):
         return False
     if "first_evidence" in value and not nonempty_string(value["first_evidence"]):
         return False
@@ -64,7 +90,7 @@ def valid_finding(value: Any) -> bool:
 
 def fingerprint(finding: dict[str, Any]) -> tuple[str, str, str]:
     return (
-        finding["file"].strip().lower(),
+        finding["file"],
         str(finding["line"]).strip(),
         " ".join(finding["title"].lower().split()),
     )
@@ -73,9 +99,13 @@ def fingerprint(finding: dict[str, Any]) -> tuple[str, str, str]:
 def independent_reviewer(name: str, source: dict[str, Any]) -> bool:
     if name == "fast-pass":
         return False
-    if name.startswith("adversarial-"):
+    if cross_model_peer(name):
         return source.get("independence_verified") is True
     return True
+
+
+def cross_model_peer(name: str) -> bool:
+    return name.startswith("adversarial-")
 
 
 def promote(confidence: int) -> int:
@@ -119,7 +149,10 @@ def merge_group(group: list[tuple[dict[str, Any], str, tuple[str, ...]]]) -> dic
     has_first_evidence = nonempty_string(merged.get("first_evidence"))
     if confidence >= 75 and not has_first_evidence:
         confidence = 50
-    if len(independent) >= 2 and has_first_evidence:
+    # 同模型 persona 的共识保留为贡献记录；自动提分还需要已验证的跨模型 peer。
+    if (len(independent) >= 2 and has_first_evidence
+            and any(cross_model_peer(n) for n in independent)
+            and any(reviewer != "synthesis" for _, reviewer, _ in group)):
         confidence = promote(confidence)
     merged["confidence"] = confidence
     merged["reviewers"] = reviewer_names
@@ -142,6 +175,7 @@ def main() -> int:
 
     malformed_returns = 0
     malformed_findings = 0
+    first_evidence_backfilled = 0
     grouped: dict[
         tuple[str, str, str], list[tuple[dict[str, Any], str, tuple[str, ...]]]
     ] = {}
@@ -156,10 +190,24 @@ def main() -> int:
         residual_risks.extend(source["residual_risks"])
         testing_gaps.extend(source["testing_gaps"])
         for finding in source["findings"]:
+            backfilled = False
+            if isinstance(finding, dict):
+                finding = dict(finding)
+                evidence = finding.get("evidence")
+                if (
+                    finding.get("confidence") in (50, 75, 100)
+                    and ("first_evidence" not in finding or isinstance(finding["first_evidence"], str))
+                    and not nonempty_string(finding.get("first_evidence"))
+                    and isinstance(evidence, list)
+                    and evidence
+                    and nonempty_string(evidence[0])
+                ):
+                    finding["first_evidence"] = evidence[0]
+                    backfilled = True
             if not valid_finding(finding):
                 malformed_findings += 1
                 continue
-            finding = dict(finding)
+            first_evidence_backfilled += int(backfilled)
             if reviewer == "fast-pass":
                 finding["confidence"] = min(finding["confidence"], 50)
             independent_names: tuple[str, ...]
@@ -196,11 +244,9 @@ def main() -> int:
         if finding["pre_existing"]:
             pre_existing.append(finding)
             continue
-        if (
-            finding["confidence"] < 75
-            and finding["severity"] != "P0"
-            and not finding.get("settled_conflict")
-        ):
+        critical_exception = (finding["severity"] == "P0" and finding["confidence"] >= 50
+                              and nonempty_string(finding.get("first_evidence")))
+        if finding["confidence"] < 75 and not critical_exception:
             suppressed[str(finding["confidence"])] += 1
             suppressed_findings.append(finding)
             continue
@@ -231,6 +277,7 @@ def main() -> int:
         json.dumps(
             {
                 "status": "complete",
+                "input_status": "invalid" if malformed_returns or malformed_findings else "valid",
                 "findings": survivors,
                 "suppressed_findings": suppressed_findings,
                 "pre_existing_findings": pre_existing,
@@ -239,6 +286,7 @@ def main() -> int:
                 "suppressed_by_confidence": dict(sorted(suppressed.items())),
                 "malformed_returns": malformed_returns,
                 "malformed_findings": malformed_findings,
+                "first_evidence_backfilled": first_evidence_backfilled,
             },
             sort_keys=True,
         )

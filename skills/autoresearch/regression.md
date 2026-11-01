@@ -71,11 +71,13 @@ Run candidate verify vs baseline metric → compute `regressed` bool + 0-100 `su
 
 ## Verdict
 
-- Any HARD `regressed=true` with `classification=eligible` → **UNSTABLE** (green→red hard-blocks).
-- Else `stability_score = Σ(weight × dim_subscore)` over SCORE dims that ran (flakiness .30 / performance .30 / resource .20 / visual .20, renormalized over present dims). **STABLE iff ≥ 95** (`REG_THRESHOLD`/weights overridable).
+- Any HARD `regressed=true` with `classification=regression-eligible` → **UNSTABLE** (green→red hard-blocks). The scorer accepts legacy `eligible` as the same classification.
+- Else `stability_score = Σ(weight × dim_subscore)` over eligible SCORE dims that ran (flakiness .30 / performance .30 / resource .20 / visual-ui .20, renormalized over present dims). Legacy `visual` means `visual-ui`. `flaky` contributes only to flakiness SCORE; `pre-existing`, `new-coverage` and `baseline-unavailable` never contribute. **STABLE iff ≥ 95** (`REG_THRESHOLD` may override the threshold within 0..100; weights are fixed).
 - Print the **score math** (per-dim contribution table) + declare **dims-ran vs UNAVAILABLE** — an UNAVAILABLE dimension is always listed, never silently passed.
 
-Backed by `scripts/score-regression.sh verdict <results.tsv>` (exit 0 STABLE / 1 UNSTABLE).
+Backed by `scripts/score-regression.sh verdict <results.tsv>`: exit 0 means STABLE, exit 1 means UNSTABLE or unavailable evidence, and exit 2 means INVALID_INPUT with no safety verdict. Require exactly the documented TSV columns (the header row is optional), known dimension/classification names, the registry's tier, and a boolean `regressed` (`true`/`false`, legacy `1`/`0` or `yes`/`no`). Eligible SCORE values must be finite numbers in 0..100. A malformed row cannot be discarded to make another row pass. `status`, descriptions and baseline/candidate display values remain descriptive; they do not authenticate a test run.
+
+STABLE covers only the listed, scored evidence. It does not waive a required but unavailable dimension or authorize a commit, push or deployment. Invalid input produces an ERROR handoff with no STABLE verdict; repair or rerun the producer before shipping.
 
 ## Hunter (root cause)
 

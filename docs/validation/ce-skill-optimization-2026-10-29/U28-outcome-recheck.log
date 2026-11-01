@@ -1,0 +1,37 @@
+FAIL tests/unit/ce-u28-outcome-calibration.test.js
+  U28 supplemental outcome judge calibration
+    ✓ spec-strategy check-owned-update accepts observed controls and rejects changed evidence (341 ms)
+    ✓ spec-product-pulse check-source-outcomes accepts observed controls and rejects changed evidence (374 ms)
+    ✓ spec-promote check-unreleased-local-drafts accepts observed controls and rejects changed evidence (337 ms)
+    ✓ spec-handoff check-research-continuation accepts observed controls and rejects changed evidence (403 ms)
+    ✓ spec-handoff check-review-continuation accepts observed controls and rejects changed evidence (345 ms)
+    ✕ spec-riffrec-feedback-analysis check-local-evidence accepts observed controls and rejects changed evidence (285 ms)
+
+  ● U28 supplemental outcome judge calibration › spec-riffrec-feedback-analysis check-local-evidence accepts observed controls and rejects changed evidence
+
+    node:internal/assert/utils:77
+        throw err;
+        ^
+
+    AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+      assert.ok(result.event_moments.some((event) => event.type === 'console_error'))
+
+      at [stdin]:202:8
+      at [stdin]-wrapper:6:24
+      at ReadStream.emit (node:events:519:28) {
+        generatedMessage: true,
+        code: 'ERR_ASSERTION',
+        actual: false,
+        expected: true,
+        operator: '==',
+        diff: 'simple'
+      }
+      Node.js v22.22.3
+      at tests/unit/ce-u28-outcome-calibration.test.js:55:38
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 5 passed, 6 total
+Snapshots:   0 total
+Time:        2.24 s, estimated 3 s
+Ran all test suites matching /tests\/unit\/ce-u28-outcome-calibration.test.js/i.

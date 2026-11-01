@@ -1,0 +1,33 @@
+{
+  "id": "CEOPT-26",
+  "skill": "spec-simplify-code",
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/CEOPT-26-request.txt",
+  "request_sha256": "3ec389eb689ff8ce267396d4c0d409ce62e4ac39ba261fca65e320971e126417",
+  "fixture_root": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/simplify",
+  "fixture_files": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/simplify/prepare-eval.cjs": "0bb64e398f2c01fdbad21c92d0e3a3223d73b245e58118a4505f43794af1a69b",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/simplify/README.md": "4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/simplify/package.json": "966fdf6bda7b2bf2bd70b9c42ddcbd4f2411804e4a22de7ff0ef161db16ddcad",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/simplify/test/entries.test.cjs": "04bc52452e6a611d0609d28002ea50937126dcf5466e5a40c22727c6726623cf",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/simplify/src/server.js": "60fcede431e7da0426edd494e69a0680e4f6b3dd786e373d942872ce7a4c0716",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/simplify/test/support/ledger-proof.cjs": "621f7beb407ab683a34577ab28393256b3736ef4f9c4cc2601ed1785a2169c05"
+  },
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "deadline_seconds": 300,
+  "trials_per_arm": 3,
+  "execution_mode": "fresh-readonly-proposal-plus-parent-execution",
+  "parent_recipe": "Save response unchanged. Inspect proposed executable for bounded scope before executing in a fresh disposable fixture under an environment allowlist. Preserve protected proof bytes; run the exact same checks on each arm. Record rejected unsafe proposals without executing them. No semantic correction of candidates.",
+  "grading": "Source-grounded independent judgment plus actual candidate process/proof results; no keyword success.",
+  "limitations": [
+    "Parent mediation cannot establish autonomous mutation.",
+    "Serving identity unauthenticated.",
+    "Synthetic local fixture, not field outcome."
+  ]
+}

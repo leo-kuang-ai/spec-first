@@ -1,0 +1,12 @@
+{
+  "trial": "CEOPT-33-A1",
+  "at": "2026-10-31T05:33:03.089496+00:00",
+  "original_sha256": "8176af1aecf7776713f2956d65c4eab468d42a3c379f73ebe2cd16807ff89e32",
+  "source_lines_inclusive": [
+    1,
+    230
+  ],
+  "candidate_sha256": "2d57263f30ae2bb81c0ed3f62d62b5bca6e44597d048768094c4add2df6236b4",
+  "admission": "Parent reviewed complete draft through Regeneration Rules; exact contiguous original lines, excludes separate final disposition. No semantic edits or status promotion.",
+  "semantic_observation": "Three serial owners preserve KD-1/proof/seam and exact downstream receipt; explicit draft-only, validation not run. Canonical result must retain draft status."
+}

@@ -1,0 +1,864 @@
+{
+  "reviewer": "execution-correctness-security-testing",
+  "findings": [
+    {
+      "title": "Repair judge rejects legitimate new regression tests",
+      "severity": "P2",
+      "file": "skills/spec-debug/evals/fixtures/scripts/check-fixed-no-commit.sh",
+      "line": 80,
+      "why_it_matters": "A correct authorized repair that adds test/regression.test.cjs or tests/regression.test.cjs fails with 'Unexpected scoped file' before the HTTP outcome probe runs. The fixture has no existing tests, and the debug test-first contract explicitly permits adding a minimal regression test when no existing test owns the behavior. The judge therefore penalizes a normal contract-compliant repair and can distort subsequent model comparisons.",
+      "autofix_class": "gated_auto",
+      "owner": "downstream-resolver",
+      "requires_verification": true,
+      "suggested_fix": "Add an explicit repair-only option in scripts/evals/fixture-state.cjs allowing new regression-test files under test/ and tests/, enable it for check-fixed-no-commit in scripts/evals/build-outcome-judges.cjs, and regenerate the bundled judge. Preserve checks protecting existing fixture files, HEAD, and index, and leave diagnosis-only judges strict. Extend calibration with a correct repair plus a genuine new regression test; retain negative cases for baseline tampering and unauthorized commits.",
+      "confidence": 100,
+      "evidence": [
+        "skills/spec-debug/evals/fixtures/scripts/check-fixed-no-commit.sh:80 -- else assert.ok(Object.hasOwn(expected, file) || (options.allowNewSource && (dir === 'src' || dir.startsWith('src/')))\n        || (options.allowNewDocs && (dir === 'docs' || dir.startsWith('docs/'))), `Unexpected scoped file: ${file}`);",
+        "skills/spec-debug/evals/fixtures/scripts/check-fixed-no-commit.sh:84 -- for (const dir of ['src', 'test', 'tests', 'scripts', 'docs']) walk(dir);",
+        "skills/spec-debug/evals/fixtures/scripts/check-fixed-no-commit.sh:94 -- }, {}, {\"mutableFiles\":[\"src/server.js\"],\"allowNewSource\":true});",
+        "skills/spec-debug/references/fix.md:7 -- 'or add a new minimal focused test only when no existing test is the right home.' The repair fixture manifest contains only README.md, package.json, and src/server.js.",
+        "scripts/evals/build-outcome-judges.cjs:169 configures check-fixed-no-commit with mutableFiles and allowNewSource only; scripts/evals/fixture-state.cjs:76-80 owns the shared inventory guard.",
+        "tests/unit/spec-debug-judge-calibration.test.js checks the positive repair by changing src/server.js only; it does not exercise a valid repair accompanied by a new test.",
+        "The frozen original dirty snapshot at .git/spec-first-ce-optimization-2026-10-29/files/skills/spec-debug/evals/fixtures/scripts/check-fixed-no-commit.sh has no new-file inventory rejection. This failure is introduced by the reviewed change, rather than inherited from HEAD."
+      ],
+      "pre_existing": false
+    }
+  ],
+  "residual_risks": [
+    "This was a read-only fresh-source review against the original dirty snapshot and supplied execution.diff, not against HEAD. All 8,031 diff lines were inspected, with surrounding source and consumers inspected where needed. No tests, builds, installation, Git mutations, external requests, or edits were performed.",
+    "Static review does not establish actual model compliance, real-host behavior, remote PR freshness, visual outcomes, or performance improvement. Local fixtures and receipt-integrity checks retain their documented evidence limits.",
+    "This fresh review context is not evidence of cross-model independence.",
+    "Coverage statuses refer to the assigned diff and relevant source inspection, not exhaustive whole-repository verification. Changes made after this reviewed snapshot require reconciliation."
+  ],
+  "testing_gaps": [
+    "The debug repair judge calibration lacks the positive case identified in the finding: a valid HTTP repair plus a new focused regression test, with HEAD and index unchanged."
+  ],
+  "coverage": [
+    {
+      "path": "skills/autoresearch/autoresearch.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/autoresearch/fix.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/autoresearch/learn.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/autoresearch/reason.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/autoresearch/references/orchestrator-routing.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/autoresearch/references/reason-judge-protocol.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/autoresearch/regression.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/autoresearch/scripts/score-regression.sh",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-commit-push-pr/evals/cases/description-only-non-mutating.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-commit-push-pr/evals/cases/no-landing-auth-stops-before-push.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-commit-push-pr/evals/fixtures/repos/mini-ledger/prepare-eval.cjs",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-commit-push-pr/evals/fixtures/scripts/check-desc-only.sh",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-commit-push-pr/evals/fixtures/scripts/check-landing-gate.sh",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-commit-push-pr/references/apply-and-handoff.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-commit-push-pr/references/branch-creation.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-commit-push-pr/references/commit-and-push.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-commit-push-pr/references/compose.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-commit-push-pr/references/context.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-commit-push-pr/references/pr-description-writing.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-commit/SKILL.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-commit/evals/cases/fresh-tree-logical-grouping.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-commit/evals/cases/no-auth-stops-before-staging.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-commit/evals/fixtures/repos/mini-ledger/prepare-eval.cjs",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-commit/evals/fixtures/scripts/check-auth-gate.sh",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-commit/evals/fixtures/scripts/check-logical-grouping.sh",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-debug/SKILL.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-debug/evals/cases/diagnosis-only-no-fix.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-debug/evals/cases/fix-authorized-fixes-no-commit.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-debug/evals/cases/prior-attempt-asks-first.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-debug/evals/cases/r2-three-attempts-asked-first.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-debug/evals/fixtures/repos/mini-ledger/prepare-eval.cjs",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-debug/evals/fixtures/scripts/check-diagnosis-no-fix.sh",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-debug/evals/fixtures/scripts/check-fixed-no-commit.sh",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-debug/evals/fixtures/scripts/check-prior-attempt-ask.sh",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-debug/evals/fixtures/scripts/check-r2-prior-ask.sh",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-debug/references/fix.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-debug/references/investigate.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-debug/references/investigation-techniques.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-debug/references/pipeline-return.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-lfg/references/pr-watch-loop.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-lfg/references/review-followup.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-lfg/references/shipping-tail.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-lfg/scripts/pr-watch-state.cjs",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-optimize/SKILL.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-optimize/references/agents/repo-research-analyst.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-optimize/references/experiment-log-schema.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-optimize/references/judge-prompt-template.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-optimize/references/loop.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-optimize/references/measurement-only-calibration.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-optimize/references/measurement.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-optimize/references/optimize-spec-schema.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-optimize/references/persistence.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-optimize/references/wrap-up.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-optimize/scripts/decide.cjs",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-optimize/scripts/experiment-worktree.sh",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-optimize/scripts/measurement-admission.cjs",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/evals/cases/pipeline-pending-conversation.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/evals/eval.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/evals/fixtures/repos/mini-ledger/pr-snapshot.json",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/evals/fixtures/repos/mini-ledger/prepare-eval.cjs",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/evals/fixtures/scripts/check-pipeline-pending.sh",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/references/full-mode.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/references/pipeline-return.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/scripts/inspect-fix-publication.cjs",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-simplify-code/SKILL.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/cases/docs-only-no-yield.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/cases/r2-elegant-refactor.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/cases/safety-check-preserved.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/package.json",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/prepare-eval.cjs",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/test/entries.test.cjs",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/test/support/ledger-proof.cjs",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger/docs/notes.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger/prepare-eval.cjs",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/fixtures/scripts/check-no-yield-scope.sh",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/fixtures/scripts/check-r2-safety-stays.sh",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/fixtures/scripts/check-safety-preserved.sh",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-simplify-code/references/personas/code-quality-reviewer.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-simplify-code/references/personas/code-reuse-reviewer.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-simplify-code/references/test-value-lens.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/evals/cases/drifted-pack-rejects.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/evals/cases/no-commit-auth-stays-uncommitted.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/evals/cases/non-active-rejects.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/evals/cases/r2-reverse-mismatch.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/evals/cases/requirements-only-stops.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/evals/cases/return-to-caller-envelope.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/evals/cases/standalone-closeout-order.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/evals/cases/trivial-bare-prompt-executes.yaml",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/done-plan/prepare-eval.cjs",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/drifted-pack/prepare-eval.cjs",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/mini-ledger-guarded2/prepare-eval.cjs",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/reqonly-plan/prepare-eval.cjs",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/scripts/check-closeout-order.sh",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/scripts/check-no-implementation.sh",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/scripts/check-r2-reverse-mismatch.sh",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/scripts/check-readme-fixed.sh",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/scripts/check-return-to-caller.sh",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/scripts/check-uncommitted-handback.sh",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/references/agents/figma-design-sync.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/references/execution-strategy.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/references/feedback-and-tests.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/references/implementation-loop.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/references/return-to-caller.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/references/review-findings-followup.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/references/shipping-workflow.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-work/references/work-intake-and-task-pack.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-worktree/SKILL.md",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "skills/spec-worktree/scripts/worktree-manager.sh",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "tests/unit/autoresearch-score-regression.test.js",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "tests/unit/spec-commit-push-pr-context-contracts.test.js",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "tests/unit/spec-commit-scope-regression.test.js",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "tests/unit/spec-debug-judge-calibration.test.js",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "tests/unit/spec-lfg-pr-watch-state.test.js",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "tests/unit/spec-optimize-contracts.test.js",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "tests/unit/spec-optimize-decide.test.js",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "tests/unit/spec-optimize-measurement-only-contracts.test.js",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "tests/unit/spec-work-outcome-judges.test.js",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    },
+    {
+      "path": "tests/unit/spec-worktree-contracts.test.js",
+      "status": "reviewed",
+      "limitations": [
+        "Static only; no execution."
+      ]
+    }
+  ]
+}

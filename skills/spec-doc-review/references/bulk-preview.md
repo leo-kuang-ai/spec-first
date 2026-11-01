@@ -22,7 +22,7 @@ In all three cases the user confirms with `Proceed` or backs out with `Cancel`. 
 
 ---
 
-+## Withdrawal revalidation (before composing the plan)
+## Withdrawal revalidation (before composing the plan)
 
 The walk-through's withdrawal rule (`references/walkthrough.md`, "Withdrawing findings the user's earlier answers resolved") is not confined to the one-by-one loop — it applies to every finding this preview is about to act on. Before sorting findings into Applying / Appending / Skipping buckets, judge each in-scope finding against the decisions already settled: for the `Auto-resolve with best judgment on the rest` path (option D), the earlier walk-through answers the user already gave; for any path, a finding resolved by another finding's Apply in the same plan. A finding those decisions already resolve or contradict does not belong in an action bucket — it is withdrawn, not applied, deferred, or skipped.
 

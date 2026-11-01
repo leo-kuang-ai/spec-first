@@ -1,0 +1,44 @@
+FAIL tests/unit/mcp-setup-command-display.test.js
+  setup repair command argument identity
+    ✕ POSIX copy/paste preserves path bytes without executing substitutions (6 ms)
+    ✕ folder config repair retains the selected target kind
+
+  ● setup repair command argument identity › POSIX copy/paste preserves path bytes without executing substitutions
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 2
+
+      21 |         cwd: root, encoding: 'utf8', env: { ...process.env, PATH: `${root}:${process.env.PATH}` },
+      22 |       });
+    > 23 |       expect(result.status).toBe(0);
+         |                             ^
+      24 |       expect(result.stdout.trimEnd().split('\n')).toEqual(['--only', 'graphify', '--folder', target, '--repair-host-config']);
+      25 |       expect(fs.existsSync(path.join(root, 'injected'))).toBe(false);
+      26 |       expect(fs.existsSync(path.join(root, 'injected2'))).toBe(false);
+
+      at Object.toBe (tests/unit/mcp-setup-command-display.test.js:23:29)
+
+  ● setup repair command argument identity › folder config repair retains the selected target kind
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "--folder"
+    Received string:    "spec-runtime-setup --project-config --refresh-example --repo \"/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/setup-folder-display-1P0gNN\""
+
+      34 |     try {
+      35 |       const facts = inspectProjectConfig({ repoRoot: root, targetKind: 'non-git-folder' });
+    > 36 |       expect(facts.example_config.next_action).toContain('--folder');
+         |                                                ^
+      37 |       expect(facts.example_config.next_action).not.toContain('--repo');
+      38 |     } finally {
+      39 |       fs.rmSync(root, { recursive: true, force: true });
+
+      at Object.toContain (tests/unit/mcp-setup-command-display.test.js:36:48)
+
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 2 total
+Snapshots:   0 total
+Time:        0.169 s
+Ran all test suites matching /tests\/unit\/mcp-setup-command-display.test.js/i.

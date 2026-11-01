@@ -1,0 +1,12 @@
+{
+  "trial": "CEOPT-33-B3",
+  "at": "2026-10-31T05:44:30.966551+00:00",
+  "original_sha256": "ede05b5dc75e302f926867672fd77ad3e0e4cd62c48a7047cd0b49af33460837",
+  "source_lines_inclusive": [
+    1,
+    275
+  ],
+  "candidate_sha256": "1cf2cf19adae03d1dfaf0d427ef59a905cb16f41319a6017c7a5d2e92dfcf6dd",
+  "admission": "Parent reviewed entire draft; exact contiguous original frontmatter through Regeneration Rules, excluding separate final disposition. No semantic editing or status promotion.",
+  "semantic_observation": "All3 source owners/dependencies and protected refs remain; session-settled notes carry KD-1/KTD-1 and proof preservation/externalreceipt. U3 stop condition missing live receipt potentially conflates implementation readiness with closure; independent reviewer to judge. Explicit draft-only/unperformed checks retained."
+}

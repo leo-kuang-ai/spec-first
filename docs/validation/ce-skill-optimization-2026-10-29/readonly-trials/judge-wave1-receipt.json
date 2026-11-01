@@ -1,0 +1,8 @@
+{
+  "native_task": "/root/judge_readonly_wave1",
+  "session_id": "01a18a99-a4e4-7a83-9c91-67077167bc5c",
+  "source_transcript_sha256": "285d9b07f799522830611c703919de876511d22f822d536468c2cc350e7eeb46",
+  "response_sha256": "73d42127dea4809861028fa0f6603e3a47ebb6915f8bd96f0d91c820d82631ac",
+  "translation_note": "An English-only restatement was requested after the original Chinese adjudication; outcome values were preserved.",
+  "scope": "Fresh reviewer context, arm mapping withheld; not cross-model independence or authenticated execution."
+}

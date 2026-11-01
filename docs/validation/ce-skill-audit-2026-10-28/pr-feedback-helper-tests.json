@@ -1,0 +1,10 @@
+{
+  "command": [
+    "node",
+    "node_modules/jest/bin/jest.js",
+    "--runInBand",
+    "--runTestsByPath",
+    "tests/unit/spec-pr-feedback-reply.test.js"
+  ],
+  "exit_code": 0
+}

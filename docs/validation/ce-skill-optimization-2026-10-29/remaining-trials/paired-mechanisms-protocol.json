@@ -1,0 +1,39 @@
+{
+  "created_at": "2026-10-30T03:40:32.193612+00:00",
+  "status": "frozen-before-execution",
+  "scratch_root": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-18eqh2pj",
+  "owner": "orchestrator",
+  "tests": {
+    "tests/unit/autoresearch-score-regression.test.js": "172375fd5dd55625ca0e03cc427a84265aebf90d8dd0c6f2d6db1e93fd46940b",
+    "tests/unit/spec-optimize-decide.test.js": "21f16399de9331f267b8d393bb26143f96a4e4cab4edf46e64dffd8694b634f0",
+    "tests/unit/spec-optimize-measurement-only-contracts.test.js": "e8ff654c8c79a91b6cc5d285e255b1896ffd62e3c35bb19db5810b728e708c6c",
+    "tests/unit/spec-worktree-contracts.test.js": "66013cb7369f6f2d5e2f07c03656aebf1060eabb44c19f88ed9fef67a8adab6c",
+    "tests/unit/spec-prd-finalize-transition.test.js": "be933d0ef61ded3020319c2d63ea6f305d8e152ac900e25e77d26d3efedba9ad",
+    "tests/unit/spec-code-review-mechanics.test.js": "91db40d8b2db932ffba52f78686dbfe2bc08b63f3ead2ad3f8ac4c8b27d6042b",
+    "tests/unit/spec-lfg-pr-watch-state.test.js": "c54f9f505015edd405edc0a43f85e0748f45f0b545bdd4ab17dd08945e2b4374",
+    "tests/unit/spec-test-browser-conformance-cleanup.test.js": "2569a6dfa09966dba79abf557fb2f6aa1b54b985464f648e4ee8adb5c9e519a7",
+    "tests/unit/sweep-state-safety.test.js": "02fb84840898227edd8204a80f6ee9fe01092028f447b987fbc3daf88d54bdab",
+    "tests/unit/spec-sweep-final-publication.test.js": "6285f327e9533cd4ed4adc068e096a8abd31b25382266f25015b134fbcffe77c",
+    "tests/unit/spec-sweep-media-admission.test.js": "d128cfd5e889a0ae340fe9156ab9d880662a7a640baabe63eeddc01d5ed2002d",
+    "tests/unit/spec-riffrec-evidence-coverage.test.js": "2ab314cda2a5c683a94458f5c065c840cf041fde986d045a45a82ff01b6687df",
+    "tests/unit/spec-pov-worker-admission.test.js": "f78795610b2ed5f8e9ce16a6597fcde366583e8b2837727b4fea70cc4ed4a255"
+  },
+  "limitations": [
+    "Current regression harness is identical in both arms; baseline failures are expected and retained.",
+    "This is deterministic source comparison, not model/task/field or external-provider evidence.",
+    "Source-level contract assertions are distinguished from executable mechanism tests.",
+    "No mutation-capable subagent is used; local disposable test fixtures are operated by the authorized parent."
+  ],
+  "arms": {
+    "A": {
+      "source_origin": "/Users/kuang/xiaobu/spec-first/.git/spec-first-ce-optimization-2026-10-29/files",
+      "source_paths": 1341,
+      "manifest_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-remaining-20261030/paired-mechanisms-input.json"
+    },
+    "B": {
+      "source_origin": "/Users/kuang/xiaobu/spec-first",
+      "source_paths": 1410,
+      "manifest_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-remaining-20261030/paired-mechanisms-input.json"
+    }
+  }
+}

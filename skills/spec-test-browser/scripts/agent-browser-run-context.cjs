@@ -67,6 +67,7 @@ const NAVIGATION_OR_INTERACTION_ACTIONS = new Set([
   'select',
 ]);
 const PAGE_CONTEXT_ACTIONS = new Set([
+  'vitals',
   'snapshot',
   'get',
   'console',
@@ -191,6 +192,7 @@ function buildBlockedProbe(options = {}) {
     version: options.version || null,
     capabilities: options.capabilities || buildCapabilities(),
     ...(options.binaryIdentity ? { binary_identity: options.binaryIdentity } : {}),
+    ...(options.conformanceRecovery ? { conformance_recovery: options.conformanceRecovery } : {}),
     missing: options.missing || [],
   };
 }
@@ -289,6 +291,10 @@ function evaluateConformance(result, binaryIdentity) {
       reason_code: payload && payload.status === 'failed'
         ? 'exact-origin-conformance-failed'
         : 'exact-origin-conformance-invalid',
+      recovery: isPlainObject(payload?.recovery) && typeof payload.recovery.run_root === 'string'
+        && path.isAbsolute(payload.recovery.run_root)
+        ? { run_root: payload.recovery.run_root, evidence_ref: path.join(payload.recovery.run_root, 'conformance-result.json') }
+        : null,
     };
   }
   if (!isPlainObject(payload)
@@ -297,6 +303,11 @@ function evaluateConformance(result, binaryIdentity) {
     || !sameBinaryIdentity(payload.binary_identity, binaryIdentity)
     || !isPlainObject(payload.positive_control)
     || payload.positive_control.status !== 'passed'
+    || !isPlainObject(payload.cleanup)
+    || payload.cleanup.status !== 'passed'
+    || payload.cleanup.exit_code !== 0
+    || payload.cleanup.timed_out !== false
+    || payload.cleanup.error !== null
     || payload.blocked_origin_total_hits !== 0
     || !Array.isArray(payload.cases)
     || payload.cases.length !== CONFORMANCE_CASES.length) {
@@ -431,6 +442,7 @@ function probeAgentBrowser(options = {}) {
     return buildBlockedProbe({
       status: 'available',
       reasonCode: conformance.reason_code,
+      conformanceRecovery: conformance.recovery,
       conformanceStatus: 'failed',
       repairScope: 'spec-first',
       nextAction: '当前 binary 未通过 Spec-First controlled exact-origin conformance；保持 browser execution blocked 并检查 producer evidence。',
@@ -682,10 +694,17 @@ function prepareRunContext(options = {}) {
         'open',
         'snapshot',
         'get',
+        'gettext',
+        'inputvalue',
+        'title',
+        'url',
+        'count',
         'console',
         'network',
+        'requests',
         'vitals',
         'set',
+        'viewport',
         'screenshot',
         'click',
         'fill',
@@ -693,6 +712,10 @@ function prepareRunContext(options = {}) {
         'press',
         'select',
         'find',
+        'getbyrole',
+        'getbylabel',
+        'getbytestid',
+        'getbytext',
         'close',
       ],
     }, options);

@@ -1,0 +1,60 @@
+{
+  "created_at": "2026-10-30T06:19:36.164141+00:00",
+  "source_sha256": "4da7d03d25e2ce0367823ca3e8feaef7ab6eb1bb8e94f0e94cc73a4f87e2be43",
+  "runs": [
+    {
+      "size_input": 1,
+      "exit_code": 0,
+      "stdout": "{\"size\":1,\"checksum\":3,\"elapsed_ms\":0.014708000000002386}\n",
+      "stderr": ""
+    },
+    {
+      "size_input": 99,
+      "exit_code": 0,
+      "stdout": "{\"size\":99,\"checksum\":6690,\"elapsed_ms\":0.22104199999999707}\n",
+      "stderr": ""
+    },
+    {
+      "size_input": 101,
+      "exit_code": 0,
+      "stdout": "{\"size\":101,\"checksum\":6970,\"elapsed_ms\":0.222332999999999}\n",
+      "stderr": ""
+    },
+    {
+      "size_input": 16000,
+      "exit_code": 0,
+      "stdout": "{\"size\":16000,\"checksum\":151188619,\"elapsed_ms\":355.342917}\n",
+      "stderr": ""
+    },
+    {
+      "size_input": 16000,
+      "exit_code": 0,
+      "stdout": "{\"size\":16000,\"checksum\":151188619,\"elapsed_ms\":353.317167}\n",
+      "stderr": ""
+    },
+    {
+      "size_input": 16000,
+      "exit_code": 0,
+      "stdout": "{\"size\":16000,\"checksum\":151188619,\"elapsed_ms\":352.144291}\n",
+      "stderr": ""
+    },
+    {
+      "size_input": 0,
+      "exit_code": 0,
+      "stdout": "{\"size\":0,\"checksum\":0,\"elapsed_ms\":0.0027500000000024727}\n",
+      "stderr": ""
+    }
+  ],
+  "profile_run": {
+    "exit_code": 0,
+    "stdout": "{\"size\":16000,\"checksum\":151188619,\"elapsed_ms\":357.698042}\n",
+    "stderr": "",
+    "profile_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/debug-baseline.cpuprofile"
+  },
+  "limitations": [
+    "Synthetic fixture, not production performance.",
+    "Timing samples are local and not a model A/B benefit claim.",
+    "No replacement candidate or post-fix proof exists yet."
+  ],
+  "scratch_cleaned": true
+}

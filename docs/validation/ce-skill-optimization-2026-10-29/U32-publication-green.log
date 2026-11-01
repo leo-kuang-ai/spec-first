@@ -1,0 +1,65 @@
+FAIL tests/unit/spec-sweep-final-publication.test.js
+  ✓ publishes the actual final record and released lease, then resumes without another push (774 ms)
+  ✓ missing record or unreleased lease prevents publication (213 ms)
+  ✕ record failure and another writer release failure retain remote ownership (149 ms)
+  ✕ rejected push remains pending and never reports remote cleanup (560 ms)
+  ✓ a newer writer is read before recovery and never overwritten (459 ms)
+  ✓ repo-local refuses the shared publisher without remote writes (232 ms)
+  ✓ committed-local refuses the shared publisher without remote writes (232 ms)
+  ✓ unrelated committed files cannot hitchhike on the final publication (354 ms)
+  ✓ unknown push exit is reconciled from exact remote bytes before declaring success (1152 ms)
+
+  ● record failure and another writer release failure retain remote ownership
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 2
+
+      17 | function state(command, args = []) {
+      18 |   const r = spawnSync('python3', [engine, command, '--state', path.join(repo, 'state.yml'), ...args], { env: env(), encoding: 'utf8' });
+    > 19 |   expect(r.status).toBe(0);
+         |                    ^
+      20 |   return r.stdout.trim().split('\n')[0];
+      21 | }
+      22 | function finalize() {
+
+      at toBe (tests/unit/spec-sweep-final-publication.test.js:19:20)
+      at Object.state (tests/unit/spec-sweep-final-publication.test.js:67:10)
+
+  ● rejected push remains pending and never reports remote cleanup
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 4
+    + Received  + 4
+
+      Object {
+    -   "code": 1,
+    +   "code": 0,
+        "result": Object {
+    -     "observed_remote_sha": "5216a8ed17b8b51ab2a2ab8f21163562e3de716c",
+    +     "observed_remote_sha": "1c59311edf760e152fbe616b763064e70dcd8ad8",
+          "push_attempted": true,
+    -     "release_confirmed": false,
+    -     "status": "pending",
+    +     "release_confirmed": true,
+    +     "status": "published",
+        },
+      }
+
+      75 |   finalize();
+      76 |   fs.writeFileSync(path.join(remote, 'hooks/pre-receive'), '#!/bin/sh\nexit 1\n', { mode: 0o755 });
+    > 77 |   expect(publish()).toMatchObject({ code: 1, result: { status: 'pending', release_confirmed: false, observed_remote_sha: lease, push_attempted: true } });
+         |                     ^
+      78 |   expect(git(['rev-parse', 'HEAD'])).toBe(candidate);
+      79 | });
+      80 |
+
+      at Object.toMatchObject (tests/unit/spec-sweep-final-publication.test.js:77:21)
+
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 7 passed, 9 total
+Snapshots:   0 total
+Time:        4.208 s
+Ran all test suites matching /tests\/unit\/spec-sweep-final-publication.test.js/i.

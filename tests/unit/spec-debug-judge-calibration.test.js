@@ -30,6 +30,9 @@ describe('spec-debug Judge 正反校准', () => {
     git('init', '-q');
     git('add', '.');
     git('-c', 'user.name=Judge Calibration', '-c', 'user.email=judge@example.invalid', 'commit', '-qm', 'fixture baseline');
+    fs.writeFileSync(path.join(workspace, '.git/eval-baseline.json'), JSON.stringify({
+      fixture: 'mini-ledger', head: git('rev-parse', 'HEAD').toString().trim(), index: git('ls-files', '--stage', '-z').toString(),
+    }));
   });
   afterEach(() => fs.rmSync(workspace, { recursive: true, force: true }));
 
@@ -70,6 +73,26 @@ describe('spec-debug Judge 正反校准', () => {
     expect(run('check-fixed-no-commit.sh').status).toBe(1);
   });
 
+  test.each(['test', 'tests'])('authorized repair may retain a new regression test in %s/', (directory) => {
+    const proof = path.join(directory, 'regression.test.cjs');
+    fs.mkdirSync(path.join(workspace, directory));
+    fs.writeFileSync(path.join(workspace, proof), "const assert = require('node:assert/strict');\n"
+      + fs.readFileSync(path.resolve(__dirname, '../../scripts/evals/ledger-http-probe.cjs'), 'utf8'));
+    const runProof = () => spawnSync(process.execPath, [proof], {
+      cwd: workspace, encoding: 'utf8', timeout: 15000,
+    });
+    expect(runProof().status).toBe(1);
+    writeServer(repaired);
+    expect(runProof().status).toBe(0);
+    const result = run('check-fixed-no-commit.sh');
+    expect({ status: result.status, stderr: result.stderr }).toMatchObject({ status: 0 });
+    writeServer(original);
+    expect(run('check-diagnosis-no-fix.sh').status).toBe(1);
+    writeServer(repaired);
+    fs.appendFileSync(path.join(workspace, 'README.md'), '\nUnauthorized baseline change');
+    expect(run('check-fixed-no-commit.sh').status).toBe(1);
+  });
+
   test('修复后引擎失败或产生新 commit 均不能通过', () => {
     writeServer(repaired);
     expect(run('check-fixed-no-commit.sh', { EVAL_EXIT_CODE: '1' }).status).toBe(1);
@@ -83,5 +106,12 @@ describe('spec-debug Judge 正反校准', () => {
     fs.copyFileSync(path.join(scripts, 'check-fixed-no-commit.sh'), standalone);
     writeServer(repaired);
     expect(run(standalone).status).toBe(0);
+  });
+
+  test('diagnosis and repair reject same-count HEAD metadata amendments', () => {
+    git('-c', 'user.name=Judge Calibration', '-c', 'user.email=judge@example.invalid', 'commit', '--amend', '-qm', 'unauthorized metadata rewrite');
+    expect(run('check-diagnosis-no-fix.sh').status).toBe(1);
+    writeServer(repaired);
+    expect(run('check-fixed-no-commit.sh').status).toBe(1);
   });
 });

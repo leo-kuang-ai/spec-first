@@ -605,7 +605,7 @@ describe('plugin module facade and governance', () => {
       },
       {
         suffix: '/spec-compound/references/agents/best-practices-researcher.md',
-        marker: '`.claude/skills/**/SKILL.md`, `.codex/skills/**/SKILL.md`, and `.agents/skills/**/SKILL.md`',
+        marker: "Start from the current host's supplied skill catalog and the caller's exact relevant source refs.",
       },
       {
         suffix: '/using-spec-first/references/conditional-routing-boundaries.md',

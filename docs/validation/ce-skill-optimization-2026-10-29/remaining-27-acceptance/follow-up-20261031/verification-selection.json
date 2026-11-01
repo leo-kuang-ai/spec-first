@@ -1,0 +1,28 @@
+{
+  "scope": "Six prose source successors and synthetic acceptance inputs; no CLI/runtime implementation change.",
+  "profile_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-followup-20261031/verification-profile.json",
+  "selected": [
+    "plan-contracts",
+    "commit-recovery",
+    "consumer-regression",
+    "entrypoint-lint",
+    "tasks-skill-shape",
+    "commit-skill-shape",
+    "commit-skill-shape-baseline",
+    "plan-record-integrity",
+    "scoped-source-integrity",
+    "scoped-diff-check",
+    "plan-quality",
+    "entrypoint-lint-final"
+  ],
+  "broader_profile_disposition": "Full typecheck/unit/smoke/integration are candidates, not executed in this follow-up. Focused consumer suites cover the affected contract; no whole-project green claim.",
+  "semantic_checks": [
+    "All six new Plan outputs and read traces against frozen source arms and synthetic input",
+    "Six source successors, Git procedure and task consumer boundaries independently reviewed"
+  ],
+  "required_unavailable_facets": [
+    "Original Plan production/history contracts remain unprovided; synthetic successor is separate.",
+    "Actual provider/PR/media/Xcode/design/human and autonomous facets remain governed by original per-row owners."
+  ],
+  "generic_validator_disposition": "Both original and changed Commit skill reject the existing internal-only user-invocable key. Keep actual exit 1; project lint owns entrypoint compatibility."
+}

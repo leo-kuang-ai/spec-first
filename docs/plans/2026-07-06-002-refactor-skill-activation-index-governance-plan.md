@@ -4,13 +4,13 @@ type: refactor
 status: active
 date: 2026-07-06
 spec_id: 2026-07-06-002-skill-activation-index-governance
-origin: docs/项目审查/2026-07-06-skill-prompt-精简优化方案.md
+origin: docs/project-reviews/2026-07-06-skill-prompt-精简优化方案.md
 origin_grade: legacy
 origin_verification_status: not-applicable
 origin_verification_reason_codes: []
 split_from: docs/plans/2026-07-06-001-refactor-skill-prompt-slimming-plan.md
 referenced_reviews:
-  - path: docs/项目审查/2026-07-06-skill-prompt-精简优化方案.md
+  - path: docs/project-reviews/2026-07-06-skill-prompt-精简优化方案.md
     role: origin
     scope: in
     addresses_findings: ["l1-description-routing-tax", "new-skill-system-level-governance", "route-collision-eval-coverage"]
@@ -217,7 +217,7 @@ flowchart TB
 ## 来源与参考
 
 - 拆分来源：`docs/plans/2026-07-06-001-refactor-skill-prompt-slimming-plan.md`
-- 优化审查（§10-11 索引/路由治理）：`docs/项目审查/2026-07-06-skill-prompt-精简优化方案.md`
-- 角色契约：`docs/10-prompt/结构化项目角色契约.md`
+- 优化审查（§10-11 索引/路由治理）：`docs/project-reviews/2026-07-06-skill-prompt-精简优化方案.md`
+- 角色契约：`docs/methodology/结构化项目角色契约.md`
 - skill audit rubric：`skills/retired-skill-review/references/skill-authoring-quality.md`
 - lint 入口治理：`scripts/lint-skill-entrypoints.js`、`scripts/lint-skill-entrypoints.config.json`

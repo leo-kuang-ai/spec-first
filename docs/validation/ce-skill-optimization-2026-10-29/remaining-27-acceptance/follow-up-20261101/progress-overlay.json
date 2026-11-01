@@ -1,0 +1,21 @@
+{
+  "accounting": {
+    "additional_contexts": 2,
+    "plan_reason_cases": 3,
+    "debug_simplify_consumers": 1,
+    "not_added_to_frozen_plan_trial_counts": true
+  },
+  "rows": {
+    "CEOPT-08": {
+      "november_followup_ref": "follow-up-20261101/report.md",
+      "conclusion": "All six exact proposals and parent-mediated executions pass;84 process stdout records verified. Same candidate bytes in both arms; no B superiority. Actual profiles and cleanup checked separately from the runner passed flag. November1: one fresh Simplify consumer preserved exact repaired-source/proof pins and returned no-change; parent reran seven paired checksum cases successfully.",
+      "next_action": "Actual autonomous mutation and a separately justified substantive refactor remain open. The mediated Debug-to-Simplify proof handoff is now exercised; do not repeat it as missing."
+    },
+    "CEOPT-16": {
+      "november_followup_ref": "follow-up-20261101/report.md",
+      "conclusion": "Six separate synthetic-input plans are core-usable within600s; all preserve Product Contract. All retain old reason-code/read limitations; B2/B3 omit contract-document update ownership. Current reason-code source fix independently reviewed, not exercised by frozen trials. November1: current reason-code successor correctly handles three cause-specific reporting cases in one fresh context.",
+      "next_action": "Production client/CLI evidence remains missing. Current reason-code micro-behavior is covered; full post-fix Plan workflow, autonomous persistence and production acceptance remain separate.",
+      "unblock_condition": "Current reason-code micro-behavior is covered. Full post-fix Plan workflow, autonomous persistence and real production taxonomy/replay/CLI acceptance remain pending."
+    }
+  }
+}

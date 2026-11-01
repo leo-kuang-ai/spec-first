@@ -1,0 +1,7 @@
+{
+  "trial": "CEOPT-08-A2",
+  "approved_for_disposable_execution": true,
+  "candidate_sha256": "385e5f596701ee5ed2829c179a02de851688459fa7ede0fc394776f668643052",
+  "at": "2026-10-30T08:49:07.076784+00:00",
+  "review": "Full candidate read: perf_hooks plus deterministic local aggregation and stdout only. Exact candidate bytes equal separately admitted B2. Ordered map, fields and timer semantics preserved. Parent fixed proof only; proposed model command not executed."
+}

@@ -24,10 +24,9 @@ It does **not** make sense to invoke `spec-compound-refresh` when:
 
 Use these rules:
 
-- If there is **one obvious stale candidate**, invoke `spec-compound-refresh` with a narrow scope hint after the new learning is written
-- If there are **multiple candidates in the same area**, ask the user whether to run a targeted refresh for that module, category, or pattern set
-- If context is already tight or you are in lightweight mode, do not expand into a broad refresh automatically; instead recommend `spec-compound-refresh` as the next step with a scope hint
-- **In headless mode**, never invoke `spec-compound-refresh` and never ask the user. Surface the recommended scope hint in the terminal report's "Refresh recommendation" line and let the caller decide
+- For one or several concrete candidates, report the narrowest useful Refresh scope and the evidence of drift. Capture does not itself authorize edits to other learning documents.
+- If the active caller or user already authorized that exact maintenance scope, return the recommendation and evidence to its owner for continuation; do not ask for the same authorization again or silently launch another workflow from capture.
+- If scope is not authorized, leave it as a recommendation. Lightweight and headless runs always return the recommendation without expanding into refresh or prompting.
 
 When invoking or recommending `spec-compound-refresh`, be explicit about the argument to pass. Prefer the narrowest useful scope:
 

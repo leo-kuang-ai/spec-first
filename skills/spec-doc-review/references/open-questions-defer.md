@@ -29,9 +29,9 @@ Within the Open Questions section, scan for a subsection heading matching the cu
 
 Date format: ISO 8601 calendar date (`YYYY-MM-DD`). If multiple reviews occur on the same document on the same day within the same session, they still share the same subsection. Multi-day same-document reviews get distinct subsections, which is the intended behavior.
 
-### Step 3: Format and append the entry
+### Step 3: Prepare the rendered entry
 
-Per deferred finding, append a reader-facing bullet-point entry. The entry carries no HTML comment — the markdown rendering contract forbids mixed-in HTML, and every field Step 4's dedup needs is reconstructable from the visible entry text:
+Per deferred finding, prepare a reader-facing bullet-point entry in memory; append only after Step 4 confirms it is absent. The entry carries no HTML comment — the markdown rendering contract forbids mixed-in HTML, and every field Step 4's dedup needs is reconstructable from the visible entry text:
 
 ```
 - **{title}** — {section} ({severity}, {reviewer}, confidence {confidence})
@@ -59,14 +59,16 @@ If an entry with the same compound key already exists under the same `### From Y
 
 **Compound key for dedup:** `normalize(section) + normalize(title) + why_fingerprint`. All three reconstruct from the visible entry, so no hidden metadata is needed:
 
-- `normalize(section)` and `normalize(title)` use the same normalization as synthesis step 3.3 dedup (lowercase, strip punctuation, collapse whitespace). For a new finding, compute from the schema; for an existing entry, parse `{title}` (the bold leader) and `{section}` (the text between the em-dash and the opening `(`) out of the rendered bullet.
-- `why_fingerprint` is the first ~120 characters of the entry's `{why_it_matters}` prose, word-boundary-preserving, with any run of whitespace collapsed to a single space. Because why_it_matters renders verbatim in the entry, the same fingerprint recomputes from the visible bullet on any retry or reread. When why_it_matters is empty, fall back to `normalize(section) + normalize(title)` alone.
+- `normalize(section)` and `normalize(title)` use lowercase, stripped punctuation and collapsed whitespace for lookup. For a new finding, first finalize the actual rendered title, section and rationale, then compute from that text; for an existing entry, parse `{title}` (the bold leader) and `{section}` (the text between the em-dash and the opening `(`) out of the rendered bullet.
+- `why_fingerprint` is the first ~120 characters of the entry's `{why_it_matters}` prose, word-boundary-preserving, with any run of whitespace collapsed to a single space. Compute this from the final rendered rationale, including any presentation rewrite, so the same fingerprint recomputes from the visible bullet on retry or reread. Retain the complete rendered text to disambiguate a shared prefix. When why_it_matters is empty, fall back to `normalize(section) + normalize(title)` alone.
 
-Title-only dedup is not sufficient: two different findings in the same document (even on the same review date) can legitimately share a short title if their sections or rationale differ. Using only `{title}` would silently drop one — losing user-visible backlog context. Matching on section and the why-fingerprint keeps distinct findings distinct, and stays close to the R29/R30 matching predicate (`section + title + evidence-substring overlap`) so cross-round and intra-round dedup behave consistently.
+Title-only dedup is not sufficient: two different findings in the same document (even on the same review date) can legitimately share a short title if their sections or rationale differ. Using only `{title}` would silently drop one — losing user-visible backlog context. Matching on section and the why-fingerprint keeps distinct findings distinct, while R29/R30 separately evaluate semantic consequence and current evidence across rounds.
 
 **Pre-existing entries with a `dedup-key` HTML comment:** entries written by the prior format carry a trailing `<!-- dedup-key: ... -->` comment. Ignore it for matching — the visible-text key above is authoritative — and strip the comment if the entry is otherwise edited. Do not write new ones.
 
-On collision, record the no-op in the completion report's Coverage section so the user sees the duplicate was suppressed. Cross-subsection collisions (same compound key, different dates) are not deduplicated — each review is allowed to re-raise the same concern.
+A compound-key collision is a candidate: compare the complete rendered consequence before suppressing it. Distinct concerns sharing a 120-character prefix remain separate. Before a retry after an unknown write result, read back the actual subsection and check for the prepared entry; do not blindly append again. After a successful write, read back and verify the entry exactly once. Missing or ambiguous readback remains unverified.
+
+On a confirmed duplicate, record the no-op in the completion report's Coverage section so the user sees the duplicate was suppressed. Cross-subsection collisions (same compound key, different dates) are not deduplicated — each review is allowed to re-raise the same concern.
 
 ---
 

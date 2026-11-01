@@ -63,6 +63,70 @@ describe('injectRoutingInstruction — upsert routing block into workspace entry
     expect(fs.existsSync(path.join(ws, 'CLAUDE.md'))).toBe(false);
   });
 
+  test('dangling entry links cannot create outside files; normal creation works after recovery', () => {
+    const ws = mkWorkspace();
+    const outside = mkWorkspace();
+    const entry = path.join(ws, 'AGENTS.md');
+    const target = path.join(outside, 'absent.md');
+    try {
+      fs.symlinkSync(target, entry);
+      const result = injectRoutingInstruction({ workspaceRoot: ws, hosts: ['codex'] });
+      expect(result.entries[0]).toMatchObject({ status: 'failed', reason_code: 'routing-entry-escapes-workspace' });
+      expect(fs.existsSync(target)).toBe(false);
+      expect(fs.lstatSync(entry).isSymbolicLink()).toBe(true);
+      fs.unlinkSync(entry);
+      expect(injectRoutingInstruction({ workspaceRoot: ws, hosts: ['codex'] }).entries[0].status).toBe('created');
+    } finally {
+      fs.rmSync(ws, { recursive: true, force: true });
+      fs.rmSync(outside, { recursive: true, force: true });
+    }
+  });
+
+  test('atomic replacement preserves outside hardlink peers and file permissions', () => {
+    const ws = mkWorkspace();
+    const outside = mkWorkspace();
+    try {
+      const target = path.join(outside, 'original.md');
+      const entry = path.join(ws, 'AGENTS.md');
+      fs.writeFileSync(target, '# Original content\n', { mode: 0o640 });
+      fs.linkSync(target, entry);
+      expect(injectRoutingInstruction({ workspaceRoot: ws, hosts: ['codex'] }).entries[0].status).toBe('updated');
+      expect(fs.readFileSync(target, 'utf8')).toBe('# Original content\n');
+      expect(fs.statSync(entry).mode & 0o777).toBe(fs.statSync(target).mode & 0o777);
+      expect(fs.readdirSync(ws)).toEqual(['AGENTS.md']);
+    } finally {
+      fs.rmSync(ws, { recursive: true, force: true });
+      fs.rmSync(outside, { recursive: true, force: true });
+    }
+  });
+
+  test('rejects a destination replaced by a symlink after staging and removes the temporary file', () => {
+    const ws = mkWorkspace();
+    const outside = mkWorkspace();
+    const entry = path.join(ws, 'AGENTS.md');
+    const target = path.join(outside, 'sentinel.md');
+    fs.writeFileSync(entry, '# User content\n');
+    fs.writeFileSync(target, 'sentinel');
+    const originalWrite = fs.writeFileSync;
+    const spy = jest.spyOn(fs, 'writeFileSync').mockImplementation((filename, ...args) => {
+      const result = originalWrite(filename, ...args);
+      if (typeof filename === 'number') {
+        fs.unlinkSync(entry);
+        fs.symlinkSync(target, entry);
+      }
+      return result;
+    });
+    try {
+      expect(injectRoutingInstruction({ workspaceRoot: ws, hosts: ['codex'] }).entries[0].status).toBe('failed');
+      expect(fs.readFileSync(target, 'utf8')).toBe('sentinel');
+      expect(fs.readdirSync(ws)).toEqual(['AGENTS.md']);
+    } finally {
+      spy.mockRestore();
+      fs.rmSync(ws, { recursive: true, force: true });
+      fs.rmSync(outside, { recursive: true, force: true });
+    }
+  });
+
   test('six-host injection renders the shared AGENTS block with Kiro/Qoder degradation', () => {
     const ws = mkWorkspace();
     const result = injectRoutingInstruction({

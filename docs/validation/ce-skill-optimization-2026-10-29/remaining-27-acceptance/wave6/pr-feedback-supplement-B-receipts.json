@@ -1,0 +1,43 @@
+{
+  "arm": "B",
+  "input": {
+    "host": "github.enterprise.example",
+    "base_repo": "upstream/project",
+    "number": 42,
+    "head_repo": "fork/project",
+    "head_ref": "fix/review",
+    "fix_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "comparison": {
+    "status": "behind",
+    "merge_base_commit": {
+      "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
+  },
+  "result": {
+    "verified": false,
+    "reason_code": "fix-not-proven-reachable",
+    "observed_at": "2026-10-30T07:36:54.704Z",
+    "host": "github.enterprise.example",
+    "base_repo": "upstream/project",
+    "number": 42,
+    "url": "https://github.enterprise.example/upstream/project/pull/42",
+    "head_repo": "fork/project",
+    "head_ref": "fix/review",
+    "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "fix_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "comparison_status": "behind",
+    "merge_base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "calls": [
+    {
+      "host": "github.enterprise.example",
+      "endpoint": "repos/upstream/project/pulls/42"
+    },
+    {
+      "host": "github.enterprise.example",
+      "endpoint": "repos/fork/project/compare/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
+  ],
+  "limitation": "Consistent behind ancestry stub: remote head is merge base and does not contain fix. Actual pure helper only, not live GitHub."
+}

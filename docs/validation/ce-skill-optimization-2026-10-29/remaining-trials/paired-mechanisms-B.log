@@ -1,0 +1,55 @@
+jest-haste-map: Haste module naming collision: mini-ledger
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-brainstorm/evals/fixtures/repos/mini-ledger/package.json
+    * <rootDir>/skills/spec-app-consistency-audit/evals/fixtures/repos/mini-ledger/package.json
+
+jest-haste-map: Haste module naming collision: shop-monorepo
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/package.json
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/package.json
+
+jest-haste-map: Haste module naming collision: plain-app
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/package.json
+    * <rootDir>/skills/spec-worktree/evals/fixtures/repos/plain-app/package.json
+
+jest-haste-map: Haste module naming collision: admin
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/apps/admin/package.json
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/admin/package.json
+
+jest-haste-map: Haste module naming collision: web
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/apps/web/package.json
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/web/package.json
+
+jest-haste-map: Haste module naming collision: @shop/api-client
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/packages/api-client/package.json
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/api-client/package.json
+
+jest-haste-map: Haste module naming collision: @shop/ui
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/packages/ui/package.json
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/ui/package.json
+
+PASS tests/unit/spec-optimize-decide.test.js
+PASS tests/unit/spec-lfg-pr-watch-state.test.js (6.577 s)
+PASS tests/unit/spec-code-review-mechanics.test.js (6.183 s)
+PASS tests/unit/spec-optimize-measurement-only-contracts.test.js
+PASS tests/unit/spec-worktree-contracts.test.js (6.24 s)
+PASS tests/unit/spec-riffrec-evidence-coverage.test.js
+PASS tests/unit/spec-sweep-final-publication.test.js (5.433 s)
+PASS tests/unit/spec-prd-finalize-transition.test.js
+PASS tests/unit/sweep-state-safety.test.js
+PASS tests/unit/spec-sweep-media-admission.test.js
+PASS tests/unit/autoresearch-score-regression.test.js
+PASS tests/unit/spec-pov-worker-admission.test.js
+PASS tests/unit/spec-test-browser-conformance-cleanup.test.js
+
+Test Suites: 13 passed, 13 total
+Tests:       332 passed, 332 total
+Snapshots:   0 total
+Time:        33.536 s
+Ran all test suites within paths "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-18eqh2pj/B/tests/unit/autoresearch-score-regression.test.js", "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-18eqh2pj/B/tests/unit/spec-optimize-decide.test.js", "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-18eqh2pj/B/tests/unit/spec-optimize-measurement-only-contracts.test.js", "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-18eqh2pj/B/tests/unit/spec-worktree-contracts.test.js", "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-18eqh2pj/B/tests/unit/spec-prd-finalize-transition.test.js", "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-18eqh2pj/B/tests/unit/spec-code-review-mechanics.test.js", "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-18eqh2pj/B/tests/unit/spec-lfg-pr-watch-state.test.js", "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-18eqh2pj/B/tests/unit/spec-test-browser-conformance-cleanup.test.js", "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-18eqh2pj/B/tests/unit/sweep-state-safety.test.js", "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-18eqh2pj/B/tests/unit/spec-sweep-final-publication.test.js", "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-18eqh2pj/B/tests/unit/spec-sweep-media-admission.test.js", "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-18eqh2pj/B/tests/unit/spec-riffrec-evidence-coverage.test.js", "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-18eqh2pj/B/tests/unit/spec-pov-worker-admission.test.js".
+Test results written to: ../../../../../../../../Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/paired-mechanisms-B.json

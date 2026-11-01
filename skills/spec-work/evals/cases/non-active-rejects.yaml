@@ -1,27 +1,23 @@
 id: non-active-rejects
-title: completed 计划不得进入实现
+title: A completed plan cannot authorize implementation
 description: |
-  验证生命周期出口:status: completed 的 implementation-ready 计划
-  返回 source-plan-non-active(语言变体均可),不生成执行任务、不改代码;断言锚定 completed 状态声明与 spec-plan 修复路径。
-
+  Compare the final fixture against its explicit pre-task baseline. File bytes,
+  source inventory, HEAD and index are checked; wording alone is not outcome proof.
 input:
   prompt: |
-    （spec-work skill 已安装，请按它工作。）
-    docs/plans/2026-09-01-001-feat-month-filter-plan.md 继续执行完成它。
-
+    First run `node prepare-eval.cjs` once to prepare this isolated fixture.
+    Only that preparation may create its baseline commit; it grants no task commit authority.
+    Then use the installed spec-work skill for this request:
+    Continue executing docs/plans/2026-09-01-001-feat-month-filter-plan.md.
 context:
   repo_fixture: evals/fixtures/repos/done-plan
   git:
     init: true
     checkout: main
-
-expect:
-  must_contain:
-    - "completed"
-    - "spec-plan"
-
+constraints:
+  timeout_seconds: 600
+  max_turns: 20
 judge:
   type: script
-  # 输出语义(completed+spec-plan)+文件级副作用(server.js 无 month 实现)双重断言
   script_path: evals/fixtures/scripts/check-no-implementation.sh
   timeout_seconds: 30

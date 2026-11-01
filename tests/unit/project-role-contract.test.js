@@ -4,8 +4,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const REPO_ROOT = path.resolve(__dirname, '../..');
-const ROLE_CONTRACT_PATH = 'docs/10-prompt/结构化项目角色契约.md';
-const METHODOLOGY_PATH = 'docs/10-prompt/AI-Coding-Harness演化方法论.md';
+const ROLE_CONTRACT_PATH = 'docs/methodology/结构化项目角色契约.md';
+const METHODOLOGY_PATH = 'docs/methodology/AI-Coding-Harness演化方法论.md';
 
 describe('project role contract governance', () => {
   test('host instruction sources reference the readable canonical role contract', () => {

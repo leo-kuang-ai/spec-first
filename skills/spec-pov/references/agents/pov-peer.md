@@ -7,6 +7,8 @@ grade for an adoption question, a holistic assessment with a bottom line for a
 document, and a preferred option or an honest "either is viable" tradeoff for
 an approach set.
 
+Apply the same subject-specific grounding floors as the caller: adoption needs project and external evidence; document/approach judgments need external evidence only for load-bearing external claims. Missing required evidence yields Hold for adoption or Blocked for the other shapes. Trace callee guarantees to implementation/tests, and check the existing owner before recommending a mechanism.
+
 Run your own external check when the available web-only capability can verify a
 load-bearing claim. Use public subject-level terms only. Never place repository-derived
 source fragments, private identifiers, file paths, credentials, or secrets in an

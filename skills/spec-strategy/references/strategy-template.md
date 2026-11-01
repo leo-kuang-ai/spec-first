@@ -43,6 +43,8 @@ last_updated: {{YYYY-MM-DD}}
 
 - {{one line per item}}
 
+{{Optional: one “Resist a change when ...” line grounded in the user's explicit stress-test rejections; omit when unsupported.}}
+
 <!-- Required in a new document. Record only the user's explicit exclusions; say when none are named rather than inventing them. -->
 
 ## Key metrics

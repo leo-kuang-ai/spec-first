@@ -60,11 +60,15 @@ Before checkout, server discovery, startup, or browser handoff, read [Run prepar
 
 This is the core loop. The user browses the feature and tells you what to improve. You fix it. Repeat until they're happy.
 
+Keep a compact run record of each actionable feedback item: original statement, route/element anchor, intended result, authorized scope, changed paths, verification reference and unresolved status. Merge repeated reports only when the same correction resolves them, preserving their anchors. Before resuming an interrupted item, inspect current source and the original server identity; do not treat an acknowledgement or an attempted edit as verified completion.
+
+Clear bounded feedback can be applied under existing authority. Clarify only ambiguity that changes the edit; a product/design decision outside polish returns to Plan or Work with the original feedback, anchors, current evidence and unresolved choice. After edits, check the relevant result and the original page's availability when affected. A lost connection needs diagnosis/recovery scoped to this run's changes; an HTTP 200 or hot-reload event alone does not prove the interaction works.
+
 - When the user describes something to fix, that explicit request may authorize that bounded fix. Re-resolve `local_fix_authorization` for the requested change; when authorized, make only that scoped change and let the dev server hot-reload. When missing, describe the proposed fix without editing and return `local_fix_authorization_missing`.
 - When the user asks to check something, invoke the internal `spec-test-browser` owner with `current target-origin:<verified-loopback-origin>` (retain the verified scheme, hostname, and port; strip the route into a separate action plan). Pass only the smallest repo-relative route/action plan needed for the check. `spec-polish` never constructs `agent-browser` argv or bypasses the owner's exact-origin, durable-effect, synthetic-input, private-evidence, or cleanup gates. Consume only structured route/step facts and private screenshot/inspection refs. If the owner returns `not_supported` or `not_run`, surface its reason code, recommend `spec-runtime-setup` when capability is missing, and continue the human browser loop without claiming automated inspection.
 - When the user says they're done, stop the loop. If `commit_authorization: authorized`, use the internal `spec-commit` owner to commit only run-owned verified paths. Otherwise leave the changes uncommitted and return `commit_status: not-created` with reason `commit_authorization_missing`.
 
-Return a compact closeout with changed paths, verification notes, `commit_status`, `landing_status`, and limitations. This workflow never infers push or PR authority from completion.
+Return a compact closeout with changed paths, resolved and residual feedback, verification notes, `commit_status`, `landing_status`, and limitations. Report the actual server URL, reused/run-owned status, whether it remains running, and private log/recovery location and retention limits. Do not stop a reused server or delete another session's logs. This workflow never infers push or PR authority from completion.
 
 ## References
 

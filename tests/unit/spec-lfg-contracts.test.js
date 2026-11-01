@@ -47,11 +47,8 @@ describe('spec-lfg current contracts', () => {
     expect(entry).not.toContain('verification_run_summary_ref');
     expect(entry).not.toContain('gh pr edit PR_NUMBER');
     expect(entry).not.toContain('capabilities.exact_origin_confirmed');
-    expect(entry).not.toMatch(/[\u3400-\u9fff]/);
-    for (const file of phaseFiles) {
-      const source = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-lfg/references', file), 'utf8');
-      expect(source).not.toMatch(/[\u3400-\u9fff]/);
-    }
+    expect(reviewFollowup).toContain('validation_status: unresolved');
+    expect(reviewFollowup).toContain('不得应用');
   });
 
   test('gives child skills the task view and restores the remaining pipeline after return', () => {

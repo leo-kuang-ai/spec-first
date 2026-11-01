@@ -1,0 +1,67 @@
+FAIL tests/unit/spec-test-browser-conformance-cleanup.test.js
+  ● browser conformance cleanup receipts › close exit 0 controls the overall result and diagnostic retention
+
+    expect(received).toMatchObject(expected)
+
+    Matcher error: received value must be a non-null object
+
+    Received has value: undefined
+
+      41 |     expect(payload.positive_control.status).toBe('passed');
+      42 |     expect(payload.cases.every((item) => item.status === 'passed')).toBe(true);
+    > 43 |     expect(payload.cleanup).toMatchObject({ status: closeExit === 0 ? 'passed' : 'failed', exit_code: closeExit });
+         |                             ^
+      44 |     expect(result.status).toBe(closeExit === 0 ? 0 : 1);
+      45 |     expect(payload.status).toBe(closeExit === 0 ? 'passed' : 'failed');
+      46 |     expect(fs.existsSync(runRoot)).toBe(closeExit !== 0);
+
+      at toMatchObject (tests/unit/spec-test-browser-conformance-cleanup.test.js:43:29)
+
+  ● browser conformance cleanup receipts › close exit 9 controls the overall result and diagnostic retention
+
+    expect(received).toMatchObject(expected)
+
+    Matcher error: received value must be a non-null object
+
+    Received has value: undefined
+
+      41 |     expect(payload.positive_control.status).toBe('passed');
+      42 |     expect(payload.cases.every((item) => item.status === 'passed')).toBe(true);
+    > 43 |     expect(payload.cleanup).toMatchObject({ status: closeExit === 0 ? 'passed' : 'failed', exit_code: closeExit });
+         |                             ^
+      44 |     expect(result.status).toBe(closeExit === 0 ? 0 : 1);
+      45 |     expect(payload.status).toBe(closeExit === 0 ? 'passed' : 'failed');
+      46 |     expect(fs.existsSync(runRoot)).toBe(closeExit !== 0);
+
+      at toMatchObject (tests/unit/spec-test-browser-conformance-cleanup.test.js:43:29)
+
+FAIL tests/unit/spec-test-browser-contracts.test.js
+  ● validates loopback origins, first-open ordering, routes, actions, locators, and synthetic values
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 3
+    + Received  + 1
+
+      Object {
+    -   "ok": false,
+    -   "reason_code": "test-plan-page-context-before-open",
+    -   "step_index": 0,
+    +   "ok": true,
+      }
+
+      519 |       pageContextStep(action),
+      520 |       { action: 'open', route: '/settings' },
+    > 521 |     ]))).toMatchObject({
+          |          ^
+      522 |       ok: false,
+      523 |       reason_code: 'test-plan-page-context-before-open',
+      524 |       step_index: 0,
+
+      at Object.toMatchObject (tests/unit/spec-test-browser-contracts.test.js:521:10)
+
+Test Suites: 2 failed, 2 total
+Tests:       3 failed, 46 passed, 49 total
+Snapshots:   0 total
+Time:        3.442 s
+Ran all test suites within paths "tests/unit/spec-test-browser-contracts.test.js", "tests/unit/spec-test-browser-conformance-cleanup.test.js".

@@ -1,0 +1,162 @@
+{
+  "evidence_type": "Actual parent local HTTP/server replacement and named browser execution",
+  "criteria": [
+    "Current version B must show Total: 18.",
+    "Add entry must be enabled.",
+    "A prior version A observation is not acceptance for version B."
+  ],
+  "source_hashes": {
+    "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/fixtures/page/version-B.html": "77455357199117a2ac6a6189ea13ac30cc2aa1ac078e711ae2fb608190bab96d",
+    "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/fixtures/page/server.cjs": "8ece4cace0ff37d484129d9d02a4a42efc4e38ac39f3d3286e350010b6707307",
+    "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/fixtures/page/version-A.html": "5532d605c348a1535932748b230d304a7455fb49ef56252ed43784c99a2fe843"
+  },
+  "records": [
+    {
+      "phase": "server-start",
+      "version": "A",
+      "identity": {
+        "pid": 17621,
+        "port": 57289,
+        "source": "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/fixtures/page/version-A.html",
+        "sha256": "5532d605c348a1535932748b230d304a7455fb49ef56252ed43784c99a2fe843"
+      }
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "ce27-page-17607",
+        "--allowed-domains",
+        "127.0.0.1",
+        "open",
+        "http://127.0.0.1:57289/"
+      ],
+      "exit_code": 0,
+      "stdout": "\u2713 Ledger fixture A\n  http://127.0.0.1:57289/\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "ce27-page-17607",
+        "--allowed-domains",
+        "127.0.0.1",
+        "snapshot"
+      ],
+      "exit_code": 0,
+      "stdout": "- heading \"Ledger fixture A\" [level=1, ref=e1]\n- paragraph\n  - StaticText \"Total: 12\"\n- image \"Total 12\"\n- button \"Add entry\" [disabled, ref=e2]\n- paragraph\n  - StaticText \"Synthetic acceptance fixture\"\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "ce27-page-17607",
+        "--allowed-domains",
+        "127.0.0.1",
+        "screenshot",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/page-A.png"
+      ],
+      "exit_code": 0,
+      "stdout": "\u2713 Screenshot saved to /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/page-A.png\n",
+      "stderr": ""
+    },
+    {
+      "phase": "server-A-stop",
+      "pid": 17621,
+      "exit_code": -15
+    },
+    {
+      "phase": "server-start",
+      "version": "B",
+      "identity": {
+        "pid": 17647,
+        "port": 57289,
+        "source": "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/fixtures/page/version-B.html",
+        "sha256": "77455357199117a2ac6a6189ea13ac30cc2aa1ac078e711ae2fb608190bab96d"
+      }
+    },
+    {
+      "phase": "new-server-http",
+      "status": 200,
+      "source_sha256": "77455357199117a2ac6a6189ea13ac30cc2aa1ac078e711ae2fb608190bab96d",
+      "body": "<!doctype html><html lang=\"en\"><meta charset=\"utf-8\"><title>Ledger fixture B</title><style>body{font:20px system-ui;max-width:800px;margin:48px auto;padding:24px}button{font:inherit;padding:12px}.chart{width:180px;height:180px;background:#356acd}</style><h1>Ledger fixture B</h1><p id=\"total\">Total: 18</p><div class=\"chart\" role=\"img\" aria-label=\"Total 18\"></div><button >Add entry</button><p>Synthetic acceptance fixture</p></html>\n"
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "ce27-page-17607",
+        "--allowed-domains",
+        "127.0.0.1",
+        "snapshot"
+      ],
+      "exit_code": 0,
+      "stdout": "- heading \"Ledger fixture A\" [level=1, ref=e1]\n- paragraph\n  - StaticText \"Total: 12\"\n- image \"Total 12\"\n- button \"Add entry\" [disabled, ref=e2]\n- paragraph\n  - StaticText \"Synthetic acceptance fixture\"\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "ce27-page-17607",
+        "--allowed-domains",
+        "127.0.0.1",
+        "reload"
+      ],
+      "exit_code": 0,
+      "stdout": "http://127.0.0.1:57289/\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "ce27-page-17607",
+        "--allowed-domains",
+        "127.0.0.1",
+        "snapshot"
+      ],
+      "exit_code": 0,
+      "stdout": "- heading \"Ledger fixture B\" [level=1, ref=e1]\n- paragraph\n  - StaticText \"Total: 18\"\n- image \"Total 18\"\n- button \"Add entry\" [ref=e2]\n- paragraph\n  - StaticText \"Synthetic acceptance fixture\"\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "ce27-page-17607",
+        "--allowed-domains",
+        "127.0.0.1",
+        "screenshot",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/page-B.png"
+      ],
+      "exit_code": 0,
+      "stdout": "\u2713 Screenshot saved to /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/page-B.png\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "ce27-page-17607",
+        "--allowed-domains",
+        "127.0.0.1",
+        "close"
+      ],
+      "exit_code": 0,
+      "stdout": "\u2713 Browser closed\n",
+      "stderr": ""
+    },
+    {
+      "phase": "final-cleanup",
+      "browser_close_exit": 0,
+      "server_exit": -15
+    }
+  ],
+  "limitations": [
+    "Synthetic page, not product UI. No actual user feedback or Figma target.",
+    "Browser interaction performed by parent, not model trial worker."
+  ]
+}

@@ -70,13 +70,21 @@ The returned `artifact_path` is run-local session-temp evidence. It is valid for
 
 ## What to apply
 
+Before the eligibility filter, require a structurally usable review result.
+`validation_status: rejected` or `unresolved` is report-only and must never enter
+the apply queue, even with a suggested fix or high confidence. Unknown status,
+malformed findings, or unavailable verification is a coverage limitation, not a
+confirmed finding. Legacy results without a status require current source/evidence
+confirmation by the owning reviewer before application. Preserve each excluded
+finding and its reason in the residual record.
+
 Default to applying every actionable finding. Applying is a reversible edit to a tracked tree; diffs are reviewed before commit (below) and tests run after — so leaving a clear, reversible fix unapplied "to be safe" is the failure mode, not the safe choice. Bias to act:
 
 - **Apply** any finding with a concrete `suggested_fix` that is a clear improvement — the common case. `confidence` and `autofix_class` tell you what to prioritize and what to flag, not whether you may apply: `autofix_class` is signal, **never permission**.
 - **Push back** — keep the finding, don't apply — when the reviewer is wrong; note why.
-- **Flag, don't block, green-but-unverifiable edits** — when an applied fix touches auth/authz, a public or cross-service contract/schema, or concurrency, a passing test does not prove safety; apply it when there is a clear `suggested_fix` and confidence, and call it out prominently in the diff review.
+- **Keep unverified sensitive claims open.** For auth/authz, public or cross-service contracts, and concurrency, passing tests alone do not prove the claimed behavior. Apply only an authorized, source-confirmed fix and verify the relevant invariant; otherwise retain an unresolved residual instead of declaring the edit safe or complete.
 
-There is no precondition safety checklist and no deny-list — a code-review fix is a reversible edit, so downside is controlled after the fact (diff review + tests + the commit checkpoint), not by gating the apply.
+The validated finding, current source match and caller authorization define the apply boundary. Diff review, targeted tests and the separate commit checkpoint verify the resulting change; reversibility does not waive an unresolved evidence or authority gap.
 
 **Evidence still matches the code** — the fix subagent confirms at `file:line` before editing. The orchestrator does **not** open files just to decide eligibility or dispatch.
 

@@ -1,0 +1,33 @@
+{
+  "default": "deny",
+  "allow": [
+    "launch",
+    "navigate",
+    "open",
+    "snapshot",
+    "get",
+    "gettext",
+    "inputvalue",
+    "title",
+    "url",
+    "count",
+    "console",
+    "network",
+    "requests",
+    "vitals",
+    "set",
+    "viewport",
+    "screenshot",
+    "click",
+    "fill",
+    "type",
+    "press",
+    "select",
+    "find",
+    "getbyrole",
+    "getbylabel",
+    "getbytestid",
+    "getbytext",
+    "close"
+  ]
+}

@@ -1,0 +1,1374 @@
+[
+  {
+    "skill": "autoresearch",
+    "ce_skill": null,
+    "status": "source_review_complete",
+    "evidence": [],
+    "prior_directed_review_status": "pending",
+    "conclusion": "30包内文件及相邻Optimize/commit/治理接口全读；10项融合裁定，确认scorer字段失配，保留显式可选loop",
+    "recommendation": "先修评分/候选/check协议，再接本地实验和提交owner；补结果/恢复eval，不建立第二研发总路由",
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "full_review_complete": true,
+    "note": "skills/autoresearch.md",
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "opt_in_loop_owner",
+      "immutable_measurement",
+      "independent_verify",
+      "persistence_resume",
+      "dirty_commit_owner",
+      "readonly_check",
+      "reason_panel",
+      "command_authority",
+      "ship_regression",
+      "outcome_eval"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false
+  },
+  {
+    "skill": "spec-app-consistency-audit",
+    "ce_skill": null,
+    "status": "skipped_by_user",
+    "evidence": [],
+    "prior_directed_review_status": "pending",
+    "conclusion": "用户明确指定本轮跳过，不形成源码审查或融合结论",
+    "recommendation": "本轮不评估；此前读取仅保留历史记录",
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "full_review_complete": false,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "not_applicable_excluded",
+    "capability_comparisons": [],
+    "scope_status": "excluded_by_user",
+    "exclusion_reason": "2026-10-28 用户明确排除该 Skill"
+  },
+  {
+    "skill": "spec-brainstorm",
+    "ce_skill": "ce-brainstorm",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-brainstorm/references/brainstorm-sections.md:23",
+      "skills/spec-brainstorm/references/brainstorm-sections.md:84",
+      "skills/spec-brainstorm/references/handoff.md:19",
+      "skills/spec-plan/SKILL.md:15"
+    ],
+    "conclusion": "58包内文件全读；保留本地WHAT/授权/恢复增强，建议补problem、settled和no-doc闭包",
+    "recommendation": "先修synthesis本地自洽，再目标/范围标准与结果eval；暂缓视觉及通用跨模型runtime",
+    "limitations": [
+      "已完成包内全文与具名直接接口源码对照；未实施、未独立审查、未运行真实模型或provider"
+    ],
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "prior_directed_review_status": "source_review_complete",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "problem/outcome",
+      "settlement fidelity",
+      "no-doc",
+      "scope recommendation",
+      "single owner",
+      "work relationships",
+      "atomic reservation",
+      "visual/prototype split",
+      "model elevation",
+      "caller return",
+      "organizational evidence"
+    ],
+    "scope_status": "included",
+    "note": "skills/spec-brainstorm.md",
+    "independent_review": false,
+    "host_behavior_verified": false
+  },
+  {
+    "skill": "spec-code-review",
+    "ce_skill": "ce-code-review",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-code-review/scripts/findings-mechanics.py:219",
+      "skills/spec-code-review/references/finish-review.md",
+      "skills/spec-code-review/evals/fixtures/scripts/check-r2-preset-applied-fix.sh",
+      "code-review-source-probes.json",
+      "code-review-tests.json"
+    ],
+    "conclusion": "已全量核对；scope/准入增强保留，存在mechanics与eval共同缺口，非完美融合",
+    "recommendation": "先修finding地板与修复judge，再窄吸收条件depth、末轮重算和persona证据条目；跨模型保持dormant",
+    "prior_directed_review_status": "in_progress",
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "scope/标准/同revision证据",
+      "条件depth/roster/validator",
+      "mechanics/三态/consumer",
+      "persona/示例/修复eval",
+      "跨模型准入/运行生命周期"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-code-review.md"
+  },
+  {
+    "skill": "spec-commit",
+    "ce_skill": "ce-commit",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-commit.md",
+      "commit-judge-probes.json",
+      "targeted-tests.json"
+    ],
+    "conclusion": "10 个包内文件及直接提交接口完整核对；核心能力已有等价实现，3 个轻量融合点和评测缺口已记录",
+    "recommendation": "复用共享 native 消息写入、exclude 与已知 U-ID；保留授权/mixed-hunk/作者保护；补 outcome eval",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "prior_directed_review_status": "source_review_complete",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      {
+        "capability": "精确提交与WIP保护",
+        "decision": "已有等价或更优实现"
+      },
+      {
+        "capability": "native消息写入",
+        "decision": "建议集成"
+      },
+      {
+        "capability": "已知U-ID",
+        "decision": "建议复用共享规则"
+      },
+      {
+        "capability": "真实作者来源",
+        "decision": "已有等价或更优实现"
+      },
+      {
+        "capability": "分支授权",
+        "decision": "保留本地设计"
+      },
+      {
+        "capability": "评测结果证据",
+        "decision": "建议增强"
+      }
+    ],
+    "scope_status": "included",
+    "note": "skills/spec-commit.md",
+    "independent_review": false,
+    "host_behavior_verified": false
+  },
+  {
+    "skill": "spec-commit-push-pr",
+    "ce_skill": "ce-commit-push-pr",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-commit-push-pr.md",
+      "landing-judge-probes.json",
+      "targeted-tests.json"
+    ],
+    "conclusion": "双方24个包内资产与直接接口完整核对；建议吸收项目PR模板、tracker语义与已知决策来源，保留本地提交/外写增强",
+    "recommendation": "先补模板/close-vs-link和真实状态eval；统一portable recipe；不引入stack/babysit产品面",
+    "limitations": [
+      "仅本项source能力判断；全局跨Skill闭环待完成",
+      "未执行真实host/gh/外部写入，缺独立validator"
+    ],
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "prior_directed_review_status": "source_review_complete",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      {
+        "capability": "项目PR-body contract",
+        "decision": "建议集成"
+      },
+      {
+        "capability": "tracker close/link",
+        "decision": "建议集成"
+      },
+      {
+        "capability": "caller决策来源",
+        "decision": "建议窄化集成"
+      },
+      {
+        "capability": "scope map与teaching",
+        "decision": "已有等价实现"
+      },
+      {
+        "capability": "混合改动/授权/读回",
+        "decision": "保留本地增强"
+      },
+      {
+        "capability": "portable recipes",
+        "decision": "建议统一"
+      },
+      {
+        "capability": "PR stack",
+        "decision": "暂缓"
+      },
+      {
+        "capability": "watch ownership",
+        "decision": "保留本地设计"
+      },
+      {
+        "capability": "结果导向eval",
+        "decision": "建议增强"
+      }
+    ],
+    "scope_status": "included",
+    "note": "skills/spec-commit-push-pr.md",
+    "independent_review": false,
+    "host_behavior_verified": false
+  },
+  {
+    "skill": "spec-compound",
+    "ce_skill": "ce-compound",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-compound/SKILL.md:24",
+      "skills/spec-compound/references/promotion.md:10",
+      "skills/spec-compound-refresh/references/publication.md:108"
+    ],
+    "conclusion": "完整包内及知识合同核对；保留publication增强，复现摘要误绿与正向fixture失败",
+    "recommendation": "先合同自洽/状态摘要/fixture；吸收parent-owned正文和corpus去重；配置root按需",
+    "limitations": [
+      "源码对照和隔离脚本/合同验证；未执行真实host/model/私人session/独立review"
+    ],
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "prior_directed_review_status": "source_review_complete",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "会话保真",
+      "候选发布",
+      "grounding自洽",
+      "分类corpus",
+      "模式",
+      "packs",
+      "session发现",
+      "提取防御",
+      "词汇退休",
+      "refresh/caller",
+      "专家prompt",
+      "结果eval"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-compound.md"
+  },
+  {
+    "skill": "spec-compound-refresh",
+    "ce_skill": "ce-compound-refresh",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-compound-refresh/references/modes.md:29",
+      "skills/spec-compound-refresh/references/publication.md:99",
+      "skills/spec-compound/references/promotion.md:14"
+    ],
+    "conclusion": "双方41文件全读；worth/失效条件核心已融合，保留本地候选发布和权限，窄化吸收历史术语消费者及cue覆盖",
+    "recommendation": "先补知识保留和发布失败结果eval；不并列retire_when、不恢复自动landing或全词表扫库",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "prior_directed_review_status": "source_review_complete",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "worth_counterfactual",
+      "external_invalidation",
+      "guidance_conflict",
+      "delete_replace",
+      "unverifiable",
+      "historical_vocabulary",
+      "scope",
+      "retrieval_taxonomy",
+      "docs_root",
+      "citation_checker",
+      "publication",
+      "outcome_eval"
+    ],
+    "scope_status": "included",
+    "note": "skills/spec-compound-refresh.md",
+    "independent_review": false,
+    "host_behavior_verified": false
+  },
+  {
+    "skill": "spec-debug",
+    "ce_skill": "ce-debug",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-debug.md",
+      "debug-contract-tests.json",
+      "debug-question-judge-probes.json"
+    ],
+    "conclusion": "双方31文件与shared closeout/LFG直接消费完整核对；补复现仪器、性能归因、missing-seam和proof-test，保留本地source/授权/证据",
+    "recommendation": "优先集成复现/性能/测试保护，消除隐式port/未来CI措辞，增强全角问句和真实行为eval",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "prior_directed_review_status": "source_review_complete",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "red_capable_reproducer",
+      "performance_attribution",
+      "missing_test_seam",
+      "proof_test",
+      "test_intent",
+      "dirty_comparison",
+      "hypothesis_quality",
+      "source_authority",
+      "caller_return",
+      "verification_ceiling",
+      "knowledge_value",
+      "outcome_eval"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-debug.md"
+  },
+  {
+    "skill": "spec-doc-review",
+    "ce_skill": "ce-doc-review",
+    "status": "source_review_complete",
+    "evidence": [],
+    "conclusion": "全量核对完成；保留report-only与任务包增强，吸收后果准入/证据重评，复现judge漂移",
+    "recommendation": "先修schema/eval/Withdraw闭包，再融合语义准入/去重与恢复幂等；跨模型保持dormant",
+    "prior_directed_review_status": "in_progress",
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "consequence_admission",
+      "semantic_dedup",
+      "fact_reassessment",
+      "mechanism_sizing",
+      "objective_altitude",
+      "resume_freshness",
+      "withdraw_closure",
+      "rendered_idempotency",
+      "content_vs_readiness",
+      "html_task_pack_owner",
+      "peer_admission",
+      "outcome_eval"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-doc-review.md"
+  },
+  {
+    "skill": "spec-dogfood",
+    "ce_skill": "ce-dogfood",
+    "status": "source_review_complete",
+    "evidence": [],
+    "conclusion": "双方21包内文件与browser直接合同完整核对；优先吸收criteria证据链、stale-rule和知识去重，保留本地授权/owner边界",
+    "recommendation": "先补criteria与resume/server身份；不直接导入Pack分发器，增强零调用结果eval",
+    "prior_directed_review_status": "in_progress",
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "diff_identity",
+      "persona_criteria",
+      "coverage",
+      "stale_rule",
+      "knowledge_dedup",
+      "pack_distribution",
+      "browser_owner",
+      "server_identity",
+      "resume_freshness",
+      "authority",
+      "outcome_eval"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-dogfood.md"
+  },
+  {
+    "skill": "spec-explain",
+    "ce_skill": "ce-explain",
+    "status": "source_review_complete",
+    "evidence": [],
+    "conclusion": "双方24包内文件及直接测试完整核对；建议吸收行为trace和理由分层，保留持久教学定位",
+    "recommendation": "先补trace/理由和真实fallback eval，再融合source links/provider边界；不扩发布面",
+    "prior_directed_review_status": "in_progress",
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "behavior_trace",
+      "rationale_provenance",
+      "caller_return",
+      "token_time_window",
+      "source_links",
+      "recall",
+      "reader_visual",
+      "provider_boundary",
+      "outcome_eval"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-explain.md"
+  },
+  {
+    "skill": "spec-handoff",
+    "ce_skill": "ce-handoff",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-handoff/references/artifact-contract.md:41",
+      "skills/spec-handoff/references/artifact-contract.md:15",
+      "skills/spec-handoff/references/resume.md:3"
+    ],
+    "conclusion": "双方27包内文件与直接caller完整核对；CE主要能力已具备，保留持久writer和已授权继续分支",
+    "recommendation": "补真实受管路径、HEAD差分与继续执行eval；不导入临时store/一律等待",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "prior_directed_review_status": "source_review_complete",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "continuity_truth",
+      "authorized_continuation",
+      "immutable_writer",
+      "durability",
+      "selected_source",
+      "bounded_discovery",
+      "lfg_owner",
+      "outcome_eval"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-handoff.md"
+  },
+  {
+    "skill": "spec-ideate",
+    "ce_skill": "ce-ideate",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-ideate/references/post-ideation-workflow.md:9",
+      "skills/spec-ideate/references/post-ideation-workflow.md:108",
+      "skills/spec-brainstorm/SKILL.md:3",
+      "/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-ideate/references/post-ideation-workflow.md:40"
+    ],
+    "conclusion": "双方48文本资产全读；主要发散/证据链已融合，建议补唯一dossier、杠杆排序与数量/预算闭包",
+    "recommendation": "先局部自洽，再分层样本与结果eval；保留独立授权/单次scratch/Brainstorm决策owner",
+    "limitations": [
+      "未运行真实模型、provider、tracker、Slack或浏览器；当前为单模型源码审查。"
+    ],
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "prior_directed_review_status": "source_review_complete",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "代码grounding",
+      "研究dossier",
+      "tracker杠杆",
+      "分层覆盖",
+      "主题frame",
+      "数量预算",
+      "dispatch",
+      "研究授权与缓存",
+      "持久交付",
+      "Brainstorm seed",
+      "renderer消费者"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-ideate.md"
+  },
+  {
+    "skill": "spec-lfg",
+    "ce_skill": "lfg",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-lfg/SKILL.md:54",
+      "skills/spec-lfg/references/review-followup.md:55",
+      "skills/spec-work/references/return-to-caller.md:41",
+      "skills/spec-lfg/references/shipping-tail.md:1"
+    ],
+    "conclusion": "双方35文件及work return/watch机制全读；保留本地验证和权限，确认未观测时间计入quiet window",
+    "recommendation": "先补watch连续观测和feedback completion；复用当前plan/发布owner；不复制CE通用路由/stack合并",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "prior_directed_review_status": "source_review_complete",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "intake",
+      "decision_provenance",
+      "engine_resume",
+      "independent_review",
+      "simplify_apply",
+      "browser_owner",
+      "final_freshness",
+      "custom_shipping",
+      "stack_watch",
+      "feedback_completion",
+      "tracker_provenance",
+      "next_work",
+      "narration",
+      "quiet_window",
+      "outcome_eval"
+    ],
+    "scope_status": "included",
+    "note": "skills/spec-lfg.md",
+    "independent_review": false,
+    "host_behavior_verified": false
+  },
+  {
+    "skill": "spec-optimize",
+    "ce_skill": "ce-optimize",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-optimize.md",
+      "optimize-tests.json",
+      "optimize-source-probes.json"
+    ],
+    "conclusion": "全包及6组测试源码核对；8探针确认样本/噪声与worktree缺口，保留独立holdout增强",
+    "recommendation": "先数据保护与真实样本地板，再定位/Goodhart/比较身份/报告；remote调度暂缓",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "prior_directed_review_status": "source_review_complete",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "机会定位",
+      "数值与语义地板",
+      "测量授权",
+      "预算费用",
+      "A/A",
+      "selection/holdout",
+      "比较身份",
+      "报告",
+      "校准反馈",
+      "cache",
+      "回归",
+      "工作树",
+      "恢复",
+      "eval"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-optimize.md"
+  },
+  {
+    "skill": "spec-plan",
+    "ce_skill": "ce-plan",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-plan.md",
+      "plan-tests.json",
+      "plan-judge-probes.json"
+    ],
+    "conclusion": "双方包内全读及work/task-pack消费者核对；55测试通过但复现3种judge误绿，不能整包覆盖",
+    "recommendation": "保留字节级WHAT/授权/readiness；吸收concern裁定、稳定KTD、研究dossier和决策去重，先修自洽与eval",
+    "prior_directed_review_status": "in_progress",
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "output_tiers",
+      "product_contract_authority",
+      "bounded_research",
+      "behavior_trace",
+      "concern_adjudication",
+      "normative_owner",
+      "stable_ktd",
+      "settled_decisions",
+      "review_closure",
+      "objective_means",
+      "conditional_lenses",
+      "pipeline_format",
+      "canonical_conversion",
+      "atomic_reservation",
+      "model_elevation",
+      "knowledge_packs",
+      "handoff",
+      "lifecycle_readiness"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-plan.md",
+    "limitations": [
+      "源码审查及脚本fixture验证；未执行独立模型、真实宿主或现场收益验证"
+    ]
+  },
+  {
+    "skill": "spec-polish",
+    "ce_skill": "ce-polish",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-polish/references/run.md:20",
+      "skills/spec-polish/references/run.md:51",
+      "skills/spec-test-browser/references/route-and-report.md:111"
+    ],
+    "conclusion": "47文件6825行全读；本地启动/授权更强，CE反馈及恢复闭环可窄吸收；7组共有边界证据复现",
+    "recommendation": "优先修resolver输入与Procfile事实选择；补反馈/验证/residual；暂缓整体语音/远程runtime",
+    "limitations": [
+      "只完成源码对照及融合裁定，未实施产品优化",
+      "无独立reviewer或真实宿主、模型、浏览器、外部服务验证",
+      "4 suites/19 tests及临时fixture仅证明直接覆盖事实"
+    ],
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "prior_directed_review_status": "source_review_complete",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "启动事实及服务归属",
+      "反馈与中断恢复",
+      "页面失联及residual",
+      "browser单owner与授权",
+      "暂缓语音远程基础设施"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-polish.md"
+  },
+  {
+    "skill": "spec-pov",
+    "ce_skill": "ce-pov",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-pov/references/intake.md:23",
+      "skills/spec-pov/references/method.md:22",
+      "skills/spec-pov/references/followup.md:8"
+    ],
+    "conclusion": "双方全包与直接合同核对；三类subject半融合，隔离复现worker绕过和judge误绿；正常peer仍degraded",
+    "recommendation": "先补worker/admission/schema，再统一subject/grounding；窄吸收callee证据、owner与最小实验，不导入品牌推定独立性",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "prior_directed_review_status": "source_review_complete",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "subject_types",
+      "callee_guarantee_owner",
+      "minimal_trial",
+      "bounded_grounding",
+      "caller_continuation",
+      "peer_return",
+      "served_identity",
+      "route_fallback"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-pov.md"
+  },
+  {
+    "skill": "spec-prd",
+    "ce_skill": null,
+    "status": "source_review_complete",
+    "evidence": [],
+    "prior_directed_review_status": "pending",
+    "conclusion": "全包与直接hook/consumer核对；保留产品WHAT/receipt，复现refresh越界、语义词表阻塞和judge误绿",
+    "recommendation": "先修freshness/词表gate/评测，再统一release闭包与授权；有界吸收CE单owner和concern，不上线eval-only拓扑",
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "product_what_owner",
+      "release_closure",
+      "normative_owner",
+      "current_vs_target",
+      "validate_refine_authority",
+      "confirmation_authority",
+      "question_binding",
+      "risk_depth",
+      "api_what_boundary",
+      "design_inventory",
+      "producer_consumer_topology",
+      "host_enforcement",
+      "outcome_eval"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-prd.md"
+  },
+  {
+    "skill": "spec-product-pulse",
+    "ce_skill": "ce-product-pulse",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-product-pulse/references/run.md:14",
+      "skills/spec-product-pulse/references/run.md:40",
+      "skills/spec-product-pulse/references/strategy-source.md:5"
+    ],
+    "conclusion": "双方20包内文件完整核对；CE核心已具备，本地证据/privacy更强，发现共有路由与评分歧义",
+    "recommendation": "保留本地增强；先统一metric source默认值、not-run枚举与结果eval",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "prior_directed_review_status": "source_review_complete",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "metric_feedback",
+      "source_arbitration",
+      "receipts",
+      "privacy_projection",
+      "score_anchors",
+      "scheduling",
+      "host_capabilities"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-product-pulse.md"
+  },
+  {
+    "skill": "spec-project-rules",
+    "ce_skill": null,
+    "status": "skipped_by_user",
+    "evidence": [],
+    "prior_directed_review_status": "pending",
+    "conclusion": "用户明确指定本轮跳过，不形成源码审查或融合结论",
+    "recommendation": "本轮不评估；此前读取仅保留历史记录",
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "full_review_complete": false,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "not_applicable_excluded",
+    "capability_comparisons": [],
+    "scope_status": "excluded_by_user",
+    "exclusion_reason": "2026-10-28 用户明确排除该 Skill"
+  },
+  {
+    "skill": "spec-promote",
+    "ce_skill": "ce-promote",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-promote/SKILL.md:16",
+      "skills/spec-promote/references/spiral-cli.md:74",
+      "skills/spec-promote/references/spiral-cli.md:66"
+    ],
+    "conclusion": "双方14包内文件和noslop/auth接口完整核对；核心等价，保留本地egress/失败receipt增强",
+    "recommendation": "收敛空draft commentary例外、准确交付claims和结果eval；不扩发布或config层",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "prior_directed_review_status": "source_review_complete",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "delivery_claim",
+      "channel_drafts",
+      "editorial_owner",
+      "auth_projection",
+      "egress_intent",
+      "provider_response",
+      "optout",
+      "outcome_eval"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-promote.md"
+  },
+  {
+    "skill": "spec-prototype",
+    "ce_skill": "ce-prototype",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-prototype/SKILL.md:17",
+      "skills/spec-prototype/references/scoping.md:20",
+      "/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-prototype/references/scoping.md:19",
+      "skills/spec-brainstorm/references/handoff.md:7"
+    ],
+    "conclusion": "建议吸收隔离页面批注与针对性craft floor；保留loopback/token自停和产品owner边界",
+    "recommendation": "先统一授权/eval和stop文案，再最小reload，最后真实任务验证可选批注",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "prior_directed_review_status": "source_review_complete",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "问题/保真度",
+      "craft floor",
+      "批注定位",
+      "批次完成事实",
+      "隔离产物",
+      "预览安全",
+      "更新/idle",
+      "人类决策",
+      "caller",
+      "授权/eval"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-prototype.md"
+  },
+  {
+    "skill": "spec-resolve-pr-feedback",
+    "ce_skill": "ce-resolve-pr-feedback",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-resolve-pr-feedback/references/full-mode.md:25",
+      "skills/spec-resolve-pr-feedback/references/full-mode.md:45",
+      "skills/spec-resolve-pr-feedback/references/pipeline-return.md:35",
+      "skills/spec-lfg/references/review-followup.md:75"
+    ],
+    "conclusion": "双方35文件及LFG直接接口完整核对；中央判断已融合，建议补caller-owned可恢复conversation尾部，保留独立授权和失败证据",
+    "recommendation": "先接pending-actions消费者和publication证明；精确repo示例与隔离结果eval；不默认自动commit/外发/模型裁定",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "prior_directed_review_status": "source_review_complete",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "central_judgment",
+      "instruction_condition",
+      "authority",
+      "inline_cost",
+      "partial_delta",
+      "pending_handoff",
+      "resume_idempotency",
+      "caller_completion",
+      "root_convergence",
+      "adjudication",
+      "checklist",
+      "forge_pagination",
+      "outcome_eval"
+    ],
+    "scope_status": "included",
+    "note": "skills/spec-resolve-pr-feedback.md",
+    "independent_review": false,
+    "host_behavior_verified": false
+  },
+  {
+    "skill": "spec-riffrec-feedback-analysis",
+    "ce_skill": "ce-riffrec-feedback-analysis",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-riffrec-feedback-analysis/references/analyzer.md:11",
+      "skills/spec-riffrec-feedback-analysis/references/analyzer.md:25",
+      "skills/spec-riffrec-feedback-analysis/SKILL.md:3"
+    ],
+    "conclusion": "核心反馈证据链已融合，保留隐私/快照增强；隔离复现4项证据表达缺口",
+    "recommendation": "先聚合egress receipt和partial coverage，再补事件事实/结果eval",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "prior_directed_review_status": "source_review_complete",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "反馈证据链",
+      "完成出口",
+      "快路径",
+      "下游授权",
+      "外发/隐私",
+      "输入/快照安全",
+      "事件选择",
+      "长媒体覆盖",
+      "源码映射",
+      "eval"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-riffrec-feedback-analysis.md"
+  },
+  {
+    "skill": "spec-rule-miner",
+    "ce_skill": null,
+    "status": "skipped_by_user",
+    "evidence": [],
+    "prior_directed_review_status": "pending",
+    "conclusion": "用户明确指定本轮跳过，不形成源码审查或融合结论",
+    "recommendation": "本轮不评估；此前读取仅保留历史记录",
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "full_review_complete": false,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "not_applicable_excluded",
+    "capability_comparisons": [],
+    "scope_status": "excluded_by_user",
+    "exclusion_reason": "2026-10-28 用户明确排除该 Skill"
+  },
+  {
+    "skill": "spec-runtime-setup",
+    "ce_skill": "ce-setup",
+    "status": "source_review_complete",
+    "evidence": [],
+    "prior_directed_review_status": "pending",
+    "conclusion": "双方全包及直接consumer已核对；保留runtime增强，隔离确认悬空symlink越界/Git污染/命令身份缺口",
+    "recommendation": "先修共享路径和Git runner，再统一命令/文档/consumer；窄吸收按需能力与原owner修复，不导入Pack和跨模型runtime",
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "demand_helpers",
+      "config_owning_layer",
+      "artifact_roots",
+      "installation_rollback",
+      "graph_evidence",
+      "workspace_graph_lifecycle",
+      "knowledge_discovery",
+      "packs_scope",
+      "host_degradation"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-runtime-setup.md"
+  },
+  {
+    "skill": "spec-simplify-code",
+    "ce_skill": "ce-simplify-code",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-simplify-code.md",
+      "simplify-judge-probes.json",
+      "file-tables/spec-simplify-code.md"
+    ],
+    "conclusion": "双方27包内文件及24直接依赖全读；9项融合裁定收敛，保留本地WHY/授权，优先proof-test与结果eval",
+    "recommendation": "先接caller proof-test保护与真实产物eval；条件式测试价值lens；不默认五reviewer或删除注释",
+    "prior_directed_review_status": "in_progress",
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      {
+        "capability": "proof-test保护",
+        "decision": "建议集成",
+        "recommendation": "优先传递已有证明测试路径，保护测试和 test-only seam，不冻结生产实现",
+        "evidence_ref": "skills/spec-simplify-code.md"
+      },
+      {
+        "capability": "测试价值审查",
+        "decision": "建议按需集成",
+        "recommendation": "复用 work 测试哲学，先报告并要求替代覆盖证据",
+        "evidence_ref": "skills/spec-simplify-code.md"
+      },
+      {
+        "capability": "审查与实施意图区分",
+        "decision": "建议适配",
+        "recommendation": "只读零写；明确简化授权持续生效，不重复审批",
+        "evidence_ref": "skills/spec-simplify-code.md"
+      },
+      {
+        "capability": "范围和既有WIP保护",
+        "decision": "已有等价或更优实现",
+        "recommendation": "保留本地 owner/dirty/protected 边界",
+        "evidence_ref": "skills/spec-simplify-code.md"
+      },
+      {
+        "capability": "平台保证与组合重构反例",
+        "decision": "建议集成",
+        "recommendation": "保留值转换，确认 guard 移除后的可达分支",
+        "evidence_ref": "skills/spec-simplify-code.md"
+      },
+      {
+        "capability": "词汇和未发布兼容层清理",
+        "decision": "暂缓部分实测",
+        "recommendation": "词汇可窄化吸收；兼容删改需 consumer 证据",
+        "evidence_ref": "skills/spec-simplify-code.md"
+      },
+      {
+        "capability": "默认删除注释",
+        "decision": "保留本地设计",
+        "recommendation": "保留非显然 WHY，可补工具注释保护",
+        "evidence_ref": "skills/spec-simplify-code.md"
+      },
+      {
+        "capability": "派发及生命周期",
+        "decision": "已有等价或更优实现",
+        "recommendation": "保留 host-neutral 授权与诚实降级，不复制宿主映射",
+        "evidence_ref": "skills/spec-simplify-code.md"
+      },
+      {
+        "capability": "结果导向评测",
+        "decision": "建议集成",
+        "recommendation": "工作区/行为结果验证，6 个 judge 探针已运行但非模型评测",
+        "evidence_ref": "skills/spec-simplify-code.md"
+      }
+    ],
+    "scope_status": "included",
+    "note": "skills/spec-simplify-code.md",
+    "independent_review": false,
+    "host_behavior_verified": false
+  },
+  {
+    "skill": "spec-strategy",
+    "ce_skill": "ce-strategy",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-strategy/references/update-run.md:10",
+      "skills/spec-strategy/references/strategy-template.md:48",
+      "skills/spec-product-pulse/references/strategy-source.md:6"
+    ],
+    "conclusion": "双方18包内文件及pulse直接消费合同完整核对；核心等价，建议窄化吸收判别式压力测试和拒绝原则",
+    "recommendation": "保留本地标题/ownership；先补压力测试质量与真实diff评测",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "prior_directed_review_status": "source_review_complete",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "strategy_grounding",
+      "differentiation",
+      "stress_test",
+      "resist_heuristic",
+      "document_ownership",
+      "strategy_consumer"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-strategy.md"
+  },
+  {
+    "skill": "spec-sweep",
+    "ce_skill": "ce-sweep",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-sweep/SKILL.md:61",
+      "skills/spec-sweep/references/run.md:49",
+      "skills/spec-sweep/references/run.md:58",
+      "skills/spec-sweep/references/run.md:71"
+    ],
+    "conclusion": "源端去重/租约/计划主能力已融合；保留本地授权与持久状态增强，4项floor反例复现",
+    "recommendation": "先锁/close证据floor，再版本UTF-8、shared publication与媒体授权packet",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "prior_directed_review_status": "source_review_complete",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "多源归一",
+      "ack/cursor",
+      "独立授权",
+      "lease/OS锁",
+      "shared branch",
+      "fix证据",
+      "媒体",
+      "rolling计划",
+      "Plan/LFG接口",
+      "legacy恢复",
+      "config宿主",
+      "headless"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-sweep.md"
+  },
+  {
+    "skill": "spec-test-browser",
+    "ce_skill": "ce-test-browser",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-test-browser.md",
+      "browser-source-probes.json",
+      "consumer-tests.json"
+    ],
+    "conclusion": "双方14文件及真实LFG消费合同完整核对；保留唯一owner，复现vitals先于open及producer忽略cleanup",
+    "recommendation": "先补顺序/cleanup，再按等价能力实验自适应/native；不导回server管理",
+    "prior_directed_review_status": "in_progress",
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "route_mapping",
+      "native_driver",
+      "visibility",
+      "adaptive_interaction",
+      "origin_effect",
+      "first_open",
+      "conformance_cleanup",
+      "probe",
+      "private_evidence",
+      "outcome_eval",
+      "server_owner"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-test-browser.md"
+  },
+  {
+    "skill": "spec-test-xcode",
+    "ce_skill": "ce-test-xcode",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-test-xcode.md",
+      "xcode-contract-tests.json"
+    ],
+    "conclusion": "双方9个包内文件完整核对；多数核心能力已有等价/更强实现，可窄化吸收flow推导与操作结果观察",
+    "recommendation": "补bundle ID来源、setup准确handoff和零调用eval；保留source绑定/URL/Fail边界",
+    "limitations": [
+      "仅source对照与2个prose合同测试；无真实Simulator/MCP/模型验证"
+    ],
+    "prior_directed_review_status": "source_review_complete",
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      {
+        "capability": "provider readiness",
+        "decision": "已有等价实现"
+      },
+      {
+        "capability": "screen/flow推导及结果观察",
+        "decision": "建议窄化集成"
+      },
+      {
+        "capability": "bundle ID/设备复用",
+        "decision": "建议窄化集成"
+      },
+      {
+        "capability": "失败保留/资源清理",
+        "decision": "已有等价或更强"
+      },
+      {
+        "capability": "source binding/URL authority",
+        "decision": "保留本地增强"
+      },
+      {
+        "capability": "fresh-source零调用eval",
+        "decision": "建议增强"
+      }
+    ],
+    "scope_status": "included",
+    "note": "skills/spec-test-xcode.md",
+    "independent_review": false,
+    "host_behavior_verified": false
+  },
+  {
+    "skill": "spec-work",
+    "ce_skill": "ce-work",
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-work/references/implementation-loop.md:58",
+      "skills/spec-work/references/agents/figma-design-sync.md:46",
+      "skills/spec-work/evals/fixtures/scripts/check-return-to-caller.sh:9",
+      "skills/spec-work/evals/fixtures/scripts/check-no-implementation.sh:6",
+      "skills/spec-lfg/references/work-return.md:1"
+    ],
+    "conclusion": "双方77包内文本与14直接接口全读；保留task-pack/授权/最终树增强，确认5类judge误绿及Figma合同冲突",
+    "recommendation": "先修结果eval并与simplify/Debug接proof-test保护，再吸收同frame/token比较；不导入外部runtime或自动提交",
+    "limitations": [
+      "包内全文/具名直接依赖已核；未实施、未独立评审、未执行真实模型/宿主/视觉或CE外部worker；judge反例只证明裁判盲区"
+    ],
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "prior_directed_review_status": "source_review_complete",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "settled_intake",
+      "task_pack_pins",
+      "external_done_signal",
+      "feedback_quality",
+      "proof_test_protection",
+      "dispatch_authority",
+      "recovery_facts",
+      "requested_actual_identity",
+      "caller_closeout",
+      "residual_knowledge",
+      "figma_frame_tokens"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-work.md"
+  },
+  {
+    "skill": "spec-worktree",
+    "ce_skill": "ce-worktree",
+    "status": "source_review_complete",
+    "evidence": [],
+    "conclusion": "双方17包内文件完整核对；复现路径逃逸和remote-only detached，work forward边未建立",
+    "recommendation": "先修containment/ref一致性并补caller合同；native/fork能力有条件吸收，保留env/trust边界",
+    "prior_directed_review_status": "in_progress",
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "isolation_detection",
+      "native_visibility",
+      "pr_tracking",
+      "ref_integrity",
+      "path_containment",
+      "failure_recovery",
+      "env_trust",
+      "caller_edge",
+      "outcome_eval"
+    ],
+    "scope_status": "included",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "note": "skills/spec-worktree.md"
+  },
+  {
+    "skill": "spec-write-skill",
+    "ce_skill": null,
+    "status": "skipped_by_user",
+    "evidence": [],
+    "prior_directed_review_status": "pending",
+    "conclusion": "用户明确指定本轮跳过，不形成源码审查或融合结论",
+    "recommendation": "本轮不评估；此前读取仅保留历史记录",
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "full_review_complete": false,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "not_applicable_excluded",
+    "capability_comparisons": [],
+    "scope_status": "excluded_by_user",
+    "exclusion_reason": "2026-10-28 用户明确排除该 Skill"
+  },
+  {
+    "skill": "spec-write-tasks",
+    "ce_skill": null,
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/spec-write-tasks/SKILL.md:8",
+      "src/cli/task-pack.js:516",
+      "skills/spec-doc-review/references/task-pack-review-lens.md:74",
+      "skills/spec-work/references/return-to-caller.md:33"
+    ],
+    "conclusion": "23包内文件及CLI/work/doc-review直接接口全读；保留可选派生层，复现路径/symlink及runtime边界误绿",
+    "recommendation": "先统一路径owner与结果eval，再无损投射proof/settled/external done intent；不复制CE默认并行或自动commit",
+    "limitations": [
+      "未执行真实宿主、模型或外部副作用；未声称递归全文审完所有资产。"
+    ],
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "prior_directed_review_status": "source_review_complete",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      "optional_derived_layer",
+      "task_derivation",
+      "proof_intent",
+      "identity_freshness",
+      "review_owner",
+      "semantic_parallelism",
+      "artifact_mutation_roots",
+      "external_done_signal",
+      "outcome_eval"
+    ],
+    "scope_status": "included",
+    "note": "skills/spec-write-tasks.md",
+    "independent_review": false,
+    "host_behavior_verified": false
+  },
+  {
+    "skill": "using-spec-first",
+    "ce_skill": null,
+    "status": "source_review_complete",
+    "evidence": [
+      "skills/using-spec-first.md",
+      "entry-contract-tests.json",
+      "entry-judge-probe.json",
+      "entry-source-runtime-comparison.json"
+    ],
+    "prior_directed_review_status": "pending",
+    "conclusion": "本地11文件及CE相邻入口完整核对；保留单owner轻量路由，source/runtime差异已留证",
+    "recommendation": "增强真实routing eval与包外引用投射检查；不把CE模型carrier搬入入口",
+    "review_method": "双方全部文件逐段读取、逐文件/职责对照；禁止抽查",
+    "full_review_complete": true,
+    "audit_objective": "理解双方研发能力，识别值得吸收的 CE 能力并融合本地既有增强",
+    "integration_status": "source_decisions_recorded",
+    "capability_comparisons": [
+      {
+        "capability": "workflow意图路由",
+        "decision": "保留本地设计"
+      },
+      {
+        "capability": "active owner连续性",
+        "decision": "已有等价或更强实现"
+      },
+      {
+        "capability": "按需上下文",
+        "decision": "已有等价实现"
+      },
+      {
+        "capability": "模型stage carrier",
+        "decision": "留在相应LFG/work owner"
+      },
+      {
+        "capability": "自包含引用",
+        "decision": "建议核对投射，候选待证"
+      },
+      {
+        "capability": "advisory/授权出口",
+        "decision": "保留本地增强"
+      },
+      {
+        "capability": "routing eval",
+        "decision": "建议增强"
+      }
+    ],
+    "scope_status": "included",
+    "note": "skills/using-spec-first.md",
+    "independent_review": false,
+    "host_behavior_verified": false,
+    "limitations": [
+      "CE无直接对应，仅相邻入口对照",
+      "未完成跨host引用解析/真实routing eval/独立验证"
+    ]
+  }
+]

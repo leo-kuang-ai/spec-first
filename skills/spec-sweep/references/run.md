@@ -16,6 +16,8 @@ bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/sweep-state.py" <sub
 
 Run the phases in order.
 
+Every state-engine call must consume the status word on stdout line 1; exit 0 alone is not success. `ERROR` (including `state-lock-unavailable`) or `CORRUPT` blocks dependent state, plan, and source writes; preserve state and report the reason. A `REFUSED` upsert has not persisted the item: do not advance its cursor or drain it from the plan. Include any receipt’s `downgraded` IDs in the summary, including repairs made during lease acquisition.
+
 #### 2a. Acquire lease + validate
 
 `lease-acquire --state <state> --writer <writer> --ttl-minutes <sweep_lease_ttl_minutes>`:
@@ -23,7 +25,7 @@ Run the phases in order.
 - `STALE-RECLAIMED` — an expired lease was taken over; proceed, and note the takeover in the final summary.
 - `OK` — proceed.
 
-**Shared-branch topology** (`sweep_shared_branch: true`): first require `commit_authorization`, `branch_mutation_authorization`, and `landing_authorization` to all be `authorized`; otherwise stop before the lease or any write. With all three facts, before any source-side write, `git add` only the state file, commit, and push it. A rejected push means another writer won the branch — fetch and non-rewriting rebase only within the branch-mutation scope, re-run `lease-acquire`, and if the lease is still not yours, back off (record `aborted-locked` and stop). Only once your lease is pushed and confirmed do you touch a source.
+**Shared-branch topology** (`sweep_shared_branch: true`): first require `commit_authorization`, `branch_mutation_authorization`, and `landing_authorization` to all be `authorized`; otherwise stop before the lease or any write. Resolve the exact configured remote/branch and fetch/read its state before local acquisition, without overwriting dirty work. Before any source-side write, commit only this run's acquired lease, push without force, then fetch/read the exact remote state and confirm the unique writer and published lease commit. Preserve that SHA for final publication. A rejected or unknown push requires remote readback before retry: if our exact lease is not confirmed, stop source writes and preserve recovery facts. Never rebase a stale state snapshot over another writer, force-push, or blindly re-acquire after rejection. A changed branch needs explicit reconciliation under the existing branch scope; failure is an aborted/partial run, not a locally-held shared lease.
 
 Then `validate --state <state>` (a lease-agnostic repair): note in the summary any ids it downgrades from `closed` to `fix_pending`.
 
@@ -63,7 +65,10 @@ If private scratch creation fails, upsert each affected media item as `needs_dow
 
 For each new item carrying `media`:
 - Download attachments into owner-only run-local scratch created with `umask 077` and `mktemp -d "${TMPDIR:-/tmp}/spec-first-sweep.XXXXXX"`; reject symlink/non-directory results and recheck before atomic publication. Raw media is ephemeral and never committed. A download failure -> set the item `needs_download` and continue.
-- When the package-local boundary permits the recording's sensitivity class, dispatch one generic subagent per recording, in bounded parallel, at the **generation tier**, using `references/subagent-template.md` filled from `references/agents/media-analyzer.md`. Otherwise analyze recordings inline or serially and record the matching fallback reason. Fill the template's `{skill_dir}` slot with the same absolute spec-sweep skill directory you resolve for your own `SKILL_DIR` Bash calls (a fresh subagent does not inherit your shell state, so it cannot run the bundled analyzer without being told the path). Pass only the required absolute media PATHS, a scratch artifact path, the item's `sensitive` flag, and the explicit transcription-egress fact. The analyzer command uses `--transcribe` only for non-sensitive media with `transcription_egress_authorization: authorized`; every other path uses `--no-transcribe` and records `transcription_egress_authorization_missing` or `sensitive_transcription_unsupported`. Collect the compact 1-2 line summary and provider receipt each returns. A dispatched subagent failure -> set the item `needs_analysis`, retain the media, and continue.
+- When the package-local boundary permits the recording's sensitivity class, dispatch a bounded media worker using `references/subagent-template.md`; otherwise apply the same packet and analyzer path inline. Dispatch and egress are separate authorities. Pass exact run/item identity, sensitivity, private scratch root, media path and tool-computed SHA-256, a fresh per-item output directory and the actual authorization source with matching run/item/media/provider scope.
+- Run `scripts/analyze-sweep-media.py --packet <private-packet.json>` through `run-python.sh`. It snapshots and hashes the downloaded regular file, selects `--transcribe` only for a complete matching ordinary-media scope, and otherwise uses `--no-transcribe`. Sensitive media always uses no-transcribe. The supported egress provider is `openai-audio-transcriptions`; credentials are not authority. The wrapper cannot authenticate the caller's authorization claim: the orchestrator must ground it in the actual user/upstream instruction. Unpacked directories require a local-only analyzer pass; do not package or transcribe a broader directory under a file authorization.
+- Consume the returned run/item identity, actual request-sent value (`true`, `false` or unknown/null), provider, attempts, transcript status, covered/missing intervals and private receipt ref. Read the referenced result before synthesizing; a gist alone is insufficient. Keep `partial`, `failed`, `skipped` and unknown status in the final media summary; missing coverage is not silence, and failed provider calls are not zero egress. An interrupted authorized analyzer without a receipt leaves egress unknown. Retain detailed receipts privately; commit only minimized non-sensitive findings and coarse status, never raw media/transcripts, authorization text or absolute private paths. No confirmed analysis -> `needs_analysis`, without dropping evidence already captured.
+
 - Track attempts on the item (a `media_attempts` count upserted on each try). After 3 failed attempts across runs (`needs_download`/`needs_analysis`), set the item `manual_stuck` and list it separately — out of the routine nag.
 
 #### 2f. Fix verification
@@ -73,6 +78,8 @@ For each `fix_pending` item, resolve its claimed fix ref and verify it merged to
 - Same `approved: false` guard as 2d: a source the user did not approve for writes receives no close-out action — advance its verified item's status in state only.
 - Verified -> perform the source's configured close-out action (same write -> read-back -> confirm discipline as 2d), then `upsert-item` with `status: closed` carrying all three evidence fields: `fix_ref`, `verified_merge_sha`, `verified_at`. Close-out is terminal.
 - Unverified claim -> the item stays open; record the claim on the item, but do not close.
+
+Resolve the verified commit ref to a full 40/64-character SHA before writing `verified_merge_sha`; do not store the input abbreviation as merge evidence. If source closeout succeeds but upsert fails, retain the recovery state and read back the source before retrying external writes. Do not claim the item is closed without a successful state receipt.
 - Item deleted at source -> set `source_gone`.
 
 #### 2g. Plan reconciliation

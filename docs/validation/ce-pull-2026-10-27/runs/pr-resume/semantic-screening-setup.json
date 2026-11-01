@@ -1,0 +1,78 @@
+{
+  "artifact_type": "producer-semantic-screening",
+  "independent_review": false,
+  "unit_id": "U6",
+  "paths": [
+    "skills/ce-setup/SKILL.md",
+    "skills/ce-setup/agents/openai.yaml",
+    "skills/ce-setup/assets/pack-rule-template.md",
+    "skills/ce-setup/references/acpx-cache-warm.md",
+    "skills/ce-setup/references/config-template.yaml",
+    "skills/ce-setup/references/pack-scaffold.md",
+    "skills/ce-setup/references/repo-fixes.md",
+    "skills/ce-setup/scripts/check-health",
+    "skills/ce-setup/scripts/packs-resolve.py"
+  ],
+  "reading": "前轮逐文件净 diff/新增全文；packs-resolve.py 737行已分段完整读取；本轮回源 config/repo-fixes/metadata 净 diff 与本地 SKILL 前135行、project-config全文、current config consumers 和对应真实测试",
+  "decisions": [
+    {
+      "path": "skills/ce-setup/SKILL.md",
+      "target_action": "evidence-only",
+      "rationale": "既有 Runtime Setup registry/显式 host authority 及项目 facts owner 不同；CE 新引擎和 Packs 不构成新增本地 consumer，保留现有入口与权限。"
+    },
+    {
+      "path": "skills/ce-setup/agents/openai.yaml",
+      "target_action": "evidence-only",
+      "rationale": "仅 CE 元数据禁止隐式调用；本地 setup 已有显式 host/mode mutation 边界，不为同步增加新的 metadata/generator surface。"
+    },
+    {
+      "path": "skills/ce-setup/assets/pack-rule-template.md",
+      "target_action": "evidence-only",
+      "rationale": "新增 Packs rule 模板依赖未采用的远程/本地 Packs resolver；现有 project-rules、rule-miner 和 docs/solutions 不消费该格式，不复制孤立模板。"
+    },
+    {
+      "path": "skills/ce-setup/references/acpx-cache-warm.md",
+      "target_action": "evidence-only",
+      "rationale": "属于 CE acpx peer 引擎缓存准备，联网 npm install 不是当前 Runtime Setup consumer，不执行或复制。"
+    },
+    {
+      "path": "skills/ce-setup/references/config-template.yaml",
+      "target_action": "evidence-only",
+      "rationale": "外部引擎/effort/model/Packs keys 在本地无 reader；渲染偏好由既有各 workflow owner 决定 pipeline override，不能由上游示例配置改变。"
+    },
+    {
+      "path": "skills/ce-setup/references/pack-scaffold.md",
+      "target_action": "evidence-only",
+      "rationale": "新的可发布 Pack 产品和目录协议；当前没有 consumer，不在同步中建立第二套 prescriptive 规则库。"
+    },
+    {
+      "path": "skills/ce-setup/references/repo-fixes.md",
+      "target_action": "evidence-only",
+      "rationale": "Node22.13/npx 和 effort 修复属于 CE external engine 依赖；本地 registry 和 config consumer 独立拥有 readiness，保留不迁移 legacy key 与精确 target 安全边界。"
+    },
+    {
+      "path": "skills/ce-setup/scripts/check-health",
+      "target_action": "evidence-only",
+      "rationale": "CE 引擎 effort/acpx/Antigravity/Packs health 与本地 registry/facts owner 不同；现有 check-health shim 委托 setup.cjs，不移植第二套 health 脚本。"
+    },
+    {
+      "path": "skills/ce-setup/scripts/packs-resolve.py",
+      "target_action": "evidence-only",
+      "rationale": "737行 resolver、Git clone/cache/YAML子集及规则schema引入新产品与外部读取/执行边界；没有现有 reader，不复制。显式后续 Packs 方案确立 consumer 与权限后重估。"
+    }
+  ],
+  "source_refs": [
+    "skills/spec-runtime-setup/SKILL.md",
+    "skills/spec-runtime-setup/references/project-config.md",
+    "skills/spec-runtime-setup/scripts/lib/project-config.cjs",
+    "skills/spec-work/references/execution-strategy.md",
+    "skills/spec-project-rules/SKILL.md",
+    "skills/spec-rule-miner/SKILL.md"
+  ],
+  "limitations": [
+    "不是 CE setup feature parity；未提供 Packs、Antigravity 或 acpx 执行引擎",
+    "未运行外部安装、cache warm 或真实 host setup；27项测试只证明本地 consumer 合同",
+    "Packs 需要显式产品设计后重估；当前 evidence-only 是本次逐路径适用性结论"
+  ],
+  "verification": "logs/u6-setup-consumers.log: exit0, 3 suites / 27 tests"
+}

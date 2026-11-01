@@ -1,0 +1,139 @@
+FAIL tests/unit/session-history-scripts.test.js
+  session-history JSONL scripts
+    ✕ skeleton preserves structured Codex exit 23 without legacy output (23 ms)
+    ✕ skeleton preserves structured Codex exit -9 without legacy output (21 ms)
+    ✕ skeleton preserves structured Codex exit 23 without legacy output (20 ms)
+    ✕ skeleton preserves structured Codex exit -9 without legacy output (19 ms)
+    ✕ skeleton distinguishes missing exit evidence from a confirmed zero (19 ms)
+    ✕ collapsed Claude tools retain unknown results and reject mismatched result identities (19 ms)
+    ✓ extract-errors detects Codex records after arbitrary metadata and ignores successful stderr (19 ms)
+    ✓ extract-errors.py degrades malformed JSON shapes per line (18 ms)
+    ✓ extract-skeleton.py degrades malformed JSON shapes per line (20 ms)
+    ✓ extract-errors.py survives invalid UTF-8 input as a per-line degradation (18 ms)
+    ✓ extract-skeleton.py survives invalid UTF-8 input as a per-line degradation (19 ms)
+  metadata bounded discovery
+    ✓ metadata at line 25 obeys the 200-line boundary (16 ms)
+    ✓ metadata at line 26 obeys the 200-line boundary (16 ms)
+    ✓ metadata at line 200 obeys the 200-line boundary (16 ms)
+    ✓ metadata at line 201 obeys the 200-line boundary (17 ms)
+    ✓ empty, malformed, valid and missing files keep read failures separate (16 ms)
+
+  ● session-history JSONL scripts › skeleton preserves structured Codex exit 23 without legacy output
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "error(exit 23)"
+    Received string:    "[tool] exec verify -> ok
+    {\"_meta\": true, \"lines\": 1, \"parse_errors\": 0, \"user\": 0, \"assistant\": 0, \"tool\": 1, \"summary\": 0}
+    "
+
+      38 |   test.each([23, -9, '23', '-9'])('skeleton preserves structured Codex exit %s without legacy output', (code) => {
+      39 |     const input = JSON.stringify({ type: 'event_msg', payload: { type: 'exec_command_end', command: ['bash', '-lc', 'verify'], exit_code: code, aggregated_output: '' } });
+    > 40 |     expect(runScript('extract-skeleton.py', input)).toContain(`error(exit ${code})`);
+         |                                                     ^
+      41 |     expect(runScript('extract-errors.py', input)).toContain(`exit=${code}`);
+      42 |   });
+      43 |
+
+      at toContain (tests/unit/session-history-scripts.test.js:40:53)
+
+  ● session-history JSONL scripts › skeleton preserves structured Codex exit -9 without legacy output
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "error(exit -9)"
+    Received string:    "[tool] exec verify -> ok
+    {\"_meta\": true, \"lines\": 1, \"parse_errors\": 0, \"user\": 0, \"assistant\": 0, \"tool\": 1, \"summary\": 0}
+    "
+
+      38 |   test.each([23, -9, '23', '-9'])('skeleton preserves structured Codex exit %s without legacy output', (code) => {
+      39 |     const input = JSON.stringify({ type: 'event_msg', payload: { type: 'exec_command_end', command: ['bash', '-lc', 'verify'], exit_code: code, aggregated_output: '' } });
+    > 40 |     expect(runScript('extract-skeleton.py', input)).toContain(`error(exit ${code})`);
+         |                                                     ^
+      41 |     expect(runScript('extract-errors.py', input)).toContain(`exit=${code}`);
+      42 |   });
+      43 |
+
+      at toContain (tests/unit/session-history-scripts.test.js:40:53)
+
+  ● session-history JSONL scripts › skeleton preserves structured Codex exit 23 without legacy output
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "error(exit 23)"
+    Received string:    "[tool] exec verify -> ok
+    {\"_meta\": true, \"lines\": 1, \"parse_errors\": 0, \"user\": 0, \"assistant\": 0, \"tool\": 1, \"summary\": 0}
+    "
+
+      38 |   test.each([23, -9, '23', '-9'])('skeleton preserves structured Codex exit %s without legacy output', (code) => {
+      39 |     const input = JSON.stringify({ type: 'event_msg', payload: { type: 'exec_command_end', command: ['bash', '-lc', 'verify'], exit_code: code, aggregated_output: '' } });
+    > 40 |     expect(runScript('extract-skeleton.py', input)).toContain(`error(exit ${code})`);
+         |                                                     ^
+      41 |     expect(runScript('extract-errors.py', input)).toContain(`exit=${code}`);
+      42 |   });
+      43 |
+
+      at toContain (tests/unit/session-history-scripts.test.js:40:53)
+
+  ● session-history JSONL scripts › skeleton preserves structured Codex exit -9 without legacy output
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "error(exit -9)"
+    Received string:    "[tool] exec verify -> ok
+    {\"_meta\": true, \"lines\": 1, \"parse_errors\": 0, \"user\": 0, \"assistant\": 0, \"tool\": 1, \"summary\": 0}
+    "
+
+      38 |   test.each([23, -9, '23', '-9'])('skeleton preserves structured Codex exit %s without legacy output', (code) => {
+      39 |     const input = JSON.stringify({ type: 'event_msg', payload: { type: 'exec_command_end', command: ['bash', '-lc', 'verify'], exit_code: code, aggregated_output: '' } });
+    > 40 |     expect(runScript('extract-skeleton.py', input)).toContain(`error(exit ${code})`);
+         |                                                     ^
+      41 |     expect(runScript('extract-errors.py', input)).toContain(`exit=${code}`);
+      42 |   });
+      43 |
+
+      at toContain (tests/unit/session-history-scripts.test.js:40:53)
+
+  ● session-history JSONL scripts › skeleton distinguishes missing exit evidence from a confirmed zero
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "-> unknown"
+    Received string:    "[tool] exec verify -> ok
+    {\"_meta\": true, \"lines\": 1, \"parse_errors\": 0, \"user\": 0, \"assistant\": 0, \"tool\": 1, \"summary\": 0}
+    "
+
+      44 |   test('skeleton distinguishes missing exit evidence from a confirmed zero', () => {
+      45 |     const event = { type: 'event_msg', payload: { type: 'exec_command_end', command: ['bash', '-lc', 'verify'], aggregated_output: '' } };
+    > 46 |     expect(runScript('extract-skeleton.py', JSON.stringify(event))).toContain('-> unknown');
+         |                                                                     ^
+      47 |     event.payload.exit_code = 0;
+      48 |     expect(runScript('extract-skeleton.py', JSON.stringify(event))).toContain('-> ok');
+      49 |   });
+
+      at Object.toContain (tests/unit/session-history-scripts.test.js:46:69)
+
+  ● session-history JSONL scripts › collapsed Claude tools retain unknown results and reject mismatched result identities
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "1 ok, 0 error, 2 unknown"
+    Received string:    "[tools] 3x Read (a.md, b.md, +1 more) -> all ok
+    {\"_meta\": true, \"lines\": 3, \"parse_errors\": 0, \"user\": 0, \"assistant\": 0, \"tool\": 3, \"summary\": 0}
+    "
+
+      53 |     const result = (id) => ({ type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: id, content: 'ok' }] } });
+      54 |     const output = runScript('extract-skeleton.py', [calls, result('a'), result('unrelated')].map(JSON.stringify).join('\n'));
+    > 55 |     expect(output).toContain('1 ok, 0 error, 2 unknown');
+         |                    ^
+      56 |     expect(output).not.toContain('all ok');
+      57 |     const all = runScript('extract-skeleton.py', [calls, result('a'), result('b'), result('c')].map(JSON.stringify).join('\n'));
+      58 |     expect(all).toContain('all ok');
+
+      at Object.toContain (tests/unit/session-history-scripts.test.js:55:20)
+
+Test Suites: 1 failed, 1 total
+Tests:       6 failed, 10 passed, 16 total
+Snapshots:   0 total
+Time:        0.432 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/session-history-scripts.test.js/i.

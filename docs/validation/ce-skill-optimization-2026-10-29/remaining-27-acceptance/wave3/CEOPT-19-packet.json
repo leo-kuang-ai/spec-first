@@ -1,0 +1,31 @@
+{
+  "id": "CEOPT-19",
+  "skill": "spec-prd",
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/CEOPT-19-request.txt",
+  "request_sha256": "467ad6880c21039cc4c1023688791ae37155ad345cdc803246cc16d68245e097",
+  "arm_receipts": {
+    "A": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/prd-A-receipts.json",
+      "sha256": "68acd6b4bbc65dc22c2ac0f2749f2d179c8134e0515fd1d0ec741ea2053fdbb7"
+    },
+    "B": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/prd-B-receipts.json",
+      "sha256": "a93c6081dbd5f1c1f26899719b9cab3fccb2dd9c616eee04e13076a944bfc750"
+    }
+  },
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "deadline_seconds": 300,
+  "parent_recipe": "Provide only assigned arm actual helper/artifact receipts. Save unchanged final response; independently adjudicate semantic decisions against initial and changed intent.",
+  "status": "prepared-not-executed",
+  "limitations": [
+    "Actual helper mutations are parent-operated in disposable fixtures, not model autonomous execution.",
+    "Receipts establish script behavior, not product approval."
+  ]
+}

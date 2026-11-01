@@ -19,6 +19,8 @@ The merge bar is the one from Google's Code Review Developer Guide: the change m
 
 ### Classic maintainability
 
+- **未请求的新表面**：新 public endpoint、flag、config key、parameter 或 export 被明确意图排除，或超出已清楚限定的范围时，指出应删除的表面。简短需求未提及某表面，本身不足以证明它不应存在。
+- **少量代码引入新依赖**：manifest 新增依赖，而标准库、平台或仓库既有 helper 已能完成相同工作时，命名可替代的函数或 helper 路径，不能只泛称“减少依赖”。
 - **Premature abstraction** — interfaces with one implementor, factories for a single type, extension points with zero consumers.
 - **Unnecessary indirection** — more than two delegation hops to reach logic; base classes with a single subclass used once.
 - **Dead or unreachable code** — commented-out code, unused exports, unreachable branches, compatibility shims for unreleased paths.

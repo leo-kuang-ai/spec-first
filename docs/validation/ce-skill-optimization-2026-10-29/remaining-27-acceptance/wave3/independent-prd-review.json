@@ -1,0 +1,194 @@
+{
+  "scenario_id": "CEOPT-19",
+  "review_scope": "Independent read-only acceptance review of all six final responses, their receipts and tool-event traces, the exact request and packet, both complete parent helper receipts, and relevant frozen A/B source.",
+  "overall_response_verdict": "pass",
+  "full_frozen_scenario_verdict": {
+    "B": "pass within the supplied parent-operated fixture scope",
+    "A": "fail at the helper mechanism layer",
+    "model_response_comparison": "All three responses in each arm pass the bounded semantic assessment. No observed model-quality improvement is established."
+  },
+  "integrity": {
+    "request_hash": "matched",
+    "arm_receipt_hashes": {
+      "A": "matched",
+      "B": "matched"
+    },
+    "all_six_artifact_hashes": "matched",
+    "all_six_tool_trace_hashes": "matched",
+    "helper_identity": {
+      "A": {
+        "finalizer_sha256": "a28fbff58e9c2b9ed0adc4e218f1b1afb35cab84e47ce6a54983bd92835eb915",
+        "matches_recorded_helper_sha256": true
+      },
+      "B": {
+        "finalizer_sha256": "338d76d7f70b4755556498d42eb632994afd50467b26152c4d97b37d9975e90a",
+        "matches_recorded_helper_sha256": true
+      }
+    },
+    "embedded_snapshot_hashes": "Independently recomputed normalized PRD hashes and path-bound input hashes match the initial, preview, refresh and final verification fields for all eight renewal records. PRD hashes also match both OQ records in each arm.",
+    "identity_limit": "The recorded helper hash authenticates the finalizer file, not every dependency or the complete frozen source tree. The frozen scenario source_digest was not independently reconstructed."
+  },
+  "per_trial": [
+    {
+      "trial": "CEOPT-19-A1",
+      "verdict": "pass",
+      "elapsed_seconds": 184.525,
+      "timing_300s": "pass",
+      "case_verdicts": {
+        "body": "pass",
+        "metadata": "pass",
+        "body-and-input": "pass",
+        "input-only": "pass",
+        "how-word": "pass",
+        "declared-what": "pass"
+      },
+      "findings": [],
+      "evidence": "Rejects ready handoff for all three changed-PRD cases despite A's verified/current final receipts; distinguishes the title change from machine-owned metadata; accepts only bounded input-only renewal; rejects keyword inference as semantic proof while retaining observed blockers and receipt absence; preserves the explicit WHAT contradiction. It explicitly limits supplied helper evidence and makes no new execution or owner-approval claim."
+    },
+    {
+      "trial": "CEOPT-19-B1",
+      "verdict": "pass",
+      "elapsed_seconds": 144.118,
+      "timing_300s": "pass",
+      "case_verdicts": {
+        "body": "pass",
+        "metadata": "pass",
+        "body-and-input": "pass",
+        "input-only": "pass",
+        "how-word": "pass",
+        "declared-what": "pass"
+      },
+      "findings": [],
+      "evidence": "Correctly reports blocked refresh and stale final verification for all three PRD mutations, actual successful input-only renewal, advisory lexical evidence with receipt absence, and four blockers for declared-what. Historical initial verification and preview preservation are not promoted to current readiness."
+    },
+    {
+      "trial": "CEOPT-19-B2",
+      "verdict": "pass",
+      "elapsed_seconds": 95.714,
+      "timing_300s": "pass",
+      "case_verdicts": {
+        "body": "pass",
+        "metadata": "pass",
+        "body-and-input": "pass",
+        "input-only": "pass",
+        "how-word": "pass",
+        "declared-what": "pass"
+      },
+      "findings": [],
+      "evidence": "Accurately distinguishes protected non-receipt metadata and simultaneous body/input changes from input-only renewal. Treats permission mock naming as HOW without manufacturing source verification; retains absent receipt and explicit declaration blockers. Its fixture-readiness wording is expressly bounded and does not certify arbitrary input changes or production readiness."
+    },
+    {
+      "trial": "CEOPT-19-A2",
+      "verdict": "pass",
+      "elapsed_seconds": 116.986,
+      "timing_300s": "pass",
+      "case_verdicts": {
+        "body": "pass",
+        "metadata": "pass",
+        "body-and-input": "pass",
+        "input-only": "pass",
+        "how-word": "pass",
+        "declared-what": "pass"
+      },
+      "findings": [],
+      "evidence": "Correctly rejects the three false-success refresh outcomes and identifies their source cause: A's sole-stale-reason exception lacks a PRD-currentness check. Its explanation of the keyword-triggered HOW false positive matches the frozen checker. It preserves explicit WHAT and missing-receipt blockers and does not claim an A/B acceptance verdict."
+    },
+    {
+      "trial": "CEOPT-19-A3",
+      "verdict": "pass",
+      "elapsed_seconds": 117.014,
+      "timing_300s": "pass",
+      "case_verdicts": {
+        "body": "pass",
+        "metadata": "pass",
+        "body-and-input": "pass",
+        "input-only": "pass",
+        "how-word": "pass",
+        "declared-what": "pass"
+      },
+      "findings": [],
+      "evidence": "Separates mechanical receipt currentness from semantic closure for all three PRD mutations. Correctly accepts bounded input freshness, rejects lexical semantic inference, preserves the explicit contradiction, and explains that fixture source references and source-proven declarations are not independent source verification."
+    },
+    {
+      "trial": "CEOPT-19-B3",
+      "verdict": "pass",
+      "elapsed_seconds": 101.689,
+      "timing_300s": "pass",
+      "case_verdicts": {
+        "body": "pass",
+        "metadata": "pass",
+        "body-and-input": "pass",
+        "input-only": "pass",
+        "how-word": "pass",
+        "declared-what": "pass"
+      },
+      "findings": [],
+      "evidence": "Reports actual blocked/current states faithfully, correctly names the B helper hash, and separates the pre-renewal stale finding from subsequent zero-finding verification. It neither turns advisory HOW vocabulary into an owner decision nor erases the explicit WHAT declaration."
+    }
+  ],
+  "mechanism_conclusions": [
+    {
+      "topic": "PRD content and non-receipt metadata protection",
+      "A": "Failed. body, metadata and body-and-input previews permit finalization; refresh writes new receipts; final verification reports current, verified and zero findings despite changed product-bearing content.",
+      "B": "Passed the three recorded negative cases. Preview and refresh remain blocked with ready_receipt_stale; final verification remains unverified; final PRD bytes retain the mutation and old receipt.",
+      "source_basis": "Frozen scripts/finalize-prd-artifact.js around lines 208-215: B requires ready_receipt_prd_current=true and ready_receipt_inputs_current=false before the sole-stale-reason exception. A checks only the option and sole blocking reason. check-prd-artifact.js normalizeForReceipt excludes machine-ready fields but retains title and body."
+    },
+    {
+      "topic": "Legitimate input-only renewal",
+      "A": "Passed the recorded positive control.",
+      "B": "Passed the recorded positive control.",
+      "evidence": "Both retain PRD hash 504d7389e39269b72a3af044ba177bdbf24d061d966b076766845d50275c183a. Actual refresh writes updated input hashes and subsequent verification reports zero findings and current receipts. The visible input delta adds Updated evidence. without a concrete new product decision.",
+      "boundary": "A preview is read-only and does not renew the receipt. Even B's input-only preview reports can_closeout=true while its underlying receipt remains stale; all responses correctly avoid treating that flag as completed renewal."
+    },
+    {
+      "topic": "Lexical HOW advisory",
+      "A": "Failed the frozen lexical-nonblocking acceptance facet. permission in a mock-file naming question produces how_pushdown_touches_what and preflight_closure_contradicted in addition to ready_receipt_absent.",
+      "B": "Passed the recorded lexical case. possible_misclassified_how_pushdown_count=1 is advisory; how_pushdown_touches_what_count=0; only ready_receipt_absent blocks.",
+      "source_basis": "Frozen checker analyzeOutstandingQuestions: A promotes keyword matches under ready intent; B records keyword hits as advisory and uses explicit planning_would_invent_what=true for the HOW contradiction blocker."
+    },
+    {
+      "topic": "Explicit WHAT contradiction",
+      "A": "Preserved blocking.",
+      "B": "Preserved blocking.",
+      "evidence": "Both recorded declared-what cases retain how_pushdown_touches_what, planning_invention_question_present, preflight_closure_contradicted and ready_receipt_absent. All six responses refuse to silently change yes to no."
+    },
+    {
+      "topic": "Authority and readiness",
+      "conclusion": "The readiness lens requires semantic adequacy above deterministic facts and prohibits ready claims with unresolved blockers. All six responses obey that distinction. The A responses are successful recognition of a failing mechanism, not evidence that A itself satisfies the frozen acceptance."
+    }
+  ],
+  "full_frozen_missing_facets": {
+    "missing_core_facets_in_parent_fixture_evidence": [],
+    "covered_core_facets": [
+      "Changed signed body is not eligible for input-only renewal",
+      "Changed non-receipt metadata is not eligible for input-only renewal",
+      "Simultaneous body/input mutation cannot bypass PRD freshness",
+      "True input-only renewal remains possible",
+      "WHAT vocabulary alone is not semantic proof",
+      "Explicit contradictory declarations retain deterministic blocking",
+      "Actual artifact states and helper returns remain distinct from semantic approval"
+    ],
+    "not_demonstrated": [
+      "Autonomous model selection, invocation and execution of refresh/finalize against mutable PRDs",
+      "A model independently detecting its own newly introduced PRD mutation during authoring",
+      "Complete original helper process transcripts and exit codes; supplied evidence contains helper returns and snapshots",
+      "Actual input-only changes with substantive contradictory product evidence",
+      "Broader keyword vocabulary and equivalent explicit contradictions without a lexical keyword",
+      "Successful finalization of the lexical HOW fixture after resolving receipt absence",
+      "Real owner interaction, authentic owner approval or source-reference truth",
+      "Live host hook enforcement, filesystem isolation or cross-host parity",
+      "Downstream planning outcomes, production readiness or release completion",
+      "The broader existing PRD eval suite listed in frozen-scenarios.json"
+    ]
+  },
+  "comparison_limitations": [
+    "The same parent-produced helper fixtures are reused across three responses per arm; these are repeated interpretations, not three independent mechanism executions.",
+    "Both helper behavior and the B readiness reference differ between arms. The evidence does not isolate prose-only effects from deterministic code changes.",
+    "All six responses pass; this is a ceiling result for this bounded interpretation task.",
+    "Elapsed times are recomputed from recorded start/final timestamps and all are below 300 seconds. They do not establish causal latency or cost improvement.",
+    "Observed tool calls are bounded read operations; no helper execution, mutation, network operation or delegation is visible in the trial calls. This is not enforced filesystem isolation.",
+    "The packet still says prepared-not-executed; actual execution evidence is in individual receipts and tool traces, not that stale packet status.",
+    "Serving model identity and unchanged parent persistence remain recorded provenance claims rather than independently authenticated runtime facts.",
+    "No tests or PRD helpers were executed during this review; only source reads, artifact comparisons, timestamp arithmetic and hash recomputation were performed."
+  ]
+}

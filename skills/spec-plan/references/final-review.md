@@ -20,7 +20,7 @@ Before finalizing, check:
 - Each feature-bearing unit has test scenarios from every applicable category (happy path, edge cases, error paths, integration) — right-sized to the unit's complexity, not padded or skimped
 - Test scenarios name specific inputs, actions, and expected outcomes without becoming test code
 - Feature-bearing units with blank or missing test scenarios are flagged as incomplete — feature-bearing units must have actual test scenarios, not just an annotation. The `Test expectation: none -- [reason]` annotation is only valid for non-feature-bearing units (pure config, scaffolding, styling)
-- Deferred items are explicit and not hidden as fake certainty
+- Deferred items are explicit and not hidden as fake certainty. Apply `structure.md` § 3.8 to each added concern; keep considered-and-not-built dispositions out of the work backlog. Check stable KTD identities and single rule ownership per `plan-sections.md`
 - Each unit implementing a session-settled decision cites its owner in Requirements or Approach: `KTD<N>` for a planning decision, or the R-IDs governed by the Product Contract Key Decision. Reverse-resolve its `Governs R...` links so bounded execution receives the decision label; missing links are a producer-owned gap, not permission to rewrite the Product Contract.
 - Multi-surface work names every materially-considered client, service/backend, API/schema/event contract, data, operational/rollout, verification/test, and agent/tool surface as in-scope, out-of-scope with a reason, or deferred with an owner/trigger; irrelevant surfaces are omitted
 - When a high-risk trigger applies, the plan satisfies `references/high-risk-plan-lens.md` through concrete decisions or explicit Open Questions/deferments; a launch-blocking risk gap prevents `artifact_readiness: implementation-ready`
@@ -79,7 +79,7 @@ Use the Write tool to save the complete plan to the resolved format's extension:
 docs/plans/YYYY-MM-DD-NNN-<type>-<descriptive-name>-plan.<md|html>
 ```
 
-Extension follows `OUTPUT_FORMAT` from Phase 0.0 — `.md` when markdown, `.html` when HTML. Sequence number `NNN` is derived from existing plan files in `docs/plans/` regardless of extension (count both `.md` and `.html`) to ensure unique daily ordering.
+Extension follows `OUTPUT_FORMAT` from Phase 0.0 — `.md` when markdown, `.html` when HTML. Reserve a new path with exclusive creation and retry collisions; never overwrite another run. Updates recheck the existing artifact identity. Sequence number `NNN` is proposed from existing plan files in `docs/plans/` regardless of extension (count both `.md` and `.html`) to ensure unique daily ordering.
 
 Compose the plan using the content from `references/plan-sections.md` and the format-specific principles from the rendering reference loaded at Phase 0.0 (`markdown-rendering.md` OR `html-rendering.md`).
 

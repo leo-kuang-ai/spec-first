@@ -1,0 +1,22 @@
+{
+  "arm": "A",
+  "input": {
+    "host": "github.enterprise.example",
+    "base_repo": "upstream/project",
+    "number": 42,
+    "head_repo": "fork/project",
+    "head_ref": "fix/review",
+    "fix_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "comparison": {
+    "status": "behind",
+    "merge_base_commit": {
+      "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
+  },
+  "result": {
+    "status": "capability-absent"
+  },
+  "calls": [],
+  "limitation": "Consistent behind ancestry stub: remote head is merge base and does not contain fix. Actual pure helper only, not live GitHub."
+}

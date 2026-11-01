@@ -34,7 +34,7 @@ Read [evaluation-rubric.md](evaluation-rubric.md) and judge this thread before a
 
 Apply all five Exit Authority Admission facts from SKILL.md. Without `local_fix_authorization`, validate against source without editing; without `reply_authorization`, do not post; without `thread_resolution_authorization`, do not resolve. Commit and push also require their own authority; one cannot imply another.
 
-Handle only `fixed` / `fixed-differently` verdicts through the same Mutating resolver dispatch boundary as Full Mode. First read `references/agents/pr-comment-resolver.md`. Dispatch one generic worker only with `local_fix_authorization: authorized`, `worker_dispatch_authorization: authorized`, `worker_dispatch_capability: available`, and safe isolation of this thread's work. If a local fix is authorized but dispatch is unavailable, apply the same prompt sequentially inline with its fallback reason. Without local-fix authority, retain the pending list.
+Handle only `fixed` / `fixed-differently` verdicts through the same Mutating resolver dispatch boundary as Full Mode. First read `references/agents/pr-comment-resolver.md`. 判断阶段已读清的单项修复优先 inline；只有实施需要跨多个调用点深入调查、委派有实际收益时，才考虑一个 generic worker。Dispatch 仍必须同时具备 `local_fix_authorization: authorized`, `worker_dispatch_authorization: authorized`, `worker_dispatch_capability: available`, and safe isolation of this thread's work。Inline 沿用相同 prompt、逐反馈结果和修改前 baseline；缺 dispatch 授权或能力时保留对应 fallback reason。Without local-fix authority, retain the pending list.
 
 Pass the same fields full mode does, including `isOutdated` and the location fields: `line`, `originalLine`, `startLine`, `originalStartLine`. Targeted threads can be outdated too and need the same relocation handling.
 

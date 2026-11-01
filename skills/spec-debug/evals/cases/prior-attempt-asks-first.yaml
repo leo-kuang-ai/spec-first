@@ -1,20 +1,16 @@
 id: prior-attempt-asks-first
-title: 用户表明多次修复失败应先问已试过什么
+title: Ask for prior attempts before starting a new investigation
 description: |
-  验证 Prior-attempt awareness:用户信号("试了好几次都修不好")
-  触发时,先问已经尝试过什么再开始调查,避免重复失败路径。
-
+  Accept Unicode question marks and inspect runner call order for known
+  investigation and mutation operations. Semantic adequacy needs separate review.
 input:
   prompt: |
-    （spec-debug skill 已安装，请按它工作。）
-    服务一直起不来,我已经试了好几次都没修好,快疯了,帮我看看。
-
+    Use the installed spec-debug skill. The service will not start. I have tried several fixes without success. Help me diagnose it.
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger
   git:
     init: true
     checkout: main
-
 judge:
   type: script
   script_path: evals/fixtures/scripts/check-prior-attempt-ask.sh

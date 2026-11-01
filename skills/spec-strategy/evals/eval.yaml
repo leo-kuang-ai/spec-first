@@ -12,6 +12,7 @@ engine:
 
 cases:
   files:
+    - evals/cases/check-owned-update.yaml
     - evals/cases/first-run-interview-asks.yaml
     - evals/cases/existing-asks-which-section.yaml
     - evals/cases/targeted-update-metrics.yaml

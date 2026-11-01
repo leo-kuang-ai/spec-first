@@ -1,0 +1,11 @@
+{
+  "command": [
+    "node",
+    "node_modules/jest/bin/jest.js",
+    "--runInBand",
+    "--runTestsByPath",
+    "tests/unit/spec-compound-refresh-reference-contracts.test.js",
+    "tests/unit/frontmatter-validator-utf8.test.js"
+  ],
+  "exit_code": 0
+}
