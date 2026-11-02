@@ -1,0 +1,25 @@
+PASS tests/unit/spec-commit-push-pr-context-contracts.test.js
+PASS tests/unit/spec-commit-scope-regression.test.js
+FAIL tests/unit/using-spec-first-contracts.test.js
+  ● using-spec-first entry-governor contracts › keeps a lean front controller and reports the target as an advisory footprint proxy
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 5800
+    Received:    6433
+
+      36 |
+      37 |     expect(skill).not.toMatch(/^## (?:Flow Map|Route Map|Routing Rules)$/m);
+    > 38 |     expect(footprint).toBeLessThanOrEqual(5800);
+         |                       ^
+      39 |     expect(skill).toMatch(/^name: using-spec-first$/m);
+      40 |     expect(skill).toContain('standalone entry governor');
+      41 |     expect(skill).toContain('selects one next entrypoint and yields control');
+
+      at Object.toBeLessThanOrEqual (tests/unit/using-spec-first-contracts.test.js:38:23)
+
+Test Suites: 1 failed, 2 passed, 3 total
+Tests:       1 failed, 16 passed, 17 total
+Snapshots:   0 total
+Time:        0.598 s, estimated 1 s
+Ran all test suites within paths "tests/unit/spec-commit-scope-regression.test.js", "tests/unit/using-spec-first-contracts.test.js", "tests/unit/spec-commit-push-pr-context-contracts.test.js".

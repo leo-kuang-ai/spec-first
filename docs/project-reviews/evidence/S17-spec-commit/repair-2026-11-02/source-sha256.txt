@@ -1,0 +1,11 @@
+4ba34e8a9f54f50fa4e1fcd40c55dad88ea0a8912d47735663ee9e7119b7d752  skills/spec-commit/SKILL.md
+a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94  skills/spec-commit/agents/openai.yaml
+98bfbe974052d7a0629644e55da8f44fbeb0c8d2e7efb27cfb48833998fc5ff8  skills/spec-commit/evals/cases/fresh-tree-logical-grouping.yaml
+a10986e8cd19e1e6b0fbe8cc37e3e0570b9a0ec004efaffe1ea8f625e686d9b5  skills/spec-commit/evals/cases/no-auth-stops-before-staging.yaml
+73ca0edf1eeb780eeb38494f1fd7a4d8d79f56514a8c644d829822fd48c9fb5a  skills/spec-commit/evals/eval.yaml
+4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855  skills/spec-commit/evals/fixtures/repos/mini-ledger/README.md
+03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b  skills/spec-commit/evals/fixtures/repos/mini-ledger/package.json
+bf52ca02b9faceb85e52bde94688f6a472801ca49ac669325aff7a2960e79b20  skills/spec-commit/evals/fixtures/repos/mini-ledger/prepare-eval.cjs
+ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34  skills/spec-commit/evals/fixtures/repos/mini-ledger/src/server.js
+71babe4f30cde6f3010f12a588f0deb18673a96daf5ed9d769dd3fee9ec7d56d  skills/spec-commit/evals/fixtures/scripts/check-auth-gate.sh
+5a3b0af10e03c86d521dd4cf4c6dd25c64ee7961502e8ea3f87fddcb34bd89bc  skills/spec-commit/evals/fixtures/scripts/check-logical-grouping.sh

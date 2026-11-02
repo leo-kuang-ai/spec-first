@@ -286,6 +286,24 @@ describe('plugin module facade and governance', () => {
     }
   });
 
+  test('projects explicit-only metadata for internal helpers on every supported host', () => {
+    const helpers = ['spec-commit', 'spec-commit-push-pr', 'spec-test-browser', 'spec-worktree'];
+    for (const platform of getSupportedPlatforms()) {
+      const projectRoot = tempProject();
+      try {
+        const adapter = getAdapter(platform);
+        const { plan } = plugin.planBundledAssetSync(projectRoot, adapter);
+        for (const name of helpers) {
+          const metadata = plan.operations.find((entry) => entry.path === path.posix.join(adapter.skillsRoot, name, 'agents/openai.yaml'));
+          expect(metadata).toBeDefined();
+          expect(metadata.contents).toMatch(/policy:\s*\n\s+allow_implicit_invocation: false/);
+        }
+      } finally {
+        fs.rmSync(projectRoot, { recursive: true, force: true });
+      }
+    }
+  });
+
   test('在每个宿主递归投射用户显式调用的 handoff、PR feedback 与 Xcode skill', () => {
     const resolverSource = fs.readFileSync(
       path.join(__dirname, '../../skills/spec-resolve-pr-feedback/SKILL.md'),

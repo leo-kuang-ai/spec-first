@@ -10,6 +10,8 @@ Create scoped logical commit(s) that explain the outcome of the authorized chang
 
 ## Invocation And Authorization Boundary
 
+**暂存前分支门禁：** 先读取当前分支及默认分支事实；当前为`main`、`master`或已解析的默认分支时，不得先`git add`再处理分支。只有已获授权并成功创建/切换到确认的非默认分支后，才能进入暂存与提交；分支授权缺失或探针失败时保留index/worktree并返回阻塞。Step 4仍负责具体分支操作。提交信息使用`-F`文件，每个Git动作分别执行并检查结果，不能用串联命令掩盖失败。
+
 This is an internal-only helper. A public workflow may delegate here only after the current user or a visible upstream handoff has established `commit_authorization: authorized` for the intended run-owned paths. Record branch authority separately:
 
 ```yaml
