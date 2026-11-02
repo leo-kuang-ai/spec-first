@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-11-02 codex: fix(routing): 补修S20入口体积回归，去重后6433降至5771字节，保留路由/授权边界且不放宽5800门槛；28项测试及独立复核通过。 (internal)
 - v1.15.3 2026-11-02 codex: fix(internal-skills): S17提前默认分支暂存门禁，四内部helper增加Codex显式调用策略并经既有递归投射；plugin及提交检查通过，真实隐式选择未测；另发现S20入口字节回归待单独修复。 (user-visible)
 - v1.15.3 2026-11-02 codex: fix(doc-review): S09移除walkthrough旧固定动作优先序，统一消费synthesis证据推荐；54项测试及独立源码复核通过，模型交互未测。 (user-visible)
 - v1.15.3 2026-11-02 codex: test(refresh): S15补误删保护与partial恢复合成现场及独立判据，同步S08案例ID合同；55项测试和独立复核通过，runner/模型未执行，K-EVAL-K01行为缺口保留。 (internal)

@@ -1,0 +1,39 @@
+{
+  "profile": {
+    "source": "local",
+    "name": "S20-followup-using-spec-first-repair",
+    "path": null
+  },
+  "checks": [
+    {
+      "id": "tests",
+      "service": "local",
+      "command": "node node_modules/jest/bin/jest.js --runInBand --runTestsByPath tests/unit/using-spec-first-contracts.test.js tests/unit/instruction-bootstrap.test.js tests/unit/sync-instruction-files.test.js",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s20-followup-using-spec-first-resume5-20261102/logs/tests.txt",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "footprint",
+      "service": "local",
+      "command": "wc -c skills/using-spec-first/SKILL.md",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "wc"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s20-followup-using-spec-first-resume5-20261102/logs/footprint.txt",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    }
+  ]
+}

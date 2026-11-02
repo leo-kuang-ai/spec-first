@@ -92,11 +92,11 @@ describe('using-spec-first entry-governor contracts', () => {
     // U2 新增语义（输入物路由、推荐/执行边界、首次成功判据）与 S5 修复的
     // 执行中失败裁决是路由行为的 load-bearing 文本；被编辑稀释时无行为测试
     // 会报警，这里以存在性断言守住最低语义面。
-    expect(skill).toContain('明确点名的入口、当前进行中的 owner 和失败信号优先按现有边界处理');
-    expect(skill).toContain('执行中出现的失败或报错由该 workflow 既有反馈回路处理，不重启路由');
-    expect(skill).toContain('缺少必需能力才交给 `spec-runtime-setup`');
+    expect(skill).toContain('用户明确点名 workflow 时按对应入口承接');
+    expect(skill).toContain('活跃 workflow 内的失败由当前 owner 处理，超范围时才移交');
+    expect(skill).toContain('环境必需能力缺失交给`spec-runtime-setup`');
     expect(skill).toContain('不再把入口推荐当成一次新的审批');
-    expect(skill).toContain('欢迎语、入口推荐、setup receipt 和文件存在均不能证明首次任务成功');
+    expect(skill).toContain('欢迎语、入口推荐、setup receipt或文件存在不证明成功');
     expect(routeMap).toContain('## 按已有输入选择结果');
     expect(routeMap).toContain('执行中出现的失败由活跃 workflow 的反馈回路处理');
     expect(routeMap).toContain('不要因中途补充或询问进度重新路由');

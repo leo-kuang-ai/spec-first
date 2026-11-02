@@ -1,0 +1,24 @@
+PASS tests/unit/using-spec-first-contracts.test.js
+  ● Console
+
+    console.warn
+      using-spec-first Front Controller is 5771 bytes; the 5,200-byte target is advisory, not a token or behavior proof.
+
+      43 |
+      44 |     if (footprint > 5200) {
+    > 45 |       console.warn(
+         |               ^
+      46 |         `using-spec-first Front Controller is ${footprint} bytes; the 5,200-byte target is advisory, not a token or behavior proof.`,
+      47 |       );
+      48 |     }
+
+      at Object.warn (tests/unit/using-spec-first-contracts.test.js:45:15)
+
+PASS tests/unit/instruction-bootstrap.test.js
+PASS tests/unit/sync-instruction-files.test.js
+
+Test Suites: 3 passed, 3 total
+Tests:       28 passed, 28 total
+Snapshots:   0 total
+Time:        0.181 s, estimated 1 s
+Ran all test suites within paths "tests/unit/using-spec-first-contracts.test.js", "tests/unit/instruction-bootstrap.test.js", "tests/unit/sync-instruction-files.test.js".
