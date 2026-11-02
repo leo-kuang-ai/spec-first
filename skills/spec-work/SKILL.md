@@ -29,7 +29,7 @@ This command takes a work document (plan or specification) or a bare prompt desc
 
 ## Phase Reads
 
-Read each required owner in full when entering its phase; a read made before that phase does not satisfy it. A terminal owner must be read again at its step even when already in context. Resolve references from this skill's root. If a required owner is unreadable, preserve artifacts and changed state, return blocked with the missing owner and recovery path, and do not infer completion from existing files.
+在执行所属阶段前完整读取其必需 owner；同一连续上下文中已完整读取且已确认内容未变化时可以复用，不因阶段编号重复读取。上下文恢复、源码变更、引用不可用或新分支触发时重新读取相关 owner。终止出口明确要求的即时重读仍须执行。 Resolve references from this skill's root. If a required owner is unreadable, preserve artifacts and changed state, return blocked with the missing owner and recovery path, and do not infer completion from existing files.
 
 ## Reference Trigger Map
 
@@ -100,9 +100,9 @@ One commit boundary remains unconditional: only the orchestrator may stage and c
 
 Standalone only; Return-to-Caller skips this phase. When all Phase 2 tasks are complete and execution transitions to quality check, you must read `references/shipping-workflow.md` for the full shipping workflow. Do not skip this.
 
-**Code review: one portable path.** Review with `spec-code-review`, which self-sizes (lite roster for small low-risk code-only diffs, full roster otherwise). No harness-native review detection and no escalation tiers — the size/sensitive-surface judgment lives inside `spec-code-review`. Skip dedicated review only for a purely mechanical diff (formatting, dep-bumps, lint-only, generated). Full rules (autonomous Residual Gate, infra fallback) in `shipping-workflow.md`.
+**Code review: one portable path.** 专项审查使用 `spec-code-review`，具体适用范围由 `shipping-workflow.md` 的风险判断持有。单边界、低风险且验证充分的局部变更可做显式定向 diff 审查；机械修改可按该引用记录跳过。显式审查要求、必需 task review、高风险或影响面不明确时不得采用低风险例外。所有代码变更仍保留验证证据和 residual 处置。
 
-**Review is two steps — review, then fix.** spec-work's `mode:agent` invocation is report-only: it returns JSON findings and does not edit the checkout, commit, or apply fixes. This statement is scoped to the orchestrated invocation below; other explicit `spec-code-review` entry modes retain their own contract.
+**专项审查按以下两步执行；低风险定向审查仍按 shipping owner 进入 residual 和验证出口。** spec-work's `mode:agent` invocation is report-only: it returns JSON findings and does not edit the checkout, commit, or apply fixes. This statement is scoped to the orchestrated invocation below; other explicit `spec-code-review` entry modes retain their own contract.
 
 1. **Review** — Invoke the `spec-code-review` skill (invocation command in `references/review-findings-followup.md` § Fallback). Use `mode:agent` in orchestrated workflows; pass `plan:<path>` when you have a plan, `base:<ref>` when the merge base is known, and `depth:full` when a deep/thorough review was explicitly requested.
 2. **Apply fixes** — Load `references/review-findings-followup.md`. Filter eligibility on JSON only and batch by file. Use authorized fix workers or inline fallback; the orchestrator integrates and tests. Commit only with `commit_authorization: authorized`.
@@ -123,4 +123,4 @@ If that read fails, preserve every changed file, commit, and workspace. Return o
 - Track actual task/unit evidence and blockers; commits and plan status are not progress proof.
 - Finish every in-scope unit and required review/verification before a completion claim. Keep failed/not-run/degraded limitations explicit.
 - Do not widen work into adjacent cleanup, imagined future abstractions, human-time “session phases,” or a new private decomposition. Return scope-changing discoveries to the plan/task owner.
-- Review every non-mechanical diff through the portable review path or record the honest unavailable/manual fallback. Commit and landing remain separately authorized.
+- 按 shipping owner 的风险条件审查每个非机械 diff，保留低风险定向审查或真实不可用降级的依据；commit 与 landing 始终分别授权。

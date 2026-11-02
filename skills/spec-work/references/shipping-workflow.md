@@ -63,21 +63,21 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
 
    This step refines reuse, quality, and efficiency on the **current diff** so any later review sees cleaner code. It is not a substitute for code review.
 
-   Pass `plan:<path>` or a scope hint when the plan or user narrowed what changed. If the skill is unavailable on the harness, skip or do a brief manual pass for obvious duplicate/dead code — code review (step 3) still runs regardless.
+   Pass `plan:<path>` or a scope hint when the plan or user narrowed what changed. If the skill is unavailable on the harness, skip or do a brief manual pass for obvious duplicate/dead code — 第3步仍按风险规则完成相应审查。
 
    At this handoff, apply `references/feedback-and-tests.md` § Preserve proof through cleanup. Pass every evidence-bound test as `proof-test:<path>` with its unit/task, test-only seams, command/log refs and current byte identity. These are protection context, not wider scope. Consume the returned preservation comparison and missing/stale limitations; rerun the original symptom and proof tests after edits before final-tree closeout.
 
 3. **Code Review**
 
-   Review the diff with **`spec-code-review`** — the spec-first portable review skill — as the single path. It self-right-sizes (a lite roster for small, low-risk, code-only diffs; the full roster otherwise), so there is no "escalate to a heavier reviewer" decision and **no harness-specific review detection** — it behaves identically on every harness. (This replaces the former harness-native-review-first split: the size and sensitive-surface judgment that used to live here now lives inside `spec-code-review`'s own reviewer selection and small-diff gate.) A host catalog entry named `review` is not this step.
+   先根据实际影响面选择审查强度，不仅按行数判断。以下条件全部成立时可由 owner 做显式定向 diff 审查：单一明确边界、可逆局部行为、已有足够的针对性验证；无权限、安全、支付、持久化/迁移、并发、外部副作用、公共/跨模块合同或source/runtime治理变化；用户、计划和task均未要求独立/完整审查。记录检查的路径、发现及本地验证，标注 `Code review: targeted manual (bounded low-risk change)`，不能称独立审查。影响面不确定时回到专项审查。
 
-   **Skip dedicated review only for a purely mechanical diff** — formatting, dependency-version bumps, lint-only fixes, generated artifacts (the same class step 2 skips for simplify). Note in the shipping summary: `Code review: skipped (mechanical diff)`. Everything else gets reviewed.
+   其余非机械变更使用 **`spec-code-review`** 的 portable 路径，由它选择 lite/full roster；不按宿主重建另一套审查流程。明确完整审查、必需 task review 和上述风险条件始终保留。纯机械变更可记录 `Code review: skipped (mechanical diff)`；依赖升级或生成文件若改变运行行为不能仅凭文件类型豁免。任何 manual review 发现仍进入第4步，后续验证与证据出口不跳过。
 
    Task-pack `review_gate: required` reviews are early, bounded feedback only. They never replace this full work-run/branch review, even when every Task Card closed cleanly.
 
    **Review is not fix — two steps:**
 
-   **3a. Review (read-only).** Invoke `spec-code-review` with `mode:agent` (add `plan:<path>` when known; `base:<ref>` when the diff base is resolved). Pass **`depth:full`** when the plan, the task, or the user explicitly asked for a full / deep / thorough review — that is the one escalation signal `spec-code-review` cannot infer from the diff alone. Do not pass `mode:autofix`. Parse the JSON and retain its concrete `artifact_path`; never derive an artifact directory from `run_id`.
+   **3a. Review (read-only；适用于上面选择专项审查的变更).** Invoke `spec-code-review` with `mode:agent` (add `plan:<path>` when known; `base:<ref>` when the diff base is resolved). Pass **`depth:full`** when the plan, the task, or the user explicitly asked for a full / deep / thorough review — that is the one escalation signal `spec-code-review` cannot infer from the diff alone. Do not pass `mode:autofix`. Parse the JSON and retain its concrete `artifact_path`; never derive an artifact directory from `run_id`.
 
    **3b. Apply fixes (caller-owned).** Load `references/review-findings-followup.md`: filter on JSON, batch by file, and use only explicitly authorized worker dispatch. The orchestrator integrates and tests. Commit only when `commit_authorization: authorized`; otherwise keep the verified review fixes uncommitted. Then proceed to the Residual Work Gate.
 
@@ -261,17 +261,11 @@ Before creating PR, verify:
 - [ ] Commit messages follow conventional format when commits were authorized
 - [ ] PR description includes Post-Deploy Monitoring & Validation section (or explicit no-impact rationale) when a PR was authorized
 - [ ] Simplify: `spec-simplify-code` when diff >=30 lines (or skipped with reason)
-- [ ] Code review: `spec-code-review` ran (self-sized), or skipped (mechanical diff / unavailable — noted in summary); residuals handled via the Residual Work Gate
+- [ ] Code review: 按第3步记录专项审查、低风险定向审查或机械/不可用原因；Residual Work Gate 已处理全部实际发现。
 - [ ] Authorized PR description includes summary, testing notes, evidence when captured, and accurate attribution
 
 ## Code Review
 
-Single portable path: **`spec-code-review`** self-sizes (lite roster for small low-risk code-only diffs, full roster otherwise). No harness-native review detection, no escalation tiers — the size/sensitive-surface judgment lives inside `spec-code-review` now.
-
-**Skip** only for a purely mechanical diff (formatting, dep-bumps, lint-only, generated). Everything else is reviewed.
-
-**Two steps — review is not fix.** (3a) Review-only via `mode:agent`; add `depth:full` when the plan/task/user explicitly asked for a deep review. (3b) Batched fix subagents per `references/review-findings-followup.md`; residuals → Residual Work Gate.
-
-**If `spec-code-review` can't run** (no subagent dispatch): interactive → harness-native review if present, fix inline; non-interactive → skip-with-note + manual diff scan in Final Validation. Never silently ship a non-mechanical change unreviewed.
+审查选择、适用例外、必需覆盖和不可用降级均以本文件 Phase 3 第3步为唯一 owner；不在这里重复另一套规则。所有审查发现交回 caller 按已有授权修复并处理 residual，证据与完成出口保持不变。
 
 涉及 mutation 安全保证的 closeout，按 `docs/contracts/workflows/mutation-enforcement.md` 记录实际宿主强制范围、旁路与未验证项。

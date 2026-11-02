@@ -1,0 +1,2 @@
+f718ddb6771e584d7e57b38cfe2491047466ae3d708db68f741c3fc8fe19c3e8  skills/spec-work/SKILL.md
+3b80283c75e58ebdb00f31624ceebac28fb367a28caad5f813a93dad2b5df693  skills/spec-work/references/shipping-workflow.md
