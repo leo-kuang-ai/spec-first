@@ -174,11 +174,9 @@ Before staging, inspect the complete index against the pre-dispatch baseline: un
 
 When the index contains only validated run-owned changes (or is empty), stage only the owned paths or hunks reconciled in step 5. A reported filename is not permission to stage an entire mixed file. Re-read the entire staged diff immediately before committing and verify that every hunk is run-owned and validated; any unrelated or unknown delta stops commit and push. Only then commit with a message referencing the PR. Record the resulting commit SHA and inspect its actual diff before pushing; unexpected content blocks push and requires bounded recovery rather than silently rewriting history.
 
-Push to remote:
+推送前读取并消费 `skills/spec-commit-push-pr/references/commit-and-push.md` 的共享推送合同（从当前已安装的 `spec-commit-push-pr` Skill 目录解析 `references/commit-and-push.md`）。本步骤的 `push_authorization: authorized` 对应该合同的 `landing_authorization: authorized`，仅限本次已授权反馈修复与实际 PR head repository/branch；不能由 mode token 推导授权。
 
-```bash
-git push
-```
+依共享合同复核当前提交的项目发布门禁、实际 PR head 身份、唯一匹配授权的 push endpoint 与显式单分支 refspec，使用其禁额外 tag、mirror 和子模块的完整命令；不使用裸 `git push` 或依赖 ambient push 配置。合同不可读、目标不明或推送失败时，保留本地提交 SHA 和具体阻塞并进入 Step 9，不声称远端已修复。推送成功仍须按 Step 7 验证实际 head repository 中 fix SHA 的可达性，方可执行另有授权的回复/resolve。
 
 ## 7. Reply and Resolve
 

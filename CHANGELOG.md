@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-11-02 codex: fix(feedback): S13反馈修复推送消费S18受控合同，保留提交/回复/解决独立授权及实际PR head的fix SHA可达性门禁；11项测试、本地提供方探针与独立源码复核通过，未执行真实GitHub写入。 (user-visible)
 - v1.15.3 2026-11-02 codex: fix(shipping): S18受控push以单次配置覆盖remote mirror，修复显式refspec在本机Git上的安全失败；隔离双remote探针、5项测试及独立源码复核通过，未真实发布。 (user-visible)
 - v1.15.3 2026-11-02 codex: docs(debug): S10澄清普通同根影响核查不受纵深防御三处阈值限制，保留有界回源及授权；合成带提交probe、8项测试和独立源码复核通过，模型实际漏修改善未测。 (user-visible)
 - v1.15.3 2026-11-02 codex: fix(review): S07明确无提交仓库的基线失败与有效base恢复路径，披露未跟踪范围并保留report-only边界；84项测试、5例配置及独立源码复核通过，真实模型恢复行为未测。 (user-visible)
