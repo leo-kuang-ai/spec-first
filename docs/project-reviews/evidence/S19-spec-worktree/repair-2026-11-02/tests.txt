@@ -1,0 +1,24 @@
+PASS tests/unit/spec-worktree-contracts.test.js (7.237 s)
+  spec-worktree existing-ref isolation contracts
+    ✓ create rejects symlinked worktree containers and preserves the original checkout and outside files (430 ms)
+    ✓ isolate rejects symlinked worktree containers and preserves the original checkout and outside files (424 ms)
+    ✓ create rejects existing ancestor links in nested branch paths (386 ms)
+    ✓ create rejects dangling ancestor links in nested branch paths (399 ms)
+    ✓ remote-only branches in ordinary checkouts explicitly track upstream without detaching (525 ms)
+    ✓ remote-only branches in linked checkouts explicitly track upstream without detaching (454 ms)
+    ✓ source documents caller-owned isolation for spec-dogfood and spec-work (1 ms)
+    ✓ isolate attaches an existing branch and reports already-checked-out on repeat (803 ms)
+    ✓ rejects the traversal-unsafe worktree slug .. instead of building a path from it (370 ms)
+    ✓ rejects the traversal-unsafe worktree slug ../escaped instead of building a path from it (363 ms)
+    ✓ rejects the traversal-unsafe worktree slug . instead of building a path from it (359 ms)
+    ✓ rejects the traversal-unsafe worktree slug a/b instead of building a path from it (371 ms)
+    ✓ accepts a safe caller-supplied worktree slug (479 ms)
+    ✓ detect compares git directories through one canonical path resolver (394 ms)
+    ✓ reports mise and direnv trust commands without executing them (567 ms)
+    ✓ env copy audit log is owner-only and contains no paths or content hash (792 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       16 passed, 16 total
+Snapshots:   0 total
+Time:        7.268 s
+Ran all test suites within paths "tests/unit/spec-worktree-contracts.test.js".

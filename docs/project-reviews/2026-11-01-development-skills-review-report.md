@@ -44,7 +44,7 @@
 | S16 | spec-lfg | 主体 | 完整 | D | fallback源码合同修复完成 | 静态主链完成；端到端未运行 | 条件充分；fallback合同已接通 | 3个静态场景及S18本地probe | 未与基线对照 | 返修后独立fresh-source复核通过 | X-04 | 18项测试及提供方probe通过，真实PR/CI未测：[记录](evidence/S16-spec-lfg/repair-2026-11-02/README.md) |
 | S17 | spec-commit | 内部依赖；基线仅静态判断 | 聚焦 | E | 门禁与metadata源码修复完成 | 本地commit/projection验证；新模型行为未测 | 条件充分；真实选择待测 | batch4既有3次A/B及本地检查 | 已有提交请求不构成越权；不推断普遍增益 | 独立fresh-source复核通过 | F-S17-01、X-02 | 四helper显式调用策略投射通过，不证明模型默认分支拒绝：[记录](evidence/S17-spec-commit/repair-2026-11-02/README.md) |
 | S18 | spec-commit-push-pr | 内部依赖；基线仅静态判断 | 聚焦 | E | 提供方合同修复及本地验证完成 | 静态完成；未真实发布 | 条件充分 | 3个静态场景及本地双remote探针 | 本地Git复现mirror配置导致安全失败，单次覆盖后通过 | 独立fresh-source复核通过 | X-04的合同提供方；X-02待S17 | 5项测试及本地refs边界验证通过；不外推模型门禁行为：[记录](evidence/S18-spec-commit-push-pr/repair-2026-11-02/README.md) |
-| S19 | spec-worktree | 内部依赖；基线仅静态判断 | 聚焦 | E | 静态完成 | 静态完成；真实多平台未验证 | 条件充分（已读出口） | 3个静态场景 | 仅静态：隔离/身份事实有增量 | 主审补充；非独立复核 | X-02 | 待逐项处理 |
+| S19 | spec-worktree | 内部依赖；基线仅静态判断 | 聚焦 | E | 共享metadata复验完成，无独立缺陷 | 静态完成；真实多平台未验证 | 条件充分（已读出口） | 3个静态场景及临时Git测试 | 仅本地：隔离/身份事实有增量 | 独立fresh-source复核通过 | X-02 | 16项测试与投射通过，真实宿主选择未测：[记录](evidence/S19-spec-worktree/repair-2026-11-02/README.md) |
 
 逐项分析：[S00](evidence/S00-spec-runtime-setup/analysis.md)、[S20](evidence/S20-using-spec-first/analysis.md)、[S04](evidence/S04-spec-plan/analysis.md)。S00 的就绪事实基线见其分析第 10 节，后续行为场景引用它。
 
