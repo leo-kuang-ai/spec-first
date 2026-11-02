@@ -7,6 +7,8 @@ function checkKnowledgePublication(expected, mode) {
   assert.equal(receipt.fixture, 'publication-safety');
   assert.equal(git('rev-parse', 'HEAD').trim(), receipt.head, '不得提交或重写基线');
   assert.equal(git('ls-files', '--stage', '-z'), receipt.index, '不得改变暂存区');
+  const tracked = [...Object.keys(expected), 'prepare-eval.cjs'].sort();
+  assert.equal(git('ls-files', '-v', '-z'), tracked.map((file) => `H ${file}\0`).join(''), '不得改变索引标志');
   assert.equal(regular('prepare-eval.cjs').toString(), execFileSync('git', ['show', 'HEAD:prepare-eval.cjs'], { env: cleanEnv, encoding: 'utf8' }), '评测准备脚本被修改');
   const old = 'docs/solutions/old.md';
   const successor = 'docs/solutions/new.md';

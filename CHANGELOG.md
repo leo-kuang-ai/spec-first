@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-11-02 codex: fix(refresh-eval): S15固定判据补检assume-unchanged与skip-worktree，两个漏检反例修复前失败、修复后通过；S15/S08共32项校准及独立源码复核通过，不外推模型行为。 (internal)
 - v1.15.3 2026-11-02 codex: test(compound): S08假因果材料接入可执行认证/重试反事实fixture与独立判据；12项正反例校准及6例配置加载通过，实际模型知识判断未测。 (internal)
 - v1.15.3 2026-11-02 codex: test(refresh): S15接入误删保护、partial报告及恢复发布三例，新增固定文件/Git基线判据；18项正反例校准、4例配置及独立复核通过，模型行为和真实故障顺序未测。 (internal)
 - v1.15.3 2026-11-02 codex: docs(review): 对账22项逐项修复/裁决与本地提交，更新共享push、内部调用和分类结论；保留S12平台阻塞及S08/S15/真实模型验证缺口，整体不标完成。 (internal)

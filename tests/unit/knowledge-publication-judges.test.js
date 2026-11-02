@@ -51,6 +51,10 @@ describe('知识发布固定判据正反例校准', () => {
   test('partial即使文件未改也拒绝虚假的Applied', () => {
     expect(judge('partial', { ...reports.partial, status: 'applied' }).status).not.toBe(0);
   });
+  test.each(['--assume-unchanged', '--skip-worktree'])('拒绝仅修改索引标志%s', (flag) => {
+    git('update-index', flag, '--', catalog);
+    expect(judge('preserve').status).not.toBe(0);
+  });
   test('保留措辞不能掩盖真实删除', () => {
     fs.unlinkSync(path.join(workspace, old));
     expect(judge('preserve').status).not.toBe(0);

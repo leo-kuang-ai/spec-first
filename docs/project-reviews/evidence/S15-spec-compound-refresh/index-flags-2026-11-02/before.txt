@@ -1,0 +1,60 @@
+FAIL tests/unit/knowledge-publication-judges.test.js (5.328 s)
+  知识发布固定判据正反例校准
+    ✓ preserve允许真实未改文件与准确报告 (259 ms)
+    ✓ partial允许真实未改文件与准确报告 (257 ms)
+    ✓ partial即使文件未改也拒绝虚假的Applied (257 ms)
+    ✕ 拒绝仅修改索引标志--assume-unchanged (258 ms)
+    ✕ 拒绝仅修改索引标志--skip-worktree (267 ms)
+    ✓ 保留措辞不能掩盖真实删除 (249 ms)
+    ✓ 恢复正例保留独有知识、人工条目及可恢复原件 (270 ms)
+    ✓ 恢复反例拒绝unique-content (266 ms)
+    ✓ 恢复反例拒绝citation (267 ms)
+    ✓ 恢复反例拒绝manual-content (269 ms)
+    ✓ 恢复反例拒绝report (265 ms)
+    ✓ 恢复反例拒绝index (219 ms)
+    ✓ 恢复反例拒绝head (223 ms)
+    ✓ 恢复反例拒绝extra-file (278 ms)
+    ✓ 恢复反例拒绝root-extra (274 ms)
+    ✓ 恢复反例拒绝new-directory (277 ms)
+    ✓ 恢复反例拒绝empty-directory (274 ms)
+    ✓ 恢复反例拒绝frontmatter-loss (261 ms)
+    ✓ 恢复反例拒绝contradiction (264 ms)
+    ✓ 恢复反例拒绝symlink (250 ms)
+
+  ● 知识发布固定判据正反例校准 › 拒绝仅修改索引标志--assume-unchanged
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not 0
+
+      54 |   test.each(['--assume-unchanged', '--skip-worktree'])('拒绝仅修改索引标志%s', (flag) => {
+      55 |     git('update-index', flag, '--', catalog);
+    > 56 |     expect(judge('preserve').status).not.toBe(0);
+         |                                          ^
+      57 |   });
+      58 |   test('保留措辞不能掩盖真实删除', () => {
+      59 |     fs.unlinkSync(path.join(workspace, old));
+
+      at toBe (tests/unit/knowledge-publication-judges.test.js:56:42)
+
+  ● 知识发布固定判据正反例校准 › 拒绝仅修改索引标志--skip-worktree
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not 0
+
+      54 |   test.each(['--assume-unchanged', '--skip-worktree'])('拒绝仅修改索引标志%s', (flag) => {
+      55 |     git('update-index', flag, '--', catalog);
+    > 56 |     expect(judge('preserve').status).not.toBe(0);
+         |                                          ^
+      57 |   });
+      58 |   test('保留措辞不能掩盖真实删除', () => {
+      59 |     fs.unlinkSync(path.join(workspace, old));
+
+      at toBe (tests/unit/knowledge-publication-judges.test.js:56:42)
+
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 18 passed, 20 total
+Snapshots:   0 total
+Time:        5.36 s
+Ran all test suites within paths "tests/unit/knowledge-publication-judges.test.js".

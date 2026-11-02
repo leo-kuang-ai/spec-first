@@ -37,7 +37,7 @@
 | S13 | spec-resolve-pr-feedback | 主体 | 完整 | B | 共享push合同源码修复完成 | 静态完成；真实GitHub未运行 | 条件充分 | 3个静态场景及S18本地probe | 未与基线对照 | 独立fresh-source复核通过 | X-04 | 11项测试及提供方probe通过，消费者真实选路/可达性未测：[记录](evidence/S13-spec-resolve-pr-feedback/repair-2026-11-02/README.md) |
 | S08 | spec-compound | 主体 | 完整 | C | 源码修复与可执行因果反例完成 | 本地校准通过；真实history/模型未运行 | 条件充分（常规路径） | 合成cwd筛选及认证/重试反事实 | 未与基线对照 | 返修后独立fresh-source复核通过 | K-S08-01、K-EVAL-K01、H-S08-01/02 | 23项原测试及12项因果判据校准通过，6例配置可加载；模型not-run：[续补记录](evidence/S08-spec-compound/followup-2026-11-02/README.md) |
 | S14 | spec-handoff | 主体 | 完整 | C | 源码裁决完成，无确认缺陷 | 本地验证完成；真实宿主未运行 | 条件充分 | 3个静态场景；writer与消费者复验 | 未与基线对照 | 独立fresh-source复核通过 | 无新增已确认缺陷 | 26项测试通过，无需改Skill：[记录](evidence/S14-spec-handoff/repair-2026-11-02/README.md) |
-| S15 | spec-compound-refresh | 主体 | 聚焦 | C | 可执行评测及判据校准完成，行为partial | 本地18项校准通过；模型未运行 | 条件充分 | 三例新case/固定状态judge，4例配置加载 | 未与基线对照 | 返修后独立fresh-source复核通过 | K-EVAL-K01 | 误删/partial/恢复已接入可执行case；不证明模型或真实中断顺序：[续补记录](evidence/S15-spec-compound-refresh/followup-2026-11-02/README.md) |
+| S15 | spec-compound-refresh | 主体 | 聚焦 | C | 可执行评测及判据校准完成，行为partial | 本地20项校准通过；模型未运行 | 条件充分 | 三例新case/固定状态judge，4例配置加载 | 未与基线对照 | 返修后独立fresh-source复核通过 | K-EVAL-K01 | 误删/partial/恢复已接入可执行case；补检索引标志，不证明模型或真实中断顺序：[最新记录](evidence/S15-spec-compound-refresh/index-flags-2026-11-02/README.md) |
 | S09 | spec-doc-review | 主体 | 聚焦 | D | 推荐动作文案修复完成 | 静态完成；未做实际交互写入 | 条件充分（含交互恢复合同） | 3个静态场景 | 未与基线对照 | 独立fresh-source复核通过 | RS-S09-01；置信过滤效果未验证 | 54项测试通过，模型交互未测：[记录](evidence/S09-spec-doc-review/repair-2026-11-02/README.md) |
 | S11 | spec-test-browser | 内部依赖 | 聚焦 | D | 分类更正及消费者复核完成 | 静态完成；真实browser未运行 | 条件充分（已读合同） | 3个静态场景；本地55项测试 | 未与基线对照 | 独立fresh-source复核通过 | F-S11-01、X-02 | S17显式调用metadata投射通过；实际浏览器未测：[记录](evidence/S11-spec-test-browser/repair-2026-11-02/README.md) |
 | S12 | spec-test-xcode | 主体 | 聚焦 | D | 源码裁决完成；平台验证未完成 | readiness失败；真实build/install/launch未运行 | 本机必需能力不满足 | 3个静态场景及真实readiness探测 | 未与基线对照 | 独立fresh-source复核通过 | 真实平台效果未验证 | 2项合同测试通过，平台blocked/not-run，不能标PASS：[记录](evidence/S12-spec-test-xcode/repair-2026-11-02/README.md) |
@@ -111,7 +111,7 @@
 | UP-S05-01 | S05 | P3文案 | quality-guide允许mark overlap，但schema/CLI不允许豁免同wave文件重叠 | 删除错误豁免说法，保持串行/重拆 | marker不能绕过CLI，分wave可执行 | 文案已修；validator正反例及Work消费者核对通过 |
 | K-S08-01 | S08 | P3文案，源码已修 | assembly与grounding已统一fetch授权 | 同时披露头尾/全文读取与初始跨repo元数据范围 | cwd合成筛选及23项测试通过；真实history未读 | 返修后独立复核通过 |
 | K-S21-01 | S21 | P2待场景验证 | 无条件全项目typecheck/lint可能增加小改动成本 | 先测blast-radius方案，不直接删验证 | 时间与跨边界缺陷发现双指标 | 单次本机耗时已测；质量/漏检对照未做 |
-| K-EVAL-K01 | S08、S15评测 | partial，资产已补 | 字段/词匹配不能独证因果知识质量或安全删除 | 已补假因果、误删、partial恢复具体合成材料与独立rubric | 尚未挂runner或执行模型，不宣称行为通过 | 资产独立复核通过；真实行为缺口保留 |
+| K-EVAL-K01 | S08、S15评测 | partial，配置与判据已补 | 字段/词匹配不能独证因果知识质量或安全删除 | 已接入可加载的skill-up case与固定fixture判据；S08 12项、S15 20项本地校准通过 | 配置加载不等于runner端到端执行；尚未执行模型，不宣称行为通过 | 资产独立复核通过；真实行为缺口保留 |
 | RS-S09-01 | S09 | P3文案，已修 | walkthrough移除固定优先序，消费producer证据推荐 | 与synthesis 3.5b一致，保留用户选择和缺修复Defer | 54项测试通过；模型交互未测 | 独立fresh-source复核通过 |
 
 最新补审候选：[S08](evidence/final-S08-history-review.md)的H-S08-01读取范围说明漂移、H-S08-02相似仓库候选读取范围风险；[S09](evidence/resume-doc-review-dependencies.md)的分数门/既有问题抑制/固定分级等；[S00](evidence/final-S00-graph-review.md)的CodeGraph currentness旧文档漂移。均未证明真实泄露、漏报或业务损害，不升级P0/P1，不进入强制实施排序。S20描述预算数字仅保留历史来源，不据此断言当前宿主已截断列表。
