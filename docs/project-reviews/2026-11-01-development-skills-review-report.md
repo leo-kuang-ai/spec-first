@@ -1,5 +1,6 @@
 # 研发链路 Skill 专业能力审查报告
 
+- 全量修复执行计划：[逐项Workflow与提交台账](../plans/2026-11-02-development-skills-repair-workflow.md)。
 - 后续逐项修复执行参考：[问题修复流程](2026-11-02-development-skills-repair-process.md)。
 - 依据：[审查需求](2026-11-01-development-skills-review-requirements.md)、[执行方案](../plans/2026-11-01-development-skills-review-plan.md)、[调研记录](2026-11-01-ai-assisted-brownfield-research.md)。
 - 当前状态（2026-11-02，第五批最终收口）：22项逐项分析与29条验收对照已形成；22项静态审查已收口，补齐S00配置/图谱消费者、S03全部surface、S08私有history授权出口与S09相关依赖，22项业界实践已作现时或本轮共享核验。[S06/S07第五批评测包](evidence/batch5/README.md)已执行收口：22/24 次已批准调用完成 **S06/S07 × 两模型四对有效 A/B 配对、各 n=2 重复**（含一次 B 组环境污染判无效后修复环境重跑），业务正确性与缺陷检出两组均无差异且两轮稳定复现（饱和），A 组成本约 3.0–6.6× 并多产出结构化证据出口，全批观测约 10.92M token 未达 12M 停止线；详见[第五批台账](evidence/batch5/execution-ledger.md)、[r3](evidence/batch5/r3-pairs-record.md)/[r4 配对记录](evidence/batch5/r4-pairs-record.md)与[无效样本记录](evidence/batch5/r2-work-glm-pair-invalid.md)。既有6套156个不同测试通过只证明对应确定性行为。29条验收中27条满足、#22/#24 两条部分满足（历史元数据与投入计量缺口保留），整体不标100%；真实企业任务效果仍未验证。
