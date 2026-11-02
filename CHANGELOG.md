@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-11-02 codex: docs(xcode): S12记录真实readiness失败：active CommandLineTools、simctl不可用、无可见XcodeBuildMCP；2项合同测试及独立复核通过，真实平台验证blocked/not-run，整体未完成。 (internal)
 - v1.15.3 2026-11-02 codex: docs(worktree): S19复核S17内部显式调用metadata及worktree隔离合同，16项测试、投射和独立复核通过；无新增Skill修改，真实多平台未测。 (internal)
 - v1.15.3 2026-11-02 codex: docs(browser): S11按governance修正为内部依赖，保留LFG/dogfood调用方验证责任；55项测试、metadata投射及独立复核通过，真实浏览器未运行。 (internal)
 - v1.15.3 2026-11-02 codex: fix(routing): 补修S20入口体积回归，去重后6433降至5771字节，保留路由/授权边界且不放宽5800门槛；28项测试及独立复核通过。 (internal)

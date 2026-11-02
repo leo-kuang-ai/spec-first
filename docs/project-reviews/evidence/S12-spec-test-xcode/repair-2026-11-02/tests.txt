@@ -1,0 +1,10 @@
+PASS tests/unit/spec-test-xcode-contracts.test.js
+  spec-test-xcode evidence contract
+    ✓ returns bounded provider evidence with source identity and limitations (2 ms)
+    ✓ keeps invocation user-owned and does not create a shared evidence artifact
+
+Test Suites: 1 passed, 1 total
+Tests:       2 passed, 2 total
+Snapshots:   0 total
+Time:        0.139 s, estimated 1 s
+Ran all test suites within paths "tests/unit/spec-test-xcode-contracts.test.js".
