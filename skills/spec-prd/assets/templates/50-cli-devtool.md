@@ -11,7 +11,7 @@
 | 工具类型 | CLI / script / workflow / agent-facing command / runtime projection |
 | 目标用户 | 开发者 / reviewer / CI / 本地 agent / 其它 |
 | 公开入口 | 命令 / 参数 / skill / workflow / npm script |
-| 支持平台 | macOS / Linux / Windows / Claude / Codex / Cursor / Kiro / Qoder |
+| 支持平台 | 按目标产品实际支持的操作系统与宿主分别列明，以当前支持注册表/官方合同为依据 |
 | 副作用 | 只读 / 写文件 / 删除 / host config / 外部调用 |
 | consumer | 人类 / shell / CI / downstream workflow / parser |
 
@@ -58,11 +58,9 @@
 
 | Host | source | generated runtime | 支持 / 降级 | 验证方式 |
 | --- | --- | --- | --- | --- |
-| Claude | | | | |
-| Codex | | | | |
-| Cursor | | | | |
-| Kiro | | | | |
-| Qoder | | | | |
+| 按本次目标实际宿主逐行填写 | | | | |
+
+涉及 spec-first 时从 `getSupportedPlatforms()` 核对当前支持集（当前包括 Claude、Codex、Cursor、Kiro、Qoder、OpenCode、ZCode、Pi）；只验证本次需求涉及的目标及共享影响面，不把模板示例当固定支持全集。
 
 Source-first：修 source/generator，再运行正式 init；不手改 generated mirrors。
 
@@ -76,7 +74,7 @@ Source-first：修 source/generator，再运行正式 init；不手改 generated
 - preview 与 confirm 后实际 mutation 一致。
 - stdout/stderr/JSON/exit code 可被 consumer 稳定读取。
 - 中途失败无静默残留，恢复路径明确。
-- 五宿主 source/runtime projection 按实际支持范围验证。
+- 目标宿主 source/runtime projection 按当前实际支持范围验证，区分生成验证、宿主加载和真实任务效果。
 
 ## CLI/DevTool 待闭合问题候选
 

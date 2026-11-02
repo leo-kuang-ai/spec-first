@@ -1,0 +1,41 @@
+{
+  "schema_version": "verification-run-summary.v1",
+  "generated_at": "2026-11-02T10:25:10.759Z",
+  "profile": {
+    "source": "local",
+    "name": "S03-spec-prd-repair",
+    "path": null
+  },
+  "checks": [
+    {
+      "id": "eval",
+      "service": "local",
+      "command": "skill-up validate skills/spec-prd/evals/eval.yaml",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "skill-up"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s03-spec-prd-resume-20261102/logs/eval.txt",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "tests",
+      "service": "local",
+      "command": "node node_modules/jest/bin/jest.js --runInBand --runTestsByPath tests/unit/spec-prd-contracts.test.js tests/unit/spec-prd-decision-card-contracts.test.js tests/unit/spec-prd-exit-safety.test.js tests/unit/spec-prd-plan-handoff-contracts.test.js",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s03-spec-prd-resume-20261102/logs/tests.txt",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    }
+  ]
+}
