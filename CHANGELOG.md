@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-11-02 codex: fix(compound): S08统一fetch授权、披露会话头尾与全文读取，cwd筛除缺值及相似仓库并保留Claude真实cwd；23项测试及返修后独立复核通过，补假因果合成评测资产，真实历史及模型未测。 (user-visible)
 - v1.15.3 2026-11-02 codex: fix(lfg): S16 fallback复用受控推送合同，移除origin/首remote猜测及固定origin旧描述，保留无remote本地持久化；18项测试、共享探针和返修后独立源码复核通过，真实PR未运行。 (user-visible)
 - v1.15.3 2026-11-02 codex: fix(feedback): S13反馈修复推送消费S18受控合同，保留提交/回复/解决独立授权及实际PR head的fix SHA可达性门禁；11项测试、本地提供方探针与独立源码复核通过，未执行真实GitHub写入。 (user-visible)
 - v1.15.3 2026-11-02 codex: fix(shipping): S18受控push以单次配置覆盖remote mirror，修复显式refspec在本机Git上的安全失败；隔离双remote探针、5项测试及独立源码复核通过，未真实发布。 (user-visible)

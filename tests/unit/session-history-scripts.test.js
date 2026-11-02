@@ -118,4 +118,42 @@ describe('metadata bounded discovery', () => {
     expect(rows[0]).toMatchObject({ platform: 'codex', session: 'one' });
     expect(rows.at(-1)).toMatchObject({ files_processed: 4, parse_errors: 1, files_without_metadata: 2 });
   });
+  test('absolute cwd filter excludes missing and sibling cwd before keyword scanning', () => {
+    const current = path.join(root, 'repo');
+    const sibling = path.join(root, 'repo-old');
+    const files = [
+      ['exact.jsonl', current],
+      ['sibling.jsonl', sibling],
+      ['missing-cwd.jsonl', undefined],
+    ].map(([name, cwd]) => {
+      const file = path.join(root, name);
+      fs.writeFileSync(file, [
+        JSON.stringify({ type: 'session_meta', payload: { id: name, ...(cwd ? { cwd } : {}) } }),
+        JSON.stringify({ type: 'event_msg', payload: { type: 'user_message', message: 'unique-topic' } }),
+      ].join('\n'));
+      return file;
+    });
+    const result = spawnSync('python3', [path.join(scriptsRoot, 'extract-metadata.py'), '--cwd-filter', current, '--keyword', 'unique-topic', ...files], { encoding: 'utf8' });
+    expect(result.status).toBe(0);
+    const rows = result.stdout.trim().split('\n').map(JSON.parse);
+    expect(rows.slice(0, -1).map((row) => row.session)).toEqual(['exact.jsonl']);
+    expect(rows.at(-1).filtered_by_cwd).toBe(2);
+  });
+  test('Claude cwd metadata retains only the exact repository', () => {
+    const current = path.join(root, 'repo');
+    const files = [
+      ['exact', current],
+      ['sibling', path.join(root, 'repo-old')],
+      ['missing', undefined],
+    ].map(([name, cwd]) => {
+      const file = path.join(root, `${name}.jsonl`);
+      fs.writeFileSync(file, JSON.stringify({ type: 'user', gitBranch: 'feature', sessionId: name, ...(cwd ? { cwd } : {}) }) + '\n');
+      return file;
+    });
+    const result = spawnSync('python3', [path.join(scriptsRoot, 'extract-metadata.py'), '--cwd-filter', current, ...files], { encoding: 'utf8' });
+    expect(result.status).toBe(0);
+    const rows = result.stdout.trim().split('\n').map(JSON.parse);
+    expect(rows.slice(0, -1).map((row) => row.session)).toEqual(['exact']);
+    expect(rows.at(-1).filtered_by_cwd).toBe(2);
+  });
 });

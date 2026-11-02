@@ -9,7 +9,7 @@ Two claim categories verify against different trees:
 - **Code-behavior claims** (enum values, status semantics, limits, defaults) verify against the **local working tree** — they describe what this session's work produced and verified here.
 - **Merge-state claims** ("fixed in #1608", "landed", "shipped") verify against **remote truth** — the checkout may predate a merge, so `gh pr view` (or the tracker equivalent) is primary and local git reachability is only the fallback. The script's `INFO: worktree is N commits behind …` line tells you how much to distrust the local tree for this category.
 
-Before running the script, optionally run `git fetch --quiet` (best-effort — skip silently on failure or offline; the network is never a correctness dependency). When remote state cannot be checked at all, keep the claim, add an as-of qualifier ("as of this writing"), and record degraded verification in the run report.
+Before running the script, follow `references/assembly.md` for network and remote-ref mutation authorization. Run `git fetch --quiet` only when that scope is already authorized; otherwise use existing local refs and record remote merge-state claims as degraded. A failed authorized fetch is not evidence of current remote state. When remote state cannot be checked, keep the claim only with an as-of qualifier ("as of this writing") and record degraded verification in the run report.
 
 ## Step 1: Adjudicate the mechanical flags
 

@@ -35,6 +35,7 @@ def try_claude(lines):
             if obj.get("type") == "user" and "gitBranch" in obj:
                 return {
                     "platform": "claude",
+                    "cwd": obj.get("cwd", ""),
                     "branch": obj["gitBranch"],
                     "ts": obj.get("timestamp", ""),
                     "session": obj.get("sessionId", ""),
@@ -368,8 +369,10 @@ def process_file(filepath):
 
 
 def cwd_matches_filter(session_cwd, cwd_filter):
-    if not session_cwd or not cwd_filter:
+    if not cwd_filter:
         return True
+    if not session_cwd:
+        return False
     if os.path.isabs(cwd_filter):
         return os.path.normpath(session_cwd) == os.path.normpath(cwd_filter)
     return cwd_filter in session_cwd
@@ -412,7 +415,7 @@ if files:
             # scan cost — Codex discovery returns sessions across all repos,
             # so without this ordering --keyword would scan files that are
             # immediately discarded.
-            if cwd_filter and result.get("cwd") and not cwd_matches_filter(result["cwd"], cwd_filter):
+            if cwd_filter and not cwd_matches_filter(result.get("cwd"), cwd_filter):
                 filtered += 1
                 continue
             # Apply keyword scan only after cheap filters pass.
