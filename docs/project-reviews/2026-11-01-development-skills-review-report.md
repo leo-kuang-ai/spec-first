@@ -27,7 +27,7 @@
 | S20 | using-spec-first | 前提对象；行为完成+基线（必选） | 完整 | 2 | 源码修复及事实裁决完成 | 静态完成；行为完成 | 条件充分 | 第一批 4 场景；R6b 第二批每组 3 次、第三轮带提交 fixture 每组 2 次 | GLM：R6b 有可观察增益（第三轮 2/2 对 0/2，路由到 `spec-ideate`，合适；第二批路由不合适，不计入），成本约 2.5–3.5 倍；gpt：无差异（仅对 GLM-5.3 与经 qianxing.pro 中转的 gpt-6-astra 成立） | 修复后独立源码复核通过 | K-01、F-S20-01、F-S20-02 | K-01/F-S20-01已修；F-S20-02旧预算推断已纠正，真实截断未证实；17项测试、入口lint及独立复核通过：[记录](evidence/S20-using-spec-first/repair-2026-11-02/README.md) |
 | S04 | spec-plan | 主体；行为完成+基线（必选，试点） | 完整 | 3 试点 | 源码修复与既有修复复验完成 | 静态完成；已有行为对照（归因受限） | 条件充分（渲染/worker条件排除） | 第一批 32 次 + 筛查 3 场景 + 复现 2 次 | gpt上已测产出指标无差异；GLM单轮未产出计划，是否不合理等待有分歧（F-S04-04）（仅对 GLM-5.3 与经 qianxing.pro 中转的 gpt-6-astra 成立） | 修复后独立源码复核通过；真实双模型回归未运行 | F-S04-01、F-S04-02、F-S04-04 | F-S04-01/04已修；F-S04-02当前已挂载，9用例配置复验有效；49项契约测试与独立源码复核通过，真实行为回归待验证：[记录](evidence/S04-spec-plan/repair-2026-11-02/README.md) |
 | S01 | spec-ideate | 主体 | 完整 | A | 源码裁决完成；无确认缺陷 | 静态完成；行为未运行 | 条件充分 | 3个静态场景；无新行为运行 | 未与基线对照 | 独立当前源码复核通过；非行为实验 | 六视角成本待测 | 不盲改六视角；8项契约测试通过，成本/收益仍未测，保留受控对照重开条件：[记录](evidence/S01-spec-ideate/repair-2026-11-02/README.md) |
-| S02 | spec-brainstorm | 主体 | 完整 | A | 静态完成 | 静态完成；行为未运行 | 条件充分 | 3个静态场景 | 未与基线对照 | 新上下文源码复核，非盲评 | UP-S02-01 | 待逐项处理 |
+| S02 | spec-brainstorm | 主体 | 完整 | A | 源码修复完成（本地验证） | 静态完成；行为未运行 | 条件充分 | 3个静态场景 | 未与基线对照 | 复核发现返修后独立源码复核通过 | UP-S02-01 | UP-S02-01已统一授权、修订与摘要模板；13项测试、7例配置及独立源码复核通过；真实行为待验证：[记录](evidence/S02-spec-brainstorm/repair-2026-11-02/README.md) |
 | S03 | spec-prd | 主体 | 完整 | A | 静态完成 | 静态完成（含所有surface/证券/拆分）；行为未运行 | 条件充分（各surface静态） | 3个静态场景 | 未与基线对照 | 新上下文源码复核，非盲评 | UP-S03-01/02 | 待逐项处理 |
 | S05 | spec-write-tasks | 主体 | 完整 | A | 静态完成 | 静态完成（核心出口与消费者；条件排除见清单） | 条件充分 | 3个静态场景；validator与Work consumer已读 | 未与基线对照 | 新上下文源码复核，非盲评 | UP-S05-01 | 待逐项处理 |
 | S06 | spec-work | 主体；行为完成+基线（必选） | 完整 | B | 静态完成；行为完成（第五批有效A/B） | 静态完成；行为完成 | 条件充分（核心refs） | 两轮筛查 6 场景，W5 两组各 3 次；第五批 r2–r4 两模型各两对有效 A/B（业务全部 5/5、测试强度核验、A 真实加载挂载 Skill、B 无污染） | gpt：无差异（n=2，成本约 3.3–3.5× token）；GLM：无差异（n=2，成本约 3.0–3.6× input）；A 组多结构化收尾证据出口（仅对 GLM-5.3 与经 qianxing.pro 中转的 gpt-6-astra 成立） | 未复核 | F-S06-01、F-S06-02 | 待逐项处理 |
@@ -103,7 +103,7 @@
 | F-EVAL-01 | 审查评测设施 | P2 | skill-up `git: init: true` 不创建初始提交，所有 fixture 都是“无提交、全部未跟踪”。S07 第一轮结论无效。第三轮用带提交的 fixture 复跑 S20-R6b、S10-D1：结论方向不变，但 S20 A 组的路由从 `spec-code-review` 变为 `spec-ideate` | `evidence/batch*/evals/fixtures` | 已改用自带 `.git` 与基线提交的 fixture | 已用复跑验证 |
 
 | X-04 | S13、S16（S18提供合同） | P2待场景验证 | full-mode Step6及shipping-tail fallback直接push，未消费S18唯一endpoint、显式refspec与禁额外tag/mirror协议；shipping-tail还将helper描述为固定origin | 复用S18受控push合同，修正描述；不新增发布框架 | 隔离本地假remote配置多pushurl/followTags验证实际refs/端点；未执行，不称越权已发生 | 两组回源发现合并；非盲评 |
-| UP-S02-01 | S02 | P2待行为验证 | 已授权续跑与revision绝对确认措辞冲突 | synthesis-summary统一现有授权例外 | WHAT已闭合+自主修订应落盘，真歧义仍询问 | 新上下文源码复核 |
+| UP-S02-01 | S02 | P2待行为验证 | 已授权续跑与revision绝对确认措辞冲突 | synthesis-summary统一现有授权例外 | WHAT已闭合+自主修订应落盘，真歧义仍询问 | 源码修复及独立复核完成；真实行为未重跑 |
 | UP-S03-01 | S03 | P2待行为验证 | 低价值/范围外分支只排序与skip规定不一致 | domain-language-and-decision-ledger统一停止语义 | 范围外不无界grill，关键权限缺口仍阻断 | 新上下文源码复核 |
 | UP-S03-02 | S03 | P3文案 | CLI模板仍列五宿主，当前支持集已扩展 | 50-cli-devtool按实际目标核对支持集 | 涉及OpenCode/ZCode/Pi时不遗漏；不强制全端 | 新上下文源码复核 |
 | UP-S05-01 | S05 | P3文案 | quality-guide允许mark overlap，但schema/CLI不允许豁免同wave文件重叠 | 删除错误豁免说法，保持串行/重拆 | marker不能绕过CLI，分wave可执行 | validator及Work消费者已读 |

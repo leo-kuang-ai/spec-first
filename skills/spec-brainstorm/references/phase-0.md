@@ -46,7 +46,7 @@ When the shape matches — at intake, or whenever later dialogue (Phases 1.3–2
 - Constrained, well-defined scope
 
 **If requirements are already clear:**
-Keep the interaction brief. Confirm understanding and present concise next-step options rather than forcing a long brainstorm. Only write a short requirements-only unified plan when a durable handoff to planning or later review would be valuable. Skip Phase 1.1 and 1.2 entirely — still classify tier in Phase 0.3, then go straight to Phase 1.3 or Phase 2.5 and follow `references/synthesis-summary.md`'s Path A / Path B gate exactly. Do not assume the synthesis is announce-only: a richly pre-loaded prompt classifies as Standard or Deep, which routes to Path B (full scoping synthesis + confirmation), not Path A — collapsing that gate is the defect `synthesis-summary.md` warns against.
+Keep the interaction brief. Confirm understanding and present concise next-step options rather than forcing a long brainstorm. Only write a short requirements-only unified plan when a durable handoff to planning or later review would be valuable. Skip Phase 1.1 and 1.2 entirely — still classify tier in Phase 0.3, then go straight to Phase 1.3 or Phase 2.5 and follow `references/synthesis-summary.md`'s Path A / Path B gate exactly. Do not assume the synthesis is announce-only: a richly pre-loaded prompt classifies as Standard or Deep, which routes to Path B（完整摘要；是否等待依该引用的当前授权与真实缺口判断），不是 Path A — collapsing that gate is the defect `synthesis-summary.md` warns against.
 
 #### 0.3 Assess Scope
 

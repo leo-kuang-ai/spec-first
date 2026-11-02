@@ -1,0 +1,3 @@
+b06f578cb25d5d5646099260143f79fb231cc7449b12b7f352bf5bf482c0b764  skills/spec-brainstorm/references/synthesis-summary.md
+3d264908ac292b503e055b4d8b2d0afbe018fdcb60786f07dc491b741b183107  skills/spec-brainstorm/references/approaches.md
+774352865b23a8fcf3763b167512ed5072a2cf0e6737ea49c552656ec71bee9e  skills/spec-brainstorm/references/phase-0.md

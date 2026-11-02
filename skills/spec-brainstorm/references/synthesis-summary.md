@@ -42,14 +42,16 @@ Each section answers a different question:
 - **What did we cut?** → deferred items a reader would expect to see acknowledged
 - **Where might you redirect?** → residual forks: post-dialogue consequences, silent inferences, late-cycle bets
 
-Resolve whether a document is warranted under `brainstorm-sections.md` before promising the next action. If yes: "Confirm and I'll write the requirements-only plan next. Or tell me what to change." If the user declined a document or brief alignment suffices: "Confirm and we're done here; no document will be written." Name a downstream destination only if this run established it. Do not claim a file, commit message, knowledge publication or workflow invocation that has not occurred. Existing task authorization can cover continuation, but cannot be reported as explicit user review.
+Resolve whether a document is warranted under `brainstorm-sections.md` before promising the next action. 需要确认且文档必要时使用："Confirm and I'll write the requirements-only plan next. Or tell me what to change." 若需要确认且用户不需要文档或简短对齐已足够，使用："Confirm and we're done here; no document will be written." 无需确认时直接说明实际交付，不输出等待邀请。 Name a downstream destination only if this run established it. Do not claim a file, commit message, knowledge publication or workflow invocation that has not occurred. Existing task authorization can cover continuation, but cannot be reported as explicit user review.
 
 ### Path A vs Path B: the gate that fires the confirmation question
 
+先区分呈现深度与等待条件：已有自主整理、写入或续跑授权且 WHAT 已闭合时，各深度均说明范围后继续，不重复索取批准；用户明确要求逐阶段确认或出现新的实质产品决策、权限或副作用缺口时，仅阻塞依赖动作。自主执行不是用户逐项审阅，未解决的产品问题不得写成确认事实。
+
 Phase 2.5 has two presentation modes, gated by **two signals**: (1) did any blocking question fire before Phase 2.5? AND (2) what tier did Phase 0.3 classify the scope as? Blocking questions include Phase 0.3 scope disambiguation, Phase 1.3 collaborative dialogue probes, and Phase 2 approach selection (when a menu fires). Internal classification, Phase 1.1 scan, and Phase 1.2 pressure test are not blocking questions — they don't count.
 
-- **Path A — no blocking questions fired AND tier is Lightweight**: announce-mode. Emit "What we're building" prose only (no other sections, no confirmation question), then proceed in the same turn to Phase 3 only when a document is warranted, otherwise to Phase 4 handoff. Do NOT end the turn waiting for acknowledgment. The user can revise after the doc lands if the shape is wrong — Lightweight Path A docs are short, post-hoc revision is cheap.
-- **Path B — at least one blocking question fired, OR tier is Standard / Deep-feature / Deep-product**: full tier-aware scoping synthesis with confirmation gate. Two scenarios fire Path B: (a) the user invested answer-time during dialogue, or (b) the user pre-loaded substantive scope content (Phase 0.2 fast-path with a richly-specified opening prompt). Either way, the substance earns a real checkpoint. The confirmation question is unconditional even when zero call-outs survive the keep test.
+- **Path A — no blocking questions fired AND tier is Lightweight**: 默认使用简短公告。仅在统一等待判断允许继续时，不提确认问题并在同轮进入必要的 Phase 3 或 Phase 4；用户明确要求先确认时，简短呈现后等待，不能由 Lightweight 覆盖该要求。 The user can revise after the doc lands if the shape is wrong — Lightweight Path A docs are short, post-hoc revision is cheap.
+- **Path B — at least one blocking question fired, OR tier is Standard / Deep-feature / Deep-product**: full tier-aware scoping synthesis with confirmation gate. Two scenarios fire Path B: (a) the user invested answer-time during dialogue, or (b) the user pre-loaded substantive scope content (Phase 0.2 fast-path with a richly-specified opening prompt). Either way, the substance earns a real checkpoint. 呈现完整摘要不等于必须等待：只有上面的授权与缺口判断要求确认时才提出确认问题；没有新决策且已授权继续时公告后进入既定交付。
 
 **Why the tier guard exists.** Phase 0.2's fast path is designed for two very different cases — a tight one-line prompt that needs no dialogue ("fix the typo on line 47"), and a richly pre-loaded brainstorm context that ALSO needs no dialogue because the user pre-stated everything (e.g., handing off accumulated decisions from a prior session for a brainstorm doc backfill). Without a tier guard, both route to Path A, and the richly-loaded case gets a 1-sentence checkpoint for what may be 20+ items worth of scope. Tier-classifying Phase 0.3 distinguishes these cases — pre-loaded substance makes the tier Standard or Deep, which then routes to Path B and produces the full scoping synthesis the substance deserves. Do not simplify the gate back to a single "no questions fired" signal — that was a real defect that produced one-sentence syntheses on Deep-tier pre-loads.
 
@@ -165,9 +167,9 @@ Proposing: [1–3 line shape and the outcome it serves].
 [Continue to the warranted document or the established no-document handoff.] Interrupt if the shape is wrong.
 ```
 
-Proceed in the same turn: write only a warranted document, otherwise deliver the alignment and established handoff. Do not wait for acknowledgment or invent a file to satisfy this template.
+仅当统一等待判断允许继续时，在同轮写必要文档或交付既定简短对齐；不要为满足模板而造文档。明确要求先确认时，在同样的简短摘要后请求确认。
 
-Ask the user open-ended on Path B (no `AskUserQuestion` menu). The justification is Interaction Rule 5(a) in `references/interaction-rules.md` — an option menu would unintentionally influence the user's feedback toward the parts the menu lists.
+仅当统一等待判断要求确认时，Path B 使用开放式问题（无 `AskUserQuestion` 菜单）；已授权自主继续时使用公告。 The justification is Interaction Rule 5(a) in `references/interaction-rules.md` — an option menu would unintentionally influence the user's feedback toward the parts the menu lists.
 
 ### Worked example: compression from internal draft to scoping synthesis (Standard tier)
 
@@ -217,21 +219,15 @@ This is one mental act — re-read as the user — not a checklist to mechanical
 
 ## Re-present after revision; follow the resolved destination
 
-A revision is not a confirmation. After any user revision (even a trivially-understood swap like "move deferred item X back into scope"), integrate the change, re-present the revised scoping synthesis with the change reflected, and wait for explicit confirmation before writing the doc. The loop is:
-
-1. Present scoping synthesis → user responds
-2. User confirms → follow the resolved document or no-document destination
-3. User revises → integrate, re-present revised scoping synthesis, return to step 1
-
-Doc-write fires only on explicit confirm or after the soft-cut blocking question's "proceed" option (see below). The confirmation step is what makes the scoping synthesis **confirmed** rather than "agent's last proposal" — never write immediately after a revision, even when the revision is small enough that the agent feels it understood.
+修订不等于确认，也不自动撤销已有任务授权。合并修订后，若 WHAT 已闭合、范围及重要后果仍在授权内，简述变化并继续既定文档或无文档交付。若用户要求逐阶段共创，或修订引入新的实质产品决定、权限及副作用缺口，则呈现相关差异并等待必要答案。不得将理解、沉默或修订本身记为人工批准；记录真实决定来源与未决项。
 
 ---
 
 ## Soft-cut on circularity (not iteration count)
 
-Track which scoping synthesis items the user touched per round. The soft-cut blocking question fires **only when the same item is revised twice** (or a third-round revision targets an item already revised in round two). New-item revisions across rounds proceed without limit — revising different aspects of a wrong scoping synthesis is exactly what the mechanism should support.
+记录每轮修订涉及的决定维度。同一事项修订两次（或第三轮触及第二轮已修项）时检查是否存在未解决的真实分歧；修订次数本身不构成等待条件。只有统一等待判断要求用户决定时才提出下面的 soft-cut 问题。 New-item revisions across rounds proceed without limit — revising different aspects of a wrong scoping synthesis is exactly what the mechanism should support.
 
-**Identity across rounds is by decision dimension, not surface wording or section.** A revision may cause stage 2 to re-derive — the same underlying decision can come back rephrased, merged with another bullet, or moved to a different section (e.g., what was a Trade-off in round one becomes a Call-out in round two after the user pushed back). "Same item" means the same underlying decision regardless of which section currently holds it. When a re-cut collapses multiple prior bullets into one, the new combined bullet inherits the "touched" status of any of its constituents — soft-cut fires if any underlying decision was already revised once before.
+**Identity across rounds is by decision dimension, not surface wording or section.** A revision may cause stage 2 to re-derive — the same underlying decision can come back rephrased, merged with another bullet, or moved to a different section (e.g., what was a Trade-off in round one becomes a Call-out in round two after the user pushed back). "Same item" means the same underlying decision regardless of which section currently holds it. When a re-cut collapses multiple prior bullets into one, the new combined bullet inherits the "touched" status of any of its constituents — 任一底层决定已被修订时进入分歧检查，再按统一等待判断决定是否提问。
 
 When the soft-cut fires, use the platform's blocking question tool (match the host's blocking question tool by capability from the current tool list) with two options:
 
