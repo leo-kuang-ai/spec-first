@@ -60,12 +60,14 @@ Re-check the current branch, remote, and existing PR immediately before pushing.
 Resolve the selected push endpoint and head branch to the caller's intended head repository. Never infer them from the base remote or an ambient push configuration. Inspect `git remote get-url --push --all <push-remote>` and require a single matching authorized endpoint; ambiguous or additional destinations block the push. Use one explicit non-force refspec, excluding unrelated tags, mirrors and submodules:
 
 ```text
-git push --no-follow-tags --no-mirror --recurse-submodules=no -u <push-remote> HEAD:refs/heads/<head-branch>
+git -c remote.<push-remote>.mirror=false push --no-follow-tags --no-mirror --recurse-submodules=no -u <push-remote> HEAD:refs/heads/<head-branch>
 ```
 
 A failed or unknown branch/remote probe blocks push. Do not treat an empty
 working-tree diff as proof that all intended commits are already published.
 If push fails, retain the actual local commit SHA and reason, report the
 publication blocker, and do not claim the remote changed or start a watch.
+
+`remote.<push-remote>.mirror=false` 仅覆盖本次命令，不改仓库配置；某些 Git 版本在读取 remote 配置时会重新启用 mirror，单独 `--no-mirror` 不足以与显式 refspec 并用。将已确认的 remote 名作为该 `-c` 参数的一部分传入，不拼接可执行 shell 文本。
 
 For caller-owned feedback fixes, return the actual created commit SHA(s), selected push target, push exit/result and current remote PR/head identity. Preserve partial facts if pushing or reading back fails. Do not report publication merely because a commit exists. The caller verifies exact fix-SHA reachability in the actual head repository before any repaired-remote reply; this helper does not reply to or resolve review feedback.
