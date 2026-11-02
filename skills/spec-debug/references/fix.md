@@ -14,4 +14,6 @@ Read this before writing the Phase 2 recommendation or editing any file in Phase
 
 If a fix fails, return to Phase 2, explicitly invalidate the current hypothesis with the evidence that ruled it out, and form a new hypothesis with its own grounding observation and prediction. Three failed fix attempts trigger smart escalation; do not retry variants of the same theory.
 
+**同根影响核查：** 根因确认后，按已定位的失败签名、共享入口及直接消费者做有界检查；即使只有一个其他位置，也应核实它是否满足同一触发条件并补对应回归。搜索命中只是候选，不是同根结论；不因此全仓扫改。已确认且在现有授权范围内的同根缺陷逐处修复、验证；范围外位置记录具体证据与移交，不静默扩权。下述三处阈值仅触发额外的纵深防御/复盘，不是普通影响核查或修复的最低数量。
+
 The entrypoint owns branch safety, pre-fix scope, and the final quality tail; do not repeat their decisions here. When the same root-cause pattern occurs in at least three other files or would be catastrophic in production, read `references/defense-in-depth.md`，先按其条件判断结构性预防，再选择适用层，不只叠加检查。For a production incident or a pattern in at least three locations, examine how it was introduced and escaped detection; carry any reusable finding to the handoff's learning decision.
