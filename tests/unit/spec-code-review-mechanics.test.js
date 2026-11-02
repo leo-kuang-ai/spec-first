@@ -11,6 +11,30 @@ const reviewScope = path.join(repoRoot, 'skills/spec-code-review/scripts/review-
 const findingsMechanics = path.join(repoRoot, 'skills/spec-code-review/scripts/findings-mechanics.py');
 
 describe('spec-code-review mechanical floor', () => {
+  test('无提交仓库不得把缺基线当空diff；显式基线仍排除未跟踪文件', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-review-unborn-'));
+    try {
+      git(root, ['init', '-q']);
+      git(root, ['config', 'user.email', 'test@example.invalid']);
+      git(root, ['config', 'user.name', 'Fixture']);
+      fs.writeFileSync(path.join(root, 'owned.js'), 'module.exports = 1;\n');
+      fs.writeFileSync(path.join(root, 'unrelated.js'), 'module.exports = 2;\n');
+      const missing = JSON.parse(runPython(reviewScope, ['--base', 'HEAD'], { cwd: root }).stdout);
+      expect(missing).toMatchObject({ status: 'unknown', lite_eligible: false });
+      expect(missing.files_changed).toBeUndefined();
+      git(root, ['add', '--', 'owned.js']);
+      expect(JSON.parse(runPython(reviewScope, ['--base', 'HEAD'], { cwd: root }).stdout).status).toBe('unknown');
+      const tree = spawnSync('git', ['hash-object', '-t', 'tree', '--stdin', '-w'], { cwd: root, input: '', encoding: 'utf8' });
+      expect(tree.status).toBe(0);
+      const base = git(root, ['commit-tree', tree.stdout.trim(), '-m', 'review baseline']).stdout.trim();
+      const before = git(root, ['status', '--porcelain']).stdout;
+      const scoped = JSON.parse(runPython(reviewScope, ['--base', base], { cwd: root }).stdout);
+      expect(scoped).toMatchObject({ status: 'complete', files_changed: 1, changed_files: ['owned.js'] });
+      expect(git(root, ['status', '--porcelain']).stdout).toBe(before);
+      expect(spawnSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: root }).status).not.toBe(0);
+    } finally { fs.rmSync(root, { recursive: true, force: true }); }
+  });
+
   test.each(['modify', 'delete', 'add', 'stage', 'outside', 'symlink', 'directory'])('任务未跟踪文件快照：%s', (action) => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-review-untracked-'));
     try {

@@ -6,6 +6,8 @@ Read before Stage 1. This file owns local, remote, and task scope, snapshot vali
 
 Compute the diff range, file list, and diff. Minimize permission prompts by combining into as few commands as possible.
 
+**无提交仓库：** 普通本地审查先用 `git rev-parse --verify HEAD` 核实是否有提交。若没有提交且未提供可解析的 `base:`，返回 `status: failed`、`reason: review-base-unresolved`、`required_gate_eligible: false`，列出 staged 与 untracked 路径及未审查范围；不能将失败当空 diff 或审查通过。恢复时明确指定本地可访问、与本次审查意图一致的 commit 作为 `base:<ref>`；仅暂存文件不能补出基线。不要虚构 HEAD、默认分支或空树 commit。普通模式的未跟踪文件仍被排除：提示 owner 在另行获授权的准备步骤中暂存精确路径，或由调用方提供已验证的 task-owned bundle；本次 report-only 审查不执行暂存、创建初始提交或 fetch。有效 `base:` 下仍按下方规则冻结和复验范围。
+
 #### Task-scoped `mode:agent` intake
 
 When `task-pack:`, `task:`, and `task-context:` are present, run this branch before the ordinary `base:` fast path. This is a bounded review of one Task Card inside the current checkout. It remains report-only: task context never enables Stage 5c, checkout mutation, commit, push, PR, or ticket creation.
