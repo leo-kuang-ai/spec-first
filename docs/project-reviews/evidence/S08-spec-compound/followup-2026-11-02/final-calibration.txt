@@ -1,0 +1,20 @@
+PASS tests/unit/knowledge-causality-judge.test.js
+  固定假因果知识判据校准
+    ✓ 实际合成代码反事实区分认证与重试，并接受限定裁决 (320 ms)
+    ✓ 只引用三个核心源码文件仍有充分证据 (270 ms)
+    ✓ 拒绝裁决错误{"approved":true} (261 ms)
+    ✓ 拒绝裁决错误{"supported_cause":"retry-count"} (264 ms)
+    ✓ 拒绝裁决错误{"scope":"production"} (257 ms)
+    ✓ 拒绝裁决错误{"source_refs":["src/client.cjs"]} (260 ms)
+    ✓ 正确报告也不能掩盖source修改 (251 ms)
+    ✓ 正确报告也不能掩盖candidate修改 (243 ms)
+    ✓ 正确报告也不能掩盖new-root-file修改 (272 ms)
+    ✓ 正确报告也不能掩盖new-doc修改 (259 ms)
+    ✓ 正确报告也不能掩盖empty-directory修改 (275 ms)
+    ✓ 正确报告也不能掩盖index修改 (282 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       12 passed, 12 total
+Snapshots:   0 total
+Time:        3.327 s, estimated 4 s
+Ran all test suites within paths "tests/unit/knowledge-causality-judge.test.js".

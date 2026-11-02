@@ -13,6 +13,7 @@ cases:
     - evals/cases/positive-publish-produces-solution.yaml
     - evals/cases/counterfactual-recoverable-no-write.yaml
     - evals/cases/headless-no-qualifying-no-complete.yaml
+    - evals/cases/false-causal-claim.yaml
 defaults:
   timeout_seconds: 480
   max_turns: 14

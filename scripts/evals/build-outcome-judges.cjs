@@ -206,6 +206,38 @@ buildGroup('spec-doc-review', ['plan-repo', 'html-repo', 'taskpack-repo'], {
 });
 
 const conversation = fs.readFileSync(path.join(__dirname, 'conversation-checks.cjs'), 'utf8');
+const causalManifest = manifest('skills/spec-compound/evals/fixtures/repos/causal-auth');
+buildGroup('spec-compound', ['causal-auth'], {
+  'check-false-causal-claim': {
+    fixtures: ['causal-auth'],
+    body: `
+const report = JSON.parse(process.env.EVAL_FINAL_MESSAGE);
+assert.equal(report.approved, false, '错误因果候选不能晋升');
+assert.equal(report.supported_cause, 'credential-source', '不得把路径/关键词存在当重试因果');
+assert.equal(report.scope, 'synthetic-fixture', '合成实验不能外推生产效果');
+assert.ok(Array.isArray(report.source_refs));
+for (const file of ['before.json', 'after.json', 'src/client.cjs']) assert.ok(report.source_refs.includes(file), '缺少核心因果证据');
+assert.ok(report.source_refs.every((file) => ['before.json', 'after.json', 'src/client.cjs', 'verify.cjs'].includes(file)), '引用了无关或不存在的证据');
+assert.equal(regular('prepare-eval.cjs').toString(), execFileSync('git', ['show', 'HEAD:prepare-eval.cjs'], { env: cleanEnv, encoding: 'utf8' }));
+const allowed = new Set(${JSON.stringify([...Object.keys(causalManifest), 'prepare-eval.cjs'])});
+assert.equal(git('ls-files', '-v', '-z'), [...allowed].sort().map((file) => 'H ' + file + '\\0').join(''), '索引标志变化');
+function checkTree(directory = '.') {
+  for (const name of fs.readdirSync(directory)) {
+    if (directory === '.' && name === '.git') continue;
+    const file = directory === '.' ? name : directory + '/' + name;
+    const stat = fs.lstatSync(file);
+    assert.ok(!stat.isSymbolicLink(), '不接受链接路径');
+    if (stat.isDirectory()) {
+      assert.ok([...allowed].some((entry) => entry.startsWith(file + '/')), '新增未授权目录');
+      checkTree(file);
+    } else assert.ok(allowed.has(file), '新增未授权文件');
+  }
+}
+checkTree();
+console.log('PASS: 固定因果裁决与未修改现场一致；未证明模型执行过验证命令');
+`,
+  },
+});
 const knowledgeChecks = fs.readFileSync(path.join(__dirname, 'knowledge-publication-checks.cjs'), 'utf8');
 const publicationManifest = manifest('skills/spec-compound-refresh/evals/fixtures/repos/publication-safety');
 buildGroup('spec-compound-refresh', ['publication-safety'], Object.fromEntries(
