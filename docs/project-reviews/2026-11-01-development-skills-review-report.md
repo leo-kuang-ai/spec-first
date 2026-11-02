@@ -36,7 +36,7 @@
 | S10 | spec-debug | 主体；行为完成+基线（必选） | 完整 | B | 静态完成 | 静态完成；行为完成 | 条件充分（新同根核查行为待验证） | D1 第二批每组 3 次 × 2 模型；第三轮带提交 fixture 每组 2 次 | 无可观察差异（结果相同）；GLM 上 A 组每次都补了回归测试，B 组没有（仅对 GLM-5.3 与经 qianxing.pro 中转的 gpt-6-astra 成立） | 新增澄清独立源码复核通过 | F-S10-01、F-S10-03 | F-S10-01已澄清，带提交唯一同根位置probe及8项测试通过；新模型行为未测；F-S10-03保持观察，见[S10证据](evidence/S10-spec-debug/repair-2026-11-02/README.md) |
 | S13 | spec-resolve-pr-feedback | 主体 | 完整 | B | 共享push合同源码修复完成 | 静态完成；真实GitHub未运行 | 条件充分 | 3个静态场景及S18本地probe | 未与基线对照 | 独立fresh-source复核通过 | X-04 | 11项测试及提供方probe通过，消费者真实选路/可达性未测：[记录](evidence/S13-spec-resolve-pr-feedback/repair-2026-11-02/README.md) |
 | S08 | spec-compound | 主体 | 完整 | C | 源码修复与本地合成验证完成 | 静态完成；真实history/模型未运行 | 条件充分（常规路径） | 3个静态场景及合成cwd筛选 | 未与基线对照 | 返修后独立fresh-source复核通过 | K-S08-01、K-EVAL-K01、H-S08-01/02 | 23项测试通过；假因果资产补充、模型not-run，初始跨repo元数据读取仍需授权：[记录](evidence/S08-spec-compound/repair-2026-11-02/README.md) |
-| S14 | spec-handoff | 主体 | 完整 | C | 静态完成 | 静态完成；行为未运行 | 条件充分 | 3个静态场景；writer已读 | 未与基线对照 | 新上下文源码复核，非盲评 | 无新增已确认缺陷 | 待逐项处理 |
+| S14 | spec-handoff | 主体 | 完整 | C | 源码裁决完成，无确认缺陷 | 本地验证完成；真实宿主未运行 | 条件充分 | 3个静态场景；writer与消费者复验 | 未与基线对照 | 独立fresh-source复核通过 | 无新增已确认缺陷 | 26项测试通过，无需改Skill：[记录](evidence/S14-spec-handoff/repair-2026-11-02/README.md) |
 | S15 | spec-compound-refresh | 主体 | 聚焦 | C | 静态完成 | 静态完成；行为未运行 | 条件充分 | 3个静态场景 | 未与基线对照 | 新上下文源码复核，非盲评 | K-EVAL-K01 | 待逐项处理 |
 | S09 | spec-doc-review | 主体 | 聚焦 | D | 静态完成 | 静态完成；未做实际交互写入 | 条件充分（含交互恢复合同） | 3个静态场景 | 未与基线对照 | 主审与专项补读完成；非盲评 | RS-S09-01；置信过滤效果未验证 | 待逐项处理 |
 | S11 | spec-test-browser | 主体 | 聚焦 | D | 静态完成 | 静态完成；真实browser未运行 | 条件充分（已读合同） | 3个静态场景；真实browser未运行 | 未与基线对照 | 主审完整补读；非独立复核 | F-S11-01、X-02 | 待逐项处理 |
