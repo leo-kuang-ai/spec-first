@@ -206,6 +206,15 @@ buildGroup('spec-doc-review', ['plan-repo', 'html-repo', 'taskpack-repo'], {
 });
 
 const conversation = fs.readFileSync(path.join(__dirname, 'conversation-checks.cjs'), 'utf8');
+const knowledgeChecks = fs.readFileSync(path.join(__dirname, 'knowledge-publication-checks.cjs'), 'utf8');
+const publicationManifest = manifest('skills/spec-compound-refresh/evals/fixtures/repos/publication-safety');
+buildGroup('spec-compound-refresh', ['publication-safety'], Object.fromEntries(
+  ['preserve', 'partial', 'recover'].map((mode) => [`check-publication-${mode}`, {
+    fixtures: ['publication-safety'],
+    customState: true,
+    body: `${knowledgeChecks}\ncheckKnowledgePublication(${JSON.stringify(publicationManifest)}, ${JSON.stringify(mode)});`,
+  }]),
+));
 for (const [skill, name, action] of [
   ['spec-debug', 'check-prior-attempt-ask', 'priorAttemptQuestion'],
   ['spec-debug', 'check-r2-prior-ask', 'priorAttemptQuestion'],

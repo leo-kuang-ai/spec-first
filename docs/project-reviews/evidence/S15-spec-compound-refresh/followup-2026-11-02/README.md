@@ -1,0 +1,7 @@
+# S15 可执行评测判据补齐
+
+基线dbcb60fd0。上一轮只有JSON场景，本轮增加三份skill-up case、独立文件fixture、真实Git baseline准备与单文件judge。复用既有评测生成器，不改产品Skill或真实宿主runtime。
+
+18项最终判据正反例通过，4例配置加载通过，生成器无漂移。初版与既有Work判据合计39项测试通过；随后独立复核指出根目录漏检和successor只做includes检查，修正并增加反例后18项专项测试通过，最终独立源码复核passed。知识文档frontmatter也已校验。structured verification首次因日志不在run-owned目录而拒绝，复制日志到规定路径后成功；拒绝不代表测试失败。
+
+这些校准通过手工构造正确或错误的最终文件状态，验证判据拒绝误删、独有知识丢失、断引用、人工内容丢失、误报、HEAD/index变化、越界文件/目录和symlink。它们不执行被测模型、不注入真实发布中断，也不验证操作先后顺序。实际Skill行为仍not-run，K-EVAL-K01仍partial。未来runner若向fixture根安装额外设施，须在准入时明确其身份与范围，不能静默忽略额外路径或把环境失败当模型失败。
