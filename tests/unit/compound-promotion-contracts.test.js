@@ -191,6 +191,7 @@ describe('compound knowledge-promotion contract', () => {
 
     expect(new Set(cases.keys())).toEqual(new Set([
       'irrelevant-existing-source-ref',
+      'plausible-but-false-causal-learning',
       'transcript-only-completion-claim',
       'high-risk-context-pressure',
       'current-source-contradicts-draft',

@@ -1,0 +1,37 @@
+FAIL tests/unit/compound-promotion-contracts.test.js
+  ● compound knowledge-promotion contract › compound behavior evals cover semantic promotion refusal boundaries
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 1
+
+    @@ -2,9 +2,10 @@
+        "candidate-validation-failure-keeps-final-untouched",
+        "current-source-contradicts-draft",
+        "high-risk-context-pressure",
+        "irrelevant-existing-source-ref",
+        "multi-target-partial-publication",
+    +   "plausible-but-false-causal-learning",
+        "specialized-review-before-promotion",
+        "transcript-only-completion-claim",
+        "vague-invalidation-condition",
+      }
+
+      190 |     const cases = new Map(evals.cases.map((entry) => [entry.id, entry]));
+      191 |
+    > 192 |     expect(new Set(cases.keys())).toEqual(new Set([
+          |                                   ^
+      193 |       'irrelevant-existing-source-ref',
+      194 |       'transcript-only-completion-claim',
+      195 |       'high-risk-context-pressure',
+
+      at Object.toEqual (tests/unit/compound-promotion-contracts.test.js:192:35)
+
+PASS tests/unit/spec-compound-refresh-reference-contracts.test.js
+
+Test Suites: 1 failed, 1 passed, 2 total
+Tests:       1 failed, 54 passed, 55 total
+Snapshots:   0 total
+Time:        1.131 s, estimated 2 s
+Ran all test suites within paths "tests/unit/spec-compound-refresh-reference-contracts.test.js", "tests/unit/compound-promotion-contracts.test.js".

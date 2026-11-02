@@ -1,0 +1,8 @@
+PASS tests/unit/compound-promotion-contracts.test.js
+PASS tests/unit/spec-compound-refresh-reference-contracts.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       55 passed, 55 total
+Snapshots:   0 total
+Time:        1.042 s, estimated 2 s
+Ran all test suites within paths "tests/unit/spec-compound-refresh-reference-contracts.test.js", "tests/unit/compound-promotion-contracts.test.js".
