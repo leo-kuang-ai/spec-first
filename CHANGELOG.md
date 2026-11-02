@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-11-02 codex: docs(review): 对账22项逐项修复/裁决与本地提交，更新共享push、内部调用和分类结论；保留S12平台阻塞及S08/S15/真实模型验证缺口，整体不标完成。 (internal)
 - v1.15.3 2026-11-02 codex: docs(xcode): S12记录真实readiness失败：active CommandLineTools、simctl不可用、无可见XcodeBuildMCP；2项合同测试及独立复核通过，真实平台验证blocked/not-run，整体未完成。 (internal)
 - v1.15.3 2026-11-02 codex: docs(worktree): S19复核S17内部显式调用metadata及worktree隔离合同，16项测试、投射和独立复核通过；无新增Skill修改，真实多平台未测。 (internal)
 - v1.15.3 2026-11-02 codex: docs(browser): S11按governance修正为内部依赖，保留LFG/dogfood调用方验证责任；55项测试、metadata投射及独立复核通过，真实浏览器未运行。 (internal)
