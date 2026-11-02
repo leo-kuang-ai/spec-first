@@ -21,6 +21,10 @@ Generated runtime mirrors and host-local managed slices are not source-of-truth.
 
 Provider graphs, MCP results, run-local orientation summaries, historical learnings, and external research are advisory. Record provenance and freshness, then confirm any load-bearing conclusion against current source, tests, logs, contracts, or a current owner decision. A provider self-report, stale plan, or past transcript cannot support a confirmed planning claim by itself.
 
+## 新依赖事实
+
+计划引入新包、服务或API，且其存在性或版本影响可实施性时，核对官方注册表、项目官方文档或当前锁文件中的名称、来源、可用版本及所需API。模型记忆、相似包名和搜索摘要仅作线索；未取得证据的依赖标为待核实，不生成可直接执行的确定安装建议，也不把该依赖相关单元标为已就绪。读取失败保留具体缺口；核实依赖不授权安装、付费或提交数据。
+
 ## Cross-Repo Scope
 
 When the request names another repo, state `target_repo` before broad investigation and make every file path relative to that repo. Read-only evidence from adjacent repos may inform the plan, but implementation units must not silently mix write owners. If the plan spans multiple repos, name the owner repo for each unit and keep handoff limitations explicit.

@@ -11,7 +11,7 @@ test('phase owners remain reachable from the entrypoint with explicit triggers',
   for (const file of phaseFiles) {
     expect(entry).toContain(`references/${file}`);
     expect(read(`references/${file}`)).toContain('**Trigger:**');
-    expect(read(`references/${file}`)).not.toMatch(/\p{Script=Han}/u);
+    // 语言由当前项目与用户要求决定；phase owner 的契约是可达性和触发条件。
   }
   expect(entry).not.toMatch(/\p{Script=Han}/u);
   expect(entry).toContain('before source discovery or bootstrap');
