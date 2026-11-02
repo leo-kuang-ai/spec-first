@@ -1,0 +1,8 @@
+PASS tests/unit/runtime-setup-eval-judge.test.js
+PASS tests/unit/mcp-setup-facts-renderer.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       69 passed, 69 total
+Snapshots:   0 total
+Time:        2.441 s, estimated 3 s
+Ran all test suites within paths "tests/unit/runtime-setup-eval-judge.test.js", "tests/unit/mcp-setup-facts-renderer.test.js".

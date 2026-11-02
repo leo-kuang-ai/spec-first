@@ -1,0 +1,8 @@
+PASS tests/unit/mcp-setup-node-contracts.test.js (17.944 s)
+PASS tests/unit/mcp-setup-mode-target.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       87 passed, 87 total
+Snapshots:   0 total
+Time:        18.466 s
+Ran all test suites within paths "tests/unit/mcp-setup-mode-target.test.js", "tests/unit/mcp-setup-node-contracts.test.js".

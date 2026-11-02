@@ -1,7 +1,7 @@
 #!/bin/bash
 # 仅用于 --check 的有界文件副作用检查；不证明宿主外部路径或瞬时写入未发生。
 set -euo pipefail
-node <<'NODE'
+node - "$@" <<'NODE'
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const crypto = require('node:crypto');
@@ -23,6 +23,8 @@ for (const file of ['.claude/settings.json', '.mcp.json']) {
 for (const dir of ['.spec-first/config', '.spec-first/workspace']) {
   assert.ok(!fs.existsSync(dir) && !fs.lstatSync(dir, { throwIfNoEntry: false }), `${dir} 不应由 --check 创建`);
 }
-assert.match(process.env.EVAL_FINAL_MESSAGE, /readiness|就绪|检查|verify|status|状态|provider|host/i);
+if (!process.argv.includes('--scope-only')) {
+  assert.match(process.env.EVAL_FINAL_MESSAGE, /readiness|就绪|检查|verify|status|状态|provider|host/i);
+}
 console.log('PASS: 夹具字节与配置哨兵保持，setup facts 未产生；不证明全局无副作用');
 NODE

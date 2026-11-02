@@ -1,0 +1,10 @@
+0c77c8122a35221a9c51644a2c907fb4d9e3c0cdd84efa977d2c4300d6b72da6  skills/spec-runtime-setup/SKILL.md
+d9f35c83cc23c4df1472df1e134214925ebacfd88bfce00237f710f25e4b3cf7  skills/spec-runtime-setup/scripts/lib/human-output.cjs
+35c00a05c4c0202133e04f225d8aeb4e57c63d09b0f19679642c2356a0c687ab  skills/spec-runtime-setup/evals/fixtures/scripts/check-bare-mutation.sh
+590e4cc0356eda6bdef7c48d899c3f330fd8bab7cfa7e428e7f0a26b97060141  skills/spec-runtime-setup/evals/fixtures/scripts/check-not-setup-scope.sh
+1a0d880af613dd40826e1c95b6e23358133bfb151b401873453cdfbe43b365f2  skills/spec-runtime-setup/evals/fixtures/scripts/check-readonly-verify.sh
+d16ddd3ce5e361dbb0419f11e375f494c83c73564b6076f42804e33d917ffefe  skills/spec-runtime-setup/evals/README.md
+303634abcfa735b407062378729b2857e31377e323c34aa771c7a8c7addb9091  skills/spec-runtime-setup/evals/examples.json
+f1d035625b30e9c03a686ef40d5e8678a993758a302ae5979d4eebb812761a57  skills/spec-runtime-setup/evals/cases/semantic-question-not-setup.yaml
+d95a6ba08c47bca55ce21963ffec90a85a20b627c72e1edec077a586a8c7cad1  tests/unit/mcp-setup-facts-renderer.test.js
+f68e17ed2ecadbce17c0008e40abba8959f3110631cb1697ff1d7ebdc78a38a1  tests/unit/runtime-setup-eval-judge.test.js

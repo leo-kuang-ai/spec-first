@@ -1,0 +1,84 @@
+{
+  "schema_version": "verification-run-summary.v1",
+  "generated_at": "2026-11-02T09:52:09.809Z",
+  "profile": {
+    "source": "local",
+    "name": "S00限定修复",
+    "path": null
+  },
+  "checks": [
+    {
+      "id": "original-reproducer",
+      "service": "local",
+      "command": "node (diagnosticNextActions 与历史误判文本隔离复现，命令见会话记录)",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s00-repair-final/logs/original-reproducer.log",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "regression",
+      "service": "local",
+      "command": "node node_modules/jest/bin/jest.js --runInBand --runTestsByPath tests/unit/runtime-setup-eval-judge.test.js tests/unit/mcp-setup-facts-renderer.test.js",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s00-repair-final/logs/green-final.log",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "mode-contracts",
+      "service": "local",
+      "command": "node node_modules/jest/bin/jest.js --runInBand --runTestsByPath tests/unit/mcp-setup-mode-target.test.js tests/unit/mcp-setup-node-contracts.test.js",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s00-repair-final/logs/mode-contracts.log",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "eval-schema",
+      "service": "local",
+      "command": "skill-up validate skills/spec-runtime-setup/evals/eval.yaml",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "skill-up"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s00-repair-final/logs/eval-validate.log",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "real-host-model",
+      "service": "host",
+      "command": "真实宿主双模型行为回归",
+      "status": "not-run",
+      "exit_code": null,
+      "ran": false,
+      "required_tools": [],
+      "missing_tools": [],
+      "log_path": null,
+      "reason_code": "outside_authorized_local_validation_scope",
+      "redaction_status": "none-required"
+    }
+  ]
+}

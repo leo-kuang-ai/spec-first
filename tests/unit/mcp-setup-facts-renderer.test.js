@@ -974,7 +974,7 @@ describe('spec-runtime-setup renderer', () => {
       ],
     });
 
-    expect(actions).toContain('运行当前 host 的 spec-runtime-setup --verify-only，确认 required Provider readiness。');
+    expect(actions).toContain('运行当前 host 的 spec-runtime-setup --verify-only，验证 required Provider readiness 并刷新 setup-owned facts（会写入事实文件）；只读检查使用 --check。');
     expect(actions.some((action) => action.includes('继续目标'))).toBe(false);
   });
 
@@ -1093,4 +1093,13 @@ describe('spec-runtime-setup renderer', () => {
     expect(actions).toEqual(expect.arrayContaining(['install ffmpeg', 'repair codegraph']));
     expect(actions.some((action) => action.includes('继续目标'))).toBe(false);
   });
+});
+
+test('诊断建议不得把 facts 写入模式描述为只读', () => {
+  const { diagnosticNextActions } = require('../../skills/spec-runtime-setup/scripts/lib/human-output.cjs');
+  const text = diagnosticNextActions({ runtime: {} }).join('\n');
+  expect(text).toContain('只读检查使用 --check');
+  expect(text).toContain('--verify-only');
+  expect(text).toContain('写入');
+  expect(text).not.toContain('只读复核时使用 --verify-only');
 });

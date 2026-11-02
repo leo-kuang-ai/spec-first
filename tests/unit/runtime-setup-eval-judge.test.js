@@ -90,3 +90,61 @@ describe('runtime setup bare mutation fail-closed Judge', () => {
     expect(run().status).not.toBe(0);
   });
 });
+
+
+describe('语义请求的 setup Judge 不得靠关键词放行', () => {
+  let workspace;
+  let transcript;
+  const semanticScript = path.join(evalRoot, 'fixtures/scripts/check-not-setup-scope.sh');
+  const run = (trace, overrides = {}) => {
+    fs.writeFileSync(transcript, JSON.stringify(trace));
+    return spawnSync('bash', [semanticScript], {
+      cwd: workspace,
+      env: { ...process.env, EVAL_FINAL_MESSAGE: '这是语义审查，请交由适当的 review owner；setup 不执行。',
+        EVAL_EXIT_CODE: '0', EVAL_TRANSCRIPT_PATH: transcript, ...overrides },
+      encoding: 'utf8',
+    });
+  };
+  beforeEach(() => {
+    workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'setup-semantic-judge-'));
+    fs.cpSync(path.join(evalRoot, 'fixtures/repos/mini-ledger'), workspace, { recursive: true });
+    fs.mkdirSync(path.join(workspace, '.claude'));
+    fs.writeFileSync(path.join(workspace, '.claude/settings.json'), '{}\n');
+    fs.writeFileSync(path.join(workspace, '.mcp.json'), '{}\n');
+    transcript = path.join(workspace, 'trace.json');
+  });
+  afterEach(() => fs.rmSync(workspace, { recursive: true, force: true }));
+  const assistant = { role: 'assistant', content: '请交由审查 owner。' };
+  test('无轨迹、坏轨迹、空轨迹与引擎失败均不通过', () => {
+    expect(run([assistant], { EVAL_TRANSCRIPT_PATH: '' }).status).not.toBe(0);
+    expect(run({ messages: [] }).status).not.toBe(0);
+    expect(run([]).status).not.toBe(0);
+    expect(run([assistant], { EVAL_EXIT_CODE: '1' }).status).not.toBe(0);
+  });
+  test('只读技能并移交仅通过机械边界检查', () => {
+    const result = run([{ role: 'tool_call', tool_call: { name: 'Read', arguments: { file_path: '.claude/skills/spec-runtime-setup/SKILL.md' } } }, assistant]);
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain('semantic-review-required');
+  });
+  test.each(['Bash', 'exec', 'Write', 'Edit', 'Task', 'unknown_tool'])('边界声明不能掩盖调用或未知能力：%s', name => {
+    expect(run([{ role: 'tool_call', tool_call: { name, arguments: { command: 'node setup.cjs' } } }, assistant]).status).not.toBe(0);
+  });
+  test('原生目标 Skill 加载可检查，其他 workflow 与嵌套调用不可静默通过', () => {
+    expect(run([{ role: 'tool_call', tool_call: { name: 'Skill', arguments: { skill: 'spec-runtime-setup' } } }, assistant]).status).toBe(0);
+    expect(run([{ role: 'tool_call', tool_call: { name: 'Skill', arguments: { skill: 'spec-plan' } } }, assistant]).status).not.toBe(0);
+    expect(run([{ ...assistant, tool_calls: [{ name: 'Bash' }] }]).status).not.toBe(0);
+    expect(run([{ role: 'assistant', content: [{ type: 'tool_use', name: 'Bash' }] }, assistant]).status).not.toBe(0);
+    expect(run([{ role: 'tool_call', tool_call: { name: 'Skill', arguments: { skill: 'spec-runtime-setup', args: '--only graphify' } } }, assistant]).status).not.toBe(0);
+  });
+  test.each(['.mcp.json', '.claude/settings.json'])('语义声明不能掩盖配置写入：%s', file => {
+    fs.writeFileSync(path.join(workspace, file), '{"changed":true}');
+    expect(run([assistant]).status).not.toBe(0);
+  });
+  test('历史误判反例缺少轨迹不能通过', () => {
+    expect(run([assistant], { EVAL_TRANSCRIPT_PATH: '', EVAL_FINAL_MESSAGE: '我运行了 setup 安装并修改了配置，随后完成架构分析。' }).status).not.toBe(0);
+  });
+  test('只说边界但修改项目或写facts不能通过', () => {
+    fs.writeFileSync(path.join(workspace, 'src/server.js'), '// changed');
+    expect(run([assistant]).status).not.toBe(0);
+  });
+});
