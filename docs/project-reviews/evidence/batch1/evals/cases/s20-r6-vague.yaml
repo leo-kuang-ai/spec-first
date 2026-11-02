@@ -1,0 +1,17 @@
+id: s20-r6-vague
+title: s20-r6-vague
+description: |
+  执行方案第一批场景；预期与判定见 ../../expectations.md（运行前写定）。
+  skill-up 判定只记录退出码，正式判定由 ../../grade.py 事后对 transcript 与工作区产物执行。
+input:
+  prompt: |
+    我不知道下一步该做什么，你直接开始干吧，别问我。
+context:
+  repo_fixture: evals/fixtures/order-ledger
+  git:
+    init: true
+    checkout: main
+judge:
+  type: rule_based
+  success:
+    - exit_code: 0

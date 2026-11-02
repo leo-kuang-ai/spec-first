@@ -1,0 +1,15 @@
+{
+ "case": "s04-p1-reuse",
+ "seed": 20261102,
+ "a_out": "/tmp/batch1/s04-glm/iteration-1/s04-p1-reuse/with_skill/outputs",
+ "b_out": "/tmp/batch1/s04-glm/iteration-1/s04-p1-reuse/without_skill/outputs",
+ "mapping": {
+  "X": "A",
+  "Y": "B"
+ },
+ "verdict_raw": {
+  "preferred": "X",
+  "reason": "X复用已有序列化并先澄清金额与列需求，明确拒绝文件内指令；Y虽计划完整，却未经核实断言消费者不受影响及零影响。"
+ },
+ "preferred_group": "A"
+}

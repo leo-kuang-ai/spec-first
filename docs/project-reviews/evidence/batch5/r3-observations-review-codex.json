@@ -1,0 +1,50 @@
+[
+ {
+  "run": "/tmp/spec-first-batch5-r2/out-r3-review-codex/iteration-1/batch5-review/with_skill/outputs/agent/run",
+  "group": "with_skill",
+  "case": "batch5-review",
+  "engine": "codex",
+  "engine_group": "r3-review-codex",
+  "trace": "rollout-2026-11-02T10-51-10-01a19a2a-fae4-7f40-8dd4-dc98fcfd3259.jsonl",
+  "trace_sha256": "6a82bf80886fac4e7efc0fec92d8a63100b87d417c6a9a954cf398cb61cb18f1",
+  "model": "gpt-6-astra",
+  "effort": "medium",
+  "usage": {
+   "input_tokens": 299118,
+   "cached_input_tokens": 260864,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 2977,
+   "reasoning_output_tokens": 127,
+   "total_tokens": 302095
+  },
+  "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-2821585280",
+  "tool_calls": 7,
+  "duration_s": 104.1,
+  "final": "**不可合入：发现 3 个 P1 合同回归，均已通过本地假 provider 复现。**\n\n1. **P1：金额缩小 100 倍** — [lib/amount.cjs:4](lib/amount.cjs#L4)  \n   README 要求入口到 provider 全程使用整数分，但新增 `/ 100` 将 `1250` 分转换为 `12.5`，随后仍作为 `amountCents` 传给 provider。回执的 `chargedCents` 也错误，实际消费者 `formatReceipt` 显示 `captured: 0.13`，而非 `12.50`。应保持整数分原样传递。\n\n2. **P1：去重键丢失租户隔离** — [lib/ledger.cjs:7](lib/ledger.cjs#L7)  \n   不同租户使用相同 `requestId`、共享同一 ledger 时，后一个请求直接取得前一个租户的回执，不调用 provider。新增批量入口同样触发此问题。实测两租户仅产生一次支付调用。应恢复 `tenantId` 与 `requestId` 的联合键。\n\n3. **P1：支付失败后仍返回成功，无法重试** — [lib/ledger.cjs:11](lib/ledger.cjs#L11)  \n   成功回执在 `await provider.charge` 前写入缓存。provider 拒绝后，同一请求重试直接返回 `captured`，不会再次支付；首次支付尚未完成时，重复请求也提前返回成功。应在 provider 成功后才缓存成功结果，失败后允许重试。\n\n验证范围：已显式读取 `spec-code-review/SKILL.md`，检查相对 HEAD 的全部 4 个改动文件、README 合同和实际调用链。Node v22.22.3 下原有 **2 个测试通过**，但未覆盖上述缺陷；额外本地验证复现了三项问题，并确认批量顺序执行、空批量行为正常。`receipt.cjs` 的整理本身行为等价。\n\n限制：仅完成本地单模型审查，未做独立复核；未建立审查开始时的冻结快照，不能声称技能要求的完整审查门禁通过。未跟踪的 `.codex/` 不纳入产品改动审查。未修改实现、提交、推送、访问真实项目或用户配置，也未调用外部服务。[审查记录](/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-code-review-kkvevmvz/report.md)\n\n**合入前需处理 #1–#3，并补充金额、跨租户、失败重试及支付未完成时重复请求的回归测试。**",
+  "cli_version": "0.166.0"
+ },
+ {
+  "run": "/tmp/spec-first-batch5-r2/out-r3-review-codex/iteration-1/batch5-review/without_skill/outputs/agent/run",
+  "group": "without_skill",
+  "case": "batch5-review",
+  "engine": "codex",
+  "engine_group": "r3-review-codex",
+  "trace": "rollout-2026-11-02T10-53-04-01a19a2c-b99a-7e13-b598-882392f0083a.jsonl",
+  "trace_sha256": "e44cd0cad049afb0ce69f0e0fce06ca8bc46765f3a9cfcf15caa379c87ba74b0",
+  "model": "gpt-6-astra",
+  "effort": "medium",
+  "usage": {
+   "input_tokens": 86835,
+   "cached_input_tokens": 80640,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 1792,
+   "reasoning_output_tokens": 32,
+   "total_tokens": 88627
+  },
+  "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-2437125314",
+  "tool_calls": 4,
+  "duration_s": 59.7,
+  "final": "**不建议合入：存在 3 个 P1 合同回归，均已本地复现。**\n\n1. **[P1] 保持金额单位为整数分** — [lib/amount.cjs:4](< /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-2437125314/lib/amount.cjs:4>)\n   输入 `amountCents: 1250` 时，实际 provider 收到 `12.5`，回执 `chargedCents` 也变为 `12.5`。这违反 README 的整数分合同，导致少收或被 provider 拒绝；实际消费者 `formatReceipt` 再除以 100，显示为 `captured: 0.13`，而非 `12.50`。\n\n2. **[P1] 恢复包含租户的去重键** — [lib/ledger.cjs:7](/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-2437125314/lib/ledger.cjs:7)\n   不同租户使用相同 `requestId` 时，第二笔直接复用第一笔回执，不调用 provider。新增批量入口共享同一个 ledger，也会触发：两个租户分别请求收款，实际只扣第一笔，第二笔却返回成功。\n\n3. **[P1] 在 provider 成功后缓存 captured 回执** — [lib/ledger.cjs:11](/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-2437125314/lib/ledger.cjs:11)\n   provider 抛错前已写入成功回执，导致失败后的同请求重试跳过支付、直接返回 `captured`。本地模拟首次支付失败，再次请求返回成功，但 provider 调用次数仍为 1。支付尚未完成时的并发重试也可能提前得到成功状态。\n\n验证范围：已审查相对 HEAD 的全部四个文件差异、README 合同及仓库内消费者。`npm test` 的 2 项测试通过，但未覆盖以上回归；额外内存脚本复现了三项问题，并验证批量按顺序执行。显示格式化改动本身等价。\n\n隔离环境未安装 `spec-code-review`，因此直接审查。未修改文件、提交、推送，未访问真实项目、用户配置或外部服务。",
+  "cli_version": "0.166.0"
+ }
+]

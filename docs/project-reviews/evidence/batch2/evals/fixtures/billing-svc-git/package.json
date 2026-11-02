@@ -1,0 +1,6 @@
+{
+  "name": "billing-svc",
+  "version": "1.4.0",
+  "private": true,
+  "scripts": { "test": "node --test" }
+}

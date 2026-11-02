@@ -1,0 +1,8 @@
+{"label": "s20a-glm", "runs": 10, "in": 406737, "out": 22464, "ms": 1953007, "status": {"PASS": 10}}
+{"label": "s20b-glm", "runs": 10, "in": 288908, "out": 20399, "ms": 1221405, "status": {"PASS": 10}}
+{"label": "s20a-gpt-429", "runs": 10, "in": 105019, "out": 268, "ms": 156810, "status": {"ERROR": 9, "PASS": 1}}
+{"label": "s20a-gpt2", "runs": 4, "in": 1798812, "out": 6138, "ms": 241350, "status": {"PASS": 4}}
+{"label": "s20b-gpt", "runs": 5, "in": 1695773, "out": 6871, "ms": 255616, "status": {"PASS": 5}}
+{"label": "s04-glm", "runs": 16, "in": 519241, "out": 55357, "ms": 2106892, "status": {"PASS": 16}}
+{"label": "s04-gpt", "runs": 16, "in": 6235595, "out": 34602, "ms": 1300766, "status": {"PASS": 16}}
+{"label": "TOTAL", "runs": 71, "in": 11050085, "out": 146099, "ms": 7235846, "tokens": 11196184}

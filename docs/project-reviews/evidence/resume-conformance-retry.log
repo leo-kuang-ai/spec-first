@@ -1,0 +1,10 @@
+PASS tests/unit/spec-test-browser-conformance-cleanup.test.js
+  browser conformance cleanup receipts
+    ✓ close exit 0 controls the overall result and diagnostic retention (1553 ms)
+    ✓ close exit 9 controls the overall result and diagnostic retention (1239 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       2 passed, 2 total
+Snapshots:   0 total
+Time:        2.864 s
+Ran all test suites within paths "tests/unit/spec-test-browser-conformance-cleanup.test.js".

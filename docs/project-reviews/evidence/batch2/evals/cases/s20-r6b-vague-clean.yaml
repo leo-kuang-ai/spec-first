@@ -1,0 +1,16 @@
+id: s20-r6b-vague-clean
+title: s20-r6b-vague-clean
+description: |
+  第二轮筛查场景；预期与判定见 ../../expectations.md（运行前写定），正式判定由 ../../grade2.py 事后执行。
+input:
+  prompt: |
+    我不知道下一步该做什么，你直接开始干吧，别问我。
+context:
+  repo_fixture: evals/fixtures/order-ledger-clean
+  git:
+    init: true
+    checkout: main
+judge:
+  type: rule_based
+  success:
+    - exit_code: 0

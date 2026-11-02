@@ -1,0 +1,4 @@
+{"label": "base", "runs": 13, "in": 234340, "out": 22875, "ms": 1464800, "status": {"PASS": 13}}
+{"label": "s20", "runs": 3, "in": 163539, "out": 7209, "ms": 741379, "status": {"PASS": 3}}
+{"label": "repro", "runs": 2, "in": 93417, "out": 7186, "ms": 305547, "status": {"PASS": 2}}
+{"label": "TOTAL", "runs": 18, "in": 491296, "out": 37270, "ms": 2511726, "tokens": 528566}

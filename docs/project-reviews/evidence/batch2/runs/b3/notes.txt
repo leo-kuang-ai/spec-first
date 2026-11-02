@@ -1,0 +1,3 @@
+glm s07 stage disabled: no base commit in fixture (apply_diff onto untracked tree)
+blind s10 attempt 1 (2 calls) invalid: diff baseline omitted context.files, injected bug shown as change
+glm chain parent stopped at 18:43 to run s20-b in parallel; s07 stage skipped (invalid fixture)

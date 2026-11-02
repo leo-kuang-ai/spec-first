@@ -1,0 +1,13 @@
+{
+  "run_id": "spec-code-review-kkvevmvz",
+  "branch": "eval-review",
+  "head_sha": "9f04885ec8d919404cd59c13f17d9f8b79401ba7",
+  "verdict": "Not ready",
+  "status": "degraded",
+  "completed_at": "2026-11-02T02:52:37.851024+00:00",
+  "limitations": [
+    "dispatch_authorization_missing",
+    "mutation_guard_unavailable",
+    "standard_verification_summary_not_produced"
+  ]
+}

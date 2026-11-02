@@ -1,0 +1,8 @@
+{"label": "x02", "runs": 3, "in": 442681, "out": 1505, "ms": 85375, "status": {"PASS": 3}}
+{"label": "x02c", "runs": 3, "in": 358620, "out": 929, "ms": 69291, "status": {"PASS": 3}}
+{"label": "s07codex", "runs": 3, "in": 510935, "out": 2162, "ms": 102777, "status": {"PASS": 3}}
+{"label": "s07c4", "runs": 1, "in": 14017, "out": 948, "ms": 179925, "status": {"PASS": 1}}
+{"label": "fs10", "runs": 4, "in": 108458, "out": 5039, "ms": 504370, "status": {"PASS": 4}}
+{"label": "fs20a", "runs": 2, "in": 168428, "out": 20091, "ms": 1042331, "status": {"PASS": 2}}
+{"label": "fs20b", "runs": 2, "in": 56469, "out": 8192, "ms": 250057, "status": {"PASS": 2}}
+{"label": "TOTAL", "runs": 18, "in": 1659608, "out": 38866, "ms": 2234126, "tokens": 1698474}

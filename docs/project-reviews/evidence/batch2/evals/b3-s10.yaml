@@ -1,0 +1,25 @@
+schema_version: v1alpha1
+
+# 第二批正式评测；工作目录由 skill-up 放在 $TMPDIR，位于仓库之外
+environment:
+  type: none
+
+skills:
+  - source: local_path
+    path: ../../../../skills/spec-debug
+
+engine:
+  name: claude_code
+
+cases:
+  files:
+    - evals/cases/s10-d1-same-root.yaml
+  defaults:
+    timeout_seconds: 1500
+    max_turns: 50
+    collect_artifacts: ["**"]
+  parallelism: 3
+
+report:
+  formats: [json]
+  artifacts: [transcript]

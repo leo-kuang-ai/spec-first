@@ -1,0 +1,17 @@
+id: s20-r1-failure
+title: s20-r1-failure
+description: |
+  执行方案第一批场景；预期与判定见 ../../expectations.md（运行前写定）。
+  skill-up 判定只记录退出码，正式判定由 ../../grade.py 事后对 transcript 与工作区产物执行。
+input:
+  prompt: |
+    跑 npm test 挂了，报 TypeError: order.lines is not iterable，昨天还是绿的。帮我处理一下。
+context:
+  repo_fixture: evals/fixtures/order-ledger
+  git:
+    init: true
+    checkout: main
+judge:
+  type: rule_based
+  success:
+    - exit_code: 0

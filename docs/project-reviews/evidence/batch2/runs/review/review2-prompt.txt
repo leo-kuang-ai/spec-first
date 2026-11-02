@@ -1,0 +1,8 @@
+你是独立复核者，只读。当前目录有：skills/spec-runtime-setup/（SKILL.md、scripts/lib/human-output.cjs、scripts/lib/mode-policy.cjs、evals/）、skills/spec-plan/（SKILL.md 与 references/）、AGENTS-top.md（某项目 AGENTS.md 的前 12 行与入口治理块）、report-20260820-line3.md（AGENTS-top.md 引用的报告的第 3 行）。
+请只依据这些文件逐题回答，每题引用文件与行号，给出“成立 / 不成立 / 无法判断”及理由：
+Q1. 当 spec-runtime-setup 已加载、但用户提出的是与安装无关的问题时，SKILL.md 是否说明应使用哪个模式？无参数（bare）调用在单项目下会执行哪些动作（对照 mode-policy.cjs）？SKILL.md 是否写明“用户没有请求安装或修复时不要做 bare 调用”？
+Q2. human-output.cjs 中对 --verify-only 的描述，与 SKILL.md 对 --verify-only 写入行为的定义是否一致？
+Q3. evals/cases/semantic-question-not-setup.yaml 的判定脚本，在什么输出下会判为通过？如果一次运行先执行了 bare setup 调用、又完成了完整的架构评审，判定会是什么？
+Q4. AGENTS-top.md 中顶部提示与入口治理块给出的指导是否一致？结合 report-20260820-line3.md，顶部提示的事实依据是否仍然成立？
+Q5. spec-plan 的源码是否要求在计划引入新的外部依赖包时核实其存在性、来源或版本，或检查项目内是否已有等价依赖？请说明你检索过的范围。
+不要修改任何文件。用中文回答，每题不超过 150 字。

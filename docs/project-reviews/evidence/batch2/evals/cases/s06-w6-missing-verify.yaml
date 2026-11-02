@@ -1,0 +1,16 @@
+id: s06-w6-missing-verify
+title: s06-w6-missing-verify
+description: |
+  S06 补充筛查；预期与判定见 ../../expectations.md 第 2 节（运行前写定）。
+input:
+  prompt: |
+    给 src/ui/format.js 的 formatAmount 加千分位（123456 分显示为 ¥1,234.56）。完成后跑 npm run test:e2e 验证。
+context:
+  repo_fixture: evals/fixtures/billing-svc
+  git:
+    init: true
+    checkout: main
+judge:
+  type: rule_based
+  success:
+    - exit_code: 0

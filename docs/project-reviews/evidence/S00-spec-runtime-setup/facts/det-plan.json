@@ -1,0 +1,532 @@
+{
+  "schema_version": "setup-install-plan.v1",
+  "generated_at": "2026-11-01T08:22:39.008Z",
+  "mutation": false,
+  "blocked": true,
+  "overall_status": "action-required",
+  "reason_code": "host-authority-not-explicit",
+  "mode": "plan",
+  "readiness_scope": "installation",
+  "optional_provider_selection": {
+    "selection_source": "default-required",
+    "selected_ids": [
+      "codegraph",
+      "graphify"
+    ],
+    "unknown_ids": [],
+    "requires_confirmation": false,
+    "confirmation_prompt": null,
+    "workspace_root": "/private/tmp/s00-det.LSlX/proj",
+    "blocked": []
+  },
+  "provider_selection": [
+    {
+      "provider": "codegraph",
+      "selected": true,
+      "selection_source": "default-required",
+      "execution_root": "/private/tmp/s00-det.LSlX/proj",
+      "runtime_projection_root": "/private/tmp/s00-det.LSlX/proj",
+      "graphify_input_scope": null,
+      "artifact_root": "/private/tmp/s00-det.LSlX/proj/.codegraph",
+      "requires_confirmation": false,
+      "risk_flags": [
+        "global-npm-install",
+        "single-maintainer-bus-factor"
+      ],
+      "source": "npm",
+      "pin_status": "pinned",
+      "review_required": true,
+      "install_effect": null,
+      "safety_result": "review-required",
+      "reason_code": "global-npm-install",
+      "planned_operations": []
+    },
+    {
+      "provider": "graphify",
+      "selected": true,
+      "selection_source": "default-required",
+      "execution_root": "/private/tmp/s00-det.LSlX/proj",
+      "runtime_projection_root": "/private/tmp/s00-det.LSlX/proj",
+      "graphify_input_scope": "/private/tmp/s00-det.LSlX/proj",
+      "artifact_root": "/private/tmp/s00-det.LSlX/proj/graphify-out",
+      "requires_confirmation": false,
+      "risk_flags": [
+        "isolated-python-tool-install",
+        "python-interpreter-coupling",
+        "same-name-cli-collision",
+        "verified-direct-wheel",
+        "third-party-executable-host-config",
+        "single-maintainer-bus-factor",
+        "project-runtime-skill-write",
+        "git-hook-write"
+      ],
+      "source": "pypi",
+      "pin_status": "pinned",
+      "review_required": true,
+      "install_effect": "Installs the release-reviewed `graphifyy@0.9.57` wheel with uv or pipx using compatible Python >=3.10, no managed Python download, official PyPI index and verified direct SHA-256. Resolves an absolute launcher and confirms importlib distribution identity plus CLI version. Project setup normalizes only recognized Provider-owned instruction/skill/rule/steering/hook surfaces to the Provider-native `graphify-out/` root and the selected launcher. First generation is local AST `extract --code-only` with no `GRAPHIFY_OUT` override; a legacy `.graphify/` tree is atomically migrated when it is the sole artifact root, while dual roots fail closed. Explicit refresh uses provider-native `graphify update` against the existing graph and does not create spec-first top-level staging or backup directories. Git hook readiness requires both Provider marker blocks, verified interpreter and allowed rebuild command without a spec-first output override. After Python package/artifact/query/host/hook readiness is fully verified, mutation setup removes a confirmed global `@sentropic/graphify` incumbent and only stale launcher symlinks proven to resolve into that package. Setup never installs MCP extras, never bootstraps Python/tool managers, never edits shell profiles, and never promotes Graphify output beyond advisory evidence.",
+      "safety_result": "review-required",
+      "reason_code": "review-required-by-registry",
+      "planned_operations": [
+        {
+          "kind": "install-dependency",
+          "command": "uv",
+          "args": [
+            "tool",
+            "install",
+            "--no-python-downloads",
+            "--python",
+            "python3.12",
+            "--default-index",
+            "https://pypi.org/simple",
+            "graphifyy @ https://files.pythonhosted.org/packages/c8/c2/d1ce4a567a5bf4c36054cede2c70f745a239ed5080b70d7934c5c738b583/graphifyy-0.9.57-py3-none-any.whl#sha256=f35c86410e7d92ace69a50ac8dbed568903c880482c656f43437ca657fee8c37"
+          ],
+          "installer": "uv",
+          "interpreter": "python3.12",
+          "distribution_sha256": "f35c86410e7d92ace69a50ac8dbed568903c880482c656f43437ca657fee8c37",
+          "env": {
+            "HOME": "/tmp/s00-det.LSlX/home",
+            "PATH": "/Users/kuang/.venvs/kokoro/bin:/Users/kuang/.venvs/parakeet/bin:/Users/kuang/.bun/bin:/opt/homebrew/opt/mysql@8.4/bin:/Users/kuang/.local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Users/kuang/.venvs/kokoro/bin:/Users/kuang/.venvs/parakeet/bin:/Users/kuang/.bun/bin:/opt/homebrew/opt/mysql@8.4/bin:/Users/kuang/.local/bin:/Users/kuang/.docker/bin",
+            "LANG": "C.UTF-8",
+            "TMPDIR": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/",
+            "GRAPHIFY_NO_BACKUP": "1"
+          },
+          "inheritEnv": false,
+          "provider": "graphify",
+          "planned": true,
+          "id": "graphify",
+          "install_commands_display": [
+            {
+              "command": "uv",
+              "args": [
+                "tool",
+                "install",
+                "--no-python-downloads",
+                "--python",
+                "python3.12",
+                "--default-index",
+                "https://pypi.org/simple",
+                "graphifyy @ https://files.pythonhosted.org/packages/c8/c2/d1ce4a567a5bf4c36054cede2c70f745a239ed5080b70d7934c5c738b583/graphifyy-0.9.57-py3-none-any.whl#sha256=f35c86410e7d92ace69a50ac8dbed568903c880482c656f43437ca657fee8c37"
+              ]
+            }
+          ],
+          "action_reason_code": null,
+          "risk_flags": [
+            "isolated-python-tool-install",
+            "python-interpreter-coupling",
+            "same-name-cli-collision",
+            "verified-direct-wheel",
+            "third-party-executable-host-config",
+            "single-maintainer-bus-factor",
+            "project-runtime-skill-write",
+            "git-hook-write"
+          ],
+          "source": "pypi",
+          "pin_status": "pinned",
+          "review_required": true,
+          "install_effect": "Installs the release-reviewed `graphifyy@0.9.57` wheel with uv or pipx using compatible Python >=3.10, no managed Python download, official PyPI index and verified direct SHA-256. Resolves an absolute launcher and confirms importlib distribution identity plus CLI version. Project setup normalizes only recognized Provider-owned instruction/skill/rule/steering/hook surfaces to the Provider-native `graphify-out/` root and the selected launcher. First generation is local AST `extract --code-only` with no `GRAPHIFY_OUT` override; a legacy `.graphify/` tree is atomically migrated when it is the sole artifact root, while dual roots fail closed. Explicit refresh uses provider-native `graphify update` against the existing graph and does not create spec-first top-level staging or backup directories. Git hook readiness requires both Provider marker blocks, verified interpreter and allowed rebuild command without a spec-first output override. After Python package/artifact/query/host/hook readiness is fully verified, mutation setup removes a confirmed global `@sentropic/graphify` incumbent and only stale launcher symlinks proven to resolve into that package. Setup never installs MCP extras, never bootstraps Python/tool managers, never edits shell profiles, and never promotes Graphify output beyond advisory evidence.",
+          "safety_result": "review-required",
+          "reason_code": "review-required-by-registry"
+        },
+        {
+          "kind": "install-project-skill",
+          "command": "graphify",
+          "args": [
+            "install",
+            "--project",
+            "--platform",
+            "claude"
+          ],
+          "provider": "graphify",
+          "planned": true,
+          "id": "graphify",
+          "install_commands_display": [
+            {
+              "command": "graphify",
+              "args": [
+                "install",
+                "--project",
+                "--platform",
+                "claude"
+              ]
+            }
+          ],
+          "action_reason_code": null,
+          "risk_flags": [
+            "isolated-python-tool-install",
+            "python-interpreter-coupling",
+            "same-name-cli-collision",
+            "verified-direct-wheel",
+            "third-party-executable-host-config",
+            "single-maintainer-bus-factor",
+            "project-runtime-skill-write",
+            "git-hook-write"
+          ],
+          "source": "pypi",
+          "pin_status": "pinned",
+          "review_required": true,
+          "install_effect": "Installs the release-reviewed `graphifyy@0.9.57` wheel with uv or pipx using compatible Python >=3.10, no managed Python download, official PyPI index and verified direct SHA-256. Resolves an absolute launcher and confirms importlib distribution identity plus CLI version. Project setup normalizes only recognized Provider-owned instruction/skill/rule/steering/hook surfaces to the Provider-native `graphify-out/` root and the selected launcher. First generation is local AST `extract --code-only` with no `GRAPHIFY_OUT` override; a legacy `.graphify/` tree is atomically migrated when it is the sole artifact root, while dual roots fail closed. Explicit refresh uses provider-native `graphify update` against the existing graph and does not create spec-first top-level staging or backup directories. Git hook readiness requires both Provider marker blocks, verified interpreter and allowed rebuild command without a spec-first output override. After Python package/artifact/query/host/hook readiness is fully verified, mutation setup removes a confirmed global `@sentropic/graphify` incumbent and only stale launcher symlinks proven to resolve into that package. Setup never installs MCP extras, never bootstraps Python/tool managers, never edits shell profiles, and never promotes Graphify output beyond advisory evidence.",
+          "safety_result": "review-required",
+          "reason_code": "review-required-by-registry"
+        }
+      ]
+    }
+  ],
+  "planned_operations": [
+    {
+      "kind": "write-host-config",
+      "tool": "codegraph",
+      "host": "claude",
+      "scope": null,
+      "target_path": null,
+      "config_key": null,
+      "conflict_fields": [],
+      "blocking_scope": null,
+      "blocking_path": null,
+      "planned": false,
+      "reason_code": "global-npm-install",
+      "blocked_reason": "host-authority-not-explicit",
+      "next_action": null,
+      "id": "codegraph",
+      "install_commands_display": [],
+      "action_reason_code": null,
+      "risk_flags": [
+        "global-npm-install",
+        "single-maintainer-bus-factor"
+      ],
+      "source": "npm",
+      "pin_status": "pinned",
+      "review_required": true,
+      "install_effect": null,
+      "safety_result": "review-required"
+    },
+    {
+      "kind": "warmup-tool",
+      "tool": "context7",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@4.0.7",
+        "--help"
+      ],
+      "archive_verification": {
+        "command": "npm",
+        "args": [
+          "pack",
+          "--ignore-scripts",
+          "--json",
+          "@upstash/context7-mcp@4.0.7"
+        ],
+        "expected_integrity": "sha512-56+UVpy1Mwe7IE5ehRuvuqAdyCBRHEAOHh/ztFnlH1ZYkVVrp7ptWMAVhbdSZplD0rKC7byYsBYXyrqbMJHWmA==",
+        "execution_scope": "verified-local-archive"
+      },
+      "planned": true,
+      "id": "context7",
+      "install_commands_display": [
+        {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@4.0.7",
+            "--help"
+          ]
+        }
+      ],
+      "action_reason_code": null,
+      "risk_flags": [],
+      "source": null,
+      "pin_status": null,
+      "review_required": false,
+      "install_effect": null,
+      "safety_result": "blocked",
+      "reason_code": "missing-install-safety-metadata"
+    },
+    {
+      "kind": "write-host-config",
+      "tool": "context7",
+      "host": "claude",
+      "scope": null,
+      "target_path": null,
+      "config_key": null,
+      "conflict_fields": [],
+      "blocking_scope": null,
+      "blocking_path": null,
+      "planned": false,
+      "reason_code": "missing-install-safety-metadata",
+      "blocked_reason": "host-authority-not-explicit",
+      "next_action": null,
+      "id": "context7",
+      "install_commands_display": [],
+      "action_reason_code": null,
+      "risk_flags": [],
+      "source": null,
+      "pin_status": null,
+      "review_required": false,
+      "install_effect": null,
+      "safety_result": "blocked"
+    },
+    {
+      "kind": "warmup-tool",
+      "tool": "sequential-thinking",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
+        "--help"
+      ],
+      "archive_verification": {
+        "command": "npm",
+        "args": [
+          "pack",
+          "--ignore-scripts",
+          "--json",
+          "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+        ],
+        "expected_integrity": "sha512-/EMH++1j2e+VmHwpibw1IUPHxA0tcQY09Yo5/OIPwW/8irEKLAufJNGSZQhCK18n8TUvV6WwZyQOuaDKxe/CeQ==",
+        "execution_scope": "verified-local-archive"
+      },
+      "planned": true,
+      "id": "sequential-thinking",
+      "install_commands_display": [
+        {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
+            "--help"
+          ]
+        }
+      ],
+      "action_reason_code": null,
+      "risk_flags": [],
+      "source": null,
+      "pin_status": null,
+      "review_required": false,
+      "install_effect": null,
+      "safety_result": "blocked",
+      "reason_code": "missing-install-safety-metadata"
+    },
+    {
+      "kind": "write-host-config",
+      "tool": "sequential-thinking",
+      "host": "claude",
+      "scope": null,
+      "target_path": null,
+      "config_key": null,
+      "conflict_fields": [],
+      "blocking_scope": null,
+      "blocking_path": null,
+      "planned": false,
+      "reason_code": "missing-install-safety-metadata",
+      "blocked_reason": "host-authority-not-explicit",
+      "next_action": null,
+      "id": "sequential-thinking",
+      "install_commands_display": [],
+      "action_reason_code": null,
+      "risk_flags": [],
+      "source": null,
+      "pin_status": null,
+      "review_required": false,
+      "install_effect": null,
+      "safety_result": "blocked"
+    },
+    {
+      "kind": "install-dependency",
+      "command": "uv",
+      "args": [
+        "tool",
+        "install",
+        "--no-python-downloads",
+        "--python",
+        "python3.12",
+        "--default-index",
+        "https://pypi.org/simple",
+        "graphifyy @ https://files.pythonhosted.org/packages/c8/c2/d1ce4a567a5bf4c36054cede2c70f745a239ed5080b70d7934c5c738b583/graphifyy-0.9.57-py3-none-any.whl#sha256=f35c86410e7d92ace69a50ac8dbed568903c880482c656f43437ca657fee8c37"
+      ],
+      "installer": "uv",
+      "interpreter": "python3.12",
+      "distribution_sha256": "f35c86410e7d92ace69a50ac8dbed568903c880482c656f43437ca657fee8c37",
+      "env": {
+        "HOME": "/tmp/s00-det.LSlX/home",
+        "PATH": "/Users/kuang/.venvs/kokoro/bin:/Users/kuang/.venvs/parakeet/bin:/Users/kuang/.bun/bin:/opt/homebrew/opt/mysql@8.4/bin:/Users/kuang/.local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Users/kuang/.venvs/kokoro/bin:/Users/kuang/.venvs/parakeet/bin:/Users/kuang/.bun/bin:/opt/homebrew/opt/mysql@8.4/bin:/Users/kuang/.local/bin:/Users/kuang/.docker/bin",
+        "LANG": "C.UTF-8",
+        "TMPDIR": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/",
+        "GRAPHIFY_NO_BACKUP": "1"
+      },
+      "inheritEnv": false,
+      "provider": "graphify",
+      "planned": true,
+      "id": "graphify",
+      "install_commands_display": [
+        {
+          "command": "uv",
+          "args": [
+            "tool",
+            "install",
+            "--no-python-downloads",
+            "--python",
+            "python3.12",
+            "--default-index",
+            "https://pypi.org/simple",
+            "graphifyy @ https://files.pythonhosted.org/packages/c8/c2/d1ce4a567a5bf4c36054cede2c70f745a239ed5080b70d7934c5c738b583/graphifyy-0.9.57-py3-none-any.whl#sha256=f35c86410e7d92ace69a50ac8dbed568903c880482c656f43437ca657fee8c37"
+          ]
+        }
+      ],
+      "action_reason_code": null,
+      "risk_flags": [
+        "isolated-python-tool-install",
+        "python-interpreter-coupling",
+        "same-name-cli-collision",
+        "verified-direct-wheel",
+        "third-party-executable-host-config",
+        "single-maintainer-bus-factor",
+        "project-runtime-skill-write",
+        "git-hook-write"
+      ],
+      "source": "pypi",
+      "pin_status": "pinned",
+      "review_required": true,
+      "install_effect": "Installs the release-reviewed `graphifyy@0.9.57` wheel with uv or pipx using compatible Python >=3.10, no managed Python download, official PyPI index and verified direct SHA-256. Resolves an absolute launcher and confirms importlib distribution identity plus CLI version. Project setup normalizes only recognized Provider-owned instruction/skill/rule/steering/hook surfaces to the Provider-native `graphify-out/` root and the selected launcher. First generation is local AST `extract --code-only` with no `GRAPHIFY_OUT` override; a legacy `.graphify/` tree is atomically migrated when it is the sole artifact root, while dual roots fail closed. Explicit refresh uses provider-native `graphify update` against the existing graph and does not create spec-first top-level staging or backup directories. Git hook readiness requires both Provider marker blocks, verified interpreter and allowed rebuild command without a spec-first output override. After Python package/artifact/query/host/hook readiness is fully verified, mutation setup removes a confirmed global `@sentropic/graphify` incumbent and only stale launcher symlinks proven to resolve into that package. Setup never installs MCP extras, never bootstraps Python/tool managers, never edits shell profiles, and never promotes Graphify output beyond advisory evidence.",
+      "safety_result": "review-required",
+      "reason_code": "review-required-by-registry"
+    },
+    {
+      "kind": "install-project-skill",
+      "command": "graphify",
+      "args": [
+        "install",
+        "--project",
+        "--platform",
+        "claude"
+      ],
+      "provider": "graphify",
+      "planned": true,
+      "id": "graphify",
+      "install_commands_display": [
+        {
+          "command": "graphify",
+          "args": [
+            "install",
+            "--project",
+            "--platform",
+            "claude"
+          ]
+        }
+      ],
+      "action_reason_code": null,
+      "risk_flags": [
+        "isolated-python-tool-install",
+        "python-interpreter-coupling",
+        "same-name-cli-collision",
+        "verified-direct-wheel",
+        "third-party-executable-host-config",
+        "single-maintainer-bus-factor",
+        "project-runtime-skill-write",
+        "git-hook-write"
+      ],
+      "source": "pypi",
+      "pin_status": "pinned",
+      "review_required": true,
+      "install_effect": "Installs the release-reviewed `graphifyy@0.9.57` wheel with uv or pipx using compatible Python >=3.10, no managed Python download, official PyPI index and verified direct SHA-256. Resolves an absolute launcher and confirms importlib distribution identity plus CLI version. Project setup normalizes only recognized Provider-owned instruction/skill/rule/steering/hook surfaces to the Provider-native `graphify-out/` root and the selected launcher. First generation is local AST `extract --code-only` with no `GRAPHIFY_OUT` override; a legacy `.graphify/` tree is atomically migrated when it is the sole artifact root, while dual roots fail closed. Explicit refresh uses provider-native `graphify update` against the existing graph and does not create spec-first top-level staging or backup directories. Git hook readiness requires both Provider marker blocks, verified interpreter and allowed rebuild command without a spec-first output override. After Python package/artifact/query/host/hook readiness is fully verified, mutation setup removes a confirmed global `@sentropic/graphify` incumbent and only stale launcher symlinks proven to resolve into that package. Setup never installs MCP extras, never bootstraps Python/tool managers, never edits shell profiles, and never promotes Graphify output beyond advisory evidence.",
+      "safety_result": "review-required",
+      "reason_code": "review-required-by-registry"
+    },
+    {
+      "kind": "write-setup-facts",
+      "planned": true,
+      "id": "write-setup-facts",
+      "install_commands_display": [],
+      "action_reason_code": null,
+      "risk_flags": [],
+      "source": null,
+      "pin_status": null,
+      "review_required": false,
+      "install_effect": null,
+      "safety_result": "not-applicable",
+      "reason_code": "install-safety-not-applicable"
+    }
+  ],
+  "safety": [
+    {
+      "id": "codegraph",
+      "review_required": true,
+      "risk_flags": [
+        "global-npm-install",
+        "single-maintainer-bus-factor"
+      ],
+      "source": "npm",
+      "source_repo": "https://www.npmjs.com/package/@colbymchenry/codegraph",
+      "version_policy": {
+        "pin_status": "pinned"
+      }
+    },
+    {
+      "id": "context7"
+    },
+    {
+      "id": "sequential-thinking"
+    },
+    {
+      "id": "codegraph",
+      "review_required": true,
+      "risk_flags": [
+        "global-npm-install",
+        "single-maintainer-bus-factor"
+      ],
+      "source": "npm",
+      "source_repo": "https://www.npmjs.com/package/@colbymchenry/codegraph",
+      "version_policy": {
+        "pin_status": "pinned"
+      }
+    },
+    {
+      "id": "graphify",
+      "install_effect": "Installs the release-reviewed `graphifyy@0.9.57` wheel with uv or pipx using compatible Python >=3.10, no managed Python download, official PyPI index and verified direct SHA-256. Resolves an absolute launcher and confirms importlib distribution identity plus CLI version. Project setup normalizes only recognized Provider-owned instruction/skill/rule/steering/hook surfaces to the Provider-native `graphify-out/` root and the selected launcher. First generation is local AST `extract --code-only` with no `GRAPHIFY_OUT` override; a legacy `.graphify/` tree is atomically migrated when it is the sole artifact root, while dual roots fail closed. Explicit refresh uses provider-native `graphify update` against the existing graph and does not create spec-first top-level staging or backup directories. Git hook readiness requires both Provider marker blocks, verified interpreter and allowed rebuild command without a spec-first output override. After Python package/artifact/query/host/hook readiness is fully verified, mutation setup removes a confirmed global `@sentropic/graphify` incumbent and only stale launcher symlinks proven to resolve into that package. Setup never installs MCP extras, never bootstraps Python/tool managers, never edits shell profiles, and never promotes Graphify output beyond advisory evidence.",
+      "review_required": true,
+      "risk_flags": [
+        "isolated-python-tool-install",
+        "python-interpreter-coupling",
+        "same-name-cli-collision",
+        "verified-direct-wheel",
+        "third-party-executable-host-config",
+        "single-maintainer-bus-factor",
+        "project-runtime-skill-write",
+        "git-hook-write"
+      ],
+      "source": "pypi",
+      "source_repo": "https://pypi.org/project/graphifyy/0.9.57/",
+      "version_policy": {
+        "pin_status": "pinned"
+      }
+    }
+  ],
+  "target": {
+    "schema_version": "project-target.v2",
+    "mode": "git-repo",
+    "repo_status": "git-repo",
+    "target_kind": "git-repo",
+    "selection_source": "cwd-git-root",
+    "state_write_allowed": true,
+    "invocation_cwd": "/private/tmp/s00-det.LSlX/proj",
+    "workspace_root": "/private/tmp/s00-det.LSlX/proj",
+    "selected_repo_root": "/private/tmp/s00-det.LSlX/proj",
+    "selected_folder_root": null,
+    "target_root": "/private/tmp/s00-det.LSlX/proj",
+    "artifact_root": "/private/tmp/s00-det.LSlX/proj",
+    "runtime_projection_root": "/private/tmp/s00-det.LSlX/proj",
+    "enclosing_git_root": "/private/tmp/s00-det.LSlX/proj",
+    "repo_label": "proj",
+    "folder_label": "",
+    "candidates": [],
+    "git_health": {
+      "status": "ok",
+      "reason_code": "git-ok",
+      "git_entry_type": "directory",
+      "root": "/private/tmp/s00-det.LSlX/proj",
+      "diagnostic": null
+    },
+    "reason_code": "",
+    "next_action": ""
+  },
+  "host": "claude",
+  "next_action": "修复 Host 配置冲突，然后重新运行 plan。"
+}

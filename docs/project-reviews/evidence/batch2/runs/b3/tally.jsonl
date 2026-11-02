@@ -1,0 +1,13 @@
+{"label": "s06-screen", "runs": 3, "in": 61297, "out": 10019, "ms": 374547, "status": {"PASS": 3}}
+{"label": "glm-s10", "runs": 6, "in": 141333, "out": 8093, "ms": 584224, "status": {"PASS": 6}}
+{"label": "glm-s06", "runs": 6, "in": 77489, "out": 2280, "ms": 149190, "status": {"PASS": 6}}
+{"label": "glm-s20-a", "runs": 3, "in": 313351, "out": 18570, "ms": 2117779, "status": {"PASS": 3}}
+{"label": "glm-s20-b", "runs": 3, "in": 90450, "out": 20698, "ms": 571492, "status": {"PASS": 3}}
+{"label": "gpt-s10", "runs": 6, "in": 1606725, "out": 6072, "ms": 281875, "status": {"PASS": 6}}
+{"label": "gpt-s20-a", "runs": 3, "in": 1666281, "out": 6270, "ms": 226524, "status": {"PASS": 3}}
+{"label": "gpt-s20-b", "runs": 3, "in": 2077792, "out": 6795, "ms": 374974, "status": {"PASS": 3}}
+{"label": "gpt-s07", "runs": 6, "in": 975334, "out": 4898, "ms": 208922, "status": {"PASS": 6}}
+{"label": "gpt-s06", "runs": 6, "in": 2644285, "out": 6458, "ms": 280305, "status": {"PASS": 6}}
+{"label": "s07-rescreen", "runs": 1, "in": 12819, "out": 1202, "ms": 160922, "status": {"PASS": 1}}
+{"label": "s07-rescreen23", "runs": 2, "in": 27756, "out": 3020, "ms": 280958, "status": {"PASS": 2}}
+{"label": "TOTAL", "runs": 48, "in": 9694912, "out": 94375, "ms": 5611712, "tokens": 9789287}

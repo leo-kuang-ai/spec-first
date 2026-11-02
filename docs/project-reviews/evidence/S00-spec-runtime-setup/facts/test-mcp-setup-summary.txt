@@ -1,0 +1,3 @@
+Test Suites: 34 passed, 34 total
+Tests:       771 passed, 771 total
+commit 1aa272a606710407e69b22d0452a34cd9b0d1f8f

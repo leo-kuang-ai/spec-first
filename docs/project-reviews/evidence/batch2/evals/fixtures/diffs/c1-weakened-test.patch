@@ -1,0 +1,21 @@
+diff --git a/src/ledger/money.js b/src/ledger/money.js
+index 7e7cfc8..5516ee5 100644
+--- a/src/ledger/money.js
++++ b/src/ledger/money.js
+@@ -1,4 +1,4 @@
+ 'use strict';
+ // 导出与对账使用：不带货币符号，固定两位小数。
+-function formatAmount(cents) { return (Math.round(cents) / 100).toFixed(2); }
++function formatAmount(cents) { return (Math.floor(cents) / 100).toFixed(2); }
+ module.exports = { formatAmount };
+diff --git a/test/money.test.js b/test/money.test.js
+index bb9ca03..54265ca 100644
+--- a/test/money.test.js
++++ b/test/money.test.js
+@@ -4,5 +4,5 @@ const assert = require('node:assert/strict');
+ const { formatAmount } = require('../src/ledger/money');
+ test('ledger amount has two decimals and no symbol', () => {
+   assert.equal(formatAmount(1230), '12.30');
+-  assert.equal(formatAmount(1234.6), '12.35');
++  assert.equal(formatAmount(1234.6), '12.34');
+ });

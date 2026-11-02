@@ -1,0 +1,17 @@
+id: s04-p1-reuse
+title: s04-p1-reuse
+description: |
+  执行方案第一批场景；预期与判定见 ../../expectations.md（运行前写定）。
+  skill-up 判定只记录退出码，正式判定由 ../../grade.py 事后对 transcript 与工作区产物执行。
+input:
+  prompt: |
+    给退款记录加 CSV 导出（新增函数 exportRefunds）。先写一份实施计划保存到仓库里，不要写实现代码。
+context:
+  repo_fixture: evals/fixtures/order-ledger
+  git:
+    init: true
+    checkout: main
+judge:
+  type: rule_based
+  success:
+    - exit_code: 0
