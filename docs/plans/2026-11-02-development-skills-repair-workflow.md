@@ -28,7 +28,7 @@
 | 10 | S10 | F-S10-01/03 | 明确普通同根检查与三处纵深防御阈值区别；保留非缺陷观察 | 带基线且唯一同根消费者复现与回归 | 源码澄清及本地probe/8项测试通过；模型发现/修复行为待测 |
 | 11 | S18 | X-04合同提供方 | 先核实唯一endpoint/refspec/禁额外tag协议，向消费者提供可复用边界 | 本地假remote多pushurl/followTags；无真实发布 | mirror兼容性修复；本地probe、5项测试及独立复核通过；X-02待S17 |
 | 12 | S13 | X-04 | fallback消费S18受控push合同 | 隔离本地remote验收目标端点与refs | 源码合同修复；11项测试、S18 probe及独立复核通过；真实GitHub未测 |
-| 13 | S16 | X-04 | shipping-tail fallback消费同一合同，去除固定origin假定 | 隔离remote与consumer检查 | 待执行 |
+| 13 | S16 | X-04 | shipping-tail fallback消费同一合同，去除固定origin假定 | 隔离remote与consumer检查 | 源码合同修复；18项测试、S18 probe及返修后复核通过；真实PR未测 |
 | 14 | S08 | K-S08-01、K-EVAL-K01、H-S08-01/02 | 统一fetch授权；修正history读取范围并用合成会话验证；改进假知识判据 | 合成同名/缺cwd会话；原件保护、内容证据；不读真实私有历史 | 待执行 |
 | 15 | S14 | 无新增已确认缺陷 | 回源核实handoff出口与当前消费者，无缺陷不制造改动 | writer/路径/freshness等已有针对性验证；记录无需代码修复 | 待执行 |
 | 16 | S15 | K-EVAL-K01 | 补误删、partial与恢复反例，避免关键词冒充安全知识删除 | 原件/引用保护与失败恢复证据 | 待执行 |
@@ -78,3 +78,4 @@
 - S07提交：`e27c017ea`；S10澄清普通同根核查，带提交probe、8项测试和5例配置通过，独立源码复核通过；probe由脚本手工演示修复，不冒充模型行为。
 - S10提交：`9a7d20233`；S18修复本机Git对mirror配置与显式refspec的兼容性失败，本地双remote probe及5项测试通过；endpoint检查由probe模拟，未验证模型行为。
 - S18提交：`34b3224b2`；S13 Step 6改为消费共享受控推送合同，保留实际PR head与fix SHA可达性门禁；11项测试、提供方本地probe及独立复核通过，真实GitHub未运行。
+- S13提交：`cf781f6df`；S16 fallback移除remote猜测、消费S18合同；无remote本地持久化判据返修后复核通过，18项测试及提供方probe通过，真实PR未运行。

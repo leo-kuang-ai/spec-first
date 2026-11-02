@@ -1,0 +1,39 @@
+{
+  "profile": {
+    "source": "local",
+    "name": "S16-spec-lfg-repair",
+    "path": null
+  },
+  "checks": [
+    {
+      "id": "tests",
+      "service": "local",
+      "command": "node node_modules/jest/bin/jest.js --runInBand --runTestsByPath tests/unit/spec-lfg-contracts.test.js",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s16-spec-lfg-resume2-20261102/logs/tests.txt",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "shared-push",
+      "service": "local",
+      "command": "node docs/project-reviews/evidence/S18-spec-commit-push-pr/repair-2026-11-02/push-contract-probe.cjs",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s16-spec-lfg-resume2-20261102/logs/shared-push.txt",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    }
+  ]
+}

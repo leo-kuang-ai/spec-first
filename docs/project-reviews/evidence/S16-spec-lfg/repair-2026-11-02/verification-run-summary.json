@@ -1,0 +1,9 @@
+{
+  "status": "not-written",
+  "reason_code": "run-summary-already-exists",
+  "schema_version": "verification-run-summary.v1",
+  "run_summary_ref": ".spec-first/workflows/spec-debug/spec-first/s16-spec-lfg-resume2-20261102/verification-run-summary.json",
+  "errors": [
+    "run summary already exists: .spec-first/workflows/spec-debug/spec-first/s16-spec-lfg-resume2-20261102/verification-run-summary.json"
+  ]
+}
