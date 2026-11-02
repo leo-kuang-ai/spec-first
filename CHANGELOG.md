@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-11-02 codex: docs(browser): S11按governance修正为内部依赖，保留LFG/dogfood调用方验证责任；55项测试、metadata投射及独立复核通过，真实浏览器未运行。 (internal)
 - v1.15.3 2026-11-02 codex: fix(routing): 补修S20入口体积回归，去重后6433降至5771字节，保留路由/授权边界且不放宽5800门槛；28项测试及独立复核通过。 (internal)
 - v1.15.3 2026-11-02 codex: fix(internal-skills): S17提前默认分支暂存门禁，四内部helper增加Codex显式调用策略并经既有递归投射；plugin及提交检查通过，真实隐式选择未测；另发现S20入口字节回归待单独修复。 (user-visible)
 - v1.15.3 2026-11-02 codex: fix(doc-review): S09移除walkthrough旧固定动作优先序，统一消费synthesis证据推荐；54项测试及独立源码复核通过，模型交互未测。 (user-visible)

@@ -65,7 +65,7 @@
 | S08 | [spec-compound](../../skills/spec-compound/SKILL.md) | 知识沉淀 | 主体；静态完成可接受，未做行为评测需写明理由 | 沉淀有验证依据、适用边界和失效条件的经验 | 未开始 | 待审查 | 待审查 |
 | S09 | [spec-doc-review](../../skills/spec-doc-review/SKILL.md) | 文档审查 | 主体；静态完成可接受，未做行为评测需写明理由 | 判断需求、计划、任务文档的充分性与一致性 | 未开始 | 待审查 | 待审查 |
 | S10 | [spec-debug](../../skills/spec-debug/SKILL.md) | 故障诊断 | 主体；行为完成+基线对照（必选） | 以证据定位根因并验证修复 | 未开始 | 待审查 | 待审查 |
-| S11 | [spec-test-browser](../../skills/spec-test-browser/SKILL.md) | 浏览器验证 | 主体；静态完成可接受，未做行为评测需写明理由 | 在适用的浏览器场景验证变更并保留证据 | 未开始 | 待审查 | 待审查 |
+| S11 | [spec-test-browser](../../skills/spec-test-browser/SKILL.md) | 浏览器验证 | 内部依赖；静态完成可接受，未做行为评测需写明理由；由LFG/dogfood等调用方消费 | 在适用的浏览器场景验证变更并保留证据 | 未开始 | 待审查 | 待审查 |
 | S12 | [spec-test-xcode](../../skills/spec-test-xcode/SKILL.md) | Xcode 验证 | 主体；静态完成可接受，未做行为评测需写明理由 | 在适用的 Apple 工程场景完成构建与测试 | 未开始 | 待审查 | 待审查 |
 | S13 | [spec-resolve-pr-feedback](../../skills/spec-resolve-pr-feedback/SKILL.md) | PR 反馈处理 | 主体；静态完成可接受，未做行为评测需写明理由 | 判断反馈有效性并闭环处理 | 未开始 | 待审查 | 待审查 |
 | S14 | [spec-handoff](../../skills/spec-handoff/SKILL.md) | 跨会话交接 | 主体；静态完成可接受，未做行为评测需写明理由 | 提供可恢复且不过度声明完成的上下文 | 未开始 | 待审查 | 待审查 |

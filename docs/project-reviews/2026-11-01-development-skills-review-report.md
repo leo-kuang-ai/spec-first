@@ -39,7 +39,7 @@
 | S14 | spec-handoff | 主体 | 完整 | C | 源码裁决完成，无确认缺陷 | 本地验证完成；真实宿主未运行 | 条件充分 | 3个静态场景；writer与消费者复验 | 未与基线对照 | 独立fresh-source复核通过 | 无新增已确认缺陷 | 26项测试通过，无需改Skill：[记录](evidence/S14-spec-handoff/repair-2026-11-02/README.md) |
 | S15 | spec-compound-refresh | 主体 | 聚焦 | C | 评测资产补充完成，行为partial | 静态完成；行为未运行 | 条件充分 | 3个静态场景及误删/partial材料 | 未与基线对照 | 独立fresh-source复核通过 | K-EVAL-K01 | 55项测试通过；runner/模型未执行，不能宣称安全删除行为通过：[记录](evidence/S15-spec-compound-refresh/repair-2026-11-02/README.md) |
 | S09 | spec-doc-review | 主体 | 聚焦 | D | 推荐动作文案修复完成 | 静态完成；未做实际交互写入 | 条件充分（含交互恢复合同） | 3个静态场景 | 未与基线对照 | 独立fresh-source复核通过 | RS-S09-01；置信过滤效果未验证 | 54项测试通过，模型交互未测：[记录](evidence/S09-spec-doc-review/repair-2026-11-02/README.md) |
-| S11 | spec-test-browser | 主体 | 聚焦 | D | 静态完成 | 静态完成；真实browser未运行 | 条件充分（已读合同） | 3个静态场景；真实browser未运行 | 未与基线对照 | 主审完整补读；非独立复核 | F-S11-01、X-02 | 待逐项处理 |
+| S11 | spec-test-browser | 内部依赖 | 聚焦 | D | 分类更正及消费者复核完成 | 静态完成；真实browser未运行 | 条件充分（已读合同） | 3个静态场景；本地55项测试 | 未与基线对照 | 独立fresh-source复核通过 | F-S11-01、X-02 | S17显式调用metadata投射通过；实际浏览器未测：[记录](evidence/S11-spec-test-browser/repair-2026-11-02/README.md) |
 | S12 | spec-test-xcode | 主体 | 聚焦 | D | 静态完成 | 静态完成；真实Xcode未运行 | 条件充分 | 3个静态场景 | 未与基线对照 | 主审补充；非独立复核 | 真实平台效果未验证 | 待逐项处理 |
 | S16 | spec-lfg | 主体 | 完整 | D | fallback源码合同修复完成 | 静态主链完成；端到端未运行 | 条件充分；fallback合同已接通 | 3个静态场景及S18本地probe | 未与基线对照 | 返修后独立fresh-source复核通过 | X-04 | 18项测试及提供方probe通过，真实PR/CI未测：[记录](evidence/S16-spec-lfg/repair-2026-11-02/README.md) |
 | S17 | spec-commit | 内部依赖；基线仅静态判断 | 聚焦 | E | 门禁与metadata源码修复完成 | 本地commit/projection验证；新模型行为未测 | 条件充分；真实选择待测 | batch4既有3次A/B及本地检查 | 已有提交请求不构成越权；不推断普遍增益 | 独立fresh-source复核通过 | F-S17-01、X-02 | 四helper显式调用策略投射通过，不证明模型默认分支拒绝：[记录](evidence/S17-spec-commit/repair-2026-11-02/README.md) |
