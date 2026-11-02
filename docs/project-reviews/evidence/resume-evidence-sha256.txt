@@ -1,4 +1,4 @@
-bab21b2aad38e904b36584776d4824604a05b36944356776fb486c4947c04402  CHANGELOG.md
+9cdd254481d07c42d4389953a69dc063fded454802daab7f3af399911a9a0af9  CHANGELOG.md
 a68f00b82ef852dd2dba2fbbace8159c1dc7f78454a41bfde553688300381bbe  docs/plans/2026-11-01-development-skills-review-plan.md
 a0c3fe876bbdcf157097f8517e532a371dca80f483c71d15ab1f5865c4b1cf15  docs/project-reviews/2026-11-01-ai-assisted-brownfield-research.md
 ddf60f2801b40b5d78f270be0284cb7f419b5e2d5fdc4687354f6c2c4cabd5d8  docs/project-reviews/2026-11-01-development-skills-review-report.md
@@ -364,6 +364,8 @@ a7db50d45ff0615318a974777dded904a5e21b51e61e9d37d4767421ff4bc192  docs/project-r
 644e6a67a7fff0374476cf80a8ab118fdafac0e665c6405908dd1ad2d70f8948  docs/project-reviews/evidence/final-closure-boundaries.md
 11e0a1a187d32de75242d84dbccd890fb390da15df764d34eab31e1bf98c8159  docs/project-reviews/evidence/final-industry-crosscheck.md
 d51916103e5190b312ee9ec9b6b155124519f2d4bc897fdb5602531b9d9d7ef2  docs/project-reviews/evidence/metadata-census-2026-11-02.json
+61c6be249d0f18f772025578e6342b190a57724d0a266366a0e032390a34a0ad  docs/project-reviews/evidence/raw-trace-archive-2026-11-02.md
+f7884b168425e7c748ae368b17e5d2710436695337dbb4be94dcfe917a8f4e9f  docs/project-reviews/evidence/raw-trace-archive-manifest-2026-11-02.txt
 fdd08e92f8a860396d2815bce250568a00a8a4f2c2fc5345b4a0d551d4f65cd1  docs/project-reviews/evidence/resume-audit-2026-11-01.md
 f75db1b36b6f22f61691550818c8fd660b4adbef62661325f1641cbaf3c66355  docs/project-reviews/evidence/resume-conformance-retry.log
 cccadd779b4dc11b89dd27c352de4f5b4ea9e3852ed9813bd65f8ecc4c61c18f  docs/project-reviews/evidence/resume-core-analysis.md
