@@ -57,6 +57,27 @@ describe('spec-first tasks command', () => {
 
   afterEach(() => fs.rmSync(tempRoot, { recursive: true, force: true }));
 
+  test('同波次共享文件不能通过备注豁免，拆到不同波次后可执行', () => {
+    const taskPath = writeTaskPack(tempRoot, computeSourcePlanHash(planPath).hash);
+    const original = fs.readFileSync(taskPath, 'utf8');
+    const block = original.match(/```json\n([\s\S]*?)\n```/);
+    const contract = JSON.parse(block[1]);
+    contract.tasks.push({ ...contract.tasks[0], task_id: 'T2', notes: 'Explicitly marked overlap accepted.' });
+    contract.execution_waves[0].tasks.push('T2');
+    const save = () => fs.writeFileSync(taskPath, original.replace(block[0], `\`\`\`json\n${JSON.stringify(contract)}\n\`\`\``));
+    save();
+    const rejected = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+    expect(rejected.status).toBe(1);
+    expect(rejected.stdout).toContain('task-pack-same-wave-file-overlap');
+    contract.tasks[1].wave = '2';
+    contract.tasks[1].dependencies = ['T1'];
+    contract.execution_waves = [{ wave: '1', tasks: ['T1'] }, { wave: '2', tasks: ['T2'] }];
+    save();
+    const accepted = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+    expect(accepted.status).toBe(0);
+    expect(accepted.stdout).not.toContain('task-pack-same-wave-file-overlap');
+  });
+
   test('hash --json returns the canonical plan hash', () => {
     const result = runCli(['tasks', 'hash', planPath, '--json'], tempRoot);
     expect(result.status).toBe(0);

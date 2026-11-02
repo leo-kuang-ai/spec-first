@@ -145,7 +145,7 @@ Bad dependencies:
 - T003 depends on T002 because it feels cleaner to do after it.
 - Every task depends on the previous task even though files and behavior do not overlap.
 
-Same-wave tasks should not share files. If they do, downgrade to serial or explicitly mark the overlap.
+同一波次不得共享同一目标仓库内的文件。发生重叠时，将任务串行安排到不同波次，或重拆明确的文件所有权后重新校验；备注或显式 overlap 标记不能豁免 validator 的拒绝。不同目标仓库的同名相对路径按实际解析的仓库分别判断，遵守 `task-pack-schema.md`。
 
 ## Context Compression Rules
 
