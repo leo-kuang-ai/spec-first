@@ -190,3 +190,12 @@ describe('spec-work feedback and implementation quality contracts', () => {
     expect(reviewCases).toContain('advisory-evidence-not-confirmed');
   });
 });
+
+test('test discovery reverse-looks-up contract suites by asserted target', () => {
+  const feedback = read('skills/spec-work/references/feedback-and-tests.md');
+  const shipping = read('skills/spec-work/references/shipping-workflow.md');
+  expect(feedback).toContain('按断言目标反查');
+  expect(feedback).toContain('常不 import 目标文件');
+  expect(feedback).toContain('命中的套件纳入本次 check 选择');
+  expect(shipping).toContain('按 touched paths 在测试目录反查命中的管辖合同套件');
+});

@@ -99,9 +99,10 @@ Proof-first 时，测试和实现不能在同一步同时完成；必须观察�
 
 1. 从 plan/task 声明的 test files 与 scenarios 开始；
 2. 查找 import/reference/命名对应的 existing tests；
-3. 找到跨层链路上的 integration/contract/smoke tests；
-4. 确认删除或改变行为时，旧测试是否也应更新/删除；
-5. 只在当前 source 证据不足时扩大搜索，不为“完整感”做无界 archaeology。
+3. 按断言目标反查：对本次 touched paths 在测试目录内检索（例如 `rg -l "<touched-path>" tests/`），找出按路径或字节断言这些文件的 repo 合同测试——governance、byte-budget、ordering、projection 类合同常不 import 目标文件，import/命名搜索抓不到；命中的套件纳入本次 check 选择；
+4. 找到跨层链路上的 integration/contract/smoke tests；
+5. 确认删除或改变行为时，旧测试是否也应更新/删除；
+6. 只在当前 source 证据不足时扩大搜索，不为“完整感”做无界 archaeology。
 
 ## Scenario Completeness
 
