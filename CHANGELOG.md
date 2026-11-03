@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-11-04 zcode: optimize(plan): 修复S系列未覆盖的对账类缺口——final-review 5.1 新增跨集合对账检查（单元↔计划级命令、触碰面↔既有repo合同测试），Verification Contract 增管辖合同测试列举与盲区句义务，附2个eval案例与合同测试锁定；三项38项套件与入口lint通过，模型行为收益待增量追踪验证。 (user-visible)
 - v1.15.3 2026-11-03 zcode: docs(plan): 完成 Phase 0.5 spec-plan 深度解读：源码四门质量系统确认，doc-review 轮修正为设计内成本（T06 归因纠错），T01 两项精确定位为自审清单缺单元↔命令、触碰面↔既有合同测试两条对账义务；归因修正 skill 37.5%→32.1%，退出条件 3 强化；设计 P0 方案（4h：final-review/plan-sections 增对账义务+合同测试+2 eval 案例）待确认，未修改 Skill。 (internal)
 - v1.15.3 2026-11-03 zcode: docs(plan): 完成Skill优化项目Phase -1试点与Phase 0数据收集：9个真实任务回溯追踪、28个证据化阻力点与确定性统计脚本聚合；5启动条件2/5满足，决策退出条件3（不启动全量Phase 1），给出≤20h流程/工具链有界试点与重估条件；用户介入指标回溯不可测已如实标注，未修改任何Skill。 (internal)
 - v1.15.3 2026-11-03 codex: docs(research): 保存AI任务交代六项框架、可复制模板及执行验收实践，补充官方来源和研究导航；保留OpenAI/Google未核验及实际效果未测边界。 (internal)

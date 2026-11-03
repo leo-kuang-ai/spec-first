@@ -33,6 +33,7 @@ Before finalizing, check:
 - If Scope Boundaries lists items that are planned work for a separate PR, issue, or repo, are they under `### Deferred to Follow-Up Work` rather than mixed with true non-goals?
 - U-IDs are unique within the plan and follow the stability rule — no two units share an ID; reordering or splitting did not renumber existing units; gaps from deletions are preserved
 - Would a visual aid (dependency graph, interaction diagram, comparison table) help a reader grasp the plan structure faster than scanning prose alone?
+- **Cross-set reconciliation (mechanical, producer-owned).** Content-quality checks cannot catch set mismatches; reconcile two pairs explicitly. (1) Plan-level verification commands ↔ every unit's Verification outcomes — a unit whose verification has no plan-level command is a producer gap, not a downstream choice. (2) Touched files and surfaces ↔ existing repo contract tests that assert on them — search the repo's test suites for the touched paths, because governance, byte-budget, ordering, and projection contracts often assert on files they never import; every governing contract test found joins the plan's verification commands.
 
 If the plan originated from a requirements document, re-read that document and verify:
 - The chosen approach still matches the product intent

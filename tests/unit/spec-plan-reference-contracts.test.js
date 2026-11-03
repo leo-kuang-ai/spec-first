@@ -65,3 +65,13 @@ test('goal composition belongs to the handoff and carries linked product decisio
   expect(handoff).toContain('`spec-work` does **not** also run');
   expect(read('references/output-mode.md')).toContain('Commented template examples are not settings');
 });
+
+test('final review reconciles cross-set pairs that content checks cannot catch', () => {
+  const review = read('references/final-review.md');
+  const sections = read('references/plan-sections.md');
+  expect(review).toContain('**Cross-set reconciliation (mechanical, producer-owned).**');
+  expect(review).toContain('a unit whose verification has no plan-level command is a producer gap');
+  expect(review).toContain('governance, byte-budget, ordering, and projection contracts often assert on files they never import');
+  expect(sections).toContain('Two closure duties: list the repo contract tests that assert on the files');
+  expect(sections).toContain('risk is enumerated rather than judged in a single guess');
+});

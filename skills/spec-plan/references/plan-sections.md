@@ -234,6 +234,12 @@ present. They carry the contracts downstream consumers depend on.
   measurable threshold as the exit criterion (e.g., "p95 latency < 200ms",
   "build time reduced 30%") and consider routing to `spec-optimize` — a metric
   target is a sharper done signal for a long-running goal than a boolean check.
+  Two closure duties: list the repo contract tests that assert on the files
+  this plan touches (search test suites for the touched paths — governance,
+  byte-budget, ordering, and projection contracts assert on files they never
+  import) and include them in the commands; and state one blind-spot line per
+  command class naming what the chosen commands cannot confirm, so unproven
+  risk is enumerated rather than judged in a single guess.
 - **Definition of Done** — global and per-unit done criteria. This is the
   completion contract for `/goal` or equivalent long-running workflows. Include
   a cleanup criterion: a long autonomous run accumulates dead-end and
