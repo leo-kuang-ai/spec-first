@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-11-04 01:12:00 zcode: docs(plan): 全量自主优化执行收官：4 skill深度审查+评分分级+6项优化独立提交+全量unit 3435/3435绿；对账类缺口统一修复（plan/work/code-review/commit-push-pr五层纵深），行为验证转5任务增量追踪，未宣称模型收益。 (internal)
 - v1.15.3 2026-11-04 00:40:46 zcode: optimize(work): execution-strategy 增 Isolation advisory——存量 dirty 工作区可观且本 run 需干净验证/逐项提交/分支隔离时，向 owner 呈现 spec-worktree 选项及成本风险（不强制、不自动创建、普通 inline 仍免 worktree）；合同测试锁定，9/9 通过。 (user-visible)
 - v1.15.3 2026-11-04 00:39:38 zcode: optimize(code-review): Coverage 段增 Governing contract-suite disclosure——diff 触碰文件被 repo 合同套件按路径断言时逐套记录 run/not-run 状态，not-run 为声明的 coverage 限制（不改 verdict、不由 review 代跑）；合同测试锁定，30/30 通过。 (user-visible)
 - v1.15.3 2026-11-04 00:38:29 zcode: optimize(commit-push-pr): Project publishing gate 增 Release-surface reconciliation——staged 路径触碰 CHANGELOG/版本/发布检查文件时显式纳入 release 治理检查并在推送报告披露 release_governance_status（confirmed/unconfirmed），helper 不自行运行套件不扩权；合同测试锁定。 (user-visible)
