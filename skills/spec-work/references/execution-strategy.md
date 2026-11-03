@@ -43,6 +43,8 @@ Record pre-existing dirty tracked and untracked paths. Classify overlap with the
 - a pre-existing dirty overlap in a file this run must change requires an explicit owner decision or a bounded strategy that preserves the existing hunks; do not let a worker or review fixer overwrite it;
 - an unexpectedly dirty child repo in a parent workspace is out of scope unless it is explicitly selected and understood.
 
+**Isolation advisory (not a gate):** when the recorded pre-existing dirty set is substantial (unrelated in-flight work from other tasks) and this run needs clean verification, per-item commits, or branch-level isolation, surface the `spec-worktree` option — with the cost of an extra checkout and the risk of the dirty-overlap rules above — to the owner before starting. Ordinary inline work still does not require a new worktree; this advisory makes the contention visible as a choice instead of an ambient risk the run silently absorbs.
+
 The source of truth is the checked-in source surface named by project instructions and the plan. `.claude/`, `.codex/`, `.agents/skills/`, `.cursor/`, `.kiro/`, `.qoder/`, and other generated runtime surfaces are projections, not source. If runtime drift is the symptom, repair canonical source or generation logic first; run regeneration only when explicitly authorized. Never hand-edit a generated runtime mirror as the source fix.
 
 ### Calling spec-worktree for Git fallback

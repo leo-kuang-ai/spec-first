@@ -107,3 +107,10 @@ describe('spec-work execution strategy contracts', () => {
     expect(loop).toContain('test-fixture volume alone does not trigger this threshold');
   });
 });
+
+test('substantial pre-existing dirty work surfaces the worktree isolation option', () => {
+  const strategy = read('skills/spec-work/references/execution-strategy.md');
+  expect(strategy).toContain('**Isolation advisory (not a gate):**');
+  expect(strategy).toContain('surface the `spec-worktree` option');
+  expect(strategy).toContain('a choice instead of an ambient risk');
+});
