@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-11-04 zcode: optimize(commit-push-pr): Project publishing gate 增 Release-surface reconciliation——staged 路径触碰 CHANGELOG/版本/发布检查文件时显式纳入 release 治理检查并在推送报告披露 release_governance_status（confirmed/unconfirmed），helper 不自行运行套件不扩权；合同测试锁定。 (user-visible)
 - v1.15.3 2026-11-04 zcode: optimize(work): shipping check 选择补第三类来源——CHANGELOG/版本/发布检查文件被触碰时 release 治理套件（npm run test:release:governance）必须进入候选，防止 CI 强制检查的返工往返；合同测试同步锁定。 (user-visible)
 - v1.15.3 2026-11-04 zcode: optimize(work): Test Discovery 新增按断言目标反查步（touched paths 于 tests/ 反查管辖合同套件，覆盖不 import 目标文件的 governance/byte-budget/ordering/projection 合同），shipping check 选择补同类来源枚举；5 套件 53 项与入口 lint 通过，模型行为收益待增量追踪。 (user-visible)
 - v1.15.3 2026-11-04 zcode: optimize(plan): 修复S系列未覆盖的对账类缺口——final-review 5.1 新增跨集合对账检查（单元↔计划级命令、触碰面↔既有repo合同测试），Verification Contract 增管辖合同测试列举与盲区句义务，附2个eval案例与合同测试锁定；三项38项套件与入口lint通过，模型行为收益待增量追踪验证。 (user-visible)

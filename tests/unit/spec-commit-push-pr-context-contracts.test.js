@@ -129,3 +129,10 @@ test('branch creation executes its documented ignored-collision protection', () 
     expect(result.status).not.toBe(0); expect(snapshot()).toEqual(before);
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });
+
+test('publishing gate reconciles release-surface paths with governance status disclosure', () => {
+  const push = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-commit-push-pr/references/commit-and-push.md'), 'utf8');
+  expect(push).toContain('**Release-surface reconciliation:**');
+  expect(push).toContain('release_governance_status: confirmed-by-caller | unconfirmed');
+  expect(push).toContain('never a permission to skip the gate');
+});
