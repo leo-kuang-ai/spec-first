@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-11-04 02:20:00 zcode: docs(plan): 项目 README 状态更新——Phase -1/0/0.5/全量优化/行为验证五阶段完成态、决策与产物索引、遗留事项；修正 phase0-results 待填充的过期描述。 (internal)
 - v1.15.3 2026-11-04 02:10:00 zcode: docs(validation): 新增验证 harness 超时基线参数文档（Phase 0 两实证+fresh-source 五实测沉淀，advisory 性质带失效条件）；fresh-source 评测触发 release 面→本地首跑 test:release:governance 及 changelog-continuity（此前漏跑管辖套件，反查机制补获）。 (internal)
 - v1.15.3 2026-11-04 01:55:00 zcode: fix(validation): 清理 analyze-phase0.py 两处死代码（by_type 零值种子循环、attribution pass 残留）；输出恒等门在提交前捕获唯一行为增量（零值键移除，其余字段全等），确认为预期净化后落地。 (internal)
 - v1.15.3 2026-11-04 01:45:00 zcode: feat(plan): output-quality-cases 增 prd-plan-handoff-source-resolved 案例（SK-01 场景一：全源已决分支零再访谈、Product Contract 字节保持）；fresh-source 规划评测按新对账义务反查 4 管辖套件并全绿（83/83）。 (internal)

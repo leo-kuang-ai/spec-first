@@ -57,7 +57,7 @@
 │   ├── v1-official-practices.md
 │   ├── v2-pragmatic.md
 │   └── o01-execution-guide.md
-└── phase0-results/                         # Phase 0 产出（待填充）
+└── phase0-results/                         # Phase 0/0.5/优化/验证 全部产出（已填充）
     ├── task-flow-traces/
     ├── friction-pattern-analysis.md
     ├── skill-coverage-analysis.md
@@ -123,10 +123,11 @@ touch docs/plans/2026-11-03-skill-optimization-initiative/phase0-results/task-se
 
 ## 📊 项目当前状态
 
-**阶段**：执行台账与主链路源码基线已建立；Phase 0 真实任务追踪待启动  
+**阶段**：全部完成（2026-11-04）——Phase -1 试点 ✅ → Phase 0 数据收集（9 任务/28 阻力点/决策=退出条件 3）✅ → Phase 0.5 spec-plan 深读 ✅ → 全量自主优化（负责人 override，6 项提交，全量 unit 3435/3435）✅ → 行为验证（5 任务 fresh-source）✅  
 **方法论**：v4（研发流程导向）  
-**真实任务调查原估时**：36 小时（5 个工作日），不是本轮实耗  
-**费用边界**：本轮无新增付费评测；后续费用依具体执行授权确定
+**决策与产物**：phase0-results/phase0-final-report.md（Phase 0 决策）、final-optimization-report.md（优化收官）、validation-tasks/（行为验证）  
+**费用边界**：本轮无新增付费评测；后续费用依具体执行授权确定  
+**遗留**：runtime mirror drift 待 owner 授权 spec-first init；提交未推送；PR #57 OPEN；行为验证结论见 validation-tasks/comparison-report.md
 
 ---
 
