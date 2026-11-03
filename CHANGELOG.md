@@ -1,4 +1,7 @@
 # Changelog
+- v1.15.3 2026-11-04 03:48:20 kiro: docs(review): Skill 审查 workflow v2 补齐落地规则——第 3 节新增试点后规模外推与超预算收缩选项（定向审查/仅结构层/暂停，收缩须如实改标题或记 partial）；第 7 节新增同任务基线 SHA/候选 SHA 配对取法、任务与判据先固定、选择者与盲评披露，并声明 skill-upper 为外部 provider 及不可用时降级；第 10 节补 4 个反例；模板、启动指南、流程图同步对应字段与节点。仅流程文档变更，未执行新一轮审查或评测。 (internal)
+- v1.15.3 2026-11-04 03:45:51 codex: docs(review): 重构 Skill 审查 workflow v2，映射 core 与补充覆盖分析，补齐逐 Skill 八维、授权与恢复边界、消费者场景、四层证据、指标口径和分离验收；同步启动指南、报告模板、流程图及 core 导航。仅流程文档变更，不代表新一轮 Skill 审查或行为评测完成。 (internal)
+- v1.15.3 2026-11-04 03:41:29 kiro: docs(plan): 重写 Skill 优化项目 core/README——文档数由误记的 13 份更正为 17 份，补列 12/DECISION-RULES/DECISION-AUTHORITY/RESOURCE-PLAN；按执行产物实际引用把文档分为「实际起作用」「背景」「未按原设计执行」三类，标注 08 契约方案未采纳、09 路线偏离执行（无工具链、无 A/B 对照）、10/11 未执行，并记录「规则 3 情况 3」误标与总结数字不一致两处待修问题。 (internal)
 - v1.15.3 2026-11-04 03:25:00 zcode: docs(plan): 补充入库 PROJECT-COMPLETION-CHECKLIST（并行产出补扫第二论）。 (internal)
 - v1.15.3 2026-11-04 03:15:00 zcode: docs(plan): 入库自主执行授权指令、监督者评审与工作流状态共8份文档（AUTONOMOUS×2/EXECUTION-SUPPORT/ITERATION 模板与评审/PHASE1 决策分析/FINAL-REPORT-REVIEW/WORKFLOW-COMPLETION-STATUS）；排除 .v2c 本机插件指针与 ignored 运行时目录。 (internal)
 - v1.15.3 2026-11-04 03:00:00 zcode: chore(runtime): owner授权执行 spec-first init 再生8宿主runtime mirror——4处新对账义务 source↔mirror 全部对账1:1（优化正式生效运行时），doctor drift清除；npm pack dry-run 1.15.3/1505文件验证通过，投影管辖套件72/72+smoke绿，零tracked文件变更。 (user-visible)
