@@ -12,10 +12,23 @@ from collections import defaultdict
 import yaml
 
 TRACE_DIR = sys.argv[1] if len(sys.argv) > 1 else "phase0-results/task-flow-traces"
+# 可选：--compare <baseline.json> 输出与基线统计的增量对比（行为验证阶段用）
+BASELINE = None
+if "--compare" in sys.argv:
+    i = sys.argv.index("--compare")
+    with open(sys.argv[i + 1]) as f:
+        BASELINE = json.load(f)
+    sys.argv.pop(i + 1)
+    sys.argv.pop(i)
+    TRACE_DIR = sys.argv[1] if len(sys.argv) > 1 else TRACE_DIR
 # 只统计正式任务追踪（试点 pilot-task-01.yaml 与 task-01.yaml 同内容，排除避免双计）
 FILES = sorted(
     f for f in glob.glob(f"{TRACE_DIR}/task-*.yaml")
 )
+
+def _parse_rate(s):
+    a, b = s.split("/")
+    return int(a)
 
 def main():
     tasks = []
@@ -94,6 +107,22 @@ def main():
         "layer2_affected_tasks": dict(layer2_any),
         "per_task": per_task,
     }
+    if BASELINE is not None:
+        def rate(x, n):
+            return (x / n) if n else 0.0
+        n0, n1 = BASELINE["n_tasks"], result["n_tasks"]
+        cmp_result = {
+            "baseline_n": n0,
+            "current_n": n1,
+            "rework_task_rate": {
+                "baseline": rate(BASELINE["layer3"]["rework_task_rate_parsed"] if "rework_task_rate_parsed" in BASELINE["layer3"] else _parse_rate(BASELINE["layer3"]["rework_task_rate"]), n0),
+                "current": rate(_parse_rate(result["layer3"]["rework_task_rate"]), n1),
+            },
+            "rework_events": {"baseline": BASELINE["layer3"]["rework_events_total"], "current": result["layer3"]["rework_events_total"]},
+            "mechanism_activation": result.get("mechanism_activation", {}),
+        }
+        print("--- compare ---")
+        print(json.dumps(cmp_result, ensure_ascii=False, indent=2))
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 if __name__ == "__main__":

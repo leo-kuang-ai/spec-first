@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-11-04 01:30:00 zcode: feat(validation): analyze-phase0.py 增 --compare 基线对比模式（返工任务率/事件数增量对比），默认输出 md5 不变零回归；触碰面反查 0 管辖套件、盲区=脚本正确性无 repo 测试覆盖（以输出对比验证）。 (internal)
 - v1.15.3 2026-11-04 01:12:00 zcode: docs(plan): 全量自主优化执行收官：4 skill深度审查+评分分级+6项优化独立提交+全量unit 3435/3435绿；对账类缺口统一修复（plan/work/code-review/commit-push-pr五层纵深），行为验证转5任务增量追踪，未宣称模型收益。 (internal)
 - v1.15.3 2026-11-04 00:40:46 zcode: optimize(work): execution-strategy 增 Isolation advisory——存量 dirty 工作区可观且本 run 需干净验证/逐项提交/分支隔离时，向 owner 呈现 spec-worktree 选项及成本风险（不强制、不自动创建、普通 inline 仍免 worktree）；合同测试锁定，9/9 通过。 (user-visible)
 - v1.15.3 2026-11-04 00:39:38 zcode: optimize(code-review): Coverage 段增 Governing contract-suite disclosure——diff 触碰文件被 repo 合同套件按路径断言时逐套记录 run/not-run 状态，not-run 为声明的 coverage 限制（不改 verdict、不由 review 代跑）；合同测试锁定，30/30 通过。 (user-visible)
