@@ -1,0 +1,89 @@
+# T05：runtime-setup P123 优化（U1-U12）与收尾审计
+# 证据：docs/plans/2026-09-11-spec-runtime-setup-p123-optimization-plan.md、
+# docs/validation/runtime-setup-p123-progress.md（U1-U12 单元状态）、
+# d487cf02/10b2460c/24da2ead（CodeGraph 证据边界三次收紧）、3c04708c（收尾审计）、7c6bdd66（收口状态更新）
+
+task_id: "T05"
+task_title: "runtime-setup P1-P3 优化（12 个实施单元）与八宿主收尾审计"
+task_type: "cross_module"
+complexity: "complex"
+calendar_span: "2026-09-11（方案）→ 2026-09-12（实施+修复+验证+收尾，密集单日）"
+
+context:
+  repository: "spec-first"
+  branch: "leo-2026-09-07-update-skills（基线 fb7905d2）"
+  commits:
+    - "d487cf02 / 10b2460c / 24da2ead fix(runtime-setup): CodeGraph 证据边界三次收紧（证据读取+宿主与图绑定+CE 快照绑定）"
+    - "3c04708c 2026-09-12 chore: 完成 runtime-setup P123 收尾审计"
+    - "7c6bdd66 2026-09-12 docs(runtime-setup): 更新 P123 收口状态与验证证据"
+
+workflow:
+  - stage: "1_requirement"
+    evidence_tier: "confirmed"
+    evidence: "docs/plans/2026-09-11-spec-runtime-setup-p123-optimization-plan.md"
+    friction_points: []
+  - stage: "2_plan"
+    evidence_tier: "confirmed"
+    evidence: "同上方案（U1-U12 单元划分）；progress 文档逐单元记录执行边界"
+    friction_points:
+      - id: "FP-T05-1"
+        type: "衔接断裂"
+        severity: "P1"
+        description: "单一 checkout 并行承载多个任务的未提交改动：progress 文档明示'不修改预先存在的 peer runner、handoff、LFG、brand、plugin-sync、CE localization 等其他任务改动'——工作区任务争用，提交隔离靠人工纪律维持"
+        evidence: "runtime-setup-p123-progress.md '执行边界' 一节"
+        attribution: "external_factor(主)：单工作区多任务并行的宿主模式；skill_issue(轻)：无工作区隔离辅助（spec-worktree 存在但未被采用）"
+  - stage: "3_work"
+    evidence_tier: "confirmed"
+    evidence: "progress 文档 U1-U12 分批进展（U1 文案统一、U3 registry v11 readiness_policy、U4 installation/artifact 分离、U11 权限 key、U12 decision health）"
+    friction_points:
+      - id: "FP-T05-2"
+        type: "验证缺失"
+        severity: "P2"
+        description: "CodeGraph/Graphify 证据边界需要连续三次提交收紧（d487cf02→10b2460c→24da2ead）——证据绑定标准在任务进行中演化，初版实现两次不达标"
+        evidence: "三个 fix 提交链"
+        attribution: "skill_issue(轻)+model：证据绑定要求未在首轮实现完整；tooling 反复验证兜底"
+      - id: "FP-T05-3"
+        type: "验证缺失"
+        severity: "P2"
+        description: "U7/U8 联调（实际依赖 digest、Provider identity/receipt currentness）在 progress 阶段未完成；U9/U10（故障/宿主验证、最终收口）当时'未完成'，靠同日收尾审计补齐"
+        evidence: "progress 文档单元状态表"
+        attribution: "external_factor：联调环境依赖；后由 3c04708c 收尾审计闭环"
+  - stage: "4_validation"
+    evidence_tier: "confirmed"
+    evidence: "5 suites 50 tests + entrypoint lint（490 文件）+ U12 反例（缺失/非法 generated_at 误报 pass 复现后修复为 warn）+ 真实 filesystem/git 行为用例 25 tests"
+    friction_points: []
+  - stage: "5_review"
+    evidence_tier: "confirmed"
+    evidence: "3c04708c 收尾审计 + 7c6bdd66 收口状态与验证证据更新"
+    friction_points: []
+  - stage: "6_commit"
+    evidence_tier: "confirmed"
+    evidence: "分批提交，各含 CHANGELOG"
+    friction_points: []
+
+summary:
+  delivered: true
+  merged: true
+  correct: true
+  complete: true      # 收尾审计完成（U7/U8 联调与 U9/U10 由收尾审计闭环）
+  tested: true
+  documented: true
+  rework_count: 1     # 证据边界三次收紧中两次为返工性质（首版不达标）
+  user_intervention_count: null
+  overall_quality: "high（分批证据+反例先行+收尾审计）；工作区并行争用为主要结构性摩擦"
+
+layer_3_metrics: { 端到端正确: true, 端到端返工: true, 用户介入次数: null }
+layer_2_metrics: { 信息丢失: false, 信息重复: false, 验证缺失: true, 衔接断裂: true }
+
+friction_summary:
+  total: 3
+  by_type: { 信息丢失: 0, 信息重复: 0, 验证缺失: 2, 衔接断裂: 1 }
+  by_attribution: { skill_issue: 1.0, model_capability: 0, external_factor: 1.5, tooling_issue: 0.5, none: 0 }
+
+lessons_learned:
+  what_went_well:
+    - "U12 用'先复现反例再修复'（missing/invalid generated_at 误报 pass → warn）"
+    - "progress 文档逐单元诚实状态（部分实施/未完成不冒充完成）"
+  what_could_be_better:
+    - "并行任务共用一个 dirty checkout 的模式应改为 worktree 隔离或按任务串行提交"
+    - "证据绑定标准应在方案轮定义为验收条件，而非实施中三次收紧"

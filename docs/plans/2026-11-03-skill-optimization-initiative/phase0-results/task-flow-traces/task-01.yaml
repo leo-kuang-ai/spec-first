@@ -1,0 +1,172 @@
+# Phase -1 试点任务追踪：onboarding 与 workflow 路由体验
+# 证据来源：git 历史（78b2a3a9/a250a7d7/1bb558e0/59cb4cb1）、PR #57、
+# docs/plans/2026-10-08-001-feat-onboarding-workflow-routing-ux-plan.md、
+# docs/validation/onboarding-workflow-routing-2026-10-09/*、CHANGELOG.md
+# 未使用私有会话 transcript；会话级事实（用户介入次数）标 unknown，不虚构。
+
+task_id: "PILOT-001"
+task_title: "首次上手（onboarding）与 workflow 路由体验优化"
+task_type: "feature_development"
+complexity: "medium"
+calendar_span: "2026-10-08 至 2026-10-26（主体交付 10-08 晚间至 10-09 凌晨；Skill 修复收口延迟至 10-26）"
+agent_trace_time: "约 40 分钟（AI agent 执行；人工口径不可比，仅记录）"
+
+context:
+  repository: "spec-first"
+  branch: "feat/onboarding-workflow-routing-ux"
+  pr_number: 57
+  pr_url: "https://github.com/leo-kuang-ai/spec-first/pull/57"
+  pr_state: "OPEN（未合并；base 为 leo-2026-09-14-audit-plan-v2-hardening，非 main）"
+  commits:
+    - "78b2a3a9 2026-10-09 00:21 docs: 落盘首次上手路由方案（含三角色审查修复）与 Prompt 适配证据修订"
+    - "a250a7d7 2026-10-09 01:09 feat(onboarding): 明确首次任务路径与 workflow 路由"
+    - "1bb558e0 2026-10-09 01:17 fix(release): 校验实际宿主展示并修正变更记录格式"
+    - "59cb4cb1 2026-10-26 fix(routing): 裁决活跃 workflow 执行中失败信号的入口归属并落地三专家复核收尾"
+
+workflow:
+
+  - stage: "1_requirement"
+    skill_used: "spec-brainstorm"
+    evidence: "plan 文档 front-matter：product_contract_source: spec-brainstorm；Product Contract 章节（Problem Frame/Key Decisions/R1-R6）"
+    input:
+      user_request: |
+        （会话原文不可回源）依据 Product Contract Summary 还原：把 onboarding 从
+        "初始化命令列表"改为"当前状态+唯一下一步"引导，把日常入口从 skill 清单
+        改为基于意图与手头产物的路由。
+      context_provided:
+        - "quickstart/init/doctor 现状（CLI 探测、projection 写入、聚合 verified）"
+        - "README 已列 workflow 场景但要求用户先理解完整阶段模型"
+    output:
+      requirement_artifact: "Product Contract（嵌入 plan 文档，R1-R6.2 共 20+ 条需求）"
+      clarifications_recorded_in_plan: true
+    friction_points: []
+
+  - stage: "2_plan"
+    skill_used: "spec-plan（经 LFG 规划入口复核两次）"
+    evidence: "docs/plans/2026-10-08-001-feat-onboarding-workflow-routing-ux-plan.md（519 行，spec-unified-plan/v1）+ Plan Review Record 章节"
+    output:
+      plan_path: "docs/plans/2026-10-08-001-feat-onboarding-workflow-routing-ux-plan.md"
+      units: "U1-U4（init 输出与恢复 / 路由语义 / doctor continuation / README 手册）"
+      verification_contract: "V0-V4 五层证据与退出条件、Implementation Commands、DoD 9 条"
+    review_rounds:
+      - "多角色只读审查（1 轮）→ 补恢复入口、doctor 证据提示、首发宿主门槛、多宿主提示"
+      - "2026-10-09 复核 → 1 P1 + 3 P2 落到 Interface/U3/命令级验证/V3 基线政策"
+      - "三角色隔离审查（coherence/feasibility/design-lens）→ 6 项方案修复（含补入缺失测试文件、U2 场景补 compound 去向、摘要预算上限等）"
+    friction_points:
+      - id: "FP-PLAN-1"
+        type: "信息重复"
+        severity: "P2"
+        description: "方案经历 4 轮审查修正（含 6 项 doc-review 修复），计划文本反复修订后才达到 implementation-ready；审查轮次多但每轮均有可回源 findings"
+        evidence: "plan 文档 Plan Review Record 三段记录 + 78b2a3a9 提交信息"
+        attribution: "skill_issue(部分)：spec-plan 产出首轮即遗漏 U1 缺失测试文件等，需要多轮审查兜底"
+
+  - stage: "3_work"
+    skill_used: "spec-work mode:return-to-caller（plan 文档 LFG 复核记录明确）"
+    evidence: "a250a7d7 变更面：README×3、快速开始手册、using-spec-first SKILL.md + public-route-map.md、doctor.js/init-output.js/init.js/init-i18n.js、8 项验证 fixture"
+    output:
+      files_changed_summary: "CLI 输出改造 + 路由 skill 文本 + 文档 + 验证资产（git show --stat 可复核）"
+      v1_local: "10 个聚焦单测套件 94 项通过；命令级 continuation 3 项；CLI smoke 5 项"
+    friction_points: []
+
+  - stage: "4_validation"
+    skill_used: "（执行验证合同 V2/V3：fresh-source 注入 + 真实宿主隔离项目）"
+    evidence: "docs/validation/onboarding-workflow-routing-2026-10-09/（README、v2-routing.json、timeout-history.json、v3-*-retry.json、source-manifest、final-source-manifest）"
+    output:
+      v2: "14 路由场景全部得到完整结果（Codex 0.161.0 fresh-source）"
+      v3: "隔离 Git 项目 quickstart 选中 Codex；固定示例走 spec-brainstorm、真实任务走 spec-plan，延长超时后两个任务均 turn.completed"
+      honesty_notes: "V3 首次 2 次调用 ETIMEDOUT 不计成功并留档；隔离快照缺 package.json/docs/contracts，规划的项目测试未运行（如实记录）"
+    friction_points:
+      - id: "FP-VAL-1"
+        type: "验证缺失"
+        severity: "P2"
+        description: "V3 首跑 2 次 240s harness 超时（spawnSync codex ETIMEDOUT），延长至 900s 重跑才通过；初始超时预算未按真实宿主耗时校准"
+        evidence: "timeout-history.json 两条记录（16:38:29-16:42:29、16:42:29-16:46:29 UTC）"
+        attribution: "tooling_issue（验证 harness 参数），非 Skill 问题"
+      - id: "FP-VAL-2"
+        type: "验证缺失"
+        severity: "P1"
+        description: "隔离快照缺完整仓库基线 → 方案规划的 npm 测试未在 V3 运行；后续三专家全量 unit 才暴露本分支引入的 2 个断言回归（using-spec-first-contracts 字节预算 4800→5600、readme-community-entry 顺序断言），main 上均通过"
+        evidence: "validation README '三专家测试复核' 一节"
+        attribution: "skill_issue(部分)+model：方案 Verification Contract 明示'全部通过后不重复扩大测试'，聚焦验证策略未覆盖字节预算类全局回归；全量运行兜底在专家轮才发生"
+
+  - stage: "5_review"
+    skill_used: "独立只读 reviewer（八视角）+ 三专家测试复核 + ZCode V2 followup（fresh subagent 盲判）"
+    evidence: "validation README '独立审查与收口' 与 '三专家测试复核' 两节；v2-routing-zcode-followup.json"
+    output:
+      independent_review: "27 文件；1 项 P2（confirmed workspace 子仓 projection 异常误提升为主行动）已修复并补真实 Git 子仓新进程测试"
+      three_expert: "全链路复跑 6 条命令通过；修复 2 断言回归后全量 unit 240 套件 3024 项通过"
+      adversarial: "取消测试做受控变异验证（confirm 强制 true）确认灵敏度"
+    friction_points:
+      - id: "FP-REV-1"
+        type: "衔接断裂"
+        severity: "P1"
+        description: "S5 场景（活跃 spec-work 内出现失败信号）被误路由到 spec-debug：AGENTS.md 入口硬规则与 skill owner 连续性条款字面冲突，U2 新增文本未给裁决；ZCode 8 场景 7 通过 1 失败"
+        evidence: "v2-routing-zcode-followup.json S5 记录 + README 逐项优化轮"
+        attribution: "skill_issue：路由规则文本缺口（真 Layer 1 缺陷，被 fresh-source 评测捕获）"
+      - id: "FP-REV-2"
+        type: "验证缺失"
+        severity: "P1"
+        description: "测试环境污染：brand-presentation.test.js（既有测试）每次运行把测试身份写入真实 ~/.spec-first/.developer（os.homedir 与 jest mock 双重穿透）；本轮全量运行已实际覆盖该文件（不可回滚），变异验证时 ~/.claude/CLAUDE.md 亦被插入 managed block"
+        evidence: "validation README '测试环境污染发现与修复' 一节"
+        attribution: "tooling_issue（既有测试基建缺陷，非本任务引入，但被本任务全量运行触发实际副作用）"
+
+  - stage: "6_commit_pr"
+    skill_used: "LFG 提交与 PR 门禁（plan 文档 LFG 复核记录明确）"
+    evidence: "3 个提交 + PR #57（2026-10-09 01:10 创建，OPEN）"
+    friction_points:
+      - id: "FP-CICD-1"
+        type: "衔接断裂"
+        severity: "P1"
+        description: "PR #57 首次 CI 误阻断：release continuity 检查仍搜索硬编码 'OpenCode preview'，而 brand.js 已改为 registry 动态生成；本地复现后改为检查实际品牌输出，补正负例单测（1bb558e0）"
+        evidence: "validation README PR #57 段 + 1bb558e0（含 tests/unit/release-continuity-opencode.test.js 新增 21 行）"
+        attribution: "tooling_issue（基线发布检查未随 brand 动态化同步更新的存量债，非 Skill 问题）"
+      - id: "FP-CICD-2"
+        type: "衔接断裂"
+        severity: "P2"
+        description: "修复延迟落地：S5 裁决修复与三专家收尾直到 2026-10-26（59cb4cb1）才提交，距发现 17 天；期间以工作区未提交状态存在（README 记录'待 owner 审阅'）；PR #57 至今未合并且不含该修复"
+        evidence: "59cb4cb1 提交日期 + PR #57 state=OPEN + README 'P1#5 说明性处置'"
+        attribution: "external_factor（owner 审阅/提交节奏），流程上无机制强制收口时限"
+
+summary:
+  delivered: true          # 代码+文档+验证资产已提交到分支
+  merged: false            # PR #57 OPEN，未合入 base
+  correct: true            # 经 1 项 P2、2 断言回归、S5 修复后正确；3024 项 unit 通过
+  complete: true           # 对照 DoD：本地实现完成 + V3 双任务满足 R2.2/R2.5/R2.6；V4 人工试用 not_run（如实标注）
+  tested: true             # V1 聚焦+命令级+smoke；V2 14 场景；V3 真实宿主双任务；全量 unit
+  documented: true
+  rework_count: 3          # ① CI release 连续性修复(1bb558e0) ② 2 断言回归修复 ③ S5 误路由修复(59cb4cb1)；均为初版实现提交后的返工
+  user_intervention_count: null  # unknown：无会话 transcript 证据，不虚构
+  overall_quality: "high（证据文化强：超时留档、not_run 如实标注、受控变异验证）；但收口延迟与 3 次返工真实存在"
+
+layer_3_metrics:
+  端到端正确: true          # 最终正确（含修复后）
+  端到端返工: true          # rework_count=3 > 0
+  用户介入次数: null        # unknown
+
+layer_2_metrics:
+  信息丢失: false           # 未发现（Product Contract→Plan→Work 链路完整可回源）
+  信息重复: false           # FP-PLAN-1 属审查轮次冗余，非跨阶段信息重复
+  验证缺失: true            # FP-VAL-1/FP-VAL-2
+  衔接断裂: true            # FP-REV-1/FP-CICD-1/FP-CICD-2
+
+layer_1_findings:
+  - skill: "spec-plan"
+    issue: "验证范围策略（聚焦优先、'不重复扩大测试'）未提示字节预算类全局回归的盲区，2 个断言回归靠专家全量运行兜底"
+  - skill: "using-spec-first(+AGENTS.md 入口规则)"
+    issue: "入口硬规则与 owner 连续性条款字面冲突无裁决句（S5），已修复并加静态护栏测试防稀释"
+
+friction_summary:
+  total: 7
+  by_type: { 信息丢失: 0, 信息重复: 1, 验证缺失: 3, 衔接断裂: 3 }
+  by_attribution: { skill_issue: 2.5, tooling_issue: 2.5, model_capability: 0.5, external_factor: 1, none: 0.5 }
+  # 半票：FP-VAL-2 记 skill+model 各半；FP-CICD-1 记 tooling；FP-REV-2 tooling；FP-PLAN-1 skill
+
+lessons_learned:
+  what_went_well:
+    - "Verification Contract V0-V4 分层证据在真实执行中被完整履行且诚实标注 not_run"
+    - "fresh-source 评测捕获了纯靠人工审查难发现的规则字面冲突（S5）"
+    - "受控变异验证测试灵敏度是可复用手法"
+  what_could_be_better:
+    - "方案级验证范围应显式评估'聚焦测试的盲区类型'（全局预算/顺序断言）"
+    - "跨会话收口缺机制：修复在工作区滞留 17 天、PR 长期 OPEN 无跟踪"
+    - "验证 harness 超时参数未先校准；隔离快照应包含跑通规划测试所需的仓库基线"

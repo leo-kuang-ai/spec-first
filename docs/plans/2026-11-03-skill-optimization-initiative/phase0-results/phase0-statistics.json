@@ -1,0 +1,103 @@
+{
+  "n_tasks": 9,
+  "total_friction_points": 28,
+  "friction_by_type": {
+    "信息重复": 3.0,
+    "验证缺失": 13.0,
+    "衔接断裂": 12.0,
+    "信息丢失": 0.0
+  },
+  "friction_by_severity": {
+    "P2": 17.0,
+    "P1": 11.0
+  },
+  "friction_by_attribution": {
+    "skill_issue": 10.5,
+    "tooling_issue": 7.0,
+    "model_capability": 2.0,
+    "external_factor": 8.0,
+    "none": 0.5
+  },
+  "task_incidence_by_type": {
+    "信息重复": "3/9",
+    "验证缺失": "6/9",
+    "衔接断裂": "8/9"
+  },
+  "layer3": {
+    "correct_rate": "9/9",
+    "rework_task_rate": "6/9",
+    "rework_events_total": 9,
+    "user_intervention_measurable": "2/9",
+    "user_intervention_sum": 2
+  },
+  "layer2_affected_tasks": {
+    "验证缺失": 6,
+    "衔接断裂": 8,
+    "信息重复": 2
+  },
+  "per_task": [
+    {
+      "task": "PILOT-001",
+      "type": "feature_development",
+      "friction": 7,
+      "rework": 3,
+      "correct": true
+    },
+    {
+      "task": "T02",
+      "type": "feature_development",
+      "friction": 1,
+      "rework": 0,
+      "correct": true
+    },
+    {
+      "task": "T03",
+      "type": "feature_development",
+      "friction": 3,
+      "rework": 1,
+      "correct": true
+    },
+    {
+      "task": "T04",
+      "type": "cross_module",
+      "friction": 5,
+      "rework": 2,
+      "correct": true
+    },
+    {
+      "task": "T05",
+      "type": "cross_module",
+      "friction": 3,
+      "rework": 1,
+      "correct": true
+    },
+    {
+      "task": "T06",
+      "type": "bug_fix",
+      "friction": 1,
+      "rework": 0,
+      "correct": true
+    },
+    {
+      "task": "T07",
+      "type": "bug_fix",
+      "friction": 2,
+      "rework": 0,
+      "correct": true
+    },
+    {
+      "task": "T10",
+      "type": "cross_session",
+      "friction": 3,
+      "rework": 1,
+      "correct": true
+    },
+    {
+      "task": "T11",
+      "type": "cross_session",
+      "friction": 3,
+      "rework": 1,
+      "correct": true
+    }
+  ]
+}

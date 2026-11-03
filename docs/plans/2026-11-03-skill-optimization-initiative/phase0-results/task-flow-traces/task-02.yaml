@@ -1,0 +1,75 @@
+# T02：runtime-setup 八宿主隔离初始化验证 + SIGINT 重入探针
+# 证据：bb4f0219（2026-09-12 21:07）、1502a75c（2026-09-12 21:42）、
+# docs/validation/.../cross-host-isolated-init-2026-09-12.json（64 行证据）
+# 关联：P123 优化任务（task-05）同日会话的独立验证交付，边界已注明，摩擦不重复计数
+
+task_id: "T02"
+task_title: "runtime-setup 八宿主隔离初始化验证与 SIGINT 重入探针"
+task_type: "feature_development"
+complexity: "simple"
+calendar_span: "2026-09-12（单日，2 个提交）"
+
+context:
+  repository: "spec-first"
+  branch: "leo-2026-09-07-update-skills"
+  commits:
+    - "bb4f0219 2026-09-12 21:07 test(runtime-setup): 增加顶层 SIGINT 重入探针（45 行集成测试）"
+    - "1502a75c 2026-09-12 21:42 test(runtime-setup): 记录八宿主隔离初始化验证（64 行 JSON 证据）"
+
+workflow:
+  - stage: "1_requirement"
+    evidence_tier: "inferred"
+    evidence: "P123 任务（docs/plans/2026-09-11-spec-runtime-setup-p123-optimization-plan.md）的验证需求；U9（故障/宿主验证）在当时状态为'未完成'"
+    output: { requirement: "验证八宿主隔离初始化行为与 SIGINT 中断重入健壮性" }
+    friction_points: []
+  - stage: "2_plan"
+    evidence_tier: "inferred"
+    evidence: "无独立 plan 文档；作为 P123 验证收尾的一部分直接执行"
+    output: { plan: "探针测试 + 隔离验证证据落盘" }
+    friction_points:
+      - id: "FP-T02-1"
+        type: "衔接断裂"
+        severity: "P2"
+        description: "验证交付无独立方案记录，依赖 P123 主任务上下文；单独回溯时需求侧证据为 inferred"
+        evidence: "两提交均无对应独立 plan/requirement 文档"
+        attribution: "skill_issue(轻)：小交付沿用主任务上下文，缺少最小独立记录"
+  - stage: "3_work"
+    evidence_tier: "confirmed"
+    skill_used: "inferred（测试编写，未记录具体 skill 调用）"
+    evidence: "bb4f0219 新增 runtime-setup-sigint-recovery.integration.test.js（45 行）"
+    friction_points: []
+  - stage: "4_validation"
+    evidence_tier: "confirmed"
+    evidence: "1502a75c 落盘 cross-host-isolated-init-2026-09-12.json（八宿主隔离初始化验证结果）"
+    friction_points: []
+  - stage: "5_review"
+    evidence_tier: "unknown"
+    evidence: "无独立审查记录；推断由 P123 收尾审计（3c04708c）覆盖"
+    friction_points: []
+  - stage: "6_commit"
+    evidence_tier: "confirmed"
+    evidence: "两个独立提交，各含 CHANGELOG 条目"
+    friction_points: []
+
+summary:
+  delivered: true
+  merged: true   # 随分支链合入
+  correct: true
+  complete: true
+  tested: true
+  documented: true
+  rework_count: 0
+  user_intervention_count: null  # unknown：无会话证据
+  overall_quality: "high（小而干净的验证交付）"
+
+layer_3_metrics: { 端到端正确: true, 端到端返工: false, 用户介入次数: null }
+layer_2_metrics: { 信息丢失: false, 信息重复: false, 验证缺失: false, 衔接断裂: true }
+
+friction_summary:
+  total: 1
+  by_type: { 信息丢失: 0, 信息重复: 0, 验证缺失: 0, 衔接断裂: 1 }
+  by_attribution: { skill_issue: 1, model_capability: 0, external_factor: 0, tooling_issue: 0, none: 0 }
+
+lessons_learned:
+  what_went_well: ["验证证据独立落盘为 JSON artifact，可回源"]
+  what_could_be_better: ["小交付应有最小独立需求/方案记录（哪怕三行），否则回溯只能 inferred"]

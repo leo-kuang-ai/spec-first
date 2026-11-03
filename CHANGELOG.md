@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-11-03 zcode: docs(plan): 完成Skill优化项目Phase -1试点与Phase 0数据收集：9个真实任务回溯追踪、28个证据化阻力点与确定性统计脚本聚合；5启动条件2/5满足，决策退出条件3（不启动全量Phase 1），给出≤20h流程/工具链有界试点与重估条件；用户介入指标回溯不可测已如实标注，未修改任何Skill。 (internal)
 - v1.15.3 2026-11-03 codex: docs(research): 保存AI任务交代六项框架、可复制模板及执行验收实践，补充官方来源和研究导航；保留OpenAI/Google未核验及实际效果未测边界。 (internal)
 - v1.15.3 2026-11-03 codex: docs(review): 保存Skill优化项目最终审查结论，明确已有源码基线、六类实施问题、最小验证顺序与证据失效条件；保留新增10/11文档未审及真实模型收益未验证边界，未实施优化或刷新runtime。 (internal)
 - v1.15.3 2026-11-03 codex: docs(plan): 建立38个Skill执行台账与PRD→Plan→可选Tasks→Work→Review源码基线，合并23个候选编号并记录来源hash、8组95项本地合同检查；同步入口和分层进度，保留真实任务与模型效果未验证边界，未修改Skill或刷新runtime。 (internal)
