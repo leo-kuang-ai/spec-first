@@ -1,4 +1,9 @@
 # Changelog
+- v1.15.3 2026-11-03 codex: docs(research): 保存AI任务交代六项框架、可复制模板及执行验收实践，补充官方来源和研究导航；保留OpenAI/Google未核验及实际效果未测边界。 (internal)
+- v1.15.3 2026-11-03 codex: docs(review): 保存Skill优化项目最终审查结论，明确已有源码基线、六类实施问题、最小验证顺序与证据失效条件；保留新增10/11文档未审及真实模型收益未验证边界，未实施优化或刷新runtime。 (internal)
+- v1.15.3 2026-11-03 codex: docs(plan): 建立38个Skill执行台账与PRD→Plan→可选Tasks→Work→Review源码基线，合并23个候选编号并记录来源hash、8组95项本地合同检查；同步入口和分层进度，保留真实任务与模型效果未验证边界，未修改Skill或刷新runtime。 (internal)
+- v1.15.3 2026-11-03 codex: docs(plan): 按用户新范围将优化扩展为24个研发Skill体系，以五类任务和跨阶段交接组织调查；统一既有方案入口，保留零新增付费与真实验证边界，未宣称Skill优化完成。 (internal)
+- v1.15.3 2026-11-03 codex: docs(plan): 按审查补齐Skill优化候选隔离与推广门、最小实验卡、调查顺序与验证依赖、证据版本绑定；统一受阻续行规则，未实施Skill变更或启动评测。 (internal)
 - v1.15.3 2026-11-03 codex: docs(plan): 为Skill优化方案补充12项顺序、范围、边界、验收与逐项记录规则；完成spec-plan C1首次准入核查，因缺当前读取/residency证据保留pending-evidence，未修改Skill或宣称收益。 (internal)
 - v1.15.3 2026-11-03 codex: docs(research): 保存结合官方实践的Skill优化建议，明确行为回归、触发准确性、上下文负载与风险分级优先级；保留OpenAI文档未核验和效果待实验边界，未修改Skill或运行评测。 (internal)
 - v1.15.3 2026-11-02 codex: fix(refresh-eval): S15固定判据补检assume-unchanged与skip-worktree，两个漏检反例修复前失败、修复后通过；S15/S08共32项校准及独立源码复核通过，不外推模型行为。 (internal)
