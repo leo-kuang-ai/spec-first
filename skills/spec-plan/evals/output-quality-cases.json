@@ -569,6 +569,26 @@
       "expected_outcome": "Units and plan-level commands reconcile before write; no unit-level verification is left implicit for the implementer to rediscover.",
       "evidence_status": "file-backed fixture",
       "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "prd-plan-handoff-source-resolved",
+      "input": "Enrich a requirements-only unified plan whose load-bearing branches are all source-resolved (Canonical stop 2); no owner interview is needed.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/plan-handoff.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The enriching run rewrites or normalizes the upstream Product Contract region instead of preserving it byte-for-byte, or buries planning additions inside it."
+      ],
+      "with_skill_expectations": [
+        "The Product Contract region stays byte-for-byte preserved and planning additions (Planning Contract, Implementation Units, Verification Contract, Definition of Done) land outside it.",
+        "No owner question is asked for branches already closed by source evidence; the run records the source-resolved trace instead of re-interviewing."
+      ],
+      "objective_assertions": [
+        "A diff of the artifact shows zero byte changes inside the Product Contract region and all new content in the planning-owned sections."
+      ],
+      "expected_outcome": "The requirements-only artifact enriches to implementation-ready without mutating the upstream product truth.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
     }
   ]
 }
