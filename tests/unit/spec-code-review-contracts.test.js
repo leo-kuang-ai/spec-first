@@ -609,3 +609,13 @@ describe('spec-code-review current contracts', () => {
     expect(structuralComplexity.forbidden).toContain('Duplicate pure structural complexity as a frontend-quality finding');
   });
 });
+
+test('coverage discloses governing contract-suite status for touched files', () => {
+  const finish = require('node:fs').readFileSync(
+    require('node:path').join(__dirname, '../../skills/spec-code-review/references/finish-review.md'),
+    'utf8'
+  );
+  expect(finish).toContain('**Governing contract-suite disclosure:**');
+  expect(finish).toContain('record each governing suite as run or not-run');
+  expect(finish).toContain('a stated coverage limitation, not a verdict change');
+});
