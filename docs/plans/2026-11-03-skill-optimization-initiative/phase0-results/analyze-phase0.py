@@ -57,16 +57,12 @@ def main():
             by_type[fp["type"]] += 1
             by_sev[fp.get("severity", "?")] += 1
             type_task_incidence[fp["type"]].add(t["task_id"])
-            for k, v in fp.get("attribution", {}).items() if isinstance(fp.get("attribution"), dict) else []:
-                pass  # attribution 是文本，不在此拆
         fs = t.get("friction_summary", {})
         # 计数一致性校验
         declared = fs.get("total")
         if declared != n:
             print(f"ERROR: {t['_file']} friction total {declared} != 实际 {n}", file=sys.stderr)
             sys.exit(1)
-        for k, v in fs.get("by_type", {}).items():
-            by_type[k] += 0  # 已在上面按条目计
         for k, v in fs.get("by_attribution", {}).items():
             by_attr[k] += float(v)
         l3 = t.get("layer_3_metrics", {})
