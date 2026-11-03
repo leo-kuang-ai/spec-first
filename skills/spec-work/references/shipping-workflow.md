@@ -51,7 +51,7 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
      --json
    ```
 
-   `verification-profile` 只准备候选 checks 与工具事实，不执行命令，也不判断哪些 checks 在语义上充分。LLM 根据 active instructions、plan requirements、changed surface 与项目脚本选择最终 checks；计划、profile 或文档里出现过的命令只是 candidate，未实际执行的 planned command 不是 run evidence，更不能标为 `passed`。check 选择至少覆盖两类来源：plan/task 声明的命令，以及按 touched paths 在测试目录反查命中的管辖合同套件（governance、byte-budget、ordering、projection 类，见 `feedback-and-tests.md` Test Discovery 第 3 步）。
+   `verification-profile` 只准备候选 checks 与工具事实，不执行命令，也不判断哪些 checks 在语义上充分。LLM 根据 active instructions、plan requirements、changed surface 与项目脚本选择最终 checks；计划、profile 或文档里出现过的命令只是 candidate，未实际执行的 planned command 不是 run evidence，更不能标为 `passed`。check 选择至少覆盖两类来源：plan/task 声明的命令，以及按 touched paths 在测试目录反查命中的管辖合同套件（governance、byte-budget、ordering、projection 类，见 `feedback-and-tests.md` Test Discovery 第 3 步）。CHANGELOG、版本文件或发布检查相关文件被触碰时，release 治理套件（如本仓 `npm run test:release:governance`）同样必须进入候选——CI 通常会在 PR 上强制执行它们，本地缺跑会把发现推迟成一次返工往返。
 
    预留 repo-local run root：`.spec-first/workflows/spec-work/<workspace-slug>/<run-id>/`。此时不要提前调用 `verification-run-summary record`：后续 simplify/review fix 可能改变代码，最终 summary 只能转录所有 mutation 结束后的真实结果。
 

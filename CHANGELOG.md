@@ -1,4 +1,5 @@
 # Changelog
+- v1.15.3 2026-11-04 zcode: optimize(work): shipping check 选择补第三类来源——CHANGELOG/版本/发布检查文件被触碰时 release 治理套件（npm run test:release:governance）必须进入候选，防止 CI 强制检查的返工往返；合同测试同步锁定。 (user-visible)
 - v1.15.3 2026-11-04 zcode: optimize(work): Test Discovery 新增按断言目标反查步（touched paths 于 tests/ 反查管辖合同套件，覆盖不 import 目标文件的 governance/byte-budget/ordering/projection 合同），shipping check 选择补同类来源枚举；5 套件 53 项与入口 lint 通过，模型行为收益待增量追踪。 (user-visible)
 - v1.15.3 2026-11-04 zcode: optimize(plan): 修复S系列未覆盖的对账类缺口——final-review 5.1 新增跨集合对账检查（单元↔计划级命令、触碰面↔既有repo合同测试），Verification Contract 增管辖合同测试列举与盲区句义务，附2个eval案例与合同测试锁定；三项38项套件与入口lint通过，模型行为收益待增量追踪验证。 (user-visible)
 - v1.15.3 2026-11-03 zcode: docs(plan): 完成 Phase 0.5 spec-plan 深度解读：源码四门质量系统确认，doc-review 轮修正为设计内成本（T06 归因纠错），T01 两项精确定位为自审清单缺单元↔命令、触碰面↔既有合同测试两条对账义务；归因修正 skill 37.5%→32.1%，退出条件 3 强化；设计 P0 方案（4h：final-review/plan-sections 增对账义务+合同测试+2 eval 案例）待确认，未修改 Skill。 (internal)

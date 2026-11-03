@@ -198,4 +198,6 @@ test('test discovery reverse-looks-up contract suites by asserted target', () =>
   expect(feedback).toContain('常不 import 目标文件');
   expect(feedback).toContain('命中的套件纳入本次 check 选择');
   expect(shipping).toContain('按 touched paths 在测试目录反查命中的管辖合同套件');
+  expect(shipping).toContain('release 治理套件');
+  expect(shipping).toContain('test:release:governance');
 });
