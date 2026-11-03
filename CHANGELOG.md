@@ -1,4 +1,6 @@
 # Changelog
+- v1.15.3 2026-11-03 codex: docs(plan): 为Skill优化方案补充12项顺序、范围、边界、验收与逐项记录规则；完成spec-plan C1首次准入核查，因缺当前读取/residency证据保留pending-evidence，未修改Skill或宣称收益。 (internal)
+- v1.15.3 2026-11-03 codex: docs(research): 保存结合官方实践的Skill优化建议，明确行为回归、触发准确性、上下文负载与风险分级优先级；保留OpenAI文档未核验和效果待实验边界，未修改Skill或运行评测。 (internal)
 - v1.15.3 2026-11-02 codex: fix(refresh-eval): S15固定判据补检assume-unchanged与skip-worktree，两个漏检反例修复前失败、修复后通过；S15/S08共32项校准及独立源码复核通过，不外推模型行为。 (internal)
 - v1.15.3 2026-11-02 codex: test(compound): S08假因果材料接入可执行认证/重试反事实fixture与独立判据；12项正反例校准及6例配置加载通过，实际模型知识判断未测。 (internal)
 - v1.15.3 2026-11-02 codex: test(refresh): S15接入误删保护、partial报告及恢复发布三例，新增固定文件/Git基线判据；18项正反例校准、4例配置及独立复核通过，模型行为和真实故障顺序未测。 (internal)
