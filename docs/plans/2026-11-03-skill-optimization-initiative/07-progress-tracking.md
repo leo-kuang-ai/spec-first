@@ -7,7 +7,7 @@ Owner：当前项目负责人
 
 ## 执行台账与主链路基线（本轮完成）
 
-当前源码范围与逐项状态见 [38 项执行台账](07-skill-execution-ledger.md)，主链路依据见 [源码/合同基线](08-mainline-baseline.md)。
+当前源码范围与逐项状态见 [38 项执行台账](archive/07-skill-execution-ledger.md)，主链路依据见 [源码/合同基线](06-mainline-baseline.md)。
 
 | 工作项 | 状态 | 已取得的证据 |
 |---|---|---|

@@ -21,7 +21,7 @@
 
 #### 1. Phase 0 执行文档（3→1）
 
-**合并到**：`EXECUTION-CHECKLIST.md`
+**合并到**：`02-execution-checklist.md`
 
 **已归档**：
 - `QUICK-START.md` → 合并到第 1 部分（快速开始）
@@ -36,7 +36,7 @@
 
 #### 3. 执行台账（2→1）
 
-**合并到**：`progress-tracking.md`
+**合并到**：`07-progress-tracking.md`
 
 **已归档**：
 - `07-skill-execution-ledger.md`
@@ -45,23 +45,24 @@
 
 ## 合并后的文档结构（10 个）
 
-### 立即执行层（2 个）
-1. ✅ **EXECUTION-CHECKLIST.md**（25K）- 统一执行清单
+### 立即执行层（3 个）
+1. ✅ **README.md**（12K）- 项目入口
 2. ✅ **00-goals-and-success-criteria.md**（9.6K）- 目标与标准
+3. ✅ **02-execution-checklist.md**（25K）- 统一执行清单
 
-### 核心方法论层（2 个）
-3. ✅ **README.md**（12K）- 项目入口
+### 核心方法论层（1 个）
 4. ✅ **01-v4-workflow-driven-approach.md**（16K）- v4 主方案
 
 ### 参考层（4 个）
 5. ✅ **03-optimization-candidates.md**（7.3K）- 20 个候选项
 6. ✅ **04-dev-lifecycle-full-analysis.md**（15K）- 研发流程分析
-7. ✅ **06-optimization-dimensions-with-trends.md**（19K）- 8 大优化维度
-8. ✅ **08-mainline-baseline.md**（14K）- 主链路基线
+7. ✅ **05-optimization-dimensions-with-trends.md**（19K）- 8 大优化维度
+8. ✅ **06-mainline-baseline.md**（14K）- 主链路基线
 
-### 日常层（2 个）
-9. ✅ **progress-tracking.md**（7.9K）- 进度跟踪（含执行台账）
-10. ✅ **REVIEW-REPORT.md**（12K）- 审查报告
+### 日常层（3 个）
+9. ✅ **07-progress-tracking.md**（7.9K）- 进度跟踪（含执行台账）
+10. ✅ **REVIEW-REPORT.md**（12K）- 文档审查报告
+11. ✅ **MERGE-COMPLETE-REPORT.md**（本文件）- 合并完成报告
 
 ---
 
@@ -83,7 +84,7 @@
 
 ```bash
 # 阅读统一执行清单
-cat EXECUTION-CHECKLIST.md
+cat 02-execution-checklist.md
 
 # 查看最近任务
 cd /Users/kuang/xiaobu/spec-first
@@ -101,7 +102,7 @@ cat 00-goals-and-success-criteria.md
 
 ```bash
 # 查看进度跟踪
-cat progress-tracking.md
+cat 07-progress-tracking.md
 ```
 
 ---
@@ -126,7 +127,7 @@ cat progress-tracking.md
 ✅ 文档合并已完成，可立即启动 Phase 0
 
 **立即可做**：
-1. 阅读 `EXECUTION-CHECKLIST.md`（统一执行清单）
+1. 阅读 `02-execution-checklist.md`（统一执行清单）
 2. 选择 11 个代表性真实任务
 3. 开始追踪第一个任务流程
 
