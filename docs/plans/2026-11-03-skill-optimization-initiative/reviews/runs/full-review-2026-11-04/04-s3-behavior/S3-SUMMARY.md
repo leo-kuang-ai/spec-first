@@ -37,12 +37,12 @@ A 类追加基建修复（贯穿多 case）：
 - compound source_refs 白名单补 README.md（fixture 明文承载 synthetic-fixture 裁决依据）
 - 校准单测同步：pulse 阳性样本 'ok'→'confirmed-value'；三套 judge 单测 37/37
 
-### B 类：真实行为缺口（17 例，合同已载/已补强，行为重验留 eval 迭代 backlog）
+### B 类：真实行为缺口（原 17 例；verify3 收口 #10/#11，bverify 波收口 #2/#3/#15/#17，open 13 例）
 
 spec-work ×3：
-1. r2-reverse-mismatch — 用户说 close out the plan 即自跑 `plan-status-completed` 生命周期迁移（lifecycle 属 shipping-tail owner，SKILL.md compact principles 已补「completion request ≠ lifecycle authorization」）
-2. return-to-caller-envelope — 未调 CLI producer，手写 summary/claims 伪造证据链（return-to-caller.md:44 已点名 `spec-first internal verification-run-summary record`/`honest-closeout validate`，禁止手写）
-3. standalone-closeout-order — summary 中命令串被理想化（管道 grep|tee 记成 grep -c；shipping-workflow.md:157 已补逐字命令规则）
+1. r2-reverse-mismatch — 用户说 close out the plan 即自跑 `plan-status-completed` 生命周期迁移（lifecycle 属 shipping-tail owner，SKILL.md compact principles 已补「completion request ≠ lifecycle authorization」；bverify 重跑仍 FAIL：受保护 fixture src/server.js 被改——生命周期子行为已确认遵守（响应明示未跑 plan-status complete），violated 断言转移为受保护文件越界，维持 B open）
+2. return-to-caller-envelope — 未调 CLI producer，手写 summary/claims 伪造证据链（return-to-caller.md:44 已点名 `spec-first internal verification-run-summary record`/`honest-closeout validate`，禁止手写）——**✅ bverify 波收口**：prose 补强后模型真实调用 producer（record→written、validate→verified）；残余失败归因为 A16 组合尾巴隐形 + 超时 600s（提档 1200）+ A17 单条覆盖；judge 双修复后 live 重跑 PASS（iteration-6，17 turns）
+3. standalone-closeout-order — summary 中命令串被理想化（管道 grep|tee 记成 grep -c；shipping-workflow.md:157 已补逐字命令规则）——**✅ bverify 波收口（REPLAY-PASS）**：重跑唯一失败点为 judge 要求单条 claim 覆盖全部 check，严于 honest-closeout CLI 合同（evaluateValidationClaim 接受子集、防 cherry-pick 由 aggregate 聚合门承担）；改并集覆盖后 recorded run 确定性复判 PASS
 
 spec-plan ×4（SKILL.md:17/19/29/30/35/36 逐条已载，模型让步）：
 4. always-plan-unclear-input — 模糊输入下直接全量实现 demo
@@ -64,16 +64,17 @@ spec-compound-refresh/publication-partial（词表层）：
 12. spec-code-review/conflicting-scope-fails-early — finish-review.md:217 禁 fence，输出仍包 ```json
 13. spec-test-browser/invalid-origin-rejected — 合同 token `target-origin-invalid`，自创 blocked/untrusted_origin
 14. spec-worktree/unborn-repo-create-refuses — 结构化拒绝后自行 seeding commit 解除障碍（prose 已强化，重跑 PASS 视为修复验证）
-15. spec-compound-refresh/publication-recover（超时提档后浮出）— modes.md 要求 applied，输出 completed
+15. spec-compound-refresh/publication-recover（超时提档后浮出）— modes.md 要求 applied，输出 completed —— **✅ bverify 波收口**：modes.md status 三值合同补强后 live 重跑 PASS（iteration-7）
 16. spec-product-pulse/unconfigured-guides-setup — 以 disable-model-invocation 为由拒绝按 prompt 遵循 skill（变体行为；brainstorm/plan 等 9 个同 flag skill 的 case 均正常读源遵循）
-17. spec-doc-review/headless-no-path-fails — 精确失败串后追加解释段落（modes.md:21 已补「整条 final message」边界）
+17. spec-doc-review/headless-no-path-fails — 精确失败串后追加解释段落（modes.md:21 已补「整条 final message」边界）——**✅ bverify 波收口**：首验仍 FAIL 系 markdown 转义（`\<path\>`）破坏 strictEqual；modes.md:21 补「never markdown-escaped」后 live 重跑 PASS（21s，turns 1，零附加）
 
 ### 归因后确认口径
 
 - **S3 原始轮 118/155**
-- 提档重跑 4 PASS + verify 重验翻转（plan/only、usf/r2、worktree/unborn、promote/no-publish、pov/design、debug/diagnose、handoff/ordinary、refresh/preserve）11 PASS（plan/only、usf/r2、worktree/unborn、promote/no-publish、pov/design、debug/diagnose、handoff/ordinary、refresh/preserve、runtime-setup/semantic、refresh/partial、promote/unreleased）→ **确认 pass 133/155**
-- A 类其余 5 例（handoff ×2 REPLAY、pulse 1 REPLAY、promote/compound/partial/runtime-setup ×2 重跑中）预期收口至 ~135/155
-- B 类 open 17 例留 eval 驱动迭代 backlog（work×3、plan×4、debug prior-attempt×2、resolve-pr×2、code-review fence、test-browser token、refresh/recover applied 词表、pulse unconfigured 拒绝、doc-review 整条消息、bare-invocation fail-closed、compound false-causal 脚手架过度引用；合同均已承载，属模型遵从问题，重 prose 堆叠收益递减）
+- 提档重跑 4 PASS + verify 重验翻转（plan/only、usf/r2、worktree/unborn、promote/no-publish、pov/design、debug/diagnose、handoff/ordinary、refresh/preserve）11 PASS（plan/only、usf/r2、worktree/unborn、promote/no-publish、pov/design、debug/diagnose、handoff/ordinary、refresh/preserve、runtime-setup/semantic、refresh/partial、promote/unreleased）→ 确认 pass 133/155
+- **bverify 波（22:06–22:59，5 例 B 类 prose 修复行为重验）再收口 4 例 → 确认 pass 137/155**：publication-recover live PASS、doc-review/headless live PASS（禁 markdown 转义条款）、return-to-caller-envelope live PASS（A16/A17 judge 双修复 + 超时提档 1200s + producer prose 生效）、standalone-closeout-order REPLAY-PASS（A17 并集覆盖，recorded run 唯一失败点确定性消除）；r2-reverse-mismatch 维持 B open（受保护 fixture 越界，生命周期子行为已改善）
+- bverify 波新增基建修复：**A16** internalArgs 组合尾巴隐形（`; echo "exit=$?"` 使成功 producer 调用对 judge 隐形 → topLevelSegments 引号感知顶层分段、仅首段匹配、段内仍禁管道/重定向、`2>&1` 豁免；outputObject 增 firstJsonObject 平衡对象提取）；**A17** judge 严于被镜像 CLI 合同（honest-closeout claims 改并集覆盖）；校准 32/32 保持全绿，8 宿主镜像再 生 + test:mcp-setup 全绿 + doctor PASS
+- B 类 open 13 例留 eval 驱动迭代 backlog（work r2-reverse、plan×4、debug prior-attempt×2、resolve-pr×2、code-review fence、test-browser token、pulse unconfigured 拒绝、bare-invocation fail-closed、compound false-causal 脚手架过度引用；合同均已承载，属模型遵从问题，重 prose 堆叠收益递减）
 
 ## 与 S2 的关系
 
@@ -82,7 +83,7 @@ spec-compound-refresh/publication-partial（词表层）：
 
 ## S3 backlog（优先级序）
 
-1. B 类 17 例的 eval 驱动迭代（重点：plan 4 例遵从、work 证据链 3 例、promote/refresh 词表 2 例重验）
+1. B 类 13 例的 eval 驱动迭代（重点：plan 4 例遵从、debug/resolve-pr 各 2 例、work r2-reverse 受保护边界）
 2. verify2/verify3 未收口 5 例（semantic、bare、false-causal、partial、unreleased）终态记录
 3. disable-model-invocation 拒绝变体（pulse）观察是否跨模型复现，再决定 prompt 约定是否统一补「直接读取已安装 skill 并按其工作」
 

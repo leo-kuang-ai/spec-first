@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "skill_name": "spec-work",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-work",
+    "timestamp": "2026-11-04T14:58:59Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "Caller-owned implementation returns a complete evidence-bound envelope",
+      "configuration": "with_skill",
+      "run_number": 6,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 395.627,
+        "tokens": 74370,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-return-to-caller.sh",
+          "passed": true,
+          "evidence": "PASS: fixture state and required outcome evidence verified; semantic quality is not scored."
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 395.627,
+        "stddev": 0,
+        "min": 395.627,
+        "max": 395.627
+      },
+      "tokens": {
+        "mean": 74370,
+        "stddev": 0,
+        "min": 74370,
+        "max": 74370
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

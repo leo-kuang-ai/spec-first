@@ -143,29 +143,76 @@ function commandOf(call) {
   return args.command || args.cmd || (Array.isArray(args.argv) ? args.argv.join(' ') : '');
 }
 
+function topLevelSegments(command) {
+  const segments = [[]];
+  let quote = null;
+  let buffer = '';
+  const flush = () => { if (buffer) { segments[segments.length - 1].push(buffer); buffer = ''; } };
+  for (let i = 0; i < command.length; i += 1) {
+    const ch = command[i];
+    if (quote) { buffer += ch; if (ch === quote) quote = null; continue; }
+    if (ch === '"' || ch === '\'') { quote = ch; buffer += ch; continue; }
+    if (ch === ';') { flush(); segments.push([]); continue; }
+    if ((ch === '&' || ch === '|') && command[i + 1] === ch) { flush(); segments.push([]); i += 1; continue; }
+    if (/\s/.test(ch)) { flush(); continue; }
+    buffer += ch;
+  }
+  flush();
+  return segments;
+}
+
 function internalArgs(call, owner, action) {
-  const command = commandOf(call);
-  const tokens = command.match(/"[^"\n]*"|'[^'\n]*'|[^\s]+/g) || [];
-  const args = tokens.map((token) => token.replace(/^(['"])(.*)\1$/, '$2'));
+  // 模型常给纯 producer 调用追加良性捕获尾巴（`; echo "exit=$?"`、`2>&1`）。
+  // 只在首个顶层段（`;` / `&&` / `||` 分隔）上匹配调用身份；段内仍禁管道与
+  // 重定向（`2>&1` 除外），保证 stdout 归属可判定——这是组合守卫的本意。
+  const first = topLevelSegments(commandOf(call))[0] || [];
+  const args = first
+    .filter((token) => token !== '2>&1')
+    .map((token) => token.replace(/^(['"])(.*)\1$/, '$2'));
   let offset = 1;
   if (path.basename(args[0] || '') === 'node') {
     if (path.basename(args[1] || '') !== 'spec-first.js') return null;
     offset = 2;
   } else if (path.basename(args[0] || '') !== 'spec-first') return null;
   if (args.slice(offset, offset + 3).join(' ') !== `internal ${owner} ${action}`) return null;
-  // Shell compositions need a richer trace; do not infer their execution order.
   if (args.some((arg) => /[;&|<>`]/.test(arg))) return null;
   return args.slice(offset + 3);
+}
+
+function firstJsonObject(text) {
+  const start = text.indexOf('{');
+  if (start < 0) return null;
+  let depth = 0;
+  let quote = null;
+  let escaped = false;
+  for (let i = start; i < text.length; i += 1) {
+    const ch = text[i];
+    if (quote) {
+      if (escaped) escaped = false;
+      else if (ch === '\\') escaped = true;
+      else if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === '"') quote = ch;
+    else if (ch === '{') depth += 1;
+    else if (ch === '}') {
+      depth -= 1;
+      if (!depth) {
+        try { return JSON.parse(text.slice(start, i + 1)); } catch { return null; }
+      }
+    }
+  }
+  return null;
 }
 
 function outputObject(call) {
   let value = call.result.content;
   if (Array.isArray(value)) value = value.filter((item) => item.type === 'text').map((item) => item.text).join('\n');
   if (typeof value === 'string') {
-    try { value = JSON.parse(value); } catch { return null; }
+    try { value = JSON.parse(value); } catch { value = firstJsonObject(value); if (!value) return null; }
   }
   if (typeof value?.stdout === 'string') {
-    try { return JSON.parse(value.stdout); } catch { return null; }
+    try { return JSON.parse(value.stdout); } catch { return firstJsonObject(value.stdout); }
   }
   return value;
 }
@@ -197,8 +244,16 @@ function checkCloseout(envelope) {
   const relativeInput = path.relative(process.cwd(), path.resolve(input));
   const claims = JSON.parse(regular(relativeInput));
   assert.equal(claims.run_summary_ref, ref, 'Closeout validated a different summary');
-  assert.ok(claims.claims.some((claim) => claim.claim_type === 'validation' && claim.asserted_status === 'passed'
-    && summary.checks.every((check) => claim.evidence_refs.includes(`verification-run-summary:${check.id}`))), 'Closeout did not cover every check');
+  // CLI 合同允许按 check 分解 claims（evaluateValidationClaim 接受任意非空子集，
+  // 防 cherry-pick 由 aggregateRunSummaryStatus 聚合门承担）；此处校验并集覆盖：
+  // 每条 check 至少被一条 passed validation claim 引用。
+  const passedValidationClaims = claims.claims
+    .filter((claim) => claim.claim_type === 'validation' && claim.asserted_status === 'passed');
+  assert.ok(passedValidationClaims.length, 'Closeout recorded no passed validation claim');
+  for (const check of summary.checks) {
+    assert.ok(passedValidationClaims.some((claim) => claim.evidence_refs.includes(`verification-run-summary:${check.id}`)),
+      `Closeout did not cover every check: ${check.id}`);
+  }
   assert.equal(envelope.honest_closeout_verdict, 'verified');
   assert.ok(Array.isArray(envelope.claim_limitations));
   return closeout;

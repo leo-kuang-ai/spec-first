@@ -15,7 +15,7 @@ context:
     init: true
     checkout: main
 constraints:
-  timeout_seconds: 600
+  timeout_seconds: 1200
   max_turns: 25
 judge:
   type: script

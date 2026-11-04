@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "skill_name": "spec-doc-review",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-doc-review",
+    "timestamp": "2026-11-04T14:38:12Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "Non-interactive review without a path returns the fixed receipt",
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 31.965,
+        "tokens": 22996,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-doc-review/evals/fixtures/scripts/check-headless-no-path.sh",
+          "passed": false,
+          "evidence": "script exited with code 1 [stderr: node:assert:150\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'Review failed: non-interactive mode requires a document path. Expected arguments: mode:non-interactive \\\\\u003cpath\\\\\u003e'\n- 'Review failed: non-interactive mode requires a document path. Expected arguments: mode:non-interactive \u003cpath\u003e'\n\n    at missingDocumentPath ([stdin]:49:10)\n    at [stdin]:52:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 'Review failed: non-interactive mode requires a document path. Expected arguments: mode:non-interactive \\\\\u003cpath\\\\\u003e',\n  expected: 'Review failed: non-interactive mode requires a document path. Expected arguments: mode:non-interactive \u003cpath\u003e',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0,
+        "stddev": 0,
+        "min": 0,
+        "max": 0
+      },
+      "time_seconds": {
+        "mean": 31.965,
+        "stddev": 0,
+        "min": 31.965,
+        "max": 31.965
+      },
+      "tokens": {
+        "mean": 22996,
+        "stddev": 0,
+        "min": 22996,
+        "max": 22996
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

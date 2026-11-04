@@ -91,10 +91,15 @@
 | 051 | spec-work prose ×3：lifecycle 授权边界（SKILL.md）/ CLI producer 点名+禁手写（return-to-caller.md:44）/ 逐字命令规则（shipping-workflow.md:157） | S3 D 类归因 B | 本波 |
 | 052 | spec-promote channel 机器 id 合同 + compound-refresh status 三值机器 token 合同（modes.md） | S3 verify3 | 本波 |
 | 053 | spec-doc-review modes.md 失败串「整条 final message」边界澄清 | S3 D 类归因 B | 本波 |
+| 054 | fixture-state.cjs internalArgs 组合尾巴隐形修复：topLevelSegments 引号感知顶层分段（`;`/`&&`/`||`），仅首段匹配调用身份，段内仍禁管道/重定向（`2>&1` 豁免）——`; echo "exit=$?"` 尾巴不再使成功 producer 调用隐形 | S3 bverify A16 | 本波 |
+| 055 | fixture-state.cjs outputObject 增 firstJsonObject 平衡 JSON 对象提取——producer stdout 混入 `exit=0` 尾巴行时仍可提取 run_summary_ref/overall | S3 bverify A16 | 本波 |
+| 056 | fixture-state.cjs checkCloseout claims 覆盖改并集（每条 check 至少被一条 passed validation claim 引用）——对齐 honest-closeout CLI 合同（子集合法、防 cherry-pick 由 aggregate 聚合门承担） | S3 bverify A17 | 本波 |
+| 057 | spec-doc-review modes.md:21 verbatim 条款补「never markdown-escaped」（`<path>` 不得写 `\<path\>`）+ rtc-envelope case 超时 600→1200 | S3 bverify | 本波 |
 
-## 终态对账（2026-11-05，D 类归因收口后更新）
+## 终态对账（2026-11-05，bverify 波后更新）
 
-- 静态层：38/38 skill 收敛（各批次 *-convergence.md；FIX-001..053 全部 landed，无 open fail）
-- 行为层：S3 原始 118/155 → 归因后确认 133/155（提档 4 PASS + A 类修复重验 11 PASS）；A 类 15 例全部修复（11 例重跑翻转 + 3 例 REPLAY-PASS + riffrec 1 例合同承载），B 类 open 17 例留 eval 迭代 backlog（合同均已承载；含 verify 收口新归因 bare-invocation fail-closed 与 false-causal 脚手架过度引用）
-- judge 单测：ce-u28/knowledge-publication/eval-fixture-contracts 37/37；runtime-setup 白名单解析器 15/15
+- 静态层：38/38 skill 收敛（各批次 *-convergence.md；FIX-001..057 全部 landed，无 open fail）
+- 行为层：S3 原始 118/155 → 归因后确认 **137/155**（提档 4 PASS + A 类修复重验 11 PASS + bverify 波 4 例：publication-recover/headless/rtc-envelope live PASS + closeout-order REPLAY-PASS）；A 类累计 17 例修复（A15 + bverify A16/A17），B 类 open 13 例留 eval 迭代 backlog（合同均已承载；r2-reverse 生命周期子行为已确认改善，violated 断言为受保护 fixture 越界）
+- judge 单测：ce-u28/knowledge-publication/eval-fixture-contracts 37/37；spec-work-outcome-judges + ce-u28 校准 32/32（A16/A17 后保持全绿）；runtime-setup 白名单解析器 15/15
+- 8 宿主镜像再 生 + test:mcp-setup 全绿 + doctor PASS（bverify 波 prose 变更同步）
 - 留观清单不变；spec-prd R1 #5/#6 低频 P3 维持 deferred

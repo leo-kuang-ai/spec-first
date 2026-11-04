@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "Caller-owned implementation returns a complete evidence-bound envelope",
+  "prompt": "First run `node prepare-eval.cjs` once to prepare this isolated fixture.\nOnly that preparation may create its baseline commit; it grants no task commit authority.\nThen use the installed spec-work skill for this request:\nI am the upstream caller. Change only the README.md heading \"Known rough edges\" to \"Known limitations\". Perform local verification; I retain the shipping tail. Return the full Return-to-Caller envelope as a JSON object or a fenced JSON block. Use individual verification and closeout tool calls, preserving their actual results. Task commits and landing are not authorized.\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-return-to-caller.sh"
+  ]
+}

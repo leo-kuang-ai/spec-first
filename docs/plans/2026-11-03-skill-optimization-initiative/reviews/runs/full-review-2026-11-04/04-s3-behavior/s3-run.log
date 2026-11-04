@@ -2002,3 +2002,195 @@ level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"zhipu/g
 📋 Results: 1 passed, 0 failed, 0 errors
 === verify3 spec-promote/check-unreleased-local-drafts EXIT 0 21:35:56
 FIXVERIFY3-DONE 21:35:56
+=== bverify spec-work/r2-reverse-mismatch START 22:06:33
+📋 Loading configuration...
+level=INFO msg="Config: discovered eval.yaml: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/eval.yaml"
+level=INFO msg="Config: loading eval.yaml from /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/eval.yaml"
+✅ Loaded 1 case(s) | engine: claude_code | model: zhipu/glm-5.3
+
+🔑 Loading credentials...
+✅ Credentials ready
+
+🚀 Running evaluation (1 cases)
+level=WARNING msg="ANTHROPIC_API_KEY not set, claude-code will rely on existing login state if available"
+   ⏳ [1/1] r2-reverse-mismatch: An already implemented requirement does not authorize changing plan lifecycle...
+level=WARNING msg="stderr: Switched to a new branch 'main'\n"
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"zhipu/glm-5.3\",\"query_source\":\"sdk\"}\n"
+level=WARNING msg="command exited with code 1: chmod 700 '/tmp/skill-up-judge-1793801751625724000/script' && '/tmp/skill-up-judge-1793801751625724000/script'"
+level=WARNING msg="stderr: node:assert:150\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Protected fixture changed: src/server.js\n+ actual - expected\n\n+ '215c24a84bd9cd8d0af963f8c55860c426478a99ddb2fa3029533cbc2fbdbf31'\n- 'e5f46eadeb6533438ee83f04cfcfe5296a8f25d66736945f8b783e077d0ae726'\n\n    at checkFixture ([stdin]:78:69)\n    at [stdin]:99:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.<anonymous> (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: '215c24a84bd9cd8d0af963f8c55860c426478a99ddb2fa3029533cbc2fbdbf31',\n  expected: 'e5f46eadeb6533438ee83f04cfcfe5296a8f25d66736945f8b783e077d0ae726',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.22.3\n"
+   ❌ [1/1] r2-reverse-mismatch: FAIL (0.0%)
+
+📊 Generating reports...
+✅ Reports saved to /Users/kuang/xiaobu/spec-first/docs/plans/2026-11-03-skill-optimization-initiative/reviews/runs/full-review-2026-11-04/04-s3-behavior/spec-work/iteration-2
+
+────────────────────────────────────────
+📋 Results: 0 passed, 1 failed, 0 errors
+Error: one or more cases failed
+=== bverify spec-work/r2-reverse-mismatch EXIT 1 22:15:52
+=== bverify spec-work/return-to-caller-envelope START 22:15:52
+📋 Loading configuration...
+level=INFO msg="Config: discovered eval.yaml: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/eval.yaml"
+level=INFO msg="Config: loading eval.yaml from /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/eval.yaml"
+✅ Loaded 1 case(s) | engine: claude_code | model: zhipu/glm-5.3
+
+🔑 Loading credentials...
+✅ Credentials ready
+
+🚀 Running evaluation (1 cases)
+level=WARNING msg="ANTHROPIC_API_KEY not set, claude-code will rely on existing login state if available"
+   ⏳ [1/1] return-to-caller-envelope: Caller-owned implementation returns a complete evidence-bound envelope...
+level=WARNING msg="stderr: Switched to a new branch 'main'\n"
+level=ERROR msg="command killed by context (context deadline exceeded (deadline elapsed by 77ms)); command: claude --settings '{\"disableAllHooks\":true}' --session-id de44fe26-e1d2-4ea0-a976-ef9efd63c788 -p --permission-mode=bypassPermissions --model 'zhipu/glm-5.3' 'First run `node prepare-eval.cjs` once to..."
+level=ERROR msg="stderr: [claude-code:unrecognized_model] {\"model\":\"zhipu/glm-5.3\",\"query_source\":\"sdk\"}\n"
+   ⚠️ [1/1] return-to-caller-envelope: ERROR
+
+📊 Generating reports...
+✅ Reports saved to /Users/kuang/xiaobu/spec-first/docs/plans/2026-11-03-skill-optimization-initiative/reviews/runs/full-review-2026-11-04/04-s3-behavior/spec-work/iteration-3
+
+────────────────────────────────────────
+📋 Results: 0 passed, 0 failed, 1 errors
+[ERROR] case return-to-caller-envelope: agent execution failed: claude-code run failed: context deadline exceeded (case timeout 600s via case.constraints.timeout_seconds)
+Error: one or more cases errored
+=== bverify spec-work/return-to-caller-envelope EXIT 1 22:25:52
+=== bverify spec-work/standalone-closeout-order START 22:25:52
+📋 Loading configuration...
+level=INFO msg="Config: discovered eval.yaml: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/eval.yaml"
+level=INFO msg="Config: loading eval.yaml from /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/eval.yaml"
+✅ Loaded 1 case(s) | engine: claude_code | model: zhipu/glm-5.3
+
+🔑 Loading credentials...
+✅ Credentials ready
+
+🚀 Running evaluation (1 cases)
+level=WARNING msg="ANTHROPIC_API_KEY not set, claude-code will rely on existing login state if available"
+   ⏳ [1/1] standalone-closeout-order: Standalone completion requires ordered execution and closeout evidence...
+level=WARNING msg="stderr: Switched to a new branch 'main'\n"
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"zhipu/glm-5.3\",\"query_source\":\"sdk\"}\n"
+level=WARNING msg="command exited with code 1: chmod 700 '/tmp/skill-up-judge-1793802836624492000/script' && '/tmp/skill-up-judge-1793802836624492000/script'"
+level=WARNING msg="stderr: node:internal/assert/utils:77\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: Closeout did not cover every check\n    at checkCloseout ([stdin]:200:10)\n    at [stdin]:234:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.<anonymous> (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v22.22.3\n"
+   ❌ [1/1] standalone-closeout-order: FAIL (0.0%)
+
+📊 Generating reports...
+✅ Reports saved to /Users/kuang/xiaobu/spec-first/docs/plans/2026-11-03-skill-optimization-initiative/reviews/runs/full-review-2026-11-04/04-s3-behavior/spec-work/iteration-4
+
+────────────────────────────────────────
+📋 Results: 0 passed, 1 failed, 0 errors
+Error: one or more cases failed
+=== bverify spec-work/standalone-closeout-order EXIT 1 22:33:57
+=== bverify spec-compound-refresh/publication-recover START 22:33:57
+📋 Loading configuration...
+level=INFO msg="Config: discovered eval.yaml: /Users/kuang/xiaobu/spec-first/skills/spec-compound-refresh/evals/eval.yaml"
+level=INFO msg="Config: loading eval.yaml from /Users/kuang/xiaobu/spec-first/skills/spec-compound-refresh/evals/eval.yaml"
+✅ Loaded 1 case(s) | engine: claude_code | model: zhipu/glm-5.3
+
+🔑 Loading credentials...
+✅ Credentials ready
+
+🚀 Running evaluation (1 cases)
+level=WARNING msg="ANTHROPIC_API_KEY not set, claude-code will rely on existing login state if available"
+   ⏳ [1/1] publication-recover: 恢复部分发布时保留人工条目及完整知识...
+level=WARNING msg="stderr: Switched to a new branch 'main'\n"
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"zhipu/glm-5.3\",\"query_source\":\"sdk\"}\n"
+   ✅ [1/1] publication-recover: PASS (100.0%)
+
+📊 Generating reports...
+✅ Reports saved to /Users/kuang/xiaobu/spec-first/docs/plans/2026-11-03-skill-optimization-initiative/reviews/runs/full-review-2026-11-04/04-s3-behavior/spec-compound-refresh/iteration-7
+
+────────────────────────────────────────
+📋 Results: 1 passed, 0 failed, 0 errors
+=== bverify spec-compound-refresh/publication-recover EXIT 0 22:37:40
+=== bverify spec-doc-review/headless-no-path-fails START 22:37:40
+📋 Loading configuration...
+level=INFO msg="Config: discovered eval.yaml: /Users/kuang/xiaobu/spec-first/skills/spec-doc-review/evals/eval.yaml"
+level=INFO msg="Config: loading eval.yaml from /Users/kuang/xiaobu/spec-first/skills/spec-doc-review/evals/eval.yaml"
+✅ Loaded 1 case(s) | engine: claude_code | model: zhipu/glm-5.3
+
+🔑 Loading credentials...
+✅ Credentials ready
+
+🚀 Running evaluation (1 cases)
+level=WARNING msg="ANTHROPIC_API_KEY not set, claude-code will rely on existing login state if available"
+   ⏳ [1/1] headless-no-path-fails: Non-interactive review without a path returns the fixed receipt...
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"zhipu/glm-5.3\",\"query_source\":\"sdk\"}\n"
+level=WARNING msg="command exited with code 1: chmod 700 '/tmp/skill-up-judge-1793803092649630000/script' && '/tmp/skill-up-judge-1793803092649630000/script'"
+level=WARNING msg="stderr: node:assert:150\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'Review failed: non-interactive mode requires a document path. Expected arguments: mode:non-interactive \\\\<path\\\\>'\n- 'Review failed: non-interactive mode requires a document path. Expected arguments: mode:non-interactive <path>'\n\n    at missingDocumentPath ([stdin]:49:10)\n    at [stdin]:52:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.<anonymous> (node:internal/process/execution:201:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 'Review failed: non-interactive mode requires a document path. Expected arguments: mode:non-interactive \\\\<path\\\\>',\n  expected: 'Review failed: non-interactive mode requires a document path. Expected arguments: mode:non-interactive <path>',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.22.3\n"
+   ❌ [1/1] headless-no-path-fails: FAIL (0.0%)
+
+📊 Generating reports...
+✅ Reports saved to /Users/kuang/xiaobu/spec-first/docs/plans/2026-11-03-skill-optimization-initiative/reviews/runs/full-review-2026-11-04/04-s3-behavior/spec-doc-review/iteration-2
+
+────────────────────────────────────────
+📋 Results: 0 passed, 1 failed, 0 errors
+Error: one or more cases failed
+=== bverify spec-doc-review/headless-no-path-fails EXIT 1 22:38:12
+BVERIFY-DONE 22:38:13
+=== bverify2 spec-doc-review/headless-no-path-fails START 22:39:50
+📋 Loading configuration...
+level=INFO msg="Config: discovered eval.yaml: /Users/kuang/xiaobu/spec-first/skills/spec-doc-review/evals/eval.yaml"
+level=INFO msg="Config: loading eval.yaml from /Users/kuang/xiaobu/spec-first/skills/spec-doc-review/evals/eval.yaml"
+✅ Loaded 1 case(s) | engine: claude_code | model: zhipu/glm-5.3
+
+🔑 Loading credentials...
+✅ Credentials ready
+
+🚀 Running evaluation (1 cases)
+level=WARNING msg="ANTHROPIC_API_KEY not set, claude-code will rely on existing login state if available"
+   ⏳ [1/1] headless-no-path-fails: Non-interactive review without a path returns the fixed receipt...
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"zhipu/glm-5.3\",\"query_source\":\"sdk\"}\n"
+   ✅ [1/1] headless-no-path-fails: PASS (100.0%)
+
+📊 Generating reports...
+✅ Reports saved to /Users/kuang/xiaobu/spec-first/docs/plans/2026-11-03-skill-optimization-initiative/reviews/runs/full-review-2026-11-04/04-s3-behavior/spec-doc-review/iteration-3
+
+────────────────────────────────────────
+📋 Results: 1 passed, 0 failed, 0 errors
+=== bverify2 spec-doc-review/headless-no-path-fails EXIT 0 22:40:11
+=== bverify2 spec-work/return-to-caller-envelope START 22:40:11
+📋 Loading configuration...
+level=INFO msg="Config: discovered eval.yaml: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/eval.yaml"
+level=INFO msg="Config: loading eval.yaml from /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/eval.yaml"
+✅ Loaded 1 case(s) | engine: claude_code | model: zhipu/glm-5.3
+
+🔑 Loading credentials...
+✅ Credentials ready
+
+🚀 Running evaluation (1 cases)
+level=WARNING msg="ANTHROPIC_API_KEY not set, claude-code will rely on existing login state if available"
+   ⏳ [1/1] return-to-caller-envelope: Caller-owned implementation returns a complete evidence-bound envelope...
+level=WARNING msg="stderr: Switched to a new branch 'main'\n"
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"zhipu/glm-5.3\",\"query_source\":\"sdk\"}\n"
+level=WARNING msg="command exited with code 1: chmod 700 '/tmp/skill-up-judge-1793803664792345000/script' && '/tmp/skill-up-judge-1793803664792345000/script'"
+level=WARNING msg="stderr: node:internal/assert/utils:77\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: Missing successful summary producer call/result\n    at checkCloseout ([stdin]:182:10)\n    at [stdin]:234:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.<anonymous> (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: undefined,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v22.22.3\n"
+   ❌ [1/1] return-to-caller-envelope: FAIL (0.0%)
+
+📊 Generating reports...
+✅ Reports saved to /Users/kuang/xiaobu/spec-first/docs/plans/2026-11-03-skill-optimization-initiative/reviews/runs/full-review-2026-11-04/04-s3-behavior/spec-work/iteration-5
+
+────────────────────────────────────────
+📋 Results: 0 passed, 1 failed, 0 errors
+Error: one or more cases failed
+=== bverify2 spec-work/return-to-caller-envelope EXIT 1 22:47:45
+BVERIFY2-DONE 22:47:45
+=== bverify3 spec-work/return-to-caller-envelope START 22:52:23
+📋 Loading configuration...
+level=INFO msg="Config: discovered eval.yaml: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/eval.yaml"
+level=INFO msg="Config: loading eval.yaml from /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/eval.yaml"
+✅ Loaded 1 case(s) | engine: claude_code | model: zhipu/glm-5.3
+
+🔑 Loading credentials...
+✅ Credentials ready
+
+🚀 Running evaluation (1 cases)
+level=WARNING msg="ANTHROPIC_API_KEY not set, claude-code will rely on existing login state if available"
+   ⏳ [1/1] return-to-caller-envelope: Caller-owned implementation returns a complete evidence-bound envelope...
+level=WARNING msg="stderr: Switched to a new branch 'main'\n"
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"zhipu/glm-5.3\",\"query_source\":\"sdk\"}\n"
+   ✅ [1/1] return-to-caller-envelope: PASS (100.0%)
+
+📊 Generating reports...
+✅ Reports saved to /Users/kuang/xiaobu/spec-first/docs/plans/2026-11-03-skill-optimization-initiative/reviews/runs/full-review-2026-11-04/04-s3-behavior/spec-work/iteration-6
+
+────────────────────────────────────────
+📋 Results: 1 passed, 0 failed, 0 errors
+=== bverify3 spec-work/return-to-caller-envelope EXIT 0 22:58:59
+BVERIFY3-DONE 22:58:59

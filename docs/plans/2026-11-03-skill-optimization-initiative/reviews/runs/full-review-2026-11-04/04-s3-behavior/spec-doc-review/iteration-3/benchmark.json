@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "skill_name": "spec-doc-review",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-doc-review",
+    "timestamp": "2026-11-04T14:40:11Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "Non-interactive review without a path returns the fixed receipt",
+      "configuration": "with_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 21.255,
+        "tokens": 22713,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-doc-review/evals/fixtures/scripts/check-headless-no-path.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 21.255,
+        "stddev": 0,
+        "min": 21.255,
+        "max": 21.255
+      },
+      "tokens": {
+        "mean": 22713,
+        "stddev": 0,
+        "min": 22713,
+        "max": 22713
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "skill_name": "spec-work",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T22:15:52.71563+08:00",
+  "end_time": "2026-11-04T22:25:52.852557+08:00",
+  "case_results": [
+    {
+      "case_id": "return-to-caller-envelope",
+      "title": "Caller-owned implementation returns a complete evidence-bound envelope",
+      "status": "ERROR",
+      "duration_ms": 600066,
+      "turns": 25,
+      "input_tokens": 73540,
+      "output_tokens": 2844,
+      "error": "agent execution failed: claude-code run failed: context deadline exceeded (case timeout 600s via case.constraints.timeout_seconds)",
+      "grading": null,
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once to prepare this isolated fixture.\nOnly that preparation may create its baseline commit; it grants no task commit authority.\nThen use the installed spec-work skill for this request:\nI am the upstream caller. Change only the README.md heading \"Known rough edges\" to \"Known limitations\". Perform local verification; I retain the shipping tail. Return the full Return-to-Caller envelope as a JSON object or a fenced JSON block. Use individual verification and closeout tool calls, preserving their actual results. Task commits and landing are not authorized.\n",
+      "response": "存在一个 plan（`2026-09-01-001-feat-month-filter-plan.md`），但它是无关的 month-filter 功能计划——本 run 的工作来自 bare prompt，不受它管辖。只读确认其状态以保证 envelope 准确：",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 76384,
+  "judge_tokens": 0,
+  "overall_tokens": 76384
+}

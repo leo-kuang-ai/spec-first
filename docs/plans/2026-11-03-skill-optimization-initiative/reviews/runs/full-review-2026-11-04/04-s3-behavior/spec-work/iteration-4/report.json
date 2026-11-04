@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-work",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T22:25:52.866675+08:00",
+  "end_time": "2026-11-04T22:33:57.426403+08:00",
+  "case_results": [
+    {
+      "case_id": "standalone-closeout-order",
+      "title": "Standalone completion requires ordered execution and closeout evidence",
+      "status": "FAIL",
+      "duration_ms": 483690,
+      "turns": 29,
+      "input_tokens": 63555,
+      "output_tokens": 3141,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 29,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-closeout-order.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: node:internal/assert/utils:77\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: Closeout did not cover every check\n    at checkCloseout ([stdin]:200:10)\n    at [stdin]:234:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once to prepare this isolated fixture.\nOnly that preparation may create its baseline commit; it grants no task commit authority.\nThen use the installed spec-work skill for this request:\nChange only the README.md heading \"Known rough edges\" to \"Known limitations\". Follow the standalone closeout contract. Return its evidence fields as a JSON object or a fenced JSON block. Use individual verification and closeout tool calls, preserving their actual results. Task commits and landing are not authorized.\n",
+      "response": "指纹已捕获。所有收尾步骤完成，无未决 gate。组装最终 closeout 信封并返回。\n\n## 执行摘要\n\n- **变更**：`README.md:8` 标题短语 `Known rough edges` → `Known limitations`，行内其余内容逐字保留；工作树中无其他被跟踪文件变更（`git diff --name-only` 仅 `README.md`）。\n- **验证**：3 项窄域 check（新标题存在 / 旧标题消失 / diff 范围仅 README.md）全部实际执行、退出码 0、日志已写入 run root；run summary 经 CLI 写入，honest-closeout 校验 `overall: verified`。\n- **质量关卡**：simplify 与 code review 均按机械 diff 显式跳过；Residual Gate 无 actionable findings；无 source plan（bare prompt），plan 语义复核与 lifecycle closeout 不适用。\n- **授权姿态**：`commit_authorization: missing`、`landing_authorization: missing`（任务明示不授权）→ 已验证的变更**保持未提交**，未 push、未开 PR。未跟踪的 `.claude/` 为 pre-existing，未触碰；`.spec-first/` 为本次 closeout 合同要求的证据产物。\n\n```json\n{\n  \"status\": \"complete\",\n  \"mode\": \"standalone\",\n  \"target_repo\": \"/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-1449142945\",\n  \"run_id\": \"run-20261104-a7d5e2c9\",\n  \"changed_files\": [\"README.md\"],\n  \"verification_run_summary_ref\": \".spec-first/workflows/spec-work/skill-up-1449142945/run-20261104-a7d5e2c9/verification-run-summary.json\",\n  \"honest_closeout_verdict\": \"verified\",\n  \"honest_closeout_overall_reason_code\": \"all-claims-consistent\",\n  \"run_artifact_path\": null,\n  \"run_artifact_reason_code\": \"no-trigger-matched\",\n  \"verification_results\": [\n    {\n      \"id\": \"readme-new-heading-present\",\n      \"service\": \"grep\",\n      \"command\": \"set -o pipefail; grep -n \\\"Known limitations\\\" README.md 2\u003e\u00261 | tee .spec-first/workflows/spec-work/skill-up-1449142945/run-20261104-a7d5e2c9/logs/readme-new-heading-present.log\",\n      \"ran\": true,\n      \"exit_code\": 0,\n      \"status\": \"passed\",\n      \"log_path\": \".spec-first/workflows/spec-work/skill-up-1449142945/run-20261104-a7d5e2c9/logs/readme-new-heading-present.log\",\n      \"result_excerpt\": \"8:Known limitations: adding an entry requires five fields typed by hand; no categories; no summary view.\"\n    },\n    {\n      \"id\": \"readme-old-heading-absent\",\n      \"service\": \"grep\",\n      \"command\": \"set -o pipefail; ! grep -n \\\"Known rough edges\\\" README.md \u0026\u0026 echo \\\"OK: old heading absent (grep found nothing)\\\" | tee .spec-first/workflows/spec-work/skill-up-1449142945/run-20261104-a7d5e2c9/logs/readme-old-heading-absent.log\",\n      \"ran\": true,\n      \"exit_code\": 0,\n      \"status\": \"passed\",\n      \"log_path\": \".spec-first/workflows/spec-work/skill-up-1449142945/run-20261104-a7d5e2c9/logs/readme-old-heading-absent.log\",\n      \"result_excerpt\": \"OK: old heading absent (grep found nothing)\"\n    },\n    {\n      \"id\": \"diff-scope-readme-only\",\n      \"service\": \"git\",\n      \"command\": \"set -o pipefail; test \\\"$(git diff --name-only)\\\" = \\\"README.md\\\" \u0026\u0026 { echo \\\"OK: tracked modifications limited to README.md\\\"; git diff --name-only; } 2\u003e\u00261 | tee .spec-first/workflows/spec-work/skill-up-1449142945/run-20261104-a7d5e2c9/logs/diff-scope-readme-only.log\",\n      \"ran\": true,\n      \"exit_code\": 0,\n      \"status\": \"passed\",\n      \"log_path\": \".spec-first/workflows/spec-work/skill-up-1449142945/run-20261104-a7d5e2c9/logs/diff-scope-readme-only.log\",\n      \"result_excerpt\": \"OK: tracked modifications limited to README.md / README.md\"\n    }\n  ],\n  \"verification_profile\": {\n    \"status\": \"not-configured\",\n    \"reason_code\": \"verification-scripts-missing\",\n    \"checks_selected_by\": \"LLM narrow-surface selection for trivial non-behavioral edit (repo declares no test scripts; no test files exist)\"\n  },\n  \"claim_limitations\": [\n    \"evidence authority: transcribed (command strings and results transcribed verbatim from actual tool runs; no provider-confirmed evidence)\",\n    \"repo has no configured verification scripts and no test files; verification ceiling is content/scope-level checks, not a test suite\",\n    \"Code review: skipped (mechanical diff — single-line prose text substitution, no behavioral surface)\",\n    \"Simplify: skipped (mechanical diff, 2 changed lines \u003c 30-line threshold)\",\n    \"Source plan semantic review: not applicable (bare-prompt input; no source plan bound to this run)\",\n    \"Plan status closeout: not applicable (no source plan; docs/plans/ contains an unrelated month-filter plan that was not touched)\",\n    \"fingerprint-stability-unverified: .spec-first/ is not covered by .gitignore in this repo, so fingerprint includes closeout evidence artifacts\",\n    \"Required-proof reconciliation: all required intents (new heading present, old heading absent, scope limited to README.md) have fresh passed results executed after the final mutation; no mutations to README.md occurred after verification\"\n  ],\n  \"verified_worktree_fingerprint\": {\n    \"schema_version\": \"spec-work-working-tree-fingerprint/v1\",\n    \"repo_root\": \"/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-1449142945\",\n    \"head_sha\": \"f623a223c34c1548456d27de0424cf8d2b4a1715\",\n    \"fingerprint\": \"sha256:c80c02a9b06c3fe5c9471a28b328f9caaef26b50788bebbae91fbdfd1d8cb03d\",\n    \"dirty\": true,\n    \"untracked_file_count\": 24\n  },\n  \"commit_authorization\": \"missing\",\n  \"landing_authorization\": \"missing\",\n  \"commit_candidates\": [\n    \"README.md: rename 'Known rough edges' heading to 'Known limitations' (uncommitted, awaiting commit authorization)\"\n  ],\n  \"blockers\": [],\n  \"post_deploy_monitoring\": \"No additional operational monitoring required — README prose-only change with no runtime, build, or production behavior impact.\"\n}\n```\n\n**后续动作**：变更已验证但按授权边界保持未提交；如需提交/落地，请显式下达 commit/landing 授权。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 66696,
+  "judge_tokens": 0,
+  "overall_tokens": 66696
+}
