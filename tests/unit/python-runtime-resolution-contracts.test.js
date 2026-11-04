@@ -33,6 +33,7 @@ describe('portable Python runtime resolution', () => {
     expect(source).toMatch(/for candidate in python3 python/);
     expect(source).toMatch(/"\$candidate" -c 'import sys/);
     expect(source).toMatch(/command -v py[\s\S]*py -3 -c 'import sys/);
+    expect(source).toMatch(/sys\.version_info >= \(3, 10\)/);
     expect(source.indexOf('python3 python')).toBeLessThan(source.indexOf('command -v py'));
   });
 

@@ -589,7 +589,7 @@ function main() {
       repo_root: args.repoRoot,
       build_kind: 'unsupported-layout',
       sampling: buildSourceSampling(args.repoRoot),
-      note: 'no npm workspaces and no gradle settings; dependency edges unavailable; mine along sampling.modules[].sample_files and disclose the sampled/total ratio in closeout',
+      note: 'no npm workspaces and no gradle settings; dependency edges unavailable; mine along sampling.modules[].sample_files and disclose the sampled/total ratio in closeout; --verify is not applicable in this degraded mode (no dependency graph to check)',
     };
     if (args.freshness) samplingPayload.freshness = runFreshness(args.repoRoot);
     process.stdout.write(`${JSON.stringify(samplingPayload, null, args.pretty ? 2 : 0)}\n`);
