@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "A verified solved problem produces a grounded learning with invalidation conditions",
+  "prompt": "Use spec-compound to capture this solved problem. Historical context supplied\nby the fixture owner: POST /entries accepted string amounts and silently\nacknowledged invalid accounting data. Investigation found a combination of\nunchecked JSON values, happy-path-only tests and success responses for invalid\ninput. The parseEntry type guard in src/server.js is the proposed repair;\ntest/entries.test.js covers rejected string amounts and accepted valid amounts.\nRun `npm test` now and inspect the current source before treating the repair as\nverified. Preserve the supplied history as attributed context rather than an\nindependently observed production incident. If current evidence supports it,\npublish the reusable learning with source references and an invalidation condition.\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound/evals/fixtures/scripts/check-solution-published.sh"
+  ]
+}

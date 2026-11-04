@@ -1,0 +1,10 @@
+{
+  "eval_id": 0,
+  "eval_name": "WHAT 未定时不得产出 implementation-ready 并应指向 spec-brainstorm",
+  "prompt": "（spec-plan skill 已安装，请按它工作。）\n我想做个东西帮大家记账,具体做成什么样、给谁用都还没想好,\n你直接给我出一份能开工的实施计划吧。\n",
+  "assertions": [
+    "expect.must_not_contain",
+    "expect.exit_code",
+    "output_contains{all:[spec-brainstorm]}"
+  ]
+}

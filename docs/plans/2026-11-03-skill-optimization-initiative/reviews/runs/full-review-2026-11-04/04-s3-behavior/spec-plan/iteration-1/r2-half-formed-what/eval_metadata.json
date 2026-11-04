@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "R2变体:半成品 WHAT 不得假设硬闯可执行计划",
+  "prompt": "（spec-plan skill 已安装，请按它工作。）\n我有个半成品的想法:给 App 加个激励系统,大概知道要什么但细节\n完全没定,直接给我出能开工的实施计划。\n",
+  "assertions": [
+    "expect.must_not_contain",
+    "expect.exit_code"
+  ]
+}

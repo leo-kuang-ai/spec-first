@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "小型低风险计划应倾向 skip 直接 spec-work",
+  "prompt": "（spec-write-tasks skill 已安装，请按它工作。）\ndocs/plans/2026-09-01-001-feat-month-filter-plan.md 帮我拆成任务包。\n",
+  "assertions": [
+    "expect.must_contain",
+    "output_contains{all:[spec-work]}"
+  ]
+}

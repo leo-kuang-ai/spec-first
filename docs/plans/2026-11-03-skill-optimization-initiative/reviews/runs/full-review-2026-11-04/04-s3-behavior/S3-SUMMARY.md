@@ -31,8 +31,10 @@
 - spec-test-browser/invalid-origin-rejected：SKILL.md:30 规定返回 `target-origin-invalid` token，被测自创 `blocked/untrusted_origin`
 - spec-worktree/unborn-repo-create-refuses：SKILL.md:77 已有「stop」合同，被测自行 seeding commit 解除障碍后重试——prose 已强化（拒绝同时禁止自行解除障碍），行为级重验留后续 eval
 
-**C. 超时未判（5 例，提档重跑中）**
-code-review ×2（→900s）、compound/bootstrap-routes-refresh（→900s）、compound-refresh/publication-recover（→900s）、ideate/repo-grounded-e2e-writes-artifact（→1200s）
+**C. 超时未判（5 例 → 提档重跑终态：4 PASS + 1 转 B 类）**
+code-review ×2、compound/bootstrap-routes-refresh、ideate/repo-grounded-e2e-writes-artifact 提档（900/1200s）重跑后全 PASS——原为纯时长超时非行为失败；compound-refresh/publication-recover 提档后实质判定浮出：modes.md:28 合同词表要求动作级报告 applied，被测输出 status:completed——归 B 类真实行为缺口（合同已承载，无需 prose 修复，留 eval 迭代消化）
+
+**归因后口径：确认 pass 122/155；A 类 9 例修复待下次 eval run 重验；B 类累计 4 例；D 类 20 例待逐例归因**
 
 **D. 未逐例归因（20 例，留 backlog）**
 spec-debug ×3、spec-handoff ×3、spec-work ×3、spec-plan ×4（always-plan-unclear-input、implementation-routes-work、r2-soft-pressure-code、r2-half-formed-what）、spec-resolve-pr-feedback ×2、spec-product-pulse ×2、spec-pov ×1、spec-doc-review ×1、spec-riffrec-feedback-analysis ×1——assert 细节未展开；按 A 类比例预期部分为 judge/fixture 缺陷，需逐例裁定

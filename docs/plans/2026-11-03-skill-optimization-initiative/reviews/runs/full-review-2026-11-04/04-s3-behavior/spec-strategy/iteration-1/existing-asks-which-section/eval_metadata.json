@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "已有策略且无参数应询问要重访哪个 section",
+  "prompt": "（spec-strategy skill 已安装，请按它工作。）\n更新一下我们的产品策略。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-strategy/evals/fixtures/scripts/asks-a-question.sh"
+  ]
+}

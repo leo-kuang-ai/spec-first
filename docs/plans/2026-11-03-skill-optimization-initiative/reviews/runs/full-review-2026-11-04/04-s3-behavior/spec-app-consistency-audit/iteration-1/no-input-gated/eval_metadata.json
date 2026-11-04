@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "无 PRD/Figma/源码输入应被 gate",
+  "prompt": "（spec-app-consistency-audit skill 已安装，请按它工作。）\n帮我审一下我们的 App 一致性。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-app-consistency-audit/evals/skillup/fixtures/scripts/check-no-input-gate.sh"
+  ]
+}

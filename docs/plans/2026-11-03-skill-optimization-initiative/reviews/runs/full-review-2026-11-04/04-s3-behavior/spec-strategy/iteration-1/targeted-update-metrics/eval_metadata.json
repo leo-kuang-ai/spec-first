@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "指定 section 应定向重访该 section 并保留其余",
+  "prompt": "（spec-strategy skill 已安装，请按它工作。）\nmetrics 这部分想重新过一遍。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-strategy/evals/fixtures/scripts/asks-a-question.sh"
+  ]
+}

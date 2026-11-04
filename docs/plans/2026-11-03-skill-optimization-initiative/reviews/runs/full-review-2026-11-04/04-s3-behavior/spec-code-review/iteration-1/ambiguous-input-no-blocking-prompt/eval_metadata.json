@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "信息不足的审查请求不得阻断提问，推断意图并在 Coverage 披露不确定性",
+  "prompt": "（spec-code-review skill 已安装，请按它工作。）\n帮我看看现在的改动，随便审一下，有问题说问题，不用问我。\n",
+  "assertions": [
+    "expect.exit_code",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-code-review/evals/fixtures/scripts/check-no-blocking-inference.sh"
+  ]
+}

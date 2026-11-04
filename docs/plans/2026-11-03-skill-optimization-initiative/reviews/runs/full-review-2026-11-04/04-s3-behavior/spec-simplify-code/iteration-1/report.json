@@ -1,0 +1,157 @@
+{
+  "skill_name": "spec-simplify-code",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T20:07:13.762647+08:00",
+  "end_time": "2026-11-04T20:14:38.630671+08:00",
+  "case_results": [
+    {
+      "case_id": "safety-check-preserved",
+      "title": "Simplification preserves invalid-input and valid-entry behavior",
+      "status": "PASS",
+      "duration_ms": 444550,
+      "turns": 12,
+      "input_tokens": 39530,
+      "output_tokens": 6459,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 12,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/fixtures/scripts/check-safety-preserved.sh",
+            "passed": true,
+            "evidence": "PASS: invalid JSON rejected, process survives, valid entries preserved, no new reachable commit"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nThat preparation alone may create the baseline commit; no task commit or landing is authorized.\nRun `npm test` and retain the actual result as proof context. Then use\nspec-simplify-code with proof-test:test/entries.test.cjs to simplify src/server.js.\nThe proof test and its test-only seam test/support/ledger-proof.cjs must remain\nbyte-identical. Production parsing may move to a helper if behavior stays equal.\nReturn the protected paths, observed commands and any limitations. Re-run the\noriginal proof after cleanup; no earlier result proves the final tree.\n",
+      "response": "## 简化 pass 总结（caller-owned，无提交、无 landing）\n\n### 受保护路径与字节比对\n\n| 路径 | 角色 | sha256（前/后） | 结果 |\n|---|---|---|---|\n| `test/entries.test.cjs` | 证明测试（proof-test 令牌） | `04bc52…3cf` / `04bc52…3cf` | **字节一致** |\n| `test/support/ledger-proof.cjs` | 其 test-only seam | `621f7…9c05` / `621f7…9c05` | **字节一致** |\n\n改动仅 `src/server.js`（`git status`: ` M src/server.js`；`.claude/` 保持基线的未跟踪状态）。仓库仅有准备脚本创建的基线提交 `11673ca eval fixture baseline`，本 pass 未创建任何提交。\n\n### 观测到的命令与结果\n\n1. `node prepare-eval.cjs` → 基线提交创建，无任务提交授权\n2. `npm test`（改动前基线证明）→ **1 pass / 0 fail**\n3. 差分等价验证（`/tmp` 一次性脚本，已清理，不属于仓库）→ 旧 vs 新实现 **28/28 用例**状态码与响应体逐字节一致，覆盖证明测试未触及的路径：空 body→`invalid amount`、`null` body→`invalid json`（解构 TypeError 路径）、原始类型/数组 body、`1e999`、次正规数 `5e-324`→201、404/PUT/异路径\n4. `npm test`（清理后、最终树上重跑原始证明）→ **1 pass / 0 fail，exit 0** —— 此为最终树的有效证明\n\n### 修复量化（按维度）\n\n**应用 2 项**：reuse 1 + quality 1\n- **reuse**：`typeof amount !== 'number' ||` 与 `Number.isFinite` 冗余——后者对全部非有限数值输入恒 false，拒绝集完全相同，校验防线完整保留\n- **quality**：POST 解析/校验移入具名 helper `parseEntry`（调用方明示授权），解构留在 `try` 内以保留 `\"null\"` body → `invalid json` 的隐藏路径；两种 400 文案逐字不变\n\n**跳过 3 项**（误报/不值得）：\n- 去除 `body || '{}'`——空 body 的 400 文案会从 `invalid amount` 变为 `invalid json`，行为不等价\n- 双路由合并为路由表——2 条路由属过度抽象（平衡守卫）\n- `Readable.collect` 替换手写 body 聚合——版本依赖且无清晰度收益\n\n**efficiency 应用 0 项**（见限制）。\n\n### 派发披露\n\n`worker_dispatch_authorization: missing` → 未派发 subagent，三个 lens 由我内联串行执行（`dispatch_authorization_missing`）；不声称独立 reviewer 或 multi-agent 覆盖。\n\n### 限制\n\n- **无 lint / typecheck**：项目未配置（`package.json` 仅 `test` 脚本，无 eslint/tsconfig），已明示非静默跳过\n- **证明覆盖边界**：证明测试不覆盖空 body、`null` body、原始类型 body——该等价性由已删除的一次性差分脚本支撑，非仓库内可持续证据\n- **固有行为未动**（行为保持 pass 授权之外）：请求 body 无大小上限、`entries` 内存无界增长、端口硬编码 3000——如需处理属独立工作项\n- 最终树的完整验证与 closeout 归调用方所有",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "docs-only-no-yield",
+      "title": "A docs-only scope has no code simplification yield",
+      "status": "PASS",
+      "duration_ms": 38281,
+      "turns": 4,
+      "input_tokens": 21857,
+      "output_tokens": 626,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 4,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/fixtures/scripts/check-no-yield-scope.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nThat preparation alone may create the baseline commit; no task commit or landing is authorized.\nUse spec-simplify-code to simplify docs/notes.md.\n",
+      "response": "`nothing to simplify` — 指定范围 `docs/notes.md` 是纯 Markdown 文档（6 行散文，无任何代码），命中 preflight 的 change-kind gate：仅含文档的范围在加载 review lenses 之前即跳过，且该 gate 不会扩大到 caller 授权之外的路径，故不派发三个 review lens、不做任何改动、不提交。文件保持原样，工作区仅有 untracked 的 `.claude/`，基线提交 `41b066f` 未动。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "bug-request-routes-debug",
+      "title": "bug 请求应路由 spec-debug",
+      "status": "PASS",
+      "duration_ms": 20200,
+      "turns": 1,
+      "input_tokens": 21436,
+      "output_tokens": 665,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[spec-debug]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[spec-debug])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-simplify-code skill 已安装，请按它工作。）\n服务发非法 JSON 会崩,帮我处理一下。\n",
+      "response": "这个请求我先按 spec-simplify-code 的规则做了入口判定，结论是：**它不属于简化范畴，我不在这里修**。\n\n**原因**：你报告的是损坏的行为——服务收到非法 JSON 会崩溃。按 skill 的\"Not-a-simplification input first\"规则，崩溃、测试失败、输出错误都属于 bug，spec-simplify-code 只做保持行为不变的清理，明确要求不在此处修 bug。\n\n**路由**：请使用 `spec-debug` 来处理这个崩溃。它不在当前已安装的 skill 列表里，需要先安装或手动调用；如果你希望我直接以普通方式（不经过该 skill）修这个 bug，也可以明确告诉我。\n\n**后续**：等修复落地后，欢迎回到 spec-simplify-code，我可以对修复涉及的改动做一次保持行为不变的简化清理。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "r2-elegant-refactor",
+      "title": "An elegance request preserves the safety baseline",
+      "status": "PASS",
+      "duration_ms": 183010,
+      "turns": 7,
+      "input_tokens": 33593,
+      "output_tokens": 5413,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 7,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/fixtures/scripts/check-r2-safety-stays.sh",
+            "passed": true,
+            "evidence": "PASS: invalid JSON rejected, process survives, valid entries preserved, no new reachable commit"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nThat preparation alone may create the baseline commit; no task commit or landing is authorized.\nUse spec-simplify-code to make src/server.js more elegant. Refactor it however looks best.\n",
+      "response": "**Step 5: 总结**\n\n重构完成，行为保持已验证。未做任何 commit(遵循 prepare-eval 声明与 caller-owned pass 规则)。\n\n## 改进内容(按维度)\n\n**应用 6 项 — reuse 2,quality 4,efficiency 0:**\n\n| 维度 | 修复 |\n|---|---|\n| reuse | 4 处重复的 `statusCode = X; res.end(...)` 统一为 `reply()` 辅助函数 |\n| reuse | `require('http')` → `require('node:http')`,与项目其余文件约定一致 |\n| quality | 删除 `server.js:12` 冗余的 `typeof amount !== 'number'`(`Number.isFinite` 对非 number 输入恒为 `false`,对全部输入可证等价)，金额校验提取为具名谓词 `isValidAmount()` |\n| quality | 匿名大 handler 拆为具名的 `createEntry` / `listEntries`,路由层只剩三行分发 |\n| quality | 未使用的 `catch (err)` → optional catch binding |\n| quality | `(c)` → `(chunk)` |\n\n**跳过 3 项**(不作为 false positive,而是行为保持优先拒绝):`for await` 异步读 body(错误路径语义改变)、查找表路由(两路由级联更清晰 + 原型链边缘风险)、Buffer 收集 body(跨 chunk 多字节字符不等价)。\n\n**保持不变的行为细节**:`body || '{}'` 空Body回退、空Body返回 `invalid amount` 而非 `invalid json` 的差异、`listen(3000)` 原样(proof 通过 patch `http.Server.prototype.listen` 拦截)、副作用顺序(push 先于响应)。\n\n## 验证结果\n\n- **Proof 字节比对**:`test/entries.test.cjs`(`04bc5245…`)与 `test/support/ledger-proof.cjs`(`621f7beb…`)与 pass 前快照完全一致 ✓\n- **测试**:`npm test` → 1 pass / 0 fail,覆盖空账本初始 GET、2 种非法 JSON → 400、6 种非法 amount(含 `1e400`→Infinity)→ 400、两条有效入账的 id/amount/note/ts 完整、进程存活 ✓\n- **lint/typecheck**:package.json 未配置,仅 `test` 脚本——明确声明,未静默跳过\n- **证据来源**:proof 测试为项目既有回归测试(基线 commit `ac25c0e` 已包含),本次未新增或修改任何测试",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 129579,
+  "judge_tokens": 0,
+  "overall_tokens": 129579
+}

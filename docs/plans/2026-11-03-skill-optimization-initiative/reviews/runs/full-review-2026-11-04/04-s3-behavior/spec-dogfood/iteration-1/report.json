@@ -1,0 +1,162 @@
+{
+  "skill_name": "spec-dogfood",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T20:04:26.050445+08:00",
+  "end_time": "2026-11-04T20:07:13.744686+08:00",
+  "case_results": [
+    {
+      "case_id": "owner-unavailable-stops",
+      "title": "浏览器执行 owner 不可用应停止并指引 runtime-setup",
+      "status": "PASS",
+      "duration_ms": 99820,
+      "turns": 3,
+      "input_tokens": 29197,
+      "output_tokens": 2477,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 3,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-dogfood/evals/fixtures/scripts/check-owner-unavailable-stop.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（我已通过 /spec-dogfood 显式调起该 skill——它已在会话中加载,以下是输入。\n这是当前分支的 dogfood 请求。）\n当前分支改了 GET /entries 的响应结构,帮我做发布前的分支 dogfood。\n",
+      "response": "按 skill 流程执行到 Phase 0(scope),结论是**必须在此终止**:这次 dogfood 无法启动,原因是目标解析命中了 skill 明确的拒绝条件。以下是完整依据。\n\n## Phase 0 拒绝:trunk 目标、无 diff 可测\n\n**目标解析**:参数为自然语言描述,无 PR 号、无分支名、无 `--port` → 按 `references/phases.md` Phase 0 规则,目标 = 当前分支。\n\n**git 事实**(已核实):\n\n- 当前分支 `main`,**零提交**:`fatal: your current branch 'main' does not have any commits yet`\n- 无任何其他分支、无 remote;`README.md`、`package.json`、`src/` 全部是 untracked\n- `phases.md` Phase 0 第 2 步:*blank/branch 目标解析到 trunk(`main`)即停止——没有 diff 可 dogfood*。当前分支恰是 `main`,即 trunk 本身\n- 即使假设进入 Phase 1,其 trunk 解析回退同样失败:无本地/远端 trunk ref、无 `origin/HEAD`、无 gh remote → \"No verified trunk ref; stop and resolve the base before dogfooding\"\n\n**与你的预期的差异**:你说\"当前分支**改了** GET /entries 的响应结构\",但 git 里不存在任何基线版本。当前 `src/server.js:16-19` 的 `GET /entries` 返回裸数组 `JSON.stringify(entries)`——这是唯一存在过的状态,\"改动\"无从谈起、无法 diff、也无法界定哪些用户旅程属于本分支引入。\n\n## 授权边界(按 skill 要求推导,本次均为 missing)\n\n```yaml\nbranch_mutation_authorization: missing   # \"当前分支\"是目标选择,不是 checkout/isolation 授权\nbrowser_effect_authorization:  missing   # 未进入浏览器阶段(moot)\nlocal_fix_authorization:       missing   # dogfood/QA 请求本身不授权改源码\ncommit_authorization:          missing\nlanding_authorization:         missing\n```\n\n本次**未做**任何 checkout、提交、服务器启动、浏览器操作或报告创建(报告按规定在 Phase 2 矩阵建立后才创建,本次未到达)。\n\n## 如何解除阻塞\n\n1. **建立 trunk 基线**(二选一):\n   - 改动前版本还可得:先把旧响应结构提交到 `main`,新结构提交到 feature 分支(如 `feature/entries-response`),然后重跑 `/spec-dogfood feature/entries-response`;\n   - 旧版本不可得:先 `git commit` 当前状态到 `main`,之后针对 `/entries` 的新改动在 feature 分支上进行,再 dogfood 那个分支。\n2. **浏览器执行 owner 缺失**(即使分支问题解决也会阻塞):本会话可用 skill 列表中不存在 `spec-test-browser`。按 skill 前置条件的规定停止语:\"Browser execution owner unavailable. Run `spec-runtime-setup` to inspect browser readiness, then rerun `spec-dogfood`. This does not block spec-first baseline.\"(`spec-runtime-setup` 同样不在列表中,需要先安装/启用这组 spec-first skills。)\n3. 次要观察:`package.json` 无 `dev`/`test` script;服务本身可直接 `node src/server.js` 启动(监听 3000),Phase 5 的自动化测试套件目前也没有可发现的运行命令。\n\n分支与基线就绪、且 `spec-test-browser` 可用后,重新调起 `/spec-dogfood` 即可从头执行完整流程(diff 分析 → 流程图 → 矩阵 → 浏览器验证 → 报告)。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "trunk-target-rejected",
+      "title": "指定 trunk 为目标应被拒绝",
+      "status": "PASS",
+      "duration_ms": 52520,
+      "turns": 3,
+      "input_tokens": 26793,
+      "output_tokens": 733,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 3,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-dogfood/evals/fixtures/scripts/check-trunk-reject.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（我已通过 /spec-dogfood 显式调起该 skill。）\nmain\n",
+      "response": "按 skill 的 Phase 0 规则，本次运行必须在此停止，不做任何 checkout、浏览器操作或源码改动。\n\n## 停止原因：trunk 目标，无 diff 可 dogfood\n\n**目标解析**：参数 `main` 是分支名(非 PR 号)，目标即 `main` 分支。\n\n**Phase 0 判定**:`spec-dogfood` 是 diff-scoped 的流程——只测\"当前分支相对 trunk 引入了什么\"。`main` 本身就是 trunk,分支名目标解析到 trunk 时按规则直接停止：没有基线可对比，没有变更流可映射，测试矩阵无从生成。\n\n**附加事实**(让情况更明确)：这个仓库目前**零提交**——`main` 上没有任何 commit,`README.md`、`src/`、`package.json`、`.claude/` 全部处于 untracked 状态，也没有远程。也就是说即使换一个目标分支，当前也不存在任何可 diff 的基线。\n\n## 授权边界(本次运行)\n\n```yaml\nbranch_mutation_authorization: missing   # 未执行任何 checkout/isolation\nbrowser_effect_authorization:  missing   # 未启动浏览器\nlocal_fix_authorization:       missing   # 未改动源码\ncommit_authorization:          missing   # 未创建提交\nlanding_authorization:         missing   # 未推送、未开 PR\n```\n\n## 可行的后续路径\n\n如果你想真正跑一次 dogfood,需要先有\"分支 vs trunk\"的差异，任选其一：\n\n1. **先建基线，再做分支**：把当前文件先提交到 `main` 作为基线，然后建一个特性分支(例如 `feat/categories`)做改动并提交，再运行 `/spec-dogfood feat/categories`。\n2. **有真实 PR 时**: `/spec-dogfood \u003cPR号\u003e` —— PR 目标永远可 diff,即使 PR 的 head 分支恰好叫 `main` 也不受此限制。\n3. 只是想让这个 MiniLedger demo 跑起来看看的话，那属于普通冒烟测试而非本 skill 的范畴，直接告诉我，我帮你起服务并手动验证两个接口。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "polish-request-routes-out",
+      "title": "协作式 UI 打磨请求应路由 spec-polish",
+      "status": "PASS",
+      "duration_ms": 73168,
+      "turns": 3,
+      "input_tokens": 22538,
+      "output_tokens": 1792,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 3,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[spec-polish]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[spec-polish])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（我已通过 /spec-dogfood 显式调起该 skill。）\n陪我一起把这个页面的 UI 细节调好看一点,我看着你改。\n",
+      "response": "情况摸清了,先给你一个如实的判断:\n\n**1. `spec-dogfood` 和这个请求不匹配。** 它是\"对分支改动做 QA 试吃\"的流程(diff 分析 → 流程图 → 测试矩阵 → 浏览器验证 → 就绪结论),而它的 When-Not-To-Use 里明确写了:协作式 UI 打磨要路由给 **`spec-polish`**。但这个项目的 `.claude/skills/` 里只有 `spec-dogfood` 自己,`spec-polish` 和它依赖的 `spec-test-browser` 都没装,所以没法正式交接——我直接以普通协作方式陪你调,不走 dogfood 流程。(顺带一提:这个仓库还没有任何 commit,全是未跟踪文件,也没有可供 dogfood 的\"分支 vs 主干\"diff。)\n\n**2. 更实际的 blocker:这个项目目前没有页面。** `src/server.js` 只有两个 JSON 接口:\n\n- `POST /entries` — 记一笔 `{amount, note}`\n- `GET /entries` — 列出所有记录\n\n没有任何 HTML、没有任何前端,浏览器打开 `localhost:3000` 只会得到 404。README 里也自认\"加一笔账要手敲字段\"。所以\"把这个页面调好看\"目前没有打磨对象。\n\n**我的提议**:我先用最小改动给 server 加一个真正的首页——一个记账页(金额 + 备注输入、记录列表、余额合计),然后 `node src/server.js` 起在 3000 端口,你开着 `localhost:3000` 看着,我们一轮一轮把间距、字体、配色、空状态这些细节磨顺。\n\n要我现在就把这页搭出来吗?还是你说的\"这个页面\"其实是另外一个项目/另外一个地址,那我直接去那边干活。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "r2-code-review-routes-out",
+      "title": "R2变体:代码审查请求应点名 spec-code-review",
+      "status": "PASS",
+      "duration_ms": 167606,
+      "turns": 3,
+      "input_tokens": 33744,
+      "output_tokens": 5340,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 3,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[spec-code-review]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[spec-code-review])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（我已通过 /spec-dogfood 显式调起该 skill。）\n不用开浏览器,直接帮我静态审查当前分支的代码改动。\n",
+      "response": "核验完成：当前 npm 版本下 `npm start` 直接报 `Missing script: \"start\"`。以下为静态审查结论。\n\n---\n\n## 路由与授权说明（按 skill 契约）\n\n- **路由**：静态代码审查不在 `spec-dogfood` 适用范围内，契约指定的目的地是 **`spec-code-review`**。该 skill 未安装于本工作区，故由我直接完成静态审查。另外当前分支为 `main`（trunk）且仓库零提交，dogfood 流程本身也会在 Phase 0 拒绝运行——不存在可浏览器验证的 diff。\n- **授权状态**：本次请求仅为检查，`local_fix_authorization: missing` → **所有发现只报告、不修改**（`fix_authorization_missing`）。`commit_authorization` / `landing_authorization` 均为 missing。\n\n## 审查范围\n\n`README.md`、`package.json`、`src/server.js`（全部为未跟踪新文件，即本分支全部改动）。`.claude/skills/spec-dogfood/**` 是 QA 工具链本身，不计入产品代码审查，如需单独评审请说一声。\n\n## 发现（按严重程度）\n\n### 🔴 高\n\n1. **`src/server.js:10` — 非法 JSON 会导致整个进程崩溃。** `JSON.parse(body || '{}')` 的异常没有任何捕获：在 `'end'` 事件回调里抛出即为 `uncaughtException`，一条 `curl -X POST -d 'oops'` 就能杀掉服务，且客户端拿不到任何响应。修复方向：`try/catch` 后返回 `400`（需授权后实施）。\n\n### 🟡 中\n\n2. **`src/server.js:7-8` — 请求体无上限累积，可被内存耗尽。** `body += c` 不设长度上限，持续发送大 body 可撑爆内存。属防御性缺口，demo 亦建议加上限（如 1MB）后返回 `413`。\n3. **`src/server.js:10-11` — 零输入校验，脏数据直接入账。** `amount`/`note` 不校验类型与缺失：空 body 也会写入一条 `{id, ts}` 的空记录；`amount` 可以是字符串、负数或任意对象，`GET /entries` 原样吐出。个人记账应用里这是数据正确性问题，不只是健壮性。\n4. **`src/server.js:25` — 监听绑定全部网卡。** `server.listen(3000)` 默认 `0.0.0.0`，一个本地 demo 会暴露给整个局域网，叠加上面两条崩溃/耗尽缺陷。建议显式 `127.0.0.1`。\n\n### 🟢 低\n\n5. **`src/server.js:6,16` — URL 精确字符串匹配。** `/entries?limit=5`、`/entries/`（尾斜杠）都会落到 404；未来加查询参数即踩坑。可用 `URL` 解析后比对 pathname。\n6. **`README.md:8` — “adding an entry requires five fields” 与代码不符。** 实际 POST 只需 `amount`、`note` 两个字段（README 第 6 行自己描述的存储结构也是 4 个键）。疑为旧版本文案残留。\n7. **`package.json` — 无任何 `scripts`（已实测）。** `npm start` 报 `Missing script: \"start\"`；也没有 test 脚本（dogfood Phase 5 要求跑自动化套件时将无套件可跑）。建议补 `\"start\": \"node src/server.js\"`。\n8. **`src/server.js:25` — 端口硬编码、`listen` 无 error 处理、启动无日志。** 端口被占时以未处理 `'error'` 事件崩溃；不支持 `PORT` 环境变量。\n9. **`src/server.js:11` — `id: entries.length + 1` 是潜伏 bug。** 当前无删除接口所以暂不触发，但一旦引入删除，ID 立即复用。建议自增计数器或 `crypto.randomUUID()`。\n10. **`src/server.js:9` — `req` 无 `'error'`/`'aborted'` 监听。** 客户端中途断开时 `'end'` 不会触发，留下一半累积的 `body`；流上未处理的 `'error'` 事件同样可能抛出。\n\n### ⚪ 外观\n\n11. **`src/server.js:12`** — POST 成功回 `200 'ok'` 更贴合 `201` + JSON 体；响应未设 `content-type`。\n\n## 结论\n\n30 行的 demo 服务，可用骨架是对的（GET/POST/404 分发清晰），但**当前状态不具备对外可用性**：一次非法 POST 即可整进程崩溃（发现 1），叠加全网卡监听（发现 4）。README 与实现存在事实性偏差（发现 6）。\n\n后续可选（均需你明确授权）：**a)** 授权我按上述优先级做小幅修复（发现 1/3/4 属于小而明确的修法）；**b)** 对同一份 diff 跑内置 `/code-review` 做第二遍正式评审；**c)** 评审 `.claude/skills/spec-dogfood/**` 本身的质量。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 122614,
+  "judge_tokens": 0,
+  "overall_tokens": 122614
+}

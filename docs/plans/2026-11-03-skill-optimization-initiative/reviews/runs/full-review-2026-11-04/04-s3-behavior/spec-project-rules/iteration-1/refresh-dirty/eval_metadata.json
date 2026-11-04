@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "refs 脏检测后聚焦重验仍准确则零写入且不回滚用户工作区改动",
+  "prompt": "这是一个隔离的非交互评测工作区（自动化 runner 执行，无交互确认原语，属 skill\n规程定义的 headless 环境）。先运行 `bash prepare-eval-fixture.sh` 创建\nfixture 基线 commit，然后依次执行以下 setup 命令模拟\"知识库生成于当前\n基线、之后代码有改动\"：\n1. `perl -pi -e \"s/eval0001/$(git rev-parse --short HEAD)/\" docs/architecture.md \u0026\u0026 git add docs/architecture.md \u0026\u0026 git commit -qm kb-baseline`\n2. `printf 'export const TOUCHED = 1;\\n' \u003e\u003e apps/web/src/order.ts`（不要 commit 这条改动）\n本用例完全自包含；不要读取本工作区之外的任何资料。然后使用\nspec-project-rules skill 处理以下要求：\"知识库是之前建的，帮我检查一下\n还准不准。\"完成后把控制权交还 caller。\n",
+  "assertions": [
+    "expect.exit_code",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-project-rules/evals/fixtures/scripts/check-refresh-dirty.sh"
+  ]
+}

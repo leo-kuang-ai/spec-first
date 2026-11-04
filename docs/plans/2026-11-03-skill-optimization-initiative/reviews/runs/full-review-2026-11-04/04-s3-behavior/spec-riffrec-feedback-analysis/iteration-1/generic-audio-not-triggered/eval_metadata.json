@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "通用音频转写请求不应触发 Riffrec 分析",
+  "prompt": "（spec-riffrec-feedback-analysis skill 已安装，请按它工作。）\n帮我把这个会议录音 meeting-final.mp3 转写成文字纪要。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-riffrec-feedback-analysis/evals/fixtures/scripts/check-generic-refused.sh"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "未解决问题不得写入 durable knowledge",
+  "prompt": "（spec-compound skill 已安装，请按它工作。）\n我遇到一个崩溃问题还没解决,先把这个问题记进知识库吧。\n",
+  "assertions": [
+    "expect.files_not_exist",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound/evals/fixtures/scripts/check-refuses-unsolved.sh"
+  ]
+}

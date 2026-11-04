@@ -1,0 +1,10 @@
+{
+  "eval_id": 0,
+  "eval_name": "模糊想法应路由到 spec-brainstorm",
+  "prompt": "（当前仓库是 spec-first，using-spec-first skill 已安装，请按它工作。\n这是隔离评测沙箱：本目录为空、spec-* workflow 未安装属预期，请只做路由判定，\n按你的宣告或推荐模板给出所选入口即可，无需实际安装或执行任何 workflow。）\n我有个模糊的念头：想给团队做个自动汇总每日站会进展的小工具，\n但不确定该做多大、给谁用、成功标准是什么。帮我理一理。\n",
+  "assertions": [
+    "expect.must_contain",
+    "expect.must_not_contain",
+    "output_contains{all:[spec-brainstorm]}"
+  ]
+}

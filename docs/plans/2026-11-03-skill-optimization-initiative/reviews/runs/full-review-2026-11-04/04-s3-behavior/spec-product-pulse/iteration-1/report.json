@@ -1,0 +1,90 @@
+{
+  "skill_name": "spec-product-pulse",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T20:13:35.46279+08:00",
+  "end_time": "2026-11-04T20:16:32.046415+08:00",
+  "case_results": [
+    {
+      "case_id": "check-source-outcomes",
+      "title": "Check source outcomes",
+      "status": "FAIL",
+      "duration_ms": 176105,
+      "turns": 3,
+      "input_tokens": 32735,
+      "output_tokens": 3596,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 3,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-product-pulse/evals/fixtures/scripts/check-source-outcomes.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: node:assert:150\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    {\n      name: 'revenue',\n      source: 'payments-export',\n+     state: 'confirmed-value',\n-     state: 'ok',\n      value: 1200\n    },\n    {\n      name: 'active_users',\n      source: 'analytics-export',\n\n    at [stdin]:203:8\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5)\n    at ReadStream.emit (node:events:519:28) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: [\n    {\n      name: 'revenue',\n      source: 'payments-export',\n      state: 'confirmed-value',\n      value: 1200\n    },\n    {\n      name: 'active_users',\n      source: 'analytics-export',\n      state: 'permission-denied',\n      value: null\n    }\n  ],\n  expected: [\n    {\n      name: 'revenue',\n      source: 'payments-export',\n      state: 'ok',\n      value: 1200\n    },\n    {\n      name: 'active_users',\n      source: 'analytics-export',\n      state: 'permission-denied',\n      value: null\n    }\n  ],\n  operator: 'deepStrictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run node prepare-eval.cjs once in this isolated fixture. Preparation may create a fixture baseline commit only. Read the current installed spec-product-pulse source and follow it. Create a local pulse report for the exact window recorded in exports/payments.json and exports/analytics.json, using those exports only. Preserve failed analytics as missing, never zero. No provider calls or schedule/config writes. Return JSON with metrics [{name,source,state,value}] in revenue then active_users order, and artifact_path for the actual saved report.",
+      "response": "报告已生成并落盘。唯一写入是 `docs/pulse-reports/2026-11-04_20-15.md`——未调用任何 provider、未写 `.spec-first/config.local.yaml`、未建立 schedule（`pulse_schedule: manual` 已在案，Phase 3 无需再提议）。\n\n**执行要点（对照已安装的 spec-product-pulse 源）：**\n- 窗口：采用导出文件记录的精确窗口 `2026-10-28T00:00:00Z/2026-10-29T00:00:00Z`，而非追踪窗口，故 15 分钟缓冲不适用（已在报告尾注说明）\n- `payments-export`（revenue）：导出 `state: ok` → 回执 `confirmed-value`，值 1200\n- `analytics-export`（active_users）：导出 `state: failed, reason: permission-denied` → 回执 `permission-denied`，值保持缺失（null），**未当作零**，也未降级为 `confirmed-zero`\n- tracing 未配置 → `not-configured`；无 prior window → 按模板规则省略 delta 而非编造；无策略种子文件 → 按规则记录限制并继续\n\n**Headlines（报告原文）：**\n\u003e - Revenue 1200 across the export window (payments-export, confirmed-value).\n\u003e - active_users unavailable: analytics-export returned permission-denied; value is missing, not zero.\n\u003e - No prior-window export on file, so no deltas are computed for any metric.\n\n**Top Followup：** Restore analytics-export access, then re-run this pulse for window 2026-10-28 -\u003e 2026-10-29 to recover active_users.\n\n```json\n{\n  \"metrics\": [\n    {\"name\": \"revenue\", \"source\": \"payments-export\", \"state\": \"confirmed-value\", \"value\": 1200},\n    {\"name\": \"active_users\", \"source\": \"analytics-export\", \"state\": \"permission-denied\", \"value\": null}\n  ],\n  \"artifact_path\": \"docs/pulse-reports/2026-11-04_20-15.md\"\n}\n```\n\n说明：JSON 中的 `state` 已从导出的 `ok`/`failed` 映射为 skill 的回执状态；`active_users` 的值为 `null`（缺失），报告与返回值中均未以 0 呈现。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "unconfigured-guides-setup",
+      "title": "未配置时应引导 setup 而非硬跑空报告",
+      "status": "FAIL",
+      "duration_ms": 14370,
+      "turns": 1,
+      "input_tokens": 18895,
+      "output_tokens": 365,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-product-pulse/evals/fixtures/scripts/asks-a-question.sh",
+            "passed": false,
+            "evidence": "输出未包含问句变体或索要输入的表述,未体现向用户提问的行为"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-product-pulse skill 已安装，请按它工作。）\n给我出一份产品脉搏报告。\n",
+      "response": "该 skill 设置了 `disable-model-invocation`（禁止模型调用），我无法通过 Skill 工具替你触发它，也不能绕过这个限制去模仿它的工作流程。\n\n请你直接在输入框中运行：\n\n```\n/spec-product-pulse\n```\n\n这样 skill 的完整指令会加载进来，我就能按它的规范为你产出产品脉搏报告。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 55591,
+  "judge_tokens": 0,
+  "overall_tokens": 55591
+}

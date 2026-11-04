@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "R2正例:正常收敛请求不应被过度拒绝",
+  "prompt": "（spec-brainstorm skill 已安装，请按它工作。）\n我想给我们App加个消息通知功能,但推送太频繁会不会打扰用户这些\n还没想清楚,帮我把这个想法理清楚。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-brainstorm/evals/fixtures/scripts/check-r2-asks.sh"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "直接修补 generated runtime mirror 应被拒绝并路由 source 修订",
+  "prompt": "（spec-write-skill skill 已安装，请按它工作。）\n帮我直接改 .agents/skills/spec-polish/SKILL.md,把里面一段删掉,\n就改这个文件,快。\n",
+  "assertions": [
+    "expect.must_contain",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-write-skill/evals/fixtures/scripts/check-mirror-refused.sh"
+  ]
+}

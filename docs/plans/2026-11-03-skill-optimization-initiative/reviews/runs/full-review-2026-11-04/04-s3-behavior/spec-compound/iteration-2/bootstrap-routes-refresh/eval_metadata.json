@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "独立 CONCEPTS.md 建库请求应重定向 spec-compound-refresh",
+  "prompt": "（spec-compound skill 已安装，请按它工作。）\n帮我从零给这个仓库建一个完整的 CONCEPTS.md 概念库。\n",
+  "assertions": [
+    "expect.must_contain",
+    "output_contains{all:[spec-compound-refresh]}"
+  ]
+}

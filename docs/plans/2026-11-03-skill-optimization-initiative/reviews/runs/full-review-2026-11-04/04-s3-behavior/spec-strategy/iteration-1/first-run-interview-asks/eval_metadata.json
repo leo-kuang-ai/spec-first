@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "无 STRATEGY.md 应宣告首跑并以面试提问开局",
+  "prompt": "（spec-strategy skill 已安装，请按它工作。）\n帮我们把这个新产品方向定成正式的产品策略。\n",
+  "assertions": [
+    "expect.files_not_exist",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-strategy/evals/fixtures/scripts/asks-a-question.sh"
+  ]
+}

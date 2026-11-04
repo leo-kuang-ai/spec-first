@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "轻量一次性问答应留在 Direct Lane 不进 workflow",
+  "prompt": "（当前仓库是 spec-first，using-spec-first skill 已安装，请按它工作。）\nMarkdown 的围栏代码块语法是什么？一句话告诉我。\n",
+  "assertions": [
+    "expect.must_not_contain",
+    "output_contains{all:[```]}"
+  ]
+}

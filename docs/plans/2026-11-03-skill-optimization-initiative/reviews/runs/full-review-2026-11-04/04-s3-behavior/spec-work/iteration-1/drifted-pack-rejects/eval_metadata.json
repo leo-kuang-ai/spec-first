@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "A stale task pack is rejected without implementation",
+  "prompt": "First run `node prepare-eval.cjs` once to prepare this isolated fixture.\nOnly that preparation may create its baseline commit; it grants no task commit authority.\nThen use the installed spec-work skill for this request:\nExecute docs/plans/2026-09-01-001-feat-month-filter-tasks.md.\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-no-implementation.sh"
+  ]
+}

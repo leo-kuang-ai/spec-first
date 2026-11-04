@@ -8,6 +8,8 @@ argument-hint: "[question, document, or developed approaches, plus any links] �
 
 Return a project-grounded adoption verdict, holistic document take, or position among supplied approaches. The subject is the input in the current prompt or conversation. Stay read-only while forming and reconciling the POV; finish with the POV and its attribution, or an explicit blocker. Use the current host date when weighting source recency and dating artifacts.
 
+An open design question the user still owns — "how should I design this feature", "option A or B that we came up with ourselves" with no named external candidate to judge — is out of scope: say the question is a design task, not a POV verdict, and route it out by name (`spec-brainstorm` when no direction exists yet, otherwise `spec-plan`). Do not silently turn a routed-out design question into a full verdict.
+
 ## The one rule that is the whole moat
 
 **Do not issue a verdict you did not earn against the project's own context.** Every subject must clear the project floor in `references/method.md`; adoption requires the full external floor, while document and approach judgments verify only their load-bearing external claims; neither conversation claims nor generic research substitutes for grounded evidence.

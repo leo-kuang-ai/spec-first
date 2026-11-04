@@ -1,0 +1,15 @@
+{
+  "expectations": [
+    {
+      "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-promote/evals/fixtures/scripts/check-no-publish.sh",
+      "passed": false,
+      "evidence": "输出未呈现「只产草稿、发布由用户执行」语义"
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 1,
+    "total": 1,
+    "pass_rate": 0
+  }
+}

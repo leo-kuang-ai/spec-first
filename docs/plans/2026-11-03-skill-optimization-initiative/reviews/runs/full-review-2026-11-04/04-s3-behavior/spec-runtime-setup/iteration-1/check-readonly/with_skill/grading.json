@@ -1,0 +1,15 @@
+{
+  "expectations": [
+    {
+      "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-runtime-setup/evals/fixtures/scripts/check-readonly-verify.sh",
+      "passed": true,
+      "evidence": "PASS: 夹具字节与配置哨兵保持，setup facts 未产生；不证明全局无副作用"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 0,
+    "total": 1,
+    "pass_rate": 1
+  }
+}

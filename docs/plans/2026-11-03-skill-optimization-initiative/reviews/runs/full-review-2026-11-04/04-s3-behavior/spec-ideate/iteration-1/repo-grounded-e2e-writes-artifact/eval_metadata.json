@@ -1,0 +1,6 @@
+{
+  "eval_id": 0,
+  "eval_name": "仓库内主题应走完整流程并落盘 ideation artifact",
+  "prompt": "（spec-ideate skill 已安装，请按它工作。）\n这个记账 demo 留存很差，帮我围绕提升用户留存想一批改进方向。\n",
+  "assertions": null
+}

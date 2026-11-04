@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "headless 首跑应报 requires interactive setup 并停止",
+  "prompt": "（skill-up 评测框架说明：本仓库 .claude/skills/spec-sweep/SKILL.md 是被测\nskill 的定义文件,已随仓库就位。本次运行不经过 Skill 工具调用——请直接完整\n读取该文件,把它视为已加载的工作指令,然后按它处理下面的输入。输入形态:\n定时调度器触发,无人在场。）\nmode:headless\n",
+  "assertions": [
+    "expect.must_contain",
+    "output_contains{all:[first run requires interactive setup]}"
+  ]
+}

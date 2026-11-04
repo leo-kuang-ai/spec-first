@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "A docs-only scope has no code simplification yield",
+  "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nThat preparation alone may create the baseline commit; no task commit or landing is authorized.\nUse spec-simplify-code to simplify docs/notes.md.\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/fixtures/scripts/check-no-yield-scope.sh"
+  ]
+}

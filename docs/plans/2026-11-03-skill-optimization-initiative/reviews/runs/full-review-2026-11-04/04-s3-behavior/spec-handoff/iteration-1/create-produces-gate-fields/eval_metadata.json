@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "create 产出含 gate 四字段的 spec-handoff/v1 artifact",
+  "prompt": "（spec-handoff skill 已安装，请按它工作。）\n给当前 mini-ledger 的工作创建一个跨会话交接：create handoff。\n背景：我们刚给 src/server.js 的 GET /entries 加了 limit 分页并本地验证通过；\n下一步是加分类汇总接口，下个会话继续做。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-handoff/evals/fixtures/scripts/check-create-artifact.sh"
+  ]
+}

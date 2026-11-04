@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "Check source outcomes",
+  "prompt": "First run node prepare-eval.cjs once in this isolated fixture. Preparation may create a fixture baseline commit only. Read the current installed spec-product-pulse source and follow it. Create a local pulse report for the exact window recorded in exports/payments.json and exports/analytics.json, using those exports only. Preserve failed analytics as missing, never zero. No provider calls or schedule/config writes. Return JSON with metrics [{name,source,state,value}] in revenue then active_users order, and artifact_path for the actual saved report.",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-product-pulse/evals/fixtures/scripts/check-source-outcomes.sh"
+  ]
+}

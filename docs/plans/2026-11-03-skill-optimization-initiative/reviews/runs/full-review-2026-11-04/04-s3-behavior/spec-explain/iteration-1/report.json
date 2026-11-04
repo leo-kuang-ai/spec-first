@@ -1,0 +1,64 @@
+{
+  "skill_name": "spec-explain",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T20:17:21.909018+08:00",
+  "end_time": "2026-11-04T20:17:45.545142+08:00",
+  "case_results": [
+    {
+      "case_id": "simple-qa-not-triggered",
+      "title": "普通 Q\u0026A 不应触发深度教学 artifact",
+      "status": "PASS",
+      "duration_ms": 23028,
+      "turns": 1,
+      "input_tokens": 18015,
+      "output_tokens": 1354,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.files_not_exist",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-explain/evals/fixtures/scripts/check-simple-qa.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-explain skill 已安装，请按它工作。）\nNode 的 stream 和 buffer 有什么区别?简单说说就行。\n",
+      "response": "这个问题按 spec-explain 自身的适用范围（明确排除「普通问答、简短解答」）不触发该 skill，直接简答：\n\n- **Buffer**：一块装二进制数据的内存容器，一次性持有完整数据。适合小数据、必须拿到全量才能处理的场景（如图片编码、MD5 计算）。\n- **Stream**：数据搬运的方式，把数据切成小块（chunk）持续流动，不必等全部到齐，边到边处理。适合大文件读写、网络传输，内存占用低。\n- **关系**：stream 里流动的每个 chunk 通常就是一个 Buffer——stream 是「怎么搬」，buffer 是「装数据的桶」。类比：stream 是水管，buffer 是水桶。\n\n如果你想要一份带图解的深度讲解（含自测题），说一声我再跑 spec-explain。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 19369,
+  "judge_tokens": 0,
+  "overall_tokens": 19369
+}

@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-compound-refresh",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T20:42:43.646243+08:00",
+  "end_time": "2026-11-04T20:51:05.457722+08:00",
+  "case_results": [
+    {
+      "case_id": "publication-recover",
+      "title": "恢复部分发布时保留人工条目及完整知识",
+      "status": "FAIL",
+      "duration_ms": 501176,
+      "turns": 16,
+      "input_tokens": 64021,
+      "output_tokens": 7048,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 16,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound-refresh/evals/fixtures/scripts/check-publication-recover.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: node:assert:150\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'completed'\n- 'applied'\n\n    at checkKnowledgePublication ([stdin]:133:12)\n    at [stdin]:165:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 'completed',\n  expected: 'applied',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "先运行 node prepare-eval.cjs，为隔离评测创建基线；这不授权任务提交。\n用 spec-compound-refresh 完成 README.md 所述部分发布的恢复，范围仅 docs/solutions/old.md、new.md、catalog.md。\n授权在new末尾添加一个空行，再逐字追加old的离线恢复标题与段落（末尾换行），new其他字节不变；核实源码和当前catalog后，\n只将catalog中的old引用改成new，保留其他字节；验证最终引用和原件可恢复后删除old。\n不提交、不push、不修改源码或其他文件。最终仅返回 JSON：status、changed、deleted、pending，路径为仓库相对路径。\n",
+      "response": "```json\n{\n  \"status\": \"completed\",\n  \"changed\": [\n    \"docs/solutions/new.md\",\n    \"docs/solutions/catalog.md\"\n  ],\n  \"deleted\": [\n    \"docs/solutions/old.md\"\n  ],\n  \"pending\": [\n    \"未提交：commit_authorization_missing，三处变更保留为未暂存工作区状态（可经基线 236a72b 恢复 old.md 原件，已按哈希验证）\",\n    \"CONCEPTS.md 词汇引导（凭据恢复、离线恢复）超出本次三文件授权范围，未发布\",\n    \"docs/solutions/new.md 的 invalidation_condition 未并入 old 的离线凭据失效条件（受逐字节授权限制），建议后续合并\",\n    \"README.md 对 old.md 的场景性提及未清理（不在授权范围）\"\n  ]\n}\n```",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 71069,
+  "judge_tokens": 0,
+  "overall_tokens": 71069
+}

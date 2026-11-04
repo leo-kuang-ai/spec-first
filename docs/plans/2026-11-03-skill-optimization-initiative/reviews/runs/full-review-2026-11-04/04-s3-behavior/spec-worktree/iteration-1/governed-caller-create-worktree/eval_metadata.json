@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "governed caller 经 detect 创建 new-work worktree 且主 checkout 不动",
+  "prompt": "这是一个隔离评测工作区。先运行 `bash prepare-worktree-fixture.sh` 建立初始提交；\n该命令仅用于准备评测环境，不属于被测行为。\n（spec-worktree skill 已安装，请按它工作。你是 governed caller，\n提供 caller-owned 隔离契约：caller 身份=并行特性开发，target repo=\n当前仓库，新分支名 feat-pagination，隔离原因=并行开发保持主分支干净，\n允许的 setup 副作用=.worktrees 目录与 .gitignore 条目，不复制 env 文件。）\n请按 skill 完成隔离并汇报结果与切换路径。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-worktree/evals/fixtures/scripts/check-create-worktree.sh"
+  ]
+}

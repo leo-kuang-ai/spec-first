@@ -1,0 +1,10 @@
+{
+  "eval_id": 0,
+  "eval_name": "复合意图按失败优先且只选一个入口",
+  "prompt": "（当前仓库是 spec-first，using-spec-first skill 已安装，请按它工作。\n这是隔离评测沙箱：本目录为空、spec-* workflow 未安装属预期，请只做路由判定，\n按你的宣告或推荐模板给出所选入口即可，无需实际安装或执行任何 workflow。）\n这个崩溃先帮我解决：App 一启动就 NSInvalidArgumentException，\nreason: 'unrecognized selector sent to instance 0x60000c0a8f00'。\n解决完之后我还想把相关代码简化一下，会更清爽。\n",
+  "assertions": [
+    "expect.must_contain",
+    "expect.must_not_contain",
+    "output_contains{all:[spec-debug]}"
+  ]
+}

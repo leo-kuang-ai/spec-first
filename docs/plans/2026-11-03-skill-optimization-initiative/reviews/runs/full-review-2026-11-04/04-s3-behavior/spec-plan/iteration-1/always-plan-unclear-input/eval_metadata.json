@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "模糊输入也应留在规划流程内澄清而非退出",
+  "prompt": "（spec-plan skill 已安装，请按它工作。）\n帮我搞点事情让这个记账 demo 更好用一点。\n",
+  "assertions": [
+    "expect.must_contain",
+    "expect.exit_code"
+  ]
+}

@@ -1,0 +1,162 @@
+{
+  "skill_name": "spec-app-consistency-audit",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T20:16:35.772018+08:00",
+  "end_time": "2026-11-04T20:17:42.037103+08:00",
+  "case_results": [
+    {
+      "case_id": "no-input-gated",
+      "title": "无 PRD/Figma/源码输入应被 gate",
+      "status": "PASS",
+      "duration_ms": 36449,
+      "turns": 2,
+      "input_tokens": 22999,
+      "output_tokens": 1068,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 2,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-app-consistency-audit/evals/skillup/fixtures/scripts/check-no-input-gate.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-app-consistency-audit skill 已安装，请按它工作。）\n帮我审一下我们的 App 一致性。\n",
+      "response": "已加载 `spec-app-consistency-audit` 工作流并完成输入预检，结论如下：\n\n## 预检结果：当前工作区没有可审计的 App 面\n\n当前目录 `/private/var/folders/.../T/skill-up-439864990` 下只有 `.claude/skills/spec-app-consistency-audit`（即本 skill 自身），没有：\n\n- App 源码（Android / iOS / KMP / Compose 等）\n- PRD 文档\n- Figma 本地上下文（`figma-context.json`）\n- `.spec-first/` 工作目录，且此处也不是 git 仓库（headless 模式所需的 `base:\u003cgit-ref\u003e` 无法解析）\n\n按本工作流的证据边界（\"No evidence, no issue\" / 输入不足属于失败模式 `insufficient App surface evidence`），我不会在零输入的情况下编造审计结论。\n\n## 请提供以下输入后我立即开审\n\n把下面任意组合发给我（可直接给路径）：\n\n| 输入 | 形式 | 说明 |\n|---|---|---|\n| **源码根目录** | `source:\u003cpath\u003e` | 必需，至少有其一（源码/PRD） |\n| **PRD** | `prd:\u003cpath\u003e` | 文档或目录 |\n| Figma | `figma-context:\u003cpath\u003e`（本地 JSON）或 `figma-ref:\u003curl\u003e` | 仅 `figma-ref` 会被降级为 `input_figma_reference_only`，设计对齐类发现只做提示性输出 |\n| 行业视角（可选） | `industry:\u003cname\u003e`（如 金融/医疗/电商） | 只是 lens，不构成 confirmed 证据 |\n| 技术方案/任务文档（可选） | `tech-plan:\u003cpath\u003e` / `task-doc:\u003cpath\u003e` | — |\n\n两点默认约定（除非你另有要求）：\n\n1. **默认 `static_only` 静态审计**：不启动模拟器、真机、构建或任何运行时验证。\n2. **默认内联执行、不派发 subagent**：本次请求未授权 delegated/persona 工作，我会由 orchestrator 内联应用各专家 lens，并在产物中如实记录 `dispatch_authorization_missing`，不声称独立多 agent 覆盖。\n\n最简单的开局方式：直接告诉我你们 App 项目的路径（例如 `source:/Users/kuang/projects/our-app prd:/Users/kuang/projects/our-app/docs/prd`），我先跑 scope 预检再展开页面路由 / KMP 分层 / 组件复用 / 埋点 / i18n 各 lens。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "test-only-routes-out",
+      "title": "只要跑测试/lint 应指出不属本审计",
+      "status": "PASS",
+      "duration_ms": 52752,
+      "turns": 2,
+      "input_tokens": 23105,
+      "output_tokens": 976,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 2,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-app-consistency-audit/evals/skillup/fixtures/scripts/check-no-input-gate.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-app-consistency-audit skill 已安装，请按它工作。）\n帮我跑一下测试和 lint 就行,不用做一致性分析。\n",
+      "response": "按你的要求没有启动一致性分析。但现状是:**当前目录里没有可跑测试和 lint 的对象**。\n\n我确认了两次,情况如下:\n\n- 工作目录 `skill-up-3068210012` 下只有刚安装的 `.claude/skills/spec-app-consistency-audit/`,没有任何项目代码——没有 `package.json`、`gradlew`、`Makefile`、`*.xcodeproj` 等构建/测试入口。\n- skill 自身也不带测试套件或 lint 配置(它只是 Markdown 规则 + 独立 Node 脚本 + JSON Schema,没有 `package.json`)。\n\n另外说明一点:跑测试/lint 本来就不属于 spec-app-consistency-audit 的职责范围(该 skill 明确排除 build/test execution),所以这一步也不需要走它。\n\n接下来二选一:\n\n1. **给我你的 App 项目路径**,我去那边识别测试/lint 命令并执行(例如 `./gradlew test lint`、`npm test` + `npm run lint` 等);\n2. 如果你的意图是**验证这个 skill 安装是否完好**,我可以对它的 `scripts/*.js` 做一轮 `node --check` 语法校验 + 校验各 JSON Schema 文件可解析——说一声我就跑。\n\n项目在哪?",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "code-review-routes-out",
+      "title": "普通 diff 代码审查应点名 spec-code-review",
+      "status": "PASS",
+      "duration_ms": 66152,
+      "turns": 1,
+      "input_tokens": 23265,
+      "output_tokens": 3013,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[spec-code-review]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[spec-code-review])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（skill-up 评测框架说明：本仓库 .claude/skills/spec-app-consistency-audit/SKILL.md 是被测 skill 的定义文件,已随仓库就位。本次运行不经过 Skill 工具调用——请直接完整读取该文件,把它视为已加载的工作指令,然后按它处理下面的输入。）\n帮我审查一下当前分支 diff 里有没有 bug 和测试覆盖问题。\n",
+      "response": "已读取 `.claude/skills/spec-app-consistency-audit/SKILL.md` 并按其作为工作指令处理你的请求。\n\n**路由结论：这个请求不在本工作流范围内，需要转出。**\n\n你要的是「审查当前分支 diff 里的 bug 和测试覆盖问题」——这是对 diff 的普通 bug / 测试覆盖评审。按本工作流（spec-app-consistency-audit）的 Routing Gate 与近邻路由规则，此类请求明确属于 **`spec-code-review`**：\n\n\u003e Ordinary bug, regression, security, or test-coverage review of a diff belongs to `spec-code-review`.\n\n本工作流只做移动 App 的 PRD / Figma / 本地源码**跨源一致性审计**（页面路由、KMP/Clean Architecture 边界、组件复用、埋点、i18n、行业规则等静态一致性），不承担代码评审、修复或实现——即使直接指示在本工作流里做评审，规则也要求路由转出而非就地执行，且转出时必须明确指出目的地。\n\n**下一步（任选其一）：**\n\n1. 直接运行 `/code-review`（可带力度参数，如 `/code-review high`）——这是当前环境中与 `spec-code-review` 职责对应的可用技能，会审查当前分支 diff 的正确性 bug；\n2. 回复一句确认，我立即替你调用 `code-review` 技能来审查当前分支的 diff；\n3. 如果你的真实意图其实是「PRD/Figma/源码跨源一致性审计」（而非普通代码评审），请提供 PRD / Figma context / 源码路径等输入，我再按本工作流继续。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "r2-implementation-routes-out",
+      "title": "R2变体:实现/修复请求应路由 spec-work",
+      "status": "PASS",
+      "duration_ms": 24630,
+      "turns": 1,
+      "input_tokens": 23258,
+      "output_tokens": 1206,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[spec-work]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[spec-work])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（skill-up 评测框架说明：本仓库 .claude/skills/spec-app-consistency-audit/SKILL.md 是被测 skill 的定义文件,已随仓库就位。本次运行不经过 Skill 工具调用——请直接完整读取该文件,把它视为已加载的工作指令,然后按它处理下面的输入。）\n别审了,直接帮我把 src/server.js 的崩溃 bug 修了。\n",
+      "response": "这个请求我不在本工作流里执行——按 `spec-app-consistency-audit` 的路由门规则处理:\n\n**\"别审了,直接修了\"是修复类请求,属于被显式路由出去的邻近任务,不因直接指令而变成覆盖条件。** 修 `src/server.js` 的崩溃 bug 请走:\n\n- **`spec-debug`** —— 如果崩溃根因还没定位,需要先做 bug 根因分析;\n- **`spec-work`** —— 如果根因已明确、只差落地实施。\n\n本工作流只做 PRD / Figma / 本地源的静态一致性审计,不做产品代码修复——即使修复看起来只是一行 try/catch,在审计里顺手修掉也是在替别的工作流干活。我没有改动 `src/server.js`。\n\n如果你希望我直接修,请在本审计工作流之外(普通会话指令)提出,或直接调用上面两个 skill 之一。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 98890,
+  "judge_tokens": 0,
+  "overall_tokens": 98890
+}

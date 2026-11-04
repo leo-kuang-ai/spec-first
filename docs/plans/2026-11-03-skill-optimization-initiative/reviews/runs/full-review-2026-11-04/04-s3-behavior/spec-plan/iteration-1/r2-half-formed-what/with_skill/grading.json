@@ -1,0 +1,20 @@
+{
+  "expectations": [
+    {
+      "text": "expect.must_not_contain",
+      "passed": false,
+      "evidence": "output contains forbidden keyword \"implementation-ready\""
+    },
+    {
+      "text": "expect.exit_code",
+      "passed": true,
+      "evidence": "all checks passed"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 1,
+    "total": 2,
+    "pass_rate": 0.5
+  }
+}
