@@ -1,7 +1,7 @@
 {
   "name": "spec-first",
   "version": "1.15.3",
-  "description": "AI Coding Harness for Claude Code, Codex, Kiro, Qoder, Cursor, and OpenCode preview — turns one-off AI coding chats into a repo-backed, verifiable engineering loop for spec-driven development. Scripts prepare facts; LLMs decide; evidence stays in your repo.",
+  "description": "AI Coding Harness for Claude Code, Codex, Kiro, Qoder, Cursor preview, OpenCode preview, ZCode, and Pi — turns one-off AI coding chats into a repo-backed, verifiable engineering loop for spec-driven development. Scripts prepare facts; LLMs decide; evidence stays in your repo.",
   "type": "commonjs",
   "bin": {
     "spec-first": "bin/spec-first.js"
@@ -39,6 +39,8 @@
   "files": [
     "bin/",
     "src/",
+    "docs/assets/readme/spec-first-cli-workflow-demo.en.svg",
+    "docs/assets/readme/spec-first-cli-workflow-demo.svg",
     "docs/catalog/runtime-capabilities.md",
     "docs/contracts/ai-coding-harness.md",
     "docs/contracts/artifact-summary.md",
@@ -101,11 +103,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sunrain520/spec-first.git"
+    "url": "git+https://github.com/leo-kuang-ai/spec-first.git"
   },
-  "homepage": "https://github.com/sunrain520/spec-first#readme",
+  "homepage": "https://github.com/leo-kuang-ai/spec-first#readme",
   "bugs": {
-    "url": "https://github.com/sunrain520/spec-first/issues"
+    "url": "https://github.com/leo-kuang-ai/spec-first/issues"
   },
   "engines": {
     "node": ">=20.0.0"

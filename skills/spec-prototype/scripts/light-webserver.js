@@ -148,10 +148,11 @@ async function runningInfo() {
   if (!alive(pid)) return null;
   try {
     const info = JSON.parse(readOwnedFile(infoFile));
-    if (!validInfo(pid, info)) return null;
+    if (!validInfo(pid, info)) return { unverified: true, pid };
     const identity = await requestIdentity(info, '/.spec-first/identity');
-    return identity && identity.status === 200 && identity.body.pid === pid && identity.body.root === root ? info : null;
-  } catch { return null; }
+    if (!(identity && identity.status === 200 && identity.body.pid === pid && identity.body.root === root)) return { unverified: true, pid };
+    return info;
+  } catch { return { unverified: true, pid }; }
 }
 function realContained(candidate) {
   try {
@@ -176,9 +177,27 @@ function respond(res, status, body, contentTypeValue = 'text/plain; charset=utf-
   res.writeHead(status, responseHeaders(contentTypeValue));
   res.end(body);
 }
+function screenCandidates() {
+  const candidates = [];
+  try {
+    for (const name of fs.readdirSync(screens)) {
+      const top = path.join(screens, name);
+      if (name.endsWith('.html')) { const file = realContained(top); if (file) candidates.push(file); }
+      else {
+        try {
+          if (!fs.statSync(top).isDirectory()) continue;
+          for (const child of fs.readdirSync(top).sort()) {
+            if (child.endsWith('.html')) { const file = realContained(path.join(top, child)); if (file) candidates.push(file); }
+          }
+        } catch { continue; }
+      }
+    }
+  } catch { return candidates; }
+  return candidates;
+}
 function newestScreen() {
   try {
-    return fs.readdirSync(screens).filter((name) => name.endsWith('.html')).map((name) => realContained(path.join(screens, name))).filter(Boolean).map((file) => ({ file, mtime: fs.statSync(file).mtimeMs })).sort((a, b) => b.mtime - a.mtime)[0]?.file || null;
+    return screenCandidates().map((file) => ({ file, mtime: fs.statSync(file).mtimeMs })).sort((a, b) => b.mtime - a.mtime)[0]?.file || null;
   } catch { return null; }
 }
 function render() {
@@ -236,17 +255,25 @@ function serve() {
     if ((ownerPid && !alive(ownerPid)) || Date.now() - touched > idleMs) server.close(() => process.exit(0));
   }, checkMs);
   timer.unref();
-  process.on('exit', () => { try { fs.rmSync(pidFile, { force: true }); fs.rmSync(infoFile, { force: true }); } catch {} });
+  process.on('exit', () => {
+    try {
+      if (fs.readFileSync(pidFile, 'utf8').trim() !== String(process.pid)) return;
+      const recorded = JSON.parse(fs.readFileSync(infoFile, 'utf8'));
+      if (recorded.instance_token !== instanceToken || recorded.pid !== process.pid) return;
+      fs.rmSync(pidFile, { force: true }); fs.rmSync(infoFile, { force: true });
+    } catch {}
+  });
 }
 async function start() {
   ensureDirs();
   const existing = await runningInfo();
+  if (existing && existing.unverified) { json({ status: 'blocked', reason_code: 'preview-process-identity-unverified', root, pid: existing.pid }); process.exitCode = 2; return; }
   if (existing) { json({ ...publicInfo(existing), status: 'running' }); return; }
   if (foreground) { serve(); return; }
   const log = openAppendOnly(path.join(state, 'server.log'));
   const child = spawn(process.execPath, [scriptPath, 'serve', '--root', root, '--host', host, '--port', String(port), '--instance-token', instanceToken, ...(ownerPid ? ['--owner-pid', String(ownerPid)] : [])], { detached: true, stdio: ['ignore', log, log] });
   child.unref(); fs.closeSync(log);
-  for (let i = 0; i < 100; i += 1) { const info = await runningInfo(); if (info) { json({ ...publicInfo(info), status: 'started' }); return; } await new Promise((resolve) => setTimeout(resolve, 50)); }
+  for (let i = 0; i < 100; i += 1) { const info = await runningInfo(); if (info && !info.unverified) { json({ ...publicInfo(info), status: 'started' }); return; } await new Promise((resolve) => setTimeout(resolve, 50)); }
   fail(`server failed to start; see ${path.join(state, 'server.log')}`);
 }
 async function stop() {
@@ -255,7 +282,8 @@ async function stop() {
   if (!alive(pid)) { fs.rmSync(pidFile, { force: true }); fs.rmSync(infoFile, { force: true }); json({ status: 'stopped', root }); return; }
   let info;
   try { info = JSON.parse(readOwnedFile(infoFile)); } catch { info = null; }
-  if (!validInfo(pid, info) || !(await runningInfo())) {
+  const probe = await runningInfo();
+  if (!validInfo(pid, info) || !probe || probe.unverified) {
     json({ status: 'blocked', reason_code: 'preview-process-identity-unverified', root, pid });
     process.exitCode = 2;
     return;
@@ -280,6 +308,6 @@ async function stop() {
 }
 if (command === 'start') start().catch((error) => fail(error.message));
 else if (command === 'serve') serve();
-else if (command === 'status') { ensureDirs(); runningInfo().then((info) => json(info ? { ...publicInfo(info), status: 'running' } : { status: 'stopped', root })).catch((error) => fail(error.message)); }
+else if (command === 'status') { ensureDirs(); runningInfo().then((info) => { if (info && info.unverified) { json({ status: 'blocked', reason_code: 'preview-process-identity-unverified', root, pid: info.pid }); process.exitCode = 2; return; } json(info ? { ...publicInfo(info), status: 'running' } : { status: 'stopped', root }); }).catch((error) => fail(error.message)); }
 else if (command === 'stop') stop().catch((error) => fail(error.message));
 else fail('usage: light-webserver.js start|status|stop --root <dir>');

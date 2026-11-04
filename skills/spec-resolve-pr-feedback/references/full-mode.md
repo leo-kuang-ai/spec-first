@@ -168,7 +168,7 @@ Record the validation outcome for the step 9 summary.
 
 ## 6. Commit and Push
 
-Commit and push are independent exits: stage/commit only with `commit_authorization: authorized`; push only after commit succeeds and `push_authorization: authorized` is present. Missing authority stops that exit; preserve verified local state and proceed to Step 9. Do not claim a fixed thread is repaired remotely or resolve it without the required remote result.
+Commit and push are independent exits: stage/commit only with `commit_authorization: authorized`; push only after commit succeeds and `push_authorization: authorized` is present. Missing authority stops that exit only; preserve verified local state, skip the blocked exits, and continue into Step 7 with the independent, already-authorized, dependency-free actions (pending remote-fix-dependent replies stay pending). Do not claim a fixed thread is repaired remotely or resolve it without the required remote result.
 
 Before staging, inspect the complete index against the pre-dispatch baseline: unrelated staged content or uncertain hunk ownership blocks this exit. Preserve the index and working tree, report the exact collision, and return to Step 9; do not unstage, stash, reset, or include the user's changes to make commit possible. A separate worktree with explicitly scoped transfer is a caller-owned recovery option, not an automatic fallback.
 
@@ -334,7 +334,7 @@ Replied (count): [what questions were answered]
 Not addressing (count): [what was skipped and why]
 Declined (count): [what was declined and the harm cited]
 
-Validation: [one line; omit when no code changes were committed]
+Validation: [one line; disclose whenever an implementation attempt was made, residual local edits remain, or any check ran — include failed/not-run/blocked states verbatim; omit only when no fix was attempted at all]
 ```
 
 If any item remains `needs-human`, render the complete typed residual under `## Needs your decision`: quoted_feedback, investigation, decision_reason, every option/tradeoff, recommendation when non-null, and every thread_urls link. Return the same objects unchanged to a caller. Include still-current decisions from previous runs; do not report them as resolved or replace their payloads with counts.

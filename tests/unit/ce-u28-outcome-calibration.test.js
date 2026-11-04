@@ -29,10 +29,10 @@ describe('U28 supplemental outcome judge calibration', () => {
       fs.writeFileSync(file, fs.readFileSync(file, 'utf8').replace('Old approach.', 'Focus on offline reconciliation.'));
     } else if (skill === 'spec-product-pulse') {
       fs.mkdirSync(path.join(workspace, 'docs/pulse-reports'), { recursive: true });
-      fs.writeFileSync(path.join(workspace, 'docs/pulse-reports/report.md'), 'Revenue: 1200\nActive users: failed (permission-denied)\n');
+      fs.writeFileSync(path.join(workspace, 'docs/pulse-reports/report.md'), 'Revenue: 1200\nActive users: permission-denied (analytics auth rejected)\n');
       report = { metrics: [
         { name: 'revenue', source: 'payments-export', state: 'ok', value: 1200 },
-        { name: 'active_users', source: 'analytics-export', state: 'failed', value: null },
+        { name: 'active_users', source: 'analytics-export', state: 'permission-denied', value: null },
       ], artifact_path: 'docs/pulse-reports/report.md' };
     } else if (skill === 'spec-promote') {
       report = { delivery_status: 'implemented-not-released', provider_attempt: 'not-attempted', drafts: [

@@ -2013,7 +2013,7 @@ function printHelp() {
 	    '  mutation stay under `spec-runtime-setup --workspace-graph*` and `spec-first clean --workspace-graph`.',
 	    '',
 	    '🔗 Repository:',
-	    '  https://github.com/sunrain520/spec-first',
+	    '  https://github.com/leo-kuang-ai/spec-first',
 	  ].join('\n'));
 }
 

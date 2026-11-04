@@ -556,7 +556,7 @@ function printHelp() {
     'Workspace graph cleanup removes managed per-requirement graph assets (child .codegraph/, exclude block, graphify hooks, workspace graphify-out/, routing markers) without touching host runtime mirrors.',
     '',
     '🔗 Repository:',
-    '  https://github.com/sunrain520/spec-first',
+    '  https://github.com/leo-kuang-ai/spec-first',
   ].join('\n'));
 }
 

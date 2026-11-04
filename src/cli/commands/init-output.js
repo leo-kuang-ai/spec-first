@@ -990,7 +990,7 @@ function printHelp() {
     '  Pi: run `pi` in this project and complete the project trust step (confirm the trust prompt, or trust once with `pi -a`) — without trust, project-level .agents/skills stays silent. Skills then load from the shared projection via /skill:name. Support remains preview (skills discovery and the trust gate live-verified on 0.85.0; /skill: invocation pending live evidence).',
     '',
     '🔗 Repository:',
-    '  https://github.com/sunrain520/spec-first',
+    '  https://github.com/leo-kuang-ai/spec-first',
   ].join('\n'));
 }
 

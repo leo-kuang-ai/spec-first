@@ -13,6 +13,13 @@
    <!-- spec-rule-miner-end -->
    ```
 
+## 规则块组成（canonical full rules）
+
+写入独立规则文件的 marked block 由两部分组成：
+
+- **规则正文**：纯规则内容，不包含挖掘过程元说明（样本量、挖掘步骤、会话记录）。
+- **适用与失效边界段**：块末尾一段简短的有效性约定——「本规则块仅适用于所列包/范围；各规则的代表性源码、配置或包结构发生变化，或出现相反证据时，相关规则须重新核实；未重新核实前不得作为强制依据」。可附每规则组 1-2 个代表性源码锚点（文件路径），供失效判断回源。适用与失效边界是规则有效性约定，不算挖掘过程元说明；详细的采样限制与覆盖披露仍走 closeout 的 `limitations`，不写入规则文件。
+
 2. `AGENTS.md`：默认写 pointer 到 `docs/ai/project-rules.md`，同样用 markers 包住。使用一句目标项目语言的说明，例如“本项目 AI 编码规则以 `docs/ai/project-rules.md` 为唯一来源，编码前必须阅读并遵守。”
 
 3. `CLAUDE.md`：默认写 pointer 到 `docs/ai/project-rules.md`，同样用 markers 包住。优先使用宿主支持的 native import，例如 `@docs/ai/project-rules.md`；不确定时用一句目标项目语言的说明。

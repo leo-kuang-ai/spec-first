@@ -237,7 +237,7 @@ graphify-out/
 
 ## 共享 project guidance
 
-如果团队希望跨人复用 project guidance，应把已确认内容写入明确 source-of-truth，例如 `AGENTS.md`、`CLAUDE.md`、目录级 `AGENTS.md` / `CLAUDE.md`，或精确的 `docs/contracts/**` 合同。`docs/specs/**` 记录能力行为真相，不能替代团队协作约束。
+如果团队希望跨人复用 project guidance，应把已确认内容写入明确 source-of-truth，例如 `AGENTS.md`、`CLAUDE.md`、目录级 `AGENTS.md` / `CLAUDE.md`，或精确的 `docs/contracts/**` 合同；它们记录能力行为真相，但不能替代团队协作约束。
 
 ## 不建议加入的规则
 

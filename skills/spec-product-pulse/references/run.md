@@ -58,7 +58,7 @@ Keep the total to 30-40 lines. If a section is thin, leave it thin; do not pad.
 
 #### 2.4 Write the Report
 
-Save to `docs/pulse-reports/YYYY-MM-DD_HH-MM.md` using the local time of the run. Create `docs/pulse-reports/` if it does not exist.
+Save to `docs/pulse-reports/YYYY-MM-DD_HH-MM.md` using the local time of the run. Create `docs/pulse-reports/` if it does not exist. Before writing, check whether the target path already exists (a same-minute rerun is expected); when it does, do not overwrite — keep the existing report and give this run a unique suffix (`YYYY-MM-DD_HH-MM_2.md`, `_3.md`, …) so every run remains in the timeline.
 
 Surface the Headlines and top Followup in chat. Provide the full file path so the user can open the saved report.
 

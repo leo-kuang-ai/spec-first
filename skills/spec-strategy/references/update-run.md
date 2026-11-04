@@ -13,7 +13,7 @@ For a section marked `author-approved`, preserve both heading and body and do no
 
 ## Update Sequence
 
-1. Summarize the current file in three to five lines, then compare every section against the repo model's stated intent, structure, relevant docs, and recent history. Do not restrict the check to commits since `last_updated`: a targeted update does not review other sections.
+1. Read the whole file once to identify section ownership and protected content, then summarize the current file in three to five lines. The semantic drift check is scoped to the target section(s) only; before a target is chosen, scan the full file to surface candidates. Do not restrict candidate scanning to commits since `last_updated`, and once a target is chosen, do not semantically review other sections — a targeted update does not rewrite them.
 2. Name potentially stale sections with specific evidence as candidates, never as a verdict that strategy has changed. Recent activity shows attention, not permission to rewrite purpose, approach, or users.
 3. With a focus hint, revisit that section directly. Otherwise ask which section to update, listing drift candidates first while allowing any section.
 4. Read the corresponding questions in `interview.md`; challenge existing answers using repo evidence, with two rounds maximum. Preserve content the user confirms is still accurate. Do not skip necessary pushback merely because an answer is already written.

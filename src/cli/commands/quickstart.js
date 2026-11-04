@@ -124,7 +124,7 @@ function printHelp() {
     'host-session spec-* workflow itself — those run inside the host session after you restart it.',
     '',
     '🔗 Repository:',
-    '  https://github.com/sunrain520/spec-first',
+    '  https://github.com/leo-kuang-ai/spec-first',
   ].join('\n'));
 }
 

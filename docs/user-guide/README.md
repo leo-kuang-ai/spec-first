@@ -65,7 +65,7 @@ Plan lifecycle audit 的边界：
 - 全局 `~/.spec-first/.developer` 中的开发者与宿主选择偏好（不跟随项目提交）
 - 严格 schema 的 `.claude/spec-first/state.json` / `.codex/spec-first/state.json`
 - `init` 自动维护的 `.gitignore` spec-first managed block，只忽略明确的 host-local scratch/settings、`.spec-first` 本地 facts 与 optional provider artifacts；selected-host generated runtime 默认 Git 可见并跟随项目提交
-- 一份研发场景与降级路径手册，说明 scenario fingerprint、capability matrix、parent orphan quarantine、build-target coverage 和 quality signals 如何帮助 workflow 在单仓、多仓、非 Git folder 与 dirty worktree 场景中选择证据路径
+- 一份研发场景与降级路径手册，说明 scenario fingerprint、capability matrix 与 parent orphan quarantine 如何帮助 workflow 在单仓、多仓、非 Git build 目录与 dirty worktree 场景中选择证据路径
 - 可更新、可恢复、可清理的受管资产模型
 - 一条面向首次使用者的 workflow 走查，说明从一个需求句子到 requirements / plan / task pack 的真实产物链路
 - 一份 workflow 产物目录，说明每类文档和 generated runtime assets 的生成者、读取方与 Git 边界
@@ -167,6 +167,6 @@ spec-app-consistency-audit prd:<path> figma-context:<path> source:<path>
 
 ## 版本
 
-本手册对应当前 `spec-first` 代码与运行时资产布局。当前版本以 `spec-first -v` 与 `package.json` 的 `version` 字段为单一真相源（撰写时为 `v1.13.2`），手册不再单独维护版本号以避免漂移。
+本手册对应当前 `spec-first` 代码与运行时资产布局。当前版本以 `spec-first -v` 与 `package.json` 的 `version` 字段为单一真相源（撰写时为 `v1.15.3`），手册不再单独维护版本号以避免漂移。
 
 > 说明：遇到行为疑问时，优先以 source-of-truth 文件、CLI contract 和本手册当前章节为准。

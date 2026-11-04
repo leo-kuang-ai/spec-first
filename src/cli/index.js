@@ -195,7 +195,7 @@ function printHelp(withErrorPrefix = false) {
     '  -v, --version          Show version',
     '',
     '🔗 Repository:',
-    '  https://github.com/sunrain520/spec-first',
+    '  https://github.com/leo-kuang-ai/spec-first',
   ];
 
   if (withErrorPrefix) {
@@ -231,7 +231,7 @@ function printVersion() {
        Cursor/OpenCode 需要显式运行 spec-first init --cursor / --opencode，且当前 loader validation unavailable；它们只代表 generated-runtime preview。
 
   了解更多:
-    https://github.com/sunrain520/spec-first
+    https://github.com/leo-kuang-ai/spec-first
 `);
 }
 

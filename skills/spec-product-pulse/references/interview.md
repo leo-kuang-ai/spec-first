@@ -190,7 +190,7 @@ Do not offer top-N or percentile customization. Those settings are not persisted
 
 **Opening question:** "What should the default lookback window be when no time window is specified? Common: 24h for daily ops, 7d for weekly review, 1h for launches."
 
-Capture: single default (e.g., `24h`).
+Capture: single default from the config contract's four values (`1h`, `24h`, `7d`, `30d`). A user-named custom window (e.g., `48h`) stays a per-run explicit argument — do not persist it as the default, which would not round-trip through the config contract.
 
 ---
 
@@ -231,7 +231,7 @@ The pulse block uses flat top-level keys in the spec-first local config:
 # --- Product pulse ---
 
 pulse_product_name: "{{product_name}}"
-pulse_lookback_default: {{24h | 7d | 1h | other}}    # default 24h if omitted
+pulse_lookback_default: {{1h | 24h | 7d | 30d}}    # default 24h if omitted; the persisted default must be one of the four config-contract values — a custom window stays a per-run explicit argument and is not persisted here
 pulse_primary_event: "{{event_name}}"
 pulse_value_event: "{{event_name}}"                  # may equal pulse_primary_event; omit if not defined
 pulse_completion_events: "{{event,event,event}}"     # comma-separated, 0-3 events; omit if none

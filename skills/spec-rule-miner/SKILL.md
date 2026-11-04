@@ -53,7 +53,7 @@ description: "Use this standalone skill when the user asks to mine a repo's exis
 2. 盘点仓库形态：根目录、主要语言、源码目录、测试目录、配置文件、包/应用边界、生成物/依赖目录和已有 agent rule 文件；多包 workspace 必须识别具体子项目范围。
 3. 过滤读取范围：跳过依赖、构建产物、锁文件、minified 文件、二进制、vendored/generated 代码；大仓库或多包仓库使用分层抽样并在 preview 和 closeout 中披露样本包、未覆盖子项目和适用范围。
 4. 读取并记录证据。抽取前先读 [Pattern Categories](references/pattern-categories.md)，用其中类别组织证据；大仓库可按其中 capability-class 边界使用 `code-graph` / `project-graph` 候选缩小阅读范围，但规则证据必须回到当前源码；配置已强制的 formatter/linter 规则只记录为“已由工具处理”，不要重复写入 AI 规则。
-5. 合成规则：按 `frequency x deviation from defaults` 排序，保留高频且偏离默认的做法；多包规则必须区分跨包通用模式、包级专属模式和历史例外，旧项目反例只能写成“新增代码优先”或“不扩大例外”；除非证据在适用范围内压倒性一致，不使用全仓库绝对措辞。必须包含至少一个 hidden association 和至少一个 anti-pattern，除非证据明确不存在，并在 preview 限制中说明。规则正文可以包含适用范围和例外边界，这不算挖掘过程元说明。
+5. 合成规则：按 `frequency x deviation from defaults` 排序，保留高频且偏离默认的做法；多包规则必须区分跨包通用模式、包级专属模式和历史例外，旧项目反例只能写成“新增代码优先”或“不扩大例外”；除非证据在适用范围内压倒性一致，不使用全仓库绝对措辞。必须包含至少一个 hidden association 和至少一个 anti-pattern，除非证据明确不存在，并在 preview 限制中说明。规则块末尾必须带一个简短的适用与失效边界段（见 [Write Targets](references/write-targets.md) 的块组成约定）：仅适用于所列包/范围；代表性源码、配置或包结构变化或出现相反证据时，相关规则须重新核实，未核实前不得作为强制依据。适用范围与失效边界属于规则有效性约定，不算挖掘过程元说明。
 6. Preview：展示将写入独立规则文件的规则块、入口引用文件、word count、采样/证据限制、适用包范围、历史例外、refresh diff/no-op 判断，以及每个规则组的代表性 source refs。规则正文不要包含挖掘过程元说明。
 7. 写入前读 [Write Targets](references/write-targets.md)，按目标文件的 marker、frontmatter、pointer/inline 规则执行。默认把完整规则写入 `docs/ai/project-rules.md`，并让 `AGENTS.md` 与 `CLAUDE.md` 指向该文件。
 8. 收尾输出：列出写入文件、规则字数、是否采样、未写入的近邻工具文件、需要用户手动检查的限制；如果没有写文件，说明 preview-only 状态；如果因 headless 走默认写入，必须说明 `headless_default_write` 的证据来源。

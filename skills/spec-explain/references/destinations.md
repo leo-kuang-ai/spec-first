@@ -1,6 +1,6 @@
 # Destinations and Close
 
-Everything Phase 6 does: capability detection, the destination menu, the action for each option, each destination sub-flow, audience re-render ordering, consent gates, and improvement observations. `SKILL.md` names this file as a required read before Phase 6 renders anything; do not render the menu or act on a selection without it. Local file and Leave it are the always-present floor.
+Everything Phase 4 does: capability detection, the destination menu, the action for each option, each destination sub-flow, audience re-render ordering, consent gates, and improvement observations. `SKILL.md` names this file as a required read before Phase 4 renders anything; do not render the menu or act on a selection without it. Local file and Leave it are the always-present floor.
 
 ## Menu and per-option actions
 

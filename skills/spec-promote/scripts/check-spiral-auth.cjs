@@ -47,14 +47,22 @@ function probeAuth(options = {}) {
     return fact('unverified', 'spiral-auth-output-invalid', null, true);
   }
 
-  if (payload && (payload.authenticated === true || payload.status === 'authenticated')) {
-    return fact('ready', 'spiral-authenticated', true, true);
-  }
-  if (payload && payload.authenticated === false) {
-    return fact('not-ready', 'spiral-not-authenticated', false, true);
-  }
-  if (payload && payload.status === 'pending') {
-    return fact('not-ready', 'spiral-authentication-pending', false, true);
+  if (payload) {
+    const boolSignal = payload.authenticated === true ? true : payload.authenticated === false ? false : null;
+    const statusSignal = payload.status === 'authenticated' ? true : payload.status === 'pending' ? false : null;
+    const signals = [boolSignal, statusSignal].filter((value) => value !== null);
+    if (signals.length > 0 && signals.some((value) => value !== signals[0])) {
+      return fact('unverified', 'spiral-auth-signals-conflicting', null, true);
+    }
+    if (signals.length > 0 && signals[0] === true) {
+      return fact('ready', 'spiral-authenticated', true, true);
+    }
+    if (signals.length > 0 && signals[0] === false) {
+      if (payload.status === 'pending') {
+        return fact('not-ready', 'spiral-authentication-pending', false, true);
+      }
+      return fact('not-ready', 'spiral-not-authenticated', false, true);
+    }
   }
   return fact('unverified', 'spiral-auth-output-invalid', null, true);
 }

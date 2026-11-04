@@ -239,7 +239,7 @@ async function lookupLatestGitHubPackageVersion(options = {}) {
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const response = await fetch('https://raw.githubusercontent.com/sunrain520/spec-first/main/package.json', {
+    const response = await fetch('https://raw.githubusercontent.com/leo-kuang-ai/spec-first/main/package.json', {
       headers: {
         accept: 'application/json',
       },

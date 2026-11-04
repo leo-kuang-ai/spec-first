@@ -557,7 +557,7 @@ function printHelp() {
     'to rebuild graphs, or `spec-first clean --workspace-graph` to remove managed graph assets.',
     '',
     '🔗 Repository:',
-    '  https://github.com/sunrain520/spec-first',
+    '  https://github.com/leo-kuang-ai/spec-first',
   ].join('\n'));
 }
 

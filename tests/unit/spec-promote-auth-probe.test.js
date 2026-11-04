@@ -76,4 +76,35 @@ describe('spec-promote Spiral auth probe', () => {
       expect(payload.authenticated).toBeNull();
     }
   });
+
+  test('treats conflicting auth signals as unverified instead of promoting one side', () => {
+    for (const payload of [
+      { authenticated: false, status: 'authenticated' },
+      { authenticated: true, status: 'pending' },
+    ]) {
+      const result = runProbe(fakeSpiral(JSON.stringify(payload)));
+      const fact = JSON.parse(result.stdout);
+
+      expect(result.status).toBe(0);
+      expect(fact.status).toBe('unverified');
+      expect(fact.reason_code).toBe('spiral-auth-signals-conflicting');
+      expect(fact.authenticated).toBeNull();
+    }
+  });
+
+  test('keeps consistent not-authenticated and pending facts distinct', () => {
+    for (const [payload, reasonCode] of [
+      [{ authenticated: false, status: undefined }, 'spiral-not-authenticated'],
+      [{ status: 'pending' }, 'spiral-authentication-pending'],
+      [{ authenticated: false, status: 'pending' }, 'spiral-authentication-pending'],
+    ]) {
+      const result = runProbe(fakeSpiral(JSON.stringify(payload)));
+      const fact = JSON.parse(result.stdout);
+
+      expect(result.status).toBe(0);
+      expect(fact.status).toBe('not-ready');
+      expect(fact.reason_code).toBe(reasonCode);
+      expect(fact.authenticated).toBe(false);
+    }
+  });
 });

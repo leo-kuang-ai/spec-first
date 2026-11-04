@@ -53,7 +53,7 @@ last_updated: {{YYYY-MM-DD}}
 - **{{metric 2 name}}** - {{...}}
 - **{{metric 3 name}}** - {{...}}
 
-<!-- 3-5 total. Stop at 5. -->
+<!-- 3-5 total. Stop at 5. After the interview's retry cap, keep the count the user actually confirmed and mark it for revisit — never pad to reach 3. -->
 
 ## Tracks
 
@@ -63,7 +63,7 @@ last_updated: {{YYYY-MM-DD}}
 
 _Why it serves the approach:_ {{one line}}
 
-<!-- Duplicate the block above for 2-4 tracks total. If you can't keep it to 4, something is wrong - fold related tracks together. -->
+<!-- Duplicate the block above for 2-4 tracks total. If you can't keep it to 4, something is wrong - fold related tracks together. After the retry cap, keep the user-confirmed count with a revisit note instead of padding. -->
 
 ## Milestones
 
@@ -89,5 +89,5 @@ Before confirming the write, scan the draft for:
 - [ ] Each section this skill wrote has at most four sentences, except Tracks, where each track has a short block. Do not apply this limit to other writers.
 - [ ] No placeholders remain (`{{...}}`).
 - [ ] Optional sections with no content have been deleted, not left empty.
-- [ ] This skill's metric count is 3-5 and track count is 2-4. Count meanings explicitly deferred to a linked legacy document as carried there, not missing. Other writers' content, headings, and positions satisfy update-run's protection rules.
+- [ ] This skill's metric count is 3-5 and track count is 2-4, or fewer with a revisit note kept after the interview's retry cap (never padded to reach the minimum). Count meanings explicitly deferred to a linked legacy document as carried there, not missing. Other writers' content, headings, and positions satisfy update-run's protection rules.
 - [ ] Target problem and Our approach are connected - one clearly responds to the other.
