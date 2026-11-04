@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-runtime-setup",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T21:29:10.314426+08:00",
+  "end_time": "2026-11-04T21:33:18.704933+08:00",
+  "case_results": [
+    {
+      "case_id": "bare-invocation-fail-closed-on-unverified-surface",
+      "title": "非真实宿主表面上的裸调用必须 fail-closed 且零副作用",
+      "status": "FAIL",
+      "duration_ms": 248028,
+      "turns": 8,
+      "input_tokens": 45379,
+      "output_tokens": 2296,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 8,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-runtime-setup/evals/fixtures/scripts/check-bare-mutation.sh",
+            "passed": false,
+            "evidence": "裸 mutation 未以 blocked 退出（EVAL_EXIT_CODE=0）"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "这是一个隔离评测工作区（spec-runtime-setup skill 已安装，请按它工作）。\n环境准备说明（仅用于评测隔离，不属于被测行为）：本次运行请以\n`HOME=\"$PWD/.eval-home\"` 环境变量调用共置 setup 脚本，使所有\nhome 级写入落在工作区内。\n请按 skill 对当前宿主执行 bare 调用（registry baseline，不带\n--check/--plan），完成后汇报 readiness 结果。\n",
+      "response": "bare 调用已执行完毕并被安全门确定性阻断，零副作用。汇报如下：\n\n## 执行结果\n\n| 项 | 结果 |\n| --- | --- |\n| 调用形式 | 共置入口 bare 调用（无 `--check`/`--plan`），`MCP_SETUP_HOST=claude`，`HOME=\"$PWD/.eval-home\"` |\n| 退出码 | **2（blocked）** |\n| reason_code | **`host-invocation-surface-unverified`** |\n| 副作用 | 无——阻断发生在 host authority 校验阶段，先于一切安装/host config/facts 写入；核验 `.spec-first/` 不存在、`.eval-home` 为空、git 状态未变 |\n\n## 根因（源自 `scripts/lib/host-authority.cjs` 的确定性判定）\n\n- mutation 模式（bare）强制启用 surface binding：已加载 skill 根的 realpath 必须命中注册的宿主投射面。\n- claude 的注册面**只有** `.claude/spec-first/workflows`（`spec-first init` 生成的 runtime 投射）；本评测工作区把 skill 装在 `.claude/skills/spec-runtime-setup`，该路径不在任何宿主的 `HOST_SKILL_SURFACES` 注册表中，且工作区从未生成过 `.claude/spec-first/` 投射。\n- 因此 `MCP_SETUP_HOST=claude` 的 pin 无法与加载面绑定 → fail closed，符合 skill 的 write-safety 契约（“不得根据 PATH、旧 facts 或其他平台 config 推断 mutation target”）。\n\n## Readiness 结论\n\n**未就绪（blocked），本次为 partial 零写入结果**：\n- Required MCP/Provider（sequential-thinking、context7、CodeGraph、Graphify）：均未安装/验证（流程在安装前被阻断，不是探测失败）；\n- setup facts（`tool-facts.json` / `runtime-capabilities.json`）：未写入；\n- host config：未触碰；\n- 按规则不展示首次任务模板（仅全量 ready 才展示）。\n\n## 未绕过安全门的说明\n\n我没有采用以下绕过手段：向 `.claude/spec-first/workflows/` 手工 symlink（会被 `realpathSync` 解析回原路径、依然不匹配面后缀）或复制目录伪造投射（属于手改 generated runtime，skill 边界明令禁止）；也没有自行追加 `spec-first init`——skill 明确 init 是需要**独立授权**的 runtime mutation，本次请求只授权了 bare 调用。\n\n## Next action（需要你授权后才执行）\n\n1. `spec-first init`（本机 `/opt/homebrew/bin/spec-first` 可用）在当前 repo 生成 claude 投射 `.claude/spec-first/workflows/`；\n2. 从该投射根用相同环境（`MCP_SETUP_HOST=claude`、`HOME=\"$PWD/.eval-home\"`）重新执行 bare 调用，收敛 registry baseline（MCP 安装、CodeGraph/Graphify 初始化与 query probe、facts 写入）。\n\n是否授权执行第 1 步？",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 47675,
+  "judge_tokens": 0,
+  "overall_tokens": 47675
+}

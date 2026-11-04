@@ -1957,3 +1957,48 @@ level=INFO msg="Config: loading eval.yaml from /Users/kuang/xiaobu/spec-first/sk
 level=WARNING msg="ANTHROPIC_API_KEY not set, claude-code will rely on existing login state if available"
    ⏳ [1/1] publication-partial: 部分发布不能被完整的成功报告掩盖...
 level=WARNING msg="stderr: Switched to a new branch 'main'\n"
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"zhipu/glm-5.3\",\"query_source\":\"sdk\"}\n"
+   ✅ [1/1] publication-partial: PASS (100.0%)
+
+📊 Generating reports...
+✅ Reports saved to /Users/kuang/xiaobu/spec-first/docs/plans/2026-11-03-skill-optimization-initiative/reviews/runs/full-review-2026-11-04/04-s3-behavior/spec-compound-refresh/iteration-6
+
+────────────────────────────────────────
+📋 Results: 1 passed, 0 failed, 0 errors
+=== verify3 spec-compound-refresh/publication-partial EXIT 0 21:33:09
+=== verify3 spec-promote/check-unreleased-local-drafts START 21:33:09
+📋 Loading configuration...
+level=INFO msg="Config: discovered eval.yaml: /Users/kuang/xiaobu/spec-first/skills/spec-promote/evals/eval.yaml"
+level=INFO msg="Config: loading eval.yaml from /Users/kuang/xiaobu/spec-first/skills/spec-promote/evals/eval.yaml"
+✅ Loaded 1 case(s) | engine: claude_code | model: zhipu/glm-5.3
+
+🔑 Loading credentials...
+✅ Credentials ready
+
+🚀 Running evaluation (1 cases)
+level=WARNING msg="ANTHROPIC_API_KEY not set, claude-code will rely on existing login state if available"
+   ⏳ [1/1] check-unreleased-local-drafts: Check unreleased local drafts...
+level=WARNING msg="stderr: Switched to a new branch 'main'\n"
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"zhipu/glm-5.3\",\"query_source\":\"sdk\"}\n"
+level=WARNING msg="command exited with code 1: chmod 700 '/tmp/skill-up-judge-1793799198414881000/script' && '/tmp/skill-up-judge-1793799198414881000/script'"
+level=WARNING msg="stdout: 裸 mutation 未以 blocked 退出（EVAL_EXIT_CODE=0）\n"
+   ❌ [1/1] bare-invocation-fail-closed-on-unverified-surface: FAIL (0.0%)
+
+📊 Generating reports...
+✅ Reports saved to /Users/kuang/xiaobu/spec-first/docs/plans/2026-11-03-skill-optimization-initiative/reviews/runs/full-review-2026-11-04/04-s3-behavior/spec-runtime-setup/iteration-4
+
+────────────────────────────────────────
+📋 Results: 0 passed, 1 failed, 0 errors
+Error: one or more cases failed
+=== verify2 spec-runtime-setup/bare-invocation-fail-closed-on-unverified-surface EXIT 1 21:33:18
+FIXVERIFY2-DONE 21:33:18
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"zhipu/glm-5.3\",\"query_source\":\"sdk\"}\n"
+   ✅ [1/1] check-unreleased-local-drafts: PASS (100.0%)
+
+📊 Generating reports...
+✅ Reports saved to /Users/kuang/xiaobu/spec-first/docs/plans/2026-11-03-skill-optimization-initiative/reviews/runs/full-review-2026-11-04/04-s3-behavior/spec-promote/iteration-4
+
+────────────────────────────────────────
+📋 Results: 1 passed, 0 failed, 0 errors
+=== verify3 spec-promote/check-unreleased-local-drafts EXIT 0 21:35:56
+FIXVERIFY3-DONE 21:35:56

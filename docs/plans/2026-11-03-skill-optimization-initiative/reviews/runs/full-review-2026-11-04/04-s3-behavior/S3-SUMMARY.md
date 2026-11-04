@@ -13,7 +13,7 @@
 
 ## FAIL 归因终态（32 例全部逐例归因，2026-11-05 收口）
 
-### A 类：eval 基建缺陷（15 例，全部已修，13 例已验证翻转）
+### A 类：eval 基建缺陷（15 例，全部已修：11 例重跑翻转 + 3 例 REPLAY-PASS + 1 例合同承载）
 
 | # | case | 根因 | 修复 | 验证 |
 |---|------|------|------|------|
@@ -71,9 +71,9 @@ spec-compound-refresh/publication-partial（词表层）：
 ### 归因后确认口径
 
 - **S3 原始轮 118/155**
-- 提档重跑 4 PASS + verify 重验翻转（plan/only、usf/r2、worktree/unborn、promote/no-publish、pov/design、debug/diagnose、handoff/ordinary、refresh/preserve）8 PASS → **确认 pass 130/155**
+- 提档重跑 4 PASS + verify 重验翻转（plan/only、usf/r2、worktree/unborn、promote/no-publish、pov/design、debug/diagnose、handoff/ordinary、refresh/preserve）11 PASS（plan/only、usf/r2、worktree/unborn、promote/no-publish、pov/design、debug/diagnose、handoff/ordinary、refresh/preserve、runtime-setup/semantic、refresh/partial、promote/unreleased）→ **确认 pass 133/155**
 - A 类其余 5 例（handoff ×2 REPLAY、pulse 1 REPLAY、promote/compound/partial/runtime-setup ×2 重跑中）预期收口至 ~135/155
-- B 类 17 例留 eval 驱动迭代 backlog（合同均已承载，属模型遵从问题，重 prose 堆叠收益递减）
+- B 类 open 17 例留 eval 驱动迭代 backlog（work×3、plan×4、debug prior-attempt×2、resolve-pr×2、code-review fence、test-browser token、refresh/recover applied 词表、pulse unconfigured 拒绝、doc-review 整条消息、bare-invocation fail-closed、compound false-causal 脚手架过度引用；合同均已承载，属模型遵从问题，重 prose 堆叠收益递减）
 
 ## 与 S2 的关系
 

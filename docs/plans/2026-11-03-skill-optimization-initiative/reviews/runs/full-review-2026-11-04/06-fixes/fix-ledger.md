@@ -95,6 +95,6 @@
 ## 终态对账（2026-11-05，D 类归因收口后更新）
 
 - 静态层：38/38 skill 收敛（各批次 *-convergence.md；FIX-001..053 全部 landed，无 open fail）
-- 行为层：S3 原始 118/155 → 归因后确认 130/155（提档 4 PASS + A 类修复重验 8 PASS）；A 类 15 例全部修复（13 例已验证翻转，2 例重跑收口中），B 类 17 例留 eval 迭代 backlog（合同均已承载）
+- 行为层：S3 原始 118/155 → 归因后确认 133/155（提档 4 PASS + A 类修复重验 11 PASS）；A 类 15 例全部修复（11 例重跑翻转 + 3 例 REPLAY-PASS + riffrec 1 例合同承载），B 类 open 17 例留 eval 迭代 backlog（合同均已承载；含 verify 收口新归因 bare-invocation fail-closed 与 false-causal 脚手架过度引用）
 - judge 单测：ce-u28/knowledge-publication/eval-fixture-contracts 37/37；runtime-setup 白名单解析器 15/15
 - 留观清单不变；spec-prd R1 #5/#6 低频 P3 维持 deferred
