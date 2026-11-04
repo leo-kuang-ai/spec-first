@@ -31,7 +31,7 @@ Use this path when the input is a longer recording (over ~60 seconds), contains 
 
 8. Add source mapping to the brainstorm material as suspected implementation surfaces, not as proven root cause unless the code clearly proves it. Include confidence levels and short evidence notes explaining why each file or component is relevant.
 
-9. Return a `ready-to-brainstorm` handoff once `analysis.md`, `problem-analysis.md`, `source-materials.md`, and `requirements-kickoff.md` exist. Provide the `spec-brainstorm <requirements-kickoff.md>` handoff with `source-materials.md` as its evidence manifest, without invoking it automatically. The callee owns requirements confirmation and the durable requirements-only plan.
+9. Return a `ready-to-brainstorm` handoff once `analysis.md`, `problem-analysis.md`, `source-materials.md`, and `requirements-kickoff.md` exist. Provide the `spec-brainstorm <requirements-kickoff.md>` handoff with `source-materials.md` as its evidence manifest, without invoking it automatically. The callee owns requirements confirmation and the durable requirements-only plan. Every handoff carries the analyzer's `analysis_batch_id` and source digest from `analysis.json`: when the source capture changes or the same output path is re-analyzed with different input (new batch id or source digest), older references into that output must be re-checked against the current `analysis.json` before being cited — a same-path artifact is not proof the evidence is unchanged.
 
 ## Authorized handoff
 

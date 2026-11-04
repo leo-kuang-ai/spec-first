@@ -20,6 +20,7 @@ function parseArgs(argv) {
   for (let index = 0; index < argv.length; index += 1) {
     if (argv[index] === '--binary') options.binary = argv[++index];
     else if (argv[index] === '--expected-sha256') options.expectedSha256 = argv[++index];
+    else if (argv[index] === '--run-root') options.runRoot = argv[++index];
     else return null;
   }
   return options.binary && options.expectedSha256 ? options : null;
@@ -102,7 +103,9 @@ async function main() {
   const identity = { path: binary, sha256: sha256(fs.readFileSync(binary)), size: stat.size };
   if (identity.sha256 !== options.expectedSha256) throw new Error('conformance-binary-identity-mismatch');
 
-  const runRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-agent-browser-conformance-'));
+  const runRoot = options.runRoot && path.isAbsolute(options.runRoot)
+    ? (() => { fs.mkdirSync(options.runRoot, { recursive: true, mode: 0o700 }); return options.runRoot; })()
+    : fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-agent-browser-conformance-'));
   fs.chmodSync(runRoot, 0o700);
   const configPath = path.join(runRoot, 'config.json');
   const policyPath = path.join(runRoot, 'action-policy.json');
@@ -198,6 +201,10 @@ async function main() {
   let positiveControlPassed = false;
   let cleanup;
   let executionError = null;
+  // Pre-land the recovery position before any browser side effect: an external
+  // timeout that kills this producer mid-run still leaves a locatable receipt.
+  const pendingReceipt = { schema_version: SCHEMA_VERSION, phase: 'running', run_root: runRoot, binary, session, namespace, started_at: new Date().toISOString() };
+  try { fs.writeFileSync(path.join(runRoot, 'pending-receipt.json'), `${JSON.stringify(pendingReceipt, null, 2)}\n`, { mode: 0o600, flag: 'wx' }); } catch { /* already present from an earlier partial start */ }
   try {
     let before = blockedHits;
     const initial = await openAllowed();
@@ -267,6 +274,7 @@ async function main() {
     result.recovery = { run_root: runRoot, binary, session, namespace,
       next_action: cleanup.status === 'failed' ? 'retry isolated close, then remove private diagnostics' : 'inspect private diagnostics before removal' };
     fs.writeFileSync(path.join(runRoot, 'conformance-result.json'), `${JSON.stringify(result, null, 2)}\n`, { mode: 0o600, flag: 'wx' });
+    try { fs.rmSync(path.join(runRoot, 'pending-receipt.json'), { force: true }); } catch { /* best-effort: the final receipt supersedes it */ }
   }
   process.stdout.write(`${JSON.stringify(result)}\n`);
   process.exitCode = result.status === 'passed' ? 0 : 1;

@@ -14,10 +14,12 @@ package 不能导入另一个 skill 的 private script path。
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -901,6 +903,28 @@ def markdown_link(path: str | None, output_dir: Path, repo_root: Path) -> str:
     return path
 
 
+def safe_write_text(path: Path, text: str) -> None:
+    """Write text without following a pre-existing symlink or special file at the target.
+
+    A pre-existing non-regular file (e.g., a symlink planted at a report path) is
+    rejected instead of being written through; the payload lands via a fresh
+    temporary file in the same directory and an atomic directory-entry replace.
+    """
+
+    if path.exists() or path.is_symlink():
+        if not stat.S_ISREG(path.lstat().st_mode):
+            raise SystemExit(f"refusing to write report through non-regular file: {path}")
+    fd, tmp_name = tempfile.mkstemp(dir=str(path.parent), prefix=f".{path.name}.", suffix=".tmp")
+    tmp_path = Path(tmp_name)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(text)
+        os.replace(tmp_path, path)
+    except BaseException:
+        tmp_path.unlink(missing_ok=True)
+        raise
+
+
 def write_analysis_md(
     output_path: Path,
     source_path: Path,
@@ -977,7 +1001,7 @@ def write_analysis_md(
     lines.append("- Tie transcript language to the closest click or visible UI state.")
     lines.append("- Promote only confirmed product problems into requirements.")
     lines.append("- Use repo-relative screenshot paths when moving evidence into a spec-first requirements document.")
-    output_path.write_text("\n".join(lines) + "\n")
+    safe_write_text(output_path, "\n".join(lines) + "\n")
 
 
 def write_requirements_kickoff(
@@ -1115,7 +1139,7 @@ def write_requirements_kickoff(
             "-> Resume `spec-brainstorm` to confirm candidate findings and promote only confirmed product-specific requirements.",
         ]
     )
-    output_path.write_text("\n".join(lines) + "\n")
+    safe_write_text(output_path, "\n".join(lines) + "\n")
 
 
 def write_source_materials(
@@ -1200,7 +1224,7 @@ def write_source_materials(
     if len(raw_files) > 50:
         lines.append(f"- ... {len(raw_files) - 50} more files")
 
-    output_path.write_text("\n".join(lines) + "\n")
+    safe_write_text(output_path, "\n".join(lines) + "\n")
 
 
 def write_problem_analysis(
@@ -1259,7 +1283,7 @@ def write_problem_analysis(
         lines.append("1. Review the transcript or notes for workflow friction, confusion, and unmet expectations.")
 
     lines.append("</analysis>")
-    output_path.write_text("\n".join(lines) + "\n")
+    safe_write_text(output_path, "\n".join(lines) + "\n")
 
 
 def write_review_prompt(
@@ -1326,7 +1350,7 @@ def write_review_prompt(
         "",
         "Your final output should contain only the analysis section with clearly categorized, numbered problem statements. Do not include scratchpad notes.",
     ]
-    output_path.write_text("\n".join(lines) + "\n")
+    safe_write_text(output_path, "\n".join(lines) + "\n")
 
 
 def main() -> int:
@@ -1409,9 +1433,23 @@ def main() -> int:
     write_source_materials(source_materials_md, source_path, source_kind, session, transcript, moments, raw_dir, frames_dir, repo_root)
     write_requirements_kickoff(kickoff_md, topic, session, findings, moments, repo_root)
 
+    def source_digest(path: Path) -> str:
+        hasher = hashlib.sha256()
+        if path.is_file():
+            hasher.update(path.read_bytes())
+        else:
+            for item in sorted(path.rglob("*")):
+                hasher.update(str(item.relative_to(path)).encode("utf-8"))
+                if item.is_file():
+                    hasher.update(item.read_bytes())
+        return hasher.hexdigest()
+
+    batch_id = f"{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}-{os.urandom(4).hex()}"
     structured = {
         "source": str(source_path),
         "source_kind": source_kind,
+        "source_sha256": source_digest(source_path),
+        "analysis_batch_id": batch_id,
         "output_dir": str(output_dir),
         "session": session,
         "event_counts": event_counts(events),
@@ -1435,7 +1473,7 @@ def main() -> int:
             "raw_dir": str(raw_dir),
         },
     }
-    (output_dir / "analysis.json").write_text(json.dumps(structured, indent=2, sort_keys=True) + "\n")
+    safe_write_text(output_dir / "analysis.json", json.dumps(structured, indent=2, sort_keys=True) + "\n")
 
     print(f"Analysis written to: {analysis_md}")
     print(f"Problem analysis scaffold written to: {problem_analysis_md}")

@@ -2,7 +2,7 @@
 
 Read before quick or extensive analysis. Setup does not use the analyzer. Apply the entrypoint's Riffrec-only trigger, privacy, transcription egress, and dispatch boundaries.
 
-Set `SKILL_DIR` to the absolute directory containing the loaded Skill in each independent call. The project's cwd is not the Skill's script directory. The bundled wrapper probes a runnable Python 3 interpreter in order: `python3`, `python`, then `py -3`; a name on PATH alone is insufficient.
+Set `SKILL_DIR` to the absolute directory containing the loaded Skill in each independent call. The project's cwd is not the Skill's script directory. The bundled wrapper probes a runnable Python 3 interpreter in order: `python3`, `python`, then `py -3`; a name on PATH alone is insufficient. Every candidate must satisfy Python >= 3.10 (the wrapper rejects older interpreters and continues to the next candidate); the analyzer uses runtime-union syntax and 3.10+ path APIs, so an older interpreter would fail after passing a major-version-only check.
 
 Quick mode writes to a new temporary directory:
 

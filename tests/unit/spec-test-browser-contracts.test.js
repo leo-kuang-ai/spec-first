@@ -222,6 +222,21 @@ test('probe carries the private recovery reference from failed conformance', () 
   expect(result.conformance_recovery.evidence_ref).toBe(path.join(payload.recovery.run_root, 'conformance-result.json'));
 });
 
+test('probe surfaces the pre-allocated recovery position when the producer is killed by an external timeout', () => {
+  const identity = binaryIdentity();
+  const runRoot = tempRoot();
+  const result = wrapper.probeAgentBrowser({
+    runner: probeRunner({ exactOrigin: true }), binaryIdentityResolver: () => identity,
+    conformanceRunner: () => ({ runRoot, result: { status: null, stdout: '', stderr: '', error: { code: 'ETIMEDOUT' } } }),
+  });
+  expect(result.execution_readiness).toBe('blocked');
+  expect(result.reason_code).toBe('exact-origin-conformance-timeout');
+  expect(result.conformance_recovery).toEqual({
+    run_root: runRoot,
+    evidence_ref: path.join(runRoot, 'pending-receipt.json'),
+  });
+});
+
 test.each([null, 'null', 'invalid'])('probe rejects failed conformance with absent or malformed payload: %s', (stdout) => {
   const result = wrapper.probeAgentBrowser({
     runner: probeRunner({ exactOrigin: true }), binaryIdentityResolver: binaryIdentity,

@@ -261,23 +261,31 @@ function resolveExecutablePath(command, env, platform) {
 
 function defaultConformanceRunner(options) {
   const producer = path.join(__dirname, 'agent-browser-exact-origin-conformance.cjs');
-  return spawnSync(process.execPath, [
-    producer,
-    '--binary', options.binaryIdentity.path,
-    '--expected-sha256', options.binaryIdentity.sha256,
-  ], {
-    cwd: options.cwd,
-    env: options.env,
-    encoding: 'utf8',
-    shell: false,
-    timeout: options.timeout || 180000,
-    windowsHide: true,
-  });
+  // Pre-allocate the run root so an external timeout still leaves a locatable
+  // recovery position: the producer pre-lands pending-receipt.json inside it
+  // before the first browser side effect.
+  const runRoot = options.runRoot || fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-agent-browser-conformance-'));
+  return {
+    runRoot,
+    result: spawnSync(process.execPath, [
+      producer,
+      '--binary', options.binaryIdentity.path,
+      '--expected-sha256', options.binaryIdentity.sha256,
+      '--run-root', runRoot,
+    ], {
+      cwd: options.cwd,
+      env: options.env,
+      encoding: 'utf8',
+      shell: false,
+      timeout: options.timeout || 180000,
+      windowsHide: true,
+    }),
+  };
 }
 
 function evaluateConformance(result, binaryIdentity) {
   if (result && result.error && result.error.code === 'ETIMEDOUT') {
-    return { ok: false, reason_code: 'exact-origin-conformance-timeout' };
+    return { ok: false, reason_code: 'exact-origin-conformance-timeout', recovery: result.recovery || null };
   }
   let payload;
   try {
@@ -413,13 +421,19 @@ function probeAgentBrowser(options = {}) {
   const conformanceRunner = options.conformanceRunner || defaultConformanceRunner;
   let conformanceResult;
   try {
-    conformanceResult = conformanceRunner({
+    const runnerOutcome = conformanceRunner({
       command,
       binaryIdentity,
       cwd: options.cwd || process.cwd(),
       env: buildCleanEnv(options.env || process.env),
       timeout: options.conformanceTimeout || 180000,
     });
+    conformanceResult = runnerOutcome && runnerOutcome.result !== undefined ? runnerOutcome.result : runnerOutcome;
+    if (runnerOutcome && runnerOutcome.result && runnerOutcome.result.error && runnerOutcome.result.error.code === 'ETIMEDOUT' && runnerOutcome.runRoot) {
+      // External timeout: the producer was killed mid-run, so surface the
+      // pre-allocated recovery position instead of an empty stdout parse.
+      conformanceResult.recovery = { run_root: runnerOutcome.runRoot, evidence_ref: path.join(runnerOutcome.runRoot, 'pending-receipt.json') };
+    }
   } catch (_error) {
     return buildBlockedProbe({
       status: 'available',
@@ -817,6 +831,10 @@ function runPreparedContext(options = {}) {
       blocked_actions: initialPlan.plan.steps
         .filter((step) => NAVIGATION_OR_INTERACTION_ACTIONS.has(step.action))
         .map((step) => step.action),
+      conformance_status: probe.conformance_status || 'not_run',
+      repair_scope: probe.repair_scope || 'dependency',
+      next_action: probe.next_action || '',
+      ...(probe.conformance_recovery ? { conformance_recovery: probe.conformance_recovery } : {}),
     };
   }
 
