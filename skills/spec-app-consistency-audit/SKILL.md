@@ -291,7 +291,7 @@ Read these on demand; they are not required for routing:
 - [Mode, Output, And Issue Contract](references/mode-output-contract.md): detailed mode tokens, scope resolution, Figma materialization, output/writeback, and issue protocol fields.
 - [`references/report-format.md`](references/report-format.md): the report section structure that downstream Report-Writer steps emit.
 - [`references/pilot-validation.md`](references/pilot-validation.md): minimal pilot-record format gating the v0.2 readiness decision.
-- [`references/ecc-source-lock.json`](references/ecc-source-lock.json): ECC source-lock policy consumed by `scripts/merge-contracts.js` and the orchestrator prompt to keep ECC-derived lenses read-only.
+- [`references/ecc-source-lock.json`](references/ecc-source-lock.json): ECC source-lock policy consumed by the orchestrator prompt (`prompts/orchestrator.md`) to keep ECC-derived lenses read-only.
 
 ## Workflow Handoff Boundary
 

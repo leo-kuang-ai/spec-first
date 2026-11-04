@@ -222,20 +222,7 @@ if should_probe "$PROJ_TYPE" "framework-config"; then
   done
 fi
 
-# ── Probe 3: Rails config/puma.rb ───────────────────────────────────────────
-
-if should_probe "$PROJ_TYPE" "puma"; then
-  puma_file="$PROJECT_ROOT/config/puma.rb"
-  if [ -f "$puma_file" ]; then
-    puma_port=$(grep -Eo 'port[[:space:]]+[0-9]+' "$puma_file" 2>/dev/null | head -1 | grep -Eo '[0-9]+')
-    if valid_port "$puma_port"; then
-      emit_port "$puma_port"
-      exit 0
-    fi
-  fi
-fi
-
-# ── Probe 4: Procfile.dev ───────────────────────────────────────────────────
+# ── Probe 3: Procfile.dev ───────────────────────────────────────────────────
 
 if should_probe "$PROJ_TYPE" "procfile"; then
   procfile="$PROJECT_ROOT/Procfile.dev"
@@ -250,6 +237,19 @@ if should_probe "$PROJ_TYPE" "procfile"; then
         emit_port "$proc_port"
         exit 0
       fi
+    fi
+  fi
+fi
+
+# ── Probe 4: Rails config/puma.rb ───────────────────────────────────────────
+
+if should_probe "$PROJ_TYPE" "puma"; then
+  puma_file="$PROJECT_ROOT/config/puma.rb"
+  if [ -f "$puma_file" ]; then
+    puma_port=$(grep -Eo 'port[[:space:]]+[0-9]+' "$puma_file" 2>/dev/null | head -1 | grep -Eo '[0-9]+')
+    if valid_port "$puma_port"; then
+      emit_port "$puma_port"
+      exit 0
     fi
   fi
 fi

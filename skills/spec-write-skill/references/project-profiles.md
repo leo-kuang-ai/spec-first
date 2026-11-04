@@ -21,7 +21,7 @@ Project profile 必须说明 source、producer、consumer、authority 与失效�
 - workflow/standalone/internal delivery 由 `src/cli/contracts/dual-host-governance/skills-governance.json` 管理；
 - Claude command metadata source 在 `templates/claude/commands/spec/`；
 - `docs/catalog/runtime-capabilities.md` 是 generator 生成的只读 catalog；
-- `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/` 是 generated runtime surfaces；
+- `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/`、`.opencode/` 是 generated runtime surfaces；
 - source 变化更新 tests、必要 docs 和 `CHANGELOG.md`；runtime 通过 `spec-first init` 重建。
 
 新增 user-visible Skill 时先更新 source/governance，再运行 `npm run docs:runtime-catalog` 和项目批准的 runtime projection。不要把 catalog 或 runtime patch 当 source change。

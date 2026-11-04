@@ -6,7 +6,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { finding, findSymlinkSegment, isInside, readStableRegularFile } = require('./lib/package-inspection.cjs');
 
-const GENERATED_RUNTIME_PREFIXES = ['.claude/', '.codex/', '.agents/skills/', '.cursor/', '.kiro/', '.qoder/'];
+const GENERATED_RUNTIME_PREFIXES = ['.claude/', '.codex/', '.agents/skills/', '.cursor/', '.kiro/', '.qoder/', '.opencode/'];
 const SHA256 = /^[a-f0-9]{64}$/;
 const CLAIMS = new Set(['ready', 'preview-only', 'blocked']);
 const STATUS_ORDER = { error: 0, warning: 1, not_checked: 2 };

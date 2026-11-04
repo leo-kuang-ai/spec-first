@@ -106,7 +106,7 @@ If any item is missing, stop and help the user create a safe spec or route the w
 
 ## Measurement-Only Calibration Mode
 
-When the invocation or approved spec selects `mode:measurement-only`, load
+When the invocation selects the `mode:measurement-only` token, or the approved spec sets `calibration.mode: measurement-only` (its schema field, `optimize-spec-schema.yaml`), load
 `references/measurement-only-calibration.md`. This mode compares an explicitly
 identified baseline and candidate against the same repeatable task/corpus. It
 must run an A/A noise floor before A/B, use a pre-registered acceptance

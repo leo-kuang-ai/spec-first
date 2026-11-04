@@ -118,6 +118,14 @@ case ${#MATCHES[@]} in
     exit 0
     ;;
   *)
+    # astro.config.* is the more specific signature: Astro ships Vite under the
+    # hood, so a leftover vite.config.* in an Astro project is not ambiguity.
+    for m in "${MATCHES[@]}"; do
+      if [ "$m" = "astro" ]; then
+        echo "astro"
+        exit 0
+      fi
+    done
     echo "multiple"
     exit 0
     ;;

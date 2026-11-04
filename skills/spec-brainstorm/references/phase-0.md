@@ -17,6 +17,8 @@ Before proceeding to Phase 0.2, classify whether this is a software task. The ke
 
 **Software** (continue to Phase 0.2) -- the task references code, repositories, APIs, databases, or asks to build/modify/debug/deploy software.
 
+**Debug carve-out -- route out at intake, not at synthesis.** A request whose primary intent is diagnosing or fixing a concrete failure, bug, regression, or error routes out to `spec-debug` here (repo entry governance); `debug` in the software-signal list covers brainstorming the *approach* around a software problem, not owning the fix of a live failure. Continue in this skill only when the user explicitly wants to explore the solution space rather than get the failure fixed.
+
 **Non-software brainstorming** (route to universal brainstorming) -- BOTH conditions must be true:
 - None of the software signals above are present
 - The task describes something the user wants to explore, decide, or think through in a non-software domain

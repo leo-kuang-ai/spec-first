@@ -166,12 +166,16 @@ function validateSkill(options) {
   let totalTextBytes = 0;
   let secretLikeCount = 0;
   let inventoryHalted = false;
+  let rootSymlinkHalted = false;
   let rootStat;
   let authorizedReal = null;
 
   const symlinkSegment = findSymlinkSegment(requestedRoot);
   if (symlinkSegment) {
     findings.push(finding('skill_root_symlink_segment', 'path-safety', 'error', '.', 'Skill root path must not traverse a symbolic-link segment.'));
+    inventoryHalted = true;
+    rootSymlinkHalted = true;
+    findings.push(finding('inventory_halted_root_symlink', 'inventory', 'not_checked', null, 'Inventory skipped: the skill root traverses a symbolic-link segment, so no file is inventoried or read through it.'));
   }
 
   if (options.authorizedRoot) {
@@ -353,7 +357,10 @@ function validateSkill(options) {
   if (rootStat.isDirectory() && !rootStat.isSymbolicLink()) walk(realRoot, 0);
 
   const skillMdPath = path.join(realRoot, 'SKILL.md');
-  if (!fs.existsSync(skillMdPath)) {
+  if (rootSymlinkHalted) {
+    // Symlink-traversing root: nothing inside the target is read, including SKILL.md.
+    findings.push(finding('skill_md_not_checked_root_symlink', 'frontmatter', 'not_checked', 'SKILL.md', 'SKILL.md checks skipped: the skill root traverses a symbolic-link segment.'));
+  } else if (!fs.existsSync(skillMdPath)) {
     findings.push(finding('skill_md_missing', 'frontmatter', 'error', 'SKILL.md', 'SKILL.md is required.'));
   } else {
     try {

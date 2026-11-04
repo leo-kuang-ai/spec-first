@@ -87,7 +87,7 @@ This is the core analytical step. Group issues into themes that represent **area
 
 **Clustering approach:**
 
-1. **Cluster from open issues first.** Open issues define the active themes. Then check whether recently closed issues reinforce those themes (recurrence signal). Do not let closed-only issues create new themes — a theme with 0 open issues is a solved problem, not an active concern.
+1. **Cluster from open issues first.** Open issues define the active themes. Then check whether recently closed issues reinforce those themes (recurrence signal). Do not let closed-only issues create new themes — treat a theme with 0 open issues as likely solved for theme-formation purposes, while carrying the interpretation caution above: closed issues alone are not proof the pain is gone.
 
 2. Start with labels as strong clustering hints when present (e.g., `subsystem:collab` groups collaboration issues). When labels are absent or inconsistent, cluster by title similarity and inferred problem domain.
 

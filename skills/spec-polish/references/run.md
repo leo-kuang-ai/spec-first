@@ -8,6 +8,8 @@ With no target, stay in the current checkout. For a PR or branch, inspect existi
 
 Reject detached HEAD, main/master, and the repository's actual default branch. Determine that default from current repository configuration or remote metadata; an unresolved branch identity blocks checkout/startup.
 
+Before the first source edit, capture the workspace's dirty/untracked file set. Any overlap between the intended polish edit surface and pre-existing user changes blocks that edit and surfaces the conflict for the user — a commit-time mixed-change check alone is too late.
+
 ## Resolve Startup Facts
 
 Set `SKILL_DIR` to the absolute directory containing the loaded Skill in each independent shell call. Shell variables do not persist across tool calls.
