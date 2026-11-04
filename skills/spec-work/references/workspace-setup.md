@@ -41,7 +41,7 @@ Unresolved repository, source ownership, dirty overlap, or authority blocks the 
 
    Apply the reference and record one run-local boundary: `target_repo`, current `HEAD`/branch, pre-existing dirty paths and overlap, canonical source owner, allowed/changed paths, scope-changing discoveries, worker dispatch authorization/capability/isolation, and separate mutation/commit/landing authorization. Branch or worktree mutation requires explicit authority; never pull/switch/create/rename merely because a plan exists. Default-branch commit still requires explicit confirmation.
 
-   A necessary discovered file may join the changed set only when direct evidence shows it completes existing scope. Acceptance/public-contract/architecture/provider/repo/source-owner expansion returns to `spec-plan` or task regeneration. Unknown isolation follows shared-directory rules; missing dispatch authorization/capability runs inline. Workers never commit.
+   Discovered-file admission, scope-changing returns, isolation, and dispatch fallback follow the §2 anchors above verbatim (direct-evidence admission; acceptance/public-contract/architecture/provider/repo/source-owner expansion returns to `spec-plan` or task regeneration); workers never commit.
 
 3. **Create Task List** _(skip if Phase 0 already built one, or if Phase 0 routed as Trivial)_
 

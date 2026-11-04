@@ -2,7 +2,7 @@
 
 ## Owned
 
-Execute a dependency-ready slice, capture evidence, apply existing patterns, and track completion. `references/execution-strategy.md` owns commit and dispatch authorization; `references/feedback-and-tests.md` owns proof selection; `references/implementation-quality.md` owns durable-surface and simplification decisions.
+Execute a dependency-ready slice, capture evidence, apply existing patterns, and track completion. `references/execution-strategy.md` owns commit and dispatch authorization and builds the task tracker this loop consumes; `references/feedback-and-tests.md` owns proof selection; `references/implementation-quality.md` owns durable-surface and simplification decisions.
 
 ## Not Owned
 

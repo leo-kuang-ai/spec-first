@@ -59,7 +59,7 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
 
 2. **Simplify** (conditional — separate from code review)
 
-   Before code review, invoke **`spec-simplify-code`** when the diff is non-mechanical and large enough to benefit (default: **>=30 changed lines**). Skip when the diff is purely mechanical (formatting, dependency bumps, lint-only fixes, generated artifacts).
+   Before code review, invoke **`spec-simplify-code`** when the diff is non-mechanical and large enough to benefit (default: **>=30 changed lines**; this final pass counts all changed lines, whereas the phase-boundary threshold in `implementation-loop.md` counts substantive human-authored lines only — both defaults coexist on purpose). Skip when the diff is purely mechanical (formatting, dependency bumps, lint-only fixes, generated artifacts).
 
    This step refines reuse, quality, and efficiency on the **current diff** so any later review sees cleaner code. It is not a substitute for code review.
 
@@ -185,7 +185,7 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
 
    `script_confirmed.validation.run_summary_ref` 必须指向 same workflow、same workspace、same run-id 的 `.spec-first/workflows/spec-work/<workspace-slug>/<run-id>/verification-run-summary.json`。`script_confirmed.artifact_refs` 与 `llm_asserted.read_artifacts` 只能引用 repo-relative materialized evidence；不得引用 session-temp absolute path。相同 run-id 不可覆盖；`artifact-already-exists`、`producer-error` 或其他 `not-written` reason 原样进入 handoff。
 
-   **E. 形成 closeout envelope。** Standalone 与 Return-to-Caller 均返回 `verification_run_summary_ref`、`honest_closeout_verdict`、`run_artifact_path`、`run_artifact_reason_code`、`claim_limitations`。Return-to-Caller 额外在 A-D 全部完成之后、返回 envelope 之前，从当前已加载 Skill 的 `SKILL_DIR` 运行 `scripts/working-tree-fingerprint.cjs` 捕获 `verified_worktree_fingerprint`——run summary 与 run artifact 都写在被 ignore 的 `.spec-first/workflows/` 下，因此这些写入不改变指纹；helper 无法运行时按 SKILL.md 记录 `fingerprint-helper-unavailable` blocker。Return-to-Caller 仍跳过 standalone simplify/review/PR/lifecycle tail，但不能跳过自己已执行 local verification 的 structured evidence closeout；caller 继续拥有最终 review、plan lifecycle 与 landing。
+   **E. 形成 closeout envelope。** Standalone 与 Return-to-Caller 均返回 `verification_run_summary_ref`、`honest_closeout_verdict`、`run_artifact_path`、`run_artifact_reason_code`、`claim_limitations`。Return-to-Caller 额外在 A-D 全部完成之后、返回 envelope 之前，从当前已加载 Skill 的 `SKILL_DIR` 运行 `scripts/working-tree-fingerprint.cjs` 捕获 `verified_worktree_fingerprint`——run summary 与 run artifact 都写在被 ignore 的 `.spec-first/workflows/` 下，因此这些写入不改变指纹；该不变性依赖该目录在目标 repo 确实被 gitignore 覆盖（可用 `git check-ignore -v .spec-first/workflows/` 预验），未覆盖的 repo 中 before/after 指纹差异不构成 drift 证据，应在 `claim_limitations` 记 `fingerprint-stability-unverified`；helper 无法运行时按 SKILL.md 记录 `fingerprint-helper-unavailable` blocker。Return-to-Caller 仍跳过 standalone simplify/review/PR/lifecycle tail，但不能跳过自己已执行 local verification 的 structured evidence closeout；caller 继续拥有最终 review、plan lifecycle 与 landing。
 
 5.2 **Plan Status Closeout**
 
@@ -202,7 +202,7 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
    For an applicable candidate, invoke `spec-first internal plan-status complete --target-repo <root> --plan <repo-relative-source-plan> --json`. `active → completed` and `plan-status-already-completed` are successful closeouts. Duplicate, malformed, invalid, unsafe-path, read, or write failures on an applicable lifecycle-managed plan keep it unchanged and block the lifecycle closeout claim. Missing status on a unified lifecycle-managed Markdown plan is also a contract failure; legacy missing/closed status follows the explicit degraded branch above rather than forcing migration. The helper re-reads current disk content and uses the shared temp-file + rename writer: POSIX replacement is atomic, Windows replacement is best effort with retry, and neither path is a cross-process CAS. The shipping-tail single-writer rule remains a loud convention.
 
 6. **Prepare Operational Validation Plan** (REQUIRED)
-   - Add a `## Post-Deploy Monitoring & Validation` section to the PR description for every change.
+   - Add a `## Post-Deploy Monitoring & Validation` section to the PR description for every change. On exits with no authorized PR (inline completion or commit-only), carry the same section in the verified handoff summary returned to the caller instead of dropping it.
    - Include concrete:
      - Log queries/search terms
      - Metrics or dashboards to watch

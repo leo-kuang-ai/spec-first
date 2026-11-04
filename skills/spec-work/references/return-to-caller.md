@@ -35,6 +35,9 @@ Return:
 - `u_ids_attempted`
 - `u_ids_completed`
 - `task_ids_attempted` and `task_ids_completed` when Task Cards drove execution
+
+*Maintenance coupling:* any change to this envelope's field set must update, in the same change, the bundled judge scripts (`skills/spec-work/evals/fixtures/scripts/check-return-to-caller.sh`, `check-closeout-order.sh`) and the calibration expectations in `tests/unit/spec-work-outcome-judges.test.js` — the judges are synchronized with these fields by `scripts/evals/build-outcome-judges.cjs --check`.
+
 - `verification_results`
 - `verification_evidence`: one entry per attempted behavior-bearing unit, plus any non-behavioral unit where tests were intentionally skipped. Each entry states the unit/task, `behavior_changed`, `existing_tests_inspected`, `tests_added_or_changed`, tests used unchanged, red failure or characterization observed when applicable, verification commands/results, and any exception reason. For units executed by subagents, this entry is assembled from each worker's returned evidence (the workspace setup worker-packet step), not reconstructed from the diff — the red-before-implementation observation exists only in the worker's report.
 - Proof-test context travels inside `verification_evidence`: exact proof paths, test-only seams, originating unit/task, observed command/log refs and the current byte identity when captured. Include missing/stale limitations explicitly; the caller must snapshot any uncaptured identity before cleanup and reverify after edits. This carries protection intent, not additional mutation authority or a claim that historical RED was observed.

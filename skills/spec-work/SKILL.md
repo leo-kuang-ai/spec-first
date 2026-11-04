@@ -21,7 +21,7 @@ This command takes a work document (plan or specification) or a bare prompt desc
 - **Inputs:** settled implementation-ready code plan, validated task pack, explicit knowledge-work plan, or concrete bounded implementation prompt.
 - **Outputs:** scoped source changes, task/unit evidence, required review/residual posture, structured verification closeout, and an authorization-aware handoff. A task pack remains derived; its source plan owns scope/lifecycle.
 - **Hard exits:** unresolved target repo/dirty overlap/source owner, requirements-only or invalid unified metadata, task-pack/source-plan drift, scope-changing acceptance/architecture/provider/source-runtime discovery, failed required review/verification, or missing mutation/commit/landing authority for the requested exit.
-- **Enforcement provenance:** among the hard exits, only `failed required verification` is script-verified (closeout chain: `verification-run-summary` + `spec-first internal honest-closeout`); the rest are LLM-owned semantic exits enforced by this contract text, not runtime blocks.
+- **Enforcement provenance:** among the hard exits, only `failed required verification` is script-verified at the schema/shape layer (closeout chain: `verification-run-summary` + `spec-first internal honest-closeout`); the required-proof semantic reconciliation above that floor remains an LLM-owned gate (see Required-Proof Reconciliation in `references/shipping-workflow.md`), and the remaining exits are LLM-owned semantic exits enforced by this contract text, not runtime blocks.
 - **Ownership:** scripts prepare deterministic facts; LLMs judge semantic fit. Canonical source is modified; generated runtime mirrors are never source fixes. Local mutation, commit, landing, lifecycle, and durable evidence are separate exits.
 - **Consumers:** `spec-code-review`, caller-owned LFG/goal flows, commit/PR/release workflows, `spec-compound`, and human reviewers.
 
@@ -37,7 +37,7 @@ This command takes a work document (plan or specification) or a bare prompt desc
 | --- | --- | --- |
 | [Input triage](references/input-triage.md) | Phase 0, before classification. | Block execution and preserve state. |
 | [Workspace setup](references/workspace-setup.md) | Phase 1, before task derivation. | Block dependent actions and preserve state. |
-| [Return to caller](references/return-to-caller.md) | Immediately before caller return. | Minimum blocked recovery only. |
+| [Return to caller](references/return-to-caller.md) | Immediately before caller return. | Minimum blocked recovery only (blocked envelope shape: see the Return-to-Caller Mode section below). |
 | [Work intake](references/work-intake.md) | Before bare-prompt discovery or bounded plan reading. | No implementation task derivation until scope is clear. |
 | [Implementation loop](references/implementation-loop.md) | Before any implementation write, including trivial work. | Keep execution and completion open. |
 | [Work intake and task pack](references/work-intake-and-task-pack.md) | Shallow metadata says `type: task-pack`. | Do not execute the pack; return validation/regeneration handoff. |
