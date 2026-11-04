@@ -11,6 +11,7 @@
 | 判断优化方案是否合理 | 方案评估 | 范围、可行性、风险与证据设计判断 |
 | 检查指定 Skill 或具体机制 | 定向 Skill 审查 | 指定范围的源码、消费者与行为证据 |
 | 系统审查 Skill 并判断交付是否可靠 | 完整 Skill 审查 | 全范围清单、三层质量、四层证据、发现与验收结论 |
+| 一次跑完全部 Skill 的结构、行为与成本检查 | 全量单次审查 | 按 [FULL-REVIEW-ONE-PASS.md](FULL-REVIEW-ONE-PASS.md) 的 S0–S8；收益未验证 |
 | 核实已修复的问题是否关闭 | 修复复验 | 原问题复现依据、修改后的回归与消费者证据 |
 
 “新一轮 Skill 审查”默认采用完整 Skill 审查。对象以用户明确范围为准；未限定时清点当前 `skills/`，不沿用历史数量。先从主链路做一批校准，不能用该批结果代表全范围。
@@ -49,4 +50,4 @@
 - 发现关键缺陷，仍可以完成一次充分审查，但被审对象不能通过。
 - 没有有效问题，可以保持现状；不为凑发现数量修改 Skill。
 
-[流程图](REVIEW-WORKFLOW-DIAGRAMS.md)用于导航；[旧覆盖分析](../CORE-REVIEW-DIMENSIONS-COVERAGE.md)用于发现待核验线索，不能直接复用其完成率。
+[流程图](REVIEW-WORKFLOW-DIAGRAMS.md)用于导航；[旧覆盖分析](../analysis/CORE-REVIEW-DIMENSIONS-COVERAGE.md)用于发现待核验线索，不能直接复用其完成率。

@@ -4,7 +4,7 @@
 
 新一轮 Skill 审查以 [Skill 审查 Workflow v2](../process/REVIEW-EXECUTION-WORKFLOW.md) 为执行入口；其第 2 节逐份映射本目录要求，说明当前合同、历史候选、旧统计与阈值冲突的处理。下文保留历史方案导航，不代表其中数字、拟议 Contract 或“已完成”状态已被本轮核验。源码深读另见 [12-phase05-skill-deep-dive.md](12-phase05-skill-deep-dive.md)，实际入口与必读引用以当前源码为准。
 
-本目录共 17 份方案文档（`00`–`12`，其中 `02` 有两份，另有 `DECISION-RULES`、`DECISION-AUTHORITY`、`RESOURCE-PLAN`）。全部写于 2026-11-03 Phase 0 之前，属于**事前设计**。项目实际执行结果不在本目录，见文末「实际结果在哪里」。
+方案文档共 17 份（`00`–`12`，其中 `02` 有两份，另有 `DECISION-RULES`、`DECISION-AUTHORITY`、`RESOURCE-PLAN`），全部写于 2026-11-03 Phase 0 之前，属于**事前设计**。其中 5 份未执行/未采纳的设计（`09`、`10`、`11`、`DECISION-AUTHORITY`、`RESOURCE-PLAN`）已于 2026-11-04 归档至 `../archive/`，本目录现存 12 份。项目实际执行结果不在本目录，见文末「实际结果在哪里」。
 
 「执行中的角色」一列依据 `phase0-results/`、`execution/`、`summary/` 中的实际引用和执行记录判断。
 
@@ -33,6 +33,8 @@
 
 ## 三、未按原设计执行的文档（阅读时注意）
 
+> 2026-11-04 归档说明：`09`、`10`、`11`、`DECISION-AUTHORITY`、`RESOURCE-PLAN` 已移至 `../archive/`，下表保留对其角色与实际情况的判断记录；`08` 因 prose 层 Contract 要素仍被本轮 WP1/WP3 用作 Contract 基准而留在本目录（未采纳的仅其 schema 与自动检查器部分）。`10`/`11` 的**关注面**（当前 Skill 对超大需求的适配质量）由 WP4 任务4.4 承接主动审查（2026-11-04 owner 裁定）。
+
 | 文档 | 原设计 | 实际情况 |
 |---|---|---|
 | **08-skill-contract-protocol.md** | 5 个 Skill 的强 schema YAML 输入输出契约、3 个 Inter-Skill Protocol，以及 Python 自动检查（`ProtocolViolationError`、失败自动重试） | **未采纳**。Phase 0 追踪没有填 `contract_protocol_analysis` 字段。Phase 1 改的是 prose 层的对账义务，不是本文的 schema 和检查器。本文「预期收益」表里的「信息丢失 64%、返工 73%」是 Phase 0 之前的假设值，Phase 0 实测信息丢失为 0/9、返工为 6/9 |
@@ -48,7 +50,7 @@
 
 - **理解决策过程（30 分钟）**：`00` → `DECISION-RULES` 规则 3、规则 4 → `phase0-results/phase0-final-report.md`
 - **理解方法论（1 小时）**：再读 `01`、`02-execution-quick-reference`、`12`
-- **复用到新项目**：`00`、`01`、`02-execution-checklist`、`DECISION-RULES` 可以直接复用。复用 `08`、`09` 之前，先对照上表的「实际情况」，确认前提成立
+- **复用到新项目**：`00`、`01`、`02-execution-checklist`、`DECISION-RULES` 可以直接复用。复用 `08`、`09`（`../archive/`）之前，先对照上表的「实际情况」，确认前提成立
 
 ## 实际结果在哪里
 

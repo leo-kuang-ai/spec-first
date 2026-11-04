@@ -31,7 +31,7 @@ ls -la
 cat README.md | head -50
 
 # 阅读快速开始指南
-cat HOW-TO-START-REVIEW.md | head -50
+cat process/HOW-TO-START-REVIEW.md | head -50
 
 # 阅读执行清单
 cat core/02-execution-quick-reference.md
@@ -1053,7 +1053,7 @@ ls -la scripts/
 
 ```bash
 # 查看文档
-cat HOW-TO-START-REVIEW.md
+cat process/HOW-TO-START-REVIEW.md
 cat core/02-execution-quick-reference.md
 cat core/02-execution-checklist.md
 
