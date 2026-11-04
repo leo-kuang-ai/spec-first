@@ -92,6 +92,6 @@ If --evals present:
 
 ## Chain Handoff
 
-After completion, write handoff.json to output directory: version "2.1.0", source "debug", timestamp, status (COMPLETE|USER_INTERRUPT|BOUNDED|ERROR), results_tsv path, findings = confirmed bugs with severity + file:line, config{scope, symptom}.
+After completion, write handoff.json to output directory: version "2.1.0", source "debug", timestamp, status (COMPLETE|USER_INTERRUPT|BOUNDED|ERROR), results_tsv path, findings = confirmed bugs with severity + file:line, config{scope, symptom}. Two fields are the orchestrator's normalized routing signals and must keep their strict shapes: `unresolved_count` (integer — confirmed bugs still unfixed; 0 when none outstanding) and `untested_gaps` (array of strings — suspected areas that could not be tested with available capability; empty array when none). Malformed shapes block the orchestrator's completion claims instead of being read optimistically.
 If --fix flag → chain to fix automatically.
 Invoke next target in --chain order. Propagate --evals flag.

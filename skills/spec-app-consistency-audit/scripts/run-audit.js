@@ -97,11 +97,14 @@ function parseRunnerArgs(argv) {
   const passthrough = [];
   let rawIssues = null;
   let rawIssuesValueMissing = false;
+  let codeReviewOrigin = false;
   let help = false;
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === '--help' || arg === '-h') {
       help = true;
+    } else if (arg === '--from-code-review') {
+      codeReviewOrigin = true;
     } else if (arg === '--raw-issues') {
       const next = argv[index + 1];
       if (typeof next !== 'string' || next.length === 0 || next.startsWith('--')) {
@@ -115,7 +118,7 @@ function parseRunnerArgs(argv) {
     }
   }
   const options = parseCommonArgs(passthrough);
-  return { options, rawIssues, rawIssuesValueMissing, help };
+  return { options: { ...options, codeReviewOrigin }, rawIssues, rawIssuesValueMissing, help };
 }
 
 function isInsideOrSame(parentPath, childPath) {
@@ -300,6 +303,10 @@ function main(argv) {
       reasonCode: 'run_dir_outside_default_root',
       message: 'run-dir must stay under .spec-first/app-audit/runs.',
     });
+    // Publish the run root to the shared write-boundary check: artifact writes
+    // resolve (realpath) against it so a linked subdirectory inside the run
+    // root cannot carry writes outside it.
+    process.env.SPEC_AUDIT_WRITE_BOUNDARY = absoluteRunDir;
 
     envelopePath = options.output || path.join(absoluteRunDir, 'headless-envelope.txt');
     envelopePath = resolvePathAgainstRoot(repoRoot, envelopePath);
@@ -361,6 +368,15 @@ function main(argv) {
     const figmaFlags = options.figmaContext ? ['--figma-context', options.figmaContext] : [];
     const maxFilesFlags = boundedNumberFlag('--max-files', options.maxFiles);
     const prdMaxBytesFlags = boundedNumberFlag('--prd-max-bytes', options.prdMaxBytes);
+    // Scope/lens inputs the entrypoint accepts must reach the producers that
+    // report capability facts against them; dropping them here would make
+    // metadata/preflight/impact understate what this run can actually cover.
+    const techPlanFlags = options.techPlan ? ['--tech-plan', options.techPlan] : [];
+    const taskDocFlags = options.taskDoc ? ['--task-doc', options.taskDoc] : [];
+    const industryFlags = options.industry ? ['--industry', options.industry] : [];
+    const industryProfileFlags = options.industryProfile ? ['--industry-profile', options.industryProfile] : [];
+    const depthFlags = options.depth && options.depth !== 'default' ? ['--depth', options.depth] : [];
+    const expectedInputFlags = (options.expectedInputs || []).flatMap((input) => ['--expected-input', input]);
 
     runStep('build-run-metadata', [
       script('build-run-metadata.js'),
@@ -370,6 +386,12 @@ function main(argv) {
       ...sharedSourceFlags,
       ...prdFlags,
       ...figmaFlags,
+      ...techPlanFlags,
+      ...taskDocFlags,
+      ...industryFlags,
+      ...industryProfileFlags,
+      ...depthFlags,
+      ...expectedInputFlags,
       ...maxFilesFlags,
       '--run-dir', absoluteRunDir,
       '--output', artifacts.metadata,
@@ -381,6 +403,9 @@ function main(argv) {
       ...sharedSourceFlags,
       ...prdFlags,
       ...figmaFlags,
+      ...techPlanFlags,
+      ...taskDocFlags,
+      ...expectedInputFlags,
       ...prdMaxBytesFlags,
       '--output', artifacts.preflight,
     ], repoRoot);
@@ -392,6 +417,9 @@ function main(argv) {
       ...sharedSourceFlags,
       ...prdFlags,
       ...figmaFlags,
+      ...techPlanFlags,
+      ...taskDocFlags,
+      ...industryFlags,
       ...maxFilesFlags,
       '--output', artifacts.impact,
     ], repoRoot);
@@ -481,20 +509,27 @@ function main(argv) {
       '--output', artifacts.rules,
     ], repoRoot);
 
+    // The report must state coverage over every domain the run actually
+    // produced; building this list separately from merge-contracts:merged
+    // would let the two drift apart again.
+    const domainArtifactFlags = [
+      artifacts.product,
+      artifacts.figma,
+      artifacts.code,
+      artifacts.routes,
+      artifacts.architecture,
+      artifacts.quality,
+      artifacts.components,
+      artifacts.modules,
+      artifacts.analytics,
+      artifacts.i18n,
+      artifacts.industry,
+      artifacts.rules,
+    ].flatMap((artifactPath) => ['--artifacts', artifactPath]);
+
     runStep('merge-contracts:merged', [
       script('merge-contracts.js'),
-      '--artifacts', artifacts.product,
-      '--artifacts', artifacts.figma,
-      '--artifacts', artifacts.code,
-      '--artifacts', artifacts.routes,
-      '--artifacts', artifacts.architecture,
-      '--artifacts', artifacts.quality,
-      '--artifacts', artifacts.components,
-      '--artifacts', artifacts.modules,
-      '--artifacts', artifacts.analytics,
-      '--artifacts', artifacts.i18n,
-      '--artifacts', artifacts.industry,
-      '--artifacts', artifacts.rules,
+      ...domainArtifactFlags,
       '--output', artifacts.merged,
     ], repoRoot);
 
@@ -502,6 +537,14 @@ function main(argv) {
       ? resolvePathAgainstRoot(repoRoot, rawIssues)
       : path.join(absoluteRunDir, 'input', 'raw-issues.json');
     let autoStubbed = false;
+    const isRunnerStub = (file) => {
+      try {
+        const staged = JSON.parse(fs.readFileSync(file, 'utf8'));
+        return staged && staged._runner_stub === true;
+      } catch (_error) {
+        return false;
+      }
+    };
     if (!fs.existsSync(stagedRawIssues)) {
       if (options.issueSynthesisStatus === 'llm_provided' || options.issueSynthesisStatus === 'fixture_provided') {
         emitFailure(
@@ -513,7 +556,12 @@ function main(argv) {
         return;
       }
       fs.mkdirSync(path.dirname(stagedRawIssues), { recursive: true });
-      fs.writeFileSync(stagedRawIssues, `${JSON.stringify({ issues: [], rejected_issues: [] }, null, 2)}\n`);
+      // The stub is marked in-band: a same-run-id retry reads the file, sees the
+      // marker, and treats it as runner-produced rather than demanding a caller
+      // synthesis status for input the runner itself created.
+      fs.writeFileSync(stagedRawIssues, `${JSON.stringify({ _runner_stub: true, issues: [], rejected_issues: [] }, null, 2)}\n`);
+      autoStubbed = true;
+    } else if (isRunnerStub(stagedRawIssues)) {
       autoStubbed = true;
     }
     if (!autoStubbed && (!options.issueSynthesisStatus || options.issueSynthesisStatus === 'not_run')) {
@@ -531,7 +579,11 @@ function main(argv) {
       script('merge-contracts.js'),
       '--issues-artifact',
       '--issue', stagedRawIssues,
-      'from:code-review',
+      // `from:code-review` is passed only when the caller explicitly declares a
+      // code-review origin; the dormant code_review_handoff channel has no
+      // active consumer, so an unconditional flag would activate handoff fields
+      // that nothing downstream reads.
+      ...(options.codeReviewOrigin === true ? ['from:code-review'] : []),
       runIdToken,
       ...effectiveSynthesisFlags,
       '--output', artifacts.issues,
@@ -542,8 +594,7 @@ function main(argv) {
       ...sharedSourceFlags,
       '--run-dir', absoluteRunDir,
       runIdToken,
-      '--artifacts', artifacts.routes,
-      '--artifacts', artifacts.quality,
+      ...domainArtifactFlags,
       '--issue', artifacts.issues,
       ...effectiveSynthesisFlags,
       '--output', artifacts.report,

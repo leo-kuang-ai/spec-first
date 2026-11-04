@@ -117,15 +117,21 @@ def is_plateau(state):
 
 def unresolved_hop(state):
     lh = state.get("last_handoff") or {}
-    if int(lh.get("errors") or 0) > 0:
+    # Routing signals are strictly typed: only an int > 0 counts as unresolved
+    # errors and only a non-empty list counts as untested gaps. Malformed
+    # handoff shapes block completion claims instead of promoting them.
+    unresolved = lh.get("unresolved_count")
+    if not isinstance(unresolved, int) or unresolved < 0:
+        unresolved = lh.get("errors") if isinstance(lh.get("errors"), int) else None
+    if isinstance(unresolved, int) and unresolved > 0:
         return "fix"
     if lh.get("verdict") == "UNSTABLE":
         return "regression"
-    if lh.get("untested_gaps"):
+    if isinstance(lh.get("untested_gaps"), list) and lh.get("untested_gaps"):
         return "debug"
     if consecutive_unknown(state) >= 3:
         return "BLOCKED"
-    if state.get("pending_verify"):
+    if state.get("pending_verify") is True:
         return "verify"
     hop_log = state.get("hop_log") or []
     last = hop_log[-1] if hop_log else {}
@@ -137,7 +143,7 @@ def cmd_next_hop(state):
     pending = unresolved_hop(state)
     if pending:
         print(pending); return 0
-    if state.get("predicate_met"):
+    if state.get("predicate_met") is True:
         print("DONE"); return 0
     if is_plateau(state):
         print("PLATEAU"); return 0
@@ -233,7 +239,7 @@ def cmd_verdict(state):
         verdict = {"verify": "PENDING-VERIFY", "BLOCKED": "BLOCKED"}.get(pending, "INCOMPLETE")
     elif state.get("stop_reason"):
         verdict = state["stop_reason"]
-    elif state.get("predicate_met"):
+    elif state.get("predicate_met") is True:
         pipeline = state.get("pipeline") or []
         verdict = ("PENDING-SHIP-APPROVAL"
                    if state.get("terminal_choice") == "proceed-to-ship" and "ship" in pipeline
@@ -264,6 +270,18 @@ def cmd_validate_state(state):
         issues.append("pipeline: required non-empty array")
     if not isinstance(state.get("hop_log"), list):
         issues.append("hop_log: required array")
+    for boolean_field in ("predicate_met", "pending_verify"):
+        if boolean_field in state and not isinstance(state[boolean_field], bool):
+            issues.append(f"{boolean_field}: must be a boolean when present")
+    lh = state.get("last_handoff")
+    if lh is not None and not isinstance(lh, dict):
+        issues.append("last_handoff: must be an object when present")
+    elif isinstance(lh, dict):
+        for count_field in ("unresolved_count", "errors"):
+            if count_field in lh and not isinstance(lh[count_field], int):
+                issues.append(f"last_handoff.{count_field}: must be an integer when present")
+        if "untested_gaps" in lh and not isinstance(lh["untested_gaps"], list):
+            issues.append("last_handoff.untested_gaps: must be an array when present")
     if not isinstance(state.get("cycle_count"), int) or state.get("cycle_count", -1) < 0:
         issues.append("cycle_count: required non-negative integer")
     if state.get("mode") == "loop":

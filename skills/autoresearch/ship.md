@@ -110,9 +110,10 @@ Write:
 ## Rollback
 
 If `--rollback`:
-- Identify last ship action from most recent ship log
-- Reverse it (revert PR, unpublish, rollback deployment)
-- Verify rollback succeeded
+- Identify the rollback Target from the invoking request (deployment, release, or artifact it names); do not infer it from "most recent log" alone.
+- Reconcile before acting: the Target named in the request, the object the chosen ship log actually shipped, the current state of that object (still at the shipped version? superseded by a later change?), and the authorized rollback scope for this run must all agree. A later change layered on top makes blind reversal unsafe — surface the conflict and stop instead of overwriting it.
+- Reverse it (revert PR, unpublish, rollback deployment) only within the reconciled scope.
+- Verify rollback succeeded against the same Target and record the reconciliation (log identity, current-state check, scope) in the rollback log entry.
 
 ## Chain Handoff
 

@@ -19,7 +19,7 @@ Extract from $ARGUMENTS:
 - `Iterations:` or `--iterations` — default 15. "unlimited" for unbounded.
 - `--evals`, `--evals-interval N`
 
-If upstream `handoff.json` exists in CWD → read it. Map source findings to default seed categories:
+If upstream `handoff.json` exists in CWD → read it. Before reusing its findings or a prior learn summary, check freshness: record the handoff's run directory (or summary path) as the source identity, and confirm the repository state it describes still holds (the changes it mentions are still present, or the branch/worktree still matches). A source whose evidence has been superseded by later changes is a lead to re-derive, not a premise; note `reused_source: <path>` plus its staleness check result in the output. Map source findings to default seed categories:
 - probe → ICP challenges, UX & experience
 - predict → Competitor gaps, Revenue & growth
 - debug/security → Competitor gaps, ICP challenges

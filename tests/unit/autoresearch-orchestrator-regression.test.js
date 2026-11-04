@@ -53,7 +53,7 @@ test.each([
   [{ hop_log: [{ outcome: 'failed', retry_route: 'fix' }] }, 'fix', 'INCOMPLETE'],
   [{ last_handoff: { errors: 1 } }, 'fix', 'INCOMPLETE'],
   [{ last_handoff: { verdict: 'UNSTABLE' } }, 'regression', 'INCOMPLETE'],
-  [{ last_handoff: { untested_gaps: true } }, 'debug', 'INCOMPLETE'],
+  [{ last_handoff: { untested_gaps: ['retry path not exercised'] } }, 'debug', 'INCOMPLETE'],
   [{ units_remaining: [null, null, null] }, 'BLOCKED', 'BLOCKED'],
 ])('unresolved evidence cannot converge: %j', (state, hop, verdict) => {
   expect(stateRun('validate-state', state).status).toBe(0);
@@ -61,6 +61,22 @@ test.each([
   const result = stateRun('verdict', state);
   expect(result.status).toBe(0);
   expect(result.stdout.split('\n')[0]).toBe(verdict);
+});
+
+test.each([
+  { predicate_met: 'false' },
+  { pending_verify: 'yes' },
+  { last_handoff: { errors: 'many' } },
+  { last_handoff: { untested_gaps: true } },
+])('malformed routing signals are rejected by validate-state instead of routing: %j', (state) => {
+  const result = stateRun('validate-state', state);
+  expect(result.status).toBe(2);
+  expect(result.stdout.split('\n')[0]).toBe('invalid:');
+});
+
+test('string predicate_met never produces DONE', () => {
+  const state = { predicate_met: 'false' };
+  expect(stateRun('next-hop', state).stdout).not.toBe('DONE\n');
 });
 
 test('verified recovery can converge after an older failed hop', () => {

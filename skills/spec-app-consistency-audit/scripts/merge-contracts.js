@@ -116,6 +116,42 @@ function applyEvidenceGate(issues, options = {}) {
         rulePackEvidence,
       });
     }
+    if (issue.contract_status === 'confirmed'
+      && !Object.prototype.hasOwnProperty.call(CLAIM_FAMILY_REQUIREMENTS, issue.claim_family)) {
+      return {
+        ...issue,
+        contract_status: 'candidate',
+        static_confirmed: false,
+        evidence_gate: {
+          passed: false,
+          reason: 'unknown_claim_family',
+          project_evidence_count: projectEvidence.length,
+          rule_pack_evidence_count: rulePackEvidence.length,
+        },
+        review_lifecycle: appendLifecycle(issue, {
+          stage: 'deterministic_evidence_gate',
+          action: 'downgraded',
+          reason_code: 'unknown_claim_family',
+        }),
+      };
+    }
+    if (issue.contract_status === 'confirmed' && issue.static_confirmed === false) {
+      return {
+        ...issue,
+        contract_status: 'candidate',
+        evidence_gate: {
+          passed: false,
+          reason: 'static_confirmation_conflict',
+          project_evidence_count: projectEvidence.length,
+          rule_pack_evidence_count: rulePackEvidence.length,
+        },
+        review_lifecycle: appendLifecycle(issue, {
+          stage: 'deterministic_evidence_gate',
+          action: 'downgraded',
+          reason_code: 'static_confirmation_conflict',
+        }),
+      };
+    }
     if (issue.contract_status === 'confirmed' && projectEvidence.length === 0) {
       return rejectIssue(issue, {
         reason: 'confirmed_issue_requires_project_specific_evidence',
@@ -414,7 +450,12 @@ function normalizeIssue(issue, options = {}) {
   if (normalized.contract_status !== 'confirmed') {
     normalized.static_confirmed = false;
   } else if (normalized.static_confirmed !== true) {
-    normalized.static_confirmed = true;
+    // An explicit static_confirmed:false on a confirmed issue is a producer
+    // conflict, not a gap to paper over: leave it false so the deterministic
+    // evidence gate downgrades the issue instead of silently promoting it.
+    if (typeof issue.static_confirmed !== 'boolean') {
+      normalized.static_confirmed = true;
+    }
   }
   if (typeof normalized.requires_runtime_verification !== 'boolean') {
     normalized.requires_runtime_verification = Boolean(normalized.runtime_verification.required);

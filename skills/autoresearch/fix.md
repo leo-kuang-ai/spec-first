@@ -100,5 +100,5 @@ If --evals present:
 
 ## Chain Handoff
 
-After completion, write handoff.json to output directory: version "2.1.0", source "fix", timestamp, status (COMPLETE|USER_INTERRUPT|BOUNDED|ERROR), results_tsv path, findings = unfixed errors, config{target, scope, guard}.
+After completion, write handoff.json to output directory: version "2.1.0", source "fix", timestamp, status (COMPLETE|USER_INTERRUPT|BOUNDED|ERROR), results_tsv path, findings = unfixed errors, config{target, scope, guard}. Two fields are the orchestrator's normalized routing signals and must keep their strict shapes: `unresolved_count` (integer — number of errors still unfixed at handoff; 0 when all landed) and `untested_gaps` (array of strings — behaviors changed but not yet re-verified; empty array when none). A handoff whose unresolved signals are ambiguous in shape (non-integer count, non-array gaps) blocks the orchestrator's completion claims rather than being read optimistically.
 Invoke next target in --chain order. Propagate --evals flag.

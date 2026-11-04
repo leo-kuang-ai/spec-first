@@ -98,7 +98,7 @@ Do not start a simulator, real device, package build, Appium, Maestro, cloud dev
 
 ## Mode Contract
 
-v1 deterministic orchestrator (`scripts/run-audit.js`) accepts `mode:headless` only; `mode:default` and `mode:report-only` orchestration is deferred. Long-lived canonical-token semantics live in [Mode, Output, And Issue Contract](references/mode-output-contract.md).
+v1 deterministic orchestrator (`scripts/run-audit.js`) accepts `mode:headless` only; `mode:default` and `mode:report-only` orchestration is deferred — that deferral covers the runner entrypoint only. Host-side interactive steps, such as Figma MCP materialization into a run-local context file (see Figma MCP Materialization below), remain available in an interactive/default session without a runner orchestration call. Long-lived canonical-token semantics live in [Mode, Output, And Issue Contract](references/mode-output-contract.md).
 
 Keep these route-critical defaults in memory:
 

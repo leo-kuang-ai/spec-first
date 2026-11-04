@@ -320,6 +320,41 @@ function readArtifact(filePath) {
   return readJson(filePath);
 }
 
+function assertWithinWriteBoundary(absolutePath, artifactKind) {
+  // The run root is the write boundary. Before creating or replacing an
+  // artifact, verify the target and every existing parent resolve (realpath)
+  // inside it: a symlinked subdirectory planted inside the run root must not
+  // carry writes outside it.
+  const boundaryRaw = path.resolve(process.env.SPEC_AUDIT_WRITE_BOUNDARY || path.dirname(absolutePath));
+  const boundary = (() => {
+    try {
+      return fs.realpathSync(boundaryRaw);
+    } catch (_error) {
+      return boundaryRaw;
+    }
+  })();
+  const check = (candidate, depth = 0) => {
+    if (depth > 64) throw new Error(`artifact write boundary check exceeded depth for ${candidate}`);
+    // Recurse only along the chain inside the run root; the boundary itself
+    // (and anything above it) ends the walk.
+    const relToBoundaryRaw = path.relative(boundaryRaw, path.resolve(candidate));
+    if (relToBoundaryRaw === '' || relToBoundaryRaw.startsWith('..')) return;
+    try {
+      const real = fs.realpathSync(candidate);
+      const rel = path.relative(boundary, real);
+      if (rel.startsWith('..') || path.isAbsolute(rel)) {
+        throw new Error(`artifact write escapes the run-root boundary via a linked path (${artifactKind}): ${candidate}`);
+      }
+    } catch (_error) {
+      if (_error instanceof Error && _error.message.includes('escapes the run-root boundary')) throw _error;
+      // not on disk yet (normal for fresh artifacts); parents still govern
+    }
+    const parent = path.dirname(candidate);
+    if (parent !== candidate) check(parent, depth + 1);
+  };
+  check(absolutePath);
+}
+
 function assertCanWrite(options = {}, targetPath, artifactKind = 'artifact') {
   if (options.mode === 'report-only' && targetPath) {
     throw new Error(`mode:report-only forbids --output and run artifact writes (${artifactKind}).`);
@@ -332,6 +367,7 @@ function writeJsonOutput(result, outputPath, options = {}) {
   if (outputPath) {
     assertCanWrite(options, outputPath, 'json');
     const absolutePath = resolveOutputPath(outputPath, options);
+    assertWithinWriteBoundary(absolutePath, 'json');
     fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
     fs.writeFileSync(absolutePath, json);
   } else {
@@ -343,6 +379,7 @@ function writeTextOutput(text, outputPath, options = {}) {
   if (outputPath) {
     assertCanWrite(options, outputPath, 'text');
     const absolutePath = resolveOutputPath(outputPath, options);
+    assertWithinWriteBoundary(absolutePath, 'text');
     fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
     fs.writeFileSync(absolutePath, text);
   } else {
