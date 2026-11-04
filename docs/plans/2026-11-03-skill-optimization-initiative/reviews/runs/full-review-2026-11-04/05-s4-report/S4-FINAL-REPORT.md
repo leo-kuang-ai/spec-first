@@ -34,14 +34,14 @@
 - L1 裁决 fail 不成立（R2 断言被证伪）：spec-sweep B02（源码已有规范化规则）
 - L1 建议判 80/20 留观：test-browser 内部总预算调优（确定性恢复缺口已由 pending-receipt 关闭）
 
-## 修复台账摘要（FIX-001..039）
+## 修复台账摘要（静态层 FIX-001..039；行为层 FIX-040..057 见 S3 节与 ledger）
 
 批次1（001..010 详见 ledger）：spec-plan/runtime-maintenance 引用、prd D05 复述密度、write-tasks 假护栏复活、work run.json 断链、commit-push-pr 保留清单等；批次2（011..014）：Python>=3.10 全仓护栏、provider-readiness 字段合同等；批次3（015..021）+022；批次4/5+audit/autoresearch（023..039）。**全部有窄验证（合同/单元测试绿）**，验证记录见 ledger。
 
 ## S3 行为基线（非验收门）
 
 - 原始 118/155（20/38 skill 全 case 通过）→ 归因收口后确认 137/155（bverify 波再收口 4 例：refresh/recover、doc-review/headless、work/rtc-envelope live PASS + work/closeout-order REPLAY-PASS）
-- 全部 32 FAIL + 5 超时逐例归因：A 类 eval 基建 15 例（judge 窄假设/prompt-judge 失配/词表未承载/引擎挂载面/.claude 跳过/只读 Bash 白名单等，全部修复，11 例重跑翻转 + 3 例 REPLAY-PASS + 1 例合同承载）；B 类真实行为缺口 17 例 open backlog（work 证据链 ×3、plan 遵从 ×4、debug prior-attempt ×2、resolve-pr ×2、词表违约 ×3、fail-closed/脚手架引用/拒绝变体/整条消息 ×4——合同均已承载，留 eval 驱动迭代）
+- 全部 32 FAIL + 5 超时逐例归因：A 类 eval 基建 17 例（judge 窄假设/prompt-judge 失配/词表未承载/引擎挂载面/.claude 跳过/只读 Bash 白名单/组合尾巴隐形 A16/judge 严于 CLI 合同 A17 等，全部修复——11 例重跑翻转 + 4 例 REPLAY-PASS + 1 例合同承载 + bverify 波 2 例 judge 修复带动 live PASS）；B 类真实行为缺口 13 例 open backlog（work 受保护边界 ×1、plan 遵从 ×4、debug prior-attempt ×2、resolve-pr ×2、code-review fence/test-browser token/pulse 拒绝变体/bare fail-closed/false-causal 脚手架引用——合同均已承载，留 eval 驱动迭代）
 - 修复登记 FIX-001..057；judge 校准单测 37/37 + ce-outcome 30/30 + spec-work-outcome-judges/ce-u28 32/32（A16/A17 后保持绿）；runtime mirror 再生、test:mcp-setup 与 doctor 复验绿
 - 5 超时（300-600s 档）可提档重跑
 
