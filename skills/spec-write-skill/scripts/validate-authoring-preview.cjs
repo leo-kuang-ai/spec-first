@@ -132,6 +132,9 @@ function validateAuthoringPreview({ manifest, authorizedRoot, scope, writeSet })
     if (group === 'would_change') wouldChange = entries;
     for (const entry of entries) {
       const relative = entry && entry.path;
+      if (entry && entry.supporting !== undefined && typeof entry.supporting !== 'boolean') {
+        add('supporting_flag_invalid', 'ownership', 'error', relative || null, 'would_change supporting flag must be a boolean.');
+      }
       if (!isSafeRelative(relative)) {
         add('manifest_path_invalid', 'path-safety', 'error', null, `${group} contains an unsafe path.`);
         continue;
@@ -141,9 +144,15 @@ function validateAuthoringPreview({ manifest, authorizedRoot, scope, writeSet })
       if (GENERATED_RUNTIME_PREFIXES.some((prefix) => relative.startsWith(prefix))) add('generated_runtime_path_forbidden', 'source-runtime', 'error', relative, 'Generated runtime paths are not canonical source mutation targets.');
       const absolute = resolveWithin(root, relative);
       if (!absolute) add('manifest_path_unsafe', 'path-safety', 'error', relative, 'Path escapes or traverses a symbolic link.');
-      else if (canonicalRoot && !isInside(absolute, canonicalRoot)) add('path_outside_canonical_source_root', 'ownership', 'error', relative, 'Declared path is outside canonical_source_root.');
+      else if (canonicalRoot && !isInside(absolute, canonicalRoot) && !(group === 'would_change' && entry.supporting === true)) add('path_outside_canonical_source_root', 'ownership', 'error', relative, 'Declared path is outside canonical_source_root.');
     }
   }
+  // Authorized supporting paths: repo-level files a delivery must touch (tests,
+  // docs, CHANGELOG) that live outside canonical_source_root. They stay bound to
+  // the authorized root, the snapshot, the write set, and the dirty-overlap
+  // contract exactly like canonical paths; only the canonical containment
+  // requirement is waived per explicit manifest flag.
+  const supportingPaths = new Set(wouldChange.filter((entry) => entry && entry.supporting === true).map((entry) => entry.path));
   if (wouldChange.length === 0) add('empty_mutation_list', 'mutation', 'error', null, 'Apply preview requires at least one would_change entry.');
 
   for (const entry of wouldChange) {
@@ -184,7 +193,7 @@ function validateAuthoringPreview({ manifest, authorizedRoot, scope, writeSet })
       }
       snapshotPaths.add(entry.path);
       const absolute = resolveWithin(root, entry.path);
-      if (!absolute || (canonicalRoot && !isInside(absolute, canonicalRoot))) {
+      if (!absolute || (canonicalRoot && !isInside(absolute, canonicalRoot) && !supportingPaths.has(entry.path))) {
         add('snapshot_path_missing', 'snapshot', 'error', entry.path, 'Snapshot file is missing or unsafe.');
         continue;
       }
@@ -202,7 +211,7 @@ function validateAuthoringPreview({ manifest, authorizedRoot, scope, writeSet })
     const canonicalSkill = `${manifest.canonical_source_root}/SKILL.md`;
     for (const relative of [canonicalSkill, ...allPaths.keys()]) {
       const absolute = resolveWithin(root, relative);
-      if (!absolute || (canonicalRoot && !isInside(absolute, canonicalRoot))) continue;
+      if (!absolute || (canonicalRoot && !isInside(absolute, canonicalRoot) && !supportingPaths.has(relative))) continue;
       try {
         hashFile(absolute);
         requiredSnapshotPaths.add(relative);

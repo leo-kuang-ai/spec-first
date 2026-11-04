@@ -32,7 +32,7 @@ full apply 在 source patch 前先按 `evaluation-design.md` 形成最小 eval p
 
 ## Preview Handoff
 
-把语义 preview 与私有 manifest 分开。manifest 只承载 canonical/authorized root、snapshot、would-change（path、before hash、after hash、collision disposition）、preserve/generated/not-touch、planned side effects 和 residual risks；不要把 Design Record 正文写入 machine contract。snapshot 至少覆盖 canonical `SKILL.md`、所有已存在的声明路径，以及新文件最近现存父目录的 entry hash。宿主 scope 还要给出 preview-time dirty paths；任何将被改写的 dirty path 必须在 manifest 中逐项记录 current hash、replace/preserve disposition，并说明当前请求已明确覆盖该替换或取得重新确认。
+把语义 preview 与私有 manifest 分开。manifest 只承载 canonical/authorized root、snapshot、would-change（path、before hash、after hash、collision disposition、可选 `supporting: true`）、preserve/generated/not-touch、planned side effects 和 residual risks；不要把 Design Record 正文写入 machine contract。`supporting: true` 声明 authorized root 内、`canonical_source_root` 外的授权支撑路径（tests、docs、根 CHANGELOG 等交付必然触及的 repo 级文件）；它们与 canonical 路径同样受 snapshot、write set、dirty-overlap 与 receipt 绑定，仅豁免 canonical containment。snapshot 至少覆盖 canonical `SKILL.md`、所有已存在的声明路径（含 supporting 路径），以及新文件最近现存父目录的 entry hash。宿主 scope 还要给出 preview-time dirty paths；任何将被改写的 dirty path 必须在 manifest 中逐项记录 current hash、replace/preserve disposition，并说明当前请求已明确覆盖该替换或取得重新确认。
 
 在宿主创建的私有临时目录中，以 `0700` directory、`0600` exclusive-create file 保存 run-local manifest/scope/write-set。调用：
 
