@@ -1,0 +1,18 @@
+# consumers: spec-compound
+tests/unit/agent-persona-template-drift.test.js
+tests/unit/ce-localization-closeout-contracts.test.js
+tests/unit/ce-post-3-20-calibration-contracts.test.js
+tests/unit/ce-upstream-skill-sync-contracts.test.js
+tests/unit/compound-candidate-claims.test.js
+tests/unit/compound-promotion-contracts.test.js
+tests/unit/dispatch-authorization-matrix-contracts.test.js
+tests/unit/frontmatter-validator-utf8.test.js
+tests/unit/knowledge-causality-judge.test.js
+tests/unit/low-findings-cleanup-contracts.test.js
+tests/unit/private-scratch-migration-contracts.test.js
+tests/unit/python-runtime-resolution-contracts.test.js
+tests/unit/remaining-script-defenses.test.js
+tests/unit/session-history-scripts.test.js
+tests/unit/skill-flow-p2-closure-contracts.test.js
+tests/unit/spec-compound-reference-contracts.test.js
+tests/unit/specialized-skill-calibration-contracts.test.js

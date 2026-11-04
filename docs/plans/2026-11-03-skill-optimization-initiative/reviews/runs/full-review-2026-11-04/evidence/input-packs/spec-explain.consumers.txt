@@ -1,0 +1,5 @@
+# consumers: spec-explain
+tests/unit/dispatch-authorization-matrix-contracts.test.js
+tests/unit/plugin-modules.test.js
+tests/unit/private-scratch-migration-contracts.test.js
+tests/unit/specialized-skill-calibration-contracts.test.js

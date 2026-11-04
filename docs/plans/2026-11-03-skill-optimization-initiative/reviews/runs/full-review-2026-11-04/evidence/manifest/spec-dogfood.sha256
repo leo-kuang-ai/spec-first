@@ -1,0 +1,17 @@
+# manifest: spec-dogfood
+# frozen: 5b59293b
+9e5057e8670a5a9073b27e8051c0a669d759065ec1997a371d618719b2023a88  skills/spec-dogfood/SKILL.md
+b10a8385333b3f2265b6ef81ccb5c1db0ab09f2288cb022af2c63ebfb1ff53ce  skills/spec-dogfood/evals/cases/owner-unavailable-stops.yaml
+f8d38d80efb95a4affd18d5e458976ae25cad213b0e395fbe364061344f09e36  skills/spec-dogfood/evals/cases/polish-request-routes-out.yaml
+b80383bfcca9b06fc73f021a52939155ab59c425b001fbe522a6394e2c298c14  skills/spec-dogfood/evals/cases/r2-code-review-routes-out.yaml
+bce3198d57ded657f2263126ae99e1d7589943b217b3d9ef1a6d61c169afa79c  skills/spec-dogfood/evals/cases/trunk-target-rejected.yaml
+e3f4f3b11ef188ad18e3f9753bf87d570101bd43344ffb0bbc904b96bfb521d9  skills/spec-dogfood/evals/eval.yaml
+4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855  skills/spec-dogfood/evals/fixtures/repos/mini-ledger/README.md
+03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b  skills/spec-dogfood/evals/fixtures/repos/mini-ledger/package.json
+ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34  skills/spec-dogfood/evals/fixtures/repos/mini-ledger/src/server.js
+14bea02a91277a7440f671f9d6bb5cd70117d23508a03b39dc986169d64fa973  skills/spec-dogfood/evals/fixtures/scripts/asks-a-question.sh
+6ab514f1e67de91818a7c7087de26cb878810e71d23ca882d40b8ed92985e081  skills/spec-dogfood/evals/fixtures/scripts/check-owner-unavailable-stop.sh
+fee5f9629be37749d944c7f8a969a4c9fdd44cd861af04c7ce054bb123c3a88b  skills/spec-dogfood/evals/fixtures/scripts/check-trunk-reject.sh
+9d191bf3493e0a3786650de55bfd022c24b4c2ba295a563b8badd3ab81e5a92a  skills/spec-dogfood/references/dogfood-report-template.md
+87378121c56f5d29b6820212b230669db0cba1c2d92a1c8305cc546101f88004  skills/spec-dogfood/references/phases.md
+dbb9951a04279575dd7a6bfcf62a53626fdd6a4bcac98e5f5706f837a3ae357d  skills/spec-dogfood/references/test-matrix-taxonomy.md

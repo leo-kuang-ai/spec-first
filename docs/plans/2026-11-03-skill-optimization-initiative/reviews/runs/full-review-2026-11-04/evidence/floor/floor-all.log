@@ -1,0 +1,82 @@
+=== npm ci ===
+=== typecheck ===
+> node scripts/typecheck-js.js
+
+typecheck passed (314 files checked)
+=== lint:skill-entrypoints ===
+> node scripts/lint-skill-entrypoints.js
+
+skill entrypoint lint passed (518 files scanned)
+=== test:unit ===
+Test Suites: 255 passed, 255 total
+Tests:       3435 passed, 3435 total
+Snapshots:   0 total
+Time:        305.145 s
+Ran all test suites matching /tests\/unit/i.
+=== test:smoke ===
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        10.492 s
+Ran all test suites matching /tests\/smoke\/cli-smoke.test.js/i.
+=== skill-up validate (38 suites) ===
+skills/autoresearch :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/autoresearch: is a directory
+skills/spec-app-consistency-audit :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-app-consistency-audit: is a directory
+skills/spec-brainstorm :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-brainstorm: is a directory
+skills/spec-code-review :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-code-review: is a directory
+skills/spec-commit-push-pr :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-commit-push-pr: is a directory
+skills/spec-commit :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-commit: is a directory
+skills/spec-compound-refresh :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-compound-refresh: is a directory
+skills/spec-compound :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-compound: is a directory
+skills/spec-debug :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-debug: is a directory
+skills/spec-doc-review :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-doc-review: is a directory
+skills/spec-dogfood :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-dogfood: is a directory
+skills/spec-explain :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-explain: is a directory
+skills/spec-handoff :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-handoff: is a directory
+skills/spec-ideate :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-ideate: is a directory
+skills/spec-lfg :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-lfg: is a directory
+skills/spec-optimize :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-optimize: is a directory
+skills/spec-plan :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-plan: is a directory
+skills/spec-polish :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-polish: is a directory
+skills/spec-pov :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-pov: is a directory
+skills/spec-prd :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-prd: is a directory
+skills/spec-product-pulse :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-product-pulse: is a directory
+skills/spec-project-rules :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-project-rules: is a directory
+skills/spec-promote :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-promote: is a directory
+skills/spec-prototype :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-prototype: is a directory
+skills/spec-resolve-pr-feedback :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-resolve-pr-feedback: is a directory
+skills/spec-riffrec-feedback-analysis :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-riffrec-feedback-analysis: is a directory
+skills/spec-rule-miner :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-rule-miner: is a directory
+skills/spec-runtime-setup :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-runtime-setup: is a directory
+skills/spec-simplify-code :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-simplify-code: is a directory
+skills/spec-strategy :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-strategy: is a directory
+skills/spec-sweep :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-sweep: is a directory
+skills/spec-test-browser :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-test-browser: is a directory
+skills/spec-test-xcode :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-test-xcode: is a directory
+skills/spec-work :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-work: is a directory
+skills/spec-worktree :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-worktree: is a directory
+skills/spec-write-skill :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-write-skill: is a directory
+skills/spec-write-tasks :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/spec-write-tasks: is a directory
+skills/using-spec-first :: Error: failed to load config: failed to read eval.yaml: read /tmp/spec-first-fr-wt/skills/using-spec-first: is a directory
+=== doctor ===
+{
+  "schema_version": "v1",
+  "platforms": [
+    "claude"
+  ],
+  "selection_mode": "explicit",
+  "install_health": "pass",
+  "runtime_asset_health": "warn",
+  "host_readiness": "pass",
+  "decision_input_health": "missing",
+  "decision_input_health_basis": {
+    "reason_code": "setup-facts-missing",
+    "artifact_refs": [
+      "/private/tmp/spec-first-fr-wt/.spec-first/config/tool-facts.json"
+    ],
+    "schema_versions": {},
+    "facts_host": null,
+    "facts_platform": null,
+    "requested_platforms": [
+      "claude"
+=== FLOOR DONE rc=0 ===

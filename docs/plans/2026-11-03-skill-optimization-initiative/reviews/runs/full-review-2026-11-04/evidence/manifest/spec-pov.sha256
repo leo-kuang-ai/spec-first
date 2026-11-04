@@ -1,0 +1,26 @@
+# manifest: spec-pov
+# frozen: 5b59293b
+3d39dc292d30bcc7bc4997da8c357576db061952bad32da751a4b5c542acc94a  skills/spec-pov/SKILL.md
+b74498c726ae9d070ed68ad183d2ace302ceeabe7fdc9ac9f25b4162b6ca8dfe  skills/spec-pov/evals/cases/design-question-not-verdict.yaml
+18ad8918bdc0ec095cbc76f131e29af4fdb7bb3788f50fd8f22bb045347ea6a2  skills/spec-pov/evals/cases/r2-real-verdict-works.yaml
+824f7ec6f2ad7c93d3c9bcbbf1eabad59af35cc258f08bd73d1d4652bb39cd89  skills/spec-pov/evals/eval.yaml
+4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855  skills/spec-pov/evals/fixtures/repos/mini-ledger/README.md
+03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b  skills/spec-pov/evals/fixtures/repos/mini-ledger/package.json
+ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34  skills/spec-pov/evals/fixtures/repos/mini-ledger/src/server.js
+14bea02a91277a7440f671f9d6bb5cd70117d23508a03b39dc986169d64fa973  skills/spec-pov/evals/fixtures/scripts/asks-a-question.sh
+60e27dd9160731ea73355c04cedd8d92d51c46ab7c3cbb33bdd36fb27302361a  skills/spec-pov/evals/fixtures/scripts/check-r2-verdict-given.sh
+5012308c4ecf6e3efafb6d9e606792c5ae0be3d5ccd92652105d224b7d184c05  skills/spec-pov/references/agents/external-evidence-researcher.md
+8201ed323eae7c9f5f5c10d51616584993e32503bf671f22c3e8760aadad7186  skills/spec-pov/references/agents/pov-peer.md
+313a956a682bdb25de245b77c1504342fcf59de4e6eaf9e7575ba4766c8fce11  skills/spec-pov/references/agents/precedent-activity-scout.md
+591b6237aaa48917a0be2a618f40232a651d54f499aa0049c984a6e55ae19f67  skills/spec-pov/references/agents/project-grounding-scout.md
+3bb84fafdd685a35b306f9b23b5e53f14f28486191325c9534934b0503d01db4  skills/spec-pov/references/boundaries.md
+3f11fca987c1179b1c6bd2b31a2eaf0f2fc3f242f7dbed8e655f01d607a7fc75  skills/spec-pov/references/cross-model-panel.md
+bb943bb40a7d3f797a326c385266f57a7948f553b3764c2b6bccbf58a273db8f  skills/spec-pov/references/followup.md
+965f0ce3891b33e99d40938bee7b31d0ee1fe7552edf4b5d064fdc55d183e3d9  skills/spec-pov/references/grounding.md
+7573876f7552cc326270c7e28ce8875b64721a95945971dbba7f6d6dcb828440  skills/spec-pov/references/intake.md
+609375f9b4591343b70972b4b424b04843f6419ad6d8f04cc2db4ec473052505  skills/spec-pov/references/invocation.md
+a7777747a4a693978cf3d7e5ed965a97df2cf6689ab1fb4f63b33d97ec718893  skills/spec-pov/references/method.md
+094b766f040d28c657deaa3e1777d5defb52e684189587e029ed0be973ee6154  skills/spec-pov/references/pov-schema.json
+7f7f7a3bc9b7dabea6e5ff3890499feb469a9bcda1b216c00592939916e2effa  skills/spec-pov/references/report.md
+515cc12919cfbc1efe5292c837a90a146f6f10008a69cd57de0e19e42ae9bb1a  skills/spec-pov/scripts/cross-model-pov.sh
+db8fcf60a8cc1297ccfa200c55956a9691ce7b8eee8dcacebb751bb3a437863c  skills/spec-pov/scripts/peer-job-runner.py

@@ -1,0 +1,6 @@
+# consumers: spec-pov
+tests/unit/dispatch-authorization-matrix-contracts.test.js
+tests/unit/peer-job-runner-parity.test.js
+tests/unit/plugin-modules.test.js
+tests/unit/private-scratch-migration-contracts.test.js
+tests/unit/review-peer-expansion-contracts.test.js

@@ -55,7 +55,7 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
 
    预留 repo-local run root：`.spec-first/workflows/spec-work/<workspace-slug>/<run-id>/`。此时不要提前调用 `verification-run-summary record`：后续 simplify/review fix 可能改变代码，最终 summary 只能转录所有 mutation 结束后的真实结果。
 
-   Preserve `run.json` as immutable generation-0 identity. Before and after each mutation or verification transaction, use the append-only state contract from `execution-strategy.md`: record `started` before execution and append the confirmed terminal fact afterward. A resumed `started` transaction is unknown, never passed. CAS conflict or source drift blocks completion until the orchestrator re-reads and reconciles the current tree.
+   Preserve `run.json` as immutable generation-0 identity; in a fresh run it is first written by the Step D producer at closeout. The append-only state contract from `execution-strategy.md` therefore applies from the moment a durable `run.json` exists — resumed runs, and any later transaction of a run whose Step D artifact has landed: record `started` before execution and append the confirmed terminal fact afterward. A resumed `started` transaction is unknown, never passed. CAS conflict or source drift blocks completion until the orchestrator re-reads and reconciles the current tree. A fresh run interrupted before its durable artifact exists has no state generations to resume from: recover via workspace fingerprint, task-pack pins, and git state, and do not call `state-write` before `run.json` exists (it rejects with `artifact-unreadable`).
 
 2. **Simplify** (conditional — separate from code review)
 

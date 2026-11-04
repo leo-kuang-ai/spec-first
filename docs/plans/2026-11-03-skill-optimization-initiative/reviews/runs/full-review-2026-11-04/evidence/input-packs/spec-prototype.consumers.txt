@@ -1,0 +1,2 @@
+# consumers: spec-prototype
+tests/integration/spec-prototype-human-journey.integration.test.js

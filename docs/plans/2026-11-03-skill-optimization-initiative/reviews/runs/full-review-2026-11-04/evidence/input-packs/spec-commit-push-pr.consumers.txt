@@ -1,0 +1,5 @@
+# consumers: spec-commit-push-pr
+tests/unit/ce-upstream-skill-sync-contracts.test.js
+tests/unit/pipeline-mode-contracts.test.js
+tests/unit/spec-commit-push-pr-context-contracts.test.js
+tests/unit/spec-work-lfg-recovery-contracts.test.js

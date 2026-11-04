@@ -1,0 +1,5 @@
+# consumers: spec-test-browser
+tests/unit/low-findings-cleanup-contracts.test.js
+tests/unit/pipeline-mode-contracts.test.js
+tests/unit/spec-test-browser-conformance-cleanup.test.js
+tests/unit/spec-test-browser-contracts.test.js

@@ -1,0 +1,17 @@
+# manifest: spec-explain
+# frozen: 5b59293b
+bd82dcd441b82fd5336f3ea26bc22c5e382baf1d5dfc52ccb734719db4c6e39e  skills/spec-explain/SKILL.md
+c1ba12805be87b0d1c464c9f7894ad87db363d15d7e0fa9c3be80e1a61bea11b  skills/spec-explain/evals/cases/simple-qa-not-triggered.yaml
+26eda9259c6d23f64756c1279f1ee795995650cec52857be6480d1e6780d9c5a  skills/spec-explain/evals/eval.yaml
+4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855  skills/spec-explain/evals/fixtures/repos/mini-ledger/README.md
+03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b  skills/spec-explain/evals/fixtures/repos/mini-ledger/package.json
+ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34  skills/spec-explain/evals/fixtures/repos/mini-ledger/src/server.js
+14bea02a91277a7440f671f9d6bb5cd70117d23508a03b39dc986169d64fa973  skills/spec-explain/evals/fixtures/scripts/asks-a-question.sh
+12a1bddffbcb5a339710d36962c55e2a48e4f4edbf76bd97a4a34ceadf9ba06a  skills/spec-explain/evals/fixtures/scripts/check-simple-qa.sh
+9e9f9f419a7b4c9313a2ac471b50f4766b78461d67f026670493691eb9984b20  skills/spec-explain/references/agents/work-recap-scout.md
+1955ba6350f640a444581d18efc1ca4548d7973cc3fb504416bbfd54734a692a  skills/spec-explain/references/check-in.md
+e16665350e272c2482c547db38947aa33500330a8006fa16c7762df81002356a  skills/spec-explain/references/destinations.md
+4be63b834a32548f9faca4184510ce5fbf3d50e88d76e6dd9ad43d201430a741  skills/spec-explain/references/explainer-html.md
+b4fcc583691bbb79128ebb4d1aa0c87631ba7b53e74033310e4c6f7c1c704096  skills/spec-explain/references/explainer-markdown.md
+d568ca7f86b460230dc2b491d9c3c34e3467a9866b743085e70db39c05423b20  skills/spec-explain/references/intake.md
+19c4fd0be3613d0b98e7eab63aff9e034a7d9d9809c819948ea538bc7e39c735  skills/spec-explain/references/orchestration.md

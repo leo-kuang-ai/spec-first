@@ -1,0 +1,20 @@
+# consumers: spec-prd
+tests/integration/spec-prd-contract-reset-isolation.integration.test.js
+tests/integration/spec-prd-contract-reset-replay.integration.test.js
+tests/unit/command-resource-path-rewrite.test.js
+tests/unit/dispatch-authorization-matrix-contracts.test.js
+tests/unit/eval-fixture-contracts.test.js
+tests/unit/plugin-modules.test.js
+tests/unit/requirements-language-promotion-contracts.test.js
+tests/unit/spec-prd-contract-reset-eval.test.js
+tests/unit/spec-prd-contract-reset-evidence.test.js
+tests/unit/spec-prd-contracts.test.js
+tests/unit/spec-prd-decision-card-contracts.test.js
+tests/unit/spec-prd-exit-safety.test.js
+tests/unit/spec-prd-finalize-transition.test.js
+tests/unit/spec-prd-finding-schema-freeze.test.js
+tests/unit/spec-prd-hook-contracts.test.js
+tests/unit/spec-prd-lite-profile-contracts.test.js
+tests/unit/spec-prd-plan-handoff-contracts.test.js
+tests/unit/spec-prd-template-assets.test.js
+tests/unit/spec-prd-validate-mode.test.js

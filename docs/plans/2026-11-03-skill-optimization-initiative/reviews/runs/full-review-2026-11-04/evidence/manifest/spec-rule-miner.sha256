@@ -1,0 +1,14 @@
+# manifest: spec-rule-miner
+# frozen: 5b59293b
+306fc3e4cbe1a067434807b7eed1c765213fa6be357d2e3d16960f79abe434d1  skills/spec-rule-miner/SKILL.md
+ffd6c37911308f9fab0e96488add9102fab4dc4a703fee377d84029ab7817bc3  skills/spec-rule-miner/evals/cases/no-preview-no-write.yaml
+7c9a41b702529907b7221e4938b4c1f15376a3cc14a3814b273acc5e27ccd60d  skills/spec-rule-miner/evals/cases/r2-debug-request-routes-out.yaml
+eb9f1d41e179ea97bfc23a238d64908c229da59881a58284db5f585fb760cdd0  skills/spec-rule-miner/evals/cases/review-request-routes-out.yaml
+09b03bcaa636f85c04e4baee3c02ec2c6332bd0c531b0e5793fa045aefa691bd  skills/spec-rule-miner/evals/eval.yaml
+4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855  skills/spec-rule-miner/evals/fixtures/repos/mini-ledger/README.md
+03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b  skills/spec-rule-miner/evals/fixtures/repos/mini-ledger/package.json
+ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34  skills/spec-rule-miner/evals/fixtures/repos/mini-ledger/src/server.js
+23ce8ed068a685031609eec861284f1744da8db6b72aba5a29e6113a0c626ca4  skills/spec-rule-miner/evals/fixtures/scripts/check-preview-first.sh
+4e58bc30960a93d684477099754e28bab5bc203d154f9ea83a0bce113a8f3837  skills/spec-rule-miner/evals/trigger-cases.json
+67abf834610050d9d798b4c14e2c648039eecd797b68218437205e6d1baa5428  skills/spec-rule-miner/references/pattern-categories.md
+4bc16cc54c9f34fe88e0db40abcd1d2f4ccb69f8061919d3f9a939084f32715d  skills/spec-rule-miner/references/write-targets.md

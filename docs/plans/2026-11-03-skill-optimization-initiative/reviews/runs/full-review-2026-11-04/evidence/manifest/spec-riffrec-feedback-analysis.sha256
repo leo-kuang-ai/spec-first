@@ -1,0 +1,20 @@
+# manifest: spec-riffrec-feedback-analysis
+# frozen: 5b59293b
+dca15bcf7ece9009ebdfd761e16d660e38d081824ad18bc346df147c15b98de1  skills/spec-riffrec-feedback-analysis/SKILL.md
+ce0bf14b13bd88cb5dc5ddb39925452837437f38e2e5269f6cd9bcee5a3f1ec1  skills/spec-riffrec-feedback-analysis/evals/cases/check-local-evidence.yaml
+fc43d8ec5cca2373113eb98b8d734f45068c7eab56052f840a2c7b4335576cdf  skills/spec-riffrec-feedback-analysis/evals/cases/generic-audio-not-triggered.yaml
+7ed2fe8d7f0178c84dcaf1f690c2be1f9e1e145196c4cb9ded6aee8148a382b4  skills/spec-riffrec-feedback-analysis/evals/eval.yaml
+6c280a69ca2f4ab602ce5af74ac573d38d3f5622a27edc4e6f0a6179226ac176  skills/spec-riffrec-feedback-analysis/evals/fixtures/repos/u28-outcomes/README.md
+e3d4afc9285ba2a84c89bdc38fb0f4ffed5a6995251750da21acfce0d623cb33  skills/spec-riffrec-feedback-analysis/evals/fixtures/repos/u28-outcomes/capture/events.json
+3225fba2187a95f1638839658f29b183aad4173bbce6db98374343d776d6d173  skills/spec-riffrec-feedback-analysis/evals/fixtures/repos/u28-outcomes/capture/session.json
+294a720d64f3e01555e3203e91744f2d310ba4d07b1b16af4b4d0de2fa5aa78c  skills/spec-riffrec-feedback-analysis/evals/fixtures/repos/u28-outcomes/prepare-eval.cjs
+14bea02a91277a7440f671f9d6bb5cd70117d23508a03b39dc986169d64fa973  skills/spec-riffrec-feedback-analysis/evals/fixtures/scripts/asks-a-question.sh
+72a6f3f77fda3ed4d19a5d13b68f5619ad47c6ed370d0652097689c2f3b3d73e  skills/spec-riffrec-feedback-analysis/evals/fixtures/scripts/check-generic-refused.sh
+873b8bd81d45e907f2d7d77fa969b922bc824b386d937b54d64368d3e8112bb0  skills/spec-riffrec-feedback-analysis/evals/fixtures/scripts/check-local-evidence.sh
+e0984c4f4fa27f670d0a065fdecbc502d3adc3a7499412298ad5b29a1498924a  skills/spec-riffrec-feedback-analysis/references/analyzer.md
+21facbcdb535cdfc17b198511c1333af2e82ce1d33695657a6e97e950657b362  skills/spec-riffrec-feedback-analysis/references/extensive-analysis.md
+e6a9466ea78cf16616b57c83067002d71bd5b047a241e0cf365b81eec31c7ca1  skills/spec-riffrec-feedback-analysis/references/install-riffrec.md
+31e0d65ff3a1f8e66a5f63de54771cb3dea73557d234b609ea0a0ae76dad270a  skills/spec-riffrec-feedback-analysis/references/quick-bug-report.md
+a9fad095702dd27645b5713444a0b69ba6026419d0304371730ab970f9a846f7  skills/spec-riffrec-feedback-analysis/references/spec-first-feedback-format.md
+acc1fd99a7dbe31ef4b1d7f316d1729782ba61d2453411295a3449aa5effa6f3  skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py
+ae5ff4417bb96ac45a8f2aee143dc0bea59fa69bf101968b543e22dd766ef7c9  skills/spec-riffrec-feedback-analysis/scripts/run-python.sh

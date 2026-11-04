@@ -34,7 +34,7 @@ Determine which commits and diff the description should cover. Run this first; S
 ### Mode
 
 - **Current-branch mode.** Describe the captured HEAD vs the caller's resolved base, otherwise the confirmed default base. Used when the caller has no explicit PR reference (Step 6 of spec-commit-push-pr's full workflow; description-only mode without a PR ref).
-- **PR mode.** Describe a specific PR's commit range. Used by DU-3 (the existing PR on the current branch) and description-only mode (the user pasted a PR URL/number). The PR ref may be a bare number, `#NN`, `pr:NN`, or a full URL — the caller passes it to `gh pr view <ref>` directly. (`gh pr view` accepts numbers and URLs natively; `#NN` and `pr:NN` need the `#` or `pr:` stripped before passing.)
+- **PR mode.** Describe a specific PR's commit range. Used by the Description Update workflow (the existing PR on the current branch) and description-only mode (the user pasted a PR URL/number). The PR ref may be a bare number, `#NN`, `pr:NN`, or a full URL — the caller passes it to `gh pr view <ref>` directly. (`gh pr view` accepts numbers and URLs natively; `#NN` and `pr:NN` need the `#` or `pr:` stripped before passing.)
 
 ### Resolve PR metadata (PR mode and current-branch-with-existing-PR)
 
@@ -192,7 +192,7 @@ Lead with the point, then the mechanism, then the caveat. Dense is good; long is
 
 **Rewrite preservation:** when rewriting an existing PR body, preserve an existing `## New concepts` section and any explainer-doc link verbatim, same as `## Demo`, unless the user's focus asks to refresh the concepts. Description-only and description-update runs never write repo files.
 
-**Archival hook:** when `spec-commit-push-pr` confirms the apply and `pr_teaching_archive` is on in full workflow, the teaching content is also written to `docs/explainers/` and linked from the section. The commit-and-push transition and doc frontmatter live in `SKILL.md` Step 7.
+**Archival hook:** when `spec-commit-push-pr` confirms the apply and `pr_teaching_archive` is on in full workflow, the teaching content is also written to `docs/explainers/` and linked from the section. The commit-and-push transition and doc frontmatter live in `references/apply-and-handoff.md` (reached via `SKILL.md` Step 7).
 
 ---
 

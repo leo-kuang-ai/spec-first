@@ -1,0 +1,4 @@
+# consumers: spec-simplify-code
+tests/unit/dispatch-authorization-matrix-contracts.test.js
+tests/unit/spec-lfg-contracts.test.js
+tests/unit/specialized-skill-calibration-contracts.test.js

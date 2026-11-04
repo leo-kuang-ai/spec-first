@@ -1,0 +1,4 @@
+# consumers: autoresearch
+tests/unit/autoresearch-orchestrator-regression.test.js
+tests/unit/autoresearch-score-regression.test.js
+tests/unit/ce-localization-review-contracts.test.js

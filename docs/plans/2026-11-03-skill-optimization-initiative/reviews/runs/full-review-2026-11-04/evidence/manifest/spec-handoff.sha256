@@ -1,0 +1,37 @@
+# manifest: spec-handoff
+# frozen: 5b59293b
+4bc4a2e1da3aa5caa1e547c9f9d59410099823fa315c77f56c8e71ac7a5b6d6c  skills/spec-handoff/SKILL.md
+1d3486cff17ddefc7c91a10fcf77b2cdf1c80ab3f626827e88c21259a3e883d9  skills/spec-handoff/evals/cases/check-research-continuation.yaml
+d3a7dd82bff2d808177c5d364c4ae6742b6a6f089f7a40384ec974f8b9f58b41  skills/spec-handoff/evals/cases/check-review-continuation.yaml
+08e2cd1bf4bc9f1d5e3a2271e7cc5df57bcfcfd03ff89fcb57afcde09c3c37a5  skills/spec-handoff/evals/cases/create-produces-gate-fields.yaml
+8e722fe13101332d209b889ec20678e6491f02b4eb46770ef4e3c7b478e62621  skills/spec-handoff/evals/cases/ordinary-continuation-not-triggered.yaml
+d7c19a7e286cf4da999ce98ff45ed3836968091c82dace8779fd589c4dcc0da2  skills/spec-handoff/evals/cases/resume-explicit-source-stops-without-acting.yaml
+9916002df4acedff34f62be2530a89d586fa964da3e4d01a1bed66e8d22c5f07  skills/spec-handoff/evals/cases/resume-sparse-source-degraded-orientation.yaml
+8bb18da9e59e5113b04a563c73149b9665e7dae9528f6f0bd3ef2a9d9238ccb8  skills/spec-handoff/evals/eval.yaml
+934dc05e3a24f5dd6f0f69f13f7a7d316b38ba66441d8fca401e323f058727e3  skills/spec-handoff/evals/examples.json
+4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855  skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/README.md
+89be9fd4002c4a782b583a6512750800ce33856336d9a3e4776df89ccf006272  skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/docs/notes/2026-09-19-session.md
+6eef75dd77e37c6b4d4995b2fcbf53b16e374e2744331b6f2de9c97b28c3b1fc  skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/docs/notes/vague-progress.md
+03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b  skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/package.json
+ed67d2d83cca35fbc1177cce88499dd19de4b6152f98bb05957d930e5a350d4c  skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/prepare-eval.cjs
+ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34  skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/src/server.js
+4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855  skills/spec-handoff/evals/fixtures/repos/mini-ledger/README.md
+03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b  skills/spec-handoff/evals/fixtures/repos/mini-ledger/package.json
+23fad84546d3d7b2c32bd6737b13f4dbecde12c9ccf179ac0f51c94bc872aecb  skills/spec-handoff/evals/fixtures/repos/mini-ledger/prepare-eval.cjs
+ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34  skills/spec-handoff/evals/fixtures/repos/mini-ledger/src/server.js
+c5d20b7b58b261920b28d1c98bb2e6f7151b7cc3c9975d77c8b31cdeb3b6ad33  skills/spec-handoff/evals/fixtures/repos/u28-outcomes/README.md
+e8200dbe38ca14818450457865040571ebe2cc9b095dd1f3757d57dc975af4a2  skills/spec-handoff/evals/fixtures/repos/u28-outcomes/docs/notes/research.md
+f88c3e9407adc27f8b33e15800e33ce7c3d160226a4feadba017077fa20e2147  skills/spec-handoff/evals/fixtures/repos/u28-outcomes/docs/notes/review.md
+3e9546e4bca057f8438c9c97968bba11c7c9c07db3928518a75d6e7311baa726  skills/spec-handoff/evals/fixtures/repos/u28-outcomes/prepare-eval.cjs
+30a0b225e4ae9fc7ef8affd062eac7f0c15c5d353c5cd046d79704f254004416  skills/spec-handoff/evals/fixtures/repos/u28-outcomes/src/retry.js
+14bea02a91277a7440f671f9d6bb5cd70117d23508a03b39dc986169d64fa973  skills/spec-handoff/evals/fixtures/scripts/asks-a-question.sh
+d47d17ce4c967574cdbd81a7e88cfcb4e2d338e9e3845632dd4cb52d1871220d  skills/spec-handoff/evals/fixtures/scripts/check-continues-inline.sh
+3a9761fe952b6e00570581f3dd517778d165d4ec28180f45a67c91567ad1ba07  skills/spec-handoff/evals/fixtures/scripts/check-create-artifact.sh
+62fc32aab2bfb1fde34c5e9736a978fccf29e300538a6be393f05378b92b0c4a  skills/spec-handoff/evals/fixtures/scripts/check-degraded-orientation.sh
+243dd25793eb03e27f7da4dd682bf2f632889bb0a71a80e7047a6084b2d3304e  skills/spec-handoff/evals/fixtures/scripts/check-research-continuation.sh
+62fc32aab2bfb1fde34c5e9736a978fccf29e300538a6be393f05378b92b0c4a  skills/spec-handoff/evals/fixtures/scripts/check-resume-no-side-effects.sh
+21daa2b01058bed34a9fb237f406dac28cf231d133819e4dc058a5cfbd600624  skills/spec-handoff/evals/fixtures/scripts/check-review-continuation.sh
+57ad1f8fdb1587cf8b212e23fb0c069b2d51a01b36511a78378272471f934aa7  skills/spec-handoff/references/artifact-contract.md
+73f91ab6e0b167f3cfc9976ac0660a6da7bdbe9cc7b6e053ea229808c13e1018  skills/spec-handoff/references/create.md
+6e3b2b086fecb62e3f3e898d432ae9c2677c641d0bd9bf091889fc3e003e6137  skills/spec-handoff/references/resume.md
+7875e4d8a4350de177d6eb28af88af7bf0f97ebe12721330b5d0a0383dfbc21d  skills/spec-handoff/scripts/handoff-artifact.cjs

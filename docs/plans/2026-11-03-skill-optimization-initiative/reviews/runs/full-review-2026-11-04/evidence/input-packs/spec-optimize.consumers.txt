@@ -1,0 +1,12 @@
+# consumers: spec-optimize
+tests/unit/agent-persona-template-drift.test.js
+tests/unit/ce-localization-round-1-remediation-contracts.test.js
+tests/unit/dispatch-authorization-matrix-contracts.test.js
+tests/unit/opencode-adapter.test.js
+tests/unit/python-runtime-resolution-contracts.test.js
+tests/unit/remaining-script-defenses.test.js
+tests/unit/skill-flow-p2-closure-contracts.test.js
+tests/unit/spec-optimize-contracts.test.js
+tests/unit/spec-optimize-decide.test.js
+tests/unit/spec-optimize-loop-contracts.test.js
+tests/unit/spec-optimize-measurement-only-contracts.test.js

@@ -1,0 +1,3 @@
+# consumers: spec-promote
+tests/unit/ce-localization-round-1-remediation-contracts.test.js
+tests/unit/spec-promote-auth-probe.test.js
