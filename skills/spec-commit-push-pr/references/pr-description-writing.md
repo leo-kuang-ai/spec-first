@@ -190,7 +190,7 @@ Format by material:
 
 Lead with the point, then the mechanism, then the caveat. Dense is good; long is not. Never hand-draw box-drawing or ASCII diagrams. The section is additive to Step D's sizing: a small PR that introduces a heavy concept still gets the section, and the section never counts against the base description's size rows.
 
-**Rewrite preservation:** when rewriting an existing PR body, preserve an existing `## New concepts` section and any explainer-doc link verbatim, same as `## Demo`, unless the user's focus asks to refresh the concepts. Description-only and description-update runs never write repo files.
+**Rewrite preservation:** when rewriting an existing PR body, preserve an existing `## New concepts` section and any explainer-doc link verbatim, same as `## Demo`, unless the user's focus asks to refresh the concepts. Also preserve caller-written decision-record sections — `## Known Residuals` and `## Post-Deploy Monitoring & Validation` — verbatim: they are durable review records owned by the calling workflow (e.g., `spec-work` shipping), not description prose to regenerate; if they look stale, flag the mismatch in the handoff instead of silently dropping them. Description-only and description-update runs never write repo files.
 
 **Archival hook:** when `spec-commit-push-pr` confirms the apply and `pr_teaching_archive` is on in full workflow, the teaching content is also written to `docs/explainers/` and linked from the section. The commit-and-push transition and doc frontmatter live in `references/apply-and-handoff.md` (reached via `SKILL.md` Step 7).
 
