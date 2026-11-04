@@ -271,7 +271,7 @@ Planning: [1-3 line scope claim]
 No open decisions to weigh in on — proceeding to research. Interrupt if I have the scope wrong.
 ```
 
-Then continue to Phase 1 without waiting. Use prose for any user response that does arrive (no `AskUserQuestion` menu). Justification is Interaction Rule 5(a) in SKILL.md.
+Then continue to Phase 1 without waiting. Use prose for any user response that does arrive (no `AskUserQuestion` menu). Justification is the Interaction Method section in SKILL.md: an optional menu is not a waiting condition, and asking is reserved for answers that would change delivery, authorization, or a key decision.
 
 ---
 
@@ -323,7 +323,7 @@ Planning [brief brainstorm-scope restatement] — [plan-specific shape in one cl
 No open decisions to weigh in on — proceeding to plan-write. Interrupt if I have the scope wrong.
 ```
 
-Then continue to Phase 5.2 without waiting. Use prose for any user response that does arrive. Justification is Interaction Rule 5(a).
+Then continue to Phase 5.2 without waiting. Use prose for any user response that does arrive. Justification is the Interaction Method section in SKILL.md (an optional menu is not a waiting condition).
 
 ---
 
@@ -415,4 +415,4 @@ In a newly authored Product Contract, `### Summary` and `### Problem Frame` must
 - Defensive what-ifs and hedges — if a concern is real, state it as Inferred (internal); if speculation, drop it
 - The internal three-bucket draft pasted into chat as a verbatim user-facing artifact — that was the old shape and the volume problem it produced is why stage 2 exists. Compose internally, derive call-outs, present compressed
 - Open questions surfaced outside the buckets/call-outs — by synthesis time, every scope-shaping question must be in **Stated** (internal — asked and answered earlier), **Inferred** (internal — agent's bet for correction, surfaces as a call-out if it survives the keep test), or **Out** (internal — deliberately excluded). There is no fourth status
-- Floating questions adjacent to stage 2 — if a question genuinely cannot be defaulted, pause synthesis and resolve it before presenting. Pick the question shape that matches: a blocking multiple-choice tool when options are bounded and meaningfully distinct, prose when option sets would bias the answer per Interaction Rule 5(a). Integrate the answer, then present stage 2. Never present stage 2 with adjacent floating questions — that gives the user no clear resolution path
+- Floating questions adjacent to stage 2 — if a question genuinely cannot be defaulted, pause synthesis and resolve it before presenting. Pick the question shape that matches: a blocking multiple-choice tool when options are bounded and meaningfully distinct, prose when option sets would bias the answer per the Interaction Method section in SKILL.md (ask only when a missing answer would change delivery, authorization, or a key decision). Integrate the answer, then present stage 2. Never present stage 2 with adjacent floating questions — that gives the user no clear resolution path

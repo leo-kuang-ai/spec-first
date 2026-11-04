@@ -125,13 +125,13 @@ Each anti-pattern below produces a bullet that fails its section's keep test, or
 - **Re-stating the Phase 2 approach the user already picked**: the approach was chosen before Phase 2.5 — its mention belongs in one sentence of "What we're building," not as a call-out.
 - **Padding a section to meet a bullet count**: render-conditional means empty is allowed. Omit the section entirely rather than fill it with weak items.
 - **Pasting the three-bucket internal draft verbatim into chat**: that was the old shape and the volume problem it produced is why stage 2 exists. Compose internally, derive scoping synthesis sections, present compressed.
-- **Floating questions adjacent to stage 2**: if a question genuinely cannot be defaulted, pause synthesis and resolve it before presenting. Pick the question shape that matches: a blocking multiple-choice tool when options are bounded and meaningfully distinct, open-ended when option sets would unintentionally influence the user's answer per Interaction Rule 5(a). Integrate the answer, then present the scoping synthesis. Never present the scoping synthesis with adjacent floating questions — that gives the user no clear resolution path.
+- **Floating questions adjacent to stage 2**: if a question genuinely cannot be defaulted, pause synthesis and resolve it before presenting. Pick the question shape that matches: a blocking multiple-choice tool when options are bounded and meaningfully distinct, open-ended when option sets would unintentionally influence the user's answer per Interaction Rule 5. Integrate the answer, then present the scoping synthesis. Never present the scoping synthesis with adjacent floating questions — that gives the user no clear resolution path.
 
 ---
 
 ## Prompt templates
 
-This is directional guidance — adjust phrasing to fit dialogue context. Open-ended feedback per Interaction Rule 5(a) (an option menu would unintentionally influence the user toward the parts the menu lists, away from anything else they might want to change).
+This is directional guidance — adjust phrasing to fit dialogue context. Open-ended feedback per Interaction Rule 5 (an option menu would unintentionally influence the user toward the parts the menu lists, away from anything else they might want to change).
 
 **Prose discipline for "What we're building" (required):** forward-looking (what the proposed work will achieve), not retrospective (what's been discussed). Lead with the actual thing being built in plain words. No qualifiers ("comprehensive," "thoughtful," "substantive"). No re-stating dialogue context the user just lived through. If the work can't be said in 1–3 sentences without filler, the synthesis isn't ready yet.
 
@@ -169,7 +169,7 @@ Proposing: [1–3 line shape and the outcome it serves].
 
 仅当统一等待判断允许继续时，在同轮写必要文档或交付既定简短对齐；不要为满足模板而造文档。明确要求先确认时，在同样的简短摘要后请求确认。
 
-仅当统一等待判断要求确认时，Path B 使用开放式问题（无 `AskUserQuestion` 菜单）；已授权自主继续时使用公告。 The justification is Interaction Rule 5(a) in `references/interaction-rules.md` — an option menu would unintentionally influence the user's feedback toward the parts the menu lists.
+仅当统一等待判断要求确认时，Path B 使用开放式问题（无 `AskUserQuestion` 菜单）；已授权自主继续时使用公告。 The justification is Interaction Rule 5 in `references/interaction-rules.md` — an option menu would unintentionally influence the user's feedback toward the parts the menu lists.
 
 ### Worked example: compression from internal draft to scoping synthesis (Standard tier)
 

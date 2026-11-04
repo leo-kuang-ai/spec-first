@@ -1,6 +1,6 @@
 ---
 name: spec-plan
-description: "Create or deepen evidence-grounded plans for multi-step software and non-software work, including plans derived from requirements and answer-seeking research plans. Use when the outcome is clear enough to plan but HOW is unsettled. Prefer spec-brainstorm for unresolved WHAT, spec-debug for active failures, spec-work for implementation or tests, spec-doc-review for independent document critique, and runtime-maintenance for generated runtime mirrors."
+description: "Create or deepen evidence-grounded plans for multi-step software and non-software work, including plans derived from requirements and answer-seeking research plans. Use when the outcome is clear enough to plan but HOW is unsettled. Prefer spec-brainstorm for unresolved WHAT, spec-debug for active failures, spec-work for implementation or tests, spec-doc-review for independent document critique, and the runtime-maintenance route for generated runtime mirrors (regeneration via spec-first init)."
 argument-hint: "[optional: feature description, requirements doc path, plan path to deepen, or any task to plan] [output:html]"
 ---
 
