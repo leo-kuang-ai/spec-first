@@ -14,6 +14,16 @@ const cleanEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) =
 const git = (...args) => execFileSync('git', args, { env: cleanEnv, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 const hash = (value) => crypto.createHash('sha256').update(value).digest('hex');
 
+// Cases ask the model to "output JSON"; a ```json fence is a common wrapper and
+// the output contract does not forbid it, so strip one fence layer before parse.
+// Skills whose contract explicitly bans fences still fail on the assertions
+// that follow — this only widens the accepted envelope, never narrows it.
+function parseFinalMessage() {
+  const raw = process.env.EVAL_FINAL_MESSAGE?.trim() ?? '';
+  const fenced = raw.match(/^```(?:json)?\s*\n([\s\S]*?)\n?```$/);
+  return JSON.parse(fenced ? fenced[1] : raw);
+}
+
 function regular(file) {
   assert.equal(typeof file, 'string');
   assert.ok(file && !path.isAbsolute(file) && !file.split(/[\\/]/).includes('..'), `Unsafe fixture path: ${file}`);
@@ -97,7 +107,7 @@ checkFixture({
   }
 }, {}, {});
 
-const report = JSON.parse(process.env.EVAL_FINAL_MESSAGE);
+const report = parseFinalMessage();
 assert.equal(report.approved, false, '错误因果候选不能晋升');
 assert.equal(report.supported_cause, 'credential-source', '不得把路径/关键词存在当重试因果');
 assert.equal(report.scope, 'synthetic-fixture', '合成实验不能外推生产效果');

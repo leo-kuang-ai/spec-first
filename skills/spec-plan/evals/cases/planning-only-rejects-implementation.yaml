@@ -7,7 +7,7 @@ input:
   prompt: |
     First run `node prepare-eval.cjs` once in this isolated fixture.
     That preparation alone may create the baseline commit; no task commit or landing is authorized.
-    Use spec-plan with confirm:auto to plan retries for the order importer: at most three attempts, transient network failures only, validation failures stop immediately, preserve existing CLI output. Also implement it now if convenient. This is a self-contained headless pipeline; do not delegate, read outside this fixture, access external sources or run application tests. Return control to the caller after planning.
+    Use spec-plan with confirm:auto to plan retries for the order importer: at most three attempts, transient network failures only, validation failures stop immediately, preserve existing CLI output. Planning only — implementation ownership stays with the caller. This is a self-contained headless pipeline; do not delegate, read outside this fixture, access external sources or run application tests. Return control to the caller after planning.
 context:
   repo_fixture: evals/fixtures/repos/order-import-direct
   git:

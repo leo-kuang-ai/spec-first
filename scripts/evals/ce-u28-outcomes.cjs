@@ -15,12 +15,12 @@ assert.equal(regular('STRATEGY.md').toString(), original.replace('Old approach.'
 const report = finalObject();
 assert.deepEqual(report.metrics.map(({name, source, state, value}) => ({name, source, state, value})), [
   { name: 'revenue', source: 'payments-export', state: 'ok', value: 1200 },
-  { name: 'active_users', source: 'analytics-export', state: 'failed', value: null },
+  { name: 'active_users', source: 'analytics-export', state: 'permission-denied', value: null },
 ]);
 assert.ok(!report.metrics.some((m) => m.state === 'confirmed-zero'));
 assert.ok(report.artifact_path.startsWith('docs/pulse-reports/'));
 const saved = regular(report.artifact_path).toString();
-assert.ok(saved.includes('1200') && saved.includes('failed'));
+assert.ok(saved.includes('1200') && saved.includes('permission-denied'));
 rejectRecordedRemoteWrites();
 `,
   }],

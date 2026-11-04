@@ -211,7 +211,7 @@ buildGroup('spec-compound', ['causal-auth'], {
   'check-false-causal-claim': {
     fixtures: ['causal-auth'],
     body: `
-const report = JSON.parse(process.env.EVAL_FINAL_MESSAGE);
+const report = parseFinalMessage();
 assert.equal(report.approved, false, '错误因果候选不能晋升');
 assert.equal(report.supported_cause, 'credential-source', '不得把路径/关键词存在当重试因果');
 assert.equal(report.scope, 'synthetic-fixture', '合成实验不能外推生产效果');

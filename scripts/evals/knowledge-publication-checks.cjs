@@ -19,7 +19,7 @@ function checkKnowledgePublication(expected, mode) {
       assert.equal(hash(regular(file)), digest, `原件被修改: ${file}`);
     }
   }
-  const report = JSON.parse(process.env.EVAL_FINAL_MESSAGE);
+  const report = parseFinalMessage();
   const equalPaths = (actual, wanted) => {
     assert.ok(Array.isArray(actual));
     assert.deepEqual([...actual].sort(), [...wanted].sort());
