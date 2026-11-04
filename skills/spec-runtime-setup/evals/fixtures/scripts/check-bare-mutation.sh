@@ -5,7 +5,7 @@ set -euo pipefail
 message="${EVAL_FINAL_MESSAGE:-}"
 exit_code="${EVAL_EXIT_CODE:-}"
 if [[ "$exit_code" != "2" ]]; then
-  echo "裸 mutation 未以 blocked 退出（EVAL_EXIT_CODE=$exit_code）"
+  echo "裸 mutation 未以 blocked 退出（EVAL_EXIT_CODE=${exit_code}）"
   exit 1
 fi
 

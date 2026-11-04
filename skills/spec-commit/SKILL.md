@@ -23,7 +23,7 @@ branch_mutation_authorization: authorized | missing
 
 Consume the caller's owned paths, explicit `exclude:<paths>`, known unit context and verified hunk-isolation strategy. Exclusions win over an overlapping owned-path list; report them as left uncommitted. A changed-file list does not prove ownership.
 
-When no verified isolation strategy exists, you may return a concrete proposal for caller validation. Label it unverified and perform no staging or commit until its preservation checks pass. A proposed procedure is not an execution receipt; use the shared precommit and recovery boundaries in `skills/spec-commit-push-pr/references/commit-and-push.md`.
+When no verified isolation strategy exists, you may return a concrete proposal for caller validation. Label it unverified and perform no staging or commit until its preservation checks pass. A proposed procedure is not an execution receipt; use the shared precommit and recovery boundaries in the `spec-commit-push-pr` shared reference — resolve `references/commit-and-push.md` from the currently installed `spec-commit-push-pr` skill directory (in this repo, `skills/spec-commit-push-pr/references/commit-and-push.md`). Consume only its precommit and recovery boundaries from this helper; its default-branch branch-creation flow governs the `spec-commit-push-pr` pipeline, not this helper — branch creation here follows Step 4 below.
 
 This helper owns commit composition and the authorized commit checkpoint only. It does not own push, PR creation/update, plan lifecycle, or unrelated dirty paths. If branch creation is required, consume existing authority for that exact branch action; obtain approval only when it is missing.
 
@@ -121,7 +121,7 @@ git commit -F <message-file> -- file1 file2 file3
 
 Git's normal message cleanup still applies. Read back the actual commit message and included paths, then remove only this run's temporary file after success or preservation of necessary failure evidence. Never silently stage an excluded path or turn mixed-hunk ownership into a whole-file commit.
 
-提交前核对 owned paths 与已暂存内容。显式路径提交保留其他文件的暂存状态，但会提交这些路径的工作树内容，不保留文件内的 hunk 选择。若同一文件混有其他任务或用户修改，必须使用调用方已验证的 hunk/index 隔离方案，或停止该组提交。不得 reset/stash 用户暂存区；遵循 `skills/spec-commit-push-pr/references/commit-and-push.md` 的同一边界。
+提交前核对 owned paths 与已暂存内容。显式路径提交保留其他文件的暂存状态，但会提交这些路径的工作树内容，不保留文件内的 hunk 选择。若同一文件混有其他任务或用户修改，必须使用调用方已验证的 hunk/index 隔离方案，或停止该组提交。不得 reset/stash 用户暂存区；遵循 `spec-commit-push-pr` 共享 reference（从当前已安装的 `spec-commit-push-pr` Skill 目录解析 `references/commit-and-push.md`）的同一边界，消费范围同 Step 2 所述（precommit/recovery 边界，不含其 branch-creation 流程）。
 
 ### Step 5: Confirm
 
