@@ -1,9 +1,9 @@
 # 全量审查多 Agent 并审执行方案
 
-**版本**：v1.3
+**版本**：v1.5
 **创建日期**：2026-11-04
 **定位**：[FULL-REVIEW-ONE-PASS.md](FULL-REVIEW-ONE-PASS.md)（全量单次审查执行方案）的**执行架构特化**——对象范围、证据层承诺（前三层，`field_outcome` 不承诺）、S0-S5 骨架、收缩纪律全部沿用该文件与 [REVIEW-EXECUTION-WORKFLOW.md](REVIEW-EXECUTION-WORKFLOW.md) v2；本文件只定义一件事：**单个 Skill 由多个独立 agent 并审（K 层评审者）的架构、独立性保证、一致性度量与收敛协议**。
-**授权**：owner 2026-11-04 指令「登记全量审查，规划支持多 agent 并审单个 skill」；三项登记决定经 AskUserQuestion 确认（见下表）。v1.1：owner 提供可用模型池，K 层评审者升级为跨模型盲评（见 2.5）。v1.2：CLI 目录实测（magpie 统一目录、双 CLI 通道、别名陷阱）。v1.3：**owner 收紧模型池为四 provider（zhipu / kiro / hst-2 / ai-qianxing2）——claude 系（packycode/imported）出池**，行为层 eval 与 R1/L1 由 claude-opus-5-5 改派池内模型（见 2.5）。
+**授权**：owner 2026-11-04 指令「登记全量审查，规划支持多 agent 并审单个 skill」；三项登记决定经 AskUserQuestion 确认（见下表）。v1.1：owner 提供可用模型池，K 层评审者升级为跨模型盲评（见 2.5）。v1.2：CLI 目录实测（magpie 统一目录、双 CLI 通道、别名陷阱）。v1.3：**owner 收紧模型池为四 provider（zhipu / kiro / hst-2 / ai-qianxing2）——claude 系（packycode/imported）出池**，行为层 eval 与 R1/L1 由 claude-opus-5-5 改派池内模型（见 2.5）。v1.4：owner 指令「优先核心链路」——显式分批 S1+五批次（见 2.6），核心链路先行并直通 Option B 回填。v1.5：批次内容按 core/06 流程角色标注；spec-write-tasks 由批次3 提入批次1（H03 链），主链路 6 Skill 口径就此定案（prd/plan/write-tasks/work/code-review/commit-push-pr）。
 
 ---
 
@@ -69,6 +69,21 @@ S5 field_outcome: 不承诺（登记在案）
 ```
 
 Wave 调度：主会话并发受限时按 wave 分批，每 wave 的收敛产物**落盘**再进下一 wave，防主会话上下文瓶颈。
+
+### 2.6 分批与优先级（v1.5，owner 指令「优先核心链路」；批次内容按 core/06 主链路基线标注流程角色）
+
+| 批次 | 对象（流程角色） | 数量 | K | 出口/衔接 |
+|---|---|---|---|---|
+| S1 试点 | spec-plan（主链路·方案规划） | 1 | 3 | 校准成本+一致性+rubric；规模外推；试点后各批预算在批次边界重估（v2 规则） |
+| **批次1 核心链路** | spec-prd（主链路·需求定义）、spec-write-tasks（主链路·可选任务派生，H03）、spec-work（主链路·实现）、spec-code-review（主链路·审查）、spec-commit-push-pr（主链路·收尾落地） | 5 | 3 | **完成即回填 Option B WP1（路径甲）**；findings 可先行送修（修复复验属另一轮授权，须 owner 逐 Skill/文件批准，不随本审查自动获得） |
+| 批次2 回路与知识重型 | spec-debug（回路·失败修复硬路由）、spec-compound（Knowledge·知识沉淀）、spec-compound-refresh（Knowledge·知识刷新） | 3 | 3 | S0 增补名单（近 90 天改动/已知 finding）落此批 |
+| 批次3 工作流其余 | spec-brainstorm、spec-ideate（上游·definition 组）、spec-doc-review（评审）、spec-dogfood（验证回路）、spec-optimize、spec-polish（优化回路）、spec-app-consistency-audit（审计）、spec-runtime-setup（支撑·就绪）、spec-write-skill（支撑·Skill 演化） | 9 | 2 | — |
+| 批次4 独立入口 | spec-strategy（上游·方向）、using-spec-first（入口治理）、spec-handoff（跨会话交接）、spec-lfg、spec-pov、spec-resolve-pr-feedback（回路/裁决）、spec-explain、spec-prototype、spec-sweep、spec-simplify-code、spec-rule-miner、spec-project-rules、spec-product-pulse、spec-riffrec-feedback-analysis、autoresearch、spec-test-xcode（独立工具） | 17 | 2 | — |
+| 批次5 内部+共享 | spec-commit（收尾 helper）、spec-worktree（隔离 helper）、spec-test-browser（测试 helper）+ `_shared` 消费面 | 3+1 | 2 | `_shared` 按消费面查，非入口深读 |
+
+**口径定案（v1.5）**：S1+批次1 = **主链路 6 Skill**（prd / plan / write-tasks / work / code-review / commit-push-pr），与主计划 v3.6「主链路6 Skill」表述对齐——此前 6/5 口径差（第 6 个未登记）就此定案：第 6 个 = H03 链上的 spec-write-tasks（主链路可选派生，core/06 五入口之一）。
+
+分批纪律（沿 v2）：批次完成**不关闭全范围**（38 个对象结论在最终报告齐备前不宣称 complete）；报告按批累积，每批独立可用；核心链路批次（S1+批次1，6 个）先行完成即释放主链路证据，不等长尾。
 
 ### 2.5 模型分配表（v1.1，owner 提供模型池：glm-5.3 / claude-opus-5-5 / glm-5.3-flash / gpt-6.1-sol / gpt-6-astra）
 
@@ -141,6 +156,6 @@ Wave 调度：主会话并发受限时按 wave 分批，每 wave 的收敛产物
 
 ---
 
-**方案版本**：v1.3
+**方案版本**：v1.5
 **登记状态**：启动登记已填（2026-11-04），待执行 S0 冻结清点后正式开跑
 **维护者**：本轮审查 owner + 执行架构师
