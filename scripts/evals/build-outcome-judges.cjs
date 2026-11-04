@@ -1,6 +1,12 @@
 'use strict';
 
 // Eval-only bundling: no generated host runtime or product code is changed.
+// Maintainer coupling (moved out of the projected spec-work reference): the
+// return-to-caller envelope field set is mirrored by these generated judges —
+// skills/spec-work/evals/fixtures/scripts/check-return-to-caller.sh and
+// check-closeout-order.sh — plus the calibration expectations in
+// tests/unit/spec-work-outcome-judges.test.js; run this builder with --check
+// (or regenerate) whenever those envelope fields change.
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
