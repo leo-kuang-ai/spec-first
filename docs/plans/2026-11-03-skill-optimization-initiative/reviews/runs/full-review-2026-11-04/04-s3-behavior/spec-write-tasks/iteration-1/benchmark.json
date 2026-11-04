@@ -1,0 +1,140 @@
+{
+  "metadata": {
+    "skill_name": "spec-write-tasks",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-write-tasks",
+    "timestamp": "2026-11-04T11:30:44Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "裸拆分请求应询问源计划路径",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 83.276,
+        "tokens": 27317,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-write-tasks/evals/fixtures/scripts/asks-a-question.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "远程仓库输入应被拒绝并要求本地 source-owned 输入",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 261.086,
+        "tokens": 26380,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-write-tasks/evals/fixtures/scripts/rejects-remote.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "小型低风险计划应倾向 skip 直接 spec-work",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 198.493,
+        "tokens": 46863,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[spec-work]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[spec-work])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "非 active 计划不得编译为可执行任务包",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 113.814,
+        "tokens": 36517,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.files_not_exist",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[source_plan_non_active]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[source_plan_non_active])"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 164.16725,
+        "stddev": 70.08984471153792,
+        "min": 83.276,
+        "max": 261.086
+      },
+      "tokens": {
+        "mean": 34269.25,
+        "stddev": 8279.93002310406,
+        "min": 26380,
+        "max": 46863
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

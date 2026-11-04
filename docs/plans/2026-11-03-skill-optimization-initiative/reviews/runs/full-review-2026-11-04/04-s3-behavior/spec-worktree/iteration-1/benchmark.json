@@ -1,0 +1,103 @@
+{
+  "metadata": {
+    "skill_name": "spec-worktree",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-worktree",
+    "timestamp": "2026-11-04T12:13:22Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "governed caller 经 detect 创建 new-work worktree 且主 checkout 不动",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 73.284,
+        "tokens": 24635,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-worktree/evals/fixtures/scripts/check-create-worktree.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "非 git 目录必须 detect fail-closed，不得裸跑 git worktree add",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 67.002,
+        "tokens": 27027,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-worktree/evals/fixtures/scripts/check-not-git-refuses.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "零提交仓库 create 必须结构化拒绝，不得裸用 git worktree add",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 174.437,
+        "tokens": 32875,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-worktree/evals/fixtures/scripts/check-unborn-refuses.sh",
+          "passed": false,
+          "evidence": "unborn 仓库上创建了 .worktrees——绕过结构化拒绝"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.6666666666666666,
+        "stddev": 0.4714045207910317,
+        "min": 0,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 104.90766666666667,
+        "stddev": 49.23150770481125,
+        "min": 67.002,
+        "max": 174.437
+      },
+      "tokens": {
+        "mean": 28179,
+        "stddev": 3461.187464825716,
+        "min": 24635,
+        "max": 32875
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

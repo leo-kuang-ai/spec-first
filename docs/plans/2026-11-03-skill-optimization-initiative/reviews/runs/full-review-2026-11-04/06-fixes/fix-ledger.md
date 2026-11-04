@@ -37,7 +37,7 @@
 | 019 | spec-ideate issue-intelligence-analyst.md:90 聚簇启发式措辞软化（0 开放 issue = likely solved for theme-formation，携带 :76 认知谨慎） | R2 D02（对读核实） | 本批 |
 | 020 | spec-optimize SKILL.md:107 校准模式双口径消歧（invocation token `mode:measurement-only` vs spec 字段 `calibration.mode`） | R2 B02（schema 核实） | 本批 |
 | 021 | spec-app-consistency-audit SKILL.md:294 ecc-source-lock 消费者修正（merge-contracts.js 全文 0 处 ecc；实际消费者仅 prompts/orchestrator.md） | R1 B02 F1（grep 核实） | 本批 |
-| 022 | spec-write-skill preview 写集 seam（D04/B02/X02：交付/迁移必然触及 repo 级文件，preview 声明路径锁 canonical root 内）——L1 建议 authorized supporting paths，排队实施 | L1 仲裁采纳 | 待实施 |
+| 022 | spec-write-skill preview 写集 seam：would_change 增 supporting:true 授权支撑路径（root 边界/snapshot/write-set/dirty-overlap/receipt 全保留，仅豁免 canonical containment）+ prose 合同 + 3 测试 | L1 仲裁采纳（D04/B02/X02） | 41d14648 |
 
 ## 留观（不修，判「保持现状成立」或降级）
 
@@ -55,3 +55,31 @@
 
 - 每批修复后窄验证：spec-prd 14 套 179/179、write-tasks 44/44、compound 系 105/105、spec-work/commit-push-pr 65/65、lint:skill-entrypoints 518 文件全绿
 - runtime mirror 再生（spec-first init）留待全部优化完成后统一执行
+
+## 批次4/5 + audit/autoresearch 收敛波（L1 仲裁后追加）
+
+| FIX | 内容 | 来源 | commit |
+|---|---|---|---|
+| 023 | spec-explain destinations.md Phase 编号 ×2 归一（6→4） | L1 D05 | db177fec |
+| 024 | spec-pov external-evidence-researcher 外发最小化边界（公开主题词 only） | L1 | db177fec |
+| 025 | spec-rule-miner 规则块适用与失效边界段合同（SKILL 步骤5 + write-targets 块组成） | L1 | db177fec |
+| 026 | spec-promote check-spiral-auth 认证信号冲突检测（unverified/spiral-auth-signals-conflicting + 2 负例） | L1 | db177fec |
+| 027 | spec-strategy 数量例外 ×3 + 定向更新语义 + eval 顺序许可 | L1 | db177fec |
+| 028 | spec-handoff degraded judge 正负语义（诚实降级必在/编造完成态必拒） | L1 | db177fec |
+| 029 | using-spec-first 输出枚举登记两个特殊结果（footprint 5790≤5800 压缩） | L1/B02 | db177fec |
+| 030 | spec-resolve-pr-feedback 缺授权出口跳过受阻项 + 勾选例外删除 + Validation 披露改口径 | L1 | db177fec |
+| 031 | spec-simplify-code diff 并集 + Bounded dispatch/worker 写边界 + 重试有界化 | L1 | db177fec |
+| 032 | spec-product-pulse 时长四值合同 + 同分钟唯一后缀 + 状态规范化 permission-denied | L1 | db177fec |
+| 033 | spec-prototype webserver 三态生命周期 + 默认页一级子目录发现 | L1 | db177fec |
+| 034 | spec-riffrec analyzer safe_write_text 写隔离 + source_sha256/analysis_batch_id + Python>=3.10 披露（spec-sweep byte-identical 投射同步） | L1 + X02 预修 FIX-012 | fdd433df |
+| 035 | spec-test-browser 恢复载荷透传 + pending-receipt.json 预落盘（ETIMEDOUT 可定位） | L1 ×3 | fdd433df |
+| 036 | autoresearch 编排器路由信号严格类型化 + 单遍边界/互斥旗标/run 独占 + 手稿交接规范化 | L1 | b8f7383f |
+| 037 | spec-app-consistency-audit L1 九项（冲突降级/opt-in/stub 标记/写边界逃逸检测/参数透传/report 全域 coverage/Figma 统一） | L1 ×9 | b8f7383f |
+| 038 | spec-commit 共享 reference 双缺口：D04 消费范围限定（豁免 branch-creation 流程冲突）+ B04 安装态路径解析措辞 | R1 fail×R2 nv，确定性证实 | caa21272 |
+| 039 | spec-runtime-setup eval judge 基建 ×2（全角括号 set -u unbound / dirname 跨脚本引用不可达→内联） | S3 复核发现 | caa21272 |
+
+## 终态对账（2026-11-05）
+
+- 静态层：38/38 skill 收敛（各批次 *-convergence.md；FIX-001..039 全部 landed，无 open fail）
+- 行为层：S3 基线 118/155（backlog 见 04-s3-behavior/S3-SUMMARY.md）
+- 留观清单不变；spec-prd R1 #5/#6 低频 P3 维持 deferred

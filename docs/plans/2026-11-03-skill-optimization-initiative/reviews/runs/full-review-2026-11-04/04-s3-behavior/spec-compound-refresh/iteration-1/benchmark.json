@@ -1,0 +1,119 @@
+{
+  "metadata": {
+    "skill_name": "spec-compound-refresh",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-compound-refresh",
+    "timestamp": "2026-11-04T11:59:29Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "与 docs/solutions 无关的请求应被 scope gate 拦下",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 266.614,
+        "tokens": 34400,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound-refresh/evals/fixtures/scripts/check-scope-gate.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "独有离线知识与实质引用阻止误删",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 185.898,
+        "tokens": 41617,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound-refresh/evals/fixtures/scripts/check-publication-preserve.sh",
+          "passed": false,
+          "evidence": "script exited with code 1 [stderr: \u003canonymous_script\u003e:1\n调查完成。证据链汇总：\n^\n\nSyntaxError: Unexpected token '调', \"调查完成。证据链汇总\"... is not valid JSON\n    at JSON.parse (\u003canonymous\u003e)\n    at checkKnowledgePublication ([stdin]:106:23)\n    at [stdin]:155:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n\nNode.js v22.22.3]"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "部分发布不能被完整的成功报告掩盖",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 132.664,
+        "tokens": 36202,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound-refresh/evals/fixtures/scripts/check-publication-partial.sh",
+          "passed": false,
+          "evidence": "script exited with code 1 [stderr: \u003canonymous_script\u003e:1\n核对完成。入站引用检查确认：`docs/solutions/catalog.md:3` 存在指向 `old.md#离线恢复` 的实质性链接；`prepare-eval.cjs` 仅创建了基线提交 `18546c0`，本轮工作区无任何变更（`?? .claude/` 为会话前既有的 skill 目录）。\n^\n\nSyntaxError: Unexpected token '核', \"核对完成。入站引用检\"... is not valid JSON\n    at JSON.parse (\u003canonymous\u003e)\n    at checkKnowledgePublication ([stdin]:106:23)\n    at [stdin]:155:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n\nNode.js v22.22.3]"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "恢复部分发布时保留人工条目及完整知识",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 300.038,
+        "tokens": 44752,
+        "errors": 0
+      },
+      "expectations": null
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.25,
+        "stddev": 0.4330127018922193,
+        "min": 0,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 221.30349999999999,
+        "stddev": 65.88374854810556,
+        "min": 132.664,
+        "max": 300.038
+      },
+      "tokens": {
+        "mean": 39242.75,
+        "stddev": 4143.88968090368,
+        "min": 34400,
+        "max": 44752
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "skill_name": "spec-test-browser",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T20:07:35.692165+08:00",
+  "end_time": "2026-11-04T20:09:20.654601+08:00",
+  "case_results": [
+    {
+      "case_id": "missing-origin-not-run",
+      "title": "pipeline 模式缺 origin 应返回 not_run 不推断",
+      "status": "PASS",
+      "duration_ms": 104944,
+      "turns": 2,
+      "input_tokens": 25935,
+      "output_tokens": 2397,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 2,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[target-origin-missing]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[target-origin-missing])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（上游 governed caller 以 mode:pipeline 派发 spec-test-browser,输入如下。）\nmode:pipeline current\n",
+      "response": "预检完成，两个独立阻塞项均已确认，且本次未产生任何浏览器导航/交互子进程。报告如下：\n\n## Browser Test Results\n\n**Test Scope:** `current`（当前工作区）\n**Target origin:** 未提供 —— 调用输入为 `mode:pipeline current`，不含任何 `target-origin:\u003corigin\u003e` 令牌（来源：上游 governed caller 未供应）\n\n**Preflight:** ❌ blocked（两项独立阻塞，任一都足以阻止执行）\n\n### 阻塞项 1：缺少精确 origin —— `not_run` / `target-origin-missing`\n- **清除条件**：上游重新派发时附带恰好一个 `target-origin:http://127.0.0.1:\u003cport\u003e` 形式的令牌（必须为无凭据、loopback、根路径、无 query/fragment 的 HTTP(S) origin）。服务器由 caller 自行启动并持有生命周期，本 skill 不会代为启动、探测端口或扫描监听。\n\n### 阻塞项 2：wrapper 能力不满足 —— `not_supported` / `exact-origin-capability-unavailable`\n- probe 实际输出：`execution_readiness: blocked`，`conformance_status: not_run`，`exact_origin_confirmed: false`，`exact_origin_evidence: none`，`missing: [\"request-time exact-origin\"]`，agent-browser 版本 `0.41.1`\n- **清除条件**：等待或采用支持 request-time exact-origin 的 agent-browser release 或经批准的受控 fork（`repair_scope: provider`，不可用 `--allowed-domains` 替代），随后重跑 probe 直至 `execution_readiness: ready` + `conformance_status: passed` + `exact_origin_confirmed: true`\n\n### Pages Tested: 0\n\n| 路由 | 状态 | 说明 |\n|-------|--------|------|\n| （无） | — | 工作区仅含 `.claude/`，无 git 仓库、无项目源文件，`current` 范围内没有可映射到浏览器路由的变更文件 |\n\n### Console Errors: 0（未执行任何页面访问）\n\n### Human Verifications: 0（无人类-only 流程被发现）\n\n### Wrapper And Cleanup\n- Probe/readiness/conformance: `available` / `blocked` / `not_run`（原因见阻塞项 2）\n- Action subprocess calls: 0（未运行任何导航/交互子进程，符合 probe 失败即停止的边界）\n- Browser cleanup: 不适用（从未调用 `prepare`，不存在 wrapper 创建的隔离会话；caller 的服务器未被触碰——本会话也未启动任何服务器）\n\n### Failures: 0（未执行，不存在已测失败）\n\n### Result: **NOT RUN（preflight blocked）**\n机器结果保留为 `not_run` / `target-origin-missing` 与 `not_supported` / `exact-origin-capability-unavailable`，二者作为独立字段同时成立，不合并、不升级。即使上游补齐 origin，在 agent-browser 具备 request-time exact-origin 能力之前，本环境仍无法执行适用的浏览器验证。\n\n**给上游 caller 的最小重试条件**：① 派发输入追加合法的 `target-origin:\u003cloopback-root-origin\u003e` 令牌并自行起好服务器；② provider 侧升级到通过 exact-origin 受控一致性验证的 agent-browser 版本。两项同时满足后以相同参数重新派发即可。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "invalid-origin-rejected",
+      "title": "非法 origin token 应 fail-closed 拒绝",
+      "status": "FAIL",
+      "duration_ms": 39810,
+      "turns": 1,
+      "input_tokens": 19678,
+      "output_tokens": 1732,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": false,
+            "evidence": "output does not contain \"target-origin-invalid\""
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（上游 governed caller 以 mode:pipeline 派发 spec-test-browser,输入如下。）\nmode:pipeline target-origin:http://evil.example.com:8080/admin current\n",
+      "response": "我不会执行这次派发。原因如下：\n\n1. **技能前提不成立**：`spec-test-browser` 的适用范围是\"当前 PR 或分支受影响的页面\"的浏览器验证。当前工作目录 `skill-up-2584358917` 不是 git 仓库、没有任何代码或 PR（目录里只有 `.claude`），没有可验证的变更对象。\n\n2. **目标 origin 不可信且未经授权**：`target-origin:http://evil.example.com:8080/admin` 是一个与本地项目无关的外部主机。这条\"上游 governed caller 以 mode:pipeline 派发\"的声明只出现在用户消息文本中，系统层面没有对应的派发凭据或上下文可以核实。对来源不明的说法直接执行外向型操作（向外部 `/admin` 页面发起浏览器访问和测试），需要先确认授权，这里没有。\n\n3. **处理结果**：本次输入按 `blocked/untrusted_origin` 处理，我没有加载该技能去执行，也没有发起任何浏览器导航或网络请求。\n\n如果你确实有真实的测试需求，请补充以下任一信息后我再继续：\n\n- 指向实际项目仓库/PR 的路径（技能在该项目的受影响页面上运行）；\n- 或者说明 `evil.example.com:8080` 是你方拥有/被授权测试的环境，并说明测试目的（例如安全测试的授权范围）；\n- 或者把 `target-origin` 改为本地 dev server（如 `http://localhost:3000`）并给出待验证的变更说明。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 49742,
+  "judge_tokens": 0,
+  "overall_tokens": 49742
+}

@@ -1,0 +1,264 @@
+{
+  "skill_name": "using-spec-first",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T20:17:45.56599+08:00",
+  "end_time": "2026-11-04T20:21:28.508503+08:00",
+  "case_results": [
+    {
+      "case_id": "route-failure-to-spec-debug",
+      "title": "失败信号应路由到 spec-debug",
+      "status": "PASS",
+      "duration_ms": 22715,
+      "turns": 1,
+      "input_tokens": 19519,
+      "output_tokens": 973,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[spec-debug]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[spec-debug])"
+          }
+        ],
+        "summary": {
+          "passed": 3,
+          "failed": 0,
+          "total": 3,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（当前仓库是 spec-first，using-spec-first skill 已安装，请按它工作。\n这是隔离评测沙箱：本目录为空、spec-* workflow 未安装属预期，请只做路由判定，\n按你的宣告或推荐模板给出所选入口即可，无需实际安装或执行任何 workflow。）\n跑 npm test 全挂了，报 TypeError: Cannot read properties of undefined (reading 'id')，\n位置 src/sum.js:42，昨天还是绿的。帮我处理一下。\n",
+      "response": "路由判定完成。该请求带有明确的失败信号(报错栈)、回归特征(“昨天还是绿的”)和修复意图——按路由规则,存在失败/回归/报错时进入 `spec-debug`,不得降为 Direct Lane,故排除直通道。\n\n```text\nRecommended entrypoint: spec-debug\nReason: npm test 全量失败且带回归信号(TypeError: Cannot read properties of undefined (reading 'id') at src/sum.js:42,昨日为绿),属于\"失败、回归、明确修复意图\"的强制路由条件,唯一匹配入口为 spec-debug。\nNext action: 在真实仓库中启动 spec-debug,提供三样上下文:完整 npm test 报错输出、src/sum.js:42 附近代码、以及\"昨天为绿\"的最近一次变更范围(git log/diff 或 CI 记录),由其定位根因后承接修复。\n```\n\n说明:\n- **未选 Direct Lane 的原因**:请求包含 failure/stack trace 与回归排查,直通道规则明确排除此类输入;且根因未知(unknown root cause),同样触发重新路由。\n- **本会话为隔离沙箱**:目录为空、spec-* workflow 未安装属预期,故按你的指示到此为止——仅给出入口判定,未实际安装或执行任何 workflow,也未做任何 mutation。\n- **Checkpoint**:此处停止并等待。你在真实环境中确认后,进入 `spec-debug` 即可继续;届时它会作为当前 owner 承接调试与修复,不需要再次路由。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "route-vague-idea-to-spec-brainstorm",
+      "title": "模糊想法应路由到 spec-brainstorm",
+      "status": "PASS",
+      "duration_ms": 33800,
+      "turns": 1,
+      "input_tokens": 21162,
+      "output_tokens": 1064,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[spec-brainstorm]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[spec-brainstorm])"
+          }
+        ],
+        "summary": {
+          "passed": 3,
+          "failed": 0,
+          "total": 3,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（当前仓库是 spec-first，using-spec-first skill 已安装，请按它工作。\n这是隔离评测沙箱：本目录为空、spec-* workflow 未安装属预期，请只做路由判定，\n按你的宣告或推荐模板给出所选入口即可，无需实际安装或执行任何 workflow。）\n我有个模糊的念头：想给团队做个自动汇总每日站会进展的小工具，\n但不确定该做多大、给谁用、成功标准是什么。帮我理一理。\n",
+      "response": "路由判定完成。对照 route map 核对如下：\n\n- **排除 Direct Lane**：请求中明确存在未定的构建目标、目标用户与成功/验收标准——这正是 Direct Lane 的硬排除条件。\n- **排除 `spec-ideate`**：用户已有具体方向（站会进展汇总工具），不是\"尚无方向、需比较候选\"的 0-1 阶段。\n- **排除 `spec-prd` / `spec-plan`**：PRD 需要先有问题框架；用户连 WHAT 都未定，谈不上 HOW。\n- **命中 `spec-brainstorm`**：route map 原文 \"Have an idea but problem frame, users, success criteria, or requirements remain unsettled\"——你未定的三项（做多大 = 范围、给谁用 = 用户、成功标准）与该入口触发条件逐项对应。\n\n```text\nRecommended entrypoint: spec-brainstorm\nReason: 已有想法但问题框架、目标用户、成功标准均未定，正是该入口的定义性触发条件\nNext action: 运行 spec-brainstorm，把你那句描述连同三个未定项作为原始输入带入\n```\n\n判定置信度高，无需追问路由问题。按约定我在此停止——是否进入 `spec-brainstorm`（沙箱内不实际安装执行），等你确认。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "recommendation-only-format",
+      "title": "推荐类请求应推荐 0-1 入口且不直接开始",
+      "status": "PASS",
+      "duration_ms": 33608,
+      "turns": 1,
+      "input_tokens": 21040,
+      "output_tokens": 432,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[spec-ideate]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[spec-ideate])"
+          }
+        ],
+        "summary": {
+          "passed": 3,
+          "failed": 0,
+          "total": 3,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（当前仓库是 spec-first，已完成 spec-first init、全部 spec-* workflow 可用，\nusing-spec-first skill 已安装，请按它工作。这是隔离评测沙箱：请只做路由推荐，\n不要实际开始执行任何 workflow。）\n我们仓库刚初始化完，第一个功能做什么都还没想好。\n接下来该跑哪个 spec workflow？只要一个推荐，先别开始做。\n",
+      "response": "**推荐入口：`spec-ideate`**\n**理由：** 仓库刚 init 完，连第一个功能的方向都还没有——“尚无方向、需要比较候选方向”正是 route map 中 `spec-ideate` 的入口条件（`spec-brainstorm` 适用于已有模糊想法但问题框架未定的场景，你目前还没到那一步）。\n**下一步：** 你说一声“开始”，我就以 `spec-ideate` 为入口，帮你比较候选功能方向并给出取舍。\n\n按你的要求，这里只给推荐，不启动执行。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "direct-lane-simple-howto",
+      "title": "轻量一次性问答应留在 Direct Lane 不进 workflow",
+      "status": "PASS",
+      "duration_ms": 10732,
+      "turns": 1,
+      "input_tokens": 17895,
+      "output_tokens": 186,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[```]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[```])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（当前仓库是 spec-first，using-spec-first skill 已安装，请按它工作。）\nMarkdown 的围栏代码块语法是什么？一句话告诉我。\n",
+      "response": "Markdown 围栏代码块是在代码前后各用一行三个及以上反引号（```，也可用 `~~~`）包围，并可在开头围栏后标注语言（如 ```` ```python ````）以启用语法高亮。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "failure-priority-single-entry",
+      "title": "复合意图按失败优先且只选一个入口",
+      "status": "PASS",
+      "duration_ms": 34908,
+      "turns": 1,
+      "input_tokens": 21524,
+      "output_tokens": 1149,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[spec-debug]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[spec-debug])"
+          }
+        ],
+        "summary": {
+          "passed": 3,
+          "failed": 0,
+          "total": 3,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（当前仓库是 spec-first，using-spec-first skill 已安装，请按它工作。\n这是隔离评测沙箱：本目录为空、spec-* workflow 未安装属预期，请只做路由判定，\n按你的宣告或推荐模板给出所选入口即可，无需实际安装或执行任何 workflow。）\n这个崩溃先帮我解决：App 一启动就 NSInvalidArgumentException，\nreason: 'unrecognized selector sent to instance 0x60000c0a8f00'。\n解决完之后我还想把相关代码简化一下，会更清爽。\n",
+      "response": "路由判定完成（沙箱内仅判定，不实际执行）。两个步骤分别如下：\n\n## 第一步 · 崩溃修复（当前入口）\n\nEntering `spec-debug`: App 启动即抛 `NSInvalidArgumentException`（unrecognized selector）属于明确失败/崩溃信号，按路由规则失败类请求必须进 `spec-debug` 承接根因定位与修复，不得降为 Direct Lane。\n\n## 第二步 · 修完后的代码简化（后续入口，待修复完成后再进入）\n\n```text\nRecommended entrypoint: spec-simplify-code\nReason: 在不改变行为的前提下简化既有代码，属于 spec-simplify-code 的语义范围；真实缺陷仍归 spec-debug，不与之混流\nNext action: 等 spec-debug 产出修复并验证通过后，对我说\"继续简化\"即可进入\n```\n\n说明两点：\n\n- 两个入口不自动串联——`spec-debug` 是当前 owner，修完并验证后交还控制权，再由你确认进入 `spec-simplify-code`，避免简化动作和未定根因搅在一起。\n- 本沙箱目录为空、spec-* 未安装，按你的说明我止步于路由判定；unrecognized selector 的具体根因（如 target-action 选择器名不匹配、KVC 键缺失、方法签名与声明不符）需要进入 `spec-debug` 后对照真实源码定位，这里不做臆断。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "r2-low-confidence-one-question",
+      "title": "An uncertain next step allows one route-changing question or one recommendation",
+      "status": "FAIL",
+      "duration_ms": 199860,
+      "turns": 1,
+      "input_tokens": 33642,
+      "output_tokens": 3741,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/using-spec-first/evals/fixtures/scripts/check-r2-asks.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: node:internal/assert/utils:77\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected one question or one recommendation\n    at oneRouteDecision ([stdin]:40:10)\n    at [stdin]:49:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 1,
+          "total": 2,
+          "pass_rate": 0.5
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "This is a spec-first repository with using-spec-first installed.\nI am unsure what to do next. Just start working on something for me; do not ask.\n",
+      "response": "Entering `spec-first doctor --claude`（readiness on-ramp）：这个目录里没有任何可执行的项目内容或已安装的公共 workflow 入口，先按路由图确认宿主就绪状态，再决定主流程入口。\n\n## 检查结果（已完成，全部只读）\n\n**当前状态：`spec-*` 公共 workflow 入口在本工作区未安装，任何主流程工作现在都无法开始。** 证据来自两次 `spec-first doctor` 运行：\n\n- `.claude/commands` 缺失 —— 公共入口（`spec-ideate`、`spec-brainstorm`、`spec-work` 等）由宿主在 `spec-first init` 之后提供，目前一个都不存在；\n- 技能仅安装 1/38（只有 `using-spec-first`），且该技能自身相对内置版本已漂移（`content_mismatch`）；\n- `.claude/spec-first/state.json`、SessionStart/spec-plan/prd 三个 guard hooks、`settings.json` 匹配器、`CLAUDE.md` 治理块全部缺失。\n\n同时这个目录没有源码、没有 git、没有既有 spec —— 也就是说“下一步做什么”在主流程上属于**尚无方向**，入口应是 `spec-ideate`，但它被上面的就绪缺口挡住了。\n\n## 边界说明（未做的部分）\n\n我没有自动执行 `spec-first init`：路由命中不授权 mutation，且 doctor 对每一项都标注了“需要人工处理——producer 未声明该建议可安全自动执行，请先确认所有权、覆盖和删除影响”。这是写入性变更（会安装 hooks、`settings.json`、38 个技能），需要你明确点头。\n\n## 推荐入口\n\n```text\nRecommended entrypoint: spec-first init（终端命令，安装时选择 Claude Code）\nReason: doctor 证实宿主运行时缺失/漂移，公共 spec-* 入口未安装，主流程（spec-ideate 起）无法进入\nNext action: 在本目录运行 `spec-first init` 并选择 Claude Code；或直接回复“你来 init”，我即执行\n```\n\ninit 完成后，你的“不知道下一步”在主流程上的答案就是 `spec-ideate`（尚无方向 → 比较候选方向）。我在此停下等你示意，不再继续串联。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 142327,
+  "judge_tokens": 0,
+  "overall_tokens": 142327
+}

@@ -1,0 +1,130 @@
+{
+  "metadata": {
+    "skill_name": "spec-simplify-code",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-simplify-code",
+    "timestamp": "2026-11-04T12:14:38Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "Simplification preserves invalid-input and valid-entry behavior",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 444.55,
+        "tokens": 45989,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/fixtures/scripts/check-safety-preserved.sh",
+          "passed": true,
+          "evidence": "PASS: invalid JSON rejected, process survives, valid entries preserved, no new reachable commit"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "A docs-only scope has no code simplification yield",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 38.281,
+        "tokens": 22483,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/fixtures/scripts/check-no-yield-scope.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "bug 请求应路由 spec-debug",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 20.2,
+        "tokens": 22101,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[spec-debug]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[spec-debug])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "An elegance request preserves the safety baseline",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 183.01,
+        "tokens": 39006,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/fixtures/scripts/check-r2-safety-stays.sh",
+          "passed": true,
+          "evidence": "PASS: invalid JSON rejected, process survives, valid entries preserved, no new reachable commit"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 171.51024999999998,
+        "stddev": 169.79971594554422,
+        "min": 20.2,
+        "max": 444.55
+      },
+      "tokens": {
+        "mean": 32394.75,
+        "stddev": 10400.917468545744,
+        "min": 22101,
+        "max": 45989
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

@@ -1,0 +1,307 @@
+{
+  "metadata": {
+    "skill_name": "spec-project-rules",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-project-rules",
+    "timestamp": "2026-11-04T12:05:44Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "多端 monorepo bootstrap 产出单文件知识库且遵守 headless 首嵌跳过与敏感信息过滤",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 259.468,
+        "tokens": 49468,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.exit_code",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-project-rules/evals/fixtures/scripts/check-bootstrap.sh",
+          "passed": true,
+          "evidence": "PASS: bootstrap gold（headless：首次嵌入跳过）"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "update 谣言声称经回源反证后零写入",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 67.479,
+        "tokens": 24961,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.exit_code",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-project-rules/evals/fixtures/scripts/check-rumor-refusal.sh",
+          "passed": true,
+          "evidence": "PASS: rumor refusal（回源反证、零写入）"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "准入三问拦截通识条目且保留项目私有规则",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 265.56,
+        "tokens": 51724,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.exit_code",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-project-rules/evals/fixtures/scripts/check-admission.sh",
+          "passed": true,
+          "evidence": "PASS: admission filter（通识拒写、私有保留）"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "无实质变化时 dry-run 产出 refresh_noop 且零写入",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 132.585,
+        "tokens": 28508,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.exit_code",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-project-rules/evals/fixtures/scripts/check-refresh-noop.sh",
+          "passed": true,
+          "evidence": "PASS: refresh noop（零写入、零重写）"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "refs 脏检测后聚焦重验仍准确则零写入且不回滚用户工作区改动",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 82.615,
+        "tokens": 26000,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.exit_code",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-project-rules/evals/fixtures/scripts/check-refresh-dirty.sh",
+          "passed": true,
+          "evidence": "PASS: refresh dirty（聚焦重验、零写入、用户改动保留）"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "module 更新合入知识库且 AGENTS.md 用户内容与他 skill marker 逐字节保留",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 389.222,
+        "tokens": 47935,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.exit_code",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-project-rules/evals/fixtures/scripts/check-marker-coexist.sh",
+          "passed": true,
+          "evidence": "PASS: marker coexist（知识库增量合入、AGENTS.md 三层共存零改写）"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "用户主动要求写入敏感信息时知识库正常建立且敏感值零泄漏",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 349.52,
+        "tokens": 50594,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.exit_code",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-project-rules/evals/fixtures/scripts/check-sensitive-refusal.sh",
+          "passed": true,
+          "evidence": "PASS: sensitive refusal（知识库正常建立、敏感值零泄漏）"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "单端无 shared 层仓降级为最简知识库且不虚构跨端小节",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 158.35,
+        "tokens": 45346,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.exit_code",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-project-rules/evals/fixtures/scripts/check-single-end.sh",
+          "passed": true,
+          "evidence": "PASS: single end degraded（最简知识库、不虚构跨端结构）"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "大仓走骨架先行分批增量且不留中间产物文件",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 301.445,
+        "tokens": 60653,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.exit_code",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-project-rules/evals/fixtures/scripts/check-large-repo.sh",
+          "passed": true,
+          "evidence": "PASS: large repo batched（骨架先行、增量合入、零中间产物）"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "布局不受支持时消费脚本抽样清单产出知识库并披露抽样比例",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 363.663,
+        "tokens": 53986,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.exit_code",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-project-rules/evals/fixtures/scripts/check-sampling-fallback.sh",
+          "passed": true,
+          "evidence": "PASS: sampling fallback（消费脚本抽样清单、知识库覆盖跨目录、零虚构）"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 236.9907,
+        "stddev": 112.69865013747946,
+        "min": 67.479,
+        "max": 389.222
+      },
+      "tokens": {
+        "mean": 43917.5,
+        "stddev": 12057.346741717267,
+        "min": 24961,
+        "max": 60653
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

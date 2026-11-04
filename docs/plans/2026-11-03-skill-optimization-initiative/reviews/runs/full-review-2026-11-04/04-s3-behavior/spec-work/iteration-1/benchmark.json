@@ -1,0 +1,267 @@
+{
+  "metadata": {
+    "skill_name": "spec-work",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-work",
+    "timestamp": "2026-11-04T11:39:55Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "A requirements-only plan stops before implementation",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 158.515,
+        "tokens": 27828,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-no-implementation.sh",
+          "passed": true,
+          "evidence": "PASS: fixture state and required outcome evidence verified; semantic quality is not scored."
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "A completed plan cannot authorize implementation",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 145.307,
+        "tokens": 31476,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-no-implementation.sh",
+          "passed": true,
+          "evidence": "PASS: fixture state and required outcome evidence verified; semantic quality is not scored."
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "A stale task pack is rejected without implementation",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 209.492,
+        "tokens": 35969,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-no-implementation.sh",
+          "passed": true,
+          "evidence": "PASS: fixture state and required outcome evidence verified; semantic quality is not scored."
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "A trivial request performs the exact README change",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 388.314,
+        "tokens": 58645,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-readme-fixed.sh",
+          "passed": true,
+          "evidence": "PASS: fixture state and required outcome evidence verified; semantic quality is not scored."
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "开放式 bug 描述应路由 spec-debug",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 172.154,
+        "tokens": 29040,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[spec-debug]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[spec-debug])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "An already implemented requirement does not authorize changing plan lifecycle",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 653.159,
+        "tokens": 89748,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-r2-reverse-mismatch.sh",
+          "passed": false,
+          "evidence": "script exited with code 1 [stderr: node:assert:150\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Protected fixture changed: docs/plans/2026-09-01-001-feat-month-filter-plan.md\n+ actual - expected\n\n+ '708a10ca3b5fb73801501630f4199c440963383113553e67d76b67f6bb742263'\n- 'ebe41c2e90728c765a06f1e9b200c668a93570310c8b102fe70081ced9cbc1a1'\n\n    at checkFixture ([stdin]:64:69)\n    at [stdin]:85:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: '708a10ca3b5fb73801501630f4199c440963383113553e67d76b67f6bb742263',\n  expected: 'ebe41c2e90728c765a06f1e9b200c668a93570310c8b102fe70081ced9cbc1a1',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "R2变体:无日志无堆栈的偶现 500 应路由 spec-debug",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 141.196,
+        "tokens": 35674,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[spec-debug]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[spec-debug])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Caller-owned implementation returns a complete evidence-bound envelope",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 416.013,
+        "tokens": 65278,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-return-to-caller.sh",
+          "passed": false,
+          "evidence": "script exited with code 1 [stderr: node:internal/assert/utils:77\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: Missing successful summary producer call/result\n    at checkCloseout ([stdin]:168:10)\n    at [stdin]:220:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: undefined,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "A bounded README change remains uncommitted without commit authority",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 440.761,
+        "tokens": 67073,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-uncommitted-handback.sh",
+          "passed": true,
+          "evidence": "PASS: fixture state and required outcome evidence verified; semantic quality is not scored."
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Standalone completion requires ordered execution and closeout evidence",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 390.633,
+        "tokens": 63010,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-closeout-order.sh",
+          "passed": false,
+          "evidence": "script exited with code 1 [stderr: node:internal/assert/utils:77\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: No successful check before summary: grep -c '^Known limitations: ' README.md\n    at checkCloseout ([stdin]:174:12)\n    at [stdin]:220:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.7,
+        "stddev": 0.45825756949558405,
+        "min": 0,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 311.55439999999993,
+        "stddev": 163.2101571387026,
+        "min": 141.196,
+        "max": 653.159
+      },
+      "tokens": {
+        "mean": 50374.1,
+        "stddev": 20058.827809470822,
+        "min": 27828,
+        "max": 89748
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}
