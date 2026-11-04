@@ -5,6 +5,7 @@
 **结论层级**：按 [process/REVIEW-EXECUTION-WORKFLOW.md](../process/REVIEW-EXECUTION-WORKFLOW.md) 报告类型约定，本文仅属**方案可用性**层结论；不构成 skill 通过性结论，也不构成收益结论
 **证据类型**：confirmed（判断依据为 core/ 全量文档、`phase0-results/` 执行记录、`analysis/CORE-REVIEW-DIMENSIONS-COVERAGE.md` v1.2 的逐一核对）
 **限制**：单模型单日会话内判断，非 fresh-source 独立评审；如需独立复核，按 `docs/contracts/workflows/fresh-source-eval-checklist.md` 执行
+**复核状态**（2026-11-04）：4 专家 fresh-source 评审团已复核——结论 1 获修正（方向成立但判定推理不健全：出口非 MECE、阈值在噪声带宽内、归因无信度），结论 3 获证实并加重（override 无闭环已兑现为实际损失）；详见 [CORE-PLAN-EXPERT-PANEL-REVIEW-2026-11-04.md](CORE-PLAN-EXPERT-PANEL-REVIEW-2026-11-04.md)
 
 ---
 
@@ -28,7 +29,7 @@ v4 方法论（core/01：从真实任务出发、沿流程找阻力点、不预�
 
 ### 4. Option B 的有效定位：取证批次，收益=未验证
 
-Option B（v3.4，v2 主链路批次）成立的理由是**补齐审查证据**：覆盖 40%→100%（51 完全 + 1 显式降级如实报告）是审查覆盖账目，不是 Skill 质量改善结论。执行完成后，收益层结论（Skill 是否因此变好）仍需按 v2 三态完成标准单独验证，不得由覆盖闭合自动推导。
+Option B（v3.6，v2 主链路批次）成立的理由是**补齐审查证据**：覆盖 38%→100%（52 完全 + 1 范围外如实标注，v1.4口径）是审查覆盖账目，不是 Skill 质量改善结论。执行完成后，收益层结论（Skill 是否因此变好）仍需按 v2 三态完成标准单独验证，不得由覆盖闭合自动推导。
 
 ---
 

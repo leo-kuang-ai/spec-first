@@ -1,7 +1,7 @@
 # 目录结构说明
 
 **项目**：2026-11-03 Skill优化项目  
-**版本**：v1.6  
+**版本**：v1.9  
 **更新日期**：2026-11-04
 
 ---
@@ -21,12 +21,13 @@
 │   └── ...（09/10/11/DECISION-AUTHORITY/RESOURCE-PLAN 已归档至 archive/）
 │
 ├── planning/                           # 执行计划（主入口）
-│   ├── OPTION-B-FULL-COMPLIANCE-PLAN.md    # ⭐ 主执行计划 v3.5（v2主链路批次）
+│   ├── OPTION-B-FULL-COMPLIANCE-PLAN.md    # ⭐ 主执行计划 v3.6（v2主链路批次）
 │   └── ...
 │
 ├── analysis/                           # 分析报告
-│   ├── CORE-REVIEW-DIMENSIONS-COVERAGE.md  # 覆盖度分析（v1.3口径：53项/40%）
+│   ├── CORE-REVIEW-DIMENSIONS-COVERAGE.md  # 覆盖度分析（v1.4口径：52项/38%）
 │   ├── MULTI-AGENT-PLAN-REVIEW-2026-11-04.md # 多agent方案审查沉淀
+│   ├── CORE-PLAN-EXPERT-PANEL-REVIEW-2026-11-04.md # core方案4专家评审团报告（四票需修）
 │   ├── SKILL-SIMPLIFICATION-ANALYSIS.md    # Skill精简分析
 │   └── ...
 │
@@ -78,9 +79,9 @@
 ## 🎯 关键入口文档
 
 ### 1. 开始执行（现在）
-**入口**：`planning/OPTION-B-FULL-COMPLIANCE-PLAN.md` v3.5
+**入口**：`planning/OPTION-B-FULL-COMPLIANCE-PLAN.md` v3.6
 - 选项B完整达标执行计划
-- 60-86h（路径A）/ 70-102h（路径B）+ 汇总4-6h，4-5周
+- 62-89h（路径A）/ 72-105h（路径B）+ 汇总4-6h，4-5周
 - 4个工作包：WP1/3/4/5（wp-plans/为唯一执行真相源）
 
 ### 2. WP5详细执行
@@ -90,14 +91,14 @@
 
 ### 2b. WP1/3/4独立计划
 **入口**：`wp-plans/` 下 WP1/WP3/WP4 对应 `*-PLAN.md`
-- WP1源码深度审查（24-32h，Week 1-2）
+- WP1源码深度审查（26-35h，Week 1-2）
 - WP3真实任务验证（16-24h，Week 3）
 - WP4未覆盖维度补充（10-15h，Week 4）
 
 ### 3. 理解当前状态
 **入口**：`analysis/CORE-REVIEW-DIMENSIONS-COVERAGE.md`  
 - Core审查维度覆盖度分析
-- 当前40%覆盖（21/53，v1.3口径，core/05原文八维+v2检查面+超大需求适配），目标52完全+1显式降级（差距矩阵31条闭合）
+- 当前38%覆盖（20/52，v1.4口径，core/05原文八维+v2检查面+超大需求适配），目标52完全+1范围外（差距矩阵32条闭合）
 
 ### 4. Skill精简背景
 **入口**：`analysis/SKILL-SIMPLIFICATION-ANALYSIS.md`  
@@ -249,6 +250,16 @@ docs/plans/2026-11-03-skill-optimization-initiative/planning/OPTION-B-FULL-COMPL
 
 ## 🔄 目录演进记录
 
+### v1.9（2026-11-04）
+- 评审团两项 owner 裁决落账：① 八维本体 rubric（D01+D05+D08）纳入 WP1 深读——任务1.1-1.3 新增逐 Skill rubric 判定节，WP1 投入 24-32h→26-35h；② D06/D08 处置互换——D06 改判范围外（宿主路由层海拔错位，不计数），D08 改判部分#19 入 WP1 rubric
+- 账目重算：覆盖分析 v1.3→v1.4（53→52项、21→20完全、40%→38%、差距31→32、WP1 15→16）；主计划 v3.5→v3.6（总投入 60-86/70-102 → 62-89/72-105h）
+
+### v1.8（2026-11-04）
+- 新增 analysis/CORE-PLAN-EXPERT-PANEL-REVIEW-2026-11-04.md：4 位独立专家 fresh-source 评审 core/ 17 份方案（四票「需修」），含收敛发现 C1-C6、分歧仲裁（规则3判定"方向对/推理不健全"）、Option B 直接输入 6 项；承重引用经负责人 grep 核实（10/10 命中）
+
+### v1.7（2026-11-04）
+- core/README 增补「文档关系图」一节（目标→方法→判定→执行→记录闭环 + 三条关键依赖 + v2翻译层说明），owner授权的导航性增补
+
 ### v1.6（2026-11-04）
 - Owner 裁定 core/10/11 关注面纳入主动审查：主计划 v3.5 + 覆盖分析 v1.3（分母52→53，差距30→31，WP4 3→4项）+ WP4计划 v1.2（新增任务4.4 超大需求适配质量审查，投入8-12h→10-15h）；总投入 60-86/70-102h，交付物 44-49 个
 
@@ -292,6 +303,6 @@ docs/plans/2026-11-03-skill-optimization-initiative/planning/OPTION-B-FULL-COMPL
 
 ---
 
-**文档版本**：v1.6  
+**文档版本**：v1.9  
 **创建日期**：2026-11-04  
 **维护者**：项目执行团队
