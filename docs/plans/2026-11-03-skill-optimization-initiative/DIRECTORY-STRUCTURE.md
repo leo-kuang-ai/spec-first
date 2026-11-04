@@ -1,7 +1,7 @@
 # 目录结构说明
 
 **项目**：2026-11-03 Skill优化项目  
-**版本**：v1.9  
+**版本**：v2.0  
 **更新日期**：2026-11-04
 
 ---
@@ -43,8 +43,10 @@
 │   ├── EXECUTION-COMMANDS.md
 │   └── ...
 │
-├── process/                            # 流程方法（历史）
+├── process/                            # 流程方法（历史 + 全量审查方案）
 │   ├── REVIEW-EXECUTION-WORKFLOW.md
+│   ├── FULL-REVIEW-ONE-PASS.md         # 全量单次审查执行方案（38 Skill）
+│   ├── MULTI-AGENT-PARALLEL-REVIEW-PLAN.md # 全量审查多agent并审方案（K层评审者，启动登记已填）
 │   ├── HOW-TO-START-REVIEW.md
 │   └── ...
 │
@@ -164,10 +166,10 @@ wp1-results/
 **状态**：历史文档，已归档  
 **规则**：不新增，只参考
 
-### process/ - 流程方法（历史）
-**用途**：存放审查流程、迭代模板  
-**状态**：历史文档，已归档  
-**规则**：不新增，只参考
+### process/ - 流程方法（历史 + 全量审查方案）
+**用途**：存放审查流程、全量审查执行方案与多agent并审方案
+**状态**：v2 workflow + FULL-REVIEW-ONE-PASS + MULTI-AGENT-PARALLEL-REVIEW-PLAN 为现行方案；其余为历史文档
+**规则**：历史文档不新增，只参考
 
 ### summary/ - 总结验证
 **用途**：存放项目总结、验证报告、完成清单  
@@ -250,6 +252,10 @@ docs/plans/2026-11-03-skill-optimization-initiative/planning/OPTION-B-FULL-COMPL
 
 ## 🔄 目录演进记录
 
+### v2.0（2026-11-04）
+- owner 指令「登记全量审查 + 规划多agent并审单个skill」：新增 process/MULTI-AGENT-PARALLEL-REVIEW-PLAN.md（v1.0）——FULL-REVIEW-ONE-PASS 的执行架构特化：K 层 fresh-source 评审者（重型组 K=3 / 其余 K=2）、盲评独立性、逐项一致率与两级仲裁（同模型→codex，外发已授权）、S0-S5 映射；启动登记表 9 项已填（含 eval 固定 claude-opus-5-5）
+- process/ 定位由「历史」改为「历史 + 全量审查方案」；与 Option B 衔接（路径甲/乙）留一项待 owner 于 S0 时定案
+
 ### v1.9（2026-11-04）
 - 评审团两项 owner 裁决落账：① 八维本体 rubric（D01+D05+D08）纳入 WP1 深读——任务1.1-1.3 新增逐 Skill rubric 判定节，WP1 投入 24-32h→26-35h；② D06/D08 处置互换——D06 改判范围外（宿主路由层海拔错位，不计数），D08 改判部分#19 入 WP1 rubric
 - 账目重算：覆盖分析 v1.3→v1.4（53→52项、21→20完全、40%→38%、差距31→32、WP1 15→16）；主计划 v3.5→v3.6（总投入 60-86/70-102 → 62-89/72-105h）
@@ -303,6 +309,6 @@ docs/plans/2026-11-03-skill-optimization-initiative/planning/OPTION-B-FULL-COMPL
 
 ---
 
-**文档版本**：v1.9  
+**文档版本**：v2.0  
 **创建日期**：2026-11-04  
 **维护者**：项目执行团队
