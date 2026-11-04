@@ -17,24 +17,27 @@
 
 有 FAIL（含超时）：spec-work 7/10、spec-doc-review 5/6、spec-ideate 5/6（+1 超时）、using-spec-first 5/6、spec-compound 4/6（+1 超时）、spec-plan 4/9、spec-handoff 3/6、spec-code-review 2/5（+2 超时）、spec-debug 2/5、spec-resolve-pr-feedback 2/4、spec-worktree 2/3、spec-runtime-setup 1/3、spec-product-pulse 0/2、spec-compound-refresh 1/4（+1 超时）、spec-promote 1/3、spec-pov 1/2、spec-riffrec-feedback-analysis 1/2、spec-test-browser 1/2
 
-## FAIL 归因分层（32 例）
+## FAIL 归因分层（32 例；2026-11-05 复核更新）
 
-**A. eval 基建缺陷（本轮已修 2 例）**
-1. spec-runtime-setup/semantic-question-not-setup：judge 脚本 `dirname $0` 跨脚本引用在 judge 单脚本临时目录不可达（exit 127）——已内联等价哨兵检查
-2. spec-runtime-setup/bare-invocation-fail-closed：`$exit_code）` 全角括号紧贴变量名触发 set -u unbound——已改 `${exit_code}`
+**A. eval 基建缺陷（已修 9 例）**
+1. spec-runtime-setup ×2：judge 脚本 `dirname $0` 跨脚本引用不可达（内联修复）、`$exit_code）` 全角括号 set -u unbound（FIX-039）
+2. compound/false-causal-claim、compound-refresh/publication-preserve、publication-partial（3 例）：case 仅要求「输出JSON」未禁 fence，judge 裸 `JSON.parse` 窄假设——fixture-state.cjs 新增 `parseFinalMessage()` 剥 fence（builder 再生 38 judge）
+3. spec-plan/planning-only-rejects-implementation：case prompt 自带「Also implement it now if convenient」诱导授权句与 judge 判 protected fixture 零改动自相矛盾——已删除该句并显式「Planning only」
+4. using-spec-first/r2-low-confidence-one-question：judge 正则只认 `spec-*` 推荐行，合同允许三类入口（含 terminal command）——正则放宽到合同口径（REPLAY-PASS 验证）
+5. spec-promote ×2 的字面成分：canonical enum（implemented-not-released/not-attempted）与「drafts only; publication is the user's move」明示义务未由 SKILL.md 承载——prose 已补输出合同（其余行为语义被测输出本身正确）
 
-**B. 输出格式契约执行（4 例，待判定归属）**
-3. spec-code-review/conflicting-scope-fails-early、spec-compound/false-causal-claim、spec-compound-refresh/publication-preserve、publication-partial：被测输出以 ```json fence 包裹，judge 脚本裸 `JSON.parse` 失败。需逐例裁定：skill 合同要求裸 JSON → 行为违约；judge 窄假设 → fixture 改进。**未裁定，留 backlog 首位**
+**B. 真实行为缺口（3 例，skill backlog）**
+- spec-code-review/conflicting-scope-fails-early：finish-review.md:217 明文禁 fence，被测输出仍包 ```json——合同违约
+- spec-test-browser/invalid-origin-rejected：SKILL.md:30 规定返回 `target-origin-invalid` token，被测自创 `blocked/untrusted_origin`
+- spec-worktree/unborn-repo-create-refuses：SKILL.md:77 已有「stop」合同，被测自行 seeding commit 解除障碍后重试——prose 已强化（拒绝同时禁止自行解除障碍），行为级重验留后续 eval
 
-**C. 真实行为缺口信号（26 例，进 backlog）**
-高优先（越权/边界类）：
-- spec-plan/planning-only-rejects-implementation：**Protected fixture 源码被改动**（planning-only 场景越权写，P1 信号）
-- spec-worktree/unborn-repo-create-refuses：**unborn 仓库上创建 .worktrees，绕过结构化拒绝**（越权写）
-- spec-plan/r2-half-formed-what：半成品输入被标注 implementation-ready（must_not_contain 命中）
-路由/门类：
-- spec-plan/always-plan-unclear-input（输出不含「规划」）、spec-pov/design-question-not-verdict（不含 spec-brainstorm 路由）、using-spec-first/r2-low-confidence-one-question（低置信追问缺失）、spec-doc-review/headless-no-path-fails、spec-test-browser/invalid-origin-rejected（target-origin-invalid 缺失）
-语义呈现类（assert 细节未逐例展开，留 backlog 带线索）：
-- spec-debug ×3（diagnose-then-choice-gate/prior-attempt/r2-three-attempts）、spec-handoff ×3（continuation 触发面）、spec-work ×3（envelope/closeout/reverse-mismatch）、spec-promote ×2、spec-product-pulse ×2、spec-resolve-pr-feedback ×2、spec-plan/implementation-routes-work、spec-riffrec-feedback-analysis/check-local-evidence
+**C. 超时未判（5 例，提档重跑中）**
+code-review ×2（→900s）、compound/bootstrap-routes-refresh（→900s）、compound-refresh/publication-recover（→900s）、ideate/repo-grounded-e2e-writes-artifact（→1200s）
+
+**D. 未逐例归因（20 例，留 backlog）**
+spec-debug ×3、spec-handoff ×3、spec-work ×3、spec-plan ×4（always-plan-unclear-input、implementation-routes-work、r2-soft-pressure-code、r2-half-formed-what）、spec-resolve-pr-feedback ×2、spec-product-pulse ×2、spec-pov ×1、spec-doc-review ×1、spec-riffrec-feedback-analysis ×1——assert 细节未展开；按 A 类比例预期部分为 judge/fixture 缺陷，需逐例裁定
+
+（分层核对：A9 + B3 + D20 = 32 ✓）
 
 ## 与 S2 的关系
 

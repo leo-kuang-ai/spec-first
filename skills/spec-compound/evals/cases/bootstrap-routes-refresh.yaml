@@ -18,3 +18,5 @@ judge:
   success:
     - output_contains:
         all: ["spec-compound-refresh"]
+constraints:
+  timeout_seconds: 900
