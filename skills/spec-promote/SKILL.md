@@ -121,7 +121,7 @@ Show every draft as a clean, copy-pasteable block, labeled by channel. For each:
 - If Spiral produced them, also surface the `session_id` and each draft's `url` so the user can open and tweak them in the Spiral web app.
 - Offer to revise (tone, length, angle, more variations, another channel).
 - **Do not post, publish, schedule, commit, or open a PR.** End by reminding the user the drafts are theirs to ship — say so explicitly (drafts only; publication is the user's move), not just by omission.
-- When the run reports machine-checkable delivery facts, use these exact tokens: `delivery_status: implemented-not-released` and `provider_attempt: not-attempted` (hyphenated, no spaces or parentheticals) when work exists locally and no provider call was made — machines match these strings verbatim.
+- When the run reports machine-checkable delivery facts, use these exact tokens: `delivery_status: implemented-not-released` and `provider_attempt: not-attempted` (hyphenated, no spaces or parentheticals) when work exists locally and no provider call was made — machines match these strings verbatim. In the same machine-readable block, `drafts[].channel` carries a lowercase machine id — `x`, `changelog`, `linkedin`, `email`, `blog`, `demo-script` — not a human label like "X post" or "Changelog blurb"; the human-facing description lives in `content`.
 - If Path 0 recorded the local preference exception, disclose that local-only write once and keep it separate from the draft-output claim.
 
 ## Examples

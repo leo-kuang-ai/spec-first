@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "skill_name": "spec-compound-refresh",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-compound-refresh",
+    "timestamp": "2026-11-04T13:03:14Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "部分发布不能被完整的成功报告掩盖",
+      "configuration": "with_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 130.409,
+        "tokens": 31962,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound-refresh/evals/fixtures/scripts/check-publication-partial.sh",
+          "passed": false,
+          "evidence": "script exited with code 1 [stderr: \u003canonymous_script\u003e:1\n核对完成。所有证据齐备：README 所述与现场一致 —— new.md 为已写入但未覆盖离线恢复的后继候选；catalog 同时含指向 `old.md#离线恢复` 的旧条目（锚点在 old.md:15 仍解析，但属指向待删路径的必修链接）和必须保留的用户人工条目；`src/auth.js` 仍保留离线备份（`keepOfflineBackup: true`），old.md 的离线恢复内容仍是有效且被实质性引用的知识，其后继覆盖缺口阻断删除。本轮零写入、零删除；基线提交已使旧内容具备 Git 可恢复性。\n^\n\nSyntaxError: Unexpected token '核', \"核对完成。所有证据齐\"... is not valid JSON\n    at JSON.parse (\u003canonymous\u003e)\n    at parseFinalMessage ([stdin]:20:15)\n    at checkKnowledgePublication ([stdin]:116:18)\n    at [stdin]:165:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n\nNode.js v22.22.3]"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0,
+        "stddev": 0,
+        "min": 0,
+        "max": 0
+      },
+      "time_seconds": {
+        "mean": 130.409,
+        "stddev": 0,
+        "min": 130.409,
+        "max": 130.409
+      },
+      "tokens": {
+        "mean": 31962,
+        "stddev": 0,
+        "min": 31962,
+        "max": 31962
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

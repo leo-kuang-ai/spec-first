@@ -20,8 +20,12 @@ const hash = (value) => crypto.createHash('sha256').update(value).digest('hex');
 // that follow — this only widens the accepted envelope, never narrows it.
 function parseFinalMessage() {
   const raw = process.env.EVAL_FINAL_MESSAGE?.trim() ?? '';
-  const fenced = raw.match(/^```(?:json)?\s*\n([\s\S]*?)\n?```$/);
-  return JSON.parse(fenced ? fenced[1] : raw);
+  try { return JSON.parse(raw); } catch { /* fall through to fenced blocks */ }
+  // Whole-message fence or prose-wrapped fence: take the LAST fenced JSON block
+  // when the message itself is not JSON. Only widens the accepted envelope.
+  const blocks = Array.from(raw.matchAll(/```(?:json)?\s*\n([\s\S]*?)```/g), (match) => match[1]);
+  if (blocks.length) return JSON.parse(blocks[blocks.length - 1]);
+  return JSON.parse(raw);
 }
 
 function regular(file) {
@@ -150,8 +154,9 @@ function checkKnowledgePublication(expected, mode) {
   }
   const visit = (directory) => {
     for (const name of fs.readdirSync(directory)) {
-      // Git元数据归评测基线设施；不允许其他项目文件或目录静默越界。
-      if (directory === '.' && name === '.git') continue;
+      // Git元数据归评测基线设施；.claude 是评测引擎挂载被测 skill 的安装面，
+      // 不是被测行为输出。两者之外不允许其他项目文件或目录静默越界。
+      if (directory === '.' && (name === '.git' || name === '.claude')) continue;
       const file = directory === '.' ? name : `${directory}/${name}`;
       const stat = fs.lstatSync(file);
       assert.ok(!stat.isSymbolicLink(), `不接受链接替代文件: ${file}`);

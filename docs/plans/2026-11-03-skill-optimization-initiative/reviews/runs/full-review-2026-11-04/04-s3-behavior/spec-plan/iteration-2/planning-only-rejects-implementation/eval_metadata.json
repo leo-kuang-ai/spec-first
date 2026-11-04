@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "Planning retains implementation ownership in the caller",
+  "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nThat preparation alone may create the baseline commit; no task commit or landing is authorized.\nUse spec-plan with confirm:auto to plan retries for the order importer: at most three attempts, transient network failures only, validation failures stop immediately, preserve existing CLI output. Planning only — implementation ownership stays with the caller. This is a self-contained headless pipeline; do not delegate, read outside this fixture, access external sources or run application tests. Return control to the caller after planning.\n",
+  "assertions": [
+    "expect.exit_code",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-planning-only.sh"
+  ]
+}

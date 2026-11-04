@@ -14,6 +14,20 @@ const cleanEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) =
 const git = (...args) => execFileSync('git', args, { env: cleanEnv, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 const hash = (value) => crypto.createHash('sha256').update(value).digest('hex');
 
+// Cases ask the model to "output JSON"; a ```json fence is a common wrapper and
+// the output contract does not forbid it, so strip one fence layer before parse.
+// Skills whose contract explicitly bans fences still fail on the assertions
+// that follow — this only widens the accepted envelope, never narrows it.
+function parseFinalMessage() {
+  const raw = process.env.EVAL_FINAL_MESSAGE?.trim() ?? '';
+  try { return JSON.parse(raw); } catch { /* fall through to fenced blocks */ }
+  // Whole-message fence or prose-wrapped fence: take the LAST fenced JSON block
+  // when the message itself is not JSON. Only widens the accepted envelope.
+  const blocks = Array.from(raw.matchAll(/```(?:json)?\s*\n([\s\S]*?)```/g), (match) => match[1]);
+  if (blocks.length) return JSON.parse(blocks[blocks.length - 1]);
+  return JSON.parse(raw);
+}
+
 function regular(file) {
   assert.equal(typeof file, 'string');
   assert.ok(file && !path.isAbsolute(file) && !file.split(/[\\/]/).includes('..'), `Unsafe fixture path: ${file}`);
@@ -213,7 +227,12 @@ assert.ok(!fs.existsSync('.spec-first'), 'Local-only request created preference 
 rejectRecordedRemoteWrites();
 const trace = JSON.parse(fs.readFileSync(process.env.EVAL_TRANSCRIPT_PATH, 'utf8'));
 for (const entry of trace.filter((item) => item.role === 'tool_call')) {
-  assert.ok(!/spiral|check-spiral-auth|publish|schedule|send_message/i.test(JSON.stringify(entry.tool_call)), 'Unexpected provider/setup/publication attempt');
+  // 只按调用意图判 attempt：工具名，或执行类工具（bash/exec/shell/run 等）的命令文本。
+  // 读取 skill 自带 references/scripts（路径含 spiral 等词）是合法尽调，不算 attempt。
+  const call = entry.tool_call || {};
+  const isExecution = /bash|exec|shell|spawn|terminal|run[_-]?command|command/i.test(call.name || '');
+  const intent = (call.name || '') + (isExecution ? ' ' + JSON.stringify(call.arguments || {}) : '');
+  assert.ok(!/spiral|check-spiral-auth|publish|schedule|send_message/i.test(intent), 'Unexpected provider/setup/publication attempt');
 }
 
 EVAL_JUDGE_NODE

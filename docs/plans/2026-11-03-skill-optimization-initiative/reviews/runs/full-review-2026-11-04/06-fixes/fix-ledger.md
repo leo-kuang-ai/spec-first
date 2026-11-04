@@ -77,9 +77,24 @@
 | 037 | spec-app-consistency-audit L1 九项（冲突降级/opt-in/stub 标记/写边界逃逸检测/参数透传/report 全域 coverage/Figma 统一） | L1 ×9 | b8f7383f |
 | 038 | spec-commit 共享 reference 双缺口：D04 消费范围限定（豁免 branch-creation 流程冲突）+ B04 安装态路径解析措辞 | R1 fail×R2 nv，确定性证实 | caa21272 |
 | 039 | spec-runtime-setup eval judge 基建 ×2（全角括号 set -u unbound / dirname 跨脚本引用不可达→内联） | S3 复核发现 | caa21272 |
+| 040 | spec-debug diagnose-then-choice-gate：prompt 补 prepare 指令 + constraints（judge 依赖 baseline receipt） | S3 D 类归因 A | 本波 |
+| 041 | ce-u28 builder 自然语言精确串匹配 ×2 放宽为 token 匹配（handoff review issue / research remaining_fact） | S3 D 类归因 A | 本波 |
+| 042 | spec-handoff ordinary-continuation prompt 补只读边界（fixture 只读，续作输出即回复） | S3 D 类归因 A | 本波 |
+| 043 | ce-u28 attempt 判定收敛到调用意图（工具名+执行类命令文本；不再扫 Read 路径）| S3 verify 重跑 | 本波 |
+| 044 | knowledge-publication visit + compound checkTree 补跳根 `.claude`（引擎 skill 挂载面） | S3 verify 重跑 | 本波 |
+| 045 | fixture-state parseFinalMessage 整串失败回退 last-fenced block（prose+fence 输出） | S3 verify 重跑 | 本波 |
+| 046 | compound source_refs 白名单补 README.md（synthetic-fixture 裁决依据） | S3 verify 重跑 | 本波 |
+| 047 | runtime-setup check-not-setup-scope Bash 全禁→只读命令白名单解析器（15 边界单测） | S3 D 类归因 A | 本波 |
+| 048 | runtime-setup bare-invocation 超时 600→1200s 提档 | S3 verify 重跑 | 本波 |
+| 049 | ce-u28 pulse 枚举期望 'ok'→'confirmed-value'（对齐 SKILL.md:71 词表）+ 校准样本同步 | S3 D 类归因 A | 本波 |
+| 050 | spec-riffrec analyzer.md 补机器可读输出合同（confirmed_requirements/coverage/source_manifest_visibility 标量枚举） | S3 D 类归因 A | 本波 |
+| 051 | spec-work prose ×3：lifecycle 授权边界（SKILL.md）/ CLI producer 点名+禁手写（return-to-caller.md:44）/ 逐字命令规则（shipping-workflow.md:157） | S3 D 类归因 B | 本波 |
+| 052 | spec-promote channel 机器 id 合同 + compound-refresh status 三值机器 token 合同（modes.md） | S3 verify3 | 本波 |
+| 053 | spec-doc-review modes.md 失败串「整条 final message」边界澄清 | S3 D 类归因 B | 本波 |
 
-## 终态对账（2026-11-05）
+## 终态对账（2026-11-05，D 类归因收口后更新）
 
-- 静态层：38/38 skill 收敛（各批次 *-convergence.md；FIX-001..039 全部 landed，无 open fail）
-- 行为层：S3 基线 118/155（backlog 见 04-s3-behavior/S3-SUMMARY.md）
+- 静态层：38/38 skill 收敛（各批次 *-convergence.md；FIX-001..053 全部 landed，无 open fail）
+- 行为层：S3 原始 118/155 → 归因后确认 130/155（提档 4 PASS + A 类修复重验 8 PASS）；A 类 15 例全部修复（13 例已验证翻转，2 例重跑收口中），B 类 17 例留 eval 迭代 backlog（合同均已承载）
+- judge 单测：ce-u28/knowledge-publication/eval-fixture-contracts 37/37；runtime-setup 白名单解析器 15/15
 - 留观清单不变；spec-prd R1 #5/#6 低频 P3 维持 deferred

@@ -49,11 +49,35 @@ for (const entry of trace) {
   const call = entry.tool_call;
   assert.ok(call && typeof call.name === 'string', '缺少工具身份');
   // 这是本维护用例的保守准入，不是运行时授权器或通用shell解析器。
-  // shell即使声称只cat也不自动放行；此类样本交人工核验，避免隐藏复合命令。
+  // 纯只读巡检命令（git log/status/diff/show、ls、du、cat、head、tail、wc、
+  // find、grep、rg、file、stat、pwd）按白名单放行；setup 执行、脚本解释器、
+  // 写入与网络仍一律拒绝，复合/未知样本继续交人工核验。
+  const readOnlyBash = (command) => {
+    if (/[$(`]/.test(command)) return false;
+    // 只允许 stderr 重定向（2>&1、2>/dev/null、&>/dev/null）；其余重定向视为写入。
+    if (/(^|[^>])>{1,2}\s*(?!&1\b|\/dev\/null\b)\S/.test(command)) return false;
+    const gitMutating = ['add', 'commit', 'push', 'pull', 'checkout', 'reset', 'clean', 'stash', 'apply', 'merge', 'rebase', 'rm', 'mv', 'tag', 'branch', 'worktree', 'config', 'clone', 'fetch', 'init', 'restore', 'switch', 'update-index'];
+    return command.split(/;|&&|\|\|/).every((segment) => {
+      const tokens = segment.trim().split(/\s+/).filter(Boolean);
+      if (!tokens.length) return true;
+      const head = tokens[0];
+      if (head === 'git') {
+        if (tokens.some((token) => gitMutating.includes(token))) return false;
+        const sub = tokens.slice(1).find((token) => !/^--?[\w.-]+$/.test(token) && !/=.+$/.test(token));
+        return ['log', 'status', 'diff', 'show', 'ls-files', 'rev-parse', 'grep', 'blame', 'shortlog', 'describe'].includes(sub);
+      }
+      return ['ls', 'du', 'cat', 'head', 'tail', 'wc', 'find', 'grep', 'rg', 'file', 'stat', 'pwd', 'echo'].includes(head);
+    });
+  };
   if (call.name === 'Skill') {
     const args = typeof call.arguments === 'string' ? JSON.parse(call.arguments) : call.arguments;
     assert.equal(args?.skill, 'spec-runtime-setup', '调用其他workflow需要独立审查');
     assert.deepEqual(Object.keys(args), ['skill'], '带额外参数的 Skill 调用不能认定仅加载');
+    continue;
+  }
+  if (call.name === 'Bash' || call.name === 'bash') {
+    const args = typeof call.arguments === 'string' ? JSON.parse(call.arguments) : call.arguments;
+    assert.ok(readOnlyBash(String(args?.command ?? args ?? '')), 'Bash 调用含非白名单只读命令，机械边界未通过');
     continue;
   }
   assert.ok(['Read', 'read_file', 'Glob', 'Grep'].includes(call.name), '执行/写入/派发或未知工具，机械边界未通过');

@@ -52,8 +52,9 @@ function checkKnowledgePublication(expected, mode) {
   }
   const visit = (directory) => {
     for (const name of fs.readdirSync(directory)) {
-      // Git元数据归评测基线设施；不允许其他项目文件或目录静默越界。
-      if (directory === '.' && name === '.git') continue;
+      // Git元数据归评测基线设施；.claude 是评测引擎挂载被测 skill 的安装面，
+      // 不是被测行为输出。两者之外不允许其他项目文件或目录静默越界。
+      if (directory === '.' && (name === '.git' || name === '.claude')) continue;
       const file = directory === '.' ? name : `${directory}/${name}`;
       const stat = fs.lstatSync(file);
       assert.ok(!stat.isSymbolicLink(), `不接受链接替代文件: ${file}`);

@@ -40,7 +40,10 @@ function oneRouteDecision() {
   noDispatch();
   assert.ok(!/Entering spec-/.test(message), 'An ambiguous request already entered a workflow');
   const questions = message.match(/[?\uFF1F\uFE56]/g) || [];
-  const recommendations = message.match(/^Recommended entrypoint:\s*spec-[a-z-]+\s*$/gm) || [];
+  // The output contract (using-spec-first SKILL.md) allows `<spec-*, standalone
+  // skill, or terminal command>` with optional trailing annotation, so count
+  // any full "Recommended entrypoint:" block line rather than only spec-*.
+  const recommendations = message.match(/^Recommended entrypoint:\s*\S[^\n]*$/gm) || [];
   assert.ok((questions.length === 1 && recommendations.length === 0)
     || (questions.length === 0 && recommendations.length === 1), 'Expected one question or one recommendation');
 }

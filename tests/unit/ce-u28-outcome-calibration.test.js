@@ -31,7 +31,7 @@ describe('U28 supplemental outcome judge calibration', () => {
       fs.mkdirSync(path.join(workspace, 'docs/pulse-reports'), { recursive: true });
       fs.writeFileSync(path.join(workspace, 'docs/pulse-reports/report.md'), 'Revenue: 1200\nActive users: permission-denied (analytics auth rejected)\n');
       report = { metrics: [
-        { name: 'revenue', source: 'payments-export', state: 'ok', value: 1200 },
+        { name: 'revenue', source: 'payments-export', state: 'confirmed-value', value: 1200 },
         { name: 'active_users', source: 'analytics-export', state: 'permission-denied', value: null },
       ], artifact_path: 'docs/pulse-reports/report.md' };
     } else if (skill === 'spec-promote') {

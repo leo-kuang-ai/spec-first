@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "Diagnosis-only requests deliver the causal chain without changing source",
+  "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nOnly preparation may create a baseline commit; it grants no task commit or landing authority.\n（spec-debug skill 已安装，请按它工作。）\n这个记账服务有个 bug:给 POST /entries 发一段非法 JSON,整个 node 进程\n直接崩掉退出,后面的请求全挂。帮我查。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-debug/evals/fixtures/scripts/check-diagnosis-no-fix.sh"
+  ]
+}

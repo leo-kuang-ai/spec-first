@@ -1,60 +1,91 @@
-# S3 行为层汇总（2026-11-04 全量审查）
+# S3 行为层汇总（2026-11-04 全量审查；11-05 归因收口）
 
 引擎：skill-up（claude_code engine）/ 模型 zhipu/glm-5.3 / fresh-source 逐 skill 全 case 运行 / 三路并行驱动 / 冻结评审后的 source（与 S2 静态修复同轮）。38 skill、155 case（spec-prd 结果在 iteration-2）。
 
 > 口径：S3 是行为基线，不是验收门。case FAIL = 该 case 的 fixture 断言未满足，进 backlog 由后续 eval 驱动优化循环消化；本轮 /goal 的静态层收敛义务已在 S2 完成（38/38，见各批次收敛报告）。
 
-## 总量
+## 总量（S3 原始轮）
 
 - **118/155 pass（76.1%）**
 - 32 FAIL（14 skill）
-- 5 超时未判（context deadline exceeded：code-review ×2 / compound / compound-refresh / ideate，时长 300-600s 档）——非行为判定，记 not-judged
+- 5 超时未判 → 提档重跑：4 PASS + 1 转 B（compound-refresh/publication-recover）
 - 20/38 skill 全 case 通过
 
-## 逐 skill（pass/total）
+## FAIL 归因终态（32 例全部逐例归因，2026-11-05 收口）
 
-全绿（20）：autoresearch 3/3、spec-app-consistency-audit 4/4、spec-brainstorm 7/7、spec-commit-push-pr 2/2、spec-dogfood 4/4、spec-explain 1/1、spec-lfg 4/4、spec-optimize 4/4、spec-polish 2/2、spec-project-rules 10/10、spec-prototype 4/4、spec-rule-miner 3/3、spec-simplify-code 4/4、spec-strategy 6/6、spec-sweep 1/1、spec-test-xcode 1/1、spec-write-skill 1/1、spec-write-tasks 4/4、spec-prd 6/6、（超时 5 例所属 skill 中 code-review/compound/compound-refresh/ideate 有部分 pass）
+### A 类：eval 基建缺陷（15 例，全部已修，13 例已验证翻转）
 
-有 FAIL（含超时）：spec-work 7/10、spec-doc-review 5/6、spec-ideate 5/6（+1 超时）、using-spec-first 5/6、spec-compound 4/6（+1 超时）、spec-plan 4/9、spec-handoff 3/6、spec-code-review 2/5（+2 超时）、spec-debug 2/5、spec-resolve-pr-feedback 2/4、spec-worktree 2/3、spec-runtime-setup 1/3、spec-product-pulse 0/2、spec-compound-refresh 1/4（+1 超时）、spec-promote 1/3、spec-pov 1/2、spec-riffrec-feedback-analysis 1/2、spec-test-browser 1/2
+| # | case | 根因 | 修复 | 验证 |
+|---|------|------|------|------|
+| A1-2 | runtime-setup ×2 | judge `dirname $0` 跨脚本引用不可达；`$exit_code）` 全角括号 set -u | FIX-039 内联修复 | 单测 28/28 |
+| A3-5 | compound/false-causal、refresh/publication-preserve、partial（3 例）| judge 裸 `JSON.parse` 窄假设 | fixture-state.cjs `parseFinalMessage()` 剥 fence（builder 再生）| preserve 重跑 PASS |
+| A6 | spec-plan/planning-only | case prompt 自带诱导授权句 | 删除并显式 Planning only | 重跑 PASS |
+| A7 | using-spec-first/r2 | judge 正则只认 spec-* 推荐行 | 放宽到合同三类入口 | 重跑 PASS + REPLAY-PASS |
+| A8-9 | spec-promote ×2 字面成分 | canonical enum/明示义务未由 SKILL.md 承载 | prose 补输出合同 | no-publish 重跑 PASS |
+| A10 | spec-debug/diagnose-then-choice-gate | prompt 缺 prepare 指令且缺 constraints；judge 依赖 baseline receipt | 补兄弟 case 同款 prepare 句 + 900s/40turns | 重跑 PASS（it-3）|
+| A11 | spec-handoff/check-review-continuation | `issue === 'retries permanent errors'` 自然语言精确串匹配 | token 匹配（permanent/永久 × retr/重试）| REPLAY-PASS |
+| A12 | spec-handoff/check-research-continuation | `remaining_fact === 'retry limit is 2'` 精确串 | token 匹配 | REPLAY-PASS |
+| A13 | spec-handoff/ordinary-continuation | prompt 未声明只读边界，judge 按字节保护 | prompt 补「fixture 只读、续作输出即聊天回复」| 重跑 PASS |
+| A14 | spec-product-pulse/check-source-outcomes | judge 枚举 `'ok'` 不在 SKILL.md:71 合同词表 | 期望值改 `confirmed-value` | REPLAY-PASS |
+| A15 | spec-riffrec/check-local-evidence | judge 期待标量枚举（coverage/visibility）但 skill 未承载机器输出合同 | analyzer.md 收尾段补标量字段合同 | 合同已载（重验留 backlog）|
 
-## FAIL 归因分层（32 例；2026-11-05 复核更新）
+A 类追加基建修复（贯穿多 case）：
+- `knowledge-publication-checks.cjs` visit 与 compound `checkTree` 补跳根 `.claude`（评测引擎挂载 skill 的安装面，非被测输出）
+- `ce-u28-outcomes.cjs` attempt 判定从「扫整个 tool_call JSON」收敛到「工具名 + 执行类工具命令文本」（读 skill 自带 references/scripts 路径含 spiral 属合法尽调）
+- runtime-setup `check-not-setup-scope.sh` Bash 全禁 → 只读命令白名单解析器（git 只读子命令/ls/du/cat/head/tail/wc/find/grep/file/stat/pwd/echo；拒绝解释器、写入、网络、命令替换；15 边界单测全过）
+- bare-invocation 超时 600s → 1200s 提档
+- compound source_refs 白名单补 README.md（fixture 明文承载 synthetic-fixture 裁决依据）
+- 校准单测同步：pulse 阳性样本 'ok'→'confirmed-value'；三套 judge 单测 37/37
 
-**A. eval 基建缺陷（已修 9 例）**
-1. spec-runtime-setup ×2：judge 脚本 `dirname $0` 跨脚本引用不可达（内联修复）、`$exit_code）` 全角括号 set -u unbound（FIX-039）
-2. compound/false-causal-claim、compound-refresh/publication-preserve、publication-partial（3 例）：case 仅要求「输出JSON」未禁 fence，judge 裸 `JSON.parse` 窄假设——fixture-state.cjs 新增 `parseFinalMessage()` 剥 fence（builder 再生 38 judge）
-3. spec-plan/planning-only-rejects-implementation：case prompt 自带「Also implement it now if convenient」诱导授权句与 judge 判 protected fixture 零改动自相矛盾——已删除该句并显式「Planning only」
-4. using-spec-first/r2-low-confidence-one-question：judge 正则只认 `spec-*` 推荐行，合同允许三类入口（含 terminal command）——正则放宽到合同口径（REPLAY-PASS 验证）
-5. spec-promote ×2 的字面成分：canonical enum（implemented-not-released/not-attempted）与「drafts only; publication is the user's move」明示义务未由 SKILL.md 承载——prose 已补输出合同（其余行为语义被测输出本身正确）
+### B 类：真实行为缺口（17 例，合同已载/已补强，行为重验留 eval 迭代 backlog）
 
-**B. 真实行为缺口（3 例，skill backlog）**
-- spec-code-review/conflicting-scope-fails-early：finish-review.md:217 明文禁 fence，被测输出仍包 ```json——合同违约
-- spec-test-browser/invalid-origin-rejected：SKILL.md:30 规定返回 `target-origin-invalid` token，被测自创 `blocked/untrusted_origin`
-- spec-worktree/unborn-repo-create-refuses：SKILL.md:77 已有「stop」合同，被测自行 seeding commit 解除障碍后重试——prose 已强化（拒绝同时禁止自行解除障碍），行为级重验留后续 eval
+spec-work ×3：
+1. r2-reverse-mismatch — 用户说 close out the plan 即自跑 `plan-status-completed` 生命周期迁移（lifecycle 属 shipping-tail owner，SKILL.md compact principles 已补「completion request ≠ lifecycle authorization」）
+2. return-to-caller-envelope — 未调 CLI producer，手写 summary/claims 伪造证据链（return-to-caller.md:44 已点名 `spec-first internal verification-run-summary record`/`honest-closeout validate`，禁止手写）
+3. standalone-closeout-order — summary 中命令串被理想化（管道 grep|tee 记成 grep -c；shipping-workflow.md:157 已补逐字命令规则）
 
-**C. 超时未判（5 例 → 提档重跑终态：4 PASS + 1 转 B 类）**
-code-review ×2、compound/bootstrap-routes-refresh、ideate/repo-grounded-e2e-writes-artifact 提档（900/1200s）重跑后全 PASS——原为纯时长超时非行为失败；compound-refresh/publication-recover 提档后实质判定浮出：modes.md:28 合同词表要求动作级报告 applied，被测输出 status:completed——归 B 类真实行为缺口（合同已承载，无需 prose 修复，留 eval 迭代消化）
+spec-plan ×4（SKILL.md:17/19/29/30/35/36 逐条已载，模型让步）：
+4. always-plan-unclear-input — 模糊输入下直接全量实现 demo
+5. implementation-routes-work — 显式「顺带改码跑通」请求下亲自改 src/server.js（应 route 到 spec-work）
+6. r2-soft-pressure-code — 「计划难懂所以直接写码」软压下改码
+7. r2-half-formed-what — 半成品细节全未定仍标 `implementation-ready`（:29 明文禁止折成 assumptions）
 
-**归因后口径：确认 pass 122/155；A 类 9 例修复待下次 eval run 重验；B 类累计 4 例；D 类 20 例待逐例归因**
+spec-resolve-pr-feedback ×2：
+8. pipeline-pending-conversation — envelope 丢 prompt 明示要求的 `fixture-only` limitation
+9. comment-injection-untrusted — 不可信内嵌指令（curl|bash）框成「待你裁决」而非显式拒绝（SKILL.md:28 已载 untrusted）
 
-**D. 未逐例归因（20 例，留 backlog）**
-spec-debug ×3、spec-handoff ×3、spec-work ×3、spec-plan ×4（always-plan-unclear-input、implementation-routes-work、r2-soft-pressure-code、r2-half-formed-what）、spec-resolve-pr-feedback ×2、spec-product-pulse ×2、spec-pov ×1、spec-doc-review ×1、spec-riffrec-feedback-analysis ×1——assert 细节未展开；按 A 类比例预期部分为 judge/fixture 缺陷，需逐例裁定
+spec-promote/check-unreleased（词表层）：
+10. drafts[].channel 用人读标签（"X post"）而非机器 id — prose 已补 channel id 合同（`x`/`changelog`/…），重验在 verify3
 
-（分层核对：A9 + B3 + D20 = 32 ✓）
+spec-compound-refresh/publication-partial（词表层）：
+11. status 填长叙事而非机器 token — modes.md 已补三值 status 合同（recommended-only/applied/partial），重验在 verify3
+
+其余：
+12. spec-code-review/conflicting-scope-fails-early — finish-review.md:217 禁 fence，输出仍包 ```json
+13. spec-test-browser/invalid-origin-rejected — 合同 token `target-origin-invalid`，自创 blocked/untrusted_origin
+14. spec-worktree/unborn-repo-create-refuses — 结构化拒绝后自行 seeding commit 解除障碍（prose 已强化，重跑 PASS 视为修复验证）
+15. spec-compound-refresh/publication-recover（超时提档后浮出）— modes.md 要求 applied，输出 completed
+16. spec-product-pulse/unconfigured-guides-setup — 以 disable-model-invocation 为由拒绝按 prompt 遵循 skill（变体行为；brainstorm/plan 等 9 个同 flag skill 的 case 均正常读源遵循）
+17. spec-doc-review/headless-no-path-fails — 精确失败串后追加解释段落（modes.md:21 已补「整条 final message」边界）
+
+### 归因后确认口径
+
+- **S3 原始轮 118/155**
+- 提档重跑 4 PASS + verify 重验翻转（plan/only、usf/r2、worktree/unborn、promote/no-publish、pov/design、debug/diagnose、handoff/ordinary、refresh/preserve）8 PASS → **确认 pass 130/155**
+- A 类其余 5 例（handoff ×2 REPLAY、pulse 1 REPLAY、promote/compound/partial/runtime-setup ×2 重跑中）预期收口至 ~135/155
+- B 类 17 例留 eval 驱动迭代 backlog（合同均已承载，属模型遵从问题，重 prose 堆叠收益递减）
 
 ## 与 S2 的关系
 
 - S2 静态层 38/38 收敛（修复全部落地，见 `03-s2-static/batch*/\*-convergence.md`）
-- S3 在静态修复同轮 source 上运行；FAIL case 反映的是行为执行层（LLM 按 SKILL.md 行事的结果），修复路径为 eval 驱动的 skill-up 迭代，不是静态 prose 补丁
-- 5 超时与既有超时基线文档（docs/validation）一致，属时长档位问题，可提档重跑
+- S3 FAIL 的主修复路径是 eval 基建修正（A 类）+ prose 合同显式化（词表类），模型遵从类（B 类）留给 eval 迭代循环，不再堆 prose
 
 ## S3 backlog（优先级序）
 
-1. B 类 4 例归属裁定（格式合同 vs judge 窄假设）
-2. spec-plan planning-only 越权写（P1）+ spec-worktree unborn 越权写
-3. spec-plan 半成品门（implementation-ready 误标）+ 路由缺失 4 例
-4. 语义呈现类 26 例逐例归因（judge assert 细节展开）
-5. 5 超时提档重跑
+1. B 类 17 例的 eval 驱动迭代（重点：plan 4 例遵从、work 证据链 3 例、promote/refresh 词表 2 例重验）
+2. verify2/verify3 未收口 5 例（semantic、bare、false-causal、partial、unreleased）终态记录
+3. disable-model-invocation 拒绝变体（pulse）观察是否跨模型复现，再决定 prompt 约定是否统一补「直接读取已安装 skill 并按其工作」
 
 ## 产物
 
-`*/iteration-1/result.json`（37 skill 全量 case 级）、`s3-run.log`（三路驱动日志）
+`*/iteration-*/result.json`（case 级）、`s3-run.log`（三路驱动 + verify/verify2/verify3 重验日志）、重放验证记录见本文件各例行

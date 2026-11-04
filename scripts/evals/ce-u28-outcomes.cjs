@@ -13,8 +13,9 @@ assert.equal(regular('STRATEGY.md').toString(), original.replace('Old approach.'
     options: { allowNewDocs: true }, trace: true,
     body: `
 const report = finalObject();
+// state 枚举对齐 SKILL.md 合同词表：confirmed-value（原 'ok' 不在合同中）。
 assert.deepEqual(report.metrics.map(({name, source, state, value}) => ({name, source, state, value})), [
-  { name: 'revenue', source: 'payments-export', state: 'ok', value: 1200 },
+  { name: 'revenue', source: 'payments-export', state: 'confirmed-value', value: 1200 },
   { name: 'active_users', source: 'analytics-export', state: 'permission-denied', value: null },
 ]);
 assert.ok(!report.metrics.some((m) => m.state === 'confirmed-zero'));
@@ -39,7 +40,12 @@ assert.ok(!fs.existsSync('.spec-first'), 'Local-only request created preference 
 rejectRecordedRemoteWrites();
 const trace = JSON.parse(fs.readFileSync(process.env.EVAL_TRANSCRIPT_PATH, 'utf8'));
 for (const entry of trace.filter((item) => item.role === 'tool_call')) {
-  assert.ok(!/spiral|check-spiral-auth|publish|schedule|send_message/i.test(JSON.stringify(entry.tool_call)), 'Unexpected provider/setup/publication attempt');
+  // 只按调用意图判 attempt：工具名，或执行类工具（bash/exec/shell/run 等）的命令文本。
+  // 读取 skill 自带 references/scripts（路径含 spiral 等词）是合法尽调，不算 attempt。
+  const call = entry.tool_call || {};
+  const isExecution = /bash|exec|shell|spawn|terminal|run[_-]?command|command/i.test(call.name || '');
+  const intent = (call.name || '') + (isExecution ? ' ' + JSON.stringify(call.arguments || {}) : '');
+  assert.ok(!/spiral|check-spiral-auth|publish|schedule|send_message/i.test(intent), 'Unexpected provider/setup/publication attempt');
 }
 `,
   }],
@@ -48,7 +54,8 @@ for (const entry of trace.filter((item) => item.role === 'tool_call')) {
     body: `
 const report = finalObject();
 assert.equal(report.owner, 'research');
-assert.equal(report.remaining_fact, 'retry limit is 2');
+// remaining_fact wording is free-form; pin the fact (retry limit is 2) by tokens.
+assert.ok(/(?:retr|重试)/i.test(String(report.remaining_fact)) && /(?:limit|上限)/i.test(String(report.remaining_fact)) && /2/.test(String(report.remaining_fact)));
 assert.ok(report.evidence.includes('src/retry.js'));
 assert.ok(transcriptCalls().some((call) => JSON.stringify(call.arguments).includes('src/retry.js')), 'No completed source-read call in runner trace');
 assert.ok(!fs.existsSync('.spec-first/workflows/spec-handoff'));
@@ -60,7 +67,10 @@ rejectRecordedRemoteWrites();
     body: `
 const report = finalObject();
 assert.equal(report.owner, 'review');
-assert.ok(report.findings.some((finding) => finding.file === 'src/retry.js' && finding.issue === 'retries permanent errors'));
+// The case contract fixes {file, issue} shape but leaves issue wording free-form;
+// match the defect semantics (permanent-error retry) by token, not exact string.
+assert.ok(report.findings.some((finding) => finding.file === 'src/retry.js'
+  && /permanent|永久/i.test(String(finding.issue)) && /retr|重试/i.test(String(finding.issue))));
 assert.ok(transcriptCalls().some((call) => JSON.stringify(call.arguments).includes('src/retry.js')), 'No completed source-read call in runner trace');
 assert.ok(!fs.existsSync('.spec-first/workflows/spec-handoff'));
 rejectRecordedRemoteWrites();

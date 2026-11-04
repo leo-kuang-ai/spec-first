@@ -217,13 +217,15 @@ assert.equal(report.supported_cause, 'credential-source', '不得把路径/关�
 assert.equal(report.scope, 'synthetic-fixture', '合成实验不能外推生产效果');
 assert.ok(Array.isArray(report.source_refs));
 for (const file of ['before.json', 'after.json', 'src/client.cjs']) assert.ok(report.source_refs.includes(file), '缺少核心因果证据');
-assert.ok(report.source_refs.every((file) => ['before.json', 'after.json', 'src/client.cjs', 'verify.cjs'].includes(file)), '引用了无关或不存在的证据');
+// README.md 记载「本仓库是固定合成实验」，直接支撑 scope: synthetic-fixture 的裁决，属合法引用。
+assert.ok(report.source_refs.every((file) => ['before.json', 'after.json', 'src/client.cjs', 'verify.cjs', 'README.md'].includes(file)), '引用了无关或不存在的证据');
 assert.equal(regular('prepare-eval.cjs').toString(), execFileSync('git', ['show', 'HEAD:prepare-eval.cjs'], { env: cleanEnv, encoding: 'utf8' }));
 const allowed = new Set(${JSON.stringify([...Object.keys(causalManifest), 'prepare-eval.cjs'])});
 assert.equal(git('ls-files', '-v', '-z'), [...allowed].sort().map((file) => 'H ' + file + '\\0').join(''), '索引标志变化');
 function checkTree(directory = '.') {
   for (const name of fs.readdirSync(directory)) {
-    if (directory === '.' && name === '.git') continue;
+    // .git 归评测基线设施；.claude 是评测引擎挂载被测 skill 的安装面，均非被测输出。
+    if (directory === '.' && (name === '.git' || name === '.claude')) continue;
     const file = directory === '.' ? name : directory + '/' + name;
     const stat = fs.lstatSync(file);
     assert.ok(!stat.isSymbolicLink(), '不接受链接路径');

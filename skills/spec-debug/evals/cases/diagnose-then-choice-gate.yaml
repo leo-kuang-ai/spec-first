@@ -8,6 +8,8 @@ description: |
 
 input:
   prompt: |
+    First run `node prepare-eval.cjs` once in this isolated fixture.
+    Only preparation may create a baseline commit; it grants no task commit or landing authority.
     （spec-debug skill 已安装，请按它工作。）
     这个记账服务有个 bug:给 POST /entries 发一段非法 JSON,整个 node 进程
     直接崩掉退出,后面的请求全挂。帮我查。
@@ -17,6 +19,10 @@ context:
   git:
     init: true
     checkout: main
+
+constraints:
+  timeout_seconds: 900
+  max_turns: 40
 
 judge:
   type: script

@@ -1,0 +1,9 @@
+bare 调用正在后台运行中（surface 绑定已通过，无立即报错——说明这次进入了实际安装流程：MCP 依赖安装、CodeGraph/Graphify 安装与索引都需要时间）。等待任务完成通知后我会汇报 readiness 结果。
+
+重试已启动（ID: `bu0ndj81m`）。等待完成通知后汇报 readiness。
+
+**当前进展小结**：
+1. 首次 bare 调用被 `host-invocation-surface-unverified` 阻断 —— skill 安装位置 `.claude/skills/` 不是宿主 generated surface。
+2. 按 skill 的结构化 next action 运行 `spec-first init --claude`（HOME 隔离），生成 `.claude/spec-first/workflows/` 投射，skill 迁移至该 managed 根。
+3. 第二次 bare 从 generated surface 执行：MCP 三件套（sequential-thinking / context7 / codegraph 配置）、host runtime、hooks、generated manifest 全部 ready；但 Graphify 的 uv 安装在 2 分钟内部超时（隔离 HOME 冷缓存全量下载），导致 Provider 阶段整体阻断，codegraph 的 install/init/index 连带未执行。
+4. 现在带着已预热的 uv 缓存重试。

@@ -154,7 +154,7 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
      --json
    ```
 
-   保存返回的 `run_summary_ref`。Helper 不执行或重跑命令、不推断 exit code、不深度清洗日志；它只验证 payload、路径、日志前缀和 schema。相同 workspace/run-id 的 summary 是 immutable；`run-summary-already-exists` 不能通过覆盖旧文件修复，必须保留 reason 并停止 verified closeout claim。
+   保存返回的 `run_summary_ref`。Helper 不执行或重跑命令、不推断 exit code、不深度清洗日志；它只验证 payload、路径、日志前缀和 schema。`checks[].command` 必须逐字等于本次运行实际执行的命令串（含管道、重定向与前缀变量展开后的最终形态）；把实际执行过的 pipeline 改写成理想化的单命令字符串（如把 `grep -n … | tee log` 记成 `grep -c …`）属于伪造验证证据，即使结果数值一致。相同 workspace/run-id 的 summary 是 immutable；`run-summary-already-exists` 不能通过覆盖旧文件修复，必须保留 reason 并停止 verified closeout claim。
 
    **C. 校验 structured claims。** 使用实际 run summary 组装 validation claims；review/impact claims 只能引用 target repo 内真实存在的普通文件，例如上一步物化的 review summary、source/plan 或 changed-surface evidence。运行：
 

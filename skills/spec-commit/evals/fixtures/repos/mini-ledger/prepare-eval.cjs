@@ -18,8 +18,12 @@ const hash = (value) => crypto.createHash('sha256').update(value).digest('hex');
 // that follow — this only widens the accepted envelope, never narrows it.
 function parseFinalMessage() {
   const raw = process.env.EVAL_FINAL_MESSAGE?.trim() ?? '';
-  const fenced = raw.match(/^```(?:json)?\s*\n([\s\S]*?)\n?```$/);
-  return JSON.parse(fenced ? fenced[1] : raw);
+  try { return JSON.parse(raw); } catch { /* fall through to fenced blocks */ }
+  // Whole-message fence or prose-wrapped fence: take the LAST fenced JSON block
+  // when the message itself is not JSON. Only widens the accepted envelope.
+  const blocks = Array.from(raw.matchAll(/```(?:json)?\s*\n([\s\S]*?)```/g), (match) => match[1]);
+  if (blocks.length) return JSON.parse(blocks[blocks.length - 1]);
+  return JSON.parse(raw);
 }
 
 function regular(file) {

@@ -8,6 +8,7 @@ input:
     First run `node prepare-eval.cjs` once in this isolated fixture.
     Only preparation may create a baseline commit; it grants no task commit or landing authority.
     Use spec-handoff only if its scope applies. Continue the current work in this conversation; move to the next step.
+    State the next step inline in your reply. This fixture repo is read-only for you: do not modify tracked files or create new ones; the continuation output is the chat reply itself.
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger
   git:
