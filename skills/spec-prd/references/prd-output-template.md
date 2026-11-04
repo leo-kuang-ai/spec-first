@@ -352,7 +352,7 @@ Large-input Map-Reduce results must enter final PRD rewrite through the same sec
 
 For oversized, multi-source, long-chain, or resume-risk runs, `large-input-checkpoint.md` may write reduced candidates earlier as PRD checkpoints. Ordinary short PRDs still wait until closure before durable write-in. Checkpoint content uses existing sections and source refs; it never creates a transcript or progress schema.
 
-When the run uses `checkpoint-prd`, write it as a recovery checkpoint, not a final PRD. A checkpoint-prd must include `can_enter_spec-plan: no`, `next_owner_question`, open owner/source gaps, and `write_mode=checkpoint-prd` in `Readiness Self-Check` or closeout. It is not a final PRD and must not be presented as planning-ready. The relentless fallback uses this shape: when the owner gives no cap/continue signal — whether absent/headless or silent after a soft-cap offer (the observable signal is the same) — stop here with `pre_prd_clarification_status=checkpoint-blocked` rather than silently emitting `ready-for-planning`.
+When the run uses `checkpoint-prd`, write it as a recovery checkpoint, not a final PRD. A checkpoint-prd must include `can_enter_spec_plan: no`, `next_owner_question`, open owner/source gaps, and `write_mode=checkpoint-prd` in `Readiness Self-Check` or closeout. It is not a final PRD and must not be presented as planning-ready. The relentless fallback uses this shape: when the owner gives no cap/continue signal — whether absent/headless or silent after a soft-cap offer (the observable signal is the same) — stop here with `pre_prd_clarification_status=checkpoint-blocked` rather than silently emitting `ready-for-planning`.
 
 ## P0 PRD Quality Packs
 
@@ -549,7 +549,7 @@ For create/refine when a PRD artifact path exists, run `skills/spec-prd/scripts/
 
 The script seeds only the deterministic lines: sections included, requirement count, acceptance example count, priority distribution, NFR count, assumption count, outstanding question count, uncovered requirements, feature-to-R/AE trace gaps, finding count, blocking reason_codes, and producer receipt status. The lines `Resolved before planning`, `Still carried`, `planning recheck item count`, `current-state claims without confirmed evidence`, `readiness_outcome`, and whether planning would still have to invent WHAT stay LLM-owned: the checker intentionally does not and must not compute them, because deciding which sentence is a load-bearing source-candidate recheck item or current-state claim and whether its evidence genuinely confirms is semantic (the script reports `evidence_tags_present` by presence only, not sufficiency).
 
-For `write_mode=checkpoint-prd`, closeout wording must remain non-ready recovery: repeat `can_enter_spec-plan: no`, name `next_owner_question` or the next source question, keep `readiness_outcome=revise-prd` or `readiness_outcome=ask-owner`, and do not recommend planning. A checkpoint may preserve recoverable context, but it is not a final PRD and not a planning handoff.
+For `write_mode=checkpoint-prd`, closeout wording must remain non-ready recovery: repeat `can_enter_spec_plan: no`, name `next_owner_question` or the next source question, keep `readiness_outcome=revise-prd` or `readiness_outcome=ask-owner`, and do not recommend planning. A checkpoint may preserve recoverable context, but it is not a final PRD and not a planning handoff.
 
 When `## Feature Slices` is present, or when PRD complexity was explicitly evaluated for slice need, additionally report:
 

@@ -90,7 +90,7 @@ This makes the PRD file the checkpoint. Progress is derived from PRD sections:
 - `Outstanding Questions` = owner closure still needed
 - `Planning Recheck` = downstream must re-read, re-run, or re-confirm before selecting HOW
 
-`checkpoint-prd` is not a final PRD. When checkpoint write-in is used, set `write_mode=checkpoint-prd`, `can_enter_spec-plan: no`, and `next_owner_question` in Readiness Self-Check or closeout, and list the unclosed owner/source gaps. The checkpoint preserves recoverable context; it must not be described as `ready-for-planning`.
+`checkpoint-prd` is not a final PRD. When checkpoint write-in is used, set `write_mode=checkpoint-prd`, `can_enter_spec_plan: no`, and `next_owner_question` in Readiness Self-Check or closeout, and list the unclosed owner/source gaps. The checkpoint preserves recoverable context; it must not be described as `ready-for-planning`.
 
 ## Resume Discipline
 
