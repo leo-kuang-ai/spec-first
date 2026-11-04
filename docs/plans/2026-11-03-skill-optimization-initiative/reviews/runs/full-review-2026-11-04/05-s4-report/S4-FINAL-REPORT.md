@@ -8,8 +8,8 @@
 |---|---|---|
 | S0/S1 | 登记、方案、试点（spec-plan/spec-code-review K=3） | 完成 |
 | S2 静态 | 38 skill × 18 维 × K=2/3 分层盲评 + L1 仲裁 + 修复 | **完成：38/38 收敛** |
-| S3 行为 | 38 skill × 155 case（skill-up fresh-source，zhipu/glm-5.3） | **基线完成：118/155 pass（76.1%）**，30 case 进 backlog、5 超时未判、4 待裁定 |
-| 修复落地 | FIX-001..039 | **全部 landed**（见 fix-ledger 对账） |
+| S3 行为 | 38 skill × 155 case（skill-up fresh-source，zhipu/glm-5.3） | **基线+归因收口：原始 118/155 → 确认 133/155（85.8%）**；32 FAIL + 5 超时全部逐例归因（A 类 eval 基建 15 例全修复验证、B 类真实行为缺口 17 例 backlog），见 04-s3-behavior/S3-SUMMARY.md |
+| 修复落地 | FIX-001..053 | **全部 landed**（见 fix-ledger 对账） |
 
 评审者：R1 zhipu/glm-5.3 / R2 gpt-6.1-sol（ai-qianxing2 备用）/ R3 kiro/kimi-k3（批次1 K=3）/ L1 仲裁 hst-2/gpt-6-astra。冻结 worktree 5b59293b，修复落主仓。
 
@@ -40,10 +40,9 @@
 
 ## S3 行为基线（非验收门）
 
-- 118/155 pass；20/38 skill 全 case 通过
-- 已修 eval 基建 2 例（runtime-setup judge 脚本 bug，FIX-039）
-- 待裁定 4 例（```json fence × JSON.parse：格式合同 vs judge 窄假设）
-- 高优先 backlog：spec-plan planning-only 越权写（P1）、spec-worktree unborn 越权写、半成品门 + 路由缺失 4 例、语义呈现类逐例归因
+- 原始 118/155（20/38 skill 全 case 通过）→ 归因收口后确认 133/155
+- 全部 32 FAIL + 5 超时逐例归因：A 类 eval 基建 15 例（judge 窄假设/prompt-judge 失配/词表未承载/引擎挂载面/.claude 跳过/只读 Bash 白名单等，全部修复，11 例重跑翻转 + 3 例 REPLAY-PASS + 1 例合同承载）；B 类真实行为缺口 17 例 open backlog（work 证据链 ×3、plan 遵从 ×4、debug prior-attempt ×2、resolve-pr ×2、词表违约 ×3、fail-closed/脚手架引用/拒绝变体/整条消息 ×4——合同均已承载，留 eval 驱动迭代）
+- 修复登记 FIX-001..053；judge 校准单测 37/37 + ce-outcome 30/30；runtime mirror 再生、test:mcp-setup 与 doctor 复验绿
 - 5 超时（300-600s 档）可提档重跑
 
 ## 诚实边界
