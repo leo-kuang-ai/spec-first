@@ -336,6 +336,33 @@ describe('spec-code-review current contracts', () => {
     expect(counts.get('diff')).toBe(1);
   });
 
+  test('ordinary behavior review carries applicable product rules to reviewers without assuming local remote-head truth', () => {
+    const intent = fs.readFileSync(path.join(repoRoot, 'skills/spec-code-review/references/intent-and-plan.md'), 'utf8');
+    const dispatch = fs.readFileSync(path.join(repoRoot, 'skills/spec-code-review/references/dispatch-reviewers.md'), 'utf8');
+    expect(skillEntry).toContain('bounded applicable product-rule slice before dispatch or inline review');
+    expect(intent).toContain('### Stage 2b.1: Applicable product-rule context');
+    expect(intent).toContain('Scope Boundaries');
+    expect(intent).toContain('permission/state/exception rules');
+    expect(intent).toContain('selected Task Card');
+    expect(intent).toContain('git show <head>:<path>');
+    expect(intent).toContain('local-only plan cannot be used as a rule');
+    expect(dispatch).toContain('Stage 2b.1 applicable product-rule slice');
+    expect(subagentTemplate).toContain('Applicable product rules (bounded source refs');
+    expect(subagentTemplate).toContain('re-read cited sections before a consequential compliance finding');
+    expect(subagentTemplate).toContain('disclose a missing rule source');
+  });
+
+  test('inline degraded review keeps bounded business-rule and learning discovery without claiming independent coverage', () => {
+    const scope = fs.readFileSync(path.join(repoRoot, 'skills/spec-code-review/references/scope.md'), 'utf8');
+    const fallback = scope.split('### Stage 1c: Dispatch gate and inline fallback')[1];
+    expect(fallback).toContain('Stage 2b.1 applicable product-rule context');
+    expect(fallback).toContain('docs/solutions/');
+    expect(fallback).toContain('CONCEPTS.md');
+    expect(fallback).toContain('not an executed learnings persona');
+    expect(fallback).toContain('`status: degraded`');
+    expect(fallback).toContain('`verdict: Not ready`');
+  });
+
   test('task review context is paired, digest-pinned, and honestly scoped', () => {
     expect(skill).toContain('`task-pack:<path>`');
     expect(skill).toContain('`task:<task_id>`');

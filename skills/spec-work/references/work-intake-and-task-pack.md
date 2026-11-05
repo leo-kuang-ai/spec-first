@@ -84,7 +84,7 @@ The canonical body hash intentionally excludes Markdown frontmatter, so a matche
 - requirements-only, knowledge-work/non-code, progress-like readiness, HTML metadata/content-shape conflict, or lifecycle/source-path ambiguity stops execution;
 - legacy compatibility follows the direct-plan rules rather than being invented from task-pack prose.
 
-Read the source plan with the unified section-map strategy: metadata, Goal Capsule, relevant Requirements and Scope Boundaries/non-goals, Planning Contract KTDs cited by current tasks, Verification Contract, Definition of Done, and only the source units/refs needed for the active wave. The source plan remains authoritative for scope, acceptance, architecture, non-goals, verification, and lifecycle; the task pack compresses execution order and task context.
+Read the source plan with the unified section-map strategy: metadata, Goal Capsule, relevant Requirements and Scope Boundaries/non-goals, and any plan-wide product permission, state-transition, or exception invariant applicable to the active wave. Also read the Product Contract Key Decisions governing its R-IDs, Planning Contract KTDs cited by current tasks, Verification Contract, Definition of Done, and only the source units/refs needed for that wave. Carry applicable global constraints into the task/worker packet even when a Task Card omits them; if a relevant invariant cannot be located or reconciled, keep the affected behavior decision open rather than treating the task pack as a replacement for product authority. The source plan remains authoritative for scope, acceptance, architecture, non-goals, verification, and lifecycle; the task pack compresses execution order and task context.
 
 ## 3. Semantic-Fit Gate
 
@@ -101,7 +101,7 @@ If the pack omitted a material unit or conflicts with scope/non-goals/KTD, retur
 
 ## 4. Create Task Tracker From The Contract
 
-Use `validation_receipt.task_pack.contract.tasks` and `execution_waves` as the executable task source. Preserve each `task_id` in the platform task subject and carry `source_unit`, `requirement_refs`, dependencies, goal, files, `test_focus`, `done_signal`, `stop_if`, review intent, and repo scope into the bounded worker packet. Also carry `context_refs`, `notes` and `risk_note` from the full task object: the abbreviated `execution_focus` view is not a lossless task packet. Reconcile inherited proof-test/seam refs, settled decisions and external/manual done signals with the current source plan; preserve their protection intent in execution and verification evidence. Unbound or stale proof stays explicit and cannot become a synthetic passed check.
+Use `validation_receipt.task_pack.contract.tasks` and `execution_waves` as the executable task source. Preserve each `task_id` in the platform task subject and carry `source_unit`, `requirement_refs`, dependencies, goal, files, `test_focus`, `done_signal`, `stop_if`, review intent, and repo scope into the bounded worker packet. Also carry `context_refs`, `notes` and `risk_note` from the full task object, plus the applicable plan-wide constraints and their source section titles: the abbreviated `execution_focus` view is not a lossless task packet. Reconcile inherited proof-test/seam refs, settled decisions and external/manual done signals with the current source plan; preserve their protection intent in execution and verification evidence. Unbound or stale proof stays explicit and cannot become a synthetic passed check.
 
 Create tasks wave by wave in dependency order. Do not create a parallel task decomposition from the source plan or human-readable Task Cards. Human-readable sections may orient the executor, but they cannot override the validated JSON contract.
 
@@ -140,7 +140,7 @@ At work intake, pin `work_run_base` to the current `HEAD` before plan-owned muta
 After task implementation and focused verification, compare current filesystem/git facts with the pre-task facts and build `spec-code-review-task-context/v1`:
 
 - `task_pack_digest`, `source_plan`, and `work_run_base`;
-- `source_plan_section_titles`: the selected Task Card's relevant live-plan headings, derived from its `source_unit` and current source-plan structure; this is a path-plus-title label only, never plan body, hash, byte range, or anchor grammar;
+- `source_plan_section_titles`: the selected Task Card's relevant live-plan headings plus the applicable plan-wide constraint and governing Product Contract Key Decision headings identified at intake, derived from its `source_unit`, requirement refs, and current source-plan structure; this is a path-plus-title label only, never plan body, hash, byte range, or anchor grammar;
 - `pre_task_dirty_files`, `pre_task_untracked_files`, and `pre_task_file_facts`;
 - added/modified/deleted/renamed `task_delta_files` with current hashes;
 - `task_owned_untracked_files` only for files absent before the task and now present;

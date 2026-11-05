@@ -80,7 +80,7 @@ Load only selected prompt assets. Resolve any path placeholders to the verified 
 2. Shared diff-scope rules from `references/diff-scope.md`
 3. The JSON output contract from `references/findings-schema.json`
 4. PR metadata: title, body, and URL when reviewing a PR (empty string otherwise). Passed in a `<pr-context>` block so reviewers can verify code against stated intent
-5. Review context: intent summary, file list, diff, scope mode (`local-aligned` | `pr-remote` | `branch-remote`), and remote head ref (`PR_HEAD_REF` or `<branch-head-ref>`) when set
+5. Review context: intent summary, file list, diff, the Stage 2b.1 applicable product-rule slice (exact source path/section, reviewed source identity, relevant rule text and limitations) for reviewers whose concerns depend on product behavior, scope mode (`local-aligned` | `pr-remote` | `branch-remote`), and remote head ref (`PR_HEAD_REF` or `<branch-head-ref>`) when set. Do not substitute a local-only plan for the remote reviewed head or send the entire plan as a generic reviewer prompt.
 6. Run ID and reviewer name for the artifact file path
 7. **For `project-standards` only:** the Stage 3b criteria mapping — each standards file with the changed files it governs — wrapped in a `<standards-paths>` block appended to the review context
 8. **For `data-migration` only:** the resolved review base ref from Stage 1 (`BASE:` marker), wrapped in `<review-base>` inside the review context so schema drift checks never assume `main`

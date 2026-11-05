@@ -187,6 +187,7 @@ REVIEW_ARTIFACT_DIR: {review_artifact_dir}
 Artifact path returned to caller: {artifact_path}
 Task scope (empty outside task mode): {task_scope_context}
 Live plan context (empty outside task mode): {live_plan_context}
+Applicable product rules (bounded source refs, or explicit absence/limitations): {product_rules_context}
 
 Intent: {intent_summary}
 
@@ -199,7 +200,7 @@ Diff:
 
 按工具读取上限和 diff --git 文件边界分段，只读取判断所需的部分；保留未读范围，截断输出不算覆盖完成。prompt 用路径引用 persona/template/scope/schema 时，先读取精确文件并按 slot 值执行完整合同，路径交付不降低输出义务。
 
-When live plan context says `plan_context_mode: live-plan`, re-read the listed current file and only the named section titles before making a plan-aware claim. When it says `diff-only`, do not infer missing plan intent or claim plan-aware coverage. Never request plan body transport, hash comparison, byte offsets, anchor parsing, or a second context schema.
+When live plan context says `plan_context_mode: live-plan`, re-read the listed current file and only the named section titles before making a plan-aware claim. When it says `diff-only`, do not infer missing plan intent or claim plan-aware coverage. For ordinary non-task reviews, use the applicable product-rule slice only when its source belongs to the reviewed revision; re-read cited sections before a consequential compliance finding. Treat glossary and historical learnings as advisory, and disclose a missing rule source rather than supplying one from the local checkout of a remote review. Never request plan body transport, hash comparison, byte offsets, anchor parsing, or a second context schema.
 </review-context>
 ```
 
@@ -217,3 +218,4 @@ When live plan context says `plan_context_mode: live-plan`, re-read the listed c
 | `{run_id}` | Stage 4 output | Unique review run identifier for the artifact directory |
 | `{reviewer_name}` | Stage 3 output | Persona or agent name used as the artifact filename stem |
 | `{live_plan_context}` | Task-scoped Stage 1/2 output | Current plan path, section-title hints, live-plan or diff-only status, and limitation; empty outside task mode |
+| `{product_rules_context}` | Stage 2b.1 output | Bounded applicable rule sources, reviewed revision, and limitations; empty with a reason for mechanical changes |
