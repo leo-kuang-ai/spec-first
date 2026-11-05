@@ -34,7 +34,7 @@
 - L1 裁决 fail 不成立（R2 断言被证伪）：spec-sweep B02（源码已有规范化规则）
 - L1 建议判 80/20 留观：test-browser 内部总预算调优（确定性恢复缺口已由 pending-receipt 关闭）
 
-## 修复台账摘要（静态层 FIX-001..039；行为层 FIX-040..057 见 S3 节与 ledger）
+## 修复台账摘要（静态层 FIX-001..039；行为层 FIX-040..060 见 S3 节与 ledger）
 
 批次1（001..010 详见 ledger）：spec-plan/runtime-maintenance 引用、prd D05 复述密度、write-tasks 假护栏复活、work run.json 断链、commit-push-pr 保留清单等；批次2（011..014）：Python>=3.10 全仓护栏、provider-readiness 字段合同等；批次3（015..021）+022；批次4/5+audit/autoresearch（023..039）。**全部有窄验证（合同/单元测试绿）**，验证记录见 ledger。
 
@@ -59,5 +59,5 @@
 - `03-s2-static/batch{1..5}/`：盲评原文、L1、收敛报告、matrix.py
 - `04-s3-behavior/`：38 skill result.json + S3-SUMMARY.md
 - `05-s4-report/`：本报告
-- `06-fixes/fix-ledger.md`：FIX-001..039 对账
+- `06-fixes/fix-ledger.md`：FIX-001..060 对账
 - `evidence/`：codex 外发授权与落盘审计
