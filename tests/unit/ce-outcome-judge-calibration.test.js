@@ -125,6 +125,13 @@ describe('CE outcome judge counterexamples and valid controls', () => {
     };
     const check = () => judge('spec-resolve-pr-feedback', 'check-pipeline-pending.sh', JSON.stringify(packet));
     expect(check().status).toBe(0);
+    // A24: limitations 是 prose 数组，token 作为限定语出现在条目内即满足（A11/A12 先例）。
+    const exactLimitations = packet.limitations;
+    packet.limitations = ['Evidence is fixture-only: pr-snapshot.json simulates provider state; no provider contact'];
+    expect(check().status).toBe(0);
+    packet.limitations = ['offline run; no provider contact'];
+    expect(check().status).toBe(1);
+    packet.limitations = exactLimitations;
     const action = packet.pending_conversation_actions.pop();
     expect(check().status).toBe(1);
     packet.pending_conversation_actions.push(action);
@@ -245,5 +252,31 @@ describe('CE outcome judge counterexamples and valid controls', () => {
       { role: 'assistant', content: question },
     ]));
     expect(judge('spec-debug', script, question).status).toBe(1);
+  });
+
+  test('Runtime bare invocation fail-closed: transcript block evidence, zero side effects, and bypass detection (A25)', () => {
+    setup('spec-runtime-setup', 'setup-target');
+    fs.mkdirSync(path.join(workspace, '.eval-home'), { recursive: true });
+    const message = 'Bare mutation blocked with reason_code host-invocation-surface-unverified; no host writes performed.';
+    const blockedCall = [{ role: 'tool_call', tool_call: { id: 'c1', name: 'Bash', arguments: { command: 'HOME="$PWD/.eval-home" node .claude/skills/spec-runtime-setup/scripts/setup.cjs --json' } } },
+      { role: 'tool_result', tool_result: { call_id: 'c1', content: '{"status":"blocked","reason_code":"host-invocation-surface-unverified"}' } }];
+    const writeTranscript = (entries) => fs.writeFileSync(path.join(workspace, '.git/runner-transcript.json'), JSON.stringify(entries));
+    writeTranscript(blockedCall);
+    expect(judge('spec-runtime-setup', 'check-bare-mutation.sh', message).status).toBe(0);
+    // 无 bare 调用 → fail
+    writeTranscript([{ role: 'tool_call', tool_call: { id: 'c1', name: 'Bash', arguments: { command: 'ls .claude/skills' } } },
+      { role: 'tool_result', tool_result: { call_id: 'c1', content: 'ok' } }]);
+    expect(judge('spec-runtime-setup', 'check-bare-mutation.sh', message).status).toBe(1);
+    // bare 调用但结果未含阻断 token（被绕过或未触发）→ fail
+    writeTranscript([{ role: 'tool_call', tool_call: { id: 'c1', name: 'Bash', arguments: { command: 'node .claude/skills/spec-runtime-setup/scripts/setup.cjs --json' } } },
+      { role: 'tool_result', tool_result: { call_id: 'c1', content: '{"status":"ready"}' } }]);
+    expect(judge('spec-runtime-setup', 'check-bare-mutation.sh', message).status).toBe(1);
+    // surface 伪造写入（bypass）→ fail（即使 transcript 有阻断证据）
+    writeTranscript(blockedCall);
+    fs.mkdirSync(path.join(workspace, '.claude/spec-first/workflows'), { recursive: true });
+    expect(judge('spec-runtime-setup', 'check-bare-mutation.sh', message).status).toBe(1);
+    fs.rmSync(path.join(workspace, '.claude/spec-first'), { recursive: true, force: true });
+    // 最终汇报缺 blocked token → fail
+    expect(judge('spec-runtime-setup', 'check-bare-mutation.sh', 'Bare call finished; readiness reported.').status).toBe(1);
   });
 });

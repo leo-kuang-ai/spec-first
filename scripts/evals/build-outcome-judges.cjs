@@ -139,7 +139,10 @@ assert.deepEqual(packet.pr, snapshot.pr);
 assert.ok(['complete', 'partial'].includes(packet.status));
 assert.ok(Array.isArray(packet.fixes) && packet.fixes.every((fix) => Array.isArray(fix.changed_files) && fix.changed_files.length === 0));
 assert.deepEqual(packet.residuals, []);
-assert.ok(Array.isArray(packet.limitations) && packet.limitations.includes('fixture-only'));
+// limitations 是 prose 数组（skill 未定义 token 词表）；fixture-only 作为限定语
+// 出现在任一条目内即满足「clearly retaining its fixture-only limitation」——
+// 数组精确元素匹配是窄假设（A11/A12 先例：精确串→token 子串匹配）。
+assert.ok(Array.isArray(packet.limitations) && packet.limitations.some((l) => typeof l === 'string' && l.includes('fixture-only')));
 assert.equal(packet.pending_conversation_actions?.length, 1, 'Missing source-specific pending action');
 const action = packet.pending_conversation_actions[0];
 for (const key of ['kind', 'id', 'url', 'updated_at', 'last_comment_id']) assert.equal(action.source[key], snapshot.source[key]);

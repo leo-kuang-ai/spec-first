@@ -25,6 +25,8 @@ limitations and return control to the caller.
 
 Populate `residuals` with the exact typed objects from [evaluation-rubric.md](evaluation-rubric.md), retaining all owned source IDs/kinds, the complete decision_context, and every open thread URL. Continue independent authorized work; return `partial` when decisions remain. Neither a reply acknowledgment nor a count/PR link substitutes for the decision payload. Leave every covered thread open, and return before any remote write.
 
+Status semantics: `complete` when every pipeline-owned fix verdict is settled and `residuals` is empty; `partial` when owned decisions or residuals remain; `blocked` only when pipeline-owned work itself cannot proceed (for example the pending-review visibility block). Missing caller-side authority for reply, thread-resolution, commit, landing, or worker dispatch is not `blocked` — record it in `pending_conversation_actions` (and in `residuals` when findings remain open) and return `complete`/`partial`.
+
 ```json
 {
   "status": "complete | partial | blocked",

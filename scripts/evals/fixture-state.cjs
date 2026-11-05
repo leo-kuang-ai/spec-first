@@ -247,6 +247,9 @@ function outputObject(call) {
 
 function checkCloseout(envelope) {
   const ref = envelope.verification_run_summary_ref;
+  // record 从未成功完成时 envelope 会诚实留 null；先给出可读断言，避免 assert.match(null) 的 TypeError。
+  assert.ok(typeof ref === 'string' && ref.length > 0,
+    'Final envelope has no verification_run_summary_ref — the record producer never completed');
   assert.match(ref, /^\.spec-first\/workflows\/spec-work\/[^/]+\/[^/]+\/verification-run-summary\.json$/);
   const summary = JSON.parse(regular(ref));
   assert.equal(summary.schema_version, 'verification-run-summary.v1');

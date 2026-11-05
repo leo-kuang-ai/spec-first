@@ -235,3 +235,15 @@ describe('commandOf accepts the three call shapes', () => {
     expect(api.commandOf({ arguments: {} })).toBe('');
   });
 });
+
+describe('checkCloseout null-ref guard (A22)', () => {
+  test('envelope with null verification_run_summary_ref throws a readable AssertionError, not TypeError', () => {
+    expect(() => api.checkCloseout({ verification_run_summary_ref: null }))
+      .toThrow(/record producer never completed/);
+  });
+
+  test('empty-string ref fails the same guard', () => {
+    expect(() => api.checkCloseout({ verification_run_summary_ref: '' }))
+      .toThrow(/record producer never completed/);
+  });
+});
