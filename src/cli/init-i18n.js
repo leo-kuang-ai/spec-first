@@ -27,10 +27,11 @@ const MESSAGES = {
       `预览覆盖: targets=${targets} hosts=${hosts} target_host_groups=${groups} detail_budget=${budget}`
     ),
     previewSummaryCoverage: (targets, hosts) => `初始化预览: ${targets} 个目标 · ${hosts} 个宿主`,
-    previewChangeSummary: (unchanged, updated, added, removed) => `内容变更: 不变 ${unchanged} · 将更新 ${updated} · 新增 ${added} · 移除 ${removed}（相对当前磁盘状态）`,
+    previewChangeSummary: (unchanged, updated, added, removed) => `写入内容对比（按宿主计）: 不变 ${unchanged} · 将更新 ${updated} · 新增 ${added}；删除/重建操作 ${removed}（含重建同路径，非最终删除文件数）`,
     previewHostSummary: (label, destructive, critical, generated) => (
       `  ${label}: 风险操作 ${destructive} · 关键写入 ${critical} · 生成 ${generated}`
     ),
+    previewHostDrift: (reasons) => `    重置原因类别: ${reasons.join(', ')}（具体路径见 --dry-run）`,
     previewSummaryDestructive: (count, groups) => `风险操作: ${count} 个 path · ${groups} 个 target/host group（默认不展开路径）`,
     previewSummaryDestructiveDetails: '  查看具体路径: spec-first init --dry-run',
     previewSummaryGlobalDeveloper: (action, displayPath, name, lang) => (
@@ -129,10 +130,11 @@ const MESSAGES = {
       `Preview coverage: targets=${targets} hosts=${hosts} target_host_groups=${groups} detail_budget=${budget}`
     ),
     previewSummaryCoverage: (targets, hosts) => `Init preview: ${targets} target(s) · ${hosts} host(s)`,
-    previewChangeSummary: (unchanged, updated, added, removed) => `Content changes: ${unchanged} unchanged · ${updated} to update · ${added} added · ${removed} removed (vs current disk state)`,
+    previewChangeSummary: (unchanged, updated, added, removed) => `Write content comparison (per host): ${unchanged} unchanged · ${updated} to update · ${added} added; ${removed} delete/rebuild operations (includes recreated paths, not final deleted-file count)`,
     previewHostSummary: (label, destructive, critical, generated) => (
       `  ${label}: risk operations ${destructive} · critical writes ${critical} · generated ${generated}`
     ),
+    previewHostDrift: (reasons) => `    Reset reason categories: ${reasons.join(', ')} (inspect paths with --dry-run)`,
     previewSummaryDestructive: (count, groups) => `${count} risk path(s) across ${groups} target/host group(s) (paths hidden by default)`,
     previewSummaryDestructiveDetails: '  Inspect paths: spec-first init --dry-run',
     previewSummaryGlobalDeveloper: (action, displayPath, name, lang) => (

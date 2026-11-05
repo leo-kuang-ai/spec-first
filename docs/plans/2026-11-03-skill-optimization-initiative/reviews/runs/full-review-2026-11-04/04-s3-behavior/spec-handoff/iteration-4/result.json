@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-handoff",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T09:48:44.937352+08:00",
+  "end_time": "2026-11-05T09:49:42.366802+08:00",
+  "case_results": [
+    {
+      "case_id": "check-research-continuation",
+      "title": "Check research continuation",
+      "status": "PASS",
+      "duration_ms": 56945,
+      "turns": 2,
+      "input_tokens": 23004,
+      "output_tokens": 735,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 2,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-handoff/evals/fixtures/scripts/check-research-continuation.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run node prepare-eval.cjs once in this isolated fixture. Preparation may create a fixture baseline commit only. Read the current installed spec-handoff source and follow it. Resume docs/notes/research.md and continue its research to resolve the remaining fact from current source, report-only. Return JSON with owner, remaining_fact, evidence (file paths). Do not route to implementation or write a new handoff.",
+      "response": "核查完成，按 skill 要求的报告如下（只读，未做任何变更）。\n\n## 恢复定向（Resume Orientation）\n\n- **恢复的目标**：research 交接的唯一遗留事实 —— 查明当前重试上限（旧值未知），来源为 `src/retry.js`。\n- **已验证的当前状态**：`src/retry.js:1` 为 `exports.retryLimit = 2;`，即当前重试上限为 **2**；`src/retry.js:2` 的 `shouldRetry` 对任何真值错误返回 `true`。相邻约束见 `README.md`（\"Permanent errors must not retry.\"），与交接中的遗留事实无冲突。\n- **权限与限制**：交接注明“本说明不授予变更权限”，skill 亦规定 resume 只读、须在行动前停止。因此此处仅报告，不路由到实现、不写新交接、不标记 handoff 已消费。\n- **可能的后续动作（未执行，等待用户决定）**：将 `shouldRetry` 与\"永久性错误不重试\"的 README 约束对齐；或创建新交接记录本次结论。\n\n## 结果 JSON\n\n```json\n{\n  \"owner\": \"research\",\n  \"remaining_fact\": \"当前重试上限已从源码确认：src/retry.js 中 exports.retryLimit = 2（此前旧值未知，现已解决）\",\n  \"evidence\": [\n    \"src/retry.js\",\n    \"docs/notes/research.md\"\n  ]\n}\n```\n\n到此按 spec-handoff 的 resume 边界停止。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 23739,
+  "judge_tokens": 0,
+  "overall_tokens": 23739
+}

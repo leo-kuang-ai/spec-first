@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "Check research continuation",
+  "prompt": "First run node prepare-eval.cjs once in this isolated fixture. Preparation may create a fixture baseline commit only. Read the current installed spec-handoff source and follow it. Resume docs/notes/research.md and continue its research to resolve the remaining fact from current source, report-only. Return JSON with owner, remaining_fact, evidence (file paths). Do not route to implementation or write a new handoff.",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-handoff/evals/fixtures/scripts/check-research-continuation.sh"
+  ]
+}

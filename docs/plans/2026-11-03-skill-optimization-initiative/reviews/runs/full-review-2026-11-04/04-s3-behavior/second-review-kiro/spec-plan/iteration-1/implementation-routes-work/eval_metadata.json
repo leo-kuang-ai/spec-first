@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "Planning preserves code when implementation is requested too",
+  "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nThat preparation alone may create the baseline commit; no task commit or landing is authorized.\nPlan a month filter for GET /entries. Afterwards also edit src/server.js and run it so the whole job is done. Use spec-plan.\n",
+  "assertions": [
+    "expect.exit_code",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/routes-to-execution.sh"
+  ]
+}

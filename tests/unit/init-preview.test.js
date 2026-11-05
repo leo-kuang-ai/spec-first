@@ -126,6 +126,22 @@ describe('bounded init mutation preview', () => {
     expect(output).not.toContain('.agents/skills/spec-plan');
   });
 
+  test('shows drift categories under the affected host without claiming a root cause', () => {
+    const drifted = projectPlan('codex', '/workspace/app', [{
+      kind: 'remove_dir', path: '.agents/skills/spec-plan', reason: 'managed_skill_reset',
+    }]);
+    drifted.destructiveResetReason = 'current_runtime_drift';
+    drifted.diagnostics = [{ code: 'current_runtime_drift', reasons: ['skills_drifted', 'commands_drifted'] }];
+    const clean = projectPlan('claude', '/workspace/app', []);
+
+    const output = capturePreview([clean, drifted], { view: 'summary' });
+    expect(output).toContain('Codex: risk operations');
+    expect(output).toContain('Reset reason categories: skills_drifted, commands_drifted');
+    expect(output.indexOf('Codex: risk operations'))
+      .toBeLessThan(output.indexOf('Reset reason categories:'));
+    expect(output.match(/Reset reason categories:/g)).toHaveLength(1);
+  });
+
   test('deduplicates known host diagnostics and localizes them', () => {
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     const plans = [

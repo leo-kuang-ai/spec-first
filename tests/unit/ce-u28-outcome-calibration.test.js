@@ -33,7 +33,7 @@ describe('U28 supplemental outcome judge calibration', () => {
       report = { metrics: [
         { name: 'revenue', source: 'payments-export', state: 'confirmed-value', value: 1200 },
         { name: 'active_users', source: 'analytics-export', state: 'permission-denied', value: null },
-      ], artifact_path: 'docs/pulse-reports/report.md' };
+      ], artifact_path: path.join(workspace, 'docs/pulse-reports/report.md') };
     } else if (skill === 'spec-promote') {
       report = { delivery_status: 'implemented-not-released', provider_attempt: 'not-attempted', drafts: [
         { channel: 'x', content: 'Monthly summaries are implemented and awaiting release.' },

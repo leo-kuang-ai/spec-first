@@ -118,12 +118,14 @@ function checkFixture(manifests, replacements = {}, options = {}) {
 
 function finalObject() {
   const text = process.env.EVAL_FINAL_MESSAGE.trim();
+  // 反向遍历：最后的可解析对象才是模型的最终陈述（与 parseFinalMessage 的
+  // 取末块口径一致；codex 二审 P1——顺向会取到「草稿在前、最终在后」的草稿块）。
   const candidates = [text, ...fencedBlocks(text)];
-  for (const value of candidates) {
+  for (let index = candidates.length - 1; index >= 0; index -= 1) {
     try {
-      const parsed = JSON.parse(value);
+      const parsed = JSON.parse(candidates[index]);
       if (parsed && !Array.isArray(parsed) && typeof parsed === 'object') return parsed;
-    } catch { /* Try the next explicit JSON block. */ }
+    } catch { /* Try the next candidate. */ }
   }
   assert.fail('Expected the requested JSON return envelope');
 }
@@ -185,7 +187,17 @@ function internalArgs(call, owner, action) {
   // 模型常给纯 producer 调用追加良性捕获尾巴（`; echo "exit=$?"`、`2>&1`）。
   // 只在首个顶层段（`;` / `&&` / `||` 分隔）上匹配调用身份；段内仍禁管道与
   // 重定向（`2>&1` 除外），保证 stdout 归属可判定——这是组合守卫的本意。
-  const first = topLevelSegments(commandOf(call))[0] || [];
+  // codex 二审 P1 收紧：`&&`/`||` 后缀与字面输出尾巴都能伪造 producer 的
+  // 成功与 stdout 归属（`|| printf '{"overall":"verified"}'`），组合尾巴只
+  // 放行「echo + 单个变量捕获 token」形态；其余一律拒绝。
+  const segments = topLevelSegments(commandOf(call));
+  const first = segments[0] || [];
+  for (let i = 1; i < segments.length; i += 1) {
+    const tail = segments[i];
+    const benign = tail.length === 2 && tail[0] === 'echo'
+      && /^["']?(exit=)?\$\{?[?_a-zA-Z][\w?]*\}?["']?$/.test(tail[1]);
+    if (!benign) return null;
+  }
   const args = first
     .filter((token) => token !== '2>&1')
     .map((token) => token.replace(/^(['"])(.*)\1$/, '$2'));
@@ -295,8 +307,16 @@ assert.deepEqual(report.metrics.map(({name, source, state, value}) => ({name, so
   { name: 'active_users', source: 'analytics-export', state: 'permission-denied', value: null },
 ]);
 assert.ok(!report.metrics.some((m) => m.state === 'confirmed-zero'));
-assert.ok(report.artifact_path.startsWith('docs/pulse-reports/'));
-const saved = regular(report.artifact_path).toString();
+// A21：模型在引擎临时根下可能上报绝对路径（报告落位本身正确）。合同要求
+// 的是报告存在于 docs/pulse-reports/，不是上报字符串形式；归一化到 fixture
+// 相对形式再比对。codex 二审 P2：path.resolve 是词法归一化，pivot/.. 或
+// /var→/private/var symlink 都会错配——原始串含 .. 一律拒绝；两侧 realpath
+// 对称解析后 containment 按真实路径判定（外部 symlink 解析后不落 fixture 内，
+// relative 产生 .. 前缀被 startsWith 拒绝）。
+assert.ok(!report.artifact_path.includes('..'), 'artifact_path must not traverse directories');
+const artifactPath = path.relative(fs.realpathSync(process.cwd()), fs.realpathSync(path.resolve(report.artifact_path)));
+assert.ok(artifactPath.startsWith('docs/pulse-reports/'));
+const saved = regular(artifactPath).toString();
 assert.ok(saved.includes('1200') && saved.includes('permission-denied'));
 rejectRecordedRemoteWrites();
 

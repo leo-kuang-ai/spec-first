@@ -157,6 +157,9 @@ function printInitSummaryPreview(groups, options = {}) {
       formatPreviewCount(host.critical, BrandColors.write, useColor),
       formatPreviewCount(host.generated, BrandColors.write, useColor),
     ));
+    if (host.driftReasons.length > 0) {
+      console.log(messages.previewHostDrift(host.driftReasons));
+    }
   }
   printUserLanguageSyncSummaryPreview(userLanguageSyncPlan, messages);
 }
@@ -170,10 +173,12 @@ function buildInitSummaryPreview(groups) {
       destructive: 0,
       critical: 0,
       generated: 0,
+      driftReasons: [],
     };
     current.destructive += group.destructiveTotal;
     current.critical += group.criticalWrites.length;
     current.generated += group.generatedTotal;
+    current.driftReasons = [...new Set([...current.driftReasons, ...group.driftReasons])];
     hostMap.set(group.platform, current);
   }
 
@@ -348,6 +353,9 @@ function buildInitPreviewGroup({ platform, targetKind, targetLabel, targetRoot, 
       ? projectPlan.changeSummary
       : null,
     resetReason: resolvePreviewResetReason(projectPlan),
+    driftReasons: (projectPlan && Array.isArray(projectPlan.diagnostics) ? projectPlan.diagnostics : [])
+      .filter((diagnostic) => diagnostic && diagnostic.code === 'current_runtime_drift')
+      .flatMap((diagnostic) => Array.isArray(diagnostic.reasons) ? diagnostic.reasons : []),
   };
 }
 

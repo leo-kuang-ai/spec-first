@@ -202,8 +202,10 @@ describe('CLI smoke checks', () => {
     const { filename } = packResult;
     const tarballPath = path.join(packRoot, filename);
     expect(fs.existsSync(tarballPath)).toBe(true);
-    expect(packResult.files.map((entry) => entry.path).filter((entry) => entry.startsWith('.opencode/')))
-      .toEqual([]);
+    const packedPaths = packResult.files.map((entry) => entry.path);
+    expect(packedPaths.filter((entry) => entry.startsWith('.opencode/'))).toEqual([]);
+    expect(packedPaths.filter((entry) => /(^|\/)evals\//.test(entry))).toEqual([]);
+    expect(packedPaths).toContain('skills/spec-runtime-setup/scripts/setup.cjs');
 
     const install = runNpmCommand([
       'install',

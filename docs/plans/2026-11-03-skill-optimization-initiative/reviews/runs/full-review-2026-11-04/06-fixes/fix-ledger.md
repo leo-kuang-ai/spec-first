@@ -98,12 +98,15 @@
 | 058 | plan/always-plan judge 词汇代理升级：output_contains「规划」→ check-always-plan-only.sh fixture 行为断言（src/测试零改动、docs 合法）+ prompt 补 prepare 指令 + constraints | S3 eval-iteration A18 | 本波 |
 | 059 | spec-debug SKILL.md:108 prior-attempt 合同对齐 judge：报告 prior attempts 而内容未知时先问再查、终报必带未答问题（原「ask before repeating」字面允许先自行调查） | S3 eval-iteration A19 | 本波 |
 | 060 | fixture-state.cjs fence 提取器行锚定配对 fencedBlocks（```yaml 等非 json 信息串的闭栏不再被误当开栏吞掉 ```json 块）；parseFinalMessage 取最后可解析块、finalObject 取首个可解析对象 | S3 eval-iteration A20 | 本波 |
+| 061 | ce-u28 pulse artifact_path 归一化（A21）：引擎临时根下模型上报绝对路径属正常形态，judge 剥前缀比对；原始串含 .. 一律拒绝；两侧 realpathSync 对称解析后 containment 按真实路径判定（macOS /var→/private/var symlink 场景实测）+ 校准样本改绝对路径锚定 | 二审 live 重跑暴露（REPLAY 未覆盖新响应形态） | 本波 |
+| 062 | codex 对抗性二审三项收紧：internalArgs 组合尾巴白名单（仅 `; echo <变量捕获>` 形态放行，`\|\|`/`&&` 后缀与字面输出尾巴全拒——堵 `producer \|\| printf fake` 伪造向量）；finalObject 反向遍历取最后对象（与 parseFinalMessage 末块口径统一，堵草稿块误取）；A21 realpath 加固并入 061 | codex 二审 P1×2+P2（evidence/probes/codex-second-review-judge-fixes.txt） | 本波 |
 
-## 终态对账（2026-11-05，eval-iteration 波后更新）
+## 终态对账（2026-11-05，二审波后更新）
 
-- 静态层：38/38 skill 收敛（各批次 *-convergence.md；FIX-001..060 全部 landed，无 open fail）
-- 行为层：S3 原始 118/155 → 归因后确认 **143/155（92.3%）**；25 例翻转全部具备行为级证据（live 重跑 21 + 确定性 REPLAY 4：handoff×2、pulse/source-outcomes、closeout-order、riffrec/check-local-evidence）；A 类累计 20 例修复（A15 + bverify A16/A17 + eval-iteration A18/A19/A20），B 类 open 12 例（逐名枚举见 S3-SUMMARY；本轮全部复核归因，无隐藏 A）
-- 逐名审计：37 原始非 pass 名单由 s3-run.log 引擎逐案行重建；REPLAY-PASS 计法统一（与 live 同为 confirmed evidence）；debug/prior-attempt 失败点收敛为 order 违约（prose 已无歧义）
-- judge 单测：五套 93/93（eval-fixture-contracts、spec-work-outcome-judges、ce-u28、knowledge-publication、ce-outcome）；runtime-setup 白名单解析器 15/15
-- 8 宿主镜像再 生（spec-debug SKILL.md 变更同步）+ test:mcp-setup 34 套件/773 测试全绿 + doctor PASS
+- 静态层：38/38 skill 收敛（各批次 *-convergence.md；FIX-001..062 全部 landed，无 open fail）
+- 行为层：S3 原始 118/155 → 二审波后确认 **142/155（91.6%）**；A 类累计 21 例（A21 pulse artifact_path 归一化，二审 live 重跑暴露）；B-open **13 例**（work/standalone-closeout-order 二审 live 复验 FAIL 于 shipping-workflow.md:157 逐字命令合同——实际执行宽松版 grep、登记严格版命令，属合同明文禁止的理想化改写，从确认 pass 降回 B-open）
+- REPLAY 口径修正：REPLAY-PASS 证明「旧响应在新 judge 下合规」，不证明「跨 run 行为稳定」——closeout-order（REPLAY 后 live FAIL）与 pulse（REPLAY 后 live 暴露 A21）均为实例；4 例 REPLAY 中 handoff×2 已补 live PASS 升级、closeout-order 降级、pulse 经 A21 修复后 live PASS
+- codex 对抗性二审（A16–A21 五探针，evidence/probes/codex-second-review-judge-fixes.txt）：探针 1/4/5 判放松过度 → FIX-062 三项收紧落地；探针 2（A17 并集覆盖）/3（A19 先问再查 prose）判适度；已知限制记录：checkCloseout 的 check 命令逐字比对对变量间接执行形态不可判定（合同 :157 本就禁止该形态）
+- fixture-state.cjs 函数级单测新增 35 例锚定（tests/unit/eval-fixture-state-parsers.test.js，A16/A20/A21 边界正反例）；judge 五套 + 新锚定 + 校准 113/113
+- 跨模型矩阵（二审第 3 项，用户指令扩展）：B-open 13 例 × {hst-2/gpt-6.1-sol, ai-qianxing2/gpt-6.1-sol 全量, kiro/kimi-k3}——初步：plan/implementation-routes、plan/r2-soft-pressure、debug/prior-attempt 双模型违约（B 稳健）；plan/r2-half-formed-what、code-review/conflicting-scope kiro 或 hst-2 通过（zhipu 特有弱点信号，归因注记）；全量矩阵运行中（second-review-matrix/）
 - 留观清单不变；spec-prd R1 #5/#6 低频 P3 维持 deferred

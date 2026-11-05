@@ -114,12 +114,14 @@ function checkFixture(manifests, replacements = {}, options = {}) {
 
 function finalObject() {
   const text = process.env.EVAL_FINAL_MESSAGE.trim();
+  // 反向遍历：最后的可解析对象才是模型的最终陈述（与 parseFinalMessage 的
+  // 取末块口径一致；codex 二审 P1——顺向会取到「草稿在前、最终在后」的草稿块）。
   const candidates = [text, ...fencedBlocks(text)];
-  for (const value of candidates) {
+  for (let index = candidates.length - 1; index >= 0; index -= 1) {
     try {
-      const parsed = JSON.parse(value);
+      const parsed = JSON.parse(candidates[index]);
       if (parsed && !Array.isArray(parsed) && typeof parsed === 'object') return parsed;
-    } catch { /* Try the next explicit JSON block. */ }
+    } catch { /* Try the next candidate. */ }
   }
   assert.fail('Expected the requested JSON return envelope');
 }
@@ -181,7 +183,17 @@ function internalArgs(call, owner, action) {
   // 模型常给纯 producer 调用追加良性捕获尾巴（`; echo "exit=$?"`、`2>&1`）。
   // 只在首个顶层段（`;` / `&&` / `||` 分隔）上匹配调用身份；段内仍禁管道与
   // 重定向（`2>&1` 除外），保证 stdout 归属可判定——这是组合守卫的本意。
-  const first = topLevelSegments(commandOf(call))[0] || [];
+  // codex 二审 P1 收紧：`&&`/`||` 后缀与字面输出尾巴都能伪造 producer 的
+  // 成功与 stdout 归属（`|| printf '{"overall":"verified"}'`），组合尾巴只
+  // 放行「echo + 单个变量捕获 token」形态；其余一律拒绝。
+  const segments = topLevelSegments(commandOf(call));
+  const first = segments[0] || [];
+  for (let i = 1; i < segments.length; i += 1) {
+    const tail = segments[i];
+    const benign = tail.length === 2 && tail[0] === 'echo'
+      && /^["']?(exit=)?\$\{?[?_a-zA-Z][\w?]*\}?["']?$/.test(tail[1]);
+    if (!benign) return null;
+  }
   const args = first
     .filter((token) => token !== '2>&1')
     .map((token) => token.replace(/^(['"])(.*)\1$/, '$2'));

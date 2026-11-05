@@ -71,6 +71,7 @@
     "scripts/sync-instruction-files.js",
     "scripts/typecheck-js.js",
     "skills/",
+    "!skills/**/evals/**",
     "!skills/**/__pycache__/**",
     "!skills/**/*.pyc",
     "!skills/**/*.pyo",
