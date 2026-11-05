@@ -1,0 +1,193 @@
+## 结论
+
+**这批修改改善了证据诚实性，但仍有三处应优先修正：**
+
+1. 段落 1 缺少“重试仍失败”的就地终止条件，与段落 2 的失败返回形成可遵循性张力。
+2. 段落 3 把“回复受阻”作为整个 pipeline `blocked` 的例证，混淆了本地工作与外部动作两个作用域；同时把未关闭 finding 泛化为 residual，超出了 rubric 的 typed decision 职责。
+3. judge 目前最多证明“某个疑似 bare 调用的结果包含指定 token，且若干路径最终不存在”，**不足以证明真实入口 fail-closed、全部 mutation 尝试均被阻断或执行期间零副作用**。
+
+以下逐项回答。外部锚按题设接受，不质疑其本身。
+
+---
+
+## Q1：存在张力，但不是“失败返回绝对不允许”的直接逻辑矛盾
+
+段落 1 的合理意图是：
+
+> 不能把可恢复的 schema 拒绝直接当作收尾理由，应实际重跑并记录真实结果。
+
+问题在于“不是保留失败状态收尾”没有限定适用条件，也没有说明重试终点。模型遇到以下情况时会无所适从：
+
+- 换成短命令后仍被 schema 拒绝；
+- 拒绝原因不是 command 长度，而是其他字段；
+- 工具不可用、预算耗尽，或重跑需要尚未获得的权限；
+- 短命令已经执行，但后续 record 仍未成功。
+
+段落 2 允许返回 `verification_run_summary_ref: null`，却没有明确说明这是否也是上述重试失败的合法出口。
+
+**完整源码并非完全没有兜底。** `skills/spec-work/references/shipping-workflow.md:19–21` 已规定 evidence gate 无法运行时返回现有事实和显式限制、不得声称完成。因此更准确的判断是：**全局存在安全出口，但新增局部措辞没有与它衔接，容易被读成无条件持续重试。**
+
+建议改为：
+
+> `run-summary-schema-invalid` 后先按具体校验错误修正 payload；若实际命令超过长度上限，不得截断或改写历史命令，应在现有授权内改用可记录的真实调用重新验证。无法恢复、重试仍失败或继续执行需要新授权时，停止 verified closeout claim；返回 `verification_run_summary_ref: null`，在 `claim_limitations` 中保留拒绝原因、已尝试的恢复及未完成事项。不得将 record 失败或验证失败改写为成功。
+
+还需区分：
+
+- **验证命令失败**：保留真实失败结果，不是通过缩短命令“修成通过”。
+- **record/schema 失败**：结果尚未被有效持久化，不代表验证本身失败，也不代表验证已通过。
+
+---
+
+## Q2：blocked 例证确实与上文及本模式职责不一致
+
+`pending_review != null` 的已给条件只确定了：
+
+- 本地 source evaluation 可以继续；
+- 不得尝试 reply；
+- 返回 caller，并保留原因。
+
+而 pipeline-return 本来就要求在任何 remote write 前返回。因此，**回复当前不可见或不可发布，不足以证明 pipeline-owned 本地评估/修复无法推进**。
+
+即使“may continue”不保证所有本地工作都能完成，也不能据此把 pending review 本身列为整个工作受阻的充分条件。
+
+正确修法不是禁止继续本地评估，也不是把 pending review 一律判成 `partial`，而是：
+
+1. 删除该 blocked 例证；
+2. 按本地职责完成度决定 status；
+3. 把回复阻断保留在 action conditions / limitations。
+
+建议表述：
+
+> `pending_review` 非 null 本身不决定整体 status。保留 `pending-review-visible-reply-blocked`，不尝试回复，并返回 caller。本地职责已完成且无未决 decision 时返回 `complete`；仍有未决 decision 或可交付的部分工作时返回 `partial`。仅当具体障碍确实阻止 pipeline-owned 本地工作继续时返回 `blocked`，并说明受阻事项。
+
+目前 `partial` 与 `blocked` 也可能重叠——工作无法继续时通常也存在 residual。最好再明确：**`blocked` 表达无法继续推进，`partial` 表达尚未完成但仍有可推进项或待 caller 决策；不能单凭 residual 非空区分两者。**
+
+---
+
+## Q3：存在职责混淆，但两个字段同时出现并不天然矛盾
+
+rubric 的实际职责很明确：
+
+- `skills/spec-resolve-pr-feedback/references/evaluation-rubric.md:103–124`：residual 是逐个 decision 的完整 `needs-human` typed payload。
+- `skills/spec-resolve-pr-feedback/references/pipeline-return.md:63–83`：pending action 是逐个来源尚未完成的回复/解决动作及其条件。
+
+因此，同一个 `needs-human` 来源出现在两处完全合理：
+
+- residual 承载“要决定什么、依据和选项”；
+- pending action 承载“这个来源还欠什么外部动作”。
+
+真正有问题的是：
+
+> “and in residuals when findings remain open”
+
+**thread/finding 仍然 open，不等于存在未决的人类决策。** 本模式要求所有 covered thread 保持 open；如果按字面把这些全部放进 residual，就会导致：
+
+- 已修复且验证通过、只等 caller 发布回复的条目也成为 residual；
+- `complete` 所要求的 residual 为空几乎无法成立；
+- 为普通待发布动作强行制造 `decision_context`。
+
+此外，commit、landing、worker dispatch 是批次级或执行级条件，不一定能自然塞进当前按来源定义的 conversation action 对象。
+
+建议最小修正：
+
+> `residuals` 仅保留符合 rubric 的未决 decision；回复或 thread-resolution 未完成记录在对应 `pending_conversation_actions`。仅当确有未决 decision 时，才同时返回 residual。批次级 commit/landing 条件及 worker-dispatch 限制记录在相应 caller handoff/limitations，不为满足字段而虚构 conversation action。
+
+还要补充：缺少 worker-dispatch 权限后，**若可以串行执行，当然不算 blocked；若授权与可用能力确实使本地工作无法完成，就不能无条件排除 blocked。** “某类权限缺失永远不是 blocked”过于绝对。
+
+---
+
+## Q4：有漏网，也有误伤；重定向问题值得修，但不能靠全 transcript 搜 token
+
+### 1. 正则匹配的是整条 shell 文本，不是实际 setup 调用
+
+以下属于静态可推出的误伤/漏网：
+
+| 形态 | 当前判定问题 |
+|---|---|
+| `node setup.cjs; other-command --check` | 因其他命令的 `--check`，真实 bare 调用被漏掉 |
+| `node setup.cjs --check=false` | 被排除，但它是否是只读 check 必须由真实参数解析决定 |
+| `printf '%s' 'setup.cjs host-invocation-surface-unverified'` | 可能被当成入口执行，实际只是在打印字符串 |
+| `node "$SETUP_SCRIPT"` | 若变量指向 setup.cjs，调用文本不含文件名，可能漏掉 |
+| 仅运行 check-health shim | 不含 setup.cjs 时不会被当成 bare；**按给定事实这是正确排除，不是漏洞** |
+
+既然唯一受支持入口是直接调用 setup.cjs，**无需为了这一个 judge 构建通用 shell 解析器**。更合适的是让 case 明确要求可观察的直接调用形态，或者消费结构化执行 receipt。
+
+### 2. 重定向会造成假阴性
+
+例如：
+
+```bash
+node "$SKILL_DIR/scripts/setup.cjs" > setup.log 2>&1
+```
+
+即使入口真实输出了阻断原因，当前 tool result 可能为空。随后读取日志也无法通过当前检查，因为 judge 只读取原调用自身的 result。
+
+**值得修**：重定向留日志是正常证据保存方式。但修法不应是“任何后续工具输出含 token 都算通过”，否则任意打印 token 就能冒充入口证据。
+
+最小选择有两个：
+
+- case 明确要求 gate 输出直接出现在调用 result 中，并要求 runner 保留结构化退出状态；
+- 或绑定该 invocation 的日志路径、结果和退出状态，读取对应日志，而不是接受任意后续文本。
+
+### 3. 比重定向更重要：当前接受标准太弱
+
+`bare.some(...)` 只要求至少一个匹配项含 reason token：
+
+- 一个调用被阻断，另一个成功绕过，也可能通过；
+- tool result 只要含 token 即可，不要求它是实际 gate 的结构化结果；
+- 没有验证 setup 调用自身的失败退出状态。
+
+接受“会话退出码恒 0”的外部锚，并不意味着可以放弃验证**工具调用/CLI 层**的退出事实。若 transcript 不提供该事实，应显式标注“未证明退出码合同”，不能把 token 匹配当作等价证据。
+
+---
+
+## Q5：另外会改的表述与断言
+
+### A. “逐字等于命令串”与“变量展开后的最终形态”不是同一层证据
+
+shell 提交文本、展开后的参数和最终进程调用并不是一个统一字符串。包含 pipeline、重定向时尤其如此。
+
+此外，要求展开前缀变量可能把 secret 写进 summary，与脱敏证据要求冲突。
+
+建议固定记录层级：
+
+> 记录执行工具实际接收的命令文本，保留 pipeline、重定向及参数语义；按既定规则脱敏敏感值，并显式标注脱敏。不得用语义不同的命令替换实际调用。
+
+若确实需要展开后的事实，应由工具提供结构化 receipt，而不是要求模型重建。
+
+### B. `honest_closeout_verdict` 在 validate 没有产生 token 时缺少出口
+
+段落 2 规定它必须来自 validate，且只能是三个字符串；但 record 未完成时，validate 可能根本无法产生有效结果。
+
+不能为了凑齐 envelope 猜一个 `degraded` 或 `unsupported`。建议明确：
+
+> 无有效 validate 输出时，该字段如何表示未产生，以及对应失败原因由哪个稳定字段承载。
+
+`overall_reason_code` 的“另列说明”也应明确是机器字段还是自然语言说明，否则 consumer 无法稳定消费。
+
+### C. “零副作用”超过 judge 实际覆盖范围
+
+目前检查的是有限路径的**最终存在性**，并非写入历史：
+
+- 写入后删除，检查不到；
+- 未列出的写入，检查不到；
+- 若 fixture 原本存在目标文件，原样保留也会被报成“产生或被改写”。
+
+若 fixture 明确保证这些路径初始不存在，存在性断言可以保留；但必须把前置条件写进 case。否则应做基线差异比较。无论哪种方式，都应把 claim 收窄为“覆盖路径未发现持久化产物”，除非有真实 mutation 审计支持执行期间零写入。
+
+### D. `find | grep -q` 在 `pipefail` 下可能漏报
+
+`grep -q` 找到首个结果后提前退出；匹配足够多时，上游 `find` 可能因管道关闭而失败。启用 `pipefail` 后，整个条件可能变成失败，反而跳过告警。
+
+这是条件性问题，不是每次必现。可改为不提前退出、完整消费输出的检查；同时不要用 `2>/dev/null` 把目录缺失和读取错误都静默当成“没发现文件”。
+
+---
+
+## 建议落地顺序
+
+1. **先修 status 和 residual 边界**：删除 pending-review 的 blocked 例证，删除“open 即 residual”的暗示。
+2. **补失败出口**：区分 schema 恢复、验证失败、record 失败和 validate 无结果。
+3. **修 judge 的证据绑定与 claim 上限**：真实调用、对应结果、工具层退出事实、有限路径副作用断言。
+4. 最后处理命令记录层级与重定向兼容，不扩展成通用 shell 解析系统。
+
+**验证范围：**已静态对照所给四段文本、项目角色契约及当前 source 中的 rubric、pipeline-return 和 shipping fallback；未修改文件，未执行 judge、setup 或 live eval。上述 judge 反例是基于代码语义推导，不冒充实测结果。

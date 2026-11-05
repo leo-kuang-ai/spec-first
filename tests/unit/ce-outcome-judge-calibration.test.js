@@ -263,13 +263,25 @@ describe('CE outcome judge counterexamples and valid controls', () => {
     const writeTranscript = (entries) => fs.writeFileSync(path.join(workspace, '.git/runner-transcript.json'), JSON.stringify(entries));
     writeTranscript(blockedCall);
     expect(judge('spec-runtime-setup', 'check-bare-mutation.sh', message).status).toBe(0);
+    // CLI human 输出真实形态（中文「被阻止」，setup.cjs:121 词表）同样通过
+    writeTranscript([{ role: 'tool_call', tool_call: { id: 'c1', name: 'Bash', arguments: { command: 'HOME="$PWD/.eval-home" node .claude/skills/spec-runtime-setup/scripts/setup.cjs' } } },
+      { role: 'tool_result', tool_result: { call_id: 'c1', content: 'Exit code 2\nRuntime 设置被阻止：host-invocation-surface-unverified' } }]);
+    expect(judge('spec-runtime-setup', 'check-bare-mutation.sh', message).status).toBe(0);
     // 无 bare 调用 → fail
     writeTranscript([{ role: 'tool_call', tool_call: { id: 'c1', name: 'Bash', arguments: { command: 'ls .claude/skills' } } },
       { role: 'tool_result', tool_result: { call_id: 'c1', content: 'ok' } }]);
     expect(judge('spec-runtime-setup', 'check-bare-mutation.sh', message).status).toBe(1);
+    // printf 打印 token 冒充 bare 调用证据（命令文本提 setup.cjs 但非 node 执行）→ fail（复查 Q4-1）
+    writeTranscript([{ role: 'tool_call', tool_call: { id: 'c1', name: 'Bash', arguments: { command: "printf '%s' 'setup.cjs host-invocation-surface-unverified blocked'" } } },
+      { role: 'tool_result', tool_result: { call_id: 'c1', content: 'setup.cjs host-invocation-surface-unverified blocked' } }]);
+    expect(judge('spec-runtime-setup', 'check-bare-mutation.sh', message).status).toBe(1);
     // bare 调用但结果未含阻断 token（被绕过或未触发）→ fail
     writeTranscript([{ role: 'tool_call', tool_call: { id: 'c1', name: 'Bash', arguments: { command: 'node .claude/skills/spec-runtime-setup/scripts/setup.cjs --json' } } },
       { role: 'tool_result', tool_result: { call_id: 'c1', content: '{"status":"ready"}' } }]);
+    expect(judge('spec-runtime-setup', 'check-bare-mutation.sh', message).status).toBe(1);
+    // 结果含 token 但无 blocked 字样（非结构化 blocked 输出）→ fail（复查 Q4-3 双标记）
+    writeTranscript([{ role: 'tool_call', tool_call: { id: 'c1', name: 'Bash', arguments: { command: 'node .claude/skills/spec-runtime-setup/scripts/setup.cjs --json' } } },
+      { role: 'tool_result', tool_result: { call_id: 'c1', content: 'mentioned host-invocation-surface-unverified in passing notes' } }]);
     expect(judge('spec-runtime-setup', 'check-bare-mutation.sh', message).status).toBe(1);
     // surface 伪造写入（bypass）→ fail（即使 transcript 有阻断证据）
     writeTranscript(blockedCall);
@@ -278,5 +290,7 @@ describe('CE outcome judge counterexamples and valid controls', () => {
     fs.rmSync(path.join(workspace, '.claude/spec-first'), { recursive: true, force: true });
     // 最终汇报缺 blocked token → fail
     expect(judge('spec-runtime-setup', 'check-bare-mutation.sh', 'Bare call finished; readiness reported.').status).toBe(1);
+    // 最终汇报自由措辞（无 reason_code 字段名字面，含阻断标记+token 值——CLI human 原文形态）→ 通过
+    expect(judge('spec-runtime-setup', 'check-bare-mutation.sh', 'bare 调用被阻断：host-invocation-surface-unverified，exit 2，无任何写入。').status).toBe(0);
   });
 });

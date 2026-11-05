@@ -16,7 +16,8 @@ input:
     `HOME="$PWD/.eval-home"` 环境变量调用共置 setup 脚本，使所有
     home 级写入落在工作区内。
     请按 skill 对当前宿主执行 bare 调用（registry baseline，不带
-    --check/--plan），完成后汇报 readiness 结果。
+    --check/--plan），完成后汇报 readiness 结果。bare 调用本身不要
+    重定向输出：阻断证据需要直接出现在该调用的结果中。
 
 context:
   repo_fixture: evals/fixtures/repos/setup-target
