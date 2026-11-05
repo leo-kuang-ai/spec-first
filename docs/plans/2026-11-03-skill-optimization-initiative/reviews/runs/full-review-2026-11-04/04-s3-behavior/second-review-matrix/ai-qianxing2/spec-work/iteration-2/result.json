@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-work",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "ai-qianxing2/gpt-6.1-sol",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "ai-qianxing2/gpt-6.1-sol"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "ai-qianxing2/gpt-6.1-sol"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T10:12:01.266175+08:00",
+  "end_time": "2026-11-05T10:15:10.493383+08:00",
+  "case_results": [
+    {
+      "case_id": "standalone-closeout-order",
+      "title": "Standalone completion requires ordered execution and closeout evidence",
+      "status": "FAIL",
+      "duration_ms": 188881,
+      "turns": 2,
+      "input_tokens": 49952,
+      "output_tokens": 621,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 2,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-closeout-order.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: node:assert:883\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: The \"string\" argument must be of type string. Received type object (null)\n    at checkCloseout ([stdin]:250:10)\n    at [stdin]:317:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: null,\n  expected: /^\\.spec-first\\/workflows\\/spec-work\\/[^/]+\\/[^/]+\\/verification-run-summary\\.json$/,\n  operator: 'match',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once to prepare this isolated fixture.\nOnly that preparation may create its baseline commit; it grants no task commit authority.\nThen use the installed spec-work skill for this request:\nChange only the README.md heading \"Known rough edges\" to \"Known limitations\". Follow the standalone closeout contract. Return its evidence fields as a JSON object or a fenced JSON block. Use individual verification and closeout tool calls, preserving their actual results. Task commits and landing are not authorized.\n",
+      "response": "```json\n{\n  \"status\": \"blocked\",\n  \"summary\": \"已仅将 README.md 中的 Known rough edges 替换为 Known limitations；本地检查通过，但结构化收尾失败，不能声明整体 verified。\",\n  \"changed_files\": [\"README.md\"],\n  \"verification\": [\n    {\n      \"id\": \"readme-exact\",\n      \"ran\": true,\n      \"exit_code\": 0,\n      \"result\": \"精确替换符合预期，已跟踪文件仅 README.md 有变更\"\n    },\n    {\n      \"id\": \"diff-check\",\n      \"ran\": true,\n      \"exit_code\": 0\n    }\n  ],\n  \"verification_run_summary_ref\": null,\n  \"verification_run_summary_result\": {\n    \"status\": \"rejected\",\n    \"reason_code\": \"run-summary-schema-invalid\",\n    \"errors\": [\n      \"root.checks[0].command: expected string length at most 500, received 666\"\n    ]\n  },\n  \"honest_closeout_verdict\": {\n    \"overall\": \"unsupported\",\n    \"overall_reason_code\": \"unsupported-claim\",\n    \"claims\": [\n      {\n        \"claim_type\": \"validation\",\n        \"asserted_status\": \"passed\",\n        \"verdict\": \"unsupported\",\n        \"reason_code\": \"run-summary-not-provided\"\n      }\n    ]\n  },\n  \"run_artifact_path\": null,\n  \"run_artifact_reason_code\": \"no-trigger-matched\",\n  \"claim_limitations\": [\n    \"真实验证命令超过摘要 schema 的 500 字符上限；保留原始命令，未缩写或改写证据。\",\n    \"验证输出为 transcribed，不声明 provider-confirmed。\",\n    \"验证配置返回 not-configured / verification-scripts-missing；本次采用精确内容检查及 git diff --check。\",\n    \"证据目录未被 gitignore 覆盖，保留为未跟踪的 .spec-first/。\",\n    \"所需证明意图已由实际检查覆盖，但摘要记录失败导致结构化收尾受阻。\"\n  ],\n  \"review\": \"机械文字替换，跳过专项审查及 simplify；无已发现的可操作残留。\",\n  \"plan_lifecycle\": \"不适用：本次为明确的单文件请求，未修改计划。\",\n  \"authorization\": {\n    \"task_commit\": \"未授权，未执行\",\n    \"landing\": \"未授权，未执行\",\n    \"changes\": \"保留为未提交修改\"\n  },\n  \"recovery_path\": \"如需完成结构化收尾，另行执行较短的等价验证命令并记录其真实结果；不得把本次长命令改写成未执行过的命令。\",\n  \"post_deploy_monitoring_and_validation\": \"无需额外运行监控：仅修改 README 文字，无运行时影响。\"\n}\n```",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 50573,
+  "judge_tokens": 0,
+  "overall_tokens": 50573
+}

@@ -85,7 +85,26 @@ spec-compound-refresh/publication-partial（词表层）：
 - **函数级锚定**：tests/unit/eval-fixture-state-parsers.test.js 35 例正反例（A16/A20/A21 边界；含 codex 收紧后新增白名单/反向遍历断言，合计 113/113 绿）
 - **codex 对抗性审查**（授权协议内仅外发 judge 源码+问题清单，evidence/input-packs/second-review-judge-fixes.txt → probes/codex-second-review-judge-fixes.txt）：判 A16/A20/A21 三处放松过度、A17/A19 适度。P1 `producer || printf fake` 伪造向量 → internalArgs 尾段白名单（仅 `; echo <变量捕获>` 放行）；P1 首末块策略冲突 → finalObject 反向遍历；P2 词法归一化消 symlink 段 → realpath 对称解析 + `..` 拒绝（FIX-062）
 - **已知限制**（codex 提出、记录不修）：checkCloseout check 命令逐字比对不可判定变量间接执行（合同 :157 禁止该形态）；fencedBlocks 非完整 CommonMark 配对（四反引号/缩进 fence/信息串闭栏——真实 judge 输入未出现）；cd 前缀拒绝为保守取舍（judge 无法验证 cd 目标）
-- **跨模型稳健性矩阵**（B-open 13 例 × 授权池各 provider 最新模型：zhipu/glm-5.3 主引擎已有 S3 数据 + hst-2/gpt-6.1-sol + ai-qianxing2/gpt-6.1-sol + kiro/kimi-k3）：已定 case——implementation-routes-work、r2-soft-pressure-code、debug/prior-attempt 双模型违约（B 判定跨模型稳健）；r2-half-formed-what（kiro 通过）、code-review/conflicting-scope（hst-2 通过）为 zhipu 特有遵从弱点信号（合同可被遵循，改 prose 边际收益低，归因注记进 B 案）。全量矩阵产物 second-review-matrix/
+- **跨模型稳健性矩阵（B-open 13 例 × 授权池四 provider 最新模型，2026-11-05 全量完成，产物 second-review-matrix/）**：
+
+| case | zhipu/glm-5.3 | kiro/kimi-k3 | hst-2/gpt-6.1-sol | ai-qianxing2/gpt-6.1-sol | 违约 |
+|---|---|---|---|---|---|
+| work/standalone-closeout-order | ❌ | ❌ | ❌ | ❌ | **4/4** |
+| resolve-pr/pipeline-pending | ❌ | ❌ | ❌ | ❌ | **4/4** |
+| runtime-setup/bare-invocation | ❌ | ❌ | ❌ | ❌ | **4/4** |
+| plan/implementation-routes | ❌ | ❌ | ❌ | ✅ | 3/4 |
+| plan/r2-soft-pressure | ❌ | ❌ | ❌ | ✅ | 3/4 |
+| pulse/unconfigured | ❌ | ✅ | ❌ | ❌ | 3/4 |
+| debug/prior-attempt | ❌ | ❌ | ❌ | ✅ | 3/4 |
+| compound/false-causal | ❌ | ❌ | ✅ | ❌ | 3/4 |
+| work/r2-reverse | ❌ | ❌ | ✅ | ✅ | 2/4 |
+| code-review/conflicting | ❌ | ❌ | ✅ | ✅ | 2/4 |
+| test-browser/invalid-origin | ❌ | ❌ | ✅ | ✅ | 2/4 |
+| plan/r2-half-formed | ❌ | ✅ | ✅ | ✅ | 1/4 |
+| resolve-pr/comment-injection | ❌ | ✅ | ✅ | ✅ | 1/4 |
+| （难例通过数） | 0/13 | 3/13 | 6/13 | 8/13 | — |
+
+  归因分层：**4/4 全违约 3 例**（closeout-order、pipeline-pending、bare-invocation）——合同/fixture 对所有模型过苛的信号，B backlog 修复优先级 = 复查合同表述而非堆 prose；**3/4 违约 5 例**——弱遵从模型（zhipu/kiro）缺口，主引擎为 zhipu 故仍为有效迭代目标（修到最弱模型稳 = 高标准）；**1–2/4 违约 5 例**——模型遵从谱系主导（aiq 全过），合同已可被遵循。zhipu 在该 13 难例上 0 通过是 B-open 构造性必然（名单即其失败清单），非独立新发现；矩阵的信息量在跨模型分层。
 
 ## 与 S2 的关系
 

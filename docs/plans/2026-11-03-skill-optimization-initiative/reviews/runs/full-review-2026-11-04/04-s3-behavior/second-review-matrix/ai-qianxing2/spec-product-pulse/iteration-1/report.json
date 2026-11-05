@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-product-pulse",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "ai-qianxing2/gpt-6.1-sol",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "ai-qianxing2/gpt-6.1-sol"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "ai-qianxing2/gpt-6.1-sol"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T10:17:05.032719+08:00",
+  "end_time": "2026-11-05T10:17:17.429918+08:00",
+  "case_results": [
+    {
+      "case_id": "unconfigured-guides-setup",
+      "title": "未配置时应引导 setup 而非硬跑空报告",
+      "status": "FAIL",
+      "duration_ms": 12252,
+      "turns": 1,
+      "input_tokens": 19595,
+      "output_tokens": 64,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-product-pulse/evals/fixtures/scripts/asks-a-question.sh",
+            "passed": false,
+            "evidence": "输出未包含问句变体或索要输入的表述,未体现向用户提问的行为"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-product-pulse skill 已安装，请按它工作。）\n给我出一份产品脉搏报告。\n",
+      "response": "`spec-product-pulse` 已安装，但它被设置为**只能由你直接调用**，我无法代为启动。\n\n请直接发送：\n\n```text\n/spec-product-pulse 给我出一份产品脉搏报告\n```\n\n这样即可按该 Skill 的流程继续。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 19659,
+  "judge_tokens": 0,
+  "overall_tokens": 19659
+}

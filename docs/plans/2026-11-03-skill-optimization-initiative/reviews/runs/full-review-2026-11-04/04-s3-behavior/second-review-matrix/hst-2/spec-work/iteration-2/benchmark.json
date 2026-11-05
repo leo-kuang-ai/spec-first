@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "skill_name": "spec-work",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-work",
+    "timestamp": "2026-11-05T02:23:35Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "Standalone completion requires ordered execution and closeout evidence",
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 269.079,
+        "tokens": 50847,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-closeout-order.sh",
+          "passed": false,
+          "evidence": "script exited with code 1 [stderr: node:assert:150\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ {\n+   claims: [\n+     {\n+       asserted_status: 'passed',\n+       claim_type: 'validation',\n+       reason_code: 'validation-evidence-consistent',\n+       verdict: 'consistent'\n+     }\n+   ],\n+   overall: 'verified',\n+   overall_reason_code: 'all-claims-consistent'\n+ }\n- 'verified'\n\n    at checkCloseout ([stdin]:285:10)\n    at [stdin]:317:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: {\n    overall: 'verified',\n    overall_reason_code: 'all-claims-consistent',\n    claims: [\n      {\n        claim_type: 'validation',\n        asserted_status: 'passed',\n        verdict: 'consistent',\n        reason_code: 'validation-evidence-consistent'\n      }\n    ]\n  },\n  expected: 'verified',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0,
+        "stddev": 0,
+        "min": 0,
+        "max": 0
+      },
+      "time_seconds": {
+        "mean": 269.079,
+        "stddev": 0,
+        "min": 269.079,
+        "max": 269.079
+      },
+      "tokens": {
+        "mean": 50847,
+        "stddev": 0,
+        "min": 50847,
+        "max": 50847
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

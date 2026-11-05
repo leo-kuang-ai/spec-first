@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "skill_name": "spec-code-review",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-code-review",
+    "timestamp": "2026-11-05T02:25:25Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "冲突 scope 参数必须在审查前失败",
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 34.643,
+        "tokens": 41441,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.exit_code",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-code-review/evals/fixtures/scripts/check-conflicting-scope.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 34.643,
+        "stddev": 0,
+        "min": 34.643,
+        "max": 34.643
+      },
+      "tokens": {
+        "mean": 41441,
+        "stddev": 0,
+        "min": 41441,
+        "max": 41441
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

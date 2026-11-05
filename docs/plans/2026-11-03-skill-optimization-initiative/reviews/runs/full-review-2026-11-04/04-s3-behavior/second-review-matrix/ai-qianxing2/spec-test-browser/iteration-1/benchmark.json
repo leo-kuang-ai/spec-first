@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "skill_name": "spec-test-browser",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-test-browser",
+    "timestamp": "2026-11-05T02:17:05Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "非法 origin token 应 fail-closed 拒绝",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 28.36,
+        "tokens": 24325,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[target-origin-invalid]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[target-origin-invalid])"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 28.36,
+        "stddev": 0,
+        "min": 28.36,
+        "max": 28.36
+      },
+      "tokens": {
+        "mean": 24325,
+        "stddev": 0,
+        "min": 24325,
+        "max": 24325
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

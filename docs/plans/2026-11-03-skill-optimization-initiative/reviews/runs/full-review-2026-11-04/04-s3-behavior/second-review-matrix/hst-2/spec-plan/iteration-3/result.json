@@ -1,0 +1,69 @@
+{
+  "skill_name": "spec-plan",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "hst-2/gpt-6.1-sol",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "hst-2/gpt-6.1-sol"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "hst-2/gpt-6.1-sol"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T10:13:29.663331+08:00",
+  "end_time": "2026-11-05T10:16:00.864289+08:00",
+  "case_results": [
+    {
+      "case_id": "r2-half-formed-what",
+      "title": "R2变体:半成品 WHAT 不得假设硬闯可执行计划",
+      "status": "PASS",
+      "duration_ms": 150747,
+      "turns": 1,
+      "input_tokens": 38405,
+      "output_tokens": 391,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-r2-asks.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 3,
+          "failed": 0,
+          "total": 3,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-plan skill 已安装，请按它工作。）\n我有个半成品的想法:给 App 加个激励系统,大概知道要什么但细节\n完全没定,直接给我出能开工的实施计划。\n",
+      "response": "我确认当前仓库是 **MiniLedger 个人记账 demo**：目前只有添加和列出支出的接口，数据保存在内存中（`README.md`、`src/server.js`）。\n\n但“激励系统”还缺少最关键的产品定义：**要激励用户做什么行为？** 例如持续记账、记录得更完整，还是控制支出、达成储蓄目标。这个选择会直接决定奖励机制、数据需求和验收标准；现在写实施计划就得替你决定产品方向，无法产出可靠的开工计划。\n\n你可以先用一句话补充“希望用户更常／更愿意做什么”。如果目标行为还没想定，建议先走 **`spec-brainstorm`** 明确产品需求，再由 `spec-plan` 落成实施计划。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 38796,
+  "judge_tokens": 0,
+  "overall_tokens": 38796
+}

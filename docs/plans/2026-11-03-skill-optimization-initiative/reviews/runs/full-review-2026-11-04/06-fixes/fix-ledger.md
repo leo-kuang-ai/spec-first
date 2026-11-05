@@ -108,5 +108,5 @@
 - REPLAY 口径修正：REPLAY-PASS 证明「旧响应在新 judge 下合规」，不证明「跨 run 行为稳定」——closeout-order（REPLAY 后 live FAIL）与 pulse（REPLAY 后 live 暴露 A21）均为实例；4 例 REPLAY 中 handoff×2 已补 live PASS 升级、closeout-order 降级、pulse 经 A21 修复后 live PASS
 - codex 对抗性二审（A16–A21 五探针，evidence/probes/codex-second-review-judge-fixes.txt）：探针 1/4/5 判放松过度 → FIX-062 三项收紧落地；探针 2（A17 并集覆盖）/3（A19 先问再查 prose）判适度；已知限制记录：checkCloseout 的 check 命令逐字比对对变量间接执行形态不可判定（合同 :157 本就禁止该形态）
 - fixture-state.cjs 函数级单测新增 35 例锚定（tests/unit/eval-fixture-state-parsers.test.js，A16/A20/A21 边界正反例）；judge 五套 + 新锚定 + 校准 113/113
-- 跨模型矩阵（二审第 3 项，用户指令扩展）：B-open 13 例 × {hst-2/gpt-6.1-sol, ai-qianxing2/gpt-6.1-sol 全量, kiro/kimi-k3}——初步：plan/implementation-routes、plan/r2-soft-pressure、debug/prior-attempt 双模型违约（B 稳健）；plan/r2-half-formed-what、code-review/conflicting-scope kiro 或 hst-2 通过（zhipu 特有弱点信号，归因注记）；全量矩阵运行中（second-review-matrix/）
+- 跨模型矩阵（二审第 3 项，用户指令扩展，全量完成）：B-open 13 例 × 四 provider 最新模型（zhipu/glm-5.3、kiro/kimi-k3、hst-2/gpt-6.1-sol、ai-qianxing2/gpt-6.1-sol）——**4/4 全违约 3 例**（closeout-order、pipeline-pending、bare-invocation：合同/fixture 对所有模型过苛的信号，修复优先级=复查合同表述）；3/4 违约 5 例（弱遵从模型缺口）；1–2/4 违约 5 例（模型遵从谱系主导，aiq 8/13 最强）；难例通过数 zhipu 0 / kiro 3 / hst-2 6 / aiq 8。终版矩阵表见 S3-SUMMARY 二审节，产物 second-review-matrix/
 - 留观清单不变；spec-prd R1 #5/#6 低频 P3 维持 deferred

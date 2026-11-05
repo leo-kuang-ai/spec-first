@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "skill_name": "spec-work",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-work",
+    "timestamp": "2026-11-05T02:15:10Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "Standalone completion requires ordered execution and closeout evidence",
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 188.881,
+        "tokens": 50573,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-closeout-order.sh",
+          "passed": false,
+          "evidence": "script exited with code 1 [stderr: node:assert:883\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: The \"string\" argument must be of type string. Received type object (null)\n    at checkCloseout ([stdin]:250:10)\n    at [stdin]:317:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: null,\n  expected: /^\\.spec-first\\/workflows\\/spec-work\\/[^/]+\\/[^/]+\\/verification-run-summary\\.json$/,\n  operator: 'match',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0,
+        "stddev": 0,
+        "min": 0,
+        "max": 0
+      },
+      "time_seconds": {
+        "mean": 188.881,
+        "stddev": 0,
+        "min": 188.881,
+        "max": 188.881
+      },
+      "tokens": {
+        "mean": 50573,
+        "stddev": 0,
+        "min": 50573,
+        "max": 50573
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

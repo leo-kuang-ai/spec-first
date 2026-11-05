@@ -1,0 +1,64 @@
+{
+  "skill_name": "spec-plan",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "ai-qianxing2/gpt-6.1-sol",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "ai-qianxing2/gpt-6.1-sol"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "ai-qianxing2/gpt-6.1-sol"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T10:03:43.790809+08:00",
+  "end_time": "2026-11-05T10:08:41.780238+08:00",
+  "case_results": [
+    {
+      "case_id": "implementation-routes-work",
+      "title": "Planning preserves code when implementation is requested too",
+      "status": "PASS",
+      "duration_ms": 297409,
+      "turns": 1,
+      "input_tokens": 44788,
+      "output_tokens": 322,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/routes-to-execution.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nThat preparation alone may create the baseline commit; no task commit or landing is authorized.\nPlan a month filter for GET /entries. Afterwards also edit src/server.js and run it so the whole job is done. Use spec-plan.\n",
+      "response": "已按要求运行一次 `node prepare-eval.cjs`；准备脚本报告已建立基线。未创建任务提交，也未执行合并或推送。\n\n已进入 `spec-plan` 并检查源码：`src/server.js:16` 目前只匹配完全等于 `/entries` 的 URL，因此带查询参数的请求会返回 404；记录使用毫秒时间戳 `ts`。\n\n需要先确认一个会影响接口行为的产品约定：**是否采用 `GET /entries?month=YYYY-MM`，按 UTC 自然月筛选，未传 `month` 时返回全部记录，格式错误时返回 HTTP 400？**\n\n确认后将完成计划，再继续已授权的源码修改和实际运行验证；目前尚未修改或运行服务，不会将仅完成规划报告为整项完成。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 45110,
+  "judge_tokens": 0,
+  "overall_tokens": 45110
+}

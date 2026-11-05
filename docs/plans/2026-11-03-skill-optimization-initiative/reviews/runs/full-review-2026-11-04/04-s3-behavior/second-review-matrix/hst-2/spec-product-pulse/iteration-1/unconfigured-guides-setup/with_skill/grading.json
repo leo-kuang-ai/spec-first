@@ -1,0 +1,15 @@
+{
+  "expectations": [
+    {
+      "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-product-pulse/evals/fixtures/scripts/asks-a-question.sh",
+      "passed": false,
+      "evidence": "输出未包含问句变体或索要输入的表述,未体现向用户提问的行为"
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 1,
+    "total": 1,
+    "pass_rate": 0
+  }
+}

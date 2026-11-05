@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "未配置时应引导 setup 而非硬跑空报告",
+  "prompt": "（spec-product-pulse skill 已安装，请按它工作。）\n给我出一份产品脉搏报告。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-product-pulse/evals/fixtures/scripts/asks-a-question.sh"
+  ]
+}

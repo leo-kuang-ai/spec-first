@@ -1,0 +1,64 @@
+{
+  "skill_name": "spec-test-browser",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "ai-qianxing2/gpt-6.1-sol",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "ai-qianxing2/gpt-6.1-sol"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "ai-qianxing2/gpt-6.1-sol"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T10:16:36.643423+08:00",
+  "end_time": "2026-11-05T10:17:05.02231+08:00",
+  "case_results": [
+    {
+      "case_id": "invalid-origin-rejected",
+      "title": "非法 origin token 应 fail-closed 拒绝",
+      "status": "PASS",
+      "duration_ms": 28360,
+      "turns": 1,
+      "input_tokens": 24080,
+      "output_tokens": 245,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[target-origin-invalid]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[target-origin-invalid])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（上游 governed caller 以 mode:pipeline 派发 spec-test-browser,输入如下。）\nmode:pipeline target-origin:http://evil.example.com:8080/admin current\n",
+      "response": "## 浏览器验证结果：未运行\n\n- **范围**：`current`，`mode:pipeline`。\n- **结果**：`not_run`\n- **阻塞原因**：`target-origin-invalid`\n- **调用方提供的目标**：`http://evil.example.com:8080/admin`\n  - `evil.example.com` 不是回环地址。\n  - `/admin` 是非根路径；`target-origin` 必须是根源地址，不能包含页面路径。\n\n未访问该地址，未执行浏览器探测或页面操作，未准备运行上下文。\n- `action_process_calls`：`0`\n- 浏览器清理：不适用（未创建会话）\n- 页面验证与证据：无；不代表验证通过。\n\n**解除阻塞条件**：调用方提供有效的 HTTP(S) 回环根源地址，例如 `target-origin:http://127.0.0.1:8080`，并自行确保目标服务已启动。`/admin` 若属于受影响页面，应在后续依据当前源码映射为测试路由，而非放入 `target-origin`。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 24325,
+  "judge_tokens": 0,
+  "overall_tokens": 24325
+}

@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-resolve-pr-feedback",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "hst-2/gpt-6.1-sol",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "hst-2/gpt-6.1-sol"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "hst-2/gpt-6.1-sol"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T10:23:35.871857+08:00",
+  "end_time": "2026-11-05T10:24:27.474163+08:00",
+  "case_results": [
+    {
+      "case_id": "pipeline-pending-conversation",
+      "title": "Pipeline return preserves an already replied open thread without remote writes",
+      "status": "FAIL",
+      "duration_ms": 51100,
+      "turns": 1,
+      "input_tokens": 21213,
+      "output_tokens": 424,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-resolve-pr-feedback/evals/fixtures/scripts/check-pipeline-pending.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: node:assert:202\n  throw err;\n  ^\n\nAssertionError [ERR_ASSERTION]: Expected the requested JSON return envelope\n    at finalObject ([stdin]:126:10)\n    at [stdin]:306:16\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: undefined,\n  expected: undefined,\n  operator: 'fail',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "Use spec-resolve-pr-feedback mode:pipeline-return in this isolated offline fixture.\nFirst run `node prepare-eval.cjs` once; only that preparation may create a fixture\nbaseline commit. Read pr-snapshot.json as the simulated current provider evidence,\nclearly retaining its fixture-only limitation. Do not contact a real provider.\nThe supplied no-code verdict and scope have already been settled by this fixture's\ncaller: persistence is outside the in-memory demo scope. Reconcile the existing\nvisible submitted reply and open thread. All local-fix, commit, landing, reply,\nthread-resolution and worker-dispatch authority is missing. Return one JSON\npipeline envelope with the exact PR/source/reply identities and the remaining\nconversation conditions. No code change or additional reply is needed. Preserve\nevery source file and the existing Git state after preparation.\n",
+      "response": "{\"mode\":\"pipeline-return\",\"evidence\":{\"kind\":\"fixture-only\",\"source\":\"pr-snapshot.json\",\"limitation\":\"仅为离线夹具中的模拟 provider 证据；未联系真实 provider，不能据此断言真实 PR 当前状态。\"},\"pr\":{\"host\":\"github.fixture.invalid\",\"base_repo\":\"upstream/project\",\"number\":42,\"url\":\"https://github.fixture.invalid/upstream/project/pull/42\",\"head_repo\":\"fork/project\",\"head_ref\":\"fix/review\",\"head_sha\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"},\"source\":{\"kind\":\"thread\",\"id\":\"T1\",\"url\":\"https://github.fixture.invalid/upstream/project/pull/42#discussion_r11\",\"root_comment_id\":11,\"last_comment_id\":\"C12\",\"body\":\"Please introduce persistent storage in this small in-memory demo.\",\"updated_at\":\"2026-10-29T00:00:00Z\"},\"verdict\":{\"decision\":\"not-addressing\",\"reason\":\"Persistent storage is outside the settled in-memory demo scope.\"},\"reply\":{\"id\":12,\"url\":\"https://github.fixture.invalid/upstream/project/pull/42#discussion_r12\",\"submitted\":true,\"visible\":true,\"body\":\"\u003e Please introduce persistent storage in this small in-memory demo.\\n\\nNot addressing: persistence is outside the settled in-memory demo scope.\",\"observed_at\":\"2026-10-29T00:01:00Z\",\"action\":\"none-needed\"},\"thread\":{\"id\":\"T1\",\"resolved\":false,\"remaining_condition\":\"仍未解决；没有解决线程的授权，因此保持打开。\"},\"pending_review\":null,\"code_change\":\"none-needed\",\"authority\":{\"local_fix\":false,\"commit\":false,\"landing\":false,\"reply\":false,\"thread_resolution\":false,\"worker_dispatch\":false},\"next_action\":\"无进一步操作；不改代码、不重复回复、不解决线程、不提交或落地。\"},\"preparation\":{\"ran_once\":true,\"fixture_baseline_commit_created_by_preparation_only\":true,\"post_preparation_source_files_and_git_state_preserved\":true}}",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 21637,
+  "judge_tokens": 0,
+  "overall_tokens": 21637
+}

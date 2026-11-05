@@ -1,6 +1,6 @@
 # 全量审查总报告（2026-11-04 run，终稿 2026-11-05）
 
-> 状态：**静态层全部收敛、修复全部落地；行为层为基线而非验收门（76.1%，含未判定与待裁定项）**。本报告不宣称「完整审查通过」。
+> 状态：**静态层全部收敛、修复全部落地；行为层为基线而非验收门（归因+二审后确认 142/155 = 91.6%，B-open 13 例留 eval 驱动迭代）**。本报告不宣称「完整审查通过」。
 
 ## 执行概览
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | S0/S1 | 登记、方案、试点（spec-plan/spec-code-review K=3） | 完成 |
 | S2 静态 | 38 skill × 18 维 × K=2/3 分层盲评 + L1 仲裁 + 修复 | **完成：38/38 收敛** |
-| S3 行为 | 38 skill × 155 case（skill-up fresh-source，zhipu/glm-5.3） | **基线+归因+逐名审计：原始 118/155 → 确认 143/155（92.3%）**；37 非 pass 全部逐例归因（A 类 eval 基建 20 例全修复验证、B 类真实行为缺口 12 例 backlog；25 例翻转全部 live/REPLAY 行为级证据），见 04-s3-behavior/S3-SUMMARY.md |
+| S3 行为 | 38 skill × 155 case（skill-up fresh-source，zhipu/glm-5.3） | **基线+归因+逐名审计+二审：原始 118/155 → 确认 142/155（91.6%）**；37 非 pass 全部逐例归因（A 类 eval 基建 21 例全修复验证、B 类真实行为缺口 13 例 backlog；二审波：REPLAY live 复验修正口径、codex 对抗审收紧 3 处、跨模型矩阵 13 例 × 4 provider——3 例全模型违约指向合同/fixture 层），见 04-s3-behavior/S3-SUMMARY.md |
 | 修复落地 | FIX-001..060 | **全部 landed**（见 fix-ledger 对账） |
 
 评审者：R1 zhipu/glm-5.3 / R2 gpt-6.1-sol（ai-qianxing2 备用）/ R3 kiro/kimi-k3（批次1 K=3）/ L1 仲裁 hst-2/gpt-6-astra。冻结 worktree 5b59293b，修复落主仓。
@@ -40,15 +40,15 @@
 
 ## S3 行为基线（非验收门）
 
-- 原始 118/155（20/38 skill 全 case 通过）→ 逐名审计后确认 143/155（bverify +4、eval-iteration +2、REPLAY 计法统一 +3、riffrec fence 修复 +1）
-- 全部 37 非 pass 逐例归因：A 类 eval 基建 20 例（judge 窄假设/prompt-judge 失配/词表未承载/引擎挂载面/只读 Bash 白名单/组合尾巴隐形 A16/judge 严于 CLI 合同 A17/词汇代理 judge A18/合同未承载 order A19/fence 配对 A20，全部修复并经 live 或确定性 REPLAY 验证）；B 类真实行为缺口 12 例 open backlog（plan 遵从 ×3、resolve-pr ×2、work 受保护边界、debug 先问再查 order、code-review fence、test-browser token、pulse 拒绝变体、bare fail-closed、false-causal 脚手架引用——合同均已承载，留 eval 驱动迭代）
-- 修复登记 FIX-001..060；judge 五套单测 93/93（A16–A20 后保持绿）；runtime mirror 再生、test:mcp-setup（34 套件/773 测试）与 doctor 复验绿
+- 原始 118/155（20/38 skill 全 case 通过）→ 逐名审计 143/155 → **二审波终态 142/155（91.6%）**（bverify +4、eval-iteration +2、REPLAY 统一 +3、riffrec fence +1；二审 live 复验 closeout-order 降级 −1、pulse A21 修复保持 +0）
+- 全部 37 非 pass 逐例归因：A 类 eval 基建 21 例（judge 窄假设/prompt-judge 失配/词表未承载/引擎挂载面/只读 Bash 白名单/组合尾巴隐形 A16/judge 严于 CLI 合同 A17/词汇代理 judge A18/合同未承载 order A19/fence 配对 A20/绝对路径窄假设 A21，全部修复并经 live 验证）；B 类真实行为缺口 13 例 open backlog（plan 遵从 ×3、resolve-pr ×2、work 受保护边界 + 逐字命令、debug 先问再查 order、code-review fence、test-browser token、pulse 拒绝变体、bare fail-closed、false-causal 脚手架引用——合同均已承载，留 eval 驱动迭代；跨模型矩阵显示其中 3 例全模型违约，优先复查合同/fixture 表述）
+- 修复登记 FIX-001..062；judge 相关单测 113/113（含 fixture-state 函数级锚定 35 例）；runtime mirror 再生、test:mcp-setup（34 套件/773 测试）与 doctor 复验绿
 - 5 超时（300-600s 档）可提档重跑
 
 ## 诚实边界
 
 - 静态层「收敛」= 18 维逐项 pass（含仲裁修复后），不等于行为正确性——后者由 S3 基线与后续 eval 驱动迭代承担
-- S3 FAIL 的 30 例未在本轮消化（本轮义务为审查+静态修复+基线建立）
+- S3 的 B-open 13 例未在本轮消化（本轮义务为审查+静态修复+基线建立+二审复核；行为迭代属后续 eval 驱动循环）
 - spec-prd R1 #5/#6 低频 P3 维持 deferred；留观清单见 fix-ledger
 - 模型收益未外推：本轮不宣称团队/模型级收益
 - runtime mirror 再生统一在收尾执行（spec-first init）

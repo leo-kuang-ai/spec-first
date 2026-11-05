@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "skill_name": "spec-product-pulse",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-product-pulse",
+    "timestamp": "2026-11-05T02:26:43Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "未配置时应引导 setup 而非硬跑空报告",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 8.439,
+        "tokens": 17283,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-product-pulse/evals/fixtures/scripts/asks-a-question.sh",
+          "passed": false,
+          "evidence": "输出未包含问句变体或索要输入的表述,未体现向用户提问的行为"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0,
+        "stddev": 0,
+        "min": 0,
+        "max": 0
+      },
+      "time_seconds": {
+        "mean": 8.439,
+        "stddev": 0,
+        "min": 8.439,
+        "max": 8.439
+      },
+      "tokens": {
+        "mean": 17283,
+        "stddev": 0,
+        "min": 17283,
+        "max": 17283
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

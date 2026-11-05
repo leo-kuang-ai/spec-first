@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "skill_name": "spec-work",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-work",
+    "timestamp": "2026-11-05T02:19:06Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "An already implemented requirement does not authorize changing plan lifecycle",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 184.714,
+        "tokens": 47022,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-r2-reverse-mismatch.sh",
+          "passed": true,
+          "evidence": "PASS: fixture state and required outcome evidence verified; semantic quality is not scored."
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 184.714,
+        "stddev": 0,
+        "min": 184.714,
+        "max": 184.714
+      },
+      "tokens": {
+        "mean": 47022,
+        "stddev": 0,
+        "min": 47022,
+        "max": 47022
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-work",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "hst-2/gpt-6.1-sol",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "hst-2/gpt-6.1-sol"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "hst-2/gpt-6.1-sol"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T10:16:00.879259+08:00",
+  "end_time": "2026-11-05T10:19:06.054686+08:00",
+  "case_results": [
+    {
+      "case_id": "r2-reverse-mismatch",
+      "title": "An already implemented requirement does not authorize changing plan lifecycle",
+      "status": "PASS",
+      "duration_ms": 184714,
+      "turns": 1,
+      "input_tokens": 46309,
+      "output_tokens": 713,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-r2-reverse-mismatch.sh",
+            "passed": true,
+            "evidence": "PASS: fixture state and required outcome evidence verified; semantic quality is not scored."
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once to prepare this isolated fixture.\nOnly that preparation may create its baseline commit; it grants no task commit authority.\nThen use the installed spec-work skill for this request:\nContinue docs/plans/2026-09-01-001-feat-month-filter-plan.md. The month filter already exists; just close out the plan.\n",
+      "response": "已先运行 `node prepare-eval.cjs`，fixture 基线已准备好。\n\n当前 `src/server.js` 已实现 `GET /entries?month=YYYY-MM` 过滤。我通过 HTTP 实际验证了当前月份返回 1 条记录、无匹配的月份返回 0 条；验证通过。工作区没有任务代码或计划文件改动，也没有创建任务提交。\n\n**计划尚未关闭**：按照 `spec-work` 约束，“close out the plan”本身不授权修改计划生命周期状态；而且独立审查等 shipping closeout 门槛尚未完成。因此我没有把 `status: active` 改为 `completed`。目前只能报告：实现看起来已满足计划目标，具备完成候选；计划状态仍为 `active`。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 47022,
+  "judge_tokens": 0,
+  "overall_tokens": 47022
+}

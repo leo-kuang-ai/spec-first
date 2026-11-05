@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "非法 origin token 应 fail-closed 拒绝",
+  "prompt": "（上游 governed caller 以 mode:pipeline 派发 spec-test-browser,输入如下。）\nmode:pipeline target-origin:http://evil.example.com:8080/admin current\n",
+  "assertions": [
+    "expect.must_contain",
+    "output_contains{all:[target-origin-invalid]}"
+  ]
+}

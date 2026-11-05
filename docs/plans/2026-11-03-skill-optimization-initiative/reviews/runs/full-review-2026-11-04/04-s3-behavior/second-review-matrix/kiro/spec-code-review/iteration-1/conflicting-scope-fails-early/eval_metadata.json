@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "冲突 scope 参数必须在审查前失败",
+  "prompt": "请使用 spec-code-review 执行 mode:agent base:HEAD feature/other-branch 审查。\n不要调用子代理。最终只返回该 Skill 规定的机器可消费结果。\n",
+  "assertions": [
+    "expect.exit_code",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-code-review/evals/fixtures/scripts/check-conflicting-scope.sh"
+  ]
+}

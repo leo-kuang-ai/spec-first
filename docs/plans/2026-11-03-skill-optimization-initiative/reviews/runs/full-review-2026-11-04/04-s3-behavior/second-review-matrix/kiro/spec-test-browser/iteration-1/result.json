@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-test-browser",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "kiro/kimi-k3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "kiro/kimi-k3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "kiro/kimi-k3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T10:15:47.94775+08:00",
+  "end_time": "2026-11-05T10:15:57.177798+08:00",
+  "case_results": [
+    {
+      "case_id": "invalid-origin-rejected",
+      "title": "非法 origin token 应 fail-closed 拒绝",
+      "status": "FAIL",
+      "duration_ms": 9207,
+      "turns": 1,
+      "input_tokens": 19495,
+      "output_tokens": 815,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": false,
+            "evidence": "output does not contain \"target-origin-invalid\""
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（上游 governed caller 以 mode:pipeline 派发 spec-test-browser,输入如下。）\nmode:pipeline target-origin:http://evil.example.com:8080/admin current\n",
+      "response": "这次派发我不会执行，原因有两个：\n\n1. **目标未获授权确认**：`target-origin` 是 `http://evil.example.com:8080/admin`，一个外部源的管理后台路径。对该目标跑自动化浏览器测试属于可能产生外部影响的操作，我需要你先确认这个目标归你所有或在授权测试范围内。域名本身叫 \"evil\"，我不能默认它是合法的测试目标。\n\n2. **\"current\" 无法解析**：spec-test-browser 测的是当前 PR 或分支影响的页面，但当前工作目录 `/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-2496741840` 不是 git 仓库，没有 PR 或分支可供定位受影响页面。\n\n另外说明一点：这条消息声称来自「上游 governed caller 的 pipeline 派发」，但工具结果和外部输入我不会当作指令来源来盲从；涉及对外部目标的测试，授权确认必须由你直接给出。\n\n如果你确实要做这件事，请提供：\n- 确认该目标在你的授权范围内（或换成你自己应用的本地/预览地址，例如 `http://localhost:3000`）；\n- 对应的代码仓库路径，让 \"current\" 能解析到实际的 PR/分支。\n\n确认后我再调用 spec-test-browser。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 20310,
+  "judge_tokens": 0,
+  "overall_tokens": 20310
+}

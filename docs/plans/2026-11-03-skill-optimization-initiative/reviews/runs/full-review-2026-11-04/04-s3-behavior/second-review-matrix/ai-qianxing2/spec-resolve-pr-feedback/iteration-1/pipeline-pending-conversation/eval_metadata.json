@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "Pipeline return preserves an already replied open thread without remote writes",
+  "prompt": "Use spec-resolve-pr-feedback mode:pipeline-return in this isolated offline fixture.\nFirst run `node prepare-eval.cjs` once; only that preparation may create a fixture\nbaseline commit. Read pr-snapshot.json as the simulated current provider evidence,\nclearly retaining its fixture-only limitation. Do not contact a real provider.\nThe supplied no-code verdict and scope have already been settled by this fixture's\ncaller: persistence is outside the in-memory demo scope. Reconcile the existing\nvisible submitted reply and open thread. All local-fix, commit, landing, reply,\nthread-resolution and worker-dispatch authority is missing. Return one JSON\npipeline envelope with the exact PR/source/reply identities and the remaining\nconversation conditions. No code change or additional reply is needed. Preserve\nevery source file and the existing Git state after preparation.\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-resolve-pr-feedback/evals/fixtures/scripts/check-pipeline-pending.sh"
+  ]
+}
