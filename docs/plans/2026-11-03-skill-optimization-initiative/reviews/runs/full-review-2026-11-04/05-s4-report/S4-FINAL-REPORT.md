@@ -1,6 +1,6 @@
 # 全量审查总报告（2026-11-04 run，终稿 2026-11-05）
 
-> 状态：**静态层全部收敛、修复全部落地；行为层为基线而非验收门（归因+二审+B-open 消化两波后确认 147/155 = 94.8%，B-open 8 例留 eval 驱动迭代）**。本报告不宣称「完整审查通过」。
+> 状态：**静态层全部收敛、修复全部落地；行为层为基线而非验收门（归因+二审+B-open 消化两波+复查/复验/复扫三波后确认 147/155 = 94.8%，B-open 8 例留 eval 驱动迭代）**。本报告不宣称「完整审查通过」。
 
 ## 执行概览
 
@@ -9,7 +9,8 @@
 | S0/S1 | 登记、方案、试点（spec-plan/spec-code-review K=3） | 完成 |
 | S2 静态 | 38 skill × 18 维 × K=2/3 分层盲评 + L1 仲裁 + 修复 | **完成：38/38 收敛** |
 | S3 行为 | 38 skill × 155 case（skill-up fresh-source，zhipu/glm-5.3） | **基线+归因+逐名审计+二审+B-open 消化两波：原始 118/155 → 确认 147/155（94.8%）**；37 非 pass 全部逐例归因（A 类 eval 基建 26 例全修复验证、B 类真实行为缺口 8 例 backlog（归因闭环：合同可遵循、无隐藏 A）；二审波：REPLAY live 复验修正口径、codex 对抗审收紧 3 处、跨模型矩阵 13 例 × 4 provider——3 例全模型违约经 FIX-064 深挖全部消化：2 例藏 A 合同承载缺口 + 1 例 judge 结构缺陷），见 04-s3-behavior/S3-SUMMARY.md |
-| 修复落地 | FIX-001..060 | **全部 landed**（见 fix-ledger 对账） |
+| 收尾三波 | 复查（FIX-066）+ 跨模型复验（FIX-067）+ 藏 A 复扫（FIX-067 续） | **完成**：FIX-064 系复查者本人所写，按二审原则对 4/4 全违约三例合同表述做自查+ai-qianxing2 独立评审双路复查（采纳 5 修 prose/judge、登记不修 2）；5 个翻转 case × 其余三 provider 复验（bare-invocation 原 4/4 全违约→**4/4 全过**、false-causal 3/3 过，5 FAIL 格全为真 B 维持）；B-open 8 例已录制 FAIL transcript 用新 judge 确定性复扫（REPLAY 9 格+fixture-driven 3 格 live 重跑，真 B 维持 ×5、翻绿 ×1〔非主口径〕、无材料 ×1 如实登记）——**归因证据全部升级，无藏 A 残留** |
+| 修复落地 | FIX-001..067 | **全部 landed**（见 fix-ledger 对账） |
 
 评审者：R1 zhipu/glm-5.3 / R2 gpt-6.1-sol（ai-qianxing2 备用）/ R3 kiro/kimi-k3（批次1 K=3）/ L1 仲裁 hst-2/gpt-6-astra。冻结 worktree 5b59293b，修复落主仓。
 
@@ -40,15 +41,17 @@
 
 ## S3 行为基线（非验收门）
 
-- 原始 118/155（20/38 skill 全 case 通过）→ 逐名审计 143/155 → 二审波 142/155 → B-open 消化第一波 145/155 → **B-open 消化第二波 147/155（94.8%）**（bverify +4、eval-iteration +2、REPLAY 统一 +3、riffrec fence +1；二审 closeout-order 降级 −1、pulse A21 +0；B-open 消化：第一波 closeout-order/pipeline-pending/bare-invocation 三例 4/4 全违约深挖翻转，第二波 pulse/unconfigured〔disable-model-invocation 拒绝变体跨模型证实→SKILL.md flag 语义澄清〕+ compound/false-causal〔source_refs 白名单补被裁决对象〕，zhipu live PASS ×5）
-- 全部 37 非 pass 逐例归因：A 类 eval 基建 21 例（judge 窄假设/prompt-judge 失配/词表未承载/引擎挂载面/只读 Bash 白名单/组合尾巴隐形 A16/judge 严于 CLI 合同 A17/词汇代理 judge A18/合同未承载 order A19/fence 配对 A20/绝对路径窄假设 A21，全部修复并经 live 验证）；B 类真实行为缺口 13 例 open backlog（plan 遵从 ×3、resolve-pr ×2、work 受保护边界 + 逐字命令、debug 先问再查 order、code-review fence、test-browser token、pulse 拒绝变体、bare fail-closed、false-causal 脚手架引用——合同均已承载，留 eval 驱动迭代；跨模型矩阵显示其中 3 例全模型违约，优先复查合同/fixture 表述）
-- 修复登记 FIX-001..062；judge 相关单测 113/113（含 fixture-state 函数级锚定 35 例）；runtime mirror 再生、test:mcp-setup（34 套件/773 测试）与 doctor 复验绿
+- 原始 118/155（20/38 skill 全 case 通过）→ 逐名审计 143/155 → 二审波 142/155 → B-open 消化第一波 145/155 → **B-open 消化第二波 147/155（94.8%）**（bverify +4、eval-iteration +2、REPLAY 统一 +3、riffrec fence +1；二审 closeout-order 降级 −1、pulse A21 +0；B-open 消化：第一波 closeout-order/pipeline-pending/bare-invocation 三例 4/4 全违约深挖翻转，第二波 pulse/unconfigured〔disable-model-invocation 拒绝变体跨模型证实→SKILL.md flag 语义澄清〕+ compound/false-causal〔source_refs 白名单补被裁决对象〕，zhipu live PASS ×5）；收尾三波（FIX-066/067）计数不变——复查属合同质量修复、复验/复扫属稳健性与归因证据升级（跨模型格终态：bare-invocation 4/4 全过、false-causal 3/3 复验全过、closeout-order 与 pipeline-pending 各 3/4；5 FAIL 格 + 复扫 5 格真 B 维持全部逐格读 transcript 确认，与原归因一致、跨 run 稳定）
+- 全部 37 非 pass 逐例归因：A 类 eval 基建 26 例（judge 窄假设/prompt-judge 失配/词表未承载/引擎挂载面/只读 Bash 白名单/组合尾巴隐形 A16/judge 严于 CLI 合同 A17/词汇代理 judge A18/合同未承载 order A19/fence 配对 A20/绝对路径窄假设 A21/EVAL_EXIT_CODE 结构性不可满足 A25 等，全部修复并经 live 验证）；B 类真实行为缺口 8 例 open backlog（合同均已承载且经 2–4 模型通过证明可遵循，缺口为弱遵从模型执行保真度，留 eval 驱动迭代）
+- 修复登记 FIX-001..067；judge 相关单测 113/113→含复扫波后 parsers+outcome-judges+校准 101/101（fixture-state 函数级锚定）；runtime mirror 再生、test:mcp-setup（34 套件/773 测试）与 doctor 复验绿
 - 5 超时（300-600s 档）可提档重跑
 
 ## 诚实边界
 
 - 静态层「收敛」= 18 维逐项 pass（含仲裁修复后），不等于行为正确性——后者由 S3 基线与后续 eval 驱动迭代承担
-- S3 的 B-open 已消化两波（13→8：三例 4/4 全违约〔合同/fixture/judge 层〕+ pulse flag 变体 + false-causal 白名单；剩余 8 例归因闭环——矩阵 ≥1 provider 通过证明合同可遵循、无隐藏 A，缺口为弱遵从模型执行保真度，属后续 eval 驱动循环）
+- S3 的 B-open 已消化两波（13→8）；收尾三波将其归因证据升级为「新 judge 复验 + ≥1 格 live 重跑」——剩余 8 例合同可遵循性经 2–4 模型通过证明、无隐藏 A，缺口为弱遵从模型执行保真度（复验波实例：hst-2 自创 envelope 字段名、hst-2/aiq disable-model-invocation 拒绝维持、kiro 手写 run-summary artifact），属后续 eval 驱动循环，不靠堆 prose 解决
+- 复验波 judge 修复（checkCloseout 段级匹配+重定向剥离、bare-invocation 词表/汇报断言）均由真实失败形态驱动、白名单化收窄，并保留全部既有伪造向量拒绝；judge 词表两次被 live 抓回的教训（词表必须按被镜像 CLI 源码承载）已沉淀 memory #21/#22/#23
+- comment-injection 的 zhipu 违约格无录制 transcript（矩阵只存 kiro/hst-2/aiq），该格维持矩阵时归因未再复验——如实登记
 - spec-prd R1 #5/#6 低频 P3 维持 deferred；留观清单见 fix-ledger
 - 模型收益未外推：本轮不宣称团队/模型级收益
 - runtime mirror 再生统一在收尾执行（spec-first init）
@@ -57,7 +60,7 @@
 
 - `00-launch`…`02-s1-pilot`：登记与试点
 - `03-s2-static/batch{1..5}/`：盲评原文、L1、收敛报告、matrix.py
-- `04-s3-behavior/`：38 skill result.json + S3-SUMMARY.md
+- `04-s3-behavior/`：38 skill result.json + S3-SUMMARY.md + second-review-matrix/（跨模型矩阵与复验产物）
 - `05-s4-report/`：本报告
-- `06-fixes/fix-ledger.md`：FIX-001..060 对账
-- `evidence/`：codex 外发授权与落盘审计
+- `06-fixes/fix-ledger.md`：FIX-001..067 对账
+- `evidence/`：codex/aiq 外发授权与落盘审计（input-packs/ + probes/）
