@@ -177,19 +177,21 @@ flowchart TB
 
 ## Planning Contract
 
-Product Contract unchanged (byte-preserved upstream source slice).
+本轮审查修订仅触及 Planning Contract、Implementation Units 与 Verification Contract，未改写上游 Product Contract。此前“byte-preserved upstream source slice”声明缺少可复核的规划起点基线，本计划不再将其作为已验证事实；若后续需要证明跨阶段逐字节保留，须从上游需求稿的明确版本/提交重新建立基线。
 
 ### Key Technical Decisions
 
 - KTD1. **来源证明采用共享、保守的当前进程判定（`new`，复用现有解析器）。** 在 `src/cli/install-origin.js` 统一输出 `npm-global`、`claude-plugin`、`local` 或 `unknown` 加证据/原因；当前执行的包根目录必须与 `npm root -g` 下经身份、入口及真实路径核验的包一致，且全局包根不可是指向源码 checkout 的链接；不能只凭全局包存在、`PATH` 命中或非插件路径判断为 npm-global。复用 `src/cli/commands/update.js` 已有全局包入口验证及 `src/cli/version-reminder.js` 的路径线索，但将二者的来源语义收敛到一处；插件/本地只能在证据足够时正向识别，其他情况归 `unknown`。这是新增共享边界，而非新增包管理器或持久安装登记；npm/link、`npx`、符号链接解析失败和多份副本均按保守规则处理。Governs R1, R5, R15。
 - KTD2. **包升级与投射刷新分开记账（`extend`）。** `src/cli/commands/update.js` 在 KTD1 确认 npm-global 后沿用现有 npm resolver 和升级后全局 CLI bin 刷新路径；其他来源只给原生指引与独立 `init` 刷新步骤，不以本次未升级的旧 CLI 自动重写项目。保留按已装宿主和目标仓库选择、失败时跳过或降级的现有边界；升级成功后也仅能报告投射操作结果，不能证明宿主加载。Governs R4–R6, R8, R10–R12, R15。
-- KTD3. **提醒复用拉取与冷却机制，纠正比较对象和行动指引（`extend`）。** `src/cli/version-reminder.js` 与 `src/cli/index.js` 继续在现有合格调用/启动检查点查询 npm `latest`，不建常驻服务或推送通道；CLI 用执行中的包版本，宿主启动用目标投射的受管版本。所有指引消费 KTD1 的证据，不把 npm `latest` 等同插件渠道可用版本，不将未知判为已是最新；维持离线、超时、环境跳过与冷却的非阻塞语义。Governs R4, R14–R15。
+- KTD3. **提醒复用拉取与冷却机制，纠正比较对象和行动指引（`extend`）。** `src/cli/version-reminder.js` 与 `src/cli/index.js` 继续在现有合格调用/启动检查点查询 npm `latest`，不建常驻服务或推送通道；交互式 CLI 提醒比较当前执行 CLI 包版本，其升级指引使用该 CLI 的来源判定。宿主启动提醒比较目标项目投射的受管版本；它不得把调用提醒的 CLI 来源当作该 runtime 或插件的安装来源。只有宿主上下文能可靠识别 runtime 渠道时才给对应原生升级入口；插件渠道无法确认时仅报告 npm 版本事实、渠道待核实，并指向宿主插件管理界面检查，不推荐全局 npm 升级。未知来源不得说成已是最新；维持离线、超时、环境跳过与冷却的非阻塞语义。Governs R4, R14–R15。
 - KTD4. **安装、诊断和清理复用现有项目投射 owner（`extend`）。** `init` 的目标/破坏性预览、`doctor` 的投射与宿主证据区分、`clean` 的逐宿主受管清理保持各自权威；只补齐生命周期结果与缺失的恢复指引，不新增中央安装状态或软链接投射模式。状态缺失、用户改写、越界链接和多仓父目录仍由现有规划/防护路径保守处理；宿主是否加载须由可运行的原生检查或真实会话证明。Governs R1–R3, R7–R13。
 
 ### Interface Contracts
 
-- **CLI `update` 与提醒输出（evolution）：** owner 为 `src/cli/commands/update.js`、`src/cli/version-reminder.js`，消费者为交互式开发者、宿主启动提醒及现有 CLI 测试；输入是当前进程来源与用户选定项目/宿主，输出分别披露包升级、项目刷新、宿主激活的成功/失败/跳过/未知和适用指引。来源分流是有意的行为不兼容：历史非全局来源会失去自动全局 npm 安装，须在发布说明和帮助文本明示；回退仅能通过显式原生包管理器操作，不能以静默恢复旧策略作运行时 fallback。由 `tests/unit/update-command-spawn.test.js`、`tests/unit/version-reminder-hardening.test.js` 和 CLI smoke 检查输出与副作用。
-- **来源判定（greenfield，U1 创建）：** `src/cli/install-origin.js` 是共享内部契约，由 `update` 和两类提醒消费；输入限当前 CLI 路径及可核实的包/全局 npm 根证据，输出有限分类、可解释的 `reason_code`，探测失败归 `unknown` 且不触发安装。无外部持久 schema、无新配置键；U1 用 `tests/unit/install-origin.test.js` 验证平台路径及拒绝误判，若实际源码显示已有等价 owner，实施时合并回该 owner 而不叠加第二事实源。
+- **CLI `update` 与交互式 CLI 提醒（evolution）：** owner 为 `src/cli/commands/update.js`、`src/cli/version-reminder.js`，消费者为交互式开发者；输入是当前执行 CLI 来源，输出分别披露包升级、项目刷新、宿主激活的成功/失败/跳过/未知和适用指引。
+- **宿主启动提醒（evolution）：** owner 为各宿主 session-start hook 与 `src/cli/version-reminder.js`；提醒对象是项目受管 runtime，而非 hook 借 PATH 调用的 CLI 副本。输入包含目标 runtime 版本及可核实的宿主/插件渠道上下文；若无法区分插件安装与普通项目投射，则只报告 npm `latest` 与本地 runtime 的版本差异和渠道未知，不给 `spec-first update` 或全局 npm 安装指引，指向宿主插件管理界面核实渠道。该降级不能误称插件渠道已有新版本。
+- 上述来源分流是有意的行为不兼容：历史非全局来源会失去自动全局 npm 安装，须在发布说明和帮助文本明示；回退仅能通过显式原生包管理器操作，不能以静默恢复旧策略作运行时 fallback。`tests/unit/update-command-spawn.test.js`、`tests/unit/version-reminder-hardening.test.js` 和 CLI smoke 检查输出与副作用。
+- **来源判定（greenfield，U1 创建）：** `src/cli/install-origin.js` 是共享内部契约，由 `update` 和交互式 CLI 提醒消费；输入限当前 CLI 路径及可核实的包/全局 npm 根证据，输出有限分类、可解释的 `reason_code`，探测失败归 `unknown` 且不触发安装。宿主 runtime 渠道使用独立证据，不复用 CLI 来源分类；无外部持久 schema、无新配置键。U1 用 `tests/unit/install-origin.test.js` 验证平台路径及拒绝误判；若实际源码显示已有等价 owner，实施时合并回该 owner 而不叠加第二事实源。
 
 ### High-Level Technical Design
 
@@ -274,18 +276,19 @@ sequenceDiagram
 
 ### U3. 修正远程版本提醒及来源适用指引
 
-- **Goal:** 在现有合格检查点让用户获知 npm `latest` 与本地版本差异，同时避免插件/未知来源的错误升级指引。
+- **Goal:** 在现有合格检查点让用户获知 npm `latest` 与本地版本差异，同时分别按当前 CLI 副本来源和被提醒 runtime 的渠道提供指引。
 - **Requirements:** R4, R14–R15；F2；AE9–AE10；KTD1, KTD3。
-- **Dependencies:** U1, U2（共享来源语义与 `update` 输出）。
-- **Files:** `src/cli/version-reminder.js`、`src/cli/index.js`（仅在触发点/输出需要时）、`tests/unit/version-reminder.test.js`、`tests/unit/version-reminder-hardening.test.js`、`tests/unit/qoder-runtime-lifecycle.test.js`（仅在投射触发点受影响时）。
-- **Approach:** 共用来源判定与行动文本，区分当前 CLI 与项目投射版本；保持查询超时、成功/失败冷却、环境跳过和非阻塞主命令。npm 的新 `latest` 只是 npm 发布事实：插件提醒引导宿主原生检查，不能宣称插件渠道已发布同版；非交互或未触发检查没有即时推送。
-- **Patterns to follow:** `src/cli/version-reminder.js` 的 registry lookup、版本比较和冷却状态；`src/cli/index.js` 的合格命令/启动入口。
+- **Dependencies:** U1, U2（CLI 来源语义与 `update` 输出）。
+- **Files:** `src/cli/version-reminder.js`、`src/cli/index.js`（仅在触发点/输出需要时）、各受影响的 `templates/*/hooks/*` session-start source、`tests/unit/version-reminder.test.js`、`tests/unit/version-reminder-hardening.test.js`、`tests/unit/qoder-runtime-lifecycle.test.js`（仅在投射触发点受影响时）、受影响 session-start hook 对应的现有测试文件（实施时定位；必要时新增聚焦测试）。
+- **Approach:** 共用 CLI 来源判定与交互式 CLI 行动文本，但不把该分类外推到启动 hook 提醒的 runtime。宿主启动提醒应以目标项目的受管 runtime 版本比较；宿主上下文明确提供 plugin identity 时用宿主原生插件管理入口，若 hook 仅知道项目受管投射或通过 PATH 调用了 CLI，则不得推断插件渠道或 npm-global 来源。插件渠道不明时只报告 npm 上游版本事实与渠道未核实，给宿主界面检查指引，不推荐全局 npm 升级。保持查询超时、成功/失败冷却、环境跳过和非阻塞主命令；非交互或未触发检查没有即时推送。
+- **Patterns to follow:** `src/cli/version-reminder.js` 的 registry lookup、版本比较和冷却状态；现有 host session-start hook 的低阻塞输出和失败降级。
 - **Test scenarios:**
   - Covers AE9. 模拟 registry `latest` 高于当前 CLI 或项目投射版本且合格检查触发时，提醒标明比较层；无检查、仍在冷却期或未联网时不宣称“已是最新”。
-  - Covers AE10. 插件投射落后于 npm `latest` 时只陈述 npm 版本事实与插件渠道待核实，给插件原生入口；unknown/local 不提示全局 npm 升级。
-  - 非 TTY、CI、测试环境、显式关闭提醒、错误版本响应及超时，均不阻断主命令或打印不可信版本文本。
+  - Covers AE10. 插件 runtime 落后于 npm `latest`、但启动 hook 由 PATH 调用了全局 CLI 时，不将 CLI 的 npm-global 来源误作插件来源，不给全局 npm 升级指引；只报告 npm 版本差异与插件渠道待核实，并指向宿主插件管理界面。
+  - 对能够明确识别插件 identity 的宿主上下文，给原生插件更新/检查指引；对普通项目投射不误报成插件安装或插件渠道已发布。
+  - unknown/local CLI 不提示全局 npm 升级；非 TTY、CI、测试环境、显式关闭提醒、错误版本响应及超时均不阻断主命令或打印不可信版本文本。
   - 成功检查约 24 小时冷却、失败约 1 小时重试及并发抢占保持原有约束，不把 registry 错误包装成安装失败。
-- **Verification:** 版本提醒单测覆盖触发、比较层、来源指引和冷却；宿主启动链路在可用宿主上另以真实会话验证，不由 mock 单测替代。
+- **Verification:** 版本提醒与受影响 hook/template 单测覆盖触发层、runtime 渠道证据、混装场景、指引和冷却；宿主启动链路在可用宿主上另以真实会话验证，不由 mock 单测替代。
 
 ### U4. 固化安装、诊断、修复与卸载的分层体验
 
@@ -323,10 +326,12 @@ sequenceDiagram
 
 **最大未证风险：** 将插件、本地或 `npx` 当前副本误认成全局 npm 安装，从而产生重复全局副本并用错误二进制刷新用户项目。确认状态：来源分流为 `confirmed`（本轮用户选定，Product Contract Key Decisions）；其余验收为 `inherited`（需求稿，尚无独立产品复核）。实施者不得以同一代理的自审充当独立产品验收。
 
+**真实 npm-global 正向路径与副本冲突（U1–U2）：** 在隔离临时目录建立真实 npm prefix，将当前项目 tarball 安装到该 prefix 的 global 区域，并从安装后的 CLI 入口运行 `update`。记录入口路径、包根、`npm root -g`、判定结果、spawn 参数及输出；必须判为 `npm-global` 并触发预期升级动作。随后从独立本地副本入口运行，必须判为 `local` 或 `unknown` 且不触发全局安装；`npm link` 或指向 checkout 的链接不得误判为正式全局安装。所有操作限于临时 prefix 和隔离工作目录，不改用户全局 npm 状态。若环境无法完成该真实路径验证，该证明保持阻塞，mock 不可替代，相关来源升级行为不得标为完成。
+
 | 证明意图 | 状态 | 具体检查与证据上限 |
 | --- | --- | --- |
-| 来源识别与副作用边界（U1–U2） | required | 运行 `npx jest --runTestsByPath tests/unit/install-origin.test.js tests/unit/update-command-spawn.test.js --runInBand`；mock/临时目录不能证明真实 npm 全局安装环境。 |
-| 提醒、冷却、宿主入口（U3） | required | 运行 `npx jest --runTestsByPath tests/unit/version-reminder.test.js tests/unit/version-reminder-hardening.test.js tests/unit/qoder-runtime-lifecycle.test.js --runInBand`；模拟 registry 不能证明线上标签或插件渠道同步。 |
+| 来源识别与副作用边界（U1–U2） | required | 运行 `npx jest --runTestsByPath tests/unit/install-origin.test.js tests/unit/update-command-spawn.test.js --runInBand`，并通过上述隔离真实 npm-global/local 双入口验证；mock 不能替代真实安装正向路径。 |
+| 提醒、冷却、宿主入口（U3） | required | 运行 `npx jest --runTestsByPath tests/unit/version-reminder.test.js tests/unit/version-reminder-hardening.test.js tests/unit/qoder-runtime-lifecycle.test.js --runInBand`，并覆盖实际受影响的启动 hook template 测试；混装场景还需以真实宿主会话核对输出。模拟 registry 不能证明线上标签或插件渠道同步。 |
 | 投射、归属、恢复及多仓（U2, U4） | required | 运行 `npx jest --runTestsByPath tests/unit/init-preview.test.js tests/unit/init-runtime-readiness-guidance.test.js tests/unit/init-apply-failure.test.js tests/unit/cli-clean-workspace-graph.test.js tests/integration/workspace-graph-lifecycle.integration.test.js --runInBand`；临时项目断言不能证明所有宿主实际发现。 |
 | CLI 与发布包契约（U1–U5） | required | 运行 `npm run typecheck`、`npm run test:smoke`、`npm run build`；语法、smoke 与打包清单不能替代用户机器上的安装来源和宿主激活验证。 |
 | 受触及文件的间接契约 | required | 对 `tests/unit/brand-presentation.test.js`、`tests/unit/host-flag-registry-derivation.test.js`、`tests/unit/plugin-modules.test.js`、`tests/unit/init-workspace-contract.test.js` 和相关 adapter 测试做变更后定向检查；其绿灯仅支持这些合同断言，不证明跨宿主完全等价。 |
@@ -340,7 +345,9 @@ sequenceDiagram
 ## Definition of Done
 
 - U1–U5 对应的行为、失败路径、文档及兼容说明均落实到项目 source，Product Contract 的 R/F/AE 与测试结果可以反向追溯。
-- 已确认 npm-global 可升级；插件、本地、`npx` 和 unknown 不会因 `update` 静默新增全局副本；提示只陈述已核实的 npm 发布与来源事实。
+- 已确认 npm-global 可升级；真实隔离 npm prefix 正向路径、独立本地副本与 `npm link`/checkout 链接的来源区分均有可复核运行记录。无法运行真实来源验证时，相关完成声明保持阻塞，不以 mock 代替。
+- 宿主启动提醒不会把 PATH 调用的 CLI 来源当作目标 runtime/plugin 来源；渠道不能确认时不提供全局 npm 升级指引，并有启动 hook 测试或真实宿主记录覆盖该混装场景。
+- 插件、本地、`npx` 和 unknown 不会因 `update` 静默新增全局副本；提醒只陈述已核实的 npm 发布与来源事实。
 - 安装/刷新/诊断/清理均在明确的项目及宿主归属范围内；包、投射、宿主激活结果分开报告，部分失败可定位与恢复。
 - Verification Contract 的 required proof intents 经最终修订对照，测试失败、未运行或真机缺口明确记录且不冒充通过；达到发布/完成声明所需的必需证据后方可宣称完成。
 - 更新 `CHANGELOG.md` 和所有受影响的用户文档；无关工作树改动及 generated runtime 不纳入 source 修复，本次试验遗留代码、临时文件与无效引用已清理。
