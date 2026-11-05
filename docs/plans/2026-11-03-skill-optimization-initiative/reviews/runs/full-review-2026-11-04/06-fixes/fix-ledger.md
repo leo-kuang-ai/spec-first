@@ -100,6 +100,7 @@
 | 060 | fixture-state.cjs fence 提取器行锚定配对 fencedBlocks（```yaml 等非 json 信息串的闭栏不再被误当开栏吞掉 ```json 块）；parseFinalMessage 取最后可解析块、finalObject 取首个可解析对象 | S3 eval-iteration A20 | 本波 |
 | 061 | ce-u28 pulse artifact_path 归一化（A21）：引擎临时根下模型上报绝对路径属正常形态，judge 剥前缀比对；原始串含 .. 一律拒绝；两侧 realpathSync 对称解析后 containment 按真实路径判定（macOS /var→/private/var symlink 场景实测）+ 校准样本改绝对路径锚定 | 二审 live 重跑暴露（REPLAY 未覆盖新响应形态） | 本波 |
 | 062 | codex 对抗性二审三项收紧：internalArgs 组合尾巴白名单（仅 `; echo <变量捕获>` 形态放行，`\|\|`/`&&` 后缀与字面输出尾巴全拒——堵 `producer \|\| printf fake` 伪造向量）；finalObject 反向遍历取最后对象（与 parseFinalMessage 末块口径统一，堵草稿块误取）；A21 realpath 加固并入 061 | codex 二审 P1×2+P2（evidence/probes/codex-second-review-judge-fixes.txt） | 本波 |
+| 063 | 二审静态复评（定向 diff 复评 5 skill × 各自 FIX 面，ai-qianxing2/gpt-6.1-sol 独立评审，产物 second-review-static/）修复 ×4：spec-debug SKILL.md:108 prior-attempt 段结构化（786 字符连续散文拆保序列表，A19 语义逐字保留）；spec-doc-review modes.md:21 失败串独占表述精确化（headless-missing-path/missing-document 独占整条；flag-conflict=前缀+token 名，消除与「附 token 名」的字面互斥）；spec-work return-to-caller.md:44 hand-author 范围精确化（禁手写 run-summary 产物与 verdict；组装 producer input 是规定动作——原字面误禁 claims input 组装）；spec-write-skill authoring-workbench.md:35 supporting 段结构化（2736 字符拆列表）。复评 7 项中 3 项裁决不成立（shipping 密度非修复新引入 ×1、复评 prompt 归因错误 ×2） | 二审第 5 项（ai-qianxing2 复评发现，逐项确定性核实后采纳 4） | 本波 |
 
 ## 终态对账（2026-11-05，二审波后更新）
 

@@ -105,7 +105,11 @@ Read the full conversation — the original description AND every comment, with 
 - Only ask when a genuine ambiguity blocks investigation and cannot be resolved by reading code or running tests
 - When asking, ask one specific question
 
-**Prior-attempt awareness:** If the user reports repeated failed attempts, recover those attempts from the current context first. When the report names prior attempts but not their content, put the question to the user before starting your own investigation — diagnosing first and asking later is not a legal substitute — and restate the still-open prior-attempt question in your final report. Do not ask again for an already available list. Investigate independent evidence while a necessary answer is pending.
+**Prior-attempt awareness:** If the user reports repeated failed attempts, recover those attempts from the current context first. When the report names prior attempts but not their content:
+- put the question to the user **before** starting your own investigation — diagnosing first and asking later is not a legal substitute;
+- restate the still-open prior-attempt question in your final report;
+- do not ask again for an already available list;
+- after the question is asked, investigate independent evidence while the necessary answer is pending.
 
 ---
 

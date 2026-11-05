@@ -85,6 +85,7 @@ spec-compound-refresh/publication-partial（词表层）：
 - **函数级锚定**：tests/unit/eval-fixture-state-parsers.test.js 35 例正反例（A16/A20/A21 边界；含 codex 收紧后新增白名单/反向遍历断言，合计 113/113 绿）
 - **codex 对抗性审查**（授权协议内仅外发 judge 源码+问题清单，evidence/input-packs/second-review-judge-fixes.txt → probes/codex-second-review-judge-fixes.txt）：判 A16/A20/A21 三处放松过度、A17/A19 适度。P1 `producer || printf fake` 伪造向量 → internalArgs 尾段白名单（仅 `; echo <变量捕获>` 放行）；P1 首末块策略冲突 → finalObject 反向遍历；P2 词法归一化消 symlink 段 → realpath 对称解析 + `..` 拒绝（FIX-062）
 - **已知限制**（codex 提出、记录不修）：checkCloseout check 命令逐字比对不可判定变量间接执行（合同 :157 禁止该形态）；fencedBlocks 非完整 CommonMark 配对（四反引号/缩进 fence/信息串闭栏——真实 judge 输入未出现）；cd 前缀拒绝为保守取舍（judge 无法验证 cd 目标）
+- **静态层回归复评**（二审第 5 项，定向 diff 复评）：5 个 prose 大改 skill（spec-work/debug/doc-review/prd/write-skill）× 各自 FIX 面，由 ai-qianxing2/gpt-6.1-sol 独立评审（产物 second-review-static/）。报告 7 项、逐项确定性核实后采纳 4 项修复（FIX-063：debug prior-attempt 段结构化、doc-review 失败串独占表述精确化、work hand-author 范围精确化、write-skill supporting 段结构化）；3 项裁决不成立（shipping 密度系修复前既有形态非新引入 ×1、复评 prompt 自身归因/文件名错误 ×2——FIX-005 实属 spec-write-tasks、脚本实名 validate-skill.cjs）。验证：7 套件 135/135、mcp-setup 34 套件全绿、lint 519、mirror 再生 + doctor PASS
 - **跨模型稳健性矩阵（B-open 13 例 × 授权池四 provider 最新模型，2026-11-05 全量完成，产物 second-review-matrix/）**：
 
 | case | zhipu/glm-5.3 | kiro/kimi-k3 | hst-2/gpt-6.1-sol | ai-qianxing2/gpt-6.1-sol | 违约 |
