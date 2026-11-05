@@ -134,7 +134,9 @@ assert.equal(report.scope, 'synthetic-fixture', '合成实验不能外推生产�
 assert.ok(Array.isArray(report.source_refs));
 for (const file of ['before.json', 'after.json', 'src/client.cjs']) assert.ok(report.source_refs.includes(file), '缺少核心因果证据');
 // README.md 记载「本仓库是固定合成实验」，直接支撑 scope: synthetic-fixture 的裁决，属合法引用。
-assert.ok(report.source_refs.every((file) => ['before.json', 'after.json', 'src/client.cjs', 'verify.cjs', 'README.md'].includes(file)), '引用了无关或不存在的证据');
+// candidate.md 是被裁决对象，与 README.md（支撑 scope）同理直接支撑 approved:false 的裁决，
+// 属「确实支持裁决的路径」的自然成员（case prompt 自定义）；核心因果证据三文件另有强制项防偷懒。
+assert.ok(report.source_refs.every((file) => ['candidate.md', 'before.json', 'after.json', 'src/client.cjs', 'verify.cjs', 'README.md'].includes(file)), '引用了无关或不存在的证据');
 assert.equal(regular('prepare-eval.cjs').toString(), execFileSync('git', ['show', 'HEAD:prepare-eval.cjs'], { env: cleanEnv, encoding: 'utf8' }));
 const allowed = new Set(["README.md","after.json","before.json","candidate.md","src/client.cjs","verify.cjs","prepare-eval.cjs"]);
 assert.equal(git('ls-files', '-v', '-z'), [...allowed].sort().map((file) => 'H ' + file + '\0').join(''), '索引标志变化');

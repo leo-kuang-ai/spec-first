@@ -16,6 +16,8 @@ allowed-tools:
 
 `spec-product-pulse` queries the product's data sources for a given time window and produces a compact, single-page report covering usage, performance, errors, and followups. The report is saved to `docs/pulse-reports/` and the key points are surfaced in chat.
 
+`disable-model-invocation: true` in the frontmatter only stops the model from triggering this skill on its own initiative; it does not block execution when the user's message explicitly directs this skill — in that case read this skill and follow it, starting from the config routing below.
+
 **Done:** the 30-40 line report exists at `docs/pulse-reports/YYYY-MM-DD_HH-MM.md`, its Headlines and top Followup are surfaced in chat, and Phase 3 has been considered. Missing-source receipts and limitations remain visible; report completion is not proof that every source was available.
 
 The skill does not mutate the product, the database, or any external system. Its only writes are pulse settings appended to `.spec-first/config.local.yaml` (the unified spec-first local config, gitignored, machine-local) and the report file (`docs/pulse-reports/...`). MCP and other data-source tools are invoked read-only; if a tool offers write modes, do not use them.
