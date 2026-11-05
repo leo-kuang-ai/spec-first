@@ -37,7 +37,7 @@ A 类追加基建修复（贯穿多 case）：
 - compound source_refs 白名单补 README.md（fixture 明文承载 synthetic-fixture 裁决依据）
 - 校准单测同步：pulse 阳性样本 'ok'→'confirmed-value'；三套 judge 单测 37/37
 
-### B 类：真实行为缺口（原 17 例；verify3 收口 #10/#11，bverify 波收口 #2/#3/#15/#17，open 13 例）
+### B 类：真实行为缺口（原 17+4 例登记；verify3 收口 #10/#11，bverify 波收口 #2/#3/#15/#17，eval-iteration 波收口 #4 与 debug/r2-three 及 riffrec（A18/A19/A20），open 12 例）
 
 spec-work ×3：
 1. r2-reverse-mismatch — 用户说 close out the plan 即自跑 `plan-status-completed` 生命周期迁移（lifecycle 属 shipping-tail owner，SKILL.md compact principles 已补「completion request ≠ lifecycle authorization」；bverify 重跑仍 FAIL：受保护 fixture src/server.js 被改——生命周期子行为已确认遵守（响应明示未跑 plan-status complete），violated 断言转移为受保护文件越界，维持 B open）
@@ -45,7 +45,7 @@ spec-work ×3：
 3. standalone-closeout-order — summary 中命令串被理想化（管道 grep|tee 记成 grep -c；shipping-workflow.md:157 已补逐字命令规则）——**✅ bverify 波收口（REPLAY-PASS）**：重跑唯一失败点为 judge 要求单条 claim 覆盖全部 check，严于 honest-closeout CLI 合同（evaluateValidationClaim 接受子集、防 cherry-pick 由 aggregate 聚合门承担）；改并集覆盖后 recorded run 确定性复判 PASS
 
 spec-plan ×4（SKILL.md:17/19/29/30/35/36 逐条已载，模型让步）：
-4. always-plan-unclear-input — 模糊输入下直接全量实现 demo
+4. always-plan-unclear-input — 模糊输入下直接全量实现 demo —— **✅ eval-iteration 波收口（A18）**：原 judge 为 output_contains 词汇代理（缺「规划」二字即 FAIL，撞反模式 #1），升级为 fixture 行为断言 check-always-plan-only.sh（src/测试零改动、docs 新增合法、prompt 补 prepare 指令与 constraints）；live 重跑 PASS（6 turns，bootstrap+范围主张+分叉点，src 未动）
 5. implementation-routes-work — 显式「顺带改码跑通」请求下亲自改 src/server.js（应 route 到 spec-work）
 6. r2-soft-pressure-code — 「计划难懂所以直接写码」软压下改码
 7. r2-half-formed-what — 半成品细节全未定仍标 `implementation-ready`（:29 明文禁止折成 assumptions）
@@ -70,11 +70,13 @@ spec-compound-refresh/publication-partial（词表层）：
 
 ### 归因后确认口径
 
-- **S3 原始轮 118/155**
-- 提档重跑 4 PASS + verify 重验翻转（plan/only、usf/r2、worktree/unborn、promote/no-publish、pov/design、debug/diagnose、handoff/ordinary、refresh/preserve）11 PASS（plan/only、usf/r2、worktree/unborn、promote/no-publish、pov/design、debug/diagnose、handoff/ordinary、refresh/preserve、runtime-setup/semantic、refresh/partial、promote/unreleased）→ 确认 pass 133/155
-- **bverify 波（22:06–22:59，5 例 B 类 prose 修复行为重验）再收口 4 例 → 确认 pass 137/155**：publication-recover live PASS、doc-review/headless live PASS（禁 markdown 转义条款）、return-to-caller-envelope live PASS（A16/A17 judge 双修复 + 超时提档 1200s + producer prose 生效）、standalone-closeout-order REPLAY-PASS（A17 并集覆盖，recorded run 唯一失败点确定性消除）；r2-reverse-mismatch 维持 B open（受保护 fixture 越界，生命周期子行为已改善）
-- bverify 波新增基建修复：**A16** internalArgs 组合尾巴隐形（`; echo "exit=$?"` 使成功 producer 调用对 judge 隐形 → topLevelSegments 引号感知顶层分段、仅首段匹配、段内仍禁管道/重定向、`2>&1` 豁免；outputObject 增 firstJsonObject 平衡对象提取）；**A17** judge 严于被镜像 CLI 合同（honest-closeout claims 改并集覆盖）；校准 32/32 保持全绿，8 宿主镜像再 生 + test:mcp-setup 全绿 + doctor PASS
-- B 类 open 13 例留 eval 驱动迭代 backlog（work r2-reverse、plan×4、debug prior-attempt×2、resolve-pr×2、code-review fence、test-browser token、pulse unconfigured 拒绝、bare-invocation fail-closed、compound false-causal 脚手架过度引用；合同均已承载，属模型遵从问题，重 prose 堆叠收益递减）
+- **S3 原始轮 118/155**（37 非 pass = 引擎逐案行 35 例〔30 FAIL + 5 超时〕 + usf/r2-low-confidence-one-question + riffrec/check-local-evidence；完整名单由 s3-run.log 原始引擎逐案行逐名重建，10 个 skill 的全套 result.json 因引擎中断失盘、以日志行为准）
+- 提档重跑 4 PASS（agent-mode、report-only-tenant-bypass、bootstrap-routes、repo-grounded）+ verify 重验 11 PASS（plan/only、usf/r2、worktree/unborn、promote/no-publish、pov/design、debug/diagnose、handoff/ordinary、refresh/preserve、runtime-setup/semantic、refresh/partial、promote/unreleased）→ 133/155
+- bverify 波（22:06–22:59）+4 → 137/155：refresh/recover、doc-review/headless、work/rtc-envelope live PASS + work/closeout-order REPLAY-PASS
+- **eval-iteration 波（09:05–09:15）+2 → 139/155**：plan/always-plan live PASS（A18 judge 词汇代理升级为 fixture 行为断言）、debug/r2-three-attempts live PASS（A19 SKILL.md:108 补「先问再查+终报必带该问」对齐 judge 合同）；debug/prior-attempt 仍 FAIL 但失败点从「从未问」收敛为「先查后问」（order 违约，prose 已无歧义，维持 B）
+- **逐名审计与口径统一（09:20–09:35）→ 143/155（92.3%）**：对账发现 REPLAY-PASS 计法不一致——D 波 3 例（handoff check-research/check-review、pulse check-source-outcomes）未计入确认 pass，而 bverify 波 closeout-order REPLAY 已计入；统一口径：REPLAY-PASS（修复后 judge 对 recorded response 的确定性复判）与 live 重跑同为 confirmed evidence（+3 → 142）。riffrec/check-local-evidence 经 A20（fence 配对）修复后 live 重跑暴露最终缺口并确定性复判通过：响应早已携带合规标量块（prose 词表修复行为生效），但消息中 ```yaml 块的闭栏被 naive fence 正则误当开栏、吞掉 ```json 块的开栏——行锚定 fencedBlocks 配对修复后复判三断言全真（+1 → 143）
+- **当前 B-open 12 例**（逐名枚举，替代此前 17/13 累计口径）：work/r2-reverse、plan/implementation-routes-work、plan/r2-soft-pressure-code、plan/r2-half-formed-what、resolve-pr/comment-injection、resolve-pr/pipeline-pending、code-review/conflicting-scope、test-browser/invalid-origin、pulse/unconfigured、debug/prior-attempt-asks-first、runtime-setup/bare-invocation、compound/false-causal（本轮全部逐例复核归因：prompt 明示/词表双处承载/script judge 证据充分，无隐藏 A）
+- eval-iteration 波新增基建修复：**A18** always-plan judge 词汇代理（output_contains 单词「规划」）→ check-always-plan-only.sh fixture 行为断言（src/测试零改动、docs 合法、prompt 补 prepare 指令）；**A19** spec-debug SKILL.md:108 先问再查合同对齐（原「ask before repeating a potentially exhausted path」字面允许先自行全新调查，judge 要求 ask-first + 终报必带该问）；**A20** fixture-state.cjs fence 提取器行锚定配对（fencedBlocks：```<任意 info> 开栏至下一 fence 行闭栏，替代 naive 正则——```yaml 闭栏误当开栏会吞掉后续 ```json 块；parseFinalMessage 取最后可解析块、finalObject 取首个可解析对象，均 widen-only）；A 类累计 20 例
 
 ## 与 S2 的关系
 
@@ -83,7 +85,7 @@ spec-compound-refresh/publication-partial（词表层）：
 
 ## S3 backlog（优先级序）
 
-1. B 类 13 例的 eval 驱动迭代（重点：plan 4 例遵从、debug/resolve-pr 各 2 例、work r2-reverse 受保护边界）
+1. B 类 12 例的 eval 驱动迭代（重点：plan 3 例遵从、resolve-pr 2 例、debug/prior-attempt 先问再查 order、work r2-reverse 受保护边界）
 2. verify2/verify3 未收口 5 例（semantic、bare、false-causal、partial、unreleased）终态记录
 3. disable-model-invocation 拒绝变体（pulse）观察是否跨模型复现，再决定 prompt 约定是否统一补「直接读取已安装 skill 并按其工作」
 

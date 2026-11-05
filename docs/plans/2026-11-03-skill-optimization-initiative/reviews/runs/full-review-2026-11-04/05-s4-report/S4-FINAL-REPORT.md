@@ -8,8 +8,8 @@
 |---|---|---|
 | S0/S1 | 登记、方案、试点（spec-plan/spec-code-review K=3） | 完成 |
 | S2 静态 | 38 skill × 18 维 × K=2/3 分层盲评 + L1 仲裁 + 修复 | **完成：38/38 收敛** |
-| S3 行为 | 38 skill × 155 case（skill-up fresh-source，zhipu/glm-5.3） | **基线+归因收口：原始 118/155 → 确认 137/155（88.4%）**；32 FAIL + 5 超时全部逐例归因（A 类 eval 基建 17 例全修复验证——含 bverify 波 A16 组合尾巴隐形/A17 judge 严于 CLI 合同、B 类真实行为缺口 13 例 backlog），见 04-s3-behavior/S3-SUMMARY.md |
-| 修复落地 | FIX-001..057 | **全部 landed**（见 fix-ledger 对账） |
+| S3 行为 | 38 skill × 155 case（skill-up fresh-source，zhipu/glm-5.3） | **基线+归因+逐名审计：原始 118/155 → 确认 143/155（92.3%）**；37 非 pass 全部逐例归因（A 类 eval 基建 20 例全修复验证、B 类真实行为缺口 12 例 backlog；25 例翻转全部 live/REPLAY 行为级证据），见 04-s3-behavior/S3-SUMMARY.md |
+| 修复落地 | FIX-001..060 | **全部 landed**（见 fix-ledger 对账） |
 
 评审者：R1 zhipu/glm-5.3 / R2 gpt-6.1-sol（ai-qianxing2 备用）/ R3 kiro/kimi-k3（批次1 K=3）/ L1 仲裁 hst-2/gpt-6-astra。冻结 worktree 5b59293b，修复落主仓。
 
@@ -40,9 +40,9 @@
 
 ## S3 行为基线（非验收门）
 
-- 原始 118/155（20/38 skill 全 case 通过）→ 归因收口后确认 137/155（bverify 波再收口 4 例：refresh/recover、doc-review/headless、work/rtc-envelope live PASS + work/closeout-order REPLAY-PASS）
-- 全部 32 FAIL + 5 超时逐例归因：A 类 eval 基建 17 例（judge 窄假设/prompt-judge 失配/词表未承载/引擎挂载面/.claude 跳过/只读 Bash 白名单/组合尾巴隐形 A16/judge 严于 CLI 合同 A17 等，全部修复——11 例重跑翻转 + 4 例 REPLAY-PASS + 1 例合同承载 + bverify 波 2 例 judge 修复带动 live PASS）；B 类真实行为缺口 13 例 open backlog（work 受保护边界 ×1、plan 遵从 ×4、debug prior-attempt ×2、resolve-pr ×2、code-review fence/test-browser token/pulse 拒绝变体/bare fail-closed/false-causal 脚手架引用——合同均已承载，留 eval 驱动迭代）
-- 修复登记 FIX-001..057；judge 校准单测 37/37 + ce-outcome 30/30 + spec-work-outcome-judges/ce-u28 32/32（A16/A17 后保持绿）；runtime mirror 再生、test:mcp-setup 与 doctor 复验绿
+- 原始 118/155（20/38 skill 全 case 通过）→ 逐名审计后确认 143/155（bverify +4、eval-iteration +2、REPLAY 计法统一 +3、riffrec fence 修复 +1）
+- 全部 37 非 pass 逐例归因：A 类 eval 基建 20 例（judge 窄假设/prompt-judge 失配/词表未承载/引擎挂载面/只读 Bash 白名单/组合尾巴隐形 A16/judge 严于 CLI 合同 A17/词汇代理 judge A18/合同未承载 order A19/fence 配对 A20，全部修复并经 live 或确定性 REPLAY 验证）；B 类真实行为缺口 12 例 open backlog（plan 遵从 ×3、resolve-pr ×2、work 受保护边界、debug 先问再查 order、code-review fence、test-browser token、pulse 拒绝变体、bare fail-closed、false-causal 脚手架引用——合同均已承载，留 eval 驱动迭代）
+- 修复登记 FIX-001..060；judge 五套单测 93/93（A16–A20 后保持绿）；runtime mirror 再生、test:mcp-setup（34 套件/773 测试）与 doctor 复验绿
 - 5 超时（300-600s 档）可提档重跑
 
 ## 诚实边界

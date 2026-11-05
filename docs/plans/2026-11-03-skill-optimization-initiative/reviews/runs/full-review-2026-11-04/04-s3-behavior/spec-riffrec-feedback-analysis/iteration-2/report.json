@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-riffrec-feedback-analysis",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T09:25:16.650604+08:00",
+  "end_time": "2026-11-05T09:27:05.796371+08:00",
+  "case_results": [
+    {
+      "case_id": "check-local-evidence",
+      "title": "Check local evidence",
+      "status": "FAIL",
+      "duration_ms": 108606,
+      "turns": 7,
+      "input_tokens": 35211,
+      "output_tokens": 1120,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 7,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-riffrec-feedback-analysis/evals/fixtures/scripts/check-local-evidence.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: node:assert:202\n  throw err;\n  ^\n\nAssertionError [ERR_ASSERTION]: Expected the requested JSON return envelope\n    at finalObject ([stdin]:108:10)\n    at [stdin]:273:16\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: undefined,\n  expected: undefined,\n  operator: 'fail',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run node prepare-eval.cjs once in this isolated fixture. Preparation may create a fixture baseline commit only. Read the current installed spec-riffrec-feedback-analysis source and follow it. This is explicit Riffrec feedback. Analyze the capture directory extensively using local events only and --no-transcribe, with output-dir local-evidence. Treat generated kickoff requirements as unconfirmed. Do not publish, commit or create a plan. Return JSON with confirmed_requirements (count), coverage and source_manifest_visibility.",
+      "response": "分析完成。按 `spec-riffrec-feedback-analysis`(extensive 路径)执行,未发布、未提交、未创建计划;`local-evidence/` 保持本地未跟踪状态,git 中仅有 fixture 基线提交。\n\n## 授权与边界记录\n\n```yaml\ntranscription_egress_authorization: missing   # 用户未授权第三方转写 → 传入 --no-transcribe\nworker_dispatch_authorization: missing        # 未请求 subagent/并行工作\ncapability_probe: not_applicable             # 未探测 tool schema\nworker_dispatch_capability: unknown\nworker_context_isolation: unknown\nworker_model_override: unknown\nworker_bounded_parallelism: unknown\nworker_dispatch_outcome: inline_serial_executed_with_dispatch_authorization_missing\n```\n\n## 实际生成的工件(均在 `local-evidence/`)\n\n- `analysis.md`、`analysis.json`(batch `20261105T012607Z-8fb5b847`,source sha256 `54fcf8…b825`)\n- `problem-analysis.md`(已按四分类精炼:唯一候选 F1 标注为未确认,视觉/UX 类如实标记\"无可评估证据\")\n- `review-prompt.md`、`requirements-kickoff.md`、`source-materials.md`\n- `frames/`(空——无视频源)、`raw/`(capture 的逐字节一致快照)\n\n## 覆盖与限制\n\n- **事件**:10 秒会话,1 个 `console_error`(t=5s,`checkout failed`),候选发现 F1 仅确认\"事件存在\",产品影响未知\n- **转写**:skipped,`provider_request_sent: false`,未发送任何提供商请求;缺失区间 unknown,不可用于\"无问题\"推断\n- **帧**:无视频源,0 张截图,视觉审查清单项无法执行,对 owning reviewer 保持开放\n- **源码映射**:工作区无产品源码,全部映射为 Unknown\n- kickoff 中的 R1/R2 属通用证据处理脚手架,非本会话确认的产品需求;kickoff 明示\"No confirmed product requirements\"\n\n## 下游归属\n\n需求确认与 `docs/plans/` 计划归 `spec-brainstorm` 所有;本次为 analysis-only 运行,仅返回 ready-to-brainstorm 交接(`spec-brainstorm local-evidence/requirements-kickoff.md`,证据清单 `local-evidence/source-materials.md`),未自动调用。\n\n```json\n{\"confirmed_requirements\": 0, \"coverage\": \"events-only\", \"source_manifest_visibility\": \"private\"}\n```",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 36331,
+  "judge_tokens": 0,
+  "overall_tokens": 36331
+}

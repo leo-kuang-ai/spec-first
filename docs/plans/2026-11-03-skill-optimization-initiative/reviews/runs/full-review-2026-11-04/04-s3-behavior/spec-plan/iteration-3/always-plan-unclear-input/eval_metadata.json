@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "模糊输入也应留在规划流程内澄清而非退出",
+  "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture. Only that preparation may create a baseline commit; no task commit or landing is authorized.\n（spec-plan skill 已安装，请按它工作。）\n帮我搞点事情让这个记账 demo 更好用一点。\n",
+  "assertions": [
+    "expect.exit_code",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-always-plan-only.sh"
+  ]
+}

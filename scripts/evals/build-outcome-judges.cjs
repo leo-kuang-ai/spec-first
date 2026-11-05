@@ -99,6 +99,7 @@ function planFile(file) {
 `;
 buildGroup('spec-plan', ['mini-ledger', 'order-import-direct', 'order-import-enrichment', 'admin-export-blocker'], {
   'check-r2-no-code': { fixtures: ['mini-ledger'], options: { allowNewDocs: true } },
+  'check-always-plan-only': { fixtures: ['mini-ledger'], options: { allowNewDocs: true } },
   'routes-to-execution': { fixtures: ['mini-ledger'], options: { allowNewDocs: true } },
   'check-product-blocker': { fixtures: ['admin-export-blocker'] },
   'check-planning-only': { fixtures: ['order-import-direct'], options: { allowNewDocs: true }, body: planContractChecks + `

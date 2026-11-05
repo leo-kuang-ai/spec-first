@@ -16,13 +16,29 @@ const hash = (value) => crypto.createHash('sha256').update(value).digest('hex');
 // the output contract does not forbid it, so strip one fence layer before parse.
 // Skills whose contract explicitly bans fences still fail on the assertions
 // that follow — this only widens the accepted envelope, never narrows it.
+// 行锚定 fence 配对：```<info> 开栏到下一个 fence 行闭栏。naive 正则会把
+// 非 json 信息串（如 ```yaml）的闭栏误当开栏，吞掉后续真正的 ```json 块。
+function fencedBlocks(text) {
+  const blocks = [];
+  let open = false;
+  let buffer = [];
+  for (const line of text.split('\n')) {
+    if (!open && /^```/.test(line)) { open = true; buffer = []; continue; }
+    if (open && /^```/.test(line)) { blocks.push(buffer.join('\n')); open = false; continue; }
+    if (open) buffer.push(line);
+  }
+  return blocks;
+}
+
 function parseFinalMessage() {
   const raw = process.env.EVAL_FINAL_MESSAGE?.trim() ?? '';
   try { return JSON.parse(raw); } catch { /* fall through to fenced blocks */ }
   // Whole-message fence or prose-wrapped fence: take the LAST fenced JSON block
   // when the message itself is not JSON. Only widens the accepted envelope.
-  const blocks = Array.from(raw.matchAll(/```(?:json)?\s*\n([\s\S]*?)```/g), (match) => match[1]);
-  if (blocks.length) return JSON.parse(blocks[blocks.length - 1]);
+  const blocks = fencedBlocks(raw);
+  for (let index = blocks.length - 1; index >= 0; index -= 1) {
+    try { return JSON.parse(blocks[index]); } catch { /* Try the next fence. */ }
+  }
   return JSON.parse(raw);
 }
 

@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-debug",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T09:13:35.647491+08:00",
+  "end_time": "2026-11-05T09:14:53.696647+08:00",
+  "case_results": [
+    {
+      "case_id": "r2-three-attempts-asked-first",
+      "title": "Ask for prior attempts before starting a new investigation",
+      "status": "PASS",
+      "duration_ms": 77733,
+      "turns": 1,
+      "input_tokens": 25847,
+      "output_tokens": 3611,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-debug/evals/fixtures/scripts/check-r2-prior-ask.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "Use the installed spec-debug skill. The service will not start. I have already tried three approaches and none worked. Help me diagnose it.\n",
+      "response": "按照 spec-debug 的排查契约(Phase 0「prior-attempt awareness」),你已经试过三种方法但没说明具体内容——这些信息直接决定哪些假设已经被排除,我必须先拿到它们,否则很可能把你试过的路再走一遍。\n\n**问题：你之前尝试的三种方法分别是什么?**\n\n请对每一种方法提供：\n\n1. 当时的具体命令或操作步骤(最好原样粘贴，包括你启动服务所用的命令)\n2. 每次得到的结果或报错输出(尽量原样粘贴完整报错文本，如有退出码也一并给出)\n\n拿到这三组「做法 + 实际输出」后，我会立即开始独立复现和代码路径追踪，并把你已排除的方向纳入诊断，避免重复劳动。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 29458,
+  "judge_tokens": 0,
+  "overall_tokens": 29458
+}

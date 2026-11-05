@@ -1,0 +1,64 @@
+{
+  "skill_name": "spec-plan",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T09:09:01.411963+08:00",
+  "end_time": "2026-11-05T09:11:21.129976+08:00",
+  "case_results": [
+    {
+      "case_id": "always-plan-unclear-input",
+      "title": "模糊输入也应留在规划流程内澄清而非退出",
+      "status": "PASS",
+      "duration_ms": 139174,
+      "turns": 6,
+      "input_tokens": 54721,
+      "output_tokens": 3432,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 6,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-always-plan-only.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture. Only that preparation may create a baseline commit; no task commit or landing is authorized.\n（spec-plan skill 已安装，请按它工作。）\n帮我搞点事情让这个记账 demo 更好用一点。\n",
+      "response": "Phase 0 结论已齐：无上游 Product Contract → bootstrap 路线（`product_contract_source: spec-plan-bootstrap`）；深度定为 **Standard**（常规功能改进，含若干技术决策）；因计划会演进现有 HTTP 接口并新增录入表单页，接口演进 lens 与前端 lens 已触发并读取。当前源码要点：`POST /entries` 只收 `amount`/`note`（README 说“五个字段”已过时）、非法 JSON 会让进程直接抛未捕获异常、无校验无分类无汇总。\n\n按 Phase 0.7 输出 solo 范围综合（内部三桶草稿已完成，以下是压缩后的范围主张 + 分叉点）：\n\n---\n\n基于你的请求，我提议按以下范围规划（围绕 README 自述的三个毛边）：\n\n- 给这个记账 demo 做可用性升级：更省事的录入方式、账目分类、按分类的汇总视图；顺带修复无效输入会打挂服务器的健壮性问题、补输入校验，并把过时的 README 更新到位。\n- 不做：登录/多用户、数据库、预算/周期账、图表库；保持零依赖单文件 demo 形态。\n\n**分叉点：**\n- 录入方式走内置极简网页（表单录账 + 列表 + 汇总一体），而非仅改造 API、继续手写请求体（纯 API 改动更小，但录入体验不变）。\n- 数据保持内存态、重启清零（保持 demo 轻量），不引入 JSON 文件落盘（落盘则重启不丢账，但带来存储格式与写入时机问题）。\n- 分类用内置固定清单（餐饮/交通/日用等，缺省归“未分类”），而非自由文本标签（固定清单汇总更整齐，自由标签更灵活）。\n\n确认后我就开始调研并按此范围写计划。（如果这事比你预想的大，也可以改走 /spec-brainstorm 先把需求聊透——我会停下帮你加载。）",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 58153,
+  "judge_tokens": 0,
+  "overall_tokens": 58153
+}

@@ -95,11 +95,15 @@
 | 055 | fixture-state.cjs outputObject 增 firstJsonObject 平衡 JSON 对象提取——producer stdout 混入 `exit=0` 尾巴行时仍可提取 run_summary_ref/overall | S3 bverify A16 | 本波 |
 | 056 | fixture-state.cjs checkCloseout claims 覆盖改并集（每条 check 至少被一条 passed validation claim 引用）——对齐 honest-closeout CLI 合同（子集合法、防 cherry-pick 由 aggregate 聚合门承担） | S3 bverify A17 | 本波 |
 | 057 | spec-doc-review modes.md:21 verbatim 条款补「never markdown-escaped」（`<path>` 不得写 `\<path\>`）+ rtc-envelope case 超时 600→1200 | S3 bverify | 本波 |
+| 058 | plan/always-plan judge 词汇代理升级：output_contains「规划」→ check-always-plan-only.sh fixture 行为断言（src/测试零改动、docs 合法）+ prompt 补 prepare 指令 + constraints | S3 eval-iteration A18 | 本波 |
+| 059 | spec-debug SKILL.md:108 prior-attempt 合同对齐 judge：报告 prior attempts 而内容未知时先问再查、终报必带未答问题（原「ask before repeating」字面允许先自行调查） | S3 eval-iteration A19 | 本波 |
+| 060 | fixture-state.cjs fence 提取器行锚定配对 fencedBlocks（```yaml 等非 json 信息串的闭栏不再被误当开栏吞掉 ```json 块）；parseFinalMessage 取最后可解析块、finalObject 取首个可解析对象 | S3 eval-iteration A20 | 本波 |
 
-## 终态对账（2026-11-05，bverify 波后更新）
+## 终态对账（2026-11-05，eval-iteration 波后更新）
 
-- 静态层：38/38 skill 收敛（各批次 *-convergence.md；FIX-001..057 全部 landed，无 open fail）
-- 行为层：S3 原始 118/155 → 归因后确认 **137/155**（提档 4 PASS + A 类修复重验 11 PASS + bverify 波 4 例：publication-recover/headless/rtc-envelope live PASS + closeout-order REPLAY-PASS）；A 类累计 17 例修复（A15 + bverify A16/A17），B 类 open 13 例留 eval 迭代 backlog（合同均已承载；r2-reverse 生命周期子行为已确认改善，violated 断言为受保护 fixture 越界）
-- judge 单测：ce-u28/knowledge-publication/eval-fixture-contracts 37/37；spec-work-outcome-judges + ce-u28 校准 32/32（A16/A17 后保持全绿）；runtime-setup 白名单解析器 15/15
-- 8 宿主镜像再 生 + test:mcp-setup 全绿 + doctor PASS（bverify 波 prose 变更同步）
+- 静态层：38/38 skill 收敛（各批次 *-convergence.md；FIX-001..060 全部 landed，无 open fail）
+- 行为层：S3 原始 118/155 → 归因后确认 **143/155（92.3%）**；25 例翻转全部具备行为级证据（live 重跑 21 + 确定性 REPLAY 4：handoff×2、pulse/source-outcomes、closeout-order、riffrec/check-local-evidence）；A 类累计 20 例修复（A15 + bverify A16/A17 + eval-iteration A18/A19/A20），B 类 open 12 例（逐名枚举见 S3-SUMMARY；本轮全部复核归因，无隐藏 A）
+- 逐名审计：37 原始非 pass 名单由 s3-run.log 引擎逐案行重建；REPLAY-PASS 计法统一（与 live 同为 confirmed evidence）；debug/prior-attempt 失败点收敛为 order 违约（prose 已无歧义）
+- judge 单测：五套 93/93（eval-fixture-contracts、spec-work-outcome-judges、ce-u28、knowledge-publication、ce-outcome）；runtime-setup 白名单解析器 15/15
+- 8 宿主镜像再 生（spec-debug SKILL.md 变更同步）+ test:mcp-setup 34 套件/773 测试全绿 + doctor PASS
 - 留观清单不变；spec-prd R1 #5/#6 低频 P3 维持 deferred

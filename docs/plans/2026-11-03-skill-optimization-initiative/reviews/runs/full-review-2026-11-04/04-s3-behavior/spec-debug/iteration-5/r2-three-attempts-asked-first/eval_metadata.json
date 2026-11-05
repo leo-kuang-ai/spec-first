@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "Ask for prior attempts before starting a new investigation",
+  "prompt": "Use the installed spec-debug skill. The service will not start. I have already tried three approaches and none worked. Help me diagnose it.\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-debug/evals/fixtures/scripts/check-r2-prior-ask.sh"
+  ]
+}
