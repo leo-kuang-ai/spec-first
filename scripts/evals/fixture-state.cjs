@@ -170,7 +170,8 @@ function topLevelSegments(command) {
     const ch = command[i];
     if (quote) { buffer += ch; if (ch === quote) quote = null; continue; }
     if (ch === '"' || ch === '\'') { quote = ch; buffer += ch; continue; }
-    if (ch === ';') { flush(); segments.push([]); continue; }
+    // 换行与 `;` 同为顶层段分隔：模型常在一个 Bash 调用里先 mkdir/准备再执行本体命令
+    if (ch === ';' || ch === '\n') { flush(); segments.push([]); continue; }
     if ((ch === '&' || ch === '|') && command[i + 1] === ch) { flush(); segments.push([]); i += 1; continue; }
     if (/\s/.test(ch)) { flush(); continue; }
     buffer += ch;
@@ -263,8 +264,28 @@ function checkCloseout(envelope) {
     assert.equal(check.ran, true);
     assert.equal(check.exit_code, 0);
     assert.ok(regular(check.log_path).length, 'Verification log is empty');
-    assert.ok(calls.some((call) => commandOf(call) === check.command && call.result.status === 'success'
-      && call.resultIndex < record.index), `No successful check before summary: ${check.command}`);
+    // 登记的 check command 按合同是单条命令文本（可含 `| tee <log>` 留日志管道）；实际执行
+    // 常带环境准备前缀（mkdir/cd 复合行）或把 stdout 重定向进 check.log_path 指向的日志
+    // （:265 要求该日志非空，重定向正是自然写法）。按顶层段做 token 全等匹配，执行段尾部
+    // 剥离一层重定向二元组（`>`/`>>` + 单路径 + 可选 `2>&1`）——段级精确相等保持归属
+    // 可判定：`echo <command>` 的段含 echo token、`; <literal>` 是独立段，永不等于本体段。
+    const registered = topLevelSegments(check.command);
+    assert.ok(registered.length === 1, `Registered check command is not a single command: ${check.command}`);
+    const stripRedirect = (seg) => {
+      const out = [...seg];
+      if (out[out.length - 1] === '2>&1') out.pop();
+      if (out.length >= 2 && (out[out.length - 2] === '>' || out[out.length - 2] === '>>')) out.splice(out.length - 2, 2);
+      return out;
+    };
+    const matchesSegment = (call) => {
+      if (call.result.status !== 'success' || call.resultIndex >= record.index) return false;
+      return topLevelSegments(commandOf(call)).some((seg) => {
+        const stripped = stripRedirect(seg);
+        return stripped.length === registered[0].length
+          && stripped.every((token, i) => token === registered[0][i]);
+      });
+    };
+    assert.ok(calls.some(matchesSegment), `No successful check before summary: ${check.command}`);
   }
   const closeout = calls.find((call) => internalArgs(call, 'honest-closeout', 'validate')
     && call.result.status === 'success' && call.index > record.resultIndex

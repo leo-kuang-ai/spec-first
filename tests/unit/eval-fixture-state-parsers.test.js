@@ -52,6 +52,23 @@ describe('topLevelSegments composition-suffix boundary (A16)', () => {
       ['spec-first', 'internal', 'x', 'y'],
     ]);
   });
+
+  test('newline is a segment boundary like a semicolon (compound preparation prefix)', () => {
+    // 模型常在一个 Bash 调用里先 mkdir 再执行本体；换行分段后 check 本体成为独立段，
+    // checkCloseout 的段级 token 全等匹配可以命中它（跨模型复验 kiro 藏 A 实例）。
+    expect(api.topLevelSegments('mkdir -p d/log\nnode c.cjs 2>&1 | tee d/log/x.log; echo "exit:$?"')).toEqual([
+      ['mkdir', '-p', 'd/log'],
+      ['node', 'c.cjs', '2>&1', '|', 'tee', 'd/log/x.log'],
+      ['echo', '"exit:$?"'],
+    ]);
+  });
+
+  test('check-redirect tail stays inside the segment as tokens (strip happens in checkCloseout)', () => {
+    // stdout 重定向进 check.log_path 是合同鼓励的证据保存（:265 要求日志非空）；
+    // 分层：本层保留 `>` token，checkCloseout 的 stripRedirect 剥离后比对本体。
+    expect(api.topLevelSegments('grep -n "Known limitations" README.md > d/log/x.log 2>&1'))
+      .toEqual([['grep', '-n', '"Known limitations"', 'README.md', '>', 'd/log/x.log', '2>&1']]);
+  });
 });
 
 describe('internalArgs first-segment identity matching (A16)', () => {
