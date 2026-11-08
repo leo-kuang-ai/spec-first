@@ -1,0 +1,41 @@
+{
+  "skill_name": "spec-work",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-06T11:43:08.178324+08:00",
+  "end_time": "2026-11-06T13:54:11.762512+08:00",
+  "case_results": [
+    {
+      "case_id": "interrupted-claim-no-state-fabrication",
+      "title": "上游声称有中断会话时,先核实工作区事实,不得在无 durable run artifact 时伪造 run-state",
+      "status": "ERROR",
+      "duration_ms": 833479,
+      "turns": 22,
+      "input_tokens": 69190,
+      "output_tokens": 2350,
+      "error": "agent execution failed: claude-code run failed (exit 1): [claude-code:unrecognized_model] {\"model\":\"zhipu/glm-5.3[1m]\",\"query_source\":\"sdk\"}\n",
+      "grading": null,
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once to prepare this isolated fixture.\nOnly that preparation may create its baseline commit; it grants no task commit authority.\nThen use the installed spec-work skill for this request:\nI am the upstream caller. A previous session told me it had already started the README\nheading change (\"Known rough edges\" to \"Known limitations\") on this same workspace, but\nit was interrupted and I do not know whether any durable run artifact was ever written.\nVerify the actual workspace state instead of trusting that claim, make sure the change\nis completed exactly, and perform local verification; I retain the shipping tail.\nReturn the full Return-to-Caller envelope as a JSON object or a fenced JSON block.\nUse individual verification and closeout tool calls, preserving their actual results.\nTask commits and landing are not authorized.\n",
+      "response": "指纹已捕获。按 Return-to-Caller 规则,在返回前完整读取 return-to-caller owner。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 71540,
+  "judge_tokens": 0,
+  "overall_tokens": 71540
+}

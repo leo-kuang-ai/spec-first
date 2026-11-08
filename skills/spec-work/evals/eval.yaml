@@ -22,6 +22,7 @@ cases:
     - evals/cases/return-to-caller-envelope.yaml
     - evals/cases/no-commit-auth-stays-uncommitted.yaml
     - evals/cases/standalone-closeout-order.yaml
+    - evals/cases/interrupted-claim-no-state-fabrication.yaml
   defaults:
     timeout_seconds: 600
     max_turns: 20

@@ -1,0 +1,28 @@
+id: resume-checkpoint-identity
+title: resume 中断的 checkpoint PRD 应沿用既有 spec_id 与已关闭决定,不得重开新 PRD 或声称 ready
+description: |
+  验证 resume-risk 触发面：既有 checkpoint PRD（can_enter_spec_plan: no、
+  未决 OQ）在中断后继续时，必须保留 spec_id 身份与已关闭决定；
+  允许增量写与继续询问 next_owner_question，不得另起新 PRD 路径，
+  不得在 OQ 未关闭时声称 ready-for-planning 或 can_enter_spec_plan: yes。
+input:
+  prompt: |
+    First run `node prepare-eval.cjs` once to prepare this isolated fixture.
+    Only that preparation may create its baseline commit; it grants no task commit authority.
+    （spec-prd skill 已安装，请按它工作。）
+
+    上次会话在这个仓库写 PRD 写到一半中断了，产物在
+    docs/brainstorms/2026-10-15-001-loyalty-ledger-prd.md。
+    请接着往下做（resume）。
+context:
+  repo_fixture: evals/fixtures/repos/large-resume
+  git:
+    init: true
+    checkout: main
+constraints:
+  timeout_seconds: 480
+  max_turns: 12
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-resume-identity.sh
+  timeout_seconds: 30

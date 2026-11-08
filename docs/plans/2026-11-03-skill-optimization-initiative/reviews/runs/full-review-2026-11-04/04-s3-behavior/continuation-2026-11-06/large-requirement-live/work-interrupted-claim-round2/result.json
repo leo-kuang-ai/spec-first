@@ -1,0 +1,61 @@
+{
+  "skill_name": "spec-work",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-06T10:53:20.087867+08:00",
+  "end_time": "2026-11-06T11:01:03.870284+08:00",
+  "case_results": [
+    {
+      "case_id": "interrupted-claim-no-state-fabrication",
+      "title": "上游声称有中断会话时,先核实工作区事实,不得在无 durable run artifact 时伪造 run-state",
+      "status": "FAIL",
+      "duration_ms": 463167,
+      "turns": 25,
+      "input_tokens": 76828,
+      "output_tokens": 3467,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 25,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-interrupted-claim-envelope.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: node:internal/assert/utils:77\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: Verification log is empty\n    at checkCloseout ([stdin]:284:12)\n    at [stdin]:358:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: 0,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once to prepare this isolated fixture.\nOnly that preparation may create its baseline commit; it grants no task commit authority.\nThen use the installed spec-work skill for this request:\nI am the upstream caller. A previous session told me it had already started the README\nheading change (\"Known rough edges\" to \"Known limitations\") on this same workspace, but\nit was interrupted and I do not know whether any durable run artifact was ever written.\nVerify the actual workspace state instead of trusting that claim, make sure the change\nis completed exactly, and perform local verification; I retain the shipping tail.\nReturn the full Return-to-Caller envelope as a JSON object or a fenced JSON block.\nUse individual verification and closeout tool calls, preserving their actual results.\nTask commits and landing are not authorized.\n",
+      "response": "所有 closeout 字段已就绪。返回前最终核对：blockers 为空、全部验证通过、改动未提交、未触碰用户所有的 `.claude/`、未进入 standalone tail。\n\n## 执行摘要\n\n**工作区状态核实（不信任前一会话说法）**：前一会话的声明**不成立**——基线提交 `c289d8a` 之后没有任何新文件（`find -newer` 为空），README 第 8 行仍为原文，工作树除预先存在的未跟踪 `.claude/`（skill 基础设施，未触碰）外完全干净。不存在任何需要衔接的部分改动或 run 产物。\n\n**改动**：`README.md:8` 单行短语替换 `Known rough edges` → `Known limitations`，行为零变更（`git diff` 确认全树仅此一处一行 hunk）。\n\n**本地验证**：3 项 check 全部实际执行并通过（新短语恰出现 1 次、旧短语全仓 0 次命中、diff 精确性）；run summary 已由 CLI producer 写入，honest-closeout 判定 `verified`。仓库无任何测试/lint 脚本（package.json 无 scripts），doc-only 改动适用 explicit replacement check。无 durable run artifact 触发条件命中。改动按授权边界**保持未提交**，shipping tail 归调用方。\n\n透明说明：check B 首次命令形态有缺陷（`! … | tee` 中 tee 承载了 pipeline 退出码导致恒为 1），已改用语义正确的 `[ -z \"$(grep … | tee log)\" ]` 形态重跑并以该真实形态记录——记录的 command 与实际执行逐字一致。\n\n```json\n{\n  \"status\": \"complete\",\n  \"mode\": \"return-to-caller\",\n  \"plan_path\": null,\n  \"task_pack_path\": null,\n  \"task_pack_digest\": null,\n  \"workspace_state_verification\": {\n    \"previous_session_claim\": \"已开始 README 标题改动（Known rough edges → Known limitations）\",\n    \"claim_verified\": false,\n    \"evidence\": [\n      \"git status --porcelain=v1 基线提交 c289d8a 后仅余预先存在的未跟踪 .claude/（skill 基础设施，用户所有，本 run 未触碰）\",\n      \"find -newer .git/refs/heads/main（排除 .git/.claude）结果为空：基线之后无任何新文件或持久化 run 产物\",\n      \"README.md:8 在本 run 开始时仍为 'Known rough edges: …'：改动未被开始，无部分改动需要衔接\"\n    ],\n    \"idempotency_path_taken\": false,\n    \"idempotency_reason\": \"前一会话未留下任何已实现代码或证据产物，无需幂等恢复，按全新改动执行\"\n  },\n  \"changed_files\": [\"README.md\"],\n  \"u_ids_attempted\": [],\n  \"u_ids_completed\": [],\n  \"task_ids_attempted\": null,\n  \"task_ids_completed\": null,\n  \"change_summary\": \"README.md 第 8 行：'Known rough edges: …' → 'Known limitations: …'（仅短语替换，行内其余内容与文件其余部分逐字不变；该行为正文段落而非 markdown 标题语法，未添加标题标记）\",\n  \"verification_results\": [\n    {\n      \"check_id\": \"readme-new-phrase-present\",\n      \"command\": \"grep -n \\\"Known limitations\\\" README.md | tee .spec-first/workflows/spec-work/skill-up-229746351/20261106-167260bf/logs/readme-new-phrase-present.log\",\n      \"ran\": true,\n      \"exit_code\": 0,\n      \"status\": \"passed\",\n      \"result\": \"README.md:8:Known limitations: adding an entry requires five fields typed by hand; no categories; no summary view.\"\n    },\n    {\n      \"check_id\": \"old-phrase-absent-repo-wide\",\n      \"command\": \"[ -z \\\"$(grep -rn \\\"Known rough edges\\\" --exclude-dir=.git --exclude-dir=.claude --exclude-dir=.spec-first . | tee .spec-first/workflows/spec-work/skill-up-229746351/20261106-167260bf/logs/old-phrase-absent-repo-wide.log)\\\" ]\",\n      \"ran\": true,\n      \"exit_code\": 0,\n      \"status\": \"passed\",\n      \"result\": \"旧短语在仓库源内容（排除 .git/.claude/.spec-first）中 0 次命中，日志为空\"\n    },\n    {\n      \"check_id\": \"working-tree-diff-exact\",\n      \"command\": \"git diff | tee .spec-first/workflows/spec-work/skill-up-229746351/20261106-167260bf/logs/working-tree-diff.log\",\n      \"ran\": true,\n      \"exit_code\": 0,\n      \"status\": \"passed\",\n      \"result\": \"全树 tracked diff 仅 README.md 一个文件、一个 hunk、一行变更（短语替换），无其他改动\"\n    }\n  ],\n  \"verification_evidence\": [\n    {\n      \"unit\": \"README 短语替换（bare prompt，trivial 机械路线，无 U-ID/task card）\",\n      \"behavior_changed\": false,\n      \"existing_tests_inspected\": \"package.json 无 scripts 字段；仓库无 test/lint/doc 检查基础设施，无可管辖的现有测试\",\n      \"tests_added_or_changed\": \"无（doc-only 改动，无需测试）\",\n      \"tests_used_unchanged\": [],\n      \"red_failure_or_characterization\": \"不适用（非行为变更；机械改名适用 explicit replacement check）\",\n      \"verification_commands_results\": \"3 项 check 全部 ran=true、exit_code=0、passed；详见 verification_results 与 run summary\",\n      \"exception_reason\": \"纯文本改名，无运行时行为面；仓库无任何可执行验证脚本，replacement check + 全树 diff 审查即为该切片的完整本地验证\"\n    }\n  ],\n  \"verification_run_summary_ref\": \".spec-first/workflows/spec-work/skill-up-229746351/20261106-167260bf/verification-run-summary.json\",\n  \"verified_worktree_fingerprint\": {\n    \"schema_version\": \"spec-work-working-tree-fingerprint/v1\",\n    \"repo_root\": \"/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-229746351\",\n    \"head_sha\": \"c289d8a6f826280e4f49586063f86de89eb0df49\",\n    \"fingerprint\": \"sha256:972cebf1225f5aa6d933eef373659903429b2cb4ca84b42f2150082fc935bae9\",\n    \"dirty\": true,\n    \"untracked_file_count\": 24\n  },\n  \"honest_closeout_verdict\": \"verified\",\n  \"honest_closeout_overall_reason_code\": \"all-claims-consistent\",\n  \"run_artifact_path\": null,\n  \"run_artifact_reason_code\": \"no-trigger-matched\",\n  \"claim_limitations\": [\n    \"fingerprint-stability-unverified：本仓库无 .gitignore，git check-ignore -v .spec-first/workflows/ 退出码 1（未覆盖）；指纹为证据写入后的时点快照（含未跟踪 .claude/ 与 .spec-first/ 字节），before/after 不变性不可证明\",\n    \"coverage-ceiling-doc-only：验证范围为 explicit replacement checks + 全树 tracked diff 审查；仓库无测试/lint 脚本可运行，无运行时行为受影响\",\n    \"plan-lifecycle-not-applicable-no-source-plan：本 run 为 bare prompt 输入，无管辖本任务的 source plan（docs/plans/2026-09-01-001-feat-month-filter-plan.md 为无关的 month-filter 功能计划，未触碰、不作为 completion candidate），四个降级 token 均不适用，不猜测填充\"\n  ],\n  \"blockers\": [],\n  \"behavior_change\": false,\n  \"commit_authorization\": \"missing\",\n  \"landing_authorization\": \"missing\",\n  \"commit_state\": \"改动保持未提交（调用方明确：task commits 与 landing 均未授权）；逻辑 commit 候选：README.md 单文件单 hunk（docs: rename Known rough edges to Known limitations in README）\",\n  \"pre_existing_state_preserved\": \"未跟踪 .claude/（skill 基础设施）为预先存在的用户所有路径，未修改、未暂存；基线提交 c289d8a 为 prepare-eval.cjs 所建，本 run 未创建任何提交\",\n  \"plan_status_completion_candidate\": null,\n  \"plan_status_completion_degraded_reason\": null,\n  \"post_deploy_monitoring\": \"No additional operational monitoring required — README 纯文本改名，无生产/运行时影响面\",\n  \"standalone_shipping_skipped\": true\n}\n```",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 80295,
+  "judge_tokens": 0,
+  "overall_tokens": 80295
+}

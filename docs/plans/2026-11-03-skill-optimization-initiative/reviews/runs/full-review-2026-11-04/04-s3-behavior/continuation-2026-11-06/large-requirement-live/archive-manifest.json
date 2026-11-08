@@ -1,0 +1,150 @@
+{
+ "purpose": "FIX-070 超大需求行为取证三例 live 原始证据：spec-prd×2（round-1 归因+round-2 PASS）、spec-work×6 run（round-1 归因、round-2/3/4 judge 窄假设逐层修复与行为合规证据、round-5/5b gateway ERROR、round-5c 真B实例：validate 未跑谎报 verified）",
+ "files": [
+  {
+   "path": "prd-resume-identity-round2/ce2f99eb-0652-4b07-a73f-09a09e050a29.jsonl",
+   "sha256": "43294211f012243be2333d3ba8d65fc7728cee51c2c2602728bbba78f8f76ca9",
+   "bytes": 588506
+  },
+  {
+   "path": "prd-resume-identity-round2/response.md",
+   "sha256": "dd5229a2a2ac13e39f7ba16ea021e9d12444f8bc8607babc3041cffc0641d425",
+   "bytes": 4047
+  },
+  {
+   "path": "prd-round1-attribution/result.json",
+   "sha256": "d8ec75d025affd75eb30733eff2a9d5b252ac0ab92c94f9fc1c92accec5abb8b",
+   "bytes": 18575
+  },
+  {
+   "path": "prd-round1-attribution/resume-identity-round1-response.md",
+   "sha256": "d27046760d303b7774b8d3d799be602f710f870b36400cdea8e8998ad880a58a",
+   "bytes": 3006
+  },
+  {
+   "path": "prd-round1-attribution/split-gate-round1-response.md",
+   "sha256": "7c9c4f30fbaf47b59392affbf0c7b2a8496682912b716cd01a699c0030a6fe2b",
+   "bytes": 8714
+  },
+  {
+   "path": "prd-round1-attribution/work-interrupted-claim-round1-response.md",
+   "sha256": "f3b92b85dc8b477f2d933a6bdaf7bcfa0fa151a4470004e06a6f36b1421a424d",
+   "bytes": 6165
+  },
+  {
+   "path": "prd-split-gate-round2/2f14761a-1b45-4b45-80e4-cd00183401ab.jsonl",
+   "sha256": "4b985fe5cbd5185fa07ced35282ee722df251ed7d973fedea6dfd6b31a790603",
+   "bytes": 622019
+  },
+  {
+   "path": "prd-split-gate-round2/response.md",
+   "sha256": "278477f49f4d1d4c858c61c401a0c0600f0fa62e2a0a2d3136316fe6e91ec078",
+   "bytes": 6181
+  },
+  {
+   "path": "result.json",
+   "sha256": "b3b8d8658a72afa0e57f672f9cb2707b90a6c4ff21a293c9b66764a4b7c61983",
+   "bytes": 16477
+  },
+  {
+   "path": "work-interrupted-claim-round2/grading.json",
+   "sha256": "73eea67431680f0ea564330d6a393e7c5ad21a7a13b7718b6aeba14f7bfc90dc",
+   "bytes": 1114
+  },
+  {
+   "path": "work-interrupted-claim-round2/response.md",
+   "sha256": "66349c7583e054e5439441602dde46b820744781479f0bebba746d3be755bbde",
+   "bytes": 7355
+  },
+  {
+   "path": "work-interrupted-claim-round2/result.json",
+   "sha256": "12a558413cd0ff26d3f08ae760bb0e65a4b70aa8a53a730d21c5a8920e3faf6b",
+   "bytes": 11036
+  },
+  {
+   "path": "work-interrupted-claim-round2/transcript.jsonl",
+   "sha256": "8764df53ec31404e35e4e1541ec765f2280b19dd92b3257cc41dd572b1112b79",
+   "bytes": 917088
+  },
+  {
+   "path": "work-interrupted-claim-round3/grading.json",
+   "sha256": "6e5401c72aaa35e0094d8774ac684b510b5a023835ac724a7dc28c6b45037fc8",
+   "bytes": 1292
+  },
+  {
+   "path": "work-interrupted-claim-round3/response.md",
+   "sha256": "58c713adda9822c5f8e1887f94e25280667496ec19e2f7b740c7ca33075b290d",
+   "bytes": 6589
+  },
+  {
+   "path": "work-interrupted-claim-round3/result.json",
+   "sha256": "e38b01d692e01de429d18bf7fad51292485f0b59bf0bb915ca3252de4cf5078e",
+   "bytes": 10392
+  },
+  {
+   "path": "work-interrupted-claim-round3/transcript.jsonl",
+   "sha256": "73e659af758da92c692374b7405cdfad201ddbee1ff2c88e076ee6bd4cb164d3",
+   "bytes": 822712
+  },
+  {
+   "path": "work-interrupted-claim-round4/grading.json",
+   "sha256": "f1e17363e8ba44fe6a714b2f2e2f6c059f1e6006cb41dac91e73f2d464939b48",
+   "bytes": 1496
+  },
+  {
+   "path": "work-interrupted-claim-round4/response.md",
+   "sha256": "0db7df679ada35b33226a4427cb455848440414539ff4e979481d9d0ec4b47e2",
+   "bytes": 5545
+  },
+  {
+   "path": "work-interrupted-claim-round4/result.json",
+   "sha256": "2496877700f91f212791e3b98677d31d06d80d6f31f2a089a51d3074b3788362",
+   "bytes": 9450
+  },
+  {
+   "path": "work-interrupted-claim-round4/transcript.jsonl",
+   "sha256": "19a7bd28753f47bb0d1399cfc4012f4bff97d94d6deb4c2c2b8554681dc10b2f",
+   "bytes": 835596
+  },
+  {
+   "path": "work-interrupted-claim-round5-errors/round5-result.json",
+   "sha256": "bd58196314e81d2e78acacc6aacd463e2509b0b755c0f27b646e23b094134790",
+   "bytes": 2218
+  },
+  {
+   "path": "work-interrupted-claim-round5-errors/round5-transcript.jsonl",
+   "sha256": "8f10a5d6f398998ff3fa8130af9ef3e09b2b729e547db7cba3ec69641af92a21",
+   "bytes": 951790
+  },
+  {
+   "path": "work-interrupted-claim-round5-errors/round5b-result.json",
+   "sha256": "c5acc9aa172ce5a19e9bdba9cc0c970ed059709594dc5afecb6bc88cf5d19524",
+   "bytes": 2315
+  },
+  {
+   "path": "work-interrupted-claim-round5-errors/round5b-transcript.jsonl",
+   "sha256": "3e0bb692be591f8ddbe52e7cc3e1e842a2d489e05adc9c3050f7af9f1efd245a",
+   "bytes": 567545
+  },
+  {
+   "path": "work-interrupted-claim-round5c/grading.json",
+   "sha256": "f68e9a4f30fe915304bf82c2c411d1425d30e3c64f5e97ee48ac0a531e5d3e8d",
+   "bytes": 1145
+  },
+  {
+   "path": "work-interrupted-claim-round5c/response.md",
+   "sha256": "101ed1b2c2377598e1fb10582a59434141f8872f6053d7a05574cfb1bb335b67",
+   "bytes": 6694
+  },
+  {
+   "path": "work-interrupted-claim-round5c/result.json",
+   "sha256": "55ba035ee4974da55320b0e885730d762ae1f22f7e12477f8c551a1a3bc45a0d",
+   "bytes": 10312
+  },
+  {
+   "path": "work-interrupted-claim-round5c/transcript.jsonl",
+   "sha256": "fd0b3fca0ac0e578b92ab56fd4781c1704299338ed552105cb18ded54d476774",
+   "bytes": 954141
+  }
+ ]
+}

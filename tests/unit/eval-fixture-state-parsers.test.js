@@ -12,6 +12,7 @@ const modulePath = path.join(os.tmpdir(), `fixture-state-test-${process.pid}.cjs
 fs.writeFileSync(modulePath, `${fs.readFileSync(sourcePath, 'utf8')}\nmodule.exports = {
   fencedBlocks, parseFinalMessage, finalObject, transcriptCalls, commandOf,
   topLevelSegments, internalArgs, firstJsonObject, outputObject, checkCloseout,
+  readCloseoutClaims,
 };\n`);
 const api = require(modulePath);
 
@@ -64,7 +65,7 @@ describe('topLevelSegments composition-suffix boundary (A16)', () => {
   });
 
   test('check-redirect tail stays inside the segment as tokens (strip happens in checkCloseout)', () => {
-    // stdout 重定向进 check.log_path 是合同鼓励的证据保存（:265 要求日志非空）；
+    // stdout 重定向进 check.log_path 是合同鼓励的证据保存（:130/:132 只要求存在 redacted log）；
     // 分层：本层保留 `>` token，checkCloseout 的 stripRedirect 剥离后比对本体。
     expect(api.topLevelSegments('grep -n "Known limitations" README.md > d/log/x.log 2>&1'))
       .toEqual([['grep', '-n', '"Known limitations"', 'README.md', '>', 'd/log/x.log', '2>&1']]);
@@ -262,5 +263,186 @@ describe('checkCloseout null-ref guard (A22)', () => {
   test('empty-string ref fails the same guard', () => {
     expect(() => api.checkCloseout({ verification_run_summary_ref: '' }))
       .toThrow(/record producer never completed/);
+  });
+});
+
+describe('readCloseoutClaims temp-root acceptance (large-requirement live round 1)', () => {
+  const path = require('node:path');
+  const os = require('node:os');
+
+  test('repo-relative input stays the default path (flag off)', () => {
+    const repoFile = path.resolve(__dirname, '../..', 'package.json');
+    expect(api.readCloseoutClaims(repoFile, false).toString()).toContain('"name"');
+  });
+
+  test('tmpdir input is rejected without the flag and accepted with it', () => {
+    const file = path.join(fs.realpathSync(os.tmpdir()), `fixture-state-claims-${process.pid}.json`);
+    fs.writeFileSync(file, '{"claims":[]}', 'utf8');
+    try {
+      expect(() => api.readCloseoutClaims(file, false)).toThrow();
+      expect(JSON.parse(api.readCloseoutClaims(file, true).toString())).toEqual({ claims: [] });
+    } finally {
+      fs.rmSync(file, { force: true });
+    }
+  });
+
+  test('tmp symlink escaping to a non-tmp target is rejected even with the flag', () => {
+    const dir = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'fixture-state-escape-'));
+    const link = path.join(dir, 'escape.json');
+    const target = path.join(dir, 'target.json');
+    fs.writeFileSync(target, '{"claims":[]}', 'utf8');
+    // 指向 tmp 之外的真实文件：/etc/hosts 在 macOS/Linux 都存在且 realpath 不落在 tmpRoot。
+    fs.symlinkSync('/etc/hosts', link);
+    try {
+      expect(() => api.readCloseoutClaims(link, true)).toThrow(/outside fixture repo and tmpdir/);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('checkCloseout log and check-command contract anchors (large-requirement live rounds 2-4)', () => {
+  // 集成校准：直接驱动完整 checkCloseout（复用文件顶部的临时模块加载法）。
+  // 合同 :132 只要求存在 redacted log（regular() 缺文件即抛），静默形态
+  // （absence grep / ! git grep / test 断言 / bash -c 复合）的空日志合法；
+  // 防伪由登记命令的段级全等匹配承担（echo 伪造段剥后仍含自身 token）。
+  // 登记串按 :157 逐字记实际执行形态：尾部 `echo …$?…` 退出码捕获段被剥
+  // （与 internalArgs 对 producer 的既有容忍一致），剩余须单段。
+  const REF = '.spec-first/workflows/spec-work/ws/run-1/verification-run-summary.json';
+  const LOG_DIR = '.spec-first/workflows/spec-work/ws/run-1/logs';
+
+  const buildRepo = (checks) => {
+    const dir = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'closeout-carve-'));
+    fs.mkdirSync(path.join(dir, LOG_DIR), { recursive: true });
+    const summaryChecks = [];
+    const messages = [];
+    let id = 0;
+    for (const check of checks) {
+      id += 1;
+      const logRel = `${LOG_DIR}/${check.id}.log`;
+      fs.writeFileSync(path.join(dir, logRel), check.log, 'utf8');
+      summaryChecks.push({ id: check.id, status: 'passed', ran: true, exit_code: 0,
+        log_path: logRel, command: check.command });
+      // 段级匹配预期形态：实际执行可带 stdout 重定向进 log（尾部二元组被剥），
+      // 登记 command 为本体；absence 形态 exec 与登记同串直接全等。
+      const execCommand = check.exec || check.command;
+      messages.push({ role: 'tool_call', tool_call: { id: `c${id}`, name: 'Bash', arguments: { command: execCommand } } });
+      messages.push({ role: 'tool_result', tool_result: { call_id: `c${id}`, status: 'success', output: check.log } });
+    }
+    fs.writeFileSync(path.join(dir, REF), JSON.stringify({
+      schema_version: 'verification-run-summary.v1', checks: summaryChecks }), 'utf8');
+    const claimsRel = 'closeout-claims.json';
+    fs.writeFileSync(path.join(dir, claimsRel), JSON.stringify({
+      run_summary_ref: REF,
+      claims: [{ claim_type: 'validation', asserted_status: 'passed',
+        evidence_refs: summaryChecks.map((c) => `verification-run-summary:${c.id}`) }] }), 'utf8');
+    id += 1;
+    messages.push({ role: 'tool_call', tool_call: { id: `c${id}`, name: 'Bash',
+      arguments: { command: 'spec-first internal verification-run-summary record --json --input /dev/stdin' } } });
+    messages.push({ role: 'tool_result', tool_result: { call_id: `c${id}`, status: 'success',
+      content: JSON.stringify({ run_summary_ref: REF }) } });
+    const validateId = `c${id + 1}`;
+    messages.push({ role: 'tool_call', tool_call: { id: validateId, name: 'Bash',
+      arguments: { command: `spec-first internal honest-closeout validate --json --input ${claimsRel}` } } });
+    messages.push({ role: 'tool_result', tool_result: { call_id: validateId, status: 'success',
+      content: JSON.stringify({ overall: 'verified' }) } });
+    const transcript = path.join(dir, 'transcript.json');
+    fs.writeFileSync(transcript, JSON.stringify(messages), 'utf8');
+    const envelope = { verification_run_summary_ref: REF,
+      honest_closeout_verdict: 'verified', claim_limitations: [] };
+    return { dir, transcript, envelope };
+  };
+
+  const runCloseout = (repo) => {
+    const cwd = process.cwd();
+    process.chdir(repo.dir);
+    process.env.EVAL_TRANSCRIPT_PATH = repo.transcript;
+    try {
+      api.checkCloseout(repo.envelope);
+      return null;
+    } catch (error) {
+      return error.message;
+    } finally {
+      process.chdir(cwd);
+      delete process.env.EVAL_TRANSCRIPT_PATH;
+    }
+  };
+
+  test('silent-form checks with empty logs are legal; positive check keeps segment match', () => {
+    // round-2/3 live 实测形态：`[ -z "$(…| tee log)" ]` 空日志、`! git grep` 零输出、
+    // 正例 grep 非空日志——三者都合法，段级匹配各自成立。
+    const repo = buildRepo([
+      { id: 'old-absent', command: '! git grep -n "Known rough edges" -- .', log: '' },
+      { id: 'phrase-present',
+        command: 'grep -n "Known limitations" README.md',
+        exec: `grep -n "Known limitations" README.md > ${LOG_DIR}/phrase-present.log 2>&1`,
+        log: 'README.md:3:Known limitations' },
+    ]);
+    try {
+      expect(runCloseout(repo)).toBeNull();
+    } finally {
+      fs.rmSync(repo.dir, { recursive: true, force: true });
+    }
+  });
+
+  test('missing log file is rejected (contract :132 existence)', () => {
+    const repo = buildRepo([
+      { id: 'phrase-present', command: 'grep -n "Known limitations" README.md', log: 'present' },
+    ]);
+    fs.rmSync(path.join(repo.dir, `${LOG_DIR}/phrase-present.log`));
+    try {
+      expect(runCloseout(repo)).toMatch(/phrase-present\.log|ENOENT|no such file/i);
+    } finally {
+      fs.rmSync(repo.dir, { recursive: true, force: true });
+    }
+  });
+
+  test('absence-form carve-out does not relax the executed-segment forgery guard', () => {
+    const repo = buildRepo([
+      { id: 'old-absent', command: '! grep -rn "Known rough edges" README.md', log: '' },
+    ]);
+    // summary 里登记的 command 从未真实执行：改写 transcript 里的执行段。
+    const transcript = JSON.parse(fs.readFileSync(repo.transcript, 'utf8'));
+    transcript[0].tool_call.arguments.command = 'echo not-the-registered-check';
+    fs.writeFileSync(repo.transcript, JSON.stringify(transcript), 'utf8');
+    try {
+      expect(runCloseout(repo)).toMatch(/No successful check before summary/);
+    } finally {
+      fs.rmSync(repo.dir, { recursive: true, force: true });
+    }
+  });
+
+  test('registered expanded-redirect form matches variable-prefixed exec compound line (contract :157)', () => {
+    // round-3 live 实测形态：exec 以 `RUN_ROOT="…" && <check> > "$RUN_ROOT/logs/x.log" 2>&1; echo …`
+    // 复合行执行，登记按合同 :157 记「前缀变量展开后的最终形态」。两侧对称剥尾部
+    // 重定向二元组后 token 全等（变量路径 token 只出现在被剥掉的二元组里）。
+    const repo = buildRepo([
+      { id: 'readme-diff-scope',
+        command: `git diff -- README.md > ${LOG_DIR}/readme-diff-scope.log 2>&1`,
+        exec: `RUN_ROOT=".spec-first/workflows/spec-work/ws/run-1" && git diff -- README.md > "$RUN_ROOT/logs/readme-diff-scope.log" 2>&1; echo "exit=$?"; cat "$RUN_ROOT/logs/readme-diff-scope.log"`,
+        log: '- Known limitations: demo' },
+    ]);
+    try {
+      expect(runCloseout(repo)).toBeNull();
+    } finally {
+      fs.rmSync(repo.dir, { recursive: true, force: true });
+    }
+  });
+
+  test('echo exit-code capture tail is stripped before the single-command requirement (round-4 form)', () => {
+    // round-4 live 实测形态：absence 检查以 bash -c 包装（grep 无命中 exit 1 由
+    // test 转 0），退出码经 `; echo "exit_code=$?" >> log` 追加进日志。逐字登记后
+    // 是两个顶层段：剥掉尾部 echo 捕获段，剩余单段通过归属匹配。
+    const logRel = `${LOG_DIR}/old-phrase-absent.log`;
+    const repo = buildRepo([
+      { id: 'old-phrase-absent-tracked',
+        command: `bash -c 'git grep -n "Known rough edges" -- .; test $? -eq 1' > ${logRel} 2>&1; echo "exit_code=$?" >> ${logRel}`,
+        log: 'exit_code=0' },
+    ]);
+    try {
+      expect(runCloseout(repo)).toBeNull();
+    } finally {
+      fs.rmSync(repo.dir, { recursive: true, force: true });
+    }
   });
 });

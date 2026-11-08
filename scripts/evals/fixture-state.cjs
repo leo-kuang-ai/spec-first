@@ -246,7 +246,25 @@ function outputObject(call) {
   return value;
 }
 
-function checkCloseout(envelope) {
+// claims 输入读取：默认仍限 fixture 仓内（regular 包含性 + 符号链接链检查）。
+// allowTempClaims 仅放行 realpath 落在系统临时根下的输入——A21 先例：引擎会话里
+// 模型把 run-local scratch 写到 /tmp 属正常形态；内容防伪造不靠路径收窄，而靠
+// （a）该 --input 必须命中一次成功的 honest-closeout validate 内部调用、（b）CLI
+// 自身对 claims 与仓内 summary/已录 check 的核验、（c）下游并集覆盖断言。
+function readCloseoutClaims(input, allowTemp) {
+  const relative = path.relative(process.cwd(), path.resolve(input));
+  try {
+    return regular(relative);
+  } catch (error) {
+    if (!allowTemp) throw error;
+  }
+  const real = fs.realpathSync(path.resolve(input));
+  const tmpRoot = fs.realpathSync(require('node:os').tmpdir());
+  assert.ok(real.startsWith(tmpRoot + path.sep), `Claims input outside fixture repo and tmpdir: ${input}`);
+  return fs.readFileSync(real);
+}
+
+function checkCloseout(envelope, options = {}) {
   const ref = envelope.verification_run_summary_ref;
   // record 从未成功完成时 envelope 会诚实留 null；先给出可读断言，避免 assert.match(null) 的 TypeError。
   assert.ok(typeof ref === 'string' && ref.length > 0,
@@ -263,13 +281,29 @@ function checkCloseout(envelope) {
     assert.equal(check.status, 'passed');
     assert.equal(check.ran, true);
     assert.equal(check.exit_code, 0);
-    assert.ok(regular(check.log_path).length, 'Verification log is empty');
+    // 合同 :132 对日志只要求「存在 repo-relative redacted log」（:130 要求把 bounded
+    // 输出写为日志——absence/quiet/test 类检查的 bounded 输出本来就是空，空日志是
+    // 诚实成功证据）。非空断言曾在三轮 live 中误伤 `[ -z … ]`、`! git grep`、
+    // `bash -c '…; test $? -eq 1'` 等静默形态；防「空文件冒充证据」由下方段级
+    // 全等匹配承担（命令必须真实执行过），日志内容真伪归 honest-closeout 与人。
+    // regular() 在文件缺失时抛错，即存在性锚定。
+    regular(check.log_path);
     // 登记的 check command 按合同是单条命令文本（可含 `| tee <log>` 留日志管道）；实际执行
     // 常带环境准备前缀（mkdir/cd 复合行）或把 stdout 重定向进 check.log_path 指向的日志
-    // （:265 要求该日志非空，重定向正是自然写法）。按顶层段做 token 全等匹配，执行段尾部
+    // （:130/:132 只要求存在 redacted log，重定向正是自然写法）。按顶层段做 token 全等匹配，执行段尾部
     // 剥离一层重定向二元组（`>`/`>>` + 单路径 + 可选 `2>&1`）——段级精确相等保持归属
     // 可判定：`echo <command>` 的段含 echo token、`; <literal>` 是独立段，永不等于本体段。
     const registered = topLevelSegments(check.command);
+    // 合同 :157 要求逐字登记实际执行的命令串：absence 检查常以
+    // `bash -c 'grep …; test $? -eq 1' > log 2>&1; echo "exit_code=$?" >> log` 复合形态
+    // 执行（grep 无命中 exit 1 由 test 转回 0，退出码追加进日志留证）。与 internalArgs
+    // 对 producer 调用 `; echo "exit=$?"` 捕获尾巴的既有容忍一致：仅剥掉尾部一段
+    // `echo …$?…` 退出码捕获，剩余仍须单段——归属可判定不放松。
+    if (registered.length > 1
+      && registered[registered.length - 1][0] === 'echo'
+      && registered[registered.length - 1].some((token) => token.includes('$?'))) {
+      registered.pop();
+    }
     assert.ok(registered.length === 1, `Registered check command is not a single command: ${check.command}`);
     const stripRedirect = (seg) => {
       const out = [...seg];
@@ -279,10 +313,15 @@ function checkCloseout(envelope) {
     };
     const matchesSegment = (call) => {
       if (call.result.status !== 'success' || call.resultIndex >= record.index) return false;
+      // 合同 :157 要求登记「前缀变量展开后的最终形态」：exec 复合行常以
+      // `RUN_ROOT="…" && git diff … > "$RUN_ROOT/logs/x.log" 2>&1; echo …` 形态执行，
+      // 登记串则是展开绝对路径的同命令。两侧对称剥一层尾部重定向二元组后比对：
+      // echo/字面量伪造段剥后仍含自身 token，未执行的命令永远没有匹配段。
+      const registeredBody = stripRedirect(registered[0]);
       return topLevelSegments(commandOf(call)).some((seg) => {
         const stripped = stripRedirect(seg);
-        return stripped.length === registered[0].length
-          && stripped.every((token, i) => token === registered[0][i]);
+        return stripped.length === registeredBody.length
+          && stripped.every((token, i) => token === registeredBody[i]);
       });
     };
     assert.ok(calls.some(matchesSegment), `No successful check before summary: ${check.command}`);
@@ -293,8 +332,7 @@ function checkCloseout(envelope) {
   assert.ok(closeout, 'Missing successful honest-closeout after summary');
   const args = internalArgs(closeout, 'honest-closeout', 'validate');
   const input = args[args.indexOf('--input') + 1];
-  const relativeInput = path.relative(process.cwd(), path.resolve(input));
-  const claims = JSON.parse(regular(relativeInput));
+  const claims = JSON.parse(readCloseoutClaims(input, options.allowTempClaims === true));
   assert.equal(claims.run_summary_ref, ref, 'Closeout validated a different summary');
   // CLI 合同允许按 check 分解 claims（evaluateValidationClaim 接受任意非空子集，
   // 防 cherry-pick 由 aggregateRunSummaryStatus 聚合门承担）；此处校验并集覆盖：
