@@ -1,5 +1,7 @@
 # Changelog
 
+- v1.15.3 2026-11-12 18:28:15 claude: fix(deps): 修复 Dependabot 6 条依赖告警（均为 dev 依赖；本包 `dependencies` 为空，发布产物不含 `node_modules`）。`js-yaml` 3.15.1 → 3.15.2（GHSA-2883-xcg3-v3hh / CVE-2026-84375，空 merge 源下 `maxTotalMergeKeys` 不限 CPU；`package.json` 的 `overrides` 原先把版本钉在受影响区间，同步改为 3.15.2 才生效）；`fast-uri` 3.1.7 → 3.1.9（GHSA-wjr9-j795-jxcr、GHSA-w74x-v6f9-j3xg、GHSA-333x-w4r6-6crp、GHSA-xhq7-xmqj-769h 四条 host confusion / scheme 欺骗 / scheme 注入 / 相对引用路径等价性）；`brace-expansion` 1.1.18 → 1.1.22（GHSA-q2hr-2g5m-vwhr，`{a},b}` 重写二次时间膨胀）。三者都落在既有 semver 范围（`^3.0.1`、`^1.1.7`）内的补丁升级，`package-lock.json` 仅 3 条版本与完整性哈希变化、未新增包。`npm audit` 由 3 high / 1 moderate / 6 low 降为 0 high / 0 moderate / 6 low；剩余 low 均在 `jest-config → deepmerge` 链，只能把 jest 降到 25 才能「修复」，不属本次告警，未处理。验证：`npm run typecheck` 317 文件、`npm run test:unit` 279/279 套件（3670 通过、1 跳过）、`npm run test:smoke` 5/5，均 exit 0。GitHub 默认分支（main）的 alert 需本次改动合并后才关闭。 (internal)
+
 - v1.15.3 2026-09-07 16:20:00 leokuang: docs(readme): 三个 README 徽章行新增官网徽章（website spec-first.cn）；GitHub 仓库 description 优化为一句话价值主张（可治理、可验证、可沉淀的工程闭环），topics 由 7 个扩至 19 个（补 claude-code/cursor/kiro/qoder/opencode/zcode/llm/ai-agent/ai-programming/developer-tools/cli/spec-driven-development）。仅文档与仓库元数据变更。
 
 - v1.15.3 2026-09-07 16:00:00 leokuang: docs(readme): 三个 README 变体中的仓库链接统一由旧地址 `github.com/sunrain520/spec-first` 改为现址 `github.com/leo-kuang-ai/spec-first`（CI/node/license 徽章、Issues、用户手册与文档深链，共 21 处）；CI 徽章引用的 `npm-install-matrix.yml` 在现仓库存在，链接继续有效。同时设置 GitHub 仓库 homepage 为 spec-first.cn 并更新 description。仅文档与仓库元数据变更。
