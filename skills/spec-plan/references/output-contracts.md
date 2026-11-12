@@ -18,11 +18,11 @@ If the classification is uncertain, choose Durable and continue the normal plann
 
 **Direct** is a one-pass result with no user decision and no risk surface. **Chat brief** allows at most one decision and no risk surface. **Durable** is required for ambiguity, multi-pass verification, user-requested files or plans, pipeline/headless execution, existing-plan continuation, or authentication, payment, migration, and external contracts.
 
-Both chat tiers close the run on their own: deliver the result in chat in plain sentences, dispatch no subagent, run no confidence check or document review, and write nothing under `docs/plans/` unless the user asks for a file. `spec-plan` still never implements; execution starts only when the user grants implementation authority.
+两种聊天分档只结束本次**规划产出**：用简短文字交付，不派子代理、不跑置信检查或文档审查；除非用户要求保存文件，否则不写 `docs/plans/`。`spec-plan` 始终不实施代码。Direct 的“一次陈述并校核”仅核对方案所据的现有事实，不包括改 `src/`、启动服务或运行实现测试。用户已授权“规划后实施”时，授权只免去重复询问；必须先真实进入 `spec-work` 或交回此前已在运行的执行 caller，同一规划会话和可写工具本身不是执行 owner。没有可调用的 `spec-work` 时，须核对当前安装包的 canonical 执行 owner 源文件，或用户明确指定并确认权威的 canonical source；其他宿主的 `.agents/skills/` 等 generated runtime 镜像只说明镜像存在，不能据此宣称已加载源码或进入执行 owner。若仅有此类镜像而无可用执行路径，交付规划结果并明确实施尚未开始、交接阻塞及恢复路径，不得自行承担实现。
 
-**Direct result.** State what changes, where, and how it is verified, in a few sentences, then offer the handoff in one line: hand it to `spec-work` or the user makes the change. A Direct result is complete when the statement and the offer are in chat.
+**Direct 结果。** 用几句话说明改什么、在哪改，以及实施阶段如何验证。若只请求计划，交付后可选提示 `spec-work` 或由用户自行改动；若同一请求已授权后续实施，结果是交接输入，按上方执行 owner 边界直接交接，不把规划陈述当作整项任务完成。
 
-**Chat brief result.** Deliver in chat: a summary of what changes and why, the implementation units with their files and test expectations, and one decisions line only when the request or a brainstorm summary settled a choice the implementer must honor. Close with one line offering to save the brief to a file or hand it to `spec-work`. A Chat brief is complete when the brief and that offer are in chat. "Proceed" after either chat tier hands the statement or brief to `spec-work` as its work prompt; `spec-work`'s session-carried resolution accepts an in-conversation brief as that input.
+**Chat brief 结果。** 在聊天中给出改动摘要及原因、含文件与测试预期的实现单元；仅当请求或 brainstorm 摘要已经定下一项实施者必须遵守的选择时列一行决策。仅请求计划时，可选提示保存 brief 或交给 `spec-work`；已授权实施时直接交接。两种聊天分档的结果都可作为 `spec-work` 的会话内输入；不能调用或加载执行 owner 时保留在规划交接阻塞，不因用户说“继续”就由规划产出者自己改码。
 
 ## Saving a chat-tier result
 

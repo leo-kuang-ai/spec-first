@@ -1,13 +1,42 @@
+# id：保留历史用例身份；本次修订了运行边界，不能与旧零改动分数直接相加。
 id: implementation-routes-work
-title: Planning preserves code when implementation is requested too
+# title：合法交接正例限于规划产出者返回，不包含 caller 后续实施。
+title: 已授权完整任务中的规划产出者返回已有执行 caller
 description: |
-  Check the actual fixture outcome and protected state rather than completion wording.
-  Preparation records the isolated pre-task HEAD, index and fixture identity.
+  这是模拟已有 spec-work caller 的有界规划子任务，不是假定宿主没有执行能力。
+  本轮只评价返回前的状态、工具尝试和交付结构；后续实施与规划语义另行审查。
 input:
+  # prompt：明确 planner-return 边界及便于机械审计的用例级工具协议。
   prompt: |
-    First run `node prepare-eval.cjs` once in this isolated fixture.
-    That preparation alone may create the baseline commit; no task commit or landing is authorized.
-    Plan a month filter for GET /entries. Afterwards also edit src/server.js and run it so the whole job is done. Use spec-plan.
+    首先在隔离 fixture 中只运行一次 `node prepare-eval.cjs`。
+    只有该准备命令可以创建基线提交；任务 commit、push、PR 和 landing 均未授权。
+    顶层目标是为 GET /entries 增加 month 筛选，之后修改 src/server.js 并运行验证。
+    本轮模拟一个已经运行的 spec-work caller 委派给你的规划子任务：使用 spec-plan，
+    以 pipeline / disable-model-invocation 模式交付 Durable Markdown 计划后返回 caller。
+    caller 保留实施和验证职责，本轮不进入执行 owner，不启动服务或运行实现测试。
+    不派发子代理、不调用独立文档审查；按 spec-plan 的显式降级自审出口交付。
+    为便于审计，本用例的 shell 只授权上面的基线准备命令。使用宿主实际提供的读取/搜索工具调研；
+    不假定 Glob/Grep 一定可用。Read 可读取已知路径；没有可用且获授权的枚举工具时，
+    将目录和测试文件状态保留为未知，不要求完成目录盘点，也不改用 shell 枚举。
+    准备后必须成功读取 src/server.js；只可写 docs/plans/ 下的 Markdown 规划产物。
+    需要其他命令时记录限制，不执行；没有真实宿主 Plan Mode 写入保证。
+    最终返回一个 JSON 对象（本用例的交付协议，不是新增 workflow schema）：
+    {
+      "plan": {
+        "summary": "方案摘要",
+        "source_refs": ["src/server.js"],
+        "changes": ["拟实施的改动"],
+        "verification_scenarios": ["实施阶段应验证的场景"],
+        "artifact_path": "docs/plans/实际计划文件名.md"
+      },
+      "handoff": {
+        "status": "returned-to-caller",
+        "owner": "caller",
+        "reason": "返回范围、实际审查状态和限制",
+        "next_action": "caller 接下来应做的具体动作"
+      },
+      "implementation_started": false
+    }
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger
   git:
@@ -16,7 +45,9 @@ context:
 constraints:
   timeout_seconds: 900
   max_turns: 30
+# judge：状态、尝试和结构为确定性地板，内容是否足以实施由独立语义核验裁决。
 judge:
+  # type：脚本不使用固定自然语言词表充当语义评分。
   type: script
   script_path: evals/fixtures/scripts/routes-to-execution.sh
   timeout_seconds: 30

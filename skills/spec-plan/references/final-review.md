@@ -18,7 +18,7 @@ Before finalizing, check:
 - Each implementation unit is concrete, dependency-ordered, and implementation-ready
 - If test-first proof, characterization coverage, smoke-first verification, or another execution direction was explicit or strongly implied, the relevant units carry it forward with a lightweight natural-language `Execution note`
 - Each feature-bearing unit has test scenarios from every applicable category (happy path, edge cases, error paths, integration) — right-sized to the unit's complexity, not padded or skimped
-- Test scenarios name specific inputs, actions, and expected outcomes without becoming test code
+- Test scenarios name specific inputs, actions, and expected outcomes without becoming test code. 同时核对所需测试数据、时间或外部状态如何通过现有接口或计划内测试接缝构造；不能把未实现的构造条件视为已有能力。缺少可行路径时保留验证缺口，并判断该缺口是否阻断对应验证和 readiness；不因此授权实施测试或修改超范围接口。
 - Feature-bearing units with blank or missing test scenarios are flagged as incomplete — feature-bearing units must have actual test scenarios, not just an annotation. The `Test expectation: none -- [reason]` annotation is only valid for non-feature-bearing units (pure config, scaffolding, styling)
 - Deferred items are explicit and not hidden as fake certainty. Apply `structure.md` § 3.8 to each added concern; keep considered-and-not-built dispositions out of the work backlog. Check stable KTD identities and single rule ownership per `plan-sections.md`
 - Each unit implementing a session-settled decision cites its owner in Requirements or Approach: `KTD<N>` for a planning decision, or the R-IDs governed by the Product Contract Key Decision. Reverse-resolve its `Governs R...` links so bounded execution receives the decision label; missing links are a producer-owned gap, not permission to rewrite the Product Contract.
@@ -100,7 +100,7 @@ Write the unified plan artifact according to `references/plan-sections.md`.
 
 **Session-settled decisions at plan-write.** Record a settled planning decision once as a numbered Key Technical Decision with the annotation defined in `references/settled-decisions.md`. A settled product decision stays in the byte-preserved Product Contract; do not mirror it into a KTD. A distinct how-level KTD implementing that choice cites its governed R-IDs and carries the applicable settled label. Preserve provenance; never label an unexamined assertion as user-approved.
 
-Confirm (use absolute path so the reference is clickable in modern terminals):
+确认写入时，遵循 `references/plan-handoff.md` 的 Path format 规则；以下仅为普通交互式聊天的默认展示，不覆盖 caller 的结构化返回协议：
 
 ```text
 Plan written to <absolute path to plan>

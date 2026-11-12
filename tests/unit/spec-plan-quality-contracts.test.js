@@ -37,8 +37,25 @@ describe('spec-plan quality integration contracts', () => {
     expect(skill).toContain('## Planning-Only Safety Contract');
     expect(skill).toContain('plan-only request');
     expect(skill).toContain('real Plan Mode');
-    expect(skill).toContain('explicitly requests planning followed by implementation');
+    expect(skill).toContain('用户已授权规划后实施');
     expect(skill).not.toContain('Handoff stays blocking');
+    expect(skill).toContain('当前 `spec-plan` 产出者不会因为用户授权实施');
+    expect(skill).toContain('无可用执行路径时即使是单文件低风险任务也只能交付规划');
+    expect(handoff).toContain('只有成功进入执行 owner 后');
+    expect(handoff).toContain('不得以“用户已授权实施”为由自行转入编码');
+    expect(handoff).toContain('用户明确选择且宿主具有可用创建接口的原生 goal 按下文 goal 分支启动');
+    expect(handoff).toContain('且用户未明确选择具有已知可用接口的原生 goal，才报告具体交接阻塞');
+    expect(handoff).toContain('另一宿主的 generated runtime 镜像不能替代该来源');
+    const chatOutput = read('references/output-contracts.md');
+    expect(chatOutput).toContain('同一规划会话和可写工具本身不是执行 owner');
+    expect(chatOutput).toContain('Direct 的“一次陈述并校核”仅核对方案所据的现有事实');
+    expect(chatOutput).toContain('已授权实施时直接交接');
+    expect(chatOutput).toContain('generated runtime 镜像只说明镜像存在');
+    expect(skill).toContain('另一宿主的 generated runtime 镜像不属于该来源');
+    expect(skill).toContain('Direct/Chat brief 按 `references/output-contracts.md` 直接交接');
+    expect(skill).toContain('Direct/Chat brief 不生成这两个元数据字段');
+    expect(handoff).toContain('本节 Phase 5.4 适用于 Durable 计划');
+    expect(skill).not.toContain('This workflow produces a durable implementation plan.');
     expect(skill).toMatch(/do not claim a hard write guarantee from prose alone/i);
   });
 
@@ -76,6 +93,10 @@ describe('spec-plan quality integration contracts', () => {
     expect(handoff).toContain('Creation capability does not prove inspection or completion capability');
     expect(handoff).toContain('exact documented command');
     expect(handoff).toContain('do not infer support from the host name');
+    expect(handoff).toContain('若只有 documented user command');
+    expect(handoff).toContain('明确实施尚未启动');
+    expect(handoff).toContain('不误判为完全无交接路径，也不宣称已进入执行 owner');
+    expect(handoff).toContain('若既不能调用或按上方来源要求加载执行 owner');
   });
 
   test('新增 assurance 指令遵循项目中文治理且保留 contract literals', () => {

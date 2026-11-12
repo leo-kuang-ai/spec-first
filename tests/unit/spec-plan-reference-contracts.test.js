@@ -11,9 +11,7 @@ test('phase owners remain reachable from the entrypoint with explicit triggers',
   for (const file of phaseFiles) {
     expect(entry).toContain(`references/${file}`);
     expect(read(`references/${file}`)).toContain('**Trigger:**');
-    // 语言由当前项目与用户要求决定；phase owner 的契约是可达性和触发条件。
   }
-  expect(entry).not.toMatch(/\p{Script=Han}/u);
   expect(entry).toContain('before source discovery or bootstrap');
   expect(entry).toContain('before research or dispatch');
   expect(entry).toContain('before the pre-write review or plan write');
@@ -36,6 +34,24 @@ test('research uses current source and does not require worker prompts for inlin
   expect(research).not.toContain('cached project profile');
   expect(research).toContain('do not preload their full worker prompts');
   expect(research).toContain('Missing authorization forbids discovery');
+});
+
+test('调研清单不扩大工具授权，缺能力时保留证据缺口', () => {
+  const boundaries = read('references/planning-evidence-boundaries.md');
+  expect(boundaries).toContain('调研要求不是工具授权');
+  expect(boundaries).toContain('只读用途不豁免显式命令限制');
+  expect(boundaries).toContain('当前已授权且实际可用的等价工具');
+  expect(boundaries).toContain('不得把读取失败等同于目录或文件不存在');
+  expect(boundaries).toContain('立即停止该类动作');
+  expect(boundaries).toContain('不需要再发起工具调用');
+  expect(read('references/research.md')).toContain('orientation requirements do not authorize additional commands');
+});
+
+test('终审检查验证所需状态可构造，而非只枚举预期结果', () => {
+  const review = read('references/final-review.md');
+  expect(review).toContain('所需测试数据、时间或外部状态如何通过现有接口或计划内测试接缝构造');
+  expect(review).toContain('不能把未实现的构造条件视为已有能力');
+  expect(review).toContain('判断该缺口是否阻断对应验证和 readiness');
 });
 
 test('pipeline invalidation stops the write without inventing a replacement decision', () => {
@@ -64,6 +80,15 @@ test('goal composition belongs to the handoff and carries linked product decisio
   expect(handoff).toContain('**Deletion test:**');
   expect(handoff).toContain('`spec-work` does **not** also run');
   expect(read('references/output-mode.md')).toContain('Commented template examples are not settings');
+});
+
+test('交付路径以 caller 协议为先，默认展示规则由 handoff 单点拥有', () => {
+  const handoff = read('references/plan-handoff.md');
+  expect(handoff).toContain('当前用户或 caller 明确指定的交付协议优先于默认展示格式');
+  expect(handoff).toContain('计划正文中的引用仍使用仓库相对路径');
+  expect(entry).toContain('`plan-handoff.md` 的 Path format');
+  expect(entry).not.toContain('Report the absolute plan path');
+  expect(read('references/final-review.md')).toContain('不覆盖 caller 的结构化返回协议');
 });
 
 test('final review reconciles cross-set pairs that content checks cannot catch', () => {

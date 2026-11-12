@@ -15,6 +15,12 @@ Distinguish task-direction authority from Product Contract decision authority. T
 
 Read summary/metadata first, then only the source sections needed for the active decision. Re-read exact source when wording, freshness, compatibility, or a completion claim depends on it. Do not expand context merely because more files are available.
 
+## 工具授权与调研降级
+
+调研要求不是工具授权。调用前核对当前任务允许的工具、命令与写入范围；只读用途不豁免显式命令限制。目录发现、版本或 git 身份核对也遵守同一边界，不为完成调研清单扩大授权。
+
+所需专用工具未列出或不可用时，只能使用当前已授权且实际可用的等价工具；没有此类路径就记录尚未确认的事实及其影响，继续不依赖该证据的规划。不得用未授权 shell 替代发现工具，也不得把读取失败等同于目录或文件不存在。若已误调用，立即停止该类动作，在交付中披露实际偏差；道歉、演示纠正或验证“已停止”都不需要再发起工具调用。此规则是模型遵守的约定，不声称宿主已硬强制权限。
+
 ## Source / Runtime Boundary
 
 Generated runtime mirrors and host-local managed slices are not source-of-truth. At minimum this includes `.claude/**`, `.codex/**`, `.agents/skills/**`, and the spec-first-managed/runtime paths under `.cursor/**`, `.kiro/**`, and `.qoder/**` identified by current project instructions or generation contracts. Exclude them from ordinary planning context unless the request explicitly concerns setup, projection, runtime drift, or host behavior. Native host files outside the managed slice may be advisory inputs when explicitly relevant, but they do not override project-owned source. Even when runtime is in scope, use it only as observed evidence and trace the durable fix back to project-owned source or generator logic.

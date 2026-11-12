@@ -102,9 +102,7 @@ Keep this bootstrap brief. It exists to preserve direct-entry convenience, not t
 
 For every load-bearing WHAT used by direct bootstrap, preserve its authority explicitly. A behavior, scope boundary, success criterion, compatibility choice, priority, or risk decision not directly stated by the current user or confirmed by current source must be recorded as a **planning-time assumption**, never presented as producer-confirmed fact. If that unconfirmed WHAT would materially change behavior, scope, or success criteria, return it to the current user as a product decision or keep it as a named blocker; bounded bootstrap is not permission to decide it silently.
 
-If the bootstrap uncovers major unresolved product questions:
-- Recommend `spec-brainstorm` again
-- If the user still wants to continue, require explicit assumptions before proceeding
+bootstrap 发现重大的未决产品问题时，建议 `spec-brainstorm`，并按下方 Phase 0.5 的 Product-decision authority guard 处理。用户希望继续不等于该检查已通过；是否可以将问题转为假设或决策，仅由 Phase 0.5 的授权与具体决策条件判定，不在 bootstrap 建立另一条继续路径。
 
 If the bootstrap reveals that a different workflow would serve the user better:
 
