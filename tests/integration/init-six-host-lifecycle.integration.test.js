@@ -434,7 +434,9 @@ describe('six-host init lifecycle', () => {
       ), '\nmanaged drift\n');
       const repaired = runSpecFirst(initArgs, sandbox);
       expect(repaired.status).toBe(0);
-      expect(`${repaired.stdout}\n${repaired.stderr}`).toContain('current spec-first runtime drift');
+      // drift 诊断已收敛为按 code 去重的本地化已知消息。
+      expect(`${repaired.stdout}\n${repaired.stderr}`).toContain('current_runtime_drift');
+      expect(`${repaired.stdout}\n${repaired.stderr}`).toContain('managed hard reset');
       for (const customPath of customPaths) {
         expect(fs.readFileSync(customPath)).toEqual(customContents.get(customPath));
       }

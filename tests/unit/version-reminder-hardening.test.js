@@ -158,25 +158,46 @@ describe('P2 install-channel aware guidance', () => {
   test('self path under .claude/plugins switches to claude plugin update', () => {
     const channels = detectInstallChannels({
       selfPath: '/home/u/.claude/plugins/spec-first/bin/spec-first.js',
+      realpathSync: (value) => value,
     });
-    expect(channels).toEqual({ npm: false, claudePlugin: true });
+    expect(channels).toMatchObject({ npm: false, claudePlugin: true });
     const guidance = formatUpgradeGuidance(channels);
     expect(guidance).toContain('claude plugin update');
-    expect(guidance).toContain('separate npm copy');
+    expect(guidance).toContain('npm latest 不证明插件渠道已发布');
+    expect(guidance).not.toContain('spec-first update');
   });
 
-  test('regular npm install path keeps spec-first update guidance', () => {
+  test('外观像 npm 全局路径但缺乏证据时不得建议全局升级', () => {
     const channels = detectInstallChannels({
       selfPath: '/usr/local/lib/node_modules/spec-first/bin/spec-first.js',
+      realpathSync: (value) => value,
+      runNpm: () => ({ status: 1 }),
     });
-    expect(channels).toEqual({ npm: true, claudePlugin: false });
-    expect(formatUpgradeGuidance(channels)).toContain('spec-first update');
+    expect(channels).toMatchObject({ npm: false, claudePlugin: false, origin: 'unknown' });
+    expect(formatUpgradeGuidance(channels)).not.toContain('spec-first update');
+    expect(formatUpgradeGuidance({ npm: true })).toContain('spec-first update');
+  });
+
+  test('local 来源指引给出同副本 init 示例，不引导裸 init', () => {
+    const guidance = formatUpgradeGuidance({ origin: 'local', reason_code: 'fixture', npm: false, claudePlugin: false });
+    expect(guidance).toContain('同一副本');
+    expect(guidance).toContain('node <本地副本>/bin/spec-first.js init');
+    expect(guidance).not.toContain('独立运行 spec-first init');
+  });
+
+  test('unknown 来源指引绑定同一副本，不给暗示 PATH 已绑定的复制命令', () => {
+    const guidance = formatUpgradeGuidance({ origin: 'unknown', reason_code: 'fixture', npm: false, claudePlugin: false });
+    expect(guidance).toContain('同一副本');
+    expect(guidance).toContain('同一副本入口执行 init');
+    expect(guidance).not.toContain('独立运行 spec-first init');
+    expect(guidance).not.toContain('node <本地副本>/bin/spec-first.js init');
   });
 
   test('reminder output carries the channel guidance end to end', async () => {
     const result = await runReminder({
       homeRoot: makeStateHome(),
       selfPath: '/home/u/.claude/plugins/spec-first/bin/spec-first.js',
+      realpathSync: (value) => value,
       lookupLatestVersion: async () => '2.0.0',
     });
     expect(result.shown).toBe(true);

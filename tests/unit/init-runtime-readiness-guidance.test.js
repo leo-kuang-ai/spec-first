@@ -32,11 +32,57 @@ describe('init runtime readiness guidance', () => {
     expect(lines.length).toBeLessThanOrEqual(9);
   });
 
-  test('gives each host its own primary action without duplicates', () => {
+  test('consolidates multi-host single-root guidance to one target line and one primary action', () => {
     const output = captureOutput(() => printInitNextStepsForPlatforms(['claude', 'codex', 'codex'], 'en')).join('\n');
-    expect(output.match(/Next:/g)).toHaveLength(2);
+    expect(output.match(/Target:/g)).toHaveLength(1);
+    expect(output.match(/Next:/g)).toHaveLength(1);
     expect(output).toContain('Claude Code');
     expect(output).toContain('Codex');
+    expect(output).toContain('spec-first doctor --claude --codex');
+    expect(output).toMatch(/not verified/);
+  });
+
+  test('multi-host zh output groups preview and trust differences once', () => {
+    const lines = captureOutput(() => printInitNextStepsForPlatforms(getSupportedPlatforms(), 'zh', { explainTask: false }));
+    const output = lines.join('\n');
+    expect(output.match(/目标目录：/g)).toHaveLength(1);
+    expect(output.match(/主行动：/g)).toHaveLength(1);
+    expect(output.match(/spec-first doctor/g)).toHaveLength(1);
+    expect(output).toContain('宿主差异：');
+    expect(output).toContain('打开 Pi 并完成项目信任；未信任时不会加载项目 skill');
+    expect(output).toContain('Cursor / OpenCode / ZCode');
+    expect(lines.length).toBeLessThanOrEqual(10);
+  });
+
+  test('multi-host guidance omits the difference section for uniform hosts', () => {
+    const output = captureOutput(() => printInitNextStepsForPlatforms(['claude', 'codex'], 'zh')).join('\n');
+    expect(output).not.toContain('宿主差异：');
+    expect(output).not.toContain('preview');
+  });
+
+  test('result summary suppresses preserve-profile line but keeps applied profiles', () => {
+    const plans = [{ platform: 'codex', projectRoot: '/tmp/preserve-check' }];
+    const results = [{ exit_code: 0 }];
+    const preserved = captureOutput(() => printInitApplySummaries(plans, results, {
+      lang: 'en',
+      globalDeveloperWriteResult: {
+        action: 'preserve',
+        status: 'unchanged',
+        resolvedPath: '/home/tester/.spec-first/.developer',
+        developer: { name: 'Ada', lang: 'en' },
+      },
+    })).join('\n');
+    expect(preserved).not.toContain('Global developer profile:');
+    const overwritten = captureOutput(() => printInitApplySummaries(plans, results, {
+      lang: 'en',
+      globalDeveloperWriteResult: {
+        action: 'overwrite',
+        status: 'applied',
+        resolvedPath: '/home/tester/.spec-first/.developer',
+        developer: { name: 'Ada', lang: 'en' },
+      },
+    })).join('\n');
+    expect(overwritten.match(/Global developer profile:/g)).toHaveLength(1);
   });
 
   test('binds the primary action to a target containing unicode characters', () => {

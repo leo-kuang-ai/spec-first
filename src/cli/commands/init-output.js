@@ -574,7 +574,8 @@ function printInitApplySummaries(plans, results, options = {}) {
   }
 
   const globalWrite = options.globalDeveloperWriteResult;
-  if (globalWrite && globalWrite.developer) {
+  // preserve 未发生任何写入；沿用已在预览与确认提示中告知，结果段不再重复。
+  if (globalWrite && globalWrite.developer && (globalWrite.action || globalWrite.status) !== 'preserve') {
     console.log(messages.applyProfileCompact(
       globalWrite.action || globalWrite.status || 'preserve',
       globalWrite.resolvedPath || globalWrite.globalPath,
@@ -619,17 +620,39 @@ function printInitApplySummaries(plans, results, options = {}) {
 }
 
 function printInitTopologyHandoffs(plans, results, lang = 'zh') {
+  // 同一 projectRoot 的成功宿主合并为一个块，避免同目录逐宿主重复。
+  let pendingRoot = null;
+  let pendingPlatforms = [];
+  const flushPending = () => {
+    if (pendingPlatforms.length > 0) {
+      printInitNextStepsForPlatforms(pendingPlatforms, lang, { target: pendingRoot, explainTask: false });
+      pendingPlatforms = [];
+      pendingRoot = null;
+    }
+  };
   for (const [index, plan] of plans.entries()) {
     const result = results[index] || { exit_code: 1 };
     if (plan.mode === 'all-repos') {
+      flushPending();
       printAllReposInitHandoff(plan, result, lang);
       continue;
     }
-    printInitScopeHandoff(plan.platform, plan.projectRoot, result.exit_code === 0, lang);
     if (plan.gitRootTopology === 'multi-repo-workspace') {
+      flushPending();
+      printInitScopeHandoff(plan.platform, plan.projectRoot, result.exit_code === 0, lang);
       printParentOnlyInitHandoff(plan, lang);
+      continue;
     }
+    if (result.exit_code === 0 && plan.projectRoot) {
+      if (pendingRoot && pendingRoot !== plan.projectRoot) flushPending();
+      pendingRoot = plan.projectRoot;
+      pendingPlatforms.push(plan.platform);
+      continue;
+    }
+    flushPending();
+    printInitScopeHandoff(plan.platform, plan.projectRoot, result.exit_code === 0, lang);
   }
+  flushPending();
 }
 
 function printParentOnlyInitHandoff(plan, lang) {
@@ -910,23 +933,63 @@ function printInitNextStepsForPlatforms(platforms, lang = 'zh', { target = proce
   if (uniquePlatforms.length === 0) {
     return;
   }
-  for (const platform of uniquePlatforms) {
-    const host = hostDisplayName(platform);
-    const preview = ['cursor', 'opencode', 'zcode', 'pi'].includes(platform);
-    console.log(lang === 'en' ? `Target: ${target}` : `目标目录：${target}`);
-    console.log(lang === 'en'
-      ? `  ${host}: projection written; host loading, task capabilities and workflow results are not verified.${preview ? ' Support: preview.' : ''}`
-      : `  ${host}：projection 已写入；宿主加载、任务能力与 workflow 结果未验证。${preview ? '支持上限：preview。' : ''}`);
-    const activation = platform === 'pi'
-      ? (lang === 'en' ? 'open Pi and complete project trust; without trust, project skills are not loaded'
-        : '打开 Pi 并完成项目信任；未信任时不会加载项目 skill')
-      : (lang === 'en' ? `restart ${host} or open a new session` : `重启 ${host} 或新开会话`);
-    console.log(lang === 'en' ? `  Next: in this target, ${activation}.` : `  主行动：在此目录${activation}。`);
-    console.log(lang === 'en'
-      ? `  Recovery (terminal in this target): spec-first doctor --${platform} (read-only; no re-init needed).`
-      : `  恢复（此目录的终端）：spec-first doctor --${platform}（只读，无需重跑 init）。`);
+  if (uniquePlatforms.length === 1) {
+    printSingleHostNextSteps(uniquePlatforms[0], lang, { target });
+  } else {
+    printConsolidatedNextSteps(uniquePlatforms, lang, { target });
   }
   if (explainTask) printInitTaskGuidance(lang);
+}
+
+// 多宿主同一目标目录时，重复的 per-host 块只制造噪音；改为一次全局声明 + 差异段。
+function printConsolidatedNextSteps(platforms, lang = 'zh', { target = process.cwd() } = {}) {
+  const zh = lang !== 'en';
+  const hostNames = platforms.map((platform) => hostDisplayName(platform));
+  const doctorFlags = platforms.map((platform) => `--${platform}`).join(' ');
+  console.log(zh ? `目标目录：${target}` : `Target: ${target}`);
+  console.log(zh
+    ? `  已写入 projection 的宿主：${hostNames.join('、')}；宿主加载、任务能力与 workflow 结果未验证。`
+    : `  projection written for ${hostNames.join(', ')}; host loading, task capabilities and workflow results are not verified.`);
+  console.log(zh
+    ? '  主行动：在此目录重启宿主或新开会话后生效。'
+    : '  Next: in this target, restart the hosts or open a new session to take effect.');
+  console.log(zh
+    ? `  恢复（此目录的终端）：spec-first doctor ${doctorFlags}（只读，无需重跑 init）。`
+    : `  Recovery (terminal in this directory): spec-first doctor ${doctorFlags} (read-only; no re-init needed).`);
+  const piSelected = platforms.includes('pi');
+  // 差异行按规范顺序列出，宿主选择顺序不影响文案稳定性。
+  const previewSelected = ['cursor', 'opencode', 'zcode'].filter((platform) => platforms.includes(platform));
+  if (piSelected || previewSelected.length > 0) {
+    console.log(zh ? '  宿主差异：' : '  Host differences:');
+    if (piSelected) {
+      console.log(zh
+        ? '  · Pi（preview）：打开 Pi 并完成项目信任；未信任时不会加载项目 skill。'
+        : '  · Pi (preview): open Pi and complete project trust; without trust, project skills are not loaded.');
+    }
+    if (previewSelected.length > 0) {
+      const previewNames = previewSelected.map((platform) => hostDisplayName(platform)).join(' / ');
+      console.log(zh
+        ? `  · ${previewNames}（preview）：本机 skill/command 加载未验证，支持上限 preview。`
+        : `  · ${previewNames} (preview): local skill/command loading not verified; support claim: preview.`);
+    }
+  }
+}
+
+function printSingleHostNextSteps(platform, lang = 'zh', { target = process.cwd() } = {}) {
+  const host = hostDisplayName(platform);
+  const preview = ['cursor', 'opencode', 'zcode', 'pi'].includes(platform);
+  console.log(lang === 'en' ? `Target: ${target}` : `目标目录：${target}`);
+  console.log(lang === 'en'
+    ? `  ${host}: projection written; host loading, task capabilities and workflow results are not verified.${preview ? ' Support: preview.' : ''}`
+    : `  ${host}：projection 已写入；宿主加载、任务能力与 workflow 结果未验证。${preview ? '支持上限：preview。' : ''}`);
+  const activation = platform === 'pi'
+    ? (lang === 'en' ? 'open Pi and complete project trust; without trust, project skills are not loaded'
+      : '打开 Pi 并完成项目信任；未信任时不会加载项目 skill')
+    : (lang === 'en' ? `restart ${host} or open a new session` : `重启 ${host} 或新开会话`);
+  console.log(lang === 'en' ? `  Next: in this target, ${activation}.` : `  主行动：在此目录${activation}。`);
+  console.log(lang === 'en'
+    ? `  Recovery (terminal in this target): spec-first doctor --${platform} (read-only; no re-init needed).`
+    : `  恢复（此目录的终端）：spec-first doctor --${platform}（只读，无需重跑 init）。`);
 }
 
 function printInitTaskGuidance(lang) {

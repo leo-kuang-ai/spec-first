@@ -130,6 +130,7 @@ describe('brand presentation contract', () => {
     try {
       const update = require('../../src/cli/commands/update');
       const exitCode = await update.runUpdate([], {
+        detectInstallOrigin: () => ({ origin: 'npm-global', reason_code: 'fixture' }),
         runInstall: () => ({ status: 0, errorCode: null }),
         runRuntimeRefresh: () => ({ status: 0, errorCode: null }),
         resolveRuntimeRefreshCommand: () => ({ args: ['init', '-y'], cwd: process.cwd(), reason_code: 'test' }),

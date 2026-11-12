@@ -135,9 +135,11 @@ describe('CLI smoke checks', () => {
     expect(result.stderr).toBe('');
     expect(result.stdout).toContain('Init complete: 2/2 host projections written');
     expect(result.stdout.match(/Global developer profile:/g) || []).toHaveLength(1);
-    expect(result.stdout.match(/Claude Code:/g) || []).toHaveLength(2);
-    expect(result.stdout.match(/Codex:/g) || []).toHaveLength(2);
-    expect(result.stdout.match(/Next:/g) || []).toHaveLength(2);
+    // 多宿主合并指引：宿主名只在 run summary 明细行出现一次，主行动与恢复各一行。
+    expect(result.stdout.match(/Claude Code:/g) || []).toHaveLength(1);
+    expect(result.stdout.match(/Codex:/g) || []).toHaveLength(1);
+    expect(result.stdout.match(/Next:/g) || []).toHaveLength(1);
+    expect(result.stdout).toContain('spec-first doctor --claude --codex');
     expect(result.stdout).not.toContain('0 agents');
     expect(result.stdout).not.toContain('No managed runtime paths require untracking');
     expect(fs.readFileSync(path.join(sandbox.home, '.spec-first', '.developer'), 'utf8'))

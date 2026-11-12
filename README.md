@@ -254,6 +254,8 @@ spec-first plans audit --status completed --json
 
 运行 `spec-first --help` 查看全部选项。
 
+`update` 仅升级已确认的当前 npm-global CLI，再刷新当前目标已安装的宿主。插件、本地、`npx`、开发链接及未知来源只给指引，不再新增全局副本；更新原副本后，用更新后的同一副本入口运行 `init` 并预览（PATH 上的 `spec-first` 可能是另一个未更新副本）。插件资产由宿主插件渠道管理，`update` 不会为其新增项目投射。npm `latest` 提醒不证明插件渠道已发布，投射成功不证明宿主已加载。`clean` 仅清理所选项目投射，不卸载包或插件。
+
 ## 开发与贡献
 
 ```bash

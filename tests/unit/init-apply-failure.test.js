@@ -525,7 +525,11 @@ describe('init run-level global developer prerequisite', () => {
     expect(lines.length).toBeLessThanOrEqual(40);
     expect(output).toContain('Init complete: 6/6 host projections written');
     for (const label of ['Claude Code', 'Codex', 'Cursor', 'Kiro', 'Qoder', 'OpenCode']) {
-      expect(output.match(new RegExp(`${label}:`, 'g')) || []).toHaveLength(2);
+      // 多宿主合并指引后，宿主名只在 run summary 明细行出现一次；doctor 行按 flag 枚举。
+      expect(output.match(new RegExp(`${label}:`, 'g')) || []).toHaveLength(1);
+    }
+    for (const platform of ['claude', 'codex', 'cursor', 'kiro', 'qoder', 'opencode']) {
+      expect(output).toContain(`--${platform}`);
     }
     expect(output.match(/Global developer profile:/g) || []).toHaveLength(1);
     expect(output.match(/User-level language sync:/g) || []).toHaveLength(1);

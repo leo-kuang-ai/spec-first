@@ -7,7 +7,7 @@ artifact_contract: spec-unified-plan/v1
 artifact_readiness: implementation-ready
 product_contract_source: spec-brainstorm
 execution: code
-status: active
+status: completed
 ---
 
 # Spec-First 安装生命周期 - Plan
@@ -216,13 +216,20 @@ sequenceDiagram
   participant H as 合格 CLI 调用或宿主启动
   participant V as 版本提醒
   participant R as npm registry latest
-  participant O as 来源判定
-  H->>V: 当前 CLI 或项目投射版本
+  participant O as 当前 CLI 来源判定
+  participant T as 目标 runtime 渠道证据
+  H->>V: 当前 CLI 或项目投射版本及触发类型
   V->>R: 在冷却规则内查询
   R-->>V: latest 或查询失败
-  V->>O: 查询当前执行副本的来源证据
-  O-->>V: 已确认来源或 unknown
-  V-->>H: 版本事实与来源适用指引/无提醒
+  alt 交互式 CLI 提醒
+    V->>O: 查询当前执行 CLI 的来源证据
+    O-->>V: 已确认来源或 unknown
+    V-->>H: CLI 版本事实与来源适用指引
+  else 宿主启动提醒
+    V->>T: 查询目标 runtime 的宿主/插件渠道证据
+    T-->>V: 已确认渠道或 unknown
+    V-->>H: runtime 版本事实与宿主渠道指引；未知时不建议全局 npm 升级
+  end
 ```
 
 **受管资产生命周期：** 包取得、目标仓库投射和宿主加载分别持有证据；`init`/`doctor`/`clean` 只在已确认目标及归属内操作，原生包与插件卸载不由项目清理执行。部分成功时保留可诊断状态并给出下一动作，不将后续宿主启动当作本次 CLI 的已验证结果。
@@ -351,3 +358,30 @@ sequenceDiagram
 - 安装/刷新/诊断/清理均在明确的项目及宿主归属范围内；包、投射、宿主激活结果分开报告，部分失败可定位与恢复。
 - Verification Contract 的 required proof intents 经最终修订对照，测试失败、未运行或真机缺口明确记录且不冒充通过；达到发布/完成声明所需的必需证据后方可宣称完成。
 - 更新 `CHANGELOG.md` 和所有受影响的用户文档；无关工作树改动及 generated runtime 不纳入 source 修复，本次试验遗留代码、临时文件与无效引用已清理。
+
+---
+
+## 交付收口记录（2026-11-06）
+
+**结论：** U1–U5 已实现，Verification Contract 全部 required proof intents 已于 2026-11-06 在分支 `leo-2026-10-27-update` 工作树实测通过，计划标记 `completed`。截至本记录写入，实现**未提交**；提交/PR 落地与真实宿主会话验证按下文「残留事项」登记，不冒充通过。
+
+### Proof Intents 结果（2026-11-06 实测）
+
+| 证明意图 | 要求 | 结果 |
+| --- | --- | --- |
+| 来源识别与副作用边界（U1–U2） | required | ✅ `tests/unit/install-origin.test.js`、`tests/unit/update-command-spawn.test.js` 全绿（同日与 U3/U4 套件合并运行）。 |
+| 提醒、冷却、宿主入口（U3） | required | ✅ `tests/unit/version-reminder.test.js`、`tests/unit/version-reminder-hardening.test.js`、`tests/unit/qoder-runtime-lifecycle.test.js` 全绿。混装场景的真实宿主会话核对为 deferred（见残留事项）。 |
+| 投射、归属、恢复及多仓（U2, U4） | required | ✅ `tests/unit/init-preview.test.js`、`tests/unit/init-runtime-readiness-guidance.test.js`、`tests/unit/init-apply-failure.test.js`、`tests/unit/cli-clean-workspace-graph.test.js`、`tests/integration/workspace-graph-lifecycle.integration.test.js` 全绿。 |
+| CLI 与发布包契约（U1–U5） | required | ✅ `npm run typecheck`（316 文件）、`npm run build`（pack dry-run，854 文件）、`npm run test:smoke`（5/5）全绿。 |
+| 受触及文件的间接契约 | required | ✅ `tests/unit/brand-presentation.test.js`、`tests/unit/host-flag-registry-derivation.test.js`、`tests/unit/plugin-modules.test.js`、`tests/unit/init-workspace-contract.test.js` 全绿（52/52）。 |
+| 真实 npm-global 正向路径与副本冲突（U1–U2） | required（mock 不可替代） | ✅ 由 `tests/integration/install-lifecycle.integration.test.js` 以隔离临时 npm prefix 执行：真实安装正向升级触发、独立本地副本不触发、`npm link`/checkout 链接拒绝误判；不改用户全局 npm 状态。 |
+| 真实宿主与平台 | required（对声称已验证的组合） | 部分：macOS 真实安装→`init --claude`（投射逐字节核对）→`doctor`→smoke 链路由用户于 2026-11-05 在另一会话完成。真实 `update` 执行流、宿主启动提醒真机会话与 Linux/Windows 组合为 deferred（见残留事项）。 |
+| 无线上写入的计划阶段 | not applicable | 已进入实施交付，本行关闭。 |
+
+当日实测合计：17 个 Jest 套件 223 用例 + smoke 5 用例全绿，typecheck/build 通过。
+
+### 残留事项（不阻塞 completed 状态，但不得宣称）
+
+1. **未提交：** 全部实现（含新增 `src/cli/install-origin.js`、`tests/unit/install-origin.test.js`、`tests/integration/install-lifecycle.integration.test.js`）截至 2026-11-06 仍在工作树；提交时需与其他任务的工作树改动按单元分离，完成声明的最终效力以提交后的修订为准。
+2. **真机 deferred（owner：实施者/宿主维护者；unblock：真实 npm-global 环境与可激活宿主会话）：** 真实 `update` 执行流（AE7）、宿主启动提醒真机会话（AE9/AE10）、插件渠道核实、Linux/Windows 平台组合。不得在任何发布说明或文档中表述为已验证；现有标注保持降级口径。
+3. **范围外改动：** 工作树中与本计划无关的改动（spec-plan eval、review docs 等）不属于本计划交付物，不由本记录背书。

@@ -15,6 +15,7 @@ const {
 const { runNpm } = require('../../../scripts/lib/npm-cli.cjs');
 const { resolveUserLanguage } = require('../cli-lang');
 const { detectColorSupport, renderFullArt } = require('../brand');
+const { detectInstallOrigin, resolveInstalledCliPath, resolvePackageCliFromGlobalRoot } = require('../install-origin');
 
 const PACKAGE_NAME = pkg.name;
 const UPGRADE_COMMAND = `npm install -g ${PACKAGE_NAME}@latest`;
@@ -66,16 +67,12 @@ const UPDATE_MESSAGES = {
 /**
  * `spec-first update` — 实际执行 CLI 包升级。
  *
- * 设计边界(见 docs/plans/2026-06-12-003-feat-update-perform-upgrade-plan.md):
- * - 无条件直跑 `npm install -g spec-first@latest`:不查版本、不检测安装方式。
- *   npm 自身幂等,已是最新会自动 no-op。
- * - 升级成功后启动 fresh `spec-first init` 子进程刷新本地 runtime,避免旧进程
- *   直接跑新生成逻辑的版本错位。
- * - 已知风险(用户确认接受):非 npm-global 安装(Claude plugin / pnpm / volta 等)
- *   会被装出冲突副本;以一条静态 caveat 提示缓解,不做分支检测。
+ * 仅在当前入口与经校验的 npm 全局包一致时升级；其余来源只给原生指引。
+ * 升级后用新的全局入口刷新已安装宿主，不用当前旧进程运行生成逻辑。
  * - 刷新范围只覆盖本项目已安装的宿主。探测不到已装 runtime 时不刷新、不安装,
  *   打印 fallback 命令后仍以 0 退出(升级本身成功);安装是 `spec-first init` 的职责。
- * - 退出码:0=升级成功(含无可刷新目标而跳过);1=升级失败或刷新已尝试但失败;2=用法错误。
+ * - 退出码:0=升级成功;或安全跳过仅提供指引(非 npm-global 来源、探测失败或无可刷新目标,0 不代表包已升级);
+ *   1=升级失败或刷新已尝试但失败;2=用法错误。
  */
 async function runUpdate(argv, deps = {}) {
   const args = [...argv];
@@ -101,8 +98,26 @@ async function runUpdate(argv, deps = {}) {
     (deps.resolveLang || resolveUserLanguage)() === 'en' ? 'en' : 'zh'
   ];
 
+  // 来源不足时不安装第二份包，也不让旧 CLI 自动刷新项目。
+  const origin = (deps.detectInstallOrigin || detectInstallOrigin)();
+  if (origin.origin !== 'npm-global') {
+    console.log(`包升级：已跳过。安装来源：${origin.origin} (${origin.reason_code})。`);
+    if (origin.origin === 'claude-plugin') {
+      console.log('请在宿主插件管理界面确认插件身份和可用版本，再使用原生插件更新入口。插件资产随插件渠道更新；`update` 不会为其刷新项目投射，也不会新增全局 npm 副本。');
+    } else {
+      console.log('请确认当前副本的安装方式，并通过原包管理器或源码仓库更新；不会新增全局 npm 副本。');
+      console.log('项目投射：未尝试刷新。更新原副本后，请用更新后的同一副本入口在目标项目执行 `init` 并预览宿主范围；PATH 上的 `spec-first` 可能是另一个未更新的副本。');
+      if (origin.origin === 'local') {
+        console.log('本地源码副本示例：node <本地副本>/bin/spec-first.js init');
+      }
+    }
+    console.log('宿主激活：未验证。请重新加载宿主并检查实际发现结果。');
+    return 0;
+  }
+
   // 更新入口展示完整 logo：版本升级是低频、值得仪式感的时刻。
   console.log(renderFullArt(pkg.version, { useColor: detectColorSupport() }).trimEnd());
+  console.log('宿主激活：未验证；包升级与项目投射刷新不证明宿主已加载。');
   console.log(messages.upgrading(UPGRADE_COMMAND));
   console.log('');
 
@@ -225,74 +240,6 @@ function defaultRunRuntimeRefresh(args, options = {}) {
     status: result.status,
     errorCode: result.error ? result.error.code : null,
   };
-}
-
-function resolveInstalledCliPath(options = {}) {
-  const runNpmCommand = options.runNpm || runNpm;
-  let result;
-  try {
-    result = runNpmCommand(['root', '-g'], { encoding: 'utf8' });
-  } catch (_error) {
-    return { ok: false, cliPath: null, reason_code: 'global-npm-root-unavailable' };
-  }
-  if (!result || result.error || result.status !== 0) {
-    return { ok: false, cliPath: null, reason_code: 'global-npm-root-unavailable' };
-  }
-  const globalRoot = String(result.stdout || '').trim();
-  if (!globalRoot) {
-    return { ok: false, cliPath: null, reason_code: 'global-npm-root-empty' };
-  }
-  return resolvePackageCliFromGlobalRoot(globalRoot, options);
-}
-
-function resolvePackageCliFromGlobalRoot(globalRoot, options = {}) {
-  const existsSync = options.existsSync || fs.existsSync;
-  const readFileSync = options.readFileSync || fs.readFileSync;
-  const statSync = options.statSync || fs.statSync;
-  const packageRoot = path.resolve(globalRoot, ...PACKAGE_NAME.split('/'));
-  const manifestPath = path.join(packageRoot, 'package.json');
-  if (!existsSync(manifestPath)) {
-    return { ok: false, cliPath: null, reason_code: 'global-package-manifest-missing' };
-  }
-  let manifest;
-  try {
-    manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
-  } catch (_error) {
-    return { ok: false, cliPath: null, reason_code: 'global-package-manifest-invalid' };
-  }
-  if (!manifest || manifest.name !== PACKAGE_NAME) {
-    return { ok: false, cliPath: null, reason_code: 'global-package-identity-mismatch' };
-  }
-  const binEntry = typeof manifest.bin === 'string'
-    ? manifest.bin
-    : manifest.bin && typeof manifest.bin === 'object'
-      ? manifest.bin[PACKAGE_NAME]
-      : null;
-  if (typeof binEntry !== 'string' || !binEntry || path.isAbsolute(binEntry) || path.win32.isAbsolute(binEntry)) {
-    return { ok: false, cliPath: null, reason_code: 'global-package-bin-invalid' };
-  }
-  const cliPath = path.resolve(packageRoot, binEntry);
-  if (!isPathWithin(packageRoot, cliPath)) {
-    return { ok: false, cliPath: null, reason_code: 'global-package-bin-outside-package' };
-  }
-  try {
-    if (!statSync(cliPath).isFile()) {
-      return { ok: false, cliPath: null, reason_code: 'global-package-bin-not-file' };
-    }
-  } catch (_error) {
-    return { ok: false, cliPath: null, reason_code: 'global-package-bin-missing' };
-  }
-  return {
-    ok: true,
-    cliPath,
-    globalRoot: path.resolve(globalRoot),
-    reason_code: 'global-package-cli-resolved',
-  };
-}
-
-function isPathWithin(root, candidate) {
-  const relative = path.relative(path.resolve(root), path.resolve(candidate));
-  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
 }
 
 function resolveRuntimeRefreshCommand(cwd = process.cwd()) {
@@ -530,6 +477,10 @@ function printHelp() {
   console.log([
     '🔄 spec-first update — upgrade the spec-first CLI package',
     '',
+    '仅确认当前 CLI 来自 npm-global 时执行包升级。',
+    '插件、本地、npx、npm link 或未知来源只提供指引，不再静默新增全局副本。',
+    '这些来源的项目刷新未尝试；更新原副本后，用更新后的同一副本入口在目标项目运行 init 并预览宿主范围',
+    '（本地源码副本：node <本地副本>/bin/spec-first.js init；PATH 上的 spec-first 可能是另一个未更新副本）。',
     `Runs \`${UPGRADE_COMMAND}\` to upgrade the globally installed spec-first CLI,`,
     'then runs a fresh `spec-first init` subprocess to refresh this project\'s runtime assets.',
     'Only hosts already installed in this project are refreshed; update never installs a new host.',
@@ -543,8 +494,9 @@ function printHelp() {
     '  -h, --help      Show help',
     '',
     '🔢 Exit codes:',
-    '  0  upgrade succeeded and runtime refresh completed, or refresh was skipped with fallback',
-    '     guidance (including when this project has no installed runtime to refresh)',
+    '  0  upgrade succeeded and runtime refresh completed, or the run safely skipped the upgrade and',
+    '     only printed guidance (non-npm-global origin, origin probe failure, or nothing to refresh) —',
+    '     exit 0 does not imply the package was upgraded',
     '  1  upgrade failed or automatic runtime refresh failed',
     '  2  usage error (unexpected argument)',
     '',

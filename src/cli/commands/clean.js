@@ -730,6 +730,7 @@ function printCleanSummary(platform, cleanPlan, { mode, messages = CLEAN_MESSAGE
   const emptyRootCount = cleanPlan.emptyRootPlan.summary.remove_empty_root || 0;
 
   console.log(`${dryRun ? messages.dryRunLabel : messages.applyLabel} (${platform})`);
+  console.log('范围：仅当前项目所选宿主的受管投射；不会卸载 npm 包或宿主插件，也不会删除个人配置。包或插件卸载请使用原安装渠道。');
   console.log(dryRun ? messages.wouldRemove(removeCount) : messages.removing(removeCount));
   for (const operation of cleanPlan.managedPlan.operations) {
     console.log(`  - ${operation.path}`);

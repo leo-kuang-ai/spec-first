@@ -32,7 +32,7 @@ const MESSAGES = {
       `  ${label}: 风险操作 ${destructive} · 关键写入 ${critical} · 生成 ${generated}`
     ),
     previewHostDrift: (reasons) => `    重置原因类别: ${reasons.join(', ')}（具体路径见 --dry-run）`,
-    previewSummaryDestructive: (count, groups) => `风险操作: ${count} 个 path · ${groups} 个 target/host group（默认不展开路径）`,
+    previewSummaryDestructive: (count, groups) => `风险操作: ${count} 个 path（按宿主与分组重复计数，与上方删除/重建操作数口径不同）· ${groups} 个 target/host group（默认不展开路径）`,
     previewSummaryDestructiveDetails: '  查看具体路径: spec-first init --dry-run',
     previewSummaryGlobalDeveloper: (action, displayPath, name, lang) => (
       `全局 developer profile: ${action} · ${displayPath} · ${name} (${lang})`
@@ -97,10 +97,12 @@ const MESSAGES = {
     applyLanguageIssue: (host, displayPath, error) => `  ${host}: ${displayPath}${error ? ` · ${error}` : ''}`,
     applyRefreshParentRuntime: '▶ 刷新父级宿主 runtime assets',
     applyUserLanguageSyncHeader: (status, reasonCode) => `用户级语言同步: ${status}${reasonCode && reasonCode !== 'none' ? ` (${reasonCode})` : ''}`,
-    diagnosticCursorGeneratedRuntimePreview: 'Warning [cursor_generated_runtime_preview]: Cursor runtime 已生成，但本机尚未验证 skill discovery/invocation；生成的 skills 可能不会被 Cursor 加载。',
-    diagnosticQoderHookActivationUnverified: 'Warning [qoder_hook_activation_unverified]: Qoder 的 qodercli 1.0.41 evidence baseline 已确认 hook settings 与 command protocol，但 authenticated event execution 和 shared IDE loader safety 尚未验证；settings entries 保持未启用，SessionStart 与 PRD guard 当前不生效。',
-    diagnosticOpenCodeGeneratedRuntimePreview: 'Warning [opencode_generated_runtime_preview]: OpenCode runtime 已生成，但当前安装版本的 command/skill loader 尚未验证；支持声明保持 generated_runtime_preview。',
-    diagnosticPiGeneratedRuntimePreview: 'Warning [pi_generated_runtime_preview]: Pi 支持为 preview（skills 发现与 trust 门控已在 pi 0.85.0 真机验证；AGENTS.md 注入与模型中介 /skill: 调用仍为文档级验证）。激活门槛：pi 仅在项目受信任后加载项目级 .agents/skills——在本项目运行 `pi` 并确认信任提示（或用 `pi -a` 一次性信任）；未信任时项目 skills 保持静默。',
+    diagnosticCursorGeneratedRuntimePreview: 'Warning [cursor_generated_runtime_preview]: Cursor runtime 已生成，但本机尚未验证 skill 加载；生成的 skills 可能不会被 Cursor 加载。',
+    diagnosticQoderHookActivationUnverified: 'Warning [qoder_hook_activation_unverified]: Qoder hook 协议已按 qodercli 1.0.41 evidence baseline 确认，但 hook 实际执行未验证；settings entries 保持未启用，SessionStart 与 PRD guard 当前不生效。',
+    diagnosticOpenCodeGeneratedRuntimePreview: 'Warning [opencode_generated_runtime_preview]: OpenCode runtime 已生成，但当前版本的 command/skill loader 未验证；支持声明保持 generated_runtime_preview。',
+    diagnosticPiGeneratedRuntimePreview: 'Warning [pi_generated_runtime_preview]: Pi 支持为 preview（skills 发现与 trust 门控已在 pi 0.85.0 真机验证；AGENTS.md 注入与 /skill: 调用为文档级验证）。激活门槛：在项目内运行 pi 并确认信任提示（或 pi -a）；未信任时项目 skills 保持静默。',
+    diagnosticLegacyStateDetected: 'Warning [legacy_state_detected]: 检测到 legacy spec-first state；确认后将执行 managed hard reset 并重建（破坏性操作，详见下方预览）。',
+    diagnosticCurrentRuntimeDrift: 'Warning [current_runtime_drift]: 检测到当前 runtime drift；确认后将执行 managed hard reset 并重建（原因类别见下方分宿主预览）。',
   },
   en: {
     selectHosts: 'Select hosts for this session (others can be initialized later):',
@@ -135,7 +137,7 @@ const MESSAGES = {
       `  ${label}: risk operations ${destructive} · critical writes ${critical} · generated ${generated}`
     ),
     previewHostDrift: (reasons) => `    Reset reason categories: ${reasons.join(', ')} (inspect paths with --dry-run)`,
-    previewSummaryDestructive: (count, groups) => `${count} risk path(s) across ${groups} target/host group(s) (paths hidden by default)`,
+    previewSummaryDestructive: (count, groups) => `${count} risk path(s) across ${groups} target/host group(s) (counted per host/group; differs from the removal/rebuild count above; paths hidden by default)`,
     previewSummaryDestructiveDetails: '  Inspect paths: spec-first init --dry-run',
     previewSummaryGlobalDeveloper: (action, displayPath, name, lang) => (
       `Global developer profile: ${action} · ${displayPath} · ${name} (${lang})`
@@ -200,10 +202,12 @@ const MESSAGES = {
     applyLanguageIssue: (host, displayPath, error) => `  ${host}: ${displayPath}${error ? ` · ${error}` : ''}`,
     applyRefreshParentRuntime: '▶ Refresh parent host runtime assets',
     applyUserLanguageSyncHeader: (status, reasonCode) => `User-level language sync: ${status}${reasonCode && reasonCode !== 'none' ? ` (${reasonCode})` : ''}`,
-    diagnosticCursorGeneratedRuntimePreview: 'Warning [cursor_generated_runtime_preview]: Cursor runtime was generated, but local skill discovery/invocation is not verified; generated skills may not load.',
-    diagnosticQoderHookActivationUnverified: 'Warning [qoder_hook_activation_unverified]: the qodercli 1.0.41 evidence baseline confirms the hook settings and command protocol, but authenticated event execution and shared IDE loader safety are not verified; settings entries remain disabled, so SessionStart and PRD guard hooks are inactive.',
+    diagnosticCursorGeneratedRuntimePreview: 'Warning [cursor_generated_runtime_preview]: Cursor runtime was generated, but local skill loading is not verified; generated skills may not load.',
+    diagnosticQoderHookActivationUnverified: 'Warning [qoder_hook_activation_unverified]: the qodercli 1.0.41 evidence baseline confirms the hook settings and command protocol, but actual hook execution is not verified; settings entries remain inactive, so SessionStart and PRD guard hooks do not run.',
     diagnosticOpenCodeGeneratedRuntimePreview: 'Warning [opencode_generated_runtime_preview]: OpenCode runtime was generated, but command/skill loading is not verified for the installed version; the evidence claim remains generated_runtime_preview.',
-    diagnosticPiGeneratedRuntimePreview: 'Warning [pi_generated_runtime_preview]: Pi support is preview (skills discovery and the trust gate are live-verified on pi 0.85.0; AGENTS.md injection and model-mediated /skill: invocation remain docs-verified only). Activation gate: pi loads project-level .agents/skills only after the project is trusted — run `pi` in this project and confirm the trust prompt (or trust once with `pi -a`); without trust, project skills stay silent.',
+    diagnosticPiGeneratedRuntimePreview: 'Warning [pi_generated_runtime_preview]: Pi support is preview (skills discovery and trust gate live-verified on pi 0.85.0; AGENTS.md injection and /skill: invocation are docs-verified). Activation gate: run `pi` in this project and confirm the trust prompt (or `pi -a`); without trust, project skills stay silent.',
+    diagnosticLegacyStateDetected: 'Warning [legacy_state_detected]: detected legacy spec-first state; a managed hard reset and rebuild will run after confirmation (destructive; see the preview below).',
+    diagnosticCurrentRuntimeDrift: 'Warning [current_runtime_drift]: detected current runtime drift; a managed hard reset and rebuild will run after confirmation (reason categories are shown per host in the preview below).',
   },
 };
 
