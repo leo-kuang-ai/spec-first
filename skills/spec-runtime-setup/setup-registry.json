@@ -74,6 +74,12 @@
                   "wsl": "/etc/claude-code/managed-mcp.json",
                   "windows": "C:\\Program Files\\ClaudeCode\\managed-mcp.json"
                 },
+                "containment_root": {
+                  "macos": "/Library/Application Support/ClaudeCode",
+                  "linux": "/etc/claude-code",
+                  "wsl": "/etc/claude-code",
+                  "windows": "C:\\Program Files\\ClaudeCode"
+                },
                 "config_format": "json",
                 "precedence": 100,
                 "writable_check": "parent-or-file"
@@ -106,6 +112,12 @@
                   "linux": "/etc/claude-code/managed-mcp.json",
                   "wsl": "/etc/claude-code/managed-mcp.json",
                   "windows": "C:\\Program Files\\ClaudeCode\\managed-mcp.json"
+                },
+                "containment_root": {
+                  "macos": "/Library/Application Support/ClaudeCode",
+                  "linux": "/etc/claude-code",
+                  "wsl": "/etc/claude-code",
+                  "windows": "C:\\Program Files\\ClaudeCode"
                 },
                 "config_format": "json",
                 "precedence": 100,
@@ -145,6 +157,7 @@
               },
               "system": {
                 "config_path": "/etc/codex/config.toml",
+                "containment_root": "/etc/codex",
                 "config_format": "toml",
                 "precedence": 100,
                 "writable_check": "file-only"
@@ -172,6 +185,7 @@
               },
               "system": {
                 "config_path": "/etc/codex/config.toml",
+                "containment_root": "/etc/codex",
                 "config_format": "toml",
                 "precedence": 100,
                 "writable_check": "file-only"

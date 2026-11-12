@@ -582,6 +582,40 @@ describe('buildWorkspaceGraphs — orchestration contract', () => {
     expect(JSON.parse(fs.readFileSync(finalGraphPath, 'utf8'))).toEqual({ version: 1 });
   });
 
+  test('backup rename failure keeps the existing index and never calls the provider — SUP-26', () => {
+    const ws = mkWorkspace();
+    const repos = [initRepo(ws, 'api')];
+    const codegraphDir = path.join(repos[0].git_root, '.codegraph');
+    fs.mkdirSync(codegraphDir, { recursive: true });
+    fs.writeFileSync(path.join(codegraphDir, 'original.txt'), 'original index\n');
+
+    const { runners, calls } = makeRunners(ws);
+    const originalRenameSync = fs.renameSync;
+    const renameSpy = jest.spyOn(fs, 'renameSync').mockImplementation((source, target) => {
+      if (typeof source === 'string'
+        && path.resolve(source) === codegraphDir
+        && String(target).includes('.spec-first-previous-')) {
+        const error = new Error('injected backup rename failure');
+        error.code = 'EACCES';
+        throw error;
+      }
+      return originalRenameSync(source, target);
+    });
+
+    let result;
+    try {
+      result = buildWorkspaceGraphs({ workspaceRoot: ws, repos, runners });
+    } finally {
+      renameSpy.mockRestore();
+    }
+
+    // 备份失败：不调用 provider，不删除原索引
+    expect(calls.codegraphInit).toEqual([]);
+    expect(result.repos[0].codegraph_status).toBe('failed');
+    expect(result.repos[0].reason_code).toBe('codegraph-refresh-failed');
+    expect(fs.readFileSync(path.join(codegraphDir, 'original.txt'), 'utf8')).toBe('original index\n');
+  });
+
   test('source promotion failure restores the previous target after creating a backup', () => {
     const ws = mkWorkspace();
     const repos = [initRepo(ws, 'api')];
@@ -846,6 +880,24 @@ describe('buildWorkspaceGraphs — orchestration contract', () => {
     expect(result.repos[0].codegraph_status).toBe('failed');
     expect(result.repos[0].reason_code).toBe('codegraph-artifact-missing');
     expect(result.status).toBe('partial');
+  });
+
+  posixArtifactSymlinkTest('a .codegraph symlink escaping the workspace is rejected without deleting the user link — SUP-32', () => {
+    const ws = mkWorkspace();
+    const repo = initRepo(ws, 'api');
+    const { runners, calls } = makeRunners(ws);
+    const outside = mkWorkspace();
+    fs.writeFileSync(path.join(outside, 'keep.txt'), 'external');
+    fs.symlinkSync(outside, path.join(repo.git_root, '.codegraph'), 'dir');
+
+    const result = buildWorkspaceGraphs({ workspaceRoot: ws, repos: [repo], runners });
+
+    expect(result.repos[0].codegraph_status).toBe('failed');
+    expect(result.repos[0].reason_code).toBe('codegraph-target-escapes-workspace');
+    expect(calls.codegraphInit).toEqual([]);
+    // 拒绝路径不得删除用户原有的 .codegraph 链接或外部内容
+    expect(fs.lstatSync(path.join(repo.git_root, '.codegraph')).isSymbolicLink()).toBe(true);
+    expect(fs.readFileSync(path.join(outside, 'keep.txt'), 'utf8')).toBe('external');
   });
 
   test('source changed during build cannot produce a complete receipt', () => {

@@ -165,8 +165,10 @@ function commandOf(call) {
   return args.command || args.cmd || (Array.isArray(args.argv) ? args.argv.join(' ') : '');
 }
 
-function topLevelSegments(command) {
+// SUP-19: 内部辅助函数，返回段和分隔符信息
+function parseSegmentsWithSeparators(command) {
   const segments = [[]];
+  const separators = [];
   let quote = null;
   let buffer = '';
   const flush = () => { if (buffer) { segments[segments.length - 1].push(buffer); buffer = ''; } };
@@ -175,13 +177,24 @@ function topLevelSegments(command) {
     if (quote) { buffer += ch; if (ch === quote) quote = null; continue; }
     if (ch === '"' || ch === '\'') { quote = ch; buffer += ch; continue; }
     // 换行与 `;` 同为顶层段分隔：模型常在一个 Bash 调用里先 mkdir/准备再执行本体命令
-    if (ch === ';' || ch === '\n') { flush(); segments.push([]); continue; }
-    if ((ch === '&' || ch === '|') && command[i + 1] === ch) { flush(); segments.push([]); i += 1; continue; }
+    if (ch === ';' || ch === '\n') { flush(); separators.push(';'); segments.push([]); continue; }
+    if ((ch === '&' || ch === '|') && command[i + 1] === ch) {
+      flush();
+      separators.push(ch === '&' ? '&&' : '||');
+      segments.push([]);
+      i += 1;
+      continue;
+    }
     if (/\s/.test(ch)) { flush(); continue; }
     buffer += ch;
   }
   flush();
-  return segments;
+  return { segments, separators };
+}
+
+function topLevelSegments(command) {
+  // 向后兼容：只返回 segments 数组
+  return parseSegmentsWithSeparators(command).segments;
 }
 
 function internalArgs(call, owner, action) {
@@ -322,6 +335,13 @@ function checkCloseout(envelope, options = {}) {
       // 登记串则是展开绝对路径的同命令。两侧对称剥一层尾部重定向二元组后比对：
       // echo/字面量伪造段剥后仍含自身 token，未执行的命令永远没有匹配段。
       const registeredBody = stripRedirect(registered[0]);
+      // SUP-19 fix: 检测登记命令中的控制流
+      const parsed = parseSegmentsWithSeparators(check.command);
+      const hasConditionalFlow = parsed.separators.some(sep => sep === '&&' || sep === '||');
+      if (hasConditionalFlow) {
+        // 无法建立逐命令退出码时，不能用段文本出现证明该段实际执行
+        return false;
+      }
       return topLevelSegments(commandOf(call)).some((seg) => {
         const stripped = stripRedirect(seg);
         return stripped.length === registeredBody.length

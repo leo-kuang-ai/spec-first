@@ -339,6 +339,39 @@ function assertWithinWriteBoundary(absolutePath, artifactKind) {
     // (and anything above it) ends the walk.
     const relToBoundaryRaw = path.relative(boundaryRaw, path.resolve(candidate));
     if (relToBoundaryRaw === '' || relToBoundaryRaw.startsWith('..')) return;
+
+    // SUP-17 fix: 检查悬空符号链接（在磁盘上但目标不存在）
+    let isSymlink = false;
+    try {
+      const stats = fs.lstatSync(candidate);
+      isSymlink = stats.isSymbolicLink();
+    } catch (_error) {
+      // 文件不存在（正常情况，待创建）
+    }
+
+    if (isSymlink) {
+      // 悬空或正常符号链接：必须检查链接目标是否在边界内
+      try {
+        const target = fs.readlinkSync(candidate);
+        const resolvedTarget = path.resolve(path.dirname(candidate), target);
+        // SUP-17: 检查解析后的目标路径是否在边界内
+        // 需要先尝试 realpath（如果目标存在），否则使用解析后的路径
+        let targetToCheck = resolvedTarget;
+        try {
+          targetToCheck = fs.realpathSync(resolvedTarget);
+        } catch {
+          // 目标不存在（悬空链接），使用解析后的路径
+        }
+        const rel = path.relative(boundary, targetToCheck);
+        if (rel.startsWith('..') || path.isAbsolute(rel)) {
+          throw new Error(`artifact write escapes the run-root boundary via a symbolic link (${artifactKind}): ${candidate} -> ${target}`);
+        }
+      } catch (_error) {
+        if (_error instanceof Error && _error.message.includes('escapes the run-root boundary')) throw _error;
+        // readlinkSync 失败：不是链接或权限问题，继续检查 realpath
+      }
+    }
+
     try {
       const real = fs.realpathSync(candidate);
       const rel = path.relative(boundary, real);

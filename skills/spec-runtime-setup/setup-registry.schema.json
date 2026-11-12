@@ -312,8 +312,7 @@
           "type": "boolean"
         },
         "containment_root": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/configPath"
         },
         "precedence_guards": {
           "type": "array",

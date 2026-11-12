@@ -1042,8 +1042,14 @@ function replaceFile(tempPath, configPath, originalExists, token, options = {}) 
     try {
       if (fs.existsSync(configPath)) fs.rmSync(configPath, { force: true });
       renameWithWindowsRetry(displaced, configPath, options, 'restore-displaced-original');
-    } catch (_ignored) {
-      // 调用方的 backup restore 是最终恢复路径。
+    } catch (restoreError) {
+      // SUP-23 fix: 保留 displaced 路径和恢复失败状态
+      const recoveryError = new Error('Replacement failed and restore also failed');
+      recoveryError.code = 'REPLACE_AND_RESTORE_FAILED';
+      recoveryError.displaced_path = displaced;
+      recoveryError.original_error = error;
+      recoveryError.restore_error = restoreError;
+      throw recoveryError;
     }
     throw error;
   }
@@ -1398,33 +1404,52 @@ function applyHostConfig(options = {}) {
       stale_lock_recovered: lock.stale_lock_recovered,
     });
   } catch (error) {
+    // SUP-23 fix: 处理双重失败（位移了但无法安装和恢复）
+    const isDoubleFailure = error.code === 'REPLACE_AND_RESTORE_FAILED';
+    const displaced = isDoubleFailure ? error.displaced_path : null;
+
     let restore = { status: 'not-required' };
-    if (replaced) {
+    if (replaced || isDoubleFailure) {
       try {
-        restore = restoreOriginal({
-          configPath: target.config_path,
-          target,
-          originalExists,
-          originalBytes,
-          originalMode,
-          token,
-          faultInjector: options.faultInjector,
-          replace: options.replace,
-          lock,
-        });
+        if (isDoubleFailure) {
+          // 双重失败：已位移但未恢复，尝试从 displaced 路径恢复
+          if (displaced && fs.existsSync(displaced)) {
+            if (fs.existsSync(target.config_path)) fs.rmSync(target.config_path, { force: true });
+            fs.renameSync(displaced, target.config_path);
+            restore = { status: 'success', source: 'displaced-path' };
+          } else {
+            throw new Error('Displaced file not found');
+          }
+        } else {
+          // 正常替换失败，从 backup 恢复
+          restore = restoreOriginal({
+            configPath: target.config_path,
+            target,
+            originalExists,
+            originalBytes,
+            originalMode,
+            token,
+            faultInjector: options.faultInjector,
+            replace: options.replace,
+            lock,
+          });
+        }
       } catch (restoreError) {
         const retainedBackupPath = originalExists && fs.existsSync(backupPath) ? backupPath : null;
-        preserveBackup = Boolean(retainedBackupPath);
+        const retainedDisplacedPath = displaced && fs.existsSync(displaced) ? displaced : null;
+        const retainedPath = retainedDisplacedPath || retainedBackupPath;
+        preserveBackup = Boolean(retainedPath);
         const recovery = {
           status: 'manual-required',
-          next_action: retainedBackupPath
-            ? `解决文件系统错误后，将 ${retainedBackupPath} 恢复到 ${target.config_path}。`
+          next_action: retainedPath
+            ? `解决文件系统错误后，将 ${retainedPath} 恢复到 ${target.config_path}。`
             : `检查 ${target.config_path}；原始宿主配置备份未能保留。`,
         };
         restore = {
           status: 'failed',
           error: safeError(restoreError, secrets),
           backup_path: retainedBackupPath,
+          displaced_path: retainedDisplacedPath,
           recovery,
         };
         return rememberOutcome({
@@ -1432,7 +1457,7 @@ function applyHostConfig(options = {}) {
           changed: true,
           reason_code: 'host-config-restore-failed',
           restore,
-          backup_path: retainedBackupPath,
+          backup_path: retainedPath,
           recovery,
           error: safeError(error, secrets),
         });

@@ -144,6 +144,8 @@ function inspectPackage(skillDir, options = {}) {
     }
     root = fs.realpathSync(requestedRoot);
   } catch (error) {
+    // SUP-30 fix: 根目录读取失败必须标记 incomplete，不能返回 pass
+    incomplete = true;
     addFinding('skill_root_unreadable', 'input', 'not_checked', null, error.message);
     return finalize();
   }

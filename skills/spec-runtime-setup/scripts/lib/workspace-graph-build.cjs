@@ -329,20 +329,30 @@ function inspectSourceSnapshots(initialState, repos) {
 function runFreshCodegraph(fn, repoRoot, workspaceRoot) {
   const target = path.join(repoRoot, '.codegraph');
   const backup = `${target}.spec-first-previous-${process.pid}-${Date.now()}`;
+  let backupCreated = false;
+  let targetCreated = false;
+
   try {
     assertContainedPath(workspaceRoot, target, { reasonCode: 'codegraph-target-escapes-workspace' });
-    if (fs.existsSync(target)) fs.renameSync(target, backup);
+    if (fs.existsSync(target)) {
+      fs.renameSync(target, backup);
+      backupCreated = true;
+    }
     const result = runProvider(fn, repoRoot);
+    targetCreated = true;
+
     if (!result.ok || !codegraphArtifactHasContent(repoRoot, workspaceRoot)) {
       fs.rmSync(target, { recursive: true, force: true });
-      if (fs.existsSync(backup)) fs.renameSync(backup, target);
+      targetCreated = false;
+      if (backupCreated) fs.renameSync(backup, target);
       return result.ok ? { ok: false, reason_code: 'codegraph-artifact-missing' } : result;
     }
-    fs.rmSync(backup, { recursive: true, force: true });
+    if (backupCreated) fs.rmSync(backup, { recursive: true, force: true });
     return result;
   } catch (error) {
-    safe(() => fs.rmSync(target, { recursive: true, force: true }));
-    if (fs.existsSync(backup)) safe(() => fs.renameSync(backup, target));
+    // SUP-26/32 修复：只删除本次调用成功创建的 target
+    if (targetCreated) safe(() => fs.rmSync(target, { recursive: true, force: true }));
+    if (backupCreated) safe(() => fs.renameSync(backup, target));
     return { ok: false, reason_code: error.reason_code || 'codegraph-refresh-failed' };
   }
 }

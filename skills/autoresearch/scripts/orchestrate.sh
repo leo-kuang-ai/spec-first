@@ -258,6 +258,8 @@ def cmd_verdict(state):
 
 VALID_MODES = {"loop", "dispatch"}
 VALID_TERMINAL = {"stop-at-verified", "proceed-to-ship"}
+# SUP-15 修复：约束 stop_reason 只能是中断原因，不能是成功收敛
+VALID_STOP_REASONS = {"EXTERNAL-STOP", "USER-INTERRUPT", "ERROR"}
 
 def cmd_validate_state(state):
     issues = []
@@ -284,6 +286,12 @@ def cmd_validate_state(state):
             issues.append("last_handoff.untested_gaps: must be an array when present")
     if not isinstance(state.get("cycle_count"), int) or state.get("cycle_count", -1) < 0:
         issues.append("cycle_count: required non-negative integer")
+    # SUP-15 修复：校验 stop_reason 只能是合法的中断原因
+    if "stop_reason" in state:
+        if not isinstance(state["stop_reason"], str):
+            issues.append("stop_reason: must be a string when present")
+        elif state["stop_reason"] not in VALID_STOP_REASONS:
+            issues.append(f"stop_reason: must be one of {sorted(VALID_STOP_REASONS)}, not a success verdict")
     if state.get("mode") == "loop":
         predicate = state.get("predicate")
         if not isinstance(predicate, dict):

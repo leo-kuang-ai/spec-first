@@ -128,7 +128,38 @@ realpath_existing() {
 
 realpath_for_new_path() {
   local path="${1:?Error: path required}"
-  node -e 'const fs = require("fs"); const path = require("path"); const target = process.argv[1]; const dir = fs.realpathSync(path.dirname(target)); console.log(path.join(dir, path.basename(target)));' "$path"
+  # 目标及其中间目录可能尚不存在（SUP-02：containment 校验要先于 mkdir）。解析最深的已存在祖先，
+  # 拼接剩余段；缺少的段若本身是（悬空）符号链接，则跟随一次后继续解析，避免链接指向边界外时被误判为安全。
+  node -e '
+const fs = require("fs");
+const path = require("path");
+
+function resolveTarget(target, depth) {
+  if (depth > 40) throw new Error("symlink chain too deep: " + target);
+  let base = path.resolve(target);
+  const tail = [];
+  for (;;) {
+    try {
+      return path.join(fs.realpathSync(base), ...tail.reverse());
+    } catch (error) {
+      if (error.code !== "ENOENT") throw error;
+      let stat = null;
+      try { stat = fs.lstatSync(base); } catch (_) { stat = null; }
+      if (stat && stat.isSymbolicLink()) {
+        const link = fs.readlinkSync(base);
+        const next = path.isAbsolute(link) ? link : path.join(path.dirname(base), link);
+        return resolveTarget(path.join(next, ...tail.reverse()), depth + 1);
+      }
+      const parent = path.dirname(base);
+      if (parent === base) return path.join(base, ...tail.reverse());
+      tail.push(path.basename(base));
+      base = parent;
+    }
+  }
+}
+
+console.log(resolveTarget(process.argv[1], 0));
+' "$path"
 }
 
 path_within() {
@@ -383,12 +414,14 @@ copy_shared_file() {
   reject_secret_denied_tree "$source_real" "$root_real"
 
   dest_dir=$(dirname "$dest_path")
-  mkdir -p "$dest_dir"
+  # SUP-02 fix: verify containment BEFORE creating any directories
   dest_real=$(realpath_for_new_path "$dest_path")
   if ! path_within "$dest_real" "$worktree_real"; then
     echo -e "${RED}Error: shared_file destination resolves outside experiment worktree: $shared_file${NC}" >&2
     return 1
   fi
+
+  mkdir -p "$dest_dir"
 
   if [[ -f "$source_real" ]]; then
     rm -rf "$dest_real"

@@ -1097,9 +1097,66 @@ describe('host config resolution, inspection, and transaction', () => {
     expect(fs.readdirSync(path.dirname(target.config_path)).filter((name) => name.includes('.spec-first.'))).toEqual([]);
   });
 
+  test('surfaces changed=true and manual-required when displacement and restore both fail — SUP-23', () => {
+    const repoRoot = tempDir('windows-double-fail-repo');
+    const homeDir = tempDir('windows-double-fail-home');
+    const entry = jsonEntry();
+    const target = resolveHostConfigTarget({
+      entry,
+      host: 'cursor',
+      authority: authority('cursor', 'project'),
+      repoRoot,
+      homeDir,
+    });
+    fs.mkdirSync(path.dirname(target.config_path), { recursive: true });
+    const original = '{\n  "mcpServers": {\n    "keep": { "command": "keep", "args": [] }\n  }\n}\n';
+    fs.writeFileSync(target.config_path, original);
+    const renameCalls = [];
+    const renameSync = (sourcePath, destinationPath, context) => {
+      renameCalls.push({ sourcePath, destinationPath, ...context });
+      if (context.stage === 'direct-replace') {
+        throw codedError('EACCES', 'injected direct-replace contention');
+      }
+      if (context.stage === 'install-replacement') {
+        // 模拟外部干预：位移出的原文件在替换失败后也不再可用
+        for (const name of fs.readdirSync(path.dirname(destinationPath))) {
+          if (name.includes('replace-old')) {
+            fs.rmSync(path.join(path.dirname(destinationPath), name), { force: true });
+          }
+        }
+        throw codedError('EACCES', 'injected install-replacement failure');
+      }
+      fs.renameSync(sourcePath, destinationPath);
+    };
+
+    const result = applyHostConfig({
+      entry,
+      target,
+      replace: {
+        platform: 'win32',
+        retryAttempts: 1,
+        retryDelayMs: 0,
+        renameSync,
+        sleep() {},
+      },
+    });
+
+    // 关键契约：主配置已消失时不能报告 changed=false / restore=not-required
+    expect(result.ok).toBe(false);
+    expect(result.changed).toBe(true);
+    expect(result.reason_code).toBe('host-config-restore-failed');
+    expect(result.restore.status).toBe('failed');
+    expect(result.restore.recovery.status).toBe('manual-required');
+    expect(result.restore.recovery.next_action).toMatch(/恢复到|检查/);
+    expect(result.restore.backup_path).toMatch(/\.backup$/);
+    expect(fs.existsSync(result.restore.backup_path)).toBe(true);
+    expect(result.error.code).toBe('REPLACE_AND_RESTORE_FAILED');
+    expect(renameCalls.some((call) => call.stage === 'displace-original')).toBe(true);
+    expect(fs.existsSync(target.config_path)).toBe(false);
+  });
+
   test('keeps POSIX replace failures single-attempt and leaves the original untouched', () => {
-    const repoRoot = tempDir('posix-replace-repo');
-    const homeDir = tempDir('posix-replace-home');
+    const repoRoot = tempDir('posix-replace-repo');    const homeDir = tempDir('posix-replace-home');
     const entry = jsonEntry();
     const target = resolveHostConfigTarget({
       entry,

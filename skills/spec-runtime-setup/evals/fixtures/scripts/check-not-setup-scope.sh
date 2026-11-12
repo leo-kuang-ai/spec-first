@@ -57,16 +57,20 @@ for (const entry of trace) {
     // 只允许 stderr 重定向（2>&1、2>/dev/null、&>/dev/null）；其余重定向视为写入。
     if (/(^|[^>])>{1,2}\s*(?!&1\b|\/dev\/null\b)\S/.test(command)) return false;
     const gitMutating = ['add', 'commit', 'push', 'pull', 'checkout', 'reset', 'clean', 'stash', 'apply', 'merge', 'rebase', 'rm', 'mv', 'tag', 'branch', 'worktree', 'config', 'clone', 'fetch', 'init', 'restore', 'switch', 'update-index'];
+    // SUP-27 fix: 先按 ;/&&/|| 分顶层段，再按 | 分管道段，每个管道段都检查白名单
     return command.split(/;|&&|\|\|/).every((segment) => {
-      const tokens = segment.trim().split(/\s+/).filter(Boolean);
-      if (!tokens.length) return true;
-      const head = tokens[0];
-      if (head === 'git') {
-        if (tokens.some((token) => gitMutating.includes(token))) return false;
-        const sub = tokens.slice(1).find((token) => !/^--?[\w.-]+$/.test(token) && !/=.+$/.test(token));
-        return ['log', 'status', 'diff', 'show', 'ls-files', 'rev-parse', 'grep', 'blame', 'shortlog', 'describe'].includes(sub);
-      }
-      return ['ls', 'du', 'cat', 'head', 'tail', 'wc', 'find', 'grep', 'rg', 'file', 'stat', 'pwd', 'echo'].includes(head);
+      // 对每个顶层段，按管道分割并检查每个管道段
+      return segment.split('|').every((pipeSegment) => {
+        const tokens = pipeSegment.trim().split(/\s+/).filter(Boolean);
+        if (!tokens.length) return true;
+        const head = tokens[0];
+        if (head === 'git') {
+          if (tokens.some((token) => gitMutating.includes(token))) return false;
+          const sub = tokens.slice(1).find((token) => !/^--?[\w.-]+$/.test(token) && !/=.+$/.test(token));
+          return ['log', 'status', 'diff', 'show', 'ls-files', 'rev-parse', 'grep', 'blame', 'shortlog', 'describe'].includes(sub);
+        }
+        return ['ls', 'du', 'cat', 'head', 'tail', 'wc', 'find', 'grep', 'rg', 'file', 'stat', 'pwd', 'echo'].includes(head);
+      });
     });
   };
   if (call.name === 'Skill') {

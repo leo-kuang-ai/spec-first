@@ -16,7 +16,13 @@
             "config_path": "/Library/Application Support/ClaudeCode/managed-mcp.json",
             "config_format": "json",
             "precedence": 100,
-            "writable_check": "parent-or-file"
+            "writable_check": "parent-or-file",
+            "containment_root": {
+              "linux": "/etc/claude-code",
+              "macos": "/Library/Application Support/ClaudeCode",
+              "windows": "C:\\Program Files\\ClaudeCode",
+              "wsl": "/etc/claude-code"
+            }
           },
           "user": {
             "config_path": "$HOME/.claude.json",
@@ -47,7 +53,13 @@
               "config_path": "/Library/Application Support/ClaudeCode/managed-mcp.json",
               "config_format": "json",
               "precedence": 100,
-              "writable_check": "parent-or-file"
+              "writable_check": "parent-or-file",
+              "containment_root": {
+                "linux": "/etc/claude-code",
+                "macos": "/Library/Application Support/ClaudeCode",
+                "windows": "C:\\Program Files\\ClaudeCode",
+                "wsl": "/etc/claude-code"
+              }
             },
             "user": {
               "config_path": "$HOME/.claude.json",
@@ -77,7 +89,13 @@
               "config_path": "/Library/Application Support/ClaudeCode/managed-mcp.json",
               "config_format": "json",
               "precedence": 100,
-              "writable_check": "parent-or-file"
+              "writable_check": "parent-or-file",
+              "containment_root": {
+                "linux": "/etc/claude-code",
+                "macos": "/Library/Application Support/ClaudeCode",
+                "windows": "C:\\Program Files\\ClaudeCode",
+                "wsl": "/etc/claude-code"
+              }
             },
             "user": {
               "config_path": "$HOME/.claude.json",
@@ -107,7 +125,13 @@
               "config_path": "/Library/Application Support/ClaudeCode/managed-mcp.json",
               "config_format": "json",
               "precedence": 100,
-              "writable_check": "parent-or-file"
+              "writable_check": "parent-or-file",
+              "containment_root": {
+                "linux": "/etc/claude-code",
+                "macos": "/Library/Application Support/ClaudeCode",
+                "windows": "C:\\Program Files\\ClaudeCode",
+                "wsl": "/etc/claude-code"
+              }
             },
             "user": {
               "config_path": "$HOME/.claude.json",
@@ -137,7 +161,13 @@
             "config_path": "/etc/claude-code/managed-mcp.json",
             "config_format": "json",
             "precedence": 100,
-            "writable_check": "parent-or-file"
+            "writable_check": "parent-or-file",
+            "containment_root": {
+              "linux": "/etc/claude-code",
+              "macos": "/Library/Application Support/ClaudeCode",
+              "windows": "C:\\Program Files\\ClaudeCode",
+              "wsl": "/etc/claude-code"
+            }
           },
           "user": {
             "config_path": "$HOME/.claude.json",
@@ -168,7 +198,13 @@
               "config_path": "/etc/claude-code/managed-mcp.json",
               "config_format": "json",
               "precedence": 100,
-              "writable_check": "parent-or-file"
+              "writable_check": "parent-or-file",
+              "containment_root": {
+                "linux": "/etc/claude-code",
+                "macos": "/Library/Application Support/ClaudeCode",
+                "windows": "C:\\Program Files\\ClaudeCode",
+                "wsl": "/etc/claude-code"
+              }
             },
             "user": {
               "config_path": "$HOME/.claude.json",
@@ -198,7 +234,13 @@
               "config_path": "/etc/claude-code/managed-mcp.json",
               "config_format": "json",
               "precedence": 100,
-              "writable_check": "parent-or-file"
+              "writable_check": "parent-or-file",
+              "containment_root": {
+                "linux": "/etc/claude-code",
+                "macos": "/Library/Application Support/ClaudeCode",
+                "windows": "C:\\Program Files\\ClaudeCode",
+                "wsl": "/etc/claude-code"
+              }
             },
             "user": {
               "config_path": "$HOME/.claude.json",
@@ -228,7 +270,13 @@
               "config_path": "/etc/claude-code/managed-mcp.json",
               "config_format": "json",
               "precedence": 100,
-              "writable_check": "parent-or-file"
+              "writable_check": "parent-or-file",
+              "containment_root": {
+                "linux": "/etc/claude-code",
+                "macos": "/Library/Application Support/ClaudeCode",
+                "windows": "C:\\Program Files\\ClaudeCode",
+                "wsl": "/etc/claude-code"
+              }
             },
             "user": {
               "config_path": "$HOME/.claude.json",
@@ -258,7 +306,13 @@
             "config_path": "/etc/claude-code/managed-mcp.json",
             "config_format": "json",
             "precedence": 100,
-            "writable_check": "parent-or-file"
+            "writable_check": "parent-or-file",
+            "containment_root": {
+              "linux": "/etc/claude-code",
+              "macos": "/Library/Application Support/ClaudeCode",
+              "windows": "C:\\Program Files\\ClaudeCode",
+              "wsl": "/etc/claude-code"
+            }
           },
           "user": {
             "config_path": "$HOME/.claude.json",
@@ -289,7 +343,13 @@
               "config_path": "/etc/claude-code/managed-mcp.json",
               "config_format": "json",
               "precedence": 100,
-              "writable_check": "parent-or-file"
+              "writable_check": "parent-or-file",
+              "containment_root": {
+                "linux": "/etc/claude-code",
+                "macos": "/Library/Application Support/ClaudeCode",
+                "windows": "C:\\Program Files\\ClaudeCode",
+                "wsl": "/etc/claude-code"
+              }
             },
             "user": {
               "config_path": "$HOME/.claude.json",
@@ -319,7 +379,13 @@
               "config_path": "/etc/claude-code/managed-mcp.json",
               "config_format": "json",
               "precedence": 100,
-              "writable_check": "parent-or-file"
+              "writable_check": "parent-or-file",
+              "containment_root": {
+                "linux": "/etc/claude-code",
+                "macos": "/Library/Application Support/ClaudeCode",
+                "windows": "C:\\Program Files\\ClaudeCode",
+                "wsl": "/etc/claude-code"
+              }
             },
             "user": {
               "config_path": "$HOME/.claude.json",
@@ -349,7 +415,13 @@
               "config_path": "/etc/claude-code/managed-mcp.json",
               "config_format": "json",
               "precedence": 100,
-              "writable_check": "parent-or-file"
+              "writable_check": "parent-or-file",
+              "containment_root": {
+                "linux": "/etc/claude-code",
+                "macos": "/Library/Application Support/ClaudeCode",
+                "windows": "C:\\Program Files\\ClaudeCode",
+                "wsl": "/etc/claude-code"
+              }
             },
             "user": {
               "config_path": "$HOME/.claude.json",
@@ -379,7 +451,13 @@
             "config_path": "C:\\Program Files\\ClaudeCode\\managed-mcp.json",
             "config_format": "json",
             "precedence": 100,
-            "writable_check": "parent-or-file"
+            "writable_check": "parent-or-file",
+            "containment_root": {
+              "linux": "/etc/claude-code",
+              "macos": "/Library/Application Support/ClaudeCode",
+              "windows": "C:\\Program Files\\ClaudeCode",
+              "wsl": "/etc/claude-code"
+            }
           },
           "user": {
             "config_path": "$HOME/.claude.json",
@@ -410,7 +488,13 @@
               "config_path": "C:\\Program Files\\ClaudeCode\\managed-mcp.json",
               "config_format": "json",
               "precedence": 100,
-              "writable_check": "parent-or-file"
+              "writable_check": "parent-or-file",
+              "containment_root": {
+                "linux": "/etc/claude-code",
+                "macos": "/Library/Application Support/ClaudeCode",
+                "windows": "C:\\Program Files\\ClaudeCode",
+                "wsl": "/etc/claude-code"
+              }
             },
             "user": {
               "config_path": "$HOME/.claude.json",
@@ -440,7 +524,13 @@
               "config_path": "C:\\Program Files\\ClaudeCode\\managed-mcp.json",
               "config_format": "json",
               "precedence": 100,
-              "writable_check": "parent-or-file"
+              "writable_check": "parent-or-file",
+              "containment_root": {
+                "linux": "/etc/claude-code",
+                "macos": "/Library/Application Support/ClaudeCode",
+                "windows": "C:\\Program Files\\ClaudeCode",
+                "wsl": "/etc/claude-code"
+              }
             },
             "user": {
               "config_path": "$HOME/.claude.json",
@@ -470,7 +560,13 @@
               "config_path": "C:\\Program Files\\ClaudeCode\\managed-mcp.json",
               "config_format": "json",
               "precedence": 100,
-              "writable_check": "parent-or-file"
+              "writable_check": "parent-or-file",
+              "containment_root": {
+                "linux": "/etc/claude-code",
+                "macos": "/Library/Application Support/ClaudeCode",
+                "windows": "C:\\Program Files\\ClaudeCode",
+                "wsl": "/etc/claude-code"
+              }
             },
             "user": {
               "config_path": "$HOME/.claude.json",
@@ -506,7 +602,8 @@
             "config_path": "/etc/codex/config.toml",
             "config_format": "toml",
             "precedence": 100,
-            "writable_check": "file-only"
+            "writable_check": "file-only",
+            "containment_root": "/etc/codex"
           }
         },
         "fallback_order": [
@@ -536,7 +633,8 @@
               "config_path": "/etc/codex/config.toml",
               "config_format": "toml",
               "precedence": 100,
-              "writable_check": "file-only"
+              "writable_check": "file-only",
+              "containment_root": "/etc/codex"
             }
           },
           "fallback_order": [
@@ -565,7 +663,8 @@
               "config_path": "/etc/codex/config.toml",
               "config_format": "toml",
               "precedence": 100,
-              "writable_check": "file-only"
+              "writable_check": "file-only",
+              "containment_root": "/etc/codex"
             }
           },
           "fallback_order": [
@@ -594,7 +693,8 @@
               "config_path": "/etc/codex/config.toml",
               "config_format": "toml",
               "precedence": 100,
-              "writable_check": "file-only"
+              "writable_check": "file-only",
+              "containment_root": "/etc/codex"
             }
           },
           "fallback_order": [
@@ -623,7 +723,8 @@
             "config_path": "/etc/codex/config.toml",
             "config_format": "toml",
             "precedence": 100,
-            "writable_check": "file-only"
+            "writable_check": "file-only",
+            "containment_root": "/etc/codex"
           }
         },
         "fallback_order": [
@@ -653,7 +754,8 @@
               "config_path": "/etc/codex/config.toml",
               "config_format": "toml",
               "precedence": 100,
-              "writable_check": "file-only"
+              "writable_check": "file-only",
+              "containment_root": "/etc/codex"
             }
           },
           "fallback_order": [
@@ -682,7 +784,8 @@
               "config_path": "/etc/codex/config.toml",
               "config_format": "toml",
               "precedence": 100,
-              "writable_check": "file-only"
+              "writable_check": "file-only",
+              "containment_root": "/etc/codex"
             }
           },
           "fallback_order": [
@@ -711,7 +814,8 @@
               "config_path": "/etc/codex/config.toml",
               "config_format": "toml",
               "precedence": 100,
-              "writable_check": "file-only"
+              "writable_check": "file-only",
+              "containment_root": "/etc/codex"
             }
           },
           "fallback_order": [
@@ -740,7 +844,8 @@
             "config_path": "/etc/codex/config.toml",
             "config_format": "toml",
             "precedence": 100,
-            "writable_check": "file-only"
+            "writable_check": "file-only",
+            "containment_root": "/etc/codex"
           }
         },
         "fallback_order": [
@@ -770,7 +875,8 @@
               "config_path": "/etc/codex/config.toml",
               "config_format": "toml",
               "precedence": 100,
-              "writable_check": "file-only"
+              "writable_check": "file-only",
+              "containment_root": "/etc/codex"
             }
           },
           "fallback_order": [
@@ -799,7 +905,8 @@
               "config_path": "/etc/codex/config.toml",
               "config_format": "toml",
               "precedence": 100,
-              "writable_check": "file-only"
+              "writable_check": "file-only",
+              "containment_root": "/etc/codex"
             }
           },
           "fallback_order": [
@@ -828,7 +935,8 @@
               "config_path": "/etc/codex/config.toml",
               "config_format": "toml",
               "precedence": 100,
-              "writable_check": "file-only"
+              "writable_check": "file-only",
+              "containment_root": "/etc/codex"
             }
           },
           "fallback_order": [
@@ -857,7 +965,8 @@
             "config_path": "/etc/codex/config.toml",
             "config_format": "toml",
             "precedence": 100,
-            "writable_check": "file-only"
+            "writable_check": "file-only",
+            "containment_root": "/etc/codex"
           }
         },
         "fallback_order": [
@@ -887,7 +996,8 @@
               "config_path": "/etc/codex/config.toml",
               "config_format": "toml",
               "precedence": 100,
-              "writable_check": "file-only"
+              "writable_check": "file-only",
+              "containment_root": "/etc/codex"
             }
           },
           "fallback_order": [
@@ -916,7 +1026,8 @@
               "config_path": "/etc/codex/config.toml",
               "config_format": "toml",
               "precedence": 100,
-              "writable_check": "file-only"
+              "writable_check": "file-only",
+              "containment_root": "/etc/codex"
             }
           },
           "fallback_order": [
@@ -945,7 +1056,8 @@
               "config_path": "/etc/codex/config.toml",
               "config_format": "toml",
               "precedence": 100,
-              "writable_check": "file-only"
+              "writable_check": "file-only",
+              "containment_root": "/etc/codex"
             }
           },
           "fallback_order": [

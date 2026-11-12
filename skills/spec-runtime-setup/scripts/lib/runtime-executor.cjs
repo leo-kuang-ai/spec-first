@@ -115,9 +115,15 @@ function runVerificationOrMutation(context, repoRoot) {
       const graphifyReason = graphify && providerFailureReason(graphify);
       if (graphify && graphifyReason === 'graphify-scope-provenance-artifact-mismatch'
         && selectedIds.includes('graphify')) {
+        // SUP-24 fix: 切换到 graphify-refresh mode 时同步更新 capabilities
+        const refreshCapabilities = ['install-tools', 'write-host-config', 'provider-refresh', 'write-setup-facts'];
         const refreshContext = {
           ...context,
-          actionPlan: { ...context.actionPlan, mode: 'graphify-refresh' },
+          actionPlan: {
+            ...context.actionPlan,
+            mode: 'graphify-refresh',
+            capabilities: refreshCapabilities,
+          },
         };
         const refreshed = applySelectedProviders(refreshContext, repoRoot, ['graphify']);
         providerResults = providerResults.map((entry) => entry.provider === 'graphify'

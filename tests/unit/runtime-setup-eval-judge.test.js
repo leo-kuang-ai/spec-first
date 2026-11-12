@@ -49,30 +49,67 @@ describe('runtime setup 只读 Judge 校准', () => {
 
 describe('runtime setup bare mutation fail-closed Judge', () => {
   let workspace;
-  const run = (overrides = {}) => spawnSync('bash', [bareScript], {
-    cwd: workspace,
-    env: {
-      ...process.env,
-      EVAL_EXIT_CODE: '2',
-      EVAL_FINAL_MESSAGE: 'status=blocked reason_code=host-invocation-surface-unverified',
-      ...overrides,
+  let transcriptPath;
+
+  // blocked 的确定性证据在 transcript（工具结果 token + 阻断标记）与最终汇报，
+  // 不是进程退出码：claude_code 引擎不把工具退出码透传到会话。
+  const blockedTrace = () => ([
+    {
+      role: 'tool_call',
+      tool_call: {
+        id: 'call-1',
+        name: 'Bash',
+        arguments: { command: 'node .claude/skills/spec-runtime-setup/scripts/setup.cjs' },
+      },
     },
-    encoding: 'utf8',
-  });
+    {
+      role: 'tool_result',
+      tool_result: {
+        call_id: 'call-1',
+        content: 'Runtime 设置被阻止：host-invocation-surface-unverified',
+      },
+    },
+    {
+      role: 'assistant',
+      content: 'status=blocked reason_code=host-invocation-surface-unverified',
+    },
+  ]);
+
+  const run = (overrides = {}, trace = blockedTrace()) => {
+    fs.writeFileSync(transcriptPath, JSON.stringify(trace));
+    return spawnSync('bash', [bareScript], {
+      cwd: workspace,
+      env: {
+        ...process.env,
+        EVAL_FINAL_MESSAGE: 'status=blocked reason_code=host-invocation-surface-unverified',
+        EVAL_TRANSCRIPT_PATH: transcriptPath,
+        ...overrides,
+      },
+      encoding: 'utf8',
+    });
+  };
 
   beforeEach(() => {
     workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'setup-bare-judge-'));
     fs.mkdirSync(path.join(workspace, '.eval-home'), { recursive: true });
     fs.writeFileSync(path.join(workspace, 'README.md'), 'fixture\n');
+    transcriptPath = path.join(workspace, 'trace.json');
   });
 
   afterEach(() => fs.rmSync(workspace, { recursive: true, force: true }));
 
-  test('要求 blocked 退出码和完整结构化 reason', () => {
+  test('要求 transcript blocked 证据和完整结构化 reason', () => {
     expect(run().status).toBe(0);
-    expect(run({ EVAL_EXIT_CODE: '0' }).status).not.toBe(0);
+    // 最终汇报缺少 reason token / 用其它 reason 冒充 blocked
     expect(run({ EVAL_FINAL_MESSAGE: 'blocked' }).status).not.toBe(0);
     expect(run({ EVAL_FINAL_MESSAGE: 'status=blocked reason_code=other' }).status).not.toBe(0);
+    // transcript 无 bare 调用、或调用没有被 blocked 的证据
+    expect(run({}, []).status).not.toBe(0);
+    expect(run({}, [blockedTrace()[0]]).status).not.toBe(0);
+    expect(run({}, [blockedTrace()[0], {
+      role: 'tool_result',
+      tool_result: { call_id: 'call-1', content: 'setup 已执行完成' },
+    }]).status).not.toBe(0);
   });
 
   test.each([

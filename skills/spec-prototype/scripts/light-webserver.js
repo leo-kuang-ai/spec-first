@@ -200,10 +200,30 @@ function newestScreen() {
     return screenCandidates().map((file) => ({ file, mtime: fs.statSync(file).mtimeMs })).sort((a, b) => b.mtime - a.mtime)[0]?.file || null;
   } catch { return null; }
 }
+function newestScreenRelativePath() {
+  const file = newestScreen();
+  if (!file) return null;
+  // SUP-12 fix: 返回相对于 screens 目录的路径（不含文件名），用于 <base> 标签
+  const rel = path.relative(screens, path.dirname(file));
+  return rel ? '/' + rel.replace(/\\/g, '/') + '/' : '/';
+}
 function render() {
   const file = newestScreen();
   if (!file) return '<!doctype html><html><body><h1>Waiting for a page...</h1></body></html>';
-  return fs.readFileSync(file, 'utf8');
+  const html = fs.readFileSync(file, 'utf8');
+  // SUP-12 fix: 注入 <base> 标签，让浏览器基于正确的目录解析相对资源
+  const basePath = newestScreenRelativePath();
+  if (basePath === '/') return html; // 根目录文件不需要 <base>
+  // 在 <head> 后或 <html> 后注入 <base href="...">
+  const baseTag = `<base href="${basePath}">`;
+  if (/<head[\s>]/i.test(html)) {
+    return html.replace(/<head([\s>])/i, `<head$1${baseTag}`);
+  }
+  if (/<html[\s>]/i.test(html)) {
+    return html.replace(/<html([\s>])/i, `<html$1${baseTag}`);
+  }
+  // 没有 <head> 或 <html>，在开头插入
+  return baseTag + html;
 }
 function safeFile(req, res) {
   let requestPath;

@@ -1092,16 +1092,43 @@ function readPreparedManifest(manifestPath, options = {}) {
   if (!runDir.ok || path.dirname(manifestFile.path) !== runDir.path) {
     return { ok: false, reason_code: 'private-run-directory-untrusted' };
   }
+  // SUP-09 fix: runDir 和 manifestFile containment 检查通过后才执行 hardening
+  if (runDir.needsHardening) {
+    const hardened = hardenPath(manifest.run_dir, true, options);
+    if (!hardened.ok) {
+      return { ok: false, reason_code: hardened.reason_code };
+    }
+  }
+  if (manifestFile.needsHardening) {
+    const hardened = hardenPath(manifestPath, false, options);
+    if (!hardened.ok) {
+      return { ok: false, reason_code: hardened.reason_code };
+    }
+  }
   for (const filePath of [manifest.test_plan_path, manifest.config_path, manifest.action_policy_path]) {
     const inspected = inspectPrivateFile(filePath, options);
     if (!inspected.ok || !isInside(runDir.path, inspected.path)) {
       return { ok: false, reason_code: 'private-run-file-untrusted' };
+    }
+    // SUP-09 fix: containment 检查通过后才执行 hardening
+    if (inspected.needsHardening) {
+      const hardened = hardenPath(filePath, false, options);
+      if (!hardened.ok) {
+        return { ok: false, reason_code: hardened.reason_code };
+      }
     }
   }
   for (const dirPath of [manifest.raw_dir, manifest.screenshot_dir]) {
     const inspected = inspectPrivateDirectory(dirPath, options);
     if (!inspected.ok || !isInside(runDir.path, inspected.path)) {
       return { ok: false, reason_code: 'private-run-directory-untrusted' };
+    }
+    // SUP-09 fix: containment 检查通过后才执行 hardening
+    if (inspected.needsHardening) {
+      const hardened = hardenPath(dirPath, true, options);
+      if (!hardened.ok) {
+        return { ok: false, reason_code: hardened.reason_code };
+      }
     }
   }
   return { ok: true, manifest, path: manifestFile.path };
@@ -1165,10 +1192,21 @@ function inspectPrivateDirectory(dirPath, options = {}) {
     if (entry.isSymbolicLink() || !entry.isDirectory()) {
       return { ok: false, reason_code: 'private-run-directory-untrusted' };
     }
-    const hardened = hardenPath(dirPath, true, options);
-    return hardened.ok
-      ? { ok: true, path: fs.realpathSync.native(dirPath) }
-      : hardened;
+    // SUP-09 fix: 与 inspectPrivateFile 保持一致，延迟 hardening
+    let realPath;
+    try {
+      realPath = fs.realpathSync.native(dirPath);
+    } catch (_error) {
+      return { ok: false, reason_code: 'private-run-directory-untrusted' };
+    }
+    // 检查所有权（Unix）
+    if (typeof process.getuid === 'function') {
+      const stat = fs.statSync(dirPath);
+      if (stat.uid !== process.getuid()) {
+        return { ok: false, reason_code: 'private-path-owner-mismatch' };
+      }
+    }
+    return { ok: true, path: realPath, needsHardening: true };
   } catch (_error) {
     return { ok: false, reason_code: 'private-run-directory-untrusted' };
   }
@@ -1183,10 +1221,22 @@ function inspectPrivateFile(filePath, options = {}) {
     if (entry.isSymbolicLink() || !entry.isFile()) {
       return { ok: false, reason_code: 'private-run-file-untrusted' };
     }
-    const hardened = hardenPath(filePath, false, options);
-    return hardened.ok
-      ? { ok: true, path: fs.realpathSync.native(filePath) }
-      : hardened;
+    // SUP-09 fix: 只解析路径和检查类型/所有权，不修改权限
+    // hardening 延迟到调用者确认 containment 之后
+    let realPath;
+    try {
+      realPath = fs.realpathSync.native(filePath);
+    } catch (_error) {
+      return { ok: false, reason_code: 'private-run-file-untrusted' };
+    }
+    // 检查所有权（Unix）
+    if (typeof process.getuid === 'function') {
+      const stat = fs.statSync(filePath);
+      if (stat.uid !== process.getuid()) {
+        return { ok: false, reason_code: 'private-path-owner-mismatch' };
+      }
+    }
+    return { ok: true, path: realPath, needsHardening: true };
   } catch (_error) {
     return { ok: false, reason_code: 'private-run-file-untrusted' };
   }
@@ -1241,6 +1291,15 @@ function reservePrivateJson(filePath, options = {}) {
     const error = new Error('private-run-file-collision');
     error.reason_code = 'private-run-file-collision';
     throw error;
+  }
+  // SUP-09 fix: containment 检查通过后才执行 hardening
+  if (parent.needsHardening) {
+    const hardened = hardenPath(path.dirname(filePath), true, options);
+    if (!hardened.ok) {
+      const error = new Error(hardened.reason_code);
+      error.reason_code = hardened.reason_code;
+      throw error;
+    }
   }
   let descriptor;
   try {

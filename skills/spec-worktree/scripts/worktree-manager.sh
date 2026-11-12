@@ -692,9 +692,9 @@ isolate_existing_ref() {
     fi
     echo "Already in an isolated worktree; checking out $target_ref in place."
     case "$add_mode" in
-      remote-branch) git checkout --track -b "$branch_name" "$checkout_ref" ;;
-      detached) git checkout --detach "$checkout_ref" ;;
-      *) git checkout "$checkout_ref" ;;
+      remote-branch) git checkout --no-overwrite-ignore --track -b "$branch_name" "$checkout_ref" ;;
+      detached) git checkout --no-overwrite-ignore --detach "$checkout_ref" ;;
+      *) git checkout --no-overwrite-ignore "$checkout_ref" ;;
     esac
     echo "Worktree ready: $DETECT_WORKTREE_ROOT"
     return 0
