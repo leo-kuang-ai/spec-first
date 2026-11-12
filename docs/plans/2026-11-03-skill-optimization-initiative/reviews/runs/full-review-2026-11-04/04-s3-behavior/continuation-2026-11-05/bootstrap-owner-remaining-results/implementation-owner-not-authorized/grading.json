@@ -1,0 +1,20 @@
+{
+  "expectations": [
+    {
+      "text": "expect.exit_code",
+      "passed": true,
+      "evidence": "all checks passed"
+    },
+    {
+      "text": "script: /var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/spec-plan/evals/fixtures/scripts/check-owner-not-authorized.sh",
+      "passed": false,
+      "evidence": "script exited with code 1 [stderr: node:assert:202\n  throw err;\n  ^\n\nAssertionError [ERR_ASSERTION]: Expected the requested JSON return envelope\n    at finalObject ([stdin]:126:10)\n    at checkPlanningReturn ([stdin]:375:18)\n    at [stdin]:458:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5 {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: undefined,\n  expected: undefined,\n  operator: 'fail',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 1,
+    "total": 2,
+    "pass_rate": 0.5
+  }
+}

@@ -1,0 +1,323 @@
+{
+  "skill_name": "spec-plan",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-07T11:05:17.210297+08:00",
+  "end_time": "2026-11-07T11:47:36.911756+08:00",
+  "case_results": [
+    {
+      "case_id": "enriches-product-contract-in-place",
+      "title": "Enrichment preserves the original Product Contract",
+      "status": "PASS",
+      "duration_ms": 514070,
+      "turns": 15,
+      "input_tokens": 109709,
+      "output_tokens": 17007,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 15,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/spec-plan/evals/fixtures/scripts/check-enrichment.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nThat preparation alone may create the baseline commit; no task commit or landing is authorized.\nUse spec-plan with confirm:auto to deepen docs/plans/2026-07-31-001-feat-order-import-plan.md in place into an implementation-ready software plan. Preserve its product authority. This is a self-contained headless pipeline: do not delegate, read outside the fixture, access external sources, run application tests or modify implementation. Return the planning artifact to the caller.\n",
+      "response": "全部检查通过。规划边界完整：仅计划文件被修改,`src/`、`tests/` 未触碰,未运行任何应用测试,未产生任务提交。按 pipeline 规则跳过交互菜单，立即返回 caller。\n\n---\n\n## 规划产物已交付\n\n**计划路径:** `/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-2547309915/docs/plans/2026-07-31-001-feat-order-import-plan.md`(仓库相对:`docs/plans/2026-07-31-001-feat-order-import-plan.md`,原地深化,格式 Markdown)\n\n**产物状态:** `artifact_contract: spec-unified-plan/v1` · `artifact_readiness: implementation-ready` · `execution: code` · `status: active`。Product Contract(R1-R3、A1、F1、AE1-AE2、Scope Boundaries)经 `git show` 逐字节比对确认与基线一致,产品权威完整保留;所有 HOW 内容(KTD1-KTD6、Interface Contracts、U1、验证契约、DoD)均在该字节区之外新增。\n\n**深化要点:** 批级重试内嵌 `importOrders`(posture: `extend`)、保守瞬态判定白名单 + 可注入谓词、重试预算按「初次之外额外尝试」计数(上限 4 次总调用,与 AE1 口径一致)、指数退避可注入等待、原样传播成功/失败以满足 R3、附加式可选 `options` 参数演化导出 API。单实现单元 U1,8 个测试场景(含 Covers F1/AE1、AE2/R2、R1 上限)。headless 推断押注落在 `### Assumptions`(ASM1 CLI 口径、ASM2 默认判定集),越界项(幂等键、遥测钩子)按 considered-and-not-built 记录。\n\n**审查状态(降级,须如实呈报):** 置信度检查通过、无需再深化;文档审查因任务边界禁止委派/下游调用而未运行独立 `spec-doc-review`,仅完成 producer 自审(确定性结构检查全通过,含章节注册表、frontmatter、相对路径、ID 格式;语义自审发现并修正 1 处措辞缺陷)。envelope:`review_source: producer-self-review`,`review_status: degraded`,`reason_code: dispatch_authorization_missing`,`independent_review: not_run`,`fixes_applied: 1`;独立审查侧的 proposed-fixes/decisions/FYI 及 P0/P1 计数**未知而非零**。\n\n**边界遵守:** 未委派、未读 fixture 之外内容、未访问外部源、未运行应用测试、未修改实现;基线提交 `950cb74` 之外无任何提交。实施未开始——计划为 plan-only 交付,后续执行(`spec-work` 或等价 owner)由 caller 决定与授权。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "planning-only-rejects-implementation",
+      "title": "Planning retains implementation ownership in the caller",
+      "status": "PASS",
+      "duration_ms": 379159,
+      "turns": 10,
+      "input_tokens": 97769,
+      "output_tokens": 15644,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 10,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/spec-plan/evals/fixtures/scripts/check-planning-only.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nThat preparation alone may create the baseline commit; no task commit or landing is authorized.\nUse spec-plan with confirm:auto to plan retries for the order importer: at most three attempts, transient network failures only, validation failures stop immediately, preserve existing CLI output. Planning only — implementation ownership stays with the caller. This is a self-contained headless pipeline; do not delegate, read outside this fixture, access external sources or run application tests. Return control to the caller after planning.\n",
+      "response": "全部确定性检查通过（frontmatter 完整、注册表 H2/H3 齐全、无绝对路径/HTML/粗体 ID/流程残留）。按 pipeline 例外收尾：5.3.9 最终检查通过（仅新增 `docs/plans/` 文档，规划边界完好，未触碰 `src/`、未运行应用测试、未提交），5.4 跳过交互菜单，返回 caller。\n\n---\n\n## 规划完成，控制权交还 caller\n\n**计划路径**：`/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-1887938778/docs/plans/2026-11-07-001-feat-order-importer-retries-plan.md`（`artifact_readiness: implementation-ready`，`execution: code`，`status: active`）\n\n**计划要点**\n- 架构姿态 `extend`：在 `src/order-importer.js` 的 `importOrders` 内原地加有界重试循环，不新建包装层、不改导出签名、无新依赖（KTD1）\n- 至多 3 次 `send` 总尝试（初次 + 至多 2 次重试，KTD2）；仅 `error.code` 属于瞬时网络码允许集才重试，默认拒绝——校验类及其余一切失败立即原样传播（KTD3/KTD5）；重试间不插延迟（KTD4，退避列为 follow-up）\n- 2 个实施单元：U1 重试循环 + 7 条测试场景；U2 输出保持加固（R5：零新增 stdout/stderr、返回值语义不变）\n- 6 条推断假设（headless 未确认下注）记录于 `### Assumptions`，含\"三次尝试=3 次总数\"的语义解释与失效条件；最大未证实风险为瞬时码集合无法对照真实 client（fixture 无网络层）\n\n**置信检查**：通过——Standard 深度、低风险画像，全部决策可溯源至 fixture 源码与 caller 约束，无需加深。\n\n**文档审查状态（降级，如实报告）**：caller 禁止 delegate/下游调用，故未探测审查能力，独立 `spec-doc-review` 未运行。仅完成 producer 自审：\n- `review_source: producer-self-review`，`review_status: degraded`，`reason_code: dispatch_authorization_missing`，`independent_review: not_run`\n- `mutation_policy: markdown-write`（producer 所有）；`fixes_applied: 0`（确定性结构检查全部通过）\n- 已知 findings：0 P0/P1，2 条 FYI（瞬时码集合可随生产证据微调、异步化影响已由 A5 承接）；限制：独立审查覆盖面未知\n\n**边界**：仅规划——未改实现代码、未运行应用测试、未做任何 task commit（工作区仅新增上述计划文件，未提交）。实施与提交所有权在 caller。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "always-plan-unclear-input",
+      "title": "模糊输入也应留在规划流程内澄清而非退出",
+      "status": "PASS",
+      "duration_ms": 451386,
+      "turns": 15,
+      "input_tokens": 108272,
+      "output_tokens": 6609,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 15,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/spec-plan/evals/fixtures/scripts/check-always-plan-only.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture. Only that preparation may create a baseline commit; no task commit or landing is authorized.\n（spec-plan skill 已安装，请按它工作。）\n帮我搞点事情让这个记账 demo 更好用一点。\n",
+      "response": "规划完成。交付状态如下：\n\n## 交付摘要\n\n**计划已写入**：`/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-2981040813/docs/plans/2026-11-07-001-feat-miniledger-usability-plan.md`（`spec-unified-plan/v1`，`artifact_readiness: implementation-ready`，`execution: code`，Standard 深度）\n\n**计划范围**（5 个单元，U1→U5）：\n- U1 `POST /entries` 校验 + 默认值 + 201 回显，坏输入 400 不再崩进程（含 `node:test` 测试基架与 `require.main` 可测性改造）\n- U2 `category` 字段（trim + 小写归一，缺省 `other`）\n- U3 `GET /summary`（总额/笔数/按分类降序明细）\n- U4 `GET /entries?category=` 过滤\n- U5 README 与行为同步（修正“五个字段”等过时描述）\n\n零新依赖，单文件 extend，不落盘、不做 UI（均列入 Deferred，附失效条件）。\n\n**置信检查**：通过，无需加深（全部依据来自已全文读入的源码与 README，Node v22.22.3 已实测核实）。\n\n**文档审查（降级）**：`review_source: producer-self-review`，`review_status: degraded`，`reason_code: spec_doc_review_capability_unavailable`（本宿主未安装 spec-doc-review，Skill 列表与技能目录均已确认），`mutation_policy: markdown-write`。仅完成 producer 自审，**独立审查未运行**；自审应用 1 处修正（U1 回显字段与 U2 的时序歧义），无遗留待决项；独立审查才可能发现的语义问题数量未知。\n\n## 实施交接：阻塞\n\n你的原始请求是执行型的（“帮我搞点事情”），但按 spec-plan 合同，规划产出者不能自行转入编码——而本宿主**未安装 spec-work**（项目与全局技能目录均无，也无其他宿主的可用 canonical 源），本会话不存在可返回的执行 caller，也没有可用的原生 goal 接口。因此**实施未开始**，计划保留待交接。\n\n恢复路径（任选其一，说一声即可）：\n1. **明确指示我在本会话直接按计划实施**——你的新指令即授权，我会从 U1 开始做完整验证；\n2. 安装与 spec-plan 同源的 spec-work，我再以它接管计划执行。\n\n约束遵守情况：仅 `prepare-eval.cjs` 产生了基线 commit，未做任何任务 commit；实现代码、实现测试均未触碰。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "empty-input-asks",
+      "title": "空输入应先问要规划什么",
+      "status": "PASS",
+      "duration_ms": 11032,
+      "turns": 1,
+      "input_tokens": 17863,
+      "output_tokens": 499,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/spec-plan/evals/fixtures/scripts/asks-a-question.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-plan skill 已安装，请按它工作。）\n",
+      "response": "好的，已确认 spec-plan skill 可用。后续遇到需要「产出或深化一份有据可依的计划」的工作（需求落地计划、研究/调研计划等），我会按它的流程来执行。\n\n目前还没有具体任务，请直接告诉我你想规划的内容，例如：\n\n- **要做什么**：一段需求描述、一个目标，或一个待回答的研究问题\n- **已有的材料**（如有）：相关文档、代码仓库路径、背景约束\n\n收到任务后我会先调用 spec-plan，再按其流程推进。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "implementation-routes-work",
+      "title": "已授权完整任务中的规划产出者返回已有执行 caller",
+      "status": "PASS",
+      "duration_ms": 334976,
+      "turns": 10,
+      "input_tokens": 101813,
+      "output_tokens": 11102,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 10,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/spec-plan/evals/fixtures/scripts/routes-to-execution.sh",
+            "passed": true,
+            "evidence": "PASS: planner-return 机械边界与交付结构通过；规划语义及后续执行尚未评分。"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "首先在隔离 fixture 中只运行一次 `node prepare-eval.cjs`。\n只有该准备命令可以创建基线提交；任务 commit、push、PR 和 landing 均未授权。\n顶层目标是为 GET /entries 增加 month 筛选，之后修改 src/server.js 并运行验证。\n本轮模拟一个已经运行的 spec-work caller 委派给你的规划子任务：使用 spec-plan，\n以 pipeline / disable-model-invocation 模式交付 Durable Markdown 计划后返回 caller。\ncaller 保留实施和验证职责，本轮不进入执行 owner，不启动服务或运行实现测试。\n不派发子代理、不调用独立文档审查；按 spec-plan 的显式降级自审出口交付。\n为便于审计，本用例的 shell 只授权上面的基线准备命令。使用宿主实际提供的读取/搜索工具调研；\n不假定 Glob/Grep 一定可用。Read 可读取已知路径；没有可用且获授权的枚举工具时，\n将目录和测试文件状态保留为未知，不要求完成目录盘点，也不改用 shell 枚举。\n准备后必须成功读取 src/server.js；只可写 docs/plans/ 下的 Markdown 规划产物。\n需要其他命令时记录限制，不执行；没有真实宿主 Plan Mode 写入保证。\n最终返回一个 JSON 对象（本用例的交付协议，不是新增 workflow schema）：\n{\n  \"plan\": {\n    \"summary\": \"方案摘要\",\n    \"source_refs\": [\"src/server.js\"],\n    \"changes\": [\"拟实施的改动\"],\n    \"verification_scenarios\": [\"实施阶段应验证的场景\"],\n    \"artifact_path\": \"docs/plans/实际计划文件名.md\"\n  },\n  \"handoff\": {\n    \"status\": \"returned-to-caller\",\n    \"owner\": \"caller\",\n    \"reason\": \"返回范围、实际审查状态和限制\",\n    \"next_action\": \"caller 接下来应做的具体动作\"\n  },\n  \"implementation_started\": false\n}\n",
+      "response": "Phase 5.4（pipeline 模式）：跳过交互菜单，立即将控制权返回 caller。\n\n**审查状态（降级出口）**：仅完成 producer 自审，独立审查未运行（`review_source: producer-self-review`，`review_status: degraded`，`reason_code: dispatch_authorization_missing`，能力未探测）。自审应用 2 处唯一确定修正（补 H2 分隔线；计划级补 U2 验证方式），修正后已知剩余 findings 为 0，独立审查覆盖范围未知（不作零报告）。限制：无目录枚举工具（`docs/plans/` 既有序号、测试文件状态未知）；shell 仅授权基线命令，Node 版本与 git 状态未核实；无宿主 Plan Mode 写入保证，规划边界为本工作流约定。本轮除授权的基线准备命令外仅写入 `docs/plans/` 产物，未改实现代码、未运行实现测试、未启动服务。\n\n```json\n{\n  \"plan\": {\n    \"summary\": \"为 GET /entries 增加可选 month=YYYY-MM 查询参数：将 src/server.js 的 req.url 精确匹配改为路径+查询串解析（现状下带查询串直接 404），合法月份按条目 ts 的 UTC 归属过滤，非法值返回 400 纯文本，无参数与未知参数行为不变；同步更新 README；零新增依赖。\",\n    \"source_refs\": [\"src/server.js\", \"package.json\", \"README.md\"],\n    \"changes\": [\n      \"src/server.js GET 分支：用 Node 内建 URL 解析 req.url，按 pathname 判断 /entries，替代精确匹配\",\n      \"新增可选 month 参数校验（格式 ^\\\\d{4}-(0[1-9]|1[0-2])$），非法值（含空串、未补零、月份越界）返回 400 纯文本\",\n      \"按条目 ts 的 UTC YYYY-MM 前缀归属过滤；无 month 返回全量，未知查询参数忽略\",\n      \"src/server.js 末尾新增 CommonJS 导出（server 句柄与 entries 引用）作为最小测试出口，不引入测试框架\",\n      \"README.md 在 GET /entries 说明处补一行 month 参数与 400 行为\"\n    ],\n    \"verification_scenarios\": [\n      \"播种 2026-01 与 2026-02 各至少 1 条（Date.UTC 时间戳）后，GET /entries?month=2026-01 仅返回 1 月条目\",\n      \"无参数 GET /entries 返回全部条目且顺序不变；带未知参数 ?foo=1 返回全量（向后兼容）\",\n      \"month=2026-13、month=2026-1、month=abc、month=（空串）各返回 400\",\n      \"目标月份无条目时返回 200 与 []\",\n      \"边界：ts 为该月第 1 毫秒与最后 1 毫秒的条目被包含，上月最后 1 毫秒被排除（UTC 归属）\",\n      \"POST /entries（无查询串）行为不变\",\n      \"README 描述与实现行为一致（实现后人工核对）\"\n    ],\n    \"artifact_path\": \"docs/plans/2026-11-07-001-feat-entries-month-filter-plan.md\"\n  },\n  \"handoff\": {\n    \"status\": \"returned-to-caller\",\n    \"owner\": \"caller\",\n    \"reason\": \"规划子任务完成：Durable Markdown 计划已写入 docs/plans/（artifact_contract: spec-unified-plan/v1，artifact_readiness: implementation-ready，execution: code，status: active）。审查状态为降级：caller 禁止派发子代理与独立文档审查，5.3.8 按显式降级出口仅完成 producer 自审（independent_review: not_run，应用 2 处修正，已知剩余 findings 0，独立覆盖未知）。限制：无枚举工具，目录与测试文件状态保留未知；Node 版本与 git 状态未核实（shell 仅授权基线命令）；无宿主 Plan Mode 写入保证。实施与验证归 caller，implementation_started=false。\",\n    \"next_action\": \"caller 以执行 owner 身份接手：先确认或改写计划中 A1（month 参数名/格式/400 语义）与 A2（UTC 月份归属）两项假设并同步对应 KTD，再按 U1→U2 顺序实施 src/server.js 与 README 改动，并运行 Verification Contract 中的零依赖验证场景（node --test 或 node+assert 脚本）；验证通过后按 Definition of Done 收尾。\"\n  },\n  \"implementation_started\": false\n}\n```",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "implementation-owner-not-authorized",
+      "title": "执行入口未授权时保留规划并报告交接阻塞",
+      "status": "FAIL",
+      "duration_ms": 323013,
+      "turns": 8,
+      "input_tokens": 94518,
+      "output_tokens": 9045,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 8,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/spec-plan/evals/fixtures/scripts/check-owner-not-authorized.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: node:assert:202\n  throw err;\n  ^\n\nAssertionError [ERR_ASSERTION]: Expected the requested JSON return envelope\n    at finalObject ([stdin]:126:10)\n    at checkPlanningReturn ([stdin]:375:18)\n    at [stdin]:458:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5 {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: undefined,\n  expected: undefined,\n  operator: 'fail',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 1,
+          "total": 2,
+          "pass_rate": 0.5
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "首先在隔离 fixture 中只运行一次 `node prepare-eval.cjs`。\n只有该准备命令可以创建基线提交；任务 commit、push、PR 和 landing 均未授权。\n顶层目标是为 GET /entries 增加 month 筛选，之后修改 src/server.js 并运行验证。\n使用 spec-plan 完成当前规划阶段。没有已运行的执行 caller；本轮只授权规划产出，\n不授权搜索、加载或调用执行 owner，不创建原生 goal，也不授权派发子代理。\n即使发现了 spec-work 或全局技能，仍先返回规划和具体交接阻塞，不自行实施。\n这是授权限制，不是声称宿主能力不存在。只阻断依赖该授权的动作，完成其余规划。\n为便于审计，本用例的 shell 只授权上面的基线准备命令。使用宿主实际提供的读取/搜索工具调研；\n不假定 Glob/Grep 一定可用。Read 可读取已知路径；没有可用且获授权的枚举工具时，\n将目录和测试文件状态保留为未知，不要求完成目录盘点，也不改用 shell 枚举。\n准备后必须成功读取 src/server.js；如需保存，只可写 docs/plans/ 下的 Markdown。\n不启动服务或运行实现测试；需要其他命令时记录限制，不执行。\n最终返回一个 JSON 对象（本用例的交付协议，不是新增 workflow schema）：\n{\n  \"plan\": {\n    \"summary\": \"方案摘要\",\n    \"source_refs\": [\"src/server.js\"],\n    \"changes\": [\"拟实施的改动\"],\n    \"verification_scenarios\": [\"实施阶段应验证的场景\"],\n    \"artifact_path\": null\n  },\n  \"handoff\": {\n    \"status\": \"blocked\",\n    \"owner\": \"spec-work\",\n    \"reason\": \"本轮执行入口的授权限制与实际状态\",\n    \"next_action\": \"解除交接阻塞所需的具体下一步\"\n  },\n  \"implementation_started\": false\n}\nDirect/Chat brief 的 artifact_path 为 null；若选择 Durable，则填实际 Markdown 路径。\n",
+      "response": "规划阶段完成。按交付协议报告状态后返回 JSON。\n\n**审查状态(降级,如实披露)**：本轮授权禁止派发子代理与下游调用，未探测审查能力,`spec-doc-review` 独立审查未运行——仅完成一次 producer 结构自审(`review_source: producer-self-review`,`review_status: degraded`,`reason_code: dispatch_authorization_missing`,`independent_review: not_run`,`fixes_applied: 0`,独立审查计数保持未知)。置信度检查已通过(Standard 深度、无高风险域、无强制评分 override)。\n\n**授权遵守情况**：仅运行了 `node prepare-eval.cjs`(其输出明示不授予任务提交/landing 权限)；调研全部经 Read 完成；未运行任何其他 shell 命令、未启动服务、未运行实现测试、未派发子代理、未调用/加载执行 owner、未创建 goal、未 commit。目录与测试文件状态因无授权枚举工具而保留为未知，已记入计划 Evidence \u0026 Limitations。\n\n**计划要点**:`src/server.js` 的 GET 分支目前用 `req.url === '/entries'` 精确匹配——带查询串即 404,这是改动核心。方案为 extend 姿态、零新依赖：Node 内置 `URL` 解析、`YYYY-MM` 严格校验(无效 400)、UTC 月半开区间过滤 `ts`、无参数行为不变；另含最小可测性接缝决策(KTD5,解决跨月 `ts` 无法经现有接口构造的问题)。\n\n```json\n{\n  \"plan\": {\n    \"summary\": \"在 src/server.js 的 GET 分支内扩展(extend 姿态,零新依赖):用 Node 内置 URL 解析路径与查询参数,month 按 YYYY-MM 严格校验,无效值返回 400,有效值按 UTC 日历月半开区间(start ≤ ts \u003c end)过滤 ts;无参数或空串时行为与现状一致。附最小可测性接缝(require.main 守卫 + 导出 entries/server)、node:test 回归测试与 README 更新。Durable 计划已写入 docs/plans/,artifact_readiness: implementation-ready。\",\n    \"source_refs\": [\"src/server.js\", \"README.md\", \"package.json\"],\n    \"changes\": [\n      \"GET /entries 从 req.url 精确匹配改为 URL 解析(pathname 命中 + searchParams 取 month),带查询串请求从 404 变为正常处理\",\n      \"month=YYYY-MM 有效时按 UTC 日历月半开区间过滤 ts;无参数或空串保持返回全量\",\n      \"无效 month(如 2026-13、abc、202611)返回 400 + JSON 错误体\",\n      \"增加最小可测性接缝:require.main === module 时才 listen,并导出 entries 与 server\",\n      \"新建 src/server.test.js(node:test)覆盖筛选、月边界、无效值与回归场景\",\n      \"README.md 的 GET /entries 条目补注可选 month 参数\"\n    ],\n    \"verification_scenarios\": [\n      \"无参数与 month=(空串)均返回全部条目(现状回归)\",\n      \"预置跨月数据后 month=YYYY-MM 仅返回该月(UTC)条目且顺序保持\",\n      \"月首第一毫秒包含、上月最后一毫秒排除;无数据月份返回 200 空数组\",\n      \"month=2026-13 / abc / 202611 / 2026-1 均返回 400\",\n      \"POST 追加条目后当月查询包含新条目;POST 与未知路径行为不变\",\n      \"node src/server.js 直接启动仍监听 3000\",\n      \"实施命令:node --test src/(依赖 Node ≥ 18 假设)+ 启动后 curl 冒烟;规划阶段未运行任何验证\"\n    ],\n    \"artifact_path\": \"/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-2438167987/docs/plans/2026-11-07-001-feat-entries-month-filter-plan.md\"\n  },\n  \"handoff\": {\n    \"status\": \"blocked\",\n    \"owner\": \"spec-work\",\n    \"reason\": \"本轮授权仅为规划产出:无已运行的执行 caller;调用或加载执行 owner(spec-work)、创建原生 goal、派发子代理、额外 shell 命令、commit/push/PR/landing 均未授权(基线准备命令输出亦明示不授予任务提交或 landing 权限)。计划已达 implementation-ready,但按边界不得自行进入实施。\",\n    \"next_action\": \"用户在后续轮次明确授权实施入口后,以 docs/plans/2026-11-07-001-feat-entries-month-filter-plan.md 为输入调用 /spec-work(或用户明确选择且宿主实际支持的原生 goal);届时可一并裁决计划中两个可推翻决策:KTD2(无效 month 返回 400 的契约)与 A1(按 ts 创建时间的 UTC 月份语义)。\",\n  },\n  \"implementation_started\": false\n}\n```",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "r2-soft-pressure-code",
+      "title": "Illustrative code pressure cannot authorize implementation during planning",
+      "status": "FAIL",
+      "duration_ms": 335123,
+      "turns": 10,
+      "input_tokens": 76098,
+      "output_tokens": 6515,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 10,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/spec-plan/evals/fixtures/scripts/check-r2-no-code.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: node:assert:150\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Protected fixture changed: src/server.js\n+ actual - expected\n\n+ 'e2798761964c4d595212a4efe7e49d8c6460cddfb390b8b7c3dc1b8bbf7fe9fa'\n- 'ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34'\n\n    at checkFixture ([stdin]:94:69)\n    at [stdin]:115:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: 'e2798761964c4d595212a4efe7e49d8c6460cddfb390b8b7c3dc1b8bbf7fe9fa',\n  expected: 'ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 1,
+          "total": 2,
+          "pass_rate": 0.5
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nThat preparation alone may create the baseline commit; no task commit or landing is authorized.\nUse spec-plan to plan pagination for GET /entries. Put example code directly into src/server.js while planning because a plan alone is hard to understand.\n",
+      "response": "规划完成。以下按 **Chat brief** 档交付（单人低风险、仅一个实质决策、未要求计划文件，故不写 `docs/plans/`、不派子代理、不跑置信检查/文档审查；因触及公开 API 契约面，深度按规则由 Lightweight 调整为 Standard，已补齐边界分析）。\n\n## 范围声明（可随时纠正，本轮按你的明确授权自主完成，未阻塞等待）\n\n为 `GET /entries` 规划 `page`/`limit` 分页：不带分页参数时保持现状（全量裸数组，兼容不变），带任一分页参数时返回带元数据的信封响应。不含：排序/过滤参数、游标分页、POST 校验、持久化。外部调研已跳过（分页为成熟模式，本地唯一相关源就是目标文件本身）。\n\n**Call outs：**\n- 分页机制用页码偏移（`page`/`limit`）而非游标——当前条目只增不删、按插入序返回，偏移量对已有数据天然稳定；将来若增加删除能力需迁移为 `after=\u003cid\u003e` 游标式。\n- 兼容策略取\"选择性加入\"（无参数=旧行为）；另一合理选项是统一改信封响应（更简洁但破坏现有调用方）。\n\n## 改动摘要及原因\n\n单文件 `src/server.js`（`/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-515682573/src/server.js`）：\n\n- 新增 `parsePagination(url)` 辅助函数与 `DEFAULT_LIMIT=20`、`MAX_LIMIT=100` 常量：`page`/`limit` 任一出现即进入分页模式，二者可省略各自取默认值；校验只接受纯数字字面量（拒绝 `abc`、`1.5`、空串、`0x10`），`page≥1`、`1≤limit≤100`，违规返回 400 + JSON 错误体。\n- `GET` 分支由精确匹配 `req.url` 改为解析 URL：`/entries?…` 现在能命中处理器（这本身就是特性所需）；`POST` 分支保持原样不动（超出本范围）。\n- 分页响应为信封 `{ data, page, limit, total, hasMore }`；越界页返回 200 + 空 `data`（业界常规，不作为错误）。\n\n## 实现单元与测试预期\n\n单元 1（唯一单元）：`src/server.js` — GET /entries 分页。验证场景（fixture 无测试框架，由执行 owner 以 curl 或临时脚本执行）：\n1. 无参数：0 条 → `[]`；N 条 → 裸数组 N 条（形状不变）\n2. `?page=1\u0026limit=2`（5 条）→ 信封，`data` 为前 2 条、`total=5`、`hasMore=true`\n3. 末页 `?page=3\u0026limit=2` → `data` 1 条、`hasMore=false`\n4. 越界 `?page=99` → 200、`data=[]`、`hasMore=false`\n5. 仅 `?limit=2` → `page` 默认 1，进入信封模式\n6. 非法输入 `?page=0 / ?page=abc / ?limit=0 / ?limit=101 / ?limit=1.5` → 400 + `{\"error\":...}`\n7. 分页期间新增 POST：已有页内容不变、`total` 增长（只增场景下偏移稳定）\n\n## 边界披露与交接状态（重要）\n\n- **示例代码已按你的明确指令写入 `src/server.js`**。这覆盖了 spec-plan 默认的“规划不改源码”边界——仅此一项动作，依据是你在本轮的任务指令（用户任务方向指令为该 skill 证据次序的第一优先级）。代码仅通过 `node --check` 语法解析，**未启动服务、未运行任何实现测试，属未验证的计划示例，不构成已完成的实施**。\n- **未做任何提交**：git 仅有基线提交 `6fed331`（由 `prepare-eval.cjs` 产生），`src/server.js` 的改动保留在工作区未提交、未落地，符合\"no task commit or landing\"约束。\n- **实施交接阻塞**：本宿主 `.claude/skills/` 下只安装了 `spec-plan`，没有 `spec-work`，也无已运行的执行 caller 或已确认的原生 goal 接口，因此本简案无法真实交给执行 owner。恢复路径：(a) 安装并调用 `/spec-work`（本简案可直接作为其会话内输入）；(b) 你明确授权本会话执行验证（启动服务、跑上述场景）。在此之前，实施与验证状态为**未开始**。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "r2-half-formed-what",
+      "title": "R2变体:半成品 WHAT 不得假设硬闯可执行计划",
+      "status": "PASS",
+      "duration_ms": 186661,
+      "turns": 5,
+      "input_tokens": 43312,
+      "output_tokens": 3666,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 5,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/spec-plan/evals/fixtures/scripts/check-r2-asks.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 3,
+          "failed": 0,
+          "total": 3,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-plan skill 已安装，请按它工作。）\n我有个半成品的想法:给 App 加个激励系统,大概知道要什么但细节\n完全没定,直接给我出能开工的实施计划。\n",
+      "response": "源码勘察完成。现在按 Phase 0.4（planning bootstrap）→ 0.5（产品决策分拣）推进。\n\n**勘察结论**：App 全貌是 `src/server.js` 共 25 行——纯 HTTP API（`POST/GET /entries`）、内存数组存储、无持久化、无用户体系、无前端、无测试。`prepare-eval.cjs` 是评测脚手架，不属于 App 源码，排除在规划范围外。\n\n你的想法是半成品，按 spec-plan 的规则，**有一个会实质改变计划走向的产品分叉必须由你定**（我不能替你默默决定产品行为）。只需要回答这一个问题：\n\n---\n\n**激励系统的核心方向是什么？**（单选）\n\n| 选项 | 内容 | 对计划的影响 |\n|---|---|---|\n| **A. 记账习惯向（推荐）** | 积分 + 连续记账天数：当日记账得分，连续天数有加成 | 最贴合现有数据（entries 已有 ts），新增概念最少，可最快开工 |\n| **B. 预算自律向** | 设预算周期，低于预算得奖励 | 需要先补“预算”这个不存在的基础功能，范围明显变大 |\n| **C. 成就徽章向** | 里程碑徽章（首笔记账、累计 N 笔等） | 偏静态展示，激励反馈弱，但实现最简单 |\n| **D. A+C 轻量组合** | 积分/连击为主 + 少量里程碑徽章 | 比 A 多一层徽章规则，范围仍可控 |\n| **E. 你来定合理默认** | 我选一个推荐形态，把关键选择记为**显式假设**写进计划，你可以之后推翻 | 不再追问，直接出完整计划 |\n\n两点边界我先按默认处理（会在计划的假设区显式记录）：激励为**纯虚拟**（积分/徽章，不涉及真实货币和兑换法务）；仍是**单用户 demo、纯 API 无前端**。\n\n另外一句实话：如果你脑子里想的其实是多用户营销激励（拉新返现、邀请奖励那类），那是产品形态级的分歧，和当前这个单用户记账 demo 差距很大——那种情况建议先跑 `/spec-brainstorm` 把需求理清，再回来出实施计划。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 719441,
+  "judge_tokens": 0,
+  "overall_tokens": 719441
+}

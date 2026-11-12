@@ -1,0 +1,33 @@
+{
+  "artifact_type": "generated",
+  "files": [
+    {
+      "path": "plan-return-revised/result.json",
+      "sha256": "6356ea0459185c73d6df9a46f9508aa8a9efd5f639a545401ae896e72d19a992"
+    },
+    {
+      "path": "plan-return-revised/caller/grading.json",
+      "sha256": "bce9485a52461223fd3a4048ff8c10be86466c5631ace8e1bcd494aa0b433aa4"
+    },
+    {
+      "path": "plan-return-revised/blocked/grading.json",
+      "sha256": "ef69ee722e54e92679978ac7493aac627ae9f80ba05183a95dc3a3364f3a30d1"
+    },
+    {
+      "path": "plan-return-revised/blocked/transcript.jsonl",
+      "sha256": "a8614178a1445628fb941f08cb204e75056056ab2946a0249ababad36f22211c"
+    },
+    {
+      "path": "plan-return-revised/blocked/response.md",
+      "sha256": "d48396b1b070b90757487fc9aa4cdcf5d31fd6dacabc20fec5da6ba8bae7e16f"
+    },
+    {
+      "path": "plan-return-revised/blocked/plan.md",
+      "sha256": "c0c44a8389b57feac8919f7ad5293f35ddbb67fdd8bf7860a214166e5ea3dea3"
+    },
+    {
+      "path": "plan-return-revised/runner.log",
+      "sha256": "4307194a84df8b04dc2011cf34e0896038e2f0d54b87a152518aa1606eded592"
+    }
+  ]
+}

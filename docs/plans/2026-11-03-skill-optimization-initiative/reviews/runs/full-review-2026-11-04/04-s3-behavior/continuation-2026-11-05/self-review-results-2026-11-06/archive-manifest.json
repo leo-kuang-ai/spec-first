@@ -1,0 +1,44 @@
+{
+  "files": [
+    {
+      "source": "/private/tmp/plan-self-review-20261106-_94kb7ic/runs/candidate/iteration-1/result.json",
+      "archive": "result.json",
+      "sha256": "6a7e28c1b1a31f86a473bd76d151424215a3fb3f989c207a41fe14d3c9e98e6e"
+    },
+    {
+      "source": "/private/tmp/plan-self-review-20261106-_94kb7ic/runs/candidate/iteration-1/implementation-routes-work/with_skill/grading.json",
+      "archive": "implementation-routes-work/grading.json",
+      "sha256": "f31715e04ff536f4cdef5d43ab5f6d4c1645b22ff81d7dceb864c9664c2ed5b3"
+    },
+    {
+      "source": "/private/tmp/plan-self-review-20261106-_94kb7ic/runs/candidate/iteration-1/implementation-routes-work/with_skill/outputs/response.md",
+      "archive": "implementation-routes-work/response.md",
+      "sha256": "fd7cdad4da5ff9f970464d31e4fb6848055be6ed04e06791d4d05ad28e20fd21"
+    },
+    {
+      "source": "/private/tmp/plan-self-review-20261106-_94kb7ic/runs/candidate/iteration-1/implementation-routes-work/with_skill/outputs/agent/run/852dbfa6-2e11-41f6-ae70-24b0858e1618.jsonl",
+      "archive": "implementation-routes-work/transcript.jsonl",
+      "sha256": "49b6382f361901712c7ce4e8059fe89d724e9ffbfe0ae657586ea0c119a95af3"
+    },
+    {
+      "source": "/private/tmp/plan-self-review-20261106-_94kb7ic/runs/candidate/iteration-1/implementation-owner-not-authorized/with_skill/grading.json",
+      "archive": "implementation-owner-not-authorized/grading.json",
+      "sha256": "142c8070ddbdaaa870e879e26f09a3081d31ed9295d3b1c6642b27238006c81c"
+    },
+    {
+      "source": "/private/tmp/plan-self-review-20261106-_94kb7ic/runs/candidate/iteration-1/implementation-owner-not-authorized/with_skill/outputs/response.md",
+      "archive": "implementation-owner-not-authorized/response.md",
+      "sha256": "15f6dfbf62d7fa031d4383b5c91f850b60cdb0bd5c91ed4ede9f60c9662f6775"
+    },
+    {
+      "source": "/private/tmp/plan-self-review-20261106-_94kb7ic/runs/candidate/iteration-1/implementation-owner-not-authorized/with_skill/outputs/agent/run/29b71844-3360-4039-a64d-a6031090e20f.jsonl",
+      "archive": "implementation-owner-not-authorized/transcript.jsonl",
+      "sha256": "fe0f479f0f32430a8153d9ac20ac368f89d5fc80a329d0fabc0fdae96006d54c"
+    },
+    {
+      "source": "/private/tmp/claude-501/-Users-kuang-xiaobu-spec-first/5d43189d-945c-4cd5-9a03-8a20f89bfd94/tasks/bwjrgfeer.output",
+      "archive": "runner.log",
+      "sha256": "bbc3ca1ef820dcc12f312e10275cff52de46767a761b2b85d41c1acb05b549cb"
+    }
+  ]
+}

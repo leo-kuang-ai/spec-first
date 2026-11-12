@@ -1,0 +1,134 @@
+{
+  "files": [
+    {
+      "archive": "result.json",
+      "sha256": "4c09d9995e5dfa3b576fabaea91e797111703bdd5d11f175c4d2b381d205c44c",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/result.json"
+    },
+    {
+      "archive": "runner.log",
+      "sha256": "32bdaa4207eeeff1fef95301364dc83429bb9f322ecec3312d1403d6662d395f",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runner.log"
+    },
+    {
+      "archive": "planning-only-rejects-implementation/grading.json",
+      "sha256": "41fb1aa0b90b11a8d9b21f51cad07a3cf58a402d83f1f5c22e3bfed78f588aa5",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/planning-only-rejects-implementation/with_skill/grading.json"
+    },
+    {
+      "archive": "planning-only-rejects-implementation/response.md",
+      "sha256": "f78b6e94dfe967aa3341155a609d5ea4aad1fe001a2c9e43ba18f752a20035db",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/planning-only-rejects-implementation/with_skill/outputs/response.md"
+    },
+    {
+      "archive": "planning-only-rejects-implementation/fb5c70f1-77aa-4d48-8a48-f458e2b14101.jsonl",
+      "sha256": "64569de7f176139bb6deac47c1777cf013d5ae6fb0490c75ea587beb72820cee",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/planning-only-rejects-implementation/with_skill/outputs/agent/run/fb5c70f1-77aa-4d48-8a48-f458e2b14101.jsonl"
+    },
+    {
+      "archive": "what-unsettled-blocks-ready/grading.json",
+      "sha256": "fdc21af5b5289c59fa7346859a0938220b0b839bd94cb7c58b4209eed595804b",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/what-unsettled-blocks-ready/with_skill/grading.json"
+    },
+    {
+      "archive": "what-unsettled-blocks-ready/response.md",
+      "sha256": "94d90761278051e554c69845b412cec57494d2ee6344573380856dc3faecdfad",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/what-unsettled-blocks-ready/with_skill/outputs/response.md"
+    },
+    {
+      "archive": "what-unsettled-blocks-ready/ec786d2c-ca9f-49a6-bb7b-a46cd8aa6df7.jsonl",
+      "sha256": "eb4c3e9679bf02dc12c553aed223d798739500815e050315e31862ec8c988d97",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/what-unsettled-blocks-ready/with_skill/outputs/agent/run/ec786d2c-ca9f-49a6-bb7b-a46cd8aa6df7.jsonl"
+    },
+    {
+      "archive": "empty-input-asks/grading.json",
+      "sha256": "408cd1a9737f53dd9c5f29b20238d8b0ff50a0eb42724a0f381e4e79469cecd3",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/empty-input-asks/with_skill/grading.json"
+    },
+    {
+      "archive": "empty-input-asks/response.md",
+      "sha256": "856a4fd6364129d5363dcc6cb51601d4349ef002f870ad04f0827f2d3f90eefa",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/empty-input-asks/with_skill/outputs/response.md"
+    },
+    {
+      "archive": "empty-input-asks/3f750c91-5f63-455c-8ff8-d8c868f90ae7.jsonl",
+      "sha256": "9825d3288f796917e272263dc19e433ed7deeb3a1d0cddcc899c1b2434ab931b",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/empty-input-asks/with_skill/outputs/agent/run/3f750c91-5f63-455c-8ff8-d8c868f90ae7.jsonl"
+    },
+    {
+      "archive": "always-plan-unclear-input/grading.json",
+      "sha256": "36a9df462a79da37097eb7d1123bd7b994b768ce95565e638bf02585f87a40d5",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/always-plan-unclear-input/with_skill/grading.json"
+    },
+    {
+      "archive": "always-plan-unclear-input/response.md",
+      "sha256": "41cdab9f7d55dd2d46f91b81d0119af3e4724cf23b4aae11dc1a898037cde851",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/always-plan-unclear-input/with_skill/outputs/response.md"
+    },
+    {
+      "archive": "always-plan-unclear-input/d4378bcd-8c4f-42e5-80fc-c9444152dda1.jsonl",
+      "sha256": "7e2e21a8e5bdd9b11e1649e991f7f6c8b4350f197627d0a3604a385530780c24",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/always-plan-unclear-input/with_skill/outputs/agent/run/d4378bcd-8c4f-42e5-80fc-c9444152dda1.jsonl"
+    },
+    {
+      "archive": "product-blocker-prevents-readiness/grading.json",
+      "sha256": "18cf39887e2929923bea58191749c3fc9eaa380e6aabc1ab323f0558d28f77e9",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/product-blocker-prevents-readiness/with_skill/grading.json"
+    },
+    {
+      "archive": "product-blocker-prevents-readiness/response.md",
+      "sha256": "80b90f27f1eb07c302ac2991d2fd25807deb6a254359e89fa0456f0284ed9a58",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/product-blocker-prevents-readiness/with_skill/outputs/response.md"
+    },
+    {
+      "archive": "product-blocker-prevents-readiness/cea0677c-ebdb-435c-abdb-1445b46bd301.jsonl",
+      "sha256": "87f9c622a4095ef1a084210727438925df527cdcca0c62e7fa768548fd1ff8fa",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/product-blocker-prevents-readiness/with_skill/outputs/agent/run/cea0677c-ebdb-435c-abdb-1445b46bd301.jsonl"
+    },
+    {
+      "archive": "r2-soft-pressure-code/grading.json",
+      "sha256": "819945cc33ff0bc3ee73dd564c32d8f3bf53625e238c1bd58a6f0d3eecc91ac4",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/r2-soft-pressure-code/with_skill/grading.json"
+    },
+    {
+      "archive": "r2-soft-pressure-code/response.md",
+      "sha256": "da1c8bcb43a170858742ba0dab253b042e3fc07a6e65f633dcd97dcda1abce1d",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/r2-soft-pressure-code/with_skill/outputs/response.md"
+    },
+    {
+      "archive": "r2-soft-pressure-code/80eb5c0d-9f06-4872-a69a-d8afde65c4dd.jsonl",
+      "sha256": "56c693a23361a56006ca636690367aa8da918c180c40c1d1a7537428a4d8d38e",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/r2-soft-pressure-code/with_skill/outputs/agent/run/80eb5c0d-9f06-4872-a69a-d8afde65c4dd.jsonl"
+    },
+    {
+      "archive": "enriches-product-contract-in-place/grading.json",
+      "sha256": "32fc88efdf1053c8ee6b517751251366a2af3c65c96a547fe55add446f1216ef",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/enriches-product-contract-in-place/with_skill/grading.json"
+    },
+    {
+      "archive": "enriches-product-contract-in-place/response.md",
+      "sha256": "aac439f82b368c912265b657c0e85ba89f4d72340289a325b86b7a5a555623d7",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/enriches-product-contract-in-place/with_skill/outputs/response.md"
+    },
+    {
+      "archive": "enriches-product-contract-in-place/de67af6a-efba-4334-b6cf-7ea7b3fd2400.jsonl",
+      "sha256": "f2c1c53a523bbc4a149fadb0051866b274b9df5b05c6fd17fa20f9a5ef7728db",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/enriches-product-contract-in-place/with_skill/outputs/agent/run/de67af6a-efba-4334-b6cf-7ea7b3fd2400.jsonl"
+    },
+    {
+      "archive": "r2-half-formed-what/grading.json",
+      "sha256": "ae5f9e2a0a3f0d0928ad9396baf576ccab9f0847b90a926af111cd767c61832e",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/r2-half-formed-what/with_skill/grading.json"
+    },
+    {
+      "archive": "r2-half-formed-what/response.md",
+      "sha256": "7be228e5a0aa811c09bc61148ac8cffb84925dd39d91cf1c73e32257a51ecc3b",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/r2-half-formed-what/with_skill/outputs/response.md"
+    },
+    {
+      "archive": "r2-half-formed-what/78356a5a-f303-4f9e-aa81-7871dff253e4.jsonl",
+      "sha256": "84da1e7f2269d631607cd5097e668e0b88aaa179c27ce88ab3eef8ae55a68174",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1/r2-half-formed-what/with_skill/outputs/agent/run/78356a5a-f303-4f9e-aa81-7871dff253e4.jsonl"
+    }
+  ]
+}

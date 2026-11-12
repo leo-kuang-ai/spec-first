@@ -1,0 +1,140 @@
+─ spec-first v1.15.3
+已选择宿主运行时: Claude Code, Codex, Cursor, Kiro, Qoder, OpenCode, ZCode, Pi
+预览: spec-first init (claude)
+预览: spec-first init (codex)
+预览: spec-first init (cursor)
+预览: spec-first init (kiro)
+预览: spec-first init (qoder)
+预览: spec-first init (opencode)
+预览: spec-first init (zcode)
+预览: spec-first init (pi)
+预览覆盖: targets=1 hosts=8 target_host_groups=8 detail_budget=100
+写入内容对比（按宿主计）: 不变 4971 · 将更新 24 · 新增 0；删除/重建操作 241（含重建同路径，非最终删除文件数）
+全局 developer profile 预览:
+  action: preserve
+  path: /Users/kuang/.spec-first/.developer
+  name: tester
+  lang: zh
+  effect: no-op
+将先执行 managed hard reset，再重新生成 runtime assets（检测到当前 runtime drift）。
+破坏性预览: 包含 managed runtime reset/removal 操作。
+删除 paths (355):
+目标明细: host=claude kind=project label=/Users/kuang/xiaobu/spec-first root=/Users/kuang/xiaobu/spec-first reset=current_runtime_drift
+  - remove_file: .claude/commands/spec-app-consistency-audit.md
+  - remove_file: .claude/commands/spec-brainstorm.md
+  - remove_file: .claude/commands/spec-code-review.md
+  - remove_file: .claude/commands/spec-compound-refresh.md
+  - remove_file: .claude/commands/spec-compound.md
+  - remove_file: .claude/commands/spec-debug.md
+  - remove_file: .claude/commands/spec-doc-review.md
+  - remove_file: .claude/commands/spec-dogfood.md
+  - remove_file: .claude/commands/spec-ideate.md
+  - remove_file: .claude/commands/spec-optimize.md
+  - remove_file: .claude/commands/spec-plan.md
+  - remove_file: .claude/commands/spec-polish.md
+  - remove_file: .claude/commands/spec-prd.md
+  - remove_file: .claude/commands/spec-runtime-setup.md
+  - remove_file: .claude/commands/spec-work.md
+  - remove_file: .claude/commands/spec-write-skill.md
+  - remove_file: .claude/commands/spec-write-tasks.md
+  - remove_dir: .claude/skills/autoresearch
+  - remove_dir: .claude/skills/spec-commit
+  - remove_dir: .claude/skills/spec-commit-push-pr
+  - remove_dir: .claude/skills/spec-explain
+  - remove_dir: .claude/skills/spec-handoff
+  - remove_dir: .claude/skills/spec-lfg
+  - remove_dir: .claude/skills/spec-pov
+  - remove_dir: .claude/skills/spec-product-pulse
+  - remove_dir: .claude/skills/spec-project-rules
+  - remove_dir: .claude/skills/spec-promote
+  - remove_dir: .claude/skills/spec-prototype
+  - remove_dir: .claude/skills/spec-resolve-pr-feedback
+  - remove_dir: .claude/skills/spec-riffrec-feedback-analysis
+  - remove_dir: .claude/skills/spec-rule-miner
+  - remove_dir: .claude/skills/spec-simplify-code
+  - remove_dir: .claude/skills/spec-strategy
+  - remove_dir: .claude/skills/spec-sweep
+  - remove_dir: .claude/skills/spec-test-browser
+  - remove_dir: .claude/skills/spec-test-xcode
+  - remove_dir: .claude/skills/spec-worktree
+  - remove_dir: .claude/skills/using-spec-first
+  - remove_dir: .claude/spec-first/workflows/spec-app-consistency-audit
+  - remove_dir: .claude/spec-first/workflows/spec-brainstorm
+  - remove_dir: .claude/spec-first/workflows/spec-code-review
+  - remove_dir: .claude/spec-first/workflows/spec-compound
+  - remove_dir: .claude/spec-first/workflows/spec-compound-refresh
+  - remove_dir: .claude/spec-first/workflows/spec-debug
+  - remove_dir: .claude/spec-first/workflows/spec-doc-review
+  - remove_dir: .claude/spec-first/workflows/spec-dogfood
+  - remove_dir: .claude/spec-first/workflows/spec-ideate
+  - remove_dir: .claude/spec-first/workflows/spec-optimize
+  - remove_dir: .claude/spec-first/workflows/spec-plan
+  - remove_dir: .claude/spec-first/workflows/spec-polish
+  - remove_dir: .claude/spec-first/workflows/spec-prd
+  - remove_dir: .claude/spec-first/workflows/spec-runtime-setup
+  - remove_dir: .claude/spec-first/workflows/spec-work
+  - remove_dir: .claude/spec-first/workflows/spec-write-skill
+  - remove_dir: .claude/spec-first/workflows/spec-write-tasks
+目标明细: host=codex kind=project label=/Users/kuang/xiaobu/spec-first root=/Users/kuang/xiaobu/spec-first reset=current_runtime_drift
+  - remove_dir: .agents/skills/autoresearch
+  - remove_dir: .agents/skills/spec-app-consistency-audit
+  - remove_dir: .agents/skills/spec-brainstorm
+  - remove_dir: .agents/skills/spec-code-review
+  - remove_dir: .agents/skills/spec-commit
+  - remove_dir: .agents/skills/spec-commit-push-pr
+  - remove_dir: .agents/skills/spec-compound
+  - remove_dir: .agents/skills/spec-compound-refresh
+  - remove_dir: .agents/skills/spec-debug
+  - remove_dir: .agents/skills/spec-doc-review
+  - remove_dir: .agents/skills/spec-dogfood
+  - remove_dir: .agents/skills/spec-explain
+  - remove_dir: .agents/skills/spec-handoff
+  - remove_dir: .agents/skills/spec-ideate
+  - remove_dir: .agents/skills/spec-lfg
+  - remove_dir: .agents/skills/spec-optimize
+  - remove_dir: .agents/skills/spec-plan
+  - remove_dir: .agents/skills/spec-polish
+  - remove_dir: .agents/skills/spec-pov
+  - remove_dir: .agents/skills/spec-prd
+  - remove_dir: .agents/skills/spec-product-pulse
+  - remove_dir: .agents/skills/spec-project-rules
+  - remove_dir: .agents/skills/spec-promote
+  - remove_dir: .agents/skills/spec-prototype
+  - remove_dir: .agents/skills/spec-resolve-pr-feedback
+  - remove_dir: .agents/skills/spec-riffrec-feedback-analysis
+  - remove_dir: .agents/skills/spec-rule-miner
+  - remove_dir: .agents/skills/spec-runtime-setup
+  - remove_dir: .agents/skills/spec-simplify-code
+  - remove_dir: .agents/skills/spec-strategy
+  - remove_dir: .agents/skills/spec-sweep
+  - remove_dir: .agents/skills/spec-test-browser
+  - remove_dir: .agents/skills/spec-test-xcode
+  - remove_dir: .agents/skills/spec-work
+  - remove_dir: .agents/skills/spec-worktree
+  - remove_dir: .agents/skills/spec-write-skill
+  - remove_dir: .agents/skills/spec-write-tasks
+  - remove_dir: .agents/skills/using-spec-first
+目标明细: host=cursor kind=project label=/Users/kuang/xiaobu/spec-first root=/Users/kuang/xiaobu/spec-first reset=current_runtime_drift
+  - remove_dir: .cursor/skills/autoresearch
+  - remove_dir: .cursor/skills/spec-commit
+  - remove_dir: .cursor/skills/spec-commit-push-pr
+  - remove_dir: .cursor/skills/spec-explain
+关键写入 paths (32):
+生成路径 (6119):
+预览省略: targets=0 target_host_groups=5 paths=6409
+
+用户级语言同步:
+  - codex: noop (ready)
+    path: ~/.codex/AGENTS.md
+    reason_code: already-current
+  - claude: noop (ready)
+    path: ~/.claude/CLAUDE.md
+    reason_code: already-current
+预览模式：不会写入用户级 instruction 文件或全局 developer profile。
+不会修改文件。
+
+Warning [current_runtime_drift]: 检测到当前 runtime drift；确认后将执行 managed hard reset 并重建（原因类别见下方分宿主预览）。
+Warning [cursor_generated_runtime_preview]: Cursor runtime 已生成，但本机尚未验证 skill 加载；生成的 skills 可能不会被 Cursor 加载。
+Warning [qoder_hook_activation_unverified]: Qoder hook 协议已按 qodercli 1.0.41 evidence baseline 确认，但 hook 实际执行未验证；settings entries 保持未启用，SessionStart 与 PRD guard 当前不生效。
+Warning [opencode_generated_runtime_preview]: OpenCode runtime 已生成，但当前版本的 command/skill loader 未验证；支持声明保持 generated_runtime_preview。
+Warning [pi_generated_runtime_preview]: Pi 支持为 preview（skills 发现与 trust 门控已在 pi 0.85.0 真机验证；AGENTS.md 注入与 /skill: 调用为文档级验证）。激活门槛：在项目内运行 pi 并确认信任提示（或 pi -a）；未信任时项目 skills 保持静默。

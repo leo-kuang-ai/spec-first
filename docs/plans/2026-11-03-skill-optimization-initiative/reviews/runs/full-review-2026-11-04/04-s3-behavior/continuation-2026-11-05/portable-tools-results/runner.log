@@ -1,0 +1,23 @@
+📋 Loading configuration...
+level=INFO msg="Config: loading eval.yaml from /var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/spec-plan/evals/eval.yaml"
+✅ Loaded 2 case(s) | engine: claude_code | model: zhipu/glm-5.3
+
+🔑 Loading credentials...
+✅ Credentials ready
+
+🚀 Running evaluation (2 cases)
+level=WARNING msg="ANTHROPIC_API_KEY not set, claude-code will rely on existing login state if available"
+   ⏳ [1/2] implementation-routes-work: 已授权完整任务中的规划产出者返回已有执行 caller...
+level=WARNING msg="stderr: Switched to a new branch 'main'\n"
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"glm-5.3\",\"query_source\":\"sdk\"}\n"
+   ✅ [1/2] implementation-routes-work: PASS (100.0%)
+   ⏳ [2/2] implementation-owner-not-authorized: 执行入口未授权时保留规划并报告交接阻塞...
+level=WARNING msg="stderr: Switched to a new branch 'main'\n"
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"glm-5.3\",\"query_source\":\"sdk\"}\n"
+   ✅ [2/2] implementation-owner-not-authorized: PASS (100.0%)
+
+📊 Generating reports...
+✅ Reports saved to /var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/runs/iteration-1
+
+────────────────────────────────────────
+📋 Results: 2 passed, 0 failed, 0 errors

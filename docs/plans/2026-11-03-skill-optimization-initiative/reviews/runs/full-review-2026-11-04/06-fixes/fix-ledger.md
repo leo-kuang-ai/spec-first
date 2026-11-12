@@ -1,5 +1,9 @@
 # 修复台账（优化阶段）
 
+> FIX-069 最新：同一冻结版本两批十例 **8 PASS、2 FAIL、0 ERROR**；产品阻塞与 WHAT 未定的真实语义缺口仍 open。intake bootstrap 继续指引收敛至 Phase 0.5 授权 owner，两套合同25/25、fresh-source片段复核通过，两例单变量候选已2 PASS（350308 ms、107571 tokens），语义复核未复现两项违规；候选其余8例已6 PASS/2 FAIL，全套仍8 PASS/2 FAIL/0 ERROR（2885728 ms、827012 tokens）；blocked非法JSON/绝对路径、soft-pressure实际改源码，未登记整体行为修复，无后台运行。历史154/155不变。见 [归因及候选](../04-s3-behavior/continuation-2026-11-05/bootstrap-owner-2026-11-07.md)。
+
+> FIX-069 / 2026-11-07 正式用例能力适配：**2 PASS、0 FAIL、0 ERROR**（833561 ms、236709 tokens），原 900/600 秒预算内完成。两例仅一次准备 shell、均写 Durable；9 项原始证据 SHA 相符。接受不预设 Glob/Grep 可用性的用例修订，judge 未放宽；测试替代路径、未知事实否定推断及 readiness 仍有语义缺口，不登记整体修复。历史 154/155 不变、无后台运行；完整十例及真实 runtime 未执行。见 [本轮结果](../04-s3-behavior/continuation-2026-11-05/portable-tools-2026-11-07.md)。
+
 > FIX-069 / 2026-11-07 对账（11-06 实验）：能力提示对照 **2 PASS、1 ERROR**（1237375 ms、245359 tokens），正式用例与 judge 未改，不登记为 Skill 版本提升。research 示例去掉“已发现消费者”的额外前提；单变量候选 **1 PASS**（336683 ms、81133 tokens），读取修订后仍选 Chat brief，执行 owner 可用性推断也超出证据。仅保留表达纠错，行为未验收；caller 的 HTTP 证明范围与摘要转录问题仍保留。完整十例、真实 runtime 同步未执行，历史 **154/155** 不变。最新四次运行原始产物及 SHA 分别见 [诊断结果索引](../04-s3-behavior/continuation-2026-11-05/capability-control-2026-11-06.md)。
 
 > FIX-069 / 2026-11-06：降级自审单句候选已完成两例，0 PASS、2 FAIL、0 ERROR（780890 ms、225315 tokens）；已有局部语义信号但仍有授权与验证缺口，已撤回该句，未启动完整十例。请求形状确认缺 Glob/Grep，原 FAIL 不翻绿。最新八宿主 dry-run profile preserve/no-op，仍含 managed reset；临时 HOME/仓库生成退出 0、六份普通投射文件与 source 一致，真实 runtime 未同步。证据：[续作诊断](../04-s3-behavior/continuation-2026-11-05/self-review-followup-2026-11-06.md)。

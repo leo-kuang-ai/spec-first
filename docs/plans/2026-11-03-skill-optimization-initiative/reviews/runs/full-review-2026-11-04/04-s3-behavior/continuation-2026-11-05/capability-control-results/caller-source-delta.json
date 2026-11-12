@@ -1,0 +1,12 @@
+{
+  "baseline": "/private/tmp/plan-feasibility-20261105/candidate/spec-plan",
+  "candidate": "/private/tmp/plan-capability-control-fansezop/spec-plan",
+  "purpose": "只检验实际工具能力的显式提示，不改变Skill或判据",
+  "changes": [
+    {
+      "path": "evals/cases/implementation-routes-work.yaml",
+      "before": "81df192a18ce6fa18f200f78d45f3d7d05bf2cba89559eb3928aa7543f9a50c3",
+      "after": "033b5f6b4a302058f6ebc4b157e6c34d4f3a3486ae85f04badd132b4c79d44dd"
+    }
+  ]
+}

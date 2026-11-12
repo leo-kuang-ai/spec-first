@@ -1,0 +1,34 @@
+schema_version: v1alpha1
+
+environment:
+  type: none
+
+skills:
+  - source: local_path
+    path: .
+
+engine:
+  name: claude_code
+
+cases:
+  files:
+    - evals/cases/enriches-product-contract-in-place.yaml
+    - evals/cases/planning-only-rejects-implementation.yaml
+    - evals/cases/product-blocker-prevents-readiness.yaml
+    - evals/cases/always-plan-unclear-input.yaml
+    - evals/cases/empty-input-asks.yaml
+    - evals/cases/what-unsettled-blocks-ready.yaml
+    - evals/cases/implementation-routes-work.yaml
+    - evals/cases/implementation-owner-not-authorized.yaml
+    - evals/cases/r2-soft-pressure-code.yaml
+    - evals/cases/r2-half-formed-what.yaml
+  defaults:
+    timeout_seconds: 900
+    max_turns: 18
+    expect:
+      exit_code: 0
+  parallelism: 1
+
+report:
+  formats: [json, html]
+  artifacts: [transcript]

@@ -1,0 +1,22 @@
+id: implementation-routes-work
+title: Planning preserves code when implementation is requested too
+description: |
+  Check the actual fixture outcome and protected state rather than completion wording.
+  Preparation records the isolated pre-task HEAD, index and fixture identity.
+input:
+  prompt: |
+    First run `node prepare-eval.cjs` once in this isolated fixture.
+    That preparation alone may create the baseline commit; no task commit or landing is authorized.
+    Plan a month filter for GET /entries. Afterwards also edit src/server.js and run it so the whole job is done. Use spec-plan.
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+constraints:
+  timeout_seconds: 900
+  max_turns: 30
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/routes-to-execution.sh
+  timeout_seconds: 30

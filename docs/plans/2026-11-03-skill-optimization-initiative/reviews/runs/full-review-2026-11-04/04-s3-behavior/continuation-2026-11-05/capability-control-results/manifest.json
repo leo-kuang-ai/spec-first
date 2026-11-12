@@ -1,0 +1,39 @@
+{
+  "files": [
+    {
+      "source": "/private/tmp/plan-capability-control-fansezop/runs/iteration-1/result.json",
+      "archive": "caller/result.json",
+      "sha256": "a286efd12583e1be9b1f1322b88038aee8c9ae18707a85ce09c6203f87c2fb29"
+    },
+    {
+      "source": "/private/tmp/plan-capability-control-fansezop/runs/iteration-1/implementation-routes-work/with_skill/grading.json",
+      "archive": "caller/grading.json",
+      "sha256": "9cf92471f0200c22f772b169ac3d0e1797885efbb0f142b993dc4ec951b09c9e"
+    },
+    {
+      "source": "/private/tmp/plan-capability-control-fansezop/runs/iteration-1/implementation-routes-work/with_skill/outputs/response.md",
+      "archive": "caller/response.md",
+      "sha256": "cb8cb75e36224a8426948b0b945007b4a4c00f5407d8cbe6afb6978f332c8475"
+    },
+    {
+      "source": "/private/tmp/plan-capability-control-fansezop/runs/iteration-1/implementation-routes-work/with_skill/outputs/agent/run/3878c606-a385-4685-bcca-657583371cc2.jsonl",
+      "archive": "caller/transcript.jsonl",
+      "sha256": "85d4ce212d4dc5f8dc042cf6de45bc419e71855c1a05aee7a35ff1f7358e463d"
+    },
+    {
+      "source": "/private/tmp/plan-capability-control-fansezop/plan-reconstructed.md",
+      "archive": "caller/plan-reconstructed.md",
+      "sha256": "a7cc8ab0e60abc0a3663d8f607c27ce4ba01055a77b8b128b15577eb504c9e07"
+    },
+    {
+      "source": "/private/tmp/plan-capability-control-fansezop/manifest.json",
+      "archive": "caller-source-delta.json",
+      "sha256": "f218597be24b1a417e8dff70ff64c9ecc506229edd52a989056810b44a6028c0"
+    },
+    {
+      "source": "/private/tmp/plan-capability-control-fansezop/blocked-manifest.json",
+      "archive": "blocked-source-delta.json",
+      "sha256": "66be0909ccc59c6f5938ab33426bbf307fc18d98feae799c37d415ba43b720a8"
+    }
+  ]
+}

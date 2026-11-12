@@ -1,0 +1,17 @@
+{
+  "artifact_type": "generated",
+  "scope": "补漏后最终源码指纹；不是原始 live 版本或行为通过证明",
+  "created_at": "2026-11-05T16:48:35.706373+08:00",
+  "files": {
+    "skills/spec-plan/SKILL.md": "479bd4e514b39a11f800e4b8a29a302c57e6225ba429d9dea2609051d1517ee0",
+    "skills/spec-plan/references/output-contracts.md": "1b3f936051982bc93cafabb6ed630dcdd2472e588a715e74fc049e0d609bb8d4",
+    "skills/spec-plan/references/plan-handoff.md": "2e7821ff71a35cd83ed08198bb2afcc6bb220450a18f5ac902794a9793761192",
+    "skills/spec-plan/evals/eval.yaml": "81cf7368094507dac5ef3014681743f806e3cdac110fa130c272bdb5963eed93",
+    "skills/spec-plan/evals/cases/implementation-routes-work.yaml": "81df192a18ce6fa18f200f78d45f3d7d05bf2cba89559eb3928aa7543f9a50c3",
+    "skills/spec-plan/evals/cases/implementation-owner-not-authorized.yaml": "a4c4c784345f22884b06997021565c9c94254c718d6b16c0c42a9402e8fc494c",
+    "scripts/evals/plan-handoff-checks.cjs": "ae31515839147729fdf608864d951b72c25368eb09d6afc9b3ef8c5a130166b4",
+    "scripts/evals/build-outcome-judges.cjs": "957732c4b42af24b6e4630e70840793d9eb8bd842156c63f6d8e5f34544cf9be",
+    "skills/spec-plan/evals/fixtures/scripts/routes-to-execution.sh": "909a0e6237cb64c87457529b734b5bd6e0201781d16b2257c1831758bcfd1b38",
+    "skills/spec-plan/evals/fixtures/scripts/check-owner-not-authorized.sh": "bec571eddca85538e363617a9783c8978b3f0d0253f8b9624a2a3ff374333438"
+  }
+}

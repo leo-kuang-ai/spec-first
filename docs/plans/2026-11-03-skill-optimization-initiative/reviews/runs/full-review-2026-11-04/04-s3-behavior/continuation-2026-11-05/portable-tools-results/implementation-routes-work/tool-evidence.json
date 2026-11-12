@@ -1,0 +1,44 @@
+{
+  "type": "generated",
+  "note": "成功配对的Write/Edit重建，不是最终磁盘快照",
+  "calls": [
+    {
+      "line": 24,
+      "name": "Bash",
+      "input": {
+        "command": "node prepare-eval.cjs",
+        "description": "Run eval fixture preparation script once"
+      },
+      "result_line": 25,
+      "success": true
+    },
+    {
+      "line": 33,
+      "name": "Skill",
+      "input": {
+        "args": "为 GET /entries 增加 month 筛选；pipeline / disable-model-invocation 模式；仅产出 docs/plans/ 下的 Durable Markdown 计划；不派发子代理、不进入执行 owner",
+        "skill": "spec-plan"
+      },
+      "result_line": 40,
+      "success": true
+    },
+    {
+      "line": 107,
+      "name": "Write",
+      "input": {
+        "file_path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-3758350824/docs/plans/2026-11-07-001-feat-entries-month-filter-plan.md"
+      },
+      "result_line": 108,
+      "success": true
+    },
+    {
+      "line": 115,
+      "name": "Edit",
+      "input": {
+        "file_path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-3758350824/docs/plans/2026-11-07-001-feat-entries-month-filter-plan.md"
+      },
+      "result_line": 120,
+      "success": true
+    }
+  ]
+}

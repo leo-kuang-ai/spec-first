@@ -1,0 +1,20 @@
+{
+  "expectations": [
+    {
+      "text": "expect.exit_code",
+      "passed": true,
+      "evidence": "all checks passed"
+    },
+    {
+      "text": "script: /var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/spec-plan/evals/fixtures/scripts/routes-to-execution.sh",
+      "passed": true,
+      "evidence": "PASS: planner-return 机械边界与交付结构通过；规划语义及后续执行尚未评分。"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 0,
+    "total": 2,
+    "pass_rate": 1
+  }
+}

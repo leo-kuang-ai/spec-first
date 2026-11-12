@@ -1,0 +1,19 @@
+{
+  "files": [
+    {
+      "source": "/private/tmp/plan-capability-control-fansezop/blocked-runs/iteration-1/result.json",
+      "archive": "result.json",
+      "sha256": "9ba216a4fc9408d51e5b57d6f674d99398211721bbbc75ece6888f5f3cacff0d"
+    },
+    {
+      "source": "/private/tmp/plan-capability-control-fansezop/blocked-runs/iteration-1/implementation-owner-not-authorized/with_skill/outputs/response.md",
+      "archive": "response.md",
+      "sha256": "55374ac86ab5ce43061bc46ab64d3f84127ae9d5d85a5fa0e3082c28a4457bd6"
+    },
+    {
+      "source": "/private/tmp/plan-capability-control-fansezop/blocked-runs/iteration-1/implementation-owner-not-authorized/with_skill/outputs/agent/run/af4dbc1f-0483-4c12-915f-45efdaf57fa3.jsonl",
+      "archive": "transcript.jsonl",
+      "sha256": "3faf3aeb435ad611008e5e4f452e3bb6c2a27963a73f40d0efd11c412a0c3527"
+    }
+  ]
+}

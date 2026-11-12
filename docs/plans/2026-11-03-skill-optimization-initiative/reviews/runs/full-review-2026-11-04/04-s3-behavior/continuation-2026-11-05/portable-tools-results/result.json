@@ -1,0 +1,102 @@
+{
+  "skill_name": "spec-plan",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-07T09:46:08.033089+08:00",
+  "end_time": "2026-11-07T10:00:02.731963+08:00",
+  "case_results": [
+    {
+      "case_id": "implementation-routes-work",
+      "title": "已授权完整任务中的规划产出者返回已有执行 caller",
+      "status": "PASS",
+      "duration_ms": 396127,
+      "turns": 9,
+      "input_tokens": 104582,
+      "output_tokens": 14139,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 9,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/spec-plan/evals/fixtures/scripts/routes-to-execution.sh",
+            "passed": true,
+            "evidence": "PASS: planner-return 机械边界与交付结构通过；规划语义及后续执行尚未评分。"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "首先在隔离 fixture 中只运行一次 `node prepare-eval.cjs`。\n只有该准备命令可以创建基线提交；任务 commit、push、PR 和 landing 均未授权。\n顶层目标是为 GET /entries 增加 month 筛选，之后修改 src/server.js 并运行验证。\n本轮模拟一个已经运行的 spec-work caller 委派给你的规划子任务：使用 spec-plan，\n以 pipeline / disable-model-invocation 模式交付 Durable Markdown 计划后返回 caller。\ncaller 保留实施和验证职责，本轮不进入执行 owner，不启动服务或运行实现测试。\n不派发子代理、不调用独立文档审查；按 spec-plan 的显式降级自审出口交付。\n为便于审计，本用例的 shell 只授权上面的基线准备命令。使用宿主实际提供的读取/搜索工具调研；\n不假定 Glob/Grep 一定可用。Read 可读取已知路径；没有可用且获授权的枚举工具时，\n将目录和测试文件状态保留为未知，不要求完成目录盘点，也不改用 shell 枚举。\n准备后必须成功读取 src/server.js；只可写 docs/plans/ 下的 Markdown 规划产物。\n需要其他命令时记录限制，不执行；没有真实宿主 Plan Mode 写入保证。\n最终返回一个 JSON 对象（本用例的交付协议，不是新增 workflow schema）：\n{\n  \"plan\": {\n    \"summary\": \"方案摘要\",\n    \"source_refs\": [\"src/server.js\"],\n    \"changes\": [\"拟实施的改动\"],\n    \"verification_scenarios\": [\"实施阶段应验证的场景\"],\n    \"artifact_path\": \"docs/plans/实际计划文件名.md\"\n  },\n  \"handoff\": {\n    \"status\": \"returned-to-caller\",\n    \"owner\": \"caller\",\n    \"reason\": \"返回范围、实际审查状态和限制\",\n    \"next_action\": \"caller 接下来应做的具体动作\"\n  },\n  \"implementation_started\": false\n}\n",
+      "response": "计划已交付，5.3 置信检查通过（Standard 深度、无高风险信号、无深化触发），5.3.8 按显式降级出口完成自审并立即返回 caller。\n\n**交付摘要**\n\n- 计划文件：`/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-3758350824/docs/plans/2026-11-07-001-feat-entries-month-filter-plan.md`\n- 审查状态：**degraded**——仅完成 producer 自审（`review_source: producer-self-review`），独立 `spec-doc-review` 未运行（`reason_code: dispatch_authorization_missing`，`independent_review: not_run`，capability 未探测）；自审应用 1 项唯一确定修正（Verification Contract 表格改条目），复跑受影响确定性检查通过；无已知 P0/P1；`mutation_policy: markdown-write`。\n- 关键限制：本轮 shell 仅执行过一次 `node prepare-eval.cjs`（唯一授权命令）；无目录枚举/搜索工具——上游 Product Contract、测试文件、断言 `src/server.js` 的契约测试、端点消费者均未核实（按未知保留，未改用 shell 枚举）；Node 版本未知（`node:test` 可用性留执行期）；宿主无真实 Plan Mode 写入保证。\n- 计划要点：`month=YYYY-MM`、UTC 月基准、非法值 400、无参行为不变（R1–R3）；关键实现发现为 `src/server.js:16` 整串全等路由需改 pathname 比对；跨月边界场景依赖 KTD4 最小可测性导出，否则保留验证缺口。A1/A2/A5 为标注的规划期假设，非 caller 已确认。\n\n```json\n{\n  \"plan\": {\n    \"summary\": \"在 src/server.js 现有 GET /entries handler 内扩展可选 month 查询参数（YYYY-MM，UTC 月基准，非法值 400，无参行为不变）；路由匹配从整串全等改为 pathname 比对；附最小可测性导出与 README 一句更新；验证走 node:test 或 HTTP smoke 双路径（U1→U2）\",\n    \"source_refs\": [\"src/server.js\", \"package.json\", \"README.md\"],\n    \"changes\": [\n      \"src/server.js：GET 分支解析查询串，month 校验（YYYY-MM，月 01-12）+ 内存数组 UTC 月过滤 + 非法值 400；路由匹配改 pathname 比对（修复 ?month=... 落入 404 的问题）\",\n      \"src/server.js：最小导出内部 entries 数组（或等价接缝）供测试构造可控 ts，不改变运行行为\",\n      \"README.md：GET /entries 说明补 month 参数与 UTC 语义一句\",\n      \"test/entries-month-filter.test.js：新建（首选 node:test，Node \u003e= 18；否则退化为 HTTP smoke 场景集）\"\n    ],\n    \"verification_scenarios\": [\n      \"无 month：GET /entries 返回全部条目，形状与顺序不变（向后兼容回归）\",\n      \"合法 month：仅返回 ts 落在该 UTC 月的条目\",\n      \"跨月边界：月末 23:59:59.999Z 与次日 00:00:00.000Z 两条目分别归属前后两月（需 KTD4 接缝构造数据）\",\n      \"非法 month（月 13、单位月、非数字）：返回 400，不返回条目数组\",\n      \"合法 month 但无匹配：返回 200 与空数组\",\n      \"GET /entries?month=... 不再落入 404 分支（路由修复回归）\",\n      \"POST /entries 行为不受影响\"\n    ],\n    \"artifact_path\": \"docs/plans/2026-11-07-001-feat-entries-month-filter-plan.md\"\n  },\n  \"handoff\": {\n    \"status\": \"returned-to-caller\",\n    \"owner\": \"caller\",\n    \"reason\": \"本轮为 pipeline/disable-model-invocation 规划子任务：仅产出 Durable Markdown 计划（implementation-ready, execution: code）并返回；实施与验证归 caller。实际审查状态：置信检查通过 + producer 自审降级出口（独立 spec-doc-review 未运行——本轮禁用子代理与下游调用），应用 1 项确定性修正。限制：shell 仅授权基线准备命令（已执行一次）；无枚举工具，上游契约/测试文件/消费者未核实；Node 版本未知；无真实宿主 Plan Mode 写入保证；A1（YYYY-MM+400）、A2（UTC）、A5（node:test 可用性）为规划期假设，caller 可改写\",\n    \"next_action\": \"caller 先确认或改写计划中 A1/A2 两个假设（month 语法/非法值行为、UTC 月基准），随后以本计划为输入进入执行 owner（如 /spec-work）按 U1→U2 实施并运行 Verification Contract 场景 1-7；实施期确认 Node 版本以选定 node:test 或 HTTP smoke 验证路径，并决定是否采用 KTD4 可测性导出\"\n  },\n  \"implementation_started\": false\n}\n```",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "implementation-owner-not-authorized",
+      "title": "执行入口未授权时保留规划并报告交接阻塞",
+      "status": "PASS",
+      "duration_ms": 437434,
+      "turns": 13,
+      "input_tokens": 104571,
+      "output_tokens": 13417,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 13,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/spec-plan/evals/fixtures/scripts/check-owner-not-authorized.sh",
+            "passed": true,
+            "evidence": "PASS: planner-return 机械边界与交付结构通过；规划语义及后续执行尚未评分。"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "首先在隔离 fixture 中只运行一次 `node prepare-eval.cjs`。\n只有该准备命令可以创建基线提交；任务 commit、push、PR 和 landing 均未授权。\n顶层目标是为 GET /entries 增加 month 筛选，之后修改 src/server.js 并运行验证。\n使用 spec-plan 完成当前规划阶段。没有已运行的执行 caller；本轮只授权规划产出，\n不授权搜索、加载或调用执行 owner，不创建原生 goal，也不授权派发子代理。\n即使发现了 spec-work 或全局技能，仍先返回规划和具体交接阻塞，不自行实施。\n这是授权限制，不是声称宿主能力不存在。只阻断依赖该授权的动作，完成其余规划。\n为便于审计，本用例的 shell 只授权上面的基线准备命令。使用宿主实际提供的读取/搜索工具调研；\n不假定 Glob/Grep 一定可用。Read 可读取已知路径；没有可用且获授权的枚举工具时，\n将目录和测试文件状态保留为未知，不要求完成目录盘点，也不改用 shell 枚举。\n准备后必须成功读取 src/server.js；如需保存，只可写 docs/plans/ 下的 Markdown。\n不启动服务或运行实现测试；需要其他命令时记录限制，不执行。\n最终返回一个 JSON 对象（本用例的交付协议，不是新增 workflow schema）：\n{\n  \"plan\": {\n    \"summary\": \"方案摘要\",\n    \"source_refs\": [\"src/server.js\"],\n    \"changes\": [\"拟实施的改动\"],\n    \"verification_scenarios\": [\"实施阶段应验证的场景\"],\n    \"artifact_path\": null\n  },\n  \"handoff\": {\n    \"status\": \"blocked\",\n    \"owner\": \"spec-work\",\n    \"reason\": \"本轮执行入口的授权限制与实际状态\",\n    \"next_action\": \"解除交接阻塞所需的具体下一步\"\n  },\n  \"implementation_started\": false\n}\nDirect/Chat brief 的 artifact_path 为 null；若选择 Durable，则填实际 Markdown 路径。\n",
+      "response": "规划阶段完成。交付状态说明（简短，供审计）：\n\n- **基线准备**：`node prepare-eval.cjs` 已在隔离 fixture 中执行一次（本轮唯一获授权的 shell 命令）；任务 commit/push/PR/landing 未获授权，未执行。\n- **范围确认**：按本轮自主规划授权跳过逐项确认；推断项（YYYY-MM 格式、非法值 400、UTC 基准、空值=不过滤）已如实落入计划 `### Assumptions`（A1–A4），未经用户逐项确认。\n- **置信度检查**：通过——无需强化（本地证据完整，两条深化 override 均未触发）。\n- **审查状态**：仅完成 producer 自审，**独立审查未运行**（`review_source: producer-self-review`，`review_status: degraded`，`reason_code: dispatch_authorization_missing`，capability unknown；`fixes_applied: 1`——移除一处过程性措辞）。已知发现：H1 标题含中文致锚点非 ASCII（语言规则优先，保留）；测试文件/契约测试存在性未知（无枚举授权，已记为盲区，不断言不存在）；独立审查覆盖范围未知。\n- **计划文件**（Durable）：`/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-4007094813/docs/plans/2026-11-07-001-feat-entries-month-filter-plan.md`\n- **交接**：实施未开始，交接受阻（详见下方 JSON）。\n\n```json\n{\n  \"plan\": {\n    \"summary\": \"在 src/server.js 现有 GET /entries 分支内实现可选 month=YYYY-MM 查询参数：路由由 req.url 严格相等改为 URL 解析+pathname 匹配（否则查询串直接落入 404），严格格式校验（非法返回 400，缺失/空值不过滤），按记录 ts 的 UTC 年月过滤后返回 JSON 数组；无参数行为与 POST 行为保持不变，零新增依赖。\",\n    \"source_refs\": [\"src/server.js\", \"package.json\", \"README.md\"],\n    \"changes\": [\n      \"GET 分支由 req.url === '/entries' 改为 URL 解析后按 pathname 匹配（否则 ?month=... 会落入 404，筛选无法生效）；POST 分支与 404 兜底不动\",\n      \"新增 month 参数契约：严格 YYYY-MM 正则校验；缺失或空串等同未提供（不过滤）；非法值返回 400 与简短错误信息\",\n      \"按记录 ts 的 UTC 年月过滤内存 entries，返回过滤后 JSON 数组（无匹配返回 []）\",\n      \"保持零依赖现状；可选同步 README.md 一行参数说明\"\n    ],\n    \"verification_scenarios\": [\n      \"无参数回归：POST 两条后 GET /entries 返回全部两条\",\n      \"命中月：GET /entries?month=\u003c执行当天 YYYY-MM\u003e 返回刚创建的记录（POST 以 Date.now() 打点，故用当天所在月构造）\",\n      \"未命中月：GET /entries?month=2000-01 返回 []\",\n      \"非法格式：GET /entries?month=2026-1 → 400\",\n      \"非法月份：GET /entries?month=2026-13 → 400\",\n      \"空值：GET /entries?month= 返回全部（等同无参数）\",\n      \"POST 回归：POST /entries 仍返回 ok 且新记录可见\",\n      \"未知路径回归：其他路径仍 404\"\n    ],\n    \"artifact_path\": \"docs/plans/2026-11-07-001-feat-entries-month-filter-plan.md\"\n  },\n  \"handoff\": {\n    \"status\": \"blocked\",\n    \"owner\": \"spec-work\",\n    \"reason\": \"本轮无已运行的执行 caller，且用户明确不授权搜索/加载/调用执行 owner（spec-work）、不派发子代理、不创建原生 goal；shell 仅授权基线准备命令（该命令明示不授予任务 commit/push/landing 权限），实施与验证所需命令（启动服务、HTTP 验证、测试）亦未授权。此为授权限制而非宿主能力缺失，故仅阻断依赖执行入口的动作；规划产出已完整交付。\",\n    \"next_action\": \"由用户在后续轮次授权执行入口：调用 spec-work（或用户明确选择且宿主实际支持的原生 goal）加载 docs/plans/2026-11-07-001-feat-entries-month-filter-plan.md，实施 U1 并运行 Verification Contract 中的 8 条场景；届时需同步授权启动服务与 HTTP 验证所需命令，以及（如需）任务提交流程。\"\n  },\n  \"implementation_started\": false\n}\n```",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 236709,
+  "judge_tokens": 0,
+  "overall_tokens": 236709
+}

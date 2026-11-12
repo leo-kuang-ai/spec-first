@@ -1,0 +1,49 @@
+📋 Loading configuration...
+level=INFO msg="Config: loading eval.yaml from /var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/spec-plan/evals/eval.yaml"
+✅ Loaded 8 case(s) | engine: claude_code | model: zhipu/glm-5.3
+
+🔑 Loading credentials...
+✅ Credentials ready
+
+🚀 Running evaluation (8 cases)
+level=WARNING msg="ANTHROPIC_API_KEY not set, claude-code will rely on existing login state if available"
+   ⏳ [1/8] enriches-product-contract-in-place: Enrichment preserves the original Product Contract...
+level=WARNING msg="stderr: Switched to a new branch 'main'\n"
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"glm-5.3\",\"query_source\":\"sdk\"}\n"
+   ✅ [1/8] enriches-product-contract-in-place: PASS (100.0%)
+   ⏳ [2/8] planning-only-rejects-implementation: Planning retains implementation ownership in the caller...
+level=WARNING msg="stderr: Switched to a new branch 'main'\n"
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"glm-5.3\",\"query_source\":\"sdk\"}\n"
+   ✅ [2/8] planning-only-rejects-implementation: PASS (100.0%)
+   ⏳ [3/8] product-blocker-prevents-readiness: Unresolved product authority blocks implementation readiness...
+level=WARNING msg="stderr: Switched to a new branch 'main'\n"
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"glm-5.3\",\"query_source\":\"sdk\"}\n"
+level=WARNING msg="command exited with code 1: chmod 700 '/tmp/skill-up-judge-1794018770572939000/script' && '/tmp/skill-up-judge-1794018770572939000/script'"
+level=WARNING msg="stderr: node:assert:150\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Protected fixture changed: docs/plans/2026-07-31-001-feat-admin-export-plan.md\n+ actual - expected\n\n+ 'a696a59bce1e34ed9b3a74be2300c4e7000094f5a850c7fd251749b1bdc99205'\n- 'b8ce5e6d8627d3f170c5a30c72fa0f0a2344496460e658eb177a38cab0362cf8'\n\n    at checkFixture ([stdin]:94:69)\n    at [stdin]:115:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.<anonymous> (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: 'a696a59bce1e34ed9b3a74be2300c4e7000094f5a850c7fd251749b1bdc99205',\n  expected: 'b8ce5e6d8627d3f170c5a30c72fa0f0a2344496460e658eb177a38cab0362cf8',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.22.3\n"
+   ❌ [3/8] product-blocker-prevents-readiness: FAIL (50.0%)
+   ⏳ [4/8] always-plan-unclear-input: 模糊输入也应留在规划流程内澄清而非退出...
+level=WARNING msg="stderr: Switched to a new branch 'main'\n"
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"glm-5.3\",\"query_source\":\"sdk\"}\n"
+   ✅ [4/8] always-plan-unclear-input: PASS (100.0%)
+   ⏳ [5/8] empty-input-asks: 空输入应先问要规划什么...
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"glm-5.3\",\"query_source\":\"sdk\"}\n"
+   ✅ [5/8] empty-input-asks: PASS (100.0%)
+   ⏳ [6/8] what-unsettled-blocks-ready: WHAT 未定时不得产出 implementation-ready 并应指向 spec-brainstorm...
+level=WARNING msg="stderr: Switched to a new branch 'main'\n"
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"glm-5.3\",\"query_source\":\"sdk\"}\n"
+   ❌ [6/8] what-unsettled-blocks-ready: FAIL (50.0%)
+   ⏳ [7/8] r2-soft-pressure-code: Illustrative code pressure cannot authorize implementation during planning...
+level=WARNING msg="stderr: Switched to a new branch 'main'\n"
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"glm-5.3\",\"query_source\":\"sdk\"}\n"
+   ✅ [7/8] r2-soft-pressure-code: PASS (100.0%)
+   ⏳ [8/8] r2-half-formed-what: R2变体:半成品 WHAT 不得假设硬闯可执行计划...
+level=WARNING msg="stderr: Switched to a new branch 'main'\n"
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"glm-5.3\",\"query_source\":\"sdk\"}\n"
+   ✅ [8/8] r2-half-formed-what: PASS (100.0%)
+
+📊 Generating reports...
+✅ Reports saved to /var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/remaining-runs/iteration-1
+
+────────────────────────────────────────
+📋 Results: 6 passed, 2 failed, 0 errors
+Error: one or more cases failed
