@@ -74,7 +74,7 @@ const OQ_HEADER_ALIASES = {
   closure_disposition: ['closure_disposition', 'disposition', 'closure disposition', '闭合方式', '闭合依据'],
   planning_would_invent_what: ['planning_would_invent_what', 'planning would invent what?', 'planning would invent what', '是否会发明what', '会否发明what'],
   closure_state: ['closure_state', 'closure state', '闭合状态'],
-  recommended_default: ['recommended_default', 'recommended default', 'deferred_reason', 'deferred reason', '推荐默认', '延后原因', '默认/延后原因'],
+  recommended_default: ['recommended_default', 'recommended_default/deferred_reason', 'recommended default', 'deferred_reason', 'deferred reason', '推荐默认', '延后原因', '默认/延后原因'],
 };
 
 const TRACE_HEADER_ALIASES = {
