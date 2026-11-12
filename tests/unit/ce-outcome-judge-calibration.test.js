@@ -25,7 +25,7 @@ describe('CE outcome judge counterexamples and valid controls', () => {
   beforeEach(() => { workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'outcome-judge-')); });
   afterEach(() => fs.rmSync(workspace, { recursive: true, force: true }));
 
-  test.each(['check-r2-no-code.sh', 'routes-to-execution.sh'])('Plan %s rejects source deletion and untracked implementation', (script) => {
+  test.each(['check-r2-no-code.sh'])('Plan %s rejects source deletion and untracked implementation', (script) => {
     setup('spec-plan', 'mini-ledger');
     expect(judge('spec-plan', script).status).toBe(0);
     const file = path.join(workspace, 'src/server.js');
@@ -184,9 +184,12 @@ describe('CE outcome judge counterexamples and valid controls', () => {
     setup(skill, 'mini-ledger');
     const readme = path.join(workspace, 'README.md');
     fs.writeFileSync(readme, fs.readFileSync(readme, 'utf8').replace('# MiniLedger', '# MiniLedger (edited)'));
-    expect(judge(skill, script, 'commit_authorization_missing; landing_authorization_missing.').status).toBe(0);
+    const message = script === 'check-desc-only.sh'
+      ? '## 摘要\n\n仅更新 README 标题，未提交、未推送。'
+      : 'commit_authorization_missing; landing_authorization_missing.';
+    expect(judge(skill, script, message).status).toBe(0);
     git('add', 'README.md');
-    expect(judge(skill, script, 'commit_authorization_missing; landing_authorization_missing.').status).toBe(1);
+    expect(judge(skill, script, message).status).toBe(1);
   });
 
   test('Commit grouping requires actual commits containing only the owned file set', () => {

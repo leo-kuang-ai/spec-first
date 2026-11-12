@@ -4,6 +4,11 @@ description: |
   验证 Dispatch 表第一行:输入携带 Metric:/Verify: 时进入 Classic
   metric loop(非 Orchestrator),且按规程打印 mode banner。
 
+# 该例在 live 实测中跑完 3 次迭代约 340s，超过 cases.defaults 的 300s；
+# case 顶层的 timeout_seconds 会被静默忽略，必须写在 constraints 下。
+constraints:
+  timeout_seconds: 900
+
 input:
   prompt: |
     （skill-up 评测框架说明：本仓库 .claude/skills/autoresearch/SKILL.md 是被测

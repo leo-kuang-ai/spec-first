@@ -380,5 +380,20 @@ checkFixture({
     "src/server.js": "ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34"
   }
 }, {"README.md":["# MiniLedger","# MiniLedger (edited)"]}, {});
+
 rejectRecordedRemoteWrites();
+const message = process.env.EVAL_FINAL_MESSAGE ?? '';
+const lines = message.split('\n');
+const titleIndex = lines.findIndex((line) => {
+  const text = line.trim();
+  return text !== '' && (
+    /^#{1,3}\s*\S/.test(text)
+    || /^\*\*[^*]+\*\*/.test(text)
+    || /^(?:Title|标题)\s*[:：]\s*\S/i.test(text)
+  );
+});
+assert.ok(titleIndex >= 0, 'PR description is missing a non-empty title');
+const body = lines.slice(titleIndex + 1).join('\n');
+assert.ok(body.replace(/\s/g, '').length >= 10, 'PR description has no overview or change summary');
+
 EVAL_JUDGE_NODE

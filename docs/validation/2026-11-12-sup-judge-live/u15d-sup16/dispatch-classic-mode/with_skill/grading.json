@@ -1,0 +1,15 @@
+{
+  "expectations": [
+    {
+      "text": "script: /Users/kuang/xiaobu/spec-first/skills/autoresearch/evals/fixtures/scripts/check-classic-banner.sh",
+      "passed": true,
+      "evidence": "PASS: classic banner appeared in assistant output before the first work tool call."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 0,
+    "total": 1,
+    "pass_rate": 1
+  }
+}

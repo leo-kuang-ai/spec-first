@@ -1,0 +1,5 @@
+M1-list-truncation: KILLED (failing tests: 2)
+M2-month-ignored: KILLED (failing tests: 1)
+M3-trailing-slash-normalized: KILLED (failing tests: 1)
+M4-any-method-subpath: KILLED (failing tests: 1)
+M5-month-all-or-none: KILLED (failing tests: 1)

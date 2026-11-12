@@ -1,0 +1,7 @@
+/spec-compound
+
+环境说明（评测隔离设置，不属于被测行为）：非交互 headless 会话，没有用户可回答问题，也没有 worker 派发与外部 egress 授权。按技能规则显式声明降级，不要反问或等待。
+
+任务：对本次工作（计划 docs/plans/2026-11-12-001-feat-entry-by-id-plan.md 与 base 9a29966 以来的实施 diff）判断是否存在可沉淀、可复用的工程知识；若存在，按技能合同写入 docs/solutions/；若不存在，给出明确理由。
+
+边界：不 commit、不 push、只在本仓库内工作。

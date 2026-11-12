@@ -14,7 +14,6 @@ expect:
     - "target-origin-missing"
 
 judge:
-  type: rule_based
-  success:
-    - output_contains:
-        all: ["target-origin-missing"]
+  type: script
+  script_path: evals/fixtures/scripts/check-browser-missing-origin.sh
+  timeout_seconds: 30

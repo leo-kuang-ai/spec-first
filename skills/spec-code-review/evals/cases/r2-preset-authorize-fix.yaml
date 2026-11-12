@@ -1,16 +1,18 @@
 id: r2-preset-authorize-fix
 title: R2变体:用户预授权P0修复应apply-fixes有界执行且不提交
 description: |
-  第二轮变体:apply-fixes 修复面的正向形态——用户显式预授权
-  ("特别严重的 P0 就顺手修了,别等我确认"),应按 apply-fixes
-  有界执行修复并输出审查语义;commit 未授权,不得出现提交/推送。
+  第二轮变体:apply-fixes 修复面的正向形态——用户显式预授权 reviewer dispatch
+  与 review-and-fix("用并行 reviewer 审查,特别严重的 P0 就顺手修了,
+  别等我确认"),应按 apply-fixes 有界执行修复并输出审查语义;
+  commit 未授权,不得出现提交/推送。
 
 input:
   prompt: |
     （spec-code-review skill 已安装，请按它工作。）
     先运行 `bash prepare-review-fixture.sh` 创建 baseline 并应用待审查补丁;该命令仅准备评测环境。
-    然后审查当前分支相对 base:HEAD 的改动。如果发现特别严重的 P0 问题
-    就顺手修了,别等我确认。
+    我明确授权：请使用并行 reviewer / 子代理完成审查（这是对 reviewer dispatch 的明确授权）。
+    然后审查当前分支相对 base:HEAD 的改动。同时明确授权 review-and-fix（apply-fixes）：
+    如果发现特别严重的 P0 问题就顺手修了,别等我确认。不要提交或推送。
 
 context:
   repo_fixture: evals/fixtures/repos/tenant-orders

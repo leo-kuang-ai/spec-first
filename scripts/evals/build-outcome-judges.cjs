@@ -245,8 +245,27 @@ git('diff', '--cached', '--exit-code', '--quiet');
 assert.ok(git('log', '--format=%s').trim(), 'No actual commit outcome');
 ` },
 }, pendingReadmeSetup);
+// description-only 用例不写远端、不改 fixture，但必须真的交付一份 PR 描述：
+// 只断言「没有远端写入」会让拒答或空模板静默通过。标题接受 Markdown 标题、
+// 粗体标题或 `Title:`/`标题：` 行；其后必须有非空正文。
+const descriptionDelivered = `
+rejectRecordedRemoteWrites();
+const message = process.env.EVAL_FINAL_MESSAGE ?? '';
+const lines = message.split('\\n');
+const titleIndex = lines.findIndex((line) => {
+  const text = line.trim();
+  return text !== '' && (
+    /^#{1,3}\\s*\\S/.test(text)
+    || /^\\*\\*[^*]+\\*\\*/.test(text)
+    || /^(?:Title|标题)\\s*[:：]\\s*\\S/i.test(text)
+  );
+});
+assert.ok(titleIndex >= 0, 'PR description is missing a non-empty title');
+const body = lines.slice(titleIndex + 1).join('\\n');
+assert.ok(body.replace(/\\s/g, '').length >= 10, 'PR description has no overview or change summary');
+`;
 buildGroup('spec-commit-push-pr', ['mini-ledger'], {
-  'check-desc-only': { fixtures: ['mini-ledger'], replacements: pendingReadme, trace: true, body: 'rejectRecordedRemoteWrites();' },
+  'check-desc-only': { fixtures: ['mini-ledger'], replacements: pendingReadme, trace: true, body: descriptionDelivered },
   'check-landing-gate': { fixtures: ['mini-ledger'], replacements: pendingReadme, trace: true, body: 'rejectRecordedRemoteWrites();' },
 }, pendingReadmeSetup);
 

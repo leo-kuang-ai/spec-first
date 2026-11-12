@@ -1,0 +1,45 @@
+{
+  "skill_name": "autoresearch",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.322"
+  },
+  "start_time": "2026-11-12T14:49:15.709399+08:00",
+  "end_time": "2026-11-12T14:54:15.855476+08:00",
+  "case_results": [
+    {
+      "case_id": "dispatch-classic-mode",
+      "title": "Metric/Verify 输入应分发 classic 模式并打印 banner",
+      "status": "ERROR",
+      "duration_ms": 300019,
+      "turns": 5,
+      "input_tokens": 36928,
+      "output_tokens": 4031,
+      "error": "agent execution failed: claude-code run failed: context deadline exceeded (case timeout 300s via cases.defaults.timeout_seconds)",
+      "grading": null,
+      "configuration": "with_skill",
+      "prompt": "（skill-up 评测框架说明：本仓库 .claude/skills/autoresearch/SKILL.md 是被测\nskill 的定义文件,已随仓库就位。本次运行不经过 Skill 工具调用——请先 diff 该文件\n与 source 真相源 skills/autoresearch/SKILL.md；不一致时以 source 为准并在开头\n报告一行 `tested_definition: \u003cruntime-mirror|source\u003e`。然后完整读取被测定义,\n把它视为已加载的工作指令,按它处理下面的输入。）\nMetric: passing test count\nVerify: npm test --silent 2\u003e\u00261 | tail -5\nIterations: 3\n把通过测试数提上去。\n",
+      "response": "**迭代 2**（单一聚焦变更：修复 test 脚本为显式 glob）：",
+      "observed_version": "2.1.322"
+    }
+  ],
+  "total_tokens": 40959,
+  "judge_tokens": 0,
+  "overall_tokens": 40959
+}

@@ -619,3 +619,42 @@ npm run typecheck
 **整体: 17/20 问题已修复（85%）**
 
 所有修复遵守 source-first 原则、向后兼容、降级诚实和最小侵入性原则。
+
+## 2026-11-12 剩余项（阶段 A）
+
+`docs/plans/2026-11-12-001-fix-sup-remaining-validation-plan.md` 的阶段 A 已完成离线判据硬化：SUP-03/04/05/06/07/08/10/11/13/14/16 与 SUP-31。判据改为消费 Git/文件状态、角色与时序、否定语义和 transcript；新增 `tests/unit/sup-judge-hardening.test.js`（27 例）。
+
+验证：聚焦 57/57 PASS；全量单测 279 suites / 3669 passed / 1 skipped；typecheck 317；lint 521；builder `--check` 无漂移；14 个受影响 `eval.yaml` 的 `skill-up validate` 全部 valid。
+
+未执行：SUP-28 live 取证、受影响用例 live 重跑、Phase 5 隔离宿主端到端验证。原因是当前任务未获得模型成本、外部网络或宿主写入授权；离线校准不替代 live 行为结论。现有“17/20 已修复、Phase 5 未处理”的历史结论不变。
+
+未确认静态线索（U16）已按只读范围完成：14 条线索中 5 条 confirmed、6 条 not-a-defect、3 条 insufficient-evidence，逐条 `file:line` 证据见 `docs/validation/2026-11-12-unconfirmed-leads.md`。confirmed 项只登记为 follow-up 候选，本轮未修复。
+
+### 计划收口状态（2026-11-12）
+
+#### 第一轮（离线收口）
+
+- `docs/plans/2026-11-12-001-fix-sup-remaining-validation-plan.md`：阶段 A 与 U16 完成；U14/U15（live 取证）与 U17-U19（Phase 5 隔离交付）为 `not-run / environment-blocked`。
+- Plan lifecycle 字段仍为 `active`：仓库 canonical status 只有 `active` / `partially-shipped` / `completed` / `superseded`，写入 `blocked` 会使 `specs plans audit` 与 spec-work intake 判为非法状态；阻塞态已记录在计划正文的“执行状态”段。
+- 重估条件：① 授权 live 模型成本与外部网络 → U14/U15；② 提供隔离宿主或专用账户 → U17-U19；③ 判据依赖的 source 变更导致离线校准失效 → 由 plan owner 更新计划后回到阶段 A。
+- 本轮所有源码改动仍为工作树未提交改动，未 commit / push。
+
+#### 第二轮（live 与 Phase 5 已执行）
+
+| 项 | 结果 | 证据 |
+| --- | --- | --- |
+| U14 SUP-28 两例 live | 2/2 PASS（100%） | `docs/validation/2026-11-12-sup-28-live/`（report.json + 日志）；模型 `zhipu/glm-5.3` |
+| U15 判据 live 抽样 | SUP-03 PASS、SUP-14 PASS、SUP-16 首轮 ERROR（300s case timeout）→ **判据修正后重跑 PASS（574.05s，1/1）** | `docs/validation/2026-11-12-sup-judge-live/README.md` |
+| U17 隔离与哨兵 | 完成；`~/.spec-first/**` 与 `~/.claude/settings.json` 10:11→11:04 未变 | `docs/validation/2026-11-12-phase5-isolated-delivery/setup.md` |
+| U18 五阶段交付 | 完成（brainstorm → plan → work → review → compound），实施 10/10 测试通过、`honest-closeout: verified`；阶段 4 自身 review 为 `degraded`，已由补做的独立审查回路覆盖（原始交付 NOT-READY → 修复与登账后 READY） | `stage-1c/2/3/4/5` 逐阶段记录与 `artifacts/`；`artifacts/review-cycle/` |
+| U19 报告 | 完成，Phase 5 状态 `complete`，独立审查回路最终判 READY（仅覆盖该交付分支） | `docs/validation/2026-11-12-phase5-isolated-delivery/report.md` |
+
+第二轮新增的实测事实与限制（不得外推）：
+
+- `skill-up` 的 claude_code 引擎**不隔离 HOME**：SUP-14 的 live 会话执行 `spec-first init --claude -y --lang zh`，改写真实 `~/.spec-first/.developer`（11:19），原文件未备份、字段级差异不可复原；name 与 initialized_at 未变。
+- Phase 5 五阶段是在 `glm-5.3` + “headless、显式假设”指令条件下成立的；阶段 1 前两次用宿主默认模型（`claude-haiku-5-5`）失败，未产出 artifact。
+- 五阶段全程无 worker 派发；`spec-code-review` 阶段 4 判 `degraded / Not ready`（0 findings）。独立覆盖来自事后补做的 5 轮独立审查（kiro/gpt-5.6-sol）：原始交付 NOT-READY（可行动 4×P2 + 1×P3）→ `spec-work` 修复 + 编排者修复 + 3 次偏差登账 → READY；5 个变异探针全部被测试杀死。该 READY 只覆盖交付分支，不代表 workflow 默认可合并。
+- 阶段 4 的 artifact 写到 `${TMPDIR}/spec-first/…`，字面命中 setup 的停止条件，实际判为技能自带临时 sink 并继续执行，属事前未约定的偏离，已在 `report.md` §6 记录。
+- SUP-16 经判据修正（只读命令不计工作调用）+ case 预算改 `constraints.timeout_seconds: 900` 后重跑 PASS；该 PASS 有判别力——真实 transcript 里 banner 之前确实有 `diff`/`find`/`Read`，旧判据会判 FAIL。单 iteration，不外推稳定性。
+
+证据：`docs/validation/2026-11-12-sup-remaining-phase-a.md`、`docs/validation/2026-11-12-unconfirmed-leads.md`、`docs/validation/2026-11-12-sup-judge-live/README.md`、`docs/validation/2026-11-12-phase5-isolated-delivery/report.md`。

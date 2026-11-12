@@ -1,0 +1,18 @@
+📋 Loading configuration...
+level=INFO msg="Config: loading eval.yaml from skills/spec-dogfood/evals/eval.yaml"
+✅ Loaded 1 case(s) | engine: claude_code | model: zhipu/glm-5.3
+
+🔑 Loading credentials...
+✅ Credentials ready
+
+🚀 Running evaluation (1 cases)
+   ⏳ [1/1] trunk-target-rejected: 指定 trunk 为目标应被拒绝...
+level=WARNING msg="stderr: Switched to a new branch 'main'\n"
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"glm-5.3\",\"query_source\":\"sdk\"}\n"
+   ✅ [1/1] trunk-target-rejected: PASS (100.0%)
+
+📊 Generating reports...
+✅ Reports saved to /tmp/sup-live/u14-trunk-target/iteration-1
+
+────────────────────────────────────────
+📋 Results: 1 passed, 0 failed, 0 errors

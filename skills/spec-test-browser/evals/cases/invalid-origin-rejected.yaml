@@ -14,7 +14,6 @@ expect:
     - "target-origin-invalid"
 
 judge:
-  type: rule_based
-  success:
-    - output_contains:
-        all: ["target-origin-invalid"]
+  type: script
+  script_path: evals/fixtures/scripts/check-browser-invalid-origin.sh
+  timeout_seconds: 30
