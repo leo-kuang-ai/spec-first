@@ -1,0 +1,27 @@
+{
+  "id": "CEOPT-27",
+  "skill": "spec-strategy",
+  "fixture_root": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/strategy",
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-27-request.txt",
+  "input_files": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/strategy/owner-decision.md": "d8219158c5009c067fade859eb3bef835682139bba86318d0faf97c019b92f4e",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/strategy/STRATEGY.md": "0ef39f74fa53d24815cbcc629ebfa43b3bc7dff5b7bba1a6bb934dc20d3b0a5e"
+  },
+  "receipt_refs": [],
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "deadline_seconds": 300,
+  "execution_mode": "fresh-readonly-model-plus-parent-save",
+  "parent_recipe": "Save exact response; do not apply proposed edits/publication. Extract structured artifact only with original preserved and explicit receipt.",
+  "acceptance_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-27",
+  "limitations": [
+    "Mediated interpretation/draft only; autonomous mutation/publication is not executed.",
+    "Serving identity not authenticated; no enforced read-only isolation."
+  ]
+}

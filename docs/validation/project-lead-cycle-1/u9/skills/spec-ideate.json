@@ -1,0 +1,182 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "generated_at": "2026-09-20T07:35:36.158199+00:00",
+  "skill_name": "spec-ideate",
+  "source_snapshot": "source-manifest.json",
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "source_paths": [
+    "skills/spec-ideate/SKILL.md",
+    "skills/spec-ideate/references/scope-gates.md",
+    "skills/spec-ideate/references/output-mode.md",
+    "skills/spec-ideate/references/grounding.md",
+    "skills/spec-ideate/references/decomposition.md",
+    "skills/spec-ideate/references/divergent-ideation.md",
+    "skills/spec-ideate/references/post-ideation-workflow.md",
+    "tests/unit/spec-ideate-phase-contracts.test.js",
+    "tests/unit/spec-ideate-clarification-handoff-contracts.test.js"
+  ],
+  "source_read_ranges": {
+    "skills/spec-ideate/SKILL.md": "1-105",
+    "skills/spec-ideate/references/scope-gates.md": "1-139",
+    "skills/spec-ideate/references/output-mode.md": "1-51",
+    "skills/spec-ideate/references/grounding.md": "1-119",
+    "skills/spec-ideate/references/decomposition.md": "1-40",
+    "skills/spec-ideate/references/divergent-ideation.md": "1-95",
+    "skills/spec-ideate/references/post-ideation-workflow.md": "1-162"
+  },
+  "source_hashes": {
+    "skills/spec-ideate/SKILL.md": "dd427fca3e50bce7dc0fc7bc573633217e696c2f8583a1215c5e571c9665f733",
+    "skills/spec-ideate/references/scope-gates.md": "d31ea1dd22e5ca33df75c7ffb853f42c9b2c58266a3ff1cde7cefbc38a31ab95",
+    "skills/spec-ideate/references/output-mode.md": "9828d7739aad17f27b6ca762968cee98f2c3b89480572ad40397442221604baa",
+    "skills/spec-ideate/references/grounding.md": "c40a8b95f551db3e9dfcdce5c6c952dd44a002c53e66b74cded05231c36a1c20",
+    "skills/spec-ideate/references/decomposition.md": "800f8eb2b8bdb211f59c8aeffe08a606fd8d8fe872172a5bdc8e8fbe0e6bcddf",
+    "skills/spec-ideate/references/divergent-ideation.md": "8dc6dccd7aeec97b9458e877b40a844312a706b6acd38dfcb561c13a8a7dbddd",
+    "skills/spec-ideate/references/post-ideation-workflow.md": "fe085532eaf493849a4630c6a74dcb7f6b6576f0da85f244331a02610775e73e",
+    "tests/unit/spec-ideate-phase-contracts.test.js": "92fe697fddeb8106b449c5fafb0b45c2f76a376e20882b67cf10a5f902e59fe0",
+    "tests/unit/spec-ideate-clarification-handoff-contracts.test.js": "4ae4e3c4ad78c2e0cf96b0472b1aa40d4367b38c2e4c8f4e26facb2da5a7420e"
+  },
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "entry_surface": "workflow_command",
+  "batch": "B",
+  "closure_tier": "M",
+  "closure_observed": {
+    "files": 30,
+    "bytes": 231896,
+    "read_package_files_at_least_partially": 7,
+    "read_supporting_files_at_least_partially": 2,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "coverage_commitment": "committed",
+  "dependency_closure": "partial",
+  "status": "degraded",
+  "reason_codes": [
+    "bounded_source_review",
+    "dependency_closure_partial",
+    "workflow_not_run"
+  ],
+  "command_or_method": [
+    "只读reviewer逐包阅读冻结source并判断五分支；主owner整合与回源裁决，不是盲评或workflow执行。"
+  ],
+  "ran": true,
+  "exit_code": null,
+  "evidence_paths": [
+    "reviewer-returns/b.json"
+  ],
+  "source_refs": [
+    "skills/spec-ideate/SKILL.md",
+    "skills/spec-ideate/references/scope-gates.md",
+    "skills/spec-ideate/references/output-mode.md",
+    "skills/spec-ideate/references/grounding.md",
+    "skills/spec-ideate/references/decomposition.md",
+    "skills/spec-ideate/references/divergent-ideation.md",
+    "skills/spec-ideate/references/post-ideation-workflow.md",
+    "tests/unit/spec-ideate-phase-contracts.test.js",
+    "tests/unit/spec-ideate-clarification-handoff-contracts.test.js"
+  ],
+  "owner": "project-lead-cycle-1",
+  "consumers": [
+    "周期1主审查",
+    "对应上游/下游workflow（以SKILL文档声明为准）"
+  ],
+  "branches": [
+    {
+      "id": "entry_positive",
+      "status": "source-covered",
+      "judgment": "只在用户要生成并评估方向时进入；先处理 subject/mode/output/scaling/grounding，再以多种视角生成候选、核实依据、过滤和持久化。",
+      "source_refs": [
+        "skills/spec-ideate/SKILL.md:12-28",
+        "skills/spec-ideate/SKILL.md:83-105"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "near_neighbor_negative",
+      "status": "source-covered",
+      "judgment": "用户已有单一想法要收敛时转 spec-brainstorm；ideate 不产出 requirements/plan/code，不直接跳到 spec-plan。",
+      "source_refs": [
+        "skills/spec-ideate/references/scope-gates.md:3-7",
+        "skills/spec-ideate/SKILL.md:12-20"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "output_consumer",
+      "status": "source-covered",
+      "judgment": "生成 ideation artifact；Phase 5 将选定 idea 作为 focused seed 交给 spec-brainstorm；文件格式与 resume 规则明确。",
+      "source_refs": [
+        "skills/spec-ideate/references/post-ideation-workflow.md:44-75",
+        "skills/spec-ideate/references/post-ideation-workflow.md:101-115"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "critical_error_stop",
+      "status": "source-covered",
+      "judgment": "subject 无法识别时先问；外部研究需独立授权；缺 basis、meeting-test 或 subject scope 的候选被拒；写入失败不得静默丢失结果。",
+      "source_refs": [
+        "skills/spec-ideate/references/scope-gates.md:11-52",
+        "skills/spec-ideate/references/divergent-ideation.md:61-83",
+        "skills/spec-ideate/references/post-ideation-workflow.md:54-63"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "degraded_recovery_handoff",
+      "status": "source-covered",
+      "judgment": "dispatch/provider 失败时退为 inline/serial，保留 reason code 和 coverage ceiling；无 repo 或 durable dir 时完整 inline 返回，不把 scratch 当作唯一交付物。",
+      "source_refs": [
+        "skills/spec-ideate/SKILL.md:56-69",
+        "skills/spec-ideate/references/grounding.md:1-39",
+        "skills/spec-ideate/references/post-ideation-workflow.md:54-64"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    }
+  ],
+  "findings": [],
+  "fresh_source_eval": "not-run",
+  "claim_ceiling": "C0",
+  "limitations": [
+    "issue-intelligence/universal/section/rendering/cache/agent 引用及 eval 未读；tests 为 not-run。",
+    "原机械占位结论已撤销；source-covered仅证明已读范围可追踪，不证明运行通过。",
+    "未确认读取范围不计覆盖；哈希只证明字节。"
+  ],
+  "recovery_point": "如需扩大审查，补读缺口后执行 eval/fresh-source；当前未确认其他逻辑 finding。",
+  "timing": {
+    "active_seconds": null,
+    "limitation": "逐包主动时间不可可靠恢复，未用工具墙钟估算。"
+  },
+  "record_correction": {
+    "at": "2026-09-20T05:55:01.020884+00:00",
+    "invalidated": "2026-09-20T05:24 的机械占位结论",
+    "replaced_by_actual_review_at": "2026-09-20T07:35:36.158199+00:00"
+  },
+  "supporting_read_ranges": {
+    "tests/unit/spec-ideate-phase-contracts.test.js": "1-86",
+    "tests/unit/spec-ideate-clarification-handoff-contracts.test.js": "1-46"
+  },
+  "unconfirmed_read_ranges": [
+    "其余 ideate references/agents/evals/tests（未读）"
+  ],
+  "reviewer_provenance": {
+    "reviewer": "cycle1_a_exit",
+    "kind": "read-only-source-review",
+    "fresh_per_package_context": false,
+    "raw_return": "reviewer-returns/b.json",
+    "raw_return_sha256": "74c86ff4af0bab17fbeb82f390cf57eb33590df5a24910b9823d19382480563c"
+  },
+  "execution": {
+    "source_semantic_review": "ran",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "not-run"
+  }
+}

@@ -1,0 +1,4 @@
+PASS: 多pushurl阻断，两端refs未变
+PASS: 唯一但非授权endpoint仍阻断
+PASS: followTags/mirror/通配push配置下仅授权分支到达，tag及无关分支未发布
+argv: git -c remote.<push-remote>.mirror=false push --no-follow-tags --no-mirror --recurse-submodules=no -u <push-remote> HEAD:refs/heads/<head-branch>

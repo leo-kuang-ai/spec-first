@@ -1,0 +1,11 @@
+{
+  "artifact_type": "generated",
+  "scope": "追加路径优先级修订；不证明 shell 合规或 live 通过",
+  "created_at": "2026-11-05T16:59:04.034672+08:00",
+  "files": {
+    "skills/spec-plan/SKILL.md": "8153ffb70566c4e6d2527438dc71c550e0fcfbb2d2eca7da7e3f2b04512a77b5",
+    "skills/spec-plan/references/final-review.md": "b4b9d45ec982993c5190398e18cd699815298f7b6a5a2b8210d068bce87caf84",
+    "skills/spec-plan/references/plan-handoff.md": "cdfbbde361586976d90f2515de812f5f411bb94139f77046879566d49bc4b910",
+    "tests/unit/spec-plan-reference-contracts.test.js": "545687821a2956e9386dfec2286b768292d3dd420e68518cd875676d61317d57"
+  }
+}

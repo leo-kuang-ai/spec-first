@@ -1,0 +1,7 @@
+{
+  "native_task": "/root/judge_readonly_wave2",
+  "session_id": "01a18aa9-e674-7093-b7b1-886409e6f720",
+  "source_transcript_sha256": "5d4de29f31726ca5eb182842661fe1b45f2d901427128833cc75f1295c17ab62",
+  "response_sha256": "207e124f1c583d6d5f0986497d696a14bfa0c21d9b6bc0a583db951954674831",
+  "scope": "Fresh reviewer context, arm mapping withheld; not cross-model independence or authenticated execution."
+}

@@ -1,0 +1,8 @@
+PASS tests/unit/spec-test-browser-conformance-cleanup.test.js
+PASS tests/unit/spec-test-browser-contracts.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       55 passed, 55 total
+Snapshots:   0 total
+Time:        3.233 s, estimated 4 s
+Ran all test suites matching /tests\/unit\/spec-test-browser-contracts.test.js|tests\/unit\/spec-test-browser-conformance-cleanup.test.js/i.

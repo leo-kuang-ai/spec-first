@@ -1,0 +1,46 @@
+{
+  "arm": "B",
+  "source_sha256": "5981fb85eda109b29bae6f6baf519a9f4b6f860baba7b59b24ad52cf75be1242",
+  "procfile": "worker: node queue.js --port 9200\nweb: node web.js --port 4300\n",
+  "cases": [
+    {
+      "case": "missing-port",
+      "argv": [
+        "--port"
+      ],
+      "elapsed_seconds": 0.0027422079583629966,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ERROR: --port requires an integer from 1 to 65535\n",
+      "timeout": false
+    },
+    {
+      "case": "missing-type",
+      "argv": [
+        "--type"
+      ],
+      "elapsed_seconds": 0.0023414159659296274,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ERROR: --type requires a value\n",
+      "timeout": false
+    },
+    {
+      "case": "procfile-web",
+      "argv": [
+        "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-polish-rml_kwt2/B",
+        "--type",
+        "procfile"
+      ],
+      "elapsed_seconds": 0.006634207966271788,
+      "exit_code": 0,
+      "stdout": "4300\n",
+      "stderr": "",
+      "timeout": false
+    }
+  ],
+  "limitations": [
+    "Port discovery only; worker and web commands were not started by this helper.",
+    "2-second missing-argument process timeout is independent of model-trial deadline."
+  ]
+}

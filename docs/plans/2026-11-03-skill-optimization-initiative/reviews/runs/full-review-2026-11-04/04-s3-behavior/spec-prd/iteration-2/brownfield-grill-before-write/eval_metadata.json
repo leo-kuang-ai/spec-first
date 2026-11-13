@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "棕地增量的 create 应先 grill 而非读后直写 PRD",
+  "prompt": "（spec-prd skill 已安装，请按它工作。）\n这个记账 demo 想加一个\"月度支出汇总\"能力:用户能看到当月总支出和分类占比。\n帮我写 PRD。\n",
+  "assertions": [
+    "expect.files_not_exist",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-prd/evals/fixtures/scripts/asks-a-question.sh"
+  ]
+}

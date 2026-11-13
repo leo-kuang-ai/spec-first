@@ -1,0 +1,9 @@
+PASS tests/unit/spec-brainstorm-clarification-contracts.test.js
+PASS tests/unit/spec-brainstorm-visual-retirement-contracts.test.js
+PASS tests/unit/spec-brainstorm-contracts.test.js
+
+Test Suites: 3 passed, 3 total
+Tests:       13 passed, 13 total
+Snapshots:   0 total
+Time:        0.533 s, estimated 1 s
+Ran all test suites within paths "tests/unit/spec-brainstorm-clarification-contracts.test.js", "tests/unit/spec-brainstorm-contracts.test.js", "tests/unit/spec-brainstorm-visual-retirement-contracts.test.js".

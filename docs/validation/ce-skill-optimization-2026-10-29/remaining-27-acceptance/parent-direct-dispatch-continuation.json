@@ -1,0 +1,21 @@
+{
+  "recorded_at": "2026-10-31T09:37:42.931752+00:00",
+  "scope": "Remaining original Browser and Wave6 receipt-interpretation slots, plus independent reviews.",
+  "target_repo": "/Users/kuang/xiaobu/spec-first",
+  "current_owner": "/root",
+  "dispatch": "Direct collaboration tools; one combined trial/reviewer slot; fork_turns none; inherited current model/effort without override.",
+  "observed_parent_child_metadata": "gpt-6.1-sol medium in direct Prototype trials. Observe every future receipt rather than assume identity.",
+  "timing": "Unchanged per-packet300s session admission. Coordinator end-to-end and isolated compute are unmeasured.",
+  "comparability": "Recorded metadata is not authenticated serving identity. Retain per-trial labels and flag any mismatch; do not infer relative quality/runtime/field benefit.",
+  "source_and_order": "Original packet/request/assigned-arm frozen sources and existing order unchanged. No opposite-arm/current runtime/prior-trial reads. Media filters exclude other Skill entrypoint before display.",
+  "limitations": "Read-only instructions and observed traces are not enforced filesystem isolation. Parent durable capture is not autonomous model save.",
+  "stop": "New infrastructure429 stops dispatch; preserve failed attempts and exact artifacts. No paid external CLI, install, commit, push, PR or runtime edits.",
+  "historical_refs": [
+    "current-host-continuation.json",
+    "dispatch-recovery-20261031.json",
+    "prototype-dispatch-owner-handoff.json",
+    "prototype-dispatch-owner-handoff-correction.json"
+  ],
+  "prior_protocols": "Historical observations retained, not overwritten.",
+  "independent_review": "Every six-original block independently reviewed before next scenario."
+}

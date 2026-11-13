@@ -1,0 +1,23 @@
+{
+  "status": "approved",
+  "user_response": "ok",
+  "scope": "batch5 README proposal: up to 24 primary model runs; 12M observed token stop; existing providers; fixture and target Skill only",
+  "recorded_at": "2026-11-01T17:41:49.298290+00:00",
+  "providers": {
+    "codex": {
+      "host": "qianxing.pro",
+      "model": "gpt-6-astra",
+      "effort": "medium",
+      "version": "0.166.0"
+    },
+    "claude_code": {
+      "host": "open.bigmodel.cn",
+      "configured_model": "glm-5.3[1M]",
+      "version": "2.1.311"
+    }
+  },
+  "limitations": [
+    "No reliable currency price cap",
+    "No project source/runtime/commit/push authorization"
+  ]
+}

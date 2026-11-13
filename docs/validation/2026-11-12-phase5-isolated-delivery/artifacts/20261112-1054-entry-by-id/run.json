@@ -1,0 +1,106 @@
+{
+  "schema_version": "spec-work-run-artifact/v2",
+  "generated_at": "2026-11-12T02:53:44.119Z",
+  "workflow": "spec-work",
+  "run_id": "20261112-1054-entry-by-id",
+  "mode": "non-interactive",
+  "workspace_slug": "repo",
+  "producer": {
+    "producer_available": true,
+    "workflow_integrated": true,
+    "reason_code": "trigger-substantive-work"
+  },
+  "plan_path": "docs/plans/2026-11-12-001-feat-entry-by-id-plan.md",
+  "plan_source": "explicit",
+  "task_pack_path": null,
+  "source_refs": [
+    "docs/plans/2026-11-12-001-feat-entry-by-id-plan.md"
+  ],
+  "script_confirmed": {
+    "validation": {
+      "status": "passed",
+      "reason_code": "verification-run-summary-aggregate-passed",
+      "run_summary_ref": ".spec-first/workflows/spec-work/repo/20261112-1054-entry-by-id/verification-run-summary.json"
+    },
+    "changed_files": [
+      "src/server.js",
+      "test/server.test.js",
+      "package.json",
+      "README.md",
+      "CHANGELOG.md"
+    ],
+    "artifact_refs": [
+      ".spec-first/workflows/spec-work/repo/20261112-1054-entry-by-id/verification-run-summary.json"
+    ],
+    "raw_log_ref": {
+      "kind": "repo_relative_artifact",
+      "display_ref": ".spec-first/workflows/spec-work/repo/20261112-1054-entry-by-id/logs/npm-test.log",
+      "secret_stripped": true,
+      "redaction_status": "none-required",
+      "retention_status": "lifecycle-deferred",
+      "access_boundary": "repo-local",
+      "reason_code": "bounded transcribed command output; no secret-like content present"
+    },
+    "resume_evidence": {
+      "status": "not-found",
+      "reason_code": "fresh run; no prior state generations under this run-id"
+    }
+  },
+  "llm_asserted": {
+    "summary": "按计划 2026-11-12-001 实施 U1-U3：U1 建立 node:test 表征基线（AE4/AE5，3 例在路由变更前的基线代码上全绿）并为 src/server.js 增加模块导出 + require.main 守卫接缝（CLI 行为不变）；U2 在列表分支之前新增 GET /entries/:id 单条分支（纯数字段 + 前导零归一化 + parseInt 严格相等，未命中一律 404 not found；列表与 POST 分支零改动），6 个特性用例先观察到预期 RED（子路径返回全量列表）再转绿；U3 更新 README endpoint 清单（two→three）并按 CHANGELOG 约定追加 v0.2.0 (user-visible) 条目。最终 npm test 10/10 全绿，CLI 冒烟三条通过（POST→ok；GET /entries/1→200+JSON；GET /entries/999→404 not found）。",
+    "read_artifacts": [
+      "docs/plans/2026-11-12-001-feat-entry-by-id-plan.md",
+      ".spec-first/workflows/spec-work/repo/20261112-1054-entry-by-id/verification-run-summary.json"
+    ],
+    "key_decisions": [
+      "KTD2 落地：/entries/ 之后剩余路径段须整体匹配 /^\\d+$/ 才做条目匹配（前导零经 parseInt 归一化），其余（非数字、空段、尾斜杠、小数、负号、越界、合法百分号编码形态——WHATWG URL 实测不解码 %32）一律 404，不引入 400",
+      "事实修正：Node v22 实测 new URL('/entries/%zz') 不抛异常，pathname 原样保留并落入 404 分支；计划所述『URL 解析异常暴露』实际不存在，行为比计划假设更安全",
+      "CHANGELOG 版本号 v0.2.0 为显式假设（package.json 0.1.0 + 新增用户可见 endpoint 的 minor bump；package.json 版本字段本身未改动，实际发布时由维护者定版）"
+    ],
+    "deferred_follow_up": [
+      "调用方边界：最终独立 code review（spec-code-review）由后续单独会话执行，本运行按调用方指令跳过",
+      "调用方边界：不 commit/push/PR；计划保持 status: active，plan-status complete 由 shipping-tail owner 在 review 门关闭后决定",
+      "计划明确 considered-and-not-built 的既有债务维持不动：src/server.js 的 if(false) 死代码块、POST /entries 对畸形 JSON body 的未捕获异常、/entries 前缀宽松匹配（/entriesfoo 仍返回列表）"
+    ],
+    "next_action": "由后续独立会话对本 diff 执行 spec-code-review；通过后再由其决定 commit 与 plan-status complete 迁移"
+  },
+  "provider_untrusted": {
+    "readiness_status": "not-run",
+    "summaries": []
+  },
+  "direct_evidence_used": {
+    "source_refs": [
+      "src/server.js",
+      "test/server.test.js",
+      "package.json",
+      "README.md",
+      "CHANGELOG.md",
+      "docs/plans/2026-11-12-001-feat-entry-by-id-plan.md"
+    ],
+    "checks_or_logs": [
+      "npm test → 10/10 pass（U1 表征 3 例 + U2 特性 7 例，覆盖 AE1-AE5）",
+      "RED 观察：路由变更前 6 个特性用例按预期失败（当时 /entries/<子路径> 返回全量列表，200+数组 vs 期望单条目/404）",
+      "表征基线：路由变更前 U1 3 例全绿（commit 9a29966 路由 + U1 接缝）",
+      "CLI 冒烟：POST /entries→200 ok；GET /entries/1→200 application/json；GET /entries/999→404 not found",
+      ".spec-first/workflows/spec-work/repo/20261112-1054-entry-by-id/logs/（4 个转录日志）"
+    ],
+    "repo_scope": "单仓 mini-ledger（main @ 9a29966，工作区即本 target repo）",
+    "limitations": [
+      "npm test 不证明 CLI 入口与 3000 监听（已由 CLI 冒烟补齐）与文档一致性（U3 为人工核对）",
+      "month 表征用例镜像基线公式（toISOString().slice(0,7)）推导期望，钉的是现状过滤语义而非日历正确性（计划 KTD5 既定）",
+      "最终独立 code review 未在本运行执行（调用方显式延后至后续会话）",
+      "运行环境 Node v22.22.3；计划 A4 假设 Node ≥ 18 成立"
+    ],
+    "redaction_status": "none-required"
+  },
+  "retention": {
+    "retention_status": "lifecycle-deferred",
+    "artifact_category": "spec-work-run-evidence",
+    "raw_log_retention_impact": "repo-relative-redacted-ref",
+    "redaction_status": "none-required",
+    "owner": "caller（return-to-caller 交接后的 review 会话）",
+    "expires_at": "2026-12-12T02:53:44.119Z"
+  },
+  "artifact_path": ".spec-first/workflows/spec-work/repo/20261112-1054-entry-by-id/run.json",
+  "warnings": []
+}

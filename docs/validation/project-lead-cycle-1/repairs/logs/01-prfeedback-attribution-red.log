@@ -1,0 +1,49 @@
+FAIL tests/unit/spec-resolve-pr-feedback-contracts.test.js
+  spec-resolve-pr-feedback contracts
+    ✕ 未修改的 consumer 失败不能按文件集合归为历史失败并放行提交 (2 ms)
+    ✓ 逐项独立准入 mutating 与 external exit (1 ms)
+    ✓ helper scripts resolve through the loaded skill directory, not runtime mirror paths (1 ms)
+    ✓ resolver prompt is a skill-local reference, not the retired repo-level agent path
+    ✓ full mode preserves CE central judgment and resolver integration safeguards (1 ms)
+    ✓ pipeline mode keeps unattended escalation and convergence rules explicit
+    ✓ fetch keeps author feedback visible and leaves actionability to semantic judgment
+    ✓ helper scripts preserve friendly owner repo fallback under set -e
+    ✓ streams large GraphQL payloads privately and blocks invisible pending-review replies (1 ms)
+
+  ● spec-resolve-pr-feedback contracts › 未修改的 consumer 失败不能按文件集合归为历史失败并放行提交
+
+    expect(received).not.toContain(expected) // indexOf
+
+    Expected substring: not "failures touch only files no resolver changed -> treat as pre-existing"
+    Received string:        "
+
+    After all agents complete, aggregate `files_changed` across every returned summary. If it is empty, skip steps 5 and 6 and proceed to step 7.
+
+    Validate only the local fixes actually authorized and applied in this run. Read-only triage or a pending `fix-list` is not a verified fix.
+
+    Resolvers run only targeted tests on their own changes. This step runs the project's full validation once against the combined diff.
+
+    1. Run the project's validation command.
+    2. Green -> proceed to step 6.
+    3. Red and failures touch resolver-changed files -> one inline diagnose-and-fix pass. Re-run validation. If still red, escalate with `needs-human` and do not commit.
+    4. Red and failures touch only files no resolver changed -> treat as pre-existing. Proceed to step 6, but add a commit footer: `Note: pre-existing failure in <test> not addressed by this PR.`
+
+    Record the validation outcome for the step 9 summary.
+
+    "
+
+      13 |     const validation = fullMode.split('## 5. Validate Combined State')[1].split('## 6. Commit and Push')[0];
+      14 |
+    > 15 |     expect(validation).not.toContain('failures touch only files no resolver changed -> treat as pre-existing');
+         |                            ^
+      16 |     expect(validation).toContain('same command and comparable environment');
+      17 |     expect(validation).toContain('shared-module changes can break unchanged consumers');
+      18 |     expect(validation).toContain('Unknown attribution remains failed');
+
+      at Object.toContain (tests/unit/spec-resolve-pr-feedback-contracts.test.js:15:28)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 8 passed, 9 total
+Snapshots:   0 total
+Time:        0.194 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/spec-resolve-pr-feedback-contracts.test.js/i.

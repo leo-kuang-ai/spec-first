@@ -1,0 +1,533 @@
+[
+  {
+    "scenario_id": "CEOPT-04",
+    "status": "source-bound-input-recipe-not-executed",
+    "files": {
+      "skills/spec-commit/SKILL.md": "f3ed607d09ee5a4d38fe702a2c047b4394981b84fa674c534d4b79a9717596f5",
+      "skills/spec-commit/evals/cases/fresh-tree-logical-grouping.yaml": "98bfbe974052d7a0629644e55da8f44fbeb0c8d2e7efb27cfb48833998fc5ff8",
+      "skills/spec-commit/evals/cases/no-auth-stops-before-staging.yaml": "a10986e8cd19e1e6b0fbe8cc37e3e0570b9a0ec004efaffe1ea8f625e686d9b5",
+      "tests/unit/spec-commit-scope-regression.test.js": "266ddbc678db015e0fbee44a41ed35fbfb54c6d24aa6cfe2ad68dc00dcdaf8e5",
+      "skills/spec-commit/evals/fixtures/repos/mini-ledger/prepare-eval.cjs": "bf52ca02b9faceb85e52bde94688f6a472801ca49ac669325aff7a2960e79b20",
+      "skills/spec-commit/evals/fixtures/repos/mini-ledger/src/server.js": "ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34"
+    },
+    "required_materialization": [
+      "Existing preparation captures clean HEAD/index and adds a README edit; it does not create mixed ownership within one file.",
+      "Create a disposable repository with two separately attributable hunks in src/server.js, an unrelated staged file, and an existing commit with a distinct author and trailer.",
+      "Supply exact owned hunk and excluded path identities, plus either a previously verified isolation strategy or an expected stop for the mixed file.",
+      "Retain pre-task index entries, blob contents, author/trailers and HEAD ancestry; compare actual committed patch and remaining staged/unstaged changes, including an unauthorized amend counterexample."
+    ],
+    "feasible_parent_actions": [
+      "Adapt the isolated Git setup from spec-commit-scope-regression.test.js; its current test already checks literal commit messages and preservation of unrelated staged content.",
+      "Perform all fixture construction and outcome inspection locally without a remote."
+    ],
+    "external_prerequisites": [],
+    "limitations": [
+      "No scenario execution occurred in this review. Existing file-grouping and index-preservation cases do not establish mixed-hunk or authorship behavior.",
+      "Parent-executed Git checks alone do not supply the required fresh baseline/candidate model trials."
+    ]
+  },
+  {
+    "scenario_id": "CEOPT-06",
+    "status": "source-bound-input-recipe-not-executed",
+    "files": {
+      "skills/spec-compound/SKILL.md": "02da78aefef12b96966fc4dd7e9fedd48d29ab5bbc9f03d57f1f6f6127852cca",
+      "skills/spec-compound/references/grounding-validation.md": "92613636eb5e83df363038ec75630d11dcb1d5426e42172e50ae0daf329d9dbd",
+      "skills/spec-compound/references/report.md": "fa2bcb90e21c8d0845570f070908bfea8f089c0b5b8f8a6d5ce0a42bdb83e4ed",
+      "skills/spec-compound/evals/cases/positive-publish-produces-solution.yaml": "e9a0744359b2cf6f517c52616118856122e18dd7c221fe1950436f3413dfddf4",
+      "skills/spec-compound/evals/cases/headless-no-qualifying-no-complete.yaml": "9e56e0f9456c0d5b4050b5c7b002e5a582a79431675b0d29589edc1402f7e0b9",
+      "tests/unit/spec-compound-reference-contracts.test.js": "7832158ff975ef447c05c2fc6c091ea72e0a26723ac57d720e3beed557b3d24d",
+      "skills/spec-compound/evals/fixtures/repos/solved-ledger/src/server.js": "db18861a7168c6cad9ab0ba5e0e53d3e3fe3d19e225d18e90270268103aff3b8",
+      "skills/spec-compound/evals/fixtures/repos/solved-ledger/test/entries.test.js": "152395b1f15288f78c86739aa9f932459486d7d1528d0ea0f0c07c202a269bc4",
+      "skills/spec-compound/evals/fixtures/repos/solved-ledger/package.json": "7a420c375b02d08b14e41cd027881b96bbd734a826904c72f804acb82e4f6060",
+      "skills/spec-compound/evals/fixtures/repos/trivial-fix/src/app.js": "d2c9c90a2139b53c58670091d4b5649ef94c29a15443f04b5a7fce53e766d1d3"
+    },
+    "required_materialization": [
+      "The solved fixture concretely rejects string amounts and accepts numeric amounts. Its incident history is supplied owner context, not an observed production incident.",
+      "Add a candidate knowledge record with source references, an invalidation condition and a unique recovery detail that a superficially similar existing record lacks.",
+      "Bind the exact validation/publication operation that returns unknown or nonzero. Use an actual local failing invocation or a clearly labeled controlled tool-result fixture; retain its exit/result.",
+      "Check that failed publication does not produce a success summary and that unique content survives deduplication."
+    ],
+    "feasible_parent_actions": [
+      "Copy solved-ledger into an isolated directory, run its actual regression tests and retain results.",
+      "Prepare local candidate/existing knowledge inputs and exercise local validators without external services."
+    ],
+    "external_prerequisites": [],
+    "limitations": [
+      "A controlled unknown/nonzero response is fixture evidence, not proof that a real external publisher failed.",
+      "Knowledge adequacy and preservation of unique meaning need source-grounded semantic review in addition to file and exit-code checks; no trials were run here."
+    ]
+  },
+  {
+    "scenario_id": "CEOPT-07",
+    "status": "source-bound-input-recipe-not-executed",
+    "files": {
+      "skills/spec-compound-refresh/SKILL.md": "b0a5dccac1b77e349fa4a99e0e83ea20857fbf992fa6fdd1d3aa5893db0b90e3",
+      "skills/spec-compound-refresh/references/publication.md": "d070209006c0b93ad92cde99dc8c263314cd86c535d6a8aacfbe1d3775d3e0cc",
+      "skills/spec-compound-refresh/references/vocabulary-refresh.md": "e972a30527b4392518e37b1631858f887794b47ca1906351492cde2764747f43",
+      "skills/spec-compound-refresh/evals/cases/non-solutions-scope-gated.yaml": "ce21b8e11aa5f3d50c1099b9e73d2211909533a0eccf6cd727ff6f5f818768ed",
+      "tests/unit/spec-compound-refresh-reference-contracts.test.js": "fa95f8547d58a89c8caf16aee54c9b1876be0ed8707ee747bc87fcbd373be3c7",
+      "skills/spec-compound-refresh/evals/fixtures/repos/mini-ledger/src/server.js": "ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34"
+    },
+    "required_materialization": [
+      "The existing MiniLedger fixture and scope-gate case contain no glossary, historical alias consumers or failing publication.",
+      "Create a scoped CONCEPTS.md with old/new aliases, two solution records with nonidentical recovery content, and an explicit surviving consumer of the old name.",
+      "Provide evidence identifying which definition preserves the old meaning and whether the relationship is alias or replacement.",
+      "Trigger a real local publication validation failure and preserve the pre-publication documents and candidate; check no published/retired claim and no Git landing action."
+    ],
+    "feasible_parent_actions": [
+      "Materialize all glossary, solution, consumer and failure inputs locally.",
+      "Inspect current reference-owned publication requirements and run its deterministic local validation leg with retained receipts."
+    ],
+    "external_prerequisites": [],
+    "limitations": [
+      "The existing tests establish reference contracts, not a completed alias migration.",
+      "Local fixture publication failure cannot be presented as remote publication evidence; baseline/candidate semantic runs remain necessary."
+    ]
+  },
+  {
+    "scenario_id": "CEOPT-08",
+    "status": "source-bound-input-recipe-not-executed",
+    "files": {
+      "skills/spec-debug/SKILL.md": "2a34444a5f6c4909b707d5d889718d0e82621d055b2be83914efb9be014f13a5",
+      "skills/spec-debug/references/fix.md": "700433136b9cae5be7aa8f2a0d1db5c800b2f96ac8b1679d69cc2a2a8b36a854",
+      "skills/spec-debug/evals/cases/fix-authorized-fixes-no-commit.yaml": "4f377e7019d7f18fa95fa8217016456cffff7c04951c40dc99c8613c751b8b9b",
+      "tests/unit/spec-debug-fix-reference-contracts.test.js": "57e36c96aa4af8812393768a4b227e7a821b2172eb080e3c23c59d7baac00215",
+      "skills/spec-debug/evals/fixtures/repos/mini-ledger/src/server.js": "ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34",
+      "skills/spec-debug/evals/fixtures/repos/mini-ledger/prepare-eval.cjs": "23fad84546d3d7b2c32bd6737b13f4dbecde12c9ccf179ac0f51c94bc872aecb"
+    },
+    "required_materialization": [
+      "Existing server code is an unexported HTTP process on port 3000 with POST/GET entries and no performance reproducer. Existing correctness cases do not bind a performance anomaly.",
+      "Create a deterministic slow workload in a disposable copy, with a specified request/input size and a measurable costly operation.",
+      "Supply a process-level reproducer that works before a test seam exists; capture pre-fix timing/profile and repeat the same workload after repair.",
+      "Retain any subsequently introduced proof test and test-only seam, and record measurement variability instead of inventing a universal timing threshold."
+    ],
+    "feasible_parent_actions": [
+      "Build a local CPU-bound or operation-count fixture and collect real Node profile/timing output.",
+      "Use the existing preparation pattern for HEAD/index preservation; inspect proof bytes and rerun the actual reproducer after changes."
+    ],
+    "external_prerequisites": [],
+    "limitations": [
+      "Synthetic local performance results establish only the fixture workload; they do not prove production performance.",
+      "The present fixture does not yet contain the frozen anomaly, and no model or performance trial was executed here."
+    ]
+  },
+  {
+    "scenario_id": "CEOPT-10",
+    "status": "source-bound-input-recipe-not-executed",
+    "files": {
+      "skills/spec-dogfood/SKILL.md": "9e5057e8670a5a9073b27e8051c0a669d759065ec1997a371d618719b2023a88",
+      "skills/spec-dogfood/evals/cases/owner-unavailable-stops.yaml": "b10a8385333b3f2265b6ef81ccb5c1db0ab09f2288cb022af2c63ebfb1ff53ce",
+      "skills/spec-dogfood/evals/cases/trunk-target-rejected.yaml": "bce3198d57ded657f2263126ae99e1d7589943b217b3d9ef1a6d61c169afa79c",
+      "skills/spec-dogfood/evals/fixtures/repos/mini-ledger/src/server.js": "ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34",
+      "skills/spec-polish/references/run.md": "272717e7bbc825104acb4e0e4177f00961673ad7a2bbdf7477386458e9445911",
+      "skills/spec-dogfood/evals/fixtures/repos/mini-ledger/package.json": "03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b"
+    },
+    "required_materialization": [
+      "MiniLedger is a JSON HTTP API, not a criteria-bearing UI page; add a local page with explicit observable acceptance criteria.",
+      "Prepare two distinguishable server/source versions and an interruption/resume boundary. Keep exact origin, process/command/cwd, source identity and criterion-to-page evidence.",
+      "Materialize the unavailable-browser-owner leg separately from the positive browser leg; the existing owner-unavailable case is a negative-path seed only."
+    ],
+    "feasible_parent_actions": [
+      "Create and restart local fixture servers, inspect their process/source identities and preserve pre/post snapshots.",
+      "Prepare the missing-owner input and verify that any claimed browser calls have actual trace entries."
+    ],
+    "external_prerequisites": [
+      "Positive rendered-page inspection requires the permitted browser owner capability. Availability was not probed by this read-only task; absence must not be assumed."
+    ],
+    "limitations": [
+      "HTTP reachability and server identity do not establish rendered criteria outcomes.",
+      "A simulated interruption or provider reply must remain labeled fixture evidence; fresh model runs and real browser receipts are still required for the positive leg."
+    ]
+  },
+  {
+    "scenario_id": "CEOPT-11",
+    "status": "source-bound-input-recipe-not-executed",
+    "files": {
+      "skills/spec-explain/SKILL.md": "bd82dcd441b82fd5336f3ea26bc22c5e382baf1d5dfc52ccb734719db4c6e39e",
+      "skills/spec-explain/references/orchestration.md": "19c4fd0be3613d0b98e7eab63aff9e034a7d9d9809c819948ea538bc7e39c735",
+      "skills/spec-explain/references/explainer-markdown.md": "f07b75d232a3f1796fd98824ecae92e68406d6c8eda2bdab9602292bc9b7900f",
+      "skills/spec-explain/evals/cases/simple-qa-not-triggered.yaml": "c1ba12805be87b0d1c464c9f7894ad87db363d15d7e0fa9c3be80e1a61bea11b",
+      "skills/spec-explain/evals/fixtures/repos/mini-ledger/src/server.js": "ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34",
+      "skills/spec-explain/evals/fixtures/repos/mini-ledger/README.md": "4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855"
+    },
+    "required_materialization": [
+      "The existing source supplies a concrete POST /entries chain: data events accumulate body, end parses JSON, entries.push changes state, response ends, and GET exposes state.",
+      "Use malformed JSON as the source-visible failure branch; identify unavailable recovery/cancellation evidence explicitly.",
+      "Replace the unrelated stream-versus-buffer prompt with a request to explain this exact chain and distinguish observable behavior from undocumented original design intent.",
+      "Request output:md or exercise the documented durable fallback destination; inspect artifact contents and source pointers."
+    ],
+    "feasible_parent_actions": [
+      "Bind the existing server without creating application code.",
+      "Check a resulting Markdown artifact for usable diagrams/prose, correct source references and explicit untraced/unknown-rationale qualifications."
+    ],
+    "external_prerequisites": [],
+    "limitations": [
+      "The fixture's lack of rationale documents does not prove that the original author never had a rationale.",
+      "Existing simple-QA coverage is not a behavior-tracing trial; explanation adequacy needs semantic assessment."
+    ]
+  },
+  {
+    "scenario_id": "CEOPT-12",
+    "status": "source-bound-input-recipe-not-executed",
+    "files": {
+      "skills/spec-handoff/SKILL.md": "4bc4a2e1da3aa5caa1e547c9f9d59410099823fa315c77f56c8e71ac7a5b6d6c",
+      "skills/spec-handoff/evals/cases/check-research-continuation.yaml": "1d3486cff17ddefc7c91a10fcf77b2cdf1c80ab3f626827e88c21259a3e883d9",
+      "skills/spec-handoff/evals/cases/check-review-continuation.yaml": "d3a7dd82bff2d808177c5d364c4ae6742b6a6f089f7a40384ec974f8b9f58b41",
+      "tests/unit/spec-handoff-contracts.test.js": "eee4e526b8567703a2151af788ad11b63c2c5adf331c2a5751b1a2b8d08c6597",
+      "tests/unit/ce-outcome-judge-calibration.test.js": "a63e68d4d0051c65287884d6e9c2c1bd413b6766ccd3b9d621e153f98e322686",
+      "skills/spec-handoff/evals/fixtures/repos/u28-outcomes/docs/notes/research.md": "e8200dbe38ca14818450457865040571ebe2cc9b095dd1f3757d57dc975af4a2",
+      "skills/spec-handoff/evals/fixtures/repos/u28-outcomes/docs/notes/review.md": "f88c3e9407adc27f8b33e15800e33ce7c3d160226a4feadba017077fa20e2147",
+      "skills/spec-handoff/evals/fixtures/repos/u28-outcomes/src/retry.js": "30a0b225e4ae9fc7ef8affd062eac7f0c15c5d353c5cd046d79704f254004416",
+      "skills/spec-handoff/evals/fixtures/repos/u28-outcomes/prepare-eval.cjs": "3e9546e4bca057f8438c9c97968bba11c7c9c07db3928518a75d6e7311baa726",
+      "skills/spec-handoff/scripts/handoff-artifact.cjs": "7875e4d8a4350de177d6eb28af88af7bf0f97ebe12721330b5d0a0383dfbc21d"
+    },
+    "required_materialization": [
+      "Research note explicitly retains research ownership and asks for the current retry limit; source contains retryLimit = 2.",
+      "Review note retains review ownership, identifies src/retry.js and README.md, and denies fix authority.",
+      "Add distinct pre-existing staged and unstaged edits after fixture preparation, capturing their blobs/index/HEAD.",
+      "Create the managed handoff with the real helper and pass its exact artifact/source identity into a fresh continuation; verify owner, no implementation write and unchanged HEAD/index."
+    ],
+    "feasible_parent_actions": [
+      "Use the helper's local create/discover behavior and inspect its receipt.",
+      "Run report-only research/review continuation against copied fixture files and compare fragile Git state."
+    ],
+    "external_prerequisites": [],
+    "limitations": [
+      "Reading a note in the same context is not evidence of cross-context continuity.",
+      "The two supplemental cases explicitly identify themselves as outside the frozen U31 comparison set; reuse their inputs without relabeling their prior results as frozen trials."
+    ]
+  },
+  {
+    "scenario_id": "CEOPT-13",
+    "status": "source-bound-input-recipe-not-executed",
+    "files": {
+      "skills/spec-ideate/SKILL.md": "dd427fca3e50bce7dc0fc7bc573633217e696c2f8583a1215c5e571c9665f733",
+      "skills/spec-ideate/references/issue-intelligence.md": "0e6cf9e3a75911b731ee1b91046e3a3ef39351af808e5b224911e43a32bd6e98",
+      "skills/spec-ideate/evals/cases/repo-grounded-e2e-writes-artifact.yaml": "b449d880c69515d7b0e788bc1b9c05382af34caafa55d93b51737218d31a1e88",
+      "tests/unit/spec-ideate-phase-contracts.test.js": "92fe697fddeb8106b449c5fafb0b45c2f76a376e20882b67cf10a5f902e59fe0",
+      "skills/spec-ideate/evals/fixtures/repos/mini-ledger/src/server.js": "ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34",
+      "skills/spec-ideate/evals/fixtures/repos/mini-ledger/README.md": "4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855"
+    },
+    "required_materialization": [
+      "Existing case asks for retention ideas and checks artifact-path wording; it does not contain multiple sources, duplicate issue identities or low-confidence/high-risk evidence.",
+      "Create an attributed local issue export with stable IDs, duplicate appearances across sources, fetched/eligible/analyzed/excluded counts and an explicit unknown remainder.",
+      "Include at least five eligible issues if exercising the issue-clustering path, because the current reference otherwise degrades to standard ideation.",
+      "Add one low-confidence high-impact incident lead and a frequent low-impact complaint; preserve confidence, source coverage and risk in the unique dossier and final ranking."
+    ],
+    "feasible_parent_actions": [
+      "Prepare all inputs as clearly labeled fixture exports without live tracker access.",
+      "Assess deduplication by stable issue identity and inspect semantic leverage ranking and retained high-risk investigation residue."
+    ],
+    "external_prerequisites": [],
+    "limitations": [
+      "Local exports can exercise evidence consumption, not live tracker retrieval or pagination.",
+      "Artifact existence and issue counts do not establish idea quality or correct risk prioritization; fresh semantic trials remain necessary."
+    ]
+  },
+  {
+    "scenario_id": "CEOPT-16",
+    "status": "source-bound-input-recipe-not-executed",
+    "files": {
+      "skills/spec-plan/SKILL.md": "bcc0e89dd04b3199a09ac16ee74a75a418fe609bd6cf6324f5c78a9d0bc9b416",
+      "skills/spec-plan/references/settled-decisions.md": "5b36b0da843bdd2ca18dae80c2cd6b53d3489ff9e2336a26ec07f75221a60937",
+      "skills/spec-plan/evals/cases/enriches-product-contract-in-place.yaml": "7e5a36ccd44d6e8763cfbe357c4b0ff1490e44b7d9ee14da327a3de6bcc2b8f0",
+      "skills/spec-plan/evals/cases/planning-only-rejects-implementation.yaml": "4f40fa899b75fe9be76f6030c248face1e21eb50ebff2fac473cef4094167a73",
+      "tests/unit/spec-plan-reference-contracts.test.js": "bbf1bfee86299ca54847bbdf954de2d38297073910cb8cd67e5804d459a56d04",
+      "tests/unit/ce-outcome-judge-calibration.test.js": "a63e68d4d0051c65287884d6e9c2c1bd413b6766ccd3b9d621e153f98e322686",
+      "skills/spec-plan/evals/fixtures/repos/order-import-enrichment/docs/plans/2026-07-31-001-feat-order-import-plan.md": "e2a497444666b4fda5f56325f7bc5c4941cffed48efb0b4c40d073d041429e5b",
+      "skills/spec-plan/evals/fixtures/repos/order-import-enrichment/src/order-importer.js": "db67e0a54ffc50ba0e00476190d96d72d972945649a0a7e4ceabd83b1e128125",
+      "skills/spec-plan/evals/fixtures/repos/order-import-enrichment/tests/order-importer.test.js": "70fb5552f686bc5332ed1ecbfd5df8cf8d063b6cc31d271e96de63fbb439bdc1",
+      "skills/spec-plan/evals/fixtures/repos/order-import-enrichment/prepare-eval.cjs": "64452fd7674015c74f53a4d22cb05ea3237cc52abc26de4c614ae60263395276",
+      "skills/spec-plan/evals/fixtures/repos/order-import-direct/src/order-importer.js": "db67e0a54ffc50ba0e00476190d96d72d972945649a0a7e4ceabd83b1e128125"
+    },
+    "required_materialization": [
+      "Existing Product Contract provides R1 transient retries, R2 immediate validation failure, R3 compatible CLI output, and two acceptance examples inside explicit product markers.",
+      "Add an attributed settled decision with rejected alternative and reason, plus a concrete research-leaf return with source refs and stable concern/KTD identity.",
+      "Use the existing no-queue/non-background-system scope boundary to check that a rejected queue proposal does not reappear as deferred work.",
+      "Capture original Product Contract bytes and complete implementation inventory before enhancement."
+    ],
+    "feasible_parent_actions": [
+      "Reuse the in-place enrichment fixture and compare protected product bytes, source inventory, index and HEAD.",
+      "Run the research role inline where permitted and mark lack of independent-worker coverage; no application test execution belongs to this planning leg."
+    ],
+    "external_prerequisites": [],
+    "limitations": [
+      "The frozen leaf-return semantics require an actual traceable return or clearly labeled inline equivalent; an invented worker transcript is invalid.",
+      "Existing enrichment checks do not alone prove concern quality or that rejected decisions remain rejected."
+    ]
+  },
+  {
+    "scenario_id": "CEOPT-17",
+    "status": "source-bound-input-recipe-not-executed",
+    "files": {
+      "skills/spec-polish/SKILL.md": "629bccf39d24b682d49b9589035ccac7ea634055b385feac0e349ce71e25be26",
+      "skills/spec-polish/references/run.md": "272717e7bbc825104acb4e0e4177f00961673ad7a2bbdf7477386458e9445911",
+      "skills/spec-polish/references/dev-server-procfile.md": "3a5a5e796ca4dc72efa1fad5f7deaa119debca5078bd5395941d7fbff08aeb69",
+      "skills/spec-polish/evals/cases/review-request-routes-out.yaml": "9f57e31faa01707ef47c236672b712cbee5f8019098cd21476a5051c0512dd8f",
+      "tests/unit/spec-polish-launch-json.test.js": "881b86fc598a9dfeb2af66e6253c8786f7861f7ff420347e87b324264ccc239b",
+      "tests/unit/spec-polish-project-type.test.js": "995c28a50f513badd72a6d391cbcf30ff3c8184d7c3cc9f626c16d86a4bf0417",
+      "skills/spec-polish/evals/fixtures/repos/mini-ledger/src/server.js": "ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34",
+      "skills/spec-polish/scripts/read-launch-json.sh": "bb0d99075b97fbdacffd9de4e2078b2a54c4290bec0c213f2e7365bee8ec38d0",
+      "skills/spec-polish/scripts/resolve-port.sh": "5981fb85eda109b29bae6f6baf519a9f4b6f860baba7b59b24ad52cf75be1242",
+      "skills/spec-polish/scripts/detect-project-type.sh": "08540add756eb63eded2aabe2a87f5218519d7001124e14d1681f77b473d0c4b"
+    },
+    "required_materialization": [
+      "Launch tests generate missing/invalid configuration and multiple-name inputs, but the existing eval case only tests routing away from static review.",
+      "Materialize a missing argument invocation with a bounded timeout and capture exit/stdout/stderr.",
+      "Create Procfile.dev with distinct web/worker or multiple web commands and ports; preserve the selected filename and ensure only the selected web command supplies a candidate port.",
+      "Create a feedback-resume input preserving owner and server identity, replace/restart the server, and retain unresolved verification residue."
+    ],
+    "feasible_parent_actions": [
+      "Exercise launch-reader, project-detection and port-resolution helpers on local generated configurations.",
+      "Use an explicitly supplied local start command if no process manager is available; absence of Overmind alone is not a universal blocker.",
+      "Capture actual command/cwd/port/source identities before and after restart."
+    ],
+    "external_prerequisites": [
+      "A complete interactive polish/browser result requires the permitted browser owner and, where the scenario requires it, actual user feedback. Neither capability nor feedback was established here."
+    ],
+    "limitations": [
+      "Helper exit/port correctness is only the deterministic startup leg.",
+      "Generated configuration tests do not establish successful live multi-process startup or resumed visual inspection."
+    ]
+  },
+  {
+    "scenario_id": "CEOPT-19",
+    "status": "source-bound-input-recipe-not-executed",
+    "files": {
+      "skills/spec-prd/SKILL.md": "25cc60f639d886c024a61b462c84cb101f6b95a6098984a879f2a750292e230a",
+      "skills/spec-prd/evals/cases/validate-report-only.yaml": "5e3e83851c4e2769f3fe9ec172a478fbf36fd73ea34c36a325a8599d8a6f8076",
+      "tests/unit/spec-prd-finalize-transition.test.js": "be933d0ef61ded3020319c2d63ea6f305d8e152ac900e25e77d26d3efedba9ad",
+      "skills/spec-prd/evals/fixtures/repos/rough-prd/docs/brainstorms/2026-09-01-expense-export-requirements.md": "52b88776d17fe7bb2be9a110c2a24ca1937810218532dbb4b817b0dffc40077b",
+      "skills/spec-prd/scripts/finalize-prd-artifact.js": "338d76d7f70b4755556498d42eb632994afd50467b26152c4d97b37d9975e90a",
+      "skills/spec-prd/scripts/check-prd-artifact.js": "8f4f3f5e5dbc7c4ea3761cc76610ec0b1727f5c50214e7cbf8606f3ff1a181be"
+    },
+    "required_materialization": [
+      "Reuse finalIntentPrd() and source/input.md from the transition test rather than the rough PRD, which has unresolved product questions and no signed receipt.",
+      "Create a real initial receipt, then separate body, body-plus-input and metadata mutation copies before invoking refreshInputsHash.",
+      "Create the legal input-only mutation control and retain unchanged prd_hash plus changed inputs_hash.",
+      "Reuse the permission mock file naming implementation-only question and explicit planning_would_invent_what contradiction as positive/negative semantic-boundary controls."
+    ],
+    "feasible_parent_actions": [
+      "All frozen deterministic subcases have concrete local generators and assertions in the inspected transition test.",
+      "Invoke actual finalize/verify/check operations and retain real receipts and artifact bytes."
+    ],
+    "external_prerequisites": [],
+    "limitations": [
+      "These local API checks can establish receipt invalidation behavior, not whether a model chooses the correct workflow action.",
+      "The validate-report-only eval is related coverage only; it cannot substitute for baseline/candidate refresh-inputs trials."
+    ]
+  },
+  {
+    "scenario_id": "CEOPT-21",
+    "status": "source-bound-input-recipe-not-executed",
+    "files": {
+      "skills/spec-promote/SKILL.md": "96ff96037364fb5cdd95ed3d8eef355b14834f77fdb11a7820ca24abfaaaf7f7",
+      "skills/spec-promote/evals/cases/check-unreleased-local-drafts.yaml": "f6889a03b17982d4fcd730be44f9c51fcd13e7f65e173fffaf4bd99219f588cd",
+      "skills/spec-promote/evals/cases/no-publish-side-effects.yaml": "aed3e052e2c70511011362cd90289e24bb4f9f285b672cb9adad165839c2742d",
+      "tests/unit/spec-promote-auth-probe.test.js": "2b6ad9d059e03d91330b51817257239be5430969e3672bddcc9bdc7b788b428a",
+      "skills/spec-promote/evals/fixtures/repos/u28-outcomes/README.md": "9d00ef42dbcfe57e1210c16cc19ef16854ef941aba0eae0e60b6545e2deba0af",
+      "skills/spec-promote/evals/fixtures/repos/u28-outcomes/CHANGELOG.md": "f434a5f88d5eda4e48507d48e633632b2bb5bcd2d018fbf37cbc9ad5a88ddf22",
+      "skills/spec-promote/evals/fixtures/repos/u28-outcomes/prepare-eval.cjs": "e22a13c31e3026de3b99f0ff2430563afd1c81f2b908c3e253aff20f5ae0e9b9"
+    },
+    "required_materialization": [
+      "README explicitly says monthly summaries are local and not released/deployed; CHANGELOG places them under Unreleased. These are concrete release-status inputs.",
+      "Add separate existing configuration variants: tracked, untracked/ignored and untracked/not ignored. Capture tracked status and check-ignore output without overwriting preferences.",
+      "Retain local-only authority and inspect both draft bodies for unsupported availability claims, not merely delivery_status.",
+      "Capture complete relevant tool calls so unauthorized provider probing/writing is not inferred solely from final prose."
+    ],
+    "feasible_parent_actions": [
+      "Use the exact local-drafts prompt and copied release-status fixture.",
+      "Materialize Git ignore/tracking variants and compare config bytes, HEAD and index."
+    ],
+    "external_prerequisites": [],
+    "limitations": [
+      "Spiral is intentionally unnecessary for this local-only scenario; missing authentication is not a blocker.",
+      "The supplemental case explicitly disclaims full semantic wording coverage and is not itself a frozen U31 trial; semantic assessment and repeated model runs remain required."
+    ]
+  },
+  {
+    "scenario_id": "CEOPT-22",
+    "status": "source-bound-input-recipe-not-executed",
+    "files": {
+      "skills/spec-prototype/SKILL.md": "07563d5c500f0280de5adccce7be149558e3443d2f20bdeeec837f462435552a",
+      "skills/spec-prototype/evals/cases/go-ahead-before-build.yaml": "16da6a08886c461b12bba0572d4f365dcb85b2f4927688bfe3f262292376a511",
+      "skills/spec-prototype/evals/cases/headless-blocked.yaml": "6ad65da0d36a5c6822d8fe198fd181781cd6d0d9481735a2b83615ee6ec1aa90",
+      "tests/integration/spec-prototype-human-journey.integration.test.js": "5ea3cb16eeede20ed37804fc73db886503f1c58b7615c2837b510fd0857c84c4",
+      "skills/spec-prototype/scripts/light-webserver.js": "94442c66dc5fa85ceb6641bd1b644d8a66ab7cac5e741ce0f28f152d5c1162c3"
+    },
+    "required_materialization": [
+      "The integration test generates screens/screen.html containing a prototype title and exercises start/get/status/stop, CSP, traversal and symlink rejection.",
+      "Materialize a meaningful chart-first versus numbers-first throwaway screen from the existing scoping case, with explicit build authority.",
+      "Add actual reload/resume steps, changed screen content and preserved run identity; inspect new served bytes and token-bound stop behavior.",
+      "Keep production files unchanged and leave decisions.md absent unless an actual human choice exists."
+    ],
+    "feasible_parent_actions": [
+      "Exercise the local preview helper lifecycle, loopback restriction, token identity and stale/unrelated process refusal.",
+      "Check local server responses, CSP and preserved source inventory without external services."
+    ],
+    "external_prerequisites": [
+      "The current workflow explicitly requires a human to experience the prototype and refuses unattended/pipeline completion. Helper checks can proceed, but they cannot supply the missing human experience or decision."
+    ],
+    "limitations": [
+      "The integration test's name does not make its HTTP assertions human experience evidence.",
+      "No synthetic human approval, screenshot inspection or provider response may be promoted to an actual product decision."
+    ]
+  },
+  {
+    "scenario_id": "CEOPT-26",
+    "status": "source-bound-input-recipe-not-executed",
+    "files": {
+      "skills/spec-simplify-code/SKILL.md": "ed1f1b0d4c1926e8ff3a656cfc77f51de893a81f3ce5aa106ca355d9103b7320",
+      "skills/spec-simplify-code/evals/cases/safety-check-preserved.yaml": "54f7e51a7a713d07fd839336834bb52274f4daa0d121dec8d5fa79ca23fdf327",
+      "skills/spec-simplify-code/evals/cases/r2-elegant-refactor.yaml": "c6be4fae47b8ce6d39b524bab62b7b3d4dca3443882ff0d6056fa4ad7196f4f0",
+      "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/src/server.js": "60fcede431e7da0426edd494e69a0680e4f6b3dd786e373d942872ce7a4c0716",
+      "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/test/entries.test.cjs": "04bc52452e6a611d0609d28002ea50937126dcf5466e5a40c22727c6726623cf",
+      "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/test/support/ledger-proof.cjs": "621f7beb407ab683a34577ab28393256b3736ef4f9c4cc2601ed1785a2169c05",
+      "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/README.md": "4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855",
+      "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/package.json": "966fdf6bda7b2bf2bd70b9c42ddcbd4f2411804e4a22de7ff0ef161db16ddcad",
+      "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/prepare-eval.cjs": "0bb64e398f2c01fdbad21c92d0e3a3223d73b245e58118a4505f43794af1a69b"
+    },
+    "required_materialization": [
+      "The current case already explicitly names proof-test:test/entries.test.cjs and protects test/support/ledger-proof.cjs byte-for-byte.",
+      "The seam launches the actual candidate server on an ephemeral loopback port and checks malformed JSON, invalid amounts, process survival and valid entry preservation.",
+      "Capture baseline proof bytes and actual initial test result, then run the model simplification and capture final rerun plus final source identity.",
+      "For judge calibration, create separate forbidden proof weakening and removed-safety implementation mutants without editing the reference fixture."
+    ],
+    "feasible_parent_actions": [
+      "Copy the fixture, use its real HTTP proof and inspect equivalence under a production-only refactor.",
+      "Compare proof/seam hashes and verify the final rerun was after the last production mutation."
+    ],
+    "external_prerequisites": [],
+    "limitations": [
+      "The checked source provides a strong ready input binding, not an executed pass.",
+      "A parent-authored equivalent refactor calibrates mechanics but does not replace fresh baseline/candidate model trials."
+    ]
+  },
+  {
+    "scenario_id": "CEOPT-27",
+    "status": "source-bound-input-recipe-not-executed",
+    "files": {
+      "skills/spec-strategy/SKILL.md": "edfd4866fadfb26582068a2195f86a8c65f32626156a0f5bbce10afd265bb0f6",
+      "skills/spec-strategy/references/interview.md": "62864c5dcfe108e72fac67d92e1a757ca6bd051feaf68242ee1df94a513e6767",
+      "skills/spec-strategy/evals/cases/check-owned-update.yaml": "db5489a3c14b23e7424f0a88630d17ea04688ceddcb072e0023e89ddff66ce38",
+      "skills/spec-strategy/evals/cases/targeted-update-metrics.yaml": "e09d7424b99544a8b1518fcb47a31109543a9e906c83df89296991c113a808d8",
+      "tests/unit/spec-strategy-contracts.test.js": "4460d529b8c65abb2d4aecd7e6e5edcaeb352782a515c56ab8dc0af6b9f1b2c3",
+      "skills/spec-strategy/evals/fixtures/repos/existing-strategy/STRATEGY.md": "0ef39f74fa53d24815cbcc629ebfa43b3bc7dff5b7bba1a6bb934dc20d3b0a5e",
+      "skills/spec-strategy/evals/fixtures/repos/u28-outcomes/STRATEGY.md": "6c1e1e8c9dad4470bf665c24bff12b970c26f74cbb7d3ef6281bd9c0b901b8a2",
+      "skills/spec-strategy/evals/fixtures/repos/u28-outcomes/prepare-eval.cjs": "686285663ec55b49fe14ae306f43ef18b39101182d269641174f2b52cfdf6c80"
+    },
+    "required_materialization": [
+      "Existing strategy concretely targets 1\u20135 person freelance studios, automatic bank import/classification and reconciliation under ten minutes.",
+      "The u28 fixture separately supplies an author-approved retention section for unchanged-byte verification.",
+      "Provide a tempting adjacent proposal, such as expanding into studio payroll, plus an attributed actual owner rejection and its reason. Neither existing strategy fixture contains that decision.",
+      "Bind the allowed target section and preserve all other bytes; distinguish a synthesized resistance principle from the owner's original words."
+    ],
+    "feasible_parent_actions": [
+      "Prepare a synthetic but explicitly attributed evaluation decision packet, rather than claiming a real prior user rejection.",
+      "Evaluate whether the pressure test discriminates between plausible options and whether edits preserve untargeted/author-approved text."
+    ],
+    "external_prerequisites": [
+      "If the acceptance requires a real project-owner rejection rather than a controlled evaluation input, that decision must come from an actual owner record or response. It cannot be inferred from code."
+    ],
+    "limitations": [
+      "The current owned-update case proves only a prescribed sentence replacement.",
+      "A fixture role response can test decision handling, but cannot be represented as the user's real strategic judgment."
+    ]
+  },
+  {
+    "scenario_id": "CEOPT-30",
+    "status": "source-bound-input-recipe-not-executed",
+    "files": {
+      "skills/spec-test-xcode/SKILL.md": "e9397a88ddba0144200a6595bf353d8676ab3919dceb56d77360390b5317069b",
+      "skills/spec-test-xcode/references/test-and-report.md": "dba45f36ce392bee821ea849e6e2537f110c8ab714d3f7e6ba0a9a88ebe4647a",
+      "skills/spec-test-xcode/evals/cases/mcp-unavailable-stops.yaml": "17edc725e7da56df5c319d2f14738b3ccb3af5dc2c76287be2e8b8ec80ed67ea",
+      "tests/unit/spec-test-xcode-contracts.test.js": "9c6759820e0598ddb551a0f159056cd9246b54fd25e54b30a6b608fe1cbcbe27"
+    },
+    "required_materialization": [
+      "Existing case supplies only an unavailable-MCP assumption and a keyword judge; no iOS project, bundle identity, screenshot or unchanged-state tap fixture was found in this package inventory.",
+      "For the negative leg, bind actual tool availability and capture zero build/install/launch calls.",
+      "For the tap leg, provide an exact app/project/scheme/simulator and source identity, a real tool tap result, and before/after screen/state/log evidence demonstrating no navigation.",
+      "Derive bundle ID from the actual build/application evidence, never a placeholder."
+    ],
+    "feasible_parent_actions": [
+      "Inspect actual host capability and exercise the missing-capability branch.",
+      "Prepare a clearly labeled controlled tool-response transcript to evaluate interpretation separately from real simulator execution."
+    ],
+    "external_prerequisites": [
+      "Real positive/tap-state coverage requires XcodeBuildMCP, a usable simulator and a concrete app. Their readiness was not probed in this read-only task.",
+      "Any manual-only action requires an actual human observation."
+    ],
+    "limitations": [
+      "A fake successful tap with a fake unchanged screenshot tests reasoning only and cannot become provider-confirmed app evidence.",
+      "The existing keyword judge cannot establish zero build calls or correct post-action verification."
+    ]
+  },
+  {
+    "scenario_id": "CEOPT-31",
+    "status": "source-bound-input-recipe-not-executed",
+    "files": {
+      "skills/spec-work/SKILL.md": "3a192fe50952380dcf4bf18ee73435ada13b15d44110dde8a33a8c4d0557c879",
+      "skills/spec-work/references/implementation-loop.md": "7fc8a396ae871ec187eea0e0a6fb95cd11f654be84df6ef830d0a1bb71fd203c",
+      "skills/spec-work/references/feedback-and-tests.md": "71adda968968fcff7c10d3748dc2adcca8f36cca0d0787cdd4046158169f4b2a",
+      "skills/spec-work/evals/cases/return-to-caller-envelope.yaml": "2535864d918b909d21a704f3bd6ab856758ca4f5275f899b3dda2b02e2eb6ccd",
+      "skills/spec-work/evals/cases/r2-reverse-mismatch.yaml": "9358a99291854b35e684f7832227908312de588b082fd49e0975a2eac9b09c8a",
+      "skills/spec-work/evals/cases/standalone-closeout-order.yaml": "56ad9fe59724a8c61c1dff7ade0aa5eb586191e17a4ca58391ebc810656f0150",
+      "tests/unit/spec-work-execution-strategy-contracts.test.js": "f86b0516c1532fc5c04f6a30321788cfc33cd35725fa28e363f03e7504429cf5",
+      "skills/spec-work/evals/fixtures/repos/mini-ledger-guarded2/docs/plans/2026-09-01-001-feat-month-filter-plan.md": "ebe41c2e90728c765a06f1e9b200c668a93570310c8b102fe70081ced9cbc1a1",
+      "skills/spec-work/evals/fixtures/repos/mini-ledger-guarded2/src/server.js": "e5f46eadeb6533438ee83f04cfcfe5296a8f25d66736945f8b783e077d0ae726",
+      "skills/spec-work/evals/fixtures/repos/reqonly-plan/prepare-eval.cjs": "dc810371244f93761aff0fe9dcb70baf10e90a164c69a1e50368155bc23acc86",
+      "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/test/entries.test.cjs": "04bc52452e6a611d0609d28002ea50937126dcf5466e5a40c22727c6726623cf",
+      "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/test/support/ledger-proof.cjs": "621f7beb407ab683a34577ab28393256b3736ef4f9c4cc2601ed1785a2169c05"
+    },
+    "required_materialization": [
+      "Current positive work cases perform a README heading change, not a settled UI plan with Simplify and Figma comparison.",
+      "The guarded2 plan is active/implementation-ready but its month filter is already implemented; use it for reverse-mismatch preservation, not as evidence of new implementation.",
+      "Create a concrete settled UI implementation plan with protected proof paths, exact allowed source files, design node/frame widths/states and an exact local origin/route.",
+      "Reuse the Simplify proof pattern for the code leg, preserving original symptom evidence and rerunning after cleanup.",
+      "Retain same-frame design and implementation images plus final-tree identity and reconciliation of remaining differences."
+    ],
+    "feasible_parent_actions": [
+      "Construct the settled plan and local implementation/proof fixture, perform bounded implementation, Simplify and final-tree verification.",
+      "Complete nonvisual legs while explicitly retaining a visual limitation if design/browser evidence is unavailable."
+    ],
+    "external_prerequisites": [
+      "The genuine Figma comparison requires the exact design target/evidence and permitted browser screenshot capability. Neither is supplied by the inspected fixtures.",
+      "An absent Figma target is missing input, not automatically a missing host capability; capability readiness must be checked separately."
+    ],
+    "limitations": [
+      "A local code/proof pass cannot close the frozen same-frame visual requirement.",
+      "Generic screenshots or a fabricated Figma identity are not acceptable substitutes; fresh baseline/candidate orchestration traces are still needed."
+    ]
+  },
+  {
+    "scenario_id": "CEOPT-33",
+    "status": "source-bound-input-recipe-not-executed",
+    "files": {
+      "skills/spec-write-tasks/SKILL.md": "ad4decabc11124b24bfe45b850ba1f4e959f86340159bb5ebdbd90bc8e04c8e2",
+      "skills/spec-write-tasks/evals/cases/small-plan-skip.yaml": "49fd457e1dc8f2b8b8f9f26c716a01cdbde4e6e58348a9e9da98cb743727a192",
+      "skills/spec-write-tasks/evals/cases/non-active-rejected.yaml": "a45d6ab2e11ad87b728e94bd22d1012561dc88dab866101cb627bdab38cebaaa",
+      "tests/unit/spec-write-tasks-contracts.test.js": "02aca7b8683ae271611359ba0f4449f05b0720af94ccb451c838560c71171c40",
+      "tests/unit/task-pack-command.test.js": "d31e7d91045dfd59a02d6e3067d88e9a1696dc69be3777097c42db8e418c976b",
+      "skills/spec-write-tasks/evals/fixtures/repos/tiny-plan/docs/plans/2026-09-01-001-feat-month-filter-plan.md": "9740a796154e879ff8f7adf4b4fdcb307043ea84390777216e122ac2349f6fbf",
+      "skills/spec-write-tasks/evals/fixtures/repos/done-plan/docs/plans/2026-08-01-001-feat-old-thing-plan.md": "d098ab0cd8a16f2b8dc0a8c78202dc053b3fbd0f62014add5c457f3941a04c84"
+    },
+    "required_materialization": [
+      "Reuse writeTaskPack() to generate executable contract JSON with the canonical source plan hash.",
+      "Reuse existing/future/dangling/leaf symlink setup and external sentinel; reuse .git/config, case variants, .opencode skills/commands and opencode.jsonc path vectors.",
+      "Reuse taskContext containing proof refs, a test-only seam, session-settled separate owners and external callback done_signal.",
+      "Add a concrete proposed task that reverses the settled owner decision; the CLI structural validator cannot decide semantic contradiction.",
+      "Capture source plan bytes before compilation/validation and require unchanged bytes after both rejected and legal cases."
+    ],
+    "feasible_parent_actions": [
+      "All path-safety cases and the legal proof/settled/external-intent serialization control can be generated and checked locally.",
+      "Invoke tasks hash/validate against isolated roots and inspect deterministic_handoff, sentinel preservation and returned task context.",
+      "Review reverse-decision handling semantically against the explicit source plan."
+    ],
+    "external_prerequisites": [],
+    "limitations": [
+      "The inspected test explicitly limits successful CLI validity to identity-freshness-structure-only.",
+      "Preserved external done intent is not execution of that callback, and structural validation cannot establish semantic preservation of settled decisions.",
+      "No fixture was materialized and no trial was executed in this read-only task."
+    ]
+  }
+]

@@ -1,0 +1,167 @@
+{
+  "skill_name": "spec-write-tasks",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T19:26:22.950192+08:00",
+  "end_time": "2026-11-04T19:30:44.357501+08:00",
+  "case_results": [
+    {
+      "case_id": "bare-request-asks-path",
+      "title": "裸拆分请求应询问源计划路径",
+      "status": "PASS",
+      "duration_ms": 83276,
+      "turns": 5,
+      "input_tokens": 25938,
+      "output_tokens": 1379,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 5,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-write-tasks/evals/fixtures/scripts/asks-a-question.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-write-tasks skill 已安装，请按它工作。）\n帮我把计划拆成任务包。\n",
+      "response": "CLI 可用（`hash` 和 `validate` 子命令都在），后续确定性校验具备条件。但当前工作目录里除了 skill 本身没有任何源计划——`docs/plans/`、`.spec-first/` 都不存在，整个目录只有 `.claude/skills/spec-write-tasks/`。\n\n按 skill 规则，裸拆分请求必须先解析出**唯一一份本地源计划**，解析不到就不能进入 compile 分支，也不能凭空发明范围。需要你提供：\n\n1. **源计划路径**（例如 `docs/plans/xxx.md`），计划需已定稿（`status: active`），包含需求、范围边界、实施单元、验证契约等章节；\n2. 如果计划不在当前目录，告诉我它所在的仓库/目录路径。\n\n拿到路径后我会执行完整流程：读取计划 → 计算规范化哈希（`spec-first tasks hash`）→ 拆分任务卡与执行波次 → 生成任务包（`docs/tasks/`）→ `spec-first tasks validate` 确定性校验 → 返回交接信封。\n\n本次运行的决策信封：\n\n```yaml\ndecision: return-to-plan\nreason_code: source_plan_missing\nidentity_basis: source-plan-path+body-hash\nartifact_root: null\nrepo_root: null\nsource_plan: null\ntask_pack: null\ntask_pack_validity: not-applicable\ndeterministic_handoff: false\nvalidity_scope: identity-freshness-structure-only\nsemantic_posture: not-applicable\nreason: 工作目录内未解析到任何本地源计划，裸拆分请求无法定位唯一 source plan，等待用户提供计划路径。\ndispatch_authorization: not_applicable\nvalidation: null\norientation:\n  provider: direct-repo-reads\n  posture: bounded\n  evidence_refs:\n    - \"find \u003cartifact-root\u003e -name '*.md' -o -name '*.json' ...\" # 仅命中 skill 自身文件\n    - \"ls \u003cartifact-root\u003e\" # 仅 .claude/\n  limitations:\n    - 工作目录只有 skill 文件，无 docs/plans/ 或 .spec-first/ 下的计划\n    - 未执行 spec-first 校验：无可校验的任务包产物\nnext_action: stop\n```\n\n请把源计划的路径发给我，我立即继续。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "remote-input-rejected",
+      "title": "远程仓库输入应被拒绝并要求本地 source-owned 输入",
+      "status": "PASS",
+      "duration_ms": 261086,
+      "turns": 1,
+      "input_tokens": 24890,
+      "output_tokens": 1490,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-write-tasks/evals/fixtures/scripts/rejects-remote.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-write-tasks skill 已安装，请按它工作。）\n帮我把我朋友 GitHub 仓库 https://github.com/someone/their-ledger 里的\n计划拆成任务包。\n",
+      "response": "输入分类完成，但这次运行无法进入编译分支，先说结论：\n\n**这个请求被 `spec-write-tasks` 的输入契约拒绝了，而且 URL 本身也探测不到。**\n\n两 个独立的问题：\n\n1. **远程仓库不是合法输入。** 该 skill 的契约明确要求输入必须是本地、source-owned 的 spec-plan 计划（`Inputs must stay local and source-owned; remote repos ... are rejected`）。它只编译已经落在本地的计划文档，不会去拉取、解析远程仓库里的材料。\n2. **该 URL 实际不可访问。** 我探测了 `https://github.com/someone/their-ledger`，GitHub API 返回 `404`——要么仓库不存在（`someone/their-ledger` 看起来像占位符，请确认你朋友的真实仓库地址），要么是私有仓库（GitHub 对无权限访问的私有仓库同样返回 404）。\n\n## 要继续的话，需要你做两件事\n\n1. **给我真实仓库地址，并把它 clone 到本地**（或至少把里面的计划文档放到本地某个目录）。\n2. **确认里面的计划是 spec-plan 产物**：带 frontmatter、`status: active`（非 `active` 的历史计划不能编译成可执行任务包）、明确的范围/验收标准/仓库归属。拿到本地路径后我就能按正常流程编译任务包。\n\n如果那边的计划不是 spec-plan 格式，正确的路径是先走 `spec-plan` 把它整理成合格计划，再回来拆任务。\n\n## Final Decision Envelope\n\n```yaml\ndecision: return-to-plan\nreason_code: source_plan_missing\nidentity_basis: source-plan-path+body-hash\nartifact_root: null\nrepo_root: null\nsource_plan: null\ntask_pack: null\ntask_pack_validity: not-applicable\ndeterministic_handoff: false\nvalidity_scope: identity-freshness-structure-only\nsemantic_posture: not-applicable\nreason: 输入是远程 GitHub 仓库 URL（契约拒绝远程输入），且该 URL 经探测返回 404，无法解析到任何本地 source plan。\ndispatch_authorization: not_applicable\nvalidation: null\norientation:\n  provider: skipped\n  posture: unavailable\n  evidence_refs: []\n  limitations:\n    - remote-repo-input-rejected-by-contract\n    - github-url-returned-404\nnext_action: revise-plan\n```\n\n`validation: null` 是按契约如实报告：没有本地计划或任务包可运行 `spec-first tasks validate`，不虚构确定性验证结果。拿到本地计划路径后随时继续。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "small-plan-skip",
+      "title": "小型低风险计划应倾向 skip 直接 spec-work",
+      "status": "PASS",
+      "duration_ms": 198493,
+      "turns": 4,
+      "input_tokens": 43097,
+      "output_tokens": 3766,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 4,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[spec-work]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[spec-work])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-write-tasks skill 已安装，请按它工作。）\ndocs/plans/2026-09-01-001-feat-month-filter-plan.md 帮我拆成任务包。\n",
+      "response": "校验通过。最终交付如下。\n\n## 结果\n\n任务包已生成：`docs/tasks/2026-11-04-001-feat-month-filter-tasks.md`\n\n- **分支**：`compile`（你显式要求拆分；否则该计划属于 single-unit 小计划，默认会建议 `skip` 直接走 spec-work）\n- **拆分结果**：U1 实现 + 3 个测试场景构成一个自然闭环，按合并规则编译为**单任务 T001 / 单波次**，不强行细分\n- **确定性校验**：`spec-first tasks validate` → `task_pack_validity: valid`、`deterministic_handoff: true`、哈希 matched、合约 valid；仅一条限制：双侧均无 `spec_id` 追溯（可执行身份以 path+body-hash 为准，不阻塞）\n- **需要注意**：仓库当前不存在 `src/server.js`（绿地）。若执行时发现需要从零搭建服务器/端点才能实现该过滤，已写入 T001 的 `stop_if`——届时应返回 spec-plan，而不是在任务包里扩范围\n\n## Final Decision Envelope\n\n```yaml\ndecision: compile\nreason_code: task_pack_compiled\nidentity_basis: source-plan-path+body-hash\nartifact_root: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-748289594\nrepo_root: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-748289594\nsource_plan: docs/plans/2026-09-01-001-feat-month-filter-plan.md\ntask_pack: docs/tasks/2026-11-04-001-feat-month-filter-tasks.md\ntask_pack_validity: valid\ndeterministic_handoff: true\nvalidity_scope: identity-freshness-structure-only\nsemantic_posture: generated-this-run\ndispatch_authorization: not_required\nvalidation:\n  spec_id: missing\n  source_plan_hash: matched\n  hash_tool: available\n  source_plan_path: resolved\n  source_plan_lifecycle: active\n  task_pack_contract: valid\norientation:\n  provider: direct-repo-reads\n  posture: bounded\n  evidence_refs:\n    - 仓库树直接读取（仅 docs/plans 存在，src/ 与测试目录不存在）\n    - 源计划 U1 直接读取（单单元、单文件、3 测试场景）\n  limitations:\n    - src/server.js 不存在，文件边界完全来自计划声明\n    - 无既有测试可参考，done_signal 以行为观察为准\n    - task-pack-spec-id-trace-missing（双侧均无 spec_id，不阻塞）\nnext_action: spec-work-task-pack\n```\n\n非 high-risk（单任务、`review_gate: optional`、不涉及共享契约/安全面），无需 doc-review 中转，可直接交 `spec-work` 执行。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "non-active-rejected",
+      "title": "非 active 计划不得编译为可执行任务包",
+      "status": "PASS",
+      "duration_ms": 113814,
+      "turns": 5,
+      "input_tokens": 32445,
+      "output_tokens": 4072,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 5,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.files_not_exist",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[source_plan_non_active]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[source_plan_non_active])"
+          }
+        ],
+        "summary": {
+          "passed": 3,
+          "failed": 0,
+          "total": 3,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-write-tasks skill 已安装，请按它工作。）\ndocs/plans/2026-08-01-001-feat-old-thing-plan.md 帮我拆成任务包准备执行。\n",
+      "response": "已确认全部关键事实。仓库中没有 `src/server.js`（只有 `.claude/`、`docs/`），也没有已存在的 `docs/tasks/` 任务包。结论已经清楚，无需编译。\n\n## 结论：不生成可执行任务包（`source_plan_non_active`）\n\n**源计划是一个已完成的非活跃计划**，不满足编译条件：\n\n| 检查项 | 结果 |\n| --- | --- |\n| 计划 frontmatter | `type: feat`、`status: completed`、`origin: old-thing` |\n| 实施单元 | 仅 U1「已交付功能」——Goal 为「已上线并验证」，即无剩余工作 |\n| 计划声明文件 `src/server.js` | 当前仓库中不存在，印证这是从别处归档的历史计划 |\n| 现存任务包 | 无（`docs/tasks/` 不存在） |\n\n按本 skill 的核心规则：**可执行任务只能从 `status: active` 的计划编译**；`completed` 计划返回 `source_plan_non_active`——不做 hash、不写入新的可执行任务包、也不路由到 `spec-work`。该计划没有未决范围或验收缺口需要补拆，「已交付」也不构成可再执行的任务切片，因此我没有为它创建任何 `docs/tasks/` 文件。\n\n### 下一步（二选一，由你决定）\n\n1. **无需动作**——如果这份计划只是历史归档，「已上线并验证」即终态，本就没有可拆分的执行内容。\n2. **确有后续工作要做**——请明确说明要在 old-thing 上补完/继续的范围，先经 `spec-plan`（Phase 0.1 历史计划入口）建立有效的 `active` 后继计划，之后我再按本 skill 正常生成并校验新任务包。仅凭本次拆分请求不构成实施授权。\n\n### Final Decision Envelope\n\n```yaml\ndecision: return-to-plan\nreason_code: source_plan_non_active\nidentity_basis: source-plan-path+body-hash\nartifact_root: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-612924684\nrepo_root: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-612924684\nreason: 源计划 status 为 completed 且唯一实施单元已交付上线，按生命周期规则拒绝编译可执行任务包。\nsource_plan: docs/plans/2026-08-01-001-feat-old-thing-plan.md\ntask_pack: null\ntask_pack_validity: not-applicable\ndeterministic_handoff: false\nvalidity_scope: identity-freshness-structure-only\nsemantic_posture: not-applicable\ndispatch_authorization: not_applicable\nvalidation: null   # 非活跃分支不产出任务包，未运行 CLI validate/hash（Core Rule 10 禁止将其 hash 进新任务包）\norientation:\n  provider: direct-repo-reads\n  posture: bounded\n  evidence_refs:\n    - docs/plans/2026-08-01-001-feat-old-thing-plan.md\n  limitations:\n    - 计划仅声明一个已交付单元（U1），无剩余范围线索\n    - 计划声明的 src/server.js 在当前仓库不存在，确认为历史归档\n    - 仓库内无 docs/tasks/ 现存任务包\nnext_action: stop\n```\n\n`next_action: stop` 的依据：你没有明确要求「补完」这份非活跃历史计划，且它没有剩余范围；若要走选项 2，告诉我后续需求即可。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 137077,
+  "judge_tokens": 0,
+  "overall_tokens": 137077
+}

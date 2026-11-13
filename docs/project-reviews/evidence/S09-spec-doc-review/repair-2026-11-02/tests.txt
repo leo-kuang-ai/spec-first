@@ -1,0 +1,8 @@
+PASS tests/unit/spec-doc-review-contracts.test.js
+PASS tests/unit/spec-doc-review-task-pack-contracts.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       54 passed, 54 total
+Snapshots:   0 total
+Time:        1.255 s, estimated 2 s
+Ran all test suites within paths "tests/unit/spec-doc-review-contracts.test.js", "tests/unit/spec-doc-review-task-pack-contracts.test.js".

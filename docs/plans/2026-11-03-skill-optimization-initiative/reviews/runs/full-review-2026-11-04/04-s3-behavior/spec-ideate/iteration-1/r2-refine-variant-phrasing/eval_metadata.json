@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "R2变体:换措辞的 refine 请求仍应路由 spec-brainstorm",
+  "prompt": "（spec-ideate skill 已安装，请按它工作。这是隔离评测沙箱,只做路由判定。）\n我想做的已经定了:给团队做站会汇总工具,给谁用、成功标准都想清楚了。\n帮我把它变成可执行的计划。\n",
+  "assertions": [
+    "expect.must_contain",
+    "output_contains{all:[spec-brainstorm]}"
+  ]
+}

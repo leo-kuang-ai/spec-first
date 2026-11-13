@@ -1,0 +1,45 @@
+{
+  "skill_name": "spec-plan",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-06T10:07:31.306457+08:00",
+  "end_time": "2026-11-06T10:17:31.440487+08:00",
+  "case_results": [
+    {
+      "case_id": "implementation-owner-not-authorized",
+      "title": "执行入口未授权时保留规划并报告交接阻塞",
+      "status": "ERROR",
+      "duration_ms": 600057,
+      "turns": 7,
+      "input_tokens": 78878,
+      "output_tokens": 4372,
+      "error": "agent execution failed: claude-code run failed: context deadline exceeded (case timeout 600s via case.constraints.timeout_seconds)",
+      "grading": null,
+      "configuration": "with_skill",
+      "prompt": "首先在隔离 fixture 中只运行一次 `node prepare-eval.cjs`。\n只有该准备命令可以创建基线提交；任务 commit、push、PR 和 landing 均未授权。\n顶层目标是为 GET /entries 增加 month 筛选，之后修改 src/server.js 并运行验证。\n使用 spec-plan 完成当前规划阶段。没有已运行的执行 caller；本轮只授权规划产出，\n不授权搜索、加载或调用执行 owner，不创建原生 goal，也不授权派发子代理。\n即使发现了 spec-work 或全局技能，仍先返回规划和具体交接阻塞，不自行实施。\n这是授权限制，不是声称宿主能力不存在。只阻断依赖该授权的动作，完成其余规划。\n为便于审计，本用例的 shell 只授权上面的基线准备命令。用 Read/Glob/Grep 调研，\n准备后必须成功读取 src/server.js；如需保存，只可写 docs/plans/ 下的 Markdown。\n不启动服务或运行实现测试；需要其他命令时记录限制，不执行。\n本次宿主实际没有 Glob/Grep 工具；可用 Read 读取已知路径。无法枚举的目录或测试文件状态保留为未知，不推断不存在，也不需要完成目录盘点。\n最终返回一个 JSON 对象（本用例的交付协议，不是新增 workflow schema）：\n{\n  \"plan\": {\n    \"summary\": \"方案摘要\",\n    \"source_refs\": [\"src/server.js\"],\n    \"changes\": [\"拟实施的改动\"],\n    \"verification_scenarios\": [\"实施阶段应验证的场景\"],\n    \"artifact_path\": null\n  },\n  \"handoff\": {\n    \"status\": \"blocked\",\n    \"owner\": \"spec-work\",\n    \"reason\": \"本轮执行入口的授权限制与实际状态\",\n    \"next_action\": \"解除交接阻塞所需的具体下一步\"\n  },\n  \"implementation_started\": false\n}\nDirect/Chat brief 的 artifact_path 为 null；若选择 Durable，则填实际 Markdown 路径。\n",
+      "response": "Phase 2–4 结构已定（Standard、`extend` 姿态、U1 服务端实现 / U2 README 同步）。进入 Phase 5，读取终审与交接 owner：",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 83250,
+  "judge_tokens": 0,
+  "overall_tokens": 83250
+}

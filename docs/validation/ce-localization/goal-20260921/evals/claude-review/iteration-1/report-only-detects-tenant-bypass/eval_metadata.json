@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "默认审查应发现跨租户授权绕过且保持只读",
+  "prompt": "这是一个隔离评测工作区。先运行 `bash prepare-review-fixture.sh` 建立 baseline commit 并应用待审查补丁；\n该命令仅用于准备评测环境，不属于审查修复。\n请使用 spec-code-review 审查当前工作区相对 base:HEAD 的改动。\n只需要审查报告，不要修改文件、提交、切换分支，也不要调用子代理或并行 reviewer。\n",
+  "assertions": [
+    "expect.exit_code",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-code-review/evals/fixtures/scripts/check-report-only-tenant-bypass.sh"
+  ]
+}

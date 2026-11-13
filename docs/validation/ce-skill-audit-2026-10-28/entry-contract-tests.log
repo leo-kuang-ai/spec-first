@@ -1,0 +1,32 @@
+  console.warn
+    using-spec-first Front Controller is 5680 bytes; the 5,200-byte target is advisory, not a token or behavior proof.
+
+      43 |
+      44 |     if (footprint > 5200) {
+    > 45 |       console.warn(
+         |               ^
+      46 |         `using-spec-first Front Controller is ${footprint} bytes; the 5,200-byte target is advisory, not a token or behavior proof.`,
+      47 |       );
+      48 |     }
+
+      at Object.warn (tests/unit/using-spec-first-contracts.test.js:45:15)
+
+PASS tests/unit/using-spec-first-contracts.test.js
+  using-spec-first entry-governor contracts
+    ✓ keeps a lean front controller and reports the target as an advisory footprint proxy (6 ms)
+    ✓ keeps active-worker and Direct Lane admission in the Front Controller
+    ✓ uses one reachable public-route reference for public roster coverage (1 ms)
+    ✓ keeps public route selection, recommendation-only behavior, and special handoff semantics
+    ✓ keeps onboarding routing semantics and mid-execution failure adjudication (1 ms)
+    ✓ keeps five exit gates and two explicit reference triggers
+    ✓ keeps source/runtime, evidence, dispatch, and parent-repo boundaries in the package (1 ms)
+    ✓ hides internal-only skills from every user-readable routing source
+    ✓ separates public routing from package-level invocation policy for internal helpers
+    ✓ supported-host governance follows the current adapter registry (1 ms)
+    ✓ does not restore legacy host-specific workflow spellings
+
+Test Suites: 1 passed, 1 total
+Tests:       11 passed, 11 total
+Snapshots:   0 total
+Time:        0.19 s
+Ran all test suites within paths "tests/unit/using-spec-first-contracts.test.js".

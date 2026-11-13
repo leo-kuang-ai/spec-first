@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "无度量目标的模糊优化请求应被指标 gate 拦下",
+  "prompt": "（spec-optimize skill 已安装，请按它工作。）\n帮我把这个服务优化得更好一些,跑起来就行。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-optimize/evals/fixtures/scripts/check-no-metric-gate.sh"
+  ]
+}

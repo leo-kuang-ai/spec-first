@@ -1,0 +1,10 @@
+{
+  "session_id": "01a18be8-a26b-7141-9bfe-b4cf5cf88655",
+  "agent_path": "/root/judge_ce27_ideate_r2",
+  "review_sha256": "019e916403662932d5424f21af0b1588d4162513946f1794716126287a1b4f75",
+  "trace_sha256": "cd42cc9dd7115c51b5c5850de2770a54bcfa678341fb84f195ef81ebeb62e9fc",
+  "intervention": "Parsed final JSON without semantic edits; original final response retained in full trace.",
+  "limitations": [
+    "Independent context, not independently authenticated model identity or enforced read-only isolation."
+  ]
+}

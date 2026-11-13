@@ -1,0 +1,5 @@
+{
+  "change": "case timeout 600 -> 900 seconds; one bounded retry",
+  "before": "eb1fd1743881ff4f6ca7eb37297151edef574fb21c38d98f6452c58cd38da9f9",
+  "after": "bc8190aa5ee4a3cfe84c9a0ba709a9bca2f8fd76387ce9ceea9618bfbc0081de"
+}

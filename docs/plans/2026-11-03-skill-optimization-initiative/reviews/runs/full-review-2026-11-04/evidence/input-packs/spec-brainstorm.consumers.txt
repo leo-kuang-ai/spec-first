@@ -1,0 +1,16 @@
+# consumers: spec-brainstorm
+tests/unit/agent-persona-template-drift.test.js
+tests/unit/ce-post-3-20-calibration-contracts.test.js
+tests/unit/ce-upstream-reconciliation-v2.test.js
+tests/unit/ce-upstream-skill-sync-contracts.test.js
+tests/unit/dispatch-authorization-matrix-contracts.test.js
+tests/unit/eval-fixture-contracts.test.js
+tests/unit/mcp-setup-config-consumers.test.js
+tests/unit/plugin-modules.test.js
+tests/unit/private-scratch-migration-contracts.test.js
+tests/unit/requirements-rendering-parity.test.js
+tests/unit/settled-decisions-contracts.test.js
+tests/unit/spec-brainstorm-clarification-contracts.test.js
+tests/unit/spec-brainstorm-contracts.test.js
+tests/unit/spec-brainstorm-visual-retirement-contracts.test.js
+tests/unit/spec-ideate-clarification-handoff-contracts.test.js

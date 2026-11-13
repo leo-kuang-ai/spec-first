@@ -1,0 +1,10 @@
+{
+  "session_id": "01a19068-1f51-76e3-9331-b0c76497ef91",
+  "agent_path": "/root/ce27_simplify_reviewer",
+  "review_sha256": "5665a3f322fccbf0e7741eb83736cfa15c3e9f74ed079f43ec183fcd8dbc2f08",
+  "trace_sha256": "3a6ecc4888b0cef3bffbbfc84c6d59098cdc9e0cf0076526c9440d39ccbb2324",
+  "intervention": "Parsed final JSON without semantic edits; original final response retained in full trace.",
+  "limitations": [
+    "Independent context, not independently authenticated model identity or enforced read-only isolation."
+  ]
+}

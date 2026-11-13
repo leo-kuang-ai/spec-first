@@ -1,0 +1,71 @@
+{
+  "schema_version": "verification-run-summary.v1",
+  "generated_at": "2026-11-02T10:09:47.164Z",
+  "profile": {
+    "source": "local",
+    "name": "S20-source-contract",
+    "path": null
+  },
+  "checks": [
+    {
+      "id": "sync",
+      "service": "local",
+      "command": "npm run sync:instructions",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s20-repair/logs/sync.txt",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "tests",
+      "service": "local",
+      "command": "node node_modules/jest/bin/jest.js --runInBand --runTestsByPath tests/unit/sync-instruction-files.test.js tests/unit/instruction-bootstrap.test.js",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s20-repair/logs/tests.txt",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "eval",
+      "service": "local",
+      "command": "skill-up validate skills/using-spec-first/evals/eval.yaml",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "skill-up"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s20-repair/logs/eval.txt",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "entrypoints",
+      "service": "local",
+      "command": "npm run lint:skill-entrypoints",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s20-repair/logs/entrypoints.txt",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    }
+  ]
+}

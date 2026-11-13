@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "普通 Q\u0026A 不应触发深度教学 artifact",
+  "prompt": "（spec-explain skill 已安装，请按它工作。）\nNode 的 stream 和 buffer 有什么区别?简单说说就行。\n",
+  "assertions": [
+    "expect.files_not_exist",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-explain/evals/fixtures/scripts/check-simple-qa.sh"
+  ]
+}

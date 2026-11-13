@@ -1,0 +1,85 @@
+FAIL tests/unit/spec-doc-review-contracts.test.js
+  dormant document peer output contract
+    ✕ normalization preserves deferred questions in schema-valid document output (9 ms)
+  report-only 评测的文档完整性
+    ○ skipped plan judge 拒绝保留 MARKER 的文档篡改
+    ○ skipped html judge 拒绝保留 MARKER 的文档篡改
+    ○ skipped taskpack judge 拒绝保留 MARKER 的文档篡改
+  spec-doc-review current contracts
+    ○ skipped asks for or discovers a document when none is supplied
+    ○ skipped classifies unified requirements and plans by readiness
+    ○ skipped separates delivery mode from the run-local mutation policy
+    ○ skipped parses explicit mutation and JSON tokens without treating them as paths
+    ○ skipped ordinary Markdown is report-only and write mode requires explicit apply authority
+    ○ skipped requires explicit dispatch authorization and preserves the inline fallback
+    ○ skipped report-only review blocks every Markdown mutation entrypoint
+    ○ skipped report-only envelope preserves findings, coverage, and limitations without a walkthrough
+    ○ skipped JSON output is the existing zero-write envelope in machine-readable form
+    ○ skipped report-only evals contain two positive and two negative-owner cases
+    ○ skipped mandatory reviewer loss fails closed instead of producing a clean verdict
+    ○ skipped does not infer document kind from path alone
+    ○ skipped passes session-settled decisions through the reviewer context
+    ○ skipped intake prepares provenance and native-format candidates without self-invocation
+    ○ skipped U1: subagent template spine contains schema hard constraints
+    ○ skipped U1: subagent template spine contains confidence anchor quick-reference table
+    ○ skipped U1: subagent template spine contains autofix_class three-tier definitions
+    ○ skipped U1: subagent template spine contains false-positive catalog key entries
+    ○ skipped U1: subagent template spine contains optional detail guidance (not mandatory always-read)
+    ○ skipped U2: synthesis hot path contains 3.5b always-on
+    ○ skipped U2: synthesis hot path contains STOP anchors for cold paths
+    ○ skipped U2: synthesis hot path 3.5 STOP anchor semantics is unmerged opposing (not merged opposing)
+    ○ skipped U2: synthesis hot path 3.5c STOP anchor is before 3.6
+    ○ skipped U2: synthesis hot path 3.5c STOP anchor references post-3.5b (not post-routing)
+    ○ skipped U3: SKILL.md contains classification STOP anchor
+    ○ skipped U3: SKILL.md contains persona activation STOP anchor
+    ○ skipped U3: SKILL.md contains activation quick-reference table
+    ○ skipped all lazy reference files exist on disk
+    ○ skipped U1: confidence rubric detail reference contains full behavioral descriptions
+    ○ skipped U1: why-it-matters guide reference contains weak-vs-strong example
+    ○ skipped U1: why-it-matters guide is conditionally reachable from the subagent spine
+    ○ skipped U1: suggested-fix advanced reference contains strawman analysis
+    ○ skipped U2: chain-linking cold path contains shape-match signal rule and worked examples
+    ○ skipped U2: contradictions cold path references unmerged opposing actions from 3.3
+    ○ skipped U3: document classification signals reference contains requirements and plan signals
+    ○ skipped U3: persona activation matrix reference contains full adversarial activation rules
+    ○ skipped product-lens activates on an unsettled product position, not on plausible alternatives
+    ○ skipped 002: SKILL.md defines roster profiles lite/standard/full
+    ○ skipped 002: SKILL.md requires cost-shape advisory line before dispatch
+    ○ skipped 002: SKILL.md states minimum context isolation intent
+    ○ skipped 002: SKILL.md anti-waste rule for document slices
+    ○ skipped all lazy references are reachable from an execution spine
+
+  ● dormant document peer output contract › normalization preserves deferred questions in schema-valid document output
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 3
+    + Received  + 1
+
+      Object {
+    -   "deferred_questions": Array [
+    -     "Who owns the migration compatibility window?",
+    -   ],
+        "findings": Array [],
+        "residual_risks": Array [
+          "Rollback evidence is missing.",
+        ],
+        "reviewer": "whole-doc-fixture",
+    +   "testing_gaps": Array [],
+      }
+
+      55 |     expect(result.status).toBe(0);
+      56 |     const output = JSON.parse(result.stdout);
+    > 57 |     expect(output).toEqual({ reviewer: 'whole-doc-fixture', ...input });
+         |                    ^
+      58 |     const Ajv = require('ajv');
+      59 |     const validate = new Ajv().compile(JSON.parse(fs.readFileSync(
+      60 |       path.join(refsDir, 'findings-schema.json'), 'utf8')));
+
+      at Object.toEqual (tests/unit/spec-doc-review-contracts.test.js:57:20)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 45 skipped, 46 total
+Snapshots:   0 total
+Time:        0.184 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/spec-doc-review-contracts.test.js/i with tests matching "dormant document peer output contract".

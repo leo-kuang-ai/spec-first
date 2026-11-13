@@ -1,0 +1,40 @@
+{
+  "id": "CEOPT-26-B1",
+  "scenario_id": "CEOPT-26",
+  "source_revision": "B",
+  "arm": "B",
+  "trial": 1,
+  "status": "infrastructure-failed-no-final-artifact",
+  "session_id": "01a1905b-40da-7d90-8767-de3e748a729f",
+  "started_at": "2026-10-31T05:07:42.042Z",
+  "final_at": "2026-10-31T05:07:44.554Z",
+  "artifact_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/trials/CEOPT-26-B1/artifact.md",
+  "artifact_sha256": "e0c97dcdc00e33a95e56df0eb796dce0880ba4e1f95b7e337558a7960621577e",
+  "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/trials/CEOPT-26-B1/tool-events.json",
+  "tool_trace_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+  "parent_intervention": "Saved host terminal error and tool trace; no model artifact. Original attempt retained separately from any retry.",
+  "model_metadata": [
+    {
+      "model": "gpt-6-astra",
+      "effort": "medium"
+    }
+  ],
+  "limitations": [
+    "Unauthenticated serving identity",
+    "Observed read-only instructions/traces, not enforced filesystem isolation",
+    "Parent-mediated durable saving; autonomous save not tested"
+  ],
+  "final_model_artifact_available": false,
+  "elapsed_seconds": 2.512,
+  "deadline_seconds": 300,
+  "timing_admission": "not-assessable-infrastructure-failure",
+  "infrastructure_error": {
+    "message": "exceeded retry limit, last status: 429 Too Many Requests, request id: a53023477ab0515b-HKG",
+    "codex_error_info": {
+      "response_too_many_failed_attempts": {
+        "http_status_code": 429
+      }
+    }
+  },
+  "source_protocol_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/CEOPT-26-packet.json"
+}

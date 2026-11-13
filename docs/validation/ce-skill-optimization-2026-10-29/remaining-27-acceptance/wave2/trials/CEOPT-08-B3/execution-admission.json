@@ -1,0 +1,7 @@
+{
+  "trial": "CEOPT-08-B3",
+  "approved_for_disposable_execution": true,
+  "candidate_sha256": "385e5f596701ee5ed2829c179a02de851688459fa7ede0fc394776f668643052",
+  "at": "2026-10-30T08:51:22.647218+00:00",
+  "review": "Full executable read; deterministic Map aggregation and stdout with perf_hooks only. Exact bytes match independently admitted B2. No file/network/subprocess effects; source preserves map order, fields and numerical accumulation. Fixed parent proof used unchanged."
+}

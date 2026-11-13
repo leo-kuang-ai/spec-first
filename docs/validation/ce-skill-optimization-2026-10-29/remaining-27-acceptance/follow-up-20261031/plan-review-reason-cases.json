@@ -1,0 +1,8 @@
+{
+  "scope": "Fresh-source semantic review scenarios for the current Plan reason-code successor; not new blinded model trials.",
+  "cases": [
+    {"input": "Caller prohibits independent review invocation and delegation; no capability probe ran.", "expected": "dispatch_authorization_missing; capability unknown; producer-self-review degraded; independent_review not_run"},
+    {"input": "Review invocation is authorized but actual supported discovery confirms no usable review capability.", "expected": "spec_doc_review_capability_unavailable; confirmed missing capability disclosed; producer-self-review degraded"},
+    {"input": "Review invocation is authorized but discovery result is incomplete or ambiguous.", "expected": "worker_capability_unproven; no claim of confirmed absence; producer-self-review degraded"}
+  ]
+}

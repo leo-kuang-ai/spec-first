@@ -1,0 +1,12 @@
+{
+  "trial": "CEOPT-26-A2",
+  "approved_for_disposable_execution": true,
+  "recorded_at": "2026-10-31T05:18:36.730087+00:00",
+  "proposal_sha256": "b9d403fd5a39692a6d64b273aa416df8522c73ffc4795bbdfd0e9813b375951b",
+  "candidate_sha256": "60fcede431e7da0426edd494e69a0680e4f6b3dd786e373d942872ce7a4c0716",
+  "review": "Parent read complete no-change proposal; explicit guard, catch coverage and store/response ordering remain intact. No speculative helper/resource policy. Model suggests npm test; package test script exactly invokes node --test test/entries.test.cjs, which fixed parent runner invokes directly. This is parent-mediated verification of unchanged code, not literal npm invocation. Protected proof/seam retained.",
+  "limitations": [
+    "Parent execution only.",
+    "No npm lifecycle or full response equivalence claimed."
+  ]
+}

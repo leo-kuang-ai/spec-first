@@ -1,0 +1,17 @@
+id: s20-r8-env
+title: s20-r8-env
+description: |
+  执行方案第一批场景；预期与判定见 ../../expectations.md（运行前写定）。
+  skill-up 判定只记录退出码，正式判定由 ../../grade.py 事后对 transcript 与工作区产物执行。
+input:
+  prompt: |
+    CodeGraph 好像还没装。先帮我规划一下：给退款记录加一个 CSV 导出功能。只要计划，不要写代码。
+context:
+  repo_fixture: evals/fixtures/order-ledger
+  git:
+    init: true
+    checkout: main
+judge:
+  type: rule_based
+  success:
+    - exit_code: 0

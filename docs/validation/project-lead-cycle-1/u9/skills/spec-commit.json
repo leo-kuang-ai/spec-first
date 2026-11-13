@@ -1,0 +1,149 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "generated_at": "2026-09-20T07:06:40.683772+00:00",
+  "skill_name": "spec-commit",
+  "source_snapshot": "source-manifest.json",
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "source_paths": [
+    "skills/spec-commit/SKILL.md",
+    "skills/spec-commit-push-pr/references/commit-and-push.md"
+  ],
+  "source_read_ranges": {
+    "skills/spec-commit/SKILL.md": "1-121"
+  },
+  "source_hashes": {
+    "skills/spec-commit/SKILL.md": "f1cf7b8801e7d25f706af168a2acd54a864e1df4b893ff474305d415230de8b8",
+    "skills/spec-commit-push-pr/references/commit-and-push.md": "39f8ce3145cebb2074297cdcdfc5386711e3062c701ca88d20a392aa4f67b60e"
+  },
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "entry_surface": "internal_only",
+  "batch": "C1",
+  "closure_tier": "S",
+  "closure_observed": {
+    "files": 9,
+    "bytes": 13367,
+    "read_package_files_at_least_partially": 1,
+    "read_supporting_files_at_least_partially": 1,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "coverage_commitment": "committed",
+  "dependency_closure": "partial",
+  "status": "degraded",
+  "reason_codes": [
+    "bounded_dependency_closure",
+    "tests_not_run",
+    "host_projection_not_run"
+  ],
+  "command_or_method": [
+    "独立于被审源码作者的只读reviewer逐包阅读实际source并判断五分支；主owner回源裁决finding，非盲评或真实workflow运行。"
+  ],
+  "ran": true,
+  "exit_code": null,
+  "evidence_paths": [
+    "reviewer-returns/c1.json"
+  ],
+  "source_refs": [
+    "skills/spec-commit/SKILL.md",
+    "skills/spec-commit-push-pr/references/commit-and-push.md"
+  ],
+  "owner": "project-lead-cycle-1",
+  "consumers": [
+    "周期1主审查",
+    "对应上游/下游workflow（以SKILL文档声明为准）"
+  ],
+  "branches": [
+    {
+      "id": "entry_positive",
+      "status": "source-covered",
+      "judgment": "该 skill 是 caller-owned internal commit helper；commit authority 与 branch mutation authority 分离，commit 不自动扩展为 push/PR。",
+      "source_refs": [
+        "skills/spec-commit/SKILL.md:1-121"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "near_neighbor_negative",
+      "status": "source-covered",
+      "judgment": "对包含无关变更、mixed hunk 或不明确 ownership 的 index，不能用全仓 staging 代替范围判断；默认分支 gate 与新建/切换分支权限独立。",
+      "source_refs": [
+        "skills/spec-commit/SKILL.md:1-121",
+        "skills/spec-commit-push-pr/references/commit-and-push.md:1-50"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "output_consumer",
+      "status": "source-covered",
+      "judgment": "输出应把 commit 事实、覆盖路径和未处理变更交回 caller；helper 的局部成功不能关闭上游完整任务，也不能被当成远程 landing 证据。",
+      "source_refs": [
+        "skills/spec-commit/SKILL.md:1-121"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "failure_stop",
+      "status": "source-covered",
+      "judgment": "path-scoped staging 与 mixed-hunk stop 保留用户 index/path ownership；缺少精确授权、分支权限或提交验证证据时停止对应副作用。已读文本未发现放行这些失败的路径。",
+      "source_refs": [
+        "skills/spec-commit/SKILL.md:1-121",
+        "skills/spec-commit-push-pr/references/commit-and-push.md:1-50"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "recovery_handoff_closeout",
+      "status": "source-covered",
+      "judgment": "失败应保留当前状态并交回 caller，不扩大到 push 或自行代替整体关闭。由于未执行 Git mutation，也未读全部跨包依赖，当前只是合同层审查。",
+      "source_refs": [
+        "skills/spec-commit/SKILL.md:1-121"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    }
+  ],
+  "findings": [],
+  "fresh_source_eval": "not-run",
+  "claim_ceiling": "C0",
+  "limitations": [
+    "未运行 Git fixture、commit 或 tests。",
+    "共享 commit-and-push 以外的引用闭包和宿主投射未全读。",
+    "本 worker 仅进行有界 source review；未执行被审 workflow、真实模型、真实宿主、安装、浏览器或外部写入。",
+    "source-read 不等于完整依赖闭包或行为评测通过；完整包 status 由主 owner 结合 findings 裁决。"
+  ],
+  "recovery_point": "补齐依赖引用，用临时 Git fixture 覆盖路径选择、预先暂存无关文件、mixed hunk 和 default branch；检查 caller 收到的 commit receipt 与实际 index 一致。",
+  "timing": {
+    "active_seconds": null,
+    "limitation": "恢复前未记录可靠的逐包审查耗时；不以工具墙钟时间伪造语义审查耗时。"
+  },
+  "record_correction": {
+    "at": "2026-09-20T05:55:01.018421+00:00",
+    "invalidated": "2026-09-20T05:24 的机械占位结论",
+    "replaced_by_actual_review_at": "2026-09-20T07:06:40.683772+00:00"
+  },
+  "reviewer_provenance": {
+    "reviewer": "cycle1_a_readiness",
+    "kind": "read-only-source-review",
+    "fresh_per_package_context": false,
+    "raw_return": "reviewer-returns/c1.json",
+    "raw_return_sha256": "02822623ed4eb85628acd1969fb484a13ee4e04be4367e5a660cd80b82f99e09"
+  },
+  "execution": {
+    "source_semantic_review": "ran",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "not-run",
+    "owner_probe_refs": []
+  },
+  "supporting_read_ranges": {
+    "skills/spec-commit-push-pr/references/commit-and-push.md": "1-50"
+  },
+  "unconfirmed_read_ranges": []
+}

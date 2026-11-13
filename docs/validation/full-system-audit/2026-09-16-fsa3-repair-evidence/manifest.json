@@ -1,0 +1,30 @@
+{
+  "created_at": "2026-09-16T08:06:48.115204+00:00",
+  "files": {
+    "regression-after.log": "88036c16775a5f85829f103ca582238623ad391994c640a9381ad40dc47a2a64",
+    "repair-final-source.json": "3981fbf45ada48c244373c4e242547aedad7638b8dc38567cb7a36bca8f40531",
+    "repair-source.json": "ba3a071175aa4d74a672ce4e340f6db64d16c201460e0009d958191c234af397",
+    "fresh-source-review.json": "08d416a0490fd895acb4ff6bd550b66aa3c9cef2917ba4e6fd9ea38468419ad0",
+    "regression-before.log": "1760203c73665245d65c7cc38092ddb96587083296778bdd03b762d390100470",
+    "checks/eval-autoresearch.json": "083f52fb3bc86d3f34e98bb3bc9efc2acae84c94a981ea735085bfc57a9a8542",
+    "checks/full-regression-final.json": "c622c0cff881d9e7b30d9ab81ce6fae2f59640a2f3f1f00939b67b05823e0c26",
+    "checks/ce-focused-final.json": "c2f72d9eaed09c50c2d77f07cf0dbb5829e4a211ea0ee7a4b30758e89156b572",
+    "checks/shared-references.json": "47e5fc985a22cf242d3c658d839d0c50775c9a80db448a3839b1b0440c1654a4",
+    "checks/full-regression.json": "362c1fa252c536f275281eee359ebd2a63e12899f8f70d7faa9244b2690959e8",
+    "checks/lint.json": "828217484512f6001d4973a7552f5cf31678cd511dd7bd8db39166a5236bb9a6",
+    "checks/typecheck.json": "5fd2be8d6319428578b588c9bd0f62c5db1b87e907e3dbce9143c117bf16df09",
+    "checks/eval-spec-commit.json": "b372ad05289ffa0e5c267c26de6b9550031c957ebfbb0f76be5f6b77e6b1fecf",
+    "checks/build.json": "09013801a03fda37d797efd9ffba25336b7791159cf973ca950ad943475414b4",
+    "checks/sync-instructions.json": "8a11147c465206b2840a3cd6deee7ed92e05f614ca7e6b7ecdea6ea95e08f96b",
+    "logs/full-regression-final.log": "85d826a4b43c41b2de4678e8f5da40716392f2fb1732c65949a7e2a3e37a3b10",
+    "logs/lint.log": "f84b1d4816a08461f50053434364d1c907f345edc2986068d8c24f5884cd3216",
+    "logs/full-regression.log": "17aa2cc9f570bd1a626c35bcbfc342594c4e17d534b7ad71c023595bb51d2aea",
+    "logs/typecheck.log": "0ed6e75e62ecd535e41f496093780801c3206c48ef29e1c0fcfa8628d64ff84e",
+    "logs/sync-instructions.log": "265d4b8bede29c6fd0f3db409f660c02eb48b5afbf44a58f6384a11e1c2b3e56",
+    "logs/eval-autoresearch.log": "24cc55343c1fbdfab7c0dda21806e048e16ae8a5ea240a2f3074eed3c9acb926",
+    "logs/shared-references.log": "6a53819675205b983ca2ffee10d628e421b4233543b789216db7fe66575dece1",
+    "logs/eval-spec-commit.log": "fcaf0baf117b528b0ec0af185184b837e52f97bf42af54e7853ca56a092f04d5",
+    "logs/ce-focused-final.log": "439a680da216e5dc909663d6ba51040d5b1b31da9c7d5fbe7128733ec92bb9d4",
+    "logs/build.log": "cafe09fb766e1765b14b832142a3a494bc8ad30a8dbdf190cb6ec14561b3f3f1"
+  }
+}

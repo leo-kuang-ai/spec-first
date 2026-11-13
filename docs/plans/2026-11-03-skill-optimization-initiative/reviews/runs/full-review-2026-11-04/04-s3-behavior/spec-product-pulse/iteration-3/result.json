@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-product-pulse",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T09:52:07.521853+08:00",
+  "end_time": "2026-11-05T09:55:10.437862+08:00",
+  "case_results": [
+    {
+      "case_id": "check-source-outcomes",
+      "title": "Check source outcomes",
+      "status": "PASS",
+      "duration_ms": 182326,
+      "turns": 3,
+      "input_tokens": 35043,
+      "output_tokens": 6016,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 3,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-product-pulse/evals/fixtures/scripts/check-source-outcomes.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run node prepare-eval.cjs once in this isolated fixture. Preparation may create a fixture baseline commit only. Read the current installed spec-product-pulse source and follow it. Create a local pulse report for the exact window recorded in exports/payments.json and exports/analytics.json, using those exports only. Preserve failed analytics as missing, never zero. No provider calls or schedule/config writes. Return JSON with metrics [{name,source,state,value}] in revenue then active_users order, and artifact_path for the actual saved report.",
+      "response": "报告已保存，全程仅读取本地 export，未调用任何 provider，未写 `.spec-first/config.local.yaml`、未建 schedule（Phase 3 检查：`pulse_schedule: manual` 已在档，按规则不再重复提供 scheduling）。\n\n**Headlines（原文）**\n- Revenue for the exported window: 1200 (payments-export, confirmed-value); no prior-window export exists, so no delta.\n- active_users is missing, not zero: analytics-export returned permission-denied for the same window.\n- Report built from supplied exports only; no live connectors were queried.\n\n**Top Followup**：Restore analytics-export access for active_users: the provider denied permission for 2026-10-28, leaving engagement unmeasured.\n\n**保存路径**：`/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-935121194/docs/pulse-reports/2026-11-05_09-54.md`\n\n```json\n{\n  \"metrics\": [\n    {\"name\": \"revenue\", \"source\": \"payments-export\", \"state\": \"confirmed-value\", \"value\": 1200},\n    {\"name\": \"active_users\", \"source\": \"analytics-export\", \"state\": \"permission-denied\", \"value\": null}\n  ],\n  \"artifact_path\": \"docs/pulse-reports/2026-11-05_09-54.md\"\n}\n```\n\n要点说明：\n- 窗口严格采用两份 export 记录的 `2026-10-28T00:00:00Z/2026-10-29T00:00:00Z`（export 固定窗口，未按 now 推导，也未经 15m buffer 改写）。\n- `active_users` 的 `failed/permission-denied` 按 run.md 收据分类映射为 `permission-denied`（非 `confirmed-zero`、非 `no data`），在报告 Usage 与 source-status 行均保留 reason_code 与 limitation。\n- `revenue` 无上一等长窗口数据，按模板规则省略 delta 而非编造；无 tracing 源 → 按模板 Variation 省略 System performance 段并在 source-status 记 `not-configured`；策略文件缺失仅记录为 Followup，未触发重新 setup。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 41059,
+  "judge_tokens": 0,
+  "overall_tokens": 41059
+}

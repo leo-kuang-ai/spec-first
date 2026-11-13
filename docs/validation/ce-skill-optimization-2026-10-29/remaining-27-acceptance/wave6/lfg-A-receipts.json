@@ -1,0 +1,750 @@
+{
+  "arm": "A",
+  "source_sha256": "5600214530ecb03c5644213884666de7978b03a298d4f61bed0e2b402461e0cc",
+  "cases": [
+    {
+      "case": "observation-gap",
+      "initial": {
+        "exit_code": 0,
+        "stdout": "{\n  \"status\": \"read\",\n  \"reason_code\": \"generation-zero\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 0,\n  \"snapshot_sha256\": \"f5bbec4d8876dfccdc1b2a162b8c5c3e5469c4c01306728d125fc71989ae48bc\",\n  \"state\": null,\n  \"warnings\": []\n}\n",
+        "stderr": "",
+        "output": {
+          "status": "read",
+          "reason_code": "generation-zero",
+          "schema_version": "spec-lfg-pr-watch-state/v1",
+          "generation": 0,
+          "snapshot_sha256": "f5bbec4d8876dfccdc1b2a162b8c5c3e5469c4c01306728d125fc71989ae48bc",
+          "state": null,
+          "warnings": []
+        }
+      },
+      "snapshots": [
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:00:00Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 1,\n  \"snapshot_sha256\": \"593281db2338f0600c526173ecc3f8db55effc308e23988cd5fe8266375e00a5\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 0,\n  \"elapsed_seconds\": 0,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 1,
+              "snapshot_sha256": "593281db2338f0600c526173ecc3f8db55effc308e23988cd5fe8266375e00a5",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 0,
+              "elapsed_seconds": 0,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:30:00Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"green-review-clear-current\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 2,\n  \"snapshot_sha256\": \"f1edb2dde0575f3eb7735d6a50d9399215147cdf27fe7ac11bb1da7541de93f8\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"looks-ready\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 1800,\n  \"elapsed_seconds\": 1800,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "green-review-clear-current",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 2,
+              "snapshot_sha256": "f1edb2dde0575f3eb7735d6a50d9399215147cdf27fe7ac11bb1da7541de93f8",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "looks-ready",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 1800,
+              "elapsed_seconds": 1800,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "continuous-control",
+      "initial": {
+        "exit_code": 0,
+        "stdout": "{\n  \"status\": \"read\",\n  \"reason_code\": \"generation-zero\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 0,\n  \"snapshot_sha256\": \"f5bbec4d8876dfccdc1b2a162b8c5c3e5469c4c01306728d125fc71989ae48bc\",\n  \"state\": null,\n  \"warnings\": []\n}\n",
+        "stderr": "",
+        "output": {
+          "status": "read",
+          "reason_code": "generation-zero",
+          "schema_version": "spec-lfg-pr-watch-state/v1",
+          "generation": 0,
+          "snapshot_sha256": "f5bbec4d8876dfccdc1b2a162b8c5c3e5469c4c01306728d125fc71989ae48bc",
+          "state": null,
+          "warnings": []
+        }
+      },
+      "snapshots": [
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:00:00Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 1,\n  \"snapshot_sha256\": \"38cab6f1ad023815e531c241b196f0e2012bd7da4f0b810fae7adb1f5f95dd39\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 0,\n  \"elapsed_seconds\": 0,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 1,
+              "snapshot_sha256": "38cab6f1ad023815e531c241b196f0e2012bd7da4f0b810fae7adb1f5f95dd39",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 0,
+              "elapsed_seconds": 0,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:00:30Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 2,\n  \"snapshot_sha256\": \"854492038ff8ad14c587df6b83b70dde17d72f8412632759130ad89be74c51f5\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 30,\n  \"elapsed_seconds\": 30,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 2,
+              "snapshot_sha256": "854492038ff8ad14c587df6b83b70dde17d72f8412632759130ad89be74c51f5",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 30,
+              "elapsed_seconds": 30,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:01:00Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 3,\n  \"snapshot_sha256\": \"50851dbb65363fe14fa9eacd5d26c1ab5c06e3fb77e5cb2a1e86d05b2d65b470\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 60,\n  \"elapsed_seconds\": 60,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 3,
+              "snapshot_sha256": "50851dbb65363fe14fa9eacd5d26c1ab5c06e3fb77e5cb2a1e86d05b2d65b470",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 60,
+              "elapsed_seconds": 60,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:01:30Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 4,\n  \"snapshot_sha256\": \"c0d043f516ef6d5fb80cfedbeedd027dc8a9f8d812eb20873ea57c4523fb6d70\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 90,\n  \"elapsed_seconds\": 90,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 4,
+              "snapshot_sha256": "c0d043f516ef6d5fb80cfedbeedd027dc8a9f8d812eb20873ea57c4523fb6d70",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 90,
+              "elapsed_seconds": 90,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:02:00Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 5,\n  \"snapshot_sha256\": \"a8b1e47f75b2d3ca9bb5aae1ca8171b165a1311d0e039212dfb764e27c8254ec\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 120,\n  \"elapsed_seconds\": 120,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 5,
+              "snapshot_sha256": "a8b1e47f75b2d3ca9bb5aae1ca8171b165a1311d0e039212dfb764e27c8254ec",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 120,
+              "elapsed_seconds": 120,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:02:30Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 6,\n  \"snapshot_sha256\": \"ea31c48668ec1541ecd9c0c6bba52f5a529af68917157b22c0c7e1136e721b08\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 150,\n  \"elapsed_seconds\": 150,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 6,
+              "snapshot_sha256": "ea31c48668ec1541ecd9c0c6bba52f5a529af68917157b22c0c7e1136e721b08",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 150,
+              "elapsed_seconds": 150,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:03:00Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 7,\n  \"snapshot_sha256\": \"149047286250ee19290aac825f860a222cbc9830bd1bed81a8a6682a707c6337\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 180,\n  \"elapsed_seconds\": 180,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 7,
+              "snapshot_sha256": "149047286250ee19290aac825f860a222cbc9830bd1bed81a8a6682a707c6337",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 180,
+              "elapsed_seconds": 180,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:03:30Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 8,\n  \"snapshot_sha256\": \"e87688585d8c100cf9e1c9ad6e450023e13c69270dae2e250ce2e0f6a6e2ad99\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 210,\n  \"elapsed_seconds\": 210,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 8,
+              "snapshot_sha256": "e87688585d8c100cf9e1c9ad6e450023e13c69270dae2e250ce2e0f6a6e2ad99",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 210,
+              "elapsed_seconds": 210,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:04:00Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 9,\n  \"snapshot_sha256\": \"6869e5bd27fa4701007a1bb9e092a3f6c4ac3bc0f5f1bdb3e204a329ec5238fd\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 240,\n  \"elapsed_seconds\": 240,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 9,
+              "snapshot_sha256": "6869e5bd27fa4701007a1bb9e092a3f6c4ac3bc0f5f1bdb3e204a329ec5238fd",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 240,
+              "elapsed_seconds": 240,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:04:30Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 10,\n  \"snapshot_sha256\": \"4844b3150c528216ac529db4e61b5b26cd168cc7f177506e95454c1513447911\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 270,\n  \"elapsed_seconds\": 270,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 10,
+              "snapshot_sha256": "4844b3150c528216ac529db4e61b5b26cd168cc7f177506e95454c1513447911",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 270,
+              "elapsed_seconds": 270,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:05:00Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"green-review-clear-current\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 11,\n  \"snapshot_sha256\": \"a83040e89196e232069216f9d63052501bdfa5cc9df2608cf374f91f9c518782\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"looks-ready\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 300,\n  \"elapsed_seconds\": 300,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "green-review-clear-current",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 11,
+              "snapshot_sha256": "a83040e89196e232069216f9d63052501bdfa5cc9df2608cf374f91f9c518782",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "looks-ready",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 300,
+              "elapsed_seconds": 300,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Synthetic timestamps exercise actual watch-state helper; no real 30-minute PR monitoring.",
+    "No real remote requests or replies made."
+  ]
+}

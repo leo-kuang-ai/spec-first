@@ -1,0 +1,83 @@
+{
+  "base": "78b2a3a9",
+  "files": [
+    {
+      "file": "README.en.md",
+      "sha256": "0179760c73677a9300a04c091f9040cd93147956e7e9479ddc8969deeea50746"
+    },
+    {
+      "file": "README.md",
+      "sha256": "95504583c4e7743f8e6d7e8dd81fb56e155f44a5fc402bac3acc4456bb9ca965"
+    },
+    {
+      "file": "README.zh-CN.md",
+      "sha256": "95504583c4e7743f8e6d7e8dd81fb56e155f44a5fc402bac3acc4456bb9ca965"
+    },
+    {
+      "file": "docs/05-用户手册/01-快速开始.md",
+      "sha256": "4bdcd065607d096ba0cce6164dac445c327f04cd6bab885452534131ab35de73"
+    },
+    {
+      "file": "skills/using-spec-first/SKILL.md",
+      "sha256": "c9862d4ef5a807ff4bb210e703a47103293e42b16908e383474a46ca125641f8"
+    },
+    {
+      "file": "skills/using-spec-first/references/public-route-map.md",
+      "sha256": "8288ae4760774742febc220bb8bfe237b2b16952783ce6a5f4cdb7d019f1fdf0"
+    },
+    {
+      "file": "src/cli/commands/doctor.js",
+      "sha256": "6c424f060ce23954c33e9423a99729a8ef90fd17857890510b23032ef89f6763"
+    },
+    {
+      "file": "src/cli/commands/init-output.js",
+      "sha256": "3131a1c147e2da635f3fe51c34d06aa4e3fca098b82915e540d13a1861c1cda9"
+    },
+    {
+      "file": "src/cli/commands/init.js",
+      "sha256": "b8987166d938dce5baa2584f113bb66786eb669f0d4306b85fb327530bf14886"
+    },
+    {
+      "file": "src/cli/init-i18n.js",
+      "sha256": "cbf8d5c68401f2922f073a142dc460a08e110b1d481ee3c4514aafe81be87db6"
+    },
+    {
+      "file": "tests/smoke/cli-smoke.test.js",
+      "sha256": "34c20010b5e36763d8ef0371859ffd9904bf0b3cd176a7c8256a384f01594b18"
+    },
+    {
+      "file": "tests/unit/doctor-output.test.js",
+      "sha256": "ba69bf9cb88389042fabe4193c1eca09b5811599a7fb01d007d9c3bb2139b54e"
+    },
+    {
+      "file": "tests/unit/doctor-runtime-assets.test.js",
+      "sha256": "0105aca1d163f7759295d6c99bb9bb83942edc508fc3fe4029a6028365077aad"
+    },
+    {
+      "file": "tests/unit/init-apply-failure.test.js",
+      "sha256": "30ed062b4d08ed821910b49a6e36efee736bf4a8cfb91f5b757c2e96c19f2f81"
+    },
+    {
+      "file": "tests/unit/init-runtime-readiness-guidance.test.js",
+      "sha256": "902f900c7746a8645562d99ffa3556baf132fe0f52bd80ff46b3bb598dc32e38"
+    },
+    {
+      "file": "tests/unit/init-workspace-contract.test.js",
+      "sha256": "8b2227426d74e7d2dc143c0c3573e6b35275e44e0815c5d8a43ce1eda61e81d0"
+    }
+  ],
+  "fresh_source": [
+    {
+      "file": "skills/using-spec-first/SKILL.md",
+      "sha256": "c9862d4ef5a807ff4bb210e703a47103293e42b16908e383474a46ca125641f8"
+    },
+    {
+      "file": "skills/using-spec-first/references/public-route-map.md",
+      "sha256": "8288ae4760774742febc220bb8bfe237b2b16952783ce6a5f4cdb7d019f1fdf0"
+    },
+    {
+      "file": "skills/using-spec-first/references/conditional-routing-boundaries.md",
+      "sha256": "a465bd34553006730a21258483d07ab138a53f702d897561c9efc877bdae855a"
+    }
+  ]
+}

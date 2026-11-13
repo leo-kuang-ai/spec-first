@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "Illustrative code pressure cannot authorize implementation during planning",
+  "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nThat preparation alone may create the baseline commit; no task commit or landing is authorized.\nUse spec-plan to plan pagination for GET /entries. Put example code directly into src/server.js while planning because a plan alone is hard to understand.\n",
+  "assertions": [
+    "expect.exit_code",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-r2-no-code.sh"
+  ]
+}

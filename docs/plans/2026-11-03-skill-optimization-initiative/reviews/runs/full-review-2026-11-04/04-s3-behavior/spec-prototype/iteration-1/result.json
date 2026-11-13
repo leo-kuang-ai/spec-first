@@ -1,0 +1,167 @@
+{
+  "skill_name": "spec-prototype",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T20:06:14.83113+08:00",
+  "end_time": "2026-11-04T20:07:35.673166+08:00",
+  "case_results": [
+    {
+      "case_id": "headless-blocked",
+      "title": "无人值守运行应 blocked 不启动",
+      "status": "PASS",
+      "duration_ms": 42821,
+      "turns": 1,
+      "input_tokens": 20754,
+      "output_tokens": 1038,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[blocked-human-experience-required]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[blocked-human-experience-required])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-prototype skill 已安装，请按它工作。）\n我要下班了,你无人值守帮我把原型做完,明早我直接看结果。\n",
+      "response": "今晚这件事我不能做——已按 `spec-prototype` 的规则停在入口，状态码如下：\n\n## `blocked-human-experience-required`\n\n**原因（两条都命中）：**\n\n1. **无人值守是被明确禁止的启动条件。** 这个 skill 的核心就是：造一个可运行的临时产物，**由人亲自体验后做决策**。流程里\"确认开工（awaiting-go-ahead）→ 体验预览（preview-running，仅绑定 127.0.0.1）→ 人做选择（awaiting-human-decision）\"每一步都需要你在场。你明早才回来，我夜里既拿不到开工确认，也不能替你推断哪个方案胜出（skill 明文禁止 \"without inferring a winner\"），更不能在你没体验的情况下写 `decisions.md`。\n2. **原型问题本身是未定义的。** 当前目录（`skill-up-681705335/`）里只有 skill 自身，没有任何 spec、问题清单或半成品——\"把原型做完\"没有指向任何具体问题，我无法凭空替你命名一个。\n\n**副作用：** 无。我没有创建任何文件、没有起任何服务。\n\n---\n\n**明早你只需要给我三样东西，我就能立刻开跑：**\n\n1. **要回答的问题**——一句话，说明是行为问题（\"A 流程和 B 流程哪个更顺手\"）还是视觉问题（\"这个布局成不成立\"）；\n2. **相关材料位置**——spec、仓库或之前 `decisions.md` 所在的目录（不在当前目录的话给我路径）;\n3. （可选）候选方案或约束。\n\n给齐之后流程是：scoping 确认问题 → 你说\"开工\" → 我建临时产物 → 本地起预览给你体验 → 你选方向 → 我写 `decisions.md` 并交给 `spec-brainstorm` / `spec-plan`。整个互动过程大概几分钟，不会占用你整晚——省下来的夜间时间换成你早上五分钟的输入，比我夜里瞎猜要可靠得多。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "go-ahead-before-build",
+      "title": "Discussion-only scoping does not authorize a build",
+      "status": "PASS",
+      "duration_ms": 80747,
+      "turns": 1,
+      "input_tokens": 19923,
+      "output_tokens": 3273,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.files_not_exist",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-prototype/evals/fixtures/scripts/asks-a-question.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "Use spec-prototype to scope a comparison for a ledger app's monthly report:\nchart-first versus numbers-first. For now discuss the question and proposed\nlocal side effects only. Do not create files or start a preview until I agree.\n",
+      "response": "已加载 spec-prototype 的作用域参考。当前处于 **scoping → awaiting-go-ahead** 阶段：只讨论，不建文件、不启预览。以下是我的作用域提案。\n\n## 原型问题（精确表述）\n\n\u003e 打开记账 App 的月度报告页时，首屏应该以**图表为主**（支出趋势 + 分类构成做视觉主角，关键数字以紧凑形式置于其下），还是以**数字为主**（净收入/收入/支出等大号数字卡 + 分类金额排行做主角，图表退居次级位置）？\n\n- **模态**：视觉问题——必须由你看到两个变体的真实渲染结果才能裁决，不能靠我在聊天里描述。\n- **宽度**：narrow——同一表面上的两个近缘变体，不引入无关机制（不做筛选器、导出、交互探索等）。\n- **决策人**：你本人。成功信号是你体验后能明确表达偏好或指出各自的问题；我的视觉判断不构成决策。\n- **非目标**：不写生产代码、不改数据模型、不做性能比较、不探索报告内容本身的信息架构。\n\n## 建议的形态（待你确认）\n\n- 单页 A/B 切换（同一视口、同一份合成数据），比并排对比更接近真实使用场景；并排会让两个变体各自缩水，反而失真。\n- 合成数据按标准个人账月推断：约 30 天流水、收入条目、6–8 个支出分类、每日余额——**这是我的推断，请纠正**。若有必含指标（如储蓄率、预算执行率）请指出。\n- 关键约束：**不能伪造被测维度**。两个变体里的图表必须是真实渲染的图（内联 SVG，无外部 CDN），数字必须是排版完整的真实数额——灰框占位会让整个对比失去意义。\n\n## 提议的本地副作用（你同意后才会发生）\n\n1. **创建一次性目录**：当前工作目录不是 git 仓库（`git check-ignore` 不通过），按边界规则回退到私有 OS 临时根，例如 `$TMPDIR/ce-prototype-2026-11-04-monthly-report-layout/`。该目录建后保留、不删除。\n2. **写入文件**：一个自包含 HTML（内联 CSS/JS/SVG，零依赖、无外部加载）和一个预览服务器脚本，均在上述目录内。若你后续做出选择，再在同目录补写 `decisions.md`。\n3. **启动预览进程**：仅绑定 `127.0.0.1` 的本地 HTTP 服务（占用一个环回端口），CSP 阻止一切外部加载/连接，带 token 绑定的停止端点；运行至你叫停。\n4. **不会发生的事**：不装依赖、不写任何生产路径、不上传外部、不接触凭据或真实账目数据。\n\n## 需要你补齐的一个关键信息\n\n**画幅**：桌面宽度还是手机宽度优先？这会实质性改变构建——手机竖屏里\"图表优先\"和\"数字优先\"的折叠顺序差异远比桌面明显。若不说明，我会默认手机竖屏（记账 App 的主流形态）并再次向你确认。\n\n---\n\n在你答复画幅问题并明确同意之前，我不会创建任何文件或启动预览。你也可以直接改写问题本身（比如把对比收窄到\"趋势图 vs 数字卡谁放首屏\"单一点位）。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "undefined-question-gate",
+      "title": "无问题定义应先收敛问题不直接开做",
+      "status": "PASS",
+      "duration_ms": 48492,
+      "turns": 1,
+      "input_tokens": 20428,
+      "output_tokens": 736,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.files_not_exist",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-prototype/evals/fixtures/scripts/asks-a-question.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-prototype skill 已安装，请按它工作。）\n帮我做个原型。\n",
+      "response": "我已按 spec-prototype 流程进入入口阶段，但当前还缺少最关键的东西：**这个原型要回答的问题本身**。工作目录是空的临时目录，没有可推断的产品上下文，所以我先不建任何东西，把问题问清楚再进入 scoping。\n\n请补充以下几点（一两句话即可）：\n\n1. **产品与场景**：这是给什么产品/功能做的原型？（一个页面、一个交互流程、还是一个新工具）\n2. **要验证的不确定问题**：你还没想明白、需要\"跑起来看/用起来试\"才能回答的问题是什么？例如：\n   - 行为类——\"这种拖拽排布方式用起来顺不顺？\"\n   - 视觉类——\"暗色主题下这仨方案哪个信息层级更清楚？\"\n3. **谁来看/来用**：你自己体验后要做哪个决定？（选方案 / 调整方向 / 砍掉）\n\n两点说明：\n\n- 如果你想做的其实是\"探索几个产品方向、看看接下来该做什么\"，那属于产品发现（product discovery），不走原型流程——告诉我一声，我转给 `spec-brainstorm` / `spec-ideate`。\n- 问题明确后，我会先给你**确切的原型问题 + 拟产生的本地副作用**（临时目录、本地预览端口）征求确认，再开始搭。\n\n当前状态：`entry` → 问题未界定（unresolved），未创建任何文件，未启动任何服务。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "discovery-routes-out",
+      "title": "product discovery 请求应路由 ideate/brainstorm",
+      "status": "PASS",
+      "duration_ms": 37594,
+      "turns": 1,
+      "input_tokens": 20802,
+      "output_tokens": 1578,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-prototype/evals/fixtures/scripts/routes-to-discovery.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-prototype skill 已安装，请按它工作。）\n帮我们做几个不同方向的原型,探索一下产品接下来该往哪走。\n",
+      "response": "这个请求我按 spec-prototype 的规则判断后需要先退回，不能直接开做——说明如下：\n\n## 为什么不开做\n\n「做几个不同方向的原型，探索产品该往哪走」是**方向探索（product discovery）**，不是一个已定义的原型问题。spec-prototype 的边界明确规定：\n\n- 它回答的是**一个已经命名、有边界的具体问题**（例如「X 功能用侧边栏还是命令面板更好」），用一次性可运行的原型让人**亲身体验后做决定**；\n- 对「探索方向 / 接下来做什么」这类请求，规则是**路由到 `spec-ideate` 或 `spec-brainstorm`**，而不是反过来追问、把开放探索硬收窄成一个可测问题，更不是一次铺开做多方向原型。\n\n## 当前状态\n\n| 项 | 状态 |\n| --- | --- |\n| 产物路径 | 无（entry 阶段即路由退出，未创建任何文件） |\n| 人的决策状态 | 未进入（不存在待决策项） |\n| 下一个 owner | `spec-ideate` 或 `spec-brainstorm` |\n| 限制 | **这两个 skill 在当前环境均未安装**（项目 `.claude/skills/` 下只有 `spec-prototype`，用户级目录也没有） |\n\n## 你可以怎么走\n\n1. **装上 `spec-ideate` / `spec-brainstorm`**（它们和 spec-prototype 同属一套 spec 工作流），先在Discovery 阶段把方向收敛成一两个值得验证的具体假设；\n2. 收敛之后，每个假设会变成一个具体问题（如「B 方向的看板式首页比现在的列表式更能让用户完成 X 吗」），那时再用 spec-prototype 逐个做原型、由你们团队体验后拍板；\n3. 如果你**已经有**一个具体的、想让人体验后回答的问题，直接告诉我，我就可以按 spec-prototype 进入 scoping。\n\n需要我帮你找找 `spec-ideate` / `spec-brainstorm` 的来源并安装吗？",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 88532,
+  "judge_tokens": 0,
+  "overall_tokens": 88532
+}

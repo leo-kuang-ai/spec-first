@@ -1,0 +1,136 @@
+{
+  "skill_name": "spec-compound-refresh",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T19:54:28.978023+08:00",
+  "end_time": "2026-11-04T19:59:29.103692+08:00",
+  "case_results": [
+    {
+      "case_id": "non-solutions-scope-gated",
+      "title": "与 docs/solutions 无关的请求应被 scope gate 拦下",
+      "status": "PASS",
+      "duration_ms": 266614,
+      "turns": 4,
+      "input_tokens": 30885,
+      "output_tokens": 3515,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 4,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound-refresh/evals/fixtures/scripts/check-scope-gate.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-compound-refresh skill 已安装，请按它工作。）\n帮我把这个项目整体重构一下,代码太乱了。\n",
+      "response": "证据已齐，按 skill 流程走到终态，先给结论：\n\n## 结论：本 skill 无法承接「整体重构」\n\n`spec-compound-refresh` 是 **`docs/solutions/` 学习记录与 `CONCEPTS.md` 词汇的维护工作流**——它只审计和更新文档，明确排除一般性重构/调试/代码评审，且工作流本身从不修改产品代码。而你要求的交付物恰好是改代码，两者不匹配。\n\n按 `references/scope.md` 的空库规则，本次范围发现结果为：\n\n```text\nNo candidate docs found in docs/solutions/.\nRun `spec-compound` after solving problems to start building your knowledge base.\n```\n\n## 证据\n\n- `docs/solutions/` 不存在，`CONCEPTS.md` 不存在——没有任何可刷新对象，本次零写入。\n- 项目实际代码只有 `src/server.js`（26 行的 mini-ledger 内存记账演示，`POST/GET /entries` 两个端点）。「整体重构」实际是一个很小的普通编码任务：拆模块、补输入校验（目前 `JSON.parse` 无容错）、补 404/405 语义等。\n- 顺带发现一处代码-文档漂移：`README.md:8` 声称\"添加条目需手填五个字段\"，但代码只接收 `amount`/`note` 两个字段——无论选哪条路都值得修正。\n\n## 需要你定一个方向（二选一即可，回复数字就行）\n\n你的两条指令（\"按 skill 工作\" 与 \"重构代码\"）冲突，我需要你确认真实交付物：\n\n1. **直接重构（推荐）**——把重构当普通编码任务做，不走该 skill 的文档流程；README 一并对齐。26 行的演示项目，词汇表现在建价值不大，等项目长起来再说。\n2. **留在本 skill 内**——它唯一能对无文档仓库做的事是为当前代码库 bootstrap `CONCEPTS.md` 词汇表，**不改动任何代码**；\"乱\"的问题则另行处理。\n\n选 1 我立刻开始；也可以说\"1 顺带把 CONCEPTS.md 也建了\"。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "publication-preserve",
+      "title": "独有离线知识与实质引用阻止误删",
+      "status": "FAIL",
+      "duration_ms": 185898,
+      "turns": 3,
+      "input_tokens": 36881,
+      "output_tokens": 4736,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 3,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound-refresh/evals/fixtures/scripts/check-publication-preserve.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: \u003canonymous_script\u003e:1\n调查完成。证据链汇总：\n^\n\nSyntaxError: Unexpected token '调', \"调查完成。证据链汇总\"... is not valid JSON\n    at JSON.parse (\u003canonymous\u003e)\n    at checkKnowledgePublication ([stdin]:106:23)\n    at [stdin]:155:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "先运行 node prepare-eval.cjs，为隔离评测创建基线；这不授权任务提交。\n用 spec-compound-refresh 审查 docs/solutions/old.md 是否可用 new.md 替换并删除。\n本次仅审查，不修改任何文件；检查源码、独有内容和 catalog 的入站引用。\n最终仅返回 JSON，字段为 status（recommended-only）、changed、deleted；路径数组记录本轮实际变化。\n",
+      "response": "调查完成。证据链汇总：\n\n**源码核查**（`src/auth.js` 为当前实现）：`keepOfflineBackup: true` 且注释明确\"离线恢复依赖最后可用凭据；更新后仍需复验认证\"——离线保留行为仍存在，old.md 的 `invalidation_condition`（\"src/auth.js不再保留离线凭据时复查\"）**未触发**，old.md 并未失效。\n\n**独有内容**：old.md 的\"离线恢复\"节（离线时保留最后可用凭据，不删除备份）为 new.md 所缺——new.md 仅覆盖\"刷新+复验\"。README 亦确认\"new.md 是尚未覆盖离线恢复的候选\"，且\"这不是一次已完成的替换\"（此前 catalog 写入失败）。\n\n**入站引用**：`catalog.md` 中 `[离线恢复](old.md#离线恢复)` 锚定 old.md 独有小节，catalog 内无内联替代内容，属**实质性引用**；catalog 还含必须保留的用户手工值班条目。\n\n**结论**：三条件删除门全部不满足（未完全被覆盖、问题域仍活跃、入站引用非装饰性）——直接\"用 new.md 替换并删除 old.md\"不成立。正确分类为 **Consolidate** 候选（先将离线恢复节并入 new.md、改写 catalog 链接，再删 old.md）。本轮仅审查、未获变更授权（`mutation_authorization: missing`），未修改任何文件。\n\n```json\n{\n  \"status\": \"recommended-only\",\n  \"changed\": [],\n  \"deleted\": []\n}\n```",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "publication-partial",
+      "title": "部分发布不能被完整的成功报告掩盖",
+      "status": "FAIL",
+      "duration_ms": 132664,
+      "turns": 5,
+      "input_tokens": 33623,
+      "output_tokens": 2579,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 5,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound-refresh/evals/fixtures/scripts/check-publication-partial.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: \u003canonymous_script\u003e:1\n核对完成。入站引用检查确认：`docs/solutions/catalog.md:3` 存在指向 `old.md#离线恢复` 的实质性链接；`prepare-eval.cjs` 仅创建了基线提交 `18546c0`，本轮工作区无任何变更（`?? .claude/` 为会话前既有的 skill 目录）。\n^\n\nSyntaxError: Unexpected token '核', \"核对完成。入站引用检\"... is not valid JSON\n    at JSON.parse (\u003canonymous\u003e)\n    at checkKnowledgePublication ([stdin]:106:23)\n    at [stdin]:155:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "先运行 node prepare-eval.cjs，为隔离评测创建基线；这不授权任务提交。\n用 spec-compound-refresh 核对 README.md 所述的先前部分发布现场。\n本轮只读，不继续发布或删除；检查 catalog 当前人工条目与 old/new 内容。\n最终仅返回 JSON：status、published_before_run、changed、deleted、pending。\n路径均为仓库相对路径；changed/deleted只记本轮，pending记尚未完成替换的catalog修复和旧件删除。\n",
+      "response": "核对完成。入站引用检查确认：`docs/solutions/catalog.md:3` 存在指向 `old.md#离线恢复` 的实质性链接；`prepare-eval.cjs` 仅创建了基线提交 `18546c0`，本轮工作区无任何变更（`?? .claude/` 为会话前既有的 skill 目录）。\n\n审计结论要点：`src/auth.js` 同时保留 `keepOfflineBackup: true` 与 `verifyAfterUpdate: true`，即离线恢复问题域在当前实现中仍活跃；`new.md` 未覆盖离线恢复，不构成完整 successor；old.md 删除被三重门槛全部阻止（实现仍在、successor 未覆盖全部内容、catalog 有实质性入站链接）；catalog 修复必须基于当前文件内容重建并保留用户手工值班条目。\n\n```json\n{\n  \"status\": \"只读审计完成；先前发布为未完成的部分发布（new.md 已写入，catalog 写入失败，old.md 未删除），本轮未继续发布、未删除、未提交\",\n  \"published_before_run\": [\n    \"docs/solutions/new.md\"\n  ],\n  \"changed\": [],\n  \"deleted\": [],\n  \"pending\": [\n    {\n      \"path\": \"docs/solutions/new.md\",\n      \"reason\": \"successor 不完整：缺少离线恢复内容。src/auth.js 仍保留 keepOfflineBackup: true，old.md 的『离线时保留最后可用凭据，不删除备份』仍是当前有效知识；补齐该节并验证后才构成可信替换。\"\n    },\n    {\n      \"path\": \"docs/solutions/catalog.md\",\n      \"reason\": \"此前写入失败的修复仍待完成：条目仍指向 old.md#离线恢复 且无 new.md 条目；catalog 在失败后又有用户手工修改（『用户新增条目：值班交接时核对最后一次备份时间』），旧快照失效，修复必须基于当前文件重建并保留该值班条目，不得按旧快照覆盖。\"\n    },\n    {\n      \"path\": \"docs/solutions/old.md\",\n      \"reason\": \"删除被证据门槛阻止，保持 pending：① src/auth.js 中离线恢复实现仍活跃（keepOfflineBackup: true），问题域未消失；② new.md 未覆盖离线恢复内容，主题重叠不等于覆盖；③ catalog.md 存在实质性入站链接 [离线恢复](old.md#离线恢复)。待 new.md 补齐并发布、catalog 链接改指 successor 并在最终路径验证后，方可删除。\"\n    }\n  ]\n}\n```",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "publication-recover",
+      "title": "恢复部分发布时保留人工条目及完整知识",
+      "status": "ERROR",
+      "duration_ms": 300038,
+      "turns": 9,
+      "input_tokens": 41578,
+      "output_tokens": 3174,
+      "error": "agent execution failed: claude-code run failed: context deadline exceeded (case timeout 300s via cases.defaults.timeout_seconds)",
+      "grading": null,
+      "configuration": "with_skill",
+      "prompt": "先运行 node prepare-eval.cjs，为隔离评测创建基线；这不授权任务提交。\n用 spec-compound-refresh 完成 README.md 所述部分发布的恢复，范围仅 docs/solutions/old.md、new.md、catalog.md。\n授权在new末尾添加一个空行，再逐字追加old的离线恢复标题与段落（末尾换行），new其他字节不变；核实源码和当前catalog后，\n只将catalog中的old引用改成new，保留其他字节；验证最终引用和原件可恢复后删除old。\n不提交、不push、不修改源码或其他文件。最终仅返回 JSON：status、changed、deleted、pending，路径为仓库相对路径。\n",
+      "response": "验证器通过（frontmatter 提升门 OK，claims 0 flags）。语义批准（inline）：两段内容均被 `src/auth.js` 的 `keepOfflineBackup: true` / `verifyAfterUpdate: true` 与注释直接支持；old 的失效条件（\"不再保留离线凭据\"）未触发；锚点 `#离线恢复` 在候选 new.md 中存在。\n\n按发布顺序执行：重检快照 → 同目录临时文件 → 原子 rename → 验证实际目标：",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 156971,
+  "judge_tokens": 0,
+  "overall_tokens": 156971
+}

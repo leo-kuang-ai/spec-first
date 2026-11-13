@@ -1,0 +1,12 @@
+# manifest: spec-test-browser
+# frozen: 5b59293b
+bfe3cdc6e9648c6cec96bbe221a8cdd37cddb322d5b489eb1eb861fab329c4db  skills/spec-test-browser/SKILL.md
+a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94  skills/spec-test-browser/agents/openai.yaml
+7a09d38ff30c5f9b17269e263a3ad2feaca4e1e1823106dd053701bbdba495b5  skills/spec-test-browser/evals/capability-cases.json
+497c8dc7a0a826bfd02f80d11121e47f83852455335fc221f60fc76db981f9b0  skills/spec-test-browser/evals/cases/invalid-origin-rejected.yaml
+27d8a185a5a514a35eff50d5d1564b6c07f72b6bdc858e07262e187fe01cf9d3  skills/spec-test-browser/evals/cases/missing-origin-not-run.yaml
+dc7c074ee618fd45c4046962ca9ec191847a64cc50784c4f4060d241970c9860  skills/spec-test-browser/evals/eval.yaml
+467b7649c72e4428b673568432e7663aea70761f6dbd310ab8f3f2cda0c69c41  skills/spec-test-browser/references/pipeline-orchestration.md
+2f77b26725d0124a56a5fc74a3f23920109ee73b85aee81ac9f7b6e4a55fe7d9  skills/spec-test-browser/references/route-and-report.md
+3a34fea98914128ab176cdf32700ed635fba36843c1071071a93ff728c0943e9  skills/spec-test-browser/scripts/agent-browser-exact-origin-conformance.cjs
+d9e847a3b4637149f2744e66e2b1447a43c8dc47fb18e258930f139cdeb64291  skills/spec-test-browser/scripts/agent-browser-run-context.cjs

@@ -1,0 +1,132 @@
+{
+  "at": "2026-10-31T05:47:21.793676+00:00",
+  "type": "parent-execution-summary-not-independent-review",
+  "cases": [
+    {
+      "trial": "CEOPT-33-A1",
+      "elapsed_seconds": 113.277,
+      "timing_admission": "passed",
+      "original_sha256": "8176af1aecf7776713f2956d65c4eab468d42a3c379f73ebe2cd16807ff89e32",
+      "candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/trials/CEOPT-33-A1/candidate-extracted.md",
+      "validator_result_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/trials/CEOPT-33-A1/validation-result.json",
+      "task_pack_validity": "invalid",
+      "errors": [
+        {
+          "code": "task-pack-status-invalid",
+          "message": "Task pack frontmatter field 'status' must be 'derived'.",
+          "field": "status"
+        }
+      ],
+      "source_plan_hash": "matched",
+      "task_pack_contract": "valid",
+      "source_plan_preserved": true,
+      "scratch_removed": true
+    },
+    {
+      "trial": "CEOPT-33-B1",
+      "elapsed_seconds": 130.3,
+      "timing_admission": "passed",
+      "original_sha256": "78405ee60f9ab6c30a154e0573b72c74d31a1ea13f52159847b44afa76924097",
+      "candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/trials/CEOPT-33-B1/candidate-extracted.md",
+      "validator_result_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/trials/CEOPT-33-B1/validation-result.json",
+      "task_pack_validity": "invalid",
+      "errors": [
+        {
+          "code": "task-pack-status-invalid",
+          "message": "Task pack frontmatter field 'status' must be 'derived'.",
+          "field": "status"
+        }
+      ],
+      "source_plan_hash": "matched",
+      "task_pack_contract": "valid",
+      "source_plan_preserved": true,
+      "scratch_removed": true
+    },
+    {
+      "trial": "CEOPT-33-B2",
+      "elapsed_seconds": 116.255,
+      "timing_admission": "passed",
+      "original_sha256": "7cbd0ec1d8faf40fb406e4b0f933b28c4da3c08ec6ea9468ad35cdf19081f5e8",
+      "candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/trials/CEOPT-33-B2/candidate-extracted.md",
+      "validator_result_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/trials/CEOPT-33-B2/validation-result.json",
+      "task_pack_validity": "invalid",
+      "errors": [
+        {
+          "code": "task-pack-status-invalid",
+          "message": "Task pack frontmatter field 'status' must be 'derived'.",
+          "field": "status"
+        }
+      ],
+      "source_plan_hash": "matched",
+      "task_pack_contract": "valid",
+      "source_plan_preserved": true,
+      "scratch_removed": true
+    },
+    {
+      "trial": "CEOPT-33-A2",
+      "elapsed_seconds": 110.241,
+      "timing_admission": "passed",
+      "original_sha256": "7ac8d4e0a9035d65e3876cd744132214c0b2fb6521f367aff6d7f264fd7b57e6",
+      "candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/trials/CEOPT-33-A2/candidate-extracted.md",
+      "validator_result_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/trials/CEOPT-33-A2/validation-result.json",
+      "task_pack_validity": "invalid",
+      "errors": [
+        {
+          "code": "task-pack-status-invalid",
+          "message": "Task pack frontmatter field 'status' must be 'derived'.",
+          "field": "status"
+        }
+      ],
+      "source_plan_hash": "matched",
+      "task_pack_contract": "valid",
+      "source_plan_preserved": true,
+      "scratch_removed": true
+    },
+    {
+      "trial": "CEOPT-33-A3",
+      "elapsed_seconds": 119.046,
+      "timing_admission": "passed",
+      "original_sha256": "c52b19a74b45ad0ae4e75f503c7eeb0524139c7e3bf007c86bcade63124be37b",
+      "candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/trials/CEOPT-33-A3/candidate-extracted.md",
+      "validator_result_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/trials/CEOPT-33-A3/validation-result.json",
+      "task_pack_validity": "invalid",
+      "errors": [
+        {
+          "code": "task-pack-status-invalid",
+          "message": "Task pack frontmatter field 'status' must be 'derived'.",
+          "field": "status"
+        }
+      ],
+      "source_plan_hash": "matched",
+      "task_pack_contract": "valid",
+      "source_plan_preserved": true,
+      "scratch_removed": true
+    },
+    {
+      "trial": "CEOPT-33-B3",
+      "elapsed_seconds": 126.351,
+      "timing_admission": "passed",
+      "original_sha256": "ede05b5dc75e302f926867672fd77ad3e0e4cd62c48a7047cd0b49af33460837",
+      "candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/trials/CEOPT-33-B3/candidate-extracted.md",
+      "validator_result_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/trials/CEOPT-33-B3/validation-result.json",
+      "task_pack_validity": "invalid",
+      "errors": [
+        {
+          "code": "task-pack-status-invalid",
+          "message": "Task pack frontmatter field 'status' must be 'derived'.",
+          "field": "status"
+        }
+      ],
+      "source_plan_hash": "matched",
+      "task_pack_contract": "valid",
+      "source_plan_preserved": true,
+      "scratch_removed": true
+    }
+  ],
+  "scope": "Exact admitted original drafts only; no status promotion or semantic repairs. All6 intentional draft statuses rejected; valid contract/hash facts do not establish executable handoff.",
+  "limitations": [
+    "Independent semantic review pending.",
+    "No implementation/proof execution or live callback receipt.",
+    "No autonomous save or validator execution by model."
+  ]
+}

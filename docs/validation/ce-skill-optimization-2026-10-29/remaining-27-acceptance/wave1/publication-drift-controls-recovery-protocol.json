@@ -1,0 +1,20 @@
+{
+  "id": "CEOPT-06-07-parent-guard-controls-r2",
+  "at": "2026-10-31T08:08:08.567311+00:00",
+  "runner_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/verify-publication-drift-controls.py",
+  "runner_sha256": "6e8ffe0e91d8cf92db6a3b34a772fd106cbf0d64d9c4a6eedde164325a1ab7d3",
+  "result_pins": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-results.json": "b0daf67d0e1870c72601e30f67e73480c2ed1cfb46cc3d5fcfb0542f07080e4e",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/refresh-publication-results.json": "41ea9da35f256dcc5993398ccde2756e9fa1f64d001f7062b0b2713ddb700391"
+  },
+  "scope": "All six Compound and six Refresh result identities each receive a separate synthetic four-target group and deletion pair. The controls are parent-authored, not original candidates.",
+  "procedure": [
+    "Pass stale identity to actual parent group publication function; assert zero rename calls and preserved targets/prepared bytes.",
+    "Restore owned synthetic consumer, invoke same function and observe all four actual renames.",
+    "Pass stale deletion target then corrupt backup to actual parent deletion function; assert no unlink and preserve bytes.",
+    "Restore owned synthetic source/backup; invoke same function and observe actual unlink, retained backup."
+  ],
+  "claim_ceiling": "Independent parent guard implementation only. Does not retroactively strengthen original drift flags or imply native Skill/runtime enforcement. No model trials added.",
+  "initial_failure_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/publication-drift-controls-initial-failure.json",
+  "original_protocol_sha256": "671a07a9d18553dfbab6076dbabd60046b595064e8378f56ff90ad7af6fcd634"
+}

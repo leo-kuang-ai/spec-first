@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "severity": "P1",
+    "file": "lib/amount.cjs",
+    "line": 4,
+    "title": "金额被缩小100倍",
+    "suggested_fix": "保持整数分原样传递",
+    "confidence": 100,
+    "reviewers": [
+      "inline-fallback"
+    ],
+    "autofix_class": "gated_auto",
+    "owner": "downstream-resolver",
+    "requires_verification": true,
+    "pre_existing": false
+  },
+  {
+    "id": 2,
+    "severity": "P1",
+    "file": "lib/ledger.cjs",
+    "line": 7,
+    "title": "跨租户请求号碰撞",
+    "suggested_fix": "恢复tenantId与requestId联合键",
+    "confidence": 100,
+    "reviewers": [
+      "inline-fallback"
+    ],
+    "autofix_class": "gated_auto",
+    "owner": "downstream-resolver",
+    "requires_verification": true,
+    "pre_existing": false
+  },
+  {
+    "id": 3,
+    "severity": "P1",
+    "file": "lib/ledger.cjs",
+    "line": 11,
+    "title": "支付成功前缓存captured",
+    "suggested_fix": "provider成功后才写入成功缓存；失败允许重试",
+    "confidence": 100,
+    "reviewers": [
+      "inline-fallback"
+    ],
+    "autofix_class": "gated_auto",
+    "owner": "downstream-resolver",
+    "requires_verification": true,
+    "pre_existing": false
+  }
+]

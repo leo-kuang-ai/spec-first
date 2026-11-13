@@ -1,0 +1,15 @@
+{
+  "id": "CEOPT-28-supplement",
+  "status": "frozen-before-any-CEOPT-28-model-trial",
+  "arm_receipts": {
+    "A": [
+      "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/media-A-receipts.json",
+      "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/media-supplement-A-receipts.json"
+    ],
+    "B": [
+      "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/media-B-receipts.json",
+      "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/media-supplement-B-receipts.json"
+    ]
+  },
+  "instruction": "Read only the spec-sweep entrypoint from each assigned-arm media receipt, covering all chunk cases and cumulative fallback. The other analyzer copy belongs to CEOPT24. These are mocked analyzer receipts, not live transcription."
+}

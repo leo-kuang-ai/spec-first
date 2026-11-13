@@ -1,0 +1,64 @@
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+PASS tests/unit/ce-outcome-judge-calibration.test.js (8.027 s)
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+PASS tests/unit/spec-work-outcome-judges.test.js (6.613 s)
+PASS tests/unit/spec-debug-judge-calibration.test.js
+PASS tests/unit/spec-plan-quality-contracts.test.js
+
+Test Suites: 4 passed, 4 total
+Tests:       82 passed, 82 total
+Snapshots:   0 total
+Time:        17.459 s
+Ran all test suites matching /tests\/unit\/ce-outcome-judge-calibration.test.js|tests\/unit\/spec-work-outcome-judges.test.js|tests\/unit\/spec-debug-judge-calibration.test.js|tests\/unit\/spec-plan-quality-contracts.test.js/i.

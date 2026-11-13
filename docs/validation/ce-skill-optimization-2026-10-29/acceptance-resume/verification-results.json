@@ -1,0 +1,117 @@
+{
+  "checks": [
+    {
+      "id": "admission-regression",
+      "status": "passed",
+      "exit_code": 0,
+      "result": "4 suites / 82 tests",
+      "log": "direct-worker-regression-green.log"
+    },
+    {
+      "id": "debug-calibration",
+      "status": "passed",
+      "exit_code": 0,
+      "result": "4 suites / 77 tests",
+      "log": "debug-proof-green.log"
+    },
+    {
+      "id": "typecheck",
+      "status": "passed",
+      "exit_code": 0,
+      "result": "308 files",
+      "log": "final-typecheck.log"
+    },
+    {
+      "id": "entrypoints",
+      "status": "passed",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "final-entrypoints.log"
+    },
+    {
+      "id": "shared-references",
+      "status": "passed",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "final-shared-references.log"
+    },
+    {
+      "id": "build",
+      "status": "passed",
+      "exit_code": 0,
+      "result": "1468 packaged files; dry run",
+      "log": "final-build-recheck.log"
+    },
+    {
+      "id": "eval-bundles",
+      "status": "passed",
+      "exit_code": 0,
+      "result": "generation check passed",
+      "log": "final-eval-bundles.log"
+    },
+    {
+      "id": "changelog-recheck",
+      "status": "passed",
+      "exit_code": 0,
+      "result": "2 suites / 5 tests",
+      "log": "changelog-green.log"
+    },
+    {
+      "id": "smoke",
+      "status": "passed",
+      "exit_code": 0,
+      "result": "1 suite / 5 tests",
+      "log": "final-smoke.log"
+    },
+    {
+      "id": "integration",
+      "status": "passed",
+      "exit_code": 0,
+      "result": "18 suites / 87 tests passed; 2 opt-in real Graphify tests skipped",
+      "log": "final-integration.log"
+    },
+    {
+      "id": "unit-recheck",
+      "status": "passed",
+      "exit_code": 0,
+      "result": "253 suites / 3379 tests; before final Promote-only fix",
+      "log": "final-unit-recheck.log"
+    },
+    {
+      "id": "promote-final-regression",
+      "status": "passed",
+      "exit_code": 0,
+      "result": "5 suites / 28 tests after final Promote-only fix",
+      "log": "promote-negation-green.log"
+    },
+    {
+      "id": "typecheck-post-review",
+      "status": "passed",
+      "exit_code": 0,
+      "result": "308 files after final fix",
+      "log": "final-typecheck-post-review.log"
+    },
+    {
+      "id": "build-post-review",
+      "status": "passed",
+      "exit_code": 0,
+      "result": "1468 packaged files after final fix",
+      "log": "final-build-post-review.log"
+    },
+    {
+      "id": "eval-bundles-post-review",
+      "status": "passed",
+      "exit_code": 0,
+      "result": "generation check after final fix",
+      "log": "final-eval-bundles-post-review.log"
+    }
+  ],
+  "superseded_failure": {
+    "command": "npm test",
+    "exit_code": 1,
+    "log": "final-npm-test.log",
+    "observed": "One new CHANGELOG entry omitted HH:MM:SS; 3378 other unit tests passed. The format was fixed and focused checks passed. Full unit recheck plus smoke/integration runs are tracked separately."
+  },
+  "evidence_authority": "Parent transcribed from executed tools; no authenticated provider or model outcome is inferred.",
+  "final_tree_reconciliation": "The full unit rerun, smoke and integration completed before the final Promote evaluator correction. Its entire impacted test slice (five suites, including eval disk guard and changelog) was rerun afterward; typecheck, generator drift and package checks were also refreshed. No fresh full npm test pass is claimed."
+}

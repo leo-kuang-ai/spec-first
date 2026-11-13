@@ -1,0 +1,10 @@
+PASS tests/unit/spec-debug-judge-calibration.test.js
+PASS tests/unit/skill-flow-p2-closure-contracts.test.js
+PASS tests/unit/spec-debug-contracts.test.js
+PASS tests/unit/ce-upstream-skill-sync-contracts.test.js
+
+Test Suites: 4 passed, 4 total
+Tests:       37 passed, 37 total
+Snapshots:   0 total
+Time:        2.892 s, estimated 3 s
+Ran all test suites matching /tests\/unit\/spec-debug-contracts.test.js|tests\/unit\/spec-debug-judge-calibration.test.js|tests\/unit\/spec-debug-investigation-contracts.test.js|tests\/unit\/skill-flow-p2-closure-contracts.test.js|tests\/unit\/ce-upstream-skill-sync-contracts.test.js/i.

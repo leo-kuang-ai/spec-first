@@ -1,0 +1,25 @@
+PASS tests/unit/session-history-scripts.test.js
+  session-history JSONL scripts
+    ✓ skeleton preserves structured Codex exit 23 without legacy output (41 ms)
+    ✓ skeleton preserves structured Codex exit -9 without legacy output (40 ms)
+    ✓ skeleton preserves structured Codex exit 23 without legacy output (41 ms)
+    ✓ skeleton preserves structured Codex exit -9 without legacy output (40 ms)
+    ✓ skeleton distinguishes missing exit evidence from a confirmed zero (39 ms)
+    ✓ collapsed Claude tools retain unknown results and reject mismatched result identities (39 ms)
+    ✓ extract-errors detects Codex records after arbitrary metadata and ignores successful stderr (18 ms)
+    ✓ extract-errors.py degrades malformed JSON shapes per line (18 ms)
+    ✓ extract-skeleton.py degrades malformed JSON shapes per line (19 ms)
+    ✓ extract-errors.py survives invalid UTF-8 input as a per-line degradation (19 ms)
+    ✓ extract-skeleton.py survives invalid UTF-8 input as a per-line degradation (19 ms)
+  metadata bounded discovery
+    ✓ metadata at line 25 obeys the 200-line boundary (17 ms)
+    ✓ metadata at line 26 obeys the 200-line boundary (16 ms)
+    ✓ metadata at line 200 obeys the 200-line boundary (17 ms)
+    ✓ metadata at line 201 obeys the 200-line boundary (16 ms)
+    ✓ empty, malformed, valid and missing files keep read failures separate (17 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       16 passed, 16 total
+Snapshots:   0 total
+Time:        0.486 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/session-history-scripts.test.js/i.

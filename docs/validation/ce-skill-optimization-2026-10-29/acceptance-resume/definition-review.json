@@ -1,0 +1,671 @@
+{
+  "reviewer": "fresh-source-definition-review",
+  "findings": [
+    {
+      "title": "Enforce the newly promised direct-worker rejection",
+      "severity": "P2",
+      "file": "skills/spec-doc-review/references/cross-model-eval.md",
+      "line": 7,
+      "why_it_matters": "The new evaluation contract promises zero provider calls through both entrypoints, but the document-review adapter dispatches __worker before its serving-receipt rejection. A caller supplying a valid local prompt packet can therefore reach codex or claude without authenticated serving provenance. The analogous code-review adapter has the same discrepancy. The underlying bypass predates this baseline; this finding concerns the newly asserted protection and its incomplete consumer implementation, not a newly introduced bypass. Positive authenticated activation may remain dormant, but mandatory zero-call rejection cannot be deferred with it.",
+      "autofix_class": "gated_auto",
+      "owner": "downstream-resolver",
+      "requires_verification": true,
+      "confidence": 100,
+      "evidence": [
+        "skills/spec-doc-review/references/cross-model-eval.md:7: - Missing, forged or merely file-based serving identity starts no peer and creates no independence claim, through both `start` and direct worker entrypoints.",
+        "skills/spec-doc-review/scripts/cross-model-doc-review.sh:132: if [ \"${1:-}\" = \"__worker\" ]; then \u2014 this branch invokes worker_main at line 134, before the start-only serving rejection at line 158. worker_main invokes codex at line 102 or claude at line 105.",
+        "docs/contracts/verification/provider-serving-receipt.md:10 explicitly requires the peer runner and all three cross-model adapters to reject before task-packet publication or subprocess launch.",
+        "skills/spec-code-review/scripts/cross-model-adversarial-review.sh:153 branches into __worker before the serving rejection at line 177; provider invocations occur at lines 123 and 126.",
+        "skills/spec-pov/scripts/cross-model-pov.sh:93 already calls require_authenticated_serving_channel as the first worker operation; the helper unconditionally rejects at line 14 while authenticated provenance is unavailable.",
+        "The saved baseline document-review adapter already contains the same __worker branch at lines 132\u2013134 and start-only rejection at line 158; the underlying bypass is pre-existing.",
+        "Parent-run evidence in docs/validation/ce-skill-optimization-2026-10-29/acceptance-resume/direct-worker-red.json records both document-review and code-review calling local fake codex and claude executables, while POV records zero calls. This reviewer read the evidence but did not execute the probe; no real provider execution is established."
+      ],
+      "pre_existing": false,
+      "suggested_fix": "Apply the existing POV dormant-channel guard at the beginning of worker_main in both document-review and code-review adapters, before packet reads, temporary files, or provider invocations. Preserve fail-closed start behavior. Extend the focused admission tests across all three adapters and both providers, checking direct-worker rejection, zero fake-provider calls, and unchanged output. Keep authenticated positive activation explicitly unavailable."
+    }
+  ],
+  "residual_risks": [
+    "This is a fresh-source review in a separate context, not evidence of cross-model independence.",
+    "Authenticated positive cross-model execution remains unavailable. Static normalization checks and fake-provider rejection probes cannot establish actual serving identity, admitted-provider behavior, or independent review quality.",
+    "The direct-worker bypass itself predates the saved baseline. The actionable finding is anchored to the newly added explicit protection claim and the incomplete implementation across its consumers."
+  ],
+  "testing_gaps": [
+    "No tests, builds, installations, external calls, Git mutations, or source writes were performed by this reviewer.",
+    "The document-review report-only judges and PRD validate judge check protected state plus successful nonempty completion, not whether a substantive report was returned. Their owning generator cases are scripts/evals/build-outcome-judges.cjs:152 and 202\u2013205. U13-review.md explicitly limits these checks to preservation, so this is not emitted as a behavioral regression. Separate report-contract and semantic evaluation is required before treating a passing case as completed review.",
+    "Plan generator cases routes-to-execution and check-product-blocker at scripts/evals/build-outcome-judges.cjs:96\u201397 do not independently establish correct routing or a source-specific BLOCKER-1 explanation. The documented semantic-evaluation obligation remains outstanding.",
+    "The existing task-pack report-only fixture is intentionally incomplete according to the scoped audit. Valid task-pack envelope and downstream next-owner behavior require a valid task-pack scenario; byte preservation alone does not establish them.",
+    "Changed prose concerning consequence admission, deduplication, withdrawal, recovery, ideation, research, and synthesis was statically reviewed. Real model execution and downstream semantic fidelity were not exercised here.",
+    "Target-repository containment, PRD readiness/finalization, and POV admission tests were source-reviewed but not executed by this reviewer."
+  ],
+  "coverage_basis": {
+    "assigned_paths": 118,
+    "reviewed_paths": 118,
+    "not_reviewed_paths": 0,
+    "baseline": ".git/spec-first-ce-optimization-2026-10-29/files/",
+    "diff": ".spec-first/workflows/spec-work/spec-first/ce-opt-acceptance-20261029/review-input/definition.diff",
+    "diff_lines_reviewed": 5544,
+    "scope_definitions": {
+      "diff": "All assigned diff hunks reviewed; unchanged full-file content was not exhaustively reviewed.",
+      "full-static": "Current complete file and assigned diff reviewed statically.",
+      "focused-static": "All assigned diff hunks plus relevant current functions or consumer sections reviewed statically."
+    },
+    "common_limitations": "No execution by this reviewer. Static coverage does not establish live host, model, provider, Windows, or field outcomes."
+  },
+  "coverage": [
+    {
+      "path": "skills/spec-brainstorm/references/agents/slack-researcher.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/brainstorm-sections.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/handoff.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/interaction-rules.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/plan-write.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/synthesis-summary.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/evals/cases/default-report-only-no-write.yaml",
+      "status": "reviewed",
+      "scope": "full-static",
+      "limitations": "Preservation-only judge; substantive review outcome not established."
+    },
+    {
+      "path": "skills/spec-doc-review/evals/cases/headless-no-path-fails.yaml",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/evals/cases/html-forces-report-only.yaml",
+      "status": "reviewed",
+      "scope": "full-static",
+      "limitations": "Preservation-only judge; HTML review quality not established."
+    },
+    {
+      "path": "skills/spec-doc-review/evals/cases/task-pack-forces-report-only.yaml",
+      "status": "reviewed",
+      "scope": "full-static",
+      "limitations": "Incomplete task-pack fixture does not establish valid consumer-envelope behavior."
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/repos/html-repo/prepare-eval.cjs",
+      "status": "reviewed",
+      "scope": "full-static"
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/repos/plan-repo/prepare-eval.cjs",
+      "status": "reviewed",
+      "scope": "full-static"
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/repos/taskpack-repo/prepare-eval.cjs",
+      "status": "reviewed",
+      "scope": "full-static"
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/scripts/check-headless-no-path.sh",
+      "status": "reviewed",
+      "scope": "full-static"
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/scripts/check-html-marker.sh",
+      "status": "reviewed",
+      "scope": "full-static",
+      "limitations": "Generated preservation check; substantive report not checked."
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/scripts/check-plan-marker.sh",
+      "status": "reviewed",
+      "scope": "full-static",
+      "limitations": "Generated preservation check; substantive report not checked."
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/scripts/check-taskpack-marker.sh",
+      "status": "reviewed",
+      "scope": "full-static",
+      "limitations": "Generated preservation check; complete task-pack return envelope not checked."
+    },
+    {
+      "path": "skills/spec-doc-review/references/bulk-preview.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/references/cross-model-eval.md",
+      "status": "reviewed",
+      "scope": "full-static",
+      "limitations": "New direct-worker rejection claim conflicts with current adapters; see finding."
+    },
+    {
+      "path": "skills/spec-doc-review/references/dispatch.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/references/document-intake.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/references/findings-schema.json",
+      "status": "reviewed",
+      "scope": "focused-static",
+      "limitations": "Changed schema and normalization consumers reviewed; no schema validator executed."
+    },
+    {
+      "path": "skills/spec-doc-review/references/open-questions-defer.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/adversarial-document-reviewer.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/coherence-reviewer.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/design-lens-reviewer.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/feasibility-reviewer.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/product-lens-reviewer.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/scope-guardian-reviewer.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/whole-doc-reviewer.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/references/rendering-floor.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/references/review-output-template.md",
+      "status": "reviewed",
+      "scope": "focused-static",
+      "limitations": "Changed rendering contract and coverage/count rules reviewed; no rendering run."
+    },
+    {
+      "path": "skills/spec-doc-review/references/subagent-confidence-rubric-detail.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/references/subagent-template.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/references/subagent-why-it-matters-guide.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/references/synthesis-and-presentation.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/references/synthesis-contradictions.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/references/synthesis-multi-round.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/references/synthesis-premise-collapse.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/references/synthesis-restatement-suppression.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/references/walkthrough.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-doc-review/scripts/cross-model-doc-review.sh",
+      "status": "reviewed",
+      "scope": "full-static",
+      "limitations": "Direct-worker rejection discrepancy confirmed from source and parent-run fake-provider evidence; no reviewer execution."
+    },
+    {
+      "path": "skills/spec-explain/references/intake.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-explain/references/orchestration.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-ideate/references/agents/issue-intelligence-analyst.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-ideate/references/agents/slack-researcher.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-ideate/references/divergent-ideation.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-ideate/references/grounding.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-ideate/references/issue-intelligence.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-ideate/references/post-ideation-workflow.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-ideate/references/scope-gates.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-ideate/references/universal-ideation.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-ideate/references/user-research-artifacts.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-plan/evals/cases/enriches-product-contract-in-place.yaml",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-plan/evals/cases/implementation-routes-work.yaml",
+      "status": "reviewed",
+      "scope": "full-static",
+      "limitations": "State preservation does not independently establish routing correctness."
+    },
+    {
+      "path": "skills/spec-plan/evals/cases/planning-only-rejects-implementation.yaml",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-plan/evals/cases/product-blocker-prevents-readiness.yaml",
+      "status": "reviewed",
+      "scope": "full-static",
+      "limitations": "State preservation does not establish a source-specific blocker explanation."
+    },
+    {
+      "path": "skills/spec-plan/evals/cases/r2-soft-pressure-code.yaml",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/admin-export-blocker/prepare-eval-fixture.sh",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/admin-export-blocker/prepare-eval.cjs",
+      "status": "reviewed",
+      "scope": "full-static"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/mini-ledger/prepare-eval.cjs",
+      "status": "reviewed",
+      "scope": "full-static"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/order-import-direct/prepare-eval-fixture.sh",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/order-import-direct/prepare-eval.cjs",
+      "status": "reviewed",
+      "scope": "full-static"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/order-import-enrichment/prepare-eval-fixture.sh",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/order-import-enrichment/prepare-eval.cjs",
+      "status": "reviewed",
+      "scope": "full-static"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/scripts/check-enrichment.sh",
+      "status": "reviewed",
+      "scope": "full-static"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/scripts/check-planning-only.sh",
+      "status": "reviewed",
+      "scope": "full-static"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/scripts/check-product-blocker.sh",
+      "status": "reviewed",
+      "scope": "full-static",
+      "limitations": "State-only protection does not check substantive blocker handling."
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/scripts/check-r2-no-code.sh",
+      "status": "reviewed",
+      "scope": "full-static"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/scripts/routes-to-execution.sh",
+      "status": "reviewed",
+      "scope": "full-static",
+      "limitations": "State-only protection does not check substantive route choice."
+    },
+    {
+      "path": "skills/spec-plan/references/agents/best-practices-researcher.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/data-migration-reviewer.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/performance-oracle.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/repo-research-analyst.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/security-sentinel.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/slack-researcher.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-plan/references/deepening-workflow.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-plan/references/final-review.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-plan/references/plan-sections.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-plan/references/research.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-plan/references/structure.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-plan/references/synthesis-summary.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-pov/SKILL.md",
+      "status": "reviewed",
+      "scope": "full-static"
+    },
+    {
+      "path": "skills/spec-pov/references/agents/pov-peer.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-pov/references/agents/project-grounding-scout.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-pov/references/boundaries.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-pov/references/cross-model-panel.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-pov/references/grounding.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-pov/references/intake.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-pov/references/invocation.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-pov/references/method.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-pov/references/report.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-pov/scripts/cross-model-pov.sh",
+      "status": "reviewed",
+      "scope": "full-static",
+      "limitations": "Dormant rejection reviewed; positive authenticated execution remains unavailable."
+    },
+    {
+      "path": "skills/spec-prd/evals/cases/validate-report-only.yaml",
+      "status": "reviewed",
+      "scope": "full-static",
+      "limitations": "Preservation-only judge does not establish substantive readiness reporting."
+    },
+    {
+      "path": "skills/spec-prd/evals/fixtures/repos/rough-prd/prepare-eval.cjs",
+      "status": "reviewed",
+      "scope": "full-static"
+    },
+    {
+      "path": "skills/spec-prd/evals/fixtures/scripts/check-validate-report-only.sh",
+      "status": "reviewed",
+      "scope": "full-static",
+      "limitations": "Generated preservation check; report semantics not checked."
+    },
+    {
+      "path": "skills/spec-prd/references/prd-readiness-lens.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-prd/scripts/check-prd-artifact.js",
+      "status": "reviewed",
+      "scope": "focused-static",
+      "limitations": "Changed outstanding-question analysis and computeFacts reviewed; unchanged parser body not exhaustively reviewed."
+    },
+    {
+      "path": "skills/spec-prd/scripts/finalize-prd-artifact.js",
+      "status": "reviewed",
+      "scope": "full-static"
+    },
+    {
+      "path": "skills/spec-strategy/evals/cases/check-owned-update.yaml",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-strategy/evals/eval.yaml",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-strategy/evals/fixtures/repos/u28-outcomes/README.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-strategy/evals/fixtures/repos/u28-outcomes/STRATEGY.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-strategy/evals/fixtures/repos/u28-outcomes/prepare-eval.cjs",
+      "status": "reviewed",
+      "scope": "full-static"
+    },
+    {
+      "path": "skills/spec-strategy/evals/fixtures/scripts/check-owned-update.sh",
+      "status": "reviewed",
+      "scope": "full-static"
+    },
+    {
+      "path": "skills/spec-strategy/references/interview.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-strategy/references/strategy-template.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/spec-write-tasks/references/task-pack-schema.md",
+      "status": "reviewed",
+      "scope": "focused-static",
+      "limitations": "Changed target-repository contract checked against task-pack and Work consumers; no workflow execution."
+    },
+    {
+      "path": "skills/spec-write-tasks/references/task-quality-guide.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/using-spec-first/evals/cases/r2-low-confidence-one-question.yaml",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "skills/using-spec-first/evals/fixtures/scripts/check-r2-asks.sh",
+      "status": "reviewed",
+      "scope": "full-static"
+    },
+    {
+      "path": "skills/using-spec-first/references/conditional-routing-boundaries.md",
+      "status": "reviewed",
+      "scope": "diff"
+    },
+    {
+      "path": "src/cli/helpers/target-repo.js",
+      "status": "reviewed",
+      "scope": "full-static",
+      "limitations": "Containment and Git identity logic reviewed; no filesystem or platform probe executed."
+    },
+    {
+      "path": "src/cli/task-pack.js",
+      "status": "reviewed",
+      "scope": "full-static",
+      "limitations": "Target inheritance, containment, overlap, and execution_focus consumers reviewed; no CLI execution."
+    },
+    {
+      "path": "tests/unit/spec-doc-review-contracts.test.js",
+      "status": "reviewed",
+      "scope": "diff",
+      "limitations": "Changed assertions reviewed; unchanged test body not exhaustively reviewed and suite not executed."
+    },
+    {
+      "path": "tests/unit/spec-plan-quality-contracts.test.js",
+      "status": "reviewed",
+      "scope": "diff",
+      "limitations": "Changed assertions reviewed; unchanged test body not exhaustively reviewed and suite not executed."
+    },
+    {
+      "path": "tests/unit/spec-pov-worker-admission.test.js",
+      "status": "reviewed",
+      "scope": "full-static",
+      "limitations": "Admission test source reviewed; no reviewer execution or real-provider coverage."
+    },
+    {
+      "path": "tests/unit/spec-prd-finalize-transition.test.js",
+      "status": "reviewed",
+      "scope": "full-static",
+      "limitations": "Transition test source reviewed; suite not executed."
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "status": "written",
+  "reason_code": "written",
+  "schema_version": "verification-run-summary.v1",
+  "run_summary_ref": ".spec-first/workflows/spec-debug/spec-first/s15-index-flags-20261102/verification-run-summary.json",
+  "checks": [
+    {
+      "id": "regression",
+      "status": "passed",
+      "reason_code": "executed"
+    },
+    {
+      "id": "generator",
+      "status": "passed",
+      "reason_code": "executed"
+    }
+  ]
+}

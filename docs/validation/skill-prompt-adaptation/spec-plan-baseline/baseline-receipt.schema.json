@@ -1,0 +1,289 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spec-first.skill-prompt-adaptation.baseline-receipt.v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "case_id",
+    "arm",
+    "repeat_id",
+    "source",
+    "model",
+    "host",
+    "outcome",
+    "evidence"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "spec-first.skill-prompt-adaptation.baseline-receipt.v1"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "case_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "arm": {
+      "enum": [
+        "A",
+        "A_prime",
+        "B",
+        "N",
+        "M",
+        "B2"
+      ]
+    },
+    "repeat_id": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "git_identity",
+        "skill_identity"
+      ],
+      "properties": {
+        "git_identity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "skill_identity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dirty": {
+          "type": "boolean"
+        }
+      }
+    },
+    "model": {
+      "type": "object",
+      "required": [
+        "model_id",
+        "effort",
+        "identity_status"
+      ],
+      "properties": {
+        "model_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effort": {
+          "type": "string",
+          "minLength": 1
+        },
+        "identity_status": {
+          "enum": [
+            "confirmed",
+            "unknown",
+            "drift"
+          ]
+        }
+      }
+    },
+    "host": {
+      "type": "object",
+      "required": [
+        "host_id",
+        "host_version"
+      ],
+      "properties": {
+        "host_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "host_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "schedule_seed": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "outcome": {
+      "enum": [
+        "pass",
+        "fail",
+        "blocked",
+        "timeout",
+        "rate_limited",
+        "inconclusive",
+        "not_run"
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "required": [
+        "quality_status",
+        "read_status",
+        "artifact_status",
+        "layers",
+        "critical_failure",
+        "trace_refs"
+      ],
+      "properties": {
+        "quality_status": {
+          "enum": [
+            "pass",
+            "fail",
+            "inconclusive",
+            "unavailable"
+          ]
+        },
+        "read_status": {
+          "enum": [
+            "observed",
+            "proxy",
+            "unavailable"
+          ]
+        },
+        "artifact_status": {
+          "enum": [
+            "pass",
+            "fail",
+            "inconclusive",
+            "unavailable"
+          ]
+        },
+        "trace_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "failure_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "layers": {
+          "type": "object",
+          "required": [
+            "entry",
+            "behavior",
+            "artifact",
+            "runtime"
+          ],
+          "properties": {
+            "entry": {
+              "enum": [
+                "pass",
+                "fail",
+                "inconclusive"
+              ]
+            },
+            "behavior": {
+              "enum": [
+                "pass",
+                "fail",
+                "inconclusive"
+              ]
+            },
+            "artifact": {
+              "enum": [
+                "pass",
+                "fail",
+                "inconclusive"
+              ]
+            },
+            "runtime": {
+              "enum": [
+                "pass",
+                "fail",
+                "inconclusive"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "critical_failure": {
+          "type": "boolean"
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ]
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "outcome": {
+            "const": "pass"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "model": {
+            "properties": {
+              "identity_status": {
+                "const": "confirmed"
+              }
+            }
+          },
+          "evidence": {
+            "properties": {
+              "quality_status": {
+                "const": "pass"
+              },
+              "artifact_status": {
+                "const": "pass"
+              },
+              "critical_failure": {
+                "const": false
+              },
+              "trace_refs": {
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "layers": {
+                "properties": {
+                  "entry": {
+                    "const": "pass"
+                  },
+                  "behavior": {
+                    "const": "pass"
+                  },
+                  "artifact": {
+                    "const": "pass"
+                  },
+                  "runtime": {
+                    "const": "pass"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

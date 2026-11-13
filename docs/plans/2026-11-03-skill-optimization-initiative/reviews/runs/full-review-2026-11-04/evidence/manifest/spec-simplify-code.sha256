@@ -1,0 +1,27 @@
+# manifest: spec-simplify-code
+# frozen: 5b59293b
+ed1f1b0d4c1926e8ff3a656cfc77f51de893a81f3ce5aa106ca355d9103b7320  skills/spec-simplify-code/SKILL.md
+8c5dd2ae80267c1838577c9144ae60f42c31f0efaca1e499af252a8bc103372e  skills/spec-simplify-code/evals/cases/bug-request-routes-debug.yaml
+104e1aa428f760f82a897bd403a8a23c57f0b298a92f65aa965c201959979563  skills/spec-simplify-code/evals/cases/docs-only-no-yield.yaml
+c6be4fae47b8ce6d39b524bab62b7b3d4dca3443882ff0d6056fa4ad7196f4f0  skills/spec-simplify-code/evals/cases/r2-elegant-refactor.yaml
+54f7e51a7a713d07fd839336834bb52274f4daa0d121dec8d5fa79ca23fdf327  skills/spec-simplify-code/evals/cases/safety-check-preserved.yaml
+8b19cff8e16cdd55110b0e7198b9b1844bedc1c0ae672b77d57cedbd006966f9  skills/spec-simplify-code/evals/eval.yaml
+4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855  skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/README.md
+966fdf6bda7b2bf2bd70b9c42ddcbd4f2411804e4a22de7ff0ef161db16ddcad  skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/package.json
+0bb64e398f2c01fdbad21c92d0e3a3223d73b245e58118a4505f43794af1a69b  skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/prepare-eval.cjs
+60fcede431e7da0426edd494e69a0680e4f6b3dd786e373d942872ce7a4c0716  skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/src/server.js
+04bc52452e6a611d0609d28002ea50937126dcf5466e5a40c22727c6726623cf  skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/test/entries.test.cjs
+621f7beb407ab683a34577ab28393256b3736ef4f9c4cc2601ed1785a2169c05  skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/test/support/ledger-proof.cjs
+4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855  skills/spec-simplify-code/evals/fixtures/repos/mini-ledger/README.md
+b969dd4ef8c9a70997cebb0ae3fac875de32a7f11a9606b80c9a8f0e8ccd0921  skills/spec-simplify-code/evals/fixtures/repos/mini-ledger/docs/notes.md
+03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b  skills/spec-simplify-code/evals/fixtures/repos/mini-ledger/package.json
+fa1b470d1bcd45d6e6015c63e3721e1efc05fed645a04893880077f497742516  skills/spec-simplify-code/evals/fixtures/repos/mini-ledger/prepare-eval.cjs
+ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34  skills/spec-simplify-code/evals/fixtures/repos/mini-ledger/src/server.js
+14bea02a91277a7440f671f9d6bb5cd70117d23508a03b39dc986169d64fa973  skills/spec-simplify-code/evals/fixtures/scripts/asks-a-question.sh
+2c549413333958fd6014f4bc0f43886274a23d19ad567631eed9c81ae56fe8ab  skills/spec-simplify-code/evals/fixtures/scripts/check-no-yield-scope.sh
+937461da08d8d6103af59d5b8603d0001b56561a7085d18b2047d49dee5bb4ae  skills/spec-simplify-code/evals/fixtures/scripts/check-r2-safety-stays.sh
+937461da08d8d6103af59d5b8603d0001b56561a7085d18b2047d49dee5bb4ae  skills/spec-simplify-code/evals/fixtures/scripts/check-safety-preserved.sh
+7bdc8dfa97907a9754d6a2cff35477d987041d6d3b98cf809b6014d1e35708e3  skills/spec-simplify-code/references/personas/code-quality-reviewer.md
+e8fac77c60edafecc4044c008c49069c4b1a508baaee369f4b8c6a7eb92655ee  skills/spec-simplify-code/references/personas/code-reuse-reviewer.md
+82c1ad7d0b58ed1517ec8916d3c758833b4870e6e7d31039d42ac7efcacd4b08  skills/spec-simplify-code/references/personas/efficiency-reviewer.md
+651c230a43c0fd639c3d9b69a9fd895d7a28bf35324dba7c4406aa043962ebc2  skills/spec-simplify-code/references/test-value-lens.md

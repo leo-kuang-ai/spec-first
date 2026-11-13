@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-work",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T22:52:23.709224+08:00",
+  "end_time": "2026-11-04T22:58:59.983747+08:00",
+  "case_results": [
+    {
+      "case_id": "return-to-caller-envelope",
+      "title": "Caller-owned implementation returns a complete evidence-bound envelope",
+      "status": "PASS",
+      "duration_ms": 395627,
+      "turns": 17,
+      "input_tokens": 70314,
+      "output_tokens": 4056,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 17,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-return-to-caller.sh",
+            "passed": true,
+            "evidence": "PASS: fixture state and required outcome evidence verified; semantic quality is not scored."
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once to prepare this isolated fixture.\nOnly that preparation may create its baseline commit; it grants no task commit authority.\nThen use the installed spec-work skill for this request:\nI am the upstream caller. Change only the README.md heading \"Known rough edges\" to \"Known limitations\". Perform local verification; I retain the shipping tail. Return the full Return-to-Caller envelope as a JSON object or a fenced JSON block. Use individual verification and closeout tool calls, preserving their actual results. Task commits and landing are not authorized.\n",
+      "response": "所有 closeout 步骤完成。组装完整 envelope 并返回：\n\n```json\n{\n  \"status\": \"complete\",\n  \"mode\": \"return-to-caller\",\n  \"plan_path\": null,\n  \"task_pack_path\": null,\n  \"task_pack_digest\": null,\n  \"changed_files\": [\"README.md\"],\n  \"u_ids_attempted\": [],\n  \"u_ids_completed\": [],\n  \"task_ids_attempted\": [],\n  \"task_ids_completed\": [],\n  \"verification_results\": [\n    {\n      \"check_id\": \"readme-heading-swap\",\n      \"command\": \"node -e 'const t=require(\\\"fs\\\").readFileSync(\\\"README.md\\\",\\\"utf8\\\");if(!t.includes(\\\"Known limitations\\\")||t.includes(\\\"Known rough edges\\\"))process.exit(1);console.log(\\\"ok: old heading absent, new heading present\\\")' \u003e .spec-first/workflows/spec-work/skill-up-4217960152/readme-heading-rename-20261104-225618/logs/readme-heading-swap.log 2\u003e\u00261 \u0026\u0026 cat .spec-first/workflows/spec-work/skill-up-4217960152/readme-heading-rename-20261104-225618/logs/readme-heading-swap.log\",\n      \"ran\": true,\n      \"exit_code\": 0,\n      \"status\": \"passed\",\n      \"log_path\": \".spec-first/workflows/spec-work/skill-up-4217960152/readme-heading-rename-20261104-225618/logs/readme-heading-swap.log\"\n    },\n    {\n      \"check_id\": \"readme-diff-scope\",\n      \"command\": \"out=$(git diff --name-only); { echo \\\"changed_files: ${out}\\\"; test \\\"${out}\\\" = \\\"README.md\\\"; } \u003e .spec-first/workflows/spec-work/skill-up-4217960152/readme-heading-rename-20261104-225618/logs/readme-diff-scope.log 2\u003e\u00261; ec=$?; cat .spec-first/workflows/spec-work/skill-up-4217960152/readme-heading-rename-20261104-225618/logs/readme-diff-scope.log; exit $ec\",\n      \"ran\": true,\n      \"exit_code\": 0,\n      \"status\": \"passed\",\n      \"log_path\": \".spec-first/workflows/spec-work/skill-up-4217960152/readme-heading-rename-20261104-225618/logs/readme-diff-scope.log\"\n    }\n  ],\n  \"verification_evidence\": [\n    {\n      \"unit\": \"readme-heading-rename (bare prompt, trivial route)\",\n      \"behavior_changed\": false,\n      \"existing_tests_inspected\": \"仓库无测试设施：package.json 无 scripts/test；无 test/spec 文件\",\n      \"tests_added_or_changed\": 0,\n      \"tests_used_unchanged\": true,\n      \"red_or_characterization_observed\": \"not_applicable\",\n      \"verification_commands_results\": [\n        \"readme-heading-swap: exit 0, passed — README.md 不再包含 \\\"Known rough edges\\\"，包含 \\\"Known limitations\\\"\",\n        \"readme-diff-scope: exit 0, passed — git diff --name-only 输出恰为 README.md（预先存在的未跟踪 .claude/ 未触碰）\"\n      ],\n      \"exception_reason\": \"纯文档标题重命名，无行为承载面；仓库无自动化测试面，以内容断言 + diff 范围检查作为替代验证（narrow obvious check）\"\n    }\n  ],\n  \"verification_run_summary_ref\": \".spec-first/workflows/spec-work/skill-up-4217960152/readme-heading-rename-20261104-225618/verification-run-summary.json\",\n  \"verified_worktree_fingerprint\": {\n    \"schema_version\": \"spec-work-working-tree-fingerprint/v1\",\n    \"repo_root\": \"/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-4217960152\",\n    \"head_sha\": \"1ba231136457d3163e7c9e9daf659a02243170c2\",\n    \"fingerprint\": \"sha256:903d00da7a5844bd6e66b9d7cd4821459169460f0fceb2626ac4d681e6cc12c5\",\n    \"dirty\": true,\n    \"untracked_file_count\": 23\n  },\n  \"honest_closeout_verdict\": \"verified\",\n  \"honest_closeout_overall_reason_code\": \"all-claims-consistent\",\n  \"run_artifact_path\": null,\n  \"run_artifact_reason_code\": \"no-trigger-matched\",\n  \"claim_limitations\": [\n    {\n      \"type\": \"fingerprint-stability-unverified\",\n      \"detail\": \"本仓库无 .gitignore，git check-ignore -v .spec-first/workflows/ 退出码 1；run summary 与 closeout 输入写入的 .spec-first/ 未被 ignore 覆盖，计入未跟踪字节。before/after 指纹差异不构成 drift 证据。指纹为最终验证之后、返回之前捕获的当前树状态（含 .claude/ 预存未跟踪内容）\"\n    },\n    {\n      \"type\": \"review-assigned-to-caller\",\n      \"detail\": \"Return-to-Caller 模式不进入独立审查尾段；本次为单行机械文档重命名，diff 已在实现环内逐行核对。最终 review 由 caller 持有\"\n    },\n    {\n      \"type\": \"verification-profile-not-configured\",\n      \"detail\": \"spec-first internal verification-profile load 返回 not-configured (verification-scripts-missing)；最终检查集由 LLM 按 changed surface 选取（内容断言 + diff 范围）\"\n    }\n  ],\n  \"blockers\": [],\n  \"behavior_change\": false,\n  \"commit_authorization\": \"missing\",\n  \"landing_authorization\": \"missing\",\n  \"plan_status_completion_candidate\": null,\n  \"plan_status_completion_degraded_reason\": \"source-plan-path-lifecycle-degraded\",\n  \"standalone_shipping_skipped\": true\n}\n```\n\n**执行摘要**：\n\n- **变更**：`README.md:8` 仅一行——`Known rough edges:` → `Known limitations:`（该行为段落引导式标题，非 ATX 标题）。diff 中无其他任何改动。\n- **边界**：target repo 为当前单仓库（`main` @ `1ba2311`，prepare-eval 的 baseline commit）；预存未跟踪 `.claude/` 保持未触碰；`docs/plans/` 中唯一的 month-filter 计划与本任务无关且为 requirements-only，未作为输入。\n- **验证**（逐项独立调用、保留实际结果）：heading-swap 断言 exit 0（旧标题 0 次出现、新标题存在）；diff 范围 exit 0（仅 README.md）；结构化收尾链完整执行——`verification-run-summary record` → written（两项 passed），`honest-closeout validate` → `verified / all-claims-consistent`，无 durable trigger（`no-trigger-matched`），指纹已捕获。\n- **未做的事**：无 commit、无 push/PR、无 plan 生命周期变更、未进入独立 simplify/review 尾段（`standalone_shipping_skipped: true`，尾段归 caller）。运行监控段：纯文档变更，无运行时影响，无需额外操作监控。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 74370,
+  "judge_tokens": 0,
+  "overall_tokens": 74370
+}

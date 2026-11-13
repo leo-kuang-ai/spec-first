@@ -1,0 +1,229 @@
+{
+  "skill_name": "spec-strategy",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T20:02:21.129169+08:00",
+  "end_time": "2026-11-04T20:05:15.949521+08:00",
+  "case_results": [
+    {
+      "case_id": "check-owned-update",
+      "title": "Check owned update",
+      "status": "PASS",
+      "duration_ms": 49333,
+      "turns": 4,
+      "input_tokens": 27237,
+      "output_tokens": 1008,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 4,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-strategy/evals/fixtures/scripts/check-owned-update.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run node prepare-eval.cjs once in this isolated fixture. Preparation may create a fixture baseline commit only. Read the current installed spec-strategy source and follow it. Update only the Our approach sentence in STRATEGY.md to \"Focus on offline reconciliation.\" This is my settled choice and local edit authorization. Preserve all other bytes, headings and author-approved content. Do not commit.",
+      "response": "完成。结果如下：\n\n- **修改**：`STRATEGY.md:4` 的 \"Our approach\" 一句由 \"Old approach.\" 改为 \"Focus on offline reconciliation.\"，即用户定案的选择。\n- **验证**：`git diff` 确认全文件仅此一行变更；`# Ledger Strategy`、`## Our approach`、`## Legal commitments` 各级标题、`\u003c!-- author-approved --\u003e` 标记及 \"Retention remains 30 days.\" 等其余内容逐字节保留。\n- **未提交**：改动仅保留在工作区（`M STRATEGY.md`，未暂存）。仓库中唯一的提交 `f15f95c eval fixture baseline` 是 `prepare-eval.cjs` 创建的 fixture 基线，属准备脚本授权范围。\n\n按 skill 流程说明：该文件位于仓库根目录，下游 `spec-ideate`、`spec-brainstorm`、`spec-plan` 下次运行时会将其作为上游产品锚点读取。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "first-run-interview-asks",
+      "title": "无 STRATEGY.md 应宣告首跑并以面试提问开局",
+      "status": "PASS",
+      "duration_ms": 46649,
+      "turns": 5,
+      "input_tokens": 24446,
+      "output_tokens": 647,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 5,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.files_not_exist",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-strategy/evals/fixtures/scripts/asks-a-question.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-strategy skill 已安装，请按它工作。）\n帮我们把这个新产品方向定成正式的产品策略。\n",
+      "response": "Grounding 情况已确认：仓库是空的（除 skill 定义外没有任何 README / VISION.md / 产品材料），无法从代码或文档推断产品意图 —— 我们走无 grounding 的完整首次访谈，结论全部以你的口述为准。\n\n**策略文档未找到 —— 让我们来写它。**（Strategy doc not found - let's write it.）\n\n我会按顺序问几个问题，一次一个。每次回答请控制在 1-3 句 —— 回答越长，往往越容易藏着含糊的东西。\n\n**第 1 问（共约 8 问）— 目标问题：**\n\n\u003e 这个产品解决的核心问题是什么 —— 以及是什么让这个问题**难**（而不是顺手就能绕过去的）？\n\n请具体描述目标用户所处的情境：他们今天在做什么、卡在哪里。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "existing-asks-which-section",
+      "title": "已有策略且无参数应询问要重访哪个 section",
+      "status": "PASS",
+      "duration_ms": 66780,
+      "turns": 4,
+      "input_tokens": 22208,
+      "output_tokens": 2776,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 4,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-strategy/evals/fixtures/scripts/asks-a-question.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-strategy skill 已安装，请按它工作。）\n更新一下我们的产品策略。\n",
+      "response": "找到了现有策略文档——按更新流程走。先给出勘察结果：\n\n## 现状摘要\n\n**仓库勘察**（来源：仓库根目录 + git log）：仓库目前没有任何提交，无 README、无代码、无 docs——只有未跟踪的 `STRATEGY.md` 和 `.claude/`（skill 目录）。也就是说，除了策略文档本身，没有独立证据可交叉验证。\n\n**当前文档**（来源：`STRATEGY.md`，`last_updated: 2026-08-01`）：\n- LedgerFlow：面向自由职业者的极简记账工具，银行流水自动导入 + 一键分类\n- 目标问题：用三张表格拼凑记账，月底对账花两小时\n- 用户：1-5 人工作室的自由职业设计师与开发者\n- 指标：对账时长 \u003c10 分钟、周活跃导入用户\n- 轨道：自动导入质量、分类准确率\n- 结构上是标准本地模板、单一归属（solely-owned），但**缺少 \"Not working on\"（不做什么）一节**\n\n## 漂移候选（是候选，不是判定）\n\n1. **Not working on 缺失** —— 模板必填含义在文中不存在，属于明确缺口\n2. **各节均无法验证时效** —— 距上次更新已 3 个月（2026-08-01 → 今天 2026-11-04），且仓库零活动，没有任何证据表明方向变了，也没有证据表明没变\n\n## 这次要更新哪一节？\n\n请选择（也可直接指出任意一节或组合）：\n\n1. **补上 \"Not working on\"** —— 明确不做什么，补齐模板缺口\n2. **Target problem（目标问题）** —— 重新审视\"三张表格拼凑记账\"是否仍是核心痛点\n3. **Our approach（我们的方案）** —— 重新审视\"自动导入 + 一键分类\"的定位\n4. **Who it's for（目标用户）** —— 重新审视\"1-5 人工作室设计师与开发者\"\n5. **Key metrics（关键指标）** —— 重新审视对账时长与周活跃导入\n6. **Tracks（投入轨道）** —— 重新审视自动导入质量与分类准确率\n7. **逐节快速过一遍** —— 按顺序确认每节是否仍然准确，改动少的直接保留\n\n回复数字或节名即可。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "targeted-update-metrics",
+      "title": "指定 section 应定向重访该 section 并保留其余",
+      "status": "PASS",
+      "duration_ms": 147404,
+      "turns": 1,
+      "input_tokens": 28353,
+      "output_tokens": 3625,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-strategy/evals/fixtures/scripts/asks-a-question.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-strategy skill 已安装，请按它工作。）\nmetrics 这部分想重新过一遍。\n",
+      "response": "找到现有策略文档 —— 按你点名的部分做定向更新（Key metrics）。\n\n**当前文档速览**（来源仅 `STRATEGY.md` 本身；仓库无提交、无产品代码，所以除文档外没有可用的 grounding 证据，有出入请纠正）：\n\n- 产品：LedgerFlow，面向自由职业者的极简记账工具，赌注是「银行流水自动导入 + 一键分类」\n- 用户：1-5 人工作室的自由职业设计师与开发者\n- 问题：三张表格拼凑记账，月底对账两小时\n- Key metrics 现状：`月底对账时长(目标 \u003c10 分钟);周活跃导入用户。`\n\n这次只动 Key metrics，其他小节不碰。开始盘问第一轮：\n\n现在写的是两条——**「月底对账时长(目标 \u003c10 分钟)」**和**「周活跃导入用户」**。如果这个季度只能押 3-5 个数来判断「自动导入 + 一键分类」这条路走没走通，你还会押哪几个？\n\n换个问法：现在缺的那一条（或两条）是什么——是能每周看出变化的前瞻指标，还是能证明用户真的拿到了价值的指标？",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "features-route-to-brainstorm",
+      "title": "想把 feature 排期写进策略应被指出属于 spec-brainstorm",
+      "status": "PASS",
+      "duration_ms": 86580,
+      "turns": 1,
+      "input_tokens": 20438,
+      "output_tokens": 3376,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[spec-brainstorm]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[spec-brainstorm])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-strategy skill 已安装，请按它工作。）\n帮我们把下季度要做的 8 个 feature 排期直接写进 STRATEGY.md,一行一个带时间。\n",
+      "response": "看过了现有的 `STRATEGY.md`（LedgerFlow 的定位文档，2026-08-01 更新）。这件事我得按 spec-strategy 的边界拦一下，不能直接写进去。\n\n**STRATEGY.md 是锚点文档，不是计划。** 它只回答“产品是什么、为谁、怎么赢”（现在的五个小节）；feature 清单和带日期的排期一旦写入，它就会从策略漂移成项目计划，这正是这个 skill 明确要防的。它对此有明确分工：\n\n- **8 个 feature 本身** → 归 `spec-brainstorm`（功能方案工作流，它会以 STRATEGY.md 为上游输入）\n- **带时间的排期（一行一个带日期）** → 归 issue tracker（GitHub Issues、飞书任务等），这是排期的唯一归属地\n\n另外，我手上也没有这 8 个 feature 的清单——仓库和对话里都没有出现，我不能替你编造。\n\n可以这么继续，选一个：\n\n1. 把 8 个 feature 清单发我，我帮你在 issue tracker 里逐条建好、标上 2027 Q1 的时间\n2. 把清单交给 `spec-brainstorm` 先过功能方案，排期随后落到 tracker\n3. 如果你确实想在 STRATEGY.md 留痕，我可以加一条**粗粒度**的 Milestones 小节（比如“2027 Q1：自动导入 + 智能分类主打能力上线”这个级别）——但不会是 8 行带日期的排期表",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "update-reads-existing-doc",
+      "title": "更新前应真读现有文档并给出现状摘要",
+      "status": "PASS",
+      "duration_ms": 124940,
+      "turns": 2,
+      "input_tokens": 22476,
+      "output_tokens": 1572,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 2,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[LedgerFlow 对账]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[LedgerFlow 对账])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-strategy skill 已安装，请按它工作。）\n策略文档过时了,过一遍。\n",
+      "response": "Grounding 完成。按 update-run 流程先给出当前文档摘要与漂移候选。\n\n**路径：找到现有 STRATEGY.md(solely-owned 格式，最后更新 2026-08-01,距今约 3 个月)，进入更新流程。**\n\n**当前文档摘要(3 行)：**\n- LedgerFlow:面向 1-5 人工作室的自由职业设计师/开发者的极简记账工具\n- 核心主张：银行流水自动导入 + 一键分类，解决“三张表格拼凑、月底对账两小时”的痛点\n- 指标与投入：对账时长 \u003c10 分钟、周活跃导入用户；Tracks 为自动导入质量、分类准确率\n\n**Grounding 结果：** 除 STRATEGY.md 本身外，仓库内没有 README、docs、代码，git 也没有任何 commit——即**没有近期活动证据**可供漂移比对。“过时了”目前只能来自你的判断，我无法从仓库自行推断哪里变了。\n\n**漂移候选(无仓库证据，全部 5 个 section 均由你的“过时”声明触发)：**\n\n| # | Section | 现状 |\n|---|---------|------|\n| 1 | Target problem | “三张表格拼凑、对账两小时” |\n| 2 | Our approach | “自动导入 + 一键分类” |\n| 3 | Who it's for | 1-5 人工作室的设计师与开发者 |\n| 4 | Key metrics | 对账时长、周活跃导入用户 |\n| 5 | Tracks | 自动导入质量、分类准确率 |\n| 6 | (缺失) | 文档没有 **Not working on** 一节——solely-owned 格式要求补上这个含义 |\n\n**第一个问题：这次要更新哪些部分？**(可多选，回复编号即可，也可以直接描述哪里变了)\n\n1. 全部逐节过一遍(按 1→5 顺序逐节确认，顺带补 Not working on)\n2. 只改方向性的：Target problem / Our approach / Who it's for\n3. 只改执行层的：Key metrics / Tracks\n4. 其他(请说明)\n\n如果选 1 或 2,请顺便用一两句话说明：过去三个月 LedgerFlow 实际发生了什么变化(比如方向调整、用户群变了、导入/分类之外有新投入)，这是后面追问的起点。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 158162,
+  "judge_tokens": 0,
+  "overall_tokens": 158162
+}

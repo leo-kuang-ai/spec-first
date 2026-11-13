@@ -1,0 +1,9 @@
+| 维度 | 最终裁决 | 关键证据（file:line + 一句事实） | 一句理由 |
+|---|---|---|---|
+| D01 | fail | `skills/spec-strategy/SKILL.md:71-73` 明确两轮后记录未解决答案、不编造、不阻塞；`skills/spec-strategy/references/strategy-template.md:92` 仍无条件检查 3–5 个指标、2–4 条 Tracks，唯一数量例外是计入链接旧文档承载的内容。 | 用户最终只确认两个指标或一条 Track 时，两项要求无法同时满足；这是可定位的内部合同冲突，不是审计成本或质量偏好问题。 |
+| D03 | pass | `skills/spec-strategy/references/strategy-template.md:83-93` 提供写入确认前检查清单；`skills/spec-strategy/evals/fixtures/scripts/check-owned-update.sh:96-97` 对更新结果作精确内容断言；`skills/spec-strategy/evals/cases/targeted-update-metrics.yaml:6,19-22` 将定向性留给 transcript 核验，脚本仅检查提问。 | 验证承诺及可定位机制存在；通用提问脚本不足以独立证明定向性，属于 S3 判据强度问题，按本轮标准不能据此判静态 fail。 |
+| D05 | fail | `skills/spec-strategy/references/update-run.md:16` 同时要求比较所有章节与定向更新不审其他章节；`skills/spec-strategy/evals/cases/existing-asks-which-section.yaml:4-6` 允许 Phase 0 先问、摘要后置，而 `skills/spec-strategy/SKILL.md:51,77` 与 `references/update-run.md:16-18` 要求进入 Phase 2、先摘要和漂移检查再选目标。 | 前者没有明确区分全篇读取与目标语义审查，后者直接允许当前执行合同排除的顺序；两处都是静态文本一致性缺陷，而非单纯冗余。 |
+| B02 | fail | `skills/spec-strategy/references/interview.md:10,150` 要求答案仍弱或不清楚时记录已有内容并建议重访；`skills/spec-strategy/references/strategy-template.md:56,66,92` 保留固定数量要求，没有为这种降级提供数量例外。 | “值得重访”的备注虽已存在，却不能使不足数量的合法输入通过输出检查；输入降级出口与产物验收合同未闭合，与 D01 是同一根因。 |
+| B06 | pass | `skills/spec-strategy/evals/cases/update-reads-existing-doc.yaml:3-6,24-28` 用两个输出词匹配支撑真实读取声明；`skills/spec-strategy/evals/cases/features-route-to-brainstorm.yaml:3-6,23-27` 仅检查输出包含 `spec-brainstorm`，未核验禁止写入的结果。 | 用例和成功判据确实存在且可定位；其证据不足以支持全部声明，但这正属于用户明确排除的 eval 判据强度问题，应记 S3，不构成静态 fail。 |
+
+**修复建议：** D01/B02 合并修复：在 `strategy-template.md` 的数量注释及检查项中明确，3–5 个指标、2–4 条 Tracks 是正常目标；达到追问上限后，允许保留用户实际确认的不足数量，标注待重访，不得凑数，也不得宣称已达正常质量目标。D05：保留全篇读取以识别 ownership 和保护原文，将定向更新的语义漂移检查明确限定在目标章节；无目标时再扫描全篇寻找候选。同时删除或改写 `existing-asks-which-section.yaml:6` 的旧顺序许可，与“读取更新规则→摘要及相应范围检查→选择或重访目标”保持一致。此次直接核对的是隔离 worktree 中冻结提交 `5b59293bb1aecb40c4894549a89f8b045dfa40fe` 的源码；未修改文件、未运行测试或行为 eval；`/Users/kuang/.codex/AGENTS.md` 因未获读取权限未能核对。

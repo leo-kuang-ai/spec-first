@@ -1,0 +1,9 @@
+PASS tests/unit/spec-doc-review-contracts.test.js
+PASS tests/unit/spec-doc-review-task-pack-contracts.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       53 passed, 53 total
+Snapshots:   0 total
+Time:        0.359 s, estimated 1 s
+Ran all test suites within paths "tests/unit/spec-doc-review-contracts.test.js", "tests/unit/spec-doc-review-task-pack-contracts.test.js".
+Test results written to: docs/validation/ce-skill-audit-2026-10-28/doc-review-tests.json

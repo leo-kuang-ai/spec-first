@@ -1,0 +1,14 @@
+{
+  "schema_version": "npm-install-matrix-smoke.v1",
+  "status": "passed",
+  "os": "darwin",
+  "arch": "arm64",
+  "node": "v22.22.3",
+  "package": "spec-first@1.15.3",
+  "checks": [
+    "pack",
+    "global-install",
+    "direct-cli-help",
+    "installed-shim-help"
+  ]
+}

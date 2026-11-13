@@ -1,0 +1,186 @@
+{
+  "scenario_id": "CEOPT-15",
+  "skill": "spec-optimize",
+  "review_type": "independent-fresh-read-only",
+  "verdict": "partial",
+  "decision": "Accept all six decision artifacts for the bounded interpretation task. Accept the recorded B helper arithmetic counterexample/control result. Do not close the full frozen scenario or claim model improvement.",
+  "review_boundaries": {
+    "writes": false,
+    "tests_or_helpers_executed": false,
+    "network": false,
+    "delegation": false,
+    "other_reviews_or_producer_conclusions_read": false,
+    "verification_performed": "Read source, artifacts, receipts and complete recorded tool events; recomputed hashes and timestamp arithmetic using read-only inspection."
+  },
+  "provenance": {
+    "request_sha256": "f8079050540dca402ff8b60486a56b3c916863904faf805feeb8ee3524e03127",
+    "request_hash_matches_packet": true,
+    "workspace_fixture_hash_matches_packet": true,
+    "both_arm_receipt_hashes_match_packet": true,
+    "all_six_artifact_hashes_match_receipts": true,
+    "all_six_tool_trace_hashes_match_receipts": true,
+    "both_helper_source_hashes_match_frozen_source": true,
+    "A_helper_sha256": "4af1f0dfbe492193937b4317af3cb20b701e5007754296cb25b4cf498973d879",
+    "B_helper_sha256": "36f08baa4808d1d7750af8daf0ab0cc7a5287422e226b77a6d70e4b87a65a67c",
+    "both_normalized_admission_digests_verified": true,
+    "all_eight_synthetic_result_record_hashes_reconstructed_and_verified": true,
+    "helper_stdout_matches_structured_output": true,
+    "read_trace": "Every recorded call is a bounded cat read. Every call has a successful output. Decoded outputs match the complete concatenated current frozen files byte-for-byte, with no missing or truncated read content. No opposite-arm receipt or source reads appear.",
+    "timing": "All six elapsed values exactly match final_at minus started_at and are below the packet's 300-second deadline.",
+    "limits": [
+      "Hash consistency does not independently authenticate historical helper execution or model serving identity.",
+      "The supplied traces do not include independently authenticated original final messages; unchanged parent saving is a receipt assertion.",
+      "Read-only behavior is observed in the traces, not enforced filesystem isolation.",
+      "The packet remains labeled prepared-not-executed; execution evidence comes from the individual trial receipts and traces."
+    ]
+  },
+  "native_input_compatibility": {
+    "verdict": "pass",
+    "A": "The producer supplies native admission v1, valid completed-attempt scores and caller-supplied observed_noise_floor. Its admit receipt succeeds.",
+    "B": "The producer supplies native admission v2, noise_rule range-v1, distinct run IDs and result references, and corresponding result hashes. Its admit receipt succeeds.",
+    "interpretation": "B's false-zero rejection is not a v1/v2 schema mismatch. Both controls reach calibration evaluation with version-valid inputs. This establishes native-input comparability, not backward compatibility of v1 admissions with B."
+  },
+  "mechanism_findings": [
+    {
+      "id": "M1",
+      "verdict": "A-counterexample-confirmed-in-recorded-evidence",
+      "source": "inputs/A/spec-optimize/scripts/measurement-admission.cjs:allowAb",
+      "finding": "A checks that the caller-supplied noise floor is finite, nonnegative and below the ceiling, but never derives it from completed scores. Scores 0 and 100 with observed_noise_floor 0 therefore receive aa-calibration-passed and ab_allowed true. The stable control also passes with the unsupported zero."
+    },
+    {
+      "id": "M2",
+      "verdict": "B-arithmetic-boundary-supported",
+      "source": "inputs/B/spec-optimize/scripts/measurement-admission.cjs:normalizeAdmission and allowAb",
+      "finding": "B requires range-v1 and computes max minus min over all successfully validated completed result records. Median metric aggregation does not define this noise rule. The false-zero case yields range 100 and rejection against ceiling 0.01; the stable control yields range 0.001 and passes."
+    },
+    {
+      "id": "M3",
+      "verdict": "provenance-limit-preserved",
+      "finding": "B verifies file integrity, distinct run/file identities, baseline and admission bindings, exit status and score agreement. These checks cannot authenticate caller-created records or prove independent launches. The producer explicitly constructs synthetic files. Stable-control acceptance is not the frozen scenario's positive real-sample acceptance."
+    },
+    {
+      "id": "M4",
+      "verdict": "cleanup-source-improvement-not-execution-acceptance",
+      "source": "inputs/{A,B}/spec-optimize/scripts/experiment-worktree.sh",
+      "finding": "A resets existing experiment worktrees and permits forced cleanup with manual deletion fallback. B checks ownership metadata, base identity and dirty state, preserves unknown paths, and requires explicit discard for owned changes. None of these worktree operations is exercised by the six trials or the measurement receipt producer."
+    }
+  ],
+  "per_trial": [
+    {
+      "id": "CEOPT-15-A1",
+      "verdict": "pass-bounded-decision",
+      "elapsed_seconds": 70.747,
+      "deadline_seconds": 300,
+      "read_calls": 2,
+      "findings": [
+        "Correctly rejects real readiness despite A's successful false-zero gate.",
+        "Reports raw spreads descriptively without inventing a registered A noise estimator.",
+        "Rejects cleanup including unowned scratch and preserves even owned scratch under the task prohibition.",
+        "Rejects holdout-guided tuning and keeps synthetic controls separate from real measurement."
+      ],
+      "critical_defects": []
+    },
+    {
+      "id": "CEOPT-15-B1",
+      "verdict": "pass-bounded-decision",
+      "elapsed_seconds": 66.139,
+      "deadline_seconds": 300,
+      "read_calls": 2,
+      "findings": [
+        "Correctly distinguishes rejection of range 100 from acceptance of range 0.001.",
+        "Limits stable acceptance to file-integrity-and-arithmetic-only.",
+        "Requires genuine launch provenance before real comparison.",
+        "Preserves cleanup ownership and holdout independence."
+      ],
+      "critical_defects": []
+    },
+    {
+      "id": "CEOPT-15-B2",
+      "verdict": "pass-bounded-decision",
+      "elapsed_seconds": 69.029,
+      "deadline_seconds": 300,
+      "read_calls": 3,
+      "findings": [
+        "Correctly identifies native v2 and range-v1.",
+        "Does not equate distinct IDs and hashes with authentic independent launches.",
+        "Explicitly requires exact dirty source bytes rather than shared HEAD alone.",
+        "Distinguishes proposed holdout misuse from actual contamination and rejects unauthorized cleanup."
+      ],
+      "critical_defects": []
+    },
+    {
+      "id": "CEOPT-15-A2",
+      "verdict": "pass-bounded-decision",
+      "elapsed_seconds": 73.576,
+      "deadline_seconds": 300,
+      "read_calls": 3,
+      "findings": [
+        "Correctly identifies A's acceptance of unsupported caller noise.",
+        "Distinguishes synthetic dirty-workspace facts from live Git inspection.",
+        "Requires a frozen estimator, real A/A evidence and an authorized execution envelope.",
+        "Clarifies that the synthetic control budget does not authorize or establish remaining budget for a real run."
+      ],
+      "critical_defects": []
+    },
+    {
+      "id": "CEOPT-15-A3",
+      "verdict": "pass-bounded-decision",
+      "elapsed_seconds": 71.397,
+      "deadline_seconds": 300,
+      "read_calls": 2,
+      "findings": [
+        "Correctly rejects the false-positive calibration gate without claiming real candidate regression.",
+        "Keeps observed spreads separate from an absent registered estimator.",
+        "Preserves owned and unowned paths under the no-cleanup instruction.",
+        "Marks real measurement, dirty reuse and recovery as unresolved."
+      ],
+      "critical_defects": []
+    },
+    {
+      "id": "CEOPT-15-B3",
+      "verdict": "pass-bounded-decision",
+      "elapsed_seconds": 65.514,
+      "deadline_seconds": 300,
+      "read_calls": 3,
+      "findings": [
+        "Correctly separates range-based noise from median aggregation.",
+        "Treats false-zero rejection as calibration failure rather than candidate regression.",
+        "Explicitly notes that a descriptive holdout identity proves neither frozen data nor disjointness.",
+        "Provides a bounded evidence-collection prerequisite and performs no unauthorized action."
+      ],
+      "critical_defects": []
+    }
+  ],
+  "acceptance_layers": {
+    "bounded_model_decision_quality": "pass: A 3/3 and B 3/3",
+    "native_helper_input_compatibility": "pass",
+    "false_zero_helper_boundary": "A fails; B passes on the recorded synthetic counterexample",
+    "stable_synthetic_helper_control": "B passes the registered arithmetic gate; A acceptance does not establish correctly derived noise",
+    "actual_dirty_reuse_and_cleanup_preservation": "not-run",
+    "stable_real_sample_admission": "not-run",
+    "holdout_nonaccess_in_six_trials": "supported-by-read-traces",
+    "full_holdout_execution_independence": "not-run",
+    "full_frozen_scenario": "partial",
+    "relative_model_quality_improvement": "not-established",
+    "real_optimization_benefit": "not-established"
+  },
+  "missing_full_acceptance_facets": [
+    "Actual repeated creation of a dirty experiment directory, with before/after evidence proving tracked, untracked and ignored WIP preservation.",
+    "Actual cleanup attempts against unowned prefix-matching directories and legacy ownership states, with preservation and failure/recovery evidence.",
+    "Authorized cleanup positive controls proving removal of eligible owned scratch while retaining required audit and resume evidence.",
+    "Separate genuine stable A/A launches with raw command logs, exit statuses, immutable identities and an accepted calibration result.",
+    "Evidence that fabricated or duplicated samples cannot be promoted to real measurements through the owner provenance check; distinct synthetic result files alone do not satisfy this.",
+    "An actual selection/confirmation flow proving holdout isolation and preventing holdout feedback from entering subsequent tuning.",
+    "Real candidate comparison and final integrated confirmation under a frozen protocol if an optimization benefit is to be claimed."
+  ],
+  "comparative_limits": [
+    "These are six model interpretations of supplied synthetic helper evidence, not six independently executed measurement workflows.",
+    "All A artifacts already reject unsafe readiness and cleanup; B does not show a model decision-quality win on this task.",
+    "B's demonstrated advantage is a deterministic helper correction, not a prompt-only effect.",
+    "The request explicitly supplies synthetic labels, forbids cleanup and holdout access, and asks for boundary assessment; this is a strongly cued task.",
+    "Arms consume different native receipt structures and different helper outcomes. This is appropriate for mechanism comparison but does not isolate instruction wording.",
+    "Several trials overlap in wall-clock time, so the listed launch order is not six serial trials and timings cannot support a controlled latency claim.",
+    "Three trials per arm, unauthenticated serving identity and no real workload outcomes cannot support broad host, model or field generalization."
+  ],
+  "next_bounded_action": "Retain the six artifacts as accepted read-only decisions and retain the synthetic helper result as narrow mechanism evidence. Keep CEOPT-15 partial until separately authorized worktree preservation/recovery checks and genuine stable A/A admission evidence cover the frozen missing facets."
+}

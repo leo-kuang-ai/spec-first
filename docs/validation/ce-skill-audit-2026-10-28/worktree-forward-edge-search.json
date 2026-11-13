@@ -1,0 +1,12 @@
+{
+  "command": [
+    "rg",
+    "-n",
+    "spec-worktree|worktree-manager|caller-owned isolation",
+    "skills/spec-work"
+  ],
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "",
+  "limitation": "无文本引用不证明所有动态consumer不存在；直接execution合同已全文核对"
+}

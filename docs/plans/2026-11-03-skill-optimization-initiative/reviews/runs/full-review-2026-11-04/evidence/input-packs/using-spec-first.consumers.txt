@@ -1,0 +1,16 @@
+# consumers: using-spec-first
+src/cli/adapters/codex.js
+src/cli/adapters/cursor.js
+src/cli/adapters/kiro.js
+src/cli/adapters/qoder.js
+src/cli/instruction-bootstrap.js
+src/cli/plugin-sync.js
+tests/integration/init-six-host-lifecycle.integration.test.js
+tests/unit/instruction-bootstrap.test.js
+tests/unit/pointer-based-adapter.test.js
+tests/unit/project-graph-consumption-contracts.test.js
+tests/unit/qoder-runtime-lifecycle.test.js
+tests/unit/session-start-entry.test.js
+tests/unit/skill-flow-p2-closure-contracts.test.js
+tests/unit/spec-handoff-contracts.test.js
+tests/unit/using-spec-first-contracts.test.js

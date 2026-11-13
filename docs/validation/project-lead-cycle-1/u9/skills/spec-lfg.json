@@ -1,0 +1,173 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "generated_at": "2026-09-20T07:35:36.158199+00:00",
+  "skill_name": "spec-lfg",
+  "source_snapshot": "source-manifest.json",
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "source_paths": [
+    "skills/spec-lfg/SKILL.md",
+    "skills/spec-lfg/references/plan-brief.md",
+    "skills/spec-lfg/references/work-return.md",
+    "skills/spec-lfg/references/review-followup.md",
+    "skills/spec-lfg/references/stage-routing.md",
+    "skills/spec-lfg/references/shipping-tail.md",
+    "skills/spec-lfg/references/pr-watch-loop.md"
+  ],
+  "source_read_ranges": {
+    "skills/spec-lfg/SKILL.md": "1-81",
+    "skills/spec-lfg/references/plan-brief.md": "1-16",
+    "skills/spec-lfg/references/work-return.md": "1-32",
+    "skills/spec-lfg/references/review-followup.md": "1-95",
+    "skills/spec-lfg/references/stage-routing.md": "1-90",
+    "skills/spec-lfg/references/shipping-tail.md": "1-76",
+    "skills/spec-lfg/references/pr-watch-loop.md": "1-50"
+  },
+  "source_hashes": {
+    "skills/spec-lfg/SKILL.md": "6bd097a450c07fa97dc543d15f53fbfc17a5aa6a9c4661054b97a3bcc89ecaa7",
+    "skills/spec-lfg/references/plan-brief.md": "167305c4fe2701fa39ceae073f388477203cbf1cb25109ab243ba7b1864abb1b",
+    "skills/spec-lfg/references/work-return.md": "27fd6cfed628aaa678061f513b778a8c9b9c67634fb982d92afafe83c69135eb",
+    "skills/spec-lfg/references/review-followup.md": "31c35525141259fa66ef137bd388384cbb162aebbb805ca62b4fb266dcdeebd9",
+    "skills/spec-lfg/references/stage-routing.md": "ce79429220791bafdb8f73a6ef2ce8e2e1afa1dc28fe9387c5ffce001f6e62ac",
+    "skills/spec-lfg/references/shipping-tail.md": "61e06b17d6071a276f91a79a121b3a57c00b1382994cb3fb17f5e4f4421ba096",
+    "skills/spec-lfg/references/pr-watch-loop.md": "6eab53df6508e6d46fc9f7274fe89420309ca14375070a5cedd9f4c1c32d7742"
+  },
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "entry_surface": "standalone_skill",
+  "batch": "B",
+  "closure_tier": "M",
+  "closure_observed": {
+    "files": 24,
+    "bytes": 105122,
+    "read_package_files_at_least_partially": 7,
+    "read_supporting_files_at_least_partially": 0,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "coverage_commitment": "committed",
+  "dependency_closure": "partial",
+  "status": "degraded",
+  "reason_codes": [
+    "bounded_source_review",
+    "dependency_closure_partial",
+    "workflow_not_run"
+  ],
+  "command_or_method": [
+    "只读reviewer逐包阅读冻结source并判断五分支；主owner整合与回源裁决，不是盲评或workflow执行。"
+  ],
+  "ran": true,
+  "exit_code": null,
+  "evidence_paths": [
+    "reviewer-returns/b.json"
+  ],
+  "source_refs": [
+    "skills/spec-lfg/SKILL.md",
+    "skills/spec-lfg/references/plan-brief.md",
+    "skills/spec-lfg/references/work-return.md",
+    "skills/spec-lfg/references/review-followup.md",
+    "skills/spec-lfg/references/stage-routing.md",
+    "skills/spec-lfg/references/shipping-tail.md",
+    "skills/spec-lfg/references/pr-watch-loop.md"
+  ],
+  "owner": "project-lead-cycle-1",
+  "consumers": [
+    "周期1主审查",
+    "对应上游/下游workflow（以SKILL文档声明为准）"
+  ],
+  "branches": [
+    {
+      "id": "entry_positive",
+      "status": "source-covered",
+      "judgment": "只有显式 spec-lfg 或已披露 commit/push/PR/CI/review 副作用的 handoff 才准入；按 plan→work→simplify→independent review→fix→browser/final verify→ship/watch 执行。",
+      "source_refs": [
+        "skills/spec-lfg/SKILL.md:7-15",
+        "skills/spec-lfg/SKILL.md:36-81"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "near_neighbor_negative",
+      "status": "source-covered",
+      "judgment": "仅有 ship it 时先一次性披露并等待；缺 admission 时不实现或提交；inline review 不能冒充 independent review；无 remote 时进入 local-only。",
+      "source_refs": [
+        "skills/spec-lfg/SKILL.md:7-15",
+        "skills/spec-lfg/references/shipping-tail.md:3-8",
+        "skills/spec-lfg/references/review-followup.md:33-38"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "output_consumer",
+      "status": "source-covered",
+      "judgment": "spec-plan/spec-work 结构化返回、review JSON、browser result、fingerprint 与 watch 终态共同决定是否可 ship/DONE；looks-ready 仅为 advisory。",
+      "source_refs": [
+        "skills/spec-lfg/references/work-return.md:5-32",
+        "skills/spec-lfg/references/stage-routing.md:39-90",
+        "skills/spec-lfg/references/pr-watch-loop.md:46-50"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "critical_error_stop",
+      "status": "source-covered",
+      "judgment": "缺 plan/work/review/browser/final fingerprint/remote decision 证据时，在对应阶段停止；needs-human 及未持久化 residual 阻断 DONE。",
+      "source_refs": [
+        "skills/spec-lfg/SKILL.md:40-64",
+        "skills/spec-lfg/references/stage-routing.md:39-87",
+        "skills/spec-lfg/references/shipping-tail.md:63-76"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "degraded_recovery_handoff",
+      "status": "source-covered",
+      "judgment": "缺 worker/host/browser/remote 能力时保留 degraded/local-only/manual-blocker；watch event 交给 debug/resolve pipeline-return，不能把本地修复升级为远端 green。",
+      "source_refs": [
+        "skills/spec-lfg/SKILL.md:54-64",
+        "skills/spec-lfg/references/pr-watch-loop.md:15-30",
+        "skills/spec-lfg/references/shipping-tail.md:55-63"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    }
+  ],
+  "findings": [],
+  "fresh_source_eval": "not-run",
+  "claim_ceiling": "C0",
+  "limitations": [
+    "其余 LFG 引用和测试未读；未执行 pipeline invocation 或 remote/browser 验证。",
+    "原机械占位结论已撤销；source-covered仅证明已读范围可追踪，不证明运行通过。",
+    "未确认读取范围不计覆盖；哈希只证明字节。"
+  ],
+  "recovery_point": "如需 LFG runtime 闭环，补读剩余引用，并在具备明确副作用授权及 exact target origin 时执行。",
+  "timing": {
+    "active_seconds": null,
+    "limitation": "逐包主动时间不可可靠恢复，未用工具墙钟估算。"
+  },
+  "record_correction": {
+    "at": "2026-09-20T05:55:01.021141+00:00",
+    "invalidated": "2026-09-20T05:24 的机械占位结论",
+    "replaced_by_actual_review_at": "2026-09-20T07:35:36.158199+00:00"
+  },
+  "supporting_read_ranges": {},
+  "unconfirmed_read_ranges": [],
+  "reviewer_provenance": {
+    "reviewer": "cycle1_a_exit",
+    "kind": "read-only-source-review",
+    "fresh_per_package_context": false,
+    "raw_return": "reviewer-returns/b.json",
+    "raw_return_sha256": "74c86ff4af0bab17fbeb82f390cf57eb33590df5a24910b9823d19382480563c"
+  },
+  "execution": {
+    "source_semantic_review": "ran",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "not-run"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "R2变体:bug 修复请求 route-out 应宣告目的地",
+  "prompt": "（spec-prd skill 已安装，请按它工作。）\n这个服务偶尔崩的问题帮我修一下就行,不用写 PRD。\n",
+  "assertions": [
+    "expect.must_contain",
+    "output_contains{all:[spec-debug]}"
+  ]
+}

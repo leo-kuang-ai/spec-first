@@ -1,0 +1,22 @@
+{
+  "id": "ce-focused-final",
+  "command": [
+    "node",
+    "node_modules/jest/bin/jest.js",
+    "--runInBand",
+    "--runTestsByPath",
+    "tests/unit/ce-localization-review-contracts.test.js",
+    "tests/unit/ce-localization-closeout-contracts.test.js"
+  ],
+  "cwd": ".",
+  "started_at": "2026-09-16T07:59:54.986787+00:00",
+  "duration_s": 17.37,
+  "exit_code": 0,
+  "ran": true,
+  "status": "passed",
+  "reason_code": "exit-code-zero",
+  "log_path": "logs/ce-focused-final.log",
+  "redaction_status": "none-required",
+  "source_snapshot": "5581d716fa55d17b92171aedae5aa287e4537ee30bf056b493793045635d8385",
+  "claim_ceiling": "C1"
+}

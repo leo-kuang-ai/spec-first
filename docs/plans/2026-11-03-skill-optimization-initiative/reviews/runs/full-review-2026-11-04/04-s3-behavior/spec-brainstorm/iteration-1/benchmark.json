@@ -1,0 +1,226 @@
+{
+  "metadata": {
+    "skill_name": "spec-brainstorm",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-brainstorm",
+    "timestamp": "2026-11-04T11:50:49Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "空 feature 描述应先提问不推进",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 36.747,
+        "tokens": 21791,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.files_not_exist",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-brainstorm/evals/fixtures/scripts/asks-a-question.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "命名外部候选的采用裁决应交互式 handoff 到 spec-pov",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 60.942,
+        "tokens": 35230,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[spec-pov]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[spec-pov])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "快速事实问答应直接回答不走 brainstorm",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 16.315,
+        "tokens": 18790,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.files_not_exist",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[rebase]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[rebase])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "非软件主题应走 universal 路线不产软件计划",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 103.309,
+        "tokens": 29075,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.files_not_exist",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-brainstorm/evals/fixtures/scripts/asks-a-question.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "需求已清晰时应简短处理并落盘 requirements-only 计划",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 476.89,
+        "tokens": 81823,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[docs/plans -plan.md]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[docs/plans -plan.md])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "R2变体:REST→GraphQL 迁移裁决应路由 spec-pov",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 96.618,
+        "tokens": 27744,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[spec-pov]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[spec-pov])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "R2正例:正常收敛请求不应被过度拒绝",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 129.632,
+        "tokens": 40765,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-brainstorm/evals/fixtures/scripts/check-r2-asks.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 131.49328571428572,
+        "stddev": 145.6676129370407,
+        "min": 16.315,
+        "max": 476.89
+      },
+      "tokens": {
+        "mean": 36459.71428571428,
+        "stddev": 19769.251143518566,
+        "min": 18790,
+        "max": 81823
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

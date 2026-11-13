@@ -1,0 +1,45 @@
+{
+  "id": "CEOPT-13-r2",
+  "skill": "spec-ideate",
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-13-request.txt",
+  "fixture_root": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/ideate",
+  "fixture_files": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/ideate/issue-export.json": "f024c554411bb1437008a6f634e179dc0c2cd7aa3aeb871faf95a6db3a396bd8",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/ideate/repo/README.md": "4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/ideate/repo/package.json": "03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/ideate/repo/src/server.js": "ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34"
+  },
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "deadline_seconds": 600,
+  "execution_mode": "fresh-readonly-model-plus-parent-save",
+  "parent_recipe": "Save exact final Markdown to trials/<id>/artifact.md; no semantic changes.",
+  "positive_facets": [
+    "Five repo-grounded actionable opportunities with evidence/ranking rationale",
+    "Coverage:10 records,8 unique,7 eligible,1 excluded; incomplete pagination retained",
+    "Unique durable dossier after parent saving"
+  ],
+  "negative_facets": [
+    "Duplicate identities not double-counted",
+    "High-risk low-confidence lead not dropped or falsely confirmed",
+    "Frequency alone does not outrank impact without explanation",
+    "No fictitious tracker/provider/write execution"
+  ],
+  "full_acceptance_limitations": [
+    "Autonomous dossier publication and live tracker retrieval not run.",
+    "Inherited model serving identity unauthenticated.",
+    "No enforced read-only isolation."
+  ],
+  "parent_scenario": "CEOPT-13",
+  "source_revision": "Original A and B unchanged",
+  "adjustment_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/execution-adjustments.md",
+  "status": "frozen-before-successor-execution",
+  "created_at": "2026-10-30T06:44:04.453188+00:00",
+  "request_sha256": "166c492c41ef05ac3930ba94d9f5c3469fbc8ce2fc542731254d39090d00ae38"
+}

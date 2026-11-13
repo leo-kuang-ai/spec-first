@@ -1,0 +1,5 @@
+{
+  "exit_code": 0,
+  "stdout": "{\n  \"schema_version\": \"task-plan-hash/v1\",\n  \"artifact_root\": \"/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/tasks\",\n  \"source_plan\": \"docs/plans/source.md\",\n  \"plan_path\": \"/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/tasks/docs/plans/source.md\",\n  \"hash\": \"sha256:00b47d93c2c7c3a6d342d6504faeb2c6aed853bbb510c2d4cd6672e99536c505\",\n  \"canonicalization_version\": \"source-plan-body-v1\",\n  \"removed_frontmatter\": true,\n  \"canonical_body_bytes\": 1836\n}\n",
+  "stderr": ""
+}

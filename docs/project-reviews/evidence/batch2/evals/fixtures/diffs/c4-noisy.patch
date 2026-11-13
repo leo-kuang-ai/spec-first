@@ -1,0 +1,133 @@
+diff --git a/README.md b/README.md
+index b1a7a4a..12df94c 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,3 @@
+ # billing-svc
+ 
+-发票与收款服务（内部）。模块按领域放在 `src/` 下。
++发票与收款服务（内部）。金额统一以整数分存储。模块按领域放在 `src/` 下。
+diff --git a/src/export/payments.js b/src/export/payments.js
+index d2c674d..95da931 100644
+--- a/src/export/payments.js
++++ b/src/export/payments.js
+@@ -4,7 +4,8 @@ const { formatAmount } = require('../ledger/money');
+ const { query } = require('../lib/db');
+ 
+ function exportPayments() {
+-  const rows = query('payments').sort((a, b) => a.id - b.id).map((p) => ({ ...p, amount: formatAmount(p.amount) }));
++  const sorted = query('payments').sort((a, b) => a.id - b.id).map((p) => ({ ...p, amount: formatAmount(p.amount) }));
++  const rows = sorted;
+   return toCsv(rows, [{ key: 'id', header: 'ID' }, { key: 'paidAt', header: 'Paid At' }, { key: 'amount', header: 'Amount' }]);
+ }
+ 
+diff --git a/src/ledger/money.js b/src/ledger/money.js
+index 7e7cfc8..5516ee5 100644
+--- a/src/ledger/money.js
++++ b/src/ledger/money.js
+@@ -1,4 +1,4 @@
+ 'use strict';
+ // 导出与对账使用：不带货币符号，固定两位小数。
+-function formatAmount(cents) { return (Math.round(cents) / 100).toFixed(2); }
++function formatAmount(cents) { return (Math.floor(cents) / 100).toFixed(2); }
+ module.exports = { formatAmount };
+diff --git a/src/ledger/tax.js b/src/ledger/tax.js
+index 6cd81f0..7e745ab 100644
+--- a/src/ledger/tax.js
++++ b/src/ledger/tax.js
+@@ -1,3 +1,3 @@
+ 'use strict';
+-function tax(invoice, rate) { return Math.round(invoice.items.reduce((s, i) => s + i.price * i.qty, 0) * rate); }
++function tax(invoice, rate) { return Math.round(invoice.items.reduce((acc, line) => acc + line.price * line.qty, 0) * rate); }
+ module.exports = { tax };
+diff --git a/src/ledger/total.js b/src/ledger/total.js
+index d954902..41d91ff 100644
+--- a/src/ledger/total.js
++++ b/src/ledger/total.js
+@@ -1,3 +1,3 @@
+ 'use strict';
+-function total(invoice) { return invoice.items.reduce((s, i) => s + i.price * i.qty, 0); }
++function total(invoice) { return invoice.items.reduce((sum, item) => sum + item.price * item.qty, 0); }
+ module.exports = { total };
+diff --git a/src/lib/audit.js b/src/lib/audit.js
+index 324bfd1..33c925e 100644
+--- a/src/lib/audit.js
++++ b/src/lib/audit.js
+@@ -4,4 +4,5 @@ function record(tx, action, entityId) { tx.events.push({ action, entityId }); }
+ function flush(events) { log.push(...events); }
+ function entries() { return log.slice(); }
+ function clear() { log.length = 0; }
+-module.exports = { record, flush, entries, clear };
++function count() { return log.length; }
++module.exports = { record, flush, entries, clear, count };
+diff --git a/src/modules/m03.js b/src/modules/m03.js
+index 1dbf18c..480cb04 100644
+--- a/src/modules/m03.js
++++ b/src/modules/m03.js
+@@ -1,4 +1,4 @@
+ 'use strict';
+-// 内部辅助模块 03
++// 内部辅助模块 03（保留，待清理）
+ function helper03(x) { return x + 3; }
+ module.exports = { helper03 };
+diff --git a/src/modules/m08.js b/src/modules/m08.js
+index c25a315..a71a274 100644
+--- a/src/modules/m08.js
++++ b/src/modules/m08.js
+@@ -1,4 +1,4 @@
+ 'use strict';
+-// 内部辅助模块 08
++// 内部辅助模块 08（保留，待清理）
+ function helper08(x) { return x + 8; }
+ module.exports = { helper08 };
+diff --git a/src/modules/m12.js b/src/modules/m12.js
+index 84f87ae..0a5fedc 100644
+--- a/src/modules/m12.js
++++ b/src/modules/m12.js
+@@ -1,4 +1,4 @@
+ 'use strict';
+-// 内部辅助模块 12
++// 内部辅助模块 12（保留，待清理）
+ function helper12(x) { return x + 12; }
+ module.exports = { helper12 };
+diff --git a/src/modules/m19.js b/src/modules/m19.js
+index 332992c..09d816f 100644
+--- a/src/modules/m19.js
++++ b/src/modules/m19.js
+@@ -1,4 +1,4 @@
+ 'use strict';
+-// 内部辅助模块 19
++// 内部辅助模块 19（保留，待清理）
+ function helper19(x) { return x + 19; }
+ module.exports = { helper19 };
+diff --git a/src/modules/m27.js b/src/modules/m27.js
+index d72b679..81d165b 100644
+--- a/src/modules/m27.js
++++ b/src/modules/m27.js
+@@ -1,4 +1,4 @@
+ 'use strict';
+-// 内部辅助模块 27
++// 内部辅助模块 27（保留，待清理）
+ function helper27(x) { return x + 27; }
+ module.exports = { helper27 };
+diff --git a/src/ui/format.js b/src/ui/format.js
+index 8d3a90c..f8ecc83 100644
+--- a/src/ui/format.js
++++ b/src/ui/format.js
+@@ -1,4 +1,4 @@
+ 'use strict';
+-// 界面展示：带货币符号。
++// 界面展示：带货币符号（人民币）。
+ function formatAmount(cents) { return `¥${(cents / 100).toFixed(2)}`; }
+ module.exports = { formatAmount };
+diff --git a/test/money.test.js b/test/money.test.js
+index bb9ca03..54265ca 100644
+--- a/test/money.test.js
++++ b/test/money.test.js
+@@ -4,5 +4,5 @@ const assert = require('node:assert/strict');
+ const { formatAmount } = require('../src/ledger/money');
+ test('ledger amount has two decimals and no symbol', () => {
+   assert.equal(formatAmount(1230), '12.30');
+-  assert.equal(formatAmount(1234.6), '12.35');
++  assert.equal(formatAmount(1234.6), '12.34');
+ });

@@ -1,0 +1,46 @@
+{
+  "evidence_type": "Synthetic task fixture, not actual remote state or user approval",
+  "pr": "https://example.invalid/o/r/pull/42",
+  "feedback": [
+    {
+      "id": "T-fixed",
+      "disposition": "fixed-locally",
+      "fix_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "publication": "unknown"
+    },
+    {
+      "id": "T-declined",
+      "disposition": "declined",
+      "reason": "The proposed global retry changes the settled non-retryable failure policy.",
+      "code_changes_required": false
+    },
+    {
+      "id": "T-human",
+      "disposition": "needs-human",
+      "reason": "Choosing persisted key compatibility versus rename requires an owner decision."
+    }
+  ],
+  "reply_recovery": {
+    "thread": "T-declined",
+    "intended_body": "The global retry proposal conflicts with the settled non-retryable failure policy.",
+    "attempt": "POST returned a disconnected transport; acceptance is unknown.",
+    "resumed_readback": {
+      "case_present": {
+        "exact_body_found": true,
+        "id": "reply-fixture-1"
+      },
+      "case_absent": {
+        "exact_body_found": false,
+        "read_completed": true
+      },
+      "case_unavailable": {
+        "read_completed": false
+      }
+    }
+  },
+  "authority": {
+    "local_inspection": true,
+    "real_pr_writes": false,
+    "synthetic_explanation": "Interpret branches only; do not contact or post to any actual PR."
+  }
+}

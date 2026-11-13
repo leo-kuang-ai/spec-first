@@ -1,0 +1,5 @@
+
+> spec-first@1.15.3 docs:runtime-catalog
+> node scripts/generate-runtime-capability-catalog.js
+
+Generated docs/catalog/runtime-capabilities.md

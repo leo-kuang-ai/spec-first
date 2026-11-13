@@ -1,0 +1,114 @@
+FAIL tests/unit/spec-doc-review-contracts.test.js
+  ● report-only 评测的文档完整性 › plan judge 拒绝保留 MARKER 的文档篡改
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 1
+
+      79 |         env: { ...process.env, EVAL_FINAL_MESSAGE: 'review findings：建议补充边界。' },
+      80 |       });
+    > 81 |       expect(judge().status).toBe(0);
+         |                              ^
+      82 |       fs.appendFileSync(target, '\n未授权的文档修改\n');
+      83 |       expect(judge().status).not.toBe(0);
+      84 |       fs.rmSync(target);
+
+      at toBe (tests/unit/spec-doc-review-contracts.test.js:81:30)
+
+  ● report-only 评测的文档完整性 › html judge 拒绝保留 MARKER 的文档篡改
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 1
+
+      79 |         env: { ...process.env, EVAL_FINAL_MESSAGE: 'review findings：建议补充边界。' },
+      80 |       });
+    > 81 |       expect(judge().status).toBe(0);
+         |                              ^
+      82 |       fs.appendFileSync(target, '\n未授权的文档修改\n');
+      83 |       expect(judge().status).not.toBe(0);
+      84 |       fs.rmSync(target);
+
+      at toBe (tests/unit/spec-doc-review-contracts.test.js:81:30)
+
+  ● report-only 评测的文档完整性 › taskpack judge 拒绝保留 MARKER 的文档篡改
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 1
+
+      79 |         env: { ...process.env, EVAL_FINAL_MESSAGE: 'review findings：建议补充边界。' },
+      80 |       });
+    > 81 |       expect(judge().status).toBe(0);
+         |                              ^
+      82 |       fs.appendFileSync(target, '\n未授权的文档修改\n');
+      83 |       expect(judge().status).not.toBe(0);
+      84 |       fs.rmSync(target);
+
+      at toBe (tests/unit/spec-doc-review-contracts.test.js:81:30)
+
+  ● spec-doc-review current contracts › U2: contradictions cold path references unmerged opposing actions from 3.3
+
+    expect(received).toMatch(expected)
+
+    Expected pattern: /intentionally kept separate|not merged/
+    Received string:  "# 3.5 Resolve Contradictions·
+    Load when retained findings still recommend opposing actions after 3.4. Check each claim against current document text, source, agreed outcomes and constraints first. Disprove or withdraw unsupported claims before asking for a decision; reviewer disagreement alone is not a document defect.·
+    If one supported correction follows from the agreed contract, choose it within existing scope. If an unresolved user commitment or consequential preference remains, combine the opposing remedies into one `manual` finding, stating both views, the missing decision and its effect. Never schedule both remedies as separate edits. Set `finding_type` from the actual error or omission, not from the mere presence of disagreement. Preserve contributing evidence and the reason each claim was retained or rejected.·
+    Continue to 3.5b for one evidence-based `recommended_action`. This judgment grants no edit authority and cannot bypass report-only mode.
+    "
+
+      407 |   test('U2: contradictions cold path references unmerged opposing actions from 3.3', () => {
+      408 |     const contradictions = fs.readFileSync(path.join(refsDir, 'synthesis-contradictions.md'), 'utf8');
+    > 409 |     expect(contradictions).toMatch(/intentionally kept separate|not merged/);
+          |                            ^
+      410 |   });
+      411 |
+      412 |   test('U3: document classification signals reference contains requirements and plan signals', () => {
+
+      at Object.toMatch (tests/unit/spec-doc-review-contracts.test.js:409:28)
+
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+PASS tests/unit/ce-outcome-judge-calibration.test.js (9.547 s)
+PASS tests/unit/skill-flow-p2-closure-contracts.test.js
+PASS tests/unit/spec-code-review-contracts.test.js
+PASS tests/unit/agent-persona-template-drift.test.js
+PASS tests/unit/spec-doc-review-task-pack-contracts.test.js
+
+Test Suites: 1 failed, 5 passed, 6 total
+Tests:       4 failed, 129 passed, 133 total
+Snapshots:   0 total
+Time:        10.137 s, estimated 11 s
+Ran all test suites matching /tests\/unit\/spec-doc-review-contracts.test.js|tests\/unit\/spec-doc-review-task-pack-contracts.test.js|tests\/unit\/spec-code-review-contracts.test.js|tests\/unit\/skill-flow-p2-closure-contracts.test.js|tests\/unit\/agent-persona-template-drift.test.js|tests\/unit\/ce-outcome-judge-calibration.test.js/i.

@@ -1,0 +1,67 @@
+FAIL tests/unit/spec-prd-finalize-transition.test.js
+  spec-prd final intent and receipt transition
+    ✓ check-only blocks final intent until the machine receipt exists (5 ms)
+    ✓ write mode atomically creates a receipt that the read-only verifier accepts (3 ms)
+    ✓ artifact mutation makes the receipt stale and blocks closeout (2 ms)
+    ✓ input mutation makes the receipt stale and blocks closeout (2 ms)
+    ✕ input refresh cannot re-sign changed PRD body (2 ms)
+    ✕ input refresh cannot re-sign changed PRD body-and-input (1 ms)
+    ✕ input refresh cannot re-sign changed PRD metadata (2 ms)
+    ✓ input-only refresh retains the PRD hash and restores a verified receipt (9 ms)
+
+  ● spec-prd final intent and receipt transition › input refresh cannot re-sign changed PRD body
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      145 |     for (const checkOnly of [true, false]) {
+      146 |       const result = finalizePrd(prdPath, [inputPath], { refreshInputsHash: true, checkOnly });
+    > 147 |       expect(result.can_finalize).toBe(false);
+          |                                   ^
+      148 |       expect(result.should_block_closeout).toBe(true);
+      149 |       expect(result.blocking_reason_codes).toContain('ready_receipt_stale');
+      150 |       expect(fs.readFileSync(prdPath)).toEqual(before);
+
+      at toBe (tests/unit/spec-prd-finalize-transition.test.js:147:35)
+
+  ● spec-prd final intent and receipt transition › input refresh cannot re-sign changed PRD body-and-input
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      145 |     for (const checkOnly of [true, false]) {
+      146 |       const result = finalizePrd(prdPath, [inputPath], { refreshInputsHash: true, checkOnly });
+    > 147 |       expect(result.can_finalize).toBe(false);
+          |                                   ^
+      148 |       expect(result.should_block_closeout).toBe(true);
+      149 |       expect(result.blocking_reason_codes).toContain('ready_receipt_stale');
+      150 |       expect(fs.readFileSync(prdPath)).toEqual(before);
+
+      at toBe (tests/unit/spec-prd-finalize-transition.test.js:147:35)
+
+  ● spec-prd final intent and receipt transition › input refresh cannot re-sign changed PRD metadata
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      145 |     for (const checkOnly of [true, false]) {
+      146 |       const result = finalizePrd(prdPath, [inputPath], { refreshInputsHash: true, checkOnly });
+    > 147 |       expect(result.can_finalize).toBe(false);
+          |                                   ^
+      148 |       expect(result.should_block_closeout).toBe(true);
+      149 |       expect(result.blocking_reason_codes).toContain('ready_receipt_stale');
+      150 |       expect(fs.readFileSync(prdPath)).toEqual(before);
+
+      at toBe (tests/unit/spec-prd-finalize-transition.test.js:147:35)
+
+Test Suites: 1 failed, 1 total
+Tests:       3 failed, 5 passed, 8 total
+Snapshots:   0 total
+Time:        0.156 s, estimated 1 s
+Ran all test suites within paths "tests/unit/spec-prd-finalize-transition.test.js".

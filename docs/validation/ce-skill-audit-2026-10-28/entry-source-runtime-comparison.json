@@ -1,0 +1,8 @@
+{
+  "source_sha256": "21a73e2da3f24f0b8d7eef31664e5e55c9e1228e809a419efde7fe345e580079",
+  "runtime_sha256": "0621bf7aa0979a3d5829bf0535aa4d89d2e98c2778a94bfabe6563dbef4329e9",
+  "equal": false,
+  "source_has_execution_continuation": true,
+  "runtime_has_execution_continuation": false,
+  "claim": "仅核对此处两个文件的当前字节；未刷新runtime或运行宿主"
+}

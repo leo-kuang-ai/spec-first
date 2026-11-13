@@ -1,0 +1,4 @@
+dd427fca3e50bce7dc0fc7bc573633217e696c2f8583a1215c5e571c9665f733  skills/spec-ideate/SKILL.md
+38333e06ff332181953cc3afdbeefa35dc7119a8b3937a6271579d18ab8845e4  skills/spec-ideate/references/scope-gates.md
+6b3fddc76236b29b1bc50ef0c327feadef78e46a3ba53f77aa01715a728058bd  skills/spec-ideate/references/divergent-ideation.md
+902f2300a92c3ab7ac5a40f499cf90a3dc06abb73895192401b7a3801915c60a  skills/spec-ideate/references/universal-ideation.md

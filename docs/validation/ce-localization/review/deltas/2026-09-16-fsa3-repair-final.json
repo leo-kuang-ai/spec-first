@@ -1,0 +1,30 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "ce-localization-fsa3-repair-2026-09-16-final",
+  "producer": "codex-current-session author self-review",
+  "reviewed_at": "2026-09-16T08:06:51.974Z",
+  "source_binding": {
+    "head": "66b0e0c6c83c1e75d2e9634132586bfce5581ff3",
+    "dirty_path_manifest_sha256": "6c37436d8a5bdcb5f20a84726d997a2df9f95077119542111829edc11b61883b",
+    "source_tree_hash": "956b6ec3ed0883e3148062e373757f65ed8526785ebfbeb229d9488a8f1d40c0",
+    "inventory_hash": "ad15fb5a24e316debe0a2cf0301c04d84bee854568061f5745bff2adc8fdaade",
+    "inventory_artifact_sha256": "322ceb430284aa35078f7a02fdbc1f48acf9cd7c472cb4017c1c7c0501ef2d04",
+    "review_input_hash": "c6df1c9b29dd6e89000ac797f46a396c7ee736f4a33d757f6a4e25f7dcd30e6f"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "not-used",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "reviewed_paths": [],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "本轮作者增量语义复核与未变历史 receipt 合成覆盖；双 lens 非独立 provider。",
+    "真实宿主/模型/现场收益不在本轮通过范围。",
+    "仅收口报告/日志更新后重绑，7个源码/测试的既有增量裁决未改变；不重复宣称语义重审。"
+  ],
+  "claim_ceiling": "本地源码与确定性回归"
+}

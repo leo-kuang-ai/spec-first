@@ -1,0 +1,86 @@
+{
+  "metadata": {
+    "skill_name": "spec-test-browser",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-test-browser",
+    "timestamp": "2026-11-04T12:09:20Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "pipeline 模式缺 origin 应返回 not_run 不推断",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 104.944,
+        "tokens": 28332,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[target-origin-missing]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[target-origin-missing])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "非法 origin token 应 fail-closed 拒绝",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 39.81,
+        "tokens": 21410,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": false,
+          "evidence": "output does not contain \"target-origin-invalid\""
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.5,
+        "stddev": 0.5,
+        "min": 0,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 72.37700000000001,
+        "stddev": 32.567,
+        "min": 39.81,
+        "max": 104.944
+      },
+      "tokens": {
+        "mean": 24871,
+        "stddev": 3461,
+        "min": 21410,
+        "max": 28332
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

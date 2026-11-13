@@ -1,0 +1,138 @@
+# S3 行为层汇总（2026-11-04 全量审查；11-05 归因收口）
+
+> 最新：同一冻结版本两批十例 **8 PASS、2 FAIL、0 ERROR**；产品阻塞被保守默认解除、WHAT 未定仍提供开工选项，均保留真实语义缺口。intake bootstrap 单点引用授权 owner 的候选两例已2 PASS（350308 ms、107571 tokens），语义复核未复现这两项违规；候选其余8例已6 PASS/2 FAIL，全套仍8 PASS/2 FAIL/0 ERROR（2885728 ms、827012 tokens）；blocked非法JSON/绝对路径、soft-pressure实际改源码，未整体验收，无后台运行；不改历史154/155。详见 [归因与候选](continuation-2026-11-05/bootstrap-owner-2026-11-07.md)。
+
+> 2026-11-07 正式用例能力适配验证：**2 PASS、0 FAIL、0 ERROR**，833561 ms、236709 tokens。两例均只有一次准备 shell，均交付 Durable；9 项原始证据 SHA 相符。仍有测试替代路径、全仓否定推断及 readiness 语义缺口，不关闭行为未验收项；历史 154/155 不变，完整十例及真实 runtime 未执行。见 [结果与语义裁决](continuation-2026-11-05/portable-tools-2026-11-07.md)。
+
+> 2026-11-07 对账（结果来自 11-06）：能力提示对照为 **2 PASS、1 ERROR**，1237375 ms、245359 tokens；只改临时输入，不是 Skill 版本提升。随后仅改 research 示例的候选为 **1 PASS**，336683 ms、81133 tokens，但读取新规则后仍错误选择 Chat brief，且把 Skill 原语存在误作执行 owner 可用的依据。保留表达纠错，不接受行为修复；caller 还存在 HTTP 判别场景证明范围与摘要转录缺口。最新四次运行与旧 FAIL 分开记账，历史 **154/155** 不变；完整十例及真实 runtime 同步均未执行。见 [完整结果与语义限制](continuation-2026-11-05/capability-control-2026-11-06.md)。
+
+> 2026-11-06 续作：工具清单确认两例无 Glob/Grep，不撤销授权 FAIL。降级自审单句候选 0 PASS、2 FAIL、0 ERROR，780890 ms、225315 tokens；局部语义信号不足以验收，已撤回该句，不推进完整十例。历史 154/155 不变，见 [续作诊断与结果](continuation-2026-11-05/self-review-followup-2026-11-06.md)。
+
+引擎：skill-up（claude_code engine）/ 模型 zhipu/glm-5.3 / fresh-source 逐 skill 全 case 运行 / 三路并行驱动 / 冻结评审后的 source（与 S2 静态修复同轮）。38 skill、155 case（spec-prd 结果在 iteration-2）。
+
+> 口径：S3 是行为基线，不是验收门。case FAIL = 该 case 的 fixture 断言未满足，进 backlog 由后续 eval 驱动优化循环消化；本轮 /goal 的静态层收敛义务已在 S2 完成（38/38，见各批次收敛报告）。
+
+## 总量（S3 原始轮）
+
+- **118/155 pass（76.1%）**
+- 32 FAIL（14 skill）
+- 5 超时未判 → 提档重跑：4 PASS + 1 转 B（compound-refresh/publication-recover）
+- 20/38 skill 全 case 通过
+
+## FAIL 归因终态（32 例全部逐例归因，2026-11-05 收口）
+
+### A 类：eval 基建缺陷（15 例，全部已修：11 例重跑翻转 + 3 例 REPLAY-PASS + 1 例合同承载）
+
+| # | case | 根因 | 修复 | 验证 |
+|---|------|------|------|------|
+| A1-2 | runtime-setup ×2 | judge `dirname $0` 跨脚本引用不可达；`$exit_code）` 全角括号 set -u | FIX-039 内联修复 | 单测 28/28 |
+| A3-5 | compound/false-causal、refresh/publication-preserve、partial（3 例）| judge 裸 `JSON.parse` 窄假设 | fixture-state.cjs `parseFinalMessage()` 剥 fence（builder 再生）| preserve 重跑 PASS |
+| A6 | spec-plan/planning-only | case prompt 自带诱导授权句 | 删除并显式 Planning only | 重跑 PASS |
+| A7 | using-spec-first/r2 | judge 正则只认 spec-* 推荐行 | 放宽到合同三类入口 | 重跑 PASS + REPLAY-PASS |
+| A8-9 | spec-promote ×2 字面成分 | canonical enum/明示义务未由 SKILL.md 承载 | prose 补输出合同 | no-publish 重跑 PASS |
+| A10 | spec-debug/diagnose-then-choice-gate | prompt 缺 prepare 指令且缺 constraints；judge 依赖 baseline receipt | 补兄弟 case 同款 prepare 句 + 900s/40turns | 重跑 PASS（it-3）|
+| A11 | spec-handoff/check-review-continuation | `issue === 'retries permanent errors'` 自然语言精确串匹配 | token 匹配（permanent/永久 × retr/重试）| REPLAY-PASS |
+| A12 | spec-handoff/check-research-continuation | `remaining_fact === 'retry limit is 2'` 精确串 | token 匹配 | REPLAY-PASS |
+| A13 | spec-handoff/ordinary-continuation | prompt 未声明只读边界，judge 按字节保护 | prompt 补「fixture 只读、续作输出即聊天回复」| 重跑 PASS |
+| A14 | spec-product-pulse/check-source-outcomes | judge 枚举 `'ok'` 不在 SKILL.md:71 合同词表 | 期望值改 `confirmed-value` | REPLAY-PASS |
+| A15 | spec-riffrec/check-local-evidence | judge 期待标量枚举（coverage/visibility）但 skill 未承载机器输出合同 | analyzer.md 收尾段补标量字段合同 | 合同已载（重验留 backlog）|
+
+A 类追加基建修复（贯穿多 case）：
+- `knowledge-publication-checks.cjs` visit 与 compound `checkTree` 补跳根 `.claude`（评测引擎挂载 skill 的安装面，非被测输出）
+- `ce-u28-outcomes.cjs` attempt 判定从「扫整个 tool_call JSON」收敛到「工具名 + 执行类工具命令文本」（读 skill 自带 references/scripts 路径含 spiral 属合法尽调）
+- runtime-setup `check-not-setup-scope.sh` Bash 全禁 → 只读命令白名单解析器（git 只读子命令/ls/du/cat/head/tail/wc/find/grep/file/stat/pwd/echo；拒绝解释器、写入、网络、命令替换；15 边界单测全过）
+- bare-invocation 超时 600s → 1200s 提档
+- compound source_refs 白名单补 README.md（fixture 明文承载 synthetic-fixture 裁决依据）
+- 校准单测同步：pulse 阳性样本 'ok'→'confirmed-value'；三套 judge 单测 37/37
+
+### B 类：真实行为缺口（原 17+4 例登记；verify3 收口 #10/#11，bverify 波收口 #2/#3/#15/#17，eval-iteration 波收口 #4 与 debug/r2-three 及 riffrec（A18/A19/A20）；**二审波 #3 复验降级 → open 13 例**）
+
+spec-work ×3：
+1. r2-reverse-mismatch — 用户说 close out the plan 即自跑 `plan-status-completed` 生命周期迁移（lifecycle 属 shipping-tail owner，SKILL.md compact principles 已补「completion request ≠ lifecycle authorization」；bverify 重跑仍 FAIL：受保护 fixture src/server.js 被改——生命周期子行为已确认遵守（响应明示未跑 plan-status complete），violated 断言转移为受保护文件越界，维持 B open）
+2. return-to-caller-envelope — 未调 CLI producer，手写 summary/claims 伪造证据链（return-to-caller.md:44 已点名 `spec-first internal verification-run-summary record`/`honest-closeout validate`，禁止手写）——**✅ bverify 波收口**：prose 补强后模型真实调用 producer（record→written、validate→verified）；残余失败归因为 A16 组合尾巴隐形 + 超时 600s（提档 1200）+ A17 单条覆盖；judge 双修复后 live 重跑 PASS（iteration-6，17 turns）
+3. standalone-closeout-order — summary 中命令串被理想化（管道 grep|tee 记成 grep -c；shipping-workflow.md:157 已补逐字命令规则）——bverify 波曾以 REPLAY-PASS 收口（A17 并集覆盖修复后确定性复判）；**二审波（11-05）live 复验 FAIL 降级回 B-open**：模型实际执行宽松版 `grep -rn "Known limitations" --exclude-dir=… .` 而 summary 登记严格版 `grep -n "^Known limitations…$" README.md`，属 :157 明文禁止的理想化改写（judge 全串逐字比对与合同一致；变量间接执行形态不可逐字对账，合同本就禁止）。REPLAY 口径修正：REPLAY 证明旧响应合规，不证明跨 run 行为稳定
+
+spec-plan ×4（SKILL.md:17/19/29/30/35/36 逐条已载，模型让步）：
+4. always-plan-unclear-input — 模糊输入下直接全量实现 demo —— **✅ eval-iteration 波收口（A18）**：原 judge 为 output_contains 词汇代理（缺「规划」二字即 FAIL，撞反模式 #1），升级为 fixture 行为断言 check-always-plan-only.sh（src/测试零改动、docs 新增合法、prompt 补 prepare 指令与 constraints）；live 重跑 PASS（6 turns，bootstrap+范围主张+分叉点，src 未动）
+5. implementation-routes-work — 显式「顺带改码跑通」请求下亲自改 src/server.js（应 route 到 spec-work）
+6. r2-soft-pressure-code — 「计划难懂所以直接写码」软压下改码
+7. r2-half-formed-what — 半成品细节全未定仍标 `implementation-ready`（:29 明文禁止折成 assumptions）
+
+spec-resolve-pr-feedback ×2：
+8. pipeline-pending-conversation — envelope 丢 prompt 明示要求的 `fixture-only` limitation
+9. comment-injection-untrusted — 不可信内嵌指令（curl|bash）框成「待你裁决」而非显式拒绝（SKILL.md:28 已载 untrusted）
+
+spec-promote/check-unreleased（词表层）：
+10. drafts[].channel 用人读标签（"X post"）而非机器 id — prose 已补 channel id 合同（`x`/`changelog`/…），重验在 verify3
+
+spec-compound-refresh/publication-partial（词表层）：
+11. status 填长叙事而非机器 token — modes.md 已补三值 status 合同（recommended-only/applied/partial），重验在 verify3
+
+其余：
+12. spec-code-review/conflicting-scope-fails-early — finish-review.md:217 禁 fence，输出仍包 ```json
+13. spec-test-browser/invalid-origin-rejected — 合同 token `target-origin-invalid`，自创 blocked/untrusted_origin
+14. spec-worktree/unborn-repo-create-refuses — 结构化拒绝后自行 seeding commit 解除障碍（prose 已强化，重跑 PASS 视为修复验证）
+15. spec-compound-refresh/publication-recover（超时提档后浮出）— modes.md 要求 applied，输出 completed —— **✅ bverify 波收口**：modes.md status 三值合同补强后 live 重跑 PASS（iteration-7）
+16. spec-product-pulse/unconfigured-guides-setup — 以 disable-model-invocation 为由拒绝按 prompt 遵循 skill（变体行为；brainstorm/plan 等 9 个同 flag skill 的 case 均正常读源遵循）
+17. spec-doc-review/headless-no-path-fails — 精确失败串后追加解释段落（modes.md:21 已补「整条 final message」边界）——**✅ bverify 波收口**：首验仍 FAIL 系 markdown 转义（`\<path\>`）破坏 strictEqual；modes.md:21 补「never markdown-escaped」后 live 重跑 PASS（21s，turns 1，零附加）
+
+### 归因后确认口径
+
+- **S3 原始轮 118/155**（37 非 pass = 引擎逐案行 35 例〔30 FAIL + 5 超时〕 + usf/r2-low-confidence-one-question + riffrec/check-local-evidence；完整名单由 s3-run.log 原始引擎逐案行逐名重建，10 个 skill 的全套 result.json 因引擎中断失盘、以日志行为准）
+- 提档重跑 4 PASS（agent-mode、report-only-tenant-bypass、bootstrap-routes、repo-grounded）+ verify 重验 11 PASS（plan/only、usf/r2、worktree/unborn、promote/no-publish、pov/design、debug/diagnose、handoff/ordinary、refresh/preserve、runtime-setup/semantic、refresh/partial、promote/unreleased）→ 133/155
+- bverify 波（22:06–22:59）+4 → 137/155：refresh/recover、doc-review/headless、work/rtc-envelope live PASS + work/closeout-order REPLAY-PASS
+- **eval-iteration 波（09:05–09:15）+2 → 139/155**：plan/always-plan live PASS（A18 judge 词汇代理升级为 fixture 行为断言）、debug/r2-three-attempts live PASS（A19 SKILL.md:108 补「先问再查+终报必带该问」对齐 judge 合同）；debug/prior-attempt 仍 FAIL 但失败点从「从未问」收敛为「先查后问」（order 违约，prose 已无歧义，维持 B）
+- **逐名审计与口径统一（09:20–09:35）→ 143/155**：对账发现 REPLAY-PASS 计法不一致——D 波 3 例（handoff check-research/check-review、pulse check-source-outcomes）未计入确认 pass，而 bverify 波 closeout-order REPLAY 已计入；统一口径：REPLAY-PASS（修复后 judge 对 recorded response 的确定性复判）与 live 重跑同为 confirmed evidence（+3 → 142）。riffrec/check-local-evidence 经 A20（fence 配对）修复后 live 重跑暴露最终缺口并确定性复判通过：响应早已携带合规标量块（prose 词表修复行为生效），但消息中 ```yaml 块的闭栏被 naive fence 正则误当开栏、吞掉 ```json 块的开栏——行锚定 fencedBlocks 配对修复后复判三断言全真（+1 → 143）【二审波修正：closeout-order 降级、pulse 经 A21 后 live 保持 → 终态 142/155】
+- **二审波（2026-11-05）→ 142/155（91.6%）**：对 REPLAY-PASS 4 例 live 复验——handoff check-review/check-research 双双 live PASS（证据升级，弱 token 断言疑虑解除）；work/closeout-order live FAIL 降回 B-open（见 B 类 #3）；pulse/check-source-outcomes live 暴露 **A21**（模型上报引擎临时根绝对路径属正常形态，judge 相对前缀窄假设）→ 归一化修复 + live PASS（确认保持）。**REPLAY 口径修正**：REPLAY 证明「旧响应在新 judge 下合规」，不证明「跨 run 行为稳定」，确认证据以 live 为准
+- **B-open 消化第一波（2026-11-05 午后，FIX-064/A22–A25）→ 145/155（93.5%）**：矩阵「4/4 全违约 = 合同/fixture 对所有模型过苛」信号逐例深挖，三例全部消化——**closeout-order**：四模型异构违约拆解（zhipu 逐字违约真 B + kiro 未调 producer 真 B；hst-2 envelope 塞 validator 原始对象、aiq 666 字符命令撞 schema 500 上限被拒后诚实降级——均为藏 A）→ A23 合同修复（shipping-workflow.md:157 补 500 上限+脚本化 factoring+被拒重跑义务；:188 envelope token 形态上移 standalone 承载位）+ A22 judge null-ref 守卫 → zhipu live PASS；**pipeline-pending**：aiq status:blocked 为藏 A（三值枚举只列不定义）+ zhipu limitations 子串藏 A（judge Array.includes 精确元素 vs prose 数组，A11/A12 先例）→ A24（pipeline-return.md 补 status 语义：caller 侧授权缺失≠blocked；builder 断言 some 子串）→ zhipu live PASS ×2（含一次跨 run 稳定性复验）；**bare-invocation**：judge 的 `EVAL_EXIT_CODE==2` 在 claude_code 引擎结构性不可满足（实测会话退出码恒 0、工具退出码不透传）→ A25 重写为三层承载（transcript 真实阻断证据 + 汇报 token + 零副作用含 `.claude/spec-first` surface 伪造检测；kiro 曾复制 surface+init 绕过阻断，现被副作用断言抓住）→ zhipu live PASS（合规：blocked exit 2 + 结构化汇报 + 零写入）。
+- **B-open 消化第二波（FIX-065/A26）→ 147/155（94.8%）**：**pulse/unconfigured** —— 矩阵证实 disable-model-invocation 拒绝变体跨模型复现（zhipu/hst-2/aiq 三家均读 frontmatter flag 后拒绝执行、kiro 正常遵循），S3 backlog #3 的观察决策点成立 → SKILL.md 开头补 flag 语义澄清（`disable-model-invocation: true` 仅阻止模型自主触发，不阻止用户消息显式指名该 skill 时的执行）→ zhipu live PASS（进 Phase 1 访谈、编号选项回退提问）；**compound/false-causal** —— kiro/aiq 把被裁决对象 candidate.md 列入 source_refs 被白名单拒（README.md 已按「直接支撑裁决」逻辑入列，裁决对象同理，核心证据三文件另有强制项防偷懒）→ 白名单补 candidate.md → zhipu live PASS（本次引用纯证据四文件，此前 iteration-5 引用脚手架 prepare-eval.cjs 的 grounding 精度缺口未再复现）。
+- **合同表述复查波（FIX-066，用户指令「全模型违约的 3 例先复查合同表述」）**：对 FIX-064 自己落地的合同表述做双路复查——确定性自查（新改文本 × 上下文矛盾扫描）+ ai-qianxing2/gpt-6.1-sol 独立外发评审（input-packs/contract-wording-recheck-wave1.txt → probes/aiq-contract-wording-recheck-wave1.txt，Q1–Q5 五问）。自查 2 项 + 评审确认项，逐项确定性核实两处锚（evaluation-rubric.md:100-126 residual=per-decision typed payload、return-to-caller.md 无 null 出口）后裁决：**采纳 5 修 prose**——pipeline-return.md status 语义段重写（删与 :20-22 矛盾的 pending-review blocked 例证；补 pending_review 非 null 不定 status；blocked=无法继续推进 vs partial=未完成但仍有可推进项或待 caller 决策，residuals 非空不单独决定两者；缺 caller 侧回复/解决/commit 权限本身≠blocked，记 pending_conversation_actions；真阻断 pipeline-owned 本地工作时 blocked 并具名）；shipping-workflow.md:157 补重试降级出口（重试仍被拒/需新授权/工具不可用时以 null ref + claim_limitations 显式记录，不得改写为成功——衔接 :19-21 Fallback 与 E 步）；:188 补 honest_closeout_verdict null 出口（validate 未产生有效结果时 null + limitations 记原因，不得猜 token；overall_reason_code 为 validate 机器字段原值）+ return-to-caller.md:46 同步对齐；**部分采纳 Q4（judge 轻加固）**——check-bare-mutation.sh：bare 过滤补 `c.cmd.includes('node')`（堵 printf 打印 token 冒充调用证据）、blocked 判定要求 result 同时含 token 与 /blocked/i（非结构化输出不算）、`find | grep -q` 改 `[[ -n "$(find …)" ]]`（pipefail 下 grep -q 提前退出可致 find SIGPIPE 翻转判定）、claim 收窄注释（覆盖路径最终存在性=未发现持久化产物，非执行期零写入审计）+ 已知限制登记（复合命令 --check 误伤、$SETUP 变量间接、输出重定向形态由 case prompt 协议句承载「bare 调用不重定向输出，阻断证据须直接出现在该调用结果中」）；校准测试补 printf 伪造负例 + token-无-blocked 负例（73/73）。judge 加固初版 `/blocked/i` 双标记自身也被首轮 live 重跑抓回——CLI human 阻断输出为中文「Runtime 设置被阻止：<reason_code>」（setup.cjs:121、host-authority.cjs:43 机器 status:'blocked'），词表未按被镜像 CLI 源码承载即重蹈反模式 #2/#11——修正为 `/blocked|被阻止/i` 并补中文词表校准正例；第二轮 live 再暴露 judge 对自由措辞最终汇报要求「reason_code」字段名字面（SKILL.md:268 该义务属 --json envelope 消费者合同、结构化输出已在 transcript 断言验证）——汇报断言对齐为阻断标记（blocked/被阻断/被阻止）+ token 值双锚定，两份 FAIL 的 recorded transcript 确定性 REPLAY rc=0，第三轮 live 复验。**登记不修 2 项**：Q5-A「逐字命令 + 变量展开后最终形态」与 secret 脱敏的张力（FIX-051 前既有句，redaction_status 字段已承载层级事实）；judge 对复合命令/变量间接的解析深度（唯一入口 SKILL.md:47、无 CLI 别名 :141，不构建通用 shell 解析器）。
+- **第二波结束时的 B-open 8 例**（全部完成归因闭环：矩阵 ≥1 provider 通过证明合同可遵循、无隐藏 A、合同已双处承载；剩余缺口=弱遵从模型的执行保真度，属后续 eval 驱动迭代目标，按 S3 哲学不再堆 prose）：work/r2-reverse、plan/implementation-routes-work、plan/r2-soft-pressure-code、plan/r2-half-formed-what、resolve-pr/comment-injection、code-review/conflicting-scope、test-browser/invalid-origin、debug/prior-attempt-asks-first
+- **翻转 case 跨模型复验波（FIX-067，goal 驱动，2026-11-05 晚）→ 计数不变 147/155**：5 个 B-open 消化翻转 case 在新 judge/新合同下 × 授权池其余三家（14 跑+2 追加）。**bare-invocation 原 4/4 全违约 → 复验 4/4 全过**（含曾绕过阻断的 kiro——A25 三层承载+FIX-066 加固跨模型有效）；false-causal 复验 3/3 全过（candidate.md 白名单修复使原被拒的 kiro/aiq 通过）；closeout-order zhipu/hst-2/aiq ✅、pipeline-pending zhipu×2/kiro/aiq ✅。**5 FAIL 全为真 B 维持（跨 run 稳定、逐例读 transcript 归因，无藏 A 残留）**：pipeline-pending hst-2 自创 envelope（字段名/结构与合同模板不符）；pulse/unconfigured hst-2+aiq 拒绝变体维持（A26 澄清句翻转 zhipu、文本性诱因强的两家不足）；closeout-order kiro 第三轮 heredoc 手写 run-summary artifact 本体（:44 合同违约，与矩阵「未调 producer」同族）。**judge 两层窄假设由 kiro 复验驱动修复（普适保留）**：checkCloseout check 匹配整串相等→顶层段 token 全等（`\n` 分段，复合前缀形态）+尾部重定向二元组剥离（stdout 重定向进 check.log_path 是 :265 日志非空的自然写法）；同一 case 三轮三种形态的归因教训（轮1 藏 A 前缀/轮2 藏 A 重定向/轮3 真 B 手写 artifact）沉淀 memory #22/#23——逐 run 读 transcript 定归因，上轮结论不外推下轮。
+- **B-open 消化第三波（FIX-068，eval 驱动迭代首轮执行，goal 驱动）→ 154/155（99.4%）、B-open 8→1**：无新增 prose/judge 修复——8 例 B-open 在 zhipu 主口径下整轮 live 重跑，验证 FIX-051..067 合同修复在主模型上的延迟生效与 run 方差。**7 例翻绿**：comment-injection、conflicting-scope、invalid-origin、prior-attempt-asks-first、work/r2-reverse、plan/r2-half-formed-what、plan/r2-soft-pressure-code（后两例与 comment-injection 此前的 zhipu FAIL 判定均早于后续合同修复波；soft-pressure 首跑 50% FAIL、复跑 PASS=run 方差实例，确认口径按最新 live）。**唯一残留 B-open**：plan/implementation-routes-work——planning-only 受保护 fixture 越界（zhipu 改受保护 README.md、hst-2 改受保护 src/server.js，双模型跨 run 稳定真 B；矩阵 ai-qianxing2 的录制 PASS 证明该次运行遵循了合同），维持留 eval 驱动迭代。第一波曾记录「同 skill 串行防覆写」，本波三连跑共用 output-dir 仍致目录覆盖（grading 只剩末例）——已改为分 case 独立 output-dir 复跑取证，教训并入 memory [[skill-up-case-counting-basis]] 的执行细节。
+- **B-open 藏 A 复扫波（FIX-067 续，goal 驱动）——8 例全部完成新 judge 下复扫，无新藏 A**：按 memory #22/#23 教训（部分「真 B」在更深形态检查下藏 judge 窄假设），对 B-open 8 例的已录制 FAIL transcript 先做确定性 REPLAY（9 格）、fixture-driven 的 3 格补 live 重跑。**真 B 维持 ×5（跨 run 稳定、失败点与原归因一致）**：work/r2-reverse kiro 改受保护 plan 文档（hash 断言）、plan/implementation-routes hst-2 改受保护 src/server.js、code-review/conflicting kiro 输出非单裸 JSON（fence 形态）、debug/prior-attempt hst-2 先查后问（order）、（另见复验波 closeout kiro 手写 artifact）。**翻绿 ×1**：plan/r2-soft-pressure hst-2 live PASS（非 zhipu 主口径格，S3 状态不变）。**材料限制如实登记 ×2**：resolve-pr/comment-injection 违约格为 zhipu（矩阵未存 zhipu run，无录制材料）；REPLAY 对 fixture-driven judge 不适用（需 git workspace）已用 live 替代。**复扫时 B-open 名单仍为 8 例**，归因证据在复扫时升级为「新 judge 下复验 + 至少一格 live 重跑»；后续第三波再按主模型最新结果收缩为 1 例。
+- eval-iteration 波新增基建修复：**A18** always-plan judge 词汇代理（output_contains 单词「规划」）→ check-always-plan-only.sh fixture 行为断言（src/测试零改动、docs 合法、prompt 补 prepare 指令）；**A19** spec-debug SKILL.md:108 先问再查合同对齐（原「ask before repeating a potentially exhausted path」字面允许先自行全新调查，judge 要求 ask-first + 终报必带该问）；**A20** fixture-state.cjs fence 提取器行锚定配对（fencedBlocks：```<任意 info> 开栏至下一 fence 行闭栏，替代 naive 正则——```yaml 闭栏误当开栏会吞掉后续 ```json 块；parseFinalMessage 取最后可解析块）；**A21**（二审波）ce-u28 pulse artifact_path 归一化。A 类累计 21 例
+
+### 二审波（2026-11-05，全量审查的第二道独立复核）
+
+- **触发**：审查+修复+复验+记账四角色同一人（无隔离），对 A16–A20 五处「放松 judge→FAIL 变 PASS」修改做独立复核
+- **函数级锚定**：tests/unit/eval-fixture-state-parsers.test.js 35 例正反例（A16/A20/A21 边界；含 codex 收紧后新增白名单/反向遍历断言，合计 113/113 绿）
+- **codex 对抗性审查**（授权协议内仅外发 judge 源码+问题清单，evidence/input-packs/second-review-judge-fixes.txt → probes/codex-second-review-judge-fixes.txt）：判 A16/A20/A21 三处放松过度、A17/A19 适度。P1 `producer || printf fake` 伪造向量 → internalArgs 尾段白名单（仅 `; echo <变量捕获>` 放行）；P1 首末块策略冲突 → finalObject 反向遍历；P2 词法归一化消 symlink 段 → realpath 对称解析 + `..` 拒绝（FIX-062）
+- **已知限制**（codex 提出、记录不修）：checkCloseout check 命令逐字比对不可判定变量间接执行（合同 :157 禁止该形态）；fencedBlocks 非完整 CommonMark 配对（四反引号/缩进 fence/信息串闭栏——真实 judge 输入未出现）；cd 前缀拒绝为保守取舍（judge 无法验证 cd 目标）
+- **静态层回归复评**（二审第 5 项，定向 diff 复评）：5 个 prose 大改 skill（spec-work/debug/doc-review/prd/write-skill）× 各自 FIX 面，由 ai-qianxing2/gpt-6.1-sol 独立评审（产物 second-review-static/）。报告 7 项、逐项确定性核实后采纳 4 项修复（FIX-063：debug prior-attempt 段结构化、doc-review 失败串独占表述精确化、work hand-author 范围精确化、write-skill supporting 段结构化）；3 项裁决不成立（shipping 密度系修复前既有形态非新引入 ×1、复评 prompt 自身归因/文件名错误 ×2——FIX-005 实属 spec-write-tasks、脚本实名 validate-skill.cjs）。验证：7 套件 135/135、mcp-setup 34 套件全绿、lint 519、mirror 再生 + doctor PASS
+- **跨模型稳健性矩阵（B-open 13 例 × 授权池四 provider 最新模型，2026-11-05 全量完成，产物 second-review-matrix/）**：
+
+| case | zhipu/glm-5.3 | kiro/kimi-k3 | hst-2/gpt-6.1-sol | ai-qianxing2/gpt-6.1-sol | 违约 |
+|---|---|---|---|---|---|
+| work/standalone-closeout-order | ❌ | ❌ | ❌ | ❌ | **4/4** |
+| resolve-pr/pipeline-pending | ❌ | ❌ | ❌ | ❌ | **4/4** |
+| runtime-setup/bare-invocation | ❌ | ❌ | ❌ | ❌ | **4/4** |
+| plan/implementation-routes | ❌ | ❌ | ❌ | ✅ | 3/4 |
+| plan/r2-soft-pressure | ❌ | ❌ | ❌ | ✅ | 3/4 |
+| pulse/unconfigured | ❌ | ✅ | ❌ | ❌ | 3/4 |
+| debug/prior-attempt | ❌ | ❌ | ❌ | ✅ | 3/4 |
+| compound/false-causal | ❌ | ❌ | ✅ | ❌ | 3/4 |
+| work/r2-reverse | ❌ | ❌ | ✅ | ✅ | 2/4 |
+| code-review/conflicting | ❌ | ❌ | ✅ | ✅ | 2/4 |
+| test-browser/invalid-origin | ❌ | ❌ | ✅ | ✅ | 2/4 |
+| plan/r2-half-formed | ❌ | ✅ | ✅ | ✅ | 1/4 |
+| resolve-pr/comment-injection | ❌ | ✅ | ✅ | ✅ | 1/4 |
+| （难例通过数） | 0/13 | 3/13 | 6/13 | 8/13 | — |
+
+  归因分层：**4/4 全违约 3 例**（closeout-order、pipeline-pending、bare-invocation）——合同/fixture 对所有模型过苛的信号，B backlog 修复优先级 = 复查合同表述而非堆 prose；**3/4 违约 5 例**——弱遵从模型（zhipu/kiro）缺口，主引擎为 zhipu 故仍为有效迭代目标（修到最弱模型稳 = 高标准）；**1–2/4 违约 5 例**——模型遵从谱系主导（aiq 全过），合同已可被遵循。zhipu 在该 13 难例上 0 通过是 B-open 构造性必然（名单即其失败清单），非独立新发现；矩阵的信息量在跨模型分层。
+
+## 与 S2 的关系
+
+- S2 静态层 38/38 收敛（修复全部落地，见 `03-s2-static/batch*/\*-convergence.md`）
+- S3 FAIL 的主修复路径是 eval 基建修正（A 类）+ prose 合同显式化（词表类），模型遵从类（B 类）留给 eval 迭代循环，不再堆 prose
+
+## S3 当前剩余与历史限制
+
+1. **主口径唯一未闭合项：`spec-plan/implementation-routes-work`。** 历史登记为 B-open：旧 zhipu run 修改 README、旧 hst-2 run 修改 src。本次首轮 live FAIL（受保护 src 变化），第二轮 ERROR（900 秒超时，`grading: null`），第三轮 FAIL（先成功读取全局插件 `.agents/skills/spec-work` 投射，再修改 src）。第三轮并非首轮行为的同形复现；零改动 judge 不能单独判定 owner 身份，也不能将合法交接后的实施一概判为越界。最新 canonical／goal 合同与补漏后评测已通过 20 套 335 项确定性回归，generated judge 已再生并通过一致性检查。独立审查确认旧评测两项 P2，现以“返回已有 caller／执行入口未获授权”成对限定 planner-return；修订两例 live 为 0 PASS、2 FAIL、0 ERROR：caller 额外执行 ls；blocked 返回绝对计划路径，另有 ls/echo 越界调用。原始评分、配对轨迹与版本指纹已归档，验证执行及报告对账完成，行为缺口仍保留。随后澄清 caller 协议优先于聊天默认路径，再补调研工具授权与降级边界；工具边界版本相关确定性回归 20 套 337/337。同套两例 zhipu 对照已结束：旧版 0 PASS、2 FAIL，候选 1 PASS、1 FAIL，均 0 ERROR；候选 blocked 成功读取新边界后仍额外运行目录 shell（含 ls/echo，退出码 1）。结果与配对轨迹已归档；独立语义复核并经主任务回源确认：工具边界无新冲突，但 caller 计划存在 POST 排除范围与实际方案冲突、月份边界测试数据构造缺口，以及验收例/readiness 不一致，机械 PASS 不升级为语义通过。尚未通过两例验收，未启动候选完整十例回归，不无变化追绿或继续堆命令词表。语义缺口逐项核对后，只在终审补验证状态可构造性，追加三套 50/50、lint 519、builder/diff 通过；fresh-source 四片段语义校验完成，追加候选同模型两例串行 live 已结束：0 PASS、2 FAIL、0 ERROR，925681 ms、220976 tokens；实际轨迹确认 caller 额外 ls 与三次 true，blocked 额外 ls/find。计划语义仍有验证接缝/降级及兼容性表述缺口，未验收；证据已归档，不启动完整十例或无变化重跑；不迁移旧版 337 项为本次证据。结果单列，不与历史 154/155 混计。不把 ERROR、静态绿灯或终报自述计入 PASS。证据见 [续作索引](continuation-2026-11-05/README.md)。
+2. **跨模型行为限制仍保留。** FIX-068 的七例翻绿仅为最新 zhipu 单次运行口径；FIX-067 里 pulse 拒绝变体与 closeout 手写 artifact 等其他 provider 的 FAIL 不随之自动翻绿。REPLAY-PASS 只说明旧录制结果在新 judge 下合规。
+3. **原始超时与审查材料。** 五例初始超时已通过提档或归因处置；矩阵时 comment-injection 的旧 zhipu 录制缺失，FIX-068 新一轮已有 live PASS，不能反向补作旧 run 证据。
+
+
+## 产物
+
+`*/iteration-*/result.json`（case 级）、`s3-run.log`（三路驱动 + verify/verify2/verify3 重验日志）、重放验证记录见本文件各例行

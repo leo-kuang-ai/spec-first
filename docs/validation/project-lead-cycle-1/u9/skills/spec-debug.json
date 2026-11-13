@@ -1,0 +1,182 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "generated_at": "2026-09-20T07:35:36.158199+00:00",
+  "skill_name": "spec-debug",
+  "source_snapshot": "source-manifest.json",
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "source_paths": [
+    "skills/spec-debug/SKILL.md",
+    "skills/spec-debug/references/investigate.md",
+    "skills/spec-debug/references/fix.md",
+    "skills/spec-debug/references/pipeline-return.md",
+    "skills/spec-debug/references/anti-patterns.md",
+    "skills/spec-debug/references/defense-in-depth.md",
+    "tests/unit/spec-debug-contracts.test.js",
+    "tests/unit/spec-debug-fix-reference-contracts.test.js",
+    "skills/spec-lfg/references/pr-watch-loop.md"
+  ],
+  "source_read_ranges": {
+    "skills/spec-debug/SKILL.md": "1-364",
+    "skills/spec-debug/references/investigate.md": "1-61",
+    "skills/spec-debug/references/fix.md": "1-17",
+    "skills/spec-debug/references/pipeline-return.md": "1-80",
+    "skills/spec-debug/references/anti-patterns.md": "1-91",
+    "skills/spec-debug/references/defense-in-depth.md": "1-35"
+  },
+  "source_hashes": {
+    "skills/spec-debug/SKILL.md": "6c40fadd87dce2ad56bcf5556366a796ed1583a00c5bf53110b98164a3e2daf7",
+    "skills/spec-debug/references/investigate.md": "0517124f2ea5c127901c00caee3052120527c5e2de252ff96455306595fb7a0e",
+    "skills/spec-debug/references/fix.md": "5d9320cfe19d5ed165a0143da7621422dcd37e6920146b2c34b7df21ad8c4c12",
+    "skills/spec-debug/references/pipeline-return.md": "8030c630108460fadba4252acfe03bb923877d0b66220e9fe82fc5e80a8d98c1",
+    "skills/spec-debug/references/anti-patterns.md": "9597012ed66df7e52caa38bfaaaab886e2e48b3807f1aa89640139b907976e6b",
+    "skills/spec-debug/references/defense-in-depth.md": "56211e8ff51d10df8b46b58d04420ab65f1fd02ec4e4588be4b5af246cc7e046",
+    "tests/unit/spec-debug-contracts.test.js": "977f88ced4a3523730a08c4569b92180b475ae18c91a74b91ceb8705f1989b55",
+    "tests/unit/spec-debug-fix-reference-contracts.test.js": "57e36c96aa4af8812393768a4b227e7a821b2172eb080e3c23c59d7baac00215",
+    "skills/spec-lfg/references/pr-watch-loop.md": "6eab53df6508e6d46fc9f7274fe89420309ca14375070a5cedd9f4c1c32d7742"
+  },
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "entry_surface": "workflow_command",
+  "batch": "B",
+  "closure_tier": "M",
+  "closure_observed": {
+    "files": 22,
+    "bytes": 100716,
+    "read_package_files_at_least_partially": 6,
+    "read_supporting_files_at_least_partially": 3,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "coverage_commitment": "committed",
+  "dependency_closure": "partial",
+  "status": "degraded",
+  "reason_codes": [
+    "bounded_source_review",
+    "dependency_closure_partial",
+    "workflow_not_run"
+  ],
+  "command_or_method": [
+    "只读reviewer逐包阅读冻结source并判断五分支；主owner整合与回源裁决，不是盲评或workflow执行。"
+  ],
+  "ran": true,
+  "exit_code": null,
+  "evidence_paths": [
+    "reviewer-returns/b.json"
+  ],
+  "source_refs": [
+    "skills/spec-debug/SKILL.md",
+    "skills/spec-debug/references/investigate.md",
+    "skills/spec-debug/references/fix.md",
+    "skills/spec-debug/references/pipeline-return.md",
+    "skills/spec-debug/references/anti-patterns.md",
+    "skills/spec-debug/references/defense-in-depth.md",
+    "tests/unit/spec-debug-contracts.test.js",
+    "tests/unit/spec-debug-fix-reference-contracts.test.js",
+    "skills/spec-lfg/references/pr-watch-loop.md"
+  ],
+  "owner": "project-lead-cycle-1",
+  "consumers": [
+    "周期1主审查",
+    "对应上游/下游workflow（以SKILL文档声明为准）"
+  ],
+  "branches": [
+    {
+      "id": "entry_positive",
+      "status": "source-covered",
+      "judgment": "失败或回归进入诊断；明确修复意图无需重复修复确认；根因链先于最小修复。",
+      "source_refs": [
+        "skills/spec-debug/SKILL.md:15-35",
+        "skills/spec-debug/SKILL.md:164-202"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "near_neighbor_negative",
+      "status": "source-covered",
+      "judgment": "已收敛实现归 spec-work；仅诊断时跳过修改；设计错配转 brainstorm；pipeline 范围偏离返回 needs-human。",
+      "source_refs": [
+        "skills/spec-debug/SKILL.md:3",
+        "skills/spec-debug/SKILL.md:204-235",
+        "skills/spec-debug/references/pipeline-return.md:20-32"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "output_consumer",
+      "status": "source-covered",
+      "judgment": "Debug Summary/closeout refs 供用户、spec-work、code-review 与 LFG 消费；fixed-not-pushed 仅表示本地结果，调用方重新验证。",
+      "source_refs": [
+        "skills/spec-debug/SKILL.md:252-323",
+        "skills/spec-debug/references/pipeline-return.md:55-80",
+        "skills/spec-lfg/references/pr-watch-loop.md:15-30"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "critical_error_stop",
+      "status": "source-covered",
+      "judgment": "目标/source/dirty overlap 与验证证据 gate 位于修改或 verified 声明之前；修复失败使原假设失效并升级调查。",
+      "source_refs": [
+        "skills/spec-debug/SKILL.md:237-248",
+        "skills/spec-debug/SKILL.md:295-323",
+        "skills/spec-debug/references/fix.md:5-17"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "degraded_recovery_handoff",
+      "status": "source-covered",
+      "judgment": "其他任务残留、缺复现/provider、非 Git 缺口均显式保留；pipeline 返回有类型的 residual，不编造成功。",
+      "source_refs": [
+        "skills/spec-debug/SKILL.md:37-48",
+        "skills/spec-debug/SKILL.md:114-122",
+        "skills/spec-debug/references/pipeline-return.md:34-53"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    }
+  ],
+  "findings": [],
+  "fresh_source_eval": "not-run",
+  "claim_ceiling": "C0",
+  "limitations": [
+    "investigation-techniques、其余 eval 和 CLI closeout 消费者未读；tests/runtime/live 均未运行。",
+    "原机械占位结论已撤销；source-covered仅证明已读范围可追踪，不证明运行通过。",
+    "未确认读取范围不计覆盖；哈希只证明字节。"
+  ],
+  "recovery_point": "如主 owner 扩大范围，补读其余 debug 引用和消费者，并执行聚焦合同测试。",
+  "timing": {
+    "active_seconds": null,
+    "limitation": "逐包主动时间不可可靠恢复，未用工具墙钟估算。"
+  },
+  "record_correction": {
+    "at": "2026-09-20T05:55:01.019054+00:00",
+    "invalidated": "2026-09-20T05:24 的机械占位结论",
+    "replaced_by_actual_review_at": "2026-09-20T07:35:36.158199+00:00"
+  },
+  "supporting_read_ranges": {
+    "tests/unit/spec-debug-contracts.test.js": "1-76",
+    "tests/unit/spec-debug-fix-reference-contracts.test.js": "1-19",
+    "skills/spec-lfg/references/pr-watch-loop.md": "1-50"
+  },
+  "unconfirmed_read_ranges": [],
+  "reviewer_provenance": {
+    "reviewer": "cycle1_a_exit",
+    "kind": "read-only-source-review",
+    "fresh_per_package_context": false,
+    "raw_return": "reviewer-returns/b.json",
+    "raw_return_sha256": "74c86ff4af0bab17fbeb82f390cf57eb33590df5a24910b9823d19382480563c"
+  },
+  "execution": {
+    "source_semantic_review": "ran",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "not-run"
+  }
+}

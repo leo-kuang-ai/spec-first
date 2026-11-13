@@ -1,0 +1,13 @@
+{
+  "verification_run_summary_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-remaining-20261030/verification-run-summary.json",
+  "honest_closeout_verdict": "degraded",
+  "run_artifact_path": ".spec-first/workflows/spec-work/spec-first/ce-opt-remaining-20261030/run.json",
+  "run_artifact_reason_code": "trigger-not-run-validation",
+  "overall_acceptance": "incomplete",
+  "limitations": [
+    "U6 positive authenticated admission unavailable.",
+    "Twenty-seven skills have no model task trial; several local fixture variants remain to be materialized.",
+    "Full Xcode and exact Figma target/real human prototype decisions are absent.",
+    "Full frozen comparison and comparable cost/rework/time evidence unavailable."
+  ]
+}

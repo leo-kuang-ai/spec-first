@@ -1,0 +1,7 @@
+{
+  "trial": "CEOPT-04-A1",
+  "approved_for_disposable_execution": true,
+  "proposal_sha256": "0134f1cea87992aa076757ebcc9a8d6bbf671b821d7293c31359cb22eeb7885f",
+  "patch_sha256": "7e5ba6722ae2deeda6d4bd52468cacec35199af38a592c022dcfc6a78313a6be",
+  "review": "Parent reviewed entire proposal. Alternate index contains only authorized hunk. Normal index aligned before commit exactly as proposed; no model shell commands evaluated. Fixture has no hooks or remotes used. Historical commit kept immutable."
+}

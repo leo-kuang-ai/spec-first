@@ -1,0 +1,14 @@
+PASS tests/unit/task-pack-command.test.js
+PASS tests/unit/spec-work-run-artifact-producer.test.js
+PASS tests/unit/honest-closeout.test.js
+PASS tests/unit/verification-run-summary.test.js
+PASS tests/unit/target-repo-containment.test.js
+PASS tests/unit/spec-work-run-artifact-contract.test.js
+PASS tests/unit/spec-doc-review-task-pack-contracts.test.js
+PASS tests/unit/spec-write-tasks-contracts.test.js
+
+Test Suites: 8 passed, 8 total
+Tests:       125 passed, 125 total
+Snapshots:   0 total
+Time:        5.724 s, estimated 6 s
+Ran all test suites within paths "tests/unit/task-pack-command.test.js", "tests/unit/target-repo-containment.test.js", "tests/unit/verification-run-summary.test.js", "tests/unit/honest-closeout.test.js", "tests/unit/spec-work-run-artifact-producer.test.js", "tests/unit/spec-work-run-artifact-contract.test.js", "tests/unit/spec-write-tasks-contracts.test.js", "tests/unit/spec-doc-review-task-pack-contracts.test.js".

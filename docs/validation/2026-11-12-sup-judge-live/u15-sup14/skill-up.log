@@ -1,0 +1,17 @@
+📋 Loading configuration...
+level=INFO msg="Config: loading eval.yaml from skills/using-spec-first/evals/eval.yaml"
+✅ Loaded 1 case(s) | engine: claude_code | model: zhipu/glm-5.3
+
+🔑 Loading credentials...
+✅ Credentials ready
+
+🚀 Running evaluation (1 cases)
+   ⏳ [1/1] r2-low-confidence-one-question: An uncertain next step allows one route-changing question or one recommendation...
+level=WARNING msg="stderr: [claude-code:unrecognized_model] {\"model\":\"glm-5.3\",\"query_source\":\"sdk\"}\n"
+   ✅ [1/1] r2-low-confidence-one-question: PASS (100.0%)
+
+📊 Generating reports...
+✅ Reports saved to /tmp/sup-live/u15-sup14/iteration-1
+
+────────────────────────────────────────
+📋 Results: 1 passed, 0 failed, 0 errors

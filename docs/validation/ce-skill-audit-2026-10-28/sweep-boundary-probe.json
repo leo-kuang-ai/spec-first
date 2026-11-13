@@ -1,0 +1,43 @@
+{
+  "future_schema": {
+    "exit": 0,
+    "stdout": "OK",
+    "after": {
+      "schema_version": 1,
+      "sources": {},
+      "items": {},
+      "last_run": {
+        "timestamp": "2026-10-28T00:00:00Z",
+        "outcome": "completed",
+        "writer": "probe",
+        "counts": {}
+      },
+      "future_field": "keep"
+    }
+  },
+  "unavailable_lock": {
+    "exit": 0,
+    "stdout": "OK",
+    "state_created": true
+  },
+  "lock_symlink": {
+    "exit": 0,
+    "stdout": "OK",
+    "temporary_sentinel_after": ""
+  },
+  "first_run_lock": {
+    "exit": 0,
+    "stdout": "OK",
+    "state_created": true,
+    "lock_created": false
+  },
+  "closed_without_evidence": {
+    "exit": 0,
+    "stdout": "OK",
+    "status_before_validate": "closed",
+    "validate": {
+      "exit": 0,
+      "stdout": "OK\n{\"downgraded\": [\"fixture:1\"]}"
+    }
+  }
+}

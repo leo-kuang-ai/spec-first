@@ -1,0 +1,8 @@
+PASS tests/unit/instruction-bootstrap.test.js
+PASS tests/unit/sync-instruction-files.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       17 passed, 17 total
+Snapshots:   0 total
+Time:        0.097 s, estimated 1 s
+Ran all test suites within paths "tests/unit/sync-instruction-files.test.js", "tests/unit/instruction-bootstrap.test.js".

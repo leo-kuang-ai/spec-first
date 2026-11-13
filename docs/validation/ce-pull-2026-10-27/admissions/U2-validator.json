@@ -1,0 +1,159 @@
+{
+  "schema_version": "ce-upstream-sync-run/v1",
+  "kind": "package-admission",
+  "window_sha256": "213f5262a72c7447b976ae9d60714051077185739c9d2f020723d510a2d1787f",
+  "input_sha256": "be2b0955670177ac55c077ffd0ba5124b347c8298627a6529be076a44ebc0515",
+  "target_snapshot": {
+    "repository": "spec-first",
+    "head": "fe81bae9ee55ec336c85cf80c4a0460d86e3a412",
+    "dirty": true,
+    "dirty_paths": [
+      "CHANGELOG.md",
+      "docs/contracts/verification/ce-upstream-sync-run.md",
+      "docs/contracts/verification/ce-upstream-sync-run.schema.json",
+      "docs/plans/2026-10-27-001-refactor-ce-upstream-sync-technical-scheme.md",
+      "scripts/check-ce-upstream-reconciliation.cjs",
+      "skills/spec-code-review/references/diff-scope.md",
+      "skills/spec-code-review/references/finish-review.md",
+      "skills/spec-code-review/references/personas/adversarial-reviewer.md",
+      "skills/spec-code-review/references/personas/correctness-reviewer.md",
+      "skills/spec-code-review/references/personas/maintainability-reviewer.md",
+      "skills/spec-code-review/references/personas/reliability-reviewer.md",
+      "skills/spec-code-review/references/personas/security-reviewer.md",
+      "skills/spec-code-review/references/personas/testing-reviewer.md",
+      "skills/spec-code-review/references/scope.md",
+      "skills/spec-code-review/scripts/findings-mechanics.py",
+      "skills/spec-code-review/scripts/review-scope.py",
+      "skills/spec-commit-push-pr/references/branch-creation.md",
+      "skills/spec-compound/references/session-history.md",
+      "skills/spec-compound/scripts/session-history/extract-metadata.py",
+      "tests/unit/ce-upstream-reconciliation-v2.test.js",
+      "tests/unit/session-history-scripts.test.js",
+      "tests/unit/spec-code-review-mechanics.test.js",
+      "tests/unit/spec-commit-push-pr-context-contracts.test.js"
+    ],
+    "dirty_path_manifest_sha256": "b83a9ba9dfed09065bc9ffc549621fbe60ac81849a39081ea0189f5bd144582a",
+    "source_tree_hash": "dab07909482d4b67b67e8affc34e494a3ba8c90e960fbb534e4fef3d225cf56b",
+    "inventory_hash": "6d3313586aa9aafeebbf0c13a7923d7bc416e7a53228a9cd7e41536dcc471005",
+    "scope_contract": {
+      "source_roots": [
+        "CLAUDE.md",
+        "AGENTS.md",
+        "skills",
+        "templates",
+        "src",
+        "scripts",
+        "tests",
+        "docs",
+        "README.md",
+        "README.en.md",
+        "README.zh-CN.md",
+        "CHANGELOG.md",
+        "package.json"
+      ],
+      "excluded_run_outputs": [
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-name-status.md",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication-input.json",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.md",
+        "docs/validation/2026-08-19-spec-first-current-skill-package-inventory-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-evidence-exceptions.json",
+        "docs/validation/ce-pull-2026-10-27/window-facts.json",
+        "docs/validation/ce-pull-2026-10-27/execution-state.json",
+        "docs/validation/ce-pull-2026-10-27/execution-baseline.json",
+        "docs/validation/ce-pull-2026-10-27/producer-name-status.tsv",
+        "docs/validation/ce-pull-2026-10-27/target-source-inventory.json",
+        "docs/validation/ce-pull-2026-10-27/adjudication-input.json",
+        "docs/validation/ce-pull-2026-10-27/adjudication.json",
+        "docs/validation/ce-pull-2026-10-27/ledger.json",
+        "docs/validation/ce-pull-2026-10-27/summary.md",
+        "docs/validation/ce-pull-2026-10-27/artifact-set.json",
+        "docs/validation/ce-pull-2026-10-27/work-return.json",
+        "docs/validation/ce-pull-2026-10-27/verification-run-summary.json",
+        "docs/validation/ce-pull-2026-10-27/honest-closeout.md",
+        "docs/validation/ce-pull-2026-10-27/handoff.json",
+        "docs/validation/ce-pull-2026-10-27/semantic-screening.json",
+        "docs/validation/ce-pull-2026-10-27/plan-review.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/window-facts.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/execution-state.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/execution-baseline.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/producer-name-status.tsv",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/target-source-inventory.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/adjudication-input.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/adjudication.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/ledger.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/summary.md",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/artifact-set.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/work-return.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/verification-run-summary.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/honest-closeout.md",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/handoff.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/semantic-screening.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/plan-review.json",
+        "docs/validation/ce-pull-2026-10-27/logs/**",
+        "docs/validation/ce-pull-2026-10-27/owner-receipts/**",
+        "docs/validation/ce-pull-2026-10-27/admissions/**",
+        "docs/validation/ce-pull-2026-10-27/ledger-patches/**",
+        "docs/validation/ce-pull-2026-10-27/staging/**",
+        "docs/validation/2026-08-19-ce-post-3-20-ledger-patches/**",
+        "docs/validation/ce-localization/**"
+      ]
+    },
+    "hash_algorithm": {
+      "name": "sha256",
+      "version": "canonical-source-manifest-v1"
+    }
+  },
+  "source_refs": [
+    "skills/spec-code-review/references/finish-review.md",
+    "skills/spec-code-review/references/validator-template.md",
+    "skills/spec-code-review/references/findings-schema.json",
+    "skills/spec-code-review/references/apply-findings.md",
+    "skills/spec-lfg/references/review-followup.md"
+  ],
+  "limitations": [
+    "仅验证结果保留与修复队列边界；本地逐 finding 拓扑保留，不新增 batch/leaf",
+    "producer 自审；fresh-source 独立评估待后续授权范围内 review"
+  ],
+  "unresolved": [],
+  "package_id": "skills/ce-code-review",
+  "unit_id": "U2",
+  "paths": [
+    "skills/ce-code-review/references/validator-template.md",
+    "skills/ce-code-review/references/validator-batch-template.md",
+    "skills/ce-code-review/references/findings-schema.json",
+    "skills/ce-code-review/references/finish-input.md",
+    "skills/ce-code-review/references/finish-review.md"
+  ],
+  "decisions": [
+    {
+      "path": "skills/ce-code-review/references/validator-template.md",
+      "target_action": "compose",
+      "rationale": "将三态验证、敏感 claim 反证门槛及 unresolved report-only 融合进本地既有 per-finding owner 与 apply consumers；保留 scope/授权边界，不复制 CE 拓扑。"
+    },
+    {
+      "path": "skills/ce-code-review/references/validator-batch-template.md",
+      "target_action": "compose",
+      "rationale": "将三态验证、敏感 claim 反证门槛及 unresolved report-only 融合进本地既有 per-finding owner 与 apply consumers；保留 scope/授权边界，不复制 CE 拓扑。"
+    },
+    {
+      "path": "skills/ce-code-review/references/findings-schema.json",
+      "target_action": "compose",
+      "rationale": "将三态验证、敏感 claim 反证门槛及 unresolved report-only 融合进本地既有 per-finding owner 与 apply consumers；保留 scope/授权边界，不复制 CE 拓扑。"
+    },
+    {
+      "path": "skills/ce-code-review/references/finish-input.md",
+      "target_action": "compose",
+      "rationale": "将三态验证、敏感 claim 反证门槛及 unresolved report-only 融合进本地既有 per-finding owner 与 apply consumers；保留 scope/授权边界，不复制 CE 拓扑。"
+    },
+    {
+      "path": "skills/ce-code-review/references/finish-review.md",
+      "target_action": "compose",
+      "rationale": "将三态验证、敏感 claim 反证门槛及 unresolved report-only 融合进本地既有 per-finding owner 与 apply consumers；保留 scope/授权边界，不复制 CE 拓扑。"
+    }
+  ],
+  "review_ref": "docs/validation/ce-pull-2026-10-27/execution-state.json",
+  "authority_ref": "docs/validation/ce-pull-2026-10-27/execution-state.json",
+  "dependency_refs": []
+}

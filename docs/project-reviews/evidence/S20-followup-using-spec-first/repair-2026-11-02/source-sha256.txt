@@ -1,0 +1,11 @@
+456dca0a4de865aaf551e5dd5d7b2a505a1783ac556acce153154588df35987e  skills/using-spec-first/SKILL.md
+5f34a655efdf589f4f34a2f8aaaf23d5f70a79942789d236ab8eb2a22e7809d9  skills/using-spec-first/evals/cases/direct-lane-simple-howto.yaml
+7d39fa4e9595342ca58a0d16f9a9bca61e7024ccd8c417f3dd356b95606b0bd2  skills/using-spec-first/evals/cases/failure-priority-single-entry.yaml
+f610841eec8a4bc2943295b5cc3d007ca9c3b4b8e03efa7f73612a87ef1c73c5  skills/using-spec-first/evals/cases/r2-low-confidence-one-question.yaml
+92d75c148be7341a00abf97545d6dab8b21ec21c80f62eaff8ed9f25333b6493  skills/using-spec-first/evals/cases/recommendation-only-format.yaml
+e4a09c4648f4a9f5ec5d7e45bd556cf89fce0049f06c7a533d6720d37a5ced67  skills/using-spec-first/evals/cases/route-failure-to-spec-debug.yaml
+be434779c72bb119681e819bee5e27c51532ccdcf7a6eec29015d2f8e36dbf9d  skills/using-spec-first/evals/cases/route-vague-idea-to-spec-brainstorm.yaml
+5b41eead7b33493c73212abda2877882049d3e89d5acf8cde8b169ae1dd09eb8  skills/using-spec-first/evals/eval.yaml
+7e56d9164b17f97a7c92ad381c01095d5b8de3df9373ef0236124e92275dbb69  skills/using-spec-first/evals/fixtures/scripts/check-r2-asks.sh
+3bfb4cb185a6ed666942a9f314e5df4133dc57f2e0f410eefea1325658c19eb0  skills/using-spec-first/references/conditional-routing-boundaries.md
+a56255d20ae306b28aeb2b58fd6e35a2bdc1476df503cd80a2757566ebde5347  skills/using-spec-first/references/public-route-map.md

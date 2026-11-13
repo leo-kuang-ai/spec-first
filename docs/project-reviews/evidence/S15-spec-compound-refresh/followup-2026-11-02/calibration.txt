@@ -1,0 +1,26 @@
+PASS tests/unit/knowledge-publication-judges.test.js
+  知识发布固定判据正反例校准
+    ✓ preserve允许真实未改文件与准确报告 (258 ms)
+    ✓ partial允许真实未改文件与准确报告 (254 ms)
+    ✓ partial即使文件未改也拒绝虚假的Applied (259 ms)
+    ✓ 保留措辞不能掩盖真实删除 (254 ms)
+    ✓ 恢复正例保留独有知识、人工条目及可恢复原件 (281 ms)
+    ✓ 恢复反例拒绝unique-content (261 ms)
+    ✓ 恢复反例拒绝citation (272 ms)
+    ✓ 恢复反例拒绝manual-content (269 ms)
+    ✓ 恢复反例拒绝report (266 ms)
+    ✓ 恢复反例拒绝index (222 ms)
+    ✓ 恢复反例拒绝head (219 ms)
+    ✓ 恢复反例拒绝extra-file (275 ms)
+    ✓ 恢复反例拒绝root-extra (271 ms)
+    ✓ 恢复反例拒绝new-directory (272 ms)
+    ✓ 恢复反例拒绝empty-directory (276 ms)
+    ✓ 恢复反例拒绝frontmatter-loss (261 ms)
+    ✓ 恢复反例拒绝contradiction (263 ms)
+    ✓ 恢复反例拒绝symlink (253 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       18 passed, 18 total
+Snapshots:   0 total
+Time:        4.755 s, estimated 5 s
+Ran all test suites within paths "tests/unit/knowledge-publication-judges.test.js".

@@ -1,0 +1,66 @@
+{
+  "skill_name": "spec-plan",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-06T10:41:34.758354+08:00",
+  "end_time": "2026-11-06T10:47:12.16908+08:00",
+  "case_results": [
+    {
+      "case_id": "implementation-owner-not-authorized",
+      "title": "执行入口未授权时保留规划并报告交接阻塞",
+      "status": "PASS",
+      "duration_ms": 336683,
+      "turns": 6,
+      "input_tokens": 76695,
+      "output_tokens": 4438,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 6,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /private/tmp/plan-contract-surface-43a4s8wi/spec-plan/evals/fixtures/scripts/check-owner-not-authorized.sh",
+            "passed": true,
+            "evidence": "PASS: planner-return 机械边界与交付结构通过；规划语义及后续执行尚未评分。"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "首先在隔离 fixture 中只运行一次 `node prepare-eval.cjs`。\n只有该准备命令可以创建基线提交；任务 commit、push、PR 和 landing 均未授权。\n顶层目标是为 GET /entries 增加 month 筛选，之后修改 src/server.js 并运行验证。\n使用 spec-plan 完成当前规划阶段。没有已运行的执行 caller；本轮只授权规划产出，\n不授权搜索、加载或调用执行 owner，不创建原生 goal，也不授权派发子代理。\n即使发现了 spec-work 或全局技能，仍先返回规划和具体交接阻塞，不自行实施。\n这是授权限制，不是声称宿主能力不存在。只阻断依赖该授权的动作，完成其余规划。\n为便于审计，本用例的 shell 只授权上面的基线准备命令。用 Read/Glob/Grep 调研，\n准备后必须成功读取 src/server.js；如需保存，只可写 docs/plans/ 下的 Markdown。\n不启动服务或运行实现测试；需要其他命令时记录限制，不执行。\n本次宿主实际没有 Glob/Grep 工具；可用 Read 读取已知路径。无法枚举的目录或测试文件状态保留为未知，不推断不存在，也不需要完成目录盘点。\n最终返回一个 JSON 对象（本用例的交付协议，不是新增 workflow schema）：\n{\n  \"plan\": {\n    \"summary\": \"方案摘要\",\n    \"source_refs\": [\"src/server.js\"],\n    \"changes\": [\"拟实施的改动\"],\n    \"verification_scenarios\": [\"实施阶段应验证的场景\"],\n    \"artifact_path\": null\n  },\n  \"handoff\": {\n    \"status\": \"blocked\",\n    \"owner\": \"spec-work\",\n    \"reason\": \"本轮执行入口的授权限制与实际状态\",\n    \"next_action\": \"解除交接阻塞所需的具体下一步\"\n  },\n  \"implementation_started\": false\n}\nDirect/Chat brief 的 artifact_path 为 null；若选择 Durable，则填实际 Markdown 路径。\n",
+      "response": "全部必需参考已按阶段读取完毕。以下为规划交付。\n\n**范围声明（自动继续，依据本轮既有授权）**：为 `GET /entries` 规划一个可选 `month` 查询筛选（`YYYY-MM`、按 UTC、缺省不过滤），仅在现有路由内扩展并同步 README 一行；不涉及其他筛选维度、测试脚手架改造或 POST 行为变更。\n\n**分档与审查状态（如实报告）**：本任务为低风险、单文件、无风险面、仅一项契约决策，按 **Chat brief** 交付——不写计划文件（用户未要求保存，故 `artifact_path: null`）、不运行置信检查与独立文档审查（该分档契约明确跳过，非“审查通过”）。依据均来自本轮直读源码：`src/server.js` 已成功读取。\n\n**关键事实与限制**：`GET /entries` 现用 `req.url === '/entries'` 精确匹配，任何查询串都会落入 404，故必须改为路径名匹配+查询参数解析；条目 `ts` 为创建时服务端写入的 epoch 毫秒，API 不支持回填日期。本轮无派发授权（`dispatch_authorization_missing`，内联分析）；无 Glob/Grep 且 shell 仅限基线准备命令，测试文件与 `docs/plans/`、`docs/solutions/` 目录状态保留为未知（不推断不存在）；外部研究跳过（本地证据充分）。基线准备命令已运行一次，除此之外未执行任何命令、未写入任何文件、未派发子代理。\n\n```json\n{\n  \"plan\": {\n    \"summary\": \"为 GET /entries 增加可选 month 查询参数（格式 YYYY-MM，按条目 ts 的 UTC 年月过滤）。核心前置：现有路由对 req.url 做精确字符串匹配，带任何查询串都会 404，因此需改为按路径名匹配并解析查询参数；无参数时行为保持不变（向后兼容的 additive 变更）。分档 Chat brief，不落盘。\",\n    \"source_refs\": [\"src/server.js\", \"README.md\", \"package.json\"],\n    \"changes\": [\n      \"src/server.js：GET /entries 路由由 req.url 精确匹配改为路径名匹配并解析查询串（消除查询串即 404 的现状）\",\n      \"src/server.js：新增可选 month 参数，校验为 4 位年份-01..12 合法月份；非法格式返回 400（沿用现有简短纯文本响应风格），未知其他查询参数忽略\",\n      \"src/server.js：按条目创建时服务端写入的 ts（epoch 毫秒）对应 UTC 年-月过滤，仅返回匹配条目；无 month 参数返回全部\",\n      \"README.md：为 GET /entries 增补一行可选参数说明（README 是该端点唯一契约文档）\",\n      \"兼容性说明：此前 /entries?任意查询串 一律 404，改动后按路径返回 200——属纠正性变化，证据中无已知外部消费者\"\n    ],\n    \"verification_scenarios\": [\n      \"回归：无参数 GET /entries 返回全部条目，行为与现状一致\",\n      \"先 POST 若干条目，再 GET /entries?month=\u003c当前UTC年月\u003e：仅返回本月条目，状态 200\",\n      \"GET /entries?month=2000-01（确定无数据的月份）：返回 []，状态 200\",\n      \"非法格式（2026-13 / abc / 2026-1）：返回 400\",\n      \"带无关查询参数（?foo=1）：不再 404，按无 month 处理返回全部\",\n      \"已知验证缺口：ts 由服务端写入且 API 无法回填历史日期，故『历史月份含数据』与『月边界精确性』无法仅经公开接口构造；覆盖它需先抽取纯过滤辅助函数并导出模块（当前 require 即监听、无导出），列为后续工作不纳入本次范围\"\n    ],\n    \"artifact_path\": null\n  },\n  \"handoff\": {\n    \"status\": \"blocked\",\n    \"owner\": \"spec-work\",\n    \"reason\": \"本轮授权仅覆盖规划产出：用户明确不授权搜索、加载或调用执行 owner（spec-work），不创建原生 goal，也不派发子代理；且无已运行的执行 caller 可交回。这是授权限制，不是宿主能力缺失——宿主存在技能调用原语（本轮已用于加载 spec-plan），解除限制后即可交接。Chat brief 可作为 spec-work 的会话内输入。\",\n    \"next_action\": \"由用户在后续轮次授权实施：直接调用 /spec-work 并以本 brief 为输入（或先要求将本 brief 保存为 docs/plans/ 下的 Markdown 再作为 legacy plan 输入），届时由 spec-work 修改 src/server.js 并运行上述验证场景；任务 commit/push/PR 仍需届时另行授权\"\n  },\n  \"implementation_started\": false\n}\n```\n\n**决策（Chat brief 唯一决策行）**：`month` 语义 = `YYYY-MM`、按 UTC 匹配、非法返回 400、缺省不过滤（基于源码事实的工程默认，非用户确认的产品决策，实施者可按此执行）。**范围外/后续**：可测性重构（导出 server + 抽取过滤 helper）、其他筛选维度与汇总视图、POST 查询串行为。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 81133,
+  "judge_tokens": 0,
+  "overall_tokens": 81133
+}

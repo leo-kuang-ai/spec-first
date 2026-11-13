@@ -1,0 +1,61 @@
+{
+  "skill_name": "spec-dogfood",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.322"
+  },
+  "start_time": "2026-11-12T10:10:56.622078+08:00",
+  "end_time": "2026-11-12T10:16:18.603902+08:00",
+  "case_results": [
+    {
+      "case_id": "owner-unavailable-stops",
+      "title": "浏览器执行 owner 不可用应停止并指引 runtime-setup",
+      "status": "PASS",
+      "duration_ms": 320968,
+      "turns": 6,
+      "input_tokens": 46326,
+      "output_tokens": 9476,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 6,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-dogfood/evals/fixtures/scripts/check-owner-unavailable-stop.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（我已通过 /spec-dogfood 显式调起该 skill——它已在会话中加载,以下是输入。\n这是当前分支的 dogfood 请求。请先运行 `bash prepare-dogfood-fixture.sh`：\n该命令只建立 trunk 基线与待 dogfood 的 diff（仅限夹具准备提交），\n不授权推送或其他副作用。）\n当前分支改了 GET /entries 的响应结构,帮我做发布前的分支 dogfood。\n",
+      "response": "Dogfood 运行到此按 skill 规定停止。总结如下：\n\n## 运行结果：Not ready（被浏览器执行 owner 缺失阻断）\n\n**阻塞消息（skill 规定原样输出）：**\n\n\u003e Browser execution owner unavailable. Run `spec-runtime-setup` to inspect browser readiness, then rerun `spec-dogfood`. This does not block spec-first baseline.\n\n当前会话可用 skill 列表中不存在 `spec-test-browser`，而 `spec-dogfood` 强制要求所有浏览器执行只能经它以 `mode:pipeline` 委托，禁止任何第二执行路径——因此我**没有**退回本会话可用的 `agent-browser`，也没有用 curl 代替浏览器矩阵、没有探测其私有 CLI。矩阵 6 个场景全部保持 `Pending`（0/6 执行）。\n\n**已完成的 spec-first 基线（不受该阻塞影响）：**\n- 夹具：`prepare-dogfood-fixture.sh` 按你的显式授权执行完毕（两个夹具提交，未推送）——base `be34a39`（main 基线）→ head `dd41889`。\n- Phase 0：blank 目标 = 当前分支 `feature/entries-response`（非 trunk），原地 dogfood，无既有报告可续跑。\n- Phase 1：trunk 解析为本地 `main`；diff 为 `src/server.js` 单行——`GET /entries` 响应从顶层数组改为 `{ entries }` 信封，属**破坏性契约变更**；persona 无文档来源，按推断记录（记账个人用户 / API 消费者）。\n- Phase 2：1 张 Mermaid 流程图 + 6 行矩阵（空态、记账往返、多条目、契约迁移、相邻回归、console 错误），已按模板落盘为恢复检查点。\n\n**未做的事（授权缺失，如实记录）**：未启动 dev server（Phase 3 无消费者）、未修任何源码（`fix_authorization_missing`）、未提交报告（`commit_authorization_missing`）、未推送（`landing_authorization_missing`）。\n\n**报告**：`docs/dogfood-reports/2026-11-12-feature-entries-response-dogfood.md`（未提交）。恢复路径：安装/启用 `spec-test-browser`（必要时先用 `spec-runtime-setup` 检查就绪度）后重跑 `spec-dogfood`，直接从报告里的 Pending 矩阵续跑，Phase 0–2 无需重做。",
+      "observed_version": "2.1.322"
+    }
+  ],
+  "total_tokens": 55802,
+  "judge_tokens": 0,
+  "overall_tokens": 55802
+}

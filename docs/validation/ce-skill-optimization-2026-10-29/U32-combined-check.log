@@ -1,0 +1,11 @@
+PASS tests/unit/spec-sweep-final-publication.test.js
+PASS tests/unit/spec-riffrec-evidence-coverage.test.js
+PASS tests/unit/sweep-state-safety.test.js
+PASS tests/unit/spec-sweep-media-admission.test.js
+PASS tests/unit/sweep-state-legacy-import.test.js
+
+Test Suites: 5 passed, 5 total
+Tests:       61 passed, 61 total
+Snapshots:   0 total
+Time:        6.121 s, estimated 7 s
+Ran all test suites matching /tests\/unit\/spec-sweep-media-admission.test.js|tests\/unit\/spec-riffrec-evidence-coverage.test.js|tests\/unit\/spec-sweep-final-publication.test.js|tests\/unit\/sweep-state-safety.test.js|tests\/unit\/sweep-state-legacy-import.test.js/i.

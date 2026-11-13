@@ -8,24 +8,15 @@
   },
   "target_source_snapshot": {
     "repository": "spec-first",
-    "head": "918b10bbccdf6bfb3407972ce3134a82a04bdcbd",
+    "head": "f4c7a7b98ecf342e54bd3117c4d745e684532a19",
     "dirty": true,
     "dirty_paths": [
       "CHANGELOG.md",
-      "docs/10-prompt/spec-first\\344\\273\\243\\347\\240\\201\\345\\256\\241\\346\\237\\245\\346\\226\\271\\346\\241\\210.md",
-      "docs/solutions/architecture-patterns/spec-prd-finding-schema-freeze-deferred-2026-06-28.md",
-      "scripts/check-ce-upstream-reconciliation.cjs",
-      "scripts/generate-ce-localization-closeout.cjs",
-      "scripts/verify-with-gate.sh",
-      "skills/_shared/README.md",
-      "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
-      "tests/unit/ce-localization-closeout-contracts.test.js",
-      "tests/unit/ce-upstream-reconciliation-v2.test.js",
-      "tests/unit/mcp-setup-host-config.test.js"
+      "docs/research/2026-09-24-ai-industry-trends-claude-prompt-shortening.md"
     ],
-    "dirty_path_manifest_sha256": "846ffcb265bc133d50b794aa6db7de6f74c9d897c735ef7947629bc64ffe1965",
-    "source_tree_hash": "d181026578b2fa15342ebae3e4e5f4b6743a319816e4671827e9012a51858ac0",
-    "inventory_hash": "10b01c2ee73b1eb4b16eada1cc8bab2b9e419a85e0f6825b1305915015ee4ede",
+    "dirty_path_manifest_sha256": "1bb075e50a41be74a6110474cadc6e048d1a7e0ba373aedf14e1479cfdede638",
+    "source_tree_hash": "4e6dadd27c2601ee9a3f7abe1c9fe2a68ff0ac423b78373e4b217a6ad5f2a838",
+    "inventory_hash": "ed135a864893cde2a444577b62acd29af6d021dd3d34ef5d2c942caa767f4d1e",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -62,12 +53,12 @@
   "adjudication": {
     "schema_version": "ce-upstream-adjudication/v1",
     "join_key": "path+upstream+target-source",
-    "artifact_sha256": "c478d66b5adcf513808d6f411806ede8840b2154511ec3774508b369888d2a49",
+    "artifact_sha256": "30a31d610f9c0912e37024cc1de06405565de22e855459778f35c6fea726124c",
     "producer": {
       "kind": "llm-adjudication",
       "model": "codex-current-session",
-      "status": "confirmed",
-      "adjudication_scope": "reconfirmed all 517 owner/action/unit/limitation decisions against the current deterministic input after formatting-only review-plan cleanup and a concurrent changelog-only update; the deterministic 517-record digest remains unchanged, no upstream join or semantic ownership map changed, and no provider, runtime-adoption, or field-outcome claim is made"
+      "status": "degraded",
+      "adjudication_scope": "Current-source carry-over with fresh source/ref/owner/test reachability verification at pinned upstream range; semantic decisions retained only where current local and upstream references remain valid; no live behavior claim."
     }
   },
   "records": [
@@ -378,7 +369,7 @@
       "old_path": ".compound-engineering/config.local.example.yaml",
       "group_id": "G06",
       "package_id": null,
-      "surface": "metadata-governance",
+      "surface": "support",
       "role": "config-rename-evidence",
       "canonical_owner": "scripts/check-ce-upstream-reconciliation.cjs",
       "implementation_unit": "U8",

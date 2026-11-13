@@ -1,0 +1,20 @@
+{
+  "id": "CEOPT-32-supplement",
+  "created_at": "2026-10-30T07:38:03.385390+00:00",
+  "status": "frozen-before-any-CEOPT-32-model-trial",
+  "parent_packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/CEOPT-32-packet.json",
+  "parent_packet_sha256": "54851e65480ede503771113f22d60fe300d6139012b3195bfe64d36e6e9619e3",
+  "arm_receipts": {
+    "A": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/worktree-supplement-A-receipts.json",
+      "sha256": "d4678409e4932e98fa7f56047bd18c9f52472d0a00bf6f8966b1e101746a28ee"
+    },
+    "B": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/worktree-supplement-B-receipts.json",
+      "sha256": "9da592d1e94cb61344ea270a14cecbcc4a3d82c286f17c381a7fc0b4f8b696b9"
+    }
+  },
+  "interpretation": "Measure exact feature/new target for create ancestor cases, plus caller status/refs/gitignore deltas; original wrong-target measurements remain retained.",
+  "source_revision": "Original A/B unchanged",
+  "effect_scope": "Local helpers with explicitly described mocks/disposable storage; no external operation."
+}

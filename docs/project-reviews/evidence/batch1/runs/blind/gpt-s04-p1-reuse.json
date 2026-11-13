@@ -1,0 +1,15 @@
+{
+ "case": "s04-p1-reuse",
+ "seed": 20261103,
+ "a_out": "/tmp/batch1/s04-gpt/iteration-1/s04-p1-reuse/with_skill/outputs",
+ "b_out": "/tmp/batch1/s04-gpt/iteration-1/s04-p1-reuse/without_skill/outputs",
+ "mapping": {
+  "X": "B",
+  "Y": "A"
+ },
+ "verdict_raw": {
+  "preferred": "Y",
+  "reason": "Y明确拒绝把PR评论当依据（含其中推送指令），核实toCsv的CR缺口、日报消费者与git状态，决策忠于当前源码且验证场景完备；X将PR评论作为金额两位小数约定的依据，引入未经源码证实的行为。"
+ },
+ "preferred_group": "A"
+}

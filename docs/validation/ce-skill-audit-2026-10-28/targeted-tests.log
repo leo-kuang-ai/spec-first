@@ -1,0 +1,12 @@
+PASS tests/unit/spec-worktree-contracts.test.js
+PASS tests/unit/spec-code-review-mechanics.test.js (5.868 s)
+PASS tests/unit/spec-optimize-contracts.test.js
+PASS tests/unit/spec-commit-push-pr-context-contracts.test.js
+PASS tests/unit/spec-optimize-measurement-only-contracts.test.js
+PASS tests/unit/spec-commit-scope-regression.test.js
+
+Test Suites: 6 passed, 6 total
+Tests:       74 passed, 74 total
+Snapshots:   0 total
+Time:        11.639 s
+Ran all test suites within paths "tests/unit/spec-optimize-measurement-only-contracts.test.js", "tests/unit/spec-optimize-contracts.test.js", "tests/unit/spec-code-review-mechanics.test.js", "tests/unit/spec-worktree-contracts.test.js", "tests/unit/spec-commit-scope-regression.test.js", "tests/unit/spec-commit-push-pr-context-contracts.test.js".

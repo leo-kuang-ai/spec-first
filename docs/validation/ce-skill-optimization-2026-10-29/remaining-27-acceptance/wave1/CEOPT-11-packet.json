@@ -1,0 +1,40 @@
+{
+  "id": "CEOPT-11",
+  "skill": "spec-explain",
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-11-request.txt",
+  "fixture_root": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain",
+  "fixture_files": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/README.md": "4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/package.json": "03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/src/server.js": "ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34"
+  },
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "trials_per_arm": 3,
+  "deadline_seconds": 300,
+  "execution_mode": "fresh-readonly-model-plus-parent-save",
+  "parent_recipe": "Save final response bytes unchanged as trials/<id>/artifact.md; no semantic edits. Inspect Markdown/source pointers and retain response/tool traces.",
+  "positive_facets": [
+    "Correct POST-data/end-parse-state mutation-response and GET exposure chain",
+    "Durable recoverable English teaching artifact after parent save",
+    "Source-grounded diagram and ownership explanation"
+  ],
+  "negative_facets": [
+    "Malformed JSON failure not invented as handled",
+    "Missing cancellation/recovery branches stay unknown or explicitly source-limited",
+    "Original rationale not asserted from code alone",
+    "No invented tests or artifact-write claim"
+  ],
+  "grading": "Semantic source-grounded review, not keyword scoring. Judge all listed facets and recorded authority; mediated saving cannot prove autonomous destination behavior.",
+  "full_acceptance_limitations": [
+    "Autonomous scratch/destination/interaction fallback not executed.",
+    "Actual serving identity not authenticated.",
+    "Read-only trace observation is not host enforcement."
+  ]
+}

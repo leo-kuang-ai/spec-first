@@ -1,0 +1,12 @@
+{
+  "baseline": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/spec-plan",
+  "changed_files": [
+    "references/intake.md"
+  ],
+  "candidate_sha256": "820f86d1a35d7cee02fb1c0d099b2bdbeda70ed06c4f461cb22be89580bca700",
+  "cases": [
+    "product-blocker-prevents-readiness",
+    "what-unsettled-blocks-ready"
+  ],
+  "limit": "各一次，不自动重跑；不修改原始judge"
+}

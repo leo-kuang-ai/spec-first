@@ -1,0 +1,61 @@
+{
+  "skill_name": "autoresearch",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.322"
+  },
+  "start_time": "2026-11-12T15:04:03.467418+08:00",
+  "end_time": "2026-11-12T15:13:37.990133+08:00",
+  "case_results": [
+    {
+      "case_id": "dispatch-classic-mode",
+      "title": "Metric/Verify 输入应分发 classic 模式并打印 banner",
+      "status": "PASS",
+      "duration_ms": 574052,
+      "turns": 26,
+      "input_tokens": 50958,
+      "output_tokens": 4709,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 26,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/autoresearch/evals/fixtures/scripts/check-classic-banner.sh",
+            "passed": true,
+            "evidence": "PASS: classic banner appeared in assistant output before the first work tool call."
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（skill-up 评测框架说明：本仓库 .claude/skills/autoresearch/SKILL.md 是被测\nskill 的定义文件,已随仓库就位。本次运行不经过 Skill 工具调用——请先 diff 该文件\n与 source 真相源 skills/autoresearch/SKILL.md；不一致时以 source 为准并在开头\n报告一行 `tested_definition: \u003cruntime-mirror|source\u003e`。然后完整读取被测定义,\n把它视为已加载的工作指令,按它处理下面的输入。）\nMetric: passing test count\nVerify: npm test --silent 2\u003e\u00261 | tail -5\nIterations: 3\n把通过测试数提上去。\n",
+      "response": "tested_definition: runtime-mirror（source 真相源 `skills/autoresearch/SKILL.md` 在本仓库不存在，仅运行时镜像一份，无 diff 可做）\n\n---\n\n## 运行总结 — Classic 指标循环 `[autoresearch] mode: classic`\n\n| 项 | 值 |\n|---|---|\n| 总迭代 | 3 / 3（达到上限退出，status: BOUNDED） |\n| keep / discard / crash | 3 / 0 / 0 |\n| 指标（通过测试数） | **0 → 37**（`# tests 37, # pass 37, # fail 0`，冻结 Verify 连续两次复核稳定） |\n| 基线 | 0（仓库原本无 `package.json`，`npm test` 零输出、exit 254，原始输出已留存） |\n\n**各迭代贡献（全部 keep，候选未提交）：**\n1. **0 → 12**：脚手架（package.json + `scripts/run-tests.sh`）+ `src/stats.js`（sum/mean/median/percentile，空输入显式抛错、不改调用方数组、p50↔median 交叉验证）+ 12 个行为测试。\n2. **12 → 25**：`src/strings.js`（slugify NFKD 去变音符/truncate/toCamelCase/titleCase）+ 13 个测试。中途修了两个真缺陷：正则字面量语法错、`truncate` 多字符后缀超出预算的 bug（`repeat`→`slice`）；一处误标定的期望按 lodash 式标准契约校正，断言净增强。\n3. **25 → 37**：`src/collections.js`（chunk/unique(SameValueZero)/groupBy/可注入 RNG 的 Fisher–Yates shuffle）+ 12 个测试，含确定性洗牌、排列性质、非突变断言。\n\n**协议要点留痕：**\n- **测量修复（迭代前）**：node:test 的 `# pass` 位于 TAP 倒数第 6 行，会被 `tail -5` 切除——测试入口脚本末尾从真实 TAP 输出 grep 提取统计行重印（非硬编码，退出码透传），使真实通过数可经冻结信道读取。\n- **作弊路径已拒绝**：无 echo 假计数、无空断言测试、无删除/弱化失败测试；每个通过计数对应真实代码上的真实行为断言。\n- **局限**：未配 Guard；无留出集与噪声标定（结尾双次复核仅作稳定性确认）；基线为 0，相对增益百分比无定义，只报绝对增量 +37。\n- **Git 所有权**：候选全部保持未提交；既有未跟踪文件（`.claude/`、`README.md`）原样未动。\n\n日志与交付物在 `autoresearch/autoresearch-261112-1508-16c1/`（`results.tsv`、`handoff.json`）。无 `--chain`，流程到此结束；未做任何提交/推送（ship 类操作永不自动批准）。",
+      "observed_version": "2.1.322"
+    }
+  ],
+  "total_tokens": 55667,
+  "judge_tokens": 0,
+  "overall_tokens": 55667
+}

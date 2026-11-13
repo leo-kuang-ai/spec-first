@@ -1,0 +1,25 @@
+{
+  "artifact_type": "confirmed",
+  "scope": "Planning structure and identity checks only; no trials executed.",
+  "plan": "docs/plans/2026-10-30-001-test-remaining-27-ce-skill-acceptance-plan.md",
+  "plan_sha256": "60a013b36bdb2e58b68cc0c6d4124509d90b8ecaccc363ad4da99c122956908f",
+  "remaining_count": 27,
+  "wave_counts": {
+    "W1": 7,
+    "W2": 4,
+    "W3": 3,
+    "W4": 3,
+    "W5": 4,
+    "W6": 6
+  },
+  "planned_trial_slots": 162,
+  "checks": {
+    "exact_remaining_id_skill_match": "passed",
+    "all_reuse_paths_exist": "passed",
+    "english_prose": "passed",
+    "required_sections_six_units": "passed",
+    "original_plan_and_scenarios_unchanged": "passed",
+    "independent_bounded_review": "approved-no-findings",
+    "whitespace": "passed"
+  }
+}

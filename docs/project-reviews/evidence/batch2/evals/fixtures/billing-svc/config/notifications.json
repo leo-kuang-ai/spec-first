@@ -1,0 +1,6 @@
+{
+  "rules": [
+    { "when": "invoice.status=paid", "notify": "finance@internal" },
+    { "when": "invoice.status=refunded", "notify": "support@internal" }
+  ]
+}

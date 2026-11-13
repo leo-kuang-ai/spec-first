@@ -1,0 +1,4 @@
+baseline 7638e6161023e0f90ab91c7a6c6df00aa6e544b8
+RED: 两处相同输入触发缺失lines的reduce异常
+PARTIAL: 原入口通过，唯一同根位置tax仍失败
+GREEN: 两处缺失输入及正常计算均通过；仅证明合成fixture的覆盖判据

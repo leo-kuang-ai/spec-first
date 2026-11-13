@@ -1,0 +1,103 @@
+{
+  "files": [
+    {
+      "source": "/private/tmp/plan-tool-boundary-20261105/runs/baseline/iteration-1/result.json",
+      "archive": "results/baseline/result.json",
+      "sha256": "e98fc78b9236bea5229a3f4d46957610250123d7d03321ac6954dff183433d4f"
+    },
+    {
+      "source": "/private/tmp/plan-tool-boundary-20261105/runs/baseline/iteration-1/implementation-routes-work/with_skill/grading.json",
+      "archive": "results/baseline/implementation-routes-work/grading.json",
+      "sha256": "2ee476958eb6cac56673e8638bed3d449e6bddebf14120c08d2c99b292fe8625"
+    },
+    {
+      "source": "/private/tmp/plan-tool-boundary-20261105/runs/baseline/iteration-1/implementation-routes-work/with_skill/outputs/response.md",
+      "archive": "results/baseline/implementation-routes-work/response.md",
+      "sha256": "d97c3d281a89a125bed249de486fb4b95687d07a7ab64165bc6adc87d1a26637"
+    },
+    {
+      "source": "/private/tmp/plan-tool-boundary-20261105/runs/baseline/iteration-1/implementation-routes-work/with_skill/outputs/agent/run/3eca939a-1af1-4474-82fe-2dc432921834.jsonl",
+      "archive": "results/baseline/implementation-routes-work/transcript.jsonl",
+      "sha256": "01f635609d057e752e67c4d1a22f62b743a3b66328087bf418ec3616de28085e"
+    },
+    {
+      "source": "/private/tmp/plan-tool-boundary-20261105/runs/baseline/iteration-1/implementation-routes-work/with_skill/outputs/agent/run/3eca939a-1af1-4474-82fe-2dc432921834.jsonl#last-plan-Write-input",
+      "archive": "results/baseline/implementation-routes-work/plan-write-request.md",
+      "sha256": "e9261b6cc3cb9c445b488e5e507f54b58bf1f75ef97f679c88b3a1d6138c3d86",
+      "kind": "tool_input_not_final_artifact"
+    },
+    {
+      "source": "/private/tmp/plan-tool-boundary-20261105/runs/baseline/iteration-1/implementation-owner-not-authorized/with_skill/grading.json",
+      "archive": "results/baseline/implementation-owner-not-authorized/grading.json",
+      "sha256": "6b092f9220f5a71ffb6dba39af768960d8e631c361584aa10efd9d2ff7014459"
+    },
+    {
+      "source": "/private/tmp/plan-tool-boundary-20261105/runs/baseline/iteration-1/implementation-owner-not-authorized/with_skill/outputs/response.md",
+      "archive": "results/baseline/implementation-owner-not-authorized/response.md",
+      "sha256": "b7566470d3a2326c48d80565d75cf911c5b197c2a8f172e57af64660256ea5a6"
+    },
+    {
+      "source": "/private/tmp/plan-tool-boundary-20261105/runs/baseline/iteration-1/implementation-owner-not-authorized/with_skill/outputs/agent/run/b4b59444-50ba-4252-800a-cf22fd5b437e.jsonl",
+      "archive": "results/baseline/implementation-owner-not-authorized/transcript.jsonl",
+      "sha256": "de3639574a30c9441905186d992190ed61204da05dabb1116b23fe02b0eed494"
+    },
+    {
+      "source": "/private/tmp/plan-tool-boundary-20261105/runs/baseline/iteration-1/implementation-owner-not-authorized/with_skill/outputs/agent/run/b4b59444-50ba-4252-800a-cf22fd5b437e.jsonl#last-plan-Write-input",
+      "archive": "results/baseline/implementation-owner-not-authorized/plan-write-request.md",
+      "sha256": "aaf2079400d834250f7d90b15ac1d5447953ff35cecd302973a4fd638fe91df8",
+      "kind": "tool_input_not_final_artifact"
+    },
+    {
+      "source": "/private/tmp/plan-tool-boundary-20261105/runs/candidate/iteration-1/result.json",
+      "archive": "results/candidate/result.json",
+      "sha256": "8b2e3310ee6797264d80b9dd9698df31e240946b929787240eff88976ad8c781"
+    },
+    {
+      "source": "/private/tmp/plan-tool-boundary-20261105/runs/candidate/iteration-1/implementation-routes-work/with_skill/grading.json",
+      "archive": "results/candidate/implementation-routes-work/grading.json",
+      "sha256": "35f7a90da96dff462abbe27232c493cca7d60645e2e2e970e322651b7c29213f"
+    },
+    {
+      "source": "/private/tmp/plan-tool-boundary-20261105/runs/candidate/iteration-1/implementation-routes-work/with_skill/outputs/response.md",
+      "archive": "results/candidate/implementation-routes-work/response.md",
+      "sha256": "7730e8c7ccf42a41bdbfba07630cdc51380631155a9f3f48edb6b19d22b67941"
+    },
+    {
+      "source": "/private/tmp/plan-tool-boundary-20261105/runs/candidate/iteration-1/implementation-routes-work/with_skill/outputs/agent/run/89faf5d9-9015-4773-ab3f-b01127a7994f.jsonl",
+      "archive": "results/candidate/implementation-routes-work/transcript.jsonl",
+      "sha256": "b6f154f75b6bee245f1ab4563fc1df05dbd2f44a4db04e1b53da8d5c4b8dbe9f"
+    },
+    {
+      "source": "/private/tmp/plan-tool-boundary-20261105/runs/candidate/iteration-1/implementation-routes-work/with_skill/outputs/agent/run/89faf5d9-9015-4773-ab3f-b01127a7994f.jsonl#last-plan-Write-input",
+      "archive": "results/candidate/implementation-routes-work/plan-write-request.md",
+      "sha256": "df9978b8a2f3ef736f529fa6ab9c5e09ee553ebb8098c4cafeaeb823d10bee9f",
+      "kind": "tool_input_not_final_artifact"
+    },
+    {
+      "source": "/private/tmp/plan-tool-boundary-20261105/runs/candidate/iteration-1/implementation-owner-not-authorized/with_skill/grading.json",
+      "archive": "results/candidate/implementation-owner-not-authorized/grading.json",
+      "sha256": "201d2b6284eb4452550232a43d6dd77058b11e646c92d25e52781d7aaab437db"
+    },
+    {
+      "source": "/private/tmp/plan-tool-boundary-20261105/runs/candidate/iteration-1/implementation-owner-not-authorized/with_skill/outputs/response.md",
+      "archive": "results/candidate/implementation-owner-not-authorized/response.md",
+      "sha256": "06d71ab74bc7dedf64fe181060643a2b73575adf8bee7fb9faab8df674a59d8f"
+    },
+    {
+      "source": "/private/tmp/plan-tool-boundary-20261105/runs/candidate/iteration-1/implementation-owner-not-authorized/with_skill/outputs/agent/run/a9d25c7c-258e-4d45-970e-a782fa545ac1.jsonl",
+      "archive": "results/candidate/implementation-owner-not-authorized/transcript.jsonl",
+      "sha256": "24d150a0afa5ba3bce9a0bf771b897a8fce67fc0a8482c1a3fffa0ce28e64f88"
+    },
+    {
+      "source": "/private/tmp/plan-tool-boundary-20261105/runs/candidate/iteration-1/implementation-owner-not-authorized/with_skill/outputs/agent/run/a9d25c7c-258e-4d45-970e-a782fa545ac1.jsonl#last-plan-Write-input",
+      "archive": "results/candidate/implementation-owner-not-authorized/plan-write-request.md",
+      "sha256": "4d15036d9cf13346297c565d6907d4820268c8c21af3492ce888a3e4ec000c43",
+      "kind": "tool_input_not_final_artifact"
+    },
+    {
+      "source": "/private/tmp/claude-501/-Users-kuang-xiaobu-spec-first/5d43189d-945c-4cd5-9a03-8a20f89bfd94/tasks/biz89fns6.output",
+      "archive": "results/runner.log",
+      "sha256": "8d7cd132f065fa0370a47fb7167876da7524a68f1b3fccf346eec2860138a6a1"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "status": "blocked",
+  "host": null,
+  "candidates": [
+    "claude"
+  ],
+  "authority_source": "MCP_SETUP_HOST+loaded-skill-root",
+  "mutation_authorized": false,
+  "reason_code": "host-invocation-surface-unverified",
+  "invocation_receipt": {
+    "schema_version": "host-invocation-receipt/v1",
+    "producer": "skills/spec-runtime-setup/scripts/setup.cjs",
+    "verification_status": "unverified",
+    "reason_code": "host-invocation-surface-unverified",
+    "host": "claude",
+    "loaded_host": null,
+    "surface_hosts": [],
+    "surface_id": null,
+    "skill_root": "/Users/kuang/xiaobu/spec-first/skills/spec-runtime-setup",
+    "canonical_entry_name": "spec-runtime-setup",
+    "target_identity": "/private/tmp/s00-det.LSlX/proj",
+    "issued_at": "2026-11-01T08:22:39.100Z",
+    "freshness_expires_at": "2026-11-01T08:27:39.100Z",
+    "enforcement_status": "loaded-root-unverified",
+    "receipt_sha256": "853a2eb6670533b0957ffc766d9cedd9329f613ad1dbcdfe779a02896a4156cf"
+  }
+}

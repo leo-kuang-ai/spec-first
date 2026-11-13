@@ -1,0 +1,342 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "s5-historical-plan-20260908",
+  "producer": "当前 Codex owner，结合 fresh_f13_review 只读审查与修订回源结果",
+  "reviewed_at": "2026-09-08T07:09:30.252Z",
+  "source_binding": {
+    "head": "b557f8bc6f884f0fef460108e6279b31227c50fb",
+    "dirty_path_manifest_sha256": "ee10d0f99c95176a9651745bf9b44786ba00393e57769ade67a732b928a91d72",
+    "source_tree_hash": "6db652f516feb0cab9a7fdfeff1982d3cba813baf5b6a0a01b5ffe3034446b8a",
+    "inventory_hash": "34ff47158f6923701242dd88f5fb8984949e7369e7b133e872eb6295579bd326",
+    "inventory_artifact_sha256": "77b1095a9386d3d433bc2dc43f06c7cefccfd3be9d16b287fa66855827ea99bb",
+    "review_input_hash": "62960dcdb9d55024f7223cc605d014c946ac42e217c976a8f1f9a78cf893489f"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "unverified",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "reviewed_paths": [
+    {
+      "path": "skills/spec-plan/evals/examples.json",
+      "skill_ids": [
+        "spec-plan"
+      ],
+      "sha256": "1d12ae88324e1899f335b3c18d5172cb14fc7cf82b3a6c8f5e1611b9212543a7",
+      "bytes": 20608,
+      "line_count": 295,
+      "covered_line_ranges": [
+        [
+          1,
+          295
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fresh_f13_review 完整读取当前源文件；初审发现任务包 validate 失败提前截断接续，已在 Fallback/第 1 节修复并限定测试位置，最终回源审查通过。当前 owner 复核 producer/consumer 差量，保留旧历史与 pins、只读及授权边界。"
+          ],
+          "limitations": [
+            "双 lens 为审查维度，不是两个 provider；此收据为 owner 内联综合，独立 reviewer 的最终结论作为输入；不代表模型执行或主宿主旅程。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fresh_f13_review 完整读取当前源文件；初审发现任务包 validate 失败提前截断接续，已在 Fallback/第 1 节修复并限定测试位置，最终回源审查通过。当前 owner 复核 producer/consumer 差量，保留旧历史与 pins、只读及授权边界。"
+          ],
+          "limitations": [
+            "双 lens 为审查维度，不是两个 provider；此收据为 owner 内联综合，独立 reviewer 的最终结论作为输入；不代表模型执行或主宿主旅程。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-plan/references/plan-sections.md",
+      "skill_ids": [
+        "spec-plan"
+      ],
+      "sha256": "6de6fef4ac1dff9c585eac9e4fd2da1974166b1576bff9fba16c33efcfd66ad0",
+      "bytes": 26084,
+      "line_count": 456,
+      "covered_line_ranges": [
+        [
+          1,
+          456
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fresh_f13_review 完整读取当前源文件；初审发现任务包 validate 失败提前截断接续，已在 Fallback/第 1 节修复并限定测试位置，最终回源审查通过。当前 owner 复核 producer/consumer 差量，保留旧历史与 pins、只读及授权边界。"
+          ],
+          "limitations": [
+            "双 lens 为审查维度，不是两个 provider；此收据为 owner 内联综合，独立 reviewer 的最终结论作为输入；不代表模型执行或主宿主旅程。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fresh_f13_review 完整读取当前源文件；初审发现任务包 validate 失败提前截断接续，已在 Fallback/第 1 节修复并限定测试位置，最终回源审查通过。当前 owner 复核 producer/consumer 差量，保留旧历史与 pins、只读及授权边界。"
+          ],
+          "limitations": [
+            "双 lens 为审查维度，不是两个 provider；此收据为 owner 内联综合，独立 reviewer 的最终结论作为输入；不代表模型执行或主宿主旅程。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-plan/SKILL.md",
+      "skill_ids": [
+        "spec-plan"
+      ],
+      "sha256": "ded9ff7fe82f7645ca9fdf62c53cdc6d47378458b774f36906eef6bddfeb1f82",
+      "bytes": 111540,
+      "line_count": 849,
+      "covered_line_ranges": [
+        [
+          1,
+          849
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fresh_f13_review 完整读取当前源文件；初审发现任务包 validate 失败提前截断接续，已在 Fallback/第 1 节修复并限定测试位置，最终回源审查通过。当前 owner 复核 producer/consumer 差量，保留旧历史与 pins、只读及授权边界。"
+          ],
+          "limitations": [
+            "双 lens 为审查维度，不是两个 provider；此收据为 owner 内联综合，独立 reviewer 的最终结论作为输入；不代表模型执行或主宿主旅程。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fresh_f13_review 完整读取当前源文件；初审发现任务包 validate 失败提前截断接续，已在 Fallback/第 1 节修复并限定测试位置，最终回源审查通过。当前 owner 复核 producer/consumer 差量，保留旧历史与 pins、只读及授权边界。"
+          ],
+          "limitations": [
+            "双 lens 为审查维度，不是两个 provider；此收据为 owner 内联综合，独立 reviewer 的最终结论作为输入；不代表模型执行或主宿主旅程。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/spec-plan-contracts.test.js",
+      "skill_ids": [
+        "spec-plan"
+      ],
+      "sha256": "3aa95d81e336044cf4ceaba413933f51e27617bb3ec58f1d7b98ec4b82725851",
+      "bytes": 12172,
+      "line_count": 229,
+      "covered_line_ranges": [
+        [
+          1,
+          229
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fresh_f13_review 完整读取当前源文件；初审发现任务包 validate 失败提前截断接续，已在 Fallback/第 1 节修复并限定测试位置，最终回源审查通过。当前 owner 复核 producer/consumer 差量，保留旧历史与 pins、只读及授权边界。"
+          ],
+          "limitations": [
+            "双 lens 为审查维度，不是两个 provider；此收据为 owner 内联综合，独立 reviewer 的最终结论作为输入；不代表模型执行或主宿主旅程。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fresh_f13_review 完整读取当前源文件；初审发现任务包 validate 失败提前截断接续，已在 Fallback/第 1 节修复并限定测试位置，最终回源审查通过。当前 owner 复核 producer/consumer 差量，保留旧历史与 pins、只读及授权边界。"
+          ],
+          "limitations": [
+            "双 lens 为审查维度，不是两个 provider；此收据为 owner 内联综合，独立 reviewer 的最终结论作为输入；不代表模型执行或主宿主旅程。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-work/references/work-intake-and-task-pack.md",
+      "skill_ids": [
+        "spec-work"
+      ],
+      "sha256": "57db393caa33fd44d5f7fe27c762758fe1d4ee42207aa1e806bbe5702bb54303",
+      "bytes": 14806,
+      "line_count": 199,
+      "covered_line_ranges": [
+        [
+          1,
+          199
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fresh_f13_review 完整读取当前源文件；初审发现任务包 validate 失败提前截断接续，已在 Fallback/第 1 节修复并限定测试位置，最终回源审查通过。当前 owner 复核 producer/consumer 差量，保留旧历史与 pins、只读及授权边界。"
+          ],
+          "limitations": [
+            "双 lens 为审查维度，不是两个 provider；此收据为 owner 内联综合，独立 reviewer 的最终结论作为输入；不代表模型执行或主宿主旅程。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fresh_f13_review 完整读取当前源文件；初审发现任务包 validate 失败提前截断接续，已在 Fallback/第 1 节修复并限定测试位置，最终回源审查通过。当前 owner 复核 producer/consumer 差量，保留旧历史与 pins、只读及授权边界。"
+          ],
+          "limitations": [
+            "双 lens 为审查维度，不是两个 provider；此收据为 owner 内联综合，独立 reviewer 的最终结论作为输入；不代表模型执行或主宿主旅程。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-work/SKILL.md",
+      "skill_ids": [
+        "spec-work"
+      ],
+      "sha256": "b1ce9ee065125b59fc9d7f346dc05e69d3611a5d2b6806ba4f2d2624d0d135bf",
+      "bytes": 38609,
+      "line_count": 296,
+      "covered_line_ranges": [
+        [
+          1,
+          296
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fresh_f13_review 完整读取当前源文件；初审发现任务包 validate 失败提前截断接续，已在 Fallback/第 1 节修复并限定测试位置，最终回源审查通过。当前 owner 复核 producer/consumer 差量，保留旧历史与 pins、只读及授权边界。"
+          ],
+          "limitations": [
+            "双 lens 为审查维度，不是两个 provider；此收据为 owner 内联综合，独立 reviewer 的最终结论作为输入；不代表模型执行或主宿主旅程。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fresh_f13_review 完整读取当前源文件；初审发现任务包 validate 失败提前截断接续，已在 Fallback/第 1 节修复并限定测试位置，最终回源审查通过。当前 owner 复核 producer/consumer 差量，保留旧历史与 pins、只读及授权边界。"
+          ],
+          "limitations": [
+            "双 lens 为审查维度，不是两个 provider；此收据为 owner 内联综合，独立 reviewer 的最终结论作为输入；不代表模型执行或主宿主旅程。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/spec-work-contracts.test.js",
+      "skill_ids": [
+        "spec-work",
+        "spec-write-tasks"
+      ],
+      "sha256": "32a584ba5d5a3769ada91b3f550874b469459011634b6ad0aca5a66488a2ab01",
+      "bytes": 7412,
+      "line_count": 131,
+      "covered_line_ranges": [
+        [
+          1,
+          131
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fresh_f13_review 完整读取当前源文件；初审发现任务包 validate 失败提前截断接续，已在 Fallback/第 1 节修复并限定测试位置，最终回源审查通过。当前 owner 复核 producer/consumer 差量，保留旧历史与 pins、只读及授权边界。"
+          ],
+          "limitations": [
+            "双 lens 为审查维度，不是两个 provider；此收据为 owner 内联综合，独立 reviewer 的最终结论作为输入；不代表模型执行或主宿主旅程。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fresh_f13_review 完整读取当前源文件；初审发现任务包 validate 失败提前截断接续，已在 Fallback/第 1 节修复并限定测试位置，最终回源审查通过。当前 owner 复核 producer/consumer 差量，保留旧历史与 pins、只读及授权边界。"
+          ],
+          "limitations": [
+            "双 lens 为审查维度，不是两个 provider；此收据为 owner 内联综合，独立 reviewer 的最终结论作为输入；不代表模型执行或主宿主旅程。"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-write-tasks/SKILL.md",
+      "skill_ids": [
+        "spec-write-tasks"
+      ],
+      "sha256": "ad4decabc11124b24bfe45b850ba1f4e959f86340159bb5ebdbd90bc8e04c8e2",
+      "bytes": 10639,
+      "line_count": 141,
+      "covered_line_ranges": [
+        [
+          1,
+          141
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fresh_f13_review 完整读取当前源文件；初审发现任务包 validate 失败提前截断接续，已在 Fallback/第 1 节修复并限定测试位置，最终回源审查通过。当前 owner 复核 producer/consumer 差量，保留旧历史与 pins、只读及授权边界。"
+          ],
+          "limitations": [
+            "双 lens 为审查维度，不是两个 provider；此收据为 owner 内联综合，独立 reviewer 的最终结论作为输入；不代表模型执行或主宿主旅程。"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "fresh_f13_review 完整读取当前源文件；初审发现任务包 validate 失败提前截断接续，已在 Fallback/第 1 节修复并限定测试位置，最终回源审查通过。当前 owner 复核 producer/consumer 差量，保留旧历史与 pins、只读及授权边界。"
+          ],
+          "limitations": [
+            "双 lens 为审查维度，不是两个 provider；此收据为 owner 内联综合，独立 reviewer 的最终结论作为输入；不代表模型执行或主宿主旅程。"
+          ]
+        }
+      ]
+    }
+  ],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "仅 F13 八文件九关系差量；独立 reviewer 初审 concerns、修复后 passed，未执行 human/judge agreement、模型行为、宿主旅程。"
+  ],
+  "claim_ceiling": "F13 源码差量审查收据；本地确定性回归 9 suites / 90 tests exit 0。"
+}

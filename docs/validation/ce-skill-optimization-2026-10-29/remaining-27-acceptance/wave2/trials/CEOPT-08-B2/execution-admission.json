@@ -1,0 +1,7 @@
+{
+  "trial": "CEOPT-08-B2",
+  "approved_for_disposable_execution": true,
+  "candidate_sha256": "385e5f596701ee5ed2829c179a02de851688459fa7ede0fc394776f668643052",
+  "at": "2026-10-30T08:46:46.056442+00:00",
+  "review": "Parent read full candidate: only perf_hooks import, fixed deterministic array/Map aggregation and stdout. No file/network/subprocess access. Ordered entry mapping, fields, timer and checksum preserved. Model verification commands are not executed; frozen parent proof owns execution."
+}

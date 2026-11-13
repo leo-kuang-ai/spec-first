@@ -1,0 +1,12 @@
+{
+  "runner_completed": false,
+  "baseline_started": false,
+  "oracle_exit": 0,
+  "usage_message_id_deduplicated": {
+    "input_tokens": 58107,
+    "output_tokens": 19064,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1394624
+  },
+  "limitation": "Runner interrupted; final text exists but is not a verification receipt. Global installed spec-first used; compare environment before A/B claims."
+}

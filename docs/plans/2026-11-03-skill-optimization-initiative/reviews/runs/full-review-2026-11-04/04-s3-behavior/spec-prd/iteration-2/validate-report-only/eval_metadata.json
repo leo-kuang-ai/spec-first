@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "Readiness validation preserves the complete PRD bytes",
+  "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nThat preparation alone may create the baseline commit; no task commit or landing is authorized.\nUse spec-prd to validate planning readiness of docs/brainstorms/2026-09-01-expense-export-requirements.md. Return a report only; do not change the file.\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-prd/evals/fixtures/scripts/check-validate-report-only.sh"
+  ]
+}

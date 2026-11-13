@@ -1,0 +1,10 @@
+{
+  "session_id": "01a1918f-c0bd-79d0-b78b-c430c1c855a1",
+  "agent_path": "/root/ce27_18_reviewer",
+  "review_sha256": "3d8a0c1f87a321d0aecb939a19f993ea0ee155d494ce3c24586e6cd9f3bb5f36",
+  "trace_sha256": "4b64cd0f351c62f4e1331317c5ef1db3598d0b1d2afffa169a6499d70361a32a",
+  "intervention": "Parsed final JSON without semantic edits; original final response retained in full trace.",
+  "limitations": [
+    "Independent context, not independently authenticated model identity or enforced read-only isolation."
+  ]
+}

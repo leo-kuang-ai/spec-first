@@ -1,0 +1,447 @@
+{
+  "scenario_id": "CEOPT-23",
+  "review_type": "independent-read-only-full-block-review",
+  "scope": {
+    "trials": [
+      "A1",
+      "B1",
+      "B2",
+      "A2",
+      "A3",
+      "B3"
+    ],
+    "coverage": "All six artifact.md files, all six receipt.json files, and every record of all six complete stored tool-events.json files; no trial sampling.",
+    "additional_sources": [
+      "Frozen A/B spec-resolve-pr-feedback SKILL.md, references, resolver prompt and bundled helpers",
+      "Exact skill-filtered intake source pins and CEOPT-23-filtered trial-index entries",
+      "CEOPT-23 packet, supplement, request and pr-recovery-fixture.json",
+      "Original and supplemental A/B publication receipts and supplemental reproduction",
+      "prepare-pr-feedback.cjs and verify-pr-feedback-supplement.cjs",
+      "Current POV prose successor, verification record, frozen B reference and complete current/frozen B adapter"
+    ],
+    "execution": "File reads and pure JSON/hash/timestamp analysis only. No helpers, tests, repository scripts, providers, network operations, mutations, delegation or new trials were executed."
+  },
+  "overall": {
+    "local_interpretation_acceptance": "passed-all-six",
+    "full_operational_acceptance": "partial",
+    "A_B_model_superiority": "not-established",
+    "summary": "Every trial correctly covers its supplied helper cases, all three feedback items and all three interrupted-reply branches. A safely handles absent helper capability; B interprets additional mock-backed publication-helper evidence. This establishes bounded interpretation and mechanism evidence, not autonomous remediation, authenticated hosted operation, publication, visible communication or resolved threads.",
+    "verified_actual_remote_resolutions": 0
+  },
+  "integrity": {
+    "packet_sha256": "3ba4a8b9810d2b737d3133809c3a9d0df5e87458641a44d4b28dc415d38c8eaa",
+    "supplement_sha256": "b80a230e501bb0ba7bb96c2a783315d94d0514218c39cbbf6e777e0088cf521c",
+    "request_matches_packet_pin": true,
+    "fixture_matches_packet_pin": true,
+    "original_arm_receipts_match_packet_pins": true,
+    "supplement_parent_packet_pin_matches": true,
+    "supplement_arm_receipts_match_pins": true,
+    "frozen_skill_intake_pins": {
+      "A": "11/11 match",
+      "B": "12/12 match"
+    },
+    "B_publication_helper_sha256": "11b0320a5fc769e06dbbcc7f1df12d70a1816c0b5aad9968dfcb11dad4246ca2",
+    "B_receipt_and_reproduction_helper_hashes_match_source": true,
+    "A_publication_helper": "Absent; null helper source hash is consistent with the frozen package.",
+    "all_six_artifact_hashes_match": true,
+    "all_six_complete_stored_trace_hashes_match": true,
+    "all_six_receipts_equal_filtered_trial_index_entries": true,
+    "all_trace_call_output_pairs_match": true,
+    "all_trace_timestamps_within_receipt_windows": true,
+    "observed_order": [
+      "A1",
+      "B1",
+      "B2",
+      "A2",
+      "A3",
+      "B3"
+    ],
+    "order_matches_packet": true,
+    "supplement_chronology": "Its recorded 2026-10-30 creation and reproduction precede all six recorded 2026-10-31 model trials. These are recorded timestamps, not authenticated provenance.",
+    "metadata_caveat": "The packet still says prepared-not-executed and receipts say executed-awaiting-review. Neither field independently establishes acceptance."
+  },
+  "shared_case_judgments": {
+    "A_original": {
+      "judgment": "capability-absent",
+      "meaning": "No publication helper execution is demonstrated. This is neither a missing-file task failure nor successful helper coverage."
+    },
+    "A_supplement": {
+      "judgment": "capability-absent-with-consistent-synthetic-input",
+      "meaning": "The input describes behind with the head as merge base; its modeled head does not contain the fix. The A result remains capability-absent with zero calls."
+    },
+    "B_published": {
+      "judgment": "passes-mocked-publication-predicate",
+      "meaning": "ahead plus merge base equal to the exact fix SHA satisfies the helper predicate for the supplied Enterprise/fork identity. It proves no real publication or other completion condition."
+    },
+    "B_original_unpublished": {
+      "judgment": "rejection-only",
+      "meaning": "The helper rejects. behind combined with merge base equal to the fix SHA is contradictory ancestry input for the stated comparison; it is not a coherent Git graph or proof of actual nonpublication."
+    },
+    "B_wrong_head_repository": {
+      "judgment": "identity-rejected",
+      "meaning": "Expected fork/project but observed other/project; publication-pr-identity-changed follows the base PR read and prevents comparison."
+    },
+    "B_provider_unavailable": {
+      "judgment": "publication-unknown",
+      "meaning": "publication-read-unavailable proves neither publication nor absence."
+    },
+    "B_consistent_supplement": {
+      "judgment": "consistent-mocked-nonpublication",
+      "meaning": "behind with head SHA as merge base consistently models a head not containing the fix; fix-not-proven-reachable is appropriate."
+    },
+    "T-fixed": {
+      "judgment": "fixture-reported-fixed-locally-publication-unknown",
+      "remaining": "Actual local delta, source validation, required checks, authoritative current PR/head identity and exact-SHA reachability are unproven. No repeated fix, substitute SHA, repaired-remote claim or resolution is justified."
+    },
+    "T-declined": {
+      "judgment": "declined-reply-only",
+      "remaining": "The fixture supplies the settled-policy premise; real policy/source validation remains unavailable. No code dependency, invented fix SHA, commit, push or publication requirement applies. Reply recovery and resolution remain separate authorized exits."
+    },
+    "T-human": {
+      "judgment": "needs-human-leave-open",
+      "remaining": "The compatibility owner must decide persisted-key compatibility versus rename. Original reviewer quotation, authoritative fetched thread identity and owned-thread URL are missing; a production-complete typed residual cannot be manufactured."
+    },
+    "reply_present": {
+      "judgment": "preserve-id-no-duplicate-post",
+      "remaining": "reply-fixture-1 and exact-body presence do not prove correct source/author/PR association, URL identity, current relevance, visibility or submission. Verify these and pending-review state before any separately authorized resolution."
+    },
+    "reply_absent": {
+      "judgment": "completed-synthetic-read-reports-absence",
+      "remaining": "Unlike unavailable readback, this supports absence within the modeled branch. Actual scope, completeness, identity, freshness, pending-review state and reply authority must precede one future POST."
+    },
+    "reply_unavailable": {
+      "judgment": "acceptance-unknown-no-blind-retry",
+      "remaining": "Restore authoritative readback and reconcile the original attempt. Do not infer absence, duplicate the POST or resolve."
+    },
+    "target_identity": "The example.invalid/o/r fixture PR is distinct from github.enterprise.example/upstream/project with head fork/project:fix/review. Matching PR numbers and fix SHAs do not bind these targets."
+  },
+  "trials": [
+    {
+      "id": "CEOPT-23-A1",
+      "judgment": "pass-local-interpretation",
+      "helper_cases": {
+        "original_capability_absent": "correct",
+        "supplement_capability_absent_and_consistent_behind": "correct"
+      },
+      "feedback_items": {
+        "T-fixed": "Correctly preserves unverified local-fix assertion and pending publication.",
+        "T-declined": "Correctly retains decline without publication dependency.",
+        "T-human": "Correctly retains owner decision and explicitly incomplete residual."
+      },
+      "reply_branches": {
+        "present": "Correctly preserves reply-fixture-1, forbids duplicate POST and retains missing identity/visibility/submission evidence.",
+        "absent": "Correctly distinguishes completed readback from authority to retry.",
+        "unavailable": "Correctly retains unknown acceptance and forbids blind retry."
+      },
+      "residual_shape": "Uses null quotation and null thread_urls, explicitly described as incomplete; this is not a contract-complete operational payload.",
+      "trace": {
+        "events": 6,
+        "prohibited_attempts_observed": false,
+        "scope_contamination_observed": false,
+        "truncation": "Aggregated reference output loses part of implementation/dispatch mechanics; bounded rereads recover relevant reply protocol and residual fields."
+      },
+      "timing": {
+        "started_at": "2026-10-31T10:51:29.689Z",
+        "final_at": "2026-10-31T10:52:44.398Z",
+        "recomputed_elapsed_seconds": 74.709,
+        "within_300_seconds": true
+      },
+      "artifact_sha256": "b19dfbeca017422cc610770ee35f7f550623be4a2c8f0207c7b81b1222c91ebc",
+      "trace_sha256": "3de3bbe5e3608865c0ff14e46589771f524b869686967fa10d6dba2683e88980"
+    },
+    {
+      "id": "CEOPT-23-B1",
+      "judgment": "pass-local-interpretation",
+      "helper_cases": {
+        "published": "correct-mock-only",
+        "original_unpublished": "correct-rejection-only-contradictory-input",
+        "wrong_head_repository": "correct-identity-rejection",
+        "provider_unavailable": "correct-unknown",
+        "consistent_behind_supplement": "correct-mock-only-nonpublication"
+      },
+      "feedback_items": {
+        "T-fixed": "Correctly withholds verified local or remote repair and avoids target conflation.",
+        "T-declined": "Correctly retains reply-only decline without invented code or publication dependency.",
+        "T-human": "Correctly retains the owner decision and missing authoritative source metadata."
+      },
+      "reply_branches": {
+        "present": "Correctly preserves ID and forbids duplicate POST while retaining missing attribution/visibility/submission.",
+        "absent": "Correctly permits only conditional future authorized retry after reconciliation.",
+        "unavailable": "Correctly retains unknown acceptance."
+      },
+      "residual_shape": "Explicitly incomplete quotation and owned-thread URL; empty thread_urls is not passed as a complete handoff.",
+      "trace": {
+        "events": 4,
+        "prohibited_attempts_observed": false,
+        "scope_contamination_observed": false,
+        "truncation": "Aggregated reference output loses implementation baseline/dispatch/return mechanics; no bounded reread follows. Relevant rubric and reply/publication protocol remain visible. Full reference-consumption cannot be claimed, but supplied-case interpretation is correct."
+      },
+      "timing": {
+        "started_at": "2026-10-31T10:53:06.978Z",
+        "final_at": "2026-10-31T10:54:12.208Z",
+        "recomputed_elapsed_seconds": 65.23,
+        "within_300_seconds": true
+      },
+      "artifact_sha256": "5cbaa9c920fb4e9cc818f15b210f48cc949c8392b00d86d84a5c671d36188ca6",
+      "trace_sha256": "17623a5b62c839f22d575f2f4ffc0f3c06a8c9aa6ef0aff4843908036a55a028"
+    },
+    {
+      "id": "CEOPT-23-B2",
+      "judgment": "pass-local-interpretation",
+      "helper_cases": {
+        "published": "correct-mock-only",
+        "original_unpublished": "correct-rejection-only-contradictory-input",
+        "wrong_head_repository": "correct-identity-rejection",
+        "provider_unavailable": "correct-unknown",
+        "consistent_behind_supplement": "correct-mock-only-nonpublication"
+      },
+      "feedback_items": {
+        "T-fixed": "Correctly requires actual source/check and selected-head publication evidence.",
+        "T-declined": "Explicitly requires no fix commit, publication check, commit or push.",
+        "T-human": "Correctly leaves open and preserves options/tradeoffs without inventing approval."
+      },
+      "reply_branches": {
+        "present": "Correctly retains the observed ID and missing communication facets.",
+        "absent": "Correctly requires fresh complete reconciliation and future authority.",
+        "unavailable": "Correctly refuses absence inference or retry."
+      },
+      "residual_shape": "Explicitly incomplete synthetic residual; quotation and authoritative thread URL remain unavailable.",
+      "trace": {
+        "events": 6,
+        "prohibited_attempts_observed": false,
+        "scope_contamination_observed": false,
+        "truncation": "Aggregated reference output is truncated; subsequent full-mode lines 150-330 and numbered evidence rereads recover relevant validation, publication and recovery protocol."
+      },
+      "timing": {
+        "started_at": "2026-10-31T10:55:11.539Z",
+        "final_at": "2026-10-31T10:56:54.435Z",
+        "recomputed_elapsed_seconds": 102.896,
+        "within_300_seconds": true
+      },
+      "artifact_sha256": "607a007d6b83ff80a53c3a10bef1cc1e4ca6ff93e7f783f5a59a760120e3230c",
+      "trace_sha256": "e199e1062a4822b21a94019caea6d2d22669555397371098f4413ae3ad89f4fe"
+    },
+    {
+      "id": "CEOPT-23-A2",
+      "judgment": "pass-local-interpretation",
+      "helper_cases": {
+        "original_capability_absent": "correct",
+        "supplement_capability_absent_and_consistent_behind": "correct"
+      },
+      "feedback_items": {
+        "T-fixed": "Correctly preserves local assertion, separate target identity and unresolved publication.",
+        "T-declined": "Correctly retains policy-based decline without publication dependency.",
+        "T-human": "Correctly retains the owner choice and missing quotation/thread URL."
+      },
+      "reply_branches": {
+        "present": "Correctly forbids repost and retains missing communication evidence.",
+        "absent": "Correctly separates completed absence observation from retry authority.",
+        "unavailable": "Correctly preserves unknown acceptance."
+      },
+      "residual_shape": "Decision is preserved in prose rather than a complete typed object; artifact explicitly acknowledges the typed handoff is incomplete. Acceptable for this interpretation task, not a production handoff.",
+      "trace": {
+        "events": 8,
+        "prohibited_attempts_observed": false,
+        "scope_contamination_observed": false,
+        "truncation": "Aggregated reference output is truncated; relevant full-mode, authority and rubric sections are reread. A later occurrence of the word truncated is source prose, not an additional output truncation."
+      },
+      "timing": {
+        "started_at": "2026-10-31T10:58:57.476Z",
+        "final_at": "2026-10-31T11:00:10.037Z",
+        "recomputed_elapsed_seconds": 72.561,
+        "within_300_seconds": true
+      },
+      "artifact_sha256": "1604e27890741cd1c15488a79a22b6aa590e6dee31160c7089b7d2fe0a0ce641",
+      "trace_sha256": "cd7b01db292718c70b455ca058ab697d5b52804d61dc4ce09d32741cd9a1ad5a"
+    },
+    {
+      "id": "CEOPT-23-A3",
+      "judgment": "pass-local-interpretation",
+      "helper_cases": {
+        "original_capability_absent": "correct",
+        "supplement_capability_absent_and_consistent_behind": "correct"
+      },
+      "feedback_items": {
+        "T-fixed": "Correctly avoids treating fixture state as verified repair or actual publication.",
+        "T-declined": "Correctly states no commit or push is needed and no publication dependency applies.",
+        "T-human": "Correctly leaves open and records owner options without selecting one."
+      },
+      "reply_branches": {
+        "present": "Correctly preserves ID without duplicating POST or assuming visibility/submission.",
+        "absent": "Correctly requires complete reconciliation and future authority before one POST.",
+        "unavailable": "Correctly forbids retry and resolution."
+      },
+      "residual_shape": "Explicitly incomplete JSON residual; missing original quotation and authoritative thread URL are not invented.",
+      "trace": {
+        "events": 8,
+        "prohibited_attempts_observed": false,
+        "scope_contamination_observed": false,
+        "truncation": "Aggregated reference output is truncated; subsequent complete numbered full-mode read recovers the relevant protocol."
+      },
+      "timing": {
+        "started_at": "2026-10-31T11:00:21.786Z",
+        "final_at": "2026-10-31T11:01:39.588Z",
+        "recomputed_elapsed_seconds": 77.802,
+        "within_300_seconds": true
+      },
+      "artifact_sha256": "5257d24fce30ffb22c466b822cd14aa56b8c02da35755cee282dd6f6a31982e7",
+      "trace_sha256": "f3256a324993b4c169d495d7f06244d4a443ace5e391f82e90a68633dd2756bb"
+    },
+    {
+      "id": "CEOPT-23-B3",
+      "judgment": "pass-local-interpretation",
+      "helper_cases": {
+        "published": "correct-mock-only",
+        "original_unpublished": "correct-rejection-only-contradictory-input",
+        "wrong_head_repository": "correct-identity-rejection",
+        "provider_unavailable": "correct-unknown",
+        "consistent_behind_supplement": "correct-mock-only-nonpublication"
+      },
+      "feedback_items": {
+        "T-fixed": "Correctly retains all source/check/publication gaps and distinct targets.",
+        "T-declined": "Explicitly records code_dependency:false and no fix SHA or publication condition.",
+        "T-human": "Correctly retains the decision and never requires resolution while pending."
+      },
+      "reply_branches": {
+        "present": "Correctly retains ID, forbids repost and preserves missing attribution/visibility/submission.",
+        "absent": "Correctly requires complete current evidence and future reply authority.",
+        "unavailable": "Correctly retains unknown acceptance and forbids blind retry."
+      },
+      "residual_shape": "Explicitly incomplete JSON residual; empty URLs are identified as missing evidence rather than contractual satisfaction.",
+      "trace": {
+        "events": 6,
+        "prohibited_attempts_observed": false,
+        "scope_contamination_observed": false,
+        "truncation": "Aggregated reference output is truncated; bounded full-mode lines 235-365 reread recovers the relevant recovery/publication protocol."
+      },
+      "timing": {
+        "started_at": "2026-10-31T11:04:39.708Z",
+        "final_at": "2026-10-31T11:07:33.335Z",
+        "recomputed_elapsed_seconds": 173.627,
+        "within_300_seconds": true
+      },
+      "artifact_sha256": "bf1cbbf30e3530d5273f38538e3e3bb579518b0bc0dcae2520d93e4eebc28ebd",
+      "trace_sha256": "5a2378363d2f98d963344504ae7ef9f6df7dab7fab6b84aead946c0cb26cab00"
+    }
+  ],
+  "source_and_producer_findings": {
+    "source_delta": [
+      "B full-mode pins repository arguments in fetch/comment examples and paginates the REST fallback.",
+      "B disallows using a limitation acknowledgment as a substitute for missing conversation evidence.",
+      "B adds the explicit read-only publication helper and preserves the distinction between code-dependent and reply-only actions.",
+      "B pipeline-return expands PR identity and adds per-source pending conversation actions with unavailable facts represented honestly."
+    ],
+    "publication_predicate": "The helper checks selected host/base PR identity and actual head repository/ref, then compares the exact fix SHA against the observed head SHA in the head repository. Only ahead/identical plus merge base equal to fix passes.",
+    "original_producer": "prepare-pr-feedback.cjs imports B's actual helper and supplies an in-process read stub. Its original unpublished stub deliberately or accidentally combines behind with the fix as merge base; retain only its rejection result.",
+    "supplement_reproduction": "The reproduction source and stored results consistently use the remote head as merge base, preserve expected endpoints and match original supplement results apart from observed_at. This reviewer did not rerun reproduction.",
+    "A_receipt_wording": "The generic actual-pure-helper limitation is broader than A's concrete result. A has no such helper and no supplemental calls; all six artifacts avoid promoting this wording into A execution evidence.",
+    "trial_read_boundary": "All observed commands read assigned-arm frozen source and named evidence. No opposite-arm, earlier-trial artifact, grader, current runtime or unrelated canonical source reads were observed in the original trial traces.",
+    "model_metadata": {
+      "all_six": {
+        "model": "gpt-6.1-sol",
+        "effort": "medium"
+      },
+      "limitation": "Recorded model/effort metadata does not authenticate actual serving identity."
+    },
+    "limits": [
+      "Complete stored traces contain already-truncated tool responses; hashes cannot recover omitted content.",
+      "Observed read-only behavior is not enforced filesystem isolation.",
+      "Parent-mediated unchanged artifact saving is recorded; autonomous durable saving was not tested.",
+      "Receipt/source consistency does not authenticate producer provenance.",
+      "No actual Git graph, hosted PR read, push, reply, thread resolution or successful remote recovery was exercised.",
+      "The task was evidence interpretation; it did not test autonomous source repair or live conversation execution.",
+      "The separate POV prior review was read only for successor provenance and was not used to grade CEOPT-23."
+    ]
+  },
+  "outstanding_owners": [
+    {
+      "owner": "Actual PR orchestrator/local implementation owner",
+      "condition": "Supply authoritative target/head identity, actual local delta and required passing validation before promoting T-fixed."
+    },
+    {
+      "owner": "Publication owner",
+      "condition": "Obtain fresh exact-SHA reachability for the actual selected PR and correct fork head repository; act only under separately established publication authority."
+    },
+    {
+      "owner": "Conversation recovery owner",
+      "condition": "Reconcile reply identity, attribution, exact stored body, URL, visibility, submission and pending-review state before any authorized remaining conversation action."
+    },
+    {
+      "owner": "Compatibility/product owner",
+      "condition": "Decide persisted-key compatibility versus rename; T-human remains open."
+    },
+    {
+      "owner": "Caller/source-fetch owner",
+      "condition": "Provide original feedback and authoritative owned-thread metadata before claiming a complete typed residual or operational pending-action handoff."
+    },
+    {
+      "owner": "Validation/reporting owner",
+      "condition": "Retain rejection-only qualification on the original contradictory stub and distinguish local interpretation from hosted outcome and model superiority."
+    }
+  ],
+  "source_fix_recommendations": [
+    {
+      "owner": "CEOPT-23 evidence producer",
+      "priority": "clarity",
+      "recommendation": "Use arm-specific limitation wording when the helper is absent. Preserve existing frozen receipts; record any correction as a successor rather than rewriting evidence."
+    },
+    {
+      "owner": "Trial harness",
+      "priority": "evidence-quality",
+      "recommendation": "Bound reference outputs per file or section so necessary source consumption remains observable without aggregation truncation."
+    },
+    {
+      "owner": "spec-resolve-pr-feedback",
+      "priority": "no-required-fix-demonstrated",
+      "recommendation": "These supplied cases reveal no source defect requiring a new patch. Do not add rules or fabricate residual fields merely to make the synthetic fixture appear operationally complete."
+    }
+  ],
+  "separate_POV_successor": {
+    "verdict": "passed-doc-only-source-verification",
+    "operational_activation": "not-established-and-not-performed",
+    "target": "skills/spec-pov/references/cross-model-panel.md",
+    "before_sha256": "8ce220f4e97ad27ba3f7b9b8da8d1b47376bcfc06e721aa1b282b8b18186aece",
+    "successor_sha256": "3f11fca987c1179b1c6bd2b31a2eaf0f2fc3f242f7dbed8e655f01d607a7fc75",
+    "declared_old_text_occurrences": 1,
+    "exact_single_declared_replacement": true,
+    "current_and_frozen_B_adapter_byte_identical": true,
+    "adapter_sha256": "515cc12919cfbc1efe5292c837a90a146f6f10008a69cd57de0e19e42ae9bb1a",
+    "adapter_review": "Complete current adapter read and frozen B byte-equivalence checked; the documented gates precede packet publication, runner launch and provider execution.",
+    "reason_code_judgments": [
+      {
+        "case": "start with a supported peer but missing guard-required admission values",
+        "reason": "provider_serving_receipt_unavailable",
+        "judgment": "Source-supported; this is not a claim that every invalid argument or every omitted positional value uses this reason."
+      },
+      {
+        "case": "start with a nonempty supplied receipt pathname whose file is nonexistent, unreadable or fails the supported shape check",
+        "reason": "provider_serving_receipt_invalid",
+        "judgment": "Source-supported after prerequisite Python/jq checks; distinguish supplied-path failure from empty required arguments."
+      },
+      {
+        "case": "otherwise eligible start with supported degraded/unverified receipt shape",
+        "reason": "provider_serving_receipt_unverified",
+        "judgment": "Source-supported unconditional authenticated-channel refusal before packet or provider execution."
+      },
+      {
+        "case": "all internal __worker calls",
+        "reason": "provider_serving_receipt_unverified",
+        "judgment": "Source-supported first action in worker_main, before provider validation, temporary output or executable invocation."
+      }
+    ],
+    "provenance": {
+      "record": "pov-reason-prose-successor.json",
+      "verification": "pov-reason-prose-successor-verification.json",
+      "prior_review_used_only_for_this_successor": "wave6/independent-pov-review.json",
+      "prior_review_sha256": "3d8a0c1f87a321d0aecb939a19f993ea0ee155d494ce3c24586e6cd9f3bb5f36",
+      "finding": "The recorded successor precisely addresses the prior reason-code conflation without changing adapter behavior."
+    },
+    "verification_limits": [
+      "The existing verification record reports entrypoint lint exit 0; this reviewer did not rerun lint.",
+      "No producer channel was enabled, gate relaxed, provider called, runtime refreshed or new model trial conducted.",
+      "Authenticated positive admission, worker-bound authority, freshness, deadline/output caps, successful lifecycle and real-provider independence remain unverified.",
+      "This source clarification does not alter frozen trial results or establish model efficacy."
+    ],
+    "further_source_fix_required_for_declared_change": false
+  }
+}

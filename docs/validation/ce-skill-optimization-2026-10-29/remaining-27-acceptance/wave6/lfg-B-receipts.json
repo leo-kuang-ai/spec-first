@@ -1,0 +1,789 @@
+{
+  "arm": "B",
+  "source_sha256": "380e5244ccb2fb32107fd66729fed5b7df5ff1ff2c6a62bae2ca74d60ee89156",
+  "cases": [
+    {
+      "case": "observation-gap",
+      "initial": {
+        "exit_code": 0,
+        "stdout": "{\n  \"status\": \"read\",\n  \"reason_code\": \"generation-zero\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 0,\n  \"snapshot_sha256\": \"f5bbec4d8876dfccdc1b2a162b8c5c3e5469c4c01306728d125fc71989ae48bc\",\n  \"state\": null,\n  \"warnings\": []\n}\n",
+        "stderr": "",
+        "output": {
+          "status": "read",
+          "reason_code": "generation-zero",
+          "schema_version": "spec-lfg-pr-watch-state/v1",
+          "generation": 0,
+          "snapshot_sha256": "f5bbec4d8876dfccdc1b2a162b8c5c3e5469c4c01306728d125fc71989ae48bc",
+          "state": null,
+          "warnings": []
+        }
+      },
+      "snapshots": [
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:00:00Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 1,\n  \"snapshot_sha256\": \"8267a381fdb87797199e8c4650d36830a3bf910e88e0d3f2632f5739b8285341\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 0,\n  \"observation_policy\": \"cadence-30-max-gap-60/v1\",\n  \"observation_gap_seconds\": null,\n  \"quiet_window_reset_reason\": \"first-observation\",\n  \"elapsed_seconds\": 0,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 1,
+              "snapshot_sha256": "8267a381fdb87797199e8c4650d36830a3bf910e88e0d3f2632f5739b8285341",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 0,
+              "observation_policy": "cadence-30-max-gap-60/v1",
+              "observation_gap_seconds": null,
+              "quiet_window_reset_reason": "first-observation",
+              "elapsed_seconds": 0,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:30:00Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 2,\n  \"snapshot_sha256\": \"8d542adb08b647bd0c54859feaafe5c82963f11a45868aa4560d1e8555590c3b\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 0,\n  \"observation_policy\": \"cadence-30-max-gap-60/v1\",\n  \"observation_gap_seconds\": 1800,\n  \"quiet_window_reset_reason\": \"observation-gap\",\n  \"elapsed_seconds\": 1800,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 2,
+              "snapshot_sha256": "8d542adb08b647bd0c54859feaafe5c82963f11a45868aa4560d1e8555590c3b",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 0,
+              "observation_policy": "cadence-30-max-gap-60/v1",
+              "observation_gap_seconds": 1800,
+              "quiet_window_reset_reason": "observation-gap",
+              "elapsed_seconds": 1800,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "continuous-control",
+      "initial": {
+        "exit_code": 0,
+        "stdout": "{\n  \"status\": \"read\",\n  \"reason_code\": \"generation-zero\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 0,\n  \"snapshot_sha256\": \"f5bbec4d8876dfccdc1b2a162b8c5c3e5469c4c01306728d125fc71989ae48bc\",\n  \"state\": null,\n  \"warnings\": []\n}\n",
+        "stderr": "",
+        "output": {
+          "status": "read",
+          "reason_code": "generation-zero",
+          "schema_version": "spec-lfg-pr-watch-state/v1",
+          "generation": 0,
+          "snapshot_sha256": "f5bbec4d8876dfccdc1b2a162b8c5c3e5469c4c01306728d125fc71989ae48bc",
+          "state": null,
+          "warnings": []
+        }
+      },
+      "snapshots": [
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:00:00Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 1,\n  \"snapshot_sha256\": \"a9f81815a0e4bd1498fb6886ce9e27b2f7d26e4023e2937b50badae81936b34f\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 0,\n  \"observation_policy\": \"cadence-30-max-gap-60/v1\",\n  \"observation_gap_seconds\": null,\n  \"quiet_window_reset_reason\": \"first-observation\",\n  \"elapsed_seconds\": 0,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 1,
+              "snapshot_sha256": "a9f81815a0e4bd1498fb6886ce9e27b2f7d26e4023e2937b50badae81936b34f",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 0,
+              "observation_policy": "cadence-30-max-gap-60/v1",
+              "observation_gap_seconds": null,
+              "quiet_window_reset_reason": "first-observation",
+              "elapsed_seconds": 0,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:00:30Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 2,\n  \"snapshot_sha256\": \"4ca49911997ff1763f5132b8dd1eba9bd0e485aad252ac890fbd1c462c00e86f\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 30,\n  \"observation_policy\": \"cadence-30-max-gap-60/v1\",\n  \"observation_gap_seconds\": 30,\n  \"quiet_window_reset_reason\": null,\n  \"elapsed_seconds\": 30,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 2,
+              "snapshot_sha256": "4ca49911997ff1763f5132b8dd1eba9bd0e485aad252ac890fbd1c462c00e86f",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 30,
+              "observation_policy": "cadence-30-max-gap-60/v1",
+              "observation_gap_seconds": 30,
+              "quiet_window_reset_reason": null,
+              "elapsed_seconds": 30,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:01:00Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 3,\n  \"snapshot_sha256\": \"89dddc3f596b730da4e0e95627173846809562bbcf66c6bc75f03068e037f236\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 60,\n  \"observation_policy\": \"cadence-30-max-gap-60/v1\",\n  \"observation_gap_seconds\": 30,\n  \"quiet_window_reset_reason\": null,\n  \"elapsed_seconds\": 60,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 3,
+              "snapshot_sha256": "89dddc3f596b730da4e0e95627173846809562bbcf66c6bc75f03068e037f236",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 60,
+              "observation_policy": "cadence-30-max-gap-60/v1",
+              "observation_gap_seconds": 30,
+              "quiet_window_reset_reason": null,
+              "elapsed_seconds": 60,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:01:30Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 4,\n  \"snapshot_sha256\": \"de2e627731822b512f96e76e47131b30cab10403ce6c3fc0f80fbd2fe62c6a48\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 90,\n  \"observation_policy\": \"cadence-30-max-gap-60/v1\",\n  \"observation_gap_seconds\": 30,\n  \"quiet_window_reset_reason\": null,\n  \"elapsed_seconds\": 90,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 4,
+              "snapshot_sha256": "de2e627731822b512f96e76e47131b30cab10403ce6c3fc0f80fbd2fe62c6a48",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 90,
+              "observation_policy": "cadence-30-max-gap-60/v1",
+              "observation_gap_seconds": 30,
+              "quiet_window_reset_reason": null,
+              "elapsed_seconds": 90,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:02:00Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 5,\n  \"snapshot_sha256\": \"30bc28b4347f44c1e699013f0396197fe5c97231682e3987389817fbc87735dd\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 120,\n  \"observation_policy\": \"cadence-30-max-gap-60/v1\",\n  \"observation_gap_seconds\": 30,\n  \"quiet_window_reset_reason\": null,\n  \"elapsed_seconds\": 120,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 5,
+              "snapshot_sha256": "30bc28b4347f44c1e699013f0396197fe5c97231682e3987389817fbc87735dd",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 120,
+              "observation_policy": "cadence-30-max-gap-60/v1",
+              "observation_gap_seconds": 30,
+              "quiet_window_reset_reason": null,
+              "elapsed_seconds": 120,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:02:30Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 6,\n  \"snapshot_sha256\": \"cd9470fc03ef38ecba9215acfd0d13c3c5a6395507fac760a4f5853b98678991\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 150,\n  \"observation_policy\": \"cadence-30-max-gap-60/v1\",\n  \"observation_gap_seconds\": 30,\n  \"quiet_window_reset_reason\": null,\n  \"elapsed_seconds\": 150,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 6,
+              "snapshot_sha256": "cd9470fc03ef38ecba9215acfd0d13c3c5a6395507fac760a4f5853b98678991",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 150,
+              "observation_policy": "cadence-30-max-gap-60/v1",
+              "observation_gap_seconds": 30,
+              "quiet_window_reset_reason": null,
+              "elapsed_seconds": 150,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:03:00Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 7,\n  \"snapshot_sha256\": \"3a8bb1f4e5c0469e6fdf6ddc1138a53bb3aa0904eaba15d43a00053b67f08542\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 180,\n  \"observation_policy\": \"cadence-30-max-gap-60/v1\",\n  \"observation_gap_seconds\": 30,\n  \"quiet_window_reset_reason\": null,\n  \"elapsed_seconds\": 180,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 7,
+              "snapshot_sha256": "3a8bb1f4e5c0469e6fdf6ddc1138a53bb3aa0904eaba15d43a00053b67f08542",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 180,
+              "observation_policy": "cadence-30-max-gap-60/v1",
+              "observation_gap_seconds": 30,
+              "quiet_window_reset_reason": null,
+              "elapsed_seconds": 180,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:03:30Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 8,\n  \"snapshot_sha256\": \"4b96fdda2779d572be1344a47bece81d8c905f792a3412349c2a64cf4c44c8c4\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 210,\n  \"observation_policy\": \"cadence-30-max-gap-60/v1\",\n  \"observation_gap_seconds\": 30,\n  \"quiet_window_reset_reason\": null,\n  \"elapsed_seconds\": 210,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 8,
+              "snapshot_sha256": "4b96fdda2779d572be1344a47bece81d8c905f792a3412349c2a64cf4c44c8c4",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 210,
+              "observation_policy": "cadence-30-max-gap-60/v1",
+              "observation_gap_seconds": 30,
+              "quiet_window_reset_reason": null,
+              "elapsed_seconds": 210,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:04:00Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 9,\n  \"snapshot_sha256\": \"319c850c46786c2a1ae416efae9b0991be2bb6e97b2aae27e56b5b7d758946b9\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 240,\n  \"observation_policy\": \"cadence-30-max-gap-60/v1\",\n  \"observation_gap_seconds\": 30,\n  \"quiet_window_reset_reason\": null,\n  \"elapsed_seconds\": 240,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 9,
+              "snapshot_sha256": "319c850c46786c2a1ae416efae9b0991be2bb6e97b2aae27e56b5b7d758946b9",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 240,
+              "observation_policy": "cadence-30-max-gap-60/v1",
+              "observation_gap_seconds": 30,
+              "quiet_window_reset_reason": null,
+              "elapsed_seconds": 240,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:04:30Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"no-terminal\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 10,\n  \"snapshot_sha256\": \"a5f20b4f14287c21602aca7801ac4403553f02626c3a744491bef9f426bc5465\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"watching\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 270,\n  \"observation_policy\": \"cadence-30-max-gap-60/v1\",\n  \"observation_gap_seconds\": 30,\n  \"quiet_window_reset_reason\": null,\n  \"elapsed_seconds\": 270,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "no-terminal",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 10,
+              "snapshot_sha256": "a5f20b4f14287c21602aca7801ac4403553f02626c3a744491bef9f426bc5465",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "watching",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 270,
+              "observation_policy": "cadence-30-max-gap-60/v1",
+              "observation_gap_seconds": 30,
+              "quiet_window_reset_reason": null,
+              "elapsed_seconds": 270,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        },
+        {
+          "input": {
+            "pr_number": 42,
+            "pr_url": "https://example.invalid/o/r/pull/42",
+            "remote_available": true,
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "base_ref": "main",
+            "base_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "pr_state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "merge_state_status": "CLEAN",
+            "review_decision": "APPROVED",
+            "observed_at": "2026-07-30T00:05:00Z",
+            "checks": [
+              {
+                "key": "ci/test",
+                "status": "COMPLETED",
+                "conclusion": "SUCCESS"
+              }
+            ],
+            "review_items": [],
+            "repo_policy": {
+              "branch_currency_update": "non-rewriting"
+            }
+          },
+          "execution": {
+            "exit_code": 0,
+            "stdout": "{\n  \"status\": \"written\",\n  \"reason_code\": \"green-review-clear-current\",\n  \"schema_version\": \"spec-lfg-pr-watch-state/v1\",\n  \"generation\": 11,\n  \"snapshot_sha256\": \"acc1825badc0944de20890674d366ab5ecd2ed65a25d4dd7faa63870191cb456\",\n  \"events\": {\n    \"review\": [],\n    \"ci\": [],\n    \"branch_currency\": false,\n    \"head_changed\": false,\n    \"base_advanced\": false\n  },\n  \"terminal\": \"looks-ready\",\n  \"branch_currency_key\": null,\n  \"needs_human_residuals\": [],\n  \"human_decisions\": [],\n  \"answered_human_decisions\": [],\n  \"quiet_seconds\": 300,\n  \"observation_policy\": \"cadence-30-max-gap-60/v1\",\n  \"observation_gap_seconds\": 30,\n  \"quiet_window_reset_reason\": null,\n  \"elapsed_seconds\": 300,\n  \"limitations\": [],\n  \"warnings\": []\n}\n",
+            "stderr": "",
+            "output": {
+              "status": "written",
+              "reason_code": "green-review-clear-current",
+              "schema_version": "spec-lfg-pr-watch-state/v1",
+              "generation": 11,
+              "snapshot_sha256": "acc1825badc0944de20890674d366ab5ecd2ed65a25d4dd7faa63870191cb456",
+              "events": {
+                "review": [],
+                "ci": [],
+                "branch_currency": false,
+                "head_changed": false,
+                "base_advanced": false
+              },
+              "terminal": "looks-ready",
+              "branch_currency_key": null,
+              "needs_human_residuals": [],
+              "human_decisions": [],
+              "answered_human_decisions": [],
+              "quiet_seconds": 300,
+              "observation_policy": "cadence-30-max-gap-60/v1",
+              "observation_gap_seconds": 30,
+              "quiet_window_reset_reason": null,
+              "elapsed_seconds": 300,
+              "limitations": [],
+              "warnings": []
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Synthetic timestamps exercise actual watch-state helper; no real 30-minute PR monitoring.",
+    "No real remote requests or replies made."
+  ]
+}

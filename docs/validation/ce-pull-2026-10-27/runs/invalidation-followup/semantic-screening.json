@@ -1,0 +1,21 @@
+{
+  "artifact_type": "producer-semantic-screening",
+  "independent_review": false,
+  "unit_id": "U5",
+  "reading": "逐文件完整净 diff: 两份 assets/resolution-template、两份 yaml-schema、refresh classify；本地模板、yaml-schema promotion 段、classify 1-95 与 investigate 失效条件段已回源",
+  "decision": "复用已有 source_refs/invalidation_condition，而非引入 retire_when；补充外部条件及检查方式写法、条件满足但代码仍保留 workaround 时文档继续解释当前实现，并将代码移除单列为待验证行动",
+  "source_refs": [
+    "skills/spec-compound/assets/resolution-template.md",
+    "skills/spec-compound-refresh/assets/resolution-template.md",
+    "skills/spec-compound/references/yaml-schema.md",
+    "skills/spec-compound-refresh/references/yaml-schema.md",
+    "skills/spec-compound-refresh/references/classify.md",
+    "skills/spec-compound-refresh/references/investigate.md"
+  ],
+  "limitations": [
+    "不新增 schema 字段或批量迁移旧知识",
+    "source语义与合同测试不证明真实host/模型判断",
+    "U5其余 assembly/research 等大输出本轮截断，不计全文完成"
+  ],
+  "verification": "logs/invalidation-followup-tests.log"
+}

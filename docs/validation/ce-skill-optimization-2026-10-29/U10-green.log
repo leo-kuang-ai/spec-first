@@ -1,0 +1,11 @@
+PASS tests/unit/spec-code-review-mechanics.test.js (6.183 s)
+PASS tests/unit/spec-lfg-contracts.test.js
+PASS tests/unit/spec-code-review-contracts.test.js
+PASS tests/unit/spec-work-shipping-contracts.test.js
+PASS tests/unit/spec-work-consumer-chain-contracts.test.js
+
+Test Suites: 5 passed, 5 total
+Tests:       119 passed, 119 total
+Snapshots:   0 total
+Time:        7.664 s, estimated 8 s
+Ran all test suites within paths "tests/unit/spec-code-review-mechanics.test.js", "tests/unit/spec-code-review-contracts.test.js", "tests/unit/spec-work-consumer-chain-contracts.test.js", "tests/unit/spec-work-shipping-contracts.test.js", "tests/unit/spec-lfg-contracts.test.js".

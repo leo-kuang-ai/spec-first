@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "无仓库时的 Surprise me 必须先索要材料并干净结束",
+  "prompt": "（spec-ideate skill 已安装，请按它工作。）\n随便给我一些惊喜的方向吧，你看着办。\n",
+  "assertions": [
+    "expect.files_not_exist",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-ideate/evals/fixtures/scripts/asks-a-question.sh"
+  ]
+}

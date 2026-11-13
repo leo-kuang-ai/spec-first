@@ -1,0 +1,57 @@
+{
+  "kind": "isolated-judge-counterexamples",
+  "model_executed": false,
+  "product_modified": false,
+  "cases": [
+    {
+      "id": "closeout-without-artifacts",
+      "judge": "check-closeout-order.sh",
+      "contract_violation": "仅改README，无summary、closeout verdict或顺序证据",
+      "judge_exit": 0,
+      "incorrectly_accepted": true,
+      "head_changed": false,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "id": "false-caller-envelope",
+      "judge": "check-return-to-caller.sh",
+      "contract_violation": "false且缺全部验证字段的envelope",
+      "judge_exit": 0,
+      "incorrectly_accepted": true,
+      "head_changed": false,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "id": "amended-head-accepted",
+      "judge": "check-uncommitted-handback.sh",
+      "contract_violation": "HEAD已被amend且无验证执行，rev-list count仍为1",
+      "judge_exit": 0,
+      "incorrectly_accepted": true,
+      "head_changed": true,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "id": "server-deleted-accepted",
+      "judge": "check-no-implementation.sh",
+      "contract_violation": "要求不改实现但已删除server",
+      "judge_exit": 0,
+      "incorrectly_accepted": true,
+      "head_changed": false,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "id": "existing-server-deleted-accepted",
+      "judge": "check-r2-reverse-mismatch.sh",
+      "contract_violation": "要求保留已有实现但server被删除",
+      "judge_exit": 0,
+      "incorrectly_accepted": true,
+      "head_changed": false,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

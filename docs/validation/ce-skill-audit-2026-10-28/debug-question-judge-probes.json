@@ -1,0 +1,16 @@
+[
+  {
+    "script": "check-prior-attempt-ask.sh",
+    "message": "你已经试过哪三种办法？",
+    "exit_code": 1,
+    "stdout": "输出未先询问已尝试内容\n",
+    "stderr": ""
+  },
+  {
+    "script": "check-r2-prior-ask.sh",
+    "message": "你已经试过哪三种办法？",
+    "exit_code": 1,
+    "stdout": "输出未先询问已尝试内容\n",
+    "stderr": ""
+  }
+]

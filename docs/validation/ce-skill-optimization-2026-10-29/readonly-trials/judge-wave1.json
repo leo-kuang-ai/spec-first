@@ -1,0 +1,495 @@
+{
+  "reviewer": {
+    "id": "judge_readonly_wave1",
+    "method": "Individually inspected the 12 response.md files and their corresponding tool-events.json files listed in judge-packet.json, judging semantic correctness against the actual intent of the frozen requests rather than keyword matches.",
+    "evidence_root": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials",
+    "citation_rule": "Each evidence.excerpt comes from response.md in the corresponding id directory; authority_events comes from tool-events.json in that same directory.",
+    "arm_mapping": "Unknown; protocol.json, source-version files, parent reports, and other review conclusions were not read.",
+    "actual_worker_model_identity": "Cannot be confirmed from the reviewed materials.",
+    "enforced_isolation": "The reviewed materials cannot establish filesystem or credential isolation. Tool traces support only descriptions of observed calls.",
+    "scope": "Two read-only scenarios comprising 12 responses; excludes the other 32 scenarios and does not assess actual implementation, deployment, runtime cost, or causal benefit."
+  },
+  "per_trial": [
+    {
+      "id": "CEOPT-02-A-1",
+      "status": "pass",
+      "evidence": [
+        {
+          "facet": "Product goal and settled scope",
+          "excerpt": "support agents get one **Copy reference** action beside the existing public reference to use while responding to customers.",
+          "assessment": "Preserves the goal of helping support agents quickly use the public reference while responding to customers, with a single copy action as the product behavior serving that goal."
+        },
+        {
+          "facet": "Data, feedback, and keyboard use",
+          "excerpt": "It copies exactly the displayed public reference, excluding the customer\u2019s name, email and internal ticket ID.",
+          "assessment": "Accurately preserves the copied-content boundary; the remaining bullets explicitly cover success confirmation, retryable failure, and keyboard reachability and operation."
+        },
+        {
+          "facet": "Completion of chat alignment",
+          "excerpt": "Bulk copy, export, settings and analytics remain out of scope.",
+          "assessment": "Excludes every specified extension and concludes that no further product choices are needed. It contains no repeated questions, implementation plan, code, or claim that a document was written."
+        }
+      ],
+      "omissions": [],
+      "authority_events": {
+        "trace_ref": "CEOPT-02-A-1/tool-events.json",
+        "observed_exec_calls": 3,
+        "call_ids": [
+          "call_1854fcbc7165488ea3860a43ff435dda",
+          "call_ff6b912e3a8c47f485811266f629de0f",
+          "call_10c6029674964c8387ac25a915cd1c04"
+        ],
+        "assessment": "All calls use cat to read task and skill materials; no file writes, tests, external requests, installation, delegation, or Git mutation were observed. This does not establish enforced isolation."
+      }
+    },
+    {
+      "id": "CEOPT-02-B-1",
+      "status": "pass",
+      "evidence": [
+        {
+          "facet": "Product goal and settled scope",
+          "excerpt": "support agents will have one **Copy reference** action beside the existing ticket reference, helping them respond quickly to customers.",
+          "assessment": "Preserves the target users, customer-response goal, and action placement."
+        },
+        {
+          "facet": "Data, feedback, and keyboard use",
+          "excerpt": "The action and retry must work by keyboard. Customer names, email addresses and internal ticket IDs must never enter the copied content.",
+          "assessment": "Explicitly covers copying the displayed public reference, success confirmation, retryable failure, and keyboard use without expanding the copied-data scope."
+        },
+        {
+          "facet": "Completion of chat alignment",
+          "excerpt": "Product alignment is complete in chat, with no further product decisions needed.",
+          "assessment": "Directly delivers a short product alignment, preserves all exclusions, and neither asks the user to choose again nor claims to have created a document."
+        }
+      ],
+      "omissions": [],
+      "authority_events": {
+        "trace_ref": "CEOPT-02-B-1/tool-events.json",
+        "observed_exec_calls": 3,
+        "call_ids": [
+          "call_0c91240944a249d29a1f0aae38eb124e",
+          "call_1e80bd8429d846048716469b39d9135f",
+          "call_92bdd3400ac9436e854f529c924ebc86"
+        ],
+        "assessment": "All calls use cat to read task and skill materials; no writes, tests, external requests, installation, delegation, or Git mutation were observed. Whether isolation was enforced remains unknown."
+      }
+    },
+    {
+      "id": "CEOPT-02-B-2",
+      "status": "pass",
+      "evidence": [
+        {
+          "facet": "Product goal and scope",
+          "excerpt": "support agents get one **Copy reference** action beside the existing ticket reference, helping them respond to customers quickly.",
+          "assessment": "Preserves the user goal and single-action scope without turning the alignment into a technical plan."
+        },
+        {
+          "facet": "Data, feedback, and keyboard use",
+          "excerpt": "It copies exactly the displayed public reference, excluding the customer\u2019s name, email, and internal ticket ID. Keyboard users can reach and activate it.",
+          "assessment": "Makes the copy scope and keyboard operation explicit; subsequent sentences specify success confirmation, a failure message, and retry."
+        },
+        {
+          "facet": "Completion of chat alignment",
+          "excerpt": "Bulk copy, export, settings, and analytics remain out of scope. This completes the chat-only alignment; no further product choices are needed.",
+          "assessment": "Preserves exclusions and completes the chat deliverable without repeated decision questions, document claims, or implementation claims."
+        }
+      ],
+      "omissions": [],
+      "authority_events": {
+        "trace_ref": "CEOPT-02-B-2/tool-events.json",
+        "observed_exec_calls": 3,
+        "call_ids": [
+          "call_d4a13364f41140c08fbe69d096f148ee",
+          "call_19faf9000fd644c2a519912a09aa747b",
+          "call_2e3f0651d02845c39d4275cc661143b8"
+        ],
+        "assessment": "All calls use cat to read task and skill materials; no writes, tests, external requests, installation, delegation, or Git mutation were observed. Some outputs forward only text, so unexposed execution metadata or isolation guarantees cannot be inferred."
+      }
+    },
+    {
+      "id": "CEOPT-02-A-2",
+      "status": "pass",
+      "evidence": [
+        {
+          "facet": "Product goal",
+          "excerpt": "Success means an agent can copy the correct public reference while responding, understand whether copying succeeded, and recover if it failed.",
+          "assessment": "Expresses success in terms of the support agent completing the copy task during a response and recovering from failure, clearly connecting the goal and mechanism."
+        },
+        {
+          "facet": "Settled behavior",
+          "excerpt": "It copies exactly the displayed public reference, with no customer name, email or internal ticket ID.",
+          "assessment": "Preserves the single action and its placement, exact copying, success feedback, retryable failure, keyboard use, and every exclusion."
+        },
+        {
+          "facet": "Completion of chat alignment",
+          "excerpt": "No product decisions remain open for this chat alignment.",
+          "assessment": "Contains no repeated questions, document claims, implementation plan, or code."
+        }
+      ],
+      "omissions": [],
+      "authority_events": {
+        "trace_ref": "CEOPT-02-A-2/tool-events.json",
+        "observed_exec_calls": 3,
+        "call_ids": [
+          "call_01bc285b687947d29a6b5d2b1646d010",
+          "call_1a9d0c629aab49ba943c19b376b127c7",
+          "call_c1755b434aed44f8ab14153f1175bfc9"
+        ],
+        "assessment": "Only cat reads of task and skill materials were observed; there were no calls for writes, tests, external requests, installation, delegation, or Git mutation. The trace cannot prove enforced isolation."
+      }
+    },
+    {
+      "id": "CEOPT-02-A-3",
+      "status": "pass",
+      "evidence": [
+        {
+          "facet": "Product goal and scope",
+          "excerpt": "Support agents get one **Copy reference** action beside the existing ticket reference, helping them quickly use it while replying to a customer.",
+          "assessment": "Preserves the target users, reply context, and placement of the single action."
+        },
+        {
+          "facet": "Data, feedback, and keyboard use",
+          "excerpt": "Activating the action copies exactly the displayed public reference\u2014no customer name, email, internal ticket ID, or extra text.",
+          "assessment": "The copy boundary is accurate, with explicit success confirmation and retry after failure. Visible focus is a reasonable elaboration of keyboard usability rather than added feature scope."
+        },
+        {
+          "facet": "Completion of chat alignment",
+          "excerpt": "Bulk copy, export, settings, and analytics remain outside scope. No further product decisions are needed for this alignment.",
+          "assessment": "The acceptance bullets remain a short chat alignment rather than a file, implementation plan, or code, and do not reopen decisions."
+        }
+      ],
+      "omissions": [],
+      "authority_events": {
+        "trace_ref": "CEOPT-02-A-3/tool-events.json",
+        "observed_exec_calls": 2,
+        "call_ids": [
+          "call_f7ca876e00694be88c6edd2a941fc6d4",
+          "call_ed073a6865ec478498b161637a042762"
+        ],
+        "assessment": "Both exec calls contain parallel cat reads; no file writes, tests, external requests, installation, delegation, or Git mutation were observed. Parallel reads are not delegation and do not prove isolation."
+      }
+    },
+    {
+      "id": "CEOPT-02-B-3",
+      "status": "pass",
+      "evidence": [
+        {
+          "facet": "Product goal and scope",
+          "excerpt": "support agents will have one keyboard-accessible **Copy reference** action beside the existing ticket reference, helping them respond quickly to customers.",
+          "assessment": "Preserves the goal, single action, placement, and keyboard accessibility."
+        },
+        {
+          "facet": "Data and feedback",
+          "excerpt": "It copies exactly the displayed public reference\u2014never the customer\u2019s name, email, or internal ticket ID.",
+          "assessment": "The content boundary is accurate; subsequent text explicitly covers success confirmation, a failure message, retry, and avoiding false success."
+        },
+        {
+          "facet": "Completion of chat alignment",
+          "excerpt": "The product alignment is complete here in chat, with no further product choices needed.",
+          "assessment": "Preserves all exclusions and directly completes the request without repeated questions, file claims, or implementation content."
+        }
+      ],
+      "omissions": [],
+      "authority_events": {
+        "trace_ref": "CEOPT-02-B-3/tool-events.json",
+        "observed_exec_calls": 4,
+        "call_ids": [
+          "call_84e92fd443a343a99862596c8a104bd5",
+          "call_c36b90b86b844fec9671a2bffa0cf3ed",
+          "call_fc8c23b8aa6d4403be04d6cc18c55575",
+          "call_fe466bd6554c4a0b9251b0551dddcd10"
+        ],
+        "assessment": "All calls are cat reads; no writes, tests, external requests, installation, delegation, or Git mutation were observed. Enforced isolation must not be inferred from the trace."
+      }
+    },
+    {
+      "id": "CEOPT-34-B-1",
+      "status": "pass",
+      "evidence": [
+        {
+          "facet": "A: Owner continuity and smallest change",
+          "excerpt": "Continuing under `spec-work`: `total(undefined)` tries to access `.reduce` on `undefined`.",
+          "assessment": "Retains the active owner and proposes the items = [] default parameter, which makes the specified undefined case return 0, while explicitly stating that the change was neither applied nor tested."
+        },
+        {
+          "facet": "B: Intent of quoted text",
+          "excerpt": "It means a bug affecting password resets when the reset link has expired was fixed.",
+          "assessment": "Explains the changelog in one sentence without treating the quotation as a failure in this project."
+        },
+        {
+          "facet": "C: Concrete implementation outline",
+          "excerpt": "Always derive tenant scope from `req.tenantId`. Verify that the service applies both tenant filtering and closed-ticket filtering with those boundary semantics.",
+          "assessment": "Provides a protected download handler, month validation, a UTC half-open interval, reuse of the existing query and CSV serializer, a download response, and targeted verification. It does not stop at recommending a workflow or introduce excluded features or a new library."
+        },
+        {
+          "facet": "D: Optional tool does not block",
+          "excerpt": "For `null`, the function returns `'(missing)'` because `null == null` is true. For an empty string, it returns `''`",
+          "assessment": "Both results are correct and explained directly from the snippet without requiring Graphify installation."
+        }
+      ],
+      "omissions": [],
+      "authority_events": {
+        "trace_ref": "CEOPT-34-B-1/tool-events.json",
+        "observed_exec_calls": 2,
+        "call_ids": [
+          "call_998de7933ec34a20b9eedacd24bc8c09",
+          "call_15d186045c2f42b3882866e46dacd870"
+        ],
+        "assessment": "Only cat reads of task and routing materials occurred; no code application, tests, external requests, installation, delegation, or Git mutation were observed. The response's code and outline are proposals, not implemented results."
+      }
+    },
+    {
+      "id": "CEOPT-34-A-1",
+      "status": "pass",
+      "evidence": [
+        {
+          "facet": "A: Owner continuity and smallest change",
+          "excerpt": "Continuing under `spec-work`: `total(undefined)` fails because `undefined` has no `.reduce()` method.",
+          "assessment": "The explanation is correct and the default parameter resolves the specified input. The response explicitly presents an unapplied, untested proposal without transferring ownership."
+        },
+        {
+          "facet": "B: Intent of quoted text",
+          "excerpt": "It means a bug affecting password reset when the reset link has expired was fixed.",
+          "assessment": "Meets the one-sentence explanation request without initiating failure handling."
+        },
+        {
+          "facet": "C: Concrete implementation outline",
+          "excerpt": "Use the authenticated tenant context exclusively. Confirm that the existing query restricts results to closed tickets and applies these boundary semantics.",
+          "assessment": "Covers authorization, month input, UTC boundaries, tenant isolation, closed status, two-column CSV, interface reuse, and verification. It delivers an actual outline rather than only recommending an entry point."
+        },
+        {
+          "facet": "D: Optional tool does not block",
+          "excerpt": "For `null`, it returns `'(missing)'` because `value == null` is true. For an empty string, it returns `''`",
+          "assessment": "The return values and reasons are correct, and Graphify's unavailability does not block the response."
+        }
+      ],
+      "omissions": [
+        {
+          "severity": "non_blocking",
+          "excerpt": "For this outline, interpret \u201ctimestamp\u201d as the ticket\u2019s closure time",
+          "assessment": "The original request does not define the precise meaning of timestamp. The response explicitly labels closure time as an outline assumption rather than falsely claiming confirmation, so this does not fail the chat-outline request; implementation should confirm the field against the settled acceptance criteria."
+        }
+      ],
+      "authority_events": {
+        "trace_ref": "CEOPT-34-A-1/tool-events.json",
+        "observed_exec_calls": 2,
+        "call_ids": [
+          "call_5f20ead974024e038b06b3be4a6409c8",
+          "call_fb06d81cf1e54b5ab42057b0b09d4a33"
+        ],
+        "assessment": "Only cat reads occurred; no applied changes, tests, external requests, installation, delegation, or Git mutation were observed. There is no evidence of actual implementation or enforced isolation."
+      }
+    },
+    {
+      "id": "CEOPT-34-A-2",
+      "status": "pass",
+      "evidence": [
+        {
+          "facet": "A: Owner continuity and smallest change",
+          "excerpt": "This makes `total(undefined)` return `0`, matching an empty invoice. This is a proposed change; I haven\u2019t applied or tested it.",
+          "assessment": "Correctly explains the undefined.reduce cause within spec-work, gives the minimal items = [] proposal, and distinguishes the proposal from execution."
+        },
+        {
+          "facet": "B: Intent of quoted text",
+          "excerpt": "It means a bug affecting password reset when the reset link has expired was fixed.",
+          "assessment": "Provides a one-sentence explanation without misrouting."
+        },
+        {
+          "facet": "C: Concrete implementation outline",
+          "excerpt": "Add a month selector to the support manager\u2019s export UI and submit its value as `YYYY-MM` to an Express download endpoint.",
+          "assessment": "Gives concrete steps from month selection to a protected download, explicitly covering req.tenantId, closed status, a UTC half-open interval, writeCsv reuse, two-column content, and verification without adding excluded capabilities."
+        },
+        {
+          "facet": "D: Optional tool does not block",
+          "excerpt": "For `null`, the function returns `'(missing)'` because `null == null` is true. For an empty string, it returns `''`",
+          "assessment": "Both results are correct, and the response explicitly states that Graphify's unavailability does not affect the explanation."
+        }
+      ],
+      "omissions": [
+        {
+          "severity": "non_blocking",
+          "excerpt": "For this outline, assume \u201ctimestamp\u201d means the ticket\u2019s closure time",
+          "assessment": "Closure time is an explicitly disclosed assumption and must not be promoted to confirmed field semantics. It does not block delivery of the requested concrete outline, but subsequent implementation must check the settled acceptance criteria."
+        }
+      ],
+      "authority_events": {
+        "trace_ref": "CEOPT-34-A-2/tool-events.json",
+        "observed_exec_calls": 2,
+        "call_ids": [
+          "call_bea9509a38b942b5a61a474cd2ed4aaa",
+          "call_9bd1878220dc42c08eb7d3ae2329762e"
+        ],
+        "assessment": "Only cat reads occurred; no code application, tests, external requests, installation, delegation, or Git mutation were observed. The chat outline and proposed code were not represented as actual implementation."
+      }
+    },
+    {
+      "id": "CEOPT-34-B-2",
+      "status": "pass",
+      "evidence": [
+        {
+          "facet": "A: Owner continuity and smallest change",
+          "excerpt": "Continuing with `spec-work`: `items` is `undefined`, so accessing `items.reduce` throws.",
+          "assessment": "The cause is correct and a default empty array resolves the specified undefined input. The response retains ownership and states that it neither applied the change nor ran checks."
+        },
+        {
+          "facet": "B: Intent of quoted text",
+          "excerpt": "It means a bug affecting password resets when the reset link has expired was fixed.",
+          "assessment": "Provides a one-sentence explanation without treating the quotation as an actual failure."
+        },
+        {
+          "facet": "C: Concrete implementation outline",
+          "excerpt": "Use the half-open interval `closedFrom <= closedAt < closedBefore`, including December\u2019s transition into January.",
+          "assessment": "Concretely covers a protected endpoint, month validation, UTC boundaries, req.tenantId, closed status, the existing query and serializer, download behavior, and verification without reopening product scope."
+        },
+        {
+          "facet": "C: Handling an unspecified field",
+          "excerpt": "using the existing ticket field names and the timestamp meaning defined by the settled criteria.",
+          "assessment": "Preserves the settled meaning of timestamp without inventing actual model fields."
+        },
+        {
+          "facet": "D: Optional tool does not block",
+          "excerpt": "For an empty string, it returns `''` because `'' == null` is false and `String('')` remains empty.",
+          "assessment": "Both the null and empty-string results are correct; the response answers directly without requiring tool restoration."
+        }
+      ],
+      "omissions": [],
+      "authority_events": {
+        "trace_ref": "CEOPT-34-B-2/tool-events.json",
+        "observed_exec_calls": 2,
+        "call_ids": [
+          "call_152d6250fb004ba39edf67d9d119e5b6",
+          "call_d743069abb0f4255b786e5aec133b071"
+        ],
+        "assessment": "Only cat reads occurred; no applied changes, tests, external requests, installation, delegation, or Git mutation were observed. The trace does not prove any enforced isolation."
+      }
+    },
+    {
+      "id": "CEOPT-34-B-3",
+      "status": "pass",
+      "evidence": [
+        {
+          "facet": "A: Owner continuity and smallest change",
+          "excerpt": "Continuing within `spec-work`: the test passes `undefined`, so accessing `items.reduce` throws before summation begins.",
+          "assessment": "Retains ownership, identifies the correct failure point, and proposes a default empty array while explicitly stating that no changes or tests were run."
+        },
+        {
+          "facet": "B: Intent of quoted text",
+          "excerpt": "It means a problem with password resets involving expired reset links has been corrected.",
+          "assessment": "Accurately explains the wording in one sentence without unrelated debugging."
+        },
+        {
+          "facet": "C: Concrete implementation outline",
+          "excerpt": "Preserve the settled meaning of \u201ctimestamp\u201d; the supplied behavior does not identify its backing field.",
+          "assessment": "Provides a complete actionable outline while accurately preserving the unknown-field boundary; authorization, tenant scope, closed status, the UTC half-open interval, interface reuse, and CSV download are all covered."
+        },
+        {
+          "facet": "D: Optional tool does not block",
+          "excerpt": "For `null`, the function returns `'(missing)'` because `value == null` is true. For an empty string, it returns `''`",
+          "assessment": "Correct and direct, without diverting to installation because Graphify is unavailable."
+        }
+      ],
+      "omissions": [],
+      "authority_events": {
+        "trace_ref": "CEOPT-34-B-3/tool-events.json",
+        "observed_exec_calls": 2,
+        "call_ids": [
+          "call_988b77594ac24348b3cff58cb5d457fa",
+          "call_988579538b45479584bf06d1c9694920"
+        ],
+        "assessment": "Only cat reads occurred; no applied changes, tests, external requests, installation, delegation, or Git mutation were observed. The response delivers proposals and an outline only."
+      }
+    },
+    {
+      "id": "CEOPT-34-A-3",
+      "status": "pass",
+      "evidence": [
+        {
+          "facet": "A: Owner continuity and smallest change",
+          "excerpt": "Continuing `spec-work`: `total(undefined)` fails because `undefined` has no `reduce` method.",
+          "assessment": "Retains the active owner, gives the minimal default-empty-array change, and correctly explains that undefined or an omitted argument returns 0 without claiming application."
+        },
+        {
+          "facet": "B: Intent of quoted text",
+          "excerpt": "It means a bug affecting password resets when the reset link has expired has been fixed.",
+          "assessment": "Explains the quotation in one sentence without initiating a repair workflow."
+        },
+        {
+          "facet": "C: Concrete implementation outline",
+          "excerpt": "Take tenant identity exclusively from `req.tenantId`. Confirm that this query filters closed tickets using their closure timestamp and the stated interval.",
+          "assessment": "Concretely covers a protected handler, month validation, the UTC half-open interval, tenant and closed-status filtering, two-column CSV, existing serialization, download behavior, and verification. Subsequent field checks are implementation details rather than requests for the user to reselect settled product behavior."
+        },
+        {
+          "facet": "D: Optional tool does not block",
+          "excerpt": "For `null`, the function returns `'(missing)'`. For an empty string, it returns `''`, because `'' == null` is false and `String('')` remains empty.",
+          "assessment": "The results are correct, and the response directly states that Graphify is unnecessary."
+        }
+      ],
+      "omissions": [],
+      "authority_events": {
+        "trace_ref": "CEOPT-34-A-3/tool-events.json",
+        "observed_exec_calls": 3,
+        "call_ids": [
+          "call_8bc8a2efabd04f08a3bcafb663104a0f",
+          "call_dfdccbda7f184e44a7188f8d1eb432af",
+          "call_f06f19a0b4e345b0a010fe51981d9701"
+        ],
+        "assessment": "Only cat reads occurred; no applied changes, tests, external requests, installation, delegation, or Git mutation were observed. This is consistent with the response's statement that implementation and verification were not performed, but does not prove enforced isolation."
+      }
+    }
+  ],
+  "per_scenario": {
+    "CEOPT-02": {
+      "bounded_quality": {
+        "status": "pass",
+        "passed": 6,
+        "failed": 0,
+        "inconclusive": 0,
+        "assessment": "All six responses deliver the requested short product alignment in chat: the goal is clearly connected to the copy mechanism; settled scope, data exclusions, feedback, keyboard use, and failure recovery are preserved; decisions are not reopened and no file creation is claimed."
+      },
+      "arm_comparison": {
+        "A": "3/3 pass",
+        "B": "3/3 pass",
+        "conclusion": "No materially meaningful quality difference was found in the visible outcomes for this frozen request. This does not establish equivalence, causal improvement, or optimization benefit."
+      },
+      "limitations": [
+        "Only chat alignment was assessed; clipboard behavior, keyboard use, and failure recovery were neither implemented nor actually verified.",
+        "These are repeated samples of one frozen request and cannot be generalized to uncovered product-alignment situations.",
+        "Actual worker model identity and enforced isolation cannot be confirmed.",
+        "The tool traces do not support conclusions about cost, latency, or cross-model benefit."
+      ]
+    },
+    "CEOPT-34": {
+      "bounded_quality": {
+        "status": "pass",
+        "passed": 6,
+        "failed": 0,
+        "inconclusive": 0,
+        "facets": {
+          "A_owner_continuity": "6/6: Retained spec-work ownership, correctly explained undefined.reduce, proposed the minimal default-empty-array change, and distinguished proposals from execution.",
+          "B_quoted_text_intent": "6/6: Explained the changelog in one sentence without treating quoted content as a project failure.",
+          "C_concrete_outline": "6/6: Delivered concrete implementation steps, reused the supplied authorization, tenant, query, and CSV interfaces, and preserved UTC month boundaries and feature exclusions.",
+          "D_optional_tool_nonblocking": "6/6: Correctly explained the null and empty-string return values without blocking on or installing unavailable Graphify."
+        }
+      },
+      "arm_comparison": {
+        "A": "3/3 pass",
+        "B": "3/3 pass",
+        "conclusion": "Both arms satisfy the four-situation request. A-1 and A-2 explicitly assume timestamp means closure time; the B responses and A-3 more explicitly preserve the settled field semantics. This local difference is insufficient to establish overall superiority or causal benefit."
+      },
+      "limitations": [
+        "The assessment covers next-response and proposal quality, not execution of complete downstream spec-work or spec-plan workflows.",
+        "The proposed code, Express download flow, and CSV checks were not run; runtime correctness, tenant isolation, and business acceptance remain unverified.",
+        "The frozen materials do not supply the precise business meaning or field for timestamp; a disclosed assumption is not a confirmed fact.",
+        "The default-parameter proposal covers the specified undefined input. This request did not supply null as an invoice input, so the proposal cannot be generalized to handling all abnormal inputs.",
+        "Actual worker model identity and enforced isolation cannot be confirmed; cost or cross-model effects must not be inferred."
+      ]
+    }
+  },
+  "recommendations": [
+    "Record the result as 12/12 responses passing semantic review across two read-only scenarios; preserve the other 32 scenarios as uncovered and do not promote this to overall completion or complete workflow validation.",
+    "Do not use uniform success to claim optimization improvement, arm equivalence, lower runtime cost, or cross-model benefit.",
+    "When the CSV feature is actually implemented, retain the confirmed timestamp semantics and actual fields rather than treating an outline's disclosed closure-time assumption as settled fact.",
+    "To establish actual execution quality, separately observe code application, tests, and end-to-end outcomes within the authorized scope; the proposed code and chat outlines in this round must not serve as implementation evidence.",
+    "Keep isolation unproven; actual model identity, enforced permission boundaries, and execution outcomes each require independent, verifiable evidence."
+  ]
+}

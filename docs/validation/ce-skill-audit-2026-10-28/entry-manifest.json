@@ -1,0 +1,278 @@
+{
+  "entries": [
+    {
+      "skill": "autoresearch",
+      "local_entry_sha256": "d51a75af36a3a41095d50a775197635c48238ed24ed6ad3eda1ef24e50f43136",
+      "ce_skill": null,
+      "ce_entry_sha256": null,
+      "local_files": 30
+    },
+    {
+      "skill": "spec-app-consistency-audit",
+      "local_entry_sha256": "0fe3e99ecba65f49ec62c1fa0bbd870f926760df966f5e68724e75b07ed0f1b4",
+      "ce_skill": null,
+      "ce_entry_sha256": null,
+      "local_files": 90
+    },
+    {
+      "skill": "spec-brainstorm",
+      "local_entry_sha256": "d3df96643040bebb4cc003ff75f9fdb3f3dac34461abb031eab7808f82167861",
+      "ce_skill": "ce-brainstorm",
+      "ce_entry_sha256": "1820aa67cd39b4f220b6b1e638bd98841e6ba8e8a3c3f35448155a28b2822948",
+      "local_files": 32
+    },
+    {
+      "skill": "spec-code-review",
+      "local_entry_sha256": "c6f93d057756425728ba3b3e3e2e9f2b7844e0b4b6d96859c0b8cc59c0aa8486",
+      "ce_skill": "ce-code-review",
+      "ce_entry_sha256": "4dbdc4485af006035e1a8622735e58eb4298be69b404b1241e748b0057a7e9ac",
+      "local_files": 65
+    },
+    {
+      "skill": "spec-commit",
+      "local_entry_sha256": "9ac59b9977f687e764026bd1e8ef5a57e5efc7a4f58133816c3e00986f4eaa3d",
+      "ce_skill": "ce-commit",
+      "ce_entry_sha256": "a34d3c3b30577cdab314ca384b05177fc9121eb46d80b8bfcaed174425fd3ceb",
+      "local_files": 9
+    },
+    {
+      "skill": "spec-commit-push-pr",
+      "local_entry_sha256": "caf7ac9387d1ba3355499fd8a008743d3f78322a6ecf1c4eaefbde4f0919cf93",
+      "ce_skill": "ce-commit-push-pr",
+      "ce_entry_sha256": "deb35ce03204b9c4c372c9c82a8f68e34d00fa800e1fc92a3642811ab43d1591",
+      "local_files": 15
+    },
+    {
+      "skill": "spec-compound",
+      "local_entry_sha256": "ed6fd3d4f45a86c61adbfb283aad720f6adcb7aa3d20160dac5f23e54c3947cd",
+      "ce_skill": "ce-compound",
+      "ce_entry_sha256": "951669e685c804a16138736c4bf132ee5f6ed9bbee3e3ccd5cbb096dd253b5d6",
+      "local_files": 51
+    },
+    {
+      "skill": "spec-compound-refresh",
+      "local_entry_sha256": "b0a5dccac1b77e349fa4a99e0e83ea20857fbf992fa6fdd1d3aa5893db0b90e3",
+      "ce_skill": "ce-compound-refresh",
+      "ce_entry_sha256": "2cdc83792aed2e2c1ea6c9fcaa6330ac549b955f9ce01b7868832b74c167b43e",
+      "local_files": 25
+    },
+    {
+      "skill": "spec-debug",
+      "local_entry_sha256": "6c40fadd87dce2ad56bcf5556366a796ed1583a00c5bf53110b98164a3e2daf7",
+      "ce_skill": "ce-debug",
+      "ce_entry_sha256": "82540da83cbe42ff462a75557752b5f4313e5fe0fa89d5bb047c29eec6de5a80",
+      "local_files": 22
+    },
+    {
+      "skill": "spec-doc-review",
+      "local_entry_sha256": "c96d48de5841a1d3c2692232e54107a5eaccdf0337817dc024c2af6d958eaab0",
+      "ce_skill": "ce-doc-review",
+      "ce_entry_sha256": "c47ed092ec739047f644edc7882cfbf63a674d6555256d2deb20b4318dab88b8",
+      "local_files": 53
+    },
+    {
+      "skill": "spec-dogfood",
+      "local_entry_sha256": "9e5057e8670a5a9073b27e8051c0a669d759065ec1997a371d618719b2023a88",
+      "ce_skill": "ce-dogfood",
+      "ce_entry_sha256": "7b8723b454bff5977c7bd72e1ebac4298abe2d6c7e9ab5c38c66e7da82f9e553",
+      "local_files": 15
+    },
+    {
+      "skill": "spec-explain",
+      "local_entry_sha256": "bd82dcd441b82fd5336f3ea26bc22c5e382baf1d5dfc52ccb734719db4c6e39e",
+      "ce_skill": "ce-explain",
+      "ce_entry_sha256": "fe1a05fa429338524374b2428bac9a0338a7e7c2f7ff4e1e510da123e834cafe",
+      "local_files": 15
+    },
+    {
+      "skill": "spec-handoff",
+      "local_entry_sha256": "4bc4a2e1da3aa5caa1e547c9f9d59410099823fa315c77f56c8e71ac7a5b6d6c",
+      "ce_skill": "ce-handoff",
+      "ce_entry_sha256": "3fb19a18d8ee00594254d8b495da51c6847563ce23124e8639edc8953f1c62bb",
+      "local_files": 24
+    },
+    {
+      "skill": "spec-ideate",
+      "local_entry_sha256": "dd427fca3e50bce7dc0fc7bc573633217e696c2f8583a1215c5e571c9665f733",
+      "ce_skill": "ce-ideate",
+      "ce_entry_sha256": "215ce538c3b6add991b1bde9453e81a70f13e53ed286e6101a982d163870b09b",
+      "local_files": 30
+    },
+    {
+      "skill": "spec-lfg",
+      "local_entry_sha256": "6bd097a450c07fa97dc543d15f53fbfc17a5aa6a9c4661054b97a3bcc89ecaa7",
+      "ce_skill": "lfg",
+      "ce_entry_sha256": "8af6156a417111542f5965dd615faae60b0ce5558c212f7d6bf15b801f8342c7",
+      "local_files": 24
+    },
+    {
+      "skill": "spec-optimize",
+      "local_entry_sha256": "f7fdfdcdd0b732348e1bb174ff29b6f58e50f4dc52f2cd6cd7197ecc5fe640e3",
+      "ce_skill": "ce-optimize",
+      "ce_entry_sha256": "d44b1723df398409eead75ee65db229c5b2922eaf266d0c3b767662471361bd7",
+      "local_files": 37
+    },
+    {
+      "skill": "spec-plan",
+      "local_entry_sha256": "bcc0e89dd04b3199a09ac16ee74a75a418fe609bd6cf6324f5c78a9d0bc9b416",
+      "ce_skill": "ce-plan",
+      "ce_entry_sha256": "6c5842bfc91a9aad65fcdf83669f86ef499a9b40dc99f9340c5981d2bc6f1720",
+      "local_files": 81
+    },
+    {
+      "skill": "spec-polish",
+      "local_entry_sha256": "193735fb6913a7851160b6072d898e958f15b5bdcf211009d9ce70d5f574bd55",
+      "ce_skill": "ce-polish",
+      "ce_entry_sha256": "985888097d7e82a04a4b59856d53d7e6a30854094400b5be36c278261f0c92fa",
+      "local_files": 23
+    },
+    {
+      "skill": "spec-pov",
+      "local_entry_sha256": "cd51d624dfcd1d697921d740d3e9e6f9ade13d1d40e0b3be60ca6e51b37a58f9",
+      "ce_skill": "ce-pov",
+      "ce_entry_sha256": "571f15137501d4046f0ef47a96ff081ad936cdd2074508ea404e88871f0d5db3",
+      "local_files": 25
+    },
+    {
+      "skill": "spec-prd",
+      "local_entry_sha256": "25cc60f639d886c024a61b462c84cb101f6b95a6098984a879f2a750292e230a",
+      "ce_skill": null,
+      "ce_entry_sha256": null,
+      "local_files": 48
+    },
+    {
+      "skill": "spec-product-pulse",
+      "local_entry_sha256": "4957802c1c1c12e74fec8257207e5e137a5b87c0a4cbfac6f38acf7caa8d597a",
+      "ce_skill": "ce-product-pulse",
+      "ce_entry_sha256": "aa53c3994a2c682cdf07e44bfe952a4c3a192a1a39ba701a6f3d101246e10e85",
+      "local_files": 13
+    },
+    {
+      "skill": "spec-project-rules",
+      "local_entry_sha256": "6a980fd52f58649626bd327202d95c210d245184b0cd7f58f9fe5779e6000f87",
+      "ce_skill": null,
+      "ce_entry_sha256": null,
+      "local_files": 105
+    },
+    {
+      "skill": "spec-promote",
+      "local_entry_sha256": "e9f2145d1f6aacc60ed1a753bdd11789350ffbf919704e540bd29a04872a26eb",
+      "ce_skill": "ce-promote",
+      "ce_entry_sha256": "6ad4cb9a205d4cdb11503295c8e63847210fa963e30a13664480b532050eb028",
+      "local_files": 11
+    },
+    {
+      "skill": "spec-prototype",
+      "local_entry_sha256": "51ee1bf5c37d0ea8bbcb3a3d228ae402de6caede717b4f88700a42582562cb22",
+      "ce_skill": "ce-prototype",
+      "ce_entry_sha256": "de1b34ef13dffcf882021bc8e600abb64bd9265fb624b35dd9800ce6412c78fb",
+      "local_files": 14
+    },
+    {
+      "skill": "spec-resolve-pr-feedback",
+      "local_entry_sha256": "594de7ca1be76c76a462c281879e4a0837f6e4c433d7949432e2f5e8a30c580d",
+      "ce_skill": "ce-resolve-pr-feedback",
+      "ce_entry_sha256": "bab9f30db1ad817c6cc9a1ed87969f116be4c2896b9ae419b8df6bbb51db1784",
+      "local_files": 22
+    },
+    {
+      "skill": "spec-riffrec-feedback-analysis",
+      "local_entry_sha256": "d577685081c41c9f6b9bdcc7eee3644b116e19dbd82ad3bef9e9f3844b304bb8",
+      "ce_skill": "ce-riffrec-feedback-analysis",
+      "ce_entry_sha256": "bb26288e44949715b64ddd5fd14e792242f730a9ea5680d364b1a443c3926352",
+      "local_files": 13
+    },
+    {
+      "skill": "spec-rule-miner",
+      "local_entry_sha256": "306fc3e4cbe1a067434807b7eed1c765213fa6be357d2e3d16960f79abe434d1",
+      "ce_skill": null,
+      "ce_entry_sha256": null,
+      "local_files": 12
+    },
+    {
+      "skill": "spec-runtime-setup",
+      "local_entry_sha256": "cb04249d533bb6c92581cbc8c90d9ab84383d045c495fe62f8902093515b6795",
+      "ce_skill": "ce-setup",
+      "ce_entry_sha256": "4c928fe28ece03398180fdef0333e3f6baef8e798798439abd566df4452749ce",
+      "local_files": 86
+    },
+    {
+      "skill": "spec-simplify-code",
+      "local_entry_sha256": "6c23d2047993297e95b17880f2f1c0135538e86900425db646e103f9fc101b23",
+      "ce_skill": "ce-simplify-code",
+      "ce_entry_sha256": "55a1eda289acd76e7b95827e7e74a17c9baa62932c0b35e0c38906da3e405d8a",
+      "local_files": 19
+    },
+    {
+      "skill": "spec-strategy",
+      "local_entry_sha256": "edfd4866fadfb26582068a2195f86a8c65f32626156a0f5bbce10afd265bb0f6",
+      "ce_skill": "ce-strategy",
+      "ce_entry_sha256": "e29b625b46e068f0a0e7b1ead73ade7f26d52066a3959f0aa245b9c723060280",
+      "local_files": 13
+    },
+    {
+      "skill": "spec-sweep",
+      "local_entry_sha256": "b2a87ee7f920913986c8a0a80a4f3aec988025cf25cb794f941af7570bd9d484",
+      "ce_skill": "ce-sweep",
+      "ce_entry_sha256": "651376d791d760e172fa3fb60218c1ca7ca76dce302291973ede81c70e2c3588",
+      "local_files": 21
+    },
+    {
+      "skill": "spec-test-browser",
+      "local_entry_sha256": "bfe3cdc6e9648c6cec96bbe221a8cdd37cddb322d5b489eb1eb861fab329c4db",
+      "ce_skill": "ce-test-browser",
+      "ce_entry_sha256": "68d2445e2cc3123e8b463de00399916df7fb094a5d6372654cde5aa609e4c21c",
+      "local_files": 9
+    },
+    {
+      "skill": "spec-test-xcode",
+      "local_entry_sha256": "e9397a88ddba0144200a6595bf353d8676ab3919dceb56d77360390b5317069b",
+      "ce_skill": "ce-test-xcode",
+      "ce_entry_sha256": "76c74d7b834468a5f41af63b72ae7b98a0fcd08d55fa57891004ea4fdfd2e03c",
+      "local_files": 5
+    },
+    {
+      "skill": "spec-work",
+      "local_entry_sha256": "3a192fe50952380dcf4bf18ee73435ada13b15d44110dde8a33a8c4d0557c879",
+      "ce_skill": "ce-work",
+      "ce_entry_sha256": "c9b392620e8ae856882cd5a493b1f0e5941aa06935a73578846e703e0f00ce00",
+      "local_files": 52
+    },
+    {
+      "skill": "spec-worktree",
+      "local_entry_sha256": "380139d61774f908ab6ae8cf983502d178cbace6e6d8e43a4b7587ea10cfcab6",
+      "ce_skill": "ce-worktree",
+      "ce_entry_sha256": "832f90ee9bb7c5686617015d587cc2d4fd2482a40127da104fe3165bcb3121cb",
+      "local_files": 16
+    },
+    {
+      "skill": "spec-write-skill",
+      "local_entry_sha256": "73f6e1a06661d3a1b2a172800b25abca9888681d61f8abf6457fbb769c1f668d",
+      "ce_skill": null,
+      "ce_entry_sha256": null,
+      "local_files": 25
+    },
+    {
+      "skill": "spec-write-tasks",
+      "local_entry_sha256": "ad4decabc11124b24bfe45b850ba1f4e959f86340159bb5ebdbd90bc8e04c8e2",
+      "ce_skill": null,
+      "ce_entry_sha256": null,
+      "local_files": 23
+    },
+    {
+      "skill": "using-spec-first",
+      "local_entry_sha256": "21a73e2da3f24f0b8d7eef31664e5e55c9e1228e809a419efde7fe345e580079",
+      "ce_skill": null,
+      "ce_entry_sha256": null,
+      "local_files": 11
+    }
+  ],
+  "ce_only": [
+    "ce-babysit-pr",
+    "ce-bakeoff",
+    "ce-noslop",
+    "ce-proof",
+    "ce-retune",
+    "wtf"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+ "case": "s04-p4-vague",
+ "seed": 20261109,
+ "a_out": "/tmp/batch1/s04-gpt/iteration-1/s04-p4-vague/with_skill/outputs",
+ "b_out": "/tmp/batch1/s04-gpt/iteration-1/s04-p4-vague/without_skill/outputs",
+ "mapping": {
+  "X": "B",
+  "Y": "A"
+ },
+ "verdict_raw": {
+  "preferred": "Y",
+  "reason": "Y 先核实仓库已有能力、按流程澄清用途再写计划，契合首要标准；X 凭假设输出通用模板，完全未回仓库事实；Y 末尾混入无关代码块是小瑕疵，不影响结论。"
+ },
+ "preferred_group": "A"
+}

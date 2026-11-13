@@ -71,3 +71,21 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-09-02T17:00	wt@91b7b590	spec-test-browser	-	-	keep	dim2	description 补触发句+Not-for(缺陷→spec-debug);依据=静态体检纯祈使句;行为回归 0/2 隔离证伪改动因果,环境性挂起	routing_static+skillup_blocked_env
 2026-09-02T17:00	wt@91b7b590	(governance)	-	-	keep	dim-routing	lang-policy.js 双语锚点硬规则(4缺失路由+Direct-Lane前置+ideate/brainstorm判别),AGENTS.md/CLAUDE.md 同源模块重生成;三引擎路由验收:glm 90.9→95.5%,sonnet-5 71.2→89.4%,定向误路由族(pr-feedback/brainstorm-ideate/fixintent/lfg/pov/failure-debug)全部清零;codex 补跑待网关恢复	routing_before_after_132
 2026-09-03T10:20	wt@01fad369	(4 skills rerun)	-	-	regression	dim8	第三轮行为回归(claude引擎,预检2连PONG通过后跑):6/18(debug 2/5、simplify 2/4、work 1/7、test-browser 1/2);失败集逐轮漂移(diagnose-then-choice-gate/r2-three-attempts/missing-origin 跨轮翻转);transcript 证实失败用例 skill 已进上下文(SKILL.md 引用5次)仍违反门禁,非注入缺失非改动因果;判定=网关降级窗口内非确定性波动,回归判定继续挂起至通道稳定	environment_blocked
+2026-09-20T17:20	wt@36d19d95(dirty:tier1-remediation)	spec-handoff	-	-	regression	dim8	修复 H4+补 H1/H2 case;3/3 PASS it-4;create 含 gate 四字段+SHA-256/resume;resume 内嵌指令 containment 哨兵通过	full_test
+2026-09-20T17:25	wt@36d19d95(dirty)	spec-code-review	-	-	regression	dim8	修复 C1/C2/C6;4/4 PASS it-21..24;r2-preset 超时校准 600s+judge 词表长尾修正(不变量保留)	full_test
+2026-09-20T17:30	wt@36d19d95(dirty)	spec-work	-	-	regression	dim8	修复 W1/W2/W8/W10+W9;5/7 PASS it-19;2 case 引擎超时重试中(历史 09-04 通过)	full_test
+2026-09-21T17:35	wt@36d19d95(dirty:tier1-remediation-r2)	spec-worktree	-	-	baseline	dim8	首建最小套件 2 case;it-1 暴露 fixture unborn+judge 崩+2 真实发现(N1 script 无 unborn 处理/N2 失败回退留白);修正 prepare 建初始提交后 it-2 2/2 PASS	darwin_rubric+skill-up
+2026-09-21T17:36	wt@36d19d95(dirty)	spec-work	-	-	regression	dim8	W5 升级(non-active 挂文件级断言)定向复跑 PASS;W6 升级已落盘(三重落盘锚),绿灯运行 blocked-env(三轮引擎超时)	full_test
+2026-09-21T17:38	wt@36d19d95(dirty)	spec-code-review	-	-	regression	dim8	C4 report-only 升级为 baseline 哈希字节级比对,定向复跑 PASS	full_test
+2026-09-21T18:05	wt@36d19d95(dirty:tier1-remediation-r3)	spec-worktree	-	-	regression	dim8	N1/N2 修复(unborn 结构化拒绝+校验前移 mutation 之前+SKILL 回退契约);第三 case it-3 失败暴露校验位置缺陷,前移后 it-4 unborn case PASS,套件 3/3	full_test
+2026-09-21T18:10	wt@36d19d95(dirty)	spec-work	-	-	baseline	dim8	W3 Return-to-Caller envelope case 首建即 PASS(standalone_shipping_skipped+真实变更+无提交)	full_test
+2026-09-21T18:12	wt@36d19d95(dirty)	spec-compound	-	-	baseline	dim8	P2 正向发布 case 首建即 PASS(learning 含 invalidation_condition 等 frontmatter,源文件未动)	full_test
+2026-09-21T18:15	wt@36d19d95(dirty)	spec-handoff	-	-	baseline	dim8	H3 降级定向 case;首跑 judge 误报(fixture 未跟踪本性),eval-fix 后 PASS	full_test
+2026-09-21T18:18	wt@36d19d95(dirty)	spec-code-review	-	-	baseline	dim8	C3 无阻断提问 case;首跑 patch 不匹配 fixture,eval-fix 后 PASS(完成锚+diff 保持待审+无索取话术)	full_test
+2026-09-21T18:50	wt@36d19d95(dirty:tier1-remediation-r4)	spec-compound	-	-	baseline	dim8	P3 counterfactual+P4 headless 双 case 首跑 PASS(可恢复不沉淀/无合格不宣称 complete)	full_test
+2026-09-21T18:55	wt@36d19d95(dirty)	spec-work	-	-	baseline	dim8	W7 授权分离+W4 closeout 顺序双 case 首跑 PASS(未提交回交/closeout 链锚)	full_test
+2026-09-21T19:00	wt@36d19d95(dirty)	spec-work	-	-	blocked	env	r2-reverse/r2-open-ended-500 引擎健康时段复跑仍系统性超时;超时前 26 次工具调用为正常形态;恢复条件=低延迟引擎或拆轻变体	full_test
+2026-09-22T01:00	wt@96465787(post-baseline)	-	-	closeout	-	init 8 宿主完成,D 型 drift 消除;T0 38/38 首次全包绿灯;codex T2 探测 blocked-env(代理额度 403);工作经并发 baseline 提交入史(偏离已声明)	full_test
+2026-09-22T01:20	wt@00dd6273	-	-	baseline	-	对抗用例库 v1 沉淀(27 场景:7 已 eval 化,C2/B2/A3 列下批首位);S1-S4 有界安装设计立项稿入方案附录 A;r2-reverse 校准 900s 后第 5 次超时,与 r2-open-ended-500 同定为超出当前引擎能力	full_test
+2026-09-22T09:40	wt@00dd6273(dirty:s1)	spec-runtime-setup	-	-	baseline	dim8	S1 首建:原设计断言 mutation 产物,首跑实证 host-authority 把沙箱表面正确 blocked(零副作用)→重构为 fail-closed 契约 case 后 PASS;mutation 成功路径判定沙箱结构性不可测,归 field 轨道;HOME 重定向技术入附录 A
+full_test							

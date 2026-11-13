@@ -1,0 +1,64 @@
+{
+  "skill_name": "spec-test-xcode",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T20:09:20.670498+08:00",
+  "end_time": "2026-11-04T20:10:27.301148+08:00",
+  "case_results": [
+    {
+      "case_id": "mcp-unavailable-stops",
+      "title": "XcodeBuildMCP 不可用应停止并给安装指引",
+      "status": "PASS",
+      "duration_ms": 66616,
+      "turns": 4,
+      "input_tokens": 25200,
+      "output_tokens": 1279,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 4,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[XcodeBuildMCP]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[XcodeBuildMCP])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（skill-up 评测框架说明：本仓库 .claude/skills/spec-test-xcode/SKILL.md 是被测\nskill 的定义文件,已随仓库就位。本次运行不经过 Skill 工具调用——请直接完整读取\n该文件,把它视为已加载的工作指令,然后按它处理下面的用户输入。）\n用户输入: current\n",
+      "response": "Readiness 检查完成，四项前置条件全部不满足。按 skill 要求（provider 无法达到 ready 状态即停止，测试请求不授权安装工具或修改宿主配置），依赖测试全部停止——未进行任何 project discovery、build、install 或 launch 调用。以下为最终报告：\n\n## 测试结果：FAIL（readiness 阶段失败，未进入构建）\n\n| 项 | 内容 |\n|---|---|\n| **Project** | 无有效工程。当前目录 `…/T/skill-up-2583554054/` 仅含 `.claude/`，未发现 `.xcodeproj` / `.xcworkspace` / `Package.swift` |\n| **Scheme** | 请求为 `current`（默认 scheme）；因 readiness 失败于 scheme 解析之前，未能选定 |\n| **Simulator** | 无法查询。`xcrun simctl` 报错 `unable to find utility \"simctl\", not a developer tool or in PATH` |\n| **Provider** | XcodeBuildMCP 服务器未连接。当前会话工具列表与 ToolSearch 均无 `list_simulators`、`build_ios_sim_app` 等任何该 server 工具 |\n| **Target identity** | 不可用（无工程、无 scheme、无模拟器、无 bundle ID） |\n| **Source binding** | 明确限制：该目录非 git 仓库且无项目源，无 revision/fingerprint 可绑定 |\n| **Evidence authority** | `transcribed`——仅有本机命令探测输出（`xcode-select` / `xcodebuild -version` / `xcrun simctl`），无任何 XcodeBuildMCP provider 证据 |\n| **Freshness** | 不适用：无 build 开始，无最终动作 |\n| **Claim ceiling** | 仅观察到上述环境探测结果。**未执行任何 build、install、launch 或屏幕测试** |\n\n### 失败明细（readiness，全部实测）\n\n1. **Xcode 不完整**：`xcode-select -p` → `/Library/Developer/CommandLineTools`；`xcodebuild -version` → `error: tool 'xcodebuild' requires Xcode, but active developer directory … is a command line tools instance`。即本机只装了 Command Line Tools，未安装/未选中完整 Xcode。\n2. **无被测工程**：工作目录内没有任何 Xcode 工程或 Swift Package。\n3. **无模拟器基础设施**：`simctl` 不可用（由第 1 项导致）。\n4. **XcodeBuildMCP 未连接**：宿主中不存在该 MCP server 的工具。\n\n### 限制与边界\n\n- 按skill边界，本次测试请求**不授权**安装 Xcode、安装/配置 XcodeBuildMCP（如 `npx -y xcodebuildmcp@latest mcp`）或修改宿主配置，故未做任何安装或配置变更。\n- 未创建任何证据文件；以上证据仅随本回复返回。\n- 结果判定依据：readiness 阶段失败直接构成 FAIL，不存在可降级为 PARTIAL 的空间。\n\n### 最小下一步（需要另行授权/提供）\n\n1. 提供被测 iOS 工程的路径（含 `.xcodeproj`/`.xcworkspace`）；\n2. 安装完整 Xcode 并执行 `sudo xcode-select -s /Applications/Xcode.app`；\n3. 在宿主配置并连接 XcodeBuildMCP server，之后重新发起测试请求（可再次使用 `current` 选择默认 scheme）。\n\n三项就绪后重跑即可。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 26479,
+  "judge_tokens": 0,
+  "overall_tokens": 26479
+}

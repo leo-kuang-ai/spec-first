@@ -1,0 +1,23 @@
+{
+  "scenario": "CEOPT-15",
+  "kind": "separate-parent-mechanism-supplement",
+  "created_at": "2026-10-31T05:08:14.264145+00:00",
+  "source_hashes": {
+    "A": "413c50424494e44bb181448a37e4bebe8fe5bcdcde2dee40212e67ecd0d3f7d8",
+    "B": "ecaec4d29625d0e56609aac935f1d733726ea760fda42e750ac5fd835e286e16"
+  },
+  "cases": {
+    "dirty-reuse": "Create owned experiment, add tracked/untracked/ignored WIP, repeat create twice. B must reject both and preserve every byte, HEAD and index entry.",
+    "dirty-cleanup": "Default cleanup must reject owned dirty experiment and preserve WIP in B.",
+    "unowned-prefix-cleanup": "cleanup-all must preserve an unregistered prefix-matching directory and return failure in B.",
+    "legacy-cleanup": "A registered branch/worktree without an ownership manifest must survive cleanup in B.",
+    "pristine-cleanup": "Create then clean a pristine owned experiment; both native routes should remove worktree and branch.",
+    "explicit-discard": "B-only native positive control: explicitly discard owned dirty experiment after external audit capture; remove branch/worktree and retain audit bytes."
+  },
+  "authority": "Parent may create, commit and delete only newly allocated disposable fixture repositories. No project Git mutation, hooks, remotes or runtime projection.",
+  "limits": [
+    "Original packets/model trials remain unchanged.",
+    "No genuine A/A samples or holdout execution.",
+    "No claim of autonomous model mutation or broad safety coverage."
+  ]
+}

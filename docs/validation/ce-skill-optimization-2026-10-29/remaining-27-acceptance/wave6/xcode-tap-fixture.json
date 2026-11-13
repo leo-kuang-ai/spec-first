@@ -1,0 +1,22 @@
+{
+  "evidence_type": "Synthetic interpretation control; not an actual simulator observation",
+  "app_identity": {
+    "bundle_id": "invalid.fixture.ledger",
+    "scheme": "LedgerFixture",
+    "source": "fixture build settings, not actual Xcode build"
+  },
+  "before": {
+    "screen": "Entries",
+    "label": "Total: 12"
+  },
+  "tap_receipt": {
+    "success": true,
+    "target": "Settings"
+  },
+  "after": {
+    "screen": "Entries",
+    "label": "Total: 12"
+  },
+  "requested_assertion": "Settings screen is visible",
+  "constraints": "No real simulator/MCP/app is supplied. Interpret this fixture separately from actual missing-tool readiness."
+}

@@ -1,0 +1,41 @@
+{
+  "schema_version": "verification-run-summary.v1",
+  "generated_at": "2026-11-02T10:22:07.991Z",
+  "profile": {
+    "source": "local",
+    "name": "S02-spec-brainstorm-repair",
+    "path": null
+  },
+  "checks": [
+    {
+      "id": "eval",
+      "service": "local",
+      "command": "skill-up validate skills/spec-brainstorm/evals/eval.yaml",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "skill-up"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s02-spec-brainstorm-resume-20261102/logs/eval.txt",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "tests",
+      "service": "local",
+      "command": "node node_modules/jest/bin/jest.js --runInBand --runTestsByPath tests/unit/spec-brainstorm-clarification-contracts.test.js tests/unit/spec-brainstorm-contracts.test.js tests/unit/spec-brainstorm-visual-retirement-contracts.test.js",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s02-spec-brainstorm-resume-20261102/logs/tests.txt",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    }
+  ]
+}

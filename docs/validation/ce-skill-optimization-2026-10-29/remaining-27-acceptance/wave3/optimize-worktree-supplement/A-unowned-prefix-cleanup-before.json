@@ -1,0 +1,9 @@
+{
+  "exists": true,
+  "files": {
+    "sentinel.txt": "b99181fe199ec9b0aed795b11698f7bce113b9c6712b5cd36ab322a1ce1a3d85"
+  },
+  "head": null,
+  "index": null,
+  "root_head": "a24b941c69e76dcc97c7936bb3d1102eb041f1a1"
+}

@@ -1,0 +1,132 @@
+**结论：探针 1、4、5 放松过度；探针 2、3 放松适度。** 最严重的问题是：judge 将复合 shell 命令的成功和输出，错误归属于首段 producer。当前实现可以在 producer 根本没有执行成功时接受 `verified`。
+
+以下仅依据包内源码。未提供旧版解析器及 CLI 合同实现，因此不把当前缺陷直接认定为本次新增，也不声称已证明与 CLI 完全等价。
+
+1. **探针 1／A16：放松过度。**
+
+   **单字符 `|` 的直接过滤有效，但整个调用归属守卫不完备。** 普通管道中的 `|` 会保留在 token 中，随后被 `/[;&|<>`]/` 拒绝；真正的漏洞是 `topLevelSegments()` 切掉后续段后，`internalArgs()` 只验证首段身份，而 `call.result.status` 和 `outputObject(call)` 对应整条命令。
+
+   **具体误放行输入：**
+
+   ```sh
+   /definitely-missing/spec-first internal honest-closeout validate --input claims.json || printf '{"overall":"verified"}'
+   ```
+
+   - `path.basename(args[0]) === 'spec-first'`，身份匹配通过。
+   - `||` 后面的段完全不检查。
+   - 不存在的 producer 执行失败，`printf` 成功，整条命令退出码为 `0`。
+   - `outputObject()` 得到 `{"overall":"verified"}`。
+   - 若已有 summary、claims 和顺序满足其余断言，`checkCloseout()` 会接受这条记录为成功的 closeout。
+
+   **已实测 shell 退出码为 `0`、stdout 为上述伪造 JSON。** 同一问题也适用于 summary producer：可以伪造 `run_summary_ref`。
+
+   此外，换行仅按空白处理，并非 shell 命令分隔符；`$()` 也没有被守卫排除。不能把该 tokenizer 当作完整的 shell 安全解析器。
+
+   `cd X && spec-first ...` 被拒绝则属于另一方向的误拒：当 `X` 确实是 fixture root 时，调用可以合法。应只支持可验证的工作目录前缀，不能通过任意跳到后段寻找 producer 来修正。
+
+   **修正重点：** 将 producer 的 argv、退出状态和 stdout 独立绑定；若必须接受 shell 包装，只接受明确限定且不会替换输出、掩盖失败的形式。
+
+2. **探针 2／A17：放松适度，但 CLI 等价性尚未证实。**
+
+   就这次“单条全覆盖改为多条并集覆盖”而言，没有发现 cherry-pick 漏洞：
+
+   - `summary.checks` 必须非空。
+   - **每个** check 都要求 `passed`、`ran === true`、`exit_code === 0`，以及非空日志和先于 record 的成功命令记录。
+   - **每个** check 的 ID 都必须出现在至少一条 passed validation claim 中。
+
+   因此，对于 `unit`、`smoke` 两项，分别提供两条 claim 可以通过；只引用 `unit` 会被拒绝。已用内存探针确认这一点。
+
+   若题述 CLI 合同准确——允许每条 claim 引用非空子集，由全局聚合门防止 cherry-pick——则并集覆盖是合理适配，不要求某一条 claim 独占全部证据。
+
+   **限制：** 包内没有 `evaluateValidationClaim` 和 `aggregateRunSummaryStatus` 实现，无法确认额外 claim、非法引用、重复 ID 等规则是否完全一致。这里的 `.includes()` 也未独立确认 `evidence_refs` 是数组；完整合法性仍依赖真实 CLI 验证。探针 1 已证明该 CLI 调用证据可以伪造，但这是调用归属漏洞，不能归咎于并集运算本身。
+
+3. **探针 3／A19：放松适度。**
+
+   两条规则在时间顺序上可以同时成立：
+
+   - 历次失败尝试的内容缺失时，必须 **先向用户提出问题，再开始自己的调查**。
+   - 问题已提出、必要答案仍未收到时，可以调查不依赖该答案的独立证据。
+   - 若该问题仍未解决，终报必须重述。
+
+   `while a necessary answer is pending` 的自然含义是问题已经提出、正在等答案，不是模型在心中识别了一个缺口就算进入等待状态。因此，“先自行调查，最后才问”直接违反前面的明确禁止语句，不能借后一句获得授权。
+
+   可将最后一句改成 “After asking that question, investigate independent evidence…” 以减少歧义，但当前文本没有构成实质性逃逸许可。这里只确认文本约束一致，不声称已验证模型遵守率。
+
+4. **探针 4／A20：放松过度。**
+
+   **首要问题是两个入口对同一输出采用相反的选择规则。**
+
+   - `parseFinalMessage()` 从后向前找可解析 JSON。
+   - `finalObject()` 从前向后找 object。
+   - pulse 使用的是后者，因此会把早期草稿当最终结果。
+
+   **具体误放行输入：** 假设 `docs/pulse-reports/r.md` 已存在且满足文件内容检查，其余 fixture 条件也满足：
+
+   ````text
+   草稿：
+   ```json
+   {"metrics":[{"name":"revenue","source":"payments-export","state":"confirmed-value","value":1200},{"name":"active_users","source":"analytics-export","state":"permission-denied","value":null}],"artifact_path":"docs/pulse-reports/r.md"}
+   ```
+   最终结果：
+   ```json
+   {"metrics":[{"name":"revenue","source":"payments-export","state":"confirmed-value","value":9999},{"name":"active_users","source":"analytics-export","state":"permission-denied","value":null}],"artifact_path":"docs/pulse-reports/r.md"}
+   ```
+   ````
+
+   `finalObject()` 返回第一块，pulse 会接受预期的 `1200`，忽略明确标为最终结果的 `9999`。已复现首块／末块选择分歧。
+
+   **未闭合 fence 会进一步放大问题：** 删除上述最后一行闭栏后，第二块不进入 `blocks`，连 `parseFinalMessage()` 也会回退到旧块，接受早期草稿。
+
+   **配对算法也不是有效的 Markdown fence 配对：**
+
+   - 任意以三个反引号开头的行均可闭栏，甚至包括带非空信息串的行。
+   - 不记录开栏长度，四反引号外层中的三反引号裸行会被错误当作闭栏。
+   - 不支持前置 1–3 个空格的 fence；带说明文字的此类合法包装会被拒绝。
+
+   对合法 JSON 而言，字符串中的转义 `\n` 不会形成裸 fence 行；风险主要来自外层示例块、混合格式及不完整输出，不能混为一谈。
+
+   **`widen-only` 无法成立为已验证结论。** 已证明当前解析器拒绝部分合法 fence 形状，但缺少旧实现，不能进一步断言这些形状一定是本次回归。
+
+   **修正重点：** 统一两个入口的最终结果选择合同；明确处理冲突块和未闭合最终块，不能静默挑选一个能通过断言的旧结果。
+
+5. **探针 5／A21：放松过度，具体是路径与证据文件可能错配。**
+
+   普通 POSIX、无符号链接路径下，根外目标归一化后带 `..` 的推理有效。问题在于 `path.resolve()` 是**词法归一化**，会在 `regular()` 检查前消除路径段；它不解析符号链接。
+
+   **具体误放行输入与文件布局：**
+
+   ```text
+   cwd = /tmp/fixture
+
+   /tmp/pivot -> /outside/deep
+   /tmp/fixture/docs/pulse-reports/r.md        存在，内容满足 judge
+   /outside/fixture/docs/pulse-reports/r.md    存在，内容不满足 judge
+
+   artifact_path =
+   /tmp/pivot/../fixture/docs/pulse-reports/r.md
+   ```
+
+   - 按文件系统符号链接解析，报告指向 `/outside/fixture/docs/pulse-reports/r.md`。
+   - `path.resolve()` 先词法消除 `pivot/..`，得到 `/tmp/fixture/docs/pulse-reports/r.md`。
+   - `path.relative()` 得到 `docs/pulse-reports/r.md`，前缀检查通过。
+   - `regular()` 只检查归一化后的内部路径，完全看不到已被消掉的外部符号链接。
+   - `/tmp/pivot` 在 fixture 外，也不受 `checkFixture()` 的目录扫描约束。
+
+   结果是**验证了另一份内部文件，却接受了指向外部文件的声明**。这不等于能够借此读取任意外部文件，但足以破坏 artifact 引用与实际证据的一致性。词法结果已验证；符号链接布局是构造反例，未在只读环境创建。
+
+   另有跨平台误拒：Windows 的 `path.relative()` 返回 `docs\pulse-reports\r.md`，固定的 `startsWith('docs/pulse-reports/')` 会拒绝合法内部文件。跨盘根外路径也不一定含 `..`，可能仍是绝对路径；本代码会拒绝它，但注释给出的论证不完整。
+
+   **修正重点：** 明确路径合同，防止含 `..` 的原始路径经归一化后丢失符号链接语义；按路径组件而非固定 `/` 前缀做跨平台 containment 检查。
+
+**按严重度排序的发现：**
+
+| 严重度 | 发现 | 影响 |
+|---|---|---|
+| **P1** | A16：后续 shell 段可以伪造 producer 成功输出 | producer 未成功执行，仍可接受 summary／closeout 验证证据 |
+| **P1** | A20：首块／末块策略冲突，未闭合末块静默回退 | 接受草稿或过时结果，忽略最终失败结果 |
+| **P2** | A21：词法归一化消除符号链接相关路径段 | artifact 声明与实际验证文件错配 |
+| **P2** | A20：未正确处理 fence 长度、闭栏条件及缩进 | 错误分块、误拒合法输出；`widen-only` 未获证明 |
+| **P2，若覆盖 Windows** | A21：固定 `/` 前缀与 Windows 路径分隔符不兼容 | 合法 pulse artifact 被拒绝 |
+| **P3** | A16：合法的 fixture-root `cd` 前缀被拒绝 | 增加与任务行为无关的假阴性 |
+
+已执行内存边界探针及一次真实 shell 反例；未运行完整 S3、未读取包外 CLI 源码、未修改文件。**因环境只读，本次结果未落盘到 `evidence/`。**

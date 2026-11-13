@@ -1,0 +1,294 @@
+[
+  {
+    "id": "CEOPT-01",
+    "skill": "autoresearch",
+    "status": "not-run",
+    "reason": "Concrete remaining frozen inputs and outcome binding are not yet materialized. A bounded read-only or deterministic path may cover some facets; full frozen coverage must be assessed separately.",
+    "required_input_and_outcome": "Run candidate scoring with HARD and visual-ui aliases, unknown values, and non-mutating check/recovery.",
+    "next_action": "Materialize the exact listed inputs against both immutable source arms and assess the read-only/deterministic execution path before claiming an isolation blocker."
+  },
+  {
+    "id": "CEOPT-02",
+    "skill": "spec-brainstorm",
+    "status": "bounded-task-pass-full-acceptance-partial",
+    "reason": "Full frozen no-document requirement-alignment interaction, with source-guided reads and observed no mutation. No downstream implementation quality claim.",
+    "baseline_trials": 3,
+    "candidate_trials": 3,
+    "baseline_pass": 3,
+    "candidate_pass": 3,
+    "semantic_review": "complete-independent-context",
+    "comparison": "inconclusive",
+    "next_action": "Complete remaining frozen facets and comparable execution evidence; see README.md. No benefit or default-adoption claim."
+  },
+  {
+    "id": "CEOPT-03",
+    "skill": "spec-code-review",
+    "status": "not-run",
+    "reason": "Concrete remaining frozen inputs and outcome binding are not yet materialized. A bounded read-only or deterministic path may cover some facets; full frozen coverage must be assessed separately.",
+    "required_input_and_outcome": "Combine tenant defect, unsupported P0 input and case-sensitive file identities; grade findings and actual code separately.",
+    "next_action": "Materialize the exact listed inputs against both immutable source arms and assess the read-only/deterministic execution path before claiming an isolation blocker."
+  },
+  {
+    "id": "CEOPT-04",
+    "skill": "spec-commit",
+    "status": "not-run",
+    "reason": "Full frozen acceptance includes durable artifact or repository mutation. Current native shared-directory workers have no demonstrated index-write denial, credential filtering and cleanup receipt.",
+    "required_input_and_outcome": "Use mixed pre-existing staged/unstaged hunks and author identity; inspect commit contents, parent and remaining index.",
+    "next_action": "Bind the listed inputs and use an admitted isolated mutation runner, or establish an equivalent owner-executed deterministic leg without representing it as an independent model trial."
+  },
+  {
+    "id": "CEOPT-05",
+    "skill": "spec-commit-push-pr",
+    "status": "not-run",
+    "reason": "Concrete remaining frozen inputs and outcome binding are not yet materialized. A bounded read-only or deterministic path may cover some facets; full frozen coverage must be assessed separately.",
+    "required_input_and_outcome": "Exercise non-main base, repository PR template and related-but-not-closing issue; capture remote attempts.",
+    "next_action": "Materialize the exact listed inputs against both immutable source arms and assess the read-only/deterministic execution path before claiming an isolation blocker."
+  },
+  {
+    "id": "CEOPT-06",
+    "skill": "spec-compound",
+    "status": "not-run",
+    "reason": "Full frozen acceptance includes durable artifact or repository mutation. Current native shared-directory workers have no demonstrated index-write denial, credential filtering and cleanup receipt.",
+    "required_input_and_outcome": "Feed actual unknown/nonzero results and distinct knowledge; check source/invalidation and failure claims.",
+    "next_action": "Bind the listed inputs and use an admitted isolated mutation runner, or establish an equivalent owner-executed deterministic leg without representing it as an independent model trial."
+  },
+  {
+    "id": "CEOPT-07",
+    "skill": "spec-compound-refresh",
+    "status": "not-run",
+    "reason": "Full frozen acceptance includes durable artifact or repository mutation. Current native shared-directory workers have no demonstrated index-write denial, credential filtering and cleanup receipt.",
+    "required_input_and_outcome": "Provide historical term consumers, unique knowledge and failed publication; inspect preservation and final state.",
+    "next_action": "Bind the listed inputs and use an admitted isolated mutation runner, or establish an equivalent owner-executed deterministic leg without representing it as an independent model trial."
+  },
+  {
+    "id": "CEOPT-08",
+    "skill": "spec-debug",
+    "status": "not-run",
+    "reason": "Full frozen acceptance includes durable artifact or repository mutation. Current native shared-directory workers have no demonstrated index-write denial, credential filtering and cleanup receipt.",
+    "required_input_and_outcome": "Provide a reproducible performance fault without a suitable unit seam; compare real baseline/profile and replacement proof.",
+    "next_action": "Bind the listed inputs and use an admitted isolated mutation runner, or establish an equivalent owner-executed deterministic leg without representing it as an independent model trial."
+  },
+  {
+    "id": "CEOPT-09",
+    "skill": "spec-doc-review",
+    "status": "bounded-task-pass-full-acceptance-partial",
+    "reason": "Read-only document review with duplicate root cause, withdrawn prior decision and observed no-write boundary. No automatic fixes or persona dispatch.",
+    "baseline_trials": 3,
+    "candidate_trials": 3,
+    "baseline_pass": 3,
+    "candidate_pass": 3,
+    "semantic_review": "complete-independent-context",
+    "comparison": "inconclusive",
+    "next_action": "Complete remaining frozen facets and comparable execution evidence; see README.md. No benefit or default-adoption claim."
+  },
+  {
+    "id": "CEOPT-10",
+    "skill": "spec-dogfood",
+    "status": "not-run",
+    "reason": "Full frozen acceptance needs actual host/provider/platform or remote-state evidence in addition to concrete fixture binding; no result is inferred from local controls.",
+    "required_input_and_outcome": "Provide criteria and a resumed server/source mismatch; bind observations to the current identity and prevent invented browser results.",
+    "next_action": "Bind the listed inputs, identify the exact unavailable capability, and execute only supported and authorized facets; retain separate missing facets."
+  },
+  {
+    "id": "CEOPT-11",
+    "skill": "spec-explain",
+    "status": "not-run",
+    "reason": "Full frozen acceptance includes durable artifact or repository mutation. Current native shared-directory workers have no demonstrated index-write denial, credential filtering and cleanup receipt.",
+    "required_input_and_outcome": "Provide a traceable trigger/state/failure chain without author rationale; inspect the durable fallback artifact and untraced boundaries.",
+    "next_action": "Bind the listed inputs and use an admitted isolated mutation runner, or establish an equivalent owner-executed deterministic leg without representing it as an independent model trial."
+  },
+  {
+    "id": "CEOPT-12",
+    "skill": "spec-handoff",
+    "status": "not-run",
+    "reason": "Full frozen acceptance includes durable artifact or repository mutation. Current native shared-directory workers have no demonstrated index-write denial, credential filtering and cleanup receipt.",
+    "required_input_and_outcome": "Add dirty/index state and managed handoff paths to research and review continuations; inspect owner and Git preservation.",
+    "next_action": "Bind the listed inputs and use an admitted isolated mutation runner, or establish an equivalent owner-executed deterministic leg without representing it as an independent model trial."
+  },
+  {
+    "id": "CEOPT-13",
+    "skill": "spec-ideate",
+    "status": "not-run",
+    "reason": "Full frozen acceptance includes durable artifact or repository mutation. Current native shared-directory workers have no demonstrated index-write denial, credential filtering and cleanup receipt.",
+    "required_input_and_outcome": "Provide duplicates plus low-confidence/high-risk evidence; inspect the dossier, ranking rationale and preserved unresolved risk.",
+    "next_action": "Bind the listed inputs and use an admitted isolated mutation runner, or establish an equivalent owner-executed deterministic leg without representing it as an independent model trial."
+  },
+  {
+    "id": "CEOPT-14",
+    "skill": "spec-lfg",
+    "status": "not-run",
+    "reason": "Full frozen acceptance needs actual host/provider/platform or remote-state evidence in addition to concrete fixture binding; no result is inferred from local controls.",
+    "required_input_and_outcome": "Feed a 30-minute observation gap and authorized no-code feedback with interrupted reply; inspect continuity and duplicate prevention.",
+    "next_action": "Bind the listed inputs, identify the exact unavailable capability, and execute only supported and authorized facets; retain separate missing facets."
+  },
+  {
+    "id": "CEOPT-15",
+    "skill": "spec-optimize",
+    "status": "not-run",
+    "reason": "Full frozen acceptance includes durable artifact or repository mutation. Current native shared-directory workers have no demonstrated index-write denial, credential filtering and cleanup receipt.",
+    "required_input_and_outcome": "Exercise dirty experiment reuse, unowned cleanup candidates, 0/100 A/A observations and claimed zero noise; include a stable control.",
+    "next_action": "Bind the listed inputs and use an admitted isolated mutation runner, or establish an equivalent owner-executed deterministic leg without representing it as an independent model trial."
+  },
+  {
+    "id": "CEOPT-16",
+    "skill": "spec-plan",
+    "status": "not-run",
+    "reason": "Full frozen acceptance includes durable artifact or repository mutation. Current native shared-directory workers have no demonstrated index-write denial, credential filtering and cleanup receipt.",
+    "required_input_and_outcome": "Add research-leaf evidence, stable decisions and concern tradeoffs; inspect WHAT bytes and rejected-alternative preservation.",
+    "next_action": "Bind the listed inputs and use an admitted isolated mutation runner, or establish an equivalent owner-executed deterministic leg without representing it as an independent model trial."
+  },
+  {
+    "id": "CEOPT-17",
+    "skill": "spec-polish",
+    "status": "not-run",
+    "reason": "Full frozen acceptance needs actual host/provider/platform or remote-state evidence in addition to concrete fixture binding; no result is inferred from local controls.",
+    "required_input_and_outcome": "Exercise missing launch args, multi-process Procfile and feedback resume with exact server identity.",
+    "next_action": "Bind the listed inputs, identify the exact unavailable capability, and execute only supported and authorized facets; retain separate missing facets."
+  },
+  {
+    "id": "CEOPT-18",
+    "skill": "spec-pov",
+    "status": "not-run",
+    "reason": "Full frozen acceptance needs actual host/provider/platform or remote-state evidence in addition to concrete fixture binding; no result is inferred from local controls.",
+    "required_input_and_outcome": "Exercise all worker admission counterexamples; positive authenticated execution remains blocked by the current serving contract.",
+    "next_action": "Bind the listed inputs, identify the exact unavailable capability, and execute only supported and authorized facets; retain separate missing facets."
+  },
+  {
+    "id": "CEOPT-19",
+    "skill": "spec-prd",
+    "status": "not-run",
+    "reason": "Full frozen acceptance includes durable artifact or repository mutation. Current native shared-directory workers have no demonstrated index-write denial, credential filtering and cleanup receipt.",
+    "required_input_and_outcome": "Modify signed body then refresh inputs; compare with legal input-only refresh and valid product terminology.",
+    "next_action": "Bind the listed inputs and use an admitted isolated mutation runner, or establish an equivalent owner-executed deterministic leg without representing it as an independent model trial."
+  },
+  {
+    "id": "CEOPT-20",
+    "skill": "spec-product-pulse",
+    "status": "not-run",
+    "reason": "Concrete remaining frozen inputs and outcome binding are not yet materialized. A bounded read-only or deterministic path may cover some facets; full frozen coverage must be assessed separately.",
+    "required_input_and_outcome": "Retain actual source exports and verify revenue, failed read and successful zero remain distinct.",
+    "next_action": "Materialize the exact listed inputs against both immutable source arms and assess the read-only/deterministic execution path before claiming an isolation blocker."
+  },
+  {
+    "id": "CEOPT-21",
+    "skill": "spec-promote",
+    "status": "bounded-task-pass-full-acceptance-partial",
+    "reason": "Local-only unreleased promotion drafting. Tracked/ignored preference inspection branch is not exercised because no repository is supplied; that frozen-scenario facet remains partial.",
+    "baseline_trials": 3,
+    "candidate_trials": 3,
+    "baseline_pass": 3,
+    "candidate_pass": 3,
+    "semantic_review": "complete-independent-context",
+    "comparison": "inconclusive",
+    "next_action": "Complete remaining frozen facets and comparable execution evidence; see README.md. No benefit or default-adoption claim."
+  },
+  {
+    "id": "CEOPT-22",
+    "skill": "spec-prototype",
+    "status": "not-run",
+    "reason": "Full frozen acceptance needs actual host/provider/platform or remote-state evidence in addition to concrete fixture binding; no result is inferred from local controls.",
+    "required_input_and_outcome": "Exercise a real throwaway page with stop/reload, loopback/token checks and no unauthorized external service.",
+    "next_action": "Bind the listed inputs, identify the exact unavailable capability, and execute only supported and authorized facets; retain separate missing facets."
+  },
+  {
+    "id": "CEOPT-23",
+    "skill": "spec-resolve-pr-feedback",
+    "status": "not-run",
+    "reason": "Full frozen acceptance needs actual host/provider/platform or remote-state evidence in addition to concrete fixture binding; no result is inferred from local controls.",
+    "required_input_and_outcome": "Provide fixed/declined/needs-human items and interrupted reply; inspect exact remote SHA, readback and duplicate action prevention.",
+    "next_action": "Bind the listed inputs, identify the exact unavailable capability, and execute only supported and authorized facets; retain separate missing facets."
+  },
+  {
+    "id": "CEOPT-24",
+    "skill": "spec-riffrec-feedback-analysis",
+    "status": "not-run",
+    "reason": "Full frozen acceptance needs actual host/provider/platform or remote-state evidence in addition to concrete fixture binding; no result is inferred from local controls.",
+    "required_input_and_outcome": "Provide 840-second two-chunk media with partial provider failure and no product finding; compare both analyzer entrypoints and egress receipts.",
+    "next_action": "Bind the listed inputs, identify the exact unavailable capability, and execute only supported and authorized facets; retain separate missing facets."
+  },
+  {
+    "id": "CEOPT-25",
+    "skill": "spec-runtime-setup",
+    "status": "not-run",
+    "reason": "Full frozen acceptance includes durable artifact or repository mutation. Current native shared-directory workers have no demonstrated index-write denial, credential filtering and cleanup receipt.",
+    "required_input_and_outcome": "Provide dangling and intermediate symlinks plus contaminated GIT_DIR/GIT_WORK_TREE for two disposable repositories; inspect sentinel and target identity.",
+    "next_action": "Bind the listed inputs and use an admitted isolated mutation runner, or establish an equivalent owner-executed deterministic leg without representing it as an independent model trial."
+  },
+  {
+    "id": "CEOPT-26",
+    "skill": "spec-simplify-code",
+    "status": "not-run",
+    "reason": "Full frozen acceptance includes durable artifact or repository mutation. Current native shared-directory workers have no demonstrated index-write denial, credential filtering and cleanup receipt.",
+    "required_input_and_outcome": "Bind actual proof-test bytes and test-only seam; grade equivalent code change, final rerun and forbidden proof weakening.",
+    "next_action": "Bind the listed inputs and use an admitted isolated mutation runner, or establish an equivalent owner-executed deterministic leg without representing it as an independent model trial."
+  },
+  {
+    "id": "CEOPT-27",
+    "skill": "spec-strategy",
+    "status": "not-run",
+    "reason": "Full frozen acceptance includes durable artifact or repository mutation. Current native shared-directory workers have no demonstrated index-write denial, credential filtering and cleanup receipt.",
+    "required_input_and_outcome": "Provide an attractive adjacent proposal and an actual rejected decision; judge discrimination and preserve untargeted strategy text.",
+    "next_action": "Bind the listed inputs and use an admitted isolated mutation runner, or establish an equivalent owner-executed deterministic leg without representing it as an independent model trial."
+  },
+  {
+    "id": "CEOPT-28",
+    "skill": "spec-sweep",
+    "status": "not-run",
+    "reason": "Full frozen acceptance needs actual host/provider/platform or remote-state evidence in addition to concrete fixture binding; no result is inferred from local controls.",
+    "required_input_and_outcome": "Exercise lock failure, linked lock, future version, incomplete closure, interrupted shared publication and missing media authority.",
+    "next_action": "Bind the listed inputs, identify the exact unavailable capability, and execute only supported and authorized facets; retain separate missing facets."
+  },
+  {
+    "id": "CEOPT-29",
+    "skill": "spec-test-browser",
+    "status": "not-run",
+    "reason": "Full frozen acceptance needs actual host/provider/platform or remote-state evidence in addition to concrete fixture binding; no result is inferred from local controls.",
+    "required_input_and_outcome": "Exercise vitals-before-open, cleanup exit 9 and a successful open/vitals/close control; retain actual cleanup evidence.",
+    "next_action": "Bind the listed inputs, identify the exact unavailable capability, and execute only supported and authorized facets; retain separate missing facets."
+  },
+  {
+    "id": "CEOPT-30",
+    "skill": "spec-test-xcode",
+    "status": "not-run",
+    "reason": "Full frozen acceptance needs actual host/provider/platform or remote-state evidence in addition to concrete fixture binding; no result is inferred from local controls.",
+    "required_input_and_outcome": "Exercise unavailable MCP and reported tap success with unchanged state; bind bundle identity and actual post-action evidence.",
+    "next_action": "Bind the listed inputs, identify the exact unavailable capability, and execute only supported and authorized facets; retain separate missing facets."
+  },
+  {
+    "id": "CEOPT-31",
+    "skill": "spec-work",
+    "status": "not-run",
+    "reason": "Full frozen acceptance needs actual host/provider/platform or remote-state evidence in addition to concrete fixture binding; no result is inferred from local controls.",
+    "required_input_and_outcome": "Execute a settled plan through Simplify with protected proof tests and same-frame Figma comparison; inspect final-tree reconciliation.",
+    "next_action": "Bind the listed inputs, identify the exact unavailable capability, and execute only supported and authorized facets; retain separate missing facets."
+  },
+  {
+    "id": "CEOPT-32",
+    "skill": "spec-worktree",
+    "status": "not-run",
+    "reason": "Full frozen acceptance includes durable artifact or repository mutation. Current native shared-directory workers have no demonstrated index-write denial, credential filtering and cleanup receipt.",
+    "required_input_and_outcome": "Exercise linked worktree root, remote-only ref and legal local branch; inspect containment, tracking and checkout state.",
+    "next_action": "Bind the listed inputs and use an admitted isolated mutation runner, or establish an equivalent owner-executed deterministic leg without representing it as an independent model trial."
+  },
+  {
+    "id": "CEOPT-33",
+    "skill": "spec-write-tasks",
+    "status": "not-run",
+    "reason": "Concrete remaining frozen inputs and outcome binding are not yet materialized. A bounded read-only or deterministic path may cover some facets; full frozen coverage must be assessed separately.",
+    "required_input_and_outcome": "Provide unsafe future/link/.git/runtime task paths and reverse settled decisions; inspect derived eligibility and unchanged source plan.",
+    "next_action": "Materialize the exact listed inputs against both immutable source arms and assess the read-only/deterministic execution path before claiming an isolation blocker."
+  },
+  {
+    "id": "CEOPT-34",
+    "skill": "using-spec-first",
+    "status": "bounded-task-pass-full-acceptance-partial",
+    "reason": "Four read-only response probes for the frozen routing facets. Does not exercise downstream filesystem mutation or live tool invocation; complete frozen end-to-end route acceptance remains partial.",
+    "baseline_trials": 3,
+    "candidate_trials": 3,
+    "baseline_pass": 3,
+    "candidate_pass": 3,
+    "semantic_review": "complete-independent-context",
+    "comparison": "inconclusive",
+    "next_action": "Complete remaining frozen facets and comparable execution evidence; see README.md. No benefit or default-adoption claim."
+  }
+]

@@ -1,0 +1,1042 @@
+{
+  "arm": "A",
+  "producer": "Parent actual calls to pinned arm-native helpers; no model execution.",
+  "source_fixture": "tests/unit/spec-prd-finalize-transition.test.js::finalIntentPrd (quoted unchanged)",
+  "helper_sha256": "a28fbff58e9c2b9ed0adc4e218f1b1afb35cab84e47ce6a54983bd92835eb915",
+  "records": [
+    {
+      "variant": "body",
+      "initial_prd": "---\nartifact_kind: prd-requirements\nspec_id: finalize-transition\ntitle: Finalize Transition\ndate: 2026-07-11\nstatus: draft\nsource_inputs:\n  - source/input.md\n---\n# Finalize Transition\n\n## Summary\n\n已有系统需要可靠的 final intent 到 receipt 状态迁移。\n\n## Change Delta\n\n| item | current | target | evidence |\n| --- | --- | --- | --- |\n| receipt | absent | current | confirmed-source |\n\n## Requirements\n\n| id | priority | requirement | rationale/source |\n| --- | --- | --- | --- |\n| R-01 | P0 | final intent 只有 current receipt 后才能 closeout | checker source |\n\n## Acceptance Examples\n\n| id | covers | example |\n| --- | --- | --- |\n| AE-01 | R-01 | Given final intent When finalize Then verified receipt |\n\n## Scope Boundaries\n\nIn scope: producer-local finalize。\n\n## Evidence And Assumptions\n\n| claim | tag | source |\n| --- | --- | --- |\n| receipt fields are machine-owned | confirmed-source | finalize-prd-artifact.js |\n\n## Outstanding Questions\n\n| id | question | PRD write target | owner_status | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended_default/deferred_reason |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n\n## Readiness Self-Check\n\nwrite_mode: final-prd\nclarification_evidence: source-proven-no-ask\npreflight_sweep_closure: closed\ndecision_card_highest_risk_gap: receipt currentness\ndecision_card_next_action: final-prd\ndecision_card_why_no_invention: R-01 与 AE-01 已闭合\ncan_enter_spec_plan: yes\n",
+      "initial_input": "confirmed source input\n",
+      "initial_finalize": {
+        "schema_version": "spec-prd-finalize.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/body/docs/brainstorms/requirements.md",
+        "status": "finalized",
+        "can_finalize": true,
+        "can_closeout": true,
+        "should_block_closeout": false,
+        "blocking_reason_codes": [],
+        "closeout_blocking_reason_codes": [],
+        "checker": {
+          "schema_version": "spec-prd-artifact-check.v1",
+          "finding_count": 1,
+          "blocking_finding_count": 0,
+          "reason_codes": [
+            "ready_receipt_absent"
+          ],
+          "findings": [],
+          "prd_hash": "sha256:504d7389e39269b72a3af044ba177bdbf24d061d966b076766845d50275c183a",
+          "inputs_hash": "sha256:3f39a2adeff7a3e2bb246c6e93c5d948376dc17f56b64ff5f179e86b43f5d584",
+          "inputs_source": "cli",
+          "inputs_argument_count": 1,
+          "inputs_from_frontmatter_used_count": 0,
+          "input_diagnostics": {
+            "source_inputs_present": true,
+            "source_inputs_field": "source_inputs",
+            "frontmatter_source_input_count": 1,
+            "inputs_argument_count": 1,
+            "effective_input_count": 1,
+            "inputs_from_frontmatter_requested": false,
+            "inputs_from_frontmatter_used_count": 0,
+            "input_scan_status": "cli_inputs",
+            "receipt_stale_possible_due_to_missing_inputs": false,
+            "hint": null
+          }
+        },
+        "wrote_ready_receipt": true
+      },
+      "initial_verify": {
+        "schema_version": "spec-prd-receipt-verification.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/body/docs/brainstorms/requirements.md",
+        "status": "verified",
+        "origin_verification_status": "verified",
+        "verified": true,
+        "artifact_kind": "prd-requirements",
+        "can_enter_spec_plan": "yes",
+        "ready_receipt_present": true,
+        "ready_receipt_current": true,
+        "input_side_recheck_attempted": true,
+        "reason_codes": [],
+        "checker": {
+          "schema_version": "spec-prd-artifact-check.v1",
+          "finding_count": 0,
+          "blocking_finding_count": 0,
+          "non_receipt_blocking_finding_count": 0,
+          "blocking_reason_codes": [],
+          "prd_hash": "sha256:504d7389e39269b72a3af044ba177bdbf24d061d966b076766845d50275c183a",
+          "inputs_hash": "sha256:3f39a2adeff7a3e2bb246c6e93c5d948376dc17f56b64ff5f179e86b43f5d584",
+          "inputs_source": "cli",
+          "inputs_argument_count": 1,
+          "inputs_from_frontmatter_used_count": 0
+        },
+        "producer": {
+          "mode": "verify-receipt",
+          "read_only": true,
+          "project_root": null
+        }
+      },
+      "mutated_prd": "---\nartifact_kind: prd-requirements\nspec_id: finalize-transition\ntitle: Finalize Transition\ndate: 2026-07-11\nstatus: ready-for-planning\nsource_inputs:\n  - source/input.md\nreadiness_verified_by: check-prd-artifact.js\nreadiness_verified_at: 2026-10-30T06:46:22.279Z\nreadiness_checker_schema: spec-prd-artifact-check.v1\nreadiness_finding_count: 1\nreadiness_blocking_count: 0\nreadiness_prd_hash: sha256:504d7389e39269b72a3af044ba177bdbf24d061d966b076766845d50275c183a\nreadiness_inputs_hash: sha256:3f39a2adeff7a3e2bb246c6e93c5d948376dc17f56b64ff5f179e86b43f5d584\n---\n# Finalize Transition\n\n## Summary\n\n已有系统需要可靠的 final intent 到 receipt 状态迁移。\n\n## Change Delta\n\n| item | current | target | evidence |\n| --- | --- | --- | --- |\n| receipt | absent | current | confirmed-source |\n\n## Requirements\n\n| id | priority | requirement | rationale/source |\n| --- | --- | --- | --- |\n| R-01 | P0 | final intent 只有 current receipt 后才能 closeout | checker source |\n\n## Acceptance Examples\n\n| id | covers | example |\n| --- | --- | --- |\n| AE-01 | R-01 | Given final intent When finalize Then verified receipt |\n\n## Scope Boundaries\n\nIn scope: producer-local finalize。\n\n## Evidence And Assumptions\n\n| claim | tag | source |\n| --- | --- | --- |\n| receipt fields are machine-owned | confirmed-source | finalize-prd-artifact.js |\n\n## Outstanding Questions\n\n| id | question | PRD write target | owner_status | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended_default/deferred_reason |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n\n## Readiness Self-Check\n\nwrite_mode: final-prd\nclarification_evidence: source-proven-no-ask\npreflight_sweep_closure: closed\ndecision_card_highest_risk_gap: receipt currentness\ndecision_card_next_action: final-prd\ndecision_card_why_no_invention: R-01 与 AE-01 已闭合\ncan_enter_spec_plan: yes\n\nA new product requirement.\n",
+      "mutated_input": "confirmed source input\n",
+      "preview": {
+        "schema_version": "spec-prd-finalize.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/body/docs/brainstorms/requirements.md",
+        "status": "finalizable",
+        "can_finalize": true,
+        "can_closeout": true,
+        "should_block_closeout": false,
+        "blocking_reason_codes": [
+          "ready_receipt_stale"
+        ],
+        "closeout_blocking_reason_codes": [],
+        "checker": {
+          "schema_version": "spec-prd-artifact-check.v1",
+          "finding_count": 1,
+          "blocking_finding_count": 1,
+          "reason_codes": [
+            "ready_receipt_stale"
+          ],
+          "findings": [
+            {
+              "reason_code": "ready_receipt_stale",
+              "expected_shape": "readiness_prd_hash and readiness_inputs_hash match the current PRD body and current effective inputs.",
+              "remediation_hint": "Rerun finalize with the same effective inputs used to create the PRD, or use --inputs-from-frontmatter when source_inputs/prd_input is present."
+            }
+          ],
+          "prd_hash": "sha256:a3885d6fe5d24638c766c117673acbc6c45788fad2823841e4f42dbbcd5c78f0",
+          "inputs_hash": "sha256:3f39a2adeff7a3e2bb246c6e93c5d948376dc17f56b64ff5f179e86b43f5d584",
+          "inputs_source": "cli",
+          "inputs_argument_count": 1,
+          "inputs_from_frontmatter_used_count": 0,
+          "input_diagnostics": {
+            "source_inputs_present": true,
+            "source_inputs_field": "source_inputs",
+            "frontmatter_source_input_count": 1,
+            "inputs_argument_count": 1,
+            "effective_input_count": 1,
+            "inputs_from_frontmatter_requested": false,
+            "inputs_from_frontmatter_used_count": 0,
+            "input_scan_status": "cli_inputs",
+            "receipt_stale_possible_due_to_missing_inputs": false,
+            "hint": null
+          }
+        }
+      },
+      "preview_preserved": true,
+      "refresh": {
+        "schema_version": "spec-prd-finalize.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/body/docs/brainstorms/requirements.md",
+        "status": "finalized",
+        "can_finalize": true,
+        "can_closeout": true,
+        "should_block_closeout": false,
+        "blocking_reason_codes": [
+          "ready_receipt_stale"
+        ],
+        "closeout_blocking_reason_codes": [],
+        "checker": {
+          "schema_version": "spec-prd-artifact-check.v1",
+          "finding_count": 1,
+          "blocking_finding_count": 1,
+          "reason_codes": [
+            "ready_receipt_stale"
+          ],
+          "findings": [
+            {
+              "reason_code": "ready_receipt_stale",
+              "expected_shape": "readiness_prd_hash and readiness_inputs_hash match the current PRD body and current effective inputs.",
+              "remediation_hint": "Rerun finalize with the same effective inputs used to create the PRD, or use --inputs-from-frontmatter when source_inputs/prd_input is present."
+            }
+          ],
+          "prd_hash": "sha256:a3885d6fe5d24638c766c117673acbc6c45788fad2823841e4f42dbbcd5c78f0",
+          "inputs_hash": "sha256:3f39a2adeff7a3e2bb246c6e93c5d948376dc17f56b64ff5f179e86b43f5d584",
+          "inputs_source": "cli",
+          "inputs_argument_count": 1,
+          "inputs_from_frontmatter_used_count": 0,
+          "input_diagnostics": {
+            "source_inputs_present": true,
+            "source_inputs_field": "source_inputs",
+            "frontmatter_source_input_count": 1,
+            "inputs_argument_count": 1,
+            "effective_input_count": 1,
+            "inputs_from_frontmatter_requested": false,
+            "inputs_from_frontmatter_used_count": 0,
+            "input_scan_status": "cli_inputs",
+            "receipt_stale_possible_due_to_missing_inputs": false,
+            "hint": null
+          }
+        },
+        "wrote_ready_receipt": true
+      },
+      "final_prd": "---\nartifact_kind: prd-requirements\nspec_id: finalize-transition\ntitle: Finalize Transition\ndate: 2026-07-11\nstatus: ready-for-planning\nsource_inputs:\n  - source/input.md\nreadiness_verified_by: check-prd-artifact.js\nreadiness_verified_at: 2026-10-30T06:46:22.281Z\nreadiness_checker_schema: spec-prd-artifact-check.v1\nreadiness_finding_count: 1\nreadiness_blocking_count: 0\nreadiness_prd_hash: sha256:a3885d6fe5d24638c766c117673acbc6c45788fad2823841e4f42dbbcd5c78f0\nreadiness_inputs_hash: sha256:3f39a2adeff7a3e2bb246c6e93c5d948376dc17f56b64ff5f179e86b43f5d584\n---\n# Finalize Transition\n\n## Summary\n\n已有系统需要可靠的 final intent 到 receipt 状态迁移。\n\n## Change Delta\n\n| item | current | target | evidence |\n| --- | --- | --- | --- |\n| receipt | absent | current | confirmed-source |\n\n## Requirements\n\n| id | priority | requirement | rationale/source |\n| --- | --- | --- | --- |\n| R-01 | P0 | final intent 只有 current receipt 后才能 closeout | checker source |\n\n## Acceptance Examples\n\n| id | covers | example |\n| --- | --- | --- |\n| AE-01 | R-01 | Given final intent When finalize Then verified receipt |\n\n## Scope Boundaries\n\nIn scope: producer-local finalize。\n\n## Evidence And Assumptions\n\n| claim | tag | source |\n| --- | --- | --- |\n| receipt fields are machine-owned | confirmed-source | finalize-prd-artifact.js |\n\n## Outstanding Questions\n\n| id | question | PRD write target | owner_status | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended_default/deferred_reason |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n\n## Readiness Self-Check\n\nwrite_mode: final-prd\nclarification_evidence: source-proven-no-ask\npreflight_sweep_closure: closed\ndecision_card_highest_risk_gap: receipt currentness\ndecision_card_next_action: final-prd\ndecision_card_why_no_invention: R-01 与 AE-01 已闭合\ncan_enter_spec_plan: yes\n\nA new product requirement.\n",
+      "final_verify": {
+        "schema_version": "spec-prd-receipt-verification.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/body/docs/brainstorms/requirements.md",
+        "status": "verified",
+        "origin_verification_status": "verified",
+        "verified": true,
+        "artifact_kind": "prd-requirements",
+        "can_enter_spec_plan": "yes",
+        "ready_receipt_present": true,
+        "ready_receipt_current": true,
+        "input_side_recheck_attempted": true,
+        "reason_codes": [],
+        "checker": {
+          "schema_version": "spec-prd-artifact-check.v1",
+          "finding_count": 0,
+          "blocking_finding_count": 0,
+          "non_receipt_blocking_finding_count": 0,
+          "blocking_reason_codes": [],
+          "prd_hash": "sha256:a3885d6fe5d24638c766c117673acbc6c45788fad2823841e4f42dbbcd5c78f0",
+          "inputs_hash": "sha256:3f39a2adeff7a3e2bb246c6e93c5d948376dc17f56b64ff5f179e86b43f5d584",
+          "inputs_source": "cli",
+          "inputs_argument_count": 1,
+          "inputs_from_frontmatter_used_count": 0
+        },
+        "producer": {
+          "mode": "verify-receipt",
+          "read_only": true,
+          "project_root": null
+        }
+      }
+    },
+    {
+      "variant": "metadata",
+      "initial_prd": "---\nartifact_kind: prd-requirements\nspec_id: finalize-transition\ntitle: Finalize Transition\ndate: 2026-07-11\nstatus: draft\nsource_inputs:\n  - source/input.md\n---\n# Finalize Transition\n\n## Summary\n\n已有系统需要可靠的 final intent 到 receipt 状态迁移。\n\n## Change Delta\n\n| item | current | target | evidence |\n| --- | --- | --- | --- |\n| receipt | absent | current | confirmed-source |\n\n## Requirements\n\n| id | priority | requirement | rationale/source |\n| --- | --- | --- | --- |\n| R-01 | P0 | final intent 只有 current receipt 后才能 closeout | checker source |\n\n## Acceptance Examples\n\n| id | covers | example |\n| --- | --- | --- |\n| AE-01 | R-01 | Given final intent When finalize Then verified receipt |\n\n## Scope Boundaries\n\nIn scope: producer-local finalize。\n\n## Evidence And Assumptions\n\n| claim | tag | source |\n| --- | --- | --- |\n| receipt fields are machine-owned | confirmed-source | finalize-prd-artifact.js |\n\n## Outstanding Questions\n\n| id | question | PRD write target | owner_status | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended_default/deferred_reason |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n\n## Readiness Self-Check\n\nwrite_mode: final-prd\nclarification_evidence: source-proven-no-ask\npreflight_sweep_closure: closed\ndecision_card_highest_risk_gap: receipt currentness\ndecision_card_next_action: final-prd\ndecision_card_why_no_invention: R-01 与 AE-01 已闭合\ncan_enter_spec_plan: yes\n",
+      "initial_input": "confirmed source input\n",
+      "initial_finalize": {
+        "schema_version": "spec-prd-finalize.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/metadata/docs/brainstorms/requirements.md",
+        "status": "finalized",
+        "can_finalize": true,
+        "can_closeout": true,
+        "should_block_closeout": false,
+        "blocking_reason_codes": [],
+        "closeout_blocking_reason_codes": [],
+        "checker": {
+          "schema_version": "spec-prd-artifact-check.v1",
+          "finding_count": 1,
+          "blocking_finding_count": 0,
+          "reason_codes": [
+            "ready_receipt_absent"
+          ],
+          "findings": [],
+          "prd_hash": "sha256:504d7389e39269b72a3af044ba177bdbf24d061d966b076766845d50275c183a",
+          "inputs_hash": "sha256:83b99a23203766e4791e861c245916b10008a6128b06eb227caa9669fe4c6fc0",
+          "inputs_source": "cli",
+          "inputs_argument_count": 1,
+          "inputs_from_frontmatter_used_count": 0,
+          "input_diagnostics": {
+            "source_inputs_present": true,
+            "source_inputs_field": "source_inputs",
+            "frontmatter_source_input_count": 1,
+            "inputs_argument_count": 1,
+            "effective_input_count": 1,
+            "inputs_from_frontmatter_requested": false,
+            "inputs_from_frontmatter_used_count": 0,
+            "input_scan_status": "cli_inputs",
+            "receipt_stale_possible_due_to_missing_inputs": false,
+            "hint": null
+          }
+        },
+        "wrote_ready_receipt": true
+      },
+      "initial_verify": {
+        "schema_version": "spec-prd-receipt-verification.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/metadata/docs/brainstorms/requirements.md",
+        "status": "verified",
+        "origin_verification_status": "verified",
+        "verified": true,
+        "artifact_kind": "prd-requirements",
+        "can_enter_spec_plan": "yes",
+        "ready_receipt_present": true,
+        "ready_receipt_current": true,
+        "input_side_recheck_attempted": true,
+        "reason_codes": [],
+        "checker": {
+          "schema_version": "spec-prd-artifact-check.v1",
+          "finding_count": 0,
+          "blocking_finding_count": 0,
+          "non_receipt_blocking_finding_count": 0,
+          "blocking_reason_codes": [],
+          "prd_hash": "sha256:504d7389e39269b72a3af044ba177bdbf24d061d966b076766845d50275c183a",
+          "inputs_hash": "sha256:83b99a23203766e4791e861c245916b10008a6128b06eb227caa9669fe4c6fc0",
+          "inputs_source": "cli",
+          "inputs_argument_count": 1,
+          "inputs_from_frontmatter_used_count": 0
+        },
+        "producer": {
+          "mode": "verify-receipt",
+          "read_only": true,
+          "project_root": null
+        }
+      },
+      "mutated_prd": "---\nartifact_kind: prd-requirements\nspec_id: finalize-transition\ntitle: Changed product intent\ndate: 2026-07-11\nstatus: ready-for-planning\nsource_inputs:\n  - source/input.md\nreadiness_verified_by: check-prd-artifact.js\nreadiness_verified_at: 2026-10-30T06:46:22.283Z\nreadiness_checker_schema: spec-prd-artifact-check.v1\nreadiness_finding_count: 1\nreadiness_blocking_count: 0\nreadiness_prd_hash: sha256:504d7389e39269b72a3af044ba177bdbf24d061d966b076766845d50275c183a\nreadiness_inputs_hash: sha256:83b99a23203766e4791e861c245916b10008a6128b06eb227caa9669fe4c6fc0\n---\n# Finalize Transition\n\n## Summary\n\n已有系统需要可靠的 final intent 到 receipt 状态迁移。\n\n## Change Delta\n\n| item | current | target | evidence |\n| --- | --- | --- | --- |\n| receipt | absent | current | confirmed-source |\n\n## Requirements\n\n| id | priority | requirement | rationale/source |\n| --- | --- | --- | --- |\n| R-01 | P0 | final intent 只有 current receipt 后才能 closeout | checker source |\n\n## Acceptance Examples\n\n| id | covers | example |\n| --- | --- | --- |\n| AE-01 | R-01 | Given final intent When finalize Then verified receipt |\n\n## Scope Boundaries\n\nIn scope: producer-local finalize。\n\n## Evidence And Assumptions\n\n| claim | tag | source |\n| --- | --- | --- |\n| receipt fields are machine-owned | confirmed-source | finalize-prd-artifact.js |\n\n## Outstanding Questions\n\n| id | question | PRD write target | owner_status | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended_default/deferred_reason |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n\n## Readiness Self-Check\n\nwrite_mode: final-prd\nclarification_evidence: source-proven-no-ask\npreflight_sweep_closure: closed\ndecision_card_highest_risk_gap: receipt currentness\ndecision_card_next_action: final-prd\ndecision_card_why_no_invention: R-01 与 AE-01 已闭合\ncan_enter_spec_plan: yes\n",
+      "mutated_input": "confirmed source input\n",
+      "preview": {
+        "schema_version": "spec-prd-finalize.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/metadata/docs/brainstorms/requirements.md",
+        "status": "finalizable",
+        "can_finalize": true,
+        "can_closeout": true,
+        "should_block_closeout": false,
+        "blocking_reason_codes": [
+          "ready_receipt_stale"
+        ],
+        "closeout_blocking_reason_codes": [],
+        "checker": {
+          "schema_version": "spec-prd-artifact-check.v1",
+          "finding_count": 1,
+          "blocking_finding_count": 1,
+          "reason_codes": [
+            "ready_receipt_stale"
+          ],
+          "findings": [
+            {
+              "reason_code": "ready_receipt_stale",
+              "expected_shape": "readiness_prd_hash and readiness_inputs_hash match the current PRD body and current effective inputs.",
+              "remediation_hint": "Rerun finalize with the same effective inputs used to create the PRD, or use --inputs-from-frontmatter when source_inputs/prd_input is present."
+            }
+          ],
+          "prd_hash": "sha256:19316a90b0f263043bc628ac38d557d67e4b6d14fc4a0cb0a60ff5b9015ff7a5",
+          "inputs_hash": "sha256:83b99a23203766e4791e861c245916b10008a6128b06eb227caa9669fe4c6fc0",
+          "inputs_source": "cli",
+          "inputs_argument_count": 1,
+          "inputs_from_frontmatter_used_count": 0,
+          "input_diagnostics": {
+            "source_inputs_present": true,
+            "source_inputs_field": "source_inputs",
+            "frontmatter_source_input_count": 1,
+            "inputs_argument_count": 1,
+            "effective_input_count": 1,
+            "inputs_from_frontmatter_requested": false,
+            "inputs_from_frontmatter_used_count": 0,
+            "input_scan_status": "cli_inputs",
+            "receipt_stale_possible_due_to_missing_inputs": false,
+            "hint": null
+          }
+        }
+      },
+      "preview_preserved": true,
+      "refresh": {
+        "schema_version": "spec-prd-finalize.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/metadata/docs/brainstorms/requirements.md",
+        "status": "finalized",
+        "can_finalize": true,
+        "can_closeout": true,
+        "should_block_closeout": false,
+        "blocking_reason_codes": [
+          "ready_receipt_stale"
+        ],
+        "closeout_blocking_reason_codes": [],
+        "checker": {
+          "schema_version": "spec-prd-artifact-check.v1",
+          "finding_count": 1,
+          "blocking_finding_count": 1,
+          "reason_codes": [
+            "ready_receipt_stale"
+          ],
+          "findings": [
+            {
+              "reason_code": "ready_receipt_stale",
+              "expected_shape": "readiness_prd_hash and readiness_inputs_hash match the current PRD body and current effective inputs.",
+              "remediation_hint": "Rerun finalize with the same effective inputs used to create the PRD, or use --inputs-from-frontmatter when source_inputs/prd_input is present."
+            }
+          ],
+          "prd_hash": "sha256:19316a90b0f263043bc628ac38d557d67e4b6d14fc4a0cb0a60ff5b9015ff7a5",
+          "inputs_hash": "sha256:83b99a23203766e4791e861c245916b10008a6128b06eb227caa9669fe4c6fc0",
+          "inputs_source": "cli",
+          "inputs_argument_count": 1,
+          "inputs_from_frontmatter_used_count": 0,
+          "input_diagnostics": {
+            "source_inputs_present": true,
+            "source_inputs_field": "source_inputs",
+            "frontmatter_source_input_count": 1,
+            "inputs_argument_count": 1,
+            "effective_input_count": 1,
+            "inputs_from_frontmatter_requested": false,
+            "inputs_from_frontmatter_used_count": 0,
+            "input_scan_status": "cli_inputs",
+            "receipt_stale_possible_due_to_missing_inputs": false,
+            "hint": null
+          }
+        },
+        "wrote_ready_receipt": true
+      },
+      "final_prd": "---\nartifact_kind: prd-requirements\nspec_id: finalize-transition\ntitle: Changed product intent\ndate: 2026-07-11\nstatus: ready-for-planning\nsource_inputs:\n  - source/input.md\nreadiness_verified_by: check-prd-artifact.js\nreadiness_verified_at: 2026-10-30T06:46:22.284Z\nreadiness_checker_schema: spec-prd-artifact-check.v1\nreadiness_finding_count: 1\nreadiness_blocking_count: 0\nreadiness_prd_hash: sha256:19316a90b0f263043bc628ac38d557d67e4b6d14fc4a0cb0a60ff5b9015ff7a5\nreadiness_inputs_hash: sha256:83b99a23203766e4791e861c245916b10008a6128b06eb227caa9669fe4c6fc0\n---\n# Finalize Transition\n\n## Summary\n\n已有系统需要可靠的 final intent 到 receipt 状态迁移。\n\n## Change Delta\n\n| item | current | target | evidence |\n| --- | --- | --- | --- |\n| receipt | absent | current | confirmed-source |\n\n## Requirements\n\n| id | priority | requirement | rationale/source |\n| --- | --- | --- | --- |\n| R-01 | P0 | final intent 只有 current receipt 后才能 closeout | checker source |\n\n## Acceptance Examples\n\n| id | covers | example |\n| --- | --- | --- |\n| AE-01 | R-01 | Given final intent When finalize Then verified receipt |\n\n## Scope Boundaries\n\nIn scope: producer-local finalize。\n\n## Evidence And Assumptions\n\n| claim | tag | source |\n| --- | --- | --- |\n| receipt fields are machine-owned | confirmed-source | finalize-prd-artifact.js |\n\n## Outstanding Questions\n\n| id | question | PRD write target | owner_status | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended_default/deferred_reason |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n\n## Readiness Self-Check\n\nwrite_mode: final-prd\nclarification_evidence: source-proven-no-ask\npreflight_sweep_closure: closed\ndecision_card_highest_risk_gap: receipt currentness\ndecision_card_next_action: final-prd\ndecision_card_why_no_invention: R-01 与 AE-01 已闭合\ncan_enter_spec_plan: yes\n",
+      "final_verify": {
+        "schema_version": "spec-prd-receipt-verification.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/metadata/docs/brainstorms/requirements.md",
+        "status": "verified",
+        "origin_verification_status": "verified",
+        "verified": true,
+        "artifact_kind": "prd-requirements",
+        "can_enter_spec_plan": "yes",
+        "ready_receipt_present": true,
+        "ready_receipt_current": true,
+        "input_side_recheck_attempted": true,
+        "reason_codes": [],
+        "checker": {
+          "schema_version": "spec-prd-artifact-check.v1",
+          "finding_count": 0,
+          "blocking_finding_count": 0,
+          "non_receipt_blocking_finding_count": 0,
+          "blocking_reason_codes": [],
+          "prd_hash": "sha256:19316a90b0f263043bc628ac38d557d67e4b6d14fc4a0cb0a60ff5b9015ff7a5",
+          "inputs_hash": "sha256:83b99a23203766e4791e861c245916b10008a6128b06eb227caa9669fe4c6fc0",
+          "inputs_source": "cli",
+          "inputs_argument_count": 1,
+          "inputs_from_frontmatter_used_count": 0
+        },
+        "producer": {
+          "mode": "verify-receipt",
+          "read_only": true,
+          "project_root": null
+        }
+      }
+    },
+    {
+      "variant": "body-and-input",
+      "initial_prd": "---\nartifact_kind: prd-requirements\nspec_id: finalize-transition\ntitle: Finalize Transition\ndate: 2026-07-11\nstatus: draft\nsource_inputs:\n  - source/input.md\n---\n# Finalize Transition\n\n## Summary\n\n已有系统需要可靠的 final intent 到 receipt 状态迁移。\n\n## Change Delta\n\n| item | current | target | evidence |\n| --- | --- | --- | --- |\n| receipt | absent | current | confirmed-source |\n\n## Requirements\n\n| id | priority | requirement | rationale/source |\n| --- | --- | --- | --- |\n| R-01 | P0 | final intent 只有 current receipt 后才能 closeout | checker source |\n\n## Acceptance Examples\n\n| id | covers | example |\n| --- | --- | --- |\n| AE-01 | R-01 | Given final intent When finalize Then verified receipt |\n\n## Scope Boundaries\n\nIn scope: producer-local finalize。\n\n## Evidence And Assumptions\n\n| claim | tag | source |\n| --- | --- | --- |\n| receipt fields are machine-owned | confirmed-source | finalize-prd-artifact.js |\n\n## Outstanding Questions\n\n| id | question | PRD write target | owner_status | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended_default/deferred_reason |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n\n## Readiness Self-Check\n\nwrite_mode: final-prd\nclarification_evidence: source-proven-no-ask\npreflight_sweep_closure: closed\ndecision_card_highest_risk_gap: receipt currentness\ndecision_card_next_action: final-prd\ndecision_card_why_no_invention: R-01 与 AE-01 已闭合\ncan_enter_spec_plan: yes\n",
+      "initial_input": "confirmed source input\n",
+      "initial_finalize": {
+        "schema_version": "spec-prd-finalize.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/body-and-input/docs/brainstorms/requirements.md",
+        "status": "finalized",
+        "can_finalize": true,
+        "can_closeout": true,
+        "should_block_closeout": false,
+        "blocking_reason_codes": [],
+        "closeout_blocking_reason_codes": [],
+        "checker": {
+          "schema_version": "spec-prd-artifact-check.v1",
+          "finding_count": 1,
+          "blocking_finding_count": 0,
+          "reason_codes": [
+            "ready_receipt_absent"
+          ],
+          "findings": [],
+          "prd_hash": "sha256:504d7389e39269b72a3af044ba177bdbf24d061d966b076766845d50275c183a",
+          "inputs_hash": "sha256:8ccd22c0bc777013e435b4a191b112dc52d7f2909f5a207f2868676157af091f",
+          "inputs_source": "cli",
+          "inputs_argument_count": 1,
+          "inputs_from_frontmatter_used_count": 0,
+          "input_diagnostics": {
+            "source_inputs_present": true,
+            "source_inputs_field": "source_inputs",
+            "frontmatter_source_input_count": 1,
+            "inputs_argument_count": 1,
+            "effective_input_count": 1,
+            "inputs_from_frontmatter_requested": false,
+            "inputs_from_frontmatter_used_count": 0,
+            "input_scan_status": "cli_inputs",
+            "receipt_stale_possible_due_to_missing_inputs": false,
+            "hint": null
+          }
+        },
+        "wrote_ready_receipt": true
+      },
+      "initial_verify": {
+        "schema_version": "spec-prd-receipt-verification.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/body-and-input/docs/brainstorms/requirements.md",
+        "status": "verified",
+        "origin_verification_status": "verified",
+        "verified": true,
+        "artifact_kind": "prd-requirements",
+        "can_enter_spec_plan": "yes",
+        "ready_receipt_present": true,
+        "ready_receipt_current": true,
+        "input_side_recheck_attempted": true,
+        "reason_codes": [],
+        "checker": {
+          "schema_version": "spec-prd-artifact-check.v1",
+          "finding_count": 0,
+          "blocking_finding_count": 0,
+          "non_receipt_blocking_finding_count": 0,
+          "blocking_reason_codes": [],
+          "prd_hash": "sha256:504d7389e39269b72a3af044ba177bdbf24d061d966b076766845d50275c183a",
+          "inputs_hash": "sha256:8ccd22c0bc777013e435b4a191b112dc52d7f2909f5a207f2868676157af091f",
+          "inputs_source": "cli",
+          "inputs_argument_count": 1,
+          "inputs_from_frontmatter_used_count": 0
+        },
+        "producer": {
+          "mode": "verify-receipt",
+          "read_only": true,
+          "project_root": null
+        }
+      },
+      "mutated_prd": "---\nartifact_kind: prd-requirements\nspec_id: finalize-transition\ntitle: Finalize Transition\ndate: 2026-07-11\nstatus: ready-for-planning\nsource_inputs:\n  - source/input.md\nreadiness_verified_by: check-prd-artifact.js\nreadiness_verified_at: 2026-10-30T06:46:22.285Z\nreadiness_checker_schema: spec-prd-artifact-check.v1\nreadiness_finding_count: 1\nreadiness_blocking_count: 0\nreadiness_prd_hash: sha256:504d7389e39269b72a3af044ba177bdbf24d061d966b076766845d50275c183a\nreadiness_inputs_hash: sha256:8ccd22c0bc777013e435b4a191b112dc52d7f2909f5a207f2868676157af091f\n---\n# Finalize Transition\n\n## Summary\n\n已有系统需要可靠的 final intent 到 receipt 状态迁移。\n\n## Change Delta\n\n| item | current | target | evidence |\n| --- | --- | --- | --- |\n| receipt | absent | current | confirmed-source |\n\n## Requirements\n\n| id | priority | requirement | rationale/source |\n| --- | --- | --- | --- |\n| R-01 | P0 | final intent 只有 current receipt 后才能 closeout | checker source |\n\n## Acceptance Examples\n\n| id | covers | example |\n| --- | --- | --- |\n| AE-01 | R-01 | Given final intent When finalize Then verified receipt |\n\n## Scope Boundaries\n\nIn scope: producer-local finalize。\n\n## Evidence And Assumptions\n\n| claim | tag | source |\n| --- | --- | --- |\n| receipt fields are machine-owned | confirmed-source | finalize-prd-artifact.js |\n\n## Outstanding Questions\n\n| id | question | PRD write target | owner_status | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended_default/deferred_reason |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n\n## Readiness Self-Check\n\nwrite_mode: final-prd\nclarification_evidence: source-proven-no-ask\npreflight_sweep_closure: closed\ndecision_card_highest_risk_gap: receipt currentness\ndecision_card_next_action: final-prd\ndecision_card_why_no_invention: R-01 与 AE-01 已闭合\ncan_enter_spec_plan: yes\n\nA new product requirement.\n",
+      "mutated_input": "confirmed source input\nUpdated evidence.\n",
+      "preview": {
+        "schema_version": "spec-prd-finalize.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/body-and-input/docs/brainstorms/requirements.md",
+        "status": "finalizable",
+        "can_finalize": true,
+        "can_closeout": true,
+        "should_block_closeout": false,
+        "blocking_reason_codes": [
+          "ready_receipt_stale"
+        ],
+        "closeout_blocking_reason_codes": [],
+        "checker": {
+          "schema_version": "spec-prd-artifact-check.v1",
+          "finding_count": 1,
+          "blocking_finding_count": 1,
+          "reason_codes": [
+            "ready_receipt_stale"
+          ],
+          "findings": [
+            {
+              "reason_code": "ready_receipt_stale",
+              "expected_shape": "readiness_prd_hash and readiness_inputs_hash match the current PRD body and current effective inputs.",
+              "remediation_hint": "Rerun finalize with the same effective inputs used to create the PRD, or use --inputs-from-frontmatter when source_inputs/prd_input is present."
+            }
+          ],
+          "prd_hash": "sha256:a3885d6fe5d24638c766c117673acbc6c45788fad2823841e4f42dbbcd5c78f0",
+          "inputs_hash": "sha256:75cd85a807717ba15558bf78c0c43f820470a0a872589df6b9172d0ced401231",
+          "inputs_source": "cli",
+          "inputs_argument_count": 1,
+          "inputs_from_frontmatter_used_count": 0,
+          "input_diagnostics": {
+            "source_inputs_present": true,
+            "source_inputs_field": "source_inputs",
+            "frontmatter_source_input_count": 1,
+            "inputs_argument_count": 1,
+            "effective_input_count": 1,
+            "inputs_from_frontmatter_requested": false,
+            "inputs_from_frontmatter_used_count": 0,
+            "input_scan_status": "cli_inputs",
+            "receipt_stale_possible_due_to_missing_inputs": false,
+            "hint": null
+          }
+        }
+      },
+      "preview_preserved": true,
+      "refresh": {
+        "schema_version": "spec-prd-finalize.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/body-and-input/docs/brainstorms/requirements.md",
+        "status": "finalized",
+        "can_finalize": true,
+        "can_closeout": true,
+        "should_block_closeout": false,
+        "blocking_reason_codes": [
+          "ready_receipt_stale"
+        ],
+        "closeout_blocking_reason_codes": [],
+        "checker": {
+          "schema_version": "spec-prd-artifact-check.v1",
+          "finding_count": 1,
+          "blocking_finding_count": 1,
+          "reason_codes": [
+            "ready_receipt_stale"
+          ],
+          "findings": [
+            {
+              "reason_code": "ready_receipt_stale",
+              "expected_shape": "readiness_prd_hash and readiness_inputs_hash match the current PRD body and current effective inputs.",
+              "remediation_hint": "Rerun finalize with the same effective inputs used to create the PRD, or use --inputs-from-frontmatter when source_inputs/prd_input is present."
+            }
+          ],
+          "prd_hash": "sha256:a3885d6fe5d24638c766c117673acbc6c45788fad2823841e4f42dbbcd5c78f0",
+          "inputs_hash": "sha256:75cd85a807717ba15558bf78c0c43f820470a0a872589df6b9172d0ced401231",
+          "inputs_source": "cli",
+          "inputs_argument_count": 1,
+          "inputs_from_frontmatter_used_count": 0,
+          "input_diagnostics": {
+            "source_inputs_present": true,
+            "source_inputs_field": "source_inputs",
+            "frontmatter_source_input_count": 1,
+            "inputs_argument_count": 1,
+            "effective_input_count": 1,
+            "inputs_from_frontmatter_requested": false,
+            "inputs_from_frontmatter_used_count": 0,
+            "input_scan_status": "cli_inputs",
+            "receipt_stale_possible_due_to_missing_inputs": false,
+            "hint": null
+          }
+        },
+        "wrote_ready_receipt": true
+      },
+      "final_prd": "---\nartifact_kind: prd-requirements\nspec_id: finalize-transition\ntitle: Finalize Transition\ndate: 2026-07-11\nstatus: ready-for-planning\nsource_inputs:\n  - source/input.md\nreadiness_verified_by: check-prd-artifact.js\nreadiness_verified_at: 2026-10-30T06:46:22.287Z\nreadiness_checker_schema: spec-prd-artifact-check.v1\nreadiness_finding_count: 1\nreadiness_blocking_count: 0\nreadiness_prd_hash: sha256:a3885d6fe5d24638c766c117673acbc6c45788fad2823841e4f42dbbcd5c78f0\nreadiness_inputs_hash: sha256:75cd85a807717ba15558bf78c0c43f820470a0a872589df6b9172d0ced401231\n---\n# Finalize Transition\n\n## Summary\n\n已有系统需要可靠的 final intent 到 receipt 状态迁移。\n\n## Change Delta\n\n| item | current | target | evidence |\n| --- | --- | --- | --- |\n| receipt | absent | current | confirmed-source |\n\n## Requirements\n\n| id | priority | requirement | rationale/source |\n| --- | --- | --- | --- |\n| R-01 | P0 | final intent 只有 current receipt 后才能 closeout | checker source |\n\n## Acceptance Examples\n\n| id | covers | example |\n| --- | --- | --- |\n| AE-01 | R-01 | Given final intent When finalize Then verified receipt |\n\n## Scope Boundaries\n\nIn scope: producer-local finalize。\n\n## Evidence And Assumptions\n\n| claim | tag | source |\n| --- | --- | --- |\n| receipt fields are machine-owned | confirmed-source | finalize-prd-artifact.js |\n\n## Outstanding Questions\n\n| id | question | PRD write target | owner_status | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended_default/deferred_reason |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n\n## Readiness Self-Check\n\nwrite_mode: final-prd\nclarification_evidence: source-proven-no-ask\npreflight_sweep_closure: closed\ndecision_card_highest_risk_gap: receipt currentness\ndecision_card_next_action: final-prd\ndecision_card_why_no_invention: R-01 与 AE-01 已闭合\ncan_enter_spec_plan: yes\n\nA new product requirement.\n",
+      "final_verify": {
+        "schema_version": "spec-prd-receipt-verification.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/body-and-input/docs/brainstorms/requirements.md",
+        "status": "verified",
+        "origin_verification_status": "verified",
+        "verified": true,
+        "artifact_kind": "prd-requirements",
+        "can_enter_spec_plan": "yes",
+        "ready_receipt_present": true,
+        "ready_receipt_current": true,
+        "input_side_recheck_attempted": true,
+        "reason_codes": [],
+        "checker": {
+          "schema_version": "spec-prd-artifact-check.v1",
+          "finding_count": 0,
+          "blocking_finding_count": 0,
+          "non_receipt_blocking_finding_count": 0,
+          "blocking_reason_codes": [],
+          "prd_hash": "sha256:a3885d6fe5d24638c766c117673acbc6c45788fad2823841e4f42dbbcd5c78f0",
+          "inputs_hash": "sha256:75cd85a807717ba15558bf78c0c43f820470a0a872589df6b9172d0ced401231",
+          "inputs_source": "cli",
+          "inputs_argument_count": 1,
+          "inputs_from_frontmatter_used_count": 0
+        },
+        "producer": {
+          "mode": "verify-receipt",
+          "read_only": true,
+          "project_root": null
+        }
+      }
+    },
+    {
+      "variant": "input-only",
+      "initial_prd": "---\nartifact_kind: prd-requirements\nspec_id: finalize-transition\ntitle: Finalize Transition\ndate: 2026-07-11\nstatus: draft\nsource_inputs:\n  - source/input.md\n---\n# Finalize Transition\n\n## Summary\n\n已有系统需要可靠的 final intent 到 receipt 状态迁移。\n\n## Change Delta\n\n| item | current | target | evidence |\n| --- | --- | --- | --- |\n| receipt | absent | current | confirmed-source |\n\n## Requirements\n\n| id | priority | requirement | rationale/source |\n| --- | --- | --- | --- |\n| R-01 | P0 | final intent 只有 current receipt 后才能 closeout | checker source |\n\n## Acceptance Examples\n\n| id | covers | example |\n| --- | --- | --- |\n| AE-01 | R-01 | Given final intent When finalize Then verified receipt |\n\n## Scope Boundaries\n\nIn scope: producer-local finalize。\n\n## Evidence And Assumptions\n\n| claim | tag | source |\n| --- | --- | --- |\n| receipt fields are machine-owned | confirmed-source | finalize-prd-artifact.js |\n\n## Outstanding Questions\n\n| id | question | PRD write target | owner_status | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended_default/deferred_reason |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n\n## Readiness Self-Check\n\nwrite_mode: final-prd\nclarification_evidence: source-proven-no-ask\npreflight_sweep_closure: closed\ndecision_card_highest_risk_gap: receipt currentness\ndecision_card_next_action: final-prd\ndecision_card_why_no_invention: R-01 与 AE-01 已闭合\ncan_enter_spec_plan: yes\n",
+      "initial_input": "confirmed source input\n",
+      "initial_finalize": {
+        "schema_version": "spec-prd-finalize.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/input-only/docs/brainstorms/requirements.md",
+        "status": "finalized",
+        "can_finalize": true,
+        "can_closeout": true,
+        "should_block_closeout": false,
+        "blocking_reason_codes": [],
+        "closeout_blocking_reason_codes": [],
+        "checker": {
+          "schema_version": "spec-prd-artifact-check.v1",
+          "finding_count": 1,
+          "blocking_finding_count": 0,
+          "reason_codes": [
+            "ready_receipt_absent"
+          ],
+          "findings": [],
+          "prd_hash": "sha256:504d7389e39269b72a3af044ba177bdbf24d061d966b076766845d50275c183a",
+          "inputs_hash": "sha256:cef6ba967a205b08b511c341088e209369be27956df6d6478203a692174494c1",
+          "inputs_source": "cli",
+          "inputs_argument_count": 1,
+          "inputs_from_frontmatter_used_count": 0,
+          "input_diagnostics": {
+            "source_inputs_present": true,
+            "source_inputs_field": "source_inputs",
+            "frontmatter_source_input_count": 1,
+            "inputs_argument_count": 1,
+            "effective_input_count": 1,
+            "inputs_from_frontmatter_requested": false,
+            "inputs_from_frontmatter_used_count": 0,
+            "input_scan_status": "cli_inputs",
+            "receipt_stale_possible_due_to_missing_inputs": false,
+            "hint": null
+          }
+        },
+        "wrote_ready_receipt": true
+      },
+      "initial_verify": {
+        "schema_version": "spec-prd-receipt-verification.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/input-only/docs/brainstorms/requirements.md",
+        "status": "verified",
+        "origin_verification_status": "verified",
+        "verified": true,
+        "artifact_kind": "prd-requirements",
+        "can_enter_spec_plan": "yes",
+        "ready_receipt_present": true,
+        "ready_receipt_current": true,
+        "input_side_recheck_attempted": true,
+        "reason_codes": [],
+        "checker": {
+          "schema_version": "spec-prd-artifact-check.v1",
+          "finding_count": 0,
+          "blocking_finding_count": 0,
+          "non_receipt_blocking_finding_count": 0,
+          "blocking_reason_codes": [],
+          "prd_hash": "sha256:504d7389e39269b72a3af044ba177bdbf24d061d966b076766845d50275c183a",
+          "inputs_hash": "sha256:cef6ba967a205b08b511c341088e209369be27956df6d6478203a692174494c1",
+          "inputs_source": "cli",
+          "inputs_argument_count": 1,
+          "inputs_from_frontmatter_used_count": 0
+        },
+        "producer": {
+          "mode": "verify-receipt",
+          "read_only": true,
+          "project_root": null
+        }
+      },
+      "mutated_prd": "---\nartifact_kind: prd-requirements\nspec_id: finalize-transition\ntitle: Finalize Transition\ndate: 2026-07-11\nstatus: ready-for-planning\nsource_inputs:\n  - source/input.md\nreadiness_verified_by: check-prd-artifact.js\nreadiness_verified_at: 2026-10-30T06:46:22.288Z\nreadiness_checker_schema: spec-prd-artifact-check.v1\nreadiness_finding_count: 1\nreadiness_blocking_count: 0\nreadiness_prd_hash: sha256:504d7389e39269b72a3af044ba177bdbf24d061d966b076766845d50275c183a\nreadiness_inputs_hash: sha256:cef6ba967a205b08b511c341088e209369be27956df6d6478203a692174494c1\n---\n# Finalize Transition\n\n## Summary\n\n已有系统需要可靠的 final intent 到 receipt 状态迁移。\n\n## Change Delta\n\n| item | current | target | evidence |\n| --- | --- | --- | --- |\n| receipt | absent | current | confirmed-source |\n\n## Requirements\n\n| id | priority | requirement | rationale/source |\n| --- | --- | --- | --- |\n| R-01 | P0 | final intent 只有 current receipt 后才能 closeout | checker source |\n\n## Acceptance Examples\n\n| id | covers | example |\n| --- | --- | --- |\n| AE-01 | R-01 | Given final intent When finalize Then verified receipt |\n\n## Scope Boundaries\n\nIn scope: producer-local finalize。\n\n## Evidence And Assumptions\n\n| claim | tag | source |\n| --- | --- | --- |\n| receipt fields are machine-owned | confirmed-source | finalize-prd-artifact.js |\n\n## Outstanding Questions\n\n| id | question | PRD write target | owner_status | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended_default/deferred_reason |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n\n## Readiness Self-Check\n\nwrite_mode: final-prd\nclarification_evidence: source-proven-no-ask\npreflight_sweep_closure: closed\ndecision_card_highest_risk_gap: receipt currentness\ndecision_card_next_action: final-prd\ndecision_card_why_no_invention: R-01 与 AE-01 已闭合\ncan_enter_spec_plan: yes\n",
+      "mutated_input": "confirmed source input\nUpdated evidence.\n",
+      "preview": {
+        "schema_version": "spec-prd-finalize.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/input-only/docs/brainstorms/requirements.md",
+        "status": "finalizable",
+        "can_finalize": true,
+        "can_closeout": true,
+        "should_block_closeout": false,
+        "blocking_reason_codes": [
+          "ready_receipt_stale"
+        ],
+        "closeout_blocking_reason_codes": [],
+        "checker": {
+          "schema_version": "spec-prd-artifact-check.v1",
+          "finding_count": 1,
+          "blocking_finding_count": 1,
+          "reason_codes": [
+            "ready_receipt_stale"
+          ],
+          "findings": [
+            {
+              "reason_code": "ready_receipt_stale",
+              "expected_shape": "readiness_prd_hash and readiness_inputs_hash match the current PRD body and current effective inputs.",
+              "remediation_hint": "Rerun finalize with the same effective inputs used to create the PRD, or use --inputs-from-frontmatter when source_inputs/prd_input is present."
+            }
+          ],
+          "prd_hash": "sha256:504d7389e39269b72a3af044ba177bdbf24d061d966b076766845d50275c183a",
+          "inputs_hash": "sha256:0b82709649d1a122cde7e4d70c3ad6f09a9d6c03d80cf3eb9cbcef5b9c919390",
+          "inputs_source": "cli",
+          "inputs_argument_count": 1,
+          "inputs_from_frontmatter_used_count": 0,
+          "input_diagnostics": {
+            "source_inputs_present": true,
+            "source_inputs_field": "source_inputs",
+            "frontmatter_source_input_count": 1,
+            "inputs_argument_count": 1,
+            "effective_input_count": 1,
+            "inputs_from_frontmatter_requested": false,
+            "inputs_from_frontmatter_used_count": 0,
+            "input_scan_status": "cli_inputs",
+            "receipt_stale_possible_due_to_missing_inputs": false,
+            "hint": null
+          }
+        }
+      },
+      "preview_preserved": true,
+      "refresh": {
+        "schema_version": "spec-prd-finalize.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/input-only/docs/brainstorms/requirements.md",
+        "status": "finalized",
+        "can_finalize": true,
+        "can_closeout": true,
+        "should_block_closeout": false,
+        "blocking_reason_codes": [
+          "ready_receipt_stale"
+        ],
+        "closeout_blocking_reason_codes": [],
+        "checker": {
+          "schema_version": "spec-prd-artifact-check.v1",
+          "finding_count": 1,
+          "blocking_finding_count": 1,
+          "reason_codes": [
+            "ready_receipt_stale"
+          ],
+          "findings": [
+            {
+              "reason_code": "ready_receipt_stale",
+              "expected_shape": "readiness_prd_hash and readiness_inputs_hash match the current PRD body and current effective inputs.",
+              "remediation_hint": "Rerun finalize with the same effective inputs used to create the PRD, or use --inputs-from-frontmatter when source_inputs/prd_input is present."
+            }
+          ],
+          "prd_hash": "sha256:504d7389e39269b72a3af044ba177bdbf24d061d966b076766845d50275c183a",
+          "inputs_hash": "sha256:0b82709649d1a122cde7e4d70c3ad6f09a9d6c03d80cf3eb9cbcef5b9c919390",
+          "inputs_source": "cli",
+          "inputs_argument_count": 1,
+          "inputs_from_frontmatter_used_count": 0,
+          "input_diagnostics": {
+            "source_inputs_present": true,
+            "source_inputs_field": "source_inputs",
+            "frontmatter_source_input_count": 1,
+            "inputs_argument_count": 1,
+            "effective_input_count": 1,
+            "inputs_from_frontmatter_requested": false,
+            "inputs_from_frontmatter_used_count": 0,
+            "input_scan_status": "cli_inputs",
+            "receipt_stale_possible_due_to_missing_inputs": false,
+            "hint": null
+          }
+        },
+        "wrote_ready_receipt": true
+      },
+      "final_prd": "---\nartifact_kind: prd-requirements\nspec_id: finalize-transition\ntitle: Finalize Transition\ndate: 2026-07-11\nstatus: ready-for-planning\nsource_inputs:\n  - source/input.md\nreadiness_verified_by: check-prd-artifact.js\nreadiness_verified_at: 2026-10-30T06:46:22.289Z\nreadiness_checker_schema: spec-prd-artifact-check.v1\nreadiness_finding_count: 1\nreadiness_blocking_count: 0\nreadiness_prd_hash: sha256:504d7389e39269b72a3af044ba177bdbf24d061d966b076766845d50275c183a\nreadiness_inputs_hash: sha256:0b82709649d1a122cde7e4d70c3ad6f09a9d6c03d80cf3eb9cbcef5b9c919390\n---\n# Finalize Transition\n\n## Summary\n\n已有系统需要可靠的 final intent 到 receipt 状态迁移。\n\n## Change Delta\n\n| item | current | target | evidence |\n| --- | --- | --- | --- |\n| receipt | absent | current | confirmed-source |\n\n## Requirements\n\n| id | priority | requirement | rationale/source |\n| --- | --- | --- | --- |\n| R-01 | P0 | final intent 只有 current receipt 后才能 closeout | checker source |\n\n## Acceptance Examples\n\n| id | covers | example |\n| --- | --- | --- |\n| AE-01 | R-01 | Given final intent When finalize Then verified receipt |\n\n## Scope Boundaries\n\nIn scope: producer-local finalize。\n\n## Evidence And Assumptions\n\n| claim | tag | source |\n| --- | --- | --- |\n| receipt fields are machine-owned | confirmed-source | finalize-prd-artifact.js |\n\n## Outstanding Questions\n\n| id | question | PRD write target | owner_status | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended_default/deferred_reason |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n\n## Readiness Self-Check\n\nwrite_mode: final-prd\nclarification_evidence: source-proven-no-ask\npreflight_sweep_closure: closed\ndecision_card_highest_risk_gap: receipt currentness\ndecision_card_next_action: final-prd\ndecision_card_why_no_invention: R-01 与 AE-01 已闭合\ncan_enter_spec_plan: yes\n",
+      "final_verify": {
+        "schema_version": "spec-prd-receipt-verification.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/input-only/docs/brainstorms/requirements.md",
+        "status": "verified",
+        "origin_verification_status": "verified",
+        "verified": true,
+        "artifact_kind": "prd-requirements",
+        "can_enter_spec_plan": "yes",
+        "ready_receipt_present": true,
+        "ready_receipt_current": true,
+        "input_side_recheck_attempted": true,
+        "reason_codes": [],
+        "checker": {
+          "schema_version": "spec-prd-artifact-check.v1",
+          "finding_count": 0,
+          "blocking_finding_count": 0,
+          "non_receipt_blocking_finding_count": 0,
+          "blocking_reason_codes": [],
+          "prd_hash": "sha256:504d7389e39269b72a3af044ba177bdbf24d061d966b076766845d50275c183a",
+          "inputs_hash": "sha256:0b82709649d1a122cde7e4d70c3ad6f09a9d6c03d80cf3eb9cbcef5b9c919390",
+          "inputs_source": "cli",
+          "inputs_argument_count": 1,
+          "inputs_from_frontmatter_used_count": 0
+        },
+        "producer": {
+          "mode": "verify-receipt",
+          "read_only": true,
+          "project_root": null
+        }
+      }
+    },
+    {
+      "variant": "how-word",
+      "initial_prd": "---\nartifact_kind: prd-requirements\nspec_id: finalize-transition\ntitle: Finalize Transition\ndate: 2026-07-11\nstatus: draft\nsource_inputs:\n  - source/input.md\n---\n# Finalize Transition\n\n## Summary\n\n已有系统需要可靠的 final intent 到 receipt 状态迁移。\n\n## Change Delta\n\n| item | current | target | evidence |\n| --- | --- | --- | --- |\n| receipt | absent | current | confirmed-source |\n\n## Requirements\n\n| id | priority | requirement | rationale/source |\n| --- | --- | --- | --- |\n| R-01 | P0 | final intent 只有 current receipt 后才能 closeout | checker source |\n\n## Acceptance Examples\n\n| id | covers | example |\n| --- | --- | --- |\n| AE-01 | R-01 | Given final intent When finalize Then verified receipt |\n\n## Scope Boundaries\n\nIn scope: producer-local finalize。\n\n## Evidence And Assumptions\n\n| claim | tag | source |\n| --- | --- | --- |\n| receipt fields are machine-owned | confirmed-source | finalize-prd-artifact.js |\n\n## Outstanding Questions\n\n| id | question | PRD write target | owner_status | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended_default/deferred_reason |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n\n## Readiness Self-Check\n\nwrite_mode: final-prd\nclarification_evidence: source-proven-no-ask\npreflight_sweep_closure: closed\ndecision_card_highest_risk_gap: receipt currentness\ndecision_card_next_action: final-prd\ndecision_card_why_no_invention: R-01 与 AE-01 已闭合\ncan_enter_spec_plan: yes\n",
+      "initial_input": "confirmed source input\n",
+      "mutated_prd": "---\nartifact_kind: prd-requirements\nspec_id: finalize-transition\ntitle: Finalize Transition\ndate: 2026-07-11\nstatus: draft\nsource_inputs:\n  - source/input.md\n---\n# Finalize Transition\n\n## Summary\n\n已有系统需要可靠的 final intent 到 receipt 状态迁移。\n\n## Change Delta\n\n| item | current | target | evidence |\n| --- | --- | --- | --- |\n| receipt | absent | current | confirmed-source |\n\n## Requirements\n\n| id | priority | requirement | rationale/source |\n| --- | --- | --- | --- |\n| R-01 | P0 | final intent 只有 current receipt 后才能 closeout | checker source |\n\n## Acceptance Examples\n\n| id | covers | example |\n| --- | --- | --- |\n| AE-01 | R-01 | Given final intent When finalize Then verified receipt |\n\n## Scope Boundaries\n\nIn scope: producer-local finalize。\n\n## Evidence And Assumptions\n\n| claim | tag | source |\n| --- | --- | --- |\n| receipt fields are machine-owned | confirmed-source | finalize-prd-artifact.js |\n\n## Outstanding Questions\n\n| id | question | PRD write target | owner_status | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended_default/deferred_reason |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n\n| OQ-01 | permission mock file naming | tests/permission.test.js | source-proven | no | implementation-only-how-pushdown | no | closed | Source: tests/permission.test.js |\n\n## Readiness Self-Check\n\nwrite_mode: final-prd\nclarification_evidence: source-proven-no-ask\npreflight_sweep_closure: closed\ndecision_card_highest_risk_gap: receipt currentness\ndecision_card_next_action: final-prd\ndecision_card_why_no_invention: R-01 与 AE-01 已闭合\ncan_enter_spec_plan: yes\n",
+      "report": {
+        "schema_version": "spec-prd-artifact-check.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/how-word/docs/brainstorms/requirements.md",
+        "status": "checked",
+        "facts": {
+          "frontmatter_present": true,
+          "artifact_kind": "prd-requirements",
+          "core_sections_present": [
+            "Summary",
+            "Change Delta",
+            "Requirements",
+            "Acceptance Examples",
+            "Scope Boundaries",
+            "Evidence And Assumptions"
+          ],
+          "core_sections_missing": [],
+          "requirement_ids": [
+            "R-01"
+          ],
+          "valid_requirement_row_ids": [
+            "R-01"
+          ],
+          "valid_requirement_row_count": 1,
+          "acceptance_ids": [
+            "AE-01"
+          ],
+          "valid_acceptance_example_ids": [
+            "AE-01"
+          ],
+          "valid_acceptance_example_count": 1,
+          "requirements_without_acceptance_trace": [],
+          "nfr_ids": [],
+          "uncovered_requirements": [],
+          "evidence_tags_present": [
+            "confirmed-source"
+          ],
+          "priority_distribution": {
+            "P0": 1
+          },
+          "nfr_count": 0,
+          "assumption_row_count": 0,
+          "outstanding_question_count": 1,
+          "outstanding_questions_present": true,
+          "outstanding_questions_count": 1,
+          "planning_recheck_present": false,
+          "planning_recheck_count": 0,
+          "write_mode_declared_valid": true,
+          "write_mode": "final-prd",
+          "clarification_evidence_declared_valid": true,
+          "clarification_evidence": "source-proven-no-ask",
+          "clarification_trace_present": true,
+          "can_enter_spec_plan_declared_valid": true,
+          "can_enter_spec_plan": "yes",
+          "preflight_sweep_closure": "closed",
+          "preflight_sweep_closure_declared_valid": true,
+          "decision_card_present": true,
+          "decision_card_highest_risk_gap_present": true,
+          "decision_card_next_action": "final-prd",
+          "decision_card_why_no_invention_present": true,
+          "ready_claim_present": true,
+          "ready_receipt_present": false,
+          "ready_receipt_current": false,
+          "ready_receipt_prd_hash": "sha256:7ed71089f306b89a9380b4a03ef2be3d29e298525eaaa9d462fdcef75e82e292",
+          "ready_receipt_inputs_hash": "sha256:22dbe3165a226b4fa5134e82b7adc4210222c16e3f1233f1e105c042367d5051",
+          "design_source_refs_present": false,
+          "design_source_inventory_declared": false,
+          "design_source_coverage_declared": false,
+          "design_sources_read_present": false,
+          "design_sources_unread_present": false,
+          "design_sources_unread_non_empty": false,
+          "design_coverage_partial": false,
+          "design_degraded_owner_accepted": false,
+          "outstanding_question_closure_contract_present": true,
+          "outstanding_question_rows": 1,
+          "outstanding_question_missing_closure_count": 0,
+          "blocking_outstanding_question_count": 0,
+          "planning_invention_question_count": 0,
+          "unclosed_owner_question_count": 0,
+          "open_oq_without_owner_closure_count": 0,
+          "how_pushdown_touches_what_count": 1,
+          "possible_misclassified_how_pushdown_count": 0,
+          "owner_decision_trace_present": false,
+          "placeholder_line_count": 0,
+          "feature_slice_trace_gap_count": 0,
+          "source_inputs_present": true,
+          "source_inputs_field": "source_inputs",
+          "frontmatter_source_input_count": 1,
+          "inputs_argument_count": 1,
+          "effective_input_count": 1,
+          "inputs_from_frontmatter_requested": false,
+          "inputs_from_frontmatter_used_count": 0,
+          "input_scan_attempted": true,
+          "input_scan_status": "cli_inputs",
+          "receipt_stale_possible_due_to_missing_inputs": false,
+          "input_scan_hint": null,
+          "input_refs_used": [
+            "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/how-word/source/input.md"
+          ],
+          "input_design_refs_present": false,
+          "input_scan_degraded": false,
+          "blocking_reason_codes": [
+            "how_pushdown_touches_what",
+            "preflight_closure_contradicted",
+            "ready_receipt_absent"
+          ],
+          "blocking_finding_count": 3
+        },
+        "findings": [
+          {
+            "reason_code": "ready_receipt_absent"
+          },
+          {
+            "reason_code": "how_pushdown_touches_what"
+          },
+          {
+            "reason_code": "preflight_closure_contradicted"
+          }
+        ]
+      }
+    },
+    {
+      "variant": "declared-what",
+      "initial_prd": "---\nartifact_kind: prd-requirements\nspec_id: finalize-transition\ntitle: Finalize Transition\ndate: 2026-07-11\nstatus: draft\nsource_inputs:\n  - source/input.md\n---\n# Finalize Transition\n\n## Summary\n\n已有系统需要可靠的 final intent 到 receipt 状态迁移。\n\n## Change Delta\n\n| item | current | target | evidence |\n| --- | --- | --- | --- |\n| receipt | absent | current | confirmed-source |\n\n## Requirements\n\n| id | priority | requirement | rationale/source |\n| --- | --- | --- | --- |\n| R-01 | P0 | final intent 只有 current receipt 后才能 closeout | checker source |\n\n## Acceptance Examples\n\n| id | covers | example |\n| --- | --- | --- |\n| AE-01 | R-01 | Given final intent When finalize Then verified receipt |\n\n## Scope Boundaries\n\nIn scope: producer-local finalize。\n\n## Evidence And Assumptions\n\n| claim | tag | source |\n| --- | --- | --- |\n| receipt fields are machine-owned | confirmed-source | finalize-prd-artifact.js |\n\n## Outstanding Questions\n\n| id | question | PRD write target | owner_status | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended_default/deferred_reason |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n\n## Readiness Self-Check\n\nwrite_mode: final-prd\nclarification_evidence: source-proven-no-ask\npreflight_sweep_closure: closed\ndecision_card_highest_risk_gap: receipt currentness\ndecision_card_next_action: final-prd\ndecision_card_why_no_invention: R-01 与 AE-01 已闭合\ncan_enter_spec_plan: yes\n",
+      "initial_input": "confirmed source input\n",
+      "mutated_prd": "---\nartifact_kind: prd-requirements\nspec_id: finalize-transition\ntitle: Finalize Transition\ndate: 2026-07-11\nstatus: draft\nsource_inputs:\n  - source/input.md\n---\n# Finalize Transition\n\n## Summary\n\n已有系统需要可靠的 final intent 到 receipt 状态迁移。\n\n## Change Delta\n\n| item | current | target | evidence |\n| --- | --- | --- | --- |\n| receipt | absent | current | confirmed-source |\n\n## Requirements\n\n| id | priority | requirement | rationale/source |\n| --- | --- | --- | --- |\n| R-01 | P0 | final intent 只有 current receipt 后才能 closeout | checker source |\n\n## Acceptance Examples\n\n| id | covers | example |\n| --- | --- | --- |\n| AE-01 | R-01 | Given final intent When finalize Then verified receipt |\n\n## Scope Boundaries\n\nIn scope: producer-local finalize。\n\n## Evidence And Assumptions\n\n| claim | tag | source |\n| --- | --- | --- |\n| receipt fields are machine-owned | confirmed-source | finalize-prd-artifact.js |\n\n## Outstanding Questions\n\n| id | question | PRD write target | owner_status | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended_default/deferred_reason |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n\n| OQ-01 | permission mock file naming | tests/permission.test.js | source-proven | no | implementation-only-how-pushdown | yes | closed | Source: tests/permission.test.js |\n\n## Readiness Self-Check\n\nwrite_mode: final-prd\nclarification_evidence: source-proven-no-ask\npreflight_sweep_closure: closed\ndecision_card_highest_risk_gap: receipt currentness\ndecision_card_next_action: final-prd\ndecision_card_why_no_invention: R-01 与 AE-01 已闭合\ncan_enter_spec_plan: yes\n",
+      "report": {
+        "schema_version": "spec-prd-artifact-check.v1",
+        "target": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/declared-what/docs/brainstorms/requirements.md",
+        "status": "checked",
+        "facts": {
+          "frontmatter_present": true,
+          "artifact_kind": "prd-requirements",
+          "core_sections_present": [
+            "Summary",
+            "Change Delta",
+            "Requirements",
+            "Acceptance Examples",
+            "Scope Boundaries",
+            "Evidence And Assumptions"
+          ],
+          "core_sections_missing": [],
+          "requirement_ids": [
+            "R-01"
+          ],
+          "valid_requirement_row_ids": [
+            "R-01"
+          ],
+          "valid_requirement_row_count": 1,
+          "acceptance_ids": [
+            "AE-01"
+          ],
+          "valid_acceptance_example_ids": [
+            "AE-01"
+          ],
+          "valid_acceptance_example_count": 1,
+          "requirements_without_acceptance_trace": [],
+          "nfr_ids": [],
+          "uncovered_requirements": [],
+          "evidence_tags_present": [
+            "confirmed-source"
+          ],
+          "priority_distribution": {
+            "P0": 1
+          },
+          "nfr_count": 0,
+          "assumption_row_count": 0,
+          "outstanding_question_count": 1,
+          "outstanding_questions_present": true,
+          "outstanding_questions_count": 1,
+          "planning_recheck_present": false,
+          "planning_recheck_count": 0,
+          "write_mode_declared_valid": true,
+          "write_mode": "final-prd",
+          "clarification_evidence_declared_valid": true,
+          "clarification_evidence": "source-proven-no-ask",
+          "clarification_trace_present": true,
+          "can_enter_spec_plan_declared_valid": true,
+          "can_enter_spec_plan": "yes",
+          "preflight_sweep_closure": "closed",
+          "preflight_sweep_closure_declared_valid": true,
+          "decision_card_present": true,
+          "decision_card_highest_risk_gap_present": true,
+          "decision_card_next_action": "final-prd",
+          "decision_card_why_no_invention_present": true,
+          "ready_claim_present": true,
+          "ready_receipt_present": false,
+          "ready_receipt_current": false,
+          "ready_receipt_prd_hash": "sha256:631cfc3a6a088317ef8be17a91198597d8d41e693425a136aff97d7896407d3b",
+          "ready_receipt_inputs_hash": "sha256:47017a86bfec2629fe0d30fc59badcb5210140bd3c6442304aac9dae820905ac",
+          "design_source_refs_present": false,
+          "design_source_inventory_declared": false,
+          "design_source_coverage_declared": false,
+          "design_sources_read_present": false,
+          "design_sources_unread_present": false,
+          "design_sources_unread_non_empty": false,
+          "design_coverage_partial": false,
+          "design_degraded_owner_accepted": false,
+          "outstanding_question_closure_contract_present": true,
+          "outstanding_question_rows": 1,
+          "outstanding_question_missing_closure_count": 0,
+          "blocking_outstanding_question_count": 0,
+          "planning_invention_question_count": 1,
+          "unclosed_owner_question_count": 0,
+          "open_oq_without_owner_closure_count": 0,
+          "how_pushdown_touches_what_count": 1,
+          "possible_misclassified_how_pushdown_count": 0,
+          "owner_decision_trace_present": false,
+          "placeholder_line_count": 0,
+          "feature_slice_trace_gap_count": 0,
+          "source_inputs_present": true,
+          "source_inputs_field": "source_inputs",
+          "frontmatter_source_input_count": 1,
+          "inputs_argument_count": 1,
+          "effective_input_count": 1,
+          "inputs_from_frontmatter_requested": false,
+          "inputs_from_frontmatter_used_count": 0,
+          "input_scan_attempted": true,
+          "input_scan_status": "cli_inputs",
+          "receipt_stale_possible_due_to_missing_inputs": false,
+          "input_scan_hint": null,
+          "input_refs_used": [
+            "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-prd-heWRUV/A/declared-what/source/input.md"
+          ],
+          "input_design_refs_present": false,
+          "input_scan_degraded": false,
+          "blocking_reason_codes": [
+            "how_pushdown_touches_what",
+            "planning_invention_question_present",
+            "preflight_closure_contradicted",
+            "ready_receipt_absent"
+          ],
+          "blocking_finding_count": 4
+        },
+        "findings": [
+          {
+            "reason_code": "ready_receipt_absent"
+          },
+          {
+            "reason_code": "planning_invention_question_present"
+          },
+          {
+            "reason_code": "how_pushdown_touches_what"
+          },
+          {
+            "reason_code": "preflight_closure_contradicted"
+          }
+        ]
+      }
+    }
+  ]
+}

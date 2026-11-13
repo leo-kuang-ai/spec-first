@@ -1,15 +1,18 @@
 ---
 artifact_type: audit-plan
-artifact_version: 1
+artifact_version: 2
 created_at: 2026-08-01
-updated_at: 2026-08-01
+updated_at: 2026-09-15
 target_repo: .
 scope: full-system-installation-to-delivery
-status: ready-for-execution
+status: superseded
+superseded_by: docs/validation/2026-09-13-full-system-audit-plan-v2.md
 authority: audit-artifacts-only-by-default
 ---
 
 # spec-first 全链路系统审计方案
+
+> 本方案保留为历史记录。当前执行入口为 [全系统审查方案 v2](./2026-09-13-full-system-audit-plan-v2.md)，不要按本版的历史范围启动新审查。
 
 ## 1. 方案意图
 

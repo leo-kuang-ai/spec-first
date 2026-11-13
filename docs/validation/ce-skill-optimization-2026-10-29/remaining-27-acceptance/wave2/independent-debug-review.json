@@ -1,0 +1,345 @@
+{
+  "scenario_id": "CEOPT-08",
+  "review_mode": "independent fresh read-only review",
+  "verdict": "pass-for-parent-mediated-synthetic-fixture; model-only-fix-verification-not-run",
+  "blocking_findings": [],
+  "summary": "All six complete model outputs provide a source-grounded diagnosis, the same minimal correct candidate, and a concrete process-level replacement proof. All six parent executions preserve the protected inputs and outputs. This supports the bounded proposal-plus-parent-execution protocol, not autonomous repair or B superiority.",
+  "evidence_roots": {
+    "wave2": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2",
+    "frozen_criterion": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#/scenarios/CEOPT-08",
+    "frozen_sources": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/{A,B}/spec-debug",
+    "parent_runner": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/execute-debug-proposal.py",
+    "reference_convention": "Trial-local filenames below resolve beneath wave2/trials/<trial>. The frozen criterion reference identifies the CEOPT-08 entry by id rather than asserting an array index."
+  },
+  "per_trial": [
+    {
+      "trial": "CEOPT-08-A1",
+      "model_proposal_verdict": "pass",
+      "model_executed_fix_verdict": "not-run-by-design",
+      "parent_mediated_verdict": "pass",
+      "model_elapsed_seconds": 116.215,
+      "deadline_seconds": 300,
+      "cases_verified": 7,
+      "baseline_16000_elapsed_ms": [
+        365.669166,
+        363.5525,
+        364.637
+      ],
+      "candidate_16000_elapsed_ms": [
+        2.36175,
+        2.145542,
+        2.331042
+      ],
+      "profile_samples": 23,
+      "specific_observation": "Clearly distinguishes supplied baseline observations, source-level complexity reasoning, and unexecuted candidate verification. Proposed proof checks actual processes and exact outputs.",
+      "evidence_refs": [
+        "artifact.md",
+        "receipt.json",
+        "tool-events.json",
+        "execution-admission.json",
+        "execution-result.json",
+        "candidate.cjs",
+        "candidate.cpuprofile"
+      ]
+    },
+    {
+      "trial": "CEOPT-08-B1",
+      "model_proposal_verdict": "pass",
+      "model_executed_fix_verdict": "not-run-by-design",
+      "parent_mediated_verdict": "pass",
+      "model_elapsed_seconds": 154.944,
+      "deadline_seconds": 300,
+      "cases_verified": 7,
+      "baseline_16000_elapsed_ms": [
+        361.724917,
+        370.818291,
+        384.066375
+      ],
+      "candidate_16000_elapsed_ms": [
+        2.44025,
+        2.511959,
+        2.084833
+      ],
+      "profile_samples": 25,
+      "specific_observation": "Explicitly requests matched runtime conditions and separate profile inspection. Does not invent a failing latency threshold or claim measured improvement.",
+      "evidence_refs": [
+        "artifact.md",
+        "receipt.json",
+        "tool-events.json",
+        "execution-admission.json",
+        "execution-result.json",
+        "candidate.cjs",
+        "candidate.cpuprofile"
+      ]
+    },
+    {
+      "trial": "CEOPT-08-B2",
+      "model_proposal_verdict": "pass",
+      "model_executed_fix_verdict": "not-run-by-design",
+      "parent_mediated_verdict": "pass",
+      "model_elapsed_seconds": 144.77,
+      "deadline_seconds": 300,
+      "cases_verified": 7,
+      "baseline_16000_elapsed_ms": [
+        355.017709,
+        361.773209,
+        354.843208
+      ],
+      "candidate_16000_elapsed_ms": [
+        2.12825,
+        2.219667,
+        2.387375
+      ],
+      "profile_samples": 24,
+      "specific_observation": "Acknowledges missing historical runtime metadata and short-profile sampling limitations. Proposed proof includes original-source hash verification. One combined reference read was truncated in unrelated debugger/wait material; fixture source, proof intent, baseline receipts and performance guidance remained visible.",
+      "evidence_refs": [
+        "artifact.md",
+        "receipt.json",
+        "tool-events.json",
+        "execution-admission.json",
+        "execution-result.json",
+        "candidate.cjs",
+        "candidate.cpuprofile"
+      ]
+    },
+    {
+      "trial": "CEOPT-08-A2",
+      "model_proposal_verdict": "pass",
+      "model_executed_fix_verdict": "not-run-by-design",
+      "parent_mediated_verdict": "pass",
+      "model_elapsed_seconds": 115.368,
+      "deadline_seconds": 300,
+      "cases_verified": 7,
+      "baseline_16000_elapsed_ms": [
+        351.430584,
+        354.568417,
+        353.273417
+      ],
+      "candidate_16000_elapsed_ms": [
+        2.021666,
+        2.119375,
+        2.108292
+      ],
+      "profile_samples": 22,
+      "specific_observation": "Correctly explains that string argument '0' remains truthy before Number conversion. Proposed process proof stages original and replacement at the same disposable executable path and retains evidence; that proposed command was not the command actually executed.",
+      "evidence_refs": [
+        "artifact.md",
+        "receipt.json",
+        "tool-events.json",
+        "execution-admission.json",
+        "execution-result.json",
+        "candidate.cjs",
+        "candidate.cpuprofile"
+      ]
+    },
+    {
+      "trial": "CEOPT-08-A3",
+      "model_proposal_verdict": "pass",
+      "model_executed_fix_verdict": "not-run-by-design",
+      "parent_mediated_verdict": "pass",
+      "model_elapsed_seconds": 96.19,
+      "deadline_seconds": 300,
+      "cases_verified": 7,
+      "baseline_16000_elapsed_ms": [
+        354.462875,
+        355.18,
+        353.223958
+      ],
+      "candidate_16000_elapsed_ms": [
+        2.09725,
+        2.1235,
+        2.20675
+      ],
+      "profile_samples": 22,
+      "specific_observation": "Preserves the real report construction instead of replacing it with a checksum shortcut. Explicitly limits process proof to observable summary outputs and treats row preservation as source-supported.",
+      "evidence_refs": [
+        "artifact.md",
+        "receipt.json",
+        "tool-events.json",
+        "execution-admission.json",
+        "execution-result.json",
+        "candidate.cjs",
+        "candidate.cpuprofile"
+      ]
+    },
+    {
+      "trial": "CEOPT-08-B3",
+      "model_proposal_verdict": "pass",
+      "model_executed_fix_verdict": "not-run-by-design",
+      "parent_mediated_verdict": "pass",
+      "model_elapsed_seconds": 118.106,
+      "deadline_seconds": 300,
+      "cases_verified": 7,
+      "baseline_16000_elapsed_ms": [
+        361.607375,
+        384.174166,
+        361.000458
+      ],
+      "candidate_16000_elapsed_ms": [
+        2.134208,
+        2.308417,
+        2.188292
+      ],
+      "profile_samples": 24,
+      "specific_observation": "Proposes alternating execution order and discloses that no performance RED/GREEN threshold exists. The fixed parent runner instead always runs baseline before candidate. One combined read has the same noncritical truncation as B2.",
+      "evidence_refs": [
+        "artifact.md",
+        "receipt.json",
+        "tool-events.json",
+        "execution-admission.json",
+        "execution-result.json",
+        "candidate.cjs",
+        "candidate.cpuprofile"
+      ]
+    }
+  ],
+  "shared_verified_findings": {
+    "identity": {
+      "candidate_sha256": "385e5f596701ee5ed2829c179a02de851688459fa7ede0fc394776f668643052",
+      "all_six_candidates_identical": true,
+      "all_candidates_equal_exact_model_replacement_string": true,
+      "all_candidate_hashes_match_execution_admission": true,
+      "all_artifact_and_tool_trace_hashes_match_receipts": true,
+      "request_and_fixture_hashes_match_packet": true,
+      "baseline_source_hash_matches_fixture": true,
+      "qualification": "These checks establish consistency of the saved evidence and candidate identity, not cryptographic attestation of historical execution or serving-model identity."
+    },
+    "diagnosis": {
+      "verdict": "grounded",
+      "reason": "The original map runs a full filter for each of 16000 entries: 256000000 category comparisons, repeated category reductions and temporary arrays. Baseline profile nodes 66 and 67 have 223 and 58 hits respectively on the aggregation path; the garbage collector has one hit. All six outputs accurately attribute these observations and avoid equating sample counts with exact stage durations.",
+      "evidence_refs": [
+        "wave2/fixtures/debug/report.cjs:5",
+        "wave2/debug-baseline.json",
+        "wave2/debug-baseline.cpuprofile"
+      ]
+    },
+    "source_semantics": {
+      "verdict": "preserved-for-the-supplied-generator",
+      "reason": "The candidate retains input parsing, deterministic entry generation, ordered entries.map, spread fields, checksum expression and JSON output. Its Map accumulation visits each category's positive integer amounts in the same encounter order as the original filter/reduce. Aggregation remains inside the timed region. No exports, test-only seam, filesystem access, network access or subprocess invocation are introduced.",
+      "limitation": "Process checksum equality alone cannot prove row identity or ordering. Those properties are supported here by direct inspection of the complete source transformation."
+    },
+    "actual_execution": {
+      "verdict": "parent-mediated-pass",
+      "cases_per_trial": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          99,
+          1
+        ],
+        [
+          101,
+          1
+        ],
+        [
+          16000,
+          1
+        ],
+        [
+          16000,
+          2
+        ],
+        [
+          16000,
+          3
+        ]
+      ],
+      "expected_checksums": {
+        "0": 0,
+        "1": 3,
+        "99": 6690,
+        "101": 6970,
+        "16000": 151188619
+      },
+      "checks": "Independently parsed all 84 baseline/candidate process stdout records. Each matches its saved parsed object, expected size/checksum and exact output field set; all exit codes are zero, stderr is empty, and elapsed_ms values are finite and nonnegative. All six syntax checks and profile processes also succeed.",
+      "proof_preservation": "All execution receipts record unchanged proof bytes, the runner hashes them before and after, and the current original proof hash matches the frozen packet.",
+      "cleanup": "All six receipts record cleanup success; all six exact disposable roots are currently absent.",
+      "runner_boundary": "The parent extracts the exact candidate after admission, checks its hash, stages it in disposable storage, applies an environment allowlist with disposable HOME and USERPROFILE, and executes a fixed parent-owned proof. Model-proposed verification commands were not executed."
+    },
+    "timing": {
+      "model_deadline": "All six timestamp differences equal recorded elapsed_seconds and are below 300 seconds.",
+      "deadline_limit": "The deadline covers model proposal completion, not the later parent execution and independent review.",
+      "local_candidate_effect": "Every recorded 16000-entry paired process run shows substantially lower candidate elapsed_ms while preserving the output contract.",
+      "claim_limit": "This is an observed synthetic local effect of the shared algorithm change, not evidence that B is better than A or that production performance improved."
+    },
+    "profiles": {
+      "baseline_samples": 309,
+      "baseline_duration_ms": 386.958,
+      "candidate_duration_ms_range": [
+        26.583,
+        30.5
+      ],
+      "finding": "All six saved candidate profiles reference their corresponding disposable report.cjs paths. None contains the original repeated filter callback hotspot. The candidate source removes that callback, and the profiles are consistent with the measured shorter execution.",
+      "limit": "Candidate profiles have only 22 to 25 total samples and zero to two direct report-source hits. They cannot establish precise replacement-stage attribution or comparative A/B efficiency. Whole-process profile duration must not be substituted for the application's internal elapsed_ms."
+    }
+  },
+  "nonblocking_findings": [
+    {
+      "id": "N1",
+      "finding": "Parent execution validates candidates, not the executability or completeness of each model's proposed verification script.",
+      "impact": "No claim that all six model verification scripts ran successfully is supported. The fixed parent proof does preserve the required process-proof intent.",
+      "evidence_refs": [
+        "parent_runner",
+        "all six execution-result.json#/parent_intervention"
+      ]
+    },
+    {
+      "id": "N2",
+      "finding": "The runner's top-level passed flag does not include profile success, proof_preserved, cleanup or elapsed_ms validity.",
+      "impact": "That flag alone is insufficient as a complete judge. Direct review of these additional fields and saved profiles found them satisfactory for all six current trials.",
+      "evidence_refs": [
+        "parent_runner"
+      ]
+    },
+    {
+      "id": "N3",
+      "finding": "The runner does not preserve exact Node binary/version, hardware identity or an execution-time hash of the baseline copy in each receipt.",
+      "impact": "Current frozen fixture hashes, command records and matched same-run execution support the bounded fixture conclusion, but not an independently reproducible controlled benchmark or authenticated historical execution.",
+      "evidence_refs": [
+        "parent_runner",
+        "wave2/debug-baseline.json",
+        "all six execution-result.json"
+      ]
+    },
+    {
+      "id": "N4",
+      "finding": "B2 and B3 tool output truncates 416 tokens of general debugger/wait guidance in a combined read.",
+      "impact": "The relevant fixture source, baseline, protected proof and performance guidance remain present, so no material diagnosis or proof omission was identified.",
+      "evidence_refs": [
+        "wave2/trials/CEOPT-08-B2/tool-events.json",
+        "wave2/trials/CEOPT-08-B3/tool-events.json"
+      ]
+    }
+  ],
+  "frozen_criterion_coverage": {
+    "criterion": "Pre-fix baseline/profile; post-fix verification of the same symptom; preserve proof-test intent; do not substitute future CI or fake tests.",
+    "parent_mediated_fixture": "pass",
+    "model_only": "partial: diagnosis and executable proposal pass; actual mutation and verification are intentionally not run",
+    "full_frozen_missing_facets": [
+      "Autonomous model acquisition of a baseline/profile and execution of its own repair were excluded by the request.",
+      "The protected object is a process-proof intent document; this does not exercise preserving an existing executable regression test through a real simplify/review mutation.",
+      "There is no specified latency failure threshold or historical regression boundary, so no observed automated performance RED-to-GREEN transition is established.",
+      "Actual execution of the model-authored replacement-proof scripts is not covered.",
+      "Production behavior, broader repository regressions, other hosts and authenticated serving identity are not covered."
+    ],
+    "interpretation": "These are explicit scope limitations, not reasons to reject the authorized bounded protocol. They do block upgrading its result to complete autonomous debugging coverage."
+  },
+  "ab_conclusion": {
+    "A": "3 of 3 bounded proposals and parent-mediated executions pass",
+    "B": "3 of 3 bounded proposals and parent-mediated executions pass",
+    "B_superiority": "not-established",
+    "reason": "All six candidates are byte-identical. The same detailed request supplied baseline/profile evidence, demanded process proof and prohibited fabricated execution for both arms. These results show comparable success on this constrained task, not an attributable benefit of the B instruction changes.",
+    "timing_comparison": "Recorded model durations are descriptive only; overlapping model sessions and missing controlled serving/concurrency metadata prevent a causal time-to-trusted-change comparison."
+  },
+  "review_limitations": [
+    "Read-only inspection and evidence parsing only; no candidate, test, model command, network operation or delegated task was executed by this reviewer.",
+    "No parent summary report or earlier review was consulted.",
+    "Saved receipts and tool traces were checked against source and raw values; historical events were not independently replayed."
+  ]
+}

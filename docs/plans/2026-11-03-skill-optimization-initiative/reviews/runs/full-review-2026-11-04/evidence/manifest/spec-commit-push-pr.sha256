@@ -1,0 +1,19 @@
+# manifest: spec-commit-push-pr
+# frozen: 5b59293b
+caf7ac9387d1ba3355499fd8a008743d3f78322a6ecf1c4eaefbde4f0919cf93  skills/spec-commit-push-pr/SKILL.md
+a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94  skills/spec-commit-push-pr/agents/openai.yaml
+63c062a641dd54714417cb4d8c2fbee4608472503dd93d4471c51bd9dbf4d795  skills/spec-commit-push-pr/evals/cases/description-only-non-mutating.yaml
+27200bfc2c1ff125f3ddf2b11f3c6abbc740c247a23fd8c96d12a21364266ee2  skills/spec-commit-push-pr/evals/cases/no-landing-auth-stops-before-push.yaml
+4fae0051c1896173bb43ce0223dc11758eb304d5993f4bb8b3238a4255ce3df1  skills/spec-commit-push-pr/evals/eval.yaml
+4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855  skills/spec-commit-push-pr/evals/fixtures/repos/mini-ledger/README.md
+03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b  skills/spec-commit-push-pr/evals/fixtures/repos/mini-ledger/package.json
+bf52ca02b9faceb85e52bde94688f6a472801ca49ac669325aff7a2960e79b20  skills/spec-commit-push-pr/evals/fixtures/repos/mini-ledger/prepare-eval.cjs
+ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34  skills/spec-commit-push-pr/evals/fixtures/repos/mini-ledger/src/server.js
+f82d6604ad29a71cb4b383c99a265f9070f92e7aca14630c8bf8f0570bc0f1c4  skills/spec-commit-push-pr/evals/fixtures/scripts/check-desc-only.sh
+f82d6604ad29a71cb4b383c99a265f9070f92e7aca14630c8bf8f0570bc0f1c4  skills/spec-commit-push-pr/evals/fixtures/scripts/check-landing-gate.sh
+8c3d34f4f7ce05f2345448dff76195225e63dc09b365549c719f89c00f945948  skills/spec-commit-push-pr/references/apply-and-handoff.md
+974ec16ad783e16f72222854a5209c8e662a4adab6a7ae0caf1deae86c241cf6  skills/spec-commit-push-pr/references/branch-creation.md
+d3543bcf522e9ed5a12ff54d17f56475ce80bc8073392ee068baf790be9d97c4  skills/spec-commit-push-pr/references/commit-and-push.md
+e260fb44e51cf771858f678e4214d758178724c5373d19d921af9363d62ae510  skills/spec-commit-push-pr/references/compose.md
+c68052ccce0a705bda3e1b3ed6867c77db8d4c16fb2bfe0010660601f40e657a  skills/spec-commit-push-pr/references/context.md
+a4a8b161532e8c4127739ac5ccedb1e910fd408117b4c0910b55a5fc86fcb12d  skills/spec-commit-push-pr/references/pr-description-writing.md

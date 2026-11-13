@@ -1,0 +1,44 @@
+{
+  "files": [
+    {
+      "source": "/private/tmp/plan-feasibility-20261105/runs/candidate/iteration-1/result.json",
+      "archive": "result.json",
+      "sha256": "4c4849d97462e41d553d1c1f9421ab0386a7c0048f6e271c8c3dff7699d10707"
+    },
+    {
+      "source": "/private/tmp/plan-feasibility-20261105/runs/candidate/iteration-1/implementation-routes-work/with_skill/grading.json",
+      "archive": "implementation-routes-work/grading.json",
+      "sha256": "ddc780b1c235f04f710c8d3d3b87f078358fa3925c05938404b15d7c5d864c19"
+    },
+    {
+      "source": "/private/tmp/plan-feasibility-20261105/runs/candidate/iteration-1/implementation-routes-work/with_skill/outputs/response.md",
+      "archive": "implementation-routes-work/response.md",
+      "sha256": "7564a53e70e80550002612517d2491127f56c7f774c28414c722972738ba58dd"
+    },
+    {
+      "source": "/private/tmp/plan-feasibility-20261105/runs/candidate/iteration-1/implementation-routes-work/with_skill/outputs/agent/run/32daefef-963b-428c-888b-415118740701.jsonl",
+      "archive": "implementation-routes-work/transcript.jsonl",
+      "sha256": "71e1f64104809c45b0a1d4461a40a43736306fcb0ca163e3dbac6347c935b33c"
+    },
+    {
+      "source": "/private/tmp/plan-feasibility-20261105/runs/candidate/iteration-1/implementation-owner-not-authorized/with_skill/grading.json",
+      "archive": "implementation-owner-not-authorized/grading.json",
+      "sha256": "69526753ec02e1f952237445a1ba02b228c024ae5fa54ec790619fb4feee91aa"
+    },
+    {
+      "source": "/private/tmp/plan-feasibility-20261105/runs/candidate/iteration-1/implementation-owner-not-authorized/with_skill/outputs/response.md",
+      "archive": "implementation-owner-not-authorized/response.md",
+      "sha256": "0a83af786fc21b0472dc7406bd29f9c98a5842ef09e7549a48d0cbeed0a097f8"
+    },
+    {
+      "source": "/private/tmp/plan-feasibility-20261105/runs/candidate/iteration-1/implementation-owner-not-authorized/with_skill/outputs/agent/run/465c204d-6020-4e6b-b526-80697a5bca93.jsonl",
+      "archive": "implementation-owner-not-authorized/transcript.jsonl",
+      "sha256": "f4347e93c1e94bb28c98c275914a0303b8717f8abb1ed9a65efc4ed49e9949f6"
+    },
+    {
+      "source": "/private/tmp/claude-501/-Users-kuang-xiaobu-spec-first/5d43189d-945c-4cd5-9a03-8a20f89bfd94/tasks/be2fz2s8a.output",
+      "archive": "runner.log",
+      "sha256": "60e356ed7790e2f9c189d7bf5aa50465d017a13fff6bcd4100f57297fb4189cb"
+    }
+  ]
+}

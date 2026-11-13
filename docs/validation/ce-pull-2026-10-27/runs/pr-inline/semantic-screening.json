@@ -1,0 +1,42 @@
+{
+  "artifact_type": "producer-semantic-screening",
+  "independent_review": false,
+  "unit_id": "U4",
+  "paths": [
+    "skills/ce-resolve-pr-feedback/references/full-mode.md",
+    "skills/ce-resolve-pr-feedback/references/targeted-mode.md"
+  ],
+  "upstream_reading": "前轮逐段完整净 diff 与本轮本地 source/references 回源；前轮 full-mode diff 106-166 已补读，之前截断已消除",
+  "decision": "已读清单项优先 inline；有实际收益的多单元/跨调用点才考虑满足既有授权/capability/isolation 的委派",
+  "preserved": [
+    "逐 feedback 输入和结果",
+    "修改前 baseline 和真实 delta 对账",
+    "blocked partial edit 保留",
+    "各出口独立权限及 pipeline-return local-only"
+  ],
+  "verification": "logs/pr-inline-tests.log: exit0, 1 suite / 11 tests",
+  "limitations": [
+    "source contract 回归不证明真实模型行为",
+    "resume/persistence 仍需适用性判断；U4 与整窗尚未完成"
+  ],
+  "resume_protocol_review": {
+    "upstream_paths": [
+      "skills/ce-resolve-pr-feedback/references/resume.md",
+      "skills/ce-resolve-pr-feedback/references/return-to-caller.md",
+      "skills/ce-resolve-pr-feedback/scripts/pending-feedback.py"
+    ],
+    "read_status": "resume/return-to-caller 当前 head 全文；pending-feedback 全文分段（末段本轮紧接读取）",
+    "current_owners": [
+      "skills/spec-resolve-pr-feedback/references/full-mode.md#2-triage-separate-new-from-pending",
+      "skills/spec-resolve-pr-feedback/references/full-mode.md#7-reply-and-resolve",
+      "skills/spec-resolve-pr-feedback/references/pipeline-return.md"
+    ],
+    "decision": "compose 新鲜度/精确身份/远程结果不明先对账语义到现有 owner；不复制新 public resume/return-to-caller mode、持久化 schema 或嵌套 commit",
+    "rationale": "本地 pipeline-return 交回外层 caller 统一验证/提交/发布，CE fix-owned commit/no-change remote tail 改变其权限边界；既有 Full Mode 已拥有 reply readback 和 resolution-pending；只加强重入的当前上下文核实",
+    "limitations": [
+      "未实现 CE pending batch 的持久化与 publication compare helper，不能声称 API/功能等价",
+      "不将 pre-existing-failure 作为通过必要验证的替代",
+      "无真实远程读取或写入"
+    ]
+  }
+}

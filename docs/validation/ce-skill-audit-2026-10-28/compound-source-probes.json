@@ -1,0 +1,30 @@
+{
+  "structured_exit": {
+    "extract-skeleton.py": {
+      "exit": 0,
+      "stdout": "[tool] exec false -> ok\n{\"_meta\": true, \"lines\": 1, \"parse_errors\": 0, \"user\": 0, \"assistant\": 0, \"tool\": 1, \"summary\": 0}\n",
+      "stderr": ""
+    },
+    "extract-errors.py": {
+      "exit": 0,
+      "stdout": "[] [error] exit=23 cmd=false: failure\n---\n{\"_meta\": true, \"lines\": 1, \"parse_errors\": 0, \"errors_found\": 1}\n",
+      "stderr": ""
+    }
+  },
+  "mixed_unknown": {
+    "exit": 0,
+    "stdout": "[tools] 3x Read (0, 1, +1 more) -> all ok\n{\"_meta\": true, \"lines\": 2, \"parse_errors\": 0, \"user\": 0, \"assistant\": 0, \"tool\": 3, \"summary\": 0}\n",
+    "stderr": ""
+  },
+  "positive_eval_fixture": {
+    "command": "node --test test/entries.test.js",
+    "exit": 1,
+    "stdout": "TAP version 13\n# Subtest: string amount is rejected instead of stored as NaN\nnot ok 1 - string amount is rejected instead of stored as NaN\n  ---\n  duration_ms: 0.4545\n  type: 'test'\n  location: '/Users/kuang/xiaobu/spec-first/skills/spec-compound/evals/fixtures/repos/solved-ledger/test/entries.test.js:5:1'\n  failureType: 'testCodeFailure'\n  error: 'parseEntry is not a function'\n  code: 'ERR_TEST_FAILURE'\n  name: 'TypeError'\n  stack: |-\n    TestContext.<anonymous> (/Users/kuang/xiaobu/spec-first/skills/spec-compound/evals/fixtures/repos/solved-ledger/test/entries.test.js:6:22)\n    Test.runInAsyncScope (node:async_hooks:214:14)\n    Test.run (node:internal/test_runner/test:1047:25)\n    Test.start (node:internal/test_runner/test:944:17)\n    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)\n  ...\n# Subtest: valid amount is accepted\nnot ok 2 - valid amount is accepted\n  ---\n  duration_ms: 0.0625\n  type: 'test'\n  location: '/Users/kuang/xiaobu/spec-first/skills/spec-compound/evals/fixtures/repos/solved-ledger/test/entries.test.js:9:1'\n  failureType: 'testCodeFailure'\n  error: 'parseEntry is not a function'\n  code: 'ERR_TEST_FAILURE'\n  name: 'TypeError'\n  stack: |-\n    TestContext.<anonymous> (/Users/kuang/xiaobu/spec-first/skills/spec-compound/evals/fixtures/repos/solved-ledger/test/entries.test.js:10:25)\n    Test.runInAsyncScope (node:async_hooks:214:14)\n    Test.run (node:internal/test_runner/test:1047:25)\n    Test.processPendingSubtests (node:internal/test_runner/test:744:18)\n    Test.postRun (node:internal/test_runner/test:1173:19)\n    Test.run (node:internal/test_runner/test:1101:12)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)\n  ...\n1..2\n# tests 2\n# suites 0\n# pass 0\n# fail 2\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 55.679916\n",
+    "stderr": ""
+  },
+  "claude_cwd": {
+    "exit": 0,
+    "stdout": "{\"platform\": \"claude\", \"branch\": \"feature\", \"ts\": \"\", \"session\": \"fixture\"}\n{\"_meta\": true, \"files_processed\": 1, \"parse_errors\": 0}\n",
+    "stderr": ""
+  }
+}

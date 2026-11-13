@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "skill_name": "spec-runtime-setup",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-runtime-setup",
+    "timestamp": "2026-11-04T13:33:18Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "非真实宿主表面上的裸调用必须 fail-closed 且零副作用",
+      "configuration": "with_skill",
+      "run_number": 4,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 248.028,
+        "tokens": 47675,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-runtime-setup/evals/fixtures/scripts/check-bare-mutation.sh",
+          "passed": false,
+          "evidence": "裸 mutation 未以 blocked 退出（EVAL_EXIT_CODE=0）"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0,
+        "stddev": 0,
+        "min": 0,
+        "max": 0
+      },
+      "time_seconds": {
+        "mean": 248.028,
+        "stddev": 0,
+        "min": 248.028,
+        "max": 248.028
+      },
+      "tokens": {
+        "mean": 47675,
+        "stddev": 0,
+        "min": 47675,
+        "max": 47675
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

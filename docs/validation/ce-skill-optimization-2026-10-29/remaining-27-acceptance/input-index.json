@@ -1,0 +1,385 @@
+{
+  "checked_at": "2026-10-30T07:16:48.559198+00:00",
+  "scenario_count": 27,
+  "frozen_source_files_verified": 796,
+  "original_plan_and_scenarios_unchanged": true,
+  "successor_plan_unchanged": true,
+  "head_unchanged": true,
+  "packets": [
+    {
+      "id": "CEOPT-06",
+      "skill": "spec-compound",
+      "wave": 1,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-06-packet.json",
+      "packet_sha256": "74e6dffe4f2091e1a05f2f5194515679ac8db39c7a4de596d18e6b029e52cd20",
+      "checked_file_count": 6,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/invalid-candidate.md": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/README.md": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/package.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/existing-learning.md": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/test/entries.test.js": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/src/server.js": true
+      }
+    },
+    {
+      "id": "CEOPT-07",
+      "skill": "spec-compound-refresh",
+      "wave": 1,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-07-packet.json",
+      "packet_sha256": "f8797c045d00239e773484cd72868c45f11ab9731e34a1d17c1c50e854abb22e",
+      "checked_file_count": 5,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/refresh/import-v1.md": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/refresh/invalid-candidate.md": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/refresh/learning-b.md": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/refresh/CONCEPTS.md": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/refresh/learning-a.md": true
+      }
+    },
+    {
+      "id": "CEOPT-11",
+      "skill": "spec-explain",
+      "wave": 1,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-11-packet.json",
+      "packet_sha256": "1c14e43d9743f8f16dd8ef4c0464579694681df3fff90454085a25113c9dad08",
+      "checked_file_count": 3,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/README.md": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/package.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/src/server.js": true
+      }
+    },
+    {
+      "id": "CEOPT-12",
+      "skill": "spec-handoff",
+      "wave": 1,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-12-packet.json",
+      "packet_sha256": "03d78ff7d08c4599f941cf89e3e4b0a9953f91e0fde94a1b329fe20273eeb5b6",
+      "checked_file_count": 0,
+      "checked_files": {}
+    },
+    {
+      "id": "CEOPT-13",
+      "skill": "spec-ideate",
+      "wave": 1,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-13-packet.json",
+      "packet_sha256": "288d8c64e5e88122de1559057810330e678348ec84b56ecc0284b1d58efafd3d",
+      "checked_file_count": 4,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/ideate/issue-export.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/ideate/repo/README.md": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/ideate/repo/package.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/ideate/repo/src/server.js": true
+      }
+    },
+    {
+      "id": "CEOPT-16",
+      "skill": "spec-plan",
+      "wave": 1,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-16-packet.json",
+      "packet_sha256": "c2a381035972e134d9a6a182c3d1d4b6aa5b0421b2427b52a126babd42df5bc0",
+      "checked_file_count": 8,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/plan/prepare-eval-fixture.sh": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/plan/prepare-eval.cjs": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/plan/research-return.md": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/plan/package.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/plan/AGENTS.md": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/plan/tests/order-importer.test.js": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/plan/src/order-importer.js": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/plan/docs/plans/2026-07-31-001-feat-order-import-plan.md": true
+      }
+    },
+    {
+      "id": "CEOPT-27",
+      "skill": "spec-strategy",
+      "wave": 1,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-27-packet.json",
+      "packet_sha256": "a68b227c299761242d796f0f4bb039d8e5a65da77b59b213b6f1e9514eeaa296",
+      "checked_file_count": 2,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/strategy/owner-decision.md": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/strategy/STRATEGY.md": true
+      }
+    },
+    {
+      "id": "CEOPT-04",
+      "skill": "spec-commit",
+      "wave": 2,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/CEOPT-04-packet.json",
+      "packet_sha256": "8e78a8f4d16c2e4b86a11b6da85c4b0680cfd7390773a3debc6897b91a834c1d",
+      "checked_file_count": 0,
+      "checked_files": {}
+    },
+    {
+      "id": "CEOPT-08",
+      "skill": "spec-debug",
+      "wave": 2,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/CEOPT-08-packet.json",
+      "packet_sha256": "3eee30ffcb1a28853498e74ac1ef909be467efcf25b627c44b2679e7b1037edc",
+      "checked_file_count": 4,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/CEOPT-08-request.txt": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/debug/proof-intent.md": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/debug/report.cjs": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/debug/README.md": true
+      }
+    },
+    {
+      "id": "CEOPT-26",
+      "skill": "spec-simplify-code",
+      "wave": 2,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/CEOPT-26-packet.json",
+      "packet_sha256": "c19fe97c1c24b4e8b372bad124a765ec8d17f52a3d582b8740381b477ed0508e",
+      "checked_file_count": 7,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/CEOPT-26-request.txt": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/simplify/prepare-eval.cjs": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/simplify/README.md": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/simplify/package.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/simplify/test/entries.test.cjs": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/simplify/src/server.js": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/simplify/test/support/ledger-proof.cjs": true
+      }
+    },
+    {
+      "id": "CEOPT-33",
+      "skill": "spec-write-tasks",
+      "wave": 2,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/CEOPT-33-packet.json",
+      "packet_sha256": "71ec7ea99eda372d0e9bd46792e9bf98db1c0c254da33eeec122307ead06c306",
+      "checked_file_count": 4,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/CEOPT-33-request.txt": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/tasks/plan-hash-receipt.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/tasks/proposed-shortcut.md": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/tasks/docs/plans/source.md": true
+      }
+    },
+    {
+      "id": "CEOPT-01",
+      "skill": "autoresearch",
+      "wave": 3,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/CEOPT-01-packet.json",
+      "packet_sha256": "ab99cc74d427b41c2df395ceacfe2e404cdb532ef82bd825f516ab37e773e45c",
+      "checked_file_count": 8,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/CEOPT-01-request.txt": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/stable.tsv": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/unknown.tsv": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/visual-ui.tsv": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/visual.tsv": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/autoresearch/hard.tsv": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/autoresearch-A-receipts.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/autoresearch-B-receipts.json": true
+      }
+    },
+    {
+      "id": "CEOPT-15",
+      "skill": "spec-optimize",
+      "wave": 3,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/CEOPT-15-packet.json",
+      "packet_sha256": "2b277574da9e7e4d9379c2bd5cf13f6368facdf061d4c18ce8af830e803cbb74",
+      "checked_file_count": 4,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/CEOPT-15-request.txt": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/optimize/workspace-facts.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/optimize-A-receipts.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/optimize-B-receipts.json": true
+      }
+    },
+    {
+      "id": "CEOPT-19",
+      "skill": "spec-prd",
+      "wave": 3,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/CEOPT-19-packet.json",
+      "packet_sha256": "1b71dbb545169639cfdd569bfd37d876543fd1a74a929b97e2cc07c686f237cc",
+      "checked_file_count": 3,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/CEOPT-19-request.txt": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/prd-A-receipts.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/prd-B-receipts.json": true
+      }
+    },
+    {
+      "id": "CEOPT-25",
+      "skill": "spec-runtime-setup",
+      "wave": 4,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/CEOPT-25-packet.json",
+      "packet_sha256": "978546799842f71f119520267e42c0bd4dd924c4028b252eb0212d7d71cb2fcc",
+      "checked_file_count": 3,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/CEOPT-25-request.txt": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/runtime-A-receipts.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/runtime-B-receipts.json": true
+      }
+    },
+    {
+      "id": "CEOPT-28",
+      "skill": "spec-sweep",
+      "wave": 4,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/CEOPT-28-packet.json",
+      "packet_sha256": "ccfe8a76ffbc3303730a2ab51217ff065c1f830cd753060fe5813fafc82fb2d3",
+      "checked_file_count": 3,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/CEOPT-28-request.txt": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/sweep-A-receipts.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/sweep-B-receipts.json": true
+      }
+    },
+    {
+      "id": "CEOPT-32",
+      "skill": "spec-worktree",
+      "wave": 4,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/CEOPT-32-packet.json",
+      "packet_sha256": "54851e65480ede503771113f22d60fe300d6139012b3195bfe64d36e6e9619e3",
+      "checked_file_count": 3,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/CEOPT-32-request.txt": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/worktree-A-receipts.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/worktree-B-receipts.json": true
+      }
+    },
+    {
+      "id": "CEOPT-10",
+      "skill": "spec-dogfood",
+      "wave": 5,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/CEOPT-10-packet.json",
+      "packet_sha256": "fb8d00ab40f164d4ad0c1790f98f4760ec290d5488530befdb0ebf8971739630",
+      "checked_file_count": 3,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/CEOPT-10-request.txt": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/page-lifecycle-receipt.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/feedback-fixture.json": true
+      }
+    },
+    {
+      "id": "CEOPT-17",
+      "skill": "spec-polish",
+      "wave": 5,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/CEOPT-17-packet.json",
+      "packet_sha256": "f90c1d48c7d167a1be5038afbfa74489f4cc0fb0e49c49b95b10ea4e96dd5c9c",
+      "checked_file_count": 5,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/CEOPT-17-request.txt": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/page-lifecycle-receipt.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/feedback-fixture.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/polish-A-receipts.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/polish-B-receipts.json": true
+      }
+    },
+    {
+      "id": "CEOPT-22",
+      "skill": "spec-prototype",
+      "wave": 5,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/CEOPT-22-packet.json",
+      "packet_sha256": "5f4ba06254253242cad17404a477f1b38f398ceb5a7b2ceac3c57af70c76061d",
+      "checked_file_count": 3,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/CEOPT-22-request.txt": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/prototype-A-receipts.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/prototype-B-receipts.json": true
+      }
+    },
+    {
+      "id": "CEOPT-29",
+      "skill": "spec-test-browser",
+      "wave": 5,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/CEOPT-29-packet.json",
+      "packet_sha256": "201f25de61c0f0dbb5922c1f1426cb76124e45276cc1842a35f449f9eab3e516",
+      "checked_file_count": 8,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/CEOPT-29-request.txt": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/browser-policy-successor/browser-local-receipt.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/browser-policy-successor/browser-positive-run.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/browser-policy-successor/browser-positive-cleanup.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/browser-cleanup-A-receipts.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/browser-cleanup-B-receipts.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/browser-order-A-receipt.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/browser-order-B-receipt.json": true
+      }
+    },
+    {
+      "id": "CEOPT-14",
+      "skill": "spec-lfg",
+      "wave": 6,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/CEOPT-14-packet.json",
+      "packet_sha256": "450124cbea6de5838962e4d80521f0872236d99dbd52f904c27cc7f72a62c152",
+      "checked_file_count": 4,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/CEOPT-14-request.txt": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/pr-recovery-fixture.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/lfg-A-receipts.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/lfg-B-receipts.json": true
+      }
+    },
+    {
+      "id": "CEOPT-18",
+      "skill": "spec-pov",
+      "wave": 6,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/CEOPT-18-packet.json",
+      "packet_sha256": "a6e0e44fda74ba5f629803d9df825c6562f3cec02287ed38188f7a83fd85dd4e",
+      "checked_file_count": 3,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/CEOPT-18-request.txt": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/pov-A-receipts.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/pov-B-receipts.json": true
+      }
+    },
+    {
+      "id": "CEOPT-23",
+      "skill": "spec-resolve-pr-feedback",
+      "wave": 6,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/CEOPT-23-packet.json",
+      "packet_sha256": "3ba4a8b9810d2b737d3133809c3a9d0df5e87458641a44d4b28dc415d38c8eaa",
+      "checked_file_count": 4,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/CEOPT-23-request.txt": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/pr-recovery-fixture.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/pr-feedback-A-receipts.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/pr-feedback-B-receipts.json": true
+      }
+    },
+    {
+      "id": "CEOPT-24",
+      "skill": "spec-riffrec-feedback-analysis",
+      "wave": 6,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/CEOPT-24-packet.json",
+      "packet_sha256": "4c5cda85a16e1efd0eafe6169e4a516c965c7edc0c762f064abab6fed9436bbe",
+      "checked_file_count": 3,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/CEOPT-24-request.txt": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/media-A-receipts.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/media-B-receipts.json": true
+      }
+    },
+    {
+      "id": "CEOPT-30",
+      "skill": "spec-test-xcode",
+      "wave": 6,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/CEOPT-30-packet.json",
+      "packet_sha256": "d202511e3661c239c4911945b07b71a63f122366de89f74f4b6408a32d2e45b7",
+      "checked_file_count": 3,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/CEOPT-30-request.txt": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/xcode-readiness.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/xcode-tap-fixture.json": true
+      }
+    },
+    {
+      "id": "CEOPT-31",
+      "skill": "spec-work",
+      "wave": 6,
+      "packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/CEOPT-31-packet.json",
+      "packet_sha256": "3308a31906f7d0c6dbc10e1e04921cf96ec153c9f2aa9201946c8c78ac4691dd",
+      "checked_file_count": 3,
+      "checked_files": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/CEOPT-31-request.txt": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/work-closeout-fixture.json": true,
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/simplify-proof.json": true
+      }
+    }
+  ],
+  "limitation": "Checks bind deterministic inputs only, not semantic sufficiency or full acceptance."
+}

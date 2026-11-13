@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "skill_name": "spec-debug",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-debug",
+    "timestamp": "2026-11-05T01:14:53Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "Ask for prior attempts before starting a new investigation",
+      "configuration": "with_skill",
+      "run_number": 5,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 77.733,
+        "tokens": 29458,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-debug/evals/fixtures/scripts/check-r2-prior-ask.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 77.733,
+        "stddev": 0,
+        "min": 77.733,
+        "max": 77.733
+      },
+      "tokens": {
+        "mean": 29458,
+        "stddev": 0,
+        "min": 29458,
+        "max": 29458
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

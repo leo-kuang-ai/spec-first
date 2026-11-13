@@ -1,0 +1,629 @@
+diff --git a/README.md b/README.md
+index 0ea8c53..3e83a6e 100644
+--- a/README.md
++++ b/README.md
+@@ -2,7 +2,7 @@
+ 
+ A tiny personal expense-tracking demo app (Node.js, CommonJS).
+ 
+-- `src/server.js` — HTTP server with two endpoints: `POST /entries` (add an expense) and `GET /entries` (list them).
++- `src/server.js` — HTTP server with three endpoints: `POST /entries` (add an expense), `GET /entries` (list them), and `GET /entries/:id` (fetch one entry by id; 404 if not found).
+ - Data is kept in memory; entries are `{id, amount, note, ts}`.
+ 
+ Known rough edges: adding an entry requires five fields typed by hand; no categories; no summary view.
+diff --git a/docs/plans/2026-11-12-001-feat-entry-by-id-deviations.md b/docs/plans/2026-11-12-001-feat-entry-by-id-deviations.md
+new file mode 100644
+index 0000000..8cef80b
+--- /dev/null
++++ b/docs/plans/2026-11-12-001-feat-entry-by-id-deviations.md
+@@ -0,0 +1,36 @@
++# 执行偏差记录：2026-11-12-001-feat-entry-by-id
++
++本文件用于把计划中**已被事实推翻的前提**与**复现方式带来的限制**显式登账，避免计划继续陈述不成立的事实。它不修改计划的 Product Contract，也不放宽任何验收项。
++
++## D1. A3 失效：仓库不存在 `CHANGELOG.md`
++
++- 计划 A3 的前提是「根目录 CHANGELOG 约定已由 spec-first 初始化记录在案」，并要求 U3 按「文件头既有格式」追加一条。
++- 事实核验：`main`、`feature` 与全部可见历史中都不存在 `CHANGELOG.md`（`git log --all -- CHANGELOG.md` 为空）。
++- 判定：**A3 前提不成立，A3 失效**。
++- 影响（逐处列全，凡计划正文提到 `CHANGELOG.md` 即在此作废）：
++  - 计划第 127 行「检查过的既有能力与 owner：… `CHANGELOG.md`（变更记录约定）」：该 owner **不存在**，应从 owner 清单移除；本次交付无第三处 owner。
++  - 计划第 169 行 A3：前提失效，整条作废（不创建、不追加）。
++  - 计划第 174 行「直读证据：… `CHANGELOG.md`」：该文件**未被直读**（不存在），此证据声明撤回。
++  - 计划第 218 行 U3 Goal「CHANGELOG 按约定记录本次变更」、第 221 行 U3 Files 列出的 `CHANGELOG.md`：不适用，U3 实际只交付 `README.md`（Files 中该项移除）。
++  - 计划第 222 行 U3 Approach「CHANGELOG 按文件头格式追加一行并标 `(user-visible)`」：不执行。
++  - 计划第 224 行 U3 Verification「CHANGELOG 行符合文件头格式约定」：退化为只核对 README endpoint 清单。
++  - 计划第 240 行 Definition of Done「README 与 CHANGELOG 均已更新且与实现一致」：按 **README-only** 解释。
++  - 计划第 243 行 U3 检查项「CHANGELOG 格式」：无对象可检，本项退化为「README endpoint 清单与实现一致」。
++- 处置：**不为满足错误前提而凭空创建 `CHANGELOG.md`**——那是伪造交付。若仓库所有者希望建立 changelog 约定，应由计划所有者另行授权后新增，而不是由本轮修复补一条无格式先例的记录。
++
++## D2. 基线 commit 的替代关系
++
++- 计划多处引用基线 `9a29966`（提交 `src/server.js` 快照）。该 commit 属于 Phase 5 的原临时仓库，**在按归档 `impl.diff` 重建的评审仓库中不可解析**（`git cat-file -e 9a29966^{commit}` 返回 128）。
++- 重建仓库的 `main` 为 `fd4448c`，其 `src/server.js` 与 `9a29966` 内容逐行一致（由归档 `impl.diff` 应用前后的 diff 可复核）。
++- 替代关系：**`9a29966`（原仓库）≡ `fd4448c`（本仓库）**。计划中所有「快照 commit `9a29966`」的证据声明，在本仓库内以 `fd4448c` 为准。
++- 限制：第三方按计划复现时，必须先重建本仓库或回到原 Phase 5 证据目录；这一条无法通过改哈希消除，故显式记录。
++
++## D3. 审查与修复轮次（记录用）
++
++| 轮次 | 方式 | 结论 | 处置 |
++| --- | --- | --- | --- |
++| R1 | 独立审查（kiro/gpt-5.6-sol，read-only） | NOT-READY，原结论 5×P2 + 1×P3；其中 1×P2（"计划副本缺失"）经复核为我方评审仓库缺文件所致，非实现缺陷，故可行动项为 4×P2 + 1×P3 | `spec-work` 修复轮处理 6 条；P2#4（`require.main` 越界）push back，经核对计划 A2/U1 原文成立 |
++| R2 | 独立审查（同模型同范围） | NOT-READY，2×P2 + 2×P3 | P2「月份过滤抓不到全有/全无」→ 跨月硬编码 oracle + `Date.now` 固定；两条文档级偏差 → 本文件；行尾空白已清 |
++| R3 | 独立审查（同模型同范围） | NOT-READY（仅文档级：偏差未登账） | 本文件 + 计划末尾指针 |
++
++- 变异探针（5 个）用于验证测试判别力：列表截断、忽略 `month`、尾斜杠归一化、任意方法放行、全有/全无月份过滤，全部被杀死；未变异时 `npm test` 10/10 通过。
+diff --git a/docs/plans/2026-11-12-001-feat-entry-by-id-plan.md b/docs/plans/2026-11-12-001-feat-entry-by-id-plan.md
+new file mode 100644
+index 0000000..9854ed1
+--- /dev/null
++++ b/docs/plans/2026-11-12-001-feat-entry-by-id-plan.md
+@@ -0,0 +1,250 @@
++---
++title: Entry by ID - Plan
++type: feat
++status: active
++date: 2026-11-12
++topic: entry-by-id
++artifact_contract: spec-unified-plan/v1
++artifact_readiness: implementation-ready
++product_contract_source: spec-brainstorm
++execution: code
++---
++
++# Entry by ID - Plan
++
++## Goal Capsule
++
++- Objective: API 调用者可以按 id 直接获取单条账目，并获得明确的"未找到"信号；现有录入与列表能力不受影响。
++- Means: 新增 `GET /entries/:id`（endpoint 形态为任务指令给定）。
++- Approach: 在 `src/server.js` 既有分发结构中、列表分支之前新增一个单条查询分支（`extend` 姿态，不引入新抽象）；id 解析与响应形态落为 KTD2/KTD3；交付引入 `node:test` 回归基线（引用 A1/A2）。
++- Product authority: 本次任务指令。本仓库按无交互环境执行需求澄清，所有待确认点以显式假设记录（见 Dependencies / Assumptions），未经人工确认，可被后续推翻。
++- Decision focus: 子路径前缀捕获的终结范围（KTD4）与 id 解析语义（KTD2）。
++- Verification focus: AE1–AE5 全部映射为自动化用例，`npm test` + CLI 冒烟（见 Verification Contract）。
++- Largest risk / boundary: R3 列表/过滤回归——列表分支零改动 + 表征测试先行（KTD5）缓释。
++- Stop conditions: 任何钉住形态（`GET /entries`、`GET /entries?month`、`POST /entries`）行为发生改变时停止实施，回到计划复核。
++- Execution profile / tail: 单仓顺序交付 U1→U2→U3；实施、验证尾部与 landing 归交接后的执行 owner 所有。
++- Open blockers: 无。Deferred to Planning 两项已落为 KTD2/KTD3；其余待确认点以显式假设（A1–A4）记录，不阻塞实施。
++
++---
++
++## Product Contract
++
++### Summary
++
++为 MiniLedger 新增按 id 查看单条账目的能力：`GET /entries/:id` 返回该条目，id 无法对应现存条目时返回 404。`POST /entries` 与 `GET /entries`（含 `month` 过滤）行为保持不变。
++
++### Problem Frame
++
++MiniLedger 目前只有录入与全量列表两个能力。调用者想核对某一条账目时，只能 `GET /entries` 拉取全部条目再在客户端按 id 过滤；账目增多后这是无谓的载荷，也无法给出稳定的单条引用。本次为单条查看补上直接取数路径，不改动其余行为。
++
++### Key Decisions
++
++- **兼容边界钉在确切请求形态上。** "现有行为不变"精确适用于 `GET /entries` 与 `GET /entries?month=YYYY-MM` 两个形态；`/entries/<子路径>` 改由单条查询语义管辖。源码中列表分支以前缀匹配捕获所有 `/entries*` 路径，`/entries/5` 今天会返回全量列表——本决策使这一隐含行为显式终结。Governs R1, R2, R3。
++- **无法对应现存条目的路径一律 404。** 超范围、非数字的 id 同样按"不存在"处理，不引入 400 参数校验语义，保持 demo 的简单边界。Governs R2。
++- **响应形态沿用现有服务约定。** 命中时返回该条目 JSON（与 `GET /entries` 列表元素同形 `{id, amount, note, ts}`）；未命中时 404，响应形态与现有未知路径一致（现为纯文本 `not found`）。Governs R1, R2。
++- **endpoint 形态 `GET /entries/:id` 接受为给定指令。** 该形态与现有资源前缀一致且符合惯例；未发现能交付同等价值的更小形态（如 query 参数查询无额外收益）。
++
++### Requirements
++
++**单条查询**
++
++- R1. `GET /entries/:id` 对现存条目返回该条目本身，JSON 形态与 `GET /entries` 列表元素一致。
++- R2. `GET /entries/:id` 的 id 无法对应现存条目（含超范围、非数字）时返回 404。
++
++**现有能力不变**
++
++- R3. `GET /entries` 行为不变：无参数返回全部条目数组，`month=YYYY-MM` 过滤语义不变（基线为 commit `9a29966` 的源码行为）。
++- R4. `POST /entries` 行为不变：录入、id 分配（递增整数）与响应不变。
++
++### Acceptance Examples
++
++- AE1. 命中存在的 id
++  - **Covers R1.**
++  - **Given** 已通过 `POST /entries` 录入至少一条账目，**When** 请求 `GET /entries/<该条id>`，**Then** 返回 200 与该条目 JSON（含 `id`、`amount`、`note`、`ts`）。
++- AE2. id 超出范围
++  - **Covers R2.**
++  - **Given** 账本中最大 id 为 N，**When** 请求 `GET /entries/<N+1>`，**Then** 返回 404。
++- AE3. 非数字 id
++  - **Covers R2.**
++  - **When** 请求 `GET /entries/abc`，**Then** 返回 404。
++- AE4. 列表与过滤回归
++  - **Covers R3.**
++  - **Given** 录入两条账目，**When** 分别请求 `GET /entries` 与 `GET /entries?month=<某条目ts所在年月>`，**Then** 前者返回含两条的数组，后者仅返回该月条目（与基线行为一致）。
++- AE5. 录入回归
++  - **Covers R4.**
++  - **When** 请求 `POST /entries` 录入一条，**Then** 响应与 id 序列与基线行为一致，且新条目可在 `GET /entries` 中看到。
++
++### Success Criteria
++
++- R1–R4 全部可验收为真（AE1–AE5 通过）。
++- `README.md` 的 endpoint 清单包含新 endpoint（交付一致性）。
++
++### Scope Boundaries
++
++- 单条的修改与删除（`PUT` / `PATCH` / `DELETE /entries/:id`）。
++- 列表能力扩张：分页、排序、`month` 之外的新过滤。
++- 全局错误体规范化（如统一 JSON 错误格式）；404 响应形态沿用现状。
++- 持久化存储与 id 生成策略改造。
++- README 已知粗糙点（录入体验、分类、汇总视图）。
++
++### Dependencies / Assumptions
++
++- 目标用户为 MiniLedger 的 API 调用者（本地 demo 的使用与维护者）；demo 语境下无真实用户行为证据，产品权威来源为任务指令。
++- 本仓库按无交互环境执行，上述假设与 Key Decisions 均未经人工确认，后续可推翻并回写本文档。
++- id 域假设：条目只增不删、id 为从 1 起的递增整数（源码观察，commit `9a29966`）；引入删除或持久化时 id 语义需复审。
++- `month` 过滤的现有实现即行为基线（含其按条目 `ts` 的 ISO 年月匹配的特性），本次不修正其既有特性。
++
++### Outstanding Questions
++
++- Resolve Before Planning: 无。
++- Deferred to Planning:
++  - id 解析的精确实现形态（如前导零、负数、超大数值）——产品落点统一为"无法对应现存条目即 404"，实现选择不影响产品语义。
++  - 200/404 响应的 Content-Type 与响应体细节，在"沿用现有服务约定"（见 Key Decisions）框架内确定。
++
++### Sources / Research
++
++- `src/server.js:6-21` — 现有 `POST /entries` 与 `GET /entries`（含 `month` 过滤）；列表分支以 `startsWith('/entries')` 前缀匹配，子路径当前被其捕获。快照：commit `9a29966`。失效条件：路由结构重构后需复核。
++- `src/server.js:28-29` — 现有未知路径返回 404 纯文本 `not found`。快照：commit `9a29966`。
++- `src/server.js:11` — id 由 `entries.length + 1` 生成。快照：commit `9a29966`。
++- `README.md:5-8` — endpoint 清单与条目形态 `{id, amount, note, ts}`、已知粗糙点。
++- `docs/plans/2026-09-01-001-feat-month-filter-plan.md` — `GET /entries` 扩展 query 参数的先例，无单条查询能力的既有规划。
++- 限制：本仓库无测试套件，行为基线以源码为准；声明核实为会话内作者自检（未派发独立验证），置信度以此为限。
++
++---
++
++## Planning Contract
++
++Product Contract unchanged (byte-preserved upstream source slice).
++
++### Key Technical Decisions
++
++- KTD1. 单条分支置于列表分支之前，列表分支零改动。`GET` 且 URL 以 `/entries/` 开头进入单条查询分支，分支内完成解析与响应并终结请求，不落入列表分支；现有 `GET /entries` 分支（含 `month` 过滤）与 `POST /entries` 分支代码原样保留。依据 Product Contract Key Decision 1 的兼容钉子，把 R3 回归面压到最小。Governs R1, R2, R3。
++- KTD2. id 解析语义（Product Contract "Deferred to Planning" 第 1 项的落点）。`/entries/` 之后的剩余路径段须整体为十进制数字（无符号、无小数点、无尾随内容）才做条目匹配，按整数值与现存 `id` 严格相等；前导零归一化（`/entries/02` 即 id 2）；其余一切（非数字、空段、超范围、`1.5`、`-1`、`5/`、合法的百分号编码形态）在 URL 可完成解析时一律 404，不引入 400；畸形百分号编码路径触发解析异常而非 404，属显式不管辖的既有暴露（见 Implementation Scope Boundaries）。超大数值因不等于任何现存 id 自然落入 404，无需专门分支。Governs R2。
++- KTD3. 响应形态（"Deferred to Planning" 第 2 项的落点，依据 Product Contract Key Decision 3）。命中：`content-type: application/json`，body 为该条目 JSON（与列表元素同形）；未命中：404 + 纯文本 `not found`，与现有未知路径回退逐字一致，不新增 content-type 头。Governs R1, R2。
++- KTD4. 兼容边界显式终结的范围。变更后 `/entries/<非数字>` 与 `/entries/`（空子路径）从"返回全量列表"变为 404；`/entriesfoo` 等畸形前缀匹配保持现状返回列表（不借机收紧列表分支）；非 GET 方法 × 子路径（如 `POST /entries/5`）维持 404。Governs R2, R3。
++- KTD5. 验证策略：表征先行 + 内置测试器。用 Node 内置 `node:test`（零新 npm 依赖）在临时端口上对真实 HTTP 接口断言；先为钉住形态（R3/R4）建立回归基线并在基线代码上跑绿，再落路由变更。测试形态引用 A1，测试接缝引用 A2。Governs R1–R4 的可验收性。
++
++架构姿态：`extend`。检查过的既有能力与 owner：`src/server.js`（唯一路由 owner，吸收一个新分支即可，无需新文件或新抽象）、`README.md`（endpoint 文档契约）、`CHANGELOG.md`（变更记录约定）。新增 `test/server.test.js` 是验证面而非新业务边界；无被拒绝的复用或组合候选（不存在第二个可组合实现）。
++
++### Interface Contracts
++
++| 字段 | 内容 |
++| --- | --- |
++| Interface / mode | MiniLedger HTTP API / `evolution`（additive endpoint + 显式终结一处未成文隐含行为） |
++| Consumers | 本地 demo 的 API 调用者（Product Contract 目标用户）；仓库内无客户端代码，无已知外部消费者（未知不等于不存在） |
++| Canonical artifact | 无机器可读 schema 工件；实现真源 `src/server.js`，文档契约 `README.md` endpoint 清单（U3 负责更新）。`parser_unavailable`：仓库无 API schema/契约测试基建；unblock 条件：未来引入 schema 工件或契约测试时补建 |
++| Contract summary | `GET /entries/:id` → 200 + 条目 JSON；无法对应现存条目 → 404 纯文本 `not found`；无 400 语义（KTD2/KTD3） |
++| Compatibility | additive 新 endpoint；对 `/entries/<子路径>` 前缀捕获的终结是 Product Contract Key Decision 1 授权的行为收窄，仅影响未成文行为；回滚 = revert U2 的路由提交（U2 独立成原子提交） |
++| Verification | U1 引入的 `node:test` 套件（repo-native 检查 owner）+ Verification Contract 的 CLI 冒烟命令 |
++
++### High-Level Technical Design
++
++请求分发表（变更前后对照；"全量列表"指现有前缀分支返回整个数组的行为）：
++
++| 请求形态 | 现状（commit `9a29966`） | 变更后 | 依据 |
++| --- | --- | --- | --- |
++| `POST /entries` | 录入，响应 `ok` | 不变 | R4 |
++| `GET /entries` | 全量数组 JSON | 不变 | R3 |
++| `GET /entries?month=YYYY-MM` | 按月过滤数组 | 不变 | R3 |
++| `GET /entries/<命中id>` | 全量列表（前缀捕获） | 200 + 该条目 JSON | R1、KTD1 |
++| `GET /entries/<其他子路径>`（非数字/空/超范围/尾斜杠） | 全量列表（前缀捕获） | 404 `not found` | R2、KTD2、KTD4 |
++| `GET /entriesfoo` 等畸形前缀 | 全量列表 | 保持现状 | KTD4 |
++| 非 GET × 子路径（如 `POST /entries/5`） | 404 | 404 | KTD1 |
++| 其余未知路径 | 404 `not found` | 不变 | — |
++
++### Implementation Scope Boundaries
++
++- 列表分支不改写为精确路径匹配：`/entriesfoo` 维持现状。收紧时机：出现真实消费者歧义或独立清理任务时。
++- 死代码块（`src/server.js` 的 `if (false)` 分支）不删除（considered and not built）：相邻清理与本任务无关，删除无消费者收益。
++- `POST /entries` 对畸形 JSON body 的未捕获异常不修复（considered and not built）：R4 要求 POST 行为不变，修复即改变行为；留给独立任务。
++- 畸形百分号编码路径（如 `/entries/%zz` 触发的 URL 解析异常）不做防护（considered and not built）：现有列表分支对 `/entries%` 有相同既有暴露，单独给新分支加防护会偏离文件既有模式，全局修复则触及钉住分支；如需修复走独立任务。该类路径不进自动化用例（会以未捕获异常杀死测试进程）。
++- 不新增 `engines` 字段、错误体规范化、分页/排序、持久化——见 Product Contract Scope Boundaries 与 A4。
++
++### Assumptions
++
++无交互环境，以下为规划判断，未经人工确认，可推翻；推翻后回写本计划：
++
++- A1. 引入自动化测试套件（`node:test` + `test/server.test.js` + `package.json` 的 `test` script）。来源：任务指令要求计划含测试场景与验证命令，但未指定自动化形态。影响：验证命令以 `npm test` 为准。失效条件：执行 owner 选择仅手动 curl 冒烟时，U1/U2 测试场景改为手动核对清单。
++- A2. 给 `src/server.js` 增加模块导出 + `require.main === module` 守卫（CLI `node src/server.js` 行为不变），测试在临时端口（port 0）起真实 server。来源：A1 的最小测试接缝。影响：`src/server.js` 多两行非路由改动。失效条件：不允许动该文件时退回子进程固定 3000 端口方案（需接受端口冲突风险）。
++- A3. `CHANGELOG.md` 按文件头既有格式追加一条并标 `(user-visible)`。来源：根目录 CHANGELOG 约定已由 spec-first 初始化记录在案。影响：U3 多一行文档交付。失效条件：维护者认定 demo 不记 CHANGELOG。
++- A4. 运行环境 Node ≥ 18（`node:test` 与全局 `fetch`；实测本机 v22.22.3；`package.json` 无 `engines`）。失效条件：目标环境为更老 Node 时需换测试运行器或补充 polyfill。
++
++### Evidence & Limitations
++
++- 直读证据：`src/server.js`、`README.md`、`package.json`、`CHANGELOG.md`、`docs/plans/2026-09-01-001-feat-month-filter-plan.md`，快照 commit `9a29966`（tracked 文件干净；untracked 为 spec-first 宿主文件与本计划自身）。Product Contract Sources 的行号引用据此复核有效。
++- 调研为 inline 串行直读，无 worker 派发授权（`dispatch_authorization_missing`）；未做外部研究——同文件两个既有 endpoint 即直接本地模式，无外部选项集介入任何 KTD。
++- 基线仓库无测试套件（无 `test/` 目录，`package.json` 无 scripts）：已按检索义务确认没有对 `src/server.js`、`README.md`、`package.json` 断言的既有契约测试需要纳入 Verification Contract。
++
++---
++
++## Implementation Units
++
++### U1. 测试基线与可测性接缝
++
++- Goal: 为钉住形态建立自动化回归基线，并提供让 server 可在临时端口测试的最小接缝；基线在路由变更前全绿。
++- Requirements: R3、R4（AE4、AE5 作为回归用例）。
++- Dependencies: 无。
++- Files: `src/server.js`（仅接缝：导出 server、`require.main === module` 守卫监听 3000）、`test/server.test.js`（新建）、`package.json`（新增 `scripts.test`）。
++- Approach: 接缝为两行级改动，`node src/server.js` CLI 行为不变（A2）。测试用 `node:test` + `node:assert`，`before` 在 port 0 启动导出的 server、`after` 关闭（必要时关闭全部连接，避免 keep-alive 挂起），用例经 `fetch` 打真实 HTTP。month 期望值从条目自身 `ts` 按基线公式（`toISOString().slice(0,7)`）由全量列表推导，避免跨月与时区抖动。
++- Patterns to follow: `docs/plans/2026-09-01-001-feat-month-filter-plan.md`（扩展 `GET /entries` 表面的先例；注意其未建测试，本单元是仓库首个测试面）。
++- Execution note: 表征用例先落在未改路由的代码上并跑绿，再进入 U2。
++- Test scenarios:
++  - Covers AE5. POST /entries（合法 JSON body）→ 响应 `ok`；随后 GET /entries 含该条目，id 为递增整数，字段恰为 `{id, amount, note, ts}`。
++  - Covers AE4. 两条录入后 GET /entries → 含两条的数组，顺序与录入一致。
++  - Covers AE4. GET /entries?month=<按某条目 ts 计算的 YYYY-MM> → 仅返回该月条目；期望集合由全量列表按同一公式推导（表征语义）。
++- Verification: `npm test` 在基线代码上全绿；`node src/server.js` 冒烟可正常 curl（命令见 Verification Contract）。
++
++### U2. `GET /entries/:id` 单条查询路由
++
++- Goal: 落地单条查询 endpoint：命中返回条目 JSON，无法对应现存条目一律 404。
++- Requirements: R1、R2（AE1–AE3）。
++- Dependencies: U1。
++- Files: `src/server.js`（新增单条分支，置于列表分支之前）、`test/server.test.js`（追加特性用例）。
++- Approach: 分支匹配 `GET` + `/entries/` 前缀，按 KTD2 解析剩余段，命中按 KTD3 响应，否则 404 并终结请求（KTD1）；列表与 POST 分支零改动（KTD4）。畸形百分号编码路径不入用例（见 Implementation Scope Boundaries）。
++- Execution note: 特性用例可先写失败（当前子路径返回全量列表），实现路由使其转绿。
++- Test scenarios:
++  - Covers AE1. 录入至少一条后 GET /entries/<该条 id> → 200、`content-type: application/json`、body 与列表中对应元素深度相等。
++  - Covers AE2. 最大 id 为 N 时 GET /entries/<N+1> → 404、body `not found`。
++  - Covers AE3. GET /entries/abc → 404。
++  - 边界：GET /entries/1.5、/entries/-1、/entries/（空段）、/entries/5/、/entries/99999999999999999999 → 均 404。
++  - 前导零：GET /entries/02（存在 id 2）→ 200 返回 id 2 条目。
++  - 方法归属：POST /entries/5 → 404。
++  - 查询串容忍：GET /entries/1?x=1 → 200 返回条目 1（按 pathname 匹配，query 忽略）。
++  - 回归：U1 全部表征用例保持全绿。
++- Verification: `npm test` 全绿（U1 基线 + 特性用例）。
++
++### U3. 交付一致性文档
++
++- Goal: README endpoint 清单纳入新 endpoint；CHANGELOG 按约定记录本次变更。
++- Requirements: Product Contract Success Criteria（README 交付一致性）；A3。
++- Dependencies: U2。
++- Files: `README.md`、`CHANGELOG.md`。
++- Approach: README 的 endpoint 描述从 two 改为 three，新增 `GET /entries/:id`（按 id 取单条，未找到 404）；条目形态说明不变。CHANGELOG 按文件头格式追加一行并标 `(user-visible)`，版本号与时间戳以实施时实际发布为准。
++- Test expectation: none — 纯文档单元，无行为变化。
++- Verification: README 三条 endpoint 与实际路由一一对应；CHANGELOG 行符合文件头格式约定。
++
++---
++
++## Verification Contract
++
++- 主命令：`npm test`（即 `node --test`；Node ≥ 18，v20+ 自动发现 `test/`）。期望证据：全部用例通过、0 失败，覆盖 AE1–AE5（映射见 U1/U2 Test scenarios）。
++- CLI 冒烟（手动，实施后执行）：`node src/server.js` 起服后依次执行 `curl -si -X POST localhost:3000/entries -d '{"amount":10,"note":"smoke"}'`（期望 `ok`）、`curl -si localhost:3000/entries/1`（期望 200 + JSON）、`curl -si localhost:3000/entries/999`（期望 404 `not found`）。作用：证明 CLI 入口与 3000 端口监听在接缝改动后保持。
++- 既有契约测试检索：基线无测试套件，没有对 `src/server.js`、`README.md`、`package.json` 断言的既有测试需要纳入（证据：commit `9a29966` 树，见 Evidence & Limitations）。
++- Largest unproven risk / 盲区：`npm test` 不证明 CLI 入口（由冒烟命令补）与文档一致性（U3 仅人工评审）；表征用例镜像基线 month 公式，钉的是现状行为而非日历正确性。
++- Evidence authority：全部结论来自 commit `9a29966` 的源码直读；无外部研究介入任何 load-bearing 结论。
++
++---
++
++## Definition of Done
++
++- 全局：`npm test` 全绿；AE1–AE5 均有对应自动化用例且通过；README 与 CHANGELOG 已更新且与实现一致；CLI 冒烟通过；diff 内无废弃尝试或实验代码，变更限于 U1–U3 列出的文件。
++- U1：表征基线在路由变更前的代码上全绿。
++- U2：特性用例全绿且 U1 用例无回归；`src/server.js` 的列表与 POST 分支与基线逐字一致。
++- U3：文档检查通过（endpoint 清单、CHANGELOG 格式）。
++
++## 执行偏差记录（2026-11-12 追加）
++
++本计划的以下前提已被事实推翻，按 `docs/plans/2026-11-12-001-feat-entry-by-id-deviations.md` 处置：
++
++- **D1：** A3 失效——仓库不存在 `CHANGELOG.md`，U3 实际交付 `README.md`；Definition of Done 的「README 与 CHANGELOG 均已更新」按 README-only 解释。不创建该文件。
++- **D2：** 基线 `9a29966` 属原临时仓库，在本评审仓库中不可解析；重建仓库的等价基线为 `fd4448c`。
+diff --git a/docs/plans/2026-11-12-001-feat-entry-by-id-review-findings.md b/docs/plans/2026-11-12-001-feat-entry-by-id-review-findings.md
+new file mode 100644
+index 0000000..5c1a051
+--- /dev/null
++++ b/docs/plans/2026-11-12-001-feat-entry-by-id-review-findings.md
+@@ -0,0 +1,49 @@
++结论：当前实现的 ID 路由逻辑基本正确，但测试没有充分证明 AE4 和部分边界要求，同时引入了计划之外的启动语义变化。建议修正后再合并。
++
++### P0
++
++无 P0 问题。
++
++### P1
++
++无 P1 问题。
++
++### P2
++
++- **P2 — AE4 测试无法发现列表截断或月份过滤失效。**
++  位置：[test/server.test.js:50](/private/tmp/phase5-review/repo/test/server.test.js:50)、[test/server.test.js:63](/private/tmp/phase5-review/repo/test/server.test.js:63)
++  失败场景：如果 `GET /entries` 永远只返回最后两条，并且完全忽略 `month` 参数，现有测试仍会通过。列表测试只检查 `length >= 2` 和最后两条；月份测试又从同一个可能有错的全量接口计算期望值，而且所有测试数据都在当前月份。
++  建议修复：构造至少两个固定月份的条目，以硬编码的预期 ID/对象断言过滤结果；无参数列表应断言完整、精确的条目集合和顺序，不要从被测接口生成 oracle。
++
++- **P2 — 尾斜杠用例使用不存在的 ID，不能证明现存 ID 加尾斜杠会被拒绝。**
++  位置：[test/server.test.js:100](/private/tmp/phase5-review/repo/test/server.test.js:100)
++  失败场景：执行该测试时只有 ID 1–4，但测试请求 `/entries/5/`。如果实现错误地把尾斜杠归一化成 ID 5，仍会因为 ID 5 不存在而返回 404，测试继续通过。
++  建议修复：使用确定存在的 ID，例如 `/entries/1/` 或刚创建条目的 `${target.id}/`。
++
++- **P2 — “非 GET 方法”只覆盖了 POST。**
++  位置：[test/server.test.js:128](/private/tmp/phase5-review/repo/test/server.test.js:128)
++  失败场景：实现以后意外接受 `PUT /entries/1`、`PATCH /entries/1` 或 `DELETE /entries/1` 时，测试不会发现。当前实现确实会对这些方法返回 404，但测试没有锁定该合同。
++  建议修复：对 `POST`、`PUT`、`PATCH`、`DELETE`，以及计划要求时的 `HEAD` 做表驱动测试，并使用一个现存 ID。
++
++- **P2 — 为测试改变了模块加载时的启动行为，超出了新增读取端点的范围。**
++  位置：[src/server.js:45](/private/tmp/phase5-review/repo/src/server.js:45)
++  失败场景：以前 `require('./src/server')` 或 `require('.')` 会立即监听 3000 端口；现在只有直接运行文件才监听。任何依赖原加载行为的启动器会静默停止启动服务。
++  建议修复：将请求处理器或 server factory 提取到可导入模块供测试使用，同时保留实际入口文件原有的启动合同；如果确实要改变加载语义，应在计划和兼容性说明中明确批准。
++
++- **P2 — 指定的批准计划副本不存在，无法核验 AE1–AE5 的原始合同或识别全部越界变更。**
++  位置：`docs/plans/2026-11-12-001-feat-entry-by-id-plan.md:1`（文件缺失）
++  失败场景：当前分支和 `main` 都只有旧的 month-filter 计划。测试中的 AE 标签因此无法与批准文本逐项核对，后续评审只能相信测试作者对验收条件的转述。
++  建议修复：把批准计划的原始副本恢复到指定路径，再逐项核对实现和测试。
++
++### P3
++
++- **P3 — 测试依赖共享账本和固定执行顺序。**
++  位置：[test/server.test.js:3](/private/tmp/phase5-review/repo/test/server.test.js:3)、[test/server.test.js:85](/private/tmp/phase5-review/repo/test/server.test.js:85)
++  失败场景：单独运行“超出范围”测试时，列表为空，`all[all.length - 1].id` 会抛异常；前导零和查询串测试也依赖前面测试已经创建 ID 1、2。失败重跑或按名称筛选测试会得到误导性结果。
++  建议修复：每个测试创建独立 server/store，或者在每个测试内显式建立自己的前置数据。
++
++从测试名称推断，AE2、AE3、AE5 的主路径有有效覆盖；AE1 能证明某个现存条目的查询，但未独立证明本测试新 POST 的条目就是被查询对象；AE4 没有被可靠证明。生产代码的非数字、越界、空 ID、尾斜杠、查询串和非 GET 行为，经不监听端口的内存探针检查均符合当前测试意图。
++
++验证方面，`node --check` 和 `git diff --check` 通过。完整 `npm test` 未能运行，因为审查沙箱禁止监听 `127.0.0.1`，报 `listen EPERM`；这不是已确认的代码失败。
++
++NOT-READY
+diff --git a/package.json b/package.json
+index 2ef443b..dcfe116 100644
+--- a/package.json
++++ b/package.json
+@@ -2,5 +2,8 @@
+   "name": "mini-ledger",
+   "version": "0.1.0",
+   "private": true,
+-  "main": "src/server.js"
++  "main": "src/server.js",
++  "scripts": {
++    "test": "node --test"
++  }
+ }
+diff --git a/src/server.js b/src/server.js
+index d4b4176..3bed784 100644
+--- a/src/server.js
++++ b/src/server.js
+@@ -13,6 +13,19 @@ const server = http.createServer((req, res) => {
+     });
+     return;
+   }
++  if (req.method === 'GET' && req.url.startsWith('/entries/')) {
++    const u = new URL(req.url, 'http://localhost');
++    const idSegment = u.pathname.slice('/entries/'.length);
++    const entry = /^\d+$/.test(idSegment)
++      ? entries.find((e) => e.id === parseInt(idSegment, 10))
++      : undefined;
++    if (entry) {
++      res.setHeader('content-type', 'application/json');
++      return res.end(JSON.stringify(entry));
++    }
++    res.statusCode = 404;
++    return res.end('not found');
++  }
+   if (req.method === 'GET' && req.url.startsWith('/entries')) {
+     const u = new URL(req.url, 'http://localhost');
+     const month = u.searchParams.get('month');
+@@ -29,4 +42,8 @@ const server = http.createServer((req, res) => {
+   res.end('not found');
+ });
+ 
+-server.listen(3000);
++if (require.main === module) {
++  server.listen(3000);
++}
++
++module.exports = { server };
+diff --git a/test/server.test.js b/test/server.test.js
+new file mode 100644
+index 0000000..6aeb549
+--- /dev/null
++++ b/test/server.test.js
+@@ -0,0 +1,209 @@
++const { test } = require('node:test');
++const assert = require('node:assert/strict');
++
++const serverPath = require.resolve('../src/server');
++
++// 每个用例通过失效模块缓存拿到独立的 server 实例与独立的内存账本：
++// 无论整文件运行、按名单筛选还是失败重跑，用例都自建前置数据，不依赖执行顺序。
++async function withServer(run) {
++  delete require.cache[serverPath];
++  const { server } = require(serverPath);
++  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
++  try {
++    await run(`http://127.0.0.1:${server.address().port}`);
++  } finally {
++    // fetch 的 keep-alive 连接会让 close 的回调一直挂起，先断开全部连接
++    server.closeAllConnections();
++    await new Promise((resolve) => server.close(resolve));
++  }
++}
++
++async function postEntry(baseUrl, entry) {
++  return fetch(`${baseUrl}/entries`, {
++    method: 'POST',
++    headers: { 'content-type': 'application/json' },
++    body: JSON.stringify(entry),
++  });
++}
++
++async function listEntries(baseUrl, query = '') {
++  const res = await fetch(`${baseUrl}/entries${query}`);
++  assert.equal(res.status, 200);
++  return res.json();
++}
++
++
++test('POST /entries 返回 ok，新条目进入列表且字段恰为 {id, amount, note, ts}，id 从 1 递增（AE5）', async () => {
++  await withServer(async (baseUrl) => {
++    const first = await postEntry(baseUrl, { amount: 10, note: 'coffee' });
++    assert.equal(first.status, 200);
++    assert.equal(await first.text(), 'ok');
++    const second = await postEntry(baseUrl, { amount: 20, note: 'tea' });
++    assert.equal(second.status, 200);
++    assert.equal(await second.text(), 'ok');
++
++    const entries = await listEntries(baseUrl);
++    assert.equal(entries.length, 2);
++    assert.deepEqual(
++      entries.map((e) => ({ id: e.id, amount: e.amount, note: e.note })),
++      [
++        { id: 1, amount: 10, note: 'coffee' },
++        { id: 2, amount: 20, note: 'tea' },
++      ],
++    );
++    for (const entry of entries) {
++      assert.ok(typeof entry.ts === 'number' && entry.ts > 0);
++      assert.deepEqual(Object.keys(entry).sort(), ['amount', 'id', 'note', 'ts']);
++    }
++  });
++});
++
++test('三条录入后 GET /entries 返回完整、精确、有序的全量数组（AE4）', async () => {
++  await withServer(async (baseUrl) => {
++    await postEntry(baseUrl, { amount: 1, note: 'alpha' });
++    await postEntry(baseUrl, { amount: 2, note: 'beta' });
++    await postEntry(baseUrl, { amount: 3, note: 'gamma' });
++
++    const entries = await listEntries(baseUrl);
++    // 精确全量断言而非"包含最后两条"：列表截断（如只返回末尾 N 条）在此失败
++    assert.deepEqual(
++      entries.map((e) => ({ id: e.id, amount: e.amount, note: e.note })),
++      [
++        { id: 1, amount: 1, note: 'alpha' },
++        { id: 2, amount: 2, note: 'beta' },
++        { id: 3, amount: 3, note: 'gamma' },
++      ],
++    );
++    for (const entry of entries) {
++      assert.ok(typeof entry.ts === 'number' && entry.ts > 0);
++    }
++  });
++});
++
++// 服务端条目的 ts 取自 Date.now()：测试内临时固定它，才能造出跨月数据。
++async function seedAt(baseUrl, items) {
++  const realNow = Date.now;
++  try {
++    for (const item of items) {
++      Date.now = () => item.ts;
++      await postEntry(baseUrl, { amount: item.amount, note: item.note });
++    }
++  } finally {
++    Date.now = realNow;
++  }
++}
++
++test('GET /entries?month=YYYY-MM 按条目的 ts 逐条筛选，未命中的月份返回空数组（AE4）', async () => {
++  await withServer(async (baseUrl) => {
++    // 三个月跨度、两个不同月份交错录入，硬编码期望集合：
++    // 若实现把「月份匹配」做成「首条月份相同就返回全量、否则返回空」（全有/全无），
++    // 或忽略 month 参数，下面的精确集合断言都会失败。
++    await seedAt(baseUrl, [
++      { amount: 1, note: 'jan-a', ts: Date.UTC(2025, 0, 15, 12) },
++      { amount: 2, note: 'feb', ts: Date.UTC(2025, 1, 10, 12) },
++      { amount: 3, note: 'jan-b', ts: Date.UTC(2025, 0, 20, 12) },
++    ]);
++
++    const pick = (list) => list.map((e) => ({ id: e.id, amount: e.amount, note: e.note }));
++
++    assert.deepEqual(pick(await listEntries(baseUrl, '?month=2025-01')), [
++      { id: 1, amount: 1, note: 'jan-a' },
++      { id: 3, amount: 3, note: 'jan-b' },
++    ]);
++    assert.deepEqual(pick(await listEntries(baseUrl, '?month=2025-02')), [
++      { id: 2, amount: 2, note: 'feb' },
++    ]);
++    assert.deepEqual(await listEntries(baseUrl, '?month=2025-03'), []);
++
++    // 全量列表不受 month 影响，且顺序为录入顺序
++    assert.deepEqual(pick(await listEntries(baseUrl)), [
++      { id: 1, amount: 1, note: 'jan-a' },
++      { id: 2, amount: 2, note: 'feb' },
++      { id: 3, amount: 3, note: 'jan-b' },
++    ]);
++  });
++});
++
++test('GET /entries/:id 命中本用例新录入的条目，返回 200、application/json 与该条目（AE1）', async () => {
++  await withServer(async (baseUrl) => {
++    await postEntry(baseUrl, { amount: 40, note: 'single' });
++    const [entry] = await listEntries(baseUrl);
++
++    const res = await fetch(`${baseUrl}/entries/${entry.id}`);
++    assert.equal(res.status, 200);
++    assert.equal(res.headers.get('content-type'), 'application/json');
++    assert.deepEqual(await res.json(), entry);
++  });
++});
++
++test('GET /entries/:id 超出范围（最大 id + 1）返回 404 not found（AE2）', async () => {
++  await withServer(async (baseUrl) => {
++    await postEntry(baseUrl, { amount: 50, note: 'only' });
++    const entries = await listEntries(baseUrl);
++    const maxId = entries[entries.length - 1].id;
++
++    const res = await fetch(`${baseUrl}/entries/${maxId + 1}`);
++    assert.equal(res.status, 404);
++    assert.equal(await res.text(), 'not found');
++  });
++});
++
++test('GET /entries/abc 非数字 id 返回 404（AE3）', async () => {
++  await withServer(async (baseUrl) => {
++    const res = await fetch(`${baseUrl}/entries/abc`);
++    assert.equal(res.status, 404);
++    assert.equal(await res.text(), 'not found');
++  });
++});
++
++test('畸形与越界子路径一律 404：1.5、-1、空段、现存 id 加尾斜杠、超大数值', async () => {
++  await withServer(async (baseUrl) => {
++    await postEntry(baseUrl, { amount: 60, note: 'exists' });
++    // 尾斜杠用例使用确定存在的 id（本用例独占账本中为 1）：
++    // 若实现把"id/"归一化为该 id，须因返回 200 而在此失败，而非偶然因 id 不存在通过
++    for (const sub of ['1.5', '-1', '', '1/', '99999999999999999999']) {
++      const res = await fetch(`${baseUrl}/entries/${sub}`);
++      assert.equal(res.status, 404, `GET /entries/${sub}`);
++      assert.equal(await res.text(), 'not found', `GET /entries/${sub}`);
++    }
++  });
++});
++
++test('前导零归一化：GET /entries/02 返回 id 2 的条目', async () => {
++  await withServer(async (baseUrl) => {
++    await postEntry(baseUrl, { amount: 70, note: 'first' });
++    await postEntry(baseUrl, { amount: 80, note: 'second' });
++    const entries = await listEntries(baseUrl);
++    const expected = entries.find((e) => e.id === 2);
++    assert.ok(expected, '前置条件：本用例已录入 id 2');
++
++    const res = await fetch(`${baseUrl}/entries/02`);
++    assert.equal(res.status, 200);
++    assert.deepEqual(await res.json(), expected);
++  });
++});
++
++test('查询串容忍：GET /entries/1?x=1 忽略 query 返回条目 1', async () => {
++  await withServer(async (baseUrl) => {
++    await postEntry(baseUrl, { amount: 90, note: 'queried' });
++    const [expected] = await listEntries(baseUrl);
++    assert.ok(expected && expected.id === 1, '前置条件：本用例已录入 id 1');
++
++    const res = await fetch(`${baseUrl}/entries/1?x=1`);
++    assert.equal(res.status, 200);
++    assert.deepEqual(await res.json(), expected);
++  });
++});
++
++test('非 GET 方法 × 子路径（现存 id）：POST/PUT/PATCH/DELETE 一律 404', async () => {
++  await withServer(async (baseUrl) => {
++    await postEntry(baseUrl, { amount: 100, note: 'target' });
++    const entries = await listEntries(baseUrl);
++    const existingId = entries[entries.length - 1].id;
++
++    for (const method of ['POST', 'PUT', 'PATCH', 'DELETE']) {
++      const res = await fetch(`${baseUrl}/entries/${existingId}`, { method });
++      assert.equal(res.status, 404, `${method} /entries/${existingId}`);
++    }
++  });
++});

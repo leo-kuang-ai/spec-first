@@ -1,0 +1,35 @@
+
+> spec-first@1.15.3 test:jest
+> jest --runTestsByPath tests/unit/ce-u28-outcome-calibration.test.js --runInBand
+
+FAIL tests/unit/ce-u28-outcome-calibration.test.js
+  U28 supplemental outcome judge calibration
+    ✓ spec-strategy check-owned-update accepts observed controls and rejects changed evidence (325 ms)
+    ✓ spec-product-pulse check-source-outcomes accepts observed controls and rejects changed evidence (360 ms)
+    ✕ spec-promote check-unreleased-local-drafts accepts observed controls and rejects changed evidence (327 ms)
+    ✓ spec-handoff check-research-continuation accepts observed controls and rejects changed evidence (365 ms)
+    ✓ spec-handoff check-review-continuation accepts observed controls and rejects changed evidence (372 ms)
+    ✓ spec-riffrec-feedback-analysis check-local-evidence accepts observed controls and rejects changed evidence (366 ms)
+
+  ● U28 supplemental outcome judge calibration › spec-promote check-unreleased-local-drafts accepts observed controls and rejects changed evidence
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 1
+
+      57 |     if (skill === 'spec-promote') {
+      58 |       report.drafts[0].content = 'Monthly summaries are implemented locally and not released or deployed.';
+    > 59 |       expect(check().status).toBe(0);
+         |                              ^
+      60 |       report.delivery_status = 'released';
+      61 |       expect(check().status).not.toBe(0);
+      62 |       report.delivery_status = 'implemented-not-released';
+
+      at toBe (tests/unit/ce-u28-outcome-calibration.test.js:59:30)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 5 passed, 6 total
+Snapshots:   0 total
+Time:        2.275 s, estimated 3 s
+Ran all test suites within paths "tests/unit/ce-u28-outcome-calibration.test.js".

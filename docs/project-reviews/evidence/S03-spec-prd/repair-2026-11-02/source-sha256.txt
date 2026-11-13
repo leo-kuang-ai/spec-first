@@ -1,0 +1,4 @@
+c08990ccfb677ec46c919238e2f9f9e36a0582f74c5cc35fb8d2eaa6ae1c819e  skills/spec-prd/SKILL.md
+f7fc9ffeac866c55c22215d4870989f78ebd57de4cdf057a063fb86ed49de548  skills/spec-prd/references/domain-language-and-decision-ledger.md
+c6fc7fea54cb4b2aff09f9f1a5e5d7e815d783f643b17803599d87e7a5079a1e  skills/spec-prd/references/grill-with-docs-integration.md
+6e69f8d59b9e194241657456d78c0134c3ee3f58f1835fbe22cde11b29fcefbb  skills/spec-prd/assets/templates/50-cli-devtool.md

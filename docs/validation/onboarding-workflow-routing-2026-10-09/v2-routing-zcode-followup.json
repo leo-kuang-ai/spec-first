@@ -1,0 +1,137 @@
+{
+  "meta": {
+    "date": "2026-10-09",
+    "purpose": "三专家测试复核后的 V2 补充评估：在宿主 ZCode 上重建可回源的路由语义基线，覆盖上轮 v2-routing.json 未含的对抗组合，并落盘场景原文与评分 rubric（修复上轮 input_sha256 不可复算、判定不可复核的缺口）",
+    "host": "zcode",
+    "model": "GLM-5.3 (bigmodel-api) — subject subagent 与 orchestrator/grader 同模型，非跨模型判定",
+    "method": "将三个路由源文件当前磁盘全文注入 8 个全新 subagent prompt（不含期望答案），每个 subagent 仅输出结构化路由决定；orchestrator 按 rubric 判定，S3/S5 由一个不知道 orchestrator 判定的独立 grader subagent 盲判复核",
+    "source_paths": {
+      "skills/using-spec-first/SKILL.md": "c9862d4ef5a807ff4bb210e703a47103293e42b16908e383474a46ca125641f8",
+      "skills/using-spec-first/references/public-route-map.md": "8288ae4760774742febc220bb8bfe237b2b16952783ce6a5f4cdb7d019f1fdf0",
+      "skills/using-spec-first/references/conditional-routing-boundaries.md": "a465bd34553006730a21258483d07ab138a53f702d897561c9efc877bdae855a"
+    },
+    "source_note": "三个 sha256 于评估前在当前磁盘复算，与 a250a7d7 落盘的 source-manifest.json 完全一致：U2 路由输入在审查修复期间未被改动"
+  },
+  "grader_rubric_verbatim": "主入口唯一且正确；S3 失败信号优先（不得因『实现/修复』措辞选 spec-work 或 Direct Lane）；S5 活跃 spec-work 内失败信号应保持 owner 连续（Fast Path：Continue an active public workflow; do not restart routing），失败由当前 owner 边界处理；S6 显式点名且适用时不静默替换；S7 只问推荐时给出一个推荐或恰好一个澄清问题，不执行；S8 与任务无关的能力缺失只披露限制继续，不升级 spec-runtime-setup；恰好一个入口不链式；输出语言跟随用户。",
+  "scenarios": [
+    {
+      "id": "S1",
+      "prompt_verbatim": "我有个模糊的想法：我们团队需求评审来回扯皮太多，想减少这种情况，但我不确定问题出在哪、怎么算成功。该从哪个 workflow 开始？",
+      "expected": "spec-brainstorm；should_execute=false（只问推荐）",
+      "output_verbatim": "entrypoint: spec-brainstorm | reason: 已有模糊想法但问题框架、问题出在哪、怎么算成功均未确定，正是把模糊想法收敛为明确问题定义与成功标准的场景。 | should_execute: false | ask_user: none",
+      "judgment": "pass",
+      "judge_basis": "入口、理由（范围/成功标准未定）、推荐即止均符合 R3.1/R4.4"
+    },
+    {
+      "id": "S2",
+      "prompt_verbatim": "需求已经明确了：给 spec-first 的 doctor 命令增加 JSON 输出格式，验收标准都定了。但我还没想好怎么组织现有代码来实现。下一步用哪个 workflow？",
+      "expected": "spec-plan；should_execute=false（询问下一步=推荐请求）",
+      "output_verbatim": "entrypoint: spec-plan | reason: 需求（WHAT）与验收标准已明确，但实现方式（HOW）尚未确定，恰好匹配“目标清楚但实现方式未定 → 形成技术方案与验证合同”的路由。 | should_execute: false | ask_user: none",
+      "judgment": "pass",
+      "judge_basis": "WHAT 已定/HOW 未定判别正确，推荐即止正确"
+    },
+    {
+      "id": "S3",
+      "prompt_verbatim": "CI 上 tests/unit/doctor-output 一直失败，昨晚开始的回归。帮我顺手把这个功能修复实现了。",
+      "expected": "spec-debug（失败信号优先于『实现/修复』措辞）；should_execute=true（明确执行请求）",
+      "output_verbatim": "entrypoint: spec-debug | reason: 存在 CI 测试持续失败、回归信号和明确修复意图，按硬规则必须进入 spec-debug，不得走 Direct Lane。 | should_execute: true | ask_user: none",
+      "judgment": "pass",
+      "judge_basis": "R3.2 对抗场景通过：未因『顺手实现修复』措辞选 spec-work/Direct Lane；明确执行请求进入执行",
+      "agreement_check": "独立 grader 盲判 verdict=correct，与 orchestrator 一致（引 On-Ramps 逐字命中 + Direct Lane 禁止条款）"
+    },
+    {
+      "id": "S4",
+      "prompt_verbatim": "上季度我们验证了一套灰度发布回滚方案，测试证据都留存了，现在想把这套经验沉淀成团队可复用的知识，选哪个入口？",
+      "expected": "spec-compound；should_execute=false（『选哪个入口』=推荐请求）",
+      "output_verbatim": "entrypoint: spec-compound | reason: 已验证的灰度发布回滚方案且测试证据留存，正是“已验证且可复用的经验沉淀为知识”的入口。 | should_execute: false | ask_user: none",
+      "judgment": "pass",
+      "judge_basis": "已验证可复用经验→compound 正确；推荐即止正确"
+    },
+    {
+      "id": "S5",
+      "prompt_verbatim": "我正在 spec-work 里执行一个已批准的任务（改 init 的输出引导），执行到一半单测突然报了个 TypeError。现在怎么办？",
+      "expected": "保持 spec-work owner 连续（SKILL.md Fast Path: Continue an active public workflow; do not restart routing；route-map 尾注: 不要因中途补充或询问进度重新路由），失败信号由当前 owner 边界处理；最多一个澄清问题",
+      "output_verbatim": "entrypoint: spec-debug | reason: 已批准任务的执行中途出现单测 TypeError 失败信号，按入口硬规则失败/报错必须进入 spec-debug 定位根因且不得走 Direct Lane（失败路由优先于 spec-work 的 owner 连续性续走）。 | should_execute: false | ask_user: none",
+      "judgment": "fail",
+      "judge_basis": "subject 选择 reroute 到 spec-debug 并主张『失败路由优先于 owner 连续性』；该排序在三文件规则原文中不存在，且与 frontmatter（Do not use to reroute active public workflows）、Fast Path、route-map 尾注（『不要因中途补充或询问进度重新路由』）、Main Flow 行后注（active workflow owns its handoff）四条专门条款相悖",
+      "agreement_check": "独立 grader 盲判 verdict=incorrect（lex specialis 结构：owner 连续性是适用范围条款、先于入口选择逻辑；subject 虚构了优先级排序），与 orchestrator 的『规则张力暴露』判定在结论上一致；grader 同时诚实标注：若纳入 AGENTS.md 入口硬规则（失败信号必须进 spec-debug）并解读为无条件优先，结论会移向 defensible-with-conflict",
+      "finding": "U2 新增文本未澄清『活跃 workflow 执行中出现失败信号』的裁决：AGENTS.md 入口治理硬规则（存在失败信号必须进入 spec-debug）与 skill 的 owner 连续性条款在该场景字面冲突。上轮 v2-routing.json 14 场景未覆盖该组合（场景 9 无失败信号）。建议在 using-spec-first 源文本补一句裁决规则（方向：活跃 owner 内的失败信号由当前 owner 处理或显式 handoff，不静默 reroute），并由方案 owner 决定与 AGENTS.md 硬规则的表述对齐"
+    },
+    {
+      "id": "S6",
+      "prompt_verbatim": "用 spec-plan 把 docs/plans/draft-auth.md 细化成 implementation-ready 的实施计划。",
+      "expected": "spec-plan（显式点名且适用）；should_execute=true（明确执行请求）；不静默替换",
+      "output_verbatim": "entrypoint: spec-plan | reason: 用户显式点名 spec-plan，且将已有计划草案细化为 implementation-ready 实施方案正符合“目标清楚但实现方式未定 → 形成实施方案”的语义，显式路由与意图一致。 | should_execute: true | ask_user: none",
+      "judgment": "pass",
+      "judge_basis": "R3.4 对抗场景通过：显式入口被确认而非替换，明确执行请求不当作新审批（对应 U2 新增规则段 A2）"
+    },
+    {
+      "id": "S7",
+      "prompt_verbatim": "我该选哪个 workflow？",
+      "expected": "低置信：恰好一个会改变路由的澄清问题，或一个具体推荐；should_execute=false；不执行",
+      "output_verbatim": "entrypoint: 待定（当前信息不足以从 public route map 选出唯一入口） | reason: 用户没有提供任何意图、已有输入或期望结果……当前属低置信路由，按规则先澄清再路由 | should_execute: false | ask_user: 你这次想得到什么结果、手上已有什么输入（尚无方向 / 模糊想法 / 已有需求或计划 / 已有 diff 或 PR / 报错待修复）？",
+      "judgment": "pass",
+      "judge_basis": "『待定 + 恰好一个澄清问题 + 不执行』符合 SKILL.md Checkpoint—ask（低置信最多一个 route-changing 问题）；问题虽列出候选项但仍是一个问题；未虚构入口"
+    },
+    {
+      "id": "S8",
+      "prompt_verbatim": "帮我把 README 快速开始章节按新的引导流程更新一下。另外提醒：环境检查显示 browser MCP 还没配置。",
+      "expected": "文档更新任务正常路由（明确工作项）；browser MCP 缺失与本任务无关：披露限制后继续，不升级为 spec-runtime-setup 阻断",
+      "output_verbatim": "entrypoint: spec-work | reason: 用户明确要求执行一个具体工作项……不符合 Direct Lane 条件，应进入执行型 workflow。 | should_execute: true | capability_gap: browser MCP 未配置，但对本次 README 文档更新任务非必需，属可选能力缺失，披露该限制后继续；若后续需要浏览器 QA（如 spec-dogfood / spec-test-browser / spec-polish）再转 spec-runtime-setup 补齐。",
+      "judgment": "pass",
+      "judge_basis": "R2.1 对抗场景通过：无关能力缺失仅披露不阻断；且给出了正确的条件性 setup 转换条件（需要浏览器 QA 时）"
+    }
+  ],
+  "summary": {
+    "pass": 7,
+    "fail": 1,
+    "fail_detail": "S5 活跃 workflow 内失败信号的 reroute 判定（暴露规则文本缺口，非 subject 模型能力问题——其输出自洽且引用了规则，问题在规则未规定该组合的裁决）"
+  },
+  "s5_fix_replay": {
+    "date": "2026-10-09",
+    "context": "S5 finding 修复后的复验：SKILL.md Route Selection 与 route-map 尾注补裁决规则（活跃 workflow 执行中失败由其反馈回路处理，不重启路由；根因超出任务范围才由 owner 显式移交 spec-debug），CLAUDE.md/AGENTS.md 入口硬规则同步澄清；footprint 预算随授权新增上调至 hard 5800/advisory 5200",
+    "source_paths_after_fix": {
+      "skills/using-spec-first/SKILL.md": "21a73e2da3f24f0b8d7eef31664e5e55c9e1228e809a419efde7fe345e580079",
+      "skills/using-spec-first/references/public-route-map.md": "a56255d20ae306b28aeb2b58fd6e35a2bdc1476df503cd80a2757566ebde5347"
+    },
+    "prompt_verbatim": "我正在 spec-work 里执行一个已批准的任务（改 init 的输出引导），执行到一半单测突然报了个 TypeError。现在怎么办？",
+    "expected": "保持 spec-work owner 连续，不 reroute spec-debug（修复后的裁决规则）",
+    "output_verbatim": "entrypoint: spec-work（当前活跃 owner，继续执行） | reason: 活跃 workflow 执行中出现的失败或报错由该 workflow 既有反馈回路处理，不重启路由；只有根因超出当前任务范围时才由该 owner 显式移交 spec-debug。 | next_action: 在 spec-work 内查看该 TypeError 的堆栈与失败单测，先怀疑本次 init 输出引导改动引入的问题，定位修复后重跑单测确认。 | should_execute: true",
+    "judgment": "pass",
+    "judge_basis": "修复生效：reason 逐字引用新裁决规则，路由保持 owner 连续；next_action 方向正确（先怀疑任务自身改动）。should_execute=true 表达的是继续当前 owner 的既有授权而非新入口执行，语义可接受"
+  },
+  "followup_scenarios": [
+    {
+      "id": "S9",
+      "purpose": "R2.6：debug 有依据诊断计首个实质结果且保留未完成事实（上轮 14 场景与本轮 8 场景均未覆盖）",
+      "prompt_verbatim": "我第一次用 spec-first，今天第一次进 workflow：我向 spec-debug 描述了「CI 上 tests/unit/doctor-output 一直失败」，它读取了我的测试文件和 CI 日志，给出了根因分析（一个 mock 泄漏）和修复建议，但还没有改代码。这算我的第一个 workflow 成功吗？下一步该做什么？",
+      "expected": "是（有依据诊断计首结果）；保留修复未实施/无回归证据；下一入口 spec-work；推荐即止",
+      "output_verbatim": "first_result_judgment: 是——spec-debug 基于实际读取的测试文件与 CI 日志产出了可回源的根因分析（mock 泄漏）与修复建议…… | unfinished_facts: 修复尚未实施；尚无回归证据。 | next_entrypoint: spec-work | should_execute: false",
+      "judgment": "pass",
+      "judge_basis": "完全符合 R2.6 与 KTD4：可回源诊断计入首个实质结果，未完成事实显式保留，下一入口按 route map 恰好一项（可执行方案已就绪→spec-work），推荐即止"
+    },
+    {
+      "id": "S10",
+      "purpose": "R2.2/R2.3：环境阻塞不计成功并指向最近可修复阶段",
+      "prompt_verbatim": "我第一次用 spec-first，按快速开始在宿主里输入了固定示例（spec-brainstorm 那句），但 workflow 只回复了「未检测到 Git 仓库，请先初始化项目」，没有产出任何需求定义。这算我的第一次 workflow 成功吗？接下来该怎么办？",
+      "expected": "否（仅报告无法启动不计成功）；按 environment readiness on-ramp 指向修复入口；推荐即止",
+      "output_verbatim": "first_result_judgment：否——workflow 只返回了「未检测到 Git 仓库」的环境前置阻塞提示，没有产出任务相关的实质结果…… | next_entrypoint: spec-runtime-setup | reason: 该请求是环境 readiness 阻塞……按 on-ramp 表中「Environment readiness -> spec-runtime-setup」恰好路由到一个入口。 | should_execute: false",
+      "judgment": "pass",
+      "judge_basis": "符合 R2.2（仅报告无法启动不计成功）与 R2.3（指向最近可修复阶段而非从安装重来）。spec-runtime-setup 是 on-ramp 表内对环境 readiness 的正解；备注：「缺 Git 仓库」也可能是项目侧 git init/换 target 问题，doctor 或手册恢复步骤是等价出口，subject 选择表内入口自洽"
+    }
+  ],
+  "checks": {
+    "trigger_precision": "8/8 场景 prompt 原文逐字落盘于本文件",
+    "source_runtime_boundary": "注入 skills/ 源文件全文（hash 见 meta），未使用 .agents/skills 运行时镜像",
+    "host_entrypoints": "评估宿主为 ZCode（本仓库当前宿主，处于上轮 7 个 not_run 宿主集合内）；subject 为同宿主 fresh subagent",
+    "internal_only_boundary": "未涉及",
+    "deterministic_vs_semantic_boundary": "判定为 LLM 语义判定（orchestrator + 独立 grader 双判覆盖 S3/S5），未用静态关键词测试替代",
+    "rubric_separation": "grader_rubric_verbatim 与 subject prompt 分离；subject 不含期望答案；grader 不知道 orchestrator 判定"
+  },
+  "limitations": [
+    "单宿主（ZCode）、单模型（GLM-5.3）、单次运行；subject subagent 与 grader 同模型，双判缓解但不消除单模型偏差",
+    "advisory 语义评估：证明该模型/会话中的路由行为，不证明所有宿主、所有任务或 field outcome",
+    "场景为构造输入，非真实用户请求；S5 的规则张力是否在真实使用中高频出现未验证（V4 范围）",
+    "S5 finding 的修复（源文本补裁决规则）属于新的 source 变更，需方案 owner 授权，本轮未实施"
+  ]
+}

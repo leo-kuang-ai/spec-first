@@ -1,0 +1,2 @@
+Assess readiness after the observation gap and continuous control. Then handle every fixed/declined/needs-human item and all interrupted-reply readback branches in pr-recovery-fixture.json. Keep code publication, reply authority and human decisions distinct.
+Read only assigned-arm frozen Skill and the named evidence. Return an English artifact with per-case findings, exact evidence references, unresolved facets and responsible next action. Do not execute, mutate, contact external services or delegate.

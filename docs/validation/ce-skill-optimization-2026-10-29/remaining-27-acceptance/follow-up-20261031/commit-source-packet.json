@@ -1,0 +1,15 @@
+{
+  "id": "CEOPT-04-source-successor-20261031",
+  "source_files": {
+    "skills/spec-commit/SKILL.md": "47bc11e7407b55e9225fc2464a44d33174ec523a0b0c8e15892a92724458b6c4",
+    "skills/spec-commit-push-pr/references/commit-and-push.md": "01a0b42b62dda5b25019ec0e51c3a55ae1935098ac324d586758c2324e3f226b",
+    "skills/spec-commit-push-pr/references/branch-creation.md": "974ec16ad783e16f72222854a5209c8e662a4adab6a7ae0caf1deae86c241cf6"
+  },
+  "review_basis": "Original C04-INPUT-01, C04-RUNNER-01 and C04-SKILL-01; current complete dependency set. Original A/B receipts remain unchanged.",
+  "execution_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/commit-recovery-results.json",
+  "execution_scope": "Seven separately identified parent-operated disposable Git cases, not new model trials or a real repository commit.",
+  "caller_strategy_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/commit-isolation-procedure.md",
+  "caller_strategy_sha256": "08232e59d1da24dbb92b16f328b1cffa1863ceb7a7d5c74b840104f698cda414",
+  "strategy_validation": "Parent-validated for exact disposable fixture only; not general mixed-staged-hunk support or current repository commit authority.",
+  "execution_sha256": "28737469b203c0f4e2fc34942ce29989a1929a27fa5b6a09c012213fe07ad8a8"
+}

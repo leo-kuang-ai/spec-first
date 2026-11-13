@@ -1,0 +1,2147 @@
+{
+  "protocol_sha256": "db45c8610ddba6e321102b15678add5e44cddc92cccf99f62642ca0681b414c6",
+  "results": [
+    {
+      "arm": "A",
+      "case": "dirty-reuse",
+      "before": {
+        "exists": true,
+        "files": {
+          "untracked.txt": "617a24e606057331e56f013c622c84861f3e63087839e59cbe91692de761a1f6",
+          "tracked.txt": "7be5ee1826f3fba9ac97167030fada449112a8dec899e686b8804dd5600cc7ea",
+          ".gitignore": "ea710370b5c64e3402a7a38e6a22537c2473d880527d0e6413f9e05b2dc0f5ca",
+          ".ignored-cache": "1f5269120518ae2f72aba8aaf3558b54bcfb14fbfc9e9e7cfc5e1d307f7effaf",
+          ".git": "1f07cbdf256d4cdad209536f18908775ad7cbaf271b5192041853ac31f6cad85"
+        },
+        "head": "a24b941c69e76dcc97c7936bb3d1102eb041f1a1",
+        "index": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+        "root_head": "a24b941c69e76dcc97c7936bb3d1102eb041f1a1"
+      },
+      "after": {
+        "exists": true,
+        "files": {
+          "tracked.txt": "d2034cca9ec0eb5d9664647a0c972bef6fe89ff1bd942571668939d641ef83d7",
+          ".gitignore": "ea710370b5c64e3402a7a38e6a22537c2473d880527d0e6413f9e05b2dc0f5ca",
+          ".git": "1f07cbdf256d4cdad209536f18908775ad7cbaf271b5192041853ac31f6cad85"
+        },
+        "head": "a24b941c69e76dcc97c7936bb3d1102eb041f1a1",
+        "index": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+        "root_head": "a24b941c69e76dcc97c7936bb3d1102eb041f1a1"
+      },
+      "preserved": false,
+      "operations": [
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-optimize/scripts/experiment-worktree.sh",
+            "create",
+            "acceptance",
+            "1",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/A-dirty-reuse/.worktrees/optimize-acceptance-exp-001\n",
+          "stderr": "\u001b[1;33mWorktree already exists: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/A-dirty-reuse/.worktrees/optimize-acceptance-exp-001\u001b[0m\n\u001b[1;33mResetting existing experiment worktree to base: optimize-exp/acceptance/exp-001 -> HEAD\u001b[0m\n\u001b[1;33mEnvironment files not copied by default. Pass --copy-env to opt in.\u001b[0m\n"
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-optimize/scripts/experiment-worktree.sh",
+            "create",
+            "acceptance",
+            "1",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/A-dirty-reuse/.worktrees/optimize-acceptance-exp-001\n",
+          "stderr": "\u001b[1;33mWorktree already exists: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/A-dirty-reuse/.worktrees/optimize-acceptance-exp-001\u001b[0m\n\u001b[1;33mResetting existing experiment worktree to base: optimize-exp/acceptance/exp-001 -> HEAD\u001b[0m\n\u001b[1;33mEnvironment files not copied by default. Pass --copy-env to opt in.\u001b[0m\n"
+        }
+      ],
+      "branch_still_present": true,
+      "safety_expectation_satisfied": false,
+      "external_audit_preserved": true,
+      "commands": [
+        {
+          "argv": [
+            "git",
+            "init",
+            "-b",
+            "fixture-base"
+          ],
+          "exit_code": 0,
+          "stdout": "Initialized empty Git repository in /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/A-dirty-reuse/.git/\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.name",
+            "Disposable Fixture"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "core.hooksPath",
+            "/dev/null"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "add",
+            "tracked.txt",
+            ".gitignore"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "commit",
+            "-m",
+            "fixture baseline"
+          ],
+          "exit_code": 0,
+          "stdout": "[fixture-base (root-commit) a24b941] fixture baseline\n 2 files changed, 2 insertions(+)\n create mode 100644 .gitignore\n create mode 100644 tracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-optimize/scripts/experiment-worktree.sh",
+            "create",
+            "acceptance",
+            "1",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/A-dirty-reuse/.worktrees/optimize-acceptance-exp-001\n",
+          "stderr": "\u001b[1;33mEnvironment files not copied by default. Pass --copy-env to opt in.\u001b[0m\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "a24b941c69e76dcc97c7936bb3d1102eb041f1a1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "ls-files",
+            "--stage"
+          ],
+          "exit_code": 0,
+          "stdout": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "a24b941c69e76dcc97c7936bb3d1102eb041f1a1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-optimize/scripts/experiment-worktree.sh",
+            "create",
+            "acceptance",
+            "1",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/A-dirty-reuse/.worktrees/optimize-acceptance-exp-001\n",
+          "stderr": "\u001b[1;33mWorktree already exists: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/A-dirty-reuse/.worktrees/optimize-acceptance-exp-001\u001b[0m\n\u001b[1;33mResetting existing experiment worktree to base: optimize-exp/acceptance/exp-001 -> HEAD\u001b[0m\n\u001b[1;33mEnvironment files not copied by default. Pass --copy-env to opt in.\u001b[0m\n"
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-optimize/scripts/experiment-worktree.sh",
+            "create",
+            "acceptance",
+            "1",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/A-dirty-reuse/.worktrees/optimize-acceptance-exp-001\n",
+          "stderr": "\u001b[1;33mWorktree already exists: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/A-dirty-reuse/.worktrees/optimize-acceptance-exp-001\u001b[0m\n\u001b[1;33mResetting existing experiment worktree to base: optimize-exp/acceptance/exp-001 -> HEAD\u001b[0m\n\u001b[1;33mEnvironment files not copied by default. Pass --copy-env to opt in.\u001b[0m\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "a24b941c69e76dcc97c7936bb3d1102eb041f1a1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "ls-files",
+            "--stage"
+          ],
+          "exit_code": 0,
+          "stdout": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "a24b941c69e76dcc97c7936bb3d1102eb041f1a1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "show-ref",
+            "--verify",
+            "--quiet",
+            "refs/heads/optimize-exp/acceptance/exp-001"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "arm": "A",
+      "case": "dirty-cleanup",
+      "before": {
+        "exists": true,
+        "files": {
+          "untracked.txt": "617a24e606057331e56f013c622c84861f3e63087839e59cbe91692de761a1f6",
+          "tracked.txt": "7be5ee1826f3fba9ac97167030fada449112a8dec899e686b8804dd5600cc7ea",
+          ".gitignore": "ea710370b5c64e3402a7a38e6a22537c2473d880527d0e6413f9e05b2dc0f5ca",
+          ".ignored-cache": "1f5269120518ae2f72aba8aaf3558b54bcfb14fbfc9e9e7cfc5e1d307f7effaf",
+          ".git": "47156607372dd422379557f516189aad4b769f67f72f29752ab558bb07a1dcb3"
+        },
+        "head": "a24b941c69e76dcc97c7936bb3d1102eb041f1a1",
+        "index": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+        "root_head": "a24b941c69e76dcc97c7936bb3d1102eb041f1a1"
+      },
+      "after": {
+        "exists": false,
+        "files": {},
+        "head": null,
+        "index": null,
+        "root_head": "a24b941c69e76dcc97c7936bb3d1102eb041f1a1"
+      },
+      "preserved": false,
+      "operations": [
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-optimize/scripts/experiment-worktree.sh",
+            "cleanup",
+            "acceptance",
+            "1"
+          ],
+          "exit_code": 0,
+          "stdout": "Deleted branch optimize-exp/acceptance/exp-001 (was a24b941).\n",
+          "stderr": "\u001b[0;32mCleaned up: optimize-acceptance-exp-001\u001b[0m\n"
+        }
+      ],
+      "branch_still_present": false,
+      "safety_expectation_satisfied": false,
+      "external_audit_preserved": true,
+      "commands": [
+        {
+          "argv": [
+            "git",
+            "init",
+            "-b",
+            "fixture-base"
+          ],
+          "exit_code": 0,
+          "stdout": "Initialized empty Git repository in /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/A-dirty-cleanup/.git/\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.name",
+            "Disposable Fixture"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "core.hooksPath",
+            "/dev/null"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "add",
+            "tracked.txt",
+            ".gitignore"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "commit",
+            "-m",
+            "fixture baseline"
+          ],
+          "exit_code": 0,
+          "stdout": "[fixture-base (root-commit) a24b941] fixture baseline\n 2 files changed, 2 insertions(+)\n create mode 100644 .gitignore\n create mode 100644 tracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-optimize/scripts/experiment-worktree.sh",
+            "create",
+            "acceptance",
+            "1",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/A-dirty-cleanup/.worktrees/optimize-acceptance-exp-001\n",
+          "stderr": "\u001b[1;33mEnvironment files not copied by default. Pass --copy-env to opt in.\u001b[0m\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "a24b941c69e76dcc97c7936bb3d1102eb041f1a1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "ls-files",
+            "--stage"
+          ],
+          "exit_code": 0,
+          "stdout": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "a24b941c69e76dcc97c7936bb3d1102eb041f1a1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-optimize/scripts/experiment-worktree.sh",
+            "cleanup",
+            "acceptance",
+            "1"
+          ],
+          "exit_code": 0,
+          "stdout": "Deleted branch optimize-exp/acceptance/exp-001 (was a24b941).\n",
+          "stderr": "\u001b[0;32mCleaned up: optimize-acceptance-exp-001\u001b[0m\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "a24b941c69e76dcc97c7936bb3d1102eb041f1a1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "show-ref",
+            "--verify",
+            "--quiet",
+            "refs/heads/optimize-exp/acceptance/exp-001"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "arm": "A",
+      "case": "unowned-prefix-cleanup",
+      "before": {
+        "exists": true,
+        "files": {
+          "sentinel.txt": "b99181fe199ec9b0aed795b11698f7bce113b9c6712b5cd36ab322a1ce1a3d85"
+        },
+        "head": null,
+        "index": null,
+        "root_head": "a24b941c69e76dcc97c7936bb3d1102eb041f1a1"
+      },
+      "after": {
+        "exists": false,
+        "files": {},
+        "head": null,
+        "index": null,
+        "root_head": "a24b941c69e76dcc97c7936bb3d1102eb041f1a1"
+      },
+      "preserved": false,
+      "operations": [
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-optimize/scripts/experiment-worktree.sh",
+            "cleanup-all",
+            "acceptance"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "\u001b[0;32mCleaned up 1 experiment worktree(s) for acceptance\u001b[0m\n"
+        }
+      ],
+      "branch_still_present": false,
+      "safety_expectation_satisfied": false,
+      "external_audit_preserved": true,
+      "commands": [
+        {
+          "argv": [
+            "git",
+            "init",
+            "-b",
+            "fixture-base"
+          ],
+          "exit_code": 0,
+          "stdout": "Initialized empty Git repository in /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/A-unowned-prefix-cleanup/.git/\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.name",
+            "Disposable Fixture"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "core.hooksPath",
+            "/dev/null"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "add",
+            "tracked.txt",
+            ".gitignore"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "commit",
+            "-m",
+            "fixture baseline"
+          ],
+          "exit_code": 0,
+          "stdout": "[fixture-base (root-commit) a24b941] fixture baseline\n 2 files changed, 2 insertions(+)\n create mode 100644 .gitignore\n create mode 100644 tracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "a24b941c69e76dcc97c7936bb3d1102eb041f1a1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-optimize/scripts/experiment-worktree.sh",
+            "cleanup-all",
+            "acceptance"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "\u001b[0;32mCleaned up 1 experiment worktree(s) for acceptance\u001b[0m\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "a24b941c69e76dcc97c7936bb3d1102eb041f1a1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "show-ref",
+            "--verify",
+            "--quiet",
+            "refs/heads/optimize-exp/acceptance/exp-001"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "arm": "A",
+      "case": "legacy-cleanup",
+      "before": {
+        "exists": true,
+        "files": {
+          "tracked.txt": "d2034cca9ec0eb5d9664647a0c972bef6fe89ff1bd942571668939d641ef83d7",
+          ".gitignore": "ea710370b5c64e3402a7a38e6a22537c2473d880527d0e6413f9e05b2dc0f5ca",
+          ".git": "c49d54897b41d0431d8e949352a8a168fcd025c87e3391560cd7d084ba77cd3e"
+        },
+        "head": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2",
+        "index": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+        "root_head": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2"
+      },
+      "after": {
+        "exists": false,
+        "files": {},
+        "head": null,
+        "index": null,
+        "root_head": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2"
+      },
+      "preserved": false,
+      "operations": [
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-optimize/scripts/experiment-worktree.sh",
+            "cleanup",
+            "acceptance",
+            "1"
+          ],
+          "exit_code": 0,
+          "stdout": "Deleted branch optimize-exp/acceptance/exp-001 (was ee5a795).\n",
+          "stderr": "\u001b[0;32mCleaned up: optimize-acceptance-exp-001\u001b[0m\n"
+        }
+      ],
+      "branch_still_present": false,
+      "safety_expectation_satisfied": false,
+      "external_audit_preserved": true,
+      "commands": [
+        {
+          "argv": [
+            "git",
+            "init",
+            "-b",
+            "fixture-base"
+          ],
+          "exit_code": 0,
+          "stdout": "Initialized empty Git repository in /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/A-legacy-cleanup/.git/\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.name",
+            "Disposable Fixture"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "core.hooksPath",
+            "/dev/null"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "add",
+            "tracked.txt",
+            ".gitignore"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "commit",
+            "-m",
+            "fixture baseline"
+          ],
+          "exit_code": 0,
+          "stdout": "[fixture-base (root-commit) ee5a795] fixture baseline\n 2 files changed, 2 insertions(+)\n create mode 100644 .gitignore\n create mode 100644 tracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "worktree",
+            "add",
+            "-b",
+            "optimize-exp/acceptance/exp-001",
+            "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/A-legacy-cleanup/.worktrees/optimize-acceptance-exp-001",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "HEAD is now at ee5a795 fixture baseline\n",
+          "stderr": "Preparing worktree (new branch 'optimize-exp/acceptance/exp-001')\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "ls-files",
+            "--stage"
+          ],
+          "exit_code": 0,
+          "stdout": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-optimize/scripts/experiment-worktree.sh",
+            "cleanup",
+            "acceptance",
+            "1"
+          ],
+          "exit_code": 0,
+          "stdout": "Deleted branch optimize-exp/acceptance/exp-001 (was ee5a795).\n",
+          "stderr": "\u001b[0;32mCleaned up: optimize-acceptance-exp-001\u001b[0m\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "show-ref",
+            "--verify",
+            "--quiet",
+            "refs/heads/optimize-exp/acceptance/exp-001"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "arm": "A",
+      "case": "pristine-cleanup",
+      "before": {
+        "exists": true,
+        "files": {
+          "tracked.txt": "d2034cca9ec0eb5d9664647a0c972bef6fe89ff1bd942571668939d641ef83d7",
+          ".gitignore": "ea710370b5c64e3402a7a38e6a22537c2473d880527d0e6413f9e05b2dc0f5ca",
+          ".git": "e011d7a2597a0265783b47a0630c6d64f998fdecb920307abced52bb71736f6d"
+        },
+        "head": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2",
+        "index": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+        "root_head": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2"
+      },
+      "after": {
+        "exists": false,
+        "files": {},
+        "head": null,
+        "index": null,
+        "root_head": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2"
+      },
+      "preserved": false,
+      "operations": [
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-optimize/scripts/experiment-worktree.sh",
+            "cleanup",
+            "acceptance",
+            "1"
+          ],
+          "exit_code": 0,
+          "stdout": "Deleted branch optimize-exp/acceptance/exp-001 (was ee5a795).\n",
+          "stderr": "\u001b[0;32mCleaned up: optimize-acceptance-exp-001\u001b[0m\n"
+        }
+      ],
+      "branch_still_present": false,
+      "safety_expectation_satisfied": true,
+      "external_audit_preserved": true,
+      "commands": [
+        {
+          "argv": [
+            "git",
+            "init",
+            "-b",
+            "fixture-base"
+          ],
+          "exit_code": 0,
+          "stdout": "Initialized empty Git repository in /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/A-pristine-cleanup/.git/\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.name",
+            "Disposable Fixture"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "core.hooksPath",
+            "/dev/null"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "add",
+            "tracked.txt",
+            ".gitignore"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "commit",
+            "-m",
+            "fixture baseline"
+          ],
+          "exit_code": 0,
+          "stdout": "[fixture-base (root-commit) ee5a795] fixture baseline\n 2 files changed, 2 insertions(+)\n create mode 100644 .gitignore\n create mode 100644 tracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-optimize/scripts/experiment-worktree.sh",
+            "create",
+            "acceptance",
+            "1",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/A-pristine-cleanup/.worktrees/optimize-acceptance-exp-001\n",
+          "stderr": "\u001b[1;33mEnvironment files not copied by default. Pass --copy-env to opt in.\u001b[0m\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "ls-files",
+            "--stage"
+          ],
+          "exit_code": 0,
+          "stdout": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-optimize/scripts/experiment-worktree.sh",
+            "cleanup",
+            "acceptance",
+            "1"
+          ],
+          "exit_code": 0,
+          "stdout": "Deleted branch optimize-exp/acceptance/exp-001 (was ee5a795).\n",
+          "stderr": "\u001b[0;32mCleaned up: optimize-acceptance-exp-001\u001b[0m\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "show-ref",
+            "--verify",
+            "--quiet",
+            "refs/heads/optimize-exp/acceptance/exp-001"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "arm": "B",
+      "case": "dirty-reuse",
+      "before": {
+        "exists": true,
+        "files": {
+          "untracked.txt": "617a24e606057331e56f013c622c84861f3e63087839e59cbe91692de761a1f6",
+          "tracked.txt": "7be5ee1826f3fba9ac97167030fada449112a8dec899e686b8804dd5600cc7ea",
+          ".gitignore": "ea710370b5c64e3402a7a38e6a22537c2473d880527d0e6413f9e05b2dc0f5ca",
+          ".ignored-cache": "1f5269120518ae2f72aba8aaf3558b54bcfb14fbfc9e9e7cfc5e1d307f7effaf",
+          ".git": "0beb632173d34adf2b210239eda53e344ca291f3533c1eb46ac23a31c49a81f9"
+        },
+        "head": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2",
+        "index": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+        "root_head": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2"
+      },
+      "after": {
+        "exists": true,
+        "files": {
+          "untracked.txt": "617a24e606057331e56f013c622c84861f3e63087839e59cbe91692de761a1f6",
+          "tracked.txt": "7be5ee1826f3fba9ac97167030fada449112a8dec899e686b8804dd5600cc7ea",
+          ".gitignore": "ea710370b5c64e3402a7a38e6a22537c2473d880527d0e6413f9e05b2dc0f5ca",
+          ".ignored-cache": "1f5269120518ae2f72aba8aaf3558b54bcfb14fbfc9e9e7cfc5e1d307f7effaf",
+          ".git": "0beb632173d34adf2b210239eda53e344ca291f3533c1eb46ac23a31c49a81f9"
+        },
+        "head": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2",
+        "index": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+        "root_head": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2"
+      },
+      "preserved": true,
+      "operations": [
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-optimize/scripts/experiment-worktree.sh",
+            "create",
+            "acceptance",
+            "1",
+            "HEAD"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Error: experiment contains commits or working files; preserve them, or explicitly cleanup --discard after retaining evidence\n"
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-optimize/scripts/experiment-worktree.sh",
+            "create",
+            "acceptance",
+            "1",
+            "HEAD"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Error: experiment contains commits or working files; preserve them, or explicitly cleanup --discard after retaining evidence\n"
+        }
+      ],
+      "branch_still_present": true,
+      "safety_expectation_satisfied": true,
+      "external_audit_preserved": true,
+      "commands": [
+        {
+          "argv": [
+            "git",
+            "init",
+            "-b",
+            "fixture-base"
+          ],
+          "exit_code": 0,
+          "stdout": "Initialized empty Git repository in /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/B-dirty-reuse/.git/\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.name",
+            "Disposable Fixture"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "core.hooksPath",
+            "/dev/null"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "add",
+            "tracked.txt",
+            ".gitignore"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "commit",
+            "-m",
+            "fixture baseline"
+          ],
+          "exit_code": 0,
+          "stdout": "[fixture-base (root-commit) ee5a795] fixture baseline\n 2 files changed, 2 insertions(+)\n create mode 100644 .gitignore\n create mode 100644 tracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-optimize/scripts/experiment-worktree.sh",
+            "create",
+            "acceptance",
+            "1",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/B-dirty-reuse/.worktrees/optimize-acceptance-exp-001\n",
+          "stderr": "\u001b[1;33mEnvironment files not copied by default. Pass --copy-env to opt in.\u001b[0m\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "ls-files",
+            "--stage"
+          ],
+          "exit_code": 0,
+          "stdout": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-optimize/scripts/experiment-worktree.sh",
+            "create",
+            "acceptance",
+            "1",
+            "HEAD"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Error: experiment contains commits or working files; preserve them, or explicitly cleanup --discard after retaining evidence\n"
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-optimize/scripts/experiment-worktree.sh",
+            "create",
+            "acceptance",
+            "1",
+            "HEAD"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Error: experiment contains commits or working files; preserve them, or explicitly cleanup --discard after retaining evidence\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "ls-files",
+            "--stage"
+          ],
+          "exit_code": 0,
+          "stdout": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "show-ref",
+            "--verify",
+            "--quiet",
+            "refs/heads/optimize-exp/acceptance/exp-001"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "arm": "B",
+      "case": "dirty-cleanup",
+      "before": {
+        "exists": true,
+        "files": {
+          "untracked.txt": "617a24e606057331e56f013c622c84861f3e63087839e59cbe91692de761a1f6",
+          "tracked.txt": "7be5ee1826f3fba9ac97167030fada449112a8dec899e686b8804dd5600cc7ea",
+          ".gitignore": "ea710370b5c64e3402a7a38e6a22537c2473d880527d0e6413f9e05b2dc0f5ca",
+          ".ignored-cache": "1f5269120518ae2f72aba8aaf3558b54bcfb14fbfc9e9e7cfc5e1d307f7effaf",
+          ".git": "a15bbffc66084367c90df1dda8f737fd96d48e5fb7c9e75c596d3f82b7dc286e"
+        },
+        "head": "7d9ae92d5dc1d78eea683f0412efce2467aa75a5",
+        "index": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+        "root_head": "7d9ae92d5dc1d78eea683f0412efce2467aa75a5"
+      },
+      "after": {
+        "exists": true,
+        "files": {
+          "untracked.txt": "617a24e606057331e56f013c622c84861f3e63087839e59cbe91692de761a1f6",
+          "tracked.txt": "7be5ee1826f3fba9ac97167030fada449112a8dec899e686b8804dd5600cc7ea",
+          ".gitignore": "ea710370b5c64e3402a7a38e6a22537c2473d880527d0e6413f9e05b2dc0f5ca",
+          ".ignored-cache": "1f5269120518ae2f72aba8aaf3558b54bcfb14fbfc9e9e7cfc5e1d307f7effaf",
+          ".git": "a15bbffc66084367c90df1dda8f737fd96d48e5fb7c9e75c596d3f82b7dc286e"
+        },
+        "head": "7d9ae92d5dc1d78eea683f0412efce2467aa75a5",
+        "index": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+        "root_head": "7d9ae92d5dc1d78eea683f0412efce2467aa75a5"
+      },
+      "preserved": true,
+      "operations": [
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-optimize/scripts/experiment-worktree.sh",
+            "cleanup",
+            "acceptance",
+            "1"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Error: experiment contains commits or working files; preserve them, or explicitly cleanup --discard after retaining evidence\n"
+        }
+      ],
+      "branch_still_present": true,
+      "safety_expectation_satisfied": true,
+      "external_audit_preserved": true,
+      "commands": [
+        {
+          "argv": [
+            "git",
+            "init",
+            "-b",
+            "fixture-base"
+          ],
+          "exit_code": 0,
+          "stdout": "Initialized empty Git repository in /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/B-dirty-cleanup/.git/\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.name",
+            "Disposable Fixture"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "core.hooksPath",
+            "/dev/null"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "add",
+            "tracked.txt",
+            ".gitignore"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "commit",
+            "-m",
+            "fixture baseline"
+          ],
+          "exit_code": 0,
+          "stdout": "[fixture-base (root-commit) 7d9ae92] fixture baseline\n 2 files changed, 2 insertions(+)\n create mode 100644 .gitignore\n create mode 100644 tracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-optimize/scripts/experiment-worktree.sh",
+            "create",
+            "acceptance",
+            "1",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/B-dirty-cleanup/.worktrees/optimize-acceptance-exp-001\n",
+          "stderr": "\u001b[1;33mEnvironment files not copied by default. Pass --copy-env to opt in.\u001b[0m\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "7d9ae92d5dc1d78eea683f0412efce2467aa75a5\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "ls-files",
+            "--stage"
+          ],
+          "exit_code": 0,
+          "stdout": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "7d9ae92d5dc1d78eea683f0412efce2467aa75a5\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-optimize/scripts/experiment-worktree.sh",
+            "cleanup",
+            "acceptance",
+            "1"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Error: experiment contains commits or working files; preserve them, or explicitly cleanup --discard after retaining evidence\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "7d9ae92d5dc1d78eea683f0412efce2467aa75a5\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "ls-files",
+            "--stage"
+          ],
+          "exit_code": 0,
+          "stdout": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "7d9ae92d5dc1d78eea683f0412efce2467aa75a5\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "show-ref",
+            "--verify",
+            "--quiet",
+            "refs/heads/optimize-exp/acceptance/exp-001"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "arm": "B",
+      "case": "unowned-prefix-cleanup",
+      "before": {
+        "exists": true,
+        "files": {
+          "sentinel.txt": "b99181fe199ec9b0aed795b11698f7bce113b9c6712b5cd36ab322a1ce1a3d85"
+        },
+        "head": null,
+        "index": null,
+        "root_head": "7d9ae92d5dc1d78eea683f0412efce2467aa75a5"
+      },
+      "after": {
+        "exists": true,
+        "files": {
+          "sentinel.txt": "b99181fe199ec9b0aed795b11698f7bce113b9c6712b5cd36ab322a1ce1a3d85"
+        },
+        "head": null,
+        "index": null,
+        "root_head": "7d9ae92d5dc1d78eea683f0412efce2467aa75a5"
+      },
+      "preserved": true,
+      "operations": [
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-optimize/scripts/experiment-worktree.sh",
+            "cleanup-all",
+            "acceptance"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Error: path is not a registered experiment worktree\nCleaned up 0 experiment worktree(s) for acceptance\n"
+        }
+      ],
+      "branch_still_present": false,
+      "safety_expectation_satisfied": true,
+      "external_audit_preserved": true,
+      "commands": [
+        {
+          "argv": [
+            "git",
+            "init",
+            "-b",
+            "fixture-base"
+          ],
+          "exit_code": 0,
+          "stdout": "Initialized empty Git repository in /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/B-unowned-prefix-cleanup/.git/\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.name",
+            "Disposable Fixture"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "core.hooksPath",
+            "/dev/null"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "add",
+            "tracked.txt",
+            ".gitignore"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "commit",
+            "-m",
+            "fixture baseline"
+          ],
+          "exit_code": 0,
+          "stdout": "[fixture-base (root-commit) 7d9ae92] fixture baseline\n 2 files changed, 2 insertions(+)\n create mode 100644 .gitignore\n create mode 100644 tracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "7d9ae92d5dc1d78eea683f0412efce2467aa75a5\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-optimize/scripts/experiment-worktree.sh",
+            "cleanup-all",
+            "acceptance"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Error: path is not a registered experiment worktree\nCleaned up 0 experiment worktree(s) for acceptance\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "7d9ae92d5dc1d78eea683f0412efce2467aa75a5\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "show-ref",
+            "--verify",
+            "--quiet",
+            "refs/heads/optimize-exp/acceptance/exp-001"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "arm": "B",
+      "case": "legacy-cleanup",
+      "before": {
+        "exists": true,
+        "files": {
+          "tracked.txt": "d2034cca9ec0eb5d9664647a0c972bef6fe89ff1bd942571668939d641ef83d7",
+          ".gitignore": "ea710370b5c64e3402a7a38e6a22537c2473d880527d0e6413f9e05b2dc0f5ca",
+          ".git": "0799fd0146357393fcb7049f2e9265b036837fac9ac2e0fa2c7793260d0542d7"
+        },
+        "head": "86a3850404cc41155839d348a1c305e6a3e576e5",
+        "index": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+        "root_head": "86a3850404cc41155839d348a1c305e6a3e576e5"
+      },
+      "after": {
+        "exists": true,
+        "files": {
+          "tracked.txt": "d2034cca9ec0eb5d9664647a0c972bef6fe89ff1bd942571668939d641ef83d7",
+          ".gitignore": "ea710370b5c64e3402a7a38e6a22537c2473d880527d0e6413f9e05b2dc0f5ca",
+          ".git": "0799fd0146357393fcb7049f2e9265b036837fac9ac2e0fa2c7793260d0542d7"
+        },
+        "head": "86a3850404cc41155839d348a1c305e6a3e576e5",
+        "index": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+        "root_head": "86a3850404cc41155839d348a1c305e6a3e576e5"
+      },
+      "preserved": true,
+      "operations": [
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-optimize/scripts/experiment-worktree.sh",
+            "cleanup",
+            "acceptance",
+            "1"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Error: experiment ownership unavailable: ENOENT: no such file or directory, lstat '/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/B-legacy-cleanup/.git/worktrees/optimize-acceptance-exp-001/spec-first-optimize-owner.json'\n"
+        }
+      ],
+      "branch_still_present": true,
+      "safety_expectation_satisfied": true,
+      "external_audit_preserved": true,
+      "commands": [
+        {
+          "argv": [
+            "git",
+            "init",
+            "-b",
+            "fixture-base"
+          ],
+          "exit_code": 0,
+          "stdout": "Initialized empty Git repository in /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/B-legacy-cleanup/.git/\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.name",
+            "Disposable Fixture"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "core.hooksPath",
+            "/dev/null"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "add",
+            "tracked.txt",
+            ".gitignore"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "commit",
+            "-m",
+            "fixture baseline"
+          ],
+          "exit_code": 0,
+          "stdout": "[fixture-base (root-commit) 86a3850] fixture baseline\n 2 files changed, 2 insertions(+)\n create mode 100644 .gitignore\n create mode 100644 tracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "worktree",
+            "add",
+            "-b",
+            "optimize-exp/acceptance/exp-001",
+            "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/B-legacy-cleanup/.worktrees/optimize-acceptance-exp-001",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "HEAD is now at 86a3850 fixture baseline\n",
+          "stderr": "Preparing worktree (new branch 'optimize-exp/acceptance/exp-001')\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "86a3850404cc41155839d348a1c305e6a3e576e5\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "ls-files",
+            "--stage"
+          ],
+          "exit_code": 0,
+          "stdout": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "86a3850404cc41155839d348a1c305e6a3e576e5\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-optimize/scripts/experiment-worktree.sh",
+            "cleanup",
+            "acceptance",
+            "1"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Error: experiment ownership unavailable: ENOENT: no such file or directory, lstat '/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/B-legacy-cleanup/.git/worktrees/optimize-acceptance-exp-001/spec-first-optimize-owner.json'\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "86a3850404cc41155839d348a1c305e6a3e576e5\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "ls-files",
+            "--stage"
+          ],
+          "exit_code": 0,
+          "stdout": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "86a3850404cc41155839d348a1c305e6a3e576e5\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "show-ref",
+            "--verify",
+            "--quiet",
+            "refs/heads/optimize-exp/acceptance/exp-001"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "arm": "B",
+      "case": "pristine-cleanup",
+      "before": {
+        "exists": true,
+        "files": {
+          "tracked.txt": "d2034cca9ec0eb5d9664647a0c972bef6fe89ff1bd942571668939d641ef83d7",
+          ".gitignore": "ea710370b5c64e3402a7a38e6a22537c2473d880527d0e6413f9e05b2dc0f5ca",
+          ".git": "08a11693364a3ccb1e370c37d769c8b4fe8f70ddfd7f332977d0fb5e02931962"
+        },
+        "head": "86a3850404cc41155839d348a1c305e6a3e576e5",
+        "index": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+        "root_head": "86a3850404cc41155839d348a1c305e6a3e576e5"
+      },
+      "after": {
+        "exists": false,
+        "files": {},
+        "head": null,
+        "index": null,
+        "root_head": "86a3850404cc41155839d348a1c305e6a3e576e5"
+      },
+      "preserved": false,
+      "operations": [
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-optimize/scripts/experiment-worktree.sh",
+            "cleanup",
+            "acceptance",
+            "1"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Deleted branch optimize-exp/acceptance/exp-001 (was 86a3850).\n\u001b[0;32mCleaned up: optimize-acceptance-exp-001\u001b[0m\n"
+        }
+      ],
+      "branch_still_present": false,
+      "safety_expectation_satisfied": true,
+      "external_audit_preserved": true,
+      "commands": [
+        {
+          "argv": [
+            "git",
+            "init",
+            "-b",
+            "fixture-base"
+          ],
+          "exit_code": 0,
+          "stdout": "Initialized empty Git repository in /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/B-pristine-cleanup/.git/\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.name",
+            "Disposable Fixture"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "core.hooksPath",
+            "/dev/null"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "add",
+            "tracked.txt",
+            ".gitignore"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "commit",
+            "-m",
+            "fixture baseline"
+          ],
+          "exit_code": 0,
+          "stdout": "[fixture-base (root-commit) 86a3850] fixture baseline\n 2 files changed, 2 insertions(+)\n create mode 100644 .gitignore\n create mode 100644 tracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-optimize/scripts/experiment-worktree.sh",
+            "create",
+            "acceptance",
+            "1",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/B-pristine-cleanup/.worktrees/optimize-acceptance-exp-001\n",
+          "stderr": "\u001b[1;33mEnvironment files not copied by default. Pass --copy-env to opt in.\u001b[0m\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "86a3850404cc41155839d348a1c305e6a3e576e5\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "ls-files",
+            "--stage"
+          ],
+          "exit_code": 0,
+          "stdout": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "86a3850404cc41155839d348a1c305e6a3e576e5\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-optimize/scripts/experiment-worktree.sh",
+            "cleanup",
+            "acceptance",
+            "1"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Deleted branch optimize-exp/acceptance/exp-001 (was 86a3850).\n\u001b[0;32mCleaned up: optimize-acceptance-exp-001\u001b[0m\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "86a3850404cc41155839d348a1c305e6a3e576e5\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "show-ref",
+            "--verify",
+            "--quiet",
+            "refs/heads/optimize-exp/acceptance/exp-001"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "arm": "B",
+      "case": "explicit-discard",
+      "before": {
+        "exists": true,
+        "files": {
+          "untracked.txt": "617a24e606057331e56f013c622c84861f3e63087839e59cbe91692de761a1f6",
+          "tracked.txt": "7be5ee1826f3fba9ac97167030fada449112a8dec899e686b8804dd5600cc7ea",
+          ".gitignore": "ea710370b5c64e3402a7a38e6a22537c2473d880527d0e6413f9e05b2dc0f5ca",
+          ".ignored-cache": "1f5269120518ae2f72aba8aaf3558b54bcfb14fbfc9e9e7cfc5e1d307f7effaf",
+          ".git": "6a4bd15f397217e71c78774f3e91ddecc4ff5383eedcf580369f69c2699fdb8d"
+        },
+        "head": "888074431e5fb59bce367e141b90a4fe87d5e262",
+        "index": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+        "root_head": "888074431e5fb59bce367e141b90a4fe87d5e262"
+      },
+      "after": {
+        "exists": false,
+        "files": {},
+        "head": null,
+        "index": null,
+        "root_head": "888074431e5fb59bce367e141b90a4fe87d5e262"
+      },
+      "preserved": false,
+      "operations": [
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-optimize/scripts/experiment-worktree.sh",
+            "cleanup",
+            "--discard",
+            "acceptance",
+            "1"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Deleted branch optimize-exp/acceptance/exp-001 (was 8880744).\n\u001b[0;32mCleaned up: optimize-acceptance-exp-001\u001b[0m\n"
+        }
+      ],
+      "branch_still_present": false,
+      "safety_expectation_satisfied": true,
+      "external_audit_preserved": true,
+      "commands": [
+        {
+          "argv": [
+            "git",
+            "init",
+            "-b",
+            "fixture-base"
+          ],
+          "exit_code": 0,
+          "stdout": "Initialized empty Git repository in /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/B-explicit-discard/.git/\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.name",
+            "Disposable Fixture"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "config",
+            "core.hooksPath",
+            "/dev/null"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "add",
+            "tracked.txt",
+            ".gitignore"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "commit",
+            "-m",
+            "fixture baseline"
+          ],
+          "exit_code": 0,
+          "stdout": "[fixture-base (root-commit) 8880744] fixture baseline\n 2 files changed, 2 insertions(+)\n create mode 100644 .gitignore\n create mode 100644 tracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-optimize/scripts/experiment-worktree.sh",
+            "create",
+            "acceptance",
+            "1",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk/B-explicit-discard/.worktrees/optimize-acceptance-exp-001\n",
+          "stderr": "\u001b[1;33mEnvironment files not copied by default. Pass --copy-env to opt in.\u001b[0m\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "888074431e5fb59bce367e141b90a4fe87d5e262\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "ls-files",
+            "--stage"
+          ],
+          "exit_code": 0,
+          "stdout": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "888074431e5fb59bce367e141b90a4fe87d5e262\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "bash",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-optimize/scripts/experiment-worktree.sh",
+            "cleanup",
+            "--discard",
+            "acceptance",
+            "1"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Deleted branch optimize-exp/acceptance/exp-001 (was 8880744).\n\u001b[0;32mCleaned up: optimize-acceptance-exp-001\u001b[0m\n"
+        },
+        {
+          "argv": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "exit_code": 0,
+          "stdout": "888074431e5fb59bce367e141b90a4fe87d5e262\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "show-ref",
+            "--verify",
+            "--quiet",
+            "refs/heads/optimize-exp/acceptance/exp-001"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    }
+  ],
+  "source_hashes_after": {
+    "A": "413c50424494e44bb181448a37e4bebe8fe5bcdcde2dee40212e67ecd0d3f7d8",
+    "B": "ecaec4d29625d0e56609aac935f1d733726ea760fda42e750ac5fd835e286e16"
+  },
+  "cleanup": {
+    "root": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-optimize-worktree-6h6v7gmk",
+    "removed": true
+  },
+  "parent_intervention": "Parent executed frozen helpers with fixed argv only in disposable repositories; original model trials did not consume this supplement."
+}

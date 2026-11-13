@@ -1,0 +1,157 @@
+{
+  "disposition": "usable-with-scoped-limitations",
+  "scope": "Read-only review of every original wave4/wave6 mechanism case in both arms, all seven preparation recipes, packet requests/criteria, and relevant frozen source. No model trials, execution, network, mutation, or delegation.",
+  "path_aliases": {
+    "R": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance",
+    "P": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030",
+    "S": "P/inputs"
+  },
+  "integrity": {
+    "receipt_packet_hashes": "All 14 paired mechanism receipt files match their packet SHA-256 pins.",
+    "primary_source_hashes": "All recorded primary helper source hashes match frozen files, including both analyzer copies per arm.",
+    "native_compatibility": "No hidden B-only interface imposed on A was found. Missing A publication helpers are capability differences, not model failures. Sweep status words, rather than exit zero alone, determine operation success.",
+    "claim_ceiling": "Parent-operated local mechanisms and mediated interpretation only; neither autonomous workflow success nor live external acceptance."
+  },
+  "groups": [
+    {
+      "group": "runtime",
+      "disposition": "usable-for-link-safety-and-repository-selection",
+      "cases_reviewed": "Five per arm: lawful, existing leaf link, dangling leaf link, dangling ancestor, polluted Git environment.",
+      "observed": "Both lawful controls succeed. A follows both leaf links, changing sentinel bytes or creating the missing target; A rejects the dangling ancestor and fails polluted-env operation. B rejects all three linked paths while preserving sentinels and other-repository exclude bytes, and updates the intended repository under polluted Git variables.",
+      "actual_packet_problem": "The directory named outside is inside the ws supplied as workspaceRoot. These cases prove non-target writes through links, not escape from the configured workspace boundary.",
+      "missing_facets": "No snapshot HEAD identity or command-identity probe; no existing-ancestor case; no full host setup or cross-platform evidence.",
+      "refs": [
+        "P/prepare-runtime.cjs:11",
+        "P/prepare-runtime.cjs:15",
+        "R/wave4/runtime-A-receipts.json#/cases",
+        "R/wave4/runtime-B-receipts.json#/cases",
+        "S/A/spec-runtime-setup/scripts/lib/workspace-git-exclude.cjs#addManagedExclude",
+        "S/B/spec-runtime-setup/scripts/lib/git-path.cjs:10",
+        "R/wave4/CEOPT-25-packet.json"
+      ]
+    },
+    {
+      "group": "worktree",
+      "disposition": "usable-with-measurement-gap",
+      "cases_reviewed": "Five per arm: lawful local, linked container, existing ancestor, dangling ancestor, remote-only.",
+      "observed": "Both lawful controls attach feature/login. A creates checkouts outside the repository through existing links; its dangling-ancestor operation fails after reporting a .gitignore update. B rejects all linked paths. Both remote-only cases attach a local branch; only B explicitly sets origin/remote-feature upstream. Caller HEAD/index and main branch are preserved in recorded checks.",
+      "actual_packet_problem": "The producer measures feature-login for create feature/new ancestor cases, so target_branch/target_upstream are null because the wrong target is queried. Existing outside_entries and operation logs still establish A's outside checkout.",
+      "missing_facets": "HEAD/index preservation does not prove unchanged caller working-tree bytes: successful operations intentionally report .gitignore updates. No complete ref/status delta, actual hosted remote, or worker filesystem isolation.",
+      "refs": [
+        "P/prepare-worktree.py:18",
+        "P/prepare-worktree.py:21",
+        "R/wave4/worktree-A-receipts.json#/cases",
+        "R/wave4/worktree-B-receipts.json#/cases",
+        "S/B/spec-worktree/scripts/worktree-manager.sh:45",
+        "S/B/spec-worktree/scripts/worktree-manager.sh:723"
+      ]
+    },
+    {
+      "group": "sweep",
+      "disposition": "usable-local-mechanism-evidence",
+      "cases_reviewed": "Five state cases per arm, A helper absence, and all five B publication phases.",
+      "observed": "Lawful leases succeed. A truncates the linked-lock sentinel, writes despite a directory lock, downgrades schema 2 to 1, and stores closed without evidence. B preserves the sentinel/future bytes and refuses these mutations through ERROR, CORRUPT, or REFUSED output despite exit zero. B's injected lost readback leaves publication pending although the local remote contains the candidate; resume confirms exact final state without another push. A publisher absence is correctly labeled.",
+      "missing_facets": "No lock-contention/flock-failure injection. Publication uses a disposable bare remote and injected readback failure. The wave4 media authorization branch is synthetic; real chunk evidence resides separately in wave6 and must be explicitly linked if used to satisfy CEOPT-28's partial-transcription facet.",
+      "refs": [
+        "R/wave4/sweep-A-receipts.json#/cases",
+        "R/wave4/sweep-B-receipts.json#/cases",
+        "R/wave4/sweep-B-receipts.json#/publication",
+        "P/prepare-sweep.py:28",
+        "S/B/spec-sweep/scripts/sweep-state.py:340",
+        "S/B/spec-sweep/scripts/sweep-state.py:818",
+        "S/B/spec-sweep/scripts/publish-final-state.py#remote_head"
+      ]
+    },
+    {
+      "group": "lfg",
+      "disposition": "usable-local-watch-state-evidence",
+      "cases_reviewed": "Both gap cases and every snapshot in both 11-snapshot continuous controls.",
+      "observed": "A counts the 1800-second observation gap as quiet and returns looks-ready. B records observation-gap and resets quiet to zero. Both continuous controls advance in 30-second steps and reach looks-ready at 300 seconds. Inputs and generation/hash handoff match native helper contracts.",
+      "missing_facets": "Synthetic July timestamps do not establish real monitoring duration or current remote state. Mixed feedback and interrupted reply handling are interpretation-only fixtures, not executed reply recovery.",
+      "refs": [
+        "R/wave6/lfg-A-receipts.json#/cases",
+        "R/wave6/lfg-B-receipts.json#/cases",
+        "P/prepare-watch.py:11",
+        "S/B/spec-lfg/scripts/pr-watch-state.cjs:385",
+        "R/wave6/pr-recovery-fixture.json"
+      ]
+    },
+    {
+      "group": "pr-feedback",
+      "disposition": "usable-stubbed-helper-and-synthetic-recovery-evidence",
+      "cases_reviewed": "A capability absence; B published, unpublished, wrong head repository, provider unavailable; every fixed/declined/needs-human item and present/absent/unavailable reply branch.",
+      "observed": "B verifies ancestry only for the published stub, rejects changed head identity before comparison, and degrades provider failure. Request endpoints correctly separate base PR repository from fork comparison repository. The fixture preserves local-fix/publication, explanation authority, and unresolved human decision distinctions.",
+      "missing_facets": "The unpublished stub combines behind with merge_base equal to the fix SHA, an internally inconsistent Git ancestry combination. It still exercises conservative status rejection but is not a realistic behind graph. No hosted PR read, reply, restart, or write-side idempotency was exercised. Exact-body reply matching alone is not a complete real-world identity check.",
+      "refs": [
+        "P/prepare-pr-feedback.cjs:4",
+        "R/wave6/pr-feedback-B-receipts.json#/cases",
+        "R/wave6/pr-recovery-fixture.json#/reply_recovery",
+        "S/B/spec-resolve-pr-feedback/scripts/inspect-fix-publication.cjs:28"
+      ]
+    },
+    {
+      "group": "media",
+      "disposition": "usable-mocked-chunk-and-quiet-output-evidence",
+      "cases_reviewed": "All 20 chunk cases across both arms and both analyzer entrypoints, plus all four quiet captures.",
+      "observed": "Both copies are identical within each arm. Complete controls cover both chunks. A reports ok after either second-chunk failure and fails successful silence; B reports partial with missing [420,840], retains [0,420], and treats successful silence as covered. Missing authority invokes no curl in A and no subprocess in B. A fabricates a no-failure finding then turns it into R3; B keeps findings empty and confirms no product requirement.",
+      "missing_facets": "prepare-media calls transcribe_media_chunks directly, so it does not exercise initial-request-to-fallback cumulative egress preservation in transcribe_with_fallback. provider_request_sent is a mocked invocation fact; actual egress is false. No decoding, real provider transcription, generated full evidence bundle, or actual product-impact review.",
+      "cleanup_note": "TemporaryDirectory cleanup is structurally present, but scratch_removed_after_capture is assigned true before context exit rather than measured.",
+      "refs": [
+        "P/prepare-media.py:23",
+        "P/prepare-media.py:26",
+        "R/wave6/media-A-receipts.json#/entrypoints",
+        "R/wave6/media-B-receipts.json#/entrypoints",
+        "S/B/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py#transcribe_with_fallback"
+      ]
+    },
+    {
+      "group": "pov",
+      "disposition": "usable-negative-admission-evidence-only",
+      "cases_reviewed": "All 16 attempts: missing/weak/forged/expired times start/direct worker times A/B.",
+      "observed": "A rejects all start attempts but every direct worker invokes the fake provider and exits 37. B rejects all attempts before provider invocation. Recorded result sentinels remain unchanged and no peer-job root is created.",
+      "missing_facets": "Expired input is also unverified, so rejection does not isolate freshness enforcement. Forged input is incomplete, so it is not a complete forged-positive receipt test. B deliberately disables authenticated admission unconditionally; no qualified-positive scope/expiry control exists. A result preservation follows fake-provider failure and does not establish preservation after successful untrusted output.",
+      "refs": [
+        "P/prepare-pov.py:7",
+        "R/wave6/pov-A-receipts.json#/cases",
+        "R/wave6/pov-B-receipts.json#/cases",
+        "S/A/spec-pov/scripts/cross-model-pov.sh:86",
+        "S/B/spec-pov/scripts/cross-model-pov.sh:11",
+        "S/B/spec-pov/scripts/cross-model-pov.sh:93"
+      ]
+    },
+    {
+      "group": "xcode",
+      "disposition": "usable-readiness-and-synthetic-interpretation-only",
+      "observed": "Recorded xcodebuild -version fails because the selected developer directory contains CommandLineTools. Build/install/test are unexecuted. The explicitly synthetic successful tap leaves the Entries screen unchanged; Settings visibility is unsupported. Bundle identity is synthetic build-settings input.",
+      "missing_facets": "No bound MCP invocation, real application, scheme, simulator, install, navigation observation, or actual build. No preparation recipe for these files was located among the supplied run-local Python/CJS producers.",
+      "refs": [
+        "R/wave6/xcode-readiness.json",
+        "R/wave6/xcode-tap-fixture.json",
+        "R/wave6/CEOPT-30-packet.json",
+        "S/A/spec-test-xcode/SKILL.md:23",
+        "S/B/spec-test-xcode/SKILL.md:23"
+      ]
+    },
+    {
+      "group": "work-closeout",
+      "disposition": "usable-negative-closeout-interpretation-only",
+      "observed": "The source retains positive finite numeric amount validation and existing routes. Baseline HTTP proof passes; unchanged proof fails the weakened control with 201 versus required 400. Removing the guard or proof contradicts settled intent. The fixture explicitly lacks an accepted final implementation, final-tree verification, and exact Figma target.",
+      "missing_facets": "No actual model simplification, completed implementation, post-simplify verification, design comparison, or authorized landing. Referenced proof covers the supplied HTTP behavior, not all possible routes or final workflow behavior.",
+      "refs": [
+        "R/wave6/work-closeout-fixture.json",
+        "R/wave2/simplify-proof.json",
+        "R/wave2/simplify-baseline.log",
+        "R/wave2/simplify-weakened-control.log",
+        "R/wave2/fixtures/simplify/src/server.js:12",
+        "R/wave2/fixtures/simplify/test/support/ledger-proof.cjs"
+      ]
+    }
+  ],
+  "overall_limitations": [
+    "Recorded cleanup receipts report removal for runtime, worktree, sweep, lfg, and pov; this review did not rerun producers or independently reconstruct removed scratch state.",
+    "Primary source hash agreement does not substitute for complete transitive dependency provenance or before/after input manifests.",
+    "Reasonable missing facets above are not automatic failures of the narrower mediated-interpretation packets.",
+    "Original receipts remain usable; broader frozen-scenario acceptance requires supplemental evidence or explicit partial status.",
+    "Future supplemental files discussed by the owner were not read or reviewed."
+  ]
+}

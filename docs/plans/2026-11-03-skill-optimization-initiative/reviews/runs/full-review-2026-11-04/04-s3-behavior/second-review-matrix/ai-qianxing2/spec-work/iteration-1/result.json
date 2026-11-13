@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-work",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "ai-qianxing2/gpt-6.1-sol",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "ai-qianxing2/gpt-6.1-sol"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "ai-qianxing2/gpt-6.1-sol"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T10:10:37.878784+08:00",
+  "end_time": "2026-11-05T10:12:01.25465+08:00",
+  "case_results": [
+    {
+      "case_id": "r2-reverse-mismatch",
+      "title": "An already implemented requirement does not authorize changing plan lifecycle",
+      "status": "PASS",
+      "duration_ms": 82989,
+      "turns": 2,
+      "input_tokens": 47119,
+      "output_tokens": 785,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 2,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-r2-reverse-mismatch.sh",
+            "passed": true,
+            "evidence": "PASS: fixture state and required outcome evidence verified; semantic quality is not scored."
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once to prepare this isolated fixture.\nOnly that preparation may create its baseline commit; it grants no task commit authority.\nThen use the installed spec-work skill for this request:\nContinue docs/plans/2026-09-01-001-feat-month-filter-plan.md. The month filter already exists; just close out the plan.\n",
+      "response": "已完成计划范围内的只读核验：月份过滤已实现，无需修改源码。\n\n- 实现位置：`src/server.js:16–21`，支持可选 `month=YYYY-MM`。\n- 验证通过：语法检查、无参数返回全量、合法月份过滤；额外检查了 UTC 月份边界、无匹配月份，以及过滤不改变原始数据。\n- 验证使用当前请求处理逻辑与本地 HTTP 服务，时间受控；不代表生产环境验证。\n\n**计划收尾状态**\n- `plan_status_completion_candidate`: `docs/plans/2026-09-01-001-feat-month-filter-plan.md`\n- 计划保留 `status: active`。按 `spec-work` 的授权边界，“收尾计划”只产生完成候选，不授权本次执行自行迁移生命周期状态。\n- 本次未修改文件、未创建任务提交、未推送。\n\n本次为既有实现的无改动核验，未进入实现变更的结构化 shipping closeout。没有新增运行时影响，无需额外部署监控。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 47904,
+  "judge_tokens": 0,
+  "overall_tokens": 47904
+}

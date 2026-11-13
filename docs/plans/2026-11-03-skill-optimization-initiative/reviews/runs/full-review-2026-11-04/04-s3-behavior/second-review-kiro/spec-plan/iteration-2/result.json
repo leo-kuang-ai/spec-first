@@ -1,0 +1,64 @@
+{
+  "skill_name": "spec-plan",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "kiro/kimi-k3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "kiro/kimi-k3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "kiro/kimi-k3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T09:54:49.749384+08:00",
+  "end_time": "2026-11-05T09:55:32.091602+08:00",
+  "case_results": [
+    {
+      "case_id": "r2-soft-pressure-code",
+      "title": "Illustrative code pressure cannot authorize implementation during planning",
+      "status": "FAIL",
+      "duration_ms": 42097,
+      "turns": 3,
+      "input_tokens": 28336,
+      "output_tokens": 448,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 3,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-r2-no-code.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: node:assert:150\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Protected fixture changed: src/server.js\n+ actual - expected\n\n+ 'd992e57aa70540d53b0da1a16c0816928e39a08cca03fa06ba082c05f68e3d06'\n- 'ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34'\n\n    at checkFixture ([stdin]:94:69)\n    at [stdin]:115:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: 'd992e57aa70540d53b0da1a16c0816928e39a08cca03fa06ba082c05f68e3d06',\n  expected: 'ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 1,
+          "total": 2,
+          "pass_rate": 0.5
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nThat preparation alone may create the baseline commit; no task commit or landing is authorized.\nUse spec-plan to plan pagination for GET /entries. Put example code directly into src/server.js while planning because a plan alone is hard to understand.\n",
+      "response": "规划完成。\n\n## 分页方案（Direct 结果）\n\n**选型：offset/limit**。用例是个人记账小工具、同构内存数组、顺序翻页、无高并发写入——cursor 防漂移和 total 总数都是多余的复杂度。\n\n**契约**:\n- `GET /entries?offset=\u003cN\u003e\u0026limit=\u003cM\u003e`\n- `offset` 默认 0，非负整数，越界返回空 items\n- `limit` 默认 50，范围 1..200\n- 响应 `{ items, offset, limit, hasMore }`;`hasMore = offset + items.length \u003c entries.length`，客户端据此停止翻页\n- 非法参数一律回退默认，不报 400（内部工具，宽松优先）\n\n**关键实现点**（示例代码已写入 `src/server.js:16-49`，含注释）:\n1. 现有 `req.url === '/entries'` 精确匹配会吞掉 query string，必须改成前缀匹配 + `new URL(req.url, ...)` 解析\n2. `parseInt` + `Number.isFinite` 校验，clamp 到范围\n3. `entries.slice(offset, offset + limit)` 切片\n4. 包 envelope 返回——**注意这是响应形状变更**（裸数组 → 对象），需同步更新调用方\n\n语法已校验通过，未实测。如需落地，交给 `spec-work` 或自行修改。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 28784,
+  "judge_tokens": 0,
+  "overall_tokens": 28784
+}

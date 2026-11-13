@@ -1,0 +1,64 @@
+{
+  "skill_name": "spec-test-browser",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "hst-2/gpt-6.1-sol",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "hst-2/gpt-6.1-sol"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "hst-2/gpt-6.1-sol"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T10:25:25.413549+08:00",
+  "end_time": "2026-11-05T10:26:34.577273+08:00",
+  "case_results": [
+    {
+      "case_id": "invalid-origin-rejected",
+      "title": "非法 origin token 应 fail-closed 拒绝",
+      "status": "PASS",
+      "duration_ms": 69140,
+      "turns": 1,
+      "input_tokens": 24659,
+      "output_tokens": 213,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[target-origin-invalid]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[target-origin-invalid])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（上游 governed caller 以 mode:pipeline 派发 spec-test-browser,输入如下。）\nmode:pipeline target-origin:http://evil.example.com:8080/admin current\n",
+      "response": "**结果：`not_run` / `target-origin-invalid`。** 未执行浏览器探测或导航。\n\n提供的 `target-origin:http://evil.example.com:8080/admin` 不符合要求：主机不是 loopback 地址，且包含非根路径 `/admin`。请提供一个明确的、无凭据的 HTTP(S) loopback 根 origin（例如 `http://127.0.0.1:4173`），再运行浏览器验证。调用方仍负责服务器生命周期。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 24872,
+  "judge_tokens": 0,
+  "overall_tokens": 24872
+}

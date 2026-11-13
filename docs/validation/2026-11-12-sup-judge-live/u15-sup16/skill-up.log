@@ -1,0 +1,21 @@
+📋 Loading configuration...
+level=INFO msg="Config: loading eval.yaml from skills/autoresearch/evals/eval.yaml"
+✅ Loaded 1 case(s) | engine: claude_code | model: zhipu/glm-5.3
+
+🔑 Loading credentials...
+✅ Credentials ready
+
+🚀 Running evaluation (1 cases)
+   ⏳ [1/1] dispatch-classic-mode: Metric/Verify 输入应分发 classic 模式并打印 banner...
+level=WARNING msg="stderr: Switched to a new branch 'main'\n"
+level=ERROR msg="command killed by context (context deadline exceeded (deadline elapsed by 80ms)); command: claude --settings '{\"disableAllHooks\":true}' --session-id 4dec3cf6-8421-4b66-8dfa-cbf9f82feafe -p --permission-mode=bypassPermissions --model 'glm-5.3' '（skill-up 评测框架说明：本仓库 .claude/skills/autoresearc..."
+level=ERROR msg="stderr: [claude-code:unrecognized_model] {\"model\":\"glm-5.3\",\"query_source\":\"sdk\"}\n"
+   ⚠️ [1/1] dispatch-classic-mode: ERROR
+
+📊 Generating reports...
+✅ Reports saved to /tmp/sup-live/u15-sup16/iteration-1
+
+────────────────────────────────────────
+📋 Results: 0 passed, 0 failed, 1 errors
+[ERROR] case dispatch-classic-mode: agent execution failed: claude-code run failed: context deadline exceeded (case timeout 300s via cases.defaults.timeout_seconds)
+Error: one or more cases errored

@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "skill_name": "spec-debug",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-debug",
+    "timestamp": "2026-11-05T02:28:46Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "Ask for prior attempts before starting a new investigation",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 122.678,
+        "tokens": 33129,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-debug/evals/fixtures/scripts/check-prior-attempt-ask.sh",
+          "passed": false,
+          "evidence": "script exited with code 1 [stderr: node:internal/assert/utils:77\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: The prior attempts were not requested\n    at priorAttemptQuestion ([stdin]:20:10)\n    at [stdin]:52:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0,
+        "stddev": 0,
+        "min": 0,
+        "max": 0
+      },
+      "time_seconds": {
+        "mean": 122.678,
+        "stddev": 0,
+        "min": 122.678,
+        "max": 122.678
+      },
+      "tokens": {
+        "mean": 33129,
+        "stddev": 0,
+        "min": 33129,
+        "max": 33129
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

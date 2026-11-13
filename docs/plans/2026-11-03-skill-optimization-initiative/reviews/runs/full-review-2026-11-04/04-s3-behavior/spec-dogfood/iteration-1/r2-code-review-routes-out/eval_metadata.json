@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "R2变体:代码审查请求应点名 spec-code-review",
+  "prompt": "（我已通过 /spec-dogfood 显式调起该 skill。）\n不用开浏览器,直接帮我静态审查当前分支的代码改动。\n",
+  "assertions": [
+    "expect.must_contain",
+    "output_contains{all:[spec-code-review]}"
+  ]
+}

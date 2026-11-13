@@ -1,0 +1,24 @@
+{
+  "prior_reviewed_paths": 389,
+  "unchanged_paths": 386,
+  "intentional_successors": [
+    {
+      "path": "CHANGELOG.md",
+      "previous_sha256": "8c5c469fae665d3a97532fa86ca83e7918ea262d3e3539f9da81b0a0867f5310",
+      "successor_sha256": "39067adc0070c2e7f3a48c2b4dd89a2d9df74d903ac5e08260b2243ea50edf39"
+    },
+    {
+      "path": "skills/spec-test-browser/scripts/agent-browser-run-context.cjs",
+      "previous_sha256": "fc79fae147bc83091fbb65776d92c8f55ac6d3c9375a55b27dfa7a72767e0ca1",
+      "successor_sha256": "d9e847a3b4637149f2744e66e2b1447a43c8dc47fb18e258930f139cdeb64291"
+    },
+    {
+      "path": "tests/unit/spec-test-browser-contracts.test.js",
+      "previous_sha256": "5e2cb41c67a9e9d06c9a118f33f8c98e81c40a9a003294d82b58facab006736b",
+      "successor_sha256": "b3cb0ce11ee70aebc8e0c8cf29a793a5b74b16e04e6b4e036f9513d41303d768"
+    }
+  ],
+  "excluded_historical_unchanged": 406,
+  "head_index_plan_baseline_unchanged": true,
+  "limitation": "Identity detection, not filesystem enforcement."
+}

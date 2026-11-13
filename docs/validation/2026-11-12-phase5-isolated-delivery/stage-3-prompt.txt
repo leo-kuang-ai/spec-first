@@ -1,0 +1,7 @@
+/spec-work docs/plans/2026-11-12-001-feat-entry-by-id-plan.md
+
+环境说明（评测隔离设置，不属于被测行为）：非交互 headless 会话，没有用户可回答问题，也没有 worker 派发（无 Task 工具）。需要用户决策的点记录为显式假设，按 headless 规则处理，不要在最终回复反问或等待。
+
+任务：按计划实施 U1-U3，运行计划 Verification Contract 中的测试/冒烟命令，并完成本仓要求的验证收口证据。
+
+边界：不 commit、不 push、不创建 PR；不进入最终独立 code review（该步骤由后续单独会话执行，请在收尾时说明已按此跳过），不做生命周期状态迁移以外的额外写入；只在本仓库内工作。

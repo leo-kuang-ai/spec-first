@@ -1,0 +1,130 @@
+{
+  "metadata": {
+    "skill_name": "spec-optimize",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-optimize",
+    "timestamp": "2026-11-04T12:11:48Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "无度量目标的模糊优化请求应被指标 gate 拦下",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 392.526,
+        "tokens": 87317,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-optimize/evals/fixtures/scripts/check-no-metric-gate.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "空输入应询问优化目标",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 40.387,
+        "tokens": 28989,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-optimize/evals/fixtures/scripts/asks-a-question.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "无反馈循环的调试请求应指出不适配并指向 spec-debug",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 239.336,
+        "tokens": 39973,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[spec-debug]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[spec-debug])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "R2变体:\"优化到最快\"无度量命令仍应 gate",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 162.759,
+        "tokens": 44910,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-optimize/evals/fixtures/scripts/check-r2-asks.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 208.752,
+        "stddev": 127.6424629639369,
+        "min": 40.387,
+        "max": 392.526
+      },
+      "tokens": {
+        "mean": 50297.25,
+        "stddev": 22136.59870412571,
+        "min": 28989,
+        "max": 87317
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

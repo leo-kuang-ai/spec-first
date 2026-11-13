@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "Repair authority permits a verified fix but no task commit",
+  "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nOnly preparation may create a baseline commit; it grants no task commit or landing authority.\nUse spec-debug. Invalid JSON in POST /entries crashes the server. Diagnose and repair it now without another fix-choice question. Do not commit the repair.\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-debug/evals/fixtures/scripts/check-fixed-no-commit.sh"
+  ]
+}

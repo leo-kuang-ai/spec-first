@@ -1,0 +1,1940 @@
+{
+  "files": [
+    {
+      "path": "CHANGELOG.md",
+      "baseline_sha256": "6394c13f6868babd699977f010f3b16aa963cd601c61a5620882bf9cbc0da942",
+      "candidate_sha256": "60662cd533d49ecc69866d9fb77edb46229a94122d140752138da99520356348"
+    },
+    {
+      "path": "docs/catalog/runtime-capabilities.md",
+      "baseline_sha256": "29aa7e5405a5cdbfa7cc0e84180f3b772786c3de604cf26f840e6bcc32c74f32",
+      "candidate_sha256": "dd0a95740a3f16410031cd0a7dc3c6176a0df48fd6fcaa609842676e57bef194"
+    },
+    {
+      "path": "scripts/evals/build-outcome-judges.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "7c3bb6ce4504c8d0761ef61297108f8463b26e5310c9dbdc71ca1ffbcff97184"
+    },
+    {
+      "path": "scripts/evals/ce-u28-outcomes.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "c739f812bb40755c97286a43c5c7b68ee24cf9d3c85f871722e8d46337121eba"
+    },
+    {
+      "path": "scripts/evals/conversation-checks.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "aa3b5f8754f0e1592908df316d9821d013fce6cbc7e7a198bae12170e6717b7b"
+    },
+    {
+      "path": "scripts/evals/fixture-state.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "71246033f2f4abd6dbe4486f647f68b49d7f6797dd672885c9563e151fdb52c2"
+    },
+    {
+      "path": "scripts/evals/ledger-http-probe.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "7ef2cf769d9e57b9d4d49e40f08ff2f9499cb36dcc3e79bc71c334332a0d542d"
+    },
+    {
+      "path": "scripts/run-test-suite.cjs",
+      "baseline_sha256": "10399c306d3fe5f4d997e2c91aac177e906bf5afe304d365adc91d4a3e792036",
+      "candidate_sha256": "5cb2b05a80cce600d446fa50452839cec75dda6428b85bffca08341941cd7d02"
+    },
+    {
+      "path": "skills/_shared/references/concepts-vocabulary.md",
+      "baseline_sha256": "5bdbdfa6166cfd8ad2ffb76262f4ee805dc2ebaec7195d1a57cfc5530f3b2312",
+      "candidate_sha256": "76fc46b7966d11d70042a293626173c4f5394e7abd0555b4bb79d2f8d0d6a993"
+    },
+    {
+      "path": "skills/autoresearch/autoresearch.md",
+      "baseline_sha256": "970be21cf52c450ec55f22f80a029ef83bb8eb12e84e1baf6feab65885687c00",
+      "candidate_sha256": "b710d1c865e91e5655fa80a1cf0a3fd7c062fd9c5f42f65a4e959f739ca12862"
+    },
+    {
+      "path": "skills/autoresearch/fix.md",
+      "baseline_sha256": "e83f8a34be9cc61089d3fa0cad93398e028b2bee2fbabe56b3b92a0523df7833",
+      "candidate_sha256": "cab7e6c84bbd9d8ada788bc8962eacbdfb242fbf6b5807d28ae635d73c38773f"
+    },
+    {
+      "path": "skills/autoresearch/learn.md",
+      "baseline_sha256": "6d336d9b1294cf0af825ed1b23db9fca05e06c097b776079ea034d88292a8e8d",
+      "candidate_sha256": "2ed48e203f29ea6216a2fea53bbc1fe85aab85516d1cd0a60cc84272c71a3ec1"
+    },
+    {
+      "path": "skills/autoresearch/reason.md",
+      "baseline_sha256": "73025217ff63d2cc6f1906f28ab2221fccdff190780ee6e45751800e522e76a9",
+      "candidate_sha256": "48acbd2622564468d8c7712770df96af0d122e9eb4d15170c2e05b8c97df4a74"
+    },
+    {
+      "path": "skills/autoresearch/references/orchestrator-routing.md",
+      "baseline_sha256": "829530b3ee2b47d9b42e1794f43c4b2e4649d5a04d1b4e685afcce7cba3cfc91",
+      "candidate_sha256": "d3dc4cec445510017f373422b3434a0267028ffb7c6eb8c2ac733c6e344fe346"
+    },
+    {
+      "path": "skills/autoresearch/references/reason-judge-protocol.md",
+      "baseline_sha256": "5a56791e32c7604a10753ca8fe14aa92768d65b8e0e264fbe3bb2da616c25253",
+      "candidate_sha256": "88b334ec4ba4d769a4c96109341161ac5be1fc64f91f9ed50adda7a02f5817f7"
+    },
+    {
+      "path": "skills/autoresearch/regression.md",
+      "baseline_sha256": "ee35475150cbc6a3d41a9f094cc589c414af38ad67c070f8f801cd896ed85b68",
+      "candidate_sha256": "31ec3ab748937268ab2586a92efe80e44de3ce6f543736526589007e0fa81302"
+    },
+    {
+      "path": "skills/autoresearch/scripts/score-regression.sh",
+      "baseline_sha256": "290d1627c5f6f42e212966a056f3a0cbe25bc6c4c708e520e92496f8b6ee0955",
+      "candidate_sha256": "ffa6c913240b72de361752f25f8d28eebffd3fde36a26e99d3ec0d2f81d6d202"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/agents/slack-researcher.md",
+      "baseline_sha256": "74b5168f5c71001da2552d3e1f546d68dcb69918e8d3d72da774be9f34654cea",
+      "candidate_sha256": "de0ff6c912803e7fd66234c997275e341c1a3085c0896d36a99b752e1651e1a0"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/brainstorm-sections.md",
+      "baseline_sha256": "0f886fea1f9d4bc24dc6f3e56a1accb9aabe99e707b86698431103a2a42e1cc0",
+      "candidate_sha256": "ad3e9f420710f0d4355315d5ac1f81324136864e19055cbb70218cb9b7525669"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/handoff.md",
+      "baseline_sha256": "02bf09e9fd0582f6766192cdd93247e4fa1f0ef248589cba42cdb8bf084da48a",
+      "candidate_sha256": "ab4ef1ce1a28edec955fcf9403188ed3e2d233f0673c956b672f4551f758b8a6"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/interaction-rules.md",
+      "baseline_sha256": "7f1ea0d8a64b1ab928953b54699b73d4a28ff2d1566fa6b563fcb76171cf3767",
+      "candidate_sha256": "c36a97db63801c19c8d377d2a3ca8efc31b91b33b52a7a49ee2fde1aec92b0c1"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/plan-write.md",
+      "baseline_sha256": "0255bbcf720d61435c3a5ae6532bd34fe0c2c3b7bb6c1c3292126010eb0a1495",
+      "candidate_sha256": "9aace9e2cb8b7578a35afb8baf1f3bfd009ff30e8bc308196cc63e49b578eca8"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/synthesis-summary.md",
+      "baseline_sha256": "e149fbfac58dde122c3026c7b4c5ae727c6516a41498f70250cfd64b7ed55ff5",
+      "candidate_sha256": "a865c91b2d1b9f9b7f579bc498cb548f0549264302cf9e5376553bd2bf860f37"
+    },
+    {
+      "path": "skills/spec-code-review/evals/fixtures/repos/tenant-orders/prepare-review-fixture.sh",
+      "baseline_sha256": "c76730781ddc60de65e29b376ccfd5e9ba365ae6091c1eda4a20b5198355067f",
+      "candidate_sha256": "b72affb26e3580b85b58bea181f9b021c5c84231e94d967c95ace1bec1c582a2"
+    },
+    {
+      "path": "skills/spec-code-review/evals/fixtures/scripts/check-r2-preset-applied-fix.sh",
+      "baseline_sha256": "c724fe51a44304b4633c48a8d5279a3899085a78f353ca533fc109e84bc9c794",
+      "candidate_sha256": "faed806d3c2303c370657a9a3e7ba8a24747ab6d810dbbfd1b819c6689db3838"
+    },
+    {
+      "path": "skills/spec-code-review/references/findings-schema.json",
+      "baseline_sha256": "c0d7cfdc86b26f96a26d2d29cb9603ad3924e7d074a5c181f60d7708df754d66",
+      "candidate_sha256": "6fac4197af87a394b02cf0804a823e62cc1ca8518faece736f80825b8237197f"
+    },
+    {
+      "path": "skills/spec-code-review/references/finish-review.md",
+      "baseline_sha256": "10b8731df5ec6d810ca93aa56403a6e3402c20964c020bbaacc0a26704e2541f",
+      "candidate_sha256": "1719778e5d2fb891a888a6506b39a9a34155b7cad9491b07c65199a86e7e42a3"
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/data-migration-reviewer.md",
+      "baseline_sha256": "be7dc853a91d5c404638ab2eea1018513b81d9579857bcb7c7aac616f929152e",
+      "candidate_sha256": "3a2db2d27830f44ee8a2f73c7774091de9ecd93002ec81b3d237489116438478"
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/reliability-reviewer.md",
+      "baseline_sha256": "d630e310b95a50d84f97b17b012e8236bb228ecbed5052703483faeae5d11b7f",
+      "candidate_sha256": "a600f78aadc2eda00fabaa9d55c7e27d17e5628d23b9ed24125da053f2e6f2ba"
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/testing-reviewer.md",
+      "baseline_sha256": "84f5d0e9c62a97d6737ace95b9e277ef629eda3364d0a352322acc150387e16d",
+      "candidate_sha256": "3b3b031beafba76fc3e38d034fa4f994f832e3d1686f623a8bcf5ae45b90b615"
+    },
+    {
+      "path": "skills/spec-code-review/scripts/findings-mechanics.py",
+      "baseline_sha256": "1e712ec4ead2c5a509d9c4228a1a6e9d85e8cbb8d9727d0782c7d7f91480cfee",
+      "candidate_sha256": "7af2e722a9ff8bbc908a55a876c057de42d762ae9f9d2c57e8aac535efd76cfb"
+    },
+    {
+      "path": "skills/spec-commit-push-pr/evals/cases/description-only-non-mutating.yaml",
+      "baseline_sha256": "9a25f0573243e5bf1174669a97a5c26d044372d08c6b09165289a84ee797e2a0",
+      "candidate_sha256": "63c062a641dd54714417cb4d8c2fbee4608472503dd93d4471c51bd9dbf4d795"
+    },
+    {
+      "path": "skills/spec-commit-push-pr/evals/cases/no-landing-auth-stops-before-push.yaml",
+      "baseline_sha256": "95a32dcd8937d3015d639658cd84a30607abbbc42bb408d0d8286a12dc930a15",
+      "candidate_sha256": "27200bfc2c1ff125f3ddf2b11f3c6abbc740c247a23fd8c96d12a21364266ee2"
+    },
+    {
+      "path": "skills/spec-commit-push-pr/evals/fixtures/repos/mini-ledger/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "bf52ca02b9faceb85e52bde94688f6a472801ca49ac669325aff7a2960e79b20"
+    },
+    {
+      "path": "skills/spec-commit-push-pr/evals/fixtures/scripts/check-desc-only.sh",
+      "baseline_sha256": "4f51b11f901ded43a5cc85211f7326aaa8e557ae08fd7040a1468b3b6d4b7637",
+      "candidate_sha256": "74dac4efead513c181956f856074721fb0b9c106fe6fa91b61970576f5fe2292"
+    },
+    {
+      "path": "skills/spec-commit-push-pr/evals/fixtures/scripts/check-landing-gate.sh",
+      "baseline_sha256": "2b7ec96301bbe9eb146f46981ed95dda00fd74b3b06faea7cc2d1fda376b0877",
+      "candidate_sha256": "74dac4efead513c181956f856074721fb0b9c106fe6fa91b61970576f5fe2292"
+    },
+    {
+      "path": "skills/spec-commit-push-pr/references/apply-and-handoff.md",
+      "baseline_sha256": "ee8ad9e479ef5139393c334dc8338ca3375b9e5d05c35ac27df183c28c6cccfe",
+      "candidate_sha256": "8c3d34f4f7ce05f2345448dff76195225e63dc09b365549c719f89c00f945948"
+    },
+    {
+      "path": "skills/spec-commit-push-pr/references/branch-creation.md",
+      "baseline_sha256": "fb05d421dac55c1a5996709ffb8a259c8d5fb4394176e4e05ca7a2da989ce0ec",
+      "candidate_sha256": "974ec16ad783e16f72222854a5209c8e662a4adab6a7ae0caf1deae86c241cf6"
+    },
+    {
+      "path": "skills/spec-commit-push-pr/references/commit-and-push.md",
+      "baseline_sha256": "ff14e1de84832c49318ab836535fe922d6192bb17f15f90a0b89b6376a6db5ba",
+      "candidate_sha256": "0c1fde8b6cd881df3da2dcc1fcee2748a6f8549cd67ca17af89424a9926738fd"
+    },
+    {
+      "path": "skills/spec-commit-push-pr/references/compose.md",
+      "baseline_sha256": "91c55993c46b866cd396813610a9f3bba078187c15d3fc86bfb7943ee1bdddf0",
+      "candidate_sha256": "e260fb44e51cf771858f678e4214d758178724c5373d19d921af9363d62ae510"
+    },
+    {
+      "path": "skills/spec-commit-push-pr/references/context.md",
+      "baseline_sha256": "ad4437ac93408f3a327dc884ed157d8c5a167d2e12c8f601dadd4131fe9bd30e",
+      "candidate_sha256": "c68052ccce0a705bda3e1b3ed6867c77db8d4c16fb2bfe0010660601f40e657a"
+    },
+    {
+      "path": "skills/spec-commit-push-pr/references/pr-description-writing.md",
+      "baseline_sha256": "35006c457198ba97eff7dbe1360512e1c4285a5f139065c2cd9ed129ea60aa6c",
+      "candidate_sha256": "a4a8b161532e8c4127739ac5ccedb1e910fd408117b4c0910b55a5fc86fcb12d"
+    },
+    {
+      "path": "skills/spec-commit/SKILL.md",
+      "baseline_sha256": "9ac59b9977f687e764026bd1e8ef5a57e5efc7a4f58133816c3e00986f4eaa3d",
+      "candidate_sha256": "f3ed607d09ee5a4d38fe702a2c047b4394981b84fa674c534d4b79a9717596f5"
+    },
+    {
+      "path": "skills/spec-commit/evals/cases/fresh-tree-logical-grouping.yaml",
+      "baseline_sha256": "2275e457e47e43738959af905c447afde91485f740442f965618e8139c0d2c24",
+      "candidate_sha256": "98bfbe974052d7a0629644e55da8f44fbeb0c8d2e7efb27cfb48833998fc5ff8"
+    },
+    {
+      "path": "skills/spec-commit/evals/cases/no-auth-stops-before-staging.yaml",
+      "baseline_sha256": "f2aecd81da8dba2bb7d61c0a091f43dad392917e74b1dbf5c1666c3ae47cca10",
+      "candidate_sha256": "a10986e8cd19e1e6b0fbe8cc37e3e0570b9a0ec004efaffe1ea8f625e686d9b5"
+    },
+    {
+      "path": "skills/spec-commit/evals/fixtures/repos/mini-ledger/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "bf52ca02b9faceb85e52bde94688f6a472801ca49ac669325aff7a2960e79b20"
+    },
+    {
+      "path": "skills/spec-commit/evals/fixtures/scripts/check-auth-gate.sh",
+      "baseline_sha256": "5f12a790d6c4b30339cfcb1513ea0e63766d8b98713d38ea4b440329b427b6dd",
+      "candidate_sha256": "743e61c7a9f2063bd705305307f40d3535b76d7254fb77744ef6eb0813a828e3"
+    },
+    {
+      "path": "skills/spec-commit/evals/fixtures/scripts/check-logical-grouping.sh",
+      "baseline_sha256": "a76c851f4491ce885eb72985fd735252ad1c2c762273ae5ba9971903afa49763",
+      "candidate_sha256": "3ab68da4e68c02ba7947245cdfb38cc9a7b6d67438943c29fe58e85832655a44"
+    },
+    {
+      "path": "skills/spec-compound-refresh/references/concepts-vocabulary.md",
+      "baseline_sha256": "5bdbdfa6166cfd8ad2ffb76262f4ee805dc2ebaec7195d1a57cfc5530f3b2312",
+      "candidate_sha256": "76fc46b7966d11d70042a293626173c4f5394e7abd0555b4bb79d2f8d0d6a993"
+    },
+    {
+      "path": "skills/spec-compound-refresh/references/vocabulary-refresh.md",
+      "baseline_sha256": "0a3b03caf0b84190ec0fe8e742641e5bc63503580f4366dfad9159a3d29a5d9a",
+      "candidate_sha256": "e972a30527b4392518e37b1631858f887794b47ca1906351492cde2764747f43"
+    },
+    {
+      "path": "skills/spec-compound/SKILL.md",
+      "baseline_sha256": "ed6fd3d4f45a86c61adbfb283aad720f6adcb7aa3d20160dac5f23e54c3947cd",
+      "candidate_sha256": "02da78aefef12b96966fc4dd7e9fedd48d29ab5bbc9f03d57f1f6f6127852cca"
+    },
+    {
+      "path": "skills/spec-compound/evals/cases/positive-publish-produces-solution.yaml",
+      "baseline_sha256": "943b95d6b03ef28e61ec63e57023819cecf0c857232fa52e3ec1c5425bb08e77",
+      "candidate_sha256": "e9a0744359b2cf6f517c52616118856122e18dd7c221fe1950436f3413dfddf4"
+    },
+    {
+      "path": "skills/spec-compound/evals/fixtures/repos/solved-ledger/package.json",
+      "baseline_sha256": "8e6041492fba50e5e04a67ed0270c887f1c8d634a746796b142dc8ca3bc587b7",
+      "candidate_sha256": "7a420c375b02d08b14e41cd027881b96bbd734a826904c72f804acb82e4f6060"
+    },
+    {
+      "path": "skills/spec-compound/evals/fixtures/repos/solved-ledger/src/server.js",
+      "baseline_sha256": "fc62a70d3114b0312885c94ff9becda4fcac30c564bff517d5f079b2383b0231",
+      "candidate_sha256": "db18861a7168c6cad9ab0ba5e0e53d3e3fe3d19e225d18e90270268103aff3b8"
+    },
+    {
+      "path": "skills/spec-compound/references/agents/best-practices-researcher.md",
+      "baseline_sha256": "be205f2e10c5e153bd5db293e3e41885414d0e75c62a8026b5857bee983c9852",
+      "candidate_sha256": "19c48a8741546888efae2bfd5798115eb5cdc1d2c4c098c9cd696017effef22c"
+    },
+    {
+      "path": "skills/spec-compound/references/agents/performance-oracle.md",
+      "baseline_sha256": "79abcaee9a66355d996937cc6562a507b4b8d2de52060be3153ecb2088941491",
+      "candidate_sha256": "4566cd4eb9fbe7c5dc33d2f0424e25e0748b5b4552ffc617b7d3182e23ae7eb3"
+    },
+    {
+      "path": "skills/spec-compound/references/agents/security-sentinel.md",
+      "baseline_sha256": "f84717fe79958d66eab7528d5eecf91704b05121dd565e31b7536eadf2d9e5ed",
+      "candidate_sha256": "398b2466bab3d96b1d2fc9beb484076380873c4c77f0ba0c57a96eddd5810fd3"
+    },
+    {
+      "path": "skills/spec-compound/references/assembly.md",
+      "baseline_sha256": "535f5e2d39649afe6eab54d46432716f282fa1daa93917ff14083fb83d0c5e1f",
+      "candidate_sha256": "e354d7c17e2e4bacf8e4eb24c57a77fe6301d0610e3ffe35aa0941e6124bc5e9"
+    },
+    {
+      "path": "skills/spec-compound/references/concepts-vocabulary.md",
+      "baseline_sha256": "5bdbdfa6166cfd8ad2ffb76262f4ee805dc2ebaec7195d1a57cfc5530f3b2312",
+      "candidate_sha256": "76fc46b7966d11d70042a293626173c4f5394e7abd0555b4bb79d2f8d0d6a993"
+    },
+    {
+      "path": "skills/spec-compound/references/refresh-and-discoverability.md",
+      "baseline_sha256": "bdb3c437f2d129392d153492444e7820b012664bc1533b464c18288bf08e838a",
+      "candidate_sha256": "c87d6f61310f11e0bcf67c4671ea3cd278189a3c7d88628912a2c6424d661650"
+    },
+    {
+      "path": "skills/spec-compound/references/report.md",
+      "baseline_sha256": "301814213358044fa553fdfbe6145472b676ba57e55317a0b707e7389a50e487",
+      "candidate_sha256": "fa2bcb90e21c8d0845570f070908bfea8f089c0b5b8f8a6d5ce0a42bdb83e4ed"
+    },
+    {
+      "path": "skills/spec-compound/references/research.md",
+      "baseline_sha256": "5b834280c98a64323f35bfebf4e824b48c7fbc56729ad99fae3d11bc8d44b503",
+      "candidate_sha256": "fabab6ca5623bf4b6b7bdaec4c7f88658fc346bc0bc468620aee0f97d62faf2e"
+    },
+    {
+      "path": "skills/spec-compound/scripts/session-history/extract-errors.py",
+      "baseline_sha256": "be8fc525516eca1c2438b1ba95da82a4dee1080f2fcc0a55dbec6988722de1b2",
+      "candidate_sha256": "4f4548383a25678a867554696af90de8c59f8cafecd1dfdb6aedec4dadf7b184"
+    },
+    {
+      "path": "skills/spec-compound/scripts/session-history/extract-skeleton.py",
+      "baseline_sha256": "04db8e446b88c83978ec31e82b0f737c2d70b1ae88b1c6b5f23fe7c5906dcceb",
+      "candidate_sha256": "2a718e2a547ac60649b4f7edcb52fa3bbad627dc818e233cf02cdd2be9c16f32"
+    },
+    {
+      "path": "skills/spec-debug/SKILL.md",
+      "baseline_sha256": "6c40fadd87dce2ad56bcf5556366a796ed1583a00c5bf53110b98164a3e2daf7",
+      "candidate_sha256": "2a34444a5f6c4909b707d5d889718d0e82621d055b2be83914efb9be014f13a5"
+    },
+    {
+      "path": "skills/spec-debug/evals/cases/diagnosis-only-no-fix.yaml",
+      "baseline_sha256": "25fa2d0b3240aef7b0291448a0cfb44cd27eb8100af08e600b26ca71aaec0889",
+      "candidate_sha256": "2e1f459c36931185d63aba4c264eb15ddb03cebed38a6960039eb509e0d69d6f"
+    },
+    {
+      "path": "skills/spec-debug/evals/cases/fix-authorized-fixes-no-commit.yaml",
+      "baseline_sha256": "feffce6ca440ceccebc35f854fbda8fa27a3d78ff468968db50ad6a9f41aea0f",
+      "candidate_sha256": "4f377e7019d7f18fa95fa8217016456cffff7c04951c40dc99c8613c751b8b9b"
+    },
+    {
+      "path": "skills/spec-debug/evals/cases/prior-attempt-asks-first.yaml",
+      "baseline_sha256": "8f1b47247ec8eec96112cf97b961422423cfff21abd14e109535b922cafdb96f",
+      "candidate_sha256": "4435168b9517059690096e22b2a9dd4e72996c90f216c25e2e9e4e11119cd15a"
+    },
+    {
+      "path": "skills/spec-debug/evals/cases/r2-three-attempts-asked-first.yaml",
+      "baseline_sha256": "6146da9581b9cbe5f09559a07bc8b0bd16777f8c705fb229fbe9c2b1829a76c0",
+      "candidate_sha256": "31a1ba5e92502abbc16c0a96f6513d5b3fbe00a471c59e763c1d4e15cb35266f"
+    },
+    {
+      "path": "skills/spec-debug/evals/fixtures/repos/mini-ledger/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "23fad84546d3d7b2c32bd6737b13f4dbecde12c9ccf179ac0f51c94bc872aecb"
+    },
+    {
+      "path": "skills/spec-debug/evals/fixtures/scripts/check-diagnosis-no-fix.sh",
+      "baseline_sha256": "aedee0d3e754ac54f6e869dcac9193b0da35ed32a9b134a92bc403b322ef1bc0",
+      "candidate_sha256": "eea19c74d435635c166357741e729661225a46d718f49fe6a4147368b1659620"
+    },
+    {
+      "path": "skills/spec-debug/evals/fixtures/scripts/check-fixed-no-commit.sh",
+      "baseline_sha256": "2d5a51633543a78968da3e18fb3223123da57bc9efbce68e284c0be91cb998fe",
+      "candidate_sha256": "ae79e59b6ab2c98dfbff1836023c77d00ced6689c19b31aef76d22701da7219e"
+    },
+    {
+      "path": "skills/spec-debug/evals/fixtures/scripts/check-prior-attempt-ask.sh",
+      "baseline_sha256": "d01dba4adac04fce11835ab3925591da1bfdbf1050105e82b07d6ee5f9cebb30",
+      "candidate_sha256": "8e36ff3f11b0841658265a7d65b21698a23fe18a3ced0d60d5d13f8003ef0ea9"
+    },
+    {
+      "path": "skills/spec-debug/evals/fixtures/scripts/check-r2-prior-ask.sh",
+      "baseline_sha256": "8bd58ad26cef95633ca6d22fb328438abdd794e08409d4c54792dec081734c62",
+      "candidate_sha256": "8e36ff3f11b0841658265a7d65b21698a23fe18a3ced0d60d5d13f8003ef0ea9"
+    },
+    {
+      "path": "skills/spec-debug/references/fix.md",
+      "baseline_sha256": "ebe14867a2b539958187003ab1e6a9e1fd07c481478c8af23b87ffa116521c56",
+      "candidate_sha256": "700433136b9cae5be7aa8f2a0d1db5c800b2f96ac8b1679d69cc2a2a8b36a854"
+    },
+    {
+      "path": "skills/spec-debug/references/investigate.md",
+      "baseline_sha256": "0517124f2ea5c127901c00caee3052120527c5e2de252ff96455306595fb7a0e",
+      "candidate_sha256": "5898e2cf9330380e93bcff97dd68c603c514a1ac4c801b7a49d09a650255a1b6"
+    },
+    {
+      "path": "skills/spec-debug/references/investigation-techniques.md",
+      "baseline_sha256": "c361d84e7cdecadf96bde07ecb0f0d4788c8abc4f8760a4a0ecb0d6d1beed983",
+      "candidate_sha256": "213cf748481ba8402a709a210f0ca490068ef7d29b9244f750c4758cc79850f9"
+    },
+    {
+      "path": "skills/spec-debug/references/pipeline-return.md",
+      "baseline_sha256": "8030c630108460fadba4252acfe03bb923877d0b66220e9fe82fc5e80a8d98c1",
+      "candidate_sha256": "11055d5ad97683bfe955ad7456c6ed4ae4467c2b7981d811674389849d9faeef"
+    },
+    {
+      "path": "skills/spec-doc-review/evals/cases/default-report-only-no-write.yaml",
+      "baseline_sha256": "525c400306f49291ddf70b1bc0fee37e2e047f689708306a3484572c1d2d5428",
+      "candidate_sha256": "b2857f3431c2ab64622b12f4e1d7eddc5bc9a6851c4bcbb90ed370d06c6bd9e0"
+    },
+    {
+      "path": "skills/spec-doc-review/evals/cases/headless-no-path-fails.yaml",
+      "baseline_sha256": "01b74ab5362e42e7d2d50dca4aacb6fa35b931901069baf1194b5389eb56b682",
+      "candidate_sha256": "03becde3472024d7c74884eb889e222445f4c32e809aeb2995bb01e56ea62977"
+    },
+    {
+      "path": "skills/spec-doc-review/evals/cases/html-forces-report-only.yaml",
+      "baseline_sha256": "c3ba97fbed8ae225bda332b266e9c07b4c2fe2863757fa11253e4f52f850cb47",
+      "candidate_sha256": "e92cc878c6f078875eda73376a1b64f868582afa7363ada0e58dfde69588ccf9"
+    },
+    {
+      "path": "skills/spec-doc-review/evals/cases/task-pack-forces-report-only.yaml",
+      "baseline_sha256": "ac6540058ad2b6df79fc11b009e3eded3e28f9b71f453269a43be02d83634db3",
+      "candidate_sha256": "bf8f6ed32885a2331d03cc58048a73fbad1eb02bf891fc69b372eaa3372583d3"
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/repos/html-repo/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "296a2ade04ad81173d3391f8375d112e12f06d213dea24d86650d704946fec55"
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/repos/plan-repo/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "8083f872c92dc847f72be2937a59b31c992d57618767f297c8d26d74f23d1c27"
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/repos/taskpack-repo/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "9e03026327522dcb8af17196c86b044e0cab1fae20f36db5dbc3e05a047c8a7d"
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/scripts/check-headless-no-path.sh",
+      "baseline_sha256": "9f4fe36b1998b6adad161a9d2e3000d087c01d010c4d7e332668ff572413c20a",
+      "candidate_sha256": "2a89a8b6e52a6aebe290019734d3c94e1783c1b6fbfb7aa08272463f6a40f1fb"
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/scripts/check-html-marker.sh",
+      "baseline_sha256": "75656e6c4a21cbf0b04805bfb5841b0386785ef56da542b2f0ba7327829f0723",
+      "candidate_sha256": "d254e5924181b3b357117e46b82d77737a60de4794dda9bb9d3bbe00e0801ead"
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/scripts/check-plan-marker.sh",
+      "baseline_sha256": "95d43fde6946f5095671e8eeb0c6849d403f118bdb60c615da65f29f7db1ce65",
+      "candidate_sha256": "c3c491bee0f9df124210e5a5975abaef14a4878781a7d8517d1041d807e8c80f"
+    },
+    {
+      "path": "skills/spec-doc-review/evals/fixtures/scripts/check-taskpack-marker.sh",
+      "baseline_sha256": "9e54000e7f2df11112608f388eebf4a2cd65466c62879d8b2c5566452093cfa0",
+      "candidate_sha256": "4ceae526573f2a829d97aabe0d02bddee7f24ff18c46cc91f069a3b7c69e7914"
+    },
+    {
+      "path": "skills/spec-doc-review/references/bulk-preview.md",
+      "baseline_sha256": "d743ceaa7c076d474636f03b82bd7243d26d00c0b276f9f97568b09c9842666a",
+      "candidate_sha256": "34ae21804a085c9dafb5c26065a02a138da13f0815050f20714c0f390a77c2b2"
+    },
+    {
+      "path": "skills/spec-doc-review/references/cross-model-eval.md",
+      "baseline_sha256": "0f8f9df48e60327d4ec9c61a4858754795c499c7abdc5d32e84632fd86443374",
+      "candidate_sha256": "6dc69f8ea8a2c9cec050489a19ebda7f4f312a00aea4321655f49fef28cb2ee3"
+    },
+    {
+      "path": "skills/spec-doc-review/references/dispatch.md",
+      "baseline_sha256": "33a1d8c6346e2d6541255f4709d214f1fa5c63aa88cf9e65b32693283d12bdf2",
+      "candidate_sha256": "1cb585ddd8beb61e1ee08668e53769756bd2f2f76adcf78f04757565421e8da2"
+    },
+    {
+      "path": "skills/spec-doc-review/references/document-intake.md",
+      "baseline_sha256": "cad697e126a661a4eea11e59562a803efe26ec2f437f20d27b8054ea0ba7aa4c",
+      "candidate_sha256": "1360ee1f67503d1ac48aff29f85a746c9364c81bb9812d7cfa8758f84a78206c"
+    },
+    {
+      "path": "skills/spec-doc-review/references/findings-schema.json",
+      "baseline_sha256": "d20a74985ed53841a717472783f44ded059aac0f4ceb78cedcf53437ed2fbfb7",
+      "candidate_sha256": "873f1eb2021ce89f81fb01ee5e9b5b452b6700917d604f616ecf9f999628b751"
+    },
+    {
+      "path": "skills/spec-doc-review/references/open-questions-defer.md",
+      "baseline_sha256": "9deabe78d81007f13b42c07a77e1e651508d45ead59018a5c40f948791092fd1",
+      "candidate_sha256": "ff12069cd4536ce95d816056ae0292a8a0fecec9144b036c1b7e14e6151a693a"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/adversarial-document-reviewer.md",
+      "baseline_sha256": "c47fe9915999684e9a1fa2ceda50e0ad20481434c20ae29ceae1df778bf49550",
+      "candidate_sha256": "24406e816c011770207ca9e92963215bf4b8026b6b426f548e9653a76868dbc5"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/coherence-reviewer.md",
+      "baseline_sha256": "726777b93b7be6ceebf40b136db68620299bec98d7ba6292cebcd9094ba75d15",
+      "candidate_sha256": "38fba97f4274d7413b138ed844ac2f5ae9ec073b60f1a40debbb122d5a7e2c9b"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/design-lens-reviewer.md",
+      "baseline_sha256": "f3ae3cd744dab956f519d48a7a87e43f9ec04b97a8071d4ee4ed5b411e44a801",
+      "candidate_sha256": "8ab743d6aaa596d2c0b97ef0949dc6b2ed53c87354ef4eeb701357ef598ef84e"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/feasibility-reviewer.md",
+      "baseline_sha256": "1e186dabf2b6cac325dbfe8466744f8f1b63cda0c15f69fa160e92c97810de36",
+      "candidate_sha256": "3a5948f08f1860c8ce2b8f13d53b6d4121e1759386725d2396d733ca6f3e29d7"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/product-lens-reviewer.md",
+      "baseline_sha256": "859381bcc92d914745573a18b418f3e856400af465ec2fce253d6959c9fd5b25",
+      "candidate_sha256": "bf457abbee9230448560059faab030e22a000b52ca24c2d93fc16320a46a9637"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/scope-guardian-reviewer.md",
+      "baseline_sha256": "1d97e4827eba49bd188c58ed304d3faed797962d22326e763cc63080d7909ae2",
+      "candidate_sha256": "52ee2041b400a63ebe5eb19e7cef3a19ca4cc25745cdb4df51bd968fb3dea45e"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/whole-doc-reviewer.md",
+      "baseline_sha256": "d1677639d9ad15f14a357d5e88d960475aeb7d7e70b6f5be4b824a5f2b57ac71",
+      "candidate_sha256": "5768aec1aba35853a37585fe7ea2ae7808ae94d581c81a2e919599b5d21da2fe"
+    },
+    {
+      "path": "skills/spec-doc-review/references/rendering-floor.md",
+      "baseline_sha256": "810870373cf8a2621fccc3486ea3642b07fad359f5ffa13e75edc203d836560f",
+      "candidate_sha256": "6b5becfea0cb14f8b2fb250dbc1e789bd2b4f0c9e9b2af1643ace1d1edd47f49"
+    },
+    {
+      "path": "skills/spec-doc-review/references/review-output-template.md",
+      "baseline_sha256": "53fe50efbc0267a9f47651a0b4432d2ce51568e071ffe212001b73e93ed81d04",
+      "candidate_sha256": "74007b2264975fdc46d813ea9b007c57ff5ad830b87ad672d9f41c0fff482472"
+    },
+    {
+      "path": "skills/spec-doc-review/references/subagent-confidence-rubric-detail.md",
+      "baseline_sha256": "b755358f454798289880e97a0ac4a638a462ea9052cf8b12598995e2ba2bfb3c",
+      "candidate_sha256": "51c4a55d2dc823e04b5afa3ec462e9c438d8fe098c84d8206f9a6d0ff946ffd2"
+    },
+    {
+      "path": "skills/spec-doc-review/references/subagent-template.md",
+      "baseline_sha256": "48c9b27b5e5669c79176d4a44e5945df087feeb57c0cf6e34cbc61e34346f46a",
+      "candidate_sha256": "bd5f231f32822f818e24180515be01cb086e696d400b034e7530fe54124e5086"
+    },
+    {
+      "path": "skills/spec-doc-review/references/subagent-why-it-matters-guide.md",
+      "baseline_sha256": "16b842e6db99c301d8f13598c631b8a77aa37853f9247ff7c76c2b7aa23438c8",
+      "candidate_sha256": "5b6494fd421c23c13acb2fe67be523fc1a88fb771c0e9a7422dc2b94088e6b66"
+    },
+    {
+      "path": "skills/spec-doc-review/references/synthesis-and-presentation.md",
+      "baseline_sha256": "1fa37b945c957071ce2134247a2ddcb3b884bc83436d5e9600f9f272a3396223",
+      "candidate_sha256": "b8a170119aca3ed31829976f5a473646b6ffc6c96b1dedb68e2c56ba600176d1"
+    },
+    {
+      "path": "skills/spec-doc-review/references/synthesis-contradictions.md",
+      "baseline_sha256": "5a761ddc035aff52861eb1818e23aebbc3941a8cb50019a84d6441fcbc75e474",
+      "candidate_sha256": "4daefe28325fca4941e1ad2f7492d40b21216ecfda469cb92fc6a84f5d8b5e3f"
+    },
+    {
+      "path": "skills/spec-doc-review/references/synthesis-multi-round.md",
+      "baseline_sha256": "20d1585b1662d6f6d77c17e5dca9176b4db44f97a1b9a796893e06c42db36b26",
+      "candidate_sha256": "c45604bbc400dc5aa53d2620ae3625c225bc20c271affb059ba0eb8686085def"
+    },
+    {
+      "path": "skills/spec-doc-review/references/synthesis-premise-collapse.md",
+      "baseline_sha256": "a52bf0263c0ca2757bf725a607782de4839ed933f4dc49df86630397c161417b",
+      "candidate_sha256": "4079744b585f9ca7b108bcfb1cf802d5b3f110bb279c785c67d126f2ccf3c1ca"
+    },
+    {
+      "path": "skills/spec-doc-review/references/synthesis-restatement-suppression.md",
+      "baseline_sha256": "617673a2c0953ee0a2e7e4692499d6e67e801ddd46acfe47f3b79773f3d17a4e",
+      "candidate_sha256": "143651ce4480ebd04ffd3dba790183b17cc8d9188920867002fc874cfd1cbd98"
+    },
+    {
+      "path": "skills/spec-doc-review/references/walkthrough.md",
+      "baseline_sha256": "4fbc7d06a7e96f2df3d00781c39d54c1dcf04cf9cb72677bcb013b10cedd08ab",
+      "candidate_sha256": "e947cb3f15aa78e91adb060c945a7a6b51d222ae2e8da0112eabac16f1e58ba6"
+    },
+    {
+      "path": "skills/spec-doc-review/scripts/cross-model-doc-review.sh",
+      "baseline_sha256": "b99551e421ed7b4e9a9392172509b92b483cd8a8b8729bf675164448c9c047ae",
+      "candidate_sha256": "3220db44b51e9f028c136d0262bda096a87b5b29b891b1a289642c8b98202da6"
+    },
+    {
+      "path": "skills/spec-dogfood/references/dogfood-report-template.md",
+      "baseline_sha256": "a7bbe4918c5c8b818e90e2061ed92f6c256bb0383b177b857213b649057402fc",
+      "candidate_sha256": "9d191bf3493e0a3786650de55bfd022c24b4c2ba295a563b8badd3ab81e5a92a"
+    },
+    {
+      "path": "skills/spec-dogfood/references/phases.md",
+      "baseline_sha256": "20ae144c6b187477aafa1c4c7a2706436b19ff77702dcbf6a5e150560a7fbb45",
+      "candidate_sha256": "87378121c56f5d29b6820212b230669db0cba1c2d92a1c8305cc546101f88004"
+    },
+    {
+      "path": "skills/spec-explain/references/intake.md",
+      "baseline_sha256": "c0529a0b5dbaf2bdac3b1bae8b81faecfe6759b3c548dd147c0ced632d0ec2f2",
+      "candidate_sha256": "d568ca7f86b460230dc2b491d9c3c34e3467a9866b743085e70db39c05423b20"
+    },
+    {
+      "path": "skills/spec-explain/references/orchestration.md",
+      "baseline_sha256": "9169c807d875dda6aeb56a21b86e62aa5618c2a1ad0d60a7ebaa8825707167a4",
+      "candidate_sha256": "19c4fd0be3613d0b98e7eab63aff9e034a7d9d9809c819948ea538bc7e39c735"
+    },
+    {
+      "path": "skills/spec-handoff/evals/cases/check-research-continuation.yaml",
+      "baseline_sha256": null,
+      "candidate_sha256": "1d3486cff17ddefc7c91a10fcf77b2cdf1c80ab3f626827e88c21259a3e883d9"
+    },
+    {
+      "path": "skills/spec-handoff/evals/cases/check-review-continuation.yaml",
+      "baseline_sha256": null,
+      "candidate_sha256": "d3a7dd82bff2d808177c5d364c4ae6742b6a6f089f7a40384ec974f8b9f58b41"
+    },
+    {
+      "path": "skills/spec-handoff/evals/cases/ordinary-continuation-not-triggered.yaml",
+      "baseline_sha256": "2813d86b6b393c26c7aa160a6333f3c3f40e676e9a24d3de9eaf9bec434721a3",
+      "candidate_sha256": "8e722fe13101332d209b889ec20678e6491f02b4eb46770ef4e3c7b478e62621"
+    },
+    {
+      "path": "skills/spec-handoff/evals/cases/resume-explicit-source-stops-without-acting.yaml",
+      "baseline_sha256": "713decee1c157a777c1e57e1330ef811cbd6644a3b90999ad13406a10ea774a7",
+      "candidate_sha256": "d7c19a7e286cf4da999ce98ff45ed3836968091c82dace8779fd589c4dcc0da2"
+    },
+    {
+      "path": "skills/spec-handoff/evals/cases/resume-sparse-source-degraded-orientation.yaml",
+      "baseline_sha256": "2c5e6c6d1bcd4c684226533e6fc3ac8be81d79b7e7e421745c76d05e08d60d3c",
+      "candidate_sha256": "9916002df4acedff34f62be2530a89d586fa964da3e4d01a1bed66e8d22c5f07"
+    },
+    {
+      "path": "skills/spec-handoff/evals/eval.yaml",
+      "baseline_sha256": "7e00141aae930f25300c517e65729afb5e2ac46c26c7c9f698676502658563c1",
+      "candidate_sha256": "8bb18da9e59e5113b04a563c73149b9665e7dae9528f6f0bd3ef2a9d9238ccb8"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "ed67d2d83cca35fbc1177cce88499dd19de4b6152f98bb05957d930e5a350d4c"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "23fad84546d3d7b2c32bd6737b13f4dbecde12c9ccf179ac0f51c94bc872aecb"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/repos/u28-outcomes/README.md",
+      "baseline_sha256": null,
+      "candidate_sha256": "c5d20b7b58b261920b28d1c98bb2e6f7151b7cc3c9975d77c8b31cdeb3b6ad33"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/repos/u28-outcomes/docs/notes/research.md",
+      "baseline_sha256": null,
+      "candidate_sha256": "e8200dbe38ca14818450457865040571ebe2cc9b095dd1f3757d57dc975af4a2"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/repos/u28-outcomes/docs/notes/review.md",
+      "baseline_sha256": null,
+      "candidate_sha256": "f88c3e9407adc27f8b33e15800e33ce7c3d160226a4feadba017077fa20e2147"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/repos/u28-outcomes/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "3e9546e4bca057f8438c9c97968bba11c7c9c07db3928518a75d6e7311baa726"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/repos/u28-outcomes/src/retry.js",
+      "baseline_sha256": null,
+      "candidate_sha256": "30a0b225e4ae9fc7ef8affd062eac7f0c15c5d353c5cd046d79704f254004416"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/scripts/check-continues-inline.sh",
+      "baseline_sha256": "490b20e0307c29512477a73685f4dabae448fb5d182b6e6224ee0327e3c9f7d7",
+      "candidate_sha256": "a08e8e6512b7f18167aefc9571d5d177780d21407e8f5b1e96e25008c7098719"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/scripts/check-degraded-orientation.sh",
+      "baseline_sha256": "85af2563727840b3ed6dbd43188ed605480c5dd4182bf20e34bea01cf5819d13",
+      "candidate_sha256": "9b840ea019e5095e51fc1740ced10892d884d45c7ec02ad523af57a44d726f81"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/scripts/check-research-continuation.sh",
+      "baseline_sha256": null,
+      "candidate_sha256": "e08c167d0737877c54bf43c7e56bcb587ca60cbe9c629978bee9b0a9eeb0ea92"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/scripts/check-resume-no-side-effects.sh",
+      "baseline_sha256": "5dee358a212fb5add40241d9f2276d0d42172c9426762dd4f1b440871974a481",
+      "candidate_sha256": "9b840ea019e5095e51fc1740ced10892d884d45c7ec02ad523af57a44d726f81"
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/scripts/check-review-continuation.sh",
+      "baseline_sha256": null,
+      "candidate_sha256": "c3662b515918c05377ae1469a9936df0f5196e1b9b2046454ca18d98d8557963"
+    },
+    {
+      "path": "skills/spec-handoff/references/resume.md",
+      "baseline_sha256": "67028f8193ecb5e13ff5283e8f36107efdc19e60943c780dffa88f2e1b448be6",
+      "candidate_sha256": "6e3b2b086fecb62e3f3e898d432ae9c2677c641d0bd9bf091889fc3e003e6137"
+    },
+    {
+      "path": "skills/spec-ideate/references/agents/issue-intelligence-analyst.md",
+      "baseline_sha256": "69b11b92d1e9cb10eced76cdb4ad1809ae931815ea109ecbf700baf54e5f010b",
+      "candidate_sha256": "47ca4241d4b5669067b991f57ec932d1a52868cc76d6030f322c17dd139ad27c"
+    },
+    {
+      "path": "skills/spec-ideate/references/agents/slack-researcher.md",
+      "baseline_sha256": "9e13ed667d5563d3edb79e1e3e289dc271d126ec81c8529d838445e0d3a06e30",
+      "candidate_sha256": "206cf32d18a6e2adf58f8fb8ffb0fd95e28cdfdd010190f98a8562a8a57a7dce"
+    },
+    {
+      "path": "skills/spec-ideate/references/divergent-ideation.md",
+      "baseline_sha256": "8dc6dccd7aeec97b9458e877b40a844312a706b6acd38dfcb561c13a8a7dbddd",
+      "candidate_sha256": "6b3fddc76236b29b1bc50ef0c327feadef78e46a3ba53f77aa01715a728058bd"
+    },
+    {
+      "path": "skills/spec-ideate/references/grounding.md",
+      "baseline_sha256": "c40a8b95f551db3e9dfcdce5c6c952dd44a002c53e66b74cded05231c36a1c20",
+      "candidate_sha256": "195d404e41c813ba11c76601a05329711a9ffd09b3167dbd0392c0965e336092"
+    },
+    {
+      "path": "skills/spec-ideate/references/issue-intelligence.md",
+      "baseline_sha256": "4e18d15fcb893e73beade06231fe3f996f4ae2a6b740a4b6ed2783288781c5de",
+      "candidate_sha256": "0e6cf9e3a75911b731ee1b91046e3a3ef39351af808e5b224911e43a32bd6e98"
+    },
+    {
+      "path": "skills/spec-ideate/references/post-ideation-workflow.md",
+      "baseline_sha256": "fe085532eaf493849a4630c6a74dcb7f6b6576f0da85f244331a02610775e73e",
+      "candidate_sha256": "23d4b5362231f7b86fc78c3f44d10502afff0e473b3b12651a25d6ad64fc0a21"
+    },
+    {
+      "path": "skills/spec-ideate/references/scope-gates.md",
+      "baseline_sha256": "d31ea1dd22e5ca33df75c7ffb853f42c9b2c58266a3ff1cde7cefbc38a31ab95",
+      "candidate_sha256": "38333e06ff332181953cc3afdbeefa35dc7119a8b3937a6271579d18ab8845e4"
+    },
+    {
+      "path": "skills/spec-ideate/references/universal-ideation.md",
+      "baseline_sha256": "a8804b029be4c2ea97df095d5d2a3d1f4b8a8b06252dd5a3f47a60aa3bcf750f",
+      "candidate_sha256": "902f2300a92c3ab7ac5a40f499cf90a3dc06abb73895192401b7a3801915c60a"
+    },
+    {
+      "path": "skills/spec-ideate/references/user-research-artifacts.md",
+      "baseline_sha256": "31e305f1634c2e6374f5306a8399974593a17905be6747a9d1c923d2d228fd05",
+      "candidate_sha256": "a519d27376b6cc5f1874b1fc72040f5ba82d457aad3c963f1e069727ce37d782"
+    },
+    {
+      "path": "skills/spec-lfg/references/pr-watch-loop.md",
+      "baseline_sha256": "6eab53df6508e6d46fc9f7274fe89420309ca14375070a5cedd9f4c1c32d7742",
+      "candidate_sha256": "51da73ae3a84bfefc53ee0d7a6263e95a07d7f2fef723e8dc3345953a0a65c72"
+    },
+    {
+      "path": "skills/spec-lfg/references/review-followup.md",
+      "baseline_sha256": "d65b6f367d80ce03b56e1a3f334b94303cfb098f58aee9cd42d30d9070964158",
+      "candidate_sha256": "b2273359f57ce354c9e8e130baa37b5cb811a954f95a1ebf2b1027682fdbd3d9"
+    },
+    {
+      "path": "skills/spec-lfg/references/shipping-tail.md",
+      "baseline_sha256": "61e06b17d6071a276f91a79a121b3a57c00b1382994cb3fb17f5e4f4421ba096",
+      "candidate_sha256": "a43900ccebaaa65ec605efa1486c309a2e688990f49db1637d8c33cacc780e71"
+    },
+    {
+      "path": "skills/spec-lfg/scripts/pr-watch-state.cjs",
+      "baseline_sha256": "5600214530ecb03c5644213884666de7978b03a298d4f61bed0e2b402461e0cc",
+      "candidate_sha256": "380e5244ccb2fb32107fd66729fed5b7df5ff1ff2c6a62bae2ca74d60ee89156"
+    },
+    {
+      "path": "skills/spec-optimize/SKILL.md",
+      "baseline_sha256": "f7fdfdcdd0b732348e1bb174ff29b6f58e50f4dc52f2cd6cd7197ecc5fe640e3",
+      "candidate_sha256": "4da027d7a55cbbe974b136e43344e77a1306491942dc1a383e8f9be24d064dce"
+    },
+    {
+      "path": "skills/spec-optimize/references/agents/repo-research-analyst.md",
+      "baseline_sha256": "591395e57a3332b5c38824c736e15c85ea9b6184047a30b588c878fabf9b165f",
+      "candidate_sha256": "bd9add502148892f088fba6181392ba8c68804d9e2f3f446cab74124edaad111"
+    },
+    {
+      "path": "skills/spec-optimize/references/experiment-log-schema.yaml",
+      "baseline_sha256": "8d39e7776d533791e9484df3db4081e7e00ca375d7aa090178e7697aa285ecd1",
+      "candidate_sha256": "053b5944a89b852c43263ac77ac4971ae7c1fe042c7d207c4dd0e6f4673d1891"
+    },
+    {
+      "path": "skills/spec-optimize/references/judge-prompt-template.md",
+      "baseline_sha256": "423423690dbef08e75bc4c27d9255076e641f3b0ab13eb27c3f9281d58197801",
+      "candidate_sha256": "7017ed4180bb15e20ee2235bc14a42b8a4e6374498b935ad053fcaa79add6d5c"
+    },
+    {
+      "path": "skills/spec-optimize/references/loop.md",
+      "baseline_sha256": "fdbbf9a7b5db3e2fd76314652e471a8699b23c4e587f0bf2cb7a12de8c786b3b",
+      "candidate_sha256": "74d32b83f0cde4550c3eb97f2db85095855293eafe406fd4ddbb2b988dc671a2"
+    },
+    {
+      "path": "skills/spec-optimize/references/measurement-only-calibration.md",
+      "baseline_sha256": "0be64c47ea29327fc90e803709fc6b08565795f39d61f62a761f726987cfe562",
+      "candidate_sha256": "2ad7e7d29e241124d40339dcc68a3908875fb2c604a57f675bf10d190db999cb"
+    },
+    {
+      "path": "skills/spec-optimize/references/measurement.md",
+      "baseline_sha256": "f02cdaf845ebbd4e069778404cf11c0c6784986f03b588b4eb7c1544f4363f12",
+      "candidate_sha256": "92571942a4b5deec55fc7be8961e5a80acceead9bd539892ae6bba0f15fa0ca7"
+    },
+    {
+      "path": "skills/spec-optimize/references/optimize-spec-schema.yaml",
+      "baseline_sha256": "11d4d3be7ad025ba9eced7ff0a99ff20de13a821ca0ab327ec159c86aff6e9c5",
+      "candidate_sha256": "a0c3ce7e775b76bf984d342682293bbd9f3247ae4994e6595032c4e63dedb03c"
+    },
+    {
+      "path": "skills/spec-optimize/references/persistence.md",
+      "baseline_sha256": "fa717bb9ab27cd3ec9d6f19d53bd744863e5693a1a3084057c3783a2a55c5eff",
+      "candidate_sha256": "b59c8760de6936fa831aecba3a83242ace9f1690160380a6cf8b3c63ce56e1bf"
+    },
+    {
+      "path": "skills/spec-optimize/references/wrap-up.md",
+      "baseline_sha256": "290657306ef93224ebf7d3c1a72fcd4af135f8d3dd98ce3241e1781d083dd033",
+      "candidate_sha256": "b394f9219008e03c910f701a5d267691c972f3d31c9f13a5617450dbe9209dbc"
+    },
+    {
+      "path": "skills/spec-optimize/scripts/decide.cjs",
+      "baseline_sha256": "dbe2c71948fc3338319d1b52b7fd4d3dd65022b73c95b7e49c2648a5bf970bc1",
+      "candidate_sha256": "7512791280f57cb7d47111fa8d7780c4807487575a9e3ed525c6566850947f85"
+    },
+    {
+      "path": "skills/spec-optimize/scripts/experiment-worktree.sh",
+      "baseline_sha256": "413c50424494e44bb181448a37e4bebe8fe5bcdcde2dee40212e67ecd0d3f7d8",
+      "candidate_sha256": "ecaec4d29625d0e56609aac935f1d733726ea760fda42e750ac5fd835e286e16"
+    },
+    {
+      "path": "skills/spec-optimize/scripts/measurement-admission.cjs",
+      "baseline_sha256": "4af1f0dfbe492193937b4317af3cb20b701e5007754296cb25b4cf498973d879",
+      "candidate_sha256": "36f08baa4808d1d7750af8daf0ab0cc7a5287422e226b77a6d70e4b87a65a67c"
+    },
+    {
+      "path": "skills/spec-plan/evals/cases/enriches-product-contract-in-place.yaml",
+      "baseline_sha256": "1c80bc1a0182b31e212b1c9a83138144c446a78337635aed57060637bfb9ba9a",
+      "candidate_sha256": "7e5a36ccd44d6e8763cfbe357c4b0ff1490e44b7d9ee14da327a3de6bcc2b8f0"
+    },
+    {
+      "path": "skills/spec-plan/evals/cases/implementation-routes-work.yaml",
+      "baseline_sha256": "5fe85df55508731887d265cb6b790fc52f37ac56a698838c54409d88f6ba4a1f",
+      "candidate_sha256": "8f9cb684924f0c61816e77d731165e6dbfda9ed5e4b03f1352820be2744fc3b8"
+    },
+    {
+      "path": "skills/spec-plan/evals/cases/planning-only-rejects-implementation.yaml",
+      "baseline_sha256": "1b348bd554b7ffe41fa16a32ac34d282f2b459005afb39aae23ff772503045d8",
+      "candidate_sha256": "4f40fa899b75fe9be76f6030c248face1e21eb50ebff2fac473cef4094167a73"
+    },
+    {
+      "path": "skills/spec-plan/evals/cases/product-blocker-prevents-readiness.yaml",
+      "baseline_sha256": "81b2ce31d8fea8b96b45581bd9796f4ba4bb49ff97b4043e7be9806b50dcb444",
+      "candidate_sha256": "a7e632df257d8f8d17339b90f34013ad6131a4d3087007c0aa5082989d993233"
+    },
+    {
+      "path": "skills/spec-plan/evals/cases/r2-soft-pressure-code.yaml",
+      "baseline_sha256": "5c162d6ac5986eb8130447d6e3ba8ade0a5da984bc918752ab3264feb8003cfa",
+      "candidate_sha256": "499e11608d1ec79913e476ef43da60e09d0af6eb797844891bfb6a3d15d5cc02"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/admin-export-blocker/prepare-eval-fixture.sh",
+      "baseline_sha256": "6d6f1d3ec939ec0fc6af440c09114c9603b530a9ff0f6616b9e52482dbf18976",
+      "candidate_sha256": "85eb5293775f019b290c9787ded68d25e499e580b7940bab39026304e3e93c49"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/admin-export-blocker/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "b50cadfd7ad54e0a4d67ff30bca50967629356c4996de60d08787031e410a4c2"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/mini-ledger/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "23fad84546d3d7b2c32bd6737b13f4dbecde12c9ccf179ac0f51c94bc872aecb"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/order-import-direct/prepare-eval-fixture.sh",
+      "baseline_sha256": "08e027f481b1fc667cdff6889115eac2efde9d99e581b5a24d0db3f9e5d9f541",
+      "candidate_sha256": "85eb5293775f019b290c9787ded68d25e499e580b7940bab39026304e3e93c49"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/order-import-direct/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "1881f0baa40f333c928b5bedf664dae0a5c6b2cdb8bf54beec92a72a3618f4df"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/order-import-enrichment/prepare-eval-fixture.sh",
+      "baseline_sha256": "c3c40addb2d12c3ed416e73fec03b2d2728cf6d23a1d1fbac040ee7588ba46b1",
+      "candidate_sha256": "85eb5293775f019b290c9787ded68d25e499e580b7940bab39026304e3e93c49"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/order-import-enrichment/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "64452fd7674015c74f53a4d22cb05ea3237cc52abc26de4c614ae60263395276"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/scripts/check-enrichment.sh",
+      "baseline_sha256": "7428edfba6c31009e2ec60696b5b45faa1e970e7e8c24771e2d653a879b7b427",
+      "candidate_sha256": "405f31b52aeba58137a2731d56ea7da9f07c92e6cd47d4c278f3d40e2da88351"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/scripts/check-planning-only.sh",
+      "baseline_sha256": "b3fcbc95cb687ae7db9037aee7613356a4b739d2caa3a03bb44e5c8c8783b63f",
+      "candidate_sha256": "cbea5da5976fc1e1d1b8fe6db290fa79a5b111c171a5a5423c9dcf3cbc14cf60"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/scripts/check-product-blocker.sh",
+      "baseline_sha256": "062121c3beca475531ea6576ac6bc7e53b237acd0e20ab346555d09e9b465b86",
+      "candidate_sha256": "148a17fdc6aae9fa6aabec921b795019a38affb375c62cf2b8d640ed57efe36f"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/scripts/check-r2-no-code.sh",
+      "baseline_sha256": "472c8888755c59510a264f7ac54a2964f72b8f7bd7cefef7016ff1b53e24f16a",
+      "candidate_sha256": "0a5fff5d9be2efb54e9f8683fa359caece05ce729274bd082950183c30ca9d77"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/scripts/routes-to-execution.sh",
+      "baseline_sha256": "f7331a97dda24e9646b55f293a0d1a633b09c33f9f5f1d302e12acfe1e9bc6d4",
+      "candidate_sha256": "0a5fff5d9be2efb54e9f8683fa359caece05ce729274bd082950183c30ca9d77"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/best-practices-researcher.md",
+      "baseline_sha256": "79dceea93c937dcbefd4d9c785d667f3ca03c4c79df8068959c5281b04276af0",
+      "candidate_sha256": "85665097bdb450602808d875125bd80aae838a6231934bc0d0998ef0076ed80d"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/data-migration-reviewer.md",
+      "baseline_sha256": "93f0a3aff200978b6149857769edf511a4768072f8834ca604ea72cc031750c3",
+      "candidate_sha256": "99f255736d013ce91f74371ed3a2a416860800980cfbcdae130a9a9fc10ec66f"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/performance-oracle.md",
+      "baseline_sha256": "3290155a1e41b7631988168602c195adaf46b20286c46dfe23c8fcb26d4d2525",
+      "candidate_sha256": "c987dfb08dc869677bb9a41f3255fddaa6acf7e829c1b0ab706232c9cb7fcd79"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/repo-research-analyst.md",
+      "baseline_sha256": "451bd0deeab4327142ed1106ed1085f07335d80fe760fa7c155b894051a1ae56",
+      "candidate_sha256": "53c14f9afa3087922ce726287642b3f1690df95845bc275c019984f17cca1989"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/security-sentinel.md",
+      "baseline_sha256": "dc4c05421f11c924beeafc426bfd8aa95f43ec9af684f571faa0da357c7cd17c",
+      "candidate_sha256": "b25dae35fe6ce71da263c794626d733d0eea9f55ff38e132d44c90620a58bb10"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/slack-researcher.md",
+      "baseline_sha256": "616ecefae5e6a786dff863c77b1ed196b806175b73b5a0cef8ad1cfe2cea4424",
+      "candidate_sha256": "595f51dfc65dcbcbb88a550962528c595590b2055db85d065d7d15c658d4409c"
+    },
+    {
+      "path": "skills/spec-plan/references/deepening-workflow.md",
+      "baseline_sha256": "0e696875bc418e78e4a24ce34fb8464261f00ed0b3cbfa395489f5bec6482c27",
+      "candidate_sha256": "9fa8dcf512dd15c0be2667600ff31eef395b20dcc27018adbe7cc53572b72d28"
+    },
+    {
+      "path": "skills/spec-plan/references/final-review.md",
+      "baseline_sha256": "ddb5df9397bf6fb825b02a466416ebe611fe420408d1fd225c2957be3bee69cc",
+      "candidate_sha256": "02e556438f2dd607f02b0a7f5ac4fbb61a5c6d335a2376403fbeb7db6f188c61"
+    },
+    {
+      "path": "skills/spec-plan/references/plan-sections.md",
+      "baseline_sha256": "b68cc6795e7e6ee688cd0f450712715693b74dcd14702eb1a70c83abb207e630",
+      "candidate_sha256": "ac4e6383b067115da372c20342544a85f5a0d68aed0862facdbd629ae5866477"
+    },
+    {
+      "path": "skills/spec-plan/references/research.md",
+      "baseline_sha256": "fd31807f2f68dadc00ebac2b8165be9dc6b9fc34c6fe6298b800bcf208d42444",
+      "candidate_sha256": "412a0e672ad8d025c10947b60c350b4bed085dfd62ad08dbf4e21088869852a0"
+    },
+    {
+      "path": "skills/spec-plan/references/structure.md",
+      "baseline_sha256": "4c657153e2edfc053c885f99fb6878a941ad5ec7fad46d241f12dfe81c82668e",
+      "candidate_sha256": "646c07cbedcef4bd65c8371e147207f09510eef52cbcbcf904172951174bec35"
+    },
+    {
+      "path": "skills/spec-plan/references/synthesis-summary.md",
+      "baseline_sha256": "271096c33725b2718e9a96d6902a6ae643a6a342d917df9bf3295b72d2604684",
+      "candidate_sha256": "ac63616ab776152367398c477d0f25e1d866826064dcfcd7a5f460fed2ea69fc"
+    },
+    {
+      "path": "skills/spec-polish/SKILL.md",
+      "baseline_sha256": "193735fb6913a7851160b6072d898e958f15b5bdcf211009d9ce70d5f574bd55",
+      "candidate_sha256": "629bccf39d24b682d49b9589035ccac7ea634055b385feac0e349ce71e25be26"
+    },
+    {
+      "path": "skills/spec-polish/references/dev-server-detection.md",
+      "baseline_sha256": "0165af60f197c04572f6bcea5e8294c67de53b7043bc6e1719c9ce899de68a21",
+      "candidate_sha256": "383ae79026d37d82270c4abee443bacb9da99d786653793454aac74ed2cc7cc0"
+    },
+    {
+      "path": "skills/spec-polish/references/dev-server-procfile.md",
+      "baseline_sha256": "035d78bd2220b0be7c485312d7285b8ab6a9612acebd7416cca2750a35187a55",
+      "candidate_sha256": "3a5a5e796ca4dc72efa1fad5f7deaa119debca5078bd5395941d7fbff08aeb69"
+    },
+    {
+      "path": "skills/spec-polish/references/run.md",
+      "baseline_sha256": "84da64de8b2e2d3827e5c7456a2265af1a44c5de61466d24c85f2c6d43886315",
+      "candidate_sha256": "272717e7bbc825104acb4e0e4177f00961673ad7a2bbdf7477386458e9445911"
+    },
+    {
+      "path": "skills/spec-polish/scripts/config-port.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "7462153a064781300419dea9bcb957206e26b6a85f2427c106fc283c2c104f27"
+    },
+    {
+      "path": "skills/spec-polish/scripts/read-launch-json.sh",
+      "baseline_sha256": "58fe4d1dc2ca29d14bf57aea99e1c73e3cafdd117865dcf40fa6079727509bb2",
+      "candidate_sha256": "bb0d99075b97fbdacffd9de4e2078b2a54c4290bec0c213f2e7365bee8ec38d0"
+    },
+    {
+      "path": "skills/spec-polish/scripts/resolve-port.sh",
+      "baseline_sha256": "c81d5f29989e8c32a120e8337ae4b0457caab13eca115dc8bd67b20af86664e4",
+      "candidate_sha256": "5981fb85eda109b29bae6f6baf519a9f4b6f860baba7b59b24ad52cf75be1242"
+    },
+    {
+      "path": "skills/spec-pov/SKILL.md",
+      "baseline_sha256": "cd51d624dfcd1d697921d740d3e9e6f9ade13d1d40e0b3be60ca6e51b37a58f9",
+      "candidate_sha256": "3d39dc292d30bcc7bc4997da8c357576db061952bad32da751a4b5c542acc94a"
+    },
+    {
+      "path": "skills/spec-pov/references/agents/pov-peer.md",
+      "baseline_sha256": "203b511af2e932c93ecad5fd9c9e8574119b7d093cc3f110817488fc97b2f02e",
+      "candidate_sha256": "8201ed323eae7c9f5f5c10d51616584993e32503bf671f22c3e8760aadad7186"
+    },
+    {
+      "path": "skills/spec-pov/references/agents/project-grounding-scout.md",
+      "baseline_sha256": "e2c12c99205f2a9b2713c9dbf5371b952bc406619f81a58e6518d60b3bb4254f",
+      "candidate_sha256": "591b6237aaa48917a0be2a618f40232a651d54f499aa0049c984a6e55ae19f67"
+    },
+    {
+      "path": "skills/spec-pov/references/boundaries.md",
+      "baseline_sha256": "768b304e0b738da3e20382ce184a33606ad58129b52d416e8d63b08ed3c245bf",
+      "candidate_sha256": "3bb84fafdd685a35b306f9b23b5e53f14f28486191325c9534934b0503d01db4"
+    },
+    {
+      "path": "skills/spec-pov/references/cross-model-panel.md",
+      "baseline_sha256": "861e510f37d7b1a8c371a9387bfd5303f11cff2367cc986f94f4988bd65f99d6",
+      "candidate_sha256": "8ce220f4e97ad27ba3f7b9b8da8d1b47376bcfc06e721aa1b282b8b18186aece"
+    },
+    {
+      "path": "skills/spec-pov/references/grounding.md",
+      "baseline_sha256": "e92e035ba469e72d89c00210cdee33295f65b46b95c4a4c65799ae866377283b",
+      "candidate_sha256": "965f0ce3891b33e99d40938bee7b31d0ee1fe7552edf4b5d064fdc55d183e3d9"
+    },
+    {
+      "path": "skills/spec-pov/references/intake.md",
+      "baseline_sha256": "d6f4c272cfddf3f9ba5126d9115ca17b81a5fae6fabc801847723234cb45966f",
+      "candidate_sha256": "7573876f7552cc326270c7e28ce8875b64721a95945971dbba7f6d6dcb828440"
+    },
+    {
+      "path": "skills/spec-pov/references/invocation.md",
+      "baseline_sha256": "5ed38e1b8dfccc06dac1fdff9df54c63a1933c9221aaeab9eb0e5b65ed04c572",
+      "candidate_sha256": "609375f9b4591343b70972b4b424b04843f6419ad6d8f04cc2db4ec473052505"
+    },
+    {
+      "path": "skills/spec-pov/references/method.md",
+      "baseline_sha256": "b8d3042047162c6288d7bffdbe9f0cc589160c8710b907462a1059ffcb83d349",
+      "candidate_sha256": "a7777747a4a693978cf3d7e5ed965a97df2cf6689ab1fb4f63b33d97ec718893"
+    },
+    {
+      "path": "skills/spec-pov/references/report.md",
+      "baseline_sha256": "3a234fcf8d957fd1f1b00495961872e93eead2186bfb675d34afbc3fc34a104d",
+      "candidate_sha256": "7f7f7a3bc9b7dabea6e5ff3890499feb469a9bcda1b216c00592939916e2effa"
+    },
+    {
+      "path": "skills/spec-pov/scripts/cross-model-pov.sh",
+      "baseline_sha256": "97d7ef9af86caaf26b7219cd4a3d404b312f5f5ff88d93f82f9cc12a618e6e55",
+      "candidate_sha256": "515cc12919cfbc1efe5292c837a90a146f6f10008a69cd57de0e19e42ae9bb1a"
+    },
+    {
+      "path": "skills/spec-prd/evals/cases/validate-report-only.yaml",
+      "baseline_sha256": "8653ebf6f6244ac01f4308ee683611b8a65c9ac1ae8ba497bdd6f1820f399557",
+      "candidate_sha256": "5e3e83851c4e2769f3fe9ec172a478fbf36fd73ea34c36a325a8599d8a6f8076"
+    },
+    {
+      "path": "skills/spec-prd/evals/fixtures/repos/rough-prd/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "fb7a35e5860ee6ba428969e230e22539cfaa924210f08f9d383781147539ad26"
+    },
+    {
+      "path": "skills/spec-prd/evals/fixtures/scripts/check-validate-report-only.sh",
+      "baseline_sha256": "2c0b6d4a3ee1f84044032af86f72d3c913211d447a3277e9d95555a455fd5c54",
+      "candidate_sha256": "a008e85a7b01ed7a0a6a6a5866959472160b2c09de6a4312b518b29d30d086bd"
+    },
+    {
+      "path": "skills/spec-prd/references/prd-readiness-lens.md",
+      "baseline_sha256": "fddbff2c86451191210d99f2690af85490be2fd1d4016789c7b284a67839ba35",
+      "candidate_sha256": "d65406ec745a2658509513a6a9b498025d5e33217e7d159150ee1e8b7b71a19d"
+    },
+    {
+      "path": "skills/spec-prd/scripts/check-prd-artifact.js",
+      "baseline_sha256": "123c3a246a5050178380f44b185b197a16734cd79af6e7c61692fc76085b37c9",
+      "candidate_sha256": "8f4f3f5e5dbc7c4ea3761cc76610ec0b1727f5c50214e7cbf8606f3ff1a181be"
+    },
+    {
+      "path": "skills/spec-prd/scripts/finalize-prd-artifact.js",
+      "baseline_sha256": "a28fbff58e9c2b9ed0adc4e218f1b1afb35cab84e47ce6a54983bd92835eb915",
+      "candidate_sha256": "338d76d7f70b4755556498d42eb632994afd50467b26152c4d97b37d9975e90a"
+    },
+    {
+      "path": "skills/spec-product-pulse/evals/cases/check-source-outcomes.yaml",
+      "baseline_sha256": null,
+      "candidate_sha256": "2ed06d1d8397f9afeca74a428994298394be2176505c2cb9ceeceeb94516b009"
+    },
+    {
+      "path": "skills/spec-product-pulse/evals/eval.yaml",
+      "baseline_sha256": "adeecc26aafa29b0b01ae1a2a4710180c27425ea1c42eeb680b28180e1ede2f1",
+      "candidate_sha256": "1e84f2654d3451ba763b8be65a222200c388fd37050636ed17ae7b4952f18e2a"
+    },
+    {
+      "path": "skills/spec-product-pulse/evals/fixtures/repos/u28-outcomes/.spec-first/config.local.yaml",
+      "baseline_sha256": null,
+      "candidate_sha256": "1ab592f426770e9a737b46cbffc9481ddf464ae2af2ecf5275d99700a6f74672"
+    },
+    {
+      "path": "skills/spec-product-pulse/evals/fixtures/repos/u28-outcomes/README.md",
+      "baseline_sha256": null,
+      "candidate_sha256": "e312725b70877a0a02750f9337e96db5e59f733550414f91d958b8c7b2922a9b"
+    },
+    {
+      "path": "skills/spec-product-pulse/evals/fixtures/repos/u28-outcomes/exports/analytics.json",
+      "baseline_sha256": null,
+      "candidate_sha256": "1bd7976ddf10d8c4d9399cb90c48a48e7499cf3457f4dc27416603737cd84aaa"
+    },
+    {
+      "path": "skills/spec-product-pulse/evals/fixtures/repos/u28-outcomes/exports/payments.json",
+      "baseline_sha256": null,
+      "candidate_sha256": "4fc127a3930438f6e08fbee903226fd2ba70419f2961abf96a173f84dc781e09"
+    },
+    {
+      "path": "skills/spec-product-pulse/evals/fixtures/repos/u28-outcomes/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "7e810e5fa971e48c9d76ab50e4f417aaf2dd90c0305ce4a14d95b31a62181c71"
+    },
+    {
+      "path": "skills/spec-product-pulse/evals/fixtures/scripts/check-source-outcomes.sh",
+      "baseline_sha256": null,
+      "candidate_sha256": "085a5ba0ee02f5f1632878d2545894a6f61e6668eec661f1660e3c26f100d7ac"
+    },
+    {
+      "path": "skills/spec-product-pulse/references/config.md",
+      "baseline_sha256": "37d0a9b93bb9c9666423cfff620c1e198d726e74ac0196402151e9eea4440568",
+      "candidate_sha256": "6a2890ea49c1f7ee9419a2238c901289e6563c54b2b24b68cbe4bd008b56f5cf"
+    },
+    {
+      "path": "skills/spec-product-pulse/references/interview.md",
+      "baseline_sha256": "a27da6fcb9a8ce1e9bc9d3dc9018ea106823277662534da9cc323de84f66f8a4",
+      "candidate_sha256": "267e82a1864f23696063dfc81736e86493deae7684a3bdb4aac317a67acff1de"
+    },
+    {
+      "path": "skills/spec-product-pulse/references/report-template.md",
+      "baseline_sha256": "eb6be27ae3faf4e7d24fb5118c9a7fb8419a50068b8d66537152a12c0431ee48",
+      "candidate_sha256": "7e5c4adfb45554386bcbf0d9deb2645d041253ef7303f71b44b367bccc02277a"
+    },
+    {
+      "path": "skills/spec-product-pulse/references/run.md",
+      "baseline_sha256": "56884c8a71649da8460162a9a91252e64bfca480eabb57eb8d7ddcd7a4efb67c",
+      "candidate_sha256": "30c7a23887bfda09b883b36a0a98ddcc3ddf836f6c78fe52b1081905c0b42e87"
+    },
+    {
+      "path": "skills/spec-promote/SKILL.md",
+      "baseline_sha256": "e9f2145d1f6aacc60ed1a753bdd11789350ffbf919704e540bd29a04872a26eb",
+      "candidate_sha256": "96ff96037364fb5cdd95ed3d8eef355b14834f77fdb11a7820ca24abfaaaf7f7"
+    },
+    {
+      "path": "skills/spec-promote/evals/cases/check-unreleased-local-drafts.yaml",
+      "baseline_sha256": null,
+      "candidate_sha256": "5e17b94e412e96ac4b1b5b067cf7b95d44c6da26ff39fe74ccc9b546e829629b"
+    },
+    {
+      "path": "skills/spec-promote/evals/eval.yaml",
+      "baseline_sha256": "08d9db4e77f5b3e2e40761489d1000abf42a8adf6452475631efff4772c54f2e",
+      "candidate_sha256": "972cd6d6bf17dc454a260962937eec8a4ede929d8cbf1aeea07f4f0f3734f3c8"
+    },
+    {
+      "path": "skills/spec-promote/evals/fixtures/repos/u28-outcomes/CHANGELOG.md",
+      "baseline_sha256": null,
+      "candidate_sha256": "f434a5f88d5eda4e48507d48e633632b2bb5bcd2d018fbf37cbc9ad5a88ddf22"
+    },
+    {
+      "path": "skills/spec-promote/evals/fixtures/repos/u28-outcomes/README.md",
+      "baseline_sha256": null,
+      "candidate_sha256": "9d00ef42dbcfe57e1210c16cc19ef16854ef941aba0eae0e60b6545e2deba0af"
+    },
+    {
+      "path": "skills/spec-promote/evals/fixtures/repos/u28-outcomes/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "e22a13c31e3026de3b99f0ff2430563afd1c81f2b908c3e253aff20f5ae0e9b9"
+    },
+    {
+      "path": "skills/spec-promote/evals/fixtures/scripts/check-unreleased-local-drafts.sh",
+      "baseline_sha256": null,
+      "candidate_sha256": "41bfb07ed58056cc36f13447064153883f75478fab320ee977f57b717355f8e9"
+    },
+    {
+      "path": "skills/spec-promote/references/spiral-cli.md",
+      "baseline_sha256": "3e9b781e9137228f5fb3c4875e8a9d7546effa5226479a8bdf06fe5b05a6929a",
+      "candidate_sha256": "9da49c7440436222d041990277971f57d1d3dcfc4bab5d6620fc8f980b41edd5"
+    },
+    {
+      "path": "skills/spec-prototype/SKILL.md",
+      "baseline_sha256": "51ee1bf5c37d0ea8bbcb3a3d228ae402de6caede717b4f88700a42582562cb22",
+      "candidate_sha256": "07563d5c500f0280de5adccce7be149558e3443d2f20bdeeec837f462435552a"
+    },
+    {
+      "path": "skills/spec-prototype/evals/cases/go-ahead-before-build.yaml",
+      "baseline_sha256": "1bd7115856348354a56a804f35b3625d7296a6164138ae11aed3227dd4b09701",
+      "candidate_sha256": "16da6a08886c461b12bba0572d4f365dcb85b2f4927688bfe3f262292376a511"
+    },
+    {
+      "path": "skills/spec-prototype/references/craft-floor.md",
+      "baseline_sha256": "160edc9a7df32e7e6a15e16fafe26e330e6b960e87cd36c8ed292bf88d12bd63",
+      "candidate_sha256": "7955c45e3780875c35980e4fa57c3ffdf802ab6404977bd87599e1858b2c8f18"
+    },
+    {
+      "path": "skills/spec-prototype/references/preview.md",
+      "baseline_sha256": "278ad130aa442310408e0d0537aafb153e74e53d2a1e163d0353b17aeb243bb6",
+      "candidate_sha256": "79e454110e1cbda2cabadfb7349a1c5ead213441a47dae686e1fbc662d6c6755"
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/evals/cases/pipeline-pending-conversation.yaml",
+      "baseline_sha256": null,
+      "candidate_sha256": "db521b130e3d7abc8dd2ff9277435abc6253e322ba07a17dde54a0b4d9a8dfe9"
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/evals/eval.yaml",
+      "baseline_sha256": "df517708cf4fd43181370af87d89fc915366f9bbf190802a9202d3550b52e59f",
+      "candidate_sha256": "5bf01022768aa554dc90dbb6ff8d14b6bc747e207a56ac0550816bc7e22f0b14"
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/evals/fixtures/repos/mini-ledger/pr-snapshot.json",
+      "baseline_sha256": null,
+      "candidate_sha256": "85f8cb0b013d64540b7c31f47e8fc844fb806d6b0833aef891401d8ac35fd838"
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/evals/fixtures/repos/mini-ledger/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "07ab91ab6d0f94664c424ee33de91ce52f360a74f0c1b9bea396518bc0c97d93"
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/evals/fixtures/scripts/check-pipeline-pending.sh",
+      "baseline_sha256": null,
+      "candidate_sha256": "dc12c65ee56a4697d3c0dec3517e0d4c73a6ad08cf68b6b63c7c6e9f6bfe2a3b"
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/references/full-mode.md",
+      "baseline_sha256": "5bee661809c044a32fbd01928ac6d92807729572af58542313604521e33dbd89",
+      "candidate_sha256": "476a6e217223153f6fb1bc619f4efcd010d7a043831f64adb452a8c841b0ec71"
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/references/pipeline-return.md",
+      "baseline_sha256": "944d9d1d1d6f4d4abe341947833bd5f8e23c89a090a15172ba0b04a689851198",
+      "candidate_sha256": "ed06222a0b69cfc34e7c5baa15db8b29886f8799ec1e8967599c08dc98e7d027"
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/scripts/inspect-fix-publication.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "11b0320a5fc769e06dbbcc7f1df12d70a1816c0b5aad9968dfcb11dad4246ca2"
+    },
+    {
+      "path": "skills/spec-riffrec-feedback-analysis/SKILL.md",
+      "baseline_sha256": "d577685081c41c9f6b9bdcc7eee3644b116e19dbd82ad3bef9e9f3844b304bb8",
+      "candidate_sha256": "dca15bcf7ece9009ebdfd761e16d660e38d081824ad18bc346df147c15b98de1"
+    },
+    {
+      "path": "skills/spec-riffrec-feedback-analysis/evals/cases/check-local-evidence.yaml",
+      "baseline_sha256": null,
+      "candidate_sha256": "ce0bf14b13bd88cb5dc5ddb39925452837437f38e2e5269f6cd9bcee5a3f1ec1"
+    },
+    {
+      "path": "skills/spec-riffrec-feedback-analysis/evals/eval.yaml",
+      "baseline_sha256": "1fa2d27e1291ecb8ab62c4c4e07c6b2506acc52cfe08784a225b714eaa080fc1",
+      "candidate_sha256": "7ed2fe8d7f0178c84dcaf1f690c2be1f9e1e145196c4cb9ded6aee8148a382b4"
+    },
+    {
+      "path": "skills/spec-riffrec-feedback-analysis/evals/fixtures/repos/u28-outcomes/README.md",
+      "baseline_sha256": null,
+      "candidate_sha256": "6c280a69ca2f4ab602ce5af74ac573d38d3f5622a27edc4e6f0a6179226ac176"
+    },
+    {
+      "path": "skills/spec-riffrec-feedback-analysis/evals/fixtures/repos/u28-outcomes/capture/events.json",
+      "baseline_sha256": null,
+      "candidate_sha256": "e3d4afc9285ba2a84c89bdc38fb0f4ffed5a6995251750da21acfce0d623cb33"
+    },
+    {
+      "path": "skills/spec-riffrec-feedback-analysis/evals/fixtures/repos/u28-outcomes/capture/session.json",
+      "baseline_sha256": null,
+      "candidate_sha256": "3225fba2187a95f1638839658f29b183aad4173bbce6db98374343d776d6d173"
+    },
+    {
+      "path": "skills/spec-riffrec-feedback-analysis/evals/fixtures/repos/u28-outcomes/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "294a720d64f3e01555e3203e91744f2d310ba4d07b1b16af4b4d0de2fa5aa78c"
+    },
+    {
+      "path": "skills/spec-riffrec-feedback-analysis/evals/fixtures/scripts/check-local-evidence.sh",
+      "baseline_sha256": null,
+      "candidate_sha256": "39abe7c61b1719e66134f6f1fe9397f1c7485a37dcd799f46eddd333a55a59fa"
+    },
+    {
+      "path": "skills/spec-riffrec-feedback-analysis/references/analyzer.md",
+      "baseline_sha256": "a77a8edba08c0d782b4c243b00b321b1196d4463bf4f147ca532f4cb550ca6a9",
+      "candidate_sha256": "e0984c4f4fa27f670d0a065fdecbc502d3adc3a7499412298ad5b29a1498924a"
+    },
+    {
+      "path": "skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py",
+      "baseline_sha256": "f0360a61cbb4f7e5c70102e8e81094a9962be698d5f887230f1192eb292e1963",
+      "candidate_sha256": "acc1fd99a7dbe31ef4b1d7f316d1729782ba61d2453411295a3449aa5effa6f3"
+    },
+    {
+      "path": "skills/spec-runtime-setup/references/supported-mcp-tools.md",
+      "baseline_sha256": "9394b742edfdf9843c7e47fe4e38bf44e9028bf4152d66ab8e70cc2309899cc1",
+      "candidate_sha256": "013bc6060b62e08ff0e3ba8f2da0d45f64cf2b1b91accbad5dad961e0f1fa9a6"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/command-display.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "6adb148ebb0119ce77f3cdf959e77ef72233f8b12c47e053c07d8cfa6cbee5a2"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/git-path.cjs",
+      "baseline_sha256": "ad2f424e71072d476b9df26fb17bece0bf7e5f1375293d8b5b27a36bdf37b74a",
+      "candidate_sha256": "dfbea06f80a63bb9267e1a52562abcd6ddf0e8ea70bf6520f7e06688614181c4"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/host-config-repair-command.cjs",
+      "baseline_sha256": "1e2ae8a812a9614bf07f30276be9cb44b3e17b678f0855b4d5bbe69458f4bdd2",
+      "candidate_sha256": "68447410fce2b2686f4fe8c94b7289f571a028e674291a042d633b9a3cec436a"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/path-safety.cjs",
+      "baseline_sha256": "5d9d72e8ccb7b15687e08d818c6bf113e3ad27ed1f1d86e293b8edf09203facb",
+      "candidate_sha256": "3613b1773d53dae05d5170e0dc9a08c83e86bf71c16871d81909d923ce0d6780"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/project-config.cjs",
+      "baseline_sha256": "546a802f19d5da97c8fcbc5c2128353c8457dc726b15b13fe90fb577a44798b6",
+      "candidate_sha256": "50b34cf1070fd97b6928626386a40edb8e527e6b05e24789d0ff00482ac331ad"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/renderer.cjs",
+      "baseline_sha256": "fdbeaff9aeddb6377b21dc8d4cd6cbc1e5620d6fab814476d6a67f340e2ff319",
+      "candidate_sha256": "481faa49844e4cb4ddc727271ec74ef80cd39f8ca5f11d48e52160fadfa77ab4"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
+      "baseline_sha256": "bb6c313249dc9964b0df0229d35435d4b438e1afe2597259d7a47bee0d7601da",
+      "candidate_sha256": "52b5ece490f345f0614b12145b11c7c989f9a45539a78935c698a9a0935a77a8"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/source-snapshot.cjs",
+      "baseline_sha256": "bcb2995930b587be59d3c8440e07feed25866333da390d28176cb7ae59f48d3f",
+      "candidate_sha256": "93c032a23728e8d3d08f25cfaf4bf26f343c30e68d8205a62a05d24434fb47c8"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-git-exclude.cjs",
+      "baseline_sha256": "b6457c5382e2bd738dc6ef4be6e7d08682d6f58b262f357ccfb77d521ef70250",
+      "candidate_sha256": "dbcd7256ebbcd61c89d3e78542ab3563579ffc779583b05c0aecf82fd0bfee44"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-state.cjs",
+      "baseline_sha256": "12782079cad5230f02a00b8162a0639f59ba3034fc9b8687e35e130feda76801",
+      "candidate_sha256": "43d1f529973677bc74f3a8fb382041cee6ba63284b9b09ea47d57f62cd2f01d2"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-routing-inject.cjs",
+      "baseline_sha256": "658b1b6f5e33c1cae895bc341cf6e846cb4fd2a487f684ae8874b24c852ff748",
+      "candidate_sha256": "80e4c502fc35d4a07085cc77f79bb039e7ca76900643f66c53cea9396f0308b8"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
+      "baseline_sha256": "5c5ff709b990c830e0b2eb770ced37006138db64ecffaf2beac71d5acf386efe",
+      "candidate_sha256": "72d8ed5ebd894105d972347e86cc0d88ab60ad9755ae042397d87378739e2dfe"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/setup.cjs",
+      "baseline_sha256": "40e3ebe91b0eda2a7d03840afe7a35d211d1d0774fdade483ab56aabd5ad30fa",
+      "candidate_sha256": "9e90d73303043091d101290cd8a35b13149b0a2aeda71a9d0e2cb041eb592888"
+    },
+    {
+      "path": "skills/spec-simplify-code/SKILL.md",
+      "baseline_sha256": "6c23d2047993297e95b17880f2f1c0135538e86900425db646e103f9fc101b23",
+      "candidate_sha256": "ed1f1b0d4c1926e8ff3a656cfc77f51de893a81f3ce5aa106ca355d9103b7320"
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/cases/docs-only-no-yield.yaml",
+      "baseline_sha256": "2d43fb8bf6c445f8ce7e8eb6af5872b6b548870960d081c03eae21cdb21704fd",
+      "candidate_sha256": "104e1aa428f760f82a897bd403a8a23c57f0b298a92f65aa965c201959979563"
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/cases/r2-elegant-refactor.yaml",
+      "baseline_sha256": "85da764db3e2bf71d7c561b82bec925e2ebacaadf39bd0854ef948540b0ba779",
+      "candidate_sha256": "c6be4fae47b8ce6d39b524bab62b7b3d4dca3443882ff0d6056fa4ad7196f4f0"
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/cases/safety-check-preserved.yaml",
+      "baseline_sha256": "d58d384410b17c5d66c5a4abb627cd54998dbbd9618293c1d889d39ad569075c",
+      "candidate_sha256": "54f7e51a7a713d07fd839336834bb52274f4daa0d121dec8d5fa79ca23fdf327"
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/package.json",
+      "baseline_sha256": "03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b",
+      "candidate_sha256": "966fdf6bda7b2bf2bd70b9c42ddcbd4f2411804e4a22de7ff0ef161db16ddcad"
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "0bb64e398f2c01fdbad21c92d0e3a3223d73b245e58118a4505f43794af1a69b"
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/test/entries.test.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "04bc52452e6a611d0609d28002ea50937126dcf5466e5a40c22727c6726623cf"
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/test/support/ledger-proof.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "621f7beb407ab683a34577ab28393256b3736ef4f9c4cc2601ed1785a2169c05"
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger/docs/notes.md",
+      "baseline_sha256": null,
+      "candidate_sha256": "b969dd4ef8c9a70997cebb0ae3fac875de32a7f11a9606b80c9a8f0e8ccd0921"
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "fa1b470d1bcd45d6e6015c63e3721e1efc05fed645a04893880077f497742516"
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/fixtures/scripts/check-no-yield-scope.sh",
+      "baseline_sha256": "41d44c1c5950d12a694737fe40ade69ba1177c05299c1c28275d9d09ebff17c8",
+      "candidate_sha256": "eaeba0281d8eb7ff3fec070b0230817cb625270bbc3481dc743dc2aa67d8bbca"
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/fixtures/scripts/check-r2-safety-stays.sh",
+      "baseline_sha256": "6463546985feca7ba843b2cbf277362ebf21ee7ae3436351b86dff548ed136fe",
+      "candidate_sha256": "399871d3e40033508227409c8d52b44f6742b49a44375a7f88ab1a014dd4b684"
+    },
+    {
+      "path": "skills/spec-simplify-code/evals/fixtures/scripts/check-safety-preserved.sh",
+      "baseline_sha256": "6d96bbd14d6543b3bdea682dcdfee863998b53f93bfdb4852387852fe5102b6b",
+      "candidate_sha256": "399871d3e40033508227409c8d52b44f6742b49a44375a7f88ab1a014dd4b684"
+    },
+    {
+      "path": "skills/spec-simplify-code/references/personas/code-quality-reviewer.md",
+      "baseline_sha256": "17d705186aa32af33549bebbc065cba1bd50952c1d0c6a304e5b246f2f7dc979",
+      "candidate_sha256": "7bdc8dfa97907a9754d6a2cff35477d987041d6d3b98cf809b6014d1e35708e3"
+    },
+    {
+      "path": "skills/spec-simplify-code/references/personas/code-reuse-reviewer.md",
+      "baseline_sha256": "b795d3dcfcbb0992ea8905a88ccbbd81810c941306ef71ceb6588a29e3452d70",
+      "candidate_sha256": "e8fac77c60edafecc4044c008c49069c4b1a508baaee369f4b8c6a7eb92655ee"
+    },
+    {
+      "path": "skills/spec-simplify-code/references/test-value-lens.md",
+      "baseline_sha256": null,
+      "candidate_sha256": "651c230a43c0fd639c3d9b69a9fd895d7a28bf35324dba7c4406aa043962ebc2"
+    },
+    {
+      "path": "skills/spec-strategy/evals/cases/check-owned-update.yaml",
+      "baseline_sha256": null,
+      "candidate_sha256": "db5489a3c14b23e7424f0a88630d17ea04688ceddcb072e0023e89ddff66ce38"
+    },
+    {
+      "path": "skills/spec-strategy/evals/eval.yaml",
+      "baseline_sha256": "61aa8392d58c24744e67b21f3dd25886eea575ff91ee92426687dcde145842e7",
+      "candidate_sha256": "25d38ce2eb0dcd8f5c2cd5111657c3ce071d200b4fadf5c627ae24e7ddd083a0"
+    },
+    {
+      "path": "skills/spec-strategy/evals/fixtures/repos/u28-outcomes/README.md",
+      "baseline_sha256": null,
+      "candidate_sha256": "2d0682343e9e701266c28b122954228575c228ef416b201b5f1bda011433ffae"
+    },
+    {
+      "path": "skills/spec-strategy/evals/fixtures/repos/u28-outcomes/STRATEGY.md",
+      "baseline_sha256": null,
+      "candidate_sha256": "6c1e1e8c9dad4470bf665c24bff12b970c26f74cbb7d3ef6281bd9c0b901b8a2"
+    },
+    {
+      "path": "skills/spec-strategy/evals/fixtures/repos/u28-outcomes/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "686285663ec55b49fe14ae306f43ef18b39101182d269641174f2b52cfdf6c80"
+    },
+    {
+      "path": "skills/spec-strategy/evals/fixtures/scripts/check-owned-update.sh",
+      "baseline_sha256": null,
+      "candidate_sha256": "f6ec0e4935a8dab7e60eab9d59ba406f0a9f6ed471ea4250cdfe6e306c80a5d8"
+    },
+    {
+      "path": "skills/spec-strategy/references/interview.md",
+      "baseline_sha256": "93ba24c119f0bc559e771839122f94e10af539761ce79bf9470e5b35bfb3fc1d",
+      "candidate_sha256": "62864c5dcfe108e72fac67d92e1a757ca6bd051feaf68242ee1df94a513e6767"
+    },
+    {
+      "path": "skills/spec-strategy/references/strategy-template.md",
+      "baseline_sha256": "56c677055ac95eb1b504331390033199058dc37f4116de8d9528e4eaf467f695",
+      "candidate_sha256": "f3ff960b1fb0daf05dd3c994e05a06b8ad885c456a5743a1408048013bf0bffd"
+    },
+    {
+      "path": "skills/spec-sweep/SKILL.md",
+      "baseline_sha256": "b2a87ee7f920913986c8a0a80a4f3aec988025cf25cb794f941af7570bd9d484",
+      "candidate_sha256": "2690a0cf76e8e2f7c6cfda299272377f4e1a6144664a94b30a5163e62d6aad49"
+    },
+    {
+      "path": "skills/spec-sweep/references/agents/media-analyzer.md",
+      "baseline_sha256": "48504dec13f25cdfc77afcef49ec1cdcb0369b567022186a75683df7aa6d02a4",
+      "candidate_sha256": "209f6444a5b8e6b9f8cc117cbbe29ac9df0070ad7c0fa92571db08320c86b501"
+    },
+    {
+      "path": "skills/spec-sweep/references/run.md",
+      "baseline_sha256": "78c3660046d6cd3c578fe4591ebf3f7f1173bb119b347a3ed2edab1429d97d0b",
+      "candidate_sha256": "0997c6376dd50f7c8291c24674e534e440f05db519530b33cc458bfec3044c2d"
+    },
+    {
+      "path": "skills/spec-sweep/references/state-schema.md",
+      "baseline_sha256": "6631b3b20c0ef2f49b676ecc2cb2e08b548df5c870640130e4669585da0828e8",
+      "candidate_sha256": "850724a1360cd2039bdc5149527232aa88f2245aa5ae117d0c4a65e2bff2b1d3"
+    },
+    {
+      "path": "skills/spec-sweep/references/subagent-template.md",
+      "baseline_sha256": "f1432a0ac7f85f918d49a7b07e5b0dc2bfe68d0705178865e5c3a3e52fa85962",
+      "candidate_sha256": "38d2cbe4917ca328d26f601fb853d70c8110701b982eb36895c9d009a3452e4c"
+    },
+    {
+      "path": "skills/spec-sweep/scripts/analyze-sweep-media.py",
+      "baseline_sha256": null,
+      "candidate_sha256": "1891eb170f90531f887fb39eb00c6e808d7b2a04071da0ea18a61de77507c4ab"
+    },
+    {
+      "path": "skills/spec-sweep/scripts/analyze_riffrec_zip.py",
+      "baseline_sha256": "f0360a61cbb4f7e5c70102e8e81094a9962be698d5f887230f1192eb292e1963",
+      "candidate_sha256": "acc1fd99a7dbe31ef4b1d7f316d1729782ba61d2453411295a3449aa5effa6f3"
+    },
+    {
+      "path": "skills/spec-sweep/scripts/publish-final-state.py",
+      "baseline_sha256": null,
+      "candidate_sha256": "01329f37fe30294bd7d43312dc10d53763ac595e625877779a9530e6d8b90bf7"
+    },
+    {
+      "path": "skills/spec-sweep/scripts/sweep-state.py",
+      "baseline_sha256": "dfeb18f5bdec0b38d9658ce57bf9cbd2b90b4cebd18e09e852a526a0c56a64d0",
+      "candidate_sha256": "a665c8a3b9e0b9588eeab78a0bca81fc6651b90a53e144e73d075f6e0113f344"
+    },
+    {
+      "path": "skills/spec-test-browser/references/pipeline-orchestration.md",
+      "baseline_sha256": "861527e2f3c0ddfae4f0690e62a6ccdf418d1996c3272cb6e0e7f79203a4cf7b",
+      "candidate_sha256": "467b7649c72e4428b673568432e7663aea70761f6dbd310ab8f3f2cda0c69c41"
+    },
+    {
+      "path": "skills/spec-test-browser/scripts/agent-browser-exact-origin-conformance.cjs",
+      "baseline_sha256": "397718d4c9b02210f431e2d5babe83d7ad1594ea35cc93e1a3009d511d4f8e3e",
+      "candidate_sha256": "3a34fea98914128ab176cdf32700ed635fba36843c1071071a93ff728c0943e9"
+    },
+    {
+      "path": "skills/spec-test-browser/scripts/agent-browser-run-context.cjs",
+      "baseline_sha256": "e60b83ed47085a6832c5ae0a043a50233c467c082b8dbf1e68abc10d1f209d34",
+      "candidate_sha256": "fc79fae147bc83091fbb65776d92c8f55ac6d3c9375a55b27dfa7a72767e0ca1"
+    },
+    {
+      "path": "skills/spec-test-xcode/references/setup-and-build.md",
+      "baseline_sha256": "017477d6fc94cc9f217b5c0008f2419ffdeb552881607b1e83ff15857b56a99e",
+      "candidate_sha256": "b95a896afaecc3faac598ac1de775614253ce82082210ced73937920887927ae"
+    },
+    {
+      "path": "skills/spec-test-xcode/references/test-and-report.md",
+      "baseline_sha256": "923a54f020f6e048d90ce5229c1aa03df45699cdac3fdce551bf8d4a60de94b2",
+      "candidate_sha256": "dba45f36ce392bee821ea849e6e2537f110c8ab714d3f7e6ba0a9a88ebe4647a"
+    },
+    {
+      "path": "skills/spec-work/evals/cases/drifted-pack-rejects.yaml",
+      "baseline_sha256": "75c1e347249f3e022528b0d23c04e22d57dace3ece493349c0764f0bb34a7b8c",
+      "candidate_sha256": "2ff8f8f5954877c31bef89c6f79b88324aae1620602529c99d56b0f8c43ee941"
+    },
+    {
+      "path": "skills/spec-work/evals/cases/no-commit-auth-stays-uncommitted.yaml",
+      "baseline_sha256": "cbf9e4d24ee10331f508d1d2ce9ad8fece3593336fa2d72c29d45581a868d951",
+      "candidate_sha256": "8e5b97223a5f6267d0b142bd43db2dc90f6fd6dc0a3c214f3a33ff7c65b6f0c7"
+    },
+    {
+      "path": "skills/spec-work/evals/cases/non-active-rejects.yaml",
+      "baseline_sha256": "342d981fdd530e3c151f45bbc1bb01bc359eb6cd15a126244e6c2eeb246b81ac",
+      "candidate_sha256": "460fa3039e4c52e91212054f14cc501b71575c299780ebea75646959f5917de4"
+    },
+    {
+      "path": "skills/spec-work/evals/cases/r2-reverse-mismatch.yaml",
+      "baseline_sha256": "9b2b80a2a0bed5ba42e41c8481db0420105ec5ff75aa881ccfda568bbd8ebf22",
+      "candidate_sha256": "9358a99291854b35e684f7832227908312de588b082fd49e0975a2eac9b09c8a"
+    },
+    {
+      "path": "skills/spec-work/evals/cases/requirements-only-stops.yaml",
+      "baseline_sha256": "b4a30a23f4e467ab0a20417b661b75cc2eda6a914938b609f1c426901ad9d5b4",
+      "candidate_sha256": "f3bd5ac99af5b05dae392a5cb5d17b3d97014e756598a98ebc5ab70e1134c34f"
+    },
+    {
+      "path": "skills/spec-work/evals/cases/return-to-caller-envelope.yaml",
+      "baseline_sha256": "2db0e6d88b60ce59f63e79053c0214d0abede969f4141c71731fa87812029161",
+      "candidate_sha256": "2535864d918b909d21a704f3bd6ab856758ca4f5275f899b3dda2b02e2eb6ccd"
+    },
+    {
+      "path": "skills/spec-work/evals/cases/standalone-closeout-order.yaml",
+      "baseline_sha256": "dfe266c61b5840e752966f8f2632d47f060d9e50290acc8e3551edb4b1c16500",
+      "candidate_sha256": "56ad9fe59724a8c61c1dff7ade0aa5eb586191e17a4ca58391ebc810656f0150"
+    },
+    {
+      "path": "skills/spec-work/evals/cases/trivial-bare-prompt-executes.yaml",
+      "baseline_sha256": "c3c8c3dfb2bcb109f85e4c0131a089f32bddae549c846e6b45402b6134960626",
+      "candidate_sha256": "9b17a73c411983cdd5e9f7c86fa5a94da528707c380aaa0d1ca87995758c9909"
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/done-plan/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "ff682ba53423a83e912cd15b08c189c2bc4881285eb31dd21b29d190d8edc352"
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/drifted-pack/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "013fb0888ad3c7b33d4251676254c11d676f32a734d7a703de396586961fd409"
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/mini-ledger-guarded2/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "26e095f60a16f6415eba88ee8554ace49a272b1b8af9431815f855eed1f2060a"
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/repos/reqonly-plan/prepare-eval.cjs",
+      "baseline_sha256": null,
+      "candidate_sha256": "dc810371244f93761aff0fe9dcb70baf10e90a164c69a1e50368155bc23acc86"
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/scripts/check-closeout-order.sh",
+      "baseline_sha256": "daf068851d0859a4bc77c74a337cf5450a1602a7bf4892a6ef4174909ccbfed2",
+      "candidate_sha256": "1f1d89e4306bb6a83a8e4d78338be34c5e5f3dca6813aee8cab72919a703b314"
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/scripts/check-no-implementation.sh",
+      "baseline_sha256": "94a855ca6f5200cf216ed5d22951d227ab4a0491afae46fade4fc8218076f8c6",
+      "candidate_sha256": "a84b9a3b2ce7f0efac04ff8bd641c945247e8a4e8dd3f00ec9837539d0a2af3c"
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/scripts/check-r2-reverse-mismatch.sh",
+      "baseline_sha256": "16f84c3de6ea0dc29bca590d675e36efda2b022d6facb08ca4391aa43f88e9b1",
+      "candidate_sha256": "a84b9a3b2ce7f0efac04ff8bd641c945247e8a4e8dd3f00ec9837539d0a2af3c"
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/scripts/check-readme-fixed.sh",
+      "baseline_sha256": "5925a6eef489e42e1c5ec1252d58a122c1c16a7651fabce68810728643e6a621",
+      "candidate_sha256": "51be451f38d40de3aac6a597c906f90da05747fcc2a8345f6a6a0ad96a03b835"
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/scripts/check-return-to-caller.sh",
+      "baseline_sha256": "16f874f2e8c289c57aab7da5bf96e88b2c64eafebbdf4718ef3b7316e0719668",
+      "candidate_sha256": "1f3a10e7decea9e404318b856b5d4fae054f2a79c56de249435644c7d21e5979"
+    },
+    {
+      "path": "skills/spec-work/evals/fixtures/scripts/check-uncommitted-handback.sh",
+      "baseline_sha256": "f9d07c27d9a49c795409f2d86473c84ed1020f009bfc92f6a0c269ccd40a3d29",
+      "candidate_sha256": "51be451f38d40de3aac6a597c906f90da05747fcc2a8345f6a6a0ad96a03b835"
+    },
+    {
+      "path": "skills/spec-work/references/agents/figma-design-sync.md",
+      "baseline_sha256": "5fe5c07a8fd1eccda57a53399ef201c44c6d9347b2a7dede8d4dae2800a83eea",
+      "candidate_sha256": "c6e423e969f1d2afb6caeb49fc47cd0ce688be3be551034cdeeea69c5325c97c"
+    },
+    {
+      "path": "skills/spec-work/references/execution-strategy.md",
+      "baseline_sha256": "252663522d36965cd2ff2425d863f5e23b73a79784b62b3571ac79986f3b897f",
+      "candidate_sha256": "ee061257963659fcd581da31372e3ce41b37d3e1dd685b1569317e97b126f574"
+    },
+    {
+      "path": "skills/spec-work/references/feedback-and-tests.md",
+      "baseline_sha256": "12b73e8b0a075b3144bcebb8900719e5910f48c5cc83f8502c62ed7456055183",
+      "candidate_sha256": "71adda968968fcff7c10d3748dc2adcca8f36cca0d0787cdd4046158169f4b2a"
+    },
+    {
+      "path": "skills/spec-work/references/implementation-loop.md",
+      "baseline_sha256": "a2868e55de802476bf597ed46ec73b3166fc3823145a711c79d296998b2f0f41",
+      "candidate_sha256": "7fc8a396ae871ec187eea0e0a6fb95cd11f654be84df6ef830d0a1bb71fd203c"
+    },
+    {
+      "path": "skills/spec-work/references/return-to-caller.md",
+      "baseline_sha256": "85dd95cdf84f8e814c17231950c9720c1d99516701290fbfed695fe12fde1d0c",
+      "candidate_sha256": "1ba6d7716594b43c6255bd17049d0f515d56a5c468b66c58b3b9c69a4e448d3f"
+    },
+    {
+      "path": "skills/spec-work/references/review-findings-followup.md",
+      "baseline_sha256": "1fd477f9aeff8996ac38f1a5231235494e94fc20d0ce9f69ddfd3d5c6da4ccf5",
+      "candidate_sha256": "e10bdc0245430963bccfd6f233d158c39bcffb1c206675a027398d413c56abe3"
+    },
+    {
+      "path": "skills/spec-work/references/shipping-workflow.md",
+      "baseline_sha256": "1d77e52ff8c894552d5515b7b75a514a2e384a4c5d4a3c3bc8478088bff825e9",
+      "candidate_sha256": "2092c0868ab6e271d841455f92d1c15d550c5b0f18fde5b28461a3f237ece8ac"
+    },
+    {
+      "path": "skills/spec-work/references/work-intake-and-task-pack.md",
+      "baseline_sha256": "57db393caa33fd44d5f7fe27c762758fe1d4ee42207aa1e806bbe5702bb54303",
+      "candidate_sha256": "d888973eb245c8faf54c109832e999c60fc70106bfe01a6ab16897b322fe8ce3"
+    },
+    {
+      "path": "skills/spec-worktree/SKILL.md",
+      "baseline_sha256": "380139d61774f908ab6ae8cf983502d178cbace6e6d8e43a4b7587ea10cfcab6",
+      "candidate_sha256": "0c15f4281236a35c1458b49ba88010e763bef9e8727d147ee937aa3cf0d3d819"
+    },
+    {
+      "path": "skills/spec-worktree/scripts/worktree-manager.sh",
+      "baseline_sha256": "1a871490f30ee118b20b8c2e4974c6a758f7065be2799aa1f4b29e4b175110a7",
+      "candidate_sha256": "333eb0a223bcc2de4a14b543f61eedac365e0280ef7976a840a7c8cf4683d6aa"
+    },
+    {
+      "path": "skills/spec-write-tasks/references/task-pack-schema.md",
+      "baseline_sha256": "328f458f4493b5f5a99e00bcb8cf283a4e22c4d1ac07b03bbbba7d9c40a96644",
+      "candidate_sha256": "2b2efdd0547ad7841b53138d36b25d7f291729e04ada88b436b8e182fe6244aa"
+    },
+    {
+      "path": "skills/spec-write-tasks/references/task-quality-guide.md",
+      "baseline_sha256": "034a3d3a5aac53aa22a7149467c9724d6a7f882e15cf3cbe51597e1637bd4f96",
+      "candidate_sha256": "695f570b62e5ff57a5a8d4df82c5d830a3c20d6a2bf24f1b8ed6aa9665879ca2"
+    },
+    {
+      "path": "skills/using-spec-first/evals/cases/r2-low-confidence-one-question.yaml",
+      "baseline_sha256": "c9aead0e1c100d8db7dd131ce9dd3c1ca93a222cc7f7c5358931660e30aa7b4f",
+      "candidate_sha256": "f610841eec8a4bc2943295b5cc3d007ca9c3b4b8e03efa7f73612a87ef1c73c5"
+    },
+    {
+      "path": "skills/using-spec-first/evals/fixtures/scripts/check-r2-asks.sh",
+      "baseline_sha256": "efc4aea23677aae07756df5efc2191276025b78e5bfc4eb8a62f22d01692fa24",
+      "candidate_sha256": "7e56d9164b17f97a7c92ad381c01095d5b8de3df9373ef0236124e92275dbb69"
+    },
+    {
+      "path": "skills/using-spec-first/references/conditional-routing-boundaries.md",
+      "baseline_sha256": "a465bd34553006730a21258483d07ab138a53f702d897561c9efc877bdae855a",
+      "candidate_sha256": "3bfb4cb185a6ed666942a9f314e5df4133dc57f2e0f410eefea1325658c19eb0"
+    },
+    {
+      "path": "src/cli/helpers/setup-facts.js",
+      "baseline_sha256": "31cad2f021655323cae4b98afb72ff93a3255a2f404355c446023acaf665adf7",
+      "candidate_sha256": "f56a5fd05d0cf5721b15d95103c44a136915e446036065482eca0a9d846bf587"
+    },
+    {
+      "path": "src/cli/helpers/target-repo.js",
+      "baseline_sha256": "ccd0a570e271581cb134a88067daba413484fb13c3cf2d02f2fff197fd651a32",
+      "candidate_sha256": "c5c43f24ab096da478da685b389fcf4d8bbc7ae2c9c897ba5d8bc670d1cced94"
+    },
+    {
+      "path": "src/cli/task-pack.js",
+      "baseline_sha256": "3bcd189846236a760b38accf681158d0f5d2edc31f843f461e46c11bcf936a19",
+      "candidate_sha256": "97f530378030fcf314041e80c4ac0a09d5e13e9fe86b55949acb23e1b9a4e698"
+    },
+    {
+      "path": "tests/integration/eval-disk-evidence-guard.integration.test.js",
+      "baseline_sha256": "e2474216cb2096977cb5895539d14d435c6f399d1538ea2861c091309ccf02a4",
+      "candidate_sha256": "c9999f853e67127f4e468643ca71b7a57243b5f432bd262e54d7e7856294e1cf"
+    },
+    {
+      "path": "tests/smoke/cli-smoke.test.js",
+      "baseline_sha256": "34c20010b5e36763d8ef0371859ffd9904bf0b3cd176a7c8256a384f01594b18",
+      "candidate_sha256": "fe5f0e926869d065d79e8e7e4676d60acb8adf3810be7b213f5f26b14edfc6a0"
+    },
+    {
+      "path": "tests/unit/agent-persona-template-drift.test.js",
+      "baseline_sha256": "7f560012f216e56b6de2e158e53f8d7338d19cb3606f1bd17c1646f1f7fd27ec",
+      "candidate_sha256": "f93976c93af99000e87a48739e29bab832aad4d4d10626307fb86d7cab24e075"
+    },
+    {
+      "path": "tests/unit/autoresearch-score-regression.test.js",
+      "baseline_sha256": null,
+      "candidate_sha256": "172375fd5dd55625ca0e03cc427a84265aebf90d8dd0c6f2d6db1e93fd46940b"
+    },
+    {
+      "path": "tests/unit/ce-outcome-judge-calibration.test.js",
+      "baseline_sha256": null,
+      "candidate_sha256": "a63e68d4d0051c65287884d6e9c2c1bd413b6766ccd3b9d621e153f98e322686"
+    },
+    {
+      "path": "tests/unit/ce-setup-localization-contracts.test.js",
+      "baseline_sha256": "d34978507c0e27af2377fdc9903d4e023af8353b4cc1478e29719df0db12f41e",
+      "candidate_sha256": "87ac4188d0cb8ce28ae4f211dae5c89617dc9b7988f3c8e9afcdb8be1719cb7e"
+    },
+    {
+      "path": "tests/unit/ce-u28-outcome-calibration.test.js",
+      "baseline_sha256": null,
+      "candidate_sha256": "8944c741ce1674a96839004322dd5f801f614b029b0587d1c4d9b447168d8305"
+    },
+    {
+      "path": "tests/unit/mcp-setup-command-display.test.js",
+      "baseline_sha256": null,
+      "candidate_sha256": "7346a4449fb915f22ccefcb3dba61ab1f0450ca783a2d72ccc889b108b3990f3"
+    },
+    {
+      "path": "tests/unit/mcp-setup-workspace-git-exclude.test.js",
+      "baseline_sha256": "13103222489b341ef97fda7af7e32ef289082e21ef796f40fd5823ccf72dd765",
+      "candidate_sha256": "9d47738b891ea1058e4c11b4e1d20f8fe84d8d1a5e11f5d1f9d1c8b74f6ae25c"
+    },
+    {
+      "path": "tests/unit/mcp-setup-workspace-routing-inject.test.js",
+      "baseline_sha256": "28c77c19c9474ddb14315f8fc02f607ad03d22271b50bd8904ffcf70a5f415f8",
+      "candidate_sha256": "19618dcc139ae8e1b47840f93bcb89edc46cdd799f8521014bdcc53497f3d7dd"
+    },
+    {
+      "path": "tests/unit/plugin-modules.test.js",
+      "baseline_sha256": "af94db81cf639562cfe2570e577be42db44f2820643eb78572b0502e4e76366e",
+      "candidate_sha256": "2063bddb193e0a9f20fcfaf20671beff50a48b98aab0a6342f911425e91edb8d"
+    },
+    {
+      "path": "tests/unit/remaining-script-defenses.test.js",
+      "baseline_sha256": "311edd21e1af37f51938e47b309d6708867251ac48f96beb8f424a194bc22b2d",
+      "candidate_sha256": "ebd3593d06051ab889f34ad8dbf66bf5199346f423d88219a48f40f83011fbbe"
+    },
+    {
+      "path": "tests/unit/resolve-port-script.test.js",
+      "baseline_sha256": "023020c3449ac456f9737351364e20b1aa5663fb07addd2f2412227022170a79",
+      "candidate_sha256": "5f179948c019b52426de4df6e24567c799b27a363ea6b40b1aeb9170305f746c"
+    },
+    {
+      "path": "tests/unit/session-history-scripts.test.js",
+      "baseline_sha256": "3ed866f51424f23645bcd2f3ad1df181c463aeedfb3c47fd0085ffe86947b153",
+      "candidate_sha256": "f9c251d4c5b6fbf89e2c49bb090238b33c5e237d4280a4bbc90602c38125199b"
+    },
+    {
+      "path": "tests/unit/setup-facts-malformed-entries.test.js",
+      "baseline_sha256": "b2d662cb02c389609aa9d349befa0b86b759a84954ad507dccc24e925b31c5db",
+      "candidate_sha256": "888156080c1bad480399d8c1e1fefe5bbf962846558d658f870e65219de4a8c3"
+    },
+    {
+      "path": "tests/unit/skill-flow-p2-closure-contracts.test.js",
+      "baseline_sha256": "6a0458bb01f55367e05faa6d0fe260e1f99a6b861f96647f84c09377cbfcf77c",
+      "candidate_sha256": "8762be702369d14462c35a93045452c8b63026aee0fc0737194f4e16e3024194"
+    },
+    {
+      "path": "tests/unit/spec-code-review-mechanics.test.js",
+      "baseline_sha256": "5723db58e43b21f6e027351143f83c73002d7d708686db2ae73b80d17953a236",
+      "candidate_sha256": "91db40d8b2db932ffba52f78686dbfe2bc08b63f3ead2ad3f8ac4c8b27d6042b"
+    },
+    {
+      "path": "tests/unit/spec-commit-push-pr-context-contracts.test.js",
+      "baseline_sha256": "79fd042641d1f07fb989f957201e5a47b1b24193ef8b71446eaa76cfde6917b2",
+      "candidate_sha256": "635b1ed62cb144e2f512e3b74efa419035e784ee6fec84350ffc5cc07901506e"
+    },
+    {
+      "path": "tests/unit/spec-commit-scope-regression.test.js",
+      "baseline_sha256": "10f82f2dbce11fb87c6406a85a9f3fb0cfe213c2e496ed866f0a33047a5122be",
+      "candidate_sha256": "266ddbc678db015e0fbee44a41ed35fbfb54c6d24aa6cfe2ad68dc00dcdaf8e5"
+    },
+    {
+      "path": "tests/unit/spec-debug-judge-calibration.test.js",
+      "baseline_sha256": "ef5a5587231f0dc63b00a24862fb8ad5cb4d07186fc97ad146267bf564f5abef",
+      "candidate_sha256": "0d9de239ba7f986fc006c5af0f5f4c372a81283a52d2537d16729bec2239b656"
+    },
+    {
+      "path": "tests/unit/spec-doc-review-contracts.test.js",
+      "baseline_sha256": "bbe20bc9fdcdb1643a6ec3aaceb7b332274061d2c29a79aebbcc01066d055855",
+      "candidate_sha256": "ea4b37f3a918e88d39a0e38f7a3a0fb1761013fbfbc46159d3311a74051811cf"
+    },
+    {
+      "path": "tests/unit/spec-lfg-pr-watch-state.test.js",
+      "baseline_sha256": "fe529b2ae10371f370d5de4061657fd58edaf967a28e513d7e6bb4d83fae53c8",
+      "candidate_sha256": "c54f9f505015edd405edc0a43f85e0748f45f0b545bdd4ab17dd08945e2b4374"
+    },
+    {
+      "path": "tests/unit/spec-optimize-contracts.test.js",
+      "baseline_sha256": "388b14fdf848ed56b39c20a0c449b5104e322259129132d4a576cf9f1003e263",
+      "candidate_sha256": "b6798b88bdf411d90550c04410643a17a833c364446ff9a7f7b906227017c38a"
+    },
+    {
+      "path": "tests/unit/spec-optimize-decide.test.js",
+      "baseline_sha256": "114bad5ad4bc80f060eb11a51ebe8804c729c501cb325f602a40e935fe5c46c6",
+      "candidate_sha256": "21f16399de9331f267b8d393bb26143f96a4e4cab4edf46e64dffd8694b634f0"
+    },
+    {
+      "path": "tests/unit/spec-optimize-measurement-only-contracts.test.js",
+      "baseline_sha256": "a96d04ad04eee15621bc92408271f134d340b5c6c1f7682641d1da9b33bfbd81",
+      "candidate_sha256": "e8ff654c8c79a91b6cc5d285e255b1896ffd62e3c35bb19db5810b728e708c6c"
+    },
+    {
+      "path": "tests/unit/spec-plan-quality-contracts.test.js",
+      "baseline_sha256": "e25d3195b316ba3e7e47137fa71d8a7d42672829967b22484e4e291e6323bca4",
+      "candidate_sha256": "a65eea51f3a984c149288a2d76edd0fac0e428d0b0d83317fcf66b391eabddb6"
+    },
+    {
+      "path": "tests/unit/spec-polish-launch-json.test.js",
+      "baseline_sha256": null,
+      "candidate_sha256": "881b86fc598a9dfeb2af66e6253c8786f7861f7ff420347e87b324264ccc239b"
+    },
+    {
+      "path": "tests/unit/spec-pov-worker-admission.test.js",
+      "baseline_sha256": null,
+      "candidate_sha256": "2fcc3b8656474a5247abf6e88ffa36fed97a80dbb32229fa6e8d94f6c000d1cc"
+    },
+    {
+      "path": "tests/unit/spec-pr-feedback-publication.test.js",
+      "baseline_sha256": null,
+      "candidate_sha256": "1718fcd59e0207fb534eec0f3e87b131aa69a0d2dda4595f15d1b4937528162b"
+    },
+    {
+      "path": "tests/unit/spec-prd-finalize-transition.test.js",
+      "baseline_sha256": "31ca44e12da1ae73cae183be29a42e307b8626df7723e1f5b02f5a6d74f5a7a7",
+      "candidate_sha256": "be933d0ef61ded3020319c2d63ea6f305d8e152ac900e25e77d26d3efedba9ad"
+    },
+    {
+      "path": "tests/unit/spec-riffrec-evidence-coverage.test.js",
+      "baseline_sha256": null,
+      "candidate_sha256": "2ab314cda2a5c683a94458f5c065c840cf041fde986d045a45a82ff01b6687df"
+    },
+    {
+      "path": "tests/unit/spec-sweep-final-publication.test.js",
+      "baseline_sha256": null,
+      "candidate_sha256": "6285f327e9533cd4ed4adc068e096a8abd31b25382266f25015b134fbcffe77c"
+    },
+    {
+      "path": "tests/unit/spec-sweep-media-admission.test.js",
+      "baseline_sha256": null,
+      "candidate_sha256": "d128cfd5e889a0ae340fe9156ab9d880662a7a640baabe63eeddc01d5ed2002d"
+    },
+    {
+      "path": "tests/unit/spec-test-browser-conformance-cleanup.test.js",
+      "baseline_sha256": null,
+      "candidate_sha256": "2569a6dfa09966dba79abf557fb2f6aa1b54b985464f648e4ee8adb5c9e519a7"
+    },
+    {
+      "path": "tests/unit/spec-test-browser-contracts.test.js",
+      "baseline_sha256": "280b9cada77c1814d1a4520556b00e3b98ccedd61c0a34d69822a6de404237fe",
+      "candidate_sha256": "5e2cb41c67a9e9d06c9a118f33f8c98e81c40a9a003294d82b58facab006736b"
+    },
+    {
+      "path": "tests/unit/spec-work-outcome-judges.test.js",
+      "baseline_sha256": null,
+      "candidate_sha256": "efafbabcb79a82886d18eb4b9c07bde177ee4933effba812583195ef45676f67"
+    },
+    {
+      "path": "tests/unit/spec-worktree-contracts.test.js",
+      "baseline_sha256": "93201b3c9d96c9f941ece2c22702f8ecb89f2292a0f706ef09438dffb4ffcbe3",
+      "candidate_sha256": "66013cb7369f6f2d5e2f07c03656aebf1060eabb44c19f88ed9fef67a8adab6c"
+    },
+    {
+      "path": "tests/unit/sweep-state-legacy-import.test.js",
+      "baseline_sha256": "74bb54139a7679ca28058ae774fcb193cadcbbc627d2d1f3098588c27bbdb251",
+      "candidate_sha256": "1d34cef95576d06479e94c495f5a1aa290662e1d7304ed2b448600985528756e"
+    },
+    {
+      "path": "tests/unit/sweep-state-safety.test.js",
+      "baseline_sha256": null,
+      "candidate_sha256": "02fb84840898227edd8204a80f6ee9fe01092028f447b987fbc3daf88d54bdab"
+    },
+    {
+      "path": "tests/unit/target-repo-containment.test.js",
+      "baseline_sha256": "c9f89c84d23f42e572f0377560784c9e50d056611d477779aee4f13e62c92a57",
+      "candidate_sha256": "bd50819e425276191672e60d90b3d40b34d4196e77cdda21e9e36722ed8ad297"
+    },
+    {
+      "path": "tests/unit/task-pack-command.test.js",
+      "baseline_sha256": "8857ab52922f8e674c836ca90f3ed807fc4d6da80a88d25646cc1ac6e8a8e305",
+      "candidate_sha256": "d31e7d91045dfd59a02d6e3067d88e9a1696dc69be3777097c42db8e418c976b"
+    }
+  ],
+  "claim": "Byte identity only; does not prove behavior or independence."
+}

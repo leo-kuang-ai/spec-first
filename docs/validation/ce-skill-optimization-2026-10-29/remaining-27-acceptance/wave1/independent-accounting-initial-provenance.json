@@ -1,0 +1,10 @@
+{
+  "session_id": "01a191e7-4403-7c60-a01f-62b091798456",
+  "agent_path": "/root/ce27_sweep_recovery_review",
+  "review_sha256": "3c0ee8afc5e118ad2cff7a118e8fe16b593ac058b9b26aca90d9d4027bc9e95c",
+  "trace_sha256": "3cbc3f3602d45fc82a70f6f4d2844237adfdfe09d16e471abdcc6837d99752e7",
+  "intervention": "Parsed final JSON without semantic edits; original final response retained in full trace.",
+  "limitations": [
+    "Independent context, not independently authenticated model identity or enforced read-only isolation."
+  ]
+}

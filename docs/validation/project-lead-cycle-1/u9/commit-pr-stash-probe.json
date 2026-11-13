@@ -1,0 +1,203 @@
+{
+  "artifact_type": "confirmed",
+  "finding_id": "C1-COMMITPR-001",
+  "captured_at": "2026-09-20T06:03:33.017004+00:00",
+  "source_ref": "skills/spec-commit-push-pr/references/branch-creation.md:55-66",
+  "fixture": "本地30行共享文件，目标base改首行、dirty工作树改末行；另有用户staged文件与untracked文件",
+  "checkout_collision_exit": 1,
+  "stash_pop_exit": 0,
+  "staged_paths_before": [
+    "unrelated.txt"
+  ],
+  "staged_paths_after": [],
+  "user_bytes_preserved": true,
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "init",
+        "-q",
+        "-b",
+        "main"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "config",
+        "user.name",
+        "Cycle1 Fixture"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "config",
+        "user.email",
+        "fixture@example.invalid"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "add",
+        "shared.txt",
+        "unrelated.txt"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "commit",
+        "-qm",
+        "fixture base"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验\n"
+    },
+    {
+      "argv": [
+        "git",
+        "checkout",
+        "-qb",
+        "target"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "commit",
+        "-qam",
+        "target base"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验\n"
+    },
+    {
+      "argv": [
+        "git",
+        "checkout",
+        "-q",
+        "main"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "add",
+        "unrelated.txt"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--cached",
+        "--name-only"
+      ],
+      "exit_code": 0,
+      "stdout": "unrelated.txt\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "checkout",
+        "-b",
+        "feature",
+        "target"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "error: Your local changes to the following files would be overwritten by checkout:\n\tshared.txt\nPlease commit your changes or stash them before you switch branches.\nAborting\n"
+    },
+    {
+      "argv": [
+        "git",
+        "stash",
+        "push",
+        "-u",
+        "-m",
+        "spec-commit-push-pr: pre-branch feature"
+      ],
+      "exit_code": 0,
+      "stdout": "Saved working directory and index state On main: spec-commit-push-pr: pre-branch feature\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff-tree",
+        "--no-commit-id",
+        "--name-only",
+        "-r",
+        "stash@{0}^3"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "checkout",
+        "-b",
+        "feature",
+        "target"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Switched to a new branch 'feature'\n"
+    },
+    {
+      "argv": [
+        "git",
+        "stash",
+        "pop"
+      ],
+      "exit_code": 0,
+      "stdout": "Auto-merging shared.txt\nOn branch feature\nChanges not staged for commit:\n  (use \"git add <file>...\" to update what will be committed)\n  (use \"git restore <file>...\" to discard changes in working directory)\n\tmodified:   shared.txt\n\tmodified:   unrelated.txt\n\nUntracked files:\n  (use \"git add <file>...\" to include in what will be committed)\n\tnew.txt\n\nno changes added to commit (use \"git add\" and/or \"git commit -a\")\nDropped refs/stash@{0} (2ce25a3e541dbb555c744402f7edc61aabace2c3)\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--cached",
+        "--name-only"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "limitations": [
+    "仅复现指令中的Git序列；未执行真实PR、宿主workflow或用户工作树操作。",
+    "证明全仓stash和暂存选择变化，不声称用户内容丢失。",
+    "diff-tree 的第三parent枚举未提供可靠untracked清单；该项不作为捕获范围实测依据，-u范围仅由指令源码判断。"
+  ],
+  "source_sha256": "5cb38eb8314ad50a1d4f2a892081e6bc802d7fcd23080b8bcd198987d60c97ef"
+}

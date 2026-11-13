@@ -1,0 +1,223 @@
+{
+  "skill_name": "spec-ideate",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T19:42:41.420934+08:00",
+  "end_time": "2026-11-04T19:52:41.559841+08:00",
+  "case_results": [
+    {
+      "case_id": "vague-subject-gate-asks",
+      "title": "无主题的模糊请求应触发 scope 提问而非直接生成",
+      "status": "PASS",
+      "duration_ms": 47264,
+      "turns": 2,
+      "input_tokens": 28309,
+      "output_tokens": 1405,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 2,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.files_not_exist",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-ideate/evals/fixtures/scripts/asks-a-question.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-ideate skill 已安装，请按它工作。）\n给我一些改进建议。\n",
+      "response": "当前目录里只有刚安装的 spec-ideate skill 本身，没有代码库或其他素材——「改进建议」没有指明改进的对象，我需要先和你确认主题才能开始。\n\n**你想让这次构思围绕什么主题展开？**\n\n1. **指定一个主题** —— 直接告诉我改进的对象（比如某个产品、某篇文章、某个工作流程、你的某个项目，或任何你关心的事物）\n2. **给我惊喜（Surprise me）** —— 由我从你提供的素材中自行发现值得改进的方向；由于当前目录没有代码库，选这项需要你先给一点素材（一个链接、一段描述或一份草稿）\n3. **取消，让我重新组织请求** —— 退出本次流程，你可以换种说法重新发起\n\n回复数字或直接说出主题即可。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "refine-own-idea-routes-to-brainstorm",
+      "title": "打磨用户既有想法应停止并指向 spec-brainstorm",
+      "status": "PASS",
+      "duration_ms": 63800,
+      "turns": 2,
+      "input_tokens": 27126,
+      "output_tokens": 1327,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 2,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[spec-brainstorm]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[spec-brainstorm])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-ideate skill 已安装，请按它工作。）\n我已经有一个想法：给团队做一个自动汇总每日站会进展的工具。\n帮我把这个想法打磨成需求。\n",
+      "response": "我已按 spec-ideate 的流程完成必需的前置检查（`references/output-mode.md` 和 `references/scope-gates.md`），但流程在第一个关口就命中了明确的停止条件：\n\n**`scope-gates.md` Phase 0 的 refine-vs-generate 检查**（`references/scope-gates.md:5`）规定：如果用户已经持有一个想法，并要求**细化、收敛、定范围或转成需求**，这属于 `spec-brainstorm` 的工作——spec-ideate 必须**停止并指向 spec-brainstorm**，且不得在本流程内做 brainstorm 式提问或需求收敛。spec-ideate 只在\"还没有想法、想生成并评估多个候选方向\"时启动。\n\n你的请求正是\"我已有想法（站会进展自动汇总工具），帮我把**这个想法打磨成需求**\"，完全命中该路由规则。\n\n**当前的问题**：spec-brainstorm 并未安装——可用技能列表里只有 `spec-ideate`，没有 `spec-brainstorm`，我无法直接调用它。\n\n接下来怎么走，请你选：\n\n1. **安装 spec-brainstorm** — 如果你手头有这个 skill 的来源（比如同一套 spec-first 工具集），装好后我立刻按它跑。spec-ideate 的设计就是\"先 ideate、后 brainstorm\"衔接的。\n2. **不装 skill，我直接帮你打磨需求** — 脱离 skill 流程，作为普通任务做需求收敛：逐项澄清目标用户、站会数据来源（IM 消息/语音转写/看板）、输出形式、集成环境等，最后产出一份结构化需求文档。\n3. **改跑 spec-ideate 的本职** — 如果你其实想先看看\"站会进展汇总\"这件事有哪些不同做法（产品形态、自动化程度、集成路径等候选方向），再挑一个深化，那 spec-ideate 正是对的工作流，我可以完整跑一轮。\n\n我的建议：如果你的目标就是尽快拿到这份需求，选 **2** 最直接；如果你希望走规范的 spec 流程（后续还可能衔接 spec-plan），选 **1**。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "non-software-mode-no-label-leak",
+      "title": "非软件主题的情境宣告不得泄漏内部模式标签",
+      "status": "PASS",
+      "duration_ms": 124458,
+      "turns": 1,
+      "input_tokens": 33293,
+      "output_tokens": 3491,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-ideate/evals/fixtures/scripts/asks-a-question.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-ideate skill 已安装，请按它工作。）\n帮我的咖啡店想几个名字。\n",
+      "response": "我已按 spec-ideate 工作流完成了范围判断，说明如下：\n\n**主题判定**：这是一个品牌命名类话题——我会为你的咖啡店生成一批候选名字，逐个批评淘汰，最后给出带理由的推荐名单（不会直接进入需求或方案设计）。\n\n**执行方式**：本次在当前会话内串行完成（用户上下文梳理 → 多视角发散生成 → 批评筛选与理由），不派子代理；你未要求外部检索，所以不上网查资料。\n\n生成前需要一点关于这家店的实质背景——不同类型的店（精品手冲 vs 社区小店 vs 外带快取）适合的名字完全不同。请任选一种方式回答：\n\n1. **已有店**：简单说说城市/街区、风格、主打产品、主要客群\n2. **筹备中**：描述一下你想开的店是什么样子\n3. **贴材料**：直接贴一段已有的介绍文案、笔记或已有想法\n4. **随便起**：没有特别上下文，我会放宽生成面、并注明\"背景信息较薄\"\n\n直接打字描述即可，一两句话就够。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "repo-grounded-e2e-writes-artifact",
+      "title": "仓库内主题应走完整流程并落盘 ideation artifact",
+      "status": "ERROR",
+      "duration_ms": 600049,
+      "turns": 6,
+      "input_tokens": 60664,
+      "output_tokens": 9918,
+      "error": "agent execution failed: claude-code run failed: context deadline exceeded (case timeout 600s via case.constraints.timeout_seconds)",
+      "grading": null,
+      "configuration": "with_skill",
+      "prompt": "（spec-ideate skill 已安装，请按它工作。）\n这个记账 demo 留存很差，帮我围绕提升用户留存想一批改进方向。\n",
+      "response": "Phase 3 批判（内联自检，`dispatch_authorization_missing` — 非独立/新上下文验证）：所有 `direct:` 基据已对照我完整读过的仓库逐条核实（README.md:5-8、server.js:3/10-12/16-19/21-22/25、package.json:4 均属实）。37 条 → 7 名幸存者（合并聚类）+ 30 条拒绝（每条含理由），5 轴全覆盖。\n\n写入 Checkpoint B 并加载交付契约：",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "surprise-me-no-repo-needs-substance",
+      "title": "无仓库时的 Surprise me 必须先索要材料并干净结束",
+      "status": "PASS",
+      "duration_ms": 141338,
+      "turns": 2,
+      "input_tokens": 28447,
+      "output_tokens": 2067,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 2,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.files_not_exist",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-ideate/evals/fixtures/scripts/asks-a-question.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-ideate skill 已安装，请按它工作。）\n随便给我一些惊喜的方向吧，你看着办。\n",
+      "response": "前期判定完成：\n\n- **运行环境**：当前目录不是 git 仓库，也没有 `.spec-first` 配置 → 交付物为 HTML 格式、内联返回（除非你指定一个保存路径）。\n- **主题门控**：你说“随便、你看着办”——这视为明确的 **Surprise me 模式**（由我来发现值得创意的方向），这是一等模式，不需要你先给题目。\n- **但有一个硬性前提**：当前不在任何代码库里，Surprise me 模式要求**至少一份素材**作为“惊喜”的落点——否则我给出的方向就是无根之木、纯随机噪音，不是这个工作流想要的 grounded ideation。\n\n所以我需要问一个问题（仅此一个）：\n\n**有什么东西可以给我当“落点”吗？** 任何一份材料都行，比如：\n\n1. **一个 URL** —— 你最近在琢磨的产品、竞品、文章、仓库都行\n2. **一段简短描述** —— 你手头在做的项目/产品/侧项目，两三句话即可\n3. **粘贴一份草稿或笔记** —— 半成品想法、需求草稿、会议纪要、碎碎念都可以\n4. **真的什么都没有** —— 那这次运行会干净地结束，等你有了素材再来（这是工作流的硬约束：无题目 + 无仓库 + 无素材 = 无法产出有据可依的方向）\n\n哪怕是一句“我在做一个 XX”也够我发挥了。你给落点，我来给惊喜。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "r2-refine-variant-phrasing",
+      "title": "R2变体:换措辞的 refine 请求仍应路由 spec-brainstorm",
+      "status": "PASS",
+      "duration_ms": 63539,
+      "turns": 2,
+      "input_tokens": 29036,
+      "output_tokens": 1732,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 2,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[spec-brainstorm]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[spec-brainstorm])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-ideate skill 已安装，请按它工作。这是隔离评测沙箱,只做路由判定。）\n我想做的已经定了:给团队做站会汇总工具,给谁用、成功标准都想清楚了。\n帮我把它变成可执行的计划。\n",
+      "response": "路由判定完成，结论如下：\n\n## 判定：不运行 spec-ideate，此请求路由到 `spec-brainstorm`\n\n**依据**：`spec-ideate` 的 Phase 0 有一道在任何工作开始之前运行的 refine-vs-generate 门（`references/scope-gates.md:5`）：\n\n\u003e 用户已持有一个想法、要求细化/收敛/定范围/变成需求 → 这是 `spec-brainstorm` 的工作，不是 ideation：停止并指向 `spec-brainstorm`；不得在本工作流内运行 brainstorm 式提问或需求收敛。\n\n你的请求正是这种情况——方向已定（站会汇总工具）、用户与成功标准已想清楚、目标是变成可执行计划。这属于**收敛**，不属于**候选方向生成与评估**（spec-ideate 只回答\"有哪些值得探索的想法\"）。\n\n## 正确的流转链\n\n| 工作流 | 回答的问题 | 对你的适用性 |\n|---|---|---|\n| spec-ideate | 哪些方向值得探索？ | ❌ 方向已选，跳过 |\n| **spec-brainstorm** | 选定的想法到底意味着什么？ | ✅ **下一跳**：把想法精确化为 requirements-only 的统一计划（写入 `docs/plans/`） |\n| spec-plan | 应该怎么建？ | ✅ brainstorm 之后再进入 |\n\n## 本沙箱的实际情况\n\n已确认 `.claude/skills/` 下只安装了 `spec-ideate`，`spec-brainstorm` 和 `spec-plan` 不在可用 skill 列表中，我在此处无法调用它们。按 skill 契约，我也不会用 ideation 凑数（它明确不产出需求或计划），也不会越权在 ideation 里替你做需求收敛。\n\n**下一步**：在安装了 `spec-brainstorm` 的环境中用它继续（之后接 `spec-plan`）。本次路由判定到此结束，未派发任何 grounding 或生成工作。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 226815,
+  "judge_tokens": 0,
+  "overall_tokens": 226815
+}

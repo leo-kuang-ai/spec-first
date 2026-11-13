@@ -1,0 +1,97 @@
+{
+  "skill_name": "spec-prd",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-06T10:35:10.242733+08:00",
+  "end_time": "2026-11-06T10:44:31.10101+08:00",
+  "case_results": [
+    {
+      "case_id": "large-input-split-gate",
+      "title": "超大输入应停在拆分确认请求或 checkpoint,不得未经确认产出拆分产物或 final PRD",
+      "status": "FAIL",
+      "duration_ms": 423944,
+      "turns": 2,
+      "input_tokens": 73772,
+      "output_tokens": 15482,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 2,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.files_not_exist",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-prd/evals/fixtures/scripts/check-large-split-gate.sh",
+            "passed": false,
+            "evidence": "输出存在无否定限定的 ready-for-planning 声明"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 1,
+          "total": 2,
+          "pass_rate": 0.5
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-prd skill 已安装，请按它工作。）\n\n以下是一次性收到的完整需求输入（三份会议纪要合并整理，未做去重），请处理：\n\n=== 需求池开始 ===\n【模块 A 账户与认证】\nA1 用户用手机号+验证码登录；验证码 60 秒有效。\nA2 已有邮箱密码登录，保留。\nA3 同一设备连续 5 次验证码输错，锁定 15 分钟。\nA4 高频登录尝试要有频控（具体阈值见安全组的会议结论）。\nA5 支持微信扫码登录（二期）。\nA6 登录态 30 天免登。\nA7 频控：同一账号 1 分钟内最多请求 3 次验证码。\nA8 注销账户需二次确认并保留 7 天可恢复期。\n\n【模块 B 积分规则】\nB1 每笔已完成订单发放积分，比例按商务组的最终结论执行。\nB2 会议一纪要：比例为订单金额 1%，向下取整。\nB3 会议三纪要：比例为订单金额 2%，封顶每单 50 分。\nB4 积分有效期：自获取日起 12 个月。\nB5 积分过期后账本要能查到过期记录。\nB6 邀请新用户注册成功，双方各得 100 分。\nB7 每日签到得 5 分，连续 7 天额外得 30 分。\nB8 积分发放要有防刷限制：同一用户同一商品每日最多发放一次。\nB9 退款订单要回冲对应积分，积分已消费时允许负余额并从后续发放中抵扣。\n\n【模块 C 积分消费】\nC1 积分可按 100 分=1 元抵扣订单金额。\nC2 抵扣比例：100 分=1 元，单笔订单最多抵扣 50%。\nC3 积分兑换商城礼品（三期，本轮不做详细设计但要留接口）。\nC4 消费顺序：先过期先消费。\nC5 单笔积分消费生成独立流水。\nC6 部分抵扣时剩余积分不动。\n\n【模块 D 账本与对账】\nD1 用户可查看积分明细流水（获取/消费/过期/回冲四类）。\nD2 流水支持按时间筛选与分页。\nD3 每月底生成对账单，异常差异要能导出。\nD4 对账单导出格式为 Excel。\nD5 运营侧可按用户维度查询积分余额与流水。\nD6 对账单导出格式为 CSV（数据组口径，Excel 是报告组口径，两口径并存）。\nD7 积分余额与流水总额不一致时要告警。\n\n【模块 E 通知】\nE1 积分到账推送 App 内消息。\nE2 积分即将过期（7 天内）推送提醒。\nE3 提醒渠道：App push；短信通道暂不启用。\nE4 用户可关闭过期提醒。\n\n【模块 F 管理后台】\nF1 运营可手工调整用户积分，需审批流。\nF2 手工调整要记录操作人与原因。\nF3 积分规则参数（比例/有效期/签到奖励）可配置，改动需审批并留痕。\nF4 配置改动实时生效。\nF5 提供积分发放总量/消费总量日报。\n\n【交叉约束】\nX1 本期范围不含商城兑换的详细设计（见 C3）。\nX2 所有积分变动接口要求幂等。\nX3 积分账本数据保留 3 年。\nX4 频控与防刷的最终阈值以安全组评审结论为准，纪要未收录。\n=== 需求池结束 ===\n",
+      "response": "宿主工具检索确认：当前会话无阻塞式提问工具（无 AskUserQuestion 类），工具发现原语已查过 —— 按技能规定降级为 `question_delivery=chat-fallback`，在聊天中一次一问并等待答复。\n\n---\n\n## 运行广播（Phase 0）\n\n- **运行目标**：把三份会议纪要合并的需求池整理为 PRD 级需求 artifact（去重、冲突裁决、缺口闭环），并给出规划就绪度结论。\n- **输入姿态**：`reference-claims` —— 纪要是未定稿参考材料，冲突处不静默取一方，标 contradiction 交裁决。\n- **产物姿态**：`docs/brainstorms/*-requirements.md`（`artifact_kind: prd-requirements`，`status: draft` 起步；`status: ready-for-planning` 与 `readiness_*` 只由 finalize 脚本写入）。\n- **硬边界**：不做实现、不写实现计划、不做 HOW 设计；不改 `.claude/` 等生成镜像；owner 问题一次一问。\n\n**路由结论**：不 route-out —— 存量系统锚点充分（邮箱登录、订单域、App、后台均 user-stated 存在），属 brownfield 增量（积分域 `add` + 认证 `extend`），非 0-1 探索。`intent=create`，`analysis_profile=default`。\n\n## 任务清单\n\n1. ✅ Phase 0 路由 + 输入消毒（纪要=reference-claims，未发现嵌入式 agent 指令/命令）\n2. ✅ 存量证据勘察：工作目录无 source/docs/glossary → `evidence_depth=user-stated`\n3. ✅ 冲突/去重分析 + Requirement Analysis Gate + 风险排序（本回合产出，见下）\n4. 🔄 Requirements Grill：**OQ-1 积分比例/封顶**（本回合发出，待答复）\n5. ⬜ Grill 后续：OQ-2 退款拆分 → OQ-3 B8 语义 → OQ-4 签到周期 → OQ-5 注销×负余额 → OQ-6 邀请回收 → OQ-7 拆分确认 → OQ-8 频控初始值 → OQ-9 对账格式 → OQ-10 审批角色 → OQ-11 假设批次\n6. ⬜ 起草 PRD（模板组合：`00-generic` + `30-backend` 主 + `60-mixed`；无证券/交易信号，不加载 securities overlay）\n7. ⬜ Phase 4：readiness lens + `finalize-prd-artifact.js` / `check-prd-artifact.js`，报告 findings、blocking reason_codes、receipt、readiness_outcome\n\n## 存量快照（全部 `user-stated`，无 source 可证）\n\n已有：邮箱密码登录（A2 保留）、订单域及\"已完成\"状态（B1 依赖）、App 与 App 内推送通道（E1/E3）、短信通道（本期不启用）、管理后台（F 挂载点）。没有：积分体系（本期新增）、微信扫码（A5 二期）、商城兑换（C3 三期）。\n\n## 冲突 / 去重结论\n\n**直接冲突（contradiction，需裁决）**\n\n| ID | 冲突 | 条目 | 处置路径 |\n|---|---|---|---|\n| CF-1 | 订单积分比例：会议一 1% 不封顶 vs 会议三 2% 每单封顶 50 分；B1 已声明权威=商务组，结论未收录 | B1/B2/B3 | OQ-1（本次提问） |\n| CF-2 | \"每笔已完成订单发放\" vs \"同一用户同一商品每日最多发放一次\"——同日同商品多单行为未定 | B1 vs B8 | OQ-3 |\n| CF-3 | 对账单导出 Excel（报告组）vs CSV（数据组）；D6 自注\"两口径并存\" | D4/D6 | 输入自带并存声明，OQ-9 低风险确认 |\n\n**权威外置（纪要声明等外部结论，未收录）**：CF-1 的商务组；A4+X4 的登录频控阈值（安全组）。A3（设备维度 5 错锁 15 分钟）与 A7（账号维度 1 分钟 3 次验证码）是互补并存，非重复，为已知初始值。\n\n**去重合并**：C1+C2 → 100 分=1 元，单笔抵扣 ≤ 订单应付 50%；E2+E3 → 过期提醒仅 App push、短信不启用，E4\"可关闭\"仅指过期提醒；A4+X4 → 同一事项；B1/B2/B3 → 一条发放规则+待定参数；X1+C3 → 兑换为非目标、仅预留接口。\n\n**范围外（不进入追问）**：微信扫码登录（A5，二期）、商城兑换详细设计（C3/X1，三期）。\n\n## 风险排序 → 待决清单（Push-Right Brief，逐个闭环）\n\n| ID | 决策 | 推荐答案 | PRD 写入位置 | 不答则规划会发明什么 |\n|---|---|---|---|---|\n| OQ-1 | 比例/封顶（CF-1） | 参数化，默认取会议三 | Requirements(B)+Outstanding Questions | 全部发放数量验收数字 |\n| OQ-2 | **积分+现金混合支付订单退款**：积分抵扣部分退积分还是退现金？退回积分有效期怎么算？（B9 只写了正向回冲） | 原路退积分，有效期按新批次重计 12 个月 | Requirements(B9/C)+Acceptance | 退款拆分规则、资金口径 |\n| OQ-3 | B8 语义（CF-2） | B8 仅作防刷护栏：同用户同商品每日发放封顶 1 次，正常复购多单是否牺牲需 owner 明确 | Requirements(B8) | 同日多单发放行为 |\n| OQ-4 | 签到周期：第 7 天加发 30 分后周期是否重置？断签是否清零？ | 第 7 天当日加发并重起周期；断签清零重计 | Requirements(B7) | 每日奖励验收 |\n| OQ-5 | 注销×积分：恢复期内积分收支是否冻结？负余额能否注销清户？ | 申请即冻结收支；恢复期内负余额继续抵扣；7 天后清户核销余额与负余额 | Requirements(A8/B9) | 注销清算规则 |\n| OQ-6 | 邀请奖励回收与防刷（B8 只覆盖商品维度） | 被邀请人在其恢复期内注销清户则回冲双方 100 分 | Requirements(B6) | 奖励回收行为 |\n| OQ-7 | 拆分：模块 A（认证）vs B–F（积分域）是否拆两份 PRD | 拆两份：认证增强 + 积分体系；X2/X3 各自收录 | artifact 拓扑 | 规划包边界 |\n| OQ-8 | 频控初始值 | A3/A7 先行，其余参数化，安全组结论为 reopen 条件 | Requirements(A)+Blocker | 频控阈值 |\n| OQ-9 | 对账格式 | 双格式并存：运营报告 Excel / 数据组 CSV | Requirements(D) | 导出验收 |\n| OQ-10 | 审批流角色与级差（F1/F3） | 复用现有后台审批体系，至少一级授权角色审批 | Requirements(F) | 权限边界 |\n| OQ-11 | 假设批次：D3 对账范围/异常定义、D7 告警阈值与接收人、F5 日报口径、E2 提醒频率、C4 同日过期批次 FIFO 细则、X2 幂等键粒度、A6 免登续期策略 | 各带推荐假设，可整体接受或逐条改 | Assumptions+Planning Recheck | 运营行为细节 |\n\n## Decision Card（run-local）\n\n```text\nintent: create | input_posture: reference-claims | output_shape: normal-prd\nprimary_topology: add(积分域)+extend(认证) | surface_lens: Mixed\nclarification_view: Mixed(Backend 主导) | clarification_profile: backend-contract-heavy\nintake_mode: requirements-first | clarification_budget: standard\nclarification_risk_tier: medium | review_gate_mode: self-check\nevidence_depth: user-stated | quality_diagnosis: blockers(CF-1/CF-2 行为冲突+2 处权威外置)\npre_prd_clarification_status: asked-owner | owner_question_progress: outstanding-question\nwrite_mode: ask-owner-first\nhighest_risk_gap: CF-1 积分发放比例/封顶冲突（商务组结论未收录）\nnext_owner_question: OQ-1\nquestion_delivery: chat-fallback | clarification_evidence: pending（OQ-1 已发出，收到答复后记 asked-owner）\nreadiness_outcome: not-run\n```\n\n本回合**未写任何 PRD 文件**（`write_mode=ask-owner-first`，预写门之前）。\n\n---\n\n## 问题 1 / OQ-1：订单积分发放比例与封顶如何处置？\n\n**背景**：会议一纪要=订单金额 1%、向下取整、不封顶（B2）；会议三纪要=2%、每单封顶 50 分（B3）；B1 又声明\"以商务组最终结论为准\"，而该结论未收录。两份纪要直接冲突，且全部 B 模块验收数字依赖此值。\n\n**推荐答案（A）**：机制按 F3 做成可配置参数（比例 + 每单封顶值）；**上线默认值取会议三口径（2%、每单封顶 50 分，向下取整）**——这是唯一有时间序依据的最新纪要；商务组最终结论出来后走 F3 配置变更流程（审批+留痕+实时生效）调整，不阻塞本期开发与验收。\n\n- **选 A 的后果**：PRD 验收示例按 2%/封顶 50 编写；商务组改口径只动配置。\n- **不选（等待商务组书面结论）的后果**：OQ-1 转 blocker，发放验收数字留空，PRD 只能停在 checkpoint，不能 ready-for-planning。\n\n选项：\n- **A. 按推荐：参数化 + 默认 2%、每单封顶 50 分**（推荐）\n- **B. 参数化 + 默认取会议一：1%、不封顶**\n- **C. 参数化但默认值留空，等商务组结论（OQ-1 转 blocker，readiness 受限）**\n- **D. 其他**（例如商务组结论其实已有，请直接给出数值）\n\n请答复 A/B/C/D 或自由补充。答复后我按风险顺序继续下一问（OQ-2 积分抵扣订单的退款拆分）；若想减少往返，可对 OQ-11 说\"假设批次整体按推荐处理\"；若想提前结束追问，请明确说\"到此为止\"（owner-capped，剩余项会记入 checkpoint 而非 ready）。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "resume-checkpoint-identity",
+      "title": "resume 中断的 checkpoint PRD 应沿用既有 spec_id 与已关闭决定,不得重开新 PRD 或声称 ready",
+      "status": "FAIL",
+      "duration_ms": 136011,
+      "turns": 4,
+      "input_tokens": 50048,
+      "output_tokens": 2401,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 4,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-prd/evals/fixtures/scripts/check-resume-identity.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: node:fs:1722\n  const stats = binding.lstat(\n                        ^\n\nError: ENOENT: no such file or directory, lstat '.git/eval-baseline.json'\n    at Object.lstatSync (node:fs:1722:25)\n    at regular ([stdin]:48:21)\n    at checkFixture ([stdin]:81:31)\n    at [stdin]:115:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3) {\n  errno: -2,\n  code: 'ENOENT',\n  syscall: 'lstat',\n  path: '.git/eval-baseline.json'\n}\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-prd skill 已安装，请按它工作。）\n\n上次会话在这个仓库写 PRD 写到一半中断了，产物在\ndocs/brainstorms/2026-10-15-001-loyalty-ledger-prd.md。\n请接着往下做（resume）。\n",
+      "response": "grill 集成规则已加载。现在给出本次 resume run 的执行框架，然后立即进入第一个 owner 问题。\n\n---\n\n## Resume Run 广播\n\n- **目标**：原地恢复 `docs/brainstorms/2026-10-15-001-loyalty-ledger-prd.md`（保留 `spec_id: 2026-10-15-001-loyalty-ledger` 与 R1–R3 编号），继续 Requirements Grill 直到所有负载分支到达合法停止点，然后完成 PRD 写入与 finalize。\n- **input_posture**: `resume-prd`；**intent**: create（延续）；**profile**: default / compact-brownfield-increment；**risk tier**: medium（积分属类资金权益，含过期与对账）。\n- **产物形态**：更新同一份 PRD（checker 已确认接受 `docs/brainstorms/` 下现有文件名）。\n- **硬边界**：不做实现、不写实现计划、source-first 编辑、不动 `.claude/` 生成镜像；`status: ready-for-planning` 及 ready receipt 只由 finalize 脚本写入。\n\n## 任务列表\n\n1. [进行中] Grill OQ1：积分过期策略（`next_owner_question`，最高风险）\n2. [待办] Grill OQ2：积分能否抵扣运费\n3. [待办] 修复 R2 证据缺口：`source-candidate` 标注但仓库无 source 支撑（已核实全仓库仅 README + PRD），且缺 Acceptance Examples → 需 owner 确认\n4. [待办] 场景压力测试暴露的新分支：退款是否回收积分、发放基数是否含运费、\"已完成订单\"状态定义\n5. [待办] 更新 PRD：Requirements / Owner Decision Trace / Outstanding Questions / Readiness Self-Check\n6. [待办] Phase 4：readiness lens + finalize/checker，报告 receipt\n\n**Decision Card（当前）**：`write_mode: ask-owner-first`；`highest_risk_gap`: OQ1 过期策略（决定 R3 验收时点与\"先过期\"消费语义）；`next_owner_question`: OQ1；`question_delivery: chat-fallback`（已用 ToolSearch 确认本环境无阻塞式提问工具）。\n\n---\n\n## 问题 1 / OQ1（等待你的回复，一次只问这一个）\n\n**积分过期策略：按自然月月底清零，还是按获取日后 12 个月滚动过期？**\n\n- **命名的 gap**：OQ1（PRD `Outstanding Questions` 已记录，`owner-authority-needed`）\n- **已做的 source 尝试**：全仓库检索（README、prepare-eval.cjs、PRD 自身）——无任何 source 定义过期口径；仓库无产品代码，source 无法关闭此 gap。\n- **影响的 write target**：R3 的验收时点、R2\"先过期先消费\"的排序依据，以及新增一条过期规则需求行。\n- **推荐答案**：**获取日后 12 个月滚动过期**。理由：月底清零会使月末完成的订单（R1 按完成发放）积分几乎立即失效，用户感知差且对账口径复杂；滚动过期按批次独立结算，账本语义更干净。\n- **后果**：若选月底清零，R3 验收需改为\"跨月后全部余额标记 expired\"，且 R2 的排序退化为单一批次内消费，`先过期先消费` 需求行要重写。\n- 两个选项之外的口径（如按固定财年、按账户级最早获取日）也欢迎直接说。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 141703,
+  "judge_tokens": 0,
+  "overall_tokens": 141703
+}

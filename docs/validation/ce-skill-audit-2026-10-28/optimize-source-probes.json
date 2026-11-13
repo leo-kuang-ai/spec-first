@@ -1,0 +1,210 @@
+{
+  "type": "confirmed",
+  "scope": "synthetic inputs against current disk scripts; no models/providers invoked",
+  "records": [
+    {
+      "probe": "repeat-without-raw-samples",
+      "input": {
+        "spec": {
+          "primary": {
+            "name": "score",
+            "direction": "maximize",
+            "type": "hard"
+          },
+          "comparison": {
+            "method": "absolute",
+            "noise_threshold": 0.01
+          },
+          "stability_mode": "repeat",
+          "repeat_count": 5
+        },
+        "baseline": {
+          "metrics": {
+            "score": {
+              "aggregate": 1
+            }
+          }
+        },
+        "candidate": {
+          "metrics": {
+            "score": {
+              "aggregate": 2
+            }
+          }
+        }
+      },
+      "exit_code": 0,
+      "result": {
+        "decision": "keep",
+        "eligible": true,
+        "next_measurement": "none",
+        "target_reached": false,
+        "improved_objectives": [
+          "score"
+        ],
+        "violated_objectives": [],
+        "comparisons": {
+          "score": {
+            "verdict": "improved",
+            "delta": 1,
+            "relative": 1,
+            "violated": false
+          }
+        },
+        "primary_delta": 1,
+        "rank_score": 1,
+        "reason": "improved score without violating other required objectives",
+        "holdout": null
+      }
+    },
+    {
+      "probe": "ladder-aggregate-with-self-reported-count",
+      "input": {
+        "spec": {
+          "primary": {
+            "name": "score",
+            "direction": "maximize",
+            "type": "hard"
+          },
+          "comparison": {
+            "method": "absolute",
+            "noise_threshold": 0.01
+          },
+          "stability_mode": "ladder",
+          "repeat_count": 5,
+          "ladder": {
+            "exploratory_pairs": 1,
+            "confirmation_repeats": 5
+          }
+        },
+        "baseline": {
+          "metrics": {
+            "score": {
+              "aggregate": 1
+            }
+          }
+        },
+        "candidate": {
+          "metrics": {
+            "score": {
+              "aggregate": 2
+            }
+          },
+          "sample_count": 5
+        }
+      },
+      "exit_code": 0,
+      "result": {
+        "decision": "keep",
+        "eligible": true,
+        "next_measurement": "none",
+        "target_reached": false,
+        "improved_objectives": [
+          "score"
+        ],
+        "violated_objectives": [],
+        "comparisons": {
+          "score": {
+            "verdict": "improved",
+            "delta": 1,
+            "relative": 1,
+            "violated": false
+          }
+        },
+        "primary_delta": 1,
+        "rank_score": 1,
+        "reason": "improved score without violating other required objectives",
+        "holdout": null
+      }
+    },
+    {
+      "probe": "aa-noise-is-self-reported",
+      "input": {
+        "admission": {
+          "schema_version": "spec-optimize-measurement-admission/v1",
+          "baseline_identity": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "candidate_identity": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "task_or_corpus_identity": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "harness_identity": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "environment_identity": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "sample_seed": 42,
+          "metric": {
+            "name": "quality",
+            "direction": "maximize",
+            "aggregation": "mean"
+          },
+          "aa_repetitions": 2,
+          "preregistered_acceptance_threshold": 0.1,
+          "noise_ceiling": 0.1,
+          "broken_run_policy": {
+            "max_retries": 0,
+            "synthetic_scores": false
+          },
+          "stop_budget": {
+            "max_attempts": 2,
+            "timeout_seconds": 1
+          }
+        },
+        "admission_sha256": "sha256:422272cacfbc8314884309d01a4f1b5cd6122964a9f1a92ca282b6c72389f383",
+        "aa_attempts": [
+          {
+            "status": "completed",
+            "admission_sha256": "sha256:422272cacfbc8314884309d01a4f1b5cd6122964a9f1a92ca282b6c72389f383",
+            "score": 0
+          },
+          {
+            "status": "completed",
+            "admission_sha256": "sha256:422272cacfbc8314884309d01a4f1b5cd6122964a9f1a92ca282b6c72389f383",
+            "score": 100
+          }
+        ],
+        "observed_noise_floor": 0
+      },
+      "exit_code": 0,
+      "result": {
+        "status": "allowed",
+        "reason_code": "aa-calibration-passed",
+        "admission_sha256": "sha256:422272cacfbc8314884309d01a4f1b5cd6122964a9f1a92ca282b6c72389f383",
+        "completed_aa_attempts": 2,
+        "observed_noise_floor": 0,
+        "ab_allowed": true
+      }
+    },
+    {
+      "probe": "no-metric-gate-false-positive",
+      "message": "目标已优化，实验全部完成。",
+      "exit_code": 0,
+      "stdout": ""
+    },
+    {
+      "probe": "existing-worktree-recreate",
+      "side": "spec-first",
+      "exit_code": 0,
+      "untracked_preserved": false,
+      "tracked_after": "original",
+      "scope": "isolated disposable repository only"
+    },
+    {
+      "probe": "cleanup-prefix-without-run-ownership",
+      "side": "spec-first",
+      "exit_code": 0,
+      "foreign_directory_preserved": false,
+      "scope": "isolated disposable repository only"
+    },
+    {
+      "probe": "existing-worktree-recreate",
+      "side": "ce",
+      "exit_code": 0,
+      "untracked_preserved": false,
+      "tracked_after": "original",
+      "scope": "isolated disposable repository only"
+    },
+    {
+      "probe": "cleanup-prefix-without-run-ownership",
+      "side": "ce",
+      "exit_code": 0,
+      "foreign_directory_preserved": false,
+      "scope": "isolated disposable repository only"
+    }
+  ]
+}

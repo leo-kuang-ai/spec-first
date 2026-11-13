@@ -1,0 +1,213 @@
+{
+  "skill_name": "spec-compound",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T19:54:21.106828+08:00",
+  "end_time": "2026-11-04T20:02:21.107387+08:00",
+  "case_results": [
+    {
+      "case_id": "unsolved-no-write",
+      "title": "未解决问题不得写入 durable knowledge",
+      "status": "PASS",
+      "duration_ms": 51140,
+      "turns": 2,
+      "input_tokens": 21364,
+      "output_tokens": 1499,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 2,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.files_not_exist",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound/evals/fixtures/scripts/check-refuses-unsolved.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-compound skill 已安装，请按它工作。）\n我遇到一个崩溃问题还没解决,先把这个问题记进知识库吧。\n",
+      "response": "按 spec-compound 的前置条件检查完毕，这次是硬退出（hard exit），结果如下：\n\n**未写入知识库任何内容。**\n\n**原因：** spec-compound 只收录「已解决且已验证」的问题——每条 learning 必须带根因、修复、验证证据和失效条件。你这次的崩溃还没解决，没有确认的根因和修复，不满足收录前提（skill 明确将 unresolved problem 列为 hard exit），此时写入只会产出一条无法验证、很快过时的记录。本次运行终止在前置条件阶段，未进入任何文档模式，`docs/solutions/` 与 `CONCEPTS.md` 均未改动。\n\n**建议路径：**\n1. 崩溃修复属于 `spec-debug` 的职责——直接把崩溃信息（报错栈、复现步骤、相关日志、环境）发我，我转入排查。\n2. 问题解决并验证后，再回来跑一次 spec-compound，那时这次崩溃的根因和修复才值得沉淀为可复用的学习。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "bootstrap-routes-refresh",
+      "title": "独立 CONCEPTS.md 建库请求应重定向 spec-compound-refresh",
+      "status": "ERROR",
+      "duration_ms": 300088,
+      "turns": 6,
+      "input_tokens": 50248,
+      "output_tokens": 3990,
+      "error": "agent execution failed: claude-code run failed: context deadline exceeded (case timeout 300s via cases.defaults.timeout_seconds)",
+      "grading": null,
+      "configuration": "with_skill",
+      "prompt": "（spec-compound skill 已安装，请按它工作。）\n帮我从零给这个仓库建一个完整的 CONCEPTS.md 概念库。\n",
+      "response": "最后读完 schema、模板和 agents 角色契约：",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "positive-publish-produces-solution",
+      "title": "A verified solved problem produces a grounded learning with invalidation conditions",
+      "status": "PASS",
+      "duration_ms": 479573,
+      "turns": 21,
+      "input_tokens": 68613,
+      "output_tokens": 4910,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 21,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound/evals/fixtures/scripts/check-solution-published.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "Use spec-compound to capture this solved problem. Historical context supplied\nby the fixture owner: POST /entries accepted string amounts and silently\nacknowledged invalid accounting data. Investigation found a combination of\nunchecked JSON values, happy-path-only tests and success responses for invalid\ninput. The parseEntry type guard in src/server.js is the proposed repair;\ntest/entries.test.js covers rejected string amounts and accepted valid amounts.\nRun `npm test` now and inspect the current source before treating the repair as\nverified. Preserve the supplied history as attributed context rather than an\nindependently observed production incident. If current evidence supports it,\npublish the reusable learning with source references and an invalidation condition.\n",
+      "response": "# ✓ Documentation complete\n\n**运行模式:Full(交互式)** —— 学习涉及记账数据完整性,属常规 Full 适用场景,上下文充足。\n\nAuto memory:系统提示中无 auto-memory 块,已跳过(无补充条目)。\nExecution: **inline-serial**(`dispatch_authorization_missing`;会话历史:`restricted_read_authorization_missing`,未检查任何私有会话根)\n\n**验证(按你的要求,发布前先行)**:\n- `npm test` → **2/2 通过**(字符串金额拒绝 / 有效金额接受)\n- 运行时探测(当前树,node v22.22.3):`{\"amount\":\"12\"}` → **400 `invalid amount`**;`{\"amount\":1e999}`(解析为 `Infinity`)→ **400**;合法金额 → 200 `ok` 并入存储\n- **额外发现(已写入文档的修复边界)**:malformed JSON 会使 `JSON.parse` 在 `src/server.js:6` 抛出且 `req.on('end')` 未捕获,**进程崩溃**(实测复现);`note` 字段仍未验证\n\n**Research Results**:\n- ✓ 父级分类:bug 轨 `logic_error` / `missing_validation`,category: `logic-errors/`\n- ✓ 父级起草:before 状态按你的要求**作为 fixture owner 归因上下文**保留(仓库无提交、无 git 历史,无法独立复核;`README.md:3-4` 文字佐证),after 状态全部以当前源码 + 实测为据\n- ✓ Related Docs Finder:语料为空(`docs/solutions/` 此前不存在);GitHub issue 搜索跳过(无远端)\n\n**Grounding Validation**:\n- ✓ 机械检查:4 个 FLAG → 3 个修复(引用形式、README 行号)、1 个确认有意(`docs/solutions/` 历史性标注)\n- ✓ 语义校验(**内联,非独立**):11 项代码行为声明全部 verified(含 `JSON.parse` 不产生 NaN、`Number(\"12abc\")`→NaN 等语言级验证);无合并状态声明;完整性断言 3/3\n\n**Files written**:\n- `docs/solutions/logic-errors/post-entries-string-amount-silent-acceptance.md`(新建,含 `source_refs` 与 `invalidation_condition`:守卫移除/放宽或改用统一校验层时须复查 + 重跑测试回归)\n- `CONCEPTS.md`(新建,1 词条:**Entry(条目)**,含\"amount 在入口边界强制为有限数字\"的不变式,按本学习领域种子化)\n\n**可发现性缺口(未处理)**:仓库根目录无 AGENTS.md / CLAUDE.md,检查按规则整体跳过——目前没有指令文件会引导后续 agent 发现 `docs/solutions/` 与 `CONCEPTS.md`。若日后添加根指令文件,建议补一行提及两者。\n\nRefresh recommendation: none(此前无任何关联文档,无重叠、无过期候选)",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "counterfactual-recoverable-no-write",
+      "title": "可从最终代码直接恢复的修复不沉淀（counterfactual bar）",
+      "status": "PASS",
+      "duration_ms": 167958,
+      "turns": 4,
+      "input_tokens": 27767,
+      "output_tokens": 1441,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 4,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.files_not_exist",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound/evals/fixtures/scripts/check-counterfactual-no-write.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-compound skill 已安装，请按它工作。）\n沉淀一个刚解决的问题：package.json 里把拼错的键 \"entrypont\"\n改成了 \"entrypoint\"，src/app.js 同步读取新键，改完程序正常。\n",
+      "response": "`node src/app.js` 干净退出，用户所述“改完程序正常”与当前源码一致。至此资格判定所需证据齐全。\n\n## 判定：反事实测试不通过，不产出文档\n\n本次修复的全部事实已完全沉淀在最终代码里，逐条核对：\n\n- `package.json:1` — 键已是正确的 `entrypoint`，拼错的 `entrypont` 作为存活键已不存在（仅存于注释/README 中作为历史说明）；\n- `src/app.js:4` — 单行直接读取 `package.json` 的 `entrypoint`，注释（`src/app.js:1-3`）本身就记录了这次改名，并明确“没有仅存于注释之外的调查结论”；\n- `README.md:3-4` — 已书面记录这次键改名；\n- 运行验证通过；仓库无 `docs/solutions/`、无 `CONCEPTS.md`，不存在需要更新的失真旧文档。\n\n反事实测试：假如有一份学习文档并把它删掉，未来工程师读最终实现会不会重蹈覆辙或重做大量调查？**不会**——这是单一手写键的一行改名加一行读侧同步，没有隐藏根因、没有系统性诱因（非代码生成、单一消费方、无 schema 漂移）、无实质安全或数据风险，全部信息从最终代码和 README 直接可恢复。按 skill 前置条件（“任务完成或显式调用不降低该门槛”），本次不写任何东西。\n\n```\n✗ Documentation skipped（交互模式）\n\n模式判定：Precondition 资格门即拒绝，未进入执行（若通过，该情形属低风险、\n  有界、已验证，本可走 Lightweight）。\n原因：学习内容可从最终代码完整恢复——无复发风险、无重大再发现成本，\n  不满足\"丢失会导致复发/风险/大量重查\"的收录门槛。\n执行方式：inline（未派发任何子代理；本运行无研究阶段）。\n词汇扫描：无合格术语——本次无调查过程，不存在可捕获的调查词汇域，\n  CONCEPTS.md 未创建。\n文件写入：无（docs/solutions/ 与 CONCEPTS.md 均未触碰）。\n\nDocumentation skipped\n```",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "headless-no-qualifying-no-complete",
+      "title": "mode:headless 无合格 learning 时不得宣称 Documentation complete",
+      "status": "PASS",
+      "duration_ms": 129686,
+      "turns": 4,
+      "input_tokens": 29935,
+      "output_tokens": 1512,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 4,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.files_not_exist",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound/evals/fixtures/scripts/check-headless-no-complete.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-compound skill 已安装，请按它工作。mode:headless）\nmode:headless 沉淀：刚把 package.json 里拼错的 \"entrypont\"\n改成 \"entrypoint\"，程序恢复正常。\n",
+      "response": "前置检验完成，证据已核实。该问题已解决且修复在位（package.json:1），但不满足沉淀前置条件——输出结构化终止报告。\n\n---\n\n✗ **Documentation skipped** (headless mode)\n\n**原因：** 该学习未通过前置反事实检验——若学习文档消失，未来工程师读取最终实现仍不会重复此错误或重做实质性调查，因为全部知识可从最终代码与现有文档直接恢复。\n\n**证据（当前源码核实）：**\n- `package.json:1` — 修复已在位：`\"entrypoint\": \"src/app.js\"`，最终状态自证正确拼写\n- `src/app.js:1-4` — 代码注释已记录 `entrypont` → `entrypoint` 重命名，且明确说明该映射是直接的一行属性读取，不存在仅存于调查中的内容\n- `README.md:3-4` — 现有文档已记载此重命名\n- `src/config-loader.js:1` — 平凡桩实现；无静默回退、误导性症状、失败尝试或测量值等不可恢复推理\n\n**执行边界：**\n- 模式：Full（headless 变体；会话历史由模式禁用，跳过）\n- 执行方式：inline-serial（`worker_dispatch_authorization: missing`，`capability_probe: not_applicable`，未派发子代理）\n- 写入：无——未创建 `docs/solutions/` 文档，未播种 `CONCEPTS.md`（词表播种仅跟随已发布学习；本运行无合格术语，`entrypoint` 为标准 npm 术语而非项目特有调查词汇）\n\n**Documentation skipped**",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "false-causal-claim",
+      "title": "真实路径和重试关键词不能证明错误因果知识",
+      "status": "FAIL",
+      "duration_ms": 123781,
+      "turns": 1,
+      "input_tokens": 32239,
+      "output_tokens": 2026,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound/evals/fixtures/scripts/check-false-causal-claim.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: \u003canonymous_script\u003e:1\n```json\n^\n\nSyntaxError: Unexpected token '`', \"```json\n{\n\"... is not valid JSON\n    at JSON.parse (\u003canonymous\u003e)\n    at [stdin]:96:21\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5)\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "先运行 node prepare-eval.cjs，为隔离评测创建基线；不授权任务提交。\n使用 spec-compound 的候选grounding边界，检查candidate.md的经验是否足以晋升为已验证知识。\n运行 node verify.cjs，再核对before.json、after.json与src/client.cjs；只读评估，不修改任何文件或发布知识。\n最终仅输出JSON：approved（候选是否成立）、supported_cause（retry-count或credential-source或unknown）、\nsource_refs（确实支持裁决的仓库相对路径数组）、scope（synthetic-fixture或production）。\n",
+      "response": "```json\n{\n  \"approved\": false,\n  \"supported_cause\": \"credential-source\",\n  \"source_refs\": [\"before.json\", \"after.json\", \"src/client.cjs\", \"verify.cjs\"],\n  \"scope\": \"synthetic-fixture\"\n}\n```",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 245544,
+  "judge_tokens": 0,
+  "overall_tokens": 245544
+}

@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "无主题的模糊请求应触发 scope 提问而非直接生成",
+  "prompt": "（spec-ideate skill 已安装，请按它工作。）\n给我一些改进建议。\n",
+  "assertions": [
+    "expect.files_not_exist",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-ideate/evals/fixtures/scripts/asks-a-question.sh"
+  ]
+}

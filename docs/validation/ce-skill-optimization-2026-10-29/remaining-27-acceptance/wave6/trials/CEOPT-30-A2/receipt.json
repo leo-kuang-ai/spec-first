@@ -1,0 +1,32 @@
+{
+  "id": "CEOPT-30-A2",
+  "scenario_id": "CEOPT-30",
+  "source_revision": "A",
+  "arm": "A",
+  "trial": 2,
+  "status": "executed-awaiting-review",
+  "session_id": "01a191cf-16f8-76d2-b4f3-80743f2c727f",
+  "started_at": "2026-10-31T11:53:50.719Z",
+  "final_at": "2026-10-31T11:54:18.675Z",
+  "artifact_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/trials/CEOPT-30-A2/artifact.md",
+  "artifact_sha256": "9031341e98106aa1eff95254d13c33730696b6ca8d35c7ce15241feceeb6b4fa",
+  "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/trials/CEOPT-30-A2/tool-events.json",
+  "tool_trace_sha256": "4a79d7d55cf21a280d556c0d02400c4fadd5c436a08e0edb2c423ccb2dcc49de",
+  "parent_intervention": "Saved final response unchanged as artifact.md. No semantic edit.",
+  "model_metadata": [
+    {
+      "model": "gpt-6.1-sol",
+      "effort": "medium"
+    }
+  ],
+  "limitations": [
+    "Unauthenticated serving identity",
+    "Observed read-only instructions/traces, not enforced filesystem isolation",
+    "Parent-mediated durable saving; autonomous save not tested"
+  ],
+  "final_model_artifact_available": true,
+  "elapsed_seconds": 27.956,
+  "deadline_seconds": 300,
+  "timing_admission": "passed",
+  "source_protocol_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/CEOPT-30-packet.json"
+}

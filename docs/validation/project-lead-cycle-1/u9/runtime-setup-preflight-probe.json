@@ -1,0 +1,65 @@
+{
+  "artifact_type": "confirmed",
+  "captured_at": "2026-09-20T05:56:34.317442+00:00",
+  "source_head": "36d19d95c3a79df2d1278083c959bb34eadbde8c",
+  "cwd_role": "disposable-worktree-root",
+  "command": [
+    "node",
+    "-e",
+    "const { buildActionPlan } = require('./skills/spec-runtime-setup/scripts/lib/mode-policy.cjs');\nconst { requiresRuntimeProjectionPreflight } = require('./skills/spec-runtime-setup/scripts/lib/workspace-runtime-preflight.cjs');\nconst rows = [[], ['--only', 'codegraph,graphify'], ['--check'], ['--verify-only']].map(argv => {\n const p = buildActionPlan({ argv, knownIds: ['codegraph','graphify'], defaultIds: ['codegraph','graphify'] });\n return { argv, mode: p.mode, blocked: p.blocked, mutation: p.mutation, installationOnly: p.args.installationOnly, preflight: requiresRuntimeProjectionPreflight(p) };\n});\nconsole.log(JSON.stringify(rows, null, 2));\n"
+  ],
+  "exit_code": 0,
+  "stdout": "[\n  {\n    \"argv\": [],\n    \"mode\": \"bare\",\n    \"blocked\": false,\n    \"mutation\": true,\n    \"installationOnly\": false,\n    \"preflight\": false\n  },\n  {\n    \"argv\": [\n      \"--only\",\n      \"codegraph,graphify\"\n    ],\n    \"mode\": \"only\",\n    \"blocked\": false,\n    \"mutation\": true,\n    \"installationOnly\": false,\n    \"preflight\": true\n  },\n  {\n    \"argv\": [\n      \"--check\"\n    ],\n    \"mode\": \"check\",\n    \"blocked\": false,\n    \"mutation\": false,\n    \"installationOnly\": false,\n    \"preflight\": false\n  },\n  {\n    \"argv\": [\n      \"--verify-only\"\n    ],\n    \"mode\": \"verify\",\n    \"blocked\": false,\n    \"mutation\": true,\n    \"installationOnly\": true,\n    \"preflight\": false\n  }\n]\n",
+  "stderr": "",
+  "rows": [
+    {
+      "argv": [],
+      "mode": "bare",
+      "blocked": false,
+      "mutation": true,
+      "installationOnly": false,
+      "preflight": false
+    },
+    {
+      "argv": [
+        "--only",
+        "codegraph,graphify"
+      ],
+      "mode": "only",
+      "blocked": false,
+      "mutation": true,
+      "installationOnly": false,
+      "preflight": true
+    },
+    {
+      "argv": [
+        "--check"
+      ],
+      "mode": "check",
+      "blocked": false,
+      "mutation": false,
+      "installationOnly": false,
+      "preflight": false
+    },
+    {
+      "argv": [
+        "--verify-only"
+      ],
+      "mode": "verify",
+      "blocked": false,
+      "mutation": true,
+      "installationOnly": true,
+      "preflight": false
+    }
+  ],
+  "source_hashes": {
+    "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs": "30a0c5b91747cad8676e1d11040dde45b63ce4fc6450a2d5fa7c402472aa6ab8",
+    "skills/spec-runtime-setup/scripts/lib/args.cjs": "ede64b7665430fd2d6fa8fba7005df635a9eefc2cdd422a69a311eb34ba3fa0b",
+    "skills/spec-runtime-setup/scripts/lib/workspace-runtime-preflight.cjs": "ab020827f87efd6648a03c68905523825dab70dfd0ef70c1f1023bc487b2ff22"
+  },
+  "limitations": [
+    "仅实跑 buildActionPlan 与 requiresRuntimeProjectionPreflight；未调用 runSetup，未执行安装或宿主写入。",
+    "只支持模式与前置gate判断分歧；父目录与graph文案finding另由source支持。"
+  ],
+  "replaces": "此前由reviewer口述转写的probe，本记录改为主owner实际执行与原始stdout。"
+}

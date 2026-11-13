@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "product discovery 请求应路由 ideate/brainstorm",
+  "prompt": "（spec-prototype skill 已安装，请按它工作。）\n帮我们做几个不同方向的原型,探索一下产品接下来该往哪走。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-prototype/evals/fixtures/scripts/routes-to-discovery.sh"
+  ]
+}

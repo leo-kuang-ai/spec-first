@@ -1,0 +1,11 @@
+{
+  "skills/spec-optimize/SKILL.md": "f7fdfdcdd0b732348e1bb174ff29b6f58e50f4dc52f2cd6cd7197ecc5fe640e3",
+  "skills/spec-optimize/references/loop.md": "fdbbf9a7b5db3e2fd76314652e471a8699b23c4e587f0bf2cb7a12de8c786b3b",
+  "skills/spec-optimize/references/measurement.md": "0c17e4b3ee616efb896ac0772fb764aed976814f96b485ecf3b74b93ff9bdf59",
+  "skills/spec-optimize/references/persistence.md": "fa717bb9ab27cd3ec9d6f19d53bd744863e5693a1a3084057c3783a2a55c5eff",
+  "skills/spec-optimize/references/wrap-up.md": "684186ab7082900655f6226188aa0dc0806f595ed246cade8d4f2243e1a476f3",
+  "skills/spec-optimize/references/judge-prompt-template.md": "423423690dbef08e75bc4c27d9255076e641f3b0ab13eb27c3f9281d58197801",
+  "skills/spec-optimize/references/experiment-log-schema.yaml": "82c08bf02348fcac6a6393bc7d6496d3ef38ad74d472d8e246d5855a30ca8dc8",
+  "skills/autoresearch/autoresearch.md": "4a62657905dbee35224d6052349c33a74d656b1b754ff9891632aec41eab409b",
+  "skills/autoresearch/references/orchestrator-routing.md": "829530b3ee2b47d9b42e1794f43c4b2e4649d5a04d1b4e685afcce7cba3cfc91"
+}

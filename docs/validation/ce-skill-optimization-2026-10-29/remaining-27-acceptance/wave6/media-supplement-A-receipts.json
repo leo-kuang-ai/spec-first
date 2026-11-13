@@ -1,0 +1,226 @@
+{
+  "arm": "A",
+  "entrypoints": [
+    {
+      "entrypoint": "spec-riffrec-feedback-analysis",
+      "exit_code": 0,
+      "initial_request_and_fallback_calls": [
+        [
+          "curl",
+          "--config",
+          "-",
+          "-sS",
+          "https://api.openai.com/v1/audio/transcriptions",
+          "-F",
+          "file=@/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-2jxgexod/media.webm",
+          "-F",
+          "model=gpt-4o-mini-transcribe",
+          "-F",
+          "response_format=json"
+        ]
+      ],
+      "result": {
+        "artifacts": {
+          "analysis_md": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-2jxgexod/output/analysis.md",
+          "frames_dir": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-2jxgexod/output/frames",
+          "problem_analysis_md": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-2jxgexod/output/problem-analysis.md",
+          "raw_dir": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-2jxgexod/output/raw",
+          "requirements_kickoff_md": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-2jxgexod/output/requirements-kickoff.md",
+          "review_prompt_md": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-2jxgexod/output/review-prompt.md",
+          "source_materials_md": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-2jxgexod/output/source-materials.md"
+        },
+        "candidate_findings": [
+          {
+            "confidence": "Low",
+            "evidence": [
+              "M1",
+              "M2",
+              "M3"
+            ],
+            "expected": "A human should still inspect the source evidence before closing the feedback.",
+            "id": "F1",
+            "observed": "The analyzer did not find complaint cues, repeated clicks, console errors, or non-noisy failed requests.",
+            "severity": "P3",
+            "title": "No obvious failure detected automatically"
+          }
+        ],
+        "event_counts": {},
+        "moments": [
+          {
+            "events": [],
+            "id": "M1",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 84.0
+          },
+          {
+            "events": [],
+            "id": "M2",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 252.0
+          },
+          {
+            "events": [],
+            "id": "M3",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 420.0
+          },
+          {
+            "events": [],
+            "id": "M4",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 588.0
+          },
+          {
+            "events": [],
+            "id": "M5",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 756.0
+          }
+        ],
+        "output_dir": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-2jxgexod/output",
+        "session": {
+          "duration_seconds": 840
+        },
+        "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-2jxgexod/media.webm",
+        "source_kind": "video",
+        "transcript": {
+          "provider": "openai-audio-transcriptions",
+          "provider_request_sent": false,
+          "reason": "ffmpeg is not installed; cannot chunk media",
+          "status": "failed",
+          "text": "",
+          "transcription_egress_authorization": "explicit-cli-flag"
+        },
+        "transcription_egress_receipt": {
+          "provider": "openai-audio-transcriptions",
+          "provider_request_sent": false,
+          "transcription_egress_authorization": "explicit-cli-flag"
+        }
+      },
+      "scratch_root": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-2jxgexod",
+      "actual_egress": false,
+      "scratch_removed_after_context_exit": true
+    },
+    {
+      "entrypoint": "spec-sweep",
+      "exit_code": 0,
+      "initial_request_and_fallback_calls": [
+        [
+          "curl",
+          "--config",
+          "-",
+          "-sS",
+          "https://api.openai.com/v1/audio/transcriptions",
+          "-F",
+          "file=@/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-h2krguhf/media.webm",
+          "-F",
+          "model=gpt-4o-mini-transcribe",
+          "-F",
+          "response_format=json"
+        ]
+      ],
+      "result": {
+        "artifacts": {
+          "analysis_md": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-h2krguhf/output/analysis.md",
+          "frames_dir": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-h2krguhf/output/frames",
+          "problem_analysis_md": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-h2krguhf/output/problem-analysis.md",
+          "raw_dir": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-h2krguhf/output/raw",
+          "requirements_kickoff_md": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-h2krguhf/output/requirements-kickoff.md",
+          "review_prompt_md": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-h2krguhf/output/review-prompt.md",
+          "source_materials_md": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-h2krguhf/output/source-materials.md"
+        },
+        "candidate_findings": [
+          {
+            "confidence": "Low",
+            "evidence": [
+              "M1",
+              "M2",
+              "M3"
+            ],
+            "expected": "A human should still inspect the source evidence before closing the feedback.",
+            "id": "F1",
+            "observed": "The analyzer did not find complaint cues, repeated clicks, console errors, or non-noisy failed requests.",
+            "severity": "P3",
+            "title": "No obvious failure detected automatically"
+          }
+        ],
+        "event_counts": {},
+        "moments": [
+          {
+            "events": [],
+            "id": "M1",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 84.0
+          },
+          {
+            "events": [],
+            "id": "M2",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 252.0
+          },
+          {
+            "events": [],
+            "id": "M3",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 420.0
+          },
+          {
+            "events": [],
+            "id": "M4",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 588.0
+          },
+          {
+            "events": [],
+            "id": "M5",
+            "reason": "representative video frame",
+            "screenshot": null,
+            "screenshot_status": "no video source",
+            "t": 756.0
+          }
+        ],
+        "output_dir": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-h2krguhf/output",
+        "session": {
+          "duration_seconds": 840
+        },
+        "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-h2krguhf/media.webm",
+        "source_kind": "video",
+        "transcript": {
+          "provider": "openai-audio-transcriptions",
+          "provider_request_sent": false,
+          "reason": "ffmpeg is not installed; cannot chunk media",
+          "status": "failed",
+          "text": "",
+          "transcription_egress_authorization": "explicit-cli-flag"
+        },
+        "transcription_egress_receipt": {
+          "provider": "openai-audio-transcriptions",
+          "provider_request_sent": false,
+          "transcription_egress_authorization": "explicit-cli-flag"
+        }
+      },
+      "scratch_root": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-fallback-h2krguhf",
+      "actual_egress": false,
+      "scratch_removed_after_context_exit": true
+    }
+  ],
+  "limitation": "Actual analyzer CLI logic under mocked initial provider failure and absent ffmpeg. No decoding or external request. Tests cumulative attempt reporting, not live transcription."
+}

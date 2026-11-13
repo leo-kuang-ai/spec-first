@@ -1,0 +1,8 @@
+# consumers: spec-commit
+tests/unit/ce-localization-round-1-remediation-contracts.test.js
+tests/unit/ce-outcome-judge-calibration.test.js
+tests/unit/ce-upstream-skill-sync-contracts.test.js
+tests/unit/spec-commit-push-pr-context-contracts.test.js
+tests/unit/spec-commit-scope-regression.test.js
+tests/unit/specialized-skill-calibration-contracts.test.js
+tests/unit/using-spec-first-contracts.test.js

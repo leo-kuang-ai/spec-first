@@ -1,0 +1,16 @@
+PASS tests/unit/spec-sweep-final-publication.test.js
+  ✓ publishes the actual final record and released lease, then resumes without another push (533 ms)
+  ✓ missing record or unreleased lease prevents publication (221 ms)
+  ✓ record failure and another writer release failure retain remote ownership (261 ms)
+  ✓ rejected push remains pending and never reports remote cleanup (654 ms)
+  ✓ a newer writer is read before recovery and never overwritten (451 ms)
+  ✓ repo-local refuses the shared publisher without remote writes (237 ms)
+  ✓ committed-local refuses the shared publisher without remote writes (234 ms)
+  ✓ unrelated committed files cannot hitchhike on the final publication (335 ms)
+  ✓ unknown push exit is reconciled from exact remote bytes before declaring success (651 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       9 passed, 9 total
+Snapshots:   0 total
+Time:        3.728 s, estimated 5 s
+Ran all test suites matching /tests\/unit\/spec-sweep-final-publication.test.js/i.

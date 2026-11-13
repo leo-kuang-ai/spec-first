@@ -1,0 +1,26 @@
+PASS tests/unit/spec-lfg-contracts.test.js
+  spec-lfg current contracts
+    ✓ retains settled decision provenance through planning, simplification, and residual landing (2 ms)
+    ✓ requires every relocated stage before execution and keeps its content out of the entry
+    ✓ gives child skills the task view and restores the remaining pipeline after return (1 ms)
+    ✓ owns plan completion after return-to-caller gates close
+    ✓ describes Simplify verification scope without claiming an unconditional full test suite
+    ✓ uses the explicit LFG request as a scoped independent-review dispatch authorization (1 ms)
+    ✓ keeps explicit target-origin as a caller-owned browser input
+    ✓ closes browser and cleanup gates before every durable or outward shipping side effect (1 ms)
+    ✓ re-verifies the final working tree with deterministic freshness evidence (1 ms)
+    ✓ resolves the fingerprint helper from its own package instead of a source checkout
+    ✓ bundles a byte-identical package-local projection of the spec-work fingerprint helper (14 ms)
+    ✓ projects the package-local fingerprint helper into every supported host plan (499 ms)
+    ✓ treats final-verification-stale as a named-cause stop with a re-entry path
+    ✓ preserves the caller argument payload from brainstorm through spec-plan
+    ✓ keeps spec-lfg model-invocable in every supported host projection (378 ms)
+    ✓ offers spec-handoff only after terminal closeout and explicit user acceptance
+    ✓ projects the LFG next-work reference and public handoff target to every host (373 ms)
+    ✓ requires LFG to consume wrapper status without becoming a browser executor
+
+Test Suites: 1 passed, 1 total
+Tests:       18 passed, 18 total
+Snapshots:   0 total
+Time:        1.354 s, estimated 2 s
+Ran all test suites within paths "tests/unit/spec-lfg-contracts.test.js".

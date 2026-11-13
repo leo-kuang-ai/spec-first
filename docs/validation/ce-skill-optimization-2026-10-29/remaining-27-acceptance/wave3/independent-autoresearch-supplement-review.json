@@ -1,0 +1,167 @@
+{
+  "scenario_id": "CEOPT-01",
+  "review_type": "Independent read-only deterministic supplement review",
+  "judgment": "Both previously identified deterministic evidence gaps are closed for frozen B within the supplied synthetic scorer scope.",
+  "reviewed": [
+    "Complete supplement protocol.json",
+    "All 16 records in results.json",
+    "All eight supplemental TSV files",
+    "prepare-autoresearch-supplement.py",
+    "Complete frozen A and B scorer sources",
+    "Original packet references and six trial artifact/trace integrity"
+  ],
+  "facet_closure": {
+    "legacy_classification_alias_equivalence": {
+      "status": "closed_for_supplied_cases",
+      "evidence": "B produces identical exit_code, stdout and stderr for all three regression-eligible/eligible pairs: HARD failure, visual SCORE failure and scoped stable positive.",
+      "derivation_verified": "Each canonical fixture exactly matches its original fixture. Each legacy derivative changes only classification tokens from regression-eligible to eligible, preserving every other byte.",
+      "dimension_alias_context": "These supplemental visual-ui pairs change classification only. The original visual-ui/visual fixtures already demonstrated dimension alias equivalence. Together they cover both previously identified alias mechanisms."
+    },
+    "unknown_dimension_rejection": {
+      "status": "closed_for_supplied_cases",
+      "evidence": "B rejects both an unknown dimension alone and an unknown dimension following a valid 100-point performance row with exit 2, empty stdout and INVALID_INPUT.",
+      "derivation_verified": "The unknown row differs from the original stable row only in its dimension field. The mixed fixture is exactly the original stable fixture followed by that unknown row.",
+      "scope": "Together with the original unknown-classification case, this establishes rejection of the tested unknown dimension and classification values, not exhaustive malformed-input coverage."
+    }
+  },
+  "all_case_judgments": [
+    {
+      "arm": "A",
+      "case": "hard-canonical.tsv",
+      "actual": "exit 0, STABLE, score 100",
+      "judgment": "unsafe_false_green"
+    },
+    {
+      "arm": "A",
+      "case": "hard-legacy.tsv",
+      "actual": "exit 1, UNSTABLE, functional blocker",
+      "judgment": "correct_but_not_equivalent_to_canonical"
+    },
+    {
+      "arm": "A",
+      "case": "visual-ui-canonical.tsv",
+      "actual": "exit 0, STABLE, score 100",
+      "judgment": "unsafe_false_green"
+    },
+    {
+      "arm": "A",
+      "case": "visual-ui-legacy.tsv",
+      "actual": "exit 0, STABLE, score 100",
+      "judgment": "unsafe_false_green",
+      "note": "Pair equality alone is insufficient: both spellings incorrectly omit visual-ui evidence."
+    },
+    {
+      "arm": "A",
+      "case": "stable-canonical.tsv",
+      "actual": "exit 0, STABLE, score 100",
+      "judgment": "correct_scoped_positive"
+    },
+    {
+      "arm": "A",
+      "case": "stable-legacy.tsv",
+      "actual": "exit 0, STABLE, score 100",
+      "judgment": "correct_scoped_positive"
+    },
+    {
+      "arm": "A",
+      "case": "unknown-dimension-alone.tsv",
+      "actual": "exit 1, BASELINE_UNAVAILABLE",
+      "judgment": "non_green_but_unknown_dimension_not_validated",
+      "note": "The unknown row is ignored; absence of any recognized SCORE dimension prevents a green verdict."
+    },
+    {
+      "arm": "A",
+      "case": "unknown-dimension-mixed.tsv",
+      "actual": "exit 0, STABLE, score 100",
+      "judgment": "unsafe_false_green",
+      "note": "The valid performance row masks the ignored unknown dimension."
+    },
+    {
+      "arm": "B",
+      "case": "hard-canonical.tsv",
+      "actual": "exit 1, UNSTABLE, functional blocker",
+      "judgment": "pass"
+    },
+    {
+      "arm": "B",
+      "case": "hard-legacy.tsv",
+      "actual": "exit 1, UNSTABLE, functional blocker",
+      "judgment": "pass"
+    },
+    {
+      "arm": "B",
+      "case": "visual-ui-canonical.tsv",
+      "actual": "exit 1, UNSTABLE, score 60",
+      "judgment": "pass"
+    },
+    {
+      "arm": "B",
+      "case": "visual-ui-legacy.tsv",
+      "actual": "exit 1, UNSTABLE, score 60",
+      "judgment": "pass"
+    },
+    {
+      "arm": "B",
+      "case": "stable-canonical.tsv",
+      "actual": "exit 0, STABLE, score 100",
+      "judgment": "pass_scoped"
+    },
+    {
+      "arm": "B",
+      "case": "stable-legacy.tsv",
+      "actual": "exit 0, STABLE, score 100",
+      "judgment": "pass_scoped"
+    },
+    {
+      "arm": "B",
+      "case": "unknown-dimension-alone.tsv",
+      "actual": "exit 2, empty stdout, INVALID_INPUT: row 1 unknown dimension",
+      "judgment": "pass"
+    },
+    {
+      "arm": "B",
+      "case": "unknown-dimension-mixed.tsv",
+      "actual": "exit 2, empty stdout, INVALID_INPUT: row 2 unknown dimension",
+      "judgment": "pass"
+    }
+  ],
+  "source_consistency": {
+    "A": "Exact eligible matching explains the HARD pair mismatch. Exact visual lookup explains both false-green visual-ui cases. Lack of dimension validation explains unavailable-only behavior when unknown is alone and false green when mixed with valid performance.",
+    "B": "Classification normalization precedes validation and blocking. Dimension normalization and registry validation precede scoring. These mechanisms explain all eight B results without contradiction."
+  },
+  "integrity_and_producer_checks": {
+    "record_count": 16,
+    "unique_arm_case_pairs": 16,
+    "complete_two_by_eight_matrix": true,
+    "all_eight_input_hashes_match_protocol": true,
+    "both_source_hashes_match_protocol_and_original_receipts": true,
+    "all_recorded_argv_targets_match_cases_and_sources": true,
+    "all_three_B_pairs_have_identical_exit_stdout_stderr": true,
+    "protocol_written_before_helper_execution_in_producer": true,
+    "producer_captures_actual_subprocess_exit_stdout_stderr": true,
+    "producer_uses_ten_second_timeout_per_invocation": true,
+    "producer_removes_inherited_REG_THRESHOLD": true,
+    "producer_isolates_HOME_and_USERPROFILE_to_scratch": true,
+    "inputs_and_sources_preserved": "The results report post-execution preservation; current hashes independently match the pinned protocol.",
+    "scratch_cleanup": "The producer uses finally-based cleanup, results report removal, and the recorded scratch path is currently absent.",
+    "original_packet": "Its content matches the packet reviewed previously; request, fixture and arm-receipt references retain matching hashes.",
+    "original_six_trials": "All artifact and trace hashes still match their original receipts.",
+    "original_models_did_not_observe_supplement": "All six trials finalized before supplement creation, and no original tool trace references the supplemental directory.",
+    "provenance_limit": "Protocol ordering and subprocess capture are supported by producer source and supplied receipts; no independent producer execution trace or immutable timestamp attestation was supplied."
+  },
+  "updated_acceptance_scope": {
+    "deterministic_B_acceptance": "The original receipts plus this supplement support the named CEOPT-01 scorer facets: HARD regression cannot pass, tested lawful aliases preserve behavior, tested unknown classifications and dimensions cannot turn green, and the lawful stable control remains scoped.",
+    "original_model_judgments": "Unchanged. All six original artifacts passed their bounded interpretation request; none interpreted these supplemental inputs.",
+    "A_helper_judgment": "Still fails the deterministic acceptance conditions. Supplemental evidence further isolates its classification mismatch and mixed unknown-dimension false green.",
+    "orchestrator_recovery_and_check_state": "Still untested.",
+    "broader_completion": "No conclusion about full autoresearch workflow completion, remaining skills, real application behavior, model superiority or release readiness."
+  },
+  "limitations": [
+    "This is separately pinned, post-review deterministic evidence, not retroactive coverage by the original six model trials.",
+    "No scorer, producer, test, model rerun or orchestration was executed during this review.",
+    "No model-quality comparison is strengthened by adding helper-only executions.",
+    "Stable positives cover one supplied performance dimension; unavailable or unrepresented required dimensions remain unmet.",
+    "Scorer input/source preservation and scratch cleanup do not establish orchestration ledger preservation, recovery correctness or convergence.",
+    "Synthetic fixtures and local helper receipts do not authenticate upstream application tests or visual outcomes."
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "generated_at": "2026-09-20T07:06:40.683772+00:00",
+  "skill_name": "spec-test-browser",
+  "source_snapshot": "source-manifest.json",
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "source_paths": [
+    "skills/spec-test-browser/SKILL.md",
+    "skills/spec-test-browser/references/pipeline-orchestration.md",
+    "skills/spec-test-browser/references/route-and-report.md",
+    "skills/spec-test-browser/scripts/agent-browser-run-context.cjs"
+  ],
+  "source_read_ranges": {
+    "skills/spec-test-browser/SKILL.md": "1-90",
+    "skills/spec-test-browser/references/pipeline-orchestration.md": "1-20",
+    "skills/spec-test-browser/references/route-and-report.md": "1-111",
+    "skills/spec-test-browser/scripts/agent-browser-run-context.cjs": "1-140,405-540,636-735,764-973,1035-1086"
+  },
+  "source_hashes": {
+    "skills/spec-test-browser/SKILL.md": "bfe3cdc6e9648c6cec96bbe221a8cdd37cddb322d5b489eb1eb861fab329c4db",
+    "skills/spec-test-browser/references/pipeline-orchestration.md": "861527e2f3c0ddfae4f0690e62a6ccdf418d1996c3272cb6e0e7f79203a4cf7b",
+    "skills/spec-test-browser/references/route-and-report.md": "2f77b26725d0124a56a5fc74a3f23920109ee73b85aee81ac9f7b6e4a55fe7d9",
+    "skills/spec-test-browser/scripts/agent-browser-run-context.cjs": "e60b83ed47085a6832c5ae0a043a50233c467c082b8dbf1e68abc10d1f209d34"
+  },
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "entry_surface": "internal_only",
+  "batch": "C1",
+  "closure_tier": "S",
+  "closure_observed": {
+    "files": 9,
+    "bytes": 83361,
+    "read_package_files_at_least_partially": 4,
+    "read_supporting_files_at_least_partially": 0,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "coverage_commitment": "committed",
+  "dependency_closure": "partial",
+  "status": "degraded",
+  "reason_codes": [
+    "bounded_dependency_closure",
+    "tests_not_run",
+    "host_projection_not_run"
+  ],
+  "command_or_method": [
+    "独立于被审源码作者的只读reviewer逐包阅读实际source并判断五分支；主owner回源裁决finding，非盲评或真实workflow运行。"
+  ],
+  "ran": true,
+  "exit_code": null,
+  "evidence_paths": [
+    "reviewer-returns/c1.json"
+  ],
+  "source_refs": [
+    "skills/spec-test-browser/SKILL.md",
+    "skills/spec-test-browser/references/pipeline-orchestration.md",
+    "skills/spec-test-browser/references/route-and-report.md",
+    "skills/spec-test-browser/scripts/agent-browser-run-context.cjs"
+  ],
+  "owner": "project-lead-cycle-1",
+  "consumers": [
+    "周期1主审查",
+    "对应上游/下游workflow（以SKILL文档声明为准）"
+  ],
+  "branches": [
+    {
+      "id": "entry_positive",
+      "status": "source-covered",
+      "judgment": "浏览器测试统一通过 wrapper 承接 run context；exact-origin、binary identity 与 conformance 构成进入浏览器前的事实检查，immutable plan hash 约束执行计划。",
+      "source_refs": [
+        "skills/spec-test-browser/SKILL.md:1-90",
+        "skills/spec-test-browser/scripts/agent-browser-run-context.cjs:1-140",
+        "skills/spec-test-browser/scripts/agent-browser-run-context.cjs:405-540"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "near_neighbor_negative",
+      "status": "source-covered",
+      "judgment": "不得因裸 agent-browser 命令可运行就绕过 unique wrapper；human-only 的 Skip 不能由 agent 自批。route-and-report 将不同入口和浏览器状态分开，不用报告文案代替 first-open gate。",
+      "source_refs": [
+        "skills/spec-test-browser/SKILL.md:1-90",
+        "skills/spec-test-browser/references/route-and-report.md:1-111",
+        "skills/spec-test-browser/references/pipeline-orchestration.md:1-20"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "output_consumer",
+      "status": "source-covered",
+      "judgment": "run context 与 report 提供当前 route、计划、执行结果和 cleanup status，供上游 review/work 消费；计划 hash 与 runtime facts 是可核验输入，不自动证明页面行为正确。",
+      "source_refs": [
+        "skills/spec-test-browser/references/route-and-report.md:1-111",
+        "skills/spec-test-browser/scripts/agent-browser-run-context.cjs:636-735",
+        "skills/spec-test-browser/scripts/agent-browser-run-context.cjs:1035-1086"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "failure_stop",
+      "status": "source-covered",
+      "judgment": "first-open gate 对 origin、binary/conformance 和计划一致性施加边界，已读实现给出 cleanup 状态；关键授权不能通过 Skip 旁路。仍未读完整 wrapper，不能声明所有子命令和资源清理组合均通过。",
+      "source_refs": [
+        "skills/spec-test-browser/scripts/agent-browser-run-context.cjs:764-973",
+        "skills/spec-test-browser/scripts/agent-browser-run-context.cjs:1035-1086",
+        "skills/spec-test-browser/SKILL.md:1-90"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "recovery_handoff_closeout",
+      "status": "source-covered",
+      "judgment": "报告显式保留未跑/被阻断和 cleanup 情况；恢复应重新核对运行身份、origin 与计划，不能只复用旧会话成功声明。本轮未运行 conformance probe、wrapper tests 或真实浏览器。",
+      "source_refs": [
+        "skills/spec-test-browser/references/route-and-report.md:1-111",
+        "skills/spec-test-browser/scripts/agent-browser-run-context.cjs:636-735",
+        "skills/spec-test-browser/scripts/agent-browser-run-context.cjs:1035-1086"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    }
+  ],
+  "findings": [],
+  "fresh_source_eval": "not-run",
+  "claim_ceiling": "C0",
+  "limitations": [
+    "wrapper 其余区间、完整引用和 tests 未完成依赖闭包。",
+    "未运行 agent-browser probe、真实浏览器或 wrapper tests；没有宿主 runtime 结果。",
+    "本 worker 仅进行有界 source review；未执行被审 workflow、真实模型、真实宿主、安装、浏览器或外部写入。",
+    "source-read 不等于完整依赖闭包或行为评测通过；完整包 status 由主 owner 结合 findings 裁决。"
+  ],
+  "recovery_point": "补读 wrapper 未覆盖区间，在受控 fixture 中验证 origin mismatch、binary identity 变化、plan hash 变化、human-only Skip 与 cleanup failure，然后独立验证实际浏览器。",
+  "timing": {
+    "active_seconds": null,
+    "limitation": "恢复前未记录可靠的逐包审查耗时；不以工具墙钟时间伪造语义审查耗时。"
+  },
+  "record_correction": {
+    "at": "2026-09-20T05:55:01.023954+00:00",
+    "invalidated": "2026-09-20T05:24 的机械占位结论",
+    "replaced_by_actual_review_at": "2026-09-20T07:06:40.683772+00:00"
+  },
+  "reviewer_provenance": {
+    "reviewer": "cycle1_a_readiness",
+    "kind": "read-only-source-review",
+    "fresh_per_package_context": false,
+    "raw_return": "reviewer-returns/c1.json",
+    "raw_return_sha256": "02822623ed4eb85628acd1969fb484a13ee4e04be4367e5a660cd80b82f99e09"
+  },
+  "execution": {
+    "source_semantic_review": "ran",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "not-run",
+    "owner_probe_refs": []
+  },
+  "supporting_read_ranges": {},
+  "unconfirmed_read_ranges": []
+}

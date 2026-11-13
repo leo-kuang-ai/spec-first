@@ -1,0 +1,25 @@
+schema_version: v1alpha1
+
+# 第二轮筛查；工作目录由 skill-up 放在 $TMPDIR，位于仓库之外
+environment:
+  type: none
+
+skills:
+  - source: local_path
+    path: ../../../../skills/spec-plan
+
+engine:
+  name: claude_code
+
+cases:
+  files:
+    - evals/cases/s04-p1-reuse.yaml
+  defaults:
+    timeout_seconds: 1200
+    max_turns: 40
+    collect_artifacts: ["**"]
+  parallelism: 3
+
+report:
+  formats: [json]
+  artifacts: [transcript]

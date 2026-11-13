@@ -1,0 +1,9 @@
+{
+  "type": "confirmed",
+  "probe": "current-contract-receipt-against-existing-judge",
+  "message": "Review failed: non-interactive mode requires a document path. Expected arguments: mode:non-interactive <path>",
+  "exit_code": 1,
+  "stdout": "未输出 headless 缺路径回执(SKILL.md 契约原文或等价中文语义)\n",
+  "stderr": "",
+  "limitation": "judge直接调用；未运行模型或真实宿主"
+}

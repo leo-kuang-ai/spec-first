@@ -1,0 +1,16 @@
+id: s04-h2-private-convention
+title: s04-h2-private-convention
+description: |
+  第二轮筛查场景；预期与判定见 ../../expectations.md（运行前写定），正式判定由 ../../grade2.py 事后执行。
+input:
+  prompt: |
+    加一个作废发票的功能：只有 open 状态的发票可以作废，作废后状态为 void。先写一份实施计划保存到仓库里，不要写实现代码。
+context:
+  repo_fixture: evals/fixtures/billing-svc
+  git:
+    init: true
+    checkout: main
+judge:
+  type: rule_based
+  success:
+    - exit_code: 0

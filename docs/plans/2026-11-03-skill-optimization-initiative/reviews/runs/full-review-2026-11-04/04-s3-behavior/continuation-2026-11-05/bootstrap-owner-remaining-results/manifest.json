@@ -1,0 +1,134 @@
+{
+  "files": [
+    {
+      "archive": "result.json",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/result.json",
+      "sha256": "acc4020c83a58507bc05e558b97d37179dce00475ce781a8101a62f62539f13f"
+    },
+    {
+      "archive": "runner.log",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runner.log",
+      "sha256": "d8d343bd59c90f5939108debe036259ad703f1e9c6aabdfc0be17f99c6bcf477"
+    },
+    {
+      "archive": "implementation-routes-work/grading.json",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/implementation-routes-work/with_skill/grading.json",
+      "sha256": "5e74e6af0b899b13c63bbd9a9f78fa8e25a4e045136612d93e99b61384cda9ce"
+    },
+    {
+      "archive": "implementation-routes-work/response.md",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/implementation-routes-work/with_skill/outputs/response.md",
+      "sha256": "14870869fe789ddd194d84cb01b9a7e1858de67c5d600ae648861d2278ecb537"
+    },
+    {
+      "archive": "implementation-routes-work/9773dfe2-ae3b-45d1-8947-dfb8444e3395.jsonl",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/implementation-routes-work/with_skill/outputs/agent/run/9773dfe2-ae3b-45d1-8947-dfb8444e3395.jsonl",
+      "sha256": "ce60b7924b6260e32106db1ecd03a956e741d6648a0b1b404126e7a6fbae1ae0"
+    },
+    {
+      "archive": "planning-only-rejects-implementation/grading.json",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/planning-only-rejects-implementation/with_skill/grading.json",
+      "sha256": "00ade49a833a085a01419cc696a5d8f9edf9fa3847453ee7d8db3584bc367186"
+    },
+    {
+      "archive": "planning-only-rejects-implementation/response.md",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/planning-only-rejects-implementation/with_skill/outputs/response.md",
+      "sha256": "a8fd8873bbf29ccfef19a51b01e993e8073f8a25bb8a5dc312563adf2ba606f8"
+    },
+    {
+      "archive": "planning-only-rejects-implementation/b2a1ab92-a65e-4e23-b2b3-c8448d9e3bd6.jsonl",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/planning-only-rejects-implementation/with_skill/outputs/agent/run/b2a1ab92-a65e-4e23-b2b3-c8448d9e3bd6.jsonl",
+      "sha256": "25c27bd5915fedd5384845f07cf3ddacffb5758f2ffb997afa20640160e9a3f6"
+    },
+    {
+      "archive": "empty-input-asks/grading.json",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/empty-input-asks/with_skill/grading.json",
+      "sha256": "d209921718daf2e6f22c313ed1957d0e057243eb4ba0719e48f497463456a44c"
+    },
+    {
+      "archive": "empty-input-asks/response.md",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/empty-input-asks/with_skill/outputs/response.md",
+      "sha256": "213bec1d3071c7fda79c2126b9d0d1c9f19c61098b077490af858af724256d41"
+    },
+    {
+      "archive": "empty-input-asks/9e2aa9fc-2b5c-44d2-b629-e4299b44fb71.jsonl",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/empty-input-asks/with_skill/outputs/agent/run/9e2aa9fc-2b5c-44d2-b629-e4299b44fb71.jsonl",
+      "sha256": "33f3b2332f2539c4470bce3cc5eaa97c5efb3dd6dff97c1479ec63e68e11ef03"
+    },
+    {
+      "archive": "implementation-owner-not-authorized/grading.json",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/implementation-owner-not-authorized/with_skill/grading.json",
+      "sha256": "9688146f8762e7ce2405c2ba68df31335c92da225a8ca933cf13c694f3611ad5"
+    },
+    {
+      "archive": "implementation-owner-not-authorized/response.md",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/implementation-owner-not-authorized/with_skill/outputs/response.md",
+      "sha256": "f60153a82971bac8c58515650ed88a1ddc7747cd0a5dbe07c4919f838b150428"
+    },
+    {
+      "archive": "implementation-owner-not-authorized/716d1f62-e546-4065-9d7f-f7478a8264bf.jsonl",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/implementation-owner-not-authorized/with_skill/outputs/agent/run/716d1f62-e546-4065-9d7f-f7478a8264bf.jsonl",
+      "sha256": "cd24dc4f0700ab250f1acf78bf60071a4dc6842380992653aca3c85336a3d776"
+    },
+    {
+      "archive": "always-plan-unclear-input/grading.json",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/always-plan-unclear-input/with_skill/grading.json",
+      "sha256": "deae99e01ea1ad22c3f55dc170d85a5bb4652a8df4b30e4854c33106012cdab8"
+    },
+    {
+      "archive": "always-plan-unclear-input/response.md",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/always-plan-unclear-input/with_skill/outputs/response.md",
+      "sha256": "52dad60fc68d3582b3b547baf4a6d5f85f374c4c500434decf1181223d0c5028"
+    },
+    {
+      "archive": "always-plan-unclear-input/b09d31ed-32d1-4c40-938d-7d43e408476a.jsonl",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/always-plan-unclear-input/with_skill/outputs/agent/run/b09d31ed-32d1-4c40-938d-7d43e408476a.jsonl",
+      "sha256": "32e6593b8b3479891494a23b3c50dd8f72007b58ae981976993820dc8cf37f13"
+    },
+    {
+      "archive": "r2-soft-pressure-code/grading.json",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/r2-soft-pressure-code/with_skill/grading.json",
+      "sha256": "570f4dc3138e4cd18a4fc3996d8e4677608cbacb8d5b9a65c8c97b0875d22f1d"
+    },
+    {
+      "archive": "r2-soft-pressure-code/response.md",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/r2-soft-pressure-code/with_skill/outputs/response.md",
+      "sha256": "0b9854e3b206caa78211620889efc02c18e957724736a912e7c894834daae501"
+    },
+    {
+      "archive": "r2-soft-pressure-code/9752029b-b697-43b7-9d87-1d2bdf9c6c81.jsonl",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/r2-soft-pressure-code/with_skill/outputs/agent/run/9752029b-b697-43b7-9d87-1d2bdf9c6c81.jsonl",
+      "sha256": "4dec904789ff261582df22103445dcc89032868eebd64155b8c62d1149c9cb77"
+    },
+    {
+      "archive": "enriches-product-contract-in-place/grading.json",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/enriches-product-contract-in-place/with_skill/grading.json",
+      "sha256": "c37b24fc9b03a8ac2ce3b473b743fa09193b4c12435b937ad9a8209efe3f068c"
+    },
+    {
+      "archive": "enriches-product-contract-in-place/response.md",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/enriches-product-contract-in-place/with_skill/outputs/response.md",
+      "sha256": "465e735ef5bce213e57de6d3f8c5f40193a272c6a66c0752306b1475ea946fd5"
+    },
+    {
+      "archive": "enriches-product-contract-in-place/d24c6057-12c7-4806-8546-650f0ce58cfb.jsonl",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/enriches-product-contract-in-place/with_skill/outputs/agent/run/d24c6057-12c7-4806-8546-650f0ce58cfb.jsonl",
+      "sha256": "8836576dc83e85e8b21f525de173734fd06c5ea1f9876cca85a4b298c6a7941d"
+    },
+    {
+      "archive": "r2-half-formed-what/grading.json",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/r2-half-formed-what/with_skill/grading.json",
+      "sha256": "670093ea674c341ea52ae3faa7c7032ecbe3d0d02dff667eb81d11ee9031cae4"
+    },
+    {
+      "archive": "r2-half-formed-what/response.md",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/r2-half-formed-what/with_skill/outputs/response.md",
+      "sha256": "67a4f3fcdea1fd55c4b568a29934024f70eb60e05f82f09f66b50845bad99fcd"
+    },
+    {
+      "archive": "r2-half-formed-what/08eeddaa-658b-40e7-bb77-d7b48f48cabe.jsonl",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/remaining-runs/iteration-1/r2-half-formed-what/with_skill/outputs/agent/run/08eeddaa-658b-40e7-bb77-d7b48f48cabe.jsonl",
+      "sha256": "f970c580f4cbf1c937e7bfe7e0d52df524412c6c78e19bbe13cf570cf7147e5d"
+    }
+  ]
+}

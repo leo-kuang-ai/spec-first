@@ -1,0 +1,26 @@
+{
+  "results": [
+    {
+      "name": "实际HTTP成功、领域接入及金额兼容",
+      "pass": true
+    },
+    {
+      "name": "重复取消幂等且审计一次",
+      "pass": true
+    },
+    {
+      "name": "paid拒绝取消且无副作用",
+      "pass": true
+    },
+    {
+      "name": "refunded拒绝取消且无副作用",
+      "pass": true
+    },
+    {
+      "name": "不存在返回404且无写入",
+      "pass": true
+    }
+  ],
+  "passed": 5,
+  "total": 5
+}

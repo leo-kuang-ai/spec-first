@@ -1,0 +1,2683 @@
+{
+  "scope": "Parent-executed disposable Git procedure; not autonomous Skill execution or atomic/race-proof recovery.",
+  "source_refs": [
+    "skills/spec-commit/SKILL.md",
+    "skills/spec-commit-push-pr/references/commit-and-push.md"
+  ],
+  "results": [
+    {
+      "case": "normal",
+      "caller_target": "feature/owned",
+      "default_branch_probe_exit": 128,
+      "preflight": {
+        "head": "0e82daba4beef5b9205e3d0bf2e8c1c3abf5ae3d",
+        "branch": "feature/owned",
+        "index": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+        "hook_sha256": "406a98198813ff880d3d148e67333743e7efdd33d7da926f93641ddc9e53255b"
+      },
+      "preflight_admitted": true,
+      "commit_exit": 0,
+      "commit_sha": "102e4c9fca4c64060c2826b27a3f8017033b7e33",
+      "outcome": "owned-commit-reconciled",
+      "recovery": "readback-before-reconciliation-no-duplicate",
+      "protected_worktree_hashes": {
+        "ledger.js": "ad1434ad093019df4d156ed31d42de297417e8395224eaf4d5364bda649b6691",
+        "unrelated.txt": "a199f273ee3f3f5d6b830814a31e2e8fced347e4ac79b3e66344af0f764c49d6",
+        "untracked.txt": "e51e85400915f4aaf466262379639d87bbdc7e94af219658437d804f004f40d9"
+      },
+      "protected_bytes_preserved": true,
+      "prior_commit_preserved": true,
+      "unrelated_staged_preserved": true,
+      "hook_ran": true,
+      "calls": [
+        {
+          "argv": [
+            "init",
+            "-q",
+            "-b",
+            "feature/owned"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "user.name",
+            "Fixture"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "commit.gpgsign",
+            "false"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "add",
+            "--",
+            "ledger.js"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "commit",
+            "-m",
+            "baseline",
+            "-m",
+            "Co-authored-by: Prior <prior@example.invalid>"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "[feature/owned (root-commit) 0e82dab] baseline\n 1 file changed, 2 insertions(+)\n create mode 100644 ledger.js\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "add",
+            "--",
+            "unrelated.txt"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "--show-origin",
+            "--get",
+            "core.hooksPath"
+          ],
+          "alternate_index": false,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "--git-path",
+            "hooks"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": ".git/hooks\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "--abbrev-ref",
+            "origin/HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 128,
+          "stdout": "origin/HEAD\n",
+          "stderr": "fatal: ambiguous argument 'origin/HEAD': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\n"
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "0e82daba4beef5b9205e3d0bf2e8c1c3abf5ae3d\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "branch",
+            "--show-current"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "feature/owned\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "cat-file",
+            "commit",
+            "0e82daba4beef5b9205e3d0bf2e8c1c3abf5ae3d"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "tree 05655ecc200e1c98eaaf02870acbe0d5b2910cd7\nauthor Fixture <fixture@example.invalid> 1793450981 +0800\ncommitter Fixture <fixture@example.invalid> 1793450981 +0800\n\nbaseline\n\nCo-authored-by: Prior <prior@example.invalid>\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "read-tree",
+            "HEAD"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "hash-object",
+            "-w",
+            "--stdin"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "76ef99f3f0fad6d338d6dbfb114414a80695299b\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "update-index",
+            "--add",
+            "--cacheinfo",
+            "100644",
+            "76ef99f3f0fad6d338d6dbfb114414a80695299b",
+            "ledger.js"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "diff",
+            "--cached",
+            "--name-only"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "ledger.js\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "show",
+            ":ledger.js"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "exports.acceptAmount = amount => amount > 0;\nexports.label = 'Ledger';\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "0e82daba4beef5b9205e3d0bf2e8c1c3abf5ae3d\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "branch",
+            "--show-current"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "feature/owned\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "commit",
+            "-F",
+            "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ceopt-commit-recovery-12m1tbxq/message.txt"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "[feature/owned 102e4c9] fix(fixture): reject zero amount\n 1 file changed, 1 insertion(+), 1 deletion(-)\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "102e4c9fca4c64060c2826b27a3f8017033b7e33\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD^"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "0e82daba4beef5b9205e3d0bf2e8c1c3abf5ae3d\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "show",
+            "HEAD:ledger.js"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "exports.acceptAmount = amount => amount > 0;\nexports.label = 'Ledger';\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "diff-tree",
+            "--no-commit-id",
+            "--name-only",
+            "-r",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "ledger.js\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "log",
+            "-1",
+            "--format=%B"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "fix(fixture): reject zero amount\n\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "102e4c9fca4c64060c2826b27a3f8017033b7e33\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "update-index",
+            "--cacheinfo",
+            "100644",
+            "76ef99f3f0fad6d338d6dbfb114414a80695299b",
+            "ledger.js"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "diff",
+            "--cached",
+            "--name-only"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "unrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "show",
+            ":ledger.js"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "exports.acceptAmount = amount => amount > 0;\nexports.label = 'Ledger';\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-list",
+            "--count",
+            "0e82daba4beef5b9205e3d0bf2e8c1c3abf5ae3d..HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 76ef99f3f0fad6d338d6dbfb114414a80695299b 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "cat-file",
+            "commit",
+            "0e82daba4beef5b9205e3d0bf2e8c1c3abf5ae3d"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "tree 05655ecc200e1c98eaaf02870acbe0d5b2910cd7\nauthor Fixture <fixture@example.invalid> 1793450981 +0800\ncommitter Fixture <fixture@example.invalid> 1793450981 +0800\n\nbaseline\n\nCo-authored-by: Prior <prior@example.invalid>\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "show",
+            ":unrelated.txt"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "User-owned staged work.\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--others",
+            "--exclude-standard"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "untracked.txt\n",
+          "stderr": ""
+        }
+      ],
+      "scratch_removed_after_context_exit": true
+    },
+    {
+      "case": "rejecting-hook",
+      "caller_target": "feature/owned",
+      "default_branch_probe_exit": 128,
+      "preflight": {
+        "head": "044930ac00ee46031e8438043c2c7da441f5ca2a",
+        "branch": "feature/owned",
+        "index": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+        "hook_sha256": "fd9f7a8a2a8ad3f205f5fef7abd3810f117492ccae0bbca7e5ce807abeeb4f81"
+      },
+      "preflight_admitted": true,
+      "commit_exit": 1,
+      "commit_sha": null,
+      "outcome": "hook-rejected-no-commit",
+      "recovery": "not-applicable",
+      "protected_worktree_hashes": {
+        "ledger.js": "ad1434ad093019df4d156ed31d42de297417e8395224eaf4d5364bda649b6691",
+        "unrelated.txt": "a199f273ee3f3f5d6b830814a31e2e8fced347e4ac79b3e66344af0f764c49d6",
+        "untracked.txt": "e51e85400915f4aaf466262379639d87bbdc7e94af219658437d804f004f40d9"
+      },
+      "protected_bytes_preserved": true,
+      "prior_commit_preserved": true,
+      "unrelated_staged_preserved": true,
+      "hook_ran": true,
+      "calls": [
+        {
+          "argv": [
+            "init",
+            "-q",
+            "-b",
+            "feature/owned"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "user.name",
+            "Fixture"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "commit.gpgsign",
+            "false"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "add",
+            "--",
+            "ledger.js"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "commit",
+            "-m",
+            "baseline",
+            "-m",
+            "Co-authored-by: Prior <prior@example.invalid>"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "[feature/owned (root-commit) 044930a] baseline\n 1 file changed, 2 insertions(+)\n create mode 100644 ledger.js\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "add",
+            "--",
+            "unrelated.txt"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "--show-origin",
+            "--get",
+            "core.hooksPath"
+          ],
+          "alternate_index": false,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "--git-path",
+            "hooks"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": ".git/hooks\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "--abbrev-ref",
+            "origin/HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 128,
+          "stdout": "origin/HEAD\n",
+          "stderr": "fatal: ambiguous argument 'origin/HEAD': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\n"
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "044930ac00ee46031e8438043c2c7da441f5ca2a\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "branch",
+            "--show-current"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "feature/owned\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "cat-file",
+            "commit",
+            "044930ac00ee46031e8438043c2c7da441f5ca2a"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "tree 05655ecc200e1c98eaaf02870acbe0d5b2910cd7\nauthor Fixture <fixture@example.invalid> 1793450982 +0800\ncommitter Fixture <fixture@example.invalid> 1793450982 +0800\n\nbaseline\n\nCo-authored-by: Prior <prior@example.invalid>\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "read-tree",
+            "HEAD"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "hash-object",
+            "-w",
+            "--stdin"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "76ef99f3f0fad6d338d6dbfb114414a80695299b\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "update-index",
+            "--add",
+            "--cacheinfo",
+            "100644",
+            "76ef99f3f0fad6d338d6dbfb114414a80695299b",
+            "ledger.js"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "diff",
+            "--cached",
+            "--name-only"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "ledger.js\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "show",
+            ":ledger.js"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "exports.acceptAmount = amount => amount > 0;\nexports.label = 'Ledger';\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "044930ac00ee46031e8438043c2c7da441f5ca2a\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "branch",
+            "--show-current"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "feature/owned\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "commit",
+            "-F",
+            "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ceopt-commit-recovery-e_g783lp/message.txt"
+          ],
+          "alternate_index": true,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "044930ac00ee46031e8438043c2c7da441f5ca2a\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "cat-file",
+            "commit",
+            "044930ac00ee46031e8438043c2c7da441f5ca2a"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "tree 05655ecc200e1c98eaaf02870acbe0d5b2910cd7\nauthor Fixture <fixture@example.invalid> 1793450982 +0800\ncommitter Fixture <fixture@example.invalid> 1793450982 +0800\n\nbaseline\n\nCo-authored-by: Prior <prior@example.invalid>\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "show",
+            ":unrelated.txt"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "User-owned staged work.\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--others",
+            "--exclude-standard"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "untracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "044930ac00ee46031e8438043c2c7da441f5ca2a\n",
+          "stderr": ""
+        }
+      ],
+      "scratch_removed_after_context_exit": true
+    },
+    {
+      "case": "branch-drift",
+      "caller_target": "feature/owned",
+      "default_branch_probe_exit": 128,
+      "preflight": {
+        "head": "33e59c877aa8cedebe31b140b06f344e4fc1f5bb",
+        "branch": "feature/other",
+        "index": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+        "hook_sha256": "406a98198813ff880d3d148e67333743e7efdd33d7da926f93641ddc9e53255b"
+      },
+      "preflight_admitted": false,
+      "commit_exit": null,
+      "commit_sha": null,
+      "outcome": "stopped-before-commit-on-drift",
+      "recovery": "not-applicable",
+      "protected_worktree_hashes": {
+        "ledger.js": "ad1434ad093019df4d156ed31d42de297417e8395224eaf4d5364bda649b6691",
+        "unrelated.txt": "a199f273ee3f3f5d6b830814a31e2e8fced347e4ac79b3e66344af0f764c49d6",
+        "untracked.txt": "e51e85400915f4aaf466262379639d87bbdc7e94af219658437d804f004f40d9"
+      },
+      "protected_bytes_preserved": true,
+      "prior_commit_preserved": true,
+      "unrelated_staged_preserved": true,
+      "hook_ran": false,
+      "calls": [
+        {
+          "argv": [
+            "init",
+            "-q",
+            "-b",
+            "feature/owned"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "user.name",
+            "Fixture"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "commit.gpgsign",
+            "false"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "add",
+            "--",
+            "ledger.js"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "commit",
+            "-m",
+            "baseline",
+            "-m",
+            "Co-authored-by: Prior <prior@example.invalid>"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "[feature/owned (root-commit) 33e59c8] baseline\n 1 file changed, 2 insertions(+)\n create mode 100644 ledger.js\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "add",
+            "--",
+            "unrelated.txt"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "--show-origin",
+            "--get",
+            "core.hooksPath"
+          ],
+          "alternate_index": false,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "--git-path",
+            "hooks"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": ".git/hooks\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "--abbrev-ref",
+            "origin/HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 128,
+          "stdout": "origin/HEAD\n",
+          "stderr": "fatal: ambiguous argument 'origin/HEAD': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\n"
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "33e59c877aa8cedebe31b140b06f344e4fc1f5bb\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "branch",
+            "--show-current"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "feature/owned\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "cat-file",
+            "commit",
+            "33e59c877aa8cedebe31b140b06f344e4fc1f5bb"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "tree 05655ecc200e1c98eaaf02870acbe0d5b2910cd7\nauthor Fixture <fixture@example.invalid> 1793450983 +0800\ncommitter Fixture <fixture@example.invalid> 1793450983 +0800\n\nbaseline\n\nCo-authored-by: Prior <prior@example.invalid>\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "read-tree",
+            "HEAD"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "hash-object",
+            "-w",
+            "--stdin"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "76ef99f3f0fad6d338d6dbfb114414a80695299b\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "update-index",
+            "--add",
+            "--cacheinfo",
+            "100644",
+            "76ef99f3f0fad6d338d6dbfb114414a80695299b",
+            "ledger.js"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "diff",
+            "--cached",
+            "--name-only"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "ledger.js\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "show",
+            ":ledger.js"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "exports.acceptAmount = amount => amount > 0;\nexports.label = 'Ledger';\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "checkout",
+            "-q",
+            "-b",
+            "feature/other"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "33e59c877aa8cedebe31b140b06f344e4fc1f5bb\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "branch",
+            "--show-current"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "feature/other\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "cat-file",
+            "commit",
+            "33e59c877aa8cedebe31b140b06f344e4fc1f5bb"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "tree 05655ecc200e1c98eaaf02870acbe0d5b2910cd7\nauthor Fixture <fixture@example.invalid> 1793450983 +0800\ncommitter Fixture <fixture@example.invalid> 1793450983 +0800\n\nbaseline\n\nCo-authored-by: Prior <prior@example.invalid>\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "show",
+            ":unrelated.txt"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "User-owned staged work.\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--others",
+            "--exclude-standard"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "untracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "33e59c877aa8cedebe31b140b06f344e4fc1f5bb\n",
+          "stderr": ""
+        }
+      ],
+      "scratch_removed_after_context_exit": true
+    },
+    {
+      "case": "index-drift",
+      "caller_target": "feature/owned",
+      "default_branch_probe_exit": 128,
+      "preflight": {
+        "head": "33e59c877aa8cedebe31b140b06f344e4fc1f5bb",
+        "branch": "feature/owned",
+        "index": "100644 499967486d6208f8628d0a68e9e464cc1ade9d00 0\tconcurrent.txt\n100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+        "hook_sha256": "406a98198813ff880d3d148e67333743e7efdd33d7da926f93641ddc9e53255b"
+      },
+      "preflight_admitted": false,
+      "commit_exit": null,
+      "commit_sha": null,
+      "outcome": "stopped-before-commit-on-drift",
+      "recovery": "not-applicable",
+      "protected_worktree_hashes": {
+        "ledger.js": "ad1434ad093019df4d156ed31d42de297417e8395224eaf4d5364bda649b6691",
+        "unrelated.txt": "a199f273ee3f3f5d6b830814a31e2e8fced347e4ac79b3e66344af0f764c49d6",
+        "untracked.txt": "e51e85400915f4aaf466262379639d87bbdc7e94af219658437d804f004f40d9"
+      },
+      "protected_bytes_preserved": true,
+      "prior_commit_preserved": true,
+      "unrelated_staged_preserved": true,
+      "hook_ran": false,
+      "calls": [
+        {
+          "argv": [
+            "init",
+            "-q",
+            "-b",
+            "feature/owned"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "user.name",
+            "Fixture"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "commit.gpgsign",
+            "false"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "add",
+            "--",
+            "ledger.js"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "commit",
+            "-m",
+            "baseline",
+            "-m",
+            "Co-authored-by: Prior <prior@example.invalid>"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "[feature/owned (root-commit) 33e59c8] baseline\n 1 file changed, 2 insertions(+)\n create mode 100644 ledger.js\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "add",
+            "--",
+            "unrelated.txt"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "--show-origin",
+            "--get",
+            "core.hooksPath"
+          ],
+          "alternate_index": false,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "--git-path",
+            "hooks"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": ".git/hooks\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "--abbrev-ref",
+            "origin/HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 128,
+          "stdout": "origin/HEAD\n",
+          "stderr": "fatal: ambiguous argument 'origin/HEAD': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\n"
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "33e59c877aa8cedebe31b140b06f344e4fc1f5bb\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "branch",
+            "--show-current"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "feature/owned\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "cat-file",
+            "commit",
+            "33e59c877aa8cedebe31b140b06f344e4fc1f5bb"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "tree 05655ecc200e1c98eaaf02870acbe0d5b2910cd7\nauthor Fixture <fixture@example.invalid> 1793450983 +0800\ncommitter Fixture <fixture@example.invalid> 1793450983 +0800\n\nbaseline\n\nCo-authored-by: Prior <prior@example.invalid>\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "read-tree",
+            "HEAD"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "hash-object",
+            "-w",
+            "--stdin"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "76ef99f3f0fad6d338d6dbfb114414a80695299b\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "update-index",
+            "--add",
+            "--cacheinfo",
+            "100644",
+            "76ef99f3f0fad6d338d6dbfb114414a80695299b",
+            "ledger.js"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "diff",
+            "--cached",
+            "--name-only"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "ledger.js\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "show",
+            ":ledger.js"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "exports.acceptAmount = amount => amount > 0;\nexports.label = 'Ledger';\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "add",
+            "--",
+            "concurrent.txt"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "33e59c877aa8cedebe31b140b06f344e4fc1f5bb\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "branch",
+            "--show-current"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "feature/owned\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 499967486d6208f8628d0a68e9e464cc1ade9d00 0\tconcurrent.txt\n100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 499967486d6208f8628d0a68e9e464cc1ade9d00 0\tconcurrent.txt\n100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "cat-file",
+            "commit",
+            "33e59c877aa8cedebe31b140b06f344e4fc1f5bb"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "tree 05655ecc200e1c98eaaf02870acbe0d5b2910cd7\nauthor Fixture <fixture@example.invalid> 1793450983 +0800\ncommitter Fixture <fixture@example.invalid> 1793450983 +0800\n\nbaseline\n\nCo-authored-by: Prior <prior@example.invalid>\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "show",
+            ":unrelated.txt"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "User-owned staged work.\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--others",
+            "--exclude-standard"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "untracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "33e59c877aa8cedebe31b140b06f344e4fc1f5bb\n",
+          "stderr": ""
+        }
+      ],
+      "scratch_removed_after_context_exit": true
+    },
+    {
+      "case": "hook-drift",
+      "caller_target": "feature/owned",
+      "default_branch_probe_exit": 128,
+      "preflight": {
+        "head": "33e59c877aa8cedebe31b140b06f344e4fc1f5bb",
+        "branch": "feature/owned",
+        "index": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+        "hook_sha256": "94862798bf9da87e10a2abb45cd2647fd9c59dfcd15e106c5aee5e00de234976"
+      },
+      "preflight_admitted": false,
+      "commit_exit": null,
+      "commit_sha": null,
+      "outcome": "stopped-before-commit-on-drift",
+      "recovery": "not-applicable",
+      "protected_worktree_hashes": {
+        "ledger.js": "ad1434ad093019df4d156ed31d42de297417e8395224eaf4d5364bda649b6691",
+        "unrelated.txt": "a199f273ee3f3f5d6b830814a31e2e8fced347e4ac79b3e66344af0f764c49d6",
+        "untracked.txt": "e51e85400915f4aaf466262379639d87bbdc7e94af219658437d804f004f40d9"
+      },
+      "protected_bytes_preserved": true,
+      "prior_commit_preserved": true,
+      "unrelated_staged_preserved": true,
+      "hook_ran": false,
+      "calls": [
+        {
+          "argv": [
+            "init",
+            "-q",
+            "-b",
+            "feature/owned"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "user.name",
+            "Fixture"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "commit.gpgsign",
+            "false"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "add",
+            "--",
+            "ledger.js"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "commit",
+            "-m",
+            "baseline",
+            "-m",
+            "Co-authored-by: Prior <prior@example.invalid>"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "[feature/owned (root-commit) 33e59c8] baseline\n 1 file changed, 2 insertions(+)\n create mode 100644 ledger.js\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "add",
+            "--",
+            "unrelated.txt"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "--show-origin",
+            "--get",
+            "core.hooksPath"
+          ],
+          "alternate_index": false,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "--git-path",
+            "hooks"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": ".git/hooks\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "--abbrev-ref",
+            "origin/HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 128,
+          "stdout": "origin/HEAD\n",
+          "stderr": "fatal: ambiguous argument 'origin/HEAD': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\n"
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "33e59c877aa8cedebe31b140b06f344e4fc1f5bb\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "branch",
+            "--show-current"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "feature/owned\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "cat-file",
+            "commit",
+            "33e59c877aa8cedebe31b140b06f344e4fc1f5bb"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "tree 05655ecc200e1c98eaaf02870acbe0d5b2910cd7\nauthor Fixture <fixture@example.invalid> 1793450983 +0800\ncommitter Fixture <fixture@example.invalid> 1793450983 +0800\n\nbaseline\n\nCo-authored-by: Prior <prior@example.invalid>\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "read-tree",
+            "HEAD"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "hash-object",
+            "-w",
+            "--stdin"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "76ef99f3f0fad6d338d6dbfb114414a80695299b\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "update-index",
+            "--add",
+            "--cacheinfo",
+            "100644",
+            "76ef99f3f0fad6d338d6dbfb114414a80695299b",
+            "ledger.js"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "diff",
+            "--cached",
+            "--name-only"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "ledger.js\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "show",
+            ":ledger.js"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "exports.acceptAmount = amount => amount > 0;\nexports.label = 'Ledger';\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "33e59c877aa8cedebe31b140b06f344e4fc1f5bb\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "branch",
+            "--show-current"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "feature/owned\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "cat-file",
+            "commit",
+            "33e59c877aa8cedebe31b140b06f344e4fc1f5bb"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "tree 05655ecc200e1c98eaaf02870acbe0d5b2910cd7\nauthor Fixture <fixture@example.invalid> 1793450983 +0800\ncommitter Fixture <fixture@example.invalid> 1793450983 +0800\n\nbaseline\n\nCo-authored-by: Prior <prior@example.invalid>\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "show",
+            ":unrelated.txt"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "User-owned staged work.\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--others",
+            "--exclude-standard"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "untracked.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "33e59c877aa8cedebe31b140b06f344e4fc1f5bb\n",
+          "stderr": ""
+        }
+      ],
+      "scratch_removed_after_context_exit": true
+    },
+    {
+      "case": "lost-commit-result",
+      "caller_target": "feature/owned",
+      "default_branch_probe_exit": 128,
+      "preflight": {
+        "head": "33e59c877aa8cedebe31b140b06f344e4fc1f5bb",
+        "branch": "feature/owned",
+        "index": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+        "hook_sha256": "406a98198813ff880d3d148e67333743e7efdd33d7da926f93641ddc9e53255b"
+      },
+      "preflight_admitted": true,
+      "commit_exit": 0,
+      "commit_sha": "9d55b8ea38992631f04b2cadea7f65ff6ec5e9c1",
+      "outcome": "owned-commit-reconciled",
+      "recovery": "readback-before-reconciliation-no-duplicate",
+      "protected_worktree_hashes": {
+        "ledger.js": "ad1434ad093019df4d156ed31d42de297417e8395224eaf4d5364bda649b6691",
+        "unrelated.txt": "a199f273ee3f3f5d6b830814a31e2e8fced347e4ac79b3e66344af0f764c49d6",
+        "untracked.txt": "e51e85400915f4aaf466262379639d87bbdc7e94af219658437d804f004f40d9"
+      },
+      "protected_bytes_preserved": true,
+      "prior_commit_preserved": true,
+      "unrelated_staged_preserved": true,
+      "hook_ran": true,
+      "calls": [
+        {
+          "argv": [
+            "init",
+            "-q",
+            "-b",
+            "feature/owned"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "user.name",
+            "Fixture"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "commit.gpgsign",
+            "false"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "add",
+            "--",
+            "ledger.js"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "commit",
+            "-m",
+            "baseline",
+            "-m",
+            "Co-authored-by: Prior <prior@example.invalid>"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "[feature/owned (root-commit) 33e59c8] baseline\n 1 file changed, 2 insertions(+)\n create mode 100644 ledger.js\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "add",
+            "--",
+            "unrelated.txt"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "--show-origin",
+            "--get",
+            "core.hooksPath"
+          ],
+          "alternate_index": false,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "--git-path",
+            "hooks"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": ".git/hooks\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "--abbrev-ref",
+            "origin/HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 128,
+          "stdout": "origin/HEAD\n",
+          "stderr": "fatal: ambiguous argument 'origin/HEAD': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\n"
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "33e59c877aa8cedebe31b140b06f344e4fc1f5bb\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "branch",
+            "--show-current"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "feature/owned\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "cat-file",
+            "commit",
+            "33e59c877aa8cedebe31b140b06f344e4fc1f5bb"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "tree 05655ecc200e1c98eaaf02870acbe0d5b2910cd7\nauthor Fixture <fixture@example.invalid> 1793450983 +0800\ncommitter Fixture <fixture@example.invalid> 1793450983 +0800\n\nbaseline\n\nCo-authored-by: Prior <prior@example.invalid>\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "read-tree",
+            "HEAD"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "hash-object",
+            "-w",
+            "--stdin"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "76ef99f3f0fad6d338d6dbfb114414a80695299b\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "update-index",
+            "--add",
+            "--cacheinfo",
+            "100644",
+            "76ef99f3f0fad6d338d6dbfb114414a80695299b",
+            "ledger.js"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "diff",
+            "--cached",
+            "--name-only"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "ledger.js\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "show",
+            ":ledger.js"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "exports.acceptAmount = amount => amount > 0;\nexports.label = 'Ledger';\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "33e59c877aa8cedebe31b140b06f344e4fc1f5bb\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "branch",
+            "--show-current"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "feature/owned\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "commit",
+            "-F",
+            "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ceopt-commit-recovery-nmbeaf_6/message.txt"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "[feature/owned 9d55b8e] fix(fixture): reject zero amount\n 1 file changed, 1 insertion(+), 1 deletion(-)\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "9d55b8ea38992631f04b2cadea7f65ff6ec5e9c1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD^"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "33e59c877aa8cedebe31b140b06f344e4fc1f5bb\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "show",
+            "HEAD:ledger.js"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "exports.acceptAmount = amount => amount > 0;\nexports.label = 'Ledger';\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "diff-tree",
+            "--no-commit-id",
+            "--name-only",
+            "-r",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "ledger.js\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "log",
+            "-1",
+            "--format=%B"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "fix(fixture): reject zero amount\n\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "9d55b8ea38992631f04b2cadea7f65ff6ec5e9c1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "update-index",
+            "--cacheinfo",
+            "100644",
+            "76ef99f3f0fad6d338d6dbfb114414a80695299b",
+            "ledger.js"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "diff",
+            "--cached",
+            "--name-only"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "unrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "show",
+            ":ledger.js"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "exports.acceptAmount = amount => amount > 0;\nexports.label = 'Ledger';\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-list",
+            "--count",
+            "33e59c877aa8cedebe31b140b06f344e4fc1f5bb..HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "1\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 76ef99f3f0fad6d338d6dbfb114414a80695299b 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "cat-file",
+            "commit",
+            "33e59c877aa8cedebe31b140b06f344e4fc1f5bb"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "tree 05655ecc200e1c98eaaf02870acbe0d5b2910cd7\nauthor Fixture <fixture@example.invalid> 1793450983 +0800\ncommitter Fixture <fixture@example.invalid> 1793450983 +0800\n\nbaseline\n\nCo-authored-by: Prior <prior@example.invalid>\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "show",
+            ":unrelated.txt"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "User-owned staged work.\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--others",
+            "--exclude-standard"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "untracked.txt\n",
+          "stderr": ""
+        }
+      ],
+      "injection": "Parent intentionally discards successful commit result before recovery; no actual process kill or network ambiguity.",
+      "scratch_removed_after_context_exit": true
+    },
+    {
+      "case": "index-drift-after-commit",
+      "caller_target": "feature/owned",
+      "default_branch_probe_exit": 128,
+      "preflight": {
+        "head": "dc29967f62a031294741b2d59abe23a499928dac",
+        "branch": "feature/owned",
+        "index": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+        "hook_sha256": "406a98198813ff880d3d148e67333743e7efdd33d7da926f93641ddc9e53255b"
+      },
+      "preflight_admitted": true,
+      "commit_exit": 0,
+      "commit_sha": "7c27644d407e96737d654add1c61eac03553615c",
+      "outcome": "commit-created-reconciliation-blocked",
+      "recovery": "preserved-new-index-no-retry",
+      "protected_worktree_hashes": {
+        "ledger.js": "ad1434ad093019df4d156ed31d42de297417e8395224eaf4d5364bda649b6691",
+        "unrelated.txt": "a199f273ee3f3f5d6b830814a31e2e8fced347e4ac79b3e66344af0f764c49d6",
+        "untracked.txt": "e51e85400915f4aaf466262379639d87bbdc7e94af219658437d804f004f40d9"
+      },
+      "protected_bytes_preserved": true,
+      "prior_commit_preserved": true,
+      "unrelated_staged_preserved": true,
+      "hook_ran": true,
+      "calls": [
+        {
+          "argv": [
+            "init",
+            "-q",
+            "-b",
+            "feature/owned"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "user.name",
+            "Fixture"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "user.email",
+            "fixture@example.invalid"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "commit.gpgsign",
+            "false"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "add",
+            "--",
+            "ledger.js"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "commit",
+            "-m",
+            "baseline",
+            "-m",
+            "Co-authored-by: Prior <prior@example.invalid>"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "[feature/owned (root-commit) dc29967] baseline\n 1 file changed, 2 insertions(+)\n create mode 100644 ledger.js\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "add",
+            "--",
+            "unrelated.txt"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "config",
+            "--show-origin",
+            "--get",
+            "core.hooksPath"
+          ],
+          "alternate_index": false,
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "--git-path",
+            "hooks"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": ".git/hooks\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "--abbrev-ref",
+            "origin/HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 128,
+          "stdout": "origin/HEAD\n",
+          "stderr": "fatal: ambiguous argument 'origin/HEAD': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\n"
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "dc29967f62a031294741b2d59abe23a499928dac\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "branch",
+            "--show-current"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "feature/owned\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "cat-file",
+            "commit",
+            "dc29967f62a031294741b2d59abe23a499928dac"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "tree 05655ecc200e1c98eaaf02870acbe0d5b2910cd7\nauthor Fixture <fixture@example.invalid> 1793450984 +0800\ncommitter Fixture <fixture@example.invalid> 1793450984 +0800\n\nbaseline\n\nCo-authored-by: Prior <prior@example.invalid>\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "read-tree",
+            "HEAD"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "hash-object",
+            "-w",
+            "--stdin"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "76ef99f3f0fad6d338d6dbfb114414a80695299b\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "update-index",
+            "--add",
+            "--cacheinfo",
+            "100644",
+            "76ef99f3f0fad6d338d6dbfb114414a80695299b",
+            "ledger.js"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "diff",
+            "--cached",
+            "--name-only"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "ledger.js\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "show",
+            ":ledger.js"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "exports.acceptAmount = amount => amount > 0;\nexports.label = 'Ledger';\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "dc29967f62a031294741b2d59abe23a499928dac\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "branch",
+            "--show-current"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "feature/owned\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "commit",
+            "-F",
+            "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ceopt-commit-recovery-kps3wxay/message.txt"
+          ],
+          "alternate_index": true,
+          "exit_code": 0,
+          "stdout": "[feature/owned 7c27644] fix(fixture): reject zero amount\n 1 file changed, 1 insertion(+), 1 deletion(-)\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "7c27644d407e96737d654add1c61eac03553615c\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD^"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "dc29967f62a031294741b2d59abe23a499928dac\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "show",
+            "HEAD:ledger.js"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "exports.acceptAmount = amount => amount > 0;\nexports.label = 'Ledger';\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "diff-tree",
+            "--no-commit-id",
+            "--name-only",
+            "-r",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "ledger.js\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "log",
+            "-1",
+            "--format=%B"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "fix(fixture): reject zero amount\n\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "add",
+            "--",
+            "concurrent.txt"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 82aa4dd19ab59ac468c81af7a163a8e71254279c 0\tconcurrent.txt\n100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "rev-parse",
+            "HEAD"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "7c27644d407e96737d654add1c61eac03553615c\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 82aa4dd19ab59ac468c81af7a163a8e71254279c 0\tconcurrent.txt\n100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--stage"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "100644 82aa4dd19ab59ac468c81af7a163a8e71254279c 0\tconcurrent.txt\n100644 2af71ac8ff499f35e305f523d69fad6fbffae4bb 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "cat-file",
+            "commit",
+            "dc29967f62a031294741b2d59abe23a499928dac"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "tree 05655ecc200e1c98eaaf02870acbe0d5b2910cd7\nauthor Fixture <fixture@example.invalid> 1793450984 +0800\ncommitter Fixture <fixture@example.invalid> 1793450984 +0800\n\nbaseline\n\nCo-authored-by: Prior <prior@example.invalid>\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "show",
+            ":unrelated.txt"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "User-owned staged work.\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "ls-files",
+            "--others",
+            "--exclude-standard"
+          ],
+          "alternate_index": false,
+          "exit_code": 0,
+          "stdout": "untracked.txt\n",
+          "stderr": ""
+        }
+      ],
+      "scratch_removed_after_context_exit": true
+    }
+  ],
+  "limitations": [
+    "No real repository commit or external write.",
+    "Preflight comparisons do not provide atomic exclusion against a later concurrent writer.",
+    "Hook readiness covers these inspected fixture hooks, not arbitrary hook behavior.",
+    "Alternate-index metadata/filesystem guarantees outside observed bytes and index entries are untested."
+  ]
+}

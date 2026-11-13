@@ -1,0 +1,11 @@
+{
+  "trial": "CEOPT-28-A1",
+  "at": "2026-10-31T06:04:33.944025+00:00",
+  "disposition": "contaminated-original-not-clean-trial",
+  "original_artifact_sha256": "575a7337207ccb5a8ae0f6d03266a6de9f805e7a6a8bc62b85a511d94e3c2675",
+  "tool_trace_sha256": "a04291e1d50e0619bfafd5a4a2224488a9cd38c4f75e6d96f46bab5b7cab1ed2",
+  "reason": "Initial cat displayed excluded spec-riffrec-feedback-analysis entrypoint in same-arm media JSON before later jq selection. Frozen companion permits only spec-sweep.",
+  "preservation": "Exact original response and tooltrace retained; selfdisclosure does not undo context contamination. No retry yet.",
+  "successor_or_recovery": "None; later original slots get operational pre-output filter guidance under unchanged rule.",
+  "claim_limit": "May review factual content diagnostically, cannot count as clean isolated A result or infer comparative benefit."
+}

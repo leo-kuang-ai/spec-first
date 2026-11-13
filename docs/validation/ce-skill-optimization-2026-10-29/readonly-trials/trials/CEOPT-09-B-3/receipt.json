@@ -1,0 +1,26 @@
+{
+  "id": "CEOPT-09-B-3",
+  "scenario_id": "CEOPT-09",
+  "arm": "B",
+  "trial": 3,
+  "native_task": "/root/trial09_b3",
+  "session_id": "01a18a9f-2c29-7d20-9d1a-430611dd7f9f",
+  "started_at": "2026-10-30T02:24:09.890Z",
+  "final_at": "2026-10-30T02:25:23.154Z",
+  "model_metadata": [
+    {
+      "model": "gpt-6-astra",
+      "effort": "high",
+      "sandbox_policy": {
+        "type": "danger-full-access"
+      }
+    }
+  ],
+  "response_sha256": "f80945b24098470a1cf8c3b5a3dfc276642417f7cd155cbba621f21de4561983",
+  "tool_trace_sha256": "139e8572ac592ef495510867f87463c8cd6a5d98d432c29cf7f53f788f095693",
+  "source_transcript_sha256": "d3fbe905d4d67470aca8583dc41975ac9a749dbdf03aa902311efb3054d2b15f",
+  "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-B-3/response.md",
+  "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-B-3/tool-events.json",
+  "status": "executed-awaiting-semantic-review",
+  "tool_calls": 5
+}

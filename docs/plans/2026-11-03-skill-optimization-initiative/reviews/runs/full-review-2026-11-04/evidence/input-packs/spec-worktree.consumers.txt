@@ -1,0 +1,5 @@
+# consumers: spec-worktree
+tests/unit/ce-post-3-20-calibration-contracts.test.js
+tests/unit/skill-flow-p2-closure-contracts.test.js
+tests/unit/spec-work-lfg-recovery-contracts.test.js
+tests/unit/spec-worktree-contracts.test.js

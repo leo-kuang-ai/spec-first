@@ -1,0 +1,43 @@
+PASS tests/unit/task-pack-command.test.js
+  spec-first tasks command
+    ✓ 同波次共享文件不能通过备注豁免，拆到不同波次后可执行 (139 ms)
+    ✓ hash --json returns the canonical plan hash (69 ms)
+    ✓ full contract preserves proof refs, settled structure and external done intent for Work (140 ms)
+    ✓ rejects existing task paths that traverse a symlink (68 ms)
+    ✓ rejects future task paths that traverse a symlink (67 ms)
+    ✓ rejects dangling task paths that traverse a symlink (79 ms)
+    ✓ rejects leaf task paths that traverse a symlink (68 ms)
+    ✓ rejects Git metadata or generated runtime: .git/config (69 ms)
+    ✓ rejects Git metadata or generated runtime: .GIT/config (72 ms)
+    ✓ rejects Git metadata or generated runtime: .opencode/skills/example/SKILL.md (76 ms)
+    ✓ rejects Git metadata or generated runtime: .OpenCode/skills/example/SKILL.md (71 ms)
+    ✓ rejects Git metadata or generated runtime: .opencode/commands/spec-work.md (76 ms)
+    ✓ rejects Git metadata or generated runtime: opencode.jsonc (71 ms)
+    ✓ rejects Git metadata or generated runtime: .zcode/spec-first/state.json (67 ms)
+    ✓ rejects Git metadata or generated runtime: .zcode/hooks/session-start (68 ms)
+    ✓ rejects Git metadata or generated runtime: .pi/spec-first/state.json (68 ms)
+    ✓ checks task paths in the selected child repo rather than the artifact root (176 ms)
+    ✓ uses the pack target_repo when no task override is present (93 ms)
+    ✓ uses the source target_repo when no task override is present (92 ms)
+    ✓ hash resolves relative paths from --repo and returns portable identity fields (69 ms)
+    ✓ keeps source-plan-body-v1 hashing compatible after extracting frontmatter parsing (1 ms)
+    ✓ validates a current task pack and rejects stale hashes (130 ms)
+    ✓ rejects superseded source plans for new hashes and existing task-pack execution (128 ms)
+    ✓ returns a machine-readable reason when the task pack cannot be read (64 ms)
+    ✓ accepts missing spec_id as an explicit trace limitation (68 ms)
+    ✓ accepts spec_id on task pack only as a trace limitation (68 ms)
+    ✓ accepts spec_id on source plan only as a trace limitation (68 ms)
+    ✓ rejects mismatched spec_id even when the source-plan hash matches (68 ms)
+    ✓ resolves task-pack operands from --repo instead of the caller cwd (68 ms)
+    ✓ rejects command operands outside the artifact root (128 ms)
+    ✓ rejects source-plan symlink escape from the artifact root (66 ms)
+    ✓ rejects task-pack symlink escape from the artifact root (64 ms)
+    ✓ rejects duplicate source_plan ownership metadata (65 ms)
+    ✓ rejects generated runtime task targets (65 ms)
+    ✓ returns usage errors for missing paths and unknown options (389 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       35 passed, 35 total
+Snapshots:   0 total
+Time:        3.324 s
+Ran all test suites within paths "tests/unit/task-pack-command.test.js".

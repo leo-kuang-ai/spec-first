@@ -1,0 +1,832 @@
+{
+  "id": "CEOPT-06-07-parent-publication-supplement",
+  "at": "2026-10-31T07:11:23.382457+00:00",
+  "protocol_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-protocol.json",
+  "protocol_sha256": "17982a31323f12d00caeadbde086da53f1abdbc21eea9e501488c8a57c33ba0a",
+  "records": [
+    {
+      "case": "A1",
+      "original_candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-A1/candidate-extracted.md",
+      "original_candidate_sha256": "ae82fd860edd3d7eb8d2883102790f051371732d6ff477c15464507b9cecdd81",
+      "derived_candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A1/candidate-reference-normalized.md",
+      "derived_candidate_sha256": "a8b07ade694c67814390a4bce9be3419276a2a2b2ecd3b76883e5266aa471393",
+      "reference_replacements": [
+        {
+          "original": "test/entries.test.js:5\u201310",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/test/entries.test.js:5-10"
+        },
+        {
+          "original": "src/server.js:6\u201310",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/src/server.js:6-10"
+        },
+        {
+          "original": "src/server.js:19\u201322",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/src/server.js:19-22"
+        },
+        {
+          "original": "compound-proof.json",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/compound-proof.json"
+        },
+        {
+          "original": "existing-learning.md",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/existing-learning.md"
+        }
+      ],
+      "invalid_candidate_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound/scripts/validate-frontmatter.py",
+          "--promotion",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/invalid-candidate.md"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "FAIL: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/invalid-candidate.md\n  promotion requires non-empty top-level 'source_refs' array\n  promotion requires non-empty top-level 'invalidation_condition'\n",
+        "script_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb"
+      },
+      "invalid_candidate_targets_unchanged": true,
+      "candidate_promotion_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound/scripts/validate-frontmatter.py",
+          "--promotion",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A1/candidate-reference-normalized.md"
+        ],
+        "exit_code": 0,
+        "stdout": "OK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A1/candidate-reference-normalized.md\n",
+        "stderr": "",
+        "script_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb"
+      },
+      "candidate_claims_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound/scripts/validate-doc-claims.py",
+          "--repo-root",
+          "/Users/kuang/xiaobu/spec-first",
+          "--target-path",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A1/corpus/docs/solutions/numeric-input.md",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A1/candidate-reference-normalized.md"
+        ],
+        "exit_code": 0,
+        "stdout": "INFO: no upstream default branch found \u2014 path/SHA classification limited to HEAD\nchecked 4 paths, 0 SHAs, 0 links; 0 flags\nOK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A1/candidate-reference-normalized.md\n",
+        "stderr": "",
+        "script_sha256": "2b00789e7f82e20f65bdd692ff6a803724e246f691acd01ff83b75f0da045801"
+      },
+      "semantic_approval": "parent-inline for evaluation corpus only; uses previously independently reviewed content and explicit citation normalization",
+      "target_drift_control": {
+        "detected": true,
+        "writes_after_detection": 0,
+        "concurrent_edit_preserved": true,
+        "vocabulary_unchanged": true
+      },
+      "before": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A1/corpus/CONCEPTS.md": "fa7c5eb57dcbe4a606d79743219be82180f7e2774e8b87b28432e8ef93aa5caf",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A1/corpus/docs/solutions/numeric-input.md": "3b0209d19a2050f01e9801d2ff91206dcd61d256418aa31a3861d4d07a5bfe75",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A1/corpus/import-v1.md": "a59647c056ce1dd4a0dddac45716da34968d573287348f32031423ab73947143"
+      },
+      "actual_rename_failure": {
+        "type": "FileNotFoundError",
+        "errno": 2,
+        "injection": "Parent removed only prepared learning temp after glossary rename; source candidate and durable old learning retained."
+      },
+      "partial": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A1/corpus/CONCEPTS.md": "88608dcdfefbfc127d6ea5e92e8f37b6fb77c81bac1b68fd6a8bb9339ae8f613",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A1/corpus/docs/solutions/numeric-input.md": "3b0209d19a2050f01e9801d2ff91206dcd61d256418aa31a3861d4d07a5bfe75",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A1/corpus/import-v1.md": "a59647c056ce1dd4a0dddac45716da34968d573287348f32031423ab73947143"
+      },
+      "partial_report_status": "incomplete; glossary published, old learning retained; learning publication pending",
+      "recovery": "restaged preserved candidate after exact partial-state recheck; learning rename and final native validations passed",
+      "after": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A1/corpus/CONCEPTS.md": "88608dcdfefbfc127d6ea5e92e8f37b6fb77c81bac1b68fd6a8bb9339ae8f613",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A1/corpus/docs/solutions/numeric-input.md": "a8b07ade694c67814390a4bce9be3419276a2a2b2ecd3b76883e5266aa471393",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A1/corpus/import-v1.md": "a59647c056ce1dd4a0dddac45716da34968d573287348f32031423ab73947143"
+      },
+      "alias_consumer_bytes_preserved": true,
+      "unique_recovery_guidance_retained": true,
+      "temporary_files_remaining": 0,
+      "final_promotion_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound/scripts/validate-frontmatter.py",
+          "--promotion",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A1/corpus/docs/solutions/numeric-input.md"
+        ],
+        "exit_code": 0,
+        "stdout": "OK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A1/corpus/docs/solutions/numeric-input.md\n",
+        "stderr": "",
+        "script_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb"
+      },
+      "final_claims_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound/scripts/validate-doc-claims.py",
+          "--repo-root",
+          "/Users/kuang/xiaobu/spec-first",
+          "--target-path",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A1/corpus/docs/solutions/numeric-input.md",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A1/corpus/docs/solutions/numeric-input.md"
+        ],
+        "exit_code": 0,
+        "stdout": "INFO: no upstream default branch found \u2014 path/SHA classification limited to HEAD\nchecked 4 paths, 0 SHAs, 0 links; 0 flags\nOK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A1/corpus/docs/solutions/numeric-input.md\n",
+        "stderr": "",
+        "script_sha256": "2b00789e7f82e20f65bdd692ff6a803724e246f691acd01ff83b75f0da045801"
+      }
+    },
+    {
+      "case": "A2",
+      "original_candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-A2/candidate-extracted.md",
+      "original_candidate_sha256": "ce006d0cd7c59bfb7a3473981bf0c0d38604846d129a980b7ed9e487fb805e9f",
+      "derived_candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A2/candidate-reference-normalized.md",
+      "derived_candidate_sha256": "129a9c9f3b6b583b2f3a8ced934daaedaa695088fb0e00fc90a4ec85dfdb8b7e",
+      "reference_replacements": [
+        {
+          "original": "src/server.js:6",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/src/server.js:6"
+        },
+        {
+          "original": "compound-proof.json",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/compound-proof.json"
+        },
+        {
+          "original": "test/entries.test.js:5\u201310",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/test/entries.test.js:5-10"
+        }
+      ],
+      "invalid_candidate_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound/scripts/validate-frontmatter.py",
+          "--promotion",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/invalid-candidate.md"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "FAIL: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/invalid-candidate.md\n  promotion requires non-empty top-level 'source_refs' array\n  promotion requires non-empty top-level 'invalidation_condition'\n",
+        "script_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb"
+      },
+      "invalid_candidate_targets_unchanged": true,
+      "candidate_promotion_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound/scripts/validate-frontmatter.py",
+          "--promotion",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A2/candidate-reference-normalized.md"
+        ],
+        "exit_code": 0,
+        "stdout": "OK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A2/candidate-reference-normalized.md\n",
+        "stderr": "",
+        "script_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb"
+      },
+      "candidate_claims_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound/scripts/validate-doc-claims.py",
+          "--repo-root",
+          "/Users/kuang/xiaobu/spec-first",
+          "--target-path",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A2/corpus/docs/solutions/numeric-input.md",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A2/candidate-reference-normalized.md"
+        ],
+        "exit_code": 0,
+        "stdout": "INFO: no upstream default branch found \u2014 path/SHA classification limited to HEAD\nchecked 3 paths, 0 SHAs, 0 links; 0 flags\nOK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A2/candidate-reference-normalized.md\n",
+        "stderr": "",
+        "script_sha256": "2b00789e7f82e20f65bdd692ff6a803724e246f691acd01ff83b75f0da045801"
+      },
+      "semantic_approval": "parent-inline for evaluation corpus only; uses previously independently reviewed content and explicit citation normalization",
+      "target_drift_control": {
+        "detected": true,
+        "writes_after_detection": 0,
+        "concurrent_edit_preserved": true,
+        "vocabulary_unchanged": true
+      },
+      "before": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A2/corpus/CONCEPTS.md": "fa7c5eb57dcbe4a606d79743219be82180f7e2774e8b87b28432e8ef93aa5caf",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A2/corpus/docs/solutions/numeric-input.md": "3b0209d19a2050f01e9801d2ff91206dcd61d256418aa31a3861d4d07a5bfe75",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A2/corpus/import-v1.md": "a59647c056ce1dd4a0dddac45716da34968d573287348f32031423ab73947143"
+      },
+      "actual_rename_failure": {
+        "type": "FileNotFoundError",
+        "errno": 2,
+        "injection": "Parent removed only prepared learning temp after glossary rename; source candidate and durable old learning retained."
+      },
+      "partial": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A2/corpus/CONCEPTS.md": "88608dcdfefbfc127d6ea5e92e8f37b6fb77c81bac1b68fd6a8bb9339ae8f613",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A2/corpus/docs/solutions/numeric-input.md": "3b0209d19a2050f01e9801d2ff91206dcd61d256418aa31a3861d4d07a5bfe75",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A2/corpus/import-v1.md": "a59647c056ce1dd4a0dddac45716da34968d573287348f32031423ab73947143"
+      },
+      "partial_report_status": "incomplete; glossary published, old learning retained; learning publication pending",
+      "recovery": "restaged preserved candidate after exact partial-state recheck; learning rename and final native validations passed",
+      "after": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A2/corpus/CONCEPTS.md": "88608dcdfefbfc127d6ea5e92e8f37b6fb77c81bac1b68fd6a8bb9339ae8f613",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A2/corpus/docs/solutions/numeric-input.md": "129a9c9f3b6b583b2f3a8ced934daaedaa695088fb0e00fc90a4ec85dfdb8b7e",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A2/corpus/import-v1.md": "a59647c056ce1dd4a0dddac45716da34968d573287348f32031423ab73947143"
+      },
+      "alias_consumer_bytes_preserved": true,
+      "unique_recovery_guidance_retained": true,
+      "temporary_files_remaining": 0,
+      "final_promotion_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound/scripts/validate-frontmatter.py",
+          "--promotion",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A2/corpus/docs/solutions/numeric-input.md"
+        ],
+        "exit_code": 0,
+        "stdout": "OK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A2/corpus/docs/solutions/numeric-input.md\n",
+        "stderr": "",
+        "script_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb"
+      },
+      "final_claims_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound/scripts/validate-doc-claims.py",
+          "--repo-root",
+          "/Users/kuang/xiaobu/spec-first",
+          "--target-path",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A2/corpus/docs/solutions/numeric-input.md",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A2/corpus/docs/solutions/numeric-input.md"
+        ],
+        "exit_code": 0,
+        "stdout": "INFO: no upstream default branch found \u2014 path/SHA classification limited to HEAD\nchecked 3 paths, 0 SHAs, 0 links; 0 flags\nOK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A2/corpus/docs/solutions/numeric-input.md\n",
+        "stderr": "",
+        "script_sha256": "2b00789e7f82e20f65bdd692ff6a803724e246f691acd01ff83b75f0da045801"
+      }
+    },
+    {
+      "case": "A3",
+      "original_candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-A3/candidate-extracted.md",
+      "original_candidate_sha256": "c8a3c6abcf268e934eb193ac18b82131c76027c56dc5a0853309d9cecb05eae0",
+      "derived_candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A3/candidate-reference-normalized.md",
+      "derived_candidate_sha256": "0110e0b86fbb549f6d052db71ab4bf9966c9d93142590e17d6c4df636dc8b9b1",
+      "reference_replacements": [
+        {
+          "original": "README.md:3-4",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/README.md:3-4"
+        },
+        {
+          "original": "README.md:3-4",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/README.md:3-4"
+        },
+        {
+          "original": "test/entries.test.js:5-7",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/test/entries.test.js:5-7"
+        },
+        {
+          "original": "test/entries.test.js:9-11",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/test/entries.test.js:9-11"
+        },
+        {
+          "original": "src/server.js:6-10",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/src/server.js:6-10"
+        },
+        {
+          "original": "src/server.js:11",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/src/server.js:11"
+        },
+        {
+          "original": "src/server.js:19-22",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/src/server.js:19-22"
+        },
+        {
+          "original": "src/server.js:3",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/src/server.js:3"
+        },
+        {
+          "original": "existing-learning.md:3",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/existing-learning.md:3"
+        },
+        {
+          "original": "src/server.js:6-10",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/src/server.js:6-10"
+        },
+        {
+          "original": "src/server.js:19-22",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/src/server.js:19-22"
+        },
+        {
+          "original": "test/entries.test.js:5-11",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/test/entries.test.js:5-11"
+        },
+        {
+          "original": "src/server.js:6",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/src/server.js:6"
+        },
+        {
+          "original": "compound-proof.json",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/compound-proof.json"
+        }
+      ],
+      "invalid_candidate_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound/scripts/validate-frontmatter.py",
+          "--promotion",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/invalid-candidate.md"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "FAIL: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/invalid-candidate.md\n  promotion requires non-empty top-level 'source_refs' array\n  promotion requires non-empty top-level 'invalidation_condition'\n",
+        "script_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb"
+      },
+      "invalid_candidate_targets_unchanged": true,
+      "candidate_promotion_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound/scripts/validate-frontmatter.py",
+          "--promotion",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A3/candidate-reference-normalized.md"
+        ],
+        "exit_code": 0,
+        "stdout": "OK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A3/candidate-reference-normalized.md\n",
+        "stderr": "",
+        "script_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb"
+      },
+      "candidate_claims_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound/scripts/validate-doc-claims.py",
+          "--repo-root",
+          "/Users/kuang/xiaobu/spec-first",
+          "--target-path",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A3/corpus/docs/solutions/numeric-input.md",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A3/candidate-reference-normalized.md"
+        ],
+        "exit_code": 0,
+        "stdout": "INFO: no upstream default branch found \u2014 path/SHA classification limited to HEAD\nchecked 5 paths, 0 SHAs, 0 links; 0 flags\nOK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A3/candidate-reference-normalized.md\n",
+        "stderr": "",
+        "script_sha256": "2b00789e7f82e20f65bdd692ff6a803724e246f691acd01ff83b75f0da045801"
+      },
+      "semantic_approval": "parent-inline for evaluation corpus only; uses previously independently reviewed content and explicit citation normalization",
+      "target_drift_control": {
+        "detected": true,
+        "writes_after_detection": 0,
+        "concurrent_edit_preserved": true,
+        "vocabulary_unchanged": true
+      },
+      "before": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A3/corpus/CONCEPTS.md": "fa7c5eb57dcbe4a606d79743219be82180f7e2774e8b87b28432e8ef93aa5caf",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A3/corpus/docs/solutions/numeric-input.md": "3b0209d19a2050f01e9801d2ff91206dcd61d256418aa31a3861d4d07a5bfe75",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A3/corpus/import-v1.md": "a59647c056ce1dd4a0dddac45716da34968d573287348f32031423ab73947143"
+      },
+      "actual_rename_failure": {
+        "type": "FileNotFoundError",
+        "errno": 2,
+        "injection": "Parent removed only prepared learning temp after glossary rename; source candidate and durable old learning retained."
+      },
+      "partial": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A3/corpus/CONCEPTS.md": "88608dcdfefbfc127d6ea5e92e8f37b6fb77c81bac1b68fd6a8bb9339ae8f613",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A3/corpus/docs/solutions/numeric-input.md": "3b0209d19a2050f01e9801d2ff91206dcd61d256418aa31a3861d4d07a5bfe75",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A3/corpus/import-v1.md": "a59647c056ce1dd4a0dddac45716da34968d573287348f32031423ab73947143"
+      },
+      "partial_report_status": "incomplete; glossary published, old learning retained; learning publication pending",
+      "recovery": "restaged preserved candidate after exact partial-state recheck; learning rename and final native validations passed",
+      "after": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A3/corpus/CONCEPTS.md": "88608dcdfefbfc127d6ea5e92e8f37b6fb77c81bac1b68fd6a8bb9339ae8f613",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A3/corpus/docs/solutions/numeric-input.md": "0110e0b86fbb549f6d052db71ab4bf9966c9d93142590e17d6c4df636dc8b9b1",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A3/corpus/import-v1.md": "a59647c056ce1dd4a0dddac45716da34968d573287348f32031423ab73947143"
+      },
+      "alias_consumer_bytes_preserved": true,
+      "unique_recovery_guidance_retained": true,
+      "temporary_files_remaining": 0,
+      "final_promotion_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound/scripts/validate-frontmatter.py",
+          "--promotion",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A3/corpus/docs/solutions/numeric-input.md"
+        ],
+        "exit_code": 0,
+        "stdout": "OK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A3/corpus/docs/solutions/numeric-input.md\n",
+        "stderr": "",
+        "script_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb"
+      },
+      "final_claims_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound/scripts/validate-doc-claims.py",
+          "--repo-root",
+          "/Users/kuang/xiaobu/spec-first",
+          "--target-path",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A3/corpus/docs/solutions/numeric-input.md",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A3/corpus/docs/solutions/numeric-input.md"
+        ],
+        "exit_code": 0,
+        "stdout": "INFO: no upstream default branch found \u2014 path/SHA classification limited to HEAD\nchecked 5 paths, 0 SHAs, 0 links; 0 flags\nOK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A3/corpus/docs/solutions/numeric-input.md\n",
+        "stderr": "",
+        "script_sha256": "2b00789e7f82e20f65bdd692ff6a803724e246f691acd01ff83b75f0da045801"
+      }
+    },
+    {
+      "case": "B1",
+      "original_candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-B1/candidate-extracted.md",
+      "original_candidate_sha256": "a41fa13b88b93bdcf7e1173fe45cc630c6275e40b9d74f5794f033c8b0bda656",
+      "derived_candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B1/candidate-reference-normalized.md",
+      "derived_candidate_sha256": "3a782eebcd8afa770c8a91adea36520548d70c786040d45ffbcb4b9a0e8a2888",
+      "reference_replacements": [
+        {
+          "original": "test/entries.test.js:5",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/test/entries.test.js:5"
+        },
+        {
+          "original": "test/entries.test.js:9",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/test/entries.test.js:9"
+        },
+        {
+          "original": "src/server.js:8",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/src/server.js:8"
+        },
+        {
+          "original": "src/server.js:19",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/src/server.js:19"
+        },
+        {
+          "original": "existing-learning.md",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/existing-learning.md"
+        },
+        {
+          "original": "src/server.js:6",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/src/server.js:6"
+        },
+        {
+          "original": "src/server.js:19",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/src/server.js:19"
+        },
+        {
+          "original": "../compound-proof.json",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/compound-proof.json"
+        }
+      ],
+      "invalid_candidate_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound/scripts/validate-frontmatter.py",
+          "--promotion",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/invalid-candidate.md"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "FAIL: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/invalid-candidate.md\n  promotion requires non-empty top-level 'source_refs' array\n  promotion requires non-empty top-level 'invalidation_condition'\n",
+        "script_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb"
+      },
+      "invalid_candidate_targets_unchanged": true,
+      "candidate_promotion_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound/scripts/validate-frontmatter.py",
+          "--promotion",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B1/candidate-reference-normalized.md"
+        ],
+        "exit_code": 0,
+        "stdout": "OK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B1/candidate-reference-normalized.md\n",
+        "stderr": "",
+        "script_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb"
+      },
+      "candidate_claims_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound/scripts/validate-doc-claims.py",
+          "--repo-root",
+          "/Users/kuang/xiaobu/spec-first",
+          "--target-path",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B1/corpus/docs/solutions/numeric-input.md",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B1/candidate-reference-normalized.md"
+        ],
+        "exit_code": 0,
+        "stdout": "INFO: no upstream default branch found \u2014 path/SHA classification limited to HEAD\nchecked 5 paths, 0 SHAs, 0 links; 0 flags\nOK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B1/candidate-reference-normalized.md\n",
+        "stderr": "",
+        "script_sha256": "2b00789e7f82e20f65bdd692ff6a803724e246f691acd01ff83b75f0da045801"
+      },
+      "semantic_approval": "parent-inline for evaluation corpus only; uses previously independently reviewed content and explicit citation normalization",
+      "target_drift_control": {
+        "detected": true,
+        "writes_after_detection": 0,
+        "concurrent_edit_preserved": true,
+        "vocabulary_unchanged": true
+      },
+      "before": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B1/corpus/CONCEPTS.md": "fa7c5eb57dcbe4a606d79743219be82180f7e2774e8b87b28432e8ef93aa5caf",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B1/corpus/docs/solutions/numeric-input.md": "3b0209d19a2050f01e9801d2ff91206dcd61d256418aa31a3861d4d07a5bfe75",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B1/corpus/import-v1.md": "a59647c056ce1dd4a0dddac45716da34968d573287348f32031423ab73947143"
+      },
+      "actual_rename_failure": {
+        "type": "FileNotFoundError",
+        "errno": 2,
+        "injection": "Parent removed only prepared learning temp after glossary rename; source candidate and durable old learning retained."
+      },
+      "partial": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B1/corpus/CONCEPTS.md": "88608dcdfefbfc127d6ea5e92e8f37b6fb77c81bac1b68fd6a8bb9339ae8f613",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B1/corpus/docs/solutions/numeric-input.md": "3b0209d19a2050f01e9801d2ff91206dcd61d256418aa31a3861d4d07a5bfe75",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B1/corpus/import-v1.md": "a59647c056ce1dd4a0dddac45716da34968d573287348f32031423ab73947143"
+      },
+      "partial_report_status": "incomplete; glossary published, old learning retained; learning publication pending",
+      "recovery": "restaged preserved candidate after exact partial-state recheck; learning rename and final native validations passed",
+      "after": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B1/corpus/CONCEPTS.md": "88608dcdfefbfc127d6ea5e92e8f37b6fb77c81bac1b68fd6a8bb9339ae8f613",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B1/corpus/docs/solutions/numeric-input.md": "3a782eebcd8afa770c8a91adea36520548d70c786040d45ffbcb4b9a0e8a2888",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B1/corpus/import-v1.md": "a59647c056ce1dd4a0dddac45716da34968d573287348f32031423ab73947143"
+      },
+      "alias_consumer_bytes_preserved": true,
+      "unique_recovery_guidance_retained": true,
+      "temporary_files_remaining": 0,
+      "final_promotion_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound/scripts/validate-frontmatter.py",
+          "--promotion",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B1/corpus/docs/solutions/numeric-input.md"
+        ],
+        "exit_code": 0,
+        "stdout": "OK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B1/corpus/docs/solutions/numeric-input.md\n",
+        "stderr": "",
+        "script_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb"
+      },
+      "final_claims_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound/scripts/validate-doc-claims.py",
+          "--repo-root",
+          "/Users/kuang/xiaobu/spec-first",
+          "--target-path",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B1/corpus/docs/solutions/numeric-input.md",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B1/corpus/docs/solutions/numeric-input.md"
+        ],
+        "exit_code": 0,
+        "stdout": "INFO: no upstream default branch found \u2014 path/SHA classification limited to HEAD\nchecked 5 paths, 0 SHAs, 0 links; 0 flags\nOK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B1/corpus/docs/solutions/numeric-input.md\n",
+        "stderr": "",
+        "script_sha256": "2b00789e7f82e20f65bdd692ff6a803724e246f691acd01ff83b75f0da045801"
+      }
+    },
+    {
+      "case": "B2",
+      "original_candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-B2/candidate-extracted.md",
+      "original_candidate_sha256": "ca59b4ff6a0e129e845b5548e1083a2adfe6471ae04e20b625e920c1a74ad1f5",
+      "derived_candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B2/candidate-reference-normalized.md",
+      "derived_candidate_sha256": "fba667bddbd9ffcf9ceedaad83da98f8b8b1b5b2d0e90bd3f305e5827b4373b3",
+      "reference_replacements": [
+        {
+          "original": "test/entries.test.js:5\u201310",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/test/entries.test.js:5-10"
+        },
+        {
+          "original": "src/server.js:8\u201310",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/src/server.js:8-10"
+        },
+        {
+          "original": "src/server.js:19\u201322",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/src/server.js:19-22"
+        },
+        {
+          "original": "existing-learning.md:3",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/existing-learning.md:3"
+        },
+        {
+          "original": "compound-proof.json",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/compound-proof.json"
+        }
+      ],
+      "invalid_candidate_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound/scripts/validate-frontmatter.py",
+          "--promotion",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/invalid-candidate.md"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "FAIL: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/invalid-candidate.md\n  promotion requires non-empty top-level 'source_refs' array\n  promotion requires non-empty top-level 'invalidation_condition'\n",
+        "script_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb"
+      },
+      "invalid_candidate_targets_unchanged": true,
+      "candidate_promotion_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound/scripts/validate-frontmatter.py",
+          "--promotion",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B2/candidate-reference-normalized.md"
+        ],
+        "exit_code": 0,
+        "stdout": "OK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B2/candidate-reference-normalized.md\n",
+        "stderr": "",
+        "script_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb"
+      },
+      "candidate_claims_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound/scripts/validate-doc-claims.py",
+          "--repo-root",
+          "/Users/kuang/xiaobu/spec-first",
+          "--target-path",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B2/corpus/docs/solutions/numeric-input.md",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B2/candidate-reference-normalized.md"
+        ],
+        "exit_code": 0,
+        "stdout": "INFO: no upstream default branch found \u2014 path/SHA classification limited to HEAD\nchecked 4 paths, 0 SHAs, 0 links; 0 flags\nOK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B2/candidate-reference-normalized.md\n",
+        "stderr": "",
+        "script_sha256": "2b00789e7f82e20f65bdd692ff6a803724e246f691acd01ff83b75f0da045801"
+      },
+      "semantic_approval": "parent-inline for evaluation corpus only; uses previously independently reviewed content and explicit citation normalization",
+      "target_drift_control": {
+        "detected": true,
+        "writes_after_detection": 0,
+        "concurrent_edit_preserved": true,
+        "vocabulary_unchanged": true
+      },
+      "before": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B2/corpus/CONCEPTS.md": "fa7c5eb57dcbe4a606d79743219be82180f7e2774e8b87b28432e8ef93aa5caf",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B2/corpus/docs/solutions/numeric-input.md": "3b0209d19a2050f01e9801d2ff91206dcd61d256418aa31a3861d4d07a5bfe75",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B2/corpus/import-v1.md": "a59647c056ce1dd4a0dddac45716da34968d573287348f32031423ab73947143"
+      },
+      "actual_rename_failure": {
+        "type": "FileNotFoundError",
+        "errno": 2,
+        "injection": "Parent removed only prepared learning temp after glossary rename; source candidate and durable old learning retained."
+      },
+      "partial": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B2/corpus/CONCEPTS.md": "88608dcdfefbfc127d6ea5e92e8f37b6fb77c81bac1b68fd6a8bb9339ae8f613",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B2/corpus/docs/solutions/numeric-input.md": "3b0209d19a2050f01e9801d2ff91206dcd61d256418aa31a3861d4d07a5bfe75",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B2/corpus/import-v1.md": "a59647c056ce1dd4a0dddac45716da34968d573287348f32031423ab73947143"
+      },
+      "partial_report_status": "incomplete; glossary published, old learning retained; learning publication pending",
+      "recovery": "restaged preserved candidate after exact partial-state recheck; learning rename and final native validations passed",
+      "after": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B2/corpus/CONCEPTS.md": "88608dcdfefbfc127d6ea5e92e8f37b6fb77c81bac1b68fd6a8bb9339ae8f613",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B2/corpus/docs/solutions/numeric-input.md": "fba667bddbd9ffcf9ceedaad83da98f8b8b1b5b2d0e90bd3f305e5827b4373b3",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B2/corpus/import-v1.md": "a59647c056ce1dd4a0dddac45716da34968d573287348f32031423ab73947143"
+      },
+      "alias_consumer_bytes_preserved": true,
+      "unique_recovery_guidance_retained": true,
+      "temporary_files_remaining": 0,
+      "final_promotion_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound/scripts/validate-frontmatter.py",
+          "--promotion",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B2/corpus/docs/solutions/numeric-input.md"
+        ],
+        "exit_code": 0,
+        "stdout": "OK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B2/corpus/docs/solutions/numeric-input.md\n",
+        "stderr": "",
+        "script_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb"
+      },
+      "final_claims_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound/scripts/validate-doc-claims.py",
+          "--repo-root",
+          "/Users/kuang/xiaobu/spec-first",
+          "--target-path",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B2/corpus/docs/solutions/numeric-input.md",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B2/corpus/docs/solutions/numeric-input.md"
+        ],
+        "exit_code": 0,
+        "stdout": "INFO: no upstream default branch found \u2014 path/SHA classification limited to HEAD\nchecked 4 paths, 0 SHAs, 0 links; 0 flags\nOK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B2/corpus/docs/solutions/numeric-input.md\n",
+        "stderr": "",
+        "script_sha256": "2b00789e7f82e20f65bdd692ff6a803724e246f691acd01ff83b75f0da045801"
+      }
+    },
+    {
+      "case": "B3",
+      "original_candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-B3/candidate-extracted.md",
+      "original_candidate_sha256": "064a29498f8d432f17e7fa0fb8bac05ae01919af70dc2f7eed5850a50a5dfbfc",
+      "derived_candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B3/candidate-reference-normalized.md",
+      "derived_candidate_sha256": "33ba8a43fb6ad27690778211a92d39ce77e16477856ff712e1a91cdeb474fa28",
+      "reference_replacements": [
+        {
+          "original": "test/entries.test.js:5\u201310",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/test/entries.test.js:5-10"
+        },
+        {
+          "original": "src/server.js:6\u201311",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/src/server.js:6-11"
+        },
+        {
+          "original": "src/server.js:19\u201322",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/src/server.js:19-22"
+        },
+        {
+          "original": "existing-learning.md",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/existing-learning.md"
+        },
+        {
+          "original": "compound-proof.json",
+          "derived": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/compound-proof.json"
+        }
+      ],
+      "invalid_candidate_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound/scripts/validate-frontmatter.py",
+          "--promotion",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/invalid-candidate.md"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "FAIL: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/invalid-candidate.md\n  promotion requires non-empty top-level 'source_refs' array\n  promotion requires non-empty top-level 'invalidation_condition'\n",
+        "script_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb"
+      },
+      "invalid_candidate_targets_unchanged": true,
+      "candidate_promotion_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound/scripts/validate-frontmatter.py",
+          "--promotion",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B3/candidate-reference-normalized.md"
+        ],
+        "exit_code": 0,
+        "stdout": "OK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B3/candidate-reference-normalized.md\n",
+        "stderr": "",
+        "script_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb"
+      },
+      "candidate_claims_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound/scripts/validate-doc-claims.py",
+          "--repo-root",
+          "/Users/kuang/xiaobu/spec-first",
+          "--target-path",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B3/corpus/docs/solutions/numeric-input.md",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B3/candidate-reference-normalized.md"
+        ],
+        "exit_code": 0,
+        "stdout": "INFO: no upstream default branch found \u2014 path/SHA classification limited to HEAD\nchecked 4 paths, 0 SHAs, 0 links; 0 flags\nOK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B3/candidate-reference-normalized.md\n",
+        "stderr": "",
+        "script_sha256": "2b00789e7f82e20f65bdd692ff6a803724e246f691acd01ff83b75f0da045801"
+      },
+      "semantic_approval": "parent-inline for evaluation corpus only; uses previously independently reviewed content and explicit citation normalization",
+      "target_drift_control": {
+        "detected": true,
+        "writes_after_detection": 0,
+        "concurrent_edit_preserved": true,
+        "vocabulary_unchanged": true
+      },
+      "before": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B3/corpus/CONCEPTS.md": "fa7c5eb57dcbe4a606d79743219be82180f7e2774e8b87b28432e8ef93aa5caf",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B3/corpus/docs/solutions/numeric-input.md": "3b0209d19a2050f01e9801d2ff91206dcd61d256418aa31a3861d4d07a5bfe75",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B3/corpus/import-v1.md": "a59647c056ce1dd4a0dddac45716da34968d573287348f32031423ab73947143"
+      },
+      "actual_rename_failure": {
+        "type": "FileNotFoundError",
+        "errno": 2,
+        "injection": "Parent removed only prepared learning temp after glossary rename; source candidate and durable old learning retained."
+      },
+      "partial": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B3/corpus/CONCEPTS.md": "88608dcdfefbfc127d6ea5e92e8f37b6fb77c81bac1b68fd6a8bb9339ae8f613",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B3/corpus/docs/solutions/numeric-input.md": "3b0209d19a2050f01e9801d2ff91206dcd61d256418aa31a3861d4d07a5bfe75",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B3/corpus/import-v1.md": "a59647c056ce1dd4a0dddac45716da34968d573287348f32031423ab73947143"
+      },
+      "partial_report_status": "incomplete; glossary published, old learning retained; learning publication pending",
+      "recovery": "restaged preserved candidate after exact partial-state recheck; learning rename and final native validations passed",
+      "after": {
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B3/corpus/CONCEPTS.md": "88608dcdfefbfc127d6ea5e92e8f37b6fb77c81bac1b68fd6a8bb9339ae8f613",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B3/corpus/docs/solutions/numeric-input.md": "33ba8a43fb6ad27690778211a92d39ce77e16477856ff712e1a91cdeb474fa28",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B3/corpus/import-v1.md": "a59647c056ce1dd4a0dddac45716da34968d573287348f32031423ab73947143"
+      },
+      "alias_consumer_bytes_preserved": true,
+      "unique_recovery_guidance_retained": true,
+      "temporary_files_remaining": 0,
+      "final_promotion_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound/scripts/validate-frontmatter.py",
+          "--promotion",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B3/corpus/docs/solutions/numeric-input.md"
+        ],
+        "exit_code": 0,
+        "stdout": "OK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B3/corpus/docs/solutions/numeric-input.md\n",
+        "stderr": "",
+        "script_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb"
+      },
+      "final_claims_validation": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound/scripts/validate-doc-claims.py",
+          "--repo-root",
+          "/Users/kuang/xiaobu/spec-first",
+          "--target-path",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B3/corpus/docs/solutions/numeric-input.md",
+          "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B3/corpus/docs/solutions/numeric-input.md"
+        ],
+        "exit_code": 0,
+        "stdout": "INFO: no upstream default branch found \u2014 path/SHA classification limited to HEAD\nchecked 4 paths, 0 SHAs, 0 links; 0 flags\nOK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B3/corpus/docs/solutions/numeric-input.md\n",
+        "stderr": "",
+        "script_sha256": "2b00789e7f82e20f65bdd692ff6a803724e246f691acd01ff83b75f0da045801"
+      }
+    }
+  ],
+  "all_six_parent_cases_passed": true,
+  "all_original_inputs_and_frozen_helpers_preserved": true,
+  "prepublication_original_claims_results_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/compound-prepublication-claims.json",
+  "unknown_validator_outcome": "not-run; an interrupted validator outcome was not injected or inferred",
+  "independent_review": "not-run; current-session dispatch primitive absent",
+  "model_trials_added": 0,
+  "full_frozen_acceptance": false,
+  "scope": "Compound candidates; shared Compound/Refresh parent publication operations only, not execution of the six Refresh model drafts.",
+  "limitations": [
+    "Actual filesystem operations are parent inline orchestration of prose rules, not a Skill-owned transactional enforcement helper.",
+    "Advisory semantic approval and native validators do not prove real historical bank reconciliation or importer behavior.",
+    "Sequential hash rechecks are not CAS or proof against arbitrary races; only the explicit drift control was exercised.",
+    "No source/runtime generation, project knowledge promotion, external landing, autonomous mutation, model superiority or field outcome.",
+    "Native original-candidate claims failures and B1 bad proof path are preserved; derived citations are parent repairs, not original model successes."
+  ],
+  "runner_sha256": "a9356997296cc9d8f92bb5cbb7618819bb81bc46b827870833f5f75b96ef4e0b"
+}

@@ -1,0 +1,12 @@
+PASS tests/unit/specialized-skill-calibration-contracts.test.js
+PASS tests/unit/spec-ideate-phase-contracts.test.js
+PASS tests/unit/fresh-repo-grounding-contracts.test.js
+PASS tests/unit/private-scratch-migration-contracts.test.js
+PASS tests/unit/spec-ideate-clarification-handoff-contracts.test.js
+PASS tests/unit/settled-decisions-contracts.test.js
+
+Test Suites: 6 passed, 6 total
+Tests:       33 passed, 33 total
+Snapshots:   0 total
+Time:        0.355 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/spec-ideate-phase-contracts.test.js|tests\/unit\/spec-ideate-clarification-handoff-contracts.test.js|tests\/unit\/specialized-skill-calibration-contracts.test.js|tests\/unit\/fresh-repo-grounding-contracts.test.js|tests\/unit\/private-scratch-migration-contracts.test.js|tests\/unit\/settled-decisions-contracts.test.js/i.

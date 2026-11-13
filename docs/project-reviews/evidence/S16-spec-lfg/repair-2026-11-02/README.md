@@ -1,0 +1,5 @@
+# S16 LFG fallback推送合同
+
+2026-11-02；基线cf781f6df。原fallback依赖裸push、origin或首个remote，并把S18 helper误写成固定origin命令。现要求已确认的目标仓库、唯一授权endpoint和head branch，消费S18共享合同；无法确认则保留本地提交并报告阻塞。无remote仍以本地提交为持久化出口，Step 8及no_sink判据一并对齐。
+
+18项现有contract测试及S18双remote probe通过。probe验证提供方命令和模拟endpoint门禁，不证明LFG消费者在真实宿主会正确选择目标或完成GitHub发布。独立fresh-source复核首次发现no_sink判据遗漏，返修后复核通过；复核者未重复运行测试。未执行真实PR/CI、runtime刷新或模型行为评测。

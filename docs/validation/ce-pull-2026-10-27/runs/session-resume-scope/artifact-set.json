@@ -1,0 +1,17 @@
+{
+  "schema_version": "ce-upstream-artifact-set/v1",
+  "files": [
+    {
+      "path": "docs/validation/ce-pull-2026-10-27/runs/session-resume-scope/producer-name-status.tsv",
+      "sha256": "9c04f517fd188bb9b1127a1942bfdf98f3afa518e7428568548e33ef0e3aea65"
+    },
+    {
+      "path": "docs/validation/ce-pull-2026-10-27/runs/session-resume-scope/adjudication-input.json",
+      "sha256": "3ee2f5a8f4ca53aed88c37fe479568059890f1efaf497c7ff5c7a4139809cd0e"
+    },
+    {
+      "path": "docs/validation/ce-pull-2026-10-27/runs/session-resume-scope/target-source-inventory.json",
+      "sha256": "f6474f6fe3805d5a304c06ac15b2f2033bd6ee00ede426511975ddefa151e936"
+    }
+  ]
+}

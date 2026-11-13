@@ -1,0 +1,1 @@
+ed1f1b0d4c1926e8ff3a656cfc77f51de893a81f3ce5aa106ca355d9103b7320  skills/spec-simplify-code/SKILL.md

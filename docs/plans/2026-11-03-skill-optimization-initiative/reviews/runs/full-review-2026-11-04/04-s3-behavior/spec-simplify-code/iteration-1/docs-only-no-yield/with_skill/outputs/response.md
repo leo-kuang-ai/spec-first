@@ -1,0 +1,1 @@
+`nothing to simplify` — 指定范围 `docs/notes.md` 是纯 Markdown 文档（6 行散文，无任何代码），命中 preflight 的 change-kind gate：仅含文档的范围在加载 review lenses 之前即跳过，且该 gate 不会扩大到 caller 授权之外的路径，故不派发三个 review lens、不做任何改动、不提交。文件保持原样，工作区仅有 untracked 的 `.claude/`，基线提交 `41b066f` 未动。

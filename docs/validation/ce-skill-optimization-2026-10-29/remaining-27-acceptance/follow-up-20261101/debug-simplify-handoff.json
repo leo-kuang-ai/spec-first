@@ -1,0 +1,25 @@
+{
+  "origin": "CEOPT-08-B1 actual parent-verified repair, passed to new bounded Simplify consumer",
+  "mutation_scope": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/trials/CEOPT-08-B1/candidate.cjs",
+  "mode": "report-only proposal; no child writes",
+  "protected_refs": [
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/debug/report.cjs",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/debug/proof-intent.md",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/trials/CEOPT-08-B1/execution-result.json"
+  ],
+  "pins": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/trials/CEOPT-08-B1/candidate.cjs": "385e5f596701ee5ed2829c179a02de851688459fa7ede0fc394776f668643052",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/debug/report.cjs": "4da7d03d25e2ce0367823ca3e8feaef7ab6eb1bb8e94f0e94cc73a4f87e2be43",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/debug/proof-intent.md": "18d91510a3a7e227f7681b4d50487f517f5aa888783b639ad1d6526b828e7628",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/trials/CEOPT-08-B1/execution-result.json": "f2eb90d82a2cc5b345e46425e7000f40c1c839b935580add0605d9313f3215e5",
+    "skills/spec-simplify-code/SKILL.md": "ed1f1b0d4c1926e8ff3a656cfc77f51de893a81f3ce5aa106ca355d9103b7320",
+    "skills/spec-simplify-code/references/personas/code-reuse-reviewer.md": "e8fac77c60edafecc4044c008c49069c4b1a508baaee369f4b8c6a7eb92655ee",
+    "skills/spec-simplify-code/references/personas/code-quality-reviewer.md": "7bdc8dfa97907a9754d6a2cff35477d987041d6d3b98cf809b6014d1e35708e3",
+    "skills/spec-simplify-code/references/personas/efficiency-reviewer.md": "82c1ad7d0b58ed1517ec8916d3c758833b4870e6e7d31039d42ac7efcacd4b08"
+  },
+  "requested_output": "JSON replacement_report_cjs null if no justified simplification, all three lens findings, protected proof refs and preservation limitations. Parent alone materializes candidate and executes original seven-case process proof.",
+  "nonclaims": [
+    "Not a meaningful-refactor successor for CEOPT-26 unless substantive change actually occurs.",
+    "Not autonomous mutation or full row equivalence."
+  ]
+}

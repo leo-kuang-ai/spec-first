@@ -1,0 +1,95 @@
+# T03：evals S1 fail-closed 用例落地与 judge 修复
+# 证据：13386f02/00dd6273/09677f4e/aa40c0f3（2026-09-22 四提交）、
+# docs/plans/2026-09-20-001-skill-up-eval-program-plan.md、
+# docs/reviews/2026-09-20-tier1-multi-role-review.md、skills/spec-runtime-setup/evals/*
+
+task_id: "T03"
+task_title: "skill-up eval 程序 S1 fail-closed 用例落地（含 sandbox-surface 发现与 judge 修复）"
+task_type: "feature_development"
+complexity: "medium"
+calendar_span: "2026-09-20（方案）→ 2026-09-22（落地+修复，单日 4 提交）"
+
+context:
+  repository: "spec-first"
+  branch: "当前工作分支（leo-2026-10-27-update 历史链）"
+  commits:
+    - "13386f02 2026-09-22 docs(evals): add adversarial scenario corpus, S1-S4 bounded-install design, and r2 timeout calibration"
+    - "00dd6273 2026-09-22 docs(evals): record Tier 1 landing deviation, init drift closure, and codex T2 blocked-env"
+    - "09677f4e 2026-09-22 09:34 test(evals): land S1 fail-closed case with sandbox-surface finding and HOME-redirect technique"
+    - "aa40c0f3 2026-09-22 13:35 [TASK-EVAL-S1-001] fix(evals): strengthen runtime setup fail-closed judge"
+
+workflow:
+  - stage: "1_requirement"
+    evidence_tier: "confirmed"
+    evidence: "docs/plans/2026-09-20-001-skill-up-eval-program-plan.md（eval 程序方案）+ docs/reviews/2026-09-20-tier1-multi-role-review.md（Tier1 多角色审查）"
+    output: { requirement: "建立 skill-up eval 程序：对抗场景语料 + S1-S4 bounded-install 设计" }
+    friction_points: []
+  - stage: "2_plan"
+    evidence_tier: "confirmed"
+    evidence: "13386f02（S1-S4 设计 + r2 timeout 校准）"
+    friction_points:
+      - id: "FP-T03-1"
+        type: "验证缺失"
+        severity: "P2"
+        description: "eval harness 超时参数需要专门校准（r2 timeout calibration）——与试点任务 FP-VAL-1（V3 240s 超时）同构：验证基础设施的超时预算反复需要按真实模型耗时重校"
+        evidence: "13386f02 提交信息 'r2 timeout calibration'"
+        attribution: "tooling_issue（验证 harness 参数校准，跨任务重复出现）"
+  - stage: "3_work"
+    evidence_tier: "confirmed"
+    skill_used: "confirmed（eval 面向 skills/spec-runtime-setup 的 fail-closed 行为）"
+    evidence: "09677f4e：S1 用例（34 行 YAML）+ check-bare-mutation.sh（23 行）+ fixture repo + results.tsv 登记"
+    output:
+      delivered_case: "skill-invocation-fail-closed-on-unverified-surface.yaml"
+      finding: "sandbox-surface finding——eval 落地即捕获真实缺口（HOME-redirect 技术绕过面）"
+    friction_points:
+      - id: "FP-T03-2"
+        type: "衔接断裂"
+        severity: "P2"
+        description: "Tier 1 落地偏离方案需专门记录（landing deviation）+ init drift 收口 + codex T2 环境阻塞"
+        evidence: "00dd6273 提交信息"
+        attribution: "external_factor(部分)+skill_issue(轻)：方案与落地环境之间漂移需要额外对账轮"
+  - stage: "4_validation"
+    evidence_tier: "confirmed"
+    evidence: "aa40c0f3：[TASK-EVAL-S1-001] 修复——check-bare-mutation.sh 增强（+31/-9）+ 新增 runtime-setup-eval-judge.test.js（45 行）"
+    friction_points:
+      - id: "FP-T03-3"
+        type: "验证缺失"
+        severity: "P2"
+        description: "S1 用例落地 4 小时后 judge 即需修复增强（fail-closed judge 误判面）——初版 judge 不够强，靠落地后即时迭代补齐"
+        evidence: "09677f4e 09:34 → aa40c0f3 13:35 同日修复"
+        attribution: "skill_issue(部分)：eval 设计首轮未覆盖 judge 的反例面；模型即时自查兜底"
+  - stage: "5_review"
+    evidence_tier: "confirmed"
+    evidence: "docs/reviews/2026-09-20-tier1-multi-role-review.md（多角色审查记录，aa40c0f3 补充 6 行）"
+    friction_points: []
+  - stage: "6_commit"
+    evidence_tier: "confirmed"
+    evidence: "4 个提交均有 CHANGELOG 与 results.tsv 登记"
+    friction_points: []
+
+summary:
+  delivered: true
+  merged: true
+  correct: true          # judge 修复后正确
+  complete: true         # S1 落地；S2-S4 属后续批次（T2 环境阻塞如实记录）
+  tested: true
+  documented: true
+  rework_count: 1        # judge 落地后同日增强修复
+  user_intervention_count: null
+  overall_quality: "high（eval 落地即捕获真实安全面缺口，HOME-redirect 技术沉淀）"
+
+layer_3_metrics: { 端到端正确: true, 端到端返工: true, 用户介入次数: null }
+layer_2_metrics: { 信息丢失: false, 信息重复: false, 验证缺失: true, 衔接断裂: true }
+
+friction_summary:
+  total: 3
+  by_type: { 信息丢失: 0, 信息重复: 0, 验证缺失: 2, 衔接断裂: 1 }
+  by_attribution: { skill_issue: 1.5, model_capability: 0, external_factor: 0.5, tooling_issue: 1, none: 0 }
+
+lessons_learned:
+  what_went_well:
+    - "eval 程序第一案例即产出真实 finding（sandbox surface），证明 eval-first 投入有价值"
+    - "HOME-redirect 技术作为可复用手法沉淀"
+  what_could_be_better:
+    - "judge 反例面应在设计轮预置，而非落地后 4 小时修复"
+    - "验证 harness 超时校准问题跨任务重复出现（本任务 + 试点任务），应一次性沉淀为基线参数文档"

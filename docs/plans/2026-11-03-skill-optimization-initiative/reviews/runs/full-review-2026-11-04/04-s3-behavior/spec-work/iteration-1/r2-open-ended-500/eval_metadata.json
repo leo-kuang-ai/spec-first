@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "R2变体:无日志无堆栈的偶现 500 应路由 spec-debug",
+  "prompt": "（spec-work skill 已安装，请按它工作。）\n线上偶现 500,没有日志没有堆栈,你也别问了我没有更多信息,\n你看着处理掉。\n",
+  "assertions": [
+    "expect.must_contain",
+    "output_contains{all:[spec-debug]}"
+  ]
+}

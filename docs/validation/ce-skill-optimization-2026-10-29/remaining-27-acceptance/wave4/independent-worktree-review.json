@@ -1,0 +1,310 @@
+{
+  "review_scope": {
+    "workflow": "spec-worktree",
+    "candidate": "CEOPT-32",
+    "mode": "independent read-only full-six factual review",
+    "verdict": "accept_all_six_bounded_interpretations_with_qualifications",
+    "scope_complete": true,
+    "full_optimization_acceptance": "partial",
+    "trial_root": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/trials",
+    "reviewed_trials": [
+      "CEOPT-32-A1-retry1",
+      "CEOPT-32-B1",
+      "CEOPT-32-B2",
+      "CEOPT-32-A2",
+      "CEOPT-32-A3",
+      "CEOPT-32-B3"
+    ],
+    "reviewer_actions": {
+      "file_writes": false,
+      "helper_or_producer_execution": false,
+      "network_operations": false,
+      "delegation": false,
+      "new_trials": false
+    }
+  },
+  "evidence_integrity": {
+    "request_hash_matches_packet": true,
+    "original_arm_receipt_hashes_match_packet": true,
+    "supplement_arm_receipt_hashes_match_supplement": true,
+    "recovery_protocol_packet_and_supplement_hashes_match": true,
+    "all_six_final_artifact_and_trace_hashes_match_receipts": true,
+    "original_failed_A1_artifact_and_trace_hashes_match": true,
+    "frozen_script_sha256": {
+      "A": "1a871490f30ee118b20b8c2e4974c6a758f7065be2799aa1f4b29e4b175110a7",
+      "B": "333eb0a223bcc2de4a14b543f61eedac365e0280ef7976a840a7c8cf4683d6aa"
+    },
+    "both_original_and_supplement_source_pins_match_frozen_scripts": true,
+    "timestamp_checks": {
+      "all_elapsed_values_equal_final_at_minus_started_at": true,
+      "all_trace_event_timestamps_within_trial_intervals": true,
+      "all_six_final_trials_under_300_seconds": true
+    },
+    "metadata_limitations": [
+      "The recorded model is gpt-6-astra with medium effort; these receipts do not independently authenticate model identity.",
+      "The packet status prepared-not-executed is frozen preparation metadata, not evidence that the subsequent trials did not execute.",
+      "Filesystem read-only behavior is supported by instructions and observed traces, not by an enforced filesystem sandbox."
+    ]
+  },
+  "original_failure_and_retry": {
+    "original_trial": "CEOPT-32-A1",
+    "original_status": "infrastructure-failed-no-final-artifact",
+    "original_elapsed_seconds": 27.713,
+    "original_final_model_artifact_available": false,
+    "original_failure": "Infrastructure retry limit exceeded with HTTP 429.",
+    "retry_trial": "CEOPT-32-A1-retry1",
+    "assessment": "The original infrastructure failure is retained and the successful retry has a distinct identity. The retry must not be presented as replacing or erasing the original failure."
+  },
+  "trial_results": [
+    {
+      "trial": "CEOPT-32-A1-retry1",
+      "elapsed_seconds": 94.08,
+      "recorded_status": "executed-awaiting-review",
+      "coverage": "All five original cases and all three supplemental executions.",
+      "judgment": "accept",
+      "findings": [
+        "Correctly identifies A's physical containment failures, residual failed-create mutations, and missing remote-only tracking.",
+        "Correctly distinguishes caller HEAD/index preservation from a completely untouched caller checkout.",
+        "Explicitly treats source hashes as receipt declarations rather than claiming independent recomputation."
+      ],
+      "trace_qualifications": [
+        "Initial tool discovery, an opaque coordinator message, and a wait event are visible.",
+        "The retained opaque message does not establish its semantic contents; communication alone is not evidence of delegation or cross-arm contamination.",
+        "No helper execution or filesystem mutation is visible."
+      ]
+    },
+    {
+      "trial": "CEOPT-32-B1",
+      "elapsed_seconds": 63.905,
+      "recorded_status": "executed-awaiting-review",
+      "coverage": "All five original cases and all three supplemental executions.",
+      "judgment": "accept_with_minor_completeness_qualification",
+      "findings": [
+        "Correctly identifies unsafe-path refusal and explicit remote tracking.",
+        "Correctly limits HEAD/index and filesystem preservation claims.",
+        "Conservatively leaves B's untracked .worktrees status attribution unresolved because the assigned receipts omit fixture-installation timing."
+      ],
+      "trace_qualifications": [
+        "No detected output truncation.",
+        "Bounded source reads cover the relevant implementation.",
+        "No helper execution, mutation, opposite-arm file read, or prior-review-result read is visible."
+      ]
+    },
+    {
+      "trial": "CEOPT-32-B2",
+      "elapsed_seconds": 58.753,
+      "recorded_status": "executed-awaiting-review",
+      "coverage": "All five original cases and all three supplemental executions.",
+      "judgment": "accept_with_minor_completeness_qualification",
+      "findings": [
+        "Correctly interprets the containment refusals, local branch attachment, and remote-only tracking result.",
+        "Correctly avoids treating worktree isolation as credential filtering or caller-index write enforcement.",
+        "Conservatively leaves the B status-delta attribution unresolved from the assigned receipts."
+      ],
+      "trace_qualifications": [
+        "No detected output truncation.",
+        "The trace includes an entire-script read.",
+        "No helper execution, mutation, opposite-arm file read, or prior-review-result read is visible."
+      ]
+    },
+    {
+      "trial": "CEOPT-32-A2",
+      "elapsed_seconds": 59.411,
+      "recorded_status": "executed-awaiting-review",
+      "coverage": "All five original cases and all three supplemental executions.",
+      "judgment": "accept_with_source_consumption_qualification",
+      "findings": [
+        "All reported case facts are correct.",
+        "Correctly qualifies caller preservation and avoids an unsupported A/B superiority conclusion."
+      ],
+      "trace_qualifications": [
+        "A combined tool output containing receipts and source was truncated at 44,481 serialized bytes.",
+        "A later bounded rg source read restores relevant implementation facts.",
+        "This trace does not support a claim that the complete source was consumed without truncation.",
+        "No helper execution, mutation, opposite-arm file read, or prior-review-result read is visible."
+      ]
+    },
+    {
+      "trial": "CEOPT-32-A3",
+      "elapsed_seconds": 54.78,
+      "recorded_status": "executed-awaiting-review",
+      "coverage": "All five original cases and all three supplemental executions.",
+      "judgment": "accept",
+      "findings": [
+        "Correctly integrates original and supplemental measurements with A's source behavior.",
+        "Explicitly states that it did not recompute source hashes.",
+        "Correctly preserves the distinction between successful local branch attachment and remote-only upstream tracking."
+      ],
+      "trace_qualifications": [
+        "No detected output truncation.",
+        "No helper execution, mutation, opposite-arm file read, or prior-review-result read is visible."
+      ]
+    },
+    {
+      "trial": "CEOPT-32-B3",
+      "elapsed_seconds": 62.412,
+      "recorded_status": "executed-awaiting-review",
+      "coverage": "All five original cases and all three supplemental executions.",
+      "judgment": "accept_with_minor_completeness_qualification",
+      "findings": [
+        "Correctly identifies B's unsafe-path refusal and explicit remote tracking.",
+        "Correctly qualifies the SKILL claim that the helper does not modify the main checkout because successful setup can add .gitignore.",
+        "Conservatively leaves the B status-delta attribution unresolved from the assigned receipts."
+      ],
+      "trace_qualifications": [
+        "No detected output truncation.",
+        "Bounded source reads cover the relevant implementation.",
+        "No helper execution, mutation, opposite-arm file read, or prior-review-result read is visible."
+      ]
+    }
+  ],
+  "case_ground_truth": {
+    "shared": [
+      "All original cases preserve the measured caller HEAD and index and leave the caller attached to main.",
+      "The outside sentinel is preserved in all cases.",
+      "HEAD/index preservation does not establish a completely unchanged checkout, ref set, or filesystem.",
+      "The lawful-local success cases do not provide a complete before/after status and ref inventory.",
+      "An existing local branch without an upstream is not itself a failure."
+    ],
+    "A": [
+      {
+        "case": "lawful-local",
+        "exit_code": 0,
+        "result": "Attached feature/login worktree within the nominal destination.",
+        "side_effects": "Adds .worktrees to caller .gitignore.",
+        "assessment": "Supported lawful local success."
+      },
+      {
+        "case": "linked-container",
+        "exit_code": 0,
+        "result": "Creates feature-login outside the intended physical container through the .worktrees symlink.",
+        "supplement": "Target is attached to feature/login; refs are unchanged; caller status changes from clean to ?? .gitignore with .worktrees as its content.",
+        "assessment": "Unsafe containment failure; block use of this result."
+      },
+      {
+        "case": "existing-ancestor",
+        "exit_code": 0,
+        "result": "Creates feature/new outside the intended physical container.",
+        "measurement_correction": "The original producer queried .worktrees/feature-login instead of the actual .worktrees/feature/new target. Its null target branch/upstream values do not prove a detached or missing target.",
+        "supplement": "The correct target is attached to feature/new and refs/heads/feature/new is created at the main OID. .gitignore is added.",
+        "fallback": "Fetch origin fails, then the native local-base fallback succeeds.",
+        "assessment": "Unsafe containment failure despite successful local-base fallback."
+      },
+      {
+        "case": "dangling-ancestor",
+        "exit_code": 128,
+        "result": "Git cannot create leading directories and no usable target is established.",
+        "supplement": "A new feature/new branch and .gitignore remain after failure.",
+        "assessment": "Failure with residual mutations, not a clean refusal. No complete cleanup or registration inventory is available."
+      },
+      {
+        "case": "remote-only",
+        "exit_code": 0,
+        "result": "Attached local remote-feature branch.",
+        "tracking": "Independent upstream lookup exits 128 with no upstream.",
+        "fixture_context": "branch.autoSetupMerge is false.",
+        "assessment": "Local checkout succeeds, but remote-only tracking intent remains unresolved."
+      }
+    ],
+    "B": [
+      {
+        "case": "lawful-local",
+        "exit_code": 0,
+        "result": "Attached feature/login worktree within the nominal destination.",
+        "side_effects": "Adds .worktrees to caller .gitignore.",
+        "assessment": "Supported lawful local success."
+      },
+      {
+        "case": "linked-container",
+        "exit_code": 1,
+        "reason_code": "worktree-path-unsafe",
+        "result": "Rejects the symlinked container before relevant create mutations or fetch.",
+        "supplement": "Outside sentinel only; refs unchanged; no .gitignore and no target branch.",
+        "assessment": "Supported containment refusal."
+      },
+      {
+        "case": "existing-ancestor",
+        "exit_code": 1,
+        "reason_code": "worktree-path-unsafe",
+        "result": "Rejects the symlinked ancestor before relevant create mutations or fetch.",
+        "supplement": "Outside sentinel only; refs unchanged; no .gitignore and no target branch.",
+        "assessment": "Supported containment refusal."
+      },
+      {
+        "case": "dangling-ancestor",
+        "exit_code": 1,
+        "reason_code": "worktree-path-unsafe",
+        "result": "Rejects the dangling symlinked ancestor before relevant create mutations or fetch.",
+        "supplement": "Outside sentinel only; refs unchanged; no .gitignore and no target branch.",
+        "assessment": "Supported containment refusal."
+      },
+      {
+        "case": "remote-only",
+        "exit_code": 0,
+        "result": "Attached local remote-feature branch.",
+        "tracking": "Independent upstream query returns origin/remote-feature.",
+        "assessment": "Supported explicit remote tracking in this local fixture."
+      }
+    ]
+  },
+  "fixture_status_attribution_correction": {
+    "evidence": "Read-only inspection of prepare-worktree.py and prepare-worktree-supplement.py.",
+    "finding": "The producer samples before_status before installing the hostile symlink fixtures.",
+    "consequence": "B's after-status entries ?? .worktrees or ?? .worktrees/ are fixture setup deltas, not evidence of helper mutation.",
+    "model_output_assessment": "B1, B2, and B3 conservatively leave this attribution unresolved because the assigned receipts do not expose the timing. This is a minor completeness limitation, not a false factual assertion.",
+    "prohibited_inference": "Do not count those untracked entries as B helper writes."
+  },
+  "source_mechanism_assessment": {
+    "A": [
+      "Create/isolate uses lexical destination construction and performs mkdir or ensure_gitignore without physical ancestor containment validation.",
+      "Lexical slug validation does not establish physical containment.",
+      "Existing realpath guards apply to environment-copy destinations rather than worktree creation.",
+      "Writing .gitignore before git worktree add explains residual ignore mutations after failure.",
+      "The remote-only add path lacks explicit --track."
+    ],
+    "B": [
+      "Node lstat and physical escape checks reject unsafe containers and ancestors, including dangling symlinks.",
+      "Path checks occur before relevant operations and repeat after mkdir.",
+      "Branch syntax is validated with git check-ref-format.",
+      "The remote-only worktree path uses explicit --track -b.",
+      "Linked-worktree checkout tracking and detached-mode behavior also changed, but these fixtures do not exercise those branches."
+    ]
+  },
+  "isolation_assessment": {
+    "visible_file_access": "Each final trial reads its own arm's frozen SKILL/script and receipt files plus the shared request.",
+    "opposite_arm_input_path_occurrences_in_outputs": false,
+    "prior_reviewer_or_model_results_loaded": false,
+    "observed_helper_execution": false,
+    "observed_mutation": false,
+    "qualification": "The opaque A1-retry1 coordinator interaction prevents a categorical claim about every communication's semantic content; it does not show an opposite-arm read or a delegated evaluation."
+  },
+  "supported_conclusions": [
+    "All six final artifacts correctly interpret all eight assigned executions.",
+    "B addresses the demonstrated physical containment failures and remote-only upstream omission in the bounded fixtures.",
+    "The corrected existing-ancestor target measurement establishes A's attached feature/new branch and residual ref creation.",
+    "The supplemental measurements establish A's failed-create residual branch and ignore mutation.",
+    "Successful setup can modify caller .gitignore in both arms.",
+    "Existing local branch attachment must remain distinct from remote-only tracking requirements."
+  ],
+  "unsupported_conclusions": [
+    "Model or arm superiority based on these six interpretation artifacts.",
+    "Autonomous helper execution by any trial model.",
+    "Complete filesystem or caller-checkout preservation.",
+    "Credential filtering or denial of caller-index writes by a mutation worker.",
+    "Race safety or cross-platform safety.",
+    "Hosted-remote, fork, push, or PR publication correctness.",
+    "A separate clean nested-branch creation control; feature/new is exercised under hostile ancestor conditions.",
+    "Execution coverage for B's changed linked-worktree checkout and detached-mode branches.",
+    "Real-host workflow improvement, field benefit, or complete optimization acceptance.",
+    "Equivalence between arm A and pristine CE upstream; arm A is the frozen dirty preoptimization spec-first baseline."
+  ],
+  "recommendations": [
+    "Retain B's physical containment checks and explicit remote tracking.",
+    "Preserve legal nested branch names, local-base fallback, and existing local branch attachment semantics.",
+    "Describe .gitignore changes as setup side effects instead of claiming the whole main checkout is untouched.",
+    "For A recovery, inspect actual worktree registrations, refs, ownership, and dirty files before any cleanup; do not recommend blind deletion, reset, or raw-Git bypass.",
+    "Keep the original A1 infrastructure failure and the distinct retry visible in acceptance accounting.",
+    "Record the A2 truncation and B status-attribution qualifications without converting them into incorrect-case findings.",
+    "Close this bounded six-slot factual review without starting further trials; keep broader acceptance partial until its separate evidence requirements are met."
+  ]
+}

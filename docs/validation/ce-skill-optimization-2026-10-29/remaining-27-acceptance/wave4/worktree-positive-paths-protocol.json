@@ -1,0 +1,23 @@
+{
+  "id": "CEOPT-32-positive-path-parent-supplement",
+  "at": "2026-10-31T08:27:45.845151+00:00",
+  "runner_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/verify-worktree-positive-paths.py",
+  "runner_sha256": "e4e371a7b70e66083a769f49a7cbdc9bfa3cf9d6497973fcda41c1c88d11c81d",
+  "source_pins": {
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-worktree/scripts/worktree-manager.sh": "1a871490f30ee118b20b8c2e4974c6a758f7065be2799aa1f4b29e4b175110a7",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-worktree/scripts/worktree-manager.sh": "333eb0a223bcc2de4a14b543f61eedac365e0280ef7976a840a7c8cf4683d6aa"
+  },
+  "review_gap_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/independent-worktree-review.json",
+  "cases": [
+    "clean-nested-create",
+    "linked-remote-tracking",
+    "linked-detached-tag"
+  ],
+  "arms": [
+    "A",
+    "B"
+  ],
+  "procedure": "Six separate disposable local Git fixtures. Execute native frozen helpers; preserve complete command records and before/after main checkout HEAD/branch/index/status/refs/worktree registration. Verify clean nested branch creation, linked remote attachment/upstream with autoSetupMerge false, explicit detached tag behavior and no nested worktree creation. Observe cleanup after TemporaryDirectory exits.",
+  "expected": "Both arms support clean nested creation and detached tag; A linked remote checkout is detached with no upstream, B creates tracked remote-feature. Record intent outcomes separately from expected observation assertions.",
+  "scope": "Parent local mechanism supplement only; no external network, model trial, product code behavior mutation, runtime projection or full acceptance."
+}

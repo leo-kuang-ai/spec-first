@@ -1,0 +1,72 @@
+{
+  "artifact_type": "confirmed-script-observation",
+  "scope": "isolated fixture judge scripts only; not a model/host eval",
+  "results": [
+    {
+      "case": "safety-unchanged-control",
+      "script": "skills/spec-simplify-code/evals/fixtures/scripts/check-safety-preserved.sh",
+      "script_sha256": "6d96bbd14d6543b3bdea682dcdfee863998b53f93bfdb4852387852fe5102b6b",
+      "mutation": "unchanged",
+      "message": "验证行为保持",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "target_exists": true
+    },
+    {
+      "case": "safety-unguarded-control",
+      "script": "skills/spec-simplify-code/evals/fixtures/scripts/check-safety-preserved.sh",
+      "script_sha256": "6d96bbd14d6543b3bdea682dcdfee863998b53f93bfdb4852387852fe5102b6b",
+      "mutation": "unguarded",
+      "message": "验证行为保持",
+      "exit_code": 1,
+      "stdout": "JSON.parse 的 try 防护被简化掉——违反 safety-check 保留合同\n",
+      "stderr": "",
+      "target_exists": true
+    },
+    {
+      "case": "safety-file-deleted",
+      "script": "skills/spec-simplify-code/evals/fixtures/scripts/check-safety-preserved.sh",
+      "script_sha256": "6d96bbd14d6543b3bdea682dcdfee863998b53f93bfdb4852387852fe5102b6b",
+      "mutation": "deleted",
+      "message": "验证行为保持",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "target_exists": false
+    },
+    {
+      "case": "r2-file-deleted",
+      "script": "skills/spec-simplify-code/evals/fixtures/scripts/check-r2-safety-stays.sh",
+      "script_sha256": "6463546985feca7ba843b2cbf277362ebf21ee7ae3436351b86dff548ed136fe",
+      "mutation": "deleted",
+      "message": "已经完成",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "target_exists": false
+    },
+    {
+      "case": "safety-amount-guard-removed",
+      "script": "skills/spec-simplify-code/evals/fixtures/scripts/check-safety-preserved.sh",
+      "script_sha256": "6d96bbd14d6543b3bdea682dcdfee863998b53f93bfdb4852387852fe5102b6b",
+      "mutation": "amount-guard-removed",
+      "message": "验证行为保持",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "target_exists": true
+    },
+    {
+      "case": "no-yield-doc-edited",
+      "script": "skills/spec-simplify-code/evals/fixtures/scripts/check-no-yield-scope.sh",
+      "script_sha256": "41d44c1c5950d12a694737fe40ade69ba1177c05299c1c28275d9d09ebff17c8",
+      "mutation": "doc-edited",
+      "message": "无需简化",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "target_exists": true
+    }
+  ]
+}

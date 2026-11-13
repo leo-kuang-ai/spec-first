@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "rows": 79,
+  "columns": 9,
+  "bad_rows": [],
+  "changed_records": 3,
+  "repair": "仅将3个full_test还原到前行eval_mode字段，保留原始评测结论及后续追加记录。"
+}

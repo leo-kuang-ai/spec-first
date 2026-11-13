@@ -1,0 +1,26 @@
+{
+  "paths": [
+    "skills/ce-debug/references/defense-in-depth.md",
+    "skills/ce-debug/references/fix.md"
+  ],
+  "reading": "defense-in-depth 4行新增段完整；fix 完整8/8净diff；本地两个 reference 全文已读。CE debug SKILL/investigate 合并输出截断，不计全文",
+  "decision": "复用现有conditional defense-in-depth owner；先验证minimal fix，再判断已发现同根位置是否能通过现有共享入口/类型约束/针对性lint或test消除重复犯错空间。只在已授权sites、无public接口改变和真实收益条件满足时实施，否则Prevention follow-up；不默认抽helper或加多层guard",
+  "limitations": [
+    "不新增执行引擎或return mode，不移植CE默认自动commit",
+    "source合同回归不证明真实agent选择/现场收益",
+    "CE debug SKILL/investigate 合并净diff仍有截断，除本receipt两path外不作阅读闭合"
+  ],
+  "artifact_type": "producer-semantic-screening",
+  "independent_review": false,
+  "verification": "logs/debug-prevention-tests.log: exit0, 1 suite/7 tests",
+  "shared_owner_recovery": {
+    "reason": "check:shared-references exit1 发现两份yaml-schema是distribution copies，canonical owner为skills/_shared/references/yaml-schema.md",
+    "error": "首次实施未识别shared source owner；保留已有检查失败证据，不覆盖历史admissions/receipts",
+    "action": "把同段说明移到shared source，通过sync-shared-references.js同步，再复跑必要检查；无新字段或更改权限",
+    "sources": [
+      "scripts/sync-shared-references.js",
+      "skills/_shared/references/yaml-schema.md",
+      "docs/validation/ce-pull-2026-10-27/logs/resume-shared.log"
+    ]
+  }
+}

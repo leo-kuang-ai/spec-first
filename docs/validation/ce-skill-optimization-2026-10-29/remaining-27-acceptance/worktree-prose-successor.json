@@ -1,0 +1,24 @@
+{
+  "id": "CEOPT-32-prose-successor",
+  "at": "2026-10-31T08:25:07.906960+00:00",
+  "path": "skills/spec-worktree/SKILL.md",
+  "before_sha256": "0c15f4281236a35c1458b49ba88010e763bef9e8727d147ee937aa3cf0d3d819",
+  "successor_sha256": "12438f6bff6ccb18bcffbe39242c395ed2bb5b0eb7be6a52ad77aa66956095e6",
+  "before_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-worktree/SKILL.md",
+  "removed": "- Does not modify the main repo checkout \u2014 `from-branch` and PR heads are fetched, not checked out",
+  "replacement": "- Fetches `from-branch` and PR heads without switching the primary checkout branch; setup may update its `.gitignore`",
+  "reason": "Independent full-six review confirms successful setup can add caller .gitignore; branch preservation is narrower than an untouched checkout.",
+  "evidence_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/independent-worktree-review.json",
+  "validation": "Exact one-line replacement verified. Project lint:skill-entrypoints passes510 files. System quick_validate rejects pre-existing user-invocable on BOTH frozen B and current source (exit1); compatibility limitation, not passing validation.",
+  "fresh_source_eval": "Not required for this narrow factual correction; independent source/receipt review establishes side effect, no new behavioral claim.",
+  "runtime": "No runtime regeneration or patch; current session definitions may remain cached.",
+  "helper_help_successor": {
+    "path": "skills/spec-worktree/scripts/worktree-manager.sh",
+    "before_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-worktree/scripts/worktree-manager.sh",
+    "before_sha256": "333eb0a223bcc2de4a14b543f61eedac365e0280ef7976a840a7c8cf4683d6aa",
+    "successor_sha256": "f79de56aeca054b08fc919bd04afbd8b5c09f6a1038389e3c84fa63510d0e81f",
+    "removed": "The main repo checkout is not modified; from-branch is fetched but\nnot checked out.",
+    "replacement": "The primary checkout branch is preserved while from-branch is fetched.\nSetup may add .worktrees to the caller checkout .gitignore.",
+    "scope": "usage help prose only; operation implementation unchanged"
+  }
+}

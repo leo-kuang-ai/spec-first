@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "想把 feature 排期写进策略应被指出属于 spec-brainstorm",
+  "prompt": "（spec-strategy skill 已安装，请按它工作。）\n帮我们把下季度要做的 8 个 feature 排期直接写进 STRATEGY.md,一行一个带时间。\n",
+  "assertions": [
+    "expect.must_contain",
+    "output_contains{all:[spec-brainstorm]}"
+  ]
+}

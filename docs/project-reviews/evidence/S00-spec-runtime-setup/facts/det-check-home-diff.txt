@@ -1,0 +1,6 @@
+0a1,5
+> 986ec3f208b5f76a9f45a54a802ef24f3a2c52df3e0fa8a91a3a4e5dece2af8c  home/.agent-browser/namespaces/sfo-d6980847/run/sfc-d6980847.config
+> 48d11b1352c3e6fb9cf1f08cad0f8089524eb44312291beaf69bac8ec4395e10  home/.agent-browser/namespaces/sfo-d6980847/run/sfc-d6980847.target
+> e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  home/.codex/tmp/arg0-macos/codex-arg0oEFjJw/.lock
+> c0d7d90996d715d2f47228f7d8846988cb97324581b460b1e83b791c111b4bfd  home/.local/state/gh/device-id
+> 5713353fb2f2906dc60c5c9d801e432b22e8eb5a0b12f026b626d573c0c30aec  home/.npm/_logs/2026-11-01T08_22_37_748Z-debug-0.log

@@ -1,0 +1,191 @@
+{
+  "scenario_id": "CEOPT-01",
+  "review_scope": "Independent read-only review of all six complete artifacts, receipts and tool-event traces, exact request and packet, both complete helper receipt files, five TSV fixtures, frozen A/B skill, regression, scorer and routing sources, and the CEOPT-01 frozen scenario.",
+  "overall_judgment": "All six model artifacts pass the bounded evidence-interpretation request. A helper behavior fails three supplied safety cases; B helper behavior passes all five supplied cases. Full frozen acceptance remains partial because executed legacy classification alias equivalence is missing.",
+  "trials": [
+    {
+      "id": "CEOPT-01-A1",
+      "judgment": "pass_scoped",
+      "elapsed_seconds": 79.346,
+      "fixture_dispositions_correct": {
+        "hard": true,
+        "visual-ui": true,
+        "visual": true,
+        "unknown": true,
+        "stable": true
+      },
+      "findings": [],
+      "rationale": "Correctly overrides three unsafe A STABLE receipts, explains exact classification and dimension mismatches, withholds acceptance for unknown classification, and limits the stable control to supplied performance evidence."
+    },
+    {
+      "id": "CEOPT-01-B1",
+      "judgment": "pass_scoped",
+      "elapsed_seconds": 86.873,
+      "fixture_dispositions_correct": {
+        "hard": true,
+        "visual-ui": true,
+        "visual": true,
+        "unknown": true,
+        "stable": true
+      },
+      "findings": [
+        {
+          "severity": "informational",
+          "detail": "Initially attempted a nonexistent references/regression.md, then discovered and read the correct regression.md. The recovered lookup does not invalidate the final artifact."
+        }
+      ],
+      "rationale": "Accurately reports B outputs and distinguishes descriptive TSV fields from authenticated test evidence. Explicitly notes that legacy eligible classification compatibility is source-supported but unexercised."
+    },
+    {
+      "id": "CEOPT-01-B2",
+      "judgment": "pass_scoped",
+      "elapsed_seconds": 100.059,
+      "fixture_dispositions_correct": {
+        "hard": true,
+        "visual-ui": true,
+        "visual": true,
+        "unknown": true,
+        "stable": true
+      },
+      "findings": [
+        {
+          "severity": "informational",
+          "detail": "Initially attempted a nonexistent references/regression-workflow.md, then read the correct regression.md. Recovery is visible in the trace."
+        }
+      ],
+      "rationale": "Correctly explains HARD early exit, visual equivalence, invalid-classification rejection and limited stable coverage. Separates TSV unknown classification from consecutive orchestrator unknown-unit cycles."
+    },
+    {
+      "id": "CEOPT-01-A2",
+      "judgment": "pass_scoped",
+      "elapsed_seconds": 94.776,
+      "fixture_dispositions_correct": {
+        "hard": true,
+        "visual-ui": true,
+        "visual": true,
+        "unknown": true,
+        "stable": true
+      },
+      "findings": [
+        {
+          "severity": "informational",
+          "detail": "The first guessed regression reference was nonexistent. A later successful read establishes the final source claim; the combined command's exit zero alone would not establish that every preceding read succeeded."
+        }
+      ],
+      "rationale": "Correctly identifies the three false-green mechanisms and requires source correction and evidence-backed resolution. Its proposed future checks are not represented as completed checks."
+    },
+    {
+      "id": "CEOPT-01-A3",
+      "judgment": "pass_scoped",
+      "elapsed_seconds": 87.398,
+      "fixture_dispositions_correct": {
+        "hard": true,
+        "visual-ui": true,
+        "visual": true,
+        "unknown": true,
+        "stable": true
+      },
+      "findings": [
+        {
+          "severity": "nonblocking_clarity",
+          "detail": "Recovery item 2 permits explicit alias rejection as an alternative, but frozen acceptance requires lawful legacy aliases to remain equivalent. Item 3 correctly requires equivalent behavior for both eligible and visual spellings; implementation must follow that stronger requirement."
+        }
+      ],
+      "rationale": "Correctly rejects unsafe A verdicts and explicitly leaves downstream recovery/check behavior untested."
+    },
+    {
+      "id": "CEOPT-01-B3",
+      "judgment": "pass_scoped",
+      "elapsed_seconds": 75.565,
+      "fixture_dispositions_correct": {
+        "hard": true,
+        "visual-ui": true,
+        "visual": true,
+        "unknown": true,
+        "stable": true
+      },
+      "findings": [],
+      "rationale": "Accurately reconciles every receipt with source and fixtures, preserves alias equivalence, rejects invalid classification, and limits preservation claims to scorer inputs."
+    }
+  ],
+  "helper_mechanism_conclusions": {
+    "A": {
+      "hard": "Fail: exit 0 STABLE despite regression-eligible HARD regressed=true. The blocking filter accepts only literal eligible.",
+      "visual-ui": "Fail: exit 0 STABLE at 100 because the scorer recognizes only visual, discards the supplied visual-ui dimension from aggregation, and renormalizes performance alone.",
+      "visual": "Pass: exit 1 UNSTABLE at 60.",
+      "unknown": "Fail: exit 0 STABLE at 100 over two performance cells because SCORE aggregation does not validate classification.",
+      "stable": "Pass within scope: exit 0 STABLE at 100 for one performance cell."
+    },
+    "B": {
+      "hard": "Pass: exit 1 UNSTABLE with the functional HARD blocker. Numeric performance cannot override it.",
+      "visual-ui": "Pass: exit 1 UNSTABLE at 60.",
+      "visual": "Pass: exit 1 UNSTABLE at 60, with identical output to visual-ui.",
+      "unknown": "Pass: exit 2 INVALID_INPUT, row 2 unknown classification, empty stdout and no stability verdict.",
+      "stable": "Pass within scope: exit 0 STABLE at 100 for one performance cell.",
+      "source_explanation": "B normalizes visual-ui to internal visual and eligible to regression-eligible, validates classification and registry tier, and scores only admitted classifications. The supplied receipts exercise visual normalization and unknown-classification rejection, but not legacy eligible normalization."
+    },
+    "score_math": "(0.30 * 100 + 0.20 * 0) / (0.30 + 0.20) = 60, below the recorded threshold of 95.",
+    "stable_boundary": "Unavailable flakiness, resource and visual dimensions have not passed. Unrepresented HARD dimensions are not demonstrated. Synthetic display values and status=ran do not authenticate application execution."
+  },
+  "integrity_and_trace_checks": {
+    "request_sha256_matches_packet": true,
+    "all_five_fixture_hashes_match_packet": true,
+    "both_helper_receipt_hashes_match_packet": true,
+    "all_helper_source_hashes_match_frozen_scorers": true,
+    "all_helper_input_hashes_match_current_fixtures": true,
+    "all_six_artifact_hashes_match_receipts": true,
+    "all_six_tool_trace_hashes_match_receipts": true,
+    "all_six_elapsed_values_recomputed_from_timestamps": true,
+    "all_six_under_300_seconds": true,
+    "all_tool_events_inside_respective_trial_windows": true,
+    "all_claimed_source_fixture_and_receipt_reads_present": true,
+    "trace_read_coverage_method": "Decoded every tool-event payload and verified that the complete current contents of each claimed source, fixture and arm receipt occur in recorded tool outputs.",
+    "observed_operations": "Only local cat, rg and ls reads/listings. No helper execution, test execution, mutation, network or delegation appears in the model traces.",
+    "limitations": [
+      "These traces show observed behavior, not enforced filesystem isolation.",
+      "Hash agreement verifies supplied artifact consistency, not independently authenticated serving identity or provenance.",
+      "Receipt metadata claims unchanged parent saving; the supplied tool-event traces do not contain the final assistant messages needed to independently compare pre-save and saved final text.",
+      "The packet still says prepared-not-executed; per-trial receipts and traces provide execution evidence, so that packet status is stale."
+    ]
+  },
+  "recovery_and_check_obligations": {
+    "judgment": "Adequately identified across all six artifacts; not executed.",
+    "required": [
+      "Preserve original evidence and resolve unknown classification from baseline evidence without deleting or relabeling it merely to pass.",
+      "For actual HARD regressions, establish green-to-red evidence and 3/3 reproducibility before bisecting; authorized fixes require shrinking blockers and final full-battery re-gating.",
+      "Treat visual failures as SCORE differential investigations, not automatic HARD bisect.",
+      "Validate the persisted ledger and re-screen the exact pinned predicate before resume.",
+      "Prevent convergence while relevant errors, unresolved failures, coverage gaps or pending independent verification remain.",
+      "Keep unknown TSV classification distinct from orchestrator unknown units and their repeated-cycle blocking rule.",
+      "Do not infer ship authorization from STABLE."
+    ],
+    "preservation_supported": "The supplied helper receipts report scorer input preservation and scratch cleanup; matching input hashes corroborate current fixture identity.",
+    "preservation_not_supported": "Orchestrator recovery, check-state preservation, ledger mutation correctness, resume behavior and successful convergence remain untested."
+  },
+  "missing_frozen_facets": [
+    {
+      "facet": "Executed lawful legacy classification alias equivalence",
+      "missing_evidence": "A matching fixture pair using classification=eligible and classification=regression-eligible, with actual helper receipts. All supplied TSV rows use regression-eligible except the intentionally unknown row.",
+      "impact": "Visual alias equivalence is demonstrated, but the complete lawful-alias acceptance clause cannot be closed from these five fixtures."
+    },
+    {
+      "facet": "Breadth of unknown-value rejection",
+      "missing_evidence": "The supplied negative fixture covers unknown classification only; no unknown dimension execution is supplied.",
+      "impact": "The narrow claim unknown classification does not turn green is demonstrated for B. A general unknown-values rejection claim would exceed these receipts."
+    }
+  ],
+  "model_versus_parent_scope": {
+    "model": "Six read-only interpretation artifacts. A models correctly diagnose and refuse unsafe helper output; B models correctly interpret safer helper output. No model autonomously executed scoring, repaired state, saved a durable artifact, or completed an orchestrator loop.",
+    "parent": "Prepared synthetic fixtures and arm-specific helper receipts, then saved final model artifacts according to receipt metadata.",
+    "acceptance_separation": "A model judgment can pass while the A deterministic helper fails. Three model interpretations of the same arm receipt are not three independent helper executions.",
+    "broader_parent_goal": "This review cannot close full CEOPT-01 frozen acceptance, remaining skills, runtime integration, field outcomes or publication."
+  },
+  "comparison_limits": [
+    "Both arms achieve 3/3 correct scoped model decisions; these artifacts do not demonstrate a model-quality superiority claim.",
+    "The deterministic helper shows a concrete improvement on three supplied negative cases, separate from model judgment quality.",
+    "A and B consume different helper receipts and regression contracts; this is not an isolated prompt-only comparison.",
+    "Trial starts follow A1, B1, B2, A2, A3, B3, but A3 and B3 overlap. Treat timing as deadline admission, not a controlled sequential latency experiment.",
+    "Three repetitions per arm, synthetic fixed fixtures, unauthenticated serving identity and absent token/cost measurements do not establish generalized quality, latency or cost improvement.",
+    "No real application, visual rendering, upstream baseline capture, orchestrator recovery or deployment outcome is demonstrated."
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "id": "CEOPT-22",
+  "skill": "spec-prototype",
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/CEOPT-22-request.txt",
+  "request_sha256": "cec3c0b123c95aface8f3d68c5c414c364527e31c8f3a44d33c7885e66f34ca7",
+  "input_files": {},
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "deadline_seconds": 300,
+  "parent_recipe": "Save exact read-only response; independently review all supplied actual/local/synthetic evidence. No model autonomous browser operation.",
+  "status": "prepared-not-executed",
+  "limitations": [
+    "Synthetic local page/feedback and parent execution do not prove product visual acceptance, human decisions or autonomous browser workflow."
+  ],
+  "arm_receipts": {
+    "A": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/prototype-A-receipts.json",
+      "sha256": "391cc8683a2cbd83c847aa622f1f29685ea25b5f6f4a706c04b664a63c74cbeb"
+    },
+    "B": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/prototype-B-receipts.json",
+      "sha256": "53485ba4260edada4819bb34f4d76e204af5585e94f0613ef3ee6d2ba7c9bd8f"
+    }
+  }
+}

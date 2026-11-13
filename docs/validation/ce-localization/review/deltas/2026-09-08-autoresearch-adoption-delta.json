@@ -1,0 +1,1279 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "2026-09-08-autoresearch-adoption-delta",
+  "producer": "maintenance session agent (inline full-text review of the newly canonical autoresearch skill package and its two direct-support paths)",
+  "reviewed_at": "2026-09-08T00:00:00.000Z",
+  "source_binding": {
+    "head": "5e459ab8ab5c1db2f72b17273cbeb7b3361f1eaa",
+    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source_tree_hash": "cb91485ed621270f4105fd813a963b8c87a49700f60457dac480ffe7bd656327",
+    "inventory_hash": "e728c63ebaf1bd4290dbd2bbcedbbcb332033b8c443ebc6f52f95f3389f79f42",
+    "inventory_artifact_sha256": "8307033c4e749416555c980fc473b0625e3ff9e197fe29c31e1f96fb7a9d9961",
+    "review_input_hash": "aae1c6697e6d2ef5d89d0b851dbb70a822c95dd96ed5e0b7685f03978708ca3b"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "unverified",
+    "worker_context_isolation": "unknown"
+  },
+  "reviewed_paths": [
+    {
+      "path": "skills/autoresearch/agents/openai.yaml",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "4c0cfc461b870bbe9bfec557beb7e335841c09a780c6b07329825e3fc2aeb961",
+      "bytes": 250,
+      "line_count": 8,
+      "covered_line_ranges": [
+        [
+          1,
+          8
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/autoresearch.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "970be21cf52c450ec55f22f80a029ef83bb8eb12e84e1baf6feab65885687c00",
+      "bytes": 4891,
+      "line_count": 110,
+      "covered_line_ranges": [
+        [
+          1,
+          110
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/debug.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "f95104f9c43e0d073d3776cb071cbadba2896744d36652320ad9a59b29f827c5",
+      "bytes": 4074,
+      "line_count": 97,
+      "covered_line_ranges": [
+        [
+          1,
+          97
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/evals.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "09e04e2b631f8e4b64860e32e2fd5b96a046276ce0de0f6c1381887e5b2dbb5b",
+      "bytes": 5171,
+      "line_count": 118,
+      "covered_line_ranges": [
+        [
+          1,
+          118
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/evals/cases/dispatch-classic-mode.yaml",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "40d7b515f8512db4973bd11552d46a7f3d6543e8b54217fa9778b1a67f18204d",
+      "bytes": 908,
+      "line_count": 26,
+      "covered_line_ranges": [
+        [
+          1,
+          26
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/evals/cases/screen-cmd-refuses-unsafe-predicate.yaml",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "2f82416923f813ecb3d5af661d32899909fc7ab597d36fae7609cc5886c54831",
+      "bytes": 842,
+      "line_count": 19,
+      "covered_line_ranges": [
+        [
+          1,
+          19
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/evals/cases/ship-never-auto-approves.yaml",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "73d93210b5ceaa6b312a46f51138ae353413ce9a073254fabc4ac61421cdc425",
+      "bytes": 1108,
+      "line_count": 21,
+      "covered_line_ranges": [
+        [
+          1,
+          21
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/evals/eval.yaml",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "fb90699f9c098bd25b36ab56da02dc0cb449cf4bd24aa7d90372bc1001dffcc1",
+      "bytes": 408,
+      "line_count": 24,
+      "covered_line_ranges": [
+        [
+          1,
+          24
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "eval 配置三 case 均为安全调度合同（banner/mode、ship gate、screen-cmd 拒绝），judge 全部 script 型，与 evals.md 治理口径一致。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/evals/fixtures/repos/empty-repo/README.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "c226a12e187142c6e718b6dca84e148cbea9b6a4e4ee12828c5cdc27eb29db3a",
+      "bytes": 51,
+      "line_count": 3,
+      "covered_line_ranges": [
+        [
+          1,
+          3
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/evals/fixtures/scripts/check-classic-banner.sh",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "1a872369c4d9e9e28f1d82ddf6ff4fa24bbe7d4e1e21f8dd4145ead3671eb5a0",
+      "bytes": 825,
+      "line_count": 26,
+      "covered_line_ranges": [
+        [
+          1,
+          26
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/evals/fixtures/scripts/check-screen-refusal.sh",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "cf6e0d5c05968c362539a83e658d5dfed5bcea881ff1320449ea010d59a3be98",
+      "bytes": 866,
+      "line_count": 20,
+      "covered_line_ranges": [
+        [
+          1,
+          20
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/evals/fixtures/scripts/check-ship-gate.sh",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "7a3e21bfcb55c0d9e22406f34c7b3a05beeaf758634a588cad7052c6759fa586",
+      "bytes": 1250,
+      "line_count": 25,
+      "covered_line_ranges": [
+        [
+          1,
+          25
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "ship gate 断言双向：必须出现需要批准/拒绝自动部署语义，且不得宣称已部署；与 never-auto-approve 不变量一致。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/fix.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "e83f8a34be9cc61089d3fa0cad93398e028b2bee2fbabe56b3b92a0523df7833",
+      "bytes": 4410,
+      "line_count": 102,
+      "covered_line_ranges": [
+        [
+          1,
+          102
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/improve.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "49a1f0de1b81d7455bf29da9f6ba9729ef611e383fcb732d801e675c65321b22",
+      "bytes": 6169,
+      "line_count": 116,
+      "covered_line_ranges": [
+        [
+          1,
+          116
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/learn.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "6d336d9b1294cf0af825ed1b23db9fca05e06c097b776079ea034d88292a8e8d",
+      "bytes": 8082,
+      "line_count": 136,
+      "covered_line_ranges": [
+        [
+          1,
+          136
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/plan.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "2970c012d8971a7e2f7b06ae001ecbbfa672641e490489f5a75e996f4ae639a4",
+      "bytes": 2888,
+      "line_count": 95,
+      "covered_line_ranges": [
+        [
+          1,
+          95
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/predict.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "d3b16c4dca37924f4f29fd91fbdcf3906851110907517d60b932eba182cc396e",
+      "bytes": 3825,
+      "line_count": 94,
+      "covered_line_ranges": [
+        [
+          1,
+          94
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/probe.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "e41ceec05a13a24b5af853c8287ded7c680368100963d5a6157e8395062ea4b3",
+      "bytes": 4950,
+      "line_count": 116,
+      "covered_line_ranges": [
+        [
+          1,
+          116
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/reason.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "73025217ff63d2cc6f1906f28ab2221fccdff190780ee6e45751800e522e76a9",
+      "bytes": 4782,
+      "line_count": 109,
+      "covered_line_ranges": [
+        [
+          1,
+          109
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/references/orchestrator-routing.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "53ec4f48e88318812d7e2ddc51b993c44d9843000972c0e68aa24fb36158d240",
+      "bytes": 6989,
+      "line_count": 89,
+      "covered_line_ranges": [
+        [
+          1,
+          89
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "9 原型表与 orchestrate.sh ARCHETYPES 逐行一致（抽查全部 9 行）；歧义时向用户呈现候选，不静默定案。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/references/predict-personas.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "c8440a3cfb02d15c2286fd12ca318cc2c060adaa05320d5648c9214c07d008ce",
+      "bytes": 3145,
+      "line_count": 65,
+      "covered_line_ranges": [
+        [
+          1,
+          65
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/references/reason-judge-protocol.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "5a56791e32c7604a10753ca8fe14aa92768d65b8e0e264fbe3bb2da616c25253",
+      "bytes": 3508,
+      "line_count": 87,
+      "covered_line_ranges": [
+        [
+          1,
+          87
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/references/security-checklist.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "30cbf18e1509b90b0e621fe270b63d592af13b2addc7bd15d5b89633989f8c31",
+      "bytes": 3524,
+      "line_count": 76,
+      "covered_line_ranges": [
+        [
+          1,
+          76
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "STRIDE+OWASP 清单为标准内容，无误导性安全建议。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/regression.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "ee35475150cbc6a3d41a9f094cc589c414af38ad67c070f8f801cd896ed85b68",
+      "bytes": 9393,
+      "line_count": 110,
+      "covered_line_ranges": [
+        [
+          1,
+          110
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/scenario.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "170e3f0cd1bb62c8a494373b36d6bcb90f9ffaf6a0efa658f829640145d625ca",
+      "bytes": 4208,
+      "line_count": 106,
+      "covered_line_ranges": [
+        [
+          1,
+          106
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/scripts/orchestrate.sh",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "ece1680cabcefd68ef10c954a244b5d9619c051a98c7841473e75c4ea6cbdcab",
+      "bytes": 12523,
+      "line_count": 304,
+      "covered_line_ranges": [
+        [
+          1,
+          304
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "确定性 seam 实测：classify(\"fix the failing login tests\")→fix-broken/loop；screen-cmd 拒绝 curl|sh（exit 2）、拒绝 prod DB URL（锚定 allowlist 报告 host/dbname 原因）、放行 npm test；exit code 合同 0/2/1 与文档一致。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/scripts/score-regression.sh",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "d6652ecbfd4e38325ccf9f9ecd05ca0bd093ac5d704624b9667241be3b1e9722",
+      "bytes": 3798,
+      "line_count": 104,
+      "covered_line_ranges": [
+        [
+          1,
+          104
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "regression 结果 TSV 评分器；usage/verdict 子命令口径与 regression.md 一致，未发现问题。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/security.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "365f3229a45c1765ea1b69517d6d3e3acdadc9a9fa85b7010dab6ee886fd77be",
+      "bytes": 4697,
+      "line_count": 101,
+      "covered_line_ranges": [
+        [
+          1,
+          101
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/ship.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "6ab7b91c7009ccdb8801a449c0bf64cfd9ff12c36675cebadfcb9f0f67d1a14c",
+      "bytes": 3996,
+      "line_count": 120,
+      "covered_line_ranges": [
+        [
+          1,
+          120
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "--auto 显式声明为 legacy alias 且 never bypasses explicit-approval gate；8 阶段流程与 rollback 段落一致。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/autoresearch/SKILL.md",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "786f2ccf064fcecc09796f6521c6b803fd318e74b89312082e8a9d3a07de6c34",
+      "bytes": 8784,
+      "line_count": 104,
+      "covered_line_ranges": [
+        [
+          1,
+          104
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "入口合同全文核验：dispatch 表/MODE banner gate/orchestrator 循环与状态账本（orchestrator-state.json additive、handoff.json 单跳桥接）口径一致；安全不变量 8 条与 scripts/orchestrate.sh 实现对应。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全不变量清晰（never push/publish/deploy without approval、bounded by default、结果落盘、链式 handoff）；无敏感信息写入路径；模式未解析时只问一个问题。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "4f08c3cb3aa21d3f858a08f6d9a474e5cbbdacf49d4e6555f4382d3ba9809154",
+      "bytes": 16455,
+      "line_count": 652,
+      "covered_line_ranges": [
+        [
+          1,
+          652
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/ce-localization-review-contracts.test.js",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "b4e95a9a78d7255b3dac7640a2057e7ffde88bdef6e5202394cab75533495bdb",
+      "bytes": 5690,
+      "line_count": 106,
+      "covered_line_ranges": [
+        [
+          1,
+          106
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "canonical 包文件全文核验：与 SKILL.md 入口合同及 subcommand 协议口径一致，无新的工程性可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全/文案面核验：无自动批准出口、无敏感信息写入、无越权网络语义；无新的安全可行动发现。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the maintenance session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    }
+  ],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "execution_context schema (v1) only models the inline-same-context path; this delta was reviewed inline by the maintenance session agent (full-text reads of the newly canonical autoresearch package), not by independent fresh-source dispatched reviewers",
+    "deterministic seam behavior verified by live exercise (classify/next-hop table spot-check, screen-cmd refuse of pipe-to-shell and non-allowlisted DB URL, allow of npm test); deeper subcommand loops were read, not executed",
+    "autoresearch was canonically adopted in 01fad369 (2026-09-04); this delta supplies the lane review coverage the round-3 lanes never received, closing the lane-vs-inventory skill-set gap"
+  ],
+  "claim_ceiling": "Source-bound incremental review of the autoresearch skill package (30 package paths + 2 direct-support paths) only; no field or behavior evidence claim."
+}

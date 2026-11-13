@@ -1,0 +1,290 @@
+{
+  "at": "2026-10-31T06:48:46.956390+00:00",
+  "kind": "parent-record-consistency-check",
+  "execution": "Current retained records and source bytes only; no producer/browser/server rerun.",
+  "checks": [
+    {
+      "name": "10:request-pin",
+      "passed": true
+    },
+    {
+      "name": "10:order",
+      "passed": true
+    },
+    {
+      "name": "10:deadline",
+      "passed": true
+    },
+    {
+      "name": "10:input:docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/page-lifecycle-receipt.json",
+      "passed": true
+    },
+    {
+      "name": "10:input:docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/feedback-fixture.json",
+      "passed": true
+    },
+    {
+      "name": "17:request-pin",
+      "passed": true
+    },
+    {
+      "name": "17:order",
+      "passed": true
+    },
+    {
+      "name": "17:deadline",
+      "passed": true
+    },
+    {
+      "name": "17:input:docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/page-lifecycle-receipt.json",
+      "passed": true
+    },
+    {
+      "name": "17:input:docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/feedback-fixture.json",
+      "passed": true
+    },
+    {
+      "name": "17:arm_receipts:A",
+      "passed": true
+    },
+    {
+      "name": "17:arm_receipts:B",
+      "passed": true
+    },
+    {
+      "name": "22:request-pin",
+      "passed": true
+    },
+    {
+      "name": "22:order",
+      "passed": true
+    },
+    {
+      "name": "22:deadline",
+      "passed": true
+    },
+    {
+      "name": "22:arm_receipts:A",
+      "passed": true
+    },
+    {
+      "name": "22:arm_receipts:B",
+      "passed": true
+    },
+    {
+      "name": "29:request-pin",
+      "passed": true
+    },
+    {
+      "name": "29:order",
+      "passed": true
+    },
+    {
+      "name": "29:deadline",
+      "passed": true
+    },
+    {
+      "name": "29:input:docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/browser-policy-successor/browser-local-receipt.json",
+      "passed": true
+    },
+    {
+      "name": "29:input:docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/browser-policy-successor/browser-positive-run.json",
+      "passed": true
+    },
+    {
+      "name": "29:input:docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/browser-policy-successor/browser-positive-cleanup.json",
+      "passed": true
+    },
+    {
+      "name": "29:arm_receipts:A",
+      "passed": true
+    },
+    {
+      "name": "29:arm_receipts:B",
+      "passed": true
+    },
+    {
+      "name": "29:arm_order_receipts:A",
+      "passed": true
+    },
+    {
+      "name": "29:arm_order_receipts:B",
+      "passed": true
+    },
+    {
+      "name": "page-source:version-B.html",
+      "passed": true
+    },
+    {
+      "name": "page-source:server.cjs",
+      "passed": true
+    },
+    {
+      "name": "page-source:version-A.html",
+      "passed": true
+    },
+    {
+      "name": "page:same-port-new-pid",
+      "passed": true
+    },
+    {
+      "name": "page:current-http-identity",
+      "passed": true
+    },
+    {
+      "name": "page:stale-before-reload-current-after",
+      "passed": true
+    },
+    {
+      "name": "page:all-browser-commands-success",
+      "passed": true
+    },
+    {
+      "name": "page:recorded-cleanup",
+      "passed": true
+    },
+    {
+      "name": "A:polish-source",
+      "passed": true
+    },
+    {
+      "name": "A:polish-web4300",
+      "passed": true
+    },
+    {
+      "name": "A:polish:missing-port",
+      "passed": true
+    },
+    {
+      "name": "A:polish:missing-type",
+      "passed": true
+    },
+    {
+      "name": "A:prototype-source",
+      "passed": true
+    },
+    {
+      "name": "A:prototype:unauthenticated-identity",
+      "passed": true
+    },
+    {
+      "name": "A:prototype:wrong-token-identity",
+      "passed": true
+    },
+    {
+      "name": "A:prototype:authenticated",
+      "passed": true
+    },
+    {
+      "name": "A:prototype:stopped",
+      "passed": true
+    },
+    {
+      "name": "A:prototype:restart-current",
+      "passed": true
+    },
+    {
+      "name": "A:prototype:command-exits",
+      "passed": true
+    },
+    {
+      "name": "A:browser-source",
+      "passed": true
+    },
+    {
+      "name": "A:browser:close0",
+      "passed": true
+    },
+    {
+      "name": "A:browser:close9-characterization",
+      "passed": true
+    },
+    {
+      "name": "A:browser:vitals-order-characterization",
+      "passed": true
+    },
+    {
+      "name": "B:polish-source",
+      "passed": true
+    },
+    {
+      "name": "B:polish-web4300",
+      "passed": true
+    },
+    {
+      "name": "B:polish:missing-port",
+      "passed": true
+    },
+    {
+      "name": "B:polish:missing-type",
+      "passed": true
+    },
+    {
+      "name": "B:prototype-source",
+      "passed": true
+    },
+    {
+      "name": "B:prototype:unauthenticated-identity",
+      "passed": true
+    },
+    {
+      "name": "B:prototype:wrong-token-identity",
+      "passed": true
+    },
+    {
+      "name": "B:prototype:authenticated",
+      "passed": true
+    },
+    {
+      "name": "B:prototype:stopped",
+      "passed": true
+    },
+    {
+      "name": "B:prototype:restart-current",
+      "passed": true
+    },
+    {
+      "name": "B:prototype:command-exits",
+      "passed": true
+    },
+    {
+      "name": "B:browser-source",
+      "passed": true
+    },
+    {
+      "name": "B:browser:close0",
+      "passed": true
+    },
+    {
+      "name": "B:browser:close9-characterization",
+      "passed": true
+    },
+    {
+      "name": "B:browser:vitals-order-characterization",
+      "passed": true
+    },
+    {
+      "name": "polish-cleanup.json:recorded-and-current-absence",
+      "passed": true
+    },
+    {
+      "name": "prototype-cleanup.json:recorded-and-current-absence",
+      "passed": true
+    },
+    {
+      "name": "browser-close-fixture-cleanup.json:recorded-and-current-absence",
+      "passed": true
+    }
+  ],
+  "all_checks_passed": true,
+  "independent_review": "pending; parent checking is not independent review",
+  "model_acceptance": "not-run for all four Wave5 blocks",
+  "limits": [
+    "Matching current hashes do not authenticate historical serving identity or prove historical immutability.",
+    "Page lifecycle is shared synthetic evidence, not an A/B browser producer comparison.",
+    "Historical real-browser positive is B-produced only; fake close controls do not prove browser enforcement.",
+    "Characterized A failures are expected observations, not acceptance passes.",
+    "Screenshots are retained but this check makes no visual-quality judgment.",
+    "No actual product UI, human approval, Figma comparison, autonomous workflow or field benefit is demonstrated."
+  ]
+}

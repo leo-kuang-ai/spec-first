@@ -1,0 +1,6 @@
+# consumers: spec-dogfood
+tests/unit/ce-localization-round-1-remediation-contracts.test.js
+tests/unit/dispatch-authorization-matrix-contracts.test.js
+tests/unit/mutation-authority-contracts.test.js
+tests/unit/plugin-modules.test.js
+tests/unit/spec-worktree-contracts.test.js

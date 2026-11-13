@@ -1,0 +1,32 @@
+{
+  "id": "CEOPT-25",
+  "skill": "spec-runtime-setup",
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/CEOPT-25-request.txt",
+  "request_sha256": "37f21d4dd1214b9d6a9b742478ffe7b40bfaea8b5c175732715f07c5d6850de6",
+  "arm_receipts": {
+    "A": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/runtime-A-receipts.json",
+      "sha256": "3d419384fb31c7f30657b8bd9ae3b0955db02a323263e05740058f9aa0903b1a"
+    },
+    "B": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/runtime-B-receipts.json",
+      "sha256": "29b494ed9f10204510f82d84e76d750e7124d45f59c85f862e7bdff54dd28f50"
+    }
+  },
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "deadline_seconds": 300,
+  "parent_recipe": "Supply only assigned-arm pinned source and actual operation receipts. Save exact model response; independently review all cases. No model mutation or external operation.",
+  "acceptance_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-25",
+  "status": "prepared-not-executed",
+  "limitations": [
+    "Parent-operated mechanism outcomes and model interpretation are separate evidence facets.",
+    "No autonomous mutation, real remote connector or host installation is established."
+  ]
+}

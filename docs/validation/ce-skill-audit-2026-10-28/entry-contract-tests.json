@@ -1,0 +1,11 @@
+{
+  "command": [
+    "node",
+    "node_modules/jest/bin/jest.js",
+    "--runInBand",
+    "--runTestsByPath",
+    "tests/unit/using-spec-first-contracts.test.js"
+  ],
+  "exit_code": 0,
+  "claim": "当前源码合同检查，非host routing eval"
+}

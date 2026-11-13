@@ -1,0 +1,15 @@
+{
+  "expectations": [
+    {
+      "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/fixtures/scripts/check-r2-safety-stays.sh",
+      "passed": true,
+      "evidence": "PASS: invalid JSON rejected, process survives, valid entries preserved, no new reachable commit"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 0,
+    "total": 1,
+    "pass_rate": 1
+  }
+}

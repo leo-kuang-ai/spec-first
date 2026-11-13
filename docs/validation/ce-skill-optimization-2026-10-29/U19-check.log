@@ -1,0 +1,11 @@
+PASS tests/unit/spec-brainstorm-clarification-contracts.test.js
+PASS tests/unit/spec-brainstorm-contracts.test.js
+PASS tests/unit/spec-brainstorm-visual-retirement-contracts.test.js
+PASS tests/unit/spec-prd-plan-handoff-contracts.test.js
+PASS tests/unit/settled-decisions-contracts.test.js
+
+Test Suites: 5 passed, 5 total
+Tests:       21 passed, 21 total
+Snapshots:   0 total
+Time:        0.543 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/spec-brainstorm-contracts.test.js|tests\/unit\/spec-brainstorm-clarification-contracts.test.js|tests\/unit\/spec-brainstorm-visual-retirement-contracts.test.js|tests\/unit\/settled-decisions-contracts.test.js|tests\/unit\/spec-prd-plan-handoff-contracts.test.js/i.

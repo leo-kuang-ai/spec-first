@@ -4,17 +4,17 @@ type: refactor
 status: active
 date: 2026-07-06
 spec_id: 2026-07-06-001-skill-prompt-slimming
-origin: docs/项目审查/2026-07-06-真实状态与提升优先级.md
+origin: docs/project-reviews/2026-07-06-真实状态与提升优先级.md
 origin_grade: legacy
 origin_verification_status: not-applicable
 origin_verification_reason_codes: []
 referenced_reviews:
-  - path: docs/项目审查/2026-07-06-真实状态与提升优先级.md
+  - path: docs/project-reviews/2026-07-06-真实状态与提升优先级.md
     role: origin
     scope: in
     addresses_findings: ["skill-prompt-bloat", "deterministic-floor-not-downshifted"]
     deferred_findings: ["run-evidence-not-consumed"]
-  - path: docs/项目审查/2026-07-06-skill-prompt-精简优化方案.md
+  - path: docs/project-reviews/2026-07-06-skill-prompt-精简优化方案.md
     role: refinement
     scope: in
     addresses_findings: ["reuse-spec-plan-progressive-disclosure-pattern", "downshift-task-pack-validation-prose-to-cli", "avoid-duplicating-context-governance-path-lists"]
@@ -42,14 +42,14 @@ split_to: docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-p
 
 ## 问题框架
 
-`docs/项目审查/2026-07-06-真实状态与提升优先级.md` 指出当前最高优先级问题不是代码质量，而是 skill prompt 膨胀：38 个 skill 合计 10,628 行，`spec-code-review/SKILL.md` 1,241 行，`spec-work/SKILL.md` 579 行。
+`docs/project-reviews/2026-07-06-真实状态与提升优先级.md` 指出当前最高优先级问题不是代码质量，而是 skill prompt 膨胀：38 个 skill 合计 10,628 行，`spec-code-review/SKILL.md` 1,241 行，`spec-work/SKILL.md` 579 行。
 
 需要区分两层 premise，避免把假设当既定事实：
 
 - **已证实的维护性 premise（confirmed）：** 1,241 行单体、跨 6 个 skill 逐字重复的治理段落、超出 Anthropic 建议的 500 行上限——这些是 `wc -l` 与直接读源可复核的事实，是本计划的主要依据。
 - **待验证的用户影响 premise（hypothesis）：** 「主 prompt 过重 → 挤压用户代码/plan/source/test context → 后置规则在长上下文中被漏读 → not-run 升高」是 origin（`origin_grade: legacy`、`origin_verification_status: not-applicable`）的推测性因果链，尚无 run-evidence 证实。本计划**不把它当既定事实**：pilot 只赌「维护性提升 + 行为无回归」，not-run 率与 review 质量改善的验证归后续 stats 计划（见 U0 baseline 与后续工作）。
 
-这不是单纯压缩文字的问题。按 `docs/10-prompt/结构化项目角色契约.md`，正确方向是：
+这不是单纯压缩文字的问题。按 `docs/methodology/结构化项目角色契约.md`，正确方向是：
 
 - Light contract：主入口保持轻、明确、可维护。
 - Explicit boundaries：source-of-truth、generated runtime、provider、artifact、consumer 边界不能被瘦身稀释。
@@ -61,7 +61,7 @@ split_to: docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-p
 
 ## 2026-07-06 优化方案补充综合
 
-`docs/项目审查/2026-07-06-skill-prompt-精简优化方案.md` 对本计划有三点应采纳的修正：
+`docs/project-reviews/2026-07-06-skill-prompt-精简优化方案.md` 对本计划有三点应采纳的修正：
 
 - **先复用已验证模式，而不是重新证明 progressive disclosure。** `spec-plan` 已经采用 `STOP. Before X, read references/Y.md` 的 spine + references 模式，并有 contract test 守护 runtime projection。后续实现应复制这个触发语气、路径投射断言和 reference integrity 检查，而不是发明新的 prompt-budget 机制。
 - **先做 deterministic floor downshift。** `spec-work` task-pack intake 中重复描述 hash、`spec_id`、Task Pack Contract 结构等规则，是把脚本职责写回 prompt。第一个 workflow-prompt refactor PR 应先把这部分压成 CLI handoff contract：运行 `spec-first tasks validate <task-pack-path> --json`，只有 `deterministic_handoff: true` 才进入语义执行判断；失败时按 `reason_code` 停止并交还 handoff envelope。
@@ -74,7 +74,7 @@ split_to: docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-p
 
 ## Activation-L1 Description 维度：已拆分到 follow-up plan
 
-`docs/项目审查/2026-07-06-skill-prompt-精简优化方案.md` §10-11 引入了与本计划 Body 正文瘦身**正交**的维度：**Activation-L1 description 索引税**（每次对话无条件付的常驻税，实测常驻 metadata 约 6,200 tokens）。
+`docs/project-reviews/2026-07-06-skill-prompt-精简优化方案.md` §10-11 引入了与本计划 Body 正文瘦身**正交**的维度：**Activation-L1 description 索引税**（每次对话无条件付的常驻税，实测常驻 metadata 约 6,200 tokens）。
 
 该维度触及 pilot 两个 skill 之外的多个 skill（description offender 压缩、`lint-skill-entrypoints` 系统级治理、相邻 workflow route collision fixtures），blast radius 与问题性质都不同于 Active body 瘦身。为让本计划回归「最小可验证第一刀」的单维度定位、closeout 只报 body 收益，**Activation-L1 维度（原 R11-R13 / U9-U11）已拆分到独立 follow-up plan**：
 
@@ -184,9 +184,9 @@ split_to: docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-p
 - target_repo: `.`
 - evidence_sources: direct source reads, `rg`, `find`, `wc -l`, Graphify query advisory, CodeGraph advisory, `spec-first internal task-governance-signals`, git status
 - source_refs:
-  - `docs/项目审查/2026-07-06-真实状态与提升优先级.md`
-  - `docs/项目审查/2026-07-06-skill-prompt-精简优化方案.md`
-  - `docs/10-prompt/结构化项目角色契约.md`
+  - `docs/project-reviews/2026-07-06-真实状态与提升优先级.md`
+  - `docs/project-reviews/2026-07-06-skill-prompt-精简优化方案.md`
+  - `docs/methodology/结构化项目角色契约.md`
   - `skills/spec-work/SKILL.md`
   - `skills/spec-code-review/SKILL.md`
   - `skills/spec-plan/SKILL.md`
@@ -250,7 +250,7 @@ split_to: docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-p
 
 ### 已有经验
 
-- `docs/项目审查/2026-05-07-skill-agent-prompt-expert-review.md` 已建议 main `SKILL.md` 保留 Purpose、Trigger、Non-trigger、Inputs、Outputs、Workflow skeleton、Failure Modes 和 References，并用显式 STOP triggers 延迟复杂细节。
+- `docs/project-reviews/2026-05-07-skill-agent-prompt-expert-review.md` 已建议 main `SKILL.md` 保留 Purpose、Trigger、Non-trigger、Inputs、Outputs、Workflow skeleton、Failure Modes 和 References，并用显式 STOP triggers 延迟复杂细节。
 - `docs/11-业界调研/spec-first-skills-优化方案-基于16个思维模型.md` 增加了 Body-L1/Body-L2/Body-L3 区分：Body-L1 留在 spine，Body-L2 带 deterministic STOP triggers 进入 references，Body-L3 删除。
 - `docs/11-业界调研/spec-first-skills-优化方案-50轮深度审查报告.md` 提醒 progressive disclosure 的失败点是 trigger failure，而不是 reference 数量。每次 extraction 都需要 `trigger_condition`、`must_read`、`fallback_if_unread` 和 `eval_case`。
 
@@ -266,7 +266,7 @@ split_to: docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-p
 - **清单：** 现有 owner 包括 `skills/retired-skill-review/references/skill-authoring-quality.md`、`skills/spec-plan/references/plan-sections.md`、`src/cli/task-pack.js`、`src/cli/plugin.js` 和 workflow-specific reference directories。
 - **决策：** 扩展现有 owner，而不是创建新的 prompt-budget contract 或 schema。audit rubric 拥有 skill quality language，各 workflow 拥有自己的 spine/reference split，CLI validator 拥有 deterministic task-pack facts。
 - **真相源：** Source 变更位于 `skills/`、`src/cli/`、`tests/`、`docs/plans/` 和 `CHANGELOG.md`。
-- **拒绝的 owner：** 不把 prompt-budget 规则放进 `docs/10-prompt/结构化项目角色契约.md`；角色契约拥有 value boundaries，不拥有 execution details。不把所有细节放进 `docs/contracts/context-governance.md`；该文档拥有 context exclusions 和 trust boundaries，不拥有 per-skill prompt architecture。
+- **拒绝的 owner：** 不把 prompt-budget 规则放进 `docs/methodology/结构化项目角色契约.md`；角色契约拥有 value boundaries，不拥有 execution details。不把所有细节放进 `docs/contracts/context-governance.md`；该文档拥有 context exclusions 和 trust boundaries，不拥有 per-skill prompt architecture。
 - **实现阶段复查：** 实现前重新运行 skill line counts，并检查最新 `spec-work` / `spec-code-review` 文本。如果其他分支已经瘦身目标 skill，优先扩展已有结构，而不是重新 extraction。
 
 ---
@@ -391,7 +391,7 @@ flowchart TB
 - 不新建 CLI、不改 skill、不建消费层；若 run.json 不可读或样本过小，记录 `premise_baseline_degraded` 并继续，不阻断 pilot。
 
 **遵循模式：**
-- `docs/项目审查/2026-07-06-真实状态与提升优先级.md` §3.2 的 run evidence 分布统计口径。
+- `docs/project-reviews/2026-07-06-真实状态与提升优先级.md` §3.2 的 run evidence 分布统计口径。
 
 **测试场景：**
 - 正常路径：baseline artifact 产出可复算的 before 分布。
@@ -884,10 +884,10 @@ flowchart TB
 
 ## 来源与参考
 
-- 原始审查：`docs/项目审查/2026-07-06-真实状态与提升优先级.md`
-- 优化审查：`docs/项目审查/2026-07-06-skill-prompt-精简优化方案.md`
-- 角色契约：`docs/10-prompt/结构化项目角色契约.md`
-- 早期 prompt 审查：`docs/项目审查/2026-05-07-skill-agent-prompt-expert-review.md`
+- 原始审查：`docs/project-reviews/2026-07-06-真实状态与提升优先级.md`
+- 优化审查：`docs/project-reviews/2026-07-06-skill-prompt-精简优化方案.md`
+- 角色契约：`docs/methodology/结构化项目角色契约.md`
+- 早期 prompt 审查：`docs/project-reviews/2026-05-07-skill-agent-prompt-expert-review.md`
 - progressive disclosure 深度审查：`docs/11-业界调研/spec-first-skills-优化方案-50轮深度审查报告.md`
 - 16 模型优化报告：`docs/11-业界调研/spec-first-skills-优化方案-基于16个思维模型.md`
 - work skill source：`skills/spec-work/SKILL.md`

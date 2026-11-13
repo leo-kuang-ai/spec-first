@@ -1,0 +1,22 @@
+# manifest: spec-product-pulse
+# frozen: 5b59293b
+4957802c1c1c12e74fec8257207e5e137a5b87c0a4cbfac6f38acf7caa8d597a  skills/spec-product-pulse/SKILL.md
+2ed06d1d8397f9afeca74a428994298394be2176505c2cb9ceeceeb94516b009  skills/spec-product-pulse/evals/cases/check-source-outcomes.yaml
+95952237d7861b19573bd31368a75ed0515cd9cef34dbb9860436b1c0be7d415  skills/spec-product-pulse/evals/cases/unconfigured-guides-setup.yaml
+1e84f2654d3451ba763b8be65a222200c388fd37050636ed17ae7b4952f18e2a  skills/spec-product-pulse/evals/eval.yaml
+4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855  skills/spec-product-pulse/evals/fixtures/repos/mini-ledger/README.md
+03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b  skills/spec-product-pulse/evals/fixtures/repos/mini-ledger/package.json
+ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34  skills/spec-product-pulse/evals/fixtures/repos/mini-ledger/src/server.js
+1ab592f426770e9a737b46cbffc9481ddf464ae2af2ecf5275d99700a6f74672  skills/spec-product-pulse/evals/fixtures/repos/u28-outcomes/.spec-first/config.local.yaml
+e312725b70877a0a02750f9337e96db5e59f733550414f91d958b8c7b2922a9b  skills/spec-product-pulse/evals/fixtures/repos/u28-outcomes/README.md
+1bd7976ddf10d8c4d9399cb90c48a48e7499cf3457f4dc27416603737cd84aaa  skills/spec-product-pulse/evals/fixtures/repos/u28-outcomes/exports/analytics.json
+4fc127a3930438f6e08fbee903226fd2ba70419f2961abf96a173f84dc781e09  skills/spec-product-pulse/evals/fixtures/repos/u28-outcomes/exports/payments.json
+7e810e5fa971e48c9d76ab50e4f417aaf2dd90c0305ce4a14d95b31a62181c71  skills/spec-product-pulse/evals/fixtures/repos/u28-outcomes/prepare-eval.cjs
+1438ee1465137e1f01c3f7b85a3c3d4e1d254ac5bab0814b0cd9f3c98e9459e0  skills/spec-product-pulse/evals/fixtures/scripts/asks-a-question.sh
+ca89af6669010148fc5eaafa6aea19637143033858d4884f9432a5b72cec327c  skills/spec-product-pulse/evals/fixtures/scripts/check-source-outcomes.sh
+6a2890ea49c1f7ee9419a2238c901289e6563c54b2b24b68cbe4bd008b56f5cf  skills/spec-product-pulse/references/config.md
+267e82a1864f23696063dfc81736e86493deae7684a3bdb4aac317a67acff1de  skills/spec-product-pulse/references/interview.md
+7e5c4adfb45554386bcbf0d9deb2645d041253ef7303f71b44b367bccc02277a  skills/spec-product-pulse/references/report-template.md
+30c7a23887bfda09b883b36a0a98ddcc3ddf836f6c78fe52b1081905c0b42e87  skills/spec-product-pulse/references/run.md
+fee9c25a8e22ccc48f617655163cc9bfb57a68dc4002ba850770187db9a84fc3  skills/spec-product-pulse/references/setup.md
+6dfb03fbadd23a5b0e74ef6a425891ca8703943e646994ad450fd1e8d5480427  skills/spec-product-pulse/references/strategy-source.md

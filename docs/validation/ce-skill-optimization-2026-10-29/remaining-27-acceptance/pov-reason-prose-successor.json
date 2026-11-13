@@ -1,0 +1,13 @@
+{
+  "recorded_at": "2026-10-31T10:51:59.909718+00:00",
+  "path": "skills/spec-pov/references/cross-model-panel.md",
+  "before_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-pov/references/cross-model-panel.md",
+  "before_sha256": "8ce220f4e97ad27ba3f7b9b8da8d1b47376bcfc06e721aa1b282b8b18186aece",
+  "successor_sha256": "3f11fca987c1179b1c6bd2b31a2eaf0f2fc3f242f7dbed8e655f01d607a7fc75",
+  "before_text": "Missing receipt returns `provider_serving_receipt_unavailable`.",
+  "successor_text": "For `start`, missing required admission arguments return `provider_serving_receipt_unavailable`; an absent, unreadable, or unsupported receipt at a supplied path returns `provider_serving_receipt_invalid`. With the authenticated producer channel disabled, otherwise eligible `start` calls and all internal `__worker` calls return `provider_serving_receipt_unverified` before provider execution.",
+  "reason": "Source-explained reason-code discrepancy from independent full-six POV review. Documentation only; no producer/adapter behavior change.",
+  "review_ref": "wave6/independent-pov-review.json",
+  "scope": "Current canonical reference only. Frozen A/B, original trials/results unchanged; no runtime refresh or model efficacy claim.",
+  "verification": "Exact replacement shape and unchanged adapter hash; repository entrypoint lint and current-source independent review pending."
+}

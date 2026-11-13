@@ -1,0 +1,8 @@
+{
+  "artifact_type": "generated",
+  "scope": "验证状态可构造性追加版本；非此前 live 受测源码，非行为通过证据",
+  "sha256": {
+    "skills/spec-plan/references/final-review.md": "5fe8ed5ada3e4e060600f1ffd78f02315e97a608f9a8ca0c8d5cd64f49fb36cf",
+    "tests/unit/spec-plan-reference-contracts.test.js": "157637f4bc9da758773050ed20fa51e3adec18f6a01c3e1b6ecdb9b1963ea962"
+  }
+}

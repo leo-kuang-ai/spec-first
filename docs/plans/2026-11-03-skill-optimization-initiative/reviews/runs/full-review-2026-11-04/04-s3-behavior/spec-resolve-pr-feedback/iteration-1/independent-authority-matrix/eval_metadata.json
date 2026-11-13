@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "授权矩阵独立判定且不越项",
+  "prompt": "（我已通过 /spec-resolve-pr-feedback 显式调起该 skill——它已在会话中加载,以下是其本次执行的输入。本地仓库,reviewer 意见如下。）\nreviewer 意见:README 的 \"Known rough edges\" 改成 \"Known limitations\"。\n帮我改掉并本地提交,不用回复 reviewer 也不用推远端。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-resolve-pr-feedback/evals/fixtures/scripts/check-authorized-fix.sh"
+  ]
+}

@@ -1,0 +1,116 @@
+FAIL tests/unit/spec-pov-worker-admission.test.js
+  POV dormant provider admission
+    ✕ direct codex worker cannot bypass serving admission (495 ms)
+    ✕ direct claude worker cannot bypass serving admission (159 ms)
+    ✕ missing receipt never starts a provider through either entrypoint (166 ms)
+    ✕ weak receipt never starts a provider through either entrypoint (155 ms)
+    ✕ forged receipt never starts a provider through either entrypoint (156 ms)
+    ✕ expired receipt never starts a provider through either entrypoint (148 ms)
+
+  ● POV dormant provider admission › direct codex worker cannot bypass serving admission
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      33 |   test.each(['codex', 'claude'])('direct %s worker cannot bypass serving admission', (provider) => {
+      34 |     const result = spawnSync('bash', [adapter, '__worker', provider, 'fixture-model', root, packet, output], { env, encoding: 'utf8', timeout: 5000 });
+    > 35 |     expect(fs.existsSync(marker)).toBe(false);
+         |                                   ^
+      36 |     expect(result.status).not.toBe(0);
+      37 |     expect(result.stderr).toContain('provider_serving_receipt_unverified');
+      38 |     expect(fs.readFileSync(output, 'utf8')).toBe('preserve existing result');
+
+      at toBe (tests/unit/spec-pov-worker-admission.test.js:35:35)
+
+  ● POV dormant provider admission › direct claude worker cannot bypass serving admission
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      33 |   test.each(['codex', 'claude'])('direct %s worker cannot bypass serving admission', (provider) => {
+      34 |     const result = spawnSync('bash', [adapter, '__worker', provider, 'fixture-model', root, packet, output], { env, encoding: 'utf8', timeout: 5000 });
+    > 35 |     expect(fs.existsSync(marker)).toBe(false);
+         |                                   ^
+      36 |     expect(result.status).not.toBe(0);
+      37 |     expect(result.stderr).toContain('provider_serving_receipt_unverified');
+      38 |     expect(fs.readFileSync(output, 'utf8')).toBe('preserve existing result');
+
+      at toBe (tests/unit/spec-pov-worker-admission.test.js:35:35)
+
+  ● POV dormant provider admission › missing receipt never starts a provider through either entrypoint
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      53 |     ]) {
+      54 |       const result = spawnSync('bash', [adapter, ...args], { env, encoding: 'utf8', timeout: 5000 });
+    > 55 |       expect(fs.existsSync(marker)).toBe(false);
+         |                                     ^
+      56 |       expect(result.status).not.toBe(0);
+      57 |       expect(fs.readFileSync(output, 'utf8')).toBe('preserve existing result');
+      58 |       expect(fs.existsSync(env.SPEC_FIRST_PEER_JOBS_ROOT)).toBe(false);
+
+      at toBe (tests/unit/spec-pov-worker-admission.test.js:55:37)
+
+  ● POV dormant provider admission › weak receipt never starts a provider through either entrypoint
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      53 |     ]) {
+      54 |       const result = spawnSync('bash', [adapter, ...args], { env, encoding: 'utf8', timeout: 5000 });
+    > 55 |       expect(fs.existsSync(marker)).toBe(false);
+         |                                     ^
+      56 |       expect(result.status).not.toBe(0);
+      57 |       expect(fs.readFileSync(output, 'utf8')).toBe('preserve existing result');
+      58 |       expect(fs.existsSync(env.SPEC_FIRST_PEER_JOBS_ROOT)).toBe(false);
+
+      at toBe (tests/unit/spec-pov-worker-admission.test.js:55:37)
+
+  ● POV dormant provider admission › forged receipt never starts a provider through either entrypoint
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      53 |     ]) {
+      54 |       const result = spawnSync('bash', [adapter, ...args], { env, encoding: 'utf8', timeout: 5000 });
+    > 55 |       expect(fs.existsSync(marker)).toBe(false);
+         |                                     ^
+      56 |       expect(result.status).not.toBe(0);
+      57 |       expect(fs.readFileSync(output, 'utf8')).toBe('preserve existing result');
+      58 |       expect(fs.existsSync(env.SPEC_FIRST_PEER_JOBS_ROOT)).toBe(false);
+
+      at toBe (tests/unit/spec-pov-worker-admission.test.js:55:37)
+
+  ● POV dormant provider admission › expired receipt never starts a provider through either entrypoint
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      53 |     ]) {
+      54 |       const result = spawnSync('bash', [adapter, ...args], { env, encoding: 'utf8', timeout: 5000 });
+    > 55 |       expect(fs.existsSync(marker)).toBe(false);
+         |                                     ^
+      56 |       expect(result.status).not.toBe(0);
+      57 |       expect(fs.readFileSync(output, 'utf8')).toBe('preserve existing result');
+      58 |       expect(fs.existsSync(env.SPEC_FIRST_PEER_JOBS_ROOT)).toBe(false);
+
+      at toBe (tests/unit/spec-pov-worker-admission.test.js:55:37)
+
+Test Suites: 1 failed, 1 total
+Tests:       6 failed, 6 total
+Snapshots:   0 total
+Time:        1.402 s
+Ran all test suites within paths "tests/unit/spec-pov-worker-admission.test.js".

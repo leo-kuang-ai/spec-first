@@ -1,0 +1,12 @@
+{
+  "checked_at": "2026-10-30T02:36:20.041455+00:00",
+  "observed_paths": 6347,
+  "changed": [],
+  "frozen_input_paths": 122,
+  "input_drift": [],
+  "reviewed_source_paths": 389,
+  "reviewed_source_drift": [],
+  "head_unchanged": true,
+  "index_unchanged": true,
+  "limitation": "Workspace observation began after initial three dispatches, before later trials. It is a before/after observation for subsequent activity, not enforced isolation. See observation-timing.json. Checked before updating current delivery reports or CHANGELOG."
+}

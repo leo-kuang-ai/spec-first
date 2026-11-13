@@ -1,0 +1,28 @@
+PASS tests/unit/spec-code-review-mechanics.test.js
+  spec-code-review mechanical floor
+    ✓ 任务未跟踪文件快照：modify (296 ms)
+    ✓ 任务未跟踪文件快照：delete (306 ms)
+    ✓ 任务未跟踪文件快照：add (284 ms)
+    ✓ 任务未跟踪文件快照：stage (299 ms)
+    ✓ 任务未跟踪文件快照：outside (301 ms)
+    ✓ 任务未跟踪文件快照：symlink (262 ms)
+    ✓ 任务未跟踪文件快照：directory (278 ms)
+    ✓ scope helper fails closed for an invalid endpoint (75 ms)
+    ✓ scope helper distinguishes a small code-only diff from uncounted prose (328 ms)
+    ✓ scope helper freezes the reviewed diff and detects reviewer mutation (391 ms)
+    ✓ findings helper rejects malformed input and applies exact deterministic mechanics (48 ms)
+    ✓ findings helper does not promote fast-pass or unverified peer independence (43 ms)
+    ✓ findings helper demotes high confidence without first evidence (45 ms)
+    ✓ finding 行号 "42" 不能冒充正整数 (40 ms)
+    ✓ finding 行号 "unknown" 不能冒充正整数 (35 ms)
+    ✓ finding 行号 "" 不能冒充正整数 (34 ms)
+    ✓ finding 行号 0 不能冒充正整数 (32 ms)
+    ✓ finding 行号 -1 不能冒充正整数 (33 ms)
+    ✓ finding 行号 true 不能冒充正整数 (33 ms)
+    ✓ finding 行号 1.5 不能冒充正整数 (36 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       20 passed, 20 total
+Snapshots:   0 total
+Time:        3.303 s
+Ran all test suites matching /tests\/unit\/spec-code-review-mechanics.test.js/i.

@@ -1,0 +1,10 @@
+{
+  "session_id": "01a18ba7-5a10-7ea0-b046-f24611a507d1",
+  "agent_path": "/root/judge_ce27_handoff",
+  "review_sha256": "057a287b67a230e0d5e96873ee9be3ebd57119743d3c5b8829597a762ad034f5",
+  "trace_sha256": "fd77d3b34ee8dcf369df4a1b26e93c123c0042f2fa424d879392ec934f983443",
+  "intervention": "Parsed final JSON without semantic edits; original final response retained in full trace.",
+  "limitations": [
+    "Independent context, not independently authenticated model identity or enforced read-only isolation."
+  ]
+}

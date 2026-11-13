@@ -1,0 +1,8 @@
+{
+  "id": "CEOPT-32-positive-paths-initial-failure",
+  "runner_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/verify-worktree-positive-paths-failed-initial.py",
+  "runner_sha256": "e4e371a7b70e66083a769f49a7cbdc9bfa3cf9d6497973fcda41c1c88d11c81d",
+  "failure": "AssertionError at before worktrees == after worktrees; successful intended branch switching changes branch/detached registration metadata.",
+  "first_run_observation_limit": "Initial runner stopped before final results were persisted; no per-case first-run success is claimed. TemporaryDirectory context cleaned on exception.",
+  "recovery": "Preserve raw registrations as observations; compare registered worktree paths/count to test absence of nested/duplicate worktrees. New recovery protocol pins amended runner; original protocol/runner retained."
+}

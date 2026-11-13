@@ -1,0 +1,49 @@
+{
+  "files": [
+    {
+      "archive": "result.json",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/runs/iteration-1/result.json",
+      "sha256": "237fc5fd21140dd7df785ff89d092e0bb322e9174bc99bc9f6e161a8931312a8"
+    },
+    {
+      "archive": "source-delta.json",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/manifest.json",
+      "sha256": "078031b0eaf5fc5e1d09c627b064de574fb5a7b128b530048cfcaa0782eeda37"
+    },
+    {
+      "archive": "runner.log",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/runner.log",
+      "sha256": "2911458aec5343193a5362e255f877c7497c80d88d0891b8965e1ae1d9f1f735"
+    },
+    {
+      "archive": "what-unsettled-blocks-ready/grading.json",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/runs/iteration-1/what-unsettled-blocks-ready/with_skill/grading.json",
+      "sha256": "e0de67ab318f2ef836e204ace88328023c873f41eb3a6b29d206ca3597c23629"
+    },
+    {
+      "archive": "what-unsettled-blocks-ready/response.md",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/runs/iteration-1/what-unsettled-blocks-ready/with_skill/outputs/response.md",
+      "sha256": "84eeab85893df692808d55a0593605e2527d6456659eba2a32a5f6224c1b94a8"
+    },
+    {
+      "archive": "what-unsettled-blocks-ready/2645d403-fd60-4f59-8e3b-2be4110bdb5c.jsonl",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/runs/iteration-1/what-unsettled-blocks-ready/with_skill/outputs/agent/run/2645d403-fd60-4f59-8e3b-2be4110bdb5c.jsonl",
+      "sha256": "e18ba35c551068b99ab6cc6edac517d6c9dfd6570ac27dc41a57da0f8cb9df07"
+    },
+    {
+      "archive": "product-blocker-prevents-readiness/grading.json",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/runs/iteration-1/product-blocker-prevents-readiness/with_skill/grading.json",
+      "sha256": "5909f7afed75af7e9f9144d3df3c7aa2ccda4c9c20c5a0e7c19ec3d2ed6cd33e"
+    },
+    {
+      "archive": "product-blocker-prevents-readiness/response.md",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/runs/iteration-1/product-blocker-prevents-readiness/with_skill/outputs/response.md",
+      "sha256": "40429342d14a75901864af83366c0f9d77f07b3e2dff2abb548681d87d352b7b"
+    },
+    {
+      "archive": "product-blocker-prevents-readiness/b496e49c-eb4e-4b79-9be6-5af280f352af.jsonl",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-bootstrap-owner-20261107-960044_c/runs/iteration-1/product-blocker-prevents-readiness/with_skill/outputs/agent/run/b496e49c-eb4e-4b79-9be6-5af280f352af.jsonl",
+      "sha256": "4c682abaf1a1e1192e6468a935d682036f38a16516a4772fb825ae70e8ce8ae3"
+    }
+  ]
+}

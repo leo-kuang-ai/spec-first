@@ -1,0 +1,56 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "generated_at": "2026-09-20T03:05:08.768512+00:00",
+  "skill_name": "spec-compound-refresh",
+  "source_snapshot": "source-manifest.json",
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "source_paths": [],
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "entry_surface": "workflow_command",
+  "batch": "C2",
+  "closure_tier": "M",
+  "closure_observed": {
+    "files": 25,
+    "bytes": 152137,
+    "read_package_files_at_least_partially": 0,
+    "read_supporting_files_at_least_partially": 0,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "coverage_commitment": "planned-not-run",
+  "dependency_closure": "unknown",
+  "status": "not-run",
+  "reason_codes": [
+    "budget_out_of_scope_this_run"
+  ],
+  "ran": false,
+  "exit_code": null,
+  "command_or_method": [],
+  "source_hashes": {},
+  "evidence_paths": [],
+  "source_refs": [],
+  "owner": "project-lead-cycle-1",
+  "consumers": [
+    "周期1审查汇总"
+  ],
+  "branches": [],
+  "findings": [],
+  "fresh_source_eval": "not-run",
+  "claim_ceiling": "C0",
+  "limitations": [
+    "按方案C2排除，不以浅读替代覆盖。"
+  ],
+  "re_evaluate_when": "后续变更触及该包、升级强制路由入口或另行分配审查范围。",
+  "source_read_ranges": {},
+  "supporting_read_ranges": {},
+  "execution": {
+    "source_semantic_review": "not-run",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "not-run"
+  },
+  "unconfirmed_read_ranges": []
+}

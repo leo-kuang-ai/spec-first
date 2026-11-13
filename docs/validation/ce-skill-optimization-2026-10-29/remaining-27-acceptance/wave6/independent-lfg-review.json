@@ -1,0 +1,198 @@
+{
+  "scenario_id": "CEOPT-14",
+  "review_scope": "Independent read-only review of all six original trials; no sampling, execution, mutation, delegation, network access or new trials.",
+  "overall": {
+    "bounded_model_interpretation": "passed-6-of-6",
+    "candidate_helper_gap_and_control_facets": "passed-within-recorded-synthetic-scope",
+    "full_frozen_acceptance": "partial",
+    "live_pr_recovery": "not-run",
+    "comparative_model_quality_or_speed_benefit": "inconclusive",
+    "recommendation": "Retain the verified candidate gap-reset mechanism and conversation-boundary guidance; withhold full acceptance and relative-benefit claims."
+  },
+  "evidence_aliases": {
+    "E": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance",
+    "RUN": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030",
+    "A": "RUN/inputs/A/spec-lfg",
+    "B": "RUN/inputs/B/spec-lfg"
+  },
+  "coverage": {
+    "all_six_original_artifacts_receipts_and_tool_traces": "read",
+    "each_arm": {
+      "generation_zero_initializations": 2,
+      "gap_observations": 2,
+      "continuous_control_observations": 11
+    },
+    "each_model_artifact": {
+      "both_generation_zero_states": "covered",
+      "both_gap_observations": "covered",
+      "all_eleven_control_observations": "covered",
+      "T-fixed": "covered",
+      "T-declined": "covered",
+      "T-human": "covered",
+      "reply_present": "covered",
+      "reply_absent": "covered",
+      "reply_unavailable": "covered"
+    }
+  },
+  "per_trial": [
+    {
+      "id": "CEOPT-14-A1",
+      "judgment": "passed-bounded-interpretation",
+      "elapsed_seconds": 68.231,
+      "deadline_seconds": 300,
+      "findings": "Correctly rejects A helper's gap-derived false readiness, accounts for every control observation, separates publication/reply/resolution/decision facets, handles every interrupted-reply alternative, and reports incomplete typed decision evidence.",
+      "trace": "Initial output truncated; subsequent bounded reads recover omitted control observations and relevant evidence. Six trace events; read-only commands."
+    },
+    {
+      "id": "CEOPT-14-A2",
+      "judgment": "passed-bounded-interpretation",
+      "elapsed_seconds": 80.79,
+      "deadline_seconds": 300,
+      "findings": "Correctly diagnoses unsupported gap readiness and synthetic control success; preserves all three feedback items and readback alternatives without inventing approval, publication or completion.",
+      "trace": "Initial output truncated; subsequent jq projection exposes all receipt inputs and parsed outputs without truncation. Six trace events; read-only commands."
+    },
+    {
+      "id": "CEOPT-14-A3",
+      "judgment": "passed-bounded-interpretation",
+      "elapsed_seconds": 73.339,
+      "deadline_seconds": 300,
+      "findings": "Correctly rejects gap readiness, enumerates the complete control progression, preserves independent recovery conditions and explicitly identifies missing decision provenance and authoritative thread identity.",
+      "trace": "Initial output truncated; subsequent complete assigned-arm receipt read is untruncated. Six trace events; read-only commands."
+    },
+    {
+      "id": "CEOPT-14-B1",
+      "judgment": "passed-bounded-interpretation",
+      "elapsed_seconds": 104.888,
+      "deadline_seconds": 300,
+      "findings": "Correctly recognizes gap reset with unchanged invocation elapsed time, synthetic advisory control readiness, independent no-code reply authority, publication inspection requirements and unresolved human decision.",
+      "trace": "Initial evidence output truncated; subsequent field extraction covers every observation, with additional bounded receipt reads. Ten trace events; read-only commands.",
+      "minor_caveat": "Candidate decision-option consequences are proposed for investigation, not source-validated product findings; they must remain provisional."
+    },
+    {
+      "id": "CEOPT-14-B2",
+      "judgment": "passed-bounded-interpretation",
+      "elapsed_seconds": 72.251,
+      "deadline_seconds": 300,
+      "findings": "Correctly covers all gap/control observations and all feedback/recovery branches. Adds appropriate visibility, submission, pagination, pending-review and resolution-authority qualifications without treating absent authority as completed action.",
+      "trace": "Initial output truncated; subsequent bounded receipt read recovers omitted control observations. Six trace events; read-only commands."
+    },
+    {
+      "id": "CEOPT-14-B3",
+      "judgment": "passed-bounded-interpretation",
+      "elapsed_seconds": 81.223,
+      "deadline_seconds": 300,
+      "findings": "Correctly reports gap reset, every control observation, exact fix/publication uncertainty, no-code reply independence, all readback branches and incomplete typed decision handoff. Explicitly avoids claiming independently verified execution or hash verification.",
+      "trace": "Initial output truncated; subsequent complementary bounded reads recover all assigned receipt ranges. Eight trace events; read-only commands."
+    }
+  ],
+  "mechanism_findings": [
+    {
+      "owner": "A/scripts/pr-watch-state.cjs",
+      "evidence": "derive(), lines 374-407",
+      "finding": "A retains previous.last_changed_at whenever observation identity is unchanged. observed_at is excluded from observationIdentity. There is no maximum observation-gap check, so two unchanged observations 1800 seconds apart produce quiet_seconds=1800 and looks-ready.",
+      "classification": "Baseline helper defect confirmed by source and supplied receipts, not an A model-task failure."
+    },
+    {
+      "owner": "B/scripts/pr-watch-state.cjs",
+      "evidence": "derive(), lines 380-425; normalize(); output fields",
+      "finding": "B enforces complete checks/review_items arrays, rejects backward timestamps, introduces cadence-30-max-gap-60/v1, resets quiet time on gaps over 60 seconds and legacy-policy observations, and preserves first_observed_at for invocation budget.",
+      "recorded_gap_result": {
+        "generation": 2,
+        "observation_gap_seconds": 1800,
+        "quiet_seconds": 0,
+        "elapsed_seconds": 1800,
+        "quiet_window_reset_reason": "observation-gap",
+        "terminal": "watching"
+      },
+      "limitation": "These receipts exercise gap and continuous-control arithmetic; they do not separately exercise every new rejection or migration branch."
+    },
+    {
+      "owner": "E/wave6/lfg-{A,B}-receipts.json",
+      "finding": "Both cases start at generation zero with null state. Both continuous controls have generations 1-11, timestamps 00:00:00 through 00:05:00 at 30-second intervals, quiet/elapsed values 0,30,60,90,120,150,180,210,240,270,300; generations 1-10 remain watching and generation 11 is looks-ready.",
+      "checks": "All recorded helper exits are zero, stderr is empty, and every stdout JSON equals its corresponding parsed output. Snapshot inputs retain fixed head/base, OPEN/MERGEABLE/CLEAN, successful ci/test and empty review items. No emitted review/CI/head/base/currency events or decisions contradict these facts."
+    },
+    {
+      "owner": "RUN/prepare-watch.py",
+      "finding": "The producer invokes the actual frozen Node helper in separate disposable arm/case state directories using synthetic July timestamps, CAS generation/hash arguments and budget-seconds=10800. It contains no real PR fetch, reply or monitoring wait. Its finally block removes scratch; lfg-cleanup.json records removed=true.",
+      "limitation": "Read-only review inspected this producer without running it. Saved state snapshot files were removed, so their internal chain hashes cannot be independently reconstructed from the retained outputs alone."
+    },
+    {
+      "owner": "B/references/pr-watch-loop.md; review-followup.md; shipping-tail.md",
+      "finding": "B explicitly connects pending conversation actions to caller-owned publication/reply/resolution completion. Publication authority does not grant reply or resolution authority; no-code dispositions have no artificial commit/push dependency; unknown writes require readback; pending or unknown review state blocks conversation writes; needs-human threads remain open.",
+      "boundary": "This is source contract plus successful read-only interpretation, not executed live conversation recovery."
+    }
+  ],
+  "recovery_findings": {
+    "T-fixed": "The fixture reports a local fix SHA and unknown publication. Matching synthetic SHA text cannot prove actual remote reachability, fresh final verification, a reply or thread resolution. All six preserve this uncertainty.",
+    "T-declined": "No code change is required. All six preserve the non-retryable-policy rationale and independent reply authority rather than requiring a cosmetic commit.",
+    "T-human": "All six preserve the unresolved compatibility-versus-rename decision and keep completion blocked. The fixture lacks authoritative source/edit identity, original quoted feedback, investigation, validated options/tradeoffs, authoritative thread URL and a complete bound decision handoff. No actual owner answer exists.",
+    "reply_present": "All six suppress duplicate posting when the synthetic exact body and reply ID are present. B additionally preserves missing live visibility/submission and identity qualifications.",
+    "reply_absent": "All six treat completed synthetic absence as a branch for considering a later authorized controlled retry, not permission to post now. B explicitly requires pagination/visibility and pending-review reconciliation.",
+    "reply_unavailable": "All six retain unknown acceptance and require reliable readback before another POST.",
+    "fabricated_outcomes": "No artifact fabricates user approval, successful publication, actual reply delivery, thread resolution, merge or overall DONE. Synthetic approval metadata is consistently scoped to supplied fixtures."
+  },
+  "pins_and_integrity": {
+    "packet_sha256": "450124cbea6de5838962e4d80521f0872236d99dbd52f904c27cc7f72a62c152",
+    "packet_matches_input_index": true,
+    "request_sha256": "0f42ac828e73add735017301f7299578aae828a4c50b53166b54dc95558ad06e",
+    "fixture_sha256": "ed657e04804a619af384adfa73f826a635e058988fb1f1e94ba1a6fb4adab6f3",
+    "arm_receipts": {
+      "A": "59ebf34ee2aafbe61e9e78ae86a3e283750489f994087077dfe1f79bb8fe79d5",
+      "B": "b9c9f1631fef4052e38e156426d60264b34c2c9f020720ca768c07886a11b255"
+    },
+    "skill_entry_sha256_both_arms": "6bd097a450c07fa97dc543d15f53fbfc17a5aa6a9c4661054b97a3bcc89ecaa7",
+    "helper_sha256": {
+      "A": "5600214530ecb03c5644213884666de7978b03a298d4f61bed0e2b402461e0cc",
+      "B": "380e5244ccb2fb32107fd66729fed5b7df5ff1ff2c6a62bae2ca74d60ee89156"
+    },
+    "verification": "All 24 frozen spec-lfg file pins match RUN/intake.json. Request, fixture, arm receipts and packet match their recorded hashes. All six artifact and trace hashes match trial-index.json; each receipt equals its index entry. Successor plan hash matches intake.",
+    "administrative_caveat": "CEOPT-14-packet.json retains prepared-not-executed, while trial-index and receipts establish executed-awaiting-review. Preserve the immutable packet and clarify execution state in the current ledger."
+  },
+  "timing_and_model": {
+    "recorded_order": [
+      "A1",
+      "B1",
+      "B2",
+      "A2",
+      "A3",
+      "B3"
+    ],
+    "actual_order_matches": true,
+    "all_six_timestamp_deltas_match_elapsed": true,
+    "all_trace_events_within_trial_windows": true,
+    "all_under_300_second_deadline": true,
+    "unique_sessions": 6,
+    "recorded_model": "gpt-6.1-sol",
+    "recorded_effort": "medium",
+    "identity": "Parent-inherited recorded metadata; serving identity unauthenticated.",
+    "comparison": "Different truncation/recovery read patterns and unauthenticated serving identity preclude relative model speed, cost or quality-benefit conclusions."
+  },
+  "limitations_and_remaining_owners": [
+    {
+      "owner": "Repository owner and authorized PR executor",
+      "remaining": "Supply an exact authorized sandbox PR and scoped publication/reply/resolution authority; execute actual publication inspection and interrupted-write readback recovery with authoritative receipts. example.invalid is not a usable live target."
+    },
+    {
+      "owner": "LFG orchestrator and integration owner",
+      "remaining": "Exercise real structured observations, actual timestamps, interruption/resume, current remote state and bounded journal continuity. Synthetic helper timestamps do not prove continuous real monitoring."
+    },
+    {
+      "owner": "Feedback investigator and persisted-key contract/product owner",
+      "remaining": "Complete authoritative typed decision evidence, obtain a genuine owner answer, and execute the hash-bound persistence/CAS flow when authorized. Missing payload reporting passed; actual decision handoff and answer recording remain untested."
+    },
+    {
+      "owner": "Acceptance owner",
+      "remaining": "Keep frozen-scenario acceptance partial, retain baseline mechanism failure separately from six successful model interpretations, and preserve unmet external facets in the current all-34 ledger."
+    },
+    {
+      "owner": "Host/evaluation owner",
+      "remaining": "Provide authenticated serving identity and comparable execution evidence before any relative model benefit claim."
+    }
+  ],
+  "isolation_and_provenance": {
+    "observed": "All recorded trial calls are assigned-arm file reads or read-only extraction. No scripts/helpers/tests/browser/network operations, mutations or delegated workers appear.",
+    "not_proven": "Filesystem isolation or Git-index enforcement; unchanged artifact saving cannot be independently compared to unavailable original final-response envelopes.",
+    "parent_mediation": "Receipts record unchanged parent saving. Autonomous durable artifact production was not tested.",
+    "review_execution": "Only file reads, hashing, JSON analysis, diffs and timestamp analysis were performed."
+  }
+}

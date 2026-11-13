@@ -1,0 +1,149 @@
+FAIL tests/unit/mcp-setup-entrypoint.test.js
+  spec-runtime-setup unified Node entrypoint
+    ✕ bare 写前 projection 为 missing 时遵守同一 gate (202 ms)
+    ✕ bare 写前 projection 为 stale 时遵守同一 gate (135 ms)
+    ✕ bare 写前 projection 为 current 时遵守同一 gate (247 ms)
+    ○ skipped ["--check"] is read-only
+    ○ skipped ["--plan","--only","graphify"] is read-only
+    ○ skipped renders execution root, Graphify input scope, and artifact owner in the install plan
+    ○ skipped previews an explicit Graphify refresh without mutating the project
+    ○ skipped blocks plan before installation on host config conflict and previews explicit repair
+    ○ skipped repairs only conflicting managed Codex MCP entries with explicit authorization
+    ○ skipped default diagnostic output exposes actionable tools, skills, project, setup, providers, and public next actions
+    ○ skipped check reconciles CodeGraph readiness from an explicitly pinned read-only host config
+    ○ skipped check reports a current missing baseline MCP dependency instead of relying on saved facts
+    ○ skipped uses runtime markers only as read-only advisory host evidence
+    ○ skipped uses runtime markers only as read-only advisory host evidence
+    ○ skipped uses a uniquely visible host CLI as advisory evidence for bare diagnostics
+    ○ skipped stops advisory CLI probing once multiple visible hosts make the result ambiguous
+    ○ skipped verify-only writes setup-owned facts and no host/provider/project config
+    ○ skipped fails completion with a structured outcome when the host readiness ledger cannot be written
+    ○ skipped preserves a host inspection failure even when setup facts are written
+    ○ skipped blocks selected providers before project mutation when host config verification fails
+    ○ skipped fails when facts cannot be committed after otherwise successful setup
+    ○ skipped keeps scenario fingerprint containment failures advisory and records degraded status
+    ○ skipped fails canonical facts rewrite at rename 3 while preserving provider failure false
+    ○ skipped fails canonical facts rewrite at rename 4 while preserving provider failure false
+    ○ skipped fails canonical facts rewrite at rename 4 while preserving provider failure true
+    ○ skipped project-config writes only project-local config surfaces without host authority
+    ○ skipped blocks selected child setup before host, provider, or facts mutation when this host projection is missing
+    ○ skipped runtime projection preflight reads only the active host and permits a current selected child
+    ○ skipped blocks stale projection but leaves check, plan, verify-only, and project-config outside the mutation gate
+    ○ skipped fails closed for an explicit nested repo target before host, provider, or facts work in every mode
+    ○ skipped plans a nested folder at its exact artifact root while reusing the enclosing runtime projection
+    ○ skipped uses the enclosing runtime manifest but writes provider artifacts and setup facts inside a nested folder
+    ○ skipped points a nested folder at a structured enclosing-runtime init action
+    ○ skipped keeps verify-only folder remediation bound to the runtime projection root
+    ○ skipped keeps special folder paths as structured cwd data instead of shell source
+    ○ skipped repairs a fresh standalone non-Git folder through the published headless init action
+    ○ skipped blocks unreadable current-host projection before provider, host, or facts mutation
+    ○ skipped blocks the all-repos mutation before any child provider or facts write when one child projection is missing
+    ○ skipped blocks workspace graph build before provider mutation when a child projection is missing
+    ○ skipped workspace graph preflight evaluates confirmed repos but leaves discovered candidates pending
+    ○ skipped explicit workspace graph setup pins both resolved provider launchers into child hooks
+    ○ skipped internal workspace refresh reuses the pinned launcher and never reruns setup mutations
+    ○ skipped incomplete internal workspace refresh context cannot bypass public surface binding
+    ○ skipped explicit graphify setup applies baseline host config, provider mutation, and post-probe facts
+    ○ skipped fails selected Graphify completion when the artifact receipt belongs to another requested scope
+    ○ skipped 安装范围诊断不推断嵌套非 Git 目录的 enclosing hook 状态
+    ○ skipped writes OpenCode MCP entries through the native project config shape
+    ○ skipped blocks the whole OpenCode config transaction when permission rules conflict
+    ○ skipped blocks OpenCode setup before provider mutation when project JSONC has precedence
+    ○ skipped full required setup stays ready when the effective Graphify hooks root is external
+    ○ skipped reconciles CodeGraph configured lifecycle from the post-write host config probe
+    ○ skipped installation-only 安装并接线，缺图不阻断，且不执行构图或 query
+    ○ skipped 默认 plan 不预览图生成，安装后默认 verify 不运行图 probe 或改写旧图
+    ○ skipped 显式 gh 选择只验证 helper scope，不伪造 Provider 结果或生成图
+    ○ skipped repairs a missing baseline helper through structured argv operations before provider setup
+    ○ skipped preserves the first baseline helper install failure after facts reconciliation
+    ○ skipped reuses verified warmup cache entries on repeated explicit setup
+    ○ skipped CodeGraph 安装经实际归档校验发布身份，CLI normalizer 保留限定证据
+    ○ skipped 统一 setup 的 CodeGraph digest 不符在安装前阻断且保留具体原因
+    ○ skipped uses the npm mirror only after primary install failures and persists install provenance
+    ○ skipped preserves both failed npm attempts without promoting install success
+    ○ skipped treats a signaled install as failed and retries it through the configured mirror
+    ○ skipped parent verification writes contained summaries and quarantines parent repo-local artifacts
+    ○ skipped parent setup consumes selected provider failures and preserves legacy partial summary fields
+    ○ skipped parent --plan previews every selected child without writing workspace receipts, facts, host config, or provider artifacts
+    ○ skipped parent --plan preserves child-specific blockers without falling through to a parent plan
+    ○ skipped runs a Codex user-scope host phase once before child mutations and records shared receipts
+    ○ skipped does not enter child mutation when the shared host phase fails
+    ○ skipped keeps Qoder local host config mutation in each child phase
+    ○ skipped parent verification reports child manifest counts and manifest-specific next action
+    ○ skipped parent verification fails closed when the workspace summary directory is a symlink
+    ○ skipped continues later child repos and writes a partial summary after one child throws
+    ○ skipped preserves child evidence and fails when the workspace summary cannot be committed
+    ○ skipped propagates blocked provider plans without running fallback verification as mutation success
+    ○ skipped stops dependent host and provider mutations after a baseline install failure
+    ○ skipped unknown provider and missing mutation host fail closed with zero writes
+
+  ● spec-runtime-setup unified Node entrypoint › bare 写前 projection 为 missing 时遵守同一 gate
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 2
+    + Received  + 2
+
+      Object {
+    -   "exit_code": 2,
+    -   "reason_code": "generated-runtime-projection-preflight-blocked",
+    +   "exit_code": 1,
+    +   "reason_code": "npm-warmup-path-or-io-failed",
+      }
+
+      1440 |         expect(fs.existsSync(path.join(target, '.spec-first', 'config', 'tool-facts.json'))).toBe(true);
+      1441 |       } else {
+    > 1442 |         expect(result).toMatchObject({ exit_code: 2, reason_code: 'generated-runtime-projection-preflight-blocked' });
+           |                        ^
+      1443 |         expect(result.payload.results[0].next_action_command).toMatchObject({ cwd: target, command: 'spec-first', args: ['init', '--codex'] });
+      1444 |         expect(audit.violations).toEqual([]);
+      1445 |         expect(snapshot(target)).toEqual(before);
+
+      at toMatchObject (tests/unit/mcp-setup-entrypoint.test.js:1442:24)
+
+  ● spec-runtime-setup unified Node entrypoint › bare 写前 projection 为 stale 时遵守同一 gate
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 2
+    + Received  + 2
+
+      Object {
+    -   "exit_code": 2,
+    -   "reason_code": "generated-runtime-projection-preflight-blocked",
+    +   "exit_code": 1,
+    +   "reason_code": "npm-warmup-path-or-io-failed",
+      }
+
+      1440 |         expect(fs.existsSync(path.join(target, '.spec-first', 'config', 'tool-facts.json'))).toBe(true);
+      1441 |       } else {
+    > 1442 |         expect(result).toMatchObject({ exit_code: 2, reason_code: 'generated-runtime-projection-preflight-blocked' });
+           |                        ^
+      1443 |         expect(result.payload.results[0].next_action_command).toMatchObject({ cwd: target, command: 'spec-first', args: ['init', '--codex'] });
+      1444 |         expect(audit.violations).toEqual([]);
+      1445 |         expect(snapshot(target)).toEqual(before);
+
+      at toMatchObject (tests/unit/mcp-setup-entrypoint.test.js:1442:24)
+
+  ● spec-runtime-setup unified Node entrypoint › bare 写前 projection 为 current 时遵守同一 gate
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      1437 |         expect(result.mode).toBe('bare');
+      1438 |         expect(result.reason_code).not.toBe('generated-runtime-projection-preflight-blocked');
+    > 1439 |         expect(fs.existsSync(path.join(target, 'graphify-out', 'graph.json'))).toBe(true);
+           |                                                                                ^
+      1440 |         expect(fs.existsSync(path.join(target, '.spec-first', 'config', 'tool-facts.json'))).toBe(true);
+      1441 |       } else {
+      1442 |         expect(result).toMatchObject({ exit_code: 2, reason_code: 'generated-runtime-projection-preflight-blocked' });
+
+      at toBe (tests/unit/mcp-setup-entrypoint.test.js:1439:80)
+
+Test Suites: 1 failed, 1 total
+Tests:       3 failed, 73 skipped, 76 total
+Snapshots:   0 total
+Time:        0.898 s, estimated 25 s
+Ran all test suites matching /tests\/unit\/mcp-setup-entrypoint.test.js/i with tests matching "bare 写前".

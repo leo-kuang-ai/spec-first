@@ -1,0 +1,360 @@
+{
+  "review_scope": "Read-only deterministic experiment review. No tests rerun, file mutations, network actions, model task outputs, or judge packets inspected.",
+  "integrity": {
+    "A": {
+      "passed": 184,
+      "failed": 148,
+      "suites": 13,
+      "failed_suites": 13,
+      "runtime_error_suites": 0,
+      "pending": 0,
+      "todo": 0
+    },
+    "B": {
+      "passed": 332,
+      "failed": 0,
+      "suites": 13,
+      "failed_suites": 0,
+      "runtime_error_suites": 0,
+      "pending": 0,
+      "todo": 0
+    },
+    "same_assertion_names_in_each_suite": true,
+    "all_13_current_test_hashes_match_protocol": true,
+    "all_13_test_hashes_match_protocol_in_both_retained_scratch_arms": true,
+    "B_assertion_failure_messages_empty": true,
+    "suite_load_failures_hidden_by_332_passes": false,
+    "caveat": "Jest assertionResults count test cases, including parameterized cases, not individual expectations or independent defects."
+  },
+  "per_suite": [
+    {
+      "suite": "autoresearch-score-regression.test.js",
+      "counts": {
+        "A_pass": 4,
+        "A_fail": 20,
+        "B_pass": 24
+      },
+      "classification": "genuine_executable_behavior_counterexample",
+      "observed_examples": [
+        "A returns exit 0 for a regression-eligible HARD regression where the harness expects UNSTABLE and exit 1.",
+        "A accepts unknown classification, dimension, tier and several invalid score values instead of returning INVALID_INPUT.",
+        "A includes baseline-unavailable rows in scoring and does not reject an unavailable-only baseline."
+      ],
+      "source_refs": [
+        "tests/unit/autoresearch-score-regression.test.js:26",
+        "skills/autoresearch/scripts/score-regression.sh"
+      ],
+      "caveats": [
+        "Twenty failed cases share scoring and input-validation causes; they are not twenty product defects.",
+        "These are synthetic TSV inputs, not observed regression rates."
+      ]
+    },
+    {
+      "suite": "spec-optimize-decide.test.js",
+      "counts": {
+        "A_pass": 95,
+        "A_fail": 3,
+        "B_pass": 98
+      },
+      "classification": "genuine_executable_behavior_counterexample",
+      "observed_examples": [
+        "A returns keep in both repeat and ladder modes when candidate has three observations but baseline has one.",
+        "A returns keep for scalar judge snapshots accompanied by sample_count=5; B requires confirmation."
+      ],
+      "source_refs": [
+        "tests/unit/spec-optimize-decide.test.js:26",
+        "tests/unit/spec-optimize-decide.test.js:1333",
+        "skills/spec-optimize/scripts/decide.cjs"
+      ],
+      "caveats": [
+        "The suite uses supplied numeric fixtures; its wall-time constants and synthetic judge values do not measure current runtime savings or model quality."
+      ]
+    },
+    {
+      "suite": "spec-optimize-measurement-only-contracts.test.js",
+      "counts": {
+        "A_pass": 5,
+        "A_fail": 10,
+        "B_pass": 15
+      },
+      "classification": "mixed",
+      "failure_breakdown": {
+        "static_prose_contract": 1,
+        "new_schema_policy_incompatibility": 2,
+        "harness_fixture_cascade_from_rejected_v2_admission": 7
+      },
+      "observed_examples": [
+        "A's validator exists but declares schema v1; the shared harness builds v2 admissions.",
+        "The v2 admission positive control returns exit 1.",
+        "Seven subsequent cases dereference admission.normalized_admission.baseline_identity after admission rejection and throw TypeError before exercising the intended A/A scenario.",
+        "The old-version rejection case expects v1 to fail, but A legitimately accepts its own v1.",
+        "One source-string assertion fails on the loaded-skill-dir command spelling."
+      ],
+      "source_refs": [
+        "tests/unit/spec-optimize-measurement-only-contracts.test.js:59",
+        "tests/unit/spec-optimize-measurement-only-contracts.test.js:147",
+        "tests/unit/spec-optimize-measurement-only-contracts.test.js:208",
+        ".git/spec-first-ce-optimization-2026-10-29/files/skills/spec-optimize/scripts/measurement-admission.cjs:8",
+        "skills/spec-optimize/scripts/measurement-admission.cjs:283"
+      ],
+      "caveats": [
+        "This is not ten independent demonstrations that A accepts invalid experimental evidence.",
+        "B demonstrates v2 fixture processing and file-integrity/arithmetic checks, not authenticated experiment execution.",
+        "Some A negative-test passes can arise from early schema rejection rather than the specifically named negative condition."
+      ]
+    },
+    {
+      "suite": "spec-worktree-contracts.test.js",
+      "counts": {
+        "A_pass": 10,
+        "A_fail": 6,
+        "B_pass": 16
+      },
+      "classification": "genuine_executable_behavior_counterexample",
+      "observed_examples": [
+        "Create and isolate accept a symlinked worktree container.",
+        "A accepts an existing nested ancestor symlink; with a dangling ancestor it leaves .gitignore behind.",
+        "A ordinary checkout creates a remote-feature branch without upstream; linked checkout becomes detached."
+      ],
+      "source_refs": [
+        "tests/unit/spec-worktree-contracts.test.js:38",
+        "tests/unit/spec-worktree-contracts.test.js:76",
+        "skills/spec-worktree/scripts/worktree-manager.sh"
+      ],
+      "caveats": [
+        "Six failures are executable local Git/filesystem cases. The suite also contains a passing static documentation contract.",
+        "No cross-platform portability or real-host isolation claim follows."
+      ]
+    },
+    {
+      "suite": "spec-prd-finalize-transition.test.js",
+      "counts": {
+        "A_pass": 5,
+        "A_fail": 4,
+        "B_pass": 9
+      },
+      "classification": "mixed",
+      "observed_examples": [
+        "Three mutations of finalized PRD body or metadata yield can_finalize=true under refreshInputsHash in A, contradicting the preserved-intent condition.",
+        "The fourth failure is absence of the expected advisory misclassification count for an implementation-only question."
+      ],
+      "source_refs": [
+        "tests/unit/spec-prd-finalize-transition.test.js:133",
+        "skills/spec-prd/scripts/finalize-prd-artifact.js",
+        "skills/spec-prd/scripts/check-prd-artifact.js"
+      ],
+      "caveats": [
+        "The first three tests stop at check-only can_finalize; their A failures alone do not prove the later write-mode branch re-signed the artifact.",
+        "The fourth test fails before its downstream finalize and explicit WHAT-conflict expectations."
+      ]
+    },
+    {
+      "suite": "spec-code-review-mechanics.test.js",
+      "counts": {
+        "A_pass": 35,
+        "A_fail": 19,
+        "B_pass": 54
+      },
+      "classification": "genuine_executable_behavior_counterexample",
+      "observed_examples": [
+        "A admits unevidenced P0 findings at confidence 0, 25 and 50.",
+        "Truthy settled_conflict values bypass confidence checks.",
+        "Case-distinct paths collapse to one finding.",
+        "Reprocessing synthesis raises confidence from 75 to 100.",
+        "Malformed optional fields and invalid evidence arrays are not consistently rejected or counted."
+      ],
+      "source_refs": [
+        "tests/unit/spec-code-review-mechanics.test.js:204",
+        "tests/unit/spec-code-review-mechanics.test.js:249",
+        "tests/unit/spec-code-review-mechanics.test.js:304",
+        "skills/spec-code-review/scripts/findings-mechanics.py"
+      ],
+      "caveats": [
+        "These prove deterministic filtering, identity and bookkeeping behavior for supplied findings, not the semantic correctness of generated reviews."
+      ]
+    },
+    {
+      "suite": "spec-lfg-pr-watch-state.test.js",
+      "counts": {
+        "A_pass": 29,
+        "A_fail": 5,
+        "B_pass": 34
+      },
+      "classification": "genuine_executable_behavior_counterexample",
+      "observed_examples": [
+        "A treats a 30-minute unobserved interval as looks-ready.",
+        "A counts 30 quiet seconds instead of resetting a legacy journal.",
+        "A accepts backward timestamps, null review_items and null checks."
+      ],
+      "source_refs": [
+        "tests/unit/spec-lfg-pr-watch-state.test.js:62",
+        "tests/unit/spec-lfg-pr-watch-state.test.js:98",
+        "skills/spec-lfg/scripts/pr-watch-state.cjs"
+      ],
+      "caveats": [
+        "Synthetic observations exercise local journal logic; no GitHub monitoring, real quiet window or PR completion was verified."
+      ]
+    },
+    {
+      "suite": "spec-test-browser-conformance-cleanup.test.js",
+      "counts": {
+        "A_pass": 0,
+        "A_fail": 2,
+        "B_pass": 2
+      },
+      "classification": "absent_new_mechanism",
+      "observed_examples": [
+        "For fake-browser close exits 0 and 9, A has no payload.cleanup object.",
+        "B's producer records close outcome, incorporates it into status, and preserves diagnostics on cleanup failure."
+      ],
+      "source_refs": [
+        "tests/unit/spec-test-browser-conformance-cleanup.test.js:10",
+        "tests/unit/spec-test-browser-conformance-cleanup.test.js:43",
+        "skills/spec-test-browser/scripts/agent-browser-exact-origin-conformance.cjs:247"
+      ],
+      "caveats": [
+        "Both A cases stop on the missing receipt before checking overall exit code or retained diagnostics.",
+        "The fake explicitly tests lifecycle/receipts, not browser origin enforcement."
+      ]
+    },
+    {
+      "suite": "sweep-state-safety.test.js",
+      "counts": {
+        "A_pass": 1,
+        "A_fail": 16,
+        "B_pass": 17
+      },
+      "classification": "mixed",
+      "observed_examples": [
+        "A falls back to an unlocked handler when opening the lock fails.",
+        "A accepts directory, symlink and hardlink lock surfaces; FIFO invocation exceeds its timeout.",
+        "Unavailable fcntl still reaches a mutation handler.",
+        "Future/malformed state structures and invalid closed records are accepted.",
+        "ASCII-locale UTF-8 handling fails; historical repair output lacks the expected report."
+      ],
+      "source_refs": [
+        "tests/unit/sweep-state-safety.test.js:29",
+        ".git/spec-first-ce-optimization-2026-10-29/files/skills/spec-sweep/scripts/sweep-state.py:785",
+        ".git/spec-first-ce-optimization-2026-10-29/files/skills/spec-sweep/scripts/sweep-state.py:805",
+        "skills/spec-sweep/scripts/sweep-state.py"
+      ],
+      "caveats": [
+        "Most failures directly exercise behavior; historical repair failure first manifests as missing result-schema output.",
+        "FIFO timeout is attributable to the tested lock path and baseline blocking open, not evidence of arbitrary environmental instability.",
+        "B includes a real local multi-process serialization case; it does not prove Windows locking."
+      ]
+    },
+    {
+      "suite": "spec-sweep-final-publication.test.js",
+      "counts": {
+        "A_pass": 0,
+        "A_fail": 13,
+        "B_pass": 13
+      },
+      "classification": "mixed",
+      "failure_breakdown": {
+        "absent_new_mechanism": 12,
+        "genuine_executable_behavior_counterexample": 1
+      },
+      "observed_examples": [
+        "A lacks publish-final-state.py; twelve cases encounter empty stdout and fail JSON parsing instead of reaching their publication assertions.",
+        "The remaining case fails earlier because A run-record accepts a directory lock and returns OK instead of ERROR."
+      ],
+      "source_refs": [
+        "tests/unit/spec-sweep-final-publication.test.js:29",
+        "tests/unit/spec-sweep-final-publication.test.js:63",
+        "skills/spec-sweep/scripts/publish-final-state.py"
+      ],
+      "caveats": [
+        "Twelve missing-script failures are not twelve observed unsafe remote-publication behaviors.",
+        "B exercises local bare Git remotes, including failure/recovery cases; no external publication occurred."
+      ]
+    },
+    {
+      "suite": "spec-sweep-media-admission.test.js",
+      "counts": {
+        "A_pass": 0,
+        "A_fail": 12,
+        "B_pass": 12
+      },
+      "classification": "absent_new_mechanism",
+      "observed_examples": [
+        "All twelve A cases raise FileNotFoundError loading absent analyze-sweep-media.py."
+      ],
+      "source_refs": [
+        "tests/unit/spec-sweep-media-admission.test.js:4",
+        "skills/spec-sweep/scripts/analyze-sweep-media.py"
+      ],
+      "caveats": [
+        "B tests bounded command construction and authorization handling with mocked analyzer/provider subprocesses.",
+        "These results do not establish actual transcription service success or twelve baseline egress violations."
+      ]
+    },
+    {
+      "suite": "spec-riffrec-evidence-coverage.test.js",
+      "counts": {
+        "A_pass": 0,
+        "A_fail": 20,
+        "B_pass": 20
+      },
+      "classification": "mixed",
+      "observed_examples": [
+        "Both analyzer copies lack coverage interval fields and event_moments.",
+        "A labels partial chunk success ok and silence failed.",
+        "A loses an earlier provider_request_sent=true during failed fallback.",
+        "Unauthorized chunk processing attempts a subprocess and trips the mock.",
+        "A emits a candidate finding for a quiet capture.",
+        "Generated text omits partial coverage status and missing intervals."
+      ],
+      "source_refs": [
+        "tests/unit/spec-riffrec-evidence-coverage.test.js:20",
+        "skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py",
+        "skills/spec-sweep/scripts/analyze_riffrec_zip.py"
+      ],
+      "caveats": [
+        "Ten scenarios are repeated across two analyzer copies; failures are not twenty independent defects.",
+        "Six failures first hit absent output fields; others expose executable return values, generated content or subprocess calls.",
+        "External media extraction/transcription is mocked. Generated text checks here execute producers rather than merely matching source prose."
+      ]
+    },
+    {
+      "suite": "spec-pov-worker-admission.test.js",
+      "counts": {
+        "A_pass": 0,
+        "A_fail": 18,
+        "B_pass": 18
+      },
+      "classification": "genuine_executable_behavior_counterexample",
+      "observed_examples": [
+        "A starts fake provider executables through unadmitted worker/start paths, creating provider-called markers.",
+        "B blocks direct workers and missing, weak, forged and expired receipts across three adapters."
+      ],
+      "source_refs": [
+        "tests/unit/spec-pov-worker-admission.test.js:40",
+        "tests/unit/spec-pov-worker-admission.test.js:48",
+        "skills/spec-pov/scripts/cross-model-pov.sh:11"
+      ],
+      "caveats": [
+        "B's authenticated-channel function deliberately fails unconditionally because the authenticated producer channel is disabled.",
+        "All eighteen cases are rejection controls; they do not prove a working authorized positive path.",
+        "Passing this suite establishes dormant fail-closed behavior, not cross-model provider readiness."
+      ]
+    }
+  ],
+  "aggregate_claim_ceiling": {
+    "supported": "Under the identical selected regression harness, the retained B source snapshot passes all 332 test cases across 13 suites, versus A's 184 passes and 148 failures. The evidence establishes specific local deterministic behavior changes, added mechanisms/output contracts, and static contract conformance.",
+    "not_supported": [
+      "148 independent product defects fixed",
+      "A representative or unbiased product-quality improvement percentage",
+      "LLM task-quality, semantic-review or user-productivity benefit",
+      "Runtime performance improvement inferred from total Jest duration",
+      "Real browser enforcement, live provider readiness, external publication, cross-platform success or field outcomes"
+    ],
+    "important_residual": "The 332 passes do not conceal failed suite loads, but they coexist with an explicitly unavailable authenticated provider channel and heavily mocked external boundaries. Positive capability readiness remains outside the demonstrated claim.",
+    "experimental_limitations": [
+      "The tests target the changed mechanisms and use current contracts against the older source.",
+      "Schema changes and absent scripts create correlated failures and fixture cascades.",
+      "This review verifies the recorded experiment and retained test identities; it is not an independent test rerun."
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "status": "written",
+  "reason_code": "artifact-written",
+  "artifact_contract": "spec-handoff/v1",
+  "artifact_path": ".spec-first/workflows/spec-handoff/b3/20261030t060801z-review-continuation.md",
+  "sha256": "2c7b2d8c3d0415f3ecc81ed55b9ec727bbd804a5e1b6f51328ad6d8f49402c3c",
+  "created_at": "2026-10-30T06:08:01.922Z",
+  "warnings": [
+    "artifact is machine-local unless separately transferred or published"
+  ]
+}

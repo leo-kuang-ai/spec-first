@@ -1,0 +1,913 @@
+{
+  "arm": "B",
+  "entrypoints": [
+    {
+      "entrypoint": "spec-riffrec-feedback-analysis",
+      "source_sha256": "acc1fd99a7dbe31ef4b1d7f316d1729782ba61d2453411295a3449aa5effa6f3",
+      "duration_seconds": 840,
+      "chunk_cases": [
+        {
+          "case": "complete",
+          "receipt": {
+            "status": "ok",
+            "text": "[00:00.00]\nknown words\n\n[07:00.00]\nknown words",
+            "degraded": false,
+            "transcription_egress_authorization": "explicit-cli-flag",
+            "provider": "openai-audio-transcriptions",
+            "provider_request_sent": true,
+            "reason": null,
+            "source": "chunked_media",
+            "chunk_seconds": 420,
+            "covered_intervals": [
+              {
+                "start_seconds": 0,
+                "end_seconds": 420
+              },
+              {
+                "start_seconds": 420,
+                "end_seconds": 840
+              }
+            ],
+            "missing_intervals": [],
+            "chunks": [
+              {
+                "chunk": 1,
+                "start_seconds": 0,
+                "path": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/complete/audio-chunk-001-0s.mp3",
+                "status": "ok",
+                "reason": null,
+                "provider_request_sent": true,
+                "end_seconds": 420
+              },
+              {
+                "chunk": 2,
+                "start_seconds": 420,
+                "path": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/complete/audio-chunk-002-420s.mp3",
+                "status": "ok",
+                "reason": null,
+                "provider_request_sent": true,
+                "end_seconds": 840
+              }
+            ]
+          },
+          "mock_subprocess_calls": [
+            [
+              "ffmpeg",
+              "-y",
+              "-ss",
+              "0",
+              "-t",
+              "420",
+              "-i",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/media.webm",
+              "-vn",
+              "-ac",
+              "1",
+              "-ar",
+              "16000",
+              "-b:a",
+              "64k",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/complete/audio-chunk-001-0s.mp3"
+            ],
+            [
+              "curl",
+              "--config",
+              "-",
+              "-sS",
+              "https://api.openai.com/v1/audio/transcriptions",
+              "-F",
+              "file=@/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/complete/audio-chunk-001-0s.mp3",
+              "-F",
+              "model=fixture-model",
+              "-F",
+              "response_format=json"
+            ],
+            [
+              "ffmpeg",
+              "-y",
+              "-ss",
+              "420",
+              "-t",
+              "420",
+              "-i",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/media.webm",
+              "-vn",
+              "-ac",
+              "1",
+              "-ar",
+              "16000",
+              "-b:a",
+              "64k",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/complete/audio-chunk-002-420s.mp3"
+            ],
+            [
+              "curl",
+              "--config",
+              "-",
+              "-sS",
+              "https://api.openai.com/v1/audio/transcriptions",
+              "-F",
+              "file=@/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/complete/audio-chunk-002-420s.mp3",
+              "-F",
+              "model=fixture-model",
+              "-F",
+              "response_format=json"
+            ]
+          ],
+          "actual_egress": false
+        },
+        {
+          "case": "second-provider-failed",
+          "receipt": {
+            "status": "partial",
+            "text": "[00:00.00]\nknown words",
+            "degraded": true,
+            "transcription_egress_authorization": "explicit-cli-flag",
+            "provider": "openai-audio-transcriptions",
+            "provider_request_sent": true,
+            "reason": "One or more chunks are unavailable",
+            "source": "chunked_media",
+            "chunk_seconds": 420,
+            "covered_intervals": [
+              {
+                "start_seconds": 0,
+                "end_seconds": 420
+              }
+            ],
+            "missing_intervals": [
+              {
+                "start_seconds": 420,
+                "end_seconds": 840
+              }
+            ],
+            "chunks": [
+              {
+                "chunk": 1,
+                "start_seconds": 0,
+                "path": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/second-provider-failed/audio-chunk-001-0s.mp3",
+                "status": "ok",
+                "reason": null,
+                "provider_request_sent": true,
+                "end_seconds": 420
+              },
+              {
+                "chunk": 2,
+                "start_seconds": 420,
+                "path": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/second-provider-failed/audio-chunk-002-420s.mp3",
+                "status": "failed",
+                "reason": "\"provider unavailable\"",
+                "provider_request_sent": true,
+                "end_seconds": 840
+              }
+            ]
+          },
+          "mock_subprocess_calls": [
+            [
+              "ffmpeg",
+              "-y",
+              "-ss",
+              "0",
+              "-t",
+              "420",
+              "-i",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/media.webm",
+              "-vn",
+              "-ac",
+              "1",
+              "-ar",
+              "16000",
+              "-b:a",
+              "64k",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/second-provider-failed/audio-chunk-001-0s.mp3"
+            ],
+            [
+              "curl",
+              "--config",
+              "-",
+              "-sS",
+              "https://api.openai.com/v1/audio/transcriptions",
+              "-F",
+              "file=@/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/second-provider-failed/audio-chunk-001-0s.mp3",
+              "-F",
+              "model=fixture-model",
+              "-F",
+              "response_format=json"
+            ],
+            [
+              "ffmpeg",
+              "-y",
+              "-ss",
+              "420",
+              "-t",
+              "420",
+              "-i",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/media.webm",
+              "-vn",
+              "-ac",
+              "1",
+              "-ar",
+              "16000",
+              "-b:a",
+              "64k",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/second-provider-failed/audio-chunk-002-420s.mp3"
+            ],
+            [
+              "curl",
+              "--config",
+              "-",
+              "-sS",
+              "https://api.openai.com/v1/audio/transcriptions",
+              "-F",
+              "file=@/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/second-provider-failed/audio-chunk-002-420s.mp3",
+              "-F",
+              "model=fixture-model",
+              "-F",
+              "response_format=json"
+            ]
+          ],
+          "actual_egress": false
+        },
+        {
+          "case": "second-extraction-failed",
+          "receipt": {
+            "status": "partial",
+            "text": "[00:00.00]\nknown words",
+            "degraded": true,
+            "transcription_egress_authorization": "explicit-cli-flag",
+            "provider": "openai-audio-transcriptions",
+            "provider_request_sent": true,
+            "reason": "One or more chunks are unavailable",
+            "source": "chunked_media",
+            "chunk_seconds": 420,
+            "covered_intervals": [
+              {
+                "start_seconds": 0,
+                "end_seconds": 420
+              }
+            ],
+            "missing_intervals": [
+              {
+                "start_seconds": 420,
+                "end_seconds": 840
+              }
+            ],
+            "chunks": [
+              {
+                "chunk": 1,
+                "start_seconds": 0,
+                "path": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/second-extraction-failed/audio-chunk-001-0s.mp3",
+                "status": "ok",
+                "reason": null,
+                "provider_request_sent": true,
+                "end_seconds": 420
+              },
+              {
+                "chunk": 2,
+                "start_seconds": 420,
+                "status": "failed",
+                "reason": "decode failed",
+                "end_seconds": 840
+              }
+            ]
+          },
+          "mock_subprocess_calls": [
+            [
+              "ffmpeg",
+              "-y",
+              "-ss",
+              "0",
+              "-t",
+              "420",
+              "-i",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/media.webm",
+              "-vn",
+              "-ac",
+              "1",
+              "-ar",
+              "16000",
+              "-b:a",
+              "64k",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/second-extraction-failed/audio-chunk-001-0s.mp3"
+            ],
+            [
+              "curl",
+              "--config",
+              "-",
+              "-sS",
+              "https://api.openai.com/v1/audio/transcriptions",
+              "-F",
+              "file=@/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/second-extraction-failed/audio-chunk-001-0s.mp3",
+              "-F",
+              "model=fixture-model",
+              "-F",
+              "response_format=json"
+            ],
+            [
+              "ffmpeg",
+              "-y",
+              "-ss",
+              "420",
+              "-t",
+              "420",
+              "-i",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/media.webm",
+              "-vn",
+              "-ac",
+              "1",
+              "-ar",
+              "16000",
+              "-b:a",
+              "64k",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/second-extraction-failed/audio-chunk-002-420s.mp3"
+            ]
+          ],
+          "actual_egress": false
+        },
+        {
+          "case": "silence",
+          "receipt": {
+            "status": "ok",
+            "text": "",
+            "degraded": false,
+            "transcription_egress_authorization": "explicit-cli-flag",
+            "provider": "openai-audio-transcriptions",
+            "provider_request_sent": true,
+            "reason": null,
+            "source": "chunked_media",
+            "chunk_seconds": 420,
+            "covered_intervals": [
+              {
+                "start_seconds": 0,
+                "end_seconds": 420
+              },
+              {
+                "start_seconds": 420,
+                "end_seconds": 840
+              }
+            ],
+            "missing_intervals": [],
+            "chunks": [
+              {
+                "chunk": 1,
+                "start_seconds": 0,
+                "path": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/silence/audio-chunk-001-0s.mp3",
+                "status": "ok",
+                "reason": null,
+                "provider_request_sent": true,
+                "end_seconds": 420
+              },
+              {
+                "chunk": 2,
+                "start_seconds": 420,
+                "path": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/silence/audio-chunk-002-420s.mp3",
+                "status": "ok",
+                "reason": null,
+                "provider_request_sent": true,
+                "end_seconds": 840
+              }
+            ]
+          },
+          "mock_subprocess_calls": [
+            [
+              "ffmpeg",
+              "-y",
+              "-ss",
+              "0",
+              "-t",
+              "420",
+              "-i",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/media.webm",
+              "-vn",
+              "-ac",
+              "1",
+              "-ar",
+              "16000",
+              "-b:a",
+              "64k",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/silence/audio-chunk-001-0s.mp3"
+            ],
+            [
+              "curl",
+              "--config",
+              "-",
+              "-sS",
+              "https://api.openai.com/v1/audio/transcriptions",
+              "-F",
+              "file=@/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/silence/audio-chunk-001-0s.mp3",
+              "-F",
+              "model=fixture-model",
+              "-F",
+              "response_format=json"
+            ],
+            [
+              "ffmpeg",
+              "-y",
+              "-ss",
+              "420",
+              "-t",
+              "420",
+              "-i",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/media.webm",
+              "-vn",
+              "-ac",
+              "1",
+              "-ar",
+              "16000",
+              "-b:a",
+              "64k",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/silence/audio-chunk-002-420s.mp3"
+            ],
+            [
+              "curl",
+              "--config",
+              "-",
+              "-sS",
+              "https://api.openai.com/v1/audio/transcriptions",
+              "-F",
+              "file=@/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/silence/audio-chunk-002-420s.mp3",
+              "-F",
+              "model=fixture-model",
+              "-F",
+              "response_format=json"
+            ]
+          ],
+          "actual_egress": false
+        },
+        {
+          "case": "no-egress-authority",
+          "receipt": {
+            "transcription_egress_authorization": "missing",
+            "provider": "openai-audio-transcriptions",
+            "provider_request_sent": false,
+            "status": "skipped",
+            "text": "",
+            "reason": "Transcription egress was not explicitly authorized. Re-run with --transcribe."
+          },
+          "mock_subprocess_calls": [],
+          "actual_egress": false
+        }
+      ],
+      "quiet_capture": {
+        "findings": [],
+        "requirements": "---\ndate: 2026-10-30\ntopic: quiet\n---\n\n# Quiet\n\n## Problem Frame\n\nA product feedback source for `the product surface` is available for assessment. Product friction is not yet confirmed. The raw source has been converted into transcript, selected moments when video is available, screenshots when frames can be extracted, and candidate findings so the team can decide what product behavior should change before planning implementation.\n\nSource materials for brainstorm:\n- Source materials manifest: `/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/source-materials.md`\n- Analysis: `/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/analysis.md`\n- Problem analysis: `/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/problem-analysis.md`\n- Review prompt with transcript and frames: `/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/review-prompt.md`\n\n---\n\n## Actors\n\n- A1. User: Operates the product in the recorded session and verbalizes friction.\n- A2. Product surface: The UI and backend behavior visible in the recording.\n- A3. Brainstorm agent: Uses the evidence bundle to confirm, correct, and group requirements before planning.\n\n---\n\n## Key Flows\n\n- F1. Evidence-backed feedback triage\n  - **Trigger:** A feedback bundle, video, audio file, or meeting notes file is available.\n  - **Actors:** A1, A2, A3\n  - **Steps:** Extract or copy the source, transcribe media or read notes, select high-signal moments when video exists, inspect screenshots when available, confirm problems, and write requirements with supporting evidence.\n  - **Outcome:** Confirmed product problems are represented as requirements with transcript support and screenshot support when visual evidence exists.\n  - **Covered by:** R1, R2 (evidence handling only)\n\n---\n\n## Requirements\n\n**Evidence handling**\n- R1. Each confirmed product problem must cite supporting transcript, notes, or moment evidence from the source, including timestamp and screenshot when video is available.\n- R2. Transcript claims must be tied to the closest visible interaction or explicitly marked as untimed verbal context.\n\n**Product requirements from this session**\nNo confirmed product requirements. Candidate findings require source review and owner confirmation before promotion.\n\n---\n\n## Acceptance Examples\n\n- AE1. **Covers R1, R2.** Given a feedback source with voice, video, or notes, when the analysis is complete, each promoted issue includes source evidence rather than prose-only claims.\n- Product acceptance examples are pending confirmed requirements; do not invent a control or expected behavior from this scaffold.\n\n---\n\n## Success Criteria\n\n- A human reviewer can understand what went wrong without rewatching the entire recording.\n- `spec-brainstorm` can confirm requirements from linked source evidence before any planning begins.\n\n---\n\n## Scope Boundaries\n\n- The analyzer output is evidence and requirements kickoff material, not final implementation design.\n- Automatically detected findings remain candidates until screenshots are inspected.\n- Development-only noise, such as profiler requests, should not become product requirements unless it affects the user experience.\n\n---\n\n## Key Decisions\n\n- Evidence first: Requirements should cite moments and screenshots before moving to planning.\n- Brainstorm before plan: Use `spec-brainstorm` to refine product behavior when the recording reveals ambiguity.\n\n---\n\n## Dependencies / Assumptions\n\n- Source session URL: `unknown`.\n- Source materials manifest: `/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-zn6568v5/source-materials.md`.\n- Candidate findings: .\n- Screenshot evidence: See analysis.md selected moments..\n\n---\n\n## Outstanding Questions\n\n### Resolve Before Planning\n\n- Which candidate findings are real product problems after screenshot review?\n- For each promoted finding, what should the user experience be instead?\n\n### Deferred to Planning\n\n- [Technical] Which code paths own the confirmed product behavior?\n- [Technical] What regression tests should lock the behavior once fixed?\n\n---\n\n## Next Steps\n\n-> Resume `spec-brainstorm` to confirm candidate findings and promote only confirmed product-specific requirements.\n"
+      },
+      "scratch_removed_after_capture": true
+    },
+    {
+      "entrypoint": "spec-sweep",
+      "source_sha256": "acc1fd99a7dbe31ef4b1d7f316d1729782ba61d2453411295a3449aa5effa6f3",
+      "duration_seconds": 840,
+      "chunk_cases": [
+        {
+          "case": "complete",
+          "receipt": {
+            "status": "ok",
+            "text": "[00:00.00]\nknown words\n\n[07:00.00]\nknown words",
+            "degraded": false,
+            "transcription_egress_authorization": "explicit-cli-flag",
+            "provider": "openai-audio-transcriptions",
+            "provider_request_sent": true,
+            "reason": null,
+            "source": "chunked_media",
+            "chunk_seconds": 420,
+            "covered_intervals": [
+              {
+                "start_seconds": 0,
+                "end_seconds": 420
+              },
+              {
+                "start_seconds": 420,
+                "end_seconds": 840
+              }
+            ],
+            "missing_intervals": [],
+            "chunks": [
+              {
+                "chunk": 1,
+                "start_seconds": 0,
+                "path": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/complete/audio-chunk-001-0s.mp3",
+                "status": "ok",
+                "reason": null,
+                "provider_request_sent": true,
+                "end_seconds": 420
+              },
+              {
+                "chunk": 2,
+                "start_seconds": 420,
+                "path": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/complete/audio-chunk-002-420s.mp3",
+                "status": "ok",
+                "reason": null,
+                "provider_request_sent": true,
+                "end_seconds": 840
+              }
+            ]
+          },
+          "mock_subprocess_calls": [
+            [
+              "ffmpeg",
+              "-y",
+              "-ss",
+              "0",
+              "-t",
+              "420",
+              "-i",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/media.webm",
+              "-vn",
+              "-ac",
+              "1",
+              "-ar",
+              "16000",
+              "-b:a",
+              "64k",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/complete/audio-chunk-001-0s.mp3"
+            ],
+            [
+              "curl",
+              "--config",
+              "-",
+              "-sS",
+              "https://api.openai.com/v1/audio/transcriptions",
+              "-F",
+              "file=@/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/complete/audio-chunk-001-0s.mp3",
+              "-F",
+              "model=fixture-model",
+              "-F",
+              "response_format=json"
+            ],
+            [
+              "ffmpeg",
+              "-y",
+              "-ss",
+              "420",
+              "-t",
+              "420",
+              "-i",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/media.webm",
+              "-vn",
+              "-ac",
+              "1",
+              "-ar",
+              "16000",
+              "-b:a",
+              "64k",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/complete/audio-chunk-002-420s.mp3"
+            ],
+            [
+              "curl",
+              "--config",
+              "-",
+              "-sS",
+              "https://api.openai.com/v1/audio/transcriptions",
+              "-F",
+              "file=@/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/complete/audio-chunk-002-420s.mp3",
+              "-F",
+              "model=fixture-model",
+              "-F",
+              "response_format=json"
+            ]
+          ],
+          "actual_egress": false
+        },
+        {
+          "case": "second-provider-failed",
+          "receipt": {
+            "status": "partial",
+            "text": "[00:00.00]\nknown words",
+            "degraded": true,
+            "transcription_egress_authorization": "explicit-cli-flag",
+            "provider": "openai-audio-transcriptions",
+            "provider_request_sent": true,
+            "reason": "One or more chunks are unavailable",
+            "source": "chunked_media",
+            "chunk_seconds": 420,
+            "covered_intervals": [
+              {
+                "start_seconds": 0,
+                "end_seconds": 420
+              }
+            ],
+            "missing_intervals": [
+              {
+                "start_seconds": 420,
+                "end_seconds": 840
+              }
+            ],
+            "chunks": [
+              {
+                "chunk": 1,
+                "start_seconds": 0,
+                "path": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/second-provider-failed/audio-chunk-001-0s.mp3",
+                "status": "ok",
+                "reason": null,
+                "provider_request_sent": true,
+                "end_seconds": 420
+              },
+              {
+                "chunk": 2,
+                "start_seconds": 420,
+                "path": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/second-provider-failed/audio-chunk-002-420s.mp3",
+                "status": "failed",
+                "reason": "\"provider unavailable\"",
+                "provider_request_sent": true,
+                "end_seconds": 840
+              }
+            ]
+          },
+          "mock_subprocess_calls": [
+            [
+              "ffmpeg",
+              "-y",
+              "-ss",
+              "0",
+              "-t",
+              "420",
+              "-i",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/media.webm",
+              "-vn",
+              "-ac",
+              "1",
+              "-ar",
+              "16000",
+              "-b:a",
+              "64k",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/second-provider-failed/audio-chunk-001-0s.mp3"
+            ],
+            [
+              "curl",
+              "--config",
+              "-",
+              "-sS",
+              "https://api.openai.com/v1/audio/transcriptions",
+              "-F",
+              "file=@/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/second-provider-failed/audio-chunk-001-0s.mp3",
+              "-F",
+              "model=fixture-model",
+              "-F",
+              "response_format=json"
+            ],
+            [
+              "ffmpeg",
+              "-y",
+              "-ss",
+              "420",
+              "-t",
+              "420",
+              "-i",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/media.webm",
+              "-vn",
+              "-ac",
+              "1",
+              "-ar",
+              "16000",
+              "-b:a",
+              "64k",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/second-provider-failed/audio-chunk-002-420s.mp3"
+            ],
+            [
+              "curl",
+              "--config",
+              "-",
+              "-sS",
+              "https://api.openai.com/v1/audio/transcriptions",
+              "-F",
+              "file=@/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/second-provider-failed/audio-chunk-002-420s.mp3",
+              "-F",
+              "model=fixture-model",
+              "-F",
+              "response_format=json"
+            ]
+          ],
+          "actual_egress": false
+        },
+        {
+          "case": "second-extraction-failed",
+          "receipt": {
+            "status": "partial",
+            "text": "[00:00.00]\nknown words",
+            "degraded": true,
+            "transcription_egress_authorization": "explicit-cli-flag",
+            "provider": "openai-audio-transcriptions",
+            "provider_request_sent": true,
+            "reason": "One or more chunks are unavailable",
+            "source": "chunked_media",
+            "chunk_seconds": 420,
+            "covered_intervals": [
+              {
+                "start_seconds": 0,
+                "end_seconds": 420
+              }
+            ],
+            "missing_intervals": [
+              {
+                "start_seconds": 420,
+                "end_seconds": 840
+              }
+            ],
+            "chunks": [
+              {
+                "chunk": 1,
+                "start_seconds": 0,
+                "path": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/second-extraction-failed/audio-chunk-001-0s.mp3",
+                "status": "ok",
+                "reason": null,
+                "provider_request_sent": true,
+                "end_seconds": 420
+              },
+              {
+                "chunk": 2,
+                "start_seconds": 420,
+                "status": "failed",
+                "reason": "decode failed",
+                "end_seconds": 840
+              }
+            ]
+          },
+          "mock_subprocess_calls": [
+            [
+              "ffmpeg",
+              "-y",
+              "-ss",
+              "0",
+              "-t",
+              "420",
+              "-i",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/media.webm",
+              "-vn",
+              "-ac",
+              "1",
+              "-ar",
+              "16000",
+              "-b:a",
+              "64k",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/second-extraction-failed/audio-chunk-001-0s.mp3"
+            ],
+            [
+              "curl",
+              "--config",
+              "-",
+              "-sS",
+              "https://api.openai.com/v1/audio/transcriptions",
+              "-F",
+              "file=@/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/second-extraction-failed/audio-chunk-001-0s.mp3",
+              "-F",
+              "model=fixture-model",
+              "-F",
+              "response_format=json"
+            ],
+            [
+              "ffmpeg",
+              "-y",
+              "-ss",
+              "420",
+              "-t",
+              "420",
+              "-i",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/media.webm",
+              "-vn",
+              "-ac",
+              "1",
+              "-ar",
+              "16000",
+              "-b:a",
+              "64k",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/second-extraction-failed/audio-chunk-002-420s.mp3"
+            ]
+          ],
+          "actual_egress": false
+        },
+        {
+          "case": "silence",
+          "receipt": {
+            "status": "ok",
+            "text": "",
+            "degraded": false,
+            "transcription_egress_authorization": "explicit-cli-flag",
+            "provider": "openai-audio-transcriptions",
+            "provider_request_sent": true,
+            "reason": null,
+            "source": "chunked_media",
+            "chunk_seconds": 420,
+            "covered_intervals": [
+              {
+                "start_seconds": 0,
+                "end_seconds": 420
+              },
+              {
+                "start_seconds": 420,
+                "end_seconds": 840
+              }
+            ],
+            "missing_intervals": [],
+            "chunks": [
+              {
+                "chunk": 1,
+                "start_seconds": 0,
+                "path": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/silence/audio-chunk-001-0s.mp3",
+                "status": "ok",
+                "reason": null,
+                "provider_request_sent": true,
+                "end_seconds": 420
+              },
+              {
+                "chunk": 2,
+                "start_seconds": 420,
+                "path": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/silence/audio-chunk-002-420s.mp3",
+                "status": "ok",
+                "reason": null,
+                "provider_request_sent": true,
+                "end_seconds": 840
+              }
+            ]
+          },
+          "mock_subprocess_calls": [
+            [
+              "ffmpeg",
+              "-y",
+              "-ss",
+              "0",
+              "-t",
+              "420",
+              "-i",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/media.webm",
+              "-vn",
+              "-ac",
+              "1",
+              "-ar",
+              "16000",
+              "-b:a",
+              "64k",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/silence/audio-chunk-001-0s.mp3"
+            ],
+            [
+              "curl",
+              "--config",
+              "-",
+              "-sS",
+              "https://api.openai.com/v1/audio/transcriptions",
+              "-F",
+              "file=@/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/silence/audio-chunk-001-0s.mp3",
+              "-F",
+              "model=fixture-model",
+              "-F",
+              "response_format=json"
+            ],
+            [
+              "ffmpeg",
+              "-y",
+              "-ss",
+              "420",
+              "-t",
+              "420",
+              "-i",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/media.webm",
+              "-vn",
+              "-ac",
+              "1",
+              "-ar",
+              "16000",
+              "-b:a",
+              "64k",
+              "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/silence/audio-chunk-002-420s.mp3"
+            ],
+            [
+              "curl",
+              "--config",
+              "-",
+              "-sS",
+              "https://api.openai.com/v1/audio/transcriptions",
+              "-F",
+              "file=@/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/silence/audio-chunk-002-420s.mp3",
+              "-F",
+              "model=fixture-model",
+              "-F",
+              "response_format=json"
+            ]
+          ],
+          "actual_egress": false
+        },
+        {
+          "case": "no-egress-authority",
+          "receipt": {
+            "transcription_egress_authorization": "missing",
+            "provider": "openai-audio-transcriptions",
+            "provider_request_sent": false,
+            "status": "skipped",
+            "text": "",
+            "reason": "Transcription egress was not explicitly authorized. Re-run with --transcribe."
+          },
+          "mock_subprocess_calls": [],
+          "actual_egress": false
+        }
+      ],
+      "quiet_capture": {
+        "findings": [],
+        "requirements": "---\ndate: 2026-10-30\ntopic: quiet\n---\n\n# Quiet\n\n## Problem Frame\n\nA product feedback source for `the product surface` is available for assessment. Product friction is not yet confirmed. The raw source has been converted into transcript, selected moments when video is available, screenshots when frames can be extracted, and candidate findings so the team can decide what product behavior should change before planning implementation.\n\nSource materials for brainstorm:\n- Source materials manifest: `/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/source-materials.md`\n- Analysis: `/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/analysis.md`\n- Problem analysis: `/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/problem-analysis.md`\n- Review prompt with transcript and frames: `/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/review-prompt.md`\n\n---\n\n## Actors\n\n- A1. User: Operates the product in the recorded session and verbalizes friction.\n- A2. Product surface: The UI and backend behavior visible in the recording.\n- A3. Brainstorm agent: Uses the evidence bundle to confirm, correct, and group requirements before planning.\n\n---\n\n## Key Flows\n\n- F1. Evidence-backed feedback triage\n  - **Trigger:** A feedback bundle, video, audio file, or meeting notes file is available.\n  - **Actors:** A1, A2, A3\n  - **Steps:** Extract or copy the source, transcribe media or read notes, select high-signal moments when video exists, inspect screenshots when available, confirm problems, and write requirements with supporting evidence.\n  - **Outcome:** Confirmed product problems are represented as requirements with transcript support and screenshot support when visual evidence exists.\n  - **Covered by:** R1, R2 (evidence handling only)\n\n---\n\n## Requirements\n\n**Evidence handling**\n- R1. Each confirmed product problem must cite supporting transcript, notes, or moment evidence from the source, including timestamp and screenshot when video is available.\n- R2. Transcript claims must be tied to the closest visible interaction or explicitly marked as untimed verbal context.\n\n**Product requirements from this session**\nNo confirmed product requirements. Candidate findings require source review and owner confirmation before promotion.\n\n---\n\n## Acceptance Examples\n\n- AE1. **Covers R1, R2.** Given a feedback source with voice, video, or notes, when the analysis is complete, each promoted issue includes source evidence rather than prose-only claims.\n- Product acceptance examples are pending confirmed requirements; do not invent a control or expected behavior from this scaffold.\n\n---\n\n## Success Criteria\n\n- A human reviewer can understand what went wrong without rewatching the entire recording.\n- `spec-brainstorm` can confirm requirements from linked source evidence before any planning begins.\n\n---\n\n## Scope Boundaries\n\n- The analyzer output is evidence and requirements kickoff material, not final implementation design.\n- Automatically detected findings remain candidates until screenshots are inspected.\n- Development-only noise, such as profiler requests, should not become product requirements unless it affects the user experience.\n\n---\n\n## Key Decisions\n\n- Evidence first: Requirements should cite moments and screenshots before moving to planning.\n- Brainstorm before plan: Use `spec-brainstorm` to refine product behavior when the recording reveals ambiguity.\n\n---\n\n## Dependencies / Assumptions\n\n- Source session URL: `unknown`.\n- Source materials manifest: `/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-media-8cv9jsoh/source-materials.md`.\n- Candidate findings: .\n- Screenshot evidence: See analysis.md selected moments..\n\n---\n\n## Outstanding Questions\n\n### Resolve Before Planning\n\n- Which candidate findings are real product problems after screenshot review?\n- For each promoted finding, what should the user experience be instead?\n\n### Deferred to Planning\n\n- [Technical] Which code paths own the confirmed product behavior?\n- [Technical] What regression tests should lock the behavior once fixed?\n\n---\n\n## Next Steps\n\n-> Resume `spec-brainstorm` to confirm candidate findings and promote only confirmed product-specific requirements.\n"
+      },
+      "scratch_removed_after_capture": true
+    }
+  ],
+  "limitations": [
+    "Actual Python analyzer logic with mocked extraction/transcription. No media decoding, provider requests or real transcription occurred.",
+    "The 840-second media duration is synthetic. These results cannot prove live coverage or user-experienced feature findings."
+  ]
+}

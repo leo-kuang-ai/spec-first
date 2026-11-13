@@ -1,0 +1,278 @@
+FAIL tests/unit/sweep-state-safety.test.js
+  ✕ 新父目录首次写入先建立真实锁文件 (27 ms)
+  ✕ 锁为 directory 时失败且保全 sentinel 与 state (26 ms)
+  ✕ 锁为 symlink 时失败且保全 sentinel 与 state (24 ms)
+  ✕ 锁为 hardlink 时失败且保全 sentinel 与 state (23 ms)
+  ✕ 锁不可用时不调用 mutation handler，read 仍可用 (21 ms)
+  ✕ 不覆盖未来版本或损坏结构：schema_version: 2
+sources: {}
+items: {}
+future_field: "keep"
+ (23 ms)
+  ✕ 不覆盖未来版本或损坏结构：schema_version: true
+sources: {}
+items: {}
+ (24 ms)
+  ✕ 不覆盖未来版本或损坏结构：schema_version: 1
+sources: []
+items: {}
+ (24 ms)
+  ✕ 不覆盖未来版本或损坏结构：schema_version: 1
+sources: {}
+items: {}
+  orphan: "keep"
+ (23 ms)
+  ✕ 不覆盖未来版本或损坏结构：schema_version: 1
+schema_version: 2
+ (23 ms)
+  ✕ 不覆盖未来版本或损坏结构：schema_version: 1
+items:
+  bad: []
+ (23 ms)
+  ✕ 新 closed 缺证据拒绝写，合法证据和未知字段保留，历史错误由 validate 降级 (45 ms)
+  ✕ ASCII locale 下 UTF-8 状态往返，坏编码拒绝覆盖 (23 ms)
+  ✓ 实际跨进程互斥覆盖完整 handler，锁文件可复用 (161 ms)
+
+  ● 新父目录首次写入先建立真实锁文件
+
+    ENOENT: no such file or directory, stat '/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/sweep-safety-ltekOn/fresh/state.yml.lock'
+
+      30 |   state = path.join(root, 'fresh', 'state.yml');
+      31 |   expect(acquire()[0]).toBe('OK');
+    > 32 |   expect(fs.statSync(`${state}.lock`).isFile()).toBe(true);
+         |             ^
+      33 |   expect(acquire()[0]).toBe('OK');
+      34 | });
+      35 |
+
+      at Object.statSync (tests/unit/sweep-state-safety.test.js:32:13)
+
+  ● 锁为 directory 时失败且保全 sentinel 与 state
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "ERROR"
+    Received: "OK"
+
+      40 |   if (kind === 'symlink') fs.symlinkSync(sentinel, `${state}.lock`);
+      41 |   if (kind === 'hardlink') fs.linkSync(sentinel, `${state}.lock`);
+    > 42 |   expect(acquire()[0]).toBe('ERROR');
+         |                        ^
+      43 |   expect(fs.existsSync(state)).toBe(false);
+      44 |   expect(fs.readFileSync(sentinel, 'utf8')).toBe('KEEP');
+      45 | });
+
+      at toBe (tests/unit/sweep-state-safety.test.js:42:24)
+
+  ● 锁为 symlink 时失败且保全 sentinel 与 state
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "ERROR"
+    Received: "OK"
+
+      40 |   if (kind === 'symlink') fs.symlinkSync(sentinel, `${state}.lock`);
+      41 |   if (kind === 'hardlink') fs.linkSync(sentinel, `${state}.lock`);
+    > 42 |   expect(acquire()[0]).toBe('ERROR');
+         |                        ^
+      43 |   expect(fs.existsSync(state)).toBe(false);
+      44 |   expect(fs.readFileSync(sentinel, 'utf8')).toBe('KEEP');
+      45 | });
+
+      at toBe (tests/unit/sweep-state-safety.test.js:42:24)
+
+  ● 锁为 hardlink 时失败且保全 sentinel 与 state
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "ERROR"
+    Received: "OK"
+
+      40 |   if (kind === 'symlink') fs.symlinkSync(sentinel, `${state}.lock`);
+      41 |   if (kind === 'hardlink') fs.linkSync(sentinel, `${state}.lock`);
+    > 42 |   expect(acquire()[0]).toBe('ERROR');
+         |                        ^
+      43 |   expect(fs.existsSync(state)).toBe(false);
+      44 |   expect(fs.readFileSync(sentinel, 'utf8')).toBe('KEEP');
+      45 | });
+
+      at toBe (tests/unit/sweep-state-safety.test.js:42:24)
+
+  ● 锁不可用时不调用 mutation handler，read 仍可用
+
+    expect(received).not.toContain(expected) // indexOf
+
+    Expected substring: not "HANDLER_CALLED"
+    Received string:        "sweep-state: internal error: HANDLER_CALLED
+    "
+
+      54 |   const result = spawnSync('python3', ['-c', code, script, state], { encoding: 'utf8', env: pythonEnv });
+      55 |   expect(result.status).toBe(0);
+    > 56 |   expect(result.stderr).not.toContain('HANDLER_CALLED');
+         |                             ^
+      57 |   expect(result.stdout.trim().split('\n').filter(line => !line.startsWith('{'))).toEqual(['ERROR', 'NO-STATE']);
+      58 |   expect(fs.existsSync(state)).toBe(false);
+      59 | });
+
+      at Object.toContain (tests/unit/sweep-state-safety.test.js:56:29)
+
+  ● 不覆盖未来版本或损坏结构：schema_version: 2
+sources: {}
+items: {}
+future_field: "keep"
+
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "CORRUPT"
+    Received: "OK"
+
+      68 | ])('不覆盖未来版本或损坏结构：%s', (contents) => {
+      69 |   fs.writeFileSync(state, contents);
+    > 70 |   expect(acquire()[0]).toBe('CORRUPT');
+         |                        ^
+      71 |   expect(fs.readFileSync(state, 'utf8')).toBe(contents);
+      72 | });
+      73 |
+
+      at toBe (tests/unit/sweep-state-safety.test.js:70:24)
+
+  ● 不覆盖未来版本或损坏结构：schema_version: true
+sources: {}
+items: {}
+
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "CORRUPT"
+    Received: "OK"
+
+      68 | ])('不覆盖未来版本或损坏结构：%s', (contents) => {
+      69 |   fs.writeFileSync(state, contents);
+    > 70 |   expect(acquire()[0]).toBe('CORRUPT');
+         |                        ^
+      71 |   expect(fs.readFileSync(state, 'utf8')).toBe(contents);
+      72 | });
+      73 |
+
+      at toBe (tests/unit/sweep-state-safety.test.js:70:24)
+
+  ● 不覆盖未来版本或损坏结构：schema_version: 1
+sources: []
+items: {}
+
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "CORRUPT"
+    Received: "OK"
+
+      68 | ])('不覆盖未来版本或损坏结构：%s', (contents) => {
+      69 |   fs.writeFileSync(state, contents);
+    > 70 |   expect(acquire()[0]).toBe('CORRUPT');
+         |                        ^
+      71 |   expect(fs.readFileSync(state, 'utf8')).toBe(contents);
+      72 | });
+      73 |
+
+      at toBe (tests/unit/sweep-state-safety.test.js:70:24)
+
+  ● 不覆盖未来版本或损坏结构：schema_version: 1
+sources: {}
+items: {}
+  orphan: "keep"
+
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "CORRUPT"
+    Received: "OK"
+
+      68 | ])('不覆盖未来版本或损坏结构：%s', (contents) => {
+      69 |   fs.writeFileSync(state, contents);
+    > 70 |   expect(acquire()[0]).toBe('CORRUPT');
+         |                        ^
+      71 |   expect(fs.readFileSync(state, 'utf8')).toBe(contents);
+      72 | });
+      73 |
+
+      at toBe (tests/unit/sweep-state-safety.test.js:70:24)
+
+  ● 不覆盖未来版本或损坏结构：schema_version: 1
+schema_version: 2
+
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "CORRUPT"
+    Received: "OK"
+
+      68 | ])('不覆盖未来版本或损坏结构：%s', (contents) => {
+      69 |   fs.writeFileSync(state, contents);
+    > 70 |   expect(acquire()[0]).toBe('CORRUPT');
+         |                        ^
+      71 |   expect(fs.readFileSync(state, 'utf8')).toBe(contents);
+      72 | });
+      73 |
+
+      at toBe (tests/unit/sweep-state-safety.test.js:70:24)
+
+  ● 不覆盖未来版本或损坏结构：schema_version: 1
+items:
+  bad: []
+
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "CORRUPT"
+    Received: "OK"
+
+      68 | ])('不覆盖未来版本或损坏结构：%s', (contents) => {
+      69 |   fs.writeFileSync(state, contents);
+    > 70 |   expect(acquire()[0]).toBe('CORRUPT');
+         |                        ^
+      71 |   expect(fs.readFileSync(state, 'utf8')).toBe(contents);
+      72 | });
+      73 |
+
+      at toBe (tests/unit/sweep-state-safety.test.js:70:24)
+
+  ● 新 closed 缺证据拒绝写，合法证据和未知字段保留，历史错误由 validate 降级
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "REFUSED"
+    Received: "OK"
+
+      76 |   const before = fs.readFileSync(state);
+      77 |   for (const value of [{ status: 'closed' }, { status: 'closed', fix_ref: [], verified_merge_sha: true, verified_at: 'yesterday' }]) {
+    > 78 |     expect(upsert(value)[0]).toBe('REFUSED');
+         |                              ^
+      79 |     expect(fs.readFileSync(state)).toEqual(before);
+      80 |   }
+      81 |   expect(upsert({ status: 'closed', fix_ref: 'commit:fixture', verified_merge_sha: 'a'.repeat(40), verified_at: now, future_field: { keep: true } })[0]).toBe('OK');
+
+      at Object.toBe (tests/unit/sweep-state-safety.test.js:78:30)
+
+  ● ASCII locale 下 UTF-8 状态往返，坏编码拒绝覆盖
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "OK"
+    Received: "ERROR"
+
+      90 | test('ASCII locale 下 UTF-8 状态往返，坏编码拒绝覆盖', () => {
+      91 |   fs.writeFileSync(state, 'schema_version: 1\nsources: {}\nitems: {}\nextra: "中文"\n');
+    > 92 |   expect(invoke('lease-acquire', ['--writer', 'owner', '--now', now], { LC_ALL: 'C', LANG: 'C', PYTHONUTF8: '0', PYTHONCOERCECLOCALE: '0' })[0]).toBe('OK');
+         |                                                                                                                                                  ^
+      93 |   expect(fs.readFileSync(state, 'utf8')).toContain('中文');
+      94 |   const invalid = Buffer.from([0xff, 0xfe, 0x00]);
+      95 |   fs.writeFileSync(state, invalid);
+
+      at Object.toBe (tests/unit/sweep-state-safety.test.js:92:146)
+
+Test Suites: 1 failed, 1 total
+Tests:       13 failed, 1 passed, 14 total
+Snapshots:   0 total
+Time:        0.674 s
+Ran all test suites within paths "tests/unit/sweep-state-safety.test.js".

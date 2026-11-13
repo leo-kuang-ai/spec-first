@@ -1,0 +1,7 @@
+{
+  "action": "open",
+  "exit_code": 0,
+  "stdout": "{\"_boundary\":{\"nonce\":\"45408e1284df8f0f8a494dd241c858c0\",\"origin\":\"http://127.0.0.1:64973/\"},\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":8495911861322482479},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"targetId\":\"F48CCA9F7B7C4113E5FBB0B68653FA6A\",\"title\":\"CE browser control\",\"url\":\"http://127.0.0.1:64973/\"},\"error\":null,\"success\":true}\n",
+  "stderr": "",
+  "error": null
+}

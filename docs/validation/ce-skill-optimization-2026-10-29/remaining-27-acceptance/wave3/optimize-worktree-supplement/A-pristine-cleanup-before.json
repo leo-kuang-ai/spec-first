@@ -1,0 +1,11 @@
+{
+  "exists": true,
+  "files": {
+    "tracked.txt": "d2034cca9ec0eb5d9664647a0c972bef6fe89ff1bd942571668939d641ef83d7",
+    ".gitignore": "ea710370b5c64e3402a7a38e6a22537c2473d880527d0e6413f9e05b2dc0f5ca",
+    ".git": "e011d7a2597a0265783b47a0630c6d64f998fdecb920307abced52bb71736f6d"
+  },
+  "head": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2",
+  "index": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+  "root_head": "ee5a7958b4e8751e9cdf074df4b094fe120cfcb2"
+}

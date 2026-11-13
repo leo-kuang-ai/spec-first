@@ -1,0 +1,8 @@
+PASS tests/unit/autoresearch-score-regression.test.js
+PASS tests/unit/autoresearch-orchestrator-regression.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       44 passed, 44 total
+Snapshots:   0 total
+Time:        2.167 s
+Ran all test suites within paths "tests/unit/autoresearch-score-regression.test.js", "tests/unit/autoresearch-orchestrator-regression.test.js".

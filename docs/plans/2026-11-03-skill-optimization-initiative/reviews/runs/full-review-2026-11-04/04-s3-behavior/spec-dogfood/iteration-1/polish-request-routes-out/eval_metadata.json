@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "协作式 UI 打磨请求应路由 spec-polish",
+  "prompt": "（我已通过 /spec-dogfood 显式调起该 skill。）\n陪我一起把这个页面的 UI 细节调好看一点,我看着你改。\n",
+  "assertions": [
+    "expect.must_contain",
+    "output_contains{all:[spec-polish]}"
+  ]
+}

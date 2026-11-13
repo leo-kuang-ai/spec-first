@@ -1,0 +1,3 @@
+5171ead0ea3fec783fe069496e67e2553d60dfe144fcb27cacff58938de91701  skills/spec-write-tasks/references/task-quality-guide.md
+84d7b4719c62e45562b63cfc4e8f5ced7013ca46d3e32cd3ddd317a06f72c991  tests/unit/task-pack-command.test.js
+97f530378030fcf314041e80c4ac0a09d5e13e9fe86b55949acb23e1b9a4e698  src/cli/task-pack.js

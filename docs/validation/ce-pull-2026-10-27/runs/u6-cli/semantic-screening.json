@@ -1,0 +1,141 @@
+{
+  "artifact_type": "advisory",
+  "status": "partial",
+  "entries": [
+    {
+      "path": "src/commands/install.ts",
+      "local_source_refs": [
+        "src/cli/commands/init-input.js",
+        "src/cli/commands/init-paths.js",
+        "src/cli/plugin-manifest.js"
+      ],
+      "reading": "CE 固定窗口完整净 diff（删除含旧全文）；本地按列出的 owner 与调用处有界核实",
+      "target_action": "evidence-only",
+      "decision": "CE 只将 Windows absolute 路径纳入 Git 插件/本地插件分类；本地不接受任意 Git 插件源，bundled source 固定，--repo 直接 path.resolve 后检查真实路径归属，无对应分类分支。",
+      "status": "source-comparison-complete-no-change"
+    },
+    {
+      "path": "src/converters/claude-to-opencode.ts",
+      "local_source_refs": [
+        "src/cli/adapters/opencode.js"
+      ],
+      "reading": "CE 固定窗口完整净 diff（删除含旧全文）；本地按列出的 owner 与调用处有界核实",
+      "target_action": "evidence-only",
+      "decision": "窗口仅 Sonnet 5 到 5+ 注释调整；本地不生成该 model/temperature 映射，无需拷贝注释或新增映射。",
+      "status": "source-comparison-complete-no-change"
+    },
+    {
+      "path": "src/targets/kiro.ts",
+      "local_source_refs": [
+        "src/cli/adapters/index.js",
+        "src/cli/adapters/kiro.js"
+      ],
+      "reading": "CE 固定窗口完整净 diff（删除含旧全文）；本地按列出的 owner 与调用处有界核实",
+      "target_action": "evidence-only",
+      "decision": "CE 删除 Kiro target；本地 registry 仍支持 Kiro，transformAgentContent 保留只读工具并默认省略 model；保留现有 consumer，不同步删除。",
+      "status": "source-comparison-complete-no-change"
+    },
+    {
+      "path": "src/utils/detect-tools.ts",
+      "local_source_refs": [
+        "src/cli/commands/init-input.js",
+        "src/cli/adapters/index.js"
+      ],
+      "reading": "CE 固定窗口完整净 diff（删除含旧全文）；本地按列出的 owner 与调用处有界核实",
+      "target_action": "evidence-only",
+      "decision": "CE 删除未用的 getDetectedTargetNames；本地 detectInstalledHosts 经 doctor 探测并被 collectInitInput 使用，没有对应死代码可删除。",
+      "status": "source-comparison-complete-no-change"
+    },
+    {
+      "path": "src/utils/json-config.ts",
+      "local_source_refs": [
+        "src/cli/adapters/kiro.js"
+      ],
+      "reading": "CE 固定窗口完整净 diff（删除含旧全文）；本地按列出的 owner 与调用处有界核实",
+      "target_action": "evidence-only",
+      "decision": "CE 删除通用 JSON merge helper；本地不是该模块的 consumer，不按名称相似移除仍有效的 adapter/config 行为。",
+      "status": "source-comparison-complete-no-change"
+    },
+    {
+      "path": "src/utils/legacy-cleanup.ts",
+      "local_source_refs": [
+        "src/cli/plugin-manifest.js"
+      ],
+      "reading": "CE 固定窗口完整净 diff（删除含旧全文）；本地按列出的 owner 与调用处有界核实",
+      "target_action": "evidence-only",
+      "decision": "新增历史 CE setup description alias 只服务 CE 旧资产归属识别；本地 manifest 使用本地 governance/source，不引入 CE 历史 description 作为本地所有权证明。",
+      "status": "source-comparison-complete-no-change"
+    },
+    {
+      "path": "src/utils/model.ts",
+      "local_source_refs": [
+        "src/cli/adapters/opencode.js",
+        "src/cli/adapters/kiro.js"
+      ],
+      "reading": "CE 固定窗口完整净 diff（删除含旧全文）；本地按列出的 owner 与调用处有界核实",
+      "target_action": "evidence-only",
+      "decision": "CE 别名/拒绝采样参数集合更新，本地 adapters 无该 alias/temperature consumer，Kiro 默认省略 model；不将 CE 型号字符串提升为官方事实或新建映射。",
+      "status": "source-comparison-complete-no-change"
+    },
+    {
+      "path": "src/utils/resolve-output.ts",
+      "local_source_refs": [
+        "src/cli/adapters/kiro.js"
+      ],
+      "reading": "CE 固定窗口完整净 diff（删除含旧全文）；本地按列出的 owner 与调用处有界核实",
+      "target_action": "evidence-only",
+      "decision": "窗口仅删除 Kiro output root；本地仍支持 .kiro/skills、agents、spec-first，由 active adapter 拥有，不迁移删除。",
+      "status": "source-comparison-complete-no-change"
+    },
+    {
+      "path": "src/utils/secrets.ts",
+      "local_source_refs": [
+        "src/cli/plugin.js"
+      ],
+      "reading": "CE 固定窗口完整净 diff（删除含旧全文）；本地按列出的 owner 与调用处有界核实",
+      "target_action": "evidence-only",
+      "decision": "CE 删除潜在 secret 环境键扫描 helper；本地 plugin facade 无该模块依赖，不据此删除本地安全策略或新建同名 helper。",
+      "status": "source-comparison-complete-no-change"
+    },
+    {
+      "path": "src/utils/symlink.ts",
+      "local_source_refs": [
+        "src/cli/commands/init-paths.js"
+      ],
+      "reading": "CE 固定窗口完整净 diff（删除含旧全文）；本地按列出的 owner 与调用处有界核实",
+      "target_action": "evidence-only",
+      "decision": "CE 删除 forceSymlink/isValidSkillName helper；本地无该模块依赖，existing realpath containment 不因上游删除而移除。",
+      "status": "source-comparison-complete-no-change"
+    }
+  ],
+  "producer_repair": {
+    "unit_id": "U1",
+    "reason": "CLI 的 package_id=null 与 package-admission 仅接受 string 矛盾，完整窗口 CLI receipt 不可达",
+    "changes": [
+      "scripts/check-ce-upstream-reconciliation.cjs",
+      "docs/contracts/verification/ce-upstream-sync-run.schema.json",
+      "docs/contracts/verification/ce-upstream-sync-run.md",
+      "tests/unit/ce-upstream-reconciliation-v2.test.js",
+      "CHANGELOG.md"
+    ],
+    "red_log_ref": "docs/validation/ce-pull-2026-10-27/logs/non-skill-admission-red.log",
+    "verification_log_ref": "docs/validation/ce-pull-2026-10-27/logs/non-skill-admission-tests.log",
+    "suites": 2,
+    "tests": 36,
+    "exit_code": 0
+  },
+  "limitations": [
+    "仅完成 U6 中 10 个 CLI 路径的 source 适用性判断；9 个 ce-setup 路径尚未完成裁决",
+    "不代表 U6/整窗同步完成；无真实 Windows/宿主/模型验证",
+    "source refs 为当前结论依据；部分本地长文件仅有界读取，未声称全文覆盖"
+  ],
+  "additional_owner_reviews": [
+    {
+      "path": "skills/ce-code-review/references/personas/learnings-researcher.md",
+      "decision": "准入正文已在源码修改前记录通用规则证据语义；当时 review_ref 复用了 CLI screening，内容覆盖不足。此项为修改后的补证说明，不声称落盘审查材料先于源码存在",
+      "source_admission_ref": "docs/validation/ce-pull-2026-10-27/admissions/U2-learning-rule-evidence.json",
+      "review_evidence_ref": "docs/validation/ce-pull-2026-10-27/runs/learning-rule-evidence/semantic-screening.json",
+      "claim_limit": "仅作者语义判断，无独立审查"
+    }
+  ]
+}

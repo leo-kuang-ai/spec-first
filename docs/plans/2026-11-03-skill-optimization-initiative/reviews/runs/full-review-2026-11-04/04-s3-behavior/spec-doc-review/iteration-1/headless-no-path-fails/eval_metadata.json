@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "Non-interactive review without a path returns the fixed receipt",
+  "prompt": "Read the installed spec-doc-review skill and process: mode:non-interactive\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-doc-review/evals/fixtures/scripts/check-headless-no-path.sh"
+  ]
+}

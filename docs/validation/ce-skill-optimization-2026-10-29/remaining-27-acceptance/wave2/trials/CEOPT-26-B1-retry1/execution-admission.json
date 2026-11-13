@@ -1,0 +1,12 @@
+{
+  "trial": "CEOPT-26-B1-retry1",
+  "approved_for_disposable_execution": true,
+  "recorded_at": "2026-10-31T05:14:58.644957+00:00",
+  "proposal_sha256": "f4b852dab27aecb91be0671a292ecb2aafca9c67286f0e9fe1a3abc15337c6a6",
+  "candidate_sha256": "60fcede431e7da0426edd494e69a0680e4f6b3dd786e373d942872ce7a4c0716",
+  "review": "Parent read full no-change proposal and unchanged fixture/proof. All three lenses preserve validation and exception boundaries. Cosmetic response helpers and behavior-changing decoder/resource limits rejected with concrete reasons. Execute unchanged proof in fresh scratch. Embedded trial_id names original B1; receipt/path bind the separately retained retry.",
+  "limitations": [
+    "Parent execution not autonomous mutation.",
+    "Current proof has bounded coverage; no A/B improvement inferred."
+  ]
+}

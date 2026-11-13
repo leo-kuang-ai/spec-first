@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "pipeline 模式缺 origin 应返回 not_run 不推断",
+  "prompt": "（上游 governed caller 以 mode:pipeline 派发 spec-test-browser,输入如下。）\nmode:pipeline current\n",
+  "assertions": [
+    "expect.must_contain",
+    "output_contains{all:[target-origin-missing]}"
+  ]
+}

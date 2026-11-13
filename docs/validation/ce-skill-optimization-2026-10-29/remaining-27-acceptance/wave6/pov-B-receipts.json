@@ -1,0 +1,128 @@
+{
+  "arm": "B",
+  "source_sha256": "515cc12919cfbc1efe5292c837a90a146f6f10008a69cd57de0e19e42ae9bb1a",
+  "cases": [
+    {
+      "case": "missing",
+      "entrypoint": "start",
+      "input_receipt": null,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "[cross-model] provider_serving_receipt_invalid\n",
+      "fake_provider_called": false,
+      "result_preserved": true,
+      "jobs_created": false
+    },
+    {
+      "case": "missing",
+      "entrypoint": "__worker",
+      "input_receipt": null,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "[cross-model] provider_serving_receipt_unverified (authenticated producer channel disabled)\n",
+      "fake_provider_called": false,
+      "result_preserved": true,
+      "jobs_created": false
+    },
+    {
+      "case": "weak",
+      "entrypoint": "start",
+      "input_receipt": {
+        "schema_version": "provider-serving-receipt/v2",
+        "artifact_type": "degraded",
+        "verification_status": "unverified",
+        "reason_code": "authenticated-producer-unavailable"
+      },
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "[cross-model] provider_serving_receipt_unverified (authenticated producer channel disabled)\n",
+      "fake_provider_called": false,
+      "result_preserved": true,
+      "jobs_created": false
+    },
+    {
+      "case": "weak",
+      "entrypoint": "__worker",
+      "input_receipt": {
+        "schema_version": "provider-serving-receipt/v2",
+        "artifact_type": "degraded",
+        "verification_status": "unverified",
+        "reason_code": "authenticated-producer-unavailable"
+      },
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "[cross-model] provider_serving_receipt_unverified (authenticated producer channel disabled)\n",
+      "fake_provider_called": false,
+      "result_preserved": true,
+      "jobs_created": false
+    },
+    {
+      "case": "forged",
+      "entrypoint": "start",
+      "input_receipt": {
+        "schema_version": "provider-serving-receipt/v2",
+        "artifact_type": "confirmed",
+        "verification_status": "verified"
+      },
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "[cross-model] provider_serving_receipt_invalid\n",
+      "fake_provider_called": false,
+      "result_preserved": true,
+      "jobs_created": false
+    },
+    {
+      "case": "forged",
+      "entrypoint": "__worker",
+      "input_receipt": {
+        "schema_version": "provider-serving-receipt/v2",
+        "artifact_type": "confirmed",
+        "verification_status": "verified"
+      },
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "[cross-model] provider_serving_receipt_unverified (authenticated producer channel disabled)\n",
+      "fake_provider_called": false,
+      "result_preserved": true,
+      "jobs_created": false
+    },
+    {
+      "case": "expired",
+      "entrypoint": "start",
+      "input_receipt": {
+        "schema_version": "provider-serving-receipt/v2",
+        "artifact_type": "degraded",
+        "verification_status": "unverified",
+        "reason_code": "authenticated-producer-unavailable",
+        "freshness_expires_at": "2000-01-01T00:00:00Z"
+      },
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "[cross-model] provider_serving_receipt_unverified (authenticated producer channel disabled)\n",
+      "fake_provider_called": false,
+      "result_preserved": true,
+      "jobs_created": false
+    },
+    {
+      "case": "expired",
+      "entrypoint": "__worker",
+      "input_receipt": {
+        "schema_version": "provider-serving-receipt/v2",
+        "artifact_type": "degraded",
+        "verification_status": "unverified",
+        "reason_code": "authenticated-producer-unavailable",
+        "freshness_expires_at": "2000-01-01T00:00:00Z"
+      },
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "[cross-model] provider_serving_receipt_unverified (authenticated producer channel disabled)\n",
+      "fake_provider_called": false,
+      "result_preserved": true,
+      "jobs_created": false
+    }
+  ],
+  "limitations": [
+    "Only fail-fast fake provider executables available at the front of PATH. No real external model/provider was executed.",
+    "No authenticated positive serving producer exists in this test. File-based claimed verification remains untrusted."
+  ]
+}

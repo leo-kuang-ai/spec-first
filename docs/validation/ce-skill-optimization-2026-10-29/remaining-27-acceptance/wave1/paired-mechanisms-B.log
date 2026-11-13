@@ -1,0 +1,47 @@
+jest-haste-map: Haste module naming collision: mini-ledger
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-app-consistency-audit/evals/fixtures/repos/mini-ledger/package.json
+    * <rootDir>/skills/spec-brainstorm/evals/fixtures/repos/mini-ledger/package.json
+
+jest-haste-map: Haste module naming collision: shop-monorepo
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/package.json
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/package.json
+
+jest-haste-map: Haste module naming collision: plain-app
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/package.json
+    * <rootDir>/skills/spec-worktree/evals/fixtures/repos/plain-app-nogit/package.json
+
+jest-haste-map: Haste module naming collision: admin
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/admin/package.json
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/apps/admin/package.json
+
+jest-haste-map: Haste module naming collision: web
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/web/package.json
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/apps/web/package.json
+
+jest-haste-map: Haste module naming collision: @shop/api-client
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/api-client/package.json
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/packages/api-client/package.json
+
+jest-haste-map: Haste module naming collision: @shop/ui
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/ui/package.json
+    * <rootDir>/skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/packages/ui/package.json
+
+PASS tests/unit/task-pack-command.test.js
+PASS tests/unit/mcp-setup-workspace-git-exclude.test.js
+PASS tests/unit/mcp-setup-workspace-routing-inject.test.js
+PASS tests/unit/target-repo-containment.test.js
+PASS tests/unit/spec-commit-scope-regression.test.js
+
+Test Suites: 5 passed, 5 total
+Tests:       62 passed, 62 total
+Snapshots:   0 total
+Time:        4.747 s
+Ran all test suites within paths "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/B/tests/unit/spec-commit-scope-regression.test.js", "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/B/tests/unit/mcp-setup-workspace-git-exclude.test.js", "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/B/tests/unit/mcp-setup-workspace-routing-inject.test.js", "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/B/tests/unit/target-repo-containment.test.js", "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/B/tests/unit/task-pack-command.test.js".
+Test results written to: ../../../../../../../../Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/paired-mechanisms-B.json

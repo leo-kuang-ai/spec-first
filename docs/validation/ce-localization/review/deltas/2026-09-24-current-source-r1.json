@@ -1,0 +1,30 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "ce-current-20260924-r1",
+  "producer": "current project owner (fresh-source inline review)",
+  "reviewed_at": "2026-09-24T00:00:00.000Z",
+  "source_binding": {
+    "head": "f4c7a7b98ecf342e54bd3117c4d745e684532a19",
+    "dirty_path_manifest_sha256": "1bb075e50a41be74a6110474cadc6e048d1a7e0ba373aedf14e1479cfdede638",
+    "source_tree_hash": "4e6dadd27c2601ee9a3f7abe1c9fe2a68ff0ac423b78373e4b217a6ad5f2a838",
+    "inventory_hash": "ed135a864893cde2a444577b62acd29af6d021dd3d34ef5d2c942caa767f4d1e",
+    "inventory_artifact_sha256": "8fb767e4e3e828f6c853c10cd29de2bccc9fbed98c6847b9c85095824b93bd80",
+    "review_input_hash": "cb30de71d396c809811ea01ea3661455a4d4593c66878d6316f9d9d379a41ebb"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "unverified",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "reviewed_paths": [],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "本 delta 对当前 source receipt 做 fresh-source 增量复核；两个 lens 仍由同一 owner 执行，不宣称独立 provider。",
+    "真实模型/宿主 workflow 与 field outcome 不由该 delta 证明。",
+    "当前 dirty paths 属于相邻研究任务，本轮未修改或语义 adjudicate。"
+  ],
+  "claim_ceiling": "Current source receipt and bounded semantic review only; no independent provider, runtime adoption, or field outcome claim."
+}

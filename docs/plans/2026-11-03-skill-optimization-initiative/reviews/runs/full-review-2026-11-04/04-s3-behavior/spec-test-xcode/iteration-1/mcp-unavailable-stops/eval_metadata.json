@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "XcodeBuildMCP 不可用应停止并给安装指引",
+  "prompt": "（skill-up 评测框架说明：本仓库 .claude/skills/spec-test-xcode/SKILL.md 是被测\nskill 的定义文件,已随仓库就位。本次运行不经过 Skill 工具调用——请直接完整读取\n该文件,把它视为已加载的工作指令,然后按它处理下面的用户输入。）\n用户输入: current\n",
+  "assertions": [
+    "expect.must_contain",
+    "output_contains{all:[XcodeBuildMCP]}"
+  ]
+}

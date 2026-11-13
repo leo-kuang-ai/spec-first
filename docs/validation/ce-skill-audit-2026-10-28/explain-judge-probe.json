@@ -1,0 +1,32 @@
+{
+  "attempts": [
+    {
+      "command": [
+        "bash",
+        "/Users/kuang/xiaobu/spec-first/skills/spec-explain/evals/fixtures/scripts/check-simple-qa.sh",
+        "<isolated-repo>",
+        "<message>"
+      ],
+      "artifact_created": ".spec-first/workflows/spec-explain/probe/explainer.html",
+      "exit_code": 1,
+      "stdout": "最终输出为空\n",
+      "stderr": "",
+      "limitation": "仅探测judge；未运行模型或完整eval runner"
+    },
+    {
+      "command": [
+        "bash",
+        "/Users/kuang/xiaobu/spec-first/skills/spec-explain/evals/fixtures/scripts/check-simple-qa.sh"
+      ],
+      "environment": {
+        "EVAL_FINAL_MESSAGE": "stream 用于流式读取。",
+        "EVAL_WORKSPACE": "<isolated-repo>"
+      },
+      "artifact_created": ".spec-first/workflows/spec-explain/probe/explainer.html",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "limitation": "仅探测judge；首轮参数错误已保留；未运行模型或完整eval runner"
+}

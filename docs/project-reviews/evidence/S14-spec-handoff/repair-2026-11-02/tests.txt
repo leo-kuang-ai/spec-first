@@ -1,0 +1,8 @@
+PASS tests/unit/spec-lfg-contracts.test.js
+PASS tests/unit/spec-handoff-contracts.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       26 passed, 26 total
+Snapshots:   0 total
+Time:        2.023 s
+Ran all test suites within paths "tests/unit/spec-handoff-contracts.test.js", "tests/unit/spec-lfg-contracts.test.js".

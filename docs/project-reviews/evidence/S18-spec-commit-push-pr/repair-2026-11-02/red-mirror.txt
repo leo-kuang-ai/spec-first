@@ -1,0 +1,30 @@
+PASS: 多pushurl阻断，两端refs未变
+PASS: 唯一但非授权endpoint仍阻断
+node:assert:150
+  throw new AssertionError(obj);
+  ^
+
+AssertionError [ERR_ASSERTION]: push --no-follow-tags --no-mirror --recurse-submodules=no -u publish HEAD:refs/heads/feature: fatal: --mirror can't be combined with refspecs
+
+
+128 !== 0
+
+    at git (/Users/kuang/xiaobu/spec-first/docs/project-reviews/evidence/S18-spec-commit-push-pr/repair-2026-11-02/push-contract-probe.cjs:19:10)
+    at controlledPush (/Users/kuang/xiaobu/spec-first/docs/project-reviews/evidence/S18-spec-commit-push-pr/repair-2026-11-02/push-contract-probe.cjs:27:3)
+    at Object.<anonymous> (/Users/kuang/xiaobu/spec-first/docs/project-reviews/evidence/S18-spec-commit-push-pr/repair-2026-11-02/push-contract-probe.cjs:56:20)
+    at Module._compile (node:internal/modules/cjs/loader:1781:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1913:10)
+    at Module.load (node:internal/modules/cjs/loader:1505:32)
+    at Module._load (node:internal/modules/cjs/loader:1309:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    at node:internal/main/run_main_module:36:49 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 128,
+  expected: 0,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v22.22.3

@@ -1,0 +1,27 @@
+{
+  "unit": "U31",
+  "captured_at": "2026-10-29T11:32:17.357372+08:00",
+  "head": "fe81bae9ee55ec336c85cf80c4a0460d86e3a412",
+  "branch": "leo-2026-10-27-update",
+  "plan": "docs/plans/2026-10-29-001-refactor-ce-skill-optimization-plan.md",
+  "plan_sha256": "c9f5447bc34e4be96e9b69d5e016f2c2490c533580dc0becdcdc8ef76f2bd680",
+  "private_snapshot": ".git/spec-first-ce-optimization-2026-10-29",
+  "snapshot_file_count": 5998,
+  "protected_count": 6022,
+  "excluded_count": 24,
+  "excluded_policy": "宿主 runtime、缓存、凭据名文件不复制为源码；其可见文件身份保留在私有保护账。",
+  "manifest_sha256": "355fb1ea8a4e0ba8a4359f0acb4a104151f1867f4d50be47c791a80fbca804cd",
+  "restore_check": "passed",
+  "staged_unstaged_restoration": "passed",
+  "index_unchanged": true,
+  "engine": "当前 active goal / inline",
+  "worker_dispatch_authorization": "missing",
+  "worker_dispatch_outcome": "inline-fallback",
+  "reason_code": "dispatch_authorization_missing",
+  "mutation_authorization": "用户已授权按计划开发、自测、审查与本地交付",
+  "commit_authorization": "missing",
+  "landing_authorization": "missing",
+  "limitations": [
+    "恢复检查只证明本地源码与 index 内容，可选外部输入与模型行为尚未运行。"
+  ]
+}

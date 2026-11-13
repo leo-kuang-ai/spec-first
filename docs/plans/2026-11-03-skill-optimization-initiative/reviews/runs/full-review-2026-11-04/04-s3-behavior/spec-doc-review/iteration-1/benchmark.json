@@ -1,0 +1,179 @@
+{
+  "metadata": {
+    "skill_name": "spec-doc-review",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-doc-review",
+    "timestamp": "2026-11-04T11:46:03Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "冲突 mutation token 应 fail closed 且不读文档",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 95.462,
+        "tokens": 23640,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[flag-conflict-or-unsupported]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[flag-conflict-or-unsupported])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Non-interactive review without a path returns the fixed receipt",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 58.742,
+        "tokens": 22996,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-doc-review/evals/fixtures/scripts/check-headless-no-path.sh",
+          "passed": false,
+          "evidence": "script exited with code 1 [stderr: node:assert:150\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'Review failed: non-interactive mode requires a document path. Expected arguments: mode:non-interactive \u003cpath\u003e\\n' +\n+   '\\n' +\n+   '说明：本次调用只携带了 `mode:non-interactive` 标志，未附带任何文档路径，因此按技能契约在派遣评审前直接终止，未做任何 persona 分派或文档读取。\\n' +\n+   '\\n' +\n+   '如需继续，请在参数中附上待评审文档的可读路径，例如：\\n' +\n+   '- `mode:non-interactive docs/plans/my-plan.md`（默认 report-only 报告）\\n' +\n+   '- `mode:non-interactive mutation:apply-fixes docs/plans/my-plan.md`（生产者授权的受限 Markdown 修复评审）\\n' +\n+   '\\n' +\n+   '可选标志还包括 `roster:lite|standard|full`（默认 standard）与 `output:json`。'\n- 'Review failed: non-interactive mode requires a document path. Expected arguments: mode:non-interactive \u003cpath\u003e'\n\n    at missingDocumentPath ([stdin]:46:10)\n    at [stdin]:49:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 'Review failed: non-interactive mode requires a document path. Expected arguments: mode:non-interactive \u003cpath\u003e\\n' +\n    '\\n' +\n    '说明：本次调用只携带了 `mode:non-interactive` 标志，未附带任何文档路径，因此按技能契约在派遣评审前直接终止，未做任何 persona 分派或文档读取。\\n' +\n    '\\n' +\n    '如需继续，请在参数中附上待评审文档的可读路径，例如：\\n' +\n    '- `mode:non-interactive docs/plans/my-plan.md`（默认 report-only 报告）\\n' +\n    '- `mode:non-interactive mutation:apply-fixes docs/plans/my-plan.md`（生产者授权的受限 Markdown 修复评审）\\n' +\n    '\\n' +\n    '可选标志还包括 `roster:lite|standard|full`（默认 standard）与 `output:json`。',\n  expected: 'Review failed: non-interactive mode requires a document path. Expected arguments: mode:non-interactive \u003cpath\u003e',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Default review preserves the document and Git state",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 471.087,
+        "tokens": 68337,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-doc-review/evals/fixtures/scripts/check-plan-marker.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Derived task packs are reviewed without direct edits",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 119.291,
+        "tokens": 40129,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-doc-review/evals/fixtures/scripts/check-taskpack-marker.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "HTML review remains report-only despite an apply request",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 401.424,
+        "tokens": 58550,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-doc-review/evals/fixtures/scripts/check-html-marker.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "standard 预算 ≤3 且 security 信号优先选中 security-lens",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 403.629,
+        "tokens": 58507,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[cost-shape security]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[cost-shape security])"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.8333333333333334,
+        "stddev": 0.372677996249965,
+        "min": 0,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 258.2725,
+        "stddev": 169.58105836516648,
+        "min": 58.742,
+        "max": 471.087
+      },
+      "tokens": {
+        "mean": 45359.833333333336,
+        "stddev": 17673.108078062807,
+        "min": 22996,
+        "max": 68337
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-product-pulse",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "kiro/kimi-k3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "kiro/kimi-k3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "kiro/kimi-k3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T10:15:57.189356+08:00",
+  "end_time": "2026-11-05T10:16:34.235546+08:00",
+  "case_results": [
+    {
+      "case_id": "unconfigured-guides-setup",
+      "title": "未配置时应引导 setup 而非硬跑空报告",
+      "status": "PASS",
+      "duration_ms": 36632,
+      "turns": 3,
+      "input_tokens": 33006,
+      "output_tokens": 151,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 3,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-product-pulse/evals/fixtures/scripts/asks-a-question.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-product-pulse skill 已安装，请按它工作。）\n给我出一份产品脉搏报告。\n",
+      "response": "首次运行配置访谈 — 没有找到策略文件（`STRATEGY.md`/`VISION.md`/`PRODUCT.md` 都不存在），所以从零配置。从 README 看到产品是 **MiniLedger**（内存版个人记账 demo，只有 `POST /entries` 和 `GET /entries` 两个接口）。\n\n**第 1 问（产品名）**：产品名候选是 `MiniLedger`，沿用还是要改？\n\n（后续还会问：核心使用事件、价值事件、转化事件、数据源、系统性能段、默认时间窗。逐题来。）",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 33157,
+  "judge_tokens": 0,
+  "overall_tokens": 33157
+}

@@ -1,0 +1,26 @@
+# manifest: spec-polish
+# frozen: 5b59293b
+629bccf39d24b682d49b9589035ccac7ea634055b385feac0e349ce71e25be26  skills/spec-polish/SKILL.md
+d041c489991e0588886383616d54396e3da48569cb27b96d539c8e375744a688  skills/spec-polish/evals/cases/r2-screenshot-review-routes-out.yaml
+9f57e31faa01707ef47c236672b712cbee5f8019098cd21476a5051c0512dd8f  skills/spec-polish/evals/cases/review-request-routes-out.yaml
+e01de27618775bf5fcf573bfc27c99db98ec4dd9f48f3f3470caecb81a6fd45a  skills/spec-polish/evals/eval.yaml
+4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855  skills/spec-polish/evals/fixtures/repos/mini-ledger/README.md
+03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b  skills/spec-polish/evals/fixtures/repos/mini-ledger/package.json
+ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34  skills/spec-polish/evals/fixtures/repos/mini-ledger/src/server.js
+14bea02a91277a7440f671f9d6bb5cd70117d23508a03b39dc986169d64fa973  skills/spec-polish/evals/fixtures/scripts/asks-a-question.sh
+e4b6cb76f3e4237d42eb5d28ee411aae78fe12d85e9030213bb117c63053b43d  skills/spec-polish/references/dev-server-astro.md
+383ae79026d37d82270c4abee443bacb9da99d786653793454aac74ed2cc7cc0  skills/spec-polish/references/dev-server-detection.md
+a24fa96162b9d407148ca9f9bbdab2ae422548d10dc3d21fe2d52b2c9a192ea1  skills/spec-polish/references/dev-server-next.md
+3dccc0cec9257a290e8cfd78c39410f2587ce228614f0f257ac469b48ee72c9c  skills/spec-polish/references/dev-server-nuxt.md
+3a5a5e796ca4dc72efa1fad5f7deaa119debca5078bd5395941d7fbff08aeb69  skills/spec-polish/references/dev-server-procfile.md
+732ce1e7ba3fd79ed99e5409a41e3160782d5de451379a8a5ec12d96c36aff8b  skills/spec-polish/references/dev-server-rails.md
+2e811c3e58959fc3813eb88c7dee8da4f2af3d05bcbc12e25ceb2b9abe4bfecc  skills/spec-polish/references/dev-server-remix.md
+78f293f20032980156b1e857efd0f64d98c308d472a94e33affbb1c9982ace23  skills/spec-polish/references/dev-server-sveltekit.md
+55001b31e4a879823356776f9ea0345afd7aa8534382bff38bf3a1f2e5d8a7e7  skills/spec-polish/references/dev-server-vite.md
+a3e3dc07c38b7cf9b800d8d4e621e8083bee2e0fd08ce93301b96f4363ff6601  skills/spec-polish/references/launch-json-schema.md
+272717e7bbc825104acb4e0e4177f00961673ad7a2bbdf7477386458e9445911  skills/spec-polish/references/run.md
+7462153a064781300419dea9bcb957206e26b6a85f2427c106fc283c2c104f27  skills/spec-polish/scripts/config-port.cjs
+08540add756eb63eded2aabe2a87f5218519d7001124e14d1681f77b473d0c4b  skills/spec-polish/scripts/detect-project-type.sh
+bb0d99075b97fbdacffd9de4e2078b2a54c4290bec0c213f2e7365bee8ec38d0  skills/spec-polish/scripts/read-launch-json.sh
+9d9b1132fb8e4f68f79695ebe428501467be62e90a9779e02e287298db9b754f  skills/spec-polish/scripts/resolve-package-manager.sh
+5981fb85eda109b29bae6f6baf519a9f4b6f860baba7b59b24ad52cf75be1242  skills/spec-polish/scripts/resolve-port.sh

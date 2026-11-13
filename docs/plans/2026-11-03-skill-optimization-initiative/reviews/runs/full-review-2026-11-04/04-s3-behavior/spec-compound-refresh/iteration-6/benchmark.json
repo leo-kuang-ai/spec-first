@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "skill_name": "spec-compound-refresh",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-compound-refresh",
+    "timestamp": "2026-11-04T13:33:09Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "部分发布不能被完整的成功报告掩盖",
+      "configuration": "with_skill",
+      "run_number": 6,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 111.407,
+        "tokens": 42274,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound-refresh/evals/fixtures/scripts/check-publication-partial.sh",
+          "passed": true,
+          "evidence": "PASS: 固定fixture的原件、引用、恢复与报告一致；非模型行为或通用语义证明"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 111.407,
+        "stddev": 0,
+        "min": 111.407,
+        "max": 111.407
+      },
+      "tokens": {
+        "mean": 42274,
+        "stddev": 0,
+        "min": 42274,
+        "max": 42274
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

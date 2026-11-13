@@ -1,0 +1,60 @@
+{
+  "id": "CEOPT-32-prose-successor-verification",
+  "at": "2026-10-31T08:25:37.633897+00:00",
+  "source_sha256": "12438f6bff6ccb18bcffbe39242c395ed2bb5b0eb7be6a52ad77aa66956095e6",
+  "exact_one_line_change": true,
+  "generic_validator_records": [
+    {
+      "argv": [
+        "python3",
+        "/Users/kuang/.codex/skills/.system/skill-creator/scripts/quick_validate.py",
+        "skills/spec-worktree"
+      ],
+      "exit_code": 1,
+      "stdout": "Unexpected key(s) in SKILL.md frontmatter: user-invocable. Allowed properties are: allowed-tools, description, license, metadata, name\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "/Users/kuang/.codex/skills/.system/skill-creator/scripts/quick_validate.py",
+        ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-worktree"
+      ],
+      "exit_code": 1,
+      "stdout": "Unexpected key(s) in SKILL.md frontmatter: user-invocable. Allowed properties are: allowed-tools, description, license, metadata, name\n",
+      "stderr": ""
+    }
+  ],
+  "generic_validator_conclusion": "Existing schema incompatibility on baseline and successor; neither is claimed passing.",
+  "project_lint": {
+    "command": "npm run lint:skill-entrypoints",
+    "exit_code": 0,
+    "observed_output": "skill entrypoint lint passed (510 files scanned)"
+  },
+  "fresh_model_eval": "not-run; narrow factual correction, no new model behavior claim",
+  "runtime_regeneration": "not-run; no runtime write authorized in this acceptance slice",
+  "helper_help_checks": [
+    {
+      "argv": [
+        "bash",
+        "-n",
+        "skills/spec-worktree/scripts/worktree-manager.sh"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "skills/spec-worktree/scripts/worktree-manager.sh",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "Usage:\n  worktree-manager.sh detect --json\n  worktree-manager.sh create [--copy-env] <branch-name> [from-branch]\n  worktree-manager.sh isolate [--copy-env] <target-ref|pr:<number>|#<number>> [worktree-slug]\n\nCreates .worktrees/<branch-name> with <branch-name> branched from\n[from-branch] (default: origin's default branch, or main).\n\nThe primary checkout branch is preserved while from-branch is fetched.\nSetup may add .worktrees to the caller checkout .gitignore.\n\nisolate attaches .worktrees/<slug> to an existing branch, tag, commit, or PR\nhead. A branch can be checked out in only one worktree at a time; if the target\nbranch is already checked out, the command reports already_checked_out and exits\n0 without creating a duplicate checkout.\n\nBy default, .env* files are not copied. Pass --copy-env to opt in.\n\ndetect --json emits schema_version spec-worktree-detect.v1 with state:\nordinary-checkout | linked-worktree | submodule | unknown\nand reason_code:\nsame-git-dir | linked-worktree | submodule-superproject | not-git-repo | git-query-failed | output-contract-failed\n\nExit code: 0 when the state was determined (ordinary-checkout, linked-worktree,\nor submodule) -- always parse the state field to choose the next action, since\nexit 0 alone does not mean \"safe to create\". Non-zero (state=unknown) means\ndetection failed; read reason_code. node is required to emit the JSON.\n",
+      "stderr": ""
+    }
+  ],
+  "helper_help_exact_declared_replacement": true,
+  "helper_sha256": "f79de56aeca054b08fc919bd04afbd8b5c09f6a1038389e3c84fa63510d0e81f"
+}

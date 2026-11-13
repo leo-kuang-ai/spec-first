@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-31T09:27:55.987079+00:00",
+  "scenario": "CEOPT-22",
+  "reason": "Reduce observed inter-session coordination gaps; trial inputs/order/criteria unchanged.",
+  "completed_originals": {
+    "A1": 140.586,
+    "B1": 50.726
+  },
+  "former_dispatch_owner": "/root/w1_trial_coordinator",
+  "new_dispatch_owner": "/root",
+  "remaining_order": [
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "trial_agent_naming": "/root/ce27_22_<arm><trial>; existing capture regex supports both root and coordinator child paths.",
+  "single_combined_slot": true,
+  "deadline_seconds": 300,
+  "stop_on_new_infrastructure429": true,
+  "claim_limit": "No attribution of unmeasured scheduling/queue/capture gaps or relative runtime improvement."
+}

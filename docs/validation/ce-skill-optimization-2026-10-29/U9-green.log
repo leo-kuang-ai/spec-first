@@ -1,0 +1,12 @@
+PASS tests/unit/spec-prd-finalize-transition.test.js
+PASS tests/unit/spec-prd-hook-contracts.test.js
+PASS tests/unit/spec-prd-finding-schema-freeze.test.js
+PASS tests/unit/spec-prd-exit-safety.test.js
+PASS tests/unit/spec-prd-validate-mode.test.js
+PASS tests/unit/spec-prd-plan-handoff-contracts.test.js
+
+Test Suites: 6 passed, 6 total
+Tests:       76 passed, 76 total
+Snapshots:   0 total
+Time:        1.908 s, estimated 2 s
+Ran all test suites within paths "tests/unit/spec-prd-finalize-transition.test.js", "tests/unit/spec-prd-validate-mode.test.js", "tests/unit/spec-prd-exit-safety.test.js", "tests/unit/spec-prd-hook-contracts.test.js", "tests/unit/spec-prd-plan-handoff-contracts.test.js", "tests/unit/spec-prd-finding-schema-freeze.test.js".

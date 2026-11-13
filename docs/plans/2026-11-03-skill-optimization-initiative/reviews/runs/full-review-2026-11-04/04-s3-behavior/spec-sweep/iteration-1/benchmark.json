@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "skill_name": "spec-sweep",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-sweep",
+    "timestamp": "2026-11-04T12:17:21Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "headless 首跑应报 requires interactive setup 并停止",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 49.743,
+        "tokens": 24595,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[first run requires interactive setup]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[first run requires interactive setup])"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 49.743,
+        "stddev": 0,
+        "min": 49.743,
+        "max": 49.743
+      },
+      "tokens": {
+        "mean": 24595,
+        "stddev": 0,
+        "min": 24595,
+        "max": 24595
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

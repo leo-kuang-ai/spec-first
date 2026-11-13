@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "与 docs/solutions 无关的请求应被 scope gate 拦下",
+  "prompt": "（spec-compound-refresh skill 已安装，请按它工作。）\n帮我把这个项目整体重构一下,代码太乱了。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound-refresh/evals/fixtures/scripts/check-scope-gate.sh"
+  ]
+}

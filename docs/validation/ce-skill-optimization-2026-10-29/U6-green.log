@@ -1,0 +1,9 @@
+PASS tests/unit/spec-pov-worker-admission.test.js
+PASS tests/unit/review-peer-expansion-contracts.test.js
+PASS tests/unit/peer-job-runner-parity.test.js
+
+Test Suites: 3 passed, 3 total
+Tests:       15 passed, 15 total
+Snapshots:   0 total
+Time:        0.215 s, estimated 2 s
+Ran all test suites within paths "tests/unit/spec-pov-worker-admission.test.js", "tests/unit/review-peer-expansion-contracts.test.js", "tests/unit/peer-job-runner-parity.test.js".

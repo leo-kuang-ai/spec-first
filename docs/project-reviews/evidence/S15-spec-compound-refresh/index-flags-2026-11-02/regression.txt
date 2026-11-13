@@ -1,0 +1,8 @@
+PASS tests/unit/knowledge-publication-judges.test.js (5.268 s)
+PASS tests/unit/knowledge-causality-judge.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       32 passed, 32 total
+Snapshots:   0 total
+Time:        8.509 s, estimated 9 s
+Ran all test suites within paths "tests/unit/knowledge-publication-judges.test.js", "tests/unit/knowledge-causality-judge.test.js".

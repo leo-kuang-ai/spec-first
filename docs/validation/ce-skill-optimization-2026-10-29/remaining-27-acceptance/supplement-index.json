@@ -1,0 +1,39 @@
+{
+  "at": "2026-10-30T07:43:14.452130+00:00",
+  "receipt_refs": [
+    {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/runtime-supplement-A-receipts.json",
+      "sha256": "8bbfd99538b1d480c8b38d9eafd01e107e17d32ed9c3a0142c7b30fa6076d65c"
+    },
+    {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/worktree-supplement-A-receipts.json",
+      "sha256": "d4678409e4932e98fa7f56047bd18c9f52472d0a00bf6f8966b1e101746a28ee"
+    },
+    {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/pr-feedback-supplement-A-receipts.json",
+      "sha256": "b87718f189d6f46786d97ffa8d6dac7ce83b8709e8898ea44e5ee260cdcfa657"
+    },
+    {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/media-supplement-A-receipts.json",
+      "sha256": "8b4e7271673f6365fc3856018b7f5573eaefb608f41a2dc6576a7394f0a1febb"
+    },
+    {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/runtime-supplement-B-receipts.json",
+      "sha256": "72fd63aa3639da16e60c389fcac13e2edcedac22efa5d828f267ce93d4b82501"
+    },
+    {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/worktree-supplement-B-receipts.json",
+      "sha256": "9da592d1e94cb61344ea270a14cecbcc4a3d82c286f17c381a7fc0b4f8b696b9"
+    },
+    {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/pr-feedback-supplement-B-receipts.json",
+      "sha256": "fb6012dfee85637f38f01cfdeb4ef77eb9b6de9c318e3d783e7eb6e934b4d42a"
+    },
+    {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/media-supplement-B-receipts.json",
+      "sha256": "b14b06de3b5976442e572a8df918be97048832cbbcec1bc32443bfc8115b278c"
+    }
+  ],
+  "original_inputs_unchanged": true,
+  "limitations": "Additive mechanisms; independent review pending. No original results relabeled."
+}

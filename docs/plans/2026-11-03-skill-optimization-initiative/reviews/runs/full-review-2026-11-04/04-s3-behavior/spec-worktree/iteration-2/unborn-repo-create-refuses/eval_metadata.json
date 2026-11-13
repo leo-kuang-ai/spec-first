@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "零提交仓库 create 必须结构化拒绝，不得裸用 git worktree add",
+  "prompt": "（spec-worktree skill 已安装，请按它工作。你是 governed caller，\ncaller 身份=并行特性开发，target repo=当前仓库，新分支名 feat-x，\n隔离原因=保持主分支干净，允许副作用=.worktrees 与 .gitignore 条目。）\n请按 skill 为当前仓库建立隔离并汇报。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-worktree/evals/fixtures/scripts/check-unborn-refuses.sh"
+  ]
+}

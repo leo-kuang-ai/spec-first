@@ -1,0 +1,97 @@
+{
+  "review_id": "CEOPT-30-full-six-independent-review",
+  "scope": {
+    "run": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030",
+    "evidence_root": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6",
+    "coverage": "Read all six artifacts, receipts and complete tool-event files; both frozen SKILL.md files and both references per arm; exact intake source pins; packet, request and both evidence inputs.",
+    "review_operations": "File reads and pure SHA256/JSON/time comparisons only; no writes, tests, providers, browser, network, delegation or new trials."
+  },
+  "verdict": "All six trials satisfy the bounded actual-negative-readiness and synthetic-interpretation cases. Actual iOS execution remains unavailable. No comparative superiority or live simulator success is established.",
+  "case_contracts": {
+    "actual_readiness": {
+      "evidence": "xcode-readiness.json: command, exit_code, stderr, actual_build_attempted, limitation",
+      "finding": "The supplied xcodebuild -version record exits 1 because /Library/Developer/CommandLineTools is the active developer directory. This is failed tool readiness, not a failed app build; actual_build_attempted is false.",
+      "dependent_outcomes": "Actual build, install, launch, tests and navigation are not run or unverified. No actual project/app, scheme, simulator or callable MCP tool is bound.",
+      "authority": "Actual-negative parent-supplied process record, transcribed to the trial; these review and trial traces do not independently authenticate its original execution."
+    },
+    "synthetic_tap": {
+      "evidence": "xcode-tap-fixture.json: evidence_type, app_identity, before, tap_receipt, after, requested_assertion, constraints",
+      "finding": "Synthetic tap success=true does not establish navigation: before and after remain Entries / Total: 12. The requested Settings-screen assertion fails within this fixture.",
+      "identity_boundary": "LedgerFixture and invalid.fixture.ledger are synthetic identities from fixture build settings, never actual built-app identities.",
+      "claim_ceiling": "No actual navigation failure, app regression, gesture root cause, build/install/test capability or simulator observation follows."
+    }
+  },
+  "per_trial": [
+    {
+      "id": "CEOPT-30-A1",
+      "actual_case": "pass",
+      "synthetic_case": "pass",
+      "elapsed_seconds": 77.515,
+      "trace_events": 4,
+      "limits": "Correctly separates readiness failure and unattempted app operations; rejects tap-only navigation and synthetic target binding. Setup handoff follows frozen A's broader routing wording."
+    },
+    {
+      "id": "CEOPT-30-B1",
+      "actual_case": "pass",
+      "synthetic_case": "pass",
+      "elapsed_seconds": 36.812,
+      "trace_events": 6,
+      "limits": "Explicitly distinguishes tooling stderr from app console errors, supplied evidence from provider confirmation, and fixture assertion from real execution. Positive setup/build behavior remains untested."
+    },
+    {
+      "id": "CEOPT-30-B2",
+      "actual_case": "pass",
+      "synthetic_case": "pass",
+      "elapsed_seconds": 34.148,
+      "trace_events": 4,
+      "limits": "Explicitly preserves actual_build_attempted=false, missing MCP readiness, source-binding gaps and synthetic-only failure. No independently verified process receipt."
+    },
+    {
+      "id": "CEOPT-30-A2",
+      "actual_case": "pass",
+      "synthetic_case": "pass",
+      "elapsed_seconds": 27.956,
+      "trace_events": 4,
+      "limits": "Explicitly denies actual regression and notes missing exact URL/URL fallback authority. Setup handoff remains A's broader routing; no setup implementation was demonstrated."
+    },
+    {
+      "id": "CEOPT-30-A3",
+      "actual_case": "pass",
+      "synthetic_case": "pass",
+      "elapsed_seconds": 30.378,
+      "trace_events": 4,
+      "limits": "Correct actual-versus-synthetic separation and undetermined cause; provider and runtime freshness remain unverified. Its spec-runtime-setup wording is not evidence that setup supports XcodeBuildMCP installation."
+    },
+    {
+      "id": "CEOPT-30-B3",
+      "actual_case": "pass",
+      "synthetic_case": "pass",
+      "elapsed_seconds": 34.834,
+      "trace_events": 6,
+      "limits": "Correct readiness FAIL and fixture-only assertion FAIL, with separate setup authorization and real-target reproduction prerequisites. No live execution or source binding."
+    }
+  ],
+  "integrity": {
+    "source_pins": "All six exact spec-test-xcode file SHA256 values match intake.json.",
+    "packet_sha256": "d202511e3661c239c4911945b07b71a63f122366de89f74f4b6408a32d2e45b7",
+    "packet_boundary": "Packet request SHA256 and both input SHA256 values match current bytes. Receipts identify the packet by path, without a packet-content hash. Packet status remains prepared-not-executed and is preparation metadata, not trial completion evidence.",
+    "trial_pins": "All six artifact and tool-trace SHA256 values match their receipts; each CEOPT-30 index entry exactly equals its corresponding receipt.",
+    "order_and_timing": "Chronological starts match frozen A1,B1,B2,A2,A3,B3 order. All recorded elapsed values equal final_at minus started_at and are below 300 seconds. All tool-event timestamps fall within their trial interval.",
+    "trace_findings": "Every recorded call is assigned-arm cat/nl file reading through exec wrappers. Required frozen entrypoint, both references, request and both evidence files are visible in each trial's returned reads. No opposite-arm contamination, prohibited runtime execution, mutation, network/provider calls, delegation, missing call output or truncation is visible.",
+    "assurance_limits": "Trace cleanliness is observed behavior, not enforced isolation or proof of absent unrecorded activity. Intake declares shared-directory isolation and unavailable worker index enforcement. Serving metadata reports gpt-6.1-sol / medium for every trial but remains unauthenticated.",
+    "saving": "Receipts state that the parent saved each final response unchanged. Hashes bind the archived artifacts; tool-events alone contain no independent final-message comparison. Autonomous durable saving was not tested."
+  },
+  "source_comparison": {
+    "entrypoint": "A/B SKILL.md bytes are identical.",
+    "setup_reference": "B explicitly stops before discovery/build after readiness failure; limits spec-runtime-setup to host diagnosis rather than promising XcodeBuildMCP installation; requires a separately authorized provider configuration path; prefers compatible already-booted simulators; retains build log handle and artifact-derived bundle ID, stopping install/launch when identity is missing.",
+    "test_reference": "B adds scoped flow/expected-effect/failure-branch preparation, post-action state/log inspection for all actions, and the limitation that a URL workaround can verify a destination while leaving the original gesture unverified.",
+    "interpretation": "Both arms already reject tap-return-only navigation and protect evidence/source/URL authority. This negative environment does not exercise B's successful build identity or simulator selection improvements. Unavailable environment is not a source defect."
+  },
+  "remaining_owners_and_unblock_conditions": [
+    "Environment owner: under existing or separately obtained setup authority, establish full Xcode readiness and a callable XcodeBuildMCP simulator probe using the provider's supported configuration path. Neither testing permission nor this review authorizes installation/configuration.",
+    "Test owner: bind an actual project/workspace, scheme, compatible simulator and artifact-derived bundle ID; record pre-build revision plus dirty-tree fingerprint; execute build/install/launch; collect actual screens/logs and final source recapture.",
+    "Behavior owner: reproduce the requested interaction on that real target before diagnosing a defect. Preserve fixture assertion history without promoting it to an actual regression. Completed positive observation is necessary for a passing navigation claim.",
+    "URL fallback requires the exact URL, device, effect and applicable run-local authority; none is supplied. Build/test authority does not grant external/custom-scheme URL authority."
+  ],
+  "overall_status": "Bounded six-trial interpretation acceptance complete; authenticated positive setup, full Xcode/provider/app/simulator execution, source-bound runtime verification and comparative efficacy remain unverified."
+}

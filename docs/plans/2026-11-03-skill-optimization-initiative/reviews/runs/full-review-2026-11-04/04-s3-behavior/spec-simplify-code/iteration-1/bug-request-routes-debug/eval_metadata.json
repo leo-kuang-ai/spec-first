@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "bug 请求应路由 spec-debug",
+  "prompt": "（spec-simplify-code skill 已安装，请按它工作。）\n服务发非法 JSON 会崩,帮我处理一下。\n",
+  "assertions": [
+    "expect.must_contain",
+    "output_contains{all:[spec-debug]}"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "command": [
+    "node",
+    "node_modules/jest/bin/jest.js",
+    "--runInBand",
+    "--runTestsByPath",
+    "tests/unit/spec-optimize-measurement-only-contracts.test.js",
+    "tests/unit/spec-optimize-contracts.test.js",
+    "tests/unit/spec-code-review-mechanics.test.js",
+    "tests/unit/spec-worktree-contracts.test.js",
+    "tests/unit/spec-commit-scope-regression.test.js",
+    "tests/unit/spec-commit-push-pr-context-contracts.test.js"
+  ],
+  "exit_code": 0
+}

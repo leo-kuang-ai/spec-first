@@ -1,0 +1,73 @@
+FAIL tests/unit/spec-optimize-decide.test.js
+  ● local evidence boundaries › requires observations on both arms in repeat mode
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not "keep"
+
+      30 |       candidate: snapshot(5, { metrics: { wall_seconds: { samples: [5, 5, 5] } }, sample_count: 100 }),
+      31 |     });
+    > 32 |     expect(result.decision).not.toBe('keep');
+         |                                 ^
+      33 |     expect(result.target_reached).toBe(false);
+      34 |     expect(result.next_measurement).toBe('confirm');
+      35 |   });
+
+      at toBe (tests/unit/spec-optimize-decide.test.js:32:33)
+
+  ● local evidence boundaries › requires observations on both arms in ladder mode
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not "keep"
+
+      30 |       candidate: snapshot(5, { metrics: { wall_seconds: { samples: [5, 5, 5] } }, sample_count: 100 }),
+      31 |     });
+    > 32 |     expect(result.decision).not.toBe('keep');
+         |                                 ^
+      33 |     expect(result.target_reached).toBe(false);
+      34 |     expect(result.next_measurement).toBe('confirm');
+      35 |   });
+
+      at toBe (tests/unit/spec-optimize-decide.test.js:32:33)
+
+  ● cost-aware measurement ladder › a scalar judge snapshot cannot complete confirmation from sample_count
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "promising"
+    Received: "keep"
+
+      1348 |       },
+      1349 |     })
+    > 1350 |     expect(result.decision).toBe("promising")
+           |                             ^
+      1351 |     expect(result.next_measurement).toBe("confirm")
+      1352 |   })
+      1353 |
+
+      at Object.toBe (tests/unit/spec-optimize-decide.test.js:1350:29)
+
+FAIL tests/unit/spec-optimize-measurement-only-contracts.test.js
+  ● spec-optimize measurement-only calibration › computes noise from A/A results instead of accepting a caller assertion
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      161 |       observed_noise_floor: 0,
+      162 |     });
+    > 163 |     expect(result.status).toBe(1);
+          |                           ^
+      164 |     expect(result.payload.ab_allowed).toBe(false);
+      165 |   });
+      166 |
+
+      at Object.toBe (tests/unit/spec-optimize-measurement-only-contracts.test.js:163:27)
+
+Test Suites: 2 failed, 2 total
+Tests:       4 failed, 102 passed, 106 total
+Snapshots:   0 total
+Time:        2.402 s, estimated 3 s
+Ran all test suites within paths "tests/unit/spec-optimize-decide.test.js", "tests/unit/spec-optimize-measurement-only-contracts.test.js".

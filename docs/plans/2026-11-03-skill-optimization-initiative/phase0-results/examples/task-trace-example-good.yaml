@@ -1,0 +1,669 @@
+# Phase 0 任务追踪示例 - 高质量参考
+
+# 这是一个"理想"的任务追踪示例，展示完整的追踪格式
+# 真实任务可能没有这么完美，但应该尽量接近这个标准
+
+---
+# ============================================
+# 基本信息
+# ============================================
+task_id: "TASK-001"
+task_title: "增加订单查询的日期范围筛选功能"
+task_type: "feature_development"  # feature_development / bug_fix / pr_feedback / cross_session
+complexity: "medium"  # simple / medium / complex
+estimated_time: "2 days"
+actual_time: "2.5 days"
+
+# ============================================
+# 任务上下文
+# ============================================
+context:
+  repository: "order-service"
+  branch: "feature/date-range-filter"
+  pr_number: 123
+  pr_url: "https://github.com/org/order-service/pull/123"
+  commits:
+    - "a1b2c3d: feat: add date range filter UI"
+    - "e4f5g6h: feat: add backend API for date filtering"
+    - "i7j8k9l: test: add tests for date range"
+  
+  team_members:
+    - role: "developer"
+      name: "Developer A"
+    - role: "reviewer"
+      name: "Tech Lead B"
+
+# ============================================
+# 流程追踪
+# ============================================
+workflow:
+  
+  # ------------------------------------------
+  # 阶段 1：需求理解
+  # ------------------------------------------
+  - stage: "1_requirement"
+    start_time: "2024-01-01 09:00"
+    end_time: "2024-01-01 09:30"
+    duration: "30 minutes"
+    
+    input:
+      user_request: |
+        用户希望在订单查询页面增加日期范围筛选，
+        方便查询特定时间段的订单。
+      
+      context_provided:
+        - "现有订单查询功能（支持订单号、状态筛选）"
+        - "订单表有 created_at 字段（索引存在）"
+        - "用户数据量约 10 万订单/天"
+    
+    output:
+      requirement_understood: true
+      clarifications_needed:
+        - "日期范围的最大跨度是多少？"
+        - "是否需要支持时分秒？"
+        - "是否需要快捷选项（最近 7 天、30 天）？"
+      
+      clarifications_obtained:
+        - question: "日期范围最大跨度？"
+          answer: "最多 90 天"
+        - question: "是否需要时分秒？"
+          answer: "只需要日期（YYYY-MM-DD）"
+        - question: "是否需要快捷选项？"
+          answer: "需要，最近 7/30/90 天"
+    
+    friction_points: []  # 无阻力点
+  
+  # ------------------------------------------
+  # 阶段 2：PRD 生成
+  # ------------------------------------------
+  - stage: "2_prd"
+    skill_used: "spec-prd"
+    start_time: "2024-01-01 10:00"
+    end_time: "2024-01-01 10:45"
+    duration: "45 minutes"
+    
+    input:
+      from_stage: "1_requirement"
+      requirement_summary: "增加日期范围筛选功能"
+    
+    output:
+      prd_path: "docs/prd/order-date-filter.md"
+      prd_content_summary:
+        title: "订单查询日期范围筛选功能"
+        objective: "支持用户按日期范围查询订单，提升查询效率"
+        
+        functional_requirements:
+          - id: "FR-001"
+            description: "支持自定义日期范围选择"
+            priority: "P0"
+            acceptance_criteria:
+              - "用户可选择开始日期和结束日期"
+              - "日期选择器支持日历界面"
+              - "日期格式为 YYYY-MM-DD"
+          
+          - id: "FR-002"
+            description: "提供快捷日期选项"
+            priority: "P0"
+            acceptance_criteria:
+              - "提供'最近 7 天''最近 30 天''最近 90 天'快捷按钮"
+              - "点击快捷按钮自动设置日期范围"
+          
+          - id: "FR-003"
+            description: "日期范围验证"
+            priority: "P0"
+            acceptance_criteria:
+              - "开始日期不能晚于结束日期"
+              - "日期范围不能超过 90 天"
+              - "违反规则时显示错误提示"
+        
+        boundary_conditions:
+          - condition: "空日期（用户未选择日期）"
+            expected_behavior: "默认显示最近 7 天的订单"
+          
+          - condition: "日期范围超过 90 天"
+            expected_behavior: "显示错误提示'日期范围不能超过 90 天'"
+          
+          - condition: "开始日期晚于结束日期"
+            expected_behavior: "显示错误提示'开始日期不能晚于结束日期'"
+          
+          - condition: "日期范围内无订单"
+            expected_behavior: "显示空列表和提示'该时间段无订单'"
+          
+          - condition: "日期范围内订单数量巨大（>10000）"
+            expected_behavior: "分页显示，每页 100 条，响应时间 <2s"
+        
+        non_functional_requirements:
+          - type: "performance"
+            requirement: "查询响应时间 <2s（P95）"
+          
+          - type: "usability"
+            requirement: "日期选择器易用，符合常见 UI 规范"
+        
+        out_of_scope:
+          - "不支持按小时/分钟筛选"
+          - "不支持导出筛选结果（后续迭代）"
+          - "不支持保存筛选条件（后续迭代）"
+    
+    # Contract 检查
+    contract_check:
+      passed: true
+      validation:
+        - check: "functional_requirements 至少 1 项"
+          result: "passed（3 项）"
+        
+        - check: "每项 FR 至少 1 个 acceptance_criteria"
+          result: "passed（FR-001: 3 个，FR-002: 2 个，FR-003: 3 个）"
+        
+        - check: "boundary_conditions 至少 3 项"
+          result: "passed（5 项）"
+        
+        - check: "out_of_scope 明确"
+          result: "passed（3 项）"
+    
+    friction_points: []  # 无阻力点，PRD 质量高
+  
+  # ------------------------------------------
+  # 阶段 3：Plan 生成
+  # ------------------------------------------
+  - stage: "3_plan"
+    skill_used: "spec-plan"
+    start_time: "2024-01-01 11:00"
+    end_time: "2024-01-01 12:30"
+    duration: "90 minutes"
+    
+    input:
+      from_stage: "2_prd"
+      prd_path: "docs/prd/order-date-filter.md"
+    
+    output:
+      plan_path: "docs/plans/order-date-filter-plan.md"
+      plan_content_summary:
+        technical_approach:
+          architecture: "前后端分离，RESTful API"
+          
+          tech_stack:
+            - component: "前端日期选择器"
+              technology: "React DatePicker 组件"
+              config:
+                - key: "dateFormat"
+                  value: "YYYY-MM-DD"
+                  reason: "与后端约定格式一致"
+                - key: "maxDate"
+                  value: "today"
+                  reason: "不允许选择未来日期"
+            
+            - component: "后端查询"
+              technology: "PostgreSQL WHERE 子句"
+              config:
+                - key: "index"
+                  value: "created_at 索引（已存在）"
+                  reason: "加速日期范围查询"
+                - key: "query_template"
+                  value: "WHERE created_at BETWEEN $1 AND $2"
+                  reason: "标准日期范围查询"
+            
+            - component: "参数验证"
+              technology: "FastAPI Pydantic 模型"
+              config:
+                - key: "validator"
+                  value: "@validator('end_date') 检查 end_date >= start_date"
+                  reason: "自动验证日期范围合法性"
+        
+        acceptance_conditions:
+          - id: "AC-001"
+            prd_requirement_id: "FR-001"
+            condition: "用户可选择自定义日期范围"
+            test_method: "integration_test"
+            test_description: "测试用例：选择 2024-01-01 到 2024-01-31，验证返回该范围内订单"
+          
+          - id: "AC-002"
+            prd_requirement_id: "FR-002"
+            condition: "快捷按钮正常工作"
+            test_method: "integration_test"
+            test_description: "测试用例：点击'最近 7 天'，验证日期自动设置为今天往前 7 天"
+          
+          - id: "AC-003"
+            prd_requirement_id: "FR-003"
+            condition: "日期范围验证生效"
+            test_method: "unit_test"
+            test_description: "测试用例：输入无效范围（超过 90 天），验证返回 400 错误"
+        
+        boundary_handling:
+          - boundary_condition: "空日期"
+            handling_approach: "前端默认设置为最近 7 天，后端接收 null 时返回默认范围"
+            code_location: "frontend: OrderFilter.tsx, backend: order_api.py"
+          
+          - boundary_condition: "日期范围超过 90 天"
+            handling_approach: "Pydantic validator 检测，抛出 ValidationError"
+            code_location: "backend: order_models.py - DateRangeRequest"
+          
+          - boundary_condition: "开始日期晚于结束日期"
+            handling_approach: "Pydantic validator 检测，抛出 ValidationError"
+            code_location: "backend: order_models.py - DateRangeRequest"
+          
+          - boundary_condition: "日期范围内无订单"
+            handling_approach: "返回空数组 []，前端显示'该时间段无订单'"
+            code_location: "frontend: OrderList.tsx"
+          
+          - boundary_condition: "订单数量巨大"
+            handling_approach: "SQL LIMIT 100 OFFSET N，分页查询"
+            code_location: "backend: order_repository.py - query_by_date_range()"
+        
+        implementation_steps:
+          - step: 1
+            description: "前端增加日期选择器组件"
+            estimated_time: "4 hours"
+            dependencies: []
+          
+          - step: 2
+            description: "后端增加日期筛选 API"
+            estimated_time: "4 hours"
+            dependencies: []
+          
+          - step: 3
+            description: "前后端联调"
+            estimated_time: "2 hours"
+            dependencies: [1, 2]
+          
+          - step: 4
+            description: "编写单元测试和集成测试"
+            estimated_time: "4 hours"
+            dependencies: [1, 2]
+          
+          - step: 5
+            description: "性能测试和优化"
+            estimated_time: "2 hours"
+            dependencies: [3, 4]
+    
+    # Contract 检查
+    contract_check:
+      passed: true
+      validation:
+        - check: "tech_stack 具体配置（非抽象）"
+          result: "passed（所有 component 都有 config）"
+        
+        - check: "acceptance_conditions 数量 ≥ PRD 需求数量"
+          result: "passed（3 AC vs 3 FR）"
+        
+        - check: "boundary_handling 数量 = PRD 边界数量"
+          result: "passed（5 项 vs 5 项）"
+        
+        - check: "每个 AC 关联 PRD 需求 ID"
+          result: "passed（所有 AC 都有 prd_requirement_id）"
+    
+    # Protocol 检查（PRD → Plan）
+    protocol_check:
+      name: "PRD_to_Plan"
+      passed: true
+      validation:
+        - check: "所有 PRD 需求都在 Plan 中体现"
+          result: "passed（FR-001/002/003 都有对应 AC）"
+        
+        - check: "所有 PRD 边界条件都有处理方案"
+          result: "passed（5 个边界都有 handling_approach）"
+        
+        - check: "技术栈配置具体（非抽象）"
+          result: "passed（所有 config 都有 key-value-reason）"
+      
+      issues: []  # 无问题
+    
+    friction_points: []  # 无阻力点，Plan 质量高
+  
+  # ------------------------------------------
+  # 阶段 4：Work 实施
+  # ------------------------------------------
+  - stage: "4_work"
+    skill_used: "spec-work"
+    start_time: "2024-01-01 14:00"
+    end_time: "2024-01-02 18:00"
+    duration: "12 hours（跨两天）"
+    
+    input:
+      from_stage: "3_plan"
+      plan_path: "docs/plans/order-date-filter-plan.md"
+    
+    output:
+      implementation_summary:
+        files_modified:
+          - "frontend/src/components/OrderFilter.tsx"
+          - "backend/app/api/order_api.py"
+          - "backend/app/models/order_models.py"
+          - "backend/app/repositories/order_repository.py"
+        
+        files_created:
+          - "frontend/src/components/DateRangePicker.tsx（新组件）"
+          - "backend/tests/test_order_date_filter.py（测试）"
+        
+        acceptance_conditions_status:
+          - ac_id: "AC-001"
+            status: "implemented"
+            evidence: |
+              代码：OrderFilter.tsx 实现了日期选择器
+              测试：test_custom_date_range() 通过
+              测试结果：查询 2024-01-01 到 2024-01-31，返回 1234 条订单
+          
+          - ac_id: "AC-002"
+            status: "implemented"
+            evidence: |
+              代码：OrderFilter.tsx 实现了快捷按钮
+              测试：test_quick_filters() 通过
+              测试结果：点击'最近 7 天'，自动设置日期范围
+          
+          - ac_id: "AC-003"
+            status: "implemented"
+            evidence: |
+              代码：order_models.py DateRangeRequest 实现了 validator
+              测试：test_date_range_validation() 通过
+              测试结果：
+                - 输入超过 90 天 → 返回 400 错误
+                - 开始日期晚于结束日期 → 返回 400 错误
+        
+        boundary_handling_status:
+          - boundary: "空日期"
+            status: "handled"
+            code_location: "OrderFilter.tsx:45, order_api.py:123"
+            test_evidence: "test_empty_date() 通过，默认显示最近 7 天"
+          
+          - boundary: "日期范围超过 90 天"
+            status: "handled"
+            code_location: "order_models.py:78 - @validator"
+            test_evidence: "test_date_range_over_90_days() 通过，返回 400"
+          
+          - boundary: "开始日期晚于结束日期"
+            status: "handled"
+            code_location: "order_models.py:82 - @validator"
+            test_evidence: "test_start_after_end() 通过，返回 400"
+          
+          - boundary: "日期范围内无订单"
+            status: "handled"
+            code_location: "OrderList.tsx:67"
+            test_evidence: "test_no_orders_in_range() 通过，显示提示信息"
+          
+          - boundary: "订单数量巨大"
+            status: "handled"
+            code_location: "order_repository.py:156 - LIMIT/OFFSET"
+            test_evidence: |
+              test_large_dataset() 通过
+              测试数据：10000 条订单
+              响应时间：P95 = 1.8s（目标 <2s）
+        
+        tests_added:
+          - test_file: "backend/tests/test_order_date_filter.py"
+            test_cases:
+              - "test_custom_date_range（自定义范围）"
+              - "test_quick_filters（快捷按钮）"
+              - "test_date_range_validation（范围验证）"
+              - "test_empty_date（空日期）"
+              - "test_date_range_over_90_days（超过 90 天）"
+              - "test_start_after_end（起止日期错误）"
+              - "test_no_orders_in_range（无订单）"
+              - "test_large_dataset（大数据集）"
+            coverage_target: "functions: query_by_date_range, validate_date_range"
+          
+          - test_file: "frontend/tests/OrderFilter.test.tsx"
+            test_cases:
+              - "test_date_picker_render（日期选择器渲染）"
+              - "test_quick_buttons（快捷按钮）"
+              - "test_validation_messages（验证提示）"
+            coverage_target: "OrderFilter component"
+    
+    # Contract 检查
+    contract_check:
+      passed: true
+      validation:
+        - check: "所有 AC 状态为 implemented"
+          result: "passed（3/3）"
+        
+        - check: "所有边界状态为 handled"
+          result: "passed（5/5）"
+        
+        - check: "所有边界都有测试证据"
+          result: "passed（5/5）"
+        
+        - check: "测试至少覆盖所有边界"
+          result: "passed（8 个测试用例覆盖 5 个边界）"
+    
+    # Protocol 检查（Plan → Work）
+    protocol_check:
+      name: "Plan_to_Work"
+      passed: true
+      validation:
+        - check: "所有 AC 都已实现"
+          result: "passed（AC-001/002/003 全部 implemented）"
+        
+        - check: "所有边界都已处理"
+          result: "passed（5 个边界全部 handled）"
+        
+        - check: "所有边界都有测试"
+          result: "passed（5 个边界都有 test_evidence）"
+      
+      issues: []  # 无问题
+    
+    friction_points: []  # 无阻力点，Work 质量高
+  
+  # ------------------------------------------
+  # 阶段 5：Code Review
+  # ------------------------------------------
+  - stage: "5_review"
+    skill_used: "spec-code-review"
+    start_time: "2024-01-02 19:00"
+    end_time: "2024-01-02 20:00"
+    duration: "1 hour"
+    
+    input:
+      from_stage: "4_work"
+      work_summary_path: "实施完成的代码和测试"
+    
+    output:
+      review_result:
+        overall_status: "approved"
+        
+        acceptance_verification:
+          - ac_id: "AC-001"
+            verified: true
+            test_run_result: "✅ test_custom_date_range PASSED"
+            issues: []
+          
+          - ac_id: "AC-002"
+            verified: true
+            test_run_result: "✅ test_quick_filters PASSED"
+            issues: []
+          
+          - ac_id: "AC-003"
+            verified: true
+            test_run_result: "✅ test_date_range_validation PASSED"
+            issues: []
+        
+        boundary_verification:
+          - boundary: "空日期"
+            verified: true
+            test_run_result: "✅ test_empty_date PASSED"
+          
+          - boundary: "日期范围超过 90 天"
+            verified: true
+            test_run_result: "✅ test_date_range_over_90_days PASSED"
+          
+          - boundary: "开始日期晚于结束日期"
+            verified: true
+            test_run_result: "✅ test_start_after_end PASSED"
+          
+          - boundary: "日期范围内无订单"
+            verified: true
+            test_run_result: "✅ test_no_orders_in_range PASSED"
+          
+          - boundary: "订单数量巨大"
+            verified: true
+            test_run_result: |
+              ✅ test_large_dataset PASSED
+              性能：P95 = 1.8s（目标 <2s）
+        
+        code_quality_issues:
+          - severity: "minor"
+            issue: "变量命名可以更清晰"
+            location: "OrderFilter.tsx:67 - dateRange"
+            suggestion: "改为 selectedDateRange 更明确"
+    
+    # Protocol 检查（Work → Review）
+    protocol_check:
+      name: "Work_to_Review"
+      passed: true
+      validation:
+        - check: "Review 验证了所有 AC"
+          result: "passed（3/3 AC 已验证）"
+        
+        - check: "Review 验证了所有边界"
+          result: "passed（5/5 边界已验证）"
+        
+        - check: "Review 运行了测试"
+          result: "passed（所有测试都有 test_run_result）"
+      
+      issues: []  # 无问题
+    
+    friction_points: []  # 无阻力点，Review 质量高
+  
+  # ------------------------------------------
+  # 阶段 6：Commit & PR
+  # ------------------------------------------
+  - stage: "6_commit_pr"
+    skill_used: "spec-commit-push-pr"
+    start_time: "2024-01-02 20:30"
+    end_time: "2024-01-02 21:00"
+    duration: "30 minutes"
+    
+    input:
+      from_stage: "5_review"
+      review_status: "approved"
+    
+    output:
+      commit_info:
+        commits:
+          - hash: "a1b2c3d"
+            message: "feat: add date range filter UI"
+          - hash: "e4f5g6h"
+            message: "feat: add backend API for date filtering"
+          - hash: "i7j8k9l"
+            message: "test: add tests for date range filter"
+        branch: "feature/date-range-filter"
+      
+      pr_info:
+        pr_number: 123
+        pr_url: "https://github.com/org/order-service/pull/123"
+        pr_title: "feat: add date range filter for order query"
+        pr_body: |
+          ## 功能描述
+          增加订单查询的日期范围筛选功能
+          
+          ## 实现的需求
+          - FR-001: 支持自定义日期范围选择 ✅
+          - FR-002: 提供快捷日期选项 ✅
+          - FR-003: 日期范围验证 ✅
+          
+          ## 验收条件
+          - AC-001: 用户可选择自定义日期范围 ✅ 已测试
+          - AC-002: 快捷按钮正常工作 ✅ 已测试
+          - AC-003: 日期范围验证生效 ✅ 已测试
+          
+          ## 边界处理
+          - 空日期：默认最近 7 天 ✅
+          - 超过 90 天：显示错误 ✅
+          - 起止日期错误：显示错误 ✅
+          - 无订单：显示提示 ✅
+          - 大数据集：分页处理，P95 = 1.8s ✅
+          
+          ## 测试证据
+          - 单元测试：8 个测试用例全部通过
+          - 集成测试：前后端联调通过
+          - 性能测试：P95 响应时间 1.8s（目标 <2s）
+          
+          ## 相关文档
+          - PRD: docs/prd/order-date-filter.md
+          - Plan: docs/plans/order-date-filter-plan.md
+        
+        pr_status: "merged"
+        merged_at: "2024-01-03 10:00"
+    
+    friction_points: []  # 无阻力点，顺利合并
+
+# ============================================
+# 整体总结
+# ============================================
+summary:
+  delivered: true  # ✅ 有可运行的功能
+  correct: true    # ✅ 无 bug，功能符合需求
+  complete: true   # ✅ 实现了所有需求功能点
+  tested: true     # ✅ 有完整测试（单元 + 集成 + 性能）
+  documented: true # ✅ 有 PRD、Plan、PR 描述
+  
+  total_time: "2.5 days"
+  rework_count: 0  # 无返工
+  user_intervention_count: 1  # 只有一次澄清（阶段 1）
+  
+  overall_quality: "high"  # 高质量交付
+
+# ============================================
+# 三层指标评估
+# ============================================
+layer_3_metrics:
+  端到端正确: true
+  端到端返工: false
+  用户介入次数: 1  # 合理范围（<3）
+
+layer_2_metrics:
+  信息丢失: false
+  信息重复: false
+  验证缺失: false
+  衔接断裂: false
+
+layer_1_metrics:
+  skill_issues: []  # 所有 Skill 都表现良好
+
+# ============================================
+# Contract/Protocol 总结
+# ============================================
+contract_protocol_summary:
+  all_contracts_passed: true
+  all_protocols_passed: true
+  
+  prd_output_quality: "excellent"
+  plan_output_quality: "excellent"
+  work_output_quality: "excellent"
+  review_output_quality: "excellent"
+  
+  prd_to_plan_protocol: "passed"
+  plan_to_work_protocol: "passed"
+  work_to_review_protocol: "passed"
+
+# ============================================
+# 根因归因
+# ============================================
+root_cause_attribution:
+  category: "none"  # 无问题，无需归因
+  # 如果有问题，归因分类为：
+  # - skill_issue
+  # - model_capability
+  # - external_factor
+  # - tooling_issue
+
+# ============================================
+# 经验总结
+# ============================================
+lessons_learned:
+  what_went_well:
+    - "需求澄清及时（阶段 1）"
+    - "PRD 边界条件完整（5 项）"
+    - "Plan 技术栈配置具体"
+    - "Work 测试覆盖全面（8 个用例）"
+    - "Review 实际运行测试验证"
+  
+  what_could_be_better: []  # 无明显改进点
+  
+  reusable_patterns:
+    - name: "日期范围筛选模式"
+      description: "可复用到其他查询功能"
+      components:
+        - "Pydantic validator 验证日期范围"
+        - "PostgreSQL BETWEEN 查询优化"
+        - "分页处理大数据集"
+
+---
+# 文件结束

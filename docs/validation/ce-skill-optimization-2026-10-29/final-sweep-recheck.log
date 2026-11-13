@@ -1,0 +1,16 @@
+PASS tests/unit/low-findings-cleanup-contracts.test.js
+  low-severity skill cleanup contracts
+    ✓ spec-test-browser is explicitly internal-only at source and governance layers (5 ms)
+    ✓ spec-commit is delivered only as an internal helper
+    ✓ spec-commit-push-pr is delivered only as an internal helper
+    ✓ spec-sweep first-run write list includes every configured sweep key (2 ms)
+    ✓ spec-sweep separates commit, branch mutation, and landing authority (1 ms)
+    ✓ spec-sweep keeps repo-local durable state outside every stage set (1 ms)
+    ✓ Python cache artifacts remain excluded from source control (1 ms)
+    ✓ compound refresh points YAML safety guidance at root AGENTS.md (3 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       8 passed, 8 total
+Snapshots:   0 total
+Time:        0.211 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/low-findings-cleanup-contracts.test.js|tests\/unit\/sweep-final-publication.test.js|tests\/unit\/spec-sweep-media-authorization.test.js/i.

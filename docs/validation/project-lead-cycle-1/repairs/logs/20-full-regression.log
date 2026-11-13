@@ -1,0 +1,555 @@
+
+> spec-first@1.15.3 test
+> node scripts/run-test-suite.cjs all
+
+PASS tests/unit/plugin-modules.test.js (43.658 s)
+PASS tests/unit/mcp-setup-node-contracts.test.js (18.205 s)
+PASS tests/unit/mcp-setup-entrypoint.test.js (16.975 s)
+PASS tests/unit/ce-localization-closeout-contracts.test.js (12.386 s)
+PASS tests/unit/mcp-setup-workspace-graph-build.test.js (10.537 s)
+PASS tests/unit/managed-removal-ownership.test.js (9.384 s)
+PASS tests/unit/mcp-setup-workspace-graph-status.test.js (8.266 s)
+PASS tests/unit/mcp-setup-workspace-graph-executor.test.js (8.014 s)
+PASS tests/unit/ce-setup-localization-contracts.test.js
+PASS tests/unit/runtime-setup-consumer-health.test.js
+PASS tests/unit/mcp-setup-workspace-graph-entry.test.js (5.532 s)
+PASS tests/unit/spec-lfg-pr-watch-state.test.js
+PASS tests/unit/mcp-setup-workspace-graph-clean.test.js (5.235 s)
+PASS tests/unit/spec-worktree-contracts.test.js
+PASS tests/unit/spec-code-review-mechanics.test.js (6.149 s)
+PASS tests/unit/mcp-setup-providers.test.js
+PASS tests/unit/ce-localization-review-contracts.test.js
+PASS tests/unit/worker-dispatch-host-journey-contracts.test.js
+PASS tests/unit/qoder-runtime-lifecycle.test.js
+PASS tests/unit/init-workspace-contract.test.js
+PASS tests/unit/spec-prd-template-assets.test.js
+PASS tests/unit/app-audit-gate-degradation.test.js
+PASS tests/unit/routing-eval-runner.test.js
+PASS tests/unit/mcp-setup-workspace-child-hook.test.js
+PASS tests/unit/session-start-entry.test.js
+PASS tests/unit/spec-write-skill-promotion-evidence.test.js
+PASS tests/unit/spec-debug-judge-calibration.test.js
+PASS tests/unit/spec-pr-feedback-reply.test.js
+PASS tests/unit/spec-prd-hook-contracts.test.js
+PASS tests/unit/mcp-setup-process-runner.test.js
+PASS tests/unit/dispatch-authorization-matrix-contracts.test.js
+PASS tests/unit/remaining-script-defenses.test.js
+PASS tests/unit/spec-work-run-artifact-producer.test.js
+PASS tests/unit/spec-optimize-decide.test.js
+PASS tests/unit/release-git-gate.test.js
+PASS tests/unit/task-pack-command.test.js
+unsupported build layout: no npm workspaces and no gradle settings; deterministic directory sampling payload emitted (consume as-is, exit 2)
+unsupported build layout: no npm workspaces and no gradle settings; deterministic directory sampling payload emitted (consume as-is, exit 2)
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+PASS tests/unit/spec-project-rules-scripts.test.js
+PASS tests/unit/spec-lfg-contracts.test.js
+PASS tests/unit/mcp-setup-host-config.test.js
+PASS tests/unit/autoresearch-orchestrator-regression.test.js
+PASS tests/unit/mcp-setup-config-consumers.test.js
+PASS tests/unit/compound-promotion-contracts.test.js
+PASS tests/unit/spec-promote-auth-probe.test.js
+PASS tests/unit/spec-optimize-contracts.test.js
+PASS tests/unit/command-resource-path-rewrite.test.js
+PASS tests/unit/mcp-setup-workspace-git-exclude.test.js
+PASS tests/unit/compound-candidate-claims.test.js
+PASS tests/unit/init-global-developer-explicit-signal.test.js
+PASS tests/unit/spec-code-review-peer-runner.test.js
+PASS tests/unit/brand-presentation.test.js
+PASS tests/unit/python-runtime-resolution-contracts.test.js
+PASS tests/unit/honest-closeout.test.js
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+fatal: .git/index: index file smaller than expected
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+PASS tests/unit/git-quoted-path-decoding.test.js
+PASS tests/unit/plans-command.test.js
+PASS tests/unit/doctor-runtime-assets.test.js
+PASS tests/unit/runtime-setup-codegraph-evidence.test.js
+PASS tests/unit/mcp-setup-project-config.test.js
+PASS tests/unit/verification-run-summary.test.js
+PASS tests/unit/runtime-setup-provider-identity.test.js
+PASS tests/unit/spec-code-review-pr-head.test.js
+PASS tests/unit/mcp-setup-workspace-provider-runners.test.js
+PASS tests/unit/spec-plan-quality-contracts.test.js
+PASS tests/unit/runtime-setup-codegraph-launcher.test.js
+PASS tests/unit/spec-handoff-contracts.test.js
+PASS tests/unit/mcp-setup-workspace-target.test.js
+PASS tests/unit/windows-repo-relative-refs.test.js
+PASS tests/unit/spec-plan-consumer-replay-contracts.test.js
+PASS tests/unit/spec-prd-lite-profile-contracts.test.js
+PASS tests/unit/project-graph-consumption-contracts.test.js
+PASS tests/unit/test-inventory-contracts.test.js
+PASS tests/unit/spec-brainstorm-clarification-contracts.test.js
+PASS tests/unit/mcp-setup-mode-target.test.js
+PASS tests/unit/runtime-setup-eval-judge.test.js
+PASS tests/unit/spec-test-browser-contracts.test.js
+PASS tests/unit/mcp-setup-workspace-async-refresh.test.js
+PASS tests/unit/spec-optimize-measurement-only-contracts.test.js
+PASS tests/unit/cursor-duplicate-skill-roots.test.js
+PASS tests/unit/init-module-split.test.js
+PASS tests/unit/mcp-setup-workspace-parent-diagnostic.test.js
+PASS tests/unit/spec-riffrec-snapshots.test.js
+PASS tests/unit/spec-work-source-plan-file-hash.test.js
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+PASS tests/unit/spec-work-working-tree-fingerprint.test.js
+PASS tests/unit/doctor-workspace-readiness.test.js
+PASS tests/unit/spec-riffrec-analyzer-safety.test.js
+PASS tests/unit/mcp-setup-registry.test.js
+PASS tests/unit/skill-flow-p2-closure-contracts.test.js
+PASS tests/unit/specialized-skill-calibration-contracts.test.js
+PASS tests/unit/spec-riffrec-feedback-analysis-contracts.test.js
+PASS tests/unit/spec-polish-project-type.test.js
+PASS tests/unit/mcp-setup-facts-renderer.test.js
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+PASS tests/unit/ce-upstream-reconciliation-v2.test.js
+PASS tests/unit/runtime-setup-workspace-loading.test.js
+PASS tests/unit/spec-commit-push-pr-context-contracts.test.js
+PASS tests/unit/spec-write-skill-validator.test.js
+PASS tests/unit/gitignore-policy.test.js
+PASS tests/unit/plan-status-taxonomy.test.js
+PASS tests/unit/spec-prd-contract-reset-eval.test.js
+PASS tests/unit/sweep-state-legacy-import.test.js
+PASS tests/unit/peer-job-runner-killset.test.js
+PASS tests/unit/spec-prd-contract-reset-evidence.test.js
+PASS tests/unit/mcp-setup-workspace-lifecycle-lease.test.js
+PASS tests/unit/mcp-setup-powershell-contracts.test.js
+PASS tests/unit/session-history-scripts.test.js
+PASS tests/unit/spec-commit-scope-regression.test.js
+PASS tests/unit/spec-app-consistency-audit-host-boundaries.test.js
+PASS tests/unit/opencode-adapter.test.js
+PASS tests/unit/resolve-port-script.test.js
+PASS tests/unit/changelog-format.test.js
+PASS tests/unit/spec-prd-contracts.test.js
+PASS tests/unit/mcp-setup-opencode-permissions.test.js
+PASS tests/unit/ce-upstream-3-20-reconciliation.test.js
+PASS tests/unit/target-repo-containment.test.js
+{"ok":true,"summary":{"total":422,"implementation_targets":237,"evidence_only":185,"skill_runtime":215,"cli_runtime":19,"support":3,"ce_skills":29,"direct_counterpart_skills":25,"no_direct_counterpart_skills":4,"direct_counterpart_skill_files":201,"no_direct_counterpart_skill_files":14,"added_skills":["ce-babysit-pr","ce-handoff","ce-retune"],"skill_scripts":46,"all_scripts":47,"deleted_repo_profile_cache_scripts":9},"current_inventory":{"skill_count":38,"file_count":1170,"manifest_sha256":"fadeeefe569e553c08616ad770180917aa818958a8d07a4dee0db3783df5639b"}}
+PASS tests/unit/host-runtime-projection-contracts.test.js
+PASS tests/unit/doctor-workspace-graph.test.js
+PASS tests/unit/spec-write-skill-target-payload.test.js
+PASS tests/unit/active-docs-links.test.js
+PASS tests/unit/update-command-spawn.test.js
+  ● Console
+
+    console.log
+      ───────────────────────────────────────────────────────────────────────────────────────
+       ███████╗██████╗ ███████╗ ██████╗          ███████╗██╗██████╗ ███████╗████████╗
+       ██╔════╝██╔══██╗██╔════╝██╔════╝          ██╔════╝██║██╔══██╗██╔════╝╚══██╔══╝
+       ███████╗██████╔╝█████╗  ██║       █████╗  █████╗  ██║██████╔╝███████╗   ██║   
+       ╚════██║██╔═══╝ ██╔══╝  ██║       ╚════╝  ██╔══╝  ██║██╔══██╗╚════██║   ██║   
+       ███████║██║     ███████╗╚██████╗          ██║     ██║██║  ██║███████║   ██║   
+       ╚══════╝╚═╝     ╚══════╝ ╚═════╝          ╚═╝     ╚═╝╚═╝  ╚═╝╚══════╝   ╚═╝   
+       Spec-First v1.15.3
+       AI coding harness for Claude Code, Codex, Cursor, Kiro, Qoder, OpenCode, ZCode, and Pi
+      ───────────────────────────────────────────────────────────────────────────────────────
+
+      at Object.log [as runUpdate] (src/cli/commands/update.js:105:11)
+
+    console.log
+      正在通过以下命令升级 spec-first: npm install -g spec-first@latest
+
+      at Object.log [as runUpdate] (src/cli/commands/update.js:106:11)
+
+    console.log
+
+
+      at Object.log [as runUpdate] (src/cli/commands/update.js:107:11)
+
+    console.log
+
+
+      at Object.log [as runUpdate] (src/cli/commands/update.js:126:11)
+
+    console.log
+      ✅ spec-first 升级完成。
+
+      at Object.log [as runUpdate] (src/cli/commands/update.js:131:11)
+
+    console.log
+      正在刷新 runtime assets: spec-first init -y
+
+      at Object.log [as runUpdate] (src/cli/commands/update.js:148:13)
+
+    console.log
+      Runtime 刷新完成。
+
+      at Object.log [as runUpdate] (src/cli/commands/update.js:166:13)
+
+    console.log
+
+
+      at Object.log [as runUpdate] (src/cli/commands/update.js:168:11)
+
+    console.log
+      注意：如果你是以 Claude Code plugin（而非 npm -g）方式安装 spec-first，
+
+      at Object.log [as runUpdate] (src/cli/commands/update.js:169:11)
+
+    console.log
+      请改用 `claude plugin update` 升级——npm -g 管理的是另一份副本。
+
+      at Object.log [as runUpdate] (src/cli/commands/update.js:170:11)
+
+    console.log
+      ───────────────────────────────────────────────────────────────────────────────────────
+       ███████╗██████╗ ███████╗ ██████╗          ███████╗██╗██████╗ ███████╗████████╗
+       ██╔════╝██╔══██╗██╔════╝██╔════╝          ██╔════╝██║██╔══██╗██╔════╝╚══██╔══╝
+       ███████╗██████╔╝█████╗  ██║       █████╗  █████╗  ██║██████╔╝███████╗   ██║   
+       ╚════██║██╔═══╝ ██╔══╝  ██║       ╚════╝  ██╔══╝  ██║██╔══██╗╚════██║   ██║   
+       ███████║██║     ███████╗╚██████╗          ██║     ██║██║  ██║███████║   ██║   
+       ╚══════╝╚═╝     ╚══════╝ ╚═════╝          ╚═╝     ╚═╝╚═╝  ╚═╝╚══════╝   ╚═╝   
+       Spec-First v1.15.3
+       AI coding harness for Claude Code, Codex, Cursor, Kiro, Qoder, OpenCode, ZCode, and Pi
+      ───────────────────────────────────────────────────────────────────────────────────────
+
+      at Object.log [as runUpdate] (src/cli/commands/update.js:105:11)
+
+    console.log
+      正在通过以下命令升级 spec-first: npm install -g spec-first@latest
+
+      at Object.log [as runUpdate] (src/cli/commands/update.js:106:11)
+
+    console.log
+
+
+      at Object.log [as runUpdate] (src/cli/commands/update.js:107:11)
+
+    console.log
+
+
+      at Object.log [as runUpdate] (src/cli/commands/update.js:126:11)
+
+    console.log
+      ✅ spec-first 升级完成。
+
+      at Object.log [as runUpdate] (src/cli/commands/update.js:131:11)
+
+    console.log
+      正在刷新 runtime assets: spec-first init --claude -y
+
+      at Object.log [as runUpdate] (src/cli/commands/update.js:148:13)
+
+    console.log
+      Runtime 刷新完成。
+
+      at Object.log [as runUpdate] (src/cli/commands/update.js:166:13)
+
+    console.log
+
+
+      at Object.log [as runUpdate] (src/cli/commands/update.js:168:11)
+
+    console.log
+      注意：如果你是以 Claude Code plugin（而非 npm -g）方式安装 spec-first，
+
+      at Object.log [as runUpdate] (src/cli/commands/update.js:169:11)
+
+    console.log
+      请改用 `claude plugin update` 升级——npm -g 管理的是另一份副本。
+
+      at Object.log [as runUpdate] (src/cli/commands/update.js:170:11)
+
+PASS tests/unit/cli-clean-workspace-graph.test.js
+PASS tests/unit/claude-settings-hook-paths.test.js
+PASS tests/unit/run-test-suite-contracts.test.js
+PASS tests/unit/eval-fixture-contracts.test.js
+PASS tests/unit/external-evidence-closure-ledger.test.js
+PASS tests/unit/inspect-context-payload-smoke.test.js
+PASS tests/unit/frontmatter-validator-utf8.test.js
+PASS tests/unit/init-apply-failure.test.js
+PASS tests/unit/runtime-setup-warmup-identity.test.js
+PASS tests/unit/session-store.test.js
+PASS tests/unit/skill-script-mirror-parity.test.js
+PASS tests/unit/platform-registry-patterns.test.js
+PASS tests/unit/runtime-setup-npm-integrity.test.js
+PASS tests/unit/using-spec-first-contracts.test.js
+  ● Console
+
+    console.warn
+      using-spec-first Front Controller is 4332 bytes; the 4,200-byte target is advisory, not a token or behavior proof.
+
+      43 |
+      44 |     if (footprint > 4200) {
+    > 45 |       console.warn(
+         |               ^
+      46 |         `using-spec-first Front Controller is ${footprint} bytes; the 4,200-byte target is advisory, not a token or behavior proof.`,
+      47 |       );
+      48 |     }
+
+      at Object.warn (tests/unit/using-spec-first-contracts.test.js:45:15)
+
+PASS tests/unit/private-scratch-migration-contracts.test.js
+PASS tests/unit/changelog-continuity.test.js
+PASS tests/unit/fresh-repo-grounding-contracts.test.js
+PASS tests/unit/host-flag-registry-derivation.test.js
+PASS tests/unit/spec-prd-finalize-transition.test.js
+PASS tests/unit/pi-adapter.test.js
+PASS tests/unit/host-enumeration-drift-guard.test.js
+PASS tests/unit/version-reminder-hardening.test.js
+PASS tests/unit/runtime-setup-codegraph-install-integrity.test.js
+PASS tests/unit/quickstart-command.test.js
+PASS tests/unit/mcp-setup-workspace-graph-artifacts.test.js
+PASS tests/unit/zcode-adapter.test.js
+PASS tests/unit/spec-doc-review-contracts.test.js
+PASS tests/unit/spec-code-review-contracts.test.js
+PASS tests/unit/runtime-setup-registry-metadata.test.js
+PASS tests/unit/markdown-frontmatter.test.js
+PASS tests/unit/version-reminder.test.js
+PASS tests/unit/project-role-contract.test.js
+PASS tests/unit/platform-compatibility-characterization.test.js
+PASS tests/unit/init-preview.test.js
+PASS tests/unit/zcode-settings.test.js
+PASS tests/unit/worker-dispatch-host-preflight-contracts.test.js
+PASS tests/unit/spec-work-shipping-contracts.test.js
+PASS tests/unit/quickstart-language.test.js
+  ● Console
+
+    console.log
+      ─ spec-first v1.15.3
+
+      at log (src/cli/commands/quickstart.js:57:11)
+
+    console.log
+
+
+      at log (src/cli/commands/quickstart.js:58:11)
+
+    console.log
+      正在检查环境...
+
+      at log (src/cli/commands/quickstart.js:59:11)
+
+    console.log
+        ✓ Node.js: v22.0.0
+
+      at log (src/cli/commands/quickstart.js:108:11)
+
+    console.log
+        ✓ Git: git version 2.40.0
+
+      at log (src/cli/commands/quickstart.js:108:11)
+
+    console.log
+        ⚠ stub: not found on PATH
+
+      at log (src/cli/commands/quickstart.js:108:11)
+
+    console.log
+        ⚠ stub: not found on PATH
+
+      at log (src/cli/commands/quickstart.js:108:11)
+
+    console.log
+        ⚠ stub: not found on PATH
+
+      at log (src/cli/commands/quickstart.js:108:11)
+
+    console.log
+        ⚠ stub: not found on PATH
+
+      at log (src/cli/commands/quickstart.js:108:11)
+
+    console.log
+        ⚠ stub: not found on PATH
+
+      at log (src/cli/commands/quickstart.js:108:11)
+
+    console.log
+        ⚠ stub: not found on PATH
+
+      at log (src/cli/commands/quickstart.js:108:11)
+
+    console.log
+        ⚠ stub: not found on PATH
+
+      at log (src/cli/commands/quickstart.js:108:11)
+
+    console.log
+        ⚠ stub: not found on PATH
+
+      at log (src/cli/commands/quickstart.js:108:11)
+
+    console.log
+
+
+      at log (src/cli/commands/quickstart.js:85:11)
+
+    console.log
+      未能在 PATH 上自动检测到宿主 CLI，回退到交互式 `spec-first init` 由你选择。
+
+      at log (src/cli/commands/quickstart.js:94:13)
+
+PASS tests/unit/pipeline-mode-contracts.test.js
+PASS tests/unit/init-ux-improvements.test.js
+PASS tests/unit/plan-status-helper.test.js
+PASS tests/unit/instruction-bootstrap.test.js
+PASS tests/unit/init-input-profile-validation.test.js
+PASS tests/unit/spec-work-run-artifact-contract.test.js
+PASS tests/unit/spec-resolve-pr-feedback-contracts.test.js
+PASS tests/unit/spec-prd-plan-handoff-contracts.test.js
+PASS tests/unit/requirements-clarification-contracts.test.js
+PASS tests/unit/review-peer-expansion-contracts.test.js
+PASS tests/unit/cli-frontmatter-path-containment-calibration.test.js
+PASS tests/unit/ce-post-3-20-calibration-contracts.test.js
+PASS tests/unit/spec-write-skill-authoring-preview.test.js
+PASS tests/unit/init-runtime-readiness-guidance.test.js
+PASS tests/unit/supported-host-flags.test.js
+PASS tests/unit/spec-work-implementation-quality-contracts.test.js
+PASS tests/unit/spec-doc-review-task-pack-contracts.test.js
+PASS tests/unit/mcp-setup-workspace-routing-inject.test.js
+PASS tests/unit/mcp-setup-preflight.test.js
+PASS tests/unit/doctor-output.test.js
+PASS tests/unit/verify-installed-package.test.js
+PASS tests/unit/spec-write-skill-context-inspector.test.js
+PASS tests/unit/spec-work-contracts.test.js
+PASS tests/unit/spec-work-front-controller-contracts.test.js
+PASS tests/unit/spec-prd-finding-schema-freeze.test.js
+PASS tests/unit/spec-compound-reference-contracts.test.js
+PASS tests/unit/runtime-setup-demand-policy.test.js
+PASS tests/unit/readme-community-entry.test.js
+PASS tests/unit/mutation-authority-contracts.test.js
+PASS tests/unit/doctor-platform-cli.test.js
+PASS tests/unit/spec-prd-decision-card-contracts.test.js
+PASS tests/unit/spec-prd-exit-safety.test.js
+PASS tests/unit/spec-plan-contracts.test.js
+PASS tests/unit/spec-compound-refresh-reference-contracts.test.js
+PASS tests/unit/shared-skills-consumer-protection.test.js
+PASS tests/unit/mcp-setup-workspace-routing-instruction.test.js
+PASS tests/unit/low-findings-cleanup-contracts.test.js
+PASS tests/unit/spec-write-skill-contracts.test.js
+PASS tests/unit/spec-work-intake-contracts.test.js
+PASS tests/unit/spec-work-consumer-chain-contracts.test.js
+PASS tests/unit/spec-prototype-contracts.test.js
+PASS tests/unit/spec-project-rules-contracts.test.js
+PASS tests/unit/spec-ideate-phase-contracts.test.js
+PASS tests/unit/npm-cli-resolver.test.js
+PASS tests/unit/mcp-setup-contracts.test.js
+PASS tests/unit/doctor-artifact-slug.test.js
+PASS tests/unit/ce-localization-round-1-remediation-contracts.test.js
+PASS tests/unit/sync-instruction-files.test.js
+PASS tests/unit/spec-work-lfg-recovery-contracts.test.js
+PASS tests/unit/spec-work-execution-strategy-contracts.test.js
+PASS tests/unit/spec-prd-validate-mode.test.js
+PASS tests/unit/spec-plan-reference-contracts.test.js
+PASS tests/unit/pointer-based-adapter.test.js
+PASS tests/unit/peer-job-runner-parity.test.js
+PASS tests/unit/graphify-defensive-probes.test.js
+PASS tests/unit/ce-upstream-skill-sync-contracts.test.js
+PASS tests/unit/agent-persona-template-drift.test.js
+PASS tests/unit/spec-write-tasks-contracts.test.js
+PASS tests/unit/spec-test-xcode-contracts.test.js
+PASS tests/unit/spec-strategy-contracts.test.js
+PASS tests/unit/spec-product-pulse-contracts.test.js
+PASS tests/unit/spec-ideate-clarification-handoff-contracts.test.js
+PASS tests/unit/spec-brainstorm-visual-retirement-contracts.test.js
+PASS tests/unit/setup-facts-malformed-entries.test.js
+PASS tests/unit/scenario-capability-matrix-contracts.test.js
+PASS tests/unit/requirements-rendering-parity.test.js
+PASS tests/unit/requirements-language-promotion-contracts.test.js
+PASS tests/unit/mcp-setup-workspace-graph-scope.test.js
+PASS tests/unit/host-neutral-skill-invocation-contracts.test.js
+PASS tests/unit/anti-rationalization-contracts.test.js
+PASS tests/unit/spec-optimize-loop-contracts.test.js
+PASS tests/unit/spec-debug-contracts.test.js
+PASS tests/unit/spec-brainstorm-contracts.test.js
+PASS tests/unit/settled-decisions-contracts.test.js
+PASS tests/unit/runtime-setup-readiness-guidance.test.js
+PASS tests/unit/mcp-setup-workspace-graph-refresh.test.js
+PASS tests/unit/cli-lang.test.js
+PASS tests/unit/ci-required-producers.test.js
+PASS tests/unit/atomic-write.test.js
+PASS tests/unit/secret-deny-patterns-contracts.test.js
+PASS tests/unit/runtime-setup-repair-loop.test.js
+PASS tests/unit/release-publish-wiring.test.js
+PASS tests/unit/compound-template-category-contracts.test.js
+PASS tests/unit/spec-debug-fix-reference-contracts.test.js
+
+Test Suites: 239 passed, 239 total
+Tests:       2999 passed, 2999 total
+Snapshots:   0 total
+Time:        256.646 s
+Ran all test suites matching /tests\/unit/i.
+PASS tests/smoke/cli-smoke.test.js (24.339 s)
+  CLI smoke checks
+    ✓ prints top-level help (64 ms)
+    ✓ previews Qoder init without writing project or user runtime files (185 ms)
+    ✓ writes and reports one global profile for a multi-host apply (573 ms)
+    ✓ global profile failure stops before project bootstrap and preserves raw evidence (162 ms)
+    ✓ 发布包为 registry 的全部宿主生成一致 runtime (23272 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        24.372 s, estimated 25 s
+Ran all test suites matching /tests\/smoke\/cli-smoke.test.js/i.
+PASS tests/integration/init-six-host-lifecycle.integration.test.js (35.396 s)
+PASS tests/integration/workspace-graph-auto-refresh.integration.test.js (16.932 s)
+PASS tests/integration/workspace-graph-six-host-projection.integration.test.js (8.606 s)
+PASS tests/integration/spec-lfg-fingerprint-projection.integration.test.js (6.523 s)
+PASS tests/integration/doc-review-six-host-projection.integration.test.js
+PASS tests/integration/qoder-runtime-lifecycle.integration.test.js
+PASS tests/integration/runtime-setup-sigint-recovery.integration.test.js
+PASS tests/integration/runtime-setup-npm-archive.integration.test.js
+PASS tests/integration/eval-disk-evidence-guard.integration.test.js
+PASS tests/integration/workspace-graph-lifecycle.integration.test.js
+  ● Console
+
+    console.log
+      Workspace graph clean: complete
+
+      at log (src/cli/commands/clean.js:287:11)
+
+    console.log
+        root: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first-wg-integ-T0Ymnj
+
+      at log (src/cli/commands/clean.js:288:11)
+
+    console.log
+        child api: codegraph_removed=true exclude_removed=true hook=not-installed
+
+      at log (src/cli/commands/clean.js:290:13)
+
+    console.log
+        child web: codegraph_removed=true exclude_removed=true hook=not-installed
+
+      at log (src/cli/commands/clean.js:290:13)
+
+    console.log
+        workspace graphify-out removed: true
+
+      at log (src/cli/commands/clean.js:296:11)
+
+    console.log
+        routing CLAUDE.md: stripped
+
+      at log (src/cli/commands/clean.js:299:15)
+
+    console.log
+        routing AGENTS.md: stripped
+
+      at log (src/cli/commands/clean.js:299:15)
+
+    console.log
+        daemon: run `codegraph daemon` to stop any watcher bound to a removed workspace
+
+      at log (src/cli/commands/clean.js:303:13)
+
+PASS tests/integration/spec-prototype-human-journey.integration.test.js
+PASS tests/integration/spec-prd-contract-reset-replay.integration.test.js
+PASS tests/integration/runtime-setup-codegraph-launcher.integration.test.js
+PASS tests/integration/plan-status-closeout.integration.test.js
+PASS tests/integration/spec-work-closeout-producer.test.js
+PASS tests/integration/spec-prd-contract-reset-isolation.integration.test.js
+PASS tests/integration/spec-write-skill-authoring-preview.integration.test.js
+
+Test Suites: 1 skipped, 17 passed, 17 of 18 total
+Tests:       2 skipped, 84 passed, 86 total
+Snapshots:   0 total
+Time:        82.023 s, estimated 225 s
+Ran all test suites matching /tests\/integration\/doc-review-six-host-projection.integration.test.js|tests\/integration\/eval-disk-evidence-guard.integration.test.js|tests\/integration\/init-six-host-lifecycle.integration.test.js|tests\/integration\/plan-status-closeout.integration.test.js|tests\/integration\/qoder-runtime-lifecycle.integration.test.js|tests\/integration\/runtime-setup-codegraph-launcher.integration.test.js|tests\/integration\/runtime-setup-graphify-hook-boundary.integration.test.js|tests\/integration\/runtime-setup-npm-archive.integration.test.js|tests\/integration\/runtime-setup-sigint-recovery.integration.test.js|tests\/integration\/spec-lfg-fingerprint-projection.integration.test.js|tests\/integration\/spec-prd-contract-reset-isolation.integration.test.js|tests\/integration\/spec-prd-contract-reset-replay.integration.test.js|tests\/integration\/spec-prototype-human-journey.integration.test.js|tests\/integration\/spec-work-closeout-producer.test.js|tests\/integration\/spec-write-skill-authoring-preview.integration.test.js|tests\/integration\/workspace-graph-auto-refresh.integration.test.js|tests\/integration\/workspace-graph-lifecycle.integration.test.js|tests\/integration\/workspace-graph-six-host-projection.integration.test.js/i.

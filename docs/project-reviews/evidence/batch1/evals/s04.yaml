@@ -1,0 +1,28 @@
+schema_version: v1alpha1
+
+# 执行方案第一批（S20/S04）；工作目录由 skill-up 放在 $TMPDIR，位于仓库之外
+environment:
+  type: none
+
+skills:
+  - source: local_path
+    path: ../../../../skills/spec-plan
+
+engine:
+  name: claude_code
+
+cases:
+  files:
+    - evals/cases/s04-p1-reuse.yaml
+    - evals/cases/s04-p2-implicit-consumer.yaml
+    - evals/cases/s04-p3-unverified-dependency.yaml
+    - evals/cases/s04-p4-vague.yaml
+  defaults:
+    timeout_seconds: 1200
+    max_turns: 40
+    collect_artifacts: ["*.md", "package.json", "src/**", "test/**", "docs/**", "plans/**"]
+  parallelism: 3
+
+report:
+  formats: [json]
+  artifacts: [transcript]

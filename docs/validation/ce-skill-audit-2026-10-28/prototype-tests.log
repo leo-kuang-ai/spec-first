@@ -1,0 +1,9 @@
+PASS tests/integration/spec-prototype-human-journey.integration.test.js
+PASS tests/unit/spec-prototype-contracts.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       8 passed, 8 total
+Snapshots:   0 total
+Time:        1.103 s
+Ran all test suites matching /tests\/unit\/spec-prototype-contracts.test.js|tests\/integration\/spec-prototype-human-journey.integration.test.js/i.
+Test results written to: docs/validation/ce-skill-audit-2026-10-28/prototype-tests.json

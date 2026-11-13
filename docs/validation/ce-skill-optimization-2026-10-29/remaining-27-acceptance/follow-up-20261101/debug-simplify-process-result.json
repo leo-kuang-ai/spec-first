@@ -1,0 +1,161 @@
+{
+  "cases": [
+    {
+      "size": 0,
+      "baseline": {
+        "exit_code": 0,
+        "result": {
+          "size": 0,
+          "checksum": 0,
+          "elapsed_ms": 0.0022079999999995437
+        },
+        "stderr": ""
+      },
+      "candidate": {
+        "exit_code": 0,
+        "result": {
+          "size": 0,
+          "checksum": 0,
+          "elapsed_ms": 0.003084000000001197
+        },
+        "stderr": ""
+      }
+    },
+    {
+      "size": 1,
+      "baseline": {
+        "exit_code": 0,
+        "result": {
+          "size": 1,
+          "checksum": 3,
+          "elapsed_ms": 0.01504200000000111
+        },
+        "stderr": ""
+      },
+      "candidate": {
+        "exit_code": 0,
+        "result": {
+          "size": 1,
+          "checksum": 3,
+          "elapsed_ms": 0.010083999999999094
+        },
+        "stderr": ""
+      }
+    },
+    {
+      "size": 99,
+      "baseline": {
+        "exit_code": 0,
+        "result": {
+          "size": 99,
+          "checksum": 6690,
+          "elapsed_ms": 0.23558399999999935
+        },
+        "stderr": ""
+      },
+      "candidate": {
+        "exit_code": 0,
+        "result": {
+          "size": 99,
+          "checksum": 6690,
+          "elapsed_ms": 0.07041600000000159
+        },
+        "stderr": ""
+      }
+    },
+    {
+      "size": 101,
+      "baseline": {
+        "exit_code": 0,
+        "result": {
+          "size": 101,
+          "checksum": 6970,
+          "elapsed_ms": 0.23966700000000074
+        },
+        "stderr": ""
+      },
+      "candidate": {
+        "exit_code": 0,
+        "result": {
+          "size": 101,
+          "checksum": 6970,
+          "elapsed_ms": 0.0741669999999992
+        },
+        "stderr": ""
+      }
+    },
+    {
+      "size": 16000,
+      "baseline": {
+        "exit_code": 0,
+        "result": {
+          "size": 16000,
+          "checksum": 151188619,
+          "elapsed_ms": 350.640917
+        },
+        "stderr": ""
+      },
+      "candidate": {
+        "exit_code": 0,
+        "result": {
+          "size": 16000,
+          "checksum": 151188619,
+          "elapsed_ms": 2.231541
+        },
+        "stderr": ""
+      }
+    },
+    {
+      "size": 16000,
+      "baseline": {
+        "exit_code": 0,
+        "result": {
+          "size": 16000,
+          "checksum": 151188619,
+          "elapsed_ms": 372.46220800000003
+        },
+        "stderr": ""
+      },
+      "candidate": {
+        "exit_code": 0,
+        "result": {
+          "size": 16000,
+          "checksum": 151188619,
+          "elapsed_ms": 2.3998750000000015
+        },
+        "stderr": ""
+      }
+    },
+    {
+      "size": 16000,
+      "baseline": {
+        "exit_code": 0,
+        "result": {
+          "size": 16000,
+          "checksum": 151188619,
+          "elapsed_ms": 358.61929100000003
+        },
+        "stderr": ""
+      },
+      "candidate": {
+        "exit_code": 0,
+        "result": {
+          "size": 16000,
+          "checksum": 151188619,
+          "elapsed_ms": 2.2733750000000015
+        },
+        "stderr": ""
+      }
+    }
+  ],
+  "passed": true,
+  "protected_all_pins_unchanged": true,
+  "no_change_proposal": true,
+  "cleanup": true,
+  "evidence_authority": "Parent execution of original seven-case checksum process proof.",
+  "limitations": [
+    "No substantive refactor; CEOPT-26 meaningful-refactor facet remains pending.",
+    "Checksum proof is not full row equivalence.",
+    "No autonomous child mutation."
+  ]
+}

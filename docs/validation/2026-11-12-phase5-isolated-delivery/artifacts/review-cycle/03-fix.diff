@@ -1,0 +1,228 @@
+diff --git a/src/server.js b/src/server.js
+index d4b4176..3bed784 100644
+--- a/src/server.js
++++ b/src/server.js
+@@ -13,6 +13,19 @@ const server = http.createServer((req, res) => {
+     });
+     return;
+   }
++  if (req.method === 'GET' && req.url.startsWith('/entries/')) {
++    const u = new URL(req.url, 'http://localhost');
++    const idSegment = u.pathname.slice('/entries/'.length);
++    const entry = /^\d+$/.test(idSegment)
++      ? entries.find((e) => e.id === parseInt(idSegment, 10))
++      : undefined;
++    if (entry) {
++      res.setHeader('content-type', 'application/json');
++      return res.end(JSON.stringify(entry));
++    }
++    res.statusCode = 404;
++    return res.end('not found');
++  }
+   if (req.method === 'GET' && req.url.startsWith('/entries')) {
+     const u = new URL(req.url, 'http://localhost');
+     const month = u.searchParams.get('month');
+@@ -29,4 +42,8 @@ const server = http.createServer((req, res) => {
+   res.end('not found');
+ });
+ 
+-server.listen(3000);
++if (require.main === module) {
++  server.listen(3000);
++}
++
++module.exports = { server };
+diff --git a/test/server.test.js b/test/server.test.js
+new file mode 100644
+index 0000000..0cf3fc4
+--- /dev/null
++++ b/test/server.test.js
+@@ -0,0 +1,188 @@
++const { test } = require('node:test');
++const assert = require('node:assert/strict');
++
++const serverPath = require.resolve('../src/server');
++
++// 每个用例通过失效模块缓存拿到独立的 server 实例与独立的内存账本：
++// 无论整文件运行、按名单筛选还是失败重跑，用例都自建前置数据，不依赖执行顺序。
++async function withServer(run) {
++  delete require.cache[serverPath];
++  const { server } = require(serverPath);
++  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
++  try {
++    await run(`http://127.0.0.1:${server.address().port}`);
++  } finally {
++    // fetch 的 keep-alive 连接会让 close 的回调一直挂起，先断开全部连接
++    server.closeAllConnections();
++    await new Promise((resolve) => server.close(resolve));
++  }
++}
++
++async function postEntry(baseUrl, entry) {
++  return fetch(`${baseUrl}/entries`, {
++    method: 'POST',
++    headers: { 'content-type': 'application/json' },
++    body: JSON.stringify(entry),
++  });
++}
++
++async function listEntries(baseUrl, query = '') {
++  const res = await fetch(`${baseUrl}/entries${query}`);
++  assert.equal(res.status, 200);
++  return res.json();
++}
++
++// 与服务端同一公式：条目 ts 的 ISO 年月（表征基线语义，见计划 KTD5/U1）
++const monthOf = (entry) => new Date(entry.ts).toISOString().slice(0, 7);
++
++test('POST /entries 返回 ok，新条目进入列表且字段恰为 {id, amount, note, ts}，id 从 1 递增（AE5）', async () => {
++  await withServer(async (baseUrl) => {
++    const first = await postEntry(baseUrl, { amount: 10, note: 'coffee' });
++    assert.equal(first.status, 200);
++    assert.equal(await first.text(), 'ok');
++    const second = await postEntry(baseUrl, { amount: 20, note: 'tea' });
++    assert.equal(second.status, 200);
++    assert.equal(await second.text(), 'ok');
++
++    const entries = await listEntries(baseUrl);
++    assert.equal(entries.length, 2);
++    assert.deepEqual(
++      entries.map((e) => ({ id: e.id, amount: e.amount, note: e.note })),
++      [
++        { id: 1, amount: 10, note: 'coffee' },
++        { id: 2, amount: 20, note: 'tea' },
++      ],
++    );
++    for (const entry of entries) {
++      assert.ok(typeof entry.ts === 'number' && entry.ts > 0);
++      assert.deepEqual(Object.keys(entry).sort(), ['amount', 'id', 'note', 'ts']);
++    }
++  });
++});
++
++test('三条录入后 GET /entries 返回完整、精确、有序的全量数组（AE4）', async () => {
++  await withServer(async (baseUrl) => {
++    await postEntry(baseUrl, { amount: 1, note: 'alpha' });
++    await postEntry(baseUrl, { amount: 2, note: 'beta' });
++    await postEntry(baseUrl, { amount: 3, note: 'gamma' });
++
++    const entries = await listEntries(baseUrl);
++    // 精确全量断言而非"包含最后两条"：列表截断（如只返回末尾 N 条）在此失败
++    assert.deepEqual(
++      entries.map((e) => ({ id: e.id, amount: e.amount, note: e.note })),
++      [
++        { id: 1, amount: 1, note: 'alpha' },
++        { id: 2, amount: 2, note: 'beta' },
++        { id: 3, amount: 3, note: 'gamma' },
++      ],
++    );
++    for (const entry of entries) {
++      assert.ok(typeof entry.ts === 'number' && entry.ts > 0);
++    }
++  });
++});
++
++test('GET /entries?month=YYYY-MM 仅返回该月条目，不可能命中的月份返回空数组（AE4）', async () => {
++  await withServer(async (baseUrl) => {
++    await postEntry(baseUrl, { amount: 1, note: 'm-one' });
++    await postEntry(baseUrl, { amount: 2, note: 'm-two' });
++    await postEntry(baseUrl, { amount: 3, note: 'm-three' });
++
++    const all = await listEntries(baseUrl);
++    // 正例：查询首条所在月份。账本为本用例独占，期望集合按各条目自身 ts
++    // 以基线公式推导（表征语义，钉的是现状过滤行为而非日历正确性）
++    const month = monthOf(all[0]);
++    const expected = all.filter((e) => monthOf(e) === month);
++    const filtered = await listEntries(baseUrl, `?month=${month}`);
++    assert.deepEqual(filtered, expected);
++
++    // 反例（硬编码 oracle）：ts 由服务端 Date.now() 生成（当前为 2026 年），
++    // 1970-01 必然无命中；若实现忽略 month 参数返回全量，此处失败
++    const none = await listEntries(baseUrl, '?month=1970-01');
++    assert.deepEqual(none, []);
++  });
++});
++
++test('GET /entries/:id 命中本用例新录入的条目，返回 200、application/json 与该条目（AE1）', async () => {
++  await withServer(async (baseUrl) => {
++    await postEntry(baseUrl, { amount: 40, note: 'single' });
++    const [entry] = await listEntries(baseUrl);
++
++    const res = await fetch(`${baseUrl}/entries/${entry.id}`);
++    assert.equal(res.status, 200);
++    assert.equal(res.headers.get('content-type'), 'application/json');
++    assert.deepEqual(await res.json(), entry);
++  });
++});
++
++test('GET /entries/:id 超出范围（最大 id + 1）返回 404 not found（AE2）', async () => {
++  await withServer(async (baseUrl) => {
++    await postEntry(baseUrl, { amount: 50, note: 'only' });
++    const entries = await listEntries(baseUrl);
++    const maxId = entries[entries.length - 1].id;
++
++    const res = await fetch(`${baseUrl}/entries/${maxId + 1}`);
++    assert.equal(res.status, 404);
++    assert.equal(await res.text(), 'not found');
++  });
++});
++
++test('GET /entries/abc 非数字 id 返回 404（AE3）', async () => {
++  await withServer(async (baseUrl) => {
++    const res = await fetch(`${baseUrl}/entries/abc`);
++    assert.equal(res.status, 404);
++    assert.equal(await res.text(), 'not found');
++  });
++});
++
++test('畸形与越界子路径一律 404：1.5、-1、空段、现存 id 加尾斜杠、超大数值', async () => {
++  await withServer(async (baseUrl) => {
++    await postEntry(baseUrl, { amount: 60, note: 'exists' });
++    // 尾斜杠用例使用确定存在的 id（本用例独占账本中为 1）：
++    // 若实现把"id/"归一化为该 id，须因返回 200 而在此失败，而非偶然因 id 不存在通过
++    for (const sub of ['1.5', '-1', '', '1/', '99999999999999999999']) {
++      const res = await fetch(`${baseUrl}/entries/${sub}`);
++      assert.equal(res.status, 404, `GET /entries/${sub}`);
++      assert.equal(await res.text(), 'not found', `GET /entries/${sub}`);
++    }
++  });
++});
++
++test('前导零归一化：GET /entries/02 返回 id 2 的条目', async () => {
++  await withServer(async (baseUrl) => {
++    await postEntry(baseUrl, { amount: 70, note: 'first' });
++    await postEntry(baseUrl, { amount: 80, note: 'second' });
++    const entries = await listEntries(baseUrl);
++    const expected = entries.find((e) => e.id === 2);
++    assert.ok(expected, '前置条件：本用例已录入 id 2');
++
++    const res = await fetch(`${baseUrl}/entries/02`);
++    assert.equal(res.status, 200);
++    assert.deepEqual(await res.json(), expected);
++  });
++});
++
++test('查询串容忍：GET /entries/1?x=1 忽略 query 返回条目 1', async () => {
++  await withServer(async (baseUrl) => {
++    await postEntry(baseUrl, { amount: 90, note: 'queried' });
++    const [expected] = await listEntries(baseUrl);
++    assert.ok(expected && expected.id === 1, '前置条件：本用例已录入 id 1');
++
++    const res = await fetch(`${baseUrl}/entries/1?x=1`);
++    assert.equal(res.status, 200);
++    assert.deepEqual(await res.json(), expected);
++  });
++});
++
++test('非 GET 方法 × 子路径（现存 id）：POST/PUT/PATCH/DELETE 一律 404', async () => {
++  await withServer(async (baseUrl) => {
++    await postEntry(baseUrl, { amount: 100, note: 'target' });
++    const entries = await listEntries(baseUrl);
++    const existingId = entries[entries.length - 1].id;
++
++    for (const method of ['POST', 'PUT', 'PATCH', 'DELETE']) {
++      const res = await fetch(`${baseUrl}/entries/${existingId}`, { method });
++      assert.equal(res.status, 404, `${method} /entries/${existingId}`);
++    }
++  });
++});

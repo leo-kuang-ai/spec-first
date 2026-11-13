@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "Enrichment preserves the original Product Contract",
+  "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nThat preparation alone may create the baseline commit; no task commit or landing is authorized.\nUse spec-plan with confirm:auto to deepen docs/plans/2026-07-31-001-feat-order-import-plan.md in place into an implementation-ready software plan. Preserve its product authority. This is a self-contained headless pipeline: do not delegate, read outside the fixture, access external sources, run application tests or modify implementation. Return the planning artifact to the caller.\n",
+  "assertions": [
+    "expect.exit_code",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-enrichment.sh"
+  ]
+}

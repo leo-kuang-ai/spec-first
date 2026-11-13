@@ -1,0 +1,15 @@
+# consumers: spec-sweep
+tests/unit/ce-localization-round-1-remediation-contracts.test.js
+tests/unit/ce-upstream-skill-sync-contracts.test.js
+tests/unit/dispatch-authorization-matrix-contracts.test.js
+tests/unit/low-findings-cleanup-contracts.test.js
+tests/unit/private-scratch-migration-contracts.test.js
+tests/unit/python-runtime-resolution-contracts.test.js
+tests/unit/remaining-script-defenses.test.js
+tests/unit/skill-flow-p2-closure-contracts.test.js
+tests/unit/spec-riffrec-feedback-analysis-contracts.test.js
+tests/unit/spec-sweep-final-publication.test.js
+tests/unit/spec-sweep-media-admission.test.js
+tests/unit/specialized-skill-calibration-contracts.test.js
+tests/unit/sweep-state-legacy-import.test.js
+tests/unit/sweep-state-safety.test.js

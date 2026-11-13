@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "指定 trunk 为目标应被拒绝",
+  "prompt": "（我已通过 /spec-dogfood 显式调起该 skill。）\nmain\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-dogfood/evals/fixtures/scripts/check-trunk-reject.sh"
+  ]
+}

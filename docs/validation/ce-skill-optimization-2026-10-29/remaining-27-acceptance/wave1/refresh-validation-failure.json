@@ -1,0 +1,15 @@
+{
+  "artifact_type": "confirmed",
+  "command": [
+    "bash",
+    "skills/spec-compound-refresh/scripts/run-python.sh",
+    "skills/spec-compound-refresh/scripts/validate-frontmatter.py",
+    "--promotion",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/refresh/invalid-candidate.md"
+  ],
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "FAIL: docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/refresh/invalid-candidate.md\n  promotion requires non-empty top-level 'source_refs' array\n  promotion requires non-empty top-level 'invalidation_condition'\n",
+  "candidate_sha256": "335ff42d6323b91a91ded75141eb22646560eba738d3aaf1d6da30a42b1df427",
+  "scope": "Actual local deliberately invalid candidate validation; no publication attempted."
+}

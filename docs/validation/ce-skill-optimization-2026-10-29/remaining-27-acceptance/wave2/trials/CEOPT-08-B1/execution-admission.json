@@ -1,0 +1,7 @@
+{
+  "trial": "CEOPT-08-B1",
+  "approved_for_disposable_execution": true,
+  "candidate_sha256": "385e5f596701ee5ed2829c179a02de851688459fa7ede0fc394776f668643052",
+  "review": "Complete candidate matches previously reviewed A1 bytes: perf_hooks, bounded array/Map computation, stdout only. No external effects.",
+  "scope": "Parent-approved disposable execution, not worker enforcement."
+}

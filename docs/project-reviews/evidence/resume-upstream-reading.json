@@ -1,0 +1,462 @@
+{
+  "reviewer": "resume-upstream; independent source review, not blind",
+  "created_at": "2026-11-01T13:47:02.438146+00:00",
+  "head": "1aa272a606710407e69b22d0452a34cd9b0d1f8f",
+  "baseline": "049e52744",
+  "source_diff_from_baseline": "",
+  "dirty_status_at_capture": " M CHANGELOG.md\n M docs/plans/2026-11-01-development-skills-review-plan.md\n M docs/project-reviews/2026-11-01-development-skills-review-report.md\n M docs/project-reviews/2026-11-01-development-skills-review-requirements.md\n?? .agents/\n?? docs/project-reviews/evidence/D1-static-S06-S07-S10.md\n?? docs/project-reviews/evidence/S00-spec-runtime-setup/\n?? docs/project-reviews/evidence/S04-spec-plan/\n?? docs/project-reviews/evidence/S20-using-spec-first/\n?? docs/project-reviews/evidence/_shared/extract-skill-calls.py\n?? docs/project-reviews/evidence/_shared/isolated-claude.sh\n?? docs/project-reviews/evidence/_shared/isolated-run.sh\n?? docs/project-reviews/evidence/_shared/skill-facts-2026-11-01-phase1.md\n?? docs/project-reviews/evidence/_shared/skill-facts-2026-11-01-resume.md\n?? docs/project-reviews/evidence/batch-a-e-static-triage.md\n?? docs/project-reviews/evidence/batch1/\n?? docs/project-reviews/evidence/batch2/\n?? docs/project-reviews/evidence/batch4/\n?? docs/project-reviews/evidence/chain-scenario-static.md\n?? docs/project-reviews/evidence/resume-audit-2026-11-01.md\n?? docs/project-reviews/evidence/resume-core-analysis.md\n?? docs/project-reviews/evidence/resume-knowledge-reading.md\n?? docs/project-reviews/evidence/resume-knowledge.md\n?? docs/project-reviews/evidence/resume-specialists.md\n?? docs/project-reviews/evidence/resume-upstream.md\n?? docs/project-reviews/evidence/static-S16-S19.md\n",
+  "statistics": [
+    {
+      "skill": "spec-ideate",
+      "entry_lines": 105,
+      "description_line_chars": 230,
+      "all_reference_md_lines": 2572
+    },
+    {
+      "skill": "spec-brainstorm",
+      "entry_lines": 78,
+      "description_line_chars": 306,
+      "all_reference_md_lines": 2377
+    },
+    {
+      "skill": "spec-prd",
+      "entry_lines": 345,
+      "description_line_chars": 593,
+      "all_reference_md_lines": 1910
+    },
+    {
+      "skill": "spec-plan",
+      "entry_lines": 123,
+      "description_line_chars": 467,
+      "all_reference_md_lines": 5396
+    },
+    {
+      "skill": "spec-write-tasks",
+      "entry_lines": 141,
+      "description_line_chars": 547,
+      "all_reference_md_lines": 823
+    }
+  ],
+  "files": [
+    {
+      "path": "skills/spec-ideate/SKILL.md",
+      "read_scope": "full",
+      "sha256": "dd427fca3e50bce7dc0fc7bc573633217e696c2f8583a1215c5e571c9665f733"
+    },
+    {
+      "path": "skills/spec-ideate/references/decomposition.md",
+      "read_scope": "full",
+      "sha256": "800f8eb2b8bdb211f59c8aeffe08a606fd8d8fe872172a5bdc8e8fbe0e6bcddf"
+    },
+    {
+      "path": "skills/spec-ideate/references/divergent-ideation.md",
+      "read_scope": "full",
+      "sha256": "6b3fddc76236b29b1bc50ef0c327feadef78e46a3ba53f77aa01715a728058bd"
+    },
+    {
+      "path": "skills/spec-ideate/references/grounding.md",
+      "read_scope": "full",
+      "sha256": "195d404e41c813ba11c76601a05329711a9ffd09b3167dbd0392c0965e336092"
+    },
+    {
+      "path": "skills/spec-ideate/references/ideation-sections.md",
+      "read_scope": "full",
+      "sha256": "f0a1e5417971f24ed8066dadc05ec694f469dc177e485820ee12b8dff4efc598"
+    },
+    {
+      "path": "skills/spec-ideate/references/issue-intelligence.md",
+      "read_scope": "full",
+      "sha256": "0e6cf9e3a75911b731ee1b91046e3a3ef39351af808e5b224911e43a32bd6e98"
+    },
+    {
+      "path": "skills/spec-ideate/references/output-mode.md",
+      "read_scope": "full",
+      "sha256": "9828d7739aad17f27b6ca762968cee98f2c3b89480572ad40397442221604baa"
+    },
+    {
+      "path": "skills/spec-ideate/references/post-ideation-workflow.md",
+      "read_scope": "full",
+      "sha256": "23d4b5362231f7b86fc78c3f44d10502afff0e473b3b12651a25d6ad64fc0a21"
+    },
+    {
+      "path": "skills/spec-ideate/references/scope-gates.md",
+      "read_scope": "full",
+      "sha256": "38333e06ff332181953cc3afdbeefa35dc7119a8b3937a6271579d18ab8845e4"
+    },
+    {
+      "path": "skills/spec-ideate/references/universal-ideation.md",
+      "read_scope": "full",
+      "sha256": "902f2300a92c3ab7ac5a40f499cf90a3dc06abb73895192401b7a3801915c60a"
+    },
+    {
+      "path": "skills/spec-ideate/references/user-research-artifacts.md",
+      "read_scope": "full",
+      "sha256": "a519d27376b6cc5f1874b1fc72040f5ba82d457aad3c963f1e069727ce37d782"
+    },
+    {
+      "path": "skills/spec-ideate/references/web-research-cache.md",
+      "read_scope": "full",
+      "sha256": "c79a9f495294a1ec98cf77c0d0062c1b326d569d92ad17d62165fd00b87c465a"
+    },
+    {
+      "path": "skills/spec-brainstorm/SKILL.md",
+      "read_scope": "full",
+      "sha256": "d3df96643040bebb4cc003ff75f9fdb3f3dac34461abb031eab7808f82167861"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/approaches.md",
+      "read_scope": "full",
+      "sha256": "beb9864913ce83bef8fa59606b23f04950cf774893875f7a4c1b0c9dc6f6be79"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/blindspot-pass.md",
+      "read_scope": "full",
+      "sha256": "d173accf20219ad100a048382e453436f6ece885d586678f4106bc750da7e57e"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/brainstorm-sections.md",
+      "read_scope": "full",
+      "sha256": "ad3e9f420710f0d4355315d5ac1f81324136864e19055cbb70218cb9b7525669"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/dialogue.md",
+      "read_scope": "full",
+      "sha256": "f4875ae211e393bc35fafa05d99fe8b1674f0623c0327b81caf6ea35a6830472"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/handoff.md",
+      "read_scope": "full",
+      "sha256": "ab4ef1ce1a28edec955fcf9403188ed3e2d233f0673c956b672f4551f758b8a6"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/interaction-rules.md",
+      "read_scope": "full",
+      "sha256": "c36a97db63801c19c8d377d2a3ca8efc31b91b33b52a7a49ee2fde1aec92b0c1"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/model-tiers.md",
+      "read_scope": "full",
+      "sha256": "abff301100e828b0b1f07c4e3d42417f43009a102eb4823490d7dd41a819702b"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/output-mode.md",
+      "read_scope": "full",
+      "sha256": "e8fbaeb2df012a771f7c00bd56a2d5e9a90d12ae4be6b3e6019f9e7b50294f7a"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/phase-0.md",
+      "read_scope": "full",
+      "sha256": "ad69b0bbaccfc7b3c3346e8b4956c123582c1e1ef531547aa487b9cac88f280a"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/plan-write.md",
+      "read_scope": "full",
+      "sha256": "9aace9e2cb8b7578a35afb8baf1f3bfd009ff30e8bc308196cc63e49b578eca8"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/product-pressure-test.md",
+      "read_scope": "full",
+      "sha256": "2e5f4ad474d6b174cfe54555e31d695085e942c3559127153cfbb2dde928fd84"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/settled-decisions.md",
+      "read_scope": "full",
+      "sha256": "5b36b0da843bdd2ca18dae80c2cd6b53d3489ff9e2336a26ec07f75221a60937"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/synthesis-summary.md",
+      "read_scope": "full",
+      "sha256": "a865c91b2d1b9f9b7f579bc498cb548f0549264302cf9e5376553bd2bf860f37"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/universal-brainstorming.md",
+      "read_scope": "full",
+      "sha256": "13fda41db046dceb603952444c61666406db8b6ef1eb0e33a3af76160ad2b43d"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/verdict-routing.md",
+      "read_scope": "full",
+      "sha256": "be20df74222ad7107016495029317d51406817181c216285376943c68362a47c"
+    },
+    {
+      "path": "skills/spec-prd/SKILL.md",
+      "read_scope": "full",
+      "sha256": "25cc60f639d886c024a61b462c84cb101f6b95a6098984a879f2a750292e230a"
+    },
+    {
+      "path": "skills/spec-prd/references/design-source-evidence.md",
+      "read_scope": "full",
+      "sha256": "6e28b24c4824c59f801b1152f74b306b0be84cb63b9d1094ca294fe6792da66a"
+    },
+    {
+      "path": "skills/spec-prd/references/domain-language-and-decision-ledger.md",
+      "read_scope": "full",
+      "sha256": "f1ecde33b3bf5b37e3801e69f95284198506397d355c7dc343fce9acb26acfe3"
+    },
+    {
+      "path": "skills/spec-prd/references/evidence-and-topology.md",
+      "read_scope": "full",
+      "sha256": "e596b313e36f2ace3a635da75e5dd28a9993ff9e8220b1f8fb9227c56748f95b"
+    },
+    {
+      "path": "skills/spec-prd/references/grill-with-docs-integration.md",
+      "read_scope": "full",
+      "sha256": "aaa90931129db5db520d8836214a4bcc7146bd0b79710bb304906a6b97e7d14f"
+    },
+    {
+      "path": "skills/spec-prd/references/large-input-checkpoint.md",
+      "read_scope": "full",
+      "sha256": "83318f6a0a5e7626024657e8ea7ec8bf374daef9086b4d9cd50eea19f32f28d3"
+    },
+    {
+      "path": "skills/spec-prd/references/prd-output-template.md",
+      "read_scope": "full",
+      "sha256": "59a776888f79c76d7d8c0869773ece95a828918e310ece2a53dbd06bd4858c89"
+    },
+    {
+      "path": "skills/spec-prd/references/prd-readiness-lens.md",
+      "read_scope": "full",
+      "sha256": "d65406ec745a2658509513a6a9b498025d5e33217e7d159150ee1e8b7b71a19d"
+    },
+    {
+      "path": "skills/spec-prd/references/product-analysis-lite.md",
+      "read_scope": "full",
+      "sha256": "465b94f085904363524dc11cade3b65e1058d79f37359da766bba8f2774d4dc4"
+    },
+    {
+      "path": "skills/spec-prd/references/product-expert-lens.md",
+      "read_scope": "full",
+      "sha256": "3a82ec526647fb69003b5da3e0d2dfa544746aac5ced3b8b9ee6c13584740a66"
+    },
+    {
+      "path": "skills/spec-plan/SKILL.md",
+      "read_scope": "full",
+      "sha256": "bcc0e89dd04b3199a09ac16ee74a75a418fe609bd6cf6324f5c78a9d0bc9b416"
+    },
+    {
+      "path": "skills/spec-plan/references/approach-altitude.md",
+      "read_scope": "full",
+      "sha256": "73b85aaa23ae05aa5f533b0b7fa36fd2068cc7a199d4f1a8e3621abaaa95e182"
+    },
+    {
+      "path": "skills/spec-plan/references/deepening-workflow.md",
+      "read_scope": "full",
+      "sha256": "9fa8dcf512dd15c0be2667600ff31eef395b20dcc27018adbe7cc53572b72d28"
+    },
+    {
+      "path": "skills/spec-plan/references/final-review.md",
+      "read_scope": "full",
+      "sha256": "02e556438f2dd607f02b0a7f5ac4fbb61a5c6d335a2376403fbeb7db6f188c61"
+    },
+    {
+      "path": "skills/spec-plan/references/frontend-engineering-lens.md",
+      "read_scope": "full",
+      "sha256": "f678b9f905b70ccb70933400ed2171d89184ef3f5e3bc5f88218487d9e826b8d"
+    },
+    {
+      "path": "skills/spec-plan/references/high-risk-plan-lens.md",
+      "read_scope": "full",
+      "sha256": "91eeaf3707ad896bf37066a5473754e4a762cddc75a91ecafa0f770e8e969970"
+    },
+    {
+      "path": "skills/spec-plan/references/intake.md",
+      "read_scope": "full",
+      "sha256": "9e0d0e9a808cb116db84e2ca9406e1ae206da6230f7c095532a297e9f92fe6e0"
+    },
+    {
+      "path": "skills/spec-plan/references/interface-and-evolution-lens.md",
+      "read_scope": "full",
+      "sha256": "9d39c05d52bae8076a430e7b34c1c232c5cc7efa6b544a65de761d225c48b640"
+    },
+    {
+      "path": "skills/spec-plan/references/output-contracts.md",
+      "read_scope": "full",
+      "sha256": "adb91af964f51938dbdd768f5c93a2364b97b454bcfb2c303481d28cda55b83c"
+    },
+    {
+      "path": "skills/spec-plan/references/output-mode.md",
+      "read_scope": "full",
+      "sha256": "cf7cad35c001153e0e35352f9ce4ad654f2343500fa954ca0b156eb54ac98fba"
+    },
+    {
+      "path": "skills/spec-plan/references/plan-handoff.md",
+      "read_scope": "full",
+      "sha256": "079bf285adf7098e95504b7e92a567dc59a4e8629eb069aaf0c8e46774dfd053"
+    },
+    {
+      "path": "skills/spec-plan/references/plan-sections.md",
+      "read_scope": "full",
+      "sha256": "ac4e6383b067115da372c20342544a85f5a0d68aed0862facdbd629ae5866477"
+    },
+    {
+      "path": "skills/spec-plan/references/planning-evidence-boundaries.md",
+      "read_scope": "full",
+      "sha256": "3147727567747f35055f3f64c2cadb345f1892019736524a3cf1e0710b0212f5"
+    },
+    {
+      "path": "skills/spec-plan/references/research.md",
+      "read_scope": "full",
+      "sha256": "412a0e672ad8d025c10947b60c350b4bed085dfd62ad08dbf4e21088869852a0"
+    },
+    {
+      "path": "skills/spec-plan/references/resume.md",
+      "read_scope": "full",
+      "sha256": "6c0af1102219eb9fba48a615545f2fe494625b510c3d516608c340cfb5e7ef70"
+    },
+    {
+      "path": "skills/spec-plan/references/settled-decisions.md",
+      "read_scope": "full",
+      "sha256": "5b36b0da843bdd2ca18dae80c2cd6b53d3489ff9e2336a26ec07f75221a60937"
+    },
+    {
+      "path": "skills/spec-plan/references/structure.md",
+      "read_scope": "full",
+      "sha256": "646c07cbedcef4bd65c8371e147207f09510eef52cbcbcf904172951174bec35"
+    },
+    {
+      "path": "skills/spec-plan/references/synthesis-summary.md",
+      "read_scope": "full",
+      "sha256": "ac63616ab776152367398c477d0f25e1d866826064dcfcd7a5f460fed2ea69fc"
+    },
+    {
+      "path": "skills/spec-plan/references/universal-planning.md",
+      "read_scope": "full",
+      "sha256": "50139b9e10045d46080d84d992c3bdbca52b879b24343945d774b67972911dc7"
+    },
+    {
+      "path": "skills/spec-write-tasks/SKILL.md",
+      "read_scope": "full",
+      "sha256": "cdfa20fd18d983e5ddf6ef259006d5a62e1b7fdc9a2564d879649990b77867df"
+    },
+    {
+      "path": "skills/spec-write-tasks/references/execution-handoff-contract.md",
+      "read_scope": "full",
+      "sha256": "d852671d3912d313d87c65d7e4b5ee99bd3d4ec92890f8f1cfc5c6f3f0c5dd34"
+    },
+    {
+      "path": "skills/spec-write-tasks/references/task-pack-schema.md",
+      "read_scope": "full",
+      "sha256": "2b2efdd0547ad7841b53138d36b25d7f291729e04ada88b436b8e182fe6244aa"
+    },
+    {
+      "path": "skills/spec-write-tasks/references/task-quality-guide.md",
+      "read_scope": "full",
+      "sha256": "5e21b5c69cf75adbcf3098664c51cd2210598895d41db8a936c4b9076a41e42c"
+    },
+    {
+      "path": "skills/spec-prd/assets/templates/00-generic.md",
+      "read_scope": "full",
+      "sha256": "4e6cf43431a25d038ac054ff738807a5d7fd1b1409ccc55050846e62b465aacf"
+    },
+    {
+      "path": "skills/spec-prd/assets/templates/50-cli-devtool.md",
+      "read_scope": "full",
+      "sha256": "92c3c3a758b0d22b8b45215561e214b746c1bcce9e11b57777c79bb3aeeb9fbc"
+    },
+    {
+      "path": "skills/spec-prd/assets/templates/60-mixed.md",
+      "read_scope": "full",
+      "sha256": "c0cecbb661dbf633509610e8d7477aed257d40566553c0f03bdd05dcdf8f4039"
+    },
+    {
+      "path": "skills/spec-prd/scripts/finalize-prd-artifact.js",
+      "read_scope": "full",
+      "sha256": "338d76d7f70b4755556498d42eb632994afd50467b26152c4d97b37d9975e90a"
+    },
+    {
+      "path": "skills/spec-prd/scripts/lib/reason-codes.js",
+      "read_scope": "full",
+      "sha256": "34d73c24e56b1843cbb472b52b29710da01354c63a2b4bb648d52421a6671a46"
+    },
+    {
+      "path": "src/cli/task-pack.js",
+      "read_scope": "full",
+      "sha256": "97f530378030fcf314041e80c4ac0a09d5e13e9fe86b55949acb23e1b9a4e698"
+    },
+    {
+      "path": "skills/spec-work/references/work-intake-and-task-pack.md",
+      "read_scope": "full",
+      "sha256": "d888973eb245c8faf54c109832e999c60fc70106bfe01a6ab16897b322fe8ce3"
+    },
+    {
+      "path": "tests/unit/spec-prd-exit-safety.test.js",
+      "read_scope": "full",
+      "sha256": "a4fb810d8bc7933dcc9eb56d85647a5fd77595492bbbc6aa6a14c2063c64ebb6"
+    },
+    {
+      "path": "docs/methodology/结构化项目角色契约.md",
+      "read_scope": "full",
+      "sha256": "447e66b751639a36afb455380159f3b800c4a48b1189b304bed92a53a0ba0738"
+    },
+    {
+      "path": "docs/contracts/project-graph-consumption.md",
+      "read_scope": "full",
+      "sha256": "b16b3960b52b3ddbda7ae8f1dca7e2514dde4efaa5671e961783a4d34aa6bf04"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/scripts/check-enrichment.sh",
+      "read_scope": "full",
+      "sha256": "aa5a405b216be66bc81b71153d4a0079767df8c119875eb50d999510dc58067d"
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/fixtures/scripts/rejects-remote.sh",
+      "read_scope": "full",
+      "sha256": "de9695a70c0cf289dc5294747415ea908c516d3e34c590da22d2a82c4581a370"
+    },
+    {
+      "path": "docs/project-reviews/evidence/batch1/results.md",
+      "read_scope": "full",
+      "sha256": "b38817e6922d019a1ac802bdca9f5af62950bfd18695470685cb19eb0c18d56b"
+    },
+    {
+      "path": "docs/project-reviews/evidence/batch1/expectations.md",
+      "read_scope": "full",
+      "sha256": "01432836717fcc5f1f26fda20b83a1b58d30a47211fff85b8a0e3d6885254c01"
+    },
+    {
+      "path": "skills/spec-ideate/evals/eval.yaml",
+      "read_scope": "full",
+      "sha256": "8c1cea9f8d0c827b689da4ad1486ef4f02747c30c5c9c89faa3e05f437a173dd"
+    },
+    {
+      "path": "skills/spec-brainstorm/evals/eval.yaml",
+      "read_scope": "full",
+      "sha256": "66b612bc6e781a4d5b4664b9af8d4d33fe83df399c884f49019bf413ffc297cc"
+    },
+    {
+      "path": "skills/spec-prd/evals/eval.yaml",
+      "read_scope": "full",
+      "sha256": "7e11d2def8ac064180e62d661285ae12c3ea2f81eb40e725d307ada2e017183d"
+    },
+    {
+      "path": "skills/spec-plan/evals/eval.yaml",
+      "read_scope": "full",
+      "sha256": "3568bbbff6389c95d54587c4bf10ab3b47aac9102ccedd8baa053257b2f8f98e"
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/eval.yaml",
+      "read_scope": "full",
+      "sha256": "736bf9df4d309e367ed7f925b53d167f0cc811393d91e2b12954cbcc08059453"
+    },
+    {
+      "path": "skills/spec-prd/scripts/check-prd-artifact.js",
+      "read_scope": "652-818;1258-1459;1589-1692; function index only elsewhere",
+      "sha256": "8f4f3f5e5dbc7c4ea3761cc76610ec0b1727f5c50214e7cbf8606f3ff1a181be"
+    },
+    {
+      "path": "docs/project-reviews/2026-11-01-development-skills-review-requirements.md",
+      "read_scope": "3.1-3.9;4;5.2-5.3;6;7.2",
+      "sha256": "4415b828c0eba3867618237b5cc9bd82ad2f5ec2b952156f096a3836d62c0aa1"
+    },
+    {
+      "path": "docs/project-reviews/2026-11-01-ai-assisted-brownfield-research.md",
+      "read_scope": "1-2.3;3.1;4-5; section 3 partly read, not used",
+      "sha256": "a0c3fe876bbdcf157097f8517e532a371dca80f483c71d15ab1f5865c4b1cf15"
+    },
+    {
+      "path": "docs/project-reviews/evidence/batch1/runs/grades.jsonl",
+      "read_scope": "S04 rows only",
+      "sha256": "8c566990d8f76f94c133eba52959cc4fa696705fca6a63060635dccaf2fe61fe"
+    }
+  ]
+}

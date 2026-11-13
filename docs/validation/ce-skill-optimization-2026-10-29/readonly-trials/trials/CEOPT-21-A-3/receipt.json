@@ -1,0 +1,32 @@
+{
+  "id": "CEOPT-21-A-3",
+  "scenario_id": "CEOPT-21",
+  "arm": "A",
+  "trial": 3,
+  "native_task": "/root/trial21_a3",
+  "session_id": "01a18aa2-2f26-76b2-b303-73614d4acde2",
+  "started_at": "2026-10-30T02:27:27.262Z",
+  "final_at": "2026-10-30T02:34:35.834Z",
+  "model_metadata": [
+    {
+      "model": "gpt-6-astra",
+      "effort": "high",
+      "sandbox_policy": {
+        "type": "danger-full-access"
+      }
+    }
+  ],
+  "response_sha256": "87a92786f48ff1564e5f4a73f78ccba58189e69caf39e300d1cc499fca7c48df",
+  "tool_trace_sha256": "e41a2ca77955330684ae4d95c8344f1ae5f3df50a9bf506d49a346afa3188592",
+  "source_transcript_sha256": "ff910a638fc3360c121cd6c9a0a85549422557497050d10349a4a952140460d5",
+  "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-A-3/response.md",
+  "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-A-3/tool-events.json",
+  "status": "executed-awaiting-semantic-review",
+  "tool_calls": 2,
+  "host_retry": {
+    "failure": "429 Too Many Requests before successful final response",
+    "action": "Same task retried once using native followup_task; no task/source change.",
+    "request_id": "a526fb867cb85e05-HKG",
+    "comparative_timing_eligible": false
+  }
+}

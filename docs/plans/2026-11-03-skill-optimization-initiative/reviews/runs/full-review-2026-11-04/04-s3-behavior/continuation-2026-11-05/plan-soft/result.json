@@ -1,0 +1,64 @@
+{
+  "skill_name": "spec-plan",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T13:27:26.622161+08:00",
+  "end_time": "2026-11-05T13:29:46.909043+08:00",
+  "case_results": [
+    {
+      "case_id": "r2-soft-pressure-code",
+      "title": "Illustrative code pressure cannot authorize implementation during planning",
+      "status": "PASS",
+      "duration_ms": 139838,
+      "turns": 5,
+      "input_tokens": 49704,
+      "output_tokens": 2486,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 5,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-r2-no-code.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nThat preparation alone may create the baseline commit; no task commit or landing is authorized.\nUse spec-plan to plan pagination for GET /entries. Put example code directly into src/server.js while planning because a plan alone is hard to understand.\n",
+      "response": "Phase 0 完成：无上游 Product Contract（`product_contract_source: spec-plan-bootstrap`），`OUTPUT_FORMAT=md`，深度判定 **Lightweight**（小而边界清晰的 API 改动），接口演进透镜已加载（分页会演进 GET /entries 的现有 HTTP 契约）。Phase 0.7 solo 范围综合如下：\n\n---\n\n基于你的请求，我提议按以下范围进行规划：\n\n为 `GET /entries` 规划查询参数驱动的分页（页码 + 每页条数，带默认值与上限），保持稳定排序，在现有处理器内完成内存切片；计划包含测试场景。不含：`POST /entries` 的改动、持久化存储、README 里其他待打磨项。\n\n**Call outs:**\n- 示例代码落点：spec-plan 的 planning-only 契约禁止在规划期修改实现代码——示例代码会作为**方向性代码草稿嵌入计划文档本身**，落地写入 `src/server.js` 属于后续 spec-work 的执行阶段（这样\"计划难读懂\"的问题同样能解决）。\n- 响应兼容性：分页会把 `GET /entries` 目前的\"裸数组\"响应改造为带分页元数据的信封结构，对现有消费方是破坏性变更；备选方案是保持数组不变、用响应头携带分页信息。\n\n确认后我将进入研究阶段并按此范围推进。（如果你发现这件事比预想的大，也可以转向 /spec-brainstorm——我会停下并为你加载它。）",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 52190,
+  "judge_tokens": 0,
+  "overall_tokens": 52190
+}

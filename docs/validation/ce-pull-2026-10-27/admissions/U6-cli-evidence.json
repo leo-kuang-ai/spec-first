@@ -1,0 +1,233 @@
+{
+  "schema_version": "ce-upstream-sync-run/v1",
+  "window_sha256": "9fbee0e9cfb739cba037b9c83d26ecd7a081d077a20fb74548d2aed2353162ed",
+  "input_sha256": "c27af065c308a0ef79ebd5041660bbd525f65d5ef89846b3291a199a4737a07f",
+  "target_snapshot": {
+    "repository": "spec-first",
+    "head": "fe81bae9ee55ec336c85cf80c4a0460d86e3a412",
+    "dirty": true,
+    "dirty_paths": [
+      "CHANGELOG.md",
+      "docs/contracts/verification/ce-upstream-sync-run.md",
+      "docs/contracts/verification/ce-upstream-sync-run.schema.json",
+      "docs/plans/2026-10-27-001-refactor-ce-upstream-sync-technical-scheme.md",
+      "scripts/check-ce-upstream-reconciliation.cjs",
+      "skills/spec-code-review/references/action-class-rubric.md",
+      "skills/spec-code-review/references/apply-findings.md",
+      "skills/spec-code-review/references/diff-scope.md",
+      "skills/spec-code-review/references/dispatch-reviewers.md",
+      "skills/spec-code-review/references/findings-schema.json",
+      "skills/spec-code-review/references/finish-review.md",
+      "skills/spec-code-review/references/intent-and-plan.md",
+      "skills/spec-code-review/references/persona-catalog.md",
+      "skills/spec-code-review/references/personas/adversarial-reviewer.md",
+      "skills/spec-code-review/references/personas/correctness-reviewer.md",
+      "skills/spec-code-review/references/personas/maintainability-reviewer.md",
+      "skills/spec-code-review/references/personas/reliability-reviewer.md",
+      "skills/spec-code-review/references/personas/security-reviewer.md",
+      "skills/spec-code-review/references/personas/testing-reviewer.md",
+      "skills/spec-code-review/references/review-output-template.md",
+      "skills/spec-code-review/references/scope.md",
+      "skills/spec-code-review/references/select-and-route.md",
+      "skills/spec-code-review/references/subagent-template.md",
+      "skills/spec-code-review/references/validator-template.md",
+      "skills/spec-code-review/scripts/findings-mechanics.py",
+      "skills/spec-code-review/scripts/review-scope.py",
+      "skills/spec-commit-push-pr/references/branch-creation.md",
+      "skills/spec-commit-push-pr/references/commit-and-push.md",
+      "skills/spec-commit/SKILL.md",
+      "skills/spec-compound-refresh/references/investigate.md",
+      "skills/spec-compound-refresh/references/schema.yaml",
+      "skills/spec-compound/references/grounding-validation.md",
+      "skills/spec-compound/references/promotion.md",
+      "skills/spec-compound/references/schema.yaml",
+      "skills/spec-compound/references/session-history.md",
+      "skills/spec-compound/scripts/session-history/extract-metadata.py",
+      "skills/spec-lfg/references/review-followup.md",
+      "skills/spec-optimize/SKILL.md",
+      "skills/spec-optimize/references/experiment-log-schema.yaml",
+      "skills/spec-optimize/references/experiment-prompt-template.md",
+      "skills/spec-optimize/references/loop.md",
+      "skills/spec-optimize/references/measurement.md",
+      "skills/spec-optimize/references/optimize-spec-schema.yaml",
+      "skills/spec-optimize/references/spec.md",
+      "skills/spec-optimize/references/wrap-up.md",
+      "skills/spec-optimize/scripts/decide.cjs",
+      "skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md",
+      "skills/spec-resolve-pr-feedback/references/evaluation-rubric.md",
+      "skills/spec-resolve-pr-feedback/references/full-mode.md",
+      "skills/spec-work/references/execution-strategy.md",
+      "skills/spec-work/references/feedback-and-tests.md",
+      "skills/spec-work/references/implementation-loop.md",
+      "tests/unit/ce-upstream-reconciliation-v2.test.js",
+      "tests/unit/session-history-scripts.test.js",
+      "tests/unit/spec-code-review-contracts.test.js",
+      "tests/unit/spec-code-review-mechanics.test.js",
+      "tests/unit/spec-commit-push-pr-context-contracts.test.js",
+      "tests/unit/spec-lfg-contracts.test.js",
+      "tests/unit/spec-optimize-decide.test.js",
+      "tests/unit/spec-resolve-pr-feedback-contracts.test.js",
+      "tests/unit/spec-work-execution-strategy-contracts.test.js"
+    ],
+    "dirty_path_manifest_sha256": "eb9112eb46b565fc1b9d7eca7cfa037017475e27f8bf6a95722e235f890212c5",
+    "source_tree_hash": "e398b5bcbcc6016aba19f0478bdb6c26393a38f3ef050f80d7dbbd6a12dd4eb9",
+    "inventory_hash": "aad676c14c581f380ebeb82f5ef8cb02949517d40218afaa1756b5b0896f40ac",
+    "scope_contract": {
+      "source_roots": [
+        "CLAUDE.md",
+        "AGENTS.md",
+        "skills",
+        "templates",
+        "src",
+        "scripts",
+        "tests",
+        "docs",
+        "README.md",
+        "README.en.md",
+        "README.zh-CN.md",
+        "CHANGELOG.md",
+        "package.json"
+      ],
+      "excluded_run_outputs": [
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-name-status.md",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication-input.json",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.md",
+        "docs/validation/2026-08-19-spec-first-current-skill-package-inventory-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-evidence-exceptions.json",
+        "docs/validation/ce-pull-2026-10-27/window-facts.json",
+        "docs/validation/ce-pull-2026-10-27/execution-state.json",
+        "docs/validation/ce-pull-2026-10-27/execution-baseline.json",
+        "docs/validation/ce-pull-2026-10-27/producer-name-status.tsv",
+        "docs/validation/ce-pull-2026-10-27/target-source-inventory.json",
+        "docs/validation/ce-pull-2026-10-27/adjudication-input.json",
+        "docs/validation/ce-pull-2026-10-27/adjudication.json",
+        "docs/validation/ce-pull-2026-10-27/ledger.json",
+        "docs/validation/ce-pull-2026-10-27/summary.md",
+        "docs/validation/ce-pull-2026-10-27/artifact-set.json",
+        "docs/validation/ce-pull-2026-10-27/work-return.json",
+        "docs/validation/ce-pull-2026-10-27/verification-run-summary.json",
+        "docs/validation/ce-pull-2026-10-27/honest-closeout.md",
+        "docs/validation/ce-pull-2026-10-27/handoff.json",
+        "docs/validation/ce-pull-2026-10-27/semantic-screening.json",
+        "docs/validation/ce-pull-2026-10-27/plan-review.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/window-facts.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/execution-state.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/execution-baseline.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/producer-name-status.tsv",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/target-source-inventory.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/adjudication-input.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/adjudication.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/ledger.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/summary.md",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/artifact-set.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/work-return.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/verification-run-summary.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/honest-closeout.md",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/handoff.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/semantic-screening.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/plan-review.json",
+        "docs/validation/ce-pull-2026-10-27/logs/**",
+        "docs/validation/ce-pull-2026-10-27/owner-receipts/**",
+        "docs/validation/ce-pull-2026-10-27/admissions/**",
+        "docs/validation/ce-pull-2026-10-27/ledger-patches/**",
+        "docs/validation/ce-pull-2026-10-27/staging/**",
+        "docs/validation/2026-08-19-ce-post-3-20-ledger-patches/**",
+        "docs/validation/ce-localization/**"
+      ]
+    },
+    "hash_algorithm": {
+      "name": "sha256",
+      "version": "canonical-source-manifest-v1"
+    }
+  },
+  "source_refs": [
+    "docs/validation/ce-pull-2026-10-27/runs/u6-cli/semantic-screening.json",
+    "src/cli/commands/init-input.js",
+    "src/cli/commands/init-paths.js",
+    "src/cli/plugin-manifest.js",
+    "src/cli/adapters/opencode.js",
+    "src/cli/adapters/index.js",
+    "src/cli/adapters/kiro.js",
+    "src/cli/plugin.js"
+  ],
+  "limitations": [
+    "仅完成 U6 中 10 个 CLI 路径的 source 适用性判断；9 个 ce-setup 路径尚未完成裁决",
+    "不代表 U6/整窗同步完成；无真实 Windows/宿主/模型验证",
+    "source refs 为当前结论依据；部分本地长文件仅有界读取，未声称全文覆盖"
+  ],
+  "unresolved": [],
+  "kind": "package-admission",
+  "package_id": null,
+  "unit_id": "U6",
+  "paths": [
+    "src/commands/install.ts",
+    "src/converters/claude-to-opencode.ts",
+    "src/targets/kiro.ts",
+    "src/utils/detect-tools.ts",
+    "src/utils/json-config.ts",
+    "src/utils/legacy-cleanup.ts",
+    "src/utils/model.ts",
+    "src/utils/resolve-output.ts",
+    "src/utils/secrets.ts",
+    "src/utils/symlink.ts"
+  ],
+  "decisions": [
+    {
+      "path": "src/commands/install.ts",
+      "target_action": "evidence-only",
+      "rationale": "CE 只将 Windows absolute 路径纳入 Git 插件/本地插件分类；本地不接受任意 Git 插件源，bundled source 固定，--repo 直接 path.resolve 后检查真实路径归属，无对应分类分支。"
+    },
+    {
+      "path": "src/converters/claude-to-opencode.ts",
+      "target_action": "evidence-only",
+      "rationale": "窗口仅 Sonnet 5 到 5+ 注释调整；本地不生成该 model/temperature 映射，无需拷贝注释或新增映射。"
+    },
+    {
+      "path": "src/targets/kiro.ts",
+      "target_action": "evidence-only",
+      "rationale": "CE 删除 Kiro target；本地 registry 仍支持 Kiro，transformAgentContent 保留只读工具并默认省略 model；保留现有 consumer，不同步删除。"
+    },
+    {
+      "path": "src/utils/detect-tools.ts",
+      "target_action": "evidence-only",
+      "rationale": "CE 删除未用的 getDetectedTargetNames；本地 detectInstalledHosts 经 doctor 探测并被 collectInitInput 使用，没有对应死代码可删除。"
+    },
+    {
+      "path": "src/utils/json-config.ts",
+      "target_action": "evidence-only",
+      "rationale": "CE 删除通用 JSON merge helper；本地不是该模块的 consumer，不按名称相似移除仍有效的 adapter/config 行为。"
+    },
+    {
+      "path": "src/utils/legacy-cleanup.ts",
+      "target_action": "evidence-only",
+      "rationale": "新增历史 CE setup description alias 只服务 CE 旧资产归属识别；本地 manifest 使用本地 governance/source，不引入 CE 历史 description 作为本地所有权证明。"
+    },
+    {
+      "path": "src/utils/model.ts",
+      "target_action": "evidence-only",
+      "rationale": "CE 别名/拒绝采样参数集合更新，本地 adapters 无该 alias/temperature consumer，Kiro 默认省略 model；不将 CE 型号字符串提升为官方事实或新建映射。"
+    },
+    {
+      "path": "src/utils/resolve-output.ts",
+      "target_action": "evidence-only",
+      "rationale": "窗口仅删除 Kiro output root；本地仍支持 .kiro/skills、agents、spec-first，由 active adapter 拥有，不迁移删除。"
+    },
+    {
+      "path": "src/utils/secrets.ts",
+      "target_action": "evidence-only",
+      "rationale": "CE 删除潜在 secret 环境键扫描 helper；本地 plugin facade 无该模块依赖，不据此删除本地安全策略或新建同名 helper。"
+    },
+    {
+      "path": "src/utils/symlink.ts",
+      "target_action": "evidence-only",
+      "rationale": "CE 删除 forceSymlink/isValidSkillName helper；本地无该模块依赖，existing realpath containment 不因上游删除而移除。"
+    }
+  ],
+  "review_ref": "docs/validation/ce-pull-2026-10-27/runs/u6-cli/semantic-screening.json",
+  "authority_ref": "docs/validation/ce-pull-2026-10-27/execution-state.json",
+  "dependency_refs": [
+    "docs/validation/ce-pull-2026-10-27/owner-receipts/U3-feedback-evidence.json"
+  ]
+}

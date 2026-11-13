@@ -1,0 +1,961 @@
+{
+  "plan": "docs/plans/2026-10-29-001-refactor-ce-skill-optimization-plan.md",
+  "overall_status": "blocked",
+  "units": {
+    "U31": {
+      "title": "\u5728\u4ea7\u54c1\u4fee\u6539\u524d\u51bb\u7ed3\u53ef\u6062\u590d\u6e90\u7801\u4e0e\u8bc4\u6d4b\u57fa\u7ebf",
+      "dependencies": [],
+      "status": "completed",
+      "evidence": [
+        "baseline.json",
+        "frozen-scenarios.json"
+      ],
+      "claim": "Local restoration and scenario freeze verified; real behavior evaluation not run."
+    },
+    "U1": {
+      "title": "\u4fee experiment-worktree.sh \u7684\u91cd\u590d create\u3001manifest ownership\u3001dirty \u68c0\u67e5\u53ca cleanup-all \u8303\u56f4",
+      "dependencies": [
+        "U31"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U1-red.log",
+        "U1-green.log",
+        "U1-review.md"
+      ],
+      "claim": "27 focused tests passed; source self-review complete; independent and real-host evaluation remains in U29."
+    },
+    "U2": {
+      "title": "\u4fee path-safety.cjs\u3001workspace-routing-inject.cjs\u3001workspace-git-exclude.cjs \u7684\u94fe\u63a5/\u7956\u5148\u5b89\u5168\u5199",
+      "dependencies": [
+        "U31"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U2-red.log",
+        "U2-green.log",
+        "U2-review.md",
+        "batch1-typecheck.log",
+        "U3-entrypoints.log"
+      ],
+      "claim": "193 tests across eight suites passed, including shared helpers and graph consumers; real-host/model and independent review remains in U29."
+    },
+    "U3": {
+      "title": "\u4fee worktree-manager.sh \u7269\u7406 containment \u4e0e remote-only branch/ref \u4e00\u81f4\u6027\uff0c\u5e76\u6838 Work caller \u7684\u8f6c\u4ea4\u5408\u540c",
+      "dependencies": [
+        "U31"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U3-red.log",
+        "U3-green.log",
+        "U3-review.md",
+        "batch1-typecheck.log",
+        "U3-entrypoints.log"
+      ],
+      "claim": "24 tests across two suites passed, including Git fixtures and the Work forward/intake contract; real-host/model and independent review remains in U29."
+    },
+    "U4": {
+      "title": "\u4fee sweep-state.py \u7684\u9501\u521b\u5efa\u3001file type/no-follow\u3001\u5931\u8d25\u963b\u65ad",
+      "dependencies": [
+        "U31"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U4-red.log",
+        "U4-green.log",
+        "U4-review.md"
+      ],
+      "claim": "20 tests passed across safety and legacy-import suites, including real process locking. Real connector/shared-remote behavior remains assigned to U32/U29."
+    },
+    "U5": {
+      "title": "\u4fee src/cli/task-pack.js \u4e0e src/cli/helpers/target-repo.js \u7684\u771f\u5b9e\u76ee\u6807/\u672a\u6765\u7956\u5148\u3001Git \u5143\u6570\u636e\u53ca\u5bbf\u4e3b runtime \u8fb9\u754c",
+      "dependencies": [
+        "U31"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U5-red.log",
+        "U5-green.log",
+        "U5-typecheck.log",
+        "U5-review.md"
+      ],
+      "claim": "125 tests across eight suites and 272-file typecheck passed; real-host/model and independent evaluation remains pending."
+    },
+    "U6": {
+      "title": "\u8ba9 cross-model-pov.sh \u6240\u6709 worker \u5165\u53e3\u5148\u8fc7\u7edf\u4e00 receipt/scope/deadline/schema",
+      "dependencies": [
+        "U31"
+      ],
+      "status": "partial",
+      "evidence": [
+        "U6-red.log",
+        "U6-green.log",
+        "U6-review.md",
+        "acceptance-resume/direct-worker-regression-green.log",
+        "acceptance-resume/evidence-review.json"
+      ],
+      "claim": "Observed direct-worker bypass closed; 15 tests passed. Authenticated positive admission and governed worker execution remain unavailable; dormant output validation is not behavior-verified."
+    },
+    "U7": {
+      "title": "\u7edf\u4e00 score-regression.sh \u4e0e\u751f\u4ea7\u534f\u8bae\u7684 regression-eligible/eligible\u3001visual-ui/visual\uff0c\u517c\u5bb9\u5df2\u6709\u5408\u6cd5\u503c\uff0c\u672a\u77e5\u503c\u62d2\u7edd\u5b89\u5168\u7ed3\u8bba",
+      "dependencies": [
+        "U31"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U7-red.log",
+        "U7-green.log",
+        "U7-entrypoints.log",
+        "U7-review.md"
+      ],
+      "claim": "44 scorer/orchestrator tests and entrypoint lint passed; candidate/check/commit prompt behavior remains unverified pending U29."
+    },
+    "U8": {
+      "title": "\u8ba9 decide.cjs \u548c measurement-admission.cjs \u4f7f\u7528\u72ec\u7acb\u771f\u5b9e\u6837\u672c/receipt\u53ca\u9884\u6ce8\u518c\u566a\u58f0\u7b97\u6cd5",
+      "dependencies": [
+        "U31"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U8-red.log",
+        "U8-green.log",
+        "U8-typecheck.log",
+        "U8-review.md"
+      ],
+      "claim": "140 tests across four suites and typecheck passed; receipt integrity/count/arithmetic checks do not authenticate independent execution or quality gains."
+    },
+    "U9": {
+      "title": "\u5206\u79bb\u6b63\u6587 hash \u4e0e input freshness\uff0crefresh-inputs \u4e0d\u80fd\u66ff\u6b63\u6587\u4fee\u6539\u91cd\u65b0\u7b7e\u6536",
+      "dependencies": [
+        "U31"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U9-red.log",
+        "U9-keyword-red.log",
+        "U9-green.log",
+        "U9-review.md"
+      ],
+      "claim": "76 tests across six suites passed; input refresh cannot renew changed product content; keyword matches remain advisory."
+    },
+    "U10": {
+      "title": "\u4fee findings-mechanics.py \u7684\u5b57\u6bb5\u5f62\u6001\u3001\u8bc1\u636e\u51c6\u5165\u548c\u5927\u5c0f\u5199\u8def\u5f84\u8eab\u4efd",
+      "dependencies": [
+        "U31"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U10-red.log",
+        "U10-green.log",
+        "U10-review.md"
+      ],
+      "claim": "119 tests across five suites passed; findings shape/path/confidence mechanics verified, semantic and independent validation remains pending."
+    },
+    "U11": {
+      "title": "pr-watch-state.cjs \u4e0e\u5b9e\u9645\u91c7\u6837 producer \u5171\u540c\u5b9a\u4e49 cadence\u3001\u53ef\u63a5\u53d7 gap \u548c resume",
+      "dependencies": [
+        "U31"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U11-red.log",
+        "U11-green.log",
+        "U11-review.md"
+      ],
+      "claim": "52 tests passed across two suites; local observation continuity verified, live remote sampling not run."
+    },
+    "U12": {
+      "title": "wrapper \u8865 vitals \u7684 open \u524d\u7f6e",
+      "dependencies": [
+        "U31"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U12-red.log",
+        "U12-green.log",
+        "U12-typecheck.log",
+        "U12-review.md"
+      ],
+      "claim": "55 tests across two suites and typecheck passed; producer lifecycle verified with a fake browser, real browser enforcement remains unverified."
+    },
+    "U13": {
+      "title": "\u6309\u9010\u9879\u7b14\u8bb0\u628a\u7ed3\u679c judge \u63a5\u5230\u5b9e\u9645\u6587\u4ef6\u5b57\u8282\u3001HEAD/index\u3001\u8c03\u7528 trace \u548c task outcome",
+      "dependencies": [
+        "U5",
+        "U9",
+        "U10"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U13-work-red.log",
+        "U13-core-red.log",
+        "U13-commit-red.log",
+        "U13-tail-red.log",
+        "U13-debug-head-red.log",
+        "U13-review-setup-error.log",
+        "U13-expanded-green.log",
+        "U13-eval-validate.log",
+        "U13-typecheck.log",
+        "U13-review.md"
+      ],
+      "claim": "82 tests across four suites, eleven eval configuration validations and typecheck passed; named judge counterexamples repaired, recorded-driver evidence is not a model run or independent review."
+    },
+    "U14": {
+      "title": "\u4fee Compound unknown/exit-code \u6458\u8981\u548c\u6b63\u5411 fixture",
+      "dependencies": [
+        "U31"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U14-review.md",
+        "U14-green.log",
+        "U14-typecheck.log",
+        "U14-polish-corrected-red.log",
+        "U14-riffrec-corrected-red.log",
+        "U14-compound-red.log",
+        "U14-compound-npm-green.log"
+      ],
+      "claim": "108 local tests across 11 suites and 296-file typecheck passed. Pulse routing remains a prose contract; independent, real host/model/media and comparative evaluation are not-run."
+    },
+    "U15": {
+      "title": "\u5728\u73b0\u6709 handoff \u4f20 proof-test \u6765\u6e90/\u4fdd\u62a4\u610f\u56fe",
+      "dependencies": [
+        "U5",
+        "U13"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U15-review.md",
+        "U15-green.log",
+        "U15-entrypoints.log",
+        "U15-eval-validate.log",
+        "U15-typecheck.log"
+      ],
+      "claim": "114 local tests passed, including proof-byte counterexamples and full task context transport. Prose handoff behavior and independent quality remain unverified."
+    },
+    "U16": {
+      "title": "Resolver \u8f93\u51fa\u6700\u5c0f pending conversation actions",
+      "dependencies": [
+        "U11",
+        "U13"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U16-review.md",
+        "U16-green-2.log",
+        "U16-first-check.log",
+        "U16-green.log",
+        "U16-typecheck.log",
+        "U16-eval-validate.log"
+      ],
+      "claim": "92 local tests passed; pending-action producer/consumer contract and read-only publication checks implemented. Real caller orchestration, remote recovery and independent behavior remain not-run."
+    },
+    "U17": {
+      "title": "\u4fee Plan research leaf \u4e0e Work Figma leaf \u7684 authority/intent \u51b2\u7a81",
+      "dependencies": [
+        "U13"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U17-review.md",
+        "U17-contracts.log",
+        "U17-green.log",
+        "U17-final-green.log",
+        "U17-final-entrypoints.log"
+      ],
+      "claim": "57 local contract tests passed; research authority and Figma parent/leaf evidence contracts aligned. Independent/model/visual behavior remains not-run."
+    },
+    "U32": {
+      "title": "\u63a5\u901a Sweep \u5171\u4eab\u72b6\u6001\u53d1\u5e03\u5c3e\u90e8\u4e0e\u5a92\u4f53\u6388\u6743\u56de\u6267",
+      "dependencies": [
+        "U4",
+        "U14"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U32-review.md",
+        "U32-final-green.log",
+        "U32-entrypoints.log",
+        "U32-typecheck.log",
+        "U32-tag-red.log"
+      ],
+      "claim": "81 local tests passed; final shared publication and scope-bound media admission/receipt consumption implemented. Real host/provider behavior and independent validation remain not-run."
+    },
+    "U18": {
+      "title": "\u8865 concern \u7684\u5177\u4f53 harm/\u540e\u8865\u4ee3\u4ef7\u3001considered-not-built\u3001\u89c4\u8303\u5355 owner\u3001\u7a33\u5b9a KTD \u4e0e\u6309\u9700\u7814\u7a76 dossier",
+      "dependencies": [
+        "U17"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U18-review.md",
+        "U18-check.log"
+      ],
+      "claim": "65 local contract/consumer tests passed; concern adjudication, stable KTDs, bounded research and owning-rule guidance integrated. Real model benefit remains unverified."
+    },
+    "U19": {
+      "title": "\u7edf\u4e00 synthesis \u4e0e\u6765\u6e90\u5408\u540c",
+      "dependencies": [
+        "U31"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U19-review.md",
+        "U19-check.log",
+        "U19-final-check.log"
+      ],
+      "claim": "21 local contract checks passed. CEOPT-02 adds six observed no-document alignment responses, all passing independent bounded adjudication. General dialogue quality and comparative benefit remain unverified."
+    },
+    "U20": {
+      "title": "\u8865\u53ef\u91cd\u590d\u590d\u73b0 instrumentation\u3001\u6027\u80fd baseline/profile\u3001missing-seam \u66ff\u4ee3\u8bc1\u636e",
+      "dependencies": [
+        "U15"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U20-review.md",
+        "U20-check.log",
+        "U20-fix-contract.log"
+      ],
+      "claim": "38 local tests passed across five suites; reproduction, performance and replacement-proof contracts aligned. Real debugging behavior remains unverified."
+    },
+    "U21": {
+      "title": "Doc-review \u8865\u540e\u679c\u51c6\u5165/\u4e8b\u5b9e\u91cd\u8bc4/\u8bed\u4e49\u53bb\u91cd/Withdraw/\u6062\u590d\u5e42\u7b49",
+      "dependencies": [
+        "U10",
+        "U13",
+        "U15"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U21-review.md",
+        "U21-final-check.log",
+        "U21-entrypoints.log",
+        "U21-source-identities.json"
+      ],
+      "claim": "Local source/contract and dormant transform checks passed. CEOPT-09 adds six observed inline report-only reviews, all passing independent bounded adjudication. Full workflow and model comparability remain unverified."
+    },
+    "U22": {
+      "title": "\u8bfb\u53d6\u9879\u76ee PR \u6a21\u677f\u3001tracker close-vs-link \u548c\u5df2\u77e5\u51b3\u7b56\u6765\u6e90",
+      "dependencies": [
+        "U13"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U22-review.md",
+        "U22-check.log",
+        "U22-final-recipes.log",
+        "U22-source-identities.json"
+      ],
+      "claim": "Local recipes and source contracts verified; real host/PR and semantic template behavior not run."
+    },
+    "U23": {
+      "title": "Compound \u7236\u4e0a\u4e0b\u6587\u5206\u7c7b\u8d77\u8349\u3001\u6309\u9700 finder/corpus \u53bb\u91cd",
+      "dependencies": [
+        "U14"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U23-review.md",
+        "U23-check.log",
+        "U23-candidate-check.log",
+        "U23-source-identities.json"
+      ],
+      "claim": "Local source/contracts verified; independent knowledge-retention and real publication behavior not run."
+    },
+    "U24": {
+      "title": "\u8865\u673a\u4f1a\u5b9a\u4f4d\u3001Goodhart \u53cd\u8bc1\u3001\u72ec\u7acb\u6bd4\u8f83\u8eab\u4efd\u548c\u53ef\u5171\u4eab\u62a5\u544a\uff0c\u590d\u7528\u73b0\u6709\u9884\u7b97\u3001holdout\u3001persistence",
+      "dependencies": [
+        "U1",
+        "U7",
+        "U8"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U24-review.md",
+        "U24-final-check.log",
+        "U24-final-recheck.log",
+        "U24-source-identities.json"
+      ],
+      "claim": "Local decider/admission/loop checks and source review; real optimization quality/cost not run."
+    },
+    "U25": {
+      "title": "Explain \u8865 trigger/state/failure/untraced \u4e0e\u7406\u7531\u6765\u6e90",
+      "dependencies": [
+        "U31"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U25-review.md",
+        "U25-check.log",
+        "U25-source-identities.json"
+      ],
+      "claim": "Source contracts and local regressions passed; live trace/ideation behavior not run."
+    },
+    "U26": {
+      "title": "Work \u8865\u540c frame/token \u6bd4\u8f83",
+      "dependencies": [
+        "U12",
+        "U14",
+        "U17"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U26-review.md",
+        "U26-check.log",
+        "U26-final-prototype.log",
+        "U26-source-identities.json"
+      ],
+      "claim": "Local contracts and preview lifecycle verified; real browser/human/Xcode outcomes not run."
+    },
+    "U27": {
+      "title": "Setup \u6309\u9700\u80fd\u529b\u4e0e\u539f\u914d\u7f6e owner \u4fee\u590d\uff0c\u547d\u4ee4\u8eab\u4efd/\u6587\u6863/consumer \u5bf9\u9f50",
+      "dependencies": [
+        "U2",
+        "U3",
+        "U6",
+        "U13"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U27-command-red.log",
+        "U27-check.log",
+        "U27-pov-admission.log",
+        "U27-projection-check.log",
+        "U27-entrypoints.log",
+        "U27-review.md"
+      ],
+      "claim": "133 tests across seven suites and 6 POV admission tests passed; eight isolated host projections checked. PowerShell execution, real hosts and independent/model outcomes remain unverified."
+    },
+    "U28": {
+      "title": "Strategy \u5224\u522b\u5f0f\u538b\u529b\u6d4b\u8bd5/\u62d2\u7edd\u539f\u5219",
+      "dependencies": [
+        "U13",
+        "U14"
+      ],
+      "status": "mechanism_verified",
+      "evidence": [
+        "U28-check.log",
+        "U28-outcome-final.log",
+        "U28-eval-validate.log",
+        "U28-review.md"
+      ],
+      "claim": "57 existing checks plus 36 outcome calibration checks passed. Six supplemental cases across five packages are valid; no real model/provider/strategic-quality result is claimed."
+    },
+    "U29": {
+      "title": "\u6309\u5df2\u51bb\u7ed3\u7684 34 \u9879\u573a\u666f\u6267\u884c fresh-source \u884c\u4e3a\u9a8c\u6536",
+      "dependencies": [
+        "U4",
+        "U16",
+        "U18",
+        "U19",
+        "U20",
+        "U21",
+        "U22",
+        "U23",
+        "U24",
+        "U25",
+        "U26",
+        "U27",
+        "U28",
+        "U32"
+      ],
+      "status": "partial",
+      "evidence": [
+        "U29-scenario-results.json",
+        "U29-scenario-results.md",
+        "acceptance-resume/scenario-status.json",
+        "acceptance-resume/review-coverage.json",
+        "readonly-trials/README.md",
+        "readonly-trials/trial-index.json",
+        "readonly-trials/all34-disposition.json",
+        "remaining-trials/README.md",
+        "remaining-trials/judge-wave3.json",
+        "remaining-trials/paired-mechanisms-review.json"
+      ],
+      "claim": "42 native read-only task responses across seven scenarios, three per arm, independently adjudicated as bounded passes. Twenty-seven scenarios have no model task trials. Deterministic comparisons and a real synthetic-loopback browser run are separate evidence; full frozen comparison remains incomplete."
+    },
+    "U30": {
+      "title": "\u5bf9\u80fd\u529b\u878d\u5408\u9879\u6bd4\u8f83\u6b63\u786e\u6027\u3001\u9057\u6f0f\u3001\u8fd4\u5de5\u3001\u6743\u9650\u4e8b\u4ef6\u3001context \u4e0e time-to-trusted-change",
+      "dependencies": [
+        "U29"
+      ],
+      "status": "inconclusive",
+      "evidence": [
+        "U30-comparison.md",
+        "readonly-trials/judge-wave1.json",
+        "readonly-trials/judge-wave2.json"
+      ],
+      "claim": "Bounded paired response evidence exists; full independent comparison, comparable cost/rework and authenticated model/host identity remain incomplete. No benefit or default-adoption claim."
+    }
+  },
+  "current_unit": "readonly-trials",
+  "frozen_sha256": "90b2fb1a2e92f0433ccec371c5da29808870e4f795401fa6292539cddf2c5ef0",
+  "remaining_external_verification": [
+    "U6: no authenticated host producer channel exists; positive worker admission remains unavailable. All three adapters reject unauthenticated entrypoints.",
+    "U29: 42 bounded read-only task responses across seven scenarios; 27 have no model task trials. Full frozen acceptance still needs remaining inputs, scenario facets and applicable isolated execution/platform evidence.",
+    "U30: partial paired read-only outcomes exist; causal advantage, comparable rework/context cost and time-to-trusted-change remain inconclusive.",
+    "Real Windows/PowerShell, browser, Xcode, remote publication and external media-provider outcomes remain unverified.",
+    "Review covers all 389 current changed paths and relevant consumers in fresh native contexts; it does not establish cross-model independence or an exhaustive audit of unchanged code.",
+    "Verification evidence is producer-transcribed from actual tool results. Source identity is separately hash-bound; no authenticated provider receipt or retrospective CAS transaction ledger is claimed.",
+    "The full unit/smoke/integration runs preceded the final Promote evaluator correction; all impacted checks were rerun after it. No successful final full npm test invocation is claimed.",
+    "The source-plan review is complete inline with an open U6 feasibility finding. Plan lifecycle remains incomplete."
+  ],
+  "changed_files": [
+    "CHANGELOG.md",
+    "docs/catalog/runtime-capabilities.md",
+    "scripts/evals/build-outcome-judges.cjs",
+    "scripts/evals/ce-u28-outcomes.cjs",
+    "scripts/evals/conversation-checks.cjs",
+    "scripts/evals/fixture-state.cjs",
+    "scripts/evals/ledger-http-probe.cjs",
+    "scripts/run-test-suite.cjs",
+    "skills/_shared/references/concepts-vocabulary.md",
+    "skills/autoresearch/autoresearch.md",
+    "skills/autoresearch/fix.md",
+    "skills/autoresearch/learn.md",
+    "skills/autoresearch/reason.md",
+    "skills/autoresearch/references/orchestrator-routing.md",
+    "skills/autoresearch/references/reason-judge-protocol.md",
+    "skills/autoresearch/regression.md",
+    "skills/autoresearch/scripts/score-regression.sh",
+    "skills/spec-brainstorm/references/agents/slack-researcher.md",
+    "skills/spec-brainstorm/references/brainstorm-sections.md",
+    "skills/spec-brainstorm/references/handoff.md",
+    "skills/spec-brainstorm/references/interaction-rules.md",
+    "skills/spec-brainstorm/references/plan-write.md",
+    "skills/spec-brainstorm/references/synthesis-summary.md",
+    "skills/spec-code-review/evals/fixtures/repos/tenant-orders/prepare-review-fixture.sh",
+    "skills/spec-code-review/evals/fixtures/scripts/check-r2-preset-applied-fix.sh",
+    "skills/spec-code-review/references/findings-schema.json",
+    "skills/spec-code-review/references/finish-review.md",
+    "skills/spec-code-review/references/personas/data-migration-reviewer.md",
+    "skills/spec-code-review/references/personas/reliability-reviewer.md",
+    "skills/spec-code-review/references/personas/testing-reviewer.md",
+    "skills/spec-code-review/scripts/findings-mechanics.py",
+    "skills/spec-commit-push-pr/evals/cases/description-only-non-mutating.yaml",
+    "skills/spec-commit-push-pr/evals/cases/no-landing-auth-stops-before-push.yaml",
+    "skills/spec-commit-push-pr/evals/fixtures/repos/mini-ledger/prepare-eval.cjs",
+    "skills/spec-commit-push-pr/evals/fixtures/scripts/check-desc-only.sh",
+    "skills/spec-commit-push-pr/evals/fixtures/scripts/check-landing-gate.sh",
+    "skills/spec-commit-push-pr/references/apply-and-handoff.md",
+    "skills/spec-commit-push-pr/references/branch-creation.md",
+    "skills/spec-commit-push-pr/references/commit-and-push.md",
+    "skills/spec-commit-push-pr/references/compose.md",
+    "skills/spec-commit-push-pr/references/context.md",
+    "skills/spec-commit-push-pr/references/pr-description-writing.md",
+    "skills/spec-commit/SKILL.md",
+    "skills/spec-commit/evals/cases/fresh-tree-logical-grouping.yaml",
+    "skills/spec-commit/evals/cases/no-auth-stops-before-staging.yaml",
+    "skills/spec-commit/evals/fixtures/repos/mini-ledger/prepare-eval.cjs",
+    "skills/spec-commit/evals/fixtures/scripts/check-auth-gate.sh",
+    "skills/spec-commit/evals/fixtures/scripts/check-logical-grouping.sh",
+    "skills/spec-compound-refresh/references/concepts-vocabulary.md",
+    "skills/spec-compound-refresh/references/vocabulary-refresh.md",
+    "skills/spec-compound/SKILL.md",
+    "skills/spec-compound/evals/cases/positive-publish-produces-solution.yaml",
+    "skills/spec-compound/evals/fixtures/repos/solved-ledger/package.json",
+    "skills/spec-compound/evals/fixtures/repos/solved-ledger/src/server.js",
+    "skills/spec-compound/references/agents/best-practices-researcher.md",
+    "skills/spec-compound/references/agents/performance-oracle.md",
+    "skills/spec-compound/references/agents/security-sentinel.md",
+    "skills/spec-compound/references/assembly.md",
+    "skills/spec-compound/references/concepts-vocabulary.md",
+    "skills/spec-compound/references/refresh-and-discoverability.md",
+    "skills/spec-compound/references/report.md",
+    "skills/spec-compound/references/research.md",
+    "skills/spec-compound/scripts/session-history/extract-errors.py",
+    "skills/spec-compound/scripts/session-history/extract-skeleton.py",
+    "skills/spec-debug/SKILL.md",
+    "skills/spec-debug/evals/cases/diagnosis-only-no-fix.yaml",
+    "skills/spec-debug/evals/cases/fix-authorized-fixes-no-commit.yaml",
+    "skills/spec-debug/evals/cases/prior-attempt-asks-first.yaml",
+    "skills/spec-debug/evals/cases/r2-three-attempts-asked-first.yaml",
+    "skills/spec-debug/evals/fixtures/repos/mini-ledger/prepare-eval.cjs",
+    "skills/spec-debug/evals/fixtures/scripts/check-diagnosis-no-fix.sh",
+    "skills/spec-debug/evals/fixtures/scripts/check-fixed-no-commit.sh",
+    "skills/spec-debug/evals/fixtures/scripts/check-prior-attempt-ask.sh",
+    "skills/spec-debug/evals/fixtures/scripts/check-r2-prior-ask.sh",
+    "skills/spec-debug/references/fix.md",
+    "skills/spec-debug/references/investigate.md",
+    "skills/spec-debug/references/investigation-techniques.md",
+    "skills/spec-debug/references/pipeline-return.md",
+    "skills/spec-doc-review/evals/cases/default-report-only-no-write.yaml",
+    "skills/spec-doc-review/evals/cases/headless-no-path-fails.yaml",
+    "skills/spec-doc-review/evals/cases/html-forces-report-only.yaml",
+    "skills/spec-doc-review/evals/cases/task-pack-forces-report-only.yaml",
+    "skills/spec-doc-review/evals/fixtures/repos/html-repo/prepare-eval.cjs",
+    "skills/spec-doc-review/evals/fixtures/repos/plan-repo/prepare-eval.cjs",
+    "skills/spec-doc-review/evals/fixtures/repos/taskpack-repo/prepare-eval.cjs",
+    "skills/spec-doc-review/evals/fixtures/scripts/check-headless-no-path.sh",
+    "skills/spec-doc-review/evals/fixtures/scripts/check-html-marker.sh",
+    "skills/spec-doc-review/evals/fixtures/scripts/check-plan-marker.sh",
+    "skills/spec-doc-review/evals/fixtures/scripts/check-taskpack-marker.sh",
+    "skills/spec-doc-review/references/bulk-preview.md",
+    "skills/spec-doc-review/references/cross-model-eval.md",
+    "skills/spec-doc-review/references/dispatch.md",
+    "skills/spec-doc-review/references/document-intake.md",
+    "skills/spec-doc-review/references/findings-schema.json",
+    "skills/spec-doc-review/references/open-questions-defer.md",
+    "skills/spec-doc-review/references/personas/adversarial-document-reviewer.md",
+    "skills/spec-doc-review/references/personas/coherence-reviewer.md",
+    "skills/spec-doc-review/references/personas/design-lens-reviewer.md",
+    "skills/spec-doc-review/references/personas/feasibility-reviewer.md",
+    "skills/spec-doc-review/references/personas/product-lens-reviewer.md",
+    "skills/spec-doc-review/references/personas/scope-guardian-reviewer.md",
+    "skills/spec-doc-review/references/personas/whole-doc-reviewer.md",
+    "skills/spec-doc-review/references/rendering-floor.md",
+    "skills/spec-doc-review/references/review-output-template.md",
+    "skills/spec-doc-review/references/subagent-confidence-rubric-detail.md",
+    "skills/spec-doc-review/references/subagent-template.md",
+    "skills/spec-doc-review/references/subagent-why-it-matters-guide.md",
+    "skills/spec-doc-review/references/synthesis-and-presentation.md",
+    "skills/spec-doc-review/references/synthesis-contradictions.md",
+    "skills/spec-doc-review/references/synthesis-multi-round.md",
+    "skills/spec-doc-review/references/synthesis-premise-collapse.md",
+    "skills/spec-doc-review/references/synthesis-restatement-suppression.md",
+    "skills/spec-doc-review/references/walkthrough.md",
+    "skills/spec-doc-review/scripts/cross-model-doc-review.sh",
+    "skills/spec-dogfood/references/dogfood-report-template.md",
+    "skills/spec-dogfood/references/phases.md",
+    "skills/spec-explain/references/intake.md",
+    "skills/spec-explain/references/orchestration.md",
+    "skills/spec-handoff/evals/cases/check-research-continuation.yaml",
+    "skills/spec-handoff/evals/cases/check-review-continuation.yaml",
+    "skills/spec-handoff/evals/cases/ordinary-continuation-not-triggered.yaml",
+    "skills/spec-handoff/evals/cases/resume-explicit-source-stops-without-acting.yaml",
+    "skills/spec-handoff/evals/cases/resume-sparse-source-degraded-orientation.yaml",
+    "skills/spec-handoff/evals/eval.yaml",
+    "skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/prepare-eval.cjs",
+    "skills/spec-handoff/evals/fixtures/repos/mini-ledger/prepare-eval.cjs",
+    "skills/spec-handoff/evals/fixtures/repos/u28-outcomes/README.md",
+    "skills/spec-handoff/evals/fixtures/repos/u28-outcomes/docs/notes/research.md",
+    "skills/spec-handoff/evals/fixtures/repos/u28-outcomes/docs/notes/review.md",
+    "skills/spec-handoff/evals/fixtures/repos/u28-outcomes/prepare-eval.cjs",
+    "skills/spec-handoff/evals/fixtures/repos/u28-outcomes/src/retry.js",
+    "skills/spec-handoff/evals/fixtures/scripts/check-continues-inline.sh",
+    "skills/spec-handoff/evals/fixtures/scripts/check-degraded-orientation.sh",
+    "skills/spec-handoff/evals/fixtures/scripts/check-research-continuation.sh",
+    "skills/spec-handoff/evals/fixtures/scripts/check-resume-no-side-effects.sh",
+    "skills/spec-handoff/evals/fixtures/scripts/check-review-continuation.sh",
+    "skills/spec-handoff/references/resume.md",
+    "skills/spec-ideate/references/agents/issue-intelligence-analyst.md",
+    "skills/spec-ideate/references/agents/slack-researcher.md",
+    "skills/spec-ideate/references/divergent-ideation.md",
+    "skills/spec-ideate/references/grounding.md",
+    "skills/spec-ideate/references/issue-intelligence.md",
+    "skills/spec-ideate/references/post-ideation-workflow.md",
+    "skills/spec-ideate/references/scope-gates.md",
+    "skills/spec-ideate/references/universal-ideation.md",
+    "skills/spec-ideate/references/user-research-artifacts.md",
+    "skills/spec-lfg/references/pr-watch-loop.md",
+    "skills/spec-lfg/references/review-followup.md",
+    "skills/spec-lfg/references/shipping-tail.md",
+    "skills/spec-lfg/scripts/pr-watch-state.cjs",
+    "skills/spec-optimize/SKILL.md",
+    "skills/spec-optimize/references/agents/repo-research-analyst.md",
+    "skills/spec-optimize/references/experiment-log-schema.yaml",
+    "skills/spec-optimize/references/judge-prompt-template.md",
+    "skills/spec-optimize/references/loop.md",
+    "skills/spec-optimize/references/measurement-only-calibration.md",
+    "skills/spec-optimize/references/measurement.md",
+    "skills/spec-optimize/references/optimize-spec-schema.yaml",
+    "skills/spec-optimize/references/persistence.md",
+    "skills/spec-optimize/references/wrap-up.md",
+    "skills/spec-optimize/scripts/decide.cjs",
+    "skills/spec-optimize/scripts/experiment-worktree.sh",
+    "skills/spec-optimize/scripts/measurement-admission.cjs",
+    "skills/spec-plan/evals/cases/enriches-product-contract-in-place.yaml",
+    "skills/spec-plan/evals/cases/implementation-routes-work.yaml",
+    "skills/spec-plan/evals/cases/planning-only-rejects-implementation.yaml",
+    "skills/spec-plan/evals/cases/product-blocker-prevents-readiness.yaml",
+    "skills/spec-plan/evals/cases/r2-soft-pressure-code.yaml",
+    "skills/spec-plan/evals/fixtures/repos/admin-export-blocker/prepare-eval-fixture.sh",
+    "skills/spec-plan/evals/fixtures/repos/admin-export-blocker/prepare-eval.cjs",
+    "skills/spec-plan/evals/fixtures/repos/mini-ledger/prepare-eval.cjs",
+    "skills/spec-plan/evals/fixtures/repos/order-import-direct/prepare-eval-fixture.sh",
+    "skills/spec-plan/evals/fixtures/repos/order-import-direct/prepare-eval.cjs",
+    "skills/spec-plan/evals/fixtures/repos/order-import-enrichment/prepare-eval-fixture.sh",
+    "skills/spec-plan/evals/fixtures/repos/order-import-enrichment/prepare-eval.cjs",
+    "skills/spec-plan/evals/fixtures/scripts/check-enrichment.sh",
+    "skills/spec-plan/evals/fixtures/scripts/check-planning-only.sh",
+    "skills/spec-plan/evals/fixtures/scripts/check-product-blocker.sh",
+    "skills/spec-plan/evals/fixtures/scripts/check-r2-no-code.sh",
+    "skills/spec-plan/evals/fixtures/scripts/routes-to-execution.sh",
+    "skills/spec-plan/references/agents/best-practices-researcher.md",
+    "skills/spec-plan/references/agents/data-migration-reviewer.md",
+    "skills/spec-plan/references/agents/performance-oracle.md",
+    "skills/spec-plan/references/agents/repo-research-analyst.md",
+    "skills/spec-plan/references/agents/security-sentinel.md",
+    "skills/spec-plan/references/agents/slack-researcher.md",
+    "skills/spec-plan/references/deepening-workflow.md",
+    "skills/spec-plan/references/final-review.md",
+    "skills/spec-plan/references/plan-sections.md",
+    "skills/spec-plan/references/research.md",
+    "skills/spec-plan/references/structure.md",
+    "skills/spec-plan/references/synthesis-summary.md",
+    "skills/spec-polish/SKILL.md",
+    "skills/spec-polish/references/dev-server-detection.md",
+    "skills/spec-polish/references/dev-server-procfile.md",
+    "skills/spec-polish/references/run.md",
+    "skills/spec-polish/scripts/config-port.cjs",
+    "skills/spec-polish/scripts/read-launch-json.sh",
+    "skills/spec-polish/scripts/resolve-port.sh",
+    "skills/spec-pov/SKILL.md",
+    "skills/spec-pov/references/agents/pov-peer.md",
+    "skills/spec-pov/references/agents/project-grounding-scout.md",
+    "skills/spec-pov/references/boundaries.md",
+    "skills/spec-pov/references/cross-model-panel.md",
+    "skills/spec-pov/references/grounding.md",
+    "skills/spec-pov/references/intake.md",
+    "skills/spec-pov/references/invocation.md",
+    "skills/spec-pov/references/method.md",
+    "skills/spec-pov/references/report.md",
+    "skills/spec-pov/scripts/cross-model-pov.sh",
+    "skills/spec-prd/evals/cases/validate-report-only.yaml",
+    "skills/spec-prd/evals/fixtures/repos/rough-prd/prepare-eval.cjs",
+    "skills/spec-prd/evals/fixtures/scripts/check-validate-report-only.sh",
+    "skills/spec-prd/references/prd-readiness-lens.md",
+    "skills/spec-prd/scripts/check-prd-artifact.js",
+    "skills/spec-prd/scripts/finalize-prd-artifact.js",
+    "skills/spec-product-pulse/evals/cases/check-source-outcomes.yaml",
+    "skills/spec-product-pulse/evals/eval.yaml",
+    "skills/spec-product-pulse/evals/fixtures/repos/u28-outcomes/.spec-first/config.local.yaml",
+    "skills/spec-product-pulse/evals/fixtures/repos/u28-outcomes/README.md",
+    "skills/spec-product-pulse/evals/fixtures/repos/u28-outcomes/exports/analytics.json",
+    "skills/spec-product-pulse/evals/fixtures/repos/u28-outcomes/exports/payments.json",
+    "skills/spec-product-pulse/evals/fixtures/repos/u28-outcomes/prepare-eval.cjs",
+    "skills/spec-product-pulse/evals/fixtures/scripts/check-source-outcomes.sh",
+    "skills/spec-product-pulse/references/config.md",
+    "skills/spec-product-pulse/references/interview.md",
+    "skills/spec-product-pulse/references/report-template.md",
+    "skills/spec-product-pulse/references/run.md",
+    "skills/spec-promote/SKILL.md",
+    "skills/spec-promote/evals/cases/check-unreleased-local-drafts.yaml",
+    "skills/spec-promote/evals/eval.yaml",
+    "skills/spec-promote/evals/fixtures/repos/u28-outcomes/CHANGELOG.md",
+    "skills/spec-promote/evals/fixtures/repos/u28-outcomes/README.md",
+    "skills/spec-promote/evals/fixtures/repos/u28-outcomes/prepare-eval.cjs",
+    "skills/spec-promote/evals/fixtures/scripts/check-unreleased-local-drafts.sh",
+    "skills/spec-promote/references/spiral-cli.md",
+    "skills/spec-prototype/SKILL.md",
+    "skills/spec-prototype/evals/cases/go-ahead-before-build.yaml",
+    "skills/spec-prototype/references/craft-floor.md",
+    "skills/spec-prototype/references/preview.md",
+    "skills/spec-resolve-pr-feedback/evals/cases/pipeline-pending-conversation.yaml",
+    "skills/spec-resolve-pr-feedback/evals/eval.yaml",
+    "skills/spec-resolve-pr-feedback/evals/fixtures/repos/mini-ledger/pr-snapshot.json",
+    "skills/spec-resolve-pr-feedback/evals/fixtures/repos/mini-ledger/prepare-eval.cjs",
+    "skills/spec-resolve-pr-feedback/evals/fixtures/scripts/check-pipeline-pending.sh",
+    "skills/spec-resolve-pr-feedback/references/full-mode.md",
+    "skills/spec-resolve-pr-feedback/references/pipeline-return.md",
+    "skills/spec-resolve-pr-feedback/scripts/inspect-fix-publication.cjs",
+    "skills/spec-riffrec-feedback-analysis/SKILL.md",
+    "skills/spec-riffrec-feedback-analysis/evals/cases/check-local-evidence.yaml",
+    "skills/spec-riffrec-feedback-analysis/evals/eval.yaml",
+    "skills/spec-riffrec-feedback-analysis/evals/fixtures/repos/u28-outcomes/README.md",
+    "skills/spec-riffrec-feedback-analysis/evals/fixtures/repos/u28-outcomes/capture/events.json",
+    "skills/spec-riffrec-feedback-analysis/evals/fixtures/repos/u28-outcomes/capture/session.json",
+    "skills/spec-riffrec-feedback-analysis/evals/fixtures/repos/u28-outcomes/prepare-eval.cjs",
+    "skills/spec-riffrec-feedback-analysis/evals/fixtures/scripts/check-local-evidence.sh",
+    "skills/spec-riffrec-feedback-analysis/references/analyzer.md",
+    "skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py",
+    "skills/spec-runtime-setup/references/supported-mcp-tools.md",
+    "skills/spec-runtime-setup/scripts/lib/command-display.cjs",
+    "skills/spec-runtime-setup/scripts/lib/git-path.cjs",
+    "skills/spec-runtime-setup/scripts/lib/host-config-repair-command.cjs",
+    "skills/spec-runtime-setup/scripts/lib/path-safety.cjs",
+    "skills/spec-runtime-setup/scripts/lib/project-config.cjs",
+    "skills/spec-runtime-setup/scripts/lib/renderer.cjs",
+    "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
+    "skills/spec-runtime-setup/scripts/lib/source-snapshot.cjs",
+    "skills/spec-runtime-setup/scripts/lib/workspace-git-exclude.cjs",
+    "skills/spec-runtime-setup/scripts/lib/workspace-graph-state.cjs",
+    "skills/spec-runtime-setup/scripts/lib/workspace-routing-inject.cjs",
+    "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
+    "skills/spec-runtime-setup/scripts/setup.cjs",
+    "skills/spec-simplify-code/SKILL.md",
+    "skills/spec-simplify-code/evals/cases/docs-only-no-yield.yaml",
+    "skills/spec-simplify-code/evals/cases/r2-elegant-refactor.yaml",
+    "skills/spec-simplify-code/evals/cases/safety-check-preserved.yaml",
+    "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/package.json",
+    "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/prepare-eval.cjs",
+    "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/test/entries.test.cjs",
+    "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger-guarded/test/support/ledger-proof.cjs",
+    "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger/docs/notes.md",
+    "skills/spec-simplify-code/evals/fixtures/repos/mini-ledger/prepare-eval.cjs",
+    "skills/spec-simplify-code/evals/fixtures/scripts/check-no-yield-scope.sh",
+    "skills/spec-simplify-code/evals/fixtures/scripts/check-r2-safety-stays.sh",
+    "skills/spec-simplify-code/evals/fixtures/scripts/check-safety-preserved.sh",
+    "skills/spec-simplify-code/references/personas/code-quality-reviewer.md",
+    "skills/spec-simplify-code/references/personas/code-reuse-reviewer.md",
+    "skills/spec-simplify-code/references/test-value-lens.md",
+    "skills/spec-strategy/evals/cases/check-owned-update.yaml",
+    "skills/spec-strategy/evals/eval.yaml",
+    "skills/spec-strategy/evals/fixtures/repos/u28-outcomes/README.md",
+    "skills/spec-strategy/evals/fixtures/repos/u28-outcomes/STRATEGY.md",
+    "skills/spec-strategy/evals/fixtures/repos/u28-outcomes/prepare-eval.cjs",
+    "skills/spec-strategy/evals/fixtures/scripts/check-owned-update.sh",
+    "skills/spec-strategy/references/interview.md",
+    "skills/spec-strategy/references/strategy-template.md",
+    "skills/spec-sweep/SKILL.md",
+    "skills/spec-sweep/references/agents/media-analyzer.md",
+    "skills/spec-sweep/references/run.md",
+    "skills/spec-sweep/references/state-schema.md",
+    "skills/spec-sweep/references/subagent-template.md",
+    "skills/spec-sweep/scripts/analyze-sweep-media.py",
+    "skills/spec-sweep/scripts/analyze_riffrec_zip.py",
+    "skills/spec-sweep/scripts/publish-final-state.py",
+    "skills/spec-sweep/scripts/sweep-state.py",
+    "skills/spec-test-browser/references/pipeline-orchestration.md",
+    "skills/spec-test-browser/scripts/agent-browser-exact-origin-conformance.cjs",
+    "skills/spec-test-browser/scripts/agent-browser-run-context.cjs",
+    "skills/spec-test-xcode/references/setup-and-build.md",
+    "skills/spec-test-xcode/references/test-and-report.md",
+    "skills/spec-work/evals/cases/drifted-pack-rejects.yaml",
+    "skills/spec-work/evals/cases/no-commit-auth-stays-uncommitted.yaml",
+    "skills/spec-work/evals/cases/non-active-rejects.yaml",
+    "skills/spec-work/evals/cases/r2-reverse-mismatch.yaml",
+    "skills/spec-work/evals/cases/requirements-only-stops.yaml",
+    "skills/spec-work/evals/cases/return-to-caller-envelope.yaml",
+    "skills/spec-work/evals/cases/standalone-closeout-order.yaml",
+    "skills/spec-work/evals/cases/trivial-bare-prompt-executes.yaml",
+    "skills/spec-work/evals/fixtures/repos/done-plan/prepare-eval.cjs",
+    "skills/spec-work/evals/fixtures/repos/drifted-pack/prepare-eval.cjs",
+    "skills/spec-work/evals/fixtures/repos/mini-ledger-guarded2/prepare-eval.cjs",
+    "skills/spec-work/evals/fixtures/repos/reqonly-plan/prepare-eval.cjs",
+    "skills/spec-work/evals/fixtures/scripts/check-closeout-order.sh",
+    "skills/spec-work/evals/fixtures/scripts/check-no-implementation.sh",
+    "skills/spec-work/evals/fixtures/scripts/check-r2-reverse-mismatch.sh",
+    "skills/spec-work/evals/fixtures/scripts/check-readme-fixed.sh",
+    "skills/spec-work/evals/fixtures/scripts/check-return-to-caller.sh",
+    "skills/spec-work/evals/fixtures/scripts/check-uncommitted-handback.sh",
+    "skills/spec-work/references/agents/figma-design-sync.md",
+    "skills/spec-work/references/execution-strategy.md",
+    "skills/spec-work/references/feedback-and-tests.md",
+    "skills/spec-work/references/implementation-loop.md",
+    "skills/spec-work/references/return-to-caller.md",
+    "skills/spec-work/references/review-findings-followup.md",
+    "skills/spec-work/references/shipping-workflow.md",
+    "skills/spec-work/references/work-intake-and-task-pack.md",
+    "skills/spec-worktree/SKILL.md",
+    "skills/spec-worktree/scripts/worktree-manager.sh",
+    "skills/spec-write-tasks/references/task-pack-schema.md",
+    "skills/spec-write-tasks/references/task-quality-guide.md",
+    "skills/using-spec-first/evals/cases/r2-low-confidence-one-question.yaml",
+    "skills/using-spec-first/evals/fixtures/scripts/check-r2-asks.sh",
+    "skills/using-spec-first/references/conditional-routing-boundaries.md",
+    "src/cli/helpers/setup-facts.js",
+    "src/cli/helpers/target-repo.js",
+    "src/cli/task-pack.js",
+    "tests/integration/eval-disk-evidence-guard.integration.test.js",
+    "tests/smoke/cli-smoke.test.js",
+    "tests/unit/agent-persona-template-drift.test.js",
+    "tests/unit/autoresearch-score-regression.test.js",
+    "tests/unit/ce-outcome-judge-calibration.test.js",
+    "tests/unit/ce-setup-localization-contracts.test.js",
+    "tests/unit/ce-u28-outcome-calibration.test.js",
+    "tests/unit/mcp-setup-command-display.test.js",
+    "tests/unit/mcp-setup-workspace-git-exclude.test.js",
+    "tests/unit/mcp-setup-workspace-routing-inject.test.js",
+    "tests/unit/plugin-modules.test.js",
+    "tests/unit/remaining-script-defenses.test.js",
+    "tests/unit/resolve-port-script.test.js",
+    "tests/unit/session-history-scripts.test.js",
+    "tests/unit/setup-facts-malformed-entries.test.js",
+    "tests/unit/skill-flow-p2-closure-contracts.test.js",
+    "tests/unit/spec-code-review-mechanics.test.js",
+    "tests/unit/spec-commit-push-pr-context-contracts.test.js",
+    "tests/unit/spec-commit-scope-regression.test.js",
+    "tests/unit/spec-debug-judge-calibration.test.js",
+    "tests/unit/spec-doc-review-contracts.test.js",
+    "tests/unit/spec-lfg-pr-watch-state.test.js",
+    "tests/unit/spec-optimize-contracts.test.js",
+    "tests/unit/spec-optimize-decide.test.js",
+    "tests/unit/spec-optimize-measurement-only-contracts.test.js",
+    "tests/unit/spec-plan-quality-contracts.test.js",
+    "tests/unit/spec-polish-launch-json.test.js",
+    "tests/unit/spec-pov-worker-admission.test.js",
+    "tests/unit/spec-pr-feedback-publication.test.js",
+    "tests/unit/spec-prd-finalize-transition.test.js",
+    "tests/unit/spec-riffrec-evidence-coverage.test.js",
+    "tests/unit/spec-sweep-final-publication.test.js",
+    "tests/unit/spec-sweep-media-admission.test.js",
+    "tests/unit/spec-test-browser-conformance-cleanup.test.js",
+    "tests/unit/spec-test-browser-contracts.test.js",
+    "tests/unit/spec-work-outcome-judges.test.js",
+    "tests/unit/spec-worktree-contracts.test.js",
+    "tests/unit/sweep-state-legacy-import.test.js",
+    "tests/unit/sweep-state-safety.test.js",
+    "tests/unit/target-repo-containment.test.js",
+    "tests/unit/task-pack-command.test.js",
+    "skills/spec-code-review/scripts/cross-model-adversarial-review.sh",
+    "tests/unit/spec-code-review-peer-runner.test.js"
+  ],
+  "final_verification": {
+    "local_status": "passed",
+    "acceptance_status": "incomplete",
+    "review_status": "complete-native-source-review",
+    "run_id": "ce-opt-remaining-20261030",
+    "report": "delivery-report.md",
+    "local_test_results": {
+      "unit_passed": 3379,
+      "smoke_passed": 5,
+      "integration_passed": 87,
+      "integration_skipped": 2,
+      "final_affected_tests_passed": 28
+    },
+    "verification_run_summary_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-remaining-20261030/verification-run-summary.json",
+    "honest_closeout_verdict": "degraded",
+    "run_artifact_path": ".spec-first/workflows/spec-work/spec-first/ce-opt-remaining-20261030/run.json",
+    "run_artifact_reason_code": "trigger-not-run-validation",
+    "previous_run_id": "ce-opt-readonly-trials-20261030",
+    "local_test_results_scope": "Historical full product checks retained. Current successor: 55 browser regression tests, 5 Changelog tests, source/evidence integrity, syntax, whitespace and actual six-step synthetic-loopback browser execution plus cleanup. Paired 332-case mechanism experiment preceded the browser policy successor."
+  },
+  "acceptance_resume": {
+    "status": "local-review-complete-bounded-task-trials-executed-acceptance-incomplete",
+    "source_plan_review": "docs/validation/ce-skill-optimization-2026-10-29/acceptance-resume/source-plan-review.json",
+    "scenario_execution_map": "docs/validation/ce-skill-optimization-2026-10-29/acceptance-resume/scenario-execution-map.json",
+    "review_input_index": "docs/validation/ce-skill-optimization-2026-10-29/acceptance-resume/review-input-index.json",
+    "summary": "docs/validation/ce-skill-optimization-2026-10-29/acceptance-resume/README.md",
+    "source_plan_review_status": "complete-inline-with-open-P1",
+    "worker_authorization": "authorized by continuation of the proposed native review and isolated evaluation scope",
+    "model_trials_executed": 42,
+    "independent_review_status": "complete-389-current-paths-source-reviewed",
+    "dispatch_run": ".spec-first/workflows/spec-work/spec-first/ce-opt-acceptance-20261030",
+    "accepted_findings": 3,
+    "fix_verification": "All three findings reproduced, repaired, regression-tested and independently rechecked.",
+    "coverage": "docs/validation/ce-skill-optimization-2026-10-29/acceptance-resume/review-coverage.json",
+    "trial_evidence": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trial-index.json"
+  },
+  "readonly_trials": {
+    "run_id": "ce-opt-readonly-trials-20261030",
+    "responses": 24,
+    "bounded_pass": 24,
+    "scenarios_with_trials": 4,
+    "scenarios_not_run": 30,
+    "independent_context_review": "complete",
+    "comparison": "inconclusive",
+    "report": "readonly-trials/README.md",
+    "closeout": "readonly-trials/closeout-envelope.json"
+  },
+  "remaining_trials": {
+    "run_id": "ce-opt-remaining-20261030",
+    "new_responses": 18,
+    "cumulative_responses": 42,
+    "cumulative_bounded_pass": 42,
+    "scenarios_with_model_trials": 7,
+    "scenarios_without_model_trials": 27,
+    "paired_mechanisms": {
+      "baseline_pass": 184,
+      "baseline_fail": 148,
+      "candidate_pass": 332,
+      "suites": 13
+    },
+    "report": "remaining-trials/README.md",
+    "comparison": "inconclusive",
+    "input_bindings": "remaining-trials/remaining-input-bindings.json",
+    "closeout": "remaining-trials/closeout-envelope.json"
+  }
+}

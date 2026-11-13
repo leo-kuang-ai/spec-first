@@ -1,0 +1,127 @@
+{
+  "schema_version": "ce-semantic-review-results.v1",
+  "generated_at": "2026-09-12",
+  "batch_ref": "docs/validation/ce-localization/review/semantic-review-batches-2026-09-12.json#batch-3-G06",
+  "upstream": {
+    "repository": "compound-engineering-plugin",
+    "base": "5c7cb347d0686663743b87cd7227246ba24f7fa7",
+    "head": "956087b3e1dd7ccc03df32cee9e7c044dfbe75cf",
+    "name_status_sha256": "a83371963406147ede5c9752c13b324e88d9f0eaf08af7e1239dd7e6a623d459"
+  },
+  "review_basis": {
+    "target_repository": "spec-first",
+    "reviewed_against_head": "c0803ab5d2e80edde9ca67771c6d204b775bb354",
+    "working_tree_dirty_at_review_start": false,
+    "frozen_binding_head": "7c6bdd66d78616be769d8c78fc9e81340c004cda",
+    "owner_source_unchanged_since_freeze": true,
+    "owner_source_freshness_check": "git diff --stat 7c6bdd66..c0803ab5 -- scripts/check-ce-upstream-reconciliation.cjs tests/unit/ce-upstream-reconciliation-v2.test.js 为空；7c6bdd66..HEAD 仅触及 docs/validation 下三个文件（两个链工件 + 批次 JSON）。按 regeneration contract 以当前合同复核 freshness，不因 HEAD 前移判失效或自动重绑。",
+    "ce_repo": "/Users/kuang/xiaobu/compound-engineering-plugin（machine-local）",
+    "method": "LLM fresh-source 语义复核：逐条读取固定窗口完整 CE diff（git -C <ce-repo> diff <base>..<head> -- <path>）与当前 owner source 后逐条判定；脚本仅提供既有确定性事实，本结果不是脚本自动输出。",
+    "reviewer": "spec-first current session（ZCode，经 spec-handoff resume 授权继续）",
+    "reviewed_at": "2026-09-12"
+  },
+  "decision_enum_source": "scripts/check-ce-upstream-reconciliation.cjs:97-103（V2_TARGET_ACTIONS / CLOSURE_PROFILES）。本结果沿用既有 adjudication 枚举（evidence-only / source-adjudication / product-excluded），不发明新 adjudication 合同。",
+  "records": [
+    {
+      "audit_id": "A011",
+      "path": ".compound-engineering/config.example.yaml",
+      "old_path": ".compound-engineering/config.local.example.yaml",
+      "upstream_change": "R069（69% 相似度重命名）+ 内容扩展：config.local.example.yaml → config.example.yaml，从 per-checkout gitignored 本地配置示例转为 tracked 团队默认示例；确立 config.yaml（团队默认）+ config.local.yaml（本地 override）双层模型；新增 docs_root（artifact 根重定位，fail-closed，仅 tracked 文件生效）、cross_model_review_mode: off|auto、cross_model_model / cross_model_effort 固定键。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:623 判 G06；v2RoleFor:642-644 判 config-rename-evidence；SUPPORT_PATHS:67-71）",
+      "action": "maintain evidence-only（维持既有判定，不触发 spec-first source 变更）。理由：(1) 该文件是 CE 插件自身配置面，不属于 spec-first 同步的 skill 内容面；(2) 双层配置模式在 spec-first 已有对应物——.spec-first/config.local.example.yaml + config.local.yaml 本地 override 合同（skills/spec-runtime-setup/references/project-config.md:10,17），且 CE 旧 .compound-engineering/config.local.yaml 已于 CHANGELOG v1.13.2（2026-07-08）显式退役为非检查对象，构成已有覆盖；(3) docs_root 与 cross_model_* 键是 CE skill 消费面，spec-first 无对应消费者。",
+      "consumer": "reconciliation ledger / adjudication input（确定性事实层）；未来 CE sync 决策（若 spec-first 引入 CE 配置语义需重开判定）",
+      "evidence": [
+        "上游 diff 全文已读：git -C /Users/kuang/xiaobu/compound-engineering-plugin diff -M 5c7cb347..956087b -- .compound-engineering/config.example.yaml .compound-engineering/config.local.example.yaml（62 行变更，逐 hunk 复核）",
+        "owner source：scripts/check-ce-upstream-reconciliation.cjs:67-71、:623、:642-644",
+        "test 覆盖：tests/unit/ce-upstream-reconciliation-v2.test.js:287-288（groupFor/v2RoleFor 对新路径断言）、:308（R069 重命名解析）",
+        "spec-first 已有覆盖：skills/spec-runtime-setup/references/project-config.md:10,17；CHANGELOG.md v1.13.2 2026-07-08（CE config.local.yaml 退役为非检查对象）"
+      ],
+      "verdict": "confirm-existing（decision=evidence-only、closure_profile=evidence-only 维持）；附非阻断 finding G06-R1",
+      "limitations": [
+        "CE config 消费技能（ce-setup 等）运行时行为未验证；docs_root fail-closed 语义仅文档级复核"
+      ]
+    },
+    {
+      "audit_id": "A022",
+      "path": "AGENTS.md",
+      "upstream_change": "M，89 行：新增贡献门（非 maintainer 须 linked issue、新 skill 须事先审批）与 PR Security/Agent Disclosure 段（含模型身份披露反臆造规则）；scratch 空间加固（mktemp 显式 ${TMPDIR:-/tmp} 模板、/tmp 探测回退、Windows python 解析不硬编码 python3）；config.yaml 双层模型文档化；ce-skill-work 成为 skills/** 四类活动的程序所有者；state-conditions-not-cases 作者哲学；反堆叠 review 反馈规则（#1397，24 findings/9 rounds 教训）；bun test --parallel CI 论述（不钉 worker 数、按实测时间而非行数拆文件、dirtyFixtureRepo 模式）。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（ROOT_METADATA_PATHS:42、groupFor:624/:627）",
+      "action": "maintain evidence-only。AGENTS.md 是 CE 仓库自身 authoring context；spec-first 对应面是自身 CLAUDE.md/AGENTS.md 与 docs/10-prompt/结构化项目角色契约.md，已由 spec-first 合同治理。逐项对照：(1) mktemp 加固——spec-first cross-model 脚本已用显式 $RUN_DIR 模板（skills/spec-code-review/scripts/cross-model-adversarial-review.sh:196-198、spec-doc-review、spec-pov 同型），不存在上游修复的 bare mktemp -d/-t 缺陷形态，已有覆盖；(2) --parallel CI 论述——spec-first 用 Jest，方法论可参考、无机械采纳点；(3) Agent Disclosure 模型身份披露——spec-first 无对应 PR 模板面，不适用；(4) ce-skill-work 程序所有权与反堆叠规则——spec-first 角色契约已有同型治理（gate the exits, not the thinking；advisory facts 不是 confirmed truth），理念对应、无需采纳。",
+      "consumer": "reconciliation ledger / adjudication input；方法论观察项供 docs/solutions 检索（本批次不新增 solution doc）",
+      "evidence": [
+        "上游 diff 全文已读（34.8KB、89 行变更，逐段复核）",
+        "owner source：scripts/check-ce-upstream-reconciliation.cjs:42、:624、:627",
+        "spec-first mktemp 形态全库检查：skills/*/scripts/cross-model-*.sh 均为 mktemp \"$RUN_DIR/...\" 显式模板形态，无 -t 裸形态（rg 验证）"
+      ],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": [
+        "方法论条目为逐项对照判断，未对 spec-first 全库做系统性 sandbox/CI 审计（超出本批次范围）"
+      ]
+    },
+    {
+      "audit_id": "A023",
+      "path": "CONCEPTS.md",
+      "upstream_change": "M，73 行：新增概念定义 visual probe、experience prototype、knowledge track、guidance layer、dispatch skill、skill-context directives、terminalize、transport commit、warm checkout、handoff seam、context-absent agent、independence、rendering floor、offered work、fix-owned files、issue of record、residual；cross-model pass 增加 settledness 判定语义；detached job 增加进程组回收是宿主 OS 原语前提的约束。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（ROOT_METADATA_PATHS:42、groupFor:624）",
+      "action": "maintain evidence-only。CE 概念词汇表是 CE 方法论语境；与 spec-first 机制语义相近处已有各自对应物：residual ↔ spec-work shipping residual gate、independence ↔ fresh-source eval / dual-lens review、transport commit ↔ spec-work worker actual-tree integration、warm checkout ↔ spec-runtime-setup warmup/readiness。spec-first 合同已用自己的术语定义同型机制，词汇本身无需采纳。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": [
+        "上游 diff 全文已读（73 行新增，逐概念复核）",
+        "owner source：scripts/check-ce-upstream-reconciliation.cjs:42、:624",
+        "spec-first 对应机制：spec-work SKILL（shipping-workflow residual gate、fresh-source-eval checklist）、spec-runtime-setup（warmup/readiness）"
+      ],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": [
+        "概念与 spec-first 机制的对应是语义对照，非逐合同验证"
+      ]
+    },
+    {
+      "audit_id": "A024",
+      "path": "README.md",
+      "upstream_change": "M，86 行：新增 Grok Bot（经 Cursor 账号共享插件库）与 oh-my-pi（omp）安装面及更新通道；Codex 安装流程更新（Add marketplace 入口、插件名 compound-engineering-plugin）；skill 数 31→33（新增 ce-retune、ce-prototype）；lfg 无 remote 时止于本地 commit、有 remote 时不 merge 的表述；ce-setup 职责改为创建 repo config.yaml；docs_root 指引；ce-commit-push-pr/ce-babysit-pr 增 managed stack 表述。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（ROOT_METADATA_PATHS:42、groupFor:624）",
+      "action": "maintain evidence-only。CE 安装/清单文档是 CE 自身用户面，spec-first 不镜像；清单对齐已在 owner source 覆盖：README '33 skills' ↔ 脚本 PACKAGE_IDS P01-P33（含 ce-prototype P20、ce-retune P22、ce-skill-work P33，:105-140），与 LEGACY/CURRENT_NO_DIRECT_COUNTERPART 集合（:73-82）一致。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": [
+        "上游 diff 全文已读（86 行变更，逐段复核）",
+        "owner source：scripts/check-ce-upstream-reconciliation.cjs:42、:73-82、:105-140"
+      ],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": [
+        "未逐项验证 CE 各安装命令实际行为（属 CE 自身 CI 范围）"
+      ]
+    },
+    {
+      "audit_id": "A120",
+      "path": "package.json",
+      "upstream_change": "M，4 行：version 3.20.0→3.22.4；test 脚本 bun test → bun test --parallel。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（SUPPORT_PATHS:67-71 含 package.json → surfaceFor:417 判 support、categoryFor:426 判 support）",
+      "action": "maintain evidence-only。版本演进由固定窗口 base/head 绑定记录（name_status_sha256 校验）；--parallel 是 CE 内部测试执行选择，spec-first 无对应消费者。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": [
+        "上游 diff 全文已读（4 行变更）",
+        "owner source：scripts/check-ce-upstream-reconciliation.cjs:67-71、:417、:426"
+      ],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": [
+        "无——判定仅依赖固定窗口绑定与 owner source 分类，两者均已直接核验"
+      ]
+    }
+  ],
+  "batch_verdict": "confirmed：5/5 条维持既有 evidence-only 判定，0 条翻转，0 条新采纳；发现 1 个非阻断分类漂移 finding（G06-R1），登记为 residual。",
+  "residuals": [
+    {
+      "id": "G06-R1",
+      "finding": "SUPPORT_PATHS（scripts/check-ce-upstream-reconciliation.cjs:67-71）仍持有重命名前旧路径 .compound-engineering/config.local.example.yaml。窗口内 R069 重命名后，ledger 按新路径 .compound-engineering/config.example.yaml 取键，surfaceFor 落 metadata-governance（应为 support）、categoryFor 落 evidence-only（应为 support）；该分类漂移已冻结进 adjudication input（A011 surface=metadata-governance）。",
+      "severity": "non-blocking（不影响 evidence-only 判定正确性与计数不变量：group_counts G06=5 由 groupFor 前缀匹配保证）",
+      "owner": "CE localization stream closeout（canonical script 变更）",
+      "not_fixed_here_because": "修复属 canonical source 变更，会按 regeneration contract 触发链刷新；本批次为 docs/validation-only 语义复核，canonical 修复统一留到 517 条收口后的 regeneration sequence，避免中途重绑输入快照。"
+    }
+  ],
+  "limitations": [
+    "本结果为单批次（G06，5 条）语义复核，不覆盖其余 512 条（G01=298、G02=95、G03=98、G04=6、G05=15 仍 pending）",
+    "未运行 CE 上游测试，未验证 CE config 消费技能运行时行为；上游 diff 复核为文档/语义级",
+    "上游方法论观察项（mktemp 加固、--parallel CI 论述等）仅做形态对照，未对 spec-first 全库做系统性审计",
+    "ce_repo 为 machine-local 路径，本结果在本机核验；固定窗口不代表已覆盖 CE 最新上游 HEAD"
+  ]
+}

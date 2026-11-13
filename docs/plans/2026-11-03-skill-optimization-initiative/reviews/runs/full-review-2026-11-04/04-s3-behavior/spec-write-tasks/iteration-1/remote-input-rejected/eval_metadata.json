@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "远程仓库输入应被拒绝并要求本地 source-owned 输入",
+  "prompt": "（spec-write-tasks skill 已安装，请按它工作。）\n帮我把我朋友 GitHub 仓库 https://github.com/someone/their-ledger 里的\n计划拆成任务包。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-write-tasks/evals/fixtures/scripts/rejects-remote.sh"
+  ]
+}

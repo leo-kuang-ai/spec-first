@@ -1,0 +1,96 @@
+{
+  "artifact_type": "confirmed",
+  "captured_at": "2026-10-27T11:50:25.377410+00:00",
+  "status": "passed",
+  "claim_scope": "仅冻结事实、报告完整性与写入边界",
+  "checks": [
+    {
+      "check": "name-status-sha256",
+      "passed": true,
+      "detail": "9c04f517fd188bb9b1127a1942bfdf98f3afa518e7428568548e33ef0e3aea65"
+    },
+    {
+      "check": "commits-sha256",
+      "passed": true,
+      "detail": "ae3869e62113ffc98c3fc7d52c7dd731cf4b8cc3e8102cc4d451e62d439aadaf"
+    },
+    {
+      "check": "name-status-replay",
+      "passed": true,
+      "detail": "git diff --name-status -M base head"
+    },
+    {
+      "check": "counts",
+      "passed": true,
+      "detail": {
+        "net": 1023,
+        "commits": 161
+      }
+    },
+    {
+      "check": "coverage-accounting",
+      "passed": true,
+      "detail": "19 partial + 1004 inventory-only; no complete adjudication"
+    },
+    {
+      "check": "git-objects-153e605e",
+      "passed": true,
+      "detail": "逐条对照不可变 tree；不代表内容语义审查"
+    },
+    {
+      "check": "git-objects-00d0a5bb",
+      "passed": true,
+      "detail": "逐条对照不可变 tree；不代表内容语义审查"
+    },
+    {
+      "check": "json-parse",
+      "passed": true,
+      "detail": "7 JSON files; 非 schema 校验"
+    },
+    {
+      "check": "markdown-local-links",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "check": "git-diff-check",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "target-write-scope",
+      "passed": true,
+      "detail": [
+        "CHANGELOG.md",
+        "docs/validation/skill-evals/README.md",
+        "docs/plans/2026-10-27-001-refactor-ce-upstream-sync-technical-scheme.md",
+        "docs/validation/ce-pull-2026-10-27/",
+        "docs/validation/skill-evals/2026-10-27-workspace-cleanup.json"
+      ]
+    },
+    {
+      "check": "upstream-unchanged",
+      "passed": true,
+      "detail": {
+        "head": "00d0a5bbf1300b2138b65ce724b325dd4dff77ba",
+        "status": ""
+      }
+    },
+    {
+      "check": "changelog-entry-shape",
+      "passed": true,
+      "detail": "- v1.15.3 2026-10-27 19:49:45 codex: docs(ce-sync): 冻结 CE 153e605e..00d0a5bb（161 commits、1023 条净记录），补齐 Git blob/逐提交路径证据及有界准入审查；识别 readiness、跨模型授权、Kiro 适用性与旧 producer 517-path 限制。19 条有界阅读不代表整窗裁决，正式同步与 runtime 验证未执行。 (internal)"
+    },
+    {
+      "check": "producer-blocker-recorded",
+      "passed": true,
+      "detail": "这是失败证据完整性检查，不将 producer 判为通过。"
+    }
+  ],
+  "not_run": [
+    "正式 adjudication schema/join/closure",
+    "产品实现测试",
+    "fresh-source/独立 reviewer",
+    "runtime/provider/PR/CI/field validation"
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "skill_name": "spec-compound",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-compound",
+    "timestamp": "2026-11-05T02:31:06Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "真实路径和重试关键词不能证明错误因果知识",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 138.584,
+        "tokens": 20701,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound/evals/fixtures/scripts/check-false-causal-claim.sh",
+          "passed": true,
+          "evidence": "PASS: 固定因果裁决与未修改现场一致；未证明模型执行过验证命令"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 138.584,
+        "stddev": 0,
+        "min": 138.584,
+        "max": 138.584
+      },
+      "tokens": {
+        "mean": 20701,
+        "stddev": 0,
+        "min": 20701,
+        "max": 20701
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

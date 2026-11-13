@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "Description-only preserves Git state and makes no remote writes",
+  "prompt": "First run `node prepare-eval.cjs` once. Only this preparation may create the baseline commit and pending README edit. Then use spec-commit-push-pr in description-only mode to draft a PR description for the current diff. Do not stage, commit, push, create a PR or edit an existing PR.\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-commit-push-pr/evals/fixtures/scripts/check-desc-only.sh"
+  ]
+}

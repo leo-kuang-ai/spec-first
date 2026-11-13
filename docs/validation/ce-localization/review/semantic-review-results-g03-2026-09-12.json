@@ -1,0 +1,1798 @@
+{
+  "schema_version": "ce-semantic-review-results.v1",
+  "generated_at": "2026-09-12",
+  "batch_ref": "docs/validation/ce-localization/review/semantic-review-batches-2026-09-12.json#batch-6-G03",
+  "upstream": {
+    "repository": "compound-engineering-plugin",
+    "base": "5c7cb347d0686663743b87cd7227246ba24f7fa7",
+    "head": "956087b3e1dd7ccc03df32cee9e7c044dfbe75cf",
+    "name_status_sha256": "a83371963406147ede5c9752c13b324e88d9f0eaf08af7e1239dd7e6a623d459"
+  },
+  "review_basis": {
+    "target_repository": "spec-first",
+    "reviewed_against_head": "c0803ab5d2e80edde9ca67771c6d204b775bb354",
+    "working_tree_dirty_at_review": "本流已记录的采纳变更(G05-AD1 .gitattributes、G02-AD1 autoresearch 探测)与各批次结果文件",
+    "frozen_binding_head": "7c6bdd66d78616be769d8c78fc9e81340c004cda",
+    "owner_source_unchanged_since_freeze": true,
+    "owner_source_freshness_check": "git diff --stat 7c6bdd66..HEAD -- scripts/check-ce-upstream-reconciliation.cjs 为空(同源核验)。",
+    "ce_repo": "/Users/kuang/xiaobu/compound-engineering-plugin(machine-local)",
+    "method": "LLM fresh-source 语义复核:98 条逐文件 numstat 全核(+18906/-5712);代表性测试全文抽读;受测机制面交叉映射到已完成批次记录。脚本仅提供确定性事实。",
+    "reviewer": "spec-first current session(ZCode,/goal 持续推进授权)",
+    "reviewed_at": "2026-09-12"
+  },
+  "decision_enum_source": "scripts/check-ce-upstream-reconciliation.cjs:97-103。沿用既有枚举。",
+  "records": [
+    {
+      "audit_id": "A420",
+      "path": "tests/bundled-script-line-endings.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +64/-0 行)(+64/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A421",
+      "path": "tests/ce-babysit-pr-contract.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +287/-56 行)(+287/-56)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A422",
+      "path": "tests/ce-babysit-pr-snapshot.test.ts",
+      "status": "M",
+      "upstream_change": "M:+1203:pr-snapshot 快照测试大扩展。(+1203/-78)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A423",
+      "path": "tests/ce-babysit-pr-watch-bootstrap.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +52/-0 行)(+52/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A424",
+      "path": "tests/ce-code-review-mechanics.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +57/-0 行)(+57/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A425",
+      "path": "tests/ce-commit-contract.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +77/-0 行)(+77/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A426",
+      "path": "tests/ce-test-browser-driver-policy.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +52/-0 行)(+52/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A427",
+      "path": "tests/cli.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +3/-1 行)(+3/-1)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A428",
+      "path": "tests/codex-content.test.ts",
+      "status": "A",
+      "upstream_change": "M:+587:transformOutsideHttpUrls 分段器与边界用例(与 A418/G04-O1 对应)。(+587/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A429",
+      "path": "tests/codex-dev.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +18/-2 行)(+18/-2)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A430",
+      "path": "tests/codex-skill-prompt-budget.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +87/-0 行)(+87/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A431",
+      "path": "tests/commit-push-pr-contract.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +283/-16 行)(+283/-16)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A432",
+      "path": "tests/compound-support-files.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +96/-20 行)(+96/-20)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A433",
+      "path": "tests/config-layers-rule-parity.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +88/-0 行)(+88/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A434",
+      "path": "tests/detect-tools.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +3/-1 行)(+3/-1)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A435",
+      "path": "tests/docs-root-literals.test.ts",
+      "status": "A",
+      "upstream_change": "A:92 行,已抽读全文头——禁止 skill 内容中出现 CE artifact 子目录字面 docs/<subdir> 路径(docs_root 组合治理);spec-first 的 artifact 根就是 docs/,模型不同,不适用。(+92/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A436",
+      "path": "tests/docs-root-rule-parity.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +99/-0 行)(+99/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A437",
+      "path": "tests/fixtures/ce-config-layers-rule.md",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +7/-0 行)(+7/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A438",
+      "path": "tests/fixtures/ce-doc-review/negative-control-plan.expectations.md",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +54/-0 行)(+54/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A439",
+      "path": "tests/fixtures/ce-doc-review/negative-control-plan.md",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +113/-0 行)(+113/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A440",
+      "path": "tests/fixtures/ce-doc-review/seeded-advisory-plan.expectations.md",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +91/-0 行)(+91/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A441",
+      "path": "tests/fixtures/ce-doc-review/seeded-advisory-plan.md",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +118/-0 行)(+118/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A442",
+      "path": "tests/fixtures/ce-doc-review/seeded-auth-plan.expectations.md",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +37/-0 行)(+37/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A443",
+      "path": "tests/fixtures/ce-doc-review/seeded-auth-plan.md",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +22/-108 行)(+22/-108)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A444",
+      "path": "tests/fixtures/ce-doc-review/seeded-feature-plan.expectations.md",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +28/-0 行)(+28/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A445",
+      "path": "tests/fixtures/ce-doc-review/seeded-feature-plan.md",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +14/-98 行)(+14/-98)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A446",
+      "path": "tests/fixtures/ce-doc-review/seeded-plan.expectations.md",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +25/-0 行)(+25/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A447",
+      "path": "tests/fixtures/ce-doc-review/seeded-plan.md",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +25/-84 行)(+25/-84)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A448",
+      "path": "tests/fixtures/docs-root-rule.md",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +7/-0 行)(+7/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A449",
+      "path": "tests/fixtures/peer-job-runner-unit.py",
+      "status": "M",
+      "upstream_change": "A:972 行 peer-job-runner 单元 fixture(Windows 进程监督,与 A081/CI windows-native job 对应)。(+972/-10)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A450",
+      "path": "tests/fixtures/peer-job-runner-windows-smoke.py",
+      "status": "A",
+      "upstream_change": "A:792 行 Windows 冒烟 fixture(_ctypes DLL flake 重试门控的受测对象)。(+792/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A451",
+      "path": "tests/fixtures/pr-snapshot-platform.py",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +314/-0 行)(+314/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A452",
+      "path": "tests/fixtures/session-history/omp-session.jsonl",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +11/-0 行)(+11/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A453",
+      "path": "tests/omp-native-install.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +76/-0 行)(+76/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A454",
+      "path": "tests/peer-job-runner-parity.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +3/-1 行)(+3/-1)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A455",
+      "path": "tests/pipeline-review-contract.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +371/-97 行)(+371/-97)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A456",
+      "path": "tests/pov-skill-contract.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +29/-12 行)(+29/-12)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A457",
+      "path": "tests/release-metadata.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +322/-34 行)(+322/-34)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A458",
+      "path": "tests/repo-local-ce-skill-work.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +105/-0 行)(+105/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A459",
+      "path": "tests/repo-research-analyst-contract.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +4/-1 行)(+4/-1)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A460",
+      "path": "tests/resolve-pr-feedback-pagination.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +234/-1 行)(+234/-1)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A461",
+      "path": "tests/review-skill-contract.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +240/-27 行)(+240/-27)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A462",
+      "path": "tests/scratch-root-contract.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +153/-3 行)(+153/-3)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A463",
+      "path": "tests/scratch-root-preamble-executes.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +176/-0 行)(+176/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A464",
+      "path": "tests/session-history-scripts.test.ts",
+      "status": "M",
+      "upstream_change": "M:+812:会话历史发现脚本测试(含 omp 会话形状 fixture)。(+812/-16)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A465",
+      "path": "tests/skill-context-parity.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +96/-0 行)(+96/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A466",
+      "path": "tests/skill-conventions.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +119/-5 行)(+119/-5)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A467",
+      "path": "tests/skills/ce-babysit-pr-platform.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +25/-0 行)(+25/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A468",
+      "path": "tests/skills/ce-brainstorm-aggregation-check.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +14/-6 行)(+14/-6)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A469",
+      "path": "tests/skills/ce-brainstorm-output-mode.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +37/-20 行)(+37/-20)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A470",
+      "path": "tests/skills/ce-brainstorm-visual-probe-server.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +32/-11 行)(+32/-11)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A471",
+      "path": "tests/skills/ce-brainstorm-visual-probes.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +62/-8 行)(+62/-8)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A472",
+      "path": "tests/skills/ce-code-review-cross-model-routes.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +448/-64 行)(+448/-64)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A473",
+      "path": "tests/skills/ce-compound-headless-depth.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +103/-76 行)(+103/-76)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A474",
+      "path": "tests/skills/ce-compound-readonly-enhancement.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +6/-7 行)(+6/-7)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A475",
+      "path": "tests/skills/ce-doc-review-cross-model-routes.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +95/-17 行)(+95/-17)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A476",
+      "path": "tests/skills/ce-doc-review-html-editing.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +68/-0 行)(+68/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A477",
+      "path": "tests/skills/ce-doc-review-rendering-floor.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +146/-0 行)(+146/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A478",
+      "path": "tests/skills/ce-dogfood-body-pins.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +72/-0 行)(+72/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A479",
+      "path": "tests/skills/ce-explain-relocated-invariants.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +62/-0 行)(+62/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A480",
+      "path": "tests/skills/ce-explain-routing.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +222/-26 行)(+222/-26)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A481",
+      "path": "tests/skills/ce-handoff-contract.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +67/-37 行)(+67/-37)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A482",
+      "path": "tests/skills/ce-ideate-dispatch-contracts.test.ts",
+      "status": "A",
+      "upstream_change": "A:760 行 ideate 派发合同测试(dispatch skill/skill-context directives 面)。(+760/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A483",
+      "path": "tests/skills/ce-ideate-generation-contract-parity.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +215/-0 行)(+215/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A484",
+      "path": "tests/skills/ce-ideate-output-mode.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +32/-6 行)(+32/-6)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A485",
+      "path": "tests/skills/ce-plan-handoff-routing.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +30/-18 行)(+30/-18)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A486",
+      "path": "tests/skills/ce-plan-output-mode.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +44/-26 行)(+44/-26)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A487",
+      "path": "tests/skills/ce-pov-cross-model-routes.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +216/-17 行)(+216/-17)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A488",
+      "path": "tests/skills/ce-proof-body-pins.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +71/-0 行)(+71/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A489",
+      "path": "tests/skills/ce-prototype-handoff.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +54/-0 行)(+54/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A490",
+      "path": "tests/skills/ce-prototype-protocol.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +313/-0 行)(+313/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A491",
+      "path": "tests/skills/ce-prototype-run-root-executes.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +230/-0 行)(+230/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A492",
+      "path": "tests/skills/ce-prototype-server.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +249/-0 行)(+249/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A493",
+      "path": "tests/skills/ce-prototype-write-back.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +48/-0 行)(+48/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A494",
+      "path": "tests/skills/ce-session-historian-no-skill-tool.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +12/-1 行)(+12/-1)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A495",
+      "path": "tests/skills/ce-setup-check-health.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +321/-13 行)(+321/-13)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A496",
+      "path": "tests/skills/ce-sweep-body-pins.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +89/-0 行)(+89/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A497",
+      "path": "tests/skills/ce-sweep-mode-token.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +47/-0 行)(+47/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A498",
+      "path": "tests/skills/ce-work-cross-model-integration.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +1/-0 行)(+1/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A499",
+      "path": "tests/skills/ce-work-cross-model-routes.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +47/-11 行)(+47/-11)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A500",
+      "path": "tests/skills/ce-work-outcome-spine.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +69/-14 行)(+69/-14)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A501",
+      "path": "tests/skills/ce-work-unit-workspace-fallback.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +750/-0 行)(+750/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A502",
+      "path": "tests/skills/ce-work-unit-workspace-init.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +780/-0 行)(+780/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A503",
+      "path": "tests/skills/ce-work-unit-workspace-retries.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +659/-0 行)(+659/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A504",
+      "path": "tests/skills/ce-work-unit-workspace-transport.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +1026/-0 行)(+1026/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A505",
+      "path": "tests/skills/ce-work-unit-workspace-verification.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +1256/-0 行)(+1256/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A506",
+      "path": "tests/skills/ce-work-unit-workspace-warm-checkout.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +152/-0 行)(+152/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A507",
+      "path": "tests/skills/ce-work-unit-workspace.test.ts",
+      "status": "D",
+      "upstream_change": "D:4564 行单文件测试拆分为 5 个 ce-work-unit-workspace-*.test.ts 分片 + 共享 harness(与 A022 CI 论述的实测拆分决策对应,拆分后 shard 10-23s vs ~36s 天花板)。(+0/-4516)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A508",
+      "path": "tests/skills/cross-model-peer-budget.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +243/-0 行)(+243/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A509",
+      "path": "tests/skills/cross-model-review-mode.test.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +57/-0 行)(+57/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A510",
+      "path": "tests/skills/elevation-dispatch.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +6/-1 行)(+6/-1)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A511",
+      "path": "tests/skills/flatten-safety.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +6/-1 行)(+6/-1)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A512",
+      "path": "tests/skills/helpers/ce-work-workspace-harness.ts",
+      "status": "A",
+      "upstream_change": "新增 CE 测试/fixture(量级 +359/-0 行)(+359/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A513",
+      "path": "tests/skills/peer-job-runner.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +9/-2 行)(+9/-2)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A514",
+      "path": "tests/skills/task-visibility-contract.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +35/-8 行)(+35/-8)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A515",
+      "path": "tests/skills/unified-plan-artifact-contract.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +534/-91 行)(+534/-91)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A516",
+      "path": "tests/skills/user-facing-skill-invocation-rendering.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +119/-44 行)(+119/-44)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    },
+    {
+      "audit_id": "A517",
+      "path": "tests/sweep-state.test.ts",
+      "status": "M",
+      "upstream_change": "修改扩展(量级 +90/-0 行)(+90/-0)",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:621 tests/ → G03；v2RoleFor:639 evaluation）",
+      "action": "maintain evidence-only。CE 自身测试套件为其自身表面(skill/CLI/fixture)演进提供评估证据;spec-first 有自己的分层测试(tests/unit|smoke|integration),不消费 CE 测试。测试名与量级所指向的机制面(docs-root/codex-content/peer-job-runner/omp/prompt-budget/scratch-root 等)已分别在 G02/G04/G05/G06 对应记录复核,无 spec-first 缺口新增。",
+      "consumer": "reconciliation ledger / adjudication input(evaluation 证据层)",
+      "evidence": [
+        "git diff --numstat 逐文件核对(98/98)",
+        "代表性抽读:docs-root-literals.test.ts、codex-skill-prompt-budget.test.ts 全文头;ce-work-unit-workspace 拆分(0/-4516 + 5 分片 +359 行 harness)与 A022 CI 论述互证",
+        "owner source:scripts/check-ce-upstream-reconciliation.cjs:621、:639"
+      ],
+      "verdict": "confirm-existing(维持 evidence-only)",
+      "limitations": [
+        "未逐文件全文阅读全部 98 个测试 diff(标题+量级+代表抽读;其受测机制面由 G01/G02/G04/G05/G06 记录承载)"
+      ]
+    }
+  ],
+  "adopted_changes": [],
+  "residuals": [],
+  "batch_verdict": "confirmed:98/98 维持既有 evidence-only 判定,0 翻转,0 新采纳,0 新 residual。CE 测试演进指向的机制面均已在其他组记录中复核,无 spec-first 缺口。",
+  "limitations": [
+    "抽样深度:98 个测试文件按 numstat+名称+代表抽读定类,未逐个全文阅读(受测机制面由对应源码/技能记录承载)",
+    "连同已完成批次共 219/517,余 G01=298",
+    "ce_repo 为 machine-local;固定窗口不代表 CE 最新上游 HEAD"
+  ]
+}

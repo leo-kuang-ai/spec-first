@@ -1,0 +1,65 @@
+{
+  "artifact_type": "advisory",
+  "status": "partial",
+  "entries": [
+    {
+      "path": "skills/ce-work/references/implementation-loop.md",
+      "local_owner": "skills/spec-work/references/implementation-loop.md",
+      "reading": "CE 当前全文与本地全文（implementation-loop 另有窗口 diff，diff 输出曾截断，全文已单独读）",
+      "decision": "吸收两次失败回查共同假设和边界测试，放到已有 loop/feedback owner；scope/safeguard 采用本地 implementation-quality 的有界判断，不采纳无法判断就建机制或自动改变 non-goal",
+      "status": "partial-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-work/references/input-triage.md",
+      "local_owner": "skills/spec-work/references/input-triage.md",
+      "reading": "CE 当前全文与本地全文（implementation-loop 另有窗口 diff，diff 输出曾截断，全文已单独读）",
+      "decision": "保留本地 readiness/lifecycle/task-pack 严格 intake；CE retired-readiness 和外部 engine/run carriers 不采纳，continuation 已等价承接",
+      "status": "partial-reviewed-retain-local"
+    },
+    {
+      "path": "skills/ce-work/references/workspace-setup.md",
+      "local_owner": "skills/spec-work/references/workspace-setup.md",
+      "reading": "CE 当前全文与本地全文（implementation-loop 另有窗口 diff，diff 输出曾截断，全文已单独读）",
+      "decision": "保留本地 explicit target、dirty overlap 有界隔离与授权；不采纳分支自动写入或只按 whole-file 处理混合修改",
+      "status": "partial-reviewed-retain-local"
+    },
+    {
+      "path": "skills/ce-work/references/work-intake.md",
+      "local_owner": "skills/spec-work/references/work-intake.md",
+      "reading": "CE 当前全文与本地全文（implementation-loop 另有窗口 diff，diff 输出曾截断，全文已单独读）",
+      "decision": "本地已覆盖 bounded read/settled decision/source plan 不写进度；CE wording 无需机械复制",
+      "status": "partial-reviewed-retain-local"
+    },
+    {
+      "path": "skills/ce-work/references/non-code-execution.md",
+      "local_owner": "skills/spec-work/references/non-code-execution.md",
+      "reading": "CE 当前全文与本地全文（implementation-loop 另有窗口 diff，diff 输出曾截断，全文已单独读）",
+      "decision": "carve-out、命名输入、code 子步骤回到正常 owner 与本地一致，保留本地职责说明",
+      "status": "partial-reviewed-retain-local"
+    },
+    {
+      "path": "skills/ce-work/references/return-to-caller.md",
+      "local_owner": "skills/spec-work/references/return-to-caller.md",
+      "reading": "CE 当前全文与本地全文（implementation-loop 另有窗口 diff，diff 输出曾截断，全文已单独读）",
+      "decision": "本地已有更严格 summary/fingerprint/honest-closeout 与 caller tail；不采纳 return-to-caller 中 canonical commit 或外部 controller 专用字段",
+      "status": "partial-reviewed-retain-local"
+    },
+    {
+      "path": "skills/ce-work/references/execution-engines.md",
+      "local_owner": "skills/spec-work/references/execution-engines.md",
+      "reading": "CE 当前全文与本地全文（implementation-loop 另有窗口 diff，diff 输出曾截断，全文已单独读）",
+      "decision": "本地 inline/explicit goal/dynamic 与 CE native/external controller 不等价，不替换或接入 standing-config 自动外发；保留当前 owner/授权/checkpoint",
+      "status": "partial-reviewed-retain-local"
+    }
+  ],
+  "verification": {
+    "log_ref": "docs/validation/ce-pull-2026-10-27/logs/work-feedback-recovery-tests.log",
+    "exit_code": 0,
+    "prior_failure_log_ref": "docs/validation/ce-pull-2026-10-27/logs/work-feedback-tests.log",
+    "recovery": "首次命令猜测了不存在的 test 路径，确认实际文件后改用 implementation-quality contract suite；未将首次失败记绿"
+  },
+  "limitations": [
+    "U3 shipping/peer scripts/PR 辅助剩余路径仍未闭合",
+    "没有 fresh-source 独立模型验证；只证明 source contract 的确定性检查"
+  ]
+}

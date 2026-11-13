@@ -1,0 +1,32 @@
+{
+  "id": "CEOPT-28-A1-retry1",
+  "created_at": "2026-10-31T12:09:55.631729+00:00",
+  "reason": "Separate clean recovery of original A1 adjacent-entrypoint contamination. Original trial remains unchanged and failed isolation.",
+  "parent_packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/CEOPT-28-packet.json",
+  "parent_packet_sha256": "ccfe8a76ffbc3303730a2ab51217ff065c1f830cd753060fe5813fafc82fb2d3",
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/CEOPT-28-request.txt",
+  "request_sha256": "b788a1ef2f3e50b6feb2db852e0e3e64d47246e0f26d6338388f2ee24abdfda3",
+  "arm_receipt_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/sweep-A-receipts.json",
+  "arm_receipt_sha256": "47d1806269899a8cfc784c53bf4650a42803cd5b0dd4e7510d8564b6ee09e1bf",
+  "source_pins": {
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-sweep/SKILL.md": "b2a87ee7f920913986c8a0a80a4f3aec988025cf25cb794f941af7570bd9d484",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-sweep/references/model-tiers.md": "a8d956b379bff1b53999bb9fe56b57cf777964aeb93afbfb61beb624a4a24a0a",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-sweep/references/subagent-template.md": "f1432a0ac7f85f918d49a7b07e5b0dc2bfe68d0705178865e5c3a3e52fa85962",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-sweep/references/interview.md": "1df0ee91fb7ee496e3ec2e283ac7894f9a496d0b170c1b4e2bc45aa3e3e02f20",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-sweep/references/run.md": "78c3660046d6cd3c578fe4591ebf3f7f1173bb119b347a3ed2edab1429d97d0b",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-sweep/references/state-schema.md": "6631b3b20c0ef2f49b676ecc2cb2e08b548df5c870640130e4669585da0828e8",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-sweep/references/plan-template.md": "c750e1b29a304abee10d4eabddb33bb973f2163ca6f9196cfd21a83179c3ef52",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-sweep/scripts/sweep-state.py": "dfeb18f5bdec0b38d9658ce57bf9cbd2b90b4cebd18e09e852a526a0c56a64d0",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-sweep/scripts/analyze_riffrec_zip.py": "f0360a61cbb4f7e5c70102e8e81094a9962be698d5f887230f1192eb292e1963",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-sweep/scripts/run-python.sh": "ae5ff4417bb96ac45a8f2aee143dc0bea59fa69bf101968b543e22dd766ef7c9",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-sweep/references/agents/media-analyzer.md": "48504dec13f25cdfc77afcef49ec1cdcb0369b567022186a75683df7aa6d02a4",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-sweep/references/sources/github-issues.md": "84369bb4551ecab47a11e726094f878618ac0f04ff81fe580fb159b7a9b8fb35",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-sweep/references/sources/email.md": "a0b73cff1075cfdc7289de84c78eb4bd695ca09a86281b199d5952ffa59fe03b",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-sweep/references/sources/slack.md": "833872155e6478bbbbecf44d27a5dba3b9877d881ce70654ef6348eef8078aac"
+  },
+  "deadline_seconds": 300,
+  "read_scope": "Assigned frozen A spec-sweep SKILL and own references only, assigned original request and sweep-A receipts. Never read adjacent analyzer SKILL, other arm, prior trial, grader, review or broad index.",
+  "execution_scope": "Read-only interpretation; no helpers, scripts, tests, mutations, external operations or delegation.",
+  "grading_scope": "Same original supplied cases and constraints; recovery does not become an additional original slot or prove hosted/field outcomes.",
+  "dispatch": "Single combined trial/reviewer slot; inherited model settings without override."
+}

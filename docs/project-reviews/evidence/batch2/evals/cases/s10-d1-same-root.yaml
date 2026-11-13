@@ -1,0 +1,25 @@
+id: s10-d1-same-root
+title: s10-d1-same-root
+description: |
+  第二轮筛查场景；预期与判定见 ../../expectations.md（运行前写定），正式判定由 ../../grade2.py 事后执行。
+input:
+  prompt: |
+    npm test 挂了：TypeError: Cannot read properties of undefined (reading 'reduce')，帮我修一下。
+context:
+  repo_fixture: evals/fixtures/billing-svc
+  git:
+    init: true
+    checkout: main
+  files:
+    "src/ledger/total.js": |
+      'use strict';
+      function total(invoice) { return invoice.lines.reduce((s, i) => s + i.price * i.qty, 0); }
+      module.exports = { total };
+    "src/ledger/tax.js": |
+      'use strict';
+      function tax(invoice, rate) { return Math.round(invoice.lines.reduce((s, i) => s + i.price * i.qty, 0) * rate); }
+      module.exports = { tax };
+judge:
+  type: rule_based
+  success:
+    - exit_code: 0

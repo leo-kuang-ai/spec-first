@@ -1,0 +1,255 @@
+FAIL tests/unit/spec-sweep-media-admission.test.js
+  ✕ media authorized admission uses the actual bounded command and preserves partial evidence (60 ms)
+  ✕ media missing admission uses the actual bounded command and preserves partial evidence (44 ms)
+  ✕ media wrong-run admission uses the actual bounded command and preserves partial evidence (44 ms)
+  ✕ media wrong-item admission uses the actual bounded command and preserves partial evidence (45 ms)
+  ✕ media wrong-media admission uses the actual bounded command and preserves partial evidence (45 ms)
+  ✕ media wrong-provider admission uses the actual bounded command and preserves partial evidence (47 ms)
+  ✕ media sensitive admission uses the actual bounded command and preserves partial evidence (45 ms)
+  ✕ media unknown admission uses the actual bounded command and preserves partial evidence (44 ms)
+
+  ● media authorized admission uses the actual bounded command and preserves partial evidence
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 2
+    + Received  + 8
+
+      Object {
+    -   "status": 0,
+    -   "stderr": "",
+    +   "status": 1,
+    +   "stderr": "Traceback (most recent call last):
+    +   File \"<string>\", line 4, in <module>
+    +   File \"<frozen importlib._bootstrap_external>\", line 995, in exec_module
+    +   File \"<frozen importlib._bootstrap_external>\", line 1132, in get_code
+    +   File \"<frozen importlib._bootstrap_external>\", line 1190, in get_data
+    + FileNotFoundError: [Errno 2] No such file or directory: '/Users/kuang/xiaobu/spec-first/skills/spec-sweep/scripts/analyze-sweep-media.py'
+    + ",
+      }
+
+      34 | `;
+      35 |   const r = spawnSync('python3', ['-B', '-c', code, script, scenario], { encoding: 'utf8', timeout: 5000 });
+    > 36 |   expect({ status: r.status, stderr: r.stderr }).toEqual({ status: 0, stderr: '' });
+         |                                                  ^
+      37 |   const data = JSON.parse(r.stdout);
+      38 |   const authorized = ['authorized', 'unknown'].includes(scenario);
+      39 |   expect(data.calls).toHaveLength(1);
+
+      at toEqual (tests/unit/spec-sweep-media-admission.test.js:36:50)
+
+  ● media missing admission uses the actual bounded command and preserves partial evidence
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 2
+    + Received  + 8
+
+      Object {
+    -   "status": 0,
+    -   "stderr": "",
+    +   "status": 1,
+    +   "stderr": "Traceback (most recent call last):
+    +   File \"<string>\", line 4, in <module>
+    +   File \"<frozen importlib._bootstrap_external>\", line 995, in exec_module
+    +   File \"<frozen importlib._bootstrap_external>\", line 1132, in get_code
+    +   File \"<frozen importlib._bootstrap_external>\", line 1190, in get_data
+    + FileNotFoundError: [Errno 2] No such file or directory: '/Users/kuang/xiaobu/spec-first/skills/spec-sweep/scripts/analyze-sweep-media.py'
+    + ",
+      }
+
+      34 | `;
+      35 |   const r = spawnSync('python3', ['-B', '-c', code, script, scenario], { encoding: 'utf8', timeout: 5000 });
+    > 36 |   expect({ status: r.status, stderr: r.stderr }).toEqual({ status: 0, stderr: '' });
+         |                                                  ^
+      37 |   const data = JSON.parse(r.stdout);
+      38 |   const authorized = ['authorized', 'unknown'].includes(scenario);
+      39 |   expect(data.calls).toHaveLength(1);
+
+      at toEqual (tests/unit/spec-sweep-media-admission.test.js:36:50)
+
+  ● media wrong-run admission uses the actual bounded command and preserves partial evidence
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 2
+    + Received  + 8
+
+      Object {
+    -   "status": 0,
+    -   "stderr": "",
+    +   "status": 1,
+    +   "stderr": "Traceback (most recent call last):
+    +   File \"<string>\", line 4, in <module>
+    +   File \"<frozen importlib._bootstrap_external>\", line 995, in exec_module
+    +   File \"<frozen importlib._bootstrap_external>\", line 1132, in get_code
+    +   File \"<frozen importlib._bootstrap_external>\", line 1190, in get_data
+    + FileNotFoundError: [Errno 2] No such file or directory: '/Users/kuang/xiaobu/spec-first/skills/spec-sweep/scripts/analyze-sweep-media.py'
+    + ",
+      }
+
+      34 | `;
+      35 |   const r = spawnSync('python3', ['-B', '-c', code, script, scenario], { encoding: 'utf8', timeout: 5000 });
+    > 36 |   expect({ status: r.status, stderr: r.stderr }).toEqual({ status: 0, stderr: '' });
+         |                                                  ^
+      37 |   const data = JSON.parse(r.stdout);
+      38 |   const authorized = ['authorized', 'unknown'].includes(scenario);
+      39 |   expect(data.calls).toHaveLength(1);
+
+      at toEqual (tests/unit/spec-sweep-media-admission.test.js:36:50)
+
+  ● media wrong-item admission uses the actual bounded command and preserves partial evidence
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 2
+    + Received  + 8
+
+      Object {
+    -   "status": 0,
+    -   "stderr": "",
+    +   "status": 1,
+    +   "stderr": "Traceback (most recent call last):
+    +   File \"<string>\", line 4, in <module>
+    +   File \"<frozen importlib._bootstrap_external>\", line 995, in exec_module
+    +   File \"<frozen importlib._bootstrap_external>\", line 1132, in get_code
+    +   File \"<frozen importlib._bootstrap_external>\", line 1190, in get_data
+    + FileNotFoundError: [Errno 2] No such file or directory: '/Users/kuang/xiaobu/spec-first/skills/spec-sweep/scripts/analyze-sweep-media.py'
+    + ",
+      }
+
+      34 | `;
+      35 |   const r = spawnSync('python3', ['-B', '-c', code, script, scenario], { encoding: 'utf8', timeout: 5000 });
+    > 36 |   expect({ status: r.status, stderr: r.stderr }).toEqual({ status: 0, stderr: '' });
+         |                                                  ^
+      37 |   const data = JSON.parse(r.stdout);
+      38 |   const authorized = ['authorized', 'unknown'].includes(scenario);
+      39 |   expect(data.calls).toHaveLength(1);
+
+      at toEqual (tests/unit/spec-sweep-media-admission.test.js:36:50)
+
+  ● media wrong-media admission uses the actual bounded command and preserves partial evidence
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 2
+    + Received  + 8
+
+      Object {
+    -   "status": 0,
+    -   "stderr": "",
+    +   "status": 1,
+    +   "stderr": "Traceback (most recent call last):
+    +   File \"<string>\", line 4, in <module>
+    +   File \"<frozen importlib._bootstrap_external>\", line 995, in exec_module
+    +   File \"<frozen importlib._bootstrap_external>\", line 1132, in get_code
+    +   File \"<frozen importlib._bootstrap_external>\", line 1190, in get_data
+    + FileNotFoundError: [Errno 2] No such file or directory: '/Users/kuang/xiaobu/spec-first/skills/spec-sweep/scripts/analyze-sweep-media.py'
+    + ",
+      }
+
+      34 | `;
+      35 |   const r = spawnSync('python3', ['-B', '-c', code, script, scenario], { encoding: 'utf8', timeout: 5000 });
+    > 36 |   expect({ status: r.status, stderr: r.stderr }).toEqual({ status: 0, stderr: '' });
+         |                                                  ^
+      37 |   const data = JSON.parse(r.stdout);
+      38 |   const authorized = ['authorized', 'unknown'].includes(scenario);
+      39 |   expect(data.calls).toHaveLength(1);
+
+      at toEqual (tests/unit/spec-sweep-media-admission.test.js:36:50)
+
+  ● media wrong-provider admission uses the actual bounded command and preserves partial evidence
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 2
+    + Received  + 8
+
+      Object {
+    -   "status": 0,
+    -   "stderr": "",
+    +   "status": 1,
+    +   "stderr": "Traceback (most recent call last):
+    +   File \"<string>\", line 4, in <module>
+    +   File \"<frozen importlib._bootstrap_external>\", line 995, in exec_module
+    +   File \"<frozen importlib._bootstrap_external>\", line 1132, in get_code
+    +   File \"<frozen importlib._bootstrap_external>\", line 1190, in get_data
+    + FileNotFoundError: [Errno 2] No such file or directory: '/Users/kuang/xiaobu/spec-first/skills/spec-sweep/scripts/analyze-sweep-media.py'
+    + ",
+      }
+
+      34 | `;
+      35 |   const r = spawnSync('python3', ['-B', '-c', code, script, scenario], { encoding: 'utf8', timeout: 5000 });
+    > 36 |   expect({ status: r.status, stderr: r.stderr }).toEqual({ status: 0, stderr: '' });
+         |                                                  ^
+      37 |   const data = JSON.parse(r.stdout);
+      38 |   const authorized = ['authorized', 'unknown'].includes(scenario);
+      39 |   expect(data.calls).toHaveLength(1);
+
+      at toEqual (tests/unit/spec-sweep-media-admission.test.js:36:50)
+
+  ● media sensitive admission uses the actual bounded command and preserves partial evidence
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 2
+    + Received  + 8
+
+      Object {
+    -   "status": 0,
+    -   "stderr": "",
+    +   "status": 1,
+    +   "stderr": "Traceback (most recent call last):
+    +   File \"<string>\", line 4, in <module>
+    +   File \"<frozen importlib._bootstrap_external>\", line 995, in exec_module
+    +   File \"<frozen importlib._bootstrap_external>\", line 1132, in get_code
+    +   File \"<frozen importlib._bootstrap_external>\", line 1190, in get_data
+    + FileNotFoundError: [Errno 2] No such file or directory: '/Users/kuang/xiaobu/spec-first/skills/spec-sweep/scripts/analyze-sweep-media.py'
+    + ",
+      }
+
+      34 | `;
+      35 |   const r = spawnSync('python3', ['-B', '-c', code, script, scenario], { encoding: 'utf8', timeout: 5000 });
+    > 36 |   expect({ status: r.status, stderr: r.stderr }).toEqual({ status: 0, stderr: '' });
+         |                                                  ^
+      37 |   const data = JSON.parse(r.stdout);
+      38 |   const authorized = ['authorized', 'unknown'].includes(scenario);
+      39 |   expect(data.calls).toHaveLength(1);
+
+      at toEqual (tests/unit/spec-sweep-media-admission.test.js:36:50)
+
+  ● media unknown admission uses the actual bounded command and preserves partial evidence
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 2
+    + Received  + 8
+
+      Object {
+    -   "status": 0,
+    -   "stderr": "",
+    +   "status": 1,
+    +   "stderr": "Traceback (most recent call last):
+    +   File \"<string>\", line 4, in <module>
+    +   File \"<frozen importlib._bootstrap_external>\", line 995, in exec_module
+    +   File \"<frozen importlib._bootstrap_external>\", line 1132, in get_code
+    +   File \"<frozen importlib._bootstrap_external>\", line 1190, in get_data
+    + FileNotFoundError: [Errno 2] No such file or directory: '/Users/kuang/xiaobu/spec-first/skills/spec-sweep/scripts/analyze-sweep-media.py'
+    + ",
+      }
+
+      34 | `;
+      35 |   const r = spawnSync('python3', ['-B', '-c', code, script, scenario], { encoding: 'utf8', timeout: 5000 });
+    > 36 |   expect({ status: r.status, stderr: r.stderr }).toEqual({ status: 0, stderr: '' });
+         |                                                  ^
+      37 |   const data = JSON.parse(r.stdout);
+      38 |   const authorized = ['authorized', 'unknown'].includes(scenario);
+      39 |   expect(data.calls).toHaveLength(1);
+
+      at toEqual (tests/unit/spec-sweep-media-admission.test.js:36:50)
+
+Test Suites: 1 failed, 1 total
+Tests:       8 failed, 8 total
+Snapshots:   0 total
+Time:        0.517 s
+Ran all test suites matching /tests\/unit\/spec-sweep-media-admission.test.js/i.

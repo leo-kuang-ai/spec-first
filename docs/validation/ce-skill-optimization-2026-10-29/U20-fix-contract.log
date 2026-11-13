@@ -1,0 +1,9 @@
+PASS tests/unit/spec-debug-fix-reference-contracts.test.js
+  spec-debug fix reference contract
+    ✓ entry keeps the trigger while fix reference owns test-first mechanics (1 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+Snapshots:   0 total
+Time:        0.072 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/spec-debug-fix-reference-contracts.test.js/i.

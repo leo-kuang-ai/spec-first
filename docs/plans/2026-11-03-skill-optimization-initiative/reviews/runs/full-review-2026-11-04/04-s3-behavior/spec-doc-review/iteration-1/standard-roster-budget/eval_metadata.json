@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "standard 预算 ≤3 且 security 信号优先选中 security-lens",
+  "prompt": "（spec-doc-review skill 已安装，请按它工作。）\nmode:headless docs/plans/2026-09-01-monthly-summary-plan.md\n",
+  "assertions": [
+    "expect.must_contain",
+    "output_contains{all:[cost-shape security]}"
+  ]
+}

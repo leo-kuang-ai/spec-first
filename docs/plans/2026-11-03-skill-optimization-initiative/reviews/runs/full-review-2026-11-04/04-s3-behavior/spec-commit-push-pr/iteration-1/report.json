@@ -1,0 +1,90 @@
+{
+  "skill_name": "spec-commit-push-pr",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T19:39:55.423451+08:00",
+  "end_time": "2026-11-04T19:42:41.40441+08:00",
+  "case_results": [
+    {
+      "case_id": "no-landing-auth-stops-before-push",
+      "title": "The full landing helper stops when landing authority is absent",
+      "status": "PASS",
+      "duration_ms": 158007,
+      "turns": 6,
+      "input_tokens": 32696,
+      "output_tokens": 2312,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 6,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-commit-push-pr/evals/fixtures/scripts/check-landing-gate.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once. Only this preparation may create the baseline commit and pending README edit. Then evaluate the full spec-commit-push-pr handoff from a governed caller: commit_authorization: authorized; landing_authorization: missing. Stop before the full landing path, report the missing authority and return local commit work to the spec-commit owner. Do not stage, commit, push or create/update a PR in this invocation.\n",
+      "response": "授权边界检查在任何模式路径之前触发，评估到此停止。以下为本次评估的结果与回交。\n\n## 评估结论：在授权边界正确停止\n\n**停止点**：SKILL.md「Invocation And Authorization Boundary」节，位于完整 landing 路径（Step 1–8）入口之前。\n\n**触发的停止门**：\n\n```yaml\nstop: landing_authorization_missing\ncommit_authorization: authorized\nlanding_authorization: missing\n```\n\n判定依据（均来自 skill 自身契约，非外部猜测）：\n\n1. SKILL.md 第 14 行：公开工作流委托**完整** commit/push/PR 路径，前提是已同时建立 `commit_authorization: authorized` **和** `landing_authorization: authorized`；landing 授权缺失时在 push 或 PR 变更之前以 `landing_authorization_missing` 停止。\n2. `references/commit-and-push.md` 第 3–4 行：commit 与 push 都必须在调用方**分别建立两项授权**之后才能进行——因此即使 commit 授权在场，本次交接也不清空 Step 4 的 staging/commit 门槛。\n3. `mode:pipeline`、工具权限、分支状态、绿色测试套件均为执行事实而非授权；本次交接中也未提供任何授权性事实可替代 landing 授权。\n\n## 本次调用未执行的变更\n\n- 未 stage、未 commit、未 push、未创建或更新 PR\n- 未创建分支、未改写任何 PR 描述、未做 explainer 归档\n- 无 `watch_handoff`（该结构仅在授权完成的 full-workflow landing 之后返回）；无 PR URL 可输出\n- 无继承的 typed `needs-human` 决策残留需要渲染\n\n## 本地 commit 工作回交 spec-commit 所有者\n\n只读核验的当前事实（未做任何变更）：\n\n```yaml\nreturned_to: spec-commit-owner\nbranch: main            # 默认分支\nhead_sha: 693fc99913b816046ca6166c1c147e3ff5bd227f   # eval fixture baseline\npending_work:\n  - path: README.md\n    state: modified, unstaged   # \"# MiniLedger\" → \"# MiniLedger (edited)\"\nout_of_scope_left_untouched:\n  - .claude/            # untracked，非本 run 拥有的文件范围，helper 不吸收无关脏路径\nremote: none configured # push 端点未解析；因已在授权边界停止，此事实不构成额外阻塞项\n```\n\nREADME.md 的待提交修改完整保留在工作树中原样未动，所有权归 spec-commit 工作流；本 helper 未扩大文件范围、未吸收无关路径。\n\n## 恢复条件\n\n要继续完整 landing 路径，需由当前用户或可见的上游交接补充建立 `landing_authorization: authorized`（仅 `commit_authorization` 不足），然后重新委托；PR 描述更新（`gh pr edit`）同样属于 landing 变更，也需要该授权。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "description-only-non-mutating",
+      "title": "Description-only preserves Git state and makes no remote writes",
+      "status": "PASS",
+      "duration_ms": 165741,
+      "turns": 5,
+      "input_tokens": 35581,
+      "output_tokens": 3035,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 5,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-commit-push-pr/evals/fixtures/scripts/check-desc-only.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once. Only this preparation may create the baseline commit and pending README edit. Then use spec-commit-push-pr in description-only mode to draft a PR description for the current diff. Do not stage, commit, push, create a PR or edit an existing PR.\n",
+      "response": "模板与配置探针完成：仓库无 PR 模板、无 `.spec-first/config.local.yaml`、无 remote。当前 diff 即 README.md 标题行的未提交修改（`# MiniLedger` → `# MiniLedger (edited)`），基线为 `693fc99`。按 Steps A–H 完成分类（单簇文档改动、无证据需求、无新概念、无关联工作），定级「Small + simple」：1–2 句、无标题、不超 300 字符。审计通过：伞形结论为结果导向（标题现在可区分于基线），无机制化表述、无差异复述。\n\n## 模式与依据\n\n- **模式**：description-only（Step 6 组合，跳过 Step 4–5 与 Step 1 决策树；本轮不落盘、不应用）\n- **描述范围**：工作区 diff（`git diff HEAD`）——仅 `README.md:1` 一行；未跟踪的 `.claude/` 为 harness 文件，未纳入描述\n- **Pre-A 披露**：仓库无 remote（`origin/HEAD` 解析失败，exit 128），无既有 PR；所述内容为**未提交的工作区改动**，并非已发布的 PR 内容\n- **PR 正文契约**：未发现 `PULL_REQUEST_TEMPLATE.md` / `.github/` / `docs/` 模板，按默认布局\n\n## PR 描述草案\n\n**标题**\n\n```\ndocs: 在 README 标题中标注已编辑状态\n```\n\n**正文**\n\n```markdown\nREADME 标题现在读作「MiniLedger (edited)」，使当前版本与基线版本在标题上即可直观区分。纯文档改动，无任何运行时影响。\n\n---\n\nBuilt with [Spec-First](https://github.com/sunrain520/spec-first)\n```\n\n## 边界确认\n\n未暂存、未提交、未推送、未创建或编辑任何 PR，仓库状态与运行前一致（HEAD 仍为 `693fc99`，README 修改仍为未暂存状态）。如需将此描述应用到实际 PR，请明确告知。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 73624,
+  "judge_tokens": 0,
+  "overall_tokens": 73624
+}

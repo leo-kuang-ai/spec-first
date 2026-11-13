@@ -1,0 +1,11 @@
+# U28 remaining workflow integration
+
+Status: local mechanism verified; real model and provider outcomes not run.
+
+Strategy now uses discriminating proposals and optional rejection principles grounded in explicit user decisions. Existing headings, ownership and untargeted content remain protected. Pulse uses available source capabilities and preserves scoring anchors in its existing dimension string; missing legacy anchors prevent invented numeric scores. U14 already resolved canonical metric-source mappings and not-run receipt states.
+
+Promote carries actual implementation/release/deployment evidence, resolves the target/base explicitly, completes local drafts before optional setup, never exposes provider commentary on empty drafts, and checks both existing and new local preferences for tracking/ignore safety. The durable preference exception still needs explicit authority. Handoff preserves research and report-only review owners, current source identity and managed artifact paths. Riffrec distinguishes private raw/manifest evidence from separately reviewed shareable text and keeps scaffold requirements unconfirmed.
+
+Six supplemental eval cases observe a protected strategy diff, actual Pulse report/source values, local unreleased promotion, research and review continuation, and actual Riffrec analyzer output. Their script judges preserve HEAD/index/protected files and inspect bounded runner traces where relevant. Controls reject foreign strategy changes, failed-as-zero metrics, recorded provider calls, missing completed source reads, and altered transcription evidence. These checks are neither exhaustive tool mediation nor semantic model evaluation. They do not measure pressure-test quality or prove network silence. The frozen U31 scenarios remain unchanged.
+
+U28-check.log: seven suites / 57 passed. The first calibration incorrectly expected event.type; source inspection showed event.reason, so the evaluator was corrected. U28-outcome-final.log: two suites / 36 passed, including all six new positive/negative controls. Five skill-up configurations validate. Review is by the producer; no independent reviewer, real model, provider, browser or publication was used.

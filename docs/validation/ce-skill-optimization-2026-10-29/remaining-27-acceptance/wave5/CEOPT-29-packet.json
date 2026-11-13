@@ -1,0 +1,45 @@
+{
+  "id": "CEOPT-29",
+  "skill": "spec-test-browser",
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/CEOPT-29-request.txt",
+  "request_sha256": "24709c5113b2f8447c35576852ce9c42a66cedfe69dc85f1ff27eabadda90b6a",
+  "input_files": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/browser-policy-successor/browser-local-receipt.json": "696adaf5f1f26561de94dc7c34a3a0d0368faa9754dba489c32fc69e5bed9494",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/browser-policy-successor/browser-positive-run.json": "70d860604df2a43162183a194f7df3c047148c5f0352c5a3ecf1ccbb3d69e5ae",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/browser-policy-successor/browser-positive-cleanup.json": "9b15ef3c7f827b6ed14c3f73c5e2b60ad084303341d69d74859ae0a806b339b0"
+  },
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "deadline_seconds": 300,
+  "parent_recipe": "Save exact read-only response; independently review all supplied actual/local/synthetic evidence. No model autonomous browser operation.",
+  "status": "prepared-not-executed",
+  "limitations": [
+    "Synthetic local page/feedback and parent execution do not prove product visual acceptance, human decisions or autonomous browser workflow."
+  ],
+  "arm_receipts": {
+    "A": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/browser-cleanup-A-receipts.json",
+      "sha256": "98943ee0ac2696c29500e43984a812d8f1e791c4867ee2eb19fe509c47c0de81"
+    },
+    "B": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/browser-cleanup-B-receipts.json",
+      "sha256": "231c1b07bea8eb220c7c9453cd1e4c074d26ccd6214f45feb971d3a7f4a8a688"
+    }
+  },
+  "arm_order_receipts": {
+    "A": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/browser-order-A-receipt.json",
+      "sha256": "a18fc04a0b969b18f8b8b556659d91ac9415f4043a4b8654c1772133f2b7e2ea"
+    },
+    "B": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/browser-order-B-receipt.json",
+      "sha256": "f78f9a72905101620d85fe650586aec8cae1c40292ee1bbb09b66c3f686245ce"
+    }
+  }
+}

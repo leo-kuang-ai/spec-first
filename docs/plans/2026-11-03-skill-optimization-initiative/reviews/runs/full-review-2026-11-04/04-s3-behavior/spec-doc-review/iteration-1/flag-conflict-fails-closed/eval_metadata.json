@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "冲突 mutation token 应 fail closed 且不读文档",
+  "prompt": "（spec-doc-review skill 已安装，请按它工作。）\nmode:headless mutation:apply-fixes mutation:report-only docs/plans/2026-09-01-monthly-summary-plan.md\n",
+  "assertions": [
+    "expect.must_contain",
+    "output_contains{all:[flag-conflict-or-unsupported]}"
+  ]
+}

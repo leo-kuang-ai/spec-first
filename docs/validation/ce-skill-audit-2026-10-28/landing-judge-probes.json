@@ -1,0 +1,23 @@
+{
+  "scope": "isolated temporary fixture; no project source or remote writes",
+  "probes": [
+    {
+      "case": "description_only_staging_not_detected",
+      "command": "bash check-desc-only.sh",
+      "observed_index_paths": [
+        "README.md"
+      ],
+      "head_count": 1,
+      "exit_code": 0,
+      "output": "",
+      "claim": "仅证明 judge 未检查 staging，不证明模型已越权"
+    },
+    {
+      "case": "landing_success_claim_accepted",
+      "command": "bash check-landing-gate.sh",
+      "exit_code": 0,
+      "output": "",
+      "claim": "仅证明成功推送措辞亦通过关键词 judge；未执行 push/PR 或模型 eval"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "打磨用户既有想法应停止并指向 spec-brainstorm",
+  "prompt": "（spec-ideate skill 已安装，请按它工作。）\n我已经有一个想法：给团队做一个自动汇总每日站会进展的工具。\n帮我把这个想法打磨成需求。\n",
+  "assertions": [
+    "expect.must_contain",
+    "output_contains{all:[spec-brainstorm]}"
+  ]
+}

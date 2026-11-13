@@ -1,0 +1,10 @@
+{
+  "id": "CEOPT-07-six-draft-parent-publication-r2",
+  "original_protocol_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/refresh-publication-protocol.json",
+  "original_protocol_sha256": "a6a69a6513f85111a39d83ec5bc0b11ae64fd2703777f8a7c03be36a22ea1886",
+  "initial_failure_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/refresh-publication-initial-failure.json",
+  "write_root": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/refresh-publication-supplement-r2",
+  "runner_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/execute-refresh-publication.py",
+  "runner_sha256": "7084d459faa3768f8082cdcbd19eebcccb0187974e8a58a0c6f3f30fabd9606c",
+  "amendment": "Only invocation ordering is corrected: native frontmatter --promotion precedes document path. Inputs, extraction ranges, assertions and procedure remain frozen. Initial partial corpus and original runner retained; no retry counted as a model trial."
+}

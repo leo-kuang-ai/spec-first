@@ -1,0 +1,25 @@
+# manifest: spec-write-tasks
+# frozen: 5b59293b
+cdfa20fd18d983e5ddf6ef259006d5a62e1b7fdc9a2564d879649990b77867df  skills/spec-write-tasks/SKILL.md
+ade0102a959f8418a02b96969ff7add4afbabeeffd031dbce1015727e92de56c  skills/spec-write-tasks/agents/openai.yaml
+7ecd9227a4cc500abcd84256a6da0250832ed96be3100ed0501a7af18501ccc2  skills/spec-write-tasks/evals/README.md
+6b666a9b5a336c02199ef46eb6bc2642d9533bc0290f1edf0ab877a9f0e8fc20  skills/spec-write-tasks/evals/boundary-cases.json
+c1198cb7355fc651c43322f965052cd8ecf88e1c2332c673158c84e29ad45274  skills/spec-write-tasks/evals/cases/bare-request-asks-path.yaml
+a45d6ab2e11ad87b728e94bd22d1012561dc88dab866101cb627bdab38cebaaa  skills/spec-write-tasks/evals/cases/non-active-rejected.yaml
+7b1a7e5b1193ea0a8bfa774b0ceb814ea02412a79a450e6798862d41acbdf754  skills/spec-write-tasks/evals/cases/remote-input-rejected.yaml
+49fd457e1dc8f2b8b8f9f26c716a01cdbde4e6e58348a9e9da98cb743727a192  skills/spec-write-tasks/evals/cases/small-plan-skip.yaml
+736bf9df4d309e367ed7f925b53d167f0cc811393d91e2b12954cbcc08059453  skills/spec-write-tasks/evals/eval.yaml
+76dd6498a8d826b2aa5124855939189a808a8c4dd7d98889dcaaa15c83ca4c49  skills/spec-write-tasks/evals/expected-behavior-cases.json
+e335baa8d6f7e3a9a0991eed198184ca3cc11ba43440c05ea0f644546c581a3f  skills/spec-write-tasks/evals/failure-cases.json
+d098ab0cd8a16f2b8dc0a8c78202dc053b3fbd0f62014add5c457f3941a04c84  skills/spec-write-tasks/evals/fixtures/repos/done-plan/docs/plans/2026-08-01-001-feat-old-thing-plan.md
+9740a796154e879ff8f7adf4b4fdcb307043ea84390777216e122ac2349f6fbf  skills/spec-write-tasks/evals/fixtures/repos/tiny-plan/docs/plans/2026-09-01-001-feat-month-filter-plan.md
+14bea02a91277a7440f671f9d6bb5cd70117d23508a03b39dc986169d64fa973  skills/spec-write-tasks/evals/fixtures/scripts/asks-a-question.sh
+de9695a70c0cf289dc5294747415ea908c516d3e34c590da22d2a82c4581a370  skills/spec-write-tasks/evals/fixtures/scripts/rejects-remote.sh
+f483a13608d8c1f70b76cafad57b508fe13db75ef95ac78a3db1b3550a97c820  skills/spec-write-tasks/evals/output-quality-cases.json
+77a6a23388193bd5b84fbca4735219c2897bfe7d1a0c21e4a0c7c99183c4ad2d  skills/spec-write-tasks/evals/output/cases.jsonl
+3b4d0af4b3f2eb0ff56c969b0bc07bfaa8c2a92036577960ac9d37a6e03d09e1  skills/spec-write-tasks/evals/semantic_config.json
+5cbce4795097e0350ffcf02fec2630625ea481498f9c6ca4495f9bec65ab9ec4  skills/spec-write-tasks/evals/trigger-cases.json
+c43a7def49cb78e90f8eb85876692c5d95f673e79d1ae1e2c497570d162613bb  skills/spec-write-tasks/evals/yao-trigger-cases.json
+d852671d3912d313d87c65d7e4b5ee99bd3d4ec92890f8f1cfc5c6f3f0c5dd34  skills/spec-write-tasks/references/execution-handoff-contract.md
+2b2efdd0547ad7841b53138d36b25d7f291729e04ada88b436b8e182fe6244aa  skills/spec-write-tasks/references/task-pack-schema.md
+5171ead0ea3fec783fe069496e67e2553d60dfe144fcb27cacff58938de91701  skills/spec-write-tasks/references/task-quality-guide.md

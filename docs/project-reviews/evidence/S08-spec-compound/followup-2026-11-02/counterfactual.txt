@@ -1,0 +1,18 @@
+{
+  "before": {
+    "status": "authentication-rejected",
+    "attempts": 0
+  },
+  "after": {
+    "status": "ok",
+    "attempts": 1
+  },
+  "moreRetriesWithOldCredential": {
+    "status": "authentication-rejected",
+    "attempts": 0
+  },
+  "noRetriesWithNewCredential": {
+    "status": "ok",
+    "attempts": 1
+  }
+}

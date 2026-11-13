@@ -1,0 +1,16 @@
+# manifest: spec-prototype
+# frozen: 5b59293b
+07563d5c500f0280de5adccce7be149558e3443d2f20bdeeec837f462435552a  skills/spec-prototype/SKILL.md
+8a2785a95f924ca809b4b729083da6c2d5478ea30bc38e02b0f50c25a5ac9c2e  skills/spec-prototype/evals/cases/discovery-routes-out.yaml
+16da6a08886c461b12bba0572d4f365dcb85b2f4927688bfe3f262292376a511  skills/spec-prototype/evals/cases/go-ahead-before-build.yaml
+6ad65da0d36a5c6822d8fe198fd181781cd6d0d9481735a2b83615ee6ec1aa90  skills/spec-prototype/evals/cases/headless-blocked.yaml
+e685068b4e1c65dd18458525f4bb7e25a7a7eb428cc1a4fd59a138609f859214  skills/spec-prototype/evals/cases/undefined-question-gate.yaml
+07c15194fa3f47d53e37c918b76da507c35d283c7cda81c5b75d8511c4a2df13  skills/spec-prototype/evals/eval.yaml
+14bea02a91277a7440f671f9d6bb5cd70117d23508a03b39dc986169d64fa973  skills/spec-prototype/evals/fixtures/scripts/asks-a-question.sh
+e43a6e74e00c97c5a154911d85b41add79eac22685ed551b2ea7779ca67335a6  skills/spec-prototype/evals/fixtures/scripts/routes-to-discovery.sh
+5e091c857eca1a359fd80f9f40d50e449ba3962abd94e5492c836ea46273760d  skills/spec-prototype/references/build.md
+7955c45e3780875c35980e4fa57c3ffdf802ab6404977bd87599e1858b2c8f18  skills/spec-prototype/references/craft-floor.md
+79e454110e1cbda2cabadfb7349a1c5ead213441a47dae686e1fbc662d6c6755  skills/spec-prototype/references/preview.md
+806c4197f77d7dc16de18250d87d8eb61c07832e8efe7646132025e03773d96b  skills/spec-prototype/references/scoping.md
+105fd654c4da196df5dd4a6f692903d866d2f0f141d2713ee263b20fb2465629  skills/spec-prototype/references/write-back.md
+94442c66dc5fa85ceb6641bd1b644d8a66ab7cac5e741ce0f28f152d5c1162c3  skills/spec-prototype/scripts/light-webserver.js

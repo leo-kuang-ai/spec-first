@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "skill_name": "spec-worktree",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-worktree",
+    "timestamp": "2026-11-04T13:03:08Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "零提交仓库 create 必须结构化拒绝，不得裸用 git worktree add",
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 124.381,
+        "tokens": 30277,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-worktree/evals/fixtures/scripts/check-unborn-refuses.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 124.381,
+        "stddev": 0,
+        "min": 124.381,
+        "max": 124.381
+      },
+      "tokens": {
+        "mean": 30277,
+        "stddev": 0,
+        "min": 30277,
+        "max": 30277
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

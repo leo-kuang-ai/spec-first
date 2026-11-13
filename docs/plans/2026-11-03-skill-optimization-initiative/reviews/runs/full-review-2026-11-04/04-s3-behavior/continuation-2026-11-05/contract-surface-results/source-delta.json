@@ -1,0 +1,11 @@
+{
+  "baseline": "/private/tmp/plan-capability-control-fansezop/spec-plan",
+  "candidate": "/private/tmp/plan-contract-surface-43a4s8wi/spec-plan",
+  "changes": [
+    {
+      "path": "references/research.md",
+      "before": "9775f50b0998d5fe63a5593ac65713e8d02d546d542b9964ac315bbfaf9851e7",
+      "after": "88509db7ec975e332b3ba5734bea36024aa4f4f17184a61c469fd23434a6dbbf"
+    }
+  ]
+}

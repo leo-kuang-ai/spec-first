@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-10-30T02:46:17.349544+00:00",
+  "prior_reviewed_paths": 389,
+  "unchanged_paths": 388,
+  "intentional_successors": [
+    {
+      "path": "CHANGELOG.md",
+      "previous_review_sha256": "8c5c469fae665d3a97532fa86ca83e7918ea262d3e3539f9da81b0a0867f5310",
+      "current_sha256": "27d84f1c89723c1e8d4b0de0c4426ed8fd2e5bf4cd1067f1a79649106070dfe4",
+      "reason": "Current read-only evaluation Changelog entry; product source unchanged."
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+PASS tests/unit/compound-candidate-claims.test.js
+PASS tests/unit/compound-template-category-contracts.test.js
+PASS tests/unit/compound-promotion-contracts.test.js
+PASS tests/unit/session-history-scripts.test.js
+PASS tests/unit/spec-compound-reference-contracts.test.js
+
+Test Suites: 5 passed, 5 total
+Tests:       77 passed, 77 total
+Snapshots:   0 total
+Time:        2.208 s
+Ran all test suites matching /tests\/unit\/spec-compound-reference-contracts.test.js|tests\/unit\/compound-template-category-contracts.test.js|tests\/unit\/compound-candidate-claims.test.js|tests\/unit\/compound-promotion-contracts.test.js|tests\/unit\/session-history-scripts.test.js/i.
+Test results written to: docs/validation/ce-skill-audit-2026-10-28/compound-tests.json

@@ -1,0 +1,7 @@
+{
+  "command_exit_code": 1,
+  "stdout": "",
+  "stderr": "docs/validation/ce-localization/skill-inventory.json is stale; run with --refresh\n",
+  "historical_artifacts_unchanged": true,
+  "claim": "当前source漂移时拒绝current closeout，且校验不改历史证据"
+}

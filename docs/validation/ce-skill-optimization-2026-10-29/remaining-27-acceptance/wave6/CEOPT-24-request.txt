@@ -1,0 +1,2 @@
+Produce a coverage-grounded assessment across both analyzer entrypoints for every 840-second chunk case and quiet capture. Identify covered/missing intervals, cumulative egress and unsupported product claims. Separate mocked calls from actual external transcription.
+Read only assigned-arm frozen Skill and the named evidence. Return an English artifact with per-case findings, exact evidence references, unresolved facets and responsible next action. Do not execute, mutate, contact external services or delegate.

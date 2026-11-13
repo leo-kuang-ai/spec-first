@@ -1,0 +1,15 @@
+{
+ "case": "s10-d1-same-root",
+ "seed": 20261218,
+ "a_out": "/tmp/batch3/gpt-s10/iteration-1/s10-d1-same-root/with_skill/outputs",
+ "b_out": "/tmp/batch3/gpt-s10/iteration-1/s10-d1-same-root/without_skill/outputs",
+ "mapping": {
+  "X": "B",
+  "Y": "A"
+ },
+ "verdict_raw": {
+  "preferred": "X",
+  "reason": "两者都只改 total.js 且都漏了同样有错的 tax.js；X 额外补了空明细回归测试并跑全量 6 项验证，可验证性更强，略优。"
+ },
+ "preferred_group": "B"
+}

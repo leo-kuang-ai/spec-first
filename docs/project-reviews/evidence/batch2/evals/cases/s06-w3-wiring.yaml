@@ -1,0 +1,16 @@
+id: s06-w3-wiring
+title: s06-w3-wiring
+description: |
+  第二轮筛查场景；预期与判定见 ../../expectations.md（运行前写定），正式判定由 ../../grade2.py 事后执行。
+input:
+  prompt: |
+    给 POST /invoices 加金额校验：amount 必须是正整数（分），否则返回 400。
+context:
+  repo_fixture: evals/fixtures/billing-svc
+  git:
+    init: true
+    checkout: main
+judge:
+  type: rule_based
+  success:
+    - exit_code: 0

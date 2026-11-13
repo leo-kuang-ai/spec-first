@@ -1,0 +1,18 @@
+{
+  "schema_version": "spec-test-browser-run-context/v1",
+  "status": "prepared",
+  "run_dir": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-rcql_n2n/positive",
+  "raw_dir": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-rcql_n2n/positive/raw",
+  "screenshot_dir": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-rcql_n2n/positive/screenshots",
+  "test_plan_path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-rcql_n2n/positive/test-plan.json",
+  "test_plan_sha256": "sha256:fbbaa587b3fbd58a42131a8086e9604b13f100501ee03e1b55f991e9778b0f4b",
+  "config_path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-rcql_n2n/positive/agent-browser-config.json",
+  "action_policy_path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-rcql_n2n/positive/action-policy.json",
+  "target_origin": "http://127.0.0.1:64973",
+  "allowed_domain": "127.0.0.1",
+  "session": "sfb-507477b75cfb522c",
+  "namespace": "sfb-507477b75cfb522c",
+  "synthetic_seed": "507477b75cfb522c",
+  "exact_origin_capability": "unconfirmed",
+  "profile_state_login": "not_supported"
+}

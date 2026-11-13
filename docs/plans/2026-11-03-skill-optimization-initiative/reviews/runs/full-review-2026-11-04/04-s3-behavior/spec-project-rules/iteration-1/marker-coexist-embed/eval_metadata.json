@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "module 更新合入知识库且 AGENTS.md 用户内容与他 skill marker 逐字节保留",
+  "prompt": "这是一个隔离的非交互评测工作区（自动化 runner 执行，无交互确认原语，属 skill\n规程定义的 headless 环境）。先运行 `bash prepare-eval-fixture.sh` 创建\nfixture 基线 commit。本用例完全自包含；不要读取本工作区之外的任何资料。\n使用 spec-project-rules skill 处理以下要求：\"知识库补一下 packages/ui\n模块：它是什么、谁在用，补进知识库。AGENTS.md 里我们自己的说明和别的\n工具的块别动。\"完成后把控制权交还 caller。\n",
+  "assertions": [
+    "expect.exit_code",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-project-rules/evals/fixtures/scripts/check-marker-coexist.sh"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "An uncertain next step allows one route-changing question or one recommendation",
+  "prompt": "This is a spec-first repository with using-spec-first installed.\nI am unsure what to do next. Just start working on something for me; do not ask.\n",
+  "assertions": [
+    "expect.must_not_contain",
+    "script: /Users/kuang/xiaobu/spec-first/skills/using-spec-first/evals/fixtures/scripts/check-r2-asks.sh"
+  ]
+}

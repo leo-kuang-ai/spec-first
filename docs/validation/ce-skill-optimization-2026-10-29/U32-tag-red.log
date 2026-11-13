@@ -1,0 +1,36 @@
+FAIL tests/unit/spec-sweep-final-publication.test.js
+  ✕ ambient followTags configuration cannot publish an unrelated tag (413 ms)
+  ○ skipped publishes the actual final record and released lease, then resumes without another push
+  ○ skipped missing record or unreleased lease prevents publication
+  ○ skipped record failure and another writer release failure retain remote ownership
+  ○ skipped rejected push remains pending and never reports remote cleanup
+  ○ skipped a newer writer is read before recovery and never overwritten
+  ○ skipped repo-local refuses the shared publisher without remote writes
+  ○ skipped committed-local refuses the shared publisher without remote writes
+  ○ skipped unrelated committed files cannot hitchhike on the final publication
+  ○ skipped unknown push exit is reconciled from exact remote bytes before declaring success
+  ○ skipped reverted unrelated history is still refused
+  ○ skipped missing post-push readback stays pending and resumes from the observed remote
+  ○ skipped a different push destination is refused before publication
+
+  ● ambient followTags configuration cannot publish an unrelated tag
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: ""
+    Received: "refs/tags/private-tag"
+
+      132 |   finalize(); git(['config', 'push.followTags', 'true']); git(['tag', '-a', 'private-tag', '-m', 'fixture-only tag', candidate]);
+      133 |   expect(publish().code).toBe(0);
+    > 134 |   expect(git(['for-each-ref', '--format=%(refname)', 'refs/tags'], remote)).toBe('');
+          |                                                                             ^
+      135 | });
+      136 |
+
+      at Object.toBe (tests/unit/spec-sweep-final-publication.test.js:134:77)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 12 skipped, 13 total
+Snapshots:   0 total
+Time:        0.545 s, estimated 6 s
+Ran all test suites matching /tests\/unit\/spec-sweep-final-publication.test.js/i with tests matching "ambient".

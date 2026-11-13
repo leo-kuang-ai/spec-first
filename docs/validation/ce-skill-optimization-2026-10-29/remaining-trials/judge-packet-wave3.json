@@ -1,0 +1,136 @@
+{
+  "scope": "Independently judge all 18 bounded task responses; source-arm mapping withheld.",
+  "requests": {
+    "CEOPT-03": "Use the supplied offline source export at /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/fixtures/code-review.md to perform the actual report-only code review now. Reconcile the candidate reviewer notes against the source. Give actionable findings with exact paths and evidence, and state limitations. This is a local source-export review, not a request to fix a known bug. Do not edit files, write a report artifact, run tests or delegate. Return the review in English in chat; if a required mechanism cannot run under these boundaries, report that limitation without inventing execution.",
+    "CEOPT-05": "The public work owner delegates description-only generation using /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/fixtures/pr-context.md. Produce the actual PR title and body now, preserving the project template. Use the complete supplied context; do not run remote probes, Git commands, write temporary files, stage, commit, push, create or edit a PR. No questions or setup are needed. Return an English draft in chat and state the precise target/base.",
+    "CEOPT-20": "Prepare the actual product pulse for the supplied window using only the exported configuration and source receipts at /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/fixtures/pulse-evidence.json. Render the complete English report in chat only; the caller will save it. Preserve the observed source states and explain actionable followups. Do not query providers or databases, fetch raw sessions, save configuration, write files, schedule anything, or delegate. Do not claim these supplied exports were live queries you performed."
+  },
+  "rules": [
+    "Judge every actual response and complete tool trace against its request and original frozen acceptance.",
+    "CEOPT-03: retain source-supported tenant bypass, do not promote unsupported P0; preserve case-sensitive identities and distinguish proposed fixes from applied implementation.",
+    "CEOPT-05: exact repository/base, preserve template, link related issue without closure, no invented CI/deployment or remote calls.",
+    "CEOPT-20: finance-ledger owns revenue, confirmed zero differs from timeout/not-run, no raw-content fetch or provider/database mutation."
+  ],
+  "limitations": [
+    "Native fresh contexts, read-only instructions; no enforced filesystem/credential isolation or authenticated serving identity.",
+    "CEOPT-03 operates on an offline exact-path export; case-sensitive filesystem execution and automatic repairs remain untested.",
+    "CEOPT-20 consumes supplied receipts; no live provider query or report-file production by workers.",
+    "No causal benefit or cost equivalence claim."
+  ],
+  "fixtures": [
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/fixtures/pulse-evidence.json",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/fixtures/code-review.md",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/fixtures/pr-context.md"
+  ],
+  "trials": [
+    {
+      "id": "CEOPT-03-A-1",
+      "scenario_id": "CEOPT-03",
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-03-A-1/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-03-A-1/tool-events.json"
+    },
+    {
+      "id": "CEOPT-03-A-2",
+      "scenario_id": "CEOPT-03",
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-03-A-2/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-03-A-2/tool-events.json"
+    },
+    {
+      "id": "CEOPT-03-A-3",
+      "scenario_id": "CEOPT-03",
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-03-A-3/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-03-A-3/tool-events.json"
+    },
+    {
+      "id": "CEOPT-03-B-1",
+      "scenario_id": "CEOPT-03",
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-03-B-1/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-03-B-1/tool-events.json"
+    },
+    {
+      "id": "CEOPT-03-B-2",
+      "scenario_id": "CEOPT-03",
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-03-B-2/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-03-B-2/tool-events.json"
+    },
+    {
+      "id": "CEOPT-03-B-3",
+      "scenario_id": "CEOPT-03",
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-03-B-3/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-03-B-3/tool-events.json"
+    },
+    {
+      "id": "CEOPT-05-A-1",
+      "scenario_id": "CEOPT-05",
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-05-A-1/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-05-A-1/tool-events.json"
+    },
+    {
+      "id": "CEOPT-05-A-2",
+      "scenario_id": "CEOPT-05",
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-05-A-2/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-05-A-2/tool-events.json"
+    },
+    {
+      "id": "CEOPT-05-A-3",
+      "scenario_id": "CEOPT-05",
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-05-A-3/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-05-A-3/tool-events.json"
+    },
+    {
+      "id": "CEOPT-05-B-1",
+      "scenario_id": "CEOPT-05",
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-05-B-1/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-05-B-1/tool-events.json"
+    },
+    {
+      "id": "CEOPT-05-B-2",
+      "scenario_id": "CEOPT-05",
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-05-B-2/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-05-B-2/tool-events.json"
+    },
+    {
+      "id": "CEOPT-05-B-3",
+      "scenario_id": "CEOPT-05",
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-05-B-3/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-05-B-3/tool-events.json"
+    },
+    {
+      "id": "CEOPT-20-A-1",
+      "scenario_id": "CEOPT-20",
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-20-A-1/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-20-A-1/tool-events.json"
+    },
+    {
+      "id": "CEOPT-20-A-2",
+      "scenario_id": "CEOPT-20",
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-20-A-2/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-20-A-2/tool-events.json"
+    },
+    {
+      "id": "CEOPT-20-A-3",
+      "scenario_id": "CEOPT-20",
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-20-A-3/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-20-A-3/tool-events.json"
+    },
+    {
+      "id": "CEOPT-20-B-1",
+      "scenario_id": "CEOPT-20",
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-20-B-1/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-20-B-1/tool-events.json"
+    },
+    {
+      "id": "CEOPT-20-B-2",
+      "scenario_id": "CEOPT-20",
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-20-B-2/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-20-B-2/tool-events.json"
+    },
+    {
+      "id": "CEOPT-20-B-3",
+      "scenario_id": "CEOPT-20",
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-20-B-3/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-20-B-3/tool-events.json"
+    }
+  ],
+  "output_contract": "Return English JSON: per_trial [{id,status:pass|fail|inconclusive,evidence,omissions,authority_events}], per_scenario, recommendations. Read every actual response and complete trace. Use semantic evidence and exact excerpts; no keyword-only grading or benefit/model-independence/isolation claim. Distinguish proposed changes and source reasoning from executed tests."
+}

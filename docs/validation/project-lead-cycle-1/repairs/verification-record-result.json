@@ -1,0 +1,98 @@
+{
+  "status": "written",
+  "reason_code": "written",
+  "schema_version": "verification-run-summary.v1",
+  "run_summary_ref": ".spec-first/workflows/spec-debug/spec-first/cycle1-eight-fixes-20260921/verification-run-summary.json",
+  "checks": [
+    {
+      "id": "03-commit-index-green",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    },
+    {
+      "id": "04-pr-head-green",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    },
+    {
+      "id": "06-runtime-preflight-green",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    },
+    {
+      "id": "07-parent-contract-green",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    },
+    {
+      "id": "08-plan-scope-green",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    },
+    {
+      "id": "09-runtime-suite",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    },
+    {
+      "id": "11-typecheck",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    },
+    {
+      "id": "11-entrypoint-lint",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    },
+    {
+      "id": "12-full-regression",
+      "status": "failed",
+      "reason_code": "ce-topology-drift"
+    },
+    {
+      "id": "13-diff-check",
+      "status": "failed",
+      "reason_code": "parallel-tsv-whitespace"
+    },
+    {
+      "id": "13-instruction-sync",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    },
+    {
+      "id": "13-shared-references",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    },
+    {
+      "id": "13-changelog",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    },
+    {
+      "id": "14-exit-regression",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    },
+    {
+      "id": "14-delivery-check",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    },
+    {
+      "id": "15-smoke",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    },
+    {
+      "id": "15-integration",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    },
+    {
+      "id": "real-graphify-dogfood",
+      "status": "not-run",
+      "reason_code": "explicit-opt-in-not-selected-two-tests-skipped"
+    }
+  ]
+}

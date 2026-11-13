@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-debug",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T12:57:05.157826+08:00",
+  "end_time": "2026-11-05T12:58:59.409221+08:00",
+  "case_results": [
+    {
+      "case_id": "prior-attempt-asks-first",
+      "title": "Ask for prior attempts before starting a new investigation",
+      "status": "PASS",
+      "duration_ms": 113831,
+      "turns": 9,
+      "input_tokens": 33414,
+      "output_tokens": 1607,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 9,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-debug/evals/fixtures/scripts/check-prior-attempt-ask.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "Use the installed spec-debug skill. The service will not start. I have tried several fixes without success. Help me diagnose it.\n",
+      "response": "诊断完成,证据链闭环。以下是结构化结论:\n\n## Debug Summary\n\n**Problem**: mini-ledger 服务无法启动(`npm start` 报错退出),但换任何方式修代码、修环境都无效。\n\n**Root Cause**(完整因果链,已通过运行时复现验证):\n\n1. **触发点**:你用 `npm start` 启动服务(Node 项目的标准启动方式)。\n2. **缺陷位置** `package.json:1-6`:整个文件只有 `name`/`version`/`private`/`main` 四个字段,**没有 `scripts` 字段,即没有定义 `start` 脚本**。\n3. **失败机制**:npm 11.16.0 在没有 `start` 脚本时直接报 `Missing script: \"start\"` 并以退出码 1 终止(旧版 npm 会回退执行 `node server.js`,但新版不再回退)。服务进程从未被拉起。\n4. **症状**:\"service will not start\"。\n\n**关键证据**(为什么之前修不好):服务代码本身是健康的——\n\n- `node src/server.js` 直接启动完全正常:`GET /entries` 返回 `[]`,POST 一条 `{\"amount\":12.5,\"note\":\"coffee\"}` 后正确返回 `[{\"id\":1,...}]`(完整读写回路验证通过);\n- 端口 3000 空闲、Node v22.22.3、零第三方依赖、无构建产物、无环境变量要求——**所有这些方向都不存在问题**。\n\n这就是\"试了几个修复都没用\"的原因:代码没病,病在 `package.json` 缺了启动脚本接线。**任何针对源码、端口、依赖的修复都不可能生效。**\n\n**Fix**(一行,未实施——你只要求诊断):在 `package.json` 加入:\n```json\n\"scripts\": { \"start\": \"node src/server.js\" }\n```\n\n**Recommended Tests**: 修复后运行 `npm start` 并 curl `http://127.0.0.1:3000/entries` 应返回 `[]`(本次诊断已直接验证该端点的正常行为基线)。\n\n**verification_run_summary_ref**: null(仅诊断,无修复后验证)\n**honest_closeout_verdict**: not-run(diagnosis-only)\n**claim_limitations**: ① 仍待你回答:**之前试过的\"几个修复\"具体是哪些?**——若你实际不是用 `npm start` 启动,请告诉我你的确切启动命令,我会修正诊断;② 本环境无 `.spec-first` 工具,证据以命令输出形式呈现于上。\n**Confidence**: High\n\n如果需要,我可以现在就把这一行修复应用上去并验证 `npm start` 能正常拉起服务——说一声即可。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 35021,
+  "judge_tokens": 0,
+  "overall_tokens": 35021
+}

@@ -1,0 +1,18 @@
+Overall disposition: **FAIL for the supplied A control cases**. The historical actual-browser positive remains a bounded PASS and does not establish an A producer run. This trial performed file reads only; all supplied execution evidence is parent-operated.
+
+Evidence paths below are relative to `docs/validation/ce-skill-optimization-2026-10-29/`.
+
+| Case | Disposition | Exact evidence and interpretation |
+|---|---|---|
+| A vitals-before-open | **FAIL** | `remaining-27-acceptance/wave5/browser-order-A-receipt.json`, `input.steps[0].action="vitals"` followed by `open`, but `actual_validation.ok=true`. The invalid order was accepted. Actual browser execution: **NOT RUN**, explicitly stated by the receipt. |
+| A close0 | **PASS, limited** | `remaining-27-acceptance/wave5/browser-cleanup-A-receipts.json`, `cases[0]`: injected close exit 0, producer exit 0, reported conformance `passed`, zero blocked-origin hits. `diagnostic_root_retained_by_producer=false` and `retained_json_evidence={}`. This supports the successful fake-browser control only; close-result reporting itself is absent. |
+| A close9 | **FAIL** | Same file, `cases[1]`: injected close exit 9 still yields producer exit 0 and conformance `passed`. Cleanup failure is concealed; no retained producer diagnostic root or JSON evidence exists. Navigation-control success cannot override this cleanup failure. |
+| Historical invalid-order preparation | **PASS, limited** | `remaining-trials/browser-policy-successor/browser-local-receipt.json`, `calls[label="reject-vitals-first-prepare"].exit_code=1`. The summarized rejection is present; its detailed result was not supplied for reading. |
+| Historical actual-browser positive | **PASS, bounded** | `remaining-trials/browser-policy-successor/browser-positive-run.json`: `status="completed"`, six action processes, all six steps passed: `open`, `vitals`, `get`, `get`, `viewport`, `network-metadata`. This is shared historical **B-produced execution**, not A execution. |
+| Historical browser cleanup | **PASS** | `remaining-trials/browser-policy-successor/browser-positive-cleanup.json`: `status="completed"`, `reason_code=null`. The local receipt separately reports server and scratch cleanup completed. |
+
+For **each** A close0 and close9 fixture, the supplied producer reports these nine conformance cases passed: initial-open-and-frame, same-origin-redirect, cross-origin-redirect, same-origin-link, cross-origin-link, cross-origin-form, cross-origin-script, cross-origin-popup, and cross-origin-direct-open. Negative actions retain `ERR_BLOCKED_BY_CLIENT`, exit 1, and zero prohibited-origin hits. These are fake-browser fixture observations; they do not establish actual browser enforcement or a real browser crash.
+
+Historical positive diagnostics retain six `steps[].raw_output_path` pointers under `/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-aa03q1q6/positive/raw/step-001.json` through `step-006.json`. Their contents and continued availability were not checked; the parent receipt says scratch cleanup completed. In the A cleanup fixtures, the parent’s archive-before-removal statement does not supply missing producer-retained diagnostics.
+
+The frozen A Skill requires an initial `open`, independent cleanup reporting, and preservation of cleanup blockers. Remaining facets are **NOT RUN or unestablished here**: an A actual-browser positive, real-browser close failure, application route coverage, visual correctness, accessibility, console-error attribution, human-only flows, semantic mutation authorization, and full model-workflow behavior. The appropriate follow-up owner is `spec-debug`; this read-only assessment made no repairs or execution attempts.

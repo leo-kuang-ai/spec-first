@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-compound-refresh",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T21:31:17.406738+08:00",
+  "end_time": "2026-11-04T21:33:09.443623+08:00",
+  "case_results": [
+    {
+      "case_id": "publication-partial",
+      "title": "部分发布不能被完整的成功报告掩盖",
+      "status": "PASS",
+      "duration_ms": 111407,
+      "turns": 2,
+      "input_tokens": 40161,
+      "output_tokens": 2113,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 2,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound-refresh/evals/fixtures/scripts/check-publication-partial.sh",
+            "passed": true,
+            "evidence": "PASS: 固定fixture的原件、引用、恢复与报告一致；非模型行为或通用语义证明"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "先运行 node prepare-eval.cjs，为隔离评测创建基线；这不授权任务提交。\n用 spec-compound-refresh 核对 README.md 所述的先前部分发布现场。\n本轮只读，不继续发布或删除；检查 catalog 当前人工条目与 old/new 内容。\n最终仅返回 JSON：status、published_before_run、changed、deleted、pending。\n路径均为仓库相对路径；changed/deleted只记本轮，pending记尚未完成替换的catalog修复和旧件删除。\n",
+      "response": "调查完成，证据已闭环。核对结果：先前一轮是未完成的 Replace 组发布——new.md 写入成功但未覆盖 old.md 独有的“离线恢复”内容（`src/auth.js` 的 `keepOfflineBackup: true` 证明该指导仍然现行）；catalog 写入失败，其 `old.md#离线恢复` 实质引用今日仍可解析且指向唯一内容来源，其中用户手工值班条目完好；old.md 删除被前置失败正确阻断。本轮只读，无任何 durable 写入（工作树相对基线无内容变更，基线提交属评测装置准备）。\n\n```json\n{\n  \"status\": \"partial\",\n  \"published_before_run\": [\"docs/solutions/new.md\"],\n  \"changed\": [],\n  \"deleted\": [],\n  \"pending\": [\"docs/solutions/catalog.md\", \"docs/solutions/old.md\"]\n}\n```",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 42274,
+  "judge_tokens": 0,
+  "overall_tokens": 42274
+}

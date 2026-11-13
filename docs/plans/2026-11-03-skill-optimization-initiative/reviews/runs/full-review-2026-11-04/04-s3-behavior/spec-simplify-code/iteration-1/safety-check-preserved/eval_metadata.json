@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "Simplification preserves invalid-input and valid-entry behavior",
+  "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nThat preparation alone may create the baseline commit; no task commit or landing is authorized.\nRun `npm test` and retain the actual result as proof context. Then use\nspec-simplify-code with proof-test:test/entries.test.cjs to simplify src/server.js.\nThe proof test and its test-only seam test/support/ledger-proof.cjs must remain\nbyte-identical. Production parsing may move to a helper if behavior stays equal.\nReturn the protected paths, observed commands and any limitations. Re-run the\noriginal proof after cleanup; no earlier result proves the final tree.\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-simplify-code/evals/fixtures/scripts/check-safety-preserved.sh"
+  ]
+}

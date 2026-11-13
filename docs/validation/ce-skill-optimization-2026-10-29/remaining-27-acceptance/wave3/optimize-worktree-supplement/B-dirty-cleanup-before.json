@@ -1,0 +1,13 @@
+{
+  "exists": true,
+  "files": {
+    "untracked.txt": "617a24e606057331e56f013c622c84861f3e63087839e59cbe91692de761a1f6",
+    "tracked.txt": "7be5ee1826f3fba9ac97167030fada449112a8dec899e686b8804dd5600cc7ea",
+    ".gitignore": "ea710370b5c64e3402a7a38e6a22537c2473d880527d0e6413f9e05b2dc0f5ca",
+    ".ignored-cache": "1f5269120518ae2f72aba8aaf3558b54bcfb14fbfc9e9e7cfc5e1d307f7effaf",
+    ".git": "a15bbffc66084367c90df1dda8f737fd96d48e5fb7c9e75c596d3f82b7dc286e"
+  },
+  "head": "7d9ae92d5dc1d78eea683f0412efce2467aa75a5",
+  "index": "100644 48873d3358620b0c7f0cb85b51ce9bf82029a1cf 0\t.gitignore\n100644 a32c4096f07db1b496f675bfa6d2307774110b02 0\ttracked.txt\n",
+  "root_head": "7d9ae92d5dc1d78eea683f0412efce2467aa75a5"
+}

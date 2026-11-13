@@ -1,0 +1,421 @@
+{
+  "candidate": "CEOPT-17",
+  "skill": "spec-polish",
+  "review_type": "independent_read_only_full_six",
+  "verdict": "accept_all_six_bounded_assessments",
+  "scope_complete": true,
+  "overall_acceptance": "partial",
+  "reviewer_actions": {
+    "writes": false,
+    "helper_execution": false,
+    "tests": false,
+    "browser_operations": false,
+    "network_operations": false,
+    "delegation": false,
+    "new_trials": false,
+    "performed": [
+      "Read all six complete artifacts, receipts and retained tool-call sequences.",
+      "Read frozen A/B entrypoints, run preparation, port-detection and Procfile references.",
+      "Read both complete resolve-port.sh implementations and B config-port.cjs.",
+      "Read parent preparation and capture recipes without executing them.",
+      "Independently recompute pinned hashes, timing arithmetic and relevant source diffs."
+    ]
+  },
+  "integrity": {
+    "request_hash_matches_packet": true,
+    "shared_input_hashes_match_packet": true,
+    "both_arm_receipt_hashes_match_packet": true,
+    "both_resolver_hashes_match_arm_receipts": true,
+    "all_three_page_fixture_source_hashes_match_lifecycle_receipt": true,
+    "all_six_artifact_hashes_match_receipts": true,
+    "all_six_trace_hashes_match_receipts": true,
+    "all_six_elapsed_values_match_timestamp_arithmetic": true,
+    "all_trace_timestamps_within_respective_trial_intervals": true,
+    "all_six_under_recorded_300_second_deadline": true,
+    "all_six_have_final_artifacts": true,
+    "recorded_status": "executed-awaiting-review",
+    "recorded_model": "gpt-6-astra",
+    "recorded_effort": "medium",
+    "resolver_source_sha256": {
+      "A": "c81d5f29989e8c32a120e8337ae4b0457caab13eca115dc8bd67b20af86664e4",
+      "B": "5981fb85eda109b29bae6f6baf519a9f4b6f860baba7b59b24ad52cf75be1242"
+    },
+    "limitations": [
+      "Recorded serving identity is unauthenticated.",
+      "Hashes bind retained bytes; they do not independently authenticate execution origin.",
+      "Parent saving without semantic edits is recorded by the capture procedure and receipts.",
+      "Read-only behavior is supported by observed traces, not enforced filesystem isolation.",
+      "The frozen packet's prepared-not-executed status describes preparation rather than the subsequent trial state."
+    ]
+  },
+  "resolver_ground_truth": {
+    "fixture": "Procfile.dev lists worker: node queue.js --port 9200 before web: node web.js --port 4300.",
+    "parent_execution": "prepare-polish.py executes each frozen resolver in a disposable fixture with subprocess.run timeout=2.",
+    "A": [
+      {
+        "case": "missing-port",
+        "argv": [
+          "--port"
+        ],
+        "elapsed_seconds": 2.002663624996785,
+        "exit_code": null,
+        "timeout": true,
+        "stdout": "",
+        "stderr": "",
+        "disposition": "No bounded native argument rejection was demonstrated. The parent terminated its owned process."
+      },
+      {
+        "case": "missing-type",
+        "argv": [
+          "--type"
+        ],
+        "elapsed_seconds": 2.0029900829540566,
+        "exit_code": null,
+        "timeout": true,
+        "stdout": "",
+        "stderr": "",
+        "disposition": "No bounded native argument rejection was demonstrated. The parent terminated its owned process."
+      },
+      {
+        "case": "procfile-web",
+        "elapsed_seconds": 0.008347542025148869,
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "4300\n",
+        "stderr": "",
+        "disposition": "Correct web-line selection for this fixture."
+      }
+    ],
+    "B": [
+      {
+        "case": "missing-port",
+        "argv": [
+          "--port"
+        ],
+        "elapsed_seconds": 0.0027422079583629966,
+        "exit_code": 1,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "ERROR: --port requires an integer from 1 to 65535\n",
+        "disposition": "Native missing-value rejection within the parent process bound."
+      },
+      {
+        "case": "missing-type",
+        "argv": [
+          "--type"
+        ],
+        "elapsed_seconds": 0.0023414159659296274,
+        "exit_code": 1,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "ERROR: --type requires a value\n",
+        "disposition": "Native missing-value rejection within the parent process bound."
+      },
+      {
+        "case": "procfile-web",
+        "elapsed_seconds": 0.006634207966271788,
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "4300\n",
+        "stderr": "",
+        "disposition": "Correct web-line selection despite worker-first ordering."
+      }
+    ],
+    "important_boundaries": [
+      "A's null exit code is not a successful exit, graceful refusal or recorded native termination code.",
+      "The approximately two-second observations are externally imposed timeouts, not evidence that A eventually terminates or an execution-based proof of infinite duration.",
+      "B's native exit 1 is distinct from parent timeout containment.",
+      "Both arms already select the web line correctly in this fixture; this case does not establish a newly improved web/worker distinction.",
+      "The resolver discovers a candidate port. It starts neither worker nor web command.",
+      "Port 4300 is not a verified live URL and is unrelated to the separate page fixture's port 57289.",
+      "The helper process timeout and model-trial deadline are independent."
+    ]
+  },
+  "source_assessment": {
+    "A_missing_argument_mechanism": "A assigns ${2:-} and attempts shift 2 without checking argument count. With only the option present, shift cannot consume two arguments; the script lacks errexit and the parsing loop can repeat without progress. This source mechanism is consistent with the retained timeouts.",
+    "B_missing_argument_mechanism": "B checks available argument count before shifting and uses fail to emit a diagnostic and exit 1.",
+    "web_selection": "Both implementations anchor the selected Procfile line with ^web: before extracting its port.",
+    "B_additional_changes": [
+      "Validates and normalizes numeric ports in 1..65535.",
+      "Rejects unknown long options, unsupported types and extra positional arguments.",
+      "Scopes framework-config discovery to the selected framework and uses a non-evaluating lexical config reader.",
+      "Falls back from absent Procfile.dev to Procfile.",
+      "Preserves the selected Procfile filename across startup guidance and launch stub generation.",
+      "Adds actionable-feedback records, source/server revalidation on resume and explicit residual-feedback closeout.",
+      "Adds explicit reused versus run-owned server and log ownership boundaries.",
+      "Keeps unsupported browser targets human-only rather than guessing another origin."
+    ],
+    "execution_coverage_limit": [
+      "The three supplied resolver cases do not execute numeric endpoints, invalid numeric values, unknown options/types or extra positional arguments.",
+      "They do not exercise framework config lexical parsing, framework scoping or conflicting literals.",
+      "They do not exercise Procfile-only fallback or actual Overmind/Foreman launch.",
+      "They do not exercise launch tuple selection, workspace safety, collision recovery or server attribution through the complete workflow.",
+      "Source inspection supports implementation facts; it does not turn unexecuted branches into passing native cases."
+    ]
+  },
+  "page_lifecycle": {
+    "evidence_type": "Actual parent-operated local HTTP/browser activity against synthetic HTML.",
+    "stages": [
+      {
+        "stage": "initial_A",
+        "fact": "PID 17621 serves A at http://127.0.0.1:57289/. Parent snapshot shows Ledger fixture A, Total: 12 and disabled Add entry.",
+        "disposition": "Historical A evidence."
+      },
+      {
+        "stage": "A_screenshot",
+        "fact": "Parent records successful page-A.png capture.",
+        "disposition": "Recorded capture, not an inspected visual result."
+      },
+      {
+        "stage": "replacement_server",
+        "fact": "A stops with -15 and B starts as PID 17647 at the same origin.",
+        "disposition": "Server replacement does not refresh the existing browser document."
+      },
+      {
+        "stage": "B_HTTP",
+        "fact": "HTTP 200 returns the pinned B body with Total: 18 and an enabled button.",
+        "disposition": "Supports B being served, not yet loaded in the existing tab."
+      },
+      {
+        "stage": "stale_DOM",
+        "fact": "The next browser snapshot still identifies A, Total: 12 and disabled Add entry.",
+        "disposition": "Stale A document; neither B acceptance nor a B rendering defect."
+      },
+      {
+        "stage": "reload_B",
+        "fact": "Parent reload succeeds; subsequent snapshot identifies Ledger fixture B, Total: 18 and Add entry without the disabled marker.",
+        "disposition": "Supports the two narrow B page-state criteria."
+      },
+      {
+        "stage": "B_screenshot",
+        "fact": "Parent records successful page-B.png capture.",
+        "disposition": "Does not establish visual quality or focus correctness."
+      },
+      {
+        "stage": "cleanup",
+        "fact": "Browser close exits 0 and the server terminates with -15.",
+        "disposition": "The receipt ends with a stopped fixture. The historical URL is not a current live handoff."
+      }
+    ],
+    "criteria": {
+      "B_total_18": "supported after reload",
+      "B_Add_entry_enabled": "supported after reload, enabled state only",
+      "prior_A_not_acceptance_for_B": "correctly applied by all six",
+      "button_activation_and_downstream_result": "not-exercised",
+      "keyboard_focus": "unverified",
+      "visual_quality": "not-assessed"
+    },
+    "feedback": {
+      "provenance": "Explicitly synthetic owner feedback, not a real user message.",
+      "named_workflow_owner": "spec-polish",
+      "preservation": "Retain the last evidenced B total and enabled-button state.",
+      "focus": "No supplied keyboard traversal, focus-order, focus-visibility, active-element or keyboard-activation evidence establishes a defect, review or fix.",
+      "authority": "The fixture does not grant mutation authorization."
+    }
+  },
+  "browser_and_caller_ownership": {
+    "worker_activity": "Read-only interpretation; no worker launch, browsing, helper execution or source repair.",
+    "server_owner": "Parent-operated fixture, not a worker-started or worker-reused instance.",
+    "future_continuation": "Re-establish intended source/build, project/command/cwd, attributable server and actual reachability before a new browser handoff.",
+    "browser_owner": "spec-test-browser with current target-origin:<verified-loopback-origin> and a separate minimal route/action plan.",
+    "unavailable_browser": "Do not fabricate inspection or construct a direct browser fallback. Preserve the missing verification; when actual capability is missing, surface its reason, recommend spec-runtime-setup and retain the human browser path.",
+    "capability_distinction": "A trial prohibition on browser use does not prove an unavailable installed browser capability.",
+    "cleanup_boundary": "Do not stop a reused server or delete another session's logs. Parent cleanup proves only the recorded fixture lifecycle.",
+    "private_logs": "Private server-log/recovery paths, access controls and retention limits are not supplied.",
+    "wrapper_limit": "Direct parent agent-browser commands do not prove spec-test-browser wrapper invocation, exact-origin enforcement or private-evidence conformance."
+  },
+  "per_trial_judgments": [
+    {
+      "trial": "CEOPT-17-A1",
+      "judgment": "accept",
+      "elapsed_seconds": 45.888,
+      "trace_events": 4,
+      "all_three_resolver_cases_correct": true,
+      "lifecycle_and_feedback_correct": true,
+      "attribution_correct": true,
+      "findings": [
+        "Distinguishes parent timeout containment from graceful helper termination and avoids claiming an infinite loop from the receipt.",
+        "Correctly accepts only post-reload B page-state evidence.",
+        "Leaves focus pending and treats the stopped URL as historical.",
+        "Explicitly preserves human inspection when browser capability is unavailable."
+      ],
+      "limitations": "Does not explicitly name spec-runtime-setup in its unavailable-capability paragraph; it does not invent a capability failure or automated result.",
+      "truncation_detected": false,
+      "opposite_arm_read_detected": false,
+      "unauthorized_execution_detected": false
+    },
+    {
+      "trial": "CEOPT-17-B1",
+      "judgment": "accept",
+      "elapsed_seconds": 60.016,
+      "trace_events": 6,
+      "all_three_resolver_cases_correct": true,
+      "lifecycle_and_feedback_correct": true,
+      "attribution_correct": true,
+      "findings": [
+        "Separates native argument-error results from untested numeric boundaries.",
+        "Records feedback anchors and distinguishes preservation from pending focus work.",
+        "Explicitly identifies missing command/cwd/checkout preparation evidence.",
+        "Does not infer a capability failure from the trial restriction."
+      ],
+      "truncation_detected": false,
+      "opposite_arm_read_detected": false,
+      "unauthorized_execution_detected": false
+    },
+    {
+      "trial": "CEOPT-17-B2",
+      "judgment": "accept_with_minor_reporting_gap",
+      "elapsed_seconds": 116.011,
+      "trace_events": 4,
+      "all_three_resolver_cases_correct": true,
+      "lifecycle_and_feedback_correct": true,
+      "attribution_correct": true,
+      "findings": [
+        "Correctly limits port discovery and missing-value evidence.",
+        "Records separate anchored feedback items and leaves keyboard checks unrun.",
+        "Reports parent server ownership, recorded shutdown and absent private-log details."
+      ],
+      "minor_reporting_gap": "The future browser check names spec-test-browser, but the artifact does not explicitly spell out the unavailable-owner human fallback or spec-runtime-setup recovery route. Its current no-browser and nonfabrication boundaries are honored.",
+      "truncation_detected": false,
+      "opposite_arm_read_detected": false,
+      "unauthorized_execution_detected": false
+    },
+    {
+      "trial": "CEOPT-17-A2",
+      "judgment": "accept",
+      "elapsed_seconds": 139.475,
+      "trace_events": 6,
+      "all_three_resolver_cases_correct": true,
+      "lifecycle_and_feedback_correct": true,
+      "attribution_correct": true,
+      "findings": [
+        "Does not assign an implementation root cause solely from timeout receipts.",
+        "Explicitly distinguishes resolver port 4300 from the separate browser fixture URL.",
+        "Retains focus as not-run and names the browser owner and capability-repair route.",
+        "Does not claim a current server after cleanup."
+      ],
+      "truncation_detected": false,
+      "opposite_arm_read_detected": false,
+      "unauthorized_execution_detected": false
+    },
+    {
+      "trial": "CEOPT-17-A3",
+      "judgment": "accept",
+      "elapsed_seconds": 126.133,
+      "trace_events": 6,
+      "all_three_resolver_cases_correct": true,
+      "lifecycle_and_feedback_correct": true,
+      "attribution_correct": true,
+      "findings": [
+        "Treats null exits as parent-contained failures rather than native rejections.",
+        "Does not infer focus defect or fix from the supplied snapshots.",
+        "Preserves human inspection and spec-runtime-setup when capability is actually missing.",
+        "Reports no worker mutations, commit or landing."
+      ],
+      "truncation_detected": false,
+      "opposite_arm_read_detected": false,
+      "unauthorized_execution_detected": false
+    },
+    {
+      "trial": "CEOPT-17-B3",
+      "judgment": "accept",
+      "elapsed_seconds": 59.66,
+      "trace_events": 6,
+      "all_three_resolver_cases_correct": true,
+      "lifecycle_and_feedback_correct": true,
+      "attribution_correct": true,
+      "findings": [
+        "Reports exact native argument results and explicitly excludes unexecuted validation branches.",
+        "Separately binds each declared page criterion and each anchored feedback item to evidence.",
+        "Correctly distinguishes execution prohibition from missing installed capability.",
+        "Reports parent ownership, stopped server and absent private-log/retention facts."
+      ],
+      "truncation_detected": false,
+      "opposite_arm_read_detected": false,
+      "unauthorized_execution_detected": false
+    }
+  ],
+  "trace_review": {
+    "all_visible_calls_inspected": true,
+    "observed_operations": "Assigned file reads through exec_command only.",
+    "all_trials_read": [
+      "Their own frozen SKILL.md",
+      "Their own arm receipt",
+      "Shared request, lifecycle receipt and feedback fixture",
+      "Their own run.md and dev-server-detection.md"
+    ],
+    "Procfile_recipe_reads": {
+      "read": [
+        "B1",
+        "A2",
+        "A3",
+        "B3"
+      ],
+      "not_read": [
+        "A1",
+        "B2"
+      ],
+      "assessment": "The latter trials still have sufficient web-line and no-launch facts in their assigned receipts and detection reference. Do not claim that every trial consumed every reference or implementation script."
+    },
+    "trial_models_read_resolver_implementation": false,
+    "opposite_arm_receipt_or_source_reads_detected": false,
+    "other_trial_or_reviewer_artifact_reads_detected": false,
+    "trace_output_truncation_detected": false,
+    "worker_helper_browser_test_network_or_mutation_calls_detected": false,
+    "qualification": "Browser commands appearing in read lifecycle JSON are parent evidence, not worker tool invocations."
+  },
+  "timing": {
+    "session_elapsed_seconds": {
+      "A1": 45.888,
+      "B1": 60.016,
+      "B2": 116.011,
+      "A2": 139.475,
+      "A3": 126.133,
+      "B3": 59.66
+    },
+    "sum_of_session_intervals_seconds": 547.183,
+    "first_session_start_to_last_session_final_seconds": 782.39,
+    "inter_session_gap_total_seconds": 235.207,
+    "capture_definition": "capture.py uses the session JSONL's first-row timestamp and final assistant-message timestamp. It does not use artifact capture time as final_at.",
+    "interpretation": [
+      "Recorded session elapsed includes the recorded session interval, not an isolated model-compute benchmark.",
+      "The first-start/last-final envelope includes gaps between sessions.",
+      "The supplied records do not separately measure coordinator queue, dispatch, scheduling or capture overhead.",
+      "Do not assign the 235.207-second gap to a particular overhead category without additional evidence.",
+      "Post-final coordinator capture time is not included by this elapsed calculation.",
+      "All six recorded session intervals satisfy the 300-second admission bound; this does not establish coordinator end-to-end deadline compliance.",
+      "The helper's two-second bound is a separate parent-native measurement.",
+      "These timings do not establish runtime benefit or model superiority."
+    ]
+  },
+  "cleanup": {
+    "polish_fixture_removed_in_record": true,
+    "recorded_fixture_root_currently_absent": true,
+    "producer_mechanism": "finally removes the disposable fixture root.",
+    "scope": "Parent-owned resolver fixtures only; not a general server or user-workspace cleanup guarantee."
+  },
+  "remaining_facets": [
+    "Real user feedback, product acceptance and visual quality.",
+    "Keyboard focus, activation and complete Add-entry behavior.",
+    "Autonomous server startup, browser-owner handoff and live polish iteration.",
+    "Repeated-feedback merging and interrupted-item recovery through actual edits.",
+    "Authorized product fixes, regression evidence and connection recovery.",
+    "Unknown listener collision handling and protection of reused processes/logs.",
+    "Actual non-loopback or unavailable-browser execution branches.",
+    "Private-log retention and recovery behavior.",
+    "Numeric and parser cases beyond the three executed resolver cases.",
+    "Framework lexical parsing, Procfile-only fallback and complete startup tuple preservation.",
+    "Commit, push, PR, installed-runtime refresh and field outcomes."
+  ],
+  "recommendations": [
+    "Accept the six artifacts for bounded evidence interpretation; retain B2's minor unavailable-owner reporting omission.",
+    "Retain B's missing-value guards and native error exits, while preserving the distinction from A's externally enforced timeout.",
+    "Do not describe web-line selection as a demonstrated new B capability; both arms pass the supplied case.",
+    "Keep candidate-port discovery separate from command execution, listener readiness and actual browser URL.",
+    "Preserve the current-B reload requirement, synthetic-feedback label and unresolved focus item.",
+    "When reporting future unavailable-browser handling, explicitly preserve the human path and name spec-runtime-setup only when capability is actually missing.",
+    "Keep session intervals, coordinator envelope and capture/queue unknowns separate; make no runtime-benefit claim.",
+    "Do not upgrade these local receipts and interpretation trials into full autonomous polish, visual acceptance or complete optimization acceptance.",
+    "Stop this bounded review without new trials."
+  ]
+}

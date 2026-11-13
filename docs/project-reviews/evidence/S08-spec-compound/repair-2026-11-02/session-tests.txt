@@ -1,0 +1,8 @@
+PASS tests/unit/session-history-scripts.test.js
+PASS tests/unit/spec-compound-reference-contracts.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       23 passed, 23 total
+Snapshots:   0 total
+Time:        0.53 s, estimated 1 s
+Ran all test suites within paths "tests/unit/session-history-scripts.test.js", "tests/unit/spec-compound-reference-contracts.test.js".

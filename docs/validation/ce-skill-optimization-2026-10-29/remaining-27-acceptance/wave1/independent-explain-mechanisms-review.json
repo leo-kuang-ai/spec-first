@@ -1,0 +1,200 @@
+{
+  "status": "independent-read-only-review-complete",
+  "reference_roots": {
+    "W": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1",
+    "P": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e"
+  },
+  "CEOPT-11": {
+    "common_facets": {
+      "causal_ordering": "pass",
+      "ownership_and_GET_visibility": "pass",
+      "malformed_JSON_boundary": "pass",
+      "cancellation_and_recovery_limits": "pass",
+      "rationale_without_invented_author_intent": "pass",
+      "diagram_semantics": "pass",
+      "no_invented_execution_or_personal_write": "pass",
+      "durable_parent_saved_artifact_exists": "pass"
+    },
+    "trials": [
+      {
+        "id": "CEOPT-11-A1",
+        "source_reference_accuracy": "pass",
+        "artifact_usability": "partial",
+        "bounded_acceptance": "partial",
+        "finding": "Both Markdown reference targets are broken from artifact.md. Repository-relative prose does not change Markdown URL resolution. Sources remain manually recoverable from printed paths.",
+        "refs": ["W/trials/CEOPT-11-A1/artifact.md:118", "W/trials/CEOPT-11-A1/artifact.md:119"]
+      },
+      {
+        "id": "CEOPT-11-A2",
+        "source_reference_accuracy": "pass",
+        "artifact_usability": "partial",
+        "bounded_acceptance": "partial",
+        "finding": "Both source hyperlinks incorrectly resolve beneath the trial directory; printed repository-relative paths remain manually recoverable.",
+        "refs": ["W/trials/CEOPT-11-A2/artifact.md:130", "W/trials/CEOPT-11-A2/artifact.md:131"]
+      },
+      {
+        "id": "CEOPT-11-A3",
+        "source_reference_accuracy": "pass",
+        "artifact_usability": "pass",
+        "bounded_acceptance": "pass",
+        "finding": "Explicit repository-relative fixture root plus accurate plain file:line references supports recovery. No Markdown hyperlinks are advertised.",
+        "refs": ["W/trials/CEOPT-11-A3/artifact.md:16", "W/trials/CEOPT-11-A3/artifact.md:20"]
+      },
+      {
+        "id": "CEOPT-11-B1",
+        "source_reference_accuracy": "pass",
+        "artifact_usability": "pass",
+        "bounded_acceptance": "pass",
+        "finding": "Explicit fixture-root declaration and accurate plain file:line references support recovery; static inspection and mediated saving are accurately disclosed.",
+        "refs": ["W/trials/CEOPT-11-B1/artifact.md:12"]
+      },
+      {
+        "id": "CEOPT-11-B2",
+        "source_reference_accuracy": "pass-with-context",
+        "artifact_usability": "partial",
+        "bounded_acceptance": "partial",
+        "finding": "References are declared relative to the fixture root, but the artifact never identifies that root. Source retrieval requires the packet or trace; the standalone artifact is less recoverable.",
+        "refs": ["W/trials/CEOPT-11-B2/artifact.md:17"]
+      },
+      {
+        "id": "CEOPT-11-B3",
+        "source_reference_accuracy": "pass",
+        "artifact_usability": "partial",
+        "bounded_acceptance": "partial",
+        "finding": "All 13 inline source hyperlinks resolve to absent files under the trial directory. The explicit fixture-root text supports manual recovery but does not repair hyperlinks.",
+        "refs": ["W/trials/CEOPT-11-B3/artifact.md:66", "W/trials/CEOPT-11-B3/artifact.md:198", "W/trials/CEOPT-11-B3/artifact.md:229"]
+      }
+    ],
+    "link_check": {
+      "method": "Read-only path resolution from each artifact.md parent directory, removing URL fragments before checking existence.",
+      "broken_link_counts": {"A1": 2, "A2": 2, "A3": 0, "B1": 0, "B2": 0, "B3": 13},
+      "correct_relative_source_base": "../../fixtures/explain/"
+    },
+    "authority": {
+      "verdict": "pass-for-observed-action-boundary",
+      "evidence": "All six tool-events.json files contain package/request/fixture reads and file discovery; no application execution, writes, delegation, or network calls observed.",
+      "qualification": "A3 and B3 enumerate wave1 filenames outside the fixture through rg --files, including trial names. No other trial artifact contents were read in those traces."
+    },
+    "full_acceptance": "not-established",
+    "limitations": [
+      "Mediated saving does not test autonomous scratch, destination selection, publication, or interaction fallback.",
+      "Recorded model metadata does not authenticate serving-model identity.",
+      "Read-only traces are observation, not filesystem enforcement.",
+      "Mermaid semantics were reviewed as source; no rendered visual inspection was performed.",
+      "No arm superiority follows from these six outputs."
+    ],
+    "grounding_refs": [
+      "W/CEOPT-11-packet.json",
+      "W/CEOPT-11-request.txt",
+      "W/fixtures/explain/src/server.js:3",
+      "W/fixtures/explain/src/server.js:7",
+      "W/fixtures/explain/src/server.js:10",
+      "W/fixtures/explain/src/server.js:18",
+      "W/fixtures/explain/README.md:8"
+    ]
+  },
+  "paired_mechanisms": {
+    "parent_classification_verdict": "agree-with-classifications-and-narrow-interpretations",
+    "totals": {
+      "A_passed": 37,
+      "A_failed": 25,
+      "observed_behavior_differences": 21,
+      "output_contract_differences": 2,
+      "harness_incompatible": 2
+    },
+    "failure_groups": [
+      {
+        "count": 4,
+        "tests": "task-pack-command: existing/future/dangling/leaf symlink task paths",
+        "classification": "observed-behavior-difference",
+        "evidence": "A validation exits 0 instead of 1. A resolves task files lexically and does not inspect path segments; B invokes includeLeaf containment.",
+        "refs": ["P/A/tests/unit/task-pack-command.test.js:85", "P/A/tests/unit/task-pack-command.test.js:99", "P/A/src/cli/task-pack.js:804", "P/B/src/cli/task-pack.js:836"]
+      },
+      {
+        "count": 9,
+        "tests": "task-pack-command: .git/config, .GIT/config, .opencode/skills/example/SKILL.md, .OpenCode/skills/example/SKILL.md, .opencode/commands/spec-work.md, opencode.jsonc, .zcode/spec-first/state.json, .zcode/hooks/session-start, .pi/spec-first/state.json",
+        "classification": "observed-behavior-difference",
+        "evidence": "A validation exits 0. B adds Git-internals rejection, case-normalized matching and additional managed surfaces.",
+        "refs": ["P/A/tests/unit/task-pack-command.test.js:106", "P/A/tests/unit/task-pack-command.test.js:109", "P/B/src/cli/helpers/target-repo.js:150", "P/B/src/cli/task-pack.js:824"]
+      },
+      {
+        "count": 1,
+        "tests": "task-pack-command: selected child repo rather than artifact root",
+        "classification": "observed-behavior-difference",
+        "evidence": "A fails the initial rejection assertion for a symlink inside the selected child. B resolves target scope before file containment. Recovery assertions were not reached in A.",
+        "refs": ["P/A/tests/unit/task-pack-command.test.js:113", "P/A/tests/unit/task-pack-command.test.js:121", "P/B/src/cli/task-pack.js:783"]
+      },
+      {
+        "count": 2,
+        "tests": "task-pack-command: pack/source target_repo fallback",
+        "classification": "output-contract-difference",
+        "evidence": "A exits successfully but resolved_target_repo is undefined. Source confirms B adds this output and target-resolution mechanism; these test failures alone do not demonstrate a wrong write.",
+        "refs": ["P/A/tests/unit/task-pack-command.test.js:129", "P/A/tests/unit/task-pack-command.test.js:138", "P/B/src/cli/task-pack.js:595"]
+      },
+      {
+        "count": 2,
+        "tests": "workspace-git-exclude: dangling leaf/ancestor",
+        "classification": "observed-behavior-difference",
+        "evidence": "Leaf fails at addManagedExclude.ok; ancestor passes add rejection then fails at removeManagedExclude.ok. Do not describe both as observed outside writes. B inspects dangling links before absence shortcuts.",
+        "refs": ["P/A/tests/unit/mcp-setup-workspace-git-exclude.test.js:57", "P/A/tests/unit/mcp-setup-workspace-git-exclude.test.js:58", "P/A/skills/spec-runtime-setup/scripts/lib/workspace-git-exclude.cjs:79", "P/B/skills/spec-runtime-setup/scripts/lib/workspace-git-exclude.cjs:79"]
+      },
+      {
+        "count": 1,
+        "tests": "workspace-git-exclude: Git environment overrides",
+        "classification": "observed-behavior-difference",
+        "evidence": "A snapshot changes HEAD and worktree identity under overrides. Failure is at the snapshot assertion; later source-snapshot and exclude-write assertions were not reached. B routes snapshot Git reads through environment-sanitized runGit.",
+        "refs": ["P/A/tests/unit/mcp-setup-workspace-git-exclude.test.js:87", "P/A/skills/spec-runtime-setup/scripts/lib/workspace-graph-state.cjs:224", "P/B/skills/spec-runtime-setup/scripts/lib/git-path.cjs:7"]
+      },
+      {
+        "count": 1,
+        "tests": "workspace-routing-inject: dangling entry",
+        "classification": "observed-behavior-difference",
+        "evidence": "A reports created rather than failed. Source uses a direct path write after an existence-based dangling-link check; B uses contained staging. Later outside-file and recovery assertions were not reached in A.",
+        "refs": ["P/A/tests/unit/mcp-setup-workspace-routing-inject.test.js:74", "P/A/skills/spec-runtime-setup/scripts/lib/workspace-routing-inject.cjs:100", "P/B/skills/spec-runtime-setup/scripts/lib/path-safety.cjs:95"]
+      },
+      {
+        "count": 1,
+        "tests": "workspace-routing-inject: hardlink peer preservation",
+        "classification": "observed-behavior-difference",
+        "evidence": "A actually changes the outside hardlink peer, shown by its returned content diff. Permission and temporary-file assertions were not reached. B stages a new inode and renames.",
+        "refs": ["P/A/tests/unit/mcp-setup-workspace-routing-inject.test.js:94", "P/A/skills/spec-runtime-setup/scripts/lib/workspace-routing-inject.cjs:100", "P/B/skills/spec-runtime-setup/scripts/lib/path-safety.cjs:95"]
+      },
+      {
+        "count": 1,
+        "tests": "workspace-routing-inject: destination replaced after staging",
+        "classification": "harness-incompatible",
+        "evidence": "Injector runs only when writeFileSync receives a numeric descriptor. B stages through a descriptor; A writes with a string filename, so no replacement is injected into A. A's updated status is not a paired race failure.",
+        "refs": ["P/A/tests/unit/mcp-setup-workspace-routing-inject.test.js:111", "P/A/tests/unit/mcp-setup-workspace-routing-inject.test.js:113", "P/A/skills/spec-runtime-setup/scripts/lib/workspace-routing-inject.cjs:100", "P/B/skills/spec-runtime-setup/scripts/lib/path-safety.cjs:107"]
+      },
+      {
+        "count": 1,
+        "tests": "target-repo-containment: registered host managed surfaces",
+        "classification": "observed-behavior-difference",
+        "evidence": "A returns no rejection for the first failing OpenCode case. The loop stops there, so the failure does not independently observe every later host.",
+        "refs": ["P/A/tests/unit/target-repo-containment.test.js:23", "P/A/tests/unit/target-repo-containment.test.js:28", "P/B/src/cli/helpers/target-repo.js:31"]
+      },
+      {
+        "count": 1,
+        "tests": "target-repo-containment: dangling ancestors and leaf links",
+        "classification": "observed-behavior-difference",
+        "evidence": "A fails on the first dangling-ancestor assertion using the existing two-argument API. This failure is not caused by the later new includeLeaf option. Remaining cases were not reached.",
+        "refs": ["P/A/tests/unit/target-repo-containment.test.js:41", "P/A/src/cli/helpers/target-repo.js:91", "P/B/src/cli/helpers/target-repo.js:122"]
+      },
+      {
+        "count": 1,
+        "tests": "spec-commit-scope-regression: canonical argv recipe",
+        "classification": "harness-incompatible",
+        "evidence": "The extractor requires a text fence beginning directly with git add. A has a bash fence with preceding temp-file setup, so match returns null before the recipe executes. Both source arms use explicit commit paths and -F; this result does not establish an A commit failure.",
+        "refs": ["P/A/tests/unit/spec-commit-scope-regression.test.js:23", "P/A/skills/spec-commit/SKILL.md:106", "P/B/skills/spec-commit/SKILL.md:111"]
+      }
+    ],
+    "wording_recommendation": "Prefer observed baseline behavior deficits or behavior differences over regression: these results compare older A with newer B and do not establish that A regressed from an earlier version.",
+    "limitations": [
+      "Reviewed saved Jest results, test drivers, and both source arms; did not rerun tests.",
+      "The 21 behavior failures are not 21 independent defects and are not model-quality gains.",
+      "Validation acceptance is not evidence of downstream mutation.",
+      "B-specific race coverage is bounded to the injected staging point, not general concurrent filesystem safety.",
+      "Deterministic mechanism results do not establish full Skill acceptance."
+    ]
+  }
+}

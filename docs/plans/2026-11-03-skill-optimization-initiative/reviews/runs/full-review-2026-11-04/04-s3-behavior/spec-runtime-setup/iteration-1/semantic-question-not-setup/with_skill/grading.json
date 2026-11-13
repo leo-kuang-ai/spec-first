@@ -1,0 +1,15 @@
+{
+  "expectations": [
+    {
+      "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-runtime-setup/evals/fixtures/scripts/check-not-setup-scope.sh",
+      "passed": false,
+      "evidence": "script exited with code 127 [stderr: bash: /tmp/skill-up-judge-1793793123995791000/check-readonly-verify.sh: No such file or directory]"
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 1,
+    "total": 1,
+    "pass_rate": 0
+  }
+}

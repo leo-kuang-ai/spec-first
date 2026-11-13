@@ -1,0 +1,113 @@
+{
+  "id": "CEOPT-04",
+  "skill": "spec-commit",
+  "created_at": "2026-10-30T06:35:11.884829+00:00",
+  "scratch_root": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-commit-ff7xdqc5",
+  "trials": [
+    {
+      "trial": "CEOPT-04-A1",
+      "repo_root": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-commit-ff7xdqc5/A1",
+      "head": "b3e1083bc4b684c0ca55875c4b3ca1c41aa4e776",
+      "index": "100644 f590887df45a507201f4873ba31a33cbef41edee 0\tREADME.md\n100644 585d6fd16475128525c8d891bc04bf6af49e381e 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+      "staged_diff": "diff --git a/unrelated.txt b/unrelated.txt\nnew file mode 100644\nindex 0000000..5d783a5\n--- /dev/null\n+++ b/unrelated.txt\n@@ -0,0 +1 @@\n+User-owned staged work.\n",
+      "worktree_diff": "diff --git a/ledger.js b/ledger.js\nindex 585d6fd..ddd9864 100644\n--- a/ledger.js\n+++ b/ledger.js\n@@ -1,4 +1,4 @@\n-exports.acceptAmount = amount => amount >= 0;\n+exports.acceptAmount = amount => amount > 0;\n \n \n \n@@ -11,4 +11,4 @@ exports.acceptAmount = amount => amount >= 0;\n \n \n \n-exports.label = 'Ledger';\n+exports.label = 'User renamed ledger';\n",
+      "prior_commit": "fuller\nfeat(fixture): establish ledger\n\nCo-authored-by: Prior Contributor <prior@example.invalid>\n\n",
+      "files": {
+        "ledger.js": "f60f137fd60c3456cadb588cdba4c6151f54294375df470a0f1c85269c90d1dd",
+        "unrelated.txt": "a199f273ee3f3f5d6b830814a31e2e8fced347e4ac79b3e66344af0f764c49d6",
+        "README.md": "0fce89cc4b94f6293ab4531f0b151d38edee03e7bb4bfae15322bda08fa5ef90"
+      },
+      "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/commit/A1/request.txt"
+    },
+    {
+      "trial": "CEOPT-04-B1",
+      "repo_root": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-commit-ff7xdqc5/B1",
+      "head": "b3e1083bc4b684c0ca55875c4b3ca1c41aa4e776",
+      "index": "100644 f590887df45a507201f4873ba31a33cbef41edee 0\tREADME.md\n100644 585d6fd16475128525c8d891bc04bf6af49e381e 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+      "staged_diff": "diff --git a/unrelated.txt b/unrelated.txt\nnew file mode 100644\nindex 0000000..5d783a5\n--- /dev/null\n+++ b/unrelated.txt\n@@ -0,0 +1 @@\n+User-owned staged work.\n",
+      "worktree_diff": "diff --git a/ledger.js b/ledger.js\nindex 585d6fd..ddd9864 100644\n--- a/ledger.js\n+++ b/ledger.js\n@@ -1,4 +1,4 @@\n-exports.acceptAmount = amount => amount >= 0;\n+exports.acceptAmount = amount => amount > 0;\n \n \n \n@@ -11,4 +11,4 @@ exports.acceptAmount = amount => amount >= 0;\n \n \n \n-exports.label = 'Ledger';\n+exports.label = 'User renamed ledger';\n",
+      "prior_commit": "fuller\nfeat(fixture): establish ledger\n\nCo-authored-by: Prior Contributor <prior@example.invalid>\n\n",
+      "files": {
+        "ledger.js": "f60f137fd60c3456cadb588cdba4c6151f54294375df470a0f1c85269c90d1dd",
+        "unrelated.txt": "a199f273ee3f3f5d6b830814a31e2e8fced347e4ac79b3e66344af0f764c49d6",
+        "README.md": "0fce89cc4b94f6293ab4531f0b151d38edee03e7bb4bfae15322bda08fa5ef90"
+      },
+      "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/commit/B1/request.txt"
+    },
+    {
+      "trial": "CEOPT-04-B2",
+      "repo_root": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-commit-ff7xdqc5/B2",
+      "head": "b3e1083bc4b684c0ca55875c4b3ca1c41aa4e776",
+      "index": "100644 f590887df45a507201f4873ba31a33cbef41edee 0\tREADME.md\n100644 585d6fd16475128525c8d891bc04bf6af49e381e 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+      "staged_diff": "diff --git a/unrelated.txt b/unrelated.txt\nnew file mode 100644\nindex 0000000..5d783a5\n--- /dev/null\n+++ b/unrelated.txt\n@@ -0,0 +1 @@\n+User-owned staged work.\n",
+      "worktree_diff": "diff --git a/ledger.js b/ledger.js\nindex 585d6fd..ddd9864 100644\n--- a/ledger.js\n+++ b/ledger.js\n@@ -1,4 +1,4 @@\n-exports.acceptAmount = amount => amount >= 0;\n+exports.acceptAmount = amount => amount > 0;\n \n \n \n@@ -11,4 +11,4 @@ exports.acceptAmount = amount => amount >= 0;\n \n \n \n-exports.label = 'Ledger';\n+exports.label = 'User renamed ledger';\n",
+      "prior_commit": "fuller\nfeat(fixture): establish ledger\n\nCo-authored-by: Prior Contributor <prior@example.invalid>\n\n",
+      "files": {
+        "ledger.js": "f60f137fd60c3456cadb588cdba4c6151f54294375df470a0f1c85269c90d1dd",
+        "unrelated.txt": "a199f273ee3f3f5d6b830814a31e2e8fced347e4ac79b3e66344af0f764c49d6",
+        "README.md": "0fce89cc4b94f6293ab4531f0b151d38edee03e7bb4bfae15322bda08fa5ef90"
+      },
+      "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/commit/B2/request.txt"
+    },
+    {
+      "trial": "CEOPT-04-A2",
+      "repo_root": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-commit-ff7xdqc5/A2",
+      "head": "b3e1083bc4b684c0ca55875c4b3ca1c41aa4e776",
+      "index": "100644 f590887df45a507201f4873ba31a33cbef41edee 0\tREADME.md\n100644 585d6fd16475128525c8d891bc04bf6af49e381e 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+      "staged_diff": "diff --git a/unrelated.txt b/unrelated.txt\nnew file mode 100644\nindex 0000000..5d783a5\n--- /dev/null\n+++ b/unrelated.txt\n@@ -0,0 +1 @@\n+User-owned staged work.\n",
+      "worktree_diff": "diff --git a/ledger.js b/ledger.js\nindex 585d6fd..ddd9864 100644\n--- a/ledger.js\n+++ b/ledger.js\n@@ -1,4 +1,4 @@\n-exports.acceptAmount = amount => amount >= 0;\n+exports.acceptAmount = amount => amount > 0;\n \n \n \n@@ -11,4 +11,4 @@ exports.acceptAmount = amount => amount >= 0;\n \n \n \n-exports.label = 'Ledger';\n+exports.label = 'User renamed ledger';\n",
+      "prior_commit": "fuller\nfeat(fixture): establish ledger\n\nCo-authored-by: Prior Contributor <prior@example.invalid>\n\n",
+      "files": {
+        "ledger.js": "f60f137fd60c3456cadb588cdba4c6151f54294375df470a0f1c85269c90d1dd",
+        "unrelated.txt": "a199f273ee3f3f5d6b830814a31e2e8fced347e4ac79b3e66344af0f764c49d6",
+        "README.md": "0fce89cc4b94f6293ab4531f0b151d38edee03e7bb4bfae15322bda08fa5ef90"
+      },
+      "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/commit/A2/request.txt"
+    },
+    {
+      "trial": "CEOPT-04-A3",
+      "repo_root": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-commit-ff7xdqc5/A3",
+      "head": "b3e1083bc4b684c0ca55875c4b3ca1c41aa4e776",
+      "index": "100644 f590887df45a507201f4873ba31a33cbef41edee 0\tREADME.md\n100644 585d6fd16475128525c8d891bc04bf6af49e381e 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+      "staged_diff": "diff --git a/unrelated.txt b/unrelated.txt\nnew file mode 100644\nindex 0000000..5d783a5\n--- /dev/null\n+++ b/unrelated.txt\n@@ -0,0 +1 @@\n+User-owned staged work.\n",
+      "worktree_diff": "diff --git a/ledger.js b/ledger.js\nindex 585d6fd..ddd9864 100644\n--- a/ledger.js\n+++ b/ledger.js\n@@ -1,4 +1,4 @@\n-exports.acceptAmount = amount => amount >= 0;\n+exports.acceptAmount = amount => amount > 0;\n \n \n \n@@ -11,4 +11,4 @@ exports.acceptAmount = amount => amount >= 0;\n \n \n \n-exports.label = 'Ledger';\n+exports.label = 'User renamed ledger';\n",
+      "prior_commit": "fuller\nfeat(fixture): establish ledger\n\nCo-authored-by: Prior Contributor <prior@example.invalid>\n\n",
+      "files": {
+        "ledger.js": "f60f137fd60c3456cadb588cdba4c6151f54294375df470a0f1c85269c90d1dd",
+        "unrelated.txt": "a199f273ee3f3f5d6b830814a31e2e8fced347e4ac79b3e66344af0f764c49d6",
+        "README.md": "0fce89cc4b94f6293ab4531f0b151d38edee03e7bb4bfae15322bda08fa5ef90"
+      },
+      "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/commit/A3/request.txt"
+    },
+    {
+      "trial": "CEOPT-04-B3",
+      "repo_root": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-commit-ff7xdqc5/B3",
+      "head": "b3e1083bc4b684c0ca55875c4b3ca1c41aa4e776",
+      "index": "100644 f590887df45a507201f4873ba31a33cbef41edee 0\tREADME.md\n100644 585d6fd16475128525c8d891bc04bf6af49e381e 0\tledger.js\n100644 5d783a514899a519cbbd2e51b58bb30409907edb 0\tunrelated.txt\n",
+      "staged_diff": "diff --git a/unrelated.txt b/unrelated.txt\nnew file mode 100644\nindex 0000000..5d783a5\n--- /dev/null\n+++ b/unrelated.txt\n@@ -0,0 +1 @@\n+User-owned staged work.\n",
+      "worktree_diff": "diff --git a/ledger.js b/ledger.js\nindex 585d6fd..ddd9864 100644\n--- a/ledger.js\n+++ b/ledger.js\n@@ -1,4 +1,4 @@\n-exports.acceptAmount = amount => amount >= 0;\n+exports.acceptAmount = amount => amount > 0;\n \n \n \n@@ -11,4 +11,4 @@ exports.acceptAmount = amount => amount >= 0;\n \n \n \n-exports.label = 'Ledger';\n+exports.label = 'User renamed ledger';\n",
+      "prior_commit": "fuller\nfeat(fixture): establish ledger\n\nCo-authored-by: Prior Contributor <prior@example.invalid>\n\n",
+      "files": {
+        "ledger.js": "f60f137fd60c3456cadb588cdba4c6151f54294375df470a0f1c85269c90d1dd",
+        "unrelated.txt": "a199f273ee3f3f5d6b830814a31e2e8fced347e4ac79b3e66344af0f764c49d6",
+        "README.md": "0fce89cc4b94f6293ab4531f0b151d38edee03e7bb4bfae15322bda08fa5ef90"
+      },
+      "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/commit/B3/request.txt"
+    }
+  ],
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "deadline_seconds": 300,
+  "parent_recipe": "Inspect exact proposed patch/steps for the authorized hunk and preserved state. Execute only bounded safe operations in the named disposable repo under isolated HOME/USERPROFILE and Git environment. Retain unsafe or blocked proposals; never silently repair a model proposal. Compare actual commit patch and remaining staged/worktree state.",
+  "limitations": [
+    "Parent execution is not autonomous worker mutation.",
+    "No real project commit or external write is authorized."
+  ],
+  "status": "prepared-not-executed"
+}

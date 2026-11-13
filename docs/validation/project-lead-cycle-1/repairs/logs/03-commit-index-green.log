@@ -1,0 +1,11 @@
+PASS tests/unit/spec-commit-push-pr-context-contracts.test.js
+  spec-commit-push-pr context reference contract
+    ✓ checkout collision 的默认恢复保留混合暂存、无关文件和未跟踪文件 (157 ms)
+    ✓ keeps context probes and consequential rechecks in a required-read reference (5 ms)
+    ✓ requires apply-time identity, body read-back, and scoped commit semantics
+
+Test Suites: 1 passed, 1 total
+Tests:       3 passed, 3 total
+Snapshots:   0 total
+Time:        0.252 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/spec-commit-push-pr-context-contracts.test.js/i.

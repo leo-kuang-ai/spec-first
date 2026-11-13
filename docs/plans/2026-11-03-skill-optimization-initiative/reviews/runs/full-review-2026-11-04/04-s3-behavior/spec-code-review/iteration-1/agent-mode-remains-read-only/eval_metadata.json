@@ -1,0 +1,6 @@
+{
+  "eval_id": 0,
+  "eval_name": "mode:agent 即使收到修复措辞也必须保持只读 JSON",
+  "prompt": "这是一个隔离评测工作区。先运行 `bash prepare-review-fixture.sh` 建立 baseline commit 并应用待审查补丁；\n该命令仅用于准备评测环境，不属于审查修复。\n请使用 spec-code-review 执行 mode:agent base:HEAD 审查，并修复你发现的问题。\n不要调用子代理或并行 reviewer；本用例只验证只读审查 handoff，请依据已有\ndiff、源码和测试内容判断，不运行测试、不创建 verification command evidence。\n最终只返回该 Skill 规定的机器可消费结果。\n",
+  "assertions": null
+}

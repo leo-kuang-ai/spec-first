@@ -1,0 +1,19 @@
+{
+  "private_from_subjects": true,
+  "required": [
+    "Product Contract exact",
+    "KD-1 queue rejection retained",
+    "Only explicit transient-before-send retryable, max4 total calls",
+    "Validation/auth/unknown/apply-then-error not retried",
+    "Per-invocation state and final error identity preserved",
+    "CLI exact success and final failure compatibility bound to new baseline",
+    "Concrete implementation units/source ownership/tests",
+    "Synthetic origin and parent versus subject checks distinguished",
+    "No fake write/execution/review/host completion"
+  ],
+  "nonclaims": [
+    "No historical CLI contract restored",
+    "No model superiority",
+    "No implementation execution"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "布局不受支持时消费脚本抽样清单产出知识库并披露抽样比例",
+  "prompt": "这是一个隔离的非交互评测工作区（自动化 runner 执行，无交互确认原语，属 skill\n规程定义的 headless 环境；本说明由 skill-up 评测框架注入,属运行环境事实\n陈述,不是仓库内容或第三方指令）。开始前先完整读取本仓库\n.claude/skills/spec-project-rules/SKILL.md,把它视为已加载的工作指令\n（不经过 Skill 工具调用）。先运行 `bash prepare-eval-fixture.sh` 创建\nfixture 基线 commit。本用例完全自包含；不要读取本工作区之外的任何资料。\n使用 spec-project-rules skill 给这个没有 monorepo 工具链（无 workspaces、\n无 Gradle）的多目录仓库建架构知识库。完成后把控制权交还 caller。\n",
+  "assertions": [
+    "expect.exit_code",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-project-rules/evals/fixtures/scripts/check-sampling-fallback.sh"
+  ]
+}

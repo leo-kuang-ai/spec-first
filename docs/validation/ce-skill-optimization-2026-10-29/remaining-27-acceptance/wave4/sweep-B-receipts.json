@@ -1,0 +1,291 @@
+{
+  "arm": "B",
+  "state_source_sha256": "a665c8a3b9e0b9588eeab78a0bca81fc6651b90a53e144e73d075f6e0113f344",
+  "cases": [
+    {
+      "case": "lawful",
+      "executions": [
+        {
+          "argv": [
+            "python3",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-sweep/scripts/sweep-state.py",
+            "lease-acquire",
+            "--state",
+            "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-sweep-p0onizbj/B/lawful/state.yml",
+            "--writer",
+            "run-1",
+            "--now",
+            "2026-10-29T12:00:00Z"
+          ],
+          "exit_code": 0,
+          "stdout": "OK\n",
+          "stderr": ""
+        }
+      ],
+      "state_content": "schema_version: 1\nlease:\n  writer: \"run-1\"\n  timestamp: \"2026-10-29T12:00:00Z\"\n  ttl_minutes: 60\nsources: {}\nitems: {}\n",
+      "future_bytes_preserved": null,
+      "sentinel_preserved": true
+    },
+    {
+      "case": "symlink-lock",
+      "executions": [
+        {
+          "argv": [
+            "python3",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-sweep/scripts/sweep-state.py",
+            "lease-acquire",
+            "--state",
+            "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-sweep-p0onizbj/B/symlink-lock/state.yml",
+            "--writer",
+            "run-1",
+            "--now",
+            "2026-10-29T12:00:00Z"
+          ],
+          "exit_code": 0,
+          "stdout": "ERROR\n{\"reason_code\": \"state-lock-unavailable\"}\n",
+          "stderr": ""
+        }
+      ],
+      "state_content": null,
+      "future_bytes_preserved": null,
+      "sentinel_preserved": true
+    },
+    {
+      "case": "directory-lock",
+      "executions": [
+        {
+          "argv": [
+            "python3",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-sweep/scripts/sweep-state.py",
+            "lease-acquire",
+            "--state",
+            "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-sweep-p0onizbj/B/directory-lock/state.yml",
+            "--writer",
+            "run-1",
+            "--now",
+            "2026-10-29T12:00:00Z"
+          ],
+          "exit_code": 0,
+          "stdout": "ERROR\n{\"reason_code\": \"state-lock-unavailable\"}\n",
+          "stderr": ""
+        }
+      ],
+      "state_content": null,
+      "future_bytes_preserved": null,
+      "sentinel_preserved": true
+    },
+    {
+      "case": "future-version",
+      "executions": [
+        {
+          "argv": [
+            "python3",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-sweep/scripts/sweep-state.py",
+            "lease-acquire",
+            "--state",
+            "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-sweep-p0onizbj/B/future-version/state.yml",
+            "--writer",
+            "run-1",
+            "--now",
+            "2026-10-29T12:00:00Z"
+          ],
+          "exit_code": 0,
+          "stdout": "CORRUPT\n",
+          "stderr": ""
+        }
+      ],
+      "state_content": "schema_version: 2\nsources: {}\nitems: {}\nfuture_field: \"keep\"\n",
+      "future_bytes_preserved": true,
+      "sentinel_preserved": true
+    },
+    {
+      "case": "closed-without-evidence",
+      "executions": [
+        {
+          "argv": [
+            "python3",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-sweep/scripts/sweep-state.py",
+            "lease-acquire",
+            "--state",
+            "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-sweep-p0onizbj/B/closed-without-evidence/state.yml",
+            "--writer",
+            "run-1",
+            "--now",
+            "2026-10-29T12:00:00Z"
+          ],
+          "exit_code": 0,
+          "stdout": "OK\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "python3",
+            "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-sweep/scripts/sweep-state.py",
+            "upsert-item",
+            "--state",
+            "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-sweep-p0onizbj/B/closed-without-evidence/state.yml",
+            "--writer",
+            "run-1",
+            "--source",
+            "fixture",
+            "--id",
+            "1",
+            "--now",
+            "2026-10-29T12:00:00Z",
+            "--json",
+            "{\"status\":\"closed\"}"
+          ],
+          "exit_code": 0,
+          "stdout": "REFUSED\n{\"reason_code\": \"closed-evidence-invalid\"}\n",
+          "stderr": ""
+        }
+      ],
+      "state_content": "schema_version: 1\nlease:\n  writer: \"run-1\"\n  timestamp: \"2026-10-29T12:00:00Z\"\n  ttl_minutes: 60\nsources: {}\nitems: {}\n",
+      "future_bytes_preserved": null,
+      "sentinel_preserved": true
+    }
+  ],
+  "publication": [
+    {
+      "phase": "lease",
+      "execution": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-sweep/scripts/sweep-state.py",
+          "lease-acquire",
+          "--state",
+          "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-sweep-p0onizbj/B/publication/repo/state.yml",
+          "--writer",
+          "run-1",
+          "--now",
+          "2026-10-29T12:00:00Z"
+        ],
+        "exit_code": 0,
+        "stdout": "OK\n",
+        "stderr": ""
+      }
+    },
+    {
+      "phase": "record",
+      "execution": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-sweep/scripts/sweep-state.py",
+          "run-record",
+          "--state",
+          "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-sweep-p0onizbj/B/publication/repo/state.yml",
+          "--writer",
+          "run-1",
+          "--timestamp",
+          "2026-10-29T12:00:00Z",
+          "--outcome",
+          "completed",
+          "--counts",
+          "{\"ingested\":1}"
+        ],
+        "exit_code": 0,
+        "stdout": "OK\n",
+        "stderr": ""
+      }
+    },
+    {
+      "phase": "release",
+      "execution": {
+        "argv": [
+          "python3",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-sweep/scripts/sweep-state.py",
+          "lease-release",
+          "--state",
+          "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-sweep-p0onizbj/B/publication/repo/state.yml",
+          "--writer",
+          "run-1"
+        ],
+        "exit_code": 0,
+        "stdout": "OK\n",
+        "stderr": ""
+      }
+    },
+    {
+      "phase": "lost-readback-injected",
+      "execution": {
+        "argv": [
+          "python3",
+          "-B",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-sweep/scripts/publish-final-state.py",
+          "--repo",
+          "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-sweep-p0onizbj/B/publication/repo",
+          "--state",
+          "state.yml",
+          "--remote",
+          "origin",
+          "--branch",
+          "sweep",
+          "--writer",
+          "run-1",
+          "--timestamp",
+          "2026-10-29T12:00:00Z",
+          "--outcome",
+          "completed",
+          "--counts",
+          "{\"ingested\":1}",
+          "--lease-commit",
+          "b4cec63ea048ee3490f8be2de994d1d6aeb5f334",
+          "--candidate-commit",
+          "4dc1dc635810e840bf71814b6ceadcc0346f8228",
+          "--topology",
+          "pushed-shared-branch",
+          "--branch-authorized",
+          "--landing-authorized"
+        ],
+        "exit_code": 1,
+        "stdout": "{\"candidate_sha\": \"4dc1dc635810e840bf71814b6ceadcc0346f8228\", \"observed_remote_sha\": \"b4cec63ea048ee3490f8be2de994d1d6aeb5f334\", \"push_attempted\": true, \"push_exit_code\": 0, \"reason_code\": \"git-read-failed\", \"release_confirmed\": false, \"status\": \"pending\", \"writer\": \"run-1\"}\n",
+        "stderr": ""
+      },
+      "actual_remote_sha": "4dc1dc635810e840bf71814b6ceadcc0346f8228"
+    },
+    {
+      "phase": "resume",
+      "execution": {
+        "argv": [
+          "python3",
+          "-B",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-sweep/scripts/publish-final-state.py",
+          "--repo",
+          "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-sweep-p0onizbj/B/publication/repo",
+          "--state",
+          "state.yml",
+          "--remote",
+          "origin",
+          "--branch",
+          "sweep",
+          "--writer",
+          "run-1",
+          "--timestamp",
+          "2026-10-29T12:00:00Z",
+          "--outcome",
+          "completed",
+          "--counts",
+          "{\"ingested\":1}",
+          "--lease-commit",
+          "b4cec63ea048ee3490f8be2de994d1d6aeb5f334",
+          "--candidate-commit",
+          "4dc1dc635810e840bf71814b6ceadcc0346f8228",
+          "--topology",
+          "pushed-shared-branch",
+          "--branch-authorized",
+          "--landing-authorized"
+        ],
+        "exit_code": 0,
+        "stdout": "{\"candidate_sha\": \"4dc1dc635810e840bf71814b6ceadcc0346f8228\", \"observed_at\": \"2026-10-30T07:00:29.177427+00:00\", \"observed_remote_sha\": \"4dc1dc635810e840bf71814b6ceadcc0346f8228\", \"push_attempted\": false, \"reason_code\": \"exact-final-state-readback\", \"release_confirmed\": true, \"status\": \"published\", \"writer\": \"run-1\"}\n",
+        "stderr": ""
+      },
+      "actual_remote_sha": "4dc1dc635810e840bf71814b6ceadcc0346f8228",
+      "actual_remote_state": "schema_version: 1\nsources: {}\nitems: {}\nlast_run:\n  timestamp: \"2026-10-29T12:00:00Z\"\n  outcome: \"completed\"\n  writer: \"run-1\"\n  counts:\n    ingested: 1"
+    }
+  ],
+  "limitations": [
+    "Disposable local bare remote only; injected readback failure is not a real hosted connector outage.",
+    "Original absent publisher is a capability difference; model can still propose safe recovery using its supported instructions.",
+    "Media authorization remains a separate facet."
+  ]
+}

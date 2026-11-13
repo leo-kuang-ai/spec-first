@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "裸拆分请求应询问源计划路径",
+  "prompt": "（spec-write-tasks skill 已安装，请按它工作。）\n帮我把计划拆成任务包。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-write-tasks/evals/fixtures/scripts/asks-a-question.sh"
+  ]
+}

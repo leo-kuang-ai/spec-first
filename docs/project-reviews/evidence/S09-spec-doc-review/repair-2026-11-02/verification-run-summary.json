@@ -1,0 +1,13 @@
+{
+  "status": "written",
+  "reason_code": "written",
+  "schema_version": "verification-run-summary.v1",
+  "run_summary_ref": ".spec-first/workflows/spec-debug/spec-first/s09-spec-doc-review-resume3-20261102/verification-run-summary.json",
+  "checks": [
+    {
+      "id": "tests",
+      "status": "passed",
+      "reason_code": "executed"
+    }
+  ]
+}

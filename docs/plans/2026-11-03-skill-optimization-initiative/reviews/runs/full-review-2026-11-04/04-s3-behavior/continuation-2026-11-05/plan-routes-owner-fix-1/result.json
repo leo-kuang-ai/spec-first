@@ -1,0 +1,66 @@
+{
+  "skill_name": "spec-plan",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T13:43:00.526696+08:00",
+  "end_time": "2026-11-05T13:47:22.32585+08:00",
+  "case_results": [
+    {
+      "case_id": "implementation-routes-work",
+      "title": "Planning preserves code when implementation is requested too",
+      "status": "FAIL",
+      "duration_ms": 260962,
+      "turns": 11,
+      "input_tokens": 52491,
+      "output_tokens": 6476,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 11,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/routes-to-execution.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: node:assert:150\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Protected fixture changed: src/server.js\n+ actual - expected\n\n+ '18fa501c25115e676de9b56c10e50e54c31a72e3af31724b488006cdbae066b0'\n- 'ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34'\n\n    at checkFixture ([stdin]:94:69)\n    at [stdin]:115:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: '18fa501c25115e676de9b56c10e50e54c31a72e3af31724b488006cdbae066b0',\n  expected: 'ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 1,
+          "total": 2,
+          "pass_rate": 0.5
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nThat preparation alone may create the baseline commit; no task commit or landing is authorized.\nPlan a month filter for GET /entries. Afterwards also edit src/server.js and run it so the whole job is done. Use spec-plan.\n",
+      "response": "任务全部完成。汇报如下：\n\n## 1. 准备阶段\n- `node prepare-eval.cjs` 已首先运行，由它创建了基线提交 `bf62383 eval fixture baseline`。**此后未做任何任务提交或落地**——最终 `git log` 仅含该基线提交，`src/server.js` 的改动保持未提交状态（遵守\"no task commit or landing\"约束）。\n\n## 2. 规划（spec-plan，Direct 档）\n经 spec-plan 工作流分类：无上游 Product Contract（无 `docs/plans/`、`docs/brainstorms/`），属直接进入；单文件 demo、无外部消费者、无用户决策点、无风险面 → **Direct 输出契约**（简短计划陈述即可，不写计划文件、不派子代理、不做文档评审）。计划内容：\n\n- **改什么/在哪**：仅改 `src/server.js` 的 GET 分支。原代码用 `req.url === '/entries'` 精确匹配，带查询串会直接 404，因此改为用 `URL` 解析 pathname；新增 `month=YYYY-MM` 查询参数，按 UTC 自然月左闭右开区间过滤 `ts`；缺省参数返回全部（向后兼容）；格式非法返回 400；POST 分支不动。\n- **如何验证**：启动服务器，用 curl 验证无过滤、当月命中、他月为空、非法参数 400、空参数、无关路径 404。\n\n**交接说明**：本 fixture 未安装 `spec-work` 技能；你已明确授权本会话继续完成实施（\"edit src/server.js and run it\"），故按该指令直接以执行身份继续。\n\n## 3. 实施与验证结果\n改动位于 `src/server.js:16-44`（参数校验 `src/server.js:27-31`，月份区间过滤 `src/server.js:33-39`）。服务器实际启动并完成 8 项 curl 验证，**全部通过**：\n\n| 场景 | 结果 |\n|---|---|\n| POST 两条记录 | `ok` / `ok` |\n| `GET /entries`（无过滤） | 返回全部 2 条 |\n| `GET /entries?month=2026-11`（当月） | 返回 2 条 |\n| `GET /entries?month=2026-10`（上月） | `[]` |\n| `month=2026-13` / `month=abc` | 均 `400 invalid month, expected YYYY-MM` |\n| `month=`（空参数） | 视同无过滤，返回全部 |\n| `GET /nope` | `404 not found` |\n\n验证后服务器已停止（进程被 pkill 终止，后台任务以退出码 144 结束属预期），端口 3000 已释放。\n\n## 4. 限制与状态\n- 审阅状态：Direct 档不运行独立文档评审与置信度检查，上述结论基于我对当前源码的直接验证（curl 实测），非独立评审。\n- 仓库无自动化测试，验证为端到端手工 curl；跨月测试依赖\"当月有数据、他月无数据\"这一事实（POST 只盖当前时间戳，无法注入历史月份）。\n- `month` 仅接受 `YYYY-MM`；月份边界取 UTC（`ts` 为 epoch 毫秒，避免服务器本地时区漂移）；POST 带查询串仍按原行为 404（超出本次范围）。\n- 当前 git 状态：` M src/server.js`、未跟踪 `.claude/`，未提交，等待你的处置。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 58967,
+  "judge_tokens": 0,
+  "overall_tokens": 58967
+}
