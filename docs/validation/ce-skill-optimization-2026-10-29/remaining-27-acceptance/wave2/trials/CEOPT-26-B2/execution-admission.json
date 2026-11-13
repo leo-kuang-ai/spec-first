@@ -1,0 +1,12 @@
+{
+  "trial": "CEOPT-26-B2",
+  "approved_for_disposable_execution": true,
+  "recorded_at": "2026-10-31T05:16:47.866091+00:00",
+  "proposal_sha256": "61209b75f6bf87da1995f99ba3a54e1710b7cc55ff5da138637b62f0e5ac9c01",
+  "candidate_sha256": "60fcede431e7da0426edd494e69a0680e4f6b3dd786e373d942872ce7a4c0716",
+  "review": "Parent read complete proposal. No-change preserves explicit routing, numeric guard, JSON/catch and storage ordering. Proposed response abstraction offers no demonstrated benefit; new resource policy is out of scope. Protected test and seam remain unchanged; run original fixed HTTP proof in scratch.",
+  "limitations": [
+    "Parent execution only.",
+    "Proof selected invalid-input/process-survival scope; broad equivalence unverified."
+  ]
+}

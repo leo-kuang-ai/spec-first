@@ -1,0 +1,243 @@
+{
+  "at": "2026-10-31T05:28:16.750885+00:00",
+  "kind": "read-only foreign-change reconciliation",
+  "migration_record_ref": "docs/archive/migrations/2026-10-31-docs-organization.md",
+  "verified_relocations": [
+    {
+      "old_path": "docs/plans/2026-04-13-001-crg-codebase-quality-optimization-plan.md",
+      "current_path": "docs/archive/plans/2026/2026-04-13-001-crg-codebase-quality-optimization-plan.md",
+      "sha256": "1d92a10a7d95ccae767675d195807ef0d380df6143449be496a234eab3084fa1",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/plans/2026-04-23-skills-system-review.md",
+      "current_path": "docs/archive/plans/2026/2026-04-23-skills-system-review.md",
+      "sha256": "a46c6f9b56240daca92494672e8a5471bef3804fc0e24d717b9c7bad84d615be",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/plans/2026-05-09-skill-doc-splitting-proposal.md",
+      "current_path": "docs/archive/plans/2026/2026-05-09-skill-doc-splitting-proposal.md",
+      "sha256": "59765be82d1a7ff3232a4a9e1dc8bb726ad2e2a667f988f2279401ce758587e3",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/plans/2026-04-14-007-compound-post-sync-optimization-plan.md",
+      "current_path": "docs/archive/plans/2026/2026-04-14-007-compound-post-sync-optimization-plan.md",
+      "sha256": "4aaa3d1d5f26738b3e1d1ae2a03f0d69d0d654a4e09e67915bc7b8b4361867f7",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/plans/2026-05-22-003-feat-crg-impact-review-agent-plan.md",
+      "current_path": "docs/archive/plans/2026/2026-05-22-003-feat-crg-impact-review-agent-plan.md",
+      "sha256": "f9e7673fd87edb4ece5875d23e63a6b4e900419f19bb3c75ac31cd5ba79148f7",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/plans/2026-06-11-002-boundary-sections-draft.md",
+      "current_path": "docs/archive/plans/2026/2026-06-11-002-boundary-sections-draft.md",
+      "sha256": "b03d8c53ab52fdb579f6f13e03b9865ab2a2d0cbf451bde525127f41a560277c",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/plans/2026-04-19-007-next-phase-runtime-contract-followup-plan.md",
+      "current_path": "docs/archive/plans/2026/2026-04-19-007-next-phase-runtime-contract-followup-plan.md",
+      "sha256": "d41f1996e56abfa73e2510dbbc59877c18df8dfc9b347ca4f70f182f57521b66",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/plans/2026-04-15-005-crg-spec-graph-bootstrap-p4-endgame-implementation-plan.md",
+      "current_path": "docs/archive/plans/2026/2026-04-15-005-crg-spec-graph-bootstrap-p4-endgame-implementation-plan.md",
+      "sha256": "3f19e2d45d8710d501f48c83ff0f21dda0d658d8454007ef3f9aa40a9101ff1e",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/plans/2026-04-16-013-exact-same-skill-parity-implementation-plan.md",
+      "current_path": "docs/archive/plans/2026/2026-04-16-013-exact-same-skill-parity-implementation-plan.md",
+      "sha256": "8de8b1f08f382756e7ef2bcf91370a7c3dce6e8e1897f8a1df326e9831e92484",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/plans/2026-04-16-015-dual-host-governance-runtime-contract-relocation-plan.md",
+      "current_path": "docs/archive/plans/2026/2026-04-16-015-dual-host-governance-runtime-contract-relocation-plan.md",
+      "sha256": "b552931bacf70bc11a9a4fe0cf4a280d3b410ebbd6a34d10db65c30105feb4d8",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/plans/2026-04-15-001-spec-graph-bootstrap-goal-closure-optimization-plan.md",
+      "current_path": "docs/archive/plans/2026/2026-04-15-001-spec-graph-bootstrap-goal-closure-optimization-plan.md",
+      "sha256": "7743c47b030c78d944ed7074a65c34db0b2ce8e6c8c1c438970b51b7c5f3bea7",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/plans/2026-04-14-010-feat-spec-compound-hard-cut-consistency-plan.md",
+      "current_path": "docs/archive/plans/2026/2026-04-14-010-feat-spec-compound-hard-cut-consistency-plan.md",
+      "sha256": "080c9e2bab582d10a0aa317a49c2f33386569fafe85dc2027c4ca6d7d7df7acf",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/plans/2026-04-15-003-crg-stage0-final-implementation-plan.md",
+      "current_path": "docs/archive/plans/2026/2026-04-15-003-crg-stage0-final-implementation-plan.md",
+      "sha256": "fa288472532a8ecd7485f2226b94c114db1b249729265df97b6c3bed5f4ebae0",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/plans/2026-04-17-using-spec-first-technical-design.md",
+      "current_path": "docs/archive/plans/2026/2026-04-17-using-spec-first-technical-design.md",
+      "sha256": "eaae21cf558083a4acdc37336e50072d8190cf4181d832d7787e20a24e510ac2",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/plans/2026-04-21-002-cli-only-database-routing-handoff-plan.md",
+      "current_path": "docs/archive/plans/2026/2026-04-21-002-cli-only-database-routing-handoff-plan.md",
+      "sha256": "dab47ea6de2804f42053dceac7e3dccaa53d05a7c62e341a39b3becd2dba00f9",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/plans/2026-04-21-001-refactor-bootstrap-database-evidence-contract-plan.md",
+      "current_path": "docs/archive/plans/2026/2026-04-21-001-refactor-bootstrap-database-evidence-contract-plan.md",
+      "sha256": "c31b253925f08bb1be9faadab1ab7ffb427b954f0b9cbdccb79df3b34c5ba5b6",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/plans/2026-04-18-004-refactor-karpathy-guidelines-skill-decomposition-plan.md",
+      "current_path": "docs/archive/plans/2026/2026-04-18-004-refactor-karpathy-guidelines-skill-decomposition-plan.md",
+      "sha256": "46ac4d67884e1db551953788ed241264ac3651734eb56ae4a5eb536fe381b63d",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/plans/2026-04-19-006-next-top3-runtime-truth-plan.md",
+      "current_path": "docs/archive/plans/2026/2026-04-19-006-next-top3-runtime-truth-plan.md",
+      "sha256": "952cc10c1cc73abd4c54a8558140bc9367d956c3fe9e32d6e95cfd035d2778f1",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/10-prompt/Ponytail\u601d\u60f3\u6307\u5bfcspec-first-Skill\u4f18\u5316.md.bak2",
+      "current_path": "docs/archive/backups/10-prompt/Ponytail\u601d\u60f3\u6307\u5bfcspec-first-Skill\u4f18\u5316.md.bak2",
+      "sha256": "c85f3323faf7c44c708cd65ee8d070e9bb768158ad1165967929e021ce038b35",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/10-prompt/Ponytail\u601d\u60f3\u6307\u5bfcspec-first-Skill\u4f18\u5316.md.backup-20260820-161301",
+      "current_path": "docs/archive/backups/10-prompt/Ponytail\u601d\u60f3\u6307\u5bfcspec-first-Skill\u4f18\u5316.md.backup-20260820-161301",
+      "sha256": "5da1e1f443c556d4a736f06580603bbf1abd36a3d42e4d65b15dc633e8a6bd74",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/spec-first-logo-crops/01_main_logo_full.png",
+      "current_path": "docs/assets/brand/01_main_logo_full.png",
+      "sha256": "764274bcfe3515053434616b65b21bebe1abc61b695059ca4292724dcb14c9ca",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/spec-first-logo-crops/03_horizontal_logo_lockup.png",
+      "current_path": "docs/assets/brand/03_horizontal_logo_lockup.png",
+      "sha256": "86db829c34ea149d213127fd8402fc9438e7d9164e9e3a06aef53f6090c752a7",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/spec-first-logo-crops/06_clearspace_and_minimum_size.png",
+      "current_path": "docs/assets/brand/06_clearspace_and_minimum_size.png",
+      "sha256": "052c52ab2cf9ae84b17634a3edcfae2f82cde81cb7faaaaea20497de88384a1d",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/spec-first-logo-crops/07_brand_applications.png",
+      "current_path": "docs/assets/brand/07_brand_applications.png",
+      "sha256": "d0fd5dc085878ed235afc495b997c11eaeec2b1255d363c4c53edc420e2c7d75",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/spec-first-logo-crops/04_concept_and_construction.png",
+      "current_path": "docs/assets/brand/04_concept_and_construction.png",
+      "sha256": "a0907e900dc21ac805a3bb4e15c680239d04f74bf82ad3dcc456d22e153fd70a",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/spec-first-logo-crops/02_logo_symbol.png",
+      "current_path": "docs/assets/brand/02_logo_symbol.png",
+      "sha256": "1f81765dd13a5441ac8a6c675b8b0cc38d443187d11113ffee8e933e9b573ba6",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/spec-first-logo-crops/08_brand_values_footer.png",
+      "current_path": "docs/assets/brand/08_brand_values_footer.png",
+      "sha256": "46630d62c1c929b49ed3d823823511b035b9f0e3b997a77880b070210c676a1d",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/spec-first-logo-crops/05_logo_variants.png",
+      "current_path": "docs/assets/brand/05_logo_variants.png",
+      "sha256": "9ff98c86381a86ebab65cacdb1f563bc707571aeec8aa3585d41683147bddef6",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/ppt-script-v4-p01-p05.md",
+      "current_path": "docs/archive/ppt-script-v4/ppt-script-v4-p01-p05.md",
+      "sha256": "3441a313b9a3f1f9d938c9f5c9782824b801766f2bd2f5142d13ec92b18c43c5",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/ppt-script-v4-p06-p11.md",
+      "current_path": "docs/archive/ppt-script-v4/ppt-script-v4-p06-p11.md",
+      "sha256": "30fee5b0f8ba0008dca1205d1b4898d6c1f19e36bf510e4315639d44c738c7c7",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/ppt-script-v4-p12-p17.md",
+      "current_path": "docs/archive/ppt-script-v4/ppt-script-v4-p12-p17.md",
+      "sha256": "855f991c67f89f51fbb8a0c38ac463264ad9e59932dedf1c63670553a4617f6f",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/ppt-script-v4-p18-p23.md",
+      "current_path": "docs/archive/ppt-script-v4/ppt-script-v4-p18-p23.md",
+      "sha256": "f0d7b70d7d511be8a73f956e7dbf749819861f1958cb938eb40fdd6e9fbb75cc",
+      "baseline_matches": true,
+      "old_path_absent": true
+    },
+    {
+      "old_path": "docs/ppt-script-v4-p24-p26.md",
+      "current_path": "docs/archive/ppt-script-v4/ppt-script-v4-p24-p26.md",
+      "sha256": "1a88d7b86ee0f9e4146c7214f9465992b6f6129dac170af23f8df7ba8fe3a5fb",
+      "baseline_matches": true,
+      "old_path_absent": true
+    }
+  ],
+  "conclusion": "All33 absent protected documents/assets have byte-identical relocated counterparts. Navigation changes remain unrelated concurrent work. No task source/input drift was observed.",
+  "limits": [
+    "Does not authenticate author or authorize this task to edit/archive/restore unrelated files.",
+    "Historical integrity checkpoint remains unchanged; no complete-workspace preservation claim."
+  ]
+}

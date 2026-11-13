@@ -1,0 +1,121 @@
+{
+  "skill_name": "spec-runtime-setup",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T19:50:49.922921+08:00",
+  "end_time": "2026-11-04T19:54:21.084148+08:00",
+  "case_results": [
+    {
+      "case_id": "check-readonly",
+      "title": "check 保持夹具与配置只读",
+      "status": "PASS",
+      "duration_ms": 34519,
+      "turns": 1,
+      "input_tokens": 32125,
+      "output_tokens": 700,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-runtime-setup/evals/fixtures/scripts/check-readonly-verify.sh",
+            "passed": true,
+            "evidence": "PASS: 夹具字节与配置哨兵保持，setup facts 未产生；不证明全局无副作用"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-runtime-setup skill 已安装，请按它工作。）\n用 --check 检查当前夹具项目的 runtime readiness，只看状态。\n不安装、不修改 host 配置、不写 setup facts；不要改用 --verify-only。\n",
+      "response": "已按 `--check` 只读诊断完成（未安装任何工具、未改 host 配置、未写 setup facts）。当前夹具项目状态：\n\n## 执行结果\n\n| 项目 | 状态 |\n| --- | --- |\n| Required MCP 依赖 | 未验证（codegraph / context7 / sequential-thinking 均 `host-config-not-verified`） |\n| 基线就绪（baseline_ready） | unknown |\n| Generated runtime manifest | unknown（`runtime-capabilities-missing`） |\n\n## MCP servers\n- `codegraph`、`context7`、`sequential-thinking`：均为 **unknown（host-config-not-verified）**——本轮只读检查未验证 host 配置，不代表已配置或缺失的结论。\n\n## 工具\n- **degraded**：`agent-browser`（`agent-browser-capability-probe-invalid`，capability probe 输出无效，需检查 spec-test-browser probe）\n- **ready**：`ast-grep`、`ffmpeg`、`gh`、`silicon`、`vhs`、`ast-grep-skill`\n\n## Provider 状态\n| Provider | readiness | scope / probe |\n| --- | --- | --- |\n| codegraph | unknown（project-not-initialized） | installation-incomplete / query-unverified |\n| graphify | unknown（project-not-initialized） | installation-incomplete / query-unverified |\n\n## 项目设置与事实\n- Git 仓库：是\n- 示例配置 `config.local.example.yaml`：missing\n- 本地配置：**defaults-active**（无本地覆盖，默认值生效，非阻断项）\n- `.spec-first/*.local.yaml` gitignore 覆盖：missing\n- setup facts（`tool-facts.json` / `runtime-capabilities.json`）：均 missing（本轮不写入）\n\n## 后续操作（仅列出，未执行）\n1. `spec-runtime-setup --project-config` — 预览并写入项目本地配置（example/local override/gitignore）。\n2. 标准完整 `spec-runtime-setup` — 收敛 required baseline + CodeGraph/Graphify；如只需刷新事实可用 `--verify-only`（会写入事实文件）。\n\n当前完整 setup **未就绪**（Provider 未初始化、facts 缺失）。按你的要求本轮保持纯诊断；需要安装或修复时告诉我执行哪一步即可。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "semantic-question-not-setup",
+      "title": "代码理解类问题应指出不属于 setup 职责",
+      "status": "FAIL",
+      "duration_ms": 73967,
+      "turns": 4,
+      "input_tokens": 36897,
+      "output_tokens": 2275,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 4,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-runtime-setup/evals/fixtures/scripts/check-not-setup-scope.sh",
+            "passed": false,
+            "evidence": "script exited with code 127 [stderr: bash: /tmp/skill-up-judge-1793793123995791000/check-readonly-verify.sh: No such file or directory]"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-runtime-setup skill 已安装，请按它工作。）\n顺便帮我看看这个代码库的架构设计得合不合理,有什么问题。\n",
+      "response": "看完了。这个代码库本体是 `src/server.js` 一个 25 行的内存记账 demo（`.claude/` 下是 skill 工具链，不属于应用架构）。结论先说：\n\n**总体判断：对 demo 规模来说，单文件 + 零依赖 + 原生 `http` 是合理选择，没有过度设计的问题。真正的毛病不在“缺框架缺分层”，而是几个具体的健壮性缺陷，其中一个今天就会炸。**\n\n## 高优先级问题\n\n**1. 非法 JSON 会直接打崩整个服务** — `src/server.js:10`\n`JSON.parse(body || '{}')` 没有 try/catch，而且它在 `'end'` 事件回调里抛出的异常是 uncaught exception，进程直接退出。一条 `curl -d 'not json'` 就能让服务下线。这是唯一一个“现在就该修”的问题。\n\n**2. 请求体无大小上限** — `src/server.js:8`\n`body += c` 无限累积，恶意或误操作的大包会把内存吃穿。修的时候顺手加个上限（如 1MB，超限断开）。\n\n**3. ID 用 `entries.length + 1` 生成** — `src/server.js:11`\n现在没有删除功能所以暂时没炸，但一旦加 delete 端点，删一条后立刻出现重复 ID。应该用独立递增计数器或 uuid。\n\n**4. 完全没有输入校验**\n`amount` 可以是字符串、负数、甚至 `undefined`，照样存进去并返回 `ok`。README 里自己列的“五个字段手敲”痛点也在这里——错误输入应该 400 拒绝，而不是静默入库。\n\n## 架构层面的观察\n\n- **没有存储接缝**：HTTP 解析、校验、存储、响应拼装全内联在同一个闭包里，存储就是模块级数组。README 列的路线图（分类、汇总视图）每一项都得回来改这个 handler。不需要上框架，但抽一个 `store`（哪怕只是包着数组的几个函数）+ 一个带上限和错误处理的 body 解析函数，是性价比最高的一个接缝——后续加持久化（写 JSON 文件/SQLite）时 handler 一行不用动。\n- **监听所有网卡** — `src/server.js:25`：`listen(3000)` 默认绑 `0.0.0.0`，一个“个人记账”应用会对整个局域网可达。个人工具应绑 `127.0.0.1`。\n- **`req.url` 精确匹配**：`/entries?limit=5`、`/entries/` 都会 404，query string 会被当成路径的一部分。\n\n## 小的整理项\n\n- `package.json` 没有 `scripts.start`，`npm start` 跑不起来，只能 `node src/server.js`。\n- `.mcp.json` 是空的 `{}`，要么填要么删。\n- git 里所有文件都还是 untracked，连 initial commit 都没有。\n- POST 成功隐式返回 200 `'ok'`，REST 惯例是 201 + 返回创建的资源（小问题）。\n\n## 做得对的地方\n\n零依赖（没有供应链面）、README 诚实写明了已知毛边、GET 正确设置了 `content-type`、没有为 25 行代码硬造分层——这些都是对的。\n\n---\n\n要不要我直接把高优先级的四个问题修掉？改动量很小（预计 30 行以内，仍然单文件、零依赖），也可以顺手把 `store` 接缝和 `npm start` 一起带上。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "bare-invocation-fail-closed-on-unverified-surface",
+      "title": "非真实宿主表面上的裸调用必须 fail-closed 且零副作用",
+      "status": "FAIL",
+      "duration_ms": 210795,
+      "turns": 6,
+      "input_tokens": 41425,
+      "output_tokens": 3955,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 6,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-runtime-setup/evals/fixtures/scripts/check-bare-mutation.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: /tmp/skill-up-judge-1793793260815725000/script: line 8: exit_code\ufffd: unbound variable]"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "这是一个隔离评测工作区（spec-runtime-setup skill 已安装，请按它工作）。\n环境准备说明（仅用于评测隔离，不属于被测行为）：本次运行请以\n`HOME=\"$PWD/.eval-home\"` 环境变量调用共置 setup 脚本，使所有\nhome 级写入落在工作区内。\n请按 skill 对当前宿主执行 bare 调用（registry baseline，不带\n--check/--plan），完成后汇报 readiness 结果。\n",
+      "response": "bare 调用已按 skill 契约执行完毕，结果为 **fail-closed 阻断**。以下为 readiness 汇报：\n\n## 执行结果\n\n| 项 | 结果 |\n| --- | --- |\n| 调用方式 | 单项目 bare（registry baseline，无 `--check`/`--plan`），`MCP_SETUP_HOST=claude`，`HOME=$PWD/.eval-home` |\n| 退出码 | 2（blocked） |\n| reason_code | `host-invocation-surface-unverified` |\n| mutation_authorized | `false` |\n| readiness 结论 | **未就绪（blocked）**——阻断发生在 host authority 门，依赖/Provider/图能力 readiness 均未被评估 |\n\n## 根因\n\n`setup.cjs` CLI 入口固定 `enforceSurfaceBinding: true`（setup.cjs:850）：mutation mode 要求已加载 skill root 命中宿主 canonical 投射面。本工作区把 skill 装在：\n\n```\n.claude/skills/spec-runtime-setup        ← 本次加载位置（不匹配任何 canonical 面）\n.claude/spec-first/workflows/spec-runtime-setup  ← claude 的 canonical 面（工作区内不存在，host-authority.cjs:14）\n```\n\n`resolveLoadedHostSurface` 对该路径返回 null → surface binding 无法确认 pin → fail closed。这是该安全门的设计行为：未经生成的宿主面证明的 skill 镜像不获得 mutation 权限。\n\nReceipt 关键字段（`host-invocation-receipt/v1`，sha256 `af6bfa7…`）：`verification_status=unverified`、`loaded_host=null`、`surface_id=null`、`enforcement_status=loaded-root-unverified`、advisory candidate `claude` 与 pin 一致（仅 surface 绑定失败）。\n\n## 副作用确认（隔离有效）\n\n- `.eval-home/` 为空、`.spec-first/` 未创建——阻断先于任何安装、host config 写入或 facts 写入，零残留；\n- 真实 home 的 Claude MCP 配置未被触碰。\n\n## Next steps\n\n1. **推荐**：本机有 `spec-first` CLI（`/opt/homebrew/bin/spec-first`）。在本仓运行 `spec-first init` 再生成宿主投射（产出 `.claude/spec-first/workflows/spec-runtime-setup`），然后以该 generated root 的共置入口 + `MCP_SETUP_HOST=claude` 重跑 bare。按 skill 契约，init 属于独立 runtime mutation、需单独授权，故我未自动执行。\n2. 不可行路径（明确不做）：手工创建/复制 `.claude/spec-first/workflows/` 投射来骗过 surface 门——skill 禁止 hand-edit generated runtime mirrors，我不会绕过该门。\n\n需要我现在执行 `spec-first init` 并重跑 bare 调用吗？",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 117377,
+  "judge_tokens": 0,
+  "overall_tokens": 117377
+}

@@ -1,0 +1,99 @@
+schema_version: v1alpha1
+
+# 第二轮筛查；工作目录由 skill-up 放在 $TMPDIR，位于仓库之外
+environment:
+  type: none
+
+skills:
+  - source: local_path
+    path: ../../../../skills/autoresearch
+  - source: local_path
+    path: ../../../../skills/spec-app-consistency-audit
+  - source: local_path
+    path: ../../../../skills/spec-brainstorm
+  - source: local_path
+    path: ../../../../skills/spec-code-review
+  - source: local_path
+    path: ../../../../skills/spec-commit
+  - source: local_path
+    path: ../../../../skills/spec-commit-push-pr
+  - source: local_path
+    path: ../../../../skills/spec-compound
+  - source: local_path
+    path: ../../../../skills/spec-compound-refresh
+  - source: local_path
+    path: ../../../../skills/spec-debug
+  - source: local_path
+    path: ../../../../skills/spec-doc-review
+  - source: local_path
+    path: ../../../../skills/spec-dogfood
+  - source: local_path
+    path: ../../../../skills/spec-explain
+  - source: local_path
+    path: ../../../../skills/spec-handoff
+  - source: local_path
+    path: ../../../../skills/spec-ideate
+  - source: local_path
+    path: ../../../../skills/spec-lfg
+  - source: local_path
+    path: ../../../../skills/spec-optimize
+  - source: local_path
+    path: ../../../../skills/spec-plan
+  - source: local_path
+    path: ../../../../skills/spec-polish
+  - source: local_path
+    path: ../../../../skills/spec-pov
+  - source: local_path
+    path: ../../../../skills/spec-prd
+  - source: local_path
+    path: ../../../../skills/spec-product-pulse
+  - source: local_path
+    path: ../../../../skills/spec-project-rules
+  - source: local_path
+    path: ../../../../skills/spec-promote
+  - source: local_path
+    path: ../../../../skills/spec-prototype
+  - source: local_path
+    path: ../../../../skills/spec-resolve-pr-feedback
+  - source: local_path
+    path: ../../../../skills/spec-riffrec-feedback-analysis
+  - source: local_path
+    path: ../../../../skills/spec-rule-miner
+  - source: local_path
+    path: ../../../../skills/spec-runtime-setup
+  - source: local_path
+    path: ../../../../skills/spec-simplify-code
+  - source: local_path
+    path: ../../../../skills/spec-strategy
+  - source: local_path
+    path: ../../../../skills/spec-sweep
+  - source: local_path
+    path: ../../../../skills/spec-test-browser
+  - source: local_path
+    path: ../../../../skills/spec-test-xcode
+  - source: local_path
+    path: ../../../../skills/spec-work
+  - source: local_path
+    path: ../../../../skills/spec-worktree
+  - source: local_path
+    path: ../../../../skills/spec-write-skill
+  - source: local_path
+    path: ../../../../skills/spec-write-tasks
+
+engine:
+  name: claude_code
+
+cases:
+  files:
+    - evals/cases/s20-r6b-vague-clean.yaml
+    - evals/cases/s20-a1-pr-agents.yaml
+    - evals/cases/s20-m1-midflow-agents.yaml
+  defaults:
+    timeout_seconds: 1200
+    max_turns: 40
+    collect_artifacts: ["**"]
+  parallelism: 3
+
+report:
+  formats: [json]
+  artifacts: [transcript]

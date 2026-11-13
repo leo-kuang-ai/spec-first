@@ -1,0 +1,320 @@
+{
+  "artifact_type": "advisory-semantic-comparison",
+  "formal_adjudication": false,
+  "continued_session": "01a17b6c-c5fc-7573-9391-749c170097e2",
+  "window": "153e605e..00d0a5bb",
+  "unit": "U2",
+  "records": [
+    {
+      "path": "skills/ce-code-review/references/personas/adversarial-reviewer.md",
+      "local_owner": "skills/spec-code-review/references/personas/adversarial-reviewer.md",
+      "upstream_objects": {
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "a65cbb986c1089f96686d1b68408428a270f1576"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "a9c4577d01db0d9f8700fc4d303060dcb5059237"
+        }
+      },
+      "local_sha256": "685f362643319abb12a489c002532b609b0a6746ce44c5dc2fbbaf176e0d5dca",
+      "reading": "本轮读取本地全文、CE 当前全文与窗口 diff；adversarial 当前全文由前轮记录补充，本轮核对窗口 diff",
+      "decision": "采纳删除文件存活假设攻击；引用真实存活 consumer，不重复审查旧正文。保留本地 required-proof false-green 镜头。",
+      "status": "implemented-focused-checks-passed"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/correctness-reviewer.md",
+      "local_owner": "skills/spec-code-review/references/personas/correctness-reviewer.md",
+      "upstream_objects": {
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "3b248c047927e1e373907fc9173d45d0a6f5b57f"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "9687c9b69f3f588b7097f1dc2363ca995f2e9f9b"
+        }
+      },
+      "local_sha256": "bee4688a2b85635878f6f1daf61d74f3c3b85b186a8069f829321d461041b46d",
+      "reading": "本轮读取本地全文、CE 当前全文与窗口 diff；adversarial 当前全文由前轮记录补充，本轮核对窗口 diff",
+      "decision": "采纳整文件删除后的静态/字符串/路由/注册 consumer 检查，删除测试另查生产行为仍否交付。",
+      "status": "implemented-focused-checks-passed"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/security-reviewer.md",
+      "local_owner": "skills/spec-code-review/references/personas/security-reviewer.md",
+      "upstream_objects": {
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "72c96d5e3f771fb2b9ed3037498b56a46ba116b9"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "fd590690dac71a8aa8845ada2a0c6a2c24d7fb21"
+        }
+      },
+      "local_sha256": "6a8b2272f1ce207ffeebfd2a476d28cffd2c6d71aed70608df39173c4e8f2761",
+      "reading": "本轮读取本地全文、CE 当前全文与窗口 diff；adversarial 当前全文由前轮记录补充，本轮核对窗口 diff",
+      "decision": "采纳 feature gate 泄漏与补齐 crypto/生产配置专项，保留 agent trust/tenant/plan 边界；拒绝上游以 P0 绕过 anchor 50 gate 的建议，按共享合同分离 severity 与 confidence。",
+      "status": "implemented-focused-checks-passed"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/agent-native-reviewer.md",
+      "local_owner": "skills/spec-code-review/references/personas/agent-native-reviewer.md",
+      "upstream_objects": {
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "dbbec500b6fb0ffc55cc6751d8d6eb158186a3c7"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "f4aeb03460a87e05872304a078b7e8723d9f29c5"
+        }
+      },
+      "local_sha256": "41548eb73a661d6491cf968e6401d9d4608d26f4137b10c3169ce55a0e81740d",
+      "reading": "本轮逐文件读取本地全文及 CE 窗口 diff；未将此标为两端全文已读或正式裁决",
+      "decision": "窗口只改 capability hiding 措辞与 anchor 50 展开说明；本地和共享 subagent-template 已有等价路由，保留本地。",
+      "status": "window-delta-equivalent-producer-judgment"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/api-contract-reviewer.md",
+      "local_owner": "skills/spec-code-review/references/personas/api-contract-reviewer.md",
+      "upstream_objects": {
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "d9f9b62ca3e23d245b78d57e395f2f9b59fe7aad"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "a836081c39bf49e8cff5dbd2322a93e42d7dfee3"
+        }
+      },
+      "local_sha256": "f999186d08eef14fc2f6ed1a279e60d10376b2a456a38b8da32e404b529690e6",
+      "reading": "本轮逐文件读取本地全文及 CE 窗口 diff；未将此标为两端全文已读或正式裁决",
+      "decision": "窗口只改 Hyrum 表述与 anchor 50 展开说明；本地已有可观察语义变化、consumer migration 和共享置信度路由。SemVer 基线名词差异不强制新增审查 gate。",
+      "status": "window-delta-equivalent-producer-judgment"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/data-migration-reviewer.md",
+      "local_owner": "skills/spec-code-review/references/personas/data-migration-reviewer.md",
+      "upstream_objects": {
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "0de76e9babdddc5762189a610eb0f8ea936b59d2"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "ef24165e0dd65292a4531737bdaa9381889f51ae"
+        }
+      },
+      "local_sha256": "be7dc853a91d5c404638ab2eea1018513b81d9579857bcb7c7aac616f929152e",
+      "reading": "本轮逐文件读取本地全文及 CE 窗口 diff；未将此标为两端全文已读或正式裁决",
+      "decision": "窗口将 P0 escape 展开成 severity=P0；本地原文及共享 synthesis 语义等价。",
+      "status": "window-delta-equivalent-producer-judgment"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/deployment-verification-agent.md",
+      "local_owner": "skills/spec-code-review/references/personas/deployment-verification-agent.md",
+      "upstream_objects": {
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "91bb1497dab4b1f5ebbc27ae30920e628563b7bc"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "2efc784e35fd6fd2a703b884a9d1812fad7a644e"
+        }
+      },
+      "local_sha256": "a85fae19283d7cb82d2d4a34c5fd286d2bb10d5e632b1642be9d3757fef7ad23",
+      "reading": "本轮逐文件读取本地全文及 CE 窗口 diff；未将此标为两端全文已读或正式裁决",
+      "decision": "窗口只将 owns 改 reports；本地已明确 schema drift 归属且 activation 更严格，保留本地。",
+      "status": "window-delta-equivalent-producer-judgment"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/julik-frontend-races-reviewer.md",
+      "local_owner": "skills/spec-code-review/references/personas/julik-frontend-races-reviewer.md",
+      "upstream_objects": {
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "5b6a31e1405101bf6db49036409bb76d2791ff15"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "47ffd752396259d4bc9f9b2dae722694753cf924"
+        }
+      },
+      "local_sha256": "915289507bb863444d3ccb155a75c1a099121b6807dea3e451908d0a51ec48e0",
+      "reading": "本轮逐文件读取本地全文及 CE 窗口 diff；未将此标为两端全文已读或正式裁决",
+      "decision": "窗口只展开 anchor 50 的 soft-bucket 名称；共享 subagent-template 已精确定义，保留本地。",
+      "status": "window-delta-equivalent-producer-judgment"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/previous-comments-reviewer.md",
+      "local_owner": "skills/spec-code-review/references/personas/previous-comments-reviewer.md",
+      "upstream_objects": {
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "12023aca5944d2b7fd6fe193dd6dacd70a1b8368"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "68445e472366062453fc35e9e91e3910baa43905"
+        }
+      },
+      "local_sha256": "27cf0694aec33972d2dd802f03a25411df3cf1d10cc0714750165f4377df1e56",
+      "reading": "本轮逐文件读取本地全文及 CE 窗口 diff；未将此标为两端全文已读或正式裁决",
+      "decision": "窗口只展开 anchor 50 的 soft-bucket 名称；保留现有 PR-context gate 与共享路由。",
+      "status": "window-delta-equivalent-producer-judgment"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/project-standards-reviewer.md",
+      "local_owner": "skills/spec-code-review/references/personas/project-standards-reviewer.md",
+      "upstream_objects": {
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "65f6bf8125ced78b0a4a998fcbedf3fa41c873be"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "c2b621df94416b3111627c30d90dd58358e2fcb8"
+        }
+      },
+      "local_sha256": "02d33c8b35160e5c3623a7c4afa4450a4783888fdcb9e875b7b3ec3d7c08c5d5",
+      "reading": "本轮逐文件读取本地全文及 CE 窗口 diff；未将此标为两端全文已读或正式裁决",
+      "decision": "窗口只展开 anchor 50 的 soft-bucket 名称；保留本地 criteria-path scope 与 quoted-rule evidence。",
+      "status": "window-delta-equivalent-producer-judgment"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/swift-ios-reviewer.md",
+      "local_owner": "skills/spec-code-review/references/personas/swift-ios-reviewer.md",
+      "upstream_objects": {
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "55216509f57a3475c0fea55ddf2e6b7f8b6f2c52"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "0ff3f1d7ab202467c02cb38b76d05153c4ed22e0"
+        }
+      },
+      "local_sha256": "5c706ddaf1986312d15cbb1146f41a5373f1048741d33916cd86303adda9a18f",
+      "reading": "本轮逐文件读取本地全文及 CE 窗口 diff；未将此标为两端全文已读或正式裁决",
+      "decision": "窗口只改 monetary 表述和展开 anchor 50；本地金额、locale、Core Data 和共享置信度合同已等价。",
+      "status": "window-delta-equivalent-producer-judgment"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/learnings-researcher.md",
+      "local_owner": "skills/spec-code-review/references/personas/learnings-researcher.md",
+      "upstream_objects": {
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "fd6752a31d9f98313d19353940488270db95f427"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "785fe73d885dd928b1b58e30865ccb8e542894fd"
+        }
+      },
+      "local_sha256": "4db7ba4d4273e3c3f2b528aa8151bdd33b993fe80e33c8660329f38e84a63813",
+      "reading": "本轮本地全文与 CE 窗口 diff，CE 当前正文部分；未声明全量读取",
+      "decision": "CE 增加 Pack 搜索 roots、applies_when、规则引文/生效行定位与 untrusted body。按本方案 U5，远程 Pack/cache/resolver 不引入；保留 docs/solutions 单一权威。与 project-rules/rule-miner 的完整映射仍待 U5，不关闭此路径。",
+      "status": "partial"
+    },
+    {
+      "path": "skills/ce-code-review/scripts/review-scope.py",
+      "local_owner": "skills/spec-code-review/scripts/review-scope.py",
+      "upstream_objects": {
+        "old_object": {
+          "mode": "100755",
+          "type": "blob",
+          "git_oid": "1382f94c056dbc026c42f3f58b36f7ae764926b2"
+        },
+        "new_object": {
+          "mode": "100755",
+          "type": "blob",
+          "git_oid": "ce714c37db3586e9321f69d2fc7de5bbaf970d88"
+        }
+      },
+      "local_sha256": "2053480954fda4baae0ece74971ed4295b87cddb261716e2fdbd40223ededd0d",
+      "reading": "本轮两端全文与窗口 diff、直接 scope consumer、既有 tests",
+      "decision": "采纳精确路径、binary fail-closed、deleted_files；使用 Git -z 而非仅关闭 quotePath 或解析 rename 展示语法。保留本地 snapshot v2/untracked ownership。上游 depth/非测试计数/Pack declaration 差额仍待与本地 roster 合同联合关闭。",
+      "status": "partial-implemented-focused-tests-passed"
+    },
+    {
+      "path": "skills/ce-code-review/references/depth-paths.md",
+      "local_owner": "skills/spec-code-review/references/select-and-route.md",
+      "upstream_objects": {
+        "old_object": null,
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "513ca885baaf4ec64b9016ef5c76c83a31971c9b"
+        }
+      },
+      "local_sha256": "b33a9bdade91c91b7712c5b599ad9e3e9874787a2f9a0f9891db90b6b080915e",
+      "reading": "本轮 CE 全文与本地 select-and-route 全文",
+      "decision": "lite/focused/full 已读取；focused 的默认跨模型外发和独立性/授权不能原样移植。需结合本地 dispatch、roster 与 admission 合同适配，当前未实施。",
+      "status": "pending-contract-integration"
+    },
+    {
+      "path": "skills/ce-code-review/references/action-class-rubric.md",
+      "local_owner": "skills/spec-code-review/references/action-class-rubric.md",
+      "upstream_objects": {
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "0897d8ec2e37a634b701e7b1d6ed1afd5d1379a5"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "aeecb38ef702ab7a66a966e7c1fa411376ea744d"
+        }
+      },
+      "local_sha256": "fca2d4f97ce477349de7d37983da44774cbfd198e0e8852e1f4f9ed5b51b7f8d",
+      "reading": "本轮两端全文",
+      "decision": "已读取两端；mutate permission 与分类分离本地已有更严格合同。CE 新的 artifact-root 精确 protected-artifact 规则须检查本地 surviving consumers，暂不关闭。",
+      "status": "pending-consumer-comparison"
+    }
+  ],
+  "verification": {
+    "log_ref": "docs/validation/ce-pull-2026-10-27/logs/session-resume-review-tests.log",
+    "exit_code": 0,
+    "suites": 3,
+    "tests": 77,
+    "red_log_ref": "docs/validation/ce-pull-2026-10-27/logs/session-resume-scope-red.log",
+    "red_failures": 5,
+    "entrypoint_log_ref": "docs/validation/ce-pull-2026-10-27/logs/session-resume-entrypoints.log"
+  },
+  "limitations": [
+    "producer 自审；LFG 一次独立 code review 留待整窗实施完成后，fresh-source 独立语义评估本轮未执行",
+    "两端全文、窗口 diff 和部分读取分别记录；不将已打开文件或机械回归外推为整窗完成",
+    "本轮 macOS 确定性回归不证明 Windows 或真实宿主/模型效果，Windows 不运行非法控制字符文件名用例",
+    "398 个候选与 625 个历史排除例外仍未全部关闭；完整同步点不前移"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "空 feature 描述应先提问不推进",
+  "prompt": "（spec-brainstorm skill 已安装，请按它工作。）\n",
+  "assertions": [
+    "expect.files_not_exist",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-brainstorm/evals/fixtures/scripts/asks-a-question.sh"
+  ]
+}

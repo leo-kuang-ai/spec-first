@@ -1,0 +1,15 @@
+{
+  "expectations": [
+    {
+      "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-runtime-setup/evals/fixtures/scripts/check-bare-mutation.sh",
+      "passed": false,
+      "evidence": "script exited with code 1 [stderr: /tmp/skill-up-judge-1793793260815725000/script: line 8: exit_code\ufffd: unbound variable]"
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 1,
+    "total": 1,
+    "pass_rate": 0
+  }
+}

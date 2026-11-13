@@ -1,0 +1,10 @@
+{
+  "trial": "CEOPT-04-B2",
+  "status": "blocked-no-execution",
+  "recorded_at": "2026-10-31T05:06:37.367864+00:00",
+  "reason": "No concrete executable hunk/index isolation strategy supplied. Parent did not substitute another trial recipe.",
+  "head_unchanged": true,
+  "index_entries_unchanged": true,
+  "worktree_hashes_unchanged": true,
+  "parent_intervention": "Read-only preservation checks only; no staging or commit."
+}

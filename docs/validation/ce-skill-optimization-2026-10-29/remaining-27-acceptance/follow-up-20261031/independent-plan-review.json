@@ -1,0 +1,365 @@
+{
+  "review_type": "independent_read_only_full_six_plan_review",
+  "evidence_root": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/",
+  "coverage": {
+    "trial_artifacts_read_in_full": [
+      "A1",
+      "A2",
+      "A3",
+      "B1",
+      "B2",
+      "B3"
+    ],
+    "trace_records_inspected": {
+      "A1": 50,
+      "A2": 46,
+      "A3": 42,
+      "B1": 38,
+      "B2": 39,
+      "B3": 51
+    },
+    "trace_method": "Inspected every retained record through compact projections retaining all tool commands, response presence and truncation markers, assistant commentary, and final-output identification. Read all six final artifacts separately in full. Encrypted reasoning and encrypted task-message bodies were not decipherable.",
+    "inputs_read": [
+      "plan-request.txt",
+      "plan-rubric.json",
+      "plan-input3-protocol.json",
+      "plan-record-verification.json",
+      "plan-trial-index.json",
+      "All nine files under plan-inputs",
+      "plan-contract-verification.json",
+      ".spec-first/workflows/spec-work/spec-first/ce-opt-followup-20261031/logs/plan-contracts.log"
+    ],
+    "frozen_sources_read": [
+      "spec-plan/SKILL.md",
+      "references/planning-evidence-boundaries.md",
+      "references/settled-decisions.md",
+      "references/output-mode.md",
+      "references/resume.md",
+      "references/intake.md",
+      "references/research.md",
+      "references/high-risk-plan-lens.md",
+      "references/interface-and-evolution-lens.md",
+      "references/structure.md",
+      "references/plan-sections.md",
+      "references/markdown-rendering.md",
+      "references/final-review.md",
+      "references/synthesis-summary.md",
+      "references/plan-handoff.md"
+    ],
+    "source_read_method": "Read A owners and recovered ranges obscured by reviewer-output truncation. Compared the complete corresponding A/B file contents and read every changed B hunk; identical bodies were not redundantly printed.",
+    "current_successor_read": "skills/spec-plan/references/plan-handoff.md",
+    "reviewer_actions": "Read-only source inspection and record projection. No fixture tests, implementation, writes, external requests, or delegation.",
+    "deterministic_evidence_attribution": "The supplied record-verification receipt reports 85 matching pins, six complete records, deadline admission, and exact Product Contract preservation. These checks were not personally rerun."
+  },
+  "shared_core_assessment": {
+    "retry_safety": "All six plans constrain replay to the exact TRANSIENT_BEFORE_SEND code and permit at most four total sends. They distinguish unknown application outcome from known pre-send failure and terminate on validation, authentication, unclassified, and ambiguous failures.",
+    "ownership": "All six place retry coordination in the importer, preserve client-owned validation and application semantics, preserve CLI-owned serialization, and require invocation-local sequential attempt state.",
+    "identity": "All six preserve successful values and the terminal error, including final error object identity in their importer verification scenarios.",
+    "cli": "All six bind compatibility to the newly authored synthetic CLI. They correctly change the single-transient scenario to recovered success while preserving final failure formatting, streams, newline, and exit status.",
+    "product_contract": "No semantic Product Contract change found. Exact byte preservation is supported by the supplied deterministic receipt.",
+    "kd1": "All six retain the queue rejection and identify its synthetic fixture-owner provenance rather than inventing production approval.",
+    "attribution": "All six distinguish parent characterization from producer execution and avoid claiming implemented retries, production compatibility, autonomous saving, historical-trial repair, or model superiority."
+  },
+  "findings": [
+    {
+      "id": "PLAN-R1",
+      "category": "reporting",
+      "severity": "P2",
+      "affected_trials": [
+        "A1",
+        "A2",
+        "A3",
+        "B1",
+        "B2",
+        "B3"
+      ],
+      "title": "Prohibited independent review is mislabeled as unavailable capability",
+      "evidence": [
+        "plan-trials/CEOPT-16-input3-A1/artifact.md:297",
+        "plan-trials/CEOPT-16-input3-A2/artifact.md:329",
+        "plan-trials/CEOPT-16-input3-A3/artifact.md:343",
+        "plan-trials/CEOPT-16-input3-B1/artifact.md:335",
+        "plan-trials/CEOPT-16-input3-B2/artifact.md:289",
+        "plan-trials/CEOPT-16-input3-B3/artifact.md:320"
+      ],
+      "explanation": "Each artifact emits reason_code: spec_doc_review_capability_unavailable while its surrounding prose says independent invocation or delegation was prohibited. Prohibition does not establish capability absence. A3 explicitly acknowledges this distinction in prose, but retains the conflicting machine-readable reason code.",
+      "impact": "The plans honestly report degraded producer self-review and independent_review: not_run, so this does not fabricate a completed independent review or invalidate their retry design. It does prevent clean reporting acceptance.",
+      "correction": "Preserve the trial records unchanged. Any successor should report dispatch_authorization_missing with capability unknown for this assignment."
+    },
+    {
+      "id": "PLAN-D1",
+      "category": "plan_completeness",
+      "severity": "P2",
+      "affected_trials": [
+        "B2",
+        "B3"
+      ],
+      "title": "No implementation owner updates obsolete current-tense fixture contract descriptions",
+      "evidence": [
+        "plan-inputs/CONTRACT.md:20",
+        "plan-inputs/CONTRACT.md:29",
+        "plan-trials/CEOPT-16-input3-B2/artifact.md:182",
+        "plan-trials/CEOPT-16-input3-B2/artifact.md:220",
+        "plan-trials/CEOPT-16-input3-B3/artifact.md:190",
+        "plan-trials/CEOPT-16-input3-B3/artifact.md:247"
+      ],
+      "explanation": "CONTRACT.md currently says the CLI calls the unchanged single-send importer and describes the importer as retained byte-for-byte. B2 provides only importer/test units and B3 explicitly lists CONTRACT.md as a read-only integration contract. Neither assigns a documentation update after retries are implemented.",
+      "impact": "The executable design remains implementable, and both correctly replace obsolete test expectations. Following either plan literally would nevertheless leave the designated descriptive contract inconsistent with the changed importer.",
+      "correction": "Add a small documentation responsibility to an existing unit, distinguishing historical characterization from current retry behavior while preserving the frozen receipt and synthetic provenance.",
+      "blocking_classification": "Nonblocking to starting the bounded implementation; prevents treating the plan as fully closed without this minor completion addition."
+    },
+    {
+      "id": "PLAN-T1",
+      "category": "observed_read_quality",
+      "severity": "P2",
+      "affected_trials": [
+        "A1",
+        "A2",
+        "A3",
+        "B1",
+        "B2",
+        "B3"
+      ],
+      "title": "Every trial encountered truncated source-read responses",
+      "evidence": {
+        "A1_trace_ordinals": [
+          31,
+          84,
+          100
+        ],
+        "A2_trace_ordinals": [
+          25,
+          56
+        ],
+        "A3_trace_ordinals": [
+          22,
+          37,
+          80,
+          88
+        ],
+        "B1_trace_ordinals": [
+          28,
+          48,
+          64,
+          71
+        ],
+        "B2_trace_ordinals": [
+          46,
+          66,
+          73
+        ],
+        "B3_trace_ordinals": [
+          45,
+          61
+        ]
+      },
+      "explanation": "All six used large combined reads despite the request for bounded untruncated reads. They subsequently performed targeted recovery reads. However, recovery does not justify a blanket claim that every required frozen reference was consumed fully: for example, A1's synthesis-summary truncation includes the structural-discipline text preceding its recovery range beginning at line 190, and A3's combined intake/research truncation removes late intake material before a recovery focused on research.",
+      "impact": "The fixture source and retained final plans provide enough evidence for the core-task judgments below. Read discipline remains imperfect, and these traces do not establish uniformly complete Skill-reference intake.",
+      "correction": "Report truncation and recovery honestly; use smaller independent source ranges in any new trial. Do not silently repair these observations in the retained records."
+    }
+  ],
+  "per_trial": [
+    {
+      "id": "CEOPT-16-input3-A1",
+      "core_task_disposition": "acceptable_with_nonblocking_reporting_and_read_limitations",
+      "core_evidence": [
+        "artifact.md:82 exact allowlist",
+        "artifact.md:84 four-send ceiling and local state",
+        "artifact.md:163 U1 safety, identity, mixed outcomes, and isolation",
+        "artifact.md:201 U2 real-process recovery and exhaustion",
+        "artifact.md:232 U3 obsolete contract documentation"
+      ],
+      "terminal_and_null_assessment": "Explicit no-code terminal case and broad unchanged-terminal-error rule. Literal null rejection is not named as a test; null-safe classification is a useful hardening detail, not an observed unsafe retry instruction against the declared Error-producing fixture.",
+      "reporting_findings": [
+        "PLAN-R1"
+      ],
+      "read_findings": [
+        "PLAN-T1"
+      ],
+      "prohibited_read_write_observations": "No cross-arm, old-answer, grader, broad-index, runtime-mirror read, write, implementation, test execution, network request, or delegation observed. Reads include the assigned source package, named fixture/request/receipt, and linked characterization log.",
+      "deadline": {
+        "elapsed_seconds": 253.632,
+        "limit_seconds": 600,
+        "disposition": "passed_per_supplied_index"
+      },
+      "coverage": "Full artifact and all 50 trace records inspected."
+    },
+    {
+      "id": "CEOPT-16-input3-A2",
+      "core_task_disposition": "acceptable_with_nonblocking_reporting_and_read_limitations",
+      "core_evidence": [
+        "artifact.md:81 exact allowlist",
+        "artifact.md:83 four-send ceiling",
+        "artifact.md:169 U1 ownership, identity, and isolation",
+        "artifact.md:204 non-Error rejection preservation",
+        "artifact.md:212 real-process CLI exhaustion",
+        "artifact.md:258 contract documentation update"
+      ],
+      "terminal_and_null_assessment": "Explicitly requires non-Error rejections to propagate without retry or a replacement classification error. This covers the relevant null-safe classifier intent even though null is not individually named.",
+      "reporting_findings": [
+        "PLAN-R1"
+      ],
+      "read_findings": [
+        "PLAN-T1"
+      ],
+      "prohibited_read_write_observations": "No prohibited file read, write, implementation, test execution, network request, or child delegation observed. Trace ordinal 102 contains send_message to /root, not worker dispatch; its message body is encrypted in the retained record, so its semantic content was not independently inspectable.",
+      "parent_receipt_attribution": "Correctly states that the linked raw log was not inspected.",
+      "deadline": {
+        "elapsed_seconds": 281.017,
+        "limit_seconds": 600,
+        "disposition": "passed_per_supplied_index"
+      },
+      "coverage": "Full artifact and all 46 trace records inspected."
+    },
+    {
+      "id": "CEOPT-16-input3-A3",
+      "core_task_disposition": "acceptable_with_nonblocking_reporting_and_read_limitations",
+      "core_evidence": [
+        "artifact.md:81 explicit safe allowlist and terminal classes",
+        "artifact.md:83 local budget and final error identity",
+        "artifact.md:196 U1 safety and isolation",
+        "artifact.md:239 actual CLI integration and exhaustion",
+        "artifact.md:271 documentation ownership"
+      ],
+      "terminal_and_null_assessment": "Code-less failures terminate and final errors are preserved. The plan explicitly limits compatibility with unusual thrown-value contracts at line 155; literal null rejection coverage is therefore not established. This is a disclosed scope limitation against a fixture that only throws Error objects, not evidence of unsafe handling of the supplied client.",
+      "reporting_findings": [
+        "PLAN-R1"
+      ],
+      "read_findings": [
+        "PLAN-T1"
+      ],
+      "prohibited_read_write_observations": "No prohibited read, write, implementation, test execution, network request, or delegation observed.",
+      "deadline": {
+        "elapsed_seconds": 260.333,
+        "limit_seconds": 600,
+        "disposition": "passed_per_supplied_index"
+      },
+      "coverage": "Full artifact and all 42 trace records inspected."
+    },
+    {
+      "id": "CEOPT-16-input3-B1",
+      "core_task_disposition": "acceptable_with_nonblocking_reporting_and_read_limitations",
+      "core_evidence": [
+        "artifact.md:92 exact allowlist",
+        "artifact.md:94 four sends",
+        "artifact.md:203 U1 terminal outcomes, identity, input ownership, and isolation",
+        "artifact.md:240 real-process CLI exhaustion",
+        "artifact.md:268 documentation ownership"
+      ],
+      "terminal_and_null_assessment": "All rejections other than the allowlisted code are terminal; tests name missing and unfamiliar codes. A literal null rejection test is not specified. No claim of generic null-rejection CLI support is established.",
+      "reporting_findings": [
+        "PLAN-R1"
+      ],
+      "read_findings": [
+        "PLAN-T1"
+      ],
+      "prohibited_read_write_observations": "No prohibited read, write, implementation, test execution, network request, or delegation observed. It inspected the named parent log and accurately attributes the reported 15 passing tests.",
+      "deadline": {
+        "elapsed_seconds": 246.33,
+        "limit_seconds": 600,
+        "disposition": "passed_per_supplied_index"
+      },
+      "coverage": "Full artifact and all 38 trace records inspected."
+    },
+    {
+      "id": "CEOPT-16-input3-B2",
+      "core_task_disposition": "implementable_core_with_minor_completion_gap",
+      "core_evidence": [
+        "artifact.md:90 exact allowlist",
+        "artifact.md:92 invocation-local four-send ceiling",
+        "artifact.md:182 U1 concrete safety and identity tests",
+        "artifact.md:213 explicit unchanged null rejection",
+        "artifact.md:220 real-process terminal and recovery compatibility",
+        "artifact.md:245 explicit compositional exhaustion limitation"
+      ],
+      "terminal_and_null_assessment": "Explicit null-rejection preservation is correctly scoped to importer behavior. The existing CLI catch dereferences error.code/error.message, so this must not be promoted into a generic null-safe CLI claim; the plan does not make that claim.",
+      "cli_exhaustion_tradeoff": "Acceptable bounded planning tradeoff: importer exhaustion/error preservation plus inspection of the unchanged serializer and permanent-error subprocess tests. The plan explicitly discloses that one CLI process does not exercise four transient failures. A direct exhaustion subprocess would strengthen proof, but its omission is not a blocker for this tiny unchanged serializer.",
+      "reporting_findings": [
+        "PLAN-R1"
+      ],
+      "completion_findings": [
+        "PLAN-D1"
+      ],
+      "read_findings": [
+        "PLAN-T1"
+      ],
+      "prohibited_read_write_observations": "No prohibited read, write, implementation, test execution, network request, or delegation observed. It accurately states that the linked log was not independently inspected.",
+      "deadline": {
+        "elapsed_seconds": 279.751,
+        "limit_seconds": 600,
+        "disposition": "passed_per_supplied_index"
+      },
+      "coverage": "Full artifact and all 39 trace records inspected."
+    },
+    {
+      "id": "CEOPT-16-input3-B3",
+      "core_task_disposition": "implementable_core_with_minor_completion_gap",
+      "core_evidence": [
+        "artifact.md:103 exact eligibility, mixed terminal outcomes, and four-call bound",
+        "artifact.md:105 serial local state and input preservation",
+        "artifact.md:190 U1 implementation and safety tests",
+        "artifact.md:233 actual CLI exhaustion and mixed-failure integration"
+      ],
+      "terminal_and_null_assessment": "Explicit uncoded terminal handling and unchanged final-error policy. Literal null rejection is not named in the test scenarios; this remains a hardening detail beyond the declared fixture's Error-object outcomes.",
+      "reporting_findings": [
+        "PLAN-R1"
+      ],
+      "completion_findings": [
+        "PLAN-D1"
+      ],
+      "read_findings": [
+        "PLAN-T1"
+      ],
+      "prohibited_read_write_observations": "No prohibited read, write, implementation, test execution, network request, or delegation observed. The empty out-of-range final-review read at trace ordinal 68 was followed by a corrected bounded range.",
+      "deadline": {
+        "elapsed_seconds": 287.033,
+        "limit_seconds": 600,
+        "disposition": "passed_per_supplied_index"
+      },
+      "coverage": "Full artifact and all 51 trace records inspected."
+    }
+  ],
+  "source_root_disposition": {
+    "finding": "The frozen A and B plan-handoff owner uses the same capability-unavailable reason code for both actual invocation unavailability and disabled downstream invocation.",
+    "evidence": [
+      ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-plan/references/plan-handoff.md:20",
+      ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-plan/references/plan-handoff.md:20"
+    ],
+    "causal_assessment": "The shared frozen instruction directly explains the repeated reporting error. It is not an observed A-versus-B regression.",
+    "current_successor": {
+      "path": "skills/spec-plan/references/plan-handoff.md",
+      "assessment": "The current source distinguishes prohibited invocation, confirmed unavailable capability, and unproven readiness. It requires dispatch_authorization_missing and capability unknown when invocation is prohibited.",
+      "status": "source_text_addresses_root_cause",
+      "behavioral_status": "not_exercised_by_these_six_trials"
+    }
+  },
+  "aggregate_bounded_disposition": {
+    "result": "Six usable synthetic implementation plans, not six clean unconditional acceptances.",
+    "unsafe_retry_blockers_found": 0,
+    "core_implementation_plans_usable": 6,
+    "plans_with_minor_documentation_completion_gap": [
+      "B2",
+      "B3"
+    ],
+    "plans_with_reporting_reason_code_error": [
+      "A1",
+      "A2",
+      "A3",
+      "B1",
+      "B2",
+      "B3"
+    ],
+    "deadline_admission": "All six within the declared 600-second budget according to the supplied records.",
+    "acceptance_boundary": "The full-six review supports bounded core planning adequacy with the enumerated individual limitations. It does not erase reporting defects, establish complete untruncated reference intake, or prove execution outcomes."
+  },
+  "remaining_limitations": [
+    "The client and CLI are newly authored synthetic input. No historical trial has been repaired or retroactively completed.",
+    "A/B compares frozen spec-first pre/post-optimization packages, not direct execution of CE code.",
+    "No retries were implemented or executed by these planning trials or this reviewer.",
+    "No production service compatibility, real network safety, field benefit, release, or autonomous persistence is established.",
+    "Parent-mediated saving and supplied deterministic receipts remain separately attributed evidence.",
+    "Serving/model metadata is not authenticated evidence of model superiority.",
+    "The current reason-code successor needs separate behavioral evidence; these six frozen-source outputs cannot supply it.",
+    "Encrypted portions of retained traces limit inspection of task-message and one parent-status-message content."
+  ]
+}

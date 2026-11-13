@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "空输入应先问要规划什么",
+  "prompt": "（spec-plan skill 已安装，请按它工作。）\n",
+  "assertions": [
+    "expect.exit_code",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/asks-a-question.sh"
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-doc-review",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T22:39:50.356226+08:00",
+  "end_time": "2026-11-04T22:40:11.755106+08:00",
+  "case_results": [
+    {
+      "case_id": "headless-no-path-fails",
+      "title": "Non-interactive review without a path returns the fixed receipt",
+      "status": "PASS",
+      "duration_ms": 21255,
+      "turns": 1,
+      "input_tokens": 22323,
+      "output_tokens": 390,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-doc-review/evals/fixtures/scripts/check-headless-no-path.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "Read the installed spec-doc-review skill and process: mode:non-interactive\n",
+      "response": "Review failed: non-interactive mode requires a document path. Expected arguments: mode:non-interactive \u003cpath\u003e",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 22713,
+  "judge_tokens": 0,
+  "overall_tokens": 22713
+}

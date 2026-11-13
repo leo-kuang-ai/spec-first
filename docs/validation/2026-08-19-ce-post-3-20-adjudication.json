@@ -4,8 +4,8 @@
   "producer": {
     "kind": "llm-adjudication",
     "model": "codex-current-session",
-    "status": "confirmed",
-    "adjudication_scope": "reconfirmed all 517 owner/action/unit/limitation decisions against the current deterministic input after formatting-only review-plan cleanup and a concurrent changelog-only update; the deterministic 517-record digest remains unchanged, no upstream join or semantic ownership map changed, and no provider, runtime-adoption, or field-outcome claim is made"
+    "status": "degraded",
+    "adjudication_scope": "Current-source carry-over with fresh source/ref/owner/test reachability verification at pinned upstream range; semantic decisions retained only where current local and upstream references remain valid; no live behavior claim."
   },
   "upstream": {
     "repository": "compound-engineering-plugin",
@@ -15,46 +15,15 @@
   },
   "target_source_snapshot": {
     "repository": "spec-first",
-    "head": "4f2095725c4b503b0ea62cc16a9ce4631c4ede76",
+    "head": "f4c7a7b98ecf342e54bd3117c4d745e684532a19",
     "dirty": true,
     "dirty_paths": [
       "CHANGELOG.md",
-      "docs/contracts/workflows/ce-localization-regeneration-sequence.md",
-      "docs/validation/skill-evals/2026-08-30-skill-inventory.md",
-      "docs/validation/skill-evals/README.md",
-      "docs/validation/skill-evals/_template.md",
-      "docs/validation/skill-evals/results.tsv",
-      "docs/validation/skill-evals/using-spec-first.md",
-      "skills/spec-ideate/evals/cases/non-software-mode-no-label-leak.yaml",
-      "skills/spec-ideate/evals/cases/refine-own-idea-routes-to-brainstorm.yaml",
-      "skills/spec-ideate/evals/cases/repo-grounded-e2e-writes-artifact.yaml",
-      "skills/spec-ideate/evals/cases/surprise-me-no-repo-needs-substance.yaml",
-      "skills/spec-ideate/evals/cases/vague-subject-gate-asks.yaml",
-      "skills/spec-ideate/evals/eval.yaml",
-      "skills/spec-ideate/evals/fixtures/repos/mini-ledger/README.md",
-      "skills/spec-ideate/evals/fixtures/repos/mini-ledger/package.json",
-      "skills/spec-ideate/evals/fixtures/repos/mini-ledger/src/server.js",
-      "skills/spec-ideate/evals/fixtures/scripts/asks-a-question.sh",
-      "skills/spec-project-rules/SKILL.md",
-      "skills/spec-project-rules/evals/README.md",
-      "skills/spec-project-rules/references/knowledge-format.md",
-      "skills/spec-project-rules/references/mining-method.md",
-      "skills/spec-project-rules/scripts/extract-deps.cjs",
-      "skills/using-spec-first/SKILL.md",
-      "skills/using-spec-first/evals/cases/direct-lane-simple-howto.yaml",
-      "skills/using-spec-first/evals/cases/failure-priority-single-entry.yaml",
-      "skills/using-spec-first/evals/cases/recommendation-only-format.yaml",
-      "skills/using-spec-first/evals/cases/route-failure-to-spec-debug.yaml",
-      "skills/using-spec-first/evals/cases/route-vague-idea-to-spec-brainstorm.yaml",
-      "skills/using-spec-first/evals/eval.yaml",
-      "tests/unit/ce-localization-review-contracts.test.js",
-      "tests/unit/spec-project-rules-contracts.test.js",
-      "tests/unit/spec-project-rules-scripts.test.js",
-      "tests/unit/using-spec-first-contracts.test.js"
+      "docs/research/2026-09-24-ai-industry-trends-claude-prompt-shortening.md"
     ],
-    "dirty_path_manifest_sha256": "bbc7b9dcb60366a9d6a3178f2c227db2f0e4608ff453360c3b65c2d958059849",
-    "source_tree_hash": "be29eca636cd722fb90acecf19a63a74e320e0251b003b81e16ba167cea3e761",
-    "inventory_hash": "8048c355d99c8dc6af15e5da9caab06fa4a8e987a121147ac210f77a31607295",
+    "dirty_path_manifest_sha256": "1bb075e50a41be74a6110474cadc6e048d1a7e0ba373aedf14e1479cfdede638",
+    "source_tree_hash": "4e6dadd27c2601ee9a3f7abe1c9fe2a68ff0ac423b78373e4b217a6ad5f2a838",
+    "inventory_hash": "ed135a864893cde2a444577b62acd29af6d021dd3d34ef5d2c942caa767f4d1e",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -88,7 +57,7 @@
       "version": "canonical-source-manifest-v1"
     }
   },
-  "input_artifact_sha256": "d19e953bd3ffb7ea6b541e549db8d46a668498c857a10549c12eac3c3e0ac8e4",
+  "input_artifact_sha256": "600d74a0bb382f20c4113183015d0dd1e0cf81a9413019f5fdd5ad708a6e04f1",
   "records": [
     {
       "audit_id": "A001",
@@ -386,7 +355,7 @@
       "old_path": ".compound-engineering/config.local.example.yaml",
       "group_id": "G06",
       "package_id": null,
-      "surface": "metadata-governance",
+      "surface": "support",
       "role": "config-rename-evidence",
       "canonical_owner": "scripts/check-ce-upstream-reconciliation.cjs",
       "implementation_unit": "U8",
@@ -14827,26 +14796,20 @@
     }
   ],
   "review_context": {
-    "reviewed_at": "2026-08-28",
-    "basis": [
-      "current deterministic adjudication input and SHA-256 binding",
-      "zero deterministic classification mismatches across all 517 path joins",
-      "current scripts/check-ce-upstream-reconciliation.cjs owner/unit/action maps",
-      "current canonical Skill, shared-reference, benchmark-gate, and focused regression changes",
-      "current source snapshot excludes evidence run outputs outside canonical source roots"
+    "reviewed_at": "2026-09-24",
+    "reviewer": "codex-current-session",
+    "method": "fresh-source review of all 517 records on pushed HEAD f4c7a7b9 with two explicitly preserved dirty paths owned by an adjacent research task; deterministic local source/test/owner reachability and pinned upstream git-object checks; semantic carry-over only; no live behavior claim.",
+    "reference_facts": "docs/validation/ce-localization/goal-20260921/fresh-source-verification-20260924.json",
+    "changed_owner_assessment": [
+      "当前 HEAD aa40c0f3 的本轮变更未命中 517 条 upstream record 的 source_refs、test_refs 或 implementation_targets；既有 owner/action 语义保持。",
+      "真实 Graphify 两个此前跳过的 boundary case 已通过；该运行只增强 runtime evidence，不提升 CE upstream 语义或 field claim。"
     ],
-    "path_join_reconfirmed": true,
-    "source_snapshot_change": "target HEAD unchanged (4f209572) and canonical snapshot changed only additively (new eval fixtures: skills/spec-ideate/evals, skills/using-spec-first/evals; docs/validation/skill-evals; using-spec-first checkpoint markers; spec-project-rules freshness-scanner fixes and focused tests); upstream path set, deterministic classifications, and all 517 semantic owner/action/unit/limitation decisions remain applicable",
     "limitations": [
-      "provider-authenticated receipt not available",
-      "independent OpenAI and Anthropic provider review not established",
-      "fresh generated runtime adoption and real host loading not established",
-      "enterprise field outcome and knowledge promotion not established"
-    ],
-    "readjudicated_at": "2026-08-30",
-    "method": "fresh-source verification-based carry-over (re-stamped after using-spec-first/spec-ideate eval assets + spec-project-rules scanner-fix canonical edits; upstream window byte-identical, shared record fields 0 mismatches, no local ref deletions)",
-    "verified_record_count": 517,
-    "stale_flipped_count": 0,
-    "restamped_at": "2026-08-31"
+      "semantic adequacy was reviewed as bounded carry-over; no independent second model or full runtime/field execution",
+      "real host/model smoke is recorded separately and does not prove CE semantic adequacy",
+      "Cursor GUI workflow remains blocked by unavailable plan; Kiro/Qoder/ZCode GUI invocation remains not-run",
+      "A045 and A507 upstream references are absent at pinned head 956087b3e1dd7ccc03df32cee9e7c044dfbe75cf; retained as unresolved historical references.",
+      "Current snapshot is dirty by pre-existing adjacent research paths CHANGELOG.md and docs/research/2026-09-24-ai-industry-trends-claude-prompt-shortening.md; those paths were not modified or adjudicated in this task."
+    ]
   }
 }

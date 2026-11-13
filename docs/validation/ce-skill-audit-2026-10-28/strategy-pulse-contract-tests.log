@@ -1,0 +1,8 @@
+PASS tests/unit/spec-strategy-contracts.test.js
+PASS tests/unit/spec-product-pulse-contracts.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       9 passed, 9 total
+Snapshots:   0 total
+Time:        0.175 s
+Ran all test suites within paths "tests/unit/spec-strategy-contracts.test.js", "tests/unit/spec-product-pulse-contracts.test.js".

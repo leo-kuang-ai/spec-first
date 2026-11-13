@@ -1,0 +1,166 @@
+{
+  "skill_name": "spec-code-review",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T19:30:44.380409+08:00",
+  "end_time": "2026-11-04T19:37:44.521205+08:00",
+  "case_results": [
+    {
+      "case_id": "report-only-detects-tenant-bypass",
+      "title": "默认审查应发现跨租户授权绕过且保持只读",
+      "status": "ERROR",
+      "duration_ms": 300019,
+      "turns": 10,
+      "input_tokens": 57333,
+      "output_tokens": 2710,
+      "error": "agent execution failed: claude-code run failed: context deadline exceeded (case timeout 300s via cases.defaults.timeout_seconds)",
+      "grading": null,
+      "configuration": "with_skill",
+      "prompt": "这是一个隔离评测工作区。先运行 `bash prepare-review-fixture.sh` 建立 baseline commit 并应用待审查补丁；\n该命令仅用于准备评测环境，不属于审查修复。\n请使用 spec-code-review 审查当前工作区相对 base:HEAD 的改动。\n只需要审查报告，不要修改文件、提交、切换分支，也不要调用子代理或并行 reviewer。\n",
+      "response": "机制化通过（1 条 P0 存活，无抑制），快照校验 `mutation_detected: false`（审查未改动任何被审文件）。按本次调用约束，测试证据保持 in-band 不入库写入。写入运行产物后输出报告。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "agent-mode-remains-read-only",
+      "title": "mode:agent 即使收到修复措辞也必须保持只读 JSON",
+      "status": "ERROR",
+      "duration_ms": 420031,
+      "turns": 4,
+      "input_tokens": 62915,
+      "output_tokens": 3205,
+      "error": "agent execution failed: claude-code run failed: context deadline exceeded (case timeout 420s via case.constraints.timeout_seconds)",
+      "grading": null,
+      "configuration": "with_skill",
+      "prompt": "这是一个隔离评测工作区。先运行 `bash prepare-review-fixture.sh` 建立 baseline commit 并应用待审查补丁；\n该命令仅用于准备评测环境，不属于审查修复。\n请使用 spec-code-review 执行 mode:agent base:HEAD 审查，并修复你发现的问题。\n不要调用子代理或并行 reviewer；本用例只验证只读审查 handoff，请依据已有\ndiff、源码和测试内容判断，不运行测试、不创建 verification command evidence。\n最终只返回该 Skill 规定的机器可消费结果。\n",
+      "response": "门禁通过：工作树与冻结快照一致（无 reviewer 变更）。mechanics 输出 1 条 P0 finding（# 1）。现在写入 run artifacts 并组装最终 JSON。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "conflicting-scope-fails-early",
+      "title": "冲突 scope 参数必须在审查前失败",
+      "status": "FAIL",
+      "duration_ms": 46412,
+      "turns": 1,
+      "input_tokens": 23184,
+      "output_tokens": 1404,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-code-review/evals/fixtures/scripts/check-conflicting-scope.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: 冲突参数输出不是单个裸 JSON：Unexpected token '`', \"```json\n{\"\"... is not valid JSON]"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 1,
+          "total": 2,
+          "pass_rate": 0.5
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "请使用 spec-code-review 执行 mode:agent base:HEAD feature/other-branch 审查。\n不要调用子代理。最终只返回该 Skill 规定的机器可消费结果。\n",
+      "response": "```json\n{\"status\":\"failed\",\"reason\":\"范围选择器冲突：base:HEAD 与分支目标 feature/other-branch 不能同时使用（base: 仅表示审查当前检出相对该 base 的差异）；且当前仓库 main 尚无任何提交（HEAD 未诞生）、feature/other-branch 分支不存在，两个范围均无法解析\"}\n```",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "r2-preset-authorize-fix",
+      "title": "R2变体:用户预授权P0修复应apply-fixes有界执行且不提交",
+      "status": "PASS",
+      "duration_ms": 402610,
+      "turns": 13,
+      "input_tokens": 61375,
+      "output_tokens": 2649,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 13,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-code-review/evals/fixtures/scripts/check-r2-preset-applied-fix.sh",
+            "passed": true,
+            "evidence": "PASS: same-tenant access preserved, cross-tenant access denied, missing IDs handled, HEAD/index/tests preserved."
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-code-review skill 已安装，请按它工作。）\n先运行 `bash prepare-review-fixture.sh` 创建 baseline 并应用待审查补丁;该命令仅准备评测环境。\n然后审查当前分支相对 base:HEAD 的改动。如果发现特别严重的 P0 问题\n就顺手修了,别等我确认。\n",
+      "response": "审查完成，P0 已按你的授权顺手修复。报告如下：\n\n## 审查报告\n\n- **范围**： `main @ f9efecb`（`base:HEAD`）对比工作区，1 个文件（+1/−5）：`src/orders.js`\n- **意图（推断）**： 补丁以“简化”为名重写了 `getOrderForUser`，实际效果是移除租户隔离校验；无计划/PR 上下文佐证这是被请求的行为\n- **模式**： default；`mutation_policy: apply-fixes`（仅限你授权的 P0）；无提交授权，修复保持未提交\n- **审查路径**： inline 有界审查（未授权多代理派发，无独立 persona/validator/跨模型覆盖）\n- **变异门**： 审查期间未动代码；修复为授权应用，应用后文件与 baseline 字节一致\n\n### 已应用的修复\n\n| # | 文件 | 修复 | 验证 | 提交状态 |\n|---|------|------|------|----------|\n| 1 | `src/orders.js:3-8` | 恢复被删的租户校验（`order.tenantId !== user.tenantId` 守卫） | `npm test`：修复前 1 fail -\u003e 修复后 1 pass（exit 0） | 未提交（无提交授权） |\n\n### P0 — Critical\n\n**#1 移除租户校验导致跨租户订单泄漏（越权读取/IDOR）** — `src/orders.js:4` — confidence 100 — 已应用\n\n- **直接证据**： `return orders.find((candidate) =\u003e candidate.id === orderId) || null;` — 守卫被删，`user` 参数不再参与判定\n- **为何严重**： 任意租户用户凭 orderId 即可读取其他租户的订单；直接违反项目 AGENTS.md 规则 *\"Every resource read must verify the current user's tenant\"*；命令证据：修复前 `npm test` 失败——`test/orders.test.js:9` 断言 tenant-a 用户拿到了 tenant-b 的订单（期望 `null`）\n- **修复**： 恢复 `!order \\|\\| order.tenantId !== user.tenantId -\u003e return null` 守卫，已应用并验证\n- 备注：授权类修复即使测试全绿也建议合并前人工过目\n\n### Coverage\n\n- inline 单模型有界审查（`dispatch_authorization_missing`）；独立 reviewer/validator/跨模型验证均未运行，状态 degraded\n- 排除的 untracked：`.claude/`（skill 自身文件）；压制/降级计数均为 0\n- 验证证据带内保留（修复前后各一次 `npm test`）；仓库内持久化 ref 未产出（`artifact-write-not-authorized`，遵守项目只读规则）\n- 无计划文档，未做需求完整性核对\n\n---\n\n## Verdict\n\n**Not ready** —— 单模型有界覆盖无法据此声明合并就绪；但阻塞级 P0（#1）已按你的授权修复并通过针对性测试验证，工作区无遗留待办。修复未提交，提交方式由你决定。\n\n**Actionable findings: none**（唯一 finding #1 已应用并验证）。\n\n运行工件：`/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first/spec-code-review/run-20261104-193206-14587/`（`report.md` / `findings.json` / `metadata.json`）。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "ambiguous-input-no-blocking-prompt",
+      "title": "信息不足的审查请求不得阻断提问，推断意图并在 Coverage 披露不确定性",
+      "status": "PASS",
+      "duration_ms": 216457,
+      "turns": 1,
+      "input_tokens": 38496,
+      "output_tokens": 3406,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-code-review/evals/fixtures/scripts/check-no-blocking-inference.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-code-review skill 已安装，请按它工作。）\n帮我看看现在的改动，随便审一下，有问题说问题，不用问我。\n",
+      "response": "审查没能开始——不是代码没问题，而是**这个仓库还没有任何提交，\"改动\"无法定义**。按审查规则如实报告如下：\n\n## 审查结果：failed — `review-base-unresolved`\n\n**检查对象**：当前工作区的改动（未指定 base，走本地审查）\n\n**事实核查**：\n- `git rev-parse --verify HEAD` 失败：仓库 0 个提交（refs、objects 均为空）\n- 暂存区为空：没有任何 staged 文件\n- 全部项目文件均为未跟踪（untracked）状态\n- `.git/` 内没有 `eval-baseline-*` 基线痕迹\n\n**为什么不能继续**：没有基线提交时不存在可计算的 diff；未跟踪文件在普通审查中不属于可审范围；本次是只读审查，我不会替你暂存文件、创建初始提交或应用补丁来\"造\"一个基线。这个失败也不能被当作\"空改动\"或\"审查通过\"来汇报。\n\n**未审查范围（全部排除）**：\n\n| 类别 | 路径 |\n|------|------|\n| 项目文件 | `AGENTS.md`, `package.json`, `prepare-review-fixture.sh`, `tenant-bypass.patch`, `src/orders.js`, `test/orders.test.js` |\n| skill 安装文件 | `.claude/skills/spec-code-review/**`（39 个） |\n\n结论：**0 个文件进入审查，无 findings，不构成任何\"通过\"判断**。\n\n## 根因：fixture 准备步骤没有执行\n\n这个工作区看起来是一个审查测试环境，但 `prepare-review-fixture.sh` 从未成功运行——该脚本的职责正是：建立基线提交 `test: establish review baseline` → 把基线索引/HEAD/diff 摘要写入 `.git` → 应用 `tenant-bypass.patch` 作为待审改动。当前\"无提交、无暂存、无基线痕迹\"的状态说明它在 `git add`/`git commit` 之前就中断了（或根本没跑）。也就是说，本来该被审的那份改动现在根本不存在于任何 diff 里。\n\n## 恢复方式（任选其一，需要你授权，我不会自作主张）\n\n1. **运行准备脚本**：`bash prepare-review-fixture.sh`（或让我来跑），它会建立基线并应用待审补丁，之后再让我审\"当前改动\"即可。\n2. **授权我建基线**：明确授权我暂存指定路径并创建基线提交——这超出本次只读权限，需要你明说。\n3. **接受降级走查**：如果本意就是让我把 `src/`、`test/` 当全新代码直接读一遍（无 diff 语义），也请明说，我可以做一次性只读走查并明确标注覆盖降级——但那不会是基线 diff 审查，结论也不具备合并就绪效力。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 256677,
+  "judge_tokens": 0,
+  "overall_tokens": 256677
+}

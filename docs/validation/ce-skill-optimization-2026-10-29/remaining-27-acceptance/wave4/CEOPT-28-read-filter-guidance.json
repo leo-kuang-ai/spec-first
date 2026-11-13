@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-31T06:03:45.335448+00:00",
+  "kind": "operational-read-guidance-not-changed-semantic-contract",
+  "companion_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/CEOPT-28-supplement.json",
+  "companion_sha256": "a4db3cba98369145174362718a86d7ec21a29a5f02f119e2426e452949c23d9b",
+  "trigger": "Original A1 displayed both analyzer entrypoints before jq filtering; trace/final retained with input-isolation contamination.",
+  "existing_requirement": "Read only spec-sweep entrypoint from each assigned-arm media receipt. No other Skill source or receipt allowed.",
+  "method": "jq '.entrypoints |= map(select(.entrypoint == \"spec-sweep\"))' <assigned-arm-media-receipt>",
+  "scope": "Remaining original slots keep identical sources/request/pins/deadline and existing input-isolation rule. Method filters before tool output; no new outcome evidence supplied.",
+  "not_authorized": [
+    "Rewriting A1",
+    "Counting contaminated original as clean",
+    "Blind retry or unpinned successor"
+  ]
+}

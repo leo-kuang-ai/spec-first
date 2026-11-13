@@ -1,0 +1,9 @@
+# consumers: spec-riffrec-feedback-analysis
+tests/unit/dispatch-authorization-matrix-contracts.test.js
+tests/unit/python-runtime-resolution-contracts.test.js
+tests/unit/remaining-script-defenses.test.js
+tests/unit/skill-flow-p2-closure-contracts.test.js
+tests/unit/spec-riffrec-analyzer-safety.test.js
+tests/unit/spec-riffrec-feedback-analysis-contracts.test.js
+tests/unit/spec-riffrec-snapshots.test.js
+tests/unit/specialized-skill-calibration-contracts.test.js

@@ -1,0 +1,13 @@
+PASS tests/unit/spec-code-review-pr-head.test.js
+PASS tests/unit/spec-code-review-mechanics.test.js (5.441 s)
+PASS tests/unit/spec-code-review-peer-runner.test.js
+PASS tests/unit/peer-job-runner-killset.test.js
+PASS tests/unit/spec-code-review-contracts.test.js
+PASS tests/unit/peer-job-runner-parity.test.js
+
+Test Suites: 6 passed, 6 total
+Tests:       87 passed, 87 total
+Snapshots:   0 total
+Time:        7.22 s, estimated 8 s
+Ran all test suites within paths "tests/unit/spec-code-review-contracts.test.js", "tests/unit/spec-code-review-mechanics.test.js", "tests/unit/spec-code-review-peer-runner.test.js", "tests/unit/spec-code-review-pr-head.test.js", "tests/unit/peer-job-runner-killset.test.js", "tests/unit/peer-job-runner-parity.test.js".
+Test results written to: docs/validation/ce-skill-audit-2026-10-28/code-review-tests.json

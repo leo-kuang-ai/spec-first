@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "Check owned update",
+  "prompt": "First run node prepare-eval.cjs once in this isolated fixture. Preparation may create a fixture baseline commit only. Read the current installed spec-strategy source and follow it. Update only the Our approach sentence in STRATEGY.md to \"Focus on offline reconciliation.\" This is my settled choice and local edit authorization. Preserve all other bytes, headings and author-approved content. Do not commit.",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-strategy/evals/fixtures/scripts/check-owned-update.sh"
+  ]
+}

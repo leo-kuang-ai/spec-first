@@ -1,0 +1,219 @@
+{
+  "metadata": {
+    "skill_name": "using-spec-first",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/using-spec-first",
+    "timestamp": "2026-11-04T12:21:28Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "失败信号应路由到 spec-debug",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 22.715,
+        "tokens": 20492,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[spec-debug]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[spec-debug])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "模糊想法应路由到 spec-brainstorm",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 33.8,
+        "tokens": 22226,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[spec-brainstorm]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[spec-brainstorm])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "推荐类请求应推荐 0-1 入口且不直接开始",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 33.608,
+        "tokens": 21472,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[spec-ideate]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[spec-ideate])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "轻量一次性问答应留在 Direct Lane 不进 workflow",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 10.732,
+        "tokens": 18081,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[```]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[```])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "复合意图按失败优先且只选一个入口",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 34.908,
+        "tokens": 22673,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[spec-debug]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[spec-debug])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "An uncertain next step allows one route-changing question or one recommendation",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 1,
+        "failed": 1,
+        "total": 2,
+        "time_seconds": 199.86,
+        "tokens": 37383,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/using-spec-first/evals/fixtures/scripts/check-r2-asks.sh",
+          "passed": false,
+          "evidence": "script exited with code 1 [stderr: node:internal/assert/utils:77\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected one question or one recommendation\n    at oneRouteDecision ([stdin]:40:10)\n    at [stdin]:49:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.9166666666666666,
+        "stddev": 0.18633899812498247,
+        "min": 0.5,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 55.93716666666666,
+        "stddev": 64.92543555088578,
+        "min": 10.732,
+        "max": 199.86
+      },
+      "tokens": {
+        "mean": 23721.166666666668,
+        "stddev": 6288.582442720211,
+        "min": 18081,
+        "max": 37383
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

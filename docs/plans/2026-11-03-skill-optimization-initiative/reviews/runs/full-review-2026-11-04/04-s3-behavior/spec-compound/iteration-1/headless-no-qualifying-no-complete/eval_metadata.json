@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "mode:headless 无合格 learning 时不得宣称 Documentation complete",
+  "prompt": "（spec-compound skill 已安装，请按它工作。mode:headless）\nmode:headless 沉淀：刚把 package.json 里拼错的 \"entrypont\"\n改成 \"entrypoint\"，程序恢复正常。\n",
+  "assertions": [
+    "expect.files_not_exist",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound/evals/fixtures/scripts/check-headless-no-complete.sh"
+  ]
+}

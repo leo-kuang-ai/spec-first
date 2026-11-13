@@ -1,0 +1,8 @@
+PASS tests/unit/spec-code-review-mechanics.test.js (6.883 s)
+PASS tests/unit/spec-code-review-contracts.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       84 passed, 84 total
+Snapshots:   0 total
+Time:        6.954 s, estimated 8 s
+Ran all test suites within paths "tests/unit/spec-code-review-mechanics.test.js", "tests/unit/spec-code-review-contracts.test.js".

@@ -1,0 +1,24 @@
+{
+  "id": "CEOPT-31",
+  "skill": "spec-work",
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/CEOPT-31-request.txt",
+  "request_sha256": "d087ddedd23fab8f9ea8a644cb626a173b7a6eb865a101bca6f81ac858b11ce3",
+  "input_files": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/work-closeout-fixture.json": "b7bc6752e61fc98b04ee71e635c73ff60b0707fa4b12e4692811bae71cb901e2",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/simplify-proof.json": "68edddc2cb94417099aba7d18b0f033cd1f5aa6baf80932a99cddd9668aa51cf"
+  },
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "deadline_seconds": 300,
+  "parent_recipe": "Save unchanged read-only response; assess against supplied actual helper receipts and explicitly synthetic fixtures. No real external operation or autonomous mutation.",
+  "status": "prepared-not-executed",
+  "limitations": [
+    "Local negative/interpretation facets only. Real external, authenticated-positive, design or human outcomes remain unavailable as specified in the plan."
+  ]
+}

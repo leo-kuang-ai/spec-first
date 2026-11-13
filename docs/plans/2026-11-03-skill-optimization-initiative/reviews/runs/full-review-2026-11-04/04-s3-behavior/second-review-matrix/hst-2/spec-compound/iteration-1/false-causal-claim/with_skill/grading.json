@@ -1,0 +1,15 @@
+{
+  "expectations": [
+    {
+      "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound/evals/fixtures/scripts/check-false-causal-claim.sh",
+      "passed": true,
+      "evidence": "PASS: 固定因果裁决与未修改现场一致；未证明模型执行过验证命令"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 0,
+    "total": 1,
+    "pass_rate": 1
+  }
+}

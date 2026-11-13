@@ -1,0 +1,10 @@
+PASS tests/unit/spec-prd-contracts.test.js
+PASS tests/unit/spec-prd-exit-safety.test.js
+PASS tests/unit/spec-prd-decision-card-contracts.test.js
+PASS tests/unit/spec-prd-plan-handoff-contracts.test.js
+
+Test Suites: 4 passed, 4 total
+Tests:       39 passed, 39 total
+Snapshots:   0 total
+Time:        0.17 s, estimated 1 s
+Ran all test suites within paths "tests/unit/spec-prd-contracts.test.js", "tests/unit/spec-prd-decision-card-contracts.test.js", "tests/unit/spec-prd-exit-safety.test.js", "tests/unit/spec-prd-plan-handoff-contracts.test.js".

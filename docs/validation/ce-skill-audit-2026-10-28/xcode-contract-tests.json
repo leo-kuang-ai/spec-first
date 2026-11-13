@@ -1,0 +1,11 @@
+{
+  "command": [
+    "node",
+    "node_modules/jest/bin/jest.js",
+    "--runInBand",
+    "--runTestsByPath",
+    "tests/unit/spec-test-xcode-contracts.test.js"
+  ],
+  "exit_code": 0,
+  "claim": "source prose contracts only; no simulator/provider/model run"
+}

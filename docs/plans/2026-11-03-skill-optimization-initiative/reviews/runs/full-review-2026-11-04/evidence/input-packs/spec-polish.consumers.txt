@@ -1,0 +1,6 @@
+# consumers: spec-polish
+tests/unit/mutation-authority-contracts.test.js
+tests/unit/resolve-port-script.test.js
+tests/unit/spec-polish-launch-json.test.js
+tests/unit/spec-polish-project-type.test.js
+tests/unit/specialized-skill-calibration-contracts.test.js

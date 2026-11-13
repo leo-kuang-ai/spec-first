@@ -1,0 +1,19 @@
+PASS tests/unit/spec-resolve-pr-feedback-contracts.test.js
+  spec-resolve-pr-feedback contracts
+    ✓ resolver 写入后 blocked 仍报告变更且父级独立核对实际状态 (1 ms)
+    ✓ 提交前阻断不属于本轮的暂存内容
+    ✓ 未修改的 consumer 失败不能按文件集合归为历史失败并放行提交 (1 ms)
+    ✓ 逐项独立准入 mutating 与 external exit
+    ✓ helper scripts resolve through the loaded skill directory, not runtime mirror paths (1 ms)
+    ✓ resolver prompt is a skill-local reference, not the retired repo-level agent path
+    ✓ full mode preserves CE central judgment and resolver integration safeguards (1 ms)
+    ✓ pipeline mode keeps unattended escalation and convergence rules explicit
+    ✓ fetch keeps author feedback visible and leaves actionability to semantic judgment
+    ✓ helper scripts preserve friendly owner repo fallback under set -e
+    ✓ streams large GraphQL payloads privately and blocks invisible pending-review replies (1 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       11 passed, 11 total
+Snapshots:   0 total
+Time:        0.131 s, estimated 1 s
+Ran all test suites within paths "tests/unit/spec-resolve-pr-feedback-contracts.test.js".

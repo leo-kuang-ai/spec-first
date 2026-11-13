@@ -1,0 +1,160 @@
+{
+  "scope": "checked-in skills/*/SKILL.md 单行description字符；非当前宿主菜单或token预算",
+  "count": 38,
+  "characters": 11867,
+  "host_truncation": "not-verified",
+  "entries": [
+    {
+      "path": "skills/autoresearch/SKILL.md",
+      "characters": 625
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/SKILL.md",
+      "characters": 473
+    },
+    {
+      "path": "skills/spec-brainstorm/SKILL.md",
+      "characters": 293
+    },
+    {
+      "path": "skills/spec-code-review/SKILL.md",
+      "characters": 326
+    },
+    {
+      "path": "skills/spec-commit/SKILL.md",
+      "characters": 171
+    },
+    {
+      "path": "skills/spec-commit-push-pr/SKILL.md",
+      "characters": 197
+    },
+    {
+      "path": "skills/spec-compound/SKILL.md",
+      "characters": 287
+    },
+    {
+      "path": "skills/spec-compound-refresh/SKILL.md",
+      "characters": 335
+    },
+    {
+      "path": "skills/spec-debug/SKILL.md",
+      "characters": 208
+    },
+    {
+      "path": "skills/spec-doc-review/SKILL.md",
+      "characters": 223
+    },
+    {
+      "path": "skills/spec-dogfood/SKILL.md",
+      "characters": 470
+    },
+    {
+      "path": "skills/spec-explain/SKILL.md",
+      "characters": 318
+    },
+    {
+      "path": "skills/spec-handoff/SKILL.md",
+      "characters": 400
+    },
+    {
+      "path": "skills/spec-ideate/SKILL.md",
+      "characters": 217
+    },
+    {
+      "path": "skills/spec-lfg/SKILL.md",
+      "characters": 225
+    },
+    {
+      "path": "skills/spec-optimize/SKILL.md",
+      "characters": 310
+    },
+    {
+      "path": "skills/spec-plan/SKILL.md",
+      "characters": 454
+    },
+    {
+      "path": "skills/spec-polish/SKILL.md",
+      "characters": 288
+    },
+    {
+      "path": "skills/spec-pov/SKILL.md",
+      "characters": 257
+    },
+    {
+      "path": "skills/spec-prd/SKILL.md",
+      "characters": 580
+    },
+    {
+      "path": "skills/spec-product-pulse/SKILL.md",
+      "characters": 71
+    },
+    {
+      "path": "skills/spec-project-rules/SKILL.md",
+      "characters": 470
+    },
+    {
+      "path": "skills/spec-promote/SKILL.md",
+      "characters": 101
+    },
+    {
+      "path": "skills/spec-prototype/SKILL.md",
+      "characters": 335
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/SKILL.md",
+      "characters": 187
+    },
+    {
+      "path": "skills/spec-riffrec-feedback-analysis/SKILL.md",
+      "characters": 389
+    },
+    {
+      "path": "skills/spec-rule-miner/SKILL.md",
+      "characters": 559
+    },
+    {
+      "path": "skills/spec-runtime-setup/SKILL.md",
+      "characters": 173
+    },
+    {
+      "path": "skills/spec-simplify-code/SKILL.md",
+      "characters": 200
+    },
+    {
+      "path": "skills/spec-strategy/SKILL.md",
+      "characters": 175
+    },
+    {
+      "path": "skills/spec-sweep/SKILL.md",
+      "characters": 267
+    },
+    {
+      "path": "skills/spec-test-browser/SKILL.md",
+      "characters": 224
+    },
+    {
+      "path": "skills/spec-test-xcode/SKILL.md",
+      "characters": 182
+    },
+    {
+      "path": "skills/spec-work/SKILL.md",
+      "characters": 516
+    },
+    {
+      "path": "skills/spec-worktree/SKILL.md",
+      "characters": 175
+    },
+    {
+      "path": "skills/spec-write-skill/SKILL.md",
+      "characters": 222
+    },
+    {
+      "path": "skills/spec-write-tasks/SKILL.md",
+      "characters": 534
+    },
+    {
+      "path": "skills/using-spec-first/SKILL.md",
+      "characters": 430
+    }
+  ]
+}

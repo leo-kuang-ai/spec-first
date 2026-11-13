@@ -1,0 +1,189 @@
+{
+  "arm": "B",
+  "source_sha256": "11b0320a5fc769e06dbbcc7f1df12d70a1816c0b5aad9968dfcb11dad4246ca2",
+  "cases": [
+    {
+      "case": "published",
+      "input": {
+        "host": "github.enterprise.example",
+        "base_repo": "upstream/project",
+        "number": 42,
+        "head_repo": "fork/project",
+        "head_ref": "fix/review",
+        "fix_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "provider_fixture": {
+        "number": 42,
+        "html_url": "https://github.enterprise.example/upstream/project/pull/42",
+        "base": {
+          "repo": {
+            "full_name": "upstream/project"
+          }
+        },
+        "head": {
+          "repo": {
+            "full_name": "fork/project"
+          },
+          "ref": "fix/review",
+          "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      },
+      "result": {
+        "verified": true,
+        "reason_code": "fix-reachable-from-pr-head",
+        "observed_at": "2026-10-30T07:04:23.219Z",
+        "host": "github.enterprise.example",
+        "base_repo": "upstream/project",
+        "number": 42,
+        "url": "https://github.enterprise.example/upstream/project/pull/42",
+        "head_repo": "fork/project",
+        "head_ref": "fix/review",
+        "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "fix_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "comparison_status": "ahead",
+        "merge_base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "calls": [
+        {
+          "host": "github.enterprise.example",
+          "endpoint": "repos/upstream/project/pulls/42"
+        },
+        {
+          "host": "github.enterprise.example",
+          "endpoint": "repos/fork/project/compare/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      ]
+    },
+    {
+      "case": "unpublished",
+      "input": {
+        "host": "github.enterprise.example",
+        "base_repo": "upstream/project",
+        "number": 42,
+        "head_repo": "fork/project",
+        "head_ref": "fix/review",
+        "fix_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "provider_fixture": {
+        "number": 42,
+        "html_url": "https://github.enterprise.example/upstream/project/pull/42",
+        "base": {
+          "repo": {
+            "full_name": "upstream/project"
+          }
+        },
+        "head": {
+          "repo": {
+            "full_name": "fork/project"
+          },
+          "ref": "fix/review",
+          "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      },
+      "result": {
+        "verified": false,
+        "reason_code": "fix-not-proven-reachable",
+        "observed_at": "2026-10-30T07:04:23.220Z",
+        "host": "github.enterprise.example",
+        "base_repo": "upstream/project",
+        "number": 42,
+        "url": "https://github.enterprise.example/upstream/project/pull/42",
+        "head_repo": "fork/project",
+        "head_ref": "fix/review",
+        "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "fix_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "comparison_status": "behind",
+        "merge_base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "calls": [
+        {
+          "host": "github.enterprise.example",
+          "endpoint": "repos/upstream/project/pulls/42"
+        },
+        {
+          "host": "github.enterprise.example",
+          "endpoint": "repos/fork/project/compare/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      ]
+    },
+    {
+      "case": "wrong-head-repository",
+      "input": {
+        "host": "github.enterprise.example",
+        "base_repo": "upstream/project",
+        "number": 42,
+        "head_repo": "fork/project",
+        "head_ref": "fix/review",
+        "fix_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "provider_fixture": {
+        "number": 42,
+        "html_url": "https://github.enterprise.example/upstream/project/pull/42",
+        "base": {
+          "repo": {
+            "full_name": "upstream/project"
+          }
+        },
+        "head": {
+          "repo": {
+            "full_name": "other/project"
+          },
+          "ref": "fix/review",
+          "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      },
+      "result": {
+        "verified": false,
+        "reason_code": "publication-pr-identity-changed",
+        "observed_at": "2026-10-30T07:04:23.220Z"
+      },
+      "calls": [
+        {
+          "host": "github.enterprise.example",
+          "endpoint": "repos/upstream/project/pulls/42"
+        }
+      ]
+    },
+    {
+      "case": "provider-unavailable",
+      "input": {
+        "host": "github.enterprise.example",
+        "base_repo": "upstream/project",
+        "number": 42,
+        "head_repo": "fork/project",
+        "head_ref": "fix/review",
+        "fix_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "provider_fixture": {
+        "number": 42,
+        "html_url": "https://github.enterprise.example/upstream/project/pull/42",
+        "base": {
+          "repo": {
+            "full_name": "upstream/project"
+          }
+        },
+        "head": {
+          "repo": {
+            "full_name": "fork/project"
+          },
+          "ref": "fix/review",
+          "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      },
+      "result": {
+        "verified": false,
+        "reason_code": "publication-read-unavailable",
+        "observed_at": "2026-10-30T07:04:23.220Z"
+      },
+      "calls": [
+        {
+          "host": "github.enterprise.example",
+          "endpoint": "repos/upstream/project/pulls/42"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Actual pure helper with in-process provider stub. No hosted PR read or mutation; no live publication."
+  ]
+}

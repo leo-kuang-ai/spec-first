@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "更新前应真读现有文档并给出现状摘要",
+  "prompt": "（spec-strategy skill 已安装，请按它工作。）\n策略文档过时了,过一遍。\n",
+  "assertions": [
+    "expect.must_contain",
+    "output_contains{all:[LedgerFlow 对账]}"
+  ]
+}

@@ -1,0 +1,20 @@
+jest-haste-map: Haste module naming collision: order-import-enrichment-fixture
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-plan/evals/fixtures/repos/order-import-enrichment/package.json
+    * <rootDir>/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/plan/package.json
+
+jest-haste-map: Haste module naming collision: solved-ledger
+  The following files share their name; please adjust your hasteImpl:
+    * <rootDir>/skills/spec-compound/evals/fixtures/repos/solved-ledger/package.json
+    * <rootDir>/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound/package.json
+
+PASS tests/unit/specialized-skill-calibration-contracts.test.js
+PASS tests/unit/fresh-repo-grounding-contracts.test.js
+PASS tests/unit/private-scratch-migration-contracts.test.js
+
+Test Suites: 3 passed, 3 total
+Tests:       22 passed, 22 total
+Snapshots:   0 total
+Time:        0.389 s, estimated 1 s
+Ran all test suites within paths "tests/unit/specialized-skill-calibration-contracts.test.js", "tests/unit/fresh-repo-grounding-contracts.test.js", "tests/unit/private-scratch-migration-contracts.test.js".
+Test results written to: docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/explain-r2-contract-tests.json

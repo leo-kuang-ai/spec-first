@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "R2正例:真外部候选裁决应正常给出 verdict",
+  "prompt": "（spec-pov skill 已安装，请按它工作。）\n我们要不要把数据库从 MySQL 换成 PostgreSQL?给我个明确结论。\n",
+  "assertions": [
+    "expect.must_not_contain",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-pov/evals/fixtures/scripts/check-r2-verdict-given.sh"
+  ]
+}

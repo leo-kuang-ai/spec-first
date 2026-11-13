@@ -1,0 +1,10 @@
+{
+  "session_id": "01a18bcd-514d-75d2-933b-1c1f630620b3",
+  "agent_path": "/root/judge_ce27_plan_original",
+  "review_sha256": "d4f86f41904a806429b33afe1e5006c994dccd77f501538efbf3202d29490042",
+  "trace_sha256": "70d4225bfce16d697dd32c8584f3b843378657f6bab6301848b1673dc7315e35",
+  "intervention": "Parsed final JSON without semantic edits; original final response retained in full trace.",
+  "limitations": [
+    "Independent context, not independently authenticated model identity or enforced read-only isolation."
+  ]
+}

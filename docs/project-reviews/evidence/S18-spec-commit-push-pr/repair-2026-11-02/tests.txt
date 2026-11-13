@@ -1,0 +1,13 @@
+PASS tests/unit/spec-commit-push-pr-context-contracts.test.js
+  ✓ branch creation executes its documented ignored-collision protection (168 ms)
+  spec-commit-push-pr context reference contract
+    ✓ 提交来源保留真实作者且不猜邮箱 (1 ms)
+    ✓ checkout collision 的默认恢复保留混合暂存、无关文件和未跟踪文件 (164 ms)
+    ✓ keeps context probes and consequential rechecks in a required-read reference
+    ✓ requires apply-time identity, body read-back, and scoped commit semantics (1 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        0.486 s, estimated 1 s
+Ran all test suites within paths "tests/unit/spec-commit-push-pr-context-contracts.test.js".

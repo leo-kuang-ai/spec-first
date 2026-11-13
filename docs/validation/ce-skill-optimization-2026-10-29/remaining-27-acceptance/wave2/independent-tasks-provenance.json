@@ -1,0 +1,10 @@
+{
+  "session_id": "01a1907d-2dfd-78f0-83c0-b7f66db8bf36",
+  "agent_path": "/root/ce27_tasks_reviewer",
+  "review_sha256": "848497645dde97bcf0f114d801c8392b28a2153593e791012de8b856449c9ec6",
+  "trace_sha256": "399d00fc6d2febfd8be6e6770df14011cd2e15aa699ce5560f5ed7a0ba1c7d23",
+  "intervention": "Parsed final JSON without semantic edits; original final response retained in full trace.",
+  "limitations": [
+    "Independent context, not independently authenticated model identity or enforced read-only isolation."
+  ]
+}

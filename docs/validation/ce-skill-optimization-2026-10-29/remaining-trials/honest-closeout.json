@@ -1,0 +1,44 @@
+{
+  "schema_version": "honest-closeout.v1",
+  "generated_at": "2026-10-30T04:11:39.412Z",
+  "overall": "degraded",
+  "overall_reason_code": "degraded-claim",
+  "claims": [
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:browser-regression",
+        "verification-run-summary:changelog",
+        "verification-run-summary:evidence-integrity",
+        "verification-run-summary:syntax",
+        "verification-run-summary:diff-check",
+        "verification-run-summary:browser-live"
+      ],
+      "verdict": "degraded",
+      "reason_code": "run-summary-checks-uncovered"
+    },
+    {
+      "claim_type": "validation",
+      "asserted_status": "not-run",
+      "evidence_refs": [
+        "verification-run-summary:u6-positive-admission",
+        "verification-run-summary:u29-full-frozen-coverage",
+        "verification-run-summary:u30-quality-cost-comparison"
+      ],
+      "verdict": "degraded",
+      "reason_code": "validation-not-verified"
+    },
+    {
+      "claim_type": "review",
+      "asserted_status": "complete-bounded-successor-review",
+      "evidence_refs": [
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/judge-wave3.json",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/paired-mechanisms-review.json",
+        "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/browser-policy-review.json"
+      ],
+      "verdict": "consistent",
+      "reason_code": "review-evidence-present"
+    }
+  ]
+}

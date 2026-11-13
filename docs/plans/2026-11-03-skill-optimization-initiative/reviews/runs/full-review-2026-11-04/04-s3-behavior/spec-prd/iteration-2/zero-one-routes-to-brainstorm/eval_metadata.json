@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "0-1 全新产品探索应路由 spec-brainstorm 而非强上 PRD 仪式",
+  "prompt": "（spec-prd skill 已安装，请按它工作。）\n我想从零开始做一个全新的露营装备分享社区 App,帮我把 PRD 写出来。\n",
+  "assertions": [
+    "expect.must_contain",
+    "output_contains{all:[spec-brainstorm]}"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": "ce-upstream-artifact-set/v1",
+  "files": [
+    {
+      "path": "docs/validation/ce-pull-2026-10-27/runs/u2-mechanics-before/producer-name-status.tsv",
+      "sha256": "9c04f517fd188bb9b1127a1942bfdf98f3afa518e7428568548e33ef0e3aea65"
+    },
+    {
+      "path": "docs/validation/ce-pull-2026-10-27/runs/u2-mechanics-before/adjudication-input.json",
+      "sha256": "79d5f5050420c069013547d07512c539fe3aa07dbf0b91aa12c66e6f6b0819c2"
+    },
+    {
+      "path": "docs/validation/ce-pull-2026-10-27/runs/u2-mechanics-before/target-source-inventory.json",
+      "sha256": "32502c7fc1865efbc3143fce369b7f87af51eb18cca5e35c887637962ed2e4ba"
+    }
+  ]
+}

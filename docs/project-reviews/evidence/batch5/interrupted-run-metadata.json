@@ -1,0 +1,83 @@
+[
+  {
+    "isolation": "iso-work-codex-1",
+    "trace": "/tmp/spec-first-batch5-runs/iso-work-codex-1/home/.codex/sessions/2026/11/02/rollout-2026-11-02T01-40-54-01a19833-3281-7d02-9273-2f6c7249c505.jsonl",
+    "sha256": "2e47876572c32028f188ca6bb5dc1c1a50145f02942698cf25133d0f8c9ea461",
+    "model": "gpt-6-astra",
+    "last_timestamp": "2026-11-01T17:40:54.636Z",
+    "last_usage": null,
+    "assistant_messages": 0,
+    "tool_calls": 0,
+    "effort": "medium",
+    "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-2501261048"
+  },
+  {
+    "isolation": "iso-work-codex-2",
+    "trace": "/tmp/spec-first-batch5-runs/iso-work-codex-2/home/.codex/sessions/2026/11/02/rollout-2026-11-02T08-33-37-01a199ad-0d9b-76b3-a315-bea6ddd398ef.jsonl",
+    "sha256": "3d451ef22122f0554e8d7aba929d2da514bbffa27303ad41b2f88ac840f87256",
+    "model": "gpt-6-astra",
+    "last_timestamp": "2026-11-02T00:55:14.886Z",
+    "last_usage": {
+      "input_tokens": 139862,
+      "cached_input_tokens": 128256,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 2699,
+      "reasoning_output_tokens": 62,
+      "total_tokens": 142561
+    },
+    "assistant_messages": 0,
+    "tool_calls": 0,
+    "effort": "medium",
+    "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-3246165112"
+  },
+  {
+    "isolation": "iso-work-codex-2",
+    "trace": "/tmp/spec-first-batch5-runs/iso-work-codex-2/home/.codex/sessions/2026/11/02/rollout-2026-11-02T08-31-24-01a199ab-0409-7082-9602-eb087b72d426.jsonl",
+    "sha256": "911f7d3b0f8690657f08afe8dd3050aa8a9434a0a7ce4cae84286a41efbde9d6",
+    "model": "gpt-6-astra",
+    "last_timestamp": "2026-11-02T00:33:37.153Z",
+    "last_usage": {
+      "input_tokens": 358745,
+      "cached_input_tokens": 267264,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 3673,
+      "reasoning_output_tokens": 451,
+      "total_tokens": 362418
+    },
+    "assistant_messages": 0,
+    "tool_calls": 0,
+    "effort": "medium",
+    "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-693924659"
+  },
+  {
+    "isolation": "iso-work-glm-1",
+    "trace": "/tmp/spec-first-batch5-runs/iso-work-glm-1/home/.claude/projects/-private-var-folders-0v-f-smd31500113ppkqs66c9yr0000gn-T-skill-up-1683835751/3f3e982e-cf30-4470-833b-18afb419ba91.jsonl",
+    "sha256": "0d80831466abb2964492d53a0a624956bd3d6f6fae270deb3f9cf4ed35e76709",
+    "model": "glm-5.3",
+    "last_timestamp": "2026-11-02T01:17:57.396Z",
+    "last_usage": {
+      "input_tokens": 1662,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 63360,
+      "output_tokens": 1210,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "assistant_messages": 95,
+    "tool_calls": 46
+  }
+]

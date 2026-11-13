@@ -1,0 +1,16 @@
+PASS tests/unit/spec-work-run-artifact-producer.test.js
+PASS tests/unit/spec-work-contracts.test.js
+PASS tests/unit/spec-work-front-controller-contracts.test.js
+PASS tests/unit/spec-work-source-plan-file-hash.test.js
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+PASS tests/unit/spec-work-working-tree-fingerprint.test.js
+PASS tests/unit/spec-work-shipping-contracts.test.js
+PASS tests/unit/spec-work-consumer-chain-contracts.test.js
+PASS tests/unit/spec-work-execution-strategy-contracts.test.js
+
+Test Suites: 8 passed, 8 total
+Tests:       90 passed, 90 total
+Snapshots:   0 total
+Time:        2.123 s
+Ran all test suites within paths "tests/unit/spec-work-contracts.test.js", "tests/unit/spec-work-execution-strategy-contracts.test.js", "tests/unit/spec-work-consumer-chain-contracts.test.js", "tests/unit/spec-work-source-plan-file-hash.test.js", "tests/unit/spec-work-front-controller-contracts.test.js", "tests/unit/spec-work-shipping-contracts.test.js", "tests/unit/spec-work-working-tree-fingerprint.test.js", "tests/unit/spec-work-run-artifact-producer.test.js".
+Test results written to: docs/validation/ce-skill-audit-2026-10-28/work-tests.json

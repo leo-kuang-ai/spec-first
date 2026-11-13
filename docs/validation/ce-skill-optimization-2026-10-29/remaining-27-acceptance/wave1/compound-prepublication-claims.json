@@ -1,0 +1,92 @@
+[
+  {
+    "trial": "CEOPT-06-A1",
+    "argv": [
+      "python3",
+      ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound/scripts/validate-doc-claims.py",
+      "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-A1/candidate-extracted.md",
+      "--repo-root",
+      "/Users/kuang/xiaobu/spec-first",
+      "--target-path",
+      "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A1/docs/solutions/numeric-input.md"
+    ],
+    "exit_code": 1,
+    "stdout": "INFO: no upstream default branch found \u2014 path/SHA classification limited to HEAD\nFLAG path `src/server.js:6\u201310` (line 59) \u2014 not found in working tree. Fix the citation, or annotate it as historical (e.g. removed by this fix).\nFLAG path `src/server.js:19\u201322` (line 70) \u2014 not found in working tree. Fix the citation, or annotate it as historical (e.g. removed by this fix).\nchecked 2 paths, 0 SHAs, 0 links; 2 flags\n",
+    "stderr": ""
+  },
+  {
+    "trial": "CEOPT-06-A2",
+    "argv": [
+      "python3",
+      ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound/scripts/validate-doc-claims.py",
+      "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-A2/candidate-extracted.md",
+      "--repo-root",
+      "/Users/kuang/xiaobu/spec-first",
+      "--target-path",
+      "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A2/docs/solutions/numeric-input.md"
+    ],
+    "exit_code": 1,
+    "stdout": "INFO: no upstream default branch found \u2014 path/SHA classification limited to HEAD\nFLAG path `src/server.js` (line 36) \u2014 not found in working tree. Fix the citation, or annotate it as historical (e.g. removed by this fix).\nchecked 1 paths, 0 SHAs, 0 links; 1 flags\n",
+    "stderr": ""
+  },
+  {
+    "trial": "CEOPT-06-A3",
+    "argv": [
+      "python3",
+      ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound/scripts/validate-doc-claims.py",
+      "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-A3/candidate-extracted.md",
+      "--repo-root",
+      "/Users/kuang/xiaobu/spec-first",
+      "--target-path",
+      "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-A3/docs/solutions/numeric-input.md"
+    ],
+    "exit_code": 1,
+    "stdout": "INFO: no upstream default branch found \u2014 path/SHA classification limited to HEAD\nFLAG path `test/entries.test.js` (line 41) \u2014 not found in working tree. Fix the citation, or annotate it as historical (e.g. removed by this fix).\nFLAG path `src/server.js` (line 63) \u2014 not found in working tree. Fix the citation, or annotate it as historical (e.g. removed by this fix).\nchecked 2 paths, 0 SHAs, 0 links; 2 flags\n",
+    "stderr": ""
+  },
+  {
+    "trial": "CEOPT-06-B1",
+    "argv": [
+      "python3",
+      ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound/scripts/validate-doc-claims.py",
+      "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-B1/candidate-extracted.md",
+      "--repo-root",
+      "/Users/kuang/xiaobu/spec-first",
+      "--target-path",
+      "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B1/docs/solutions/numeric-input.md"
+    ],
+    "exit_code": 1,
+    "stdout": "INFO: no upstream default branch found \u2014 path/SHA classification limited to HEAD\nFLAG path `test/entries.test.js` (line 49) \u2014 not found in working tree. Fix the citation, or annotate it as historical (e.g. removed by this fix).\nFLAG path `src/server.js` (line 65) \u2014 not found in working tree. Fix the citation, or annotate it as historical (e.g. removed by this fix).\nFLAG path `../compound-proof.json` (line 109) \u2014 not found in working tree. Fix the citation, or annotate it as historical (e.g. removed by this fix).\nchecked 4 paths, 0 SHAs, 0 links; 3 flags\n",
+    "stderr": ""
+  },
+  {
+    "trial": "CEOPT-06-B2",
+    "argv": [
+      "python3",
+      ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound/scripts/validate-doc-claims.py",
+      "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-B2/candidate-extracted.md",
+      "--repo-root",
+      "/Users/kuang/xiaobu/spec-first",
+      "--target-path",
+      "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B2/docs/solutions/numeric-input.md"
+    ],
+    "exit_code": 1,
+    "stdout": "INFO: no upstream default branch found \u2014 path/SHA classification limited to HEAD\nFLAG path `src/server.js:8\u201310` (line 63) \u2014 not found in working tree. Fix the citation, or annotate it as historical (e.g. removed by this fix).\nFLAG path `src/server.js:19\u201322` (line 65) \u2014 not found in working tree. Fix the citation, or annotate it as historical (e.g. removed by this fix).\nchecked 2 paths, 0 SHAs, 0 links; 2 flags\n",
+    "stderr": ""
+  },
+  {
+    "trial": "CEOPT-06-B3",
+    "argv": [
+      "python3",
+      ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound/scripts/validate-doc-claims.py",
+      "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-B3/candidate-extracted.md",
+      "--repo-root",
+      "/Users/kuang/xiaobu/spec-first",
+      "--target-path",
+      "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/knowledge-publication-supplement/CEOPT-06-B3/docs/solutions/numeric-input.md"
+    ],
+    "exit_code": 1,
+    "stdout": "INFO: no upstream default branch found \u2014 path/SHA classification limited to HEAD\nFLAG path `src/server.js:6\u201311` (line 45) \u2014 not found in working tree. Fix the citation, or annotate it as historical (e.g. removed by this fix).\nFLAG path `src/server.js:19\u201322` (line 54) \u2014 not found in working tree. Fix the citation, or annotate it as historical (e.g. removed by this fix).\nchecked 2 paths, 0 SHAs, 0 links; 2 flags\n",
+    "stderr": ""
+  }
+]

@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "浏览器执行 owner 不可用应停止并指引 runtime-setup",
+  "prompt": "（我已通过 /spec-dogfood 显式调起该 skill——它已在会话中加载,以下是输入。\n这是当前分支的 dogfood 请求。）\n当前分支改了 GET /entries 的响应结构,帮我做发布前的分支 dogfood。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-dogfood/evals/fixtures/scripts/check-owner-unavailable-stop.sh"
+  ]
+}

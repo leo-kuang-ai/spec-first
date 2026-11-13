@@ -1,0 +1,126 @@
+{
+  "status": "configured",
+  "reason_code": "profile-loaded",
+  "profile_source": "explicit",
+  "profile_path": "spec-first.verification.json",
+  "default_profile": "default",
+  "profile": {
+    "schema_version": "verification-profile.v1",
+    "default_profile": "default",
+    "profiles": {
+      "default": {
+        "services": [
+          "spec-first"
+        ],
+        "checks": [
+          "typecheck",
+          "unit",
+          "smoke",
+          "integration"
+        ]
+      }
+    },
+    "services": {
+      "spec-first": {
+        "path": ".",
+        "stack": "node",
+        "required": true
+      }
+    },
+    "stacks": {
+      "node": {
+        "detect": [
+          "package.json"
+        ],
+        "commands": {
+          "typecheck": "npm run typecheck",
+          "unit": "npm run test:unit",
+          "smoke": "npm run test:smoke",
+          "integration": "npm run test:integration"
+        },
+        "runner_kind": {
+          "typecheck": "npm-script",
+          "unit": "npm-script",
+          "smoke": "npm-script",
+          "integration": "npm-script"
+        },
+        "required_tools": {
+          "typecheck": [
+            "node",
+            "npm"
+          ],
+          "unit": [
+            "node",
+            "npm"
+          ],
+          "smoke": [
+            "node",
+            "npm"
+          ],
+          "integration": [
+            "node",
+            "npm"
+          ]
+        }
+      }
+    }
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "profile": "default",
+      "service": "spec-first",
+      "service_path": ".",
+      "service_required": true,
+      "stack": "node",
+      "runner_kind": "npm-script",
+      "command": "npm run typecheck",
+      "required_tools": [
+        "node",
+        "npm"
+      ]
+    },
+    {
+      "id": "unit",
+      "profile": "default",
+      "service": "spec-first",
+      "service_path": ".",
+      "service_required": true,
+      "stack": "node",
+      "runner_kind": "npm-script",
+      "command": "npm run test:unit",
+      "required_tools": [
+        "node",
+        "npm"
+      ]
+    },
+    {
+      "id": "smoke",
+      "profile": "default",
+      "service": "spec-first",
+      "service_path": ".",
+      "service_required": true,
+      "stack": "node",
+      "runner_kind": "npm-script",
+      "command": "npm run test:smoke",
+      "required_tools": [
+        "node",
+        "npm"
+      ]
+    },
+    {
+      "id": "integration",
+      "profile": "default",
+      "service": "spec-first",
+      "service_path": ".",
+      "service_required": true,
+      "stack": "node",
+      "runner_kind": "npm-script",
+      "command": "npm run test:integration",
+      "required_tools": [
+        "node",
+        "npm"
+      ]
+    }
+  ]
+}

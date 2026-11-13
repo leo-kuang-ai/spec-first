@@ -1,0 +1,240 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "generated_at": "2026-09-20T05:26:12.746020+00:00",
+  "skill_name": "spec-runtime-setup",
+  "source_snapshot": "source-manifest.json",
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "source_hashes": {
+    "skills/spec-runtime-setup/SKILL.md": "c9bb4ae019db0fcbfcc89772a405e0df4fa9f4b0ba404813c330ff4d502de41a",
+    "skills/spec-runtime-setup/scripts/setup.cjs": "3fa166402a6978c20f746e87c1e1413aab5e9d80e2ae248cce8c11ef1d9dc7f6",
+    "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs": "30a0c5b91747cad8676e1d11040dde45b63ce4fc6450a2d5fa7c402472aa6ab8",
+    "skills/spec-runtime-setup/scripts/lib/host-authority.cjs": "104ddcf0a14d47a2d89aa0d258b70babd8a23beb943b14bdd4fb2926670bfd83",
+    "skills/spec-runtime-setup/scripts/lib/workspace-runtime-preflight.cjs": "ab020827f87efd6648a03c68905523825dab70dfd0ef70c1f1023bc487b2ff22",
+    "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs": "bb6c313249dc9964b0df0229d35435d4b438e1afe2597259d7a47bee0d7601da",
+    "skills/spec-runtime-setup/scripts/lib/workspace-parent-diagnostic.cjs": "9a8cc006badbfd7abb7165b80cb641bbc95c2e26708470a4a858e2fbe4a2e547",
+    "skills/spec-runtime-setup/scripts/lib/repair-loop.cjs": "749f4cb611098ccb2a63a92a20df774f19e7328104898786506ef7c1b2ad65f7",
+    "skills/spec-runtime-setup/scripts/lib/renderer.cjs": "fdbeaff9aeddb6377b21dc8d4cd6cbc1e5620d6fab814476d6a67f340e2ff319",
+    "skills/spec-runtime-setup/evals/cases/semantic-question-not-setup.yaml": "46f3f0381e1032361c88c12e3bea4c85eecedc02e49557a956acaf03bee059a4",
+    "skills/spec-runtime-setup/evals/cases/check-readonly.yaml": "a3487762e9a7f19a74011b711524685b3198885801aeec01185cbfc4fefd56c6",
+    "tests/unit/mcp-setup-entrypoint.test.js": "dc5d9f6f8988c9d080683bb097dc7bb94f7926bf50a534ef4c5e3fbb3b2ca6d1",
+    "tests/unit/mcp-setup-node-contracts.test.js": "12dada591d6c9e9c8bcd9da8f9381005bf01ed6abf510ea616bd5790ed0d2ee6",
+    "tests/unit/mcp-setup-workspace-parent-diagnostic.test.js": "32b8c2ae452986bb1271026ccfa5229040972e8b3772b80ee312b93130817fbf",
+    "src/cli/commands/doctor.js": "71619e3c55d4168016c45be14b867dd26815f0350968c4477265082588d1d6a3"
+  },
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "entry_surface": "workflow_command",
+  "batch": "A",
+  "closure_tier": "L",
+  "closure_observed": {
+    "files": 83,
+    "bytes": 1079708,
+    "read_package_files_at_least_partially": 11,
+    "read_supporting_files_at_least_partially": 4,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "coverage_commitment": "committed",
+  "dependency_closure": "partial",
+  "status": "failed",
+  "reason_codes": [
+    "source_contract_findings",
+    "bounded_dependency_sample",
+    "host_projection_and_live_execution_not_run"
+  ],
+  "command_or_method": [
+    "读取冻结worktree source及测试实现；buildActionPlan/requiresRuntimeProjectionPreflight纯函数探针，不调用runSetup、不改host、不安装依赖"
+  ],
+  "ran": true,
+  "exit_code": 0,
+  "evidence_paths": [
+    "skills/spec-runtime-setup/SKILL.md",
+    "skills/spec-runtime-setup/scripts/setup.cjs",
+    "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
+    "skills/spec-runtime-setup/scripts/lib/host-authority.cjs",
+    "skills/spec-runtime-setup/scripts/lib/workspace-runtime-preflight.cjs",
+    "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
+    "skills/spec-runtime-setup/scripts/lib/workspace-parent-diagnostic.cjs",
+    "skills/spec-runtime-setup/scripts/lib/repair-loop.cjs",
+    "skills/spec-runtime-setup/scripts/lib/renderer.cjs",
+    "skills/spec-runtime-setup/evals/cases/semantic-question-not-setup.yaml",
+    "skills/spec-runtime-setup/evals/cases/check-readonly.yaml",
+    "tests/unit/mcp-setup-entrypoint.test.js",
+    "tests/unit/mcp-setup-node-contracts.test.js",
+    "tests/unit/mcp-setup-workspace-parent-diagnostic.test.js",
+    "src/cli/commands/doctor.js",
+    "runtime-setup-preflight-probe.json"
+  ],
+  "source_paths": [
+    "skills/spec-runtime-setup/SKILL.md",
+    "skills/spec-runtime-setup/scripts/setup.cjs",
+    "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
+    "skills/spec-runtime-setup/scripts/lib/host-authority.cjs",
+    "skills/spec-runtime-setup/scripts/lib/workspace-runtime-preflight.cjs",
+    "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
+    "skills/spec-runtime-setup/scripts/lib/workspace-parent-diagnostic.cjs",
+    "skills/spec-runtime-setup/scripts/lib/repair-loop.cjs",
+    "skills/spec-runtime-setup/scripts/lib/renderer.cjs",
+    "skills/spec-runtime-setup/evals/cases/semantic-question-not-setup.yaml",
+    "skills/spec-runtime-setup/evals/cases/check-readonly.yaml",
+    "tests/unit/mcp-setup-entrypoint.test.js",
+    "tests/unit/mcp-setup-node-contracts.test.js",
+    "tests/unit/mcp-setup-workspace-parent-diagnostic.test.js",
+    "src/cli/commands/doctor.js"
+  ],
+  "source_read_ranges": {
+    "skills/spec-runtime-setup/SKILL.md": "1-368",
+    "skills/spec-runtime-setup/scripts/setup.cjs": "1-680,780-873",
+    "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs": "1-185",
+    "skills/spec-runtime-setup/scripts/lib/host-authority.cjs": "1-220",
+    "skills/spec-runtime-setup/scripts/lib/workspace-runtime-preflight.cjs": "1-174",
+    "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs": "1-565,735-860",
+    "skills/spec-runtime-setup/scripts/lib/workspace-parent-diagnostic.cjs": "1-96",
+    "skills/spec-runtime-setup/scripts/lib/repair-loop.cjs": "1-44",
+    "skills/spec-runtime-setup/scripts/lib/renderer.cjs": "1-115,198-330",
+    "skills/spec-runtime-setup/evals/cases/semantic-question-not-setup.yaml": "1-22",
+    "skills/spec-runtime-setup/evals/cases/check-readonly.yaml": "1-28"
+  },
+  "owner": "skills/spec-runtime-setup",
+  "consumers": [
+    "doctor",
+    "using-spec-first",
+    "spec-plan",
+    "spec-work",
+    "spec-code-review",
+    "spec-debug"
+  ],
+  "branches": [
+    {
+      "id": "B1",
+      "trigger": "runtime setup entry/readiness",
+      "owner": "spec-runtime-setup",
+      "expected_output": "readiness facts and grouped status",
+      "source_ref": "skills/spec-runtime-setup/SKILL.md:9-23",
+      "status": "degraded",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "B2",
+      "trigger": "--check/--plan readonly and explicit host guard",
+      "owner": "mode-policy/host-authority",
+      "expected_output": "read-only result or fail-closed mutation",
+      "source_ref": "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs:54-162",
+      "status": "degraded",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "B3",
+      "trigger": "bare single-repo mutation",
+      "owner": "setup/runtime-executor",
+      "expected_output": "projection preflight before mutation",
+      "source_ref": "skills/spec-runtime-setup/scripts/setup.cjs:206-211",
+      "status": "failed",
+      "finding_ref": "C1-U9-RUNTIME-001",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "B4",
+      "trigger": "non-Git multi-repo parent bare",
+      "owner": "setup/workspace-parent-diagnostic",
+      "expected_output": "default all-repos convergence or explicit documented diagnostic",
+      "source_ref": "skills/spec-runtime-setup/scripts/setup.cjs:213-229",
+      "status": "failed",
+      "finding_ref": "C1-U9-RUNTIME-002",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "B5",
+      "trigger": "default graph/provider scope",
+      "owner": "SKILL/mode-policy",
+      "expected_output": "one consistent graph generation contract",
+      "source_ref": "skills/spec-runtime-setup/SKILL.md:32,147,262",
+      "status": "failed",
+      "finding_ref": "C1-U9-RUNTIME-003",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "B6",
+      "trigger": "provider failure/degraded/recovery",
+      "owner": "runtime-executor/repair-loop",
+      "expected_output": "partial facts, reason code, bounded recovery",
+      "source_ref": "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs:83-128,470-474",
+      "status": "degraded",
+      "workflow_execution": "not-run"
+    }
+  ],
+  "findings": [
+    {
+      "id": "C1-U9-RUNTIME-001",
+      "severity": "P2",
+      "title": "bare mutation 漏 runtime projection preflight",
+      "status": "confirmed-open",
+      "ledger_ref": "finding-ledger.json"
+    },
+    {
+      "id": "C1-U9-RUNTIME-002",
+      "severity": "P2",
+      "title": "多仓父目录 bare 入口承诺与执行分支分歧",
+      "status": "confirmed-open",
+      "ledger_ref": "finding-ledger.json"
+    },
+    {
+      "id": "C1-U9-RUNTIME-003",
+      "severity": "P2",
+      "title": "默认 graph scope 的文案与模式矩阵冲突",
+      "status": "confirmed-open",
+      "ledger_ref": "finding-ledger.json"
+    }
+  ],
+  "fresh_source_eval": "concerns",
+  "claim_ceiling": "C1",
+  "limitations": [
+    "纯函数探针无写入；未执行setup、provider、host projection、GUI/CLI loader或真实workflow。",
+    "workspace graph、host-config/facts原子性、schema/registry深层consumer未闭合。",
+    "未声明无P1；仅本次读样本未见P1。"
+  ],
+  "recovery_point": "围绕3项finding建立最小源码修复与回归计划；先统一契约再改实现；补bare×projection、parent all-repos及graph scope测试。",
+  "timing": {
+    "first_recorded_observation": "2026-09-20T01:17:47Z",
+    "ended_at": "2026-09-20T03:07:12Z",
+    "wall_seconds": 6565,
+    "active_seconds": null,
+    "limitation": "429暂停/恢复，不作单包预算校准"
+  },
+  "redaction_status": "none-required",
+  "supporting_read_ranges": {
+    "tests/unit/mcp-setup-entrypoint.test.js": "240-285,926-1040,2080-2155,2900-3010",
+    "tests/unit/mcp-setup-node-contracts.test.js": "550-620",
+    "tests/unit/mcp-setup-workspace-parent-diagnostic.test.js": "55-95",
+    "src/cli/commands/doctor.js": "895-975"
+  },
+  "source_refs": [
+    "skills/spec-runtime-setup/SKILL.md",
+    "skills/spec-runtime-setup/scripts/setup.cjs",
+    "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
+    "skills/spec-runtime-setup/scripts/lib/host-authority.cjs",
+    "skills/spec-runtime-setup/scripts/lib/workspace-runtime-preflight.cjs",
+    "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
+    "skills/spec-runtime-setup/scripts/lib/workspace-parent-diagnostic.cjs",
+    "skills/spec-runtime-setup/scripts/lib/repair-loop.cjs",
+    "skills/spec-runtime-setup/scripts/lib/renderer.cjs",
+    "skills/spec-runtime-setup/evals/cases/semantic-question-not-setup.yaml",
+    "skills/spec-runtime-setup/evals/cases/check-readonly.yaml",
+    "tests/unit/mcp-setup-entrypoint.test.js",
+    "tests/unit/mcp-setup-node-contracts.test.js",
+    "tests/unit/mcp-setup-workspace-parent-diagnostic.test.js",
+    "src/cli/commands/doctor.js"
+  ],
+  "execution": {
+    "source_semantic_review": "ran",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "not-run",
+    "owner_probe_refs": [
+      "runtime-setup-preflight-probe.json"
+    ]
+  },
+  "unconfirmed_read_ranges": []
+}

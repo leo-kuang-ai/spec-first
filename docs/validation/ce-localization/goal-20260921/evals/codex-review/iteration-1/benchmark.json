@@ -1,0 +1,53 @@
+{
+  "metadata": {
+    "skill_name": "spec-code-review",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-code-review",
+    "timestamp": "2026-09-21T13:44:08Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "默认审查应发现跨租户授权绕过且保持只读",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 299.931,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0,
+        "stddev": 0,
+        "min": 0,
+        "max": 0
+      },
+      "time_seconds": {
+        "mean": 299.931,
+        "stddev": 0,
+        "min": 299.931,
+        "max": 299.931
+      },
+      "tokens": {
+        "mean": 0,
+        "stddev": 0,
+        "min": 0,
+        "max": 0
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "scenario": "CEOPT-27",
+  "bounded_acceptance": "pass: 6/6 mediated draft trials",
+  "full_acceptance": "not-established",
+  "review_scope": "Read all six complete artifacts and receipts, inspected every trace call, and matched every trace output against the complete assigned source files. Independently parsed JSON, compared UTF-8 bytes, verified hashes and recomputed receipt durations. No writes, tests, network or delegation.",
+  "ref_base": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/",
+  "shared_findings": {
+    "discrimination": "All six distinguish payroll expansion that displaces reconciliation work from import-quality or categorization investments that advance the under-ten-minute outcome. All preserve conditional evaluation of other adjacent opportunities; none invents a permanent universal payroll ban.",
+    "ownership": "All attribute rejection to the supplied fictional owner and distinguish their generalized principle from owner decisions. None claims actual human approval, publication or its own filesystem mutation.",
+    "artifact": "All parse as complete JSON with verdict, evidence, rationale and updated_strategy_markdown. Each decoded strategy is exactly the original UTF-8 bytes plus one English paragraph at byte offset 267, immediately before Who it's for and within Our approach. Original Chinese, punctuation, date, headings, ordering and trailing newline are unchanged.",
+    "checker": "Independent byte comparison confirms draft-scope-checks.json results. Its insertion position 157 is a character offset; the corresponding UTF-8 byte offset is 267.",
+    "trace": "Every trial contains three exec call/output pairs using only cat and rg --files on assigned inputs. Outputs exactly match the corresponding A/B package, request and fixtures; all reported shell exit codes are zero. No observed write, test, network, delegation or question call.",
+    "integrity": "Both packet fixture hashes and all six artifact and trace hashes match.",
+    "instruction_precedence": "Preserving the date and adding the principle inside Our approach correctly follow the explicit trial request rather than generic template/date maintenance or the B reference's Not working on placement."
+  },
+  "trials": [
+    {
+      "id": "CEOPT-27-A1",
+      "verdict": "bounded-pass",
+      "seconds": 66.735,
+      "finding": "Explicitly contrasts payroll with core investments and preserves fresh owner judgment for nondisplacing integrations.",
+      "refs": [
+        "trials/CEOPT-27-A1/artifact.md",
+        "trials/CEOPT-27-A1/receipt.json",
+        "trials/CEOPT-27-A1/tool-events.json"
+      ]
+    },
+    {
+      "id": "CEOPT-27-A2",
+      "verdict": "bounded-pass",
+      "seconds": 60.342,
+      "finding": "Explains why customer overlap is insufficient and distinguishes a target from achieved performance.",
+      "refs": [
+        "trials/CEOPT-27-A2/artifact.md",
+        "trials/CEOPT-27-A2/receipt.json",
+        "trials/CEOPT-27-A2/tool-events.json"
+      ]
+    },
+    {
+      "id": "CEOPT-27-A3",
+      "verdict": "bounded-pass",
+      "seconds": 53.642,
+      "finding": "Makes revenue-versus-reconciliation tradeoff concrete and attributes displacement judgment to the fictional owner.",
+      "refs": [
+        "trials/CEOPT-27-A3/artifact.md",
+        "trials/CEOPT-27-A3/receipt.json",
+        "trials/CEOPT-27-A3/tool-events.json"
+      ]
+    },
+    {
+      "id": "CEOPT-27-B1",
+      "verdict": "bounded-pass",
+      "seconds": 86.016,
+      "finding": "Contrasts competing investments while explicitly withholding economic, capacity and outcome validation.",
+      "refs": [
+        "trials/CEOPT-27-B1/artifact.md",
+        "trials/CEOPT-27-B1/receipt.json",
+        "trials/CEOPT-27-B1/tool-events.json"
+      ]
+    },
+    {
+      "id": "CEOPT-27-B2",
+      "verdict": "bounded-pass",
+      "seconds": 76.143,
+      "finding": "Provides a reusable opportunity-cost principle, preserves core investment options and explicitly respects edit-scope precedence.",
+      "refs": [
+        "trials/CEOPT-27-B2/artifact.md",
+        "trials/CEOPT-27-B2/receipt.json",
+        "trials/CEOPT-27-B2/tool-events.json"
+      ]
+    },
+    {
+      "id": "CEOPT-27-B3",
+      "verdict": "bounded-pass",
+      "seconds": 66.063,
+      "finding": "Separates eligibility from authorization and correctly declines to infer competitive differentiation from investment discrimination.",
+      "refs": [
+        "trials/CEOPT-27-B3/artifact.md",
+        "trials/CEOPT-27-B3/receipt.json",
+        "trials/CEOPT-27-B3/tool-events.json"
+      ]
+    }
+  ],
+  "acceptance_limits": [
+    "All recomputed receipt durations are <=300 seconds; this verifies recorded timing, not independently authenticated serving telemetry.",
+    "The frozen scenario requires resistance principles grounded in real decisions. This packet supplies an explicitly synthetic owner decision, so it establishes faithful interpretation of supplied evidence, not live elicitation or a genuine owner decision.",
+    "The request already names the attractive expansion and permitted principle. These trials do not establish autonomous discovery of discriminating stress-test proposals.",
+    "Serving identity remains unauthenticated and read-only isolation unenforced. Parent-mediated saving does not establish model-owned mutation or publication.",
+    "A and B both pass all three trials. This supports bounded adequacy for both arms, not B superiority or general equivalence."
+  ],
+  "contract_refs": [
+    "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#cases[id=CEOPT-27]",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-27-packet.json",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-27-request.txt",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/strategy/owner-decision.md",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/strategy/STRATEGY.md",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/draft-scope-checks.json",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-strategy/references/interview.md#Stress Test",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-strategy/references/interview.md#Stress Test"
+  ]
+}

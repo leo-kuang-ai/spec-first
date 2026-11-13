@@ -1,0 +1,129 @@
+{
+  "schema_version": "ce-semantic-review-results.v1",
+  "generated_at": "2026-09-12",
+  "batch_ref": "docs/validation/ce-localization/review/semantic-review-batches-2026-09-12.json#batch-5-G04",
+  "upstream": {
+    "repository": "compound-engineering-plugin",
+    "base": "5c7cb347d0686663743b87cd7227246ba24f7fa7",
+    "head": "956087b3e1dd7ccc03df32cee9e7c044dfbe75cf",
+    "name_status_sha256": "a83371963406147ede5c9752c13b324e88d9f0eaf08af7e1239dd7e6a623d459"
+  },
+  "review_basis": {
+    "target_repository": "spec-first",
+    "reviewed_against_head": "c0803ab5d2e80edde9ca67771c6d204b775bb354",
+    "working_tree_dirty_at_review_start": "仅含本流已复核的 G06 两个 docs/validation 文件（与本批次判定面无交集）",
+    "frozen_binding_head": "7c6bdd66d78616be769d8c78fc9e81340c004cda",
+    "owner_source_unchanged_since_freeze": true,
+    "owner_source_freshness_check": "git diff --stat 7c6bdd66..HEAD -- scripts/check-ce-upstream-reconciliation.cjs tests/unit/ce-upstream-reconciliation-v2.test.js 为空（G06 批次同日核验，本批次判定面相同 owner source）。",
+    "ce_repo": "/Users/kuang/xiaobu/compound-engineering-plugin（machine-local）",
+    "method": "LLM fresh-source 语义复核：逐条读取固定窗口完整 CE diff（git -C <ce-repo> diff <base>..<head> -- <path>）与当前 owner source 后逐条判定；脚本仅提供既有确定性事实，本结果不是脚本自动输出。",
+    "reviewer": "spec-first current session（ZCode，/goal 持续推进授权）",
+    "reviewed_at": "2026-09-12"
+  },
+  "decision_enum_source": "scripts/check-ce-upstream-reconciliation.cjs:97-103（V2_TARGET_ACTIONS / CLOSURE_PROFILES）。沿用既有 adjudication 枚举，不发明新 adjudication 合同。",
+  "records": [
+    {
+      "audit_id": "A414",
+      "path": "src/commands/convert.ts",
+      "upstream_change": "M，2 行：no-tools 提示文案加入 oh-my-pi (omp)。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（CLI_RUNTIME_PATHS:44-65 含 src/commands/convert.ts → surfaceFor:416 判 cli-runtime）",
+      "action": "maintain evidence-only。CE 自身 Bun converter 的提示文案；spec-first 不运行 CE CLI，omp 也不是 spec-first 支持宿主（registry：Claude/Codex/Cursor/Kiro/Qoder/OpenCode/ZCode/Pi）。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": [
+        "上游 diff 全文已读（2 行变更）",
+        "owner source：scripts/check-ce-upstream-reconciliation.cjs:44-65、:416、:425"
+      ],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": ["无——文案级变更，判定仅依赖宿主支持面事实，已核"]
+    },
+    {
+      "audit_id": "A415",
+      "path": "src/commands/install.ts",
+      "upstream_change": "M，2 行：与 A414 同型的 no-tools 提示文案加入 oh-my-pi (omp)。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（CLI_RUNTIME_PATHS 含 src/commands/install.ts）",
+      "action": "maintain evidence-only。理由同 A414。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": [
+        "上游 diff 全文已读（2 行变更）",
+        "owner source：scripts/check-ce-upstream-reconciliation.cjs:44-65、:416"
+      ],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": ["无——同 A414"]
+    },
+    {
+      "audit_id": "A416",
+      "path": "src/dev/codex-dev.ts",
+      "upstream_change": "M，15 行：isOfficialRemotePlugin 更名 isOfficialMarketplacePlugin 并放宽 plugin.source 判定为 local 或官方 git URL（支持 marketplace-backed 安装态）；错误文案 Git-backed → marketplace-backed。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（CLI_RUNTIME_PATHS 含 src/dev/codex-dev.ts 与 scripts/codex-dev.ts）",
+      "action": "maintain evidence-only。CE 自身的 Codex 开发链接管理器（codex:dev local/remote 模式判定）；spec-first 有独立的 runtime setup（spec-first init / doctor），不消费 CE 的 Codex 插件安装态判定。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": [
+        "上游 diff 全文已读（15 行变更，逐 hunk 复核）",
+        "owner source：scripts/check-ce-upstream-reconciliation.cjs:44-65（CLI_RUNTIME_PATHS 同时列 src/dev/codex-dev.ts 与 scripts/codex-dev.ts）"
+      ],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": ["未实际运行 CE codex:dev 验证其状态判定行为（CE 自身 CI 范围）"]
+    },
+    {
+      "audit_id": "A417",
+      "path": "src/release/metadata.ts",
+      "upstream_change": "M，74 行：新增 omp（oh-my-pi）marketplace catalog（.omp-plugin/marketplace.json）校验/同步——omp 更新检查器跳过无 version 条目，故 plugin entry 带 release-owned version（release-please 经 extra-files 拥有版本写入，此处 detect-only）；description 同步保持 write-enabled；source 必须 \"./\"。另收紧 Codex marketplace source 校验：非 local source 报错（Codex 仅在安装时物化非本地 source，/plugins 预览不列 skills/hooks/apps/MCP，issue #1226）。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（CLI_RUNTIME_PATHS 含 src/release/metadata.ts）",
+      "action": "maintain evidence-only。CE 自身 release 元数据管线；spec-first 有独立的版本/发布管理（CHANGELOG + npm pack），不消费 CE 的 marketplace catalog 同步机制。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": [
+        "上游 diff 全文已读（74 行变更，逐 hunk 复核）",
+        "owner source：scripts/check-ce-upstream-reconciliation.cjs:44-65、:416"
+      ],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": ["未运行 CE release:validate 验证 catalog 校验行为（CE 自身 CI 范围）"]
+    },
+    {
+      "audit_id": "A418",
+      "path": "src/utils/codex-content.ts",
+      "upstream_change": "M，82 行：Claude→Codex 内容变换重构——新增 transformOutsideHttpUrls 分段器，全部 replace（backticked agent、slash-command、.claude/→.codex/ 路径改写、@agent 引用）仅在非 URL 段执行，防止 URL 内路径样片段被破坏；agentRefPattern 加词边界；slashCommandPattern lookbehind 增 / 并移除冗余 includes 检查；finalSegment 简化。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（CLI_RUNTIME_PATHS 含 src/utils/codex-content.ts）",
+      "action": "maintain evidence-only，附观察项 G04-O1。CE 自身内容变换器；spec-first 不消费。但 spec-first 的 opencode adapter 存在同型形态：src/cli/adapters/opencode.js:191-204 对 .claude/commands/spec/*.md 等路径做无 URL 保护的 .replace()——若 skill 语料中出现含此类路径的 URL 存在被改写风险（未证实实际语料命中，登记为观察项，非缺陷）。",
+      "consumer": "reconciliation ledger / adjudication input；观察项供 src/cli adapter 后续加固评估",
+      "evidence": [
+        "上游 diff 全文已读（82 行变更，逐 hunk 复核）",
+        "owner source：scripts/check-ce-upstream-reconciliation.cjs:44-65、:416",
+        "spec-first 同型形态：src/cli/adapters/opencode.js:191-204（.claude/.codex 路径 .replace 无 URL 分段保护）"
+      ],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": [
+        "观察项 G04-O1 未验证 spec-first skill 语料中是否存在会被误改写的 URL（超出本批次范围）；如后续证实，修复属 canonical src/cli 变更，走流收口或独立任务"
+      ]
+    },
+    {
+      "audit_id": "A419",
+      "path": "src/utils/detect-tools.ts",
+      "upstream_change": "M，4 行：detectableTools 新增 omp 条目（~/.omp 与 ./.omp 探测路径）。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（CLI_RUNTIME_PATHS 含 src/utils/detect-tools.ts）",
+      "action": "maintain evidence-only。CE 自身工具探测；spec-first 的宿主探测是 platform registry（getSupportedPlatforms），omp 不在支持宿主集合，无对应消费者。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": [
+        "上游 diff 全文已读（4 行变更）",
+        "owner source：scripts/check-ce-upstream-reconciliation.cjs:44-65、:416",
+        "spec-first 宿主面：AGENTS.md / platform registry（当前八宿主，无 omp）"
+      ],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": ["无——宿主支持面事实已核"]
+    }
+  ],
+  "batch_verdict": "confirmed：6/6 条维持既有 evidence-only 判定，0 条翻转，0 条新采纳；登记 1 个非阻断观察项 G04-O1（opencode adapter 同型 URL 未保护 replace，未证实缺陷）。",
+  "residuals": [
+    {
+      "id": "G04-O1",
+      "finding": "spec-first src/cli/adapters/opencode.js:191-204 的路径改写 .replace() 无 URL 分段保护，与上游 A418 修复的缺陷形态同型（CE 通过 transformOutsideHttpUrls 解决）。未证实 spec-first 语料中存在会被命中的 URL，故为观察项而非缺陷。",
+      "severity": "observation（non-blocking）",
+      "owner": "后续 src/cli adapter 加固评估（独立任务或流收口随批处理）",
+      "not_fixed_here_because": "无已证实缺陷；修复属 canonical src/cli 变更且需先验证语料命中，超出本语义复核批次范围。"
+    }
+  ],
+  "limitations": [
+    "本结果为单批次（G04，6 条）语义复核；连同 G06 共 11/517，余 506 条（G01=298、G02=95、G03=98、G05=15 仍 pending）",
+    "未运行 CE CLI/release:validate；上游 diff 复核为代码语义级",
+    "ce_repo 为 machine-local 路径，本结果在本机核验；固定窗口不代表已覆盖 CE 最新上游 HEAD"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "run_summary_ref": ".spec-first/workflows/spec-debug/spec-first/s04-resume-20261102/verification-run-summary.json",
+  "claims": [
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:tests",
+        "verification-run-summary:eval"
+      ]
+    }
+  ]
+}

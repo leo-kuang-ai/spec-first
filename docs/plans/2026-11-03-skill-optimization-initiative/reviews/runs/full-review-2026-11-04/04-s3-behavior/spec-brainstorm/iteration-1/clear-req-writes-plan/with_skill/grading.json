@@ -1,0 +1,20 @@
+{
+  "expectations": [
+    {
+      "text": "expect.must_contain",
+      "passed": true,
+      "evidence": "all checks passed"
+    },
+    {
+      "text": "output_contains{all:[docs/plans -plan.md]}",
+      "passed": true,
+      "evidence": "output satisfies all contains checks (all:[docs/plans -plan.md])"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 0,
+    "total": 2,
+    "pass_rate": 1
+  }
+}

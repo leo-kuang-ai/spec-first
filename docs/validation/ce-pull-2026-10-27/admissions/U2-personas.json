@@ -1,0 +1,141 @@
+{
+  "schema_version": "ce-upstream-sync-run/v1",
+  "kind": "package-admission",
+  "window_sha256": "4404a34a8f28c8401cbe231c67ea7dbf708ff7b88f853b540140ba3473432fe3",
+  "input_sha256": "ca9c45a3bfc212213ed4bc44764a14262a814cce137315b0e00947b665070afc",
+  "target_snapshot": {
+    "repository": "spec-first",
+    "head": "fe81bae9ee55ec336c85cf80c4a0460d86e3a412",
+    "dirty": true,
+    "dirty_paths": [
+      "CHANGELOG.md",
+      "docs/contracts/verification/ce-upstream-sync-run.md",
+      "docs/contracts/verification/ce-upstream-sync-run.schema.json",
+      "docs/plans/2026-10-27-001-refactor-ce-upstream-sync-technical-scheme.md",
+      "scripts/check-ce-upstream-reconciliation.cjs",
+      "skills/spec-commit-push-pr/references/branch-creation.md",
+      "skills/spec-compound/references/session-history.md",
+      "skills/spec-compound/scripts/session-history/extract-metadata.py",
+      "tests/unit/ce-upstream-reconciliation-v2.test.js",
+      "tests/unit/session-history-scripts.test.js",
+      "tests/unit/spec-commit-push-pr-context-contracts.test.js"
+    ],
+    "dirty_path_manifest_sha256": "6091e6671a62a640222c0682101d678e2d0170ee1a71f42c5007daeac3c3f842",
+    "source_tree_hash": "050bfa8040b5315c46441544dc4795a98571a4742da1d428ba8ccf434fbd648f",
+    "inventory_hash": "03cf61bdf6ab24007e1ab674a323670b3d5f8f7cec85d8f70584aff00b094e2a",
+    "scope_contract": {
+      "source_roots": [
+        "CLAUDE.md",
+        "AGENTS.md",
+        "skills",
+        "templates",
+        "src",
+        "scripts",
+        "tests",
+        "docs",
+        "README.md",
+        "README.en.md",
+        "README.zh-CN.md",
+        "CHANGELOG.md",
+        "package.json"
+      ],
+      "excluded_run_outputs": [
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-name-status.md",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication-input.json",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.md",
+        "docs/validation/2026-08-19-spec-first-current-skill-package-inventory-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-evidence-exceptions.json",
+        "docs/validation/ce-pull-2026-10-27/window-facts.json",
+        "docs/validation/ce-pull-2026-10-27/execution-state.json",
+        "docs/validation/ce-pull-2026-10-27/execution-baseline.json",
+        "docs/validation/ce-pull-2026-10-27/producer-name-status.tsv",
+        "docs/validation/ce-pull-2026-10-27/target-source-inventory.json",
+        "docs/validation/ce-pull-2026-10-27/adjudication-input.json",
+        "docs/validation/ce-pull-2026-10-27/adjudication.json",
+        "docs/validation/ce-pull-2026-10-27/ledger.json",
+        "docs/validation/ce-pull-2026-10-27/summary.md",
+        "docs/validation/ce-pull-2026-10-27/artifact-set.json",
+        "docs/validation/ce-pull-2026-10-27/work-return.json",
+        "docs/validation/ce-pull-2026-10-27/verification-run-summary.json",
+        "docs/validation/ce-pull-2026-10-27/honest-closeout.md",
+        "docs/validation/ce-pull-2026-10-27/handoff.json",
+        "docs/validation/ce-pull-2026-10-27/semantic-screening.json",
+        "docs/validation/ce-pull-2026-10-27/plan-review.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/window-facts.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/execution-state.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/execution-baseline.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/producer-name-status.tsv",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/target-source-inventory.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/adjudication-input.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/adjudication.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/ledger.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/summary.md",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/artifact-set.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/work-return.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/verification-run-summary.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/honest-closeout.md",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/handoff.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/semantic-screening.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/plan-review.json",
+        "docs/validation/ce-pull-2026-10-27/logs/**",
+        "docs/validation/ce-pull-2026-10-27/owner-receipts/**",
+        "docs/validation/ce-pull-2026-10-27/admissions/**",
+        "docs/validation/ce-pull-2026-10-27/ledger-patches/**",
+        "docs/validation/ce-pull-2026-10-27/staging/**",
+        "docs/validation/2026-08-19-ce-post-3-20-ledger-patches/**",
+        "docs/validation/ce-localization/**"
+      ]
+    },
+    "hash_algorithm": {
+      "name": "sha256",
+      "version": "canonical-source-manifest-v1"
+    }
+  },
+  "source_refs": [
+    "docs/plans/2026-10-27-001-refactor-ce-upstream-sync-technical-scheme.md",
+    "skills/spec-code-review/references/personas/testing-reviewer.md",
+    "skills/spec-code-review/references/personas/reliability-reviewer.md",
+    "skills/spec-code-review/references/personas/maintainability-reviewer.md",
+    "skills/spec-code-review/references/diff-scope.md"
+  ],
+  "limitations": [
+    "仅四个已比较路径；其余 review 候选待审",
+    "producer 自审；不是独立或模型行为验证"
+  ],
+  "unresolved": [],
+  "package_id": "skills/ce-code-review",
+  "unit_id": "U2",
+  "paths": [
+    "skills/ce-code-review/references/personas/testing-reviewer.md",
+    "skills/ce-code-review/references/personas/reliability-reviewer.md",
+    "skills/ce-code-review/references/personas/maintainability-reviewer.md",
+    "skills/ce-code-review/references/diff-scope.md"
+  ],
+  "decisions": [
+    {
+      "path": "skills/ce-code-review/references/personas/testing-reviewer.md",
+      "target_action": "compose",
+      "rationale": "补充自证期望值、伪造 side effect、错误 guard 命中的 false confidence，以及 test-only seam 与重复 coverage；保留本地 DAMP 和执行证据边界。"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/reliability-reviewer.md",
+      "target_action": "compose",
+      "rationale": "I/O 缺保护须证明当前执行环境下真实失败成本；一次性可重跑脚本不能仅凭缺 catch 升为故障。"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/maintainability-reviewer.md",
+      "target_action": "compose",
+      "rationale": "新增 surface 必须对照明确 scope；新依赖必须命名 stdlib/既有 helper 替代，保留本地低 confidence 抑制规则。"
+    },
+    {
+      "path": "skills/ce-code-review/references/diff-scope.md",
+      "target_action": "compose",
+      "rationale": "补 whole-file deletion 的存活 consumer 检查与 reviewed head/base 绑定；不依赖尚未实现的 deleted-files block。"
+    }
+  ],
+  "review_ref": "docs/validation/ce-pull-2026-10-27/execution-state.json",
+  "authority_ref": "docs/validation/ce-pull-2026-10-27/execution-state.json",
+  "dependency_refs": []
+}

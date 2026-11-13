@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "无反馈循环的调试请求应指出不适配并指向 spec-debug",
+  "prompt": "（spec-optimize skill 已安装，请按它工作。）\n服务偶尔崩溃也没法稳定复现,帮我优化修复一下。\n",
+  "assertions": [
+    "expect.must_contain",
+    "output_contains{all:[spec-debug]}"
+  ]
+}

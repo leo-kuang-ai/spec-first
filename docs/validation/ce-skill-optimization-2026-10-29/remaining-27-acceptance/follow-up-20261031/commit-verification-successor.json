@@ -1,0 +1,14 @@
+{
+  "reason": "Independent review found lost-result branch initially identical to normal.",
+  "status": "independently-reviewed-with-disclosed-limits",
+  "pins": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/verify-commit-recovery.py": "3493acf2db029d2701bfe6e0c7aef4078d7efe5843b11e764d29f7a142e88617",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/commit-recovery-results.json": "28737469b203c0f4e2fc34942ce29989a1929a27fa5b6a09c012213fe07ad8a8",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/commit-isolation-procedure.md": "08232e59d1da24dbb92b16f328b1cffa1863ceb7a7d5c74b840104f698cda414",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/commit-initial/verify-commit-recovery.py": "36fc47efdff8fa8766efe25823f83a91143b8391e190c9776b3bffc58b2294a9",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/commit-initial/commit-recovery-results.json": "3c90b076c77715355456631c0d383ebc0cdb9dc859865af13eed1e484e33b77e",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/commit-initial/commit-recovery.log": "3527b7cedbc16418510920b559583a8b23c5876ae3425ab58d15bff384e140b2"
+  },
+  "scope": "Seven disposable Git cases; response loss simulated by discarding the result, not killing a process.",
+  "review_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/independent-source-review.json"
+}

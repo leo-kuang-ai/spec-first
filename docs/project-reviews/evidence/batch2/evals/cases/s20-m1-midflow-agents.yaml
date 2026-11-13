@@ -1,0 +1,21 @@
+id: s20-m1-midflow-agents
+title: s20-m1-midflow-agents
+description: |
+  第二轮筛查场景；预期与判定见 ../../expectations.md（运行前写定），正式判定由 ../../grade2.py 事后执行。
+input:
+  turns:
+    - role: user
+      content: |
+        按 docs/plans/refund-export.md 实现退款导出。
+    - role: user
+      content: |
+        进度怎么样？还差什么？
+context:
+  repo_fixture: evals/fixtures/order-ledger-agents
+  git:
+    init: true
+    checkout: main
+judge:
+  type: rule_based
+  success:
+    - exit_code: 0

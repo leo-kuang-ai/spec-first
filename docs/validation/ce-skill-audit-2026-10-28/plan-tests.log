@@ -1,0 +1,12 @@
+PASS tests/unit/spec-plan-quality-contracts.test.js
+PASS tests/unit/spec-plan-consumer-replay-contracts.test.js
+PASS tests/unit/spec-plan-contracts.test.js
+PASS tests/unit/spec-plan-reference-contracts.test.js
+PASS tests/unit/spec-prd-plan-handoff-contracts.test.js
+
+Test Suites: 5 passed, 5 total
+Tests:       55 passed, 55 total
+Snapshots:   0 total
+Time:        1.145 s
+Ran all test suites matching /tests\/unit\/spec-plan-contracts.test.js|tests\/unit\/spec-plan-reference-contracts.test.js|tests\/unit\/spec-plan-quality-contracts.test.js|tests\/unit\/spec-plan-consumer-replay-contracts.test.js|tests\/unit\/spec-prd-plan-handoff-contracts.test.js/i.
+Test results written to: docs/validation/ce-skill-audit-2026-10-28/plan-tests.json

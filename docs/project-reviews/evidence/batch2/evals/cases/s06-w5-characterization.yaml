@@ -1,0 +1,16 @@
+id: s06-w5-characterization
+title: s06-w5-characterization
+description: |
+  S06 补充筛查；预期与判定见 ../../expectations.md 第 2 节（运行前写定）。
+input:
+  prompt: |
+    重构 src/ledger/tax.js，让它复用 src/ledger/total.js 的 total，对外行为不能变。
+context:
+  repo_fixture: evals/fixtures/billing-svc
+  git:
+    init: true
+    checkout: main
+judge:
+  type: rule_based
+  success:
+    - exit_code: 0

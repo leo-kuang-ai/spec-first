@@ -1,0 +1,156 @@
+{
+  "trial": "CEOPT-28-A1-retry1",
+  "disposition": "accepted-bounded-clean-recovery",
+  "scope": "Accept the separate recovery interpretation of the original request, five state cases, absent publication helper, interruption-recovery proposal, and authority-limited synthetic video request. This is not an additional original slot, a full media-supplement recovery, or six-original-clean acceptance.",
+  "path_aliases": {
+    "R": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance",
+    "W": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4",
+    "T": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/trials/CEOPT-28-A1-retry1",
+    "A": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-sweep"
+  },
+  "integrity": {
+    "protocol_hashes": {
+      "parent_packet": "ccfe8a76ffbc3303730a2ab51217ff065c1f830cd753060fe5813fafc82fb2d3",
+      "request": "b788a1ef2f3e50b6feb2db852e0e3e64d47246e0f26d6338388f2ee24abdfda3",
+      "arm_receipt": "47d1806269899a8cfc784c53bf4650a42803cd5b0dd4e7510d8564b6ee09e1bf",
+      "result": "All three protocol-referenced files and all 14 source_pins match their recorded SHA-256 values."
+    },
+    "artifact_sha256": "e044335f15fe35ec83cedd1528ae8b516f3a84649b84dda5ea81fc86c6845ea6",
+    "tool_trace_sha256": "4c9cd32f59a5a5f67969f0be85d278f93eafa5d3d2edb88431fe82a069e78a98",
+    "artifact_and_trace_match_receipt": true,
+    "trial_index": {
+      "canonical_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/trial-index.json",
+      "recovery_entry_start_line": 4435,
+      "matching_entries": 1,
+      "complete_entry_equals_receipt": true,
+      "additional_wave_index_check": "W/trial-index.json also contains one equal entry at line 227. Both files exist separately; the canonical index attribution above is explicit."
+    },
+    "historical_limit": "Current hashes establish retained-record consistency, not authenticated historical immutability."
+  },
+  "timing": {
+    "started_at": "2026-10-31T12:17:23.061Z",
+    "final_at": "2026-10-31T12:18:26.202Z",
+    "calculated_elapsed_seconds": 63.141,
+    "recorded_elapsed_matches": true,
+    "deadline_seconds": 300,
+    "all_six_trace_events_within_interval": true,
+    "admission": "passed",
+    "terminal_confirmation": "The subject session records task_complete at 2026-10-31T12:18:26.324Z with duration_ms 63285. Its slightly different completion timestamp/duration also remains below 300 seconds."
+  },
+  "trace_review": {
+    "coverage": "Inspected every retained event, all three calls, and all six file-output blocks without sampling.",
+    "observed_reads": [
+      "A/SKILL.md",
+      "W/CEOPT-28-request.txt",
+      "W/sweep-A-receipts.json",
+      "A/references/state-schema.md",
+      "A/references/run.md",
+      "Repeated numbered reads of sweep-A-receipts.json and SKILL.md"
+    ],
+    "isolation": "All observed commands are cat or nl reads. Their actual outputs contain no adjacent analyzer SKILL, other arm, prior trial, reviewer, grader, or broad-index evidence. No producer/helper/test execution, mutation, network operation, or delegation is visible.",
+    "truncation": "All six retained file-output bodies are complete. After removing nl line-number prefixes where applicable, each equals its corresponding current source/request/receipt content exactly. No trial-output truncation or missing-content recovery is established; the final numbered reads repeat previously complete evidence.",
+    "source_consumption_limit": "The trial demonstrably read the complete SKILL, state-schema, run, assigned request, and assigned receipts. Hash verification of the other pinned files does not establish that the trial consumed them.",
+    "final_consistency": "The artifact's counts, case dispositions, citations, and limitations agree with the inspected receipts and actual source."
+  },
+  "unchanged_artifact_verification": {
+    "session_id": "01a191e4-a3f0-7682-858e-428400f5d6ff",
+    "terminal_record": "/Users/kuang/.codex/sessions/2026/10/31/rollout-2026-10-31T20-17-22-01a191e4-a3f0-7682-858e-428400f5d6ff.jsonl:38",
+    "terminal_event": "task_complete",
+    "terminal_message_sha256": "37b995ecb1792fa185ab29a21458624e81e9bffecb6d3fb980abff754183afff",
+    "result": "artifact.md equals last_agent_message plus exactly one terminal newline. The retained model wording is unchanged; literal byte identity requires acknowledging that added newline.",
+    "limit": "This verifies consistency with the accessible local terminal record, not authenticated model serving identity."
+  },
+  "case_assessment": {
+    "lawful": {
+      "result": "accepted",
+      "conclusion": "Successful lease persistence only. No validate, completed sweep, run-record, release, or publication receipt supports closure.",
+      "evidence": [
+        "W/sweep-A-receipts.json:6-27",
+        "T/artifact.md:9"
+      ]
+    },
+    "symlink-lock": {
+      "result": "accepted",
+      "conclusion": "OK coexists with sentinel_preserved=false. The artifact correctly rejects preservation success without inventing an observed concurrency result. The actual source opens the lock using w, supporting the symlink-truncation mechanism.",
+      "evidence": [
+        "W/sweep-A-receipts.json:30-51",
+        "A/scripts/sweep-state.py:785-798",
+        "T/artifact.md:10"
+      ]
+    },
+    "directory-lock": {
+      "result": "accepted",
+      "conclusion": "Sentinel preservation does not establish mutual exclusion. Actual source falls through to the handler when lock-file opening fails, supporting the artifact's refusal to certify safe locking.",
+      "evidence": [
+        "W/sweep-A-receipts.json:54-75",
+        "A/scripts/sweep-state.py:788-790",
+        "T/artifact.md:11"
+      ]
+    },
+    "future-version": {
+      "result": "accepted",
+      "conclusion": "Correctly reports failed exact-byte preservation, output schema_version 1, and retained future_field without inventing the original input version. A permits field-preserving forward writes; actual write_state forces version 1. One retained unknown field cannot prove safe compatibility.",
+      "evidence": [
+        "W/sweep-A-receipts.json:78-99",
+        "A/references/state-schema.md:41-55",
+        "A/scripts/sweep-state.py:290-293",
+        "T/artifact.md:12"
+      ]
+    },
+    "closed-without-evidence": {
+      "result": "accepted",
+      "conclusion": "Correctly identifies persisted closed status without the three required evidence fields. Actual upsert lacks that rejection; validate supports downgrade to fix_pending, but no executed repair is supplied.",
+      "evidence": [
+        "W/sweep-A-receipts.json:102-145",
+        "A/scripts/sweep-state.py:391-408",
+        "A/scripts/sweep-state.py:430-461",
+        "T/artifact.md:13"
+      ]
+    }
+  },
+  "publication_and_authority": {
+    "publication": "Accepted. capability-absent is correctly separated from an executed failed trial. No push, read-back, final remote state, release, or successful recovery is invented. Commit-before-record/release is an actual ordering gap.",
+    "interruption_recovery": "Accepted as an unexecuted proposal. Inspect uncertain destinations before retrying; preserve own-identity acknowledgment confirmation, durable upsert, and cursor ordering; check current lease ownership and independent Git authority. This does not prove operational idempotency.",
+    "publication_evidence": [
+      "W/sweep-A-receipts.json:148-157",
+      "A/SKILL.md:115-124",
+      "A/references/run.md:47-58",
+      "T/artifact.md:17-28"
+    ],
+    "synthetic_video": "Accepted. Limit assessment to issue text and defer video download, analysis, transcription, provider egress, and delegation. Neither the URL nor --no-transcribe grants missing authority. No actual media attempt or finding is claimed.",
+    "video_evidence": [
+      "W/CEOPT-28-request.txt:1",
+      "A/SKILL.md:23",
+      "A/SKILL.md:55-59",
+      "T/artifact.md:30-32"
+    ]
+  },
+  "historical_record": {
+    "original_A1": "contaminated-original-not-clean-trial",
+    "verification": "Original artifact and trace hashes still match input-isolation-disposition.json. Original trace output event 3 at 2026-10-31T06:02:31.704Z visibly contains the excluded spec-riffrec-feedback-analysis entrypoint.",
+    "relationship_to_prior_review": "Compatible with W/independent-sweep-review.json: five original clean trials were accepted and original A1 failed isolation. Its statements that no retry existed describe its historical review state. This recovery is separately classified.",
+    "six_original_clean_pass": false,
+    "historical_record_changes": "None performed or recommended."
+  },
+  "findings": [
+    {
+      "severity": "non-blocking-provenance",
+      "finding": "Both the recovery receipt and equal capture-index entry retain source_protocol_ref pointing to CEOPT-28-packet.json rather than CEOPT-28-A1-recovery-protocol.json.",
+      "qualification": "The separately pinned recovery protocol predates dispatch and explicitly defines the narrower request/state-receipt read scope. That companion linkage supports this bounded review, but the receipt/index alone does not identify the recovery protocol. It cannot support original full-media acceptance."
+    }
+  ],
+  "limitations": [
+    "model_metadata reports gpt-6.1-sol with medium effort; serving identity is unauthenticated.",
+    "Observed read-only instructions and traces are not enforced filesystem or context isolation.",
+    "Parent-mediated durable saving does not demonstrate autonomous saving.",
+    "No hosted connector execution, real remote side effect, actual media processing, or user productivity outcome is established.",
+    "Reviewer actions were read-only file inspection and deterministic hash/content comparisons; no project producers, helpers, tests, network operations, mutations, or delegation were executed."
+  ],
+  "remaining_facets": [
+    "The later full media supplement, including chunk coverage, quiet, and cumulative fallback, remains outside this recovery's inputs and acceptance.",
+    "Live sweep ingestion, acknowledgments, close-outs, merge verification, truthful counts, and restart idempotency.",
+    "Executed final-state publication, lease cleanup, and the proposed interruption-recovery procedure.",
+    "Lock contention, fcntl failure, cross-platform behavior, and filesystem races.",
+    "Complete pinned-source consumption, authenticated serving identity, autonomous execution/save, and real host/user outcomes."
+  ]
+}

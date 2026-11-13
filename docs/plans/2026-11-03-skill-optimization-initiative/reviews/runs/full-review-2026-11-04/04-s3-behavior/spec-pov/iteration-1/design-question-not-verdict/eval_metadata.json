@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "开放式设计问题(用户自定选项)不属 pov 裁决",
+  "prompt": "（spec-pov skill 已安装，请按它工作。）\n帮我裁决一下:这个记账功能我该怎么设计?表单和列表放一个页面还是分开?\n",
+  "assertions": [
+    "expect.must_contain"
+  ]
+}

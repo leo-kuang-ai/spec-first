@@ -1,0 +1,117 @@
+{
+  "scope": "临时fixture；无真实浏览器、连接器或服务启动",
+  "results": [
+    {
+      "id": "PL01-single-wrong-name",
+      "side": "spec-first",
+      "returncode": 0,
+      "stdout": "{\"name\":\"dev\",\"port\":3000}\n",
+      "stderr": ""
+    },
+    {
+      "id": "PL02-duplicate-name",
+      "side": "spec-first",
+      "returncode": 0,
+      "stdout": "{\"name\":\"dev\",\"port\":3000}\n{\"name\":\"dev\",\"port\":4000}\n",
+      "stderr": ""
+    },
+    {
+      "id": "PL03-wrong-shape",
+      "side": "spec-first",
+      "returncode": 0,
+      "stdout": "__MULTIPLE_CONFIGS__\n",
+      "stderr": "jq: error (at /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-polish-audit-4szdfbht/.claude/launch.json:0): Cannot iterate over string (\"ab\")\n"
+    },
+    {
+      "id": "PL04-missing-value",
+      "side": "spec-first",
+      "flag": "--port",
+      "timed_out": true,
+      "timeout_seconds": 0.5
+    },
+    {
+      "id": "PL04-missing-value",
+      "side": "spec-first",
+      "flag": "--type",
+      "timed_out": true,
+      "timeout_seconds": 0.5
+    },
+    {
+      "id": "PL05-comment-port",
+      "side": "spec-first",
+      "returncode": 0,
+      "stdout": "4999\n",
+      "stderr": ""
+    },
+    {
+      "id": "PL06-astro-vite",
+      "side": "spec-first",
+      "returncode": 0,
+      "stdout": "multiple\n",
+      "stderr": ""
+    },
+    {
+      "id": "PL07-procfile-only",
+      "side": "spec-first",
+      "returncode": 0,
+      "stdout": "procfile\n",
+      "recipe_target_exists": false
+    },
+    {
+      "id": "PL01-single-wrong-name",
+      "side": "ce",
+      "returncode": 0,
+      "stdout": "{\"name\":\"dev\",\"port\":3000}\n",
+      "stderr": ""
+    },
+    {
+      "id": "PL02-duplicate-name",
+      "side": "ce",
+      "returncode": 0,
+      "stdout": "{\"name\":\"dev\",\"port\":3000}\n{\"name\":\"dev\",\"port\":4000}\n",
+      "stderr": ""
+    },
+    {
+      "id": "PL03-wrong-shape",
+      "side": "ce",
+      "returncode": 0,
+      "stdout": "__MULTIPLE_CONFIGS__\n",
+      "stderr": "jq: error (at /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-polish-audit-4szdfbht/.claude/launch.json:0): Cannot iterate over string (\"ab\")\n"
+    },
+    {
+      "id": "PL04-missing-value",
+      "side": "ce",
+      "flag": "--port",
+      "timed_out": true,
+      "timeout_seconds": 0.5
+    },
+    {
+      "id": "PL04-missing-value",
+      "side": "ce",
+      "flag": "--type",
+      "timed_out": true,
+      "timeout_seconds": 0.5
+    },
+    {
+      "id": "PL05-comment-port",
+      "side": "ce",
+      "returncode": 0,
+      "stdout": "4999\n",
+      "stderr": ""
+    },
+    {
+      "id": "PL06-astro-vite",
+      "side": "ce",
+      "returncode": 0,
+      "stdout": "multiple\n",
+      "stderr": ""
+    },
+    {
+      "id": "PL07-procfile-only",
+      "side": "ce",
+      "returncode": 0,
+      "stdout": "procfile\n",
+      "recipe_target_exists": false
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+zhipu/glm-5.3 :: [claude-code:unrecognized_model] {"model":"zhipu/glm-5.3","query_source":"sdk"}OK
+hst-2/gpt-6.1-sol :: [claude-code:unrecognized_model] {"model":"hst-2/gpt-6.1-sol","query_source":"sdk"}OK
+kiro/kimi-k3 :: [claude-code:unrecognized_model] {"model":"kiro/kimi-k3","query_source":"sdk"}OK
+hst-2/gpt-6-astra :: [claude-code:unrecognized_model] {"model":"hst-2/gpt-6-astra","query_source":"sdk"}OK
+kiro/qwen3-coder-next :: [claude-code:unrecognized_model] {"model":"kiro/qwen3-coder-next","query_source":"sdk"}OK
+zhipu/glm-5.3-flash :: [claude-code:unrecognized_model] {"model":"zhipu/glm-5.3-flash","query_source":"sdk"}OK
+=== zhipu/glm-5.3 ===
+智谱 GLM-5.3
+=== hst-2/gpt-6.1-sol ===
+OpenAI GPT-6.1（hst-2/gpt-6.1-sol）
+=== kiro/kimi-k3 ===
+Moonshot AI Kimi K3
+=== kiro/qwen3-coder-next ===
+kitten (Qwen3-Coder-Next)

@@ -1,0 +1,13 @@
+# consumers: spec-ideate
+tests/unit/agent-persona-template-drift.test.js
+tests/unit/ce-localization-round-1-remediation-contracts.test.js
+tests/unit/ce-post-3-20-calibration-contracts.test.js
+tests/unit/ce-upstream-skill-sync-contracts.test.js
+tests/unit/dispatch-authorization-matrix-contracts.test.js
+tests/unit/eval-fixture-contracts.test.js
+tests/unit/mcp-setup-config-consumers.test.js
+tests/unit/plugin-modules.test.js
+tests/unit/private-scratch-migration-contracts.test.js
+tests/unit/requirements-rendering-parity.test.js
+tests/unit/settled-decisions-contracts.test.js
+tests/unit/spec-ideate-clarification-handoff-contracts.test.js

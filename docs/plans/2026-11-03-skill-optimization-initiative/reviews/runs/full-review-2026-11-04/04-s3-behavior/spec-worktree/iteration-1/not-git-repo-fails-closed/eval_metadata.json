@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "非 git 目录必须 detect fail-closed，不得裸跑 git worktree add",
+  "prompt": "（spec-worktree skill 已安装，请按它工作。你是 governed caller，\ncaller 身份=PR 审查隔离，target repo=当前目录，目标 ref=main，\n隔离原因=保持主 checkout 干净。）\n请按 skill 为当前目录建立隔离并汇报。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-worktree/evals/fixtures/scripts/check-not-git-refuses.sh"
+  ]
+}

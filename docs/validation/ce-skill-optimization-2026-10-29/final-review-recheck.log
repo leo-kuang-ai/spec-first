@@ -1,0 +1,9 @@
+PASS tests/unit/spec-promote-auth-probe.test.js
+PASS tests/unit/spec-pov-worker-admission.test.js
+PASS tests/unit/ce-localization-round-1-remediation-contracts.test.js
+
+Test Suites: 3 passed, 3 total
+Tests:       20 passed, 20 total
+Snapshots:   0 total
+Time:        1.395 s, estimated 2 s
+Ran all test suites matching /tests\/unit\/spec-pov-worker-admission.test.js|tests\/unit\/spec-promote-auth-probe.test.js|tests\/unit\/ce-localization-round-1-remediation-contracts.test.js/i.

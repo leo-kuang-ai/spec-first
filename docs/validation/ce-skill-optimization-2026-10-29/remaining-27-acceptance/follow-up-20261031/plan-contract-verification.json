@@ -1,0 +1,7 @@
+{
+  "id": "plan-contracts",
+  "command": "node --test docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/plan-inputs/tests/client-cli.test.js docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/plan-inputs/tests/order-importer.test.js",
+  "exit_code": 0,
+  "log_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-followup-20261031/logs/plan-contracts.log",
+  "scope": "New synthetic contract characterization only; original importer remains unchanged, no model trial or production contract claim."
+}

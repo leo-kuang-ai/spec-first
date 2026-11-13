@@ -1,0 +1,17 @@
+{
+  "schema_version": "honest-closeout.v1",
+  "generated_at": "2026-11-02T10:54:09.012Z",
+  "overall": "verified",
+  "overall_reason_code": "all-claims-consistent",
+  "claims": [
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:tests"
+      ],
+      "verdict": "consistent",
+      "reason_code": "validation-evidence-consistent"
+    }
+  ]
+}

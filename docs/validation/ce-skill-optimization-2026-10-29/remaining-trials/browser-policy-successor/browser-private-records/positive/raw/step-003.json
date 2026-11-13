@@ -1,0 +1,7 @@
+{
+  "action": "get",
+  "exit_code": 0,
+  "stdout": "{\"_boundary\":{\"nonce\":\"952808516a64dcef2c56cdf88741e8e4\",\"origin\":\"unknown\"},\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":8495911861322482479},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"title\":\"CE browser control\"},\"error\":null,\"success\":true}\n",
+  "stderr": "",
+  "error": null
+}

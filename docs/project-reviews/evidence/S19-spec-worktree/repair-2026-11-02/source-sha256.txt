@@ -1,0 +1,17 @@
+12438f6bff6ccb18bcffbe39242c395ed2bb5b0eb7be6a52ad77aa66956095e6  skills/spec-worktree/SKILL.md
+a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94  skills/spec-worktree/agents/openai.yaml
+a45f94b4b8105971b8b6673a2dfb201e734d78c874356d4b6a20889ab9e8edd8  skills/spec-worktree/evals/cases/governed-caller-create-worktree.yaml
+ca4cb05895d23d986cddabb4b44b237049ad86f6cf115e5b796e76c40db9902b  skills/spec-worktree/evals/cases/not-git-repo-fails-closed.yaml
+78d821738f063ad4bea193fd2390caf413982764f5c7dff498a80ad41dee9f17  skills/spec-worktree/evals/cases/unborn-repo-create-refuses.yaml
+2145a451d606bf0634ce6b3958eb5added5ad7e4c7c7182b01f1387a4d21964a  skills/spec-worktree/evals/eval.yaml
+d19e9618f07783cf80650c65b42663bbfd2da89401cb1827a8d1c1ec2885c0fa  skills/spec-worktree/evals/fixtures/repos/plain-app/README.md
+3da82fc1607c7da9a60b53024c82984416af84d2fde0ba0da7879395691f182f  skills/spec-worktree/evals/fixtures/repos/plain-app/package.json
+236d8921c86ace8354c6b233a3b8d2d5665951ba59493402754fb54fdb247c91  skills/spec-worktree/evals/fixtures/repos/plain-app/prepare-worktree-fixture.sh
+69d5d41b3e284f3bf548c19a9cec4a79b4a8e3ab751d4c45e4df449636159fb3  skills/spec-worktree/evals/fixtures/repos/plain-app/src/server.js
+d19e9618f07783cf80650c65b42663bbfd2da89401cb1827a8d1c1ec2885c0fa  skills/spec-worktree/evals/fixtures/repos/plain-app-nogit/README.md
+3da82fc1607c7da9a60b53024c82984416af84d2fde0ba0da7879395691f182f  skills/spec-worktree/evals/fixtures/repos/plain-app-nogit/package.json
+69d5d41b3e284f3bf548c19a9cec4a79b4a8e3ab751d4c45e4df449636159fb3  skills/spec-worktree/evals/fixtures/repos/plain-app-nogit/src/server.js
+973cabee9871ca5983736d4a822428dc86a12f9d8bc717d0de7ea6aed7ce47f6  skills/spec-worktree/evals/fixtures/scripts/check-create-worktree.sh
+6e290e70ae6a1bebe04b786664b2685f1c3882270afa56521e1ceea0a8a69c32  skills/spec-worktree/evals/fixtures/scripts/check-not-git-refuses.sh
+21ffcbd6418611b7b5a503e3403352bae36d005d84194847eab7ab8839ecebed  skills/spec-worktree/evals/fixtures/scripts/check-unborn-refuses.sh
+f79de56aeca054b08fc919bd04afbd8b5c09f6a1038389e3c84fa63510d0e81f  skills/spec-worktree/scripts/worktree-manager.sh

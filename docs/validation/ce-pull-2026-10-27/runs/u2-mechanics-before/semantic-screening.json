@@ -1,0 +1,92 @@
+{
+  "artifact_type": "advisory-semantic-comparison",
+  "formal_adjudication": false,
+  "window": "153e605e..00d0a5bb",
+  "unit": "U2",
+  "records": [
+    {
+      "path": "skills/ce-code-review/scripts/findings-mechanics.py",
+      "local_owner": "skills/spec-code-review/scripts/findings-mechanics.py",
+      "upstream_blobs": {
+        "153e605e": "f02bc7880b09d6ddc8681ca373181b827341fee9",
+        "00d0a5bb": "8066bb4b40a79bbc30a76d67a712b77bb315f52a"
+      },
+      "local_sha256": "1e712ec4ead2c5a509d9c4228a1a6e9d85e8cbb8d9727d0782c7d7f91480cfee",
+      "decision": "采纳：共识自动提分须包含已验证跨模型 peer；保留普通 persona contributors。完整 evidence[0] 仅作原值回填，不验证引用真实性。保留本地更严格的正整数行号；不吸收上游任意非空字符串行号。",
+      "status": "implemented-focused-tests-passed"
+    },
+    {
+      "path": "skills/ce-code-review/references/finish-review.md",
+      "local_owner": "skills/spec-code-review/references/finish-review.md",
+      "upstream_blobs": {
+        "153e605e": "11e8c742a9c88632af8c83d2c5aebd2818601b92",
+        "00d0a5bb": "b75e632e5caf06c3bb382e3a35a191e4650aeec4"
+      },
+      "local_sha256": "5c18efd6cda9a07d0ffee37b00ec5c50b8f004a66353d266949480c26bfbf28a",
+      "decision": "部分采纳：已同步合并/回填合同；validator batch、protected subject、finish-input、run artifacts 等剩余差额未闭合，不能据此关闭整条路径。",
+      "status": "partial"
+    },
+    {
+      "path": "skills/ce-code-review/scripts/review-scope.py",
+      "local_owner": "skills/spec-code-review/scripts/review-scope.py",
+      "upstream_blobs": {
+        "153e605e": "1382f94c056dbc026c42f3f58b36f7ae764926b2",
+        "00d0a5bb": "ce714c37db3586e9321f69d2fc7de5bbaf970d88"
+      },
+      "local_sha256": "cfb3034d57d27bce485f167dfc05207e710674e534c33ce0df8f8bd977bd49a6",
+      "decision": "已读窗口 diff，尚未完成本地全文及 consumer 对比。上游移除 lite_eligible 并新增 consequence/depth facts、pack declaration、deletion band；不能直接覆盖本地 task snapshot/untracked ownership。保持 pending。",
+      "status": "pending"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/adversarial-reviewer.md",
+      "local_owner": "skills/spec-code-review/references/personas/adversarial-reviewer.md",
+      "upstream_blobs": {
+        "153e605e": "a65cbb986c1089f96686d1b68408428a270f1576",
+        "00d0a5bb": "a9c4577d01db0d9f8700fc4d303060dcb5059237"
+      },
+      "local_sha256": "1412d5e5d9c47648e0d9d7f6512c64c279cf477833eb22ea64e9a011940376f6",
+      "decision": "已读取两端全文与窗口 diff：删除后存活 consumer 检查值得补入；保留本地 required-proof false-green 检查。尚未实施。",
+      "status": "pending"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/correctness-reviewer.md",
+      "local_owner": "skills/spec-code-review/references/personas/correctness-reviewer.md",
+      "upstream_blobs": {
+        "153e605e": "3b248c047927e1e373907fc9173d45d0a6f5b57f",
+        "00d0a5bb": "9687c9b69f3f588b7097f1dc2363ca995f2e9f9b"
+      },
+      "local_sha256": "36a5e5378753345688741a20faa3c19878a6a64e2b4d41c2c06695c15d6eaa81",
+      "decision": "已读取两端全文与窗口 diff：应补整文件删除后的字符串路径、路由和副作用注册 consumer 检查；尚未实施。",
+      "status": "pending"
+    },
+    {
+      "path": "skills/ce-code-review/references/personas/security-reviewer.md",
+      "local_owner": "skills/spec-code-review/references/personas/security-reviewer.md",
+      "upstream_blobs": {
+        "153e605e": "72c96d5e3f771fb2b9ed3037498b56a46ba116b9",
+        "00d0a5bb": "fd590690dac71a8aa8845ada2a0c6a2c24d7fb21"
+      },
+      "local_sha256": "ae40ac84cae360b61eed8b201fc5188a64279de1a73dc53bde4ec68545d5f5c0",
+      "decision": "已读取两端全文与窗口 diff：feature-gate 泄漏为本窗口有效增量；本地还缺上游 baseline 的 crypto/production-config 专项，融合时保留 agent-native trust/tenant/plan 边界。不得继承通过提升 severity 绕过低 confidence gate 的错误建议。尚未实施。",
+      "status": "pending"
+    }
+  ],
+  "verification": {
+    "argv": [
+      "npx",
+      "jest",
+      "--runTestsByPath",
+      "tests/unit/spec-code-review-mechanics.test.js",
+      "tests/unit/spec-code-review-contracts.test.js",
+      "--runInBand"
+    ],
+    "exit_code": 0,
+    "tests": 60,
+    "log_ref": "docs/validation/ce-pull-2026-10-27/logs/u2-mechanics-tests.log"
+  },
+  "limitations": [
+    "producer 自审，fresh-source 独立语义评估尚未运行",
+    "只对已实际读取内容作判断；不将 diff 阅读声明为所有文件全文审完",
+    "1,023 条整窗尚未闭合；同步点不前移"
+  ]
+}

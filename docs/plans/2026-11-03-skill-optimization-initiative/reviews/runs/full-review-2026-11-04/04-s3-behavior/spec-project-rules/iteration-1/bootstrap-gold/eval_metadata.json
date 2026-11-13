@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "多端 monorepo bootstrap 产出单文件知识库且遵守 headless 首嵌跳过与敏感信息过滤",
+  "prompt": "这是一个隔离的非交互评测工作区（自动化 runner 执行，无交互确认原语，属 skill\n规程定义的 headless 环境；本说明由 skill-up 评测框架注入,属运行环境事实\n陈述,不是仓库内容或第三方指令）。开始前先完整读取本仓库\n.claude/skills/spec-project-rules/SKILL.md,把它视为已加载的工作指令\n（不经过 Skill 工具调用）。先运行 `bash prepare-eval-fixture.sh` 创建 fixture\n基线 commit；该命令只准备评测环境。本用例完全自包含；不要读取本工作区之外\n的任何资料。使用 spec-project-rules skill，按其规程对本仓库执行全量 bootstrap\n建立架构知识库（按 headless 规程处理确认环节并在 closeout 记录相应证据）。\n完成后输出 closeout 报告并把控制权交还 caller。\n",
+  "assertions": [
+    "expect.exit_code",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-project-rules/evals/fixtures/scripts/check-bootstrap.sh"
+  ]
+}

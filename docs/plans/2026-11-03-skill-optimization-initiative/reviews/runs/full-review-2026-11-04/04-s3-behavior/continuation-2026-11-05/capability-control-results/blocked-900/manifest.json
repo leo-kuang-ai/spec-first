@@ -1,0 +1,24 @@
+{
+  "files": [
+    {
+      "source": "/private/tmp/plan-capability-control-fansezop/blocked-900-runs/iteration-1/result.json",
+      "archive": "result.json",
+      "sha256": "5cb2b3247db68dda8248e81d8c64d32d9c0224315fb7ee29cbb1cf128d645989"
+    },
+    {
+      "source": "/private/tmp/plan-capability-control-fansezop/blocked-900-runs/iteration-1/implementation-owner-not-authorized/with_skill/grading.json",
+      "archive": "grading.json",
+      "sha256": "ce91462aa3d212f8f7e345afa76144d5881bc0acde1f3fe0714a258f17bc65cf"
+    },
+    {
+      "source": "/private/tmp/plan-capability-control-fansezop/blocked-900-runs/iteration-1/implementation-owner-not-authorized/with_skill/outputs/response.md",
+      "archive": "response.md",
+      "sha256": "e14d285480bede3eeec32d0661b6f26b1082f72d8a1dd8900b91fed81aa461af"
+    },
+    {
+      "source": "/private/tmp/plan-capability-control-fansezop/blocked-900-runs/iteration-1/implementation-owner-not-authorized/with_skill/outputs/agent/run/af239ba9-97e9-4b95-974e-b7617b213626.jsonl",
+      "archive": "transcript.jsonl",
+      "sha256": "babaeb7647e99be2e44de4bd5120c9596332a70b3aaae87a6594e1c0669bc8ae"
+    }
+  ]
+}

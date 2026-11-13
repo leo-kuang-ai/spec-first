@@ -1,0 +1,203 @@
+{
+  "disposition": "usable-with-scoped-limitations",
+  "scope": {
+    "review_type": "Independent read-only source, recipe, receipt, and attribution review",
+    "supplement_receipts_reviewed": 8,
+    "coverage": "All cases: eight runtime cases, six worktree cases, two PR supplement arms, and four media supplement entrypoints. Additionally reviewed all twenty original media chunk cases and all four quiet captures.",
+    "excluded": "No model-trial artifacts or owner-review conclusions were read. No producers, tests, helpers, network operations, mutations, or delegated tasks were executed.",
+    "path_aliases": {
+      "R": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance",
+      "P": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030",
+      "S": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs"
+    }
+  },
+  "integrity": {
+    "supplement_hashes": "All eight receipt SHA-256 values independently match supplement-index.json and the corresponding hash-bearing companion packets.",
+    "source_hashes": "Both worktree source hashes match their receipts. Both analyzer copies within each arm are byte-identical by SHA-256 and match the original media receipts. The B publication helper hash matches the supplemental reproduction receipt.",
+    "qualification": "Current hash agreement does not independently establish historical freeze timing, complete transitive dependency provenance, or unchanged source throughout execution."
+  },
+  "findings": [
+    {
+      "group": "runtime",
+      "disposition": "supported-local-mechanism-evidence",
+      "cases": [
+        {
+          "case": "outside-existing-leaf",
+          "result": "Both arms reject the actual workspace escape and preserve the sentinel and symlink. This supplement does not show an A failure for an existing outside leaf."
+        },
+        {
+          "case": "outside-dangling-leaf",
+          "result": "A reports success and creates the missing target outside workspaceRoot. B rejects the path without creating the target. Both preserve the separate sentinel."
+        },
+        {
+          "case": "outside-dangling-ancestor",
+          "result": "Both arms reject the path and leave the missing target absent."
+        },
+        {
+          "case": "snapshot-identity-under-overrides",
+          "result": "A's repository snapshot changes to repository B's HEAD and clean worktree under injected Git overrides; its source snapshot remains bound to repository A. B preserves both snapshots. Source inspection confirms that A already sanitizes source-snapshot Git calls, whereas B also scopes workspace repository snapshot calls."
+        }
+      ],
+      "attribution": "The supplemental outside directory is a sibling of workspace, not a child. The correction from original non-target writes to actual outside-workspace behavior is valid. Original receipts must retain their narrower non-target/link-following interpretation.",
+      "limitations": [
+        "This is local helper evidence, not complete runtime installation or host/global configuration verification.",
+        "Source snapshot preservation is not a newly demonstrated B-only improvement.",
+        "The receipts retain host-config-path-escape and host-config-containment-root-missing limitations; they do not establish successful host configuration capture.",
+        "No existing-ancestor runtime case or concurrency/race scenario is added."
+      ],
+      "refs": [
+        "P/prepare-runtime-supplement.cjs",
+        "R/wave4/runtime-supplement-A-receipts.json",
+        "R/wave4/runtime-supplement-B-receipts.json",
+        "R/wave4/CEOPT-25-supplement.json",
+        "S/A/spec-runtime-setup/scripts/lib/workspace-git-exclude.cjs",
+        "S/B/spec-runtime-setup/scripts/lib/workspace-git-exclude.cjs",
+        "S/B/spec-runtime-setup/scripts/lib/path-safety.cjs",
+        "S/B/spec-runtime-setup/scripts/lib/git-path.cjs",
+        "S/A/spec-runtime-setup/scripts/lib/source-snapshot.cjs",
+        "S/B/spec-runtime-setup/scripts/lib/source-snapshot.cjs",
+        "S/A/spec-runtime-setup/scripts/lib/workspace-graph-state.cjs",
+        "S/B/spec-runtime-setup/scripts/lib/workspace-graph-state.cjs"
+      ]
+    },
+    {
+      "group": "worktree",
+      "disposition": "supported-with-explicit-fixture-attribution",
+      "cases": [
+        {
+          "case": "linked-container",
+          "result": "A creates the feature/login checkout at the measured feature-login target through the linked .worktrees container and writes .gitignore. B rejects before either operation."
+        },
+        {
+          "case": "existing-ancestor",
+          "result": "The corrected measured target is .worktrees/feature/new. A's target branch is feature/new, and its outside directory contains new. A creates refs/heads/feature/new and .gitignore. B rejects the ancestor link and creates neither."
+        },
+        {
+          "case": "dangling-ancestor",
+          "result": "A fails with exit 128 but leaves both refs/heads/feature/new and .gitignore. No target checkout exists. B rejects with exit 1 and leaves neither new branch nor .gitignore."
+        }
+      ],
+      "attribution": "The before_status field is captured before fixture symlink creation. B's later untracked .worktrees entries are fixture setup, not helper mutations. HEAD/index preservation must not be described as preservation of the complete caller working tree. The explicit .gitignore contents and ref deltas establish A's side effects independently of that status timing issue.",
+      "limitations": [
+        "Successful A targets have no configured upstream; these cases do not establish remote tracking.",
+        "The remote-only branch in the supplement producer is unreachable because that case is not in its loop. It contributes no supplemental coverage.",
+        "No worker filesystem isolation, hosted remote, or complete filesystem-delta measurement is established."
+      ],
+      "refs": [
+        "P/prepare-worktree-supplement.py",
+        "R/wave4/worktree-supplement-A-receipts.json",
+        "R/wave4/worktree-supplement-B-receipts.json",
+        "R/wave4/CEOPT-32-supplement.json",
+        "R/evidence-errata.md",
+        "S/A/spec-worktree/scripts/worktree-manager.sh",
+        "S/B/spec-worktree/scripts/worktree-manager.sh"
+      ]
+    },
+    {
+      "group": "pr-feedback",
+      "disposition": "supported-consistent-negative-stub-evidence",
+      "cases": [
+        {
+          "arm": "A",
+          "result": "The publication inspection helper is absent. The capability-absent result and empty call list are appropriate; this is not an executed publication failure or a model failure."
+        },
+        {
+          "arm": "B",
+          "result": "The comparison is internally consistent: fix is aaaa..., remote head is bbbb..., status is behind, and merge base is bbbb.... The helper returns verified=false with fix-not-proven-reachable. Calls correctly read the PR from upstream/project and compare commits in fork/project."
+        }
+      ],
+      "attribution": "prepare-pr-feedback.cjs remains the producer for the original contradictory stub and does not reproduce these supplemental receipts. verify-pr-feedback-supplement.cjs supplies the separate corrected recipe. Its recorded reproduction results and provider-call sequence match both original supplemental arms except observed_at, and the helper source supports those results.",
+      "limitations": [
+        "The reproduction recipe and retained reproduction receipt were inspected, not rerun by this reviewer.",
+        "The fixture is a consistent provider stub, not an independently constructed Git commit graph.",
+        "No hosted PR read, real publication, reply, resolution, or recovery idempotency is established."
+      ],
+      "refs": [
+        "P/prepare-pr-feedback.cjs",
+        "P/verify-pr-feedback-supplement.cjs",
+        "R/wave6/pr-feedback-supplement-A-receipts.json",
+        "R/wave6/pr-feedback-supplement-B-receipts.json",
+        "R/wave6/pr-feedback-supplement-reproduction.json",
+        "R/wave6/CEOPT-23-supplement.json",
+        "S/B/spec-resolve-pr-feedback/scripts/inspect-fix-publication.cjs",
+        "R/evidence-errata.md"
+      ]
+    },
+    {
+      "group": "media",
+      "disposition": "supported-mocked-cumulative-attempt-and-coverage-evidence",
+      "entrypoints": [
+        "spec-riffrec-feedback-analysis",
+        "spec-sweep"
+      ],
+      "supplement_results": "For both entrypoints in both arms, the recipe invokes analyzer main with --transcribe, mocks one initial curl request returning input_too_large, and makes ffmpeg unavailable. A overwrites the initial request fact with provider_request_sent=false. B retains two attempt records, cumulative provider_request_sent=true, failed status, degraded=true, no covered interval, and missing [0,840]. All four receipts record exit zero, which means analyzer completion rather than transcription success.",
+      "original_cases_reviewed_for_each_arm_and_entrypoint": [
+        {
+          "case": "complete",
+          "result": "Both arms report success for both chunks; B additionally records [0,420] and [420,840] coverage with no missing interval."
+        },
+        {
+          "case": "second-provider-failed",
+          "result": "A reports ok despite the second failed chunk. B reports partial, retains [0,420], and records missing [420,840]."
+        },
+        {
+          "case": "second-extraction-failed",
+          "result": "A reports ok after retaining only the first chunk. B reports partial with the same explicit covered and missing intervals."
+        },
+        {
+          "case": "silence",
+          "result": "Both provider responses successfully contain empty string text. A incorrectly reports failed because no nonempty transcript was accumulated. B reports ok with both intervals covered. This proves successful-empty-response handling under the stub, not actual acoustic silence recognition."
+        },
+        {
+          "case": "no-egress-authority",
+          "result": "Neither arm invokes mocked curl. A still invokes two mocked extraction operations and ultimately reports failed; B returns skipped before any subprocess invocation."
+        }
+      ],
+      "quiet_capture_results": "Both A copies manufacture a no-obvious-failure candidate and promote it to R3. Both B copies return no candidate findings and explicitly retain no confirmed product requirements.",
+      "cleanup": "The supplemental recipe measures scratch absence after leaving TemporaryDirectory, matching all four true cleanup fields. The original scratch_removed_after_capture field remains an assertion assigned before context exit and is not retroactively repaired.",
+      "consumer_mapping": "CEOPT-24 consumes the riffrec analyzer evidence. CEOPT-28-supplement explicitly links the spec-sweep entries from original and supplemental media receipts, closing the earlier missing cross-reference for partial-transcription evidence.",
+      "limitations": [
+        "provider_request_sent records mocked invocation in these receipts; actual_egress is false throughout.",
+        "There is no real decoding, provider request, transcription accuracy, acoustic coverage, visual inspection, or product-impact validation.",
+        "The supplement covers initial failure followed by unavailable chunk fallback, not every fallback combination.",
+        "Generated artifact paths point into removed scratch directories; the embedded receipts and original quiet text are retained evidence, not an accessible complete generated bundle."
+      ],
+      "refs": [
+        "P/prepare-media.py",
+        "P/prepare-media-supplement.py",
+        "R/wave6/media-A-receipts.json",
+        "R/wave6/media-B-receipts.json",
+        "R/wave6/media-supplement-A-receipts.json",
+        "R/wave6/media-supplement-B-receipts.json",
+        "R/wave6/CEOPT-24-supplement.json",
+        "R/wave4/CEOPT-28-supplement.json",
+        "S/A/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py",
+        "S/B/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py",
+        "S/A/spec-sweep/scripts/analyze_riffrec_zip.py",
+        "S/B/spec-sweep/scripts/analyze_riffrec_zip.py"
+      ]
+    }
+  ],
+  "unresolved_recipe_or_receipt_attribution_errors": {
+    "blocking_errors": [],
+    "remaining_constraints": [
+      "Worktree before_status remains a pre-fixture baseline, not an immediate pre-helper baseline. The erratum correctly limits its interpretation.",
+      "The corrected PR supplement must be attributed to the separate verification recipe and reproduction receipt, never to prepare-pr-feedback.cjs.",
+      "The reproduction recipe reads the corrected receipt's input and comparison as its fixture. It independently exercises helper behavior but does not independently authenticate the fixture or recover the original invocation history.",
+      "The original media cleanup assertion remains weaker than the new measured supplemental cleanup."
+    ]
+  },
+  "claim_boundaries": {
+    "supported": "Recorded parent-operated local mechanism behavior, source consistency, corrected fixture interpretation, mocked provider handling, and receipt attribution within the listed cases.",
+    "not_supported": [
+      "Autonomous model or full workflow success",
+      "Model-level A/B superiority",
+      "Live host installation or cross-platform operation",
+      "Real remote publication or external acceptance",
+      "Actual media egress or transcription accuracy",
+      "Human or visual acceptance",
+      "Field outcome or productivity improvement"
+    ],
+    "overall": "The supplements address the identified narrow evidence gaps without supporting promotion to model, live-runtime, or field-outcome claims."
+  }
+}

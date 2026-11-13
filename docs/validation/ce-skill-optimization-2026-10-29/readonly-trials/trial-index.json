@@ -1,0 +1,680 @@
+[
+  {
+    "id": "CEOPT-02-A-1",
+    "scenario_id": "CEOPT-02",
+    "arm": "A",
+    "trial": 1,
+    "native_task": "/root/trial02_a1",
+    "session_id": "01a18a92-80ec-7790-8259-b3639218df24",
+    "started_at": "2026-10-30T02:10:19.526Z",
+    "final_at": "2026-10-30T02:11:05.018Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "4e426030730a99111851be8db9e18e410b395d544dcccf11b5889dc4aeb44ee9",
+    "tool_trace_sha256": "6a69313fe8714055f594c4dcc305a23aa61dfd5ba118ce9d74043c4546d389c9",
+    "source_transcript_sha256": "8581d66acf5e773c95d9b8b3e6cfff742e26782ddfc483eb77d8f79e98f25b20",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-02-A-1/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-02-A-1/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 3,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave1.json"
+  },
+  {
+    "id": "CEOPT-02-B-1",
+    "scenario_id": "CEOPT-02",
+    "arm": "B",
+    "trial": 1,
+    "native_task": "/root/trial02_b1",
+    "session_id": "01a18a92-c489-74c0-bd6e-9da9353efba0",
+    "started_at": "2026-10-30T02:10:36.837Z",
+    "final_at": "2026-10-30T02:11:33.928Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "ed6cfa6d1b25b9e8886f9e8bde2c2a6a7764fef469cd2485f5a6fee6e9653da1",
+    "tool_trace_sha256": "51cf8bd751333dd17badcece25af6f376cfd58d259a486c8c6c600bbfc88db1e",
+    "source_transcript_sha256": "6e57dab0fb4e167967915e1a27f2b53d747356439fc3b8ce49382142667db91e",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-02-B-1/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-02-B-1/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 3,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave1.json"
+  },
+  {
+    "id": "CEOPT-02-B-2",
+    "scenario_id": "CEOPT-02",
+    "arm": "B",
+    "trial": 2,
+    "native_task": "/root/trial02_b2",
+    "session_id": "01a18a93-4378-7df0-b270-00e1c7f7a1f5",
+    "started_at": "2026-10-30T02:11:09.343Z",
+    "final_at": "2026-10-30T02:11:52.333Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "d3fb33eed6df479ef2f012e0c9188308f9b507b3f2596ee554b87679b811c2de",
+    "tool_trace_sha256": "98915261e2b5fd628d7f2cc64212a00d71c37c72775452b4bb77a6bdae3b6995",
+    "source_transcript_sha256": "dacd2809f47f481f2002d1d55b98e268f9ed5894bb2601a47db549a524406717",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-02-B-2/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-02-B-2/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 3,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave1.json"
+  },
+  {
+    "id": "CEOPT-02-A-2",
+    "scenario_id": "CEOPT-02",
+    "arm": "A",
+    "trial": 2,
+    "native_task": "/root/trial02_a2",
+    "session_id": "01a18a93-f7b6-7fa1-abf7-2e942045bf46",
+    "started_at": "2026-10-30T02:11:55.477Z",
+    "final_at": "2026-10-30T02:12:46.273Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "11a53c922c9160e1fc719eb0962f231264ea0be1661827bb40bb379ace1bc46d",
+    "tool_trace_sha256": "dcad02792376dfc0d6ad74c9f6a0dda1df4b6043d9c557690965666d961a5093",
+    "source_transcript_sha256": "b5d4107ed32d30a1c3a891c693a0cb46aee3675a9dddef6d4edb9c6984156d35",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-02-A-2/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-02-A-2/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 3,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave1.json"
+  },
+  {
+    "id": "CEOPT-02-A-3",
+    "scenario_id": "CEOPT-02",
+    "arm": "A",
+    "trial": 3,
+    "native_task": "/root/trial02_a3",
+    "session_id": "01a18a94-3c0f-72d0-ace2-bbd3abbb746a",
+    "started_at": "2026-10-30T02:12:12.975Z",
+    "final_at": "2026-10-30T02:12:52.127Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "2eef9d5b3f2fd0fe2339be23ae108059526b45094f654237b254ace82aac665c",
+    "tool_trace_sha256": "4bce31a3731900ee31791aad86f29a4464a54dfa347f685926aab3b9ed3b8828",
+    "source_transcript_sha256": "b517bd6351f69c3cf1072e9f044eae2d9e2075173a2b5322f565ff7487212249",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-02-A-3/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-02-A-3/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 2,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave1.json"
+  },
+  {
+    "id": "CEOPT-02-B-3",
+    "scenario_id": "CEOPT-02",
+    "arm": "B",
+    "trial": 3,
+    "native_task": "/root/trial02_b3",
+    "session_id": "01a18a94-8fb2-7983-8c23-0d0bd691541a",
+    "started_at": "2026-10-30T02:12:34.383Z",
+    "final_at": "2026-10-30T02:13:38.034Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "2699561f8d49983afb55c39e3951930dc7a149552c1805c20fbc54478bf190d0",
+    "tool_trace_sha256": "c12dee6aebf1a20ccbf9ea4d5fbf96954a36232af182f5053e17233d2bb44cab",
+    "source_transcript_sha256": "bc322b6fd11bf08483efa47c3460d4b3c432c2f7e28693b17f1d8e62223136f8",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-02-B-3/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-02-B-3/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 4,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave1.json"
+  },
+  {
+    "id": "CEOPT-34-B-1",
+    "scenario_id": "CEOPT-34",
+    "arm": "B",
+    "trial": 1,
+    "native_task": "/root/trial34_b1",
+    "session_id": "01a18a95-6331-7d90-be05-df405c9360ed",
+    "started_at": "2026-10-30T02:13:28.515Z",
+    "final_at": "2026-10-30T02:14:11.805Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "fd56bf92b9d80a729f181d6c1980696210c599ee55eb8d7fbab5f439daf8f371",
+    "tool_trace_sha256": "112bcaafadc391ba4845300a44d5b2a5429ee75ad64dfceb1763ae08a3c2a86b",
+    "source_transcript_sha256": "e939e9e6b627f9e805270c4d784dc5f164effbffe657ebfd6e8e0c53eebb200d",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-34-B-1/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-34-B-1/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 2,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave1.json"
+  },
+  {
+    "id": "CEOPT-34-A-1",
+    "scenario_id": "CEOPT-34",
+    "arm": "A",
+    "trial": 1,
+    "native_task": "/root/trial34_a1",
+    "session_id": "01a18a95-eb6c-7cd3-997b-e790dccdfeee",
+    "started_at": "2026-10-30T02:14:03.402Z",
+    "final_at": "2026-10-30T02:14:46.640Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "49e02cf02acc050099300a447515de13af36bc5a7bd68b53df156cd2ecc778da",
+    "tool_trace_sha256": "53949cdbaeef90ba25cca3493b23e5e09abea6bc3762e8f631d4eb79d31d3ca9",
+    "source_transcript_sha256": "e957719edde0c0c85d3cc653531c6df3111639fac56ba0f7fb3232167943ed36",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-34-A-1/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-34-A-1/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 2,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave1.json"
+  },
+  {
+    "id": "CEOPT-34-A-2",
+    "scenario_id": "CEOPT-34",
+    "arm": "A",
+    "trial": 2,
+    "native_task": "/root/trial34_a2",
+    "session_id": "01a18a96-212e-71a2-b525-9121841a2d09",
+    "started_at": "2026-10-30T02:14:17.164Z",
+    "final_at": "2026-10-30T02:14:59.234Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "809c7514a9f2553af627a3a32345bb755d9d6d6194907a0fa7e1dcbf9e43763d",
+    "tool_trace_sha256": "4a892d19a88207d0965f21c5cdc3d8aa91a74d77d9a3bae933565fe9be8cc3a4",
+    "source_transcript_sha256": "8341680850c69f00e8dd9c1dfd1e13a327a77d6c6435dc83dbc502f562554423",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-34-A-2/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-34-A-2/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 2,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave1.json"
+  },
+  {
+    "id": "CEOPT-34-B-2",
+    "scenario_id": "CEOPT-34",
+    "arm": "B",
+    "trial": 2,
+    "native_task": "/root/trial34_b2",
+    "session_id": "01a18a96-ef13-7a21-9b60-b274b70789af",
+    "started_at": "2026-10-30T02:15:09.879Z",
+    "final_at": "2026-10-30T02:15:47.406Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "4369c15c2608af1e84eb0f24d2bcc53496362390a63a19d0696137eae3270646",
+    "tool_trace_sha256": "230a70da5cc074316e407bae99f8e96348f3d30804ee53585db204a53d553347",
+    "source_transcript_sha256": "1f47b72002b759c13cd26d2672ecc965f726c0f6f72f641aada28b517cf7c7a7",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-34-B-2/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-34-B-2/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 2,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave1.json"
+  },
+  {
+    "id": "CEOPT-34-B-3",
+    "scenario_id": "CEOPT-34",
+    "arm": "B",
+    "trial": 3,
+    "native_task": "/root/trial34_b3",
+    "session_id": "01a18a97-1bb4-7221-a833-4029a2ba0c47",
+    "started_at": "2026-10-30T02:15:21.292Z",
+    "final_at": "2026-10-30T02:16:09.715Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "d6bc2786413fbcef9cbd52d1adaba5a52f107ca16dc99f66fbf731a674da0a87",
+    "tool_trace_sha256": "6488af06acae3771d5b8486e7c60b07e88e0b82e975948d970d7fb2fae20a3c0",
+    "source_transcript_sha256": "47e2e91354871b4796229431693933e2e0e714ad34d6e710f86944c815ca3aa6",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-34-B-3/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-34-B-3/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 2,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave1.json"
+  },
+  {
+    "id": "CEOPT-34-A-3",
+    "scenario_id": "CEOPT-34",
+    "arm": "A",
+    "trial": 3,
+    "native_task": "/root/trial34_a3",
+    "session_id": "01a18a97-48a2-7da0-bdc0-0e16ac5d2b3c",
+    "started_at": "2026-10-30T02:15:32.798Z",
+    "final_at": "2026-10-30T02:16:14.578Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "830a5a21ed6cbe9d294a6c9f057ea8c72b220a5051bb17f6b7026e9ea3d216b3",
+    "tool_trace_sha256": "ee1199d3f5f54fb38aa5ec9e57161f565c4aaa1270cee81b0c614567b180048f",
+    "source_transcript_sha256": "a64942030c9d85516f0db0271b8dc5a7ab65c4340855d073c90228fdf041fe2f",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-34-A-3/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-34-A-3/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 3,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave1.json"
+  },
+  {
+    "id": "CEOPT-09-A-1",
+    "scenario_id": "CEOPT-09",
+    "arm": "A",
+    "trial": 1,
+    "native_task": "/root/trial09_a1",
+    "session_id": "01a18a9b-dbdc-7600-aa6c-f6c2c7245dd0",
+    "started_at": "2026-10-30T02:20:32.729Z",
+    "final_at": "2026-10-30T02:21:44.963Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "c3c5bd4df3e6310b55d0c8bb44ada15a0e5cdb2a69f37f5a565da5fe0d6f5c4a",
+    "tool_trace_sha256": "70e987f7b7a7b8c325de0db8637c78fc6310134d2d2f51be598f4ced11f6d4aa",
+    "source_transcript_sha256": "96e65245cc125d2a231e7d04bde0612f727af921cf6cb5f0df0f1317332901b1",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-A-1/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-A-1/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 5,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave2.json"
+  },
+  {
+    "id": "CEOPT-09-B-1",
+    "scenario_id": "CEOPT-09",
+    "arm": "B",
+    "trial": 1,
+    "native_task": "/root/trial09_b1",
+    "session_id": "01a18a9c-0f5e-7bf2-8654-dc0299aced65",
+    "started_at": "2026-10-30T02:20:45.912Z",
+    "final_at": "2026-10-30T02:22:13.541Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "3878df7bd4c02e10a953e52a344fdb9bf445dcf23f29651259c3932653cb108d",
+    "tool_trace_sha256": "35e390dace28727a7e82c7e5e7c33568b3ffcd96b86aae5e70ccf45d4e4a8493",
+    "source_transcript_sha256": "a2d09df4053d13bf6a52ece696df64442f0e29a839ea527cadbbcaa8fedc343b",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-B-1/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-B-1/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 5,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave2.json"
+  },
+  {
+    "id": "CEOPT-09-B-2",
+    "scenario_id": "CEOPT-09",
+    "arm": "B",
+    "trial": 2,
+    "native_task": "/root/trial09_b2",
+    "session_id": "01a18a9d-21f4-7ee3-913f-a12c72a56a8f",
+    "started_at": "2026-10-30T02:21:56.215Z",
+    "final_at": "2026-10-30T02:23:04.890Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "d50f5995c64b32ea5af42c51c8fa8e76dfb47cba1dba4647447e1bdca03e08ce",
+    "tool_trace_sha256": "68f886987d746f7696ff63c91251544716ffeaec6546eded9e5db7495ee62e3d",
+    "source_transcript_sha256": "1b7a972f247093081d24cd97befca6d0c259b835f607db93c379e000d3c4594c",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-B-2/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-B-2/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 5,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave2.json"
+  },
+  {
+    "id": "CEOPT-09-A-2",
+    "scenario_id": "CEOPT-09",
+    "arm": "A",
+    "trial": 2,
+    "native_task": "/root/trial09_a2",
+    "session_id": "01a18a9d-d0b4-7510-8c4d-7cafca410c2a",
+    "started_at": "2026-10-30T02:22:40.926Z",
+    "final_at": "2026-10-30T02:23:57.695Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "d4aed2a30eb393cde6da173664c5e179b7d7efb297a3ad44500f5dd60131be49",
+    "tool_trace_sha256": "a275068ea9c77232f5cfc97c5319460a4ac5963e85e2a46d746f499eee05d191",
+    "source_transcript_sha256": "a43d89f2b807a8ef3342ce8a1992dfbf38ae26a57dbacbb61c87396ce79036bf",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-A-2/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-A-2/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 5,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave2.json"
+  },
+  {
+    "id": "CEOPT-09-A-3",
+    "scenario_id": "CEOPT-09",
+    "arm": "A",
+    "trial": 3,
+    "native_task": "/root/trial09_a3",
+    "session_id": "01a18a9e-62a5-79b0-9e92-e113911f06e4",
+    "started_at": "2026-10-30T02:23:18.295Z",
+    "final_at": "2026-10-30T02:24:25.841Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "c36e6cd3aac243dbce345c4f8af89e9def94e9447e1445d19a51b46d162b0d12",
+    "tool_trace_sha256": "b7c0e682f0abc8179b172f29e56a6d619dd9857f4fad9c6554c48ceb51a0bfed",
+    "source_transcript_sha256": "07f4a01ffbf642b573d1e28e7339510032f9a73cf88d15a24013c79529d32a5e",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-A-3/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-A-3/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 5,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave2.json"
+  },
+  {
+    "id": "CEOPT-09-B-3",
+    "scenario_id": "CEOPT-09",
+    "arm": "B",
+    "trial": 3,
+    "native_task": "/root/trial09_b3",
+    "session_id": "01a18a9f-2c29-7d20-9d1a-430611dd7f9f",
+    "started_at": "2026-10-30T02:24:09.890Z",
+    "final_at": "2026-10-30T02:25:23.154Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "f80945b24098470a1cf8c3b5a3dfc276642417f7cd155cbba621f21de4561983",
+    "tool_trace_sha256": "139e8572ac592ef495510867f87463c8cd6a5d98d432c29cf7f53f788f095693",
+    "source_transcript_sha256": "d3fbe905d4d67470aca8583dc41975ac9a749dbdf03aa902311efb3054d2b15f",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-B-3/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-B-3/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 5,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave2.json"
+  },
+  {
+    "id": "CEOPT-21-B-1",
+    "scenario_id": "CEOPT-21",
+    "arm": "B",
+    "trial": 1,
+    "native_task": "/root/trial21_b1",
+    "session_id": "01a18a9f-7d14-7bf0-84ac-dc26cd5a4296",
+    "started_at": "2026-10-30T02:24:30.600Z",
+    "final_at": "2026-10-30T02:24:56.174Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "ea9142e9561104755cb06347f4481fb74cd5b7191dccb1aa8c6f401707499e65",
+    "tool_trace_sha256": "f1b6a16afe309bf1007724ea678b5e6c7874921369146649e564b2982ea5d25a",
+    "source_transcript_sha256": "6d096ca5987bfff7aedc712ccfcad14570ebd607da46815f30485338b4d1007a",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-B-1/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-B-1/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 2,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave2.json"
+  },
+  {
+    "id": "CEOPT-21-A-1",
+    "scenario_id": "CEOPT-21",
+    "arm": "A",
+    "trial": 1,
+    "native_task": "/root/trial21_a1",
+    "session_id": "01a18aa1-52fe-7ca2-8781-26eb10a092b8",
+    "started_at": "2026-10-30T02:26:30.898Z",
+    "final_at": "2026-10-30T02:26:57.218Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "ab8253d826ce394af056a4407f855d1f3ec0a89a2723a5a406ad4bcfbb789530",
+    "tool_trace_sha256": "ea17da8e06e699751aa95e8958094de4bb351244acc02ff51df3299b34fc418a",
+    "source_transcript_sha256": "8231605bb1e06f6999d5c6aa0764cc585c7a19f3146750484f5a236282c8c5b4",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-A-1/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-A-1/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 2,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave2.json"
+  },
+  {
+    "id": "CEOPT-21-A-2",
+    "scenario_id": "CEOPT-21",
+    "arm": "A",
+    "trial": 2,
+    "native_task": "/root/trial21_a2",
+    "session_id": "01a18aa1-700e-7b71-89af-7039de88c1e5",
+    "started_at": "2026-10-30T02:26:38.341Z",
+    "final_at": "2026-10-30T02:27:05.350Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "89853cca3719a207fce61e4cf1c7cde28128be36319c88741455789b30077715",
+    "tool_trace_sha256": "7884ee37126ac3124340d9718ed5b1732c51f5f6d323725a20db9b6874d6a1cf",
+    "source_transcript_sha256": "ef02cb2ab1e72831e17215805b8b12249ad3d1c154a4e945b65c18425f7125e3",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-A-2/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-A-2/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 2,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave2.json"
+  },
+  {
+    "id": "CEOPT-21-B-2",
+    "scenario_id": "CEOPT-21",
+    "arm": "B",
+    "trial": 2,
+    "native_task": "/root/trial21_b2",
+    "session_id": "01a18aa1-878c-7142-846c-45f3bdb6f729",
+    "started_at": "2026-10-30T02:26:44.371Z",
+    "final_at": "2026-10-30T02:27:05.958Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "c7fcae6aa0a13516047c04cb4d2824a3daa8490b9c768279626c80f08782eb61",
+    "tool_trace_sha256": "b4aff801bb1fa34397af930e958fd2658747e96052cc7c5e20507c281d36b695",
+    "source_transcript_sha256": "b689fa422d2f5972604879ea4488a41c11c73bdf0c2fca4a5ae06d275480ef24",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-B-2/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-B-2/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 2,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave2.json"
+  },
+  {
+    "id": "CEOPT-21-B-3",
+    "scenario_id": "CEOPT-21",
+    "arm": "B",
+    "trial": 3,
+    "native_task": "/root/trial21_b3",
+    "session_id": "01a18aa2-11db-7540-a651-3fe96cf36791",
+    "started_at": "2026-10-30T02:27:19.781Z",
+    "final_at": "2026-10-30T02:27:38.444Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "f37c26053390f5cf264a8842c4ad2b68b91e6924f0e86b0b79e8e9761542cab7",
+    "tool_trace_sha256": "462bc9f87ea50cc52ec1967cd9824eb5a128184ebd924c9246528c1e298839d6",
+    "source_transcript_sha256": "3ab33bcfac64eb28266e063e823bba4cd86be2687c1515ff69ffa3af312dae9d",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-B-3/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-B-3/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 2,
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave2.json"
+  },
+  {
+    "id": "CEOPT-21-A-3",
+    "scenario_id": "CEOPT-21",
+    "arm": "A",
+    "trial": 3,
+    "native_task": "/root/trial21_a3",
+    "session_id": "01a18aa2-2f26-76b2-b303-73614d4acde2",
+    "started_at": "2026-10-30T02:27:27.262Z",
+    "final_at": "2026-10-30T02:34:35.834Z",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      }
+    ],
+    "response_sha256": "87a92786f48ff1564e5f4a73f78ccba58189e69caf39e300d1cc499fca7c48df",
+    "tool_trace_sha256": "e41a2ca77955330684ae4d95c8344f1ae5f3df50a9bf506d49a346afa3188592",
+    "source_transcript_sha256": "ff910a638fc3360c121cd6c9a0a85549422557497050d10349a4a952140460d5",
+    "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-A-3/response.md",
+    "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-A-3/tool-events.json",
+    "status": "executed-and-independently-adjudicated",
+    "tool_calls": 2,
+    "host_retry": {
+      "failure": "429 Too Many Requests before successful final response",
+      "action": "Same task retried once using native followup_task; no task/source change.",
+      "request_id": "a526fb867cb85e05-HKG",
+      "comparative_timing_eligible": false
+    },
+    "semantic_status": "pass",
+    "semantic_review_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/judge-wave2.json"
+  }
+]

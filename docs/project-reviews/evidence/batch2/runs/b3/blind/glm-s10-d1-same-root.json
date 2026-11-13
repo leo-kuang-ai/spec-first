@@ -1,0 +1,15 @@
+{
+ "case": "s10-d1-same-root",
+ "seed": 20261217,
+ "a_out": "/tmp/batch3/glm-s10/iteration-1/s10-d1-same-root/with_skill/outputs",
+ "b_out": "/tmp/batch3/glm-s10/iteration-1/s10-d1-same-root/without_skill/outputs",
+ "mapping": {
+  "X": "B",
+  "Y": "A"
+ },
+ "verdict_raw": {
+  "preferred": "X",
+  "reason": "X修复两处同源错误并复用total；Y遗漏已知受影响模块，且“全库无lines”与自身描述矛盾，验证声明过度。"
+ },
+ "preferred_group": "B"
+}

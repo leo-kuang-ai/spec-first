@@ -1,0 +1,83 @@
+# T07：routing S5 入口归属裁决与三专家复核收尾
+# 证据：v2-routing-zcode-followup.json（S5 发现，10-09）→ 59cb4cb1（10-26 裁决修复+收尾）
+# 与 T01 的边界：S5 冲突的'发现'计入 T01（FP-REV-1）；本追踪只计修复任务自身的执行与摩擦。
+# S5 冲突根因本身在统计中只计一次（归 T01），本任务不计同一根因。
+
+task_id: "T07"
+task_title: "裁决活跃 workflow 执行中失败信号的入口归属（S5）并落地三专家复核收尾"
+task_type: "bug_fix"
+complexity: "medium"
+calendar_span: "2026-10-09（发现）→ 2026-10-26（修复落地），跨度 17 天"
+
+context:
+  repository: "spec-first"
+  branch: "leo-2026-10-27-update"
+  commits:
+    - "59cb4cb1 2026-10-26 fix(routing): 裁决活跃 workflow 执行中失败信号的入口归属并落地三专家复核收尾"
+
+workflow:
+  - stage: "1_requirement"
+    evidence_tier: "confirmed"
+    evidence: "v2-routing-zcode-followup.json S5 场景失败记录（8 场景 7 通过 1 失败）；validation README 记录'修复需方案 owner 授权，本轮未实施'"
+    friction_points:
+      - id: "FP-T07-1"
+        type: "衔接断裂"
+        severity: "P1"
+        description: "已确认的 Layer 1 缺陷（规则字面冲突导致误路由）修复等待 owner 授权 17 天才落地；期间缺陷持续存在于线上的入口规则中"
+        evidence: "发现于 2026-10-09（validation README），提交于 2026-10-26（59cb4cb1）"
+        attribution: "external_factor(主)：owner 授权/审阅节奏；skill_issue(轻)：'待 owner 授权'事项无跟踪机制（无 deadline、无 reminder、无 pending 清单落盘）"
+  - stage: "2_plan"
+    evidence_tier: "confirmed"
+    evidence: "59cb4cb1 提交信息 + validation README '逐项优化轮'：裁决规则为'活跃 workflow 执行中失败由其反馈回路处理、不重启路由，根因超出任务范围才由 owner 显式移交 spec-debug'"
+    friction_points: []
+  - stage: "3_work"
+    evidence_tier: "confirmed"
+    evidence: "修复面：SKILL.md Route Selection + route-map 尾注补裁决句；canonical source 为 src/cli/lang-policy.js（zh/en），用 applyManagedBlock 从 source 重新 upsert 至 CLAUDE.md/AGENTS.md；不加静态护栏测试（using-spec-first-contracts 'onboarding routing semantics and mid-execution failure adjudication'）——护栏测试在 T01 逐项优化轮落地"
+    output:
+      source_discipline: "正确：改 source（lang-policy.js）再生 managed block；.agents/skills 镜像 drift 留待 spec-first init，不手改 mirror"
+    friction_points:
+      - id: "FP-T07-2"
+        type: "衔接断裂"
+        severity: "P2"
+        description: "源码修复后 runtime 镜像（.agents/skills 等）存在同源 drift，需 owner 授权 spec-first init 刷新；修复生效存在 source→runtime 延迟窗口"
+        evidence: "validation README 逐项优化轮 '（.agents/skills/ 等运行时镜像存在同源 drift，按边界待 owner 授权 spec-first init 刷新，不手改 mirror）'"
+        attribution: "skill_issue(轻)+external：source-first 纪律正确执行，但刷新依赖 owner 动作，无自动提示机制"
+  - stage: "4_validation"
+    evidence_tier: "confirmed"
+    evidence: "fresh-source 复验：同一 S5 场景由误路由 spec-debug 修正为保持 spec-work owner 连续（修复后源文件 hash SKILL.md 21a73e2d…、route-map a56255d2…）"
+    friction_points: []
+  - stage: "5_review"
+    evidence_tier: "confirmed"
+    evidence: "三专家复核收尾随本提交落地（提交信息）"
+    friction_points: []
+  - stage: "6_commit"
+    evidence_tier: "confirmed"
+    evidence: "59cb4cb1 单提交"
+    friction_points: []
+
+summary:
+  delivered: true
+  merged: true
+  correct: true     # fresh-source 复验通过
+  complete: true
+  tested: true      # S5 场景复验 + 静态护栏测试（T01 轮落地）
+  documented: true
+  rework_count: 0
+  user_intervention_count: 1  # confirmed：owner 授权是修复前置（有文档记录）
+  overall_quality: "high（source-first 纪律 + fresh-source 复验）；17 天授权等待为最大摩擦"
+
+layer_3_metrics: { 端到端正确: true, 端到端返工: false, 用户介入次数: 1 }
+layer_2_metrics: { 信息丢失: false, 信息重复: false, 验证缺失: false, 衔接断裂: true }
+
+friction_summary:
+  total: 2
+  by_type: { 信息丢失: 0, 信息重复: 0, 验证缺失: 0, 衔接断裂: 2 }
+  by_attribution: { skill_issue: 1.0, model_capability: 0, external_factor: 1.0, tooling_issue: 0, none: 0 }
+
+lessons_learned:
+  what_went_well:
+    - "裁决句落到 canonical source（lang-policy.js）而非只改文档副本；managed block 由 source 重新生成"
+    - "fresh-source 同场景复验证明修复有效（不只声明）"
+  what_could_be_better:
+    - "'待 owner 授权'事项应有 pending 清单与提醒机制，避免 17 天滞留"
+    - "source 修复后 runtime 镜像刷新应有低摩擦路径（如 CI 提示 drift）"

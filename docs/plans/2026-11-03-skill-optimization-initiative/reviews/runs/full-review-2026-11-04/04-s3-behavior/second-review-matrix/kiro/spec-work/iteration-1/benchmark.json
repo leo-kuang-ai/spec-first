@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "skill_name": "spec-work",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-work",
+    "timestamp": "2026-11-05T02:10:18Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "An already implemented requirement does not authorize changing plan lifecycle",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 390.925,
+        "tokens": 56462,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-r2-reverse-mismatch.sh",
+          "passed": false,
+          "evidence": "script exited with code 1 [stderr: node:assert:150\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Protected fixture changed: docs/plans/2026-09-01-001-feat-month-filter-plan.md\n+ actual - expected\n\n+ '708a10ca3b5fb73801501630f4199c440963383113553e67d76b67f6bb742263'\n- 'ebe41c2e90728c765a06f1e9b200c668a93570310c8b102fe70081ced9cbc1a1'\n\n    at checkFixture ([stdin]:94:69)\n    at [stdin]:115:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: '708a10ca3b5fb73801501630f4199c440963383113553e67d76b67f6bb742263',\n  expected: 'ebe41c2e90728c765a06f1e9b200c668a93570310c8b102fe70081ced9cbc1a1',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0,
+        "stddev": 0,
+        "min": 0,
+        "max": 0
+      },
+      "time_seconds": {
+        "mean": 390.925,
+        "stddev": 0,
+        "min": 390.925,
+        "max": 390.925
+      },
+      "tokens": {
+        "mean": 56462,
+        "stddev": 0,
+        "min": 56462,
+        "max": 56462
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

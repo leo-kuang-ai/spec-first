@@ -1,0 +1,138 @@
+{
+  "scenario_id": "CEOPT-31",
+  "review_scope": "Independent read-only review of all six artifacts, receipts and complete stored tool-event files; frozen A/B spec-work owners; packet/request/fixture; historical proof receipts, logs and all six fixture files.",
+  "verdict": "PASS for the bounded negative closeout-assessment facets, with source-consumption limitations in A2 and B2. Implementation completion, visual acceptance, operational proof preservation and causal B improvement remain unestablished.",
+  "evidence_roots": {
+    "E": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance",
+    "R": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030",
+    "trial_files": "E/wave6/trials/CEOPT-31-{A1,B1,B2,A2,A3,B3}/{artifact.md,receipt.json,tool-events.json}",
+    "frozen_sources": "R/inputs/{A,B}/spec-work",
+    "historical_proof": "E/wave2/simplify-proof.json",
+    "fixture": "E/wave2/fixtures/simplify"
+  },
+  "facet_definitions": {
+    "intent": "Preserve positive finite numeric amount validation and existing routes.",
+    "rejection": "Reject both if(false) guard replacement and assertion deletion.",
+    "proof": "Protect test/entries.test.cjs and invoked test/support/ledger-proof.cjs executable seam.",
+    "history": "Distinguish historical baseline exit 0 and weakened-control exit 1 from absent accepted final-tree evidence.",
+    "closeout": "Require fresh final-tree checks, structured summary, honest-closeout and final fingerprint before behavior-bearing completion.",
+    "visual": "Keep exact-frame comparison unresolved without authoritative design target and comparable current implementation evidence.",
+    "authority": "No implementation-complete, visual-acceptance, clean-tree, commit/publication or invented user-authority claim."
+  },
+  "per_six_matrix": [
+    {
+      "trial": "A1",
+      "elapsed_seconds": 81.432,
+      "intent": "pass",
+      "rejection": "pass",
+      "proof": "pass; names both proof paths and subprocess seam",
+      "history": "pass",
+      "closeout": "pass; fresh checks, summary, honest closeout and fingerprint required",
+      "visual": "pass; exact URL/node/frame, viewport/state and route-bound evidence requested",
+      "authority": "pass",
+      "trace": "14 events; read-only; batched-output truncation recovered through subsequent owner reads"
+    },
+    {
+      "trial": "B1",
+      "elapsed_seconds": 77.945,
+      "intent": "pass",
+      "rejection": "pass",
+      "proof": "pass; adds current byte-identity capture/comparison and originating task context without inventing it",
+      "history": "pass",
+      "closeout": "pass; explicitly preserves evidence authority and final source binding",
+      "visual": "pass; exact node/artifact, widths/states, source paths and origin/route requested",
+      "authority": "pass",
+      "trace": "12 events; read-only; initial combined quality/shipping output truncated, followed by bounded shipping recovery and terminal return-owner read"
+    },
+    {
+      "trial": "B2",
+      "elapsed_seconds": 76.755,
+      "intent": "pass",
+      "rejection": "pass",
+      "proof": "pass; exact proof/seam paths, historical hashes, future byte snapshot/comparison and original symptom rerun",
+      "history": "pass",
+      "closeout": "pass; all required closeout elements named",
+      "visual": "pass for missing-target negative judgment; source-consumption limitation",
+      "authority": "pass",
+      "trace": "16 events; read-only; truncation recovery covers relevant shipping closeout. No direct read of references/agents/figma-design-sync.md appears; visual recovery is grounded in implementation-loop and supplied fixture. Do not count full Figma-owner consumption or positive visual competence."
+    },
+    {
+      "trial": "A2",
+      "elapsed_seconds": 73.437,
+      "intent": "pass",
+      "rejection": "pass",
+      "proof": "pass; includes package test entrypoint and invoked proof seam",
+      "history": "pass",
+      "closeout": "pass; fresh logs, summary, honest-closeout and post-verification fingerprint required",
+      "visual": "pass; missing node/frame, origin/route, screenshot and matched viewport identified",
+      "authority": "pass",
+      "trace": "16 events; read-only; repeated batched-output truncation followed by focused recovery. Feedback-and-tests scenario-completeness substantive lines 112-115 and 117 remain absent from retained readable output; do not claim exhaustive owner consumption."
+    },
+    {
+      "trial": "A3",
+      "elapsed_seconds": 63.439,
+      "intent": "pass",
+      "rejection": "pass",
+      "proof": "pass; proof runner, server-loading seam and package entrypoint protected",
+      "history": "pass",
+      "closeout": "pass; explicitly requires fallback-route reconciliation and fresh complete evidence",
+      "visual": "pass; exact target and route-bound matched capture required",
+      "authority": "pass; explicitly rejects console phrase as independent commit evidence",
+      "trace": "10 events; read-only; broad initial truncation followed by overlapping recovery reads covering relevant owners"
+    },
+    {
+      "trial": "B3",
+      "elapsed_seconds": 73.088,
+      "intent": "pass",
+      "rejection": "pass",
+      "proof": "pass; exact proof/seam paths and future byte identity comparison",
+      "history": "pass",
+      "closeout": "pass; reproducer, protected proof, required final checks, summary, honest-closeout and fingerprint required",
+      "visual": "pass; identifies HTTP fixture as insufficient UI evidence and requests node/frame, widths/states, source and origin/route",
+      "authority": "pass",
+      "trace": "14 events; read-only; initial batched owner output truncated, followed by complete feedback/shipping and Figma-owner reads plus final return-owner reread"
+    }
+  ],
+  "integrity": {
+    "frozen_source_pins": "36/36 exact A/B spec-work-prefix intake entries independently SHA-256 matched. Filtering used R/inputs/{A,B}/spec-work/ prefixes, not the enclosing RUN path's spec-work substring.",
+    "trial_integrity": "6/6 artifact hashes and 6/6 complete stored trace hashes matched receipts. Each receipt equals its exact CEOPT-31 trial-index entry.",
+    "packet_integrity": "Packet request hash and both declared input-file hashes matched.",
+    "fixture_integrity": "6/6 fixture-file hashes matched simplify-proof.json, including prepare-eval.cjs, README, package, server, launcher test and HTTP proof.",
+    "historical_logs": "Both log SHA-256 values matched their proof receipt.",
+    "order_and_timing": "Recorded starts/finals follow A1, B1, B2, A2, A3, B3 without overlap; every recorded duration is below 300 seconds.",
+    "metadata_limit": "Times/session IDs and gpt-6.1-sol medium metadata are recorded provenance, not authenticated serving identity or independent timing attestation.",
+    "scope": "Observed commands only read/list assigned frozen sources and named evidence using cat, sed, nl and rg. No tests, helpers, product mutation, browser/network/provider calls or delegation appear in these trial traces. Read-only behavior was observed, not enforced filesystem isolation.",
+    "producer_limit": "Artifacts were parent-saved final responses according to receipts. Hash agreement establishes current internal consistency, not independent proof of unchanged transcript-to-artifact saving or autonomous persistence. Packet status remains prepared-not-executed while receipts record executed-awaiting-review; treat packet status as preparation metadata, not consolidated completion."
+  },
+  "historical_http_proof": {
+    "supported": "The supplied parent-produced local receipts record actual node --test execution: baseline passes one launcher test; deliberate weakened guard fails the unchanged proof with Invalid amount must return 400 and 201 !== 400. This review did not rerun them; none of the six models executed them.",
+    "actual_seam": "The launcher executes the protected proof in the fixture root. The proof starts the actual server, adapting only listen address to ephemeral loopback, and sends HTTP requests through its real request handlers.",
+    "coverage": "GET initial empty entries; successful POSTs before/after invalid input; malformed JSON; missing, zero, negative, string, null and overflowing numeric amounts; final GET status/body; preserved id/amount/note values; finite timestamps; process survival.",
+    "limits": "Requests always target /entries. No fallback 404 or alternate route/method coverage; successful POST status only requires a 2xx response, not exactly 201. No Git assertion exists in ledger-proof.cjs despite its console phrase no new reachable commit. Preparation's separate baseline-capture logic does not turn that phrase into task-level Git verification. No accepted final implementation tree, post-simplify rerun, real UI, Figma comparison or field outcome is supplied."
+  },
+  "source_delta_and_fix": {
+    "demonstrated_source_repair": "Frozen B adds explicit proof-preservation context and byte-identity comparison to feedback-and-tests, implementation-loop, shipping-workflow and return-to-caller. Its rewritten Figma owner and loop require exact matching evidence, default comparison-only authority, inherited tokens/source boundaries and fresh post-edit captures; generic Tailwind/full-width/tolerance mandates are removed.",
+    "other_deltas": "Frozen spec-work also changes review-findings-followup, execution-strategy and work-intake-and-task-pack. These broader edits are not validated by CEOPT-31.",
+    "unchanged": "A/B SKILL.md and implementation-quality.md are identical; the existing protected-surface and final-closeout rules already support the core negative judgments.",
+    "behavioral_conclusion": "All six preserve the core boundaries. B's three artifacts express stronger explicit proof-identity handoff context, but this fixture never applies cleanup or supplies a final tree. Source repair is demonstrated textually; operational preservation across mutation, positive visual behavior and a causal optimization advantage are not demonstrated."
+  },
+  "residual_owners": [
+    {
+      "owner": "Evaluation/source-consumption owner",
+      "action": "Retain A2 feedback-owner truncation and B2 unread Figma-owner limitations. Do not relabel these trials as complete phase-owner-consumption evidence."
+    },
+    {
+      "owner": "Implementation and verification caller",
+      "action": "Establish accepted canonical source and complete applicable Verification Contract; preserve proof/seam identity through authorized cleanup; rerun original symptom, protected proof and all required final checks, including unresolved route behavior. Produce fresh portable logs, structured summary, honest-closeout and post-verification fingerprint."
+    },
+    {
+      "owner": "Design and browser/comparison owners",
+      "action": "Supply exact authoritative node/frame, viewport/state, owning source and implementation origin/route; obtain current private comparable captures and refresh after edits. Keep visual acceptance blocked until grounded comparisons exist."
+    },
+    {
+      "owner": "Producer/consolidation owner",
+      "action": "Record bounded review disposition separately from preparation status; preserve historical receipts and metadata limitations. Keep implementation, visual/field outcome, lifecycle and landing eligibility separate."
+    }
+  ],
+  "reviewer_actions": "File reads and pure JSON/hash analysis only. No files written, tests/helpers executed, external services contacted or new trials created."
+}

@@ -1,0 +1,10 @@
+{
+  "eval_id": 0,
+  "eval_name": "快速事实问答应直接回答不走 brainstorm",
+  "prompt": "（spec-brainstorm skill 已安装，请按它工作。）\ngit rebase 和 git merge 有什么区别?简短说明。\n",
+  "assertions": [
+    "expect.must_contain",
+    "expect.files_not_exist",
+    "output_contains{all:[rebase]}"
+  ]
+}

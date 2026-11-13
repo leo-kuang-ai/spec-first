@@ -1,0 +1,76 @@
+# T06：全链路系统审查方案 v2 与 FSA2/FSA3 修复
+# 证据：876b5c22（09-14 方案 v2 新增）→ 66b0e0c6（09-14 按 spec-doc-review 结论加固）→
+# 36d19d95（09-18 FSA2/FSA3 修复落地 + 全量回归 3057 passed）
+# 文档：docs/validation/2026-08-01-full-system-audit-plan-v2 及 full-system-audit 目录
+
+task_id: "T06"
+task_title: "全链路系统审查方案 v2 加固与 FSA2/FSA3 修复（spec-commit 边界 + autoresearch 安全）"
+task_type: "bug_fix"
+complexity: "medium"
+calendar_span: "2026-09-14（方案+加固）→ 2026-09-18（修复落地，4 天）"
+
+context:
+  repository: "spec-first"
+  branch: "leo-2026-09-14-audit-plan-v2-hardening"
+  commits:
+    - "876b5c22 09-14 docs(audit): 新增全链路系统审查方案 v2"
+    - "66b0e0c6 09-14 docs(audit): 按 spec-doc-review 结论加固全链路审查方案 v2"
+    - "36d19d95 09-18 11:57 fix(audit): land FSA2/FSA3 repairs and evidence chain（spec-commit 提交边界 + autoresearch 安全/收敛/分类 + 确定性回归测试；npm test 3057 passed / 2 skipped；CE 合同 16 passed）"
+
+workflow:
+  - stage: "1_requirement"
+    evidence_tier: "confirmed"
+    evidence: "full-system-audit-plan-v2（承接 2026-08-01 审查链的 v2 迭代）"
+    friction_points: []
+  - stage: "2_plan"
+    evidence_tier: "confirmed"
+    evidence: "876b5c22 → 66b0e0c6：方案经 spec-doc-review 结论加固一轮"
+    friction_points:
+      - id: "FP-T06-1"
+        type: "信息重复"
+        severity: "P2"
+        description: "方案 v2 初版需经 spec-doc-review 加固一轮才达执行标准——审查-修订回路有效但增加一轮成本"
+        evidence: "66b0e0c6 提交信息 '按 spec-doc-review 结论加固'"
+        attribution: "skill_issue(轻)：spec-plan 产出一轮即过的比例不稳定，doc-review 兜底成为常态"
+  - stage: "3_work"
+    evidence_tier: "confirmed"
+    evidence: "36d19d95：修复 spec-commit 提交边界与 autoresearch 安全、收敛和分类问题；新增 mutation-enforcement 合同（25 行）；同步 CE localization 证据与审查报告"
+    friction_points: []
+  - stage: "4_validation"
+    evidence_tier: "confirmed"
+    evidence: "提交信息载明全量回归：npm test 3057 passed / 2 Graphify skipped；CE 合同测试 16 passed；确定性回归测试补齐"
+    friction_points: []
+  - stage: "5_review"
+    evidence_tier: "confirmed"
+    evidence: "审查报告随修复同步更新（36d19d95 变更面含 review-report 与 adjudication JSON）"
+    friction_points: []
+  - stage: "6_commit"
+    evidence_tier: "confirmed"
+    evidence: "三提交含 CHANGELOG 23 行"
+    friction_points: []
+
+summary:
+  delivered: true
+  merged: true
+  correct: true
+  complete: true
+  tested: true       # 全量回归 3057 passed
+  documented: true
+  rework_count: 0    # 修复一次落地，无返修记录
+  user_intervention_count: null
+  overall_quality: "high（审查→加固→修复→全量回归的干净闭环）"
+
+layer_3_metrics: { 端到端正确: true, 端到端返工: false, 用户介入次数: null }
+layer_2_metrics: { 信息丢失: false, 信息重复: true, 验证缺失: false, 衔接断裂: false }
+
+friction_summary:
+  total: 1
+  by_type: { 信息丢失: 0, 信息重复: 1, 验证缺失: 0, 衔接断裂: 0 }
+  by_attribution: { skill_issue: 1, model_capability: 0, external_factor: 0, tooling_issue: 0, none: 0 }
+
+lessons_learned:
+  what_went_well:
+    - "修复附带确定性回归测试与全量回归证据（3057 passed 写进提交信息）"
+    - "doc-review 加固在实施前完成，避免实施后返工"
+  what_could_be_better:
+    - "spec-plan 产出的'一轮即过率'若能提升，可省去常态化的 doc-review 加固轮"

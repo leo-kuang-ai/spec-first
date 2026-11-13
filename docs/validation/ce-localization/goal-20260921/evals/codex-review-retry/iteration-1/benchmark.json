@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "skill_name": "spec-code-review",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-code-review",
+    "timestamp": "2026-09-21T13:47:56Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "默认审查应发现跨租户授权绕过且保持只读",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 158.404,
+        "tokens": 511663,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.exit_code",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-code-review/evals/fixtures/scripts/check-report-only-tenant-bypass.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 158.404,
+        "stddev": 0,
+        "min": 158.404,
+        "max": 158.404
+      },
+      "tokens": {
+        "mean": 511663,
+        "stddev": 0,
+        "min": 511663,
+        "max": 511663
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

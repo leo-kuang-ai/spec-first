@@ -1,0 +1,27 @@
+{
+  "command": [
+    "node",
+    "node_modules/jest/bin/jest.js",
+    "--runInBand",
+    "--runTestsByPath",
+    "tests/unit/ce-upstream-skill-sync-contracts.test.js",
+    "tests/unit/ce-upstream-reconciliation-v2.test.js",
+    "tests/unit/spec-plan-reference-contracts.test.js",
+    "tests/unit/spec-work-consumer-chain-contracts.test.js",
+    "tests/unit/spec-doc-review-contracts.test.js",
+    "tests/unit/spec-lfg-contracts.test.js",
+    "tests/unit/spec-prd-plan-handoff-contracts.test.js",
+    "tests/unit/spec-prd-validate-mode.test.js",
+    "tests/unit/spec-write-tasks-contracts.test.js",
+    "tests/unit/spec-write-skill-contracts.test.js",
+    "tests/unit/spec-handoff-contracts.test.js",
+    "tests/unit/spec-test-browser-contracts.test.js",
+    "tests/unit/spec-project-rules-scripts.test.js",
+    "tests/unit/autoresearch-orchestrator-regression.test.js",
+    "tests/unit/mcp-setup-mode-target.test.js",
+    "tests/unit/mcp-setup-host-config.test.js",
+    "tests/unit/app-audit-gate-degradation.test.js"
+  ],
+  "missing_requested_suites": [],
+  "exit_code": 0
+}

@@ -1,0 +1,231 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "source_snapshot": "source-manifest.json",
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "coverage_commitment": "committed",
+  "dependency_closure": "partial",
+  "ran": true,
+  "exit_code": null,
+  "command_or_method": [
+    "冻结source的分支级人工语义审查；不是workflow执行"
+  ],
+  "claim_ceiling": "C1",
+  "owner": "project-lead-cycle-1",
+  "fresh_source_eval": "concerns",
+  "tests": "not-run",
+  "host_projection": "not-run",
+  "live_invocation": "not-run",
+  "redaction_status": "none-required",
+  "generated_at": "2026-09-20T03:07:08.794568+00:00",
+  "skill_name": "spec-code-review",
+  "entry_surface": "workflow_command",
+  "batch": "A",
+  "closure_tier": "L",
+  "closure_observed": {
+    "files": 61,
+    "bytes": 492745,
+    "read_package_files_at_least_partially": 8,
+    "read_supporting_files_at_least_partially": 2,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "status": "failed",
+  "reason_codes": [
+    "confirmed_logic_gap",
+    "live_execution_not_run"
+  ],
+  "source_paths": [
+    "skills/spec-code-review/SKILL.md",
+    "skills/spec-code-review/references/modes-and-output.md",
+    "skills/spec-code-review/references/scope.md",
+    "skills/spec-code-review/references/intent-and-plan.md",
+    "skills/spec-code-review/references/finish-review.md",
+    "skills/spec-code-review/references/dispatch-reviewers.md",
+    "skills/spec-code-review/scripts/review-scope.py",
+    "skills/spec-code-review/scripts/run-python.sh",
+    "tests/unit/spec-code-review-mechanics.test.js",
+    "skills/spec-work/references/review-findings-followup.md"
+  ],
+  "source_read_ranges": {
+    "skills/spec-code-review/SKILL.md": "1-75",
+    "skills/spec-code-review/references/modes-and-output.md": "1-105",
+    "skills/spec-code-review/references/scope.md": "1-232",
+    "skills/spec-code-review/references/intent-and-plan.md": "1-81",
+    "skills/spec-code-review/references/finish-review.md": "1-319",
+    "skills/spec-code-review/references/dispatch-reviewers.md": "1-105",
+    "skills/spec-code-review/scripts/review-scope.py": "1-288",
+    "skills/spec-code-review/scripts/run-python.sh": "1-27"
+  },
+  "source_hashes": {
+    "skills/spec-code-review/SKILL.md": "78a117cff4a12d5e9af6606d358a64d099833858716104eecdd33080e6b50dea",
+    "skills/spec-code-review/references/modes-and-output.md": "cc71dee0c8266af4d57626631d9f3c23d7a9c7238461e19b81c70003e9e2d6d9",
+    "skills/spec-code-review/references/scope.md": "acc0e68f87ec07a4b00af41ed9b9234e933033999c7ac7f07b0f708ad59e485b",
+    "skills/spec-code-review/references/intent-and-plan.md": "b521b2a2b3659789bb2bfd93d03985966db7c0ff4d2f20827269adbb3094347a",
+    "skills/spec-code-review/references/finish-review.md": "2456b076bcd177e76ee1f9c4c5720891715ea250529aa977e8d4e1b3ee45f7fe",
+    "skills/spec-code-review/references/dispatch-reviewers.md": "3b04ea49927e8bf416f8917bb3ee622b76f47300bbea6573748d4c273a6cae0d",
+    "skills/spec-code-review/scripts/review-scope.py": "ba359514ba60020b18381b1b1cf9268d16056e539f2bdd8e9c109ff1b8c8cc52",
+    "skills/spec-code-review/scripts/run-python.sh": "ae5ff4417bb96ac45a8f2aee143dc0bea59fa69bf101968b543e22dd766ef7c9",
+    "tests/unit/spec-code-review-mechanics.test.js": "673ab2389164d94a53558b8a82d6143ad7224c3ac6cce1eb03523edb91c188dc",
+    "skills/spec-work/references/review-findings-followup.md": "15484ad697e0a894becde3ac0a81d50197c5467f42ed7dfd99f69a43412cf9d4"
+  },
+  "source_refs": [
+    "skills/spec-code-review/SKILL.md",
+    "skills/spec-code-review/references/modes-and-output.md",
+    "skills/spec-code-review/references/scope.md",
+    "skills/spec-code-review/references/intent-and-plan.md",
+    "skills/spec-code-review/references/finish-review.md",
+    "skills/spec-code-review/references/dispatch-reviewers.md",
+    "skills/spec-code-review/scripts/review-scope.py",
+    "skills/spec-code-review/scripts/run-python.sh",
+    "tests/unit/spec-code-review-mechanics.test.js",
+    "skills/spec-work/references/review-findings-followup.md"
+  ],
+  "evidence_paths": [
+    "review-fork-ref-probe.json",
+    "review-untracked-probe.json"
+  ],
+  "branches": [
+    {
+      "id": "B1",
+      "trigger": "positive",
+      "owner": "skills/spec-code-review",
+      "expected_output": "冻结mode:agent只读与scope",
+      "source_ref": "skills/spec-code-review/references/modes-and-output.md:31-80",
+      "status": "source-covered",
+      "negative_paths": [
+        "缺输入/权限/验证则诚实停止或降级"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "B2",
+      "trigger": "negative",
+      "owner": "skills/spec-code-review",
+      "expected_output": "PR反馈属resolve-pr-feedback；未知diff不按空处理",
+      "source_ref": "skills/spec-code-review/references/scope.md:193",
+      "status": "source-covered",
+      "negative_paths": [
+        "缺输入/权限/验证则诚实停止或降级"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "B3",
+      "trigger": "output",
+      "owner": "skills/spec-code-review",
+      "expected_output": "actionable_findings/status/artifact_path供work消费",
+      "source_ref": "skills/spec-code-review/references/finish-review.md:186-249",
+      "status": "source-covered",
+      "negative_paths": [
+        "缺输入/权限/验证则诚实停止或降级"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "B4",
+      "trigger": "stop",
+      "owner": "skills/spec-code-review",
+      "expected_output": "fork同名branch的PR_HEAD_REF未绑定headRefOid",
+      "source_ref": "skills/spec-code-review/references/scope.md:132-137",
+      "status": "failed",
+      "negative_paths": [
+        "缺输入/权限/验证则诚实停止或降级"
+      ],
+      "verification_basis": "source-and-finding-ledger",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "B5",
+      "trigger": "stop",
+      "owner": "skills/spec-code-review",
+      "expected_output": "task-owned untracked修改未进入snapshot字节比较",
+      "source_ref": "skills/spec-code-review/scripts/review-scope.py:125-139",
+      "status": "failed",
+      "negative_paths": [
+        "缺输入/权限/验证则诚实停止或降级"
+      ],
+      "verification_basis": "source-and-finding-ledger",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "B6",
+      "trigger": "recovery",
+      "owner": "skills/spec-code-review",
+      "expected_output": "无dispatch/validator故障降级，P0/P1不静默删除",
+      "source_ref": "skills/spec-code-review/references/finish-review.md:61-146",
+      "status": "source-covered",
+      "negative_paths": [
+        "缺输入/权限/验证则诚实停止或降级"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    }
+  ],
+  "consumers": [
+    "spec-lfg",
+    "spec-work"
+  ],
+  "findings": [
+    {
+      "id": "C1-CR-01",
+      "severity": "P2",
+      "title": "fork PR head ref 混源",
+      "status": "confirmed-open",
+      "ledger_ref": "finding-ledger.json"
+    },
+    {
+      "id": "C1-CR-02",
+      "severity": "P2",
+      "title": "task-owned untracked mutation 未被 snapshot 检出",
+      "status": "confirmed-open",
+      "ledger_ref": "finding-ledger.json"
+    }
+  ],
+  "limitations": [
+    "persona/validator模板、schema/mechanics、cross-model/apply链未全读",
+    "真实PR、host/provider、取消回收未执行",
+    "branch passed仅指所列源码语义连通，不是运行通过。"
+  ],
+  "recovery_point": "persona/validator模板、schema/mechanics、cross-model/apply链未全读",
+  "reviewer": "cycle1_a_exit",
+  "reviewer_adjudication": "主owner保留read范围及闭包降级；CR两候选已用隔离fixture确认，包状态升级为failed。",
+  "budget_minutes": [
+    60,
+    90
+  ],
+  "timing": {
+    "started_at": "2026-09-20T01:17:27Z",
+    "ended_at": "2026-09-20T03:00:05Z",
+    "batch_wall_seconds": 6158,
+    "per_skill_active_seconds": null,
+    "limitation": "429暂停且交叉阅读；不作单包主动耗时校准。"
+  },
+  "execution": {
+    "source_semantic_review": "ran",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "仅两项隔离fixture，非完整套件",
+    "owner_probe_refs": [
+      "review-fork-ref-probe.json",
+      "review-untracked-probe.json"
+    ]
+  },
+  "reviewer_provenance": {
+    "reviewer": "cycle1_a_exit",
+    "kind": "read-only-source-review",
+    "independent_of_product_source_author": true,
+    "limitation": "有界源码审查；不是每包新建盲评上下文，也不证明宿主行为"
+  },
+  "supporting_read_ranges": {
+    "tests/unit/spec-code-review-mechanics.test.js": "1-175",
+    "skills/spec-work/references/review-findings-followup.md": "1-88"
+  },
+  "unconfirmed_read_ranges": []
+}

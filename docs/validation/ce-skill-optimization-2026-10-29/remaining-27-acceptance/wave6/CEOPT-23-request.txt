@@ -1,0 +1,2 @@
+Resolve the disposition of every mixed feedback item and every interrupted-reply branch in pr-recovery-fixture.json using available actual helper receipts. Distinguish local fix, published ancestry, declined explanation and needs-human. No real PR write is authorized.
+Read only assigned-arm frozen Skill and the named evidence. Return an English artifact with per-case findings, exact evidence references, unresolved facets and responsible next action. Do not execute, mutate, contact external services or delegate.

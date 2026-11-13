@@ -1,0 +1,41 @@
+{
+  "schema_version": "verification-run-summary.v1",
+  "generated_at": "2026-11-02T10:31:54.844Z",
+  "profile": {
+    "source": "local",
+    "name": "S21-spec-simplify-code-repair",
+    "path": null
+  },
+  "checks": [
+    {
+      "id": "lint",
+      "service": "local",
+      "command": "npm run lint:skill-entrypoints",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "npm"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s21-spec-simplify-code-resume-20261102/logs/lint.txt",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "typecheck",
+      "service": "local",
+      "command": "npm run typecheck",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "npm"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s21-spec-simplify-code-resume-20261102/logs/typecheck.txt",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    }
+  ]
+}

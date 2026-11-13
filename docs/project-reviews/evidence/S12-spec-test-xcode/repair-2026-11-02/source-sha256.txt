@@ -1,0 +1,5 @@
+e9397a88ddba0144200a6595bf353d8676ab3919dceb56d77360390b5317069b  skills/spec-test-xcode/SKILL.md
+17edc725e7da56df5c319d2f14738b3ccb3af5dc2c76287be2e8b8ec80ed67ea  skills/spec-test-xcode/evals/cases/mcp-unavailable-stops.yaml
+dfcfbe4d0a0805e4d6a0699df52f289dde306b999bf0d139abcb2a35be9c84d5  skills/spec-test-xcode/evals/eval.yaml
+b95a896afaecc3faac598ac1de775614253ce82082210ced73937920887927ae  skills/spec-test-xcode/references/setup-and-build.md
+dba45f36ce392bee821ea849e6e2537f110c8ab714d3f7e6ba0a9a88ebe4647a  skills/spec-test-xcode/references/test-and-report.md

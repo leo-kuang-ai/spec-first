@@ -1,0 +1,11 @@
+{
+  "command": [
+    "node",
+    "--test",
+    "test/entries.test.js"
+  ],
+  "cwd": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/compound",
+  "exit_code": 0,
+  "stdout": "TAP version 13\n# Subtest: string amount is rejected instead of stored as NaN\nok 1 - string amount is rejected instead of stored as NaN\n  ---\n  duration_ms: 0.520792\n  type: 'test'\n  ...\n# Subtest: valid amount is accepted\nok 2 - valid amount is accepted\n  ---\n  duration_ms: 0.062416\n  type: 'test'\n  ...\n1..2\n# tests 2\n# suites 0\n# pass 2\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 57.95575\n",
+  "stderr": ""
+}

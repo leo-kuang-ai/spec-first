@@ -1,0 +1,291 @@
+{
+  "trial": "CEOPT-08-B1",
+  "recorded_at": "2026-10-30T07:21:36.037448+00:00",
+  "parent_intervention": "Extracted replacement_report_cjs exactly from final JSON after manual safety review. Saved to disposable report.cjs and candidate.cjs without semantic changes. Ran fixed parent process proof, not model commands.",
+  "syntax": {
+    "argv": [
+      "node",
+      "--check",
+      "report.cjs"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "cases": [
+    {
+      "size": 0,
+      "repetition": 1,
+      "baseline": {
+        "argv": [
+          "node",
+          "baseline.cjs",
+          "0"
+        ],
+        "exit_code": 0,
+        "stdout": "{\"size\":0,\"checksum\":0,\"elapsed_ms\":0.003083000000000169}\n",
+        "stderr": "",
+        "passed": true,
+        "parsed": {
+          "size": 0,
+          "checksum": 0,
+          "elapsed_ms": 0.003083000000000169
+        }
+      },
+      "candidate": {
+        "argv": [
+          "node",
+          "report.cjs",
+          "0"
+        ],
+        "exit_code": 0,
+        "stdout": "{\"size\":0,\"checksum\":0,\"elapsed_ms\":0.009000000000000341}\n",
+        "stderr": "",
+        "passed": true,
+        "parsed": {
+          "size": 0,
+          "checksum": 0,
+          "elapsed_ms": 0.009000000000000341
+        }
+      }
+    },
+    {
+      "size": 1,
+      "repetition": 1,
+      "baseline": {
+        "argv": [
+          "node",
+          "baseline.cjs",
+          "1"
+        ],
+        "exit_code": 0,
+        "stdout": "{\"size\":1,\"checksum\":3,\"elapsed_ms\":0.016874999999998863}\n",
+        "stderr": "",
+        "passed": true,
+        "parsed": {
+          "size": 1,
+          "checksum": 3,
+          "elapsed_ms": 0.016874999999998863
+        }
+      },
+      "candidate": {
+        "argv": [
+          "node",
+          "report.cjs",
+          "1"
+        ],
+        "exit_code": 0,
+        "stdout": "{\"size\":1,\"checksum\":3,\"elapsed_ms\":0.010833000000001647}\n",
+        "stderr": "",
+        "passed": true,
+        "parsed": {
+          "size": 1,
+          "checksum": 3,
+          "elapsed_ms": 0.010833000000001647
+        }
+      }
+    },
+    {
+      "size": 99,
+      "repetition": 1,
+      "baseline": {
+        "argv": [
+          "node",
+          "baseline.cjs",
+          "99"
+        ],
+        "exit_code": 0,
+        "stdout": "{\"size\":99,\"checksum\":6690,\"elapsed_ms\":0.222958000000002}\n",
+        "stderr": "",
+        "passed": true,
+        "parsed": {
+          "size": 99,
+          "checksum": 6690,
+          "elapsed_ms": 0.222958000000002
+        }
+      },
+      "candidate": {
+        "argv": [
+          "node",
+          "report.cjs",
+          "99"
+        ],
+        "exit_code": 0,
+        "stdout": "{\"size\":99,\"checksum\":6690,\"elapsed_ms\":0.07537499999999753}\n",
+        "stderr": "",
+        "passed": true,
+        "parsed": {
+          "size": 99,
+          "checksum": 6690,
+          "elapsed_ms": 0.07537499999999753
+        }
+      }
+    },
+    {
+      "size": 101,
+      "repetition": 1,
+      "baseline": {
+        "argv": [
+          "node",
+          "baseline.cjs",
+          "101"
+        ],
+        "exit_code": 0,
+        "stdout": "{\"size\":101,\"checksum\":6970,\"elapsed_ms\":0.23312500000000114}\n",
+        "stderr": "",
+        "passed": true,
+        "parsed": {
+          "size": 101,
+          "checksum": 6970,
+          "elapsed_ms": 0.23312500000000114
+        }
+      },
+      "candidate": {
+        "argv": [
+          "node",
+          "report.cjs",
+          "101"
+        ],
+        "exit_code": 0,
+        "stdout": "{\"size\":101,\"checksum\":6970,\"elapsed_ms\":0.06779099999999971}\n",
+        "stderr": "",
+        "passed": true,
+        "parsed": {
+          "size": 101,
+          "checksum": 6970,
+          "elapsed_ms": 0.06779099999999971
+        }
+      }
+    },
+    {
+      "size": 16000,
+      "repetition": 1,
+      "baseline": {
+        "argv": [
+          "node",
+          "baseline.cjs",
+          "16000"
+        ],
+        "exit_code": 0,
+        "stdout": "{\"size\":16000,\"checksum\":151188619,\"elapsed_ms\":361.724917}\n",
+        "stderr": "",
+        "passed": true,
+        "parsed": {
+          "size": 16000,
+          "checksum": 151188619,
+          "elapsed_ms": 361.724917
+        }
+      },
+      "candidate": {
+        "argv": [
+          "node",
+          "report.cjs",
+          "16000"
+        ],
+        "exit_code": 0,
+        "stdout": "{\"size\":16000,\"checksum\":151188619,\"elapsed_ms\":2.4402500000000025}\n",
+        "stderr": "",
+        "passed": true,
+        "parsed": {
+          "size": 16000,
+          "checksum": 151188619,
+          "elapsed_ms": 2.4402500000000025
+        }
+      }
+    },
+    {
+      "size": 16000,
+      "repetition": 2,
+      "baseline": {
+        "argv": [
+          "node",
+          "baseline.cjs",
+          "16000"
+        ],
+        "exit_code": 0,
+        "stdout": "{\"size\":16000,\"checksum\":151188619,\"elapsed_ms\":370.818291}\n",
+        "stderr": "",
+        "passed": true,
+        "parsed": {
+          "size": 16000,
+          "checksum": 151188619,
+          "elapsed_ms": 370.818291
+        }
+      },
+      "candidate": {
+        "argv": [
+          "node",
+          "report.cjs",
+          "16000"
+        ],
+        "exit_code": 0,
+        "stdout": "{\"size\":16000,\"checksum\":151188619,\"elapsed_ms\":2.5119589999999974}\n",
+        "stderr": "",
+        "passed": true,
+        "parsed": {
+          "size": 16000,
+          "checksum": 151188619,
+          "elapsed_ms": 2.5119589999999974
+        }
+      }
+    },
+    {
+      "size": 16000,
+      "repetition": 3,
+      "baseline": {
+        "argv": [
+          "node",
+          "baseline.cjs",
+          "16000"
+        ],
+        "exit_code": 0,
+        "stdout": "{\"size\":16000,\"checksum\":151188619,\"elapsed_ms\":384.06637500000005}\n",
+        "stderr": "",
+        "passed": true,
+        "parsed": {
+          "size": 16000,
+          "checksum": 151188619,
+          "elapsed_ms": 384.06637500000005
+        }
+      },
+      "candidate": {
+        "argv": [
+          "node",
+          "report.cjs",
+          "16000"
+        ],
+        "exit_code": 0,
+        "stdout": "{\"size\":16000,\"checksum\":151188619,\"elapsed_ms\":2.0848329999999997}\n",
+        "stderr": "",
+        "passed": true,
+        "parsed": {
+          "size": 16000,
+          "checksum": 151188619,
+          "elapsed_ms": 2.0848329999999997
+        }
+      }
+    }
+  ],
+  "profile": {
+    "argv": [
+      "node",
+      "--cpu-prof",
+      "--cpu-prof-name=candidate.cpuprofile",
+      "report.cjs",
+      "16000"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"size\":16000,\"checksum\":151188619,\"elapsed_ms\":2.2665000000000006}\n",
+    "stderr": ""
+  },
+  "proof_preserved": true,
+  "passed": true,
+  "limitations": [
+    "Process checksum equivalence is not full row identity proof.",
+    "Synthetic parent execution, no autonomous mutation or production performance claim."
+  ],
+  "cleanup": {
+    "root": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-debug-exec-ni7hibeh",
+    "removed": true
+  }
+}

@@ -1,0 +1,5 @@
+# consumers: spec-app-consistency-audit
+tests/unit/dispatch-authorization-matrix-contracts.test.js
+tests/unit/plugin-modules.test.js
+tests/unit/skill-flow-p2-closure-contracts.test.js
+tests/unit/spec-app-consistency-audit-host-boundaries.test.js

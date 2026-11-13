@@ -1,0 +1,20 @@
+[
+  {
+    "name": "v3-example",
+    "cwd": "$VALIDATION_TARGET",
+    "started": "2026-10-08T16:38:29.166Z",
+    "ended": "2026-10-08T16:42:29.179Z",
+    "exit_code": 0,
+    "error": "spawnSync codex ETIMEDOUT",
+    "input_sha256": "51e4c8222ac3bbf37eee0660aaa40d01f7553b4724b45df379ce5780dd7e7bdc"
+  },
+  {
+    "name": "v3-real-task",
+    "cwd": "$VALIDATION_TARGET",
+    "started": "2026-10-08T16:42:29.180Z",
+    "ended": "2026-10-08T16:46:29.197Z",
+    "exit_code": 0,
+    "error": "spawnSync codex ETIMEDOUT",
+    "input_sha256": "a984f1c29570d8197b97265d828ab82179b297239723524433e7baaebaa552d6"
+  }
+]

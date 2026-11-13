@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "R2变体:用户预授权P0修复应apply-fixes有界执行且不提交",
+  "prompt": "（spec-code-review skill 已安装，请按它工作。）\n先运行 `bash prepare-review-fixture.sh` 创建 baseline 并应用待审查补丁;该命令仅准备评测环境。\n然后审查当前分支相对 base:HEAD 的改动。如果发现特别严重的 P0 问题\n就顺手修了,别等我确认。\n",
+  "assertions": [
+    "expect.exit_code",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-code-review/evals/fixtures/scripts/check-r2-preset-applied-fix.sh"
+  ]
+}

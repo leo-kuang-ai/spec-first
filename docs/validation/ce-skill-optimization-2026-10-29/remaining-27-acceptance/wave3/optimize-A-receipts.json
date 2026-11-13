@@ -1,0 +1,242 @@
+{
+  "arm": "A",
+  "source_sha256": "sha256:4af1f0dfbe492193937b4317af3cb20b701e5007754296cb25b4cf498973d879",
+  "admission": {
+    "input": {
+      "schema_version": "spec-optimize-measurement-admission/v1",
+      "baseline_identity": "sha256:9a5b038b289c630fcf58c973340d6f142b1e976b263cce4238c5cbad195b7e7c",
+      "candidate_identity": "sha256:3fc185232d6d72250eb33ab3a067de32768c2a9c3c4cccf4d3a9f5cc8b8d3e10",
+      "task_or_corpus_identity": "sha256:024c56c5a7981f8b29f289263d071d4457e2f1ccc84f490342a07aa75204e936",
+      "harness_identity": "sha256:00df6e7161a2af26c303e942e6076099d50a2418eb3c0fe76b4251ae5f8fd0c4",
+      "environment_identity": "sha256:22f4b93c176de2a86ed7bb8b9b96c5ab028e2503ba363ea63f6745a70b765deb",
+      "sample_seed": 42,
+      "metric": {
+        "name": "fixture_score",
+        "direction": "maximize",
+        "aggregation": "median"
+      },
+      "aa_repetitions": 2,
+      "preregistered_acceptance_threshold": 0.03,
+      "noise_ceiling": 0.01,
+      "broken_run_policy": {
+        "max_retries": 1,
+        "synthetic_scores": false
+      },
+      "stop_budget": {
+        "max_attempts": 6,
+        "timeout_seconds": 600
+      }
+    },
+    "exit_code": 0,
+    "stdout": "{\n  \"status\": \"admitted\",\n  \"reason_code\": \"measurement-admission-valid\",\n  \"schema_version\": \"spec-optimize-measurement-admission/v1\",\n  \"admission_sha256\": \"sha256:ba5e1e399c680ab693e8c4e6fa223e84ef328344322624e226df1ab4ff9ddfcd\",\n  \"normalized_admission\": {\n    \"schema_version\": \"spec-optimize-measurement-admission/v1\",\n    \"baseline_identity\": \"sha256:9a5b038b289c630fcf58c973340d6f142b1e976b263cce4238c5cbad195b7e7c\",\n    \"candidate_identity\": \"sha256:3fc185232d6d72250eb33ab3a067de32768c2a9c3c4cccf4d3a9f5cc8b8d3e10\",\n    \"task_or_corpus_identity\": \"sha256:024c56c5a7981f8b29f289263d071d4457e2f1ccc84f490342a07aa75204e936\",\n    \"harness_identity\": \"sha256:00df6e7161a2af26c303e942e6076099d50a2418eb3c0fe76b4251ae5f8fd0c4\",\n    \"environment_identity\": \"sha256:22f4b93c176de2a86ed7bb8b9b96c5ab028e2503ba363ea63f6745a70b765deb\",\n    \"sample_seed\": 42,\n    \"metric\": {\n      \"name\": \"fixture_score\",\n      \"direction\": \"maximize\",\n      \"aggregation\": \"median\"\n    },\n    \"aa_repetitions\": 2,\n    \"preregistered_acceptance_threshold\": 0.03,\n    \"noise_ceiling\": 0.01,\n    \"broken_run_policy\": {\n      \"max_retries\": 1,\n      \"synthetic_scores\": false\n    },\n    \"stop_budget\": {\n      \"max_attempts\": 6,\n      \"timeout_seconds\": 600\n    }\n  }\n}\n",
+    "stderr": "",
+    "output": {
+      "status": "admitted",
+      "reason_code": "measurement-admission-valid",
+      "schema_version": "spec-optimize-measurement-admission/v1",
+      "admission_sha256": "sha256:ba5e1e399c680ab693e8c4e6fa223e84ef328344322624e226df1ab4ff9ddfcd",
+      "normalized_admission": {
+        "schema_version": "spec-optimize-measurement-admission/v1",
+        "baseline_identity": "sha256:9a5b038b289c630fcf58c973340d6f142b1e976b263cce4238c5cbad195b7e7c",
+        "candidate_identity": "sha256:3fc185232d6d72250eb33ab3a067de32768c2a9c3c4cccf4d3a9f5cc8b8d3e10",
+        "task_or_corpus_identity": "sha256:024c56c5a7981f8b29f289263d071d4457e2f1ccc84f490342a07aa75204e936",
+        "harness_identity": "sha256:00df6e7161a2af26c303e942e6076099d50a2418eb3c0fe76b4251ae5f8fd0c4",
+        "environment_identity": "sha256:22f4b93c176de2a86ed7bb8b9b96c5ab028e2503ba363ea63f6745a70b765deb",
+        "sample_seed": 42,
+        "metric": {
+          "name": "fixture_score",
+          "direction": "maximize",
+          "aggregation": "median"
+        },
+        "aa_repetitions": 2,
+        "preregistered_acceptance_threshold": 0.03,
+        "noise_ceiling": 0.01,
+        "broken_run_policy": {
+          "max_retries": 1,
+          "synthetic_scores": false
+        },
+        "stop_budget": {
+          "max_attempts": 6,
+          "timeout_seconds": 600
+        }
+      }
+    }
+  },
+  "cases": [
+    {
+      "case": "false-zero-noise",
+      "synthetic_result_files": [
+        {
+          "name": "result-0.json",
+          "content": {
+            "schema_version": "spec-optimize-measurement-result/v1",
+            "run_id": "false-zero-noise-0",
+            "source_identity": "sha256:9a5b038b289c630fcf58c973340d6f142b1e976b263cce4238c5cbad195b7e7c",
+            "admission_sha256": "sha256:ba5e1e399c680ab693e8c4e6fa223e84ef328344322624e226df1ab4ff9ddfcd",
+            "status": "completed",
+            "exit_code": 0,
+            "score": 0
+          },
+          "sha256": "sha256:60abf6229857dae5a75b6d3a78e21b02caf92886b45159c15bc0fefbc0d9b446"
+        },
+        {
+          "name": "result-1.json",
+          "content": {
+            "schema_version": "spec-optimize-measurement-result/v1",
+            "run_id": "false-zero-noise-1",
+            "source_identity": "sha256:9a5b038b289c630fcf58c973340d6f142b1e976b263cce4238c5cbad195b7e7c",
+            "admission_sha256": "sha256:ba5e1e399c680ab693e8c4e6fa223e84ef328344322624e226df1ab4ff9ddfcd",
+            "status": "completed",
+            "exit_code": 0,
+            "score": 100
+          },
+          "sha256": "sha256:d15d7c915b85f9c1024634c04705e5d6d0debf3787411086e793f0157633e68c"
+        }
+      ],
+      "helper": {
+        "input": {
+          "admission": {
+            "schema_version": "spec-optimize-measurement-admission/v1",
+            "baseline_identity": "sha256:9a5b038b289c630fcf58c973340d6f142b1e976b263cce4238c5cbad195b7e7c",
+            "candidate_identity": "sha256:3fc185232d6d72250eb33ab3a067de32768c2a9c3c4cccf4d3a9f5cc8b8d3e10",
+            "task_or_corpus_identity": "sha256:024c56c5a7981f8b29f289263d071d4457e2f1ccc84f490342a07aa75204e936",
+            "harness_identity": "sha256:00df6e7161a2af26c303e942e6076099d50a2418eb3c0fe76b4251ae5f8fd0c4",
+            "environment_identity": "sha256:22f4b93c176de2a86ed7bb8b9b96c5ab028e2503ba363ea63f6745a70b765deb",
+            "sample_seed": 42,
+            "metric": {
+              "name": "fixture_score",
+              "direction": "maximize",
+              "aggregation": "median"
+            },
+            "aa_repetitions": 2,
+            "preregistered_acceptance_threshold": 0.03,
+            "noise_ceiling": 0.01,
+            "broken_run_policy": {
+              "max_retries": 1,
+              "synthetic_scores": false
+            },
+            "stop_budget": {
+              "max_attempts": 6,
+              "timeout_seconds": 600
+            }
+          },
+          "admission_sha256": "sha256:ba5e1e399c680ab693e8c4e6fa223e84ef328344322624e226df1ab4ff9ddfcd",
+          "aa_attempts": [
+            {
+              "status": "completed",
+              "admission_sha256": "sha256:ba5e1e399c680ab693e8c4e6fa223e84ef328344322624e226df1ab4ff9ddfcd",
+              "score": 0
+            },
+            {
+              "status": "completed",
+              "admission_sha256": "sha256:ba5e1e399c680ab693e8c4e6fa223e84ef328344322624e226df1ab4ff9ddfcd",
+              "score": 100
+            }
+          ],
+          "observed_noise_floor": 0
+        },
+        "exit_code": 0,
+        "stdout": "{\n  \"status\": \"allowed\",\n  \"reason_code\": \"aa-calibration-passed\",\n  \"admission_sha256\": \"sha256:ba5e1e399c680ab693e8c4e6fa223e84ef328344322624e226df1ab4ff9ddfcd\",\n  \"completed_aa_attempts\": 2,\n  \"observed_noise_floor\": 0,\n  \"ab_allowed\": true\n}\n",
+        "stderr": "",
+        "output": {
+          "status": "allowed",
+          "reason_code": "aa-calibration-passed",
+          "admission_sha256": "sha256:ba5e1e399c680ab693e8c4e6fa223e84ef328344322624e226df1ab4ff9ddfcd",
+          "completed_aa_attempts": 2,
+          "observed_noise_floor": 0,
+          "ab_allowed": true
+        }
+      }
+    },
+    {
+      "case": "stable-control",
+      "synthetic_result_files": [
+        {
+          "name": "result-0.json",
+          "content": {
+            "schema_version": "spec-optimize-measurement-result/v1",
+            "run_id": "stable-control-0",
+            "source_identity": "sha256:9a5b038b289c630fcf58c973340d6f142b1e976b263cce4238c5cbad195b7e7c",
+            "admission_sha256": "sha256:ba5e1e399c680ab693e8c4e6fa223e84ef328344322624e226df1ab4ff9ddfcd",
+            "status": "completed",
+            "exit_code": 0,
+            "score": 0.001
+          },
+          "sha256": "sha256:459fd5c408b47c4b37ff6fe5923c9dd694b9a80c45634c12d0a3ce7b05d40a1d"
+        },
+        {
+          "name": "result-1.json",
+          "content": {
+            "schema_version": "spec-optimize-measurement-result/v1",
+            "run_id": "stable-control-1",
+            "source_identity": "sha256:9a5b038b289c630fcf58c973340d6f142b1e976b263cce4238c5cbad195b7e7c",
+            "admission_sha256": "sha256:ba5e1e399c680ab693e8c4e6fa223e84ef328344322624e226df1ab4ff9ddfcd",
+            "status": "completed",
+            "exit_code": 0,
+            "score": 0.002
+          },
+          "sha256": "sha256:2241fc41246a76bf4facb590482632438a1b692b61bb51d11d2d03a1a5bb92a9"
+        }
+      ],
+      "helper": {
+        "input": {
+          "admission": {
+            "schema_version": "spec-optimize-measurement-admission/v1",
+            "baseline_identity": "sha256:9a5b038b289c630fcf58c973340d6f142b1e976b263cce4238c5cbad195b7e7c",
+            "candidate_identity": "sha256:3fc185232d6d72250eb33ab3a067de32768c2a9c3c4cccf4d3a9f5cc8b8d3e10",
+            "task_or_corpus_identity": "sha256:024c56c5a7981f8b29f289263d071d4457e2f1ccc84f490342a07aa75204e936",
+            "harness_identity": "sha256:00df6e7161a2af26c303e942e6076099d50a2418eb3c0fe76b4251ae5f8fd0c4",
+            "environment_identity": "sha256:22f4b93c176de2a86ed7bb8b9b96c5ab028e2503ba363ea63f6745a70b765deb",
+            "sample_seed": 42,
+            "metric": {
+              "name": "fixture_score",
+              "direction": "maximize",
+              "aggregation": "median"
+            },
+            "aa_repetitions": 2,
+            "preregistered_acceptance_threshold": 0.03,
+            "noise_ceiling": 0.01,
+            "broken_run_policy": {
+              "max_retries": 1,
+              "synthetic_scores": false
+            },
+            "stop_budget": {
+              "max_attempts": 6,
+              "timeout_seconds": 600
+            }
+          },
+          "admission_sha256": "sha256:ba5e1e399c680ab693e8c4e6fa223e84ef328344322624e226df1ab4ff9ddfcd",
+          "aa_attempts": [
+            {
+              "status": "completed",
+              "admission_sha256": "sha256:ba5e1e399c680ab693e8c4e6fa223e84ef328344322624e226df1ab4ff9ddfcd",
+              "score": 0.001
+            },
+            {
+              "status": "completed",
+              "admission_sha256": "sha256:ba5e1e399c680ab693e8c4e6fa223e84ef328344322624e226df1ab4ff9ddfcd",
+              "score": 0.002
+            }
+          ],
+          "observed_noise_floor": 0
+        },
+        "exit_code": 0,
+        "stdout": "{\n  \"status\": \"allowed\",\n  \"reason_code\": \"aa-calibration-passed\",\n  \"admission_sha256\": \"sha256:ba5e1e399c680ab693e8c4e6fa223e84ef328344322624e226df1ab4ff9ddfcd\",\n  \"completed_aa_attempts\": 2,\n  \"observed_noise_floor\": 0,\n  \"ab_allowed\": true\n}\n",
+        "stderr": "",
+        "output": {
+          "status": "allowed",
+          "reason_code": "aa-calibration-passed",
+          "admission_sha256": "sha256:ba5e1e399c680ab693e8c4e6fa223e84ef328344322624e226df1ab4ff9ddfcd",
+          "completed_aa_attempts": 2,
+          "observed_noise_floor": 0,
+          "ab_allowed": true
+        }
+      }
+    }
+  ],
+  "evidence_type": "Synthetic validator counterexample/control. Actual helper exits, not actual model quality or authenticated runner evidence.",
+  "limitations": [
+    "A v1 and B v2 use their native valid schemas; no schema mismatch counted as task failure.",
+    "Synthetic fixture result files test validator behavior only and cannot authorize real optimization."
+  ]
+}

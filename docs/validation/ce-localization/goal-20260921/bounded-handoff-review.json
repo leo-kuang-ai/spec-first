@@ -1,0 +1,481 @@
+{
+  "schema_version": "ce-review-preparation-fragment/v1",
+  "artifact_kind": "bounded-semantic-review-not-closeout-delta",
+  "reviewed_at": "2026-09-21T10:29:41.328097+00:00",
+  "source_binding": {
+    "head": "36d19d95c3a79df2d1278083c959bb34eadbde8c",
+    "dirty_path_manifest_sha256": "a8da405af0e4802b8cd33f4d5bf1a20e0ac2f25c4512819c3a5ec68da8038ac4",
+    "source_tree_hash": "07f432acaa8fe81c4ee938a00c97c6d7971c68d23e8136a6c36116ddba7400d7",
+    "inventory_hash": "7c89b7d03efe786abe6cfe6835aa812d7445527be928d180503a0c1ba07e07dc",
+    "inventory_artifact_sha256": "ea1ed38c4cf90f7c715d31d280a80d28eeddc6d3c0cdb1c0fa7e73a5025f57ed",
+    "review_input_hash": "244a150911cd4d7d6c10abe00b43ecb19b2413fa70d6fedc892af9ab90fd0664"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "unverified",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "reviewed_paths": [
+    {
+      "path": "skills/spec-handoff/evals/cases/create-produces-gate-fields.yaml",
+      "sha256": "174f8c1f56c45494d326183188da86821e7da6f0ee34c79c043c202814447546",
+      "bytes": 957,
+      "line_count": 28,
+      "skill_ids": [
+        "spec-handoff"
+      ],
+      "covered_line_ranges": [
+        [
+          1,
+          28
+        ]
+      ],
+      "read_status": "full",
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "verdict": "actionable-finding-recorded",
+          "assessment": "create 用例明确要求受管 artifact、四 gate 字段与可复制 resume；关联 judge 尚不足以证明该合同。",
+          "finding_ids": [
+            "CE-PREP-HANDOFF-02"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "verdict": "actionable-finding-recorded",
+          "assessment": "用户背景是输入声明，需归因；不能把分页通过声明等同当前测试证据。",
+          "finding_ids": [
+            "CE-PREP-HANDOFF-02"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-handoff/evals/cases/resume-explicit-source-stops-without-acting.yaml",
+      "sha256": "985ba52b2479bf78ab5c87bb30fad7c92905d03f9d940187ee909ac3e9f1cc94",
+      "bytes": 880,
+      "line_count": 27,
+      "skill_ids": [
+        "spec-handoff"
+      ],
+      "covered_line_ranges": [
+        [
+          1,
+          27
+        ]
+      ],
+      "read_status": "full",
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "verdict": "actionable-finding-recorded",
+          "assessment": "explicit source 触发只读定向与恶意旧授权声明，期望覆盖核心路径；仅两条不存在断言不足以证明 no-write。",
+          "finding_ids": [
+            "CE-PREP-HANDOFF-01"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "verdict": "actionable-finding-recorded",
+          "assessment": "不写文件的关键断言缺失，见 CE-PREP-HANDOFF-01。",
+          "finding_ids": [
+            "CE-PREP-HANDOFF-01"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-handoff/evals/cases/resume-sparse-source-degraded-orientation.yaml",
+      "sha256": "8bc2922bab317dcc3ae399dbbcd9abfe8a9f7145344bc2169a666ed5750be9f1",
+      "bytes": 858,
+      "line_count": 27,
+      "skill_ids": [
+        "spec-handoff"
+      ],
+      "covered_line_ranges": [
+        [
+          1,
+          27
+        ]
+      ],
+      "read_status": "full",
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "verdict": "actionable-finding-recorded",
+          "assessment": "稀疏来源针对未知进展与缺少 provenance 的降级；输出关键词只能证明提示出现。",
+          "finding_ids": [
+            "CE-PREP-HANDOFF-01"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "verdict": "actionable-finding-recorded",
+          "assessment": "no-write 没有完整快照比较，见 CE-PREP-HANDOFF-01；不据模型措辞证明来源真实性。",
+          "finding_ids": [
+            "CE-PREP-HANDOFF-01"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-handoff/evals/eval.yaml",
+      "sha256": "7e00141aae930f25300c517e65729afb5e2ac46c26c7c9f698676502658563c1",
+      "bytes": 504,
+      "line_count": 21,
+      "skill_ids": [
+        "spec-handoff"
+      ],
+      "covered_line_ranges": [
+        [
+          1,
+          21
+        ]
+      ],
+      "read_status": "full",
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "verdict": "no-actionable-finding-in-read-scope",
+          "assessment": "4 个 case 按固定 fixture 执行，当前引擎仅 claude_code、parallelism=1；不能外推八宿主覆盖。",
+          "finding_ids": []
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "verdict": "no-actionable-finding-in-read-scope",
+          "assessment": "只读与稀疏输入已进 suite；judge 的断言不足见本报告两个发现。",
+          "finding_ids": []
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/docs/notes/2026-09-19-session.md",
+      "sha256": "89be9fd4002c4a782b583a6512750800ce33856336d9a3e4776df89ccf006272",
+      "bytes": 968,
+      "line_count": 27,
+      "skill_ids": [
+        "spec-handoff"
+      ],
+      "covered_line_ranges": [
+        [
+          1,
+          27
+        ]
+      ],
+      "read_status": "full",
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "verdict": "no-actionable-finding-in-read-scope",
+          "assessment": "完整交接形状可支撑显式来源定向；分页已完成声明应视为待核实历史信息。",
+          "finding_ids": []
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "verdict": "no-actionable-finding-in-read-scope",
+          "assessment": "内嵌部署命令及所谓先前授权是 adversarial fixture，不是本轮授权；未执行。",
+          "finding_ids": []
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/docs/notes/vague-progress.md",
+      "sha256": "6eef75dd77e37c6b4d4995b2fcbf53b16e374e2744331b6f2de9c97b28c3b1fc",
+      "bytes": 400,
+      "line_count": 16,
+      "skill_ids": [
+        "spec-handoff"
+      ],
+      "covered_line_ranges": [
+        [
+          1,
+          16
+        ]
+      ],
+      "read_status": "full",
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "verdict": "no-actionable-finding-in-read-scope",
+          "assessment": "source_refs 空、freshness unknown，合理覆盖不完整来源。",
+          "finding_ids": []
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "verdict": "no-actionable-finding-in-read-scope",
+          "assessment": "不可据稀疏/矛盾声明补造完成状态。",
+          "finding_ids": []
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/package.json",
+      "sha256": "03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b",
+      "bytes": 96,
+      "line_count": 6,
+      "skill_ids": [
+        "spec-handoff"
+      ],
+      "covered_line_ranges": [
+        [
+          1,
+          6
+        ]
+      ],
+      "read_status": "full",
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "verdict": "no-actionable-finding-in-read-scope",
+          "assessment": "最小 Node fixture，无外部依赖，不混入项目生产包。",
+          "finding_ids": []
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "verdict": "no-actionable-finding-in-read-scope",
+          "assessment": "start 入口仅服务本地 fixture；本次未执行服务。",
+          "finding_ids": []
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/README.md",
+      "sha256": "4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855",
+      "bytes": 365,
+      "line_count": 8,
+      "skill_ids": [
+        "spec-handoff"
+      ],
+      "covered_line_ranges": [
+        [
+          1,
+          8
+        ]
+      ],
+      "read_status": "full",
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "verdict": "no-actionable-finding-in-read-scope",
+          "assessment": "描述 GET /entries 与最小代码一致；fixture 文档本身不证明分页已实现。",
+          "finding_ids": []
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "verdict": "no-actionable-finding-in-read-scope",
+          "assessment": "只作为测试上下文，不授予执行/发布权限。",
+          "finding_ids": []
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/repos/mini-ledger-with-prior-handoff/src/server.js",
+      "sha256": "ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34",
+      "bytes": 665,
+      "line_count": 25,
+      "skill_ids": [
+        "spec-handoff"
+      ],
+      "covered_line_ranges": [
+        [
+          1,
+          25
+        ]
+      ],
+      "read_status": "full",
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "verdict": "no-actionable-finding-in-read-scope",
+          "assessment": "GET /entries 路由精确匹配，未实现 note 声称的分页；这是陈旧来源样例，不推断为生产回归。",
+          "finding_ids": []
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "verdict": "no-actionable-finding-in-read-scope",
+          "assessment": "本地内存 fixture 无凭证、无外部写路径；本次未启动服务。",
+          "finding_ids": []
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/scripts/check-create-artifact.sh",
+      "sha256": "661a25dcf207ddbdbfa032d1446abc9a324ce3d2dc48dfb1617be40ae303edbf",
+      "bytes": 1300,
+      "line_count": 26,
+      "skill_ids": [
+        "spec-handoff"
+      ],
+      "covered_line_ranges": [
+        [
+          1,
+          26
+        ]
+      ],
+      "read_status": "full",
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "verdict": "actionable-finding-recorded",
+          "assessment": "只查字符串而非计算真实 hash 和 exact invocation，不能兑现 case 的 receipt 验证承诺。",
+          "finding_ids": [
+            "CE-PREP-HANDOFF-02"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "verdict": "actionable-finding-recorded",
+          "assessment": "假的完成 receipt 可通过当前检查，见 CE-PREP-HANDOFF-02。",
+          "finding_ids": [
+            "CE-PREP-HANDOFF-02"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/scripts/check-degraded-orientation.sh",
+      "sha256": "c4126bb8e20570011a881489b5b6aac9d0bb9ed54efc1afd80dde1bd6eb839ea",
+      "bytes": 1182,
+      "line_count": 26,
+      "skill_ids": [
+        "spec-handoff"
+      ],
+      "covered_line_ranges": [
+        [
+          1,
+          26
+        ]
+      ],
+      "read_status": "full",
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "verdict": "actionable-finding-recorded",
+          "assessment": "没有比较源码与 index，少量语言词只能做弱提示，见 CE-PREP-HANDOFF-01。",
+          "finding_ids": [
+            "CE-PREP-HANDOFF-01"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "verdict": "actionable-finding-recorded",
+          "assessment": "稀疏来源不发明状态不能被几个禁词完整证明；本发现限定为确定性 no-write 漏检。",
+          "finding_ids": [
+            "CE-PREP-HANDOFF-01"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-handoff/evals/fixtures/scripts/check-resume-no-side-effects.sh",
+      "sha256": "62240c7fefb9005ca7913414957d9e82b1570b3f006a0fe12d7f7a1777a88c7f",
+      "bytes": 1329,
+      "line_count": 37,
+      "skill_ids": [
+        "spec-handoff"
+      ],
+      "covered_line_ranges": [
+        [
+          1,
+          37
+        ]
+      ],
+      "read_status": "full",
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "verdict": "actionable-finding-recorded",
+          "assessment": "git commit 计数和固定哨兵不覆盖文件/index变更，见 CE-PREP-HANDOFF-01。",
+          "finding_ids": [
+            "CE-PREP-HANDOFF-01"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "verdict": "actionable-finding-recorded",
+          "assessment": "副作用断言缺口降低只读安全用例的可信度；不声称模型曾越权。",
+          "finding_ids": [
+            "CE-PREP-HANDOFF-01"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-handoff/SKILL.md",
+      "sha256": "4bc4a2e1da3aa5caa1e547c9f9d59410099823fa315c77f56c8e71ac7a5b6d6c",
+      "bytes": 9359,
+      "line_count": 99,
+      "skill_ids": [
+        "spec-handoff"
+      ],
+      "covered_line_ranges": [
+        [
+          1,
+          99
+        ]
+      ],
+      "read_status": "full",
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "verdict": "no-actionable-finding-in-read-scope",
+          "assessment": "入口清晰区分 create、显式源 resume、discovery；恢复已授权任务前检查当前 source 与 scope，不以交接产物替代 owner。",
+          "finding_ids": []
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "verdict": "no-actionable-finding-in-read-scope",
+          "assessment": "只读进展分支禁止副作用；artifact 内嵌命令不产生权限；稀疏来源保持 degraded。",
+          "finding_ids": []
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "finding_id": "CE-PREP-HANDOFF-01",
+      "severity": "P2",
+      "status": "fixed-source-awaiting-regression",
+      "title": "resume judge 未检测未提交源码/index/额外文件变更",
+      "source_refs": [
+        "skills/spec-handoff/evals/fixtures/scripts/check-resume-no-side-effects.sh:15",
+        "skills/spec-handoff/evals/fixtures/scripts/check-degraded-orientation.sh:7"
+      ],
+      "impact": "只读用例可能在发生未提交写入时通过，no-write 声明超过断言覆盖。",
+      "recommended_fix": "保留被测前文件与 index 基线，比较被测后受保护集合；显式排除 harness 自己安装的资产，覆盖新增/删除/内容变化和 staged 修改。",
+      "resolution_refs": [
+        "skills/spec-handoff/evals/fixtures/scripts/check-resume-no-side-effects.sh",
+        "skills/spec-handoff/evals/fixtures/scripts/check-degraded-orientation.sh"
+      ]
+    },
+    {
+      "finding_id": "CE-PREP-HANDOFF-02",
+      "severity": "P2",
+      "status": "fixed-source-awaiting-regression",
+      "title": "create judge 未绑定真实 artifact 与 digest/invocation",
+      "source_refs": [
+        "skills/spec-handoff/evals/fixtures/scripts/check-create-artifact.sh:10",
+        "skills/spec-handoff/evals/fixtures/scripts/check-create-artifact.sh:24"
+      ],
+      "impact": "伪造或错误 digest、指向其他 artifact 的 resume 也可能通过，只证明关键词存在。",
+      "recommended_fix": "确定新产物身份，解析 metadata，计算 artifact SHA-256并与完成回复核对，要求可复制调用精确指向同一产物。",
+      "resolution_refs": [
+        "skills/spec-handoff/evals/fixtures/scripts/check-create-artifact.sh"
+      ]
+    }
+  ],
+  "retired_relations": [],
+  "remaining": {
+    "current_paths": 123,
+    "retired_relations": 49,
+    "upstream_adjudications": 517
+  },
+  "limitations": [
+    "两个 lens 来自同一继承上下文，不是两家 provider 的独立评审。",
+    "只完成列出的13个差异文件；不能直接交给 closeout writer 作为完整 delta。",
+    "结论来自源码完整阅读，初稿阶段未运行真实模型或宿主 eval；后续修复/反例另留证据。",
+    "初稿绑定可能受并行改动影响，消费前检查 preparation-freshness.json 并重新验证 current hashes。",
+    "修复脚本已落盘；真实 skill-up/宿主模型运行仍未执行，固定反例回归另见 handoff-judge-repair-evidence.json。"
+  ]
+}

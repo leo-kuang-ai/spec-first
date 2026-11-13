@@ -1,0 +1,46 @@
+TAP version 13
+# Subtest: string amount is rejected instead of stored as NaN
+not ok 1 - string amount is rejected instead of stored as NaN
+  ---
+  duration_ms: 0.460125
+  type: 'test'
+  location: '/Users/kuang/xiaobu/spec-first/skills/spec-compound/evals/fixtures/repos/solved-ledger/test/entries.test.js:5:1'
+  failureType: 'testCodeFailure'
+  error: 'parseEntry is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (/Users/kuang/xiaobu/spec-first/skills/spec-compound/evals/fixtures/repos/solved-ledger/test/entries.test.js:6:22)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: valid amount is accepted
+not ok 2 - valid amount is accepted
+  ---
+  duration_ms: 0.063125
+  type: 'test'
+  location: '/Users/kuang/xiaobu/spec-first/skills/spec-compound/evals/fixtures/repos/solved-ledger/test/entries.test.js:9:1'
+  failureType: 'testCodeFailure'
+  error: 'parseEntry is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (/Users/kuang/xiaobu/spec-first/skills/spec-compound/evals/fixtures/repos/solved-ledger/test/entries.test.js:10:25)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 53.326875

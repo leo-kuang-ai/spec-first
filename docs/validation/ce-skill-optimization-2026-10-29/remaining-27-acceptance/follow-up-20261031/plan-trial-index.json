@@ -1,0 +1,200 @@
+[
+  {
+    "id": "CEOPT-16-input3-A1",
+    "scenario_id": "CEOPT-16",
+    "input_revision": "input3-new-synthetic-contract",
+    "arm": "A",
+    "trial": 1,
+    "session_id": "01a19204-2dd4-7700-953a-6a4bb0b79be9",
+    "agent_path": "/root/ce_followup_plan_a1",
+    "started_at": "2026-10-31T12:51:49.976Z",
+    "final_at": "2026-10-31T12:56:03.608Z",
+    "elapsed_seconds": 253.632,
+    "deadline_seconds": 600,
+    "timing_admission": "passed",
+    "final_model_artifact_available": true,
+    "artifact_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/plan-trials/CEOPT-16-input3-A1/artifact.md",
+    "artifact_sha256": "5b9e07c6616034e324139d2f5f09c38647be66b1006c0ccfece409b392f6ee79",
+    "trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/plan-trials/CEOPT-16-input3-A1/trace.json",
+    "trace_sha256": "7939688899b0acd1653d420a4e441de0c9f045b5552033a061be8db79f408f8b",
+    "source_protocol_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/plan-input3-protocol.json",
+    "source_protocol_sha256": "e5f898179edc9567b7751401b366949d4a828a31206b51931ff430e3dfc714bc",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "medium"
+      }
+    ],
+    "parent_intervention": "Final wording unchanged; one terminal newline added. Parent-mediated save, not autonomous publication.",
+    "limitations": [
+      "Unauthenticated serving metadata",
+      "Observed read-only trace, not enforced isolation",
+      "New synthetic input does not retrospectively complete original scenario"
+    ]
+  },
+  {
+    "id": "CEOPT-16-input3-A2",
+    "scenario_id": "CEOPT-16",
+    "input_revision": "input3-new-synthetic-contract",
+    "arm": "A",
+    "trial": 2,
+    "session_id": "01a19211-0a61-79e3-aba5-22367515cf98",
+    "agent_path": "/root/ce_followup_plan_a2",
+    "started_at": "2026-10-31T13:05:52.877Z",
+    "final_at": "2026-10-31T13:10:33.894Z",
+    "elapsed_seconds": 281.017,
+    "deadline_seconds": 600,
+    "timing_admission": "passed",
+    "final_model_artifact_available": true,
+    "artifact_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/plan-trials/CEOPT-16-input3-A2/artifact.md",
+    "artifact_sha256": "fee58d2dbbce55da0ad859a09bd88fcd4478bff77d43ce3908500ff188fcfcd0",
+    "trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/plan-trials/CEOPT-16-input3-A2/trace.json",
+    "trace_sha256": "db463b3fd5938313136b63d34b4741f14ecaa620fc6b59bce6f5c32864ddefdb",
+    "source_protocol_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/plan-input3-protocol.json",
+    "source_protocol_sha256": "e5f898179edc9567b7751401b366949d4a828a31206b51931ff430e3dfc714bc",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "medium"
+      }
+    ],
+    "parent_intervention": "Final wording unchanged; one terminal newline added. Parent-mediated save, not autonomous publication.",
+    "limitations": [
+      "Unauthenticated serving metadata",
+      "Observed read-only trace, not enforced isolation",
+      "New synthetic input does not retrospectively complete original scenario"
+    ]
+  },
+  {
+    "id": "CEOPT-16-input3-A3",
+    "scenario_id": "CEOPT-16",
+    "input_revision": "input3-new-synthetic-contract",
+    "arm": "A",
+    "trial": 3,
+    "session_id": "01a19215-8690-7903-a850-a88a67676d49",
+    "agent_path": "/root/ce_followup_plan_a3",
+    "started_at": "2026-10-31T13:10:46.811Z",
+    "final_at": "2026-10-31T13:15:07.144Z",
+    "elapsed_seconds": 260.333,
+    "deadline_seconds": 600,
+    "timing_admission": "passed",
+    "final_model_artifact_available": true,
+    "artifact_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/plan-trials/CEOPT-16-input3-A3/artifact.md",
+    "artifact_sha256": "5b6758d2beb6acea1fb0d63efe0440218b4d0ce5ff57b31efe7e8f100add7cd5",
+    "trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/plan-trials/CEOPT-16-input3-A3/trace.json",
+    "trace_sha256": "df065b6eb70d5fe2812648cbef02b7ef0f2de48650b9aff4fccbb9ba22ae1478",
+    "source_protocol_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/plan-input3-protocol.json",
+    "source_protocol_sha256": "e5f898179edc9567b7751401b366949d4a828a31206b51931ff430e3dfc714bc",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "medium"
+      }
+    ],
+    "parent_intervention": "Final wording unchanged; one terminal newline added. Parent-mediated save, not autonomous publication.",
+    "limitations": [
+      "Unauthenticated serving metadata",
+      "Observed read-only trace, not enforced isolation",
+      "New synthetic input does not retrospectively complete original scenario"
+    ]
+  },
+  {
+    "id": "CEOPT-16-input3-B1",
+    "scenario_id": "CEOPT-16",
+    "input_revision": "input3-new-synthetic-contract",
+    "arm": "B",
+    "trial": 1,
+    "session_id": "01a19208-aa53-7661-baf0-883138f1c001",
+    "agent_path": "/root/ce_followup_plan_b1",
+    "started_at": "2026-10-31T12:56:44.000Z",
+    "final_at": "2026-10-31T13:00:50.330Z",
+    "elapsed_seconds": 246.33,
+    "deadline_seconds": 600,
+    "timing_admission": "passed",
+    "final_model_artifact_available": true,
+    "artifact_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/plan-trials/CEOPT-16-input3-B1/artifact.md",
+    "artifact_sha256": "37722983a9454b5e153d9bf054b97c4b2c0320539c172a72e3d6d04291146fcc",
+    "trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/plan-trials/CEOPT-16-input3-B1/trace.json",
+    "trace_sha256": "7b87918da517f7ef8ebbcb4b1421fc6b29a6a649db3d420aa40e3b36eaca5cab",
+    "source_protocol_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/plan-input3-protocol.json",
+    "source_protocol_sha256": "e5f898179edc9567b7751401b366949d4a828a31206b51931ff430e3dfc714bc",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "medium"
+      }
+    ],
+    "parent_intervention": "Final wording unchanged; one terminal newline added. Parent-mediated save, not autonomous publication.",
+    "limitations": [
+      "Unauthenticated serving metadata",
+      "Observed read-only trace, not enforced isolation",
+      "New synthetic input does not retrospectively complete original scenario"
+    ]
+  },
+  {
+    "id": "CEOPT-16-input3-B2",
+    "scenario_id": "CEOPT-16",
+    "input_revision": "input3-new-synthetic-contract",
+    "arm": "B",
+    "trial": 2,
+    "session_id": "01a1920c-9bac-7441-b65f-392b04c7f2fd",
+    "agent_path": "/root/ce_followup_plan_b2",
+    "started_at": "2026-10-31T13:01:02.394Z",
+    "final_at": "2026-10-31T13:05:42.145Z",
+    "elapsed_seconds": 279.751,
+    "deadline_seconds": 600,
+    "timing_admission": "passed",
+    "final_model_artifact_available": true,
+    "artifact_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/plan-trials/CEOPT-16-input3-B2/artifact.md",
+    "artifact_sha256": "68dc816dbca3f2661699a0b35e11bf3d7e12be84576b59324105d4eebdfceb87",
+    "trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/plan-trials/CEOPT-16-input3-B2/trace.json",
+    "trace_sha256": "cbf9dc7ee72fedab5a7824883f87855eeb39a7352cb2331230d4bf1a5a01496b",
+    "source_protocol_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/plan-input3-protocol.json",
+    "source_protocol_sha256": "e5f898179edc9567b7751401b366949d4a828a31206b51931ff430e3dfc714bc",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "medium"
+      }
+    ],
+    "parent_intervention": "Final wording unchanged; one terminal newline added. Parent-mediated save, not autonomous publication.",
+    "limitations": [
+      "Unauthenticated serving metadata",
+      "Observed read-only trace, not enforced isolation",
+      "New synthetic input does not retrospectively complete original scenario"
+    ]
+  },
+  {
+    "id": "CEOPT-16-input3-B3",
+    "scenario_id": "CEOPT-16",
+    "input_revision": "input3-new-synthetic-contract",
+    "arm": "B",
+    "trial": 3,
+    "session_id": "01a19219-aad7-7e11-a128-ab191991cd20",
+    "agent_path": "/root/ce_followup_plan_b3",
+    "started_at": "2026-10-31T13:15:18.233Z",
+    "final_at": "2026-10-31T13:20:05.266Z",
+    "elapsed_seconds": 287.033,
+    "deadline_seconds": 600,
+    "timing_admission": "passed",
+    "final_model_artifact_available": true,
+    "artifact_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/plan-trials/CEOPT-16-input3-B3/artifact.md",
+    "artifact_sha256": "b0bba5a45837bd1108de84978ee564f5dbed9eeca862781d55f8402331c47ae4",
+    "trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/plan-trials/CEOPT-16-input3-B3/trace.json",
+    "trace_sha256": "f6d276e7f865b8966a547b9a479b653a5cf2bff3ffc354122863fda5bded6d9b",
+    "source_protocol_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/plan-input3-protocol.json",
+    "source_protocol_sha256": "e5f898179edc9567b7751401b366949d4a828a31206b51931ff430e3dfc714bc",
+    "model_metadata": [
+      {
+        "model": "gpt-6-astra",
+        "effort": "medium"
+      }
+    ],
+    "parent_intervention": "Final wording unchanged; one terminal newline added. Parent-mediated save, not autonomous publication.",
+    "limitations": [
+      "Unauthenticated serving metadata",
+      "Observed read-only trace, not enforced isolation",
+      "New synthetic input does not retrospectively complete original scenario"
+    ]
+  }
+]

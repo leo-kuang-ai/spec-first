@@ -1,0 +1,8 @@
+PASS tests/unit/ce-localization-closeout-contracts.test.js (13.702 s)
+PASS tests/unit/ce-localization-review-contracts.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       17 passed, 17 total
+Snapshots:   0 total
+Time:        17.151 s, estimated 22 s
+Ran all test suites matching /tests\/unit\/ce-localization-review-contracts.test.js|tests\/unit\/ce-localization-closeout-contracts.test.js/i.

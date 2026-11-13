@@ -1,0 +1,184 @@
+{
+  "metadata": {
+    "skill_name": "spec-strategy",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-strategy",
+    "timestamp": "2026-11-04T12:05:15Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "Check owned update",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 49.333,
+        "tokens": 28245,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-strategy/evals/fixtures/scripts/check-owned-update.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "无 STRATEGY.md 应宣告首跑并以面试提问开局",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 46.649,
+        "tokens": 25093,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.files_not_exist",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-strategy/evals/fixtures/scripts/asks-a-question.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "已有策略且无参数应询问要重访哪个 section",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 66.78,
+        "tokens": 24984,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-strategy/evals/fixtures/scripts/asks-a-question.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "指定 section 应定向重访该 section 并保留其余",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 147.404,
+        "tokens": 31978,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-strategy/evals/fixtures/scripts/asks-a-question.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "想把 feature 排期写进策略应被指出属于 spec-brainstorm",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 86.58,
+        "tokens": 23814,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[spec-brainstorm]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[spec-brainstorm])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "更新前应真读现有文档并给出现状摘要",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 124.94,
+        "tokens": 24048,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[LedgerFlow 对账]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[LedgerFlow 对账])"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 86.94766666666665,
+        "stddev": 37.73614817239418,
+        "min": 46.649,
+        "max": 147.404
+      },
+      "tokens": {
+        "mean": 26360.333333333332,
+        "stddev": 2899.4618274584836,
+        "min": 23814,
+        "max": 31978
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

@@ -1,0 +1,183 @@
+
+> spec-first@1.15.3 test:integration
+> node scripts/run-test-suite.cjs integration
+
+PASS tests/integration/init-six-host-lifecycle.integration.test.js (39.055 s)
+PASS tests/integration/workspace-graph-auto-refresh.integration.test.js (18.467 s)
+PASS tests/integration/spec-prd-contract-reset-replay.integration.test.js
+PASS tests/integration/workspace-graph-six-host-projection.integration.test.js (8.061 s)
+PASS tests/integration/runtime-setup-npm-archive.integration.test.js
+PASS tests/integration/spec-prd-contract-reset-isolation.integration.test.js
+PASS tests/integration/doctor-continuation.test.js (6.912 s)
+FAIL tests/integration/eval-disk-evidence-guard.integration.test.js
+  ● eval disk-evidence guard (r2-preset-applied-fix) › a model that only claims a fix without touching code is rejected
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "未见落盘"
+    Received string:    ""
+
+      76 |     const judge = runJudge(repo);
+      77 |     expect(judge.status).toBe(1);
+    > 78 |     expect(judge.stdout).toContain('未见落盘');
+         |                          ^
+      79 |   });
+      80 |
+      81 |   test('a real uncommitted fix relative to the fixture baseline passes', () => {
+
+      at Object.toContain (tests/integration/eval-disk-evidence-guard.integration.test.js:78:26)
+
+  ● eval disk-evidence guard (r2-preset-applied-fix) › a real uncommitted fix relative to the fixture baseline passes
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 1
+
+      83 |     sh('bash', [prepareScript], { cwd: repo });
+      84 |     applyRealFix(repo);
+    > 85 |     expect(runJudge(repo).status).toBe(0);
+         |                                   ^
+      86 |   });
+      87 |
+      88 |   test('a sneaky commit that moves HEAD past the baseline is rejected', () => {
+
+      at Object.toBe (tests/integration/eval-disk-evidence-guard.integration.test.js:85:35)
+
+  ● eval disk-evidence guard (r2-preset-applied-fix) › a sneaky commit that moves HEAD past the baseline is rejected
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "HEAD 已前移"
+    Received string:    ""
+
+      94 |     const judge = runJudge(repo);
+      95 |     expect(judge.status).toBe(1);
+    > 96 |     expect(judge.stdout).toContain('HEAD 已前移');
+         |                          ^
+      97 |   });
+      98 |
+      99 |   test('staging the fixture patch without changing content is rejected', () => {
+
+      at Object.toContain (tests/integration/eval-disk-evidence-guard.integration.test.js:96:26)
+
+  ● eval disk-evidence guard (r2-preset-applied-fix) › staging the fixture patch without changing content is rejected
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "未见落盘"
+    Received string:    ""
+
+      103 |     const judge = runJudge(repo);
+      104 |     expect(judge.status).toBe(1);
+    > 105 |     expect(judge.stdout).toContain('未见落盘');
+          |                          ^
+      106 |   });
+      107 |
+      108 |   test('without a baseline a clean worktree still fails the weak guard', () => {
+
+      at Object.toContain (tests/integration/eval-disk-evidence-guard.integration.test.js:105:26)
+
+  ● eval disk-evidence guard (r2-preset-applied-fix) › without a baseline a clean worktree still fails the weak guard
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "无任何变更且缺少评测基线"
+    Received string:    ""
+
+      118 |     const judge = runJudge(repo);
+      119 |     expect(judge.status).toBe(1);
+    > 120 |     expect(judge.stdout).toContain('无任何变更且缺少评测基线');
+          |                          ^
+      121 |   });
+      122 |
+      123 |   test('without a baseline a genuinely changed worktree passes the weak guard', () => {
+
+      at Object.toContain (tests/integration/eval-disk-evidence-guard.integration.test.js:120:26)
+
+  ● eval disk-evidence guard (r2-preset-applied-fix) › without a baseline a genuinely changed worktree passes the weak guard
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 1
+
+      128 |     fs.rmSync(path.join(repo, gitDir, 'eval-baseline-diff-sha'));
+      129 |     applyRealFix(repo);
+    > 130 |     expect(runJudge(repo).status).toBe(0);
+          |                                   ^
+      131 |   });
+      132 | });
+      133 |
+
+      at Object.toBe (tests/integration/eval-disk-evidence-guard.integration.test.js:130:35)
+
+PASS tests/integration/runtime-setup-codegraph-launcher.integration.test.js
+PASS tests/integration/spec-work-closeout-producer.test.js
+PASS tests/integration/workspace-graph-lifecycle.integration.test.js
+  ● Console
+
+    console.log
+      Workspace graph clean: complete
+
+      at log (src/cli/commands/clean.js:287:11)
+
+    console.log
+        root: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first-wg-integ-ROmeSc
+
+      at log (src/cli/commands/clean.js:288:11)
+
+    console.log
+        child api: codegraph_removed=true exclude_removed=true hook=not-installed
+
+      at log (src/cli/commands/clean.js:290:13)
+
+    console.log
+        child web: codegraph_removed=true exclude_removed=true hook=not-installed
+
+      at log (src/cli/commands/clean.js:290:13)
+
+    console.log
+        workspace graphify-out removed: true
+
+      at log (src/cli/commands/clean.js:296:11)
+
+    console.log
+        routing CLAUDE.md: stripped
+
+      at log (src/cli/commands/clean.js:299:15)
+
+    console.log
+        routing AGENTS.md: stripped
+
+      at log (src/cli/commands/clean.js:299:15)
+
+    console.log
+        daemon: run `codegraph daemon` to stop any watcher bound to a removed workspace
+
+      at log (src/cli/commands/clean.js:303:13)
+
+PASS tests/integration/spec-lfg-fingerprint-projection.integration.test.js (5.698 s)
+PASS tests/integration/plan-status-closeout.integration.test.js
+PASS tests/integration/doc-review-six-host-projection.integration.test.js
+PASS tests/integration/runtime-setup-sigint-recovery.integration.test.js
+PASS tests/integration/qoder-runtime-lifecycle.integration.test.js
+PASS tests/integration/spec-write-skill-authoring-preview.integration.test.js
+PASS tests/integration/spec-prototype-human-journey.integration.test.js
+
+Test Suites: 1 failed, 1 skipped, 17 passed, 18 of 19 total
+Tests:       6 failed, 2 skipped, 81 passed, 89 total
+Snapshots:   0 total
+Time:        92.917 s
+Ran all test suites matching /tests\/integration\/doc-review-six-host-projection.integration.test.js|tests\/integration\/doctor-continuation.test.js|tests\/integration\/eval-disk-evidence-guard.integration.test.js|tests\/integration\/init-six-host-lifecycle.integration.test.js|tests\/integration\/plan-status-closeout.integration.test.js|tests\/integration\/qoder-runtime-lifecycle.integration.test.js|tests\/integration\/runtime-setup-codegraph-launcher.integration.test.js|tests\/integration\/runtime-setup-graphify-hook-boundary.integration.test.js|tests\/integration\/runtime-setup-npm-archive.integration.test.js|tests\/integration\/runtime-setup-sigint-recovery.integration.test.js|tests\/integration\/spec-lfg-fingerprint-projection.integration.test.js|tests\/integration\/spec-prd-contract-reset-isolation.integration.test.js|tests\/integration\/spec-prd-contract-reset-replay.integration.test.js|tests\/integration\/spec-prototype-human-journey.integration.test.js|tests\/integration\/spec-work-closeout-producer.test.js|tests\/integration\/spec-write-skill-authoring-preview.integration.test.js|tests\/integration\/workspace-graph-auto-refresh.integration.test.js|tests\/integration\/workspace-graph-lifecycle.integration.test.js|tests\/integration\/workspace-graph-six-host-projection.integration.test.js/i.
+Error: /opt/homebrew/Cellar/node@22/22.22.3/bin/node /Users/kuang/xiaobu/spec-first/node_modules/jest/bin/jest.js tests/integration/doc-review-six-host-projection.integration.test.js tests/integration/doctor-continuation.test.js tests/integration/eval-disk-evidence-guard.integration.test.js tests/integration/init-six-host-lifecycle.integration.test.js tests/integration/plan-status-closeout.integration.test.js tests/integration/qoder-runtime-lifecycle.integration.test.js tests/integration/runtime-setup-codegraph-launcher.integration.test.js tests/integration/runtime-setup-graphify-hook-boundary.integration.test.js tests/integration/runtime-setup-npm-archive.integration.test.js tests/integration/runtime-setup-sigint-recovery.integration.test.js tests/integration/spec-lfg-fingerprint-projection.integration.test.js tests/integration/spec-prd-contract-reset-isolation.integration.test.js tests/integration/spec-prd-contract-reset-replay.integration.test.js tests/integration/spec-prototype-human-journey.integration.test.js tests/integration/spec-work-closeout-producer.test.js tests/integration/spec-write-skill-authoring-preview.integration.test.js tests/integration/workspace-graph-auto-refresh.integration.test.js tests/integration/workspace-graph-lifecycle.integration.test.js tests/integration/workspace-graph-six-host-projection.integration.test.js --runInBand 失败，状态为 1
+    at run (/Users/kuang/xiaobu/spec-first/scripts/run-test-suite.cjs:91:19)
+    at runNode (/Users/kuang/xiaobu/spec-first/scripts/run-test-suite.cjs:98:3)
+    at runJest (/Users/kuang/xiaobu/spec-first/scripts/run-test-suite.cjs:106:3)
+    at runJestFiles (/Users/kuang/xiaobu/spec-first/scripts/run-test-suite.cjs:120:3)
+    at Object.runIntegration [as integration] (/Users/kuang/xiaobu/spec-first/scripts/run-test-suite.cjs:140:3)
+    at main (/Users/kuang/xiaobu/spec-first/scripts/run-test-suite.cjs:179:18)
+    at Object.<anonymous> (/Users/kuang/xiaobu/spec-first/scripts/run-test-suite.cjs:188:22)
+    at Module._compile (node:internal/modules/cjs/loader:1781:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1913:10)
+    at Module.load (node:internal/modules/cjs/loader:1505:32)

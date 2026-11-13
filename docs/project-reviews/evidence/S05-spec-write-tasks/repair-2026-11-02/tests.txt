@@ -1,0 +1,8 @@
+PASS tests/unit/task-pack-command.test.js
+PASS tests/unit/spec-write-tasks-contracts.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       43 passed, 43 total
+Snapshots:   0 total
+Time:        2.984 s, estimated 4 s
+Ran all test suites within paths "tests/unit/task-pack-command.test.js", "tests/unit/spec-write-tasks-contracts.test.js".

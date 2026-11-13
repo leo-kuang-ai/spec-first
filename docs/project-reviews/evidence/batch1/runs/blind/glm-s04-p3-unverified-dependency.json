@@ -1,0 +1,15 @@
+{
+ "case": "s04-p3-unverified-dependency",
+ "seed": 20261106,
+ "a_out": "/tmp/batch1/s04-glm/iteration-1/s04-p3-unverified-dependency/with_skill/outputs",
+ "b_out": "/tmp/batch1/s04-glm/iteration-1/s04-p3-unverified-dependency/without_skill/outputs",
+ "mapping": {
+  "X": "A",
+  "Y": "B"
+ },
+ "verdict_raw": {
+  "preferred": "X",
+  "reason": "X先澄清范围与依赖替代，更符合需求不清先确认；Y虽有详细验证计划，却直接将订单评论升级为退款要求，并未经影响分析排除日报消费者。"
+ },
+ "preferred_group": "A"
+}

@@ -1,0 +1,27 @@
+# manifest: spec-write-skill
+# frozen: 5b59293b
+73f6e1a06661d3a1b2a172800b25abca9888681d61f8abf6457fbb769c1f668d  skills/spec-write-skill/SKILL.md
+68490830c65e6d49afaedf6acf967f1f81de3e12e11bf0bbfe50b13a44a5b851  skills/spec-write-skill/agents/openai.yaml
+98f773d0df9aa624cd5228f70813a1aeb39850c6a17c3f3f8b5d656d218cba37  skills/spec-write-skill/evals/README.md
+1a7fb13c58605f1a86b2374d8fc8256be75aee659a84e9befa9edcc03aacdfde  skills/spec-write-skill/evals/cases/mirror-patch-refused.yaml
+9943ebd6acd9554e9d13c341e6e86fd050052bfa92cc9ae8662757373545e84a  skills/spec-write-skill/evals/eval.yaml
+0f6a8337e74450f7cd1f033d167a5d38e96ad9f06275a931ccbfaf4a92f0f033  skills/spec-write-skill/evals/export-trigger-evals.cjs
+4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855  skills/spec-write-skill/evals/fixtures/repos/mini-ledger/README.md
+03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b  skills/spec-write-skill/evals/fixtures/repos/mini-ledger/package.json
+ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34  skills/spec-write-skill/evals/fixtures/repos/mini-ledger/src/server.js
+14bea02a91277a7440f671f9d6bb5cd70117d23508a03b39dc986169d64fa973  skills/spec-write-skill/evals/fixtures/scripts/asks-a-question.sh
+884150c98c9bb5e3a67e770325794c02923952dc79cab9ef83b624707bd50e2b  skills/spec-write-skill/evals/fixtures/scripts/check-mirror-refused.sh
+ce54d5f33b02a67361b3b7da2502cf9f7e7f041f4cc67f61a3479ce9c0b96ec0  skills/spec-write-skill/evals/trigger-cases.json
+fccb3545eb0190a4bac9e836b561d459fc773626331ff5291aa61590d46c7af7  skills/spec-write-skill/evals/validate-promotion-evidence.cjs
+9766c9354f938278dd6d7da92629184909ff5640e0077736fb4e7331732e3ac3  skills/spec-write-skill/references/authoring-method.md
+711e9e935eef2691d282c35a6cb370ba8e4ddab77ae162460ce569104e24188a  skills/spec-write-skill/references/authoring-workbench.md
+ac0e6a47e48e45b1cd77eec93167a2967763f78aa056bb83e3ea600d91f2349c  skills/spec-write-skill/references/behavior-contract-design.md
+2c978e3566928ad65f82f9f877ef92c9ea9ae60e194bc97502d4158be7e72a22  skills/spec-write-skill/references/delivery-gates.md
+b5226145cc983c730942c1fde8902f037911ba8be040264f140fba6fd730109e  skills/spec-write-skill/references/evaluation-design.md
+e497b64b9b5af2d28530b63a199205c2e839b6344aba9f37fde042283cebade8  skills/spec-write-skill/references/optimization-and-lifecycle.md
+72eba0d339c3e32b96d78fff86de8fb18d5a6f6be4cad81fdd18755a09a6fe3f  skills/spec-write-skill/references/project-profiles.md
+a5125bb53c7980030dc86a9aad5865c40ba794efbe6e03c946de14a2c837edba  skills/spec-write-skill/references/target-profiles.md
+f01c1ca42afa98a2499a4a113b750f26dd657200b9043540c5b8524171581556  skills/spec-write-skill/scripts/inspect-context.cjs
+8aeb18b338facb68503bf7896952df91eb973031acfe4d63a21ddc2fa39e43ec  skills/spec-write-skill/scripts/lib/package-inspection.cjs
+20a84ac75b1ff6d162505afdc883d49a27f8b55bef1c99cf4047e7866a5b1dab  skills/spec-write-skill/scripts/validate-authoring-preview.cjs
+7325709632b7675f7010568efe9535590ef0e9da2929da6fb757e2238e627e2f  skills/spec-write-skill/scripts/validate-skill.cjs

@@ -1,0 +1,15 @@
+{
+ "case": "s20-r6b-vague-clean",
+ "seed": 20261220,
+ "a_out": "/tmp/batch3/glm-s20-a/iteration-1/s20-r6b-vague-clean/with_skill/outputs",
+ "b_out": "/tmp/batch3/glm-s20-b/iteration-1/s20-r6b-vague-clean/with_skill/outputs",
+ "mapping": {
+  "X": "A",
+  "Y": "B"
+ },
+ "verdict_raw": {
+  "preferred": "Y",
+  "reason": "Y将解析能力集中于CSV模块供日报复用，回归与往返测试明确，保留原有空值语义；X增加私有解析及空值行为变更。两者均未先澄清需求。"
+ },
+ "preferred_group": "B"
+}

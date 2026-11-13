@@ -1,0 +1,745 @@
+{
+  "scope": "All 34 frozen scenarios; no sampling",
+  "frozen_scenarios_sha256": "90b2fb1a2e92f0433ccec371c5da29808870e4f795401fa6292539cddf2c5ef0",
+  "note": "Existing case names identify reusable assets, not proof of complete scenario coverage. Preserve the original baseline; use identical newly materialized inputs and judging rules on both arms.",
+  "rows": [
+    {
+      "scenario_id": "CEOPT-01",
+      "skill": "autoresearch",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-01",
+      "existing_case_refs": [
+        {
+          "path": "skills/autoresearch/evals/cases/dispatch-classic-mode.yaml",
+          "sha256": "40d7b515f8512db4973bd11552d46a7f3d6543e8b54217fa9778b1a67f18204d"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Run candidate scoring with HARD and visual-ui aliases, unknown values, and non-mutating check/recovery.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-02",
+      "skill": "spec-brainstorm",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-02",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-brainstorm/evals/cases/neither-direct-answer.yaml",
+          "sha256": "f742f594efb86f6344b04925bd00b7f2861556f22af48dd349069e80a7637ec4"
+        },
+        {
+          "path": "skills/spec-brainstorm/evals/cases/r2-normal-convergence-works.yaml",
+          "sha256": "1130ddf26abd8d9095963db788e5a110385bc1c50ed99d2b7878ecb26751f357"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Exercise settled requirements with an explicit no-document outcome; inspect artifact absence and final claims.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-03",
+      "skill": "spec-code-review",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-03",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-code-review/evals/cases/agent-mode-remains-read-only.yaml",
+          "sha256": "038133d88c5ed6524755e14f615b633e8a89404bd9adc9f78fdc55899a40c04e"
+        },
+        {
+          "path": "skills/spec-code-review/evals/cases/report-only-detects-tenant-bypass.yaml",
+          "sha256": "20804d25a204ba30d08559e2db78bc5bc90be4ea8f121ef0432dbc4029d933f2"
+        },
+        {
+          "path": "skills/spec-code-review/evals/cases/r2-preset-authorize-fix.yaml",
+          "sha256": "0782581d7c43bdf8245b241ae80370b50a02ee7250ee8ba8e9f389307fbf91d1"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Combine tenant defect, unsupported P0 input and case-sensitive file identities; grade findings and actual code separately.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-04",
+      "skill": "spec-commit",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-04",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-commit/evals/cases/fresh-tree-logical-grouping.yaml",
+          "sha256": "98bfbe974052d7a0629644e55da8f44fbeb0c8d2e7efb27cfb48833998fc5ff8"
+        },
+        {
+          "path": "skills/spec-commit/evals/cases/no-auth-stops-before-staging.yaml",
+          "sha256": "a10986e8cd19e1e6b0fbe8cc37e3e0570b9a0ec004efaffe1ea8f625e686d9b5"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Use mixed pre-existing staged/unstaged hunks and author identity; inspect commit contents, parent and remaining index.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-05",
+      "skill": "spec-commit-push-pr",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-05",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-commit-push-pr/evals/cases/description-only-non-mutating.yaml",
+          "sha256": "63c062a641dd54714417cb4d8c2fbee4608472503dd93d4471c51bd9dbf4d795"
+        },
+        {
+          "path": "skills/spec-commit-push-pr/evals/cases/no-landing-auth-stops-before-push.yaml",
+          "sha256": "27200bfc2c1ff125f3ddf2b11f3c6abbc740c247a23fd8c96d12a21364266ee2"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Exercise non-main base, repository PR template and related-but-not-closing issue; capture remote attempts.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-06",
+      "skill": "spec-compound",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-06",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-compound/evals/cases/positive-publish-produces-solution.yaml",
+          "sha256": "e9a0744359b2cf6f517c52616118856122e18dd7c221fe1950436f3413dfddf4"
+        },
+        {
+          "path": "skills/spec-compound/evals/cases/unsolved-no-write.yaml",
+          "sha256": "c80875a26db48eddb721c4c91f41d15c8e1f2753d5364457b2917e7fd951a4f2"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Feed actual unknown/nonzero results and distinct knowledge; check source/invalidation and failure claims.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-07",
+      "skill": "spec-compound-refresh",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-07",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-compound-refresh/evals/cases/non-solutions-scope-gated.yaml",
+          "sha256": "ce21b8e11aa5f3d50c1099b9e73d2211909533a0eccf6cd727ff6f5f818768ed"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Provide historical term consumers, unique knowledge and failed publication; inspect preservation and final state.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-08",
+      "skill": "spec-debug",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-08",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-debug/evals/cases/fix-authorized-fixes-no-commit.yaml",
+          "sha256": "4f377e7019d7f18fa95fa8217016456cffff7c04951c40dc99c8613c751b8b9b"
+        },
+        {
+          "path": "skills/spec-debug/evals/cases/diagnosis-only-no-fix.yaml",
+          "sha256": "2e1f459c36931185d63aba4c264eb15ddb03cebed38a6960039eb509e0d69d6f"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Provide a reproducible performance fault without a suitable unit seam; compare real baseline/profile and replacement proof.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-09",
+      "skill": "spec-doc-review",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-09",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-doc-review/evals/cases/default-report-only-no-write.yaml",
+          "sha256": "b2857f3431c2ab64622b12f4e1d7eddc5bc9a6851c4bcbb90ed370d06c6bd9e0"
+        },
+        {
+          "path": "skills/spec-doc-review/evals/cases/html-forces-report-only.yaml",
+          "sha256": "e92cc878c6f078875eda73376a1b64f868582afa7363ada0e58dfde69588ccf9"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Provide duplicate root-cause findings and a Withdraw decision; inspect semantic deduplication and zero writes.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-10",
+      "skill": "spec-dogfood",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-10",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-dogfood/evals/cases/owner-unavailable-stops.yaml",
+          "sha256": "b10a8385333b3f2265b6ef81ccb5c1db0ab09f2288cb022af2c63ebfb1ff53ce"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Provide criteria and a resumed server/source mismatch; bind observations to the current identity and prevent invented browser results.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-11",
+      "skill": "spec-explain",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-11",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-explain/evals/cases/simple-qa-not-triggered.yaml",
+          "sha256": "c1ba12805be87b0d1c464c9f7894ad87db363d15d7e0fa9c3be80e1a61bea11b"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Provide a traceable trigger/state/failure chain without author rationale; inspect the durable fallback artifact and untraced boundaries.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-12",
+      "skill": "spec-handoff",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-12",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-handoff/evals/cases/check-research-continuation.yaml",
+          "sha256": "1d3486cff17ddefc7c91a10fcf77b2cdf1c80ab3f626827e88c21259a3e883d9"
+        },
+        {
+          "path": "skills/spec-handoff/evals/cases/check-review-continuation.yaml",
+          "sha256": "d3a7dd82bff2d808177c5d364c4ae6742b6a6f089f7a40384ec974f8b9f58b41"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Add dirty/index state and managed handoff paths to research and review continuations; inspect owner and Git preservation.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-13",
+      "skill": "spec-ideate",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-13",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-ideate/evals/cases/repo-grounded-e2e-writes-artifact.yaml",
+          "sha256": "b449d880c69515d7b0e788bc1b9c05382af34caafa55d93b51737218d31a1e88"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Provide duplicates plus low-confidence/high-risk evidence; inspect the dossier, ranking rationale and preserved unresolved risk.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-14",
+      "skill": "spec-lfg",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-14",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-lfg/evals/cases/explicit-request-starts-plan.yaml",
+          "sha256": "e29efb8d555793d6edb4635da39365d19f14375be16b8765fc8477982c67bfd7"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Feed a 30-minute observation gap and authorized no-code feedback with interrupted reply; inspect continuity and duplicate prevention.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-15",
+      "skill": "spec-optimize",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-15",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-optimize/evals/cases/no-metric-goal-gated.yaml",
+          "sha256": "6404a17d58e70e57a7cd15fe41aec3dd88ee56deade8bc7cdb3e0a28473aaff6"
+        },
+        {
+          "path": "skills/spec-optimize/evals/cases/r2-fastest-no-measure.yaml",
+          "sha256": "dd1534c03b77446239618b4549a29400580139aa55637c40213687afdf70f49b"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Exercise dirty experiment reuse, unowned cleanup candidates, 0/100 A/A observations and claimed zero noise; include a stable control.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-16",
+      "skill": "spec-plan",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-16",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-plan/evals/cases/enriches-product-contract-in-place.yaml",
+          "sha256": "7e5a36ccd44d6e8763cfbe357c4b0ff1490e44b7d9ee14da327a3de6bcc2b8f0"
+        },
+        {
+          "path": "skills/spec-plan/evals/cases/planning-only-rejects-implementation.yaml",
+          "sha256": "4f40fa899b75fe9be76f6030c248face1e21eb50ebff2fac473cef4094167a73"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Add research-leaf evidence, stable decisions and concern tradeoffs; inspect WHAT bytes and rejected-alternative preservation.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-17",
+      "skill": "spec-polish",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-17",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-polish/evals/cases/review-request-routes-out.yaml",
+          "sha256": "9f57e31faa01707ef47c236672b712cbee5f8019098cd21476a5051c0512dd8f"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Exercise missing launch args, multi-process Procfile and feedback resume with exact server identity.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-18",
+      "skill": "spec-pov",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-18",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-pov/evals/cases/r2-real-verdict-works.yaml",
+          "sha256": "18ad8918bdc0ec095cbc76f131e29af4fdb7bb3788f50fd8f22bb045347ea6a2"
+        },
+        {
+          "path": "skills/spec-pov/evals/cases/design-question-not-verdict.yaml",
+          "sha256": "b74498c726ae9d070ed68ad183d2ace302ceeabe7fdc9ac9f25b4162b6ca8dfe"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Exercise all worker admission counterexamples; positive authenticated execution remains blocked by the current serving contract.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-19",
+      "skill": "spec-prd",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-19",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-prd/evals/cases/validate-report-only.yaml",
+          "sha256": "5e3e83851c4e2769f3fe9ec172a478fbf36fd73ea34c36a325a8599d8a6f8076"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Modify signed body then refresh inputs; compare with legal input-only refresh and valid product terminology.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-20",
+      "skill": "spec-product-pulse",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-20",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-product-pulse/evals/cases/check-source-outcomes.yaml",
+          "sha256": "2ed06d1d8397f9afeca74a428994298394be2176505c2cb9ceeceeb94516b009"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Retain actual source exports and verify revenue, failed read and successful zero remain distinct.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-21",
+      "skill": "spec-promote",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-21",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-promote/evals/cases/check-unreleased-local-drafts.yaml",
+          "sha256": "5e17b94e412e96ac4b1b5b067cf7b95d44c6da26ff39fe74ccc9b546e829629b"
+        },
+        {
+          "path": "skills/spec-promote/evals/cases/no-publish-side-effects.yaml",
+          "sha256": "aed3e052e2c70511011362cd90289e24bb4f9f285b672cb9adad165839c2742d"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Retain local-only unreleased input and tracked/ignored configuration cases; inspect draft claims and provider trace.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-22",
+      "skill": "spec-prototype",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-22",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-prototype/evals/cases/go-ahead-before-build.yaml",
+          "sha256": "16da6a08886c461b12bba0572d4f365dcb85b2f4927688bfe3f262292376a511"
+        },
+        {
+          "path": "skills/spec-prototype/evals/cases/headless-blocked.yaml",
+          "sha256": "6ad65da0d36a5c6822d8fe198fd181781cd6d0d9481735a2b83615ee6ec1aa90"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Exercise a real throwaway page with stop/reload, loopback/token checks and no unauthorized external service.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-23",
+      "skill": "spec-resolve-pr-feedback",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-23",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-resolve-pr-feedback/evals/cases/pipeline-pending-conversation.yaml",
+          "sha256": "db521b130e3d7abc8dd2ff9277435abc6253e322ba07a17dde54a0b4d9a8dfe9"
+        },
+        {
+          "path": "skills/spec-resolve-pr-feedback/evals/cases/independent-authority-matrix.yaml",
+          "sha256": "b642d69851d4799d47898e1cbd38b3de19b9a92e1eab7cc8a7a0ccfe88b10fef"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Provide fixed/declined/needs-human items and interrupted reply; inspect exact remote SHA, readback and duplicate action prevention.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-24",
+      "skill": "spec-riffrec-feedback-analysis",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-24",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-riffrec-feedback-analysis/evals/cases/check-local-evidence.yaml",
+          "sha256": "ce0bf14b13bd88cb5dc5ddb39925452837437f38e2e5269f6cd9bcee5a3f1ec1"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Provide 840-second two-chunk media with partial provider failure and no product finding; compare both analyzer entrypoints and egress receipts.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-25",
+      "skill": "spec-runtime-setup",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-25",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-runtime-setup/evals/cases/check-readonly.yaml",
+          "sha256": "a3487762e9a7f19a74011b711524685b3198885801aeec01185cbfc4fefd56c6"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Provide dangling and intermediate symlinks plus contaminated GIT_DIR/GIT_WORK_TREE for two disposable repositories; inspect sentinel and target identity.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-26",
+      "skill": "spec-simplify-code",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-26",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-simplify-code/evals/cases/safety-check-preserved.yaml",
+          "sha256": "54f7e51a7a713d07fd839336834bb52274f4daa0d121dec8d5fa79ca23fdf327"
+        },
+        {
+          "path": "skills/spec-simplify-code/evals/cases/r2-elegant-refactor.yaml",
+          "sha256": "c6be4fae47b8ce6d39b524bab62b7b3d4dca3443882ff0d6056fa4ad7196f4f0"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Bind actual proof-test bytes and test-only seam; grade equivalent code change, final rerun and forbidden proof weakening.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-27",
+      "skill": "spec-strategy",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-27",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-strategy/evals/cases/check-owned-update.yaml",
+          "sha256": "db5489a3c14b23e7424f0a88630d17ea04688ceddcb072e0023e89ddff66ce38"
+        },
+        {
+          "path": "skills/spec-strategy/evals/cases/targeted-update-metrics.yaml",
+          "sha256": "e09d7424b99544a8b1518fcb47a31109543a9e906c83df89296991c113a808d8"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Provide an attractive adjacent proposal and an actual rejected decision; judge discrimination and preserve untargeted strategy text.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-28",
+      "skill": "spec-sweep",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-28",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-sweep/evals/cases/headless-first-run-stops.yaml",
+          "sha256": "ac5e5f9e457a4187aaa44bd0c8c72af3d201b80379faea7d56964f724e8d7953"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Exercise lock failure, linked lock, future version, incomplete closure, interrupted shared publication and missing media authority.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-29",
+      "skill": "spec-test-browser",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-29",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-test-browser/evals/cases/invalid-origin-rejected.yaml",
+          "sha256": "497c8dc7a0a826bfd02f80d11121e47f83852455335fc221f60fc76db981f9b0"
+        },
+        {
+          "path": "skills/spec-test-browser/evals/cases/missing-origin-not-run.yaml",
+          "sha256": "27d8a185a5a514a35eff50d5d1564b6c07f72b6bdc858e07262e187fe01cf9d3"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Exercise vitals-before-open, cleanup exit 9 and a successful open/vitals/close control; retain actual cleanup evidence.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-30",
+      "skill": "spec-test-xcode",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-30",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-test-xcode/evals/cases/mcp-unavailable-stops.yaml",
+          "sha256": "17edc725e7da56df5c319d2f14738b3ccb3af5dc2c76287be2e8b8ec80ed67ea"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Exercise unavailable MCP and reported tap success with unchanged state; bind bundle identity and actual post-action evidence.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-31",
+      "skill": "spec-work",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-31",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-work/evals/cases/return-to-caller-envelope.yaml",
+          "sha256": "2535864d918b909d21a704f3bd6ab856758ca4f5275f899b3dda2b02e2eb6ccd"
+        },
+        {
+          "path": "skills/spec-work/evals/cases/r2-reverse-mismatch.yaml",
+          "sha256": "9358a99291854b35e684f7832227908312de588b082fd49e0975a2eac9b09c8a"
+        },
+        {
+          "path": "skills/spec-work/evals/cases/standalone-closeout-order.yaml",
+          "sha256": "56ad9fe59724a8c61c1dff7ade0aa5eb586191e17a4ca58391ebc810656f0150"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Execute a settled plan through Simplify with protected proof tests and same-frame Figma comparison; inspect final-tree reconciliation.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-32",
+      "skill": "spec-worktree",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-32",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-worktree/evals/cases/governed-caller-create-worktree.yaml",
+          "sha256": "a45f94b4b8105971b8b6673a2dfb201e734d78c874356d4b6a20889ab9e8edd8"
+        },
+        {
+          "path": "skills/spec-worktree/evals/cases/unborn-repo-create-refuses.yaml",
+          "sha256": "78d821738f063ad4bea193fd2390caf413982764f5c7dff498a80ad41dee9f17"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Exercise linked worktree root, remote-only ref and legal local branch; inspect containment, tracking and checkout state.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-33",
+      "skill": "spec-write-tasks",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-33",
+      "existing_case_refs": [
+        {
+          "path": "skills/spec-write-tasks/evals/cases/small-plan-skip.yaml",
+          "sha256": "49fd457e1dc8f2b8b8f9f26c716a01cdbde4e6e58348a9e9da98cb743727a192"
+        },
+        {
+          "path": "skills/spec-write-tasks/evals/cases/non-active-rejected.yaml",
+          "sha256": "a45d6ab2e11ad87b728e94bd22d1012561dc88dab866101cb627bdab38cebaaa"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Provide unsafe future/link/.git/runtime task paths and reverse settled decisions; inspect derived eligibility and unchanged source plan.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    },
+    {
+      "scenario_id": "CEOPT-34",
+      "skill": "using-spec-first",
+      "frozen_scenario_ref": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#CEOPT-34",
+      "existing_case_refs": [
+        {
+          "path": "skills/using-spec-first/evals/cases/failure-priority-single-entry.yaml",
+          "sha256": "7d39fa4e9595342ca58a0d16f9a9bca61e7024ccd8c417f3dd356b95606b0bd2"
+        },
+        {
+          "path": "skills/using-spec-first/evals/cases/direct-lane-simple-howto.yaml",
+          "sha256": "5f34a655efdf589f4f34a2f8aaaf23d5f70a79942789d236ab8eb2a22e7809d9"
+        }
+      ],
+      "coverage_assessment": "related coverage only; not a substitute for the complete frozen scenario",
+      "remaining_input_and_outcome_binding": "Compare active-owner execution, quoted bug text and unavailable optional tooling; inspect actual route and continuation.",
+      "fixture_materialization": "pending",
+      "baseline_trials": 0,
+      "candidate_trials": 0,
+      "required_trials_per_arm": 3,
+      "semantic_judgment": "not-run",
+      "execution_status": "not-run"
+    }
+  ]
+}

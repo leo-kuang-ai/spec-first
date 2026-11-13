@@ -1,0 +1,26 @@
+{
+  "run_summary_ref": ".spec-first/workflows/spec-work/repo/20261112-1054-entry-by-id/verification-run-summary.json",
+  "claims": [
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:npm-test",
+        "verification-run-summary:cli-smoke-post-entries",
+        "verification-run-summary:cli-smoke-get-entry-by-id",
+        "verification-run-summary:cli-smoke-get-missing-id"
+      ]
+    },
+    {
+      "claim_type": "impact_surface",
+      "asserted_status": "changed-files-present",
+      "evidence_refs": [
+        "src/server.js",
+        "test/server.test.js",
+        "package.json",
+        "README.md",
+        "CHANGELOG.md"
+      ]
+    }
+  ]
+}

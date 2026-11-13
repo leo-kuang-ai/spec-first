@@ -1,0 +1,61 @@
+{
+  "fixture": "隔离的无 Git folder、HOME/XDG/TMPDIR；CODEGRAPH_TELEMETRY=0、CODEGRAPH_NO_WATCH=1；保留一个已提交且无活跃事务的 SQLite 连接，以观察 WAL 而非依赖 checkpoint",
+  "fault": "删除原生三个 FTS trigger 模拟中断 bulk-load；设置 project_metadata.index_state=partial",
+  "init": {
+    "args": [
+      "init"
+    ],
+    "exit_code": 0,
+    "stdout": "┌  Initializing CodeGraph\n│\n◆  Initialized in <fixture>/project\n│\nScanning files...\nParsing code...\nResolving refs...\nLinking dynamic dispatch...\n│\n◆  Indexed 1 files\n│\n●  2 nodes, 1 edges in 141ms\n│\n▲  Live file watching is disabled here — CODEGRAPH_NO_WATCH=1 is set.\n│\n●  Until you re-sync, the CodeGraph index stays frozen — it will not pick up edits on its own.\n│\n●  Run `codegraph sync` after changing files to refresh the index.\n│\n└  Done\n\n",
+    "stderr": ""
+  },
+  "status": {
+    "args": [
+      "status",
+      "--json"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"initialized\":true,\"version\":\"1.6.0\",\"projectPath\":\"<fixture>/project\",\"indexPath\":\"<fixture>/project/.codegraph\",\"lastIndexed\":\"2026-09-11T09:32:28.776Z\",\"fileCount\":1,\"nodeCount\":2,\"edgeCount\":1,\"dbSizeBytes\":163840,\"walSizeBytes\":70072,\"backend\":\"node-sqlite\",\"journalMode\":\"wal\",\"nodesByKind\":{\"file\":1,\"function\":1},\"languages\":[\"javascript\"],\"pendingChanges\":{\"added\":0,\"modified\":0,\"removed\":0},\"worktreeMismatch\":null,\"index\":{\"builtWithVersion\":\"1.6.0\",\"builtWithExtractionVersion\":25,\"currentExtractionVersion\":25,\"reindexRecommended\":false,\"state\":\"partial\",\"pendingRefs\":0}}\n",
+    "stderr": ""
+  },
+  "files_before_status": {
+    ".codegraph/codegraph.db-wal": {
+      "size": 28872,
+      "sha256": "27e07be6bd8d179beed37397fd6ac638668edb8cda9f6ada0c56c4c4d8839356"
+    },
+    ".codegraph/codegraph.db-shm": {
+      "size": 32768,
+      "sha256": "6b4501945c4e6182bd3aafa3c7d30568f959bbe670cd777a76ba9681118b3c33"
+    },
+    ".codegraph/codegraph.db": {
+      "size": 163840,
+      "sha256": "94e08bb6b6396d4e80ab856550d032a2754a69b4853b4477a254d6668956abac"
+    },
+    ".codegraph/.gitignore": {
+      "size": 229,
+      "sha256": "47c0dacebca9f56c9020b68584470dfc51f07650a3719904e98f4b447a5dd003"
+    }
+  },
+  "files_after_status": {
+    ".codegraph/codegraph.db": {
+      "size": 163840,
+      "sha256": "b199b14be5a1130d3195e13735ca634147a6167f4ea71e15548f7ca10681f8d8"
+    },
+    ".codegraph/.gitignore": {
+      "size": 229,
+      "sha256": "47c0dacebca9f56c9020b68584470dfc51f07650a3719904e98f4b447a5dd003"
+    }
+  },
+  "changed_paths": [
+    ".codegraph/codegraph.db",
+    ".codegraph/codegraph.db-shm",
+    ".codegraph/codegraph.db-wal"
+  ],
+  "restored_triggers": [
+    "nodes_ad",
+    "nodes_ai",
+    "nodes_au"
+  ],
+  "scope": "真实已安装 CodeGraph 1.6.0 / macOS arm64；仅操作一次性 fixture；没有改写用户项目/runtime",
+  "conclusion": "status 退出 0 但 index.state=partial；本次主 DB 内容改变、WAL/SHM 文件被清理，原生 FTS trigger 被恢复，因此不能作为只读探针；SQLite 状态还涉及 WAL，不能只凭主 DB hash 推断 currentness"
+}

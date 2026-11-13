@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-work",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T09:46:43.979607+08:00",
+  "end_time": "2026-11-05T09:53:16.287921+08:00",
+  "case_results": [
+    {
+      "case_id": "standalone-closeout-order",
+      "title": "Standalone completion requires ordered execution and closeout evidence",
+      "status": "FAIL",
+      "duration_ms": 391730,
+      "turns": 17,
+      "input_tokens": 67696,
+      "output_tokens": 2668,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 17,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-closeout-order.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: node:internal/assert/utils:77\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: No successful check before summary: grep -n \"^Known limitations: adding an entry requires five fields typed by hand; no categories; no summary view\\.$\" README.md\n    at checkCloseout ([stdin]:251:12)\n    at [stdin]:305:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once to prepare this isolated fixture.\nOnly that preparation may create its baseline commit; it grants no task commit authority.\nThen use the installed spec-work skill for this request:\nChange only the README.md heading \"Known rough edges\" to \"Known limitations\". Follow the standalone closeout contract. Return its evidence fields as a JSON object or a fenced JSON block. Use individual verification and closeout tool calls, preserving their actual results. Task commits and landing are not authorized.\n",
+      "response": "standalone 收尾完成。以下为验证后交接与证据字段。\n\n## 执行摘要\n\n- **变更**：`README.md:8` 标题文本 `Known rough edges` → `Known limitations`（单行替换，diff 断言为全仓唯一 tracked 变更：`1 1 README.md`）。\n- **质量关口**：simplify 跳过（机械单行 diff）；代码审查跳过（`mechanical diff`，无行为/公共合同变化）；Residual Gate 无发现不触发；源计划语义复核与计划状态收尾均不适用（bare-prompt run，无 source plan；`docs/plans/` 中的 month-filter 计划与本 run 无关，未触碰）。\n- **Git 状态**：变更**未提交**（`commit_authorization: not_authorized`，用户明示任务提交与落地未授权）；未 push、未开 PR。`.claude/` 为预先存在的用户未跟踪目录，未触碰。\n- **Post-Deploy Monitoring \u0026 Validation**：No additional operational monitoring required —— 纯文档单行文本修改，无生产/运行时影响面。\n\n## Closeout 证据字段\n\n```json\n{\n  \"run_id\": \"run-20261105-095104-11503\",\n  \"verification_run_summary_ref\": \".spec-first/workflows/spec-work/skill-up-2030217822/run-20261105-095104-11503/verification-run-summary.json\",\n  \"honest_closeout_verdict\": {\n    \"overall\": \"verified\",\n    \"overall_reason_code\": \"all-claims-consistent\",\n    \"claims\": [\n      { \"claim_type\": \"validation\", \"evidence\": \"verification-run-summary:readme-heading-new-present\", \"verdict\": \"consistent\", \"reason_code\": \"validation-evidence-consistent\" },\n      { \"claim_type\": \"validation\", \"evidence\": \"verification-run-summary:readme-heading-old-absent-repo\", \"verdict\": \"consistent\", \"reason_code\": \"validation-evidence-consistent\" },\n      { \"claim_type\": \"validation\", \"evidence\": \"verification-run-summary:diff-scope-single-line-readme\", \"verdict\": \"consistent\", \"reason_code\": \"validation-evidence-consistent\" },\n      { \"claim_type\": \"impact_surface\", \"evidence\": \"README.md\", \"verdict\": \"consistent\", \"reason_code\": \"impact-surface-evidence-present\" }\n    ]\n  },\n  \"run_artifact_path\": null,\n  \"run_artifact_reason_code\": \"no-trigger-matched\",\n  \"claim_limitations\": [\n    \"verification-profile 未配置（verification-scripts-missing）：无计划声明命令、仓库无 test/lint 基础设施与治理套件，最终检查由 LLM 按变更面直接选定（3 项均实际执行、exit 0）\",\n    \"Code review: skipped (mechanical diff)——单行文档文本重命名；simplify 同因跳过（\u003c30 行机械 diff）\",\n    \"源计划语义复核 not-applicable（bare-prompt 输入，本 run 无 source plan）；计划状态收尾 not-applicable，未做任何 lifecycle 变更\",\n    \"commit_authorization: not_authorized；landing_authorization: not_authorized——已验证变更保持未提交\",\n    \".spec-first/ 未被 .gitignore 覆盖（仓库无 .gitignore）：run 证据目录以未跟踪文件形式留在工作区\"\n  ]\n}\n```\n\n如需提交：逻辑提交候选为 `README.md` 单行标题重命名（docs: rename \"Known rough edges\" heading to \"Known limitations\"），等待显式授权后再执行。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 70364,
+  "judge_tokens": 0,
+  "overall_tokens": 70364
+}

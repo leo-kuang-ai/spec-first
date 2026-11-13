@@ -1,0 +1,272 @@
+{
+  "receipt": {
+    "name": "v3-real-task-retry",
+    "cwd": "$VALIDATION_TARGET",
+    "started": "2026-10-08T16:48:57.877Z",
+    "ended": "2026-10-08T16:54:42.252Z",
+    "exit_code": 0,
+    "signal": null,
+    "timed_out": false,
+    "input_sha256": "a984f1c29570d8197b97265d828ab82179b297239723524433e7baaebaa552d6",
+    "retry_basis": "prior process hit 240-second harness timeout while progressing; allow 900 seconds and stream logs"
+  },
+  "terminal_type": "turn.completed",
+  "messages": [
+    "我会使用 `using-spec-first` 和 `spec-plan`，回查 README、`src/cli` 与 `tests/unit`，制定首次运行排错的最小回归验证方案；本次只交付方案，不修改业务源码、不提交或发布。",
+    "README 已明确区分“初始化写入”“宿主加载入口”和“首次任务成功”。现有测试也覆盖了不少 quickstart 分支；方案将重点检查排错时的退出码、只读诊断和输出兼容性，并明确哪些已有验证可直接复用。",
+    "已定位三个值得补测的边界：Git 前置检查失败、多宿主情况下使用 `--yes`、init 非零结果的转发。doctor 的 JSON、退出码和输出分层已有测试，可复用后补强只读检查。\n\n当前目录是源码快照，没有 `package.json` 和提交基线；方案会给出完整仓库中的验收命令，并将实际运行标为待验证。",
+    "最小补测范围已收敛：quickstart 的 Git 前置失败、多宿主下 `--yes` 拒绝，以及 init 非零结果转发；doctor 则补强项目目录只读和完整 JSON 输出检查。我会把这些写成可执行方案，并注明当前源码快照缺少运行测试所需的依赖与配置。\n",
+    "源码确认 init 的应用失败返回 `1`，quickstart 会直接转发该结果；现有测试尚未保护这条非零返回路径。另外，doctor 的只读检查应限定项目目录，CLI 入口已有版本提醒缓存写入行为，不能据此要求整个进程零写入。\n",
+    "已按 `spec-plan` 生成[首次运行排错回归验证方案](/private$VALIDATION_TARGET/docs/plans/2026-10-09-001-test-cli-first-run-regression-plan.md)。\n\n方案回源具体源码与测试，限定扩展两个现有测试文件：补齐 quickstart 三类边界，并强化 doctor 只读与完整 JSON 检查；包含风险、验收命令和通过标准。\n\n文档结构与引用路径检查通过，333 个输入文件哈希未变。未修改源码或测试，未提交或发布。当前快照缺少运行依赖，未跑测试；仅完成作者自审，独立审查未运行。\n\n"
+  ],
+  "commands": [
+    {
+      "command": "/bin/zsh -lc pwd",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'cat .agents/skills/using-spec-first/SKILL.md'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'cat .agents/skills/spec-plan/SKILL.md'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"rg -n 'CLI|首次|onboarding|spec-plan' $HOST_HOME/memories/MEMORY.md\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'cat .agents/skills/spec-plan/references/planning-evidence-boundaries.md .agents/skills/spec-plan/references/settled-decisions.md .agents/skills/spec-plan/references/output-mode.md .agents/skills/spec-plan/references/intake.md .agents/skills/spec-plan/references/research.md'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'cat .agents/skills/using-spec-first/references/public-route-map.md'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'git status --short'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'rg --files src/cli tests/unit docs/plans'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'cat .agents/skills/spec-plan/references/intake.md .agents/skills/spec-plan/references/research.md'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'nl -ba README.md'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'ls -la'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '232,260p' $HOST_HOME/memories/MEMORY.md\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'cat .agents/skills/spec-plan/references/research.md'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '230,420p' .agents/skills/spec-plan/references/intake.md\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'nl -ba src/cli/commands/quickstart.js'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'nl -ba tests/unit/quickstart-command.test.js'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"rg -n 'doctor|quickstart|node|version|exit|json|verbose' src/cli/index.js src/cli/commands/doctor.js tests/unit/doctor-output.test.js tests/unit/doctor-platform-cli.test.js tests/unit/init-runtime-readiness-guidance.test.js\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'nl -ba src/cli/commands/quickstart.js'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '1,85p' src/cli/commands/doctor.js\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'cat .agents/skills/spec-plan/references/structure.md .agents/skills/spec-plan/references/plan-sections.md .agents/skills/spec-plan/references/markdown-rendering.md'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'cat .agents/skills/spec-plan/references/final-review.md'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'cat .agents/skills/spec-plan/references/plan-handoff.md'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'nl -ba tests/unit/quickstart-language.test.js'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'nl -ba tests/unit/doctor-output.test.js'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"rg -n 'test\\\\(|test.each|describe|runDoctor|read.only|write|ExitCode|json' tests/unit/doctor-workspace-readiness.test.js tests/unit/doctor-runtime-assets.test.js tests/unit/init-runtime-readiness-guidance.test.js tests/unit/init-apply-failure.test.js tests/unit/init-preview.test.js\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'nl -ba tests/unit/doctor-runtime-assets.test.js'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'nl -ba src/cli/index.js'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'nl -ba src/cli/init-guidance.js'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"rg -n 'function (getDoctorExitCode|buildDoctorReport|printDoctorJson)|runtime_asset_health|runtime_status|mkdir|write|stderr' src/cli/commands/doctor.js src/cli/version-reminder.js\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"nl -ba src/cli/commands/doctor.js | sed -n '1260,1418p'\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'nl -ba tests/unit/init-runtime-readiness-guidance.test.js'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"rg -n 'function|first|主行动|恢复|formatRuntimeReadiness|format.*Guidance' src/cli/commands/init-output.js src/cli/commands/init-result.js src/cli/commands/init.js src/cli/init-i18n.js\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'git rev-parse --show-toplevel'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"git log -1 --format='%H %s'\"",
+      "exit_code": 128
+    },
+    {
+      "command": "/bin/zsh -lc \"rg --files docs src tests -g '*config*' -g 'package.json' -g '*jest*' -g 'AGENTS.md' -g '*plan*'\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'cat .agents/skills/spec-plan/references/plan-handoff.md'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'cat .agents/skills/spec-plan/references/structure.md'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '290,430p' .agents/skills/spec-plan/references/final-review.md\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '230,340p' .agents/skills/spec-plan/references/intake.md\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'tail -90 .agents/skills/spec-plan/references/final-review.md'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'tail -65 .agents/skills/spec-plan/references/intake.md'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'cat .agents/skills/spec-plan/references/output-mode.md'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'rg --files docs .spec-first'",
+      "exit_code": 2
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '1,180p' src/cli/commands/init-result.js\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"rg -n 'return |getInitExitCode|normalizeInit' src/cli/commands/init.js\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '896,950p' src/cli/commands/init-output.js\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '1,180p' .agents/skills/spec-plan/references/plan-handoff.md\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'ls -la docs/plans'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '232,257p' $HOST_HOME/memories/MEMORY.md\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '1,165p' tests/unit/quickstart-command.test.js\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '1,115p' src/cli/commands/quickstart.js\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '1,110p' .agents/skills/spec-plan/SKILL.md\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '1,135p' .agents/skills/spec-plan/references/plan-sections.md\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'git status --short'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'rg --files README.md src/cli tests/unit | sort | xargs shasum -a 256'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '60,145p' tests/unit/doctor-runtime-assets.test.js\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '1390,1417p' src/cli/commands/doctor.js\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '205,240p' src/cli/commands/init.js\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'rg --files README.md src/cli tests/unit | sort | xargs shasum -a 256'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"node -e 'const fs=require(\\\"fs\\\"); const p=\\\"docs/plans/2026-10-09-001-test-cli-first-run-regression-plan.md\\\"; const s=fs.readFileSync(p,\\\"utf8\\\"); const headings=[\\\"Goal Capsule\\\",\\\"Product Contract\\\",\\\"Planning Contract\\\",\\\"Implementation Units\\\",\\\"Verification Contract\\\",\\\"Definition of Done\\\"]; const missing=headings.filter(h=>\"'!s.includes(\"## \"+h)); const refs=[...s.matchAll(/`((?:src'\"\\\\/cli|tests\\\\/unit)\\\\/[\"'^`: ]+)(?::[0-9,'\"\\\\-]+)?\"'`/g)].map(m=>m[1]); const bad=[...new Set(refs)].filter(p=>!fs.existsSync(p)); const metadata=[\"artifact_contract: spec-unified-plan/v1\",\"artifact_readiness: implementation-ready\",\"product_contract_source: spec-plan-bootstrap\",\"execution: code\"].filter(x=>!s.includes(x)); console.log(JSON.stringify({missing_headings:missing,missing_paths:bad,missing_metadata:metadata,checked_paths:new Set(refs).size},null,2)); if(missing.length||bad.length||metadata.length) process.exitCode=1;'\"'\"",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'git status --short'",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '43,81p' .agents/skills/spec-plan/references/plan-handoff.md\"",
+      "exit_code": 0
+    }
+  ]
+}

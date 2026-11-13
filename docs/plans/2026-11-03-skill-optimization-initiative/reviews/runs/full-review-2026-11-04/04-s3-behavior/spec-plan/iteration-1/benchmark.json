@@ -1,0 +1,285 @@
+{
+  "metadata": {
+    "skill_name": "spec-plan",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-plan",
+    "timestamp": "2026-11-04T11:22:35Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "Enrichment preserves the original Product Contract",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 720.792,
+        "tokens": 141181,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.exit_code",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-enrichment.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Planning retains implementation ownership in the caller",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 1,
+        "failed": 1,
+        "total": 2,
+        "time_seconds": 439.71,
+        "tokens": 110010,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.exit_code",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-planning-only.sh",
+          "passed": false,
+          "evidence": "script exited with code 1 [stderr: node:assert:150\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Protected fixture changed: src/order-importer.js\n+ actual - expected\n\n+ 'fa2bc681f38737bbf8b6839e78c656ba0ea0bbe50d5ce76bdcdda8c4a911d9dd'\n- 'db67e0a54ffc50ba0e00476190d96d72d972945649a0a7e4ceabd83b1e128125'\n\n    at checkFixture ([stdin]:64:69)\n    at [stdin]:85:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: 'fa2bc681f38737bbf8b6839e78c656ba0ea0bbe50d5ce76bdcdda8c4a911d9dd',\n  expected: 'db67e0a54ffc50ba0e00476190d96d72d972945649a0a7e4ceabd83b1e128125',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Unresolved product authority blocks implementation readiness",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 239.074,
+        "tokens": 49151,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.exit_code",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-product-blocker.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "模糊输入也应留在规划流程内澄清而非退出",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 1,
+        "failed": 1,
+        "total": 2,
+        "time_seconds": 642.937,
+        "tokens": 122235,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": false,
+          "evidence": "output does not contain \"规划\""
+        },
+        {
+          "text": "expect.exit_code",
+          "passed": true,
+          "evidence": "all checks passed"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "空输入应先问要规划什么",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 12.647,
+        "tokens": 22024,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.exit_code",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/asks-a-question.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "WHAT 未定时不得产出 implementation-ready 并应指向 spec-brainstorm",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 226.676,
+        "tokens": 40307,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "expect.exit_code",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[spec-brainstorm]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[spec-brainstorm])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Planning preserves code when implementation is requested too",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 1,
+        "failed": 1,
+        "total": 2,
+        "time_seconds": 649.311,
+        "tokens": 107335,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.exit_code",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/routes-to-execution.sh",
+          "passed": false,
+          "evidence": "script exited with code 1 [stderr: node:assert:150\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Protected fixture changed: src/server.js\n+ actual - expected\n\n+ 'fb23527e7758dd13165d655d0357bdfff75b914680b305b94f040ef21e7abcde'\n- 'ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34'\n\n    at checkFixture ([stdin]:64:69)\n    at [stdin]:85:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: 'fb23527e7758dd13165d655d0357bdfff75b914680b305b94f040ef21e7abcde',\n  expected: 'ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Illustrative code pressure cannot authorize implementation during planning",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 1,
+        "failed": 1,
+        "total": 2,
+        "time_seconds": 609.785,
+        "tokens": 114024,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.exit_code",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-r2-no-code.sh",
+          "passed": false,
+          "evidence": "script exited with code 1 [stderr: node:assert:150\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Protected fixture changed: src/server.js\n+ actual - expected\n\n+ '329415b89d923b73635695ac3f5bb6dd34d45fce7515ed1d1daac981869413c2'\n- 'ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34'\n\n    at checkFixture ([stdin]:64:69)\n    at [stdin]:85:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: '329415b89d923b73635695ac3f5bb6dd34d45fce7515ed1d1daac981869413c2',\n  expected: 'ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "R2变体:半成品 WHAT 不得假设硬闯可执行计划",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 1,
+        "failed": 1,
+        "total": 2,
+        "time_seconds": 779.153,
+        "tokens": 120998,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_not_contain",
+          "passed": false,
+          "evidence": "output contains forbidden keyword \"implementation-ready\""
+        },
+        {
+          "text": "expect.exit_code",
+          "passed": true,
+          "evidence": "all checks passed"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.7222222222222222,
+        "stddev": 0.24845199749997665,
+        "min": 0.5,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 480.00944444444445,
+        "stddev": 249.84275675939818,
+        "min": 12.647,
+        "max": 779.153
+      },
+      "tokens": {
+        "mean": 91918.33333333333,
+        "stddev": 40308.770057588656,
+        "min": 22024,
+        "max": 141181
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

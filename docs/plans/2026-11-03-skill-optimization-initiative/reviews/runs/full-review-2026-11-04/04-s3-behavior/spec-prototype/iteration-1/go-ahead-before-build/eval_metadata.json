@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "Discussion-only scoping does not authorize a build",
+  "prompt": "Use spec-prototype to scope a comparison for a ledger app's monthly report:\nchart-first versus numbers-first. For now discuss the question and proposed\nlocal side effects only. Do not create files or start a preview until I agree.\n",
+  "assertions": [
+    "expect.files_not_exist",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-prototype/evals/fixtures/scripts/asks-a-question.sh"
+  ]
+}

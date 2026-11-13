@@ -1,0 +1,209 @@
+{
+  "schema_version": "ce-upstream-sync-run/v1",
+  "kind": "package-admission",
+  "window_sha256": "8ec5e315a1a6401d462875f686ea1543fc470c88ab0f925f62360b1d15f3ed68",
+  "input_sha256": "3f41df0442443d9151e2c91f377033936f7606c3b2c0c4bdb5a644370c66b7b7",
+  "target_snapshot": {
+    "repository": "spec-first",
+    "head": "fe81bae9ee55ec336c85cf80c4a0460d86e3a412",
+    "dirty": true,
+    "dirty_paths": [
+      "CHANGELOG.md",
+      "docs/contracts/verification/ce-upstream-sync-run.md",
+      "docs/contracts/verification/ce-upstream-sync-run.schema.json",
+      "docs/plans/2026-10-27-001-refactor-ce-upstream-sync-technical-scheme.md",
+      "scripts/check-ce-upstream-reconciliation.cjs",
+      "skills/spec-code-review/references/action-class-rubric.md",
+      "skills/spec-code-review/references/apply-findings.md",
+      "skills/spec-code-review/references/diff-scope.md",
+      "skills/spec-code-review/references/dispatch-reviewers.md",
+      "skills/spec-code-review/references/findings-schema.json",
+      "skills/spec-code-review/references/finish-review.md",
+      "skills/spec-code-review/references/intent-and-plan.md",
+      "skills/spec-code-review/references/persona-catalog.md",
+      "skills/spec-code-review/references/personas/adversarial-reviewer.md",
+      "skills/spec-code-review/references/personas/correctness-reviewer.md",
+      "skills/spec-code-review/references/personas/maintainability-reviewer.md",
+      "skills/spec-code-review/references/personas/reliability-reviewer.md",
+      "skills/spec-code-review/references/personas/security-reviewer.md",
+      "skills/spec-code-review/references/personas/testing-reviewer.md",
+      "skills/spec-code-review/references/review-output-template.md",
+      "skills/spec-code-review/references/scope.md",
+      "skills/spec-code-review/references/select-and-route.md",
+      "skills/spec-code-review/references/subagent-template.md",
+      "skills/spec-code-review/references/validator-template.md",
+      "skills/spec-code-review/scripts/findings-mechanics.py",
+      "skills/spec-code-review/scripts/review-scope.py",
+      "skills/spec-commit-push-pr/references/branch-creation.md",
+      "skills/spec-commit-push-pr/references/commit-and-push.md",
+      "skills/spec-commit/SKILL.md",
+      "skills/spec-compound-refresh/references/investigate.md",
+      "skills/spec-compound-refresh/references/schema.yaml",
+      "skills/spec-compound/references/grounding-validation.md",
+      "skills/spec-compound/references/promotion.md",
+      "skills/spec-compound/references/schema.yaml",
+      "skills/spec-compound/references/session-history.md",
+      "skills/spec-compound/scripts/session-history/extract-metadata.py",
+      "skills/spec-lfg/references/review-followup.md",
+      "skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md",
+      "skills/spec-resolve-pr-feedback/references/evaluation-rubric.md",
+      "skills/spec-resolve-pr-feedback/references/full-mode.md",
+      "skills/spec-work/references/execution-strategy.md",
+      "skills/spec-work/references/feedback-and-tests.md",
+      "skills/spec-work/references/implementation-loop.md",
+      "tests/unit/ce-upstream-reconciliation-v2.test.js",
+      "tests/unit/session-history-scripts.test.js",
+      "tests/unit/spec-code-review-contracts.test.js",
+      "tests/unit/spec-code-review-mechanics.test.js",
+      "tests/unit/spec-commit-push-pr-context-contracts.test.js",
+      "tests/unit/spec-lfg-contracts.test.js",
+      "tests/unit/spec-resolve-pr-feedback-contracts.test.js",
+      "tests/unit/spec-work-execution-strategy-contracts.test.js"
+    ],
+    "dirty_path_manifest_sha256": "2c822db9670658e890de71fdcfc15a2b27f8bf1c28245af1876cc061944fc4cc",
+    "source_tree_hash": "1fc82faa2320836e038d233906b605098da3fc0d1aa062616ef0fd3a4af0c1ac",
+    "inventory_hash": "ee7c1c9c9bbde3aa3bac6c01db0991501635b0e892d71b07f1b68e06e42568d6",
+    "scope_contract": {
+      "source_roots": [
+        "CLAUDE.md",
+        "AGENTS.md",
+        "skills",
+        "templates",
+        "src",
+        "scripts",
+        "tests",
+        "docs",
+        "README.md",
+        "README.en.md",
+        "README.zh-CN.md",
+        "CHANGELOG.md",
+        "package.json"
+      ],
+      "excluded_run_outputs": [
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-name-status.md",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication-input.json",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.md",
+        "docs/validation/2026-08-19-spec-first-current-skill-package-inventory-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-evidence-exceptions.json",
+        "docs/validation/ce-pull-2026-10-27/window-facts.json",
+        "docs/validation/ce-pull-2026-10-27/execution-state.json",
+        "docs/validation/ce-pull-2026-10-27/execution-baseline.json",
+        "docs/validation/ce-pull-2026-10-27/producer-name-status.tsv",
+        "docs/validation/ce-pull-2026-10-27/target-source-inventory.json",
+        "docs/validation/ce-pull-2026-10-27/adjudication-input.json",
+        "docs/validation/ce-pull-2026-10-27/adjudication.json",
+        "docs/validation/ce-pull-2026-10-27/ledger.json",
+        "docs/validation/ce-pull-2026-10-27/summary.md",
+        "docs/validation/ce-pull-2026-10-27/artifact-set.json",
+        "docs/validation/ce-pull-2026-10-27/work-return.json",
+        "docs/validation/ce-pull-2026-10-27/verification-run-summary.json",
+        "docs/validation/ce-pull-2026-10-27/honest-closeout.md",
+        "docs/validation/ce-pull-2026-10-27/handoff.json",
+        "docs/validation/ce-pull-2026-10-27/semantic-screening.json",
+        "docs/validation/ce-pull-2026-10-27/plan-review.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/window-facts.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/execution-state.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/execution-baseline.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/producer-name-status.tsv",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/target-source-inventory.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/adjudication-input.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/adjudication.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/ledger.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/summary.md",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/artifact-set.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/work-return.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/verification-run-summary.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/honest-closeout.md",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/handoff.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/semantic-screening.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/plan-review.json",
+        "docs/validation/ce-pull-2026-10-27/logs/**",
+        "docs/validation/ce-pull-2026-10-27/owner-receipts/**",
+        "docs/validation/ce-pull-2026-10-27/admissions/**",
+        "docs/validation/ce-pull-2026-10-27/ledger-patches/**",
+        "docs/validation/ce-pull-2026-10-27/staging/**",
+        "docs/validation/2026-08-19-ce-post-3-20-ledger-patches/**",
+        "docs/validation/ce-localization/**"
+      ]
+    },
+    "hash_algorithm": {
+      "name": "sha256",
+      "version": "canonical-source-manifest-v1"
+    }
+  },
+  "source_refs": [
+    "skills/spec-optimize/scripts/decide.cjs",
+    "skills/spec-optimize/references/measurement.md",
+    "skills/spec-optimize/references/loop.md"
+  ],
+  "limitations": [
+    "未采纳新外部执行引擎、proof-test token 或未经准入的 simplify 接口",
+    "本地 contract 检查不等于模型行为验证"
+  ],
+  "unresolved": [],
+  "package_id": "skills/ce-optimize",
+  "unit_id": "U4",
+  "paths": [
+    "skills/ce-optimize/scripts/decide.mjs",
+    "skills/ce-optimize/references/optimize-spec-schema.yaml",
+    "skills/ce-optimize/references/loop.md",
+    "skills/ce-optimize/references/measurement.md",
+    "skills/ce-optimize/references/spec.md",
+    "skills/ce-optimize/references/experiment-log-schema.yaml",
+    "skills/ce-optimize/references/experiment-prompt-template.md",
+    "skills/ce-optimize/references/wrap-up.md",
+    "skills/ce-optimize/SKILL.md"
+  ],
+  "decisions": [
+    {
+      "path": "skills/ce-optimize/scripts/decide.mjs",
+      "target_action": "compose",
+      "rationale": "在本地 decide/schema/measurement/loop 既有 owner 融合可选 holdout 确认和不泄漏/不选样边界；保留配对样本、A/A、授权、独立 judge 与冻结 run 协议；不接入 remote/tick，不全量替换 schema"
+    },
+    {
+      "path": "skills/ce-optimize/references/optimize-spec-schema.yaml",
+      "target_action": "compose",
+      "rationale": "在本地 decide/schema/measurement/loop 既有 owner 融合可选 holdout 确认和不泄漏/不选样边界；保留配对样本、A/A、授权、独立 judge 与冻结 run 协议；不接入 remote/tick，不全量替换 schema"
+    },
+    {
+      "path": "skills/ce-optimize/references/loop.md",
+      "target_action": "compose",
+      "rationale": "在本地 decide/schema/measurement/loop 既有 owner 融合可选 holdout 确认和不泄漏/不选样边界；保留配对样本、A/A、授权、独立 judge 与冻结 run 协议；不接入 remote/tick，不全量替换 schema"
+    },
+    {
+      "path": "skills/ce-optimize/references/measurement.md",
+      "target_action": "compose",
+      "rationale": "在本地 decide/schema/measurement/loop 既有 owner 融合可选 holdout 确认和不泄漏/不选样边界；保留配对样本、A/A、授权、独立 judge 与冻结 run 协议；不接入 remote/tick，不全量替换 schema"
+    },
+    {
+      "path": "skills/ce-optimize/references/spec.md",
+      "target_action": "compose",
+      "rationale": "在本地 decide/schema/measurement/loop 既有 owner 融合可选 holdout 确认和不泄漏/不选样边界；保留配对样本、A/A、授权、独立 judge 与冻结 run 协议；不接入 remote/tick，不全量替换 schema"
+    },
+    {
+      "path": "skills/ce-optimize/references/experiment-log-schema.yaml",
+      "target_action": "compose",
+      "rationale": "在本地 decide/schema/measurement/loop 既有 owner 融合可选 holdout 确认和不泄漏/不选样边界；保留配对样本、A/A、授权、独立 judge 与冻结 run 协议；不接入 remote/tick，不全量替换 schema"
+    },
+    {
+      "path": "skills/ce-optimize/references/experiment-prompt-template.md",
+      "target_action": "compose",
+      "rationale": "在本地 decide/schema/measurement/loop 既有 owner 融合可选 holdout 确认和不泄漏/不选样边界；保留配对样本、A/A、授权、独立 judge 与冻结 run 协议；不接入 remote/tick，不全量替换 schema"
+    },
+    {
+      "path": "skills/ce-optimize/references/wrap-up.md",
+      "target_action": "compose",
+      "rationale": "在本地 decide/schema/measurement/loop 既有 owner 融合可选 holdout 确认和不泄漏/不选样边界；保留配对样本、A/A、授权、独立 judge 与冻结 run 协议；不接入 remote/tick，不全量替换 schema"
+    },
+    {
+      "path": "skills/ce-optimize/SKILL.md",
+      "target_action": "compose",
+      "rationale": "在本地 decide/schema/measurement/loop 既有 owner 融合可选 holdout 确认和不泄漏/不选样边界；保留配对样本、A/A、授权、独立 judge 与冻结 run 协议；不接入 remote/tick，不全量替换 schema"
+    }
+  ],
+  "review_ref": "docs/validation/ce-pull-2026-10-27/execution-state.json",
+  "authority_ref": "docs/validation/ce-pull-2026-10-27/execution-state.json",
+  "dependency_refs": []
+}

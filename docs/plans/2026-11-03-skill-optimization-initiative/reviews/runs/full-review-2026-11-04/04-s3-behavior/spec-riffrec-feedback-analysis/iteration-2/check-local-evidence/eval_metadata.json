@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "Check local evidence",
+  "prompt": "First run node prepare-eval.cjs once in this isolated fixture. Preparation may create a fixture baseline commit only. Read the current installed spec-riffrec-feedback-analysis source and follow it. This is explicit Riffrec feedback. Analyze the capture directory extensively using local events only and --no-transcribe, with output-dir local-evidence. Treat generated kickoff requirements as unconfirmed. Do not publish, commit or create a plan. Return JSON with confirmed_requirements (count), coverage and source_manifest_visibility.",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-riffrec-feedback-analysis/evals/fixtures/scripts/check-local-evidence.sh"
+  ]
+}

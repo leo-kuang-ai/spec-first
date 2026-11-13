@@ -1,0 +1,75 @@
+{
+  "schema_version": "verification-run-summary.v1",
+  "generated_at": "2026-11-12T02:51:56.095Z",
+  "profile": {
+    "source": "inferred",
+    "name": "inferred",
+    "path": "package.json"
+  },
+  "checks": [
+    {
+      "id": "npm-test",
+      "service": "root",
+      "command": "npm test",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-work/repo/20261112-1054-entry-by-id/logs/npm-test.log",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "cli-smoke-post-entries",
+      "service": "root",
+      "command": "curl -si -X POST localhost:3000/entries -d '{\"amount\":10,\"note\":\"smoke\"}'",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "curl"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-work/repo/20261112-1054-entry-by-id/logs/cli-smoke-post-entries.log",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "cli-smoke-get-entry-by-id",
+      "service": "root",
+      "command": "curl -si localhost:3000/entries/1",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "curl"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-work/repo/20261112-1054-entry-by-id/logs/cli-smoke-get-entry-by-id.log",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "cli-smoke-get-missing-id",
+      "service": "root",
+      "command": "curl -si localhost:3000/entries/999",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "curl"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-work/repo/20261112-1054-entry-by-id/logs/cli-smoke-get-missing-id.log",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    }
+  ]
+}

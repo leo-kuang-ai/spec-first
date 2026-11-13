@@ -1,0 +1,177 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "generated_at": "2026-09-20T07:35:36.158199+00:00",
+  "skill_name": "spec-prd",
+  "source_snapshot": "source-manifest.json",
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "source_paths": [
+    "skills/spec-prd/SKILL.md",
+    "skills/spec-prd/references/prd-readiness-lens.md",
+    "skills/spec-prd/scripts/finalize-prd-artifact.js"
+  ],
+  "source_read_ranges": {
+    "skills/spec-prd/SKILL.md": "1-90, 321-345",
+    "skills/spec-prd/references/prd-readiness-lens.md": "1-100",
+    "skills/spec-prd/scripts/finalize-prd-artifact.js": "1-220,262-323,399-453"
+  },
+  "source_hashes": {
+    "skills/spec-prd/SKILL.md": "25cc60f639d886c024a61b462c84cb101f6b95a6098984a879f2a750292e230a",
+    "skills/spec-prd/references/prd-readiness-lens.md": "fddbff2c86451191210d99f2690af85490be2fd1d4016789c7b284a67839ba35",
+    "skills/spec-prd/scripts/finalize-prd-artifact.js": "a28fbff58e9c2b9ed0adc4e218f1b1afb35cab84e47ce6a54983bd92835eb915"
+  },
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "entry_surface": "workflow_command",
+  "batch": "B",
+  "closure_tier": "L",
+  "closure_observed": {
+    "files": 48,
+    "bytes": 674822,
+    "read_package_files_at_least_partially": 3,
+    "read_supporting_files_at_least_partially": 0,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "coverage_commitment": "committed",
+  "dependency_closure": "partial",
+  "status": "degraded",
+  "reason_codes": [
+    "bounded_source_review",
+    "dependency_closure_partial",
+    "workflow_not_run"
+  ],
+  "command_or_method": [
+    "只读reviewer逐包阅读冻结source并判断五分支；主owner整合与回源裁决，不是盲评或workflow执行。"
+  ],
+  "ran": true,
+  "exit_code": null,
+  "evidence_paths": [
+    "reviewer-returns/b.json"
+  ],
+  "source_refs": [
+    "skills/spec-prd/SKILL.md",
+    "skills/spec-prd/references/prd-readiness-lens.md",
+    "skills/spec-prd/scripts/finalize-prd-artifact.js"
+  ],
+  "owner": "project-lead-cycle-1",
+  "consumers": [
+    "周期1主审查",
+    "对应上游/下游workflow（以SKILL文档声明为准）"
+  ],
+  "branches": [
+    {
+      "id": "entry_positive",
+      "status": "source-covered",
+      "judgment": "面向 brownfield PRD 的创建、细化与验证，通过源码优先质询及 readiness 完成 WHAT 交接；validate 保持 report-only。",
+      "source_refs": [
+        "skills/spec-prd/SKILL.md:13-17",
+        "skills/spec-prd/SKILL.md:41-59"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "near_neighbor_negative",
+      "status": "source-covered",
+      "judgment": "从零探索转 brainstorm，HOW/任务编译转 plan/write-tasks；实现、排错、审查及设计一致性具有独立 owner。",
+      "source_refs": [
+        "skills/spec-prd/SKILL.md:4",
+        "skills/spec-prd/SKILL.md:29-35"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "output_consumer",
+      "status": "source-covered",
+      "judgment": "create/refine 输出 PRD 产物与 finalize/readiness facts；validate 输出当前报告，供 spec-plan、spec-doc-review 和产品 owner 消费。",
+      "source_refs": [
+        "skills/spec-prd/SKILL.md:41-59",
+        "skills/spec-prd/SKILL.md:321-345"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "critical_error_stop",
+      "status": "source-covered",
+      "judgment": "checker reason code、owner 闭环、设计源、receipt 时效或 readiness 声明未解决时，阻止 planning handoff。",
+      "source_refs": [
+        "skills/spec-prd/references/prd-readiness-lens.md:33-45",
+        "skills/spec-prd/SKILL.md:321-342"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "degraded_recovery_handoff",
+      "status": "source-covered",
+      "judgment": "问题交互、provider 或设计证据不可用时，显式降级并保留 blocker/OQ；validate 不修复或 finalize。",
+      "source_refs": [
+        "skills/spec-prd/SKILL.md:70-78",
+        "skills/spec-prd/SKILL.md:323-342"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    }
+  ],
+  "findings": [],
+  "fresh_source_eval": "not-run",
+  "claim_ceiling": "C0",
+  "limitations": [
+    "完整 script 行段、测试及宿主 mutation enforcement 的证据未完整阅读或运行。",
+    "仅凭 source review 尚未验证 runtime guard 是否激活。",
+    "原机械占位结论已撤销；source-covered仅证明已读范围可追踪，不证明运行通过。",
+    "未确认读取范围不计覆盖；哈希只证明字节。"
+  ],
+  "recovery_point": "补读剩余 references/tests，并在具备宿主时执行 finalize/check-only 和 fresh-source eval。",
+  "timing": {
+    "active_seconds": null,
+    "limitation": "逐包主动时间不可可靠恢复，未用工具墙钟估算。"
+  },
+  "record_correction": {
+    "at": "2026-09-20T05:55:01.022039+00:00",
+    "invalidated": "2026-09-20T05:24 的机械占位结论",
+    "replaced_by_actual_review_at": "2026-09-20T07:35:36.158199+00:00"
+  },
+  "supporting_read_ranges": {},
+  "unconfirmed_read_ranges": [
+    "tests/unit/spec-prd-*.test.js（精确阅读范围未确认）",
+    "其余 spec-prd 引用及完整 scripts（未确认）",
+    "skills/spec-prd/references/evidence-and-topology.md（曾审阅但精确行段不可恢复，不计确认覆盖）",
+    "skills/spec-prd/references/grill-with-docs-integration.md（曾审阅但精确行段不可恢复，不计确认覆盖）",
+    "skills/spec-prd/scripts/check-prd-artifact.js（曾审阅但精确行段不可恢复，不计确认覆盖）",
+    "skills/spec-prd/scripts/finalize-prd-artifact.js（曾审阅但精确行段不可恢复，不计确认覆盖）",
+    "skills/spec-prd/scripts/check-glossary-drift.js（曾审阅但精确行段不可恢复，不计确认覆盖）"
+  ],
+  "reviewer_provenance": {
+    "reviewer": "cycle1_a_exit",
+    "kind": "read-only-source-review",
+    "fresh_per_package_context": false,
+    "raw_return": "reviewer-returns/b.json",
+    "raw_return_sha256": "74c86ff4af0bab17fbeb82f390cf57eb33590df5a24910b9823d19382480563c"
+  },
+  "execution": {
+    "source_semantic_review": "ran",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "not-run"
+  },
+  "additional_owner_review": {
+    "reviewer": "root",
+    "kind": "owner-self-review",
+    "source_read_ranges": {
+      "skills/spec-prd/scripts/finalize-prd-artifact.js": "1-220,262-323,399-453"
+    },
+    "timing": "压缩前实际显示，未记录精确时间",
+    "limitations": [
+      "只读主owner补审，未执行workflow或脚本；不是独立reviewer范围。"
+    ],
+    "judgments": [
+      "finalizePrd在!can_finalize或checkOnly时先返回，写入发生在之后；main区分verifyReceipt与finalize，非法参数exit 2。",
+      "check-prd本体、verify其余实现与真实运行未验证。"
+    ]
+  }
+}

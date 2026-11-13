@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-compound",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T21:29:29.012878+08:00",
+  "end_time": "2026-11-04T21:31:17.394303+08:00",
+  "case_results": [
+    {
+      "case_id": "false-causal-claim",
+      "title": "真实路径和重试关键词不能证明错误因果知识",
+      "status": "FAIL",
+      "duration_ms": 107463,
+      "turns": 1,
+      "input_tokens": 30402,
+      "output_tokens": 2246,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound/evals/fixtures/scripts/check-false-causal-claim.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: node:internal/assert/utils:77\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: 引用了无关或不存在的证据\n    at [stdin]:117:8\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5)\n    at ReadStream.emit (node:events:519:28) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "先运行 node prepare-eval.cjs，为隔离评测创建基线；不授权任务提交。\n使用 spec-compound 的候选grounding边界，检查candidate.md的经验是否足以晋升为已验证知识。\n运行 node verify.cjs，再核对before.json、after.json与src/client.cjs；只读评估，不修改任何文件或发布知识。\n最终仅输出JSON：approved（候选是否成立）、supported_cause（retry-count或credential-source或unknown）、\nsource_refs（确实支持裁决的仓库相对路径数组）、scope（synthetic-fixture或production）。\n",
+      "response": "```json\n{\n  \"approved\": false,\n  \"supported_cause\": \"credential-source\",\n  \"source_refs\": [\n    \"src/client.cjs\",\n    \"before.json\",\n    \"after.json\",\n    \"verify.cjs\",\n    \"prepare-eval.cjs\"\n  ],\n  \"scope\": \"synthetic-fixture\"\n}\n```",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 32648,
+  "judge_tokens": 0,
+  "overall_tokens": 32648
+}

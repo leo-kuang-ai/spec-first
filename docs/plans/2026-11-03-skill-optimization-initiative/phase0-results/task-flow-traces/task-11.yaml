@@ -1,0 +1,93 @@
+# T11：TASK-CE-FSA3-001→003 CE 审查证据链收口（跨 4 天 3 个任务 ID）
+# 证据：626a8d73（09-21 20:37 [TASK-CE-FSA3-001] fix 收口证据链）→ 96465787（09-21 绑定 clean HEAD）
+# → a2566137（09-22 [TASK-CE-FSA3-001] close）→ f4c7a7b9（09-24 [TASK-CE-FSA3-002] refresh）
+# → 04628f8f（09-24 [TASK-CE-FSA3-003] commit all）
+# 变更面：docs/validation/2026-08-19-ce-post-3-20-adjudication*.json 等大 JSON 反复更新
+
+task_id: "T11"
+task_title: "CE post-3-20 审查证据链收口（TASK-CE-FSA3-001/002/003）"
+task_type: "cross_session"
+complexity: "medium"
+calendar_span: "2026-09-21 → 2026-09-24（跨 4 天，5 个提交，3 个任务 ID）"
+
+context:
+  repository: "spec-first"
+  branch: "当前工作分支"
+  commits:
+    - "626a8d73 09-21 20:37 [TASK-CE-FSA3-001] fix(validation): 收口当前 CE 审查证据链（adjudication-input +183、adjudication +195、reconciliation-v2、inventory-v2、autoresearch baseline 等大 JSON 更新）"
+    - "96465787 09-21 [TASK-CE-FSA3-001] chore(validation): 绑定 clean HEAD closeout"
+    - "a2566137 09-22 [TASK-CE-FSA3-001] chore(validation): close current CLI and CE audit evidence"
+    - "f4c7a7b9 09-24 [TASK-CE-FSA3-002] chore(validation): refresh current CE closeout and graphify evidence"
+    - "04628f8f 09-24 [TASK-CE-FSA3-003] chore: commit all current validation and research artifacts"
+
+workflow:
+  - stage: "1_requirement"
+    evidence_tier: "confirmed"
+    evidence: "任务 ID 链本身（TASK-CE-FSA3-001→003）；目标：把 CE post-3-20 对账证据链收敛到可关闭状态"
+    friction_points: []
+  - stage: "2_plan"
+    evidence_tier: "inferred"
+    evidence: "无独立 plan 文档；按任务 ID 逐段推进"
+    friction_points: []
+  - stage: "3_work"
+    evidence_tier: "confirmed"
+    evidence: "adjudication JSON 多轮大幅更新（+183/+195/+214/+236 行级变更）+ inventory/autoresearch baseline 反复刷新"
+    friction_points:
+      - id: "FP-T11-1"
+        type: "衔接断裂"
+        severity: "P1"
+        description: "证据链收敛困难：同一批 adjudication/reconciliation JSON 在 4 天内经 001 收口→clean HEAD 重绑→close→002 refresh→003 全量兜底提交，共 5 轮才落定；close 之后又因 refresh 需求重开"
+        evidence: "5 个提交的信息与变更面（close 后 f4c7a7b9 再 refresh）"
+        attribution: "tooling_issue(主)：证据绑定与收口机制缺少幂等性（close 后新事实出现需重开整链）；external_factor(轻)：上游证据持续到达"
+      - id: "FP-T11-2"
+        type: "验证缺失"
+        severity: "P2"
+        description: "证据最初未绑定 clean HEAD，需要专门一次提交重绑（96465787）——证据与代码状态的绑定时机滞后"
+        evidence: "96465787 '绑定 clean HEAD closeout'"
+        attribution: "tooling_issue：收口流程未在首轮强制 HEAD 绑定"
+      - id: "FP-T11-3"
+        type: "衔接断裂"
+        severity: "P2"
+        description: "最终以 'commit all current validation and research artifacts' 兜底提交收尾——逐项提交纪律在链尾失效，回到批量提交"
+        evidence: "04628f8f 提交信息"
+        attribution: "external_factor：收尾疲劳/兜底习惯；无机制阻止 catch-all 提交"
+  - stage: "4_validation"
+    evidence_tier: "confirmed"
+    evidence: "各提交含验证证据更新；最终含 graphify evidence（f4c7a7b9）"
+    friction_points: []
+  - stage: "5_review"
+    evidence_tier: "inferred"
+    evidence: "adjudication JSON 本身为审查对账产物；无独立 review 记录可见"
+    friction_points: []
+  - stage: "6_commit"
+    evidence_tier: "confirmed"
+    evidence: "5 提交均带任务 ID 前缀，可追溯"
+    friction_points: []
+
+summary:
+  delivered: true
+  merged: true
+  correct: true
+  complete: true     # 003 全量兜底后证据链落定
+  tested: true
+  documented: true
+  rework_count: 1    # close 后 refresh 重开（001 close → 002 refresh）
+  user_intervention_count: null
+  overall_quality: "medium-high（任务 ID 链可追溯）；证据链 5 轮才收敛反映收口机制缺幂等性"
+
+layer_3_metrics: { 端到端正确: true, 端到端返工: true, 用户介入次数: null }
+layer_2_metrics: { 信息丢失: false, 信息重复: false, 验证缺失: true, 衔接断裂: true }
+
+friction_summary:
+  total: 3
+  by_type: { 信息丢失: 0, 信息重复: 0, 验证缺失: 1, 衔接断裂: 2 }
+  by_attribution: { skill_issue: 0, model_capability: 0, external_factor: 1.0, tooling_issue: 2.0, none: 0 }
+
+lessons_learned:
+  what_went_well:
+    - "任务 ID 前缀使跨 4 天的链路可完整回溯"
+    - "证据以 JSON 落盘而非只在会话中"
+  what_could_be_better:
+    - "证据收口机制需要幂等设计：close 后新事实应增量追加而非重开整链"
+    - "clean HEAD 绑定应为收口首轮的强制步骤"
+    - "禁止/警惕 catch-all 提交作为任务收尾模式"

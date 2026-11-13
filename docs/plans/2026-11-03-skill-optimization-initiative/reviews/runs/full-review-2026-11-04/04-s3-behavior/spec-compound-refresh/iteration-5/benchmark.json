@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "skill_name": "spec-compound-refresh",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-compound-refresh",
+    "timestamp": "2026-11-04T13:24:45Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "独有离线知识与实质引用阻止误删",
+      "configuration": "with_skill",
+      "run_number": 5,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 121.505,
+        "tokens": 41426,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound-refresh/evals/fixtures/scripts/check-publication-preserve.sh",
+          "passed": true,
+          "evidence": "PASS: 固定fixture的原件、引用、恢复与报告一致；非模型行为或通用语义证明"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 121.505,
+        "stddev": 0,
+        "min": 121.505,
+        "max": 121.505
+      },
+      "tokens": {
+        "mean": 41426,
+        "stddev": 0,
+        "min": 41426,
+        "max": 41426
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

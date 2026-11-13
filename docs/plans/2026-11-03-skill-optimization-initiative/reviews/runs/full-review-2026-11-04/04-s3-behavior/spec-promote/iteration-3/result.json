@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-promote",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T21:24:45.698695+08:00",
+  "end_time": "2026-11-04T21:26:58.595833+08:00",
+  "case_results": [
+    {
+      "case_id": "check-unreleased-local-drafts",
+      "title": "Check unreleased local drafts",
+      "status": "FAIL",
+      "duration_ms": 132333,
+      "turns": 4,
+      "input_tokens": 28476,
+      "output_tokens": 4440,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 4,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-promote/evals/fixtures/scripts/check-unreleased-local-drafts.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: node:assert:150\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   'Changelog blurb',\n+   'X post'\n-   'changelog',\n-   'x'\n  ]\n\n    at [stdin]:218:8\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5)\n    at ReadStream.emit (node:events:519:28) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: [ 'Changelog blurb', 'X post' ],\n  expected: [ 'changelog', 'x' ],\n  operator: 'deepStrictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run node prepare-eval.cjs once in this isolated fixture. Preparation may create a fixture baseline commit only. Read the current installed spec-promote source and follow it. Draft locally one X post and one changelog blurb for the implemented monthly summaries, preserving the delivery facts in README.md and CHANGELOG.md. Do not probe or use Spiral, save preferences, write files, commit or publish. Return JSON with delivery_status, provider_attempt and drafts [{channel,content}].",
+      "response": "依据 spec-promote(Path B 本地直写，未探测 Spiral、未走 Path 0):仓库仅有 prepare 生成的 fixture 基线提交，无发布/部署痕迹，与 README、CHANGELOG 的 `Unreleased` 一致。两份草稿如下，仅供复制：\n\n### X post\n\u003e Ledger 的月度汇总做完了：一整月的账，收进一份摘要里。目前只在本地实现，未发布未部署；真上线了再来报。\n\n### Changelog blurb(Unreleased 下)\n\u003e 新增月度汇总：整月账目汇成一份摘要；已实现，尚未发布。\n\n```json\n{\n  \"delivery_status\": \"implemented-not-released\",\n  \"provider_attempt\": \"not-attempted\",\n  \"drafts\": [\n    {\n      \"channel\": \"X post\",\n      \"content\": \"Ledger 的月度汇总做完了:一整月的账,收进一份摘要里。目前只在本地实现,未发布未部署;真上线了再来报。\"\n    },\n    {\n      \"channel\": \"Changelog blurb\",\n      \"content\": \"新增月度汇总:整月账目汇成一份摘要;已实现,尚未发布。\"\n    }\n  ]\n}\n```\n\n说明：\n- 可用性措辞严格对齐交付事实：已实现(implemented)、本地、未发布、未部署，两份草稿均未做 \"现已上线\" 类声明。\n- 按你的要求与 skill 约束：未运行 `check-spiral-auth.cjs`、未调用 Spiral、未写任何偏好或文件、未提交、未发布;`provider_attempt` 为 `not-attempted`。\n- 草稿仅为草稿，发布与否完全由你决定。如需调整语气、长度、角度，或改成英文版本/增加渠道，告诉我即可。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 32916,
+  "judge_tokens": 0,
+  "overall_tokens": 32916
+}

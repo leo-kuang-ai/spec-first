@@ -1,0 +1,45 @@
+{
+  "created_at": "2026-10-31T12:51:34.153294+00:00",
+  "status": "independently-reviewed-with-disclosed-limits",
+  "source_successors": [
+    {
+      "path": "skills/spec-commit/SKILL.md",
+      "before_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-followup-20261031/before/skills/spec-commit/SKILL.md",
+      "before_sha256": "f3ed607d09ee5a4d38fe702a2c047b4394981b84fa674c534d4b79a9717596f5",
+      "successor_sha256": "47bc11e7407b55e9225fc2464a44d33174ec523a0b0c8e15892a92724458b6c4"
+    },
+    {
+      "path": "skills/spec-commit-push-pr/references/commit-and-push.md",
+      "before_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-followup-20261031/before/skills/spec-commit-push-pr/references/commit-and-push.md",
+      "before_sha256": "0c1fde8b6cd881df3da2dcc1fcee2748a6f8549cd67ca17af89424a9926738fd",
+      "successor_sha256": "01a0b42b62dda5b25019ec0e51c3a55ae1935098ac324d586758c2324e3f226b"
+    },
+    {
+      "path": "skills/spec-write-tasks/SKILL.md",
+      "before_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-followup-20261031/before/skills/spec-write-tasks/SKILL.md",
+      "before_sha256": "ad4decabc11124b24bfe45b850ba1f4e959f86340159bb5ebdbd90bc8e04c8e2",
+      "successor_sha256": "cdfa20fd18d983e5ddf6ef259006d5a62e1b7fdc9a2564d879649990b77867df"
+    },
+    {
+      "path": "skills/spec-write-tasks/references/execution-handoff-contract.md",
+      "before_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-followup-20261031/before/skills/spec-write-tasks/references/execution-handoff-contract.md",
+      "before_sha256": "543d4a4bcea92d1127dd615cf72ffda2125ae5ae6645d3d1531d59d3cc65ec1b",
+      "successor_sha256": "d852671d3912d313d87c65d7e4b5ee99bd3d4ec92890f8f1cfc5c6f3f0c5dd34"
+    },
+    {
+      "path": "skills/spec-write-tasks/references/task-quality-guide.md",
+      "before_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-followup-20261031/before/skills/spec-write-tasks/references/task-quality-guide.md",
+      "before_sha256": "695f570b62e5ff57a5a8d4df82c5d830a3c20d6a2bf24f1b8ed6aa9665879ca2",
+      "successor_sha256": "5e21b5c69cf75adbcf3098664c51cd2210598895d41db8a936c4b9076a41e42c"
+    },
+    {
+      "path": "skills/spec-plan/references/plan-handoff.md",
+      "before_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-followup-20261031/before/skills/spec-plan/references/plan-handoff.md",
+      "before_sha256": "103e4d205215a2b4fdfd05118c782bc497feec5b680dd57204184519f020ebc8",
+      "successor_sha256": "079bf285adf7098e95504b7e92a567dc59a4e8629eb069aaf0c8e46774dfd053",
+      "reason": "Repeated trial reporting defect traced to existing fallback conflating prohibited invocation with unavailable capability."
+    }
+  ],
+  "claim_limit": "New source revision, not a modification of frozen A/B inputs or original trial conclusions.",
+  "review_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/follow-up-20261031/independent-source-review.json"
+}

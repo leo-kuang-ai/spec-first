@@ -1,0 +1,11 @@
+PASS tests/unit/spec-ideate-phase-contracts.test.js
+PASS tests/unit/requirements-rendering-parity.test.js
+PASS tests/unit/spec-ideate-clarification-handoff-contracts.test.js
+PASS tests/unit/settled-decisions-contracts.test.js
+
+Test Suites: 4 passed, 4 total
+Tests:       15 passed, 15 total
+Snapshots:   0 total
+Time:        0.192 s
+Ran all test suites within paths "tests/unit/spec-ideate-phase-contracts.test.js", "tests/unit/spec-ideate-clarification-handoff-contracts.test.js", "tests/unit/requirements-rendering-parity.test.js", "tests/unit/settled-decisions-contracts.test.js".
+Test results written to: docs/validation/ce-skill-audit-2026-10-28/ideate-tests.json

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="spec-code-review" tests="1" failures="0" errors="0" skipped="0" time="219.142" timestamp="2026-09-21T21:34:47+08:00">
+    <testcase name="report-only-detects-tenant-bypass" classname="spec-code-review" time="218.421">
+      <properties>
+        <property name="judge.skills.count" value="0"></property>
+      </properties>
+    </testcase>
+  </testsuite>
+</testsuites>

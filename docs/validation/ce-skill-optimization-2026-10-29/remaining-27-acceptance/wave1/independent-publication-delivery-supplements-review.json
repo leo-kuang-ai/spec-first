@@ -1,0 +1,280 @@
+{
+  "review": "Independent read-only review of parent publication and delivery supplements",
+  "disposition": "approved-with-explicit-evidence-scope-qualifications",
+  "path_aliases": {
+    "W": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1",
+    "RUN": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030"
+  },
+  "scope": {
+    "refresh_publication_cases": 6,
+    "compound_publication_cases": 6,
+    "explain_delivery_cases": 3,
+    "separate_parent_drift_control_sets": 12,
+    "retained_failures": [
+      "Refresh initial validator invocation-order failure",
+      "Parent drift-control initial schema-key failure"
+    ],
+    "method": "Read protocols, retained results, runner sources, relevant current skill references and referenced model material; independently recompute hashes, extraction/derivation identities, final file identities and delivery link resolutions.",
+    "not_performed": "No producer/helper execution, writes, network operations or delegation."
+  },
+  "integrity": {
+    "protocol_input_pins": {
+      "refresh": "All 23 input/helper pins match.",
+      "compound": "All 34 input/helper pins match.",
+      "explain": "All 8 artifact/fixture/source-rule pins match."
+    },
+    "runner_and_protocol_pins": "All three publication/delivery runner hashes match their retained results. Refresh recovery pins match the original protocol and corrected runner. Separate drift-control runner, recovery protocol, original protocol, result pins and failed-initial runner hashes match.",
+    "refresh_extractions": "All twelve learning/glossary files exactly equal the specified inclusive line slices of their six original artifacts.",
+    "refresh_derivations": "All six derived learning files exactly equal the original extraction with the two recorded source-reference replacements and the declared parent provenance paragraph.",
+    "compound_extractions": "Every retained candidate-extracted.md occurs byte-for-byte inside its corresponding original model artifact.",
+    "compound_derivations": "All six normalized candidates exactly reproduce the recorded backticked reference replacements; no additional prose changes were found.",
+    "final_state": "All recorded final publication hashes and deletion absences match current files. All three final delivery hashes match.",
+    "historical_limit": "Current byte agreement and source inspection support retained-record consistency; they do not independently reconstruct past filesystem execution or authenticate historical tool availability."
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "material-claim-qualification",
+      "scope": "Original Refresh deletion-drift flags",
+      "finding": "deletion_drift_refused=true is not an exercised refusal.",
+      "evidence": "execute-refresh-publication.py writes modified bytes to a separate drift file, asserts that its hash changed, then defines refusal as file existence plus preservation of those bytes. It never passes the stale identity into a deletion decision or attempts the guarded deletion.",
+      "supported_claim": "The runner detects a known hash difference and preserves the edited fixture.",
+      "unsupported_claim": "The original six cases prove that deletion is refused on stale identity.",
+      "resolution": "Retain the original records unchanged and qualify these flags. The separately pinned successor controls provide their own narrower parent-guard evidence."
+    },
+    {
+      "id": "F2",
+      "severity": "material-claim-qualification",
+      "scope": "Original Compound target-drift controls",
+      "finding": "The original whole-group refusal claim has the same weak control pattern.",
+      "evidence": "execute-knowledge-publication.py modifies a separate learning copy, compares snapshots and asserts preserved bytes. No publication function receives the stale snapshot; writes_after_detection=0 is supplied as a report value.",
+      "supported_claim": "Manual parent detection/preservation on the separate fixture.",
+      "unsupported_claim": "An exercised publication routine refused the affected group.",
+      "resolution": "Use the separate parent-control results for actual guarded-function evidence without retroactively upgrading this flag."
+    },
+    {
+      "id": "F3",
+      "severity": "validation-scope",
+      "scope": "Refresh claims validation",
+      "finding": "All six native claims checks pass while checking zero paths, zero SHAs and zero links.",
+      "evidence": "Every retained Refresh candidate and final claims stdout reports checked 0 paths, 0 SHAs, 0 links; 0 flags, with no upstream default branch found.",
+      "implication": "These passes do not verify source_refs or publication links. Source-backup identity comes from explicit hash checks; consumer/catalog anchors come from the separate link checks. Semantic sufficiency remains a parent judgment."
+    },
+    {
+      "id": "F4",
+      "severity": "historical-failure-preserved",
+      "scope": "Compound citations",
+      "finding": "All six original candidate claims checks failed before parent normalization; these remain failures.",
+      "evidence": "compound-prepublication-claims.json retains exit 1 for A1/A2/A3/B1/B2/B3. B1 includes the erroneous ../compound-proof.json reference.",
+      "implication": "Normalized success is a parent repair, not an original model publication success.",
+      "qualification": "Normalized B1 still contains surrounding prose saying paths are fixture-relative; after normalization that wording is imprecise, although the full repository paths resolve unambiguously."
+    },
+    {
+      "id": "F5",
+      "severity": "evidence-scope",
+      "scope": "Deletion and citation safety",
+      "finding": "Refresh safely addresses the admitted synthetic dependency graph, not arbitrary repository-wide inbound references.",
+      "evidence": "The runner repairs its generated consumer and catalog, checks their links, retains both original source bytes outside the corpus and excludes the canonical target from deletion.",
+      "implication": "Four admitted subsumed copies are removed after those dependency checks; this does not prove a general inbound-citation discovery mechanism, filesystem CAS, arbitrary race resistance or crash-safe multi-file transaction."
+    }
+  ],
+  "refresh": {
+    "initial_failure": {
+      "disposition": "correctly-retained-usage-failure",
+      "evidence": "The initial invocation puts --promotion after the document; the retained reproduction records exit 2 and usage stderr. Its pinned partial files still match.",
+      "publication": "No final target publication is supported before that failure; preparation files and evaluation corpus initialization did occur.",
+      "recovery": "Corrected runner moves --promotion before the document and writes a separate -r2 corpus. Runner diff otherwise changes output/result identity and recovery metadata, not extraction or publication logic."
+    },
+    "shared_case_results": {
+      "invalid_validation": "All six retain exit 1 for missing promotion fields and unchanged publication targets.",
+      "candidate_and_final_validation": "All six retain promotion exit 0 and claims exit 0; claims coverage has the F3 limitation.",
+      "actual_partial_failure": "All six invoke os.replace on an intentionally removed prepared catalog file and catch FileNotFoundError errno 2 after publishing glossary, canonical and consumer.",
+      "recovery": "Recorded partial state retains old deletion targets; catalog is restaged and renamed after snapshot rechecks. Final files match derived bytes.",
+      "retained_knowledge": "All six preserve numeric-before-write, original-export reconciliation, original-import-ID comparison and unrelated-row protection, with implementation/outcome uncertainty stated.",
+      "alias": "All six preserve the original import-v1 consumer bytes and retain Ledger space as an alias of Workspace."
+    },
+    "per_case": [
+      {
+        "trial": "CEOPT-07-A1",
+        "canonical": "learning-b.md",
+        "deleted": "learning-a.md",
+        "extraction_derivation_final_hashes": "verified",
+        "partial_failure_recovery": "supported",
+        "disposition": "accepted-with-F1-F3-F5-qualifications"
+      },
+      {
+        "trial": "CEOPT-07-A2",
+        "canonical": "docs/solutions/best-practices/bank-import-validation-and-recovery.md",
+        "deleted": null,
+        "original_local_sources": "both retained unchanged",
+        "extraction_derivation_final_hashes": "verified",
+        "partial_failure_recovery": "supported",
+        "disposition": "accepted-with-F1-F3-F5-qualifications"
+      },
+      {
+        "trial": "CEOPT-07-A3",
+        "canonical": "docs/solutions/best-practices/bank-import-validation-and-recovery.md",
+        "deleted": null,
+        "original_local_sources": "both retained unchanged",
+        "glossary": "Also retains a Ledger space heading linked to Workspace.",
+        "extraction_derivation_final_hashes": "verified",
+        "partial_failure_recovery": "supported",
+        "disposition": "accepted-with-F1-F3-F5-qualifications"
+      },
+      {
+        "trial": "CEOPT-07-B1",
+        "canonical": "learning-b.md",
+        "deleted": "learning-a.md",
+        "extraction_derivation_final_hashes": "verified",
+        "partial_failure_recovery": "supported",
+        "disposition": "accepted-with-F1-F3-F5-qualifications"
+      },
+      {
+        "trial": "CEOPT-07-B2",
+        "canonical": "learning-a.md",
+        "deleted": "learning-b.md",
+        "extraction_derivation_final_hashes": "verified",
+        "partial_failure_recovery": "supported",
+        "disposition": "accepted-with-F1-F3-F5-qualifications"
+      },
+      {
+        "trial": "CEOPT-07-B3",
+        "canonical": "learning-b.md",
+        "deleted": "learning-a.md",
+        "extraction_derivation_final_hashes": "verified",
+        "partial_failure_recovery": "supported",
+        "disposition": "accepted-with-F1-F3-F5-qualifications"
+      }
+    ]
+  },
+  "compound": {
+    "shared_case_results": {
+      "invalid_validation": "All six retain genuine promotion exit 1 and unchanged admitted targets.",
+      "positive_validation": "All six normalized candidates and published final files retain promotion/claims exit 0.",
+      "actual_partial_failure": "All six publish the glossary, remove the prepared learning temp, attempt its rename and retain FileNotFoundError errno 2. Old learning and alias consumer remain unchanged at the partial stage.",
+      "recovery": "Retained candidate bytes are restaged following exact partial-state checks, then published and validated.",
+      "knowledge_preservation": "All six retain historical original-bank-export reconciliation and unrelated-row protection without claiming operational recovery.",
+      "unknown_validator": "Interrupted validator outcome explicitly remains not-run.",
+      "glossary_attribution": "The added numeric-ledger glossary sentence is parent-authored and source-grounded; it is not original model vocabulary output."
+    },
+    "per_case": [
+      {
+        "case": "A1",
+        "normalized_claim_paths_checked": 4,
+        "derivation_and_final_hashes": "verified",
+        "disposition": "accepted-with-F2-F4-qualifications"
+      },
+      {
+        "case": "A2",
+        "normalized_claim_paths_checked": 3,
+        "derivation_and_final_hashes": "verified",
+        "disposition": "accepted-with-F2-F4-qualifications"
+      },
+      {
+        "case": "A3",
+        "normalized_claim_paths_checked": 5,
+        "derivation_and_final_hashes": "verified",
+        "disposition": "accepted-with-F2-F4-qualifications"
+      },
+      {
+        "case": "B1",
+        "normalized_claim_paths_checked": 5,
+        "derivation_and_final_hashes": "verified",
+        "disposition": "accepted-with-F2-F4-qualifications"
+      },
+      {
+        "case": "B2",
+        "normalized_claim_paths_checked": 4,
+        "derivation_and_final_hashes": "verified",
+        "disposition": "accepted-with-F2-F4-qualifications"
+      },
+      {
+        "case": "B3",
+        "normalized_claim_paths_checked": 4,
+        "derivation_and_final_hashes": "verified",
+        "disposition": "accepted-with-F2-F4-qualifications"
+      }
+    ]
+  },
+  "explain": {
+    "per_case": [
+      {
+        "trial": "CEOPT-11r2-B1",
+        "initial_links": "3/3 correct",
+        "relocated_stale_links": "3/3 invalid as expected",
+        "rebased_links": "3/3 correct",
+        "final_hash_and_original_prefix": "verified",
+        "disposition": "accepted"
+      },
+      {
+        "trial": "CEOPT-11r2-B2",
+        "initial_links": "3/3 correct",
+        "relocated_stale_links": "3/3 invalid as expected",
+        "rebased_links": "3/3 correct",
+        "final_hash_and_original_prefix": "verified",
+        "disposition": "accepted"
+      },
+      {
+        "trial": "CEOPT-11r2-B3",
+        "initial_links": "3/3 correct",
+        "relocated_stale_links": "3/3 invalid as expected",
+        "rebased_links": "3/3 correct",
+        "final_hash_and_original_prefix": "verified",
+        "disposition": "accepted"
+      }
+    ],
+    "attribution": "The appendix is explicitly parent-authored. Original model bodies retain plain source pointers and are exact byte prefixes.",
+    "supported": "Parent local Markdown save, actual relocation and destination-relative link rebasing, with exact admitted source identities.",
+    "not_supported": "Model-autonomous known-destination behavior, rendering quality, browser inspection or external publication."
+  },
+  "separate_drift_controls": {
+    "disposition": "accepted-as-independent-parent-guard-controls",
+    "all_sets_reviewed": {
+      "compound": [
+        "A1",
+        "A2",
+        "A3",
+        "B1",
+        "B2",
+        "B3"
+      ],
+      "refresh": [
+        "CEOPT-07-A1",
+        "CEOPT-07-A2",
+        "CEOPT-07-A3",
+        "CEOPT-07-B1",
+        "CEOPT-07-B2",
+        "CEOPT-07-B3"
+      ]
+    },
+    "initial_failure": "Pinned initial runner accesses record['trial'] for a Compound record using case. Failure occurs before case-directory creation or target mutation; initial output root remains empty.",
+    "recovery": "Pinned successor selects the appropriate key and writes a separate -r2 corpus.",
+    "nonvacuous_evidence": "The same parent publish_group function receives stale digests and returns refused-target-drift before rename, then receives restored identities and executes four os.replace calls per set. The same delete_retained function rejects a changed source and a corrupt backup before unlink, then unlinks the restored source.",
+    "counts": {
+      "group_refusals": 12,
+      "positive_renames": 48,
+      "changed_source_refusals": 12,
+      "corrupt_backup_refusals": 12,
+      "positive_deletions": 12
+    },
+    "current_file_verification": "Every set has the four expected Candidate files, no prepared files, absent subsumed.md and the expected retained-source hash.",
+    "limits": "These are repeated generic synthetic parent functions associated with result identities, not execution of the original model-derived candidates through a native product gate. They do not establish per-target CAS, arbitrary concurrency safety or multi-file atomicity, and do not repair the original F1/F2 evidence retroactively."
+  },
+  "approval_boundary": {
+    "approved": "Use these supplements as qualified parent-operated evaluation evidence for publication ordering, injected partial failure/recovery, retained provenance and local delivery.",
+    "model_trials_added": 0,
+    "model_gain": "not-established",
+    "full_frozen_acceptance": false,
+    "field_outcomes": "unknown",
+    "historical_tool_claims": "Keep historical missing-dispatch statements as historical records. Current direct collaboration callability does not prove what the earlier invocation could use.",
+    "remaining_gaps": [
+      "Autonomous workflow publication and final destination handling.",
+      "Native product enforcement of publication/deletion freshness.",
+      "Interrupted or unavailable validator recovery.",
+      "General inbound-citation discovery and dependency safety.",
+      "Crash/race/CAS and cross-platform guarantees.",
+      "Real importer compatibility, reconciliation, incident recovery and user outcomes.",
+      "Rendered or visual Explain quality."
+    ]
+  }
+}

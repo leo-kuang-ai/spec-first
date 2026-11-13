@@ -1,0 +1,84 @@
+{
+  "id": "CEOPT-12",
+  "skill": "spec-handoff",
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "deadline_seconds": 300,
+  "trials": [
+    {
+      "trial": "CEOPT-12-A1",
+      "root": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-handoff-f76qmnke/A1",
+      "receipt_dir": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/handoff/A1",
+      "handoffs": {
+        "research": ".spec-first/workflows/spec-handoff/a1/20261030t060800z-research-continuation.md",
+        "review": ".spec-first/workflows/spec-handoff/a1/20261030t060800z-review-continuation.md"
+      }
+    },
+    {
+      "trial": "CEOPT-12-B1",
+      "root": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-handoff-f76qmnke/B1",
+      "receipt_dir": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/handoff/B1",
+      "handoffs": {
+        "research": ".spec-first/workflows/spec-handoff/b1/20261030t060800z-research-continuation.md",
+        "review": ".spec-first/workflows/spec-handoff/b1/20261030t060800z-review-continuation.md"
+      }
+    },
+    {
+      "trial": "CEOPT-12-B2",
+      "root": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-handoff-f76qmnke/B2",
+      "receipt_dir": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/handoff/B2",
+      "handoffs": {
+        "research": ".spec-first/workflows/spec-handoff/b2/20261030t060801z-research-continuation.md",
+        "review": ".spec-first/workflows/spec-handoff/b2/20261030t060801z-review-continuation.md"
+      }
+    },
+    {
+      "trial": "CEOPT-12-A2",
+      "root": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-handoff-f76qmnke/A2",
+      "receipt_dir": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/handoff/A2",
+      "handoffs": {
+        "research": ".spec-first/workflows/spec-handoff/a2/20261030t060801z-research-continuation.md",
+        "review": ".spec-first/workflows/spec-handoff/a2/20261030t060801z-review-continuation.md"
+      }
+    },
+    {
+      "trial": "CEOPT-12-A3",
+      "root": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-handoff-f76qmnke/A3",
+      "receipt_dir": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/handoff/A3",
+      "handoffs": {
+        "research": ".spec-first/workflows/spec-handoff/a3/20261030t060801z-research-continuation.md",
+        "review": ".spec-first/workflows/spec-handoff/a3/20261030t060801z-review-continuation.md"
+      }
+    },
+    {
+      "trial": "CEOPT-12-B3",
+      "root": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-handoff-f76qmnke/B3",
+      "receipt_dir": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/handoff/B3",
+      "handoffs": {
+        "research": ".spec-first/workflows/spec-handoff/b3/20261030t060801z-research-continuation.md",
+        "review": ".spec-first/workflows/spec-handoff/b3/20261030t060801z-review-continuation.md"
+      }
+    }
+  ],
+  "positive_facets": [
+    "Actual generated managed handoff consumed by fresh context",
+    "Research retains owner and discovers retryLimit 2",
+    "Review retains owner and compares permanent error requirement against Boolean(error)",
+    "Actual HEAD/index/dirty state inspected and preserved"
+  ],
+  "negative_facets": [
+    "No fix/commit/stage/new handoff",
+    "No fabricated previous completion or runtime behavior"
+  ],
+  "parent_recipe": "Record exact responses and compare each fixture head/index/files after read-only continuation; preserve handoff and cleanup owned roots.",
+  "limitations": [
+    "Parent generated artifacts, not model-authored handoff producer",
+    "Serving identity unauthenticated; no enforced filesystem isolation"
+  ]
+}

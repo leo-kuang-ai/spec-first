@@ -1,0 +1,83 @@
+{
+  "recorded_at": "2026-10-31T09:35:12.661904+00:00",
+  "original_record": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/prototype-dispatch-owner-handoff.json",
+  "original_sha256": "21e8218764ff8d9ad660a8727d66cc03536d35f2652ca551371a0f4c22b00816",
+  "correction": "Original handoff is retrospective, written after B2 final. Its remaining_order is the intended cutover sequence, not actual remaining slots at record time. Do not treat the timestamp as pre-B2 admission. Original bytes preserved.",
+  "actual_trials": [
+    {
+      "id": "CEOPT-22-A1",
+      "session_id": "01a1913b-1888-7bc3-b63f-be7491d0134e",
+      "started_at": "2026-10-31T09:12:11.789Z",
+      "final_at": "2026-10-31T09:14:32.375Z",
+      "model_metadata": [
+        {
+          "model": "gpt-6-astra",
+          "effort": "medium"
+        }
+      ]
+    },
+    {
+      "id": "CEOPT-22-A2",
+      "session_id": "01a19149-c629-71a0-be25-fbab075f5e30",
+      "started_at": "2026-10-31T09:28:13.746Z",
+      "final_at": "2026-10-31T09:29:02.055Z",
+      "model_metadata": [
+        {
+          "model": "gpt-6.1-sol",
+          "effort": "medium"
+        }
+      ]
+    },
+    {
+      "id": "CEOPT-22-A3",
+      "session_id": "01a1914a-c0e2-7083-a21f-76b12633bb14",
+      "started_at": "2026-10-31T09:29:17.928Z",
+      "final_at": "2026-10-31T09:30:02.761Z",
+      "model_metadata": [
+        {
+          "model": "gpt-6.1-sol",
+          "effort": "medium"
+        }
+      ]
+    },
+    {
+      "id": "CEOPT-22-B1",
+      "session_id": "01a19145-b029-75b3-bfa0-fbcfb931e260",
+      "started_at": "2026-10-31T09:23:45.978Z",
+      "final_at": "2026-10-31T09:24:36.704Z",
+      "model_metadata": [
+        {
+          "model": "gpt-6-astra",
+          "effort": "medium"
+        }
+      ]
+    },
+    {
+      "id": "CEOPT-22-B2",
+      "session_id": "01a19148-1da8-7ce3-b971-564c1a4a663f",
+      "started_at": "2026-10-31T09:26:25.083Z",
+      "final_at": "2026-10-31T09:27:19.511Z",
+      "model_metadata": [
+        {
+          "model": "gpt-6.1-sol",
+          "effort": "medium"
+        }
+      ]
+    },
+    {
+      "id": "CEOPT-22-B3",
+      "session_id": "01a1914b-b40c-7723-813c-c4eb4ab52aee",
+      "started_at": "2026-10-31T09:30:20.188Z",
+      "final_at": "2026-10-31T09:30:59.743Z",
+      "model_metadata": [
+        {
+          "model": "gpt-6.1-sol",
+          "effort": "medium"
+        }
+      ]
+    }
+  ],
+  "model_boundary": "A1/B1 recorded gpt-6-astra; B2/A2/A3/B3 recorded gpt-6.1-sol. Parent direct dispatch inherited current model without overrides. This is a mixed-recorded-model block, not an established same-model comparison.",
+  "decision": "Preserve per-trial correctness evidence per KTD6; model comparability and relative runtime/benefit inconclusive. No original source/request/order/deadline changes, no silent retries.",
+  "serving_identity": "Recorded metadata is not authenticated serving identity."
+}

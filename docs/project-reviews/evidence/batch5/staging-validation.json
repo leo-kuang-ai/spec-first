@@ -1,0 +1,93 @@
+{
+  "stage": "/private/tmp/spec-first-review-batch5-20261102-v2",
+  "model_calls": 0,
+  "configs": [
+    {
+      "config": "/private/tmp/spec-first-review-batch5-20261102-v2/evals/work-claude_code.yaml",
+      "exit_code": 0,
+      "stdout": "level=WARNING msg=\"SKILL.md not found within 10 levels above /private/tmp/spec-first-review-batch5-20261102-v2/evals; falling back to /private/tmp/spec-first-review-batch5-20261102-v2\"\n✓ eval.yaml is valid (loaded 1 case(s))\n",
+      "stderr": "",
+      "dry_run": {
+        "exit_code": 0,
+        "stdout": "📋 Loading configuration...\nlevel=INFO msg=\"Config: loading eval.yaml from /private/tmp/spec-first-review-batch5-20261102-v2/evals/work-claude_code.yaml\"\nlevel=WARNING msg=\"SKILL.md not found within 10 levels above /private/tmp/spec-first-review-batch5-20261102-v2/evals; falling back to /private/tmp/spec-first-review-batch5-20261102-v2\"\n✅ Loaded 1 case(s) | engine: claude_code | model: <unset>\nWould run 1 case(s) with agent claude_code\n  - batch5-work\n",
+        "stderr": ""
+      }
+    },
+    {
+      "config": "/private/tmp/spec-first-review-batch5-20261102-v2/evals/work-codex.yaml",
+      "exit_code": 0,
+      "stdout": "level=WARNING msg=\"SKILL.md not found within 10 levels above /private/tmp/spec-first-review-batch5-20261102-v2/evals; falling back to /private/tmp/spec-first-review-batch5-20261102-v2\"\n✓ eval.yaml is valid (loaded 1 case(s))\n",
+      "stderr": "",
+      "dry_run": {
+        "exit_code": 0,
+        "stdout": "📋 Loading configuration...\nlevel=INFO msg=\"Config: loading eval.yaml from /private/tmp/spec-first-review-batch5-20261102-v2/evals/work-codex.yaml\"\nlevel=WARNING msg=\"SKILL.md not found within 10 levels above /private/tmp/spec-first-review-batch5-20261102-v2/evals; falling back to /private/tmp/spec-first-review-batch5-20261102-v2\"\n✅ Loaded 1 case(s) | engine: codex | model: <unset>\nWould run 1 case(s) with agent codex\n  - batch5-work\n",
+        "stderr": ""
+      }
+    },
+    {
+      "config": "/private/tmp/spec-first-review-batch5-20261102-v2/evals/review-claude_code.yaml",
+      "exit_code": 0,
+      "stdout": "level=WARNING msg=\"SKILL.md not found within 10 levels above /private/tmp/spec-first-review-batch5-20261102-v2/evals; falling back to /private/tmp/spec-first-review-batch5-20261102-v2\"\n✓ eval.yaml is valid (loaded 1 case(s))\n",
+      "stderr": "",
+      "dry_run": {
+        "exit_code": 0,
+        "stdout": "📋 Loading configuration...\nlevel=INFO msg=\"Config: loading eval.yaml from /private/tmp/spec-first-review-batch5-20261102-v2/evals/review-claude_code.yaml\"\nlevel=WARNING msg=\"SKILL.md not found within 10 levels above /private/tmp/spec-first-review-batch5-20261102-v2/evals; falling back to /private/tmp/spec-first-review-batch5-20261102-v2\"\n✅ Loaded 1 case(s) | engine: claude_code | model: <unset>\nWould run 1 case(s) with agent claude_code\n  - batch5-review\n",
+        "stderr": ""
+      }
+    },
+    {
+      "config": "/private/tmp/spec-first-review-batch5-20261102-v2/evals/review-codex.yaml",
+      "exit_code": 0,
+      "stdout": "level=WARNING msg=\"SKILL.md not found within 10 levels above /private/tmp/spec-first-review-batch5-20261102-v2/evals; falling back to /private/tmp/spec-first-review-batch5-20261102-v2\"\n✓ eval.yaml is valid (loaded 1 case(s))\n",
+      "stderr": "",
+      "dry_run": {
+        "exit_code": 0,
+        "stdout": "📋 Loading configuration...\nlevel=INFO msg=\"Config: loading eval.yaml from /private/tmp/spec-first-review-batch5-20261102-v2/evals/review-codex.yaml\"\nlevel=WARNING msg=\"SKILL.md not found within 10 levels above /private/tmp/spec-first-review-batch5-20261102-v2/evals; falling back to /private/tmp/spec-first-review-batch5-20261102-v2\"\n✅ Loaded 1 case(s) | engine: codex | model: <unset>\nWould run 1 case(s) with agent codex\n  - batch5-review\n",
+        "stderr": ""
+      }
+    }
+  ],
+  "input_sha256": {
+    "evals/candidate.patch": "75a3314e1bfbf84390a943fa903668329aef1e06b1550ed0f45c828c3fba4d98",
+    "evals/cases/review.yaml": "867489808d3571c4369a01cacb2b21ab6ec23539e59cdd3d6eaacffc9f22471f",
+    "evals/cases/work.yaml": "87077d587020a48021f726d24730df260b5f52704c6c2fa90ad7e7e81d06c1b5",
+    "evals/fixtures/review/README.md": "1d3e32e48aabe116016b90704e9178ca298cbb8aec30ab27f2d314c2899d31b6",
+    "evals/fixtures/review/lib/amount.cjs": "b299c4c379f0c86204dfb0a2c0df534b5d8db22f22f0c7272decfc6172d5dd1f",
+    "evals/fixtures/review/lib/http.cjs": "6e056560f3daae451688f94f9f8680407506266771e33cfc094e8d8941af86fb",
+    "evals/fixtures/review/lib/ledger.cjs": "b6bae153343c29a0c3fd4c19d6a4f66e72bdc92d50b709d9e70f11509092a563",
+    "evals/fixtures/review/lib/receipt.cjs": "d3a170a55a0929a6f21f7ad5f245c88a76b0ccca6645ab94e9d65889bfb4da6d",
+    "evals/fixtures/review/package.json": "29e9880195229d71404687c20bdf51e1eecfd181819aaa06898e4c40a50aadda",
+    "evals/fixtures/review/test/smoke.test.cjs": "52c9fe80c7a6df8f3a07e17f4e332d2cdc3512c3ed24ede72231dc7dd536aea2",
+    "evals/fixtures/work/README.md": "7f302cc8dd4488707f0b4b76c209fe9cb2a245c8583cc4c89b03c3eb087b0e12",
+    "evals/fixtures/work/docs/plans/cancel-invoice.md": "002aa28608ebb7ea68bf3683ff9dd50d94cb2e9acfc4153ac59572b5e95fb9f2",
+    "evals/fixtures/work/package.json": "b4e0ac830e1771d8b726b1c02b825e8f5ce4662f404d2b67288181d9bd458a91",
+    "evals/fixtures/work/src/export/csv.js": "1b3a13f6831e510ea32448dd8c430b1a167c8c33de0628489c6bb2c0c9cfea05",
+    "evals/fixtures/work/src/export/payments.js": "d3a1ed9a59da54ee1a967052121677de5a964d9f581d82cc567ae0f2d02d0f72",
+    "evals/fixtures/work/src/http/routes.js": "9741ddf1978b83c73e83106828a608d4088b8dc70c1c9f20c51cd252402ecfad",
+    "evals/fixtures/work/src/invoices/create.js": "75ce4c9473830a7bdbfb9de9b33d7be57130ab5f85d841e19ca8b96df84a93b5",
+    "evals/fixtures/work/src/invoices/fromForm.js": "42cef225742c29b954defa066cea505dddfc997081f31eb92cff1b85984cef11",
+    "evals/fixtures/work/src/invoices/pay.js": "8125034256e0addb10539083a7ca6f8fe1780a12cc2b5a52ee745b85439f8145",
+    "evals/fixtures/work/src/invoices/refund.js": "d8f9a96b7ae1120640bbceb87b9e35d038a6fc0e90bc1d2f66d3f5f187a95028",
+    "evals/fixtures/work/src/ledger/money.js": "aea2d2ee9a4d1c5fde83baa9dd3278bd521292e47d191926032bca83803fda71",
+    "evals/fixtures/work/src/ledger/tax.js": "e93593a6bc122fe880d526d299e639ae1b3c08c928dfffcdfc29591ee25fcfce",
+    "evals/fixtures/work/src/ledger/total.js": "e41a4d65080972a29ebdd126a8284091a99dec5f7dc051915ce96eb4b41b9133",
+    "evals/fixtures/work/src/legacy/csv.js": "c2890e7d0f54092e4502c65db5f42716c6273c3e5d3daad44d960d05b106222e",
+    "evals/fixtures/work/src/lib/audit.js": "70fed673fcc2380dc7f30ac5d683902b0d600078d3e9d13074e7c0c7450f7700",
+    "evals/fixtures/work/src/lib/db.js": "fe58b30489391bd61b03159950dd34a9c1c6e03d06dc040451b80563f0f380d7",
+    "evals/fixtures/work/src/lib/sequence.js": "597f2b7e43a4899093901ecb2845eadffddf85ed1b59d50f6702db5ff6774fe7",
+    "evals/fixtures/work/src/modules/m17.js": "fd561477faf8f9d2fd730302bcc6d7efd57e6ff0b6023cb4b16fc2b82c992072",
+    "evals/fixtures/work/src/pricing/discount.js": "2b3ae1f6740539687357c9c26be36e620325a904eebfd62fc3c6ddc702db82bd",
+    "evals/fixtures/work/src/report/daily.js": "495911f2610b52e2271265b300bfea76e56a4384ddc04b3b67f0c1b139d30f4e",
+    "evals/fixtures/work/src/ui/format.js": "c15ba3620b1aac1b068ee8b0f2a1e7538b76888214cd209bdcb9faf8edeb24d2",
+    "evals/fixtures/work/src/validate.js": "ffda71c0eaef6f3ff844de1b2dcafe6af0f261b283ef4fa347d838d5622f75bf",
+    "evals/fixtures/work/test/discount.test.js": "a3a6b57867130c2b1f456bccf8de87ca3bf7ee9fe7cda946d1eb1eb997d4e236",
+    "evals/fixtures/work/test/form.test.js": "a8cd925e5e606bf76d43556c75f6ad4cd2a3ff65abdfc7942ecef7d3f251bde5",
+    "evals/fixtures/work/test/invoices.test.js": "f590ec9424eee9f028627af3b7903dd9eb501ac12c1dc204965f6a1f4b831a66",
+    "evals/fixtures/work/test/ledger.test.js": "4ac04afda36c9a2368e75328700dbdf43f5cd199fc6fb9b9e4efae691762601f",
+    "evals/fixtures/work/test/money.test.js": "6b49e7c9b3a397d2cb65c900b62fc5b588c244305fae3204c6d9901cb8a761e2",
+    "evals/review-claude_code.yaml": "624373b0a9e980cdc673b334373920cb8d96290a2233f2f9ecb06e899ef06cab",
+    "evals/review-codex.yaml": "0679dedf40b8dd1b0fb84a4dc2f61fbcb263eb3b1df0f082193a941e4c61fbf0",
+    "evals/work-claude_code.yaml": "df029ac1ada0f6ca5aad58ec9d7e90f7954f755735e331f3ff1addbeda35d9e5",
+    "evals/work-codex.yaml": "5219312b74c2f96fd616334f7f505ee5455545465caa650f9a355732aa3deaf3"
+  }
+}

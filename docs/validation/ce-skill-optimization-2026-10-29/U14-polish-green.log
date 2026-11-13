@@ -1,0 +1,113 @@
+FAIL tests/unit/resolve-port-script.test.js
+  ● resolve-port package script probing › uses dev before start and ignores unrelated scripts with port flags
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 2
+
+      14 |   try {
+      15 |     const result = spawnSync('bash', [script, root, '--type', 'vite'], { encoding: 'utf8' });
+    > 16 |     expect(result.status).toBe(0);
+         |                           ^
+      17 |     return String(result.stdout || '').trim();
+      18 |   } finally {
+      19 |     fs.rmSync(root, { recursive: true, force: true });
+
+      at toBe (tests/unit/resolve-port-script.test.js:16:27)
+      at Object.resolvePort (tests/unit/resolve-port-script.test.js:37:12)
+
+  ● resolve-port package script probing › falls back to the start script when dev has no explicit port
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 2
+
+      14 |   try {
+      15 |     const result = spawnSync('bash', [script, root, '--type', 'vite'], { encoding: 'utf8' });
+    > 16 |     expect(result.status).toBe(0);
+         |                           ^
+      17 |     return String(result.stdout || '').trim();
+      18 |   } finally {
+      19 |     fs.rmSync(root, { recursive: true, force: true });
+
+      at toBe (tests/unit/resolve-port-script.test.js:16:27)
+      at Object.resolvePort (tests/unit/resolve-port-script.test.js:47:12)
+
+  ● resolve-port package script probing › accepts an unquoted docker-compose host-port mapping
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 2
+
+      26 |   try {
+      27 |     const result = spawnSync('bash', [script, root, '--type', 'procfile'], { encoding: 'utf8' });
+    > 28 |     expect(result.status).toBe(0);
+         |                           ^
+      29 |     return String(result.stdout || '').trim();
+      30 |   } finally {
+      31 |     fs.rmSync(root, { recursive: true, force: true });
+
+      at toBe (tests/unit/resolve-port-script.test.js:28:27)
+      at Object.resolveComposePort (tests/unit/resolve-port-script.test.js:51:12)
+
+  ● port input and configuration boundaries › framework comments and another framework config cannot override the selected server
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "4300"
+    Received: ""
+
+      69 |     fs.writeFileSync(path.join(root, 'next.config.js'), 'module.exports = { port: 4998 };');
+      70 |     fs.writeFileSync(path.join(root, 'vite.config.js'), '// port: 4999\nexport default { server: { port: 4300 } };\n');
+    > 71 |     expect(run('--type', 'vite').stdout.trim()).toBe('4300');
+         |                                                 ^
+      72 |   });
+      73 |
+      74 |   test('comment and string decoys are ignored while an explicit literal is retained', () => {
+
+      at Object.toBe (tests/unit/resolve-port-script.test.js:71:49)
+
+  ● port input and configuration boundaries › comment and string decoys are ignored while an explicit literal is retained
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "4300"
+    Received: ""
+
+      74 |   test('comment and string decoys are ignored while an explicit literal is retained', () => {
+      75 |     fs.writeFileSync(path.join(root, 'vite.config.js'), '/* port: 4999 */\nconst example = "port: 4998";\nexport default { server: { port: 4300 } };');
+    > 76 |     expect(run('--type', 'vite').stdout.trim()).toBe('4300');
+         |                                                 ^
+      77 |     expect(run('--port', '4444').stdout.trim()).toBe('4444');
+      78 |   });
+      79 |
+
+      at Object.toBe (tests/unit/resolve-port-script.test.js:76:49)
+
+  ● port input and configuration boundaries › a Procfile-only project uses its actual web command port
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "4500"
+    Received: ""
+
+      80 |   test('a Procfile-only project uses its actual web command port', () => {
+      81 |     fs.writeFileSync(path.join(root, 'Procfile'), 'web: node server.js --port 4500\n');
+    > 82 |     expect(run('--type', 'procfile').stdout.trim()).toBe('4500');
+         |                                                     ^
+      83 |   });
+      84 | });
+      85 |
+
+      at Object.toBe (tests/unit/resolve-port-script.test.js:82:53)
+
+PASS tests/unit/spec-polish-launch-json.test.js
+
+Test Suites: 1 failed, 1 passed, 2 total
+Tests:       6 failed, 16 passed, 22 total
+Snapshots:   0 total
+Time:        0.415 s, estimated 3 s
+Ran all test suites matching /tests\/unit\/resolve-port-script.test.js|tests\/unit\/spec-polish-launch-json.test.js/i.

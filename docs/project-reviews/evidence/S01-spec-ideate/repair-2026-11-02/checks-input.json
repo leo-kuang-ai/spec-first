@@ -1,0 +1,24 @@
+{
+  "profile": {
+    "source": "local",
+    "name": "S01-spec-ideate-repair",
+    "path": null
+  },
+  "checks": [
+    {
+      "id": "tests",
+      "service": "local",
+      "command": "node node_modules/jest/bin/jest.js --runInBand --runTestsByPath tests/unit/spec-ideate-phase-contracts.test.js tests/unit/spec-ideate-clarification-handoff-contracts.test.js",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s01-spec-ideate-resume-20261102/logs/tests.txt",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    }
+  ]
+}

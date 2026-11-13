@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "显式点名 spec-lfg 应成立 admission 并从 plan 开始",
+  "prompt": "（spec-lfg skill 已安装，请按它工作。）\n用 spec-lfg 给这个记账 demo 的 GET /entries 加 month=YYYY-MM 过滤。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-lfg/evals/fixtures/scripts/check-starts-pipeline.sh"
+  ]
+}

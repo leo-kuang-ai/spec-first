@@ -1,0 +1,18 @@
+
+> spec-first@1.15.3 check:shared-references
+> node scripts/sync-shared-references.js --check
+
+OK   skills/spec-plan/references/html-rendering.md
+OK   skills/spec-ideate/references/html-rendering.md
+OK   skills/spec-brainstorm/references/html-rendering.md
+OK   skills/spec-plan/references/markdown-rendering.md
+OK   skills/spec-ideate/references/markdown-rendering.md
+OK   skills/spec-brainstorm/references/markdown-rendering.md
+OK   skills/spec-compound/references/concepts-vocabulary.md
+OK   skills/spec-compound-refresh/references/concepts-vocabulary.md
+OK   skills/spec-plan/references/settled-decisions.md
+OK   skills/spec-brainstorm/references/settled-decisions.md
+OK   skills/spec-work/references/tracker-defer.md
+OK   skills/spec-lfg/references/tracker-defer.md
+OK   skills/spec-compound/references/yaml-schema.md
+OK   skills/spec-compound-refresh/references/yaml-schema.md

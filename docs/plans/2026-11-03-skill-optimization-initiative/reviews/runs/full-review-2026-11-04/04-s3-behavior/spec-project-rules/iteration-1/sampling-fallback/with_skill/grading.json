@@ -1,0 +1,20 @@
+{
+  "expectations": [
+    {
+      "text": "expect.exit_code",
+      "passed": true,
+      "evidence": "all checks passed"
+    },
+    {
+      "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-project-rules/evals/fixtures/scripts/check-sampling-fallback.sh",
+      "passed": true,
+      "evidence": "PASS: sampling fallback（消费脚本抽样清单、知识库覆盖跨目录、零虚构）"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 0,
+    "total": 2,
+    "pass_rate": 1
+  }
+}

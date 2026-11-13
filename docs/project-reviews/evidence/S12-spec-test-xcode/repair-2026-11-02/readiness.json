@@ -1,0 +1,37 @@
+{
+  "platform": "Darwin",
+  "checks": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "chunk_id": "2f7ddd",
+        "wall_time_seconds": 0.000006416,
+        "exit_code": 1,
+        "original_token_count": 40,
+        "output": "xcode-select: error: tool 'xcodebuild' requires Xcode, but active developer directory '/Library/Developer/CommandLineTools' is a command line tools instance\n"
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "chunk_id": "272a83",
+        "wall_time_seconds": 0.000005959,
+        "exit_code": 0,
+        "original_token_count": 9,
+        "output": "/Library/Developer/CommandLineTools\n"
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "chunk_id": "8eceab",
+        "wall_time_seconds": 0.000005541,
+        "exit_code": 72,
+        "original_token_count": 20,
+        "output": "xcrun: error: unable to find utility \"simctl\", not a developer tool or in PATH\n"
+      }
+    }
+  ],
+  "provider_tools_visible": [],
+  "claim": "真实build/install/launch未运行；仅记录readiness失败"
+}

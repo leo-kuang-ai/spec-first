@@ -1,0 +1,86 @@
+{
+  "at": "2026-10-31T13:32:55.796215+00:00",
+  "scope": "Deterministic retained-record checks only; no semantic grading or field outcome.",
+  "pins_checked": 85,
+  "pin_mismatches": [],
+  "record_count": 6,
+  "expected_count": 6,
+  "complete": true,
+  "observed_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "order_matches_declared_prefix": true,
+  "results": [
+    {
+      "id": "CEOPT-16-input3-A1",
+      "checks": {
+        "artifact_ref": true,
+        "trace_ref": true,
+        "source_protocol_ref": true,
+        "deadline": true,
+        "final_available": true,
+        "product_contract_byte_preserved": true
+      }
+    },
+    {
+      "id": "CEOPT-16-input3-A2",
+      "checks": {
+        "artifact_ref": true,
+        "trace_ref": true,
+        "source_protocol_ref": true,
+        "deadline": true,
+        "final_available": true,
+        "product_contract_byte_preserved": true
+      }
+    },
+    {
+      "id": "CEOPT-16-input3-A3",
+      "checks": {
+        "artifact_ref": true,
+        "trace_ref": true,
+        "source_protocol_ref": true,
+        "deadline": true,
+        "final_available": true,
+        "product_contract_byte_preserved": true
+      }
+    },
+    {
+      "id": "CEOPT-16-input3-B1",
+      "checks": {
+        "artifact_ref": true,
+        "trace_ref": true,
+        "source_protocol_ref": true,
+        "deadline": true,
+        "final_available": true,
+        "product_contract_byte_preserved": true
+      }
+    },
+    {
+      "id": "CEOPT-16-input3-B2",
+      "checks": {
+        "artifact_ref": true,
+        "trace_ref": true,
+        "source_protocol_ref": true,
+        "deadline": true,
+        "final_available": true,
+        "product_contract_byte_preserved": true
+      }
+    },
+    {
+      "id": "CEOPT-16-input3-B3",
+      "checks": {
+        "artifact_ref": true,
+        "trace_ref": true,
+        "source_protocol_ref": true,
+        "deadline": true,
+        "final_available": true,
+        "product_contract_byte_preserved": true
+      }
+    }
+  ]
+}

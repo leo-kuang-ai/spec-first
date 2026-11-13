@@ -1,7 +1,7 @@
 ---
 title: "Refactor the full Skill system for progressive disclosure - Plan"
 type: refactor
-status: active
+status: completed
 date: 2026-07-30
 deepened: 2026-07-30
 artifact_contract: spec-unified-plan/v1
@@ -1243,6 +1243,7 @@ git diff --check
 
 ## Plan Review and Execution Notes
 
+- 2026-09-09：按用户明确指令「直接更新成完成」，将计划生命周期状态更新为 `completed`。本次为用户决定的计划关闭，不代表全部 Implementation Units 或 Definition of Done 已验证通过；保留未勾选验收项及历史证据边界，未补跑 paired A/B、fresh-source、retention/compaction、supported-host projection 或 field outcome 验证，不据此声明 pilot promotion 或用户性能收益。
 - 本计划是 2026-07-06 两份计划的系统级 consolidation/successor；旧计划保留 active/history 状态，不在本次文档写作中修改 lifecycle。
 - 2026-07-29 progressive-loading design 以附录 C/D 为最终修订依据；早期 L1 manifest/schema 扩展方向已被否决。
 - 当前没有 worker/subagent dispatch 授权：`worker_dispatch_authorization: missing`、`capability_probe: not_applicable`、`worker_dispatch_capability: unknown`、`worker_dispatch_outcome: dispatch_authorization_missing`。本次方案由主线程串行完成，不声明独立 reviewer coverage。

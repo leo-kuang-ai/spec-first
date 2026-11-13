@@ -1,0 +1,18 @@
+# consumers: spec-plan
+tests/integration/init-six-host-lifecycle.integration.test.js
+tests/unit/agent-persona-template-drift.test.js
+tests/unit/ce-post-3-20-calibration-contracts.test.js
+tests/unit/ce-upstream-skill-sync-contracts.test.js
+tests/unit/dispatch-authorization-matrix-contracts.test.js
+tests/unit/eval-fixture-contracts.test.js
+tests/unit/gitignore-policy.test.js
+tests/unit/mcp-setup-config-consumers.test.js
+tests/unit/plugin-modules.test.js
+tests/unit/private-scratch-migration-contracts.test.js
+tests/unit/requirements-rendering-parity.test.js
+tests/unit/settled-decisions-contracts.test.js
+tests/unit/spec-code-review-contracts.test.js
+tests/unit/spec-plan-consumer-replay-contracts.test.js
+tests/unit/spec-plan-contracts.test.js
+tests/unit/spec-prd-plan-handoff-contracts.test.js
+tests/unit/test-inventory-contracts.test.js

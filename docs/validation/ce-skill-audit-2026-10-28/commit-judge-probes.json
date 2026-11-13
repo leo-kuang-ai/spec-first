@@ -1,0 +1,23 @@
+{
+  "artifact_type": "confirmed-script-observation",
+  "scope": "throwaway fixture repo only; not a host/model eval",
+  "results": [
+    {
+      "case": "unauthorized-stage-with-no-commit",
+      "actual_index_paths": [
+        "README.md"
+      ],
+      "message": "commit_authorization_missing",
+      "judge_exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "case": "no-group-no-commit-message",
+      "message": "没有提交，也没有分组。",
+      "judge_exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "files": [
+    {
+      "archive": "result.json",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/runs/iteration-1/result.json",
+      "sha256": "31c527528127979096cadb6a314c47c252d35dd399d3ab003934a4c916937e78"
+    },
+    {
+      "archive": "source-manifest.json",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/source-manifest.json",
+      "sha256": "de4731985cef96305bb585c21f240321436e63c3720deac2b9e0c69ca14a6d95"
+    },
+    {
+      "archive": "runner.log",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/runner.log",
+      "sha256": "beee04f0fefc175c1a0e08379478b608b8b0f9e5ef221ab615fae47255dc901b"
+    },
+    {
+      "archive": "implementation-routes-work/grading.json",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/runs/iteration-1/implementation-routes-work/with_skill/grading.json",
+      "sha256": "e87d3574ac51e4c5165865f8c328100dccbbd561c171a13545aaf4e452503b91"
+    },
+    {
+      "archive": "implementation-routes-work/response.md",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/runs/iteration-1/implementation-routes-work/with_skill/outputs/response.md",
+      "sha256": "ca1487f5781d3467d22d849d92a6d24ef927b2a2226bc1890f3870e85d83e385"
+    },
+    {
+      "archive": "implementation-routes-work/transcript.jsonl",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/runs/iteration-1/implementation-routes-work/with_skill/outputs/agent/run/e10ca283-4291-4696-b436-e736e2914a93.jsonl",
+      "sha256": "81215741c69a7373e29ed75b27409c5c150e5d356e68b441806ebf070fc48a37"
+    },
+    {
+      "archive": "implementation-owner-not-authorized/grading.json",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/runs/iteration-1/implementation-owner-not-authorized/with_skill/grading.json",
+      "sha256": "34aa9d58a2c1da9521ceecac69fd06bd827fd40911209fdebf1f46cb3ca34534"
+    },
+    {
+      "archive": "implementation-owner-not-authorized/response.md",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/runs/iteration-1/implementation-owner-not-authorized/with_skill/outputs/response.md",
+      "sha256": "c84abdc32c9f185db9a12b4dc43972244cae7fbdc5c5bcaa009a2345fc2e78f9"
+    },
+    {
+      "archive": "implementation-owner-not-authorized/transcript.jsonl",
+      "source": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/plan-portable-tools-20261107-tdqa60qf/runs/iteration-1/implementation-owner-not-authorized/with_skill/outputs/agent/run/b891c837-f83c-4368-89af-e1587d34a2e3.jsonl",
+      "sha256": "103c7fb93eaae86acb7f045e15b56b65b5cfd1c1ae2fd9599981a400a32097c8"
+    }
+  ]
+}

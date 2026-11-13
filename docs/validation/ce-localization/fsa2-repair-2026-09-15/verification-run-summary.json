@@ -1,0 +1,221 @@
+{
+  "schema_version": "verification-run-summary.v1",
+  "generated_at": "2026-09-15T06:44:42.968Z",
+  "profile": {
+    "source": "explicit",
+    "name": "fsa2-local-repair",
+    "path": null
+  },
+  "checks": [
+    {
+      "id": "npm-test-final",
+      "service": "spec-first",
+      "command": "npm test",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/2026-09-15-fsa2-repair/logs/npm-test-final.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "typecheck",
+      "service": "spec-first",
+      "command": "npm run typecheck",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/2026-09-15-fsa2-repair/logs/typecheck.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "lint-entrypoints",
+      "service": "spec-first",
+      "command": "npm run lint:skill-entrypoints",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/2026-09-15-fsa2-repair/logs/lint-entrypoints-final.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "shared-references",
+      "service": "spec-first",
+      "command": "npm run check:shared-references",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/2026-09-15-fsa2-repair/logs/shared-references.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "sync-instructions",
+      "service": "spec-first",
+      "command": "npm run sync:instructions",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/2026-09-15-fsa2-repair/logs/sync-instructions.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "build",
+      "service": "spec-first",
+      "command": "npm run build",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/2026-09-15-fsa2-repair/logs/build-final.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "changelog",
+      "service": "spec-first",
+      "command": "node node_modules/jest/bin/jest.js --runTestsByPath tests/unit/changelog-format.test.js --runInBand --silent",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/2026-09-15-fsa2-repair/logs/changelog-final.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "ce-contracts",
+      "service": "spec-first",
+      "command": "node node_modules/jest/bin/jest.js --runTestsByPath tests/unit/ce-localization-closeout-contracts.test.js tests/unit/ce-localization-review-contracts.test.js --runInBand --silent",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/2026-09-15-fsa2-repair/logs/ce-contracts-final.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "docs-integrity",
+      "service": "spec-first",
+      "command": "git diff --check",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "git"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/2026-09-15-fsa2-repair/logs/docs-final.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "eval-configs",
+      "service": "skill-up-37-packages",
+      "command": "skill-up validate evals/eval.yaml",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "skill-up"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/2026-09-15-fsa2-repair/logs/eval-configs.log",
+      "reason_code": "all-37-configs-loaded-132-cases",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "model-behavior",
+      "service": "spec-first",
+      "command": "skill-up run evals/eval.yaml",
+      "status": "not-run",
+      "exit_code": null,
+      "ran": false,
+      "required_tools": [],
+      "missing_tools": [],
+      "log_path": null,
+      "reason_code": "fresh-model-behavior-not-executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "host-invocation",
+      "service": "spec-first",
+      "command": "未选择：按 U8 确定当前版本宿主的调用命令",
+      "status": "not-run",
+      "exit_code": null,
+      "ran": false,
+      "required_tools": [],
+      "missing_tools": [],
+      "log_path": null,
+      "reason_code": "real-host-journey-not-executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "graphify-real-dogfood",
+      "service": "spec-first",
+      "command": "SPEC_FIRST_REAL_GRAPHIFY_DOGFOOD=1 node node_modules/jest/bin/jest.js --runTestsByPath tests/integration/runtime-setup-graphify-hook-boundary.integration.test.js --runInBand",
+      "status": "not-run",
+      "exit_code": null,
+      "ran": false,
+      "required_tools": [],
+      "missing_tools": [],
+      "log_path": null,
+      "reason_code": "explicit-real-provider-dogfood-not-enabled",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "field-outcome",
+      "service": "spec-first",
+      "command": "未选择：按 U10/field 协议确定真实任务与采样命令",
+      "status": "not-run",
+      "exit_code": null,
+      "ran": false,
+      "required_tools": [],
+      "missing_tools": [],
+      "log_path": null,
+      "reason_code": "field-data-not-collected",
+      "redaction_status": "none-required"
+    }
+  ]
+}

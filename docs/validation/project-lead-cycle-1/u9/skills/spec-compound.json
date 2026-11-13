@@ -1,0 +1,203 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "generated_at": "2026-09-20T03:08:57.362587+00:00",
+  "skill_name": "spec-compound",
+  "source_snapshot": "source-manifest.json",
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "source_paths": [
+    "skills/spec-compound/SKILL.md",
+    "skills/spec-compound/references/modes.md",
+    "skills/spec-compound/references/research.md",
+    "skills/spec-compound/references/assembly.md",
+    "skills/spec-compound/references/promotion.md",
+    "skills/spec-compound/references/lightweight.md",
+    "skills/spec-compound/references/report.md"
+  ],
+  "source_read_ranges": {
+    "skills/spec-compound/SKILL.md": "1-61",
+    "skills/spec-compound/references/modes.md": "1-43",
+    "skills/spec-compound/references/research.md": "1-75",
+    "skills/spec-compound/references/assembly.md": "1-92",
+    "skills/spec-compound/references/promotion.md": "1-12",
+    "skills/spec-compound/references/lightweight.md": "1-66",
+    "skills/spec-compound/references/report.md": "1-96"
+  },
+  "source_hashes": {
+    "skills/spec-compound/SKILL.md": "32a1da0107adaf31f116e3e05ed146b4dfd3935b9a89cb4c7e9dd95ed26c63e5",
+    "skills/spec-compound/references/modes.md": "dec899f88bd94094f71bd98ed3f5958e1631ff60435cc34b9e391ecf9576c80d",
+    "skills/spec-compound/references/research.md": "5b834280c98a64323f35bfebf4e824b48c7fbc56729ad99fae3d11bc8d44b503",
+    "skills/spec-compound/references/assembly.md": "535f5e2d39649afe6eab54d46432716f282fa1daa93917ff14083fb83d0c5e1f",
+    "skills/spec-compound/references/promotion.md": "50a855b206118e1c621fe080f3d3c4d670cffe21e7362648f79b0d3c9c62d788",
+    "skills/spec-compound/references/lightweight.md": "c1cef00d217c3859eb8a51731b5cb691fc1fbb320068d1d31c6bcc07836d8a70",
+    "skills/spec-compound/references/report.md": "301814213358044fa553fdfbe6145472b676ba57e55317a0b707e7389a50e487"
+  },
+  "entry_surface": "workflow_command",
+  "batch": "A",
+  "closure_tier": "M",
+  "closure_observed": {
+    "files": 37,
+    "bytes": 238634,
+    "read_package_files_at_least_partially": 7,
+    "read_supporting_files_at_least_partially": 0,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "coverage_commitment": "committed",
+  "dependency_closure": "partial",
+  "status": "degraded",
+  "reason_codes": [
+    "dependency_closure_partial",
+    "independent_dispatch_rate_limited",
+    "runtime_and_tests_not_run"
+  ],
+  "command_or_method": [
+    "主owner逐分支source语义核对；不执行compound发布"
+  ],
+  "ran": true,
+  "exit_code": null,
+  "evidence_paths": [
+    "skills/spec-compound/SKILL.md:25-37",
+    "skills/spec-compound/SKILL.md:29-39",
+    "skills/spec-compound/references/assembly.md:27-48",
+    "skills/spec-compound/references/promotion.md:7-12",
+    "skills/spec-compound/references/modes.md:16-26",
+    "skills/spec-compound/references/report.md:1-3"
+  ],
+  "source_refs": [
+    "skills/spec-compound/SKILL.md",
+    "skills/spec-compound/references/modes.md",
+    "skills/spec-compound/references/research.md",
+    "skills/spec-compound/references/assembly.md",
+    "skills/spec-compound/references/promotion.md",
+    "skills/spec-compound/references/lightweight.md",
+    "skills/spec-compound/references/report.md"
+  ],
+  "owner": "project-lead-cycle-1",
+  "consumers": [
+    "spec-plan",
+    "spec-work",
+    "spec-debug",
+    "spec-code-review"
+  ],
+  "branches": [
+    {
+      "id": "B1",
+      "trigger": "positive",
+      "owner": "spec-compound",
+      "expected_output": "已验证且不可从代码轻易恢复的一个问题→Full/低风险Lightweight；未解决不写",
+      "source_ref": "skills/spec-compound/SKILL.md:25-37",
+      "status": "source-covered",
+      "negative_paths": [
+        "缺验证/授权/target hash则skip或partial"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "B2",
+      "trigger": "negative",
+      "owner": "spec-compound",
+      "expected_output": "独立CONCEPTS bootstrap→compound-refresh；多问题拆分；头less仍Full",
+      "source_ref": "skills/spec-compound/SKILL.md:29-39",
+      "status": "source-covered",
+      "negative_paths": [
+        "缺验证/授权/target hash则skip或partial"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "B3",
+      "trigger": "output",
+      "owner": "spec-compound",
+      "expected_output": "候选source_refs/invalidation经机械及语义验证→solutions与可选vocabulary，供plan/work/debug消费",
+      "source_ref": "skills/spec-compound/references/assembly.md:27-48",
+      "status": "source-covered",
+      "negative_paths": [
+        "缺验证/授权/target hash则skip或partial"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "B4",
+      "trigger": "stop",
+      "owner": "spec-compound",
+      "expected_output": "target existence/hash漂移重建；rename部分失败保留精确partial、不complete",
+      "source_ref": "skills/spec-compound/references/promotion.md:7-12",
+      "status": "source-covered",
+      "negative_paths": [
+        "缺验证/授权/target hash则skip或partial"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "B5",
+      "trigger": "degraded",
+      "owner": "spec-compound",
+      "expected_output": "无dispatch同角色inline，不宣称独立；受限history未授权跳过；脚本不可用manual gate响亮降级",
+      "source_ref": "skills/spec-compound/references/modes.md:16-26",
+      "status": "source-covered",
+      "negative_paths": [
+        "缺验证/授权/target hash则skip或partial"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "B6",
+      "trigger": "recovery",
+      "owner": "spec-compound",
+      "expected_output": "skip不发布；drift重建，partial不覆写；report列实际written/failed targets并结束",
+      "source_ref": "skills/spec-compound/references/report.md:1-3",
+      "status": "source-covered",
+      "negative_paths": [
+        "缺验证/授权/target hash则skip或partial"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    }
+  ],
+  "findings": [],
+  "fresh_source_eval": "not-run",
+  "claim_ceiling": "C0",
+  "budget_minutes": [
+    30,
+    45
+  ],
+  "timing": {
+    "actual_seconds": null,
+    "reason": "交叉阅读，逐包主动时间未测"
+  },
+  "limitations": [
+    "主owner source review，不是独立fresh reviewer。",
+    "测试、host projection、实际publication与消费者检索均not-run。",
+    "重新确认实际显示区间；schema、validator实现、知识消费者与词汇闭包未读全，不能推导promotion运行成功。",
+    "schema/category/template、research personas、session-history、concepts和claims validator未闭合；rg-only仅作navigation，不计语义读取。"
+  ],
+  "recovery_point": "补schema/claims validator和consumer检索闭包，运行promotion拒绝与partial publication关键用例；不可据本文发布真实knowledge。",
+  "redaction_status": "none-required",
+  "execution": {
+    "source_semantic_review": "ran",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "not-run"
+  },
+  "navigation_only_refs": {
+    "skills/spec-compound/scripts/validate-frontmatter.py": "先前仅rg符号定位，不计为语义读取",
+    "skills/spec-debug/SKILL.md": "只作下游候选定位，未全读consumer"
+  },
+  "reviewer_provenance": {
+    "reviewer": "root",
+    "kind": "owner-self-review",
+    "independent": false,
+    "method": "实际读取入口、modes/research前75行、assembly/promotion/lightweight/report；截断区间补读，不把hash或rg命中当语义审查"
+  },
+  "supporting_read_ranges": {},
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "unconfirmed_read_ranges": []
+}

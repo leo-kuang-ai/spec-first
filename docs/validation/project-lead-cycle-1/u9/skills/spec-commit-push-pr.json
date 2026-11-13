@@ -1,0 +1,173 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "generated_at": "2026-09-20T07:06:40.683772+00:00",
+  "skill_name": "spec-commit-push-pr",
+  "source_snapshot": "source-manifest.json",
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "source_paths": [
+    "skills/spec-commit-push-pr/SKILL.md",
+    "skills/spec-commit-push-pr/references/context.md",
+    "skills/spec-commit-push-pr/references/commit-and-push.md",
+    "skills/spec-commit-push-pr/references/apply-and-handoff.md",
+    "skills/spec-commit-push-pr/references/branch-creation.md"
+  ],
+  "source_read_ranges": {
+    "skills/spec-commit-push-pr/SKILL.md": "1-132",
+    "skills/spec-commit-push-pr/references/context.md": "1-65",
+    "skills/spec-commit-push-pr/references/commit-and-push.md": "1-50",
+    "skills/spec-commit-push-pr/references/apply-and-handoff.md": "1-93",
+    "skills/spec-commit-push-pr/references/branch-creation.md": "1-85"
+  },
+  "source_hashes": {
+    "skills/spec-commit-push-pr/SKILL.md": "caf7ac9387d1ba3355499fd8a008743d3f78322a6ecf1c4eaefbde4f0919cf93",
+    "skills/spec-commit-push-pr/references/context.md": "ad4437ac93408f3a327dc884ed157d8c5a167d2e12c8f601dadd4131fe9bd30e",
+    "skills/spec-commit-push-pr/references/commit-and-push.md": "39f8ce3145cebb2074297cdcdfc5386711e3062c701ca88d20a392aa4f67b60e",
+    "skills/spec-commit-push-pr/references/apply-and-handoff.md": "ee8ad9e479ef5139393c334dc8338ca3375b9e5d05c35ac27df183c28c6cccfe",
+    "skills/spec-commit-push-pr/references/branch-creation.md": "5cb38eb8314ad50a1d4f2a892081e6bc802d7fcd23080b8bcd198987d60c97ef"
+  },
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "entry_surface": "internal_only",
+  "batch": "C1",
+  "closure_tier": "S",
+  "closure_observed": {
+    "files": 15,
+    "bytes": 61637,
+    "read_package_files_at_least_partially": 5,
+    "read_supporting_files_at_least_partially": 0,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "coverage_commitment": "committed",
+  "dependency_closure": "partial",
+  "status": "failed",
+  "reason_codes": [
+    "confirmed_open_findings",
+    "bounded_dependency_closure"
+  ],
+  "command_or_method": [
+    "独立于被审源码作者的只读reviewer逐包阅读实际source并判断五分支；主owner回源裁决finding，非盲评或真实workflow运行。"
+  ],
+  "ran": true,
+  "exit_code": null,
+  "evidence_paths": [
+    "reviewer-returns/c1.json",
+    "commit-pr-stash-probe.json"
+  ],
+  "source_refs": [
+    "skills/spec-commit-push-pr/SKILL.md",
+    "skills/spec-commit-push-pr/references/context.md",
+    "skills/spec-commit-push-pr/references/commit-and-push.md",
+    "skills/spec-commit-push-pr/references/apply-and-handoff.md",
+    "skills/spec-commit-push-pr/references/branch-creation.md"
+  ],
+  "owner": "project-lead-cycle-1",
+  "consumers": [
+    "周期1主审查",
+    "对应上游/下游workflow（以SKILL文档声明为准）"
+  ],
+  "branches": [
+    {
+      "id": "entry_positive",
+      "status": "source-covered",
+      "judgment": "caller-owned landing helper 区分 description-only、已存在 PR 和完整 commit/push/PR scope；landing authority 不由 helper 名称或已有登录态产生。",
+      "source_refs": [
+        "skills/spec-commit-push-pr/SKILL.md:1-132",
+        "skills/spec-commit-push-pr/references/context.md:1-65"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "near_neighbor_negative",
+      "status": "source-covered",
+      "judgment": "description-only 不应写远程；fork owner 与现有 PR identity 需匹配，unknown remote state 不能当作不存在后重建。已读引用明确使用 body-file 和 read-back，避免依赖 shell 插值或未核实的写入回执。",
+      "source_refs": [
+        "skills/spec-commit-push-pr/SKILL.md:1-132",
+        "skills/spec-commit-push-pr/references/apply-and-handoff.md:1-93"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "output_consumer",
+      "status": "source-covered",
+      "judgment": "apply-and-handoff 要求把实际 landing 状态、验证与未完成项交回 caller；commit/push/PR 是分别有证据的事实，不能由一个步骤成功替代后续确认。",
+      "source_refs": [
+        "skills/spec-commit-push-pr/references/apply-and-handoff.md:1-93",
+        "skills/spec-commit-push-pr/references/commit-and-push.md:1-50"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "failure_stop",
+      "status": "failed",
+      "judgment": "checkout collision 恢复采用 stash -u / stash pop；没有可靠恢复并验证原始 index 的动作，会保留文件内容但丢失原来 staged-vs-unstaged 选择，与后续 staging ownership 要求冲突。登记 C1-COMMITPR-001，主 owner 已用临时 Git fixture 确认。",
+      "source_refs": [
+        "skills/spec-commit-push-pr/references/branch-creation.md:55-66",
+        "skills/spec-commit-push-pr/references/commit-and-push.md:8-19"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "recovery_handoff_closeout",
+      "status": "failed",
+      "judgment": "远程 unknown 或 write/read-back 不一致应显式留下未完成状态。checkout collision 的当前 stash 恢复路径尚不能证明保留 index，因此本包不得升级 passed；修复后需复验预先暂存与未暂存混合情形。",
+      "source_refs": [
+        "skills/spec-commit-push-pr/references/apply-and-handoff.md:1-93",
+        "skills/spec-commit-push-pr/references/branch-creation.md:55-66"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    }
+  ],
+  "findings": [
+    {
+      "id": "C1-COMMITPR-001",
+      "severity": "P2",
+      "title": "checkout collision 的 stash/pop 改变用户暂存选择",
+      "status": "confirmed-open",
+      "ledger_ref": "finding-ledger.json"
+    }
+  ],
+  "fresh_source_eval": "not-run",
+  "claim_ceiling": "C1",
+  "limitations": [
+    "compose、pr-description-writing 等完整依赖尚未读完。",
+    "未执行远程 GitHub/PR 操作、真实宿主调用或该 child 的 Git mutation。",
+    "本 worker 仅进行有界 source review；未执行被审 workflow、真实模型、真实宿主、安装、浏览器或外部写入。",
+    "source-read 不等于完整依赖闭包或行为评测通过；完整包 status 由主 owner 结合 findings 裁决。"
+  ],
+  "recovery_point": "先修复并回归 checkout collision 的 index preservation finding；补读其余依赖，分别验证 description-only、已有 fork PR、远程状态未知与 read-back 不一致，不触发真实外部写入。",
+  "timing": {
+    "active_seconds": null,
+    "limitation": "恢复前未记录可靠的逐包审查耗时；不以工具墙钟时间伪造语义审查耗时。"
+  },
+  "record_correction": {
+    "at": "2026-09-20T05:55:01.018126+00:00",
+    "invalidated": "2026-09-20T05:24 的机械占位结论",
+    "replaced_by_actual_review_at": "2026-09-20T07:06:40.683772+00:00"
+  },
+  "reviewer_provenance": {
+    "reviewer": "cycle1_a_readiness",
+    "kind": "read-only-source-review",
+    "fresh_per_package_context": false,
+    "raw_return": "reviewer-returns/c1.json",
+    "raw_return_sha256": "02822623ed4eb85628acd1969fb484a13ee4e04be4367e5a660cd80b82f99e09"
+  },
+  "execution": {
+    "source_semantic_review": "ran",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "not-run",
+    "owner_probe_refs": [
+      "commit-pr-stash-probe.json"
+    ]
+  },
+  "supporting_read_ranges": {},
+  "unconfirmed_read_ranges": []
+}

@@ -1,0 +1,10 @@
+PASS tests/unit/spec-plan-quality-contracts.test.js
+PASS tests/unit/spec-plan-consumer-replay-contracts.test.js
+PASS tests/unit/spec-plan-contracts.test.js
+PASS tests/unit/spec-plan-reference-contracts.test.js
+
+Test Suites: 4 passed, 4 total
+Tests:       49 passed, 49 total
+Snapshots:   0 total
+Time:        1.061 s, estimated 2 s
+Ran all test suites within paths "tests/unit/spec-plan-contracts.test.js", "tests/unit/spec-plan-reference-contracts.test.js", "tests/unit/spec-plan-consumer-replay-contracts.test.js", "tests/unit/spec-plan-quality-contracts.test.js".

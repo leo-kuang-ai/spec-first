@@ -1,0 +1,142 @@
+{
+  "scenario_id": "CEOPT-07",
+  "review_scope": "All six complete artifacts, receipts, all recorded tool-call inputs and output coverage; supplied fixtures, validation receipt, frozen scenario and relevant frozen A/B references. No artifact sampling.",
+  "refs": {
+    "base": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/",
+    "packet": "CEOPT-07-packet.json",
+    "request": "CEOPT-07-request.txt",
+    "source_protocol": "source-protocol.json",
+    "failure_receipt": "refresh-validation-failure.json",
+    "fixtures": [
+      "fixtures/refresh/CONCEPTS.md",
+      "fixtures/refresh/import-v1.md",
+      "fixtures/refresh/learning-a.md",
+      "fixtures/refresh/learning-b.md",
+      "fixtures/refresh/invalid-candidate.md"
+    ],
+    "acceptance": "docs/validation/ce-skill-optimization-2026-10-29/frozen-scenarios.json#cases[id=CEOPT-07]",
+    "frozen_source_base": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/",
+    "frozen_references": [
+      "A/spec-compound-refresh/SKILL.md",
+      "B/spec-compound-refresh/SKILL.md",
+      "A/spec-compound-refresh/references/classify.md",
+      "B/spec-compound-refresh/references/classify.md",
+      "A/spec-compound-refresh/references/publication.md",
+      "B/spec-compound-refresh/references/publication.md",
+      "A/spec-compound-refresh/references/concepts-vocabulary.md",
+      "B/spec-compound-refresh/references/concepts-vocabulary.md",
+      "A/spec-compound-refresh/references/vocabulary-refresh.md",
+      "B/spec-compound-refresh/references/vocabulary-refresh.md"
+    ],
+    "resolution": "Packet, request, fixture, receipt and trial references resolve relative to base; frozen references resolve relative to frozen_source_base."
+  },
+  "trials": [
+    {
+      "id": "CEOPT-07-A1",
+      "refs": [
+        "trials/CEOPT-07-A1/artifact.md",
+        "trials/CEOPT-07-A1/receipt.json",
+        "trials/CEOPT-07-A1/tool-events.json"
+      ],
+      "bounded_verdict": "pass",
+      "elapsed_seconds": 147.828,
+      "deadline_pass": true,
+      "finding": "Preserves all safeguards and the existing consumer. Proposed same-path canonical learning explicitly blocks publication until self-referential/deletion-bound provenance is repaired."
+    },
+    {
+      "id": "CEOPT-07-A2",
+      "refs": [
+        "trials/CEOPT-07-A2/artifact.md",
+        "trials/CEOPT-07-A2/receipt.json",
+        "trials/CEOPT-07-A2/tool-events.json"
+      ],
+      "bounded_verdict": "pass",
+      "elapsed_seconds": 192.506,
+      "deadline_pass": true,
+      "finding": "Complete separate-destination candidate retains fixture evidence, consumer meaning and all four safeguards; publication and broader consumer checks remain pending."
+    },
+    {
+      "id": "CEOPT-07-A3",
+      "refs": [
+        "trials/CEOPT-07-A3/artifact.md",
+        "trials/CEOPT-07-A3/receipt.json",
+        "trials/CEOPT-07-A3/tool-events.json"
+      ],
+      "bounded_verdict": "pass",
+      "elapsed_seconds": 156.625,
+      "deadline_pass": true,
+      "finding": "Explicit Ledger space heading resolves internally to Workspace; all recovery guidance survives. Additional glossary preamble is unnecessary but does not violate the acceptance conditions."
+    },
+    {
+      "id": "CEOPT-07-B1",
+      "refs": [
+        "trials/CEOPT-07-B1/artifact.md",
+        "trials/CEOPT-07-B1/receipt.json",
+        "trials/CEOPT-07-B1/tool-events.json"
+      ],
+      "bounded_verdict": "pass",
+      "elapsed_seconds": 148.057,
+      "deadline_pass": true,
+      "finding": "Tracks the load-bearing historical consumer, retains complete originals pending verified consolidation, and expressly distinguishes parent artifact persistence from publication."
+    },
+    {
+      "id": "CEOPT-07-B2",
+      "refs": [
+        "trials/CEOPT-07-B2/artifact.md",
+        "trials/CEOPT-07-B2/receipt.json",
+        "trials/CEOPT-07-B2/tool-events.json"
+      ],
+      "bounded_verdict": "pass",
+      "elapsed_seconds": 193.954,
+      "deadline_pass": true,
+      "finding": "Different canonical-target choice is an explained editorial judgment. All unique knowledge survives; provenance recovery and publication dependencies prevent premature deletion."
+    },
+    {
+      "id": "CEOPT-07-B3",
+      "refs": [
+        "trials/CEOPT-07-B3/artifact.md",
+        "trials/CEOPT-07-B3/receipt.json",
+        "trials/CEOPT-07-B3/tool-events.json"
+      ],
+      "bounded_verdict": "pass",
+      "elapsed_seconds": 223.814,
+      "deadline_pass": true,
+      "finding": "Preserves alias semantics, import-v1 and all four instructions. Distinguishes manual schema observations from actual validator errors and leaves all changes unpublished."
+    }
+  ],
+  "shared_findings": [
+    "All six preserve Workspace as a tenant-isolated accounting scope and Ledger space as its historical equivalent, without claiming consumer migration or concept retirement.",
+    "All six retain numeric validation before writes, original bank exports for reconciliation, original import-ID comparison before reimport, and protection of unrelated rows.",
+    "All six exclude the invalid candidate's unsupported diagnosis from confirmed knowledge while retaining the failed fixture as evidence.",
+    "All six correctly interpret exit code 1 and the missing source_refs/invalidation_condition errors. The actual receipt explicitly says no publication was attempted.",
+    "All recorded commands are bounded reads or discovery; no recorded mutation, validator execution, network request, delegation or landing.",
+    "Artifact and trace hashes match all six receipts. All five fixture hashes and all 38 frozen spec-compound-refresh source-file hashes match their recorded identities. Receipt timestamp differences match elapsed_seconds.",
+    "Large initial reference reads were truncated in every trial; targeted rereads recovered central material. A3 also has a truncated second reference batch. This limits claims of exhaustive reference exposure but does not erase the visible fixtures, failure receipt or complete final outputs."
+  ],
+  "bounded_acceptance": {
+    "status": "pass",
+    "scope": "Mediated read-only interpretation and complete draft production, with evidence honesty and 300-second timing admission",
+    "A_passes": 3,
+    "B_passes": 3,
+    "material_acceptance_failures": []
+  },
+  "full_acceptance": {
+    "status": "partial",
+    "reason": "The frozen scenario names publication failure, but supplied execution demonstrates a pre-publication validation failure only.",
+    "unknown_or_not_run": [
+      "Autonomous mutation and durable saving",
+      "Actual publication failure or partial-publication recovery",
+      "Freshness enforcement, atomic replacement and deletion safety under concurrent changes",
+      "Live import-v1 runtime compatibility",
+      "Successful promotion or validation of the proposed drafts",
+      "Exhaustive repository-wide consumer preservation"
+    ]
+  },
+  "limitations": [
+    "Serving identity is unauthenticated.",
+    "Read-only behavior is observed in supplied traces, not enforced isolation.",
+    "Parent-mediated saving is recorded in receipts; this review does not independently authenticate the original session transcript.",
+    "No tests, publication, network requests or writes were performed by this reviewer.",
+    "Equal bounded passes establish neither B superiority nor model superiority."
+  ]
+}

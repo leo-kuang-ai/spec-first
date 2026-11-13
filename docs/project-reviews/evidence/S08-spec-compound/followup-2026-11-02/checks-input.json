@@ -1,0 +1,69 @@
+{
+  "profile": {
+    "source": "local",
+    "name": "S08-causal-followup",
+    "path": null
+  },
+  "checks": [
+    {
+      "id": "calibration",
+      "service": "local",
+      "command": "node node_modules/jest/bin/jest.js --runInBand --runTestsByPath tests/unit/knowledge-causality-judge.test.js",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s08-causal-followup-20261102/logs/calibration.txt",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "config",
+      "service": "local",
+      "command": "skill-up validate skills/spec-compound/evals/eval.yaml",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "skill-up"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s08-causal-followup-20261102/logs/config.txt",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "generator",
+      "service": "local",
+      "command": "node scripts/evals/build-outcome-judges.cjs --check",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s08-causal-followup-20261102/logs/generator.txt",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "counterfactual",
+      "service": "local",
+      "command": "node skills/spec-compound/evals/fixtures/repos/causal-auth/verify.cjs",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s08-causal-followup-20261102/logs/counterfactual.txt",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    }
+  ]
+}

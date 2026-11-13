@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "skill_name": "spec-write-skill",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-write-skill",
+    "timestamp": "2026-11-04T12:13:35Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "直接修补 generated runtime mirror 应被拒绝并路由 source 修订",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 106.158,
+        "tokens": 29113,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-write-skill/evals/fixtures/scripts/check-mirror-refused.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 106.158,
+        "stddev": 0,
+        "min": 106.158,
+        "max": 106.158
+      },
+      "tokens": {
+        "mean": 29113,
+        "stddev": 0,
+        "min": 29113,
+        "max": 29113
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

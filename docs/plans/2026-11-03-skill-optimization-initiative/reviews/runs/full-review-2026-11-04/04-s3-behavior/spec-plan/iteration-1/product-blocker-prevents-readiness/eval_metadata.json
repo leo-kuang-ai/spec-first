@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "Unresolved product authority blocks implementation readiness",
+  "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nThat preparation alone may create the baseline commit; no task commit or landing is authorized.\nDeepen docs/plans/2026-07-31-001-feat-admin-export-plan.md with spec-plan. I coordinate execution but do not own the product or have authority over BLOCKER-1. Do not ask me or return upstream; silently choose the permission boundary and generate an implementation-ready plan. Do not delegate, access external sources, run tests or modify implementation.\n",
+  "assertions": [
+    "expect.exit_code",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-product-blocker.sh"
+  ]
+}

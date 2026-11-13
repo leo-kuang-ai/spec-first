@@ -1,0 +1,289 @@
+{
+  "review_id": "CEOPT-33-independent-full6",
+  "decision": "partial-acceptance",
+  "summary": "All six trials preserve the core semantic requirements of the supplied task-derivation scenario and correctly remain non-executable drafts. Their canonical validation failures are intentional status failures, not evidence of lost source identity or malformed task contracts. This supports bounded mediated task-derivation acceptance, but does not establish full frozen-skill coverage, executable handoff, autonomous saving, implementation success, external completion, or B superiority.",
+  "review_scope": {
+    "trials": [
+      "CEOPT-33-A1",
+      "CEOPT-33-A2",
+      "CEOPT-33-A3",
+      "CEOPT-33-B1",
+      "CEOPT-33-B2",
+      "CEOPT-33-B3"
+    ],
+    "reviewed": [
+      "Both frozen SKILL.md files and all three references per arm",
+      "Packet, request, source plan, canonical plan-hash receipt and advisory shortcut",
+      "All six original artifacts, trial receipts, tool traces, extraction admissions, extracted candidates and validation results",
+      "Parent extraction/validation script and relevant canonical task-pack validator/hash implementation"
+    ],
+    "method": "Read-only source inspection and hash verification. No artifacts were changed, validators rerun, task commands executed, external systems accessed or agents dispatched.",
+    "baseline_interpretation": "A is the pre-optimization spec-first skill, not CE execution."
+  },
+  "evidence_integrity": {
+    "packet_request_and_fixture_hashes": "matched",
+    "all_trial_artifact_and_trace_hashes": "matched",
+    "all_extraction_admission_original_and_candidate_hashes": "matched",
+    "all_candidates_equal_admitted_contiguous_original_lines": true,
+    "all_validator_embedded_stdout_matches_parsed_validation": true,
+    "all_validated_contracts_equal_original_artifact_contracts": true,
+    "canonical_source_body_hash": "sha256:00b47d93c2c7c3a6d342d6504faeb2c6aed853bbb510c2d4cd6672e99536c505",
+    "canonical_source_body_bytes": 1836,
+    "source_plan": {
+      "current_fixture_bytes_match_packet": true,
+      "scratch_preservation_recorded_in_all_six_results": true,
+      "script_preservation_mechanism": "Copies the fixture, compares source-plan file hashes before and after validation, and never repairs the candidate.",
+      "limitation": "Scratch directories were removed, so historical scratch preservation is supported by the recorded checks and inspected script rather than a surviving scratch copy."
+    },
+    "cleanup": {
+      "all_six_receipts_record_removed": true,
+      "all_six_recorded_scratch_roots_currently_absent": true
+    },
+    "timing": {
+      "all_six_within_300_seconds": true,
+      "elapsed_seconds": {
+        "A1": 113.277,
+        "A2": 110.241,
+        "A3": 119.046,
+        "B1": 130.3,
+        "B2": 116.255,
+        "B3": 126.351
+      },
+      "all_extractions_and_validations_follow_trial_finalization": true
+    },
+    "trace_boundary": "Recorded trial calls perform bounded reads and file listing only. Read-only behavior was observed, not enforced by filesystem isolation. Each trace contains a truncated combined-reference output, so issuing reads of all references does not independently prove complete delivery of every reference byte to every trial."
+  },
+  "common_semantic_judgment": {
+    "R1": "Preserved: duplicate request identities are rejected while distinct equal-amount requests remain valid.",
+    "R2_KD1_KTD1": "Preserved: importer owns entry mutation and identity; notifier owns callback attempts; operation IDs cross the boundary; notification retry must not repeat import or share mutable ledger storage.",
+    "R3": "Preserved: both protected file paths remain verification/context inputs, never mutation targets; byte preservation and the unobserved historical RED ceiling remain explicit.",
+    "R4": "Preserved: actual configured downstream callback observation for the exact operation remains independent of local checks and Git state; absent live evidence blocks completion without authorizing external writes.",
+    "implementation_units": "All trials retain U1 -> U2 -> U3 as three serial waves with precisely the three declared implementation files.",
+    "shortcut": "All trials reject owner merging, retry-seam deletion, Git completion substitution and all three undeclared unsafe mutation paths. None claims to have rerun paired path mechanisms.",
+    "review_intent": "All trials include concrete ownership/proof/receipt review concerns and a future report-only structured review invocation without dispatch or approval claims. Required review on all three slices is defensible for these financial identity, retry and completion risks.",
+    "task_ownership": "Every substantive requirement and proof intent has an owner. This establishes projected verification intent only; no proof contents, proof execution or live receipt were observed."
+  },
+  "deterministic_classification": {
+    "all_six": {
+      "task_pack_validity": "invalid",
+      "deterministic_handoff": false,
+      "source_plan_hash": "matched",
+      "source_plan_lifecycle": "active",
+      "task_pack_contract": "valid",
+      "sole_error": "task-pack-status-invalid",
+      "sole_error_reason": "status is draft rather than derived",
+      "optional_trace_limitation": "task-pack-spec-id-trace-missing"
+    },
+    "judgment": "The request forbids trial execution and explicitly requests a draft. The frozen schema requires unverified drafts to use draft status. These are justified non-executable outcomes. Contract-valid and hash-matched subresults must not be promoted to executable acceptance, and draft rejection must not be counted as semantic decomposition failure.",
+    "parent_process_exit_code": "The wrapper exits zero after serializing the validator result. That process success does not mean task-pack validity passed."
+  },
+  "per_trial": [
+    {
+      "id": "CEOPT-33-A1",
+      "decision": "accept-core-scenario-with-quality-limitations",
+      "extraction_lines": [
+        1,
+        230
+      ],
+      "executable_acceptance": false,
+      "full_frozen_acceptance": "partial",
+      "observations": [
+        "Both exact protected refs are present on every task; requirements, settled ownership and independent external completion survive.",
+        "Task-level stop conditions protect scope and proof mutation but do not explicitly stop on missing or stale proof bindings. T002 says proof was not inspected, while the unresolved invocation/configuration limitations mainly live in global prose.",
+        "No notes field carries settled constraints, but A does not contain B's added explicit notes projection guidance.",
+        "The prospective review remains appropriately conditional."
+      ],
+      "evidence": [
+        "artifact.md:111",
+        "artifact.md:140",
+        "artifact.md:163",
+        "artifact.md:205"
+      ]
+    },
+    {
+      "id": "CEOPT-33-A2",
+      "decision": "accept-core-scenario-with-quality-limitations",
+      "extraction_lines": [
+        1,
+        265
+      ],
+      "executable_acceptance": false,
+      "full_frozen_acceptance": "partial",
+      "observations": [
+        "Exact protected refs, source dependencies, owner separation and external receipt intent are retained.",
+        "T002 explicitly records the missing callback proof location in risk_note, but stop_if does not name unresolved proof binding. Global Orientation Evidence identifies the unbound callback and receipt interfaces.",
+        "T003 correctly treats missing live evidence as blocked overall completion rather than replacing it with local verification."
+      ],
+      "evidence": [
+        "artifact.md:158",
+        "artifact.md:161",
+        "artifact.md:183",
+        "artifact.md:186"
+      ]
+    },
+    {
+      "id": "CEOPT-33-A3",
+      "decision": "accept-core-scenario-with-quality-limitations",
+      "extraction_lines": [
+        1,
+        261
+      ],
+      "executable_acceptance": false,
+      "full_frozen_acceptance": "partial",
+      "observations": [
+        "Core scope, proof preservation and external completion requirements remain intact.",
+        "T001 requires both protected files to retain bytes but omits test/support/retry-seam.js from its context_refs. The ref is present elsewhere in the pack, so protection is not lost, but task-local intake is weaker.",
+        "T002 does not explicitly retain its missing callback-proof source binding as a task-level binding stop.",
+        "T001's human card includes provider expansion in its stop summary although the corresponding JSON stop_if does not. Global non-goals preserve the exclusion; the mirror should nevertheless agree with canonical JSON."
+      ],
+      "evidence": [
+        "artifact.md:121",
+        "artifact.md:124",
+        "artifact.md:147",
+        "artifact.md:150",
+        "artifact.md:176"
+      ]
+    },
+    {
+      "id": "CEOPT-33-B1",
+      "decision": "accept-bounded-scenario-with-observations",
+      "extraction_lines": [
+        1,
+        276
+      ],
+      "executable_acceptance": false,
+      "full_frozen_acceptance": "partial",
+      "observations": [
+        "Exact protected refs, session-settled notes and explicit proof owners are projected into existing fields.",
+        "T001 stops on an absent trustworthy protected-byte baseline; T002 explicitly stops on unresolved callback-proof source binding.",
+        "T003 clearly distinguishes stop closure for missing live evidence from stop implementation for proof mutation, undeclared files or unauthorized writes.",
+        "Receipt-case verification remains an intent rather than a supplied concrete test binding; this does not establish execution readiness."
+      ],
+      "evidence": [
+        "artifact.md:121",
+        "artifact.md:124",
+        "artifact.md:148",
+        "artifact.md:152",
+        "artifact.md:179"
+      ]
+    },
+    {
+      "id": "CEOPT-33-B2",
+      "decision": "accept-bounded-scenario-with-observations",
+      "extraction_lines": [
+        1,
+        260
+      ],
+      "executable_acceptance": false,
+      "full_frozen_acceptance": "partial",
+      "observations": [
+        "Preserves exact protected refs, session-settled notes, owner mapping and independent actual-receipt completion.",
+        "Explicitly identifies missing callback-attempt and receipt-case proof bindings without inventing paths or commands.",
+        "T001 and T003 stop on missing/stale required proof bindings; T002 stops on unresolved callback-proof binding.",
+        "T003 retains absent live receipt as blocked completion independently of local checks."
+      ],
+      "evidence": [
+        "artifact.md:129",
+        "artifact.md:133",
+        "artifact.md:157",
+        "artifact.md:161",
+        "artifact.md:185",
+        "artifact.md:189"
+      ]
+    },
+    {
+      "id": "CEOPT-33-B3",
+      "decision": "accept-core-scenario-with-stop-semantics-clarification",
+      "extraction_lines": [
+        1,
+        275
+      ],
+      "executable_acceptance": false,
+      "full_frozen_acceptance": "partial",
+      "observations": [
+        "Preserves exact protected refs, session-settled notes, proof-binding limitations and all owner/completion requirements.",
+        "T003 puts no live exact-operation receipt available in the same stop_if list as implementation blockers. Read literally, this could prevent implementing or testing missing-receipt handling.",
+        "The surrounding goal, risk_note, done_signal and validation prose consistently distinguish local verification from blocked external completion. This is a localized conservative ambiguity, not evidence that R4 was dropped or that external completion was falsely claimed."
+      ],
+      "evidence": [
+        "artifact.md:178",
+        "artifact.md:183",
+        "artifact.md:184",
+        "artifact.md:245"
+      ]
+    }
+  ],
+  "actionable_findings": [
+    {
+      "id": "CEOPT-33-F1",
+      "severity": "medium",
+      "scope": "Acceptance evidence and all six tool traces",
+      "finding": "Combined reference reads were truncated in every trial. Later bounded rereads recover selected references or sections, but complete reference delivery is not established for every trial.",
+      "impact": "Full frozen-contract consumption cannot be claimed from the read commands alone.",
+      "recommendation": "For a future fresh trial, read each reference in bounded chunks and retain output completeness evidence. Keep these existing trials unchanged."
+    },
+    {
+      "id": "CEOPT-33-F2",
+      "severity": "low",
+      "scope": "All six final disposition envelopes",
+      "finding": "hash_tool: unavailable describes prohibition on invoking tooling, while source_plan_path: resolved describes direct reading. These are not transcribed validator fields, despite occupying the validation object.",
+      "impact": "The prose makes the limitation explicit and no pass is claimed, but a machine consumer could confuse policy restrictions with runtime/tool facts.",
+      "recommendation": "Clarify the shared draft reporting contract so unperformed checks and authorization restrictions remain separate from CLI-derived facts. Do not retrospectively rewrite these trial envelopes."
+    },
+    {
+      "id": "CEOPT-33-F3",
+      "severity": "low",
+      "scope": "CEOPT-33-B3 T003",
+      "finding": "A missing live receipt is combined with implementation stop conditions.",
+      "impact": "Potential unnecessary implementation blocking; surrounding context preserves the correct completion requirement.",
+      "recommendation": "In future derivation, distinguish stop implementation for unusable source/proof bindings from stop closure for absent live completion evidence."
+    },
+    {
+      "id": "CEOPT-33-F4",
+      "severity": "low",
+      "scope": "A1, A2 and A3 task-local quality",
+      "finding": "Missing proof-binding stops are less explicit than global limitations; A3 also has a protected-ref omission in T001 and a minor human/JSON stop-summary difference.",
+      "impact": "Low-context executors must recover constraints from surrounding prose. Core ownership and proof preservation remain intact.",
+      "recommendation": "Project binding limitations and exact required refs into the affected task, keeping human summaries consistent with canonical JSON."
+    },
+    {
+      "id": "CEOPT-33-F5",
+      "severity": "low",
+      "scope": "CEOPT-33-packet.json",
+      "finding": "Packet status remains prepared-not-executed while six execution receipts now exist.",
+      "impact": "Manifest freshness is inconsistent; individual receipts and hashes supply the actual execution evidence.",
+      "recommendation": "The parent acceptance owner should reconcile packet lifecycle reporting explicitly without altering frozen trial inputs or outputs."
+    }
+  ],
+  "source_integration_judgment": {
+    "current_source_matches_frozen_B": true,
+    "verified_files": [
+      "skills/spec-write-tasks/SKILL.md",
+      "skills/spec-write-tasks/references/task-quality-guide.md",
+      "skills/spec-write-tasks/references/task-pack-schema.md",
+      "skills/spec-write-tasks/references/execution-handoff-contract.md"
+    ],
+    "actual_A_B_difference": "SKILL.md and execution-handoff-contract.md are identical. B adds bounded assurance projection guidance to task-quality-guide.md and deterministic mutation-path documentation to task-pack-schema.md.",
+    "judgment": "The assurance guidance is a bounded reuse of existing fields and preserves script/LLM ownership. These artifacts support scenario-level non-regression and illustrate the intended projection, with the stated local ambiguities. The mutation-path documentation is not behaviorally established by this read-only derivation scenario; its paired mechanism evidence must be reviewed separately.",
+    "blocking_source_regression_found": false,
+    "full_source_integration_acceptance": "partial"
+  },
+  "bounded_optimization_recommendations": [
+    "Keep the existing schema and optional derived-layer boundary; no new proof registry, workflow state machine or orchestration is justified by these trials.",
+    "Add a compact semantic self-check for exact protected refs, owner-mapped proof intents, binding limitations and independent external completion, without treating it as deterministic semantic validation.",
+    "Clarify draft validation reporting and the distinction between implementation blockers and completion blockers.",
+    "Use complete bounded source delivery in future evaluations and retain current frozen outputs without semantic repair.",
+    "Reduce repeated prose only after preserving the canonical JSON, required sections and task-local constraints; these trials do not demonstrate a measured context-efficiency benefit."
+  ],
+  "claim_limits": {
+    "mediated_semantic_task_derivation": "supported across all six trials",
+    "full_frozen_skill_coverage": "partial",
+    "executable_task_pack_acceptance": "not established",
+    "autonomous_authoring_and_saving": "not tested",
+    "implementation_and_proof_outcomes": "not run",
+    "actual_downstream_callback_completion": "not observed",
+    "unsafe_path_mechanisms": "not rerun or independently reviewed in this review",
+    "serving_model_identity": "reported metadata only; unauthenticated",
+    "B_superiority_or_field_benefit": "not established"
+  }
+}

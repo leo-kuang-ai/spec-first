@@ -1,0 +1,33 @@
+{
+  "id": "CEOPT-05-A-3",
+  "scenario_id": "CEOPT-05",
+  "arm": "A",
+  "trial": 3,
+  "native_task": "/root/trial05_a3",
+  "session_id": "01a18ae7-7dd7-75d3-80cd-5a1232483e4f",
+  "started_at": "2026-10-30T03:43:09.401Z",
+  "final_at": "2026-10-30T03:51:26.635Z",
+  "model_metadata": [
+    {
+      "model": "gpt-6-astra",
+      "effort": "high",
+      "sandbox_policy": {
+        "type": "danger-full-access"
+      }
+    }
+  ],
+  "response_sha256": "3227afe84cadf1e83c0cb60f492549b9fe64e6ea34b915e8c5432512f32929bf",
+  "tool_trace_sha256": "c0319820e02b1bfaac30c830789c82ab7fa92962f6ca932107ebd3e24bfec373",
+  "source_transcript_sha256": "1710cf344b418d2edb64dbdd68e9af05b34b3962750b100fac95a6bae5103f1e",
+  "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-05-A-3/response.md",
+  "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-05-A-3/tool-events.json",
+  "status": "executed",
+  "tool_calls": 3,
+  "host_retry": {
+    "failure": "429 Too Many Requests",
+    "action": "Identical task retried once in the same agent context; no source/request change.",
+    "timing_comparable": false
+  },
+  "semantic_status": "pass",
+  "judge_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/judge-wave3.json"
+}

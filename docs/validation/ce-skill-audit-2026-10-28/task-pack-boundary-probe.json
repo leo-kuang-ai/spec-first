@@ -1,0 +1,43 @@
+{
+  "boundary": "validator-only; no workflow execution or external writes",
+  "observations": [
+    {
+      "file": "src/example.js",
+      "deterministic_handoff": true,
+      "validity": "valid",
+      "errors": []
+    },
+    {
+      "file": "linked/external.js",
+      "deterministic_handoff": true,
+      "validity": "valid",
+      "errors": []
+    },
+    {
+      "file": "linked/new.js",
+      "deterministic_handoff": true,
+      "validity": "valid",
+      "errors": []
+    },
+    {
+      "file": ".opencode/skills/example/SKILL.md",
+      "deterministic_handoff": true,
+      "validity": "valid",
+      "errors": []
+    },
+    {
+      "file": ".claude/skills/example/SKILL.md",
+      "deterministic_handoff": false,
+      "validity": "invalid",
+      "errors": [
+        "task-pack-task-file-generated-runtime"
+      ]
+    },
+    {
+      "file": ".git/config",
+      "deterministic_handoff": true,
+      "validity": "valid",
+      "errors": []
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "status": "completed",
+  "reason_code": null,
+  "action_process_calls": 6,
+  "steps": [
+    {
+      "index": 0,
+      "action": "open",
+      "status": "passed",
+      "exit_code": 0,
+      "raw_output_path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-aa03q1q6/positive/raw/step-001.json"
+    },
+    {
+      "index": 1,
+      "action": "vitals",
+      "status": "passed",
+      "exit_code": 0,
+      "raw_output_path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-aa03q1q6/positive/raw/step-002.json"
+    },
+    {
+      "index": 2,
+      "action": "get",
+      "status": "passed",
+      "exit_code": 0,
+      "raw_output_path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-aa03q1q6/positive/raw/step-003.json"
+    },
+    {
+      "index": 3,
+      "action": "get",
+      "status": "passed",
+      "exit_code": 0,
+      "raw_output_path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-aa03q1q6/positive/raw/step-004.json"
+    },
+    {
+      "index": 4,
+      "action": "viewport",
+      "status": "passed",
+      "exit_code": 0,
+      "raw_output_path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-aa03q1q6/positive/raw/step-005.json"
+    },
+    {
+      "index": 5,
+      "action": "network-metadata",
+      "status": "passed",
+      "exit_code": 0,
+      "raw_output_path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-aa03q1q6/positive/raw/step-006.json"
+    }
+  ]
+}

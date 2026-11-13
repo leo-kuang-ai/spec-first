@@ -1,0 +1,24 @@
+{
+  "id": "CEOPT-10",
+  "skill": "spec-dogfood",
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/CEOPT-10-request.txt",
+  "request_sha256": "c1351030d93516470e951d9326fa1f04f4489b16ff8a621530cdd64bad951825",
+  "input_files": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/page-lifecycle-receipt.json": "3434bf5fc109fffe5aed7d4319d074126197eccfa984cce5340c4857f1072c7d",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/feedback-fixture.json": "85fde21ef065b3bd8edd87217b1d1d64b464076de6517860f1fe2f3a7de07950"
+  },
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "deadline_seconds": 300,
+  "parent_recipe": "Save exact read-only response; independently review all supplied actual/local/synthetic evidence. No model autonomous browser operation.",
+  "status": "prepared-not-executed",
+  "limitations": [
+    "Synthetic local page/feedback and parent execution do not prove product visual acceptance, human decisions or autonomous browser workflow."
+  ]
+}

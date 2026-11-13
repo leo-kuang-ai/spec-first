@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "Ordinary continuation creates no handoff artifact",
+  "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nOnly preparation may create a baseline commit; it grants no task commit or landing authority.\nUse spec-handoff only if its scope applies. Continue the current work in this conversation; move to the next step.\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-handoff/evals/fixtures/scripts/check-continues-inline.sh"
+  ]
+}

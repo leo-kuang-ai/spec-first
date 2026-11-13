@@ -1,0 +1,28 @@
+{
+  "id": "CEOPT-20-B-2",
+  "scenario_id": "CEOPT-20",
+  "arm": "B",
+  "trial": 2,
+  "native_task": "/root/trial20_b2",
+  "session_id": "01a18ae5-4088-7b72-afb4-74703b8c6b04",
+  "started_at": "2026-10-30T03:40:42.640Z",
+  "final_at": "2026-10-30T03:41:37.338Z",
+  "model_metadata": [
+    {
+      "model": "gpt-6-astra",
+      "effort": "high",
+      "sandbox_policy": {
+        "type": "danger-full-access"
+      }
+    }
+  ],
+  "response_sha256": "18e8726ad41e8670459baaad18f49227011c025c0a0830016ef3f91451ad3820",
+  "tool_trace_sha256": "16a6355772ab820d494e74b26d91566bc199dcd8afd7ba53083615862f0c20a3",
+  "source_transcript_sha256": "d0f9a0cb9edaa2304be0f5f4a554045d24a9bc6d2a05c429351906bb0bb322d0",
+  "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-20-B-2/response.md",
+  "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/trials/CEOPT-20-B-2/tool-events.json",
+  "status": "executed",
+  "tool_calls": 4,
+  "semantic_status": "pass",
+  "judge_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-trials/judge-wave3.json"
+}

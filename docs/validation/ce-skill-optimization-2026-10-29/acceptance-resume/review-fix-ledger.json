@@ -1,0 +1,68 @@
+{
+  "updated_at": "2026-10-30T01:21:45.349121+00:00",
+  "findings": [
+    {
+      "review_ref": "definition-review.json",
+      "finding_index": 1,
+      "status": "resolved-tested-and-independently-rechecked",
+      "source_confirmation": "Direct-worker fake-provider probe called both providers in both review adapters before the fix.",
+      "fix": "Reuse the existing POV fail-closed guard in both review adapters before all worker operations.",
+      "paths": [
+        "skills/spec-doc-review/scripts/cross-model-doc-review.sh",
+        "skills/spec-code-review/scripts/cross-model-adversarial-review.sh",
+        "tests/unit/spec-pov-worker-admission.test.js",
+        "tests/unit/spec-code-review-peer-runner.test.js"
+      ],
+      "red": "direct-worker-regression-red.log",
+      "green": "direct-worker-regression-green.log",
+      "focused_tests_passed": 82,
+      "followup_review": "confirmed-by-source-review; evidence-review.json#fix_rechecks",
+      "limitations": [
+        "Positive authenticated execution remains unavailable.",
+        "Dormant constraint normalization is tested as a pure transform; no test bypasses provider admission.",
+        "The two old direct-worker tests previously exercised the unsafe entrypoint; they now test their pure transform without provider execution."
+      ]
+    },
+    {
+      "review_ref": "execution-review.json",
+      "finding_index": 1,
+      "status": "resolved-tested-and-independently-rechecked",
+      "source_confirmation": "Both new genuine regression-test cases failed before the repair-judge option was enabled; the standalone HTTP proof fails on the original server and passes on the repaired server.",
+      "fix": "Add allowNewTests to the shared fixture guard, enable it only for Debug repair, regenerate the bundled judges.",
+      "paths": [
+        "scripts/evals/fixture-state.cjs",
+        "scripts/evals/build-outcome-judges.cjs",
+        "tests/unit/spec-debug-judge-calibration.test.js",
+        "skills/spec-debug/evals/fixtures/scripts/check-fixed-no-commit.sh"
+      ],
+      "red": "debug-proof-red.log",
+      "green": "debug-proof-green.log",
+      "focused_tests_passed": 77,
+      "followup_review": "confirmed-by-source-review; evidence-review.json#fix_rechecks",
+      "limitations": [
+        "Deterministic fixture calibration only; no model task success is inferred.",
+        "Shared helper is bundled into multiple judges; only Debug repair enables the new permission."
+      ]
+    },
+    {
+      "review_ref": "evidence-review.json",
+      "finding_index": 1,
+      "status": "resolved-tested-and-independently-rechecked",
+      "source_confirmation": "The exact truthful fixture sentence failed the regex judge before the fix.",
+      "fix": "Remove the unqualified natural-language regex; retain explicit structured status, draft shape and trace/state guards. Declare wording truth as a separate semantic evaluation obligation.",
+      "paths": [
+        "scripts/evals/ce-u28-outcomes.cjs",
+        "skills/spec-promote/evals/fixtures/scripts/check-unreleased-local-drafts.sh",
+        "skills/spec-promote/evals/cases/check-unreleased-local-drafts.yaml",
+        "tests/unit/ce-u28-outcome-calibration.test.js"
+      ],
+      "red": "promote-negation-red.log",
+      "green": "promote-negation-green.log",
+      "focused_tests_passed": 28,
+      "followup_review": "resolved; promote-fix-review.json",
+      "limitations": [
+        "Script success is not semantic release-truth validation. Positive or negative wording requires independent outcome adjudication."
+      ]
+    }
+  ]
+}

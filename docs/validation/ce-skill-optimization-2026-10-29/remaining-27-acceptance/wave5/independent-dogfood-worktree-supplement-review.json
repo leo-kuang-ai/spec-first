@@ -1,0 +1,483 @@
+{
+  "review_type": "independent_read_only_full_six_and_supplement_review",
+  "verdict": "accept_bounded_evidence_with_explicit_limits",
+  "scope_complete": true,
+  "reviewer_actions": {
+    "writes": false,
+    "helper_or_producer_execution": false,
+    "test_execution": false,
+    "browser_execution": false,
+    "network_operations": false,
+    "delegation": false,
+    "new_trials": false,
+    "verification_method": "Read artifacts, receipts, complete retained command records, frozen source and references; independently compute hashes, timestamp arithmetic and exact source diffs."
+  },
+  "dogfood": {
+    "candidate": "CEOPT-10",
+    "verdict": "accept_all_six_bounded_receipt_assessments",
+    "evidence_root": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5",
+    "integrity": {
+      "request_hash_matches_packet": true,
+      "both_packet_input_hashes_match": true,
+      "all_three_fixture_source_hashes_match_lifecycle_receipt": true,
+      "all_six_artifact_hashes_match_receipts": true,
+      "all_six_tool_trace_hashes_match_receipts": true,
+      "all_six_elapsed_values_equal_final_at_minus_started_at": true,
+      "all_trace_timestamps_within_respective_trial_intervals": true,
+      "all_six_under_300_second_deadline": true,
+      "all_six_recorded_statuses": "executed-awaiting-review",
+      "all_six_recorded_model_metadata": {
+        "model": "gpt-6-astra",
+        "effort": "medium"
+      },
+      "limitations": [
+        "Model serving identity is recorded but unauthenticated.",
+        "Parent saving without semantic edits is a receipt declaration, not independent proof of the upstream response origin.",
+        "The frozen packet's prepared-not-executed status describes preparation; it does not override subsequent trial receipts.",
+        "Read-only compliance is supported by observed calls and instructions, not enforced filesystem isolation."
+      ]
+    },
+    "frozen_source": {
+      "all_relevant_files_read": true,
+      "files_per_arm": [
+        "SKILL.md",
+        "references/phases.md",
+        "references/test-matrix-taxonomy.md",
+        "references/dogfood-report-template.md"
+      ],
+      "entry_skill_identical_between_arms": true,
+      "entry_skill_sha256": "9e5057e8670a5a9073b27e8051c0a669d759065ec1997a371d618719b2023a88",
+      "taxonomy_identical_between_arms": true,
+      "A_phases_sha256": "20ae144c6b187477aafa1c4c7a2706436b19ff77702dcbf6a5e150560a7fbb45",
+      "B_phases_sha256": "87378121c56f5d29b6820212b230669db0cba1c2d92a1c8305cc546101f88004",
+      "A_report_template_sha256": "a7bbe4918c5c8b818e90e2061ed92f6c256bb0383b177b857213b649057402fc",
+      "B_report_template_sha256": "9d191bf3493e0a3786650de55bfd022c24b4c2ba295a563b8badd3ab81e5a92a",
+      "B_changes": [
+        "Resume compares repository/base/head, relevant dirty-file identities and served-build identity; affected stale evidence requires revalidation.",
+        "Skipped is explicitly distinguished from Pass.",
+        "Applicable existing criteria are carried with source references and applicability conditions and bound to scenario observations.",
+        "Listener reuse requires attributable project/process/build identity or an explicit source-binding limitation.",
+        "External-interaction blockers retain their actual authority and verification requirements.",
+        "Stale-rule conflicts require comparison with active intent and cannot silently reverse intentional behavior or rewrite rules.",
+        "Knowledge handoff distinguishes restoration of an existing rule from a potentially new verified lesson.",
+        "The report template adds identity requirements and an Applicable Criteria section."
+      ],
+      "claim_limit": "These source changes and the receipt-interpretation trials do not demonstrate autonomous execution of every changed workflow branch."
+    },
+    "lifecycle_ground_truth": [
+      {
+        "stage": "initial_A_server_and_document",
+        "evidence": "PID 17621 serves A at http://127.0.0.1:57289/. Parent open and snapshot succeed; snapshot identifies Ledger fixture A, Total: 12 and disabled Add entry.",
+        "disposition": "Historical A evidence only."
+      },
+      {
+        "stage": "A_screenshot_capture",
+        "evidence": "Parent screenshot command reports successful page-A.png save.",
+        "disposition": "Capture is recorded; no visual judgment follows without image inspection."
+      },
+      {
+        "stage": "server_replacement",
+        "evidence": "A terminates with -15. B starts as PID 17647 at the same port.",
+        "disposition": "A new server process is established; the existing browser document is not thereby refreshed."
+      },
+      {
+        "stage": "B_HTTP_response",
+        "evidence": "HTTP 200 returns the pinned B body containing Total: 18 and a button without disabled.",
+        "disposition": "Supports B being served, not B already being loaded in the existing tab."
+      },
+      {
+        "stage": "pre_reload_snapshot",
+        "evidence": "The same session still reports Ledger fixture A, Total: 12 and disabled Add entry.",
+        "disposition": "Stale A DOM; neither acceptance nor a rendering-failure finding for current B."
+      },
+      {
+        "stage": "reload_and_current_B_snapshot",
+        "evidence": "Reload succeeds; subsequent snapshot identifies Ledger fixture B, Total: 18, image label Total 18 and Add entry without the disabled marker.",
+        "disposition": "Supports the two narrow current-B page-state criteria."
+      },
+      {
+        "stage": "B_screenshot_capture",
+        "evidence": "Parent screenshot command reports successful page-B.png save.",
+        "disposition": "Does not establish visual quality or keyboard focus."
+      },
+      {
+        "stage": "cleanup",
+        "evidence": "Browser close exits 0; final cleanup records browser close 0 and server exit -15.",
+        "disposition": "Parent-recorded cleanup, not worker-executed cleanup or proof of present runtime readiness."
+      }
+    ],
+    "criteria_disposition": [
+      {
+        "criterion": "Current version B must show Total: 18.",
+        "result": "honored",
+        "scope": "Parent's recorded post-reload synthetic B document."
+      },
+      {
+        "criterion": "Add entry must be enabled.",
+        "result": "honored",
+        "scope": "Recorded enabled state only; activation and downstream behavior were not exercised."
+      },
+      {
+        "criterion": "A prior version A observation is not acceptance for version B.",
+        "result": "honored_by_all_six_assessments",
+        "scope": "All six exclude initial and stale A observations from B acceptance."
+      },
+      {
+        "criterion": "Keep total 18 and the enabled Add entry button.",
+        "result": "consistent_with_recorded_B_state",
+        "scope": "Synthetic feedback preservation constraint; no later source change or preservation regression run occurred."
+      },
+      {
+        "criterion": "Review keyboard focus; do not claim it fixed from a screenshot alone.",
+        "result": "not_exercised",
+        "scope": "No traversal, focus-order, visible-focus, active-element or keyboard-activation evidence. No focus defect or fix is established."
+      }
+    ],
+    "ownership_and_unavailable_branch": {
+      "feedback": "Explicitly labeled synthetic owner feedback, not a real owner or user message.",
+      "named_feedback_workflow_owner": "spec-polish",
+      "assessment": "All six correctly route collaborative focus/polish continuation to spec-polish and distinguish it from autonomous diff-scoped dogfood.",
+      "browser_owner": "spec-test-browser",
+      "future_dogfood_mode": "mode:pipeline with an exact loopback target-origin",
+      "worker_browser_activity": "not-run",
+      "unavailable_branch": "All six preserve the prescribed spec-runtime-setup recovery route and reject invented direct browser fallback.",
+      "important_distinction": "The trial's prohibition on browser execution does not itself prove browser installation or execution-owner unavailability.",
+      "parent_receipt_limit": "Direct agent-browser commands support attributed local observations. They do not establish spec-test-browser wrapper conformance, request-time exact-origin enforcement or private-evidence protocol compliance."
+    },
+    "per_trial_judgments": [
+      {
+        "trial": "CEOPT-10-A1",
+        "elapsed_seconds": 58.14,
+        "judgment": "accept",
+        "coverage": "All declared criteria, all supplied lifecycle stages, synthetic feedback ownership, keyboard-focus gap, browser-unavailable branch and remaining readiness facets.",
+        "specific_observations": [
+          "Explicit lifecycle diagram separates replacement HTTP evidence from stale DOM and post-reload B.",
+          "Correctly distinguishes worker execution prohibition from an installation failure.",
+          "Does not infer visual acceptance from screenshot-save records."
+        ],
+        "artifact_and_trace_hashes": "match",
+        "trace_events": 6,
+        "truncation_detected": false,
+        "arm_isolation": "own-arm frozen source and shared assigned inputs only",
+        "unauthorized_execution_detected": false
+      },
+      {
+        "trial": "CEOPT-10-B1",
+        "elapsed_seconds": 66.417,
+        "judgment": "accept",
+        "coverage": "All declared criteria, all supplied lifecycle stages, synthetic feedback ownership, keyboard-focus gap, browser-unavailable branch and remaining readiness facets.",
+        "specific_observations": [
+          "Correctly states server identity and HTTP content do not establish current browser-document freshness.",
+          "Treats feedback as synthetic and focus as not-exercised.",
+          "Leaves product diff, dirty identities, visuals, suite and full readiness unverified."
+        ],
+        "artifact_and_trace_hashes": "match",
+        "trace_events": 6,
+        "truncation_detected": false,
+        "arm_isolation": "own-arm frozen source and shared assigned inputs only",
+        "unauthorized_execution_detected": false
+      },
+      {
+        "trial": "CEOPT-10-B2",
+        "elapsed_seconds": 68.832,
+        "judgment": "accept",
+        "coverage": "All declared criteria, all supplied lifecycle stages, synthetic feedback ownership, keyboard-focus gap, browser-unavailable branch and remaining readiness facets.",
+        "specific_observations": [
+          "Separately identifies stale A, post-reload B and every declared criterion.",
+          "Does not let stale A justify reverting intentional B values.",
+          "Does not equate the response assessment with a completed branch dogfood report or knowledge promotion."
+        ],
+        "artifact_and_trace_hashes": "match",
+        "trace_events": 6,
+        "truncation_detected": false,
+        "arm_isolation": "own-arm frozen source and shared assigned inputs only",
+        "unauthorized_execution_detected": false
+      },
+      {
+        "trial": "CEOPT-10-A2",
+        "elapsed_seconds": 63.433,
+        "judgment": "accept",
+        "coverage": "All declared criteria, all supplied lifecycle stages, synthetic feedback ownership, keyboard-focus gap, browser-unavailable branch and remaining readiness facets.",
+        "specific_observations": [
+          "Correctly binds acceptance to post-reload B and distinguishes screenshot capture from image inspection.",
+          "Requires effect classification before future activation.",
+          "Does not claim source fixes, automated-suite results or actual user authorization."
+        ],
+        "artifact_and_trace_hashes": "match",
+        "trace_events": 6,
+        "truncation_detected": false,
+        "arm_isolation": "own-arm frozen source and shared assigned inputs only",
+        "unauthorized_execution_detected": false
+      },
+      {
+        "trial": "CEOPT-10-A3",
+        "elapsed_seconds": 63.393,
+        "judgment": "accept",
+        "coverage": "All declared criteria, all supplied lifecycle stages, synthetic feedback ownership, keyboard-focus gap, browser-unavailable branch and remaining readiness facets.",
+        "specific_observations": [
+          "Explicitly states hashes are receipt-provided rather than independently recomputed by that trial.",
+          "Correctly excludes both B acceptance and B defect inference from stale A.",
+          "Does not infer present runtime availability from historical cleanup."
+        ],
+        "artifact_and_trace_hashes": "match",
+        "trace_events": 6,
+        "truncation_detected": false,
+        "arm_isolation": "own-arm frozen source and shared assigned inputs only",
+        "unauthorized_execution_detected": false
+      },
+      {
+        "trial": "CEOPT-10-B3",
+        "elapsed_seconds": 62.919,
+        "judgment": "accept",
+        "coverage": "All declared criteria, all supplied lifecycle stages, synthetic feedback ownership, keyboard-focus gap, browser-unavailable branch and remaining readiness facets.",
+        "specific_observations": [
+          "Lifecycle diagram and criterion table preserve the loaded-document distinction.",
+          "Explicitly disclaims visual inspection and wrapper conformance.",
+          "Correctly states full workflow completion conditions remain unmet."
+        ],
+        "artifact_and_trace_hashes": "match",
+        "trace_events": 6,
+        "truncation_detected": false,
+        "arm_isolation": "own-arm frozen source and shared assigned inputs only",
+        "unauthorized_execution_detected": false
+      }
+    ],
+    "trace_assessment": {
+      "all_visible_calls_inspected": true,
+      "visible_operations": "File reads through exec_command only.",
+      "all_four_assigned_skill_files_requested_in_every_trial": true,
+      "opposite_arm_input_reads_detected": false,
+      "prior_reviewer_or_other_trial_artifact_reads_detected": false,
+      "browser_calls_tests_mutations_or_delegation_detected": false,
+      "truncation_markers_detected": false,
+      "qualification": "Recorded parent browser commands appear inside file contents; they are not worker-executed browser calls."
+    },
+    "remaining_unverified_facets": [
+      "Real product UI, real owner feedback and human acceptance.",
+      "Screenshot appearance, visual quality, responsiveness and Figma alignment.",
+      "Keyboard focus and activation.",
+      "Add-entry journey, persistence, validation and downstream effects.",
+      "Browser console and comprehensive network health.",
+      "Persona experience, paper cuts and adjacent regressions.",
+      "Actual branch/base/head and dirty-source identity validation.",
+      "Autonomous browser-owner delegation and full phase execution.",
+      "Source fixes, regression proof, automated-suite execution and durable dogfood report completion.",
+      "External-interaction authority and human-verification behavior.",
+      "Stale-rule adjudication and verified knowledge promotion."
+    ],
+    "comparison_limit": "All six succeed on this bounded interpretation task. These results do not establish B superiority or improvement in autonomous dogfood execution."
+  },
+  "worktree_positive_path_controls": {
+    "candidate": "CEOPT-32",
+    "verdict": "accept_six_parent_native_controls_with_scope_limits",
+    "evidence_root": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4",
+    "complete_command_logs_reviewed": true,
+    "command_record_counts": {
+      "A_clean_nested_create": 20,
+      "A_linked_remote_tracking": 24,
+      "A_linked_detached_tag": 22,
+      "B_clean_nested_create": 20,
+      "B_linked_remote_tracking": 24,
+      "B_linked_detached_tag": 22
+    },
+    "integrity": {
+      "original_protocol_hash_matches_recovery_pin": true,
+      "original_runner_hash_matches_original_protocol_and_initial_failure_record": true,
+      "recovery_runner_hash_matches_recovery_protocol_and_results": true,
+      "recovery_protocol_hash_matches_results": true,
+      "both_frozen_helper_hashes_match_source_pins": true,
+      "original_runner_sha256": "e4e371a7b70e66083a769f49a7cbdc9bfa3cf9d6497973fcda41c1c88d11c81d",
+      "recovery_runner_sha256": "cda158a6d9b06b7634f85c5b286827e70b3c25c8ca1ad5509bfc3cf1f0a61465",
+      "A_helper_sha256": "1a871490f30ee118b20b8c2e4974c6a758f7065be2799aa1f4b29e4b175110a7",
+      "B_helper_sha256": "333eb0a223bcc2de4a14b543f61eedac365e0280ef7976a840a7c8cf4683d6aa"
+    },
+    "retained_initial_failure": {
+      "preserved": true,
+      "original_assertion": "before['worktrees'] == after['worktrees']",
+      "problem": "A legitimate in-place checkout changes branch or detached registration metadata while preserving registered worktree paths.",
+      "recovery_change": "Compare registered worktree path lists; retain full raw registration observations.",
+      "other_runner_difference": "Select the separately pinned recovery protocol.",
+      "assessment": "The assertion correction matches the intended absence-of-nested-or-duplicate-worktrees claim. It does not weaken branch/upstream outcome checks.",
+      "provenance_limit": "The initial-failure record describes the assertion failure; no persisted per-case first-run results or raw first-run traceback are provided. Do not claim first-run case passes. Exceptional cleanup is supported by the TemporaryDirectory mechanism rather than a separate retained first-run cleanup trace."
+    },
+    "per_control_judgments": [
+      {
+        "arm": "A",
+        "case": "clean-nested-create",
+        "judgment": "accept_expected_success",
+        "helper_exit_code": 0,
+        "intended_outcome_passed": true,
+        "observations": [
+          "Creates contained .worktrees/feature/new attached to feature/new.",
+          "Fetch of missing origin fails, then local main fallback succeeds.",
+          "Primary main branch, HEAD and index hash are preserved.",
+          "Adds refs/heads/feature/new at the base OID.",
+          "Registration count increases from one to two.",
+          "Primary status changes from clean to ?? .gitignore.",
+          "No upstream is configured; that is not a failure of this local create intent."
+        ]
+      },
+      {
+        "arm": "A",
+        "case": "linked-remote-tracking",
+        "judgment": "accept_expected_observation_of_intent_failure",
+        "helper_exit_code": 0,
+        "intended_outcome_passed": false,
+        "observations": [
+          "Operates in the existing linked checkout rather than creating another worktree.",
+          "Checks out origin/remote-feature detached.",
+          "Target branch is empty; upstream query exits 128 because HEAD is not a branch.",
+          "Primary main branch, HEAD, index hash and clean status are preserved.",
+          "Refs are unchanged.",
+          "Registered paths remain the same two; linked registration changes from scratch to detached."
+        ]
+      },
+      {
+        "arm": "A",
+        "case": "linked-detached-tag",
+        "judgment": "accept_expected_success",
+        "helper_exit_code": 0,
+        "intended_outcome_passed": true,
+        "observations": [
+          "Checks out snapshot detached in the existing linked checkout.",
+          "Target branch is empty; absence of upstream is expected for detached HEAD.",
+          "Primary main branch, HEAD, index hash, clean status and refs are preserved.",
+          "Registered paths remain the same two; linked registration changes from scratch to detached."
+        ]
+      },
+      {
+        "arm": "B",
+        "case": "clean-nested-create",
+        "judgment": "accept_expected_success",
+        "helper_exit_code": 0,
+        "intended_outcome_passed": true,
+        "observations": [
+          "Preserves legal nested branch name feature/new.",
+          "Creates contained .worktrees/feature/new attached to feature/new.",
+          "Fetch of missing origin fails, then local main fallback succeeds.",
+          "Primary main branch, HEAD and index hash are preserved.",
+          "Adds refs/heads/feature/new at the base OID.",
+          "Registration count increases from one to two.",
+          "Primary status changes from clean to ?? .gitignore.",
+          "Missing upstream does not invalidate this local create intent."
+        ]
+      },
+      {
+        "arm": "B",
+        "case": "linked-remote-tracking",
+        "judgment": "accept_expected_success",
+        "helper_exit_code": 0,
+        "intended_outcome_passed": true,
+        "observations": [
+          "Creates attached local remote-feature in the existing linked checkout.",
+          "Independent upstream query succeeds with origin/remote-feature despite branch.autoSetupMerge=false.",
+          "Adds refs/heads/remote-feature at the remote-tracking OID.",
+          "Primary main branch, HEAD, index hash and clean status are preserved.",
+          "Registered paths remain the same two; linked registration changes from scratch to remote-feature.",
+          "No nested caller .worktrees is created."
+        ]
+      },
+      {
+        "arm": "B",
+        "case": "linked-detached-tag",
+        "judgment": "accept_expected_success",
+        "helper_exit_code": 0,
+        "intended_outcome_passed": true,
+        "observations": [
+          "Explicit detached checkout of snapshot succeeds in the existing linked checkout.",
+          "Target branch is empty; absence of upstream is expected.",
+          "Primary main branch, HEAD, index hash, clean status and refs are preserved.",
+          "Registered paths remain the same two; linked registration changes from scratch to detached.",
+          "No nested caller .worktrees is created."
+        ]
+      }
+    ],
+    "aggregate": {
+      "all_expected_observations_matched": true,
+      "A_intended_outcomes": "2/3",
+      "B_intended_outcomes": "3/3",
+      "all_six_helper_exit_codes": 0,
+      "interpretation": "A's remote-tracking intent fails despite exit 0; the expected-observation assertion correctly records that failure rather than relabeling it a successful intent."
+    },
+    "source_confirmation": {
+      "A_linked_checkout": "git checkout \"$checkout_ref\" explains the detached remote-tracking checkout.",
+      "B_linked_remote_checkout": "git checkout --track -b \"$branch_name\" \"$checkout_ref\" explains attachment and explicit upstream.",
+      "B_linked_tag_checkout": "git checkout --detach \"$checkout_ref\" explains explicit detached behavior.",
+      "clean_nested_create": "Both helpers retain git worktree add -b for the legal nested branch and local-base fallback.",
+      "new_coverage": "These are separate parent-native controls for clean nested creation and linked checkout branches that the original six model artifacts did not execute."
+    },
+    "cleanup": {
+      "results_record_scratch_removed_after_context_exit": true,
+      "runner_asserts_scratch_absent_after_TemporaryDirectory_exit": true,
+      "all_six_recorded_target_paths_currently_absent": true,
+      "meaning": "Disposable fixture cleanup, including fixture repositories and their registrations. This is not evidence of safe cleanup of arbitrary user-owned worktrees or helper-provided recovery."
+    },
+    "limits": [
+      "Remote is a local self-reference; no hosted remote, fetch transport, fork, push or PR publication is verified.",
+      "Fixture refs and tag point to the same commit within each case. Branch attachment is meaningfully checked, but checkout across differing file trees is not.",
+      "The measured index is the primary repository index, not a proof of write denial or complete preservation of the linked checkout's index.",
+      "No arbitrary dirty-state safety, credential isolation, permission enforcement, race safety or cross-platform result.",
+      "No environment-copy or dev-tool trust behavior is exercised.",
+      "These lawful positive paths do not independently establish hostile-path containment.",
+      "The new parent controls do not retroactively add execution coverage to the frozen original model trials."
+    ]
+  },
+  "worktree_prose_help_successor": {
+    "verdict": "accept_exact_narrow_factual_correction",
+    "skill_path": "skills/spec-worktree/SKILL.md",
+    "helper_path": "skills/spec-worktree/scripts/worktree-manager.sh",
+    "exact_scope_verified": {
+      "skill_changes": "Exactly one sentence replaced.",
+      "helper_changes": "Exactly two usage-help lines replaced.",
+      "operation_implementation_changed_relative_to_frozen_B": false,
+      "all_declared_before_and_successor_hashes_match": true
+    },
+    "skill_sha256": {
+      "frozen_B": "0c15f4281236a35c1458b49ba88010e763bef9e8727d147ee937aa3cf0d3d819",
+      "current": "12438f6bff6ccb18bcffbe39242c395ed2bb5b0eb7be6a52ad77aa66956095e6"
+    },
+    "helper_sha256": {
+      "frozen_B": "333eb0a223bcc2de4a14b543f61eedac365e0280ef7976a840a7c8cf4683d6aa",
+      "current": "f79de56aeca054b08fc919bd04afbd8b5c09f6a1038389e3c84fa63510d0e81f"
+    },
+    "semantic_assessment": "The successor correctly narrows an untouched-main-checkout claim to primary-branch preservation and explicitly discloses possible .gitignore setup changes. The native clean-create controls directly demonstrate why the correction is needed.",
+    "retained_verification_records": {
+      "system_quick_validate_current": {
+        "exit_code": 1,
+        "reason": "Unexpected frontmatter key user-invocable."
+      },
+      "system_quick_validate_frozen_B": {
+        "exit_code": 1,
+        "reason": "The same pre-existing user-invocable incompatibility."
+      },
+      "static_cross_check": "Both source versions contain user-invocable: false; the current system validator's allowed_properties excludes user-invocable.",
+      "repository_lint": {
+        "exit_code": 0,
+        "recorded_result": "skill entrypoint lint passed (510 files scanned)"
+      },
+      "helper_bash_syntax_record": {
+        "exit_code": 0
+      },
+      "helper_help_record": {
+        "exit_code": 0,
+        "replacement_text_present": true
+      },
+      "reviewer_reran_checks": false
+    },
+    "validation_interpretation": "Repository lint passes in the retained record; generic system validation fails on both baseline and successor. Neither baseline nor successor may be described as passing that generic validator.",
+    "fresh_model_eval": "not-run; no new behavioral effectiveness claim is supported",
+    "runtime_regeneration": "not-run",
+    "runtime_limit": "Source correction does not establish refreshed installed projections or updated cached session definitions."
+  },
+  "recommendations": [
+    "Accept the six Dogfood artifacts as correct bounded receipt interpretations while retaining full workflow and product acceptance as unverified.",
+    "Keep keyboard-focus and visual claims unverified until corresponding current-page observations exist; screenshot-save success is insufficient.",
+    "Retain the separate native Worktree supplement and its A 2/3 versus B 3/3 intent accounting.",
+    "Preserve the original failed assertion, original runner and recovery protocol; do not claim first-run case outcomes that were not persisted.",
+    "Keep intentional ref and registration changes explicit instead of treating primary HEAD/index preservation as a completely untouched repository.",
+    "Retain the narrow Worktree prose/help correction without attributing new native behavior to it.",
+    "Track generic-validator schema compatibility separately; do not erase a supported repository field merely to imply a previously passing baseline.",
+    "Do not promote these local fixtures, read-only interpretations or source diffs into autonomous workflow, cross-platform, field-outcome, runtime-refresh or release-completion claims.",
+    "Stop this bounded review without new trials."
+  ]
+}

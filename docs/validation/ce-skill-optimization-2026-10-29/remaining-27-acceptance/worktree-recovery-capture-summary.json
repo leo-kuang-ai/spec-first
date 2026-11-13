@@ -1,0 +1,81 @@
+{
+  "id": "CEOPT-32-complete-recovery-capture",
+  "at": "2026-10-31T08:20:39.978195+00:00",
+  "attempts": [
+    {
+      "id": "CEOPT-32-A1",
+      "elapsed_seconds": 27.713,
+      "timing_admission": "not-assessable-infrastructure-failure",
+      "final_model_artifact_available": false,
+      "artifact_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/trials/CEOPT-32-A1/artifact.md",
+      "artifact_sha256": "7726eb74fb66a49fb85ccb97ad60896c46f28fac0037bd17c340f47d20534005",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/trials/CEOPT-32-A1/tool-events.json",
+      "tool_trace_sha256": "4925013af06b2d162503caf781d5329c4212e174b53767e94e112bcf93a7d3be"
+    },
+    {
+      "id": "CEOPT-32-A1-retry1",
+      "elapsed_seconds": 94.08,
+      "timing_admission": "passed",
+      "final_model_artifact_available": true,
+      "artifact_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/trials/CEOPT-32-A1-retry1/artifact.md",
+      "artifact_sha256": "21cc8f9c08f43c61aeea876feda355f26cd57f2af9e706fb09ac13ff6e532dee",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/trials/CEOPT-32-A1-retry1/tool-events.json",
+      "tool_trace_sha256": "545ff04f5770d46a68ce7a45b6c9175fce90539213edcae57ad33bf8b720705c"
+    },
+    {
+      "id": "CEOPT-32-A2",
+      "elapsed_seconds": 59.411,
+      "timing_admission": "passed",
+      "final_model_artifact_available": true,
+      "artifact_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/trials/CEOPT-32-A2/artifact.md",
+      "artifact_sha256": "2605b97164990ba0dcaf9c38aae62bd5f76fbd10d55f3a5e6f97a3a8ed73dc2c",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/trials/CEOPT-32-A2/tool-events.json",
+      "tool_trace_sha256": "b5ec6dc1fffac2014d5b9be249023fa299b87adf87129984224c988df353e8f6"
+    },
+    {
+      "id": "CEOPT-32-A3",
+      "elapsed_seconds": 54.78,
+      "timing_admission": "passed",
+      "final_model_artifact_available": true,
+      "artifact_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/trials/CEOPT-32-A3/artifact.md",
+      "artifact_sha256": "5ba09d34574889daa26782ef227406bb5facd027516e666b95eb37a3b50ea34f",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/trials/CEOPT-32-A3/tool-events.json",
+      "tool_trace_sha256": "35367f2fb2ffd8992c50b6c888ceb4d076322d04a57787a8b89f42ca22cfea91"
+    },
+    {
+      "id": "CEOPT-32-B1",
+      "elapsed_seconds": 63.905,
+      "timing_admission": "passed",
+      "final_model_artifact_available": true,
+      "artifact_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/trials/CEOPT-32-B1/artifact.md",
+      "artifact_sha256": "25d47a2cf2d856f2385bf9f2e6ce7f1d1366dcd0c9aa2b2a3d4b44dd71a56908",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/trials/CEOPT-32-B1/tool-events.json",
+      "tool_trace_sha256": "217b5b9b5a0e4c328140c0cf26b80f7790f2187d04690bab25cb92131445d4b1"
+    },
+    {
+      "id": "CEOPT-32-B2",
+      "elapsed_seconds": 58.753,
+      "timing_admission": "passed",
+      "final_model_artifact_available": true,
+      "artifact_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/trials/CEOPT-32-B2/artifact.md",
+      "artifact_sha256": "70b2bfa751a0a920d67a760d56fd6dc9bb7f2d481082505c94b07dc60487b0cc",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/trials/CEOPT-32-B2/tool-events.json",
+      "tool_trace_sha256": "a32b1f5b77e0769426d1f82aab603027a10923f4ea1a57ed345d98630aa8b3d9"
+    },
+    {
+      "id": "CEOPT-32-B3",
+      "elapsed_seconds": 62.412,
+      "timing_admission": "passed",
+      "final_model_artifact_available": true,
+      "artifact_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/trials/CEOPT-32-B3/artifact.md",
+      "artifact_sha256": "800b588e05633a1f1f48568071e92f24687bd6455dac5aabcaae4e7832387fa7",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/trials/CEOPT-32-B3/tool-events.json",
+      "tool_trace_sha256": "922e05b7a16e29407296a04cc641d4a2aec5f31fda25f2b030f381f07e37b917"
+    }
+  ],
+  "original_failure_retained": true,
+  "six_valid_finals_captured": true,
+  "independent_review": "dispatched, awaiting final",
+  "new_infrastructure_errors": 0,
+  "claim_ceiling": "Read-only model interpretation of parent-operated receipts; no autonomous worktree mutation or full frozen acceptance."
+}

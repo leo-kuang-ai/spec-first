@@ -1,0 +1,13 @@
+PASS tests/unit/spec-sweep-final-publication.test.js (5.669 s)
+PASS tests/unit/spec-riffrec-evidence-coverage.test.js
+PASS tests/unit/sweep-state-safety.test.js
+PASS tests/unit/spec-sweep-media-admission.test.js
+PASS tests/unit/specialized-skill-calibration-contracts.test.js
+PASS tests/unit/sweep-state-legacy-import.test.js
+PASS tests/unit/ce-upstream-skill-sync-contracts.test.js
+
+Test Suites: 7 passed, 7 total
+Tests:       80 passed, 80 total
+Snapshots:   0 total
+Time:        8.483 s
+Ran all test suites matching /tests\/unit\/spec-sweep-final-publication.test.js|tests\/unit\/spec-sweep-media-admission.test.js|tests\/unit\/spec-riffrec-evidence-coverage.test.js|tests\/unit\/sweep-state-safety.test.js|tests\/unit\/sweep-state-legacy-import.test.js|tests\/unit\/specialized-skill-calibration-contracts.test.js|tests\/unit\/ce-upstream-skill-sync-contracts.test.js/i.

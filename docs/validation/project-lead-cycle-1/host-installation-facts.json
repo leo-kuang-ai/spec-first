@@ -1,0 +1,160 @@
+{
+  "captured_at": "2026-09-20T03:03:09.665392+00:00",
+  "method": "shutil.which + CLI --version (timeout 15s) + application Info.plist version keys only",
+  "cwd": "/Users/kuang/xiaobu/spec-first",
+  "redaction_status": "none-required",
+  "limitations": [
+    "仅安装/版本事实；未读取私有配置、环境变量、认证状态或会话。",
+    "本轮 GUI journey 未运行；不是 GUI 能力 blocked 的证明。"
+  ],
+  "hosts": [
+    {
+      "host": "claude",
+      "cli": [
+        {
+          "command": "claude",
+          "path_visible": true,
+          "exit_code": 0,
+          "version": "2.1.278 (Claude Code)"
+        }
+      ],
+      "gui": [],
+      "loader": "not-run",
+      "workflow_invocation": "not-run"
+    },
+    {
+      "host": "codex",
+      "cli": [
+        {
+          "command": "codex",
+          "path_visible": true,
+          "exit_code": 0,
+          "version": "codex-cli 0.155.1"
+        }
+      ],
+      "gui": [],
+      "loader": "not-run",
+      "workflow_invocation": "not-run"
+    },
+    {
+      "host": "cursor",
+      "cli": [
+        {
+          "command": "cursor",
+          "path_visible": false
+        },
+        {
+          "command": "cursor-agent",
+          "path_visible": false
+        }
+      ],
+      "gui": [
+        {
+          "app": "Cursor.app",
+          "installed": true,
+          "version": "3.19.7",
+          "build": "3.19.7"
+        }
+      ],
+      "loader": "not-run",
+      "workflow_invocation": "not-run"
+    },
+    {
+      "host": "kiro",
+      "cli": [
+        {
+          "command": "kiro",
+          "path_visible": false
+        }
+      ],
+      "gui": [
+        {
+          "app": "Kiro.app",
+          "installed": true,
+          "version": "1.1.14",
+          "build": "1.1.14"
+        }
+      ],
+      "loader": "not-run",
+      "workflow_invocation": "not-run"
+    },
+    {
+      "host": "qoder",
+      "cli": [
+        {
+          "command": "qoder",
+          "path_visible": false
+        },
+        {
+          "command": "qodercli",
+          "path_visible": true,
+          "exit_code": 0,
+          "version": "1.0.41"
+        }
+      ],
+      "gui": [
+        {
+          "app": "Qoder.app",
+          "installed": true,
+          "version": "1.20.1",
+          "build": "1.20.1"
+        },
+        {
+          "app": "Qoder CN.app",
+          "installed": true,
+          "version": "1.6.0",
+          "build": "1.6.0"
+        }
+      ],
+      "loader": "not-run",
+      "workflow_invocation": "not-run"
+    },
+    {
+      "host": "opencode",
+      "cli": [
+        {
+          "command": "opencode",
+          "path_visible": true,
+          "exit_code": 0,
+          "version": "1.18.9"
+        }
+      ],
+      "gui": [],
+      "loader": "not-run",
+      "workflow_invocation": "not-run"
+    },
+    {
+      "host": "zcode",
+      "cli": [
+        {
+          "command": "zcode",
+          "path_visible": false
+        }
+      ],
+      "gui": [
+        {
+          "app": "ZCode.app",
+          "installed": true,
+          "version": "3.11.2",
+          "build": "3.11.2.6792"
+        }
+      ],
+      "loader": "not-run",
+      "workflow_invocation": "not-run"
+    },
+    {
+      "host": "pi",
+      "cli": [
+        {
+          "command": "pi",
+          "path_visible": true,
+          "exit_code": 0,
+          "version": "0.85.0"
+        }
+      ],
+      "gui": [],
+      "loader": "not-run",
+      "workflow_invocation": "not-run"
+    }
+  ]
+}

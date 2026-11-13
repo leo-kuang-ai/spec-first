@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "skill_name": "spec-compound",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-compound",
+    "timestamp": "2026-11-04T12:44:08Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "独立 CONCEPTS.md 建库请求应重定向 spec-compound-refresh",
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 84.441,
+        "tokens": 32540,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[spec-compound-refresh]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[spec-compound-refresh])"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 84.441,
+        "stddev": 0,
+        "min": 84.441,
+        "max": 84.441
+      },
+      "tokens": {
+        "mean": 32540,
+        "stddev": 0,
+        "min": 32540,
+        "max": 32540
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

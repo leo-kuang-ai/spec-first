@@ -1,0 +1,16 @@
+id: s20-a1-pr-agents
+title: s20-a1-pr-agents
+description: |
+  第二轮筛查场景；预期与判定见 ../../expectations.md（运行前写定），正式判定由 ../../grade2.py 事后执行。
+input:
+  prompt: |
+    帮我处理一下 PR #42 收到的 review 评论，评论内容我导出在 pr-comments.md 里。
+context:
+  repo_fixture: evals/fixtures/order-ledger-agents
+  git:
+    init: true
+    checkout: main
+judge:
+  type: rule_based
+  success:
+    - exit_code: 0

@@ -1,0 +1,267 @@
+{
+  "trial": "CEOPT-33-B3",
+  "at": "2026-10-31T05:44:31.039649+00:00",
+  "command": [
+    "node",
+    "-e",
+    "const m=require(process.argv[1]);process.stdout.write(JSON.stringify(m.validateTaskPack(process.argv[2],{repoRoot:process.argv[3]}),null,2)+'\\n');",
+    "/Users/kuang/xiaobu/spec-first/src/cli/task-pack.js",
+    "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-tasks-validation-rv0qj1w6/docs/plans/derived-tasks.md",
+    "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-tasks-validation-rv0qj1w6"
+  ],
+  "exit_code": 0,
+  "stdout": "{\n  \"schema_version\": \"task-pack-validation/v1\",\n  \"identity_basis\": \"source-plan-path+body-hash\",\n  \"task_pack_path\": \"/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-tasks-validation-rv0qj1w6/docs/plans/derived-tasks.md\",\n  \"artifact_root\": \"/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-tasks-validation-rv0qj1w6\",\n  \"repo_root\": \"/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-tasks-validation-rv0qj1w6\",\n  \"task_pack_validity\": \"invalid\",\n  \"deterministic_handoff\": false,\n  \"validity_scope\": \"identity-freshness-structure-only\",\n  \"source_plan\": {\n    \"path\": \"docs/plans/source.md\",\n    \"absolute_path\": \"/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-tasks-validation-rv0qj1w6/docs/plans/source.md\"\n  },\n  \"task_pack\": {\n    \"metadata\": {\n      \"title\": \"Preserve import and notification ownership \u2014 task-pack draft\",\n      \"type\": \"task-pack\",\n      \"status\": \"draft\",\n      \"date\": \"2026-10-31\",\n      \"source_plan\": \"docs/plans/source.md\",\n      \"source_plan_hash\": \"sha256:00b47d93c2c7c3a6d342d6504faeb2c6aed853bbb510c2d4cd6672e99536c505\",\n      \"generated_by\": \"spec-write-tasks\",\n      \"mode\": \"derived\",\n      \"source_sections\": \"\"\n    },\n    \"contract\": {\n      \"schema_version\": \"task-pack/v1\",\n      \"execution_waves\": [\n        {\n          \"wave\": 1,\n          \"tasks\": [\n            \"T001\"\n          ]\n        },\n        {\n          \"wave\": 2,\n          \"tasks\": [\n            \"T002\"\n          ]\n        },\n        {\n          \"wave\": 3,\n          \"tasks\": [\n            \"T003\"\n          ]\n        }\n      ],\n      \"tasks\": [\n        {\n          \"task_id\": \"T001\",\n          \"source_unit\": \"U1\",\n          \"requirement_refs\": [\n            \"R1\",\n            \"R2\",\n            \"R3\",\n            \"KD-1\",\n            \"KTD-1\"\n          ],\n          \"goal\": \"Implement request-identity handling in the importer while preserving distinct equal-amount requests and separate notification ownership.\",\n          \"dependencies\": [],\n          \"files\": [\n            \"src/importer.js\"\n          ],\n          \"context_refs\": [\n            \"docs/plans/source.md#product-contract\",\n            \"docs/plans/source.md#planning-contract\",\n            \"docs/plans/source.md#u1-import-identity\",\n            \"docs/plans/source.md#verification-contract\",\n            \"src/importer.js\",\n            \"test/import-proof.test.js\",\n            \"test/support/retry-seam.js\"\n          ],\n          \"entry_hint\": \"Read U1, R1, KD-1, KTD-1, and the existing protected import proof before changing importer identity handling.\",\n          \"test_focus\": \"Protected import proof and duplicate-retry behavior: reject repeated request identities while permitting distinct identities with equal amounts, without moving callback attempts into the importer.\",\n          \"done_signal\": \"Current verification observes duplicate rejection and acceptance of distinct equal-amount requests; protected proof and retry-seam bytes remain unchanged, and the importer retains entry mutation and request-identity ownership.\",\n          \"stop_if\": \"Execution requires a file outside src/importer.js, changes either protected proof asset, merges import and notification, introduces mutable ledger sharing, or lacks a usable source-bound proof for duplicate and equal-amount behavior.\",\n          \"wave\": 1,\n          \"parallelizable\": false,\n          \"review_gate\": \"required\",\n          \"review_focus\": \"Check that request identity is not replaced by amount equality, that financial mutation ownership stays with the importer, and that preserved proof cannot yield a false completion claim.\",\n          \"risk_note\": \"Implementation and proof contents were not inspected. Existing proof bindings and observable duplicate-retry behavior must be established before execution; historical RED was not observed.\",\n          \"notes\": \"session-settled: KD-1 rejects merging importer and notifier. KTD-1 reserves entry mutation and request identity to src/importer.js; owners exchange operation IDs, not mutable ledger storage. test/import-proof.test.js and test/support/retry-seam.js are read-only verification context, not file ownership.\"\n        },\n        {\n          \"task_id\": \"T002\",\n          \"source_unit\": \"U2\",\n          \"requirement_refs\": [\n            \"R2\",\n            \"R3\",\n            \"KD-1\",\n            \"KTD-1\"\n          ],\n          \"goal\": \"Keep notification retries within the notifier, consuming the operation ID without repeating a financial import.\",\n          \"dependencies\": [\n            \"T001\"\n          ],\n          \"files\": [\n            \"src/notifier.js\"\n          ],\n          \"context_refs\": [\n            \"docs/plans/source.md#product-contract\",\n            \"docs/plans/source.md#planning-contract\",\n            \"docs/plans/source.md#u2-notification-retry-ownership\",\n            \"docs/plans/source.md#verification-contract\",\n            \"src/importer.js\",\n            \"src/notifier.js\",\n            \"test/import-proof.test.js\",\n            \"test/support/retry-seam.js\"\n          ],\n          \"entry_hint\": \"Read U2 and the protected retry seam, then identify the existing callback-attempt proof and its source binding.\",\n          \"test_focus\": \"Callback-attempt proof observes retries for the same operation without another financial import; the protected retry seam and import proof remain byte-for-byte unchanged.\",\n          \"done_signal\": \"Source-bound callback-attempt verification observes notification retry without re-import or mutable ledger sharing, and byte comparison confirms both protected assets remain unchanged.\",\n          \"stop_if\": \"The callback-attempt proof cannot be bound to existing source evidence, the operation-ID boundary is unavailable, or implementation requires re-importing, merging owners, modifying a protected asset, adding a queue, replacing a provider, or changing a file outside src/notifier.js.\",\n          \"wave\": 2,\n          \"parallelizable\": false,\n          \"review_gate\": \"required\",\n          \"review_focus\": \"Check that retry control cannot cross into financial import ownership and that removing or weakening the protected retry seam is not used to obtain passing results.\",\n          \"risk_note\": \"The source plan names callback-attempt proof but supplies no exact test path. That proof intent remains an explicit binding limitation until the existing evidence is identified; no synthetic command or invented test ref substitutes for it.\",\n          \"notes\": \"session-settled: KD-1 forbids the importer/notifier merge; KTD-1 assigns callback attempts to src/notifier.js and permits operation-ID exchange only. Both protected assets must retain their bytes. This task does not authorize an external callback write.\"\n        },\n        {\n          \"task_id\": \"T003\",\n          \"source_unit\": \"U3\",\n          \"requirement_refs\": [\n            \"R3\",\n            \"R4\"\n          ],\n          \"goal\": \"Read the configured downstream callback receipt for the exact operation and retain external observation as an independent completion requirement.\",\n          \"dependencies\": [\n            \"T002\"\n          ],\n          \"files\": [\n            \"src/receipt-reader.js\"\n          ],\n          \"context_refs\": [\n            \"docs/plans/source.md#product-contract\",\n            \"docs/plans/source.md#u3-observe-downstream-completion\",\n            \"docs/plans/source.md#verification-contract\",\n            \"src/notifier.js\",\n            \"src/receipt-reader.js\",\n            \"test/import-proof.test.js\",\n            \"test/support/retry-seam.js\"\n          ],\n          \"entry_hint\": \"Read U3 and R4, then bind the configured receipt source and exact operation identity before interpreting completion evidence.\",\n          \"test_focus\": \"Reject missing and mismatched receipts and verify a positive exact-operation receipt. After the final implementation change, run the protected tests and verify unchanged proof bytes. Track actual downstream callback observation independently from local verification.\",\n          \"done_signal\": \"Receipt-reader verification rejects absent or mismatched receipts and recognizes the exact operation; protected tests are run after the final implementation change with unchanged proof bytes; overall completion additionally requires observation of the actual configured downstream callback receipt for that operation.\",\n          \"stop_if\": \"The configured receipt source or exact operation binding cannot be established, no live exact-operation receipt is available, verification would require modifying protected proof, or work requires an external write, publication, provider replacement, or mutation outside src/receipt-reader.js.\",\n          \"wave\": 3,\n          \"parallelizable\": false,\n          \"review_gate\": \"required\",\n          \"review_focus\": \"Check receipt authority and exact-operation binding, preserve the distinction between local verification and live completion, and reject green tests or Git state as substitutes for downstream evidence.\",\n          \"risk_note\": \"No live receipt was observed and no receipt-reader verification binding was inspected. Missing live evidence leaves completion blocked even when local checks pass. Implementation authority does not authorize external publication.\",\n          \"notes\": \"session-settled: R4 requires the configured downstream callback receipt for the exact operation. External/manual done intent remains an observed-state requirement. Historical RED was not observed. T003 owns the final post-change verification obligation but gains no write ownership over either protected asset.\"\n        }\n      ]\n    },\n    \"execution_focus\": [\n      {\n        \"task_id\": \"T001\",\n        \"source_unit\": \"U1\",\n        \"goal\": \"Implement request-identity handling in the importer while preserving distinct equal-amount requests and separate notification ownership.\",\n        \"files\": [\n          \"src/importer.js\"\n        ],\n        \"wave\": 1,\n        \"dependencies\": [],\n        \"test_focus\": \"Protected import proof and duplicate-retry behavior: reject repeated request identities while permitting distinct identities with equal amounts, without moving callback attempts into the importer.\",\n        \"done_signal\": \"Current verification observes duplicate rejection and acceptance of distinct equal-amount requests; protected proof and retry-seam bytes remain unchanged, and the importer retains entry mutation and request-identity ownership.\",\n        \"stop_if\": \"Execution requires a file outside src/importer.js, changes either protected proof asset, merges import and notification, introduces mutable ledger sharing, or lacks a usable source-bound proof for duplicate and equal-amount behavior.\",\n        \"review_gate\": \"required\",\n        \"review_focus\": \"Check that request identity is not replaced by amount equality, that financial mutation ownership stays with the importer, and that preserved proof cannot yield a false completion claim.\",\n        \"target_repo\": null,\n        \"resolved_target_repo\": \"/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-tasks-validation-rv0qj1w6\",\n        \"expected_side_effects\": []\n      },\n      {\n        \"task_id\": \"T002\",\n        \"source_unit\": \"U2\",\n        \"goal\": \"Keep notification retries within the notifier, consuming the operation ID without repeating a financial import.\",\n        \"files\": [\n          \"src/notifier.js\"\n        ],\n        \"wave\": 2,\n        \"dependencies\": [\n          \"T001\"\n        ],\n        \"test_focus\": \"Callback-attempt proof observes retries for the same operation without another financial import; the protected retry seam and import proof remain byte-for-byte unchanged.\",\n        \"done_signal\": \"Source-bound callback-attempt verification observes notification retry without re-import or mutable ledger sharing, and byte comparison confirms both protected assets remain unchanged.\",\n        \"stop_if\": \"The callback-attempt proof cannot be bound to existing source evidence, the operation-ID boundary is unavailable, or implementation requires re-importing, merging owners, modifying a protected asset, adding a queue, replacing a provider, or changing a file outside src/notifier.js.\",\n        \"review_gate\": \"required\",\n        \"review_focus\": \"Check that retry control cannot cross into financial import ownership and that removing or weakening the protected retry seam is not used to obtain passing results.\",\n        \"target_repo\": null,\n        \"resolved_target_repo\": \"/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-tasks-validation-rv0qj1w6\",\n        \"expected_side_effects\": []\n      },\n      {\n        \"task_id\": \"T003\",\n        \"source_unit\": \"U3\",\n        \"goal\": \"Read the configured downstream callback receipt for the exact operation and retain external observation as an independent completion requirement.\",\n        \"files\": [\n          \"src/receipt-reader.js\"\n        ],\n        \"wave\": 3,\n        \"dependencies\": [\n          \"T002\"\n        ],\n        \"test_focus\": \"Reject missing and mismatched receipts and verify a positive exact-operation receipt. After the final implementation change, run the protected tests and verify unchanged proof bytes. Track actual downstream callback observation independently from local verification.\",\n        \"done_signal\": \"Receipt-reader verification rejects absent or mismatched receipts and recognizes the exact operation; protected tests are run after the final implementation change with unchanged proof bytes; overall completion additionally requires observation of the actual configured downstream callback receipt for that operation.\",\n        \"stop_if\": \"The configured receipt source or exact operation binding cannot be established, no live exact-operation receipt is available, verification would require modifying protected proof, or work requires an external write, publication, provider replacement, or mutation outside src/receipt-reader.js.\",\n        \"review_gate\": \"required\",\n        \"review_focus\": \"Check receipt authority and exact-operation binding, preserve the distinction between local verification and live completion, and reject green tests or Git state as substitutes for downstream evidence.\",\n        \"target_repo\": null,\n        \"resolved_target_repo\": \"/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-tasks-validation-rv0qj1w6\",\n        \"expected_side_effects\": []\n      }\n    ]\n  },\n  \"validation\": {\n    \"spec_id\": \"missing\",\n    \"source_plan_hash\": \"matched\",\n    \"hash_tool\": \"available\",\n    \"source_plan_path\": \"resolved\",\n    \"source_plan_lifecycle\": \"active\",\n    \"task_pack_contract\": \"valid\"\n  },\n  \"errors\": [\n    {\n      \"code\": \"task-pack-status-invalid\",\n      \"message\": \"Task pack frontmatter field 'status' must be 'derived'.\",\n      \"field\": \"status\"\n    }\n  ],\n  \"limitations\": [\n    {\n      \"code\": \"task-pack-spec-id-trace-missing\",\n      \"message\": \"spec_id compatibility trace is missing on the task pack, source plan, or both; source_plan path and hash remain the executable identity.\",\n      \"task_pack_spec_id\": \"missing\",\n      \"source_plan_spec_id\": \"missing\"\n    }\n  ],\n  \"reason_code\": \"invalid_contract\"\n}\n",
+  "stderr": "",
+  "validation": {
+    "schema_version": "task-pack-validation/v1",
+    "identity_basis": "source-plan-path+body-hash",
+    "task_pack_path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-tasks-validation-rv0qj1w6/docs/plans/derived-tasks.md",
+    "artifact_root": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-tasks-validation-rv0qj1w6",
+    "repo_root": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-tasks-validation-rv0qj1w6",
+    "task_pack_validity": "invalid",
+    "deterministic_handoff": false,
+    "validity_scope": "identity-freshness-structure-only",
+    "source_plan": {
+      "path": "docs/plans/source.md",
+      "absolute_path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-tasks-validation-rv0qj1w6/docs/plans/source.md"
+    },
+    "task_pack": {
+      "metadata": {
+        "title": "Preserve import and notification ownership \u2014 task-pack draft",
+        "type": "task-pack",
+        "status": "draft",
+        "date": "2026-10-31",
+        "source_plan": "docs/plans/source.md",
+        "source_plan_hash": "sha256:00b47d93c2c7c3a6d342d6504faeb2c6aed853bbb510c2d4cd6672e99536c505",
+        "generated_by": "spec-write-tasks",
+        "mode": "derived",
+        "source_sections": ""
+      },
+      "contract": {
+        "schema_version": "task-pack/v1",
+        "execution_waves": [
+          {
+            "wave": 1,
+            "tasks": [
+              "T001"
+            ]
+          },
+          {
+            "wave": 2,
+            "tasks": [
+              "T002"
+            ]
+          },
+          {
+            "wave": 3,
+            "tasks": [
+              "T003"
+            ]
+          }
+        ],
+        "tasks": [
+          {
+            "task_id": "T001",
+            "source_unit": "U1",
+            "requirement_refs": [
+              "R1",
+              "R2",
+              "R3",
+              "KD-1",
+              "KTD-1"
+            ],
+            "goal": "Implement request-identity handling in the importer while preserving distinct equal-amount requests and separate notification ownership.",
+            "dependencies": [],
+            "files": [
+              "src/importer.js"
+            ],
+            "context_refs": [
+              "docs/plans/source.md#product-contract",
+              "docs/plans/source.md#planning-contract",
+              "docs/plans/source.md#u1-import-identity",
+              "docs/plans/source.md#verification-contract",
+              "src/importer.js",
+              "test/import-proof.test.js",
+              "test/support/retry-seam.js"
+            ],
+            "entry_hint": "Read U1, R1, KD-1, KTD-1, and the existing protected import proof before changing importer identity handling.",
+            "test_focus": "Protected import proof and duplicate-retry behavior: reject repeated request identities while permitting distinct identities with equal amounts, without moving callback attempts into the importer.",
+            "done_signal": "Current verification observes duplicate rejection and acceptance of distinct equal-amount requests; protected proof and retry-seam bytes remain unchanged, and the importer retains entry mutation and request-identity ownership.",
+            "stop_if": "Execution requires a file outside src/importer.js, changes either protected proof asset, merges import and notification, introduces mutable ledger sharing, or lacks a usable source-bound proof for duplicate and equal-amount behavior.",
+            "wave": 1,
+            "parallelizable": false,
+            "review_gate": "required",
+            "review_focus": "Check that request identity is not replaced by amount equality, that financial mutation ownership stays with the importer, and that preserved proof cannot yield a false completion claim.",
+            "risk_note": "Implementation and proof contents were not inspected. Existing proof bindings and observable duplicate-retry behavior must be established before execution; historical RED was not observed.",
+            "notes": "session-settled: KD-1 rejects merging importer and notifier. KTD-1 reserves entry mutation and request identity to src/importer.js; owners exchange operation IDs, not mutable ledger storage. test/import-proof.test.js and test/support/retry-seam.js are read-only verification context, not file ownership."
+          },
+          {
+            "task_id": "T002",
+            "source_unit": "U2",
+            "requirement_refs": [
+              "R2",
+              "R3",
+              "KD-1",
+              "KTD-1"
+            ],
+            "goal": "Keep notification retries within the notifier, consuming the operation ID without repeating a financial import.",
+            "dependencies": [
+              "T001"
+            ],
+            "files": [
+              "src/notifier.js"
+            ],
+            "context_refs": [
+              "docs/plans/source.md#product-contract",
+              "docs/plans/source.md#planning-contract",
+              "docs/plans/source.md#u2-notification-retry-ownership",
+              "docs/plans/source.md#verification-contract",
+              "src/importer.js",
+              "src/notifier.js",
+              "test/import-proof.test.js",
+              "test/support/retry-seam.js"
+            ],
+            "entry_hint": "Read U2 and the protected retry seam, then identify the existing callback-attempt proof and its source binding.",
+            "test_focus": "Callback-attempt proof observes retries for the same operation without another financial import; the protected retry seam and import proof remain byte-for-byte unchanged.",
+            "done_signal": "Source-bound callback-attempt verification observes notification retry without re-import or mutable ledger sharing, and byte comparison confirms both protected assets remain unchanged.",
+            "stop_if": "The callback-attempt proof cannot be bound to existing source evidence, the operation-ID boundary is unavailable, or implementation requires re-importing, merging owners, modifying a protected asset, adding a queue, replacing a provider, or changing a file outside src/notifier.js.",
+            "wave": 2,
+            "parallelizable": false,
+            "review_gate": "required",
+            "review_focus": "Check that retry control cannot cross into financial import ownership and that removing or weakening the protected retry seam is not used to obtain passing results.",
+            "risk_note": "The source plan names callback-attempt proof but supplies no exact test path. That proof intent remains an explicit binding limitation until the existing evidence is identified; no synthetic command or invented test ref substitutes for it.",
+            "notes": "session-settled: KD-1 forbids the importer/notifier merge; KTD-1 assigns callback attempts to src/notifier.js and permits operation-ID exchange only. Both protected assets must retain their bytes. This task does not authorize an external callback write."
+          },
+          {
+            "task_id": "T003",
+            "source_unit": "U3",
+            "requirement_refs": [
+              "R3",
+              "R4"
+            ],
+            "goal": "Read the configured downstream callback receipt for the exact operation and retain external observation as an independent completion requirement.",
+            "dependencies": [
+              "T002"
+            ],
+            "files": [
+              "src/receipt-reader.js"
+            ],
+            "context_refs": [
+              "docs/plans/source.md#product-contract",
+              "docs/plans/source.md#u3-observe-downstream-completion",
+              "docs/plans/source.md#verification-contract",
+              "src/notifier.js",
+              "src/receipt-reader.js",
+              "test/import-proof.test.js",
+              "test/support/retry-seam.js"
+            ],
+            "entry_hint": "Read U3 and R4, then bind the configured receipt source and exact operation identity before interpreting completion evidence.",
+            "test_focus": "Reject missing and mismatched receipts and verify a positive exact-operation receipt. After the final implementation change, run the protected tests and verify unchanged proof bytes. Track actual downstream callback observation independently from local verification.",
+            "done_signal": "Receipt-reader verification rejects absent or mismatched receipts and recognizes the exact operation; protected tests are run after the final implementation change with unchanged proof bytes; overall completion additionally requires observation of the actual configured downstream callback receipt for that operation.",
+            "stop_if": "The configured receipt source or exact operation binding cannot be established, no live exact-operation receipt is available, verification would require modifying protected proof, or work requires an external write, publication, provider replacement, or mutation outside src/receipt-reader.js.",
+            "wave": 3,
+            "parallelizable": false,
+            "review_gate": "required",
+            "review_focus": "Check receipt authority and exact-operation binding, preserve the distinction between local verification and live completion, and reject green tests or Git state as substitutes for downstream evidence.",
+            "risk_note": "No live receipt was observed and no receipt-reader verification binding was inspected. Missing live evidence leaves completion blocked even when local checks pass. Implementation authority does not authorize external publication.",
+            "notes": "session-settled: R4 requires the configured downstream callback receipt for the exact operation. External/manual done intent remains an observed-state requirement. Historical RED was not observed. T003 owns the final post-change verification obligation but gains no write ownership over either protected asset."
+          }
+        ]
+      },
+      "execution_focus": [
+        {
+          "task_id": "T001",
+          "source_unit": "U1",
+          "goal": "Implement request-identity handling in the importer while preserving distinct equal-amount requests and separate notification ownership.",
+          "files": [
+            "src/importer.js"
+          ],
+          "wave": 1,
+          "dependencies": [],
+          "test_focus": "Protected import proof and duplicate-retry behavior: reject repeated request identities while permitting distinct identities with equal amounts, without moving callback attempts into the importer.",
+          "done_signal": "Current verification observes duplicate rejection and acceptance of distinct equal-amount requests; protected proof and retry-seam bytes remain unchanged, and the importer retains entry mutation and request-identity ownership.",
+          "stop_if": "Execution requires a file outside src/importer.js, changes either protected proof asset, merges import and notification, introduces mutable ledger sharing, or lacks a usable source-bound proof for duplicate and equal-amount behavior.",
+          "review_gate": "required",
+          "review_focus": "Check that request identity is not replaced by amount equality, that financial mutation ownership stays with the importer, and that preserved proof cannot yield a false completion claim.",
+          "target_repo": null,
+          "resolved_target_repo": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-tasks-validation-rv0qj1w6",
+          "expected_side_effects": []
+        },
+        {
+          "task_id": "T002",
+          "source_unit": "U2",
+          "goal": "Keep notification retries within the notifier, consuming the operation ID without repeating a financial import.",
+          "files": [
+            "src/notifier.js"
+          ],
+          "wave": 2,
+          "dependencies": [
+            "T001"
+          ],
+          "test_focus": "Callback-attempt proof observes retries for the same operation without another financial import; the protected retry seam and import proof remain byte-for-byte unchanged.",
+          "done_signal": "Source-bound callback-attempt verification observes notification retry without re-import or mutable ledger sharing, and byte comparison confirms both protected assets remain unchanged.",
+          "stop_if": "The callback-attempt proof cannot be bound to existing source evidence, the operation-ID boundary is unavailable, or implementation requires re-importing, merging owners, modifying a protected asset, adding a queue, replacing a provider, or changing a file outside src/notifier.js.",
+          "review_gate": "required",
+          "review_focus": "Check that retry control cannot cross into financial import ownership and that removing or weakening the protected retry seam is not used to obtain passing results.",
+          "target_repo": null,
+          "resolved_target_repo": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-tasks-validation-rv0qj1w6",
+          "expected_side_effects": []
+        },
+        {
+          "task_id": "T003",
+          "source_unit": "U3",
+          "goal": "Read the configured downstream callback receipt for the exact operation and retain external observation as an independent completion requirement.",
+          "files": [
+            "src/receipt-reader.js"
+          ],
+          "wave": 3,
+          "dependencies": [
+            "T002"
+          ],
+          "test_focus": "Reject missing and mismatched receipts and verify a positive exact-operation receipt. After the final implementation change, run the protected tests and verify unchanged proof bytes. Track actual downstream callback observation independently from local verification.",
+          "done_signal": "Receipt-reader verification rejects absent or mismatched receipts and recognizes the exact operation; protected tests are run after the final implementation change with unchanged proof bytes; overall completion additionally requires observation of the actual configured downstream callback receipt for that operation.",
+          "stop_if": "The configured receipt source or exact operation binding cannot be established, no live exact-operation receipt is available, verification would require modifying protected proof, or work requires an external write, publication, provider replacement, or mutation outside src/receipt-reader.js.",
+          "review_gate": "required",
+          "review_focus": "Check receipt authority and exact-operation binding, preserve the distinction between local verification and live completion, and reject green tests or Git state as substitutes for downstream evidence.",
+          "target_repo": null,
+          "resolved_target_repo": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-tasks-validation-rv0qj1w6",
+          "expected_side_effects": []
+        }
+      ]
+    },
+    "validation": {
+      "spec_id": "missing",
+      "source_plan_hash": "matched",
+      "hash_tool": "available",
+      "source_plan_path": "resolved",
+      "source_plan_lifecycle": "active",
+      "task_pack_contract": "valid"
+    },
+    "errors": [
+      {
+        "code": "task-pack-status-invalid",
+        "message": "Task pack frontmatter field 'status' must be 'derived'.",
+        "field": "status"
+      }
+    ],
+    "limitations": [
+      {
+        "code": "task-pack-spec-id-trace-missing",
+        "message": "spec_id compatibility trace is missing on the task pack, source plan, or both; source_plan path and hash remain the executable identity.",
+        "task_pack_spec_id": "missing",
+        "source_plan_spec_id": "missing"
+      }
+    ],
+    "reason_code": "invalid_contract"
+  },
+  "source_plan_preserved": true,
+  "parent_intervention": "Exact explicitly admitted line range extracted; canonical validator called without executing task commands or repairing the draft.",
+  "limitations": [
+    "Identity/freshness/structure result cannot decide semantic ownership or proof preservation.",
+    "Fixture omits production/proof files; no implementation or downstream callback outcome is established."
+  ],
+  "cleanup": {
+    "root": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-tasks-validation-rv0qj1w6",
+    "removed": true
+  }
+}

@@ -1,0 +1,16 @@
+PASS tests/unit/spec-prd-hook-contracts.test.js
+PASS tests/unit/spec-prd-finding-schema-freeze.test.js
+PASS tests/unit/spec-prd-exit-safety.test.js
+PASS tests/unit/spec-prd-decision-card-contracts.test.js
+PASS tests/unit/spec-prd-lite-profile-contracts.test.js
+PASS tests/unit/spec-prd-contracts.test.js
+PASS tests/unit/spec-prd-finalize-transition.test.js
+PASS tests/unit/spec-prd-validate-mode.test.js
+PASS tests/unit/spec-prd-plan-handoff-contracts.test.js
+
+Test Suites: 9 passed, 9 total
+Tests:       100 passed, 100 total
+Snapshots:   0 total
+Time:        2.364 s
+Ran all test suites within paths "tests/unit/spec-prd-validate-mode.test.js", "tests/unit/spec-prd-finalize-transition.test.js", "tests/unit/spec-prd-exit-safety.test.js", "tests/unit/spec-prd-decision-card-contracts.test.js", "tests/unit/spec-prd-finding-schema-freeze.test.js", "tests/unit/spec-prd-hook-contracts.test.js", "tests/unit/spec-prd-plan-handoff-contracts.test.js", "tests/unit/spec-prd-lite-profile-contracts.test.js", "tests/unit/spec-prd-contracts.test.js".
+Test results written to: docs/validation/ce-skill-audit-2026-10-28/prd-tests.json

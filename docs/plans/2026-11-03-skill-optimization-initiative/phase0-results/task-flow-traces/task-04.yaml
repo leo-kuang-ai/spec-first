@@ -1,0 +1,102 @@
+# T04：研发链路 Skill 专业能力审查（22 对象）与 21 项修复
+# 证据：bb05db71（11-01 需求/调研/方案/报告骨架，1144 行新增）→ bc37a830/9d94dbbd（A/B 补证与 trace 归档）
+# → a56609db（S00 承接）→ fcf793cb（11-02 修复规划）→ S01-S21 逐项提交（a7ce802c…0d471286）
+# 核心文档：docs/project-reviews/2026-11-01-development-skills-review-{requirements,report}.md、
+# docs/plans/2026-11-02-development-skills-repair-workflow.md
+
+task_id: "T04"
+task_title: "研发链路 Skill 专业能力审查（22 个 S 编号对象）与剩余 21 项逐项修复"
+task_type: "cross_module"
+complexity: "complex"
+calendar_span: "2026-11-01 13:49（需求+方案）→ 2026-11-02（审查执行+逐项修复，~28 提交）"
+
+context:
+  repository: "spec-first"
+  branch: "leo-2026-10-27-update"
+  commits:
+    - "bb05db71 11-01 docs(review): 需求（556 行）+ 调研 R1-R30（147 行）+ 执行方案（238 行）+ 报告骨架 + 只读统计脚本"
+    - "bc37a830 / 9d94dbbd 11-01~02 两模型 A/B 五批补证 + 原始 trace 归档与全量 SHA 清单"
+    - "a56609db 11-02 S00 承接提交（156 项证据核验）"
+    - "fcf793cb 11-02 18:07 修复 workflow 规划（21 项逐项：定位→根因→修复→验证→fresh-source 复核→回填→独立提交）"
+    - "S01-S21 修复链：a7ce802c(S01)…0d471286(refresh-eval 补检)，含 23f4dffe/94fe0b63(S20 两轮)、89e34a1f(S08)、8f9bf0eb(S16) 等"
+
+workflow:
+  - stage: "1_requirement"
+    evidence_tier: "confirmed"
+    evidence: "review-requirements.md（556 行）：22 个审查对象、企业研发专项、相对基线增益、面向模型演进"
+    friction_points: []
+  - stage: "2_plan"
+    evidence_tier: "confirmed"
+    evidence: "review-plan.md（238 行，skill-up 为主、最低行为覆盖、预算与停止条件）+ repair-workflow.md（59 行逐项流程）"
+    friction_points:
+      - id: "FP-T04-1"
+        type: "衔接断裂"
+        severity: "P1"
+        description: "审查阶段逐项等待方案确认造成瓶颈；用户中途改授权：'先规划后自主连续执行并逐项 commit，取代此前逐项等待方案确认'"
+        evidence: "repair-workflow.md '目标与授权' 一节明文记录该流程变更"
+        attribution: "external_factor(主)：owner 确认节奏；skill_issue(轻)：原流程默认逐项确认未提供批量授权选项"
+  - stage: "3_review_execution"
+    evidence_tier: "confirmed"
+    evidence: "review-report.md 总表（22 个 S 编号）+ 五批两模型 A/B 补证 + trace 归档（9d94dbbd 入库全量 SHA）"
+    friction_points:
+      - id: "FP-T04-2"
+        type: "信息重复"
+        severity: "P1"
+        description: "初轮审查存在失效主张与未确认缺陷：S20 的 K-01（宿主截断）主张被复核实证为未证实；S01/S14/S19/S21 裁决后无确认缺陷——22 项中至少 5 项需要降级/证伪裁决，产生额外裁决成本"
+        evidence: "repair-workflow.md 逐项状态列（'真实截断未证实'、'无确认缺陷'、'源码裁决完成'）"
+        attribution: "model_capability(主)：审查轮 over-claim；skill_issue(轻)：审查合同未强制主张分级（confirmed/advisory）先于裁决"
+      - id: "FP-T04-3"
+        type: "验证缺失"
+        severity: "P2"
+        description: "五批两模型 A/B 补证 + 原始 trace 归档用户目录——审查证据成本高（多批次才收敛）"
+        evidence: "bc37a830 '收口第五批两模型A/B补证'；9d94dbbd '归档原始trace至用户目录'"
+        attribution: "external_factor：多模型补证为刻意质量投入；但批次数（5）反映单轮审查收敛度不足"
+  - stage: "4_repair"
+    evidence_tier: "confirmed"
+    evidence: "21 项逐项修复，每项独立中文 Conventional Commit；S16/S08 记录'返修后复核通过'"
+    friction_points:
+      - id: "FP-T04-4"
+        type: "验证缺失"
+        severity: "P2"
+        description: "修复后大量必要行为验证未执行：S02/S03/S04 '真实行为未运行'、S13/S16 '真实 GitHub/PR 未测'、S12 真实 Xcode blocked、S08/S15 模型未测——21 项中约 12 项的模型/宿主/平台层验证缺口如实保留"
+        evidence: "repair-workflow.md 逐项表 '必要验证' 与 '状态' 两列"
+        attribution: "external_factor(主)：真实环境/成本不可用；诚实标注而非缺陷"
+      - id: "FP-T04-5"
+        type: "验证缺失"
+        severity: "P2"
+        description: "S00 证据日志受 gitignore 影响未随首次提交入库，需在同一提交补齐"
+        evidence: "repair-workflow.md 执行记录 '日志原受 ignore 影响，已在同一提交补齐'"
+        attribution: "tooling_issue：ignore 规则与证据目录冲突"
+  - stage: "5_closeout"
+    evidence_tier: "confirmed"
+    evidence: "dbcb60fd '对账逐项修复与剩余验收缺口'——逐项对账 + 剩余缺口显式化"
+    friction_points: []
+
+summary:
+  delivered: true
+  merged: true    # 已在分支（待整体合并）
+  correct: true   # 已修复项经本地验证+独立复核；未验证面如实标注
+  complete: partial  # 源码修复 21/21 交付；必要真实行为验证约 12 项未执行（S12 平台 blocked）
+  tested: true    # 逐项测试（如 S07 84 项、S13 11 项、S15 55 项）+ fresh-source 复核
+  documented: true
+  rework_count: 2  # S16、S08 首修复后返修再复核
+  user_intervention_count: 1  # confirmed：流程授权变更（逐项确认→自主连续执行），有文档记录
+  overall_quality: "high（逐项独立提交+独立复核+诚实缺口标注）；审查收敛与真实环境验证为主要缺口"
+
+layer_3_metrics: { 端到端正确: true, 端到端返工: true, 用户介入次数: 1 }
+layer_2_metrics: { 信息丢失: false, 信息重复: true, 验证缺失: true, 衔接断裂: true }
+
+friction_summary:
+  total: 5
+  by_type: { 信息丢失: 0, 信息重复: 1, 验证缺失: 3, 衔接断裂: 1 }
+  by_attribution: { skill_issue: 1.0, model_capability: 1.0, external_factor: 2.0, tooling_issue: 1.0, none: 0 }
+
+lessons_learned:
+  what_went_well:
+    - "逐项独立提交 + 只 stage 该项 owned paths 的串行纪律，21 项修复可逐条回溯"
+    - "无缺陷项不制造改动（S01/S14/S19/S21 裁决交付而非空改）——裁决文化有效"
+    - "每项 fresh-source 复核 + 受影响正文复核防缓存假验证"
+  what_could_be_better:
+    - "审查输出应在首轮即强制 confirmed/advisory 分级，减少后续证伪裁决轮"
+    - "owner 确认瓶颈应在方案轮预授权（连续执行模式），而非中途变更"
+    - "真实行为验证缺口（~12 项）需要后续环境/预算闭环路径，否则长期停留'本地通过'"

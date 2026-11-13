@@ -1,0 +1,89 @@
+# T10：CE 上游同步（方案冻结 → 跨 5 天执行 → 批量提交）
+# 证据：fe81bae9（10-27 21:03 方案+冻结证据，567 行方案 + 万行级 JSON 清单）、
+# .agents/tasks/2026-10-27-ce-upstream-sync-plan-review.md（三 reviewer，CHANGES_REQUESTED）、
+# .agents/tasks/project-understanding-2026-10-27.md（会话引导）、049e5274（11-01 13:49 批量提交）
+# docs/validation/ce-pull-2026-10-27/（freeze-summary、candidate-owner-map、commits.tsv 等）
+
+task_id: "T10"
+task_title: "CE 上游更新同步：技术方案冻结、审查修订与跨 5 天实施"
+task_type: "cross_session"
+complexity: "complex"
+calendar_span: "2026-10-27（方案冻结+审查）→ 10-27~10-31（实施）→ 2026-11-01（批量提交）"
+
+context:
+  repository: "spec-first"
+  branch: "leo-2026-10-27-update"
+  commits:
+    - "fe81bae9 10-27 21:03 docs(ce-sync): 固化上游同步方案与冻结证据（含 historical-exclusions 8580 行、git-object-inventory 13248 行、commits.tsv 等；本提交仅规划与验证材料）"
+    - "049e5274 11-01 13:49 chore(skills): 提交 10-27 至 10-31 期间的 CE 同步、Skill 优化与验收改动（skills/src/scripts/tests/docs + 剩余 27 项验收证据 + CHANGELOG 95 行；不含 .agents/）"
+
+workflow:
+  - stage: "1_requirement"
+    evidence_tier: "confirmed"
+    evidence: "2026-10-27-001-refactor-ce-upstream-sync-technical-scheme.md（567 行：517 与 1,023 路径冲突、source/runtime 边界、分阶段实施、claim ceiling）"
+    friction_points: []
+  - stage: "2_plan_review"
+    evidence_tier: "confirmed"
+    evidence: ".agents/tasks/2026-10-27-ce-upstream-sync-plan-review.md：两名+独立 reviewer，verdict CHANGES_REQUESTED/修订后可实施"
+    friction_points:
+      - id: "FP-T10-1"
+        type: "验证缺失"
+        severity: "P1"
+        description: "方案初版以 implementation-ready 自居但被审查阻断：H1（docs/tests 可能未经语义筛查就被机械关闭——count/hash 收口会漏行为要求）与 H2（包级实施准入缺正式合同/validator）两个 High；U2-U6/U9 canonical mutation 在门槛满足前不应开始"
+        evidence: "plan-review 报告 '结论' 与 High 清单（含源码锚点与 confidence 100 的 confirmed 状态）"
+        attribution: "skill_issue(主)：spec-plan 产出缺语义筛查与准入合同设计；model_capability(轻)：方案自评 readiness 偏乐观；多 reviewer 兜底有效"
+  - stage: "3_execution"
+    evidence_tier: "confirmed"
+    evidence: "049e5274 变更面（skills/src/scripts/tests/docs + validation 27 项验收证据）；执行跨 10-27~10-31 五天，.agents/tasks/ 保留过程任务笔记（未入库，按边界排除）"
+    friction_points:
+      - id: "FP-T10-2"
+        type: "衔接断裂"
+        severity: "P1"
+        description: "五天工作区累积未提交改动，最终以单一批量提交（049e5274）落盘——回溯粒度粗、中断风险高、审查负担集中；跨会话续做依赖 .agents/tasks 本地笔记而非入库 artifact"
+        evidence: "049e5274 提交信息 '提交 10-27 至 10-31 期间的…改动'；.agents/ 未入库"
+        attribution: "external_factor(主)：owner 提交节奏与单 checkout 模式；skill_issue(轻)：跨会话 handoff 产物（spec-handoff 存在）未被用于入库留痕"
+      - id: "FP-T10-3"
+        type: "验证缺失"
+        severity: "P2"
+        description: "证据准备成本极高：git-object-inventory 13248 行、historical-exclusions 8580 行、candidate-owner-map 5186 行等手工冻结材料——为可信证据付出的成本显著（deliberate but heavy）"
+        evidence: "fe81bae9 变更统计"
+        attribution: "external_factor：上游同步的固有复杂度；skill/脚本可部分自动化（部分已有 collect-skill-facts.sh 类脚本）"
+  - stage: "4_validation"
+    evidence_tier: "confirmed"
+    evidence: "docs/validation/ce-pull-2026-10-27/（freeze-summary.md、commit-path-coverage.json 3512 行、historical-exclusions-verification.json）+ 049e5274 含'剩余 27 项验收证据'"
+    friction_points: []
+  - stage: "5_review"
+    evidence_tier: "confirmed"
+    evidence: "三 reviewer 计划审查（adversarial-document-reviewer、feasibility-reviewer 等）+ 裁决校准记录（finding 合并与'不因共识升级'原则落盘）"
+    friction_points: []
+  - stage: "6_commit"
+    evidence_tier: "confirmed"
+    evidence: "fe81bae9（规划冻结）+ 049e5274（实施批量）两段式提交"
+    friction_points: []
+
+summary:
+  delivered: true
+  merged: true
+  correct: true      # 按修订后合同执行；plan-review 门槛（H1/H2 关闭）驱动修订
+  complete: partial  # 同步窗口收口完成；"每一轮更新"目标收窄为固定窗口（plan-review 门槛 4 的二选一）
+  tested: true
+  documented: true
+  rework_count: 1    # 方案被 CHANGES_REQUESTED 后修订一轮
+  user_intervention_count: null
+  overall_quality: "high（审查门槛严格阻断未就绪方案）；工作区五天积压与证据成本为结构性摩擦"
+
+layer_3_metrics: { 端到端正确: true, 端到端返工: true, 用户介入次数: null }
+layer_2_metrics: { 信息丢失: false, 信息重复: false, 验证缺失: true, 衔接断裂: true }
+
+friction_summary:
+  total: 3
+  by_type: { 信息丢失: 0, 信息重复: 0, 验证缺失: 2, 衔接断裂: 1 }
+  by_attribution: { skill_issue: 1.5, model_capability: 0.5, external_factor: 1.0, tooling_issue: 0, none: 0 }
+
+lessons_learned:
+  what_went_well:
+    - "三 reviewer 计划审查带源码锚点与 confidence 分级，H1/H2 在实施前被阻断——gate the exits 有效"
+    - "审查报告自身有裁决校准记录（finding 合并、不因共识升级）"
+  what_could_be_better:
+    - "spec-plan 应在产出时内置语义筛查步骤与准入合同模板（H1/H2 类缺口不应靠 reviewer 发现）"
+    - "跨会话长任务应有入库的阶段性 handoff artifact 与分批提交纪律，避免 5 天积压单点提交"

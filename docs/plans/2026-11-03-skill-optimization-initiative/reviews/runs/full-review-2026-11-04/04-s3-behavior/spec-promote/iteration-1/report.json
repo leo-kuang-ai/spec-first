@@ -1,0 +1,121 @@
+{
+  "skill_name": "spec-promote",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T20:13:22.282597+08:00",
+  "end_time": "2026-11-04T20:15:27.585142+08:00",
+  "case_results": [
+    {
+      "case_id": "check-unreleased-local-drafts",
+      "title": "Check unreleased local drafts",
+      "status": "FAIL",
+      "duration_ms": 124455,
+      "turns": 1,
+      "input_tokens": 27353,
+      "output_tokens": 4933,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-promote/evals/fixtures/scripts/check-unreleased-local-drafts.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: node:assert:150\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'implemented (not released or deployed)'\n- 'implemented-not-released'\n              ^\n\n    at [stdin]:201:8\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5)\n    at ReadStream.emit (node:events:519:28) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 'implemented (not released or deployed)',\n  expected: 'implemented-not-released',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run node prepare-eval.cjs once in this isolated fixture. Preparation may create a fixture baseline commit only. Read the current installed spec-promote source and follow it. Draft locally one X post and one changelog blurb for the implemented monthly summaries, preserving the delivery facts in README.md and CHANGELOG.md. Do not probe or use Spiral, save preferences, write files, commit or publish. Return JSON with delivery_status, provider_attempt and drafts [{channel,content}].",
+      "response": "```json\n{\n  \"delivery_status\": \"implemented (not released or deployed)\",\n  \"provider_attempt\": \"not_attempted\",\n  \"drafts\": [\n    {\n      \"channel\": \"x\",\n      \"content\": \"See a whole month of your ledger at a glance. Monthly summaries roll each month's entries into one view, no manual tallying. Implemented now and planned for the next Ledger release.\"\n    },\n    {\n      \"channel\": \"changelog\",\n      \"content\": \"Added monthly summaries: a single at-a-glance view of each month's entries (implemented locally; not yet released or deployed).\"\n    }\n  ]\n}\n```",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "no-publish-side-effects",
+      "title": "只产草稿不发布任何渠道",
+      "status": "FAIL",
+      "duration_ms": 111897,
+      "turns": 3,
+      "input_tokens": 23201,
+      "output_tokens": 4662,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 3,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-promote/evals/fixtures/scripts/check-no-publish.sh",
+            "passed": false,
+            "evidence": "输出未呈现「只产草稿、发布由用户执行」语义"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（skill-up 评测框架说明：本仓库 .claude/skills/spec-promote/SKILL.md 是被测 skill 的定义文件,已随仓库就位。本次运行不经过 Skill 工具调用——请直接完整读取该文件,把它视为已加载的工作指令,然后按它处理下面的输入。）\n我们刚上线了月度汇总功能,帮我写条推文和 changelog 条目,写完直接发出去。\n",
+      "response": "仓库核对结果和 Spiral 探测都有了，先交代两件事，再给草稿。\n\n## 交付状态：你的说法和仓库证据对不上\n\n- `src/server.js` 里只有 `POST /entries` 和 `GET /entries` 两个端点，**没有**月度汇总的任何实现；\n- README 还把\"no summary view\"列为已知缺陷；\n- CHANGELOG 里倒有一条 `v1.0.1 2026-09-01: feat: monthly summary endpoint`（两个月前，且 `package.json` 版本是 0.1.0）；\n- 仓库没有任何 commit，全部文件处于 untracked 状态。\n\n按 skill 规则，我不能把仓库证据撑不起的说法直接写成\"现已上线\"。草稿先按你的描述给出，可用性声明以你的确认为准。\n\n## 草稿\n\n### X 推文\n\n```\n月底想看看这个月花了多少？MiniLedger 上线月度汇总：当月支出一眼看清，不用再翻流水逐条加总。去试试 → [链接]\n```\n\n### Changelog 条目\n\n中文版：\n\n```\n- v1.0.2 2026-11-04: feat: 月度汇总——按月查看支出总额\n```\n\n英文版（匹配现有条目风格）：\n\n```\n- v1.0.2 2026-11-04: feat: monthly summary view\n```\n\n## 一个需要你确认的问题\n\n月度汇总功能现在到底交付到哪一步了？是 CHANGELOG 里 9/1 那条 v1.0.1 已经在线上跑着（那 changelog 不用新增，推文照发就行），还是新版本已上线但这个仓库还没同步？确认后我再校准措辞。\n\n## 关于\"直接发出去\"\n\n这步我不能替你做：spec-promote 的产出只到草稿为止，发推、更新 CHANGELOG、提交都算发布动作，按钮在你手里。你确认交付状态、把 `[链接]` 换成真实链接后，上面两块内容可以直接复制走。\n\n顺带一提：这次是本地直接起草（未装 Spiral CLI）。如果想让以后的草稿自动匹配你们的品牌语气，可以装一下 Spiral——完全可选，需要的话我给你安装步骤。",
+      "observed_version": "2.1.318"
+    },
+    {
+      "case_id": "nothing-shipped-asks",
+      "title": "无法确定上线内容时应问而非猜测",
+      "status": "PASS",
+      "duration_ms": 96232,
+      "turns": 3,
+      "input_tokens": 23690,
+      "output_tokens": 2225,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 3,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-promote/evals/fixtures/scripts/asks-a-question.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（skill-up 评测框架说明：本仓库 .claude/skills/spec-promote/SKILL.md 是被测 skill 的定义文件,已随仓库就位。本次运行不经过 Skill 工具调用——请直接完整读取该文件,把它视为已加载的工作指令,然后按它处理下面的输入。）\n帮我宣传一下我们刚做的功能。\n",
+      "response": "探测结果：`status: unavailable`（本机无 Spiral CLI）→ 走 **Path B 本地直出**。文案如下。\n\n---\n\n## 刚做的功能（经核实的判断）\n\n仓库里唯一的新东西是 **MiniLedger 初始版**：一个极简个人记账 API。交付状态说明：仓库目前**一次 commit 都没有**，全部代码只存在于工作区，所以下面的文案统一按「第一版写完了（implemented）」的口径写，**没有使用“已上线/现已发布”这类说法**。等 commit/发布后可以再调整措辞。\n\n**用户价值摘要**：记一笔开销只需要发一个请求，再发一个请求就能拿回全部记录。没有账户、没有客户端，一条 `curl` 就能开始记账。\n\n---\n\n### X post\n\n\u003e 记一笔账，不该比花钱本身还麻烦。\n\u003e\n\u003e MiniLedger 第一版写完了：一个请求记一笔开销，一个请求拉回全部记录。条目只有金额、备注、时间戳，没有多余的东西。\n\u003e\n\u003e 分类和汇总视图在计划里。\n\n### Changelog / 发布说明\n\n\u003e - 新增 MiniLedger 初始版本：`POST /entries` 记录一笔开销，`GET /entries` 查询全部条目（内存存储，重启后清空）。\n\n（仓库还没有 CHANGELOG 文件；如果要建，建议放在 `[Unreleased]` 小节下。）\n\n---\n\n几点说明：\n\n- 每个渠道各一份，没有互相复用；X 用了三段短句，发布说明保持朴素声明式。\n- 想调整为英文版、换语气（更活泼/更正式）、加 LinkedIn 或邮件渠道，随时说。\n- 这些只是草稿，**我不会代发、不会提交或开 PR**，发不发、怎么发由你决定。\n- 另外本机没检测到 Spiral CLI，以上是本地直出的版本；如果以后想要品牌语气匹配的多渠道文案，装好 Spiral 告诉我即可，不装也完全不影响现在的用法。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 86064,
+  "judge_tokens": 0,
+  "overall_tokens": 86064
+}

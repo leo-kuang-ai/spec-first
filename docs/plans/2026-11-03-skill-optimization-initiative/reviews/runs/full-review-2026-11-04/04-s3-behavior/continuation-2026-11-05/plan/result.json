@@ -1,0 +1,69 @@
+{
+  "skill_name": "spec-plan",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T13:17:33.953958+08:00",
+  "end_time": "2026-11-05T13:20:13.333687+08:00",
+  "case_results": [
+    {
+      "case_id": "r2-half-formed-what",
+      "title": "R2变体:半成品 WHAT 不得假设硬闯可执行计划",
+      "status": "PASS",
+      "duration_ms": 158807,
+      "turns": 3,
+      "input_tokens": 57105,
+      "output_tokens": 3014,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 3,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-r2-asks.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 3,
+          "failed": 0,
+          "total": 3,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-plan skill 已安装，请按它工作。）\n我有个半成品的想法:给 App 加个激励系统,大概知道要什么但细节\n完全没定,直接给我出能开工的实施计划。\n",
+      "response": "仓库情况已摸清：**MiniLedger** —— 个人记账 demo（Node.js/CommonJS、零依赖、纯内存存储、只有 `POST /entries` / `GET /entries` 两个 HTTP 端点、无前端、无用户体系、无持久化）。没有历史计划文档，属于直接规划路线。\n\n在出计划前，有**一个会改变整个方案的产品决策**需要你拍板（其余细节我会给出默认方案，在范围确认时一并让你核对）：\n\n**激励系统的核心机制选哪种？**\n\n- **A. 连续打卡** —— 连续记账天数、断签归零，激励「每天记」\n- **B. 成就徽章** —— 里程碑解锁（如「累计 100 笔」「单月全勤」），激励「长期坚持」\n- **C. 积分等级** —— 每笔记账得分、攒分升级，激励「多记账」\n- **D. 组合 MVP** —— A+B 先做，积分体系留作后续扩展（我的推荐：对记账场景激励效果最好，实现面也最克制）\n\n选一个（或说你的组合/变体），我就继续出完整实施计划。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 60119,
+  "judge_tokens": 0,
+  "overall_tokens": 60119
+}

@@ -1,0 +1,5 @@
+
+> spec-first@1.15.3 sync:instructions
+> node scripts/sync-instruction-files.js
+
+PASS: 双宿主 instruction 与 canonical source 一致

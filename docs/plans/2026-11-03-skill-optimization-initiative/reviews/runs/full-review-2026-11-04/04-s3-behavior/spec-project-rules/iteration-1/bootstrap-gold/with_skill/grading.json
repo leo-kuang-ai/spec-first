@@ -1,0 +1,20 @@
+{
+  "expectations": [
+    {
+      "text": "expect.exit_code",
+      "passed": true,
+      "evidence": "all checks passed"
+    },
+    {
+      "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-project-rules/evals/fixtures/scripts/check-bootstrap.sh",
+      "passed": true,
+      "evidence": "PASS: bootstrap gold（headless：首次嵌入跳过）"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 0,
+    "total": 2,
+    "pass_rate": 1
+  }
+}

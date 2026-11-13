@@ -1,0 +1,17 @@
+{
+  "schema_version": "ce-upstream-artifact-set/v1",
+  "files": [
+    {
+      "path": "docs/validation/ce-pull-2026-10-27/runs/learning-rule-evidence/producer-name-status.tsv",
+      "sha256": "9c04f517fd188bb9b1127a1942bfdf98f3afa518e7428568548e33ef0e3aea65"
+    },
+    {
+      "path": "docs/validation/ce-pull-2026-10-27/runs/learning-rule-evidence/adjudication-input.json",
+      "sha256": "72f0f0d6f1d915faca42631a2b733b4f3bc91dd95024075141fa8d2d699aa276"
+    },
+    {
+      "path": "docs/validation/ce-pull-2026-10-27/runs/learning-rule-evidence/target-source-inventory.json",
+      "sha256": "b49beaa09e05608a75f97c558ae387c91ecda3f6b096f09b1e83cb2d917b7a08"
+    }
+  ]
+}

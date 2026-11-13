@@ -1,0 +1,91 @@
+{
+  "metadata": {
+    "skill_name": "spec-polish",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-polish",
+    "timestamp": "2026-11-04T12:06:14Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "静态代码审查请求应路由 spec-code-review",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 30.077,
+        "tokens": 21660,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[spec-code-review]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[spec-code-review])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "R2变体:截图静态审查应路由 spec-code-review",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 24.54,
+        "tokens": 20926,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[spec-code-review]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[spec-code-review])"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 27.308500000000002,
+        "stddev": 2.7685000000000013,
+        "min": 24.54,
+        "max": 30.077
+      },
+      "tokens": {
+        "mean": 21293,
+        "stddev": 367,
+        "min": 20926,
+        "max": 21660
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

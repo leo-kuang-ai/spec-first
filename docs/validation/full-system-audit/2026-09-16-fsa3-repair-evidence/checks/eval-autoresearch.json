@@ -1,0 +1,19 @@
+{
+  "id": "eval-autoresearch",
+  "command": [
+    "/Users/kuang/.local/bin/skill-up",
+    "validate",
+    "evals/eval.yaml"
+  ],
+  "cwd": "skills/autoresearch",
+  "started_at": "2026-09-16T07:50:26.751252+00:00",
+  "duration_s": 0.03,
+  "exit_code": 0,
+  "ran": true,
+  "status": "passed",
+  "reason_code": "exit-code-zero",
+  "log_path": "logs/eval-autoresearch.log",
+  "redaction_status": "none-required",
+  "source_snapshot": "22a66be116a3ce1854e0b0af0ad4226a817688ae5b6e533de141d86fa34f332e",
+  "claim_ceiling": "C1"
+}

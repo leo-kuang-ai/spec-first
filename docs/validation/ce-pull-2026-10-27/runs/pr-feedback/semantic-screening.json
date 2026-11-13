@@ -1,0 +1,40 @@
+{
+  "artifact_type": "advisory",
+  "status": "partial",
+  "entries": [
+    {
+      "path": "skills/ce-resolve-pr-feedback/references/evaluation-rubric.md",
+      "local_owner": "skills/spec-resolve-pr-feedback/references/evaluation-rubric.md",
+      "reading": "固定 head 当前全文、本地全文；full-mode 分段补读至文件结尾",
+      "decision": "重述条件/owner，限定 PR purpose 与高影响风险，保留当前独立授权，不自动调用 pov/oracle/noslop",
+      "status": "partial-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-resolve-pr-feedback/references/full-mode.md",
+      "local_owner": "skills/spec-resolve-pr-feedback/references/full-mode.md",
+      "reading": "固定 head 当前全文、本地全文；full-mode 分段补读至文件结尾",
+      "decision": "同 invariant 的精确枚举实施单元，保留每 ID 单项结果及实际变更归因；跨 invocation 核实同一根因历史，不依 commit subject 宣判",
+      "status": "partial-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-resolve-pr-feedback/references/agents/pr-comment-resolver.md",
+      "local_owner": "skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md",
+      "reading": "固定 head 当前全文、本地全文；full-mode 分段补读至文件结尾",
+      "decision": "枚举集为 mutation 边界，逐位置检验 invariant，blocked 保留实际变更，逐 ID 返回",
+      "status": "partial-implemented-contract-tested"
+    }
+  ],
+  "verification": {
+    "exit_code": 0,
+    "suites": 1,
+    "tests": 11,
+    "log_ref": "docs/validation/ce-pull-2026-10-27/logs/pr-rubric-recovery-tests.log",
+    "prior_failure_log_ref": "docs/validation/ce-pull-2026-10-27/logs/pr-rubric-tests.log",
+    "recovery": "旧断言禁止中文，与当前语言规则冲突；移除该断言并以跨调用历史不归零合同锚替换，实际复跑通过"
+  },
+  "limitations": [
+    "U4 optimize 与 PR feedback 其余路径仍未闭合",
+    "仅 source contract 检查，独立评估和真实远程行为未运行",
+    "保留本地 pipeline-return 无 nested commit/remote write，不引入 CE resume 协议"
+  ]
+}

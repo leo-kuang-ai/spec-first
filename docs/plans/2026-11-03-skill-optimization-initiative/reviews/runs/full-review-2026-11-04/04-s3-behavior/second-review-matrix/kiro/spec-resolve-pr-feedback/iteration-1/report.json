@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-resolve-pr-feedback",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "kiro/kimi-k3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "kiro/kimi-k3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "kiro/kimi-k3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T10:12:56.124491+08:00",
+  "end_time": "2026-11-05T10:13:25.766624+08:00",
+  "case_results": [
+    {
+      "case_id": "pipeline-pending-conversation",
+      "title": "Pipeline return preserves an already replied open thread without remote writes",
+      "status": "FAIL",
+      "duration_ms": 29166,
+      "turns": 1,
+      "input_tokens": 20216,
+      "output_tokens": 449,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-resolve-pr-feedback/evals/fixtures/scripts/check-pipeline-pending.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: node:internal/assert/utils:77\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(['complete', 'partial'].includes(packet.status))\n\n    at [stdin]:309:8\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5)\n    at ReadStream.emit (node:events:519:28) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "Use spec-resolve-pr-feedback mode:pipeline-return in this isolated offline fixture.\nFirst run `node prepare-eval.cjs` once; only that preparation may create a fixture\nbaseline commit. Read pr-snapshot.json as the simulated current provider evidence,\nclearly retaining its fixture-only limitation. Do not contact a real provider.\nThe supplied no-code verdict and scope have already been settled by this fixture's\ncaller: persistence is outside the in-memory demo scope. Reconcile the existing\nvisible submitted reply and open thread. All local-fix, commit, landing, reply,\nthread-resolution and worker-dispatch authority is missing. Return one JSON\npipeline envelope with the exact PR/source/reply identities and the remaining\nconversation conditions. No code change or additional reply is needed. Preserve\nevery source file and the existing Git state after preparation.\n",
+      "response": "```json\n{\n  \"mode\": \"pipeline-return\",\n  \"evidence_kind\": \"fixture-only\",\n  \"evidence_limitation\": \"pr-snapshot.json 为离线 fixture 模拟的 provider 证据，未联系真实 provider，不代表真实远端状态\",\n  \"pr\": {\n    \"host\": \"github.fixture.invalid\",\n    \"base_repo\": \"upstream/project\",\n    \"number\": 42,\n    \"url\": \"https://github.fixture.invalid/upstream/project/pull/42\",\n    \"head_repo\": \"fork/project\",\n    \"head_ref\": \"fix/review\",\n    \"head_sha\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\n  },\n  \"source\": {\n    \"kind\": \"thread\",\n    \"id\": \"T1\",\n    \"url\": \"https://github.fixture.invalid/upstream/project/pull/42#discussion_r11\",\n    \"root_comment_id\": 11,\n    \"body\": \"Please introduce persistent storage in this small in-memory demo.\",\n    \"updated_at\": \"2026-10-29T00:00:00Z\",\n    \"last_comment_id\": \"C12\"\n  },\n  \"reply\": {\n    \"id\": 12,\n    \"url\": \"https://github.fixture.invalid/upstream/project/pull/42#discussion_r12\",\n    \"submitted\": true,\n    \"visible\": true,\n    \"observed_at\": \"2026-10-29T00:01:00Z\"\n  },\n  \"verdict\": \"not-addressing\",\n  \"reason\": \"Persistent storage is outside the settled in-memory demo scope.\",\n  \"remaining_conversation_conditions\": {\n    \"thread_resolved\": false,\n    \"thread_id\": \"T1\",\n    \"pending_review\": null\n  },\n  \"actions_taken\": [\n    \"运行 node prepare-eval.cjs 一次，生成 fixture baseline 提交 a40104f\",\n    \"读取 pr-snapshot.json 作为模拟 provider 证据并保留 fixture-only 限定\",\n    \"核对 git 状态：除 fixture baseline 提交和原有 .claude/ 未跟踪目录外无变更\"\n  ],\n  \"actions_not_taken\": [\n    \"本地修复\",\n    \"新提交\",\n    \"落地/合并\",\n    \"新增回复\",\n    \"线程 resolve\",\n    \"worker 分发\",\n    \"联系真实 provider\"\n  ],\n  \"missing_authority\": [\n    \"local-fix\",\n    \"commit\",\n    \"landing\",\n    \"reply\",\n    \"thread-resolution\",\n    \"worker-dispatch\"\n  ],\n  \"git_state_after\": \"fixture baseline 提交 a40104f 已存在；源文件与其余 git 状态保持原样\"\n}\n```",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 20665,
+  "judge_tokens": 0,
+  "overall_tokens": 20665
+}

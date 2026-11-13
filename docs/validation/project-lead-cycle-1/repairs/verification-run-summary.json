@@ -1,0 +1,332 @@
+{
+  "schema_version": "verification-run-summary.v1",
+  "generated_at": "2026-09-21T09:32:38.942Z",
+  "profile": {
+    "source": "explicit",
+    "name": "cycle1-eight-fixes-local-validation",
+    "path": null
+  },
+  "checks": [
+    {
+      "id": "03-commit-index-green",
+      "service": "spec-first",
+      "command": "node node_modules/jest/bin/jest.js tests/unit/spec-commit-push-pr-context-contracts.test.js --runInBand",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-eight-fixes-20260921/logs/03-commit-index-green.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "04-pr-head-green",
+      "service": "spec-first",
+      "command": "node node_modules/jest/bin/jest.js tests/unit/spec-code-review-pr-head.test.js --runInBand",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-eight-fixes-20260921/logs/04-pr-head-green.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "06-runtime-preflight-green",
+      "service": "spec-first",
+      "command": "node node_modules/jest/bin/jest.js tests/unit/mcp-setup-entrypoint.test.js tests/unit/mcp-setup-workspace-parent-diagnostic.test.js --runInBand -t 'bare|parent'",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-eight-fixes-20260921/logs/06-runtime-preflight-green.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "07-parent-contract-green",
+      "service": "spec-first",
+      "command": "npx jest tests/unit/mcp-setup-contracts.test.js tests/unit/mcp-setup-workspace-parent-diagnostic.test.js --runInBand",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-eight-fixes-20260921/logs/07-parent-contract-green.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "08-plan-scope-green",
+      "service": "spec-first",
+      "command": "npx jest tests/unit/mcp-setup-entrypoint.test.js tests/unit/mcp-setup-mode-target.test.js --runInBand -t 'parent --plan|计划转执行'",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-eight-fixes-20260921/logs/08-plan-scope-green.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "09-runtime-suite",
+      "service": "spec-first",
+      "command": "npm run test:mcp-setup",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-eight-fixes-20260921/logs/09-runtime-suite.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "11-typecheck",
+      "service": "spec-first",
+      "command": "npm run typecheck",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-eight-fixes-20260921/logs/11-typecheck.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "11-entrypoint-lint",
+      "service": "spec-first",
+      "command": "npm run lint:skill-entrypoints",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-eight-fixes-20260921/logs/11-entrypoint-lint.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "12-full-regression",
+      "service": "spec-first",
+      "command": "npm test",
+      "status": "failed",
+      "exit_code": 1,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-eight-fixes-20260921/logs/12-full-regression.log",
+      "reason_code": "ce-topology-drift",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "13-diff-check",
+      "service": "spec-first",
+      "command": "git diff --check",
+      "status": "failed",
+      "exit_code": 2,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-eight-fixes-20260921/logs/13-diff-check.log",
+      "reason_code": "parallel-tsv-whitespace",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "13-instruction-sync",
+      "service": "spec-first",
+      "command": "npm run sync:instructions",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-eight-fixes-20260921/logs/13-instruction-sync.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "13-shared-references",
+      "service": "spec-first",
+      "command": "npm run check:shared-references",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-eight-fixes-20260921/logs/13-shared-references.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "13-changelog",
+      "service": "spec-first",
+      "command": "npx jest tests/unit/changelog-format.test.js tests/unit/changelog-continuity.test.js --runInBand",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-eight-fixes-20260921/logs/13-changelog.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "14-exit-regression",
+      "service": "spec-first",
+      "command": "npx jest tests/unit/spec-code-review-mechanics.test.js tests/unit/spec-code-review-pr-head.test.js tests/unit/spec-resolve-pr-feedback-contracts.test.js tests/unit/spec-commit-push-pr-context-contracts.test.js --runInBand",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-eight-fixes-20260921/logs/14-exit-regression.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "14-delivery-check",
+      "service": "spec-first",
+      "command": "python3 docs/validation/project-lead-cycle-1/repairs/verify-delivery.py",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-eight-fixes-20260921/logs/14-delivery-check.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "15-smoke",
+      "service": "spec-first",
+      "command": "npm run test:smoke",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-eight-fixes-20260921/logs/15-smoke.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "15-integration",
+      "service": "spec-first",
+      "command": "npm run test:integration",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node",
+        "npm",
+        "git",
+        "python3"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/cycle1-eight-fixes-20260921/logs/15-integration.log",
+      "reason_code": "exit-code-zero",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "real-graphify-dogfood",
+      "service": "spec-first",
+      "command": "SPEC_FIRST_REAL_GRAPHIFY_DOGFOOD=1 npm run test:integration",
+      "status": "not-run",
+      "exit_code": null,
+      "ran": false,
+      "required_tools": [
+        "graphify"
+      ],
+      "missing_tools": [],
+      "log_path": null,
+      "reason_code": "explicit-opt-in-not-selected-two-tests-skipped",
+      "redaction_status": "none-required"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+PASS tests/integration/eval-disk-evidence-guard.integration.test.js
+PASS tests/smoke/cli-smoke.test.js (11.181 s)
+
+Test Suites: 2 passed, 2 total
+Tests:       11 passed, 11 total
+Snapshots:   0 total
+Time:        12.472 s
+Ran all test suites within paths "tests/integration/eval-disk-evidence-guard.integration.test.js", "tests/smoke/cli-smoke.test.js".

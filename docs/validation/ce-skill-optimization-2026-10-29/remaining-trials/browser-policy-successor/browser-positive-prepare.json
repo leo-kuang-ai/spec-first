@@ -1,0 +1,15 @@
+{
+  "status": "prepared",
+  "reason_code": null,
+  "run_dir": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-aa03q1q6/positive",
+  "raw_dir": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-aa03q1q6/positive/raw",
+  "screenshot_dir": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-aa03q1q6/positive/screenshots",
+  "test_plan_path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-aa03q1q6/positive/test-plan.json",
+  "test_plan_sha256": "sha256:d5c0d91320d6217e6aa59e78d4d0ef3495d0ef8856a2941830b50134cb540f5e",
+  "config_path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-aa03q1q6/positive/agent-browser-config.json",
+  "action_policy_path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-aa03q1q6/positive/action-policy.json",
+  "manifest_path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-browser-aa03q1q6/positive/run-context.json",
+  "target_origin": "http://127.0.0.1:50523",
+  "session": "sfb-e862632cfcfc1773",
+  "namespace": "sfb-e862632cfcfc1773"
+}

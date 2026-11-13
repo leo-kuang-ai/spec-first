@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-31T06:49:23.976194+00:00",
+  "status": "model-dispatch-stopped",
+  "trial": "CEOPT-32-A1",
+  "trial_agent": "/root/w1_trial_coordinator/ce27_32_a1",
+  "trial_error": "exceeded retry limit, last status: 429 Too Many Requests",
+  "trial_request_id": "a5308e113bf6ccbf-HKG",
+  "coordinator_request_id": "a5308e149e9809c4-HKG",
+  "final_model_artifact_available": false,
+  "action": "Preserve original failure; stop all new model/reviewer dispatch. No automatic retry or replacement.",
+  "pending_original_slots": "Other five CEOPT-32 slots and all W5/W6 original slots remain not-run.",
+  "recovery": "Resume only after observed capacity recovery under the existing one-slot bound; any retry must retain a distinct identity and preserve original failure.",
+  "independent_work": "Wave5 parent retained-record consistency:68 checks pass; independent mechanism/model reviews remain pending.",
+  "full_acceptance": "incomplete"
+}

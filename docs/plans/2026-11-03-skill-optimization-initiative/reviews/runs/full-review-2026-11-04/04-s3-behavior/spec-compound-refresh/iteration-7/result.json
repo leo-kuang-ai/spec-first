@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-compound-refresh",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T22:33:57.439208+08:00",
+  "end_time": "2026-11-04T22:37:40.652731+08:00",
+  "case_results": [
+    {
+      "case_id": "publication-recover",
+      "title": "恢复部分发布时保留人工条目及完整知识",
+      "status": "PASS",
+      "duration_ms": 222564,
+      "turns": 9,
+      "input_tokens": 51327,
+      "output_tokens": 2295,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 9,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound-refresh/evals/fixtures/scripts/check-publication-recover.sh",
+            "passed": true,
+            "evidence": "PASS: 固定fixture的原件、引用、恢复与报告一致；非模型行为或通用语义证明"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "先运行 node prepare-eval.cjs，为隔离评测创建基线；这不授权任务提交。\n用 spec-compound-refresh 完成 README.md 所述部分发布的恢复，范围仅 docs/solutions/old.md、new.md、catalog.md。\n授权在new末尾添加一个空行，再逐字追加old的离线恢复标题与段落（末尾换行），new其他字节不变；核实源码和当前catalog后，\n只将catalog中的old引用改成new，保留其他字节；验证最终引用和原件可恢复后删除old。\n不提交、不push、不修改源码或其他文件。最终仅返回 JSON：status、changed、deleted、pending，路径为仓库相对路径。\n",
+      "response": "```json\n{\n  \"status\": \"applied\",\n  \"changed\": [\"docs/solutions/new.md\", \"docs/solutions/catalog.md\"],\n  \"deleted\": [\"docs/solutions/old.md\"],\n  \"pending\": []\n}\n```",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 53622,
+  "judge_tokens": 0,
+  "overall_tokens": 53622
+}

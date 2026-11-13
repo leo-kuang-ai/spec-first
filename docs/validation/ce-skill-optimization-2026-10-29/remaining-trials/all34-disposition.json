@@ -1,0 +1,869 @@
+[
+  {
+    "id": "CEOPT-01",
+    "skill": "autoresearch",
+    "status": "bounded-pass-full-partial",
+    "reason": "Six model decisions pass; independent review of16 supplemental executions closes tested legacy-classification/unknown-dimension mechanism gaps. B passes named scorer controls; A has canonical HARD and mixed-unknown false greens.",
+    "required_input_and_outcome": "Run candidate scoring with HARD and visual-ui aliases, unknown values, and non-mutating check/recovery.",
+    "next_action": "Retain scorer safeguards. Actual orchestration recovery/check state and application outcomes remain untested.",
+    "paired_mechanism_evidence": {
+      "suites": [
+        "autoresearch-score-regression"
+      ],
+      "ref": "remaining-trials/paired-mechanisms-review.json",
+      "ceiling": "Selected deterministic harness only; no full model workflow acceptance."
+    },
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "wave3/CEOPT-01-packet.json",
+    "continuation_trials": [
+      "CEOPT-01-A1",
+      "CEOPT-01-A2",
+      "CEOPT-01-A3",
+      "CEOPT-01-B1",
+      "CEOPT-01-B2",
+      "CEOPT-01-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave3/independent-autoresearch-review.json"
+  },
+  {
+    "id": "CEOPT-02",
+    "skill": "spec-brainstorm",
+    "status": "bounded-task-pass-full-acceptance-partial",
+    "reason": "Full frozen no-document requirement-alignment interaction, with source-guided reads and observed no mutation. No downstream implementation quality claim.",
+    "baseline_trials": 3,
+    "candidate_trials": 3,
+    "baseline_pass": 3,
+    "candidate_pass": 3,
+    "semantic_review": "complete-independent-context",
+    "comparison": "inconclusive",
+    "next_action": "Complete remaining frozen facets and comparable execution evidence; see README.md. No benefit or default-adoption claim."
+  },
+  {
+    "id": "CEOPT-03",
+    "skill": "spec-code-review",
+    "status": "bounded-task-pass-full-acceptance-partial",
+    "reason": "Three responses per arm passed independent bounded offline-task adjudication.",
+    "required_input_and_outcome": "Combine tenant defect, unsupported P0 input and case-sensitive file identities; grade findings and actual code separately.",
+    "next_action": "Materialize the exact listed inputs against both immutable source arms and assess the read-only/deterministic execution path before claiming an isolation blocker.",
+    "baseline_trials": 3,
+    "candidate_trials": 3,
+    "baseline_pass": 3,
+    "candidate_pass": 3,
+    "semantic_review": "complete-independent-context",
+    "comparison": "inconclusive",
+    "evidence_ref": "remaining-trials/judge-wave3.json",
+    "paired_mechanism_evidence": {
+      "suites": [
+        "spec-code-review-mechanics"
+      ],
+      "ref": "remaining-trials/paired-mechanisms-review.json",
+      "ceiling": "Selected deterministic harness only; no full model workflow acceptance."
+    }
+  },
+  {
+    "id": "CEOPT-04",
+    "skill": "spec-commit",
+    "status": "bounded-source-and-fixture-pass-full-partial",
+    "reason": "Original six trials retained. Current Commit source/dependencies and seven corrected parent Git controls independently reviewed; initial lost-result runner defect archived and corrected. No autonomous or arbitrary mixed-staged-hunk claim.",
+    "required_input_and_outcome": "Use mixed pre-existing staged/unstaged hunks and author identity; inspect commit contents, parent and remaining index.",
+    "next_action": "Broader autonomous Git/hook and mixed-staged-hunk outcomes require separately authorized exact targets; no repetition of completed local controls.",
+    "input_binding_ref": "remaining-trials/remaining-input-bindings.json#CEOPT-04",
+    "external_prerequisites": [],
+    "input_status": "source-bound-recipe; required new fixture variants not yet materialized",
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "wave2/CEOPT-04-packet.json",
+    "continuation_trials": [
+      "CEOPT-04-A1",
+      "CEOPT-04-A2",
+      "CEOPT-04-A3",
+      "CEOPT-04-B1",
+      "CEOPT-04-B2",
+      "CEOPT-04-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave2/independent-commit-review.json",
+    "separate_followup": {
+      "followup_ref": "follow-up-20261031/final-report.md",
+      "followup_source_review_ref": "follow-up-20261031/independent-source-review.json",
+      "model_status": "original-block-reviewed-current-source-followup-reviewed",
+      "candidate_acceptance": "bounded-source-and-fixture-pass-full-partial",
+      "conclusion": "Original six trials retained. Current Commit source/dependencies and seven corrected parent Git controls independently reviewed; initial lost-result runner defect archived and corrected. No autonomous or arbitrary mixed-staged-hunk claim.",
+      "optimization_recommendation": "Retain caller-confirmed target, proposed-versus-validated isolation and readback-before-retry boundaries. Use the bounded procedure only when its preconditions hold.",
+      "next_action": "Broader autonomous Git/hook and mixed-staged-hunk outcomes require separately authorized exact targets; no repetition of completed local controls.",
+      "next_owner": "Task caller and Git integration owner",
+      "unblock_condition": "Exact authorized target, preservation strategy and actual autonomous/mixed-index evidence beyond the admitted fixture."
+    }
+  },
+  {
+    "id": "CEOPT-05",
+    "skill": "spec-commit-push-pr",
+    "status": "bounded-task-pass-full-acceptance-partial",
+    "reason": "Three responses per arm passed independent bounded offline-task adjudication.",
+    "required_input_and_outcome": "Exercise non-main base, repository PR template and related-but-not-closing issue; capture remote attempts.",
+    "next_action": "Materialize the exact listed inputs against both immutable source arms and assess the read-only/deterministic execution path before claiming an isolation blocker.",
+    "baseline_trials": 3,
+    "candidate_trials": 3,
+    "baseline_pass": 3,
+    "candidate_pass": 3,
+    "semantic_review": "complete-independent-context",
+    "comparison": "inconclusive",
+    "evidence_ref": "remaining-trials/judge-wave3.json"
+  },
+  {
+    "id": "CEOPT-06",
+    "skill": "spec-compound",
+    "status": "bounded-pass-full-partial",
+    "reason": "All six parent Compound publications and separate guard controls independently reviewed with qualifications. Original six citation checks remain failed; explicit normalized derivatives and actual partial-rename recoveries pass. Original drift flag is observation only; separate synthetic parent guard controls are nonvacuous. No native enforcement or model gain.",
+    "required_input_and_outcome": "Feed actual unknown/nonzero results and distinct knowledge; check source/invalidation and failure claims.",
+    "next_action": "Distinct interrupted/unknown-validator, autonomous promotion and actual historical recovery facets remain open.",
+    "input_binding_ref": "remaining-trials/remaining-input-bindings.json#CEOPT-06",
+    "external_prerequisites": [],
+    "input_status": "source-bound-recipe; required new fixture variants not yet materialized",
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-06-packet.json",
+    "continuation_trials": [
+      "CEOPT-06-A1",
+      "CEOPT-06-A2",
+      "CEOPT-06-A3",
+      "CEOPT-06-B1",
+      "CEOPT-06-B2",
+      "CEOPT-06-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave1/independent-compound-review.json"
+  },
+  {
+    "id": "CEOPT-07",
+    "skill": "spec-compound-refresh",
+    "status": "bounded-pass-full-partial",
+    "reason": "All six Refresh parent derivative publications and separate guard controls independently reviewed. Exact model blocks/source backups verified; six catalog interruptions recovered; four synthetic dependent deletions preserve guidance/aliases. Native claims checks inspect0 paths/SHAs/links: separate explicit hashes and link checks supply that evidence. Original deletion-drift flag remains observation only; no native gate or full acceptance.",
+    "required_input_and_outcome": "Provide historical term consumers, unique knowledge and failed publication; inspect preservation and final state.",
+    "next_action": "Autonomous refresh, native freshness enforcement, unknown-validator and live consumer facets remain open.",
+    "input_binding_ref": "remaining-trials/remaining-input-bindings.json#CEOPT-07",
+    "external_prerequisites": [],
+    "input_status": "source-bound-recipe; required new fixture variants not yet materialized",
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-07-packet.json",
+    "continuation_trials": [
+      "CEOPT-07-A1",
+      "CEOPT-07-A2",
+      "CEOPT-07-A3",
+      "CEOPT-07-B1",
+      "CEOPT-07-B2",
+      "CEOPT-07-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave1/independent-refresh-review.json"
+  },
+  {
+    "id": "CEOPT-08",
+    "skill": "spec-debug",
+    "status": "bounded-pass-full-partial",
+    "reason": "All six exact proposals and parent-mediated executions pass;84 process stdout records verified. Same candidate bytes in both arms; no B superiority. Actual profiles and cleanup checked separately from the runner passed flag. November1: one fresh Simplify consumer preserved exact repaired-source/proof pins and returned no-change; parent reran seven paired checksum cases successfully.",
+    "required_input_and_outcome": "Provide a reproducible performance fault without a suitable unit seam; compare real baseline/profile and replacement proof.",
+    "next_action": "Actual autonomous mutation and a separately justified substantive refactor remain open. The mediated Debug-to-Simplify proof handoff is now exercised; do not repeat it as missing.",
+    "input_binding_ref": "remaining-trials/remaining-input-bindings.json#CEOPT-08",
+    "external_prerequisites": [],
+    "input_status": "source-bound-recipe; required new fixture variants not yet materialized",
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "wave2/CEOPT-08-packet.json",
+    "continuation_trials": [
+      "CEOPT-08-A1",
+      "CEOPT-08-A2",
+      "CEOPT-08-A3",
+      "CEOPT-08-B1",
+      "CEOPT-08-B2",
+      "CEOPT-08-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave2/independent-debug-review.json"
+  },
+  {
+    "id": "CEOPT-09",
+    "skill": "spec-doc-review",
+    "status": "bounded-task-pass-full-acceptance-partial",
+    "reason": "Read-only document review with duplicate root cause, withdrawn prior decision and observed no-write boundary. No automatic fixes or persona dispatch.",
+    "baseline_trials": 3,
+    "candidate_trials": 3,
+    "baseline_pass": 3,
+    "candidate_pass": 3,
+    "semantic_review": "complete-independent-context",
+    "comparison": "inconclusive",
+    "next_action": "Complete remaining frozen facets and comparable execution evidence; see README.md. No benefit or default-adoption claim."
+  },
+  {
+    "id": "CEOPT-10",
+    "skill": "spec-dogfood",
+    "status": "bounded-pass-full-partial",
+    "reason": "All six timely responses correctly assess every supplied lifecycle stage and declared criterion, with clean assigned-arm traces and no detected truncation. Post-reload B supports total18/enabled button only; old A DOM is neither B acceptance nor B defect. Synthetic feedback and browser-unavailable branch remain attributed; no autonomous or visual outcome.",
+    "required_input_and_outcome": "Provide criteria and a resumed server/source mismatch; bind observations to the current identity and prevent invented browser results.",
+    "next_action": "Actual diff/base/head/dirty identity, autonomous browser owner, focus/visual/journey and genuine owner outcomes remain unverified.",
+    "input_binding_ref": "remaining-trials/remaining-input-bindings.json#CEOPT-10",
+    "external_prerequisites": [
+      "Positive rendered-page inspection requires the permitted browser owner capability. Availability was not probed by this read-only task; absence must not be assumed."
+    ],
+    "input_status": "source-bound-recipe; required new fixture variants not yet materialized",
+    "capability_observation": "Browser capability now confirmed for synthetic loopback; task-specific UI, interruption and feedback inputs remain separate.",
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "wave5/CEOPT-10-packet.json",
+    "continuation_trials": [
+      "CEOPT-10-A1",
+      "CEOPT-10-A2",
+      "CEOPT-10-A3",
+      "CEOPT-10-B1",
+      "CEOPT-10-B2",
+      "CEOPT-10-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave5/independent-dogfood-worktree-supplement-review.json"
+  },
+  {
+    "id": "CEOPT-11",
+    "skill": "spec-explain",
+    "status": "bounded-pass-full-partial",
+    "reason": "Original six and B-r2 three outputs retain independent reviews. All three parent deliveries independently reviewed: exact original prefixes,9 stale links after actual relocation and9 correct rebased links. Parent-authored appendix is separate from model content; no autonomous destination or visual claim.",
+    "required_input_and_outcome": "Provide a traceable trigger/state/failure chain without author rationale; inspect the durable fallback artifact and untraced boundaries.",
+    "next_action": "Obtain genuine model-authored destination/autonomous-save and interaction fallback evidence if required; rendered/visual quality remains unverified.",
+    "input_binding_ref": "remaining-trials/remaining-input-bindings.json#CEOPT-11",
+    "external_prerequisites": [],
+    "input_status": "source-bound-recipe; required new fixture variants not yet materialized",
+    "baseline_trials": 3,
+    "candidate_trials": 3,
+    "semantic_review": "complete-independent-context",
+    "comparison": "inconclusive",
+    "successor_evidence": "remaining-27-acceptance/wave1/independent-explain-r2-review.json",
+    "candidate_pass": 3,
+    "candidate_revision": "B-r2",
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-11-packet.json",
+    "continuation_trials": [
+      "CEOPT-11-A1",
+      "CEOPT-11-A2",
+      "CEOPT-11-A3",
+      "CEOPT-11-B1",
+      "CEOPT-11-B2",
+      "CEOPT-11-B3",
+      "CEOPT-11r2-B1",
+      "CEOPT-11r2-B2",
+      "CEOPT-11r2-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "continuation_review_ref": "remaining-27-acceptance/wave1/independent-explain-r2-review.json"
+  },
+  {
+    "id": "CEOPT-12",
+    "skill": "spec-handoff",
+    "status": "bounded-pass-full-partial",
+    "reason": "Six fresh consumers preserve research/review owners and Git/source; B helper produced all handoffs.",
+    "required_input_and_outcome": "Add dirty/index state and managed handoff paths to research and review continuations; inspect owner and Git preservation.",
+    "next_action": "Owned fixture cleanup complete; model-authored production and autonomous save remain open.",
+    "input_binding_ref": "remaining-trials/remaining-input-bindings.json#CEOPT-12",
+    "external_prerequisites": [],
+    "input_status": "source-bound-recipe; required new fixture variants not yet materialized",
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-12-packet.json",
+    "continuation_trials": [
+      "CEOPT-12-A1",
+      "CEOPT-12-A2",
+      "CEOPT-12-A3",
+      "CEOPT-12-B1",
+      "CEOPT-12-B2",
+      "CEOPT-12-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave1/independent-handoff-review.json"
+  },
+  {
+    "id": "CEOPT-13",
+    "skill": "spec-ideate",
+    "status": "bounded-pass-full-partial",
+    "reason": "Six successor dossiers pass content and600s admission; seventh attempt is retained429 failure. Original five300s overruns remain failures. Both arms pass; superiority unestablished.",
+    "required_input_and_outcome": "Provide duplicates plus low-confidence/high-risk evidence; inspect the dossier, ranking rationale and preserved unresolved risk.",
+    "next_action": "Live tracker/pagination and autonomous publication remain open; current mediated block complete.",
+    "input_binding_ref": "remaining-trials/remaining-input-bindings.json#CEOPT-13",
+    "external_prerequisites": [],
+    "input_status": "source-bound-recipe; required new fixture variants not yet materialized",
+    "successor_evidence": "remaining-27-acceptance/wave1/trial-index.json",
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-13-packet.json",
+    "continuation_trials": [
+      "CEOPT-13-A1",
+      "CEOPT-13-A2",
+      "CEOPT-13-A3",
+      "CEOPT-13-B1",
+      "CEOPT-13-B2",
+      "CEOPT-13-B3",
+      "CEOPT-13r2-A1",
+      "CEOPT-13r2-A2",
+      "CEOPT-13r2-A2-retry1",
+      "CEOPT-13r2-A3",
+      "CEOPT-13r2-B1",
+      "CEOPT-13r2-B2",
+      "CEOPT-13r2-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave1/independent-ideate-r2-review.json"
+  },
+  {
+    "id": "CEOPT-14",
+    "skill": "spec-lfg",
+    "status": "bounded-pass-full-partial",
+    "reason": "All six correct interpretations reviewed: A gap false-ready is a helper defect, B resets1800s gap while preserving invocation elapsed; both continuous controls reach300s advisory readiness. Every observation,3 feedback items and3 interrupted-reply branches covered; no fabricated publication/reply/resolution/decision. Truncated initial reads recovered bounded evidence; no full-source-ingestion claim.",
+    "required_input_and_outcome": "Feed a 30-minute observation gap and authorized no-code feedback with interrupted reply; inspect continuity and duplicate prevention.",
+    "next_action": "Actual authorized PR publication/readback/resolution, genuine human typed-decision/answer/CAS and real continuous monitoring remain open.",
+    "paired_mechanism_evidence": {
+      "suites": [
+        "spec-lfg-pr-watch-state"
+      ],
+      "ref": "remaining-trials/paired-mechanisms-review.json",
+      "ceiling": "Selected deterministic harness only; no full model workflow acceptance."
+    },
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "wave6/CEOPT-14-packet.json",
+    "continuation_trials": [
+      "CEOPT-14-A1",
+      "CEOPT-14-A2",
+      "CEOPT-14-A3",
+      "CEOPT-14-B1",
+      "CEOPT-14-B2",
+      "CEOPT-14-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave6/independent-lfg-review.json"
+  },
+  {
+    "id": "CEOPT-15",
+    "skill": "spec-optimize",
+    "status": "bounded-pass-full-partial",
+    "reason": "Six bounded model decisions pass. Independent review confirms all11 native worktree controls: B refuses four preservation negatives and passes pristine/explicit-discard positives; A exhibits loss in four controls. Preservation covers recorded file hashes/HEAD/index entries, not all metadata or recoverable WIP backup.",
+    "required_input_and_outcome": "Exercise dirty experiment reuse, unowned cleanup candidates, 0/100 A/A observations and claimed zero noise; include a stable control.",
+    "next_action": "Genuine stable A/A launches, holdout selection/confirmation and real optimization outcomes remain open.",
+    "paired_mechanism_evidence": {
+      "suites": [
+        "spec-optimize-decide",
+        "spec-optimize-measurement-only-contracts"
+      ],
+      "ref": "remaining-trials/paired-mechanisms-review.json",
+      "ceiling": "Selected deterministic harness only; no full model workflow acceptance."
+    },
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "wave3/CEOPT-15-packet.json",
+    "continuation_trials": [
+      "CEOPT-15-A1",
+      "CEOPT-15-A2",
+      "CEOPT-15-A3",
+      "CEOPT-15-B1",
+      "CEOPT-15-B2",
+      "CEOPT-15-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave3/independent-optimize-review.json"
+  },
+  {
+    "id": "CEOPT-16",
+    "skill": "spec-plan",
+    "status": "synthetic-core-usable-with-findings-full-partial",
+    "reason": "Six separate synthetic-input plans are core-usable within600s; all preserve Product Contract. All retain old reason-code/read limitations; B2/B3 omit contract-document update ownership. Current reason-code source fix independently reviewed, not exercised by frozen trials. November1: current reason-code successor correctly handles three cause-specific reporting cases in one fresh context.",
+    "required_input_and_outcome": "Add research-leaf evidence, stable decisions and concern tradeoffs; inspect WHAT bytes and rejected-alternative preservation.",
+    "next_action": "Production client/CLI evidence remains missing. Current reason-code micro-behavior is covered; full post-fix Plan workflow, autonomous persistence and production acceptance remain separate.",
+    "input_binding_ref": "remaining-trials/remaining-input-bindings.json#CEOPT-16",
+    "external_prerequisites": [],
+    "input_status": "source-bound-recipe; required new fixture variants not yet materialized",
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-16-packet.json",
+    "continuation_trials": [
+      "CEOPT-16-A1",
+      "CEOPT-16-A2",
+      "CEOPT-16-A3",
+      "CEOPT-16-B1",
+      "CEOPT-16-B2",
+      "CEOPT-16-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave1/independent-plan-original-review-review.json",
+    "separate_followup": {
+      "followup_ref": "follow-up-20261031/final-report.md",
+      "followup_source_review_ref": "follow-up-20261031/independent-source-review.json",
+      "model_status": "original-and-six-input3-followup-reviewed",
+      "candidate_acceptance": "synthetic-core-usable-with-findings-full-partial",
+      "conclusion": "Six separate synthetic-input plans are core-usable within600s; all preserve Product Contract. All retain old reason-code/read limitations; B2/B3 omit contract-document update ownership. Current reason-code source fix independently reviewed, not exercised by frozen trials.",
+      "optimization_recommendation": "Retain exact replay/CLI input requirements. Current fallback distinguishes prohibited, unavailable and unknown review; preserve original defects and require B2/B3 documentation responsibility before execution.",
+      "next_action": "Production/client owners supply real taxonomy/replay/CLI contracts for production acceptance. Post-fix behavioral evidence remains separate; original missing finals are not replaced.",
+      "next_owner": "Client/service and CLI owners; Plan maintainer",
+      "unblock_condition": "Actual production contract evidence and a separately bounded behavioral check if claiming post-fix model behavior."
+    }
+  },
+  {
+    "id": "CEOPT-17",
+    "skill": "spec-polish",
+    "status": "bounded-pass-full-partial",
+    "reason": "All six timely outputs correctly interpret all three resolver cases and all lifecycle/feedback evidence. B missing-value cases natively exit1; A is externally terminated after2s with null native exit. Both select web4300. Only reloaded B supports total18/enabled. B2 omits explicit unavailable-owner fallback/setup wording; current nonfabrication boundary holds. No model superiority or runtime benefit.",
+    "required_input_and_outcome": "Exercise missing launch args, multi-process Procfile and feedback resume with exact server identity.",
+    "next_action": "Real focus/activation/visual/product, autonomous server/browser loop and unexecuted parser/config/startup facets remain open.",
+    "input_binding_ref": "remaining-trials/remaining-input-bindings.json#CEOPT-17",
+    "external_prerequisites": [
+      "A complete interactive polish/browser result requires the permitted browser owner and, where the scenario requires it, actual user feedback. Neither capability nor feedback was established here."
+    ],
+    "input_status": "source-bound-recipe; required new fixture variants not yet materialized",
+    "capability_observation": "Browser capability now confirmed for synthetic loopback; task-specific UI, interruption and feedback inputs remain separate.",
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "wave5/CEOPT-17-packet.json",
+    "continuation_trials": [
+      "CEOPT-17-A1",
+      "CEOPT-17-A2",
+      "CEOPT-17-A3",
+      "CEOPT-17-B1",
+      "CEOPT-17-B2",
+      "CEOPT-17-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave5/independent-polish-review.json"
+  },
+  {
+    "id": "CEOPT-18",
+    "skill": "spec-pov",
+    "status": "bounded-pass-full-partial",
+    "reason": "All six correct eight-case interpretations independently reviewed. B refuses all8 before fake calls; no authenticated positive provider or isolated expiry validation. Current one-sentence reason-code successor independently verified as exact replacement; adapter is byte-identical to frozen B and no producer/gate activated.",
+    "required_input_and_outcome": "Exercise all worker admission counterexamples; positive authenticated execution remains blocked by the current serving contract.",
+    "next_action": "Authenticated positive producer and actual serving/admission/freshness/lifecycle/independence remain blocked.",
+    "paired_mechanism_evidence": {
+      "suites": [
+        "spec-pov-worker-admission"
+      ],
+      "ref": "remaining-trials/paired-mechanisms-review.json",
+      "ceiling": "Selected deterministic harness only; no full model workflow acceptance."
+    },
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "wave6/CEOPT-18-packet.json",
+    "continuation_trials": [
+      "CEOPT-18-A1",
+      "CEOPT-18-A2",
+      "CEOPT-18-A3",
+      "CEOPT-18-B1",
+      "CEOPT-18-B2",
+      "CEOPT-18-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave6/independent-pov-review.json"
+  },
+  {
+    "id": "CEOPT-19",
+    "skill": "spec-prd",
+    "status": "bounded-pass-full-partial",
+    "reason": "All six responses pass source-grounded semantic and300s checks. B rejects three changed-PRD refreshes and lexical false positives; A mechanism fails those facets despite correct model diagnosis. Both allow input-only renewal and preserve explicit WHAT blocking.",
+    "required_input_and_outcome": "Modify signed body then refresh inputs; compare with legal input-only refresh and valid product terminology.",
+    "next_action": "Core parent-fixture facets covered. Autonomous authoring/finalization, broader eval coverage and real owner/downstream outcomes remain unverified.",
+    "input_binding_ref": "remaining-trials/remaining-input-bindings.json#CEOPT-19",
+    "external_prerequisites": [],
+    "input_status": "source-bound-recipe; required new fixture variants not yet materialized",
+    "paired_mechanism_evidence": {
+      "suites": [
+        "spec-prd-finalize-transition"
+      ],
+      "ref": "remaining-trials/paired-mechanisms-review.json",
+      "ceiling": "Selected deterministic harness only; no full model workflow acceptance."
+    },
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "wave3/CEOPT-19-packet.json",
+    "continuation_trials": [
+      "CEOPT-19-A1",
+      "CEOPT-19-A2",
+      "CEOPT-19-A3",
+      "CEOPT-19-B1",
+      "CEOPT-19-B2",
+      "CEOPT-19-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave3/independent-prd-review.json"
+  },
+  {
+    "id": "CEOPT-20",
+    "skill": "spec-product-pulse",
+    "status": "bounded-task-pass-full-acceptance-partial",
+    "reason": "Three responses per arm passed independent bounded offline-task adjudication.",
+    "required_input_and_outcome": "Retain actual source exports and verify revenue, failed read and successful zero remain distinct.",
+    "next_action": "Materialize the exact listed inputs against both immutable source arms and assess the read-only/deterministic execution path before claiming an isolation blocker.",
+    "baseline_trials": 3,
+    "candidate_trials": 3,
+    "baseline_pass": 3,
+    "candidate_pass": 3,
+    "semantic_review": "complete-independent-context",
+    "comparison": "inconclusive",
+    "evidence_ref": "remaining-trials/judge-wave3.json"
+  },
+  {
+    "id": "CEOPT-21",
+    "skill": "spec-promote",
+    "status": "bounded-task-pass-full-acceptance-partial",
+    "reason": "Local-only unreleased promotion drafting. Tracked/ignored preference inspection branch is not exercised because no repository is supplied; that frozen-scenario facet remains partial.",
+    "baseline_trials": 3,
+    "candidate_trials": 3,
+    "baseline_pass": 3,
+    "candidate_pass": 3,
+    "semantic_review": "complete-independent-context",
+    "comparison": "inconclusive",
+    "next_action": [
+      "README explicitly says monthly summaries are local and not released/deployed; CHANGELOG places them under Unreleased. These are concrete release-status inputs.",
+      "Add separate existing configuration variants: tracked, untracked/ignored and untracked/not ignored. Capture tracked status and check-ignore output without overwriting preferences.",
+      "Retain local-only authority and inspect both draft bodies for unsupported availability claims, not merely delivery_status.",
+      "Capture complete relevant tool calls so unauthorized provider probing/writing is not inferred solely from final prose."
+    ],
+    "input_binding_ref": "remaining-trials/remaining-input-bindings.json#CEOPT-21",
+    "external_prerequisites": [],
+    "input_status": "source-bound-recipe; required new fixture variants not yet materialized"
+  },
+  {
+    "id": "CEOPT-22",
+    "skill": "spec-prototype",
+    "status": "bounded-correctness-pass-comparability-inconclusive-full-partial",
+    "reason": "All six outputs cover all14 lifecycle records with clean assigned-arm traces. Identical native servers support parent HTTP lifecycle only; B prose clarifies self-close, authority and manual refresh. A2 correctly flags A stop wording conflict. A1/B1 recorded astra, other four sol: no same-model comparison. Retrospective handoff and separate correction independently checked; no pre-B2 admission inferred.",
+    "required_input_and_outcome": "Exercise a real throwaway page with stop/reload, loopback/token checks and no unauthorized external service.",
+    "next_action": "Genuine human question/experience/choice, browser refresh/rendering, additional lifecycle branches and field outcomes remain open.",
+    "input_binding_ref": "remaining-trials/remaining-input-bindings.json#CEOPT-22",
+    "external_prerequisites": [
+      "The current workflow explicitly requires a human to experience the prototype and refuses unattended/pipeline completion. Helper checks can proceed, but they cannot supply the missing human experience or decision."
+    ],
+    "input_status": "source-bound-recipe; required new fixture variants not yet materialized",
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "wave5/CEOPT-22-packet.json",
+    "continuation_trials": [
+      "CEOPT-22-A1",
+      "CEOPT-22-A2",
+      "CEOPT-22-A3",
+      "CEOPT-22-B1",
+      "CEOPT-22-B2",
+      "CEOPT-22-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave5/independent-prototype-review.json"
+  },
+  {
+    "id": "CEOPT-23",
+    "skill": "spec-resolve-pr-feedback",
+    "status": "bounded-pass-full-partial",
+    "reason": "All six correct bounded interpretations independently reviewed for every assigned helper case,3 feedback items and3 recovery branches. A helper absent is not model failure; B mock publication predicate and consistent-behind supplement remain distinct from original contradictory rejection-only stub. Fixture target differs from Enterprise/fork helper target. Aggregated reference truncations retained; B1 has no recovery of unrelated implementation mechanics, so no full-source-consumption claim.",
+    "required_input_and_outcome": "Provide fixed/declined/needs-human items and interrupted reply; inspect exact remote SHA, readback and duplicate action prevention.",
+    "next_action": "Actual selected PR, validated local delta, publication and visible submitted reply/resolution plus genuine compatibility decision remain open.",
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "wave6/CEOPT-23-packet.json",
+    "continuation_trials": [
+      "CEOPT-23-A1",
+      "CEOPT-23-A2",
+      "CEOPT-23-A3",
+      "CEOPT-23-B1",
+      "CEOPT-23-B2",
+      "CEOPT-23-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave6/independent-pr-feedback-review.json"
+  },
+  {
+    "id": "CEOPT-24",
+    "skill": "spec-riffrec-feedback-analysis",
+    "status": "bounded-pass-full-partial",
+    "reason": "All six artifacts cover both analyzer copies,10 chunk cases,2 quiet and2 fallback cases per assigned arm. Independent source review confirms A partial-ok/empty-success/quiet-promotion/attempt-loss defects and B interval/status/cumulative corrections. A outputs omit explicit aggregate-failed vs subordinate-skipped precision; B1 truncation fully recovered. Base cleanup bool hardcoded/unmeasured; supplement post-context measurements separate. No real decoding/egress/product outcome.",
+    "required_input_and_outcome": "Provide 840-second two-chunk media with partial provider failure and no product finding; compare both analyzer entrypoints and egress receipts.",
+    "next_action": "Actual authorized media decode/transcription/coverage/visual/product and privacy outcomes remain open.",
+    "paired_mechanism_evidence": {
+      "suites": [
+        "spec-riffrec-evidence-coverage"
+      ],
+      "ref": "remaining-trials/paired-mechanisms-review.json",
+      "ceiling": "Selected deterministic harness only; no full model workflow acceptance."
+    },
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "wave6/CEOPT-24-packet.json",
+    "continuation_trials": [
+      "CEOPT-24-A1",
+      "CEOPT-24-A2",
+      "CEOPT-24-A3",
+      "CEOPT-24-B1",
+      "CEOPT-24-B2",
+      "CEOPT-24-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave6/independent-media-review.json"
+  },
+  {
+    "id": "CEOPT-25",
+    "skill": "spec-runtime-setup",
+    "status": "bounded-pass-full-partial",
+    "reason": "All six timely responses correctly interpret all nine assigned cases. B helper fixes tested dangling-link containment and Git override identity; source snapshots are preserved in both arms. A1/A3 conservatively omit one exact repository identity recoverable from producer. No full setup or B model superiority.",
+    "required_input_and_outcome": "Provide dangling and intermediate symlinks plus contaminated GIT_DIR/GIT_WORK_TREE for two disposable repositories; inspect sentinel and target identity.",
+    "next_action": "Full host setup/consumption, actual worktree/submodule, cross-platform/concurrency and field outcomes remain unverified.",
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "wave4/CEOPT-25-packet.json",
+    "continuation_trials": [
+      "CEOPT-25-A1",
+      "CEOPT-25-A2",
+      "CEOPT-25-A3",
+      "CEOPT-25-B1",
+      "CEOPT-25-B2",
+      "CEOPT-25-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave4/independent-runtime-review.json"
+  },
+  {
+    "id": "CEOPT-26",
+    "skill": "spec-simplify-code",
+    "status": "bounded-pass-full-partial",
+    "reason": "Six defensible no-change proposals and six parent syntax/HTTP proof executions pass independent review. Original B1 infrastructure429 remains separate from B1-retry1. No applied refactor, autonomous execution or B advantage demonstrated.",
+    "required_input_and_outcome": "Bind actual proof-test bytes and test-only seam; grade equivalent code change, final rerun and forbidden proof weakening.",
+    "next_action": "A separately pinned worthwhile production refactor is needed to exercise preservation after substantive editing and caller handoff.",
+    "input_binding_ref": "remaining-trials/remaining-input-bindings.json#CEOPT-26",
+    "external_prerequisites": [],
+    "input_status": "source-bound-recipe; required new fixture variants not yet materialized",
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "wave2/CEOPT-26-packet.json",
+    "continuation_trials": [
+      "CEOPT-26-A1",
+      "CEOPT-26-A2",
+      "CEOPT-26-A3",
+      "CEOPT-26-B1",
+      "CEOPT-26-B1-retry1",
+      "CEOPT-26-B2",
+      "CEOPT-26-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave2/independent-simplify-review.json"
+  },
+  {
+    "id": "CEOPT-27",
+    "skill": "spec-strategy",
+    "status": "bounded-pass-full-partial",
+    "reason": "All six preserve original strategy bytes plus one grounded resistance principle; fictional owner evidence remains synthetic.",
+    "required_input_and_outcome": "Provide an attractive adjacent proposal and an actual rejected decision; judge discrimination and preserve untargeted strategy text.",
+    "next_action": "Real owner elicitation and autonomous discovery/publication remain unverified.",
+    "input_binding_ref": "remaining-trials/remaining-input-bindings.json#CEOPT-27",
+    "external_prerequisites": [
+      "If the acceptance requires a real project-owner rejection rather than a controlled evaluation input, that decision must come from an actual owner record or response. It cannot be inferred from code."
+    ],
+    "input_status": "source-bound-recipe; required new fixture variants not yet materialized",
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-27-packet.json",
+    "continuation_trials": [
+      "CEOPT-27-A1",
+      "CEOPT-27-A2",
+      "CEOPT-27-A3",
+      "CEOPT-27-B1",
+      "CEOPT-27-B2",
+      "CEOPT-27-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave1/independent-strategy-review.json"
+  },
+  {
+    "id": "CEOPT-28",
+    "skill": "spec-sweep",
+    "status": "bounded-clean-recovery-original-isolation-failure-full-partial",
+    "reason": "Original six reviewed, five clean; original A1 remains contaminated. Separate A1-retry1 passes independent review of original five state cases, publication absence and issue-text authority only. Complete assigned reads and timely63.141s response; recovery does not cover later media supplements or restore original full clean block.",
+    "required_input_and_outcome": "Exercise lock failure, linked lock, future version, incomplete closure, interrupted shared publication and missing media authority.",
+    "next_action": "Retain original failure and narrower clean recovery. Actual autonomous sweep, live connector/merge verification, scoped media and hosted final-state publication/recovery remain open.",
+    "paired_mechanism_evidence": {
+      "suites": [
+        "sweep-state-safety",
+        "spec-sweep-final-publication",
+        "spec-sweep-media-admission"
+      ],
+      "ref": "remaining-trials/paired-mechanisms-review.json",
+      "ceiling": "Selected deterministic harness only; no full model workflow acceptance."
+    },
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "wave4/CEOPT-28-packet.json",
+    "continuation_trials": [
+      "CEOPT-28-A1",
+      "CEOPT-28-A1-retry1",
+      "CEOPT-28-A2",
+      "CEOPT-28-A3",
+      "CEOPT-28-B1",
+      "CEOPT-28-B2",
+      "CEOPT-28-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave4/independent-sweep-review.json"
+  },
+  {
+    "id": "CEOPT-29",
+    "skill": "spec-test-browser",
+    "status": "bounded-correctness-pass-full-partial",
+    "reason": "All six correct interpretations reviewed: A accepts vitals-before-open and conceals injected close9; B rejects ordering, propagates cleanup failure and retains archived diagnostics. All9 cases under each injection covered. Fake producer controls and historical B actual-browser positive remain separate; raw pointers are now absent. No full workflow or benefit claim.",
+    "required_input_and_outcome": "Exercise vitals-before-open, cleanup exit 9 and a successful open/vitals/close control; retain actual cleanup evidence.",
+    "next_action": "Fresh exact-origin real-browser conformance, actual close/crash recovery and application/visual/field outcomes remain open.",
+    "additional_evidence": "Real exact-origin conformance, vitals-before-open rejection, repaired six-step synthetic-loopback execution and cleanup; model workflow not run.",
+    "paired_mechanism_evidence": {
+      "suites": [
+        "spec-test-browser-conformance-cleanup"
+      ],
+      "ref": "remaining-trials/paired-mechanisms-review.json",
+      "ceiling": "Selected deterministic harness only; no full model workflow acceptance."
+    },
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "wave5/CEOPT-29-packet.json",
+    "continuation_trials": [
+      "CEOPT-29-A1",
+      "CEOPT-29-A2",
+      "CEOPT-29-A3",
+      "CEOPT-29-B1",
+      "CEOPT-29-B2",
+      "CEOPT-29-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave5/independent-browser-review.json"
+  },
+  {
+    "id": "CEOPT-30",
+    "skill": "spec-test-xcode",
+    "status": "bounded-pass-full-partial",
+    "reason": "All six correctly distinguish actual supplied CLT readiness exit1 from unattempted app build/install/launch/test and separately reject synthetic tap-success navigation with unchanged Entries/Total12. Six source pins and all artifacts/traces/timings match with no observed truncation/contamination/execution. No actual app regression, positive MCP or source-bound runtime outcome.",
+    "required_input_and_outcome": "Exercise unavailable MCP and reported tap success with unchanged state; bind bundle identity and actual post-action evidence.",
+    "next_action": "Apple owner supplies full Xcode, actual project/scheme/app, simulator and callable provider before real execution.",
+    "input_binding_ref": "remaining-trials/remaining-input-bindings.json#CEOPT-30",
+    "external_prerequisites": [
+      "Real positive/tap-state coverage requires XcodeBuildMCP, a usable simulator and a concrete app. Their readiness was not probed in this read-only task.",
+      "Any manual-only action requires an actual human observation."
+    ],
+    "input_status": "source-bound-recipe; required new fixture variants not yet materialized",
+    "capability_observation": "xcodebuild -version exit 1: CommandLineTools selected, full Xcode unavailable.",
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "wave6/CEOPT-30-packet.json",
+    "continuation_trials": [
+      "CEOPT-30-A1",
+      "CEOPT-30-A2",
+      "CEOPT-30-A3",
+      "CEOPT-30-B1",
+      "CEOPT-30-B2",
+      "CEOPT-30-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave6/independent-xcode-review.json"
+  },
+  {
+    "id": "CEOPT-31",
+    "skill": "spec-work",
+    "status": "bounded-pass-full-partial",
+    "reason": "All six reject if(false)/assertion deletion and protect HTTP proof/launcher seam; historical baseline0/negative1 do not prove a missing accepted final tree. Exact design target and comparable capture absent; no implementation/visual completion. All36 source pins and6 fixture pins plus logs/traces match. A2 partial feedback-owner read and B2 unread Figma owner retained; no complete source-consumption claim.",
+    "required_input_and_outcome": "Execute a settled plan through Simplify with protected proof tests and same-frame Figma comparison; inspect final-tree reconciliation.",
+    "next_action": "Actual accepted implementation/proof preservation across cleanup and exact-frame design/browser comparison remain open; complete final source-bound required verification before closure.",
+    "input_binding_ref": "remaining-trials/remaining-input-bindings.json#CEOPT-31",
+    "external_prerequisites": [
+      "The genuine Figma comparison requires the exact design target/evidence and permitted browser screenshot capability. Neither is supplied by the inspected fixtures.",
+      "An absent Figma target is missing input, not automatically a missing host capability; capability readiness must be checked separately."
+    ],
+    "input_status": "source-bound-recipe; required new fixture variants not yet materialized",
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "wave6/CEOPT-31-packet.json",
+    "continuation_trials": [
+      "CEOPT-31-A1",
+      "CEOPT-31-A2",
+      "CEOPT-31-A3",
+      "CEOPT-31-B1",
+      "CEOPT-31-B2",
+      "CEOPT-31-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave6/independent-work-review.json"
+  },
+  {
+    "id": "CEOPT-32",
+    "skill": "spec-worktree",
+    "status": "bounded-pass-full-partial",
+    "reason": "Six model interpretations and original failure independently reviewed. Separate six native positive-path controls independently confirm A2/3 versus B3/3 intended outcomes; B attaches/tracks remote-only branch in linked checkout while A detaches. Both support clean nested create and tag detachment; exact current prose/help correction reviewed, operations unchanged. No autonomy, full filesystem, platform or field claim.",
+    "required_input_and_outcome": "Exercise linked worktree root, remote-only ref and legal local branch; inspect containment, tracking and checkout state.",
+    "next_action": "Autonomous caller execution, different-file-tree/dirty checkout, race/platform and actual hosted-remote outcomes remain open; clean nested creation, linked remote tracking and tag detachment already have independently reviewed local controls.",
+    "paired_mechanism_evidence": {
+      "suites": [
+        "spec-worktree-contracts"
+      ],
+      "ref": "remaining-trials/paired-mechanisms-review.json",
+      "ceiling": "Selected deterministic harness only; no full model workflow acceptance."
+    },
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "wave4/CEOPT-32-packet.json",
+    "continuation_trials": [
+      "CEOPT-32-A1",
+      "CEOPT-32-A1-retry1",
+      "CEOPT-32-A2",
+      "CEOPT-32-A3",
+      "CEOPT-32-B1",
+      "CEOPT-32-B2",
+      "CEOPT-32-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave4/independent-worktree-review.json"
+  },
+  {
+    "id": "CEOPT-33",
+    "skill": "spec-write-tasks",
+    "status": "bounded-source-consumer-pass-full-partial",
+    "reason": "Original drafts remain unchanged. Current Tasks false/null reporting, real negative receipt preservation, task-local proof and completion-versus-mutation semantics pass full source/consumer review; 51 related consumer tests passed.",
+    "required_input_and_outcome": "Provide unsafe future/link/.git/runtime task paths and reverse settled decisions; inspect derived eligibility and unchanged source plan.",
+    "next_action": "Any executable task-pack claim still requires current CLI receipt and semantic review. Actual autonomous task generation/execution and external done-signals remain open.",
+    "input_binding_ref": "remaining-trials/remaining-input-bindings.json#CEOPT-33",
+    "external_prerequisites": [],
+    "input_status": "source-bound-recipe; required new fixture variants not yet materialized",
+    "continuation_ref": "remaining-27-acceptance/coverage.md",
+    "continuation_packet": "wave2/CEOPT-33-packet.json",
+    "continuation_trials": [
+      "CEOPT-33-A1",
+      "CEOPT-33-A2",
+      "CEOPT-33-A3",
+      "CEOPT-33-B1",
+      "CEOPT-33-B2",
+      "CEOPT-33-B3"
+    ],
+    "full_frozen_coverage": "partial",
+    "comparison": "inconclusive",
+    "continuation_review_ref": "remaining-27-acceptance/wave2/independent-tasks-review.json",
+    "separate_followup": {
+      "followup_ref": "follow-up-20261031/final-report.md",
+      "followup_source_review_ref": "follow-up-20261031/independent-source-review.json",
+      "model_status": "original-block-and-current-source-followup-reviewed",
+      "candidate_acceptance": "bounded-source-consumer-pass-full-partial",
+      "conclusion": "Original drafts remain unchanged. Current Tasks false/null reporting, real negative receipt preservation, task-local proof and completion-versus-mutation semantics pass full source/consumer review; 51 related consumer tests passed.",
+      "optimization_recommendation": "Retain null only for no usable validation, preserve complete real negative CLI results, and keep task-local proof bindings. Do not block implementation solely on missing live completion evidence.",
+      "next_action": "Any executable task-pack claim still requires current CLI receipt and semantic review. Actual autonomous task generation/execution and external done-signals remain open.",
+      "next_owner": "Tasks/Work caller and real task owner",
+      "unblock_condition": "Exact executable plan/task pack, current valid CLI receipt, source-bound proof and observed external done-signals where required."
+    }
+  },
+  {
+    "id": "CEOPT-34",
+    "skill": "using-spec-first",
+    "status": "bounded-task-pass-full-acceptance-partial",
+    "reason": "Four read-only response probes for the frozen routing facets. Does not exercise downstream filesystem mutation or live tool invocation; complete frozen end-to-end route acceptance remains partial.",
+    "baseline_trials": 3,
+    "candidate_trials": 3,
+    "baseline_pass": 3,
+    "candidate_pass": 3,
+    "semantic_review": "complete-independent-context",
+    "comparison": "inconclusive",
+    "next_action": "Complete remaining frozen facets and comparable execution evidence; see README.md. No benefit or default-adoption claim."
+  }
+]

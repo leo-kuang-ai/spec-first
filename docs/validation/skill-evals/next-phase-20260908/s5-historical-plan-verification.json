@@ -1,0 +1,48 @@
+{
+  "artifact_kind": "confirmed",
+  "claim_ceiling": "仅源码快照与确定性测试结果，不代表模型行为验收",
+  "head": "b557f8bc6f884f0fef460108e6279b31227c50fb",
+  "verified_at": "2026-09-08T07:06:44.451Z",
+  "command": "npx jest tests/unit/spec-plan-contracts.test.js tests/unit/spec-work-contracts.test.js tests/unit/task-pack-command.test.js tests/unit/spec-handoff-contracts.test.js tests/unit/spec-plan-quality-contracts.test.js tests/unit/eval-fixture-contracts.test.js tests/unit/spec-doc-review-task-pack-contracts.test.js tests/unit/active-docs-links.test.js tests/unit/changelog-format.test.js --runInBand",
+  "exit_code": 0,
+  "suites_passed": 9,
+  "tests_passed": 90,
+  "source_snapshots": [
+    {
+      "path": "skills/spec-plan/SKILL.md",
+      "sha256": "ded9ff7fe82f7645ca9fdf62c53cdc6d47378458b774f36906eef6bddfeb1f82"
+    },
+    {
+      "path": "skills/spec-plan/references/plan-sections.md",
+      "sha256": "6de6fef4ac1dff9c585eac9e4fd2da1974166b1576bff9fba16c33efcfd66ad0"
+    },
+    {
+      "path": "skills/spec-plan/evals/examples.json",
+      "sha256": "1d12ae88324e1899f335b3c18d5172cb14fc7cf82b3a6c8f5e1611b9212543a7"
+    },
+    {
+      "path": "skills/spec-work/SKILL.md",
+      "sha256": "b1ce9ee065125b59fc9d7f346dc05e69d3611a5d2b6806ba4f2d2624d0d135bf"
+    },
+    {
+      "path": "skills/spec-work/references/work-intake-and-task-pack.md",
+      "sha256": "57db393caa33fd44d5f7fe27c762758fe1d4ee42207aa1e806bbe5702bb54303"
+    },
+    {
+      "path": "skills/spec-write-tasks/SKILL.md",
+      "sha256": "ad4decabc11124b24bfe45b850ba1f4e959f86340159bb5ebdbd90bc8e04c8e2"
+    },
+    {
+      "path": "tests/unit/spec-plan-contracts.test.js",
+      "sha256": "3aa95d81e336044cf4ceaba413933f51e27617bb3ec58f1d7b98ec4b82725851"
+    },
+    {
+      "path": "tests/unit/spec-work-contracts.test.js",
+      "sha256": "32a584ba5d5a3769ada91b3f550874b469459011634b6ad0aca5a66488a2ab01"
+    }
+  ],
+  "limitations": [
+    "合同与场景定义不证明模型端到端执行",
+    "未运行目标模型、完整主宿主旅程或消融"
+  ]
+}

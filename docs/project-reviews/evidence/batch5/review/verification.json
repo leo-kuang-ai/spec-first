@@ -1,0 +1,65 @@
+{
+  "schema": "s07-batch5-fixture-check/v1",
+  "status": "passed",
+  "base_commit_created": "a8762833e25a8dd2e523040ef88d4b34af02e27d",
+  "patch_check": "passed",
+  "changed_files": [
+    "lib/amount.cjs",
+    "lib/http.cjs",
+    "lib/ledger.cjs",
+    "lib/receipt.cjs"
+  ],
+  "baseline": {
+    "D1_amount_contract": {
+      "passed": true
+    },
+    "D2_tenant_isolation": {
+      "passed": true
+    },
+    "D3_retry_after_failure": {
+      "passed": true
+    },
+    "N1_formatting_preserved": {
+      "passed": true
+    }
+  },
+  "candidate": {
+    "D1_amount_contract": {
+      "passed": false,
+      "detail": "Expected values to be strictly equal:\n\n12.5 !== 1250\n"
+    },
+    "D2_tenant_isolation": {
+      "passed": false,
+      "detail": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'a',\n-   'b'\n  ]\n"
+    },
+    "D3_retry_after_failure": {
+      "passed": false,
+      "detail": "Expected values to be strictly equal:\n\n1 !== 2\n"
+    },
+    "N1_formatting_preserved": {
+      "passed": true
+    }
+  },
+  "base_smoke": "TAP version 13\n# Subtest: single request completes and repeated request is stable\nok 1 - single request completes and repeated request is stable\n  ---\n  duration_ms: 1.055333\n  type: 'test'\n  ...\n# Subtest: receipt formatting\nok 2 - receipt formatting\n  ---\n  duration_ms: 0.063792\n  type: 'test'\n  ...\n1..2\n# tests 2\n# suites 0\n# pass 2\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 52.86725",
+  "candidate_smoke": "TAP version 13\n# Subtest: single request completes and repeated request is stable\nok 1 - single request completes and repeated request is stable\n  ---\n  duration_ms: 0.778541\n  type: 'test'\n  ...\n# Subtest: receipt formatting\nok 2 - receipt formatting\n  ---\n  duration_ms: 0.047208\n  type: 'test'\n  ...\n1..2\n# tests 2\n# suites 0\n# pass 2\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 53.570416",
+  "batch_shape": "batch-shape-passed",
+  "limitations": [
+    "无模型调用；不证明审查检出率或Skill增益",
+    "纯内存provider；无真实支付或网络",
+    "隐藏判据不应提供给被测reviewer"
+  ],
+  "sha256": {
+    "README.md": "448f19c5552f8896f5819cb707e337c0ce9b3c3e08c21f47ab306fc4a10c86e4",
+    "candidate.patch": "75a3314e1bfbf84390a943fa903668329aef1e06b1550ed0f45c828c3fba4d98",
+    "fixture/README.md": "1d3e32e48aabe116016b90704e9178ca298cbb8aec30ab27f2d314c2899d31b6",
+    "fixture/lib/amount.cjs": "b299c4c379f0c86204dfb0a2c0df534b5d8db22f22f0c7272decfc6172d5dd1f",
+    "fixture/lib/http.cjs": "6e056560f3daae451688f94f9f8680407506266771e33cfc094e8d8941af86fb",
+    "fixture/lib/ledger.cjs": "b6bae153343c29a0c3fd4c19d6a4f66e72bdc92d50b709d9e70f11509092a563",
+    "fixture/lib/receipt.cjs": "d3a170a55a0929a6f21f7ad5f245c88a76b0ccca6645ab94e9d65889bfb4da6d",
+    "fixture/package.json": "29e9880195229d71404687c20bdf51e1eecfd181819aaa06898e4c40a50aadda",
+    "fixture/test/smoke.test.cjs": "52c9fe80c7a6df8f3a07e17f4e332d2cdc3512c3ed24ede72231dc7dd536aea2",
+    "private/frozen-criteria.md": "7cf3c864978b270294f4e2a0fbcf7a4033f920fcab0adc6b60c319e41f855616",
+    "private/oracle.cjs": "1a37c7e0604562bb9665892b1713dd184ea748bb5b9d0593e5d793ff7fc7aeb7",
+    "verify.py": "1e2bd9a0e0f9ca863e3ab129ad1ed0806974577f0f38dd59ea1096774671dfb0"
+  }
+}

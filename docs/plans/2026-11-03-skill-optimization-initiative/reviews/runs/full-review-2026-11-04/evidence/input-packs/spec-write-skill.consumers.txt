@@ -1,0 +1,12 @@
+# consumers: spec-write-skill
+tests/integration/spec-write-skill-authoring-preview.integration.test.js
+tests/unit/ce-post-3-20-calibration-contracts.test.js
+tests/unit/eval-fixture-contracts.test.js
+tests/unit/inspect-context-payload-smoke.test.js
+tests/unit/plugin-modules.test.js
+tests/unit/spec-write-skill-authoring-preview.test.js
+tests/unit/spec-write-skill-context-inspector.test.js
+tests/unit/spec-write-skill-contracts.test.js
+tests/unit/spec-write-skill-promotion-evidence.test.js
+tests/unit/spec-write-skill-target-payload.test.js
+tests/unit/spec-write-skill-validator.test.js

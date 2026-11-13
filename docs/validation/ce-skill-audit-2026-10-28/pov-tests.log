@@ -1,0 +1,12 @@
+PASS tests/unit/dispatch-authorization-matrix-contracts.test.js
+PASS tests/unit/review-peer-expansion-contracts.test.js
+PASS tests/unit/private-scratch-migration-contracts.test.js
+PASS tests/unit/fresh-repo-grounding-contracts.test.js
+PASS tests/unit/peer-job-runner-parity.test.js
+
+Test Suites: 5 passed, 5 total
+Tests:       63 passed, 63 total
+Snapshots:   0 total
+Time:        0.805 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/review-peer-expansion-contracts.test.js|tests\/unit\/peer-job-runner-parity.test.js|tests\/unit\/dispatch-authorization-matrix-contracts.test.js|tests\/unit\/private-scratch-migration-contracts.test.js|tests\/unit\/fresh-repo-grounding-contracts.test.js/i.
+Test results written to: docs/validation/ce-skill-audit-2026-10-28/pov-tests.json

@@ -1,0 +1,39 @@
+{
+  "profile": {
+    "source": "local",
+    "name": "S08-spec-compound-repair",
+    "path": null
+  },
+  "checks": [
+    {
+      "id": "session-tests",
+      "service": "local",
+      "command": "node node_modules/jest/bin/jest.js --runInBand --runTestsByPath tests/unit/session-history-scripts.test.js tests/unit/spec-compound-reference-contracts.test.js",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s08-spec-compound-resume2-20261102/logs/session-tests.txt",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    },
+    {
+      "id": "eval-json",
+      "service": "local",
+      "command": "node -e \"const f=require(\\\"fs\\\"); for(const p of [\\\"skills/spec-compound/evals/examples.json\\\",\\\"skills/spec-compound/evals/fixtures/false-causal-learning.json\\\"]) JSON.parse(f.readFileSync(p,\\\"utf8\\\"))\"",
+      "status": "passed",
+      "exit_code": 0,
+      "ran": true,
+      "required_tools": [
+        "node"
+      ],
+      "missing_tools": [],
+      "log_path": ".spec-first/workflows/spec-debug/spec-first/s08-spec-compound-resume2-20261102/logs/eval-json.txt",
+      "reason_code": "executed",
+      "redaction_status": "none-required"
+    }
+  ]
+}

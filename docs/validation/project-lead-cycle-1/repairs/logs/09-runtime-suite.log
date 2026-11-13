@@ -1,0 +1,43 @@
+
+> spec-first@1.15.3 test:mcp-setup
+> node scripts/run-test-suite.cjs mcp-setup
+
+PASS tests/unit/plugin-modules.test.js (45.728 s)
+PASS tests/unit/mcp-setup-node-contracts.test.js (17.311 s)
+PASS tests/unit/mcp-setup-workspace-graph-build.test.js (10.22 s)
+PASS tests/unit/mcp-setup-workspace-graph-status.test.js (9.422 s)
+PASS tests/unit/mcp-setup-workspace-graph-executor.test.js (8.395 s)
+PASS tests/unit/mcp-setup-workspace-graph-clean.test.js (5.582 s)
+PASS tests/unit/mcp-setup-workspace-graph-entry.test.js (5.166 s)
+PASS tests/unit/mcp-setup-providers.test.js
+PASS tests/unit/mcp-setup-workspace-child-hook.test.js
+PASS tests/unit/mcp-setup-config-consumers.test.js
+PASS tests/unit/mcp-setup-process-runner.test.js
+PASS tests/unit/mcp-setup-host-config.test.js
+PASS tests/unit/mcp-setup-workspace-git-exclude.test.js
+PASS tests/unit/mcp-setup-workspace-target.test.js
+PASS tests/unit/mcp-setup-project-config.test.js
+PASS tests/unit/mcp-setup-workspace-provider-runners.test.js
+PASS tests/unit/mcp-setup-entrypoint.test.js (15.605 s)
+PASS tests/unit/mcp-setup-mode-target.test.js
+PASS tests/unit/mcp-setup-workspace-async-refresh.test.js
+PASS tests/unit/mcp-setup-workspace-parent-diagnostic.test.js
+PASS tests/unit/mcp-setup-registry.test.js
+PASS tests/unit/mcp-setup-facts-renderer.test.js
+PASS tests/unit/mcp-setup-workspace-lifecycle-lease.test.js
+PASS tests/unit/mcp-setup-powershell-contracts.test.js
+PASS tests/unit/mcp-setup-opencode-permissions.test.js
+PASS tests/unit/host-runtime-projection-contracts.test.js
+PASS tests/unit/mcp-setup-workspace-graph-artifacts.test.js
+PASS tests/unit/mcp-setup-workspace-routing-instruction.test.js
+PASS tests/unit/mcp-setup-preflight.test.js
+PASS tests/unit/mcp-setup-contracts.test.js
+PASS tests/unit/mcp-setup-workspace-routing-inject.test.js
+PASS tests/unit/mcp-setup-workspace-graph-scope.test.js
+PASS tests/unit/mcp-setup-workspace-graph-refresh.test.js
+
+Test Suites: 33 passed, 33 total
+Tests:       761 passed, 761 total
+Snapshots:   0 total
+Time:        134.516 s, estimated 141 s
+Ran all test suites matching /tests\/unit\/host-runtime-projection-contracts.test.js|tests\/unit\/mcp-setup-config-consumers.test.js|tests\/unit\/mcp-setup-contracts.test.js|tests\/unit\/mcp-setup-entrypoint.test.js|tests\/unit\/mcp-setup-facts-renderer.test.js|tests\/unit\/mcp-setup-host-config.test.js|tests\/unit\/mcp-setup-mode-target.test.js|tests\/unit\/mcp-setup-node-contracts.test.js|tests\/unit\/mcp-setup-opencode-permissions.test.js|tests\/unit\/mcp-setup-powershell-contracts.test.js|tests\/unit\/mcp-setup-preflight.test.js|tests\/unit\/mcp-setup-process-runner.test.js|tests\/unit\/mcp-setup-project-config.test.js|tests\/unit\/mcp-setup-providers.test.js|tests\/unit\/mcp-setup-registry.test.js|tests\/unit\/mcp-setup-workspace-async-refresh.test.js|tests\/unit\/mcp-setup-workspace-child-hook.test.js|tests\/unit\/mcp-setup-workspace-git-exclude.test.js|tests\/unit\/mcp-setup-workspace-graph-artifacts.test.js|tests\/unit\/mcp-setup-workspace-graph-build.test.js|tests\/unit\/mcp-setup-workspace-graph-clean.test.js|tests\/unit\/mcp-setup-workspace-graph-entry.test.js|tests\/unit\/mcp-setup-workspace-graph-executor.test.js|tests\/unit\/mcp-setup-workspace-graph-refresh.test.js|tests\/unit\/mcp-setup-workspace-graph-scope.test.js|tests\/unit\/mcp-setup-workspace-graph-status.test.js|tests\/unit\/mcp-setup-workspace-lifecycle-lease.test.js|tests\/unit\/mcp-setup-workspace-parent-diagnostic.test.js|tests\/unit\/mcp-setup-workspace-provider-runners.test.js|tests\/unit\/mcp-setup-workspace-routing-inject.test.js|tests\/unit\/mcp-setup-workspace-routing-instruction.test.js|tests\/unit\/mcp-setup-workspace-target.test.js|tests\/unit\/plugin-modules.test.js/i.

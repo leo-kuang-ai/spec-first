@@ -1,0 +1,9 @@
+PASS tests/unit/spec-debug-judge-calibration.test.js
+PASS tests/unit/spec-debug-fix-reference-contracts.test.js
+PASS tests/unit/spec-debug-contracts.test.js
+
+Test Suites: 3 passed, 3 total
+Tests:       20 passed, 20 total
+Snapshots:   0 total
+Time:        1.896 s
+Ran all test suites within paths "tests/unit/spec-debug-contracts.test.js", "tests/unit/spec-debug-fix-reference-contracts.test.js", "tests/unit/spec-debug-judge-calibration.test.js".

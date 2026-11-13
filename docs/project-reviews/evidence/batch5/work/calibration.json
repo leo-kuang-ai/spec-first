@@ -1,0 +1,42 @@
+{
+  "kind": "fixture_calibration",
+  "model_calls": 0,
+  "base_tests": {
+    "exit_code": 0,
+    "stdout": "\n> billing-svc@1.4.0 test\n> node --test\n\nTAP version 13\n# Subtest: discount applies from 10000 cents inclusive\nok 1 - discount applies from 10000 cents inclusive\n  ---\n  duration_ms: 0.522458\n  type: 'test'\n  ...\n# Subtest: form amount in yuan is stored as cents\nok 2 - form amount in yuan is stored as cents\n  ---\n  duration_ms: 0.642208\n  type: 'test'\n  ...\n# Subtest: create, pay and refund write audit entries\nok 3 - create, pay and refund write audit entries\n  ---\n  duration_ms: 1.754542\n  type: 'test'\n  ...\n# Subtest: total sums price * qty\nok 4 - total sums price * qty\n  ---\n  duration_ms: 0.540125\n  type: 'test'\n  ...\n# Subtest: ledger amount has two decimals and no symbol\nok 5 - ledger amount has two decimals and no symbol\n  ---\n  duration_ms: 0.523792\n  type: 'test'\n  ...\n1..5\n# tests 5\n# suites 0\n# pass 5\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 69.182208\n",
+    "stderr": ""
+  },
+  "base_oracle": {
+    "exit_code": 1,
+    "stdout": "{\n  \"results\": [\n    {\n      \"name\": \"实际HTTP成功、领域接入及金额兼容\",\n      \"pass\": false,\n      \"error\": \"Expected values to be strictly deep-equal:\\n+ actual - expected\\n\\n  {\\n+   status: 404\\n-   body: {\\n-     id: 'one',\\n-     status: 'cancelled'\\n-   },\\n-   status: 200\\n  }\\n\"\n    },\n    {\n      \"name\": \"重复取消幂等且审计一次\",\n      \"pass\": false,\n      \"error\": \"Expected values to be strictly equal:\\n\\n404 !== 200\\n\"\n    },\n    {\n      \"name\": \"paid拒绝取消且无副作用\",\n      \"pass\": false,\n      \"error\": \"Expected values to be strictly equal:\\n\\n404 !== 409\\n\"\n    },\n    {\n      \"name\": \"refunded拒绝取消且无副作用\",\n      \"pass\": false,\n      \"error\": \"Expected values to be strictly equal:\\n\\n404 !== 409\\n\"\n    },\n    {\n      \"name\": \"不存在返回404且无写入\",\n      \"pass\": true\n    }\n  ],\n  \"passed\": 1,\n  \"total\": 5\n}\n",
+    "stderr": ""
+  },
+  "reference_tests": {
+    "exit_code": 0,
+    "stdout": "\n> billing-svc@1.4.0 test\n> node --test\n\nTAP version 13\n# Subtest: discount applies from 10000 cents inclusive\nok 1 - discount applies from 10000 cents inclusive\n  ---\n  duration_ms: 0.517708\n  type: 'test'\n  ...\n# Subtest: form amount in yuan is stored as cents\nok 2 - form amount in yuan is stored as cents\n  ---\n  duration_ms: 0.661917\n  type: 'test'\n  ...\n# Subtest: create, pay and refund write audit entries\nok 3 - create, pay and refund write audit entries\n  ---\n  duration_ms: 1.715708\n  type: 'test'\n  ...\n# Subtest: total sums price * qty\nok 4 - total sums price * qty\n  ---\n  duration_ms: 0.538708\n  type: 'test'\n  ...\n# Subtest: ledger amount has two decimals and no symbol\nok 5 - ledger amount has two decimals and no symbol\n  ---\n  duration_ms: 0.562792\n  type: 'test'\n  ...\n1..5\n# tests 5\n# suites 0\n# pass 5\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 75.341833\n",
+    "stderr": ""
+  },
+  "reference_oracle": {
+    "exit_code": 0,
+    "stdout": "{\n  \"results\": [\n    {\n      \"name\": \"实际HTTP成功、领域接入及金额兼容\",\n      \"pass\": true\n    },\n    {\n      \"name\": \"重复取消幂等且审计一次\",\n      \"pass\": true\n    },\n    {\n      \"name\": \"paid拒绝取消且无副作用\",\n      \"pass\": true\n    },\n    {\n      \"name\": \"refunded拒绝取消且无副作用\",\n      \"pass\": true\n    },\n    {\n      \"name\": \"不存在返回404且无写入\",\n      \"pass\": true\n    }\n  ],\n  \"passed\": 5,\n  \"total\": 5\n}\n",
+    "stderr": ""
+  },
+  "mutants": {
+    "no_audit": {
+      "exit_code": 1,
+      "stdout": "{\n  \"results\": [\n    {\n      \"name\": \"实际HTTP成功、领域接入及金额兼容\",\n      \"pass\": true\n    },\n    {\n      \"name\": \"重复取消幂等且审计一次\",\n      \"pass\": false,\n      \"error\": \"Expected values to be strictly deep-equal:\\n+ actual - expected\\n\\n  [\\n    'invoice.create',\\n-   'invoice.cancel'\\n  ]\\n\"\n    },\n    {\n      \"name\": \"paid拒绝取消且无副作用\",\n      \"pass\": true\n    },\n    {\n      \"name\": \"refunded拒绝取消且无副作用\",\n      \"pass\": true\n    },\n    {\n      \"name\": \"不存在返回404且无写入\",\n      \"pass\": true\n    }\n  ],\n  \"passed\": 4,\n  \"total\": 5\n}\n",
+      "stderr": ""
+    },
+    "no_idempotency": {
+      "exit_code": 1,
+      "stdout": "{\n  \"results\": [\n    {\n      \"name\": \"实际HTTP成功、领域接入及金额兼容\",\n      \"pass\": true\n    },\n    {\n      \"name\": \"重复取消幂等且审计一次\",\n      \"pass\": false,\n      \"error\": \"Expected values to be strictly equal:\\n\\n409 !== 200\\n\"\n    },\n    {\n      \"name\": \"paid拒绝取消且无副作用\",\n      \"pass\": true\n    },\n    {\n      \"name\": \"refunded拒绝取消且无副作用\",\n      \"pass\": true\n    },\n    {\n      \"name\": \"不存在返回404且无写入\",\n      \"pass\": true\n    }\n  ],\n  \"passed\": 4,\n  \"total\": 5\n}\n",
+      "stderr": ""
+    },
+    "paid_allowed": {
+      "exit_code": 1,
+      "stdout": "{\n  \"results\": [\n    {\n      \"name\": \"实际HTTP成功、领域接入及金额兼容\",\n      \"pass\": true\n    },\n    {\n      \"name\": \"重复取消幂等且审计一次\",\n      \"pass\": true\n    },\n    {\n      \"name\": \"paid拒绝取消且无副作用\",\n      \"pass\": false,\n      \"error\": \"Expected values to be strictly equal:\\n\\n200 !== 409\\n\"\n    },\n    {\n      \"name\": \"refunded拒绝取消且无副作用\",\n      \"pass\": true\n    },\n    {\n      \"name\": \"不存在返回404且无写入\",\n      \"pass\": true\n    }\n  ],\n  \"passed\": 4,\n  \"total\": 5\n}\n",
+      "stderr": ""
+    }
+  },
+  "passed": true
+}

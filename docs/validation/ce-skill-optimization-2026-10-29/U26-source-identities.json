@@ -1,0 +1,13 @@
+{
+  "skills/spec-polish/SKILL.md": "629bccf39d24b682d49b9589035ccac7ea634055b385feac0e349ce71e25be26",
+  "skills/spec-polish/references/run.md": "272717e7bbc825104acb4e0e4177f00961673ad7a2bbdf7477386458e9445911",
+  "skills/spec-dogfood/references/phases.md": "87378121c56f5d29b6820212b230669db0cba1c2d92a1c8305cc546101f88004",
+  "skills/spec-dogfood/references/dogfood-report-template.md": "9d191bf3493e0a3786650de55bfd022c24b4c2ba295a563b8badd3ab81e5a92a",
+  "skills/spec-prototype/SKILL.md": "07563d5c500f0280de5adccce7be149558e3443d2f20bdeeec837f462435552a",
+  "skills/spec-prototype/references/craft-floor.md": "7955c45e3780875c35980e4fa57c3ffdf802ab6404977bd87599e1858b2c8f18",
+  "skills/spec-prototype/references/preview.md": "79e454110e1cbda2cabadfb7349a1c5ead213441a47dae686e1fbc662d6c6755",
+  "skills/spec-prototype/evals/cases/go-ahead-before-build.yaml": "16da6a08886c461b12bba0572d4f365dcb85b2f4927688bfe3f262292376a511",
+  "skills/spec-test-xcode/references/setup-and-build.md": "b95a896afaecc3faac598ac1de775614253ce82082210ced73937920887927ae",
+  "skills/spec-test-xcode/references/test-and-report.md": "dba45f36ce392bee821ea849e6e2537f110c8ab714d3f7e6ba0a9a88ebe4647a",
+  "skills/spec-work/references/implementation-loop.md": "7fc8a396ae871ec187eea0e0a6fb95cd11f654be84df6ef830d0a1bb71fd203c"
+}

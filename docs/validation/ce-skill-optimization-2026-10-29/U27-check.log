@@ -1,0 +1,28 @@
+PASS tests/unit/mcp-setup-command-display.test.js
+PASS tests/unit/mcp-setup-facts-renderer.test.js
+PASS tests/unit/setup-facts-malformed-entries.test.js
+PASS tests/unit/spec-worktree-contracts.test.js (6.457 s)
+PASS tests/unit/mcp-setup-host-config.test.js
+PASS tests/unit/mcp-setup-project-config.test.js
+PASS tests/unit/using-spec-first-contracts.test.js
+  ● Console
+
+    console.warn
+      using-spec-first Front Controller is 5680 bytes; the 5,200-byte target is advisory, not a token or behavior proof.
+
+      43 |
+      44 |     if (footprint > 5200) {
+    > 45 |       console.warn(
+         |               ^
+      46 |         `using-spec-first Front Controller is ${footprint} bytes; the 5,200-byte target is advisory, not a token or behavior proof.`,
+      47 |       );
+      48 |     }
+
+      at Object.warn (tests/unit/using-spec-first-contracts.test.js:45:15)
+
+
+Test Suites: 7 passed, 7 total
+Tests:       133 passed, 133 total
+Snapshots:   0 total
+Time:        9.251 s, estimated 11 s
+Ran all test suites matching /tests\/unit\/mcp-setup-command-display.test.js|tests\/unit\/mcp-setup-project-config.test.js|tests\/unit\/mcp-setup-host-config.test.js|tests\/unit\/mcp-setup-facts-renderer.test.js|tests\/unit\/setup-facts-malformed-entries.test.js|tests\/unit\/spec-pov-contracts.test.js|tests\/unit\/using-spec-first-contracts.test.js|tests\/unit\/spec-worktree-contracts.test.js/i.

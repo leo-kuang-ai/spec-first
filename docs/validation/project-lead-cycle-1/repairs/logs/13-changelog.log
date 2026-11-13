@@ -1,0 +1,8 @@
+PASS tests/unit/changelog-format.test.js
+PASS tests/unit/changelog-continuity.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        0.137 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/changelog-format.test.js|tests\/unit\/changelog-continuity.test.js/i.

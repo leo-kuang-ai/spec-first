@@ -1,0 +1,6 @@
+{
+  "session_id": "01a18af1-5e1b-7c13-8114-3f670686634a",
+  "transcript_sha256": "91076b2915bc7b255652374b1cd670521fb54df45d84d2e21d1c8d4cb903dc86",
+  "host_retry": "One 429; identical task retried serially.",
+  "serving_identity": "unauthenticated"
+}

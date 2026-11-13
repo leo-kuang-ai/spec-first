@@ -1,0 +1,8 @@
+{
+  "status": "blocked",
+  "host": null,
+  "candidates": [],
+  "authority_source": null,
+  "mutation_authorized": false,
+  "reason_code": "host-authority-required"
+}

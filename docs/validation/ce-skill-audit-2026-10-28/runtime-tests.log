@@ -1,0 +1,11 @@
+PASS tests/unit/mcp-setup-workspace-git-exclude.test.js
+PASS tests/unit/mcp-setup-workspace-routing-inject.test.js
+PASS tests/unit/runtime-setup-demand-policy.test.js
+PASS tests/unit/mcp-setup-config-consumers.test.js
+
+Test Suites: 4 passed, 4 total
+Tests:       33 passed, 33 total
+Snapshots:   0 total
+Time:        2.204 s
+Ran all test suites matching /tests\/unit\/mcp-setup-config-consumers.test.js|tests\/unit\/mcp-setup-workspace-routing-inject.test.js|tests\/unit\/mcp-setup-workspace-git-exclude.test.js|tests\/unit\/runtime-setup-demand-policy.test.js/i.
+Test results written to: docs/validation/ce-skill-audit-2026-10-28/runtime-tests.json

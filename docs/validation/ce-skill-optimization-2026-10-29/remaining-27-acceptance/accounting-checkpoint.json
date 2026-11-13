@@ -1,0 +1,71 @@
+{
+  "schema_version": "ce27-accounting-checkpoint/v1",
+  "created_at": "2026-10-31T12:29:19.787373+00:00",
+  "scope": "Full retained-record accounting; not full Skill execution or field acceptance.",
+  "scenario_count": 27,
+  "original_slots": 162,
+  "original_final_artifacts": 158,
+  "original_no_final": [
+    "CEOPT-16-B1",
+    "CEOPT-16-B2",
+    "CEOPT-26-B1",
+    "CEOPT-32-A1"
+  ],
+  "total_attempts": 175,
+  "total_final_artifacts": 170,
+  "successor_recovery_attempts": 13,
+  "original_contamination_retained": [
+    "CEOPT-28-A1"
+  ],
+  "review_refs": {
+    "CEOPT-01": "wave3/independent-autoresearch-review.json",
+    "CEOPT-04": "wave2/independent-commit-review.json",
+    "CEOPT-06": "wave1/independent-compound-review.json",
+    "CEOPT-07": "wave1/independent-refresh-review.json",
+    "CEOPT-08": "wave2/independent-debug-review.json",
+    "CEOPT-10": "wave5/independent-dogfood-worktree-supplement-review.json",
+    "CEOPT-11": "wave1/independent-explain-r2-review.json",
+    "CEOPT-12": "wave1/independent-handoff-review.json",
+    "CEOPT-13": "wave1/independent-ideate-r2-review.json",
+    "CEOPT-14": "wave6/independent-lfg-review.json",
+    "CEOPT-15": "wave3/independent-optimize-review.json",
+    "CEOPT-16": "wave1/independent-plan-original-review-review.json",
+    "CEOPT-17": "wave5/independent-polish-review.json",
+    "CEOPT-18": "wave6/independent-pov-review.json",
+    "CEOPT-19": "wave3/independent-prd-review.json",
+    "CEOPT-22": "wave5/independent-prototype-review.json",
+    "CEOPT-23": "wave6/independent-pr-feedback-review.json",
+    "CEOPT-24": "wave6/independent-media-review.json",
+    "CEOPT-25": "wave4/independent-runtime-review.json",
+    "CEOPT-26": "wave2/independent-simplify-review.json",
+    "CEOPT-27": "wave1/independent-strategy-review.json",
+    "CEOPT-28": "wave4/independent-sweep-review.json",
+    "CEOPT-29": "wave5/independent-browser-review.json",
+    "CEOPT-30": "wave6/independent-xcode-review.json",
+    "CEOPT-31": "wave6/independent-work-review.json",
+    "CEOPT-32": "wave4/independent-worktree-review.json",
+    "CEOPT-33": "wave2/independent-tasks-review.json"
+  },
+  "sweep_recovery": {
+    "trial_id": "CEOPT-28-A1-retry1",
+    "protocol_ref": "wave4/CEOPT-28-A1-recovery-protocol.json",
+    "review_ref": "wave4/independent-sweep-recovery-review.json",
+    "receipt_protocol_ref_limit": "The preserved receipt names the parent packet; the predispatch recovery protocol is the narrower companion linkage."
+  },
+  "checks": {
+    "trial_artifacts": 170,
+    "trial_traces": 175,
+    "review_hashes": 37,
+    "trace_hashes": 34,
+    "scenario_refs": 54,
+    "diagnostic_placeholders": 5
+  },
+  "overall_acceptance": "incomplete",
+  "comparison": "inconclusive; A is frozen dirty preoptimization spec-first, not direct CE execution",
+  "claim_limits": [
+    "Review coverage is not complete untruncated source ingestion by every subject.",
+    "Historical hash consistency is not authenticated serving or immutable historical provenance.",
+    "Recovery outputs never overwrite original failures.",
+    "Full host/provider/visual/human and autonomous outcomes are not established."
+  ]
+}

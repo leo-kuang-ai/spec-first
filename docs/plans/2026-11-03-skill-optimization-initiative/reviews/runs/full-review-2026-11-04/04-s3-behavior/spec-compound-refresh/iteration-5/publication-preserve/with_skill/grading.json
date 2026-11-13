@@ -1,0 +1,15 @@
+{
+  "expectations": [
+    {
+      "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound-refresh/evals/fixtures/scripts/check-publication-preserve.sh",
+      "passed": true,
+      "evidence": "PASS: 固定fixture的原件、引用、恢复与报告一致；非模型行为或通用语义证明"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 0,
+    "total": 1,
+    "pass_rate": 1
+  }
+}

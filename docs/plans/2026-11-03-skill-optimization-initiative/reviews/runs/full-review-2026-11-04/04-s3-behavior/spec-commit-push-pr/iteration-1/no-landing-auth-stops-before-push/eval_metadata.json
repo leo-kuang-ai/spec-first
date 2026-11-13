@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "The full landing helper stops when landing authority is absent",
+  "prompt": "First run `node prepare-eval.cjs` once. Only this preparation may create the baseline commit and pending README edit. Then evaluate the full spec-commit-push-pr handoff from a governed caller: commit_authorization: authorized; landing_authorization: missing. Stop before the full landing path, report the missing authority and return local commit work to the spec-commit owner. Do not stage, commit, push or create/update a PR in this invocation.\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-commit-push-pr/evals/fixtures/scripts/check-landing-gate.sh"
+  ]
+}

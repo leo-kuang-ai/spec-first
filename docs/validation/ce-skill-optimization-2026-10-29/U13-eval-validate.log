@@ -1,0 +1,33 @@
+spec-work: exit=0
+✓ eval.yaml is valid (loaded 10 case(s))
+
+spec-plan: exit=0
+✓ eval.yaml is valid (loaded 9 case(s))
+
+spec-code-review: exit=0
+✓ eval.yaml is valid (loaded 5 case(s))
+
+spec-prd: exit=0
+✓ eval.yaml is valid (loaded 6 case(s))
+
+spec-simplify-code: exit=0
+✓ eval.yaml is valid (loaded 4 case(s))
+
+spec-debug: exit=0
+✓ eval.yaml is valid (loaded 5 case(s))
+
+spec-doc-review: exit=0
+✓ eval.yaml is valid (loaded 6 case(s))
+
+spec-commit: exit=0
+✓ eval.yaml is valid (loaded 2 case(s))
+
+spec-commit-push-pr: exit=0
+✓ eval.yaml is valid (loaded 2 case(s))
+
+spec-handoff: exit=0
+✓ eval.yaml is valid (loaded 4 case(s))
+
+using-spec-first: exit=0
+✓ eval.yaml is valid (loaded 6 case(s))
+

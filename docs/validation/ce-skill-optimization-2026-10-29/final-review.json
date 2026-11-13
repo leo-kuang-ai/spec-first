@@ -1,0 +1,123 @@
+{
+  "status": "degraded",
+  "verdict": "Not ready",
+  "mutation_policy": "report-only",
+  "commit_authorization": "missing",
+  "scope": {
+    "base": "U31 frozen working-tree snapshot; HEAD alone is not the baseline",
+    "branch": "leo-2026-10-27-update",
+    "head_sha": "fe81bae9ee55ec336c85cf80c4a0460d86e3a412",
+    "pr_url": null,
+    "files_changed": 387
+  },
+  "intent": "Implement bounded CE-derived improvements while preserving Spec-First source ownership, authorization, proof and evidence boundaries.",
+  "intent_confidence": "explicit",
+  "reviewers": [
+    "producer-inline"
+  ],
+  "findings": [],
+  "actionable_findings": [],
+  "triage_groups": [],
+  "pre_existing_findings": [],
+  "requirements_completeness": {
+    "local_mechanisms": "verified within recorded unit checks",
+    "full_acceptance": "incomplete"
+  },
+  "learnings": [],
+  "agent_native_gaps": [],
+  "deployment_notes": [
+    "No commit, push, PR, global install or workspace runtime regeneration performed."
+  ],
+  "residual_risks": [
+    "U6: authenticated positive worker admission is unavailable; provider execution remains denied.",
+    "U29: all 34 frozen scenarios are accounted for, but baseline/candidate model runs and independent review are not-run.",
+    "U30: comparative quality, rework, context cost and time-to-trusted-change remain inconclusive.",
+    "Real Windows/PowerShell, browser, Xcode, remote publication and external media-provider outcomes are not verified.",
+    "Final review is producer-only and bounded; prior unit self-reviews are retained, not relabeled as independent review.",
+    "A fresh full source-plan semantic review envelope was not produced during final closeout; plan bytes remain unchanged.",
+    "Final checks have producer-transcribed evidence. The preparation-only transaction ledger is not a complete CAS execution record."
+  ],
+  "testing_gaps": [
+    "U6: authenticated positive worker admission is unavailable; provider execution remains denied.",
+    "U29: all 34 frozen scenarios are accounted for, but baseline/candidate model runs and independent review are not-run.",
+    "U30: comparative quality, rework, context cost and time-to-trusted-change remain inconclusive.",
+    "Real Windows/PowerShell, browser, Xcode, remote publication and external media-provider outcomes are not verified."
+  ],
+  "coverage": {
+    "task_scope": null,
+    "dispatch_reason_code": "dispatch_authorization_missing",
+    "scenario_capability": "partial",
+    "verification_evidence": {
+      "status": "recorded",
+      "run_summary_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-final-20261029/verification-run-summary.json",
+      "closeout_verdict": "degraded",
+      "reason_code": "required-acceptance-not-run",
+      "checks": [
+        "npm test",
+        "npm run typecheck",
+        "npm run lint:skill-entrypoints",
+        "npm run build"
+      ],
+      "limitations": [
+        "U6: authenticated positive worker admission is unavailable; provider execution remains denied.",
+        "U29: all 34 frozen scenarios are accounted for, but baseline/candidate model runs and independent review are not-run.",
+        "U30: comparative quality, rework, context cost and time-to-trusted-change remain inconclusive.",
+        "Real Windows/PowerShell, browser, Xcode, remote publication and external media-provider outcomes are not verified.",
+        "Final review is producer-only and bounded; prior unit self-reviews are retained, not relabeled as independent review.",
+        "A fresh full source-plan semantic review envelope was not produced during final closeout; plan bytes remain unchanged.",
+        "Final checks have producer-transcribed evidence. The preparation-only transaction ledger is not a complete CAS execution record."
+      ]
+    },
+    "review_source": "producer-self-review",
+    "independent_review": "not-run",
+    "prior_unit_reviews": [
+      "U1-review.md",
+      "U10-review.md",
+      "U11-review.md",
+      "U12-review.md",
+      "U13-review.md",
+      "U14-review.md",
+      "U15-review.md",
+      "U16-review.md",
+      "U17-review.md",
+      "U18-review.md",
+      "U19-review.md",
+      "U2-review.md",
+      "U20-review.md",
+      "U21-review.md",
+      "U22-review.md",
+      "U23-review.md",
+      "U24-review.md",
+      "U25-review.md",
+      "U26-review.md",
+      "U27-review.md",
+      "U28-review.md",
+      "U3-review.md",
+      "U32-review.md",
+      "U4-review.md",
+      "U5-review.md",
+      "U6-review.md",
+      "U7-review.md",
+      "U8-review.md",
+      "U9-review.md"
+    ],
+    "final_integration_scan": [
+      "Displayed command argv preservation and target kind",
+      "Eval baseline, HEAD/index and tenant-isolation integration",
+      "Stable snapshot seam versus production freshness",
+      "Suite registration and generated catalog consistency",
+      "POV grounding/subject evidence and Promote preference-write ordering"
+    ],
+    "all_changed_lines_re_reviewed_at_closeout": false
+  },
+  "artifact_path": null,
+  "artifact_write_status": "written",
+  "run_id": "ce-opt-final-20261029",
+  "resolved_integration_findings": [
+    "Registered the command-display suite and refreshed the runtime catalog.",
+    "Corrected stale mirror-search assertions and the explicit-transcription fixture.",
+    "Isolated the output-immutability test from concurrent evidence-log changes without weakening production snapshot checks.",
+    "Restored explicit Sweep staging boundaries.",
+    "Updated disk-evidence guard fixtures to require baseline identity and actual tenant isolation."
+  ]
+}

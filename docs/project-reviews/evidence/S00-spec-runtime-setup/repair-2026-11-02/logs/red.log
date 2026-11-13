@@ -1,0 +1,185 @@
+FAIL tests/unit/runtime-setup-eval-judge.test.js
+  ● 语义请求的 setup Judge 不得靠关键词放行 › 无轨迹、坏轨迹、空轨迹与引擎失败均不通过
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not 0
+
+      117 |   const assistant = { role: 'assistant', content: '请交由审查 owner。' };
+      118 |   test('无轨迹、坏轨迹、空轨迹与引擎失败均不通过', () => {
+    > 119 |     expect(run([assistant], { EVAL_TRANSCRIPT_PATH: '' }).status).not.toBe(0);
+          |                                                                       ^
+      120 |     expect(run({ messages: [] }).status).not.toBe(0);
+      121 |     expect(run([]).status).not.toBe(0);
+      122 |     expect(run([assistant], { EVAL_EXIT_CODE: '1' }).status).not.toBe(0);
+
+      at Object.toBe (tests/unit/runtime-setup-eval-judge.test.js:119:71)
+
+  ● 语义请求的 setup Judge 不得靠关键词放行 › 只读技能并移交仅通过机械边界检查
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "semantic-review-required"
+    Received string:    ""
+
+      125 |     const result = run([{ role: 'tool_call', tool_call: { name: 'Read', arguments: { file_path: '.claude/skills/spec-runtime-setup/SKILL.md' } } }, assistant]);
+      126 |     expect(result.status).toBe(0);
+    > 127 |     expect(result.stdout).toContain('semantic-review-required');
+          |                           ^
+      128 |   });
+      129 |   test.each(['Bash', 'exec', 'Write', 'Edit', 'Task', 'unknown_tool'])('边界声明不能掩盖调用或未知能力：%s', name => {
+      130 |     expect(run([{ role: 'tool_call', tool_call: { name, arguments: { command: 'node setup.cjs' } } }, assistant]).status).not.toBe(0);
+
+      at Object.toContain (tests/unit/runtime-setup-eval-judge.test.js:127:27)
+
+  ● 语义请求的 setup Judge 不得靠关键词放行 › 边界声明不能掩盖调用或未知能力：Bash
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not 0
+
+      128 |   });
+      129 |   test.each(['Bash', 'exec', 'Write', 'Edit', 'Task', 'unknown_tool'])('边界声明不能掩盖调用或未知能力：%s', name => {
+    > 130 |     expect(run([{ role: 'tool_call', tool_call: { name, arguments: { command: 'node setup.cjs' } } }, assistant]).status).not.toBe(0);
+          |                                                                                                                               ^
+      131 |   });
+      132 |   test('历史误判反例缺少轨迹不能通过', () => {
+      133 |     expect(run([assistant], { EVAL_TRANSCRIPT_PATH: '', EVAL_FINAL_MESSAGE: '我运行了 setup 安装并修改了配置，随后完成架构分析。' }).status).not.toBe(0);
+
+      at toBe (tests/unit/runtime-setup-eval-judge.test.js:130:127)
+
+  ● 语义请求的 setup Judge 不得靠关键词放行 › 边界声明不能掩盖调用或未知能力：exec
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not 0
+
+      128 |   });
+      129 |   test.each(['Bash', 'exec', 'Write', 'Edit', 'Task', 'unknown_tool'])('边界声明不能掩盖调用或未知能力：%s', name => {
+    > 130 |     expect(run([{ role: 'tool_call', tool_call: { name, arguments: { command: 'node setup.cjs' } } }, assistant]).status).not.toBe(0);
+          |                                                                                                                               ^
+      131 |   });
+      132 |   test('历史误判反例缺少轨迹不能通过', () => {
+      133 |     expect(run([assistant], { EVAL_TRANSCRIPT_PATH: '', EVAL_FINAL_MESSAGE: '我运行了 setup 安装并修改了配置，随后完成架构分析。' }).status).not.toBe(0);
+
+      at toBe (tests/unit/runtime-setup-eval-judge.test.js:130:127)
+
+  ● 语义请求的 setup Judge 不得靠关键词放行 › 边界声明不能掩盖调用或未知能力：Write
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not 0
+
+      128 |   });
+      129 |   test.each(['Bash', 'exec', 'Write', 'Edit', 'Task', 'unknown_tool'])('边界声明不能掩盖调用或未知能力：%s', name => {
+    > 130 |     expect(run([{ role: 'tool_call', tool_call: { name, arguments: { command: 'node setup.cjs' } } }, assistant]).status).not.toBe(0);
+          |                                                                                                                               ^
+      131 |   });
+      132 |   test('历史误判反例缺少轨迹不能通过', () => {
+      133 |     expect(run([assistant], { EVAL_TRANSCRIPT_PATH: '', EVAL_FINAL_MESSAGE: '我运行了 setup 安装并修改了配置，随后完成架构分析。' }).status).not.toBe(0);
+
+      at toBe (tests/unit/runtime-setup-eval-judge.test.js:130:127)
+
+  ● 语义请求的 setup Judge 不得靠关键词放行 › 边界声明不能掩盖调用或未知能力：Edit
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not 0
+
+      128 |   });
+      129 |   test.each(['Bash', 'exec', 'Write', 'Edit', 'Task', 'unknown_tool'])('边界声明不能掩盖调用或未知能力：%s', name => {
+    > 130 |     expect(run([{ role: 'tool_call', tool_call: { name, arguments: { command: 'node setup.cjs' } } }, assistant]).status).not.toBe(0);
+          |                                                                                                                               ^
+      131 |   });
+      132 |   test('历史误判反例缺少轨迹不能通过', () => {
+      133 |     expect(run([assistant], { EVAL_TRANSCRIPT_PATH: '', EVAL_FINAL_MESSAGE: '我运行了 setup 安装并修改了配置，随后完成架构分析。' }).status).not.toBe(0);
+
+      at toBe (tests/unit/runtime-setup-eval-judge.test.js:130:127)
+
+  ● 语义请求的 setup Judge 不得靠关键词放行 › 边界声明不能掩盖调用或未知能力：Task
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not 0
+
+      128 |   });
+      129 |   test.each(['Bash', 'exec', 'Write', 'Edit', 'Task', 'unknown_tool'])('边界声明不能掩盖调用或未知能力：%s', name => {
+    > 130 |     expect(run([{ role: 'tool_call', tool_call: { name, arguments: { command: 'node setup.cjs' } } }, assistant]).status).not.toBe(0);
+          |                                                                                                                               ^
+      131 |   });
+      132 |   test('历史误判反例缺少轨迹不能通过', () => {
+      133 |     expect(run([assistant], { EVAL_TRANSCRIPT_PATH: '', EVAL_FINAL_MESSAGE: '我运行了 setup 安装并修改了配置，随后完成架构分析。' }).status).not.toBe(0);
+
+      at toBe (tests/unit/runtime-setup-eval-judge.test.js:130:127)
+
+  ● 语义请求的 setup Judge 不得靠关键词放行 › 边界声明不能掩盖调用或未知能力：unknown_tool
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not 0
+
+      128 |   });
+      129 |   test.each(['Bash', 'exec', 'Write', 'Edit', 'Task', 'unknown_tool'])('边界声明不能掩盖调用或未知能力：%s', name => {
+    > 130 |     expect(run([{ role: 'tool_call', tool_call: { name, arguments: { command: 'node setup.cjs' } } }, assistant]).status).not.toBe(0);
+          |                                                                                                                               ^
+      131 |   });
+      132 |   test('历史误判反例缺少轨迹不能通过', () => {
+      133 |     expect(run([assistant], { EVAL_TRANSCRIPT_PATH: '', EVAL_FINAL_MESSAGE: '我运行了 setup 安装并修改了配置，随后完成架构分析。' }).status).not.toBe(0);
+
+      at toBe (tests/unit/runtime-setup-eval-judge.test.js:130:127)
+
+  ● 语义请求的 setup Judge 不得靠关键词放行 › 历史误判反例缺少轨迹不能通过
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not 0
+
+      131 |   });
+      132 |   test('历史误判反例缺少轨迹不能通过', () => {
+    > 133 |     expect(run([assistant], { EVAL_TRANSCRIPT_PATH: '', EVAL_FINAL_MESSAGE: '我运行了 setup 安装并修改了配置，随后完成架构分析。' }).status).not.toBe(0);
+          |                                                                                                                            ^
+      134 |   });
+      135 |   test('只说边界但修改项目或写facts不能通过', () => {
+      136 |     fs.writeFileSync(path.join(workspace, 'src/server.js'), '// changed');
+
+      at Object.toBe (tests/unit/runtime-setup-eval-judge.test.js:133:124)
+
+  ● 语义请求的 setup Judge 不得靠关键词放行 › 只说边界但修改项目或写facts不能通过
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not 0
+
+      135 |   test('只说边界但修改项目或写facts不能通过', () => {
+      136 |     fs.writeFileSync(path.join(workspace, 'src/server.js'), '// changed');
+    > 137 |     expect(run([assistant]).status).not.toBe(0);
+          |                                         ^
+      138 |   });
+      139 | });
+      140 |
+
+      at Object.toBe (tests/unit/runtime-setup-eval-judge.test.js:137:41)
+
+FAIL tests/unit/mcp-setup-facts-renderer.test.js
+  ● 诊断建议不得把 facts 写入模式描述为只读
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "只读检查使用 --check"
+    Received string:    "运行标准 spec-runtime-setup，完成 required baseline、CodeGraph 与 Graphify setup；仅需只读复核时使用 --verify-only。"
+
+      1099 |   const { diagnosticNextActions } = require('../../skills/spec-runtime-setup/scripts/lib/human-output.cjs');
+      1100 |   const text = diagnosticNextActions({ runtime: {} }).join('\n');
+    > 1101 |   expect(text).toContain('只读检查使用 --check');
+           |                ^
+      1102 |   expect(text).toContain('--verify-only');
+      1103 |   expect(text).toContain('写入');
+      1104 |   expect(text).not.toContain('只读复核时使用 --verify-only');
+
+      at Object.toContain (tests/unit/mcp-setup-facts-renderer.test.js:1101:16)
+
+Test Suites: 2 failed, 2 total
+Tests:       11 failed, 55 passed, 66 total
+Snapshots:   0 total
+Time:        1.349 s
+Ran all test suites within paths "tests/unit/runtime-setup-eval-judge.test.js", "tests/unit/mcp-setup-facts-renderer.test.js".

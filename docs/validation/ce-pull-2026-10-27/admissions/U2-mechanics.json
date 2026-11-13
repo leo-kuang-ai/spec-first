@@ -1,0 +1,133 @@
+{
+  "schema_version": "ce-upstream-sync-run/v1",
+  "kind": "package-admission",
+  "window_sha256": "bb4a1a7ca1515046fd41ef4809eda8446ca4974ed315a40897f99dec6fd79935",
+  "input_sha256": "79d5f5050420c069013547d07512c539fe3aa07dbf0b91aa12c66e6f6b0819c2",
+  "target_snapshot": {
+    "repository": "spec-first",
+    "head": "fe81bae9ee55ec336c85cf80c4a0460d86e3a412",
+    "dirty": true,
+    "dirty_paths": [
+      "CHANGELOG.md",
+      "docs/contracts/verification/ce-upstream-sync-run.md",
+      "docs/contracts/verification/ce-upstream-sync-run.schema.json",
+      "docs/plans/2026-10-27-001-refactor-ce-upstream-sync-technical-scheme.md",
+      "scripts/check-ce-upstream-reconciliation.cjs",
+      "skills/spec-code-review/references/diff-scope.md",
+      "skills/spec-code-review/references/personas/maintainability-reviewer.md",
+      "skills/spec-code-review/references/personas/reliability-reviewer.md",
+      "skills/spec-code-review/references/personas/testing-reviewer.md",
+      "skills/spec-commit-push-pr/references/branch-creation.md",
+      "skills/spec-compound/references/session-history.md",
+      "skills/spec-compound/scripts/session-history/extract-metadata.py",
+      "tests/unit/ce-upstream-reconciliation-v2.test.js",
+      "tests/unit/session-history-scripts.test.js",
+      "tests/unit/spec-commit-push-pr-context-contracts.test.js"
+    ],
+    "dirty_path_manifest_sha256": "91426a4ea76756e4055d880194b5805e3b8289e0e9834ec00bdbb9eac1b2fa60",
+    "source_tree_hash": "246dfe98a7e08942f2e3dd5b83b2ade949a2fc51d6aff3498b64f794c354c9af",
+    "inventory_hash": "32502c7fc1865efbc3143fce369b7f87af51eb18cca5e35c887637962ed2e4ba",
+    "scope_contract": {
+      "source_roots": [
+        "CLAUDE.md",
+        "AGENTS.md",
+        "skills",
+        "templates",
+        "src",
+        "scripts",
+        "tests",
+        "docs",
+        "README.md",
+        "README.en.md",
+        "README.zh-CN.md",
+        "CHANGELOG.md",
+        "package.json"
+      ],
+      "excluded_run_outputs": [
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-name-status.md",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication-input.json",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.md",
+        "docs/validation/2026-08-19-spec-first-current-skill-package-inventory-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-evidence-exceptions.json",
+        "docs/validation/ce-pull-2026-10-27/window-facts.json",
+        "docs/validation/ce-pull-2026-10-27/execution-state.json",
+        "docs/validation/ce-pull-2026-10-27/execution-baseline.json",
+        "docs/validation/ce-pull-2026-10-27/producer-name-status.tsv",
+        "docs/validation/ce-pull-2026-10-27/target-source-inventory.json",
+        "docs/validation/ce-pull-2026-10-27/adjudication-input.json",
+        "docs/validation/ce-pull-2026-10-27/adjudication.json",
+        "docs/validation/ce-pull-2026-10-27/ledger.json",
+        "docs/validation/ce-pull-2026-10-27/summary.md",
+        "docs/validation/ce-pull-2026-10-27/artifact-set.json",
+        "docs/validation/ce-pull-2026-10-27/work-return.json",
+        "docs/validation/ce-pull-2026-10-27/verification-run-summary.json",
+        "docs/validation/ce-pull-2026-10-27/honest-closeout.md",
+        "docs/validation/ce-pull-2026-10-27/handoff.json",
+        "docs/validation/ce-pull-2026-10-27/semantic-screening.json",
+        "docs/validation/ce-pull-2026-10-27/plan-review.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/window-facts.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/execution-state.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/execution-baseline.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/producer-name-status.tsv",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/target-source-inventory.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/adjudication-input.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/adjudication.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/ledger.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/summary.md",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/artifact-set.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/work-return.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/verification-run-summary.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/honest-closeout.md",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/handoff.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/semantic-screening.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/plan-review.json",
+        "docs/validation/ce-pull-2026-10-27/logs/**",
+        "docs/validation/ce-pull-2026-10-27/owner-receipts/**",
+        "docs/validation/ce-pull-2026-10-27/admissions/**",
+        "docs/validation/ce-pull-2026-10-27/ledger-patches/**",
+        "docs/validation/ce-pull-2026-10-27/staging/**",
+        "docs/validation/2026-08-19-ce-post-3-20-ledger-patches/**",
+        "docs/validation/ce-localization/**"
+      ]
+    },
+    "hash_algorithm": {
+      "name": "sha256",
+      "version": "canonical-source-manifest-v1"
+    }
+  },
+  "source_refs": [
+    "docs/plans/2026-10-27-001-refactor-ce-upstream-sync-technical-scheme.md",
+    "skills/spec-code-review/scripts/findings-mechanics.py",
+    "skills/spec-code-review/references/finish-review.md",
+    "skills/spec-code-review/references/findings-schema.json",
+    "skills/spec-code-review/references/cross-model-review.md"
+  ],
+  "limitations": [
+    "本次仅 findings mechanics 及对应合并合同；finish-review 其余差额未闭合",
+    "producer 自审，不是独立或真实模型效果验证"
+  ],
+  "unresolved": [],
+  "package_id": "skills/ce-code-review",
+  "unit_id": "U2",
+  "paths": [
+    "skills/ce-code-review/scripts/findings-mechanics.py",
+    "skills/ce-code-review/references/finish-review.md"
+  ],
+  "decisions": [
+    {
+      "path": "skills/ce-code-review/scripts/findings-mechanics.py",
+      "target_action": "compose",
+      "rationale": "采纳经验证 cross-model peer 才能触发 agreement promotion 与完整 evidence 首项回填；保留本地正整数行号、普通 persona contributor 合并和 source gate。"
+    },
+    {
+      "path": "skills/ce-code-review/references/finish-review.md",
+      "target_action": "compose",
+      "rationale": "同步明确同模型 persona 共识不自动提分及 evidence 回填合同；其余 validator/depth/finish-input 迁移仍待独立逐文件审查，不借此关闭整文件。"
+    }
+  ],
+  "review_ref": "docs/validation/ce-pull-2026-10-27/execution-state.json",
+  "authority_ref": "docs/validation/ce-pull-2026-10-27/execution-state.json",
+  "dependency_refs": []
+}

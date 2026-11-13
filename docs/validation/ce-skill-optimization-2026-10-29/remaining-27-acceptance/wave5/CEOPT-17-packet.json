@@ -1,0 +1,34 @@
+{
+  "id": "CEOPT-17",
+  "skill": "spec-polish",
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/CEOPT-17-request.txt",
+  "request_sha256": "f68f3392750d2b4c62bebba30c562bb72e602ecb62dd5c6aad7e37238ff0d0be",
+  "input_files": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/page-lifecycle-receipt.json": "3434bf5fc109fffe5aed7d4319d074126197eccfa984cce5340c4857f1072c7d",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/feedback-fixture.json": "85fde21ef065b3bd8edd87217b1d1d64b464076de6517860f1fe2f3a7de07950"
+  },
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "deadline_seconds": 300,
+  "parent_recipe": "Save exact read-only response; independently review all supplied actual/local/synthetic evidence. No model autonomous browser operation.",
+  "status": "prepared-not-executed",
+  "limitations": [
+    "Synthetic local page/feedback and parent execution do not prove product visual acceptance, human decisions or autonomous browser workflow."
+  ],
+  "arm_receipts": {
+    "A": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/polish-A-receipts.json",
+      "sha256": "a0934a10c93eb9f7c38f6be37e641deb2e475a017d9e63b8a36e16e16c1e460e"
+    },
+    "B": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave5/polish-B-receipts.json",
+      "sha256": "bf6fe64d99a997edca200eb89c0859b6d953c5f5c85429967bed55cb4029d6ff"
+    }
+  }
+}

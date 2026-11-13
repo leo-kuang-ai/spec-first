@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-worktree",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T21:01:03.800568+08:00",
+  "end_time": "2026-11-04T21:03:08.629061+08:00",
+  "case_results": [
+    {
+      "case_id": "unborn-repo-create-refuses",
+      "title": "零提交仓库 create 必须结构化拒绝，不得裸用 git worktree add",
+      "status": "PASS",
+      "duration_ms": 124381,
+      "turns": 5,
+      "input_tokens": 27191,
+      "output_tokens": 3086,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 5,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-worktree/evals/fixtures/scripts/check-unborn-refuses.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-worktree skill 已安装，请按它工作。你是 governed caller，\ncaller 身份=并行特性开发，target repo=当前仓库，新分支名 feat-x，\n隔离原因=保持主分支干净，允许副作用=.worktrees 与 .gitignore 条目。）\n请按 skill 为当前仓库建立隔离并汇报。\n",
+      "response": "核查完毕，按 skill 契约在此**停止并汇报**，等待你决定恢复路径。\n\n## 执行汇报\n\n**Step 0 检测**：`state=ordinary-checkout`（`reason_code=same-git-dir`），主检出即仓库根，分支 `main`，未隔离 → 允许创建。\n\n**Step 1 创建**（new-work 模式，`create feat-x`，未带 `--copy-env`——intake 未授权环境文件复制，走默认不复制）：脚本**结构化拒绝**，退出码 1：\n\n```\nError: base ref 'main' does not resolve to a commit (empty or unborn repository)\nreason_code=base-ref-unresolvable base_ref=main\n```\n\n**根因**：仓库无任何提交（`git rev-parse --verify HEAD` 失败，HEAD unborn，`git worktree list` 显示 `0000000 [main]`）；且无 `origin` 远端，fetch 失败后按契约回退本地 ref，本地 `main` 同样解析不到 commit。\n\n**实际副作用核查**（契约要求核查而非假设零写入）：**零副作用** —— 未创建 worktree、无 `.worktrees/` 目录、`.gitignore` 未改动，仅存主检出。\n\n## 为什么我停在这里\n\nSkill 契约明确：脚本失败即契约失败，禁止回退裸 `git worktree add`，也禁止自行\"清除障碍\"——包括播种初始提交、配置远端等一切超出授权副作用（你仅授权 `.worktrees` 与 `.gitignore` 条目）的仓库状态变更。初始提交到 `main` 属于授权范围外的状态变更，须由 caller 决定。\n\n## 恢复选项（请你决定）\n\n1. **运行仓库自带的 `./prepare-worktree-fixture.sh`**——其自述为\"评测环境准备：建立初始提交，不属于被测行为\"。注意它会 `git add -A` 把当前全部未跟踪文件（`README.md`、`package.json`、`src/`、`.claude/` 等）一并提交。你可自行运行，或明确授权我运行。\n2. **你手动做任意初始提交**（可只提交选定文件），保持对首个提交内容的控制。\n3. （可选）如需基于远端默认分支建分支，先配置 `origin`；本场景非必需。\n\n任一选项完成后我重跑 `create feat-x` 即可完成隔离；若届时需要 `.env*` 进入 worktree，请一并明示，我将加 `--copy-env`。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 30277,
+  "judge_tokens": 0,
+  "overall_tokens": 30277
+}

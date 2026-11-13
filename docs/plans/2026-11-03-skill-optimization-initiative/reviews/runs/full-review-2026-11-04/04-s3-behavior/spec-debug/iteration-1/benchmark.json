@@ -1,0 +1,147 @@
+{
+  "metadata": {
+    "skill_name": "spec-debug",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-debug",
+    "timestamp": "2026-11-04T11:42:36Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "Diagnosis-only requests deliver the causal chain without changing source",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 240.042,
+        "tokens": 33479,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-debug/evals/fixtures/scripts/check-diagnosis-no-fix.sh",
+          "passed": false,
+          "evidence": "script exited with code 1 [stderr: node:fs:1722\n  const stats = binding.lstat(\n                        ^\n\nError: ENOENT: no such file or directory, lstat '.git/eval-baseline.json'\n    at Object.lstatSync (node:fs:1722:25)\n    at regular ([stdin]:18:21)\n    at checkFixture ([stdin]:51:31)\n    at [stdin]:85:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3) {\n  errno: -2,\n  code: 'ENOENT',\n  syscall: 'lstat',\n  path: '.git/eval-baseline.json'\n}\n\nNode.js v22.22.3]"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Repair authority permits a verified fix but no task commit",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 569.619,
+        "tokens": 57860,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-debug/evals/fixtures/scripts/check-fixed-no-commit.sh",
+          "passed": true,
+          "evidence": "PASS: invalid JSON rejected, process survives, valid entries preserved, no new reachable commit"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Ask for prior attempts before starting a new investigation",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 245.161,
+        "tokens": 45740,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-debug/evals/fixtures/scripts/check-prior-attempt-ask.sh",
+          "passed": false,
+          "evidence": "script exited with code 1 [stderr: node:internal/assert/utils:77\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: The prior attempts were not requested\n    at priorAttemptQuestion ([stdin]:20:10)\n    at [stdin]:49:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Diagnosis-only preserves the complete implementation baseline",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 211.06,
+        "tokens": 40892,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-debug/evals/fixtures/scripts/check-diagnosis-no-fix.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "Ask for prior attempts before starting a new investigation",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 210.932,
+        "tokens": 50539,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-debug/evals/fixtures/scripts/check-r2-prior-ask.sh",
+          "passed": false,
+          "evidence": "script exited with code 1 [stderr: node:internal/assert/utils:77\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: The prior attempts were not requested\n    at priorAttemptQuestion ([stdin]:20:10)\n    at [stdin]:49:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.4,
+        "stddev": 0.4898979485566356,
+        "min": 0,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 295.3628,
+        "stddev": 137.86413380629497,
+        "min": 210.932,
+        "max": 569.619
+      },
+      "tokens": {
+        "mean": 45702,
+        "stddev": 8291.595817452753,
+        "min": 33479,
+        "max": 57860
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "artifact_type": "advisory",
+  "status": "partial",
+  "entries": [
+    {
+      "path": "skills/ce-code-review/references/action-class-rubric.md",
+      "local_owner": "skills/spec-code-review/references/action-class-rubric.md",
+      "upstream_objects": {
+        "path": "skills/ce-code-review/references/action-class-rubric.md",
+        "status": "M",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "0897d8ec2e37a634b701e7b1d6ed1afd5d1379a5"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "aeecb38ef702ab7a66a966e7c1fa411376ea744d"
+        },
+        "current_owner_surface_candidate": "skills/spec-code-review/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "local_sha256": "292d85f4ccd6f5268c701e44b5fe3597ddf5a8f012812d84360e5ebf5df15f67",
+      "reading": "两端全文与窗口 diff",
+      "decision": "吸收根限定且覆盖嵌套分类的 artifact 保护，集中为共享 rubric；保留固定 docs root 和本地 mutation_policy",
+      "status": "partial-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-code-review/references/review-output-template.md",
+      "local_owner": "skills/spec-code-review/references/review-output-template.md",
+      "upstream_objects": {
+        "path": "skills/ce-code-review/references/review-output-template.md",
+        "status": "M",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "214261809015157b33cd329ca6b13bf6fc58bbbe"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "048a2487f14bdd223fb89553d02cd1f0c4bc13d3"
+        },
+        "current_owner_surface_candidate": "skills/spec-code-review/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "local_sha256": "2c53cee5339cfab4c182a09cf0bd927949828255e07e0e531f5c4b4e705ccb3e",
+      "reading": "本地全文分段与 CE 窗口完整 diff，CE 当前正文未全文读取",
+      "decision": "输出三态结果与理由，unresolved 无 apply 权限；表达性措辞不机械同步",
+      "status": "partial-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-code-review/references/intent-and-plan.md",
+      "local_owner": "skills/spec-code-review/references/intent-and-plan.md",
+      "upstream_objects": {
+        "path": "skills/ce-code-review/references/intent-and-plan.md",
+        "status": "M",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "9ec84336fd9c25f54c784645187d65f81173bc21"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "08ac22703afde49cbc28f60dd5a08de26137539e"
+        },
+        "current_owner_surface_candidate": "skills/spec-code-review/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "local_sha256": "6284e52365eaa73e8f3068388b8cd2ca54b0903fb5705e028ba975222bb12455",
+      "reading": "本地全文与 CE 窗口完整 diff，CE 当前正文未全文读取",
+      "decision": "吸收逆向核对未请求可观察行为，保持 P3 advisory/human；不吸收 readiness 降级，保留任务级 completeness 边界",
+      "status": "partial-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-code-review/references/finish-review.md",
+      "local_owner": "skills/spec-code-review/references/finish-review.md",
+      "upstream_objects": {
+        "path": "skills/ce-code-review/references/finish-review.md",
+        "status": "M",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "11e8c742a9c88632af8c83d2c5aebd2818601b92"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "b75e632e5caf06c3bb382e3a35a191e4650aeec4"
+        },
+        "current_owner_surface_candidate": "skills/spec-code-review/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "local_sha256": "10b8731df5ec6d810ca93aa56403a6e3402c20964c020bbaacc0a26704e2541f",
+      "reading": "本地相关完整段落与 CE head 分段（尚有整体 presentation/quality 细节待全文复核）",
+      "decision": "吸收 source-detail map/hydration、软桶证据筛查、反证 revision 回源、逆向需求与嵌套保护；本地逐 finding/fingerprint/授权合同保留",
+      "status": "partial-implemented-contract-tested"
+    }
+  ],
+  "verification": {
+    "log_ref": "docs/validation/ce-pull-2026-10-27/logs/finish-detail-tests.log",
+    "exit_code": 0,
+    "suites": 4,
+    "tests": 96
+  },
+  "limitations": [
+    "source/schema 检查仅证明合同存在与确定性回归，未执行独立模型语义验证",
+    "保留两端全文/窗口 diff/部分读取区别，不把读取数量当作整窗关闭",
+    "depth/roster/peer/Pack 等 U2 其他差额仍 open；其他 U 单元和完整 adjudication/ledger/handoff 尚未完成"
+  ]
+}

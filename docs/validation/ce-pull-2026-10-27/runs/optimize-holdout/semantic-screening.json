@@ -1,0 +1,91 @@
+{
+  "artifact_type": "advisory",
+  "status": "partial",
+  "entries": [
+    {
+      "path": "skills/ce-optimize/scripts/decide.mjs",
+      "local_owner": "skills/spec-optimize/scripts/decide.cjs",
+      "reading": "CE 完整窗口 diff 分段读完，本地 decide 全文 1-588 分段读取",
+      "decision": "采用可选 holdout 确认，复用同一数值比较逻辑和本地完整样本/配对/授权/独立 judge 保护；每个路径仍有非 holdout 变更待审，不代表整文件闭合",
+      "status": "partial-holdout-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-optimize/references/optimize-spec-schema.yaml",
+      "local_owner": "skills/spec-optimize/references/optimize-spec-schema.yaml",
+      "reading": "本地全文及 CE 窗口相关 changed blocks；长 diff 有截断，未把其余行为标为读完",
+      "decision": "采用可选 holdout 确认，复用同一数值比较逻辑和本地完整样本/配对/授权/独立 judge 保护；每个路径仍有非 holdout 变更待审，不代表整文件闭合",
+      "status": "partial-holdout-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-optimize/references/loop.md",
+      "local_owner": "skills/spec-optimize/references/loop.md",
+      "reading": "本地全文及 CE 窗口相关 changed blocks；长 diff 有截断，未把其余行为标为读完",
+      "decision": "采用可选 holdout 确认，复用同一数值比较逻辑和本地完整样本/配对/授权/独立 judge 保护；每个路径仍有非 holdout 变更待审，不代表整文件闭合",
+      "status": "partial-holdout-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-optimize/references/measurement.md",
+      "local_owner": "skills/spec-optimize/references/measurement.md",
+      "reading": "本地全文及 CE 窗口相关 changed blocks；长 diff 有截断，未把其余行为标为读完",
+      "decision": "采用可选 holdout 确认，复用同一数值比较逻辑和本地完整样本/配对/授权/独立 judge 保护；每个路径仍有非 holdout 变更待审，不代表整文件闭合",
+      "status": "partial-holdout-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-optimize/references/spec.md",
+      "local_owner": "skills/spec-optimize/references/spec.md",
+      "reading": "本地全文及 CE 窗口相关 changed blocks；长 diff 有截断，未把其余行为标为读完",
+      "decision": "采用可选 holdout 确认，复用同一数值比较逻辑和本地完整样本/配对/授权/独立 judge 保护；每个路径仍有非 holdout 变更待审，不代表整文件闭合",
+      "status": "partial-holdout-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-optimize/references/experiment-log-schema.yaml",
+      "local_owner": "skills/spec-optimize/references/experiment-log-schema.yaml",
+      "reading": "本地全文及 CE 窗口相关 changed blocks；长 diff 有截断，未把其余行为标为读完",
+      "decision": "采用可选 holdout 确认，复用同一数值比较逻辑和本地完整样本/配对/授权/独立 judge 保护；每个路径仍有非 holdout 变更待审，不代表整文件闭合",
+      "status": "partial-holdout-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-optimize/references/experiment-prompt-template.md",
+      "local_owner": "skills/spec-optimize/references/experiment-prompt-template.md",
+      "reading": "本地全文及 CE 窗口相关 changed blocks；长 diff 有截断，未把其余行为标为读完",
+      "decision": "采用可选 holdout 确认，复用同一数值比较逻辑和本地完整样本/配对/授权/独立 judge 保护；每个路径仍有非 holdout 变更待审，不代表整文件闭合",
+      "status": "partial-holdout-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-optimize/references/wrap-up.md",
+      "local_owner": "skills/spec-optimize/references/wrap-up.md",
+      "reading": "本地全文及 CE 窗口相关 changed blocks；长 diff 有截断，未把其余行为标为读完",
+      "decision": "采用可选 holdout 确认，复用同一数值比较逻辑和本地完整样本/配对/授权/独立 judge 保护；每个路径仍有非 holdout 变更待审，不代表整文件闭合",
+      "status": "partial-holdout-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-optimize/SKILL.md",
+      "local_owner": "skills/spec-optimize/SKILL.md",
+      "reading": "本地全文及 CE 窗口相关 changed blocks；长 diff 有截断，未把其余行为标为读完",
+      "decision": "采用可选 holdout 确认，复用同一数值比较逻辑和本地完整样本/配对/授权/独立 judge 保护；每个路径仍有非 holdout 变更待审，不代表整文件闭合",
+      "status": "partial-holdout-implemented-contract-tested"
+    }
+  ],
+  "verification": {
+    "red_exit_code": 1,
+    "red_tests_failed": 10,
+    "red_log_ref": "docs/validation/ce-pull-2026-10-27/logs/optimize-holdout-red.log",
+    "exit_code": 0,
+    "suites": 4,
+    "tests": 120,
+    "log_ref": "docs/validation/ce-pull-2026-10-27/logs/optimize-holdout-final-tests.log"
+  },
+  "decisions": [
+    "measurement.holdout.command 和 judge.confirmation_seed 为可选增量，旧 spec/log 不改写、不冒称泛化收益",
+    "holdout 缺失时 eligible=false/target=false；保持同一目标改善、其余目标不退化；确认结果不得调整 selection 排名或生成假设",
+    "重复/ladder 确认要求两侧完整 samples；保留本地缺配对报 error，不采用 CE 更宽松处理",
+    "measurement-admission.cjs 仍拥有 measurement-only A/A；它不集成变更，不复制为 holdout producer",
+    "不引入 remote backend、wake/tick、共享 state-root 或 CE worker commit/push",
+    "scripts 不证明真实 source/corpus 身份或 item 互斥；workflow 需直接证据，缺失时不提升 claim"
+  ],
+  "limitations": [
+    "所有 18 个 optimize 路径尚未逐行为闭合；schema/model/calibration/per-case/persistence/attribution 等仍待审",
+    "仅脚本数值/结构行为和 source contracts；无独立模型、真实宿主、真实测量或 field outcome",
+    "上游长输出截断部分不作为全文读取证据"
+  ]
+}

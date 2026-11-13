@@ -1,0 +1,70 @@
+{
+  "artifact_type": "advisory",
+  "status": "partial",
+  "entries": [
+    {
+      "path": "skills/ce-resolve-pr-feedback/scripts/reply-to-pr-thread",
+      "local_owner": "skills/spec-resolve-pr-feedback/scripts/reply-to-pr-thread",
+      "reading": "CE 完整窗口 diff、本地 helper 与真实调用 fixture 全文",
+      "target_action": "implement-in-current-owner",
+      "decision": "采用 IFS/read -r -d 空字符保留终端换行；保留单次 POST、body 空值检查、回执留存、pending review postflight",
+      "status": "implemented-targeted-tests-passed"
+    }
+  ],
+  "verification": {
+    "red_exit_code": 1,
+    "red_log_ref": "docs/validation/ce-pull-2026-10-27/logs/reply-stdin-red.log",
+    "exit_code": 0,
+    "suites": 2,
+    "tests": 22,
+    "log_ref": "docs/validation/ce-pull-2026-10-27/logs/reply-stdin-tests.log"
+  },
+  "additional_reading": [
+    {
+      "path": "skills/ce-resolve-pr-feedback/scripts/pending-feedback.py",
+      "reading": "新增脚本 287 行全文",
+      "status": "pending-owner-decision",
+      "note": "保存完整 judged batch、publication GET、checkpoint；不把其文件存在当实际 reply/resolution 证据。新增持久协议需与本地 pipeline-return owner 对齐，不直接拷贝。"
+    },
+    {
+      "path": "skills/ce-resolve-pr-feedback/SKILL.md",
+      "reading": "完整净 diff、本地全文",
+      "status": "partial-consumer-comparison",
+      "note": "保持独立五项出口授权；不采纳 return-to-caller 自动 commit 或 no-change 远程写入。mode:resume/handoff 新协议尚未闭合。"
+    },
+    {
+      "path": "skills/ce-resolve-pr-feedback/references/targeted-mode.md",
+      "reading": "CE 完整净 diff、本地全文",
+      "status": "pending-inline-policy-comparison",
+      "note": "CE 单项优先 inline 候选；本地保留授权与 per-feedback 输出。"
+    },
+    {
+      "path": "skills/ce-resolve-pr-feedback/references/pipeline-mode.md",
+      "reading": "CE 完整净 diff、本地全文",
+      "status": "partial-rubric-reused",
+      "note": "保留本地 typed residual 和 local-only pipeline-return；不自动外发 pov。"
+    },
+    {
+      "path": "skills/ce-resolve-pr-feedback/references/full-mode.md",
+      "reading": "本地前轮全文与本轮 dispatch 部分；CE 净 diff 分段读取，106-166 合并输出有截断，未称全部差分闭合",
+      "status": "partial",
+      "note": "保持 blocked partial diff 对账、remote outcome 单独验证；待补 inline policy 与 resume 联动剩余判定。"
+    }
+  ],
+  "limitations": [
+    "仅 helper 正文保真与本地 consumer 回归；无真实 GitHub 外发",
+    "整个 U4 PR 包及整窗仍未完成；不得前移完整同步点或进入 shipping"
+  ],
+  "next_admission_review": {
+    "paths": [
+      "skills/ce-resolve-pr-feedback/references/full-mode.md",
+      "skills/ce-resolve-pr-feedback/references/targeted-mode.md"
+    ],
+    "decision": "已在判定阶段读清的单项优先 inline；真正不重叠批次或跨调用点的大范围实施才在授权/capability/isolation 满足时委派。两路径仍返回逐 feedback 相同结果并执行实际 delta 对账；pipeline-return 和各出口权限不变。",
+    "source_evidence": [
+      "skills/spec-resolve-pr-feedback/references/full-mode.md#4-implement",
+      "skills/spec-resolve-pr-feedback/references/targeted-mode.md#2-fix-reply-resolve"
+    ],
+    "reading_note": "CE full-mode 净 diff 106-166 已补读，其余段已读取；不将该子行为实施称整文件闭合"
+  }
+}

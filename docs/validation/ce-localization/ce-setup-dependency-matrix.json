@@ -5,12 +5,15 @@
   "public_entrypoint_disposition": "reuse-spec-runtime-setup-only",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "e4e667176516ad08e6ca36439f2e02f8db31b2a8",
-    "dirty": false,
-    "dirty_paths": [],
-    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "source_tree_hash": "d3ac3c993f255d3149854f40664468ef4e27a6a3b3f7fcea127b4c1367bf6f03",
-    "inventory_hash": "fbd548868fd472bc8748c727dcc79f1785995844f9fb451db7839b4c41dbf29d",
+    "head": "f4c7a7b98ecf342e54bd3117c4d745e684532a19",
+    "dirty": true,
+    "dirty_paths": [
+      "CHANGELOG.md",
+      "docs/research/2026-09-24-ai-industry-trends-claude-prompt-shortening.md"
+    ],
+    "dirty_path_manifest_sha256": "1bb075e50a41be74a6110474cadc6e048d1a7e0ba373aedf14e1479cfdede638",
+    "source_tree_hash": "4e6dadd27c2601ee9a3f7abe1c9fe2a68ff0ac423b78373e4b217a6ad5f2a838",
+    "inventory_hash": "ed135a864893cde2a444577b62acd29af6d021dd3d34ef5d2c942caa767f4d1e",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -45,9 +48,9 @@
     }
   },
   "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
-  "inventory_sha256": "ac55468a93c9614c8afcf2ad3ba69a9375cdc18c67665a42b40b176c1d72227b",
+  "inventory_sha256": "8fb767e4e3e828f6c853c10cd29de2bccc9fbed98c6847b9c85095824b93bd80",
   "preflight_ref": "docs/validation/ce-localization/ce-setup-prerequisite-preflight.json",
-  "preflight_sha256": "e39835e9ecf8e25dd6d4c27b16d844346fabc0a944e93fcebee173f3f095703c",
+  "preflight_sha256": "d03ad47e9882da06f59117fc3862c092637e375acd58793ecb0a555525ad39f5",
   "ce_tool_dispositions": [
     {
       "tool_id": "agent-browser",
@@ -75,7 +78,7 @@
       "reason_code": "local-required-baseline",
       "local_registry_kind": "helper",
       "local_required": true,
-      "baseline_blocking": true,
+      "baseline_blocking": false,
       "source_ref": "skills/spec-runtime-setup/setup-registry.json",
       "status_authority": "plan-settled-and-source-checked"
     },
@@ -85,7 +88,7 @@
       "reason_code": "local-promoted-required",
       "local_registry_kind": "helper",
       "local_required": true,
-      "baseline_blocking": true,
+      "baseline_blocking": false,
       "source_ref": "skills/spec-runtime-setup/setup-registry.json",
       "status_authority": "plan-settled-and-source-checked"
     },
@@ -95,7 +98,7 @@
       "reason_code": "local-promoted-required",
       "local_registry_kind": "helper",
       "local_required": true,
-      "baseline_blocking": true,
+      "baseline_blocking": false,
       "source_ref": "skills/spec-runtime-setup/setup-registry.json",
       "status_authority": "plan-settled-and-source-checked"
     },

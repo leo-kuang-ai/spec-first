@@ -1,0 +1,159 @@
+{
+  "schema_version": "audit-skill-receipt/v1",
+  "artifact_type": "single-skill-logic-receipt",
+  "run_id": "2026-09-20-cycle1-u9",
+  "generated_at": "2026-09-20T07:35:36.158199+00:00",
+  "skill_name": "using-spec-first",
+  "source_snapshot": "source-manifest.json",
+  "source_snapshot_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+  "source_paths": [
+    "skills/using-spec-first/SKILL.md",
+    "skills/using-spec-first/references/public-route-map.md",
+    "skills/using-spec-first/references/conditional-routing-boundaries.md",
+    "tests/unit/using-spec-first-contracts.test.js"
+  ],
+  "source_read_ranges": {
+    "skills/using-spec-first/SKILL.md": "1-42",
+    "skills/using-spec-first/references/public-route-map.md": "1-50",
+    "skills/using-spec-first/references/conditional-routing-boundaries.md": "1-51"
+  },
+  "source_hashes": {
+    "skills/using-spec-first/SKILL.md": "0621bf7aa0979a3d5829bf0535aa4d89d2e98c2778a94bfabe6563dbef4329e9",
+    "skills/using-spec-first/references/public-route-map.md": "851eeddf2c5e0060b15bb83ab9396816f8704de4e9b98e444bac630650f73031",
+    "skills/using-spec-first/references/conditional-routing-boundaries.md": "a465bd34553006730a21258483d07ab138a53f702d897561c9efc877bdae855a",
+    "tests/unit/using-spec-first-contracts.test.js": "e087cecc4fbfd81c566ae85dba68e775de05592874e45ca312587709075bbdf4"
+  },
+  "inventory_ref": "skill-inventory.json",
+  "inventory_sha256": "43a98f27af5c6936836c73a569f4dde9dde01d80d9ae087dcdf806cd1bc32958",
+  "entry_surface": "standalone_skill",
+  "batch": "B",
+  "closure_tier": "S",
+  "closure_observed": {
+    "files": 11,
+    "bytes": 21815,
+    "read_package_files_at_least_partially": 3,
+    "read_supporting_files_at_least_partially": 1,
+    "denominator": "包内普通文件；局部读取不算全文，文件计数不代表递归闭包或语义充分性。"
+  },
+  "coverage_commitment": "committed",
+  "dependency_closure": "partial",
+  "status": "degraded",
+  "reason_codes": [
+    "bounded_source_review",
+    "dependency_closure_partial",
+    "workflow_not_run"
+  ],
+  "command_or_method": [
+    "只读reviewer逐包阅读冻结source并判断五分支；主owner整合与回源裁决，不是盲评或workflow执行。"
+  ],
+  "ran": true,
+  "exit_code": null,
+  "evidence_paths": [
+    "reviewer-returns/b.json"
+  ],
+  "source_refs": [
+    "skills/using-spec-first/SKILL.md",
+    "skills/using-spec-first/references/public-route-map.md",
+    "skills/using-spec-first/references/conditional-routing-boundaries.md",
+    "tests/unit/using-spec-first-contracts.test.js"
+  ],
+  "owner": "project-lead-cycle-1",
+  "consumers": [
+    "周期1主审查",
+    "对应上游/下游workflow（以SKILL文档声明为准）"
+  ],
+  "branches": [
+    {
+      "id": "entry_positive",
+      "status": "source-covered",
+      "judgment": "入口 governor 恰好选择一个公开 workflow/skill/command/Direct Lane 后移交；不重路由 active workflow/worker。",
+      "source_refs": [
+        "skills/using-spec-first/SKILL.md:8-16",
+        "skills/using-spec-first/SKILL.md:18-36"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "near_neighbor_negative",
+      "status": "source-covered",
+      "judgment": "Direct Lane 排除失败、文档审查、runtime、显式 workflow、handoff 与未决目标；public map 导向 owner。",
+      "source_refs": [
+        "skills/using-spec-first/SKILL.md:20-26",
+        "skills/using-spec-first/references/public-route-map.md:7-25"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "output_consumer",
+      "status": "source-covered",
+      "judgment": "只返回一个入口或建议，不产生 artifact/state 或修改授权；随后由消费者 owner 接管。",
+      "source_refs": [
+        "skills/using-spec-first/SKILL.md:8-16",
+        "skills/using-spec-first/SKILL.md:28-36"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "critical_error_stop",
+      "status": "source-covered",
+      "judgment": "路由匹配不授予 mutation/verification/runtime/handoff 权限；低置信度至多问一个改变路由的问题；worker dispatch 先核对授权。",
+      "source_refs": [
+        "skills/using-spec-first/SKILL.md:26-40",
+        "skills/using-spec-first/references/conditional-routing-boundaries.md:26-31"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    },
+    {
+      "id": "degraded_recovery_handoff",
+      "status": "source-covered",
+      "judgment": "provider 缺失或陈旧时退为有界直接读取；handoff/knowledge promotion 要求 summary、source refs、freshness、limitations 及 confirmed evidence。",
+      "source_refs": [
+        "skills/using-spec-first/references/conditional-routing-boundaries.md:5-10",
+        "skills/using-spec-first/references/conditional-routing-boundaries.md:42-51"
+      ],
+      "verification_basis": "source-semantic-review",
+      "workflow_execution": "not-run"
+    }
+  ],
+  "findings": [],
+  "fresh_source_eval": "not-run",
+  "claim_ceiling": "C0",
+  "limitations": [
+    "其余 8 个包内文件与外部合同未完成阅读；using-spec-first-contracts.test.js 已静态读取，未运行。",
+    "tests、host projection、fresh-source eval 和 live invocation 均为 not-run。",
+    "原机械占位结论已撤销；source-covered仅证明已读范围可追踪，不证明运行通过。",
+    "未确认读取范围不计覆盖；哈希只证明字节。"
+  ],
+  "recovery_point": "如主 owner 扩大范围，补读 eval/contracts 并执行 routing contract tests 和 fresh-source eval。",
+  "timing": {
+    "active_seconds": null,
+    "limitation": "逐包主动时间不可可靠恢复，未用工具墙钟估算。"
+  },
+  "record_correction": {
+    "at": "2026-09-20T05:55:01.025041+00:00",
+    "invalidated": "2026-09-20T05:24 的机械占位结论",
+    "replaced_by_actual_review_at": "2026-09-20T07:35:36.158199+00:00"
+  },
+  "supporting_read_ranges": {
+    "tests/unit/using-spec-first-contracts.test.js": "1-162"
+  },
+  "unconfirmed_read_ranges": [],
+  "reviewer_provenance": {
+    "reviewer": "cycle1_a_exit",
+    "kind": "read-only-source-review",
+    "fresh_per_package_context": false,
+    "raw_return": "reviewer-returns/b.json",
+    "raw_return_sha256": "74c86ff4af0bab17fbeb82f390cf57eb33590df5a24910b9823d19382480563c"
+  },
+  "execution": {
+    "source_semantic_review": "ran",
+    "workflow": "not-run",
+    "host_projection": "not-run",
+    "model": "not-run",
+    "tests": "not-run"
+  }
+}

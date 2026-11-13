@@ -1,0 +1,20 @@
+# manifest: spec-strategy
+# frozen: 5b59293b
+edfd4866fadfb26582068a2195f86a8c65f32626156a0f5bbce10afd265bb0f6  skills/spec-strategy/SKILL.md
+db5489a3c14b23e7424f0a88630d17ea04688ceddcb072e0023e89ddff66ce38  skills/spec-strategy/evals/cases/check-owned-update.yaml
+6c1b9575ba62583eef9f961859b7a457050a75d2bd660ce53a739f41161eb2f6  skills/spec-strategy/evals/cases/existing-asks-which-section.yaml
+7f8ad76840f28423176522b0f2e847c95ac082ed2d1e61ee1109703e9b103033  skills/spec-strategy/evals/cases/features-route-to-brainstorm.yaml
+553a9bd9deba7163f4cb42175903a0075f09e04fb5480410103a6b145c54e006  skills/spec-strategy/evals/cases/first-run-interview-asks.yaml
+e09d7424b99544a8b1518fcb47a31109543a9e906c83df89296991c113a808d8  skills/spec-strategy/evals/cases/targeted-update-metrics.yaml
+0ae5a3c163988124f42e6a6aa71ab0d04bad6e01443e518abc77e136fe2f6412  skills/spec-strategy/evals/cases/update-reads-existing-doc.yaml
+25d38ce2eb0dcd8f5c2cd5111657c3ce071d200b4fadf5c627ae24e7ddd083a0  skills/spec-strategy/evals/eval.yaml
+0ef39f74fa53d24815cbcc629ebfa43b3bc7dff5b7bba1a6bb934dc20d3b0a5e  skills/spec-strategy/evals/fixtures/repos/existing-strategy/STRATEGY.md
+2d0682343e9e701266c28b122954228575c228ef416b201b5f1bda011433ffae  skills/spec-strategy/evals/fixtures/repos/u28-outcomes/README.md
+6c1e1e8c9dad4470bf665c24bff12b970c26f74cbb7d3ef6281bd9c0b901b8a2  skills/spec-strategy/evals/fixtures/repos/u28-outcomes/STRATEGY.md
+686285663ec55b49fe14ae306f43ef18b39101182d269641174f2b52cfdf6c80  skills/spec-strategy/evals/fixtures/repos/u28-outcomes/prepare-eval.cjs
+14bea02a91277a7440f671f9d6bb5cd70117d23508a03b39dc986169d64fa973  skills/spec-strategy/evals/fixtures/scripts/asks-a-question.sh
+3677dfd218aa81222358934ed12ca3532df6f6cfabf0f435678dfd5d3248b004  skills/spec-strategy/evals/fixtures/scripts/check-owned-update.sh
+35f2d9186861a9a3ea6fe2b3133208b557d50b66bcaedad2d60c2fc47d03e9c4  skills/spec-strategy/references/grounding.md
+62864c5dcfe108e72fac67d92e1a757ca6bd051feaf68242ee1df94a513e6767  skills/spec-strategy/references/interview.md
+f3ff960b1fb0daf05dd3c994e05a06b8ad885c456a5743a1408048013bf0bffd  skills/spec-strategy/references/strategy-template.md
+925a7c70545b9d4f34710a7e8bf5ef014ce18443aaf9431a7857e409d541edb4  skills/spec-strategy/references/update-run.md

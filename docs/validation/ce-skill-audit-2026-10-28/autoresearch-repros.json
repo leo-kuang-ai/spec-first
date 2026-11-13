@@ -1,0 +1,34 @@
+{
+  "type": "confirmed",
+  "scope": "本地评分脚本，未执行真实回归/ship",
+  "results": [
+    {
+      "case": "documented_classification",
+      "input_tsv": "iteration\ttimestamp\tdimension\taxis\ttier\tclassification\tbaseline\tcandidate\tdelta\tregressed\tsubscore\tseverity\tstatus\tfile_line\tdescription\n1\t2026-10-28\tfunctional\tdiff\tHARD\tregression-eligible\t1\t0\t-1\ttrue\t0\thigh\tcomplete\tfixture:1\taudit fixture\n1\t2026-10-28\tperformance\tdiff\tSCORE\teligible\t1\t0\t-1\tfalse\t100\thigh\tcomplete\tfixture:1\taudit fixture\n",
+      "exit_code": 0,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  visual: UNAVAILABLE (weight 0.20 renormalized out)\n  performance: subscore 100.0 over 1 cells -> contribution 100.00\nUNAVAILABLE dims: flakiness, resource, visual\nstability_score = 100.00 (threshold 95.0)\nSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "case": "script_classification_control",
+      "input_tsv": "iteration\ttimestamp\tdimension\taxis\ttier\tclassification\tbaseline\tcandidate\tdelta\tregressed\tsubscore\tseverity\tstatus\tfile_line\tdescription\n1\t2026-10-28\tfunctional\tdiff\tHARD\teligible\t1\t0\t-1\ttrue\t0\thigh\tcomplete\tfixture:1\taudit fixture\n1\t2026-10-28\tperformance\tdiff\tSCORE\teligible\t1\t0\t-1\tfalse\t100\thigh\tcomplete\tfixture:1\taudit fixture\n",
+      "exit_code": 1,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  visual: UNAVAILABLE (weight 0.20 renormalized out)\n  BLOCKING: functional/diff fixture:1 audit fixture\nUNSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "case": "documented_visual_name",
+      "input_tsv": "iteration\ttimestamp\tdimension\taxis\ttier\tclassification\tbaseline\tcandidate\tdelta\tregressed\tsubscore\tseverity\tstatus\tfile_line\tdescription\n1\t2026-10-28\tvisual-ui\tdiff\tSCORE\teligible\t1\t0\t-1\ttrue\t0\thigh\tcomplete\tfixture:1\taudit fixture\n1\t2026-10-28\tperformance\tdiff\tSCORE\teligible\t1\t0\t-1\tfalse\t100\thigh\tcomplete\tfixture:1\taudit fixture\n",
+      "exit_code": 0,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  visual: UNAVAILABLE (weight 0.20 renormalized out)\n  performance: subscore 100.0 over 1 cells -> contribution 100.00\nUNAVAILABLE dims: flakiness, resource, visual\nstability_score = 100.00 (threshold 95.0)\nSTABLE\n",
+      "stderr": ""
+    },
+    {
+      "case": "script_visual_name_control",
+      "input_tsv": "iteration\ttimestamp\tdimension\taxis\ttier\tclassification\tbaseline\tcandidate\tdelta\tregressed\tsubscore\tseverity\tstatus\tfile_line\tdescription\n1\t2026-10-28\tvisual\tdiff\tSCORE\teligible\t1\t0\t-1\ttrue\t0\thigh\tcomplete\tfixture:1\taudit fixture\n1\t2026-10-28\tperformance\tdiff\tSCORE\teligible\t1\t0\t-1\tfalse\t100\thigh\tcomplete\tfixture:1\taudit fixture\n",
+      "exit_code": 1,
+      "stdout": "per-dim contributions:\n  flakiness: UNAVAILABLE (weight 0.30 renormalized out)\n  resource: UNAVAILABLE (weight 0.20 renormalized out)\n  performance: subscore 100.0 over 1 cells -> contribution 60.00\n  visual: subscore 0.0 over 1 cells -> contribution 0.00\nUNAVAILABLE dims: flakiness, resource\nstability_score = 60.00 (threshold 95.0)\nUNSTABLE\n",
+      "stderr": ""
+    }
+  ]
+}

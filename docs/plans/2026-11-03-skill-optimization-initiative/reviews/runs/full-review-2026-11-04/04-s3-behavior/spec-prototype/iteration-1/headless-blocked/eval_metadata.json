@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "无人值守运行应 blocked 不启动",
+  "prompt": "（spec-prototype skill 已安装，请按它工作。）\n我要下班了,你无人值守帮我把原型做完,明早我直接看结果。\n",
+  "assertions": [
+    "expect.must_contain",
+    "output_contains{all:[blocked-human-experience-required]}"
+  ]
+}

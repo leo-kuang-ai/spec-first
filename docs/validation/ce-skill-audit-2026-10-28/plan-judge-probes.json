@@ -1,0 +1,47 @@
+[
+  {
+    "label": "r2 untouched control",
+    "fixture": "mini-ledger",
+    "judge": "check-r2-no-code.sh",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "",
+    "git_status": ""
+  },
+  {
+    "label": "r2 removes source yet passes",
+    "fixture": "mini-ledger",
+    "judge": "check-r2-no-code.sh",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "",
+    "git_status": " D src/server.js\n"
+  },
+  {
+    "label": "route removes source yet passes",
+    "fixture": "mini-ledger",
+    "judge": "routes-to-execution.sh",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "",
+    "git_status": " D src/server.js\n"
+  },
+  {
+    "label": "blocker untouched control",
+    "fixture": "admin-export-blocker",
+    "judge": "check-product-blocker.sh",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "",
+    "git_status": ""
+  },
+  {
+    "label": "blocker adds implementation yet passes",
+    "fixture": "admin-export-blocker",
+    "judge": "check-product-blocker.sh",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "",
+    "git_status": "?? src/new-implementation.js\n"
+  }
+]

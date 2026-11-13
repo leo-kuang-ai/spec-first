@@ -1,0 +1,11 @@
+# consumers: spec-compound-refresh
+tests/unit/ce-post-3-20-calibration-contracts.test.js
+tests/unit/compound-promotion-contracts.test.js
+tests/unit/dispatch-authorization-matrix-contracts.test.js
+tests/unit/frontmatter-validator-utf8.test.js
+tests/unit/knowledge-publication-judges.test.js
+tests/unit/low-findings-cleanup-contracts.test.js
+tests/unit/mutation-authority-contracts.test.js
+tests/unit/python-runtime-resolution-contracts.test.js
+tests/unit/remaining-script-defenses.test.js
+tests/unit/spec-compound-refresh-reference-contracts.test.js

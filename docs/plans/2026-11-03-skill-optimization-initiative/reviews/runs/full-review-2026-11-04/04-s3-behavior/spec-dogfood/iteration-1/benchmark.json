@@ -1,0 +1,135 @@
+{
+  "metadata": {
+    "skill_name": "spec-dogfood",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-dogfood",
+    "timestamp": "2026-11-04T12:07:13Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "浏览器执行 owner 不可用应停止并指引 runtime-setup",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 99.82,
+        "tokens": 31674,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-dogfood/evals/fixtures/scripts/check-owner-unavailable-stop.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "指定 trunk 为目标应被拒绝",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 52.52,
+        "tokens": 27526,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-dogfood/evals/fixtures/scripts/check-trunk-reject.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "协作式 UI 打磨请求应路由 spec-polish",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 73.168,
+        "tokens": 24330,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[spec-polish]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[spec-polish])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "R2变体:代码审查请求应点名 spec-code-review",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 167.606,
+        "tokens": 39084,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[spec-code-review]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[spec-code-review])"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 98.27850000000001,
+        "stddev": 43.39658975944999,
+        "min": 52.52,
+        "max": 167.606
+      },
+      "tokens": {
+        "mean": 30653.5,
+        "stddev": 5520.02398092617,
+        "min": 24330,
+        "max": 39084
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

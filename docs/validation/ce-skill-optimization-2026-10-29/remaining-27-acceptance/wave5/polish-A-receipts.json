@@ -1,0 +1,48 @@
+{
+  "arm": "A",
+  "source_sha256": "c81d5f29989e8c32a120e8337ae4b0457caab13eca115dc8bd67b20af86664e4",
+  "procfile": "worker: node queue.js --port 9200\nweb: node web.js --port 4300\n",
+  "cases": [
+    {
+      "case": "missing-port",
+      "argv": [
+        "--port"
+      ],
+      "elapsed_seconds": 2.002663624996785,
+      "exit_code": null,
+      "stdout": "",
+      "stderr": "",
+      "timeout": true,
+      "parent_intervention": "subprocess.run terminated only this owned process after2s"
+    },
+    {
+      "case": "missing-type",
+      "argv": [
+        "--type"
+      ],
+      "elapsed_seconds": 2.0029900829540566,
+      "exit_code": null,
+      "stdout": "",
+      "stderr": "",
+      "timeout": true,
+      "parent_intervention": "subprocess.run terminated only this owned process after2s"
+    },
+    {
+      "case": "procfile-web",
+      "argv": [
+        "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-polish-rml_kwt2/A",
+        "--type",
+        "procfile"
+      ],
+      "elapsed_seconds": 0.008347542025148869,
+      "exit_code": 0,
+      "stdout": "4300\n",
+      "stderr": "",
+      "timeout": false
+    }
+  ],
+  "limitations": [
+    "Port discovery only; worker and web commands were not started by this helper.",
+    "2-second missing-argument process timeout is independent of model-trial deadline."
+  ]
+}

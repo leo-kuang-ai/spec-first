@@ -1,0 +1,35 @@
+{
+  "id": "CEOPT-15",
+  "skill": "spec-optimize",
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/CEOPT-15-request.txt",
+  "request_sha256": "f8079050540dca402ff8b60486a56b3c916863904faf805feeb8ee3524e03127",
+  "fixture_root": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/optimize",
+  "fixture_files": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/fixtures/optimize/workspace-facts.json": "e4df60afff62dd802035fd2ff5bd6943ff9cf952ba90b1daa39858d08d775db0"
+  },
+  "arm_receipts": {
+    "A": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/optimize-A-receipts.json",
+      "sha256": "60d97d1c1ead0d6e874438c83b9d9c121ff43f785b17e25984489e87a009cb0a"
+    },
+    "B": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave3/optimize-B-receipts.json",
+      "sha256": "7678894052a2e747f19d1949f4750de8fbe2e601202cd69dd28ee56d9e620799"
+    }
+  },
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "deadline_seconds": 300,
+  "parent_recipe": "Supply exact assigned native-version receipt and shared synthetic workspace facts; save response unchanged. No cleanup or holdout read.",
+  "status": "prepared-not-executed",
+  "limitations": [
+    "Decision interpretation only; actual dirty-reuse and cleanup recovery remain open.",
+    "Synthetic result files test validator boundaries, not positive real-run admission or model improvement."
+  ]
+}

@@ -1,0 +1,520 @@
+{
+  "record_type": "一次性维护者源码基线，不是产品或runtime schema",
+  "captured_at": "2026-11-03T09:50:47.963884+00:00",
+  "recorded_at": "2026-11-03T10:05:15.149700+00:00",
+  "head": "6e056d9f2077647624d4937216a3c44492583c96",
+  "branch": "leo-2026-10-27-update",
+  "authority": "当前磁盘源码；不使用runtime mirror作为事实源",
+  "skill_count": 38,
+  "entries": [
+    {
+      "skill": "autoresearch",
+      "path": "skills/autoresearch/SKILL.md",
+      "entry_surface": "standalone_skill",
+      "sha256": "d51a75af36a3a41095d50a775197635c48238ed24ed6ad3eda1ef24e50f43136",
+      "bytes": 9653,
+      "lines": 108,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-app-consistency-audit",
+      "path": "skills/spec-app-consistency-audit/SKILL.md",
+      "entry_surface": "workflow_command",
+      "sha256": "0fe3e99ecba65f49ec62c1fa0bbd870f926760df966f5e68724e75b07ed0f1b4",
+      "bytes": 19395,
+      "lines": 307,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-brainstorm",
+      "path": "skills/spec-brainstorm/SKILL.md",
+      "entry_surface": "workflow_command",
+      "sha256": "d3df96643040bebb4cc003ff75f9fdb3f3dac34461abb031eab7808f82167861",
+      "bytes": 8461,
+      "lines": 78,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-code-review",
+      "path": "skills/spec-code-review/SKILL.md",
+      "entry_surface": "workflow_command",
+      "sha256": "c6f93d057756425728ba3b3e3e2e9f2b7844e0b4b6d96859c0b8cc59c0aa8486",
+      "bytes": 8615,
+      "lines": 76,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-commit",
+      "path": "skills/spec-commit/SKILL.md",
+      "entry_surface": "internal_only",
+      "sha256": "4ba34e8a9f54f50fa4e1fcd40c55dad88ea0a8912d47735663ee9e7119b7d752",
+      "bytes": 11476,
+      "lines": 128,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-commit-push-pr",
+      "path": "skills/spec-commit-push-pr/SKILL.md",
+      "entry_surface": "internal_only",
+      "sha256": "caf7ac9387d1ba3355499fd8a008743d3f78322a6ecf1c4eaefbde4f0919cf93",
+      "bytes": 9619,
+      "lines": 132,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-compound",
+      "path": "skills/spec-compound/SKILL.md",
+      "entry_surface": "workflow_command",
+      "sha256": "02da78aefef12b96966fc4dd7e9fedd48d29ab5bbc9f03d57f1f6f6127852cca",
+      "bytes": 6887,
+      "lines": 61,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-compound-refresh",
+      "path": "skills/spec-compound-refresh/SKILL.md",
+      "entry_surface": "workflow_command",
+      "sha256": "b0a5dccac1b77e349fa4a99e0e83ea20857fbf992fa6fdd1d3aa5893db0b90e3",
+      "bytes": 14725,
+      "lines": 164,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-debug",
+      "path": "skills/spec-debug/SKILL.md",
+      "entry_surface": "workflow_command",
+      "sha256": "2a34444a5f6c4909b707d5d889718d0e82621d055b2be83914efb9be014f13a5",
+      "bytes": 37907,
+      "lines": 368,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-doc-review",
+      "path": "skills/spec-doc-review/SKILL.md",
+      "entry_surface": "workflow_command",
+      "sha256": "c96d48de5841a1d3c2692232e54107a5eaccdf0337817dc024c2af6d958eaab0",
+      "bytes": 5354,
+      "lines": 74,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-dogfood",
+      "path": "skills/spec-dogfood/SKILL.md",
+      "entry_surface": "workflow_command",
+      "sha256": "9e5057e8670a5a9073b27e8051c0a669d759065ec1997a371d618719b2023a88",
+      "bytes": 9238,
+      "lines": 99,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-explain",
+      "path": "skills/spec-explain/SKILL.md",
+      "entry_surface": "standalone_skill",
+      "sha256": "bd82dcd441b82fd5336f3ea26bc22c5e382baf1d5dfc52ccb734719db4c6e39e",
+      "bytes": 10799,
+      "lines": 92,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-handoff",
+      "path": "skills/spec-handoff/SKILL.md",
+      "entry_surface": "standalone_skill",
+      "sha256": "4bc4a2e1da3aa5caa1e547c9f9d59410099823fa315c77f56c8e71ac7a5b6d6c",
+      "bytes": 9359,
+      "lines": 99,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-ideate",
+      "path": "skills/spec-ideate/SKILL.md",
+      "entry_surface": "workflow_command",
+      "sha256": "dd427fca3e50bce7dc0fc7bc573633217e696c2f8583a1215c5e571c9665f733",
+      "bytes": 10152,
+      "lines": 105,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-lfg",
+      "path": "skills/spec-lfg/SKILL.md",
+      "entry_surface": "standalone_skill",
+      "sha256": "6bd097a450c07fa97dc543d15f53fbfc17a5aa6a9c4661054b97a3bcc89ecaa7",
+      "bytes": 9458,
+      "lines": 81,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-optimize",
+      "path": "skills/spec-optimize/SKILL.md",
+      "entry_surface": "workflow_command",
+      "sha256": "4da027d7a55cbbe974b136e43344e77a1306491942dc1a383e8f9be24d064dce",
+      "bytes": 16288,
+      "lines": 180,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-plan",
+      "path": "skills/spec-plan/SKILL.md",
+      "entry_surface": "workflow_command",
+      "sha256": "bcc0e89dd04b3199a09ac16ee74a75a418fe609bd6cf6324f5c78a9d0bc9b416",
+      "bytes": 18771,
+      "lines": 123,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-polish",
+      "path": "skills/spec-polish/SKILL.md",
+      "entry_surface": "workflow_command",
+      "sha256": "629bccf39d24b682d49b9589035ccac7ea634055b385feac0e349ce71e25be26",
+      "bytes": 8482,
+      "lines": 92,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-pov",
+      "path": "skills/spec-pov/SKILL.md",
+      "entry_surface": "standalone_skill",
+      "sha256": "3d39dc292d30bcc7bc4997da8c357576db061952bad32da751a4b5c542acc94a",
+      "bytes": 5076,
+      "lines": 59,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-prd",
+      "path": "skills/spec-prd/SKILL.md",
+      "entry_surface": "workflow_command",
+      "sha256": "c08990ccfb677ec46c919238e2f9f9e36a0582f74c5cc35fb8d2eaa6ae1c819e",
+      "bytes": 67595,
+      "lines": 347,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-product-pulse",
+      "path": "skills/spec-product-pulse/SKILL.md",
+      "entry_surface": "standalone_skill",
+      "sha256": "4957802c1c1c12e74fec8257207e5e137a5b87c0a4cbfac6f38acf7caa8d597a",
+      "bytes": 7963,
+      "lines": 92,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-project-rules",
+      "path": "skills/spec-project-rules/SKILL.md",
+      "entry_surface": "standalone_skill",
+      "sha256": "6a980fd52f58649626bd327202d95c210d245184b0cd7f58f9fe5779e6000f87",
+      "bytes": 10731,
+      "lines": 122,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-promote",
+      "path": "skills/spec-promote/SKILL.md",
+      "entry_surface": "standalone_skill",
+      "sha256": "96ff96037364fb5cdd95ed3d8eef355b14834f77fdb11a7820ca24abfaaaf7f7",
+      "bytes": 10691,
+      "lines": 134,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-prototype",
+      "path": "skills/spec-prototype/SKILL.md",
+      "entry_surface": "standalone_skill",
+      "sha256": "07563d5c500f0280de5adccce7be149558e3443d2f20bdeeec837f462435552a",
+      "bytes": 5139,
+      "lines": 44,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-resolve-pr-feedback",
+      "path": "skills/spec-resolve-pr-feedback/SKILL.md",
+      "entry_surface": "standalone_skill",
+      "sha256": "594de7ca1be76c76a462c281879e4a0837f6e4c433d7949432e2f5e8a30c580d",
+      "bytes": 10083,
+      "lines": 126,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-riffrec-feedback-analysis",
+      "path": "skills/spec-riffrec-feedback-analysis/SKILL.md",
+      "entry_surface": "standalone_skill",
+      "sha256": "dca15bcf7ece9009ebdfd761e16d660e38d081824ad18bc346df147c15b98de1",
+      "bytes": 5555,
+      "lines": 47,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-rule-miner",
+      "path": "skills/spec-rule-miner/SKILL.md",
+      "entry_surface": "standalone_skill",
+      "sha256": "306fc3e4cbe1a067434807b7eed1c765213fa6be357d2e3d16960f79abe434d1",
+      "bytes": 9100,
+      "lines": 77,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-runtime-setup",
+      "path": "skills/spec-runtime-setup/SKILL.md",
+      "entry_surface": "workflow_command",
+      "sha256": "0c77c8122a35221a9c51644a2c907fb4d9e3c0cdd84efa977d2c4300d6b72da6",
+      "bytes": 59274,
+      "lines": 386,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "skills/spec-simplify-code/SKILL.md",
+      "entry_surface": "standalone_skill",
+      "sha256": "ed1f1b0d4c1926e8ff3a656cfc77f51de893a81f3ce5aa106ca355d9103b7320",
+      "bytes": 13088,
+      "lines": 108,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-strategy",
+      "path": "skills/spec-strategy/SKILL.md",
+      "entry_surface": "standalone_skill",
+      "sha256": "edfd4866fadfb26582068a2195f86a8c65f32626156a0f5bbce10afd265bb0f6",
+      "bytes": 7402,
+      "lines": 94,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-sweep",
+      "path": "skills/spec-sweep/SKILL.md",
+      "entry_surface": "standalone_skill",
+      "sha256": "2690a0cf76e8e2f7c6cfda299272377f4e1a6144664a94b30a5163e62d6aad49",
+      "bytes": 14291,
+      "lines": 127,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-test-browser",
+      "path": "skills/spec-test-browser/SKILL.md",
+      "entry_surface": "internal_only",
+      "sha256": "bfe3cdc6e9648c6cec96bbe221a8cdd37cddb322d5b489eb1eb861fab329c4db",
+      "bytes": 9896,
+      "lines": 90,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-test-xcode",
+      "path": "skills/spec-test-xcode/SKILL.md",
+      "entry_surface": "standalone_skill",
+      "sha256": "e9397a88ddba0144200a6595bf353d8676ab3919dceb56d77360390b5317069b",
+      "bytes": 3570,
+      "lines": 31,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-work",
+      "path": "skills/spec-work/SKILL.md",
+      "entry_surface": "workflow_command",
+      "sha256": "f718ddb6771e584d7e57b38cfe2491047466ae3d708db68f741c3fc8fe19c3e8",
+      "bytes": 14922,
+      "lines": 126,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-worktree",
+      "path": "skills/spec-worktree/SKILL.md",
+      "entry_surface": "internal_only",
+      "sha256": "12438f6bff6ccb18bcffbe39242c395ed2bb5b0eb7be6a52ad77aa66956095e6",
+      "bytes": 14382,
+      "lines": 156,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-write-skill",
+      "path": "skills/spec-write-skill/SKILL.md",
+      "entry_surface": "workflow_command",
+      "sha256": "73f6e1a06661d3a1b2a172800b25abca9888681d61f8abf6457fbb769c1f668d",
+      "bytes": 8869,
+      "lines": 62,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "spec-write-tasks",
+      "path": "skills/spec-write-tasks/SKILL.md",
+      "entry_surface": "workflow_command",
+      "sha256": "cdfa20fd18d983e5ddf6ef259006d5a62e1b7fdc9a2564d879649990b77867df",
+      "bytes": 10798,
+      "lines": 141,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    },
+    {
+      "skill": "using-spec-first",
+      "path": "skills/using-spec-first/SKILL.md",
+      "entry_surface": "standalone_skill",
+      "sha256": "456dca0a4de865aaf551e5dd5d7b2a505a1783ac556acce153154588df35987e",
+      "bytes": 5771,
+      "lines": 52,
+      "inspection": "入口声明与治理类型核对；主链路定向检查范围另列"
+    }
+  ],
+  "mainline_skills": [
+    "spec-prd",
+    "spec-plan",
+    "spec-write-tasks",
+    "spec-work",
+    "spec-code-review"
+  ],
+  "evidence_refs": [
+    {
+      "path": "docs/methodology/结构化项目角色契约.md",
+      "sha256": "447e66b751639a36afb455380159f3b800c4a48b1189b304bed92a53a0ba0738",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "6506e740c8c4c7921f647b0cf3e7f3f1deefc0b8ab06f91247717a876c699eaf",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "package.json",
+      "sha256": "ef5e8f54c98c77dec7f0bcb2afc927f660c9756cd0e10d05a53b66a4368ac6f7",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "skills/spec-code-review/SKILL.md",
+      "sha256": "c6f93d057756425728ba3b3e3e2e9f2b7844e0b4b6d96859c0b8cc59c0aa8486",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "skills/spec-code-review/references/intent-and-plan.md",
+      "sha256": "6284e52365eaa73e8f3068388b8cd2ca54b0903fb5705e028ba975222bb12455",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "skills/spec-plan/SKILL.md",
+      "sha256": "bcc0e89dd04b3199a09ac16ee74a75a418fe609bd6cf6324f5c78a9d0bc9b416",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "skills/spec-plan/evals/consumer-replay-cases.json",
+      "sha256": "2733cdd5373515e8c8924597caa1bce159066259e080afd88ba3e19acff54fd0",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "skills/spec-plan/references/intake.md",
+      "sha256": "7996c03d919c0c0aab45c725fd15925a7ba6f1ec4ddbff10ceb7f2e60313ba2c",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "skills/spec-plan/references/plan-sections.md",
+      "sha256": "ac4e6383b067115da372c20342544a85f5a0d68aed0862facdbd629ae5866477",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "skills/spec-prd/SKILL.md",
+      "sha256": "c08990ccfb677ec46c919238e2f9f9e36a0582f74c5cc35fb8d2eaa6ae1c819e",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "skills/spec-prd/evals/examples.json",
+      "sha256": "ebc9039ee0a8a47287380370ed56c2466d8300e742b4e939b8ae84f397dc3733",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "skills/spec-prd/references/prd-output-template.md",
+      "sha256": "59a776888f79c76d7d8c0869773ece95a828918e310ece2a53dbd06bd4858c89",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "skills/spec-work/SKILL.md",
+      "sha256": "f718ddb6771e584d7e57b38cfe2491047466ae3d708db68f741c3fc8fe19c3e8",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "skills/spec-work/references/input-triage.md",
+      "sha256": "aeb94e9aea68c0dd82c4f4a17541135beb805de3133a0f40dfdce527bf38450a",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "skills/spec-work/references/review-findings-followup.md",
+      "sha256": "e10bdc0245430963bccfd6f233d158c39bcffb1c206675a027398d413c56abe3",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "skills/spec-work/references/shipping-workflow.md",
+      "sha256": "3b80283c75e58ebdb00f31624ceebac28fb367a28caad5f813a93dad2b5df693",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "skills/spec-work/references/work-intake-and-task-pack.md",
+      "sha256": "d888973eb245c8faf54c109832e999c60fc70106bfe01a6ab16897b322fe8ce3",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "skills/spec-work/references/work-intake.md",
+      "sha256": "28c1314a19b5f2d1ac661a3b47382e7a812c8e02d3a09532c1b0d80c3883c88a",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "skills/spec-write-tasks/SKILL.md",
+      "sha256": "cdfa20fd18d983e5ddf6ef259006d5a62e1b7fdc9a2564d879649990b77867df",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
+      "sha256": "4f08c3cb3aa21d3f858a08f6d9a474e5cbbdacf49d4e6555f4382d3ba9809154",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "tests/unit/spec-code-review-contracts.test.js",
+      "sha256": "6acde478ff17b71895343364182c75855372d428334b974e1602d9a826fd05f5",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "tests/unit/spec-plan-consumer-replay-contracts.test.js",
+      "sha256": "4e56cf5cc864b44865847bacae53e633e6e5d7d7a2c174b5b9c349ca195cb5e9",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "tests/unit/spec-plan-quality-contracts.test.js",
+      "sha256": "a65eea51f3a984c149288a2d76edd0fac0e428d0b0d83317fcf66b391eabddb6",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "tests/unit/spec-prd-plan-handoff-contracts.test.js",
+      "sha256": "3402196d6429dfa1d5fcb948feff40d2bf9d9380435d808efcf5a773877183de",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "tests/unit/spec-work-consumer-chain-contracts.test.js",
+      "sha256": "23177bc229354a500859730d23d65cbd9cff07a45e044d0a1fb6386769958e9c",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "tests/unit/spec-work-intake-contracts.test.js",
+      "sha256": "97f5078970dea531dae72300324544d3d8a9fbabc4f3b91ab441ae641b49ac4a",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "tests/unit/spec-work-shipping-contracts.test.js",
+      "sha256": "e03787ee8ff267c7c7df04c42ba72151d1884a97180c00d9d7cbfb227c5b7d49",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    },
+    {
+      "path": "tests/unit/spec-write-tasks-contracts.test.js",
+      "sha256": "02aca7b8683ae271611359ba0f4449f05b0720af94ccb451c838560c71171c40",
+      "scope": "基线引用/选定检查资产；不表示全文或实现穷尽审计"
+    }
+  ],
+  "protected_source_tree": {
+    "file_count": 1744,
+    "sha256": "e67430651cd1d37253aee633e96e93765fba21574e1a7c628e27c6d6066d8d3a",
+    "discovery": "git ls-files -z skills src templates tests scripts package.json package-lock.json；只纳入当前存在的普通文件",
+    "digest_algorithm": "对每个文件计算SHA-256；按repo-relative路径排序，拼接path+NUL+hex_sha256+LF，对UTF-8字节再做SHA-256",
+    "preexisting_dirty_in_protected_paths": false
+  },
+  "environment": {
+    "node": "v22.22.3",
+    "platform": "Darwin arm64",
+    "jest": "29.7.0"
+  },
+  "limitations": [
+    "不是所有38个Skill的深度审查",
+    "未测量模型行为、runtime成本和field outcome",
+    "未运行独立fresh-source评估或真实宿主加载",
+    "readiness与scope的语义充分性不能从hash或合同测试推断"
+  ]
+}

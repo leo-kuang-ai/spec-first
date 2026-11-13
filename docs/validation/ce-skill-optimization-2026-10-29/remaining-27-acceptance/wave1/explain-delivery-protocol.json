@@ -1,0 +1,33 @@
+{
+  "id": "CEOPT-11-parent-delivery-supplement",
+  "created_at": "2026-10-31T07:08:30.806589+00:00",
+  "execution_owner": "parent-inline; no independent worker tool available in current session",
+  "input_artifacts": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-11r2-B1/artifact.md": "9ba4ae4e792f91d8a09cb7a1bde40f87ea286fdd66d7984949d04c6e1a287e87",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-11r2-B2/artifact.md": "1c4882a068ae326227592501140198f28431225deb51af1b51cf8c1d8a7d7e57",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-11r2-B3/artifact.md": "649f22ac8e1e9d3f02f0ffaf01fcc5445aaffcacb98554f39e1fbe2c9cf5c348"
+  },
+  "fixture_files": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/README.md": "4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/package.json": "03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/src/server.js": "ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34"
+  },
+  "source_rules": {
+    "skills/spec-explain/references/destinations.md": "e16665350e272c2482c547db38947aa33500330a8006fa16c7762df81002356a",
+    "skills/spec-explain/references/explainer-markdown.md": "b4fcc583691bbb79128ebb4d1aa0c87631ba7b53e74033310e4c6f7c1c704096"
+  },
+  "allowed_writes": [
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/explain-delivery-supplement",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/explain-delivery-results.json"
+  ],
+  "procedure": [
+    "Verify every original model artifact and fixture pin. Do not edit historical artifacts.",
+    "Derive each document by appending an explicitly parent-authored navigation appendix with links computed from one known initial destination. Preserve original response as exact byte prefix.",
+    "Atomically save each initial document and resolve all three links to exact admitted source paths and hashes.",
+    "Actually rename each saved document into a deeper final directory. Validate unchanged links first as a stale-location negative control; all three must fail.",
+    "Rebase only appendix links against final directory; atomically replace and validate all links/source hashes plus original-byte-prefix preservation.",
+    "Retain all three accessible delivered artifacts, source identities and negative/positive observations. Remove empty initial directory and private temp files."
+  ],
+  "claim_ceiling": "Actual parent Markdown save/relocation/rebasing only; no autonomous Skill behavior, independent review, rendering/UI quality, A/B benefit, or full frozen acceptance.",
+  "historical_trials": "Unchanged; these are derived supplemental documents, never replacement trial responses."
+}

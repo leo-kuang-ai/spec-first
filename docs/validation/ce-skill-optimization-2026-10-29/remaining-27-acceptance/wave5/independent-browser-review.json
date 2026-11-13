@@ -1,0 +1,515 @@
+{
+  "review": "CEOPT-29 independent full-six Browser review and CEOPT-22 provenance-correction verification",
+  "overall_verdict": {
+    "model_artifacts": "All six are acceptable bounded receipt interpretations.",
+    "A_controls": "Failed: vitals-before-open is accepted, and injected close9 is concealed by a successful producer result without retained diagnostics.",
+    "B_controls": "The supplied ordering rejection, cleanup-failure propagation and diagnostic-retention controls pass. The injected close9 run itself remains failed.",
+    "claim_ceiling": "No full Browser workflow acceptance, real-browser crash recovery, application acceptance, superiority or relative cost/benefit conclusion."
+  },
+  "scope_and_method": {
+    "reviewed": [
+      "CEOPT-29 packet and request",
+      "All six original artifacts, receipts and complete tool-event traces",
+      "Both cleanup receipts, including all nine cases under each close0 and close9 injection",
+      "All archived diagnostic JSON",
+      "Both ordering receipts",
+      "All three named shared historical actual-browser receipts",
+      "Frozen A/B SKILL.md and relevant references",
+      "Frozen conformance producer and relevant wrapper validation/conformance-consumer source",
+      "Parent prepare-browser-cleanup.py and prepare-browser.py",
+      "Input-index and intake pins",
+      "Prototype handoff correction, six existing CEOPT-22 receipts, original handoff, preserved independent review and parent-direct continuation"
+    ],
+    "method": "Read-only inspection, source comparison, JSON parsing, hashing, timestamp arithmetic and bounded session-metadata inspection.",
+    "not_performed": [
+      "New trials",
+      "Mutations",
+      "Helper or producer execution",
+      "Tests",
+      "Browser operation",
+      "Network requests",
+      "Delegation"
+    ]
+  },
+  "integrity_and_provenance": {
+    "verdict": "pass_with_explicit_claim_limits",
+    "checks": [
+      "Packet matches its input-index hash.",
+      "Request and all three shared historical input hashes match the packet.",
+      "Both cleanup and both ordering receipt hashes match the packet.",
+      "All ten frozen Browser source-file pins match intake.",
+      "Intake plan hash matches.",
+      "All six artifact and trace hashes match their receipts.",
+      "All six receipts equal their trial-index entries.",
+      "All six session start/final timestamps and recorded model metadata agree with existing session records.",
+      "All event timestamps fall within their trial intervals.",
+      "All six elapsed intervals match timestamp arithmetic and are below 300 seconds.",
+      "Observed trial order is A1, B1, B2, A2, A3, B3, without overlapping trial intervals.",
+      "Every original tool output exactly matches the complete concatenation of its named current frozen/input files; no original output truncation was found.",
+      "Observed calls are file reads only, confined to assigned-arm frozen Skill/references and named shared/arm inputs.",
+      "No opposite-arm, prior-trial or reviewer-output reads appear in original traces."
+    ],
+    "key_hashes": {
+      "packet": "201f25de61c0f0dbb5922c1f1426cb76124e45276cc1842a35f449f9eab3e516",
+      "request": "24709c5113b2f8447c35576852ce9c42a66cedfe69dc85f1ff27eabadda90b6a",
+      "A_cleanup_receipt": "98943ee0ac2696c29500e43984a812d8f1e791c4867ee2eb19fe509c47c0de81",
+      "B_cleanup_receipt": "231c1b07bea8eb220c7c9453cd1e4c074d26ccd6214f45feb971d3a7f4a8a688",
+      "A_order_receipt": "a18fc04a0b969b18f8b8b556659d91ac9415f4043a4b8654c1772133f2b7e2ea",
+      "B_order_receipt": "f78f9a72905101620d85fe650586aec8cae1c40292ee1bbb09b66c3f686245ce",
+      "A_conformance_source": "397718d4c9b02210f431e2d5babe83d7ad1594ea35cc93e1a3009d511d4f8e3e",
+      "B_conformance_source": "3a34fea98914128ab176cdf32700ed635fba36843c1071071a93ff728c0943e9"
+    },
+    "limitations": [
+      "Recorded metadata is not authenticated serving identity.",
+      "Observed read-only compliance is not enforced filesystem isolation.",
+      "Durable saving is parent-mediated, not autonomous model saving.",
+      "Six interpretations reuse parent-produced evidence; they are not six independent browser executions.",
+      "Reviewer display truncation occurred during broad reads and was resolved using bounded reads and exact-content comparisons; this is separate from original trial outputs."
+    ]
+  },
+  "ground_truth": {
+    "ordering": {
+      "input": [
+        "vitals",
+        "open"
+      ],
+      "A": {
+        "actual_validation_ok": true,
+        "control_verdict": "fail",
+        "browser_execution": "not_run"
+      },
+      "B": {
+        "actual_validation_ok": false,
+        "reason_code": "test-plan-page-context-before-open",
+        "step_index": 0,
+        "control_verdict": "pass",
+        "browser_execution": "not_run"
+      },
+      "interpretation": "Supplying a route on vitals does not establish an initial open. These receipts exercise actual plan validation, not browser execution."
+    },
+    "cleanup": [
+      {
+        "arm": "A",
+        "injected_close_exit": 0,
+        "producer_exit": 0,
+        "reported_status": "passed",
+        "independent_cleanup_field": "absent",
+        "diagnostic_root_retained": false,
+        "archived_json": [],
+        "disposition": "Compatible with successful fake-browser cleanup, but independent cleanup-result reporting is absent."
+      },
+      {
+        "arm": "A",
+        "injected_close_exit": 9,
+        "producer_exit": 0,
+        "reported_status": "passed",
+        "independent_cleanup_field": "absent",
+        "diagnostic_root_retained": false,
+        "archived_json": [],
+        "disposition": "Failed control: injected cleanup failure is not propagated or retained."
+      },
+      {
+        "arm": "B",
+        "injected_close_exit": 0,
+        "producer_exit": 0,
+        "reported_status": "passed",
+        "cleanup_status": "passed",
+        "cleanup_exit": 0,
+        "cleanup_timed_out": false,
+        "cleanup_stderr": "cleanup diagnostic",
+        "diagnostic_root_retained": false,
+        "archived_json": [],
+        "disposition": "Passed bounded success control."
+      },
+      {
+        "arm": "B",
+        "injected_close_exit": 9,
+        "producer_exit": 1,
+        "reported_status": "failed",
+        "cleanup_status": "failed",
+        "cleanup_exit": 9,
+        "cleanup_timed_out": false,
+        "cleanup_stderr": "cleanup diagnostic",
+        "diagnostic_root_retained": true,
+        "archived_json": [
+          "config.json",
+          "action-policy.json",
+          "conformance-result.json"
+        ],
+        "disposition": "Failed run; passed failure-propagation and diagnostic-retention control. Recovery remains unexecuted."
+      }
+    ],
+    "all_nine_conformance_cases": [
+      {
+        "name": "initial-open-and-frame",
+        "A_close0": "passed",
+        "A_close9": "passed",
+        "B_close0": "passed",
+        "B_close9": "passed"
+      },
+      {
+        "name": "same-origin-redirect",
+        "A_close0": "passed",
+        "A_close9": "passed",
+        "B_close0": "passed",
+        "B_close9": "passed"
+      },
+      {
+        "name": "cross-origin-redirect",
+        "A_close0": "passed",
+        "A_close9": "passed",
+        "B_close0": "passed",
+        "B_close9": "passed"
+      },
+      {
+        "name": "same-origin-link",
+        "A_close0": "passed",
+        "A_close9": "passed",
+        "B_close0": "passed",
+        "B_close9": "passed"
+      },
+      {
+        "name": "cross-origin-link",
+        "A_close0": "passed",
+        "A_close9": "passed",
+        "B_close0": "passed",
+        "B_close9": "passed"
+      },
+      {
+        "name": "cross-origin-form",
+        "A_close0": "passed",
+        "A_close9": "passed",
+        "B_close0": "passed",
+        "B_close9": "passed"
+      },
+      {
+        "name": "cross-origin-script",
+        "A_close0": "passed",
+        "A_close9": "passed",
+        "B_close0": "passed",
+        "B_close9": "passed"
+      },
+      {
+        "name": "cross-origin-popup",
+        "A_close0": "passed",
+        "A_close9": "passed",
+        "B_close0": "passed",
+        "B_close9": "passed"
+      },
+      {
+        "name": "cross-origin-direct-open",
+        "A_close0": "passed",
+        "A_close9": "passed",
+        "B_close0": "passed",
+        "B_close9": "passed"
+      }
+    ],
+    "conformance_boundary": "All four fixtures report passing positive controls and zero prohibited-origin hits. Negative actions return exit1 with ERR_BLOCKED_BY_CLIENT. The fake executable synthesizes these responses without real browser enforcement; zero hits cannot establish request-time browser protection. Frame coverage is combined with initial-open-and-frame, not a separately executed named negative case."
+  },
+  "diagnostic_review": {
+    "archive_contents": {
+      "config.json": {},
+      "action-policy.json": {
+        "default": "deny",
+        "allow": [
+          "launch",
+          "navigate",
+          "open",
+          "get",
+          "gettext",
+          "geturl",
+          "url",
+          "click",
+          "close"
+        ]
+      },
+      "conformance-result.json": "Parsed archive is exactly equal to the complete B close9 stdout result, including all nine cases, failed cleanup and recovery facts."
+    },
+    "recovery_facts": {
+      "session": "sfc-82eb7252",
+      "namespace": "sfo-82eb7252",
+      "suggestion": "retry isolated close, then remove private diagnostics",
+      "successful_retry": "not_supplied"
+    },
+    "retention_boundary": [
+      "B close9 retained its private root at producer completion.",
+      "Parent archived JSON before removing the owned outer fixture root.",
+      "The fixture cleanup receipt reports removal; both outer root and B recovery root are currently absent.",
+      "Archived JSON remains readable evidence. The original recovery path is not a currently available recovery environment.",
+      "Directory removal does not establish successful browser-session recovery."
+    ]
+  },
+  "historical_actual_browser": {
+    "provenance": "Shared historical parent-operated, B-produced execution on a caller-owned synthetic loopback page; not an A producer run or fresh execution by any original model trial.",
+    "origin": "http://127.0.0.1:50523",
+    "local_receipt": {
+      "vitals_first_prepare_exit": 1,
+      "positive_prepare_exit": 0,
+      "positive_run_exit": 0,
+      "positive_cleanup_exit": 0,
+      "server_cleanup": "completed",
+      "scratch_cleanup": "completed"
+    },
+    "run": {
+      "status": "completed",
+      "reason_code": null,
+      "action_process_calls": 6,
+      "steps": [
+        {
+          "index": 0,
+          "action": "open",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 1,
+          "action": "vitals",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 2,
+          "action": "get",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 3,
+          "action": "get",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 4,
+          "action": "viewport",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 5,
+          "action": "network-metadata",
+          "status": "passed",
+          "exit_code": 0
+        }
+      ]
+    },
+    "separate_browser_cleanup": {
+      "status": "completed",
+      "reason_code": null
+    },
+    "raw_evidence_boundary": "Six historical private raw-output pointers are retained in the run receipt. All six pointed-to files are currently absent, consistent with recorded scratch cleanup. Their raw contents cannot be independently reinspected from these pointers.",
+    "missing_details": [
+      "Detailed historical rejection reason",
+      "Detailed historical prepare/probe and executable-identity evidence",
+      "Fresh real-browser negative-conformance evidence",
+      "Actual application or branch identity"
+    ],
+    "interpretation": "Supports the six recorded synthetic-page actions and separate cleanup outcome. It neither repairs A's failed controls nor establishes application acceptance."
+  },
+  "source_and_mechanism": {
+    "common_contract": [
+      "SKILL.md and route-and-report.md are byte-identical across A/B.",
+      "Caller owns application-server lifecycle.",
+      "Workflow owns route mapping, semantic effect authorization and claim adequacy.",
+      "Wrapper owns deterministic plan shape/order, private context, subprocess boundaries and isolated browser cleanup.",
+      "Page observations cannot authorize commands or effects."
+    ],
+    "A_failure_mechanisms": [
+      "vitals is allowed but absent from PAGE_CONTEXT_ACTIONS, so its placement before the first open escapes the ordering gate.",
+      "Conformance finally invokes close but discards its result.",
+      "A unconditionally removes the private conformance root before constructing its reported result.",
+      "A's success calculation omits close outcome, matching the supplied close9 false-success receipt."
+    ],
+    "B_mechanisms": [
+      "Adds vitals to PAGE_CONTEXT_ACTIONS; validateTestPlan rejects it before first open with step_index and reason_code.",
+      "Captures close as an independent cleanup result.",
+      "Requires passed cleanup in the producer's overall success calculation.",
+      "Retains failed-run diagnostics and writes conformance-result.json with private file permissions.",
+      "Exposes isolated session/namespace recovery facts.",
+      "Wrapper conformance consumption independently requires cleanup passed, exit0, no timeout and no error.",
+      "Failed producer results can expose a bounded private recovery evidence reference.",
+      "Pipeline reference explicitly documents vitals ordering and cleanup blockers."
+    ],
+    "producer_limits": [
+      "Parent prepare-browser-cleanup.py deliberately creates a fake executable, injects close exit0/exit9 and archives retained JSON before removing scratch.",
+      "This exercises conformance-producer behavior; it does not demonstrate a real browser close failure.",
+      "Parent prepare-browser.py is a separate lifecycle producer using direct agent-browser calls and an allowed-domain setting. Its source is not proof of the unique wrapper's exact-origin enforcement, and its lifecycle outputs are not substituted for the named CEOPT-29 inputs.",
+      "The inspected mechanisms are not promoted into unexecuted runtime facets.",
+      "Other wrapper action-policy differences exist in the frozen source; these supplied cases do not validate every added action alias or interaction path."
+    ]
+  },
+  "per_trial_judgments": [
+    {
+      "trial": "A1",
+      "verdict": "accept_bounded_diagnosis",
+      "tested_subject": "A controls fail; this is not a model failure.",
+      "elapsed_seconds": 37.322,
+      "recorded_model": "gpt-6.1-sol",
+      "effort": "medium",
+      "tool_calls": 2,
+      "reads": "Assigned SKILL, request, both A receipts, all three historical receipts and route-and-report reference.",
+      "coverage": "Both injections, all nine cases per injection, ordering, historical six-step positive, cleanup and remaining facets.",
+      "assessment": [
+        "Correctly rejects A's accepted invalid order and hidden close9 failure.",
+        "Keeps close0 bounded because separate close reporting is absent.",
+        "Correctly identifies historical positive as B-produced.",
+        "Does not claim current raw-file availability, actual enforcement or recovery."
+      ],
+      "qualification": "Pipeline reference and implementation were not read by the original model; its artifact does not claim otherwise."
+    },
+    {
+      "trial": "B1",
+      "verdict": "accept_bounded_interpretation",
+      "elapsed_seconds": 45.68,
+      "recorded_model": "gpt-6.1-sol",
+      "effort": "medium",
+      "tool_calls": 2,
+      "reads": "Assigned SKILL, request, both B receipts, all three historical receipts and both references.",
+      "coverage": "Complete requested case and facet coverage.",
+      "assessment": [
+        "Distinguishes a passing failure-handling control from a failed close9 execution.",
+        "Accounts for all nine cases under both injections.",
+        "Correctly describes producer retention, parent archival and later removal.",
+        "Maintains fake-browser, historical-provenance, raw-pointer and full-workflow limits."
+      ],
+      "qualification": "No implementation source was read by the original model."
+    },
+    {
+      "trial": "B2",
+      "verdict": "accept_bounded_interpretation",
+      "elapsed_seconds": 67.203,
+      "recorded_model": "gpt-6.1-sol",
+      "effort": "medium",
+      "tool_calls": 1,
+      "reads": "Assigned SKILL, request, both B receipts and all three historical receipts.",
+      "coverage": "Complete requested case coverage, including all nine names for both injections.",
+      "assessment": [
+        "Correct order rejection and close0/close9 dispositions.",
+        "Explicit fake-browser limitation and no real crash inference.",
+        "Correct historical B attribution and diagnostic/archive distinction.",
+        "Does not infer successful recovery."
+      ],
+      "qualification": "Neither referenced route-and-report nor pipeline-orchestration was read. The factual receipt analysis remains correct; this is not proof of complete ordinary Skill execution or reference adherence."
+    },
+    {
+      "trial": "A2",
+      "verdict": "accept_bounded_diagnosis",
+      "tested_subject": "A controls fail; this is not a model failure.",
+      "elapsed_seconds": 39.157,
+      "recorded_model": "gpt-6.1-sol",
+      "effort": "medium",
+      "tool_calls": 2,
+      "reads": "Assigned SKILL, request, both A receipts, all three historical receipts and both references.",
+      "coverage": "Complete requested case and facet coverage.",
+      "assessment": [
+        "Correctly separates invalid-order acceptance, hidden cleanup failure and diagnostic-retention failure.",
+        "Covers all nine cases in each injection.",
+        "Does not let historical B success repair A controls.",
+        "Keeps raw evidence, browser enforcement and application facets unestablished."
+      ],
+      "qualification": "No implementation source was read by the original model."
+    },
+    {
+      "trial": "A3",
+      "verdict": "accept_bounded_diagnosis",
+      "tested_subject": "A controls fail; this is not a model failure.",
+      "elapsed_seconds": 93.692,
+      "recorded_model": "gpt-6.1-sol",
+      "effort": "medium",
+      "tool_calls": 2,
+      "reads": "Assigned SKILL, request, both A receipts, all three historical receipts and route-and-report reference.",
+      "coverage": "Complete requested case coverage.",
+      "assessment": [
+        "Correctly diagnoses both A defects.",
+        "Preserves all nine conformance observations without upgrading simulated enforcement.",
+        "Distinguishes historical B execution from A.",
+        "Explicitly leaves corrected controls, actual browser facets and application acceptance unresolved."
+      ],
+      "qualification": "Pipeline reference and implementation were not read by the original model."
+    },
+    {
+      "trial": "B3",
+      "verdict": "accept_bounded_interpretation",
+      "elapsed_seconds": 108.653,
+      "recorded_model": "gpt-6.1-sol",
+      "effort": "medium",
+      "tool_calls": 2,
+      "reads": "Assigned SKILL, request, both B receipts, all three historical receipts and both references.",
+      "coverage": "Complete requested case and facet coverage.",
+      "assessment": [
+        "Explicitly keeps close9 failed while accepting failure propagation.",
+        "Accounts for all nine cases and correctly identifies combined frame representation.",
+        "Explicitly states no successful retry is supplied.",
+        "Clearly separates archived diagnostics, historical raw pointers, caller-server cleanup and wrapper-browser cleanup."
+      ],
+      "qualification": "No implementation source was read by the original model."
+    }
+  ],
+  "timing_and_metadata": {
+    "measurement": "Existing session first timestamp to final assistant-message timestamp; not capture time.",
+    "recorded_model_all_six": "gpt-6.1-sol medium",
+    "authenticated_serving_identity": false,
+    "all_individual_intervals_below_300_seconds": true,
+    "sum_trial_intervals_seconds": 391.707,
+    "first_start_to_last_final_seconds": 1440.381,
+    "inter_trial_gaps_seconds": [
+      16.637,
+      23.557,
+      291.144,
+      367.274,
+      350.062
+    ],
+    "gap_total_seconds": 1048.674,
+    "interpretation": "No causal attribution of gaps, isolated compute measurement or relative runtime/benefit conclusion. Uniform recorded labels within Browser do not authenticate serving identity or convert reused receipt interpretations into independent browser outcomes."
+  },
+  "prototype_correction_review": {
+    "verdict": "consistent_with_existing_receipts_and_appropriate_boundary",
+    "original_handoff": {
+      "sha256_matches_correction": true,
+      "sha256": "21e8218764ff8d9ad660a8727d66cc03536d35f2652ca551371a0f4c22b00816",
+      "timestamp": "2026-10-31T09:27:55.987079+00:00",
+      "interpretation": "Retrospective record, after B2 final. Its remaining_order is not evidence of remaining slots or pre-B2 admission at record time."
+    },
+    "correction": {
+      "all_six_session_ids_match_receipts": true,
+      "all_six_start_final_timestamps_match_receipts": true,
+      "all_six_model_metadata_entries_match_receipts": true,
+      "A1_B1": "gpt-6-astra medium",
+      "B2_A2_A3_B3": "gpt-6.1-sol medium",
+      "claim": "Preserves local correctness while keeping same-model comparability and relative cost/benefit inconclusive.",
+      "boundary": "The statement that parent dispatch inherited current settings without overrides is dispatch-owner documentation; the receipts establish recorded model labels, not authenticated serving identity or independent proof of absence of overrides."
+    },
+    "preserved_review": {
+      "path": "wave5/independent-prototype-review.json",
+      "sha256": "dc0f0c199e5bb58556c2a405ef1574410733e0c6ed6c232ce88f472ef71f0132",
+      "observation": "Retains the original mixed-model and handoff-chronology findings. The correction supplements rather than erases those findings."
+    },
+    "parent_direct_continuation": {
+      "consistent_boundaries": [
+        "One combined trial/reviewer slot",
+        "Original order and per-packet 300-second interval retained",
+        "Inherited settings documented without treating serving identity as authenticated",
+        "Read-only traces distinguished from enforced isolation",
+        "Parent saving distinguished from autonomous saving",
+        "No relative quality/runtime/field-benefit inference"
+      ],
+      "chronology": "Recorded at 09:37:42.931752Z, after Browser A1 and during B1. It is not evidence of a newly documented pre-A1 or pre-B1 admission event."
+    },
+    "disposition": "Apply KTD6 as documented: preserve unaffected per-trial correctness, disclose the mixed Prototype model block, retain the original records and do not infer a retrospective pre-B2 admission or perform silent retries."
+  },
+  "remaining_facets": [
+    "Fresh actual-browser execution under each frozen producer",
+    "Real-browser close9 or crash failure and successful isolated recovery",
+    "Fresh identity-bound request-time exact-origin conformance",
+    "Affected application-route and changed-file coverage",
+    "Application branch identity",
+    "Visual rendering, screenshots and human acceptance",
+    "Accessibility and substantive application assertions",
+    "Attributable console-error verification",
+    "Business interactions and semantic durable-effect authorization",
+    "Human-only flows",
+    "Full autonomous model workflow",
+    "Relative model or arm superiority, isolated cost and field benefit"
+  ],
+  "recommended_disposition": "Accept all six local receipt-analysis artifacts with their stated limits. Preserve A's tested failures as failures, preserve B close9 as a failed run with correctly passing failure-handling controls, retain historical B evidence separately, and keep full acceptance and comparative benefit claims unestablished."
+}

@@ -1,0 +1,106 @@
+{
+  "created_at": "2026-10-30T02:10:04.334176+00:00",
+  "status": "frozen-before-trials",
+  "source_snapshot": "Original U31 immutable dirty baseline",
+  "arm_mapping": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "scenarios": {
+    "CEOPT-02": {
+      "skill": "spec-brainstorm",
+      "request": "We have settled the target user and goal: support agents need to copy a ticket's public reference quickly while responding to a customer. The scope is one Copy reference action beside the existing reference. It copies only the displayed public reference, shows a brief success confirmation, and shows a retryable failure message if clipboard access fails. It must not copy the customer's name, email or internal ticket ID. Keyboard use must work. Do not add bulk copy, export, settings or analytics. I want a short product alignment here in chat only, not a document, implementation plan or code. Carry these decisions forward and finish the alignment without asking me to choose them again.",
+      "scope": "Full frozen no-document requirement-alignment interaction, with source-guided reads and observed no mutation. No downstream implementation quality claim."
+    },
+    "CEOPT-34": {
+      "skill": "using-spec-first",
+      "request": "Provide the next assistant response for each of the four separate conversation situations below. Treat them independently. Each is a real request for a chat-only result at this point; no repository mutation, installation or external calls are authorized. Do not give a general explanation of the routing system.\n\nA. The active owner is spec-work, implementing a settled invoice total change. A local check inside that work reports TypeError: Cannot read properties of undefined (reading 'reduce'). The relevant code is `function total(items) { return items.reduce((sum, item) => sum + item.price, 0); }`; the test calls `total(undefined)` and the settled requirement says missing items means an empty invoice. The user says: Continue this work. For this response explain the cause and the smallest change implied by our settled requirement; I will apply it myself.\n\nB. The user asks: In one sentence, explain this changelog wording: \"Fix bug in password reset when the link expires.\" I am asking what the sentence means, not reporting a failure in this project.\n\nC. The user asks: We already chose monthly CSV export for support managers and the acceptance criteria are settled. Please turn the attached behavior into a concrete implementation outline here in chat; do not stop at recommending a workflow. Behavior: a support manager selects a calendar month and downloads only their tenant's closed tickets, with timestamp and public reference columns. Our Express controller uses `requireSupportManager`, receives `req.tenantId`, and reads tickets via `listTickets({tenantId, closedFrom, closedBefore})`. CSV serialization already exists as `writeCsv(rows, columns)`. Boundaries are UTC calendar months. No email, scheduling, cross-tenant aggregation or new library is needed.\n\nD. The user asks: From this snippet explain what is returned for null and for an empty string: `function label(value) { return value == null ? '(missing)' : String(value); }`. Our optional Graphify tool is unavailable. I need the explanation now, not setup or installation.",
+      "scope": "Four read-only response probes for the frozen routing facets. Does not exercise downstream filesystem mutation or live tool invocation; complete frozen end-to-end route acceptance remains partial."
+    }
+  },
+  "trials_per_arm": 3,
+  "order": [
+    "CEOPT-02/A/1",
+    "CEOPT-02/B/1",
+    "CEOPT-02/B/2",
+    "CEOPT-02/A/2",
+    "CEOPT-02/A/3",
+    "CEOPT-02/B/3",
+    "CEOPT-34/B/1",
+    "CEOPT-34/A/1",
+    "CEOPT-34/A/2",
+    "CEOPT-34/B/2",
+    "CEOPT-34/B/3",
+    "CEOPT-34/A/3"
+  ],
+  "judge_rules": [
+    "Judge the frozen task and original acceptance criteria using exact response excerpts and observed tool events.",
+    "Do not penalize wording or output shape unless it contradicts the task; do not use keyword success.",
+    "For CEOPT-02 check product goal versus mechanism, preserved settled scope, no repeated decision questions, no file writes or invented document claims.",
+    "For CEOPT-34 assess each situation independently: owner continuity, quoted-text intent, requested concrete outline, optional-tool nonblocking behavior.",
+    "Record unavailable actual model identity and enforcement separately; no cross-model, causal benefit or runtime-cost inference.",
+    "Do not expose these judge rules or arm mapping to performers."
+  ],
+  "capability": {
+    "primitive": "native collaboration.spawn_agent",
+    "fork_turns": "none",
+    "model": "inherited; no override; actual serving identity not authenticated",
+    "workspace": "shared directory; source reads only; no writes authorized",
+    "isolation": "fresh context; filesystem enforcement unavailable",
+    "evaluation_type": "read-only conversation task trials; not skill-up CLI model execution"
+  },
+  "files": {
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/spec-brainstorm/SKILL.md": "d3df96643040bebb4cc003ff75f9fdb3f3dac34461abb031eab7808f82167861",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/spec-brainstorm/references/agents/slack-researcher.md": "74b5168f5c71001da2552d3e1f546d68dcb69918e8d3d72da774be9f34654cea",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/spec-brainstorm/references/approaches.md": "beb9864913ce83bef8fa59606b23f04950cf774893875f7a4c1b0c9dc6f6be79",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/spec-brainstorm/references/blindspot-pass.md": "d173accf20219ad100a048382e453436f6ece885d586678f4106bc750da7e57e",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/spec-brainstorm/references/brainstorm-sections.md": "0f886fea1f9d4bc24dc6f3e56a1accb9aabe99e707b86698431103a2a42e1cc0",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/spec-brainstorm/references/dialogue.md": "f4875ae211e393bc35fafa05d99fe8b1674f0623c0327b81caf6ea35a6830472",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/spec-brainstorm/references/handoff.md": "02bf09e9fd0582f6766192cdd93247e4fa1f0ef248589cba42cdb8bf084da48a",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/spec-brainstorm/references/html-rendering.md": "3a73c760bf2daea7428671862b05af8ba8a5971ed21fec2d911c484e8da44383",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/spec-brainstorm/references/interaction-rules.md": "7f1ea0d8a64b1ab928953b54699b73d4a28ff2d1566fa6b563fcb76171cf3767",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/spec-brainstorm/references/markdown-rendering.md": "1cc87b51fa1aa815249a82fe663eb23087453b77ba50070dff30f5c42c737c60",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/spec-brainstorm/references/model-tiers.md": "abff301100e828b0b1f07c4e3d42417f43009a102eb4823490d7dd41a819702b",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/spec-brainstorm/references/output-mode.md": "e8fbaeb2df012a771f7c00bd56a2d5e9a90d12ae4be6b3e6019f9e7b50294f7a",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/spec-brainstorm/references/phase-0.md": "ad69b0bbaccfc7b3c3346e8b4956c123582c1e1ef531547aa487b9cac88f280a",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/spec-brainstorm/references/plan-write.md": "0255bbcf720d61435c3a5ae6532bd34fe0c2c3b7bb6c1c3292126010eb0a1495",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/spec-brainstorm/references/product-pressure-test.md": "2e5f4ad474d6b174cfe54555e31d695085e942c3559127153cfbb2dde928fd84",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/spec-brainstorm/references/settled-decisions.md": "5b36b0da843bdd2ca18dae80c2cd6b53d3489ff9e2336a26ec07f75221a60937",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/spec-brainstorm/references/synthesis-summary.md": "e149fbfac58dde122c3026c7b4c5ae727c6516a41498f70250cfd64b7ed55ff5",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/spec-brainstorm/references/universal-brainstorming.md": "13fda41db046dceb603952444c61666406db8b6ef1eb0e33a3af76160ad2b43d",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/spec-brainstorm/references/verdict-routing.md": "be20df74222ad7107016495029317d51406817181c216285376943c68362a47c",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/using-spec-first/SKILL.md": "21a73e2da3f24f0b8d7eef31664e5e55c9e1228e809a419efde7fe345e580079",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/using-spec-first/references/conditional-routing-boundaries.md": "a465bd34553006730a21258483d07ab138a53f702d897561c9efc877bdae855a",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/A/using-spec-first/references/public-route-map.md": "a56255d20ae306b28aeb2b58fd6e35a2bdc1476df503cd80a2757566ebde5347",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/spec-brainstorm/SKILL.md": "d3df96643040bebb4cc003ff75f9fdb3f3dac34461abb031eab7808f82167861",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/spec-brainstorm/references/agents/slack-researcher.md": "de0ff6c912803e7fd66234c997275e341c1a3085c0896d36a99b752e1651e1a0",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/spec-brainstorm/references/approaches.md": "beb9864913ce83bef8fa59606b23f04950cf774893875f7a4c1b0c9dc6f6be79",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/spec-brainstorm/references/blindspot-pass.md": "d173accf20219ad100a048382e453436f6ece885d586678f4106bc750da7e57e",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/spec-brainstorm/references/brainstorm-sections.md": "ad3e9f420710f0d4355315d5ac1f81324136864e19055cbb70218cb9b7525669",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/spec-brainstorm/references/dialogue.md": "f4875ae211e393bc35fafa05d99fe8b1674f0623c0327b81caf6ea35a6830472",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/spec-brainstorm/references/handoff.md": "ab4ef1ce1a28edec955fcf9403188ed3e2d233f0673c956b672f4551f758b8a6",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/spec-brainstorm/references/html-rendering.md": "3a73c760bf2daea7428671862b05af8ba8a5971ed21fec2d911c484e8da44383",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/spec-brainstorm/references/interaction-rules.md": "c36a97db63801c19c8d377d2a3ca8efc31b91b33b52a7a49ee2fde1aec92b0c1",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/spec-brainstorm/references/markdown-rendering.md": "1cc87b51fa1aa815249a82fe663eb23087453b77ba50070dff30f5c42c737c60",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/spec-brainstorm/references/model-tiers.md": "abff301100e828b0b1f07c4e3d42417f43009a102eb4823490d7dd41a819702b",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/spec-brainstorm/references/output-mode.md": "e8fbaeb2df012a771f7c00bd56a2d5e9a90d12ae4be6b3e6019f9e7b50294f7a",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/spec-brainstorm/references/phase-0.md": "ad69b0bbaccfc7b3c3346e8b4956c123582c1e1ef531547aa487b9cac88f280a",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/spec-brainstorm/references/plan-write.md": "9aace9e2cb8b7578a35afb8baf1f3bfd009ff30e8bc308196cc63e49b578eca8",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/spec-brainstorm/references/product-pressure-test.md": "2e5f4ad474d6b174cfe54555e31d695085e942c3559127153cfbb2dde928fd84",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/spec-brainstorm/references/settled-decisions.md": "5b36b0da843bdd2ca18dae80c2cd6b53d3489ff9e2336a26ec07f75221a60937",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/spec-brainstorm/references/synthesis-summary.md": "a865c91b2d1b9f9b7f579bc498cb548f0549264302cf9e5376553bd2bf860f37",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/spec-brainstorm/references/universal-brainstorming.md": "13fda41db046dceb603952444c61666406db8b6ef1eb0e33a3af76160ad2b43d",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/spec-brainstorm/references/verdict-routing.md": "be20df74222ad7107016495029317d51406817181c216285376943c68362a47c",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/using-spec-first/SKILL.md": "21a73e2da3f24f0b8d7eef31664e5e55c9e1228e809a419efde7fe345e580079",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/using-spec-first/references/conditional-routing-boundaries.md": "3bfb4cb185a6ed666942a9f314e5df4133dc57f2e0f410eefea1325658c19eb0",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-readonly-trials-20261030/inputs/B/using-spec-first/references/public-route-map.md": "a56255d20ae306b28aeb2b58fd6e35a2bdc1476df503cd80a2757566ebde5347"
+  },
+  "head": "fe81bae9ee55ec336c85cf80c4a0460d86e3a412",
+  "index_entries_sha256": "782199f52263f69a6fc327fd38fc037c5c29cc2f20f00c932b970db0eae44ce6",
+  "limitations": [
+    "Two admitted read-only scenarios only; other32 remain separately accounted for.",
+    "CEOPT-34 probes response decisions rather than full downstream execution.",
+    "Read-only instructions and before/after observations do not establish enforced filesystem or credential isolation.",
+    "No external provider calls; no skill installation or runtime regeneration."
+  ]
+}

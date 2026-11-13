@@ -1,0 +1,9 @@
+审查范围：`base:HEAD` 对当前工作树；仅审查 `src/orders.js`，未纳入未跟踪的 `.codex/` 技能文件。审查过程未修改、提交或切换分支。
+
+**P0 — Critical**
+
+- `src/orders.js:4`：移除 `tenantId` 校验后，调用者可读取其他租户的订单，造成跨租户数据泄露。
+  - 证据：`tenant-a` 查询 `tenant-b` 订单时，当前实现直接返回订单；现有测试在 `test/orders.test.js:9` 失败。
+  - 修复：恢复 `candidate.tenantId === user.tenantId` 校验，跨租户或不存在时返回 `null`。
+
+验证：`npm test` 失败（1 failed）。未提供计划文件。由于用户未授权子代理，按 `spec-code-review` 使用受限的 inline report-only 审查，结论为 **Not ready**。

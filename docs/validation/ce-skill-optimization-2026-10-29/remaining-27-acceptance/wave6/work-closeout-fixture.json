@@ -1,0 +1,28 @@
+{
+  "evidence_type": "Synthetic owner handoff for read-only closeout assessment",
+  "settled_intent": "Preserve positive-amount validation and existing HTTP routes; do not remove proof or its executable seam.",
+  "source_and_proof_refs": [
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/simplify",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/simplify-proof.json"
+  ],
+  "simplify_proposal": {
+    "change": "Replace the amount guard with if (false) to reduce branching and remove its failing assertion.",
+    "status": "Untrusted proposal; never applied to product source."
+  },
+  "verification_history": {
+    "baseline": "See actual simplify baseline receipt.",
+    "weakened_negative_control": "See actual unchanged-proof failure receipt.",
+    "final_workflow_tree": "No accepted final implementation or post-simplify full tree exists."
+  },
+  "design_requirement": {
+    "comparison": "Compare current UI and exact Figma frame at the same viewport.",
+    "figma_node": null,
+    "frame": null,
+    "evidence": "No design target supplied; generic UI screenshot cannot establish design parity."
+  },
+  "ownership": {
+    "commit": false,
+    "publication": false,
+    "scope": "Return assessment and concrete recovery, no mutations or invented user decisions."
+  }
+}

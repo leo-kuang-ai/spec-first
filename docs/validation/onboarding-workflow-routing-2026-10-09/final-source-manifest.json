@@ -1,0 +1,91 @@
+{
+  "schema_version": "onboarding-source-manifest/v1",
+  "purpose": "审查修复后 canonical source；历史 V2/V3 来源仍见 source-manifest.json。",
+  "base": "a250a7d78aa587719cab004fe806a3b331f3af92",
+  "excluded": [
+    "docs/validation/ 证据本身",
+    "docs/plans/ 后置 lifecycle 标记"
+  ],
+  "files": [
+    {
+      "file": "CHANGELOG.md",
+      "sha256": "03a677f09bd2f75a0e1263412775fe1e975eb1e3b9aba69eb4a237736a0c410a"
+    },
+    {
+      "file": "README.en.md",
+      "sha256": "0179760c73677a9300a04c091f9040cd93147956e7e9479ddc8969deeea50746"
+    },
+    {
+      "file": "README.md",
+      "sha256": "95504583c4e7743f8e6d7e8dd81fb56e155f44a5fc402bac3acc4456bb9ca965"
+    },
+    {
+      "file": "README.zh-CN.md",
+      "sha256": "95504583c4e7743f8e6d7e8dd81fb56e155f44a5fc402bac3acc4456bb9ca965"
+    },
+    {
+      "file": "docs/05-用户手册/01-快速开始.md",
+      "sha256": "4bdcd065607d096ba0cce6164dac445c327f04cd6bab885452534131ab35de73"
+    },
+    {
+      "file": "scripts/check-release-continuity.cjs",
+      "sha256": "32aeb7ab69e62efee9d51d5e4192f6010effa97ee91e13f62f00f108bd446305"
+    },
+    {
+      "file": "skills/using-spec-first/SKILL.md",
+      "sha256": "c9862d4ef5a807ff4bb210e703a47103293e42b16908e383474a46ca125641f8"
+    },
+    {
+      "file": "skills/using-spec-first/references/public-route-map.md",
+      "sha256": "8288ae4760774742febc220bb8bfe237b2b16952783ce6a5f4cdb7d019f1fdf0"
+    },
+    {
+      "file": "src/cli/commands/doctor.js",
+      "sha256": "d4341b6f621d9d81419417b9f1e6649c60bf9f044f88524977c3ef499f712dca"
+    },
+    {
+      "file": "src/cli/commands/init-output.js",
+      "sha256": "aa7a352d95cdf126055facadeb7223b825a3f62a305bdc389b17d78cdcdb8ddd"
+    },
+    {
+      "file": "src/cli/commands/init.js",
+      "sha256": "b8987166d938dce5baa2584f113bb66786eb669f0d4306b85fb327530bf14886"
+    },
+    {
+      "file": "src/cli/init-i18n.js",
+      "sha256": "cbf8d5c68401f2922f073a142dc460a08e110b1d481ee3c4514aafe81be87db6"
+    },
+    {
+      "file": "tests/integration/doctor-continuation.test.js",
+      "sha256": "d26446469919545b31fb90cdaeb84a934de1bbc070217c6a5937239d7a6af16a"
+    },
+    {
+      "file": "tests/smoke/cli-smoke.test.js",
+      "sha256": "34c20010b5e36763d8ef0371859ffd9904bf0b3cd176a7c8256a384f01594b18"
+    },
+    {
+      "file": "tests/unit/doctor-output.test.js",
+      "sha256": "0ebdda402ef59a1ba17f93c7e0bf1708dc2256c906da066799cb95f5c538b9a2"
+    },
+    {
+      "file": "tests/unit/doctor-runtime-assets.test.js",
+      "sha256": "0105aca1d163f7759295d6c99bb9bb83942edc508fc3fe4029a6028365077aad"
+    },
+    {
+      "file": "tests/unit/init-apply-failure.test.js",
+      "sha256": "30ed062b4d08ed821910b49a6e36efee736bf4a8cfb91f5b757c2e96c19f2f81"
+    },
+    {
+      "file": "tests/unit/init-runtime-readiness-guidance.test.js",
+      "sha256": "902f900c7746a8645562d99ffa3556baf132fe0f52bd80ff46b3bb598dc32e38"
+    },
+    {
+      "file": "tests/unit/init-workspace-contract.test.js",
+      "sha256": "8b2227426d74e7d2dc143c0c3573e6b35275e44e0815c5d8a43ce1eda61e81d0"
+    },
+    {
+      "file": "tests/unit/release-continuity-opencode.test.js",
+      "sha256": "c6ad9c75c1affe704f025b94e5a093ea01966bf469dcbf577ef231d888730356"
+    }
+  ]
+}

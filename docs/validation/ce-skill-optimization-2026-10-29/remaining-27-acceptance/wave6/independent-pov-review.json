@@ -1,0 +1,285 @@
+{
+  "scenario_id": "CEOPT-18",
+  "review_scope": "All six original trials, all six artifacts, receipts and complete tool traces; frozen A/B Skill entries and relevant references; complete A/B cross-model-pov.sh; parent prepare-pov.py; packet, request, arm receipts, intake pins and cleanup evidence. Read-only review; no helper execution, tests, providers, network, mutations, delegation or new trials.",
+  "overall": {
+    "full_acceptance": "partial",
+    "local_interpretation_acceptance": "passed-all-six",
+    "superiority": "not-established",
+    "summary": "All six artifacts correctly interpret all eight assigned-arm attempts and preserve the boundary between fake executable invocation, authenticated admission and real provider execution. A exposes four direct-worker fake executable calls; B records zero fake executable calls across eight attempts. This establishes a bounded local mechanism difference, not overall Skill or real-provider superiority."
+  },
+  "integrity": {
+    "packet_sha256": "a6e0e44fda74ba5f629803d9df825c6562f3cec02287ed38188f7a83fd85dd4e",
+    "request_sha256": "3a132346b82f221e83b09ef65daf2da9c01eeb8f36db2d97c4c01968c02fd16e",
+    "request_matches_packet_pin": true,
+    "arm_receipts_match_packet_pins": true,
+    "A_receipts_sha256": "b889f4b1382c1330c4997cf1c66dfa0d35bcc688b11d061988e9b3248c5a6531",
+    "B_receipts_sha256": "090b8f97a2605e3f6ac5b16272550f85be1458fae898301437c4c7c3aa867fe9",
+    "frozen_spec_pov_intake_pins": {
+      "A": "16/16 match",
+      "B": "16/16 match"
+    },
+    "frozen_source_pins": {
+      "A_skill": "cd51d624dfcd1d697921d740d3e9e6f9ade13d1d40e0b3be60ca6e51b37a58f9",
+      "B_skill": "3d39dc292d30bcc7bc4997da8c357576db061952bad32da751a4b5c542acc94a",
+      "A_script": "97d7ef9af86caaf26b7219cd4a3d404b312f5f5ff88d93f82f9cc12a618e6e55",
+      "B_script": "515cc12919cfbc1efe5292c837a90a146f6f10008a69cd57de0e19e42ae9bb1a",
+      "A_cross_model_panel": "861e510f37d7b1a8c371a9387bfd5303f11cff2367cc986f94f4988bd65f99d6",
+      "B_cross_model_panel": "8ce220f4e97ad27ba3f7b9b8da8d1b47376bcfc06e721aa1b282b8b18186aece"
+    },
+    "arm_receipt_script_hashes_match_frozen_scripts": true,
+    "all_six_receipts_equal_trial_index_entries": true,
+    "all_six_artifact_hashes_match": true,
+    "all_six_complete_trace_hashes_match": true,
+    "observed_order": [
+      "A1",
+      "B1",
+      "B2",
+      "A2",
+      "A3",
+      "B3"
+    ],
+    "order_matches_packet": true,
+    "all_elapsed_values_recomputed": true,
+    "all_under_300_seconds": true,
+    "all_trace_timestamps_within_trial_windows": true,
+    "model_metadata": {
+      "all_six": {
+        "model": "gpt-6.1-sol",
+        "effort": "medium"
+      },
+      "claim_ceiling": "Recorded requested/model metadata; serving identity is unauthenticated."
+    },
+    "opposite_arm_reads_in_original_traces": false,
+    "truncation_indicators_in_original_traces": false,
+    "observed_trace_operations": "Only bounded cat, nl and rg reads through exec_command. No scripts, helpers, tests, mutation commands, browser, network, providers or delegation.",
+    "cleanup": {
+      "receipt_reports_removed": true,
+      "scratch_root_currently_absent": true
+    },
+    "metadata_caveat": "Packet status remains prepared-not-executed and trial entries remain executed-awaiting-review. Those fields do not themselves establish acceptance."
+  },
+  "shared_case_findings": {
+    "case_order": [
+      "missing/start",
+      "missing/__worker",
+      "weak/start",
+      "weak/__worker",
+      "forged/start",
+      "forged/__worker",
+      "expired/start",
+      "expired/__worker"
+    ],
+    "A": {
+      "exit_codes": [
+        1,
+        37,
+        1,
+        37,
+        1,
+        37,
+        1,
+        37
+      ],
+      "fake_provider_called": [
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        false,
+        true
+      ],
+      "start_reasons": [
+        "provider_serving_receipt_invalid",
+        "provider_serving_receipt_unverified",
+        "provider_serving_receipt_invalid",
+        "provider_serving_receipt_unverified"
+      ],
+      "direct_worker_stderr": "Empty in all four cases.",
+      "interpretation": "Direct __worker invocation reaches the fail-fast fake codex executable; exit 37 is its configured failure. This is an admission boundary gap in A, not authenticated positive admission or real provider execution."
+    },
+    "B": {
+      "exit_codes": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "fake_provider_called": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "missing_and_forged_start_reason": "provider_serving_receipt_invalid",
+      "other_reasons": "provider_serving_receipt_unverified (authenticated producer channel disabled)",
+      "interpretation": "Both entrypoints refuse before the fake provider executable. The unconditional disabled-channel gate does not prove an authenticated admission implementation."
+    },
+    "both_arms": {
+      "all_eight_results_preserved": true,
+      "jobs_created": false,
+      "real_external_provider_executed": false,
+      "any_file_receipt_authorizes_real_provider": false,
+      "authenticated_positive_admission_available": false,
+      "expiry_specific_rejection_proven": false,
+      "expiry_explanation": "The expired fixture is also degraded/unverified; rejection is attributable to receipt shape or disabled authentication, without isolated freshness validation."
+    }
+  },
+  "trials": [
+    {
+      "id": "CEOPT-18-A1",
+      "judgment": "pass-local-interpretation",
+      "attempts_correctly_covered": "8/8",
+      "elapsed_seconds": 94.767,
+      "artifact_sha256": "1a5db96682f6c429c4bebeb70870988fb60317d99e5318b3ef94c975bd8fb742",
+      "trace_sha256": "8d7f996162b27755e550d4afe4348b7a71d232d26635d49029234b137a0eb608",
+      "finding": "Correctly distinguishes four fake direct-worker calls from positive admission; states preservation, no jobs, missing producer, expiry limitation and owners."
+    },
+    {
+      "id": "CEOPT-18-B1",
+      "judgment": "pass-local-interpretation",
+      "attempts_correctly_covered": "8/8",
+      "elapsed_seconds": 37.552,
+      "artifact_sha256": "68469d3cd1f661156d081005e0219224fb16289643caf255062cd0a39a769da6",
+      "trace_sha256": "251135503d663262bf0d694b48665c19a5d2e2fc2ec52f2c3090494787a3627c",
+      "finding": "Correctly describes eight refusals and zero fake calls; explicitly withholds positive serving, freshness and activation claims."
+    },
+    {
+      "id": "CEOPT-18-B2",
+      "judgment": "pass-local-interpretation",
+      "attempts_correctly_covered": "8/8",
+      "elapsed_seconds": 46.241,
+      "artifact_sha256": "236124044c280feaadfd0025c01af00ae7d5a98d06f1399cb4e0c16db8b21e98",
+      "trace_sha256": "c80b2d29eeacdb535d9e228c2abac2b8890406abcb9c05132ed8f3f256c714f9",
+      "finding": "Correct per-entrypoint reasons and limitations; identifies producer, authorization, runner and validation ownership."
+    },
+    {
+      "id": "CEOPT-18-A2",
+      "judgment": "pass-local-interpretation",
+      "attempts_correctly_covered": "8/8",
+      "elapsed_seconds": 62.357,
+      "artifact_sha256": "ea096c459dfdf6581d520b31e1312edbd1fd2991f38d6c9312e9abd644469922",
+      "trace_sha256": "d4048bc24c917eb28a0a3889e0c1b4902e4359d7bb112d1b2952ea0e7c226a47",
+      "finding": "Correct fake-call interpretation, preservation and no-job observations; appropriately leaves source-level cause unknown within its narrower allowed reads."
+    },
+    {
+      "id": "CEOPT-18-A3",
+      "judgment": "pass-local-interpretation",
+      "attempts_correctly_covered": "8/8",
+      "elapsed_seconds": 47.652,
+      "artifact_sha256": "21845249bf8561c46fff6271ff49b2bf8ca97ee6911dfb8927fef07527367e77",
+      "trace_sha256": "244368c527e972f1585e08aa89275ec56b71d89aba2b59cac29aa48b8df4f6b6",
+      "finding": "Correctly rejects receipt-file verification as producer evidence and distinguishes expired/unverified rejection from freshness enforcement."
+    },
+    {
+      "id": "CEOPT-18-B3",
+      "judgment": "pass-local-interpretation",
+      "attempts_correctly_covered": "8/8",
+      "elapsed_seconds": 44.77,
+      "artifact_sha256": "3e1c061af4eb65a6cdb043b915fb436f867354ce32dc1fbbcd4103a72c99f174",
+      "trace_sha256": "abd82a08a21a36dfda8caf62a231bd814a1a0f1f2c30339e9c1bcf24602e08b3",
+      "finding": "Correct eight-case refusal analysis; retains the fallback and explicitly defers authenticated positive operation and independence."
+    }
+  ],
+  "source_mechanisms": [
+    {
+      "owner": "Frozen A/spec-pov/scripts/cross-model-pov.sh",
+      "locations": [
+        "worker_main:86",
+        "__worker dispatch:141",
+        "start argument guard:150-156",
+        "jq receipt gate:159-165"
+      ],
+      "mechanism": "The direct __worker branch executes worker_main before the start-only receipt gate. worker_main does not consume the extra serving receipt arguments and reaches command codex after basic provider/model/tool and prompt checks. start cannot reach job publication because the degraded-shape check is followed by unconditional unverified failure."
+    },
+    {
+      "owner": "Frozen B/spec-pov/scripts/cross-model-pov.sh; current skills/spec-pov/scripts/cross-model-pov.sh is byte-identical",
+      "locations": [
+        "require_authenticated_serving_channel:11",
+        "worker_main gate:93",
+        "__worker dispatch:150",
+        "start argument guard:159-165",
+        "jq gate:168-173",
+        "start channel gate:174"
+      ],
+      "mechanism": "An unconditional failure closes worker_main before provider validation, tool discovery, temporary output or executable invocation. start rejects unsupported/missing-file receipt content through jq, and otherwise reaches the same unconditional failure. Later packet creation, runner startup, output normalization and schema validation remain dormant."
+    },
+    {
+      "owner": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/prepare-pov.py",
+      "locations": [
+        "fixture and missing-file setup:7-10",
+        "fake executable:11-12",
+        "arguments:14",
+        "recording:16",
+        "cleanup:18-19"
+      ],
+      "mechanism": "For missing receipt, the harness omits creating serving.json but still passes its nonempty pathname and nonempty hash arguments. It also uses this pathname as the authorization receipt placeholder. Both fake provider executables mark invocation and exit 37; only codex is selected in these controls. Existing result content and jobs-directory presence are checked. Scratch cleanup is parent-owned."
+    }
+  ],
+  "reason_code_discrepancy": {
+    "status": "source-explained; documentation clarification warranted",
+    "documentation_owner": "skills/spec-pov/references/cross-model-panel.md:21",
+    "current_text": "Missing receipt returns provider_serving_receipt_unavailable.",
+    "why_inaccurate": "The statement conflates missing required arguments, a supplied path whose file is absent, and direct __worker invocation.",
+    "actual_semantics": [
+      "The start guard returns unavailable when one of its required values is empty; the reason is not exclusive to serving-receipt absence.",
+      "The fixture supplies a nonempty nonexistent serving pathname; the guard passes and jq failure returns invalid.",
+      "B __worker immediately returns unverified because its authenticated producer channel is disabled; it does not inspect receipt presence.",
+      "A __worker lacks that gate and reaches the fake executable."
+    ],
+    "minimal_safe_fix": "Clarify the source reference: start reports provider_serving_receipt_unavailable for missing required admission arguments and provider_serving_receipt_invalid for an absent, unreadable or unsupported receipt at a supplied path. With the authenticated producer channel disabled, otherwise eligible start calls and all internal __worker calls return provider_serving_receipt_unverified before provider execution.",
+    "implementation_change_required": false,
+    "producer_enablement_authorized": false,
+    "evidence_preservation": "Do not rewrite frozen inputs, original receipts, artifacts or traces. Record the clarification as a later source change with its own provenance."
+  },
+  "unresolved_facets_and_owners": [
+    {
+      "facet": "Authenticated positive serving admission",
+      "status": "unavailable",
+      "owner": "Authenticated host/provider producer owner",
+      "required_evidence": "A consumer-verifiable authenticated channel establishing actual host identity and the fixed requested/served peer provider and model, bound to current source, exact scope/payload hashes, freshness and admitted job. Self-declared verified JSON is insufficient."
+    },
+    {
+      "facet": "External dispatch authority",
+      "status": "not-established-by-these-fixtures",
+      "owner": "Canonical dispatch/admission owner",
+      "required_evidence": "Current eligible worker-dispatch journey receipt, explicit delegated-work authority, applicable restricted-read/data-egress/credential-use/external-communication authorization, allowlisted inputs and minimized/redacted payload."
+    },
+    {
+      "facet": "Future activation contract",
+      "status": "unverified",
+      "owner": "Runner/adapter owner",
+      "required_evidence": "Worker-bound admission and freshness, deadline and byte-cap enforcement, complete result-schema validation and lifecycle/reap evidence. Dormant source does not establish these outcomes."
+    },
+    {
+      "facet": "Expiry-specific negative admission",
+      "status": "unproven",
+      "owner": "Validation owner after authenticated producer availability",
+      "required_evidence": "A separately authorized stale authenticated control that isolates expiry from the existing unverified-channel refusal."
+    },
+    {
+      "facet": "Real providers and independence",
+      "status": "unavailable",
+      "owner": "Provider integration and validation owners",
+      "required_evidence": "Actual provider launch/response evidence and authenticated requested/served identities; different authenticated host and peer providers before an independence claim."
+    }
+  ],
+  "limitations": [
+    "The six model artifacts interpret parent-supplied controls; they do not independently reproduce those controls.",
+    "Read-only behavior is observed in traces, not proof of enforced filesystem isolation.",
+    "Artifacts were saved by the parent unchanged; autonomous durable saving was not tested.",
+    "Source/receipt hashes establish byte consistency, not authenticated producer provenance.",
+    "Fake executable markers do not establish network access, credentials, real model execution, real-provider output quality or successful admission.",
+    "No successful job lifecycle or reap behavior is exercised when no job is created.",
+    "The review does not authorize enabling the producer, running providers or performing new trials."
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "代码理解类问题应指出不属于 setup 职责",
+  "prompt": "（spec-runtime-setup skill 已安装，请按它工作。）\n顺便帮我看看这个代码库的架构设计得合不合理,有什么问题。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-runtime-setup/evals/fixtures/scripts/check-not-setup-scope.sh"
+  ]
+}

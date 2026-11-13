@@ -1,0 +1,30 @@
+[
+  {
+    "case": "documented-relative",
+    "cwd": "temporary consumer repository",
+    "command": [
+      "node",
+      "scripts/measurement-admission.cjs",
+      "admit",
+      "--input",
+      "<temporary input.json>"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "node:internal/modules/cjs/loader:1433\n  throw err;\n  ^\n\nError: Cannot find module '/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-optimize-repro-i45y7lgm/scripts/measurement-admission.cjs'\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1430:15)\n    at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)\n    at Module._load (node:internal/modules/cjs/loader:1216:25)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: []\n}\n\nNode.js v22.22.3\n"
+  },
+  {
+    "case": "resolved-absolute",
+    "cwd": "temporary consumer repository",
+    "command": [
+      "node",
+      "/Users/kuang/xiaobu/spec-first/skills/spec-optimize/scripts/measurement-admission.cjs",
+      "admit",
+      "--input",
+      "<temporary input.json>"
+    ],
+    "exit_code": 1,
+    "stdout": "{\n  \"status\": \"rejected\",\n  \"reason_code\": \"measurement-admission-incomplete\",\n  \"errors\": [\n    {\n      \"field\": \"schema_version\",\n      \"reason\": \"unsupported-schema-version\"\n    },\n    {\n      \"field\": \"baseline_identity\",\n      \"reason\": \"must-be-a-full-git-sha-or-sha256\"\n    },\n    {\n      \"field\": \"candidate_identity\",\n      \"reason\": \"must-be-a-full-git-sha-or-sha256\"\n    },\n    {\n      \"field\": \"task_or_corpus_identity\",\n      \"reason\": \"must-be-a-sha256-content-identity\"\n    },\n    {\n      \"field\": \"harness_identity\",\n      \"reason\": \"must-be-a-sha256-content-identity\"\n    },\n    {\n      \"field\": \"environment_identity\",\n      \"reason\": \"must-be-a-sha256-content-identity\"\n    },\n    {\n      \"field\": \"sample_seed\",\n      \"reason\": \"must-be-an-integer\"\n    },\n    {\n      \"field\": \"metric.name\",\n      \"reason\": \"must-be-a-non-empty-string\"\n    },\n    {\n      \"field\": \"metric.direction\",\n      \"reason\": \"must-be-maximize-or-minimize\"\n    },\n    {\n      \"field\": \"metric.aggregation\",\n      \"reason\": \"unsupported-aggregation\"\n    },\n    {\n      \"field\": \"aa_repetitions\",\n      \"reason\": \"must-be-at-least-2\"\n    },\n    {\n      \"field\": \"preregistered_acceptance_threshold\",\n      \"reason\": \"must-be-a-non-negative-finite-number\"\n    },\n    {\n      \"field\": \"noise_ceiling\",\n      \"reason\": \"must-be-a-non-negative-finite-number\"\n    },\n    {\n      \"field\": \"broken_run_policy.max_retries\",\n      \"reason\": \"must-be-a-non-negative-integer\"\n    },\n    {\n      \"field\": \"broken_run_policy.synthetic_scores\",\n      \"reason\": \"must-be-false\"\n    },\n    {\n      \"field\": \"stop_budget.max_attempts\",\n      \"reason\": \"must-be-at-least-2\"\n    },\n    {\n      \"field\": \"stop_budget.timeout_seconds\",\n      \"reason\": \"must-be-a-positive-integer\"\n    }\n  ]\n}\n",
+    "stderr": ""
+  }
+]

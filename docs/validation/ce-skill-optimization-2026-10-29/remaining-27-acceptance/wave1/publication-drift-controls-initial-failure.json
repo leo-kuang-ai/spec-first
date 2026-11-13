@@ -1,0 +1,8 @@
+{
+  "failure": "KeyError trial before case mutation; Compound records use case, Refresh use trial.",
+  "runner_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/verify-publication-drift-controls-failed-initial.py",
+  "runner_sha256": "f3570d36500cdc4f41a060b1de982b014d90f5ee5324881ccacf9b58ae9c3650",
+  "output_root": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/publication-drift-controls",
+  "output_files": [],
+  "recovery": "Read actual record schemas and select trial or case; retain original protocol/runner and use separate r2 corpus."
+}

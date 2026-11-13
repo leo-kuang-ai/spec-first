@@ -1,0 +1,296 @@
+{
+  "id": "CEOPT-11-parent-delivery-supplement",
+  "at": "2026-10-31T07:08:30.911583+00:00",
+  "protocol_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/explain-delivery-protocol.json",
+  "protocol_sha256": "5c853c4e12401fabf3e71f64a89674298cd1e9973f6ca443cd0bf667cadc4b19",
+  "runner_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/execute-explain-delivery.py",
+  "records": [
+    {
+      "trial": "CEOPT-11r2-B1",
+      "original_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-11r2-B1/artifact.md",
+      "original_sha256": "9ba4ae4e792f91d8a09cb7a1bde40f87ea286fdd66d7984949d04c6e1a287e87",
+      "initial_destination": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/explain-delivery-supplement/initial/CEOPT-11r2-B1.md",
+      "initial_sha256": "6f8a536928714eb012f59f19b7522d367f5b65d48de0cbf64088712a38bbe158",
+      "initial_link_checks": [
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/README.md",
+          "target": "../../fixtures/explain/README.md",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/README.md",
+          "identity_matches": true,
+          "is_file": true,
+          "hash_matches": true
+        },
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/package.json",
+          "target": "../../fixtures/explain/package.json",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/package.json",
+          "identity_matches": true,
+          "is_file": true,
+          "hash_matches": true
+        },
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/src/server.js",
+          "target": "../../fixtures/explain/src/server.js",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/src/server.js",
+          "identity_matches": true,
+          "is_file": true,
+          "hash_matches": true
+        }
+      ],
+      "actual_rename": true,
+      "stale_location_negative": [
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/README.md",
+          "target": "../../fixtures/explain/README.md",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/explain-delivery-supplement/fixtures/explain/README.md",
+          "identity_matches": false,
+          "is_file": false,
+          "hash_matches": false
+        },
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/package.json",
+          "target": "../../fixtures/explain/package.json",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/explain-delivery-supplement/fixtures/explain/package.json",
+          "identity_matches": false,
+          "is_file": false,
+          "hash_matches": false
+        },
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/src/server.js",
+          "target": "../../fixtures/explain/src/server.js",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/explain-delivery-supplement/fixtures/explain/src/server.js",
+          "identity_matches": false,
+          "is_file": false,
+          "hash_matches": false
+        }
+      ],
+      "stale_location_negative_detected": true,
+      "final_destination": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/explain-delivery-supplement/relocated/deeper/CEOPT-11r2-B1.md",
+      "final_sha256": "b9f442a6b36d49233b3945d0d2f41e463729003e9630dc92f76100007b672cad",
+      "rebased_link_checks": [
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/README.md",
+          "target": "../../../fixtures/explain/README.md",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/README.md",
+          "identity_matches": true,
+          "is_file": true,
+          "hash_matches": true
+        },
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/package.json",
+          "target": "../../../fixtures/explain/package.json",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/package.json",
+          "identity_matches": true,
+          "is_file": true,
+          "hash_matches": true
+        },
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/src/server.js",
+          "target": "../../../fixtures/explain/src/server.js",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/src/server.js",
+          "identity_matches": true,
+          "is_file": true,
+          "hash_matches": true
+        }
+      ],
+      "original_body_exact_prefix": true,
+      "historical_input_unchanged": true
+    },
+    {
+      "trial": "CEOPT-11r2-B2",
+      "original_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-11r2-B2/artifact.md",
+      "original_sha256": "1c4882a068ae326227592501140198f28431225deb51af1b51cf8c1d8a7d7e57",
+      "initial_destination": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/explain-delivery-supplement/initial/CEOPT-11r2-B2.md",
+      "initial_sha256": "ca772dd66dff143e0768f09d28876740febc3802b501f089ee074b3406b4da33",
+      "initial_link_checks": [
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/README.md",
+          "target": "../../fixtures/explain/README.md",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/README.md",
+          "identity_matches": true,
+          "is_file": true,
+          "hash_matches": true
+        },
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/package.json",
+          "target": "../../fixtures/explain/package.json",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/package.json",
+          "identity_matches": true,
+          "is_file": true,
+          "hash_matches": true
+        },
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/src/server.js",
+          "target": "../../fixtures/explain/src/server.js",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/src/server.js",
+          "identity_matches": true,
+          "is_file": true,
+          "hash_matches": true
+        }
+      ],
+      "actual_rename": true,
+      "stale_location_negative": [
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/README.md",
+          "target": "../../fixtures/explain/README.md",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/explain-delivery-supplement/fixtures/explain/README.md",
+          "identity_matches": false,
+          "is_file": false,
+          "hash_matches": false
+        },
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/package.json",
+          "target": "../../fixtures/explain/package.json",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/explain-delivery-supplement/fixtures/explain/package.json",
+          "identity_matches": false,
+          "is_file": false,
+          "hash_matches": false
+        },
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/src/server.js",
+          "target": "../../fixtures/explain/src/server.js",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/explain-delivery-supplement/fixtures/explain/src/server.js",
+          "identity_matches": false,
+          "is_file": false,
+          "hash_matches": false
+        }
+      ],
+      "stale_location_negative_detected": true,
+      "final_destination": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/explain-delivery-supplement/relocated/deeper/CEOPT-11r2-B2.md",
+      "final_sha256": "ca3b297c0d8bb8b7e2a6de0c3efcbc707ee46636484fd1dd922477a26bec4c53",
+      "rebased_link_checks": [
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/README.md",
+          "target": "../../../fixtures/explain/README.md",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/README.md",
+          "identity_matches": true,
+          "is_file": true,
+          "hash_matches": true
+        },
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/package.json",
+          "target": "../../../fixtures/explain/package.json",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/package.json",
+          "identity_matches": true,
+          "is_file": true,
+          "hash_matches": true
+        },
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/src/server.js",
+          "target": "../../../fixtures/explain/src/server.js",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/src/server.js",
+          "identity_matches": true,
+          "is_file": true,
+          "hash_matches": true
+        }
+      ],
+      "original_body_exact_prefix": true,
+      "historical_input_unchanged": true
+    },
+    {
+      "trial": "CEOPT-11r2-B3",
+      "original_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-11r2-B3/artifact.md",
+      "original_sha256": "649f22ac8e1e9d3f02f0ffaf01fcc5445aaffcacb98554f39e1fbe2c9cf5c348",
+      "initial_destination": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/explain-delivery-supplement/initial/CEOPT-11r2-B3.md",
+      "initial_sha256": "f58b465a95598d0381e0ef0e6a992a6db7a3c9e1c822f21e9d0dfafaee859d72",
+      "initial_link_checks": [
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/README.md",
+          "target": "../../fixtures/explain/README.md",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/README.md",
+          "identity_matches": true,
+          "is_file": true,
+          "hash_matches": true
+        },
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/package.json",
+          "target": "../../fixtures/explain/package.json",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/package.json",
+          "identity_matches": true,
+          "is_file": true,
+          "hash_matches": true
+        },
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/src/server.js",
+          "target": "../../fixtures/explain/src/server.js",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/src/server.js",
+          "identity_matches": true,
+          "is_file": true,
+          "hash_matches": true
+        }
+      ],
+      "actual_rename": true,
+      "stale_location_negative": [
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/README.md",
+          "target": "../../fixtures/explain/README.md",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/explain-delivery-supplement/fixtures/explain/README.md",
+          "identity_matches": false,
+          "is_file": false,
+          "hash_matches": false
+        },
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/package.json",
+          "target": "../../fixtures/explain/package.json",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/explain-delivery-supplement/fixtures/explain/package.json",
+          "identity_matches": false,
+          "is_file": false,
+          "hash_matches": false
+        },
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/src/server.js",
+          "target": "../../fixtures/explain/src/server.js",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/explain-delivery-supplement/fixtures/explain/src/server.js",
+          "identity_matches": false,
+          "is_file": false,
+          "hash_matches": false
+        }
+      ],
+      "stale_location_negative_detected": true,
+      "final_destination": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/explain-delivery-supplement/relocated/deeper/CEOPT-11r2-B3.md",
+      "final_sha256": "51c598aeef885f8b68cf837f028c47f959f3c86fc3c0d36db1b0519533ccbec3",
+      "rebased_link_checks": [
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/README.md",
+          "target": "../../../fixtures/explain/README.md",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/README.md",
+          "identity_matches": true,
+          "is_file": true,
+          "hash_matches": true
+        },
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/package.json",
+          "target": "../../../fixtures/explain/package.json",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/package.json",
+          "identity_matches": true,
+          "is_file": true,
+          "hash_matches": true
+        },
+        {
+          "source": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/src/server.js",
+          "target": "../../../fixtures/explain/src/server.js",
+          "resolved_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/fixtures/explain/src/server.js",
+          "identity_matches": true,
+          "is_file": true,
+          "hash_matches": true
+        }
+      ],
+      "original_body_exact_prefix": true,
+      "historical_input_unchanged": true
+    }
+  ],
+  "all_admitted_inputs_preserved": true,
+  "temporary_files_remaining": 0,
+  "initial_directory_removed": true,
+  "parent_delivery_checks": "passed",
+  "independent_review": "not-run; callable dispatch tool absent",
+  "model_trials_added": 0,
+  "full_frozen_acceptance": false,
+  "limitations": [
+    "Derived parent-authored navigation is not model-authored known-destination behavior.",
+    "No renderer, browser visual assessment, autonomous destination flow or external publication was run.",
+    "No force overwrite, symlink, concurrent-writer, crash or cross-platform atomicity claim.",
+    "Original trial responses and their independent reviews retain their original scope."
+  ],
+  "runner_sha256": "7dea6990fa14f6fbe796822a60bfae3fa48adb366b77d532b6b705b4889196c9"
+}

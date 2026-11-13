@@ -1,0 +1,15 @@
+{
+  "expectations": [
+    {
+      "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-runtime-setup/evals/fixtures/scripts/check-not-setup-scope.sh",
+      "passed": true,
+      "evidence": "mechanical-boundary-only: semantic-review-required；不证明语义移交正确或全局无副作用"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 0,
+    "total": 1,
+    "pass_rate": 1
+  }
+}

@@ -1,0 +1,230 @@
+[
+  {
+    "skill": "autoresearch",
+    "files": 30,
+    "bytes": 122434,
+    "entry_lines": 108
+  },
+  {
+    "skill": "spec-app-consistency-audit",
+    "files": 90,
+    "bytes": 415367,
+    "entry_lines": 307
+  },
+  {
+    "skill": "spec-brainstorm",
+    "files": 32,
+    "bytes": 206694,
+    "entry_lines": 78
+  },
+  {
+    "skill": "spec-code-review",
+    "files": 61,
+    "bytes": 492745,
+    "entry_lines": 75
+  },
+  {
+    "skill": "spec-commit",
+    "files": 9,
+    "bytes": 12901,
+    "entry_lines": 119
+  },
+  {
+    "skill": "spec-commit-push-pr",
+    "files": 15,
+    "bytes": 61637,
+    "entry_lines": 132
+  },
+  {
+    "skill": "spec-compound",
+    "files": 37,
+    "bytes": 238634,
+    "entry_lines": 61
+  },
+  {
+    "skill": "spec-compound-refresh",
+    "files": 25,
+    "bytes": 152137,
+    "entry_lines": 164
+  },
+  {
+    "skill": "spec-debug",
+    "files": 22,
+    "bytes": 100716,
+    "entry_lines": 364
+  },
+  {
+    "skill": "spec-doc-review",
+    "files": 52,
+    "bytes": 376615,
+    "entry_lines": 74
+  },
+  {
+    "skill": "spec-dogfood",
+    "files": 15,
+    "bytes": 41664,
+    "entry_lines": 99
+  },
+  {
+    "skill": "spec-explain",
+    "files": 15,
+    "bytes": 36254,
+    "entry_lines": 92
+  },
+  {
+    "skill": "spec-handoff",
+    "files": 13,
+    "bytes": 43162,
+    "entry_lines": 99
+  },
+  {
+    "skill": "spec-ideate",
+    "files": 30,
+    "bytes": 231896,
+    "entry_lines": 105
+  },
+  {
+    "skill": "spec-lfg",
+    "files": 24,
+    "bytes": 105122,
+    "entry_lines": 81
+  },
+  {
+    "skill": "spec-optimize",
+    "files": 37,
+    "bytes": 234568,
+    "entry_lines": 178
+  },
+  {
+    "skill": "spec-plan",
+    "files": 81,
+    "bytes": 563609,
+    "entry_lines": 123
+  },
+  {
+    "skill": "spec-polish",
+    "files": 23,
+    "bytes": 65786,
+    "entry_lines": 88
+  },
+  {
+    "skill": "spec-pov",
+    "files": 24,
+    "bytes": 166502,
+    "entry_lines": 59
+  },
+  {
+    "skill": "spec-prd",
+    "files": 48,
+    "bytes": 674822,
+    "entry_lines": 345
+  },
+  {
+    "skill": "spec-product-pulse",
+    "files": 13,
+    "bytes": 51792,
+    "entry_lines": 92
+  },
+  {
+    "skill": "spec-project-rules",
+    "files": 105,
+    "bytes": 121224,
+    "entry_lines": 122
+  },
+  {
+    "skill": "spec-promote",
+    "files": 11,
+    "bytes": 31999,
+    "entry_lines": 140
+  },
+  {
+    "skill": "spec-prototype",
+    "files": 14,
+    "bytes": 32450,
+    "entry_lines": 44
+  },
+  {
+    "skill": "spec-resolve-pr-feedback",
+    "files": 22,
+    "bytes": 70675,
+    "entry_lines": 126
+  },
+  {
+    "skill": "spec-riffrec-feedback-analysis",
+    "files": 12,
+    "bytes": 87536,
+    "entry_lines": 47
+  },
+  {
+    "skill": "spec-rule-miner",
+    "files": 12,
+    "bytes": 38989,
+    "entry_lines": 77
+  },
+  {
+    "skill": "spec-runtime-setup",
+    "files": 83,
+    "bytes": 1079708,
+    "entry_lines": 368
+  },
+  {
+    "skill": "spec-simplify-code",
+    "files": 19,
+    "bytes": 24738,
+    "entry_lines": 90
+  },
+  {
+    "skill": "spec-strategy",
+    "files": 13,
+    "bytes": 35258,
+    "entry_lines": 94
+  },
+  {
+    "skill": "spec-sweep",
+    "files": 20,
+    "bytes": 173699,
+    "entry_lines": 124
+  },
+  {
+    "skill": "spec-test-browser",
+    "files": 9,
+    "bytes": 83361,
+    "entry_lines": 90
+  },
+  {
+    "skill": "spec-test-xcode",
+    "files": 5,
+    "bytes": 10428,
+    "entry_lines": 31
+  },
+  {
+    "skill": "spec-work",
+    "files": 47,
+    "bytes": 226651,
+    "entry_lines": 125
+  },
+  {
+    "skill": "spec-worktree",
+    "files": 2,
+    "bytes": 36401,
+    "entry_lines": 152
+  },
+  {
+    "skill": "spec-write-skill",
+    "files": 25,
+    "bytes": 182076,
+    "entry_lines": 62
+  },
+  {
+    "skill": "spec-write-tasks",
+    "files": 23,
+    "bytes": 102605,
+    "entry_lines": 141
+  },
+  {
+    "skill": "using-spec-first",
+    "files": 11,
+    "bytes": 21815,
+    "entry_lines": 42
+  }
+]

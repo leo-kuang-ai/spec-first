@@ -1,0 +1,64 @@
+{
+  "skill_name": "spec-sweep",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T20:16:32.06383+08:00",
+  "end_time": "2026-11-04T20:17:21.891474+08:00",
+  "case_results": [
+    {
+      "case_id": "headless-first-run-stops",
+      "title": "headless 首跑应报 requires interactive setup 并停止",
+      "status": "PASS",
+      "duration_ms": 49743,
+      "turns": 2,
+      "input_tokens": 23887,
+      "output_tokens": 708,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 2,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "output_contains{all:[first run requires interactive setup]}",
+            "passed": true,
+            "evidence": "output satisfies all contains checks (all:[first run requires interactive setup])"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（skill-up 评测框架说明：本仓库 .claude/skills/spec-sweep/SKILL.md 是被测\nskill 的定义文件,已随仓库就位。本次运行不经过 Skill 工具调用——请直接完整\n读取该文件,把它视为已加载的工作指令,然后按它处理下面的输入。输入形态:\n定时调度器触发,无人在场。）\nmode:headless\n",
+      "response": "## Sweep 运行结果：已中止（首次运行需要交互式设置）\n\n**路由过程（Phase 0）：**\n\n| 步骤 | 结果 |\n|---|---|\n| 解析 repo root | `/private/var/folders/0v/.../skill-up-2963896305` |\n| 读取 `.spec-first/config.local.yaml` | 文件不存在（`.spec-first/` 目录本身也不存在） |\n| 参数解析 | `mode:headless` 已识别并剥离，无 `setup` / `reconfigure` 剩余令牌 |\n| 路由判定 | 配置缺失 → 首次运行 → Phase 1（设置访谈） |\n| Headless 检查 | 触发：设置仅支持交互式，定时调度环境下无法执行 |\n\n**结果：`first run requires interactive setup` — 运行按规范在此停止。**\n\n依据 SKILL.md Phase 1 与 `references/interview.md` 的明确约束：首次设置访谈是 interactive-only，headless 运行不得进行设置，也不得在未询问的情况下推断任何反馈源、确认动作或授权。因此本次运行：\n\n- 未创建、未写入任何配置、状态或计划文件\n- 未获取 lease、未执行任何源端读写（当前也没有已配置的源）\n- 未发生 git 暂存/提交/推送，无子代理派发\n\n**需要的后续动作（由人来完成一次即可）：** 在交互式会话中运行一次 `spec-sweep`（或 `spec-sweep setup`）完成设置访谈——它会写入 `feedback_sources` 与各项 `sweep_*` 配置，并提供调度交接（注册的定时调用需带 `mode:headless`）。设置完成后，后续的定时 headless 运行即可正常进入 Phase 2 执行完整的 sweep 流程并产出计划。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 24595,
+  "judge_tokens": 0,
+  "overall_tokens": 24595
+}

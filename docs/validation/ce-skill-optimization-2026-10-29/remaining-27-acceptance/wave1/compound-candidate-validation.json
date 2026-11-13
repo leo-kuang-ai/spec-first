@@ -1,0 +1,132 @@
+{
+  "at": "2026-10-30T08:14:28.812947+00:00",
+  "records": [
+    {
+      "trial": "CEOPT-06-A1",
+      "original_sha256": "f702062f30651c8d4a8ffb6b638e0b0201928dcfb95acd7951f359fe90c85200",
+      "extracted_candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-A1/candidate-extracted.md",
+      "candidate_sha256": "ae82fd860edd3d7eb8d2883102790f051371732d6ff477c15464507b9cecdd81",
+      "source_lines_inclusive": [
+        29,
+        130
+      ],
+      "validator_source_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb",
+      "argv": [
+        "python3",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound/scripts/validate-frontmatter.py",
+        "--promotion",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-A1/candidate-extracted.md"
+      ],
+      "exit_code": 0,
+      "stdout": "OK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-A1/candidate-extracted.md\n",
+      "stderr": "",
+      "intervention": "Exact contiguous candidate text extracted from outer code fence; no content changes."
+    },
+    {
+      "trial": "CEOPT-06-A2",
+      "original_sha256": "fbd9b3f40b2ccf0c313caff7c0189f34974a0380f4e77347a8ceb89c21197f57",
+      "extracted_candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-A2/candidate-extracted.md",
+      "candidate_sha256": "ce006d0cd7c59bfb7a3473981bf0c0d38604846d129a980b7ed9e487fb805e9f",
+      "source_lines_inclusive": [
+        27,
+        99
+      ],
+      "validator_source_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb",
+      "argv": [
+        "python3",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound/scripts/validate-frontmatter.py",
+        "--promotion",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-A2/candidate-extracted.md"
+      ],
+      "exit_code": 0,
+      "stdout": "OK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-A2/candidate-extracted.md\n",
+      "stderr": "",
+      "intervention": "Exact contiguous candidate text extracted from outer code fence; no content changes."
+    },
+    {
+      "trial": "CEOPT-06-A3",
+      "original_sha256": "2187e043f62a14f23330ee4c3cc372fad59631c2a3f1b1bc9ec495ed76f96495",
+      "extracted_candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-A3/candidate-extracted.md",
+      "candidate_sha256": "c8a3c6abcf268e934eb193ac18b82131c76027c56dc5a0853309d9cecb05eae0",
+      "source_lines_inclusive": [
+        25,
+        124
+      ],
+      "validator_source_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb",
+      "argv": [
+        "python3",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/A/spec-compound/scripts/validate-frontmatter.py",
+        "--promotion",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-A3/candidate-extracted.md"
+      ],
+      "exit_code": 0,
+      "stdout": "OK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-A3/candidate-extracted.md\n",
+      "stderr": "",
+      "intervention": "Exact contiguous intended candidate text extracted; original wrapper retained. A3 has broken nested outer fences; manual extraction does not repair its original rendering defect."
+    },
+    {
+      "trial": "CEOPT-06-B1",
+      "original_sha256": "ae5e6bf8befd736678a77c1bb7d9e02ce583116a4ff485c454e99661de7bfae2",
+      "extracted_candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-B1/candidate-extracted.md",
+      "candidate_sha256": "a41fa13b88b93bdcf7e1173fe45cc630c6275e40b9d74f5794f033c8b0bda656",
+      "source_lines_inclusive": [
+        14,
+        127
+      ],
+      "validator_source_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb",
+      "argv": [
+        "python3",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound/scripts/validate-frontmatter.py",
+        "--promotion",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-B1/candidate-extracted.md"
+      ],
+      "exit_code": 0,
+      "stdout": "OK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-B1/candidate-extracted.md\n",
+      "stderr": "",
+      "intervention": "Exact contiguous candidate text extracted from outer code fence; no content changes."
+    },
+    {
+      "trial": "CEOPT-06-B2",
+      "original_sha256": "4b0823589123b7a4a6d89eb9fe06ce16cfbfeeb89e2ac13a0fb3ca2afae63cf9",
+      "extracted_candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-B2/candidate-extracted.md",
+      "candidate_sha256": "ca59b4ff6a0e129e845b5548e1083a2adfe6471ae04e20b625e920c1a74ad1f5",
+      "source_lines_inclusive": [
+        27,
+        124
+      ],
+      "validator_source_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb",
+      "argv": [
+        "python3",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound/scripts/validate-frontmatter.py",
+        "--promotion",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-B2/candidate-extracted.md"
+      ],
+      "exit_code": 0,
+      "stdout": "OK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-B2/candidate-extracted.md\n",
+      "stderr": "",
+      "intervention": "Exact contiguous candidate text extracted from outer code fence; no content changes."
+    },
+    {
+      "trial": "CEOPT-06-B3",
+      "original_sha256": "052170b6085236b2c8c003c307415c1c21d0b17394c21ba4d00b28b726415928",
+      "extracted_candidate_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-B3/candidate-extracted.md",
+      "candidate_sha256": "064a29498f8d432f17e7fa0fb8bac05ae01919af70dc2f7eed5850a50a5dfbfc",
+      "source_lines_inclusive": [
+        28,
+        110
+      ],
+      "validator_source_sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb",
+      "argv": [
+        "python3",
+        "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-compound/scripts/validate-frontmatter.py",
+        "--promotion",
+        "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-B3/candidate-extracted.md"
+      ],
+      "exit_code": 0,
+      "stdout": "OK: /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/trials/CEOPT-06-B3/candidate-extracted.md\n",
+      "stderr": "",
+      "intervention": "Exact contiguous candidate text extracted from outer code fence; no content changes."
+    }
+  ],
+  "scope": "Parent-executed deterministic frontmatter/promotion-field validation of six unchanged candidate derivatives. Does not prove semantic knowledge promotion, actual publication or original wrapper usability."
+}

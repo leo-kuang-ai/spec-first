@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-work",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "kiro/kimi-k3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "kiro/kimi-k3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "kiro/kimi-k3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T10:03:47.583042+08:00",
+  "end_time": "2026-11-05T10:10:18.994328+08:00",
+  "case_results": [
+    {
+      "case_id": "r2-reverse-mismatch",
+      "title": "An already implemented requirement does not authorize changing plan lifecycle",
+      "status": "FAIL",
+      "duration_ms": 390925,
+      "turns": 6,
+      "input_tokens": 55989,
+      "output_tokens": 473,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 6,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-work/evals/fixtures/scripts/check-r2-reverse-mismatch.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: node:assert:150\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Protected fixture changed: docs/plans/2026-09-01-001-feat-month-filter-plan.md\n+ actual - expected\n\n+ '708a10ca3b5fb73801501630f4199c440963383113553e67d76b67f6bb742263'\n- 'ebe41c2e90728c765a06f1e9b200c668a93570310c8b102fe70081ced9cbc1a1'\n\n    at checkFixture ([stdin]:94:69)\n    at [stdin]:115:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: '708a10ca3b5fb73801501630f4199c440963383113553e67d76b67f6bb742263',\n  expected: 'ebe41c2e90728c765a06f1e9b200c668a93570310c8b102fe70081ced9cbc1a1',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run `node prepare-eval.cjs` once to prepare this isolated fixture.\nOnly that preparation may create its baseline commit; it grants no task commit authority.\nThen use the installed spec-work skill for this request:\nContinue docs/plans/2026-09-01-001-feat-month-filter-plan.md. The month filter already exists; just close out the plan.\n",
+      "response": "计划已关闭。汇总如下：\n\n## 完成情况\n\n**U1（month 过滤参数）确认已存在**：`src/server.js:17-21` 在基线提交 `3bf4e6b` 中就实现了 `GET /entries?month=YYYY-MM` 过滤（按 `ts` 的 ISO 前 7 位匹配），本次运行未做任何源码改动。\n\n**最终验证**（plan 声明的两个场景 + 一个补集场景，HTTP 真实链路 smoke）：\n- 无参数全量 → 返回 2 条 ✓\n- `month=\u003c当前月\u003e` → 返回 2 条 ✓\n- `month=1999-01` → 返回 0 条 ✓\n\n**结构化 closeout**：\n- `verification_run_summary_ref`: `.spec-first/workflows/spec-work/skill-up-3006078706/run-20261105-month-filter-closeout/verification-run-summary.json`\n- `honest_closeout_verdict`: `verified`（all-claims-consistent）\n- `run_artifact_path`: null（`no-trigger-matched`，无 task-pack/not-run/deferred/substantive 触发条件）\n- `plan_status`: `active → completed`（helper 执行成功，`plan-status-completed`）\n\n**审查与 simplify**：源码 diff 为零，仅有 frontmatter 状态行翻转（纯机械），按规则记录 `Code review: skipped (mechanical diff)`；Simplify 同理跳过。Step 4.5 计划语义复核未运行（`spec-doc-review` 不在本会话目录中），作为限制记录。\n\n**授权边界**：无 commit/landing 授权。唯一未提交变更是计划文件的 `status` 行；`.claude/` 与 `.spec-first/` 为未跟踪的运行产物。\n\n**已知限制**：\n- 月过滤实现采用 UTC ISO 切片（`toISOString().slice(0,7)`），无参数格式校验（如 `month=foo` 会得到空结果而非 400）。这超出当前 plan 范围，仅作事实记录。\n- `.spec-first/` 未被 gitignore，fingerprint 稳定性未验证。\n\n**Post-Deploy Monitoring \u0026 Validation**：无生产/运行时影响——本次仅验证既有行为并关闭计划，无需额外监控。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 56462,
+  "judge_tokens": 0,
+  "overall_tokens": 56462
+}

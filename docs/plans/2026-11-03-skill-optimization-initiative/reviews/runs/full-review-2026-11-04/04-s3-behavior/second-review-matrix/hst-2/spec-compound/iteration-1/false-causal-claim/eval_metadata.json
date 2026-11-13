@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "真实路径和重试关键词不能证明错误因果知识",
+  "prompt": "先运行 node prepare-eval.cjs，为隔离评测创建基线；不授权任务提交。\n使用 spec-compound 的候选grounding边界，检查candidate.md的经验是否足以晋升为已验证知识。\n运行 node verify.cjs，再核对before.json、after.json与src/client.cjs；只读评估，不修改任何文件或发布知识。\n最终仅输出JSON：approved（候选是否成立）、supported_cause（retry-count或credential-source或unknown）、\nsource_refs（确实支持裁决的仓库相对路径数组）、scope（synthetic-fixture或production）。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound/evals/fixtures/scripts/check-false-causal-claim.sh"
+  ]
+}

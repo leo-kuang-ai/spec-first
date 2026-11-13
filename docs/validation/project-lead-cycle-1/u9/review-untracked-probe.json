@@ -1,0 +1,63 @@
+{
+  "captured_at": "2026-09-20T03:04:41.685228+00:00",
+  "finding_id": "C1-CR-02",
+  "method": [
+    "isolated git init + tracked baseline commit + untracked new.js",
+    "python3 skills/spec-code-review/scripts/review-scope.py --base <fixture HEAD> --snapshot-out <outside-repo>/snapshot.json",
+    "modify only untracked new.js",
+    "python3 skills/spec-code-review/scripts/review-scope.py --verify-snapshot <snapshot>",
+    "positive control: modify tracked base.txt and verify again"
+  ],
+  "source_sha256": "ba359514ba60020b18381b1b1cf9268d16056e539f2bdd8e9c109ff1b8c8cc52",
+  "untracked_hash_before": "6e66e366f0aefb84ad8110afcd9b2245702c643c831edf8316ff048fec739d2e",
+  "untracked_hash_after": "0178ebe33198629bc345d7410d644ab4991518d537db5fd04912d281df792928",
+  "before": {
+    "exit_code": 0,
+    "result": {
+      "agent_surface": false,
+      "changed_files": [],
+      "diff_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exec_lines": 0,
+      "files_changed": 0,
+      "has_learnings_corpus": false,
+      "lite_eligible": false,
+      "reason": null,
+      "signals": [],
+      "snapshot_written": true,
+      "status": "complete",
+      "test_files_changed": false,
+      "uncounted_files": 0
+    }
+  },
+  "after_untracked_mutation": {
+    "exit_code": 0,
+    "result": {
+      "expected_diff_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected_files_changed": 0,
+      "mutated_paths": [],
+      "mutation_detected": false,
+      "observed_diff_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "observed_files_changed": 0,
+      "reason_code": null,
+      "status": "complete"
+    }
+  },
+  "after_tracked_mutation_control": {
+    "exit_code": 0,
+    "result": {
+      "expected_diff_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected_files_changed": 0,
+      "mutated_paths": [
+        "base.txt"
+      ],
+      "mutation_detected": true,
+      "observed_diff_sha256": "sha256:7de3e3951ffac667eeadf7c4af2e1d294b8c476d152af3ab213a2e1d082e4c58",
+      "observed_files_changed": 1,
+      "reason_code": "reviewer_mutation_detected",
+      "status": "complete"
+    }
+  },
+  "verdict": "confirmed",
+  "claim_ceiling": "C1；isolated script fixture，未发生真实宿主越权",
+  "redaction_status": "none-required"
+}

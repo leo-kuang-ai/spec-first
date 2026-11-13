@@ -1,0 +1,561 @@
+=== skill-up validate 修正重跑 (38 suites, eval.yaml 路径) ===
+skills/autoresearch/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 3 case(s))
+skills/spec-app-consistency-audit/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 4 case(s))
+skills/spec-brainstorm/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 7 case(s))
+skills/spec-code-review/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 5 case(s))
+skills/spec-commit-push-pr/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 2 case(s))
+skills/spec-commit/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 2 case(s))
+skills/spec-compound-refresh/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 4 case(s))
+skills/spec-compound/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 6 case(s))
+skills/spec-debug/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 5 case(s))
+skills/spec-doc-review/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 6 case(s))
+skills/spec-dogfood/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 4 case(s))
+skills/spec-explain/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 1 case(s))
+skills/spec-handoff/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 6 case(s))
+skills/spec-ideate/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 6 case(s))
+skills/spec-lfg/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 4 case(s))
+skills/spec-optimize/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 4 case(s))
+skills/spec-plan/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 9 case(s))
+skills/spec-polish/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 2 case(s))
+skills/spec-pov/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 2 case(s))
+skills/spec-prd/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 6 case(s))
+skills/spec-product-pulse/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 2 case(s))
+skills/spec-project-rules/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 10 case(s))
+skills/spec-promote/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 3 case(s))
+skills/spec-prototype/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 4 case(s))
+skills/spec-resolve-pr-feedback/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 4 case(s))
+skills/spec-riffrec-feedback-analysis/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 2 case(s))
+skills/spec-rule-miner/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 3 case(s))
+skills/spec-runtime-setup/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 3 case(s))
+skills/spec-simplify-code/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 4 case(s))
+skills/spec-strategy/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 6 case(s))
+skills/spec-sweep/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 1 case(s))
+skills/spec-test-browser/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 2 case(s))
+skills/spec-test-xcode/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 1 case(s))
+skills/spec-work/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 10 case(s))
+skills/spec-worktree/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 3 case(s))
+skills/spec-write-skill/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 1 case(s))
+skills/spec-write-tasks/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 4 case(s))
+skills/using-spec-first/evals/eval.yaml :: ✓ eval.yaml is valid (loaded 6 case(s))
+invalid_count=0
+=== doctor 全量 ===
+{
+  "schema_version": "v1",
+  "platforms": [
+    "claude"
+  ],
+  "selection_mode": "explicit",
+  "install_health": "pass",
+  "runtime_asset_health": "warn",
+  "host_readiness": "pass",
+  "decision_input_health": "missing",
+  "decision_input_health_basis": {
+    "reason_code": "setup-facts-missing",
+    "artifact_refs": [
+      "/private/tmp/spec-first-fr-wt/.spec-first/config/tool-facts.json"
+    ],
+    "schema_versions": {},
+    "facts_host": null,
+    "facts_platform": null,
+    "requested_platforms": [
+      "claude"
+    ],
+    "freshness": {
+      "status": "missing",
+      "generated_at": null,
+      "age_ms": null,
+      "max_age_ms": 604800000,
+      "reason_code": "setup-facts-missing"
+    },
+    "required_action_count": 0,
+    "degraded_count": 0,
+    "skipped_count": 0,
+    "configured_scan_status": "unknown",
+    "configured_dependency_counts": {
+      "action_required": 0,
+      "undeclared": 0,
+      "total": 0
+    },
+    "provider_counts": {
+      "missing": 0,
+      "stale": 0,
+      "fresh": 0,
+      "degraded": 0,
+      "unknown": 0,
+      "total": 0
+    },
+    "next_action": "Run `spec-runtime-setup` from claude to create setup facts."
+  },
+  "workflow_runnability": "not_verified",
+  "workflow_runnability_basis": {
+    "runtime_assets_ready": false,
+    "host_readiness_ready": true,
+    "managed_state_present": false,
+    "workflow_surface_resolved": false,
+    "execution_evidence_present": false,
+    "evidence_present": false,
+    "evidence_path": ".spec-first/workflows/verification/spec-first-fr-wt/verification-evidence.json",
+    "evidence_source": null,
+    "evidence_schema_valid": false,
+    "evidence_freshness": "missing",
+    "evidence_age_summary": {
+      "oldest_captured_at": null,
+      "oldest_age_ms": null,
+      "newest_captured_at": null,
+      "newest_age_ms": null,
+      "max_age_ms": 604800000
+    },
+    "fallback_reason": "verification_evidence_missing",
+    "reason": "Workflow runnability remains unverified because runtime assets or workflow surfaces are incomplete."
+  },
+  "workspace_readiness": null,
+  "host_support": {
+    "claude": {
+      "support_state": "active",
+      "evidence_claim": null,
+      "detected_version": "2.1.318",
+      "tested_versions": [],
+      "loader_evidence": false,
+      "reason_codes": []
+    }
+  },
+  "checks": [
+    {
+      "level": "PASS",
+      "name": "Node.js",
+      "message": "v22.22.3"
+    },
+    {
+      "level": "PASS",
+      "name": "Git",
+      "message": "git version 2.54.0 (Apple Git-157)"
+    },
+    {
+      "level": "PASS",
+      "name": "runtime asset manifest",
+      "message": "spec-first@1.15.3 with 17 command definition(s)"
+    },
+    {
+      "level": "PASS",
+      "name": "~/.spec-first/.developer",
+      "message": "t (zh) 1.15.3"
+    },
+    {
+      "level": "PASS",
+      "name": "Claude Code",
+      "message": "2.1.318 (Claude Code)",
+      "detectedVersion": "2.1.318"
+    },
+    {
+      "level": "WARNING",
+      "name": ".claude/spec-first/state.json",
+      "message": "missing",
+      "fix": "Run `spec-first init` in this project and choose Claude Code when prompted to record managed assets."
+    },
+    {
+      "level": "WARNING",
+      "name": "CLAUDE.md workflow entry guidance",
+      "message": ".claude/skills/using-spec-first/SKILL.md is missing",
+      "fix": "Run `spec-first init` in this project and choose Claude Code when prompted to restore the merged language/governance block."
+    },
+    {
+      "level": "WARNING",
+      "name": ".claude/hooks/session-start",
+      "message": "missing",
+      "fix": "Run `spec-first init` in this project and choose Claude Code when prompted to install the managed SessionStart hook."
+    },
+    {
+      "level": "WARNING",
+      "name": ".claude/hooks/spec-plan-guard",
+      "message": "missing",
+      "fix": "Run `spec-first init` in this project and choose Claude Code when prompted to install the managed UserPromptExpansion spec-plan guard hook."
+    },
+    {
+      "level": "WARNING",
+      "name": ".claude/hooks/prd-prewrite-guard",
+      "message": "missing",
+      "fix": "Run `spec-first init` in this project and choose Claude Code when prompted to install the managed PreToolUse PRD prewrite guard hook."
+    },
+    {
+      "level": "WARNING",
+      "name": ".claude/hooks/prd-readiness-guard",
+      "message": "missing",
+      "fix": "Run `spec-first init` in this project and choose Claude Code when prompted to install the managed Stop PRD readiness guard hook."
+    },
+    {
+      "level": "WARNING",
+      "name": ".claude/commands",
+      "message": "missing",
+      "fix": "Run `spec-first init` in this project and choose Claude Code when prompted."
+    },
+    {
+      "level": "PASS",
+      "name": ".claude/settings.json SessionStart",
+      "message": "managed SessionStart matcher present"
+    },
+    {
+      "level": "PASS",
+      "name": ".claude/settings.json UserPromptExpansion spec-plan guard",
+      "message": "managed UserPromptExpansion spec-plan guard matcher present"
+    },
+    {
+      "level": "PASS",
+      "name": ".claude/settings.json PreToolUse PRD prewrite guard",
+      "message": "managed PreToolUse PRD prewrite guard matcher present"
+    },
+    {
+      "level": "PASS",
+      "name": ".claude/settings.json Stop PRD readiness guard",
+      "message": "managed Stop PRD readiness guard matcher present"
+    },
+    {
+      "level": "WARNING",
+      "name": ".claude/skills",
+      "message": "missing",
+      "fix": "Run `spec-first init` in this project and choose Claude Code when prompted to install bundled skills."
+    },
+    {
+      "level": "PASS",
+      "name": ".claude/agents",
+      "message": "no bundled agents"
+    },
+    {
+      "level": "PASS",
+      "name": ".claude/agents support assets",
+      "message": "no bundled support assets"
+    }
+  ],
+  "common_checks": [
+    {
+      "level": "PASS",
+      "name": "Node.js",
+      "message": "v22.22.3"
+    },
+    {
+      "level": "PASS",
+      "name": "Git",
+      "message": "git version 2.54.0 (Apple Git-157)"
+    },
+    {
+      "level": "PASS",
+      "name": "runtime asset manifest",
+      "message": "spec-first@1.15.3 with 17 command definition(s)"
+    },
+    {
+      "level": "PASS",
+      "name": "~/.spec-first/.developer",
+      "message": "t (zh) 1.15.3"
+    }
+  ],
+  "platform_checks": {
+    "claude": [
+      {
+        "level": "PASS",
+        "name": "Claude Code",
+        "message": "2.1.318 (Claude Code)",
+        "detectedVersion": "2.1.318"
+      },
+      {
+        "level": "WARNING",
+        "name": ".claude/spec-first/state.json",
+        "message": "missing",
+        "fix": "Run `spec-first init` in this project and choose Claude Code when prompted to record managed assets."
+      },
+      {
+        "level": "WARNING",
+        "name": "CLAUDE.md workflow entry guidance",
+        "message": ".claude/skills/using-spec-first/SKILL.md is missing",
+        "fix": "Run `spec-first init` in this project and choose Claude Code when prompted to restore the merged language/governance block."
+      },
+      {
+        "level": "WARNING",
+        "name": ".claude/hooks/session-start",
+        "message": "missing",
+        "fix": "Run `spec-first init` in this project and choose Claude Code when prompted to install the managed SessionStart hook."
+      },
+      {
+        "level": "WARNING",
+        "name": ".claude/hooks/spec-plan-guard",
+        "message": "missing",
+        "fix": "Run `spec-first init` in this project and choose Claude Code when prompted to install the managed UserPromptExpansion spec-plan guard hook."
+      },
+      {
+        "level": "WARNING",
+        "name": ".claude/hooks/prd-prewrite-guard",
+        "message": "missing",
+        "fix": "Run `spec-first init` in this project and choose Claude Code when prompted to install the managed PreToolUse PRD prewrite guard hook."
+      },
+      {
+        "level": "WARNING",
+        "name": ".claude/hooks/prd-readiness-guard",
+        "message": "missing",
+        "fix": "Run `spec-first init` in this project and choose Claude Code when prompted to install the managed Stop PRD readiness guard hook."
+      },
+      {
+        "level": "WARNING",
+        "name": ".claude/commands",
+        "message": "missing",
+        "fix": "Run `spec-first init` in this project and choose Claude Code when prompted."
+      },
+      {
+        "level": "PASS",
+        "name": ".claude/settings.json SessionStart",
+        "message": "managed SessionStart matcher present"
+      },
+      {
+        "level": "PASS",
+        "name": ".claude/settings.json UserPromptExpansion spec-plan guard",
+        "message": "managed UserPromptExpansion spec-plan guard matcher present"
+      },
+      {
+        "level": "PASS",
+        "name": ".claude/settings.json PreToolUse PRD prewrite guard",
+        "message": "managed PreToolUse PRD prewrite guard matcher present"
+      },
+      {
+        "level": "PASS",
+        "name": ".claude/settings.json Stop PRD readiness guard",
+        "message": "managed Stop PRD readiness guard matcher present"
+      },
+      {
+        "level": "WARNING",
+        "name": ".claude/skills",
+        "message": "missing",
+        "fix": "Run `spec-first init` in this project and choose Claude Code when prompted to install bundled skills."
+      },
+      {
+        "level": "PASS",
+        "name": ".claude/agents",
+        "message": "no bundled agents"
+      },
+      {
+        "level": "PASS",
+        "name": ".claude/agents support assets",
+        "message": "no bundled support assets"
+      }
+    ]
+  },
+  "runtime_status_projections": [
+    {
+      "schema_version": "runtime-status-projection/v1",
+      "status": "ready",
+      "reason_code": "doctor-ready",
+      "disposition": "ready",
+      "scope": "common",
+      "artifact_refs": [],
+      "next_action": null
+    },
+    {
+      "schema_version": "runtime-status-projection/v1",
+      "status": "ready",
+      "reason_code": "doctor-ready",
+      "disposition": "ready",
+      "scope": "common",
+      "artifact_refs": [],
+      "next_action": null
+    },
+    {
+      "schema_version": "runtime-status-projection/v1",
+      "status": "ready",
+      "reason_code": "doctor-ready",
+      "disposition": "ready",
+      "scope": "common",
+      "artifact_refs": [],
+      "next_action": null
+    },
+    {
+      "schema_version": "runtime-status-projection/v1",
+      "status": "ready",
+      "reason_code": "doctor-ready",
+      "disposition": "ready",
+      "scope": "common",
+      "artifact_refs": [],
+      "next_action": null
+    },
+    {
+      "schema_version": "runtime-status-projection/v1",
+      "status": "ready",
+      "reason_code": "doctor-ready",
+      "disposition": "ready",
+      "scope": "claude",
+      "artifact_refs": [],
+      "next_action": null
+    },
+    {
+      "schema_version": "runtime-status-projection/v1",
+      "status": "action-required",
+      "reason_code": "doctor-action-required",
+      "disposition": "action-required",
+      "scope": "claude",
+      "artifact_refs": [],
+      "next_action": "Run `spec-first init` in this project and choose Claude Code when prompted to record managed assets."
+    },
+    {
+      "schema_version": "runtime-status-projection/v1",
+      "status": "action-required",
+      "reason_code": "doctor-action-required",
+      "disposition": "action-required",
+      "scope": "claude",
+      "artifact_refs": [],
+      "next_action": "Run `spec-first init` in this project and choose Claude Code when prompted to restore the merged language/governance block."
+    },
+    {
+      "schema_version": "runtime-status-projection/v1",
+      "status": "action-required",
+      "reason_code": "doctor-action-required",
+      "disposition": "action-required",
+      "scope": "claude",
+      "artifact_refs": [],
+      "next_action": "Run `spec-first init` in this project and choose Claude Code when prompted to install the managed SessionStart hook."
+    },
+    {
+      "schema_version": "runtime-status-projection/v1",
+      "status": "action-required",
+      "reason_code": "doctor-action-required",
+      "disposition": "action-required",
+      "scope": "claude",
+      "artifact_refs": [],
+      "next_action": "Run `spec-first init` in this project and choose Claude Code when prompted to install the managed UserPromptExpansion spec-plan guard hook."
+    },
+    {
+      "schema_version": "runtime-status-projection/v1",
+      "status": "action-required",
+      "reason_code": "doctor-action-required",
+      "disposition": "action-required",
+      "scope": "claude",
+      "artifact_refs": [],
+      "next_action": "Run `spec-first init` in this project and choose Claude Code when prompted to install the managed PreToolUse PRD prewrite guard hook."
+    },
+    {
+      "schema_version": "runtime-status-projection/v1",
+      "status": "action-required",
+      "reason_code": "doctor-action-required",
+      "disposition": "action-required",
+      "scope": "claude",
+      "artifact_refs": [],
+      "next_action": "Run `spec-first init` in this project and choose Claude Code when prompted to install the managed Stop PRD readiness guard hook."
+    },
+    {
+      "schema_version": "runtime-status-projection/v1",
+      "status": "action-required",
+      "reason_code": "doctor-action-required",
+      "disposition": "action-required",
+      "scope": "claude",
+      "artifact_refs": [],
+      "next_action": "Run `spec-first init` in this project and choose Claude Code when prompted."
+    },
+    {
+      "schema_version": "runtime-status-projection/v1",
+      "status": "ready",
+      "reason_code": "doctor-ready",
+      "disposition": "ready",
+      "scope": "claude",
+      "artifact_refs": [],
+      "next_action": null
+    },
+    {
+      "schema_version": "runtime-status-projection/v1",
+      "status": "ready",
+      "reason_code": "doctor-ready",
+      "disposition": "ready",
+      "scope": "claude",
+      "artifact_refs": [],
+      "next_action": null
+    },
+    {
+      "schema_version": "runtime-status-projection/v1",
+      "status": "ready",
+      "reason_code": "doctor-ready",
+      "disposition": "ready",
+      "scope": "claude",
+      "artifact_refs": [],
+      "next_action": null
+    },
+    {
+      "schema_version": "runtime-status-projection/v1",
+      "status": "ready",
+      "reason_code": "doctor-ready",
+      "disposition": "ready",
+      "scope": "claude",
+      "artifact_refs": [],
+      "next_action": null
+    },
+    {
+      "schema_version": "runtime-status-projection/v1",
+      "status": "action-required",
+      "reason_code": "doctor-action-required",
+      "disposition": "action-required",
+      "scope": "claude",
+      "artifact_refs": [],
+      "next_action": "Run `spec-first init` in this project and choose Claude Code when prompted to install bundled skills."
+    },
+    {
+      "schema_version": "runtime-status-projection/v1",
+      "status": "ready",
+      "reason_code": "doctor-ready",
+      "disposition": "ready",
+      "scope": "claude",
+      "artifact_refs": [],
+      "next_action": null
+    },
+    {
+      "schema_version": "runtime-status-projection/v1",
+      "status": "ready",
+      "reason_code": "doctor-ready",
+      "disposition": "ready",
+      "scope": "claude",
+      "artifact_refs": [],
+      "next_action": null
+    }
+  ],
+  "warnings": [
+    {
+      "level": "WARNING",
+      "name": ".claude/spec-first/state.json",
+      "message": "missing",
+      "fix": "Run `spec-first init` in this project and choose Claude Code when prompted to record managed assets."
+    },
+    {
+      "level": "WARNING",
+      "name": "CLAUDE.md workflow entry guidance",
+      "message": ".claude/skills/using-spec-first/SKILL.md is missing",
+      "fix": "Run `spec-first init` in this project and choose Claude Code when prompted to restore the merged language/governance block."
+    },
+    {
+      "level": "WARNING",
+      "name": ".claude/hooks/session-start",
+      "message": "missing",
+      "fix": "Run `spec-first init` in this project and choose Claude Code when prompted to install the managed SessionStart hook."
+    },
+    {
+      "level": "WARNING",
+      "name": ".claude/hooks/spec-plan-guard",
+      "message": "missing",
+      "fix": "Run `spec-first init` in this project and choose Claude Code when prompted to install the managed UserPromptExpansion spec-plan guard hook."
+    },
+    {
+      "level": "WARNING",
+      "name": ".claude/hooks/prd-prewrite-guard",
+      "message": "missing",
+      "fix": "Run `spec-first init` in this project and choose Claude Code when prompted to install the managed PreToolUse PRD prewrite guard hook."
+    },
+    {
+      "level": "WARNING",
+      "name": ".claude/hooks/prd-readiness-guard",
+      "message": "missing",
+      "fix": "Run `spec-first init` in this project and choose Claude Code when prompted to install the managed Stop PRD readiness guard hook."
+    },
+    {
+      "level": "WARNING",
+      "name": ".claude/commands",
+      "message": "missing",
+      "fix": "Run `spec-first init` in this project and choose Claude Code when prompted."
+    },
+    {
+      "level": "WARNING",
+      "name": ".claude/skills",
+      "message": "missing",
+      "fix": "Run `spec-first init` in this project and choose Claude Code when prompted to install bundled skills."
+    }
+  ]
+}

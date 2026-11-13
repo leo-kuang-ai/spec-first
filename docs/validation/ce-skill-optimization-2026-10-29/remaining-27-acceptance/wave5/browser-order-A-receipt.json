@@ -1,0 +1,38 @@
+{
+  "arm": "A",
+  "input": {
+    "target_origin": "http://127.0.0.1:50523",
+    "routes": [
+      "/"
+    ],
+    "steps": [
+      {
+        "action": "vitals",
+        "route": "/"
+      },
+      {
+        "action": "open",
+        "route": "/"
+      }
+    ]
+  },
+  "actual_validation": {
+    "ok": true,
+    "target_origin": "http://127.0.0.1:50523",
+    "allowed_domain": "127.0.0.1",
+    "routes": [
+      "/"
+    ],
+    "steps": [
+      {
+        "action": "vitals",
+        "route": "/"
+      },
+      {
+        "action": "open",
+        "route": "/"
+      }
+    ]
+  },
+  "limitation": "Actual plan validation only; no browser started."
+}

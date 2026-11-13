@@ -1,0 +1,10 @@
+PASS tests/unit/spec-riffrec-analyzer-safety.test.js
+PASS tests/unit/spec-riffrec-feedback-analysis-contracts.test.js
+PASS tests/unit/spec-riffrec-snapshots.test.js
+
+Test Suites: 3 passed, 3 total
+Tests:       19 passed, 19 total
+Snapshots:   0 total
+Time:        0.798 s
+Ran all test suites matching /tests\/unit\/spec-riffrec-feedback-analysis-contracts.test.js|tests\/unit\/spec-riffrec-analyzer-safety.test.js|tests\/unit\/spec-riffrec-snapshots.test.js/i.
+Test results written to: docs/validation/ce-skill-audit-2026-10-28/riffrec-tests.json

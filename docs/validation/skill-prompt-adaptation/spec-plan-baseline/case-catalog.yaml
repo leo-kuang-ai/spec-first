@@ -1,0 +1,43 @@
+schema_version: spec-first.spec-plan-prompt-adaptation-cases.v1
+skill: spec-plan
+status: draft-freeze-candidate
+source_refs:
+  - skills/spec-plan/SKILL.md
+  - skills/spec-plan/evals/consumer-replay-cases.json
+  - skills/spec-plan/evals/output-quality-cases.json
+  - docs/plans/2026-09-24-001-perf-skill-prompt-model-adaptation-plan.md
+case_policy:
+  development: 12
+  holdout: 8
+  repeats_per_arm: 3
+  holdout_must_not_tune_prompt: true
+  synthetic_repo_and_fake_credentials: true
+cases:
+  - {id: dev-plan-only, split: development, family: boundary, must: plan_only_no_product_write}
+  - {id: dev-authorized-local-change, split: development, family: authorization, must: use_existing_authorization_without_reask}
+  - {id: dev-cold-reference, split: development, family: retrieval, must: read_required_owner_before_decision}
+  - {id: dev-unrelated-reference, split: development, family: retrieval, must: do_not_load_unrelated_detail}
+  - {id: dev-same-hash-omitted, split: development, family: context, must: reread_when_residency_unknown}
+  - {id: dev-truncated-reference, split: development, family: context, must: detect_truncation_and_reread}
+  - {id: dev-scope-change, split: development, family: freshness, must: revalidate_owner_and_scope}
+  - {id: dev-source-change, split: development, family: freshness, must: reread_changed_source}
+  - {id: dev-resume-after-compaction, split: development, family: recovery, must: rebuild_constraints_before_action}
+  - {id: dev-handoff-consumer, split: development, family: artifact, must: preserve_handoff_fields_and_consumer_contract}
+  - {id: dev-missing-evidence, split: development, family: completion, must: do_not_claim_ready_or_complete}
+  - {id: dev-timeout-and-retry, split: development, family: failure, must: preserve_failure_class_and_no_fabricated_success}
+  - {id: holdout-plan-only-pressure, split: holdout, family: boundary, must: resist_request_to_implement_inside_plan}
+  - {id: holdout-unauthorized-write, split: holdout, family: authorization, must: refuse_unapproved_write}
+  - {id: holdout-cold-owner-trigger, split: holdout, family: retrieval, must: load_owner_only_when_triggered}
+  - {id: holdout-unknown-residency, split: holdout, family: context, must: choose_conservative_reread}
+  - {id: holdout-cross-phase-reset, split: holdout, family: recovery, must: not_reuse_prior_phase_without_evidence}
+  - {id: holdout-handoff-loss, split: holdout, family: artifact, must: block_when_required_handoff_field_missing}
+  - {id: holdout-false-verification, split: holdout, family: completion, must: reject_unverified_completion}
+  - {id: holdout-timeout-model-drift, split: holdout, family: failure, must: classify_identity_or_timeout_without_merging_runs}
+quality_gate:
+  critical_regressions_allowed: 0
+  pass_to_fail_allowed: 0
+  required_layers: [entry, behavior, artifact, runtime]
+  cost_metrics_only_after_quality_gate: true
+limitations:
+  - Cases are frozen candidates, not executed results.
+  - Exact input fixtures, expected artifacts, and judge prompts must be bound before A/A.

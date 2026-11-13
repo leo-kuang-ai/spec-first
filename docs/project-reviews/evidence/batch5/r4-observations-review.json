@@ -1,0 +1,86 @@
+[
+ {
+  "run": "/tmp/spec-first-batch5-r2/out-r4-review-codex4/iteration-1/batch5-review/with_skill/outputs/agent/run",
+  "group": "with_skill",
+  "case": "batch5-review",
+  "engine": "codex",
+  "engine_group": "r4-review-codex",
+  "trace": "rollout-2026-11-02T12-13-22-01a19a76-3bc9-71e3-bb35-c0c7e221d2f5.jsonl",
+  "trace_sha256": "c9f9f3af81f3660e94daa3de32d5f67b54fdc220cbabed9dcdec8f7d4ee73e12",
+  "model": "gpt-6-astra",
+  "effort": "medium",
+  "usage": {
+   "input_tokens": 349054,
+   "cached_input_tokens": 311040,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 4865,
+   "reasoning_output_tokens": 114,
+   "total_tokens": 353919
+  },
+  "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-4166709184",
+  "tool_calls": 8,
+  "duration_s": 141.6,
+  "final": "**结论：不可合入（Not ready）。** 相对 HEAD 的 4 个已跟踪文件中，确认 3 项 P1 合同回归，均经本地假 provider 复现。\n\n已显式读取并使用 spec-code-review 的 SKILL.md；本次为单模型本地只读审查，未执行独立 reviewer 或跨模型复核。\n\n1. **#1 P1：金额单位错误** — [lib/amount.cjs:4](/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-4166709184/lib/amount.cjs:4)  \n   README 要求入口到 provider 全程使用整数分，但这里返回 `amountCents / 100`。实际消费者 ledger 将结果直接传给 `provider.charge.amountCents` 并写入回执。输入 1250 分，provider 收到 12.5，回执经 `formatReceipt` 显示为 `captured: 0.13`，而非 12.50。接受该值的 provider 会少收款，严格校验整数分的 provider 则可能拒绝。**建议：保留整数分，只有显示层换算。**\n\n2. **#2 P1：去重键丢失租户隔离** — [lib/ledger.cjs:7](/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-4166709184/lib/ledger.cjs:7)  \n   `key = request.requestId` 违反“租户和请求号共同标识”的合同。同一 ledger 中，租户 A 成功后，租户 B 使用相同请求号会直接得到 A 的回执，B 的 provider 调用被跳过。已在单项及混合租户批量入口复现：两笔请求只有一次扣款。**建议：恢复包含 tenantId 和 requestId 的无歧义组合键。**\n\n3. **#3 P1：支付成功前缓存成功回执** — [lib/ledger.cjs:11](/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-4166709184/lib/ledger.cjs:11)  \n   `receipts.set(key, receipt)` 被移到等待 provider 成功之前。首次支付抛错后，同请求重试直接返回 `captured`，不再尝试扣款，违反失败可重试合同；支付仍在等待时，重复请求也会提前拿到成功回执。两种情况均已复现，可使消费者将未付款交易视为成功。**建议：仅在 provider 成功后缓存成功回执；若需并发去重，应共享待完成操作，并在失败后允许重试。**\n\n验证范围：检查全部 diff、README 合同、4 个模块及测试中的实际消费者。`node --test test/smoke.test.cjs` 为 **2/2 通过**；另用内存假 provider 复现以上问题，并验证批量顺序、空批量及单项转发。现有测试未断言扣款金额、跨租户隔离、失败重试或等待期间重复请求。`receipt.cjs` 的局部变量整理保持原行为，显示异常归属于 #1。\n\n边界：未跟踪的 `.codex/` 不纳入产品改动审查，仅读取指定技能及其配套资源。未修改实现、提交、推送、访问真实项目或用户配置，也未调用外部服务。快照复核确认 4 个改动文件未变。独立审查及真实 provider 集成未执行；未生成技能 CLI 的标准验证摘要，命令证据保存在[审查产物](/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-code-review-44ynbk4j)中。\n\n**Actionable Findings：合入前处理 #1（amount.cjs:4）、#2（ledger.cjs:7）、#3（ledger.cjs:11），均为 P1，置信度 100，已有修复建议，分类 `gated_auto`，交由 `downstream-resolver` 修复并补充回归验证。本次不应用修复。**"
+ },
+ {
+  "run": "/tmp/spec-first-batch5-r2/out-r4-review-codex4/iteration-1/batch5-review/without_skill/outputs/agent/run",
+  "group": "without_skill",
+  "case": "batch5-review",
+  "engine": "codex",
+  "engine_group": "r4-review-codex",
+  "trace": "rollout-2026-11-02T12-15-54-01a19a78-8cef-75a3-8003-7c6273e1f35c.jsonl",
+  "trace_sha256": "1386c67285d6800345021b3cccc920919c7dbf41edfd2bbb64fe8da0ca5a7e04",
+  "model": "gpt-6-astra",
+  "effort": "medium",
+  "usage": {
+   "input_tokens": 104524,
+   "cached_input_tokens": 89216,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 1759,
+   "reasoning_output_tokens": 48,
+   "total_tokens": 106283
+  },
+  "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-510150392",
+  "tool_calls": 5,
+  "duration_s": 64.3,
+  "final": "**当前不建议合入**：发现 3 个 P1 问题，均违反 README 合同，并已用本地假 provider 复现。\n\n1. **[P1] 保持传给 provider 的金额为整数分** — [lib/amount.cjs:4](/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-510150392/lib/amount.cjs:4)  \n   输入 `amountCents: 1250` 后，实际传给 `provider.charge` 的 `amountCents` 和返回的 `chargedCents` 均为 `12.5`。这违反整数分合同，可能导致支付被拒绝或少收款；实际显示消费者 `formatReceipt` 再除以 100，最终显示 `captured: 0.13`，而非 `12.50`。\n\n2. **[P1] 恢复包含租户的去重键** — [lib/ledger.cjs:7](/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-510150392/lib/ledger.cjs:7)  \n   两个租户使用相同 `requestId`、共享同一 ledger 时，第二个请求直接获得第一个租户的回执，完全跳过扣款。在新增批量入口中已复现：两项不同租户请求只调用一次 provider，第二项金额也被错误复用。\n\n3. **[P1] 等待 provider 成功后再缓存成功回执** — [lib/ledger.cjs:11](/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-510150392/lib/ledger.cjs:11)  \n   提前写入缓存使 provider 抛错后仍留下 `captured` 回执。同一请求重试时直接返回成功，不再调用 provider，违反失败可重试合同。此外，首次支付尚未完成时，重复请求也会提前收到成功回执。\n\n验证范围：审查了相对 HEAD 的全部四个文件差异、README、调用链及现有测试。现有 2 项测试通过，但未覆盖上述违约情形；额外内存验证覆盖了三个缺陷、批量顺序、结果顺序、单项兼容和空批量。显示格式化改动本身未发现问题。\n\n当前技能目录未找到 `spec-code-review`，因此直接审查。未修改文件、提交或推送，未访问真实项目、用户配置或外部服务。"
+ },
+ {
+  "run": "/tmp/spec-first-batch5-r2/out-r4-review-glm4/iteration-1/batch5-review/with_skill/outputs/agent/run",
+  "group": "with_skill",
+  "case": "batch5-review",
+  "engine": "claude_code",
+  "engine_group": "r4-review-glm",
+  "trace": "91bf4e5c-2023-43fa-9ea8-52ca157deee0.jsonl",
+  "trace_sha256": "cad474561d298249f1d4333410b082e856d12070b0f3ef794ea585d4d0d4877b",
+  "model": "glm-5.3",
+  "usage_dedup": {
+   "input_tokens": 70033,
+   "output_tokens": 29768,
+   "cache_read_input_tokens": 623296
+  },
+  "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-1984169158",
+  "tool_calls": 29,
+  "duration_s": 406.5,
+  "final": "审查完成，工件已写入。以下为最终报告（与 `report.md` 一致）：\n\n## Code Review Results\n\n**Scope:** HEAD (9f04885) -> working tree（未提交改动），4 files，+10/-4：lib/amount.cjs, lib/http.cjs, lib/ledger.cjs, lib/receipt.cjs\n**Intent:** 在保持 README 合同（整数分、租户+请求号共同去重、provider 成功才记 captured）的前提下，为 HTTP 适配器增加顺序批量收款入口，拆出金额转换函数便于复用，单项入口保持兼容（README.md:7）。\n**Mode:** interactive（`mutation_policy: report-only`；`commit_authorization: missing`；被审文件审查期间零改动，范围快照复核 `mutation_detected: false`）\n\n**Reviewers:** inline-fallback（单模型内联检查）\n- 覆盖限制：本次调用未授权多代理派发与外部服务，未运行独立 reviewer / validator / 交叉模型确认。结论来自直接读码、README 合同对照、全量消费者 grep 与 `npm test`。\n\n### Triage Groups\n\n| Group | Findings | Context | Preferred Resolution | Why |\n|-------|----------|---------|----------------------|-----|\n| 账本幂等与扣款顺序（apply-queue） | #1, #2 | 同一函数内两处改动共同破坏去重与 captured 语义 | 同批修复 #1、#2（同文件同函数），先恢复合键再恢复扣款顺序，并补多租户 + 失败重试测试 | 一条修复路径解决两项，两项测试互相锚定 |\n\n### P0 -- Critical\n\n| # | File | Issue | Reviewer | Confidence |\n|---|------|-------|----------|------------|\n| 1 | `lib/ledger.cjs:11` | charge 失败仍缓存 captured 回执，重试被缓存吞掉 | inline-fallback | 100 |\n| 2 | `lib/ledger.cjs:7` | 幂等键丢弃 tenantId，跨租户同 requestId 返回他人回执且不再扣款 | inline-fallback | 100 |\n| 3 | `lib/amount.cjs:4` | 分转元破坏整数分合同，下游双重换算 | inline-fallback | 100 |\n\n- **#1** — 触发：`provider.charge` 抛错（瞬时故障）。`lib/ledger.cjs:11` 已写入 `status:'captured'` 回执后 :12 才扣款并抛异常；同请求重试在 :8 命中被污染缓存，返回 captured 且不再扣款。违反 README.md:5「只有 provider 成功才能记为 captured，失败后同一请求允许重试」——调用方认为已收款、provider 从未扣款，静默资损。次级：重复请求在 charge 完成前（一个 await 窗口）即拿到 captured。修复：恢复先 `await provider.charge` 成功、再构造并写入回执的顺序，补「首次失败 -> 重试成功」测试。\n- **#2** — 触发：租户 A capture 成功后，租户 B 以相同 requestId 发起（README.md:5 明确允许，金额可不同）。B 在 `lib/ledger.cjs:8` 命中 A 的缓存，拿到 A 的 captured 回执（含 A 的 chargedCents）——跨租户数据泄露；B 自己的扣款永不发起——漏收。修复：恢复 `JSON.stringify([request.tenantId, request.requestId])` 合键，补双租户同 requestId 测试。\n- **#3** — 触发：任意 capture（单项或批量每项）。1250 分 -> `provider.charge` 收到 `amountCents: 12.5`（缩小 100 倍）；回执 `chargedCents: 12.5` 经 `lib/receipt.cjs:3` 再 /100 显示 \"0.13\"（正确 \"12.50\"）。违反 README.md:5「金额从入口到 provider 均为整数分」，且引入浮点（1 分 -> 0.01 不可精确表示）。变更目标（README.md:7）只授权「拆出函数便于复用」，未授权改单位。修复：恢复 `return amountCents;`；元单位显示只属显示层（receipt.cjs 已做）。\n\n### P2 -- Moderate\n\n| # | File | Issue | Reviewer | Confidence |\n|---|------|-------|----------|------------|\n| 4 | `lib/http.cjs:6` | 批量部分失败时已成功项结果丢失，语义未约定（设计决策） | inline-fallback | 75 |\n\n- **#4** — 触发：items 第 k 项 capture 抛错（provider 故障或 amountCents 非法）。前 k-1 项已真实扣款但整个 handle 以异常结束，results 丢失；调用方只能整批重试（#1 修复后幂等安全），却无法得知哪些项已成功，需按 requestId 逐项对账。README.md:7 未约定部分失败行为。两个方向：a) 维持 fail-fast 并在合同写明整批重试语义；b) 返回逐项结果（如 `{ ok, receipt?, error? }`），需同步更新 README。\n\n### Actionable Findings\n\n| # | File | Issue | Route | Notes |\n|---|------|-------|-------|-------|\n| 1 | `lib/ledger.cjs:11` | 恢复 charge 成功后再写回执缓存 | `gated_auto -> downstream-resolver` | `suggested_fix` present；修复需补失败重试测试 |\n| 2 | `lib/ledger.cjs:7` | 恢复 tenantId + requestId 合键 | `gated_auto -> downstream-resolver` | `suggested_fix` present；修复需补多租户测试 |\n| 3 | `lib/amount.cjs:4` | 恢复 `return amountCents;` | `gated_auto -> downstream-resolver` | `suggested_fix` present；修复需补端到端金额断言 |\n| 4 | `lib/http.cjs:6` | 批量部分失败语义需接口决策 | `manual -> downstream-resolver` | 两个可选方向见 finding #4 |\n\n### Coverage\n\n- 独立审查：未派发（`dispatch_reason_code: dispatch_authorization_missing`）——单模型内联降级路径；validator / 交叉模型确认均未运行，本报告不宣称独立审查通过。\n- 定向命令：`npm test`（node --test）-> exit 0，2/2 通过。绿色不代表合同保持：fake provider 不校验金额、单租户、无失败路径。spec-first CLI 不可用，无持久 verification-run-summary，结果保留于本报告（degraded，in-band）。\n- 范围快照：base 9f04885 -> 工作树，diff_sha256 `sha256:4c5b466d…`；审查结束时复核 `mutation_detected: false`。\n- 排除项：untracked `.claude/**`（spec-code-review 技能自身文件，33 个，非产品代码）。\n- 抑制 / 降级 / malformed：0 / 0 / 0。\n- Testing gaps：\n  - `test/smoke.test.cjs:9` fake provider 不校验金额单位，无端到端金额断言（无法捕捉 #3）\n  - `test/smoke.test.cjs` 无两个租户使用相同 requestId 的用例（无法捕捉 #2）\n  - `test/smoke.test.cjs` 无 provider.charge 失败后重试的用例（无法捕捉 #1）\n  - 无批量入口测试（含部分失败场景，对应 #4）\n- Residual risks：无（超出 findings 的部分无新证据项）。\n\n---\n\n> **Verdict:** Not ready\n>\n> **Reasoning:** 三项 P0 均直接违反 README.md:5 的合同约束（provider 成功才记 captured / 租户+请求号共同去重 / 整数分），任一单独成立即不可合入；#4 是需产品决策的接口语义缺口。`npm test` 全绿是覆盖假象，现有断言捕捉不到全部四处问题。\n>\n> **Fix order:** #1 + #2（ledger.cjs 同函数一次改完）-> #3（恢复单位语义）-> #4（决策批量失败语义）-> 补 4 类测试（多租户、失败重试、金额端到端、批量）\n\n**Actionable findings summary**：\n\n- #1 P0 `lib/ledger.cjs:11` 恢复 charge 成功后写缓存 — `gated_auto`，`suggested_fix` present，confidence 100\n- #2 P0 `lib/ledger.cjs:7` 恢复 tenantId + requestId 合键 — `gated_auto`，`suggested_fix` present，confidence 100\n- #3 P0 `lib/amount.cjs:4` 恢复 `return amountCents;` — `gated_auto`，`suggested_fix` present，confidence 100\n- #4 P2 `lib/http.cjs:6` 批量部分失败语义决策 — `manual`，`suggested_fix`（两方向）present，confidence 75\n\nRun artifacts: `/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first/spec-code-review/scr-20261102T041837Z-21971/`（scope-snapshot.json, inline-fallback.json, findings-mechanics-out.json, report.md, metadata.json, actionable-findings.json）\n\n---\n\n补充说明：receipt.cjs 的改动是纯提取变量重构，行为等价，合同允许，无问题；三处 P0 均由本次 diff 引入（HEAD 基线行为与合同一致），无 pre-existing 项。未修改任何实现，未提交、未推送，未调用外部服务。"
+ },
+ {
+  "run": "/tmp/spec-first-batch5-r2/out-r4-review-glm4/iteration-1/batch5-review/without_skill/outputs/agent/run",
+  "group": "without_skill",
+  "case": "batch5-review",
+  "engine": "claude_code",
+  "engine_group": "r4-review-glm",
+  "trace": "38899da6-eda0-448f-bc3d-3211d657b412.jsonl",
+  "trace_sha256": "6f6a06caef862b112a77631df9e83457f935fcb04c064cabd5812fb1b2255828",
+  "model": "glm-5.3",
+  "usage_dedup": {
+   "input_tokens": 12191,
+   "output_tokens": 7773,
+   "cache_read_input_tokens": 147840
+  },
+  "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-3022943265",
+  "tool_calls": 17,
+  "duration_s": 125.7,
+  "final": "# 审查结论：不可合入\n\n`spec-code-review` 未安装（技能列表与文件系统均无此技能），按你的指示直接审查。合同取自 `README.md:5-7`（整数分、租户+请求号去重、provider 成功才 captured、失败可重试、允许跨租户同请求号），消费者为 `lib/http.cjs`、`lib/receipt.cjs` 与 `test/smoke.test.cjs`。\n\n`npm test` 2/2 全绿，但现有测试只断言 `status` 和重复请求稳定性，覆盖不到上述合同属性。我用内存假 provider 写了行为探针（`/tmp/review-probe/probe.cjs`，未动仓库），三处违约全部实测复现。\n\n## 阻断性问题（均实测确认）\n\n**1. `lib/ledger.cjs:10-12` — 先记 captured 后扣款，失败后回执被污染且重试被吞** 🔴\ndiff 把 `receipts.set(key, receipt)` 移到 `await provider.charge(...)` 之前。\n- 触发：`provider.charge` 抛错（provider 故障/拒付，任一瞬时错误）\n- 实测：首次调用抛 `provider down` 后，同 requestId 重试命中缓存直接返回 `captured`，扣款次数停在 1——**重试永远不再发起扣款，却返回成功回执**。直接违反「只有 provider 成功才能记为 captured，失败后同一请求允许重试」。这是支付账本最坏失败模式：未收款但账面 captured。\n\n**2. `lib/ledger.cjs:7` — 去重键丢掉 tenantId** 🔴\n`JSON.stringify([request.tenantId, request.requestId])` → `request.requestId`。\n- 触发：不同租户使用相同 requestId（合同第 5 行明确允许）\n- 实测：租户 one 以 r1/1250 成功后，租户 two 的 r1/9999 **返回租户 one 的回执（金额 12.5），provider 只被调用 1 次**——第二个租户的钱从未被收，跨租户串账。违反「重试去重以租户和请求号共同标识」。\n\n**3. `lib/amount.cjs:4` — 分转元，整条单位链路错 100 倍** 🔴\n`return amountCents` → `return amountCents / 100`。\n- 触发：任何一次 capture（必然触发）\n- 实测：入口 1250 分 → `provider.charge` 收到 `{amountCents: 12.5}`（字段名为分、值为元、且是浮点）→ 回执 `chargedCents: 12.5` → `formatReceipt` 再除 100 显示 `\"captured: 0.13\"`（实际 $12.50）。违反「金额从入口到 provider 均为整数分」，三个下游（provider 载荷、回执、显示）全错。且入口仍用 `Number.isSafeInteger` 按分校验，校验与输出单位自相矛盾。\n\n## 非阻断\n\n- **`lib/receipt.cjs:2-4`** — 仅提取变量，无行为变化，属 README 允许的显示整理。显示错 100 倍的根因在问题 3，本文件本身正确。\n- **`lib/http.cjs:4-8`** — 批量入口本身符合目标：顺序 for-await（顺序批量）、每项走同一 ledger、单项入口保持兼容。一个设计观察（实测确认）：批量第 2 项失败时整批抛错，已完成扣款的第 1 项不返回部分结果；README 未规定批量原子性，修复问题 1/2 后整批重试可由去重兜住，建议在合同中补充批量失败语义，不阻断。\n\n## 验证范围\n\n- **已执行**：`npm test`（全绿）；4 组行为探针（单位链路 / 跨租户同号 / 失败重试 / 批量含中途失败），全部使用注入的内存 provider。\n- **未覆盖**：真实 provider 集成（本仓库不接真实支付网络）；并发同请求的竞态细节（次要——set-before-await 本身就应回退）。\n- **未做**：未修改任何实现，未提交、未推送，未访问真实项目/用户配置，未调用外部服务。探针脚本留在 `/tmp/review-probe/probe.cjs` 可复跑。\n\n三处 Critical 均直接违反 README 合同且稳定复现，需回退 `ledger.cjs` 的两处改动与 `amount.cjs` 的单位转换后再提交审查。"
+ }
+]

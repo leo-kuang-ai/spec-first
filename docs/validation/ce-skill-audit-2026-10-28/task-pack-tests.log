@@ -1,0 +1,10 @@
+PASS tests/unit/task-pack-command.test.js
+PASS tests/unit/spec-doc-review-task-pack-contracts.test.js
+PASS tests/unit/spec-write-tasks-contracts.test.js
+
+Test Suites: 3 passed, 3 total
+Tests:       33 passed, 33 total
+Snapshots:   0 total
+Time:        1.644 s
+Ran all test suites matching /tests\/unit\/task-pack-command.test.js|tests\/unit\/spec-doc-review-task-pack-contracts.test.js|tests\/unit\/spec-write-tasks-contracts.test.js/i.
+Test results written to: docs/validation/ce-skill-audit-2026-10-28/task-pack-tests.json

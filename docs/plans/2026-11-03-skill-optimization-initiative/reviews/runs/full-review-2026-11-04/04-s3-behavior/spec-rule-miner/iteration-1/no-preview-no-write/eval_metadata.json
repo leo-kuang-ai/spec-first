@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "交互场景未经 preview 确认不得写规则文件",
+  "prompt": "（spec-rule-miner skill 已安装，请按它工作。）\n帮我挖掘这个仓库的编码规范,生成项目规则。\n",
+  "assertions": [
+    "expect.files_not_exist",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-rule-miner/evals/fixtures/scripts/check-preview-first.sh"
+  ]
+}

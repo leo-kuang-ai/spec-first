@@ -1,0 +1,7 @@
+{
+  "session_id": "01a18b82-2b3d-7850-8b89-9e2915e4651a",
+  "review_sha256": "925a790cfce1c9b0ddc33ce07af9591e34b94aead2aed93f420ef1e3fdfdfaa8",
+  "started_at": "2026-10-30T06:32:06.327Z",
+  "final_at": "2026-10-30T06:33:29.932Z",
+  "independence": "Separate fresh context; not different authenticated model or enforced sandbox."
+}

@@ -1,0 +1,11 @@
+PASS tests/unit/pipeline-mode-contracts.test.js
+PASS tests/unit/spec-pr-feedback-publication.test.js
+PASS tests/unit/spec-pr-feedback-reply.test.js
+PASS tests/unit/spec-lfg-contracts.test.js
+PASS tests/unit/spec-resolve-pr-feedback-contracts.test.js
+
+Test Suites: 5 passed, 5 total
+Tests:       62 passed, 62 total
+Snapshots:   0 total
+Time:        4.034 s
+Ran all test suites matching /tests\/unit\/spec-pr-feedback-publication.test.js|tests\/unit\/spec-pr-feedback-reply.test.js|tests\/unit\/spec-resolve-pr-feedback-contracts.test.js|tests\/unit\/spec-lfg-contracts.test.js|tests\/unit\/pipeline-mode-contracts.test.js/i.

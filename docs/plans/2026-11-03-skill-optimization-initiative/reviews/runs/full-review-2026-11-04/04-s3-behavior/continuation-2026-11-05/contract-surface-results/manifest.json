@@ -1,0 +1,29 @@
+{
+  "files": [
+    {
+      "source": "/private/tmp/plan-contract-surface-43a4s8wi/runs/iteration-1/result.json",
+      "archive": "result.json",
+      "sha256": "7772835e5a98373f6ba1f60d1e2cdcebb5600d99438799ebf393fc05cce88daa"
+    },
+    {
+      "source": "/private/tmp/plan-contract-surface-43a4s8wi/runs/iteration-1/implementation-owner-not-authorized/with_skill/grading.json",
+      "archive": "grading.json",
+      "sha256": "54425548842a30a85a64ad263f6aa297de9ad3fcd8a6656d5532269d41d27125"
+    },
+    {
+      "source": "/private/tmp/plan-contract-surface-43a4s8wi/runs/iteration-1/implementation-owner-not-authorized/with_skill/outputs/response.md",
+      "archive": "response.md",
+      "sha256": "2f8df78a7024083b300f5203474b77501fccae3e58c6510b21fd77909b215e12"
+    },
+    {
+      "source": "/private/tmp/plan-contract-surface-43a4s8wi/runs/iteration-1/implementation-owner-not-authorized/with_skill/outputs/agent/run/07db5477-ab15-4b19-850f-9a29bb1924fa.jsonl",
+      "archive": "transcript.jsonl",
+      "sha256": "0dfda77b0e22a3b71f6dfc8ea0cecc2c0cc9315d34201d94cf45d53c8823d950"
+    },
+    {
+      "source": "/private/tmp/plan-contract-surface-43a4s8wi/manifest.json",
+      "archive": "source-delta.json",
+      "sha256": "e17c9d8ae097186f91f3236e43809f13cff85c00725f39a4b6d5dfe0258816f3"
+    }
+  ]
+}

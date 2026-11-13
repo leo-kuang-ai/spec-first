@@ -1,0 +1,107 @@
+[
+ {
+  "run": "/tmp/spec-first-batch5-r2/out-work-glm/iteration-1/batch5-work/with_skill/outputs/agent/run",
+  "group": "with_skill",
+  "case": "batch5-work",
+  "engine": "claude_code",
+  "engine_group": "r2-work-glm",
+  "trace": "d8572d36-a2d0-4263-a214-fc563817967a.jsonl",
+  "trace_sha256": "c142f480910fb883a3a5cdfe77ac9e2586049255bfe83c950774e48db53b0f4c",
+  "model": "glm-5.3",
+  "usage_dedup": {
+   "input_tokens": 62241,
+   "output_tokens": 22096,
+   "cache_read_input_tokens": 1239424
+  },
+  "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-68539544",
+  "tool_calls": 47,
+  "duration_s": 455.4,
+  "oracle": {
+   "results": [
+    {
+     "name": "实际HTTP成功、领域接入及金额兼容",
+     "pass": true
+    },
+    {
+     "name": "重复取消幂等且审计一次",
+     "pass": true
+    },
+    {
+     "name": "paid拒绝取消且无副作用",
+     "pass": true
+    },
+    {
+     "name": "refunded拒绝取消且无副作用",
+     "pass": true
+    },
+    {
+     "name": "不存在返回404且无写入",
+     "pass": true
+    }
+   ],
+   "passed": 5,
+   "total": 5
+  },
+  "regression": {
+   "exit_code": 0,
+   "summary": [
+    "# tests 11",
+    "# pass 11",
+    "# fail 0"
+   ]
+  }
+ },
+ {
+  "run": "/tmp/spec-first-batch5-r2/out-work-glm/iteration-1/batch5-work/without_skill/outputs/agent/run",
+  "group": "without_skill",
+  "case": "batch5-work",
+  "engine": "claude_code",
+  "engine_group": "r2-work-glm",
+  "trace": "489d958f-a2a7-4efc-b512-2d37eb5970e3.jsonl",
+  "trace_sha256": "10224f5fdd6c2c3054d6369e9f380e9ce021620b8f8a62f03ef13cc22fbc7ca6",
+  "model": "glm-5.3",
+  "usage_dedup": {
+   "input_tokens": 57802,
+   "output_tokens": 20468,
+   "cache_read_input_tokens": 1362688
+  },
+  "cwd": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-141636448",
+  "tool_calls": 53,
+  "duration_s": 451.6,
+  "oracle": {
+   "results": [
+    {
+     "name": "实际HTTP成功、领域接入及金额兼容",
+     "pass": true
+    },
+    {
+     "name": "重复取消幂等且审计一次",
+     "pass": true
+    },
+    {
+     "name": "paid拒绝取消且无副作用",
+     "pass": true
+    },
+    {
+     "name": "refunded拒绝取消且无副作用",
+     "pass": true
+    },
+    {
+     "name": "不存在返回404且无写入",
+     "pass": true
+    }
+   ],
+   "passed": 5,
+   "total": 5
+  },
+  "regression": {
+   "exit_code": 0,
+   "summary": [
+    "# Subtest: cancelling a missing invoice fails with not_found and no audit write",
+    "# tests 11",
+    "# pass 11",
+    "# fail 0"
+   ]
+  }
+ }
+]

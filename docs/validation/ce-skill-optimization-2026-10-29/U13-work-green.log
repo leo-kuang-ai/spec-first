@@ -1,0 +1,61 @@
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+PASS tests/unit/spec-work-outcome-judges.test.js (6.537 s)
+  Work outcome judge calibration
+    ✓ unchanged reqonly-plan is a valid stop (181 ms)
+    ✓ unchanged done-plan is a valid stop (167 ms)
+    ✓ unchanged drifted-pack is a valid stop (168 ms)
+    ✓ stop rejects delete (168 ms)
+    ✓ stop rejects edit (170 ms)
+    ✓ stop rejects extra (170 ms)
+    ✓ stop rejects staged (155 ms)
+    ✓ stop rejects amend (158 ms)
+    ✓ stop rejects failure (119 ms)
+    ✓ reverse mismatch preserves existing implementation and plan bytes (264 ms)
+    ✓ README-only edit passes handback without vocabulary-dependent rejection (251 ms)
+    ✓ README task rejects extra-readme scope mutation (148 ms)
+    ✓ README task rejects staged scope mutation (149 ms)
+    ✓ README task rejects server scope mutation (181 ms)
+    ✓ incomplete caller envelope cannot pass even when shipping_skipped=false (172 ms)
+    ✓ incomplete caller envelope cannot pass even when shipping_skipped=true (170 ms)
+    ✓ closeout wording without artifacts and execution trace is insufficient (168 ms)
+    ✓ real local verification and producer calls pass the standalone and caller judges (560 ms)
+    ✓ evidence chain rejects missing-trace (398 ms)
+    ✓ evidence chain rejects reversed (397 ms)
+    ✓ evidence chain rejects echo (392 ms)
+    ✓ evidence chain rejects wrong-summary (391 ms)
+    ✓ evidence chain rejects false-flag (393 ms)
+    ✓ evidence chain rejects stale-fingerprint (428 ms)
+    ✓ the real fixture preparer creates one baseline and refuses rebaselining (306 ms)
+    ✓ bundled judges stay self-contained and synchronized with canonical eval helpers (211 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       26 passed, 26 total
+Snapshots:   0 total
+Time:        6.562 s
+Ran all test suites matching /tests\/unit\/spec-work-outcome-judges.test.js/i.

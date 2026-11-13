@@ -1,0 +1,15 @@
+{
+  "run_summary_ref": ".spec-first/workflows/spec-debug/spec-first/s08-causal-followup-20261102/verification-run-summary.json",
+  "claims": [
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:calibration",
+        "verification-run-summary:config",
+        "verification-run-summary:generator",
+        "verification-run-summary:counterfactual"
+      ]
+    }
+  ]
+}

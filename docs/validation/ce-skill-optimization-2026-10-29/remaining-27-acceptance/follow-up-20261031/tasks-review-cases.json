@@ -1,0 +1,31 @@
+{
+  "scope": "Fresh-source review scenarios, not executed model behavioral trials or CLI outputs.",
+  "cases": [
+    {
+      "id": "read-only-draft",
+      "input": "A caller asks for a nonexecutable task outline and prohibits CLI execution. The source plan was read. No validator command or capability probe ran.",
+      "review_focus": "Can the new envelope report missing execution evidence without claiming tool absence or validator success?"
+    },
+    {
+      "id": "failed-cli-receipt",
+      "input": "The real validator returned JSON with deterministic_handoff:false and task_pack_validity:invalid. A source hash matched, but the draft lifecycle failed.",
+      "receipt_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/trials/CEOPT-33-B1/validation-result.json",
+      "review_focus": "Does source require preserving the actual negative CLI fields rather than replacing them with null?"
+    },
+    {
+      "id": "missing-live-result",
+      "input": "Task implements callback receipt handling. Source and protected proof binding exist. No live callback completion receipt exists yet.",
+      "review_focus": "Can local implementation and tests proceed while external completion remains unclaimed?"
+    },
+    {
+      "id": "missing-proof-binding",
+      "input": "Task must preserve an exact test seam but its source identity is unavailable.",
+      "review_focus": "Does implementation remain blocked when the missing evidence is required to make the mutation safe?"
+    },
+    {
+      "id": "protected-task-context",
+      "input": "Two tasks share a requirement but each invokes a different proof seam.",
+      "review_focus": "Are exact refs and ownership preserved on the affected task with canonical JSON/human agreement?"
+    }
+  ]
+}

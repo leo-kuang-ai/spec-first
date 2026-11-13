@@ -1,0 +1,7 @@
+{
+  "action": "viewport",
+  "exit_code": 0,
+  "stdout": "{\"_boundary\":{\"nonce\":\"ec490055e2bda8efa574aae5d0a4001b\",\"origin\":\"unknown\"},\"data\":{\"deviceScaleFactor\":1.0,\"height\":844,\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":8495911861322482479},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"mobile\":false,\"width\":390},\"error\":null,\"success\":true}\n",
+  "stderr": "",
+  "error": null
+}

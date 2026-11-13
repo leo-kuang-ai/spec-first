@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "skill_name": "spec-pov",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-pov",
+    "timestamp": "2026-11-04T13:03:46Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "开放式设计问题(用户自定选项)不属 pov 裁决",
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 162.239,
+        "tokens": 23534,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[spec-brainstorm]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[spec-brainstorm])"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 162.239,
+        "stddev": 0,
+        "min": 162.239,
+        "max": 162.239
+      },
+      "tokens": {
+        "mean": 23534,
+        "stddev": 0,
+        "min": 23534,
+        "max": 23534
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

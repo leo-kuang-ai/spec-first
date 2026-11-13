@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-product-pulse",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T09:46:42.841637+08:00",
+  "end_time": "2026-11-05T09:48:53.166083+08:00",
+  "case_results": [
+    {
+      "case_id": "check-source-outcomes",
+      "title": "Check source outcomes",
+      "status": "FAIL",
+      "duration_ms": 129843,
+      "turns": 2,
+      "input_tokens": 33152,
+      "output_tokens": 3451,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 2,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-product-pulse/evals/fixtures/scripts/check-source-outcomes.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: node:internal/assert/utils:77\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(report.artifact_path.startsWith('docs/pulse-reports/'))\n\n    at [stdin]:294:8\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n    at ReadStream.\u003canonymous\u003e (node:internal/process/execution:201:5)\n    at ReadStream.emit (node:events:519:28) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v22.22.3]"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "First run node prepare-eval.cjs once in this isolated fixture. Preparation may create a fixture baseline commit only. Read the current installed spec-product-pulse source and follow it. Create a local pulse report for the exact window recorded in exports/payments.json and exports/analytics.json, using those exports only. Preserve failed analytics as missing, never zero. No provider calls or schedule/config writes. Return JSON with metrics [{name,source,state,value}] in revenue then active_users order, and artifact_path for the actual saved report.",
+      "response": "报告已生成并落盘。按 skill 要求 surfaced 要点如下：\n\n**Headlines（报告原文）**\n- Revenue: 1200 over the recorded 2026-10-28 UTC window (payments-export, confirmed-value).\n- Active users: no confirmed value - analytics-export failed with permission-denied; recorded as missing, not zero.\n- No tracing source configured; System performance section omitted for this run.\n\n**Top Followup**：恢复 analytics-export 的凭据/权限后按同一窗口重跑，找回 active_users。\n\n```json\n{\n  \"metrics\": [\n    {\n      \"name\": \"revenue\",\n      \"source\": \"payments-export\",\n      \"state\": \"confirmed-value\",\n      \"value\": 1200\n    },\n    {\n      \"name\": \"active_users\",\n      \"source\": \"analytics-export\",\n      \"state\": \"permission-denied\",\n      \"value\": null\n    }\n  ],\n  \"artifact_path\": \"/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-472847680/docs/pulse-reports/2026-11-05_09-48.md\"\n}\n```\n\n关键处理说明：\n\n- **窗口**：严格采用两份 export 记录的同一窗口 `[2026-10-28T00:00:00Z -\u003e 2026-10-29T00:00:00Z]`，未重新锚定到当前时间，15 分钟 trailing buffer 未重复施加（footer 中已注明）。\n- **失败分析数据保留为缺失**：`active_users` 依据 `run.md` §2.1 归类为 `permission-denied`（reason_code 同名），值为 `null`，绝非 0；报告正文同样渲染为 \"no confirmed value\"。\n- **无 provider 调用**：仅读取 `exports/payments.json` 与 `exports/analytics.json`；tracing 未配置记 `not-configured`（System performance 整节省略），DB 门控为 false 记 `not-configured` 未探测，质量评分未开启故省略。\n- **无 schedule/config 写入**：`.spec-first/config.local.yaml` 未被改动，未创建任何调度，也未产生 baseline 之外的 commit。\n- 另按 `strategy-source.md`：仓库无 STRATEGY/VISION/PRODUCT 文件，属已配置运行，保留配置指标继续执行，该限制已写入 Followups。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 36603,
+  "judge_tokens": 0,
+  "overall_tokens": 36603
+}

@@ -1,0 +1,164 @@
+{
+  "arm": "B",
+  "source_sha256": "333eb0a223bcc2de4a14b543f61eedac365e0280ef7976a840a7c8cf4683d6aa",
+  "cases": [
+    {
+      "case": "lawful-local",
+      "execution": {
+        "argv": [
+          "bash",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-worktree/scripts/worktree-manager.sh",
+          "isolate",
+          "feature/login"
+        ],
+        "exit_code": 0,
+        "stdout": "Isolating feature/login at /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-p5nt_u_7/B/lawful-local/repo/.worktrees/feature-login\nAdded .worktrees to .gitignore\nHEAD is now at 1ae9ee0 fixture\nEnvironment files:\n  Not copied by default. Re-run isolate with --copy-env to opt in.\nDev tool trust:\n  No installed dev-tool trust command applies.\n\nWorktree ready: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-p5nt_u_7/B/lawful-local/repo/.worktrees/feature-login\nSwitch with: cd /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-p5nt_u_7/B/lawful-local/repo/.worktrees/feature-login\n",
+        "stderr": "Preparing worktree (checking out 'feature/login')\n"
+      },
+      "main_head_preserved": true,
+      "main_index_preserved": true,
+      "main_branch": "main",
+      "outside_entries": [
+        "sentinel"
+      ],
+      "sentinel_preserved": true,
+      "target_branch": {
+        "argv": [
+          "git",
+          "branch",
+          "--show-current"
+        ],
+        "exit_code": 0,
+        "stdout": "feature/login\n",
+        "stderr": ""
+      },
+      "target_upstream": {
+        "argv": [
+          "git",
+          "rev-parse",
+          "--abbrev-ref",
+          "@{upstream}"
+        ],
+        "exit_code": 128,
+        "stdout": "",
+        "stderr": "fatal: no upstream configured for branch 'feature/login'\n"
+      }
+    },
+    {
+      "case": "linked-container",
+      "execution": {
+        "argv": [
+          "bash",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-worktree/scripts/worktree-manager.sh",
+          "isolate",
+          "feature/login"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "reason_code=worktree-path-unsafe Refusing symlink or non-directory: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-p5nt_u_7/B/linked-container/repo/.worktrees\n"
+      },
+      "main_head_preserved": true,
+      "main_index_preserved": true,
+      "main_branch": "main",
+      "outside_entries": [
+        "sentinel"
+      ],
+      "sentinel_preserved": true,
+      "target_branch": null,
+      "target_upstream": null
+    },
+    {
+      "case": "existing-ancestor",
+      "execution": {
+        "argv": [
+          "bash",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-worktree/scripts/worktree-manager.sh",
+          "create",
+          "feature/new",
+          "main"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "reason_code=worktree-path-unsafe Refusing symlink or non-directory: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-p5nt_u_7/B/existing-ancestor/repo/.worktrees/feature\n"
+      },
+      "main_head_preserved": true,
+      "main_index_preserved": true,
+      "main_branch": "main",
+      "outside_entries": [
+        "sentinel"
+      ],
+      "sentinel_preserved": true,
+      "target_branch": null,
+      "target_upstream": null
+    },
+    {
+      "case": "dangling-ancestor",
+      "execution": {
+        "argv": [
+          "bash",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-worktree/scripts/worktree-manager.sh",
+          "create",
+          "feature/new",
+          "main"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "reason_code=worktree-path-unsafe Refusing symlink or non-directory: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-p5nt_u_7/B/dangling-ancestor/repo/.worktrees/feature\n"
+      },
+      "main_head_preserved": true,
+      "main_index_preserved": true,
+      "main_branch": "main",
+      "outside_entries": [
+        "sentinel"
+      ],
+      "sentinel_preserved": true,
+      "target_branch": null,
+      "target_upstream": null
+    },
+    {
+      "case": "remote-only",
+      "execution": {
+        "argv": [
+          "bash",
+          "/Users/kuang/xiaobu/spec-first/.spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B/spec-worktree/scripts/worktree-manager.sh",
+          "isolate",
+          "remote-feature"
+        ],
+        "exit_code": 0,
+        "stdout": "Isolating remote-feature at /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-p5nt_u_7/B/remote-only/repo/.worktrees/remote-feature\nAdded .worktrees to .gitignore\nbranch 'remote-feature' set up to track 'origin/remote-feature'.\nHEAD is now at 880b1ee fixture\nEnvironment files:\n  Not copied by default. Re-run isolate with --copy-env to opt in.\nDev tool trust:\n  No installed dev-tool trust command applies.\n\nWorktree ready: /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-p5nt_u_7/B/remote-only/repo/.worktrees/remote-feature\nSwitch with: cd /private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-worktree-p5nt_u_7/B/remote-only/repo/.worktrees/remote-feature\n",
+        "stderr": "Preparing worktree (new branch 'remote-feature')\n"
+      },
+      "main_head_preserved": true,
+      "main_index_preserved": true,
+      "main_branch": "main",
+      "outside_entries": [
+        "sentinel"
+      ],
+      "sentinel_preserved": true,
+      "target_branch": {
+        "argv": [
+          "git",
+          "branch",
+          "--show-current"
+        ],
+        "exit_code": 0,
+        "stdout": "remote-feature\n",
+        "stderr": ""
+      },
+      "target_upstream": {
+        "argv": [
+          "git",
+          "rev-parse",
+          "--abbrev-ref",
+          "@{upstream}"
+        ],
+        "exit_code": 0,
+        "stdout": "origin/remote-feature\n",
+        "stderr": ""
+      }
+    }
+  ],
+  "limitations": [
+    "Parent-operated local Git only. No worker filesystem isolation or external remote tested."
+  ]
+}

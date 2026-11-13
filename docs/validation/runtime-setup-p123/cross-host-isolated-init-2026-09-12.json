@@ -1,0 +1,64 @@
+{
+  "schema_version": "cross-host-isolated-init.v1",
+  "generated_at": "2026-09-12",
+  "command": "spec-first init --<host> -y -u cross-host-probe --lang en",
+  "timeout_ms": 15000,
+  "results": [
+    {
+      "platform": "claude",
+      "status": "pass",
+      "exit_code": 0,
+      "signal": null,
+      "stderr": ""
+    },
+    {
+      "platform": "codex",
+      "status": "pass",
+      "exit_code": 0,
+      "signal": null,
+      "stderr": ""
+    },
+    {
+      "platform": "cursor",
+      "status": "pass",
+      "exit_code": 0,
+      "signal": null,
+      "stderr": "Warning [cursor_generated_runtime_preview]: Cursor runtime was generated, but local skill discovery/invocation is not verified; generated skills may not load."
+    },
+    {
+      "platform": "kiro",
+      "status": "pass",
+      "exit_code": 0,
+      "signal": null,
+      "stderr": ""
+    },
+    {
+      "platform": "qoder",
+      "status": "pass",
+      "exit_code": 0,
+      "signal": null,
+      "stderr": "Warning [qoder_hook_activation_unverified]: the qodercli 1.0.41 evidence baseline confirms the hook settings and command protocol, but authenticated event execution and shared IDE loader safety are not verified; settings entries remain disabled, so SessionStart and PRD guard hooks are inactive."
+    },
+    {
+      "platform": "opencode",
+      "status": "pass",
+      "exit_code": 0,
+      "signal": null,
+      "stderr": "Warning [opencode_generated_runtime_preview]: OpenCode runtime was generated, but command/skill loading is not verified for the installed version; the evidence claim remains generated_runtime_preview."
+    },
+    {
+      "platform": "zcode",
+      "status": "pass",
+      "exit_code": 0,
+      "signal": null,
+      "stderr": ""
+    },
+    {
+      "platform": "pi",
+      "status": "pass",
+      "exit_code": 0,
+      "signal": null,
+      "stderr": "Warning [pi_generated_runtime_preview]: Pi support is preview (skills discovery and the trust gate are live-verified on pi 0.85.0; AGENTS.md injection and model-mediated /skill: invocation remain docs-verified only). Activation gate: pi loads project-level .agents/skills only after the project is trusted — run `pi` in this project and confirm the trust prompt (or trust once with `pi -a`); without trust, project skills stay silent."
+    }
+  ]
+}

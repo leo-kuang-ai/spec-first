@@ -1,0 +1,61 @@
+{
+  "skill_name": "spec-brainstorm",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.322"
+  },
+  "start_time": "2026-11-12T11:15:33.356637+08:00",
+  "end_time": "2026-11-12T11:17:46.389908+08:00",
+  "case_results": [
+    {
+      "case_id": "r2-normal-convergence-works",
+      "title": "R2正例:正常收敛请求不应被过度拒绝",
+      "status": "PASS",
+      "duration_ms": 132086,
+      "turns": 3,
+      "input_tokens": 33244,
+      "output_tokens": 1291,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 3,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-brainstorm/evals/fixtures/scripts/check-r2-asks.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（spec-brainstorm skill 已安装，请按它工作。）\n我想给我们App加个消息通知功能,但推送太频繁会不会打扰用户这些\n还没想清楚,帮我把这个想法理清楚。\n",
+      "response": "压力测试目录已读。范围先按 **Standard**（常规功能、有真实产品决策要做）处理，视回答再升降级。\n\n**环境说明（降级记录）**：当前目录没有你们的 App 代码仓库，我无法扫描现有实现来代替你回答，后续问题都基于你的描述。另外你提到的「推送频繁打扰用户」本身就是产品决策核心，我们会专门处理，不会略过。\n\n从最基础的问题开始，一次只问一个：\n\n**你们的 App 是做什么的？用户现在会在什么时刻「错过什么」，让你觉得需要消息通知？**\n\n（比如：外卖 App 用户错过订单状态变化、社区 App 用户错过别人对自己内容的回复、工具类 App 用户忘记回来完成任务……说说你们的实际情况，尽量具体到场景。）",
+      "observed_version": "2.1.322"
+    }
+  ],
+  "total_tokens": 34535,
+  "judge_tokens": 0,
+  "overall_tokens": 34535
+}

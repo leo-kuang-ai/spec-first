@@ -1,0 +1,7 @@
+{
+  "action": "get",
+  "exit_code": 0,
+  "stdout": "{\"_boundary\":{\"nonce\":\"f0424226a45fe846997dc0ea35a284f6\",\"origin\":\"http://127.0.0.1:50523/\"},\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":8495911861322482479},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"url\":\"http://127.0.0.1:50523/\"},\"error\":null,\"success\":true}\n",
+  "stderr": "",
+  "error": null
+}

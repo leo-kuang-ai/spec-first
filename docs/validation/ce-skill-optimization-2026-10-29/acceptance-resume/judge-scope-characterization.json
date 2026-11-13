@@ -1,0 +1,42 @@
+{
+  "observed_at": "2026-10-30T01:08:24.324903+00:00",
+  "claim_scope": "Deterministic judge coverage characterization, not behavioral acceptance or model output.",
+  "results": [
+    {
+      "skill": "spec-doc-review",
+      "fixture": "plan-repo",
+      "judge": "check-plan-marker.sh",
+      "prepare_exit_code": 0,
+      "synthetic_final_message": "OK",
+      "judge_exit_code": 0,
+      "limitation": "Judge checks preservation only; this output is not a task-complete report. No model executed."
+    },
+    {
+      "skill": "spec-doc-review",
+      "fixture": "html-repo",
+      "judge": "check-html-marker.sh",
+      "prepare_exit_code": 0,
+      "synthetic_final_message": "OK",
+      "judge_exit_code": 0,
+      "limitation": "Judge checks preservation only; this output is not a task-complete report. No model executed."
+    },
+    {
+      "skill": "spec-doc-review",
+      "fixture": "taskpack-repo",
+      "judge": "check-taskpack-marker.sh",
+      "prepare_exit_code": 0,
+      "synthetic_final_message": "OK",
+      "judge_exit_code": 0,
+      "limitation": "Judge checks preservation only; this output is not a task-complete report. No model executed."
+    },
+    {
+      "skill": "spec-prd",
+      "fixture": "rough-prd",
+      "judge": "check-validate-report-only.sh",
+      "prepare_exit_code": 0,
+      "synthetic_final_message": "OK",
+      "judge_exit_code": 0,
+      "limitation": "Judge checks preservation only; this output is not a task-complete report. No model executed."
+    }
+  ]
+}

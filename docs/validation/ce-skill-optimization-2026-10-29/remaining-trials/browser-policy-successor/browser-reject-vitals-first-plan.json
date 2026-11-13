@@ -1,0 +1,16 @@
+{
+  "target_origin": "http://127.0.0.1:50523",
+  "routes": [
+    "/"
+  ],
+  "steps": [
+    {
+      "action": "vitals",
+      "route": "/"
+    },
+    {
+      "action": "open",
+      "route": "/"
+    }
+  ]
+}

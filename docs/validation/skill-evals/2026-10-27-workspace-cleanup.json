@@ -1,0 +1,223 @@
+{
+  "date": "2026-10-27",
+  "artifact_type": "confirmed",
+  "operation": "delete-local-evaluation-workspaces",
+  "directories": [
+    {
+      "path": "skills/autoresearch-workspace",
+      "files": 188,
+      "bytes": 3202853
+    },
+    {
+      "path": "skills/spec-app-consistency-audit-workspace",
+      "files": 197,
+      "bytes": 2927623
+    },
+    {
+      "path": "skills/spec-brainstorm-workspace",
+      "files": 192,
+      "bytes": 3725601
+    },
+    {
+      "path": "skills/spec-code-review-workspace",
+      "files": 312,
+      "bytes": 29518534
+    },
+    {
+      "path": "skills/spec-commit-workspace",
+      "files": 111,
+      "bytes": 1889590
+    },
+    {
+      "path": "skills/spec-commit-push-pr-workspace",
+      "files": 85,
+      "bytes": 2683758
+    },
+    {
+      "path": "skills/spec-compound-workspace",
+      "files": 88,
+      "bytes": 5059639
+    },
+    {
+      "path": "skills/spec-compound-refresh-workspace",
+      "files": 39,
+      "bytes": 1291251
+    },
+    {
+      "path": "skills/spec-debug-workspace",
+      "files": 213,
+      "bytes": 5490200
+    },
+    {
+      "path": "skills/spec-doc-review-workspace",
+      "files": 119,
+      "bytes": 5233887
+    },
+    {
+      "path": "skills/spec-dogfood-workspace",
+      "files": 109,
+      "bytes": 4392708
+    },
+    {
+      "path": "skills/spec-explain-workspace",
+      "files": 29,
+      "bytes": 471456
+    },
+    {
+      "path": "skills/spec-handoff-workspace",
+      "files": 90,
+      "bytes": 3501156
+    },
+    {
+      "path": "skills/spec-ideate-workspace",
+      "files": 231,
+      "bytes": 11753494
+    },
+    {
+      "path": "skills/spec-lfg-workspace",
+      "files": 177,
+      "bytes": 10159167
+    },
+    {
+      "path": "skills/spec-optimize-workspace",
+      "files": 110,
+      "bytes": 5498729
+    },
+    {
+      "path": "skills/spec-plan-workspace",
+      "files": 197,
+      "bytes": 34244965
+    },
+    {
+      "path": "skills/spec-polish-workspace",
+      "files": 89,
+      "bytes": 1634271
+    },
+    {
+      "path": "skills/spec-pov-workspace",
+      "files": 70,
+      "bytes": 5281763
+    },
+    {
+      "path": "skills/spec-prd-workspace",
+      "files": 117,
+      "bytes": 4034011
+    },
+    {
+      "path": "skills/spec-product-pulse-workspace",
+      "files": 29,
+      "bytes": 695638
+    },
+    {
+      "path": "skills/spec-project-rules-workspace",
+      "files": 465,
+      "bytes": 31241702
+    },
+    {
+      "path": "skills/spec-promote-workspace",
+      "files": 53,
+      "bytes": 1296344
+    },
+    {
+      "path": "skills/spec-prototype-workspace",
+      "files": 45,
+      "bytes": 846715
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback-workspace",
+      "files": 85,
+      "bytes": 2451225
+    },
+    {
+      "path": "skills/spec-riffrec-feedback-analysis-workspace",
+      "files": 29,
+      "bytes": 458738
+    },
+    {
+      "path": "skills/spec-rule-miner-workspace",
+      "files": 124,
+      "bytes": 2442341
+    },
+    {
+      "path": "skills/spec-runtime-setup-workspace",
+      "files": 78,
+      "bytes": 4916636
+    },
+    {
+      "path": "skills/spec-simplify-code-workspace",
+      "files": 185,
+      "bytes": 3659387
+    },
+    {
+      "path": "skills/spec-strategy-workspace",
+      "files": 114,
+      "bytes": 2386115
+    },
+    {
+      "path": "skills/spec-sweep-workspace",
+      "files": 69,
+      "bytes": 1133380
+    },
+    {
+      "path": "skills/spec-test-browser-workspace",
+      "files": 103,
+      "bytes": 1497612
+    },
+    {
+      "path": "skills/spec-test-xcode-workspace",
+      "files": 49,
+      "bytes": 740014
+    },
+    {
+      "path": "skills/spec-work-workspace",
+      "files": 450,
+      "bytes": 19040025
+    },
+    {
+      "path": "skills/spec-worktree-workspace",
+      "files": 60,
+      "bytes": 3500855
+    },
+    {
+      "path": "skills/spec-write-skill-workspace",
+      "files": 29,
+      "bytes": 591438
+    },
+    {
+      "path": "skills/spec-write-tasks-workspace",
+      "files": 71,
+      "bytes": 2874380
+    },
+    {
+      "path": "skills/using-spec-first-workspace",
+      "files": 200,
+      "bytes": 4150800
+    }
+  ],
+  "total_files": 5001,
+  "total_bytes": 225918001,
+  "tracked_skill_files_unchanged": 1186,
+  "formal_skill_count_after": 38,
+  "limitations": [
+    "仅记录删除范围与结构核验，不包含已删除的原始测评证据。",
+    "原始文件未被 Git 跟踪，不能通过 Git 恢复；历史测评结果未重新验证。"
+  ],
+  "verification": [
+    {
+      "command": "npm run lint:skill-entrypoints",
+      "exit_code": 0,
+      "result": "通过，扫描 499 个文件。"
+    },
+    {
+      "command": "npm run test:jest -- --runTestsByPath tests/unit/plugin-modules.test.js --runInBand",
+      "exit_code": 0,
+      "result": "1 个套件、19 项测试通过；启动时出现保留 fixture 的包名重复警告。"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "result": "通过。"
+    }
+  ],
+  "review": "本轮内联复核删除边界与文档差异；未执行独立 Agent 审查，未运行模型测评。"
+}

@@ -1,0 +1,729 @@
+{
+  "schema_version": "audit-skill-receipt-summary/v1",
+  "run_id": "2026-09-16-fsa3",
+  "source_snapshot": "e806f0ee3d06f9ddc761a8feb9e3b4d3dec3bdb3b0748ffc49dd3d6b8f2cd9e7",
+  "rows": [
+    {
+      "skill": "autoresearch",
+      "closure_observed": {
+        "files": 30,
+        "bytes": 122434,
+        "entry_lines": 108
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-app-consistency-audit",
+      "closure_observed": {
+        "files": 90,
+        "bytes": 415367,
+        "entry_lines": 307
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-brainstorm",
+      "closure_observed": {
+        "files": 32,
+        "bytes": 206694,
+        "entry_lines": 78
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-code-review",
+      "closure_observed": {
+        "files": 61,
+        "bytes": 492745,
+        "entry_lines": 75
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-commit",
+      "closure_observed": {
+        "files": 9,
+        "bytes": 12901,
+        "entry_lines": 119
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-commit-push-pr",
+      "closure_observed": {
+        "files": 15,
+        "bytes": 61637,
+        "entry_lines": 132
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-compound",
+      "closure_observed": {
+        "files": 37,
+        "bytes": 238634,
+        "entry_lines": 61
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-compound-refresh",
+      "closure_observed": {
+        "files": 25,
+        "bytes": 152137,
+        "entry_lines": 164
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-debug",
+      "closure_observed": {
+        "files": 22,
+        "bytes": 100716,
+        "entry_lines": 364
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-doc-review",
+      "closure_observed": {
+        "files": 52,
+        "bytes": 376615,
+        "entry_lines": 74
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-dogfood",
+      "closure_observed": {
+        "files": 15,
+        "bytes": 41664,
+        "entry_lines": 99
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-explain",
+      "closure_observed": {
+        "files": 15,
+        "bytes": 36254,
+        "entry_lines": 92
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-handoff",
+      "closure_observed": {
+        "files": 13,
+        "bytes": 43162,
+        "entry_lines": 99
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-ideate",
+      "closure_observed": {
+        "files": 30,
+        "bytes": 231896,
+        "entry_lines": 105
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-lfg",
+      "closure_observed": {
+        "files": 24,
+        "bytes": 105122,
+        "entry_lines": 81
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-optimize",
+      "closure_observed": {
+        "files": 37,
+        "bytes": 234568,
+        "entry_lines": 178
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-plan",
+      "closure_observed": {
+        "files": 81,
+        "bytes": 563609,
+        "entry_lines": 123
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-polish",
+      "closure_observed": {
+        "files": 23,
+        "bytes": 65786,
+        "entry_lines": 88
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-pov",
+      "closure_observed": {
+        "files": 24,
+        "bytes": 166502,
+        "entry_lines": 59
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-prd",
+      "closure_observed": {
+        "files": 48,
+        "bytes": 674822,
+        "entry_lines": 345
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-product-pulse",
+      "closure_observed": {
+        "files": 13,
+        "bytes": 51792,
+        "entry_lines": 92
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-project-rules",
+      "closure_observed": {
+        "files": 105,
+        "bytes": 121224,
+        "entry_lines": 122
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-promote",
+      "closure_observed": {
+        "files": 11,
+        "bytes": 31999,
+        "entry_lines": 140
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-prototype",
+      "closure_observed": {
+        "files": 14,
+        "bytes": 32450,
+        "entry_lines": 44
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-resolve-pr-feedback",
+      "closure_observed": {
+        "files": 22,
+        "bytes": 70675,
+        "entry_lines": 126
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-riffrec-feedback-analysis",
+      "closure_observed": {
+        "files": 12,
+        "bytes": 87536,
+        "entry_lines": 47
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-rule-miner",
+      "closure_observed": {
+        "files": 12,
+        "bytes": 38989,
+        "entry_lines": 77
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-runtime-setup",
+      "closure_observed": {
+        "files": 83,
+        "bytes": 1079708,
+        "entry_lines": 368
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-simplify-code",
+      "closure_observed": {
+        "files": 19,
+        "bytes": 24738,
+        "entry_lines": 90
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-strategy",
+      "closure_observed": {
+        "files": 13,
+        "bytes": 35258,
+        "entry_lines": 94
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-sweep",
+      "closure_observed": {
+        "files": 20,
+        "bytes": 173699,
+        "entry_lines": 124
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-test-browser",
+      "closure_observed": {
+        "files": 9,
+        "bytes": 83361,
+        "entry_lines": 90
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-test-xcode",
+      "closure_observed": {
+        "files": 5,
+        "bytes": 10428,
+        "entry_lines": 31
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-work",
+      "closure_observed": {
+        "files": 47,
+        "bytes": 226651,
+        "entry_lines": 125
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-worktree",
+      "closure_observed": {
+        "files": 2,
+        "bytes": 36401,
+        "entry_lines": 152
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-write-skill",
+      "closure_observed": {
+        "files": 25,
+        "bytes": 182076,
+        "entry_lines": 62
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "spec-write-tasks",
+      "closure_observed": {
+        "files": 23,
+        "bytes": 102605,
+        "entry_lines": 141
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    },
+    {
+      "skill": "using-spec-first",
+      "closure_observed": {
+        "files": 11,
+        "bytes": 21815,
+        "entry_lines": 42
+      },
+      "status": "degraded",
+      "entry_contract_review": "read",
+      "key_error_stop_path": "read or bounded source check",
+      "consumer_review": "read or bounded source check",
+      "fresh_source_eval": "not-run",
+      "claim_ceiling": "C0",
+      "limitations": [
+        "未执行真实宿主/模型行为",
+        "深层 references/scripts/tests 未逐包全量遍历",
+        "当前 Agent inline/serial，不是独立 reviewer"
+      ]
+    }
+  ]
+}

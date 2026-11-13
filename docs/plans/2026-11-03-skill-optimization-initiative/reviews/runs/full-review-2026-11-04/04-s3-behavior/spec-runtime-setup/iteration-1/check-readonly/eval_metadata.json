@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "check 保持夹具与配置只读",
+  "prompt": "（spec-runtime-setup skill 已安装，请按它工作。）\n用 --check 检查当前夹具项目的 runtime readiness，只看状态。\n不安装、不修改 host 配置、不写 setup facts；不要改用 --verify-only。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-runtime-setup/evals/fixtures/scripts/check-readonly-verify.sh"
+  ]
+}

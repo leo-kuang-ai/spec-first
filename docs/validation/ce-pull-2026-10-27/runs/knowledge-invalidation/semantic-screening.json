@@ -1,0 +1,44 @@
+{
+  "artifact_type": "advisory",
+  "status": "partial",
+  "entries": [
+    {
+      "path": "skills/ce-compound/references/schema.yaml",
+      "local_owner": "skills/spec-compound/references/schema.yaml",
+      "reading": "CE 当前全文与本地全文",
+      "decision": "外部退役条件融合到已有必填 invalidation_condition；保留本地责任枚举及 promotion gate，不采纳 CE open vocabulary 或仅可选 retire_when",
+      "status": "partial-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-compound/references/grounding-validation.md",
+      "local_owner": "skills/spec-compound/references/grounding-validation.md",
+      "reading": "CE 当前全文与本地全文",
+      "decision": "本地已区分 FLAG/NOTE、non-git、candidate/final path；新增外部失效条件语义核查，不采用不可达时确认远程状态",
+      "status": "partial-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-compound-refresh/references/schema.yaml",
+      "local_owner": "skills/spec-compound-refresh/references/schema.yaml",
+      "reading": "CE 当前全文与本地全文",
+      "decision": "保持与 compound 共享 schema 逐字一致，沿用本地失效字段而非新增平行权威",
+      "status": "partial-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-compound-refresh/references/investigate.md",
+      "local_owner": "skills/spec-compound-refresh/references/investigate.md",
+      "reading": "CE 当前全文与本地全文",
+      "decision": "吸收声明条件的只读检查、日期/结果只进 run report、来源不可达不删除；保留 authority 冲突判定与 memory-only 保留规则",
+      "status": "partial-implemented-contract-tested"
+    }
+  ],
+  "verification": {
+    "log_ref": "docs/validation/ce-pull-2026-10-27/logs/invalidation-tests.log",
+    "exit_code": 0,
+    "suites": 4,
+    "tests": 70
+  },
+  "limitations": [
+    "未运行真实外部条件查询/模型行为或独立评估",
+    "不代表 U5 整包逐文件裁决完成"
+  ]
+}

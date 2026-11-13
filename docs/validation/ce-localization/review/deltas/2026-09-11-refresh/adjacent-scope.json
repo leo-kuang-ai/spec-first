@@ -1,0 +1,26 @@
+{
+  "paths": [
+    "tests/unit/plugin-modules.test.js",
+    "skills/spec-code-review/evals/fixtures/repos/tenant-orders/prepare-review-fixture.sh",
+    "skills/spec-code-review/evals/fixtures/scripts/check-r2-preset-applied-fix.sh",
+    "skills/spec-code-review/references/personas/project-standards-reviewer.md",
+    "skills/spec-code-review/scripts/peer-job-runner.py",
+    "tests/unit/peer-job-runner-parity.test.js",
+    "tests/unit/spec-code-review-peer-runner.test.js",
+    "tests/unit/ce-localization-closeout-contracts.test.js",
+    "skills/spec-doc-review/scripts/peer-job-runner.py",
+    "skills/spec-explain/references/explainer-html.md",
+    "skills/spec-explain/references/explainer-markdown.md",
+    "skills/spec-explain/references/orchestration.md",
+    "skills/spec-explain/SKILL.md",
+    "skills/spec-handoff/scripts/handoff-artifact.cjs",
+    "tests/unit/spec-handoff-contracts.test.js",
+    "skills/spec-lfg/scripts/pr-watch-state.cjs",
+    "tests/unit/spec-lfg-pr-watch-state.test.js",
+    "skills/spec-optimize/scripts/decide.cjs",
+    "tests/unit/spec-optimize-decide.test.js",
+    "skills/spec-pov/scripts/peer-job-runner.py",
+    "docs/contracts/project-graph-consumption.md"
+  ],
+  "head": "9b3f37177412ad51293f118fe613243ba85d7fd0"
+}

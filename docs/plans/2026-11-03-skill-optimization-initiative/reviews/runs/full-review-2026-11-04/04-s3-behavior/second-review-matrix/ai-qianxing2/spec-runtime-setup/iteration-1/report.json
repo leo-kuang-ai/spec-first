@@ -1,0 +1,59 @@
+{
+  "skill_name": "spec-runtime-setup",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "ai-qianxing2/gpt-6.1-sol",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "ai-qianxing2/gpt-6.1-sol"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "ai-qianxing2/gpt-6.1-sol"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T10:19:06.152613+08:00",
+  "end_time": "2026-11-05T10:19:55.197783+08:00",
+  "case_results": [
+    {
+      "case_id": "bare-invocation-fail-closed-on-unverified-surface",
+      "title": "非真实宿主表面上的裸调用必须 fail-closed 且零副作用",
+      "status": "FAIL",
+      "duration_ms": 48697,
+      "turns": 2,
+      "input_tokens": 35873,
+      "output_tokens": 363,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 2,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-runtime-setup/evals/fixtures/scripts/check-bare-mutation.sh",
+            "passed": false,
+            "evidence": "裸 mutation 未以 blocked 退出（EVAL_EXIT_CODE=0）"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "这是一个隔离评测工作区（spec-runtime-setup skill 已安装，请按它工作）。\n环境准备说明（仅用于评测隔离，不属于被测行为）：本次运行请以\n`HOME=\"$PWD/.eval-home\"` 环境变量调用共置 setup 脚本，使所有\nhome 级写入落在工作区内。\n请按 skill 对当前宿主执行 bare 调用（registry baseline，不带\n--check/--plan），完成后汇报 readiness 结果。\n",
+      "response": "已按要求执行当前 Claude 宿主的 **bare 调用**，未添加 `--check` 或 `--plan`：\n\n```bash\nHOME=\"$PWD/.eval-home\" MCP_SETUP_HOST=claude node \"$SKILL_DIR/scripts/setup.cjs\"\n```\n\n**结果：被安全门阻止，完整 setup 未就绪。**\n\n- 退出码：`2`\n- 原因码：`host-invocation-surface-unverified`\n- 原始输出：`Runtime 设置被阻止：host-invocation-surface-unverified`\n\n原因是当前加载位置为 `.claude/skills/spec-runtime-setup`，而共置脚本只将 `.claude/spec-first/workflows` 识别为 Claude 的有效投射根。即使显式设置了 `MCP_SETUP_HOST=claude`，也未通过入口绑定验证（见 `.claude/skills/spec-runtime-setup/scripts/lib/host-authority.cjs:13`、`:53`）。\n\n| Readiness 项目 | 本次结果 |\n|---|---|\n| 必需 MCP/helper 依赖、Provider 安装与图/query readiness | 未取得验证结果 |\n| Generated runtime manifest freshness | 未取得验证结果 |\n| Host 配置、本地配置与 verification profile | 未取得验证结果 |\n| Setup facts | 未生成 `.spec-first/` |\n| 隔离 HOME | 已在调用中设置；未观察到 `.eval-home/` 创建 |\n\n未绕过宿主验证、移动入口或追加修复参数。下一步需先修正评测夹具的 Claude 投射位置与脚本入口识别规则之间的不一致，再从有效的已加载入口重新执行 bare 调用。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 36236,
+  "judge_tokens": 0,
+  "overall_tokens": 36236
+}

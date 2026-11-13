@@ -1,0 +1,28 @@
+FAIL tests/unit/ce-setup-localization-contracts.test.js
+  CE setup localization prerequisite contracts
+    ✓ builds source-bound preflight and exact S1-S11 dependency records (989 ms)
+    ✓ propagates non-confirmed prerequisite contracts into the preflight status
+    ✓ publishes versioned schemas for each prerequisite artifact boundary (1 ms)
+    ✓ validates produced setup artifacts against their published schemas (1065 ms)
+    ✕ refresh writes all artifacts and verify-only is byte-read-only (1998 ms)
+
+  ● CE setup localization prerequisite contracts › refresh writes all artifacts and verify-only is byte-read-only
+
+    ../../../../var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-setup-localization-Sjkmxc/skill-inventory.json is stale; run with --refresh
+
+      1447 |     for (const [filePath, value] of artifactEntries) {
+      1448 |       if (!fs.existsSync(filePath) || fs.readFileSync(filePath, 'utf8') !== stableJson(value)) {
+    > 1449 |         throw new Error(`${path.relative(REPO_ROOT, filePath)} is stale; run with --refresh`);
+           |               ^
+      1450 |       }
+      1451 |     }
+      1452 |   }
+
+      at Object.main (scripts/check-ce-localization-review.cjs:1449:15)
+      at Object.main (tests/unit/ce-setup-localization-contracts.test.js:150:23)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 4 passed, 5 total
+Snapshots:   0 total
+Time:        4.189 s
+Ran all test suites matching /tests\/unit\/ce-setup-localization-contracts.test.js/i.

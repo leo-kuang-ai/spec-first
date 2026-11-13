@@ -1,0 +1,52 @@
+{
+  "method": "actual source helper; 2 synthetic observations 30 minutes apart; no intermediate snapshots, remote or sleeps",
+  "observations": [
+    {
+      "status": "written",
+      "reason_code": "no-terminal",
+      "schema_version": "spec-lfg-pr-watch-state/v1",
+      "generation": 1,
+      "snapshot_sha256": "6ed76ccefe3217fac53959dfdb1848aad7c6f7258147a1e20d6ab475bf7a7f6e",
+      "events": {
+        "review": [],
+        "ci": [],
+        "branch_currency": false,
+        "head_changed": false,
+        "base_advanced": false
+      },
+      "terminal": "watching",
+      "branch_currency_key": null,
+      "needs_human_residuals": [],
+      "human_decisions": [],
+      "answered_human_decisions": [],
+      "quiet_seconds": 0,
+      "elapsed_seconds": 0,
+      "limitations": [],
+      "warnings": []
+    },
+    {
+      "status": "written",
+      "reason_code": "green-review-clear-current",
+      "schema_version": "spec-lfg-pr-watch-state/v1",
+      "generation": 2,
+      "snapshot_sha256": "791a53ead4b6bd85feba5adfe0ac78f2d82053cc848aeae380b06cb5f29b2b1e",
+      "events": {
+        "review": [],
+        "ci": [],
+        "branch_currency": false,
+        "head_changed": false,
+        "base_advanced": false
+      },
+      "terminal": "looks-ready",
+      "branch_currency_key": null,
+      "needs_human_residuals": [],
+      "human_decisions": [],
+      "answered_human_decisions": [],
+      "quiet_seconds": 1800,
+      "elapsed_seconds": 1800,
+      "limitations": [],
+      "warnings": []
+    }
+  ],
+  "claim": "source helper counts unobserved interval as quiet window; no live PR reproduced"
+}

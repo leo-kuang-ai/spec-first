@@ -1,0 +1,146 @@
+{
+  "arm": "A",
+  "cases": [
+    {
+      "case": "outside-existing-leaf",
+      "workspace_root": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-supplement-ATpslo/A/outside-existing-leaf/workspace",
+      "outside_root": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-supplement-ATpslo/A/outside-existing-leaf/outside",
+      "outside_is_outside_workspace": true,
+      "result": {
+        "ok": false,
+        "reason_code": "exclude-target-escapes-workspace",
+        "target": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-supplement-ATpslo/A/outside-existing-leaf/outside/sentinel"
+      },
+      "sentinel_preserved": true,
+      "link_preserved": true,
+      "missing_target_created": null,
+      "outside_entries": [
+        "sentinel"
+      ]
+    },
+    {
+      "case": "outside-dangling-leaf",
+      "workspace_root": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-supplement-ATpslo/A/outside-dangling-leaf/workspace",
+      "outside_root": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-supplement-ATpslo/A/outside-dangling-leaf/outside",
+      "outside_is_outside_workspace": true,
+      "result": {
+        "ok": true,
+        "changed": true,
+        "target": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-supplement-ATpslo/A/outside-dangling-leaf/workspace/a/.git/info/exclude"
+      },
+      "sentinel_preserved": true,
+      "link_preserved": true,
+      "missing_target_created": true,
+      "outside_entries": [
+        "missing",
+        "sentinel"
+      ]
+    },
+    {
+      "case": "outside-dangling-ancestor",
+      "workspace_root": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-supplement-ATpslo/A/outside-dangling-ancestor/workspace",
+      "outside_root": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-supplement-ATpslo/A/outside-dangling-ancestor/outside",
+      "outside_is_outside_workspace": true,
+      "result": {
+        "ok": false,
+        "reason_code": "exclude-target-escapes-workspace",
+        "target": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-supplement-ATpslo/A/outside-dangling-ancestor/workspace/a/.git/info/exclude"
+      },
+      "sentinel_preserved": true,
+      "link_preserved": true,
+      "missing_target_created": false,
+      "outside_entries": [
+        "sentinel"
+      ]
+    },
+    {
+      "case": "snapshot-identity-under-overrides",
+      "actual_a_head": "07d1d46925a2b08a0d8dcf36e2e9ebec55be1e72",
+      "actual_b_head": "42a96eb289fe65051e00f3e370522daddfa5c1f0",
+      "before": {
+        "repo": {
+          "repo_id": "a",
+          "head_sha": "07d1d46925a2b08a0d8dcf36e2e9ebec55be1e72",
+          "head_state": "commit",
+          "worktree_clean": false,
+          "worktree_fingerprint": "b11e1d26bd609353cdbc43726bee34ca09a98862dbf25b5b6d00af38de58c4f9",
+          "observed": true
+        },
+        "source": {
+          "schema_version": "setup-source-snapshot.v2",
+          "registry_sha256": "be15a661ed39a67fa0d071719e80c3a7dcb503278986a50d6f2ac7f2c503f9bf",
+          "host_config_sha256": "496a02a5ec5aa2f61a4fd91e51670ce3ea5bfa43545b10537a0bd84df6d9bf5b",
+          "repo_root": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-supplement-ATpslo/A/snapshot/a",
+          "source_head": "07d1d46925a2b08a0d8dcf36e2e9ebec55be1e72",
+          "source_kind": "git",
+          "source_content_sha256": "a86e43ff4cc6732dd813fc2e581ff0e39b72b2d3f98cbca26d80ac0547d6079d",
+          "host": "codex",
+          "platform": "macos",
+          "captured_at": "2026-10-29T00:00:00.000Z",
+          "invalidation": [
+            "source-content-change",
+            "source-kind-change",
+            "source-head-change",
+            "registry-change",
+            "host-config-change",
+            "host-change",
+            "platform-change"
+          ],
+          "limitations": [
+            "host-config-path-escape",
+            "host-config-containment-root-missing",
+            "host-config-path-escape",
+            "host-config-containment-root-missing",
+            "host-config-path-escape",
+            "host-config-containment-root-missing"
+          ]
+        }
+      },
+      "after": {
+        "repo": {
+          "repo_id": "a",
+          "head_sha": "42a96eb289fe65051e00f3e370522daddfa5c1f0",
+          "head_state": "commit",
+          "worktree_clean": true,
+          "worktree_fingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "observed": true
+        },
+        "source": {
+          "schema_version": "setup-source-snapshot.v2",
+          "registry_sha256": "be15a661ed39a67fa0d071719e80c3a7dcb503278986a50d6f2ac7f2c503f9bf",
+          "host_config_sha256": "496a02a5ec5aa2f61a4fd91e51670ce3ea5bfa43545b10537a0bd84df6d9bf5b",
+          "repo_root": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-runtime-supplement-ATpslo/A/snapshot/a",
+          "source_head": "07d1d46925a2b08a0d8dcf36e2e9ebec55be1e72",
+          "source_kind": "git",
+          "source_content_sha256": "a86e43ff4cc6732dd813fc2e581ff0e39b72b2d3f98cbca26d80ac0547d6079d",
+          "host": "codex",
+          "platform": "macos",
+          "captured_at": "2026-10-29T00:00:00.000Z",
+          "invalidation": [
+            "source-content-change",
+            "source-kind-change",
+            "source-head-change",
+            "registry-change",
+            "host-config-change",
+            "host-change",
+            "platform-change"
+          ],
+          "limitations": [
+            "host-config-path-escape",
+            "host-config-containment-root-missing",
+            "host-config-path-escape",
+            "host-config-containment-root-missing",
+            "host-config-path-escape",
+            "host-config-containment-root-missing"
+          ]
+        }
+      },
+      "repo_snapshot_preserved": false,
+      "source_snapshot_preserved": true
+    }
+  ],
+  "limitations": [
+    "Supplement follows independent review: original outside path was inside workspaceRoot. Original receipts retained; this block tests actual workspace escape and snapshot identity.",
+    "Parent helper execution only; no host/global configuration writes."
+  ]
+}

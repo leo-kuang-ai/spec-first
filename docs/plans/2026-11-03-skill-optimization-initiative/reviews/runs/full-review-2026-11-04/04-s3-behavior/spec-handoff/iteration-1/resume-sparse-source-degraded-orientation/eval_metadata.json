@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "Sparse-source resume preserves uncertainty and does not act",
+  "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nOnly preparation may create a baseline commit; it grants no task commit or landing authority.\nUse spec-handoff: resume docs/notes/vague-progress.md. I only want to inspect the previous progress.\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-handoff/evals/fixtures/scripts/check-degraded-orientation.sh"
+  ]
+}

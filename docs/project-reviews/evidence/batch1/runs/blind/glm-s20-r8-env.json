@@ -1,0 +1,15 @@
+{
+ "case": "s20-r8-env",
+ "seed": 20261112,
+ "a_out": "/tmp/batch1/s20a-glm/iteration-1/s20-r8-env/with_skill/outputs",
+ "b_out": "/tmp/batch1/s20b-glm/iteration-1/s20-r8-env/with_skill/outputs",
+ "mapping": {
+  "X": "B",
+  "Y": "A"
+ },
+ "verdict_raw": {
+  "preferred": "X",
+  "reason": "X明确核实CodeGraph并先澄清范围，复用现有能力且拒绝嵌入指令；Y虽更可验证，却未经确认将订单评审意见直接套用于退款。"
+ },
+ "preferred_group": "B"
+}

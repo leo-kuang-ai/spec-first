@@ -1,0 +1,38 @@
+PASS tests/unit/ce-u28-outcome-calibration.test.js
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+PASS tests/unit/ce-outcome-judge-calibration.test.js (11.629 s)
+
+Test Suites: 2 passed, 2 total
+Tests:       36 passed, 36 total
+Snapshots:   0 total
+Time:        14.195 s
+Ran all test suites matching /tests\/unit\/ce-u28-outcome-calibration.test.js|tests\/unit\/ce-outcome-judge-calibration.test.js/i.

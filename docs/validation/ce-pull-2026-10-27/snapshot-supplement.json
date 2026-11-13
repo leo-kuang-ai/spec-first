@@ -1,0 +1,26 @@
+{
+  "artifact_type": "confirmed",
+  "captured_at": "2026-10-27T11:45:16.732717+00:00",
+  "upstream_head_observed": "00d0a5bbf1300b2138b65ce724b325dd4dff77ba",
+  "upstream_status_porcelain": "",
+  "base_is_ancestor": true,
+  "package_versions": {
+    "153e605e1622154a0d7da095fceed13edcb68bf7": "3.24.0",
+    "00d0a5bbf1300b2138b65ce724b325dd4dff77ba": "3.33.1"
+  },
+  "hash_semantics": {
+    "source_tree_sha256": "仅绑定 git ls-tree -r HEAD 的字节；不绑定 dirty 文件内容。",
+    "inventory_sha256": "仅绑定 git ls-files 文件名清单；不绑定文件内容。",
+    "dirty_manifest_sha256": "仅绑定初始状态与路径；没有保存编辑前 dirty 内容，不可追补历史哈希。"
+  },
+  "schema_status": "原 snapshot/inventory 的 schema_version 仅为自描述格式标识；没有对应正式 schema，未通过项目 schema 准入。",
+  "net_records": 1023,
+  "commit_count": 161,
+  "unique_commit_touched_paths": 1026,
+  "paths_absent_from_net_endpoints": [],
+  "limitations": [
+    "净 diff 不覆盖被中间提交新增后删除的内容；提交路径清单用于恢复这些审查入口。",
+    "Git blob OID 绑定端点内容，不能证明已阅读或测试。",
+    "本次复核未改写初次 snapshot；方案和 CHANGELOG 将在本轮继续补充。"
+  ]
+}

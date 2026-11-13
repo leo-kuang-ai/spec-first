@@ -1,0 +1,118 @@
+{
+  "metadata": {
+    "skill_name": "spec-rule-miner",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-rule-miner",
+    "timestamp": "2026-11-04T12:16:35Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "交互场景未经 preview 确认不得写规则文件",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 116.712,
+        "tokens": 30679,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.files_not_exist",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-rule-miner/evals/fixtures/scripts/check-preview-first.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "审查请求应路由 spec-code-review",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 35.795,
+        "tokens": 22748,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[spec-code-review]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[spec-code-review])"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "R2变体:调试请求应路由 spec-debug",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 69.717,
+        "tokens": 24062,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "output_contains{all:[spec-debug]}",
+          "passed": true,
+          "evidence": "output satisfies all contains checks (all:[spec-debug])"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 74.07466666666666,
+        "stddev": 33.17762465209882,
+        "min": 35.795,
+        "max": 116.712
+      },
+      "tokens": {
+        "mean": 25829.666666666668,
+        "stddev": 3470.7035149791877,
+        "min": 22748,
+        "max": 30679
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

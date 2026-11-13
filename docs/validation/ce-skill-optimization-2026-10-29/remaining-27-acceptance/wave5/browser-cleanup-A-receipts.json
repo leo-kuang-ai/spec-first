@@ -1,0 +1,506 @@
+{
+  "arm": "A",
+  "source_sha256": "397718d4c9b02210f431e2d5babe83d7ad1594ea35cc93e1a3009d511d4f8e3e",
+  "cases": [
+    {
+      "injected_close_exit": 0,
+      "producer_exit_code": 0,
+      "stdout": {
+        "schema_version": "agent-browser-exact-origin-conformance/v1",
+        "status": "passed",
+        "binary_identity": {
+          "path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-browser-close-r6kbi9ma/A/0/fake-browser",
+          "sha256": "sha256:293590e7af8ad327a03fb7444c373a60ff749f22b7dd07e269f8f47c87f6071b",
+          "size": 762
+        },
+        "positive_control": {
+          "status": "passed"
+        },
+        "blocked_origin_total_hits": 0,
+        "cases": [
+          {
+            "name": "initial-open-and-frame",
+            "status": "passed",
+            "blocked_origin_hits_before": 0,
+            "blocked_origin_hits_after": 0,
+            "actions": [
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "ALLOWED ORIGIN",
+                "stderr": "",
+                "error": null
+              }
+            ]
+          },
+          {
+            "name": "same-origin-redirect",
+            "status": "passed",
+            "blocked_origin_hits_before": 0,
+            "blocked_origin_hits_after": 0,
+            "actions": [
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "http://127.0.0.1:59517/ok",
+                "stderr": "",
+                "error": null
+              }
+            ]
+          },
+          {
+            "name": "cross-origin-redirect",
+            "status": "passed",
+            "blocked_origin_hits_before": 0,
+            "blocked_origin_hits_after": 0,
+            "actions": [
+              {
+                "exit_code": 1,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "ERR_BLOCKED_BY_CLIENT",
+                "error": null
+              }
+            ]
+          },
+          {
+            "name": "same-origin-link",
+            "status": "passed",
+            "blocked_origin_hits_before": 0,
+            "blocked_origin_hits_after": 0,
+            "actions": [
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "ALLOWED ORIGIN",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "http://127.0.0.1:59517/ok",
+                "stderr": "",
+                "error": null
+              }
+            ]
+          },
+          {
+            "name": "cross-origin-link",
+            "status": "passed",
+            "blocked_origin_hits_before": 0,
+            "blocked_origin_hits_after": 0,
+            "actions": [
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "ALLOWED ORIGIN",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 1,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "ERR_BLOCKED_BY_CLIENT",
+                "error": null
+              }
+            ]
+          },
+          {
+            "name": "cross-origin-form",
+            "status": "passed",
+            "blocked_origin_hits_before": 0,
+            "blocked_origin_hits_after": 0,
+            "actions": [
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "ALLOWED ORIGIN",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 1,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "ERR_BLOCKED_BY_CLIENT",
+                "error": null
+              }
+            ]
+          },
+          {
+            "name": "cross-origin-script",
+            "status": "passed",
+            "blocked_origin_hits_before": 0,
+            "blocked_origin_hits_after": 0,
+            "actions": [
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "ALLOWED ORIGIN",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 1,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "ERR_BLOCKED_BY_CLIENT",
+                "error": null
+              }
+            ]
+          },
+          {
+            "name": "cross-origin-popup",
+            "status": "passed",
+            "blocked_origin_hits_before": 0,
+            "blocked_origin_hits_after": 0,
+            "actions": [
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "ALLOWED ORIGIN",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 1,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "ERR_BLOCKED_BY_CLIENT",
+                "error": null
+              }
+            ]
+          },
+          {
+            "name": "cross-origin-direct-open",
+            "status": "passed",
+            "blocked_origin_hits_before": 0,
+            "blocked_origin_hits_after": 0,
+            "actions": [
+              {
+                "exit_code": 1,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "ERR_BLOCKED_BY_CLIENT",
+                "error": null
+              }
+            ]
+          }
+        ]
+      },
+      "stderr": "",
+      "diagnostic_root_retained_by_producer": false,
+      "retained_json_evidence": {}
+    },
+    {
+      "injected_close_exit": 9,
+      "producer_exit_code": 0,
+      "stdout": {
+        "schema_version": "agent-browser-exact-origin-conformance/v1",
+        "status": "passed",
+        "binary_identity": {
+          "path": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-browser-close-r6kbi9ma/A/9/fake-browser",
+          "sha256": "sha256:293590e7af8ad327a03fb7444c373a60ff749f22b7dd07e269f8f47c87f6071b",
+          "size": 762
+        },
+        "positive_control": {
+          "status": "passed"
+        },
+        "blocked_origin_total_hits": 0,
+        "cases": [
+          {
+            "name": "initial-open-and-frame",
+            "status": "passed",
+            "blocked_origin_hits_before": 0,
+            "blocked_origin_hits_after": 0,
+            "actions": [
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "ALLOWED ORIGIN",
+                "stderr": "",
+                "error": null
+              }
+            ]
+          },
+          {
+            "name": "same-origin-redirect",
+            "status": "passed",
+            "blocked_origin_hits_before": 0,
+            "blocked_origin_hits_after": 0,
+            "actions": [
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "http://127.0.0.1:59546/ok",
+                "stderr": "",
+                "error": null
+              }
+            ]
+          },
+          {
+            "name": "cross-origin-redirect",
+            "status": "passed",
+            "blocked_origin_hits_before": 0,
+            "blocked_origin_hits_after": 0,
+            "actions": [
+              {
+                "exit_code": 1,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "ERR_BLOCKED_BY_CLIENT",
+                "error": null
+              }
+            ]
+          },
+          {
+            "name": "same-origin-link",
+            "status": "passed",
+            "blocked_origin_hits_before": 0,
+            "blocked_origin_hits_after": 0,
+            "actions": [
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "ALLOWED ORIGIN",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "http://127.0.0.1:59546/ok",
+                "stderr": "",
+                "error": null
+              }
+            ]
+          },
+          {
+            "name": "cross-origin-link",
+            "status": "passed",
+            "blocked_origin_hits_before": 0,
+            "blocked_origin_hits_after": 0,
+            "actions": [
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "ALLOWED ORIGIN",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 1,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "ERR_BLOCKED_BY_CLIENT",
+                "error": null
+              }
+            ]
+          },
+          {
+            "name": "cross-origin-form",
+            "status": "passed",
+            "blocked_origin_hits_before": 0,
+            "blocked_origin_hits_after": 0,
+            "actions": [
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "ALLOWED ORIGIN",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 1,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "ERR_BLOCKED_BY_CLIENT",
+                "error": null
+              }
+            ]
+          },
+          {
+            "name": "cross-origin-script",
+            "status": "passed",
+            "blocked_origin_hits_before": 0,
+            "blocked_origin_hits_after": 0,
+            "actions": [
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "ALLOWED ORIGIN",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 1,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "ERR_BLOCKED_BY_CLIENT",
+                "error": null
+              }
+            ]
+          },
+          {
+            "name": "cross-origin-popup",
+            "status": "passed",
+            "blocked_origin_hits_before": 0,
+            "blocked_origin_hits_after": 0,
+            "actions": [
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 0,
+                "timed_out": false,
+                "stdout": "ALLOWED ORIGIN",
+                "stderr": "",
+                "error": null
+              },
+              {
+                "exit_code": 1,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "ERR_BLOCKED_BY_CLIENT",
+                "error": null
+              }
+            ]
+          },
+          {
+            "name": "cross-origin-direct-open",
+            "status": "passed",
+            "blocked_origin_hits_before": 0,
+            "blocked_origin_hits_after": 0,
+            "actions": [
+              {
+                "exit_code": 1,
+                "timed_out": false,
+                "stdout": "",
+                "stderr": "ERR_BLOCKED_BY_CLIENT",
+                "error": null
+              }
+            ]
+          }
+        ]
+      },
+      "stderr": "",
+      "diagnostic_root_retained_by_producer": false,
+      "retained_json_evidence": {}
+    }
+  ],
+  "limitations": [
+    "Fake browser tests producer cleanup only. No browser enforcement or actual browser crash is established.",
+    "Parent archived retained diagnostics before deleting owned fixture root."
+  ]
+}

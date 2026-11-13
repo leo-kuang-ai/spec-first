@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "非真实宿主表面上的裸调用必须 fail-closed 且零副作用",
+  "prompt": "这是一个隔离评测工作区（spec-runtime-setup skill 已安装，请按它工作）。\n环境准备说明（仅用于评测隔离，不属于被测行为）：本次运行请以\n`HOME=\"$PWD/.eval-home\"` 环境变量调用共置 setup 脚本，使所有\nhome 级写入落在工作区内。\n请按 skill 对当前宿主执行 bare 调用（registry baseline，不带\n--check/--plan），完成后汇报 readiness 结果。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-runtime-setup/evals/fixtures/scripts/check-bare-mutation.sh"
+  ]
+}

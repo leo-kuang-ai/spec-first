@@ -1,0 +1,86 @@
+{
+  "metadata": {
+    "skill_name": "spec-pov",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-pov",
+    "timestamp": "2026-11-04T12:04:26Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "开放式设计问题(用户自定选项)不属 pov 裁决",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 115.816,
+        "tokens": 33020,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_contain",
+          "passed": false,
+          "evidence": "output does not contain \"spec-brainstorm\""
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "R2正例:真外部候选裁决应正常给出 verdict",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 127.926,
+        "tokens": 35799,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "expect.must_not_contain",
+          "passed": true,
+          "evidence": "all checks passed"
+        },
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-pov/evals/fixtures/scripts/check-r2-verdict-given.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.5,
+        "stddev": 0.5,
+        "min": 0,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 121.87100000000001,
+        "stddev": 6.055,
+        "min": 115.816,
+        "max": 127.926
+      },
+      "tokens": {
+        "mean": 34409.5,
+        "stddev": 1389.5,
+        "min": 33020,
+        "max": 35799
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

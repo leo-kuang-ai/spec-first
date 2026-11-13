@@ -1,0 +1,13 @@
+{
+  "cases": 7,
+  "outcomes": {
+    "normal": "owned-commit-reconciled",
+    "rejecting-hook": "hook-rejected-no-commit",
+    "branch-drift": "stopped-before-commit-on-drift",
+    "index-drift": "stopped-before-commit-on-drift",
+    "hook-drift": "stopped-before-commit-on-drift",
+    "lost-commit-result": "owned-commit-reconciled",
+    "index-drift-after-commit": "commit-created-reconciliation-blocked"
+  },
+  "cleanup": true
+}

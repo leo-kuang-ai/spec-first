@@ -1,0 +1,8 @@
+PASS tests/unit/frontmatter-validator-utf8.test.js
+PASS tests/unit/spec-compound-refresh-reference-contracts.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       11 passed, 11 total
+Snapshots:   0 total
+Time:        0.157 s, estimated 1 s
+Ran all test suites within paths "tests/unit/spec-compound-refresh-reference-contracts.test.js", "tests/unit/frontmatter-validator-utf8.test.js".

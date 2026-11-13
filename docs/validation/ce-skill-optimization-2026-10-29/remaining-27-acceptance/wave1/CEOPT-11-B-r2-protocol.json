@@ -1,0 +1,25 @@
+{
+  "id": "CEOPT-11-B-r2",
+  "created_at": "2026-10-30T06:22:56.189766+00:00",
+  "source_files": {
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B-r2/spec-explain/SKILL.md": "bd82dcd441b82fd5336f3ea26bc22c5e382baf1d5dfc52ccb734719db4c6e39e",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B-r2/spec-explain/references/check-in.md": "1955ba6350f640a444581d18efc1ca4548d7973cc3fb504416bbfd54734a692a",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B-r2/spec-explain/references/orchestration.md": "19c4fd0be3613d0b98e7eab63aff9e034a7d9d9809c819948ea538bc7e39c735",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B-r2/spec-explain/references/explainer-html.md": "4be63b834a32548f9faca4184510ce5fbf3d50e88d76e6dd9ad43d201430a741",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B-r2/spec-explain/references/intake.md": "d568ca7f86b460230dc2b491d9c3c34e3467a9866b743085e70db39c05423b20",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B-r2/spec-explain/references/destinations.md": "e16665350e272c2482c547db38947aa33500330a8006fa16c7762df81002356a",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B-r2/spec-explain/references/explainer-markdown.md": "b4fcc583691bbb79128ebb4d1aa0c87631ba7b53e74033310e4c6f7c1c704096",
+    ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/inputs/B-r2/spec-explain/references/agents/work-recap-scout.md": "9e9f9f419a7b4c9313a2ac471b50f4766b78461d67f026670493691eb9984b20"
+  },
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-11-request.txt",
+  "request_sha256": "cce0e23824867cf475b84bd9abd198c550b117fd06f862b4c631b9c2c32ba9bf",
+  "fixture_packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/CEOPT-11-packet.json",
+  "reason": "Observed broken/degraded source links in delivered Markdown. Narrow rendering/destination clarification.",
+  "trials": [
+    "B1",
+    "B2",
+    "B3"
+  ],
+  "baseline_reuse": "Original A trials retained; request and fixture unchanged. No cross-revision aggregation.",
+  "status": "frozen-before-successor-trials"
+}

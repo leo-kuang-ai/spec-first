@@ -1,0 +1,5 @@
+/spec-code-review mode:agent base:9a29966 plan:docs/plans/2026-11-12-001-feat-entry-by-id-plan.md
+
+环境说明（评测隔离设置，不属于被测行为）：非交互 headless 会话，没有用户可回答问题，也没有 worker/peer 派发（无 Task 工具，无外部 egress 授权）。按技能的 inline 降级规则显式声明覆盖缺口，不要反问或等待。
+
+任务：对 base 9a29966 以来的改动做 report-only 审查，输出结构化 JSON 结论。

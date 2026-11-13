@@ -1,0 +1,233 @@
+{
+  "schema_version": "ce-semantic-review-results.v1",
+  "generated_at": "2026-09-12",
+  "batch_ref": "docs/validation/ce-localization/review/semantic-review-batches-2026-09-12.json#batch-1-G05",
+  "upstream": {
+    "repository": "compound-engineering-plugin",
+    "base": "5c7cb347d0686663743b87cd7227246ba24f7fa7",
+    "head": "956087b3e1dd7ccc03df32cee9e7c044dfbe75cf",
+    "name_status_sha256": "a83371963406147ede5c9752c13b324e88d9f0eaf08af7e1239dd7e6a623d459"
+  },
+  "review_basis": {
+    "target_repository": "spec-first",
+    "reviewed_against_head": "c0803ab5d2e80edde9ca67771c6d204b775bb354",
+    "working_tree_dirty_at_review": "本流 G04/G06 的 docs/validation 结果文件 + 本批次执行的一项 canonical 最小采纳（.gitattributes 一行,见 A014 与 adopted_changes）",
+    "frozen_binding_head": "7c6bdd66d78616be769d8c78fc9e81340c004cda",
+    "owner_source_unchanged_since_freeze": true,
+    "owner_source_freshness_check": "git diff --stat 7c6bdd66..HEAD -- scripts/check-ce-upstream-reconciliation.cjs tests/unit/ce-upstream-reconciliation-v2.test.js 为空（G06 批次同日核验）。本批次新增的 .gitattributes 编辑是 review 过程中的采纳动作,记录于 adopted_changes,链收口时统一进入 regeneration sequence。",
+    "ce_repo": "/Users/kuang/xiaobu/compound-engineering-plugin（machine-local）",
+    "method": "LLM fresh-source 语义复核：逐条读取固定窗口完整 CE diff 与当前 owner source 后逐条判定；脚本仅提供既有确定性事实，本结果不是脚本自动输出。",
+    "reviewer": "spec-first current session（ZCode，/goal 持续推进授权）",
+    "reviewed_at": "2026-09-12"
+  },
+  "decision_enum_source": "scripts/check-ce-upstream-reconciliation.cjs:97-103（V2_TARGET_ACTIONS / CLOSURE_PROFILES）。沿用既有 adjudication 枚举，不发明新 adjudication 合同。",
+  "records": [
+    {
+      "audit_id": "A001",
+      "path": ".agents/plugins/marketplace.json",
+      "upstream_change": "M，4 行：plugin source 从 url（GitHub .git）改为 local（\"./\"）——配合 Codex 仅在安装时物化非本地 source 的行为（#1226，与 A417 metadata.ts 校验收紧联动）。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:626 dotfile → G05；v2RoleFor host-metadata-evidence）",
+      "action": "maintain evidence-only。CE 自身分发面配置；spec-first 不镜像 CE marketplace 结构。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": [
+        "上游 diff 全文已读（4 行变更）",
+        "owner source：scripts/check-ce-upstream-reconciliation.cjs:625-626、:641",
+        "联动证据：A417（src/release/metadata.ts 同窗口收紧 local source 校验）"
+      ],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": ["无——分发面配置,判定仅依赖 ownership 边界事实"]
+    },
+    {
+      "audit_id": "A008",
+      "path": ".claude-plugin/plugin.json",
+      "upstream_change": "M，2 行：version 3.20.0→3.22.4。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:625 plugin.json → G05）",
+      "action": "maintain evidence-only。release automation 拥有的版本字段演进，由固定窗口绑定记录。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": ["上游 diff 全文已读（2 行）", "owner source：scripts/check-ce-upstream-reconciliation.cjs:625"],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": ["无"]
+    },
+    {
+      "audit_id": "A009",
+      "path": ".claude/skills",
+      "upstream_change": "A，1 行：新增符号链接 .claude/skills → ../.agents/skills（Claude Code 经 .agents/skills 发现 skill,单源)。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:626 dotfile → G05）",
+      "action": "maintain evidence-only,附形态对照观察。CE 用 symlink 收敛 Claude/Codex 双 skill 根;spec-first 的同型机制不同——source 真相源在 skills/,各宿主 runtime 镜像由 spec-first init 生成(非 symlink),且 spec-first 仓库自己的 .claude/ 即为 generated runtime(AGENTS.md Source 与 Runtime 边界)。CE 的 repo 内 symlink 模式不适用于 spec-first 的 source/runtime 同源纪律。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": [
+        "上游 diff 全文已读（symlink,mode 120000）",
+        "owner source：scripts/check-ce-upstream-reconciliation.cjs:626",
+        "spec-first 边界：AGENTS.md Source 与 Runtime 节（.claude/ 为 generated mirror,禁止手改）"
+      ],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": ["形态对照为语义判断,未实测 CE 侧 symlink 在各宿主的发现行为（CE 自身 CI 范围）"]
+    },
+    {
+      "audit_id": "A010",
+      "path": ".codex-plugin/plugin.json",
+      "upstream_change": "M，2 行：version 3.20.0→3.22.4。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:626 → G05）",
+      "action": "maintain evidence-only。同 A008。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": ["上游 diff 全文已读（2 行）", "owner source：scripts/check-ce-upstream-reconciliation.cjs:626"],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": ["无"]
+    },
+    {
+      "audit_id": "A012",
+      "path": ".cursor-plugin/plugin.json",
+      "upstream_change": "M，2 行：version 3.20.0→3.22.4。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:626 → G05）",
+      "action": "maintain evidence-only。同 A008。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": ["上游 diff 全文已读（2 行）", "owner source：scripts/check-ce-upstream-reconciliation.cjs:626"],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": ["无"]
+    },
+    {
+      "audit_id": "A013",
+      "path": ".devin-plugin/plugin.json",
+      "upstream_change": "M，2 行：version 3.20.0→3.22.4。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:626 → G05）",
+      "action": "maintain evidence-only。同 A008。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": ["上游 diff 全文已读（2 行）", "owner source：scripts/check-ce-upstream-reconciliation.cjs:626"],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": ["无"]
+    },
+    {
+      "audit_id": "A014",
+      "path": ".gitattributes",
+      "upstream_change": "A，10 行：新增 LF 钉扎——*.sh/*.py text eol=lf,并对无扩展名 bundled script（ce-babysit-pr/scripts/pr-snapshot、ce-resolve-pr-feedback/scripts/*、ce-setup/scripts/check-health）显式钉扎,防 Windows CRLF checkout（core.autocrlf=true）破坏 POSIX 执行（#1251）。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（SUPPORT_PATHS:67-71 含 .gitattributes → surface support）",
+      "action": "已有覆盖 + 执行一项最小采纳。spec-first 的 .gitattributes 已有同型治理（*.sh/*.py/*.ps1 等 LF 钉扎 + skills/spec-resolve-pr-feedback/scripts/* 无扩展名钉扎）。复核发现一个真实缺口：skills/spec-runtime-setup/scripts/check-health（CE ce-setup/scripts/check-health 的直接对应物,#!/usr/bin/env node 无扩展名脚本）eol=unspecified——CRLF checkout 后经 POSIX shell 直接执行会因 \\r 破坏 env shebang。已补一行钉扎（见 adopted_changes）。",
+      "consumer": "reconciliation ledger / adjudication input；.gitattributes 变更消费者为全部宿主 checkout 与 skill 脚本执行",
+      "evidence": [
+        "上游 diff 全文已读（10 行新增）",
+        "owner source：scripts/check-ce-upstream-reconciliation.cjs:67-71、:417",
+        "spec-first 已有覆盖：.gitattributes(*.sh/*.py/*.ps1 + 无扩展名脚本段)",
+        "缺口证据：git check-attr eol -- skills/spec-runtime-setup/scripts/check-health 复核前=unspecified;head -1 确认 #!/usr/bin/env node shebang;补钉后=lf,文件本身无 CRLF(od 验证 0)"
+      ],
+      "verdict": "confirm-existing + adopt-minimal（判定维持 evidence-only;采纳动作见 adopted_changes[0],非判定翻转）",
+      "limitations": ["未在真实 Windows autocrlf checkout 环境实测(风险机制与 CE #1251 同型,已有上游实证)"]
+    },
+    {
+      "audit_id": "A015",
+      "path": ".github/.release-please-manifest.json",
+      "upstream_change": "M，2 行：根组件版本 3.20.0→3.22.4。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:626 → G05）",
+      "action": "maintain evidence-only。release automation 拥有。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": ["上游 diff 全文已读（2 行）", "owner source：scripts/check-ce-upstream-reconciliation.cjs:626"],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": ["无"]
+    },
+    {
+      "audit_id": "A016",
+      "path": ".github/pull_request_template.md",
+      "upstream_change": "A，24 行：新增 PR 模板——Security Disclosure（shell/exec、路径/输入处理、converter 输出、密钥、权限、依赖变更披露）与 Agent Disclosure（模型身份披露,反臆造规则,与 A022 AGENTS.md 联动）。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:626 → G05）",
+      "action": "maintain evidence-only,附观察。spec-first 的对应面是自身 PR 实践（Conventional Commits + 验证命令披露,AGENTS.md Commit 与 PR 节）;模型身份披露段是 CE 仓库治理选择,spec-first 无对应 PR 模板面,不采纳为 source 变更。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": [
+        "上游 diff 全文已读（24 行新增）",
+        "owner source：scripts/check-ce-upstream-reconciliation.cjs:626",
+        "spec-first 对应面：AGENTS.md Commit 与 PR 节"
+      ],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": ["观察项不构成采纳;若 spec-first 未来引入 PR 模板可参考该双披露结构"]
+    },
+    {
+      "audit_id": "A017",
+      "path": ".github/release-please-config.json",
+      "upstream_change": "M，8 行：omp marketplace 纳入 release-please 管护（extra-files $.plugins[0].version 写入）。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:626 → G05）",
+      "action": "maintain evidence-only。CE release 管线配置（与 A017/A021 联动的 omp 分发面）。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": ["上游 diff 全文已读（8 行）", "owner source：scripts/check-ce-upstream-reconciliation.cjs:626", "联动：A421 omp catalog、A417 metadata 校验"],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": ["无"]
+    },
+    {
+      "audit_id": "A018",
+      "path": ".github/workflows/ci.yml",
+      "upstream_change": "M，105 行：claude-code 校验器钉版本（CLAUDE_CODE_VERSION 2.1.220 单源）+ actions/cache 缓存（275MB 平台二进制,尾延迟治理）;bun test → bun run test;新增 windows-native job——真实 win32 执行 peer-job-runner/pr-snapshot/scratch-root preamble（autocrlf 关闭、python 而非 python3、_ctypes DLL flake 签名门控重试）。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:626 → G05）",
+      "action": "maintain evidence-only,附观察。CE CI 演进;spec-first 用 Jest + 自有 npm scripts,无 bun 面。观察项:windows-native job 的『真实 win32 才能执行 sys.platform==win32 分支』论述与 spec-first 的 PowerShell/peer-runner Windows 测试策略语义相关,已有对应物（spec-first 的 PowerShell 契约测试与 CHANGELOG 既有 Windows 拆分蓝图 docs/solutions/peer-job-runner 记录）,不构成新采纳。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": [
+        "上游 diff 全文已读（105 行,逐 hunk 复核）",
+        "owner source：scripts/check-ce-upstream-reconciliation.cjs:626",
+        "spec-first 对应物：tests/unit/mcp-setup-powershell-contracts、docs/solutions peer-job-runner Windows 蓝图"
+      ],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": ["未验证 CE windows-native job 实际运行结果（CE CI 范围）"]
+    },
+    {
+      "audit_id": "A019",
+      "path": ".grok-plugin/plugin.json",
+      "upstream_change": "M，2 行：version 3.20.0→3.22.4。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:626 → G05）",
+      "action": "maintain evidence-only。同 A008。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": ["上游 diff 全文已读（2 行）", "owner source：scripts/check-ce-upstream-reconciliation.cjs:626"],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": ["无"]
+    },
+    {
+      "audit_id": "A020",
+      "path": ".kimi-plugin/plugin.json",
+      "upstream_change": "M，2 行：version 3.20.0→3.22.4。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:626 → G05）",
+      "action": "maintain evidence-only。同 A008。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": ["上游 diff 全文已读（2 行）", "owner source：scripts/check-ce-upstream-reconciliation.cjs:626"],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": ["无"]
+    },
+    {
+      "audit_id": "A021",
+      "path": ".omp-plugin/marketplace.json",
+      "upstream_change": "A，29 行：新增 omp marketplace catalog（plugin entry 带 version 3.22.4、source \"./\"——omp 更新检查器跳过无 version 条目）。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:626 → G05）",
+      "action": "maintain evidence-only。omp 分发面新增;omp 非 spec-first 支持宿主（registry 八宿主无 omp）,无对应消费者。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": [
+        "上游 diff 全文已读（29 行新增）",
+        "owner source：scripts/check-ce-upstream-reconciliation.cjs:626",
+        "联动：A017 release-please 配置、A417 metadata 校验、A419 detect-tools"
+      ],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": ["无"]
+    },
+    {
+      "audit_id": "A121",
+      "path": "plugin.json",
+      "upstream_change": "M，20 行：根 plugin.json 从 antigravity $schema 极简形态扩为完整 manifest（author/homepage/repository/license MIT/keywords）,version 3.22.4——对齐多宿主 plugin manifest 形态。",
+      "current_owner": "scripts/check-ce-upstream-reconciliation.cjs（groupFor:625 → G05）",
+      "action": "maintain evidence-only。CE 分发 manifest;spec-first 的宿主分发面是 templates/ + runtime init 生成,不消费 CE 根 plugin.json 结构。",
+      "consumer": "reconciliation ledger / adjudication input",
+      "evidence": ["上游 diff 全文已读（20 行变更）", "owner source：scripts/check-ce-upstream-reconciliation.cjs:625"],
+      "verdict": "confirm-existing（维持 evidence-only）",
+      "limitations": ["无"]
+    }
+  ],
+  "adopted_changes": [
+    {
+      "id": "G05-AD1",
+      "source_record": "A014",
+      "change": "spec-first .gitattributes 补一行：skills/spec-runtime-setup/scripts/check-health text eol=lf",
+      "reason": "CE #1251 同型风险的真实缺口：无扩展名 Node shebang bundled script 未被 LF 钉扎覆盖,CRLF checkout 后 POSIX shell 直接执行会因 \\r 破坏 env shebang",
+      "verification": "git check-attr eol 补钉前=unspecified、补钉后=lf;head -1 确认 #!/usr/bin/env node;od 验证文件本身无 CRLF",
+      "note": "canonical 变更,随流收口 regeneration sequence 一并进入链刷新;本批次未提交"
+    }
+  ],
+  "batch_verdict": "confirmed：15/15 条维持既有 evidence-only 判定，0 条翻转；执行 1 项最小采纳（G05-AD1,.gitattributes 一行,对应 A014 发现的缺口）；无新增 residual。",
+  "residuals": [],
+  "limitations": [
+    "本结果为单批次（G05，15 条）语义复核；连同 G04/G06 共 26/517，余 491 条（G01=298、G02=95、G03=98 仍 pending）",
+    "G05-AD1 采纳未在真实 Windows autocrlf 环境实测（机制同型上游已实证）",
+    "ce_repo 为 machine-local 路径，本结果在本机核验；固定窗口不代表已覆盖 CE 最新上游 HEAD"
+  ]
+}

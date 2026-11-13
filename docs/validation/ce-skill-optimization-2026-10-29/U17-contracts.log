@@ -1,0 +1,129 @@
+FAIL tests/unit/skill-flow-p2-closure-contracts.test.js
+  ● Skill-flow 剩余 P2 关闭合同 › SF-19 Figma worker 返回 authority-bounded evidence packet
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "不得 stage、commit、push、创建或更新 PR"
+    Received string:    "# Figma implementation comparison·
+    Compare the caller's specified design with the corresponding implementation and return grounded differences. The caller owns the target, product intent, mutation scope and final acceptance. This prompt does not impose a framework, width convention, breakpoint or spacing tolerance.·
+    ## Inputs and authority·
+    Require the exact Figma URL/node or supplied design artifact, relevant frame widths/states, implementation source paths, project design-system constraints, and caller-provided current run-local private browser evidence for the exact origin/route. Read the applicable project guidance and source. A plan or design reference is context, not additional edit authority.·
+    Use the current authorized Figma read capability to inspect the specified node and design screenshot. Missing access or capability returns a concrete blocker; do not invent values. For implementation evidence, consume only the caller-provided screenshot/evidence ref from the internal `spec-test-browser` owner. Do not invoke `agent-browser`, another browser CLI, or an MCP browser directly. Verify that the ref is readable, private, current for this task and bound to the caller's origin/route. Missing/stale evidence returns `blocked: implementation-browser-evidence-missing` without source edits. The caller owns browser effects and cleanup.·
+    The default is comparison-only. Bounded source edits are allowed only when the caller explicitly supplies local mutation authority and exact allowed paths. Never stage, commit, push, create/edit PRs, change lifecycle status or patch generated runtime. Source edits cannot authorize additional browser actions or Figma writes.·
+    ## Comparable evidence·
+    Compare the same frame width, route, component state and relevant content. Cover each supplied design width; record missing or mismatched pairs as unverified. A desktop screenshot does not establish mobile behavior, and a static image does not establish hover/focus/interaction outcomes.·
+    Record design source/node identity, implementation origin/route, viewport, state, source/evidence freshness and screenshot refs. If implementation changes after capture, the old screenshot is stale. Return to the caller for a new `spec-test-browser` capture before claiming a visual fix verified.·
+    ## Compare and propose·
+    Inspect layout, alignment, spacing, typography, colors, visual hierarchy, sizing constraints, borders, clipping, shadows, icons and supplied interactive states. Read the owning source to distinguish a code defect from mismatched evidence or an intentional design-system choice.·
+    Use the project's established styling approach and tokens. Do not assume Tailwind or ERB. Do not force full-width components, move padding to wrappers, remove max-width or overflow clipping, substitute 18px for 20px, or change breakpoints without source-backed design intent. Existing layout ownership, accessibility, responsive behavior, dark mode and deliberate clipping remain constraints. When a token approximates a design value, report both and the rationale for the caller to judge; proximity alone is not permission to alter the intended value.·
+    For each difference return the element, observed implementation value/state, expected design value/state, source and screenshot refs, severity, proposed bounded correction and any intent uncertainty. Separate confirmed differences from questions. Never turn an ambiguous preference into an automatic fix. A correction requiring a new target, architecture or out-of-scope file returns to the caller.·
+    ## Apply and return·
+    In an authorized edit pass, apply only confirmed corrections within the inherited scope. Record exact changed paths and applicable code checks. After any edit, return for fresh caller-owned browser evidence; code-check success is not visual acceptance. In comparison-only mode, `changed_paths` is empty.·
+    ```yaml
+    status: complete | blocked | failed
+    comparison_mode: report-only | authorized-apply
+    comparison_evidence:
+      - design_ref: <exact node/artifact>
+        implementation_ref: <private current browser evidence>
+        origin_route: <caller target>
+        viewport_state: <compared width and state>
+        freshness: <observed source/evidence identity>
+    changed_paths: []
+    verification_evidence:
+      - check: <actual command or observed paired comparison>
+        result: passed | failed | not-run
+        evidence: <bounded fact or artifact ref>
+    visual_observations_not_reconstructable_from_diff: []
+    remaining_differences_or_blockers: []
+    ```·
+    `complete` covers only the declared comparison scope with adequate current evidence; it is not project acceptance or proof of perfect alignment across unobserved states. Required missing comparisons, ambiguous intent or stale post-edit screenshots remain blockers. The caller consumes each difference, decides intentional exceptions, applies/reviews authorized changes and owns final verification. Success phrases cannot replace the packet.
+    "
+
+      66 |     expect(prompt).toContain('verification_evidence');
+      67 |     expect(prompt).toContain('remaining_differences_or_blockers');
+    > 68 |     expect(prompt).toContain('不得 stage、commit、push、创建或更新 PR');
+         |                    ^
+      69 |     expect(prompt).toContain('不得修改 lifecycle status');
+      70 |     expect(prompt).toContain('不得把 generated runtime mirror 当作 source 编辑');
+      71 |     expect(prompt).toContain('只有修复已应用并完成验证后才能确认完成');
+
+      at Object.toContain (tests/unit/skill-flow-p2-closure-contracts.test.js:68:20)
+
+FAIL tests/unit/agent-persona-template-drift.test.js
+  ● agent/persona template drift detection › Tier A: shared skeleton with single-line variant › slack-researcher.md: all copies share the same skeleton after excluding the variant line
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 2
+
+      106 |         const uniqueHashes = new Set(skeletonHashes.map((entry) => entry.hash));
+      107 |
+    > 108 |         expect(uniqueHashes.size).toBe(1);
+          |                                   ^
+      109 |         // Additional sanity: each file should have exactly one variant line
+      110 |         for (const dir of dirs) {
+      111 |           const filePath = path.join(dir, templateName);
+
+      at toBe (tests/unit/agent-persona-template-drift.test.js:108:35)
+
+  ● agent/persona template drift detection › Tier A: shared skeleton with single-line variant › learnings-researcher.md: all copies share the same skeleton after excluding the variant line
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 2
+
+      106 |         const uniqueHashes = new Set(skeletonHashes.map((entry) => entry.hash));
+      107 |
+    > 108 |         expect(uniqueHashes.size).toBe(1);
+          |                                   ^
+      109 |         // Additional sanity: each file should have exactly one variant line
+      110 |         for (const dir of dirs) {
+      111 |           const filePath = path.join(dir, templateName);
+
+      at toBe (tests/unit/agent-persona-template-drift.test.js:108:35)
+
+  ● agent/persona template drift detection › Tier A: shared skeleton with single-line variant › repo-research-analyst.md: all copies share the same skeleton after excluding the variant line
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 2
+
+      106 |         const uniqueHashes = new Set(skeletonHashes.map((entry) => entry.hash));
+      107 |
+    > 108 |         expect(uniqueHashes.size).toBe(1);
+          |                                   ^
+      109 |         // Additional sanity: each file should have exactly one variant line
+      110 |         for (const dir of dirs) {
+      111 |           const filePath = path.join(dir, templateName);
+
+      at toBe (tests/unit/agent-persona-template-drift.test.js:108:35)
+
+  ● agent/persona template drift detection › Tier B/C: frozen full-file hashes (semantic divergence) › best-practices-researcher.md: each copy matches its frozen SHA-256
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "79dceea93c937dcbefd4d9c785d667f3ca03c4c79df8068959c5281b04276af0"
+    Received: "85665097bdb450602808d875125bd80aae838a6231934bc0d0998ef0076ed80d"
+
+      126 |           const filePath = path.join(dir, templateName);
+      127 |           const actualHash = computeFullHash(filePath);
+    > 128 |           expect(actualHash).toBe(expectedHash);
+          |                              ^
+      129 |         }
+      130 |       },
+      131 |     );
+
+      at toBe (tests/unit/agent-persona-template-drift.test.js:128:30)
+
+PASS tests/unit/spec-plan-quality-contracts.test.js
+PASS tests/unit/ce-upstream-skill-sync-contracts.test.js
+PASS tests/unit/spec-work-contracts.test.js
+
+Test Suites: 2 failed, 3 passed, 5 total
+Tests:       5 failed, 52 passed, 57 total
+Snapshots:   0 total
+Time:        0.843 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/spec-plan-quality-contracts.test.js|tests\/unit\/ce-upstream-skill-sync-contracts.test.js|tests\/unit\/skill-flow-p2-closure-contracts.test.js|tests\/unit\/agent-persona-template-drift.test.js|tests\/unit\/spec-work-contracts.test.js/i.

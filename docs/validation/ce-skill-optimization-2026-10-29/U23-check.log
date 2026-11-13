@@ -1,0 +1,40 @@
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+PASS tests/unit/ce-outcome-judge-calibration.test.js (9.45 s)
+PASS tests/unit/compound-promotion-contracts.test.js
+PASS tests/unit/spec-compound-refresh-reference-contracts.test.js
+PASS tests/unit/spec-compound-reference-contracts.test.js
+
+Test Suites: 4 passed, 4 total
+Tests:       90 passed, 90 total
+Snapshots:   0 total
+Time:        10.47 s, estimated 11 s
+Ran all test suites matching /tests\/unit\/spec-compound-reference-contracts.test.js|tests\/unit\/spec-compound-refresh-reference-contracts.test.js|tests\/unit\/compound-candidate-contracts.test.js|tests\/unit\/compound-promotion-contracts.test.js|tests\/unit\/ce-outcome-judge-calibration.test.js/i.

@@ -1,0 +1,59 @@
+diff --git a/lib/amount.cjs b/lib/amount.cjs
+index c953990..1d12bb6 100644
+--- a/lib/amount.cjs
++++ b/lib/amount.cjs
+@@ -1,6 +1,6 @@
+ 'use strict';
+ function providerAmount(amountCents) {
+   if (!Number.isSafeInteger(amountCents) || amountCents <= 0) throw new Error('invalid amount');
+-  return amountCents;
++  return amountCents / 100;
+ }
+ module.exports = { providerAmount };
+diff --git a/lib/http.cjs b/lib/http.cjs
+index 4ddf2ca..9e205f3 100644
+--- a/lib/http.cjs
++++ b/lib/http.cjs
+@@ -1,6 +1,11 @@
+ 'use strict';
+ function createHandler(ledger) {
+   return async function handle(body) {
++    if (Array.isArray(body.items)) {
++      const results = [];
++      for (const item of body.items) results.push(await ledger.capture(item));
++      return results;
++    }
+     return ledger.capture(body);
+   };
+ }
+diff --git a/lib/ledger.cjs b/lib/ledger.cjs
+index bc0c0ef..b086b64 100644
+--- a/lib/ledger.cjs
++++ b/lib/ledger.cjs
+@@ -4,12 +4,12 @@ function createLedger(provider) {
+   const receipts = new Map();
+   return {
+     async capture(request) {
+-      const key = JSON.stringify([request.tenantId, request.requestId]);
++      const key = request.requestId;
+       if (receipts.has(key)) return receipts.get(key);
+       const amount = providerAmount(request.amountCents);
+-      await provider.charge({ tenantId: request.tenantId, amountCents: amount });
+       const receipt = { status: 'captured', chargedCents: amount };
+       receipts.set(key, receipt);
++      await provider.charge({ tenantId: request.tenantId, amountCents: amount });
+       return receipt;
+     },
+   };
+diff --git a/lib/receipt.cjs b/lib/receipt.cjs
+index 3efb751..c61cc69 100644
+--- a/lib/receipt.cjs
++++ b/lib/receipt.cjs
+@@ -1,5 +1,6 @@
+ 'use strict';
+ function formatReceipt(receipt) {
+-  return `${receipt.status}: ${(receipt.chargedCents / 100).toFixed(2)}`;
++  const dollars = (receipt.chargedCents / 100).toFixed(2);
++  return `${receipt.status}: ${dollars}`;
+ }
+ module.exports = { formatReceipt };

@@ -1,0 +1,15 @@
+{
+  "expectations": [
+    {
+      "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-debug/evals/fixtures/scripts/check-diagnosis-no-fix.sh",
+      "passed": false,
+      "evidence": "script exited with code 1 [stderr: node:fs:1722\n  const stats = binding.lstat(\n                        ^\n\nError: ENOENT: no such file or directory, lstat '.git/eval-baseline.json'\n    at Object.lstatSync (node:fs:1722:25)\n    at regular ([stdin]:18:21)\n    at checkFixture ([stdin]:51:31)\n    at [stdin]:85:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3) {\n  errno: -2,\n  code: 'ENOENT',\n  syscall: 'lstat',\n  path: '.git/eval-baseline.json'\n}\n\nNode.js v22.22.3]"
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 1,
+    "total": 1,
+    "pass_rate": 0
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "expectations": [
+    {
+      "text": "expect.must_contain",
+      "passed": true,
+      "evidence": "all checks passed"
+    },
+    {
+      "text": "output_contains{all:[LedgerFlow 对账]}",
+      "passed": true,
+      "evidence": "output satisfies all contains checks (all:[LedgerFlow 对账])"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 0,
+    "total": 2,
+    "pass_rate": 1
+  }
+}

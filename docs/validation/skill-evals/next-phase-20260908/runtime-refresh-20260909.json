@@ -1,0 +1,53 @@
+{
+  "schema_version": "runtime-refresh-receipt/v1",
+  "artifact_type": "confirmed",
+  "captured_at": "2026-09-09T00:20:00+08:00",
+  "target_repo": "/Users/kuang/xiaobu/spec-first",
+  "source_of_truth": "skills/",
+  "init_command": "node bin/spec-first.js init --claude --codex --cursor --kiro --qoder --opencode --zcode --pi -y --no-sync-user-language",
+  "init_result": {
+    "status": "ready",
+    "hosts_ready": 8,
+    "hosts_requested": 8,
+    "source_runtime_drift_before": true,
+    "source_runtime_drift_after": false,
+    "projection_mode": "host-specific-contractual-projection"
+  },
+  "doctor_summary": {
+    "claude": {"runtime_asset_health": "pass", "workflow_runnability": "simulated"},
+    "codex": {"runtime_asset_health": "pass", "workflow_runnability": "simulated", "decision_input_health": "missing", "reason_code": "setup-facts-host-mismatch"},
+    "cursor": {"runtime_asset_health": "warn", "workflow_runnability": "not_verified", "reason_code": "cursor_generated_runtime_loader_unverified"},
+    "kiro": {"runtime_asset_health": "pass", "workflow_runnability": "simulated", "reason_code": "kiro_cli_not_found"},
+    "qoder": {"runtime_asset_health": "warn", "workflow_runnability": "not_verified", "reason_code": "qoder_hook_activation_unverified"},
+    "opencode": {"runtime_asset_health": "warn", "workflow_runnability": "not_verified", "reason_code": "opencode_generated_runtime_loader_unverified"},
+    "zcode": {"runtime_asset_health": "pass", "workflow_runnability": "simulated"},
+    "pi": {"runtime_asset_health": "pass", "workflow_runnability": "simulated"}
+  },
+  "verification": [
+    {"command": "npm run typecheck", "status": "passed", "evidence": "257 files checked"},
+    {"command": "npm run lint:skill-entrypoints", "status": "passed", "evidence": "401 files scanned"},
+    {"command": "npm run test:unit", "status": "passed", "evidence": "206 suites, 2503 tests"},
+    {"command": "npm run test:smoke", "status": "passed", "evidence": "5 tests"},
+    {"command": "npm run test:integration", "status": "passed_with_environment_skips", "evidence": "13 suites, 68 tests passed; 1 suite and 2 tests skipped by default environment"},
+    {"command": "npm run build", "status": "passed", "evidence": "npm pack --dry-run"},
+    {"command": "npm run sync:instructions", "status": "passed", "evidence": "canonical instruction blocks match"},
+    {"command": "git diff --check", "status": "passed"},
+    {"command": "npx --no-install jest tests/unit/changelog-format.test.js tests/unit/active-docs-links.test.js tests/unit/host-runtime-projection-contracts.test.js --runInBand", "status": "passed", "evidence": "3 suites, 32 tests"}
+  ],
+  "claim_ceiling": [
+    "current source and generated projections are locally reproducible",
+    "local deterministic regression is green"
+  ],
+  "not_verified": [
+    "GPT-6 Astra service identity and three-arm behavior",
+    "broader field trials and user acceptance",
+    "remote Windows CI rerun for PR #55",
+    "cross-model holdout and long-term knowledge reuse",
+    "X1 external personal Skill installation and loader evidence"
+  ],
+  "limitations": [
+    "host-specific projections may rewrite prose or paths; byte-identical hashes across hosts are not required",
+    "Cursor and OpenCode remain generated-runtime preview; Qoder hook activation remains degraded by design",
+    "workflow execution evidence is absent in this setup run"
+  ]
+}

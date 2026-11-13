@@ -1,0 +1,4 @@
+interrupted-1: 5 runs started, results lost (tool timeout killed parent)
+s20a-gpt: 10 runs started, 9 errored (qianxing.pro 429 Too Many Requests at parallelism 3); only s20-r5 iteration-1 valid
+plan change: gpt S20 groups 1 iteration each at parallelism 1; S20 blind cut to R3/R8 if budget allows
+blind attempt 1: wrapper heredoc consumed stdin; ~5 GLM judge calls answered the wrapper script instead of the prompt (wasted, no secrets in script); codex calls exited without model call

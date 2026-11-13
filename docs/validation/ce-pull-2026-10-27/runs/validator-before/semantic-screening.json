@@ -1,0 +1,132 @@
+{
+  "artifact_type": "advisory",
+  "status": "partial",
+  "entries": [
+    {
+      "path": "skills/ce-code-review/references/validator-template.md",
+      "local_owner": "skills/spec-code-review/references/validator-template.md",
+      "upstream_objects": {
+        "path": "skills/ce-code-review/references/validator-template.md",
+        "status": "D",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "89f486234e8fe5013886bdb9b696b2cb3621f594"
+        },
+        "new_object": null,
+        "current_owner_surface_candidate": "skills/spec-code-review/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "local_sha256": "a810d51c2e2afe6071fccb170ac779a8afd3214868d1d18d1de29149a6826e1b",
+      "reading": "本地全文与 CE base 全文（上一恢复段已读）；CE head 删除，直接核对存活 consumer",
+      "decision": "保留本地逐 finding validator；吸收三态和具体反证门槛，不删除有 consumer 的模板",
+      "status": "partial-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-code-review/references/validator-batch-template.md",
+      "local_owner": "skills/spec-code-review/references/validator-template.md",
+      "upstream_objects": {
+        "path": "skills/ce-code-review/references/validator-batch-template.md",
+        "status": "M",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "4612ffeef5fbbf8ff92a991d90c659ae09848fa5"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "7ef81a5869d5b6a662b71df3efac0a2a41901427"
+        },
+        "current_owner_surface_candidate": "skills/spec-code-review/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "local_sha256": "a810d51c2e2afe6071fccb170ac779a8afd3214868d1d18d1de29149a6826e1b",
+      "reading": "本轮 CE head 全文与本地 validator 全文；CE 窗口 batch 拓扑只作比较",
+      "decision": "compose 三态与 protected subject 语义，不引入 batch 调度",
+      "status": "partial-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-code-review/references/findings-schema.json",
+      "local_owner": "skills/spec-code-review/references/findings-schema.json",
+      "upstream_objects": {
+        "path": "skills/ce-code-review/references/findings-schema.json",
+        "status": "M",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "ef5c4099bac6516ba808f00f62080a6e9fb306cb"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "1a67b36f6f1e61a6b10edf00d2993077745cc551"
+        },
+        "current_owner_surface_candidate": "skills/spec-code-review/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "local_sha256": "c0d7cfdc86b26f96a26d2d29cb9603ad3924e7d074a5c181f60d7708df754d66",
+      "reading": "本地全文（上一恢复段）及本轮 CE 窗口完整 diff；新增字段联合 consumer 核对",
+      "decision": "可选 protected_subject/validation_status/validation_reason，保留旧报告兼容；状态出现须带理由和分类",
+      "status": "partial-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-code-review/references/finish-input.md",
+      "local_owner": "skills/spec-code-review/references/finish-review.md",
+      "upstream_objects": {
+        "path": "skills/ce-code-review/references/finish-input.md",
+        "status": "A",
+        "old_object": null,
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "00c5c2b3f311639f5122e62705388e9ab5e471d4"
+        },
+        "current_owner_surface_candidate": "skills/spec-code-review/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "local_sha256": "184fdb0c8b0752a7547f36d6f8e6b9f9fbae2b6269731f0597385e2792c4ee01",
+      "reading": "本轮 CE head 全文；本地 finish-review 与 dispatch 相关段落（非全文）",
+      "decision": "吸收上下文保真到既有 finish owner，不新增 merge/report leaf",
+      "status": "partial-implemented-contract-tested"
+    },
+    {
+      "path": "skills/ce-code-review/references/finish-review.md",
+      "local_owner": "skills/spec-code-review/references/finish-review.md",
+      "upstream_objects": {
+        "path": "skills/ce-code-review/references/finish-review.md",
+        "status": "M",
+        "old_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "11e8c742a9c88632af8c83d2c5aebd2818601b92"
+        },
+        "new_object": {
+          "mode": "100644",
+          "type": "blob",
+          "git_oid": "b75e632e5caf06c3bb382e3a35a191e4650aeec4"
+        },
+        "current_owner_surface_candidate": "skills/spec-code-review/SKILL.md",
+        "owner_exists_in_inventory": true
+      },
+      "local_sha256": "184fdb0c8b0752a7547f36d6f8e6b9f9fbae2b6269731f0597385e2792c4ee01",
+      "reading": "本轮本地 5b/apply/output 完整相关段落；CE head 对应变更尚未全文复核",
+      "decision": "局部吸收三态与 unresolved report-only，保持 U2 整包 open",
+      "status": "partial-implemented-contract-tested"
+    }
+  ],
+  "verification": {
+    "log_ref": "docs/validation/ce-pull-2026-10-27/logs/validator-contract-green.log",
+    "exit_code": 0,
+    "suites": 4,
+    "tests": 96,
+    "red_log_ref": "docs/validation/ce-pull-2026-10-27/logs/validator-contract-red.log",
+    "consumer_first_failure_ref": "docs/validation/ce-pull-2026-10-27/logs/validator-lfg-consumer.log",
+    "note": "consumer 首次失败来自旧 English-only 断言，与当前用户中文策略冲突；移除语言禁令并增加 unresolved 不可应用断言，随后 96 项通过"
+  },
+  "limitations": [
+    "source/schema 合同回归不是模型实际语义行为；fresh-source 独立 review 待整体实施后",
+    "仅验证结果与上下文 slice；其余 depth/Pack/peer/完整 finish 仍未关闭",
+    "未刷新 runtime、未 commit/push/PR/CI，完整同步点不前移"
+  ]
+}

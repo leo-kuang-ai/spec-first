@@ -1,0 +1,18 @@
+PASS tests/unit/spec-pr-feedback-reply.test.js
+  ✓ reply posts once to the root REST endpoint and preserves multiline Markdown (545 ms)
+  ✓ pending review after POST preserves the reply receipt and prevents successful completion (212 ms)
+  ✓ POST_FAIL never retries or resolves the thread (152 ms)
+  ✓ REVIEW_FAIL never retries or resolves the thread (189 ms)
+  ✓ invalid identity "x" makes no provider call (3 ms)
+  ✓ invalid identity "42" makes no provider call (3 ms)
+  ✓ invalid identity "42" makes no provider call (2 ms)
+  ✓ fetch carries root REST IDs across pages without dropping threads whose ID is unavailable (262 ms)
+  ✓ fetch preserves every identity and excludes null or blank comments bodies (278 ms)
+  ✓ fetch preserves every identity and excludes null or blank reviews bodies (277 ms)
+  ✓ thread lookup returns authoritative GraphQL and root REST identities from later pages (190 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       11 passed, 11 total
+Snapshots:   0 total
+Time:        2.206 s, estimated 3 s
+Ran all test suites within paths "tests/unit/spec-pr-feedback-reply.test.js".

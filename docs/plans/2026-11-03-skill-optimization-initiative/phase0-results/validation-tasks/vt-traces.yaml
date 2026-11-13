@@ -1,0 +1,122 @@
+# 行为验证追踪（模板沿用 Phase 0 格式，右尺寸版）
+# 说明：本会话 runtime mirror 未再生（旧合同），「使用优化后 Skill」以仓库标准
+# fresh-source eval 实现（新合同文本注入全新 subagent）；无 fresh-source 的步骤
+# 为 executor 应用并如实标注。
+
+task_id: "VT-01"
+task_title: "analyze-phase0.py 增 --compare 基线对比模式"
+task_type: "feature_development"
+complexity: "simple"
+mechanism_usage:
+  reverse_lookup: "executor 应用：touched paths（docs/plans/**）反查 → 0 管辖套件（rg 证实）"
+  blind_spot_line: "已记录：脚本正确性无 repo 测试覆盖，以输出 md5 恒等门验证"
+  fresh_source_eval: false
+workflow:
+  - stage: "plan/work/review/commit"
+    evidence: "提交 bfed20bf；默认输出 md5 与基线一致（e9254c20…）零回归；--compare 正向输出正确"
+    friction_points: []
+summary:
+  delivered: true
+  correct: true
+  rework_count: 0
+  user_intervention_count: 0
+  first_pass_green: true
+layer_3_metrics: { 端到端正确: true, 端到端返工: false }
+friction_summary: { total: 0, by_type: { 信息丢失: 0, 信息重复: 0, 验证缺失: 0, 衔接断裂: 0 } }
+---
+
+task_id: "VT-02"
+task_title: "SK-01 场景一 eval 案例（prd-plan-handoff-source-resolved）"
+task_type: "feature_development"
+complexity: "medium"
+mechanism_usage:
+  fresh_source_eval: true   # 注入 final-review 5.1 对账组 + plan-sections 两条 closure duties
+  reverse_lookup: "fresh-source 触发：反查发现 4 个管辖套件（quality-contracts[行级断言]、consumer-replay、plugin-modules、init-six-host-lifecycle integration）——全部不 import 目标 JSON，旧 import/命名搜索抓不到"
+  blind_spot_line: "fresh-source 产出每命令类盲区句，含'直接套件通过但新案例缺失不可见'的精确盲区（命令1为此存在）"
+  duty1_reconciliation: "fresh-source 明确声明：单元验证↔计划级命令全覆盖"
+workflow:
+  - stage: "plan(fresh-source) → work → verify → commit"
+    evidence: "提交 8fd82e36；Verification Contract 命令 1-5 全绿（形状检查 + 83/83）；umbrella 留待收尾统一跑（已补跑，见对比报告）"
+    friction_points: []
+summary:
+  delivered: true
+  correct: true
+  rework_count: 0
+  user_intervention_count: 0
+  first_pass_green: true
+  mechanism_activation: "SP-1 + P-WORK-1 完整触发（本验证最强证据）"
+layer_3_metrics: { 端到端正确: true, 端到端返工: false }
+friction_summary: { total: 0, by_type: { 信息丢失: 0, 信息重复: 0, 验证缺失: 0, 衔接断裂: 0 } }
+---
+
+task_id: "VT-03"
+task_title: "analyze-phase0.py 死代码清理"
+task_type: "bug_fix"
+complexity: "simple"
+mechanism_usage:
+  blind_spot_line: "V-T1 记录的盲区句规定输出对比验证——该门在提交前首跑 FAIL（md5 变化）"
+  fresh_source_eval: false
+workflow:
+  - stage: "work → verify(gate FAIL→定界→判定) → commit"
+    evidence: "提交 fb649815；输出恒等门 FAIL → diff 定界：唯一增量=零值键'信息丢失'移除、其余字段全等 → 判定预期净化后落地"
+    friction_points:
+      - id: "FP-VT3-1"
+        type: "验证缺失"
+        severity: "P2"
+        description: "输出恒等门首跑失败：被清理的'死代码'含零值种子行为，非纯死代码——需 diff 定界后才可判定为预期行为变化"
+        evidence: "md5 e9254c20→6963d6d9；diff 输出证明仅零值键差异"
+        attribution: "executor（V-T1 盲区句设计如此）；提交前捕获，非返工"
+summary:
+  delivered: true
+  correct: true
+  rework_count: 0        # 捕获发生在提交前——机制前置捕获，不构成返工
+  user_intervention_count: 0
+  first_pass_green: false  # 验证门首跑 FAIL，但一次定界后通过，无修正轮
+  pre_commit_capture: true
+layer_3_metrics: { 端到端正确: true, 端到端返工: false }
+friction_summary: { total: 1, by_type: { 信息丢失: 0, 信息重复: 0, 验证缺失: 1, 衔接断裂: 0 } }
+---
+
+task_id: "VT-04"
+task_title: "验证 harness 超时基线参数文档化"
+task_type: "cross_module"
+complexity: "medium"
+mechanism_usage:
+  fresh_source_eval: true   # 注入 shipping check 选择 + publishing gate release 面文本
+  release_surface_trigger: "fresh-source 确认触发：CHANGELOG 触碰 → test:release:governance 必入候选；并核实 CI（skill-entrypoint-gate.yml:39）确实在 PR 强制执行"
+  reverse_lookup: "fresh-source 额外发现 changelog-continuity 管辖套件——此前 6 个提交均漏跑（含优化阶段本身！），本任务补跑"
+  disclosure: "release_governance_status 按'未运行不得自证'原则先报 unconfirmed，实际运行后升级 confirmed-by-caller"
+workflow:
+  - stage: "plan(fresh-source) → work → verify → commit"
+    evidence: "提交 1245570d；changelog 两套件 5/5；test:release:governance 本地首跑 exit 0（含 opencode-release-surface——PR #57 曾误阻断项）"
+    friction_points: []
+summary:
+  delivered: true
+  correct: true
+  rework_count: 0
+  user_intervention_count: 0
+  first_pass_green: true
+  mechanism_activation: "P-WORK-2 + P-CPPR-1 完整触发；反查补获漏跑套件"
+layer_3_metrics: { 端到端正确: true, 端到端返工: false }
+friction_summary: { total: 0, by_type: { 信息丢失: 0, 信息重复: 0, 验证缺失: 0, 衔接断裂: 0 } }
+---
+
+task_id: "VT-05"
+task_title: "项目 README 状态更新至五阶段完成态"
+task_type: "documentation"
+complexity: "simple"
+mechanism_usage:
+  release_surface_trigger: "executor 应用：CHANGELOG 触碰 → changelog 两套件 + release-governance（exit 0）"
+  fresh_source_eval: false
+workflow:
+  - stage: "work → verify → commit"
+    evidence: "提交 457834a6；三处过期描述修正；5/5 + release-governance exit 0"
+    friction_points: []
+summary:
+  delivered: true
+  correct: true
+  rework_count: 0
+  user_intervention_count: 0
+  first_pass_green: true
+layer_3_metrics: { 端到端正确: true, 端到端返工: false }
+friction_summary: { total: 0, by_type: { 信息丢失: 0, 信息重复: 0, 验证缺失: 0, 衔接断裂: 0 } }

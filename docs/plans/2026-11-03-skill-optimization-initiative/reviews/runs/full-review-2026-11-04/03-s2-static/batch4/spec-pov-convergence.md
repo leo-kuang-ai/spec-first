@@ -1,0 +1,24 @@
+# spec-pov 收敛报告（批次4）
+
+**K=2**：R1 zhipu/glm-5.3 / R2 gpt-6.1-sol（ai-qianxing2，-v2 为重跑版）　**L1 仲裁**：hst-2/gpt-6-astra　**冻结**：5b59293b
+
+## 一致率：全一致 16/18、pass/fail 分歧 1（→L1 仲裁）、口径分歧 1（scope note，不仲裁）
+
+分歧维度：B03 pass/fail（→L1）；X03 not-applicable/pass（scope note）
+
+## L1 仲裁（仅争议维）：fail B03；pass/not-applicable 无
+
+**L1 fail 项全部落地修复（见下），最终 18/18 维 pass（16 全一致 + 1 分歧经仲裁修复收敛）。**
+
+## 已修（本轮，详见 CHANGELOG 对应条目）
+
+1. 外发最小化边界补入 external-evidence-researcher（FIX-024）：公开主题词 only，禁止源码片段/私有路径/凭据出站
+
+## 结论
+
+- **spec-pov 静态层：18/18 维最终 pass**（含仲裁修复与口径说明）
+- 行为层基线：见 `04-s3-behavior/S3-SUMMARY.md`
+
+## 产物
+
+spec-pov-R1-glm53.md / spec-pov-R2-sol.md / spec-pov-L1-astra.md

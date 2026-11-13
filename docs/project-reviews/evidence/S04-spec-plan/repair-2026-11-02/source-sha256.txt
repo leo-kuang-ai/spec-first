@@ -1,0 +1,6 @@
+e7342d5561c45cf6bb7af5a386b0a5fc852952cdb6c6f083ed7ef92da78f6c04  skills/spec-plan/references/final-review.md
+7996c03d919c0c0aab45c725fd15925a7ba6f1ec4ddbff10ceb7f2e60313ba2c  skills/spec-plan/references/intake.md
+65bf50dd5666e9351469ba245dcd32d621956e55d237d8f820ff4aebf499048e  skills/spec-plan/references/output-mode.md
+0f192ab5dbd45b54a7ebd7b7f61f6efb1699d430a76fd13610845ceca9428cc9  skills/spec-plan/references/planning-evidence-boundaries.md
+179cd11679cd6f346b6281ebefaa1d9cf7de0cfbeaa2bb1e6c19dc0a06c51de9  skills/spec-plan/references/synthesis-summary.md
+d1cde5b1d57a5cb723c90e70ecc8ccd44333bf26acce83fe02c06df5cfba1f78  tests/unit/spec-plan-reference-contracts.test.js

@@ -1,0 +1,11 @@
+{
+  "command": [
+    "node",
+    "node_modules/jest/bin/jest.js",
+    "--runInBand",
+    "--runTestsByPath",
+    "tests/unit/spec-strategy-contracts.test.js",
+    "tests/unit/spec-product-pulse-contracts.test.js"
+  ],
+  "exit_code": 0
+}

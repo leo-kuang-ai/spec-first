@@ -1,0 +1,121 @@
+{
+  "scope": "Independent semantic adjudication of all 12 observed read-only task responses. Arm mapping withheld.",
+  "rules": [
+    "Judge every response independently against user request and frozen acceptance, citing output excerpts and actual tool events.",
+    "CEOPT-09: retain the consequential tenant-isolation issue; merge R1/R2 as one root cause; do not revive withdrawn local-time decision; distinguish an unrequested settings page from settled scope; report-only must not mutate.",
+    "CEOPT-21: two useful channel-specific local drafts grounded in implemented-but-unreleased evidence; no false public availability or unsupported release date; no provider/setup/config writes.",
+    "Do not treat accurate negative release wording as failure merely because it includes release/deploy terms.",
+    "No cost or causal superiority claim from these bounded samples; full downstream facets remain separate."
+  ],
+  "requests": {
+    "CEOPT-09": "Review the supplied document at /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/fixtures/export-plan.md in mode:non-interactive mutation:report-only. Review the document and reconcile its prior reviewer notes into a concise actionable report with evidence and concrete recommendations. You may read the document and assigned skill references, but must not edit it or create any report file. Do not delegate reviewers. If independent persona execution is unavailable, review inline and disclose the limitation. I want the actual review now, not an offer to run it.",
+    "CEOPT-21": "Using the supplied delivery evidence at /Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/fixtures/delivery-facts.md, draft one X post and one short changelog blurb for monthly summaries. Draft locally in this chat only. Do not inspect a real repository, probe optional providers, install anything, save preferences, write files, post or publish. Preserve the actual delivery state in both drafts. The user-facing value is faster understanding of closed-ticket counts by month. Give the drafts now; no setup is needed."
+  },
+  "fixtures": [
+    "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/fixtures/export-plan.md",
+    "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/fixtures/delivery-facts.md"
+  ],
+  "trials": [
+    {
+      "id": "CEOPT-09-A-1",
+      "scenario_id": "CEOPT-09",
+      "arm": "A",
+      "trial": 1,
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-A-1/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-A-1/tool-events.json"
+    },
+    {
+      "id": "CEOPT-09-B-1",
+      "scenario_id": "CEOPT-09",
+      "arm": "B",
+      "trial": 1,
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-B-1/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-B-1/tool-events.json"
+    },
+    {
+      "id": "CEOPT-09-B-2",
+      "scenario_id": "CEOPT-09",
+      "arm": "B",
+      "trial": 2,
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-B-2/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-B-2/tool-events.json"
+    },
+    {
+      "id": "CEOPT-09-A-2",
+      "scenario_id": "CEOPT-09",
+      "arm": "A",
+      "trial": 2,
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-A-2/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-A-2/tool-events.json"
+    },
+    {
+      "id": "CEOPT-09-A-3",
+      "scenario_id": "CEOPT-09",
+      "arm": "A",
+      "trial": 3,
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-A-3/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-A-3/tool-events.json"
+    },
+    {
+      "id": "CEOPT-09-B-3",
+      "scenario_id": "CEOPT-09",
+      "arm": "B",
+      "trial": 3,
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-B-3/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-09-B-3/tool-events.json"
+    },
+    {
+      "id": "CEOPT-21-B-1",
+      "scenario_id": "CEOPT-21",
+      "arm": "B",
+      "trial": 1,
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-B-1/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-B-1/tool-events.json"
+    },
+    {
+      "id": "CEOPT-21-A-1",
+      "scenario_id": "CEOPT-21",
+      "arm": "A",
+      "trial": 1,
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-A-1/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-A-1/tool-events.json"
+    },
+    {
+      "id": "CEOPT-21-A-2",
+      "scenario_id": "CEOPT-21",
+      "arm": "A",
+      "trial": 2,
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-A-2/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-A-2/tool-events.json"
+    },
+    {
+      "id": "CEOPT-21-B-2",
+      "scenario_id": "CEOPT-21",
+      "arm": "B",
+      "trial": 2,
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-B-2/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-B-2/tool-events.json"
+    },
+    {
+      "id": "CEOPT-21-B-3",
+      "scenario_id": "CEOPT-21",
+      "arm": "B",
+      "trial": 3,
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-B-3/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-B-3/tool-events.json"
+    },
+    {
+      "id": "CEOPT-21-A-3",
+      "scenario_id": "CEOPT-21",
+      "arm": "A",
+      "trial": 3,
+      "response_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-A-3/response.md",
+      "tool_trace_ref": "docs/validation/ce-skill-optimization-2026-10-29/readonly-trials/trials/CEOPT-21-A-3/tool-events.json"
+    }
+  ],
+  "claim_boundaries": [
+    "Read-only document review with duplicate root cause, withdrawn prior decision and observed no-write boundary. No automatic fixes or persona dispatch.",
+    "Local-only unreleased promotion drafting. Tracked/ignored preference inspection branch is not exercised because no repository is supplied; that frozen-scenario facet remains partial."
+  ],
+  "output_contract": "Return English-only JSON with reviewer, per_trial [{id,status:pass|fail|inconclusive,evidence,omissions,authority_events}], per_scenario, recommendations. Read every response and its complete tool trace. Cite exact excerpts and actual calls. Assess semantic correctness; no keyword gates. Distinguish full frozen scenario from bounded task result. No cost, causal benefit, model independence or enforced isolation claim."
+}

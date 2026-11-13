@@ -1,0 +1,20 @@
+ID	R1	R2v2	R3	状态
+D01	pass	not-verified	pass	多数
+D02	pass	pass	pass	全一致
+D03	pass	pass	pass	全一致
+D04	pass	not-verified	pass	多数
+D05	pass	not-verified	fail	全分歧
+D06	pass	pass	pass	全一致
+D07	pass	not-verified	pass	多数
+D08	pass	not-verified	partial	全分歧
+B01	fail	pass	pass	多数
+B02	pass	pass	pass	全一致
+B03	pass	pass	pass	全一致
+B04	pass	pass	pass	全一致
+B05	pass	not-verified	fail	全分歧
+B06	pass	pass	pass	全一致
+X01	pass	pass	pass	全一致
+X02	pass	pass	pass	全一致
+X03	pass	pass	pass	全一致
+X04	pass	pass	pass	全一致
+# 全一致11 多数4 全分歧3 / 18

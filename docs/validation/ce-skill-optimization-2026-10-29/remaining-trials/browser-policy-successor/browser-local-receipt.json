@@ -1,0 +1,29 @@
+{
+  "origin": "http://127.0.0.1:50523",
+  "calls": [
+    {
+      "label": "reject-vitals-first-prepare",
+      "exit_code": 1,
+      "result_ref": "browser-reject-vitals-first-prepare.json"
+    },
+    {
+      "label": "positive-prepare",
+      "exit_code": 0,
+      "result_ref": "browser-positive-prepare.json"
+    },
+    {
+      "label": "positive-run",
+      "exit_code": 0,
+      "result_ref": "browser-positive-run.json"
+    },
+    {
+      "label": "positive-cleanup",
+      "exit_code": 0,
+      "result_ref": "browser-positive-cleanup.json"
+    }
+  ],
+  "server_cleanup": "completed",
+  "scratch_cleanup": "completed",
+  "scope": "Actual browser on caller-owned synthetic loopback page; no application visual or full model workflow claim.",
+  "finished_at": "2026-10-30T04:06:27.721053+00:00"
+}

@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "无问题定义应先收敛问题不直接开做",
+  "prompt": "（spec-prototype skill 已安装，请按它工作。）\n帮我做个原型。\n",
+  "assertions": [
+    "expect.files_not_exist",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-prototype/evals/fixtures/scripts/asks-a-question.sh"
+  ]
+}

@@ -1,0 +1,1015 @@
+[
+  {
+    "skill_name": "spec-plan",
+    "status": "degraded",
+    "package_files": 81,
+    "read_files": 1,
+    "source_read_ranges": {
+      "skills/spec-plan/SKILL.md": "1-123"
+    },
+    "unconfirmed_read_ranges": [
+      "skills/spec-plan/references/research.md",
+      "skills/spec-plan/references/structure.md",
+      "tests/unit/spec-plan-*.test.js（精确阅读范围未确认）",
+      "skills/spec-plan/references/planning-evidence-boundaries.md（曾审阅但精确行段不可恢复，不计确认覆盖）",
+      "skills/spec-plan/references/intake.md（曾审阅但精确行段不可恢复，不计确认覆盖）",
+      "skills/spec-plan/references/final-review.md（曾审阅但精确行段不可恢复，不计确认覆盖）",
+      "skills/spec-plan/references/plan-handoff.md（曾审阅但精确行段不可恢复，不计确认覆盖）",
+      "skills/spec-plan/references/resume.md（曾审阅但精确行段不可恢复，不计确认覆盖）"
+    ],
+    "branches": {
+      "entry_positive": {
+        "status": "source-covered",
+        "judgment": "目标已足够明确时进入规划；保持 Product Contract 对 WHAT 的权威，细化 HOW，不执行实现修改。",
+        "evidence": [
+          "skills/spec-plan/SKILL.md:15-19",
+          "skills/spec-plan/SKILL.md:25-38"
+        ]
+      },
+      "near_neighbor_negative": {
+        "status": "source-covered",
+        "judgment": "未决 WHAT 转 spec-brainstorm，现存失败转 spec-debug，实现转 spec-work；排除 generated runtime mirror 修改。",
+        "evidence": [
+          "skills/spec-plan/SKILL.md:3",
+          "skills/spec-plan/SKILL.md:27-31"
+        ]
+      },
+      "output_consumer": {
+        "status": "source-covered",
+        "judgment": "输出可执行统一计划，或 blocked/producer handoff，供 spec-work、spec-write-tasks、spec-doc-review 和调用方消费；只请求计划时可以完成交付，无须选择后续菜单。",
+        "evidence": [
+          "skills/spec-plan/SKILL.md:21-31",
+          "skills/spec-plan/SKILL.md:40-46",
+          "skills/spec-plan/SKILL.md:96-112"
+        ]
+      },
+      "critical_error_stop": {
+        "status": "source-covered",
+        "judgment": "缺目标/source owner、承重决策、有效元数据或必需引用时，阻止计划晋级及实现交接。",
+        "evidence": [
+          "skills/spec-plan/SKILL.md:27-38",
+          "skills/spec-plan/SKILL.md:64-68"
+        ]
+      },
+      "degraded_recovery_handoff": {
+        "status": "source-covered",
+        "judgment": "Provider 失败时退为有界直接读取；blocked envelope 保留产物路径、阶段、阻塞及恢复路径。",
+        "evidence": [
+          "skills/spec-plan/SKILL.md:9-11",
+          "skills/spec-plan/SKILL.md:64-68"
+        ]
+      }
+    },
+    "findings": [],
+    "gaps": [
+      "research/structure/eval 与下游命令闭包未完整阅读。",
+      "tests、runtime 和 fresh invocation 均未运行。"
+    ],
+    "recovery_point": "主 owner 可按需补读未确认引用并执行 source/eval 验证；当前未确认其他逻辑 finding。",
+    "timing": {
+      "started_at": null,
+      "ended_at": null,
+      "active_seconds": null,
+      "limitation": "逐包阅读计时无法可靠恢复；不使用受限流、等待和批量读取影响的墙钟校准预算。"
+    },
+    "execution": {
+      "source_writes": 0,
+      "tests": "not-run",
+      "host_projection": "not-run",
+      "live_invocation": "not-run",
+      "fresh_source_eval": "not-run"
+    },
+    "review_id": "spec-first-cycle1-20260920-b2.4",
+    "worktree": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first-cycle1-20260920-qh_ul_2o/repo",
+    "frozen_head": "36d19d95c3a79df2d1278083c959bb34eadbde8c",
+    "source_manifest_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+    "mode": "read-only",
+    "supporting_read_ranges": {},
+    "read_files_definition": "确认至少部分语义阅读且保留精确行段的包内唯一文件数；支持性测试和消费者引用单列，不代表文件全部读完。",
+    "coverage_limit": "有界五分支 source review；包内引用、测试、消费者和 runtime 闭包未全部验证。source-covered 仅表示已读合同覆盖该分支，不表示运行通过。"
+  },
+  {
+    "skill_name": "spec-prd",
+    "status": "degraded",
+    "package_files": 48,
+    "read_files": 2,
+    "source_read_ranges": {
+      "skills/spec-prd/SKILL.md": "1-90, 321-345",
+      "skills/spec-prd/references/prd-readiness-lens.md": "1-100"
+    },
+    "unconfirmed_read_ranges": [
+      "tests/unit/spec-prd-*.test.js（精确阅读范围未确认）",
+      "其余 spec-prd 引用及完整 scripts（未确认）",
+      "skills/spec-prd/references/evidence-and-topology.md（曾审阅但精确行段不可恢复，不计确认覆盖）",
+      "skills/spec-prd/references/grill-with-docs-integration.md（曾审阅但精确行段不可恢复，不计确认覆盖）",
+      "skills/spec-prd/scripts/check-prd-artifact.js（曾审阅但精确行段不可恢复，不计确认覆盖）",
+      "skills/spec-prd/scripts/finalize-prd-artifact.js（曾审阅但精确行段不可恢复，不计确认覆盖）",
+      "skills/spec-prd/scripts/check-glossary-drift.js（曾审阅但精确行段不可恢复，不计确认覆盖）"
+    ],
+    "branches": {
+      "entry_positive": {
+        "status": "source-covered",
+        "judgment": "面向 brownfield PRD 的创建、细化与验证，通过源码优先质询及 readiness 完成 WHAT 交接；validate 保持 report-only。",
+        "evidence": [
+          "skills/spec-prd/SKILL.md:13-17",
+          "skills/spec-prd/SKILL.md:41-59"
+        ]
+      },
+      "near_neighbor_negative": {
+        "status": "source-covered",
+        "judgment": "从零探索转 brainstorm，HOW/任务编译转 plan/write-tasks；实现、排错、审查及设计一致性具有独立 owner。",
+        "evidence": [
+          "skills/spec-prd/SKILL.md:4",
+          "skills/spec-prd/SKILL.md:29-35"
+        ]
+      },
+      "output_consumer": {
+        "status": "source-covered",
+        "judgment": "create/refine 输出 PRD 产物与 finalize/readiness facts；validate 输出当前报告，供 spec-plan、spec-doc-review 和产品 owner 消费。",
+        "evidence": [
+          "skills/spec-prd/SKILL.md:41-59",
+          "skills/spec-prd/SKILL.md:321-345"
+        ]
+      },
+      "critical_error_stop": {
+        "status": "source-covered",
+        "judgment": "checker reason code、owner 闭环、设计源、receipt 时效或 readiness 声明未解决时，阻止 planning handoff。",
+        "evidence": [
+          "skills/spec-prd/references/prd-readiness-lens.md:33-45",
+          "skills/spec-prd/SKILL.md:321-342"
+        ]
+      },
+      "degraded_recovery_handoff": {
+        "status": "source-covered",
+        "judgment": "问题交互、provider 或设计证据不可用时，显式降级并保留 blocker/OQ；validate 不修复或 finalize。",
+        "evidence": [
+          "skills/spec-prd/SKILL.md:70-78",
+          "skills/spec-prd/SKILL.md:323-342"
+        ]
+      }
+    },
+    "findings": [],
+    "gaps": [
+      "完整 script 行段、测试及宿主 mutation enforcement 的证据未完整阅读或运行。",
+      "仅凭 source review 尚未验证 runtime guard 是否激活。"
+    ],
+    "recovery_point": "补读剩余 references/tests，并在具备宿主时执行 finalize/check-only 和 fresh-source eval。",
+    "timing": {
+      "started_at": null,
+      "ended_at": null,
+      "active_seconds": null,
+      "limitation": "逐包阅读计时无法可靠恢复；不使用受限流、等待和批量读取影响的墙钟校准预算。"
+    },
+    "execution": {
+      "source_writes": 0,
+      "tests": "not-run",
+      "host_projection": "not-run",
+      "live_invocation": "not-run",
+      "fresh_source_eval": "not-run"
+    },
+    "review_id": "spec-first-cycle1-20260920-b2.4",
+    "worktree": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first-cycle1-20260920-qh_ul_2o/repo",
+    "frozen_head": "36d19d95c3a79df2d1278083c959bb34eadbde8c",
+    "source_manifest_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+    "mode": "read-only",
+    "supporting_read_ranges": {},
+    "read_files_definition": "确认至少部分语义阅读且保留精确行段的包内唯一文件数；支持性测试和消费者引用单列，不代表文件全部读完。",
+    "coverage_limit": "有界五分支 source review；包内引用、测试、消费者和 runtime 闭包未全部验证。source-covered 仅表示已读合同覆盖该分支，不表示运行通过。"
+  },
+  {
+    "skill_name": "spec-doc-review",
+    "status": "degraded",
+    "package_files": 52,
+    "read_files": 9,
+    "source_read_ranges": {
+      "skills/spec-doc-review/SKILL.md": "1-74",
+      "skills/spec-doc-review/references/modes.md": "1-25",
+      "skills/spec-doc-review/references/document-intake.md": "1-73",
+      "skills/spec-doc-review/references/dispatch.md": "1-52",
+      "skills/spec-doc-review/references/persona-selection.md": "1-46",
+      "skills/spec-doc-review/references/rendering-floor.md": "1-96",
+      "skills/spec-doc-review/references/synthesis-and-presentation.md": "1-100,102-339",
+      "skills/spec-doc-review/references/task-pack-review-lens.md": "1-85",
+      "skills/spec-doc-review/references/findings-schema.json": "1-85"
+    },
+    "unconfirmed_read_ranges": [
+      "其余 spec-doc-review references/personas/evals/tests（未读）"
+    ],
+    "branches": {
+      "entry_positive": {
+        "status": "source-covered",
+        "judgment": "根据内容形态识别需求、计划和 task pack，选择 persona，并将确定性事实交由语义综合。",
+        "evidence": [
+          "skills/spec-doc-review/SKILL.md:7-26",
+          "skills/spec-doc-review/references/document-intake.md:17-30"
+        ]
+      },
+      "near_neighbor_negative": {
+        "status": "source-covered",
+        "judgment": "task pack 是 derived 且 report-only 的 producer 输入；review 不替代 producer、plan、implementation 或 runtime owner。",
+        "evidence": [
+          "skills/spec-doc-review/SKILL.md:9-16",
+          "skills/spec-doc-review/references/task-pack-review-lens.md:5-10"
+        ]
+      },
+      "output_consumer": {
+        "status": "source-covered",
+        "judgment": "结构化文本/JSON envelope 输出 findings、coverage、limitations 和 task_pack_outcome；调用方消费修复候选与下一 owner。",
+        "evidence": [
+          "skills/spec-doc-review/references/synthesis-and-presentation.md:149-163",
+          "skills/spec-doc-review/references/synthesis-and-presentation.md:217-263",
+          "skills/spec-doc-review/references/task-pack-review-lens.md:74-83"
+        ]
+      },
+      "critical_error_stop": {
+        "status": "source-covered",
+        "judgment": "输入不可读或冲突、task pack 确定性失败、必需覆盖缺失及 report-only 边界阻止写入或 clean/execution-ready 声明。",
+        "evidence": [
+          "skills/spec-doc-review/references/document-intake.md:5-16",
+          "skills/spec-doc-review/references/task-pack-review-lens.md:20-38",
+          "skills/spec-doc-review/references/synthesis-and-presentation.md:215-215"
+        ]
+      },
+      "degraded_recovery_handoff": {
+        "status": "source-covered",
+        "judgment": "无 worker 权限或能力时退为 inline 并声明覆盖降级；task pack 缺陷返回 spec-write-tasks，source plan 缺口返回 spec-plan。",
+        "evidence": [
+          "skills/spec-doc-review/references/dispatch.md:7-13",
+          "skills/spec-doc-review/references/task-pack-review-lens.md:74-85"
+        ]
+      }
+    },
+    "findings": [],
+    "gaps": [
+      "persona/eval/dispatch 消费者闭包未完整阅读；未执行 review invocation 或测试。"
+    ],
+    "recovery_point": "按需补读选定 persona 资产，并执行 contract tests 和 fresh invocation。",
+    "timing": {
+      "started_at": null,
+      "ended_at": null,
+      "active_seconds": null,
+      "limitation": "逐包阅读计时无法可靠恢复；不使用受限流、等待和批量读取影响的墙钟校准预算。"
+    },
+    "execution": {
+      "source_writes": 0,
+      "tests": "not-run",
+      "host_projection": "not-run",
+      "live_invocation": "not-run",
+      "fresh_source_eval": "not-run"
+    },
+    "review_id": "spec-first-cycle1-20260920-b2.4",
+    "worktree": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first-cycle1-20260920-qh_ul_2o/repo",
+    "frozen_head": "36d19d95c3a79df2d1278083c959bb34eadbde8c",
+    "source_manifest_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+    "mode": "read-only",
+    "supporting_read_ranges": {
+      "tests/unit/spec-doc-review-task-pack-contracts.test.js": "1-117"
+    },
+    "read_files_definition": "确认至少部分语义阅读且保留精确行段的包内唯一文件数；支持性测试和消费者引用单列，不代表文件全部读完。",
+    "coverage_limit": "有界五分支 source review；包内引用、测试、消费者和 runtime 闭包未全部验证。source-covered 仅表示已读合同覆盖该分支，不表示运行通过。"
+  },
+  {
+    "skill_name": "spec-brainstorm",
+    "status": "degraded",
+    "package_files": 32,
+    "read_files": 10,
+    "source_read_ranges": {
+      "skills/spec-brainstorm/SKILL.md": "1-78",
+      "skills/spec-brainstorm/references/phase-0.md": "1-71",
+      "skills/spec-brainstorm/references/output-mode.md": "1-21",
+      "skills/spec-brainstorm/references/interaction-rules.md": "1-29",
+      "skills/spec-brainstorm/references/settled-decisions.md": "1-45",
+      "skills/spec-brainstorm/references/dialogue.md": "1-61",
+      "skills/spec-brainstorm/references/approaches.md": "1-53",
+      "skills/spec-brainstorm/references/plan-write.md": "1-24",
+      "skills/spec-brainstorm/references/handoff.md": "1-168",
+      "skills/spec-brainstorm/references/brainstorm-sections.md": "1-110,285-387"
+    },
+    "unconfirmed_read_ranges": [
+      "synthesis-summary.md",
+      "其余 brainstorm-sections/rendering/references/personas/evals/tests（未读）"
+    ],
+    "branches": {
+      "entry_positive": {
+        "status": "source-covered",
+        "judgment": "WHAT 未收敛时进入对话、压力测试、方案比较，并形成 requirements-only 统一计划；产品确认归用户。",
+        "evidence": [
+          "skills/spec-brainstorm/SKILL.md:11-25",
+          "skills/spec-brainstorm/references/dialogue.md:41-61"
+        ]
+      },
+      "near_neighbor_negative": {
+        "status": "source-covered",
+        "judgment": "点名外部采用、切换或替代裁决转 spec-pov；已收敛 HOW 转 spec-plan；实现、排错和代码审查保持独立。",
+        "evidence": [
+          "skills/spec-brainstorm/SKILL.md:15-17",
+          "skills/spec-brainstorm/references/phase-0.md:30-38"
+        ]
+      },
+      "output_consumer": {
+        "status": "source-covered",
+        "judgment": "requirements-only 统一计划供 spec-plan/spec-doc-review 消费；Phase 4 交给 plan、review 或显式选择的 LFG，并保留产物路径。",
+        "evidence": [
+          "skills/spec-brainstorm/SKILL.md:15-25",
+          "skills/spec-brainstorm/references/plan-write.md:1-24",
+          "skills/spec-brainstorm/references/handoff.md:14-123"
+        ]
+      },
+      "critical_error_stop": {
+        "status": "source-covered",
+        "judgment": "产品 blocker、未决集成问题、无依据声明及 readiness 失败阻止 planning handoff；不进行实现修改。",
+        "evidence": [
+          "skills/spec-brainstorm/SKILL.md:21-25",
+          "skills/spec-brainstorm/references/dialogue.md:52-61",
+          "skills/spec-brainstorm/references/plan-write.md:10-18",
+          "skills/spec-brainstorm/references/brainstorm-sections.md:84-93"
+        ]
+      },
+      "degraded_recovery_handoff": {
+        "status": "source-covered",
+        "judgment": "grounding/claim verifier 失败时退为 inline 并显式声明降级；暂停时在产物中保留 blocker、source refs 和下一问题。",
+        "evidence": [
+          "skills/spec-brainstorm/references/dialogue.md:15-21",
+          "skills/spec-brainstorm/references/approaches.md:47-51",
+          "skills/spec-brainstorm/references/plan-write.md:18-24"
+        ]
+      }
+    },
+    "findings": [],
+    "gaps": [
+      "synthesis-summary 及若干 phase/rendering/eval 引用未读；tests 为 not-run。"
+    ],
+    "recovery_point": "补读 synthesis/sections/rendering/eval 后执行 fresh-source eval。",
+    "timing": {
+      "started_at": null,
+      "ended_at": null,
+      "active_seconds": null,
+      "limitation": "逐包阅读计时无法可靠恢复；不使用受限流、等待和批量读取影响的墙钟校准预算。"
+    },
+    "execution": {
+      "source_writes": 0,
+      "tests": "not-run",
+      "host_projection": "not-run",
+      "live_invocation": "not-run",
+      "fresh_source_eval": "not-run"
+    },
+    "review_id": "spec-first-cycle1-20260920-b2.4",
+    "worktree": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first-cycle1-20260920-qh_ul_2o/repo",
+    "frozen_head": "36d19d95c3a79df2d1278083c959bb34eadbde8c",
+    "source_manifest_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+    "mode": "read-only",
+    "supporting_read_ranges": {
+      "tests/unit/spec-brainstorm-contracts.test.js": "1-44"
+    },
+    "read_files_definition": "确认至少部分语义阅读且保留精确行段的包内唯一文件数；支持性测试和消费者引用单列，不代表文件全部读完。",
+    "coverage_limit": "有界五分支 source review；包内引用、测试、消费者和 runtime 闭包未全部验证。source-covered 仅表示已读合同覆盖该分支，不表示运行通过。"
+  },
+  {
+    "skill_name": "spec-ideate",
+    "status": "degraded",
+    "package_files": 30,
+    "read_files": 7,
+    "source_read_ranges": {
+      "skills/spec-ideate/SKILL.md": "1-105",
+      "skills/spec-ideate/references/scope-gates.md": "1-139",
+      "skills/spec-ideate/references/output-mode.md": "1-51",
+      "skills/spec-ideate/references/grounding.md": "1-119",
+      "skills/spec-ideate/references/decomposition.md": "1-40",
+      "skills/spec-ideate/references/divergent-ideation.md": "1-95",
+      "skills/spec-ideate/references/post-ideation-workflow.md": "1-162"
+    },
+    "unconfirmed_read_ranges": [
+      "其余 ideate references/agents/evals/tests（未读）"
+    ],
+    "branches": {
+      "entry_positive": {
+        "status": "source-covered",
+        "judgment": "只在用户要生成并评估方向时进入；先处理 subject/mode/output/scaling/grounding，再以多种视角生成候选、核实依据、过滤和持久化。",
+        "evidence": [
+          "skills/spec-ideate/SKILL.md:12-28",
+          "skills/spec-ideate/SKILL.md:83-105"
+        ]
+      },
+      "near_neighbor_negative": {
+        "status": "source-covered",
+        "judgment": "用户已有单一想法要收敛时转 spec-brainstorm；ideate 不产出 requirements/plan/code，不直接跳到 spec-plan。",
+        "evidence": [
+          "skills/spec-ideate/references/scope-gates.md:3-7",
+          "skills/spec-ideate/SKILL.md:12-20"
+        ]
+      },
+      "output_consumer": {
+        "status": "source-covered",
+        "judgment": "生成 ideation artifact；Phase 5 将选定 idea 作为 focused seed 交给 spec-brainstorm；文件格式与 resume 规则明确。",
+        "evidence": [
+          "skills/spec-ideate/references/post-ideation-workflow.md:44-75",
+          "skills/spec-ideate/references/post-ideation-workflow.md:101-115"
+        ]
+      },
+      "critical_error_stop": {
+        "status": "source-covered",
+        "judgment": "subject 无法识别时先问；外部研究需独立授权；缺 basis、meeting-test 或 subject scope 的候选被拒；写入失败不得静默丢失结果。",
+        "evidence": [
+          "skills/spec-ideate/references/scope-gates.md:11-52",
+          "skills/spec-ideate/references/divergent-ideation.md:61-83",
+          "skills/spec-ideate/references/post-ideation-workflow.md:54-63"
+        ]
+      },
+      "degraded_recovery_handoff": {
+        "status": "source-covered",
+        "judgment": "dispatch/provider 失败时退为 inline/serial，保留 reason code 和 coverage ceiling；无 repo 或 durable dir 时完整 inline 返回，不把 scratch 当作唯一交付物。",
+        "evidence": [
+          "skills/spec-ideate/SKILL.md:56-69",
+          "skills/spec-ideate/references/grounding.md:1-39",
+          "skills/spec-ideate/references/post-ideation-workflow.md:54-64"
+        ]
+      }
+    },
+    "findings": [],
+    "gaps": [
+      "issue-intelligence/universal/section/rendering/cache/agent 引用及 eval 未读；tests 为 not-run。"
+    ],
+    "recovery_point": "如需扩大审查，补读缺口后执行 eval/fresh-source；当前未确认其他逻辑 finding。",
+    "timing": {
+      "started_at": null,
+      "ended_at": null,
+      "active_seconds": null,
+      "limitation": "逐包阅读计时无法可靠恢复；不使用受限流、等待和批量读取影响的墙钟校准预算。"
+    },
+    "execution": {
+      "source_writes": 0,
+      "tests": "not-run",
+      "host_projection": "not-run",
+      "live_invocation": "not-run",
+      "fresh_source_eval": "not-run"
+    },
+    "review_id": "spec-first-cycle1-20260920-b2.4",
+    "worktree": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first-cycle1-20260920-qh_ul_2o/repo",
+    "frozen_head": "36d19d95c3a79df2d1278083c959bb34eadbde8c",
+    "source_manifest_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+    "mode": "read-only",
+    "supporting_read_ranges": {
+      "tests/unit/spec-ideate-phase-contracts.test.js": "1-86",
+      "tests/unit/spec-ideate-clarification-handoff-contracts.test.js": "1-46"
+    },
+    "read_files_definition": "确认至少部分语义阅读且保留精确行段的包内唯一文件数；支持性测试和消费者引用单列，不代表文件全部读完。",
+    "coverage_limit": "有界五分支 source review；包内引用、测试、消费者和 runtime 闭包未全部验证。source-covered 仅表示已读合同覆盖该分支，不表示运行通过。"
+  },
+  {
+    "skill_name": "spec-write-tasks",
+    "status": "degraded",
+    "package_files": 23,
+    "read_files": 4,
+    "source_read_ranges": {
+      "skills/spec-write-tasks/SKILL.md": "1-141",
+      "skills/spec-write-tasks/references/task-pack-schema.md": "1-345",
+      "skills/spec-write-tasks/references/task-quality-guide.md": "1-125",
+      "skills/spec-write-tasks/references/execution-handoff-contract.md": "1-139"
+    },
+    "branches": {
+      "entry_positive": {
+        "status": "source-covered",
+        "judgment": "已收敛本地 plan 或 task pack 验证进入可选派生层；plan 保持唯一源，不执行代码。",
+        "evidence": [
+          "skills/spec-write-tasks/SKILL.md:8-20",
+          "skills/spec-write-tasks/SKILL.md:56-67"
+        ]
+      },
+      "near_neighbor_negative": {
+        "status": "source-covered",
+        "judgment": "未决范围返回 spec-plan；小计划可以跳过；拒绝 generated runtime mirror、通用任务清单和远程任务列表。",
+        "evidence": [
+          "skills/spec-write-tasks/SKILL.md:18-32",
+          "skills/spec-write-tasks/SKILL.md:128-135"
+        ]
+      },
+      "output_consumer": {
+        "status": "source-covered",
+        "judgment": "compile/validate envelope 交给 spec-work；高风险包建议有界 report-only spec-doc-review，并消费结构化 task_pack_outcome。",
+        "evidence": [
+          "skills/spec-write-tasks/SKILL.md:89-120",
+          "skills/spec-write-tasks/references/execution-handoff-contract.md:42-95",
+          "skills/spec-work/references/work-intake-and-task-pack.md:1-31"
+        ]
+      },
+      "critical_error_stop": {
+        "status": "source-covered",
+        "judgment": "非 active plan、陈旧/错误链/不可验证 hash、无效合同或缺 repo scope 时，阻止可执行交接；需要 CLI 证据。",
+        "evidence": [
+          "skills/spec-write-tasks/SKILL.md:38-44",
+          "skills/spec-write-tasks/SKILL.md:67-68",
+          "skills/spec-write-tasks/references/execution-handoff-contract.md:53-78"
+        ]
+      },
+      "degraded_recovery_handoff": {
+        "status": "source-covered",
+        "judgment": "CLI 不可用时降为 draft-only；语义质量归 LLM；无效或陈旧包返回 producer 或 plan owner，不推测任务。",
+        "evidence": [
+          "skills/spec-write-tasks/references/execution-handoff-contract.md:47-78",
+          "skills/spec-work/references/work-intake-and-task-pack.md:25-33"
+        ]
+      }
+    },
+    "findings": [],
+    "gaps": [
+      "task-quality-guide 126 行以后未读；task-pack CLI 实现、命令测试及 eval 未完成闭包。",
+      "tests、host projection、fresh-source eval 和 live invocation 均为 not-run。"
+    ],
+    "recovery_point": "在具备对应授权的独立验证阶段运行 tasks validate/hash 和 spec-work intake tests。",
+    "timing": {
+      "started_at": null,
+      "ended_at": null,
+      "active_seconds": null,
+      "limitation": "逐包阅读计时无法可靠恢复；不使用受限流、等待和批量读取影响的墙钟校准预算。"
+    },
+    "execution": {
+      "source_writes": 0,
+      "tests": "not-run",
+      "host_projection": "not-run",
+      "live_invocation": "not-run",
+      "fresh_source_eval": "not-run"
+    },
+    "review_id": "spec-first-cycle1-20260920-b2.4",
+    "worktree": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first-cycle1-20260920-qh_ul_2o/repo",
+    "frozen_head": "36d19d95c3a79df2d1278083c959bb34eadbde8c",
+    "source_manifest_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+    "mode": "read-only",
+    "unconfirmed_read_ranges": [],
+    "supporting_read_ranges": {
+      "tests/unit/spec-write-tasks-contracts.test.js": "1-85",
+      "skills/spec-work/references/work-intake-and-task-pack.md": "1-90"
+    },
+    "read_files_definition": "确认至少部分语义阅读且保留精确行段的包内唯一文件数；支持性测试和消费者引用单列，不代表文件全部读完。",
+    "coverage_limit": "有界五分支 source review；包内引用、测试、消费者和 runtime 闭包未全部验证。source-covered 仅表示已读合同覆盖该分支，不表示运行通过。"
+  },
+  {
+    "skill_name": "spec-lfg",
+    "status": "degraded",
+    "package_files": 24,
+    "read_files": 7,
+    "source_read_ranges": {
+      "skills/spec-lfg/SKILL.md": "1-81",
+      "skills/spec-lfg/references/plan-brief.md": "1-16",
+      "skills/spec-lfg/references/work-return.md": "1-32",
+      "skills/spec-lfg/references/review-followup.md": "1-95",
+      "skills/spec-lfg/references/stage-routing.md": "1-90",
+      "skills/spec-lfg/references/shipping-tail.md": "1-76",
+      "skills/spec-lfg/references/pr-watch-loop.md": "1-50"
+    },
+    "branches": {
+      "entry_positive": {
+        "status": "source-covered",
+        "judgment": "只有显式 spec-lfg 或已披露 commit/push/PR/CI/review 副作用的 handoff 才准入；按 plan→work→simplify→independent review→fix→browser/final verify→ship/watch 执行。",
+        "evidence": [
+          "skills/spec-lfg/SKILL.md:7-15",
+          "skills/spec-lfg/SKILL.md:36-81"
+        ]
+      },
+      "near_neighbor_negative": {
+        "status": "source-covered",
+        "judgment": "仅有 ship it 时先一次性披露并等待；缺 admission 时不实现或提交；inline review 不能冒充 independent review；无 remote 时进入 local-only。",
+        "evidence": [
+          "skills/spec-lfg/SKILL.md:7-15",
+          "skills/spec-lfg/references/shipping-tail.md:3-8",
+          "skills/spec-lfg/references/review-followup.md:33-38"
+        ]
+      },
+      "output_consumer": {
+        "status": "source-covered",
+        "judgment": "spec-plan/spec-work 结构化返回、review JSON、browser result、fingerprint 与 watch 终态共同决定是否可 ship/DONE；looks-ready 仅为 advisory。",
+        "evidence": [
+          "skills/spec-lfg/references/work-return.md:5-32",
+          "skills/spec-lfg/references/stage-routing.md:39-90",
+          "skills/spec-lfg/references/pr-watch-loop.md:46-50"
+        ]
+      },
+      "critical_error_stop": {
+        "status": "source-covered",
+        "judgment": "缺 plan/work/review/browser/final fingerprint/remote decision 证据时，在对应阶段停止；needs-human 及未持久化 residual 阻断 DONE。",
+        "evidence": [
+          "skills/spec-lfg/SKILL.md:40-64",
+          "skills/spec-lfg/references/stage-routing.md:39-87",
+          "skills/spec-lfg/references/shipping-tail.md:63-76"
+        ]
+      },
+      "degraded_recovery_handoff": {
+        "status": "source-covered",
+        "judgment": "缺 worker/host/browser/remote 能力时保留 degraded/local-only/manual-blocker；watch event 交给 debug/resolve pipeline-return，不能把本地修复升级为远端 green。",
+        "evidence": [
+          "skills/spec-lfg/SKILL.md:54-64",
+          "skills/spec-lfg/references/pr-watch-loop.md:15-30",
+          "skills/spec-lfg/references/shipping-tail.md:55-63"
+        ]
+      }
+    },
+    "findings": [],
+    "gaps": [
+      "其余 LFG 引用和测试未读；未执行 pipeline invocation 或 remote/browser 验证。"
+    ],
+    "recovery_point": "如需 LFG runtime 闭环，补读剩余引用，并在具备明确副作用授权及 exact target origin 时执行。",
+    "timing": {
+      "started_at": null,
+      "ended_at": null,
+      "active_seconds": null,
+      "limitation": "逐包阅读计时无法可靠恢复；不使用受限流、等待和批量读取影响的墙钟校准预算。"
+    },
+    "execution": {
+      "source_writes": 0,
+      "tests": "not-run",
+      "host_projection": "not-run",
+      "live_invocation": "not-run",
+      "fresh_source_eval": "not-run"
+    },
+    "review_id": "spec-first-cycle1-20260920-b2.4",
+    "worktree": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first-cycle1-20260920-qh_ul_2o/repo",
+    "frozen_head": "36d19d95c3a79df2d1278083c959bb34eadbde8c",
+    "source_manifest_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+    "mode": "read-only",
+    "unconfirmed_read_ranges": [],
+    "supporting_read_ranges": {},
+    "read_files_definition": "确认至少部分语义阅读且保留精确行段的包内唯一文件数；支持性测试和消费者引用单列，不代表文件全部读完。",
+    "coverage_limit": "有界五分支 source review；包内引用、测试、消费者和 runtime 闭包未全部验证。source-covered 仅表示已读合同覆盖该分支，不表示运行通过。"
+  },
+  {
+    "skill_name": "spec-debug",
+    "status": "degraded",
+    "package_files": 22,
+    "read_files": 6,
+    "source_read_ranges": {
+      "skills/spec-debug/SKILL.md": "1-364",
+      "skills/spec-debug/references/investigate.md": "1-61",
+      "skills/spec-debug/references/fix.md": "1-17",
+      "skills/spec-debug/references/pipeline-return.md": "1-80",
+      "skills/spec-debug/references/anti-patterns.md": "1-91",
+      "skills/spec-debug/references/defense-in-depth.md": "1-35"
+    },
+    "branches": {
+      "entry_positive": {
+        "status": "source-covered",
+        "judgment": "失败或回归进入诊断；明确修复意图无需重复修复确认；根因链先于最小修复。",
+        "evidence": [
+          "skills/spec-debug/SKILL.md:15-35",
+          "skills/spec-debug/SKILL.md:164-202"
+        ]
+      },
+      "near_neighbor_negative": {
+        "status": "source-covered",
+        "judgment": "已收敛实现归 spec-work；仅诊断时跳过修改；设计错配转 brainstorm；pipeline 范围偏离返回 needs-human。",
+        "evidence": [
+          "skills/spec-debug/SKILL.md:3",
+          "skills/spec-debug/SKILL.md:204-235",
+          "skills/spec-debug/references/pipeline-return.md:20-32"
+        ]
+      },
+      "output_consumer": {
+        "status": "source-covered",
+        "judgment": "Debug Summary/closeout refs 供用户、spec-work、code-review 与 LFG 消费；fixed-not-pushed 仅表示本地结果，调用方重新验证。",
+        "evidence": [
+          "skills/spec-debug/SKILL.md:252-323",
+          "skills/spec-debug/references/pipeline-return.md:55-80",
+          "skills/spec-lfg/references/pr-watch-loop.md:15-30"
+        ]
+      },
+      "critical_error_stop": {
+        "status": "source-covered",
+        "judgment": "目标/source/dirty overlap 与验证证据 gate 位于修改或 verified 声明之前；修复失败使原假设失效并升级调查。",
+        "evidence": [
+          "skills/spec-debug/SKILL.md:237-248",
+          "skills/spec-debug/SKILL.md:295-323",
+          "skills/spec-debug/references/fix.md:5-17"
+        ]
+      },
+      "degraded_recovery_handoff": {
+        "status": "source-covered",
+        "judgment": "其他任务残留、缺复现/provider、非 Git 缺口均显式保留；pipeline 返回有类型的 residual，不编造成功。",
+        "evidence": [
+          "skills/spec-debug/SKILL.md:37-48",
+          "skills/spec-debug/SKILL.md:114-122",
+          "skills/spec-debug/references/pipeline-return.md:34-53"
+        ]
+      }
+    },
+    "findings": [],
+    "gaps": [
+      "investigation-techniques、其余 eval 和 CLI closeout 消费者未读；tests/runtime/live 均未运行。"
+    ],
+    "recovery_point": "如主 owner 扩大范围，补读其余 debug 引用和消费者，并执行聚焦合同测试。",
+    "timing": {
+      "started_at": null,
+      "ended_at": null,
+      "active_seconds": null,
+      "limitation": "逐包阅读计时无法可靠恢复；不使用受限流、等待和批量读取影响的墙钟校准预算。"
+    },
+    "execution": {
+      "source_writes": 0,
+      "tests": "not-run",
+      "host_projection": "not-run",
+      "live_invocation": "not-run",
+      "fresh_source_eval": "not-run"
+    },
+    "review_id": "spec-first-cycle1-20260920-b2.4",
+    "worktree": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first-cycle1-20260920-qh_ul_2o/repo",
+    "frozen_head": "36d19d95c3a79df2d1278083c959bb34eadbde8c",
+    "source_manifest_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+    "mode": "read-only",
+    "unconfirmed_read_ranges": [],
+    "supporting_read_ranges": {
+      "tests/unit/spec-debug-contracts.test.js": "1-76",
+      "tests/unit/spec-debug-fix-reference-contracts.test.js": "1-19",
+      "skills/spec-lfg/references/pr-watch-loop.md": "1-50"
+    },
+    "read_files_definition": "确认至少部分语义阅读且保留精确行段的包内唯一文件数；支持性测试和消费者引用单列，不代表文件全部读完。",
+    "coverage_limit": "有界五分支 source review；包内引用、测试、消费者和 runtime 闭包未全部验证。source-covered 仅表示已读合同覆盖该分支，不表示运行通过。"
+  },
+  {
+    "skill_name": "spec-resolve-pr-feedback",
+    "status": "degraded",
+    "package_files": 22,
+    "read_files": 11,
+    "source_read_ranges": {
+      "skills/spec-resolve-pr-feedback/SKILL.md": "1-126",
+      "skills/spec-resolve-pr-feedback/references/full-mode.md": "1-315",
+      "skills/spec-resolve-pr-feedback/references/targeted-mode.md": "1-43",
+      "skills/spec-resolve-pr-feedback/references/evaluation-rubric.md": "1-111",
+      "skills/spec-resolve-pr-feedback/references/pipeline-mode.md": "1-17",
+      "skills/spec-resolve-pr-feedback/references/pipeline-return.md": "1-50",
+      "skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md": "1-56",
+      "skills/spec-resolve-pr-feedback/scripts/get-pr-comments": "1-187",
+      "skills/spec-resolve-pr-feedback/scripts/get-thread-for-comment": "1-88",
+      "skills/spec-resolve-pr-feedback/scripts/reply-to-pr-thread": "1-50",
+      "skills/spec-resolve-pr-feedback/scripts/resolve-pr-thread": "1-23"
+    },
+    "branches": {
+      "entry_positive": {
+        "status": "source-covered",
+        "judgment": "集中评价 PR feedback，区分 Full/Targeted 及本地修复、commit、push、reply、resolve 权限；host/repo 来自权威 URL/remotes。",
+        "evidence": [
+          "skills/spec-resolve-pr-feedback/SKILL.md:19-28",
+          "skills/spec-resolve-pr-feedback/SKILL.md:32-87"
+        ]
+      },
+      "near_neighbor_negative": {
+        "status": "source-covered",
+        "judgment": "新代码审查归 spec-code-review；只有 discussion_r 选择 Targeted；pipeline-return 禁止嵌套远端尾流程。",
+        "evidence": [
+          "skills/spec-resolve-pr-feedback/SKILL.md:3",
+          "skills/spec-resolve-pr-feedback/SKILL.md:56-85"
+        ]
+      },
+      "output_consumer": {
+        "status": "source-covered",
+        "judgment": "resolver summary 聚合后进行组合验证；pipeline return 提供修复、残留与限制，LFG 负责最终 fingerprint、commit、push 和 watch。",
+        "evidence": [
+          "skills/spec-resolve-pr-feedback/references/full-mode.md:109-149",
+          "skills/spec-resolve-pr-feedback/references/pipeline-return.md:24-50",
+          "skills/spec-lfg/references/pr-watch-loop.md:15-30"
+        ]
+      },
+      "critical_error_stop": {
+        "status": "degraded",
+        "judgment": "五类权限、pending review 和远端结果未知会阻止相关出口；但组合验证用薄弱的文件集合启发式判断 pre-existing failure。",
+        "evidence": [
+          "skills/spec-resolve-pr-feedback/SKILL.md:32-52",
+          "skills/spec-resolve-pr-feedback/references/full-mode.md:144-147",
+          "skills/spec-resolve-pr-feedback/references/full-mode.md:206-255"
+        ]
+      },
+      "degraded_recovery_handoff": {
+        "status": "source-covered",
+        "judgment": "分页告警保留不完整证据；dispatch 不可用时串行处理；完整 needs-human residual 返回调用方；重复循环有停止边界。",
+        "evidence": [
+          "skills/spec-resolve-pr-feedback/scripts/get-pr-comments:137-187",
+          "skills/spec-resolve-pr-feedback/references/full-mode.md:277-315",
+          "skills/spec-resolve-pr-feedback/references/evaluation-rubric.md:90-111"
+        ]
+      }
+    },
+    "findings": [
+      {
+        "severity": "P1",
+        "status": "confirmed-source-contract-gap",
+        "title": "组合验证可能把新引入的跨文件回归误判为既有失败",
+        "trigger": "失败触及的 consumer/test 文件不在 resolver files_changed 中。",
+        "evidence": [
+          "skills/spec-resolve-pr-feedback/references/full-mode.md:144-147"
+        ],
+        "risk": "缺少 baseline 或因果证据仍进入 commit/push，可能放过新回归。",
+        "adjudication": "主 owner 已回源确认为 source 合同缺口；优先级 P1/P2；尚未修复或执行真实 workflow。"
+      },
+      {
+        "severity": "P2",
+        "status": "confirmed-source-contract-gap",
+        "title": "resolver 修改后阻塞，却被要求返回空 files_changed",
+        "trigger": "resolver 已编辑文件，随后遇到 targeted check/caller contradiction。",
+        "evidence": [
+          "skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md:18-20",
+          "skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md:37-50",
+          "skills/spec-resolve-pr-feedback/references/full-mode.md:113-138"
+        ],
+        "risk": "若未证明回滚或报告真实 diff，聚合器可能跳过验证并丢失残留修改记录。",
+        "adjudication": "主 owner 已回源确认为 source 合同缺口；优先级 P1/P2；尚未修复或执行真实 workflow。"
+      }
+    ],
+    "gaps": [
+      "其余 eval fixture 与跨宿主/远端检查未运行。",
+      "helper scripts 未在 GitHub/GHE 执行。"
+    ],
+    "recovery_point": "按主 owner 对 P1/P2 的回源裁决进入后续修复，并补充聚焦 source/contract 测试。",
+    "timing": {
+      "started_at": null,
+      "ended_at": null,
+      "active_seconds": null,
+      "limitation": "逐包阅读计时无法可靠恢复；不使用受限流、等待和批量读取影响的墙钟校准预算。"
+    },
+    "execution": {
+      "source_writes": 0,
+      "tests": "not-run",
+      "host_projection": "not-run",
+      "live_invocation": "not-run",
+      "fresh_source_eval": "not-run"
+    },
+    "review_id": "spec-first-cycle1-20260920-b2.4",
+    "worktree": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first-cycle1-20260920-qh_ul_2o/repo",
+    "frozen_head": "36d19d95c3a79df2d1278083c959bb34eadbde8c",
+    "source_manifest_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+    "mode": "read-only",
+    "unconfirmed_read_ranges": [],
+    "supporting_read_ranges": {
+      "tests/unit/spec-resolve-pr-feedback-contracts.test.js": "1-170",
+      "skills/spec-lfg/references/pr-watch-loop.md": "1-50"
+    },
+    "read_files_definition": "确认至少部分语义阅读且保留精确行段的包内唯一文件数；支持性测试和消费者引用单列，不代表文件全部读完。",
+    "coverage_limit": "有界五分支 source review；包内引用、测试、消费者和 runtime 闭包未全部验证。source-covered 仅表示已读合同覆盖该分支，不表示运行通过。"
+  },
+  {
+    "skill_name": "spec-pov",
+    "status": "degraded",
+    "package_files": 24,
+    "read_files": 7,
+    "source_read_ranges": {
+      "skills/spec-pov/SKILL.md": "1-59",
+      "skills/spec-pov/references/intake.md": "1-59",
+      "skills/spec-pov/references/grounding.md": "1-33",
+      "skills/spec-pov/references/method.md": "1-53",
+      "skills/spec-pov/references/followup.md": "1-14",
+      "skills/spec-pov/references/boundaries.md": "1-33",
+      "skills/spec-pov/references/cross-model-panel.md": "1-47"
+    },
+    "unconfirmed_read_ranges": [
+      "pov-schema.json（未读）",
+      "report.md（未读）",
+      "其余 refs/agents/scripts/evals（未读）"
+    ],
+    "branches": {
+      "entry_positive": {
+        "status": "source-covered",
+        "judgment": "结合当前项目对外部候选或决策给出分级 POV，保持只读。",
+        "evidence": [
+          "skills/spec-pov/SKILL.md:7-17",
+          "skills/spec-pov/references/boundaries.md:5-18"
+        ]
+      },
+      "near_neighbor_negative": {
+        "status": "source-covered",
+        "judgment": "中性解释、开放方向探索、产品 WHAT/HOW 和真实故障诊断分流；仅承接有界采用裁决。",
+        "evidence": [
+          "skills/spec-pov/references/intake.md:23-51",
+          "skills/spec-pov/references/boundaries.md:11-29"
+        ]
+      },
+      "output_consumer": {
+        "status": "source-covered",
+        "judgment": "对话 verdict 包含等级、现状、已核实项目/外部事实、条件、交接和反转触发；后续动作须具备对应授权。",
+        "evidence": [
+          "skills/spec-pov/references/method.md:26-53",
+          "skills/spec-pov/references/followup.md:1-14"
+        ]
+      },
+      "critical_error_stop": {
+        "status": "source-covered",
+        "judgment": "项目与外部证据两层地板分别约束 Adopt/Reject；任一失败返回 Hold 及精确缺失证据。",
+        "evidence": [
+          "skills/spec-pov/references/method.md:17-24"
+        ]
+      },
+      "degraded_recovery_handoff": {
+        "status": "source-covered",
+        "judgment": "scout 不可用时执行有界 inline 并降低覆盖；无本地材料标为 out-of-scope；cross-model peer gate 失败时关闭该路径并退回进程内评审。",
+        "evidence": [
+          "skills/spec-pov/references/grounding.md:1-33",
+          "skills/spec-pov/references/cross-model-panel.md:1-21"
+        ]
+      }
+    },
+    "findings": [],
+    "gaps": [
+      "schema/report/agent/scripts/eval 未读；有界 tests/unit 文件名检索未命中 pov，不代表不存在相关测试。",
+      "外部 provider、live peer、tests、host projection 和 fresh-source eval 均未运行。"
+    ],
+    "recovery_point": "按需补读 schema/report，并仅在授权范围内执行只读 fresh-source 或 provider 检查。",
+    "timing": {
+      "started_at": null,
+      "ended_at": null,
+      "active_seconds": null,
+      "limitation": "逐包阅读计时无法可靠恢复；不使用受限流、等待和批量读取影响的墙钟校准预算。"
+    },
+    "execution": {
+      "source_writes": 0,
+      "tests": "not-run",
+      "host_projection": "not-run",
+      "live_invocation": "not-run",
+      "fresh_source_eval": "not-run"
+    },
+    "review_id": "spec-first-cycle1-20260920-b2.4",
+    "worktree": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first-cycle1-20260920-qh_ul_2o/repo",
+    "frozen_head": "36d19d95c3a79df2d1278083c959bb34eadbde8c",
+    "source_manifest_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+    "mode": "read-only",
+    "supporting_read_ranges": {},
+    "read_files_definition": "确认至少部分语义阅读且保留精确行段的包内唯一文件数；支持性测试和消费者引用单列，不代表文件全部读完。",
+    "coverage_limit": "有界五分支 source review；包内引用、测试、消费者和 runtime 闭包未全部验证。source-covered 仅表示已读合同覆盖该分支，不表示运行通过。"
+  },
+  {
+    "skill_name": "using-spec-first",
+    "status": "degraded",
+    "package_files": 11,
+    "read_files": 3,
+    "source_read_ranges": {
+      "skills/using-spec-first/SKILL.md": "1-42",
+      "skills/using-spec-first/references/public-route-map.md": "1-50",
+      "skills/using-spec-first/references/conditional-routing-boundaries.md": "1-51"
+    },
+    "branches": {
+      "entry_positive": {
+        "status": "source-covered",
+        "judgment": "入口 governor 恰好选择一个公开 workflow/skill/command/Direct Lane 后移交；不重路由 active workflow/worker。",
+        "evidence": [
+          "skills/using-spec-first/SKILL.md:8-16",
+          "skills/using-spec-first/SKILL.md:18-36"
+        ]
+      },
+      "near_neighbor_negative": {
+        "status": "source-covered",
+        "judgment": "Direct Lane 排除失败、文档审查、runtime、显式 workflow、handoff 与未决目标；public map 导向 owner。",
+        "evidence": [
+          "skills/using-spec-first/SKILL.md:20-26",
+          "skills/using-spec-first/references/public-route-map.md:7-25"
+        ]
+      },
+      "output_consumer": {
+        "status": "source-covered",
+        "judgment": "只返回一个入口或建议，不产生 artifact/state 或修改授权；随后由消费者 owner 接管。",
+        "evidence": [
+          "skills/using-spec-first/SKILL.md:8-16",
+          "skills/using-spec-first/SKILL.md:28-36"
+        ]
+      },
+      "critical_error_stop": {
+        "status": "source-covered",
+        "judgment": "路由匹配不授予 mutation/verification/runtime/handoff 权限；低置信度至多问一个改变路由的问题；worker dispatch 先核对授权。",
+        "evidence": [
+          "skills/using-spec-first/SKILL.md:26-40",
+          "skills/using-spec-first/references/conditional-routing-boundaries.md:26-31"
+        ]
+      },
+      "degraded_recovery_handoff": {
+        "status": "source-covered",
+        "judgment": "provider 缺失或陈旧时退为有界直接读取；handoff/knowledge promotion 要求 summary、source refs、freshness、limitations 及 confirmed evidence。",
+        "evidence": [
+          "skills/using-spec-first/references/conditional-routing-boundaries.md:5-10",
+          "skills/using-spec-first/references/conditional-routing-boundaries.md:42-51"
+        ]
+      }
+    },
+    "findings": [],
+    "gaps": [
+      "其余 8 个包内文件与外部合同未完成阅读；using-spec-first-contracts.test.js 已静态读取，未运行。",
+      "tests、host projection、fresh-source eval 和 live invocation 均为 not-run。"
+    ],
+    "recovery_point": "如主 owner 扩大范围，补读 eval/contracts 并执行 routing contract tests 和 fresh-source eval。",
+    "timing": {
+      "started_at": null,
+      "ended_at": null,
+      "active_seconds": null,
+      "limitation": "逐包阅读计时无法可靠恢复；不使用受限流、等待和批量读取影响的墙钟校准预算。"
+    },
+    "execution": {
+      "source_writes": 0,
+      "tests": "not-run",
+      "host_projection": "not-run",
+      "live_invocation": "not-run",
+      "fresh_source_eval": "not-run"
+    },
+    "review_id": "spec-first-cycle1-20260920-b2.4",
+    "worktree": "/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/spec-first-cycle1-20260920-qh_ul_2o/repo",
+    "frozen_head": "36d19d95c3a79df2d1278083c959bb34eadbde8c",
+    "source_manifest_sha256": "e43122f5c401047254569505c71be6bb9581290e2b66eeec79a4182d921347e8",
+    "mode": "read-only",
+    "unconfirmed_read_ranges": [],
+    "supporting_read_ranges": {
+      "tests/unit/using-spec-first-contracts.test.js": "1-162"
+    },
+    "read_files_definition": "确认至少部分语义阅读且保留精确行段的包内唯一文件数；支持性测试和消费者引用单列，不代表文件全部读完。",
+    "coverage_limit": "有界五分支 source review；包内引用、测试、消费者和 runtime 闭包未全部验证。source-covered 仅表示已读合同覆盖该分支，不表示运行通过。"
+  }
+]

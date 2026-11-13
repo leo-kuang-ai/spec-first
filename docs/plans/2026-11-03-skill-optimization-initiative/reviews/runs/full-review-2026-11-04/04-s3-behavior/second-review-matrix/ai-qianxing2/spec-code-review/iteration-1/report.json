@@ -1,0 +1,64 @@
+{
+  "skill_name": "spec-code-review",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "ai-qianxing2/gpt-6.1-sol",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "ai-qianxing2/gpt-6.1-sol"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "ai-qianxing2/gpt-6.1-sol"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-05T10:16:18.031588+08:00",
+  "end_time": "2026-11-05T10:16:36.632343+08:00",
+  "case_results": [
+    {
+      "case_id": "conflicting-scope-fails-early",
+      "title": "冲突 scope 参数必须在审查前失败",
+      "status": "PASS",
+      "duration_ms": 18405,
+      "turns": 1,
+      "input_tokens": 24283,
+      "output_tokens": 66,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-code-review/evals/fixtures/scripts/check-conflicting-scope.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "请使用 spec-code-review 执行 mode:agent base:HEAD feature/other-branch 审查。\n不要调用子代理。最终只返回该 Skill 规定的机器可消费结果。\n",
+      "response": "{\"status\":\"failed\",\"reason\":\"审查范围参数冲突：base:HEAD 表示审查当前检出相对于该基准的变更，不能同时指定分支目标 feature/other-branch。请仅保留其中一种范围选择方式。\"}",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 24349,
+  "judge_tokens": 0,
+  "overall_tokens": 24349
+}

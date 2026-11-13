@@ -1,0 +1,26 @@
+
+> solved-ledger@1.1.0 test
+> node --test test/entries.test.js
+
+TAP version 13
+# Subtest: string amount is rejected instead of stored as NaN
+ok 1 - string amount is rejected instead of stored as NaN
+  ---
+  duration_ms: 0.462958
+  type: 'test'
+  ...
+# Subtest: valid amount is accepted
+ok 2 - valid amount is accepted
+  ---
+  duration_ms: 0.0525
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 54.608375

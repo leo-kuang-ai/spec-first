@@ -1,0 +1,7 @@
+{
+  "action": "get",
+  "exit_code": 1,
+  "stdout": "{\"_boundary\":{\"nonce\":\"b47c690e4b26d4e608fbc26ed54e5247\",\"origin\":\"unknown\"},\"data\":null,\"error\":\"Action 'title' denied by policy: Action 'title' is not in the allow list\",\"success\":false}\n",
+  "stderr": "",
+  "error": null
+}

@@ -1,0 +1,25 @@
+{
+  "id": "CEOPT-32-observed-dispatch-recovery",
+  "at": "2026-10-31T08:09:36.693746+00:00",
+  "original_packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/CEOPT-32-packet.json",
+  "original_packet_sha256": "54851e65480ede503771113f22d60fe300d6139012b3195bfe64d36e6e9619e3",
+  "supplement_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave4/CEOPT-32-supplement.json",
+  "supplement_sha256": "c8206871b61b125c2ca7b5af88ca90fd31baf5b05f181c59442ad2212368d98c",
+  "original_failure_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/capacity-stop-20261031-worktree.json",
+  "readiness": "Pending current independent reviewer final; dispatch only after that observed success releases combined slot.",
+  "sequence": [
+    "A1-retry1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "original_A1": "Preserved infrastructure429; separately identified fresh-context recovery cannot overwrite original.",
+  "source_revision": "Original assigned-arm frozen files unchanged; A is dirty spec-first baseline, not CE upstream.",
+  "deadline_seconds": 300,
+  "resource_policy": "One combined trial/reviewer slot. On any new infrastructure429 stop new dispatch; preserve errors. No blind retry. No external CLI.",
+  "isolation": "Fresh fork_turns none per model trial, assigned-arm bounded reads only, no other-arm receipts or prior model/reviewer results. Shared filesystem is not enforced read-only isolation.",
+  "capture": "Existing capture.py saves exact final/errors and trace under distinct trial identity; failed original remains.",
+  "claims": "Read-only interpretation only. No model mutation, autonomous worktree execution, field benefit or full acceptance inferred."
+}

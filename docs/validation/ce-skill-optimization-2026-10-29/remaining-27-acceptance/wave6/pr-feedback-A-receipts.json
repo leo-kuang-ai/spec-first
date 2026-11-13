@@ -1,0 +1,13 @@
+{
+  "arm": "A",
+  "source_sha256": null,
+  "cases": [
+    {
+      "status": "capability-absent",
+      "reason": "Original package lacks this helper; evaluate safe task handling using original instructions, not a missing-file failure."
+    }
+  ],
+  "limitations": [
+    "Actual pure helper with in-process provider stub. No hosted PR read or mutation; no live publication."
+  ]
+}

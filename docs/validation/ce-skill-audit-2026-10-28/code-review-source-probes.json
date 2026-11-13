@@ -1,0 +1,269 @@
+{
+  "p0-anchor-zero": {
+    "input": [
+      {
+        "reviewer": "correctness",
+        "findings": [
+          {
+            "title": "unconfirmed candidate",
+            "severity": "P0",
+            "file": "src/a.js",
+            "line": 1,
+            "confidence": 0,
+            "autofix_class": "manual",
+            "owner": "downstream-resolver",
+            "requires_verification": true,
+            "pre_existing": false
+          }
+        ],
+        "residual_risks": [],
+        "testing_gaps": []
+      }
+    ],
+    "exit_code": 0,
+    "stdout": {
+      "findings": [
+        {
+          "#": 1,
+          "autofix_class": "manual",
+          "confidence": 0,
+          "file": "src/a.js",
+          "independent_reviewers": [
+            "correctness"
+          ],
+          "line": 1,
+          "owner": "downstream-resolver",
+          "pre_existing": false,
+          "requires_verification": true,
+          "reviewers": [
+            "correctness"
+          ],
+          "severity": "P0",
+          "title": "unconfirmed candidate"
+        }
+      ],
+      "first_evidence_backfilled": 0,
+      "malformed_findings": 0,
+      "malformed_returns": 0,
+      "pre_existing_findings": [],
+      "residual_risks": [],
+      "status": "complete",
+      "suppressed_by_confidence": {},
+      "suppressed_findings": [],
+      "testing_gaps": []
+    },
+    "stderr": ""
+  },
+  "settlement-anchor-zero": {
+    "input": [
+      {
+        "reviewer": "correctness",
+        "findings": [
+          {
+            "title": "unconfirmed candidate",
+            "severity": "P2",
+            "file": "src/a.js",
+            "line": 1,
+            "confidence": 0,
+            "autofix_class": "manual",
+            "owner": "downstream-resolver",
+            "requires_verification": true,
+            "pre_existing": false,
+            "settled_conflict": true
+          }
+        ],
+        "residual_risks": [],
+        "testing_gaps": []
+      }
+    ],
+    "exit_code": 0,
+    "stdout": {
+      "findings": [
+        {
+          "#": 1,
+          "autofix_class": "manual",
+          "confidence": 0,
+          "file": "src/a.js",
+          "independent_reviewers": [
+            "correctness"
+          ],
+          "line": 1,
+          "owner": "downstream-resolver",
+          "pre_existing": false,
+          "requires_verification": true,
+          "reviewers": [
+            "correctness"
+          ],
+          "settled_conflict": true,
+          "severity": "P2",
+          "title": "unconfirmed candidate"
+        }
+      ],
+      "first_evidence_backfilled": 0,
+      "malformed_findings": 0,
+      "malformed_returns": 0,
+      "pre_existing_findings": [],
+      "residual_risks": [],
+      "status": "complete",
+      "suppressed_by_confidence": {},
+      "suppressed_findings": [],
+      "testing_gaps": []
+    },
+    "stderr": ""
+  },
+  "case-sensitive-paths": {
+    "input": [
+      {
+        "reviewer": "correctness",
+        "findings": [
+          {
+            "title": "unconfirmed candidate",
+            "severity": "P1",
+            "file": "src/A.js",
+            "line": 1,
+            "confidence": 75,
+            "autofix_class": "manual",
+            "owner": "downstream-resolver",
+            "requires_verification": true,
+            "pre_existing": false,
+            "first_evidence": "src/A.js:1 x"
+          },
+          {
+            "title": "unconfirmed candidate",
+            "severity": "P1",
+            "file": "src/a.js",
+            "line": 1,
+            "confidence": 75,
+            "autofix_class": "manual",
+            "owner": "downstream-resolver",
+            "requires_verification": true,
+            "pre_existing": false,
+            "first_evidence": "src/A.js:1 x"
+          }
+        ],
+        "residual_risks": [],
+        "testing_gaps": []
+      }
+    ],
+    "exit_code": 0,
+    "stdout": {
+      "findings": [
+        {
+          "#": 1,
+          "autofix_class": "manual",
+          "confidence": 75,
+          "file": "src/A.js",
+          "first_evidence": "src/A.js:1 x",
+          "independent_reviewers": [
+            "correctness"
+          ],
+          "line": 1,
+          "owner": "downstream-resolver",
+          "pre_existing": false,
+          "requires_verification": true,
+          "reviewers": [
+            "correctness"
+          ],
+          "severity": "P1",
+          "title": "unconfirmed candidate"
+        }
+      ],
+      "first_evidence_backfilled": 0,
+      "malformed_findings": 0,
+      "malformed_returns": 0,
+      "pre_existing_findings": [],
+      "residual_risks": [],
+      "status": "complete",
+      "suppressed_by_confidence": {},
+      "suppressed_findings": [],
+      "testing_gaps": []
+    },
+    "stderr": ""
+  },
+  "r2-judge-unfixed-tenant": {
+    "setup": [
+      {
+        "argv": [
+          "git",
+          "init",
+          "-q"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "git",
+          "config",
+          "user.name",
+          "Audit fixture"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "git",
+          "config",
+          "user.email",
+          "audit@example.invalid"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "git",
+          "config",
+          "core.hooksPath",
+          "/dev/null"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "git",
+          "config",
+          "commit.gpgsign",
+          "false"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "bash",
+          "prepare-review-fixture.sh"
+        ],
+        "exit_code": 0,
+        "stdout": "[main (root-commit) 0037613] test: establish review baseline\n 6 files changed, 70 insertions(+)\n create mode 100644 AGENTS.md\n create mode 100644 package.json\n create mode 100755 prepare-review-fixture.sh\n create mode 100644 src/orders.js\n create mode 100644 tenant-bypass.patch\n create mode 100644 test/orders.test.js\n",
+        "stderr": ""
+      }
+    ],
+    "judge": {
+      "argv": [
+        "bash",
+        "/Users/kuang/xiaobu/spec-first/skills/spec-code-review/evals/fixtures/scripts/check-r2-preset-applied-fix.sh"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "actual_test": {
+      "argv": [
+        "node",
+        "--test",
+        "test/orders.test.js"
+      ],
+      "exit_code": 1,
+      "stdout": "TAP version 13\n# Subtest: 只返回当前租户的订单\nnot ok 1 - 只返回当前租户的订单\n  ---\n  duration_ms: 1.354417\n  type: 'test'\n  location: '/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-review-judge-probe-j_ws8tor/test/orders.test.js:7:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly equal:\n    + actual - expected\n    \n    + {\n    +   id: 'o-1',\n    +   tenantId: 'tenant-b'\n    + }\n    - null\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: ~\n  actual:\n    id: 'o-1'\n    tenantId: 'tenant-b'\n  operator: 'strictEqual'\n  stack: |-\n    TestContext.<anonymous> (/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-review-judge-probe-j_ws8tor/test/orders.test.js:9:10)\n    Test.runInAsyncScope (node:async_hooks:214:14)\n    Test.run (node:internal/test_runner/test:1047:25)\n    Test.start (node:internal/test_runner/test:944:17)\n    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)\n  ...\n1..1\n# tests 1\n# suites 0\n# pass 0\n# fail 1\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 65.985959\n",
+      "stderr": ""
+    }
+  }
+}

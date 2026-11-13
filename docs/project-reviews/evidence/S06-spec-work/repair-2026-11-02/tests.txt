@@ -1,0 +1,11 @@
+PASS tests/unit/spec-work-run-artifact-contract.test.js
+PASS tests/unit/spec-work-shipping-contracts.test.js
+PASS tests/unit/spec-work-contracts.test.js
+PASS tests/unit/spec-work-front-controller-contracts.test.js
+PASS tests/unit/spec-work-execution-strategy-contracts.test.js
+
+Test Suites: 5 passed, 5 total
+Tests:       61 passed, 61 total
+Snapshots:   0 total
+Time:        0.139 s, estimated 1 s
+Ran all test suites within paths "tests/unit/spec-work-front-controller-contracts.test.js", "tests/unit/spec-work-shipping-contracts.test.js", "tests/unit/spec-work-contracts.test.js", "tests/unit/spec-work-execution-strategy-contracts.test.js", "tests/unit/spec-work-run-artifact-contract.test.js".

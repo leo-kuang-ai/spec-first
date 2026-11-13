@@ -1,0 +1,11 @@
+# sentinel snapshot 2026-11-12T10:11:04+0800
+FILE /Users/kuang/.claude/settings.json 49e66812b512ad114e93f4d6e784d56f21dd5dbad42ecebdc95c296b689763a4
+  mtime=2026-11-12T09:42:37 size=9665
+FILE /Users/kuang/.claude/settings.local.json <absent>
+FILE /Users/kuang/.claude.json 20512b74b71270c33d2774f34cb91eaecb75056f428f4fe6a65f97d5cd63687e
+  mtime=2026-11-12T10:10:29 size=137200
+SF .spec-first/.developer 2652abea86a146e9f24d367a1c54bfb99fdec6476b49a6fbdbc8fe6b0579d288
+SF .spec-first/version-reminder.json 0d392c96dbb0c266df06f414fccf3319f618ad8c994cc692216d99537d8b449a
+SF .spec-first/workspace/init-summary-claude.json b5fa183cc90e1a61091033ca61ad430eb5f097a98f6d1f88f4bb5fc0772ea047
+SF .spec-first/workspace/init-summary-codex.json b41dffbb1f98ecccd7856a7d674e22c5cb5c90faa98d11c4616b4704eddd9f76
+SF .spec-first/workspace/init-summary.json 77bff1da8ff4e7d82786970d0df54a3adf58e1f64ba4b6d6e2323cd293e4d1f8

@@ -1,0 +1,541 @@
+{
+  "schema_version": "spec-runtime-setup-preflight.v2",
+  "generated_at": "2026-11-01T08:22:37.887Z",
+  "target": {
+    "schema_version": "project-target.v2",
+    "mode": "git-repo",
+    "repo_status": "git-repo",
+    "target_kind": "git-repo",
+    "selection_source": "cwd-git-root",
+    "state_write_allowed": true,
+    "invocation_cwd": "/private/tmp/s00-det.LSlX/proj",
+    "workspace_root": "/private/tmp/s00-det.LSlX/proj",
+    "selected_repo_root": "/private/tmp/s00-det.LSlX/proj",
+    "selected_folder_root": null,
+    "target_root": "/private/tmp/s00-det.LSlX/proj",
+    "artifact_root": "/private/tmp/s00-det.LSlX/proj",
+    "runtime_projection_root": "/private/tmp/s00-det.LSlX/proj",
+    "enclosing_git_root": "/private/tmp/s00-det.LSlX/proj",
+    "repo_label": "proj",
+    "folder_label": "",
+    "candidates": [],
+    "git_health": {
+      "status": "ok",
+      "reason_code": "git-ok",
+      "git_entry_type": "directory",
+      "root": "/private/tmp/s00-det.LSlX/proj",
+      "diagnostic": null
+    },
+    "reason_code": "",
+    "next_action": ""
+  },
+  "host": {
+    "status": "advisory",
+    "host": null,
+    "candidates": [],
+    "authority_source": null,
+    "mutation_authorized": false,
+    "reason_code": "host-undetermined-advisory"
+  },
+  "mcp_servers": [
+    {
+      "id": "codegraph",
+      "kind": "mcp",
+      "required": false,
+      "setup_required": true,
+      "baseline_blocking": false,
+      "dependency_status": "ready",
+      "configured_status": "not-checked",
+      "result": "unknown",
+      "reason_code": "host-config-not-verified",
+      "next_action": "",
+      "config_path": null,
+      "config_key": null,
+      "conflict_fields": []
+    },
+    {
+      "id": "context7",
+      "kind": "mcp",
+      "required": true,
+      "setup_required": false,
+      "baseline_blocking": true,
+      "dependency_status": "ready",
+      "configured_status": "not-checked",
+      "result": "unknown",
+      "reason_code": "host-config-not-verified",
+      "next_action": "",
+      "config_path": null,
+      "config_key": null,
+      "conflict_fields": []
+    },
+    {
+      "id": "sequential-thinking",
+      "kind": "mcp",
+      "required": true,
+      "setup_required": false,
+      "baseline_blocking": true,
+      "dependency_status": "ready",
+      "configured_status": "not-checked",
+      "result": "unknown",
+      "reason_code": "host-config-not-verified",
+      "next_action": "",
+      "config_path": null,
+      "config_key": null,
+      "conflict_fields": []
+    }
+  ],
+  "tools": [
+    {
+      "id": "agent-browser",
+      "kind": "browser-helper",
+      "status": "skipped",
+      "verified": true,
+      "source": "read-only-probe",
+      "reason_code": "agent-browser-manual-setup-incomplete",
+      "configured_status": "not-applicable",
+      "dependency_status": "ready",
+      "execution_readiness": "blocked",
+      "conformance_status": "failed",
+      "repair_scope": "dependency",
+      "next_action": "运行 `spec-runtime-setup` 查看当前 agent-browser 安装命令；需要 browser automation 时再手动安装",
+      "profile": "recommended",
+      "required": false,
+      "baseline_blocking": false,
+      "host_config_status": "not-applicable",
+      "project_status": "not-applicable",
+      "allowed": "not-applicable",
+      "result": "skipped",
+      "install_command": "CI=true npm install -g agent-browser@latest --no-audit --no-fund --loglevel=error && agent-browser install && npx -y skills@latest add https://github.com/vercel-labs/agent-browser --skill agent-browser -g -y",
+      "url": "https://github.com/vercel-labs/agent-browser"
+    },
+    {
+      "id": "ast-grep",
+      "kind": "cli",
+      "status": "ready",
+      "verified": true,
+      "source": "read-only-probe",
+      "reason_code": "ready",
+      "configured_status": "not-applicable",
+      "next_action": "",
+      "profile": "minimal",
+      "required": false,
+      "baseline_blocking": false,
+      "dependency_status": "ready",
+      "host_config_status": "not-applicable",
+      "project_status": "not-applicable",
+      "allowed": "not-applicable",
+      "result": "ready",
+      "install_command": "brew install ast-grep",
+      "url": "https://ast-grep.github.io"
+    },
+    {
+      "id": "ffmpeg",
+      "kind": "cli",
+      "status": "ready",
+      "verified": true,
+      "source": "read-only-probe",
+      "reason_code": "ready",
+      "configured_status": "not-applicable",
+      "next_action": "",
+      "profile": "recommended",
+      "required": false,
+      "baseline_blocking": false,
+      "dependency_status": "ready",
+      "host_config_status": "not-applicable",
+      "project_status": "not-applicable",
+      "allowed": "not-applicable",
+      "result": "ready",
+      "install_command": "brew install ffmpeg",
+      "url": "https://ffmpeg.org/download.html"
+    },
+    {
+      "id": "gh",
+      "kind": "cli",
+      "status": "ready",
+      "verified": true,
+      "source": "read-only-probe",
+      "reason_code": "ready",
+      "configured_status": "not-applicable",
+      "next_action": "",
+      "profile": "minimal",
+      "required": false,
+      "baseline_blocking": false,
+      "dependency_status": "ready",
+      "host_config_status": "not-applicable",
+      "project_status": "not-applicable",
+      "allowed": "not-applicable",
+      "result": "ready",
+      "install_command": "brew install gh",
+      "url": "https://cli.github.com"
+    },
+    {
+      "id": "silicon",
+      "kind": "cli",
+      "status": "ready",
+      "verified": true,
+      "source": "read-only-probe",
+      "reason_code": "ready",
+      "configured_status": "not-applicable",
+      "next_action": "",
+      "profile": "recommended",
+      "required": false,
+      "baseline_blocking": false,
+      "dependency_status": "ready",
+      "host_config_status": "not-applicable",
+      "project_status": "not-applicable",
+      "allowed": "not-applicable",
+      "result": "ready",
+      "install_command": "brew install silicon",
+      "url": "https://github.com/Aloxaf/silicon"
+    },
+    {
+      "id": "vhs",
+      "kind": "cli",
+      "status": "ready",
+      "verified": true,
+      "source": "read-only-probe",
+      "reason_code": "ready",
+      "configured_status": "not-applicable",
+      "next_action": "",
+      "profile": "recommended",
+      "required": false,
+      "baseline_blocking": false,
+      "dependency_status": "ready",
+      "host_config_status": "not-applicable",
+      "project_status": "not-applicable",
+      "allowed": "not-applicable",
+      "result": "ready",
+      "install_command": "brew install vhs",
+      "url": "https://github.com/charmbracelet/vhs"
+    }
+  ],
+  "skills": [
+    {
+      "id": "ast-grep-skill",
+      "kind": "global-skill",
+      "status": "missing",
+      "verified": true,
+      "source": "read-only-probe",
+      "reason_code": "optional-capability-degraded",
+      "configured_status": "not-applicable",
+      "next_action": "npx -y skills@latest add ast-grep/agent-skill -g -y",
+      "profile": "minimal",
+      "required": false,
+      "baseline_blocking": false,
+      "dependency_status": "missing",
+      "host_config_status": "not-applicable",
+      "project_status": "not-applicable",
+      "allowed": "not-applicable",
+      "result": "degraded",
+      "install_command": "npx -y skills@latest add ast-grep/agent-skill -g -y",
+      "url": "https://ast-grep.github.io",
+      "skill_name": "ast-grep"
+    }
+  ],
+  "project": {
+    "inside_git_repo": true,
+    "local_config_status": "defaults-active",
+    "local_config_gitignore_status": "missing",
+    "example_config_status": "missing"
+  },
+  "legacy": {
+    "legacy_markdown_status": "missing",
+    "legacy_local_config_status": "retired"
+  },
+  "runtime": {
+    "schema_version": "spec-runtime-setup-diagnostic-snapshot.v1",
+    "setup_facts_status": "missing",
+    "setup_facts_reason_code": "setup-facts-missing",
+    "setup_facts_path": "/private/tmp/s00-det.LSlX/proj/.spec-first/config/tool-facts.json",
+    "runtime_capabilities_status": "missing",
+    "runtime_capabilities_reason_code": "runtime-capabilities-missing",
+    "runtime_capabilities_path": "/private/tmp/s00-det.LSlX/proj/.spec-first/config/runtime-capabilities.json",
+    "generated_at": null,
+    "generated_runtime_manifest": {
+      "status": "unknown",
+      "reason_code": "runtime-capabilities-missing",
+      "next_action": "spec-runtime-setup --verify-only"
+    },
+    "baseline_ready": null,
+    "host_runtime_ready": null,
+    "provider_readiness": [
+      {
+        "schema_version": "provider-readiness.v2",
+        "readiness_scope": "installation",
+        "provider": "codegraph",
+        "kind": "code-structure",
+        "profile": "minimal",
+        "readiness_status": "unknown",
+        "lifecycle": {
+          "installed": true,
+          "configured": false,
+          "initialized": false,
+          "indexed": false,
+          "server_reachable": false,
+          "artifact_exists": false,
+          "query_verified": false,
+          "fallback_used": false
+        },
+        "repo_aligned": "unknown",
+        "capabilities": [
+          "code-graph",
+          "impact-candidates",
+          "affected-tests-candidates"
+        ],
+        "limitations": [
+          "Provider candidate 仅为 advisory，必须通过 source、test、log、contract 或 owner evidence 确认。"
+        ],
+        "source_read_required": true,
+        "fallback": {
+          "available": true,
+          "methods": [
+            "rg",
+            "ast-grep",
+            "direct-source-read"
+          ],
+          "reason_code": "code-graph-provider-unavailable"
+        },
+        "next_actions": [],
+        "native_interfaces": [
+          "mcp",
+          "cli"
+        ],
+        "first_generation": {
+          "owner": "runtime-setup",
+          "status": "not-run",
+          "scope": "project",
+          "requires_explicit_gate": false,
+          "requirement_workspace_path": null,
+          "artifact_root": ".codegraph",
+          "artifact_refs": [],
+          "next_action": null
+        },
+        "steady_state": {
+          "refresh_owner": "provider-native",
+          "refresh_mode": "watcher",
+          "hook_default": false,
+          "usage_owner": "downstream-skill",
+          "hook_installed": false,
+          "hook_verified": false,
+          "hook_status": "unknown",
+          "hook_skipped_reason": null
+        },
+        "usage_note": "使用 CodeGraph MCP 工具获取 impact/call graph candidate。`codegraph serve --mcp` 只为 server 默认项目提供 provider-native watcher；从非 Git parent 打开的其他 `projectPath` 子仓由 spec-first workspace hook 执行 bounded `codegraph sync`。结论需由 source/test/log/contract/user evidence 确认。",
+        "provider_identity": {
+          "package": "@colbymchenry/codegraph",
+          "version": "1.6.0",
+          "installer": "npm",
+          "command": "/opt/homebrew/lib/node_modules/@colbymchenry/codegraph/node_modules/@colbymchenry/codegraph-darwin-arm64/bin/codegraph",
+          "inventory_sha256": "84c58510e0a199d13a0476d15949d0a8ade7dee8b82de0b4010c6811ef9bd4d0"
+        }
+      },
+      {
+        "schema_version": "provider-readiness.v2",
+        "readiness_scope": "installation",
+        "provider": "graphify",
+        "kind": "project-graph",
+        "profile": "minimal",
+        "readiness_status": "not-run",
+        "lifecycle": {
+          "installed": false,
+          "configured": false,
+          "initialized": false,
+          "indexed": false,
+          "server_reachable": false,
+          "artifact_exists": false,
+          "query_verified": false,
+          "fallback_used": false
+        },
+        "repo_aligned": "unknown",
+        "capabilities": [
+          "project-graph"
+        ],
+        "limitations": [
+          "Provider candidate 仅为 advisory，必须通过 source、test、log、contract 或 owner evidence 确认。"
+        ],
+        "source_read_required": true,
+        "fallback": {
+          "available": true,
+          "methods": [
+            "docs",
+            "rg",
+            "direct-source-read"
+          ],
+          "reason_code": "project-graph-provider-unavailable"
+        },
+        "next_actions": [
+          "运行显式 installation-only setup 安装 Graphify。"
+        ],
+        "native_interfaces": [
+          "cli"
+        ],
+        "first_generation": {
+          "owner": "runtime-setup",
+          "status": "not-run",
+          "scope": "project",
+          "requires_explicit_gate": false,
+          "requirement_workspace_path": null,
+          "artifact_root": "graphify-out",
+          "artifact_refs": [],
+          "next_action": null
+        },
+        "steady_state": {
+          "refresh_owner": "provider-native",
+          "refresh_mode": "skill-cli-hook-on-demand",
+          "hook_default": true,
+          "usage_owner": "downstream-skill",
+          "hook_installed": false,
+          "hook_verified": false,
+          "hook_status": "unknown",
+          "hook_skipped_reason": null
+        },
+        "usage_note": "使用 Graphify query/path/explain 获取 project-graph candidate，再通过 source、test、log、contract 或 owner evidence 确认结论。"
+      }
+    ],
+    "configured_dependencies": []
+  },
+  "generated_runtime_manifest": {
+    "status": "unknown",
+    "reason_code": "runtime-capabilities-missing",
+    "next_action": "spec-runtime-setup --verify-only"
+  },
+  "provider_readiness": [
+    {
+      "schema_version": "provider-readiness.v2",
+      "readiness_scope": "installation",
+      "provider": "codegraph",
+      "kind": "code-structure",
+      "profile": "minimal",
+      "readiness_status": "unknown",
+      "lifecycle": {
+        "installed": true,
+        "configured": false,
+        "initialized": false,
+        "indexed": false,
+        "server_reachable": false,
+        "artifact_exists": false,
+        "query_verified": false,
+        "fallback_used": false
+      },
+      "repo_aligned": "unknown",
+      "capabilities": [
+        "code-graph",
+        "impact-candidates",
+        "affected-tests-candidates"
+      ],
+      "limitations": [
+        "Provider candidate 仅为 advisory，必须通过 source、test、log、contract 或 owner evidence 确认。"
+      ],
+      "source_read_required": true,
+      "fallback": {
+        "available": true,
+        "methods": [
+          "rg",
+          "ast-grep",
+          "direct-source-read"
+        ],
+        "reason_code": "code-graph-provider-unavailable"
+      },
+      "next_actions": [],
+      "native_interfaces": [
+        "mcp",
+        "cli"
+      ],
+      "first_generation": {
+        "owner": "runtime-setup",
+        "status": "not-run",
+        "scope": "project",
+        "requires_explicit_gate": false,
+        "requirement_workspace_path": null,
+        "artifact_root": ".codegraph",
+        "artifact_refs": [],
+        "next_action": null
+      },
+      "steady_state": {
+        "refresh_owner": "provider-native",
+        "refresh_mode": "watcher",
+        "hook_default": false,
+        "usage_owner": "downstream-skill",
+        "hook_installed": false,
+        "hook_verified": false,
+        "hook_status": "unknown",
+        "hook_skipped_reason": null
+      },
+      "usage_note": "使用 CodeGraph MCP 工具获取 impact/call graph candidate。`codegraph serve --mcp` 只为 server 默认项目提供 provider-native watcher；从非 Git parent 打开的其他 `projectPath` 子仓由 spec-first workspace hook 执行 bounded `codegraph sync`。结论需由 source/test/log/contract/user evidence 确认。",
+      "provider_identity": {
+        "package": "@colbymchenry/codegraph",
+        "version": "1.6.0",
+        "installer": "npm",
+        "command": "/opt/homebrew/lib/node_modules/@colbymchenry/codegraph/node_modules/@colbymchenry/codegraph-darwin-arm64/bin/codegraph",
+        "inventory_sha256": "84c58510e0a199d13a0476d15949d0a8ade7dee8b82de0b4010c6811ef9bd4d0"
+      }
+    },
+    {
+      "schema_version": "provider-readiness.v2",
+      "readiness_scope": "installation",
+      "provider": "graphify",
+      "kind": "project-graph",
+      "profile": "minimal",
+      "readiness_status": "not-run",
+      "lifecycle": {
+        "installed": false,
+        "configured": false,
+        "initialized": false,
+        "indexed": false,
+        "server_reachable": false,
+        "artifact_exists": false,
+        "query_verified": false,
+        "fallback_used": false
+      },
+      "repo_aligned": "unknown",
+      "capabilities": [
+        "project-graph"
+      ],
+      "limitations": [
+        "Provider candidate 仅为 advisory，必须通过 source、test、log、contract 或 owner evidence 确认。"
+      ],
+      "source_read_required": true,
+      "fallback": {
+        "available": true,
+        "methods": [
+          "docs",
+          "rg",
+          "direct-source-read"
+        ],
+        "reason_code": "project-graph-provider-unavailable"
+      },
+      "next_actions": [
+        "运行显式 installation-only setup 安装 Graphify。"
+      ],
+      "native_interfaces": [
+        "cli"
+      ],
+      "first_generation": {
+        "owner": "runtime-setup",
+        "status": "not-run",
+        "scope": "project",
+        "requires_explicit_gate": false,
+        "requirement_workspace_path": null,
+        "artifact_root": "graphify-out",
+        "artifact_refs": [],
+        "next_action": null
+      },
+      "steady_state": {
+        "refresh_owner": "provider-native",
+        "refresh_mode": "skill-cli-hook-on-demand",
+        "hook_default": true,
+        "usage_owner": "downstream-skill",
+        "hook_installed": false,
+        "hook_verified": false,
+        "hook_status": "unknown",
+        "hook_skipped_reason": null
+      },
+      "usage_note": "使用 Graphify query/path/explain 获取 project-graph candidate，再通过 source、test、log、contract 或 owner evidence 确认结论。"
+    }
+  ],
+  "configured_dependencies": [],
+  "next_actions": [
+    "运行 spec-runtime-setup --project-config，预览并写入项目本地设置。",
+    "运行标准 spec-runtime-setup，完成 required baseline、CodeGraph 与 Graphify setup；仅需只读复核时使用 --verify-only。"
+  ]
+}

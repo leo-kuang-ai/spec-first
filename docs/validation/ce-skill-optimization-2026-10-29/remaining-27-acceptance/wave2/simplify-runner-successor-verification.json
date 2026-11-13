@@ -1,0 +1,141 @@
+{
+  "at": "2026-10-31T05:27:17.692051+00:00",
+  "runner_sha256": "0f6f85fd2d55821e42e6f2fdbaa0b6b928738159353a6722000ff5d4cbe55850",
+  "method": "Exact runner source with only disposable base path substituted; positive unchanged fixture and self-modifying production negative control. No original trial rerun or evidence overwrite.",
+  "cases": [
+    {
+      "case": "positive",
+      "result": {
+        "trial": "CEOPT-26-A1",
+        "recorded_at": "2026-10-31T05:27:17.432346+00:00",
+        "no_change_proposal": false,
+        "candidate_sha256": "60fcede431e7da0426edd494e69a0680e4f6b3dd786e373d942872ce7a4c0716",
+        "syntax": {
+          "argv": [
+            "node",
+            "--check",
+            "src/server.js"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "timed_out": false
+        },
+        "proof": {
+          "argv": [
+            "node",
+            "--test",
+            "test/entries.test.cjs"
+          ],
+          "exit_code": 0,
+          "stdout": "TAP version 13\n# Subtest: invalid entries are rejected and valid entries survive without a server crash\nok 1 - invalid entries are rejected and valid entries survive without a server crash\n  ---\n  duration_ms: 95.137458\n  type: 'test'\n  ...\n1..1\n# tests 1\n# suites 0\n# pass 1\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 145.324292\n",
+          "stderr": "",
+          "timed_out": false
+        },
+        "protected_before": {
+          "prepare-eval.cjs": "0bb64e398f2c01fdbad21c92d0e3a3223d73b245e58118a4505f43794af1a69b",
+          "README.md": "4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855",
+          "package.json": "966fdf6bda7b2bf2bd70b9c42ddcbd4f2411804e4a22de7ff0ef161db16ddcad",
+          "test/entries.test.cjs": "04bc52452e6a611d0609d28002ea50937126dcf5466e5a40c22727c6726623cf",
+          "test/support/ledger-proof.cjs": "621f7beb407ab683a34577ab28393256b3736ef4f9c4cc2601ed1785a2169c05"
+        },
+        "protected_after": {
+          "prepare-eval.cjs": "0bb64e398f2c01fdbad21c92d0e3a3223d73b245e58118a4505f43794af1a69b",
+          "README.md": "4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855",
+          "package.json": "966fdf6bda7b2bf2bd70b9c42ddcbd4f2411804e4a22de7ff0ef161db16ddcad",
+          "test/entries.test.cjs": "04bc52452e6a611d0609d28002ea50937126dcf5466e5a40c22727c6726623cf",
+          "test/support/ledger-proof.cjs": "621f7beb407ab683a34577ab28393256b3736ef4f9c4cc2601ed1785a2169c05"
+        },
+        "protected_files_preserved": true,
+        "production_before_sha256": "60fcede431e7da0426edd494e69a0680e4f6b3dd786e373d942872ce7a4c0716",
+        "production_after_sha256": "60fcede431e7da0426edd494e69a0680e4f6b3dd786e373d942872ce7a4c0716",
+        "production_source_preserved": true,
+        "passed": true,
+        "parent_intervention": "Exact JSON candidate extracted after manual admission; fixed unchanged HTTP proof run in disposable storage. No model commands executed or candidate repairs applied.",
+        "limitations": [
+          "Parent execution does not prove autonomous mutation.",
+          "Fixture HTTP proof does not establish all behavioral equivalence; source review remains required."
+        ],
+        "cleanup": {
+          "root": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-simplify-exec-5zzwq_vu",
+          "removed": true
+        }
+      },
+      "stdout": "CEOPT-26-A1 True\n",
+      "stderr": ""
+    },
+    {
+      "case": "production-self-mutation",
+      "result": {
+        "trial": "CEOPT-26-A1",
+        "recorded_at": "2026-10-31T05:27:17.686436+00:00",
+        "no_change_proposal": false,
+        "candidate_sha256": "644c138b49120b4934799e9c0e34553a436b286321b51b4eb8c45ebb971d61a8",
+        "syntax": {
+          "argv": [
+            "node",
+            "--check",
+            "src/server.js"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "timed_out": false
+        },
+        "proof": {
+          "argv": [
+            "node",
+            "--test",
+            "test/entries.test.cjs"
+          ],
+          "exit_code": 0,
+          "stdout": "TAP version 13\n# Subtest: invalid entries are rejected and valid entries survive without a server crash\nok 1 - invalid entries are rejected and valid entries survive without a server crash\n  ---\n  duration_ms: 94.611042\n  type: 'test'\n  ...\n1..1\n# tests 1\n# suites 0\n# pass 1\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 144.126709\n",
+          "stderr": "",
+          "timed_out": false
+        },
+        "protected_before": {
+          "prepare-eval.cjs": "0bb64e398f2c01fdbad21c92d0e3a3223d73b245e58118a4505f43794af1a69b",
+          "README.md": "4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855",
+          "package.json": "966fdf6bda7b2bf2bd70b9c42ddcbd4f2411804e4a22de7ff0ef161db16ddcad",
+          "test/entries.test.cjs": "04bc52452e6a611d0609d28002ea50937126dcf5466e5a40c22727c6726623cf",
+          "test/support/ledger-proof.cjs": "621f7beb407ab683a34577ab28393256b3736ef4f9c4cc2601ed1785a2169c05"
+        },
+        "protected_after": {
+          "prepare-eval.cjs": "0bb64e398f2c01fdbad21c92d0e3a3223d73b245e58118a4505f43794af1a69b",
+          "README.md": "4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855",
+          "package.json": "966fdf6bda7b2bf2bd70b9c42ddcbd4f2411804e4a22de7ff0ef161db16ddcad",
+          "test/entries.test.cjs": "04bc52452e6a611d0609d28002ea50937126dcf5466e5a40c22727c6726623cf",
+          "test/support/ledger-proof.cjs": "621f7beb407ab683a34577ab28393256b3736ef4f9c4cc2601ed1785a2169c05"
+        },
+        "protected_files_preserved": true,
+        "production_before_sha256": "644c138b49120b4934799e9c0e34553a436b286321b51b4eb8c45ebb971d61a8",
+        "production_after_sha256": "54ddc346a57a7386bc3be2a592a391b6d98526affd6614b0b9c92e419fdba56b",
+        "production_source_preserved": false,
+        "passed": false,
+        "parent_intervention": "Exact JSON candidate extracted after manual admission; fixed unchanged HTTP proof run in disposable storage. No model commands executed or candidate repairs applied.",
+        "limitations": [
+          "Parent execution does not prove autonomous mutation.",
+          "Fixture HTTP proof does not establish all behavioral equivalence; source review remains required."
+        ],
+        "cleanup": {
+          "root": "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce27-simplify-exec-_634_rn6",
+          "removed": true
+        }
+      },
+      "stdout": "CEOPT-26-A1 False\n",
+      "stderr": ""
+    }
+  ],
+  "harness_root_removed": true,
+  "limitations": [
+    "Local runner check, not a model or skill behavior trial."
+  ],
+  "runner_revision": {
+    "at": "2026-10-31T05:24:55.634745+00:00",
+    "prior_runner_sha256": "9390cfc0676bc499e3699fc6fbc32a794bb8c7f5cc0754d591e1a39dfb32cdc5",
+    "prior_runner_ref": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030/execute-simplify-proposal-reviewed.py",
+    "updated_runner_sha256": "0f6f85fd2d55821e42e6f2fdbaa0b6b928738159353a6722000ff5d4cbe55850",
+    "fix": "Record and compare production source identity after proof execution, not only protected supporting assets.",
+    "past_trial_disposition": "Six original execution results retain the reviewed old runner and its final-production-identity limitation; no retroactive hash observation or rerun is claimed."
+  }
+}

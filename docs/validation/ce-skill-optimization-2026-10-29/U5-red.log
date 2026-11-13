@@ -1,0 +1,228 @@
+FAIL tests/unit/target-repo-containment.test.js
+  ● target repo containment helpers › rejects dangling ancestors and leaf links while allowing future nested files
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 0
+    Received:   0
+
+      25 |       fs.symlinkSync(path.join(outside, 'missing'), path.join(repo, 'dangling'), 'dir');
+      26 |       fs.symlinkSync(path.join(outside, 'missing.txt'), path.join(repo, 'leaf.txt'));
+    > 27 |       expect(validateOutputContainment(repo, path.join(repo, 'dangling/new/file.txt')).errors.length).toBeGreaterThan(0);
+         |                                                                                                       ^
+      28 |       expect(validateOutputContainment(repo, path.join(repo, 'leaf.txt')).errors.length).toBeGreaterThan(0);
+      29 |       expect(validateOutputContainment(repo, path.join(outside, 'escaped.txt')).errors.length).toBeGreaterThan(0);
+      30 |       expect(validateOutputContainment(repo, path.join(repo, 'future/nested/file.txt')).errors).toEqual([]);
+
+      at Object.toBeGreaterThan (tests/unit/target-repo-containment.test.js:27:103)
+
+FAIL tests/unit/task-pack-command.test.js
+  ● spec-first tasks command › rejects existing task paths that traverse a symlink
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      79 |       const taskPath = writeTaskPack(tempRoot, computeSourcePlanHash(planPath).hash, [file]);
+      80 |       const result = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+    > 81 |       expect(result.status).toBe(1);
+         |                             ^
+      82 |       expect(JSON.parse(result.stdout).deterministic_handoff).toBe(false);
+      83 |       expect(fs.readdirSync(outside)).toEqual(['existing.js']);
+      84 |       expect(fs.readFileSync(path.join(outside, 'existing.js'), 'utf8')).toBe('sentinel');
+
+      at toBe (tests/unit/task-pack-command.test.js:81:29)
+
+  ● spec-first tasks command › rejects future task paths that traverse a symlink
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      79 |       const taskPath = writeTaskPack(tempRoot, computeSourcePlanHash(planPath).hash, [file]);
+      80 |       const result = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+    > 81 |       expect(result.status).toBe(1);
+         |                             ^
+      82 |       expect(JSON.parse(result.stdout).deterministic_handoff).toBe(false);
+      83 |       expect(fs.readdirSync(outside)).toEqual(['existing.js']);
+      84 |       expect(fs.readFileSync(path.join(outside, 'existing.js'), 'utf8')).toBe('sentinel');
+
+      at toBe (tests/unit/task-pack-command.test.js:81:29)
+
+  ● spec-first tasks command › rejects dangling task paths that traverse a symlink
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      79 |       const taskPath = writeTaskPack(tempRoot, computeSourcePlanHash(planPath).hash, [file]);
+      80 |       const result = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+    > 81 |       expect(result.status).toBe(1);
+         |                             ^
+      82 |       expect(JSON.parse(result.stdout).deterministic_handoff).toBe(false);
+      83 |       expect(fs.readdirSync(outside)).toEqual(['existing.js']);
+      84 |       expect(fs.readFileSync(path.join(outside, 'existing.js'), 'utf8')).toBe('sentinel');
+
+      at toBe (tests/unit/task-pack-command.test.js:81:29)
+
+  ● spec-first tasks command › rejects leaf task paths that traverse a symlink
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      79 |       const taskPath = writeTaskPack(tempRoot, computeSourcePlanHash(planPath).hash, [file]);
+      80 |       const result = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+    > 81 |       expect(result.status).toBe(1);
+         |                             ^
+      82 |       expect(JSON.parse(result.stdout).deterministic_handoff).toBe(false);
+      83 |       expect(fs.readdirSync(outside)).toEqual(['existing.js']);
+      84 |       expect(fs.readFileSync(path.join(outside, 'existing.js'), 'utf8')).toBe('sentinel');
+
+      at toBe (tests/unit/task-pack-command.test.js:81:29)
+
+  ● spec-first tasks command › rejects Git metadata or generated runtime: .git/config
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      89 |     const taskPath = writeTaskPack(tempRoot, computeSourcePlanHash(planPath).hash, [file]);
+      90 |     const result = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+    > 91 |     expect(result.status).toBe(1);
+         |                           ^
+      92 |     expect(JSON.parse(result.stdout).deterministic_handoff).toBe(false);
+      93 |   });
+      94 |
+
+      at toBe (tests/unit/task-pack-command.test.js:91:27)
+
+  ● spec-first tasks command › rejects Git metadata or generated runtime: .opencode/skills/example/SKILL.md
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      89 |     const taskPath = writeTaskPack(tempRoot, computeSourcePlanHash(planPath).hash, [file]);
+      90 |     const result = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+    > 91 |     expect(result.status).toBe(1);
+         |                           ^
+      92 |     expect(JSON.parse(result.stdout).deterministic_handoff).toBe(false);
+      93 |   });
+      94 |
+
+      at toBe (tests/unit/task-pack-command.test.js:91:27)
+
+  ● spec-first tasks command › rejects Git metadata or generated runtime: .opencode/commands/spec-work.md
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      89 |     const taskPath = writeTaskPack(tempRoot, computeSourcePlanHash(planPath).hash, [file]);
+      90 |     const result = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+    > 91 |     expect(result.status).toBe(1);
+         |                           ^
+      92 |     expect(JSON.parse(result.stdout).deterministic_handoff).toBe(false);
+      93 |   });
+      94 |
+
+      at toBe (tests/unit/task-pack-command.test.js:91:27)
+
+  ● spec-first tasks command › rejects Git metadata or generated runtime: opencode.jsonc
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      89 |     const taskPath = writeTaskPack(tempRoot, computeSourcePlanHash(planPath).hash, [file]);
+      90 |     const result = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+    > 91 |     expect(result.status).toBe(1);
+         |                           ^
+      92 |     expect(JSON.parse(result.stdout).deterministic_handoff).toBe(false);
+      93 |   });
+      94 |
+
+      at toBe (tests/unit/task-pack-command.test.js:91:27)
+
+  ● spec-first tasks command › rejects Git metadata or generated runtime: .zcode/spec-first/state.json
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      89 |     const taskPath = writeTaskPack(tempRoot, computeSourcePlanHash(planPath).hash, [file]);
+      90 |     const result = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+    > 91 |     expect(result.status).toBe(1);
+         |                           ^
+      92 |     expect(JSON.parse(result.stdout).deterministic_handoff).toBe(false);
+      93 |   });
+      94 |
+
+      at toBe (tests/unit/task-pack-command.test.js:91:27)
+
+  ● spec-first tasks command › rejects Git metadata or generated runtime: .zcode/hooks/session-start
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      89 |     const taskPath = writeTaskPack(tempRoot, computeSourcePlanHash(planPath).hash, [file]);
+      90 |     const result = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+    > 91 |     expect(result.status).toBe(1);
+         |                           ^
+      92 |     expect(JSON.parse(result.stdout).deterministic_handoff).toBe(false);
+      93 |   });
+      94 |
+
+      at toBe (tests/unit/task-pack-command.test.js:91:27)
+
+  ● spec-first tasks command › rejects Git metadata or generated runtime: .pi/spec-first/state.json
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      89 |     const taskPath = writeTaskPack(tempRoot, computeSourcePlanHash(planPath).hash, [file]);
+      90 |     const result = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+    > 91 |     expect(result.status).toBe(1);
+         |                           ^
+      92 |     expect(JSON.parse(result.stdout).deterministic_handoff).toBe(false);
+      93 |   });
+      94 |
+
+      at toBe (tests/unit/task-pack-command.test.js:91:27)
+
+  ● spec-first tasks command › checks task paths in the selected child repo rather than the artifact root
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      101 |       fs.symlinkSync(outside, path.join(child, 'src'), 'dir');
+      102 |       const taskPath = writeTaskPack(tempRoot, computeSourcePlanHash(planPath).hash, ['src/new.js'], { taskTargetRepo: 'child' });
+    > 103 |       expect(runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot).status).toBe(1);
+          |                                                                                                      ^
+      104 |       fs.unlinkSync(path.join(child, 'src'));
+      105 |       expect(runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot).status).toBe(0);
+      106 |     } finally { fs.rmSync(outside, { recursive: true, force: true }); }
+
+      at Object.toBe (tests/unit/task-pack-command.test.js:103:102)
+
+Test Suites: 2 failed, 2 total
+Tests:       13 failed, 20 passed, 33 total
+Snapshots:   0 total
+Time:        2.409 s
+Ran all test suites within paths "tests/unit/task-pack-command.test.js", "tests/unit/target-repo-containment.test.js".

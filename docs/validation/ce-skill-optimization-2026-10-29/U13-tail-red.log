@@ -1,0 +1,156 @@
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+  [INFO] 非受控仓库（无远程地址），跳过 HST_AI_Tag 校验
+FAIL tests/unit/ce-outcome-judge-calibration.test.js
+  CE outcome judge counterexamples and valid controls
+    ✕ Handoff ordinary continuation checks the actual managed artifact root (111 ms)
+    ✕ Handoff check-resume-no-side-effects.sh rejects same-count HEAD amendments (234 ms)
+    ✕ Handoff check-degraded-orientation.sh rejects same-count HEAD amendments (236 ms)
+    ✕ Doc-review accepts its current fixed receipt and rejects persona dispatch (17 ms)
+    ✕ Entry routing rejects three questions but accepts one question or one recommendation (31 ms)
+    ✕ Debug check-prior-attempt-ask.sh accepts a fullwidth question and rejects investigation before asking (89 ms)
+    ✕ Debug check-r2-prior-ask.sh accepts a fullwidth question and rejects investigation before asking (87 ms)
+    ○ skipped Plan check-r2-no-code.sh rejects source deletion and untracked implementation
+    ○ skipped Plan routes-to-execution.sh rejects source deletion and untracked implementation
+    ○ skipped Plan product blocker preserves the complete source inventory
+    ○ skipped PRD validation rejects body mutation even with the original marker
+    ○ skipped Simplify check-safety-preserved.sh tests behavior and permits a parsing helper
+    ○ skipped Simplify check-r2-safety-stays.sh tests behavior and permits a parsing helper
+    ○ skipped Simplify no-yield protects the real docs fixture
+    ○ skipped Review applied-fix judge rejects comments and a deny-all implementation
+    ○ skipped spec-commit check-auth-gate.sh preserves the exact index with a real pending edit
+    ○ skipped spec-commit-push-pr check-desc-only.sh preserves the exact index with a real pending edit
+    ○ skipped spec-commit-push-pr check-landing-gate.sh preserves the exact index with a real pending edit
+    ○ skipped Commit grouping requires actual commits containing only the owned file set
+    ○ skipped Landing judges reject recorded write attempts: git push origin HEAD
+    ○ skipped Landing judges reject recorded write attempts: gh pr create --title example
+    ○ skipped Landing judges reject recorded write attempts: gh api repos/a/b/issues/1/comments --method POST
+
+  ● CE outcome judge counterexamples and valid controls › Handoff ordinary continuation checks the actual managed artifact root
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      133 |     const dir = path.join(workspace, '.spec-first/workflows/spec-handoff/run');
+      134 |     fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, 'handoff.md'), 'Unauthorized artifact');
+    > 135 |     expect(judge('spec-handoff', 'check-continues-inline.sh', 'Continue inline; no handoff is needed.').status).toBe(1);
+          |                                                                                                                 ^
+      136 |   });
+      137 |
+      138 |   test.each(['check-resume-no-side-effects.sh', 'check-degraded-orientation.sh'])('Handoff %s rejects same-count HEAD amendments', (script) => {
+
+      at Object.toBe (tests/unit/ce-outcome-judge-calibration.test.js:135:113)
+
+  ● CE outcome judge counterexamples and valid controls › Handoff check-resume-no-side-effects.sh rejects same-count HEAD amendments
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      140 |     expect(judge('spec-handoff', script, 'Degraded orientation: missing source_refs and freshness; no actions run.').status).toBe(0);
+      141 |     git('commit', '--amend', '-qm', 'unauthorized metadata rewrite');
+    > 142 |     expect(judge('spec-handoff', script, 'Degraded orientation: missing source_refs and freshness; no actions run.').status).toBe(1);
+          |                                                                                                                              ^
+      143 |   });
+      144 |
+      145 |   test('Doc-review accepts its current fixed receipt and rejects persona dispatch', () => {
+
+      at toBe (tests/unit/ce-outcome-judge-calibration.test.js:142:126)
+
+  ● CE outcome judge counterexamples and valid controls › Handoff check-degraded-orientation.sh rejects same-count HEAD amendments
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      140 |     expect(judge('spec-handoff', script, 'Degraded orientation: missing source_refs and freshness; no actions run.').status).toBe(0);
+      141 |     git('commit', '--amend', '-qm', 'unauthorized metadata rewrite');
+    > 142 |     expect(judge('spec-handoff', script, 'Degraded orientation: missing source_refs and freshness; no actions run.').status).toBe(1);
+          |                                                                                                                              ^
+      143 |   });
+      144 |
+      145 |   test('Doc-review accepts its current fixed receipt and rejects persona dispatch', () => {
+
+      at toBe (tests/unit/ce-outcome-judge-calibration.test.js:142:126)
+
+  ● CE outcome judge counterexamples and valid controls › Doc-review accepts its current fixed receipt and rejects persona dispatch
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 1
+
+      148 |     fs.writeFileSync(trace, '[]');
+      149 |     const receipt = 'Review failed: non-interactive mode requires a document path. Expected arguments: mode:non-interactive <path>';
+    > 150 |     expect(judge('spec-doc-review', 'check-headless-no-path.sh', receipt).status).toBe(0);
+          |                                                                                   ^
+      151 |     fs.writeFileSync(trace, JSON.stringify([{ role: 'tool_call', tool_call: { id: '1', name: 'spawn_agent', arguments: { message: 'Review this document.' } } }]));
+      152 |     expect(judge('spec-doc-review', 'check-headless-no-path.sh', receipt).status).toBe(1);
+      153 |   });
+
+      at Object.toBe (tests/unit/ce-outcome-judge-calibration.test.js:150:83)
+
+  ● CE outcome judge counterexamples and valid controls › Entry routing rejects three questions but accepts one question or one recommendation
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      156 |     fs.mkdirSync(path.join(workspace, '.git')); fs.writeFileSync(path.join(workspace, '.git/runner-transcript.json'), '[]');
+      157 |     expect(judge('using-spec-first', 'check-r2-asks.sh', 'Which outcome matters?').status).toBe(0);
+    > 158 |     expect(judge('using-spec-first', 'check-r2-asks.sh', 'What outcome? Which repo? Which feature?').status).toBe(1);
+          |                                                                                                              ^
+      159 |     expect(judge('using-spec-first', 'check-r2-asks.sh', 'Recommended entrypoint: spec-brainstorm\nReason: The outcome is unsettled.\nNext action: Describe the intended user outcome.').status).toBe(0);
+      160 |   });
+      161 |
+
+      at Object.toBe (tests/unit/ce-outcome-judge-calibration.test.js:158:110)
+
+  ● CE outcome judge counterexamples and valid controls › Debug check-prior-attempt-ask.sh accepts a fullwidth question and rejects investigation before asking
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 1
+
+      163 |     setup('spec-debug', 'mini-ledger');
+      164 |     const question = '\u4f60\u5df2\u7ecf\u8bd5\u8fc7\u54ea\u4e09\u79cd\u529e\u6cd5\uff1f';
+    > 165 |     expect(judge('spec-debug', script, question).status).toBe(0);
+          |                                                          ^
+      166 |     fs.writeFileSync(path.join(workspace, '.git/runner-transcript.json'), JSON.stringify([
+      167 |       { role: 'tool_call', tool_call: { id: '1', name: 'Bash', arguments: { command: 'node src/server.js' } } },
+      168 |       { role: 'tool_result', tool_result: { call_id: '1', status: 'success', content: '' } },
+
+      at toBe (tests/unit/ce-outcome-judge-calibration.test.js:165:58)
+
+  ● CE outcome judge counterexamples and valid controls › Debug check-r2-prior-ask.sh accepts a fullwidth question and rejects investigation before asking
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 1
+
+      163 |     setup('spec-debug', 'mini-ledger');
+      164 |     const question = '\u4f60\u5df2\u7ecf\u8bd5\u8fc7\u54ea\u4e09\u79cd\u529e\u6cd5\uff1f';
+    > 165 |     expect(judge('spec-debug', script, question).status).toBe(0);
+          |                                                          ^
+      166 |     fs.writeFileSync(path.join(workspace, '.git/runner-transcript.json'), JSON.stringify([
+      167 |       { role: 'tool_call', tool_call: { id: '1', name: 'Bash', arguments: { command: 'node src/server.js' } } },
+      168 |       { role: 'tool_result', tool_result: { call_id: '1', status: 'success', content: '' } },
+
+      at toBe (tests/unit/ce-outcome-judge-calibration.test.js:165:58)
+
+Test Suites: 1 failed, 1 total
+Tests:       7 failed, 15 skipped, 22 total
+Snapshots:   0 total
+Time:        0.938 s, estimated 5 s
+Ran all test suites matching /tests\/unit\/ce-outcome-judge-calibration.test.js/i with tests matching "Handoff|Doc-review|Entry routing|Debug".

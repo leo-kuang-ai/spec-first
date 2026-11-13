@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="spec-code-review" tests="1" failures="0" errors="1" skipped="0" time="300.061" timestamp="2026-09-21T21:39:08+08:00">
+    <testcase name="report-only-detects-tenant-bypass" classname="spec-code-review" time="299.931">
+      <properties>
+        <property name="judge.skills.count" value="0"></property>
+      </properties>
+      <error message="agent execution failed: codex run failed: context deadline exceeded (case timeout 300s via cases.defaults.timeout_seconds)" type="ExecutionError">agent execution failed: codex run failed: context deadline exceeded (case timeout 300s via cases.defaults.timeout_seconds)</error>
+    </testcase>
+  </testsuite>
+</testsuites>

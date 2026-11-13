@@ -1,0 +1,64 @@
+{
+  "skill_name": "using-spec-first",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "model": "zhipu/glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.318"
+  },
+  "start_time": "2026-11-04T21:01:03.795856+08:00",
+  "end_time": "2026-11-04T21:02:43.329521+08:00",
+  "case_results": [
+    {
+      "case_id": "r2-low-confidence-one-question",
+      "title": "An uncertain next step allows one route-changing question or one recommendation",
+      "status": "PASS",
+      "duration_ms": 99130,
+      "turns": 5,
+      "input_tokens": 30064,
+      "output_tokens": 1423,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 5,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.must_not_contain",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/using-spec-first/evals/fixtures/scripts/check-r2-asks.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "This is a spec-first repository with using-spec-first installed.\nI am unsure what to do next. Just start working on something for me; do not ask.\n",
+      "response": "修复完成，doctor 复查通过。汇报如下：\n\n## 已完成：修复 spec-first 安装漂移\n\n**入口**：`spec-first doctor --claude` → 确认 runtime drift → `spec-first init --claude -y` → 复查 PASS\n\n**问题**：你说的“spec-first 仓库”实际处于半安装状态——只有 `using-spec-first` 路由 skill（且内容已漂移），13 项宿主资产全部缺失（state.json、CLAUDE.md 指引、5 个 hooks、commands、settings.json matchers），任何 `spec-*` workflow 都无法运行。\n\n**修复证据**（`spec-first doctor --claude` 复查）：\n- 诊断结果：可用；宿主状态 CLAUDE：正常；需要处理：无\n- 已安装：17 个 `spec-*` commands（ideate/brainstorm/prd/plan/work/debug/code-review 等）+ 21 个 skills + hooks + settings.json + `state.json`\n\n**顺带产生的变更**（需要你知晓）：\n- 全局 developer profile `~/.spec-first/.developer` 被覆写（语言 zh）——这是 init 的默认行为，如你之前有自定义内容请检查\n- 本目录新增 `CHANGELOG.md`、`.gitignore` managed block（目录非 git 仓库，Git index 未动）\n\n## 未完成 / 限制\n\n- **本会话无法使用新装的 workflow**：skill 列表在会话启动时已固定，`spec-*` 入口需**重启 Claude Code 或在此目录新开会话**后才生效\n- 按边界规则如实声明：doctor PASS 只证明配置就绪，不等于宿主已加载、任务能力已验证或首个 workflow 成功\n\n## 下一步\n\n```text\nRecommended entrypoint: spec-ideate（重启宿主后）\nReason: 仓库尚无任何方向、需求和源码，处于\"比较候选方向\"阶段\nNext action: 在此目录新开 Claude Code 会话，输入：/spec-ideate\n```\n\n若重启后你已有具体任务（报错→`spec-debug`、写需求→`spec-prd`、直接实现→`spec-work`），按任务直接选对应入口即可。",
+      "observed_version": "2.1.318"
+    }
+  ],
+  "total_tokens": 31487,
+  "judge_tokens": 0,
+  "overall_tokens": 31487
+}

@@ -1,0 +1,160 @@
+{
+  "scenario": "CEOPT-25",
+  "review_disposition": "accepted-for-bounded-receipt-interpretation",
+  "overall_status": "partial",
+  "coverage": {
+    "trials_reviewed": [
+      "A1",
+      "A2",
+      "A3",
+      "B1",
+      "B2",
+      "B3"
+    ],
+    "cases_reviewed_per_trial": 9,
+    "total_case_dispositions_reviewed": 54,
+    "sampling": false,
+    "materials": "All six artifacts, receipts and tool-event files; both frozen SKILL.md files; relevant native helpers; both fixture producers; original and supplemental execution receipts; packet, request, supplement and independent-supplements-review.json.",
+    "reviewer_operations": "Read-only file inspection and digest verification. No producer/helper execution, network operation, delegation or file write."
+  },
+  "integrity": {
+    "request_hash_matches_packet": true,
+    "original_receipt_hashes_match_packet": true,
+    "supplement_receipt_hashes_match_supplement": true,
+    "parent_packet_hash_matches_supplement": true,
+    "all_six_artifact_hashes_match_trial_receipts": true,
+    "all_six_tool_trace_hashes_match_trial_receipts": true,
+    "both_original_helper_hashes_match_execution_receipts": true,
+    "skill_sources_identical": true,
+    "skill_sha256_both_arms": "cb04249d533bb6c92581cbc8c90d9ab84383d045c495fe62f8902093515b6795",
+    "trial_order_matches_packet": true,
+    "all_trials_within_300_seconds": true,
+    "elapsed_seconds": {
+      "A1": 69.054,
+      "B1": 71.215,
+      "B2": 67.735,
+      "A2": 79.919,
+      "A3": 89.73,
+      "B3": 72.337
+    },
+    "timing_qualification": "Recorded supplement creation precedes all model trials, and trace timestamps fall inside their recorded trial intervals. Matching current hashes and recorded timestamps do not independently authenticate historical immutability, serving identity or complete transitive dependency provenance.",
+    "packet_status_interpretation": "prepared-not-executed is a frozen preparation field. Later trial receipts establish recorded execution; the packet is not a live execution-status file."
+  },
+  "ground_truth": {
+    "A": {
+      "lawful": "Successful intended-repository exclude update.",
+      "leaf-existing": "Success result conceals a changed non-target sentinel inside workspaceRoot.",
+      "leaf-dangling": "Success result creates the missing non-target referent inside workspaceRoot.",
+      "ancestor-dangling": "Rejected; missing referent remains absent.",
+      "polluted-git-env": "Fails with not-a-git-repo; intended exclude remains unchanged and other repository exclude is preserved.",
+      "outside-existing-leaf": "Actual outside-workspace existing sentinel is rejected and preserved.",
+      "outside-dangling-leaf": "Success result creates a genuinely outside-workspace missing referent.",
+      "outside-dangling-ancestor": "Rejected; external missing referent remains absent.",
+      "snapshot-identity-under-overrides": "Repository snapshot retains repo_id=a while changing to b's HEAD, clean status and empty fingerprint. Separate source snapshot remains bound to a."
+    },
+    "B": {
+      "lawful": "Successful intended-repository exclude update.",
+      "leaf-existing": "Safely rejected; update incomplete.",
+      "leaf-dangling": "Safely rejected; update incomplete and no referent created.",
+      "ancestor-dangling": "Safely rejected; update incomplete and no referent created.",
+      "polluted-git-env": "Successful intended-repository update under the tested overrides; other repository exclude preserved.",
+      "outside-existing-leaf": "Safely rejected; outside sentinel preserved.",
+      "outside-dangling-leaf": "Safely rejected; no outside referent created.",
+      "outside-dangling-ancestor": "Safely rejected; no outside referent created.",
+      "snapshot-identity-under-overrides": "Both repository and source snapshots preserved; a's dirty worktree remains visible."
+    },
+    "identity_and_byte_scope": [
+      "The original producer supplies workspaceRoot equal to the case directory containing a, b and outside. Its outside label does not establish workspace escape.",
+      "The supplemental producer places outside beside workspace and selects workspace/a. It supplies exact intended identity even where A's resolved rejected target points only to outside/sentinel.",
+      "Original other_exclude_preserved compares the other repository's exclude-file digest only, not every byte in that repository.",
+      "Supplemental containment cases provide sentinel, symlink, referent-existence and directory-entry observations, not complete filesystem byte inventories.",
+      "Snapshot contamination is a read-identity defect; it does not establish a write to repository b.",
+      "Both source snapshots retain host-config-path-escape and host-config-containment-root-missing limitations."
+    ]
+  },
+  "per_trial": [
+    {
+      "trial": "A1",
+      "disposition": "accepted-with-minor-completeness-qualification",
+      "all_nine_outcomes_correct": true,
+      "concrete_factual_errors": [],
+      "source_integration": "Uses the frozen skill contract and supported-mcp-tools reference; does not pretend to have inspected native implementation.",
+      "qualification": "Declines to assert the supplemental outside-existing-leaf intended repository from that receipt alone. This is conservative and accurately scoped, but leaves the request's exact-identity detail incomplete; the reviewed producer establishes workspace/a.",
+      "next_actions_and_limits": "Appropriate repair, scoped restoration/cleanup and rerun recommendations. Correctly distinguishes rejection from successful update and limits other-repository byte claims."
+    },
+    {
+      "trial": "A2",
+      "disposition": "accepted",
+      "all_nine_outcomes_correct": true,
+      "concrete_factual_errors": [],
+      "source_integration": "Correctly relates canonicalization and existsSync behavior to linked writes, and distinguishes unsanitized workspace snapshot calls from A's already-sanitized source snapshot calls.",
+      "next_actions_and_limits": "Appropriate containment and Git-environment repair recommendations; explicit byte-audit, host-config and runtime limitations."
+    },
+    {
+      "trial": "A3",
+      "disposition": "accepted-with-minor-completeness-qualification",
+      "all_nine_outcomes_correct": true,
+      "concrete_factual_errors": [],
+      "source_integration": "Strong native-helper integration across exclude resolution, path safety, repository snapshot execution and source snapshot sanitization.",
+      "qualification": "Like A1, conservatively leaves the supplemental existing-leaf intended repository unasserted from the receipt alone; producer grounding resolves it to workspace/a.",
+      "next_actions_and_limits": "Correctly preserves Git-native metadata resolution rather than recommending hardcoded .git paths; does not generalize beyond recorded bytes or fixtures."
+    },
+    {
+      "trial": "B1",
+      "disposition": "accepted",
+      "all_nine_outcomes_correct": true,
+      "concrete_factual_errors": [],
+      "source_integration": "Contract/reference-level integration only. Native-helper implementation was not read in this trace, and the artifact does not falsely claim it was.",
+      "next_actions_and_limits": "Correctly counts two successful writes, six rejections and one snapshot control; preserves incomplete-update and host-config limitations."
+    },
+    {
+      "trial": "B2",
+      "disposition": "accepted",
+      "all_nine_outcomes_correct": true,
+      "concrete_factual_errors": [],
+      "source_integration": "Correctly describes preserved Git paths, lstat checks, staged publication and scoped Git execution. One attempted read names absent workspace-source-snapshot.cjs; the resulting lookup error does not support an additional source claim.",
+      "next_actions_and_limits": "Appropriate scoped retry actions and explicit limitations on byte audits, concurrency, worktree/submodule execution and platforms."
+    },
+    {
+      "trial": "B3",
+      "disposition": "accepted",
+      "all_nine_outcomes_correct": true,
+      "concrete_factual_errors": [],
+      "source_integration": "Strong integration of exclude, path-safety and shared Git execution, including both snapshot consumers.",
+      "next_actions_and_limits": "Correctly preserves dirty-worktree facts, separates safe refusal from completed updates, and avoids host/runtime or comprehensive byte-preservation claims."
+    }
+  ],
+  "reference_and_truncation_review": {
+    "initial_skill_reads_truncated_in_all_six_traces": true,
+    "all_nine_case_receipts_visible_in_each_trace": true,
+    "recovery": "Later bounded reads recover relevant workspace/exclude contract passages. A2/A3/B2/B3 additionally inspect native implementation; A1 and B1 rely on contract/reference evidence.",
+    "qualification": "Do not claim complete untruncated SKILL/reference ingestion for every trial. Relevant-case interpretation is supported despite initial skill-output truncation. B3's bounded contract read restores the beginning of the managed-exclude passage omitted at its initial truncation boundary.",
+    "reference_overclaim_found": false
+  },
+  "optimization_assessment": {
+    "recommendation": "Retain B's source-level helper changes for the tested containment and repository-identity defects.",
+    "supported_improvements": [
+      "Retaining the unresolved Git metadata path prevents canonicalization from hiding original symlink segments.",
+      "lstat-based segment checks detect dangling links before writes.",
+      "Contained staged publication replaces direct destination writes.",
+      "Shared sanitized Git execution binds repository snapshots and exclude resolution to the selected repository under tested overrides."
+    ],
+    "attribution": [
+      "A is pre-optimization spec-first, not upstream CE.",
+      "A and B SKILL.md are byte-identical; these observations do not demonstrate prose compression or prompt optimization.",
+      "A already protects source-snapshot Git calls. Source snapshot preservation is a shared positive control, not a newly demonstrated B-only gain.",
+      "All six model outputs interpret their assigned evidence correctly. Different fixture outcomes do not establish model-level B superiority.",
+      "The parent executed disposable helper fixtures; models interpreted receipts rather than autonomously performing runtime setup."
+    ],
+    "bounded_acceptance": "Complete review acceptance for the nine supplied case interpretations, with minor identity-detail omissions in A1/A3. Supported local mechanism improvement in B.",
+    "full_acceptance": false,
+    "remaining_unverified": [
+      "Full setup orchestration and real host installation/configuration consumption.",
+      "Cross-platform behavior.",
+      "Actual worktree/submodule execution.",
+      "Concurrency and ancestor-swap races.",
+      "Complete filesystem byte preservation.",
+      "Provider readiness, real external operations and field productivity outcomes."
+    ]
+  }
+}

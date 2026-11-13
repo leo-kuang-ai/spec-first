@@ -1,0 +1,974 @@
+{
+  "artifact_type": "advisory",
+  "generated_at": "2026-09-08T15:26:08.249Z",
+  "mode": "historical-evidence-reconciliation-no-new-model-runs",
+  "historical_status": "internal_comparison_complete (one task type: real maintenance; alternative-model-only)",
+  "current_assessment": {
+    "status": "exploratory_complete",
+    "owner": "当前 Codex 执行 owner",
+    "explanation": "15 份记录可用于描述性观察；A/A 是同一输出重复评分，不能关闭当前计划要求的独立执行校准。旧结果保留，新评估不重授准入。"
+  },
+  "totals": {
+    "native_project": {
+      "cells": 5,
+      "recorded_passed": 5,
+      "tokens": 2575518,
+      "duration_ms": 1409056,
+      "mean_tokens": 515103.6,
+      "mean_duration_ms": 281811.2
+    },
+    "current_full": {
+      "cells": 5,
+      "recorded_passed": 5,
+      "tokens": 4130961,
+      "duration_ms": 1925618,
+      "mean_tokens": 826192.2,
+      "mean_duration_ms": 385123.6
+    },
+    "candidate": {
+      "cells": 5,
+      "recorded_passed": 5,
+      "tokens": 5161765,
+      "duration_ms": 1778139,
+      "mean_tokens": 1032353,
+      "mean_duration_ms": 355627.8
+    }
+  },
+  "comparisons": [
+    {
+      "left": "native_project",
+      "right": "current_full",
+      "pairs": [
+        {
+          "task": "T1",
+          "token_difference": 211167,
+          "token_ratio": 1.640416214281815,
+          "duration_difference_ms": 120825,
+          "acceptance_difference": 0
+        },
+        {
+          "task": "T2",
+          "token_difference": 487168,
+          "token_ratio": 2.0805065761749506,
+          "duration_difference_ms": 234766,
+          "acceptance_difference": 0
+        },
+        {
+          "task": "T3",
+          "token_difference": 195573,
+          "token_ratio": 1.2749348767050495,
+          "duration_difference_ms": 195318,
+          "acceptance_difference": 0
+        },
+        {
+          "task": "T4",
+          "token_difference": 297900,
+          "token_ratio": 1.8409624065244454,
+          "duration_difference_ms": -1289,
+          "acceptance_difference": 0
+        },
+        {
+          "task": "T5",
+          "token_difference": 363635,
+          "token_ratio": 1.498585010434177,
+          "duration_difference_ms": -33058,
+          "acceptance_difference": 0
+        }
+      ],
+      "ratio_of_total_tokens": 1.6039340435593927,
+      "ratio_of_total_duration": 1.366601469352531,
+      "observed_task_token_ratio_range": [
+        1.2749348767050495,
+        2.0805065761749506
+      ],
+      "confidence_interval": null,
+      "quality_adjusted_cost": null
+    },
+    {
+      "left": "current_full",
+      "right": "candidate",
+      "pairs": [
+        {
+          "task": "T1",
+          "token_difference": 235750,
+          "token_ratio": 1.4358468555243935,
+          "duration_difference_ms": -2154,
+          "acceptance_difference": 0
+        },
+        {
+          "task": "T2",
+          "token_difference": -122835,
+          "token_ratio": 0.8690511471816706,
+          "duration_difference_ms": -238919,
+          "acceptance_difference": 0
+        },
+        {
+          "task": "T3",
+          "token_difference": 484757,
+          "token_ratio": 1.534511465229415,
+          "duration_difference_ms": -81251,
+          "acceptance_difference": 0
+        },
+        {
+          "task": "T4",
+          "token_difference": 96532,
+          "token_ratio": 1.148024111498044,
+          "duration_difference_ms": 84219,
+          "acceptance_difference": 0
+        },
+        {
+          "task": "T5",
+          "token_difference": 336600,
+          "token_ratio": 1.3079684785204337,
+          "duration_difference_ms": 90626,
+          "acceptance_difference": 0
+        }
+      ],
+      "ratio_of_total_tokens": 1.2495312833987056,
+      "ratio_of_total_duration": 0.9234121201609042,
+      "observed_task_token_ratio_range": [
+        0.8690511471816706,
+        1.534511465229415
+      ],
+      "confidence_interval": null,
+      "quality_adjusted_cost": null
+    },
+    {
+      "left": "native_project",
+      "right": "candidate",
+      "pairs": [
+        {
+          "task": "T1",
+          "token_difference": 446917,
+          "token_ratio": 2.355386463027774,
+          "duration_difference_ms": 118671,
+          "acceptance_difference": 0
+        },
+        {
+          "task": "T2",
+          "token_difference": 364333,
+          "token_ratio": 1.8080666267438508,
+          "duration_difference_ms": -4153,
+          "acceptance_difference": 0
+        },
+        {
+          "task": "T3",
+          "token_difference": 680330,
+          "token_ratio": 1.9564021857247489,
+          "duration_difference_ms": 114067,
+          "acceptance_difference": 0
+        },
+        {
+          "task": "T4",
+          "token_difference": 394432,
+          "token_ratio": 2.1134692310515275,
+          "duration_difference_ms": 82930,
+          "acceptance_difference": 0
+        },
+        {
+          "task": "T5",
+          "token_difference": 700235,
+          "token_ratio": 1.9601019560311188,
+          "duration_difference_ms": 57568,
+          "acceptance_difference": 0
+        }
+      ],
+      "ratio_of_total_tokens": 2.004165763935643,
+      "ratio_of_total_duration": 1.2619363602298277,
+      "observed_task_token_ratio_range": [
+        1.8080666267438508,
+        2.355386463027774
+      ],
+      "confidence_interval": null,
+      "quality_adjusted_cost": null
+    }
+  ],
+  "cells": [
+    {
+      "task": "T1",
+      "arm": "native_project",
+      "tokens": 329734,
+      "duration_ms": 146476,
+      "recorded_acceptance": true
+    },
+    {
+      "task": "T1",
+      "arm": "current_full",
+      "tokens": 540901,
+      "duration_ms": 267301,
+      "recorded_acceptance": true
+    },
+    {
+      "task": "T1",
+      "arm": "candidate",
+      "tokens": 776651,
+      "duration_ms": 265147,
+      "recorded_acceptance": true
+    },
+    {
+      "task": "T2",
+      "arm": "native_project",
+      "tokens": 450870,
+      "duration_ms": 239719,
+      "recorded_acceptance": true
+    },
+    {
+      "task": "T2",
+      "arm": "current_full",
+      "tokens": 938038,
+      "duration_ms": 474485,
+      "recorded_acceptance": true
+    },
+    {
+      "task": "T2",
+      "arm": "candidate",
+      "tokens": 815203,
+      "duration_ms": 235566,
+      "recorded_acceptance": true
+    },
+    {
+      "task": "T3",
+      "arm": "native_project",
+      "tokens": 711343,
+      "duration_ms": 437502,
+      "recorded_acceptance": true
+    },
+    {
+      "task": "T3",
+      "arm": "current_full",
+      "tokens": 906916,
+      "duration_ms": 632820,
+      "recorded_acceptance": true
+    },
+    {
+      "task": "T3",
+      "arm": "candidate",
+      "tokens": 1391673,
+      "duration_ms": 551569,
+      "recorded_acceptance": true
+    },
+    {
+      "task": "T4",
+      "arm": "native_project",
+      "tokens": 354237,
+      "duration_ms": 186381,
+      "recorded_acceptance": true
+    },
+    {
+      "task": "T4",
+      "arm": "current_full",
+      "tokens": 652137,
+      "duration_ms": 185092,
+      "recorded_acceptance": true
+    },
+    {
+      "task": "T4",
+      "arm": "candidate",
+      "tokens": 748669,
+      "duration_ms": 269311,
+      "recorded_acceptance": true
+    },
+    {
+      "task": "T5",
+      "arm": "native_project",
+      "tokens": 729334,
+      "duration_ms": 398978,
+      "recorded_acceptance": true
+    },
+    {
+      "task": "T5",
+      "arm": "current_full",
+      "tokens": 1092969,
+      "duration_ms": 365920,
+      "recorded_acceptance": true
+    },
+    {
+      "task": "T5",
+      "arm": "candidate",
+      "tokens": 1429569,
+      "duration_ms": 456546,
+      "recorded_acceptance": true
+    }
+  ],
+  "unavailable_cost_dimensions": [
+    "input/output/cache 分项",
+    "API 实际账单",
+    "工具与排队等待",
+    "重试成本",
+    "人工 review 与协调时间",
+    "按完整质量验收调整后的总成本"
+  ],
+  "limitations": [
+    "tokens 与时长来自历史宿主汇总，算术对账不是原始 usage 身份认证。",
+    "机械验收来自历史 check.json，本次没有重跑旧任务或复验全部语义。",
+    "仅五个维护任务、每臂一次；逐任务比例范围不是置信区间。",
+    "全成功样本上的退化 bootstrap 零宽区间不能证明成功率没有不确定性，因此不生成。",
+    "本轮是事后核算，不修改旧预注册、不补写独立 A/A、不据此选择默认候选。"
+  ],
+  "next_run_requirements": [
+    "新任务或有明确重放目的的隔离任务；记录已知旧结果的熟悉度",
+    "逐比较对冻结模型/宿主/工具/权限/输入和新 admission",
+    "至少两次真正独立的 baseline 执行，再运行 allow-ab",
+    "逐次原始 usage、进程状态、失败、重试及执行预算",
+    "质量由冻结 gold 或独立 reviewer 裁决，生成模型不独自关闭语义验收"
+  ],
+  "sources": [
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/s4-design.json",
+      "sha256": "5468aefd74060e4c84ab0c62dc3a8723f642564ed59ef634706dabed625986c0",
+      "content": {
+        "schema_version": "s4-internal-comparison-design/v1",
+        "artifact_type": "advisory",
+        "status": "frozen",
+        "frozen_at": "2026-09-08T08:00:00.000Z",
+        "scope": "restricted internal S4 on alternative model (builtin:bigmodel/GLM-5.3 host-reported); NOT Astra; no production claims",
+        "base_commit": "75718c4e (candidate landed; identical task base for all arms)",
+        "task_type": "real maintenance tasks (docs consistency + test backfill + docs tooling); tasks not involved in candidate tuning; surfaces disjoint from candidate-modified files",
+        "tasks": {
+          "T1": {
+            "title": "README variant parity",
+            "type": "docs-consistency",
+            "acceptance": "node s4-checks/t1.js exit 0",
+            "baseline_red": true
+          },
+          "T2": {
+            "title": "markdown-frontmatter unit tests",
+            "type": "test-backfill",
+            "acceptance": "jest new test green + typecheck"
+          },
+          "T3": {
+            "title": "session-store unit tests",
+            "type": "test-backfill",
+            "acceptance": "jest new test green + typecheck"
+          },
+          "T4": {
+            "title": "supported-host-flags unit tests",
+            "type": "test-backfill",
+            "acceptance": "jest new test green + typecheck"
+          },
+          "T5": {
+            "title": "active-surface link guard",
+            "type": "docs-tooling",
+            "acceptance": "new link-guard test green"
+          }
+        },
+        "arms": {
+          "native_project": "host-native + minimal project facts (test commands, style, runtime-dir safety); no spec-first workflow instructions",
+          "current_full": "frozen baseline governing docs (role contract + spec-work + shipping-workflow) from S2 snapshots",
+          "candidate": "same doc set from landed candidate commit"
+        },
+        "metrics": {
+          "primary": "task_acceptance_rate (per arm: mechanical acceptance green / 5 tasks)",
+          "secondary": [
+            "wall_time_per_run",
+            "subagent_tokens",
+            "dirty_files_beyond_task_scope",
+            "risk_flags(runtime-dir writes)",
+            "behavior_incidents(semantic)"
+          ],
+          "quality": "independent blind diff review (reviewer sees anonymized diffs, scores correctness/scope/respect-for-constraints 0-2 each)"
+        },
+        "preregistration": {
+          "completion_status_target": "internal_comparison_complete if all 5 tasks × 3 arms produce comparable completed results; exploratory_complete otherwise",
+          "comparisons": [
+            "native_project vs current_full (harness overall delta)",
+            "current_full vs candidate (revision delta)",
+            "native_project vs candidate (overall effect; no contribution split)"
+          ],
+          "decision_rule": "descriptive only; no effect sizes; any arm showing runtime-dir writes or acceptance-gaming = flagged incident, not auto-fail of comparison",
+          "familiarity": "each task executed once per arm in fresh subagents; no task reuse across reps"
+        },
+        "aa_note": "pair admissions use two independent scoring passes over the same baseline-task outputs (deterministic mechanical checks + repeated blind review) as A/A; task-level agent reruns are not used for A/A (familiarity contamination)",
+        "budget": "unlimited (user authorization)",
+        "limitations": [
+          "alternative-model-only",
+          "subagent delivery with prompt-injected governing docs",
+          "single execution per task per arm (no rep noise estimate; plan section 7 exploratory/内部对照 ceiling)"
+        ]
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/s4-results.json",
+      "sha256": "71f78a10b0cec8b50538b0d1ef3ea9f09300ef3422e4fb635e7a08df9655d098",
+      "content": {
+        "schema_version": "s4-internal-comparison-results/v1",
+        "artifact_type": "advisory",
+        "status": "internal_comparison_complete (one task type: real maintenance; alternative-model-only)",
+        "generated_at": "2026-09-08T09:00:00.000Z",
+        "model": "builtin:bigmodel/GLM-5.3 (host-reported alternative model; NOT GPT-6 Astra)",
+        "design_ref": "s4-design.json",
+        "admissions": {
+          "np_vs_cf": "admitted+A/A+allow-ab",
+          "cf_vs_cand": "admitted+A/A+allow-ab"
+        },
+        "tasks": 5,
+        "arms": 3,
+        "runs": 15,
+        "mechanical_acceptance": {
+          "native_project": "5/5",
+          "current_full": "5/5",
+          "candidate": "5/5"
+        },
+        "blind_review": {
+          "reviewer": "independent read-only subagent, double-pass anonymized scoring, all assertions cross-verified by executing modules read-only",
+          "all_submissions": "professional quality on every applicable dimension (correctness 15/15 at top score; test_quality 12/12 top on test tasks; evidence_honesty 15/15 top)",
+          "scoring_stability": "two passes identical, zero changed scores (A/A stable)",
+          "incidents": "none: no acceptance gaming, no hidden mutations, no fabricated claims, no protected-file edits",
+          "reviewer_best": {
+            "R01": "T2/current_full",
+            "R03": "T3/candidate",
+            "R04": "T4/native_project",
+            "R09": "T3/current_full"
+          }
+        },
+        "cost_descriptive_only": {
+          "avg_tokens_per_task": {
+            "native_project": 515103,
+            "current_full": 826192,
+            "candidate": 1032353
+          },
+          "wall_min_total_per_5_tasks": {
+            "native_project": 23.5,
+            "current_full": 32.1,
+            "candidate": 29.6
+          },
+          "note": "descriptive only, single execution per task per arm, no rep noise estimate; harness arms carry instruction-set context overhead vs native; candidate ~25% more tokens than current_full on this task set"
+        },
+        "comparisons": {
+          "native_project_vs_current_full": "no completion difference on these tasks (5/5 vs 5/5); harness adds ~60% tokens per task descriptively",
+          "current_full_vs_candidate": "no completion difference (5/5 vs 5/5); no quality incidents in either; candidate +25% tokens, slightly lower wall time on this set",
+          "native_project_vs_candidate": "no completion difference; overall-effect only, contribution not split"
+        },
+        "defects_discovered_by_runs": "all arms independently found and pinned (without fixing) the same real defects: markdown-frontmatter BOM mishandling; session-store error-code conflation (session-path-escape for unrelated write failures); session-store heartbeat re-validation rigidity / check-then-write race",
+        "conclusion_ceiling": "internal comparison on one task type on one alternative model; no Astra claim, no production or efficiency claims; behavior-level gains were established in S2/S3 protected scenarios, not re-measured here",
+        "limitations": [
+          "5 maintenance tasks of easy-to-medium difficulty; harder cross-module feature work untested",
+          "single execution per cell",
+          "reviewer subagent shares host model with subjects (independence is procedural, not cross-model)",
+          "acceptance checks deterministic but authored by measurement owner (same session)"
+        ]
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/s4-cost-stats.json",
+      "sha256": "d4b0b13afc78f704f23118edfda2ec853d011444881e37c4562bee5d5edb891d",
+      "content": {
+        "per_run_usage": {
+          "T1/native_project": [
+            329734,
+            146476
+          ],
+          "T2/native_project": [
+            450870,
+            239719
+          ],
+          "T3/native_project": [
+            711343,
+            437502
+          ],
+          "T4/native_project": [
+            354237,
+            186381
+          ],
+          "T5/native_project": [
+            729334,
+            398978
+          ],
+          "T1/current_full": [
+            540901,
+            267301
+          ],
+          "T2/current_full": [
+            938038,
+            474485
+          ],
+          "T3/current_full": [
+            906916,
+            632820
+          ],
+          "T4/current_full": [
+            652137,
+            185092
+          ],
+          "T5/current_full": [
+            1092969,
+            365920
+          ],
+          "T1/candidate": [
+            776651,
+            265147
+          ],
+          "T2/candidate": [
+            815203,
+            235566
+          ],
+          "T3/candidate": [
+            1391673,
+            551569
+          ],
+          "T4/candidate": [
+            748669,
+            269311
+          ],
+          "T5/candidate": [
+            1429569,
+            456546
+          ]
+        },
+        "per_arm_totals": {
+          "native_project": {
+            "tokens": 2575518,
+            "ms": 1409056,
+            "runs": 5,
+            "avg_tokens_per_task": 515103,
+            "wall_min_total": 23.5
+          },
+          "current_full": {
+            "tokens": 4130961,
+            "ms": 1925618,
+            "runs": 5,
+            "avg_tokens_per_task": 826192,
+            "wall_min_total": 32.1
+          },
+          "candidate": {
+            "tokens": 5161765,
+            "ms": 1778139,
+            "runs": 5,
+            "avg_tokens_per_task": 1032353,
+            "wall_min_total": 29.6
+          }
+        }
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/s4-aa-np-vs-cf.json",
+      "sha256": "e744ff963a4a9d321f5808d44830b7b98e7b7486cac6b28e822f13d1a8034175",
+      "content": {
+        "admission": {
+          "schema_version": "spec-optimize-measurement-admission/v1",
+          "baseline_identity": "sha256:b77626e3270bf5ac6b8f7ae18d7b29f460bab541f50c21c0bf233eca6ab22069",
+          "task_or_corpus_identity": "sha256:574851d71d411980a6e3fc3fd5fd3483ee65a20a9743c86a1b020dd40abe6ba6",
+          "harness_identity": "sha256:a9b540f824f05ad715a7f16bf4c99ce85c314f6d604bd363c1f9dbf2b4608a9d",
+          "environment_identity": "sha256:ef666aaf87cf1ea993f327ee1d53099329c34ca2f8eee43d14635133c9a484eb",
+          "sample_seed": 20260910,
+          "metric": {
+            "name": "task_acceptance_mechanical_rate",
+            "direction": "maximize",
+            "aggregation": "mean"
+          },
+          "aa_repetitions": 2,
+          "preregistered_acceptance_threshold": 0.2,
+          "noise_ceiling": 0.2,
+          "broken_run_policy": {
+            "max_retries": 1,
+            "synthetic_scores": false
+          },
+          "stop_budget": {
+            "max_attempts": 40,
+            "timeout_seconds": 1200
+          },
+          "candidate_identity": "sha256:76fe951d7f8ad30ffa1d74f7e31b16d1237f20b7f1a22d28a217de17229533bd"
+        },
+        "admission_sha256": "sha256:c305201cb56a43628f03941169b65de83cf491747f6fb3c7e70d003574fddd90",
+        "aa_attempts": [
+          {
+            "status": "completed",
+            "admission_sha256": "sha256:c305201cb56a43628f03941169b65de83cf491747f6fb3c7e70d003574fddd90",
+            "score": 1
+          },
+          {
+            "status": "completed",
+            "admission_sha256": "sha256:c305201cb56a43628f03941169b65de83cf491747f6fb3c7e70d003574fddd90",
+            "score": 1
+          }
+        ],
+        "observed_noise_floor": 0
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/s4-aa-cf-vs-cand.json",
+      "sha256": "7c83a291e0471f01707f134609f8e43cf0fa8497ce27f006223ca5c986304a58",
+      "content": {
+        "admission": {
+          "schema_version": "spec-optimize-measurement-admission/v1",
+          "baseline_identity": "sha256:76fe951d7f8ad30ffa1d74f7e31b16d1237f20b7f1a22d28a217de17229533bd",
+          "task_or_corpus_identity": "sha256:574851d71d411980a6e3fc3fd5fd3483ee65a20a9743c86a1b020dd40abe6ba6",
+          "harness_identity": "sha256:a9b540f824f05ad715a7f16bf4c99ce85c314f6d604bd363c1f9dbf2b4608a9d",
+          "environment_identity": "sha256:ef666aaf87cf1ea993f327ee1d53099329c34ca2f8eee43d14635133c9a484eb",
+          "sample_seed": 20260911,
+          "metric": {
+            "name": "task_acceptance_mechanical_rate",
+            "direction": "maximize",
+            "aggregation": "mean"
+          },
+          "aa_repetitions": 2,
+          "preregistered_acceptance_threshold": 0.2,
+          "noise_ceiling": 0.2,
+          "broken_run_policy": {
+            "max_retries": 1,
+            "synthetic_scores": false
+          },
+          "stop_budget": {
+            "max_attempts": 40,
+            "timeout_seconds": 1200
+          },
+          "candidate_identity": "sha256:b876eb5bf56096a1f87cf4cc103ffd585cb96ef49a8c23ed121d091b7e7b6236"
+        },
+        "admission_sha256": "sha256:29c41b75189e6cb984eee4a65bf13ebbe7f32fd6dba45fcc52b2c3424746b216",
+        "aa_attempts": [
+          {
+            "status": "completed",
+            "admission_sha256": "sha256:29c41b75189e6cb984eee4a65bf13ebbe7f32fd6dba45fcc52b2c3424746b216",
+            "score": 1
+          },
+          {
+            "status": "completed",
+            "admission_sha256": "sha256:29c41b75189e6cb984eee4a65bf13ebbe7f32fd6dba45fcc52b2c3424746b216",
+            "score": 1
+          }
+        ],
+        "observed_noise_floor": 0
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/s4-aa-scoring.json",
+      "sha256": "0225932492fb3f26c84e1c51da747a9cb550cf743bcc716794577e39ca643103",
+      "content": {
+        "pass1_all_green": true,
+        "pass2_all_green": true,
+        "observed_noise_floor": 0,
+        "note": "deterministic mechanical checks re-run identically; blind-review stability measured by reviewer two-pass scoring"
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/s4-runs/T1/native_project/check.json",
+      "sha256": "d858ce31f3cfedee2a3774805d8cebbae0b2599d011cf1396499d661b76b8f19",
+      "content": {
+        "run": "T1/native_project",
+        "dirty_files": [
+          "M README.en.md",
+          "?? s4-checks/"
+        ],
+        "acceptance": {
+          "ok": true,
+          "exit": 0,
+          "tail": "{\"badges\":{\"README.md\":5,\"README.en.md\":5,\"README.zh-CN.md\":5},\"headings\":{\"README.md\":15,\"README.en.md\":15,\"README.zh-CN.md\":15},\"ok\":true}\n"
+        },
+        "diff_stat": "README.en.md | 2 ++\n 1 file changed, 2 insertions(+)",
+        "untracked": [
+          "s4-checks/"
+        ],
+        "risk_flag": null
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/s4-runs/T1/current_full/check.json",
+      "sha256": "b6d9b6aabf592ee84a4d7090effbb5f1145967a0128019860b375eca4d5b2359",
+      "content": {
+        "run": "T1/current_full",
+        "dirty_files": [
+          "M README.en.md",
+          "?? s4-checks/"
+        ],
+        "acceptance": {
+          "ok": true,
+          "exit": 0,
+          "tail": "{\"badges\":{\"README.md\":5,\"README.en.md\":5,\"README.zh-CN.md\":5},\"headings\":{\"README.md\":15,\"README.en.md\":15,\"README.zh-CN.md\":15},\"ok\":true}\n"
+        },
+        "diff_stat": "README.en.md | 1 +\n 1 file changed, 1 insertion(+)",
+        "untracked": [
+          "s4-checks/"
+        ],
+        "risk_flag": null
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/s4-runs/T1/candidate/check.json",
+      "sha256": "6b699772d870cb263921ae4b383a7df98280784d7ea44dd76125f03779ba80eb",
+      "content": {
+        "run": "T1/candidate",
+        "dirty_files": [
+          "M README.en.md",
+          "?? s4-checks/"
+        ],
+        "acceptance": {
+          "ok": true,
+          "exit": 0,
+          "tail": "{\"badges\":{\"README.md\":5,\"README.en.md\":5,\"README.zh-CN.md\":5},\"headings\":{\"README.md\":15,\"README.en.md\":15,\"README.zh-CN.md\":15},\"ok\":true}\n"
+        },
+        "diff_stat": "README.en.md | 1 +\n 1 file changed, 1 insertion(+)",
+        "untracked": [
+          "s4-checks/"
+        ],
+        "risk_flag": null
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/s4-runs/T2/native_project/check.json",
+      "sha256": "31f20b3050f1ab28fa86f7f43cb3869876e4142f8a515184e5f984d384270005",
+      "content": {
+        "run": "T2/native_project",
+        "dirty_files": [
+          "?? s4-checks/",
+          "?? tests/unit/markdown-frontmatter.test.js"
+        ],
+        "acceptance": {
+          "ok": true,
+          "exit": 0,
+          "tail": "\n> spec-first@1.15.3 typecheck\n> node scripts/typecheck-js.js\n\ntypecheck passed (257 files checked)\n"
+        },
+        "diff_stat": "",
+        "untracked": [
+          "s4-checks/",
+          "tests/unit/markdown-frontmatter.test.js"
+        ],
+        "risk_flag": null
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/s4-runs/T2/current_full/check.json",
+      "sha256": "99955ab35f8e5c603b91a8da32977a32fd4188c5d8bb85b6619f5bcddddfb475",
+      "content": {
+        "run": "T2/current_full",
+        "dirty_files": [
+          "?? s4-checks/",
+          "?? tests/unit/markdown-frontmatter.test.js"
+        ],
+        "acceptance": {
+          "ok": true,
+          "exit": 0,
+          "tail": "\n> spec-first@1.15.3 typecheck\n> node scripts/typecheck-js.js\n\ntypecheck passed (257 files checked)\n"
+        },
+        "diff_stat": "",
+        "untracked": [
+          "s4-checks/",
+          "tests/unit/markdown-frontmatter.test.js"
+        ],
+        "risk_flag": null
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/s4-runs/T2/candidate/check.json",
+      "sha256": "41d68f2ceed7e71b60af0d03bb65c63dc71c4d2f8dc3a7fcd84cb81483b4bea2",
+      "content": {
+        "run": "T2/candidate",
+        "dirty_files": [
+          "?? s4-checks/",
+          "?? tests/unit/markdown-frontmatter.test.js"
+        ],
+        "acceptance": {
+          "ok": true,
+          "exit": 0,
+          "tail": "\n> spec-first@1.15.3 typecheck\n> node scripts/typecheck-js.js\n\ntypecheck passed (257 files checked)\n"
+        },
+        "diff_stat": "",
+        "untracked": [
+          "s4-checks/",
+          "tests/unit/markdown-frontmatter.test.js"
+        ],
+        "risk_flag": null
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/s4-runs/T3/native_project/check.json",
+      "sha256": "6504081123bbb96bf7971ee6660767c0de989b7c3ed3310fe07f361dd672ce9f",
+      "content": {
+        "run": "T3/native_project",
+        "dirty_files": [
+          "?? s4-checks/",
+          "?? tests/unit/session-store.test.js"
+        ],
+        "acceptance": {
+          "ok": true,
+          "exit": 0,
+          "tail": "\n> spec-first@1.15.3 typecheck\n> node scripts/typecheck-js.js\n\ntypecheck passed (257 files checked)\n"
+        },
+        "diff_stat": "",
+        "untracked": [
+          "s4-checks/",
+          "tests/unit/session-store.test.js"
+        ],
+        "risk_flag": null
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/s4-runs/T3/current_full/check.json",
+      "sha256": "ccb17ee0dfdf63b3052ce0e4b4278ef7a146dd5e57dec063845dc7f832e2a322",
+      "content": {
+        "run": "T3/current_full",
+        "dirty_files": [
+          "?? s4-checks/",
+          "?? tests/unit/session-store.test.js"
+        ],
+        "acceptance": {
+          "ok": true,
+          "exit": 0,
+          "tail": "\n> spec-first@1.15.3 typecheck\n> node scripts/typecheck-js.js\n\ntypecheck passed (257 files checked)\n"
+        },
+        "diff_stat": "",
+        "untracked": [
+          "s4-checks/",
+          "tests/unit/session-store.test.js"
+        ],
+        "risk_flag": null
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/s4-runs/T3/candidate/check.json",
+      "sha256": "f624212c8bc9ca5625e04aa3d7d3ec0a311e3b7f1c216f4cd1f8e36cf747703f",
+      "content": {
+        "run": "T3/candidate",
+        "dirty_files": [
+          "?? s4-checks/",
+          "?? tests/unit/session-store.test.js"
+        ],
+        "acceptance": {
+          "ok": true,
+          "exit": 0,
+          "tail": "\n> spec-first@1.15.3 typecheck\n> node scripts/typecheck-js.js\n\ntypecheck passed (257 files checked)\n"
+        },
+        "diff_stat": "",
+        "untracked": [
+          "s4-checks/",
+          "tests/unit/session-store.test.js"
+        ],
+        "risk_flag": null
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/s4-runs/T4/native_project/check.json",
+      "sha256": "d3770ad54e5c74242dbdc65225e221eb348c307d88afcb2ac844299691fca3df",
+      "content": {
+        "run": "T4/native_project",
+        "dirty_files": [
+          "?? s4-checks/",
+          "?? tests/unit/supported-host-flags.test.js"
+        ],
+        "acceptance": {
+          "ok": true,
+          "exit": 0,
+          "tail": "\n> spec-first@1.15.3 typecheck\n> node scripts/typecheck-js.js\n\ntypecheck passed (257 files checked)\n"
+        },
+        "diff_stat": "",
+        "untracked": [
+          "s4-checks/",
+          "tests/unit/supported-host-flags.test.js"
+        ],
+        "risk_flag": null
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/s4-runs/T4/current_full/check.json",
+      "sha256": "0d262259ecdb1c3e2402e51f01e7338c0a4ff591464de5d927a31e14f004a130",
+      "content": {
+        "run": "T4/current_full",
+        "dirty_files": [
+          "?? s4-checks/",
+          "?? tests/unit/supported-host-flags.test.js"
+        ],
+        "acceptance": {
+          "ok": true,
+          "exit": 0,
+          "tail": "\n> spec-first@1.15.3 typecheck\n> node scripts/typecheck-js.js\n\ntypecheck passed (257 files checked)\n"
+        },
+        "diff_stat": "",
+        "untracked": [
+          "s4-checks/",
+          "tests/unit/supported-host-flags.test.js"
+        ],
+        "risk_flag": null
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/s4-runs/T4/candidate/check.json",
+      "sha256": "0e87984ebdc259a3b3297811218cf00812dc6580e6c521668a2bd1d40edfad78",
+      "content": {
+        "run": "T4/candidate",
+        "dirty_files": [
+          "?? s4-checks/",
+          "?? tests/unit/supported-host-flags.test.js"
+        ],
+        "acceptance": {
+          "ok": true,
+          "exit": 0,
+          "tail": "\n> spec-first@1.15.3 typecheck\n> node scripts/typecheck-js.js\n\ntypecheck passed (257 files checked)\n"
+        },
+        "diff_stat": "",
+        "untracked": [
+          "s4-checks/",
+          "tests/unit/supported-host-flags.test.js"
+        ],
+        "risk_flag": null
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/s4-runs/T5/native_project/check.json",
+      "sha256": "757fe977bab5c13df5a836427a1bbd39f3b72ea3fb585f9db6997b03d5d19f91",
+      "content": {
+        "run": "T5/native_project",
+        "dirty_files": [
+          "M skills/spec-sweep/references/plan-template.md",
+          "?? s4-checks/",
+          "?? tests/unit/active-docs-links.test.js"
+        ],
+        "acceptance": {
+          "ok": true,
+          "exit": 0,
+          "tail": ""
+        },
+        "diff_stat": "skills/spec-sweep/references/plan-template.md | 2 +-\n 1 file changed, 1 insertion(+), 1 deletion(-)",
+        "untracked": [
+          "s4-checks/",
+          "tests/unit/active-docs-links.test.js"
+        ],
+        "risk_flag": null
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/s4-runs/T5/current_full/check.json",
+      "sha256": "b8d099b49bb591d33ceb9038e5269f9a38f6443ea3abe388327dde43a466ef9a",
+      "content": {
+        "run": "T5/current_full",
+        "dirty_files": [
+          "M skills/spec-sweep/references/plan-template.md",
+          "?? s4-checks/",
+          "?? tests/unit/active-docs-links.test.js"
+        ],
+        "acceptance": {
+          "ok": true,
+          "exit": 0,
+          "tail": ""
+        },
+        "diff_stat": "skills/spec-sweep/references/plan-template.md | 2 +-\n 1 file changed, 1 insertion(+), 1 deletion(-)",
+        "untracked": [
+          "s4-checks/",
+          "tests/unit/active-docs-links.test.js"
+        ],
+        "risk_flag": null
+      }
+    },
+    {
+      "original_path": ".spec-first/workflows/spec-debug/spec-first/s2-baseline-prep-20260908/s4-runs/T5/candidate/check.json",
+      "sha256": "1c41a117087357a85c58574d0236ab07e5aacf4fb8db5eefecc2091d108f0dc6",
+      "content": {
+        "run": "T5/candidate",
+        "dirty_files": [
+          "M skills/spec-sweep/references/plan-template.md",
+          "?? s4-checks/",
+          "?? tests/unit/active-docs-links.test.js"
+        ],
+        "acceptance": {
+          "ok": true,
+          "exit": 0,
+          "tail": ""
+        },
+        "diff_stat": "skills/spec-sweep/references/plan-template.md | 2 +-\n 1 file changed, 1 insertion(+), 1 deletion(-)",
+        "untracked": [
+          "s4-checks/",
+          "tests/unit/active-docs-links.test.js"
+        ],
+        "risk_flag": null
+      }
+    }
+  ]
+}

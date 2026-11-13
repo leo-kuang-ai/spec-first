@@ -1,0 +1,14 @@
+PASS tests/unit/mcp-setup-workspace-graph-build.test.js (9.309 s)
+PASS tests/unit/mcp-setup-workspace-graph-status.test.js (7.591 s)
+PASS tests/unit/mcp-setup-providers.test.js
+PASS tests/unit/mcp-setup-workspace-git-exclude.test.js
+PASS tests/unit/mcp-setup-workspace-lifecycle-lease.test.js
+PASS tests/unit/mcp-setup-workspace-routing-inject.test.js
+PASS tests/unit/mcp-setup-contracts.test.js
+PASS tests/unit/mcp-setup-workspace-graph-refresh.test.js
+
+Test Suites: 8 passed, 8 total
+Tests:       193 passed, 193 total
+Snapshots:   0 total
+Time:        23.477 s
+Ran all test suites within paths "tests/unit/mcp-setup-workspace-routing-inject.test.js", "tests/unit/mcp-setup-workspace-git-exclude.test.js", "tests/unit/mcp-setup-workspace-graph-status.test.js", "tests/unit/mcp-setup-workspace-graph-build.test.js", "tests/unit/mcp-setup-workspace-graph-refresh.test.js", "tests/unit/mcp-setup-workspace-lifecycle-lease.test.js", "tests/unit/mcp-setup-providers.test.js", "tests/unit/mcp-setup-contracts.test.js".

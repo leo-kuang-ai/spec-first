@@ -1,0 +1,447 @@
+{
+  "review": "CEOPT-22 independent full-six read-only review",
+  "overall_verdict": "The six artifacts are acceptable as bounded receipt-interpretation outputs. A controlled same-model A/B comparison is not established: recorded model metadata changes after A1/B1, and the retained ownership-handoff chronology is inconsistent with B2's recorded interval.",
+  "scope": {
+    "trials": [
+      "A1",
+      "B1",
+      "B2",
+      "A2",
+      "A3",
+      "B3"
+    ],
+    "reviewed": [
+      "All six artifact.md files",
+      "All six receipt.json files and tool-events.json files",
+      "All 14 records in each arm's prototype receipt",
+      "Frozen A/B SKILL.md files and referenced scoping, build, preview, write-back and craft-floor documents",
+      "Frozen light-webserver.js implementation",
+      "Parent prepare-prototype.py producer",
+      "Packet, request, intake and input-index pins",
+      "Cleanup evidence and dispatch-owner handoff"
+    ],
+    "method": "Read-only source inspection, hashing, JSON parsing, source comparison and timestamp arithmetic.",
+    "not_performed": [
+      "New trials",
+      "Server or helper execution",
+      "Browser interaction",
+      "Human or visual acceptance",
+      "Network requests",
+      "Mutations",
+      "Delegation"
+    ]
+  },
+  "material_findings": [
+    {
+      "id": "F1",
+      "severity": "material_comparability_limitation",
+      "finding": "Recorded model metadata differs across the six originals.",
+      "evidence": {
+        "A1": "gpt-6-astra, medium",
+        "B1": "gpt-6-astra, medium",
+        "B2": "gpt-6.1-sol, medium",
+        "A2": "gpt-6.1-sol, medium",
+        "A3": "gpt-6.1-sol, medium",
+        "B3": "gpt-6.1-sol, medium"
+      },
+      "impact": "Do not present the pooled six as a same-model controlled experiment or infer model superiority. Recorded metadata is provenance evidence; serving identity was not independently authenticated.",
+      "recommendation": "Retain the originals and disclose the model change. Any timing or quality summaries must preserve the per-trial model labels."
+    },
+    {
+      "id": "F2",
+      "severity": "provenance_qualification",
+      "finding": "The retained handoff document does not establish an ownership cutover before B2.",
+      "evidence": {
+        "handoff_path": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/prototype-dispatch-owner-handoff.json",
+        "handoff_timestamp": "2026-10-31T09:27:55.987079+00:00",
+        "completed_originals_listed": [
+          "A1",
+          "B1"
+        ],
+        "remaining_order_listed": [
+          "B2",
+          "A2",
+          "A3",
+          "B3"
+        ],
+        "B2_interval": [
+          "2026-10-31T09:26:25.083Z",
+          "2026-10-31T09:27:19.511Z"
+        ]
+      },
+      "impact": "B2 finishes before the document timestamp despite being listed as remaining. This is a documentary chronology mismatch, not proof of which agent dispatched B2.",
+      "recommendation": "Qualify ownership provenance or reconcile it using existing authoritative dispatch evidence. Do not silently backdate the handoff."
+    },
+    {
+      "id": "F3",
+      "severity": "source_wording_conflict",
+      "finding": "A2 correctly identifies conflicting stop-mechanism wording in frozen A.",
+      "evidence": {
+        "A_SKILL": "A stop request signals a process only after its PID, root, script and instance identity all match.",
+        "A_preview": "Stop asks the identified server to close itself; it never sends a signal directly to a PID.",
+        "implementation": "Stop authenticates the running instance and sends a token-bound HTTP stop request. The server closes itself. process.kill(pid, 0) is a liveness probe, not a terminating signal. The inspected identity validation does not independently verify a script path."
+      },
+      "impact": "A's SKILL wording overstates and misdescribes the mechanism. A2 appropriately leaves the implementation unresolved from its receipt-level evidence.",
+      "recommendation": "Prefer B's self-close description. Keep reviewer source confirmation separate from the original trials' observed facets."
+    }
+  ],
+  "integrity": {
+    "verdict": "pass",
+    "checks": [
+      "Packet hash matches input-index.",
+      "Request hash matches packet.",
+      "All 14 frozen source-file pins match intake.",
+      "Intake plan hash matches.",
+      "Both prototype receipt pins match.",
+      "All six artifact and tool-trace hashes match their receipts.",
+      "Each trial receipt matches its wave5 trial-index entry.",
+      "All tool-event timestamps fall inside their trial intervals.",
+      "Elapsed-time arithmetic is exact.",
+      "All six trials finish below the 300-second individual limit.",
+      "Frozen A/B webserver files are byte-identical.",
+      "Cleanup root is reported removed and is currently absent."
+    ],
+    "key_hashes": {
+      "packet": "5f4ba06254253242cad17404a477f1b38f398ceb5a7b2ceac3c57af70c76061d",
+      "request": "cec3c0b123c95aface8f3d68c5c414c364527e31c8f3a44d33c7885e66f34ca7",
+      "A_receipt": "391cc8683a2cbd83c847aa622f1f29685ea25b5f6f4a706c04b664a63c74cbeb",
+      "B_receipt": "53485ba4260edada4819bb34f4d76e204af5585e94f0613ef3ee6d2ba7c9bd8f",
+      "identical_webserver": "94442c66dc5fa85ceb6641bd1b644d8a66ab7cac5e741ce0f28f152d5c1162c3"
+    },
+    "limitations": [
+      "Integrity establishes correspondence among retained files; it does not establish browser experience or model serving identity.",
+      "Reviewer source inspection does not retroactively add executed facets to original trials."
+    ]
+  },
+  "receipt_record_review": {
+    "applies_to": [
+      "A",
+      "B"
+    ],
+    "record_count_per_arm": 14,
+    "records": [
+      {
+        "index": 0,
+        "observation": "Initial start reports a running instance.",
+        "boundary": "owner_pid is null; owner supervision was not exercised."
+      },
+      {
+        "index": 1,
+        "observation": "Parent HTTP GET returns 200 and initial total12 content with security headers.",
+        "boundary": "HTTP response evidence, not browser rendering or header enforcement."
+      },
+      {
+        "index": 2,
+        "observation": "Unauthenticated identity request returns 404.",
+        "boundary": "One exercised endpoint case."
+      },
+      {
+        "index": 3,
+        "observation": "Wrong-token identity request returns 404.",
+        "boundary": "Does not establish old-token rejection after restart."
+      },
+      {
+        "index": 4,
+        "observation": "Authenticated identity request returns 200 with matching root and PID.",
+        "boundary": "Initial instance only."
+      },
+      {
+        "index": 5,
+        "observation": "After rewriting the same screen filename, parent HTTP GET returns total18 content.",
+        "boundary": "The reload-current-content phase uses urllib; it is not a browser refresh."
+      },
+      {
+        "index": 6,
+        "observation": "First stop command exits 0 and reports stopped.",
+        "boundary": "Command result plus subsequent external corroboration."
+      },
+      {
+        "index": 7,
+        "observation": "Subsequent HTTP request is unavailable with URLError.",
+        "boundary": "Corroborates first-stop unavailability at that probe."
+      },
+      {
+        "index": 8,
+        "observation": "Status exits 0 and reports stopped.",
+        "boundary": "Reported status."
+      },
+      {
+        "index": 9,
+        "observation": "Restart exits 0 with a new PID and port.",
+        "boundary": "No separate authenticated identity probe after restart."
+      },
+      {
+        "index": 10,
+        "observation": "Restarted HTTP GET returns 200 and total18; producer records changed PID and token_changed=true.",
+        "boundary": "Token rotation is reported by the producer; old-token rejection was not exercised."
+      },
+      {
+        "index": 11,
+        "observation": "Second stop exits 0 and reports stopped.",
+        "boundary": "No second post-stop external HTTP probe."
+      },
+      {
+        "index": 12,
+        "observation": "Status exits 0 and reports stopped.",
+        "boundary": "Does not substitute for a missing external HTTP probe."
+      },
+      {
+        "index": 13,
+        "observation": "Finally-block repeated stop exits 0 and reports stopped.",
+        "boundary": "Fixture cleanup behavior."
+      }
+    ],
+    "arm_instances": {
+      "A": {
+        "initial_pid": 18921,
+        "initial_port": 59134,
+        "restart_pid": 18925,
+        "restart_port": 59145
+      },
+      "B": {
+        "initial_pid": 18930,
+        "initial_port": 59151,
+        "restart_pid": 18942,
+        "restart_port": 59167
+      }
+    },
+    "producer_attribution": "The parent producer creates scratch roots and screens, invokes Node start/status/stop commands, performs urllib HTTP requests, compares private state tokens and removes the scratch tree in finally. These are not worker-executed actions or ordinary deletion of a retained user prototype."
+  },
+  "trial_judgments": [
+    {
+      "trial": "A1",
+      "verdict": "accept_with_experiment_qualifications",
+      "elapsed_seconds": 140.586,
+      "recorded_model": "gpt-6-astra",
+      "reasoning_effort": "medium",
+      "tool_events": 6,
+      "tool_calls": 3,
+      "reads": [
+        "SKILL",
+        "request",
+        "receipt",
+        "preview",
+        "scoping",
+        "build",
+        "write-back"
+      ],
+      "coverage": "All 14 records covered.",
+      "strengths": [
+        "Correctly attributes execution to the parent.",
+        "Explicitly identifies the missing second post-stop HTTP probe.",
+        "Does not claim independent verification of the source hash.",
+        "Preserves browser, human-choice and production-authority limits."
+      ],
+      "qualifications": [
+        "Does not identify A's stop-wording conflict.",
+        "Current root availability remains unverified in the artifact; the trial did not receive cleanup evidence."
+      ]
+    },
+    {
+      "trial": "B1",
+      "verdict": "accept_with_experiment_qualifications",
+      "elapsed_seconds": 50.726,
+      "recorded_model": "gpt-6-astra",
+      "reasoning_effort": "medium",
+      "tool_events": 6,
+      "tool_calls": 3,
+      "reads": [
+        "SKILL",
+        "request",
+        "receipt",
+        "preview",
+        "scoping",
+        "build",
+        "write-back"
+      ],
+      "coverage": "All 14 records semantically covered; stop/status records are grouped.",
+      "strengths": [
+        "Explicitly identifies the missing second post-stop HTTP probe.",
+        "Preserves human-choice, retention and authority boundaries.",
+        "Does not convert HTTP evidence into visual acceptance."
+      ],
+      "qualifications": []
+    },
+    {
+      "trial": "B2",
+      "verdict": "accept_with_experiment_qualifications",
+      "elapsed_seconds": 54.428,
+      "recorded_model": "gpt-6.1-sol",
+      "reasoning_effort": "medium",
+      "tool_events": 4,
+      "tool_calls": 2,
+      "reads": [
+        "SKILL",
+        "request",
+        "receipt",
+        "preview",
+        "scoping",
+        "build",
+        "write-back",
+        "craft-floor"
+      ],
+      "coverage": "All 14 zero-based records explicitly covered.",
+      "strengths": [
+        "Explicitly distinguishes B's manual-refresh instruction from the HTTP GET evidence.",
+        "Conservatively leaves internal stop implementation unverified from allowed reads.",
+        "Maintains human and browser evidence boundaries."
+      ],
+      "qualifications": [
+        "Model metadata differs from A1/B1.",
+        "Recorded interval precedes the retained handoff timestamp."
+      ]
+    },
+    {
+      "trial": "A2",
+      "verdict": "accept_with_experiment_qualifications",
+      "elapsed_seconds": 48.309,
+      "recorded_model": "gpt-6.1-sol",
+      "reasoning_effort": "medium",
+      "tool_events": 4,
+      "tool_calls": 2,
+      "reads": [
+        "SKILL",
+        "request",
+        "receipt",
+        "preview"
+      ],
+      "coverage": "All 14 records covered.",
+      "strengths": [
+        "Correctly identifies A's SKILL-versus-preview stop-wording conflict.",
+        "Correctly states that receipts cannot settle implementation.",
+        "Does not claim to have read unconsumed references."
+      ],
+      "qualifications": [
+        "Scoping, build and write-back references were not read.",
+        "Model metadata differs from A1/B1."
+      ]
+    },
+    {
+      "trial": "A3",
+      "verdict": "accept_with_experiment_qualifications",
+      "elapsed_seconds": 44.833,
+      "recorded_model": "gpt-6.1-sol",
+      "reasoning_effort": "medium",
+      "tool_events": 4,
+      "tool_calls": 2,
+      "reads": [
+        "SKILL",
+        "request",
+        "receipt",
+        "preview",
+        "build",
+        "scoping"
+      ],
+      "coverage": "All 14 records covered.",
+      "strengths": [
+        "Explicitly states the source hash was not recomputed.",
+        "Preserves receipt-versus-implementation and human-evidence boundaries."
+      ],
+      "qualifications": [
+        "Does not identify A's stop-wording conflict.",
+        "Write-back and craft-floor references were not read.",
+        "Model metadata differs from A1/B1."
+      ]
+    },
+    {
+      "trial": "B3",
+      "verdict": "accept_with_minor_reporting_and_experiment_qualifications",
+      "elapsed_seconds": 39.555,
+      "recorded_model": "gpt-6.1-sol",
+      "reasoning_effort": "medium",
+      "tool_events": 4,
+      "tool_calls": 2,
+      "reads": [
+        "SKILL",
+        "request",
+        "receipt",
+        "preview",
+        "scoping"
+      ],
+      "coverage": "All 14 records covered.",
+      "strengths": [
+        "Explicitly identifies resumed-instance authenticated identity as untested.",
+        "Scopes second stop/status to reported state.",
+        "Preserves browser and human-choice boundaries."
+      ],
+      "qualifications": [
+        "Does not explicitly call out the missing second post-stop HTTP probe, although it does not claim that probe occurred.",
+        "Build, write-back and craft-floor references were not read.",
+        "Model metadata differs from A1/B1."
+      ]
+    }
+  ],
+  "cross_trial_observations": {
+    "all_six": [
+      "Use only file-reading calls; do not execute the prototype server.",
+      "Do not read the opposite arm or earlier model/reviewer outputs.",
+      "Have no truncated original tool output.",
+      "Correctly attribute receipt production to the parent.",
+      "Distinguish updated HTTP bytes from browser refresh, visual quality and human experience.",
+      "Distinguish reported token rotation from untested old-token rejection.",
+      "Leave human questions and choices unresolved.",
+      "Do not manufacture decisions.md, production write-back authority or external-action authority."
+    ],
+    "status": "All retained trial statuses are executed-awaiting-review and final_artifact=true."
+  },
+  "source_verification": {
+    "shared_server": "A and B contain byte-identical webserver implementations; the changes under comparison are prose.",
+    "confirmed_by_source": [
+      "Root validation rejects a symlink root and uses a canonical real directory with owner checks where available.",
+      "Binding is restricted to loopback.",
+      "Instance tokens are freshly generated for starts.",
+      "Identity verification checks root, PID, token and loopback endpoint information.",
+      "Stop uses an authenticated HTTP request; the server closes itself.",
+      "The zero-signal PID operation checks liveness and does not terminate the process.",
+      "Root requests reread current HTML content.",
+      "/version reports the latest filename, not a content digest.",
+      "There is no injected live-reload watcher."
+    ],
+    "not_promoted_to_runtime_pass": [
+      "Old-token rejection after restart",
+      "Owner-supervision shutdown",
+      "Idle shutdown",
+      "Hostile path or symlink scenarios",
+      "Browser enforcement of security headers",
+      "Second-stop external HTTP unavailability",
+      "Human or visual acceptance"
+    ],
+    "B_prose_changes": [
+      "Honors existing scoped authority and asks about missing or materially expanded effects.",
+      "Describes authenticated self-close without a terminating PID signal.",
+      "Explicitly requires manual browser refresh after edits and distinguishes no-store from live reload.",
+      "Clarifies /version filename semantics.",
+      "Adds craft-floor guidance for focus, loading, errors, density and viewport limitations."
+    ],
+    "interpretation": "These are supported wording improvements. This review does not establish superior runtime behavior, user benefit or model performance."
+  },
+  "timing": {
+    "measurement": "First session JSONL timestamp to final assistant-message timestamp; not capture time.",
+    "individual_limit_seconds": 300,
+    "all_within_individual_limit": true,
+    "sum_of_trial_intervals_seconds": 378.437,
+    "first_start_to_last_final_seconds": 1127.954,
+    "inter_trial_gap_total_seconds": 749.517,
+    "inter_trial_gaps_seconds": {
+      "A1_to_B1": 553.603,
+      "B1_to_B2": 108.379,
+      "B2_to_A2": 54.235,
+      "A2_to_A3": 15.873,
+      "A3_to_B3": 17.427
+    },
+    "qualification": "Do not causally assign gaps to scheduling, queueing or capture, and do not treat the measured intervals as demonstrated user-facing efficiency gains."
+  },
+  "completion_boundary": {
+    "completed": "Full-six read-only artifact, receipt, trace, frozen-source, producer, pin, timing and handoff review.",
+    "not_established": [
+      "A controlled same-model six-trial comparison",
+      "An ownership cutover before B2 from the retained handoff document",
+      "A complete interactive prototype workflow",
+      "Human choice or acceptance",
+      "Visual or field outcomes",
+      "Runtime superiority",
+      "Production readiness or release"
+    ],
+    "recommended_disposition": "Accept the six bounded receipt-analysis artifacts, retain the A wording-conflict finding, and qualify aggregate experiment claims with the recorded model change and handoff chronology mismatch."
+  }
+}

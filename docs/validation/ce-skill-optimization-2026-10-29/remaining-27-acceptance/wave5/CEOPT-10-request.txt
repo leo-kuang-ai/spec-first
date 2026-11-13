@@ -1,0 +1,2 @@
+Assess all declared criteria against the actual page lifecycle, explicitly distinguishing the stale DOM after server replacement from the post-reload current page. Include the browser-unavailable branch; do not invent worker browsing.
+Read only assigned-arm frozen Skill, named receipts and fixture. Produce an English evidence-grounded disposition covering every case and remaining facet. No mutations, browser commands, network calls, tests or delegation in this model trial; parent-operated evidence is explicitly attributed.

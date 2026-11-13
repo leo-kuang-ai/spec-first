@@ -1,0 +1,18 @@
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 59.842583
+--- probe-units ---
+{"tenantId":"t1","amountCents":12.5} {"status":"captured","chargedCents":12.5} captured: 0.13
+--- probe-cross-tenant ---
+charged: ["A"] A: {"status":"captured","chargedCents":10} B: {"status":"captured","chargedCents":10}
+--- probe-retry-after-failure ---
+first threw: provider down
+retry: {"status":"captured","chargedCents":5} attempts: 1
+--- probe-batch-partial ---
+batch threw: boom
+charged order: ["a","bad"]

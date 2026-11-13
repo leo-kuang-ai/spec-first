@@ -1,0 +1,62 @@
+{
+  "skill_name": "spec-code-review",
+  "schema_version": "v1alpha1",
+  "engine_name": "codex",
+  "model_name": "",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "codex",
+    "protocol": "openai"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "codex",
+    "protocol": "openai"
+  },
+  "observed_configuration": {
+    "version": "0.155.1"
+  },
+  "start_time": "2026-09-21T21:45:17.38506+08:00",
+  "end_time": "2026-09-21T21:47:56.501003+08:00",
+  "case_results": [
+    {
+      "case_id": "report-only-detects-tenant-bypass",
+      "title": "默认审查应发现跨租户授权绕过且保持只读",
+      "status": "PASS",
+      "duration_ms": 158404,
+      "turns": 1,
+      "input_tokens": 508836,
+      "output_tokens": 2827,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "expect.exit_code",
+            "passed": true,
+            "evidence": "all checks passed"
+          },
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-code-review/evals/fixtures/scripts/check-report-only-tenant-bypass.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "这是一个隔离评测工作区。先运行 `bash prepare-review-fixture.sh` 建立 baseline commit 并应用待审查补丁；\n该命令仅用于准备评测环境，不属于审查修复。\n请使用 spec-code-review 审查当前工作区相对 base:HEAD 的改动。\n只需要审查报告，不要修改文件、提交、切换分支，也不要调用子代理或并行 reviewer。\n",
+      "response": "审查范围：`base:HEAD` 对当前工作树；仅审查 `src/orders.js`，未纳入未跟踪的 `.codex/` 技能文件。审查过程未修改、提交或切换分支。\n\n**P0 — Critical**\n\n- `src/orders.js:4`：移除 `tenantId` 校验后，调用者可读取其他租户的订单，造成跨租户数据泄露。\n  - 证据：`tenant-a` 查询 `tenant-b` 订单时，当前实现直接返回订单；现有测试在 `test/orders.test.js:9` 失败。\n  - 修复：恢复 `candidate.tenantId === user.tenantId` 校验，跨租户或不存在时返回 `null`。\n\n验证：`npm test` 失败（1 failed）。未提供计划文件。由于用户未授权子代理，按 `spec-code-review` 使用受限的 inline report-only 审查，结论为 **Not ready**。",
+      "observed_version": "0.155.1"
+    }
+  ],
+  "total_tokens": 511663,
+  "judge_tokens": 0,
+  "overall_tokens": 511663
+}

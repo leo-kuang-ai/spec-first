@@ -1,0 +1,25 @@
+schema_version: v1alpha1
+
+# 第二轮筛查；工作目录由 skill-up 放在 $TMPDIR，位于仓库之外
+environment:
+  type: none
+
+skills: []
+
+engine:
+  name: claude_code
+
+cases:
+  files:
+    - evals/cases/s06-w4-unit-conflict.yaml
+    - evals/cases/s06-w5-characterization.yaml
+    - evals/cases/s06-w6-missing-verify.yaml
+  defaults:
+    timeout_seconds: 1200
+    max_turns: 40
+    collect_artifacts: ["**"]
+  parallelism: 3
+
+report:
+  formats: [json]
+  artifacts: [transcript]

@@ -1,0 +1,20 @@
+{
+  "expectations": [
+    {
+      "text": "expect.exit_code",
+      "passed": true,
+      "evidence": "all checks passed"
+    },
+    {
+      "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-project-rules/evals/fixtures/scripts/check-refresh-dirty.sh",
+      "passed": true,
+      "evidence": "PASS: refresh dirty（聚焦重验、零写入、用户改动保留）"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 0,
+    "total": 2,
+    "pass_rate": 1
+  }
+}

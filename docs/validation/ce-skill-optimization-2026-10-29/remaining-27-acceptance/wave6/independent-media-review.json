@@ -1,0 +1,325 @@
+{
+  "review_id": "CEOPT-24-independent-full-six",
+  "verdict": "bounded-local-evidence-accepted-with-reporting-limitations",
+  "summary": "All six artifacts address both analyzer copies, all ten chunk cases, both quiet cases, and both cumulative-fallback cases. They distinguish mocked calls from actual egress and avoid claiming real transcription or confirmed product outcomes. Independent source inspection confirms the reported A defects and B bookkeeping mechanisms. This supports local mechanism and interpretation findings only; it establishes neither model superiority nor live product capability.",
+  "evidence_aliases": {
+    "E": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6",
+    "RUN": ".spec-first/workflows/spec-work/spec-first/ce-opt-27-w1-20261030",
+    "M_A": "E/media-A-receipts.json",
+    "M_B": "E/media-B-receipts.json",
+    "S_A": "E/media-supplement-A-receipts.json",
+    "S_B": "E/media-supplement-B-receipts.json",
+    "R": "entrypoints[0]: spec-riffrec-feedback-analysis analyzer",
+    "W": "entrypoints[1]: spec-sweep analyzer",
+    "trial_artifact": "E/trials/CEOPT-24-{trial}/artifact.md"
+  },
+  "review_scope": {
+    "read": [
+      "All six complete artifacts, receipts, and tool-event files",
+      "Exact CEOPT-24 trial-index records and relevant intake source pins",
+      "Packet, supplement, request, and all four media receipt files",
+      "Frozen A/B Riffrec Skills and own references",
+      "Both frozen analyzer copies per arm, including byte-equivalence checks",
+      "prepare-media.py and prepare-media-supplement.py"
+    ],
+    "performed": "Read-only inspection and pure JSON, hash, comparison, and timestamp analysis.",
+    "not_performed": "No mutations, helpers, tests, browser, network, providers, delegation, or new trials."
+  },
+  "case_truth": {
+    "notation": "Intervals are half-open seconds. Covered means simulated successful processing, not verified speech completeness.",
+    "applies_to": [
+      "R",
+      "W"
+    ],
+    "rows": [
+      {
+        "case": "complete",
+        "pointer": "M_{arm}/entrypoints/{j}/chunk_cases/0",
+        "A": "ok; inferred coverage [0,420),[420,840); interval arrays absent",
+        "B": "ok; degraded=false; explicit covered intervals [0,420),[420,840); missing=[]",
+        "mock_calls_ffmpeg_provider": [
+          2,
+          2
+        ]
+      },
+      {
+        "case": "second-provider-failed",
+        "pointer": "M_{arm}/entrypoints/{j}/chunk_cases/1",
+        "A": "aggregate ok despite failed second provider; interval arrays absent",
+        "B": "partial; degraded=true; explicit coverage [0,420), missing [420,840)",
+        "independent_interval_assessment": "First interval represented; second unavailable",
+        "mock_calls_ffmpeg_provider": [
+          2,
+          2
+        ]
+      },
+      {
+        "case": "second-extraction-failed",
+        "pointer": "M_{arm}/entrypoints/{j}/chunk_cases/2",
+        "A": "aggregate ok despite second extraction failure; interval arrays absent",
+        "B": "partial; degraded=true; explicit coverage [0,420), missing [420,840)",
+        "mock_calls_ffmpeg_provider": [
+          2,
+          1
+        ],
+        "missing_field": "Failed extraction chunk has no provider_request_sent field; call list establishes no second provider call."
+      },
+      {
+        "case": "silence",
+        "pointer": "M_{arm}/entrypoints/{j}/chunk_cases/3",
+        "A": "Both chunks ok with empty text, but aggregate failed: No chunks transcribed successfully; interval arrays absent",
+        "B": "ok with empty text; degraded=false; both intervals covered; missing=[]",
+        "mock_calls_ffmpeg_provider": [
+          2,
+          2
+        ],
+        "limit": "Empty successful responses do not establish acoustic silence."
+      },
+      {
+        "case": "no-egress-authority",
+        "pointer": "M_{arm}/entrypoints/{j}/chunk_cases/4",
+        "A": "Aggregate failed; two subordinate skipped chunks; authorization missing; provider_request_sent=false; two mocked extractions",
+        "B": "Aggregate skipped; authorization missing; provider_request_sent=false; no subprocess calls",
+        "intervals": "Neither arm supplies interval arrays here. Whole [0,840) remains untranscribed; this is an assessment, not a recorded numeric coverage field.",
+        "mock_calls_ffmpeg_provider_A": [
+          2,
+          0
+        ],
+        "mock_calls_ffmpeg_provider_B": [
+          0,
+          0
+        ]
+      },
+      {
+        "case": "quiet",
+        "pointer": "M_{arm}/entrypoints/{j}/quiet_capture",
+        "A": "Evidence-free, low-confidence F1 becomes R3; friction assertion and unclickable-button AE2 are unsupported",
+        "B": "findings=[]; no confirmed product requirements; R1/R2 are evidence-handling guidance",
+        "residual": "B still contains generic scaffold assumptions about verbalized friction and converted transcript. These are not session observations."
+      },
+      {
+        "case": "initial-request-then-unavailable-fallback",
+        "pointer": "S_{arm}/entrypoints/{j}",
+        "both": "One mocked whole-file curl request returns input_too_large; absent ffmpeg prevents chunking; transcript failed and empty; CLI exit=0",
+        "A": "Final transcript and egress receipt incorrectly say provider_request_sent=false; no attempts or interval arrays",
+        "B": "Both retain attempts with request flags true then false; aggregate true; covered=[]; missing=[0,840); degraded=true",
+        "cleanup": "scratch_removed_after_context_exit=true is measured after leaving TemporaryDirectory"
+      }
+    ]
+  },
+  "exhaustive_trial_coverage_matrix": {
+    "columns": [
+      "A1",
+      "B1",
+      "B2",
+      "A2",
+      "A3",
+      "B3"
+    ],
+    "legend": {
+      "C": "Case addressed consistently with the bounded evidence",
+      "C*": "Case addressed, but A aggregate no-authority status failed was not explicitly distinguished from subordinate skipped statuses"
+    },
+    "rows": {
+      "R.complete": [
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C"
+      ],
+      "W.complete": [
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C"
+      ],
+      "R.second-provider-failed": [
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C"
+      ],
+      "W.second-provider-failed": [
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C"
+      ],
+      "R.second-extraction-failed": [
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C"
+      ],
+      "W.second-extraction-failed": [
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C"
+      ],
+      "R.silence": [
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C"
+      ],
+      "W.silence": [
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C"
+      ],
+      "R.no-egress-authority": [
+        "C*",
+        "C",
+        "C",
+        "C*",
+        "C*",
+        "C"
+      ],
+      "W.no-egress-authority": [
+        "C*",
+        "C",
+        "C",
+        "C*",
+        "C*",
+        "C"
+      ],
+      "R.quiet": [
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C"
+      ],
+      "W.quiet": [
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C"
+      ],
+      "R.fallback-and-cleanup": [
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C"
+      ],
+      "W.fallback-and-cleanup": [
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C"
+      ]
+    }
+  },
+  "per_trial_verdicts": [
+    {
+      "trial": "A1",
+      "verdict": "accepted-with-minor-status-precision-limit",
+      "seconds": 66.277,
+      "findings": "Correctly identifies partial-ok, empty-success failure, unsupported quiet promotion, cumulative-attempt loss, and 16 mocked provider calls.",
+      "cleanup_wording": "Says base flag records cleanup after capture, then explicitly withholds established context-exit timing. Do not reinterpret this as measured base cleanup."
+    },
+    {
+      "trial": "B1",
+      "verdict": "accepted-with-recovered-truncation",
+      "seconds": 69.459,
+      "findings": "Correct intervals, partial/empty-success/skipped distinctions, absent skipped coverage fields, quiet boundary, cumulative attempts, and mocked totals.",
+      "cleanup_wording": "Says base flag reports cleanup after capture and explicitly withholds established post-context timing."
+    },
+    {
+      "trial": "B2",
+      "verdict": "accepted",
+      "seconds": 61.156,
+      "findings": "Complete case coverage, explicit skipped-field limitation, cumulative accounting, scaffold caveats, and cleanup timing boundary."
+    },
+    {
+      "trial": "A2",
+      "verdict": "accepted-with-minor-status-precision-limit",
+      "seconds": 59.214,
+      "findings": "Correct A reporting defects, unsupported quiet claims, fallback history loss, attempt totals, and distinct cleanup evidence strength."
+    },
+    {
+      "trial": "A3",
+      "verdict": "accepted-with-minor-status-precision-limit",
+      "seconds": 70.318,
+      "findings": "Correct A defects and bounded outcomes; includes exact evidence line references and explicit post-context timing limitation."
+    },
+    {
+      "trial": "B3",
+      "verdict": "accepted",
+      "seconds": 64.503,
+      "findings": "Correct case distinctions, numeric interval boundaries, cumulative history, quiet-versus-silence separation, and historical scratch artifact limitation."
+    }
+  ],
+  "mechanism_and_producer_findings": {
+    "source_equivalence": "Within each arm, Riffrec and Sweep analyzer files are byte-identical. This establishes duplicated analyzer implementation behavior, not spec-sweep Skill entrypoint behavior.",
+    "A_root_mechanisms": [
+      "transcribe_media_chunks chooses aggregate success from nonempty transcript text rather than complete successful chunk coverage.",
+      "main replaces the initial result with fallback output, losing prior request-attempt truth.",
+      "summarize_candidate_findings invents a no-failure placeholder; write_requirements_kickoff promotes findings into R-items and includes unsupported friction/example text."
+    ],
+    "B_mechanisms": [
+      "Chunk statuses determine explicit covered/missing intervals and partial/failed/ok aggregation, preserving empty successful text.",
+      "Authorization is checked before chunk extraction.",
+      "transcribe_with_fallback retains compact attempts and ORs request flags.",
+      "Quiet findings remain empty and product requirements remain unconfirmed."
+    ],
+    "producer_cleanup": "prepare-media.py writes scratch_removed_after_capture=True inside TemporaryDirectory without a post-exit existence measurement. The base flag is hardcoded and proves no measured cleanup. prepare-media-supplement.py evaluates not p.exists() after context exit. Its four arm/entrypoint checks support only those disposable roots.",
+    "fairness": "Trials were not permitted to inspect producer scripts. Failure to discover the hardcoded base flag is not a model failure; each artifact explicitly withholds established base post-context timing.",
+    "egress_totals": "Per arm: seven mocked provider calls per entrypoint across chunk cases, plus one supplement call each: sixteen provider attempts. A has twenty mocked extraction calls across both entrypoints; B has sixteen. All actual_egress fields are false. These are separate fixture totals, not one production session.",
+    "execution_limit": "Producer source and stored receipts support mocked Python control-flow observations. No independent rerun occurred."
+  },
+  "integrity_and_trace_review": {
+    "pins": "All eighteen relevant intake source hashes match. All four base-receipt analyzer pins match. Packet request and A/B receipt pins match. Supplement parent-packet and A/B receipt pins match. All twelve trial artifact/trace hashes match; six index records equal their receipt files.",
+    "timing": "Recomputed elapsed times equal all six recorded values and are below 300 seconds. Starts are sequential in prescribed A1,B1,B2,A2,A3,B3 order, without overlap. Supplement timestamp precedes all six trials.",
+    "provenance_limits": "Hashes establish present-byte consistency, not authenticated historical immutability. Packet status remains prepared-not-executed. Frozen-before-trial and unchanged-save statements are provenance declarations, not independent serving or storage attestations.",
+    "model": "All receipts label gpt-6.1-sol with medium effort; serving identity is unauthenticated.",
+    "allowed_reads": "All observed trial commands are cat, sed, wc, or rg over assigned-arm frozen Riffrec Skill/own references, request, and assigned receipt files.",
+    "forbidden_reads_or_actions": "No observed opposite-arm reads, prior-trial/grader reads, current-runtime reads, adjacent Sweep Skill reads, analyzer execution, mutation, external contact, or delegation.",
+    "truncation": "B1 has one 175-token aggregate-output elision covering approximately media-B lines 656\u2013673. Its subsequent sed read of lines 570\u2013730 recovers that entire range. Other five traces show no truncation. Each trial's bounded reads cover complete assigned base and supplement receipt files.",
+    "isolation": "Trace-observed compliance does not establish enforced filesystem isolation or absence of inherited context.",
+    "saving": "Artifacts are parent-saved responses; autonomous durable saving was not tested."
+  },
+  "residual_owners_and_minimal_recommendations": [
+    {
+      "owner": "Acceptance/report owner",
+      "action": "Retain original A failure receipts. Record B as locally verified bookkeeping mechanisms, without superiority, real-transcription, visual-review, or product-outcome claims."
+    },
+    {
+      "owner": "Validation producer",
+      "action": "Label base cleanup unmeasured; retain supplement post-context measurements separately. Preserve B1 truncation and recovery evidence."
+    },
+    {
+      "owner": "Artifact author/reviewer",
+      "action": "When describing A authorization cases, explicitly distinguish aggregate failed from subordinate skipped. Preserve absent interval fields as absent."
+    },
+    {
+      "owner": "Analyzer and product reviewers",
+      "action": "Keep unsupported scaffold claims unconfirmed. Real decoding, accuracy, coverage, provider acceptance, visual interpretation, privacy review, and product requirement promotion remain pending separately authorized evidence."
+    }
+  ]
+}

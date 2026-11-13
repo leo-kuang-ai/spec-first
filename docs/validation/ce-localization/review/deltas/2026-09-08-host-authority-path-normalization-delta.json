@@ -1,0 +1,68 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "2026-09-08-host-authority-path-normalization-delta",
+  "producer": "current Codex session bounded source review",
+  "reviewed_at": "2026-09-08T00:00:00.000Z",
+  "source_binding": {
+    "head": "b557f8bc6f884f0fef460108e6279b31227c50fb",
+    "dirty_path_manifest_sha256": "33b61786960964e9410d7896334c5d74af7d9864197c34485c42c5e7682c5b73",
+    "source_tree_hash": "31f6342f194db75c0a07343e4574b1311a30c907a02bfab9513fbd41a9c41985",
+    "inventory_hash": "e45bd0fdd5d8d88fef13e0e50f2da78becc28d53ba639abc968a571f7f335063",
+    "inventory_artifact_sha256": "8168285ba62bc959ddef3a6b8d3649345ac85735824c2133f9ccf9c99a0f028e",
+    "review_input_hash": "47dde7545f50495bbbb690919409c904ecd2cee8370f0b54a5d793c93154de29"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "not-used",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "reviewed_paths": [
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/host-authority.cjs",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "785e07eccaa5470ba6ef2e6af41983980d90a7bfb9f1ca624ba9e5d1d073c9c0",
+      "bytes": 7587,
+      "line_count": 217,
+      "covered_line_ranges": [
+        [
+          1,
+          217
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Reviewed the canonical host authority normalization change and its containment behavior against the local runtime setup contract."
+          ],
+          "limitations": [
+            "Inline same-context review is not independent provider evidence."
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Checked that the normalization change preserves loaded-host binding and does not widen mutation authority."
+          ],
+          "limitations": [
+            "Inline same-context review is not independent provider evidence."
+          ]
+        }
+      ]
+    }
+  ],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "Bounded review covers the one changed source path after the Windows path normalization fix; it does not establish Windows CI rerun or field outcome."
+  ],
+  "claim_ceiling": "Source receipt refresh only; no independent model or production claim."
+}

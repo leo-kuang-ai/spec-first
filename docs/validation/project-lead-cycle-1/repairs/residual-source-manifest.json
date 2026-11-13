@@ -1,0 +1,10 @@
+{
+  "captured_at": "2026-09-21T10:09:27.936779+00:00",
+  "source_hashes": {
+    "tests/unit/ce-localization-review-contracts.test.js": "b07f0fbdf9612b952ad1ac568d3de4603a8c570e8bea199be0f007cf97b87738",
+    "tests/unit/ce-localization-closeout-contracts.test.js": "d4a0c6116490e6dcb314c1eaba05cf9360f7faf156d0ab545afdfebb1bfea72d",
+    "docs/contracts/workflows/ce-localization-regeneration-sequence.md": "77eed3489b1d2bace46908e70fc8f83e9ab36f981363785b28c57503c23f887e",
+    "docs/validation/skill-evals/results.tsv": "598d54749720eb48c36b92fd6078f25605a586d6c361769a590137b08c05a658"
+  },
+  "note": "TSV其他任务仍可追加；hash为本次修复后采样。"
+}

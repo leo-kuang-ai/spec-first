@@ -1,0 +1,19 @@
+{
+  "captured_at": "2026-09-21T10:35:30.161Z",
+  "red_fix": {
+    "command": "node producer receipt + Ajv strict validation before schema patch",
+    "before_exit_code": 1,
+    "before_error": "additionalProperties: surface_hosts"
+  },
+  "green": {
+    "command": "npx --no-install jest --runInBand tests/unit/mcp-setup-config-consumers.test.js tests/unit/mcp-setup-host-config.test.js",
+    "exit_code": 0,
+    "suites": 2,
+    "tests": 57
+  },
+  "files": {
+    "docs/contracts/verification/host-invocation-receipt.schema.json": "79df9df0a569bf754989ed86d41ccf59aa186d31da972517d334c76a19c2ec00",
+    "tests/unit/mcp-setup-config-consumers.test.js": "a4d0e30587e5e2519136290e5d1c2e0c76a17eca05649653b6c7fc81a6a3ee3b",
+    "tests/unit/mcp-setup-host-config.test.js": "a5ddbc6b21fd8506ca3fd965bbbfb0ec0c29e736c9e73e989abd213baed4faee"
+  }
+}

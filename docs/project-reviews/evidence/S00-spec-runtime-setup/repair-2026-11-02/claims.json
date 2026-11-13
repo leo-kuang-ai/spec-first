@@ -1,0 +1,40 @@
+{
+  "run_summary_ref": ".spec-first/workflows/spec-debug/spec-first/s00-repair-final/verification-run-summary.json",
+  "claims": [
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:original-reproducer"
+      ]
+    },
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:regression"
+      ]
+    },
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:mode-contracts"
+      ]
+    },
+    {
+      "claim_type": "validation",
+      "asserted_status": "passed",
+      "evidence_refs": [
+        "verification-run-summary:eval-schema"
+      ]
+    },
+    {
+      "claim_type": "validation",
+      "asserted_status": "not-run",
+      "evidence_refs": [
+        "verification-run-summary:real-host-model"
+      ]
+    }
+  ]
+}

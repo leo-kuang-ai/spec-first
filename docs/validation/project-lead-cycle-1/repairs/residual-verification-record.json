@@ -1,0 +1,48 @@
+{
+  "status": "written",
+  "reason_code": "written",
+  "schema_version": "verification-run-summary.v1",
+  "run_summary_ref": ".spec-first/workflows/spec-debug/spec-first/cycle1-residual-regression-20260921/verification-run-summary.json",
+  "checks": [
+    {
+      "id": "20-full-regression",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    },
+    {
+      "id": "21-typecheck",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    },
+    {
+      "id": "21-entrypoint-lint",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    },
+    {
+      "id": "21-changelog",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    },
+    {
+      "id": "22-ce-strengthened",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    },
+    {
+      "id": "23-current-gate-negative",
+      "status": "passed",
+      "reason_code": "negative-gate-correctly-rejected-stale"
+    },
+    {
+      "id": "24-final-delivery",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    },
+    {
+      "id": "24-final-whitespace",
+      "status": "passed",
+      "reason_code": "exit-code-zero"
+    }
+  ]
+}

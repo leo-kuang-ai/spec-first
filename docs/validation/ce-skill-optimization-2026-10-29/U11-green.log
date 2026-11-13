@@ -1,0 +1,8 @@
+PASS tests/unit/spec-lfg-pr-watch-state.test.js (6.594 s)
+PASS tests/unit/spec-lfg-contracts.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       52 passed, 52 total
+Snapshots:   0 total
+Time:        7.906 s, estimated 8 s
+Ran all test suites within paths "tests/unit/spec-lfg-pr-watch-state.test.js", "tests/unit/spec-lfg-contracts.test.js".

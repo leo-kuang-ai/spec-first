@@ -1,0 +1,91 @@
+{
+  "status": "degraded",
+  "verdict": "Not ready",
+  "mutation_policy": "report-only",
+  "commit_authorization": "missing",
+  "scope": {
+    "base": "9a299661dbd5434636f9e1a8ceacb355325f6367",
+    "branch": "main",
+    "head_sha": "9a299661dbd5434636f9e1a8ceacb355325f6367",
+    "pr_url": null,
+    "files_changed": 4
+  },
+  "intent": "为 MiniLedger 新增 GET /entries/:id 单条查询：命中返回条目 JSON（与列表元素同形），无法对应现存条目（含非数字/超范围/空段/尾斜杠）一律 404 纯文本 not found；/entries/<子路径> 的前缀捕获行为按计划 KTD4 显式终结。GET /entries（含 month 过滤）与 POST /entries 保持基线逐字不变，并引入 node:test 回归基线（U1-U3，R1-R4）。",
+  "intent_confidence": "explicit",
+  "reviewers": ["inline-fallback"],
+  "findings": [],
+  "actionable_findings": [],
+  "triage_groups": [],
+  "pre_existing_findings": [],
+  "requirements_completeness": {
+    "plan_path": "docs/plans/2026-11-12-001-feat-entry-by-id-plan.md",
+    "plan_source": "explicit",
+    "artifact_contract": "spec-unified-plan/v1",
+    "artifact_readiness": "implementation-ready",
+    "requirements": [
+      {"id": "R1", "status": "met", "evidence": "src/server.js:16-28 命中返回条目 JSON；test/server.test.js AE1 用例（200 + application/json + 深度相等）"},
+      {"id": "R2", "status": "met", "evidence": "src/server.js:19-27 非数字/未命中一律 404；AE2/AE3 及边界用例（1.5、-1、空段、5/、超大数值）实测通过"},
+      {"id": "R3", "status": "met", "evidence": "src/server.js:29-35 列表分支与基线 9a29966 逐字一致；AE4 两条用例（全量+month 过滤表征）通过"},
+      {"id": "R4", "status": "met", "evidence": "src/server.js:6-15 POST 分支与基线逐字一致；AE5 用例通过"}
+    ],
+    "units": [
+      {"id": "U1", "status": "met", "evidence": "test/server.test.js 新建（10 用例）、package.json scripts.test、src/server.js:45-49 require.main 守卫 + 导出接缝"},
+      {"id": "U2", "status": "met", "evidence": "src/server.js:16-28 单条分支置于列表分支之前；特性用例含边界/前导零/查询串/方法归属"},
+      {"id": "U3", "status": "met", "evidence": "README.md endpoint 清单改为 three 并纳入 GET /entries/:id；CHANGELOG.md 工作区已有 v0.2.0 (user-visible) 条目（注意：CHANGELOG.md 为 untracked，超出冻结 tracked diff，系工作区直读）"}
+    ],
+    "reverse_requirement_check": "未发现计划外来新增的可观察行为规则：子路径 404 化与响应形态均有 Product Contract Key Decision 1/3 与 KTD2-KTD4 授权。"
+  },
+  "learnings": [],
+  "agent_native_gaps": [],
+  "deployment_notes": [],
+  "residual_risks": [
+    "src/server.js:10 — POST /entries 对畸形 JSON body 的 JSON.parse 未捕获异常（进程级崩溃面）为基线既有问题，计划 Implementation Scope Boundaries 明确不修复；本次 diff 未扩大该暴露。",
+    "实际 Node 下限为 >= 18.2 而非计划 A4 写的 >= 18：test/server.test.js:18 的 server.closeAllConnections() 于 Node 18.2 才引入；更老运行器上 after() 钩子会抛错。",
+    "版本口径：package.json 仍为 0.1.0，CHANGELOG.md（untracked，超出冻结 diff）记录 v0.2.0；计划允许'以实际发布为准'，由维护者决定是否对齐或补发布流程。"
+  ],
+  "testing_gaps": [
+    "test/server.test.js — 全部用例共享同一 server 与内存 entries 且依赖文件内顺序执行（如'前导零'用例的前置'id 2 存在'由更早用例建立）；--test-name-pattern 选择性运行或开启并发时前置会失败。当前 node:test 默认串行下实测全绿，属可接受的设计权衡（计划 U1 表征测试形态），扩展用例时再引入按用例数据隔离。"
+  ],
+  "coverage": {
+    "task_scope": null,
+    "dispatch_reason_code": "dispatch_authorization_missing",
+    "scenario_capability": "fallback-only",
+    "verification_evidence": {
+      "status": "degraded",
+      "run_summary_ref": null,
+      "closeout_verdict": "not-run",
+      "reason_code": "verification-summary-record-unavailable",
+      "checks": [
+        {
+          "check_id": "npm-test",
+          "command": "npm test",
+          "observed": "node --test TAP 汇总：tests 10, pass 10, fail 0（覆盖 AE1-AE5 + 边界/前导零/查询串/方法归属）",
+          "evidence_basis": "运行器 TAP 输出；exit code 因输出管道未单独复捕（复捕命令被权限拒绝），以 fail=0 汇总为准"
+        },
+        {
+          "check_id": "url-parse-fact-check",
+          "command": "node -e（WHATWG URL 对 %zz、%、%32、%2F5、//5 的行为）",
+          "observed": "均不抛异常，pathname 原样保留 -> 新分支对这些形态稳定 404，符合 KTD2 主句；计划中'畸形百分号编码触发解析异常'的叙述与实测不符（代码行为正确，计划文本不准）",
+          "evidence_basis": "orchestrator 直接机械核查输出"
+        }
+      ],
+      "limitations": [
+        "spec-first verification-run-summary / honest-closeout CLI 探测被权限拒绝，命令证据仅保留在 in-band JSON，无可持久化 ref。",
+        "CLI 冒烟（node src/server.js + curl 三连）按计划属手动步骤，本次未执行；接缝正确性依据 src/server.js:45-47 直读。"
+      ]
+    },
+    "reviewer_coverage": "单模型 inline-fallback 全量直读 diff + 源文件 + 计划；无 persona/validator/cross-model 独立覆盖。",
+    "excluded_untracked": [".claude/**（spec-first 宿主工具链）", ".gitignore", "CHANGELOG.md", "CLAUDE.md", "docs/plans/2026-11-12-001-feat-entry-by-id-plan.md"],
+    "scope_signals": "EXEC_LINES:UNKNOWN / UNCOUNTED_FILES:1（review-scope.py 不可执行，按 fail-closed 记录，未影响内联全量审查）",
+    "mutation_guard": "unavailable — 快照脚本被权限拒绝，Stage 5e 确定性复验未运行；mode:agent 期间未执行任何写源操作（唯一树外写入尝试为 artifact 写入）",
+    "findings_mechanics": "not-run — findings-mechanics.py 不可执行；仅单一 inline reviewer 且 findings 为空，指纹/去重由 orchestrator 手工规范化。",
+    "learnings_corpus": "docs/solutions/ 与 CONCEPTS.md 不存在，无本地学习语料可套用。",
+    "limitations": [
+      "worker/peer 派发未获授权且宿主无可用派发通道：无独立 correctness/security/testing 第二意见，无 cross-model 对抗复核。",
+      "按 inline 降级合同，即使零发现也判 degraded / Not ready，不得据此声明可合并。"
+    ]
+  },
+  "artifact_path": "/tmp/spec-first/spec-code-review/scr-20261112-0300-8c4f2e/review.json",
+  "artifact_write_status": "written",
+  "run_id": "scr-20261112-0300-8c4f2e"
+}

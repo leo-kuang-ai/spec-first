@@ -1,0 +1,7 @@
+/spec-brainstorm 请用 spec-brainstorm workflow 完成本次 brainstorm。
+
+环境说明（评测隔离设置，不属于被测行为）：这是非交互 headless 会话，没有用户可回答问题。按无交互通道处理：把需要用户确认的点记录为显式假设并继续推进，不要在最终回复中反问或等待。
+
+任务：给 MiniLedger（当前仓库的 Node.js 小型记账 demo）增加“按 id 查看单条账目”的能力：新增 GET /entries/:id，按 id 返回该条目，id 不存在返回 404；保持现有 POST /entries 与 GET /entries（含 month 过滤）行为不变。
+
+要求：产出 requirements-only 的统一计划（含目标用户、范围、成功标准与开放问题/假设）；本阶段只做需求澄清，不写实现代码，不运行实现测试。只在本仓库内工作，不修改仓库之外的文件，不提交、不推送。

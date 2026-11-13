@@ -1,0 +1,9 @@
+PASS tests/unit/low-findings-cleanup-contracts.test.js
+PASS tests/unit/sweep-state-legacy-import.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       5 skipped, 6 passed, 11 total
+Snapshots:   0 total
+Time:        0.274 s
+Ran all test suites matching /tests\/unit\/sweep-state-legacy-import.test.js|tests\/unit\/low-findings-cleanup-contracts.test.js/i with tests matching "spec-sweep".
+Test results written to: docs/validation/ce-skill-audit-2026-10-28/sweep-tests.json

@@ -1,0 +1,9 @@
+{
+  "eval_id": 0,
+  "eval_name": "空输入应先询问目标 increment 或 PRD 路径",
+  "prompt": "（spec-prd skill 已安装，请按它工作。）\n",
+  "assertions": [
+    "expect.files_not_exist",
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-prd/evals/fixtures/scripts/asks-a-question.sh"
+  ]
+}

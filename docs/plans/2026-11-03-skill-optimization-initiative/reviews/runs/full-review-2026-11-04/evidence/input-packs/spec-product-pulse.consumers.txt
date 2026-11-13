@@ -1,0 +1,6 @@
+# consumers: spec-product-pulse
+tests/unit/ce-localization-round-1-remediation-contracts.test.js
+tests/unit/ce-upstream-skill-sync-contracts.test.js
+tests/unit/mcp-setup-config-consumers.test.js
+tests/unit/spec-product-pulse-contracts.test.js
+tests/unit/specialized-skill-calibration-contracts.test.js

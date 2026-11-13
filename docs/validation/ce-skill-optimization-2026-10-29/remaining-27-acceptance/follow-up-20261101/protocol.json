@@ -1,0 +1,23 @@
+{
+  "scope": "Single fresh-context behavioral probe of three Plan review fallback cases; not a full Plan trial or A/B comparison.",
+  "source_ref": "skills/spec-plan/references/plan-handoff.md",
+  "source_sha256": "079bf285adf7098e95504b7e92a567dc59a4e8629eb069aaf0c8e46774dfd053",
+  "head": "fe81bae9ee55ec336c85cf80c4a0460d86e3a412",
+  "index_sha256": "782199f52263f69a6fc327fd38fc037c5c29cc2f20f00c932b970db0eae44ce6",
+  "cases": [
+    "caller prohibition without capability probe",
+    "authorized and confirmed no usable capability",
+    "authorized but ambiguous discovery"
+  ],
+  "expected_codes": [
+    "dispatch_authorization_missing",
+    "spec_doc_review_capability_unavailable",
+    "worker_capability_unproven"
+  ],
+  "limits": [
+    "One model context, three cases; no statistical reliability claim.",
+    "Scenario capability facts are supplied, not live host readiness.",
+    "No writes or downstream invocation by subject."
+  ],
+  "status": "pre-dispatch"
+}

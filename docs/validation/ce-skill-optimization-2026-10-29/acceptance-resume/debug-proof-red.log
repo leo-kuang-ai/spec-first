@@ -1,0 +1,71 @@
+
+> spec-first@1.15.3 test:jest
+> jest --runTestsByPath tests/unit/spec-debug-judge-calibration.test.js --runInBand
+
+FAIL tests/unit/spec-debug-judge-calibration.test.js
+  spec-debug Judge 正反校准
+    ✓ 原始诊断现场通过，非零引擎退出不能通过 (204 ms)
+    ✓ 诊断拒绝源码变化：delete (146 ms)
+    ✓ 诊断拒绝源码变化：no-try-edit (147 ms)
+    ✓ 诊断拒绝源码变化：staged-edit (133 ms)
+    ✓ 诊断拒绝源码变化：extra-source (164 ms)
+    ✓ 诊断拒绝源码变化：package (145 ms)
+    ✓ 诊断拒绝源码变化：readme (138 ms)
+    ✓ try 注释不能伪装修复 (210 ms)
+    ✓ 诊断不能留下 index 修改，即使工作文件恢复原字节 (142 ms)
+    ✓ 真实 HTTP 修复通过，但合法记账回归不能通过 (356 ms)
+    ✕ authorized repair may retain a new regression test in test/ (329 ms)
+    ✕ authorized repair may retain a new regression test in tests/ (337 ms)
+    ✓ 修复后引擎失败或产生新 commit 均不能通过 (193 ms)
+    ✓ Judge 脚本独立搬运后仍可执行，不依赖同目录 helper (205 ms)
+    ✓ diagnosis and repair reject same-count HEAD metadata amendments (218 ms)
+
+  ● spec-debug Judge 正反校准 › authorized repair may retain a new regression test in test/
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+    -   "status": 0,
+    +   "status": 1,
+      }
+
+      86 |     expect(runProof().status).toBe(0);
+      87 |     const result = run('check-fixed-no-commit.sh');
+    > 88 |     expect({ status: result.status, stderr: result.stderr }).toMatchObject({ status: 0 });
+         |                                                              ^
+      89 |     writeServer(original);
+      90 |     expect(run('check-diagnosis-no-fix.sh').status).toBe(1);
+      91 |     writeServer(repaired);
+
+      at toMatchObject (tests/unit/spec-debug-judge-calibration.test.js:88:62)
+
+  ● spec-debug Judge 正反校准 › authorized repair may retain a new regression test in tests/
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+    -   "status": 0,
+    +   "status": 1,
+      }
+
+      86 |     expect(runProof().status).toBe(0);
+      87 |     const result = run('check-fixed-no-commit.sh');
+    > 88 |     expect({ status: result.status, stderr: result.stderr }).toMatchObject({ status: 0 });
+         |                                                              ^
+      89 |     writeServer(original);
+      90 |     expect(run('check-diagnosis-no-fix.sh').status).toBe(1);
+      91 |     writeServer(repaired);
+
+      at toMatchObject (tests/unit/spec-debug-judge-calibration.test.js:88:62)
+
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 13 passed, 15 total
+Snapshots:   0 total
+Time:        3.245 s
+Ran all test suites within paths "tests/unit/spec-debug-judge-calibration.test.js".

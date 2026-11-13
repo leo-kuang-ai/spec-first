@@ -1,0 +1,13 @@
+diff --git a/src/export/payments.js b/src/export/payments.js
+index d2c674d..c55d9b2 100644
+--- a/src/export/payments.js
++++ b/src/export/payments.js
+@@ -4,7 +4,7 @@ const { formatAmount } = require('../ledger/money');
+ const { query } = require('../lib/db');
+ 
+ function exportPayments() {
+-  const rows = query('payments').sort((a, b) => a.id - b.id).map((p) => ({ ...p, amount: formatAmount(p.amount) }));
++  const rows = query('payments').sort((a, b) => b.amount - a.amount).map((p) => ({ ...p, amount: formatAmount(p.amount) }));
+   return toCsv(rows, [{ key: 'id', header: 'ID' }, { key: 'paidAt', header: 'Paid At' }, { key: 'amount', header: 'Amount' }]);
+ }
+ 

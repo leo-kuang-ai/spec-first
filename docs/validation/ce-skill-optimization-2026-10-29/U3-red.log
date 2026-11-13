@@ -1,0 +1,122 @@
+FAIL tests/unit/spec-worktree-contracts.test.js (6.166 s)
+  spec-worktree existing-ref isolation contracts
+    ✕ create 拒绝外链工作树容器，保全外部与原 checkout (407 ms)
+    ✕ isolate 拒绝外链工作树容器，保全外部与原 checkout (364 ms)
+    ✕ create 拒绝嵌套分支路径的 existing 祖先链接 (379 ms)
+    ✕ create 拒绝嵌套分支路径的 dangling 祖先链接 (374 ms)
+    ✕ ordinary checkout 的 remote-only 分支显式跟踪远端且不 detached (394 ms)
+    ✕ linked checkout 的 remote-only 分支显式跟踪远端且不 detached (386 ms)
+    ✓ source documents caller-owned isolation for spec-dogfood and spec-work (1 ms)
+    ✓ isolate attaches an existing branch and reports already-checked-out on repeat (666 ms)
+    ✓ rejects the traversal-unsafe worktree slug .. instead of building a path from it (327 ms)
+    ✓ rejects the traversal-unsafe worktree slug ../escaped instead of building a path from it (330 ms)
+    ✓ rejects the traversal-unsafe worktree slug . instead of building a path from it (328 ms)
+    ✓ rejects the traversal-unsafe worktree slug a/b instead of building a path from it (337 ms)
+    ✓ accepts a safe caller-supplied worktree slug (353 ms)
+    ✓ detect compares git directories through one canonical path resolver (349 ms)
+    ✓ reports mise and direnv trust commands without executing them (410 ms)
+    ✓ env copy audit log is owner-only and contains no paths or content hash (623 ms)
+
+  ● spec-worktree existing-ref isolation contracts › create 拒绝外链工作树容器，保全外部与原 checkout
+
+    expect(received).toThrow()
+
+    Received function did not throw
+
+      45 |       const index = fs.readFileSync(path.join(dir, '.git/index'));
+      46 |       const args = mode === 'create' ? ['create', 'feature/new', 'main'] : ['isolate', 'feature/login'];
+    > 47 |       expect(() => run('bash', [scriptPath, ...args], { cwd: dir })).toThrow();
+         |                                                                      ^
+      48 |       expect(fs.readdirSync(outside)).toEqual(['sentinel']);
+      49 |       expect(fs.readFileSync(path.join(outside, 'sentinel'), 'utf8')).toBe('keep');
+      50 |       expect(run('git', ['rev-parse', 'HEAD'], { cwd: dir })).toBe(head);
+
+      at toThrow (tests/unit/spec-worktree-contracts.test.js:47:70)
+
+  ● spec-worktree existing-ref isolation contracts › isolate 拒绝外链工作树容器，保全外部与原 checkout
+
+    expect(received).toThrow()
+
+    Received function did not throw
+
+      45 |       const index = fs.readFileSync(path.join(dir, '.git/index'));
+      46 |       const args = mode === 'create' ? ['create', 'feature/new', 'main'] : ['isolate', 'feature/login'];
+    > 47 |       expect(() => run('bash', [scriptPath, ...args], { cwd: dir })).toThrow();
+         |                                                                      ^
+      48 |       expect(fs.readdirSync(outside)).toEqual(['sentinel']);
+      49 |       expect(fs.readFileSync(path.join(outside, 'sentinel'), 'utf8')).toBe('keep');
+      50 |       expect(run('git', ['rev-parse', 'HEAD'], { cwd: dir })).toBe(head);
+
+      at toThrow (tests/unit/spec-worktree-contracts.test.js:47:70)
+
+  ● spec-worktree existing-ref isolation contracts › create 拒绝嵌套分支路径的 existing 祖先链接
+
+    expect(received).toThrow()
+
+    Received function did not throw
+
+      63 |       fs.mkdirSync(path.join(dir, '.worktrees'));
+      64 |       fs.symlinkSync(kind === 'existing' ? outside : path.join(outside, 'missing'), path.join(dir, '.worktrees/feature'), 'dir');
+    > 65 |       expect(() => run('bash', [scriptPath, 'create', 'feature/new', 'main'], { cwd: dir })).toThrow();
+         |                                                                                              ^
+      66 |       expect(fs.readdirSync(outside)).toEqual([]);
+      67 |       expect(fs.existsSync(path.join(dir, '.gitignore'))).toBe(false);
+      68 |     } finally {
+
+      at toThrow (tests/unit/spec-worktree-contracts.test.js:65:94)
+
+  ● spec-worktree existing-ref isolation contracts › create 拒绝嵌套分支路径的 dangling 祖先链接
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      65 |       expect(() => run('bash', [scriptPath, 'create', 'feature/new', 'main'], { cwd: dir })).toThrow();
+      66 |       expect(fs.readdirSync(outside)).toEqual([]);
+    > 67 |       expect(fs.existsSync(path.join(dir, '.gitignore'))).toBe(false);
+         |                                                           ^
+      68 |     } finally {
+      69 |       fs.rmSync(dir, { recursive: true, force: true });
+      70 |       fs.rmSync(outside, { recursive: true, force: true });
+
+      at toBe (tests/unit/spec-worktree-contracts.test.js:67:59)
+
+  ● spec-worktree existing-ref isolation contracts › ordinary checkout 的 remote-only 分支显式跟踪远端且不 detached
+
+    Command failed: git rev-parse --abbrev-ref @{upstream}
+    fatal: no upstream configured for branch 'remote-feature'
+
+      15 |
+      16 | function run(command, args, options = {}) {
+    > 17 |   return execFileSync(command, args, {
+         |          ^
+      18 |     cwd: options.cwd,
+      19 |     env: { ...process.env, ...(options.env || {}) },
+      20 |     encoding: 'utf8',
+
+      at execFileSync (tests/unit/spec-worktree-contracts.test.js:17:10)
+      at run (tests/unit/spec-worktree-contracts.test.js:88:14)
+
+  ● spec-worktree existing-ref isolation contracts › linked checkout 的 remote-only 分支显式跟踪远端且不 detached
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "remote-feature"
+    Received: ""
+
+      85 |       run('bash', [scriptPath, 'isolate', 'remote-feature'], { cwd });
+      86 |       const target = kind === 'linked' ? cwd : path.join(dir, '.worktrees/remote-feature');
+    > 87 |       expect(run('git', ['branch', '--show-current'], { cwd: target }).trim()).toBe('remote-feature');
+         |                                                                                ^
+      88 |       expect(run('git', ['rev-parse', '--abbrev-ref', '@{upstream}'], { cwd: target }).trim()).toBe('origin/remote-feature');
+      89 |       expect(run('git', ['branch', '--show-current'], { cwd: dir }).trim()).toBe('main');
+      90 |     } finally {
+
+      at toBe (tests/unit/spec-worktree-contracts.test.js:87:80)
+
+Test Suites: 1 failed, 1 total
+Tests:       6 failed, 10 passed, 16 total
+Snapshots:   0 total
+Time:        6.197 s
+Ran all test suites within paths "tests/unit/spec-worktree-contracts.test.js".

@@ -1,0 +1,41 @@
+FAIL tests/unit/runtime-setup-eval-judge.test.js
+  ● 语义请求的 setup Judge 不得靠关键词放行 › 只读技能并移交仅通过机械边界检查
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 1
+
+      124 |   test('只读技能并移交仅通过机械边界检查', () => {
+      125 |     const result = run([{ role: 'tool_call', tool_call: { name: 'Read', arguments: { file_path: '.claude/skills/spec-runtime-setup/SKILL.md' } } }, assistant]);
+    > 126 |     expect(result.status).toBe(0);
+          |                           ^
+      127 |     expect(result.stdout).toContain('semantic-review-required');
+      128 |   });
+      129 |   test.each(['Bash', 'exec', 'Write', 'Edit', 'Task', 'unknown_tool'])('边界声明不能掩盖调用或未知能力：%s', name => {
+
+      at Object.toBe (tests/unit/runtime-setup-eval-judge.test.js:126:27)
+
+FAIL tests/unit/mcp-setup-facts-renderer.test.js
+  ● spec-runtime-setup renderer › diagnostic next actions report repair without also suggesting continuation
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected value: "运行当前 host 的 spec-runtime-setup --verify-only，确认 required Provider readiness。"
+    Received array: ["运行当前 host 的 spec-runtime-setup --verify-only，验证 required Provider readiness 并刷新 setup-owned facts（会写入事实文件）；只读检查使用 --check。"]
+
+      975 |     });
+      976 |
+    > 977 |     expect(actions).toContain('运行当前 host 的 spec-runtime-setup --verify-only，确认 required Provider readiness。');
+          |                     ^
+      978 |     expect(actions.some((action) => action.includes('继续目标'))).toBe(false);
+      979 |   });
+      980 |
+
+      at Object.toContain (tests/unit/mcp-setup-facts-renderer.test.js:977:21)
+
+Test Suites: 2 failed, 2 total
+Tests:       2 failed, 64 passed, 66 total
+Snapshots:   0 total
+Time:        1.429 s, estimated 2 s
+Ran all test suites within paths "tests/unit/runtime-setup-eval-judge.test.js", "tests/unit/mcp-setup-facts-renderer.test.js".

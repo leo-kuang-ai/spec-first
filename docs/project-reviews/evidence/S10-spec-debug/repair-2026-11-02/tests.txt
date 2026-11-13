@@ -1,0 +1,8 @@
+PASS tests/unit/spec-debug-contracts.test.js
+PASS tests/unit/spec-debug-fix-reference-contracts.test.js
+
+Test Suites: 2 passed, 2 total
+Tests:       8 passed, 8 total
+Snapshots:   0 total
+Time:        0.191 s, estimated 1 s
+Ran all test suites within paths "tests/unit/spec-debug-fix-reference-contracts.test.js", "tests/unit/spec-debug-contracts.test.js".

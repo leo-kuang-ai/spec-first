@@ -1,0 +1,58 @@
+[
+  {
+    "arm": "A",
+    "started_at": "2026-10-30T06:09:22.228589+00:00",
+    "finished_at": "2026-10-30T06:09:27.037769+00:00",
+    "exit_code": 1,
+    "command": [
+      "node",
+      "/Users/kuang/xiaobu/spec-first/node_modules/jest/bin/jest.js",
+      "--config",
+      "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/A/jest.config.cjs",
+      "--runInBand",
+      "--json",
+      "--outputFile",
+      "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/paired-mechanisms-A.json",
+      "--runTestsByPath",
+      "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/A/tests/unit/spec-commit-scope-regression.test.js",
+      "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/A/tests/unit/mcp-setup-workspace-git-exclude.test.js",
+      "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/A/tests/unit/mcp-setup-workspace-routing-inject.test.js",
+      "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/A/tests/unit/target-repo-containment.test.js",
+      "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/A/tests/unit/task-pack-command.test.js"
+    ],
+    "log_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/paired-mechanisms-A.log",
+    "result_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/paired-mechanisms-A.json",
+    "tests_passed": 37,
+    "tests_failed": 25,
+    "suites_failed": 5,
+    "source_drift": []
+  },
+  {
+    "arm": "B",
+    "started_at": "2026-10-30T06:09:27.073747+00:00",
+    "finished_at": "2026-10-30T06:09:32.141086+00:00",
+    "exit_code": 0,
+    "command": [
+      "node",
+      "/Users/kuang/xiaobu/spec-first/node_modules/jest/bin/jest.js",
+      "--config",
+      "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/B/jest.config.cjs",
+      "--runInBand",
+      "--json",
+      "--outputFile",
+      "/Users/kuang/xiaobu/spec-first/docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/paired-mechanisms-B.json",
+      "--runTestsByPath",
+      "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/B/tests/unit/spec-commit-scope-regression.test.js",
+      "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/B/tests/unit/mcp-setup-workspace-git-exclude.test.js",
+      "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/B/tests/unit/mcp-setup-workspace-routing-inject.test.js",
+      "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/B/tests/unit/target-repo-containment.test.js",
+      "/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/ce-paired-mechanisms-3jmpfz0e/B/tests/unit/task-pack-command.test.js"
+    ],
+    "log_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/paired-mechanisms-B.log",
+    "result_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave1/paired-mechanisms-B.json",
+    "tests_passed": 62,
+    "tests_failed": 0,
+    "suites_failed": 0,
+    "source_drift": []
+  }
+]

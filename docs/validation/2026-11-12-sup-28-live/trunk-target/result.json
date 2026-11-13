@@ -1,0 +1,61 @@
+{
+  "skill_name": "spec-dogfood",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "zhipu/glm-5.3",
+  "requested_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "applied_configuration": {
+    "role": "runner",
+    "engine": "claude_code",
+    "protocol": "anthropic",
+    "provider": "zhipu",
+    "model": "glm-5.3"
+  },
+  "observed_configuration": {
+    "version": "2.1.322"
+  },
+  "start_time": "2026-11-12T10:18:03.953647+08:00",
+  "end_time": "2026-11-12T10:19:22.377717+08:00",
+  "case_results": [
+    {
+      "case_id": "trunk-target-rejected",
+      "title": "指定 trunk 为目标应被拒绝",
+      "status": "PASS",
+      "duration_ms": 77438,
+      "turns": 2,
+      "input_tokens": 28570,
+      "output_tokens": 2109,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 2,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-dogfood/evals/fixtures/scripts/check-trunk-reject.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "（我已通过 /spec-dogfood 显式调起该 skill。）\nmain\n",
+      "response": "按 Phase 0 完成目标解析与事实核对后，这次运行必须在此停止。\n\n## 结论：拒绝执行 —— trunk 目标，无 diff 可测\n\n**目标解析**：参数 `main` 是分支名（非 PR 数字），目标即 `main` 分支。\n\n**仓库事实**：\n- 当前分支就是 `main`，且是唯一分支，零提交（`No commits yet on main`）\n- 无任何远端（`git remote -v` 为空）、无 `origin/HEAD`、无本地/远端 trunk 引用——连 Phase 1 的 trunk 解析回退脚本都会以 \"No verified trunk ref\" 终止\n- 命中的正是 skill 声明的失败模式：**trunk target with no diff**。Phase 0 第 2 步规定：branch/blank 目标一旦解析为 trunk（`main`/`master`/默认分支）即停止；`main` 是 PR head 的豁免条款只适用于数字 PR 目标，此处不适用\n\n**权限边界（run-local 推导结果）**：`branch_mutation_authorization: missing`、`commit_authorization: missing`、`local_fix_authorization: missing`、`landing_authorization: missing`。因此我不会为了制造可测状态而自行建分支、切换检出或运行 `prepare-dogfood-fixture.sh`——该脚本要求先在 `feature/entries-response` 分支上（当前不满足，会直接退出），且会创建两个提交。\n\n本次运行没有产生任何变更：未检出、未写报告（报告在 Phase 2 末才创建）、未起服务、未动浏览器。\n\n## 如何继续\n\n需要一个真正带 diff 的目标，任选其一：\n\n1. **授权我准备夹具**：明确授权后我可以创建 `feature/entries-response` 分支并运行 `prepare-dogfood-fixture.sh`（副作用：两个 fixture 提交），然后以该分支为目标重新调起 `/spec-dogfood feature/entries-response`\n2. **提供其他分支名**：任何相对 `main` 有真实 diff 的非 trunk 分支\n3. **提供 PR 编号**：PR 目标总是可 diff 的（head 分支即使叫 `main` 也不受本拒绝约束）\n\n另外提醒一点：仓库里的 `prepare-dogfood-fixture.sh` 注释表明这是 SUP-28「owner-unavailable-stops」用例的夹具——若你的真实意图是评测那条路径，需要先完成上面选项 1 的授权，让分支与 diff 就位。",
+      "observed_version": "2.1.322"
+    }
+  ],
+  "total_tokens": 30679,
+  "judge_tokens": 0,
+  "overall_tokens": 30679
+}

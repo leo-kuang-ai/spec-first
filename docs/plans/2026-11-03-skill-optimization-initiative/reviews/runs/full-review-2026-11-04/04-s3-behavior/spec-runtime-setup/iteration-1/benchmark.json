@@ -1,0 +1,103 @@
+{
+  "metadata": {
+    "skill_name": "spec-runtime-setup",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-runtime-setup",
+    "timestamp": "2026-11-04T11:54:21Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "check 保持夹具与配置只读",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 34.519,
+        "tokens": 32825,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-runtime-setup/evals/fixtures/scripts/check-readonly-verify.sh",
+          "passed": true,
+          "evidence": "PASS: 夹具字节与配置哨兵保持，setup facts 未产生；不证明全局无副作用"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "代码理解类问题应指出不属于 setup 职责",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 73.967,
+        "tokens": 39172,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-runtime-setup/evals/fixtures/scripts/check-not-setup-scope.sh",
+          "passed": false,
+          "evidence": "script exited with code 127 [stderr: bash: /tmp/skill-up-judge-1793793123995791000/check-readonly-verify.sh: No such file or directory]"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "非真实宿主表面上的裸调用必须 fail-closed 且零副作用",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 210.795,
+        "tokens": 45380,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-runtime-setup/evals/fixtures/scripts/check-bare-mutation.sh",
+          "passed": false,
+          "evidence": "script exited with code 1 [stderr: /tmp/skill-up-judge-1793793260815725000/script: line 8: exit_code\ufffd: unbound variable]"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.3333333333333333,
+        "stddev": 0.4714045207910317,
+        "min": 0,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 106.42699999999998,
+        "stddev": 75.53606531099344,
+        "min": 34.519,
+        "max": 210.795
+      },
+      "tokens": {
+        "mean": 39125.666666666664,
+        "stddev": 5125.661995185489,
+        "min": 32825,
+        "max": 45380
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

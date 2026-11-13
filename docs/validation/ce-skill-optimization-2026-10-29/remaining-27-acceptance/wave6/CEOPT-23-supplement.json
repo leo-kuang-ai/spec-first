@@ -1,0 +1,20 @@
+{
+  "id": "CEOPT-23-supplement",
+  "created_at": "2026-10-30T07:38:03.385770+00:00",
+  "status": "frozen-before-any-CEOPT-23-model-trial",
+  "parent_packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/CEOPT-23-packet.json",
+  "parent_packet_sha256": "3ba4a8b9810d2b737d3133809c3a9d0df5e87458641a44d4b28dc415d38c8eaa",
+  "arm_receipts": {
+    "A": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/pr-feedback-supplement-A-receipts.json",
+      "sha256": "b87718f189d6f46786d97ffa8d6dac7ce83b8709e8898ea44e5ee260cdcfa657"
+    },
+    "B": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/pr-feedback-supplement-B-receipts.json",
+      "sha256": "fb6012dfee85637f38f01cfdeb4ef77eb9b6de9c318e3d783e7eb6e934b4d42a"
+    }
+  },
+  "interpretation": "Use a consistent behind ancestry fixture. Original contradictory status/merge-base stub tests rejection only; it is not a real Git graph.",
+  "source_revision": "Original A/B unchanged",
+  "effect_scope": "Local helpers with explicitly described mocks/disposable storage; no external operation."
+}

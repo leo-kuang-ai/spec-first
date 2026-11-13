@@ -1,0 +1,9 @@
+PASS tests/unit/spec-commit-push-pr-context-contracts.test.js
+PASS tests/unit/spec-commit-scope-regression.test.js
+PASS tests/unit/pipeline-mode-contracts.test.js
+
+Test Suites: 3 passed, 3 total
+Tests:       10 passed, 10 total
+Snapshots:   0 total
+Time:        0.509 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/spec-commit-scope-regression.test.js|tests\/unit\/spec-commit-push-pr-context-contracts.test.js|tests\/unit\/pipeline-mode-contracts.test.js/i.

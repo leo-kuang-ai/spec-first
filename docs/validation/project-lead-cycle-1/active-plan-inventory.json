@@ -1,0 +1,180 @@
+{
+  "captured_at": "2026-09-20T03:08:03.274526+00:00",
+  "scope": "docs/plans/**/*.md的YAML frontmatter；不把正文status示例计入",
+  "active_count": 8,
+  "claim_ceiling": "C0",
+  "rows": [
+    {
+      "path": "docs/plans/2026-07-06-001-refactor-skill-prompt-slimming-plan.md",
+      "lifecycle": "active",
+      "review_depth": "metadata全量+目标/状态/执行记录与命名source定向triage；不是逐单元验收",
+      "disposition": "premise-stale",
+      "observation": "7月行数与retired-skill-review引用过时；当前work/review入口已拆references，不能据此确认全部U0-U8完成。stats committed trigger与当前暂缓策略需新证据裁定。",
+      "evidence": [
+        {
+          "path": "skills/spec-work/SKILL.md",
+          "exists": true
+        },
+        {
+          "path": "skills/spec-code-review/SKILL.md",
+          "exists": true
+        },
+        {
+          "path": "skills/retired-skill-review/references/skill-authoring-quality.md",
+          "exists": false
+        }
+      ],
+      "next_action": "保留active；恢复时先替换已退役source owner并重建baseline，不能机械重复瘦身。",
+      "source_sha256": "bf20bf42be0989a7726c5bcfc7521790ba668be4fc13ff4a3930313a87f4485f"
+    },
+    {
+      "path": "docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-plan.md",
+      "lifecycle": "active",
+      "review_depth": "metadata全量+目标/状态/执行记录与命名source定向triage；不是逐单元验收",
+      "disposition": "premise-stale",
+      "observation": "依赖001及已退役rubric；未找到本次可独立核验的全单元closeout。",
+      "evidence": [
+        {
+          "path": "scripts/lint-skill-entrypoints.js",
+          "exists": true
+        },
+        {
+          "path": "scripts/lint-skill-entrypoints.config.json",
+          "exists": true
+        },
+        {
+          "path": "skills/retired-skill-review/references/skill-authoring-quality.md",
+          "exists": false
+        }
+      ],
+      "next_action": "保留active；继承当前owner/registry后再决定续行或后继，不以标题判已完成。",
+      "source_sha256": "9863d52172c6d65ab5be4737b20fd89346d557e65954d1e8be409534751f45f8"
+    },
+    {
+      "path": "docs/plans/2026-08-29-001-feat-spec-project-rules-v2-ultimate-design-plan.md",
+      "lifecycle": "active",
+      "review_depth": "metadata全量+目标/状态/执行记录与命名source定向triage；不是逐单元验收",
+      "disposition": "partly-implemented-unclosed",
+      "observation": "当前SKILL/knowledge-format/extract-deps承载主要机制；哈希sidecar策略被002的git基线裁决替代；大仓/CI/现场DoD未逐项复验。",
+      "evidence": [
+        {
+          "path": "skills/spec-project-rules/SKILL.md",
+          "exists": true
+        },
+        {
+          "path": "skills/spec-project-rules/references/knowledge-format.md",
+          "exists": true
+        },
+        {
+          "path": "skills/spec-project-rules/scripts/extract-deps.cjs",
+          "exists": true
+        }
+      ],
+      "next_action": "保留active；标出hash策略后继，完成与否须逐U验收，不以当前入口存在判定。",
+      "source_sha256": "34bf6cf8b6d6769ebb637c3598b4d09a93b5dcd3f1b411b57b35871dcd3b27ff"
+    },
+    {
+      "path": "docs/plans/2026-08-29-002-feat-spec-project-rules-hash-freshness-plan.md",
+      "lifecycle": "active",
+      "review_depth": "metadata全量+目标/状态/执行记录与命名source定向triage；不是逐单元验收",
+      "disposition": "completion-candidate",
+      "observation": "artifact_readiness=implemented及Implementation Record存在；当前extract-deps仍有source_commit/dirty_refs三态实现，历史21测试/行为eval记录本轮未重跑。",
+      "evidence": [
+        {
+          "path": "skills/spec-project-rules/scripts/extract-deps.cjs",
+          "exists": true
+        },
+        {
+          "path": "tests/unit/spec-project-rules-scripts.test.js",
+          "exists": true
+        },
+        {
+          "path": "tests/unit/spec-project-rules-contracts.test.js",
+          "exists": true
+        }
+      ],
+      "next_action": "保留active；status与implemented不是逻辑矛盾，先核验剩余验收/终态证据再由owner收口。",
+      "source_sha256": "331eda763ff26cd8b85c6f6e19a87a78fde9e0a5cb580c709ff0c0af2c75b6d1"
+    },
+    {
+      "path": "docs/plans/2026-09-09-001-feat-ai-sdlc-change-traceability-plan.md",
+      "lifecycle": "active",
+      "review_depth": "metadata全量+目标/状态/执行记录与命名source定向triage；不是逐单元验收",
+      "disposition": "implementation-unverified",
+      "observation": "本文为implementation-ready候选；本轮只检查scope/验收/依赖，未逐consumer验证落地。",
+      "evidence": [
+        {
+          "path": "skills/spec-commit-push-pr/SKILL.md",
+          "exists": true
+        },
+        {
+          "path": "docs/contracts/verification/verification-run-summary.md",
+          "exists": true
+        }
+      ],
+      "next_action": "保留active；按真实变更trace consumer和验证证据继续。",
+      "source_sha256": "73aa85ba69fb5efd74f76586cfdffcf4f7dd19f1c322cf7e3384f6361a94cdc7"
+    },
+    {
+      "path": "docs/plans/2026-09-09-002-feat-automated-skill-evolution-loop-plan.md",
+      "lifecycle": "active",
+      "review_depth": "metadata全量+目标/状态/执行记录与命名source定向triage；不是逐单元验收",
+      "disposition": "not-fully-implemented",
+      "observation": "方案明确不是运行结果；关键新schema/controller路径未见，不能声明已实施全loop。",
+      "evidence": [
+        {
+          "path": "docs/contracts/verification/skill-evolution-record.schema.json",
+          "exists": false
+        },
+        {
+          "path": "src/cli/helpers/skill-evolution/run-record.cjs",
+          "exists": false
+        }
+      ],
+      "next_action": "保留active候选；本周期B4冻结，不因本次盘点自动启动实现。",
+      "source_sha256": "28d5358222dedc1505d0cdd7cb7fa16030a55a3e82c25b7fb8f22bf234da5863"
+    },
+    {
+      "path": "docs/plans/2026-09-11-spec-runtime-setup-p123-optimization-plan.md",
+      "lifecycle": "active",
+      "review_depth": "metadata全量+目标/状态/执行记录与命名source定向triage；不是逐单元验收",
+      "disposition": "premise-corrected-partial",
+      "observation": "bare只读前提已按当前source修正；仍保留partial-with-evidence，不把局部前提替代等同全计划退役。",
+      "evidence": [
+        {
+          "path": "skills/spec-runtime-setup/SKILL.md",
+          "exists": true
+        },
+        {
+          "path": "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
+          "exists": true
+        },
+        {
+          "path": "docs/validation/runtime-setup-p123-progress.md",
+          "exists": true
+        }
+      ],
+      "next_action": "本轮已修Goal/KTD2/U1/U4措辞；其余验收未升级。",
+      "source_sha256": "8e6bc33d192a4dff4e9b6aa5bdf1c1f79c27094a0a16a054965dceec59bdbb46"
+    },
+    {
+      "path": "docs/plans/2026-09-18-001-project-lead-cycle-1-plan.md",
+      "lifecycle": "active",
+      "review_depth": "metadata全量+目标/状态/执行记录与命名source定向triage；不是逐单元验收",
+      "disposition": "in-progress",
+      "observation": "本周期正在执行，整体验收以最终报告和逐包receipt为准。",
+      "evidence": [
+        {
+          "path": "docs/validation/project-lead-cycle-1/2026-09-18-cycle-1-execution-evidence.md",
+          "exists": true
+        }
+      ],
+      "next_action": "保留active，不以文档落盘冒充host/field或全部闭包完成。",
+      "source_sha256": "0796a771a1edc7713a9f44c7cbc55fd1e8f400f0f3b5ec68ce49a6e1fa7f4020"
+    }
+  ],
+  "limitations": [
+    "未逐项证实全量计划已完成，任何completion-candidate均非完成结论。",
+    "计划随后新增执行记录会改变hash；此为盘点时点快照。"
+  ]
+}

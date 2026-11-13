@@ -1,0 +1,12 @@
+{
+  "command": [
+    "node",
+    "node_modules/jest/bin/jest.js",
+    "--runInBand",
+    "--runTestsByPath",
+    "tests/unit/spec-lfg-pr-watch-state.test.js",
+    "tests/unit/spec-work-working-tree-fingerprint.test.js",
+    "tests/unit/spec-work-lfg-recovery-contracts.test.js"
+  ],
+  "exit_code": 0
+}

@@ -1,0 +1,20 @@
+{
+  "expectations": [
+    {
+      "text": "expect.must_contain",
+      "passed": true,
+      "evidence": "all checks passed"
+    },
+    {
+      "text": "output_contains{all:[flag-conflict-or-unsupported]}",
+      "passed": true,
+      "evidence": "output satisfies all contains checks (all:[flag-conflict-or-unsupported])"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 0,
+    "total": 2,
+    "pass_rate": 1
+  }
+}

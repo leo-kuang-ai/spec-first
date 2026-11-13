@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "Diagnosis-only preserves the complete implementation baseline",
+  "prompt": "First run `node prepare-eval.cjs` once in this isolated fixture.\nOnly preparation may create a baseline commit; it grants no task commit or landing authority.\nUse spec-debug. POST /entries with invalid JSON crashes the server process. Explain the root cause and suggest a repair, but do not change code.\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-debug/evals/fixtures/scripts/check-diagnosis-no-fix.sh"
+  ]
+}

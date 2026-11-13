@@ -1,0 +1,460 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "ce-localization-lane-refresh-2026-09-14-repair-loop",
+  "producer": "zcode-current-session (chain-closeout reviewer; repair-loop batch authored by a concurrent codex session)",
+  "reviewed_at": "2026-09-14T07:13:14.000Z",
+  "source_binding": {
+    "head": "c0803ab5d2e80edde9ca67771c6d204b775bb354",
+    "dirty_path_manifest_sha256": "7af829a1f316c8385378e61aa37da56e9af518b01e12bcc22b12a396cf5a7802",
+    "source_tree_hash": "30e23af473d58352a8fa72dc84b1826f65072fc27dbb80a97569744d092dc85a",
+    "inventory_hash": "01b3a8d60125adc6604b439dc3ebffdd834a5337030e5da02318c2bb23f666ff",
+    "inventory_artifact_sha256": "463bbf35aa0b431ae0cabea527bbbafc1834aefd7995dd35b1cb79ed1952f3c0",
+    "review_input_hash": "5b5c31849bdca4e14f4ab83161f6d094e2146d69a7c02c3507b52afe45324293"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "unverified",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "reviewed_paths": [
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/provider-display.cjs",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "c2f0da819d935aac8067b10affda612066b730e1b0e2f4aa95bcb4f1445ef50d",
+      "bytes": 1605,
+      "line_count": 39,
+      "covered_line_ranges": [
+        [
+          1,
+          39
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "projectState 为确定性生命周期推导链,缺失 lifecycle 证据时为 null 不臆测;作为 reason_code 回退插在 provider.reason_code 之后,优先级顺序明确。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,非独立 provider 证据"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "not-installed/not-initialized/not-indexed/query-unverified 分层诚实报告;无证据不产出误导性 ready 状态。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,非独立 provider 证据"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/renderer.cjs",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "fdbeaff9aeddb6377b21dc8d4cd6cbc1e5620d6fab814476d6a67f340e2ff319",
+      "bytes": 15564,
+      "line_count": 340,
+      "covered_line_ranges": [
+        [
+          1,
+          340
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "新增推荐 next-action 仅在 action-required 且 provider 已安装未初始化时给出具体命令(host/repo 取自 facts);hook 降级判断限定 graphify 与三种 hook_status 枚举。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,非独立 provider 证据"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "外部/不可接管 hook 不再把已验证核心 readiness 拉为整体 action-required,消除虚假阻断;推荐命令的 flag 语义与 SKILL.md 一致(--verify-only/--project-config 边界保持)。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,非独立 provider 证据"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/repair-loop.cjs",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "749f4cb611098ccb2a63a92a20df774f19e7328104898786506ef7c1b2ad65f7",
+      "bytes": 1916,
+      "line_count": 44,
+      "covered_line_ranges": [
+        [
+          1,
+          44
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "纯逻辑有界修复循环:apply/verify 注入、无自身 I/O;修复动作经 repairFor 由调用方/registry 提供,模块不合成命令。引用闭包完整,消费方为 runtime-executor seam 与聚焦单测。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,非独立 provider 证据"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "上限 2 次尝试;同 reason 短路与 repeated-reason 终止防循环;apply 失败立即返回 action-required,不以合成成功伪装;无越权副作用面。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,非独立 provider 证据"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "bb6c313249dc9964b0df0229d35435d4b438e1afe2597259d7a47bee0d7601da",
+      "bytes": 38206,
+      "line_count": 966,
+      "covered_line_ranges": [
+        [
+          1,
+          966
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "bare 并入 install mutation 与 mode-policy/SKILL.md 新姿态一致;graphify provenance 漂移仅对单一 reason_code 执行一次 graphify-refresh 并以复探针结果替换;hostConfigRepairCommand 委托抽取后的单一实现,导出面新增 repair seam 单点。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,非独立 provider 证据"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "自动修复限定在 mutation mode 与特定 reason_code;刷新后仍以真实 readiness 判定;repair seam 注释明确未知 reason 不得由模型即兴执行命令。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,非独立 provider 证据"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/providers/codegraph.cjs",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "332cce29ff1731ebe34be4e5d1d3e456fd0c0990bc90ba6645a5ba92052ea515",
+      "bytes": 24844,
+      "line_count": 563,
+      "covered_line_ranges": [
+        [
+          1,
+          563
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "重试为同一真实 probe(同 argv/timeout/limit),仅一次;失败仍返回同 reason degraded;快照捕获与身份验证顺序不变。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,非独立 provider 证据"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "瞬态未命中经复探针确认后才降级,不以合成证据替代真实查询;bounded 单次重试。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,非独立 provider 证据"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-runtime-setup/SKILL.md",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "892434da474d5b0d58f1b89628351552f6782e8136a896b79e56d78795de73ad",
+      "bytes": 55598,
+      "line_count": 368,
+      "covered_line_ranges": [
+        [
+          1,
+          368
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "description 补齐八宿主与 getSupportedPlatforms 对齐;bare→基线收敛、--check→只读的重述在 mode 表、Setup Posture、Diagnostic Flow、Machine contract 各段一致;argument-hint 同步为 bare baseline converge。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,非独立 provider 证据"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "安全门表述全数保留(不安全路径、symlink/secret、更高优先级冲突、--repair-host-config 显式授权、partial 不称全量 ready);bounded repair 指引要求读机器 reason_code 并复跑同一真实 probe。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,非独立 provider 证据"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/ce-localization-review-contracts.test.js",
+      "skill_ids": [
+        "autoresearch"
+      ],
+      "sha256": "f40c8f707b0e2caa0ad9843f92a065e48e146d6a0d6e981ffeb990b181e46ea8",
+      "bytes": 7149,
+      "line_count": 123,
+      "covered_line_ranges": [
+        [
+          1,
+          123
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "本会话对该文件的计数冻结钉更新:1127→1128 与 222/438→223/439 均附日期化计数日志注释,沿用既有注释规范且未引用 skill 路径(避免提取器计数漂移);refresh/verify 字节一致性与结构断言未改动,计数与刷新后确定性产物一致。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,计数断言由当轮 --refresh 产物直接证实"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "missing_path_count=0 与冻结计数钉保持防静默收缩审计面;注释自我警示保留。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,非独立 provider 证据"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/mcp-setup-contracts.test.js",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "b0a77ff35311ada63e26dde089575200dd84ce4d3899fcfe6f69fe70a80e0d27",
+      "bytes": 8073,
+      "line_count": 141,
+      "covered_line_ranges": [
+        [
+          1,
+          141
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "SKILL.md 文案断言更新与新 bare 姿态精确对齐;负例断言(不自动携带 --repair-host-config)保留。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,非独立 provider 证据"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "断言绑定真实文档内容,无永真化。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,非独立 provider 证据"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/mcp-setup-facts-renderer.test.js",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "a8f0cec2f2f08d412420b721be7fc52bb3fa21e6ff7a0b4191af4d56e49f7fc9",
+      "bytes": 42487,
+      "line_count": 1096,
+      "covered_line_ranges": [
+        [
+          1,
+          1096
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "两个新渲染测试断言真实输出(整体状态 ready、不含 --project-config),fixture 生命周期字段完整;既有 unknown 语义测试未动。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,非独立 provider 证据"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "defaults-active 非阻断断言防止虚假 action-required 回归。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,非独立 provider 证据"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/mcp-setup-mode-target.test.js",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "4b8aebb34e44dfd616e9a3e43f99958107ca1e5c79685a5828404fc280a36a69",
+      "bytes": 24785,
+      "line_count": 643,
+      "covered_line_ranges": [
+        [
+          1,
+          643
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "bare 计划断言 mutation:true 与四个动作集 id 逐一列出;installation-only 阻断负例保留;更名测试附日期注释说明行为切换。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,非独立 provider 证据"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "注释明确既有安全门仍拒绝不安全路径与更高优先级冲突。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,非独立 provider 证据"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/runtime-setup-repair-loop.test.js",
+      "skill_ids": [
+        "spec-runtime-setup"
+      ],
+      "sha256": "124898480d70b49f6b40c97a4550ab5f5a8ce8c77099239ccad1554382748f52",
+      "bytes": 1168,
+      "line_count": 28,
+      "covered_line_ranges": [
+        [
+          1,
+          28
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "覆盖两条核心性质:修复后复探针并记录 attempt 证据;同 reason 终止不无限循环(MAX_REPAIR_ATTEMPTS=2 锚定)。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,非独立 provider 证据"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "post_probe verified/not-ready 证据字段被断言,失败路径可见。"
+          ],
+          "limitations": [
+            "inline 同上下文复核,非独立 provider 证据"
+          ]
+        }
+      ]
+    }
+  ],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "本 delta 由当前会话(zcode)inline 同上下文复核;repair-loop 批次作者为并发 codex 会话,非作者自证亦非独立 provider 证据。",
+    "每路径证据为全文 diff 通读 + 当轮聚焦测试套件全绿(计数测试文件为本会话自改,其断言由当轮 --refresh 产物直接证实);无 runtime/field 证据,repair-loop 模块未在真实宿主上观察全链路。",
+    "上游 517 条 per-record adjudication 判定不变,本 delta 仅覆盖目标侧增量路径。"
+  ],
+  "claim_ceiling": "current-session inline review of a concurrent-session batch; focused test evidence only; no runtime or field outcome claims"
+}

@@ -1,0 +1,10 @@
+✓ eval.yaml is valid (loaded 6 case(s))
+✓ eval.yaml is valid (loaded 2 case(s))
+✓ eval.yaml is valid (loaded 3 case(s))
+✓ eval.yaml is valid (loaded 6 case(s))
+✓ eval.yaml is valid (loaded 2 case(s))
+spec-strategy: exit=0
+spec-product-pulse: exit=0
+spec-promote: exit=0
+spec-handoff: exit=0
+spec-riffrec-feedback-analysis: exit=0

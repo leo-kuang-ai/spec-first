@@ -1,0 +1,30 @@
+{
+  "id": "CEOPT-08",
+  "skill": "spec-debug",
+  "request_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/CEOPT-08-request.txt",
+  "request_sha256": "95f98be09acb35cc459c4c29497aec3839121e72661abb8a49856163c22ebafa",
+  "fixture_root": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/debug",
+  "fixture_files": {
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/debug/proof-intent.md": "18d91510a3a7e227f7681b4d50487f517f5aa888783b639ad1d6526b828e7628",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/debug/report.cjs": "4da7d03d25e2ce0367823ca3e8feaef7ab6eb1bb8e94f0e94cc73a4f87e2be43",
+    "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave2/fixtures/debug/README.md": "553c2d6f5987ac58b7c5f53420bc342cd8156c8d5c3a4b1be4cde6197d95f2be"
+  },
+  "trial_order": [
+    "A1",
+    "B1",
+    "B2",
+    "A2",
+    "A3",
+    "B3"
+  ],
+  "deadline_seconds": 300,
+  "trials_per_arm": 3,
+  "execution_mode": "fresh-readonly-proposal-plus-parent-execution",
+  "parent_recipe": "Save response unchanged. Inspect proposed executable for bounded scope before executing in a fresh disposable fixture under an environment allowlist. Preserve protected proof bytes; run the exact same checks on each arm. Record rejected unsafe proposals without executing them. No semantic correction of candidates.",
+  "grading": "Source-grounded independent judgment plus actual candidate process/proof results; no keyword success.",
+  "limitations": [
+    "Parent mediation cannot establish autonomous mutation.",
+    "Serving identity unauthenticated.",
+    "Synthetic local fixture, not field outcome."
+  ]
+}

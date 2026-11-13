@@ -1,0 +1,162 @@
+{
+  "schema_version": "ce-upstream-sync-run/v1",
+  "kind": "package-admission",
+  "window_sha256": "25939fdd552b44f3acd16be3eee274823cb586ddb604973417ac3e7ce0603dac",
+  "input_sha256": "5be50486716ebc9322b61aa41bd3b41e2724b70dfbd8d379ffc0fd3ff449fc08",
+  "target_snapshot": {
+    "repository": "spec-first",
+    "head": "fe81bae9ee55ec336c85cf80c4a0460d86e3a412",
+    "dirty": true,
+    "dirty_paths": [
+      "CHANGELOG.md",
+      "docs/contracts/verification/ce-upstream-sync-run.md",
+      "docs/contracts/verification/ce-upstream-sync-run.schema.json",
+      "docs/plans/2026-10-27-001-refactor-ce-upstream-sync-technical-scheme.md",
+      "scripts/check-ce-upstream-reconciliation.cjs",
+      "skills/spec-code-review/references/apply-findings.md",
+      "skills/spec-code-review/references/diff-scope.md",
+      "skills/spec-code-review/references/findings-schema.json",
+      "skills/spec-code-review/references/finish-review.md",
+      "skills/spec-code-review/references/personas/adversarial-reviewer.md",
+      "skills/spec-code-review/references/personas/correctness-reviewer.md",
+      "skills/spec-code-review/references/personas/maintainability-reviewer.md",
+      "skills/spec-code-review/references/personas/reliability-reviewer.md",
+      "skills/spec-code-review/references/personas/security-reviewer.md",
+      "skills/spec-code-review/references/personas/testing-reviewer.md",
+      "skills/spec-code-review/references/scope.md",
+      "skills/spec-code-review/references/validator-template.md",
+      "skills/spec-code-review/scripts/findings-mechanics.py",
+      "skills/spec-code-review/scripts/review-scope.py",
+      "skills/spec-commit-push-pr/references/branch-creation.md",
+      "skills/spec-commit-push-pr/references/commit-and-push.md",
+      "skills/spec-commit/SKILL.md",
+      "skills/spec-compound/references/session-history.md",
+      "skills/spec-compound/scripts/session-history/extract-metadata.py",
+      "skills/spec-lfg/references/review-followup.md",
+      "skills/spec-work/references/execution-strategy.md",
+      "tests/unit/ce-upstream-reconciliation-v2.test.js",
+      "tests/unit/session-history-scripts.test.js",
+      "tests/unit/spec-code-review-contracts.test.js",
+      "tests/unit/spec-code-review-mechanics.test.js",
+      "tests/unit/spec-commit-push-pr-context-contracts.test.js",
+      "tests/unit/spec-lfg-contracts.test.js",
+      "tests/unit/spec-work-execution-strategy-contracts.test.js"
+    ],
+    "dirty_path_manifest_sha256": "d67b61362a90cd8a7c0bb16647dac85de51119b36a71de3c7d341e8e8428d719",
+    "source_tree_hash": "a41662e1adaa2726419e2d1edd34ba7c946e78ade68c146a88ea5548ada99e28",
+    "inventory_hash": "22d452f02c1e3345c30ab22cd5e52e18857e69b7f85520a0414c65824b613151",
+    "scope_contract": {
+      "source_roots": [
+        "CLAUDE.md",
+        "AGENTS.md",
+        "skills",
+        "templates",
+        "src",
+        "scripts",
+        "tests",
+        "docs",
+        "README.md",
+        "README.en.md",
+        "README.zh-CN.md",
+        "CHANGELOG.md",
+        "package.json"
+      ],
+      "excluded_run_outputs": [
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-name-status.md",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication-input.json",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.md",
+        "docs/validation/2026-08-19-spec-first-current-skill-package-inventory-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-evidence-exceptions.json",
+        "docs/validation/ce-pull-2026-10-27/window-facts.json",
+        "docs/validation/ce-pull-2026-10-27/execution-state.json",
+        "docs/validation/ce-pull-2026-10-27/execution-baseline.json",
+        "docs/validation/ce-pull-2026-10-27/producer-name-status.tsv",
+        "docs/validation/ce-pull-2026-10-27/target-source-inventory.json",
+        "docs/validation/ce-pull-2026-10-27/adjudication-input.json",
+        "docs/validation/ce-pull-2026-10-27/adjudication.json",
+        "docs/validation/ce-pull-2026-10-27/ledger.json",
+        "docs/validation/ce-pull-2026-10-27/summary.md",
+        "docs/validation/ce-pull-2026-10-27/artifact-set.json",
+        "docs/validation/ce-pull-2026-10-27/work-return.json",
+        "docs/validation/ce-pull-2026-10-27/verification-run-summary.json",
+        "docs/validation/ce-pull-2026-10-27/honest-closeout.md",
+        "docs/validation/ce-pull-2026-10-27/handoff.json",
+        "docs/validation/ce-pull-2026-10-27/semantic-screening.json",
+        "docs/validation/ce-pull-2026-10-27/plan-review.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/window-facts.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/execution-state.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/execution-baseline.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/producer-name-status.tsv",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/target-source-inventory.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/adjudication-input.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/adjudication.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/ledger.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/summary.md",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/artifact-set.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/work-return.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/verification-run-summary.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/honest-closeout.md",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/handoff.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/semantic-screening.json",
+        "docs/validation/ce-pull-2026-10-27/runs/<run-id>/plan-review.json",
+        "docs/validation/ce-pull-2026-10-27/logs/**",
+        "docs/validation/ce-pull-2026-10-27/owner-receipts/**",
+        "docs/validation/ce-pull-2026-10-27/admissions/**",
+        "docs/validation/ce-pull-2026-10-27/ledger-patches/**",
+        "docs/validation/ce-pull-2026-10-27/staging/**",
+        "docs/validation/2026-08-19-ce-post-3-20-ledger-patches/**",
+        "docs/validation/ce-localization/**"
+      ]
+    },
+    "hash_algorithm": {
+      "name": "sha256",
+      "version": "canonical-source-manifest-v1"
+    }
+  },
+  "source_refs": [
+    "skills/spec-code-review/references/action-class-rubric.md",
+    "skills/spec-code-review/references/review-output-template.md",
+    "skills/spec-code-review/references/intent-and-plan.md",
+    "skills/spec-code-review/references/finish-review.md"
+  ],
+  "limitations": [
+    "仅已读取对应差额和消费者；完整 depth/peer/Pack 暂未闭合",
+    "保留现有逐 finding 与授权合同"
+  ],
+  "unresolved": [],
+  "package_id": "skills/ce-code-review",
+  "unit_id": "U2",
+  "paths": [
+    "skills/ce-code-review/references/action-class-rubric.md",
+    "skills/ce-code-review/references/review-output-template.md",
+    "skills/ce-code-review/references/intent-and-plan.md",
+    "skills/ce-code-review/references/finish-review.md"
+  ],
+  "decisions": [
+    {
+      "path": "skills/ce-code-review/references/action-class-rubric.md",
+      "target_action": "compose",
+      "rationale": "将 protected artifacts 明确放入共享 rubric，根限定 docs 的 plans/solutions/brainstorms 含嵌套分类；不引入配置 root 或误保护普通同名目录"
+    },
+    {
+      "path": "skills/ce-code-review/references/review-output-template.md",
+      "target_action": "compose",
+      "rationale": "补齐三态结果输出、unresolved 无 apply 权限及已有 protected artifact 引用"
+    },
+    {
+      "path": "skills/ce-code-review/references/intent-and-plan.md",
+      "target_action": "compose",
+      "rationale": "采纳逆向检查未请求的用户可观察行为规则为 advisory；保留本地 readiness 和任务级 scope"
+    },
+    {
+      "path": "skills/ce-code-review/references/finish-review.md",
+      "target_action": "compose",
+      "rationale": "补齐 compact/detail hydration、拒绝敏感 claim 的 revision 回源、反向需求核对和 scoped artifact protection"
+    }
+  ],
+  "review_ref": "docs/validation/ce-pull-2026-10-27/execution-state.json",
+  "authority_ref": "docs/validation/ce-pull-2026-10-27/execution-state.json",
+  "dependency_refs": []
+}

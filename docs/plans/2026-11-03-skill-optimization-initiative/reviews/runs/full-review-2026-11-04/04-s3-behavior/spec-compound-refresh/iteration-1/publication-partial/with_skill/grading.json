@@ -1,0 +1,15 @@
+{
+  "expectations": [
+    {
+      "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-compound-refresh/evals/fixtures/scripts/check-publication-partial.sh",
+      "passed": false,
+      "evidence": "script exited with code 1 [stderr: \u003canonymous_script\u003e:1\n核对完成。入站引用检查确认：`docs/solutions/catalog.md:3` 存在指向 `old.md#离线恢复` 的实质性链接；`prepare-eval.cjs` 仅创建了基线提交 `18546c0`，本轮工作区无任何变更（`?? .claude/` 为会话前既有的 skill 目录）。\n^\n\nSyntaxError: Unexpected token '核', \"核对完成。入站引用检\"... is not valid JSON\n    at JSON.parse (\u003canonymous\u003e)\n    at checkKnowledgePublication ([stdin]:106:23)\n    at [stdin]:155:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:446:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:444:60)\n    at evalFunction (node:internal/process/execution:279:30)\n    at evalTypeScript (node:internal/process/execution:291:3)\n    at node:internal/main/eval_stdin:53:5\n\nNode.js v22.22.3]"
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 1,
+    "total": 1,
+    "pass_rate": 0
+  }
+}

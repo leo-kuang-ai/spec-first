@@ -1,0 +1,11 @@
+PASS tests/unit/spec-plan-quality-contracts.test.js
+PASS tests/unit/skill-flow-p2-closure-contracts.test.js
+PASS tests/unit/spec-work-contracts.test.js
+PASS tests/unit/agent-persona-template-drift.test.js
+PASS tests/unit/ce-upstream-skill-sync-contracts.test.js
+
+Test Suites: 5 passed, 5 total
+Tests:       57 passed, 57 total
+Snapshots:   0 total
+Time:        0.848 s, estimated 1 s
+Ran all test suites matching /tests\/unit\/spec-plan-quality-contracts.test.js|tests\/unit\/ce-upstream-skill-sync-contracts.test.js|tests\/unit\/skill-flow-p2-closure-contracts.test.js|tests\/unit\/agent-persona-template-drift.test.js|tests\/unit\/spec-work-contracts.test.js/i.

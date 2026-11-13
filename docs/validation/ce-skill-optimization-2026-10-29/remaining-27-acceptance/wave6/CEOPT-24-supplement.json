@@ -1,0 +1,20 @@
+{
+  "id": "CEOPT-24-supplement",
+  "created_at": "2026-10-30T07:38:03.385925+00:00",
+  "status": "frozen-before-any-CEOPT-24-model-trial",
+  "parent_packet_ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/CEOPT-24-packet.json",
+  "parent_packet_sha256": "4c5cda85a16e1efd0eafe6169e4a516c965c7edc0c762f064abab6fed9436bbe",
+  "arm_receipts": {
+    "A": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/media-supplement-A-receipts.json",
+      "sha256": "8b4e7271673f6365fc3856018b7f5573eaefb608f41a2dc6576a7394f0a1febb"
+    },
+    "B": {
+      "ref": "docs/validation/ce-skill-optimization-2026-10-29/remaining-27-acceptance/wave6/media-supplement-B-receipts.json",
+      "sha256": "b14b06de3b5976442e572a8df918be97048832cbbcec1bc32443bfc8115b278c"
+    }
+  },
+  "interpretation": "Cover initial request to unavailable chunk fallback, preserving cumulative egress and measuring cleanup after context exit.",
+  "source_revision": "Original A/B unchanged",
+  "effect_scope": "Local helpers with explicitly described mocks/disposable storage; no external operation."
+}

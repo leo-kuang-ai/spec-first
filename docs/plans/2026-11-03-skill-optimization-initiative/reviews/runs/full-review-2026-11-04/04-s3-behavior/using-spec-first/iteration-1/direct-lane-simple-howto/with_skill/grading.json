@@ -1,0 +1,20 @@
+{
+  "expectations": [
+    {
+      "text": "expect.must_not_contain",
+      "passed": true,
+      "evidence": "all checks passed"
+    },
+    {
+      "text": "output_contains{all:[```]}",
+      "passed": true,
+      "evidence": "output satisfies all contains checks (all:[```])"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 0,
+    "total": 2,
+    "pass_rate": 1
+  }
+}
