@@ -19,7 +19,7 @@
 #            {name, runtimeExecutable, runtimeArgs, port, cwd, env}.
 #   Sentinels (printed to stdout, one per line):
 #     __NO_LAUNCH_JSON__           - file not found
-#     __INVALID_LAUNCH_JSON__      - file exists but fails JSON parsing
+#     __INVALID_LAUNCH_JSON__      - invalid document, entries, or duplicate names
 #     __MISSING_CONFIGURATIONS__   - valid JSON but no `configurations` array
 #     __MULTIPLE_CONFIGS__         - ambiguity, needs caller disambiguation.
 #                                    Followed by a JSON array of names on line 2.
@@ -51,21 +51,27 @@ if [ ! -f "$LAUNCH_PATH" ]; then
   exit 0
 fi
 
-# Validate JSON. We parse with `jq empty` so malformed JSON is caught
-# before any downstream query runs.
-if ! jq empty "$LAUNCH_PATH" >/dev/null 2>&1; then
+# Slurp only for validation: exactly one object is a launch document.
+if ! jq -se 'length == 1 and (.[0] | type == "object")' "$LAUNCH_PATH" >/dev/null 2>&1; then
   echo "__INVALID_LAUNCH_JSON__"
   exit 0
 fi
 
-CONFIG_COUNT=$(jq '(.configurations // []) | length' "$LAUNCH_PATH")
-
-if [ "$CONFIG_COUNT" = "0" ]; then
+if ! jq -e '.configurations | type == "array" and length > 0' "$LAUNCH_PATH" >/dev/null 2>&1; then
   echo "__MISSING_CONFIGURATIONS__"
   exit 0
 fi
 
-if [ "$CONFIG_COUNT" = "1" ]; then
+# Names are selection identities. Reject malformed entries and duplicates before
+# selection; runtimeExecutable/args/port/cwd/env remain caller-validated fields.
+if ! jq -e '.configurations | all(.[]; type == "object" and (.name | type == "string" and length > 0))
+  and ((map(.name) | unique | length) == length)' "$LAUNCH_PATH" >/dev/null 2>&1; then
+  echo "__INVALID_LAUNCH_JSON__"
+  exit 0
+fi
+
+CONFIG_COUNT=$(jq '.configurations | length' "$LAUNCH_PATH")
+if [ -z "$REQUESTED_NAME" ] && [ "$CONFIG_COUNT" = "1" ]; then
   jq -c '.configurations[0]' "$LAUNCH_PATH"
   exit 0
 fi

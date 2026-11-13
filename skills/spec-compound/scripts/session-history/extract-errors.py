@@ -21,6 +21,7 @@ import io
 import os
 import sys
 import json
+import re
 
 parser = argparse.ArgumentParser(add_help=True)
 parser.add_argument(
@@ -110,7 +111,7 @@ def _codex_exit_code(payload, output):
         value = payload.get(key)
         if isinstance(value, int) and not isinstance(value, bool):
             return value if value != 0 else None
-        if isinstance(value, str) and value.isdigit():
+        if isinstance(value, str) and re.fullmatch(r"-?\d+", value):
             parsed = int(value)
             return parsed if parsed != 0 else None
 

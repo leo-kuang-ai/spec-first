@@ -10,6 +10,10 @@ Not every bug warrants this. Use when:
 
 Skip when the root cause is a one-off logic error with no realistic recurrence path.
 
+## 先判断能否消除重复犯错的空间
+
+同根模式跨文件重现时，多加几层检查仍可能让下一个 caller 再犯同样错误。最小修复验证通过后，检查已发现的位置能否复用现有共享入口、值构造/类型约束，或用针对性的 lint/test 阻止同一错误重现；不默认抽 helper 或引入新抽象。只有变更局限于已发现且已授权的位置、不改变 public interface，且有当前证据支持时，才实施这项预防改动，并在 debug summary 中与最小修复区分、验证。否则保持结构，在 Prevention 中记录具体后续建议。提交与发布仍由 handoff owner 决定；下面的分层防护处理结构本身无法消除的风险。
+
 ## The four layers
 
 Pick the layers that apply. Not every bug needs all four.

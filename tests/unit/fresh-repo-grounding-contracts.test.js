@@ -19,11 +19,16 @@ const consumers = [
 describe('fresh repo grounding contracts', () => {
   test.each(consumers)('%s has a current-source path and an honest degraded path', (skill) => {
     const skillDir = path.join(repoRoot, 'skills', skill);
-    const source = fs.readFileSync(path.join(skillDir, 'SKILL.md'), 'utf8');
+    const source = fs.readFileSync(path.join(skillDir,
+      skill === 'spec-brainstorm' ? 'references/dialogue.md'
+        : skill === 'spec-code-review' ? 'references/intent-and-plan.md'
+        : ['spec-ideate', 'spec-pov'].includes(skill) ? 'references/grounding.md'
+          : skill === 'spec-optimize' ? 'references/loop.md'
+          : ['spec-compound', 'spec-plan'].includes(skill) ? 'references/research.md' : 'SKILL.md'), 'utf8');
 
-    expect(source).toMatch(/current (?:target repo\/worktree|target repo|git identity|target)/i);
+    expect(source).toMatch(/current (?:target repo\/worktree|target repo|git identity|target|project orientation)/i);
     expect(source).toMatch(/dirty state|dirty worktree/i);
-    expect(source).toMatch(/never (?:persist or )?reuse|do not persist or reuse/i);
+    expect(source).toMatch(/never (?:persist or )?reuse|do not (?:persist or )?reuse/i);
     expect(source).toMatch(/degraded fact|narrow .*claims|limit its claims/i);
     expect(fs.existsSync(path.join(skillDir, 'references', 'repo-profile-cache.md'))).toBe(false);
     expect(fs.existsSync(path.join(skillDir, 'references', 'agents', 'repo-profiler.md'))).toBe(false);

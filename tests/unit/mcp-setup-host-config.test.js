@@ -605,6 +605,7 @@ describe('host config resolution, inspection, and transaction', () => {
     // 不是 skills 根（旧表用 .claude/skills 与实际投射不符，掩盖了 surface drift）。
     ['claude', '.claude/spec-first/workflows'],
     ['codex', '.agents/skills'],
+    ['zcode', '.agents/skills'],
     ['cursor', '.cursor/skills'],
     ['kiro', '.kiro/skills'],
     ['qoder', '.qoder/skills'],
@@ -706,6 +707,31 @@ describe('host config resolution, inspection, and transaction', () => {
       repoRoot,
       homeDir,
     })).toMatchObject({ ok: false, reason_code: 'host-authority-not-explicit' });
+  });
+
+  test('accepts shared-surface zcode and pi pins only when surface_hosts includes the pin', () => {
+    const repoRoot = tempDir('shared-surface-repo');
+    const sharedSkillRoot = path.join(repoRoot, '.agents', 'skills', 'spec-runtime-setup');
+    fs.mkdirSync(sharedSkillRoot, { recursive: true });
+    for (const host of ['zcode', 'pi']) {
+      const authority = resolveHostAuthority({
+        env: { MCP_SETUP_HOST: host },
+        mutationRequested: true,
+        candidates: [host],
+        skillRoot: sharedSkillRoot,
+        targetIdentity: repoRoot,
+        enforceSurfaceBinding: true,
+      });
+      expect(authority).toMatchObject({
+        status: 'ready',
+        host,
+        invocation_receipt: {
+          loaded_host: 'codex',
+          surface_hosts: ['codex', 'zcode', 'pi'],
+        },
+      });
+      expect(authority.invocation_receipt.receipt_sha256).toMatch(/^[a-f0-9]{64}$/);
+    }
   });
 
   test('skips an unavailable preferred target and selects the next writable fallback', () => {
@@ -1071,9 +1097,66 @@ describe('host config resolution, inspection, and transaction', () => {
     expect(fs.readdirSync(path.dirname(target.config_path)).filter((name) => name.includes('.spec-first.'))).toEqual([]);
   });
 
+  test('surfaces changed=true and manual-required when displacement and restore both fail — SUP-23', () => {
+    const repoRoot = tempDir('windows-double-fail-repo');
+    const homeDir = tempDir('windows-double-fail-home');
+    const entry = jsonEntry();
+    const target = resolveHostConfigTarget({
+      entry,
+      host: 'cursor',
+      authority: authority('cursor', 'project'),
+      repoRoot,
+      homeDir,
+    });
+    fs.mkdirSync(path.dirname(target.config_path), { recursive: true });
+    const original = '{\n  "mcpServers": {\n    "keep": { "command": "keep", "args": [] }\n  }\n}\n';
+    fs.writeFileSync(target.config_path, original);
+    const renameCalls = [];
+    const renameSync = (sourcePath, destinationPath, context) => {
+      renameCalls.push({ sourcePath, destinationPath, ...context });
+      if (context.stage === 'direct-replace') {
+        throw codedError('EACCES', 'injected direct-replace contention');
+      }
+      if (context.stage === 'install-replacement') {
+        // 模拟外部干预：位移出的原文件在替换失败后也不再可用
+        for (const name of fs.readdirSync(path.dirname(destinationPath))) {
+          if (name.includes('replace-old')) {
+            fs.rmSync(path.join(path.dirname(destinationPath), name), { force: true });
+          }
+        }
+        throw codedError('EACCES', 'injected install-replacement failure');
+      }
+      fs.renameSync(sourcePath, destinationPath);
+    };
+
+    const result = applyHostConfig({
+      entry,
+      target,
+      replace: {
+        platform: 'win32',
+        retryAttempts: 1,
+        retryDelayMs: 0,
+        renameSync,
+        sleep() {},
+      },
+    });
+
+    // 关键契约：主配置已消失时不能报告 changed=false / restore=not-required
+    expect(result.ok).toBe(false);
+    expect(result.changed).toBe(true);
+    expect(result.reason_code).toBe('host-config-restore-failed');
+    expect(result.restore.status).toBe('failed');
+    expect(result.restore.recovery.status).toBe('manual-required');
+    expect(result.restore.recovery.next_action).toMatch(/恢复到|检查/);
+    expect(result.restore.backup_path).toMatch(/\.backup$/);
+    expect(fs.existsSync(result.restore.backup_path)).toBe(true);
+    expect(result.error.code).toBe('REPLACE_AND_RESTORE_FAILED');
+    expect(renameCalls.some((call) => call.stage === 'displace-original')).toBe(true);
+    expect(fs.existsSync(target.config_path)).toBe(false);
+  });
+
   test('keeps POSIX replace failures single-attempt and leaves the original untouched', () => {
-    const repoRoot = tempDir('posix-replace-repo');
-    const homeDir = tempDir('posix-replace-home');
+    const repoRoot = tempDir('posix-replace-repo');    const homeDir = tempDir('posix-replace-home');
     const entry = jsonEntry();
     const target = resolveHostConfigTarget({
       entry,
@@ -1569,4 +1652,29 @@ describe('host config resolution, inspection, and transaction', () => {
     });
     expect(fs.readdirSync(outside)).toEqual([]);
   });
+});
+
+
+test.each([[], ['--repo', '.']])('默认策略经过真实配置写入口仍保留冲突配置 %j', (...argv) => {
+  const { buildActionPlan } = require('../../skills/spec-runtime-setup/scripts/lib/mode-policy.cjs');
+  const { configureOrInspectHost } = require('../../skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs');
+  const repoRoot = tempDir('bare-policy-repo');
+  const homeDir = tempDir('bare-policy-home');
+  try {
+    const configPath = path.join(homeDir, '.codex', 'config.toml');
+    fs.mkdirSync(path.dirname(configPath), { recursive: true });
+    const before = '[mcp_servers.context7]\ncommand = "user-owned"\nargs = []\n';
+    fs.writeFileSync(configPath, before);
+    const env = { MCP_SETUP_HOST: 'codex' };
+    const result = configureOrInspectHost({
+      actionPlan: buildActionPlan({ argv }), host: 'codex', homeDir, env,
+      authority: resolveHostAuthority({ env, mutationRequested: true }),
+      effectiveRegistry: { tools: [codexEntry()] },
+    }, repoRoot, { applyMutation: true, selectedIds: [], providerResults: [], installResults: new Map() });
+    expect(result.get('context7')).toMatchObject({ reason_code: 'host-config-conflict', repair_authorized: false });
+    expect(fs.readFileSync(configPath, 'utf8')).toBe(before);
+  } finally {
+    fs.rmSync(repoRoot, { recursive: true, force: true });
+    fs.rmSync(homeDir, { recursive: true, force: true });
+  }
 });

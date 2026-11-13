@@ -22,7 +22,7 @@ applicable_versions:
   - "spec-first 1.12.x"
 invalidation_condition: "如果 host skill runtime 原生支持可靠的按需上下文加载、workflow references 不再由 SKILL.md 触发，或 spec-first 改用独立 package manifest 作为 skill source truth，则需要重估本模式。"
 source_refs:
-  - "docs/10-prompt/结构化项目角色契约.md"
+  - "docs/methodology/结构化项目角色契约.md"
   - "skills/spec-prd/SKILL.md"
   - "skills/spec-prd/evals/evaluation-governance.md"
   - "skills/spec-prd/evals/examples.json"
@@ -242,4 +242,4 @@ evals/
 - `docs/solutions/architecture-patterns/rebar-structure-skill-simplification-pattern-2026-06-04.md`：相邻模式，强调先找承重轴再精简 skill。
 - `docs/solutions/workflow-issues/skill-prose-rewrite-contract-test-coverage-2026-06-28.md`：提醒 prose contract tests 不等于 runtime behavior proof。
 - `skills/spec-prd/evals/evaluation-governance.md`：source-only 记录 `spec-prd` production posture、eval 证据边界和非 governed/public-claim-ready 边界，不投射为 runtime reference。
-- `docs/10-prompt/结构化项目角色契约.md`：定义 deterministic floor 与 LLM semantic judgment 的总边界。
+- `docs/methodology/结构化项目角色契约.md`：定义 deterministic floor 与 LLM semantic judgment 的总边界。

@@ -3,6 +3,7 @@
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
+const { verifiedNpmWarmup, isVerifiedNpmArchiveIdentity } = require('./npm-warmup.cjs');
 const {
   assertContainedPath,
   ensureContainedDirectory,
@@ -212,27 +213,45 @@ function helperProbe(entry, status, reasonCode, details = {}) {
 function installBaselineTools(context, repoRoot, selectedIds = []) {
   const results = new Map();
   for (const entry of context.effectiveRegistry.tools || []) {
+    // Provider 的安装与复核归其 adapter 所有，避免 baseline 提前绕过校验。
+    if (providerOwnsInstallation(context.effectiveRegistry, entry.id)) continue;
     if (entry.required === false) continue;
     if (entry.setup_required === true && !selectedIds.includes(entry.id)) continue;
     const installation = resolveInstallation(entry, context.platform);
     if (!installation || !installation.command) continue;
     const dependency = dependencyFor(context, entry.dependency_ref);
     const args = interpolateArgs(installation.args || [], dependency);
-    if (installation.kind === 'warmup' && warmupCacheHit(context, repoRoot, entry, installation.command, args)) {
+    const cached = installation.kind === 'warmup'
+      ? readWarmupCache(context, repoRoot, entry, installation.command, args) : null;
+    if (cached) {
       results.set(entry.id, {
         status: 'ready',
         verified: true,
         source: 'post-mutation-probe',
         reason_code: 'warmup-cache-hit',
+        attempts: [],
+        install_source: cached.install_source,
+        mirror_used: cached.mirror_used,
+        ...(cached.dependency_identity ? { dependency_identity: cached.dependency_identity } : {}),
       });
       continue;
     }
-    const result = executeInstallWithMirror(context, installation.command, args, {
-      cwd: repoRoot,
-      timeoutMs: 120000,
-    });
+    if (installation.kind === 'warmup') {
+      try {
+        const cachePath = warmupCachePath(context, repoRoot, entry.id);
+        assertContainedPath(repoRoot, cachePath, { reasonCode: 'warmup-cache-symlink-escape' });
+        fs.rmSync(cachePath, { force: true });
+      } catch (_error) {
+        results.set(entry.id, { status: 'failed', verified: true, source: 'post-mutation-probe', reason_code: 'warmup-cache-invalidation-failed' });
+        continue;
+      }
+    }
+    const result = installation.kind === 'warmup' && (entry.resolved_dependency || entry.readiness_policy === 'always-required')
+      ? verifiedNpmWarmup({ context, repoRoot, entry, command: installation.command, args,
+        executeInstall: (command, installArgs, options) => executeInstallWithMirror(context, command, installArgs, options) })
+      : executeInstallWithMirror(context, installation.command, args, { cwd: repoRoot, timeoutMs: 120000 });
     if (commandSucceeded(result)) {
-      if (installation.kind === 'warmup') writeWarmupCache(context, repoRoot, entry, installation.command, args);
+      if (installation.kind === 'warmup') writeWarmupCache(context, repoRoot, entry, installation.command, args, result);
       results.set(entry.id, {
         status: 'ready',
         verified: true,
@@ -245,7 +264,7 @@ function installBaselineTools(context, repoRoot, selectedIds = []) {
         status: 'failed',
         verified: true,
         source: 'post-mutation-probe',
-        reason_code: 'tool-install-failed',
+        reason_code: result.reason_code || 'tool-install-failed',
         ...installProvenance(result),
       });
     }
@@ -254,28 +273,38 @@ function installBaselineTools(context, repoRoot, selectedIds = []) {
 }
 
 function warmupCacheHit(context, repoRoot, entry, command, args) {
+  return readWarmupCache(context, repoRoot, entry, command, args) !== null;
+}
+
+function readWarmupCache(context, repoRoot, entry, command, args) {
   if (context.env.SPEC_FIRST_FORCE_WARMUP === '1' || context.env.SPEC_FIRST_DISABLE_WARMUP_CACHE === '1') {
-    return false;
+    return null;
   }
   const cachePath = warmupCachePath(context, repoRoot, entry.id);
   try {
     assertContainedPath(repoRoot, cachePath, { reasonCode: 'warmup-cache-symlink-escape' });
-    if (!fs.existsSync(cachePath)) return false;
+    if (!fs.existsSync(cachePath)) return null;
     const value = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
-    if (value.schema_version !== 'mcp-warmup-cache.v1'
+    if (value.schema_version !== 'mcp-warmup-cache.v2'
       || value.tool_id !== entry.id
       || value.host !== context.host
       || value.platform !== context.platform
       || value.command_hash !== warmupCommandHash(command, args)
-      || value.exit_code !== 0) return false;
+      || value.dependency_sha256 !== warmupDependencyHash(entry)
+      || ![INSTALL_SOURCE.OFFICIAL, INSTALL_SOURCE.MIRROR].includes(value.install_source)
+      || value.mirror_used !== (value.install_source === INSTALL_SOURCE.MIRROR)
+      || value.exit_code !== 0) return null;
+    if (entry.resolved_dependency && !isVerifiedNpmArchiveIdentity(value.dependency_identity, entry.resolved_dependency)) return null;
+    const now = Math.floor(Date.now() / 1000);
+    if (!Number.isSafeInteger(value.last_success_epoch) || value.last_success_epoch < 0 || value.last_success_epoch > now) return null;
     const ttl = warmupTtlSeconds(context, command, args);
-    return ttl === 0 || (Number(value.last_success_epoch) + ttl) >= Math.floor(Date.now() / 1000);
+    return ttl === 0 || value.last_success_epoch + ttl >= now ? value : null;
   } catch (_error) {
-    return false;
+    return null;
   }
 }
 
-function writeWarmupCache(context, repoRoot, entry, command, args) {
+function writeWarmupCache(context, repoRoot, entry, command, args, result) {
   const cachePath = warmupCachePath(context, repoRoot, entry.id);
   let temp = null;
   try {
@@ -287,13 +316,17 @@ function writeWarmupCache(context, repoRoot, entry, command, args) {
     temp = path.join(directory, `.${entry.id}.${process.pid}.${crypto.randomBytes(6).toString('hex')}.tmp`);
     const now = new Date();
     const payload = {
-      schema_version: 'mcp-warmup-cache.v1',
+      schema_version: 'mcp-warmup-cache.v2',
       tool_id: entry.id,
       host: context.host,
       platform: context.platform,
       command,
       args,
       command_hash: warmupCommandHash(command, args),
+      dependency_sha256: warmupDependencyHash(entry),
+      install_source: result.install_source,
+      mirror_used: result.mirror_used,
+      ...(result.dependency_identity ? { dependency_identity: result.dependency_identity } : {}),
       package_spec: entry.package && entry.version ? `${entry.package}@${entry.version}` : '',
       last_success_at: now.toISOString(),
       last_success_epoch: Math.floor(now.getTime() / 1000),
@@ -316,6 +349,17 @@ function writeWarmupCache(context, repoRoot, entry, command, args) {
 
 function warmupCachePath(context, repoRoot, toolId) {
   return path.join(repoRoot, '.spec-first', 'cache', 'mcp-warmup', context.host, context.platform, `${toolId}.json`);
+}
+
+function warmupDependencyHash(entry) {
+  const dependency = entry.resolved_dependency || {};
+  // 绑定 registry 声明的身份；该摘要不是下载字节校验结果。
+  return crypto.createHash('sha256').update(JSON.stringify([
+    dependency.package || entry.package || null,
+    dependency.version || entry.version || null,
+    dependency.integrity || null,
+    dependency.source || null,
+  ])).digest('hex');
 }
 
 function warmupCommandHash(command, args) {
@@ -399,6 +443,10 @@ function dependencyFor(context, id) {
   return (context.effectiveRegistry.external_dependencies || []).find((entry) => entry.id === id) || null;
 }
 
+function providerOwnsInstallation(registry, id) {
+  return (registry.providers || []).some((entry) => entry.id === id);
+}
+
 function resolveInstallation(entry, platform) {
   const installation = entry.installation || {};
   if (installation.command) return installation;
@@ -474,6 +522,8 @@ function installProvenance(result) {
     attempts: result.attempts.map((attempt) => ({ ...attempt })),
     install_source: result.install_source || INSTALL_SOURCE.OFFICIAL,
     mirror_used: result.mirror_used === true,
+    ...(result.dependency_identity ? { dependency_identity: result.dependency_identity } : {}),
+    ...(result.limitations ? { limitations: result.limitations } : {}),
   };
 }
 
@@ -482,12 +532,14 @@ function combinedInstallProvenance(results) {
   if (completed.length === 0) return {};
   const mirrorUsed = completed.some((result) => result.mirror_used === true);
   const bothFailed = completed.some((result) => result.install_source === INSTALL_SOURCE.BOTH_FAILED);
+  const identities = completed.filter((result) => result.dependency_identity).map((result) => result.dependency_identity);
   return {
     attempts: completed.flatMap((result) => result.attempts.map((attempt) => ({ ...attempt }))),
     install_source: bothFailed
       ? INSTALL_SOURCE.BOTH_FAILED
       : (mirrorUsed ? INSTALL_SOURCE.MIRROR : INSTALL_SOURCE.OFFICIAL),
     mirror_used: mirrorUsed,
+    ...(identities.length === 1 ? { dependency_identity: identities[0] } : {}),
   };
 }
 
@@ -516,6 +568,7 @@ module.exports = {
   interpolateArgs,
   probeHelper,
   probeRegistry,
+  providerOwnsInstallation,
   resolveAgentBrowserProbePath,
   resolveInstallation,
   warmupCacheHit,

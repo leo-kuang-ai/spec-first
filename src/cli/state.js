@@ -317,10 +317,9 @@ function planManagedAssetRemoval(projectRoot, managedState, adapter) {
     manifestVersion: state.manifestVersion || 'normalized',
   }, adapter);
   const operations = [];
-  // Shared skills roots (e.g. `.agents/skills/` consumed by both Codex and
-  // ZCode) must survive a per-host clean/hard-reset while another host's state
-  // still claims the same projection; AGENTS.md has the same guard via the
-  // instruction-file consumer classification in clean.js.
+  // 共享 skills 根（如 `.agents/skills/` 由 Codex 与 ZCode 共同消费）在其他宿主
+  // state 仍声明同一投影时，必须能在单宿主 clean/hard-reset 中幸存；AGENTS.md
+  // 经 clean.js 的指令文件消费者分类获得同款保护。
   const preserveSharedSkills = hasSharedSkillsRootConsumer(projectRoot, adapter);
 
   for (const commandFile of state.commands) {
@@ -391,9 +390,9 @@ function removeManagedAssets(projectRoot, managedState, adapter) {
   applyOperationPlan(projectRoot, planManagedAssetRemoval(projectRoot, managedState, adapter));
 }
 
-// True when another supported host's managed state still claims the same
-// skillsRoot projection (e.g. Codex and ZCode both consume `.agents/skills/`).
-// Lazy require: adapters depend on this module, so a top-level import would cycle.
+// 另一受支持宿主的受管 state 仍声明同一 skillsRoot 投影时为 true（如 Codex 与
+// ZCode 共同消费 `.agents/skills/`）。惰性 require：adapters 依赖本模块，顶层
+// import 会成环。
 function hasSharedSkillsRootConsumer(projectRoot, adapter) {
   const { getSupportedPlatforms, getAdapter } = require('./adapters');
   return getSupportedPlatforms().some((platform) => {
@@ -411,9 +410,16 @@ function hasSharedSkillsRootConsumer(projectRoot, adapter) {
     }
     try {
       const candidateState = readState(projectRoot, candidate);
-      return Boolean(candidateState && candidateState.platform === candidate.id);
+      if (candidateState && candidateState.platform === candidate.id) {
+        return true;
+      }
+      // state 缺失但受管 runtime 面仍在（如手工删了 state.json）：按不确定处理，
+      // 保留共享投影——与 AGENTS.md 消费者判定的 uncertain 口径一致。
+      return fs.existsSync(path.join(projectRoot, candidate.managedRoot));
     } catch (_error) {
-      return false;
+      // state 不可读（损坏 JSON 等）：不确定即保留。此前这里返回 false 会在
+      // 兄弟宿主 state 损坏时误删其仍在消费的共享 skills 投影。
+      return true;
     }
   });
 }

@@ -25,6 +25,7 @@ Select your depth:
 Identify assumptions the code makes about its environment and construct scenarios where those assumptions break.
 
 - **Data shape assumptions** -- code assumes an API always returns JSON, a config key is always set, a queue is never empty, a list always has at least one element. What if it doesn't?
+- **删除文件的存活假设**：整文件删除假设已无调用者。除静态 import，还要检查字符串引用的资源路径、配置与插件名、按文件名解析的路由，以及 import 时完成的注册。删除测试时，另查被测行为是否仍在交付。证明删除造成故障的 finding 应引用存活调用行；只有构造失败路径需要旧实现时，才读取 `git show <base>:<path>`。
 - **Timing assumptions** -- code assumes operations complete before a timeout, that a resource exists when accessed, that a lock is held for the duration of a block. What if timing changes?
 - **Ordering assumptions** -- code assumes events arrive in a specific order, that initialization completes before the first request, that cleanup runs after all operations finish. What if the order changes?
 - **Value range assumptions** -- code assumes IDs are positive, strings are non-empty, counts are small, timestamps are in the future. What if the assumption is violated?
@@ -63,7 +64,7 @@ Find legitimate-seeming usage patterns that cause bad outcomes. These are not se
 
 When the change *is* a guard that stands in for the real thing -- a CI/CD gate, merge-blocking check, build/deploy step, coverage/lint gate, or test harness/mock -- its risk is not blast radius, it is fidelity: it can go green while production is red. Construct the scenario where the guard passes but the thing it protects fails. Verify it reproduces the same context, inputs, and steps as the real thing -- build context, working directory, prepared dirs, environment, and the exact command sequence -- not merely that it runs. A guard that exercises a different context than production, mocks away the code path that actually breaks, or asserts on a proxy rather than the real output is the green-while-red failure. This lens is yours whenever a verification mechanism is in the diff, independent of changed-line count.
 
-还要攻击 required-proof reconciliation 本身：构造 recorded checks 全部通过，但某个 required proof intent 被遗漏、无 owner 地 deferred、由 synthetic command 代替，或绑定 stale source 的 false-green 路径。如果 closeout 仍能报告 `complete` 或 `verified`，应报告具体的 required proof false-green failure，而不是泛化为 coverage concern。
+Also challenge required-proof reconciliation itself: construct a false-green path where recorded checks all pass but a required proof intent is omitted, deferred without an owner, replaced by a synthetic command, or bound to stale source. If closeout still reports `complete` or `verified`, report the concrete required-proof false-green failure rather than a generic coverage concern.
 
 ## Confidence calibration
 

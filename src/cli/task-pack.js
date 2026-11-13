@@ -6,6 +6,9 @@ const path = require('node:path');
 const {
   GENERATED_RUNTIME_PREFIXES,
   GENERATED_RUNTIME_ROOTS,
+  resolveTargetRepoRoot,
+  validateOutputContainment,
+  validateRepoRelativeField,
 } = require('./helpers/target-repo');
 const { isSecretDeniedPath } = require('./helpers/secret-deny-patterns');
 const {
@@ -206,7 +209,7 @@ function parseTaskPackContract(markdown) {
 
 function isInsidePath(parentPath, childPath) {
   const relative = path.relative(parentPath, childPath);
-  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
+  return relative !== '..' && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative);
 }
 
 function realpath(value) {
@@ -243,7 +246,7 @@ function isConcreteRepoRelativeFile(filePath) {
 
 function isGeneratedRuntimeMirrorPath(filePath) {
   if (typeof filePath !== 'string') return false;
-  const normalized = filePath.replace(/\\/g, '/');
+  const normalized = filePath.replace(/\\/g, '/').toLowerCase();
   return GENERATED_RUNTIME_MIRROR_ROOTS.has(normalized)
     || GENERATED_RUNTIME_MIRROR_PREFIXES.some((prefix) => normalized.startsWith(prefix));
 }
@@ -258,6 +261,7 @@ function isSafeExpectedSideEffectPattern(pattern) {
   if (pattern !== pattern.trim()) return false;
   if (pattern.includes('\\')) return false;
   if (path.isAbsolute(pattern)) return false;
+  if (/^\.git(?:\/|$)/i.test(pattern)) return false;
   if (isGeneratedRuntimeMirrorPath(pattern)) return false;
   if (isSecretDeniedPath(pattern)) return false;
   if (pattern.includes('**')) return false;
@@ -443,6 +447,7 @@ function validateTaskPack(taskPackPath, options = {}) {
   }
 
   const metadata = parseFrontmatterScalars(split.frontmatter);
+  let sourceTargetRepo;
   const sourcePlanOccurrences = parseFrontmatterScalarOccurrences(split.frontmatter)
     .filter((occurrence) => occurrence.key === 'source_plan');
   result.task_pack.metadata = metadata;
@@ -512,6 +517,7 @@ function validateTaskPack(taskPackPath, options = {}) {
         addFinding(errors, 'source-plan-frontmatter-invalid', sourcePlanSplit.error.message);
       } else {
         const sourcePlanMetadata = parseFrontmatterScalars(sourcePlanSplit.frontmatter);
+        sourceTargetRepo = sourcePlanMetadata.target_repo;
         const lifecycle = inspectSourcePlanExecutionEligibility(sourcePlanRead.text);
         validation.source_plan_lifecycle = lifecycle.eligible
           ? (lifecycle.status === 'active' ? 'active' : 'unmanaged')
@@ -561,13 +567,14 @@ function validateTaskPack(taskPackPath, options = {}) {
   }
 
   const parsedContract = parseTaskPackContract(taskPackRead.text);
+  let taskRoots;
   if (parsedContract.error) {
     validation.task_pack_contract = 'invalid';
     addFinding(errors, parsedContract.error.code, parsedContract.error.message);
   } else {
     result.task_pack.contract = parsedContract.contract;
     const errorCountBeforeContractValidation = errors.length;
-    validateTaskPackContract(parsedContract.contract, repoRoot, errors, limitations);
+    taskRoots = validateTaskPackContract(parsedContract.contract, repoRoot, errors, limitations, metadata.target_repo ?? sourceTargetRepo);
     validation.task_pack_contract = errors.length === errorCountBeforeContractValidation ? 'valid' : 'invalid';
   }
 
@@ -585,6 +592,7 @@ function validateTaskPack(taskPackPath, options = {}) {
       review_gate: task.review_gate || null,
       review_focus: task.review_focus || null,
       target_repo: task.target_repo || null,
+      resolved_target_repo: taskRoots ? taskRoots.get(task) || null : null,
       expected_side_effects: Array.isArray(task.expected_side_effects) ? task.expected_side_effects : [],
     }));
   }
@@ -595,7 +603,7 @@ function validateTaskPack(taskPackPath, options = {}) {
   return result;
 }
 
-function validateTaskPackContract(contract, repoRoot, errors, limitations) {
+function validateTaskPackContract(contract, repoRoot, errors, limitations, defaultTargetRepo) {
   if (!contract || typeof contract !== 'object') {
     addFinding(errors, 'task-pack-contract-invalid', 'Task Pack Contract must be a JSON object.');
     return;
@@ -625,6 +633,7 @@ function validateTaskPackContract(contract, repoRoot, errors, limitations) {
   const waveTasks = new Map();
   const taskWaveAppearances = new Map();
   const validTasks = [];
+  const taskRoots = new Map();
 
   for (const [index, wave] of contract.execution_waves.entries()) {
     if (!wave || typeof wave !== 'object') {
@@ -771,6 +780,29 @@ function validateTaskPackContract(contract, repoRoot, errors, limitations) {
       validateStringArray(task.dependencies, 'dependencies', task, errors);
     }
 
+    const targetScope = task.target_repo ?? defaultTargetRepo;
+    let taskRoot = repoRoot;
+    if (targetScope !== undefined && targetScope !== null) {
+      const scopeErrors = [];
+      if (targetScope !== '.' && targetScope !== path.basename(repoRoot)) {
+        validateRepoRelativeField(targetScope, 'target_repo', scopeErrors);
+        if (!scopeErrors.length) {
+          taskRoot = path.resolve(repoRoot, targetScope);
+          scopeErrors.push(...validateOutputContainment(repoRoot, taskRoot, { includeLeaf: true }).errors);
+        }
+      }
+      if (!scopeErrors.length) {
+        const resolved = resolveTargetRepoRoot(taskRoot);
+        if (!resolved.ok) scopeErrors.push(...resolved.errors);
+      }
+      if (scopeErrors.length) {
+        addFinding(errors, 'task-pack-task-target-repo-invalid', 'The selected mutation repository cannot be resolved safely.', {
+          task_id: task.task_id || null, target_repo: targetScope, details: scopeErrors,
+        });
+      }
+    }
+    taskRoots.set(task, taskRoot);
+
     if (!Array.isArray(task.files)) {
       addFinding(errors, 'task-pack-task-files-invalid', `Task '${task.task_id || '<unknown>'}' files must be an array.`, {
         task_id: task.task_id || null,
@@ -789,26 +821,23 @@ function validateTaskPackContract(contract, repoRoot, errors, limitations) {
           });
           continue;
         }
-        if (isGeneratedRuntimeMirrorPath(filePath)) {
-          addFinding(errors, 'task-pack-task-file-generated-runtime', `Task '${task.task_id || '<unknown>'}' file points at a generated runtime mirror path.`, {
-            task_id: task.task_id || null,
-            file: filePath,
-          });
+        const sharedPathErrors = [];
+        validateRepoRelativeField(filePath, 'files', sharedPathErrors, { allowSpecFirstWorkflows: true });
+        for (const message of sharedPathErrors) {
+          const suffix = message.includes('generated runtime') ? 'generated-runtime'
+            : message.includes('secret-denied') ? 'secret-denied'
+              : message.includes('Git internals') ? 'git-internals' : 'unsafe-path';
+          addFinding(errors, `task-pack-task-file-${suffix}`, message, { task_id: task.task_id || null, file: filePath });
         }
-        if (isSecretDeniedPath(filePath)) {
-          addFinding(errors, 'task-pack-task-file-secret-denied', `Task '${task.task_id || '<unknown>'}' file points at a secret-denied path.`, {
-            task_id: task.task_id || null,
-            file: filePath,
-          });
-        }
-        const absolute = path.resolve(repoRoot, filePath);
-        if (!isInsidePath(repoRoot, absolute)) {
+        const absolute = path.resolve(taskRoot, filePath);
+        const containment = validateOutputContainment(taskRoot, absolute, { includeLeaf: true });
+        if (containment.errors.length) {
           addFinding(errors, 'task-pack-task-file-outside-repo', `Task '${task.task_id || '<unknown>'}' file resolves outside repo root.`, {
             task_id: task.task_id || null,
             file: filePath,
           });
         }
-        if (fs.existsSync(absolute) && fs.statSync(absolute).isDirectory()) {
+        if (!containment.errors.length && fs.existsSync(absolute) && fs.statSync(absolute).isDirectory()) {
           addFinding(errors, 'task-pack-task-file-is-directory', `Task '${task.task_id || '<unknown>'}' file path points to a directory.`, {
             task_id: task.task_id || null,
             file: filePath,
@@ -937,18 +966,20 @@ function validateTaskPackContract(contract, repoRoot, errors, limitations) {
       if (!Array.isArray(task.files)) continue;
       for (const filePath of task.files) {
         if (!isConcreteRepoRelativeFile(filePath)) continue;
-        if (!fileOwners.has(filePath)) {
-          fileOwners.set(filePath, task.task_id);
+        const fileIdentity = path.resolve(taskRoots.get(task), filePath);
+        if (!fileOwners.has(fileIdentity)) {
+          fileOwners.set(fileIdentity, task.task_id);
           continue;
         }
-        addFinding(errors, 'task-pack-same-wave-file-overlap', `Tasks '${fileOwners.get(filePath)}' and '${task.task_id}' share file '${filePath}' in wave '${wave}'.`, {
+        addFinding(errors, 'task-pack-same-wave-file-overlap', `Tasks '${fileOwners.get(fileIdentity)}' and '${task.task_id}' share file '${filePath}' in wave '${wave}'.`, {
           wave,
           file: filePath,
-          task_ids: [fileOwners.get(filePath), task.task_id],
+          task_ids: [fileOwners.get(fileIdentity), task.task_id],
         });
       }
     }
   }
+  return taskRoots;
 }
 
 module.exports = {

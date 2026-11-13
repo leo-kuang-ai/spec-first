@@ -36,7 +36,7 @@ describe('Skill-flow 剩余 P2 关闭合同', () => {
   });
 
   test('SF-16 session historian 只拥有 caller 提供的 scratch artifact return', () => {
-    const caller = read('skills/spec-compound/SKILL.md');
+    const caller = read('skills/spec-compound/references/session-history.md');
     const prompt = read('skills/spec-compound/references/agents/session-historian.md');
 
     expect(caller).toContain('`output_path: <private-scratch-dir>/session-history.md`');
@@ -59,23 +59,23 @@ describe('Skill-flow 剩余 P2 关闭合同', () => {
     expect(callers).not.toContain('`spec-work` and `spec-code-review` offer this skill');
   });
 
-  test('SF-19 Figma worker 返回 authority-bounded evidence packet', () => {
+  test('SF-19 Figma worker returns an authority-bounded evidence packet', () => {
     const prompt = read('skills/spec-work/references/agents/figma-design-sync.md');
 
     expect(prompt).toContain('changed_paths');
     expect(prompt).toContain('verification_evidence');
     expect(prompt).toContain('remaining_differences_or_blockers');
-    expect(prompt).toContain('不得 stage、commit、push、创建或更新 PR');
-    expect(prompt).toContain('不得修改 lifecycle status');
-    expect(prompt).toContain('不得把 generated runtime mirror 当作 source 编辑');
-    expect(prompt).toContain('只有修复已应用并完成验证后才能确认完成');
-    expect(prompt).toContain('caller-provided run-local private screenshot/evidence ref');
+    expect(prompt).toContain('Never stage, commit, push, create/edit PRs');
+    expect(prompt).toContain('change lifecycle status');
+    expect(prompt).toContain('patch generated runtime');
+    expect(prompt).toContain('code-check success is not visual acceptance');
+    expect(prompt).toContain('caller-provided current run-local private browser evidence');
     expect(prompt).toContain('implementation-browser-evidence-missing');
     expect(prompt).not.toContain('agent-browser open');
   });
 
   test('SF-20 code review 从真实 reviewed tree 当轮派生且不跨 source identity 复用', () => {
-    const skill = read('skills/spec-code-review/SKILL.md');
+    const skill = read('skills/spec-code-review/references/intent-and-plan.md');
     const groundingSection = section(skill, '### Stage 2c: Resolve current-tree orientation');
 
     expect(groundingSection).toContain('tree actually under review');
@@ -88,8 +88,8 @@ describe('Skill-flow 剩余 P2 关闭合同', () => {
   test('SF-21 maintainability 不能用 P1 anchor-50 绕过 synthesis', () => {
     const prompt = read('skills/spec-code-review/references/personas/maintainability-reviewer.md');
 
-    expect(prompt).toContain('Anchor 50 — suppress');
-    expect(prompt).toContain('提升为 anchor 75');
+    expect(prompt).toContain('Anchor 50 - suppress');
+    expect(prompt).toContain('raise confidence to anchor 75');
     expect(prompt).not.toContain('suppress unless severity is P1');
   });
 
@@ -132,7 +132,7 @@ describe('Skill-flow 剩余 P2 关闭合同', () => {
     ]) {
       expect(resolver).toContain(authority);
     }
-    expect(resolver).toContain('workflow invocation 不授权这些副作用');
+    expect(resolver).toContain('workflow invocation does not authorize these effects');
     expect(xcode).toMatch(/^disable-model-invocation:\s*true$/m);
     expect(xcode).not.toContain('## Integration with spec-code-review');
   });

@@ -345,7 +345,8 @@ describe('spec-prd Claude and Qoder hook parity', () => {
   test('hosts without confirmed hard enforcement are described as degraded', () => {
     const skill = fs.readFileSync('skills/spec-prd/SKILL.md', 'utf8');
 
-    expect(skill).toContain('Claude is the only host with confirmed managed hard enforcement');
+    expect(skill).toContain('不覆盖 Bash/外部进程直写或任意文件名');
+    expect(skill).toContain('必须有版本绑定的运行证据');
     expect(skill).toContain('Qoder hook projection is present but activation remains unverified');
     expect(skill).toContain('Codex, Cursor, and Kiro remain loud degraded');
   });

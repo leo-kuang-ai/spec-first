@@ -18,6 +18,36 @@ function makeRepo() {
 }
 
 describe('target repo containment helpers', () => {
+  test('denies managed roots and Skill projections for every registered host', () => {
+    const { getSupportedPlatforms, getAdapter } = require('../../src/cli/adapters');
+    for (const host of getSupportedPlatforms()) {
+      const adapter = getAdapter(host);
+      for (const value of [adapter.stateFile, `${adapter.workflowsRoot}/spec-work/SKILL.md`]) {
+        const errors = [];
+        validateRepoRelativeField(value, host, errors);
+        expect(errors).toContain(`${host} must not point at generated runtime mirrors`);
+      }
+    }
+    const errors = [];
+    validateRepoRelativeField('.opencode/custom-user-file.md', 'custom', errors);
+    expect(errors).toEqual([]);
+  });
+  test('rejects dangling ancestors and leaf links while allowing future nested files', () => {
+    const repo = makeRepo();
+    const outside = makeRepo();
+    try {
+      fs.symlinkSync(path.join(outside, 'missing'), path.join(repo, 'dangling'), 'dir');
+      fs.symlinkSync(path.join(outside, 'missing.txt'), path.join(repo, 'leaf.txt'));
+      expect(validateOutputContainment(repo, path.join(repo, 'dangling/new/file.txt')).errors.length).toBeGreaterThan(0);
+      expect(validateOutputContainment(repo, path.join(repo, 'leaf.txt'), { includeLeaf: true }).errors.length).toBeGreaterThan(0);
+      expect(validateOutputContainment(repo, path.join(outside, 'escaped.txt')).errors.length).toBeGreaterThan(0);
+      expect(validateOutputContainment(repo, path.join(repo, 'future/nested/file.txt')).errors).toEqual([]);
+      expect(validateOutputContainment(repo, repo).errors).toEqual([]);
+    } finally {
+      fs.rmSync(repo, { recursive: true, force: true });
+      fs.rmSync(outside, { recursive: true, force: true });
+    }
+  });
   test('resolves only a concrete Git repository root', () => {
     const repo = makeRepo();
     const nonGit = fs.mkdtempSync(path.join(os.tmpdir(), 'target-repo-nongit-'));

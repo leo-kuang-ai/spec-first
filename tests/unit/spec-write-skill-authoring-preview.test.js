@@ -140,6 +140,71 @@ test('rejects writes outside canonical source root and requires snapshot/dirty-o
   ]));
 });
 
+test('authorized supporting paths carry a cross-root delivery in one bound write set', () => {
+  const { root, manifest, scope } = fixture();
+  const changelogBefore = '# Changelog\n';
+  fs.writeFileSync(path.join(root, 'CHANGELOG.md'), changelogBefore);
+  fs.mkdirSync(path.join(root, 'tests', 'unit'), { recursive: true });
+  const skillChange = manifest.would_change[0];
+  const changelogChange = {
+    path: 'CHANGELOG.md', before_sha256: sha(changelogBefore), after_sha256: sha('# Changelog\n\n- entry\n'), collision_disposition: 'replace', supporting: true,
+  };
+  const testCreate = {
+    path: 'tests/unit/example-skill.test.js', before_sha256: null, after_sha256: sha("test('x', () => {});\n"), collision_disposition: 'create', supporting: true,
+  };
+  manifest.would_change = [skillChange, changelogChange, testCreate];
+  manifest.source_snapshot = {
+    files: [
+      { path: 'example-skill/SKILL.md', sha256: skillChange.before_sha256 },
+      { path: 'CHANGELOG.md', sha256: changelogChange.before_sha256 },
+    ],
+    parents: [{ path: 'tests/unit', entries_sha256: sha('') }],
+  };
+  scope.paths = manifest.would_change.map((entry) => entry.path);
+  const writeSet = manifest.would_change.map((entry) => ({ ...entry }));
+
+  const report = validateAuthoringPreview({ manifest, authorizedRoot: root, scope, writeSet });
+  expect(report).toMatchObject({ result: 'pass', mutation_readiness: 'ready' });
+});
+
+test('unflagged sibling outside canonical source root stays rejected next to authorized supporting paths', () => {
+  const { root, manifest, scope } = fixture();
+  const changelogBefore = '# Changelog\n';
+  fs.writeFileSync(path.join(root, 'CHANGELOG.md'), changelogBefore);
+  const unflagged = {
+    path: 'README.md', before_sha256: null, after_sha256: sha('# No\n'), collision_disposition: 'create',
+  };
+  const changelogChange = {
+    path: 'CHANGELOG.md', before_sha256: sha(changelogBefore), after_sha256: sha('# Changelog\n\n- entry\n'), collision_disposition: 'replace', supporting: true,
+  };
+  manifest.would_change = [manifest.would_change[0], changelogChange, unflagged];
+  manifest.source_snapshot.files.push({ path: 'CHANGELOG.md', sha256: changelogChange.before_sha256 });
+  scope.paths = manifest.would_change.map((entry) => entry.path);
+
+  const report = validateAuthoringPreview({ manifest, authorizedRoot: root, scope, writeSet: manifest.would_change });
+  expect(report.result).toBe('fail');
+  expect(report.findings).toEqual(expect.arrayContaining([
+    expect.objectContaining({ reason_code: 'path_outside_canonical_source_root', path: 'README.md', status: 'error' }),
+  ]));
+});
+
+test('supporting paths must be snapshotted like canonical paths', () => {
+  const { root, manifest, scope } = fixture();
+  const changelogBefore = '# Changelog\n';
+  fs.writeFileSync(path.join(root, 'CHANGELOG.md'), changelogBefore);
+  const changelogChange = {
+    path: 'CHANGELOG.md', before_sha256: sha(changelogBefore), after_sha256: sha('# Changelog\n\n- entry\n'), collision_disposition: 'replace', supporting: true,
+  };
+  manifest.would_change = [manifest.would_change[0], changelogChange];
+  scope.paths = manifest.would_change.map((entry) => entry.path);
+
+  const report = validateAuthoringPreview({ manifest, authorizedRoot: root, scope, writeSet: manifest.would_change });
+  expect(report.result).toBe('fail');
+  expect(report.findings).toEqual(expect.arrayContaining([
+    expect.objectContaining({ reason_code: 'snapshot_required_path_missing', path: 'CHANGELOG.md', status: 'error' }),
+  ]));
+});
+
 test('requires a nearest-parent snapshot before a new canonical source file is created', () => {
   const { root, manifest, scope } = fixture();
   const create = {

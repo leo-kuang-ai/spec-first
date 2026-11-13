@@ -1,0 +1,11 @@
+id: headless-no-path-fails
+title: Non-interactive review without a path returns the fixed receipt
+description: |
+  Require the current canonical receipt and no recorded persona dispatch.
+input:
+  prompt: |
+    Read the installed spec-doc-review skill and process: mode:non-interactive
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-headless-no-path.sh
+  timeout_seconds: 30

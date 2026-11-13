@@ -3,6 +3,9 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const crypto = require('node:crypto');
+const { execFileSync } = require('node:child_process');
+const repoRoot = path.resolve(__dirname, '../..');
 
 const producer = require('../../scripts/check-ce-localization-review.cjs');
 
@@ -16,10 +19,25 @@ describe('CE localization deterministic review producer', () => {
       'check-spiral-auth.cjs',
     ].join('/');
 
-    expect(inventory.skill_count).toBe(38);
-    // 692 = 676 + spec-ideate/using-spec-first eval 资产与断言脚本进入 inventory 源集（2026-08-31 批次）
-    // 1029 = 692 + autoresearch 收编为 canonical skill 源（2026-09-04 批次，01fad369，+337 包路径）
-    expect(inventory.package_path_count).toBe(1029);
+    // 独立枚举 Git 可见的正规 package 文件；不以 producer 自报数量证明完整性。
+    const candidates = [...new Set(execFileSync('git', [
+      '-C', repoRoot, 'ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', 'skills',
+    ], { encoding: 'utf8' }).split('\0').filter(Boolean))].filter((name) => {
+      try { return fs.lstatSync(path.join(repoRoot, name)).isFile(); } catch { return false; }
+    });
+    const skills = candidates.filter((name) => /^skills\/[^/]+\/SKILL\.md$/.test(name))
+      .map((name) => name.split('/')[1]).sort();
+    const expectedPaths = candidates.filter((name) => skills.includes(name.split('/')[1])).sort();
+    expect(inventory.skills.map((entry) => entry.skill_id).sort()).toEqual(skills);
+    expect(inventory.skill_count).toBe(skills.length);
+    expect(inventory.files.map((entry) => entry.path).sort()).toEqual(expectedPaths);
+    expect(inventory.package_path_count).toBe(expectedPaths.length);
+    for (const entry of inventory.files) {
+      const bytes = fs.readFileSync(path.join(repoRoot, entry.path));
+      expect(entry.owning_skill).toBe(entry.path.split('/')[1]);
+      expect(entry.sha256).toBe(crypto.createHash('sha256').update(bytes).digest('hex'));
+      expect(entry.bytes).toBe(bytes.length);
+    }
     expect(inventory.files).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',
@@ -37,33 +55,47 @@ describe('CE localization deterministic review producer', () => {
       terminal_disposition: 'included-canonical-skill-source',
     }));
     expect(coverage.coverage_summary.missing_path_count).toBe(0);
-    // 2026-08-21: 186 -> 187 / 392 -> 393 after adding
-    // tests/unit/spec-prd-finding-schema-freeze.test.js, which the coverage
-    // producer picks up as one additional spec-prd `focused-test-name` relation.
-    // 2026-08-28: 187 -> 189 / 393 -> 402 after adding skills/spec-project-rules
-    // (new focused test + shared governance/project-graph relations);
-    // 189 -> 190 / 402 -> 403 after adding its deterministic scripts test.
-    // 2026-08-29: 575 -> 617 after adding skill-up eval assets; 617 -> 616 after v2 removed verify-deps.cjs
-    // (eval.yaml + 3 cases + 2 fixture repos + 3 judge scripts); 616 -> 612 after the review-hardening
-    // pass retired the five-file fixture KB into single-file docs/architecture.md (net -4);
-    // 612 -> 650 after the darwin/governance rounds expanded behavior evals to 9 cases
-    // (+6 case yamls, +6 judge scripts, single-end fixture, generated large-repo fixture,
-    // multi-end-embedded fixture, evals/README);
-    // 650 -> 676 after committing exposed previously-untracked sources to the
-    // inventory (2 plans, 3 review deltas, spec-project-rules validation reports).
-    // 2026-09-04 (01fad369): 190 -> 191 / 403 -> 405 after adopting autoresearch
-    // into the canonical inventory (its package + eval relations);
-    // 191 -> 192 / 405 -> 406 after this fix batch added the explicit autoresearch
-    // source refs below (a new direct-support path: this very test file, carrying
-    // two focused-test-explicit-source-ref relations). Note: the extractor scans
-    // quoted skill paths anywhere in this file, comments included — do not cite
-    // skill paths in comments here or the frozen count drifts.
-    // 2026-09-05 (pi host): 192 -> 193 / 406 -> 407 — the new direct-support path
-    // is the pi adapter test file itself (its runtime-setup transform fixture's
-    // frontmatter names that skill, incidentally matching the focused-test
-    // relation); the adapter source file carries no relation of its own.
-    expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(193);
-    expect(coverage.coverage_summary.direct_support_relation_count).toBe(407);
+    const relations = coverage.direct_support.map((entry) => `${entry.skill_id}:${entry.path}`);
+    expect(new Set(relations).size).toBe(relations.length);
+    expect(coverage.coverage_summary.direct_support_relation_count).toBe(relations.length);
+    expect(coverage.coverage_summary.direct_support_unique_path_count)
+      .toBe(new Set(coverage.direct_support.map((entry) => entry.path)).size);
+    const testPaths = execFileSync('git', [
+      '-C', repoRoot, 'ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', 'tests',
+    ], { encoding: 'utf8' }).split('\0').filter((name) => name.endsWith('.test.js') && fs.existsSync(path.join(repoRoot, name)));
+    const governance = JSON.parse(fs.readFileSync(path.join(repoRoot,
+      'src/cli/contracts/dual-host-governance/skills-governance.json'), 'utf8'));
+    for (const skill of skills) {
+      expect(relations).toContain(`${skill}:src/cli/contracts/dual-host-governance/skills-governance.json`);
+      const command = governance.skills.find((entry) => entry.skill_name === skill).command_name;
+      if (command) expect(relations).toContain(`${skill}:templates/claude/commands/spec/${command}.md`);
+      for (const testPath of testPaths) {
+        const content = fs.readFileSync(path.join(repoRoot, testPath), 'utf8');
+        if (path.basename(testPath).startsWith(`${skill}-`) || content.includes(`skills/${skill}/`)) {
+          expect(relations).toContain(`${skill}:${testPath}`);
+        }
+      }
+    }
+    // 独立检查所有正文中的明确跨包 root 路径，防止只验证 producer 返回的剩余关系。
+    for (const name of expectedPaths.filter((entry) => entry.endsWith('.md'))) {
+      const content = fs.readFileSync(path.join(repoRoot, name), 'utf8');
+      const owner = name.split('/')[1];
+      for (const match of content.matchAll(/(?:src|scripts|templates|tests|docs\/contracts)\/[A-Za-z0-9_./@-]+/g)) {
+        const target = match[0].replace(/[.,;]+$/, '');
+        try {
+          if (!fs.lstatSync(path.join(repoRoot, target)).isFile()) continue;
+        } catch { continue; }
+        expect(relations).toContain(`${owner}:${target}`);
+      }
+    }
+    for (const entry of coverage.direct_support) {
+      expect(skills).toContain(entry.skill_id);
+      expect(entry.owning_skill).toBe(entry.skill_id);
+      expect(entry.relation_types.length).toBeGreaterThan(0);
+      expect(entry.evidence.length).toBeGreaterThan(0);
+      const bytes = fs.readFileSync(path.join(repoRoot, entry.path));
+      expect(entry.sha256).toBe(crypto.createHash('sha256').update(bytes).digest('hex'));
+    }
     expect(coverage.direct_support).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',
@@ -88,13 +120,17 @@ describe('CE localization deterministic review producer', () => {
     const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ce-localization-review-'));
     const inventoryPath = path.join(tempRoot, 'skill-inventory.json');
     const coveragePath = path.join(tempRoot, 'source-coverage.json');
+    const preflightPath = path.join(tempRoot, 'preflight.json');
+    const matrixPath = path.join(tempRoot, 'matrix.json');
     const stdout = jest.spyOn(process.stdout, 'write').mockImplementation(() => true);
     try {
       expect(producer.main([
         '--refresh', '--inventory', inventoryPath, '--coverage', coveragePath,
+        '--preflight', preflightPath, '--matrix', matrixPath,
       ])).toBe(0);
       expect(producer.main([
         '--inventory', inventoryPath, '--coverage', coveragePath,
+        '--preflight', preflightPath, '--matrix', matrixPath,
       ])).toBe(0);
       const inventory = JSON.parse(fs.readFileSync(inventoryPath, 'utf8'));
       expect(inventory.producer).toBe('scripts/check-ce-localization-review.cjs');

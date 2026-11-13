@@ -120,11 +120,12 @@ describe('P1-B change summary', () => {
       [planWithChangeSummary({ unchanged: 10, updated: 3, added: 2, removed: 1 })],
       { lang: 'zh', view: 'summary' },
     ));
-    const changeLine = lines.find((line) => line.includes('内容变更'));
+    const changeLine = lines.find((line) => line.includes('写入内容对比'));
     expect(changeLine).toContain('不变 10');
     expect(changeLine).toContain('将更新 3');
     expect(changeLine).toContain('新增 2');
-    expect(changeLine).toContain('移除 1');
+    expect(changeLine).toContain('删除/重建操作 1');
+    expect(changeLine).toContain('非最终删除文件数');
   });
 
   test('plans without changeSummary keep the legacy output shape', () => {
@@ -132,7 +133,7 @@ describe('P1-B change summary', () => {
       [planWithChangeSummary(null)],
       { lang: 'zh', view: 'summary' },
     ));
-    expect(lines.some((line) => line.includes('内容变更'))).toBe(false);
+    expect(lines.some((line) => line.includes('写入内容对比'))).toBe(false);
   });
 
   test('multiple targets aggregate their counts', () => {
@@ -140,11 +141,11 @@ describe('P1-B change summary', () => {
       planWithChangeSummary({ unchanged: 5, updated: 1, added: 0, removed: 0 }),
       planWithChangeSummary({ unchanged: 2, updated: 0, added: 4, removed: 2 }),
     ], { lang: 'zh', view: 'summary' }));
-    const changeLine = lines.find((line) => line.includes('内容变更'));
+    const changeLine = lines.find((line) => line.includes('写入内容对比'));
     expect(changeLine).toContain('不变 7');
     expect(changeLine).toContain('将更新 1');
     expect(changeLine).toContain('新增 4');
-    expect(changeLine).toContain('移除 2');
+    expect(changeLine).toContain('删除/重建操作 2');
   });
 
   test('buffer-encoded operations compare by content, not string coercion', () => {
@@ -184,5 +185,14 @@ describe('P2-C prompt microcopy explains its purpose', () => {
     expect(getInitMessages('zh').languageSelect).toContain('AI');
     expect(getInitMessages('en').developerName).toContain('CHANGELOG');
     expect(getInitMessages('en').languageSelect).toContain('language');
+  });
+});
+
+describe('multi-host selection copy explains the checkbox scope', () => {
+  test('selectHosts says to pick hosts for this session and that others can wait', () => {
+    expect(getInitMessages('zh').selectHosts).toContain('本次');
+    expect(getInitMessages('zh').selectHosts).toContain('稍后');
+    expect(getInitMessages('en').selectHosts).toContain('for this session');
+    expect(getInitMessages('en').selectHosts).toContain('later');
   });
 });

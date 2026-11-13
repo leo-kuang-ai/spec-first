@@ -156,6 +156,45 @@ describe('managed block removal leaves marker-free instruction files verbatim', 
 });
 
 describe('single-host clean characterization', () => {
+  test.each([
+    { hosts: ['codex'] },
+    { hosts: ['zcode'] },
+    { hosts: ['pi'] },
+    { hosts: ['codex', 'zcode', 'pi'] },
+    { hosts: ['zcode', 'pi', 'codex'] },
+    { hosts: ['pi', 'codex', 'zcode'] },
+  ])('clears shared instruction after the final shared-skill host exits: $hosts', ({ hosts }) => {
+    const sandbox = tempLifecycleSandbox('spec-first-shared-skill-final-clean-');
+    expect(initHosts(hosts, sandbox).status).toBe(0);
+    const instructionPath = path.join(sandbox.projectRoot, 'AGENTS.md');
+    const userBytes = '\n# User guidance\n\nKeep this exact tail.\n';
+    fs.appendFileSync(instructionPath, userBytes);
+    const before = fs.readFileSync(instructionPath, 'utf8');
+
+    for (const [index, host] of hosts.entries()) {
+      const clean = runSpecFirst(['clean', `--${host}`], sandbox);
+      expect(clean.status).toBe(0);
+      if (index < hosts.length - 1) expect(fs.readFileSync(instructionPath, 'utf8')).toBe(before);
+    }
+    const cleaned = fs.readFileSync(instructionPath, 'utf8');
+    expect(cleaned).not.toContain(LANG_START);
+    expect(cleaned).not.toContain(LANG_END);
+    expect(cleaned).toContain(userBytes);
+    expect(fs.existsSync(path.join(sandbox.projectRoot, '.agents', 'skills', 'spec-work'))).toBe(false);
+  }, 120000);
+
+  test('keeps instruction when a shared-skill sibling has its own orphaned runtime root', () => {
+    const sandbox = tempLifecycleSandbox('spec-first-orphaned-shared-skill-clean-');
+    expect(initHosts(['codex', 'pi'], sandbox).status).toBe(0);
+    const instructionPath = path.join(sandbox.projectRoot, 'AGENTS.md');
+    const before = fs.readFileSync(instructionPath, 'utf8');
+    fs.rmSync(path.join(sandbox.projectRoot, '.codex', 'spec-first', 'state.json'));
+    const clean = runSpecFirst(['clean', '--pi'], sandbox);
+    expect(clean.status).toBe(0);
+    expect(clean.stdout).toContain('shared_instruction_consumer_uncertain');
+    expect(fs.readFileSync(instructionPath, 'utf8')).toBe(before);
+  }, 120000);
+
   test('removes host runtime and state without changing user-owned AGENTS.md bytes', () => {
     const sandbox = tempLifecycleSandbox('spec-first-single-consumer-clean-');
     const init = initHosts(['qoder'], sandbox);

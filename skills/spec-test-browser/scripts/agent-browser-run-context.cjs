@@ -67,6 +67,7 @@ const NAVIGATION_OR_INTERACTION_ACTIONS = new Set([
   'select',
 ]);
 const PAGE_CONTEXT_ACTIONS = new Set([
+  'vitals',
   'snapshot',
   'get',
   'console',
@@ -191,6 +192,7 @@ function buildBlockedProbe(options = {}) {
     version: options.version || null,
     capabilities: options.capabilities || buildCapabilities(),
     ...(options.binaryIdentity ? { binary_identity: options.binaryIdentity } : {}),
+    ...(options.conformanceRecovery ? { conformance_recovery: options.conformanceRecovery } : {}),
     missing: options.missing || [],
   };
 }
@@ -259,23 +261,31 @@ function resolveExecutablePath(command, env, platform) {
 
 function defaultConformanceRunner(options) {
   const producer = path.join(__dirname, 'agent-browser-exact-origin-conformance.cjs');
-  return spawnSync(process.execPath, [
-    producer,
-    '--binary', options.binaryIdentity.path,
-    '--expected-sha256', options.binaryIdentity.sha256,
-  ], {
-    cwd: options.cwd,
-    env: options.env,
-    encoding: 'utf8',
-    shell: false,
-    timeout: options.timeout || 180000,
-    windowsHide: true,
-  });
+  // Pre-allocate the run root so an external timeout still leaves a locatable
+  // recovery position: the producer pre-lands pending-receipt.json inside it
+  // before the first browser side effect.
+  const runRoot = options.runRoot || fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-agent-browser-conformance-'));
+  return {
+    runRoot,
+    result: spawnSync(process.execPath, [
+      producer,
+      '--binary', options.binaryIdentity.path,
+      '--expected-sha256', options.binaryIdentity.sha256,
+      '--run-root', runRoot,
+    ], {
+      cwd: options.cwd,
+      env: options.env,
+      encoding: 'utf8',
+      shell: false,
+      timeout: options.timeout || 180000,
+      windowsHide: true,
+    }),
+  };
 }
 
 function evaluateConformance(result, binaryIdentity) {
   if (result && result.error && result.error.code === 'ETIMEDOUT') {
-    return { ok: false, reason_code: 'exact-origin-conformance-timeout' };
+    return { ok: false, reason_code: 'exact-origin-conformance-timeout', recovery: result.recovery || null };
   }
   let payload;
   try {
@@ -289,6 +299,10 @@ function evaluateConformance(result, binaryIdentity) {
       reason_code: payload && payload.status === 'failed'
         ? 'exact-origin-conformance-failed'
         : 'exact-origin-conformance-invalid',
+      recovery: isPlainObject(payload?.recovery) && typeof payload.recovery.run_root === 'string'
+        && path.isAbsolute(payload.recovery.run_root)
+        ? { run_root: payload.recovery.run_root, evidence_ref: path.join(payload.recovery.run_root, 'conformance-result.json') }
+        : null,
     };
   }
   if (!isPlainObject(payload)
@@ -297,6 +311,11 @@ function evaluateConformance(result, binaryIdentity) {
     || !sameBinaryIdentity(payload.binary_identity, binaryIdentity)
     || !isPlainObject(payload.positive_control)
     || payload.positive_control.status !== 'passed'
+    || !isPlainObject(payload.cleanup)
+    || payload.cleanup.status !== 'passed'
+    || payload.cleanup.exit_code !== 0
+    || payload.cleanup.timed_out !== false
+    || payload.cleanup.error !== null
     || payload.blocked_origin_total_hits !== 0
     || !Array.isArray(payload.cases)
     || payload.cases.length !== CONFORMANCE_CASES.length) {
@@ -402,13 +421,19 @@ function probeAgentBrowser(options = {}) {
   const conformanceRunner = options.conformanceRunner || defaultConformanceRunner;
   let conformanceResult;
   try {
-    conformanceResult = conformanceRunner({
+    const runnerOutcome = conformanceRunner({
       command,
       binaryIdentity,
       cwd: options.cwd || process.cwd(),
       env: buildCleanEnv(options.env || process.env),
       timeout: options.conformanceTimeout || 180000,
     });
+    conformanceResult = runnerOutcome && runnerOutcome.result !== undefined ? runnerOutcome.result : runnerOutcome;
+    if (runnerOutcome && runnerOutcome.result && runnerOutcome.result.error && runnerOutcome.result.error.code === 'ETIMEDOUT' && runnerOutcome.runRoot) {
+      // External timeout: the producer was killed mid-run, so surface the
+      // pre-allocated recovery position instead of an empty stdout parse.
+      conformanceResult.recovery = { run_root: runnerOutcome.runRoot, evidence_ref: path.join(runnerOutcome.runRoot, 'pending-receipt.json') };
+    }
   } catch (_error) {
     return buildBlockedProbe({
       status: 'available',
@@ -431,6 +456,7 @@ function probeAgentBrowser(options = {}) {
     return buildBlockedProbe({
       status: 'available',
       reasonCode: conformance.reason_code,
+      conformanceRecovery: conformance.recovery,
       conformanceStatus: 'failed',
       repairScope: 'spec-first',
       nextAction: '当前 binary 未通过 Spec-First controlled exact-origin conformance；保持 browser execution blocked 并检查 producer evidence。',
@@ -682,10 +708,17 @@ function prepareRunContext(options = {}) {
         'open',
         'snapshot',
         'get',
+        'gettext',
+        'inputvalue',
+        'title',
+        'url',
+        'count',
         'console',
         'network',
+        'requests',
         'vitals',
         'set',
+        'viewport',
         'screenshot',
         'click',
         'fill',
@@ -693,6 +726,10 @@ function prepareRunContext(options = {}) {
         'press',
         'select',
         'find',
+        'getbyrole',
+        'getbylabel',
+        'getbytestid',
+        'getbytext',
         'close',
       ],
     }, options);
@@ -794,6 +831,10 @@ function runPreparedContext(options = {}) {
       blocked_actions: initialPlan.plan.steps
         .filter((step) => NAVIGATION_OR_INTERACTION_ACTIONS.has(step.action))
         .map((step) => step.action),
+      conformance_status: probe.conformance_status || 'not_run',
+      repair_scope: probe.repair_scope || 'dependency',
+      next_action: probe.next_action || '',
+      ...(probe.conformance_recovery ? { conformance_recovery: probe.conformance_recovery } : {}),
     };
   }
 
@@ -1051,16 +1092,43 @@ function readPreparedManifest(manifestPath, options = {}) {
   if (!runDir.ok || path.dirname(manifestFile.path) !== runDir.path) {
     return { ok: false, reason_code: 'private-run-directory-untrusted' };
   }
+  // SUP-09 fix: runDir 和 manifestFile containment 检查通过后才执行 hardening
+  if (runDir.needsHardening) {
+    const hardened = hardenPath(manifest.run_dir, true, options);
+    if (!hardened.ok) {
+      return { ok: false, reason_code: hardened.reason_code };
+    }
+  }
+  if (manifestFile.needsHardening) {
+    const hardened = hardenPath(manifestPath, false, options);
+    if (!hardened.ok) {
+      return { ok: false, reason_code: hardened.reason_code };
+    }
+  }
   for (const filePath of [manifest.test_plan_path, manifest.config_path, manifest.action_policy_path]) {
     const inspected = inspectPrivateFile(filePath, options);
     if (!inspected.ok || !isInside(runDir.path, inspected.path)) {
       return { ok: false, reason_code: 'private-run-file-untrusted' };
+    }
+    // SUP-09 fix: containment 检查通过后才执行 hardening
+    if (inspected.needsHardening) {
+      const hardened = hardenPath(filePath, false, options);
+      if (!hardened.ok) {
+        return { ok: false, reason_code: hardened.reason_code };
+      }
     }
   }
   for (const dirPath of [manifest.raw_dir, manifest.screenshot_dir]) {
     const inspected = inspectPrivateDirectory(dirPath, options);
     if (!inspected.ok || !isInside(runDir.path, inspected.path)) {
       return { ok: false, reason_code: 'private-run-directory-untrusted' };
+    }
+    // SUP-09 fix: containment 检查通过后才执行 hardening
+    if (inspected.needsHardening) {
+      const hardened = hardenPath(dirPath, true, options);
+      if (!hardened.ok) {
+        return { ok: false, reason_code: hardened.reason_code };
+      }
     }
   }
   return { ok: true, manifest, path: manifestFile.path };
@@ -1124,10 +1192,21 @@ function inspectPrivateDirectory(dirPath, options = {}) {
     if (entry.isSymbolicLink() || !entry.isDirectory()) {
       return { ok: false, reason_code: 'private-run-directory-untrusted' };
     }
-    const hardened = hardenPath(dirPath, true, options);
-    return hardened.ok
-      ? { ok: true, path: fs.realpathSync.native(dirPath) }
-      : hardened;
+    // SUP-09 fix: 与 inspectPrivateFile 保持一致，延迟 hardening
+    let realPath;
+    try {
+      realPath = fs.realpathSync.native(dirPath);
+    } catch (_error) {
+      return { ok: false, reason_code: 'private-run-directory-untrusted' };
+    }
+    // 检查所有权（Unix）
+    if (typeof process.getuid === 'function') {
+      const stat = fs.statSync(dirPath);
+      if (stat.uid !== process.getuid()) {
+        return { ok: false, reason_code: 'private-path-owner-mismatch' };
+      }
+    }
+    return { ok: true, path: realPath, needsHardening: true };
   } catch (_error) {
     return { ok: false, reason_code: 'private-run-directory-untrusted' };
   }
@@ -1142,10 +1221,22 @@ function inspectPrivateFile(filePath, options = {}) {
     if (entry.isSymbolicLink() || !entry.isFile()) {
       return { ok: false, reason_code: 'private-run-file-untrusted' };
     }
-    const hardened = hardenPath(filePath, false, options);
-    return hardened.ok
-      ? { ok: true, path: fs.realpathSync.native(filePath) }
-      : hardened;
+    // SUP-09 fix: 只解析路径和检查类型/所有权，不修改权限
+    // hardening 延迟到调用者确认 containment 之后
+    let realPath;
+    try {
+      realPath = fs.realpathSync.native(filePath);
+    } catch (_error) {
+      return { ok: false, reason_code: 'private-run-file-untrusted' };
+    }
+    // 检查所有权（Unix）
+    if (typeof process.getuid === 'function') {
+      const stat = fs.statSync(filePath);
+      if (stat.uid !== process.getuid()) {
+        return { ok: false, reason_code: 'private-path-owner-mismatch' };
+      }
+    }
+    return { ok: true, path: realPath, needsHardening: true };
   } catch (_error) {
     return { ok: false, reason_code: 'private-run-file-untrusted' };
   }
@@ -1200,6 +1291,15 @@ function reservePrivateJson(filePath, options = {}) {
     const error = new Error('private-run-file-collision');
     error.reason_code = 'private-run-file-collision';
     throw error;
+  }
+  // SUP-09 fix: containment 检查通过后才执行 hardening
+  if (parent.needsHardening) {
+    const hardened = hardenPath(path.dirname(filePath), true, options);
+    if (!hardened.ok) {
+      const error = new Error(hardened.reason_code);
+      error.reason_code = hardened.reason_code;
+      throw error;
+    }
   }
   let descriptor;
   try {

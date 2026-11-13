@@ -1,6 +1,6 @@
 # Vite dev-server recipe (auto-detect fallback)
 
-Loaded when `detect-project-type.sh` returns `vite` and there is no `.claude/launch.json` to consult.
+Read only when classification resolves to `vite` and the startup command is still missing. Preserve selected cwd, environment, and numeric port; use the port resolver only for a missing port.
 
 ## Signature
 
@@ -20,7 +20,7 @@ The `dev` script in `package.json` typically wraps `vite` directly. Prefer the p
 
 Default: `5173`. Vite respects `--port <n>` and the `VITE_PORT` env var. The cascade in `references/dev-server-detection.md` picks up `--port` from `package.json` scripts and `PORT` from `.env*`.
 
-Vite's `--strictPort` flag causes the dev server to fail rather than increment to the next available port when the requested port is in use. Polish's kill-by-port step will reclaim the port before starting, so `strictPort` is not a problem in practice — but users who disable port reclamation and run multiple Vite instances will see the port auto-increment unless `strictPort: true` is set in `vite.config.ts`.
+Vite's `--strictPort` fails on an occupied port; otherwise Vite may increment it. Reuse only an attributed project instance, resolve unrelated collisions before launch, and verify the actual URL reported by the selected server. Never reclaim a port by killing its owner automatically.
 
 ## Host binding
 

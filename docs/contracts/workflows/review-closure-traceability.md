@@ -47,7 +47,7 @@ The deterministic check is intentionally minimal — it catches只 silent 断链
 | Consumer | 消费方式 |
 | --- | --- |
 | `tests/unit/plan-status-taxonomy.test.js` | 弱校验:遍历 `docs/plans/*.md`,对 `role: origin`+`scope: in` entry 断言带 finding id |
-| closure-adjudication 文档 | 如 `docs/项目审查/2026-06-14-06-10-P1-闭环裁决.md`,承载某报告逐条裁决,被 plan 以 `scope: adjudicated` 引用 |
+| closure-adjudication 文档 | 如 `docs/project-reviews/2026-06-14-06-10-P1-闭环裁决.md`,承载某报告逐条裁决,被 plan 以 `scope: adjudicated` 引用 |
 | `skills/spec-plan`(deferred) | 未来在 plan frontmatter 生成时提示填 `addresses_findings`,本批不实现 |
 
 ## Legacy & Precedent

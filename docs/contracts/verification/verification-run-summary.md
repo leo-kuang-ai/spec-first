@@ -6,6 +6,8 @@ Callers select the owning scope with `verification-run-summary record --workflow
 
 Canonical fields are defined by `docs/contracts/verification/verification-run-summary.schema.json`:
 
+输入与输出不是同一形状。运行 `spec-first internal verification-run-summary record --help` 可读取当前输入字段、状态枚举和最小示例；`read --help` 提供回读参数。帮助只读且不要求目标仓库，示例默认为 `not-run`，必须以实际命令结果和日志替换后才能声明通过。输出的 `schema_version`、`generated_at` 由 writer 生成，不放入输入。
+
 - `profile`: the profile source, active profile name, and source path.
 - `checks[]`: `id`, `service`, `command`, `status`, `exit_code`, `ran`, `required_tools`, `missing_tools`, `log_path`, `reason_code`, and `redaction_status`.
 
@@ -19,12 +21,13 @@ Status boundaries:
 Red-line mappings:
 
 - Dry-run or schedulable-but-not-executed checks must be `not-run` with `reason_code: "schedulable"`.
+- `reason_code` 是具体原因字符串而非固定枚举。将帮助示例转为实测结果时，必须同步替换 `schedulable`（例如 `executed`），不能仅修改 `status`、`ran` 和退出码；帮助中也说明此约束。
 - Missing required tools must be `not-run` with `reason_code: "missing_dependency"` and non-empty `missing_tools`.
 - Helpers do not install tools, rerun commands, infer exit codes, or promote dry-runs to passed.
 
 Trust boundary:
 
-The capture helper is a thin recorder. Its trust level is "workflow step transcribed the real command result"; it is weaker than process-level supervision. The helper scans bounded log content (first 64 KB) for obvious secret-like text and rejects the record when it matches, regardless of the check's self-reported `redaction_status` — a `redacted` claim is verified, not trusted. Because the scan is bounded, callers remain responsible for writing redacted logs before recording the summary; the helper does not deep-scan full large logs.
+记录器依赖 workflow 如实转录命令结果，不等于进程级监督。当前 helper 以 64 KiB 分块扫描完整日志，匹配已知 secret 模式即拒绝，无论输入自报的 `redaction_status` 是什么；读取失败或跨块候选超过检查预算也拒绝，不静默截断为仅检查前 64 KiB。该检查不保证识别所有敏感内容，调用方仍须在记录前脱敏。
 
 Workflow-specific limits:
 

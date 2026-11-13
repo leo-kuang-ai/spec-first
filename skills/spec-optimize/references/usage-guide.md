@@ -125,3 +125,18 @@ Common pattern:
 - Judge mode scores the surviving candidates for actual usefulness.
 
 That hybrid setup is often the best default for ranking, clustering, and prompt work.
+# Multiple targets and expensive measurements
+
+Use `example-expensive-benchmark-spec.yaml` when local time, CI latency, and
+runner cost all matter. The primary remains required; another required hard
+objective may provide the winning improvement, while secondary objectives are
+diagnostic only. Fix targets, regression tolerances, thresholds, and sampling
+counts before measurement. `scripts/decide.cjs` reports the numeric comparison;
+the owner still judges whether the metric and proposed change are meaningful.
+
+A ladder spends smoke and exploratory work before confirmation. A promising
+sample is not a completed win. Each sample is persisted on its experiment's
+existing entry, and `kept` requires successful integration. Invalid protocols
+or missing paired baselines stop comparison instead of synthesizing evidence.
+The decision helper and adapted reference/test material originate from CE
+6dda2038; the upstream permission notice is in `ce-license.txt`.

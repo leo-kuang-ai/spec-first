@@ -1,6 +1,6 @@
 # Product Pulse First-Run Interview
 
-Loaded by `SKILL.md` at the start of Phase 1. Captures the configuration that will be merged into `.spec-first/config.local.yaml` (the unified spec-first local config, gitignored, machine-local) as `pulse_*` keys and re-read on every subsequent run.
+Loaded by `references/setup.md` at the start of Phase 1. Captures the configuration that will be merged into `.spec-first/config.local.yaml` (the unified spec-first local config, gitignored, machine-local) as `pulse_*` keys and re-read on every subsequent run.
 
 For each section: ask the opening question, evaluate the answer against the quality bar, push back when it falls into a named anti-pattern, and capture the final answer in the user's own language.
 
@@ -9,7 +9,7 @@ For each section: ask the opening question, evaluate the answer against the qual
 1. **Push back, but don't spiral.** One round of pushback per section max. If the second answer still isn't usable, capture what the user gave, flag it in the config as `needs-review`, and move on.
 2. **Name events in the user's own words.** The config will be readable by the whole team - use the terms they actually use, not a generic template.
 3. **Ask about tools, not credentials.** The interview captures *which* tool and *what shape of query*. It does not collect API keys, tokens, or database passwords. Those stay in the user's environment.
-4. **Honor strategy seeds.** If `SKILL.md` Phase 1.0 surfaced a product name or a list of key metrics from `STRATEGY.md`, start with those as defaults and let the user edit. Do not re-ask questions that the strategy doc already answered unambiguously.
+4. **Honor strategy seeds.** Use the product name and metrics from the STRATEGY or legacy source that setup read under `references/strategy-source.md` as defaults for correction. Do not re-ask questions the document already answered unambiguously.
 5. **Evaluate metrics against the SMART bar.** Every event, metric, and signal the user proposes should be:
    - **Specific** - a named event or a named metric, not a category. `message_sent` passes; "engagement" does not.
    - **Measurable** - you can point to the tool and query that returns a number. "Users like it" does not pass; "NPS score from Delighted" does.
@@ -99,9 +99,9 @@ If the user opts in, ask: "What dimension should sessions be scored on? (e.g., '
 
 - **Vague dimension** ("quality", "goodness", "helpful", "good response") -> "Quality on what axis specifically? The dimension should be something a human could look at a transcript and judge consistently."
 - **Multiple dimensions** ("accurate AND actionable") -> "Start with one. You can add dimensions by editing the config later. Keeping it at one keeps the scores comparable across runs. Which matters more right now?"
-- **Reviewability test** - after the user names a dimension, apply this check silently: could two separate reviewers look at the same session and agree on the score? If no, push back once: "Let's tighten this - what would make a reviewer score this a 5 vs a 3? If you can name the distinction in one sentence, the dimension is tight enough." If the user can answer, capture it as a scoring note alongside the dimension. If they can't, flag the dimension `needs-review` and move on.
+- **Reviewability test** - after the user names a dimension, apply this check silently: could two separate reviewers look at the same session and agree on the score? If no, push back once: "Let's tighten this - what would make a reviewer score this a 5 vs a 3? If you can name the distinction in one sentence, the dimension is tight enough." If the user can answer, persist the short scoring note within the existing `pulse_quality_dimension` string alongside the dimension name. If they can't, flag the dimension `needs-review` and move on.
 
-**Capture:** opt-in after the context-processing disclosure (yes/no), dimension (if opted in), scoring note (1 sentence distinguishing 5 from 3), scoring discipline reminder ("default to 4-5; reserve 1-3 for clear failures").
+**Capture:** opt-in after the context-processing disclosure (yes/no), dimension (if opted in), scoring note (1 sentence distinguishing 5 from 3), scoring anchors within `pulse_quality_dimension` (no forced score distribution).
 
 ---
 
@@ -122,7 +122,7 @@ For each entry, ask one question: "Where does `{{event or metric}}` live? Name t
 
 The answer produces (tool name, query shape). If multiple entries land in the same tool, consolidate them into one source entry.
 
-**Persist per-strategy-metric source mapping.** For each strategy metric whose source differs from the default (`pulse_analytics_source` for analytics-class metrics, `pulse_payments_source` for revenue/payments-class metrics, etc.), record the override in `pulse_metric_sources` as a `metric=source` pair. Example: if `pulse_analytics_source` is `posthog` but `nps` is captured in Delighted, write `pulse_metric_sources: "nps=delighted"`. Strategy metrics whose source matches the class default do not need an entry. Without this mapping, multi-source setups silently lose the per-metric routing between runs.
+**Persist per-strategy-metric source mapping.** Record every active strategy metric in `pulse_metric_sources` as a `metric=source` pair, including class defaults. Resolve each metric from the owner's answer or existing explicit evidence; do not infer its source from its name alone. For example, with analytics in PostHog and revenue in Stripe, save `pulse_metric_sources: "retention_d7=posthog,revenue=stripe"`. Pending/excluded metrics need no active source mapping. One metric has one canonical source; conflicting mappings must be resolved before querying it. This preserves routing between runs without adding a metric-class rule engine.
 
 **Dual-source arbitration.** If a single signal could be answered from two different sources (e.g., both PostHog and a read-only DB replica have the search events), pick one as canonical and name it in the config. Ask: "Both `{{source A}}` and `{{source B}}` can cover this - which is the source of truth? The pulse queries one per signal so numbers stay consistent across runs." Capture the canonical source. The other tool may still be used for ad-hoc investigation but is not wired into the pulse.
 
@@ -137,12 +137,9 @@ Do not silently skip. Every un-instrumented strategy metric must land in exactly
 
 After each unique source is named, check MCP coverage:
 
-1. Call `search_mcp_registry` with the tool name to see if an official or community MCP exists. Do not guess from memory.
-2. If one exists and the user already has it connected (ask: "Is the `{{tool}}` MCP already connected?"), note `using MCP for {{tool}}` in the config.
-3. If one exists but the user hasn't connected it, suggest: "There's an MCP for `{{tool}}`. Connecting it is the fastest way to let the agent query on each run - I can call `suggest_connectors` to walk you through it, or we can skip and I'll note the source as `manual - agent will need credentials or another path`."
-4. If no MCP exists, capture `manual` and note what shape of query the agent should use (CLI, API, etc.).
+Inspect the actual available source capabilities first: connected MCP, authorized CLI/API, or a user-provided export. Call `search_mcp_registry` or `suggest_connectors` only if that capability exists in the current host. A missing named tool does not mean the source is unavailable; record a usable read-only alternative, or `manual` with the required access and query shape. Do not invent a call, demand installation, or treat a registry listing as proof of a working connection.
 
-Do not set up MCP connections inside this interview - that's a separate flow. Just record which tools have MCP coverage and which do not.
+Do not set up MCP connections inside this interview. Reuse confirmed current access facts; ask only about missing access that affects the selected metrics. Keep connection/authentication setup with its owner.
 
 ### 6.2 Database access (optional, read-only only)
 
@@ -193,7 +190,7 @@ Do not offer top-N or percentile customization. Those settings are not persisted
 
 **Opening question:** "What should the default lookback window be when no time window is specified? Common: 24h for daily ops, 7d for weekly review, 1h for launches."
 
-Capture: single default (e.g., `24h`).
+Capture: single default from the config contract's four values (`1h`, `24h`, `7d`, `30d`). A user-named custom window (e.g., `48h`) stays a per-run explicit argument — do not persist it as the default, which would not round-trip through the config contract.
 
 ---
 
@@ -234,7 +231,7 @@ The pulse block uses flat top-level keys in the spec-first local config:
 # --- Product pulse ---
 
 pulse_product_name: "{{product_name}}"
-pulse_lookback_default: {{24h | 7d | 1h | other}}    # default 24h if omitted
+pulse_lookback_default: {{1h | 24h | 7d | 30d}}    # default 24h if omitted; the persisted default must be one of the four config-contract values — a custom window stays a per-run explicit argument and is not persisted here
 pulse_primary_event: "{{event_name}}"
 pulse_value_event: "{{event_name}}"                  # may equal pulse_primary_event; omit if not defined
 pulse_completion_events: "{{event,event,event}}"     # comma-separated, 0-3 events; omit if none
@@ -244,7 +241,7 @@ pulse_analytics_source: {{posthog | mixpanel | custom | omit}}
 pulse_tracing_source: {{sentry | datadog | custom | omit}}
 pulse_payments_source: {{stripe | custom | omit}}    # omit if not used
 pulse_db_enabled: {{true | false}}                   # default false; read-only DB access only
-pulse_metric_sources: "{{metric=source,metric=source}}"  # strategy-metric -> source overrides; omit metrics that use the class default (pulse_analytics_source for analytics-class, pulse_payments_source for revenue, etc.)
+pulse_metric_sources: "{{metric=source,metric=source}}"  # every active strategy metric -> canonical source, including class defaults
 pulse_pending_metrics: "{{metric,metric}}"           # strategy metrics deferred for instrumentation; render as 'no data'; omit if none
 pulse_excluded_metrics: "{{metric,metric}}"          # strategy metrics intentionally not in pulse; omit if none
 pulse_schedule: {{daily | weekly | manual | ask-again-after-3-runs}}  # include time/day if applicable
@@ -252,9 +249,9 @@ pulse_schedule: {{daily | weekly | manual | ask-again-after-3-runs}}  # include 
 
 **Notes on what is NOT persisted in config:**
 
-- **Strategy metrics carried forward**: surfaced in the report, not stored as config — they live in `STRATEGY.md` and are re-read each run from there.
+- **Strategy metrics carried forward**: display them in the report, not as stored config; re-read current strategy metrics on every run using `references/strategy-source.md`.
 - **Per-source connection details** (URLs, API keys, query specifics): live with the user's MCP configuration, not in this config.
-- **Hardcoded operational settings** (15-minute trailing buffer, top-N error count, p50/p95/p99 latencies, "no PII in reports", "parallel analytics + tracing, serial DB"): these are skill behavior, not user config; they live in `SKILL.md` and stay constant.
+- **Hardcoded operational settings** (15-minute trailing buffer, top-N error count, p50/p95/p99 latencies, "no PII in reports", "parallel analytics + tracing, serial DB"): these are skill behavior, not user config; they live in `SKILL.md` and `references/run.md` and stay constant.
 - **Tracing top-N count and latency on/off**: not configurable in this version. The report always includes top 5 errors and full p50/p95/p99 latency. Add config keys later if a real need surfaces.
 
 After writing, surface the resulting `pulse_*` block to the user in chat. Offer one round of edits. Then return to SKILL.md Phase 2.

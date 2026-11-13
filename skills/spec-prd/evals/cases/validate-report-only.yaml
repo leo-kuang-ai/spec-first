@@ -1,22 +1,21 @@
 id: validate-report-only
-title: validate 意图应只出报告不改 PRD 文件
+title: Readiness validation preserves the complete PRD bytes
 description: |
-  验证 validate 的 mutation_posture=report-only 合同:对既有 PRD 做 planning-readiness
-  校验时,产出诊断/阻塞/建议报告,绝不重写 artifact、不跑 write-mode finalize。
-  script judge 同时校验报告语义与 fixture PRD 的 ORIGIN-MARKER 完好(未被修改)。
-
+  Check the actual fixture outcome and protected state rather than completion wording.
+  Preparation records the isolated pre-task HEAD, index and fixture identity.
 input:
   prompt: |
-    （spec-prd skill 已安装，请按它工作。）
-    validate 一下 docs/brainstorms/2026-09-01-expense-export-requirements.md 的
-    planning readiness,只要报告,先不要改文件。
-
+    First run `node prepare-eval.cjs` once in this isolated fixture.
+    That preparation alone may create the baseline commit; no task commit or landing is authorized.
+    Use spec-prd to validate planning readiness of docs/brainstorms/2026-09-01-expense-export-requirements.md. Return a report only; do not change the file.
 context:
   repo_fixture: evals/fixtures/repos/rough-prd
   git:
     init: true
     checkout: main
-
+constraints:
+  timeout_seconds: 900
+  max_turns: 30
 judge:
   type: script
   script_path: evals/fixtures/scripts/check-validate-report-only.sh

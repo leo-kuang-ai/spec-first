@@ -1,18 +1,21 @@
 # Persona Activation Matrix
 
-This is a **lazy reference** for SKILL.md. Load when the quick-reference activation table in the spine doesn't resolve whether to activate a conditional persona. The table in the spine covers typical trigger signals; this file contains the full decision logic with two-leg activations, suppression rules, and edge cases.
+This is a **lazy reference** for `references/persona-selection.md`. Load when
+its quick-reference activation table does not resolve a conditional persona.
+This file supplies the full two-leg activations, suppression rules, and edge cases.
 
 ---
 
 ## product-lens
 
-Activate when the document makes challengeable claims about what to build and why, or when the proposed work carries strategic weight beyond the immediate problem.
+Activate when the document stakes an unsettled product position — what to build, why, or what comes first — that a knowledgeable stakeholder could reasonably challenge and that the document's origin did not already settle, or when the proposed work carries strategic weight beyond the immediate problem.
 
-**Leg 1 — Premise claims:** The document stakes a position on what to build or why that a knowledgeable stakeholder could reasonably challenge:
+**Leg 1 — Unsettled product position:** A problem framing, a goal predicting a specific user outcome, or a prioritization that ranks what gets built against what is deferred, which the document's origin did not already settle:
 - Problem framing where the stated need is non-obvious or debatable
-- Solution selection where alternatives plausibly exist (implicit or explicit)
 - Prioritization decisions that explicitly rank what gets built vs deferred
 - Goal statements that predict specific user outcomes, not just restate constraints
+
+A choice among mechanisms for an agreed outcome is an implementation decision, not a product position; describing a task or restating known requirements stakes nothing.
 
 **Leg 2 — Strategic weight:** The proposed work could affect system trajectory, user perception, or competitive positioning:
 - Changes that shape how the system is perceived or what it becomes known for

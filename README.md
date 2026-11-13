@@ -4,7 +4,9 @@
 
 **把 AI coding 会话变成可信、由项目拥有的变更。**
 
-`spec-first` 是面向 Claude Code、Codex、Kiro、Qoder、Cursor、OpenCode、ZCode 与 Pi 的仓库原生 AI Coding Harness。它把想法、需求、计划、代码、审查和知识连接成可检查的工程闭环。
+`spec-first` 是面向 Claude Code、Codex、Kiro、Qoder、Cursor、OpenCode、ZCode 与 Pi 的仓库原生 AI Coding Harness。它以传统 SDLC / SDD 的需求到变更链路为骨架，把想法、需求、计划、代码、审查和知识连接成可检查的工程闭环。
+
+当前定位是 **AI-enhanced SDLC / SDD workflow harness**：重点是把一次 AI coding 会话变成可信、可追踪、可复用的工程变更。它不是覆盖团队交付、部署编排、生产运维和运营反馈的完整 AI-DLC 平台；这些能力应由现有工程系统或明确接入的外部 workflow 承担。
 
 [![npm version](https://img.shields.io/npm/v/spec-first.svg)](https://www.npmjs.com/package/spec-first)
 [![npm monthly downloads](https://img.shields.io/npm/dm/spec-first.svg)](https://www.npmjs.com/package/spec-first)
@@ -13,7 +15,7 @@
 [![license](https://img.shields.io/npm/l/spec-first.svg)](https://github.com/leo-kuang-ai/spec-first/blob/master/LICENSE)
 [![Website](https://img.shields.io/badge/website-spec--first.cn-blue)](http://spec-first.cn/)
 
-[English](README.en.md) | [简体中文](README.md) | [用户手册](docs/05-用户手册/README.md) | [官方网站](http://spec-first.cn/)
+[English](README.en.md) | [简体中文](README.md) | [用户手册](docs/user-guide/README.md) | [官方网站](http://spec-first.cn/)
 
 </div>
 
@@ -65,23 +67,17 @@ spec-first doctor
 spec-first init --codex -y -u <name> --lang <zh|en>
 ```
 
-初始化会在写入前预览受管 runtime 文件；它不会自动 stage 或提交文件。多宿主、非 Git 目录、dry-run 和 preview 宿主用法见[完整快速开始指南](docs/05-用户手册/01-快速开始.md)。
+初始化会在写入前预览受管 runtime 文件；它不会自动 stage 或提交文件。多宿主、非 Git 目录、dry-run 和 preview 宿主用法见[完整快速开始指南](docs/user-guide/01-快速开始.md)。
 
 ### 2. 首次运行 workflow
 
-在宿主会话中运行（这些不是 shell 子命令）。首次 workflow 前先准备 runtime；后续在 readiness 或配置变化时重跑：
+在初始化输出的同一目录打开所选宿主的新会话，直接描述真实任务；这些入口不是 shell 子命令。没有现成任务时，可以输入：
 
 ```text
-spec-runtime-setup
+请使用 spec-brainstorm：我想减少项目中重复出现的需求澄清，请帮我明确使用场景、范围和成功标准。
 ```
 
-随后生成第一个需求产物：
-
-```text
-spec-brainstorm "改进 CLI 新用户 onboarding"
-```
-
-这会把模糊想法收敛为可审查的 requirements artifact，通常位于：
+首个实质结果应包含问题定义、范围、成功标准和待确认项；欢迎语或入口推荐不算成功。值得持久化的需求产物通常位于：
 
 ```text
 docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
@@ -89,7 +85,9 @@ docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
 
 如果需求已经明确，可直接使用 `spec-plan`；准备执行时使用 `spec-work`。如果没有值得持久化的决策，workflow 可以合法地不创建文档；这不表示运行失败。
 
-找不到入口时，运行 `spec-first doctor --verbose`，并核对 [Runtime Capability Catalog](docs/catalog/runtime-capabilities.md) 中的宿主限制。
+只有当前任务缺少必需的 MCP/helper 或 readiness 需要修复时，才在宿主会话请求 `spec-runtime-setup`；可选能力缺失时可说明限制后继续。初始化成功只证明 projection 已写入，尚不证明宿主加载或任务成功。
+
+关闭终端后，回到初始化输出的 target，运行 `spec-first doctor --codex`（使用原来选择的宿主参数）；它只读检查，不需要重新 init。找不到入口时使用 `--verbose` 查看明细，脚本和 CI 使用 `--json`。宿主限制以 [Runtime Capability Catalog](docs/catalog/runtime-capabilities.md) 为准。
 
 ## 选择合适的 Workflow
 
@@ -97,9 +95,11 @@ docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
 
 按当前任务进入一项即可，不要求从头依次运行。以下是能力地图，后续步骤由当前任务、验证结果和授权决定。
 
+例如，“有想法但范围未定”进入 `spec-brainstorm`；“目标确定、实现方式未定”进入 `spec-plan`；“已有方案请实现”进入 `spec-work`。测试失败先进入 `spec-debug`，已有文档要审查进入 `spec-doc-review`，已验证经验要沉淀进入 `spec-compound`。只询问下一步时返回一个入口建议；明确请求执行时继续已授权任务。
+
 | 阶段 | 何时使用 | Skill | 主要结果 |
 |---|---|---|---|
-| 环境准备 | 首次使用、MCP/helper 缺失或配置变化 | `spec-runtime-setup` | readiness facts 与准备结果 |
+| 环境准备 | 当前任务必需的 MCP/helper 缺失或 readiness 需要修复 | `spec-runtime-setup` | readiness facts 与准备结果 |
 | 方向探索 | 比较多个候选方向 | `spec-ideate` | 排序后的方向记录 |
 | 需求定义 | 有想法，但范围和成功标准未定 | `spec-brainstorm` | requirements-only plan |
 | PRD 澄清 | 已有 PRD，需要结合代码澄清 | `spec-prd` | planning-readiness artifact |
@@ -147,7 +147,7 @@ docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
 | `spec-commit` | 在已有提交授权下创建范围明确的 commit |
 | `spec-commit-push-pr` | 在已有提交与交付授权下提交、推送及创建或更新 PR |
 
-不确定从哪里开始时，由 `using-spec-first` 选择一个最匹配入口。上述 Skill 在宿主会话中使用，不是 `spec-first` 的 shell 子命令；具体调用形式以宿主发现的入口为准。完整边界见[公开入口与 Skill 目录](docs/05-用户手册/24-公开入口与Skill目录.md)。
+不确定从哪里开始时，由 `using-spec-first` 选择一个最匹配入口。上述 Skill 在宿主会话中使用，不是 `spec-first` 的 shell 子命令；具体调用形式以宿主发现的入口为准。完整边界见[公开入口与 Skill 目录](docs/user-guide/24-公开入口与Skill目录.md)。
 
 ## 从 Prompt 到可信变更
 
@@ -158,7 +158,7 @@ docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
 
 `spec-prd` 是已有 PRD 或 brownfield 请求的替代入口；`spec-doc-review` 是跨阶段的可选 review lane，可审查 requirements、plan 或 task pack。
 
-### 一个完整的最小路径
+### 一个最小变更路径
 
 ```text
 粗略想法
@@ -208,7 +208,7 @@ docs/
 - provider 和历史 artifact 默认是带 provenance、freshness 与 limitation 的 advisory input，进入结论前需要回源确认。
 - 长时或高影响工作需要 scope、checkpoint、停止条件、恢复点和独立验证。
 
-完整原则见[项目角色契约](docs/10-prompt/结构化项目角色契约.md)、[Source/Runtime 边界](docs/contracts/source-runtime-customization-boundary.md)、[Verification Summary 合同](docs/contracts/verification/verification-run-summary.md)和 [Honest Closeout 合同](docs/contracts/workflows/honest-closeout.md)。
+完整原则见[项目角色契约](docs/methodology/结构化项目角色契约.md)、[Source/Runtime 边界](docs/contracts/source-runtime-customization-boundary.md)、[Verification Summary 合同](docs/contracts/verification/verification-run-summary.md)和 [Honest Closeout 合同](docs/contracts/workflows/honest-closeout.md)。
 
 ## 宿主支持
 
@@ -223,7 +223,7 @@ docs/
 | ZCode | opt-in preview，部分能力已有实机验证 | `--zcode` |
 | Pi | opt-in preview，部分能力已有实机验证 | `--pi` |
 
-生成 runtime、宿主发现入口和真实 workflow 验证是不同层次。运行 `spec-first doctor --verbose` 查看当前项目事实；详细状态以[Runtime Capability Catalog](docs/catalog/runtime-capabilities.md)为准。
+生成 runtime、宿主发现入口和真实 workflow 验证是不同层次。运行 `spec-first doctor` 查看总览，运行 `spec-first doctor --verbose` 查看当前项目完整事实；脚本消费者使用 `--json`。详细状态以[Runtime Capability Catalog](docs/catalog/runtime-capabilities.md)为准。
 
 ## 适用边界
 
@@ -254,6 +254,8 @@ spec-first plans audit --status completed --json
 
 运行 `spec-first --help` 查看全部选项。
 
+`update` 仅升级已确认的当前 npm-global CLI，再刷新当前目标已安装的宿主。插件、本地、`npx`、开发链接及未知来源只给指引，不再新增全局副本；更新原副本后，用更新后的同一副本入口运行 `init` 并预览（PATH 上的 `spec-first` 可能是另一个未更新副本）。插件资产由宿主插件渠道管理，`update` 不会为其新增项目投射。npm `latest` 提醒不证明插件渠道已发布，投射成功不证明宿主已加载。`clean` 仅清理所选项目投射，不卸载包或插件。
+
 ## 开发与贡献
 
 ```bash
@@ -271,9 +273,9 @@ npm run build
 
 ## 相关文档
 
-- [用户手册](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/README.md)
+- [用户手册](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/user-guide/README.md)
 - [Runtime Capability Catalog](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/catalog/runtime-capabilities.md)
-- [项目角色契约](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/10-prompt/%E7%BB%93%E6%9E%84%E5%8C%96%E9%A1%B9%E7%9B%AE%E8%A7%92%E8%89%B2%E5%A5%91%E7%BA%A6.md)
+- [项目角色契约](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/methodology/%E7%BB%93%E6%9E%84%E5%8C%96%E9%A1%B9%E7%9B%AE%E8%A7%92%E8%89%B2%E5%A5%91%E7%BA%A6.md)
 
 ## 加入社区
 

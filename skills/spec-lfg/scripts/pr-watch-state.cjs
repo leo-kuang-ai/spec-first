@@ -6,6 +6,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const SCHEMA_VERSION = 'spec-lfg-pr-watch-state/v1';
+const OBSERVATION_POLICY = 'cadence-30-max-gap-60/v1';
+const MAX_OBSERVATION_GAP_SECONDS = 60;
 const FAILING = new Set(['FAILURE', 'TIMED_OUT', 'CANCELLED', 'ACTION_REQUIRED', 'STARTUP_FAILURE', 'STALE']);
 
 function sha256(value) {
@@ -124,24 +126,53 @@ function normalize(input) {
     if (!(field in input)) fail('snapshot-invalid', ['missing field: ' + field]);
   }
   if (!Number.isInteger(input.pr_number) || input.pr_number < 1) fail('snapshot-invalid', ['invalid pr_number']);
+  if (!Array.isArray(input.checks) || !Array.isArray(input.review_items)) {
+    fail('snapshot-invalid', ['checks and review_items must be complete arrays; missing evidence is not an empty set']);
+  }
   if (!/^[a-f0-9]{40}$/.test(input.head_sha || '') || !/^[a-f0-9]{40}$/.test(input.base_oid || '')) {
     fail('snapshot-invalid', ['head_sha and base_oid must be full lowercase commit SHAs']);
   }
   if (!Number.isFinite(Date.parse(input.observed_at))) fail('snapshot-invalid', ['observed_at must be an ISO timestamp']);
+  const identityText = value => typeof value === 'string' ? value.slice(0, 500) : null;
   const checks = (Array.isArray(input.checks) ? input.checks : []).map((check) => ({
     key: String(check.key || check.name || 'unknown').slice(0, 200),
     status: String(check.status || 'UNKNOWN').toUpperCase(),
     conclusion: check.conclusion == null ? null : String(check.conclusion).toUpperCase(),
+    run_id: check.run_id == null ? null : String(check.run_id),
+    created_at: identityText(check.created_at),
+    started_at: identityText(check.started_at),
+    completed_at: identityText(check.completed_at),
+    details_url: normalizePrUrl(check.details_url),
   })).sort((a, b) => a.key.localeCompare(b.key));
+  // review item 的 id 是不透明源身份(REST 数字或 GraphQL base64 节点 id,后者可含
+  // '+'/'='),仅用于等值/去重与回显输出,不进 shell。旧版静默过滤非法 id、把非法
+  // kind 改写为 comment,会让 open review 无声退出观测(lane finding DR-003);现在
+  // 对缺失/超长/含空白的 id 与缺失/非法 kind 一律拒绝快照,与 checks 的 fail-closed
+  // 风格对齐。空/未知输入不能证明没有反馈残留,宁可拒绝也不静默收窄 open 集。
   const reviewItems = (Array.isArray(input.review_items) ? input.review_items : [])
-    .filter((item) => item && /^[A-Za-z0-9][A-Za-z0-9._-]{0,120}$/.test(String(item.id || '')))
-    .map((item) => ({
-      id: String(item.id),
-      kind: ['thread', 'comment', 'review'].includes(item.kind) ? item.kind : 'comment',
-      updated_at: typeof item.updated_at === 'string' ? item.updated_at : null,
-      disposition: item.disposition === 'needs-human' ? 'needs-human' : 'open',
-    }))
+    .map((item) => {
+      if (!item || typeof item !== 'object') fail('snapshot-invalid', ['review item must be an object']);
+      const id = item.id == null ? '' : String(item.id);
+      if (id.length < 1 || id.length > 200 || /\s/.test(id)) {
+        fail('snapshot-invalid', ['review item id must be 1-200 non-whitespace characters']);
+      }
+      if (!['thread', 'comment', 'review'].includes(item.kind)) {
+        fail('snapshot-invalid', ['review item kind must be thread|comment|review, got: ' + String(item.kind)]);
+      }
+      return {
+        id,
+        kind: item.kind,
+        updated_at: typeof item.updated_at === 'string' ? item.updated_at : null,
+        last_comment_id: item.last_comment_id == null ? null : String(item.last_comment_id),
+        url: normalizePrUrl(item.url),
+        disposition: 'open',
+      };
+    })
     .sort((a, b) => a.id.localeCompare(b.id));
+  if (new Set(checks.map(check => check.key)).size !== checks.length
+    || new Set(reviewItems.map(sourceKey)).size !== reviewItems.length) {
+    fail('snapshot-invalid', ['ambiguous duplicate source identity']);
+  }
   return {
     pr_number: input.pr_number,
     pr_url: normalizePrUrl(input.pr_url),
@@ -176,6 +207,137 @@ function observationIdentity(snapshot) {
     checks: snapshot.checks,
     review_items: snapshot.review_items,
   }));
+}
+
+function decisionError(message) {
+  fail('decision-invalid', [message]);
+}
+
+function readDecisionArtifact(ref) {
+  if (!ref || typeof ref.path !== 'string' || !path.isAbsolute(ref.path)
+    || !/^[a-f0-9]{64}$/.test(ref.sha256 || '')) decisionError('private artifact path and SHA-256 required');
+  inspectPrivateDirectory(path.dirname(ref.path), 'decision artifact parent');
+  let raw;
+  try {
+    inspectPrivateFile(ref.path);
+    raw = fs.readFileSync(ref.path, 'utf8');
+  } catch (error) {
+    // 引用工件被删除或不可读（private-scratch 清理、会话重启、tmp 清空）是可预期输入，
+    // 必须走结构化 decision 拒绝，而不是裸 ENOENT 堆栈使 watch 循环不可解析。
+    decisionError(`decision artifact missing or unreadable: ${error.code || error.message}`);
+  }
+  if (sha256(raw) !== ref.sha256) decisionError('artifact hash mismatch');
+  try { return JSON.parse(raw); } catch (_error) { decisionError('artifact must be JSON'); }
+}
+
+function sourceKey(source) {
+  return JSON.stringify([source.kind, source.id]);
+}
+
+function currencyKey(current) {
+  return 'currency:' + sha256(JSON.stringify([
+    current.pr_url, current.pr_number, current.head_sha, current.base_ref,
+    current.base_oid, current.merge_state_status,
+  ]));
+}
+
+function sourceObservation(current, source) {
+  if (!current) return null;
+  const scope = [current.pr_url, current.pr_number, current.head_sha];
+  if (source.kind === 'check') {
+    const check = current.checks.find(item => item.key === source.id);
+    return check && (check.run_id || check.created_at || check.started_at || check.completed_at || check.details_url)
+      && FAILING.has(check.conclusion || check.status) ? [...scope, check] : null;
+  }
+  if (source.kind === 'currency') {
+    return source.id === currencyKey(current) && ['BEHIND', 'DIRTY'].includes(current.merge_state_status)
+      ? [...scope, current.base_oid, current.merge_state_status, current.repo_policy] : null;
+  }
+  const item = current.review_items.find(entry => entry.kind === source.kind && entry.id === source.id);
+  return item && (item.updated_at || item.last_comment_id) ? [...scope, item] : null;
+}
+
+function validateResidual(value, current) {
+  const text = item => typeof item === 'string' && item.trim().length > 0;
+  const context = value && value.decision_context;
+  if (!value || value.type !== 'needs-human' || !Array.isArray(value.sources) || !value.sources.length
+    || !context || !['quoted_feedback', 'investigation', 'decision_reason'].every(key => text(context[key]))
+    || !Array.isArray(context.options) || !context.options.length
+    || !context.options.every(option => option && text(option.option) && text(option.tradeoff))
+    || !(context.recommendation === null || text(context.recommendation))
+    || !Array.isArray(value.thread_urls) || !value.thread_urls.every(text)) decisionError('incomplete typed residual');
+  const seen = new Set();
+  const urls = [];
+  for (const source of value.sources) {
+    if (!source || !text(source.id) || !['thread', 'comment', 'review', 'check', 'currency'].includes(source.kind)
+      || seen.has(sourceKey(source))) decisionError('invalid or duplicate decision source');
+    seen.add(sourceKey(source));
+    if (!sourceObservation(current, source)) decisionError('decision source is missing or lacks identity');
+    if (source.kind === 'thread') {
+      const url = current.review_items.find(item => item.id === source.id && item.kind === 'thread').url;
+      if (!url) decisionError('thread source has no authoritative URL');
+      urls.push(url);
+    }
+  }
+  if (new Set(value.thread_urls).size !== value.thread_urls.length
+    || JSON.stringify([...value.thread_urls].sort()) !== JSON.stringify(urls.sort())) {
+    decisionError('thread URLs must match every owned thread');
+  }
+}
+
+function reconcileDecisions(previous, current, input) {
+  if ((input.decision_answers !== undefined && !Array.isArray(input.decision_answers))
+    || (input.decision_residuals !== undefined && !Array.isArray(input.decision_residuals))) {
+    decisionError('decision requests must be arrays');
+  }
+  const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  const matches = source => sourceObservation(current, source) !== null
+    && same(source.observation, sourceObservation(current, source));
+  // Payloads stay in hash-bound private artifacts; the journal stores only identities and refs.
+  let decisions = (previous && previous.human_decisions || []).filter(record => record.sources.every(matches));
+  const answers = (previous && previous.answered_human_decisions || []).filter(record => record.sources.some(matches));
+  for (const request of input.decision_answers || []) {
+    const record = decisions.find(item => item.decision_id === request.decision_id);
+    const answer = readDecisionArtifact(request);
+    if (!answer || typeof answer.answer !== 'string' || !answer.answer.trim()) decisionError('an exact human answer is required');
+    if (!record) {
+      const existing = answers.find(item => item.decision_id === request.decision_id);
+      if (existing && same(readDecisionArtifact(existing.answer_ref), answer)) continue;
+      decisionError('answer must name a current decision');
+    }
+    answers.push({ ...record, answer_ref: { path: request.path, sha256: request.sha256 } });
+    decisions = decisions.filter(item => item !== record);
+  }
+  for (const ref of input.decision_residuals || []) {
+    const payload = readDecisionArtifact(ref);
+    validateResidual(payload, current);
+    const sources = payload.sources.map(source => ({
+      kind: source.kind, id: source.id, observation: sourceObservation(current, source),
+    })).sort((a, b) => sourceKey(a).localeCompare(sourceKey(b)));
+    if (!previous || !sources.every(source => same(source.observation, sourceObservation(previous, source)))) {
+      decisionError('source changed since the caller observation; investigate again');
+    }
+    if (answers.some(answer => answer.sources.some(source => matches(source)
+      && sources.some(item => sourceKey(item) === sourceKey(source))))) decisionError('source already has a recorded answer');
+    const decisionId = 'decision:' + sha256(JSON.stringify([ref.sha256, sources]));
+    if (decisions.some(record => record.decision_id === decisionId)) continue;
+    if (decisions.some(record => record.sources.some(source => sources.some(item => sourceKey(item) === sourceKey(source))))) {
+      decisionError('source already belongs to a current decision');
+    }
+    decisions.push({ decision_id: decisionId, residual_ref: { path: ref.path, sha256: ref.sha256 }, sources });
+  }
+  const payloads = decisions.map(record => {
+    const payload = readDecisionArtifact(record.residual_ref);
+    validateResidual(payload, current);
+    return payload;
+  });
+  const answered = answers.map(record => ({
+    decision_id: record.decision_id,
+    residual: readDecisionArtifact(record.residual_ref),
+    answer: readDecisionArtifact(record.answer_ref).answer,
+    sources: record.sources.filter(matches).map(({ kind, id }) => ({ kind, id })),
+  }));
+  return { decisions, answers, payloads, answered };
 }
 
 function readChain(stateDir) {
@@ -214,18 +376,30 @@ function readChain(stateDir) {
   return { generation, sha256: digest, state, warnings };
 }
 
-function derive(previous, current, budgetSeconds) {
+function derive(previous, current, budgetSeconds, decisions) {
   const now = Date.parse(current.observed_at);
   const firstObservedAt = previous ? Date.parse(previous.first_observed_at) : now;
   const elapsedSeconds = Math.max(0, Math.floor((now - firstObservedAt) / 1000));
   const identity = observationIdentity(current);
   const changed = !previous || previous.observation_identity !== identity;
-  const lastChangedAt = changed ? current.observed_at : previous.last_changed_at;
+  const observationGapSeconds = previous ? (now - Date.parse(previous.observed_at)) / 1000 : null;
+  if (previous && (!Number.isFinite(observationGapSeconds) || observationGapSeconds < 0)) {
+    fail('snapshot-invalid', ['observation timestamps must not move backward']);
+  }
+  const resetReason = !previous ? 'first-observation'
+    : previous.observation_policy !== OBSERVATION_POLICY ? 'legacy-observation-policy'
+      : observationGapSeconds > MAX_OBSERVATION_GAP_SECONDS ? 'observation-gap'
+        : changed ? 'observation-changed' : null;
+  const lastChangedAt = resetReason ? current.observed_at : previous.last_changed_at;
   const quietSeconds = Math.max(0, Math.floor((now - Date.parse(lastChangedAt)) / 1000));
   const failingChecks = current.checks.filter((check) => FAILING.has(check.conclusion || check.status)).map((check) => check.key);
   const pendingChecks = current.checks.filter((check) => ['QUEUED', 'IN_PROGRESS', 'PENDING', 'WAITING'].includes(check.status)).map((check) => check.key);
-  const needsHuman = current.review_items.filter((item) => item.disposition === 'needs-human').map((item) => item.id);
-  const openReview = current.review_items.filter((item) => item.disposition === 'open').map((item) => item.id);
+  const allChecksOk = current.checks.length > 0 && current.checks.every(check =>
+    check.status === 'COMPLETED' && ['SUCCESS', 'NEUTRAL', 'SKIPPED'].includes(check.conclusion));
+  const covered = new Set(decisions.flatMap(record => record.sources.map(sourceKey)));
+  const actionableChecks = failingChecks.filter(id => !covered.has(sourceKey({ kind: 'check', id })));
+  const needsHuman = stable(decisions.flatMap(record => record.sources.map(source => source.id)));
+  const openReview = current.review_items.filter(item => !covered.has(sourceKey(item))).map(item => item.id);
   const baseAdvanced = Boolean(previous && previous.base_oid !== current.base_oid);
   const headChanged = Boolean(previous && previous.head_sha !== current.head_sha);
   const baseStale = ['BEHIND', 'DIRTY'].includes(current.merge_state_status) || baseAdvanced;
@@ -234,16 +408,22 @@ function derive(previous, current, budgetSeconds) {
   if (current.pr_state !== 'OPEN') [terminal, reasonCode] = ['terminal', current.pr_state === 'MERGED' ? 'pr-merged' : 'pr-closed'];
   else if (!current.remote_available) [terminal, reasonCode] = ['local-only', 'no-remote'];
   else if (elapsedSeconds >= budgetSeconds) [terminal, reasonCode] = ['budget-exhausted', 'active-budget-exhausted'];
-  else if (needsHuman.length > 0) [terminal, reasonCode] = ['manual-blocker', 'review-needs-human'];
-  else if (baseStale && current.repo_policy.branch_currency_update !== 'non-rewriting') {
+  else if (needsHuman.length > 0 && openReview.length === 0 && actionableChecks.length === 0
+    && pendingChecks.length === 0 && (!baseStale || covered.has(sourceKey({ kind: 'currency', id: currencyKey(current) })))) {
+    [terminal, reasonCode] = ['manual-blocker', 'needs-human'];
+  } else if (baseStale && current.repo_policy.branch_currency_update !== 'non-rewriting'
+    && openReview.length === 0 && actionableChecks.length === 0 && pendingChecks.length === 0) {
     [terminal, reasonCode] = ['manual-blocker', 'branch-currency-update-required'];
-  } else if (failingChecks.length === 0 && pendingChecks.length === 0 && openReview.length === 0
+  } else if (decisions.length === 0 && allChecksOk && openReview.length === 0
     && !baseStale && current.mergeable === 'MERGEABLE' && current.merge_state_status === 'CLEAN'
     && quietSeconds >= 300) {
     [terminal, reasonCode] = ['looks-ready', 'green-review-clear-current'];
   }
   return {
     first_observed_at: previous ? previous.first_observed_at : current.observed_at,
+    observation_policy: OBSERVATION_POLICY,
+    observation_gap_seconds: observationGapSeconds,
+    quiet_window_reset_reason: resetReason,
     last_changed_at: lastChangedAt,
     observation_identity: identity,
     elapsed_seconds: elapsedSeconds,
@@ -253,6 +433,7 @@ function derive(previous, current, budgetSeconds) {
     base_advanced: baseAdvanced,
     base_stale: baseStale,
     failing_checks: failingChecks,
+    actionable_checks: actionableChecks,
     pending_checks: pendingChecks,
     open_review_items: openReview,
     needs_human_items: needsHuman,
@@ -281,7 +462,8 @@ function main() {
     return;
   }
   const args = parseArgs(argv);
-  const current = normalize(readInput(path.resolve(args.input)));
+  const input = readInput(path.resolve(args.input));
+  const current = normalize(input);
   const stateDir = path.resolve(args.stateDir);
   const stateLocation = inspectStateLocation(stateDir);
   const chain = readChain(stateDir);
@@ -291,7 +473,11 @@ function main() {
         + ', actual ' + chain.generation + '/' + chain.sha256,
     ]);
   }
-  const derived = derive(chain.state, current, args.budgetSeconds);
+  if (chain.state && (chain.state.pr_number !== current.pr_number || chain.state.pr_url !== current.pr_url)) {
+    fail('snapshot-invalid', ['state belongs to another PR']);
+  }
+  const decisionState = reconcileDecisions(chain.state, current, input);
+  const derived = derive(chain.state, current, args.budgetSeconds, decisionState.decisions);
   const generation = chain.generation + 1;
   const state = {
     schema_version: SCHEMA_VERSION,
@@ -301,6 +487,8 @@ function main() {
     captured_at: new Date().toISOString(),
     ...current,
     ...derived,
+    human_decisions: decisionState.decisions,
+    answered_human_decisions: decisionState.answers,
   };
   ensureStateDirectory(stateDir, stateLocation);
   const file = path.join(stateDir, String(generation).padStart(6, '0') + '.json');
@@ -318,13 +506,23 @@ function main() {
     snapshot_sha256: sha256(serialized),
     events: {
       review: state.open_review_items,
-      ci: state.failing_checks,
-      branch_currency: state.base_stale,
+      ci: state.actionable_checks,
+      branch_currency: state.base_stale && !state.human_decisions.some(record =>
+        record.sources.some(source => source.kind === 'currency' && source.id === currencyKey(current))),
       head_changed: state.head_changed,
       base_advanced: state.base_advanced,
     },
     terminal: state.terminal,
+    branch_currency_key: state.base_stale ? currencyKey(current) : null,
+    needs_human_residuals: decisionState.payloads,
+    human_decisions: state.human_decisions.map((record, index) => ({
+      decision_id: record.decision_id, residual: decisionState.payloads[index],
+    })),
+    answered_human_decisions: decisionState.answered,
     quiet_seconds: state.quiet_seconds,
+    observation_policy: state.observation_policy,
+    observation_gap_seconds: state.observation_gap_seconds,
+    quiet_window_reset_reason: state.quiet_window_reset_reason,
     elapsed_seconds: state.elapsed_seconds,
     limitations: state.limitations,
     warnings: chain.warnings,

@@ -68,7 +68,9 @@ Overrides: none
 
 ## Input Paths
 
-- Source plan path: read the source plan frontmatter and focused sections: Requirements, Scope Boundaries, Technical Approach, Implementation Units, Files, Test Scenarios, Verification, and Deferred to Implementation.
+当前用户明确要求补完非活跃历史计划时，将 `source_plan_non_active`、已核验来源和剩余范围线索交给 `spec-plan` Phase 0.1。旧计划与旧 task-pack pins 保持不变；owner 返回有效后继后才按本 skill 正常生成和校验新任务包。仅拆分历史材料或只读请求不产生实施授权。
+
+- Source plan path: read the source plan frontmatter and focused sections: Requirements, Scope Boundaries, Planning Contract (legacy name: Technical Approach), Implementation Units, Files, Test Scenarios, Verification Contract (legacy name: Verification), Definition of Done, Goal Capsule, and Deferred to Implementation.
 - Existing task-pack path: read the task pack, source plan, and `Task Pack Contract`; validate identity/freshness/structure before treating it as executable.
 - Bare task-splitting request: resolve exactly one local source plan; if resolution is ambiguous, ask for the path.
 
@@ -107,8 +109,8 @@ Every run must end with the compact envelope from [Execution Handoff Contract](r
 
 Required posture:
 
-- include `decision`, `reason_code`, `identity_basis`, `artifact_root`, `source_plan`, `task_pack`, `task_pack_validity`, `deterministic_handoff`, `validity_scope`, `semantic_posture`, `dispatch_authorization`, `validation`, `orientation`, and `next_action`;
-- 🔴 GATE (verification): run `spec-first tasks validate <task-pack-path> --repo <artifact-root> --json` before reporting `deterministic_handoff` or validation fields;
+- include `decision`, `reason_code`, `identity_basis`, `artifact_root`, `repo_root` (compat alias equal to `artifact_root`), `reason` (one sentence), `source_plan`, `task_pack`, `task_pack_validity`, `deterministic_handoff`, `validity_scope`, `semantic_posture`, `dispatch_authorization`, `validation`, `orientation`, and `next_action`;
+- 🔴 GATE (verification): run `spec-first tasks validate <task-pack-path> --repo <artifact-root> --json` before reporting `deterministic_handoff` as true or populated validation fields; without a usable CLI result, report `deterministic_handoff: false` and `validation: null` under the reference's unperformed-validation rule;
 - run `spec-first tasks hash <plan-path> --repo <artifact-root> --json` when computing or comparing `source_plan_hash`, and copy its portable `source_plan` field rather than deriving identity from an absolute machine path;
 - 🔴 GATE (verification): never self-report `deterministic_handoff: true` without CLI JSON evidence;
 - 🔴 GATE (handoff): allow `next_action: spec-work-task-pack` only for valid deterministic handoff plus semantic posture `generated-this-run` or `reviewed-existing`;

@@ -10,7 +10,7 @@ function read(relativePath) {
 }
 
 describe('spec-work task-pack intake contracts', () => {
-  const skill = read('skills/spec-work/SKILL.md');
+  const skill = read('skills/spec-work/references/input-triage.md');
   const intake = read('skills/spec-work/references/work-intake-and-task-pack.md');
   const engines = read('skills/spec-work/references/execution-engines.md');
   const quality = read('skills/spec-write-tasks/references/task-quality-guide.md');
@@ -72,9 +72,24 @@ describe('spec-work task-pack intake contracts', () => {
 
   test('keeps task pack optional for direct implementation-ready plans', () => {
     expect(intake).toContain('optional derived execution index');
-    expect(skill).toContain('suggest `spec-write-tasks`');
-    expect(skill).toMatch(/never auto-compile/i);
+    const planIntake = read('skills/spec-work/references/work-intake.md');
+    expect(planIntake).toContain('suggest `spec-write-tasks`');
+    expect(planIntake).toMatch(/never auto-compile/i);
     expect(quality).toContain('Downstream `spec-work` intake');
+  });
+
+  test('direct implementation and both plan intakes preserve applicable global business constraints', () => {
+    const planIntake = read('skills/spec-work/references/work-intake.md');
+    expect(planIntake).toContain('For behavior-bearing work, check the applicable repo instructions');
+    expect(planIntake).toContain('docs/solutions/');
+    expect(planIntake).toContain('permission, state-transition, exception, or non-goal rule');
+    expect(planIntake).toContain('plan-wide `Scope Boundaries`/non-goals');
+    expect(planIntake).toContain('Product Contract Key Decision');
+    expect(intake).toContain('plan-wide product permission, state-transition, or exception invariant');
+    expect(intake).toContain('Product Contract Key Decisions governing its R-IDs');
+    expect(intake).toContain('Carry applicable global constraints into the task/worker packet');
+    expect(intake).toContain('plus the applicable plan-wide constraints and their source section titles');
+    expect(planIntake).toContain('Skip this discovery for purely mechanical, behavior-preserving changes');
   });
 
   test('source-only evals cover valid, stale, review-blocked, and non-trigger paths', () => {

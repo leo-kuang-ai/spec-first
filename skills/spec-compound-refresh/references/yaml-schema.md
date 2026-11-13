@@ -9,6 +9,31 @@ Use this file as the quick reference for:
 - category mapping
 - track classification (bug vs knowledge)
 
+## Classification Contract v2
+
+Use closed responsibility-based enums for new learnings. Select the owning boundary, not the host name or a concrete class; put the precise project/module name in `module` and searchable details in `tags`. Scripts check mechanical facts; classification remains an evidence-grounded author judgment.
+
+| Component | Owning responsibility |
+| --- | --- |
+| `cli` | Commands, argument handling, user-facing CLI output |
+| `workflow` | Spec, plan, tasks, work, review and their handoffs |
+| `skill` | Skill instructions and local prompt assets |
+| `runtime` | Host projection, initialization and source/runtime synchronization |
+| `provider` | External tool adapters and readiness facts |
+| `contract` | Artifact schemas and producer/consumer agreements |
+| `verification` | Evidence admission, checks and completion claims |
+| `knowledge` | Learning capture, retrieval and vocabulary |
+| `governance` | Authority, ownership and project rules |
+| `application_code` | User-project domain/application implementation |
+| `development_workflow` | Cross-cutting engineering practices |
+| `testing_framework` | Test and evaluation infrastructure |
+| `documentation` | Documentation content and discoverability |
+| `tooling` | Supporting scripts not owned by a more specific boundary |
+
+For example, a projection copying obsolete assets is `runtime` / `source_runtime_drift`; a consumer reading an incompatible artifact is `contract` / `contract_drift`; an agent asserting behavior from old session notes is `knowledge` / `stale_context`. Choose the demonstrated cause, not merely the affected area.
+
+Untouched existing docs keep their path and remain readable, including legacy component/root-cause values and `rails_version`. New docs use v2. Every material rewrite re-evaluates all classification fields against current evidence and uses v2 enums, while preserving the path and unrelated metadata and adding promotion fields. Do not mechanically map every legacy term or migrate unrelated docs. In particular, a class named `assistant` does not establish a workflow owner.
+
 ## Tracks
 
 The `problem_type` determines which **track** applies. Each track has different required and optional fields.
@@ -23,7 +48,7 @@ The `problem_type` determines which **track** applies. Each track has different 
 - **module**: Module or area affected
 - **date**: ISO date in `YYYY-MM-DD`
 - **problem_type**: One of the values listed in the Tracks table above
-- **component**: One of `rails_model`, `rails_controller`, `rails_view`, `service_object`, `background_job`, `database`, `frontend_stimulus`, `hotwire_turbo`, `email_processing`, `brief_system`, `assistant`, `authentication`, `payments`, `development_workflow`, `testing_framework`, `documentation`, `tooling`
+- **component**: One of the closed values in Classification Contract v2 above; `schema.yaml` is canonical.
 - **severity**: One of `critical`, `high`, `medium`, `low`
 
 ## Promotion Exit Fields
@@ -33,13 +58,15 @@ Every **new or materially rewritten learning**, in either track, must include:
 - **source_refs**: A non-empty array of verifiable references that lets a later reader recover the evidence behind the learning. Prefer repo-relative source/test/doc paths, issue or PR identifiers, and other stable evidence references. Mechanical validation checks only that this is a non-empty array of non-empty strings; the author must judge whether the references are trustworthy and sufficient.
 - **invalidation_condition**: A non-empty scalar or block string naming the concrete condition that requires the learning to be re-checked, revised, or retired. Mechanical validation checks only that content exists; the author must judge semantic adequacy.
 
+若条件依赖外部 issue、版本或依赖行为，写明哪个外部变化会使建议失效，以及 refresh 如何只读核查。移除 workaround、升级依赖再跑 CI 等修改后验证步骤写在正文，不能冒充已满足的外部条件。沿用 `invalidation_condition`，不并列增加同义退役字段；未改写的 legacy 文档不作批量迁移。
+
 Run `scripts/validate-frontmatter.py --promotion <doc-path>` after writing a new learning, materially rewriting an existing learning, or writing a replacement successor. Default validator mode remains parser-safety-only so untouched legacy docs are not forced through a bulk migration.
 
 ## Bug Track Fields
 
 Required:
 - **symptoms**: YAML array with 1-5 observable symptoms (errors, broken behavior)
-- **root_cause**: One of `missing_association`, `missing_include`, `missing_index`, `wrong_api`, `scope_issue`, `thread_violation`, `async_timing`, `memory_leak`, `config_error`, `logic_error`, `test_isolation`, `missing_validation`, `missing_permission`, `missing_workflow_step`, `inadequate_documentation`, `missing_tooling`, `incomplete_setup`
+- **root_cause**: One of `contract_drift`, `source_runtime_drift`, `stale_context`, `wrong_api`, `ownership_violation`, `concurrency`, `data_integrity`, `async_timing`, `memory_leak`, `config_error`, `logic_error`, `test_isolation`, `missing_validation`, `missing_permission`, `missing_workflow_step`, `inadequate_documentation`, `missing_tooling`, `incomplete_setup`
 - **resolution_type**: One of `code_fix`, `migration`, `config_change`, `test_fix`, `dependency_update`, `environment_setup`, `workflow_improvement`, `documentation_update`, `tooling_addition`, `seed_data_update`
 
 ## Knowledge Track Fields
@@ -58,7 +85,7 @@ No additional track-specific required fields beyond the shared fields and the pr
 
 ## Optional Fields (bug track only)
 
-- **rails_version**: Rails version in `X.Y.Z` format
+- **framework_version**: Observed framework or runtime and version, for example `node 22.4.0`.
 
 ## Backward Compatibility
 
@@ -99,7 +126,7 @@ Docs created before the track system may have `symptoms`/`root_cause`/`resolutio
 7. Enum fields must match the allowed values exactly.
 8. Array fields must respect min/max item counts.
 9. `date` must match `YYYY-MM-DD`.
-10. `rails_version`, if present, must match `X.Y.Z` and only applies to bug-track docs.
+10. `framework_version`, if present, names the observed framework/runtime and only applies to bug-track docs; legacy `rails_version` remains readable.
 
 ## YAML Safety Rules
 

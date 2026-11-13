@@ -30,6 +30,8 @@ function writeTaskPack(root, hash, files = ['src/example.js'], options = {}) {
       done_signal: 'Focused tests pass.',
       wave: '1',
       stop_if: 'The source plan is stale.',
+      ...(options.taskTargetRepo ? { target_repo: options.taskTargetRepo } : {}),
+      ...(options.taskContext || {}),
     }],
     execution_waves: [{ wave: '1', tasks: ['T1'] }],
   };
@@ -55,12 +57,106 @@ describe('spec-first tasks command', () => {
 
   afterEach(() => fs.rmSync(tempRoot, { recursive: true, force: true }));
 
+  test('同波次共享文件不能通过备注豁免，拆到不同波次后可执行', () => {
+    const taskPath = writeTaskPack(tempRoot, computeSourcePlanHash(planPath).hash);
+    const original = fs.readFileSync(taskPath, 'utf8');
+    const block = original.match(/```json\n([\s\S]*?)\n```/);
+    const contract = JSON.parse(block[1]);
+    contract.tasks.push({ ...contract.tasks[0], task_id: 'T2', notes: 'Explicitly marked overlap accepted.' });
+    contract.execution_waves[0].tasks.push('T2');
+    const save = () => fs.writeFileSync(taskPath, original.replace(block[0], `\`\`\`json\n${JSON.stringify(contract)}\n\`\`\``));
+    save();
+    const rejected = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+    expect(rejected.status).toBe(1);
+    expect(rejected.stdout).toContain('task-pack-same-wave-file-overlap');
+    contract.tasks[1].wave = '2';
+    contract.tasks[1].dependencies = ['T1'];
+    contract.execution_waves = [{ wave: '1', tasks: ['T1'] }, { wave: '2', tasks: ['T2'] }];
+    save();
+    const accepted = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+    expect(accepted.status).toBe(0);
+    expect(accepted.stdout).not.toContain('task-pack-same-wave-file-overlap');
+  });
+
   test('hash --json returns the canonical plan hash', () => {
     const result = runCli(['tasks', 'hash', planPath, '--json'], tempRoot);
     expect(result.status).toBe(0);
     const payload = JSON.parse(result.stdout);
     expect(payload.schema_version).toBe('task-plan-hash/v1');
     expect(payload.hash).toMatch(/^sha256:[a-f0-9]{64}$/);
+  });
+
+  test('full contract preserves proof refs, settled structure and external done intent for Work', () => {
+    const taskContext = {
+      context_refs: ['test/proof.test.js', 'test/support/fixture.js'],
+      notes: 'Protect proof tests and their test-only seam. Preserve session-settled: separate owners.',
+      risk_note: 'Historical RED is unobserved; do not invent it.',
+      done_signal: 'Observe the configured external callback; Git state is not completion evidence.',
+    };
+    const taskPath = writeTaskPack(tempRoot, computeSourcePlanHash(planPath).hash, ['src/example.js'], { taskContext });
+    const result = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+    expect(result.status).toBe(0);
+    const receipt = JSON.parse(result.stdout);
+    expect(receipt.task_pack.contract.tasks[0]).toMatchObject(taskContext);
+    expect(receipt.validity_scope).toBe('identity-freshness-structure-only');
+    fs.appendFileSync(planPath, '\nChanged proof ownership.\n');
+    expect(runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot).status).toBe(1);
+  });
+
+  test.each(['existing', 'future', 'dangling', 'leaf'])('rejects %s task paths that traverse a symlink', (kind) => {
+    const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'task-pack-outside-'));
+    try {
+      fs.writeFileSync(path.join(outside, 'existing.js'), 'sentinel');
+      let file = 'linked/existing.js';
+      if (kind === 'leaf') {
+        fs.symlinkSync(path.join(outside, 'existing.js'), path.join(tempRoot, 'linked.js'));
+        file = 'linked.js';
+      } else {
+        fs.symlinkSync(kind === 'dangling' ? path.join(outside, 'missing') : outside, path.join(tempRoot, 'linked'), 'dir');
+        if (kind !== 'existing') file = 'linked/future/new.js';
+      }
+      const taskPath = writeTaskPack(tempRoot, computeSourcePlanHash(planPath).hash, [file]);
+      const result = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+      expect(result.status).toBe(1);
+      expect(JSON.parse(result.stdout).deterministic_handoff).toBe(false);
+      expect(fs.readdirSync(outside)).toEqual(['existing.js']);
+      expect(fs.readFileSync(path.join(outside, 'existing.js'), 'utf8')).toBe('sentinel');
+    } finally { fs.rmSync(outside, { recursive: true, force: true }); }
+  });
+
+  test.each(['.git/config', '.GIT/config', '.opencode/skills/example/SKILL.md', '.OpenCode/skills/example/SKILL.md', '.opencode/commands/spec-work.md', 'opencode.jsonc', '.zcode/spec-first/state.json', '.zcode/hooks/session-start', '.pi/spec-first/state.json'])('rejects Git metadata or generated runtime: %s', (file) => {
+    const taskPath = writeTaskPack(tempRoot, computeSourcePlanHash(planPath).hash, [file]);
+    const result = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+    expect(result.status).toBe(1);
+    expect(JSON.parse(result.stdout).deterministic_handoff).toBe(false);
+  });
+
+  test('checks task paths in the selected child repo rather than the artifact root', () => {
+    const child = path.join(tempRoot, 'child');
+    const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'task-pack-child-outside-'));
+    fs.mkdirSync(child);
+    expect(spawnSync('git', ['init', '-q', child]).status).toBe(0);
+    try {
+      fs.symlinkSync(outside, path.join(child, 'src'), 'dir');
+      const taskPath = writeTaskPack(tempRoot, computeSourcePlanHash(planPath).hash, ['src/new.js'], { taskTargetRepo: 'child' });
+      expect(runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot).status).toBe(1);
+      fs.unlinkSync(path.join(child, 'src'));
+      const valid = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+      expect(valid.status).toBe(0);
+      expect(JSON.parse(valid.stdout).task_pack.execution_focus[0].resolved_target_repo).toBe(fs.realpathSync(child));
+    } finally { fs.rmSync(outside, { recursive: true, force: true }); }
+  });
+
+  test.each(['pack', 'source'])('uses the %s target_repo when no task override is present', (owner) => {
+    const child = path.join(tempRoot, 'child');
+    fs.mkdirSync(child);
+    expect(spawnSync('git', ['init', '-q', child]).status).toBe(0);
+    if (owner === 'source') fs.writeFileSync(planPath, '---\nspec_id: example\ntarget_repo: child\n---\n# Source Plan\n');
+    const taskPath = writeTaskPack(tempRoot, computeSourcePlanHash(planPath).hash);
+    if (owner === 'pack') fs.writeFileSync(taskPath, fs.readFileSync(taskPath, 'utf8').replace('status: derived', 'status: derived\ntarget_repo: child'));
+    const result = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+    expect(result.status).toBe(0);
+    expect(JSON.parse(result.stdout).task_pack.execution_focus[0].resolved_target_repo).toBe(fs.realpathSync(child));
   });
 
   test('hash resolves relative paths from --repo and returns portable identity fields', () => {

@@ -1,6 +1,6 @@
 # Universal Brainstorming Facilitator
 
-This file is loaded when spec-brainstorm detects a non-software task (Phase 0). It replaces the software-specific brainstorming phases (Phases 0.2 through 4) with facilitation principles for any domain. The Core Principles and **Interaction Rules** in the parent `spec-brainstorm/SKILL.md` still apply unchanged — including one-question-per-turn and the default to the platform's blocking question tool. This file extends those rules with universal-domain facilitation guidance; it does not relax them.
+This file is loaded when spec-brainstorm detects a non-software task (Phase 0). It replaces the software-specific brainstorming phases (Phases 0.2 through 4) with facilitation principles for any domain. The Core Principles and **Interaction Rules** in `references/interaction-rules.md` still apply unchanged — including one-question-per-turn and the default to the platform's blocking question tool. This file extends those rules with universal-domain facilitation guidance; it does not relax them.
 
 This route is intentionally outside the software unified-plan artifact contract.
 Do not write `artifact_contract: spec-unified-plan/v1`,
@@ -20,11 +20,13 @@ Be a thinking partner, not an answer machine. The user came here because they're
 
 ## Asking questions
 
+Apply the facts-versus-decisions rule from `references/interaction-rules.md` on this route too. Use authorized reachable sources to settle facts, and continue independent questions while a lookup runs. Do not turn unavailable evidence into an assumed answer or let source facts decide the user's preferences.
+
 "Thinking partner" framing does not mean "conversational prose." The parent skill's Interaction Rules apply in full: one question per turn, and default to the platform's blocking question tool (with its free-text fallback) even for opening and elicitation.
 
 "What's prompting this?", "what matters most here?", and "what have you ruled out?" feel open-ended and conversational, but that's not a reason to skip the tool. The free-text option preserves flexibility while a well-crafted option set teaches the user the dimensions they might not have separated. Pick-plus-optional-note is lower activation energy than composing prose from scratch — especially for emotional or values-laden topics where prose can feel like an essay prompt.
 
-Drop the blocking tool only when (a) the answer is inherently narrative ("walk me through how you got here"), (b) the question is diagnostic or introspective and presented options would unintentionally influence the user's answer, or (c) you cannot write 3-4 genuinely distinct, plausibly-correct options that cover the space without padding. If you'd be straining to fill the option slots, the question is open — ask it open-ended (see Interaction Rule 6 in SKILL.md for how to phrase open-ended questions so they earn their place).
+Drop the blocking tool only when (a) the answer is inherently narrative ("walk me through how you got here"), (b) the question is diagnostic or introspective and presented options would unintentionally influence the user's answer, or (c) you cannot write 3-4 genuinely distinct, plausibly-correct options that cover the space without padding. If you'd be straining to fill the option slots, the question is open — ask it open-ended (see Interaction Rule 6 in `references/interaction-rules.md` for how to phrase open-ended questions so they earn their place).
 
 ## How to start
 
@@ -63,7 +65,7 @@ When the conversation has enough material to narrow — reflect back what you've
 
 **Always synthesize a summary in the chat.** Before offering any next steps, reflect back what emerged: key decisions, the direction chosen, open threads, and any assumptions made. This is the primary output of the brainstorm — the user should be able to read the summary and know what they landed on.
 
-**Then offer next steps** using the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
+**Then offer next steps** using the platform's blocking question tool: the host's blocking question tool already in the current tool list, matched by capability (if a matching tool is listed but unloaded, load it through the host's tool-discovery primitive). Fall back to numbered options in chat only when no such tool is in the list or a real question call errors. Never silently skip the question.
 
 **Question:** "Brainstorm wrapped. What would you like to do next?"
 

@@ -11,17 +11,20 @@ const TARGETS = [
   {
     skill: 'spec-work',
     filePath: 'skills/spec-work/SKILL.md',
+    reminder: 'These are attention reminders, not additional gates or substitutes for judgment.',
     minRows: 3,
   },
   {
     skill: 'spec-debug',
     filePath: 'skills/spec-debug/SKILL.md',
+    reminder: 'These are attention reminders, not additional gates or substitutes for judgment.',
     minRows: 3,
   },
   {
     skill: 'spec-code-review',
     filePath: 'skills/spec-code-review/SKILL.md',
     exactRows: 3,
+    reminder: 'These are attention reminders, not additional gates or substitutes for judgment.',
   },
 ];
 
@@ -64,15 +67,16 @@ function antiRationalizationRows(section) {
     .split(/\r?\n/)
     .map(tableColumns)
     .filter((columns) => columns && columns.length === 2)
-    .filter(([first, second]) => first !== '红旗念头' && second !== '停下来做什么');
+    .filter(([first, second]) => first !== '红旗念头' && second !== '停下来做什么'
+      && first !== 'Rationalization' && second !== 'Response');
 }
 
 describe('anti-rationalization workflow prose contracts', () => {
-  test.each(TARGETS)('$skill has a scoped anti-rationalization section', ({ filePath }) => {
+  test.each(TARGETS)('$skill has a scoped anti-rationalization section', ({ filePath, reminder }) => {
     const skill = read(filePath);
 
     expect(skill).toContain(SECTION_HEADING);
-    expect(markdownSection(skill, SECTION_HEADING)).toContain(BEST_EFFORT_STATEMENT);
+    expect(markdownSection(skill, SECTION_HEADING)).toContain(reminder || BEST_EFFORT_STATEMENT);
   });
 
   test.each(TARGETS)('$skill keeps the expected table data-row count', ({ filePath, minRows, exactRows }) => {

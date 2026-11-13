@@ -7,6 +7,10 @@ description: 公开 workflow：创建、修改或迁移项目拥有的 Agent Ski
 
 把可复用目标转成 portable、source-first 的 Skill patch，或在零写入模式下报告 package readiness；交付正确分支的结果、匹配证据与 residual risks，不把 source bytes、fixture pass 或模型自述当成语义改善。
 
+## Prose and size discipline
+
+When revising a Skill under a size constraint, preserve plain sentences and one idea per sentence. Move coherent blocks to required-read references or delete real redundancy; do not squeeze wording by fusing clauses or dropping connective words. Leave headroom for later fixes so byte savings do not create dense or meaning-shifted instructions.
+
 ## Scenario Capability
 
 Follows `docs/contracts/workflows/scenario-capability-matrix.md` (default).

@@ -19,6 +19,8 @@ Do NOT, on requirements documents:
 
 A requirements-classified finding from feasibility should answer: "would the proposed direction force a fundamental rework?" If your finding answers "what implementation details are missing?" instead, suppress it.
 
+When requirements-only metadata accompanies actual HOW sections, review those supplied sections with the planning checks below; do not demand absent sections or upgrade execution readiness.
+
 **When `Document type: plan`:** run the full check below. Shadow path tracing, dependency analysis, migration safety, implementability, and performance feasibility all apply.
 
 ## What you check
@@ -27,17 +29,17 @@ A requirements-classified finding from feasibility should answer: "would the pro
 
 **Architecture reality** -- Do proposed approaches conflict with the framework or stack? Does the plan assume capabilities the infrastructure doesn't have? If it introduces a new pattern, does it address coexistence with existing patterns?
 
-**Shadow path tracing** -- For each new data flow or integration point, trace four paths: happy (works as expected), nil (input missing), empty (input present but zero-length), error (upstream fails). Produce a finding for any path the plan doesn't address. Plans that only describe the happy path are plans that only work on demo day.
+**Shadow path tracing** -- For each new data flow or integration point, trace four paths: happy (works as expected), nil (input missing), empty (input present but zero-length), error (upstream fails). Read references and existing project conventions before treating an unstated path as missing. Report only a consequential branch that implementers cannot derive correctly; a missing four-row enumeration is not a defect.
 
 **Dependencies** -- Are external dependencies identified? Are there implicit dependencies it doesn't acknowledge?
 
-**Performance feasibility** -- Do stated performance targets match the proposed architecture? Back-of-envelope math is sufficient. If targets are absent but the work is latency-sensitive, flag the gap.
+**Performance feasibility** -- Do stated performance targets match the proposed architecture? Back-of-envelope math is sufficient. Absent numbers are a finding only when current workload evidence leaves a consequential architecture or acceptance decision unresolved; do not invent universal targets.
 
 **Migration safety** -- Is the migration path concrete or does it wave at "migrate the data"? Are backward compatibility, rollback strategy, data volumes, and ordering dependencies addressed?
 
 **Implementability** -- Could an engineer start coding tomorrow? Are file paths, interfaces, and error handling specific enough, or would the implementer need to make architectural decisions the plan should have made?
 
-Apply each check only when relevant. Silence is only a finding when the gap would block implementation.
+Apply each check only when relevant. Silence is only a finding when the gap would block correct implementation. Check whether a proposed mechanism serves an existing contract or supported costly harm, and whether its absence leaves that contract unfulfilled. Reuse current capabilities before recommending a new control; no additional default reviewer is required.
 
 ## Confidence calibration
 

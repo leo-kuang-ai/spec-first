@@ -4,14 +4,7 @@ Use this path when the input is a short recording (under ~60 seconds), the user 
 
 ## Workflow
 
-1. Run the analyzer to a temp directory so nothing pollutes the repo (`SKILL_DIR` is the directory containing the `spec-riffrec-feedback-analysis` SKILL.md; set it in the same command — shell state does not persist between Bash calls):
-
-   ```bash
-   SKILL_DIR="<absolute path of the directory containing the spec-riffrec-feedback-analysis SKILL.md>"
-   bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/analyze_riffrec_zip.py" /path/to/input --no-transcribe --output-dir "$(mktemp -d -t riffrec-quick-XXXXXX)"
-   ```
-
-   Capture the printed output directory; later steps read from it. If the user explicitly requested third-party transcription for this recording, replace `--no-transcribe` with `--transcribe` and preserve the analyzer's egress receipt. A credential in the environment is not consent.
+1. Read [Shared analyzer](analyzer.md) and run its quick command with a temporary output directory. Use `--no-transcribe` unless explicit provider egress authority permits `--transcribe`. Capture the printed directory and receipt for subsequent reads.
 
 2. Read only `analysis.md` from the temp output. Skip `problem-analysis.md`, `review-prompt.md`, `requirements-kickoff.md`, and `source-materials.md` — they are designed for the extensive path.
 

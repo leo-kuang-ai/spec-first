@@ -191,7 +191,7 @@ function createRuntimeRollbackBackup({ projectRoot, plans = [] } = {}) {
     if (!plan || !Array.isArray(plan.operations)) continue;
     for (const operation of plan.operations) {
       if (!operation || !operation.path) continue;
-      if (!['remove_file', 'remove_dir', 'write_file', 'update_file'].includes(operation.kind)) {
+      if (!['ensure_dir', 'remove_file', 'remove_dir', 'write_file', 'update_file'].includes(operation.kind)) {
         continue;
       }
 
@@ -209,7 +209,12 @@ function createRuntimeRollbackBackup({ projectRoot, plans = [] } = {}) {
     const kinds = pathKinds.get(relativePath);
     const absolutePath = path.join(projectRoot, relativePath);
     const stats = fs.existsSync(absolutePath) ? fs.lstatSync(absolutePath) : null;
-    const isDirectory = kinds.has('remove_dir') || Boolean(stats && stats.isDirectory());
+    // 已存在且仅由 ensure_dir 触及的目录属于用户/既有 runtime，不需要纳入回滚；
+    // 不存在的 ensure_dir 则记录为新建目录，失败时移除空目录。
+    if (kinds.size === 1 && kinds.has('ensure_dir') && stats) {
+      continue;
+    }
+    const isDirectory = kinds.has('ensure_dir') || kinds.has('remove_dir') || Boolean(stats && stats.isDirectory());
 
     if (selectedEntries.some((entry) => entry.isDirectory && isNestedPath(relativePath, entry.relativePath))) {
       continue;

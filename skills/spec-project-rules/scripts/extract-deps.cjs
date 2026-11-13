@@ -447,7 +447,8 @@ function collectSourceRefs(kbText) {
     const fields = line.slice(2).split(' | ');
     if (fields.length < 3) continue;
     for (const m of fields[2].matchAll(/`([^`]+)`/g)) addRef(m[1], line);
-    const home = fields[0].match(/住址\s+`?([^\s，,；;（）()]+)`?/);
+    // SUP-21 fix: 排除反引号，分别处理有反引号和无反引号的住址
+    const home = fields[0].match(/住址\s+`([^`]+)`/) || fields[0].match(/住址\s+([^\s`，,；;（）()]+)/);
     if (home) addRef(home[1], line);
   }
   return refs;
@@ -466,6 +467,8 @@ function gitChangedPaths(repoRoot, sourceCommit) {
     `diff --name-only ${sourceCommit}..HEAD`,
     'diff --name-only',
     'diff --name-only --cached',
+    // SUP-20 fix: 包含未跟踪文件
+    'ls-files --others --exclude-standard',
   ]) {
     for (const line of git(args).split('\n')) {
       const trimmed = line.trim();
@@ -589,7 +592,7 @@ function main() {
       repo_root: args.repoRoot,
       build_kind: 'unsupported-layout',
       sampling: buildSourceSampling(args.repoRoot),
-      note: 'no npm workspaces and no gradle settings; dependency edges unavailable; mine along sampling.modules[].sample_files and disclose the sampled/total ratio in closeout',
+      note: 'no npm workspaces and no gradle settings; dependency edges unavailable; mine along sampling.modules[].sample_files and disclose the sampled/total ratio in closeout; --verify is not applicable in this degraded mode (no dependency graph to check)',
     };
     if (args.freshness) samplingPayload.freshness = runFreshness(args.repoRoot);
     process.stdout.write(`${JSON.stringify(samplingPayload, null, args.pretty ? 2 : 0)}\n`);

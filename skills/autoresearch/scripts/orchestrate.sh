@@ -1,11 +1,8 @@
 #!/bin/bash
 # autoresearch orchestrator — deterministic seam.
 #
-# Ownership: goal classification, next-hop routing, units reporting, plateau
-# detection, command safety screening (incl. anchored DB-URL allowlist),
-# orchestrator-state validation, and the final run verdict. Routing semantics
-# are documented in references/orchestrator-routing.md; this script is the
-# authoritative implementation, the reference is documentation.
+# 职责：提取目标关键词候选、按状态确定 next-hop、计算指标及校验安全出口。
+# 目标语义分类由 LLM 负责；classify 输出不是执行路由或副作用授权。
 #
 # Usage:
 #   orchestrate.sh classify "<goal>"
@@ -17,7 +14,8 @@
 #   orchestrate.sh validate-state <orchestrator-state.json>
 #   orchestrate.sh screen-state-predicate <orchestrator-state.json>
 #
-# Exit codes: 0 = allow/ok, 2 = refuse/invalid/usage, 1 = unexpected error.
+# Exit codes: 0 = allow/ok, 2 = refuse/invalid/usage, 1 = unexpected error,
+#             127 = no runnable Python 3 interpreter (tried python3, python, py -3).
 set -euo pipefail
 
 if [[ $# -lt 1 ]]; then
@@ -27,9 +25,31 @@ fi
 
 cmd="$1"; shift
 
+# 与 spec-riffrec run-python.sh 同型的解释器探测:名字在 PATH 上不代表可运行,
+# Windows 下 python3 常是 Microsoft Store stub。
+resolve_python() {
+  local candidate
+  for candidate in python3 python; do
+    if command -v "$candidate" >/dev/null 2>&1 && "$candidate" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)' >/dev/null 2>&1; then
+      PYTHON_CMD=("$candidate")
+      return 0
+    fi
+  done
+  if command -v py >/dev/null 2>&1 && py -3 -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)' >/dev/null 2>&1; then
+    PYTHON_CMD=(py -3)
+    return 0
+  fi
+  return 1
+}
+
+if ! resolve_python; then
+  echo 'orchestrate.sh: no runnable Python 3 interpreter found (tried python3, python, py -3)' >&2
+  exit 127
+fi
+
 case "$cmd" in
   classify|next-hop|units|plateau|screen-cmd|verdict|validate-state|screen-state-predicate)
-    exec python3 - "$cmd" "$@" <<'PYEOF'
+    exec "${PYTHON_CMD[@]}" - "$cmd" "$@" <<'PYEOF'
 import json
 import re
 import sys
@@ -38,7 +58,7 @@ cmd, args = sys.argv[1], sys.argv[2:]
 
 # --- classify -------------------------------------------------------------
 
-# (archetype, mode, keywords); rank = specificity precedence (lower first).
+# 候选词表只提供匹配事实，顺序不表示语义优先级。
 ARCHETYPES = [
     ("ship-ready", "loop", ["ship", "release", "deploy", "publish", "production-ready", "merge"]),
     ("fix-broken", "loop", ["fix", "broken", "failing", "error", "crash", "bug", "can't run", "tests fail"]),
@@ -53,18 +73,14 @@ ARCHETYPES = [
 
 def cmd_classify(goal):
     text = goal.lower()
-    hits = [(rank, name, mode) for rank, (name, mode, kws) in enumerate(ARCHETYPES)
-            if any(kw in text for kw in kws)]
-    if not hits:
-        print("explore\tloop")
-        print("candidates: (none matched; defaulting to explore — confirm archetype with the user)")
-        return 0
-    hits.sort()
-    primary = hits[0]
-    print(f"{primary[1]}\t{primary[2]}")
-    if len(hits) > 1:
-        names = [h[1] for h in hits[:2]]
-        print(f"candidates: {', '.join(names)}")
+    candidates = []
+    for name, mode, keywords in ARCHETYPES:
+        matched = [keyword for keyword in keywords if keyword in text]
+        if matched:
+            candidates.append({"archetype": name, "mode": mode, "matched_keywords": matched})
+    print(json.dumps({"schema_version": 1, "status": "advisory",
+                      "requires_semantic_judgment": True,
+                      "candidates": candidates}, ensure_ascii=False))
     return 0
 
 # --- state helpers ---------------------------------------------------------
@@ -99,25 +115,36 @@ def is_plateau(state):
 
 # --- next-hop --------------------------------------------------------------
 
-def cmd_next_hop(state):
+def unresolved_hop(state):
     lh = state.get("last_handoff") or {}
-    if int(lh.get("errors") or 0) > 0:
-        print("fix"); return 0
+    # Routing signals are strictly typed: only an int > 0 counts as unresolved
+    # errors and only a non-empty list counts as untested gaps. Malformed
+    # handoff shapes block completion claims instead of promoting them.
+    unresolved = lh.get("unresolved_count")
+    if not isinstance(unresolved, int) or unresolved < 0:
+        unresolved = lh.get("errors") if isinstance(lh.get("errors"), int) else None
+    if isinstance(unresolved, int) and unresolved > 0:
+        return "fix"
     if lh.get("verdict") == "UNSTABLE":
-        print("regression"); return 0
-    if lh.get("untested_gaps"):
-        print("debug"); return 0
-    # Unknown-units backstop: repeated unknown invalidates progress signals.
+        return "regression"
+    if isinstance(lh.get("untested_gaps"), list) and lh.get("untested_gaps"):
+        return "debug"
     if consecutive_unknown(state) >= 3:
-        print("BLOCKED"); return 0
-    if state.get("pending_verify"):
-        print("verify"); return 0
-    if state.get("predicate_met"):
-        print("DONE"); return 0
+        return "BLOCKED"
+    if state.get("pending_verify") is True:
+        return "verify"
     hop_log = state.get("hop_log") or []
     last = hop_log[-1] if hop_log else {}
-    if last.get("outcome") in ("blocked", "failed") and not last.get("retry_route"):
-        print("BLOCKED"); return 0
+    if last.get("outcome") in ("blocked", "failed"):
+        return last.get("retry_route") or "BLOCKED"
+    return None
+
+def cmd_next_hop(state):
+    pending = unresolved_hop(state)
+    if pending:
+        print(pending); return 0
+    if state.get("predicate_met") is True:
+        print("DONE"); return 0
     if is_plateau(state):
         print("PLATEAU"); return 0
     pipeline = state.get("pipeline") or []
@@ -187,7 +214,7 @@ def screen_command(command):
     for match in DB_URL.finditer(command):
         allowed, detail = db_url_allowed(match.group(0))
         if not allowed:
-            return f"refuse: DB URL {match.group(0)} — {detail}"
+            return "refuse: db-url-not-allowed (requires an allowed local/service host or *_test/*_ci database)"
     return "allow"
 
 def cmd_screen_cmd(command):
@@ -207,9 +234,12 @@ def cmd_verdict(state):
     first = known[0] if known else "?"
     last = known[-1] if known else "?"
     outcome_summary = " ".join(f"{k}={v}" for k, v in sorted(outcomes.items())) or "none"
-    if state.get("stop_reason"):
+    pending = unresolved_hop(state)
+    if pending:
+        verdict = {"verify": "PENDING-VERIFY", "BLOCKED": "BLOCKED"}.get(pending, "INCOMPLETE")
+    elif state.get("stop_reason"):
         verdict = state["stop_reason"]
-    elif state.get("predicate_met"):
+    elif state.get("predicate_met") is True:
         pipeline = state.get("pipeline") or []
         verdict = ("PENDING-SHIP-APPROVAL"
                    if state.get("terminal_choice") == "proceed-to-ship" and "ship" in pipeline
@@ -228,6 +258,8 @@ def cmd_verdict(state):
 
 VALID_MODES = {"loop", "dispatch"}
 VALID_TERMINAL = {"stop-at-verified", "proceed-to-ship"}
+# SUP-15 修复：约束 stop_reason 只能是中断原因，不能是成功收敛
+VALID_STOP_REASONS = {"EXTERNAL-STOP", "USER-INTERRUPT", "ERROR"}
 
 def cmd_validate_state(state):
     issues = []
@@ -240,8 +272,26 @@ def cmd_validate_state(state):
         issues.append("pipeline: required non-empty array")
     if not isinstance(state.get("hop_log"), list):
         issues.append("hop_log: required array")
+    for boolean_field in ("predicate_met", "pending_verify"):
+        if boolean_field in state and not isinstance(state[boolean_field], bool):
+            issues.append(f"{boolean_field}: must be a boolean when present")
+    lh = state.get("last_handoff")
+    if lh is not None and not isinstance(lh, dict):
+        issues.append("last_handoff: must be an object when present")
+    elif isinstance(lh, dict):
+        for count_field in ("unresolved_count", "errors"):
+            if count_field in lh and not isinstance(lh[count_field], int):
+                issues.append(f"last_handoff.{count_field}: must be an integer when present")
+        if "untested_gaps" in lh and not isinstance(lh["untested_gaps"], list):
+            issues.append("last_handoff.untested_gaps: must be an array when present")
     if not isinstance(state.get("cycle_count"), int) or state.get("cycle_count", -1) < 0:
         issues.append("cycle_count: required non-negative integer")
+    # SUP-15 修复：校验 stop_reason 只能是合法的中断原因
+    if "stop_reason" in state:
+        if not isinstance(state["stop_reason"], str):
+            issues.append("stop_reason: must be a string when present")
+        elif state["stop_reason"] not in VALID_STOP_REASONS:
+            issues.append(f"stop_reason: must be one of {sorted(VALID_STOP_REASONS)}, not a success verdict")
     if state.get("mode") == "loop":
         predicate = state.get("predicate")
         if not isinstance(predicate, dict):

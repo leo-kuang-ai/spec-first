@@ -64,6 +64,13 @@ describe('makeWorkspaceRunners — command/env construction mirrors verified pro
     expect(runners.graphifyMerge(['/a'], '/o')).toEqual(expect.objectContaining({ ok: false, reason_code: 'graphify-merge-failed' }));
   });
 
+  test('默认 runner 保留真实子进程超时事实', () => {
+    const result = defaultWorkspaceExec(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { timeoutMs: 200 });
+    expect(result.status).not.toBe(0);
+    expect(result.error).toBe('ETIMEDOUT');
+    expect(result.timed_out).toBe(true);
+  });
+
   test('requires an exec function', () => {
     expect(() => makeWorkspaceRunners({})).toThrow(/exec/);
   });

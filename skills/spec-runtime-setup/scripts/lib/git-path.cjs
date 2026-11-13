@@ -4,12 +4,18 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
-function runGit(repoRoot, args) {
-  return spawnSync('git', ['-C', path.resolve(repoRoot), ...args], {
+function runGit(repoRoot, args, options = {}) {
+  const env = { ...process.env };
+  // Bind Git reads to repoRoot, excluding inherited repository, index, and configuration overrides.
+  for (const key of Object.keys(env)) if (key.startsWith('GIT_')) delete env[key];
+  env.GIT_OPTIONAL_LOCKS = '0';
+  return spawnSync('git', ['-c', 'core.fsmonitor=false', '-C', path.resolve(repoRoot), ...args], {
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'ignore'],
-    timeout: 5000,
+    timeout: options.timeout || 5000,
+    maxBuffer: options.maxBuffer || 1024 * 1024,
     windowsHide: true,
+    env,
   });
 }
 
@@ -48,6 +54,7 @@ function canonicalizeGitPath(candidatePath) {
 }
 
 module.exports = {
+  runGit,
   canonicalizeGitPath,
   resolveGitPath,
 };

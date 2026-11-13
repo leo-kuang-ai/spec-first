@@ -6,6 +6,7 @@ const {
 const {
   commandSucceeded,
 } = require('./process-runner.cjs');
+const { providerDisplayFacts } = require('./provider-display.cjs');
 
 const RUNTIME_MARKERS = Object.freeze([
   ['codex', ['CODEX_CI', 'CODEX_MANAGED_BY_NPM', 'CODEX_THREAD_ID', 'CODEX_SANDBOX']],
@@ -74,7 +75,7 @@ function diagnosticNextActions(payload = {}, { liveBaselineFailures, requiredPro
     && runtime.baseline_ready === true
     && runtime.host_runtime_ready === true;
   if (!persistedRuntimeReady) {
-    actions.push('运行标准 spec-runtime-setup，完成 required baseline、CodeGraph 与 Graphify setup；仅需只读复核时使用 --verify-only。');
+    actions.push('运行标准 spec-runtime-setup，完成 required baseline、CodeGraph 与 Graphify setup；只读检查使用 --check；验证并刷新 setup-owned facts 使用 --verify-only（会写入事实文件）。');
     blocking = true;
   } else {
     const providers = Array.isArray(payload.provider_readiness)
@@ -91,7 +92,7 @@ function diagnosticNextActions(payload = {}, { liveBaselineFailures, requiredPro
         .filter((entry) => requiredSet.has(entry.provider) && !providerReadyForDiagnostic(entry))
         .flatMap((entry) => entry.next_actions || []);
       if (providerActions.length > 0) actions.push(...providerActions);
-      else actions.push('运行当前 host 的 spec-runtime-setup --verify-only，确认 required Provider readiness。');
+      else actions.push('运行当前 host 的 spec-runtime-setup --verify-only，验证 required Provider readiness 并刷新 setup-owned facts（会写入事实文件）；只读检查使用 --check。');
       blocking = true;
     } else {
       const requiredSet = new Set(requiredIds);
@@ -102,7 +103,7 @@ function diagnosticNextActions(payload = {}, { liveBaselineFailures, requiredPro
         .flatMap((entry) => entry.next_actions || []));
     }
     if (manifest.status !== 'current') {
-      actions.push('运行当前 host 的 spec-runtime-setup --verify-only，确认 required Provider readiness。');
+      actions.push('运行当前 host 的 spec-runtime-setup --verify-only，验证 required Provider readiness 并刷新 setup-owned facts（会写入事实文件）；只读检查使用 --check。');
       blocking = true;
     }
   }
@@ -152,7 +153,9 @@ function renderDiagnosticHuman(payload, pluginVersion) {
     lines.push('- 暂无已确认的 required Provider 就绪事实；运行标准 Runtime Setup 完成 CodeGraph/Graphify 准备。');
   } else {
     for (const provider of payload.provider_readiness) {
-      lines.push(`- ${provider.provider || provider.id || 'unknown'}: ${provider.readiness_status || 'unknown'} (${provider.reason_code || 'not-reported'})`);
+      const display = providerDisplayFacts(provider);
+      lines.push(`- ${provider.provider || provider.id || 'unknown'}: ${display.currentness_status} (${display.reason_code})`);
+      lines.push(`  readiness_scope: ${display.readiness_scope}; probe_status: ${display.probe_status}`);
     }
   }
 

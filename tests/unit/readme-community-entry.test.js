@@ -92,23 +92,24 @@ describe('README community entry contract', () => {
       'npm install -g spec-first',
       'spec-first quickstart',
       'Restart the selected host',
-      'spec-runtime-setup',
-      'spec-brainstorm "Improve CLI onboarding for new users"',
+      'Please use spec-brainstorm: I want to reduce repeated requirements clarification',
       'docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md',
+      'spec-runtime-setup',
     ]);
     expectOrdered(readme, [
       'npm install -g spec-first',
       'spec-first quickstart',
       '重启已选择的宿主',
-      'spec-runtime-setup',
-      'spec-brainstorm "改进 CLI 新用户 onboarding"',
+      '请使用 spec-brainstorm：我想减少项目中重复出现的需求澄清',
       'docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md',
+      'spec-runtime-setup',
     ]);
 
     for (const quickstart of [section(readmeEn, 'Quick start'), section(readme, '快速开始')]) {
       expect(quickstart).toContain('Node.js `>=20.0.0`');
       expect(quickstart).toContain('spec-first init --codex -y -u <name> --lang <zh|en>');
-      expect(quickstart).toContain('spec-first doctor --verbose');
+      expect(quickstart).toContain('spec-first doctor');
+      expect(quickstart).toContain('--verbose');
       expect(quickstart).toContain('docs/catalog/runtime-capabilities.md');
       for (const implementationDetail of [
         'Graphify',

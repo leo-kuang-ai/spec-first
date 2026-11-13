@@ -82,4 +82,32 @@ describe('spec-write-tasks current contracts', () => {
     expect(fixture.cases.map((entry) => entry.expected_failure)).not.toContain('missing_spec_id');
     expect(fixture.cases.map((entry) => entry.id)).toContain('source-plan-path-escape');
   });
+
+  // 2026-11-04 复活：该测试曾于 e9fe0769（2026-08-04）重写测试文件时被删未迁移，
+  // 导致 schema「a parity test enforces bidirectional sync」承诺落空（全量审查批次1 X02·P2）。
+  test('task pack schema stays in parity with validator task fields', () => {
+    const {
+      REQUIRED_TASK_FIELDS: required,
+      ALLOWED_TASK_FIELDS: allowed,
+    } = require(path.join(repoRoot, 'src/cli/task-pack.js'));
+
+    const taskCardsStart = schema.indexOf('## Task Cards');
+    const taskCardsEnd = schema.indexOf('## Orientation Evidence');
+    expect(taskCardsStart).toBeGreaterThan(-1);
+    expect(taskCardsEnd).toBeGreaterThan(taskCardsStart);
+    const taskCardsSection = schema.slice(taskCardsStart, taskCardsEnd);
+    const documentedTaskFields = new Set(
+      [...taskCardsSection.matchAll(/^\| `([a-z_]+)` \| /gm)].map((match) => match[1]),
+    );
+
+    for (const field of required) {
+      expect(allowed.has(field)).toBe(true);
+    }
+    for (const field of allowed) {
+      expect(documentedTaskFields.has(field)).toBe(true);
+    }
+    for (const field of documentedTaskFields) {
+      expect(allowed.has(field)).toBe(true);
+    }
+  });
 });

@@ -1,0 +1,56 @@
+'use strict';
+
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+assert.equal(process.env.EVAL_EXIT_CODE, '0', 'Engine success evidence is required');
+const message = process.env.EVAL_FINAL_MESSAGE?.trim();
+assert.ok(message, 'Missing final response');
+assert.ok(process.env.EVAL_TRANSCRIPT_PATH, 'Missing runner trace; call boundaries are unverified');
+const trace = JSON.parse(fs.readFileSync(process.env.EVAL_TRANSCRIPT_PATH, 'utf8'));
+assert.ok(Array.isArray(trace), 'Unsupported transcript');
+const isDispatch = (call) => /(?:^|__)(?:spawn_agent|dispatch_agent|task|agent)$/i.test(call?.name || '');
+const isPriorQuestion = (value) => /[?\uFF1F\uFE56]|please (?:describe|list|share|provide)/i.test(value)
+  && /tried|attempt|\u8bd5\u8fc7|\u5c1d\u8bd5|\u505a\u8fc7/.test(value);
+
+function noDispatch() {
+  assert.ok(!trace.some((entry) => entry.role === 'tool_call' && isDispatch(entry.tool_call)), 'Unexpected worker dispatch');
+}
+
+function priorAttemptQuestion() {
+  assert.ok(isPriorQuestion(message), 'The prior attempts were not requested');
+  let asked = false;
+  for (const entry of trace) {
+    if (entry.role === 'assistant' && isPriorQuestion(entry.content || '')) asked = true;
+    if (entry.role !== 'tool_call') continue;
+    const call = entry.tool_call || {};
+    const args = JSON.stringify(call.arguments || {});
+    if (/ask.*question|request_user_input/i.test(call.name || '') && isPriorQuestion(args)) asked = true;
+    if (!asked) {
+      assert.ok(!isDispatch(call), 'Worker investigation preceded the prior-attempt question');
+      assert.ok(!/apply_patch|write_file|edit_file/i.test(call.name || '') && !/\bsrc[\\/]|\b(?:npm|pnpm|yarn)\s+(?:test|start|run)|\bcurl\b/.test(args), 'Recorded investigation or mutation preceded the prior-attempt question');
+    }
+  }
+}
+
+function oneRouteDecision() {
+  noDispatch();
+  assert.ok(!/(?:Entering|\u8FDB\u5165)\s*spec-/.test(message), 'A routing decision already entered a workflow');
+  const questions = message.match(/[?\uFF1F\uFE56]/g) || [];
+  // \u8F93\u51FA\u5408\u540C\u63A5\u53D7\u82F1\u6587\u4E09\u884C\u683C\u5F0F\u6216\u4E2D\u6587\u5355\u884C\u63A8\u8350\uFF1B\u4E2D\u6587\u5165\u53E3\u9009\u62E9\u540C\u6837\u662F\u5355\u4E00\u51B3\u7B56\uFF0C
+  // \u4E0D\u80FD\u56E0\u4E3A\u8BED\u8A00\u4E0D\u540C\u88AB\u5F53\u6210\u96F6\u63A8\u8350\u3002\u95EE\u9898\u8BA1\u6570\u4F7F\u7528\u4E2D\u82F1/\u5168\u89D2/small question mark\u3002
+  const recommendations = [
+    ...(message.match(/^Recommended entrypoint:\s*\S[^\n]*$/gm) || []),
+    ...(message.match(/^\s*(?:[-*]\s*)?(?:\*\*)?(?:\u63A8\u8350\u5165\u53E3|\u5EFA\u8BAE\u5165\u53E3)(?:\*\*)?\s*[:\uFF1A]\s*\S[^\n]*$/gm) || []),
+    ...(message.match(/^\s*(?:[-*]\s*)?(?:\*\*)?\u5EFA\u8BAE\u4F7F\u7528(?:\*\*)?\s*[:\uFF1A]?\s*spec-\S*[^\n]*$/gm) || []),
+  ];
+  if (questions.length && recommendations.length) {
+    assert.fail('A recommendation must not also ask the user a question');
+  }
+  assert.ok((questions.length === 1 && recommendations.length === 0)
+    || (questions.length === 0 && recommendations.length === 1), 'Expected one question or one recommendation');
+}
+
+function missingDocumentPath() {
+  noDispatch();
+  assert.equal(message, 'Review failed: non-interactive mode requires a document path. Expected arguments: mode:non-interactive <path>');
+}

@@ -1,3 +1,5 @@
+const { getSupportedPlatforms, getPlatformDisplayName } = require('./adapters');
+
 const BrandColors = {
   brand: '\x1b[36m',
   write: '\x1b[32m',
@@ -17,7 +19,14 @@ const LOGO_LINES = [
   '███████║██║     ███████╗╚██████╗          ██║     ██║██║  ██║███████║   ██║   ',
   '╚══════╝╚═╝     ╚══════╝ ╚═════╝          ╚═╝     ╚═╝╚═╝  ╚═╝╚══════╝   ╚═╝   ',
 ];
-const TAGLINE = 'AI coding harness for Claude Code, Codex, Kiro, Qoder, Cursor, and OpenCode preview';
+// 宿主清单从 registry 派生（与 usage/flag 文案同一事实源）：新增宿主时 tagline
+// 自动扩展，不再是一个会漏改的手写同步点。
+function buildTagline() {
+  const names = getSupportedPlatforms().map((platform) => getPlatformDisplayName(platform));
+  if (names.length <= 1) return `AI coding harness for ${names.join('')}`;
+  return `AI coding harness for ${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`;
+}
+const TAGLINE = buildTagline();
 // art 与品牌行左侧缩进,保持与分隔线对齐的呼吸感。
 const INDENT = ' ';
 

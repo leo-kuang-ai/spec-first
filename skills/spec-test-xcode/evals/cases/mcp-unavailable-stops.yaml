@@ -16,7 +16,6 @@ expect:
     - "XcodeBuildMCP"
 
 judge:
-  type: rule_based
-  success:
-    - output_contains:
-        all: ["XcodeBuildMCP"]
+  type: script
+  script_path: evals/fixtures/scripts/check-xcode-mcp-unavailable.sh
+  timeout_seconds: 30

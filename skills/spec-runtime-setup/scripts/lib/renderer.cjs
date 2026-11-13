@@ -1,5 +1,9 @@
 'use strict';
 
+const { renderCommand } = require('./command-display.cjs');
+
+const { providerDisplayFacts } = require('./provider-display.cjs');
+
 const REVIEW_RISK_FLAGS = new Set([
   'unpinned-npx',
   'global-npx-execution',
@@ -24,6 +28,7 @@ function renderInstallPlan(plan = {}) {
     overall_status: plan.overall_status || (blocked ? 'action-required' : 'ready'),
     reason_code: plan.reason_code || null,
     mode: plan.mode || 'plan',
+    readiness_scope: plan.args && plan.args.installationOnly ? 'installation' : 'artifact',
     optional_provider_selection: normalizeOptionalProviderSelection(plan, selectedIds, blocked),
     provider_selection: providerSelection,
     planned_operations: plannedOperations,
@@ -237,9 +242,9 @@ function renderHumanSummary(
   }
   lines.push('', 'Provider 工具');
   for (const provider of toolFacts.provider_readiness || []) {
-    const status = provider.readiness_status || 'unknown';
-    const reasonCode = provider.reason_code || (status === 'fresh' ? 'ready' : 'unknown');
-    lines.push(`- ${provider.provider || provider.id}: ${status} (${reasonCode})`);
+    const display = providerDisplayFacts(provider);
+    lines.push(`- ${provider.provider || provider.id}: ${display.currentness_status} (${display.reason_code})`);
+    lines.push(`  readiness_scope: ${display.readiness_scope}; probe_status: ${display.probe_status}`);
     const steadyState = provider.steady_state || {};
     if (steadyState.hook_status) {
       if (steadyState.hook_status === 'blocked') {
@@ -257,6 +262,16 @@ function renderHumanSummary(
   }
   lines.push('', '后续步骤');
   const nextActions = [];
+  const providerNeedsInit = (toolFacts.provider_readiness || []).some((provider) => {
+    const lifecycle = provider.lifecycle || {};
+    return lifecycle.installed === true && (lifecycle.initialized !== true || lifecycle.artifact_exists !== true);
+  });
+  const repoRoot = runtimeCapabilities.repo_root || (runtimeCapabilities.target && runtimeCapabilities.target.target_root);
+  if (execution.overall_status === 'action-required' && providerNeedsInit && repoRoot) {
+    const targetFlag = runtimeCapabilities.target && runtimeCapabilities.target.target_kind === 'non-git-folder' ? '--folder' : '--repo';
+    nextActions.push(`Run full project setup for host ${runtimeCapabilities.host || '<host>'} (select MCP_SETUP_HOST in your shell):\n${renderCommand(['spec-runtime-setup', '--only', 'codegraph,graphify', targetFlag, repoRoot])}`);
+    nextActions.push('仅需生成 setup facts 时使用 --verify-only；仅需本地配置覆盖时使用 --project-config。');
+  }
   if (manifest.status === 'stale' || manifest.status === 'missing') {
     nextActions.push('对所选 topology 运行 spec-first init，然后重新运行 spec-runtime-setup --verify-only。');
   }
@@ -284,9 +299,13 @@ function renderHumanSummary(
 
 function deriveExecutionSummary({ toolFacts, summary, manifest }) {
   const itemActionRequired = (toolFacts.items || []).some((item) => item.result === 'action-required');
-  const providerActionRequired = (toolFacts.provider_readiness || []).some((provider) => (
-    ['degraded', 'failed', 'blocked'].includes(provider.readiness_status)
-  ));
+  const providerActionRequired = (toolFacts.provider_readiness || []).some((provider) => {
+    const hookStatus = provider.steady_state && provider.steady_state.hook_status;
+    // 外部/不可接管 hook 是可选稳态能力，不得覆盖已通过的核心 Provider readiness。
+    if (provider.provider === 'graphify'
+      && ['blocked', 'verified-external', 'skipped'].includes(hookStatus)) return false;
+    return ['degraded', 'failed', 'blocked'].includes(provider.readiness_status);
+  });
   const actionRequired = summary.baseline_ready !== true
     || summary.host_runtime_ready !== true
     || ['stale', 'missing'].includes(manifest.status)

@@ -41,6 +41,13 @@ describe('SessionStart using-spec-first entry pointer', () => {
       envName: 'QODER_PROJECT_DIR',
       input: '{}',
     },
+    {
+      host: 'zcode',
+      instructionFile: 'AGENTS.md',
+      runtimeSkill: '.agents/skills/using-spec-first/SKILL.md',
+      envName: 'ZCODE_PROJECT_DIR',
+      input: '{}',
+    },
   ])('$host recognizes the new managed block and emits its runtime path', ({
     host,
     instructionFile,

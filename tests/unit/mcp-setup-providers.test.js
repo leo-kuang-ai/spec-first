@@ -6,6 +6,8 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const { validateAgainstSchema } = require('../../src/contracts/schema-validator');
 
+const codegraphStatus = require('../fixtures/mcp-setup/codegraph-status.cjs');
+
 const repoRoot = path.resolve(__dirname, '..', '..');
 const providerSchema = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs', 'contracts', 'provider-readiness.schema.json'), 'utf8'));
 
@@ -50,10 +52,20 @@ function materializeGraphifyProjectSkill(target, args) {
     cursor: '.cursor/skills/graphify',
     kiro: '.kiro/skills/graphify',
     qoder: '.qoder/skills/graphify',
+    opencode: '.opencode/skills/graphify',
+    agents: '.agents/skills/graphify',
   };
   const skillDir = path.join(target, roots[platform] || '.codex/skills/graphify');
   fs.mkdirSync(skillDir, { recursive: true });
   fs.writeFileSync(path.join(skillDir, 'SKILL.md'), '# Graphify\n');
+  if (platform === 'opencode') {
+    fs.mkdirSync(path.join(target, '.opencode', 'plugins'), { recursive: true });
+    fs.writeFileSync(path.join(target, '.opencode', 'plugins', 'graphify.js'), '// graphify plugin\n');
+    fs.writeFileSync(
+      path.join(target, '.opencode', 'opencode.json'),
+      JSON.stringify({ plugin: ['.opencode/plugins/graphify.js'] }, null, 2),
+    );
+  }
 }
 
 function materializePythonGraphifyHooks(
@@ -122,6 +134,10 @@ function createGraphifyApplyFixture(label) {
     }
     if (command === launcher && args[0] === '--version') return success('graphify 0.9.12');
     if (command === launcher) graphifyCalls.push({ args: [...args], env: { ...(options.env || {}) } });
+    if (command === launcher && args[0] === 'install') {
+      materializeGraphifyProjectSkill(target, args);
+      return success('installed');
+    }
     if (command === launcher && args[0] === 'extract') {
       fs.mkdirSync(path.join(target, 'graphify-out'), { recursive: true });
       fs.writeFileSync(path.join(target, 'graphify-out', 'graph.json'), JSON.stringify({ nodes: [{ id: 'fixture' }], links: [] }));
@@ -205,13 +221,13 @@ describe('CodeGraph provider', () => {
     const calls = [];
     const runner = (command, args) => {
       calls.push([command, ...args]);
-      if (args[0] === '--version') return success('codegraph 1.5.0');
+      if (args[0] === '--version') return success('codegraph 1.6.0');
       if (args[0] === 'init') {
         fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
         fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
         return success();
       }
-      if (args[0] === 'status') return success('index ready');
+      if (args[0] === 'status') return success(codegraphStatus(target));
       if (args[0] === 'query') return success('{}');
       return failure(`unexpected ${command} ${args.join(' ')}`);
     };
@@ -220,7 +236,8 @@ describe('CodeGraph provider', () => {
       probeDependency: true,
       configured: true,
       repoRoot: target,
-      dependency: { package: '@colbymchenry/codegraph', version: '1.5.0' },
+      env: {},
+      dependency: { package: '@colbymchenry/codegraph', version: '1.6.0' },
       runner,
     };
 
@@ -233,7 +250,7 @@ describe('CodeGraph provider', () => {
       artifact_root_relative: '.codegraph',
     });
     expect(result).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       lifecycle: {
         initialized: true,
         indexed: true,
@@ -253,7 +270,7 @@ describe('CodeGraph provider', () => {
     const executable = path.join(binRoot, process.platform === 'win32' ? 'codegraph.cmd' : 'codegraph');
     fs.writeFileSync(executable, process.platform === 'win32' ? '@exit /b 0\r\n' : '#!/bin/sh\nexit 0\n');
     fs.chmodSync(executable, 0o755);
-    const runner = jest.fn(() => success('codegraph 1.5.0'));
+    const runner = jest.fn(() => success('codegraph 1.6.0'));
 
     const resolved = provider.resolveCodegraphCommand({
       repoRoot: target,
@@ -262,7 +279,7 @@ describe('CodeGraph provider', () => {
         PATH: binRoot,
         PATHEXT: '.CMD;.EXE',
       },
-      dependency: { version: '1.5.0' },
+      dependency: { version: '1.6.0' },
     }, target);
 
     expect(resolved).toMatchObject({ ok: true, command: executable });
@@ -288,7 +305,7 @@ describe('CodeGraph provider', () => {
     let statusCount = 0;
     const runner = (command, args) => {
       calls.push([command, ...args]);
-      if (args[0] === '--version') return success('codegraph 1.5.0');
+      if (args[0] === '--version') return success('codegraph 1.6.0');
       if (args[0] === 'init') {
         fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
         fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
@@ -296,9 +313,9 @@ describe('CodeGraph provider', () => {
       }
       if (args[0] === 'status') {
         statusCount += 1;
-        if (statusCount === 1) return success('pending changes; run codegraph sync');
-        if (statusCount === 2) return success('full rebuild recommended; run codegraph index -f');
-        return success('index ready');
+        if (statusCount === 1) return success(codegraphStatus(target, { pendingChanges: { added: 1, modified: 0, removed: 0 } }));
+        if (statusCount === 2) return success(codegraphStatus(target, { index: { state: 'complete', pendingRefs: 0, reindexRecommended: true } }));
+        return success(codegraphStatus(target));
       }
       return success();
     };
@@ -307,13 +324,16 @@ describe('CodeGraph provider', () => {
     const plan = provider.plan({
       selected: true,
       repoRoot: target,
-      dependency: { package: '@colbymchenry/codegraph', version: '1.5.0' },
+      env: {},
+      probeDependency: true,
+      runner,
+      dependency: { package: '@colbymchenry/codegraph', version: '1.6.0' },
     });
     expect(plan).toMatchObject({ mutation: true, blocked: false, provider: 'codegraph' });
 
-    const result = provider.apply({ repoRoot: target, runner, configured: true }, plan);
+    const result = provider.apply({ repoRoot: target, env: {}, runner, configured: true }, plan);
     expect(validateAgainstSchema(providerSchema, result)).toEqual({ valid: true, errors: [] });
-    expect(result.readiness_status).toBe('fresh');
+    expect(result.readiness_status).toBe('unknown');
     expect(result.lifecycle).toMatchObject({
       installed: true,
       initialized: true,
@@ -331,13 +351,13 @@ describe('CodeGraph provider', () => {
     const calls = [];
     const runner = (command, args) => {
       calls.push([command, ...args]);
-      if (args[0] === '--version') return success('codegraph 1.5.0');
+      if (args[0] === '--version') return success('codegraph 1.6.0');
       if (args[0] === 'init') {
         fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
         fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
         return success();
       }
-      if (args[0] === 'status') return success('pending changes; run codegraph sync');
+      if (args[0] === 'status') return success(codegraphStatus(target, { pendingChanges: { added: 1, modified: 0, removed: 0 } }));
       if (args[0] === 'sync') return { ...failure(''), stdout: 'Maximum call stack size exceeded' };
       return success();
     };
@@ -345,9 +365,12 @@ describe('CodeGraph provider', () => {
     const plan = provider.plan({
       selected: true,
       repoRoot: target,
-      dependency: { package: '@colbymchenry/codegraph', version: '1.5.0' },
+      env: {},
+      probeDependency: true,
+      runner,
+      dependency: { package: '@colbymchenry/codegraph', version: '1.6.0' },
     });
-    const result = provider.apply({ repoRoot: target, runner, configured: true }, plan);
+    const result = provider.apply({ repoRoot: target, env: {}, runner, configured: true }, plan);
 
     expect(result.readiness_status).toBe('degraded');
     expect(result.limitations).toContain('failed: codegraph-sync-stack-overflow. CodeGraph setup 失败。');
@@ -358,24 +381,25 @@ describe('CodeGraph provider', () => {
   test.each([
     ['unknown', undefined, 'unknown'],
     ['not configured', false, 'degraded'],
-    ['configured', true, 'fresh'],
+    ['configured', true, 'unknown'],
   ])('reports indexed CLI readiness as %s when host configuration is %s', (_label, configured, expected) => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
     const target = tempRepo(`codegraph-config-${expected}`);
     fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
     fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
     const runner = (_command, args) => {
-      if (args[0] === '--version') return success('codegraph 1.5.0');
-      if (args[0] === 'status') return success('index ready');
+      if (args[0] === '--version') return success('codegraph 1.6.0');
+      if (args[0] === 'status') return success(codegraphStatus(target));
       if (args[0] === 'query') return success('{}');
       return success();
     };
 
     const result = provider.verify({
       repoRoot: target,
+      env: {},
       runner,
       configured,
-      dependency: { version: '1.5.0' },
+      dependency: { version: '1.6.0' },
     });
 
     expect(result.readiness_status).toBe(expected);
@@ -414,19 +438,22 @@ describe('CodeGraph provider', () => {
     fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
     fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
     const runner = (_command, args) => {
-      if (args[0] === '--version') return success('codegraph 1.5.0');
-      if (args[0] === 'status') return success('pending changes; run codegraph sync');
+      if (args[0] === '--version') return success('codegraph 1.6.0');
+      if (args[0] === 'status') return success(codegraphStatus(target, { pendingChanges: { added: 1, modified: 0, removed: 0 } }));
       return success();
     };
 
     const result = provider.verify({
       repoRoot: target,
+      env: {},
       runner,
       configured: true,
-      dependency: { version: '1.5.0' },
+      dependency: { version: '1.6.0' },
     });
 
-    expect(result.readiness_status).toBe('degraded');
+    expect(result.readiness_status).toBe('unknown');
+    expect(result.lifecycle.query_verified).toBe(false);
+    expect(result.limitations).toContain('codegraph-artifact-evidence-missing');
     expect(result.next_actions).toContain(
       '运行 spec-runtime-setup --only codegraph，修复 CodeGraph index/query readiness。',
     );
@@ -438,16 +465,18 @@ describe('CodeGraph provider', () => {
     fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
     fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
     const runner = (_command, args) => {
-      if (args[0] === '--version') return success('codegraph 1.5.0');
-      if (args[0] === 'status') return success('index ready');
+      if (args[0] === '--version') return success('codegraph 1.6.0');
+      if (args[0] === 'status') return success(codegraphStatus(target));
       if (args[0] === 'query') return failure('query failed');
       return success();
     };
     const context = {
       selected: true,
       repoRoot: target,
-      dependency: { package: '@colbymchenry/codegraph', version: '1.5.0' },
+      env: {},
+      probeDependency: true,
       runner,
+      dependency: { package: '@colbymchenry/codegraph', version: '1.6.0' },
     };
 
     const result = provider.apply(context, provider.plan(context));
@@ -469,7 +498,7 @@ describe('CodeGraph provider', () => {
       blocked: true,
       reason_code: 'codegraph-artifact-symlink-escape',
     });
-    const result = provider.apply({ selected: true, repoRoot: target, runner });
+    const result = provider.apply({ selected: true, repoRoot: target, env: {}, runner });
     expect(result.readiness_status).toBe('degraded');
     expect(fs.readdirSync(outside)).toEqual([]);
     expect(runner).toHaveBeenCalledTimes(1);
@@ -489,27 +518,94 @@ describe('CodeGraph provider', () => {
   });
 
   test.each([
-    ['pending changes remain after sync', 'pending changes; run codegraph sync', 'codegraph-sync-incomplete'],
-    ['full rebuild remains after reindex', 'full rebuild recommended; run codegraph index -f', 'codegraph-post-mutation-probe-failed'],
+    ['partial', { index: { state: 'partial', pendingRefs: 0, reindexRecommended: false } }],
+    ['indexing', { index: { state: 'indexing', pendingRefs: 0, reindexRecommended: false } }],
+    ['failed', { index: { state: 'failed', pendingRefs: 0, reindexRecommended: false } }],
+    ['missing-state', { index: { pendingRefs: 0, reindexRecommended: false } }],
+    ['pending-refs', { index: { state: 'complete', pendingRefs: 2, reindexRecommended: false } }],
+    ['pending-files', { pendingChanges: { added: 1, modified: 0, removed: 0 } }],
+    ['worktree-mismatch', { worktreeMismatch: { worktreeRoot: '/other', indexRoot: '/old' } }],
+    ['wrong-root', { projectPath: '/other' }],
+    ['missing-pending', { pendingChanges: null }],
+  ])('CodeGraph JSON %s 不能仅因退出 0 成为 indexed 或执行 query', (_label, overrides) => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
+    const target = tempRepo('codegraph-json');
+    try {
+      fs.mkdirSync(path.join(target, '.codegraph')); fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
+      const runner = jest.fn((_command, args) => success(args[0] === '--version' ? 'codegraph 1.6.0' : codegraphStatus(target, overrides)));
+      const context = { repoRoot: target, env: {}, runner, configured: true, dependency: { version: '1.6.0' } };
+      const result = provider.apply(context, { mutation: true, dependency_version: '1.6.0', actions: [] });
+      expect(result.readiness_status).toBe('degraded');
+      expect(result.lifecycle.indexed).toBe(false);
+      expect(runner.mock.calls.some(([, args]) => args[0] === 'query')).toBe(false);
+    } finally {
+      fs.rmSync(target, { recursive: true, force: true });
+    }
+  });
+
+  test.each(['index ready', '{}', '{broken', 'null'])('CodeGraph 未识别 status %s 不执行 query', (output) => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
+    const target = tempRepo('codegraph-unrecognized-status');
+    try {
+      fs.mkdirSync(path.join(target, '.codegraph')); fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
+      const runner = jest.fn((_command, args) => success(args[0] === '--version' ? 'codegraph 1.6.0' : output));
+      const result = provider.apply({ repoRoot: target, env: {}, runner }, { mutation: true, dependency_version: '1.6.0', actions: [] });
+      expect(result.readiness_status).toBe('degraded');
+      expect(runner.mock.calls.some(([, args]) => args[0] === 'query')).toBe(false);
+    } finally {
+      fs.rmSync(target, { recursive: true, force: true });
+    }
+  });
+
+  test.each(['partial', null])('CodeGraph %s 经原生重建成为 complete 后允许 query', (initialState) => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
+    const target = tempRepo('codegraph-json-repair');
+    try {
+      fs.mkdirSync(path.join(target, '.codegraph')); fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
+      let rebuilt = false;
+      const runner = jest.fn((_command, args) => {
+        if (args[0] === '--version') return success('codegraph 1.6.0');
+        if (args[0] === 'index') { rebuilt = true; return success(); }
+        if (args[0] === 'status') {
+          expect(args).toEqual(['status', '--json']);
+          return success(codegraphStatus(target, { index: { state: rebuilt ? 'complete' : initialState, pendingRefs: 0, reindexRecommended: !rebuilt && initialState === null } }));
+        }
+        return success('[]');
+      });
+      const result = provider.apply({ repoRoot: target, env: {}, runner }, { mutation: true, dependency_version: '1.6.0', actions: [] });
+      expect(result.lifecycle.indexed).toBe(true);
+      expect(result.lifecycle.query_verified).toBe(true);
+      expect(runner.mock.calls.filter(([, args]) => args[0] === 'index')).toHaveLength(1);
+    } finally {
+      fs.rmSync(target, { recursive: true, force: true });
+    }
+  });
+
+  test.each([
+    ['pending changes remain after sync', { pendingChanges: { added: 1, modified: 0, removed: 0 } }, 'codegraph-sync-incomplete'],
+    ['full rebuild remains after reindex', { index: { state: 'complete', pendingRefs: 0, reindexRecommended: true } }, 'codegraph-post-mutation-probe-failed'],
   ])('degrades when %s', (_label, statusOutput, reasonCode) => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
     const target = tempRepo(`codegraph-residual-${reasonCode}`);
     const runner = (command, args) => {
-      if (args[0] === '--version') return success('codegraph 1.5.0');
+      if (args[0] === '--version') return success('codegraph 1.6.0');
       if (args[0] === 'init') {
         fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
         fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
         return success();
       }
-      if (args[0] === 'status') return success(statusOutput);
+      if (args[0] === 'status') return success(codegraphStatus(target, statusOutput));
       return success();
     };
     const plan = provider.plan({
       selected: true,
       repoRoot: target,
-      dependency: { package: '@colbymchenry/codegraph', version: '1.5.0' },
+      env: {},
+      probeDependency: true,
+      runner,
+      dependency: { package: '@colbymchenry/codegraph', version: '1.6.0' },
     });
-    const result = provider.apply({ repoRoot: target, runner }, plan);
+    const result = provider.apply({ repoRoot: target, env: {}, runner }, plan);
     expect(result.readiness_status).toBe('degraded');
     expect(result.limitations).toContain(`failed: ${reasonCode}. CodeGraph setup 失败。`);
     expect(result.lifecycle.indexed).toBe(false);
@@ -521,12 +617,13 @@ describe('CodeGraph provider', () => {
     fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
     fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
     const runner = (_command, args) => signalTermination(
-      args[0] === '--version' ? 'codegraph 1.5.0' : 'index ready',
+      args[0] === '--version' ? 'codegraph 1.6.0' : 'index ready',
     );
 
     const result = provider.verify({
       repoRoot: target,
-      dependency: { version: '1.5.0' },
+      env: {},
+      dependency: { version: '1.6.0' },
       runner,
     });
 
@@ -536,6 +633,67 @@ describe('CodeGraph provider', () => {
 });
 
 describe('Graphify provider', () => {
+  test('maps the zcode host onto the graphify agents platform end to end', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('zcode-agents-platform');
+    fixture.context.host = 'zcode';
+
+    const plan = provider.plan(fixture.context);
+    const installAction = (plan.actions || []).find((action) => action.kind === 'install-project-skill');
+    expect(installAction.args).toEqual(['install', '--project', '--platform', 'agents']);
+
+    const result = provider.apply(fixture.context, plan);
+    expect(result).toMatchObject({
+      readiness_status: 'unknown',
+      lifecycle: { initialized: true, indexed: true, query_verified: true },
+    });
+    expect(fs.existsSync(path.join(fixture.target, '.agents', 'skills', 'graphify', 'SKILL.md'))).toBe(true);
+    expect(fixture.graphifyCalls.some((call) => call.args.join(' ') === 'install --project --platform agents')).toBe(true);
+    expect(provider.verify({ ...fixture.context, repoRoot: fixture.target })).toMatchObject({
+      lifecycle: expect.objectContaining({ configured: true }),
+    });
+  });
+
+  test('maps the pi host onto the graphify agents platform end to end', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('pi-agents-platform');
+    fixture.context.host = 'pi';
+
+    const plan = provider.plan(fixture.context);
+    const installAction = (plan.actions || []).find((action) => action.kind === 'install-project-skill');
+    expect(installAction.args).toEqual(['install', '--project', '--platform', 'agents']);
+
+    const result = provider.apply(fixture.context, plan);
+    expect(result).toMatchObject({
+      readiness_status: 'unknown',
+      lifecycle: { initialized: true, indexed: true, query_verified: true },
+    });
+    expect(fs.existsSync(path.join(fixture.target, '.agents', 'skills', 'graphify', 'SKILL.md'))).toBe(true);
+    expect(provider.verify({ ...fixture.context, repoRoot: fixture.target })).toMatchObject({
+      lifecycle: expect.objectContaining({ configured: true }),
+    });
+  });
+
+  test('verifies the opencode host against its native graphify platform surfaces', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('opencode-native-platform');
+    fixture.context.host = 'opencode';
+
+    const plan = provider.plan(fixture.context);
+    const installAction = (plan.actions || []).find((action) => action.kind === 'install-project-skill');
+    expect(installAction.args).toEqual(['install', '--project', '--platform', 'opencode']);
+
+    const result = provider.apply(fixture.context, plan);
+    expect(result).toMatchObject({
+      readiness_status: 'unknown',
+      lifecycle: { initialized: true, indexed: true, query_verified: true },
+    });
+    expect(fs.existsSync(path.join(fixture.target, '.opencode', 'skills', 'graphify', 'SKILL.md'))).toBe(true);
+    expect(provider.verify({ ...fixture.context, repoRoot: fixture.target })).toMatchObject({
+      lifecycle: expect.objectContaining({ configured: true }),
+    });
+  });
+
   test('generates a graph in a standalone non-Git folder and skips only Git hook automation', () => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const fixture = createGraphifyApplyFixture('non-git-folder');
@@ -660,7 +818,7 @@ describe('Graphify provider', () => {
     expect(hookCalls).toEqual([]);
     expect(fs.readdirSync(outsideHooks).map((name) => [name, fs.readFileSync(path.join(outsideHooks, name), 'utf8')])).toEqual(before);
     expect(result).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       lifecycle: {
         configured: true,
         initialized: true,
@@ -692,6 +850,7 @@ describe('Graphify provider', () => {
     });
     expect(verified.next_actions).toEqual([
       expect.stringContaining('可选 commit-time 自动刷新未检测到'),
+      expect.stringContaining('构图未取得完整源码快照'),
     ]);
     expect(verified.next_actions.join('\n')).toContain('也不写入外部 hook');
     expect(verified.next_actions.join('\n')).not.toContain('执行显式 incremental refresh');
@@ -939,6 +1098,79 @@ describe('Graphify provider', () => {
     });
   });
 
+  test.each([false, true])('构图前后源码绑定只接受稳定内容，构图期间变化=%s', (changeSource) => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('generation-source-binding');
+    try {
+      fs.rmSync(path.join(fixture.target, '.git'), { recursive: true, force: true });
+      fs.writeFileSync(path.join(fixture.target, 'main.js'), 'module.exports = 1;');
+      const context = { ...fixture.context, targetKind: 'non-git-folder', runner: (command, args, options) => {
+        const result = fixture.context.runner(command, args, options);
+        if (changeSource && command === fixture.launcher && args[0] === 'extract') {
+          fs.writeFileSync(path.join(fixture.target, 'main.js'), 'module.exports = 2;');
+        }
+        return result;
+      } };
+      const result = provider.apply(context, provider.plan(context));
+      const receipt = JSON.parse(fs.readFileSync(path.join(fixture.target, 'graphify-out', 'spec-first-graph-scope.json')));
+      if (changeSource) {
+        expect(receipt.source_snapshot).toBeNull();
+        expect(result.first_generation.scope_provenance.source_reason_code).toBe('graphify-source-changed-during-generation');
+        expect(result.readiness_status).toBe('degraded');
+      } else {
+        expect(result.readiness_status).toBe('fresh');
+        expect(receipt.source_snapshot).toMatchObject({ schema_version: 'setup-source-snapshot.v2', source_kind: 'folder', source_content_sha256: expect.stringMatching(/^[a-f0-9]{64}$/) });
+        expect(result.first_generation.scope_provenance.source_snapshot).toEqual(receipt.source_snapshot);
+      }
+      expect(validateAgainstSchema(providerSchema, result).valid).toBe(true);
+    } finally {
+      fs.rmSync(fixture.target, { recursive: true, force: true });
+      fs.rmSync(fixture.homeDir, { recursive: true, force: true });
+    }
+  });
+
+  test.each(['query-graph', 'final-probe-graph', 'query-identity'])('Graphify %s 漂移不能绑定未验证的对象', (change) => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('query-evidence-drift');
+    try {
+      fs.rmSync(path.join(fixture.target, '.git'), { recursive: true, force: true });
+      fs.writeFileSync(path.join(fixture.target, 'main.js'), 'module.exports = 1;');
+      let queried = false;
+      const context = { ...fixture.context, targetKind: 'non-git-folder', runner: (command, args, options) => {
+        const result = fixture.context.runner(command, args, options);
+        if (command === fixture.launcher && args[0] === 'query') {
+          queried = true;
+          if (change === 'query-graph') fs.writeFileSync(path.join(fixture.target, 'graphify-out', 'graph.json'), JSON.stringify({ nodes: [{ id: 'replaced' }], links: [] }));
+        }
+        if (queried && change === 'final-probe-graph' && command === fixture.interpreter && args[0] === '-c') fs.writeFileSync(path.join(fixture.target, 'graphify-out', 'graph.json'), JSON.stringify({ nodes: [{ id: 'replaced' }], links: [] }));
+        if (queried && change === 'query-identity' && command === fixture.interpreter && args[0] === '-c') {
+          return success(JSON.stringify({ version: '0.9.12', packages: [['graphifyy', '0.9.12'], ['changed', '1']] }));
+        }
+        return result;
+      } };
+      const result = provider.apply(context, provider.plan(context));
+      expect(result.readiness_status).toBe('degraded');
+      expect(result.limitations.join(' ')).toMatch(/graphify-(artifact|identity)-changed-during-verification/);
+    } finally {
+      fs.rmSync(fixture.target, { recursive: true, force: true });
+      fs.rmSync(fixture.homeDir, { recursive: true, force: true });
+    }
+  });
+
+  test('无 HEAD 的 Git 目录无法采集源码身份，成功构图也保持 unknown', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('generation-source-unavailable');
+    try {
+      const result = provider.apply(fixture.context, provider.plan(fixture.context));
+      expect(result.first_generation.scope_provenance.source_reason_code).toBe('graphify-source-snapshot-unavailable');
+      expect(result.lifecycle.query_verified).toBe(true);
+      expect(result.readiness_status).toBe('unknown');
+    } finally {
+      fs.rmSync(fixture.target, { recursive: true, force: true });
+      fs.rmSync(fixture.homeDir, { recursive: true, force: true });
+    }
+  });
+
   test('does not follow a symlinked Graphify scope receipt', () => {
     if (process.platform === 'win32') return;
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
@@ -991,7 +1223,7 @@ describe('Graphify provider', () => {
 
     const result = provider.refresh(refreshContext, actionPlan);
     expect(result).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       lifecycle: { artifact_exists: true, query_verified: true },
       steady_state: {
         refresh_mode: 'manual-only',
@@ -1079,7 +1311,7 @@ describe('Graphify provider', () => {
 
     const result = provider.apply(fixture.context, actionPlan);
     expect(result).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       lifecycle: { artifact_exists: true, query_verified: true },
     });
     expect(fs.existsSync(path.join(fixture.target, '.graphify'))).toBe(false);
@@ -1183,7 +1415,7 @@ describe('Graphify provider', () => {
       env: expect.objectContaining({ GRAPHIFY_OUT: path.join('..', '..', 'graphify-out') }),
     });
     expect(result).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       lifecycle: { artifact_exists: true, query_verified: true },
       first_generation: {
         scope: 'user-specified',
@@ -1233,7 +1465,7 @@ describe('Graphify provider', () => {
     expect(fs.existsSync(path.join(customHooks, 'post-commit'))).toBe(true);
     expect(fs.existsSync(path.join(fixture.target, '.git', 'hooks', 'post-commit'))).toBe(false);
     expect(result).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       steady_state: {
         refresh_mode: 'skill-cli-hook-on-demand',
         hook_installed: true,
@@ -1243,6 +1475,66 @@ describe('Graphify provider', () => {
       },
     });
     expect(validateAgainstSchema(providerSchema, result)).toEqual({ valid: true, errors: [] });
+  });
+
+  test('Graphify 图操作后发布当前安装身份，并拒绝执行期间的版本漂移', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    for (const changedVersion of [false, true]) {
+      const fixture = createGraphifyApplyFixture('identity-after-apply');
+      const actionPlan = provider.plan(fixture.context);
+      const original = fixture.context.runner;
+      let queried = false;
+      fixture.context.runner = (command, args, options) => {
+        if (command === fixture.launcher && args[0] === 'query') queried = true;
+        if (queried && changedVersion && command === fixture.interpreter && args[0] === '-c') {
+          return success(JSON.stringify({ version: '9.9.9', packages: [['graphifyy', '9.9.9']] }));
+        }
+        return original(command, args, options);
+      };
+      try {
+        const result = provider.apply(fixture.context, actionPlan);
+        if (changedVersion) {
+          expect(result.readiness_status).toBe('degraded');
+          expect(result).not.toHaveProperty('provider_identity');
+          expect(result.limitations.join(' ')).toContain('graphify-package-version-mismatch');
+        } else {
+          expect(result.provider_identity).toMatchObject({ package: 'graphifyy', version: '0.9.12', installer: 'uv' });
+        }
+      } finally {
+        fs.rmSync(fixture.target, { recursive: true, force: true });
+        fs.rmSync(fixture.homeDir, { recursive: true, force: true });
+      }
+    }
+  });
+
+  test('执行期间 launcher 更换 interpreter 时不混用旧身份', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('identity-interpreter-drift');
+    const second = path.join(fixture.homeDir, '.local', 'share', 'uv', 'tools', 'graphifyy', 'other-python');
+    fs.writeFileSync(second, '#!/bin/sh\n');
+    fs.chmodSync(second, 0o755);
+    const original = fixture.context.runner;
+    let switched = false;
+    fixture.context.runner = (command, args, options) => {
+      if (command === fixture.launcher && args[0] === 'query' && !switched) {
+        fs.writeFileSync(fixture.launcher, `#!${second}\n`);
+        switched = true;
+      }
+      if (command === second && args[0] === '-c') return success(JSON.stringify({ version: '0.9.12', packages: [['graphifyy', '0.9.12'], ['different', '1.0.0']] }));
+      return original(command, args, options);
+    };
+    try {
+      const result = provider.apply(fixture.context, provider.plan(fixture.context));
+      expect(result.provider_identity.interpreter).toBe(second);
+      expect(result.provider_identity.inventory_sha256).toBe(
+        require('node:crypto').createHash('sha256')
+          .update(JSON.stringify([['graphifyy', '0.9.12'], ['different', '1.0.0']].map((entry) => JSON.stringify(entry)).sort()))
+          .digest('hex'),
+      );
+    } finally {
+      fs.rmSync(fixture.target, { recursive: true, force: true });
+      fs.rmSync(fixture.homeDir, { recursive: true, force: true });
+    }
   });
 
   test('re-resolves a stale plan before hook mutation and blocks a newly external target', () => {
@@ -1257,7 +1549,7 @@ describe('Graphify provider', () => {
     const result = provider.apply(fixture.context, actionPlan);
     expect(fixture.hookCalls).toEqual([]);
     expect(result).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       steady_state: {
         refresh_mode: 'manual-only',
         hook_status: 'blocked',
@@ -1282,14 +1574,15 @@ describe('Graphify provider', () => {
     expect(fixture.hookCalls.map((call) => call.args.join(' '))).toEqual(['hook status', 'hook install']);
     expect(fs.readFileSync(path.join(customHooks, 'post-commit'), 'utf8')).not.toContain('# spec-first graphify artifact env start');
     expect(result).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'degraded',
       steady_state: {
         refresh_mode: 'manual-only',
         hook_verified: false,
         hook_status: 'blocked',
-        hook_skipped_reason: 'graphify-hook-target-changed',
+        hook_skipped_reason: 'graphify-hook-path-outside-project',
       },
     });
+    expect(result.limitations.join(' ')).toContain('graphify-hook-target-changed');
   });
 
   test('blocks a contained hooks root that escapes through a symlink without reading the external target', () => {
@@ -1311,7 +1604,7 @@ describe('Graphify provider', () => {
     expect(fixture.hookCalls).toEqual([]);
     expect(fs.readFileSync(path.join(outsideHooks, 'sentinel'), 'utf8')).toBe('preserve\n');
     expect(result).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       steady_state: {
         refresh_mode: 'manual-only',
         hook_status: 'blocked',
@@ -1831,4 +2124,25 @@ describe('Graphify provider', () => {
     });
     expect(runner).not.toHaveBeenCalled();
   });
+});
+
+test.each([false, true])('Graphify refresh 缺少 graph.json 时拒绝首次构图（仅报告=%s）', (reportOnly) => {
+  const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+  const fixture = createGraphifyApplyFixture('refresh-missing-artifact');
+  try {
+    if (reportOnly) {
+      fs.mkdirSync(path.join(fixture.target, 'graphify-out'));
+      fs.writeFileSync(path.join(fixture.target, 'graphify-out', 'GRAPH_REPORT.md'), 'old report');
+    }
+    const context = { ...fixture.context, refresh: true };
+    const plan = provider.plan(context);
+    expect(plan).toMatchObject({ blocked: true, reason_code: 'graphify-refresh-artifact-missing', actions: [] });
+    const result = provider.apply(context, plan);
+    expect(result.readiness_status).toBe('degraded');
+    expect(fixture.graphifyCalls.some((args) => args.includes('extract') || args.includes('update'))).toBe(false);
+    expect(fs.existsSync(path.join(fixture.target, 'graphify-out', 'graph.json'))).toBe(false);
+  } finally {
+    fs.rmSync(fixture.target, { recursive: true, force: true });
+    fs.rmSync(fixture.homeDir, { recursive: true, force: true });
+  }
 });

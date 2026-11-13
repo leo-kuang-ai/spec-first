@@ -10,8 +10,9 @@ const plugin = require('../../src/cli/plugin');
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
 const EVAL_ROOT = path.join(REPO_ROOT, 'skills/spec-plan/evals');
 const MANIFEST_PATH = path.join(EVAL_ROOT, 'consumer-replay-cases.json');
-const WORK_SKILL = fs.readFileSync(path.join(REPO_ROOT, 'skills/spec-work/SKILL.md'), 'utf8');
-const PLAN_SKILL = fs.readFileSync(path.join(REPO_ROOT, 'skills/spec-plan/SKILL.md'), 'utf8');
+const WORK_SKILL = ['SKILL.md', 'references/input-triage.md', 'references/work-intake.md', 'references/return-to-caller.md']
+  .map(file => fs.readFileSync(path.join(REPO_ROOT, 'skills/spec-work', file), 'utf8')).join('\n');
+const PLAN_SKILL = require('../helpers/plan-contract').readPlanContract();
 const PLAN_HANDOFF = fs.readFileSync(
   path.join(REPO_ROOT, 'skills/spec-plan/references/plan-handoff.md'),
   'utf8',

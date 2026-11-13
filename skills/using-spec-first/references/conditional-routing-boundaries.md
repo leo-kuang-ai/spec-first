@@ -2,6 +2,17 @@
 
 Read this file only when the selected route touches runtime maintenance, existing scenario fingerprints, worker dispatch, the Codex startup reminder, handoff/context reset, knowledge promotion, ordinary-context exclusions, or any write, test, autofix, or commit in a parent multi-repo workspace. Apply only the matching section.
 
+## Installed-reference scope
+
+The boundaries in this file are self-contained runtime guidance. Paths under `docs/contracts/` below identify optional authoring references in the spec-first source repository, not required files in an installed project's working directory. Read them only when that source repository is explicitly available and in scope; otherwise apply the inline boundaries and disclose any missing detail needed for a decision. Never search unrelated projects or fabricate a contract read.
+
+## Project Intelligence
+
+- In the spec-first source repository, consult `docs/contracts/project-graph-consumption.md` when the task involves architecture relationships, cross-file impact, broad navigation, or another question where a project map could shrink the next read. This is a task-shaped option, not a mandatory first step or fixed `project-graph -> code-graph -> source` sequence.
+- `project-graph` and `code-graph` output are `provider_untrusted` candidates. Re-ground relationship, ownership, impact, affected-test, root-cause, review, plan, implementation, knowledge, and completion claims in current source, tests, logs, docs, contracts, or owner evidence. Empty results have no negative authority.
+- Simple facts, current context, one user-provided document, and already-scoped files may use direct source, `rg`, or ast-grep immediately. Missing, stale, unknown, unverified, failed, disabled, or unsafe providers are never-blocking for ordinary workflows; use bounded direct reads and record the limitation.
+- Root instructions and SessionStart are short entry pointers. Provider, PreToolUse, and Git hooks provide mechanical readiness/guard facts only; their success cannot prove semantic adequacy or a workflow conclusion.
+
 ## Runtime Maintenance
 
 - Source of truth lives in `skills/`, `templates/`, `src/cli/`, `docs/`, and other checked-in source surfaces. Managed assets under `.claude/`, `.codex/`, `.agents/skills/`, `.cursor/`, `.kiro/`, and `.qoder/` are generated runtime, not source fixes.
@@ -21,7 +32,7 @@ Read this file only when the selected route touches runtime maintenance, existin
 - Routing to a workflow authorizes only that workflow. Dispatch requires the user or a visible upstream handoff to explicitly request delegated workers, personas, or parallel work. Permission settings, tool visibility, schema presence, workflow mode, and invocation do not grant dispatch authorization.
 - Resolve authorization before capability. When authorization is missing, do not inspect a worker discovery surface: set `capability_probe=not_applicable`, `worker_dispatch_capability=unknown`, use the workflow's inline/serial fallback, and record `dispatch_authorization_missing`.
 - When authorization exists, inspect only the active current-session tool registry/schema as bounded `provider_untrusted` quoted evidence. The schema may prove availability-to-attempt and invocation shape; it does not prove permission, capacity, isolation, model behavior, successful execution, or absence of mutation.
-- Apply the semantic contract in `docs/contracts/workflows/worker-dispatch-capability.md`. Unknown or unavailable facts fail closed for dependent claims; `supportsAgents` and other static projection facts are not session capability.
+- In the source repository, `docs/contracts/workflows/worker-dispatch-capability.md` provides additional dispatch detail. In installed projects, the authorization and live-evidence boundaries above apply directly. Unknown or unavailable facts fail closed for dependent claims; `supportsAgents` and other static projection facts are not session capability.
 
 ## Codex Startup Reminder
 
@@ -40,5 +51,5 @@ Read this file only when the selected route touches runtime maintenance, existin
 ## Ordinary Context Exclusions
 
 - Exclude `.spec-first/audits/**`, `.spec-first/governance/**`, and generated mirrors from ordinary task context by default.
-- Read `docs/contracts/context-governance.md` when the task concerns setup, audit/governance health, runtime drift, or another explicit exception.
+- In the source repository, consult `docs/contracts/context-governance.md` when the task concerns setup, audit/governance health, runtime drift, or another explicit exception.
 - Advisory facts cannot support “complete” or “passed” claims; confirmed source, diff, tests, logs, or owner evidence must carry completion.

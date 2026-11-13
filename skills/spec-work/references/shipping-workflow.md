@@ -51,43 +51,47 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
      --json
    ```
 
-   `verification-profile` 只准备候选 checks 与工具事实，不执行命令，也不判断哪些 checks 在语义上充分。LLM 根据 active instructions、plan requirements、changed surface 与项目脚本选择最终 checks；计划、profile 或文档里出现过的命令只是 candidate，未实际执行的 planned command 不是 run evidence，更不能标为 `passed`。
+   `verification-profile` 只准备候选 checks 与工具事实，不执行命令，也不判断哪些 checks 在语义上充分。LLM 根据 active instructions、plan requirements、changed surface 与项目脚本选择最终 checks；计划、profile 或文档里出现过的命令只是 candidate，未实际执行的 planned command 不是 run evidence，更不能标为 `passed`。check 选择至少覆盖两类来源：plan/task 声明的命令，以及按 touched paths 在测试目录反查命中的管辖合同套件（governance、byte-budget、ordering、projection 类，见 `feedback-and-tests.md` Test Discovery 第 3 步）。CHANGELOG、版本文件或发布检查相关文件被触碰时，release 治理套件（如本仓 `npm run test:release:governance`）同样必须进入候选——CI 通常会在 PR 上强制执行它们，本地缺跑会把发现推迟成一次返工往返。
 
    预留 repo-local run root：`.spec-first/workflows/spec-work/<workspace-slug>/<run-id>/`。此时不要提前调用 `verification-run-summary record`：后续 simplify/review fix 可能改变代码，最终 summary 只能转录所有 mutation 结束后的真实结果。
 
-   Preserve `run.json` as immutable generation-0 identity. Before and after each mutation or verification transaction, use the append-only state contract from `execution-strategy.md`: record `started` before execution and append the confirmed terminal fact afterward. A resumed `started` transaction is unknown, never passed. CAS conflict or source drift blocks completion until the orchestrator re-reads and reconciles the current tree.
+   Preserve `run.json` as immutable generation-0 identity; in a fresh run it is first written by the Step D producer at closeout. The append-only state contract from `execution-strategy.md` therefore applies from the moment a durable `run.json` exists — resumed runs, and any later transaction of a run whose Step D artifact has landed: record `started` before execution and append the confirmed terminal fact afterward. A resumed `started` transaction is unknown, never passed. CAS conflict or source drift blocks completion until the orchestrator re-reads and reconciles the current tree. A fresh run interrupted before its durable artifact exists has no state generations to resume from: recover via workspace fingerprint, task-pack pins, and git state, and do not call `state-write` before `run.json` exists (it rejects with `artifact-unreadable`).
 
 2. **Simplify** (conditional — separate from code review)
 
-   Before code review, invoke **`spec-simplify-code`** when the diff is non-mechanical and large enough to benefit (default: **>=30 changed lines**). Skip when the diff is purely mechanical (formatting, dependency bumps, lint-only fixes, generated artifacts).
+   Before code review, invoke **`spec-simplify-code`** when the diff is non-mechanical and large enough to benefit (default: **>=30 changed lines**; this final pass counts all changed lines, whereas the phase-boundary threshold in `implementation-loop.md` counts substantive human-authored lines only — both defaults coexist on purpose). Skip when the diff is purely mechanical (formatting, dependency bumps, lint-only fixes, generated artifacts).
 
    This step refines reuse, quality, and efficiency on the **current diff** so any later review sees cleaner code. It is not a substitute for code review.
 
-   Pass `plan:<path>` or a scope hint when the plan or user narrowed what changed. If the skill is unavailable on the harness, skip or do a brief manual pass for obvious duplicate/dead code — code review (step 3) still runs regardless.
+   Pass `plan:<path>` or a scope hint when the plan or user narrowed what changed. If the skill is unavailable on the harness, skip or do a brief manual pass for obvious duplicate/dead code — 第3步仍按风险规则完成相应审查。
+
+   At this handoff, apply `references/feedback-and-tests.md` § Preserve proof through cleanup. Pass every evidence-bound test as `proof-test:<path>` with its unit/task, test-only seams, command/log refs and current byte identity. These are protection context, not wider scope. Consume the returned preservation comparison and missing/stale limitations; rerun the original symptom and proof tests after edits before final-tree closeout.
 
 3. **Code Review**
 
-   Review the diff with **`spec-code-review`** — the spec-first portable review skill — as the single path. It self-right-sizes (a lite roster for small, low-risk, code-only diffs; the full roster otherwise), so there is no "escalate to a heavier reviewer" decision and **no harness-specific review detection** — it behaves identically on every harness. (This replaces the former Tier 1 harness-native `/review` / Tier 2 escalation split: the size and sensitive-surface judgment that used to live here now lives inside `spec-code-review`'s own reviewer selection and small-diff gate.)
+   先根据实际影响面选择审查强度，不仅按行数判断。以下条件全部成立时可由 owner 做显式定向 diff 审查：单一明确边界、可逆局部行为、已有足够的针对性验证；无权限、安全、支付、持久化/迁移、并发、外部副作用、公共/跨模块合同或source/runtime治理变化；用户、计划和task均未要求独立/完整审查。记录检查的路径、发现及本地验证，标注 `Code review: targeted manual (bounded low-risk change)`，不能称独立审查。影响面不确定时回到专项审查。
 
-   **Skip dedicated review only for a purely mechanical diff** — formatting, dependency-version bumps, lint-only fixes, generated artifacts (the same class step 2 skips for simplify). Note in the shipping summary: `Code review: skipped (mechanical diff)`. Everything else gets reviewed.
+   其余非机械变更使用 **`spec-code-review`** 的 portable 路径，由它选择 lite/full roster；不按宿主重建另一套审查流程。明确完整审查、必需 task review 和上述风险条件始终保留。纯机械变更可记录 `Code review: skipped (mechanical diff)`；依赖升级或生成文件若改变运行行为不能仅凭文件类型豁免。任何 manual review 发现仍进入第4步，后续验证与证据出口不跳过。
 
    Task-pack `review_gate: required` reviews are early, bounded feedback only. They never replace this full work-run/branch review, even when every Task Card closed cleanly.
 
    **Review is not fix — two steps:**
 
-   **3a. Review (read-only).** Invoke `spec-code-review` with `mode:agent` (add `plan:<path>` when known; `base:<ref>` when the diff base is resolved). Pass **`depth:full`** when the plan, the task, or the user explicitly asked for a full / deep / thorough review — that is the one escalation signal `spec-code-review` cannot infer from the diff alone. Do not pass `mode:autofix`. Parse the JSON and retain its concrete `artifact_path`; never derive an artifact directory from `run_id`.
+   **3a. Review (read-only；适用于上面选择专项审查的变更).** Invoke `spec-code-review` with `mode:agent` (add `plan:<path>` when known; `base:<ref>` when the diff base is resolved). Pass **`depth:full`** when the plan, the task, or the user explicitly asked for a full / deep / thorough review — that is the one escalation signal `spec-code-review` cannot infer from the diff alone. Do not pass `mode:autofix`. Parse the JSON and retain its concrete `artifact_path`; never derive an artifact directory from `run_id`.
 
    **3b. Apply fixes (caller-owned).** Load `references/review-findings-followup.md`: filter on JSON, batch by file, and use only explicitly authorized worker dispatch. The orchestrator integrates and tests. Commit only when `commit_authorization: authorized`; otherwise keep the verified review fixes uncommitted. Then proceed to the Residual Work Gate.
 
-   **If independent `spec-code-review` coverage is unavailable** — including `dispatch_authorization_missing`, `subagent_capability_missing`, `worker_capability_unproven`, unauthenticated/hard-capped dispatch, or `status: failed`/`degraded` without independent coverage — preserve any bounded inline findings, but treat the dedicated review as unavailable. In an **interactive** session, run the harness-native report-only review if one exists (e.g. `/review`) and apply fixes only under the existing caller authorization; when no native reviewer exists, perform and record an explicit manual diff scan. In a **non-interactive** session, note `Code review: skipped (independent spec-code-review unavailable)` and add the manual diff scan to Final Validation. This fallback is not persona/validator/cross-model evidence, and required task-level review gates remain blocked when their contract requires independent coverage. Never silently ship a non-mechanical change with no review of any kind.
+   **If independent `spec-code-review` coverage is unavailable** — established only by the cataloged skill definition failing to load, or by an attempted top-level invocation terminating with `status: failed`/`degraded` without independent coverage (carrying its own reason codes such as `dispatch_authorization_missing`, `subagent_capability_missing`, `worker_capability_unproven`, or unauthenticated/hard-capped dispatch); intermediate internal events never establish caller-owned unavailability, and a missing dedicated runner or binary is not evidence when the definition loads — preserve any bounded inline findings, but treat the dedicated review as unavailable. In an **interactive** session, run the harness-native report-only review if the session catalog lists one (use that entry's listed path; it is not a spec-first skill) and apply fixes only under the existing caller authorization; when no native reviewer exists, perform and record an explicit manual diff scan. In a **non-interactive** session, note `Code review: skipped (independent spec-code-review unavailable)` and add the manual diff scan to Final Validation. This fallback is not persona/validator/cross-model evidence, and required task-level review gates remain blocked when their contract requires independent coverage. Never silently ship a non-mechanical change with no review of any kind.
 
-4. **Residual Work Gate** (REQUIRED when `spec-code-review` ran and left actionable residuals)
+4. **Residual Work Gate** (applies whenever any review leaves actionable residuals, including inline/manual review)
 
    After code review and review-findings followup, inspect the **Actionable Findings** summary (or read `review.json` under the returned non-null `artifact_path` if the summary was truncated). If `artifact_path` is unavailable, use the in-band JSON and preserve the limitation; do not re-run review just to recreate a temp artifact. If one or more actionable `downstream-resolver` findings were not applied in followup, do not proceed to Final Validation until they are resolved or durably recorded.
 
-   **Non-interactive / autonomous sessions (no human can answer — e.g. an `lfg`-style pipeline or a headless run):** do **not** call the blocking tool — that would hang the pipeline. After step 3b auto-applied every mechanically-eligible finding, take the `Accept and proceed` path automatically: record the remaining actionable residuals verbatim to the durable Known Residuals sink (the PR description's Known Residuals section, or `docs/residual-review-findings/<branch-or-head-sha>.md` on the no-PR path) and continue to Final Validation. Residuals are recorded, never dropped — this keeps autonomous shipping unblocked without losing findings.
+   **Honor existing repair authorization:** When the current user or visible caller has requested review and repair, resolve actionable residuals within scope and rerun affected verification without asking again whether to fix the same issue. Ask only about new decisions that change the product, acceptance, permissions, or material consequences.
 
-   **Interactive sessions:** Ask the user using the platform's blocking question tool (`AskUserQuestion` in Claude Code with `ToolSearch select:AskUserQuestion` pre-loaded if needed, `request_user_input` in Codex). Fall back to numbered options in chat only when the harness genuinely lacks a blocking tool. Never silently skip the gate.
+   **Non-interactive / autonomous sessions:** Headless mode does not authorize risk acceptance or prove that no user can answer. P0/P1 findings, permission or truthfulness issues, and failed or unrun required verification for this task cannot automatically enter `Accept and proceed`. Continue repairs within existing scope; record missing dependencies as pending, never fabricate accepted status, and retain blocked/not-complete status. Only existing explicit risk acceptance covering specific P2/P3 residuals permits Final Validation after recording each decision and durable Known Residuals, provided acceptance criteria remain unchanged and none of the serious boundaries above apply. When no user can answer, do not call an unavailable blocking tool; continue independent work and report the blocker honestly.
+
+   **Interactive sessions:** Ask only about decisions not covered by existing authorization. Use an available question channel; a missing tool neither waives a necessary decision nor requires repeated approval for authorized repairs.
 
    Stem: `Code review left N actionable finding(s) not yet fixed. How should the agent proceed?`
 
@@ -97,7 +101,7 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
    - `Accept and proceed` — record the residual findings verbatim in a durable "Known Residuals" sink before shipping. If a PR will be created or updated in Phase 4, include them in the PR description's "Known Residuals" section (the agent owns this when calling `spec-commit-push-pr`). If the user later chooses the no-PR `spec-commit` path, create `docs/residual-review-findings/<branch-or-head-sha>.md`, include the accepted findings and source review-run context, stage it with the implementation commit, and mention the file path in the final summary. The user has acknowledged the risk, but the findings must not live only in the transient session.
    - `Stop — do not ship` — abort the shipping workflow. The user will handle findings manually before re-invoking.
 
-   Skip this gate entirely when the review reported `Actionable findings: none.` (and followup applied everything mechanical), or when dedicated review was skipped (mechanical diff or `spec-code-review` unavailable). Do not proceed past this gate on an `Accept and proceed` decision (including the autonomous auto-accept above) until the agent has recorded whether the durable sink is `PR Known Residuals` or `docs/residual-review-findings/<branch-or-head-sha>.md`.
+   Skip this gate only when review leaves no actionable residuals; unavailable independent review does not waive inline/manual findings. Before applying an explicit `Accept and proceed` decision, record its scope, basis, and durable sink: `PR Known Residuals` or `docs/residual-review-findings/<branch-or-head-sha>.md`. Recording residuals does not prove risk acceptance, and risk acceptance cannot turn failed required verification for this task into a pass.
 
    A session-temp review `artifact_path` is never the durable sink. When later shipping, resume, tracker, compound, or release work needs full review evidence, materialize sanitized repo-local review evidence in the current spec-work run artifact and reference that copy; if materialization fails, preserve the structured finding summary and an explicit copy-failure limitation. Never persist only the temp path.
 
@@ -150,7 +154,7 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
      --json
    ```
 
-   保存返回的 `run_summary_ref`。Helper 不执行或重跑命令、不推断 exit code、不深度清洗日志；它只验证 payload、路径、日志前缀和 schema。相同 workspace/run-id 的 summary 是 immutable；`run-summary-already-exists` 不能通过覆盖旧文件修复，必须保留 reason 并停止 verified closeout claim。
+   保存返回的 `run_summary_ref`。Helper 不执行或重跑命令、不推断 exit code、不深度清洗日志；它只验证 payload、路径、日志前缀和 schema。`checks[].command` 必须逐字等于本次运行实际执行的命令串（含管道、重定向与前缀变量展开后的最终形态）；把实际执行过的 pipeline 改写成理想化的单命令字符串（如把 `grep -n … | tee log` 记成 `grep -c …`）属于伪造验证证据，即使结果数值一致。schema 将 `command` 上限设为 500 字符（`verification-run-summary.schema.json`）：真实验证需要更长命令时，先把验证逻辑物化为 run 目录下的脚本文件并执行该脚本，`command` 记录这条短调用的真实形态——为通过 schema 而截断或改写已执行的长命令同样属于伪造。`run-summary-schema-invalid` 拒绝后，按具体校验错误修正 payload（实际命令超长时改用可记录的真实短调用重新验证并记录其真实结果）；重试仍被拒、恢复需要新授权或工具不可用时，按本文件 Fallback 与 E 步合同以 `null` ref + `claim_limitations` 显式记录拒绝原因与已尝试的恢复收尾——record 失败不代表验证失败或验证通过，不得改写为成功。相同 workspace/run-id 的 summary 是 immutable；`run-summary-already-exists` 不能通过覆盖旧文件修复，必须保留 reason 并停止 verified closeout claim。
 
    **C. 校验 structured claims。** 使用实际 run summary 组装 validation claims；review/impact claims 只能引用 target repo 内真实存在的普通文件，例如上一步物化的 review summary、source/plan 或 changed-surface evidence。运行：
 
@@ -181,7 +185,7 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
 
    `script_confirmed.validation.run_summary_ref` 必须指向 same workflow、same workspace、same run-id 的 `.spec-first/workflows/spec-work/<workspace-slug>/<run-id>/verification-run-summary.json`。`script_confirmed.artifact_refs` 与 `llm_asserted.read_artifacts` 只能引用 repo-relative materialized evidence；不得引用 session-temp absolute path。相同 run-id 不可覆盖；`artifact-already-exists`、`producer-error` 或其他 `not-written` reason 原样进入 handoff。
 
-   **E. 形成 closeout envelope。** Standalone 与 Return-to-Caller 均返回 `verification_run_summary_ref`、`honest_closeout_verdict`、`run_artifact_path`、`run_artifact_reason_code`、`claim_limitations`。Return-to-Caller 额外在 A-D 全部完成之后、返回 envelope 之前，从当前已加载 Skill 的 `SKILL_DIR` 运行 `scripts/working-tree-fingerprint.cjs` 捕获 `verified_worktree_fingerprint`——run summary 与 run artifact 都写在被 ignore 的 `.spec-first/workflows/` 下，因此这些写入不改变指纹；helper 无法运行时按 SKILL.md 记录 `fingerprint-helper-unavailable` blocker。Return-to-Caller 仍跳过 standalone simplify/review/PR/lifecycle tail，但不能跳过自己已执行 local verification 的 structured evidence closeout；caller 继续拥有最终 review、plan lifecycle 与 landing。
+   **E. 形成 closeout envelope。** Standalone 与 Return-to-Caller 均返回 `verification_run_summary_ref`、`honest_closeout_verdict`、`run_artifact_path`、`run_artifact_reason_code`、`claim_limitations`。字段形态：`honest_closeout_verdict` 是 validate 输出中的 token 值——字符串 `verified`、`degraded` 或 `unsupported`（连同 validate 的机器字段 `overall_reason_code` 原值另列），不是 validator 的原始输出对象；validate 未产生有效结果时该字段为 `null` 并在 `claim_limitations` 记录原因，不得为凑齐 envelope 猜 token；`verification_run_summary_ref` 是 record 成功写出的 repo-relative ref，record 未完成时为 `null` 且必须在 `claim_limitations` 显式记录该失败与原因。Return-to-Caller 额外在 A-D 全部完成之后、返回 envelope 之前，从当前已加载 Skill 的 `SKILL_DIR` 运行 `scripts/working-tree-fingerprint.cjs` 捕获 `verified_worktree_fingerprint`——run summary 与 run artifact 都写在被 ignore 的 `.spec-first/workflows/` 下，因此这些写入不改变指纹；该不变性依赖该目录在目标 repo 确实被 gitignore 覆盖（可用 `git check-ignore -v .spec-first/workflows/` 预验），未覆盖的 repo 中 before/after 指纹差异不构成 drift 证据，应在 `claim_limitations` 记 `fingerprint-stability-unverified`；helper 无法运行时按 SKILL.md 记录 `fingerprint-helper-unavailable` blocker。Return-to-Caller 仍跳过 standalone simplify/review/PR/lifecycle tail，但不能跳过自己已执行 local verification 的 structured evidence closeout；caller 继续拥有最终 review、plan lifecycle 与 landing。
 
 5.2 **Plan Status Closeout**
 
@@ -198,7 +202,7 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
    For an applicable candidate, invoke `spec-first internal plan-status complete --target-repo <root> --plan <repo-relative-source-plan> --json`. `active → completed` and `plan-status-already-completed` are successful closeouts. Duplicate, malformed, invalid, unsafe-path, read, or write failures on an applicable lifecycle-managed plan keep it unchanged and block the lifecycle closeout claim. Missing status on a unified lifecycle-managed Markdown plan is also a contract failure; legacy missing/closed status follows the explicit degraded branch above rather than forcing migration. The helper re-reads current disk content and uses the shared temp-file + rename writer: POSIX replacement is atomic, Windows replacement is best effort with retry, and neither path is a cross-process CAS. The shipping-tail single-writer rule remains a loud convention.
 
 6. **Prepare Operational Validation Plan** (REQUIRED)
-   - Add a `## Post-Deploy Monitoring & Validation` section to the PR description for every change.
+   - Add a `## Post-Deploy Monitoring & Validation` section to the PR description for every change. On exits with no authorized PR (inline completion or commit-only), carry the same section in the verified handoff summary returned to the caller instead of dropping it.
    - Include concrete:
      - Log queries/search terms
      - Metrics or dashboards to watch
@@ -257,15 +261,11 @@ Before creating PR, verify:
 - [ ] Commit messages follow conventional format when commits were authorized
 - [ ] PR description includes Post-Deploy Monitoring & Validation section (or explicit no-impact rationale) when a PR was authorized
 - [ ] Simplify: `spec-simplify-code` when diff >=30 lines (or skipped with reason)
-- [ ] Code review: `spec-code-review` ran (self-sized), or skipped (mechanical diff / unavailable — noted in summary); residuals handled via the Residual Work Gate
+- [ ] Code review: 按第3步记录专项审查、低风险定向审查或机械/不可用原因；Residual Work Gate 已处理全部实际发现。
 - [ ] Authorized PR description includes summary, testing notes, evidence when captured, and accurate attribution
 
 ## Code Review
 
-Single portable path: **`spec-code-review`** self-sizes (lite roster for small low-risk code-only diffs, full roster otherwise). No harness-native review detection, no escalation tiers — the size/sensitive-surface judgment lives inside `spec-code-review` now.
+审查选择、适用例外、必需覆盖和不可用降级均以本文件 Phase 3 第3步为唯一 owner；不在这里重复另一套规则。所有审查发现交回 caller 按已有授权修复并处理 residual，证据与完成出口保持不变。
 
-**Skip** only for a purely mechanical diff (formatting, dep-bumps, lint-only, generated). Everything else is reviewed.
-
-**Two steps — review is not fix.** (3a) Review-only via `mode:agent`; add `depth:full` when the plan/task/user explicitly asked for a deep review. (3b) Batched fix subagents per `references/review-findings-followup.md`; residuals → Residual Work Gate.
-
-**If `spec-code-review` can't run** (no subagent dispatch): interactive → harness-native review if present, fix inline; non-interactive → skip-with-note + manual diff scan in Final Validation. Never silently ship a non-mechanical change unreviewed.
+涉及 mutation 安全保证的 closeout，按 `docs/contracts/workflows/mutation-enforcement.md` 记录实际宿主强制范围、旁路与未验证项。

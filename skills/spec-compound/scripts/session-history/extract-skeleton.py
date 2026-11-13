@@ -99,7 +99,7 @@ def flush_tools():
         if len(group) <= 2:
             # Print individually
             for e in group:
-                status = f" -> {e['status']}" if e.get("status") else ""
+                status = f" -> {e.get('status') or 'unknown'}"
                 ts_prefix = f"[{e['ts']}] " if e.get("ts") else ""
                 print(f"{ts_prefix}[tool] {name} {e['target']}{status}")
                 stats["tool"] += 1
@@ -108,7 +108,7 @@ def flush_tools():
             ts = group[0].get("ts", "")
             targets = [e["target"] for e in group if e.get("target")]
             ok = sum(1 for e in group if e.get("status") == "ok")
-            err = sum(1 for e in group if e.get("status") and e["status"] != "ok")
+            err = sum(1 for e in group if e.get("status") not in (None, "", "unknown", "ok"))
             no_status = len(group) - ok - err
 
             # Show first 2 targets, then "+N more"
@@ -119,12 +119,10 @@ def flush_tools():
             else:
                 target_str = ""
 
-            if no_status == len(group):
-                status_str = ""
-            elif err == 0:
+            if ok == len(group):
                 status_str = " -> all ok"
             else:
-                status_str = f" -> {ok} ok, {err} error"
+                status_str = f" -> {ok} ok, {err} error, {no_status} unknown"
 
             ts_prefix = f"[{ts}] " if ts else ""
             print(f"{ts_prefix}[tools] {len(group)}x {name} ({target_str}){status_str}")
@@ -184,7 +182,7 @@ def handle_claude(obj):
                                 entry["status"] = status
                                 matched = True
                                 break
-                    if not matched:
+                    if not matched and not tool_use_id:
                         # Fallback: assign to earliest pending entry without a status
                         for entry in pending_tools:
                             if not entry.get("status"):
@@ -250,17 +248,24 @@ def handle_codex(obj):
         elif p.get("type") == "exec_command_end":
             # This is the deduplicated result — has status info
             command = p.get("command", [])
-            cmd_str = command[-1] if command else ""
+            cmd_str = command if isinstance(command, str) else (command[-1] if command else "")
             output = p.get("aggregated_output", "")
 
-            status = "ok"
-            if "Process exited with code " in output:
+            code = None
+            for key in ("exit_code", "exitCode", "status"):
+                value = p.get(key)
+                if isinstance(value, int) and not isinstance(value, bool):
+                    code = value
+                    break
+                if isinstance(value, str) and re.fullmatch(r"-?\d+", value):
+                    code = int(value)
+                    break
+            if code is None and isinstance(output, str) and "Process exited with code " in output:
                 try:
                     code = int(output.split("Process exited with code ")[1].split("\n")[0])
-                    if code != 0:
-                        status = f"error(exit {code})"
                 except (IndexError, ValueError):
                     pass
+            status = "unknown" if code is None else ("ok" if code == 0 else f"error(exit {code})")
 
             if cmd_str:
                 # Shorten common patterns for readability
@@ -382,7 +387,9 @@ def handle_pi(obj):
         exit_code = msg.get("exitCode")
         if msg.get("cancelled"):
             status = "cancelled"
-        elif exit_code in (None, 0):
+        elif not isinstance(exit_code, int) or isinstance(exit_code, bool):
+            status = "unknown"
+        elif exit_code == 0:
             status = "ok"
         else:
             status = f"error(exit {exit_code})"

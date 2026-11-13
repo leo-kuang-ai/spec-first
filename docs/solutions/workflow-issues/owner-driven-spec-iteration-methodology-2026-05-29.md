@@ -324,7 +324,7 @@ computeBootstrapLayer 没有基于 merged facts 重算 state_class / complexity_
 
 ## Related
 
-- `docs/10-prompt/结构化项目角色契约.md`(Light contract / Scripts prepare / Let the LLM decide 三原则)
+- `docs/methodology/结构化项目角色契约.md`(Light contract / Scripts prepare / Let the LLM decide 三原则)
 - `docs/contracts/ai-coding-harness.md`(6 层 Harness 模型)
 - `docs/plans/2026-05-28-003-fix-spec-first-precision-fix-d1-d3-d6-plan.md`(本次方案落地)
 - `docs/plans/2026-05-28-002-feat-spec-first-scenario-adaptive-milestone-plan.md`(原过度设计 milestone,active 备查)

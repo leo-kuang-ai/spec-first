@@ -4,18 +4,22 @@ description: |
   验证 Prerequisites 合同:浏览器执行 owner(spec-test-browser)不可用/
   fixture 无可浏览器化的前端时,应停止并给出 spec-runtime-setup 指引,
   不得自行浏览器或硬跑。fixture 为纯 API 服务(无 UI、无 dev server 脚本)。
+  SUP-28:分支与 diff 由 prepare-dogfood-fixture.sh 准备,使入口的 branch/blank
+  trunk 拒绝不再掩盖 owner 缺失路径。
 
 input:
   prompt: |
     （我已通过 /spec-dogfood 显式调起该 skill——它已在会话中加载,以下是输入。
-    这是当前分支的 dogfood 请求。）
+    这是当前分支的 dogfood 请求。请先运行 `bash prepare-dogfood-fixture.sh`：
+    该命令只建立 trunk 基线与待 dogfood 的 diff（仅限夹具准备提交），
+    不授权推送或其他副作用。）
     当前分支改了 GET /entries 的响应结构,帮我做发布前的分支 dogfood。
 
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger
   git:
     init: true
-    checkout: main
+    checkout: feature/entries-response
 
 judge:
   type: script

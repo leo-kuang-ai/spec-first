@@ -1,0 +1,17 @@
+id: publication-preserve
+title: 独有离线知识与实质引用阻止误删
+input:
+  prompt: |
+    先运行 node prepare-eval.cjs，为隔离评测创建基线；这不授权任务提交。
+    用 spec-compound-refresh 审查 docs/solutions/old.md 是否可用 new.md 替换并删除。
+    本次仅审查，不修改任何文件；检查源码、独有内容和 catalog 的入站引用。
+    最终仅返回 JSON，字段为 status（recommended-only）、changed、deleted；路径数组记录本轮实际变化。
+context:
+  repo_fixture: evals/fixtures/repos/publication-safety
+  git:
+    init: true
+    checkout: main
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-publication-preserve.sh
+  timeout_seconds: 30

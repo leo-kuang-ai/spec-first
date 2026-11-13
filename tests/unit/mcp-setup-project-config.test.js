@@ -98,6 +98,27 @@ describe('spec-runtime-setup project config', () => {
     });
   });
 
+  test('刷新模板保留用户 override、固定产物目录和无关 ignore 规则', () => {
+    const { planProjectConfig, applyProjectConfig } = require('../../skills/spec-runtime-setup/scripts/lib/project-config.cjs');
+    const target = tempRepo('preserve-local');
+    try {
+      fs.mkdirSync(path.join(target, '.spec-first'));
+      const local = path.join(target, '.spec-first/config.local.yaml');
+      const contents = '# 用户偏好\nplan_output: html\n';
+      fs.writeFileSync(local, contents);
+      fs.writeFileSync(path.join(target, '.gitignore'), 'dist/\n');
+      const plan = planProjectConfig({ repoRoot: target, refreshExample: true, createLocal: true, ensureGitignore: true });
+      expect(applyProjectConfig({ plan, templatePath }).overall_status).toBe('ready');
+      expect(fs.readFileSync(local, 'utf8')).toBe(contents);
+      expect(fs.readFileSync(path.join(target, '.gitignore'), 'utf8')).toContain('dist/');
+      expect(childProcess.spawnSync('git', ['check-ignore', '--quiet', '.spec-first/config.local.yaml'], { cwd: target }).status).toBe(0);
+      expect(childProcess.spawnSync('git', ['check-ignore', '--quiet', 'docs/plans/feature.md'], { cwd: target }).status).toBe(1);
+      expect(fs.existsSync(path.join(target, '.compound-engineering'))).toBe(false);
+    } finally {
+      fs.rmSync(target, { recursive: true, force: true });
+    }
+  });
+
   test('preserves the not-applicable project-local-config-status v1 shape', () => {
     const { inspectProjectConfig } = require('../../skills/spec-runtime-setup/scripts/lib/project-config.cjs');
 

@@ -12,7 +12,7 @@ Detect whether the current checkout is already isolated, then create or attach a
 - Does not copy `.env*` files by default; `--copy-env` is an explicit opt-in for workflows that need local env files
 - Detects `mise`/`direnv` configs and prints review commands without changing user trust state
 - Adds `.worktrees` to `.gitignore` if not already ignored
-- Does not modify the main repo checkout — `from-branch` and PR heads are fetched, not checked out
+- Fetches `from-branch` and PR heads without switching the primary checkout branch; setup may update its `.gitignore`
 
 ## Step 0: Detect existing isolation
 
@@ -74,7 +74,7 @@ bash -c 'if [ -n "${CLAUDE_SKILL_DIR:-}" ]; then exec bash "$CLAUDE_SKILL_DIR/sc
 
 After creation, switch to the worktree with `cd .worktrees/<branch-name>`.
 
-The `create` command consumes the same detection function before creating `.worktrees/<branch>` or running `git worktree add`. It refuses `linked-worktree`, `unknown`, `not-git-repo`, `git-query-failed`, and `output-contract-failed` states so this helper cannot create nested or invisible worktrees by bypassing Step 0.
+The `create` command consumes the same detection function before creating `.worktrees/<branch>` or running `git worktree add`. It refuses `linked-worktree`, `unknown`, `not-git-repo`, `git-query-failed`, and `output-contract-failed` states so this helper cannot create nested or invisible worktrees by bypassing Step 0. If the script exits non-zero for any other reason — including a base ref that does not resolve to a commit on an empty/unborn repository (`reason_code=base-ref-unresolvable`) — report the reason and stop. Do not fall back to raw `git worktree add`; a script failure is a contract failure, not permission to bypass the wrapper. This also bars removing the obstacle yourself before retrying — seeding an initial commit on an unborn repository, configuring a remote, or any other repository-state change outside the caller's authorized side effects turns a structured refusal into a silent bypass; return the reason with recovery options and let the caller decide.
 
 ## Isolating an existing ref
 
@@ -100,6 +100,8 @@ Behavior:
 - Tag or commit: create a detached worktree at that commit.
 - Already in a linked worktree: check the target out in place unless it is already the current branch; do not create a nested worktree.
 - Target branch already checked out elsewhere: report `already_checked_out branch=<name> path=<path>` and do not create a second checkout.
+
+Before directory, Git, or ignore writes, path checks reject symlinks (including dangling links) in `.worktrees` or target ancestors and reject physical escapes. New-work mode retains nested directories for valid `feat/name` branches; existing-ref slugs remain a single segment. Remote-only branches explicitly create a local tracking branch in both ordinary and linked checkouts; tags and commits use detached mode. On failure, the caller must inspect actual side effects rather than treating a nonzero exit as proof of zero writes.
 
 ## Env File Opt-In
 
@@ -134,6 +136,8 @@ Create a worktree when:
 Do not create a new-work worktree for single-task work that can happen on a branch in the main checkout, and never create a nested worktree when Step 0 reports `state=linked-worktree`. For existing-ref isolation, use `isolate` so branch uniqueness and already-checked-out verdicts remain deterministic.
 
 ## Integration
+
+The caller may choose host-native isolation only when its actual capability and authority are established and it returns equivalent repository/ref/HEAD/path, setup-side-effect and cleanup facts. This helper remains the Git fallback; never infer those guarantees from a host name or tool presence. PR shorthand fetches the base repository's PR ref; it does not establish permission or a push destination for a fork. Before publishing later fixes, the landing owner must verify the current PR head repository, branch and OID, and the exact authorized remote/ref. Do not activate native dispatch or change tracking merely because isolation succeeded.
 
 This helper accepts only a caller-owned isolation contract: caller identity, target repo, target ref or new branch, reason isolation is needed, allowed setup side effects, environment-copy authorization, and the return path consumer. It detects or creates the worktree and returns facts. It never selects an execution engine, dispatches a worker, stages, commits, pushes, opens a PR, or decides cleanup. A worker placed in a linked worktree is edit-and-test only: it must not run `git add`, `git commit`, or any command that writes the shared Git index. A worker sandbox `EPERM` is evidence about that worker only, not host capability evidence.
 

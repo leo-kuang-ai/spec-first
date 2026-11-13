@@ -12,6 +12,8 @@ Think in terms of the deploy window: old code on new schema, new code on old dat
 
 For planning invocations, do not emit review-style JSON. Convert migration analysis into plan requirements: expand/contract sequencing, backfill and batching strategy, dual-write needs, deploy-window risks, rollback constraints, schema-artifact handling, verification SQL, monitoring, and explicit acceptance criteria. If the caller provides an actual diff and review base, you may perform diff-level checks as supporting evidence, but the final output should still be planning guidance.
 
+Planning is read-only: SQL and migration snippets are proposed verification or implementation guidance, not authority to run queries, alter data or change source. The parent owns WHAT, scope, execution authorization and acceptance. Use existing supplied evidence; missing production facts remain limitations.
+
 ## Step 0: Schema drift or schema-artifact handling
 
 Run this **first** when the caller provides a concrete diff and `db/schema.rb` or `db/structure.sql` appears in that diff. Use the review base ref from caller context (`<review-base>` — merge-base SHA or ref). **Never assume `main`.**

@@ -8,6 +8,8 @@ const skillPath = path.join(repoRoot, 'skills/spec-work/SKILL.md');
 const referencesRoot = path.join(repoRoot, 'skills/spec-work/references');
 
 const runtimeReferences = [
+  'work-intake.md',
+  'implementation-loop.md',
   'work-intake-and-task-pack.md',
   'non-code-execution.md',
   'execution-strategy.md',
@@ -78,6 +80,19 @@ describe('spec-work front controller and reference reachability', () => {
     expect(section(feedback, 'Fallback')).toMatch(/最窄已知检查.*claim ceiling/is);
     expect(section(quality, 'Fallback')).toMatch(/不输出架构矩阵/is);
     expect(section(shipping, 'Fallback')).toMatch(/do not claim completion.*commit.*push.*open a PR/is);
+  });
+
+  test('trivial and planned writes load the loop without duplicating execution steps', () => {
+    const loop = read(path.join(referencesRoot, 'implementation-loop.md'));
+    const intake = read(path.join(referencesRoot, 'work-intake.md'));
+    expect(skill).toContain('Before the first implementation write, including a trivial route without tasks');
+    expect(skill).not.toContain('1. **Task Execution Loop**');
+    expect(loop).toContain('1. **Task Execution Loop**');
+    expect(loop).toContain('review_gate: required');
+    expect(loop).toContain('stop_if');
+    expect(loop).toContain('Do not reconstruct worker-only pre-implementation observations');
+    expect(intake).toContain('Build a section map');
+    expect(intake).toContain('Explicit clarification answers take effect directly');
   });
 
   test('source-only evals carry trigger and non-trigger routing cases', () => {

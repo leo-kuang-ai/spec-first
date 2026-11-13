@@ -6,6 +6,57 @@ const path = require('node:path');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 
+describe('来源不足时禁止安装及刷新', () => {
+  test.each(['claude-plugin', 'local', 'unknown'])('%s 不创建全局副本且不自动刷新', async (origin) => {
+    const { runUpdate } = require('../../src/cli/commands/update');
+    const runInstall = jest.fn();
+    const runRuntimeRefresh = jest.fn();
+    const log = jest.spyOn(console, 'log').mockImplementation(() => {});
+    try {
+      expect(await runUpdate([], {
+        detectInstallOrigin: () => ({ origin, reason_code: 'fixture' }),
+        runInstall,
+        runRuntimeRefresh,
+      })).toBe(0);
+      expect(runInstall).not.toHaveBeenCalled();
+      expect(runRuntimeRefresh).not.toHaveBeenCalled();
+      const output = log.mock.calls.flat().join('\n');
+      // 旧指引让裸 `spec-first init` 重新依赖 PATH，可能执行另一份未更新副本。
+      expect(output).not.toContain('在目标项目运行 `spec-first init`');
+      if (origin === 'claude-plugin') {
+        // 插件不被无条件引导新增项目投射：不出现裸 init 指引。
+        expect(output).toContain('宿主插件管理界面');
+        expect(output).not.toMatch(/spec-first init/);
+        expect(output).not.toContain('未尝试刷新');
+      } else {
+        expect(output).toContain('未尝试刷新');
+        expect(output).toContain('同一副本');
+        if (origin === 'local') {
+          expect(output).toContain('node <本地副本>/bin/spec-first.js init');
+        } else {
+          expect(output).not.toContain('node <本地副本>/bin/spec-first.js init');
+        }
+      }
+    } finally {
+      log.mockRestore();
+    }
+  });
+
+  test('帮助契约：退出码 0 不代表包已升级，刷新指引绑定同一副本', async () => {
+    const { runUpdate } = require('../../src/cli/commands/update');
+    const log = jest.spyOn(console, 'log').mockImplementation(() => {});
+    try {
+      expect(await runUpdate(['--help'], {})).toBe(0);
+      const output = log.mock.calls.flat().join('\n');
+      expect(output).toContain('exit 0 does not imply the package was upgraded');
+      expect(output).toContain('同一副本入口');
+      expect(output).not.toContain('独立运行 spec-first init');
+    } finally {
+      log.mockRestore();
+    }
+  });
+});
+
 // Node >=20.12 (CVE-2024-27980) refuses to spawn a `.cmd` shim with shell:false, so naming
 // `npm.cmd` / `spec-first.cmd` directly makes these paths unusable on Windows. Both must go
 // through an explicit Node interpreter instead.
@@ -32,6 +83,7 @@ describe('spec-first update spawns without .cmd shims', () => {
     const { calls, update } = loadUpdateWithSpawnSpy();
 
     await update.runUpdate([], {
+        detectInstallOrigin: () => ({ origin: 'npm-global', reason_code: 'fixture' }),
       runRuntimeRefresh: () => ({ status: 0, errorCode: null }),
       resolveRuntimeRefreshCommand: () => ({ args: ['init', '-y'], cwd: repoRoot, reason_code: 'test' }),
       resolveInstalledCliPath: () => ({ ok: true, cliPath: '/global/spec-first/bin/spec-first.js' }),
@@ -51,6 +103,7 @@ describe('spec-first update spawns without .cmd shims', () => {
     const globalCliPath = path.join(os.tmpdir(), 'global-node_modules', 'spec-first', 'bin', 'spec-first.js');
 
     await update.runUpdate([], {
+        detectInstallOrigin: () => ({ origin: 'npm-global', reason_code: 'fixture' }),
       resolveRuntimeRefreshCommand: () => ({
         args: ['init', '--claude', '-y'],
         cwd: repoRoot,
@@ -82,6 +135,7 @@ describe('spec-first update spawns without .cmd shims', () => {
     const errorSpy = jest.spyOn(console, 'error').mockImplementation((message = '') => errors.push(String(message)));
     try {
       const exitCode = await update.runUpdate([], {
+        detectInstallOrigin: () => ({ origin: 'npm-global', reason_code: 'fixture' }),
         runInstall: () => ({ status: 0, errorCode: null }),
         runRuntimeRefresh,
         resolveRuntimeRefreshCommand: () => ({ args: ['init', '-y'], cwd: repoRoot, reason_code: 'test' }),
@@ -365,6 +419,7 @@ describe('spec-first update exits 0 and spawns no init when there is nothing to 
     let exitCode;
     try {
       exitCode = await update.runUpdate([], {
+        detectInstallOrigin: () => ({ origin: 'npm-global', reason_code: 'fixture' }),
         runInstall: () => ({ status: 0, errorCode: null }),
         resolveInstalledCliPath: () => ({ ok: true, cliPath: '/global/spec-first/bin/spec-first.js' }),
         resolveRuntimeRefreshCommand: () => ({
@@ -395,6 +450,7 @@ describe('spec-first update exits 0 and spawns no init when there is nothing to 
     const output = captureOutput();
     try {
       await update.runUpdate([], {
+        detectInstallOrigin: () => ({ origin: 'npm-global', reason_code: 'fixture' }),
         runInstall: () => ({ status: 0, errorCode: null }),
         resolveInstalledCliPath: () => ({ ok: true, cliPath: '/global/spec-first/bin/spec-first.js' }),
         resolveRuntimeRefreshCommand: () => ({
@@ -422,6 +478,7 @@ describe('spec-first update exits 0 and spawns no init when there is nothing to 
     const output = captureOutput();
     try {
       await update.runUpdate([], {
+        detectInstallOrigin: () => ({ origin: 'npm-global', reason_code: 'fixture' }),
         runInstall: () => ({ status: 0, errorCode: null }),
         resolveInstalledCliPath: () => ({ ok: true, cliPath: '/global/spec-first/bin/spec-first.js' }),
         resolveRuntimeRefreshCommand: () => ({
@@ -447,6 +504,7 @@ describe('spec-first update exits 0 and spawns no init when there is nothing to 
     let exitCode;
     try {
       exitCode = await update.runUpdate([], {
+        detectInstallOrigin: () => ({ origin: 'npm-global', reason_code: 'fixture' }),
         runInstall: () => ({ status: 0, errorCode: null }),
         resolveInstalledCliPath: () => ({ ok: true, cliPath: '/global/spec-first/bin/spec-first.js' }),
         resolveRuntimeRefreshCommand: () => ({

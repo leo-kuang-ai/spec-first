@@ -320,6 +320,74 @@ function readArtifact(filePath) {
   return readJson(filePath);
 }
 
+function assertWithinWriteBoundary(absolutePath, artifactKind) {
+  // The run root is the write boundary. Before creating or replacing an
+  // artifact, verify the target and every existing parent resolve (realpath)
+  // inside it: a symlinked subdirectory planted inside the run root must not
+  // carry writes outside it.
+  const boundaryRaw = path.resolve(process.env.SPEC_AUDIT_WRITE_BOUNDARY || path.dirname(absolutePath));
+  const boundary = (() => {
+    try {
+      return fs.realpathSync(boundaryRaw);
+    } catch (_error) {
+      return boundaryRaw;
+    }
+  })();
+  const check = (candidate, depth = 0) => {
+    if (depth > 64) throw new Error(`artifact write boundary check exceeded depth for ${candidate}`);
+    // Recurse only along the chain inside the run root; the boundary itself
+    // (and anything above it) ends the walk.
+    const relToBoundaryRaw = path.relative(boundaryRaw, path.resolve(candidate));
+    if (relToBoundaryRaw === '' || relToBoundaryRaw.startsWith('..')) return;
+
+    // SUP-17 fix: 检查悬空符号链接（在磁盘上但目标不存在）
+    let isSymlink = false;
+    try {
+      const stats = fs.lstatSync(candidate);
+      isSymlink = stats.isSymbolicLink();
+    } catch (_error) {
+      // 文件不存在（正常情况，待创建）
+    }
+
+    if (isSymlink) {
+      // 悬空或正常符号链接：必须检查链接目标是否在边界内
+      try {
+        const target = fs.readlinkSync(candidate);
+        const resolvedTarget = path.resolve(path.dirname(candidate), target);
+        // SUP-17: 检查解析后的目标路径是否在边界内
+        // 需要先尝试 realpath（如果目标存在），否则使用解析后的路径
+        let targetToCheck = resolvedTarget;
+        try {
+          targetToCheck = fs.realpathSync(resolvedTarget);
+        } catch {
+          // 目标不存在（悬空链接），使用解析后的路径
+        }
+        const rel = path.relative(boundary, targetToCheck);
+        if (rel.startsWith('..') || path.isAbsolute(rel)) {
+          throw new Error(`artifact write escapes the run-root boundary via a symbolic link (${artifactKind}): ${candidate} -> ${target}`);
+        }
+      } catch (_error) {
+        if (_error instanceof Error && _error.message.includes('escapes the run-root boundary')) throw _error;
+        // readlinkSync 失败：不是链接或权限问题，继续检查 realpath
+      }
+    }
+
+    try {
+      const real = fs.realpathSync(candidate);
+      const rel = path.relative(boundary, real);
+      if (rel.startsWith('..') || path.isAbsolute(rel)) {
+        throw new Error(`artifact write escapes the run-root boundary via a linked path (${artifactKind}): ${candidate}`);
+      }
+    } catch (_error) {
+      if (_error instanceof Error && _error.message.includes('escapes the run-root boundary')) throw _error;
+      // not on disk yet (normal for fresh artifacts); parents still govern
+    }
+    const parent = path.dirname(candidate);
+    if (parent !== candidate) check(parent, depth + 1);
+  };
+  check(absolutePath);
+}
+
 function assertCanWrite(options = {}, targetPath, artifactKind = 'artifact') {
   if (options.mode === 'report-only' && targetPath) {
     throw new Error(`mode:report-only forbids --output and run artifact writes (${artifactKind}).`);
@@ -332,6 +400,7 @@ function writeJsonOutput(result, outputPath, options = {}) {
   if (outputPath) {
     assertCanWrite(options, outputPath, 'json');
     const absolutePath = resolveOutputPath(outputPath, options);
+    assertWithinWriteBoundary(absolutePath, 'json');
     fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
     fs.writeFileSync(absolutePath, json);
   } else {
@@ -343,6 +412,7 @@ function writeTextOutput(text, outputPath, options = {}) {
   if (outputPath) {
     assertCanWrite(options, outputPath, 'text');
     const absolutePath = resolveOutputPath(outputPath, options);
+    assertWithinWriteBoundary(absolutePath, 'text');
     fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
     fs.writeFileSync(absolutePath, text);
   } else {

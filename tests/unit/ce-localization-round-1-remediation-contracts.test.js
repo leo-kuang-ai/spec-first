@@ -75,14 +75,18 @@ describe('CE localization Round 1 owner remediation contracts', () => {
 
   test('optimize authorizes the exact measurement execution before the first command', () => {
     const skill = read('skills/spec-optimize/SKILL.md');
-    const authorizationIndex = skill.indexOf('measurement_execution_authorization: authorized | missing');
-    const firstMeasureIndex = skill.indexOf('bash "$SKILL_DIR/scripts/measure.sh"');
+    const measurement = read('skills/spec-optimize/references/measurement.md');
+    const persistence = read('skills/spec-optimize/references/persistence.md');
+    const authorizationIndex = measurement.indexOf('measurement_execution_authorization: authorized | missing');
+    const firstMeasureIndex = measurement.indexOf('bash "$SKILL_DIR/scripts/measure.sh"');
 
     expect(authorizationIndex).toBeGreaterThan(0);
     expect(firstMeasureIndex).toBeGreaterThan(authorizationIndex);
-    expect(skill).toContain('measurement_execution_authorization_missing');
-    expect(skill).toContain('strategy digest is derived, reconstructable state');
-    expect(skill).toContain('experiment log remains the canonical resume and audit source');
+    expect(measurement).toContain('measurement_execution_authorization_missing');
+    expect(persistence).toContain('strategy digest is derived, reconstructable state');
+    expect(persistence).toContain('experiment log remains the canonical resume and audit source');
+    expect(skill).toContain('references/measurement.md');
+    expect(skill).toContain('references/persistence.md');
   });
 
   test('product pulse preserves per-source state instead of collapsing it to no data', () => {

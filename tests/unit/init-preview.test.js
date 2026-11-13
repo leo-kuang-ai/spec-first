@@ -126,6 +126,22 @@ describe('bounded init mutation preview', () => {
     expect(output).not.toContain('.agents/skills/spec-plan');
   });
 
+  test('shows drift categories under the affected host without claiming a root cause', () => {
+    const drifted = projectPlan('codex', '/workspace/app', [{
+      kind: 'remove_dir', path: '.agents/skills/spec-plan', reason: 'managed_skill_reset',
+    }]);
+    drifted.destructiveResetReason = 'current_runtime_drift';
+    drifted.diagnostics = [{ code: 'current_runtime_drift', reasons: ['skills_drifted', 'commands_drifted'] }];
+    const clean = projectPlan('claude', '/workspace/app', []);
+
+    const output = capturePreview([clean, drifted], { view: 'summary' });
+    expect(output).toContain('Codex: risk operations');
+    expect(output).toContain('Reset reason categories: skills_drifted, commands_drifted');
+    expect(output.indexOf('Codex: risk operations'))
+      .toBeLessThan(output.indexOf('Reset reason categories:'));
+    expect(output.match(/Reset reason categories:/g)).toHaveLength(1);
+  });
+
   test('deduplicates known host diagnostics and localizes them', () => {
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     const plans = [
@@ -168,6 +184,63 @@ describe('bounded init mutation preview', () => {
     expect(output).toContain('保持未启用');
     expect(output).not.toContain('raw cursor warning');
     expect(output).not.toContain('raw qoder warning');
+  });
+
+  describe('init diagnostics wording', () => {
+    function captureWarnings(render) {
+      const lines = [];
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation((line) => lines.push(String(line)));
+      const logSpy = jest.spyOn(console, 'log').mockImplementation((line) => lines.push(String(line)));
+      try { render(); } finally { warnSpy.mockRestore(); logSpy.mockRestore(); }
+      return lines;
+    }
+
+    test('drift diagnostics render localized once across adapters (zh)', () => {
+      const plans = ['claude', 'codex', 'qoder'].map((platform) => ({
+        platform,
+        diagnostics: [{ level: 'warn', code: 'current_runtime_drift', reasons: ['skills_drifted'] }],
+      }));
+      const output = captureWarnings(() => printInitDiagnostics(plans, { lang: 'zh' })).join('\n');
+      expect(output.match(/current_runtime_drift/g)).toHaveLength(1);
+      expect(output).toContain('检测到当前 runtime drift');
+      expect(output).toContain('managed hard reset');
+      expect(output).not.toContain('Detected current spec-first runtime drift');
+    });
+
+    test('legacy state diagnostics render localized (en)', () => {
+      const plans = [{
+        platform: 'claude',
+        diagnostics: [{ level: 'warn', code: 'legacy_state_detected' }],
+      }];
+      const output = captureWarnings(() => printInitDiagnostics(plans, { lang: 'en' })).join('\n');
+      expect(output.match(/legacy_state_detected/g)).toHaveLength(1);
+      expect(output).toContain('legacy spec-first state');
+      expect(output).not.toContain('Detected legacy spec-first state; performing');
+    });
+
+    test('qoder zh warning keeps activation facts without the English evidence tail', () => {
+      const plans = [{
+        platform: 'qoder',
+        diagnostics: [{ level: 'warn', code: 'qoder_hook_activation_unverified' }],
+      }];
+      const output = captureWarnings(() => printInitDiagnostics(plans, { lang: 'zh' })).join('\n');
+      expect(output).toContain('hook 实际执行未验证');
+      expect(output).toContain('SessionStart 与 PRD guard');
+      expect(output).toContain('保持未启用');
+      expect(output).not.toContain('authenticated event execution');
+      expect(output).not.toContain('shared IDE loader safety');
+    });
+
+    test('qoder en warning preserves the evidence contract substrings', () => {
+      const plans = [{
+        platform: 'qoder',
+        diagnostics: [{ level: 'warn', code: 'qoder_hook_activation_unverified' }],
+      }];
+      const output = captureWarnings(() => printInitDiagnostics(plans, { lang: 'en' })).join('\n');
+      expect(output).toContain('qodercli 1.0.41 evidence baseline confirms the hook settings and command protocol');
+      expect(output).toContain('inactive');
+      expect(output).toContain('not verified');
+    });
   });
 
   test('prints the canonical global profile once with its resolved path', () => {

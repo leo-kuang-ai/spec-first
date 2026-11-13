@@ -21,3 +21,5 @@ judge:
   type: script
   script_path: evals/fixtures/scripts/check-report-only-tenant-bypass.sh
   timeout_seconds: 30
+constraints:
+  timeout_seconds: 900

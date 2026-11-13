@@ -4,14 +4,14 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { spawnSync } = require('node:child_process');
 const {
   assertContainedPath,
   ensureContainedDirectory,
   isPathWithin,
   reasonError,
 } = require('../lib/path-safety.cjs');
-const { resolveGitPath } = require('../lib/git-path.cjs');
+const { resolveGitPath, runGit } = require('../lib/git-path.cjs');
+const { captureSourceSnapshot, sourceContentIdentity } = require('../lib/source-snapshot.cjs');
 const {
   isSpecFirstSourceRepo,
   providerLimitation,
@@ -31,6 +31,22 @@ const HOOK_ARTIFACT_BLOCK_END = '# spec-first graphify artifact env end';
 const HOOK_CREDENTIAL_BLOCK_START = '# spec-first graphify credential isolation start';
 const HOOK_CREDENTIAL_BLOCK_END = '# spec-first graphify credential isolation end';
 const GRAPHIFY_HOOK_MARKER = 'Installed by: graphify hook install';
+// Graphify 0.9.57 无 zcode 平台，zcode 映射 Provider 原生 agents 平台；pi 虽有原生
+// 平台但它写 .pi/agent/skills/——不在 Pi 官方项目级发现路径（.pi/skills、.agents/skills）
+// 内，故同样映射 agents 平台写入共享 .agents/skills/ 投影根。
+const GRAPHIFY_PROJECT_PLATFORM_BY_HOST = Object.freeze({ zcode: 'agents', pi: 'agents' });
+// 各宿主 Python Provider project integration 的 required surface 清单，
+// 被 verify/configured/mutation-guard 三处共用；新增宿主时必须三处一致。
+const GRAPHIFY_PYTHON_HOST_SURFACES = Object.freeze({
+  claude: ['.claude/skills/graphify/SKILL.md', '.claude/CLAUDE.md', 'CLAUDE.md', '.claude/settings.json'],
+  codex: ['.codex/skills/graphify/SKILL.md', 'AGENTS.md', '.codex/hooks.json'],
+  opencode: ['.opencode/skills/graphify/SKILL.md', '.opencode/plugins/graphify.js', '.opencode/opencode.json'],
+  cursor: ['.cursor/rules/graphify.mdc'],
+  kiro: ['.kiro/skills/graphify/SKILL.md', '.kiro/steering/graphify.md'],
+  qoder: ['.qoder/rules/spec-first.md'],
+  zcode: ['.agents/skills/graphify/SKILL.md'],
+  pi: ['.agents/skills/graphify/SKILL.md'],
+});
 const PYTHON_HOOK_MARKERS = {
   'post-commit': ['# graphify-hook-start', '# graphify-hook-end'],
   'post-checkout': ['# graphify-checkout-hook-start', '# graphify-checkout-hook-end'],
@@ -109,7 +125,8 @@ function plan(context = {}) {
     actions.push(installAction.action);
   }
   if (!isSpecFirstSourceRepo(repoRoot) && context.host !== 'qoder') {
-    actions.push({ kind: 'install-project-skill', command: 'graphify', args: ['install', '--project', '--platform', context.host || 'codex'] });
+    const platform = GRAPHIFY_PROJECT_PLATFORM_BY_HOST[context.host] || context.host || 'codex';
+    actions.push({ kind: 'install-project-skill', command: 'graphify', args: ['install', '--project', '--platform', platform] });
   } else if (!isSpecFirstSourceRepo(repoRoot) && context.host === 'qoder') {
     actions.push({ kind: 'install-qoder-adapter', command: null, args: [] });
   }
@@ -127,6 +144,10 @@ function plan(context = {}) {
   }
   const hasCurrent = currentArtifactRefs(repoRoot, currentArtifactRoot).length > 0;
   const hasLegacy = currentArtifactRefs(repoRoot, legacyArtifactRoot).length > 0;
+  if (context.refresh && ![currentArtifactRoot, legacyArtifactRoot].some((root) => {
+    const graph = lstatOrNull(path.join(root, 'graph.json'));
+    return graph && graph.isFile() && !graph.isSymbolicLink();
+  })) return blockedPlan(repoRoot, 'graphify-refresh-artifact-missing');
   const pythonProvider = true;
   if (!currentRootExists && legacyRootExists) {
     actions.push({
@@ -171,7 +192,7 @@ function plan(context = {}) {
       hook_names: [...GRAPHIFY_HOOK_NAMES],
     });
   } else if (hookTarget.classification === 'external') {
-    nonActions.push('有效 Git hooks root 位于当前项目外；setup 不运行 Graphify hook 命令，也不读取或修改该目录。');
+    nonActions.push('The effective Git hooks root is outside the project; setup may inspect bounded hook markers read-only, but does not execute hook commands or modify that directory. Marker verification does not verify execution.');
   } else if (hookTarget.classification === 'unsafe') {
     nonActions.push('项目内 hooks root 未通过 no-follow containment；setup 不运行 Graphify hook 命令。');
   } else if (hookTarget.classification === 'not-applicable') {
@@ -210,7 +231,9 @@ function plan(context = {}) {
     existing_artifact: hasCurrent,
     legacy_artifact: legacyRootExists,
     hook_target: publicGraphifyHookTarget(hookTarget),
-    actions,
+    actions: context.installationOnly
+      ? actions.filter((action) => ['install-dependency', 'install-project-skill', 'install-qoder-adapter'].includes(action.kind))
+      : actions,
     non_actions: nonActions,
   };
 }
@@ -256,6 +279,14 @@ function verify(context = {}) {
     }
     : context;
   const installed = resolvedCommand.ok;
+  if (context.installationOnly) return providerResult(METADATA, {
+    installed,
+    configured: isSpecFirstSourceRepo(repoRoot) || (installed && pythonHostIntegrationConfigured(repoRoot, context.host, runtimeContext).ok),
+    readinessStatus: installed ? 'unknown' : 'not-run',
+    readinessScope: 'installation', firstGenerationStatus: 'not-run',
+    nextActions: installed ? [] : ['运行显式 installation-only setup 安装 Graphify。'],
+    providerIdentity: graphifyIdentity(resolvedCommand),
+  });
   const currentRootExists = Boolean(lstatOrNull(resolved.artifact_root));
   const legacyArtifactRoot = path.join(repoRoot, LEGACY_ARTIFACT_ROOT);
   const legacyRootEntry = lstatOrNull(legacyArtifactRoot);
@@ -304,6 +335,7 @@ function verify(context = {}) {
   const degraded = installed && (legacyRootUnsafe || rootConflict || !configured || (hasCurrent && !graphIntegrity.ok)
     || (artifactUsable && !queryVerified) || scopeReadinessBlocked);
   return providerResult(METADATA, {
+    providerIdentity: graphifyIdentity(resolvedCommand),
     installed,
     configured,
     initialized: artifactUsable,
@@ -338,9 +370,10 @@ function verify(context = {}) {
 }
 
 function apply(context = {}, actionPlan = plan(context)) {
-  if (!actionPlan || actionPlan.blocked || !actionPlan.mutation) return verify(context);
+  if (actionPlan && actionPlan.blocked) return unsafeReadiness(context, path.resolve(context.repoRoot || actionPlan.repo_root || process.cwd()), actionPlan.reason_code);
+  if (!actionPlan || !actionPlan.mutation) return verify(context);
   const repoRoot = path.resolve(context.repoRoot || actionPlan.repo_root || process.cwd());
-  const recovery = recoverGraphifyMigration(repoRoot);
+  const recovery = context.installationOnly ? { ok: true } : recoverGraphifyMigration(repoRoot);
   if (!recovery.ok) return unsafeReadiness(context, repoRoot, recovery.reason_code);
   if (recovery.recovered) {
     actionPlan = plan({ ...context, selected: true, refresh: actionPlan.refresh === true });
@@ -357,6 +390,10 @@ function apply(context = {}, actionPlan = plan(context)) {
   }
   let fallbackUsed = false;
   let mutationFailure = null;
+  let generationSource = null;
+  let generationIdentity = null;
+  let queryIdentity = null;
+  let queryGraph = null;
   const pythonProvider = true;
   const pathRepair = { status: 'report-only', reason_code: null };
   let runtimeContext = actionPlan.resolved_graphify_command
@@ -388,6 +425,18 @@ function apply(context = {}, actionPlan = plan(context)) {
     };
   }
 
+  function currentExecutionIdentity() {
+    const identity = probePythonDistributionIdentity(runtimeContext, repoRoot, runtimeContext.graphifyCommand,
+      context.dependency, runtimeContext.graphifyInterpreter);
+    return graphifyIdentity({ ok: identity.ok, package_identity: identity, command: runtimeContext.graphifyCommand,
+      interpreter: identity.interpreter, installer: runtimeContext.graphifyInstaller });
+  }
+
+  function currentGraphHash() {
+    return graphArtifactSha256(repoRoot, actionPlan.artifact_root || path.join(repoRoot, CURRENT_ARTIFACT_ROOT),
+      (filename) => readBoundedScopeFile(repoRoot, filename));
+  }
+
   if (actionPlan.resolved_graphify_command) {
     adoptResolvedCommand({
       ok: true,
@@ -404,6 +453,7 @@ function apply(context = {}, actionPlan = plan(context)) {
   }
 
   for (const action of actionPlan.actions || []) {
+    if (context.installationOnly && !['install-dependency', 'install-project-skill', 'install-qoder-adapter'].includes(action.kind)) continue;
     try {
       assertGraphifyMutationSurfaces(repoRoot, context.host, actionPlan.artifact_root || path.join(repoRoot, CURRENT_ARTIFACT_ROOT), context.dependency && context.dependency.ecosystem);
     } catch (error) {
@@ -418,6 +468,24 @@ function apply(context = {}, actionPlan = plan(context)) {
         break;
       }
       adoptResolvedCommand(resolved);
+    }
+    if (['first-generation', 'refresh'].includes(action.kind)) {
+      // Project-contained hook installation is a setup-managed mutation. Perform it
+      // before taking the generation source snapshot so the snapshot measures the
+      // user's source rather than the hook files/config that setup just owns.
+      const preGenerationHookTarget = resolveGraphifyHookTarget(repoRoot, context.targetKind);
+      if (preGenerationHookTarget.classification === 'project-contained') {
+        const preGenerationHook = applyGraphifyHookCapability(
+          repoRoot,
+          runtimeContext,
+          preGenerationHookTarget,
+          pythonProvider,
+        );
+        if (['failed', 'blocked'].includes(preGenerationHook.status)) {
+          mutationFailure = preGenerationHook.reason_code || 'graphify-hook-install-failed';
+          break;
+        }
+      }
     }
     if (action.kind === 'install-dependency') {
       const result = run(context, action.command, action.args, {
@@ -452,6 +520,8 @@ function apply(context = {}, actionPlan = plan(context)) {
         }
       }
     } else if (action.kind === 'first-generation') {
+      generationIdentity = currentExecutionIdentity();
+      generationSource = sourceContentIdentity(captureSourceSnapshot({ ...context, repoRoot }));
       const extract = runGraphify(runtimeContext, action.args, {
         cwd: repoRoot,
         timeoutMs: 120000,
@@ -467,6 +537,8 @@ function apply(context = {}, actionPlan = plan(context)) {
         mutationFailure = 'graphify-first-generation-failed';
       }
     } else if (action.kind === 'refresh') {
+      generationIdentity = currentExecutionIdentity();
+      generationSource = sourceContentIdentity(captureSourceSnapshot({ ...context, repoRoot }));
       const refresh = runGraphify(runtimeContext, action.args, {
         cwd: repoRoot,
         timeoutMs: 120000,
@@ -477,6 +549,10 @@ function apply(context = {}, actionPlan = plan(context)) {
     if (mutationFailure) break;
   }
 
+  if (context.installationOnly) {
+    if (mutationFailure) return unsafeReadiness(context, repoRoot, mutationFailure);
+    return verify(runtimeContext);
+  }
   let queryVerified = false;
   try {
     assertGraphifyMutationSurfaces(repoRoot, context.host, actionPlan.artifact_root || path.join(repoRoot, CURRENT_ARTIFACT_ROOT), context.dependency && context.dependency.ecosystem);
@@ -491,18 +567,36 @@ function apply(context = {}, actionPlan = plan(context)) {
     if (!graphIntegrity.ok) mutationFailure = graphIntegrity.reason_code;
   }
   if (!mutationFailure && artifactRefs.length > 0) {
-    queryVerified = succeeded(runGraphify(runtimeContext, ['query', 'main'], { cwd: repoRoot, timeoutMs: 30000 }));
+    queryIdentity = currentExecutionIdentity();
+    try {
+      queryGraph = currentGraphHash();
+      queryVerified = succeeded(runGraphify(runtimeContext, ['query', 'main'], { cwd: repoRoot, timeoutMs: 30000 }));
+      if (queryGraph !== currentGraphHash()) mutationFailure = 'graphify-artifact-changed-during-verification';
+    } catch (_error) {
+      mutationFailure = 'graphify-artifact-changed-during-verification';
+    }
   }
   const hasArtifact = artifactRefs.length > 0;
   const generationAction = (actionPlan.actions || []).find(
     (action) => ['first-generation', 'refresh'].includes(action.kind),
   );
-  if (!mutationFailure && generationAction && hasArtifact) {
+  const hookTarget = resolveGraphifyHookTarget(repoRoot, context.targetKind);
+  const hookOutcome = !mutationFailure
+    ? applyGraphifyHookCapability(repoRoot, runtimeContext, hookTarget, pythonProvider)
+    : defaultGraphifyHookOutcome(hookTarget);
+  if (!mutationFailure && generationAction && currentArtifactRefs(repoRoot, actionPlan.artifact_root || path.join(repoRoot, CURRENT_ARTIFACT_ROOT)).length > 0) {
+    const currentSource = sourceContentIdentity(captureSourceSnapshot({ ...context, repoRoot }));
+    const stableSource = generationSource && currentSource && JSON.stringify(generationSource) === JSON.stringify(currentSource)
+      ? generationSource : null;
+    const sourceReason = stableSource ? null : (generationSource && currentSource
+      ? 'graphify-source-changed-during-generation' : 'graphify-source-snapshot-unavailable');
     const receiptWrite = writeGraphifyScopeProvenance(
       repoRoot,
       actionPlan.artifact_root || path.join(repoRoot, CURRENT_ARTIFACT_ROOT),
       actionPlan.requirement_workspace_path || '.',
       generationAction.kind,
+      stableSource,
+      sourceReason,
     );
     if (!receiptWrite.ok) mutationFailure = receiptWrite.reason_code;
   }
@@ -513,10 +607,6 @@ function apply(context = {}, actionPlan = plan(context)) {
   );
   const firstGeneration = graphifyFirstGenerationFacts(hasArtifact, scopeProvenance);
   const scopeReadinessBlocked = graphifyScopeReadinessBlocked(scopeProvenance);
-  const hookTarget = resolveGraphifyHookTarget(repoRoot, context.targetKind);
-  const hookOutcome = !mutationFailure
-    ? applyGraphifyHookCapability(repoRoot, runtimeContext, hookTarget, pythonProvider)
-    : defaultGraphifyHookOutcome(hookTarget);
   const generatedThisRun = !mutationFailure && (actionPlan.actions || []).some(
     (action) => ['first-generation', 'refresh'].includes(action.kind),
   );
@@ -536,6 +626,24 @@ function apply(context = {}, actionPlan = plan(context)) {
     if (!incumbentCleanup.ok) mutationFailure = incumbentCleanup.reason_code;
     else runtimeContext = { ...runtimeContext, graphifyCollisionState: 'none', graphifyOriginalPathCommand: null };
   }
+  // 发布前核对实际执行环境，不能把 plan 的历史 pin 当作当前安装身份。
+  const finalIdentity = runtimeContext.graphifyCommand
+    ? probePythonDistributionIdentity(runtimeContext, repoRoot, runtimeContext.graphifyCommand,
+      context.dependency, runtimeContext.graphifyInterpreter) : null;
+  if (!mutationFailure && (!finalIdentity || !finalIdentity.ok)) {
+    mutationFailure = (finalIdentity && finalIdentity.reason_code) || 'graphify-package-identity-unverified';
+  }
+  const publishedIdentity = graphifyIdentity({ ok: finalIdentity && finalIdentity.ok, package_identity: finalIdentity,
+    command: runtimeContext.graphifyCommand, interpreter: finalIdentity && finalIdentity.interpreter,
+    installer: runtimeContext.graphifyInstaller });
+  if (!mutationFailure && queryVerified) {
+    const identities = [queryIdentity, publishedIdentity, ...(generationAction ? [generationIdentity] : [])];
+    if (identities.some((identity) => !identity || !identity.inventory_sha256)) mutationFailure = 'graphify-package-identity-unverified';
+    else if (new Set(identities.map((identity) => JSON.stringify(identity))).size !== 1) mutationFailure = 'graphify-identity-changed-during-verification';
+    try {
+      if (queryGraph !== currentGraphHash()) mutationFailure = mutationFailure || 'graphify-artifact-changed-during-verification';
+    } catch (_error) { mutationFailure = mutationFailure || 'graphify-artifact-changed-during-verification'; }
+  }
   const degraded = Boolean(mutationFailure) || !hasArtifact || !queryVerified || scopeReadinessBlocked;
   const nextActions = [];
   if (mutationFailure) nextActions.push(`检查 ${mutationFailure} 的 Graphify diagnostic，并重新运行显式 setup。`);
@@ -545,6 +653,10 @@ function apply(context = {}, actionPlan = plan(context)) {
   const pathVisibilityAction = graphifyPathVisibilityAction(runtimeContext, pathRepair);
   if (pathVisibilityAction) nextActions.push(pathVisibilityAction);
   return providerResult(METADATA, {
+    providerIdentity: graphifyIdentity({ ok: finalIdentity && finalIdentity.ok,
+      package_identity: finalIdentity, command: runtimeContext.graphifyCommand,
+      interpreter: finalIdentity && finalIdentity.interpreter,
+      installer: runtimeContext.graphifyInstaller }),
     installed: !mutationFailure || hasArtifact,
     configured,
     initialized: hasArtifact,
@@ -552,7 +664,7 @@ function apply(context = {}, actionPlan = plan(context)) {
     artifactExists: hasArtifact,
     queryVerified,
     fallbackUsed,
-    readinessStatus: degraded ? 'degraded' : (generatedThisRun ? 'fresh' : 'unknown'),
+    readinessStatus: degraded ? 'degraded' : (generatedThisRun && scopeProvenance.source_snapshot ? 'fresh' : 'unknown'),
     repoAligned: 'unknown',
     firstGenerationStatus: mutationFailure && !hasArtifact ? 'failed' : firstGeneration.status,
     firstGenerationScope: firstGeneration.scope,
@@ -712,7 +824,11 @@ function probeExternalGraphifyHookMarker(hooksRoot) {
     try {
       const stat = fs.lstatSync(file);
       if (!stat.isFile()) continue;
-      const contents = fs.readFileSync(file, 'utf8');
+      // 外部 hooks root 不在本仓 containment 内,不能用 readBoundedScopeFile;此处以
+      // O_NOFOLLOW + 1MiB 前缀读取封顶(lane finding DR-005:旧版无上限读入用户可控
+      // hook 文件)。超限文件仅在前缀内探测 marker——探测是 advisory 检测,不证明全文。
+      const contents = readHookFilePrefix(file, 1024 * 1024);
+      if (contents == null) continue;
       if (contents.includes(GRAPHIFY_HOOK_MARKER)) {
         if (name === 'post-commit') detected.post_commit = true;
         else if (name === 'post-checkout') detected.post_checkout = true;
@@ -723,6 +839,24 @@ function probeExternalGraphifyHookMarker(hooksRoot) {
     }
   }
   return detected;
+}
+
+function readHookFilePrefix(file, maxBytes) {
+  const fd = fs.openSync(file, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0));
+  try {
+    const stat = fs.fstatSync(fd);
+    if (!stat.isFile()) return null;
+    const bytes = Buffer.alloc(Math.min(stat.size, maxBytes));
+    let size = 0;
+    while (size < bytes.length) {
+      const count = fs.readSync(fd, bytes, size, bytes.length - size, null);
+      if (!count) break;
+      size += count;
+    }
+    return bytes.subarray(0, size).toString('utf8');
+  } finally {
+    fs.closeSync(fd);
+  }
 }
 
 function usesLegacyGraphifyArtifactOverride(contents) {
@@ -906,7 +1040,7 @@ function graphifyScopeReceiptRef(repoRoot, artifactRoot) {
   return relativeRef(repoRoot, path.join(artifactRoot, GRAPHIFY_SCOPE_RECEIPT));
 }
 
-function graphArtifactSha256(repoRoot, artifactRoot) {
+function graphArtifactSha256(repoRoot, artifactRoot, readFile = fs.readFileSync) {
   const graphPath = assertContainedPath(repoRoot, path.join(artifactRoot, 'graph.json'), {
     reasonCode: 'graphify-scope-provenance-graph-unsafe',
   });
@@ -914,7 +1048,34 @@ function graphArtifactSha256(repoRoot, artifactRoot) {
   if (!graphEntry || graphEntry.isSymbolicLink() || !graphEntry.isFile()) {
     throw reasonError('graphify-scope-provenance-graph-unsafe', 'Graphify scope receipt 只能绑定真实 graph.json 文件');
   }
-  return crypto.createHash('sha256').update(fs.readFileSync(graphPath)).digest('hex');
+  return crypto.createHash('sha256').update(readFile(graphPath)).digest('hex');
+}
+
+function readBoundedScopeFile(repoRoot, filename, encoding) {
+  const maxBytes = path.basename(filename) === GRAPHIFY_SCOPE_RECEIPT ? 65536 : 64 * 1024 * 1024;
+  const signature = (stat) => JSON.stringify([stat.dev, stat.ino, stat.size, stat.mode, stat.nlink, stat.mtimeMs, stat.ctimeMs]);
+  assertContainedPath(repoRoot, filename, { reasonCode: 'graphify-scope-provenance-unsafe' });
+  const stat = fs.lstatSync(filename);
+  if (!stat.isFile() || stat.isSymbolicLink() || stat.nlink !== 1) throw reasonError('graphify-scope-provenance-unsafe');
+  if (stat.size > maxBytes) throw reasonError('graphify-scope-provenance-size-limit');
+  const fd = fs.openSync(filename, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0) | (fs.constants.O_NONBLOCK || 0));
+  try {
+    if (signature(fs.fstatSync(fd)) !== signature(stat)) throw reasonError('graphify-scope-provenance-changed-during-read');
+    const bytes = Buffer.alloc(stat.size + 1);
+    let size = 0;
+    while (size < bytes.length) {
+      const count = fs.readSync(fd, bytes, size, bytes.length - size, null);
+      if (!count) break;
+      size += count;
+    }
+    assertContainedPath(repoRoot, filename, { reasonCode: 'graphify-scope-provenance-unsafe' });
+    if (size !== stat.size || signature(fs.fstatSync(fd)) !== signature(stat)
+      || signature(fs.lstatSync(filename)) !== signature(stat)) throw reasonError('graphify-scope-provenance-changed-during-read');
+    const result = bytes.subarray(0, size);
+    return encoding ? result.toString(encoding) : result;
+  } finally {
+    fs.closeSync(fd);
+  }
 }
 
 function scopeProvenanceResult(status, requestedPath, verifiedPath, receiptRef, reasonCode = null) {
@@ -927,7 +1088,26 @@ function scopeProvenanceResult(status, requestedPath, verifiedPath, receiptRef, 
   };
 }
 
-function readGraphifyScopeProvenance(repoRoot, artifactRoot, requestedPath) {
+function readCurrentScopeProvenance(context = {}) {
+  const repoRoot = path.resolve(context.repoRoot || process.cwd());
+  if (typeof context.requirementWorkspace !== 'string' || !context.requirementWorkspace) {
+    return scopeProvenanceResult('unknown', null, null, null, 'graphify-scope-provenance-scope-unknown');
+  }
+  try {
+    const resolved = resolveProviderPaths({ requirementWorkspace: context.requirementWorkspace }, repoRoot);
+    if (!resolved.ok) return scopeProvenanceResult('invalid', context.requirementWorkspace, null, null, resolved.reason_code);
+    if (lstatOrNull(path.join(repoRoot, LEGACY_ARTIFACT_ROOT))) {
+      throw reasonError('graphify-artifact-root-conflict');
+    }
+    assertGraphifyArtifactSurface(repoRoot, resolved.artifact_root);
+    return readGraphifyScopeProvenance(repoRoot, resolved.artifact_root, resolved.workspace_relative,
+      (filename, encoding) => readBoundedScopeFile(repoRoot, filename, encoding));
+  } catch (error) {
+    return scopeProvenanceResult('invalid', context.requirementWorkspace, null, null, error.reason_code || 'graphify-scope-provenance-invalid');
+  }
+}
+
+function readGraphifyScopeProvenance(repoRoot, artifactRoot, requestedPath, readFile = fs.readFileSync) {
   const receiptRef = graphifyScopeReceiptRef(repoRoot, artifactRoot);
   const receiptPath = path.join(artifactRoot, GRAPHIFY_SCOPE_RECEIPT);
   try {
@@ -951,7 +1131,7 @@ function readGraphifyScopeProvenance(repoRoot, artifactRoot, requestedPath) {
         'graphify-scope-provenance-unsafe',
       );
     }
-    const receipt = JSON.parse(fs.readFileSync(receiptPath, 'utf8'));
+    const receipt = JSON.parse(readFile(receiptPath, 'utf8'));
     const receiptWorkspacePath = receipt && typeof receipt.requirement_workspace_path === 'string'
       && receipt.requirement_workspace_path.length > 0
       ? receipt.requirement_workspace_path
@@ -981,7 +1161,7 @@ function readGraphifyScopeProvenance(repoRoot, artifactRoot, requestedPath) {
         'graphify-scope-provenance-invalid',
       );
     }
-    if (receipt.graph_sha256 !== graphArtifactSha256(repoRoot, artifactRoot)) {
+    if (receipt.graph_sha256 !== graphArtifactSha256(repoRoot, artifactRoot, readFile)) {
       return scopeProvenanceResult(
         'invalid',
         requestedPath,
@@ -999,7 +1179,11 @@ function readGraphifyScopeProvenance(repoRoot, artifactRoot, requestedPath) {
         'graphify-scope-provenance-mismatch',
       );
     }
-    return scopeProvenanceResult('verified', requestedPath, verifiedPath, receiptRef);
+    const sourceSnapshot = receipt.source_reason_code == null ? sourceContentIdentity(receipt.source_snapshot) : null;
+    return { ...scopeProvenanceResult('verified', requestedPath, verifiedPath, receiptRef), graph_sha256: receipt.graph_sha256,
+      ...(sourceSnapshot ? { source_snapshot: sourceSnapshot } : {}),
+      ...(['graphify-source-changed-during-generation', 'graphify-source-snapshot-unavailable'].includes(receipt.source_reason_code)
+        ? { source_reason_code: receipt.source_reason_code } : {}) };
   } catch (error) {
     return scopeProvenanceResult(
       'invalid',
@@ -1011,7 +1195,7 @@ function readGraphifyScopeProvenance(repoRoot, artifactRoot, requestedPath) {
   }
 }
 
-function writeGraphifyScopeProvenance(repoRoot, artifactRoot, requirementWorkspacePath, operation) {
+function writeGraphifyScopeProvenance(repoRoot, artifactRoot, requirementWorkspacePath, operation, sourceSnapshot = null, sourceReason = null) {
   const receiptPath = path.join(artifactRoot, GRAPHIFY_SCOPE_RECEIPT);
   const temporaryPath = path.join(
     artifactRoot,
@@ -1033,6 +1217,8 @@ function writeGraphifyScopeProvenance(repoRoot, artifactRoot, requirementWorkspa
       requirement_workspace_path: requirementWorkspacePath || '.',
       operation,
       graph_sha256: graphArtifactSha256(repoRoot, artifactRoot),
+      source_snapshot: sourceSnapshot,
+      source_reason_code: sourceReason,
     };
     fs.writeFileSync(temporaryPath, `${JSON.stringify(payload, null, 2)}\n`, { flag: 'wx', mode: 0o600 });
     const current = lstatOrNull(receiptPath);
@@ -1076,10 +1262,17 @@ function graphifyFirstGenerationFacts(artifactExists, scopeProvenance) {
 
 function graphifyScopeReadinessBlocked(scopeProvenance) {
   return Boolean(scopeProvenance
-    && ['mismatch', 'invalid'].includes(scopeProvenance.status));
+    && (['mismatch', 'invalid'].includes(scopeProvenance.status)
+      || scopeProvenance.source_reason_code === 'graphify-source-changed-during-generation'));
 }
 
 function graphifyScopeNextActions(scopeProvenance) {
+  if (scopeProvenance?.source_reason_code === 'graphify-source-changed-during-generation') {
+    return ['构图期间源码发生变化；在源码稳定后显式运行 Graphify refresh，再验证当前图。'];
+  }
+  if (scopeProvenance?.source_reason_code === 'graphify-source-snapshot-unavailable') {
+    return ['构图未取得完整源码快照；检查源码路径/采集预算后显式 refresh，当前图仅作 advisory candidate。'];
+  }
   if (!scopeProvenance || scopeProvenance.status === 'verified') return [];
   if (scopeProvenance.status === 'mismatch') {
     return ['requested Graphify scope 与 artifact scope provenance 不匹配；运行显式 --only graphify --refresh --requirement-workspace <scope> 后重新 verify。'];
@@ -1091,9 +1284,7 @@ function graphifyScopeNextActions(scopeProvenance) {
 }
 
 function readGitHeadSha(repoRoot) {
-  const result = spawnSync('git', ['-C', path.resolve(repoRoot), 'rev-parse', 'HEAD'], {
-    encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 5000, windowsHide: true,
-  });
+  const result = runGit(repoRoot, ['rev-parse', 'HEAD']);
   if (result.error || result.status !== 0) return null;
   return String(result.stdout || '').trim() || null;
 }
@@ -1154,6 +1345,53 @@ function graphifyHookNextActions(outcome) {
   return ['Project-local Graphify 自动刷新未验证；如需该增强可重新运行显式 setup，核心图查询不受影响。'];
 }
 
+function readCurrentIdentity(context = {}) {
+  if (!context.dependency || context.dependency.ecosystem !== 'pypi') {
+    return { status: 'unknown', reason_code: 'graphify-python-provider-required' };
+  }
+  const deadline = performance.now() + 5000;
+  const remaining = () => {
+    const budget = Math.floor(deadline - performance.now());
+    if (budget <= 0) throw reasonError('graphify-identity-probe-timeout');
+    return budget;
+  };
+  const probeContext = { ...context, identityOnly: true, runner(command, args, options) {
+    const result = run(context, command, args, { ...options,
+      env: { ...options.env, PYTHONDONTWRITEBYTECODE: '1' },
+      timeoutMs: Math.min(options.timeoutMs || 5000, remaining()) });
+    remaining();
+    return result;
+  } };
+  try {
+    const resolved = resolveGraphifyCommand(probeContext, path.resolve(context.repoRoot || process.cwd()));
+    if (!resolved.ok) return {
+      status: resolved.reason_code === 'graphify-package-version-mismatch' ? 'stale' : 'unknown',
+      reason_code: resolved.reason_code,
+    };
+    return { status: 'confirmed', identity: graphifyIdentity(resolved) };
+  } catch (error) {
+    return { status: 'unknown', reason_code: error.reason_code === 'graphify-identity-probe-timeout' ? error.reason_code : 'graphify-package-identity-unverified' };
+  }
+}
+
+function graphifyIdentity(resolved) {
+  if (!resolved || !resolved.ok || !resolved.package_identity) return null;
+  const identity = resolved.package_identity;
+  const packages = identity.inventory && identity.inventory.packages;
+  const validInventory = Array.isArray(packages) && packages.length > 0 && packages.length <= 10000
+    && packages.every((entry) => Array.isArray(entry) && entry.length === 2
+      && entry.every((value) => typeof value === 'string' && value.length > 0));
+  return {
+    package: identity.package,
+    version: identity.version,
+    command: resolved.command,
+    interpreter: resolved.interpreter,
+    installer: resolved.installer,
+    inventory_sha256: validInventory
+      ? crypto.createHash('sha256').update(JSON.stringify(packages.map((entry) => JSON.stringify(entry)).sort())).digest('hex') : null,
+  };
+}
+
 function resolveGraphifyCommand(context, repoRoot) {
   return resolvePythonGraphifyCommand(context, repoRoot, context.dependency);
 }
@@ -1167,7 +1405,7 @@ function resolvePythonGraphifyCommand(context, repoRoot, dependency) {
   const windows = context.platform === 'windows' || process.platform === 'win32';
   const originalPath = providerOriginalPath(context);
   const originalPathCommand = commandFromSearchPath('graphify', originalPath, windows, context.env || {});
-  const collisionState = originalPathCommand
+  const collisionState = originalPathCommand && !context.identityOnly
     ? classifyOriginalGraphifyCommand(context, repoRoot, originalPathCommand)
     : 'none';
   const candidateNames = windows ? ['graphify.exe', 'graphify.cmd', 'graphify'] : ['graphify'];
@@ -1204,7 +1442,8 @@ function resolvePythonGraphifyCommand(context, repoRoot, dependency) {
       env: graphifyProcessEnv(context),
       inheritEnv: false,
     });
-    if (!succeeded(versionResult) || !versionOutputMatches(text(versionResult), dependency.version)) {
+    if (!succeeded(versionResult)) continue;
+    if (!versionOutputMatches(text(versionResult), dependency.version)) {
       mismatch = true;
       continue;
     }
@@ -1380,7 +1619,10 @@ function inspectGraphIntegrity(artifactRoot, supportedCodeFact = { status: 'pres
   }
   const supportedCodePresent = sourceFact.status === 'present';
   try {
-    const graph = JSON.parse(fs.readFileSync(graphPath, 'utf8'));
+    // 经 readBoundedScopeFile 读取:containment + 读取前后稳定性复核 + 64MiB 合同上限,
+    // 取代旧版无上限 readFileSync(lane finding DR-005);超限/读取期变化与解析失败
+    // 同路返回 artifact 合同不满足。
+    const graph = JSON.parse(readBoundedScopeFile(artifactRoot, graphPath, 'utf8'));
     const nodes = Array.isArray(graph.nodes) ? graph.nodes.length : null;
     if (nodes === null) return { ok: false, reason_code: 'graphify-artifact-contract-mismatch' };
     if (nodes === 0 && supportedCodePresent) return { ok: false, reason_code: 'graphify-extract-integrity-failed' };
@@ -1464,6 +1706,9 @@ function graphifyProviderLimitations(
   scopeProvenance = null,
 ) {
   const limitations = pythonProviderLimitations(runtimeContext, graphIntegrity, incumbentCleanup) || [];
+  if (scopeProvenance?.source_reason_code) {
+    limitations.push(providerLimitation('degraded', scopeProvenance.source_reason_code, '当前图未绑定稳定的构图源码快照。'));
+  }
   if (readinessFailureReason) {
     limitations.push(providerLimitation(
       'degraded',
@@ -1628,7 +1873,22 @@ function probePythonDistributionIdentity(context, repoRoot, launcher, dependency
 function launcherInterpreter(launcher) {
   if (path.extname(launcher).toLowerCase() === '.exe') return null;
   try {
-    const firstLine = fs.readFileSync(launcher, 'utf8').split(/\r?\n/, 1)[0];
+    // 只读首 4KiB 取 shebang,不再整文件读入(lane finding DR-005)。
+    const fd = fs.openSync(launcher, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0));
+    let prefix = '';
+    try {
+      const bytes = Buffer.alloc(4096);
+      let size = 0;
+      while (size < bytes.length) {
+        const count = fs.readSync(fd, bytes, size, bytes.length - size, null);
+        if (!count) break;
+        size += count;
+      }
+      prefix = bytes.subarray(0, size).toString('utf8');
+    } finally {
+      fs.closeSync(fd);
+    }
+    const firstLine = prefix.split(/\r?\n/, 1)[0];
     const match = firstLine.match(/^#!\s*(\S+)/);
     return match && (path.isAbsolute(match[1]) || path.win32.isAbsolute(match[1])) ? match[1] : null;
   } catch (_error) {
@@ -1646,6 +1906,27 @@ function parseJsonStdout(result) {
   } catch (_error) {
     return null;
   }
+}
+
+function graphifyArtifactIsProtected(repoRoot) {
+  // 与 Provider backup_if_protected（graphifyy 0.9.x export.py）同构的触发判定：
+  // graph.json 存在，且 .graphify_semantic_marker 存在，或 .graphify_labels.json
+  // 含任一非默认（非 "Community N"）社区标签。判定失败时保守视为受保护。
+  try {
+    const outDir = path.join(repoRoot, CURRENT_ARTIFACT_ROOT);
+    if (!fs.existsSync(path.join(outDir, 'graph.json'))) return false;
+    if (fs.existsSync(path.join(outDir, '.graphify_semantic_marker'))) return true;
+    const labelsPath = path.join(outDir, '.graphify_labels.json');
+    if (fs.existsSync(labelsPath)) {
+      const labels = JSON.parse(fs.readFileSync(labelsPath, 'utf8'));
+      if (labels && typeof labels === 'object' && !Array.isArray(labels)) {
+        return Object.entries(labels).some(([key, value]) => value !== `Community ${key}`);
+      }
+    }
+  } catch (error) {
+    return true;
+  }
+  return false;
 }
 
 function graphifyProcessEnv(context, additions = {}) {
@@ -1671,6 +1952,12 @@ function graphifyProcessEnv(context, additions = {}) {
       || /^GIT_CONFIG_(?:KEY|VALUE)_\d+$/.test(key)) {
       env[key] = value;
     }
+  }
+  // Provider 的 backup_if_protected 会在覆盖前把 curated/semantic 图快照到 graphify-out/<日期>/。
+  // 非 curated 的 setup 管理图关闭按天备份避免逐日镜像堆积；curated/semantic 图保留该快照
+  // 作为覆盖前唯一回滚通道（判定与 backup_if_protected 同构，判定失败时保守保留备份）。
+  if (!graphifyArtifactIsProtected(path.resolve(context.repoRoot || process.cwd()))) {
+    env.GRAPHIFY_NO_BACKUP = '1';
   }
   return env;
 }
@@ -1897,13 +2184,8 @@ function assertGraphifyMutationSurfaces(repoRoot, host, artifactRoot, ecosystem)
 
 function projectMutationSurfaces(repoRoot, host, ecosystem) {
   if (ecosystem === 'pypi') {
-    const pythonPaths = {
-      claude: ['.claude/skills/graphify/SKILL.md', '.claude/CLAUDE.md', 'CLAUDE.md', '.claude/settings.json'],
-      codex: ['.codex/skills/graphify/SKILL.md', 'AGENTS.md', '.codex/hooks.json'],
-      cursor: ['.cursor/rules/graphify.mdc'],
-      kiro: ['.kiro/skills/graphify/SKILL.md', '.kiro/steering/graphify.md'],
-      qoder: ['.qoder/rules/spec-first.md'],
-    }[host] || ['.codex/skills/graphify/SKILL.md', 'AGENTS.md', '.codex/hooks.json'];
+    const pythonPaths = GRAPHIFY_PYTHON_HOST_SURFACES[host]
+      || ['.codex/skills/graphify/SKILL.md', 'AGENTS.md', '.codex/hooks.json'];
     return pythonPaths.map((relativePath) => path.join(repoRoot, relativePath));
   }
   const instruction = host === 'claude' ? 'CLAUDE.md' : 'AGENTS.md';
@@ -1919,13 +2201,8 @@ function projectMutationSurfaces(repoRoot, host, ecosystem) {
 function projectSkillConfigured(repoRoot, host, ecosystem) {
   if (isSpecFirstSourceRepo(repoRoot)) return true;
   if (ecosystem === 'pypi') {
-    const required = {
-      claude: ['.claude/skills/graphify/SKILL.md', '.claude/CLAUDE.md', 'CLAUDE.md', '.claude/settings.json'],
-      codex: ['.codex/skills/graphify/SKILL.md', 'AGENTS.md', '.codex/hooks.json'],
-      cursor: ['.cursor/rules/graphify.mdc'],
-      kiro: ['.kiro/skills/graphify/SKILL.md', '.kiro/steering/graphify.md'],
-      qoder: ['.qoder/rules/spec-first.md'],
-    }[host] || ['.codex/skills/graphify/SKILL.md', 'AGENTS.md', '.codex/hooks.json'];
+    const required = GRAPHIFY_PYTHON_HOST_SURFACES[host]
+      || ['.codex/skills/graphify/SKILL.md', 'AGENTS.md', '.codex/hooks.json'];
     return required.every((relativePath) => fs.existsSync(path.join(repoRoot, relativePath)));
   }
   const candidates = {
@@ -2028,8 +2305,11 @@ function normalizePythonHostIntegration(repoRoot, host, runtimeContext) {
   const providerOwnedSurfaces = {
     claude: ['.claude/skills/graphify', '.claude/CLAUDE.md'],
     codex: ['.codex/skills/graphify'],
+    opencode: ['.opencode/skills/graphify', '.opencode/plugins/graphify.js', '.opencode/opencode.json'],
     cursor: ['.cursor/rules/graphify.mdc'],
     kiro: ['.kiro/skills/graphify', '.kiro/steering/graphify.md'],
+    zcode: ['.agents/skills/graphify'],
+    pi: ['.agents/skills/graphify'],
   }[host] || [];
   for (const relativePath of providerOwnedSurfaces) {
     const surface = path.join(repoRoot, relativePath);
@@ -2171,12 +2451,7 @@ function pythonHostIntegrationConfigured(repoRoot, host, runtimeContext) {
       ? { ok: true, mode: 'spec-first-adapter' }
       : { ok: false, reason_code: 'graphify-qoder-adapter-invalid' };
   }
-  const required = {
-    claude: ['.claude/skills/graphify/SKILL.md', '.claude/CLAUDE.md', 'CLAUDE.md', '.claude/settings.json'],
-    codex: ['.codex/skills/graphify/SKILL.md', 'AGENTS.md', '.codex/hooks.json'],
-    cursor: ['.cursor/rules/graphify.mdc'],
-    kiro: ['.kiro/skills/graphify/SKILL.md', '.kiro/steering/graphify.md'],
-  }[host] || [];
+  const required = GRAPHIFY_PYTHON_HOST_SURFACES[host] || [];
   if (required.length === 0 || required.some((relativePath) => !fs.existsSync(path.join(repoRoot, relativePath)))) {
     return { ok: false, reason_code: 'graphify-project-integration-missing' };
   }
@@ -2465,6 +2740,8 @@ function unsafeReadiness(context, repoRoot, reasonCode) {
 }
 
 module.exports = {
+  readCurrentScopeProvenance,
+  readCurrentIdentity,
   apply,
   cleanupNpmGraphifyIncumbent,
   graphifyProcessEnv,

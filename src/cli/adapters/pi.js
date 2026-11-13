@@ -35,7 +35,9 @@ class PiAdapter extends CodexAdapter {
   }
 
   get agentsRoot() {
-    return '.pi/agents';
+    // supportsAgents=false 使其不参与写路径；收在受管命名空间内，避免 clean 的
+    // 无守卫探针把用户自有的 .pi/agents/ 误判为 spec-first 安装。
+    return '.pi/spec-first/agents';
   }
 
   get stateFile() {

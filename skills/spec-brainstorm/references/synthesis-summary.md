@@ -1,6 +1,6 @@
 # Synthesis Summary
 
-**Synthesis ≠ unified plan artifact.** The synthesis is NOT a preview, draft, or substitute for the requirements-only unified plan — it's the scope checkpoint that doc-write consumes as input. The Product Contract itself is written in Phase 3 from the confirmed synthesis. Both the synthesis and the Product Contract stay scope-only — implementation detail (file paths, code shapes, exact error wording) is downstream (spec-plan's job), not the Product Contract.
+**Synthesis ≠ unified plan artifact.** The synthesis is NOT a preview, draft, or substitute for the requirements-only unified plan — it's the scope checkpoint that doc-write consumes as input. When a durable artifact is warranted, Phase 3 writes the Product Contract from the confirmed synthesis; otherwise the synthesis is brief alignment and Phase 4 owns any established handoff. Both the synthesis and the Product Contract stay scope-only — implementation detail (file paths, code shapes, exact error wording) is downstream (spec-plan's job), not the Product Contract.
 
 **Two-stage shape: internal draft, then chat-time scoping synthesis.** The synthesis is composed in two stages. Stage 1 is an internal three-bucket draft (Stated / Inferred / Out of scope) the agent uses to think comprehensively about scope. Stage 2 is the scoping synthesis presented to the user — shaped like what two product collaborators would confirm before writing a PRD, not like a comprehensive audit and not like a one-line preview. The user only sees stage 2. The internal draft still informs the doc body via the doc-shape routing below; it just doesn't reach the user verbatim. This split exists because the comprehensive audit shape produced too much detail for the user to actually weigh in on, even when the granularity rules were followed.
 
@@ -16,7 +16,7 @@ Fires for **all tiers** including Lightweight. Skip Phase 2.5 entirely on the Ph
 
 The internal draft is structured in three labeled buckets. Items may appear in two buckets when meaningfully both — flag the inclusion-then-exclusion as Inferred so the reasoning is captured.
 
-- **Stated** — what the user said directly (in the original prompt, prior conversation, dialogue answers, approach selection in Phase 2). Items here have explicit user-language anchors.
+- **Stated** — including already-settled choices with their actual decision source and provenance per `settled-decisions.md`, as well as what the user said directly (in the original prompt, prior conversation, dialogue answers, approach selection in Phase 2). Items here have explicit user-language anchors.
 - **Inferred** — what the agent assumed to fill gaps. Scope boundaries the user never explicitly named, success criteria extrapolated from intent, technical assumptions made because the brief interview didn't probe them. The Inferred bucket is the most actionable surface for correction — items here are the agent's bets.
 - **Out of scope** — deliberately excluded items. Adjacent work the agent considered but decided not to include, refactors, nice-to-haves, future-work items. Making exclusions explicit lets the agent spot anything that should actually be included.
 
@@ -28,7 +28,7 @@ This draft is internal. Do not paste it verbatim into chat. Compose it as a thin
 
 The scoping synthesis is what the user actually sees. It reflects the dialogue's substance back so the user can pattern-match — long enough to serve a multi-turn conversation, short enough to be high-impact only. The reference shape is what two product collaborators would say to each other after a real discussion: "OK, so we're doing X, with Y trade-off, deferring Z, and one thing I want to double-check is W. Sound right?"
 
-The scoping synthesis has up to four named sections, each **render-conditional** on having something to say. Empty sections are omitted, not padded.
+The scoping synthesis first states **The problem** in one plain sentence: the user problem and desired outcome, labeling any inference that still needs correction. A proposed solution is a means, not proof of the underlying goal. It then has up to four named sections, each **render-conditional** on having something to say. Empty sections are omitted, not padded.
 
 1. **What we're building** (always present) — 1–3 sentences. The shape that emerged from dialogue, forward-looking, plain words. Not a transcript of "you said X."
 2. **Key trade-offs** (conditional) — 1–3 bullets, each with a brief why. Render only when real trade-offs were made in dialogue.
@@ -42,14 +42,16 @@ Each section answers a different question:
 - **What did we cut?** → deferred items a reader would expect to see acknowledged
 - **Where might you redirect?** → residual forks: post-dialogue consequences, silent inferences, late-cycle bets
 
-Then the confirmation: *"Confirm and I'll write the requirements-only plan next, drawing on our dialogue and this synthesis. Or tell me what to change."* The phrasing sets the expectation that confirm -> artifact-write, so the user knows what's about to happen and can interrupt without ambiguity.
+Resolve whether a document is warranted under `brainstorm-sections.md` before promising the next action. 需要确认且文档必要时使用："Confirm and I'll write the requirements-only plan next. Or tell me what to change." 若需要确认且用户不需要文档或简短对齐已足够，使用："Confirm and we're done here; no document will be written." 无需确认时直接说明实际交付，不输出等待邀请。 Name a downstream destination only if this run established it. Do not claim a file, commit message, knowledge publication or workflow invocation that has not occurred. Existing task authorization can cover continuation, but cannot be reported as explicit user review.
 
 ### Path A vs Path B: the gate that fires the confirmation question
 
+先区分呈现深度与等待条件：已有自主整理、写入或续跑授权且 WHAT 已闭合时，各深度均说明范围后继续，不重复索取批准；用户明确要求逐阶段确认或出现新的实质产品决策、权限或副作用缺口时，仅阻塞依赖动作。自主执行不是用户逐项审阅，未解决的产品问题不得写成确认事实。
+
 Phase 2.5 has two presentation modes, gated by **two signals**: (1) did any blocking question fire before Phase 2.5? AND (2) what tier did Phase 0.3 classify the scope as? Blocking questions include Phase 0.3 scope disambiguation, Phase 1.3 collaborative dialogue probes, and Phase 2 approach selection (when a menu fires). Internal classification, Phase 1.1 scan, and Phase 1.2 pressure test are not blocking questions — they don't count.
 
-- **Path A — no blocking questions fired AND tier is Lightweight**: announce-mode. Emit "What we're building" prose only (no other sections, no confirmation question), then proceed to Phase 3 doc-write in the same turn. Do NOT end the turn waiting for acknowledgment. The user can revise after the doc lands if the shape is wrong — Lightweight Path A docs are short, post-hoc revision is cheap.
-- **Path B — at least one blocking question fired, OR tier is Standard / Deep-feature / Deep-product**: full tier-aware scoping synthesis with confirmation gate. Two scenarios fire Path B: (a) the user invested answer-time during dialogue, or (b) the user pre-loaded substantive scope content (Phase 0.2 fast-path with a richly-specified opening prompt). Either way, the substance earns a real checkpoint. The confirmation question is unconditional even when zero call-outs survive the keep test.
+- **Path A — no blocking questions fired AND tier is Lightweight**: 默认使用简短公告。仅在统一等待判断允许继续时，不提确认问题并在同轮进入必要的 Phase 3 或 Phase 4；用户明确要求先确认时，简短呈现后等待，不能由 Lightweight 覆盖该要求。 The user can revise after the doc lands if the shape is wrong — Lightweight Path A docs are short, post-hoc revision is cheap.
+- **Path B — at least one blocking question fired, OR tier is Standard / Deep-feature / Deep-product**: full tier-aware scoping synthesis with confirmation gate. Two scenarios fire Path B: (a) the user invested answer-time during dialogue, or (b) the user pre-loaded substantive scope content (Phase 0.2 fast-path with a richly-specified opening prompt). Either way, the substance earns a real checkpoint. 呈现完整摘要不等于必须等待：只有上面的授权与缺口判断要求确认时才提出确认问题；没有新决策且已授权继续时公告后进入既定交付。
 
 **Why the tier guard exists.** Phase 0.2's fast path is designed for two very different cases — a tight one-line prompt that needs no dialogue ("fix the typo on line 47"), and a richly pre-loaded brainstorm context that ALSO needs no dialogue because the user pre-stated everything (e.g., handing off accumulated decisions from a prior session for a brainstorm doc backfill). Without a tier guard, both route to Path A, and the richly-loaded case gets a 1-sentence checkpoint for what may be 20+ items worth of scope. Tier-classifying Phase 0.3 distinguishes these cases — pre-loaded substance makes the tier Standard or Deep, which then routes to Path B and produces the full scoping synthesis the substance deserves. Do not simplify the gate back to a single "no questions fired" signal — that was a real defect that produced one-sentence syntheses on Deep-tier pre-loads.
 
@@ -123,20 +125,22 @@ Each anti-pattern below produces a bullet that fails its section's keep test, or
 - **Re-stating the Phase 2 approach the user already picked**: the approach was chosen before Phase 2.5 — its mention belongs in one sentence of "What we're building," not as a call-out.
 - **Padding a section to meet a bullet count**: render-conditional means empty is allowed. Omit the section entirely rather than fill it with weak items.
 - **Pasting the three-bucket internal draft verbatim into chat**: that was the old shape and the volume problem it produced is why stage 2 exists. Compose internally, derive scoping synthesis sections, present compressed.
-- **Floating questions adjacent to stage 2**: if a question genuinely cannot be defaulted, pause synthesis and resolve it before presenting. Pick the question shape that matches: a blocking multiple-choice tool when options are bounded and meaningfully distinct, open-ended when option sets would unintentionally influence the user's answer per Interaction Rule 5(a). Integrate the answer, then present the scoping synthesis. Never present the scoping synthesis with adjacent floating questions — that gives the user no clear resolution path.
+- **Floating questions adjacent to stage 2**: if a question genuinely cannot be defaulted, pause synthesis and resolve it before presenting. Pick the question shape that matches: a blocking multiple-choice tool when options are bounded and meaningfully distinct, open-ended when option sets would unintentionally influence the user's answer per Interaction Rule 5. Integrate the answer, then present the scoping synthesis. Never present the scoping synthesis with adjacent floating questions — that gives the user no clear resolution path.
 
 ---
 
 ## Prompt templates
 
-This is directional guidance — adjust phrasing to fit dialogue context. Open-ended feedback per Interaction Rule 5(a) (an option menu would unintentionally influence the user toward the parts the menu lists, away from anything else they might want to change).
+This is directional guidance — adjust phrasing to fit dialogue context. Open-ended feedback per Interaction Rule 5 (an option menu would unintentionally influence the user toward the parts the menu lists, away from anything else they might want to change).
 
-**Prose discipline for "What we're building" (required):** forward-looking (what *will* be in the doc), not retrospective (what's been discussed). Lead with the actual thing being built in plain words. No qualifiers ("comprehensive," "thoughtful," "substantive"). No re-stating dialogue context the user just lived through. If the work can't be said in 1–3 sentences without filler, the synthesis isn't ready yet.
+**Prose discipline for "What we're building" (required):** forward-looking (what the proposed work will achieve), not retrospective (what's been discussed). Lead with the actual thing being built in plain words. No qualifiers ("comprehensive," "thoughtful," "substantive"). No re-stating dialogue context the user just lived through. If the work can't be said in 1–3 sentences without filler, the synthesis isn't ready yet.
 
 ### Path B template (questions were asked)
 
 ```
 Based on our dialogue, here's the scope I'm proposing for the Product Contract:
+
+**The problem:** [user problem and desired outcome; mark inference]
 
 **What we're building:** [1–3 sentences — the shape that emerged from dialogue, forward-looking, plain words]
 
@@ -152,20 +156,20 @@ Based on our dialogue, here's the scope I'm proposing for the Product Contract:
 - [scope-level fork or non-obvious consequence the user can affirm or redirect]
 - [same]
 
-Confirm and I'll write the requirements-only plan next, drawing on our dialogue and this synthesis. Or tell me what to change — even something I captured correctly earlier is fair game to revise (you may have changed your mind or want to correct an unstated assumption).
+[Name the actual next action: write the warranted document, or finish brief alignment with no document.] Tell me what to change, including any previously settled choice you now want to revise.
 ```
 
 ### Path A template (no questions were asked — typically Phase 0.2 short-circuit)
 
 ```
-Proposing: [1–3 line shape — what the doc will say in plain words].
+Proposing: [1–3 line shape and the outcome it serves].
 
-No open decisions — writing the requirements-only plan now. Interrupt if the shape is wrong.
+[Continue to the warranted document or the established no-document handoff.] Interrupt if the shape is wrong.
 ```
 
-Proceed to Phase 3 doc-write in the same turn — do NOT end the turn waiting for an acknowledgment. The "interrupt if wrong" affordance means the user can revise after the doc lands, not before. Lightweight Path A docs are short, so post-hoc revision is cheap.
+仅当统一等待判断允许继续时，在同轮写必要文档或交付既定简短对齐；不要为满足模板而造文档。明确要求先确认时，在同样的简短摘要后请求确认。
 
-Ask the user open-ended on Path B (no `AskUserQuestion` menu). The justification is Interaction Rule 5(a) in SKILL.md — an option menu would unintentionally influence the user's feedback toward the parts the menu lists.
+仅当统一等待判断要求确认时，Path B 使用开放式问题（无 `AskUserQuestion` 菜单）；已授权自主继续时使用公告。 The justification is Interaction Rule 5 in `references/interaction-rules.md` — an option menu would unintentionally influence the user's feedback toward the parts the menu lists.
 
 ### Worked example: compression from internal draft to scoping synthesis (Standard tier)
 
@@ -213,30 +217,24 @@ This is one mental act — re-read as the user — not a checklist to mechanical
 
 ---
 
-## Re-present after revision; write only on confirm
+## Re-present after revision; follow the resolved destination
 
-A revision is not a confirmation. After any user revision (even a trivially-understood swap like "move deferred item X back into scope"), integrate the change, re-present the revised scoping synthesis with the change reflected, and wait for explicit confirmation before writing the doc. The loop is:
-
-1. Present scoping synthesis → user responds
-2. User confirms → write the doc
-3. User revises → integrate, re-present revised scoping synthesis, return to step 1
-
-Doc-write fires only on explicit confirm or after the soft-cut blocking question's "proceed" option (see below). The confirmation step is what makes the scoping synthesis **confirmed** rather than "agent's last proposal" — never write immediately after a revision, even when the revision is small enough that the agent feels it understood.
+修订不等于确认，也不自动撤销已有任务授权。合并修订后，若 WHAT 已闭合、范围及重要后果仍在授权内，简述变化并继续既定文档或无文档交付。若用户要求逐阶段共创，或修订引入新的实质产品决定、权限及副作用缺口，则呈现相关差异并等待必要答案。不得将理解、沉默或修订本身记为人工批准；记录真实决定来源与未决项。
 
 ---
 
 ## Soft-cut on circularity (not iteration count)
 
-Track which scoping synthesis items the user touched per round. The soft-cut blocking question fires **only when the same item is revised twice** (or a third-round revision targets an item already revised in round two). New-item revisions across rounds proceed without limit — revising different aspects of a wrong scoping synthesis is exactly what the mechanism should support.
+记录每轮修订涉及的决定维度。同一事项修订两次（或第三轮触及第二轮已修项）时检查是否存在未解决的真实分歧；修订次数本身不构成等待条件。只有统一等待判断要求用户决定时才提出下面的 soft-cut 问题。 New-item revisions across rounds proceed without limit — revising different aspects of a wrong scoping synthesis is exactly what the mechanism should support.
 
-**Identity across rounds is by decision dimension, not surface wording or section.** A revision may cause stage 2 to re-derive — the same underlying decision can come back rephrased, merged with another bullet, or moved to a different section (e.g., what was a Trade-off in round one becomes a Call-out in round two after the user pushed back). "Same item" means the same underlying decision regardless of which section currently holds it. When a re-cut collapses multiple prior bullets into one, the new combined bullet inherits the "touched" status of any of its constituents — soft-cut fires if any underlying decision was already revised once before.
+**Identity across rounds is by decision dimension, not surface wording or section.** A revision may cause stage 2 to re-derive — the same underlying decision can come back rephrased, merged with another bullet, or moved to a different section (e.g., what was a Trade-off in round one becomes a Call-out in round two after the user pushed back). "Same item" means the same underlying decision regardless of which section currently holds it. When a re-cut collapses multiple prior bullets into one, the new combined bullet inherits the "touched" status of any of its constituents — 任一底层决定已被修订时进入分歧检查，再按统一等待判断决定是否提问。
 
-When the soft-cut fires, use the platform's blocking question tool (`AskUserQuestion` in Claude Code, `request_user_input` in Codex) with two options:
+When the soft-cut fires, use the platform's blocking question tool (match the host's blocking question tool by capability from the current tool list) with two options:
 
-- `Proceed and write the requirements-only plan`
+- `Proceed with the agreed next step`
 - `Hold off — keep discussing before the doc`
 
-Fall back to a numbered list in chat only when no blocking tool exists or the call errors. Never silently skip.
+Fall back to a numbered list in chat only when no such tool is in the list or a real question call errors. Never silently skip.
 
 ---
 
@@ -255,14 +253,17 @@ This support exists because the scoping synthesis is an honest checkpoint. If th
 
 ## Doc shape after confirmation
 
-After user confirmation (or after the soft-cut decision proceeds), Phase 3 writes the requirements-only unified plan. The internal draft does NOT carry into the artifact as a `## Synthesis` section. Only the "What we're building" prose embeds, as `## Summary` inside the Product Contract. Internal-draft content dissolves into the Product Contract's body sections:
+After confirmation or authorized continuation, Phase 3 writes only when a durable document is warranted. On a no-document path, return the confirmed scope and any established destination without claiming artifact creation. The routing below applies only to a written artifact. The internal draft does NOT carry into the artifact as a `## Synthesis` section. Only the "What we're building" prose embeds, as `## Summary` inside the Product Contract. Internal-draft content dissolves into the Product Contract's body sections:
 
 | Internal-draft element | Where it goes in the doc |
 |---|---|
+| Confirmed problem | `## Problem Frame`, distinct from the proposed means |
 | "What we're building" prose | `## Summary` (1–3 lines, forward-looking, what's proposed) |
 | Stated bullets | `## Requirements` (numbered R-IDs, full detail) and where relevant `## Problem Frame` for narrative context |
 | Inferred bullets | `## Key Decisions` (with rationale) — bets the user accepted in dialogue become decisions in the doc. |
 | Out-of-scope bullets | `## Scope Boundaries` |
+
+**Settled-choice exception.** A genuinely session-settled product choice in Stated routes once to Product Contract Key Decisions with its actual `session-settled:` annotation and `Governs R...` links. Do not soften it into an inferred assumption or ask the same choice again without new invalidating evidence. A cold directive and an agent-proposed bet do not acquire a fabricated deliberation/approval history. Technical choices remain planning-owned KTDs; synthesis must not insert them as new product requirements. New consequences or ambiguities are named separately with their source.
 
 The chat-time Trade-offs section dissolves into `## Key Decisions` (the explicit choices acknowledged in chat become documented decisions). The chat-time What's-not-in-scope section dissolves into `## Scope Boundaries`.
 

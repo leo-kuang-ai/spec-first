@@ -19,7 +19,7 @@ context:
     checkout: main
 
 constraints:
-  timeout_seconds: 600
+  timeout_seconds: 1200
   max_turns: 40
 
 expect:

@@ -17,6 +17,7 @@ context:
 
 expect:
   files_not_exist:
+    - ".spec-first/workflows/spec-explain"
     - "docs/explainers"
 
 judge:

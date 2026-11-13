@@ -8,6 +8,7 @@ const {
   finalizePrd,
   verifyPrdReceipt,
 } = require('../../skills/spec-prd/scripts/finalize-prd-artifact');
+const { buildReport } = require('../../skills/spec-prd/scripts/check-prd-artifact');
 
 function write(filePath, content) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
@@ -131,5 +132,55 @@ describe('spec-prd final intent and receipt transition', () => {
     expect(preview.blocking_reason_codes).toContain('ready_receipt_stale');
     expect(verified.verified).toBe(false);
     expect(verified.reason_codes).toContain('ready_receipt_stale');
+  });
+
+  test.each(['body', 'body-and-input', 'metadata'])('input refresh cannot re-sign changed PRD %s', (mutation) => {
+    finalizePrd(prdPath, [inputPath]);
+    if (mutation === 'metadata') {
+      write(prdPath, fs.readFileSync(prdPath, 'utf8').replace('title: Finalize Transition', 'title: Changed product intent'));
+    } else {
+      fs.appendFileSync(prdPath, '\nA new product requirement.\n');
+    }
+    if (mutation === 'body-and-input') fs.appendFileSync(inputPath, 'new evidence\n');
+    const before = fs.readFileSync(prdPath);
+    for (const checkOnly of [true, false]) {
+      const result = finalizePrd(prdPath, [inputPath], { refreshInputsHash: true, checkOnly });
+      expect(result.can_finalize).toBe(false);
+      expect(result.should_block_closeout).toBe(true);
+      expect(result.blocking_reason_codes).toContain('ready_receipt_stale');
+      expect(fs.readFileSync(prdPath)).toEqual(before);
+    }
+    expect(verifyPrdReceipt(prdPath, [inputPath]).verified).toBe(false);
+  });
+
+  test('input-only refresh retains the PRD hash and restores a verified receipt', () => {
+    const first = finalizePrd(prdPath, [inputPath]);
+    fs.appendFileSync(inputPath, 'updated evidence\n');
+    const before = fs.readFileSync(prdPath);
+    const preview = finalizePrd(prdPath, [inputPath], { refreshInputsHash: true, checkOnly: true });
+    expect(preview.can_finalize).toBe(true);
+    expect(fs.readFileSync(prdPath)).toEqual(before);
+    const refreshed = finalizePrd(prdPath, [inputPath], { refreshInputsHash: true });
+    expect(refreshed.status).toBe('finalized');
+    expect(refreshed.checker.prd_hash).toBe(first.checker.prd_hash);
+    expect(refreshed.checker.inputs_hash).not.toBe(first.checker.inputs_hash);
+    expect(verifyPrdReceipt(prdPath, [inputPath]).verified).toBe(true);
+  });
+
+  test('product words in implementation questions are advisory, while explicit WHAT conflicts block', () => {
+    const marker = '## Readiness Self-Check';
+    const question = '| OQ-01 | permission mock file naming | tests/permission.test.js | source-proven | no | implementation-only-how-pushdown | no | closed | Source: tests/permission.test.js |\n\n';
+    const text = finalIntentPrd().replace(marker, question + marker);
+    const report = buildReport(prdPath, text, { inputs: [inputPath] });
+    expect(report.facts.possible_misclassified_how_pushdown_count).toBe(1);
+    expect(report.facts.blocking_reason_codes).not.toContain('how_pushdown_touches_what');
+    expect(report.facts.blocking_reason_codes).not.toContain('preflight_closure_contradicted');
+    write(prdPath, text);
+    expect(finalizePrd(prdPath, [inputPath]).status).toBe('finalized');
+
+    const contradictory = text.replace('| no | closed | Source:', '| yes | closed | Source:');
+    const conflict = buildReport(prdPath, contradictory, { inputs: [inputPath] });
+    expect(conflict.facts.blocking_reason_codes).toContain('planning_invention_question_present');
+    expect(conflict.facts.blocking_reason_codes).toContain('how_pushdown_touches_what');
   });
 });

@@ -1,0 +1,5 @@
+pulse_product_name: Ledger
+pulse_metric_sources: revenue=payments-export,active_users=analytics-export
+pulse_quality_scoring: false
+pulse_db_enabled: false
+pulse_schedule: manual

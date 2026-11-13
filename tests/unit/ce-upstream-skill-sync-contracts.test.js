@@ -9,11 +9,6 @@ function read(filePath) {
 describe('CE upstream skill sync contracts', () => {
   test('keeps pre-resolved git commands shell-portable', () => {
     const files = [
-      'skills/spec-brainstorm/SKILL.md',
-      'skills/spec-commit-push-pr/SKILL.md',
-      'skills/spec-compound/SKILL.md',
-      'skills/spec-ideate/SKILL.md',
-      'skills/spec-plan/SKILL.md',
       'skills/spec-sweep/SKILL.md',
     ];
 
@@ -32,6 +27,15 @@ describe('CE upstream skill sync contracts', () => {
   });
 
   test('gathers commit and product-pulse context at runtime without host pre-resolution', () => {
+    const brainstorm = read('skills/spec-brainstorm/references/output-mode.md');
+    expect(brainstorm).toContain('Resolve `<repo-root>` at runtime');
+    expect(brainstorm).not.toContain('!`git rev-parse');
+    const ideateOutput = read('skills/spec-ideate/references/output-mode.md');
+    expect(ideateOutput).toContain('Resolve `<repo-root>` at runtime');
+    expect(ideateOutput).not.toContain('!`git rev-parse');
+    const plan = read('skills/spec-plan/references/output-mode.md');
+    expect(plan).toContain('Resolve `<repo-root>` at runtime');
+    expect(plan).not.toContain('!`git rev-parse');
     const commit = read('skills/spec-commit/SKILL.md');
     const pulse = read('skills/spec-product-pulse/SKILL.md');
 
@@ -39,6 +43,7 @@ describe('CE upstream skill sync contracts', () => {
     expect(commit).toContain('Re-read the branch and staged paths immediately');
     expect(commit).not.toContain('!`git status`');
     expect(commit).not.toContain('Context fallback');
+    expect(read('skills/spec-commit-push-pr/SKILL.md')).toContain('Read `references/context.md` before Step 1');
     expect(pulse).toContain('Resolve `<repo-root>` at runtime');
     expect(pulse).toContain('fixed `docs/pulse-reports/` contract');
     expect(pulse).not.toContain('!`git rev-parse');
@@ -53,19 +58,28 @@ describe('CE upstream skill sync contracts', () => {
     expect(work).toContain('[Execution engines](references/execution-engines.md)');
     expect(engines).toContain('The engine is chosen once');
     expect(engines).toContain('The engine decides *how* implementation runs; it never changes *who* owns the shipping tail');
-    expect(plan).toContain('**Recommended marker:** `spec-work` (option 1) always carries *(recommended)*');
+    // Scope-based delivery keeps spec-work as the single recommended execution
+    // entry: the SKILL.md names it recommended among optional next steps, and
+    // the handoff reference retains the exactly-one recommended marker rule.
+    expect(plan).toContain('Start `/spec-work` (recommended)');
+    expect(plan).toContain('`spec-work` owns engine selection and the tail when chosen');
     expect(handoff).toContain('**Recommended marker:** `spec-work` (option 1) always carries *(recommended)*');
     expect(plan).not.toContain('**Recommended marker (dynamic):** Goal mode is the recommended default');
     expect(handoff).not.toContain('**Recommended marker (dynamic):** Goal mode is the recommended default');
   });
 
   test('fails document review before persona dispatch when paths are unreadable', () => {
-    const review = read('skills/spec-doc-review/SKILL.md');
+    const review = [
+      read('skills/spec-doc-review/SKILL.md'),
+      read('skills/spec-doc-review/references/document-intake.md'),
+      read('skills/spec-doc-review/references/dispatch.md'),
+    ].join('\n');
 
     expect(review).toContain('**Missing-document gate — verify before any dispatch.**');
     expect(review).toContain('If any path is unreadable, do not dispatch personas');
     expect(review).toContain('Review failed: document(s) not found on disk: <paths>');
     expect(review).toContain('`security-lens-reviewer`, `feasibility-reviewer`, `product-lens-reviewer`, `adversarial-document-reviewer`: inherit the parent model');
+    expect(review).toContain('`{settled_ktds}`');
   });
 
   test('sizes PR descriptions by reviewer decision cost and runtime purpose', () => {
@@ -76,8 +90,10 @@ describe('CE upstream skill sync contracts', () => {
     expect(writing).toContain("name the change's **material claims**");
     expect(writing).toContain('Classify files by runtime purpose, not extension.');
     expect(writing).toContain('audit the body against the material claims from Step D');
-    expect(skill).toContain('Classify by runtime purpose, not extension');
-    expect(skill).toContain('ranking/scoring logic, deployment/config behavior');
+    expect(skill).toContain('`references/compose.md`');
+    const compose = read('skills/spec-commit-push-pr/references/compose.md');
+    expect(compose).toContain('Classify by runtime purpose, not extension');
+    expect(compose).toContain('ranking/scoring logic, deployment/config behavior');
   });
 
   test('replaces generic reviewer exhortations with checkable output criteria', () => {
@@ -96,7 +112,7 @@ describe('CE upstream skill sync contracts', () => {
   });
 
   test('keeps compound mode selection local and session-history reads authorization-gated', () => {
-    const compound = read('skills/spec-compound/SKILL.md');
+    const compound = require('../helpers/compound-contract').readCompoundContract();
 
     expect(compound).toContain('**Mode selection (Full vs Lightweight) — decide it, don\'t ask it.**');
     expect(compound).toContain('**Session history — an authorization-gated probe in Full mode.**');

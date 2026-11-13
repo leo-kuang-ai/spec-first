@@ -8,6 +8,41 @@ function read(filePath) {
 }
 
 describe('spec-resolve-pr-feedback contracts', () => {
+  test('resolver 写入后 blocked 仍报告变更且父级独立核对实际状态', () => {
+    const fullMode = read('skills/spec-resolve-pr-feedback/references/full-mode.md');
+    const resolver = read('skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md');
+    const targeted = read('skills/spec-resolve-pr-feedback/references/targeted-mode.md');
+
+    expect(fullMode + resolver).not.toContain('empty if blocked');
+    expect(resolver).toContain('including blocked');
+    expect(resolver).toContain('tracked, staged, and task-owned untracked');
+    expect(resolver).toContain('verification:');
+    expect(fullMode).toContain('pre-dispatch baseline');
+    expect(fullMode).toContain('independently inspect the actual');
+    expect(fullMode).toContain('empty summary alone never skips validation');
+    expect(targeted).toContain('including a blocked resolver');
+  });
+
+  test('提交前阻断不属于本轮的暂存内容', () => {
+    const commit = read('skills/spec-resolve-pr-feedback/references/full-mode.md').split('## 6. Commit and Push')[1].split('## 7. Reply and Resolve')[0];
+    expect(commit).toContain('Before staging, inspect the complete index');
+    expect(commit).toContain('unrelated staged content or uncertain hunk ownership blocks this exit');
+    expect(commit).toContain('Re-read the entire staged diff');
+    expect(commit).not.toContain('git add [validated run-owned paths');
+  });
+
+  test('未修改的 consumer 失败不能按文件集合归为历史失败并放行提交', () => {
+    const fullMode = read('skills/spec-resolve-pr-feedback/references/full-mode.md');
+    const validation = fullMode.split('## 5. Validate Combined State')[1].split('## 6. Commit and Push')[0];
+
+    expect(validation).not.toContain('failures touch only files no resolver changed -> treat as pre-existing');
+    expect(validation).toContain('same command and comparable environment');
+    expect(validation).toContain('shared-module changes can break unchanged consumers');
+    expect(validation).toContain('Unknown attribution remains failed');
+    expect(validation).toContain('do not proceed to commit or push');
+    expect(validation).toContain('A confirmed pre-existing failure is still failed');
+  });
+
   test('逐项独立准入 mutating 与 external exit', () => {
     const entrypoint = read('skills/spec-resolve-pr-feedback/SKILL.md');
     const fullMode = read('skills/spec-resolve-pr-feedback/references/full-mode.md');
@@ -26,12 +61,12 @@ describe('spec-resolve-pr-feedback contracts', () => {
     ]) {
       expect(entrypoint).toContain(authority);
     }
-    expect(entrypoint).toContain('workflow invocation 不授权这些副作用');
-    expect(entrypoint).toContain('缺授权只阻断该出口及依赖它的 downstream 动作');
-    expect(fullMode).toMatch(/Commit 与 push 是两个独立出口/);
-    expect(fullMode).toMatch(/只有 `reply_authorization: authorized` 才发布回复/);
-    expect(fullMode).toMatch(/无代码依赖的 `reply-list` \/ `human-list` 仍可/);
-    expect(targetedMode).toMatch(/五项 Exit Authority Admission/);
+    expect(entrypoint).toContain('workflow invocation does not authorize these effects');
+    expect(entrypoint).toContain('missing authority blocks only that exit and dependent downstream actions');
+    expect(fullMode).toContain('Commit and push are independent exits');
+    expect(fullMode).toContain('Publish replies only with `reply_authorization: authorized`');
+    expect(fullMode).toContain('Independent `reply-list` / `human-list` items without code dependencies');
+    expect(targetedMode).toContain('all five Exit Authority Admission');
   });
 
   test('helper scripts resolve through the loaded skill directory, not runtime mirror paths', () => {
@@ -51,9 +86,11 @@ describe('spec-resolve-pr-feedback contracts', () => {
     }
 
     expect(fullMode).toMatch(/SKILL_DIR="<absolute path of the directory containing this SKILL\.md>"\n\s*bash "\$SKILL_DIR\/scripts\/get-pr-comments" PR_NUMBER/);
-    expect(fullMode).toMatch(/SKILL_DIR="<absolute path of the directory containing this SKILL\.md>"\n\s*bash "\$SKILL_DIR\/scripts\/reply-to-pr-thread" THREAD_ID < "\$reply_file"/);
+    expect(fullMode).toMatch(/SKILL_DIR="<absolute path of the directory containing this SKILL\.md>"\n\s*bash "\$SKILL_DIR\/scripts\/reply-to-pr-thread" PR_NUMBER ROOT_COMMENT_ID OWNER\/REPO < "\$reply_file"/);
     expect(fullMode).toMatch(/SKILL_DIR="<absolute path of the directory containing this SKILL\.md>"\n\s*bash "\$SKILL_DIR\/scripts\/resolve-pr-thread" THREAD_ID/);
-    expect(targetedMode).toMatch(/SKILL_DIR="<absolute path of the directory containing this SKILL\.md>"\n\s*bash "\$SKILL_DIR\/scripts\/get-thread-for-comment" PR_NUMBER COMMENT_NODE_ID \[OWNER\/REPO\]/);
+    expect(targetedMode).toMatch(/SKILL_DIR="<absolute path of the directory containing this SKILL\.md>"\n\s*bash "\$SKILL_DIR\/scripts\/get-thread-for-comment" PR_NUMBER COMMENT_NODE_ID OWNER\/REPO/);
+    expect(targetedMode).toContain('Set `GH_HOST` to that exact HOST');
+    expect(fullMode).toContain('Set `GH_HOST` to that exact host');
 
     expect(combined).not.toContain('bash skills/spec-resolve-pr-feedback/scripts/');
     expect(combined).not.toContain('.claude/skills/');
@@ -94,6 +131,43 @@ describe('spec-resolve-pr-feedback contracts', () => {
     expect(fullMode).toMatch(/bash "\$SKILL_DIR\/scripts\/get-thread-for-comment" PR_NUMBER COMMENT_NODE_ID \[OWNER\/REPO\]/);
   });
 
+  test('pipeline mode keeps unattended escalation and convergence rules explicit', () => {
+    const entrypoint = read('skills/spec-resolve-pr-feedback/SKILL.md');
+    const fullMode = read('skills/spec-resolve-pr-feedback/references/full-mode.md');
+    const pipelineMode = read('skills/spec-resolve-pr-feedback/references/pipeline-mode.md');
+
+    expect(entrypoint).toContain('exact legacy token `mode:pipeline`');
+    expect(entrypoint).toContain('read `references/pipeline-mode.md` before acting');
+    expect(entrypoint).toContain('Do not treat `mode:pipeline-return` as this token');
+    expect(pipelineMode).toContain('Never call the blocking-question tool');
+    expect(pipelineMode).toContain('Return the exact typed residual');
+    expect(pipelineMode).toContain('Only with existing reply authorization');
+    expect(pipelineMode).toContain('Leave every covered thread open');
+    expect(pipelineMode).toContain('demonstrated non-converging approach');
+    expect(fullMode).toContain('When a `trajectory` is present, apply the non-convergence check');
+    expect(pipelineMode).toContain('never merely to announce that the thread remains open');
+    expect(pipelineMode).toContain('A single batch or reviewer identity alone proves neither pattern');
+    expect(fullMode).toContain('`mode:pipeline-return` never ask or wait');
+    expect(fullMode).toContain('已有可确认历史不因新 invocation 而归零');
+  });
+
+  test('fetch keeps author feedback visible and leaves actionability to semantic judgment', () => {
+    const entrypoint = read('skills/spec-resolve-pr-feedback/SKILL.md');
+    const fullMode = read('skills/spec-resolve-pr-feedback/references/full-mode.md');
+    const getComments = read('skills/spec-resolve-pr-feedback/scripts/get-pr-comments');
+
+    expect(getComments).toContain('pr_author: ($author.login // null)');
+    expect(getComments).toContain('viewer: ($viewer // null)');
+    expect(getComments).not.toContain('select(.author.login != $author.login)');
+    expect(getComments).toContain('excludes only blank bodies');
+    expect(entrypoint).toContain('| PR URL without a fragment | **Full**');
+    expect(entrypoint).toContain('| PR URL with `#issuecomment-...` | **Full**');
+    expect(entrypoint).toContain('| Review-comment URL with `#discussion_r...` | **Targeted**');
+    expect(read('skills/spec-lfg/references/pr-watch-loop.md')).toContain('Identity never excludes a candidate');
+    expect(fullMode).toContain('identity never makes feedback disappear');
+    expect(entrypoint).toContain('Every unresolved item evaluated across inline threads, review bodies, and top-level comments');
+  });
+
   test('helper scripts preserve friendly owner repo fallback under set -e', () => {
     const getComments = read('skills/spec-resolve-pr-feedback/scripts/get-pr-comments');
     const getThread = read('skills/spec-resolve-pr-feedback/scripts/get-thread-for-comment');
@@ -122,7 +196,7 @@ describe('spec-resolve-pr-feedback contracts', () => {
     expect(getComments).toContain('--slurpfile threads');
     expect(getComments).toContain('pending_review:');
     expect(getComments).toContain('data.viewer.login');
-    expect(reply).toContain("pending_review field");
+    expect(reply).toContain('select(.state == "PENDING")');
     expect(fullMode).toContain('pending-review-visible-reply-blocked');
     expect(entrypoint).toContain('mode:pipeline-return');
     expect(pipeline).toMatch(/Failed,\s+not-run/);

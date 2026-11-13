@@ -1,0 +1,29 @@
+id: create-produces-gate-fields
+title: create 产出含 gate 四字段的 spec-handoff/v1 artifact
+description: |
+  验证 create 主路径：显式创建交接时，经包内 writer 产出受管 artifact，
+  frontmatter 含 handoff gate 四字段（summary/source_refs/freshness/limitations）
+  且非空；judge 计算同一 artifact 的真实 SHA-256，并要求完成汇报包含
+  指向该文件的精确、可复制 resume 调用。
+
+input:
+  prompt: |
+    （spec-handoff skill 已安装，请按它工作。）
+    给当前 mini-ledger 的工作创建一个跨会话交接：create handoff。
+    背景：我们刚给 src/server.js 的 GET /entries 加了 limit 分页并本地验证通过；
+    下一步是加分类汇总接口，下个会话继续做。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 30
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-create-artifact.sh
+  timeout_seconds: 30

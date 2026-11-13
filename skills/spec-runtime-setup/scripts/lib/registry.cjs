@@ -5,8 +5,8 @@ const path = require('node:path');
 
 const REGISTRY_FILE = 'setup-registry.json';
 const SCHEMA_FILE = 'setup-registry.schema.json';
-const REGISTRY_SCHEMA_VERSION = 'setup-registry.v10';
-const HOST_IDS = Object.freeze(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder', 'zcode']);
+const REGISTRY_SCHEMA_VERSION = 'setup-registry.v11';
+const HOST_IDS = Object.freeze(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder', 'zcode', 'pi']);
 const PLATFORM_IDS = Object.freeze(['macos', 'linux', 'wsl', 'windows']);
 const KIND_COLLECTIONS = Object.freeze({
   tool: 'tools',
@@ -176,6 +176,23 @@ function validateSchemaValue(value, schema, rootSchema, location = '$') {
     });
     if (!matches) throw new SchemaValidationError(location, '不匹配任何允许的 schema');
   }
+  // if/then(/else):条件应用——前提不匹配时静默跳过(2026-09-13 补实现;
+  // 此前被静默忽略,使 pypi 条件必填形同虚设,lane finding DR-017)。
+  if (isPlainObject(schema.if)) {
+    let preconditionHolds = true;
+    try {
+      validateSchemaValue(value, schema.if, rootSchema, location);
+    } catch (error) {
+      if (error instanceof SchemaValidationError) preconditionHolds = false;
+      else throw error;
+    }
+    if (preconditionHolds && isPlainObject(schema.then)) {
+      validateSchemaValue(value, schema.then, rootSchema, location);
+    }
+    if (!preconditionHolds && isPlainObject(schema.else)) {
+      validateSchemaValue(value, schema.else, rootSchema, location);
+    }
+  }
   if (schema.const !== undefined && value !== schema.const) {
     throw new SchemaValidationError(location, `必须等于 ${JSON.stringify(schema.const)}`);
   }
@@ -200,16 +217,32 @@ function validateSchemaValue(value, schema, rootSchema, location = '$') {
     if (schema.minItems !== undefined && value.length < schema.minItems) {
       throw new SchemaValidationError(location, `至少必须包含 ${schema.minItems} 项`);
     }
+    // maxItems/prefixItems(2026-09-13 补实现,此前被静默忽略)。
+    if (schema.maxItems !== undefined && value.length > schema.maxItems) {
+      throw new SchemaValidationError(location, `最多只能包含 ${schema.maxItems} 项`);
+    }
     if (schema.uniqueItems) {
       const serialized = value.map((item) => JSON.stringify(canonicalize(item)));
       if (new Set(serialized).size !== serialized.length) {
         throw new SchemaValidationError(location, '必须只包含唯一项');
       }
     }
-    if (schema.items) {
-      value.forEach((item, index) => {
-        validateSchemaValue(item, schema.items, rootSchema, `${location}[${index}]`);
-      });
+    const prefixItems = Array.isArray(schema.prefixItems) ? schema.prefixItems : [];
+    prefixItems.forEach((itemSchema, index) => {
+      if (index < value.length) {
+        validateSchemaValue(value[index], itemSchema, rootSchema, `${location}[${index}]`);
+      }
+    });
+    if (schema.items !== undefined) {
+      if (schema.items === false) {
+        if (value.length > prefixItems.length) {
+          throw new SchemaValidationError(location, `最多只能包含 ${prefixItems.length} 项(prefixItems 之外不允许额外项)`);
+        }
+      } else {
+        for (let index = prefixItems.length; index < value.length; index += 1) {
+          validateSchemaValue(value[index], schema.items, rootSchema, `${location}[${index}]`);
+        }
+      }
     }
   }
   if (isPlainObject(value)) {
@@ -426,22 +459,54 @@ function assertOverrideKeys(registry) {
   }
 }
 
-function assertOpenCodePermissionPolicyOwnership(registry) {
-  const openCodePolicy = registry.hosts.opencode.defaults.tool.host_config.permission_policy;
-  if (!openCodePolicy || openCodePolicy.kind !== 'opencode-governed-assets-v1') {
-    throw new RegistryError(
-      'registry_opencode_permission_policy_invalid_owner',
-      'OpenCode host config 必须声明 opencode-governed-assets-v1 permission policy。',
-    );
+function overrideServerCommand(override) {
+  const hostConfig = override && isPlainObject(override.host_config) ? override.host_config : null;
+  if (!hostConfig) return null;
+  const source = isPlainObject(hostConfig.server) ? hostConfig.server : hostConfig;
+  return typeof source.command === 'string' && source.command.length > 0 ? source.command : null;
+}
+
+function assertHostOverrideCoverage(registry) {
+  const coverage = [
+    ['tools', (entry) => entry.host_config_required !== false],
+    ['providers', (entry) => Object.keys(entry.host_overrides || {}).length > 0],
+  ];
+  for (const [collection, requiresCoverage] of coverage) {
+    for (const entry of registry[collection]) {
+      if (!requiresCoverage(entry)) continue;
+      for (const hostId of HOST_IDS) {
+        if (!overrideServerCommand(entry.host_overrides && entry.host_overrides[hostId])) {
+          throw new RegistryError(
+            'registry_host_override_missing',
+            `${collection}.${entry.id} 缺少 ${hostId} 的 host override command，该宿主 setup 将 fail closed。`,
+            { collection, id: entry.id, host: hostId },
+          );
+        }
+      }
+    }
   }
-  for (const hostId of HOST_IDS) {
-    if (hostId === 'opencode') continue;
-    if (registry.hosts[hostId].defaults.tool.host_config.permission_policy !== undefined) {
+}
+
+function assertOpenCodePermissionPolicyOwnership(registry) {
+  for (const kind of ['tool', 'provider']) {
+    const openCodePolicy = registry.hosts.opencode.defaults[kind].host_config
+      && registry.hosts.opencode.defaults[kind].host_config.permission_policy;
+    if (!openCodePolicy || openCodePolicy.kind !== 'opencode-governed-assets-v1') {
       throw new RegistryError(
         'registry_opencode_permission_policy_invalid_owner',
-        `Host ${hostId} 不得声明 OpenCode permission policy。`,
-        { host: hostId },
+        `OpenCode ${kind} host config 必须声明 opencode-governed-assets-v1 permission policy。`,
       );
+    }
+    for (const hostId of HOST_IDS) {
+      if (hostId === 'opencode') continue;
+      const defaultsConfig = registry.hosts[hostId].defaults[kind].host_config;
+      if (defaultsConfig && defaultsConfig.permission_policy !== undefined) {
+        throw new RegistryError(
+          'registry_opencode_permission_policy_invalid_owner',
+          `Host ${hostId} 不得声明 OpenCode permission policy。`,
+          { host: hostId },
+        );
+      }
     }
   }
   for (const collection of Object.values(KIND_COLLECTIONS)) {
@@ -475,10 +540,12 @@ function canonicalizeRegistry(registry) {
   });
 }
 
-function validateRegistry(registry, schema) {
-  assertNoIllegalNull(registry);
+function validateRegistry(registry, schema) {  assertNoIllegalNull(registry);
   try {
-    validateSchemaValue(registry, schema, schema);
+    const compatibleSchema = registry.schema_version === 'setup-registry.v10'
+      ? { ...schema, properties: { ...schema.properties, schema_version: { const: 'setup-registry.v10' } } }
+      : schema;
+    validateSchemaValue(registry, compatibleSchema, compatibleSchema);
   } catch (error) {
     if (!(error instanceof SchemaValidationError)) throw error;
     throw new RegistryError(
@@ -487,11 +554,19 @@ function validateRegistry(registry, schema) {
       { location: error.location },
     );
   }
-  if (registry.schema_version !== REGISTRY_SCHEMA_VERSION) {
+  if (![REGISTRY_SCHEMA_VERSION, 'setup-registry.v10'].includes(registry.schema_version)) {
     throw new RegistryError(
       'registry_schema_invalid',
       `预期 ${REGISTRY_SCHEMA_VERSION}，实际为 ${registry.schema_version}。`,
     );
+  }
+  if (registry.schema_version === REGISTRY_SCHEMA_VERSION) {
+    for (const entry of [...registry.tools, ...registry.helpers]) {
+      if (!entry.readiness_policy) throw new RegistryError('registry_readiness_policy_missing', `缺少 ${entry.id} 的 readiness_policy`);
+    }
+    // 覆盖不变量只约束 v11：真实 v10 registry（如 npm 1.15.3）没有 zcode override，
+    // 混合加载时按原始语义在 setup 阶段 fail closed，而不是在加载期拒绝兼容读取。
+    assertHostOverrideCoverage(registry);
   }
   for (const [collection, entries] of [
     ['external_dependencies', registry.external_dependencies],
@@ -513,6 +588,93 @@ function validateRegistry(registry, schema) {
   assertNoDuplicateHostTargets(registry);
   assertOverrideKeys(registry);
   assertOpenCodePermissionPolicyOwnership(registry);
+  assertProviderReadinessMirrorsProvider(registry);
+}
+
+// tools[].provider_readiness 与 providers[] 同 id 条目之间存在有意冗余的共享元数据
+// (lane finding DR-001:双 canonical 段任一单独更新即漂移)。加载期断言共享字段
+// 逐字一致,使漂移在 registry 加载阶段 fail-closed,而不是静默进入运行时。
+function assertProviderReadinessMirrorsProvider(registry) {
+  const providersById = new Map((registry.providers || []).map((entry) => [entry.id, entry]));
+  for (const tool of registry.tools || []) {
+    const readiness = tool.provider_readiness;
+    if (!readiness || typeof readiness.provider !== 'string') continue;
+    const provider = providersById.get(readiness.provider);
+    if (!provider) continue;
+    const shared = [
+      ['usage_note', 'usage_note'],
+      ['first_generation', 'first_generation'],
+      ['steady_state', 'steady_state'],
+      ['fallback_methods', 'fallback.methods'],
+    ];
+    for (const [readinessPath, providerPath] of shared) {
+      const providerValue = providerPath.split('.').reduce((value, key) => (
+        value && typeof value === 'object' ? value[key] : undefined
+      ), provider);
+      const readinessValue = readinessPath.split('.').reduce((value, key) => (
+        value && typeof value === 'object' ? value[key] : undefined
+      ), readiness);
+      if (JSON.stringify(readinessValue) !== JSON.stringify(providerValue)) {
+        throw new RegistryError(
+          'registry_provider_metadata_drift',
+          `tools.${tool.id}.provider_readiness.${readinessPath} 与 providers.${readiness.provider}.${providerPath} 漂移;两段共享元数据必须同批更新。`,
+          { tool: tool.id, provider: readiness.provider, readinessPath, providerPath },
+        );
+      }
+    }
+  }
+}
+
+// validator 方言白名单(lane finding DR-017):schema 演化引入 validator 不认识的
+// 关键字时,校验强度会静默下降。加载期对整个 schema(含 $defs)做关键字审计,
+// 出现白名单之外的关键字即 fail-closed,迫使「扩展 schema」与「扩展 validator」同批。
+const SCHEMA_DIALECT_KEYWORDS = new Set([
+  '$schema', '$id', '$ref', 'title', 'description',
+  'type', 'const', 'enum',
+  'allOf', 'anyOf', 'if', 'then', 'else',
+  'properties', 'required', 'additionalProperties', 'minProperties',
+  'items', 'prefixItems', 'minItems', 'maxItems', 'uniqueItems',
+  'minLength', 'pattern',
+]);
+
+function assertSchemaDialect(schema) {
+  const unknown = new Set();
+  const visit = (node) => {
+    if (Array.isArray(node)) {
+      node.forEach(visit);
+      return;
+    }
+    if (!isPlainObject(node)) return;
+    for (const [key, value] of Object.entries(node)) {
+      if (key === '$defs') {
+        for (const def of Object.values(value || {})) visit(def);
+        continue;
+      }
+      if (key === 'properties' || key === 'additionalProperties') {
+        // properties 的键是数据字段名而非方言关键字;遍历其 schema 值。
+        if (isPlainObject(value)) for (const child of Object.values(value)) visit(child);
+        else if (value !== undefined && value !== false && value !== true) visit(value);
+        continue;
+      }
+      if (key === 'items' || key === 'prefixItems' || key === 'if' || key === 'then' || key === 'else') {
+        visit(value);
+        continue;
+      }
+      if (key === 'allOf' || key === 'anyOf') {
+        visit(value);
+        continue;
+      }
+      if (!SCHEMA_DIALECT_KEYWORDS.has(key)) unknown.add(key);
+    }
+  };
+  visit(schema);
+  if (unknown.size > 0) {
+    throw new RegistryError(
+      'registry_schema_dialect_keyword_unsupported',
+      `setup-registry.schema.json 使用了 validator 方言之外的关键字：${[...unknown].sort().join(', ')}。扩展 schema 必须同批扩展 validateSchemaValue 与 SCHEMA_DIALECT_KEYWORDS。`,
+      { unknownKeywords: [...unknown].sort() },
+    );
+  }
 }
 
 function loadRegistry({ skillRoot }) {
@@ -523,6 +685,7 @@ function loadRegistry({ skillRoot }) {
   const schemaPath = path.join(skillRoot, SCHEMA_FILE);
   const schema = readJsonFile(schemaPath, 'registry_schema_unreadable');
   const registry = readJsonFile(registryPath, 'registry_unreadable');
+  assertSchemaDialect(schema);
   validateRegistry(registry, schema);
   return canonicalizeRegistry(registry);
 }
@@ -648,10 +811,12 @@ function getDiagnosticRegistry(registry, { platform }) {
 
 module.exports = {
   canonicalize,
+  canonicalizeRegistry,
   detectRuntimePlatform,
   getDiagnosticRegistry,
   getEffectiveEntry,
   getEffectiveRegistry,
+  HOST_IDS,
   loadRegistry,
   mergeLayers,
   validateSchemaValue,

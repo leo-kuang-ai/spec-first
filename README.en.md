@@ -4,15 +4,18 @@
 
 **Turn AI coding sessions into trusted, project-owned changes.**
 
-`spec-first` is a repository-native AI Coding Harness for Claude Code, Codex, Kiro, Qoder, Cursor, OpenCode, ZCode, and Pi. It connects intent, requirements, plans, code, review, evidence, and reusable knowledge in one inspectable engineering loop.
+`spec-first` is a repository-native AI Coding Harness for Claude Code, Codex, Kiro, Qoder, Cursor, OpenCode, ZCode, and Pi. It uses the traditional SDLC / SDD requirements-to-change path as its backbone and connects intent, requirements, plans, code, review, evidence, and reusable knowledge in one inspectable engineering loop.
+
+Its current position is an **AI-enhanced SDLC / SDD workflow harness**. It turns an AI coding session into a trusted, traceable, reusable engineering change. It is not a full AI-DLC platform covering team delivery governance, deployment orchestration, production operations, and operational feedback; those responsibilities belong to existing engineering systems or explicitly connected workflows.
 
 [![npm version](https://img.shields.io/npm/v/spec-first.svg)](https://www.npmjs.com/package/spec-first)
+[![npm monthly downloads](https://img.shields.io/npm/dm/spec-first.svg)](https://www.npmjs.com/package/spec-first)
 [![CI](https://github.com/leo-kuang-ai/spec-first/actions/workflows/npm-install-matrix.yml/badge.svg?branch=master)](https://github.com/leo-kuang-ai/spec-first/actions/workflows/npm-install-matrix.yml?query=branch%3Amaster)
 [![node](https://img.shields.io/node/v/spec-first.svg)](https://github.com/leo-kuang-ai/spec-first/blob/master/package.json)
 [![license](https://img.shields.io/npm/l/spec-first.svg)](https://github.com/leo-kuang-ai/spec-first/blob/master/LICENSE)
 [![Website](https://img.shields.io/badge/website-spec--first.cn-blue)](http://spec-first.cn/)
 
-[简体中文](README.md) | [English](README.en.md) | [User Manual](docs/05-用户手册/README.md) | [Website](http://spec-first.cn/)
+[简体中文](README.md) | [English](README.en.md) | [User Manual](docs/user-guide/README.md) | [Website](http://spec-first.cn/)
 
 </div>
 
@@ -64,23 +67,17 @@ spec-first doctor
 spec-first init --codex -y -u <name> --lang <zh|en>
 ```
 
-Initialization previews managed runtime files before writing and does not stage or commit them. See the [full quick start guide](docs/05-用户手册/01-快速开始.md) for multi-host, non-Git, dry-run, and preview-host usage.
+Initialization previews managed runtime files before writing and does not stage or commit them. See the [full quick start guide](docs/user-guide/01-快速开始.md) for multi-host, non-Git, dry-run, and preview-host usage.
 
 ### 2. Run your first workflow
 
-Run workflow entries inside the host session; they are not shell subcommands. Prepare runtime before the first workflow, then rerun when readiness or configuration changes:
+Open a new session in the selected host at the target shown by initialization and describe your real task. Workflow entries are not shell subcommands. Without a current task, try:
 
 ```text
-spec-runtime-setup
+Please use spec-brainstorm: I want to reduce repeated requirements clarification in this project. Help me define use cases, scope, and success criteria.
 ```
 
-Then create the first requirements artifact:
-
-```text
-spec-brainstorm "Improve CLI onboarding for new users"
-```
-
-This turns a rough idea into a reviewable requirements artifact, usually under:
+The first substantive result should contain a problem definition, scope, success criteria, and open questions. A greeting or entry recommendation is not success. Durable requirements artifacts usually live under:
 
 ```text
 docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
@@ -88,7 +85,9 @@ docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
 
 Use `spec-plan` when the requirements are settled and `spec-work` when the plan is ready to execute. Without durable decisions, the workflow may legitimately skip writing a document; that is not a failure.
 
-If entries are missing, run `spec-first doctor --verbose` and check host limitations in the [Runtime Capability Catalog](docs/catalog/runtime-capabilities.md).
+Request `spec-runtime-setup` inside the host only when a capability required by the current task is missing or readiness needs repair. Missing optional capabilities can be disclosed while work continues. Successful initialization proves that projections were written, not that the host loaded them or completed a task.
+
+After closing the terminal, return to the original target and run `spec-first doctor --codex` using your original host flag. This is read-only and requires no re-init. Add `--verbose` for details or `--json` for scripts. See the [Runtime Capability Catalog](docs/catalog/runtime-capabilities.md) for host limitations.
 
 ## Choose the Right Workflow
 
@@ -96,9 +95,11 @@ If entries are missing, run `spec-first doctor --verbose` and check host limitat
 
 Enter at the step that matches the current task; running every step is not required. This is a capability map. Task needs, verification results, and authorization determine what follows.
 
+For example, use `spec-brainstorm` for an idea with unsettled scope, `spec-plan` for a clear goal with an unsettled implementation, and `spec-work` to execute a ready plan. Use `spec-debug` for failing tests, `spec-doc-review` for an existing document, and `spec-compound` for verified reusable experience. A request for advice gets one recommendation; an execution request continues the authorized task.
+
 | Stage | When to use it | Skill | Main result |
 |---|---|---|---|
-| Environment | First use, missing MCP/helpers, or configuration changes | `spec-runtime-setup` | Readiness facts and setup results |
+| Environment | A task-required MCP/helper is missing or readiness needs repair | `spec-runtime-setup` | Readiness facts and setup results |
 | Exploration | Compare candidate directions | `spec-ideate` | Ranked ideas |
 | Requirements | Scope and success criteria remain unsettled | `spec-brainstorm` | Requirements-only plan |
 | PRD clarification | Clarify an existing PRD against the codebase | `spec-prd` | Planning-readiness artifact |
@@ -146,7 +147,7 @@ Workflows invoke these helpers with the required authorization. They are not rec
 | `spec-commit` | Scoped commits under existing commit authorization |
 | `spec-commit-push-pr` | Commit, push, and PR creation or updates under existing landing authorization |
 
-When unsure, let `using-spec-first` select one matching entrypoint. Use these Skills inside the host session, not as `spec-first` shell subcommands; invocation syntax depends on host discovery. See the [public entrypoint and Skill catalog](docs/05-用户手册/24-公开入口与Skill目录.md) for detailed boundaries.
+When unsure, let `using-spec-first` select one matching entrypoint. Use these Skills inside the host session, not as `spec-first` shell subcommands; invocation syntax depends on host discovery. See the [public entrypoint and Skill catalog](docs/user-guide/24-公开入口与Skill目录.md) for detailed boundaries.
 
 ## From Prompt to Trusted Change
 
@@ -157,7 +158,7 @@ Existing PRD -> spec-prd ----------+-> spec-plan -> [spec-write-tasks] -> spec-w
 
 `spec-prd` is the alternative entry for an existing PRD or brownfield request; `spec-doc-review` is an optional cross-stage review lane for requirements, plans, or task packs.
 
-### A minimal end-to-end path
+### A minimal change path
 
 ```text
 Rough idea
@@ -207,7 +208,7 @@ The division is simple: **scripts prepare facts, LLMs make semantic judgments, a
 - Providers and historical artifacts are advisory inputs with provenance, freshness, and limitations until confirmed against source evidence.
 - Long-running or high-impact work needs scope, checkpoints, stop conditions, recovery points, and independent verification.
 
-See the [project role contract](docs/10-prompt/结构化项目角色契约.md), [source/runtime boundary](docs/contracts/source-runtime-customization-boundary.md), [verification summary contract](docs/contracts/verification/verification-run-summary.md), and [honest closeout contract](docs/contracts/workflows/honest-closeout.md).
+See the [project role contract](docs/methodology/结构化项目角色契约.md), [source/runtime boundary](docs/contracts/source-runtime-customization-boundary.md), [verification summary contract](docs/contracts/verification/verification-run-summary.md), and [honest closeout contract](docs/contracts/workflows/honest-closeout.md).
 
 ## Host Support
 
@@ -260,8 +261,9 @@ MIT licensed.
 
 ## Documentation
 
-- [User Manual](docs/05-用户手册/README.md)
+- [User Manual](docs/user-guide/README.md)
 - [Runtime Capability Catalog](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/catalog/runtime-capabilities.md)
+- [Project Role Contract](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/methodology/%E7%BB%93%E6%9E%84%E5%8C%96%E9%A1%B9%E7%9B%AE%E8%A7%92%E8%89%B2%E5%A5%91%E7%BA%A6.md)
 
 ## Community
 

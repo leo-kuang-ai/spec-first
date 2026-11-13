@@ -88,7 +88,7 @@ tags: [agent-templates, drift-detection, test-coverage, deferred-parameterizatio
 ## 关联
 
 - agent/persona 模板重复发现记录: `docs/solutions/architecture-patterns/agent-persona-reference-template-duplication-2026-08-21.md`
-- 本轮审查主文档: `docs/10-prompt/spec-first代码审查方案.md`
+- 本轮审查主文档: `docs/methodology/spec-first代码审查方案.md`
 - 已存在的共享引用同步机制: `skills/_shared/README.md`、`scripts/sync-shared-references.js`
 
 ## 实施状态

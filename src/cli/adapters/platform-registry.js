@@ -2,6 +2,9 @@
 
 const PLATFORM_REGISTRY = {
   claude: {
+    // doctor 安装态判定依据：runtime-root=裸根存在即装；state-file=仅认受管
+    // state file（宿主客户端可能自建 runtime 目录）；runtime-paths=多路径任一。
+    detection: 'runtime-root',
     displayName: 'Claude Code',
     runtimeRoot: '.claude',
     surfaces: {
@@ -30,6 +33,9 @@ const PLATFORM_REGISTRY = {
     },
   },
   codex: {
+    // doctor 安装态判定依据：runtime-root=裸根存在即装；state-file=仅认受管
+    // state file（宿主客户端可能自建 runtime 目录）；runtime-paths=多路径任一。
+    detection: 'runtime-root',
     displayName: 'Codex',
     runtimeRoot: '.codex',
     surfaces: {
@@ -53,6 +59,9 @@ const PLATFORM_REGISTRY = {
     },
   },
   cursor: {
+    // doctor 安装态判定依据：runtime-root=裸根存在即装；state-file=仅认受管
+    // state file（宿主客户端可能自建 runtime 目录）；runtime-paths=多路径任一。
+    detection: 'state-file',
     displayName: 'Cursor',
     runtimeRoot: '.cursor',
     surfaces: {
@@ -78,6 +87,9 @@ const PLATFORM_REGISTRY = {
     },
   },
   kiro: {
+    // doctor 安装态判定依据：runtime-root=裸根存在即装；state-file=仅认受管
+    // state file（宿主客户端可能自建 runtime 目录）；runtime-paths=多路径任一。
+    detection: 'runtime-paths',
     displayName: 'Kiro',
     runtimeRoot: '.kiro',
     surfaces: {
@@ -106,6 +118,9 @@ const PLATFORM_REGISTRY = {
     },
   },
   qoder: {
+    // doctor 安装态判定依据：runtime-root=裸根存在即装；state-file=仅认受管
+    // state file（宿主客户端可能自建 runtime 目录）；runtime-paths=多路径任一。
+    detection: 'state-file',
     displayName: 'Qoder',
     runtimeRoot: '.qoder',
     surfaces: {
@@ -146,6 +161,9 @@ const PLATFORM_REGISTRY = {
     },
   },
   opencode: {
+    // doctor 安装态判定依据：runtime-root=裸根存在即装；state-file=仅认受管
+    // state file（宿主客户端可能自建 runtime 目录）；runtime-paths=多路径任一。
+    detection: 'state-file',
     displayName: 'OpenCode',
     runtimeRoot: '.opencode',
     surfaces: {
@@ -165,12 +183,23 @@ const PLATFORM_REGISTRY = {
     },
   },
   zcode: {
+    // doctor 安装态判定依据：runtime-root=裸根存在即装；state-file=仅认受管
+    // state file（宿主客户端可能自建 runtime 目录）；runtime-paths=多路径任一。
+    detection: 'state-file',
     displayName: 'ZCode',
     runtimeRoot: '.zcode',
     surfaces: {
       managedRoot: { kind: 'dir', path: '.zcode/spec-first/', ownership: 'generated-runtime' },
       skillsRoot: { kind: 'dir', path: '.agents/skills/', ownership: 'generated-runtime', crossRuntimeRoot: true },
       workflowsRoot: { kind: 'dir', path: '.agents/skills/', ownership: 'generated-runtime', crossRuntimeRoot: true },
+      hooksDir: { kind: 'dir', path: '.zcode/hooks/', ownership: 'generated-runtime' },
+      configFile: {
+        kind: 'managed-slice',
+        path: '.zcode/config.json',
+        ownership: 'host-user-owned',
+        managedIdentity: 'spec-first-managed-session-start-hook',
+        rewriteExclude: true,
+      },
     },
     capabilities: {
       hooks: {
@@ -182,6 +211,9 @@ const PLATFORM_REGISTRY = {
     },
   },
   pi: {
+    // doctor 安装态判定依据：runtime-root=裸根存在即装；state-file=仅认受管
+    // state file（宿主客户端可能自建 runtime 目录）；runtime-paths=多路径任一。
+    detection: 'state-file',
     displayName: 'Pi',
     runtimeRoot: '.pi',
     surfaces: {

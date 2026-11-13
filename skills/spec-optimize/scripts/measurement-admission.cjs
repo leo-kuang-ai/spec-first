@@ -5,7 +5,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const SCHEMA_VERSION = 'spec-optimize-measurement-admission/v1';
+const SCHEMA_VERSION = 'spec-optimize-measurement-admission/v2';
 const IMMUTABLE_SOURCE_ID = /^(?:[a-f0-9]{40}|sha256:[a-f0-9]{64})$/;
 const CONTENT_ID = /^sha256:[a-f0-9]{64}$/;
 const DIRECTIONS = new Set(['maximize', 'minimize']);
@@ -108,6 +108,7 @@ function normalizeAdmission(input) {
   if (!Number.isInteger(input.aa_repetitions) || input.aa_repetitions < 2) {
     fieldError(errors, 'aa_repetitions', 'must-be-at-least-2');
   }
+  if (input.noise_rule !== 'range-v1') fieldError(errors, 'noise_rule', 'must-be-range-v1');
   if (!isFiniteNumber(input.preregistered_acceptance_threshold)
     || input.preregistered_acceptance_threshold < 0) {
     fieldError(errors, 'preregistered_acceptance_threshold', 'must-be-a-non-negative-finite-number');
@@ -151,6 +152,7 @@ function normalizeAdmission(input) {
         aggregation: metric.aggregation,
       },
       aa_repetitions: input.aa_repetitions,
+      noise_rule: input.noise_rule,
       preregistered_acceptance_threshold: input.preregistered_acceptance_threshold,
       noise_ceiling: input.noise_ceiling,
       broken_run_policy: {
@@ -179,7 +181,7 @@ function admit(input) {
   }, 0);
 }
 
-function allowAb(input) {
+function allowAb(input, inputDirectory) {
   if (!isObject(input)) reject('aa-calibration-invalid', [{ field: '$', reason: 'must-be-an-object' }], { ab_allowed: false });
   const normalized = normalizeAdmission(input.admission);
   if (normalized.errors.length > 0) {
@@ -196,6 +198,9 @@ function allowAb(input) {
   const errors = [];
   let completed = 0;
   let broken = 0;
+  const scores = [];
+  const runIds = new Set();
+  const resultPaths = new Set();
   input.aa_attempts.forEach((attempt, index) => {
     const prefix = `aa_attempts[${index}]`;
     if (!isObject(attempt)) {
@@ -209,6 +214,31 @@ function allowAb(input) {
     if (attempt.status === 'completed') {
       completed += 1;
       if (!isFiniteNumber(attempt.score)) fieldError(errors, `${prefix}.score`, 'completed-attempt-requires-score');
+      try {
+        if (typeof attempt.run_id !== 'string' || !attempt.run_id.trim() || runIds.has(attempt.run_id)) {
+          throw new Error('missing-or-reused-run-id');
+        }
+        runIds.add(attempt.run_id);
+        if (typeof attempt.result_ref !== 'string' || !attempt.result_ref.trim()) throw new Error('missing-result-ref');
+        const resultPath = path.resolve(inputDirectory, attempt.result_ref);
+        const stat = fs.lstatSync(resultPath);
+        if (!stat.isFile() || stat.isSymbolicLink() || stat.size > 1024 * 1024) throw new Error('invalid-result-file');
+        const identity = `${stat.dev}:${stat.ino}`;
+        if (resultPaths.has(identity)) throw new Error('reused-result-file');
+        resultPaths.add(identity);
+        const bytes = fs.readFileSync(resultPath);
+        const hash = `sha256:${crypto.createHash('sha256').update(bytes).digest('hex')}`;
+        if (hash !== attempt.result_sha256) throw new Error('result-hash-mismatch');
+        const result = JSON.parse(bytes.toString('utf8'));
+        if (!isObject(result) || result.schema_version !== 'spec-optimize-measurement-result/v1' ||
+            result.run_id !== attempt.run_id || result.admission_sha256 !== expectedDigest ||
+            result.source_identity !== normalized.value.baseline_identity ||
+            result.status !== 'completed' || result.exit_code !== 0 ||
+            !isFiniteNumber(result.score) || result.score !== attempt.score) throw new Error('result-evidence-mismatch');
+        scores.push(result.score);
+      } catch (error) {
+        fieldError(errors, `${prefix}.result_ref`, error.code ? 'result-unreadable' : error.message);
+      }
     } else {
       broken += 1;
       if (Object.prototype.hasOwnProperty.call(attempt, 'score')) {
@@ -223,7 +253,7 @@ function allowAb(input) {
   if (broken > normalized.value.broken_run_policy.max_retries) {
     fieldError(errors, 'aa_attempts', 'broken-run-retry-budget-exceeded');
   }
-  if (!isFiniteNumber(input.observed_noise_floor) || input.observed_noise_floor < 0) {
+  if (input.observed_noise_floor !== undefined && (!isFiniteNumber(input.observed_noise_floor) || input.observed_noise_floor < 0)) {
     fieldError(errors, 'observed_noise_floor', 'must-be-a-non-negative-finite-number');
   }
   if (errors.length > 0) reject('aa-calibration-invalid', errors, { ab_allowed: false });
@@ -233,11 +263,14 @@ function allowAb(input) {
       reason: `requires-${normalized.value.aa_repetitions}-completed-attempts`,
     }], { ab_allowed: false });
   }
-  if (input.observed_noise_floor > normalized.value.noise_ceiling) {
+  // The preregistered range uses every completed observation, never a caller summary.
+  const noiseFloor = scores.reduce((max, score) => Math.max(max, score), -Infinity)
+    - scores.reduce((min, score) => Math.min(min, score), Infinity);
+  if (!Number.isFinite(noiseFloor) || noiseFloor > normalized.value.noise_ceiling) {
     reject('noise-floor-too-high', [{
       field: 'observed_noise_floor',
       reason: 'exceeds-preregistered-noise-ceiling',
-    }], { ab_allowed: false });
+    }], { ab_allowed: false, observed_noise_floor: Number.isFinite(noiseFloor) ? noiseFloor : null });
   }
 
   output({
@@ -245,7 +278,9 @@ function allowAb(input) {
     reason_code: 'aa-calibration-passed',
     admission_sha256: expectedDigest,
     completed_aa_attempts: completed,
-    observed_noise_floor: input.observed_noise_floor,
+    observed_noise_floor: noiseFloor,
+    noise_rule: normalized.value.noise_rule,
+    evidence_scope: 'file-integrity-and-arithmetic-only',
     ab_allowed: true,
   }, 0);
 }
@@ -253,4 +288,4 @@ function allowAb(input) {
 const args = parseArgs(process.argv.slice(2));
 const input = readInput(args.input);
 if (args.command === 'admit') admit(input);
-else allowAb(input);
+else allowAb(input, path.dirname(args.input));

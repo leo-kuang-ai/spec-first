@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { assertContainedPath } = require('./path-safety.cjs');
-const { defaultWorkspaceExec } = require('./workspace-exec.cjs');
+const { runGit: runScopedGit } = require('./git-path.cjs');
 const { validateSchemaValue } = require('./registry.cjs');
 const {
   jsonFileReceiptMatches,
@@ -221,7 +221,7 @@ function relativePath(root, target) {
 }
 
 function runGit(cwd, args) {
-  const result = defaultWorkspaceExec('git', ['-C', cwd, ...args], { timeoutMs: 5000 });
+  const result = runScopedGit(cwd, args);
   return {
     status: typeof result.status === 'number' ? result.status : 1,
     stdout: String(result.stdout || ''),

@@ -9,6 +9,9 @@ engine:
 cases:
   files:
     - evals/cases/non-solutions-scope-gated.yaml
+    - evals/cases/publication-preserve.yaml
+    - evals/cases/publication-partial.yaml
+    - evals/cases/publication-recover.yaml
 defaults:
   timeout_seconds: 480
   max_turns: 12

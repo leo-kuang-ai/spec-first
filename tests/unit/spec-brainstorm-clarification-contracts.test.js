@@ -11,7 +11,7 @@ function read(filePath) {
   return fs.readFileSync(filePath, 'utf8');
 }
 
-const brainstorm = read('skills/spec-brainstorm/SKILL.md');
+const brainstorm = require('../helpers/brainstorm-contract').readBrainstormContract();
 const pressure = read('skills/spec-brainstorm/references/product-pressure-test.md');
 const sections = read('skills/spec-brainstorm/references/brainstorm-sections.md');
 const handoff = read('skills/spec-brainstorm/references/handoff.md');
@@ -19,6 +19,18 @@ const htmlRendering = read('skills/spec-brainstorm/references/html-rendering.md'
 const lfg = read('skills/spec-lfg/SKILL.md');
 
 describe('spec-brainstorm clarification, scenarios, and resume contract', () => {
+  test('keeps source coverage distinct from scope and checks the written artifact', () => {
+    expect(brainstorm).toContain('Coverage is not decomposition');
+    expect(brainstorm).toContain('Coherent-work check');
+    expect(brainstorm).toContain('separate user value and acceptance boundaries');
+    expect(brainstorm).toContain('skip discovery and continue domain routing');
+    expect(brainstorm).toContain('exact `Governs R...` links');
+    expect(brainstorm).toContain('rerun the failed checks');
+    for (const dimension of ['Complete', 'Consistent', 'Focused', 'Usable by planning']) {
+      expect(sections).toContain(`**${dimension}:**`);
+    }
+    expect(sections).toContain('a saved draft is not proof');
+  });
   test('classifies load-bearing gaps without adding a persistent state table', () => {
     expect(brainstorm).toContain('source fact');
     expect(brainstorm).toContain('current-user decision');
@@ -73,7 +85,7 @@ describe('spec-brainstorm clarification, scenarios, and resume contract', () => 
     expect(lfg).toMatch(/^name: spec-lfg$/m);
     expect(lfg).not.toMatch(/^disable-model-invocation: true$/m);
     expect(lfg).toContain('Use only when the current user explicitly requests spec-lfg');
-    expect(lfg).toContain('仅有代码就绪、已完成计划或模型推断');
+    expect(lfg).toContain('Code readiness, a completed plan, or model inference');
     expect(handoff).toContain('Ship it autonomously with `spec-lfg`');
     expect(handoff).toContain('委派一组独立、只读的 reviewer 执行代码审查');
     expect(handoff).toContain('不授权任意 worker dispatch');

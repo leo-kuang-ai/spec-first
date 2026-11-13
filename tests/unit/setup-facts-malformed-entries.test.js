@@ -3,6 +3,21 @@
 const { normalizeSetupFacts } = require('../../src/cli/helpers/setup-facts');
 
 describe('setup facts malformed entry handling', () => {
+  test('preserves external marker evidence without promoting hook ownership or execution', () => {
+    const normalized = normalizeSetupFacts({
+      schema_version: 'tool-facts.v2', generated_at: new Date().toISOString(),
+      items: [], configured_dependencies: [],
+      provider_readiness: [{ provider: 'graphify', steady_state: {
+        refresh_owner: 'provider-native', refresh_mode: 'commit-hook-external-verified',
+        hook_status: 'verified-external', hook_installed: false, hook_verified: false,
+      } }],
+    });
+    expect(normalized.provider_readiness[0].steady_state).toMatchObject({
+      refresh_mode: 'commit-hook-external-verified', hook_status: 'verified-external',
+      hook_installed: false, hook_verified: false,
+    });
+  });
+
   test('keeps installed helper facts separate from blocked browser execution readiness', () => {
     const normalized = normalizeSetupFacts({
       schema_version: 'tool-facts.v2',

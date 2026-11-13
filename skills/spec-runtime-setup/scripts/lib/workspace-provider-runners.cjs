@@ -28,19 +28,19 @@ function makeWorkspaceRunners({
   if (typeof exec !== 'function') throw new Error('makeWorkspaceRunners requires an exec function');
 
   function ok(result) {
-    return result && result.status === 0;
+    return result && result.status === 0 && !result.signal && !result.error && !result.timed_out;
   }
 
   return {
     codegraphInstallGlobal() {
       const result = exec(codegraphCommand, ['install', '--yes'], { env: baseEnv, unsetEnv });
-      return ok(result) ? { ok: true } : { ok: false, reason_code: 'codegraph-install-failed', stderr: result && result.stderr };
+      return ok(result) ? { ok: true } : { ok: false, reason_code: (result && result.reason_code) || 'codegraph-install-failed', stderr: result && result.stderr };
     },
 
     codegraphInit(repoRoot) {
       // `codegraph init [path]` builds the initial index in-place at repoRoot.
       const result = exec(codegraphCommand, ['init', repoRoot], { cwd: repoRoot, env: baseEnv, unsetEnv });
-      return ok(result) ? { ok: true } : { ok: false, reason_code: 'codegraph-init-failed', stderr: result && result.stderr };
+      return ok(result) ? { ok: true } : { ok: false, reason_code: (result && result.reason_code) || 'codegraph-init-failed', stderr: result && result.stderr };
     },
 
     codegraphSync(repoRoot) {
@@ -51,7 +51,7 @@ function makeWorkspaceRunners({
       });
       return ok(result)
         ? { ok: true }
-        : { ok: false, reason_code: 'codegraph-sync-failed', stderr: result && result.stderr };
+        : { ok: false, reason_code: (result && result.reason_code) || 'codegraph-sync-failed', stderr: result && result.stderr };
     },
 
     graphifyExtract(repoRoot, outDir) {
@@ -61,7 +61,7 @@ function makeWorkspaceRunners({
         unsetEnv: [...new Set([...unsetEnv, ...GRAPHIFY_UNSET_ENV])],
       });
       if (!ok(result)) {
-        return { ok: false, reason_code: 'graphify-extract-failed', stderr: result && result.stderr };
+        return { ok: false, reason_code: (result && result.reason_code) || 'graphify-extract-failed', stderr: result && result.stderr };
       }
       const graphPath = path.join(outDir, GRAPHIFY_OUT_DIRNAME, SUBGRAPH_BASENAME);
       return { ok: true, graphPath };
@@ -72,7 +72,7 @@ function makeWorkspaceRunners({
         env: baseEnv,
         unsetEnv: [...new Set([...unsetEnv, ...GRAPHIFY_UNSET_ENV])],
       });
-      return ok(result) ? { ok: true, mergedPath: outPath } : { ok: false, reason_code: 'graphify-merge-failed', stderr: result && result.stderr };
+      return ok(result) ? { ok: true, mergedPath: outPath } : { ok: false, reason_code: (result && result.reason_code) || 'graphify-merge-failed', stderr: result && result.stderr };
     },
   };
 }

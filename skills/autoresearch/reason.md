@@ -48,8 +48,8 @@ If all provided → skip.
 
 ### Phase 2: Critic
 - Critic receives candidate-A (cold-start, no shared session)
-- MUST find at least 3 specific weaknesses
-- MUST suggest what a superior candidate would do differently
+- Identify only evidence-supported weaknesses; no minimum count. If none are material, record that result instead of inventing flaws.
+- Suggest what a superior candidate would do differently when the evidence supports a change.
 - Role is purely adversarial — never compliment
 
 ### Phase 3: Generate-B
@@ -61,10 +61,10 @@ If all provided → skip.
 - Produces hybrid candidate-AB merging best of both
 
 ### Phase 5: Blind Judge Panel
-- Each judge receives 3 candidates with RANDOMIZED labels (Label-X, Label-Y, Label-Z)
+- Each judge receives only the candidates actually produced: A/B, plus AB when synthesis ran. Randomize labels and retain the round's label-to-candidate identity map in lineage.md; labels never imply authorship.
 - Judges evaluate independently on domain-specific criteria
 - Each produces ranking + one-paragraph justification
-- Verdict: majority vote. Tie → synthesized candidate wins.
+- Verdict: advisory majority ranking, mapped back to stable candidate identities. On a tie retain the incumbent if tied; otherwise report the tied set with no winner and no convergence increment. Never select an absent AB or infer synthesis from Label-Z. Source evidence and task constraints may invalidate any ranking.
 
 ### Phase 6: Convergence Check
 - If winner == incumbent → convergence_count++

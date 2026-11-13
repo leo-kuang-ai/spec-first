@@ -8,6 +8,7 @@ engine:
   name: claude_code
 cases:
   files:
+    - evals/cases/check-local-evidence.yaml
     - evals/cases/generic-audio-not-triggered.yaml
 defaults:
   timeout_seconds: 480

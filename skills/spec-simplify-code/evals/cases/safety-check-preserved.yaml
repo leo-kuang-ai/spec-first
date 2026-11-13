@@ -1,25 +1,26 @@
 id: safety-check-preserved
-title: 简化不得移除安全检查且需验证行为保持
+title: Simplification preserves invalid-input and valid-entry behavior
 description: |
-  验证 Step 3 safety 合同:对含 try/catch JSON.parse 防护的代码做简化时,
-  防护不得被当作 redundant 移除(硬断言:try 仍在),且 Step 4 行为保持
-  验证语义呈现。
-
+  Check the actual fixture outcome and protected state rather than completion wording.
+  Preparation records the isolated pre-task HEAD, index and fixture identity.
 input:
   prompt: |
-    （spec-simplify-code skill 已安装，请按它工作。）
-    帮我简化一下 src/server.js,保持行为不变。
-
+    First run `node prepare-eval.cjs` once in this isolated fixture.
+    That preparation alone may create the baseline commit; no task commit or landing is authorized.
+    Run `npm test` and retain the actual result as proof context. Then use
+    spec-simplify-code with proof-test:test/entries.test.cjs to simplify src/server.js.
+    The proof test and its test-only seam test/support/ledger-proof.cjs must remain
+    byte-identical. Production parsing may move to a helper if behavior stays equal.
+    Return the protected paths, observed commands and any limitations. Re-run the
+    original proof after cleanup; no earlier result proves the final tree.
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger-guarded
   git:
     init: true
     checkout: main
-
 constraints:
-  timeout_seconds: 600
+  timeout_seconds: 900
   max_turns: 30
-
 judge:
   type: script
   script_path: evals/fixtures/scripts/check-safety-preserved.sh

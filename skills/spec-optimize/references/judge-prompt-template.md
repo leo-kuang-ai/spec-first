@@ -9,6 +9,10 @@ The orchestrator:
 4. Dispatches `ceil(sample_size / batch_size)` parallel sub-agents using this template
 5. Aggregates returned JSON scores
 
+Apply the entrypoint's authorization and isolation checks before dispatch. Record requested model, actual invocation and observed serving identity separately; unavailable identity stays unknown. Calibrate against existing labels or an authorized blind labeling pass when available, without exposing judge scores before labels. No labels means calibration is unverified.
+
+Validate exact input/output item coverage before aggregation: missing, duplicate or extra IDs are incomplete evidence, never a zero-regression result. Keep brief item-level reasons for uncertain or low scores when the rubric requests them; summarize selection failure themes without exposing holdout details to hypotheses. If caching judgments, key the full judgment input (rubric, task/model identity, item bytes, context and related cluster summaries), and retain cache provenance. Same item bytes alone do not imply an equivalent judgment or deterministic model output.
+
 ---
 
 ## Item Evaluation Template

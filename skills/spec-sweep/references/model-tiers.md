@@ -1,5 +1,7 @@
 # Model Tiers
 
+For an authorized native dispatch, correct a pre-launch argument rejection once without changing scope, data authority, or required capabilities. Capacity-limited work stays queued until a slot frees; repeated zero capacity uses the bounded inline degradation below. Other launch failures follow that degradation or the source owner's more specific unavailable-state rule. Once a worker launches, collect its outcome before retrying; do not duplicate source reads or external effects.
+
 Read this when dispatching a sub-agent (a source-persona fetch subagent or a media-analyzer subagent). Sub-agent dispatch is tiered by task shape, never hardcoded to a model name:
 
 - **Extraction tier** — the source-persona fetch workers: retrieval and quoting work (pulling items and their media paths out of a source connector). Request the cheapest capable tier only when `worker_model_override: supported`. "Capable" is part of the spec — escalate to the generation tier when the source is large or the connector obscure.

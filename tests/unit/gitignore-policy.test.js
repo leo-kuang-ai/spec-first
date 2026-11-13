@@ -116,7 +116,7 @@ describe('spec-first gitignore policy', () => {
     );
     const manual = normalizeLineEndings(
       fs.readFileSync(
-        path.join(REPO_ROOT, 'docs', '05-用户手册', '12-gitignore参考.md'),
+        path.join(REPO_ROOT, 'docs', 'user-guide', '12-gitignore参考.md'),
         'utf8',
       ),
     );

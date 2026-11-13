@@ -126,6 +126,11 @@ describe('CE setup localization prerequisite contracts', () => {
   });
 
   test('refresh writes all artifacts and verify-only is byte-read-only', () => {
+    // Logging the test run changes an untracked worktree file. Hold source identity
+    // stable while testing output immutability; snapshot drift has separate tests.
+    const reconciliation = require('../../scripts/check-ce-upstream-reconciliation.cjs');
+    const snapshot = reconciliation.buildTargetSourceSnapshot(repoRoot);
+    const sourceIdentity = jest.spyOn(reconciliation, 'buildTargetSourceSnapshot').mockReturnValue(snapshot);
     const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ce-setup-localization-'));
     const paths = {
       inventory: path.join(tempRoot, 'skill-inventory.json'),
@@ -159,6 +164,7 @@ describe('CE setup localization prerequisite contracts', () => {
       }
     } finally {
       stdout.mockRestore();
+      sourceIdentity.mockRestore();
       fs.rmSync(tempRoot, { recursive: true, force: true });
     }
   });

@@ -2,6 +2,7 @@
 
 const BOOLEAN_OPTIONS = new Map([
   ['--check', 'check'],
+  ['--installation-only', 'installationOnly'],
   ['--verify-only', 'verifyOnly'],
   ['--refresh-facts', 'refreshFacts'],
   ['--plan', 'plan'],
@@ -17,6 +18,7 @@ const BOOLEAN_OPTIONS = new Map([
 
 const VALUE_OPTIONS = new Map([
   ['--only', 'only'],
+  ['--workflow', 'workflows'],
   ['--repo', 'repo'],
   ['--folder', 'folder'],
   ['--requirement-workspace', 'requirementWorkspace'],
@@ -69,6 +71,7 @@ function parseArgs(argv = []) {
   const input = Array.isArray(argv) ? argv.map(String) : [];
   const result = {
     check: false,
+    installationOnly: false,
     verifyOnly: false,
     refreshFacts: false,
     plan: false,
@@ -81,6 +84,7 @@ function parseArgs(argv = []) {
     workspaceGraphClean: false,
     workspaceGraphStatus: false,
     only: [],
+    workflows: [],
     repos: [],
     repo: '',
     folder: '',
@@ -124,7 +128,7 @@ function parseArgs(argv = []) {
       }
 
       const field = VALUE_OPTIONS.get(option);
-      if (field === 'only' || field === 'repos') {
+      if (field === 'only' || field === 'repos' || field === 'workflows') {
         const selected = String(value).split(',').map((entry) => entry.trim()).filter(Boolean);
         if (selected.length === 0) {
           result.errors.push({ reason_code: 'missing-option-value', option });
@@ -157,7 +161,29 @@ function uniqueStrings(values) {
   return result;
 }
 
+function helpResult() {
+  const human = [
+    '用法：node <loaded-skill-root>/scripts/setup.cjs [options]',
+    '',
+    '需求：--workflow <ids> 精确匹配 registry required_for；--only <ids> 显式选择 provider/tool/helper。',
+    '模式：--check | --verify-only | --refresh-facts | --plan | --project-config | --only <ids> | --repair-host-config',
+    '安装与接线：--installation-only；搭配 --plan 只预览，搭配 --verify-only 只验证并写 facts；不构图/query。',
+    '默认 --plan/--verify-only 仅覆盖安装与接线；图预览/验证需 --only codegraph,graphify。',
+    'Graphify 刷新：--only graphify --refresh，仅更新已有 graph.json；缺图时显式 --only graphify 首次构图。',
+    '目标：--repo <path> | --folder <path> | --all-repos',
+    '  --repo 仅接受精确 Git root；--folder 接受精确逻辑目录且不要求 Git。',
+    '  folder 内的 Provider artifact/facts 不会提升到父 Git root；仅 generated runtime 可复用父 root。',
+    'Workspace 双层图构建：--only codegraph,graphify --workspace-graph [--repos <a,b>]',
+    'Workspace 双层图状态：--workspace-graph-status [--repos <a,b>]',
+    'Workspace 双层图清理：--workspace-graph-clean [--repos <a,b>]',
+    '约束：workspace-graph action 互斥，且不可与 --all-repos 组合；contained child Git 事件异步刷新，hook 不可用、失败或需即时刷新时显式重跑。',
+    '',
+  ].join('\n');
+  return { exit_code: 0, mode: 'help', reason_code: 'help', payload: { help: human }, human, target: null };
+}
+
 module.exports = {
+  helpResult,
   parseArgs,
   parseEntrypointOptions,
 };

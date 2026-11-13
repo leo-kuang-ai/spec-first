@@ -1,0 +1,28 @@
+id: check-readonly
+title: check 保持夹具与配置只读
+description: |
+  --check 是只读诊断；--verify-only 允许写 setup-owned facts，不能用于本用例。
+  Judge 校验固定夹具字节、两份 host 配置哨兵及 setup facts 目录未产生。
+  此检查不覆盖用户级配置、外部安装、先写后还原或真实宿主阻断；不能据此声明全局无副作用。
+
+input:
+  prompt: |
+    （spec-runtime-setup skill 已安装，请按它工作。）
+    用 --check 检查当前夹具项目的 runtime readiness，只看状态。
+    不安装、不修改 host 配置、不写 setup facts；不要改用 --verify-only。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+  files:
+    ".claude/settings.json": |
+      {}
+    ".mcp.json": |
+      {}
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-readonly-verify.sh
+  timeout_seconds: 30

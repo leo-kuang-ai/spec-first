@@ -3,11 +3,13 @@ title: 模糊输入也应留在规划流程内澄清而非退出
 description: |
   验证 "When directly invoked, always plan" 合同:直接调用即使输入不清楚,
   也必须留在规划评估内(澄清问题、bootstrap 或直接给出 scoping 建议),
-  不得判定"这不是规划任务"而放弃 workflow。断言锚定"规划在推进"证据;
-  提问/scoping 确认形态由 transcript 人工核验。
+  不得判定"这不是规划任务"而放弃 workflow,更不得滑入实现。
+  确定性地板:实现源码与测试零改动(仅 docs/ 新增允许——规划文档本身合法);
+  澄清/scoping 的语义充分性地板之上由 transcript 人工核验。
 
 input:
   prompt: |
+    First run `node prepare-eval.cjs` once in this isolated fixture. Only that preparation may create a baseline commit; no task commit or landing is authorized.
     （spec-plan skill 已安装，请按它工作。）
     帮我搞点事情让这个记账 demo 更好用一点。
 
@@ -17,12 +19,11 @@ context:
     init: true
     checkout: main
 
-expect:
-  must_contain:
-    - "规划"
+constraints:
+  timeout_seconds: 900
+  max_turns: 25
 
 judge:
-  type: rule_based
-  success:
-    - output_contains:
-        all: ["规划"]
+  type: script
+  script_path: evals/fixtures/scripts/check-always-plan-only.sh
+  timeout_seconds: 30

@@ -1,0 +1,30 @@
+id: pipeline-pending-conversation
+title: Pipeline return preserves an already replied open thread without remote writes
+description: |
+  Isolated offline contract case, not a real PR or provider receipt. Preserve the
+  known reply and return the remaining independently authorized resolution work.
+input:
+  prompt: |
+    Use spec-resolve-pr-feedback mode:pipeline-return in this isolated offline fixture.
+    First run `node prepare-eval.cjs` once; only that preparation may create a fixture
+    baseline commit. Read pr-snapshot.json as the simulated current provider evidence,
+    clearly retaining its fixture-only limitation. Do not contact a real provider.
+    The supplied no-code verdict and scope have already been settled by this fixture's
+    caller: persistence is outside the in-memory demo scope. Reconcile the existing
+    visible submitted reply and open thread. All local-fix, commit, landing, reply,
+    thread-resolution and worker-dispatch authority is missing. Return one JSON
+    pipeline envelope with the exact PR/source/reply identities and the remaining
+    conversation conditions. No code change or additional reply is needed. Preserve
+    every source file and the existing Git state after preparation.
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+constraints:
+  timeout_seconds: 600
+  max_turns: 24
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-pipeline-pending.sh
+  timeout_seconds: 30

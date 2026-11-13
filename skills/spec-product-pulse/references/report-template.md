@@ -9,11 +9,11 @@ Loaded by `SKILL.md` at Phase 2.3 after queries have returned. Fill the template
 - No hardcoded thresholds. Do not label things "high" or "low" or color anything red unless the reader asked for threshold-based annotation at setup.
 - No PII. No emails, no account IDs, no message content.
 - Headlines are the top of the page. If a reader only reads the first 3 lines, they should know the most important thing that happened.
-- If `STRATEGY.md` exists, re-read its `## Key metrics` section before assembling the report. For each strategy metric, decide what to render:
+- Before assembly, read `references/strategy-source.md` and re-resolve current sources and metrics using the same rule as setup, including STRATEGY precedence, legacy fallback, semantic headings, and explicit delegation. For each defined metric, decide how to render it:
   - If the metric name appears in `pulse_excluded_metrics`, omit it from the report.
   - If the metric name appears in `pulse_pending_metrics`, include it in the Usage section marked `no data (instrumentation pending)`.
-  - Otherwise, resolve the source for this metric: look it up in `pulse_metric_sources` (CSV of `metric=source` pairs); if present, use that source. If absent, fall back to `pulse_analytics_source` and append `(default source)` to the metric line so the implicit routing is visible. Then query and render the metric with its current value and delta. If no confirmed value exists, include the metric with its source status and `reason_code`; do not invent zero or collapse a provider failure into generic `no data`.
-- Preserve one compact source-status line per expected source. Allowed states are `confirmed-value`, `confirmed-zero`, `not-configured`, `unavailable`, `permission-denied`, and `partial`. Every line includes `reason_code`, queried window, `freshness`, and any limitation. A real measured zero is `confirmed-zero`; an empty, denied, truncated, or failed response is not.
+  - Otherwise, consume the source mapping and query receipt resolved before dispatch under `references/config.md` and `references/run.md`. Use the metric's explicit `pulse_metric_sources` entry, including class-default mappings. For missing/conflicting legacy mappings, preserve `not-run` with `reason_code: metric-source-unresolved`; do not fall back to analytics. Render only confirmed values and deltas; retain the source status when no confirmed value exists. If a newly discovered metric was not queried, record `not-run` and return to the scoped query step only when its source and access are resolved.
+- Preserve one compact source-status line per expected source. Allowed states are `confirmed-value`, `confirmed-zero`, `not-configured`, `unavailable`, `permission-denied`, `partial`, and `not-run`. Every line includes `reason_code`, queried window, `freshness`, and any limitation. A real measured zero is `confirmed-zero`; an empty, denied, truncated, or failed response is not.
 
 ## Template
 
@@ -56,7 +56,7 @@ The block below is the literal content to write. Replace every `{{placeholder}}`
 - {{3-5 items max; trim if thin}}
 
 ---
-_Source status: analytics={{status}} reason_code={{reason_code}} window=[{{start}} -> {{end}}] freshness={{freshness}}; tracing={{status}} reason_code={{reason_code}} window=[{{start}} -> {{end}}] freshness={{freshness}}; payments={{status}} reason_code={{reason_code}} window=[{{start}} -> {{end}}] freshness={{freshness}}. Allowed status: confirmed-value | confirmed-zero | not-configured | unavailable | permission-denied | partial. Trailing buffer: 15m. Saved to `docs/pulse-reports/{{YYYY-MM-DD}}_{{HH-MM}}.md`._
+_Source status: analytics={{status}} reason_code={{reason_code}} window=[{{start}} -> {{end}}] freshness={{freshness}}; tracing={{status}} reason_code={{reason_code}} window=[{{start}} -> {{end}}] freshness={{freshness}}; payments={{status}} reason_code={{reason_code}} window=[{{start}} -> {{end}}] freshness={{freshness}}. Allowed status: confirmed-value | confirmed-zero | not-configured | unavailable | permission-denied | partial | not-run. Trailing buffer: 15m. Saved to `docs/pulse-reports/{{YYYY-MM-DD}}_{{HH-MM}}.md`._
 ~~~
 
 ## Variations

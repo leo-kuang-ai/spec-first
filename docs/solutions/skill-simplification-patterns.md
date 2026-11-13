@@ -18,7 +18,7 @@ tags: [ponytail, behavior-gate, anti-pattern, cache-fixture, fisher-exact, spec-
 
 ## Context
 
-`docs/10-prompt/spec-first代码审查方案.md` 是 `docs/10-prompt/Ponytail思想指导spec-first-Skill优化.md` 的执行方案，其 §7 输出交付物要求本文档收录"≥5 项通过的 patterns"和"失败的 anti-patterns"。
+`docs/methodology/spec-first代码审查方案.md` 是 `docs/methodology/Ponytail思想指导spec-first-Skill优化.md` 的执行方案，其 §7 输出交付物要求本文档收录"≥5 项通过的 patterns"和"失败的 anti-patterns"。
 
 2026-08-20 至 2026-08-21，用 `benchmarks/agentic/` 行为门（从 ponytail 移植）对 spec-first 现有 skill 上的候选简化指令做了真实门测（Sonnet 5，共花费约 $65.27，覆盖 trace-transfer/trace-amount/reuse-slug/reuse-money/safe-path/cache 共 6 个任务、baseline/spec-work/spec-debug 三臂）。
 
@@ -140,7 +140,7 @@ tags: [ponytail, behavior-gate, anti-pattern, cache-fixture, fisher-exact, spec-
 
 ## Related
 
-- `docs/10-prompt/Ponytail思想指导spec-first-Skill优化.md` — 本文档记录的候选全部来自其 §3/§4 映射
-- `docs/10-prompt/spec-first代码审查方案.md` — 完整审查方案，含每个候选的执行模板、门测命令和时间线
+- `docs/methodology/Ponytail思想指导spec-first-Skill优化.md` — 本文档记录的候选全部来自其 §3/§4 映射
+- `docs/methodology/spec-first代码审查方案.md` — 完整审查方案，含每个候选的执行模板、门测命令和时间线
 - `benchmarks/agentic/REPORT-20260820-sonnet5-saturation.md` — 首次饱和度测试报告，AP-1/AP-2/AP-3 的原始数据来源
 - `docs/solutions/architecture-patterns/agent-persona-reference-template-duplication-2026-08-21.md` — 同一轮审查发现的另一类问题（reference 文件重复），走的是不同的证据链（人工审查而非门测）

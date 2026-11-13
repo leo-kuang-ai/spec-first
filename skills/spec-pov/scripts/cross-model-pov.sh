@@ -8,16 +8,22 @@ umask 077
 log() { printf '[cross-model] %s\n' "$*" >&2; }
 fail() { log "$*"; exit 1; }
 
+require_authenticated_serving_channel() {
+  # File receipts cannot authenticate a provider. Keep both entrypoints closed
+  # until the runner's authenticated channel and worker-bound authority exist.
+  fail "provider_serving_receipt_unverified (authenticated producer channel disabled)"
+}
+
 resolve_python() {
   local candidate
   for candidate in python3 python; do
     if command -v "$candidate" >/dev/null 2>&1 &&
-      "$candidate" -c 'import sys; raise SystemExit(0 if sys.version_info.major == 3 else 1)' >/dev/null 2>&1; then
+      "$candidate" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)' >/dev/null 2>&1; then
       PYTHON_CMD=("$candidate"); return 0
     fi
   done
   if command -v py >/dev/null 2>&1 &&
-    py -3 -c 'import sys; raise SystemExit(0 if sys.version_info.major == 3 else 1)' >/dev/null 2>&1; then
+    py -3 -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)' >/dev/null 2>&1; then
     PYTHON_CMD=(py -3); return 0
   fi
   return 1
@@ -84,6 +90,7 @@ PY
 }
 
 worker_main() {
+  require_authenticated_serving_channel
   local peer="${1:-}" model="${2:-}" repo_root="${3:-}" packet="${4:-}" out="${5:-}"
   case "$peer" in codex|claude) ;; *) fail "unsupported peer provider" ;; esac
   [ -n "$model" ] || fail "worker model is missing"
@@ -127,10 +134,12 @@ worker_main() {
     else empty end
   ' "$raw_file" >"$normalized" || fail "peer output normalization failed"
   jq -e '
-    (.voice | type == "string") and
-    (.position | type == "string") and
-    (.reasoning | type == "string") and
-    (.evidence | type == "array") and
+    type == "object" and
+    (.voice | type == "string" and length > 0) and
+    (.position | type == "string" and length > 0) and
+    (.reasoning | type == "string" and length > 0) and
+    (.evidence | type == "array" and all(.[]; type == "string" and length > 0)) and
+    ((keys - ["voice", "position", "reasoning", "evidence", "external_check", "mode", "movement", "cross_model_route", "cross_model_target", "cross_model_harness", "serving_family", "model_requested", "model_actual", "independence_verified"]) | length == 0) and
     (.external_check == "ran" or .external_check == "unavailable") and
     (.mode == "independent" or .mode == "skeptic") and
     (.movement == "initial" or .movement == "moved" or .movement == "held")
@@ -162,7 +171,7 @@ jq -e '
   .verification_status == "unverified" and
   .reason_code == "authenticated-producer-unavailable"
 ' "$SERVING_RECEIPT" >/dev/null 2>&1 || fail "provider_serving_receipt_invalid"
-fail "provider_serving_receipt_unverified"
+require_authenticated_serving_channel
 ACTUAL_PROVIDER="$(jq -er '.actual_provider | select(type == "string" and length > 0)' "$SERVING_RECEIPT")" ||
   fail "provider_serving_receipt_invalid"
 ACTUAL_MODEL="$(jq -er '.actual_model | select(type == "string" and length > 0)' "$SERVING_RECEIPT")" ||
@@ -170,7 +179,7 @@ ACTUAL_MODEL="$(jq -er '.actual_model | select(type == "string" and length > 0)'
 
 SKILL_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 RUNNER="$SKILL_ROOT/scripts/peer-job-runner.py"
-PERSONA="$SKILL_ROOT/references/personas/agents/pov-peer.md"
+PERSONA="$SKILL_ROOT/references/agents/pov-peer.md"
 SCHEMA="$SKILL_ROOT/references/pov-schema.json"
 [ -f "$RUNNER" ] && [ -f "$PERSONA" ] && [ -f "$SCHEMA" ] ||
   fail "cross-model source assets are unavailable"

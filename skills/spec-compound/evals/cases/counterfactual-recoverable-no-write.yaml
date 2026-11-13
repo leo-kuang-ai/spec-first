@@ -1,0 +1,27 @@
+id: counterfactual-recoverable-no-write
+title: 可从最终代码直接恢复的修复不沉淀（counterfactual bar）
+description: |
+  验证 preconditions 的 counterfactual 维度：拼写修正类问题的学习
+  可从最终代码直接恢复（learning 文档消失后工程师读实现也不会
+  重犯），应 write nothing 并说明理由，不产出 docs/solutions。
+
+input:
+  prompt: |
+    （spec-compound skill 已安装，请按它工作。）
+    沉淀一个刚解决的问题：package.json 里把拼错的键 "entrypont"
+    改成了 "entrypoint"，src/app.js 同步读取新键，改完程序正常。
+
+context:
+  repo_fixture: evals/fixtures/repos/trivial-fix
+  git:
+    init: true
+    checkout: main
+
+expect:
+  files_not_exist:
+    - "docs/solutions"
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-counterfactual-no-write.sh
+  timeout_seconds: 30

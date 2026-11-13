@@ -3,9 +3,9 @@
 - 状态：`accepted`
 - 生效日期：`2026-04-16`
 - 作用范围：`T00 / T01 / T11 / T12 / T14`
-- 目标：为 Claude/Codex/Cursor/Kiro/Qoder/OpenCode supported-host 产品面、治理枚举、filtered asset set 提供单一可引用 contract
+- 目标：为 Claude/Codex/Cursor/Kiro/Qoder/OpenCode/ZCode/Pi supported-host 产品面、治理枚举、filtered asset set 提供单一可引用 contract
 
-> 兼容性说明：目录名仍为 `dual-host-governance`，这是历史 compatibility path。当前 machine-readable 语义已经泛化为 supported-host / 多宿主 skill delivery governance；不得把目录名解读为只支持 Claude/Codex。Accepted supported hosts 由 canonical adapter registry 枚举，当前为 `claude`、`codex`、`cursor`、`kiro`、`qoder`、`opencode`。
+> 兼容性说明：目录名仍为 `dual-host-governance`，这是历史 compatibility path。当前 machine-readable 语义已经泛化为 supported-host / 多宿主 skill delivery governance；不得把目录名解读为只支持 Claude/Codex。Accepted supported hosts 由 canonical adapter registry 枚举，当前为 `claude`、`codex`、`cursor`、`kiro`、`qoder`、`opencode`、`zcode`、`pi`。
 
 ## 1. 产品面最终决策
 
@@ -19,8 +19,9 @@
 6. Kiro 内部投射 `.kiro/skills/spec-*/SKILL.md`；P0 不生成 Kiro command layer，也不占用 Kiro native Specs namespace
 7. Qoder 内部投射 `.qoder/commands/spec-*.md`，并同步 `.qoder/skills/spec-*` workflow skill mirror
 8. OpenCode 内部投射 `.opencode/commands/spec-*.md`，并同步 `.opencode/skills/spec-*` workflow skill mirror；`.opencode/commands/spec/` 仅作为已退役 namespace 清理；在版本化 loader journey 完成前保持 generated-runtime preview
-9. standalone skill 只能按 skill 方式表述，不得写成已声明 workflow command
-10. `Skill(...)`、`skill:`、其他内部调用 DSL 明确排除在“用户可见入口治理”之外
+9. ZCode 与 Pi 通过共享 `.agents/skills/` 和 `AGENTS.md` 交付 Skill，专属状态分别位于 `.zcode/spec-first/` 与 `.pi/spec-first/`。
+10. standalone skill 只能按 skill 方式表述，不得写成已声明 workflow command
+11. `Skill(...)`、`skill:`、其他内部调用 DSL 明确排除在“用户可见入口治理”之外
 
 ### 1.2 Codex compatibility layer 决策
 
@@ -76,7 +77,7 @@
 定义：
 
 1. `dual_host`
-   - 所有 supported hosts 都需要交付对应能力；当前 supported hosts 为 `claude`、`codex`、`cursor`、`kiro`、`qoder`、`opencode`
+   - 所有 supported hosts 都需要交付对应能力；当前 supported hosts 为 `claude`、`codex`、`cursor`、`kiro`、`qoder`、`opencode`、`zcode`、`pi`
 2. `host_exclusive`
    - 只在单一宿主上交付给用户或运行时
 3. `target_host_maintenance`
@@ -92,11 +93,11 @@
    - 类型：`string | null`
    - 当 `entry_surface = workflow_command` 时必填
 2. `owner_host`
-   - 类型：`claude | codex | cursor | kiro | qoder | opencode | null`
+   - 类型：`claude | codex | cursor | kiro | qoder | opencode | zcode | pi | null`
    - 当 `host_scope = host_exclusive` 或 `target_host_maintenance` 时必填
 3. `host_delivery`
    - 类型：对象
-   - 字段：canonical adapter registry 中的每个宿主；当前为 `claude`、`codex`、`cursor`、`kiro`、`qoder`、`opencode`
+   - 字段：canonical adapter registry 中的每个宿主；当前为 `claude`、`codex`、`cursor`、`kiro`、`qoder`、`opencode`、`zcode`、`pi`
    - 允许值：`command`、`skill`、`internal`、`none`
 
 说明：
@@ -135,10 +136,15 @@
    - 同步 `.opencode/skills/spec-*` workflow skill mirrors
    - `supportsAgents=false`，不生成 bundled agent profiles；这不改变 Skill 正文中的 host-neutral worker semantics
 
+7. ZCode / Pi
+   - `host_delivery.zcode = skill`、`host_delivery.pi = skill`
+   - 与 Codex 共享 `.agents/skills/spec-*`，不新增 command layer；`supportsAgents=false`
+   - ZCode 的 SessionStart 与 Pi 的 trust/discovery 不代表相同的工作流执行能力
+
 这意味着：
 
 1. `workflow_command` 是源层事实
-2. Codex、Cursor 和 Kiro 侧不再因为这个源层事实而额外生成 command 文件；Qoder 与 OpenCode 生成各自的 command layer
+2. Codex、Cursor、Kiro、ZCode 和 Pi 侧不再因为这个源层事实而额外生成 command 文件；Qoder 与 OpenCode 生成各自的 command layer
 
 ### 2.5 Agent 模型选择 Contract
 
@@ -182,7 +188,7 @@ filtered asset set 的最小输入固定为：
 
 1. 由 `skills-governance.json` 的 workflow records 与 command template frontmatter 生成的 manifest command set
 2. 宿主治理真源文件
-3. 目标平台：canonical adapter registry 当前枚举的 `claude | codex | cursor | kiro | qoder | opencode`
+3. 目标平台：canonical adapter registry 当前枚举的 `claude | codex | cursor | kiro | qoder | opencode | zcode | pi`
 
 ### 3.2 输出
 
@@ -279,6 +285,6 @@ machine-readable 真源文件固定落位：
 6. 不得把 Kiro 用户入口写成 host-specific legacy spelling；用户口径是同名 `spec-*` workflow，Kiro 内部投射到 `.kiro/skills/spec-*`
 7. 不得把 OpenCode 用户入口写成宿主专属 worker primitive；用户口径是同名 `spec-*` workflow，OpenCode 内部投射到 `.opencode/commands/spec-*.md` 与 `.opencode/skills/spec-*`
 8. `Skill(...)`、`skill:`、以及其他内部调用 DSL 明确不属于“用户可见入口治理”范围
-9. `docs/10-prompt/skills/` 不再是 active contract surface、runtime mirror 或 skill source；新增或修改 skill 不得要求随 `skills/` source 改动同步更新或重新创建该目录，避免把 `skills/` 与 `docs/10-prompt/skills/` 重新变成双真相源
+9. `docs/methodology/skills/` 不再是 active contract surface、runtime mirror 或 skill source；新增或修改 skill 不得要求随 `skills/` source 改动同步更新或重新创建该目录，避免把 `skills/` 与 `docs/methodology/skills/` 重新变成双真相源
 10. 新增 lint / doctor / smoke 规则时，应优先引用 `skills-governance.json` 与 canonical adapter registry，而不是重复手写 skill 或宿主名单
 11. 运行时 machine-readable contract 必须继续落在 `src/cli/contracts/dual-host-governance/`，不得重新回放到 `docs/`

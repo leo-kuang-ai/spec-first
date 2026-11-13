@@ -1,3 +1,7 @@
+## Reproduction and performance
+
+For slow or timeout symptoms, establish a numeric baseline and repeat the same measurement after the fix. For intermittent behavior, record attempts and observed rate. Minimize a reliable reproducer before broad tracing.
+
 # Investigation Techniques
 
 Techniques for deeper investigation when standard code tracing is not enough. Load this when a bug does not reproduce reliably, involves timing or concurrency, or requires framework-specific tracing.
@@ -45,32 +49,12 @@ Root-cause tracing walks one call chain. When a bug crosses subsystems — CI �
 **Shape:**
 
 1. List the component boundaries data crosses from trigger to observed symptom.
-2. At each boundary, log what enters and what exits — include the values, relevant environment, and a short tag identifying the boundary.
+2. At each boundary, capture the minimum safe input/output facts and an allowlisted stage tag. Redact secrets and private payloads before persistence; do not dump environment variables.
 3. Run the scenario once.
 4. Read the log linearly, comparing each "exits" value to the next "enters" value.
 5. The boundary where data first stops matching expectation is the failing layer.
 
-**Worked example (app signing on CI):**
-
-```bash
-# Layer 1: workflow env
-echo "=== workflow env ==="
-echo "IDENTITY: ${IDENTITY:+SET}${IDENTITY:-UNSET}"
-
-# Layer 2: build script env
-echo "=== build script env ==="
-echo "IDENTITY: ${IDENTITY:+SET}${IDENTITY:-UNSET}"
-
-# Layer 3: signing stage keychain state
-echo "=== keychain ==="
-security list-keychains
-security find-identity -v
-
-# Layer 4: the actual signing call
-codesign --sign "$IDENTITY" --verbose=4 "$APP"
-```
-
-One run, and the log shows precisely which layer drops the value — secrets → workflow ✓, workflow → build ✗ → focus investigation on the workflow-to-build-script inheritance, not on signing.
+**Example: signing configuration propagation.** At each already-authorized workflow/build/signing boundary, record only whether the expected input is present, plus an allowlisted stage identifier. Do not dump environment values, keychain entries or credentials. For a shell presence check use `if [ -n "${IDENTITY:-}" ]; then printf 'IDENTITY: SET\n'; else printf 'IDENTITY: UNSET\n'; fi`. A missing value between two stages narrows the suspected boundary; confirm the causal link before changing it. Instrumentation does not authorize signing an app or touching a keychain.
 
 **When this beats backward tracing:** When the symptom is far from the trigger (many components apart), when components are owned by different systems (CI vs app code), when the "call stack" is conceptual rather than literal (message bus, HTTP, process boundaries). Backward tracing still applies within each layer once the failing layer is identified.
 
@@ -96,7 +80,7 @@ git bisect start HEAD <known-good-ref>
 git bisect run <test-command>
 ```
 
-The test command should exit 0 for good, non-zero for bad.
+Run bisection only in an isolated, disposable checkout with recorded start refs and equivalent inputs; preserve the active dirty workspace. Always reset the bisect state afterward. For `git bisect run`, exit 0 means good, 1–127 except 125 means bad, 125 means skip because the revision cannot be tested, and other exit codes abort. A setup/tool failure must not be classified as the reported bug.
 
 ---
 
@@ -125,11 +109,11 @@ A 5% reproduction rate confirms the bug exists but suggests timing or data sensi
 - Does the input size, encoding, or edge value matter?
 - Is the data order significant (sorted vs random)?
 
-**Test-order pollution.** If an individual test passes in isolation but fails when the suite runs, tests are leaking state between each other:
+**Test-order pollution.** Passing alone and failing in a suite suggests shared-state, resource or timing interference; it does not establish which cause applies:
 
-- Run the failing test alone — if it passes, pollution is confirmed
+- Repeat the isolated test under the same environment and compare with a fixed-seed suite; keep resource and timing differences visible
 - Run the failing test's file alone — narrows pollution to same-file or cross-file
-- Run the suite with randomized test order (most runners support a seed flag) — a different failing-test neighbor each run implies global state mutation
+- Run the suite with randomized test order (most runners support a seed flag) — retain the seed and predecessor sequence; varying neighbors are a clue, not proof of global state mutation
 - Bisect the preceding tests: run the failing test with just the first half of the earlier tests, then the second half, then narrow
 
 Common culprits once isolated: module-level state, mocks not torn down, temp files not cleaned up, database rows not rolled back, environment variables mutated and not restored.
@@ -274,7 +258,7 @@ Browser subprocess ownership belongs to the internal `spec-test-browser` Skill. 
 
 Invoke `spec-test-browser current target-origin:<exact-loopback-origin>` and ask it to observe the affected route, capture a private snapshot, perform only allowlisted synthetic interaction with authorized effects, then collect private screenshot/console/network evidence. Consume the structured result and private evidence refs; never copy raw page output into commands or promote a screenshot path to durable evidence without separate authorization.
 
-**Port detection:** If your in-context project instructions explicitly state the dev-server port, use it (don't grep instruction prose for a port — it's false-positive-prone); otherwise check `package.json` dev scripts, then `.env` files, falling back to `3000`.
+**Target origin:** Require the caller-owned exact origin and server identity. A documented port or package script is only a discovery hint, never a verified running target or permission to use it. Do not read secrets from `.env`, assume port 3000, or start a server to fill missing authority; return the missing-origin limitation to the caller.
 
 **Console errors:** Use console facts returned by the browser owner to check JavaScript errors, failed network requests, and CORS issues. These often reveal the root cause of UI bugs before any code tracing is needed.
 
@@ -358,3 +342,11 @@ Before deep tracing, run down this checklist. Many bugs match a recognizable cla
 - **TOCTOU (time-of-check vs time-of-use):** a check passed a moment ago but the underlying state changed before the dependent action ran
 
 Pattern-matching here is cheap. Spending 30 seconds checking whether the symptom fits a known class can eliminate hours of speculative tracing.
+
+## Performance Regressions
+
+For a slow or timed-out operation, preserve a numeric pre-fix baseline with the exact input/data volume, runtime/dependency identity, warm/cold state, concurrency and measurement command. Use repeated samples when variability matters and retain raw observations; no universal latency or percentage threshold replaces the project's actual expected behavior.
+
+Attribute the time or resource cost using a profile or bounded per-stage timings before optimizing a suspected hotspot. A query plan or `EXPLAIN ANALYZE` can execute work: use only authorized disposable data or an approved read scope. Instrumentation overhead and changed environments remain limitations.
+
+After the fix, rerun the same operation under comparable conditions, check correctness and original symptom, and compare against the original baseline without summing percentages from intermediate rounds. A regression may be bisected using this instrument in an isolated checkout. Uncontrolled inputs, missing baseline or inconclusive samples keep the performance claim open; a source-level simplification alone does not prove speedup.

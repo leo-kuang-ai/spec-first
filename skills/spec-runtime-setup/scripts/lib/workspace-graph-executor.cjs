@@ -12,6 +12,7 @@
 // provider failure — those are isolated in the build layer.
 
 const path = require('node:path');
+const { performance } = require('node:perf_hooks');
 const { isAbsolutePath } = require('./path-safety.cjs');
 const { resolveWorkspaceTargets } = require('./workspace-target.cjs');
 const { buildWorkspaceGraphs } = require('./workspace-graph-build.cjs');
@@ -52,7 +53,12 @@ function runWorkspaceGraphBuild({
   runtimeHost = null,
   bundledVersion = '',
   resolvedTargets = null,
+  maxRepos = 32,
+  executionBudgetMs = 15 * 60 * 1000,
+  executionClock = () => performance.now(),
+  signal = null,
 } = {}) {
+  const startedAt = executionClock();
   const targets = resolvedTargets || resolveWorkspaceTargets({ cwd, repos, allowDiscovery, manifestPath });
 
   if (targets.topology !== 'requirement-workspace') {
@@ -108,6 +114,30 @@ function runWorkspaceGraphBuild({
       build: null,
     };
   }
+
+  if (!Number.isSafeInteger(maxRepos) || maxRepos < 1
+    || !Number.isSafeInteger(executionBudgetMs) || executionBudgetMs < 1) {
+    return failedBeforeWorkspaceBuild({ targets, pendingConfirm, reasonCode: 'workspace-execution-budget-invalid' });
+  }
+  if (confirmed.length > maxRepos) {
+    return failedBeforeWorkspaceBuild({ targets, pendingConfirm, reasonCode: 'workspace-repo-limit-exceeded' });
+  }
+  let stoppedReason = null;
+  const executionGuard = () => {
+    if (!stoppedReason && signal && signal.aborted) stoppedReason = 'workspace-build-cancelled';
+    if (!stoppedReason && executionClock() - startedAt >= executionBudgetMs) stoppedReason = 'workspace-build-timeout';
+    return stoppedReason;
+  };
+  const boundedExec = (command, args, options = {}) => {
+    const failure = () => ({ status: 1, stdout: '', stderr: stoppedReason, reason_code: stoppedReason });
+    if (executionGuard()) return failure();
+    const remaining = Math.max(1, Math.ceil(executionBudgetMs - (executionClock() - startedAt)));
+    const result = exec(command, args, { ...options, timeoutMs: Math.min(options.timeoutMs || 300000, remaining) });
+    if (result && result.timed_out) stoppedReason = 'workspace-build-timeout';
+    else if (result && ['SIGINT', 'SIGTERM'].includes(result.signal)) stoppedReason = 'workspace-build-cancelled';
+    return executionGuard() ? { ...result, ...failure() } : result;
+  };
+  if (executionGuard()) return failedBeforeWorkspaceBuild({ targets, pendingConfirm, reasonCode: stoppedReason });
 
   if (refreshOnly && !lifecycleCredential) {
     return failedBeforeWorkspaceBuild({
@@ -167,7 +197,8 @@ function runWorkspaceGraphBuild({
       targets,
       confirmed,
       pendingConfirm,
-      exec,
+      exec: boundedExec,
+      executionGuard,
       codegraphCommand,
       graphifyCommand,
       hosts,
@@ -180,7 +211,13 @@ function runWorkspaceGraphBuild({
       refreshHookContract,
     });
   } finally {
-    if (!lifecycle.inherited) release = lifecycle.release();
+    if (!lifecycle.inherited) {
+      if (result && executionGuard() && result.build && result.build.state && !result.build.state.ok) {
+        release = { ok: false, status: 'retained', ownership_retained: true, reason_code: 'workspace-state-write-failed' };
+      } else {
+        release = lifecycle.release();
+      }
+    }
   }
   if (release && !release.ok) {
     const reasonCode = release.reason_code || 'workspace-graph-lifecycle-release-failed';
@@ -241,6 +278,7 @@ function runWorkspaceGraphBuildOwned({
   runtimeHost,
   bundledVersion,
   refreshHookContract,
+  executionGuard,
 }) {
   lifecycle.assertOwned('before-provider-build');
   const asyncStatusGeneration = readAsyncRefreshStatusGeneration(targets.workspace_root);
@@ -265,13 +303,14 @@ function runWorkspaceGraphBuildOwned({
     refreshMode: refreshOnly ? 'commit-hook-spec-first-async' : 'explicit',
     refreshHook: refreshOnly ? refreshHookContract : null,
     deferFinalState: true,
+    executionGuard,
   });
 
   // A2/CR10: inject best-effort routing guidance into the workspace host entry
   // docs so an agent launched here uses the right graph. Only when the build
   // produced usable graphs (complete/partial).
   let routing = null;
-  if (!refreshOnly && injectRouting && (build.status === 'complete' || build.status === 'partial')) {
+  if (!executionGuard() && !refreshOnly && injectRouting && (build.status === 'complete' || build.status === 'partial')) {
     lifecycle.assertOwned('before-routing-injection');
     routing = injectRoutingInstruction({ workspaceRoot: targets.workspace_root, repos: confirmed, hosts });
   }
@@ -279,7 +318,7 @@ function runWorkspaceGraphBuildOwned({
   // spec-first 自有子仓 commit hook：仅当 build 产出可用图（complete/partial）时安装，
   // 且只写有效 hooks root 在 child 内的子仓（external/unsafe 绝不写，merged 降级 advisory）。
   let hooks = null;
-  if (!refreshOnly) {
+  if (!executionGuard() && !refreshOnly) {
     const canInstallHooks = installHooks && (build.status === 'complete' || build.status === 'partial');
     lifecycle.assertOwned('before-hook-installation');
     hooks = installWorkspaceChildHooks({
@@ -302,6 +341,7 @@ function runWorkspaceGraphBuildOwned({
 
   let status = build.status;
   let reasonCode = build.reason_code;
+  if (executionGuard()) { status = 'partial'; reasonCode = executionGuard(); }
   const routingFailed = routing && routing.entries.some((entry) => entry.status === 'failed');
   if (status === 'complete' && routingFailed) {
     status = 'partial';
@@ -340,8 +380,9 @@ function runWorkspaceGraphBuildOwned({
     }
   }
 
+  if (executionGuard()) { status = 'partial'; reasonCode = executionGuard(); }
   lifecycle.assertOwned('before-state-write');
-  const finalState = writeExecutorState({
+  let finalState = writeExecutorState({
     targets,
     build,
     refresh,
@@ -350,6 +391,20 @@ function runWorkspaceGraphBuildOwned({
     refreshHook,
     expectedRepos: build.expected_repos,
   });
+  if (executionGuard() && finalState.ok && finalState.state.operation_status === 'complete') {
+    status = 'partial';
+    reasonCode = executionGuard();
+    lifecycle.assertOwned('before-interrupted-state-correction');
+    finalState = writeExecutorState({
+      targets,
+      build,
+      refresh,
+      operationStatus: status,
+      reasonCode,
+      refreshHook,
+      expectedRepos: build.expected_repos,
+    });
+  }
   build.state = finalState;
   if (finalState.ok && finalState.state.operation_status !== status) {
     status = finalState.state.operation_status;

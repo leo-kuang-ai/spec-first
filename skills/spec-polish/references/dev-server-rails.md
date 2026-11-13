@@ -1,6 +1,6 @@
 # Rails dev-server recipe (auto-detect fallback)
 
-Loaded when `detect-project-type.sh` returns `rails` and there is no `.claude/launch.json` to consult.
+Read only when classification resolves to `rails` and the startup command is still missing. Preserve selected cwd, environment, and numeric port; use the port resolver only for a missing port.
 
 ## Signature
 
@@ -49,4 +49,4 @@ If the cascade resolved a non-3000 port, substitute it in the stub's `port` fiel
 
 - **Bundler path:** some machines require `bundle exec bin/dev`. If `bin/dev` fails with a load-path error, fall back to `bundle exec bin/dev`.
 - **Foreman vs overmind:** `Procfile` vs `Procfile.dev` often both exist. Rails' `bin/dev` resolves to `Procfile.dev`; if the project uses `overmind` explicitly, prefer `overmind start -f Procfile.dev` (see `dev-server-procfile.md`).
-- **SSL dev server:** `rails s --ssl` serves over `https://`, but polish's reachability probe, browser handoff, and printed URL are all `http://localhost:<port>` — and the scheme is not configurable via `.claude/launch.json` (it has no scheme/URL field). The probe will therefore fail against an HTTPS-only server; that failure is non-fatal (polish shows the log and asks what to do), so open `https://localhost:<port>` manually to continue. Setting `port` explicitly in `.claude/launch.json` still helps polish target the right port.
+- **SSL dev server:** Use the HTTPS URL reported by the selected server or corrected by the user for probing, browser handoff, and printed output. HTTP is only a default candidate. A port alone does not select the URL scheme.

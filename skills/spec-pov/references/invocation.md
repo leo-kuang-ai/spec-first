@@ -15,12 +15,12 @@ So every input is labeled by provenance, and only verified buckets satisfy the g
 
 | Bucket | Counts as grounding? |
 |---|---|
-| Observed project facts (from a scout dossier) | Yes |
-| Verified external facts (from a scout dossier) | Yes |
-| Conversation claims | No — frame and hypotheses until a scout corroborates |
+| Observed project facts (from source-checked scout evidence or a fresh bounded inline read) | Yes |
+| Verified external facts (from source-checked scout evidence or a fresh bounded inline read) | Yes |
+| Conversation claims | No — frame and hypotheses until a scout or fresh bounded inline read corroborates |
 | Unconfirmed assumptions | No — surfaced for the user to confirm or deny |
 
-If the conversation says "we have 40 call-sites on X," the project-grounding scout must confirm that against the codebase before it counts. **Warm adds no evidentiary weight** — it surfaces the question and hypotheses; the scouts still do the independent grounding. Same invalidation rule, no warm exemption.
+If the conversation says "we have 40 call-sites on X," the project-grounding pass must confirm that against the codebase before it counts. **Warm adds no evidentiary weight** — it surfaces the question and hypotheses; the grounding pass still checks current sources; inline work does not claim independent coverage. Same invalidation rule, no warm exemption.
 
 ## Establishing the question (frame gate)
 

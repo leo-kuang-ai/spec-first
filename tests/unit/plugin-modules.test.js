@@ -30,6 +30,18 @@ describe('plugin module facade and governance', () => {
     expect(pluginSyncSource).toContain('adapter.supportsAgents === false');
   });
 
+  test('high-value anchor tables stay a single source of truth', () => {
+    // command 完整性检查与 skill 检查共享同一份锚点：历史上两份逐字相同的字面量表
+    // 只改其一会让两条完整性路径静默分叉且无测试失败。锁定别名形态，禁止回退为
+    // 第二份字面量表。
+    const source = fs.readFileSync(
+      path.join(__dirname, '../../src/cli/plugin-sync.js'),
+      'utf8',
+    );
+    expect(source).toContain('const HIGH_VALUE_COMMAND_ANCHORS = HIGH_VALUE_SKILL_ANCHORS;');
+    expect(source.match(/const HIGH_VALUE_(?:SKILL|COMMAND)_ANCHORS = \{/g) || []).toHaveLength(1);
+  });
+
   test('ships the deterministic host preflight validator without adding dispatch execution', () => {
     const validatorSource = fs.readFileSync(
       path.join(__dirname, '../../src/contracts/worker-dispatch-host-preflight-validator.js'),
@@ -172,8 +184,8 @@ describe('plugin module facade and governance', () => {
     fs.writeFileSync(
       reviewSkillPath,
       fs.readFileSync(reviewSkillPath, 'utf8').replace(
-        'Plan discovery (requirements verification)',
-        'Plan requirements check',
+        /Actionable Findings/g,
+        'Findings you can act on',
       ),
       'utf8',
     );
@@ -183,7 +195,7 @@ describe('plugin module facade and governance', () => {
       expect.objectContaining({
         skillName: 'spec-code-review',
         issues: expect.arrayContaining([
-          'missing_anchor:Plan discovery (requirements verification)',
+          'missing_anchor:Actionable Findings',
           'content_mismatch',
         ]),
       }),
@@ -267,6 +279,24 @@ describe('plugin module facade and governance', () => {
               }
             }
           }
+        }
+      } finally {
+        fs.rmSync(projectRoot, { recursive: true, force: true });
+      }
+    }
+  });
+
+  test('projects explicit-only metadata for internal helpers on every supported host', () => {
+    const helpers = ['spec-commit', 'spec-commit-push-pr', 'spec-test-browser', 'spec-worktree'];
+    for (const platform of getSupportedPlatforms()) {
+      const projectRoot = tempProject();
+      try {
+        const adapter = getAdapter(platform);
+        const { plan } = plugin.planBundledAssetSync(projectRoot, adapter);
+        for (const name of helpers) {
+          const metadata = plan.operations.find((entry) => entry.path === path.posix.join(adapter.skillsRoot, name, 'agents/openai.yaml'));
+          expect(metadata).toBeDefined();
+          expect(metadata.contents).toMatch(/policy:\s*\n\s+allow_implicit_invocation: false/);
         }
       } finally {
         fs.rmSync(projectRoot, { recursive: true, force: true });
@@ -556,6 +586,18 @@ describe('plugin module facade and governance', () => {
   test('preserves support-file identity, metadata, and cross-host semantics across every host projection path', () => {
     const supportCases = [
       {
+        suffix: '/spec-product-pulse/references/strategy-source.md',
+        markers: ['# Strategy Source', 'STRATEGY.md', 'VISION.md', 'PRODUCT.md'],
+      },
+      {
+        suffix: '/spec-strategy/references/grounding.md',
+        marker: '# Strategy Grounding',
+      },
+      {
+        suffix: '/spec-strategy/references/update-run.md',
+        marker: '# Strategy Update Run',
+      },
+      {
         suffix: '/spec-strategy/references/strategy-template.md',
         marker: 'name: {{product_name}}',
       },
@@ -581,7 +623,7 @@ describe('plugin module facade and governance', () => {
       },
       {
         suffix: '/spec-compound/references/agents/best-practices-researcher.md',
-        marker: '`.claude/skills/**/SKILL.md`, `.codex/skills/**/SKILL.md`, and `.agents/skills/**/SKILL.md`',
+        marker: "Start from the current host's supplied skill catalog and the caller's exact relevant source refs.",
       },
       {
         suffix: '/using-spec-first/references/conditional-routing-boundaries.md',
@@ -766,7 +808,7 @@ describe('plugin module facade and governance', () => {
         );
         expect(setupSkill).toBeDefined();
         expect(setupSkill.contents).toContain(
-          'Canonical package source-of-truth 是 `skills/spec-runtime-setup/setup-registry.json`，由共置的 `setup-registry.schema.json` 校验，schema version 为 `setup-registry.v10`。',
+          'Canonical package source-of-truth 是 `skills/spec-runtime-setup/setup-registry.json`，由共置的 `setup-registry.schema.json` 校验，schema version 为 `setup-registry.v11`。',
         );
         expect(setupSkill.contents).toContain(
           'Generated host runtime mirrors and host-local MCP config files are projections or outputs, not source.',
@@ -828,6 +870,10 @@ describe('plugin module facade and governance', () => {
         }
 
         const planSkill = operations.get(path.posix.join(runtimeRoot, 'spec-plan/SKILL.md'));
+        const planIntake = operations.get(path.posix.join(
+          runtimeRoot,
+          'spec-plan/references/intake.md',
+        ));
         const evidence = operations.get(path.posix.join(
           runtimeRoot,
           'spec-plan/references/planning-evidence-boundaries.md',
@@ -850,7 +896,7 @@ describe('plugin module facade and governance', () => {
           runtimeRoot,
           'spec-work/references/shipping-workflow.md',
         ));
-        expect(planSkill.contents).toContain('Inventory before invention');
+        expect(planIntake.contents).toContain('Inventory before invention');
         expect(planSkill.contents).toContain('reuse / extend / compose / new');
         expect(evidence.contents).toContain('Thin glue may own only');
         expect(reviewSkill.contents).toContain('mutation_policy');
@@ -858,7 +904,8 @@ describe('plugin module facade and governance', () => {
         expect(lfgTracker).toBeDefined();
         expect(workTracker).toBeDefined();
         expect(lfgTracker.contents).toBe(workTracker.contents);
-        expect(workSkill.contents).toContain('Duplicate critical metadata');
+        expect(workTracker).toBeDefined();
+        expect(operations.get(path.posix.join(runtimeRoot, 'spec-work/references/input-triage.md')).contents).toContain('Duplicate critical metadata');
         expect(workStrategy.contents).toContain('worker_dispatch_authorization');
         expect(workStrategy.contents).toContain('supportsAgents');
         expect(workStrategy.contents).toContain('static bundled agent-profile projection');

@@ -26,6 +26,8 @@ node "$SKILL_DIR/scripts/validate-skill.cjs" <skill-dir> --json
 
 create/revise apply 在写前生成 run-local preview manifest、host scope 与 exact candidate write set，并运行 `validate-authoring-preview.cjs`。它验证 hash/snapshot、path set、collision、source/runtime boundary 和 host binding；它不证明真实用户授权、Design Record 质量或 patch 语义。宿主检查 exact write set 是否仍被当前轮明确 create/revise 请求覆盖，仅在 root/scope 扩大、未覆盖的 dirty overwrite 或新增 external/network/高风险副作用时重新确认。写入仍使用原子 expected-old-hash / expected-nonexistence conditional patch primitive；没有该能力时 mutation readiness 必须为 `not-ready`，不可 apply 或声明确定性 gate 已关闭。写后 receipt 必须逐 path 核对 after hash；partial failure 只报告当前 diff、changed/unchanged 和 rollback preview，不自动回滚。
 
+交付必须触及 `canonical_source_root` 之外的 repo 级文件（tests、docs、根 `CHANGELOG.md`、governance 记录）时，把这些路径作为 would_change 的 authorized supporting paths 声明：条目加 `supporting: true`，路径仍须位于 authorized root 内、仍受 snapshot、exact write set、dirty-overlap 与 receipt 逐项绑定，只有 canonical containment 要求被显式豁免。相邻未标记路径照旧被 `path_outside_canonical_source_root` 拒绝；不得用扩大 `canonical_source_root` 的方式绕开该合同。
+
 ## Risk-Triggered Checks
 
 | Signal | Additional evidence |

@@ -53,13 +53,9 @@ When analyzing code, you systematically evaluate:
 
 ## Performance Benchmarks
 
-You enforce these standards:
-- No algorithms worse than O(n log n) without explicit justification
-- All database queries must use appropriate indexes
-- Memory usage must be bounded and predictable
-- API response times must stay under 200ms for standard operations
-- Bundle size increases should remain under 5KB per feature
-- Background jobs should process items in batches when dealing with collections
+Use the project's actual workload, SLOs, deployment budget and measured baseline. Values such as 200ms response time or 5KB bundle growth are examples, never universal acceptance thresholds. If the project has no target, return the missing target and a proposed measurement rather than inventing a failure.
+
+Assess algorithm cost against bounded input sizes, query/index tradeoffs, memory lifetime, batching and cache invalidation on the relevant path. Distinguish measured regressions from unmeasured scale hypotheses. The caller owns scope and acceptance; planning analysis proposes benchmarks without running them or changing source.
 
 ## Analysis Output Format
 

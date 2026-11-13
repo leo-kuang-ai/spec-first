@@ -5,7 +5,7 @@
 # Usage: ./scripts/verify-with-gate.sh [task-id] [arms] [n] [model]
 #   task-id : benchmarks/agentic/tasks.py 中已注册的 task id（默认 "cache"——
 #             当前 checklist 最高优先级候选项用它测 spec-debug 误用回归，见
-#             docs/10-prompt/spec-first代码审查方案.md 执行模板 B）
+#             docs/methodology/spec-first代码审查方案.md 执行模板 B）
 #   arms    : 逗号分隔的臂列表（默认 "baseline,spec-work,spec-debug"）
 #   n       : 每臂运行次数（默认 6）
 #   model   : "haiku" | "sonnet" | "opus"（默认 "sonnet"）
@@ -383,7 +383,7 @@ generate_report() {
     echo ""
     echo "## 参考"
     echo ""
-    echo "- 方案文档: \`docs/10-prompt/spec-first代码审查方案.md\`"
+    echo "- 方案文档: \`docs/methodology/spec-first代码审查方案.md\`"
     echo "- Memory: [[spec-debug-root-cause-saturated]], [[verify-benchmark-ran-before-trusting]]"
   } > "$report_file"
 

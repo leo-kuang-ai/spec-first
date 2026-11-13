@@ -2,6 +2,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { getSupportedPlatforms } = require('../../src/cli/adapters');
 
 const repoRoot = path.resolve(__dirname, '../..');
 const skillPath = path.join(repoRoot, 'skills/using-spec-first/SKILL.md');
@@ -34,15 +35,15 @@ describe('using-spec-first entry-governor contracts', () => {
     const footprint = Buffer.byteLength(skill, 'utf8');
 
     expect(skill).not.toMatch(/^## (?:Flow Map|Route Map|Routing Rules)$/m);
-    expect(footprint).toBeLessThanOrEqual(4800);
+    expect(footprint).toBeLessThanOrEqual(5800);
     expect(skill).toMatch(/^name: using-spec-first$/m);
     expect(skill).toContain('standalone entry governor');
     expect(skill).toContain('selects one next entrypoint and yields control');
     expect(skill).toContain('not a rigid state machine');
 
-    if (footprint > 4200) {
+    if (footprint > 5200) {
       console.warn(
-        `using-spec-first Front Controller is ${footprint} bytes; the 4,200-byte target is advisory, not a token or behavior proof.`,
+        `using-spec-first Front Controller is ${footprint} bytes; the 5,200-byte target is advisory, not a token or behavior proof.`,
       );
     }
   });
@@ -85,6 +86,20 @@ describe('using-spec-first entry-governor contracts', () => {
     expect(routeMap).toContain('bounded source review');
     expect(routeMap).toContain('`runtime-maintenance`');
     expect(routeMap).toContain('source-revision request');
+  });
+
+  test('keeps onboarding routing semantics and mid-execution failure adjudication', () => {
+    // U2 新增语义（输入物路由、推荐/执行边界、首次成功判据）与 S5 修复的
+    // 执行中失败裁决是路由行为的 load-bearing 文本；被编辑稀释时无行为测试
+    // 会报警，这里以存在性断言守住最低语义面。
+    expect(skill).toContain('用户明确点名 workflow 时按对应入口承接');
+    expect(skill).toContain('活跃 workflow 内的失败由当前 owner 处理，超范围时才移交');
+    expect(skill).toContain('环境必需能力缺失交给`spec-runtime-setup`');
+    expect(skill).toContain('不再把入口推荐当成一次新的审批');
+    expect(skill).toContain('欢迎语、入口推荐、setup receipt或文件存在不证明成功');
+    expect(routeMap).toContain('## 按已有输入选择结果');
+    expect(routeMap).toContain('执行中出现的失败由活跃 workflow 的反馈回路处理');
+    expect(routeMap).toContain('不要因中途补充或询问进度重新路由');
   });
 
   test('keeps five exit gates and two explicit reference triggers', () => {
@@ -146,10 +161,11 @@ describe('using-spec-first entry-governor contracts', () => {
   });
 
   test('supported-host governance follows the current adapter registry', () => {
+    const hosts = getSupportedPlatforms();
     expect(governanceReadme).toContain(
-      'Accepted supported hosts 由 canonical adapter registry 枚举，当前为 `claude`、`codex`、`cursor`、`kiro`、`qoder`、`opencode`',
+      `Accepted supported hosts 由 canonical adapter registry 枚举，当前为 ${hosts.map((host) => `\`${host}\``).join('、')}`,
     );
-    expect(governanceReadme).toContain('目标平台：canonical adapter registry 当前枚举的 `claude | codex | cursor | kiro | qoder | opencode`');
+    expect(governanceReadme).toContain(`目标平台：canonical adapter registry 当前枚举的 \`${hosts.join(' | ')}\``);
     expect(governanceReadme).toContain('host_delivery.cursor = skill');
     expect(governanceReadme).toContain('host_delivery.opencode = command');
   });

@@ -25,7 +25,10 @@
       "workflow_url": "https://github.com/sunrain520/spec-first/actions/runs/29153023637",
       "head_sha": "827ee115ab638871d003d59adc2f5355682e21cb",
       "source_sha": "a574194b13ee3e53e1d7cd36bbfc86ac058db0cc",
-      "node_matrix": [20, 22],
+      "node_matrix": [
+        20,
+        22
+      ],
       "source_files_materialized": 58,
       "capture_status": "partial",
       "authority_level": "confirmed-runtime",
@@ -34,6 +37,17 @@
     }
   },
   "decisions": [
+    {
+      "id": "bare-baseline-converge",
+      "confirmed_mismatches": [
+        "bare:exit_code:0!=1",
+        "bare:artifact_schema:spec-mcp-setup-preflight.v2!=spec-runtime-setup-execution.v1",
+        "bare:side_effect_categories:[]"
+      ],
+      "classification": "intentional-divergence",
+      "legacy_difference": "旧版裸调用(bare)是只读诊断(preflight.v2,exit 0,零副作用);2026-09-13 起裸调用收敛 registry 声明的基线(mutation:安装/接线/provider/facts)。replay 基线树仍按旧语义执行,故三者差异为已确认的有意分歧。",
+      "canonical_expected_result": "裸调用按 only 模式动作集执行基线收敛;在依赖未就绪的 replay 环境中 fail-closed(provider-dependency-not-ready, execution.v1),副作用含 host-config/setup-facts/home。"
+    },
     {
       "id": "public-flag-spelling",
       "legacy_difference": "PowerShell 暴露 PascalCase alias，而 POSIX 使用 GNU-style flag。",
@@ -71,7 +85,9 @@
     },
     {
       "id": "windows-project-config-new-item-literalpath",
-      "platforms": ["windows"],
+      "platforms": [
+        "windows"
+      ],
       "confirmed_mismatches": [
         "project-config:exit_code:1!=0"
       ],

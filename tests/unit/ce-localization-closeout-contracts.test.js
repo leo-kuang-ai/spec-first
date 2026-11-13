@@ -2,8 +2,11 @@
 
 const crypto = require('node:crypto');
 const fs = require('node:fs');
+const path = require('node:path');
 
 const producer = require('../../scripts/check-ce-localization-review.cjs');
+
+const repoRoot = require('node:path').resolve(__dirname, '../..');
 const closeoutWriter = require('../../scripts/generate-ce-localization-closeout.cjs');
 
 function semanticLensVerdicts() {
@@ -79,13 +82,25 @@ function reviewDelta(deterministic, relationGaps) {
 }
 
 describe('CE localization closeout artifacts', () => {
-  test('validates the complete canonical topology against the current source snapshot', () => {
-    const deterministic = producer.buildArtifacts();
+  // 历史闭环按其记录的 source binding 校验；当前适用性由显式 current gate 判断。
+  function recordedDeterministic() {
+    const inventory = JSON.parse(fs.readFileSync(path.join(repoRoot,
+      'docs/validation/ce-localization/skill-inventory.json'), 'utf8'));
+    const coverage = JSON.parse(fs.readFileSync(path.join(repoRoot,
+      'docs/validation/ce-localization/review/round-3-source-coverage.json'), 'utf8'));
+    return { inventory, coverage };
+  }
+
+  test('历史闭环在其记录的 source snapshot 内保持完整', () => {
+    const deterministic = recordedDeterministic();
     const closeout = producer.loadCloseoutArtifacts();
     const result = producer.validateCloseoutArtifacts(closeout, deterministic);
 
     expect(result).toEqual({ valid: true, errors: [] });
-    expect(closeout.scenarios.scenarios).toHaveLength(38);
+    // 38 -> 39 (2026-09-08): the canonical standalone iteration skill gained its
+    // scenario row during the full-lane refresh batch (skill already canonical
+    // since 2026-09-04; the writer table had not caught up).
+    expect(closeout.scenarios.scenarios).toHaveLength(39);
     expect(closeout.scenarios.path_coverage).toHaveLength(
       deterministic.inventory.package_path_count
         + deterministic.coverage.coverage_summary.direct_support_relation_count,
@@ -98,8 +113,19 @@ describe('CE localization closeout artifacts', () => {
     expect(closeout.knowledgePromotion.overall_status).toBe('not-run');
   });
 
+  test('数量不变的 source binding 漂移仍拒绝历史 closeout', () => {
+    const deterministic = recordedDeterministic();
+    const closeout = producer.loadCloseoutArtifacts();
+    expect(producer.validateCloseoutArtifacts(closeout, deterministic).valid).toBe(true);
+    deterministic.inventory.source_snapshot.source_tree_hash = '0'.repeat(64);
+    expect(producer.validateCloseoutArtifacts(closeout, deterministic)).toMatchObject({
+      valid: false,
+      errors: expect.arrayContaining([expect.stringContaining('snapshot')]),
+    });
+  });
+
   test('rejects a semantic artifact that drifts from the deterministic inventory', () => {
-    const deterministic = producer.buildArtifacts();
+    const deterministic = recordedDeterministic();
     const closeout = producer.loadCloseoutArtifacts();
     closeout.scenarios.scenarios[0].skill_id = 'not-a-current-skill';
 
@@ -110,7 +136,7 @@ describe('CE localization closeout artifacts', () => {
   });
 
   test('rejects path hash drift and knowledge promotion without field evidence', () => {
-    const deterministic = producer.buildArtifacts();
+    const deterministic = recordedDeterministic();
     const closeout = producer.loadCloseoutArtifacts();
     closeout.scenarios.path_coverage[0].source_sha256 = '0'.repeat(64);
     closeout.knowledgePromotion.overall_status = 'promoted';
@@ -125,7 +151,7 @@ describe('CE localization closeout artifacts', () => {
   });
 
   test('rejects stale Round 3 source receipts even when top-level counts match', () => {
-    const deterministic = producer.buildArtifacts();
+    const deterministic = recordedDeterministic();
     const closeout = producer.loadCloseoutArtifacts();
     closeout.reviews.round3Openai.skill_reviews[0].source_read_receipts[0].sha256 = '0'.repeat(64);
 
@@ -136,7 +162,7 @@ describe('CE localization closeout artifacts', () => {
   });
 
   test('rejects a stale Round 3 lane finding summary', () => {
-    const deterministic = producer.buildArtifacts();
+    const deterministic = recordedDeterministic();
     const closeout = producer.loadCloseoutArtifacts();
     closeout.reviews.round3Anthropic.finding_summary.open_count = 99;
 
@@ -149,7 +175,7 @@ describe('CE localization closeout artifacts', () => {
   });
 
   test('rejects a report that still carries a stale snapshot warning', () => {
-    const deterministic = producer.buildArtifacts();
+    const deterministic = recordedDeterministic();
     const closeout = producer.loadCloseoutArtifacts();
     closeout.report = `> **当前快照失效**: old snapshot\n\n${closeout.report}`;
 
@@ -258,13 +284,18 @@ describe('CE localization closeout artifacts', () => {
     const closeout = producer.loadCloseoutArtifacts();
     const review = JSON.parse(JSON.stringify(closeout.reviews.round3Openai));
     const sourceDelta = JSON.parse(fs.readFileSync(
-      'docs/validation/ce-localization/review/deltas/2026-08-20-current-source-final-v2-inline-review.json',
+      require('node:path').join(repoRoot, 'docs/validation/ce-localization/review/deltas/2026-08-20-current-source-final-v2-inline-review.json'),
       'utf8',
     ));
     sourceDelta.source_binding.source_tree_hash = '0'.repeat(64);
+    // prune 合同(assertReviewDeltaPath)要求 delta artifact 位于 review/deltas/ 目录内,
+    // 故不能改用 os.tmpdir;此处以 repoRoot 绝对路径写入,修复旧版 cwd 相对路径在
+    // jest cwd ≠ 仓库根时的 ENOENT/错位问题。文件位于 chain-excluded 目录,硬杀残留
+    // 不影响 inventory;pid 后缀降低并发碰撞。
     const artifactRef = `docs/validation/ce-localization/review/deltas/.test-stale-${process.pid}.json`;
+    const artifactAbsPath = require('node:path').join(repoRoot, artifactRef);
     const artifactBytes = Buffer.from(`${JSON.stringify(sourceDelta, null, 2)}\n`);
-    fs.writeFileSync(artifactRef, artifactBytes);
+    fs.writeFileSync(artifactAbsPath, artifactBytes);
     review.review_status = 'complete-with-incremental-review';
     review.coverage_status = 'complete-current-source-with-incremental-review';
     review.review_deltas = [{
@@ -280,7 +311,7 @@ describe('CE localization closeout artifacts', () => {
       expect(review.review_status).toBe('complete-current-source');
       expect(review.coverage_status).toBe('complete-current-source');
     } finally {
-      fs.rmSync(artifactRef, { force: true });
+      fs.rmSync(artifactAbsPath, { force: true });
     }
   });
 

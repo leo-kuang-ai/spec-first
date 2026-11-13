@@ -205,9 +205,10 @@ function buildFinalizeReceipt(target, text, inputs, options = {}) {
     ...missingDesignInputScanReasons,
   ])].sort();
 
-  // --refresh-inputs-hash: 当 PRD 内容未变但 inputs 文件被修改导致 ready_receipt_stale 时，
-  // 允许只刷新 inputs hash。条件: 唯一阻断码是 ready_receipt_stale(无结构问题)。
+  // Input refresh may renew source freshness only; it cannot approve changed PRD content.
   const canRefreshInputsHash = options.refreshInputsHash === true
+    && facts.ready_receipt_prd_current === true
+    && facts.ready_receipt_inputs_current === false
     && blockingReasons.length === 1
     && blockingReasons[0] === 'ready_receipt_stale';
 

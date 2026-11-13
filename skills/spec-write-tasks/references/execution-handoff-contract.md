@@ -27,7 +27,7 @@ validation:
   spec_id: matched | missing | mismatch | not_checked
   source_plan_hash: matched | missing | mismatch | unavailable | not_checked
   hash_tool: available | unavailable
-  source_plan_path: resolved | missing | invalid
+  source_plan_path: resolved | missing | invalid | not_checked
   task_pack_contract: valid | invalid | not_checked
 orientation:
   provider: direct-repo-reads | lsp | mixed | skipped
@@ -52,7 +52,11 @@ Every branch maps to either an output artifact or an explicit no-artifact rule. 
 
 ## Deterministic Validation Rule
 
-Before filling `deterministic_handoff` and the `validation:` block, you must actually run the deterministic CLI and transcribe its result, not assert it from inspection.
+Before reporting `deterministic_handoff: true` or a populated `validation:` block, actually run the deterministic CLI and transcribe its result, not assert it from inspection.
+
+When validation was not performed or produced no usable CLI JSON, use `validation: null` and `deterministic_handoff: false`. Record the precise reason in `orientation.limitations` and `reason`: for example, execution prohibited by the assigned read-only scope, no task artifact on a skip branch, or an observed unavailable command. Do not label a prohibited but unprobed tool `hash_tool: unavailable`, or direct source reading `source_plan_path: resolved` inside a fabricated validation object. Select the existing branch and reason code that fit the actual limitation; a missing proof result never permits executable task-pack handoff.
+
+This is a reporting clarification for the workflow envelope, not a change to the task-pack schema or CLI response. Consumers treat null validation as no deterministic evidence and obtain a real CLI receipt before execution. When valid CLI JSON is available, copy its complete validation object unchanged, including negative or `not_checked` fields; do not replace a real failed result with null.
 
 Run:
 
