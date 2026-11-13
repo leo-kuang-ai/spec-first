@@ -9,7 +9,7 @@ const {
   DEFAULT_OUTPUT_PATH,
   buildRuntimeCapabilityCatalog,
 } = require('./generate-runtime-capability-catalog');
-const { getSupportedPlatforms } = require('../src/cli/adapters');
+const { getSupportedPlatforms, getPlatformDisplayName } = require('../src/cli/adapters');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const PACKAGE_JSON_PATH = path.join(REPO_ROOT, 'package.json');
@@ -356,10 +356,6 @@ function checkOpenCodeReleaseSurface() {
       path: 'skills/spec-runtime-setup/SKILL.md',
       tokens: ['Kiro/Qoder/Cursor/OpenCode', 'opencode-governed-assets-v1', 'host-config-jsonc-precedence-blocked'],
     },
-    {
-      path: 'src/cli/brand.js',
-      tokens: ['OpenCode preview'],
-    },
   ];
   const missing = [];
   for (const surface of surfaces) {
@@ -367,6 +363,11 @@ function checkOpenCodeReleaseSurface() {
     for (const token of surface.tokens) {
       if (!content.includes(token)) missing.push(`${surface.path}:${token}`);
     }
+  }
+  const displayName = getPlatformDisplayName('opencode');
+  const brandOutput = require('../src/cli/brand').renderFullArt(pkg.version, { useColor: false });
+  if (!getSupportedPlatforms().includes('opencode') || !brandOutput.includes(displayName)) {
+    missing.push(`brand-output:${displayName}`);
   }
   if (!String(pkg.description || '').includes('OpenCode')) {
     missing.push('package.json:description:OpenCode');
@@ -379,7 +380,7 @@ function checkOpenCodeReleaseSurface() {
     guardId: 'opencode-release-surface',
     classification: 'blocking',
     artifactPath: 'README.md',
-    checkedSources: [...surfaces.map((surface) => surface.path), 'package.json'],
+    checkedSources: [...surfaces.map((surface) => surface.path), 'src/cli/brand.js', 'src/cli/adapters/platform-registry.js', 'package.json'],
     ok: missing.length === 0,
     passReason: 'opencode-release-surface-current',
     failReason: `opencode-release-surface-missing:${missing.join(',')}`,

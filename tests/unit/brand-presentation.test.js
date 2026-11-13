@@ -15,6 +15,13 @@ function makeRepo() {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-brand-'));
   const repo = path.join(home, 'repo');
   fs.mkdirSync(repo, { recursive: true });
+  // jest 进程内 os.homedir() 不跟随 process.env.HOME，且 doMock 的
+  // spread 真实实现内部调用不走 mock，因此必须在 node:os 层把 homedir
+  // 指向沙箱；否则 init apply 把测试身份写进真实 ~/.spec-first/.developer。
+  jest.doMock('node:os', () => {
+    const actual = jest.requireActual('node:os');
+    return { ...actual, homedir: () => home };
+  });
   jest.doMock('../../src/cli/developer', () => ({
     ...jest.requireActual('../../src/cli/developer'),
     getGlobalDeveloperPath: () => path.join(home, 'none-developer'),
@@ -37,6 +44,7 @@ function withCapturedLogs() {
 
 describe('brand presentation contract', () => {
   afterEach(() => {
+    jest.dontMock('node:os');
     jest.dontMock('../../src/cli/developer');
     jest.dontMock('../../src/cli/commands/doctor');
     jest.dontMock('../../src/cli/commands/init');
@@ -122,6 +130,7 @@ describe('brand presentation contract', () => {
     try {
       const update = require('../../src/cli/commands/update');
       const exitCode = await update.runUpdate([], {
+        detectInstallOrigin: () => ({ origin: 'npm-global', reason_code: 'fixture' }),
         runInstall: () => ({ status: 0, errorCode: null }),
         runRuntimeRefresh: () => ({ status: 0, errorCode: null }),
         resolveRuntimeRefreshCommand: () => ({ args: ['init', '-y'], cwd: process.cwd(), reason_code: 'test' }),
@@ -135,6 +144,16 @@ describe('brand presentation contract', () => {
       expect(output).toContain('已升级到 v9.9.9');
     } finally {
       capture.restore();
+    }
+  });
+
+  test('banner tagline lists every registered host (registry-derived, no stale literals)', () => {
+    // tagline 从 getSupportedPlatforms() 派生：新增宿主时 banner 自动扩展。
+    // 该断言防止 tagline 退回手写字面量后与 usage 行宿主面自相矛盾。
+    const { getSupportedPlatforms, getPlatformDisplayName } = require('../../src/cli/adapters');
+    const art = require('../../src/cli/brand').renderFullArt('0.0.0-test', { useColor: false });
+    for (const platform of getSupportedPlatforms()) {
+      expect(art).toContain(getPlatformDisplayName(platform));
     }
   });
 });

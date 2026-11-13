@@ -19,7 +19,7 @@
 
 | Layer | 职责 | 可用 skill / artifact | v1.15 状态 | 边界 |
 | --- | --- | --- | --- | --- |
-| L1 Project Context | 保留项目角色、source/runtime 边界、host 指令和需求上下文 | `docs/10-prompt/结构化项目角色契约.md`, `AGENTS.md`, `CLAUDE.md`, `spec-prd` | L1 已由现有 `spec-prd`/host docs 覆盖 | host docs 是 source 指令，不是 workflow 状态 |
+| L1 Project Context | 保留项目角色、source/runtime 边界、host 指令和需求上下文 | `docs/methodology/结构化项目角色契约.md`, `AGENTS.md`, `CLAUDE.md`, `spec-prd` | L1 已由现有 `spec-prd`/host docs 覆盖 | host docs 是 source 指令，不是 workflow 状态 |
 | L2 Context Budget | 用最小高信号 token 集传递上游 artifact、相关路径和验证路径 | `context-bundle.v1`, `artifact-summary.v1`, `spec-plan`, `spec-work`, `spec-code-review` | L2 是 v1.15 completion gate | context budget 复用 `related_paths` / `evidence_paths` / `excluded_context` / `budget_used`，不新增 included/omitted 字段 |
 | L3 Code Intelligence | 帮助定位影响面、调用链和候选测试 | external providers, direct `rg`, ast-grep | L3 归 v1.16 capability-aware 协同 | provider 只提供 advisory navigation，不拥有 scope/finding/root-cause authority |
 | L4 Memory / Prior Decisions | 从 `docs/solutions/` 召回历史经验和已拒绝方案 | `spec-plan`, `spec-debug`, `spec-learnings-researcher`, `docs/solutions/**` | L4 是 v1.15 completion gate | recall 命中是 advisory candidate，必须回源到 source/test/doc 确认后才可升为 confirmed |
@@ -64,6 +64,8 @@ Promotion gate 的最小机制是 candidate -> review -> promote。Candidate 必
 Full、Headless 和 Lightweight 都遵循上述 publication boundary；它们的差别是研究和语义复核强度，不是 promotion gate 强度。Lightweight 仅适用于 low-risk、bounded、source-grounded 且已有验证证据的 learning；上下文压力本身不能覆盖这四项。错误结论可能实质削弱 security/authorization、data integrity、migration/release safety、privacy/compliance 或 irreversible mutation 边界时，必须进入 Full；剩余上下文不足则 handoff 或 `Documentation skipped`，不得降级写入 durable knowledge。
 
 独立 semantic reviewer 不是所有普通 learning 的普遍硬要求：有明确 dispatch authorization/capability 时可作为高风险复核增强；否则 Full/Headless 使用同一 validator prompt inline 并标记非独立，Lightweight 由 orchestrator 作显式语义 promotion decision。无论哪种路径，脚本都不判断问题是否真的解决、引用是否相关或 learning 是否值得复用；只有语义判断通过后才能发布。
+
+Refresh 的本地执行引用为 `skills/spec-compound-refresh/references/publication.md`：Replace、Consolidate、Split 及实质性缩写均先准备私有候选，连同入链、目录和词汇变更验证后再发布；同路径 Replace 不删除存续路径，异路径删除必须等待 successor 与引用迁移验证。工具提供 hash、路径、校验及实际写入事实，LLM 裁决指导是否仍有效与内容是否可恢复；当前没有独立事务式 runtime gate，不把 hash 复查表述为并发锁或跨文件原子保证。普通 refresh 不因实现偏离就改写仍有独立证据支持的规范；可选 worth audit 要逐 claim 给出存续材料的原文证据，并按实际授权决定是否删减，非交互模式仅建议 worth-based 操作。
 
 ## Open Questions / Resolved
 

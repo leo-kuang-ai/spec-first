@@ -1,0 +1,32 @@
+id: governed-caller-create-worktree
+title: governed caller 经 detect 创建 new-work worktree 且主 checkout 不动
+description: |
+  验证核心链路：caller-owned 隔离请求应先经 bundled script 的 detect
+  契约（spec-worktree-detect.v1），ordinary-checkout 下创建
+  .worktrees/<branch>，主 checkout 分支与 HEAD 不被切换，
+  .gitignore 补 .worktrees，汇报含 ready/路径语义。
+
+input:
+  prompt: |
+    这是一个隔离评测工作区。先运行 `bash prepare-worktree-fixture.sh` 建立初始提交；
+    该命令仅用于准备评测环境，不属于被测行为。
+    （spec-worktree skill 已安装，请按它工作。你是 governed caller，
+    提供 caller-owned 隔离契约：caller 身份=并行特性开发，target repo=
+    当前仓库，新分支名 feat-pagination，隔离原因=并行开发保持主分支干净，
+    允许的 setup 副作用=.worktrees 目录与 .gitignore 条目，不复制 env 文件。）
+    请按 skill 完成隔离并汇报结果与切换路径。
+
+context:
+  repo_fixture: evals/fixtures/repos/plain-app
+  git:
+    init: true
+    checkout: main
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 20
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-create-worktree.sh
+  timeout_seconds: 30

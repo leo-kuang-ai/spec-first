@@ -2,7 +2,7 @@
 """
 Analyze a product feedback source.
 
-Supported sources: Riffrec zip, standalone video, standalone audio, and
+Supported sources: Riffrec zip or unpacked capture, standalone video, audio, and
 meeting notes text/markdown. The script extracts transcript, high-signal
 video frames when available, and spec-first-friendly markdown artifacts.
 
@@ -14,10 +14,12 @@ package 不能导入另一个 skill 的 private script path。
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -55,6 +57,7 @@ NOISY_NETWORK_PATTERNS = (
 VIDEO_EXTENSIONS = {".webm", ".mp4", ".mov", ".m4v", ".mkv", ".avi"}
 AUDIO_EXTENSIONS = {".webm", ".mp3", ".mp4", ".mpeg", ".mpga", ".m4a", ".wav", ".ogg", ".flac"}
 NOTES_EXTENSIONS = {".txt", ".md", ".markdown", ".text"}
+RIFFREC_DIRECTORY_MARKERS = {"session.json", "events.json"}
 MAX_ZIP_MEMBERS = 512
 MAX_ZIP_MEMBER_BYTES = 1024 * 1024 * 1024
 MAX_ZIP_TOTAL_BYTES = 2 * 1024 * 1024 * 1024
@@ -62,9 +65,13 @@ MAX_ZIP_COMPRESSION_RATIO = 200
 ZIP_COPY_CHUNK_BYTES = 1024 * 1024
 
 
+class SourceInputError(ValueError):
+    pass
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Analyze a product feedback source")
-    parser.add_argument("source_path", type=Path, help="Path to a Riffrec zip, video, audio, or meeting notes file")
+    parser.add_argument("source_path", type=Path, help="Path to a Riffrec zip or unpacked capture directory, video, audio, or notes")
     parser.add_argument(
         "--output-dir",
         type=Path,
@@ -91,7 +98,10 @@ def parse_args() -> argparse.Namespace:
     )
     parser.set_defaults(transcribe=False)
     parser.add_argument("--max-moments", type=int, default=12, help="Maximum screenshots to extract")
-    return parser.parse_args()
+    args = parser.parse_args()
+    if args.max_moments < 0:
+        parser.error("--max-moments must be nonnegative")
+    return args
 
 
 def slugify(value: str) -> str:
@@ -167,15 +177,55 @@ def safe_extract(zip_path: Path, dest: Path) -> None:
                         f"Zip member size mismatch: {member.filename} ({member_written} != {member.file_size})"
                     )
 
-        if dest.exists():
-            if dest.is_dir():
-                shutil.rmtree(dest)
-            else:
-                dest.unlink()
-        staging.replace(dest)
+        promote_snapshot(staging, dest)
     except Exception:
         shutil.rmtree(staging, ignore_errors=True)
         raise
+
+
+def validate_snapshot_destination(destination: Path) -> None:
+    if destination.is_symlink() or (destination.exists() and not destination.is_dir()):
+        raise SourceInputError(f"Output must be a non-symlink directory: {destination}")
+    if destination.exists():
+        for entry in destination.rglob("*"):
+            if entry.is_symlink() or not (entry.is_dir() or entry.is_file()):
+                raise SourceInputError(f"Output contains an unsafe entry: {entry}")
+
+
+def promote_snapshot(staging: Path, destination: Path) -> None:
+    validate_snapshot_destination(destination)
+    previous = staging.with_name(staging.name + ".previous")
+    if previous.exists() or previous.is_symlink():
+        raise SourceInputError(f"Snapshot backup already exists: {previous}")
+    had_previous = destination.exists()
+    if had_previous:
+        os.replace(destination, previous)
+    try:
+        os.replace(staging, destination)
+    except BaseException:
+        if had_previous:
+            os.replace(previous, destination)
+        raise
+    if had_previous:
+        shutil.rmtree(previous)
+
+
+def safe_copy_capture_directory(source_dir: Path, destination: Path) -> None:
+    entries = sorted(source_dir.rglob("*"))
+    for entry in entries:
+        if entry.is_symlink() or not (entry.is_dir() or entry.is_file()):
+            raise SourceInputError(f"Unpacked capture contains an unsafe entry: {entry}")
+        if not entry.resolve().is_relative_to(source_dir.resolve()):
+            raise SourceInputError(f"Unpacked capture entry escapes source: {entry}")
+    for entry in entries:
+        target = destination / entry.relative_to(source_dir)
+        if entry.is_dir():
+            target.mkdir(parents=True, exist_ok=True)
+        else:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(entry, target)
+    if any(not (destination / marker).is_file() for marker in RIFFREC_DIRECTORY_MARKERS):
+        raise SourceInputError("Unpacked capture changed during normalization; missing session.json or events.json")
 
 
 def default_output_dir(zip_path: Path) -> Path:
@@ -187,6 +237,15 @@ def default_output_dir(zip_path: Path) -> Path:
 
 
 def classify_source(source_path: Path) -> str:
+    if source_path.is_symlink():
+        raise SourceInputError(f"Source must not be a symlink: {source_path}")
+    if source_path.is_dir():
+        missing = sorted(marker for marker in RIFFREC_DIRECTORY_MARKERS if not (source_path / marker).is_file())
+        if missing:
+            raise SourceInputError(f"Unpacked Riffrec capture is missing: {', '.join(missing)}")
+        return "riffrec_directory"
+    if not source_path.is_file():
+        raise SourceInputError(f"Unsupported source path type: {source_path}")
     if zipfile.is_zipfile(source_path):
         return "riffrec_zip"
     suffix = source_path.suffix.lower()
@@ -253,12 +312,14 @@ def read_notes(path: Path) -> dict[str, Any]:
     return {"status": "ok", "text": text.strip(), "source": "meeting_notes"}
 
 
-def prepare_source(source_path: Path, raw_dir: Path) -> dict[str, Any]:
+def populate_source_snapshot(source_path: Path, raw_dir: Path, source_kind: str) -> dict[str, Any]:
     raw_dir.mkdir(parents=True, exist_ok=True)
-    source_kind = classify_source(source_path)
 
-    if source_kind == "riffrec_zip":
-        safe_extract(source_path, raw_dir)
+    if source_kind in {"riffrec_zip", "riffrec_directory"}:
+        if source_kind == "riffrec_zip":
+            safe_extract(source_path, raw_dir)
+        else:
+            safe_copy_capture_directory(source_path, raw_dir)
         session_payload = read_json(raw_dir / "session.json", {})
         session = session_payload if isinstance(session_payload, dict) else {}
         events_payload = read_json(raw_dir / "events.json", {})
@@ -323,6 +384,24 @@ def prepare_source(source_path: Path, raw_dir: Path) -> dict[str, Any]:
         "transcription_path": transcription_path,
         "notes_transcript": None,
     }
+
+
+def prepare_source(source_path: Path, raw_dir: Path) -> dict[str, Any]:
+    source_kind = classify_source(source_path)
+    validate_snapshot_destination(raw_dir)
+    raw_dir.parent.mkdir(parents=True, exist_ok=True)
+    staging = Path(tempfile.mkdtemp(prefix=f".{raw_dir.name}.staging-", dir=raw_dir.parent))
+    try:
+        source = populate_source_snapshot(source_path, staging, source_kind)
+        promote_snapshot(staging, raw_dir)
+    except BaseException:
+        if staging.exists() and not staging.is_symlink():
+            shutil.rmtree(staging, ignore_errors=True)
+        raise
+    for key in ("recording_path", "transcription_path"):
+        if source[key] is not None:
+            source[key] = raw_dir / source[key].relative_to(staging)
+    return source
 
 
 def repo_relative(path: Path, base: Path) -> str:
@@ -459,7 +538,9 @@ def transcribe_media(
     if "error" in payload:
         return {**receipt, "status": "failed", "text": "", "reason": compact_text(json.dumps(payload["error"]), 500)}
 
-    text = payload.get("text", "")
+    text = payload.get("text")
+    if not isinstance(text, str):
+        return {**receipt, "status": "failed", "text": "", "reason": "transcription response is missing string text"}
     return {**receipt, "status": "ok", "text": text, "raw": payload}
 
 
@@ -478,6 +559,8 @@ def transcribe_media_chunks(
     egress_authorization: str = "missing",
     chunk_seconds: int = 420,
 ) -> dict[str, Any]:
+    if egress_authorization != "explicit-cli-flag":
+        return transcribe_media(media_path, model, egress_authorization)
     if not media_path or not media_path.exists():
         return {
             "status": "missing",
@@ -569,35 +652,59 @@ def transcribe_media_chunks(
         if chunk_transcript.get("text"):
             transcripts.append(f"[{format_time(start)}]\n{chunk_transcript['text'].strip()}")
 
-    if transcripts:
-        return {
-            "status": "ok",
-            "text": "\n\n".join(transcripts),
-            "transcription_egress_authorization": egress_authorization,
-            "provider": "openai-audio-transcriptions",
-            "provider_request_sent": any(chunk.get("provider_request_sent") is True for chunk in chunk_results),
-            "source": "chunked_media",
-            "chunk_seconds": chunk_seconds,
-            "chunks": chunk_results,
-        }
-
+    covered = []
+    missing = []
+    for chunk in chunk_results:
+        chunk["end_seconds"] = min(chunk["start_seconds"] + chunk_seconds, duration)
+        interval = {"start_seconds": chunk["start_seconds"], "end_seconds": chunk["end_seconds"]}
+        (covered if chunk["status"] == "ok" else missing).append(interval)
+    status = "ok" if not missing else ("partial" if covered else "failed")
     return {
-        "status": "failed",
-        "text": "",
+        "status": status,
+        "text": "\n\n".join(transcripts),
+        "degraded": bool(missing),
         "transcription_egress_authorization": egress_authorization,
         "provider": "openai-audio-transcriptions",
         "provider_request_sent": any(chunk.get("provider_request_sent") is True for chunk in chunk_results),
-        "reason": "No chunks transcribed successfully",
+        "reason": "One or more chunks are unavailable" if missing else None,
+        "source": "chunked_media",
+        "chunk_seconds": chunk_seconds,
+        "covered_intervals": covered,
+        "missing_intervals": missing,
         "chunks": chunk_results,
     }
+
+
+def transcribe_with_fallback(media_path: Path | None, model: str, chunks_dir: Path, duration: float) -> dict[str, Any]:
+    initial = transcribe_media(media_path, model, "explicit-cli-flag")
+    results = [initial]
+    if should_retry_transcription_in_chunks(initial):
+        results.append(transcribe_media_chunks(media_path, model, chunks_dir, duration, "explicit-cli-flag"))
+    # A fallback cannot erase a previous request attempt. Keep compact receipts,
+    # not duplicate raw provider payloads or transcript bodies.
+    final = dict(results[-1])
+    fields = ("status", "reason", "provider", "transcription_egress_authorization", "provider_request_sent", "covered_intervals", "missing_intervals", "chunks")
+    final["attempts"] = [{key: result[key] for key in fields if key in result} for result in results]
+    final["provider_request_sent"] = any(result.get("provider_request_sent") is True for result in results)
+    if final.get("status") != "ok" and "missing_intervals" not in final and duration > 0:
+        final.update(covered_intervals=[], missing_intervals=[{"start_seconds": 0, "end_seconds": duration}], degraded=True)
+    return final
+
+
+def transcript_coverage_note(transcript: dict[str, Any]) -> str:
+    return (f"Transcript status: {transcript.get('status', 'unknown')}. "
+            f"Missing intervals (seconds): {json.dumps(transcript.get('missing_intervals', 'unknown'))}. "
+            "Unavailable intervals cannot support absence-of-problem claims.")
 
 
 def select_moments(
     events: list[dict[str, Any]],
     transcript: str,
     duration: float,
-    max_moments: int,
+    max_moments: int | None,
 ) -> list[dict[str, Any]]:
+    if max_moments == 0:
+        return []
     candidates: list[dict[str, Any]] = []
     clicks_by_target: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
     has_complaint = transcript_has_complaint(transcript)
@@ -643,7 +750,7 @@ def select_moments(
 
     if duration and not candidates:
         fractions = (0.1, 0.3, 0.5, 0.7, 0.9)
-        for fraction in fractions[:max(1, min(max_moments, len(fractions)))]:
+        for fraction in fractions[:len(fractions) if max_moments is None else max(0, min(max_moments, len(fractions)))]:
             candidates.append({"t": max(0.0, duration * fraction), "reason": "representative video frame", "events": []})
 
     candidates.sort(key=lambda item: (item["t"], item["reason"]))
@@ -654,7 +761,7 @@ def select_moments(
         if any(abs(candidate["t"] - existing["t"]) < 0.45 and candidate["reason"] == existing["reason"] for existing in deduped):
             continue
         deduped.append(candidate)
-        if len(deduped) >= max_moments:
+        if max_moments is not None and len(deduped) >= max_moments:
             break
 
     for index, moment in enumerate(deduped, start=1):
@@ -662,7 +769,7 @@ def select_moments(
     return deduped
 
 
-def extract_frames(recording_path: Path | None, frames_dir: Path, moments: list[dict[str, Any]]) -> None:
+def populate_frames(recording_path: Path | None, frames_dir: Path, moments: list[dict[str, Any]]) -> None:
     frames_dir.mkdir(parents=True, exist_ok=True)
     if not recording_path or not recording_path.exists():
         for moment in moments:
@@ -694,6 +801,7 @@ def extract_frames(recording_path: Path | None, frames_dir: Path, moments: list[
         try:
             result = subprocess.run(command, capture_output=True, text=True, timeout=60)
         except subprocess.TimeoutExpired:
+            frame_path.unlink(missing_ok=True)
             moment["screenshot"] = None
             moment["screenshot_status"] = "ffmpeg frame extraction timed out"
             continue
@@ -701,8 +809,25 @@ def extract_frames(recording_path: Path | None, frames_dir: Path, moments: list[
             moment["screenshot"] = str(frame_path)
             moment["screenshot_status"] = "ok"
         else:
+            frame_path.unlink(missing_ok=True)
             moment["screenshot"] = None
             moment["screenshot_status"] = compact_text(result.stderr or result.stdout, 300)
+
+
+def extract_frames(recording_path: Path | None, frames_dir: Path, moments: list[dict[str, Any]]) -> None:
+    validate_snapshot_destination(frames_dir)
+    frames_dir.parent.mkdir(parents=True, exist_ok=True)
+    staging = Path(tempfile.mkdtemp(prefix=f".{frames_dir.name}.staging-", dir=frames_dir.parent))
+    try:
+        populate_frames(recording_path, staging, moments)
+        promote_snapshot(staging, frames_dir)
+    except BaseException:
+        if staging.exists() and not staging.is_symlink():
+            shutil.rmtree(staging, ignore_errors=True)
+        raise
+    for moment in moments:
+        if moment.get("screenshot"):
+            moment["screenshot"] = str(frames_dir / Path(moment["screenshot"]).relative_to(staging))
 
 
 def event_counts(events: list[dict[str, Any]]) -> dict[str, int]:
@@ -755,18 +880,17 @@ def summarize_candidate_findings(moments: list[dict[str, Any]], transcript: str)
             }
         )
 
-    if not findings:
-        findings.append(
-            {
-                "id": "F1",
-                "title": "No obvious failure detected automatically",
-                "severity": "P3",
-                "observed": "The analyzer did not find complaint cues, repeated clicks, console errors, or non-noisy failed requests.",
-                "expected": "A human should still inspect the source evidence before closing the feedback.",
-                "evidence": [moment["id"] for moment in moments[:3]],
-                "confidence": "Low",
-            }
-        )
+    console_errors = [moment for moment in moments if moment.get("reason") in {"console_error event", "error event", "exception event"}]
+    if console_errors:
+        findings.append({
+            "id": f"F{len(findings) + 1}",
+            "title": "Console or exception events were recorded",
+            "severity": "Unassessed",
+            "observed": "The event log contains console_error, error, or exception events; user impact is unconfirmed.",
+            "expected": "Review the raw event and surrounding behavior before proposing a product requirement.",
+            "evidence": [moment["id"] for moment in console_errors],
+            "confidence": "Confirmed event presence; product impact unknown",
+        })
     return findings
 
 
@@ -779,6 +903,28 @@ def markdown_link(path: str | None, output_dir: Path, repo_root: Path) -> str:
     return path
 
 
+def safe_write_text(path: Path, text: str) -> None:
+    """Write text without following a pre-existing symlink or special file at the target.
+
+    A pre-existing non-regular file (e.g., a symlink planted at a report path) is
+    rejected instead of being written through; the payload lands via a fresh
+    temporary file in the same directory and an atomic directory-entry replace.
+    """
+
+    if path.exists() or path.is_symlink():
+        if not stat.S_ISREG(path.lstat().st_mode):
+            raise SystemExit(f"refusing to write report through non-regular file: {path}")
+    fd, tmp_name = tempfile.mkstemp(dir=str(path.parent), prefix=f".{path.name}.", suffix=".tmp")
+    tmp_path = Path(tmp_name)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(text)
+        os.replace(tmp_path, path)
+    except BaseException:
+        tmp_path.unlink(missing_ok=True)
+        raise
+
+
 def write_analysis_md(
     output_path: Path,
     source_path: Path,
@@ -789,6 +935,7 @@ def write_analysis_md(
     moments: list[dict[str, Any]],
     findings: list[dict[str, Any]],
     repo_root: Path,
+    event_moments: list[dict[str, Any]] | None = None,
 ) -> None:
     lines: list[str] = []
     lines.append("# Product Feedback Analysis")
@@ -804,6 +951,8 @@ def write_analysis_md(
     lines.append(f"- Event counts: `{event_counts(events)}`")
     lines.append("")
     lines.append("## Transcript")
+    lines.append("")
+    lines.append(transcript_coverage_note(transcript))
     lines.append("")
     if transcript.get("text"):
         lines.append(transcript["text"].strip())
@@ -824,8 +973,19 @@ def write_analysis_md(
     else:
         lines.append("_No video moments available for this source._")
     lines.append("")
+    lines.append("## Event Facts Beyond the Screenshot Budget")
+    lines.append("")
+    selected_ids = {moment["id"] for moment in moments}
+    for moment in event_moments or []:
+        if moment["id"] not in selected_ids:
+            labels = "; ".join(event_label(event) for event in moment.get("events", []))
+            lines.append(f"- {moment['id']} at {format_time(moment['t'])}: {moment['reason']}. {labels}. Screenshot not selected.")
+    lines.append("The screenshot limit does not limit event-log analysis. Automated candidates do not establish product impact or an exhaustive review.")
+    lines.append("")
     lines.append("## Candidate Findings")
     lines.append("")
+    if not findings:
+        lines.append("No candidate finding was produced by the automated checks. Product impact remains unassessed; this is not evidence of no problems.")
     for finding in findings:
         lines.append(f"### {finding['id']}. {finding['title']}")
         lines.append("")
@@ -841,7 +1001,7 @@ def write_analysis_md(
     lines.append("- Tie transcript language to the closest click or visible UI state.")
     lines.append("- Promote only confirmed product problems into requirements.")
     lines.append("- Use repo-relative screenshot paths when moving evidence into a spec-first requirements document.")
-    output_path.write_text("\n".join(lines) + "\n")
+    safe_write_text(output_path, "\n".join(lines) + "\n")
 
 
 def write_requirements_kickoff(
@@ -875,7 +1035,7 @@ def write_requirements_kickoff(
         "",
         "## Problem Frame",
         "",
-        f"A product feedback source for `{session.get('url', 'the product surface')}` produced evidence of product friction. The raw source has been converted into transcript, selected moments when video is available, screenshots when frames can be extracted, and candidate findings so the team can decide what product behavior should change before planning implementation.",
+        f"A product feedback source for `{session.get('url', 'the product surface')}` is available for assessment. Product friction is not yet confirmed. The raw source has been converted into transcript, selected moments when video is available, screenshots when frames can be extracted, and candidate findings so the team can decide what product behavior should change before planning implementation.",
         "",
         "Source materials for brainstorm:",
         f"- Source materials manifest: `{source_materials}`",
@@ -896,11 +1056,11 @@ def write_requirements_kickoff(
         "## Key Flows",
         "",
         "- F1. Evidence-backed feedback triage",
-        "  - **Trigger:** A feedback zip, video, audio file, or meeting notes file is available.",
+        "  - **Trigger:** A feedback bundle, video, audio file, or meeting notes file is available.",
         "  - **Actors:** A1, A2, A3",
         "  - **Steps:** Extract or copy the source, transcribe media or read notes, select high-signal moments when video exists, inspect screenshots when available, confirm problems, and write requirements with supporting evidence.",
         "  - **Outcome:** Confirmed product problems are represented as requirements with transcript support and screenshot support when visual evidence exists.",
-        "  - **Covered by:** R1, R2, R3",
+        "  - **Covered by:** R1, R2 (evidence handling only)",
         "",
         "---",
         "",
@@ -913,8 +1073,9 @@ def write_requirements_kickoff(
         "**Product requirements from this session**",
     ]
 
-    for index, finding in enumerate(findings, start=3):
-        lines.append(f"- R{index}. Resolve or intentionally scope the issue described by {finding['id']}: {finding['title']}.")
+    lines.append("No confirmed product requirements. Candidate findings require source review and owner confirmation before promotion.")
+    for finding in findings:
+        lines.append(f"- Candidate {finding['id']}: {finding['title']}. Confirm impact and expected behavior before drafting a requirement.")
 
     lines.extend(
         [
@@ -924,7 +1085,7 @@ def write_requirements_kickoff(
             "## Acceptance Examples",
             "",
             "- AE1. **Covers R1, R2.** Given a feedback source with voice, video, or notes, when the analysis is complete, each promoted issue includes source evidence rather than prose-only claims.",
-            "- AE2. **Covers R3.** Given the user reports that a button is weird or unclickable, when requirements are finalized, the requirement identifies the specific control and the expected available/unavailable behavior.",
+            "- Product acceptance examples are pending confirmed requirements; do not invent a control or expected behavior from this scaffold.",
             "",
             "---",
             "",
@@ -975,10 +1136,10 @@ def write_requirements_kickoff(
             "",
             "## Next Steps",
             "",
-            "-> Resume `spec-brainstorm` to confirm candidate findings and replace generic R-items with product-specific requirements.",
+            "-> Resume `spec-brainstorm` to confirm candidate findings and promote only confirmed product-specific requirements.",
         ]
     )
-    output_path.write_text("\n".join(lines) + "\n")
+    safe_write_text(output_path, "\n".join(lines) + "\n")
 
 
 def write_source_materials(
@@ -1063,7 +1224,7 @@ def write_source_materials(
     if len(raw_files) > 50:
         lines.append(f"- ... {len(raw_files) - 50} more files")
 
-    output_path.write_text("\n".join(lines) + "\n")
+    safe_write_text(output_path, "\n".join(lines) + "\n")
 
 
 def write_problem_analysis(
@@ -1076,6 +1237,8 @@ def write_problem_analysis(
     complaint_text = transcript.get("text") or ""
     lines = [
         "<analysis>",
+        transcript_coverage_note(transcript),
+        "Read analysis.md for full event facts beyond the screenshot budget.",
         "## 1. Visual/UI Problems",
         "",
     ]
@@ -1120,7 +1283,7 @@ def write_problem_analysis(
         lines.append("1. Review the transcript or notes for workflow friction, confusion, and unmet expectations.")
 
     lines.append("</analysis>")
-    output_path.write_text("\n".join(lines) + "\n")
+    safe_write_text(output_path, "\n".join(lines) + "\n")
 
 
 def write_review_prompt(
@@ -1150,6 +1313,8 @@ def write_review_prompt(
         "",
         "Here is the transcript of the discussion that occurred during the feedback session:",
         "",
+        transcript_coverage_note(transcript),
+        "Read analysis.md for full event facts beyond the screenshot budget; do not infer absence from selected frames.",
         "<discussion_transcript>",
         transcript.get("text") or f"[Transcript unavailable: {transcript.get('reason') or transcript.get('status', 'unknown')}]",
         "</discussion_transcript>",
@@ -1185,21 +1350,37 @@ def write_review_prompt(
         "",
         "Your final output should contain only the analysis section with clearly categorized, numbered problem statements. Do not include scratchpad notes.",
     ]
-    output_path.write_text("\n".join(lines) + "\n")
+    safe_write_text(output_path, "\n".join(lines) + "\n")
 
 
 def main() -> int:
     args = parse_args()
-    source_path = args.source_path.expanduser().resolve()
+    source_path = args.source_path.expanduser().absolute()
     if not source_path.exists():
         print(f"Source file not found: {source_path}", file=sys.stderr)
         return 1
 
     output_dir = (args.output_dir or default_output_dir(source_path)).expanduser().resolve()
+    try:
+        classify_source(source_path)
+        resolved_source = source_path.resolve()
+        if resolved_source.is_relative_to(output_dir) or (
+            source_path.is_dir() and output_dir.is_relative_to(resolved_source)
+        ):
+            raise SourceInputError("Source and output must not contain one another")
+        validate_snapshot_destination(output_dir / "raw")
+        validate_snapshot_destination(output_dir / "frames")
+    except SourceInputError as error:
+        print(f"Invalid source or output: {error}", file=sys.stderr)
+        return 2
     output_dir.mkdir(parents=True, exist_ok=True)
     raw_dir = output_dir / "raw"
     frames_dir = output_dir / "frames"
-    source = prepare_source(source_path, raw_dir)
+    try:
+        source = prepare_source(source_path, raw_dir)
+    except SourceInputError as error:
+        print(f"Invalid source: {error}", file=sys.stderr)
+        return 2
     source_kind = source["source_kind"]
     session = source["session"]
     events = source["events"]
@@ -1222,25 +1403,22 @@ def main() -> int:
             "provider_request_sent": False,
         }
     else:
-        transcript = transcribe_media(source["transcription_path"], args.model, "explicit-cli-flag")
-        if should_retry_transcription_in_chunks(transcript):
-            transcript = transcribe_media_chunks(
-                source["transcription_path"],
-                args.model,
-                raw_dir / "transcription_chunks",
-                duration,
-                "explicit-cli-flag",
-            )
+        transcript = transcribe_with_fallback(source["transcription_path"], args.model, raw_dir / "transcription_chunks", duration)
 
-    moments = select_moments(events, transcript.get("text", ""), duration, args.max_moments)
+    event_moments = select_moments(events, transcript.get("text", ""), duration, None)
+    moments = event_moments[:args.max_moments]
     if not moments and source["recording_path"]:
         fallback_times = [0.5, 2.0, 5.0, 10.0, 15.0]
         moments = [
             {"id": f"M{index}", "t": timestamp, "reason": "representative video frame", "events": []}
             for index, timestamp in enumerate(fallback_times[: args.max_moments], start=1)
         ]
-    extract_frames(source["recording_path"], frames_dir, moments)
-    findings = summarize_candidate_findings(moments, transcript.get("text", ""))
+    try:
+        extract_frames(source["recording_path"], frames_dir, moments)
+    except SourceInputError as error:
+        print(f"Invalid output: {error}", file=sys.stderr)
+        return 2
+    findings = summarize_candidate_findings(event_moments, transcript.get("text", ""))
 
     topic = slugify(args.topic or source_path.stem)
     repo_root = Path.cwd()
@@ -1249,15 +1427,29 @@ def main() -> int:
     review_prompt_md = output_dir / "review-prompt.md"
     source_materials_md = output_dir / "source-materials.md"
     kickoff_md = output_dir / "requirements-kickoff.md"
-    write_analysis_md(analysis_md, source_path, source_kind, session, events, transcript, moments, findings, repo_root)
+    write_analysis_md(analysis_md, source_path, source_kind, session, events, transcript, moments, findings, repo_root, event_moments)
     write_problem_analysis(problem_analysis_md, transcript, moments, findings, repo_root)
     write_review_prompt(review_prompt_md, transcript, moments, repo_root)
     write_source_materials(source_materials_md, source_path, source_kind, session, transcript, moments, raw_dir, frames_dir, repo_root)
     write_requirements_kickoff(kickoff_md, topic, session, findings, moments, repo_root)
 
+    def source_digest(path: Path) -> str:
+        hasher = hashlib.sha256()
+        if path.is_file():
+            hasher.update(path.read_bytes())
+        else:
+            for item in sorted(path.rglob("*")):
+                hasher.update(str(item.relative_to(path)).encode("utf-8"))
+                if item.is_file():
+                    hasher.update(item.read_bytes())
+        return hasher.hexdigest()
+
+    batch_id = f"{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}-{os.urandom(4).hex()}"
     structured = {
         "source": str(source_path),
         "source_kind": source_kind,
+        "source_sha256": source_digest(source_path),
+        "analysis_batch_id": batch_id,
         "output_dir": str(output_dir),
         "session": session,
         "event_counts": event_counts(events),
@@ -1266,8 +1458,10 @@ def main() -> int:
             "transcription_egress_authorization": transcript.get("transcription_egress_authorization"),
             "provider": transcript.get("provider"),
             "provider_request_sent": transcript.get("provider_request_sent", False),
+            "attempts": transcript.get("attempts", []),
         },
         "moments": moments,
+        "event_moments": event_moments,
         "candidate_findings": findings,
         "artifacts": {
             "analysis_md": str(analysis_md),
@@ -1279,7 +1473,7 @@ def main() -> int:
             "raw_dir": str(raw_dir),
         },
     }
-    (output_dir / "analysis.json").write_text(json.dumps(structured, indent=2, sort_keys=True) + "\n")
+    safe_write_text(output_dir / "analysis.json", json.dumps(structured, indent=2, sort_keys=True) + "\n")
 
     print(f"Analysis written to: {analysis_md}")
     print(f"Problem analysis scaffold written to: {problem_analysis_md}")

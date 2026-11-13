@@ -1,6 +1,6 @@
 ---
 description: "Refresh stale Spec-First solution docs"
-argument-hint: "[scope hint or mode:autofix]"
+argument-hint: "[optional: scope hint — directory, filename, module, or keyword] [mode:non-interactive]"
 ---
 
 # Spec-First Compound Refresh

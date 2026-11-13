@@ -835,6 +835,66 @@ describe('spec-runtime-setup renderer', () => {
     expect(actions.some((action) => action.includes('--verify-only'))).toBe(false);
   });
 
+  test('external Graphify hook does not block core-ready setup', () => {
+    const { renderHumanSummary } = require('../../skills/spec-runtime-setup/scripts/lib/renderer.cjs');
+    const text = renderHumanSummary({
+      toolFacts: { provider_readiness: [{
+        provider: 'graphify', readiness_status: 'degraded',
+        lifecycle: { installed: true, configured: true, initialized: true, indexed: true, artifact_exists: true, query_verified: true },
+        steady_state: { hook_status: 'blocked' },
+      }] },
+      runtimeCapabilities: { setup_summary: { baseline_ready: true, host_runtime_ready: true, generated_runtime_manifest: { status: 'current' } } },
+    });
+    expect(text).toContain('整体状态：ready');
+  });
+
+  test('defaults-active without config example does not create a blocking action', () => {
+    const { renderHumanSummary } = require('../../skills/spec-runtime-setup/scripts/lib/renderer.cjs');
+    const text = renderHumanSummary({
+      toolFacts: { provider_readiness: [] },
+      runtimeCapabilities: {
+        host: 'codex',
+        repo_root: '/tmp/evoflow',
+        setup_summary: {
+          baseline_ready: true,
+          host_runtime_ready: true,
+          generated_runtime_manifest: { status: 'current' },
+          project_local_config: { local_config: { status: 'defaults-active' }, example_config: { status: 'missing' } },
+        },
+      },
+    }, { executionSummary: { overall_status: 'ready', reason_code: 'setup-ready', scope: 'full', selected_ids: [], required_provider_ids: [] } });
+    expect(text).toContain('整体状态：ready');
+    expect(text).not.toContain('--project-config');
+  });
+
+  test('explains core-ready unknown as missing currentness evidence while retaining query probe status', () => {
+    const { renderHumanSummary } = require('../../skills/spec-runtime-setup/scripts/lib/renderer.cjs');
+    const text = renderHumanSummary({
+      toolFacts: {
+        provider_readiness: [{
+          provider: 'graphify',
+          readiness_status: 'unknown',
+          lifecycle: {
+            installed: true,
+            configured: true,
+            initialized: true,
+            indexed: true,
+            artifact_exists: true,
+            query_verified: true,
+            server_reachable: false,
+          },
+          steady_state: { hook_status: 'verified', refresh_mode: 'skill-cli-hook-on-demand' },
+        }],
+        items: [],
+        configured_dependencies: [],
+      },
+      runtimeCapabilities: { setup_summary: { baseline_ready: true, host_runtime_ready: true, generated_runtime_manifest: { status: 'current' } } },
+    }, { executionSummary: { overall_status: 'ready', reason_code: 'setup-ready', scope: 'full', selected_ids: [], required_provider_ids: ['graphify'] } });
+
+    expect(text).toContain('graphify: unknown (currentness-not-verified-in-read-only-check)');
+    expect(text).toContain('readiness_scope: install-index-ready; probe_status: query-verified');
+  });
+
   test('diagnostic does not treat unknown freshness as core-ready when the query probe is unverified', () => {
     const { diagnosticNextActions } = require('../../skills/spec-runtime-setup/scripts/lib/human-output.cjs');
     const actions = diagnosticNextActions({
@@ -914,7 +974,7 @@ describe('spec-runtime-setup renderer', () => {
       ],
     });
 
-    expect(actions).toContain('运行当前 host 的 spec-runtime-setup --verify-only，确认 required Provider readiness。');
+    expect(actions).toContain('运行当前 host 的 spec-runtime-setup --verify-only，验证 required Provider readiness 并刷新 setup-owned facts（会写入事实文件）；只读检查使用 --check。');
     expect(actions.some((action) => action.includes('继续目标'))).toBe(false);
   });
 
@@ -1033,4 +1093,13 @@ describe('spec-runtime-setup renderer', () => {
     expect(actions).toEqual(expect.arrayContaining(['install ffmpeg', 'repair codegraph']));
     expect(actions.some((action) => action.includes('继续目标'))).toBe(false);
   });
+});
+
+test('诊断建议不得把 facts 写入模式描述为只读', () => {
+  const { diagnosticNextActions } = require('../../skills/spec-runtime-setup/scripts/lib/human-output.cjs');
+  const text = diagnosticNextActions({ runtime: {} }).join('\n');
+  expect(text).toContain('只读检查使用 --check');
+  expect(text).toContain('--verify-only');
+  expect(text).toContain('写入');
+  expect(text).not.toContain('只读复核时使用 --verify-only');
 });

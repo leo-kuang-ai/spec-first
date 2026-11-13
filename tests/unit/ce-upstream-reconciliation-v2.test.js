@@ -577,3 +577,169 @@ describe('CE reconciliation v2 contracts', () => {
     }, { expectedUnit: 'U4', expectedPackageIds: ['P02'] })).toThrow('confirmed record cannot be degraded');
   });
 });
+
+describe('named CE windows', () => {
+  let repo;
+  const run = (...args) => execFileSync('git', args, { cwd: repo, encoding: 'utf8' }).trim();
+  beforeEach(() => {
+    repo = fs.mkdtempSync(path.join(os.tmpdir(), 'ce-named-window-'));
+    run('init', '-q'); run('config', 'user.email', 'test@example.com'); run('config', 'user.name', 'Test');
+    fs.mkdirSync(path.join(repo, 'skills/ce-new'), { recursive: true });
+    fs.writeFileSync(path.join(repo, 'skills/ce-new/old.md'), 'old\n');
+    fs.writeFileSync(path.join(repo, 'deleted.md'), 'deleted\n');
+    run('add', '.'); run('commit', '-qm', 'base');
+  });
+  afterEach(() => fs.rmSync(repo, { recursive: true, force: true }));
+  test('derives A/D/R endpoints and rejects tampered facts or mutable refs', () => {
+    const base = run('rev-parse', 'HEAD');
+    run('mv', 'skills/ce-new/old.md', 'skills/ce-new/new.md');
+    fs.unlinkSync(path.join(repo, 'deleted.md'));
+    fs.writeFileSync(path.join(repo, 'added.md'), 'added\n');
+    run('add', '.'); run('commit', '-qm', 'head');
+    const head = run('rev-parse', 'HEAD');
+    const facts = checker.createWindowFacts(repo, base, head);
+    expect(facts.total).toBe(3);
+    expect(facts.packages).toEqual(['skills/ce-new']);
+    expect(facts.objects.find((r) => r.status === 'A').old_object).toBeNull();
+    expect(facts.objects.find((r) => r.status === 'D').new_object).toBeNull();
+    const rename = facts.objects.find((r) => r.status.startsWith('R'));
+    expect(rename.old_object.git_oid).toBe(rename.new_object.git_oid);
+    expect(checker.verifyWindowFacts(facts, repo, base, head)).toEqual(facts);
+    expect(() => checker.verifyWindowFacts({ ...facts, total: 1 }, repo, base, head)).toThrow('ce-sync-window-facts-mismatch');
+    expect(() => checker.createWindowFacts(repo, base, 'HEAD')).toThrow('ce-sync-immutable-refs-required');
+  });
+  test('aggregates mixed package actions without synthesizing a semantic decision', () => {
+    const records = [{ path: 'skills/ce-new/a', package_id: 'skills/ce-new', surface: 'ce-new', target_action: 'compose', closure_profile: 'source-adjudication' },
+      { path: 'skills/ce-new/b', package_id: 'skills/ce-new', surface: 'ce-new', target_action: 'evidence-only', closure_profile: 'evidence-only' }];
+    expect(checker.buildPackageSummary(records, ['skills/ce-new'])).toEqual([expect.objectContaining({ changed_path_count: 2, actions: { compose: 1, 'evidence-only': 1 } })]);
+  });
+  test('publishes idempotently and rejects changed output before modifying any file', () => {
+    const a = path.join(repo, 'a.json'); const b = path.join(repo, 'b.json'); const marker = path.join(repo, 'set.json');
+    checker.publishArtifactSet([[a, 'a'], [b, 'b']], marker);
+    checker.publishArtifactSet([[a, 'a'], [b, 'b']], marker);
+    expect(JSON.parse(fs.readFileSync(marker)).files).toHaveLength(2);
+    expect(() => checker.publishArtifactSet([[a, 'changed'], [b, 'changed']], marker)).toThrow('ce-sync-output-collision');
+    expect(fs.readFileSync(a, 'utf8')).toBe('a'); expect(fs.readFileSync(b, 'utf8')).toBe('b');
+    fs.writeFileSync(`${marker}.lock`, 'active writer');
+    expect(() => checker.publishArtifactSet([[a, 'a']], marker)).toThrow('ce-sync-publisher-busy');
+    expect(JSON.parse(fs.readFileSync(marker)).files).toHaveLength(2);
+    fs.unlinkSync(`${marker}.lock`);
+    expect(() => checker.publishArtifactSet([[a, 'a'], [a, 'a']], marker)).toThrow('ce-sync-output-duplicate');
+    expect(fs.existsSync(`${marker}.lock`)).toBe(false);
+  });
+  test('excludes exact run outputs but includes plan, contracts, and upstream scope evidence', () => {
+    expect(checker.isRunOutput('docs/validation/ce-pull-2026-10-27/window-facts.json')).toBe(true);
+    expect(checker.isRunOutput('docs/validation/ce-pull-2026-10-27/review-report.md')).toBe(false);
+    expect(checker.isRunOutput('docs/plans/2026-10-27-001-refactor-ce-upstream-sync-technical-scheme.md')).toBe(false);
+  });
+});
+
+
+describe('CE run artifact admission', () => {
+  let root;
+  const digest = (value) => crypto.createHash('sha256').update(value).digest('hex');
+  const stable = (value) => `${JSON.stringify(value, null, 2)}\n`;
+  const snapshot = { repository: 'spec-first', head: 'head', dirty: true, dirty_path_manifest_sha256: 'd'.repeat(64), source_tree_hash: 'a'.repeat(64), inventory_hash: 'b'.repeat(64) };
+  const input = { target_source_snapshot: snapshot, records: [{ path: 'skills/ce-new/a' }] };
+  const facts = { base: 'base', head: 'head' };
+  const envelope = () => ({ schema_version: 'ce-upstream-sync-run/v1', kind: 'package-admission', window_sha256: digest(stable(facts)), input_sha256: digest(stable(input)), target_snapshot: snapshot, source_refs: ['docs/source.md'], limitations: ['仅本地合同'], unresolved: [], package_id: 'skills/ce-new', unit_id: 'U3', paths: ['skills/ce-new/a'], decisions: [{ path: 'skills/ce-new/a', target_action: 'compose', rationale: '当前 source 差额' }], review_ref: 'docs/source.md', authority_ref: 'docs/source.md', dependency_refs: [] });
+  beforeEach(() => {
+    root = fs.mkdtempSync(path.join(os.tmpdir(), 'ce-admission-'));
+    fs.mkdirSync(path.join(root, 'docs')); fs.writeFileSync(path.join(root, 'docs/source.md'), 'source');
+  });
+  afterEach(() => fs.rmSync(root, { recursive: true, force: true }));
+  test('accepts bound subset and rejects stale identity, unresolved, duplicate and outside paths', () => {
+    const artifact = envelope();
+    expect(checker.validateRunArtifact(artifact, input, facts, root)).toBe(true);
+    expect(() => checker.validateRunArtifact({ ...artifact, input_sha256: '0'.repeat(64) }, input, facts, root)).toThrow('ce-sync-run-identity');
+    expect(() => checker.validateRunArtifact({ ...artifact, unresolved: ['pending'] }, input, facts, root)).toThrow('ce-sync-run-schema');
+    expect(() => checker.validateRunArtifact({ ...artifact, paths: [...artifact.paths, ...artifact.paths] }, input, facts, root)).toThrow('ce-sync-run-schema');
+    expect(() => checker.validateRunArtifact({ ...artifact, paths: ['outside'] }, input, facts, root)).toThrow('ce-sync-run-path-subset');
+  });
+  test('receipt joins admission and verifies file/log bytes and required exit status', () => {
+    const admission = envelope(); fs.writeFileSync(path.join(root, 'docs/admission.json'), stable(admission));
+    fs.writeFileSync(path.join(root, 'docs/test.log'), 'passed');
+    const receipt = { ...envelope(), kind: 'owner-receipt', admission_ref: 'docs/admission.json', admission_sha256: digest(stable(admission)), before_snapshot: snapshot, changed_files: [{ path: 'docs/source.md', sha256: digest('source') }], checks: [{ argv: ['node', '--check', 'file'], exit_code: 0, log_path: 'docs/test.log', log_sha256: digest('passed'), status: 'passed', required: true }], authorization_scope: '当前 source', claim_ceiling: '本地检查' };
+    for (const key of ['package_id', 'decisions', 'review_ref', 'authority_ref', 'dependency_refs']) delete receipt[key];
+    expect(checker.validateRunArtifact(receipt, input, facts, root)).toBe(true);
+    fs.writeFileSync(path.join(root, 'docs/receipt.json'), stable(receipt));
+    const handoff = { schema_version: 'ce-upstream-sync-run/v1', kind: 'handoff', window_sha256: digest(stable(facts)), input_sha256: digest(stable(input)), target_snapshot: snapshot, source_refs: ['docs/source.md'], limitations: ['仅本地合同'], unresolved: [], summary: 'fixture', receipt_refs: ['docs/receipt.json'], freshness: 'bound snapshot', next_owner: 'caller', claim_ceiling: 'local' };
+    const final = [{ path: 'skills/ce-new/a', implementation_unit: 'U3', target_action: 'compose', closure_profile: 'source-adjudication', evidence_status: 'confirmed', degraded: false }];
+    expect(checker.validateRunArtifact(handoff, input, facts, root, final)).toBe(true);
+    expect(() => checker.validateRunArtifact(handoff, input, facts, root, [...final, { ...final[0], path: 'skills/ce-new/b' }])).toThrow('ce-sync-handoff-path-missing');
+    expect(() => checker.validateRunArtifact(handoff, input, facts, root, [{ ...final[0], target_action: 'evidence-only' }])).toThrow('ce-sync-handoff-decision-mismatch');
+    expect(() => checker.validateRunArtifact(handoff, input, facts, root, [{ ...final[0], evidence_status: 'planned', degraded: true }])).toThrow('ce-sync-handoff-record-unverified');
+    expect(() => checker.validateRunArtifact({ ...handoff, receipt_refs: ['docs/receipt.json', 'docs/receipt.json'] }, input, facts, root, final)).toThrow('ce-sync-receipt-duplicate');
+    expect(() => checker.validateRunArtifact({ ...receipt, checks: [{ ...receipt.checks[0], exit_code: 1 }] }, input, facts, root)).toThrow('ce-sync-receipt-check-failed');
+    fs.writeFileSync(path.join(root, 'docs/source.md'), 'changed');
+    expect(() => checker.validateRunArtifact(receipt, input, facts, root)).toThrow('ce-sync-receipt-file-hash');
+  });
+  test('admits non-Skill paths with the input null package identity without admitting mixed packages', () => {
+    const cliInput = { ...input, records: [{ path: 'src/commands/install.ts' }, ...input.records] };
+    const admission = { ...envelope(), input_sha256: digest(stable(cliInput)), package_id: null,
+      paths: ['src/commands/install.ts'], decisions: [{ path: 'src/commands/install.ts', target_action: 'evidence-only', rationale: '本地没有 Git 插件安装 consumer' }] };
+    expect(checker.validateRunArtifact(admission, cliInput, facts, root)).toBe(true);
+    expect(() => checker.validateRunArtifact({ ...admission, package_id: 'src' }, cliInput, facts, root)).toThrow('ce-sync-admission-package-paths');
+    const mixed = { ...admission, paths: [...admission.paths, ...input.records.map((record) => record.path)], decisions: [...admission.decisions, ...envelope().decisions] };
+    expect(() => checker.validateRunArtifact(mixed, cliInput, facts, root)).toThrow('ce-sync-admission-package-paths');
+    expect(() => checker.validateRunArtifact({ ...envelope(), package_id: null }, input, facts, root)).toThrow('ce-sync-admission-package-paths');
+    fs.writeFileSync(path.join(root, 'docs/admission.json'), stable(admission));
+    fs.writeFileSync(path.join(root, 'docs/test.log'), 'passed');
+    const receipt = { ...admission, kind: 'owner-receipt', admission_ref: 'docs/admission.json', admission_sha256: digest(stable(admission)), before_snapshot: snapshot, changed_files: [], checks: [{ argv: ['node', 'check-consumer'], exit_code: 0, log_path: 'docs/test.log', log_sha256: digest('passed'), status: 'passed', required: true }], authorization_scope: '当前 CLI 适用性核对', claim_ceiling: 'fixture 合同' };
+    for (const key of ['package_id', 'decisions', 'review_ref', 'authority_ref', 'dependency_refs']) delete receipt[key];
+    expect(checker.validateRunArtifact(receipt, cliInput, facts, root)).toBe(true);
+  });
+});
+
+
+test('named-window CLI prepares, replays and refuses stale or tampered evidence', () => {
+  const upstream = fs.mkdtempSync(path.join(os.tmpdir(), 'ce-window-cli-'));
+  const runRoot = path.resolve('docs/validation/ce-pull-2026-10-27/runs/fixture-' + process.pid);
+  const git = (...args) => execFileSync('git', ['-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false', ...args], { cwd: upstream, encoding: 'utf8' }).trim();
+  const stdout = jest.spyOn(process.stdout, 'write').mockImplementation(() => true);
+  try {
+    git('init', '-q'); git('config', 'user.name', 'Fixture'); git('config', 'user.email', 'fixture@example.invalid');
+    fs.mkdirSync(path.join(upstream, 'skills/ce-new'), { recursive: true }); fs.writeFileSync(path.join(upstream, 'skills/ce-new/SKILL.md'), 'old');
+    git('add', '.'); git('commit', '-qm', 'base'); const base = git('rev-parse', 'HEAD');
+    fs.writeFileSync(path.join(upstream, 'skills/ce-new/SKILL.md'), 'new'); git('commit', '-qam', 'head'); const head = git('rev-parse', 'HEAD');
+    const factsPath = path.join(runRoot, 'window-facts.json');
+    const shared = ['--ce-repo', upstream, '--base', base, '--head', head, '--window-facts', factsPath];
+    expect(checker.main(['--create-window-facts', ...shared])).toBe(0);
+    const inventory = { files: [] }; const snapshot = { repository: 'fixture', head: 'target', dirty: false, dirty_path_manifest_sha256: 'a'.repeat(64), source_tree_hash: 'b'.repeat(64), inventory_hash: 'c'.repeat(64) };
+    const runtime = { buildCurrentInventory: () => inventory, buildTargetSourceSnapshot: () => snapshot };
+    const paths = ['--name-status', path.join(runRoot, 'producer-name-status.tsv'), '--inventory', path.join(runRoot, 'target-source-inventory.json'), '--adjudication-input', path.join(runRoot, 'adjudication-input.json')];
+    expect(checker.main(['--refresh', '--prepare-adjudication', ...shared, ...paths], runtime)).toBe(0);
+    expect(checker.main(['--prepare-adjudication', ...shared, ...paths], runtime)).toBe(0);
+    const input = JSON.parse(fs.readFileSync(path.join(runRoot, 'adjudication-input.json')));
+    expect(input.records[0].package_id).toBe('skills/ce-new');
+    expect(input.records[0].source_facts.new_object.git_oid).toBe(git('rev-parse', `${head}:skills/ce-new/SKILL.md`));
+    expect(() => checker.main(['--refresh', '--prepare-adjudication', ...shared, ...paths], { ...runtime, buildTargetSourceSnapshot: () => ({ ...snapshot, source_tree_hash: 'd'.repeat(64) }) })).toThrow('ce-sync-output-collision');
+    const marker = path.join(runRoot, 'artifact-set.json');
+    checker.verifyArtifactSet(marker, [path.join(runRoot, 'adjudication-input.json')]);
+    const stable = (value) => `${JSON.stringify(value, null, 2)}\n`;
+    const digest = (value) => crypto.createHash('sha256').update(value).digest('hex');
+    const ref = (file) => path.relative(process.cwd(), path.join(runRoot, file));
+    const write = (file, value) => fs.writeFileSync(path.join(runRoot, file), stable(value));
+    const facts = JSON.parse(fs.readFileSync(factsPath));
+    const sourceRef = 'docs/contracts/verification/ce-upstream-sync-run.md';
+    const commonEnvelope = { schema_version: 'ce-upstream-sync-run/v1', window_sha256: digest(stable(facts)), input_sha256: digest(stable(input)), target_snapshot: snapshot, source_refs: [sourceRef], limitations: ['synthetic fixture only'], unresolved: [] };
+    const admission = { ...commonEnvelope, kind: 'package-admission', package_id: 'skills/ce-new', unit_id: 'U9', paths: ['skills/ce-new/SKILL.md'], decisions: [{ path: 'skills/ce-new/SKILL.md', target_action: 'compose', rationale: 'fixture decision' }], review_ref: sourceRef, authority_ref: sourceRef, dependency_refs: [] };
+    write('plan-review.json', admission);
+    fs.mkdirSync(path.join(runRoot, 'logs')); fs.writeFileSync(path.join(runRoot, 'logs/fixture.log'), 'fixture check');
+    write('work-return.json', { ...commonEnvelope, kind: 'owner-receipt', unit_id: 'U9', paths: admission.paths, admission_ref: ref('plan-review.json'), admission_sha256: digest(stable(admission)), before_snapshot: snapshot, changed_files: [], checks: [{ argv: ['fixture-check'], exit_code: 0, log_path: ref('logs/fixture.log'), log_sha256: digest('fixture check'), status: 'passed', required: true }], authorization_scope: 'fixture', claim_ceiling: 'synthetic only' });
+    write('handoff.json', { ...commonEnvelope, kind: 'handoff', summary: 'fixture', receipt_refs: [ref('work-return.json')], freshness: 'fixture snapshot', next_owner: 'fixture', claim_ceiling: 'synthetic only' });
+    const record = { ...input.records[0], canonical_owner: sourceRef, implementation_unit: 'U9', implementation_targets: [sourceRef], target_action: 'compose', evidence_status: 'confirmed', degraded: false, source_refs: [sourceRef], test_owner: 'fixture', test_refs: [ref('logs/fixture.log')], limitations: ['fixture only'], closure_profile: 'source-adjudication' };
+    delete record.source_facts; delete record.status;
+    write('adjudication.json', { schema_version: checker.ADJUDICATION_SCHEMA_VERSION, join_key: checker.ADJUDICATION_JOIN_KEY, producer: { kind: 'llm-adjudication', model: 'fixture', status: 'confirmed' }, upstream: input.upstream, target_source_snapshot: snapshot, input_artifact_sha256: digest(stable(input)), records: [record] });
+    const close = ['--full-window', ...shared, ...paths, '--adjudication', path.join(runRoot, 'adjudication.json'), '--run-handoff', path.join(runRoot, 'handoff.json'), '--ledger', path.join(runRoot, 'ledger.json'), '--summary', path.join(runRoot, 'summary.md')];
+    expect(checker.main(['--refresh', ...close], runtime)).toBe(0);
+    expect(checker.main(close, runtime)).toBe(0);
+    const ledger = JSON.parse(fs.readFileSync(path.join(runRoot, 'ledger.json')));
+    expect(ledger.schema_version).toBe('ce-upstream-reconciliation/v3');
+    expect(ledger.package_summary[0]).toMatchObject({ package_id: 'skills/ce-new', actions: { compose: 1 }, record_paths: ['skills/ce-new/SKILL.md'] });
+    fs.appendFileSync(path.join(runRoot, 'adjudication-input.json'), ' ');
+    expect(() => checker.verifyArtifactSet(marker, [path.join(runRoot, 'adjudication-input.json')])).toThrow('ce-sync-artifact-set-hash');
+  } finally {
+    stdout.mockRestore(); fs.rmSync(upstream, { recursive: true, force: true }); fs.rmSync(runRoot, { recursive: true, force: true });
+  }
+});

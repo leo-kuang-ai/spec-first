@@ -96,7 +96,9 @@ flat paths may be read only for migration compatibility tests.
 ## Figma Materialization
 
 Figma extraction consumes a local JSON context file. A Figma node or file reference is
-not the same as an extractable context.
+not the same as an extractable context. This materialization is a host-side interactive
+step; it does not require a runner `mode:default` orchestration call (that runner entrypoint
+is deferred — only `mode:headless` is implemented).
 
 If the user provides a Figma node/file reference rather than `--figma-context`:
 

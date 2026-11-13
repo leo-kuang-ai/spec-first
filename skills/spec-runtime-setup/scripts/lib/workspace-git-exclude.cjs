@@ -19,8 +19,8 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { canonicalizeGitPath, resolveGitPath } = require('./git-path.cjs');
-const { assertContainedPath, isPathWithin } = require('./path-safety.cjs');
+const { resolveGitPath } = require('./git-path.cjs');
+const { assertContainedPath, ensureContainedDirectory, isPathWithin, writeContainedFile } = require('./path-safety.cjs');
 
 const MANAGED_BLOCK_START = '# spec-first codegraph exclude start';
 const MANAGED_BLOCK_END = '# spec-first codegraph exclude end';
@@ -29,11 +29,8 @@ const DEFAULT_PATTERNS = ['.codegraph/'];
 function resolveExcludePath(repoRoot) {
   const resolved = resolveGitPath(repoRoot, 'info/exclude');
   if (!resolved.ok) return resolved;
-  try {
-    return { ok: true, absolute: canonicalizeGitPath(resolved.absolute) };
-  } catch (_error) {
-    return { ok: false, reason_code: 'git-path-canonicalization-failed' };
-  }
+  // Keep the Git path intact for segment checks; canonicalization must not hide links.
+  return resolved;
 }
 
 // Add the managed exclude block to a child repo. Idempotent.
@@ -48,9 +45,8 @@ function addManagedExclude(repoRoot, workspaceRoot, patterns = DEFAULT_PATTERNS)
   }
   const infoDir = path.dirname(resolved.absolute);
   try {
-    fs.mkdirSync(infoDir, { recursive: true });
-    // Containment on the resolved target after ensuring its parent exists.
     assertContainedPath(workspaceRoot, resolved.absolute, { reasonCode: 'exclude-target-escapes-workspace' });
+    ensureContainedDirectory(workspaceRoot, infoDir, { reasonCode: 'exclude-target-escapes-workspace' });
   } catch (error) {
     return { ok: false, reason_code: error.reason_code || 'exclude-target-escapes-workspace', target: resolved.absolute };
   }
@@ -65,7 +61,11 @@ function addManagedExclude(repoRoot, workspaceRoot, patterns = DEFAULT_PATTERNS)
   if (next === existing) {
     return { ok: true, changed: false, target: resolved.absolute };
   }
-  fs.writeFileSync(resolved.absolute, next, 'utf8');
+  try {
+    writeContainedFile(workspaceRoot, resolved.absolute, next, { reasonCode: 'exclude-target-escapes-workspace' });
+  } catch (error) {
+    return { ok: false, reason_code: error.reason_code || 'exclude-write-failed', target: resolved.absolute };
+  }
   return { ok: true, changed: existing !== next, target: resolved.absolute };
 }
 
@@ -76,13 +76,13 @@ function removeManagedExclude(repoRoot, workspaceRoot) {
   if (!isPathWithin(resolved.absolute, workspaceRoot)) {
     return { ok: false, reason_code: 'exclude-target-escapes-workspace', target: resolved.absolute };
   }
-  if (!fs.existsSync(resolved.absolute)) {
-    return { ok: true, changed: false, target: resolved.absolute };
-  }
   try {
     assertContainedPath(workspaceRoot, resolved.absolute, { reasonCode: 'exclude-target-escapes-workspace' });
   } catch (error) {
     return { ok: false, reason_code: error.reason_code || 'exclude-target-escapes-workspace', target: resolved.absolute };
+  }
+  if (!fs.existsSync(resolved.absolute)) {
+    return { ok: true, changed: false, target: resolved.absolute };
   }
   const existing = fs.readFileSync(resolved.absolute, 'utf8');
   const stripped = stripManagedBlock(existing);
@@ -90,7 +90,11 @@ function removeManagedExclude(repoRoot, workspaceRoot) {
   if (stripped.contents === existing) {
     return { ok: true, changed: false, target: resolved.absolute };
   }
-  fs.writeFileSync(resolved.absolute, stripped.contents, 'utf8');
+  try {
+    writeContainedFile(workspaceRoot, resolved.absolute, stripped.contents, { reasonCode: 'exclude-target-escapes-workspace' });
+  } catch (error) {
+    return { ok: false, reason_code: error.reason_code || 'exclude-write-failed', target: resolved.absolute };
+  }
   return { ok: true, changed: true, target: resolved.absolute };
 }
 

@@ -50,6 +50,8 @@ Load `references/predict-personas.md` for persona definitions.
 Each persona receives: task description + codebase knowledge + their specific evaluation criteria.
 Personas are isolated — no shared context between them.
 
+**Isolation capability gate.** Independent analysis presumes the harness can isolate personas (distinct subagent contexts). Before analysis, check that dispatch capability and authorization are actually present (the same two-level capability check `references/reason-judge-protocol.md` defines for its judges). When isolation or dispatch is unavailable or unauthorized, do not run fake-independent rounds: run the persona lenses serially in one shared context, disclose `persona_isolation: degraded-shared-context` in the results, and treat cross-persona agreement as weaker evidence — convergence reached inside one context is not independent corroboration.
+
 ## Phase 3: Independent Analysis
 
 Each persona analyzes the codebase independently:

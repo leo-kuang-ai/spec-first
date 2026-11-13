@@ -1,6 +1,6 @@
 # Strategy Interview
 
-Loaded by `SKILL.md` at the start of Phase 1 and revisited per-section in Phase 2. Every section below maps one-to-one to a section in `strategy-template.md`.
+Read by `SKILL.md` at the start of Phase 1 and reused for the target section in Phase 2. The numbered questions correspond to `strategy-template.md`; Stress Test checks the interview and does not add a document section.
 
 For each section: ask the opening question, evaluate the answer against the quality bar, push back when it falls into a named anti-pattern, and capture the final answer in the user's own language.
 
@@ -43,6 +43,7 @@ Strong answers are a choice (implying alternatives explicitly *not* pursued), ar
 **Anti-patterns and pushback:**
 
 - **Fluff / values** ("we're customer-obsessed and move fast") -> "Those are values, not an approach. What are you doing *differently* from the other products users could pick? If the answer applies to any company, it's not your approach."
+- **Interchangeable positioning** — Could the nearest credible alternative truthfully make the same claim? If so, ask which concrete choice distinguishes this approach; no competitor research is required merely to ask.
 - **Feature list** ("we're building AI-powered X, Y, and Z") -> "That's a feature list. What's the underlying bet that makes you pick those features over others? What principle is guiding what you ship?"
 - **Product description as approach** ("we use AI to draft replies") -> "That's what the product does, but what's the *choice* inside it? Every competitor will say the same thing. Your approach should name what you're doing that the obvious alternative isn't - is it a grounding choice, a trust-building commitment, a workflow bet? What are you betting on that they're not?"
 - **Goal restated** ("our approach is to be the market leader") -> "That's still the goal. How does the product win? What choice are you making that competitors aren't?"
@@ -122,11 +123,11 @@ Default is to skip. Do not push the user to invent milestones. If they name some
 
 ---
 
-## 7. Not Working On (optional)
+## 7. Not Working On
 
 **Opening question:** "Is there anything you've explicitly decided *not* to do right now that's worth naming? This is for things the team keeps being tempted by."
 
-Clarity tool, not a blocker list. Skip by default. If the user names items, one sentence each. Do not encourage a long list.
+These are strategic boundaries, not an issue list. This section is required in a new house-format document. If the user has named no exclusions, write "Nothing named yet" rather than inventing restrictions. For existing documents in other formats, follow update-run's minimal-edit and ownership rules. Use one sentence per item and resist long lists.
 
 ---
 
@@ -140,4 +141,10 @@ Skip by default. Keep to 2-3 lines if present.
 
 ## After the Interview
 
-Once sections 1-5 are captured (and any optional sections the user engaged with), read `strategy-template.md` and fill it in. Present the full draft in chat before writing. Offer one edit round. Then write to `STRATEGY.md`.
+After the first five sections, run the stress test below, then capture Not working on and any optional sections the user needs. Read `strategy-template.md`, retain local template headings and order, and use the user's own words. Show the draft with one edit opportunity; proceed when current authorization covers the local write, asking only for critical strategic answers still needed.
+
+## Stress Test
+
+Build a few concrete proposals from actual tensions or tradeoffs in the draft and ask the user to judge them one at a time. Choose proposals the user could reasonably accept or reject: a tempting adjacent feature, a second persona, competing investment, or a metric that improves while the approach fails. Skip foregone conclusions already excluded by the strategy. Proposals the strategy already resolves confirm it; unresolved proposals sharpen Our approach or Tracks; explicitly rejected proposals can seed Not working on. From explicit rejections, optionally propose one reusable “Resist a change when ...” principle inside Not working on. Attribute it as a synthesis for the user to correct; omit it when no rejection supports it. Do not substitute code activity for these choices or write the check as a new strategy section.
+
+Use the repo model and the user's words to name concrete contradictions, with two rounds maximum per section. If answers remain unclear, record what is available and suggest revisiting. Apply the same bar to existing sections; written content is not automatically accepted.

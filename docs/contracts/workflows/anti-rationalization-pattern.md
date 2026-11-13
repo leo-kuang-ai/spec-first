@@ -2,7 +2,7 @@
 
 Anti-rationalization tables are light-contract workflow prose that names a likely shortcut thought and pairs it with the action that should happen before the workflow proceeds.
 
-This pattern comes from `docs/项目审查/2026-06-15-行业对标研究档案.md` §6/§12, where comparable projects use Red Flags / Common Rationalizations tables to harden agent attention. In spec-first, the borrowed mechanism is intentionally narrower: no Iron Laws, no HARD-GATE language, no state machine, and no scripted semantic enforcement.
+This pattern comes from `docs/project-reviews/2026-06-15-行业对标研究档案.md` §6/§12, where comparable projects use Red Flags / Common Rationalizations tables to harden agent attention. In spec-first, the borrowed mechanism is intentionally narrower: no Iron Laws, no HARD-GATE language, no state machine, and no scripted semantic enforcement.
 
 ## Canonical Shape
 

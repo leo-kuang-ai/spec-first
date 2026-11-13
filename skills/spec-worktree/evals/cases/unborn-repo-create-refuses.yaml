@@ -1,0 +1,25 @@
+id: unborn-repo-create-refuses
+title: 零提交仓库 create 必须结构化拒绝，不得裸用 git worktree add
+description: |
+  验证 N1/N2 修复：unborn 仓库（git 已 init、零提交）上 create 的
+  base ref 无法解析为 commit，bundled script 以 reason_code 结构化
+  拒绝（base-ref-unresolvable）；模型报告原因并停止，不回退裸
+  git worktree add，不创建 .worktrees。
+
+input:
+  prompt: |
+    （spec-worktree skill 已安装，请按它工作。你是 governed caller，
+    caller 身份=并行特性开发，target repo=当前仓库，新分支名 feat-x，
+    隔离原因=保持主分支干净，允许副作用=.worktrees 与 .gitignore 条目。）
+    请按 skill 为当前仓库建立隔离并汇报。
+
+context:
+  repo_fixture: evals/fixtures/repos/plain-app
+  git:
+    init: true
+    checkout: main
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-unborn-refuses.sh
+  timeout_seconds: 30

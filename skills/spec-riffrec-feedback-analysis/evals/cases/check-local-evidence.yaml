@@ -1,0 +1,20 @@
+{
+  "id": "check-local-evidence",
+  "title": "Check local evidence",
+  "description": "Supplemental outcome case: inspect actual fixture bytes and results. Recorded trace checks are bounded and do not prove complete absence of external effects. Not part of the frozen U31 comparison set.",
+  "input": {
+    "prompt": "First run node prepare-eval.cjs once in this isolated fixture. Preparation may create a fixture baseline commit only. Read the current installed spec-riffrec-feedback-analysis source and follow it. This is explicit Riffrec feedback. Analyze the capture directory extensively using local events only and --no-transcribe, with output-dir local-evidence. Treat generated kickoff requirements as unconfirmed. Do not publish, commit or create a plan. Return JSON with confirmed_requirements (count), coverage and source_manifest_visibility."
+  },
+  "context": {
+    "repo_fixture": "evals/fixtures/repos/u28-outcomes",
+    "git": {
+      "init": true,
+      "checkout": "main"
+    }
+  },
+  "judge": {
+    "type": "script",
+    "script_path": "evals/fixtures/scripts/check-local-evidence.sh",
+    "timeout_seconds": 30
+  }
+}

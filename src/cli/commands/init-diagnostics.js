@@ -59,6 +59,12 @@ function knownDiagnosticMessage(code, messages) {
   if (code === 'pi_generated_runtime_preview') {
     return messages.diagnosticPiGeneratedRuntimePreview;
   }
+  if (code === 'legacy_state_detected') {
+    return messages.diagnosticLegacyStateDetected;
+  }
+  if (code === 'current_runtime_drift') {
+    return messages.diagnosticCurrentRuntimeDrift;
+  }
   return '';
 }
 

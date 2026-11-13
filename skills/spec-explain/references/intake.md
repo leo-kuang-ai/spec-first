@@ -4,7 +4,7 @@ Classify the request into exactly one input shape — concept, diff, idea, or wo
 
 ## Flag tokens
 
-Literal-prefix tokens are consumed and stripped; everything else is the request text.
+Consume a literal-prefix token only when it reads as a standalone flag with a nonempty value. If removing it would break the surrounding sentence's meaning, keep it as request prose. Empty `diff:`/`since:`/`output:` strings do not force a mode.
 
 | Token | Example | Effect |
 |-------|---------|--------|
@@ -22,10 +22,18 @@ Literal-prefix tokens are consumed and stripped; everything else is the request 
 Classify the remaining text by shape:
 
 - **Diff** — the request names a resolvable change: a sha, branch, PR, "the last commit", "what you just did", "this change".
-- **Recap** — the request asks what happened over time: "what did I do this week", "catch me up", "prep me for standup". Default window when unspecified: the last 7 days in the current repo.
+- **Recap** — the request asks what happened over time: "what did I do this week", "catch me up", "prep me for standup". Preserve a supplied natural-language window (such as "since last Monday") or explicit date range using the active timezone; ask only if an ambiguity changes the evidence set. Default to the last 7 days in the current repo only when no window was supplied.
 - **Idea** — the request presents a proposal or notion of the user's to be understood: "explain my idea of X", "what would Y imply". The idea is a fixed given (see SKILL.md Boundaries).
 - **Concept** — everything else: a topic, pattern, subsystem, or external subject to learn.
 
 **Tiebreak — concept vs diff:** when the request is plausibly both (a repo topic that also names an identifiable recent change, e.g. "explain the retry logic we just added"), a concretely resolvable change wins: diff mode, with the concept as framing context. A topic with no resolvable change is a concept.
 
 **Repo footprint check (concept mode):** a concept grounds in the repo only when it actually touches it. An external subject (a language feature, an interview topic, a paper) gets no repo grounding — do not force it.
+
+## Audience
+
+Default to the user as reader. An explicit request for a version the team or another audience will read changes voice and orientation, not depth: drop second person, name people only from evidence or the user's supplied names, and otherwise stay impersonal. Add only enough context for that reader to follow the same technical explanation. Meeting preparation and "so I can explain it" still teach the user. Do not silently turn an explainer into a terse status update or deck; route an explicit request for that different deliverable to its owner.
+
+## Operational-question gate
+
+When an inferred concept request is really an ordinary question about current behavior, configuration, status, or diagnosis, answer it directly in chat. Do not create a run directory or teaching artifact. Offer a durable visual explainer only when a substantial underlying concept is present and the user plausibly wants to learn it. Explicit teaching language, or a `diff:`/`since:` token, enters the full flow directly. A question with a colon in ordinary prose is not by itself a teaching or token signal.

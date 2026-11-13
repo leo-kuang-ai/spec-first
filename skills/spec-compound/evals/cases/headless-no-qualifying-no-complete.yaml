@@ -1,0 +1,27 @@
+id: headless-no-qualifying-no-complete
+title: mode:headless 无合格 learning 时不得宣称 Documentation complete
+description: |
+  验证 headless 完成语契约：Emit "Documentation complete" only after
+  successful publication——无合格 learning（可从代码恢复）时输出
+  no-op 报告与理由，不出现 Documentation complete。
+
+input:
+  prompt: |
+    （spec-compound skill 已安装，请按它工作。mode:headless）
+    mode:headless 沉淀：刚把 package.json 里拼错的 "entrypont"
+    改成 "entrypoint"，程序恢复正常。
+
+context:
+  repo_fixture: evals/fixtures/repos/trivial-fix
+  git:
+    init: true
+    checkout: main
+
+expect:
+  files_not_exist:
+    - "docs/solutions"
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-headless-no-complete.sh
+  timeout_seconds: 30

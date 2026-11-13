@@ -10,8 +10,10 @@ describe('review peer expansion contracts', () => {
     const skill = read('skills/spec-doc-review/SKILL.md');
     const peer = read('skills/spec-doc-review/references/personas/whole-doc-reviewer.md');
     const floor = read('skills/spec-doc-review/references/rendering-floor.md');
-    expect(skill).toContain('exactly one report-only whole-document peer');
-    expect(skill).toContain('never carries `safe_auto` or mutation authority');
+    const dispatch = read('skills/spec-doc-review/references/dispatch.md');
+    expect(skill).toContain('Read `references/dispatch.md` before dispatch or inline review');
+    expect(dispatch).toContain('exactly one report-only whole-document peer');
+    expect(dispatch).toContain('never carries `safe_auto` or mutation authority');
     expect(peer).toContain('entire document');
     expect(floor).toContain('Decision-first field order');
     for (const file of [
@@ -37,12 +39,27 @@ describe('review peer expansion contracts', () => {
 
   test('POV freezes a complete approach set and keeps peers non-voting', () => {
     const skill = read('skills/spec-pov/SKILL.md');
+    const intake = read('skills/spec-pov/references/intake.md');
     const panel = read('skills/spec-pov/references/cross-model-panel.md');
-    expect(skill).toContain('Freeze an explicit approach set');
-    expect(skill).toContain('never decide by vote');
+    expect(skill).toContain('complete approach set');
+    expect(intake).toContain('freeze the complete approach set');
     expect(panel).toContain('peers are evidence, not votes');
     expect(panel).toContain('reject the framing or all candidates');
     expect(panel).toContain('starts no peer process');
+  });
+
+  test('POV loads grounding/follow-up references and discloses summoned participation', () => {
+    const skill = read('skills/spec-pov/SKILL.md');
+    const grounding = read('skills/spec-pov/references/grounding.md');
+    const followup = read('skills/spec-pov/references/followup.md');
+    const panel = read('skills/spec-pov/references/cross-model-panel.md');
+
+    expect(skill).toContain('Read `references/grounding.md` before grounding');
+    expect(skill).toContain('`references/followup.md` before follow-up decisions');
+    expect(grounding).toContain('provenance buckets');
+    expect(followup).toContain('Any implementation, commit, or landing is outside this read-only contract');
+    expect(panel).toContain('A summons is an **affirmative** request');
+    expect(panel).toContain('which peers ran');
   });
 
   test.each([

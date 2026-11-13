@@ -40,6 +40,7 @@ are emitted as inline JSON flow on a single line — itself valid YAML.
 import argparse
 import json
 import os
+import stat
 import sys
 import tempfile
 from datetime import datetime, timezone
@@ -47,7 +48,7 @@ from datetime import datetime, timezone
 try:
     import fcntl  # POSIX advisory locks (macOS, Linux — this repo's Unix targets)
     _HAS_FCNTL = True
-except ImportError:  # non-POSIX; degrade to unlocked (single-writer by convention)
+except ImportError:  # Without a reliable lock, allow reads only; never silently permit unlocked writes.
     _HAS_FCNTL = False
 
 SCHEMA_VERSION = 1
@@ -209,15 +210,17 @@ def _parse_mapping(rows, cursor, indent):
         if cur_indent < indent:
             break
         if cur_indent > indent:
-            # Orphan deeper line with no parent key; skip defensively.
-            cursor["i"] += 1
-            continue
+            raise ValueError("orphan mapping indentation")
         cursor["i"] += 1
         key, rest = _split_key(content)
+        if not isinstance(key, str) or not key or key in result:
+            raise ValueError("invalid or duplicate mapping key")
         val = _parse_value(rest)
         if val is _BLOCK:
             if cursor["i"] < len(rows) and rows[cursor["i"]][0] > indent:
-                val = _parse_mapping(rows, cursor, rows[cursor["i"]][0])
+                if rows[cursor["i"]][0] != indent + 2:
+                    raise ValueError("mapping indentation must use two spaces")
+                val = _parse_mapping(rows, cursor, indent + 2)
             else:
                 val = {}
         result[key] = val
@@ -231,10 +234,14 @@ def parse_document(text):
         if not stripped or stripped.startswith("#"):
             continue
         indent = len(raw) - len(raw.lstrip(" "))
+        if '\t' in raw[:len(raw) - len(raw.lstrip())] or indent % 2:
+            raise ValueError("invalid indentation")
         rows.append((indent, stripped))
     if not rows:
         return {}
-    return _parse_mapping(rows, {"i": 0}, rows[0][0])
+    if rows[0][0] != 0:
+        raise ValueError("root mapping must not be indented")
+    return _parse_mapping(rows, {"i": 0}, 0)
 
 
 # --------------------------------------------------------------------------- #
@@ -254,7 +261,9 @@ def load_state(path):
     """Return (status, data): ('absent', None), ('corrupt', None), or
     ('ok', dict). A file that parses but lacks schema_version is corrupt."""
     try:
-        with open(path) as f:
+        if not stat.S_ISREG(os.lstat(path).st_mode):
+            return ("corrupt", None)
+        with open(path, encoding="utf-8") as f:
             # A machine-local state file can live under world-shared /tmp, and
             # it is a correctness dependency (lease, cursors, closed status) as
             # well as an injection sink (item bodies re-read into agent
@@ -268,7 +277,7 @@ def load_state(path):
             text = f.read()
     except FileNotFoundError:
         return ("absent", None)
-    except OSError:
+    except (OSError, UnicodeDecodeError):
         return ("corrupt", None)
     if not text.strip():
         return ("absent", None)
@@ -276,10 +285,18 @@ def load_state(path):
         data = parse_document(text)
     except Exception:
         return ("corrupt", None)
-    if not isinstance(data, dict) or "schema_version" not in data:
+    if (not isinstance(data, dict)
+            or type(data.get("schema_version")) is not int
+            or data["schema_version"] != SCHEMA_VERSION):
         return ("corrupt", None)
     data.setdefault("sources", {})
     data.setdefault("items", {})
+    for key in ("sources", "items"):
+        if not isinstance(data[key], dict) or any(not isinstance(value, dict) for value in data[key].values()):
+            return ("corrupt", None)
+    for key in ("lease", "last_run"):
+        if key in data and not isinstance(data[key], dict):
+            return ("corrupt", None)
     return ("ok", data)
 
 
@@ -288,14 +305,16 @@ def new_state():
 
 
 def write_state(path, state):
-    """Atomic write of the state file. Returns True on success."""
-    state["schema_version"] = SCHEMA_VERSION
+    """Write atomically and return repaired historical closed IDs for caller reporting."""
+    if type(state.get("schema_version")) is not int or state["schema_version"] != SCHEMA_VERSION:
+        raise ValueError("unsupported state schema_version")
+    downgraded = downgrade_unverified_closed(state)
     text = emit_document(state)
     d = os.path.dirname(os.path.abspath(path))
     os.makedirs(d, exist_ok=True)
     fd, tmp = tempfile.mkstemp(dir=d, prefix=".tmp-sweep-", suffix=".yml")
     try:
-        with os.fdopen(fd, "w") as f:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as f:
             f.write(text)
         os.replace(tmp, path)
     except BaseException:
@@ -304,7 +323,14 @@ def write_state(path, state):
         except OSError:
             pass
         raise
-    return True
+    return downgraded
+
+
+def persist_and_emit(path, data, status_word="OK", payload=None):
+    downgraded = write_state(path, data)
+    if downgraded:
+        payload = dict(payload or {}, downgraded=sorted(downgraded))
+    return emit(status_word, payload)
 
 
 # --------------------------------------------------------------------------- #
@@ -394,18 +420,27 @@ def cmd_validate(args):
         return emit("CORRUPT")
     if st == "absent":
         return emit("OK", {"downgraded": []})
-    downgraded = []
-    for item_id, item in data.get("items", {}).items():
-        if not isinstance(item, dict):
-            continue
-        if item.get("status") == "closed" and any(
-            not item.get(f) for f in EVIDENCE_FIELDS
-        ):
-            item["status"] = "fix_pending"
-            downgraded.append(item_id)
+    downgraded = downgrade_unverified_closed(data)
     if downgraded:
         write_state(args.state, data)
     return emit("OK", {"downgraded": sorted(downgraded)})
+
+
+def valid_close_evidence(item):
+    # Validate shape only; the owner must establish actual merge and semantic resolution from direct evidence.
+    if any(not isinstance(item.get(key), str) or not item[key].strip() for key in EVIDENCE_FIELDS):
+        return False
+    return (re.fullmatch(r"(?:[a-fA-F0-9]{40}|[a-fA-F0-9]{64})", item["verified_merge_sha"]) is not None
+            and "T" in item["verified_at"] and _parse_iso(item["verified_at"]) is not None)
+
+
+def downgrade_unverified_closed(state):
+    downgraded = []
+    for item_id, item in state.get("items", {}).items():
+        if item.get("status") == "closed" and not valid_close_evidence(item):
+            item["status"] = "fix_pending"
+            downgraded.append(item_id)
+    return downgraded
 
 
 def _load_owned_state(args):
@@ -423,8 +458,7 @@ def _load_owned_state(args):
 def _commit_owned(args, data):
     """Shared tail for lease-gated mutations: re-stamp the lease, persist."""
     restamp_lease(data, args.writer, resolve_now(args))
-    write_state(args.state, data)
-    return emit("OK")
+    return persist_and_emit(args.state, data)
 
 
 def cmd_upsert_item(args):
@@ -447,6 +481,8 @@ def cmd_upsert_item(args):
     merged.update(incoming)
     merged["source"] = args.source
     merged["id"] = args.id
+    if merged.get("status") == "closed" and not valid_close_evidence(merged):
+        return emit("REFUSED", {"reason_code": "closed-evidence-invalid"})
 
     source_entry = data.get("sources", {}).get(args.source, {})
     is_sensitive = (
@@ -512,16 +548,14 @@ def cmd_lease_acquire(args):
     if lease is None or lease.get("writer") == args.writer:
         # Free, or re-entrant acquire by the same writer: (re)stamp and take it.
         data["lease"] = {"writer": args.writer, "timestamp": now, "ttl_minutes": ttl}
-        write_state(args.state, data)
-        return emit("OK")
+        return persist_and_emit(args.state, data)
     if lease_is_stale(lease, now):
         prev = {
             "previous_writer": lease.get("writer"),
             "previous_timestamp": lease.get("timestamp"),
         }
         data["lease"] = {"writer": args.writer, "timestamp": now, "ttl_minutes": ttl}
-        write_state(args.state, data)
-        return emit("STALE-RECLAIMED", prev)
+        return persist_and_emit(args.state, data, "STALE-RECLAIMED", prev)
     return emit("LOCKED")
 
 
@@ -537,8 +571,7 @@ def cmd_lease_release(args):
     if lease.get("writer") != args.writer:
         return emit("LEASE-LOST")  # never release another writer's lease
     data.pop("lease", None)
-    write_state(args.state, data)
-    return emit("OK")
+    return persist_and_emit(args.state, data)
 
 
 def cmd_run_record(args):
@@ -560,8 +593,7 @@ def cmd_run_record(args):
         "writer": args.writer,
         "counts": counts,
     }
-    write_state(args.state, data)
-    return emit("OK")
+    return persist_and_emit(args.state, data)
 
 
 def cmd_import_legacy(args):
@@ -597,22 +629,23 @@ def cmd_import_legacy(args):
 
     # Persist only when something changed: a fresh state file was seeded, or
     # the import actually brought data in. A no-op import writes nothing.
-    if st == "absent" or cursors_imported or items_imported:
-        write_state(args.state, data)
-    return emit("OK", {
+    payload = {
         "cursors_imported": cursors_imported,
         "items_imported": items_imported,
         # Reported rather than silently dropped: without a source these cannot be namespaced
         # into the items keyspace, so the caller needs to know they were not carried over.
         "items_skipped_unsourced": items_skipped_unsourced,
-    })
+    }
+    if st == "absent" or cursors_imported or items_imported:
+        return persist_and_emit(args.state, data, payload=payload)
+    return emit("OK", payload)
 
 
 def _read_legacy(path):
     try:
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             raw = f.read()
-    except OSError:
+    except (OSError, UnicodeDecodeError):
         return None
     # Try JSON first (Cora persists JSON); fall back to our YAML subset.
     try:
@@ -673,7 +706,7 @@ def _import_legacy_items(legacy, data, source_map=None):
         source_id = source_map.get(str(legacy_source), str(legacy_source))
         key = _item_key(source_id, item_id)
         merged = dict(items.get(key, {}))
-        for k in ("status", "title", "url"):
+        for k in ("status", "title", "url") + EVIDENCE_FIELDS:
             if k in fields and fields[k] is not None:
                 merged.setdefault(k, fields[k])
         merged.setdefault("id", str(item_id))
@@ -783,26 +816,44 @@ _MUTATING = {
 
 
 def _run_locked(handler, args):
-    lock_path = str(args.state) + ".lock"
+    if not _HAS_FCNTL or not hasattr(os, "O_NOFOLLOW"):
+        return emit("ERROR", {"reason_code": "state-lock-unavailable"})
+    lock_path = os.path.abspath(str(args.state)) + ".lock"
+    descriptor = None
     try:
-        lock_fd = open(lock_path, "w")
+        directory = os.path.dirname(lock_path)
+        os.makedirs(directory, mode=0o700, exist_ok=True)
+        parent = os.stat(directory)
+        geteuid = getattr(os, "geteuid", None)
+        if geteuid is not None and parent.st_uid != geteuid():
+            raise OSError("state directory not owned by current user")
+        descriptor = os.open(lock_path, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW | os.O_NONBLOCK, 0o600)
+        info = os.fstat(descriptor)
+        if (not stat.S_ISREG(info.st_mode) or info.st_nlink != 1
+                or (geteuid is not None and info.st_uid != geteuid())):
+            raise OSError("unsafe state lock file")
+        fcntl.flock(descriptor, fcntl.LOCK_EX)
+        current = os.lstat(lock_path)
+        if (current.st_dev, current.st_ino) != (info.st_dev, info.st_ino):
+            raise OSError("state lock identity changed")
     except OSError:
-        return handler(args)  # cannot create a lock file; degrade to unlocked
+        if descriptor is not None:
+            os.close(descriptor)
+        return emit("ERROR", {"reason_code": "state-lock-unavailable"})
     try:
-        fcntl.flock(lock_fd, fcntl.LOCK_EX)
         return handler(args)
     finally:
         try:
-            fcntl.flock(lock_fd, fcntl.LOCK_UN)
+            fcntl.flock(descriptor, fcntl.LOCK_UN)
         finally:
-            lock_fd.close()
+            os.close(descriptor)
 
 
 def main(argv):
     args = build_parser().parse_args(argv[1:])
     handler = _HANDLERS[args.cmd]
     try:
-        if _HAS_FCNTL and args.cmd in _MUTATING:
+        if args.cmd in _MUTATING:
             return _run_locked(handler, args)
         return handler(args)
     except Exception as exc:  # never leak a traceback to the caller

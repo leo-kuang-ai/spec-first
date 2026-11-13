@@ -19,7 +19,8 @@ const CONFIRMED_SOURCES = new Set([
   'read-only-probe',
   'confirmed-local-state',
 ]);
-const CANONICAL_HOSTS = new Set(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder', 'zcode']);
+const { captureSourceSnapshot } = require('./source-snapshot.cjs');
+const CANONICAL_HOSTS = new Set(require('./host-authority.cjs').CANONICAL_HOSTS);
 
 function collectSetupFacts(options = {}) {
   const registry = options.registry || {};
@@ -44,6 +45,9 @@ function collectSetupFacts(options = {}) {
   const configuredDependencies = (options.configuredDependencies || []).map(normalizeConfiguredDependency);
   const generatedAt = (options.now || new Date()).toISOString();
   const repoRoot = path.resolve(options.repoRoot || process.cwd());
+  const sourceSnapshot = captureSourceSnapshot({
+    repoRoot, sourceRegistry: options.sourceRegistry, skillRoot: options.skillRoot, homeDir: options.homeDir, env: options.env, host: options.host, platform: options.platform, now: options.now || new Date(),
+  });
   const baselineReady = items
     .filter((item) => item.required && item.baseline_blocking)
     .every((item) => item.result === 'ready');
@@ -73,6 +77,7 @@ function collectSetupFacts(options = {}) {
       'provider-readiness-generic',
     ],
     target: options.target || null,
+    source_snapshot: sourceSnapshot,
     source: {
       repo_status: options.repoStatus || 'git-repo',
       authority_level: 'confirmed-local-state',
@@ -182,6 +187,7 @@ function normalizeItem(entry, observed = null, kind) {
     required,
     setup_required: entry.setup_required === true,
     baseline_blocking: baselineBlocking,
+    ...(entry.demand ? { demand: entry.demand } : {}),
     dependency_status: installed
       ? 'ready'
       : (observedDependencyStatus || (observedStatus === 'missing' ? 'missing' : 'unknown')),
@@ -504,10 +510,24 @@ function writeSetupFacts({ repoRoot, toolFacts, runtimeCapabilities, writer } = 
   const toolFactsPath = path.join(configDir, 'tool-facts.json');
   const runtimePath = path.join(configDir, 'runtime-capabilities.json');
   const write = writer || ((filePath, payload) => atomicWriteContained(root, filePath, payload));
+
+  // 使用 lstat 捕获备份，区分不存在、悬空链接、普通文件（SUP-22 修复）
+  function captureBackup(filePath) {
+    try {
+      const stat = fs.lstatSync(filePath);
+      if (stat.isSymbolicLink()) return { type: 'symlink', existed: true };
+      return { type: 'file', content: fs.readFileSync(filePath), existed: true };
+    } catch (error) {
+      if (error.code === 'ENOENT') return { type: 'missing', existed: false };
+      throw error;
+    }
+  }
+
   const backups = new Map([
-    [toolFactsPath, fs.existsSync(toolFactsPath) ? fs.readFileSync(toolFactsPath) : null],
-    [runtimePath, fs.existsSync(runtimePath) ? fs.readFileSync(runtimePath) : null],
+    [toolFactsPath, captureBackup(toolFactsPath)],
+    [runtimePath, captureBackup(runtimePath)],
   ]);
+
   try {
     write(toolFactsPath, renderJson(toolFacts));
     write(runtimePath, renderJson(runtimeCapabilities));
@@ -552,10 +572,18 @@ function atomicWriteContained(root, filePath, contents, options = {}) {
 }
 
 function restoreFiles(root, backups) {
-  for (const [filePath, contents] of backups.entries()) {
+  for (const [filePath, backup] of backups.entries()) {
     try {
-      if (contents === null) fs.rmSync(filePath, { force: true });
-      else atomicWriteContained(root, filePath, contents);
+      if (!backup.existed) {
+        // 原本不存在，删除本次可能创建的文件
+        fs.rmSync(filePath, { force: true });
+      } else if (backup.type === 'symlink') {
+        // 原本是符号链接，保留它（不删除，因为我们没有捕获链接目标）
+        // 这避免了 SUP-22：悬空链接不会被误删
+      } else if (backup.type === 'file') {
+        // 原本是普通文件，恢复内容
+        atomicWriteContained(root, filePath, backup.content);
+      }
     } catch (_error) {
       // 恢复仅提供 best-effort 证据；调用方仍会收到失败结果。
     }

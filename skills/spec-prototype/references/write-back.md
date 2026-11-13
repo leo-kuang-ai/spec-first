@@ -1,3 +1,5 @@
 # Write-back
 
 Only write back after a human has experienced the prototype and selected a direction. Preserve the existing Product Contract or related plan as the owning artifact; add the decision and prototype evidence without copying throwaway implementation code. If no choice was made, keep the run as an unresolved input and recommend returning to `spec-brainstorm` or `spec-plan`.
+
+Every write-back carries its freshness anchors: the owning source reference (plan/contract path plus a verifiable version marker — snapshot hash or content digest), the artifact version the human actually experienced, requested adjustments not yet in the artifact, and the storage/applicability limits of the throwaway run (ephemeral storage may vanish; same-name edits cannot be confirmed from the artifact alone). State the reconfirmation condition: when the owning source or the product code the question was drawn from has materially changed, the recorded decision must be re-confirmed against the new state before being cited as current.

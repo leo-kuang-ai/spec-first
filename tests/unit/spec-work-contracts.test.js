@@ -3,7 +3,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const skill = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-work/SKILL.md'), 'utf8');
+const skill = ['SKILL.md', 'references/input-triage.md', 'references/workspace-setup.md', 'references/work-intake.md', 'references/implementation-loop.md', 'references/return-to-caller.md']
+  .map(file => fs.readFileSync(path.resolve(__dirname, '../../skills/spec-work', file), 'utf8')).join('\n');
 const shipping = fs.readFileSync(
   path.resolve(__dirname, '../../skills/spec-work/references/shipping-workflow.md'),
   'utf8',
@@ -14,6 +15,41 @@ const engines = fs.readFileSync(
 );
 
 describe('spec-work current contracts', () => {
+  test('keeps mechanical review exceptions separate from evidence and lifecycle closeout', () => {
+    const entry = skill.slice(0, skill.indexOf('## Reference Trigger Map'));
+    expect(entry).toContain('Skipping simplify or independent review does not waive evidence closeout');
+    expect(entry).toContain('verification-run-summary');
+    expect(entry).toContain('honest-closeout');
+    expect(entry).toContain('plan-status complete');
+    expect(entry).toContain('never rewrites the historical plan');
+    expect(skill).toContain('A non-behavior no-test exception explains why automated tests are unnecessary');
+    expect(skill).not.toContain('or a deliberate non-behavior exception');
+  });
+
+  test('returns authorized historical completion to the plan owner and repeats intake', () => {
+    expect(skill).toContain('current user explicitly requests completion of the historical plan');
+    expect(skill).toContain('repeat full intake');
+    expect(skill).toContain('Preserve the old plan and old task-pack pins');
+    const intake = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-work/references/work-intake-and-task-pack.md'), 'utf8');
+    expect(intake).toContain('旧 pins 不得重绑');
+    expect(intake).toContain('再从 intake 接续');
+    const validation = intake.slice(intake.indexOf('## Fallback'), intake.indexOf('## 2. Replay'));
+    expect(validation).toContain('执行第 1 节的 plan owner 接续分支');
+    expect(validation).toContain('task-pack-source-plan-non-active');
+    expect(validation).toContain('该交接不视为 validation 成功');
+    expect(validation).toContain('不从非法任务包猜测 source path');
+    const producer = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-write-tasks/SKILL.md'), 'utf8');
+    expect(producer).toContain('owner 返回有效后继后才');
+  });
+
+  test('clarification answers resolve the question without another approval loop', () => {
+    expect(skill).toContain('material ambiguity');
+    expect(skill).toContain('Explicit clarification answers take effect directly');
+    expect(skill).toContain('without another approval of the same answer');
+    expect(skill).toContain('new incompatible choice or material side effect');
+    expect(skill).not.toContain('get user approval on the resolved answers');
+  });
+
   test('gates execution on implementation-ready code plans', () => {
     expect(skill).toContain('artifact_readiness: implementation-ready');
     expect(skill).toContain('execution: code');

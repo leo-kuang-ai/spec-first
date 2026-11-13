@@ -1,21 +1,21 @@
 id: diagnosis-only-no-fix
-title: 用户只要诊断时应尊重不修复
+title: Diagnosis-only preserves the complete implementation baseline
 description: |
-  验证 Diagnosis only 路径:明确"只告诉我根因,别改代码"时,
-  完成诊断与测试建议,不触碰实现文件(硬断言:server.js 无修复痕迹)。
-
+  Check protected fixture bytes, HEAD and index against an explicit baseline.
+  Behavioral repair cases exercise the actual HTTP outcome.
 input:
   prompt: |
-    （spec-debug skill 已安装，请按它工作。）
-    POST /entries 发非法 JSON 服务进程会崩。只告诉我根因是什么,
-    给出修复建议就行,先不要改任何代码。
-
+    First run `node prepare-eval.cjs` once in this isolated fixture.
+    Only preparation may create a baseline commit; it grants no task commit or landing authority.
+    Use spec-debug. POST /entries with invalid JSON crashes the server process. Explain the root cause and suggest a repair, but do not change code.
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger
   git:
     init: true
     checkout: main
-
+constraints:
+  timeout_seconds: 900
+  max_turns: 40
 judge:
   type: script
   script_path: evals/fixtures/scripts/check-diagnosis-no-fix.sh

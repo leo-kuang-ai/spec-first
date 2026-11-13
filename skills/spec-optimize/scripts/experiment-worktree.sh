@@ -6,8 +6,8 @@
 #
 # Usage:
 #   experiment-worktree.sh create [--copy-env] <spec_name> <exp_index> <base_branch> [shared_file ...]
-#   experiment-worktree.sh cleanup <spec_name> <exp_index>
-#   experiment-worktree.sh cleanup-all <spec_name>
+#   experiment-worktree.sh cleanup [--discard] <spec_name> <exp_index>
+#   experiment-worktree.sh cleanup-all [--discard] <spec_name>
 #   experiment-worktree.sh count
 #
 # Worktrees are created at: .worktrees/optimize-<spec>-exp-<NNN>/
@@ -62,32 +62,63 @@ is_registered_worktree() {
   '
 }
 
-is_branch_checked_out() {
-  local branch_name="${1:?Error: branch_name required}"
-  local branch_ref="refs/heads/$branch_name"
-
-  git worktree list --porcelain | awk -v target="$branch_ref" '
-    $1 == "branch" && $2 == target { found = 1 }
-    END { exit(found ? 0 : 1) }
-  '
+# Store ownership in worktree-specific Git metadata, outside tracked checkout content.
+experiment_manifest() {
+  local mode="$1" worktree_path="$2" branch_name="$3" base_sha="${4:-}"
+  local git_dir common_dir root_common
+  git_dir=$(git -C "$worktree_path" rev-parse --absolute-git-dir)
+  common_dir=$(git -C "$worktree_path" rev-parse --git-common-dir)
+  root_common=$(git rev-parse --git-common-dir)
+  [[ "$(realpath_existing "$common_dir")" == "$(realpath_existing "$root_common")" ]] || return 1
+  node - "$mode" "$git_dir/spec-first-optimize-owner.json" "$GIT_ROOT" "$worktree_path" "$branch_name" "$base_sha" <<'NODE'
+const fs = require('node:fs');
+const [mode, file, root, target, branch, base] = process.argv.slice(2);
+const identity = { version: 1, repo: fs.realpathSync(root), worktree: fs.realpathSync(target), branch };
+try {
+  if (mode === 'create') {
+    fs.writeFileSync(file, JSON.stringify({ ...identity, base_sha: base }) + '\n', { flag: 'wx', mode: 0o600 });
+  } else {
+    const stat = fs.lstatSync(file);
+    if (!stat.isFile() || stat.isSymbolicLink()) throw new Error('invalid ownership file');
+    const record = JSON.parse(fs.readFileSync(file, 'utf8'));
+    if (Object.keys(identity).some(key => record[key] !== identity[key]) || !/^[a-f0-9]{40,64}$/.test(record.base_sha)) {
+      throw new Error('ownership identity mismatch');
+    }
+    process.stdout.write(record.base_sha);
+  }
+} catch (error) {
+  console.error(`Error: experiment ownership unavailable: ${error.message}`);
+  process.exitCode = 1;
+}
+NODE
 }
 
-reset_worktree_to_base() {
-  local worktree_path="${1:?Error: worktree_path required}"
-  local branch_name="${2:?Error: branch_name required}"
-  local base_branch="${3:?Error: base_branch required}"
-  local current_branch
-
-  current_branch=$(git -C "$worktree_path" symbolic-ref --quiet --short HEAD 2>/dev/null || true)
-  if [[ "$current_branch" != "$branch_name" ]]; then
-    echo -e "${RED}Error: Existing worktree is on unexpected branch: ${current_branch:-detached} (expected $branch_name)${NC}" >&2
-    echo -e "${RED}Clean up the stale worktree before rerunning this experiment.${NC}" >&2
+assert_worktree_container() {
+  if [[ -L "$WORKTREE_DIR" || ( -e "$WORKTREE_DIR" && ! -d "$WORKTREE_DIR" ) ]]; then
+    echo 'Error: .worktrees must be an owned directory, not a symlink or file' >&2
     return 1
   fi
+}
 
-  echo -e "${YELLOW}Resetting existing experiment worktree to base: $branch_name -> $base_branch${NC}" >&2
-  git -C "$worktree_path" reset --hard "$base_branch" >/dev/null
-  git -C "$worktree_path" clean -fdx >/dev/null
+assert_owned_worktree() {
+  local worktree_path="$1" branch_name="$2"
+  [[ ! -L "$worktree_path" ]] || { echo 'Error: symlink worktree is not owned' >&2; return 1; }
+  is_registered_worktree "$worktree_path" || { echo 'Error: path is not a registered experiment worktree' >&2; return 1; }
+  assert_cleanup_target_within_worktrees "$worktree_path" || return 1
+  [[ "$(git -C "$worktree_path" symbolic-ref --quiet --short HEAD)" == "$branch_name" ]] || {
+    echo 'Error: experiment branch identity changed' >&2; return 1;
+  }
+  experiment_manifest read "$worktree_path" "$branch_name"
+}
+
+assert_pristine_experiment() {
+  local worktree_path="$1" base_sha="$2" current_head worktree_status
+  current_head=$(git -C "$worktree_path" rev-parse HEAD) || return 1
+  worktree_status=$(git -C "$worktree_path" status --porcelain=v1 --untracked-files=all --ignored) || return 1
+  if [[ "$current_head" != "$base_sha" || -n "$worktree_status" ]]; then
+    echo 'Error: experiment contains commits or working files; preserve them, or explicitly cleanup --discard after retaining evidence' >&2
+    return 1
+  fi
 }
 
 realpath_existing() {
@@ -97,7 +128,38 @@ realpath_existing() {
 
 realpath_for_new_path() {
   local path="${1:?Error: path required}"
-  node -e 'const fs = require("fs"); const path = require("path"); const target = process.argv[1]; const dir = fs.realpathSync(path.dirname(target)); console.log(path.join(dir, path.basename(target)));' "$path"
+  # 目标及其中间目录可能尚不存在（SUP-02：containment 校验要先于 mkdir）。解析最深的已存在祖先，
+  # 拼接剩余段；缺少的段若本身是（悬空）符号链接，则跟随一次后继续解析，避免链接指向边界外时被误判为安全。
+  node -e '
+const fs = require("fs");
+const path = require("path");
+
+function resolveTarget(target, depth) {
+  if (depth > 40) throw new Error("symlink chain too deep: " + target);
+  let base = path.resolve(target);
+  const tail = [];
+  for (;;) {
+    try {
+      return path.join(fs.realpathSync(base), ...tail.reverse());
+    } catch (error) {
+      if (error.code !== "ENOENT") throw error;
+      let stat = null;
+      try { stat = fs.lstatSync(base); } catch (_) { stat = null; }
+      if (stat && stat.isSymbolicLink()) {
+        const link = fs.readlinkSync(base);
+        const next = path.isAbsolute(link) ? link : path.join(path.dirname(base), link);
+        return resolveTarget(path.join(next, ...tail.reverse()), depth + 1);
+      }
+      const parent = path.dirname(base);
+      if (parent === base) return path.join(base, ...tail.reverse());
+      tail.push(path.basename(base));
+      base = parent;
+    }
+  }
+}
+
+console.log(resolveTarget(process.argv[1], 0));
+' "$path"
 }
 
 path_within() {
@@ -352,12 +414,14 @@ copy_shared_file() {
   reject_secret_denied_tree "$source_real" "$root_real"
 
   dest_dir=$(dirname "$dest_path")
-  mkdir -p "$dest_dir"
+  # SUP-02 fix: verify containment BEFORE creating any directories
   dest_real=$(realpath_for_new_path "$dest_path")
   if ! path_within "$dest_real" "$worktree_real"; then
     echo -e "${RED}Error: shared_file destination resolves outside experiment worktree: $shared_file${NC}" >&2
     return 1
   fi
+
+  mkdir -p "$dest_dir"
 
   if [[ -f "$source_real" ]]; then
     rm -rf "$dest_real"
@@ -389,39 +453,26 @@ create_worktree() {
   branch_name=$(experiment_branch_name "$spec_name" "$padded_index")
   local worktree_path="$WORKTREE_DIR/$worktree_name"
 
-  # Check if worktree already exists
-  if [[ -d "$worktree_path" ]]; then
-    if ! git -C "$worktree_path" rev-parse --is-inside-work-tree >/dev/null 2>&1 || \
-       ! is_registered_worktree "$worktree_path"; then
-      echo -e "${RED}Error: Existing path is not a valid registered git worktree: $worktree_path${NC}" >&2
-      echo -e "${RED}Remove or repair that directory before rerunning the experiment.${NC}" >&2
-      return 1
-    fi
-
+  assert_worktree_container
+  local base_sha owned_base
+  base_sha=$(git rev-parse --verify --end-of-options "$base_branch^{commit}")
+  if [[ -e "$worktree_path" || -L "$worktree_path" ]]; then
+    owned_base=$(assert_owned_worktree "$worktree_path" "$branch_name")
+    [[ "$owned_base" == "$base_sha" ]] || { echo 'Error: experiment base changed; use a new index' >&2; return 1; }
+    assert_pristine_experiment "$worktree_path" "$owned_base"
     echo -e "${YELLOW}Worktree already exists: $worktree_path${NC}" >&2
-    reset_worktree_to_base "$worktree_path" "$branch_name" "$base_branch"
-  else
-    mkdir -p "$WORKTREE_DIR"
-    ensure_worktree_exclude
-
-    # Create worktree from the base branch
-    if ! git worktree add -b "$branch_name" "$worktree_path" "$base_branch" --quiet 2>/dev/null; then
-      if git show-ref --verify --quiet "refs/heads/$branch_name"; then
-        if is_branch_checked_out "$branch_name"; then
-          echo -e "${RED}Error: Existing experiment branch is already checked out: $branch_name${NC}" >&2
-          echo -e "${RED}Clean up the stale worktree before rerunning this experiment.${NC}" >&2
-          return 1
-        fi
-
-        echo -e "${YELLOW}Resetting existing experiment branch to base: $branch_name -> $base_branch${NC}" >&2
-        git branch -f "$branch_name" "$base_branch" >/dev/null
-        git worktree add "$worktree_path" "$branch_name" --quiet
-      else
-        echo -e "${RED}Error: Failed to create worktree for $branch_name from $base_branch${NC}" >&2
-        return 1
-      fi
-    fi
+    # Idempotent create never resets, cleans, or overwrites shared/env files.
+    echo "$worktree_path"
+    return 0
   fi
+  if git show-ref --verify --quiet "refs/heads/$branch_name"; then
+    echo "Error: existing experiment branch is not owned by this create: $branch_name" >&2
+    return 1
+  fi
+  mkdir -p "$WORKTREE_DIR"
+  ensure_worktree_exclude
+  git worktree add -b "$branch_name" --quiet "$worktree_path" "$base_sha"
+  experiment_manifest create "$worktree_path" "$branch_name" "$base_sha"
 
   if [[ "$copy_env" == "true" ]]; then
     copy_env_files "$worktree_path"
@@ -439,80 +490,67 @@ create_worktree() {
 
 # 清理单个 experiment worktree。
 cleanup_worktree() {
+  local discard="false"
+  if [[ "${1:-}" == "--discard" ]]; then discard="true"; shift; fi
   local spec_name="${1:?Error: spec_name required}"
   local exp_index="${2:?Error: exp_index required}"
   validate_safe_spec_name "$spec_name"
-
-  local padded_index
+  local padded_index branch_name worktree_name worktree_path owned_base
   padded_index=$(normalize_experiment_index "$exp_index")
-  local worktree_name="optimize-${spec_name}-exp-${padded_index}"
-  local branch_name
+  worktree_name="optimize-${spec_name}-exp-${padded_index}"
   branch_name=$(experiment_branch_name "$spec_name" "$padded_index")
-  local worktree_path="$WORKTREE_DIR/$worktree_name"
-
-  if [[ -d "$worktree_path" ]]; then
-    assert_cleanup_target_within_worktrees "$worktree_path"
-    git worktree remove "$worktree_path" --force 2>/dev/null || {
-      # If worktree remove fails, try manual cleanup
-      rm -rf "$worktree_path" 2>/dev/null || true
-      git worktree prune 2>/dev/null || true
-    }
+  worktree_path="$WORKTREE_DIR/$worktree_name"
+  assert_worktree_container || return 1
+  if [[ ! -e "$worktree_path" && ! -L "$worktree_path" ]]; then
+    if git show-ref --verify --quiet "refs/heads/$branch_name"; then
+      echo 'Error: branch without worktree ownership; refusing deletion' >&2
+      return 1
+    fi
+    echo "Cleaned up: $worktree_name (already absent)" >&2
+    return 0
   fi
-
-  # Delete the experiment branch
-  git branch -D "$branch_name" 2>/dev/null || true
-
+  owned_base=$(assert_owned_worktree "$worktree_path" "$branch_name") || return 1
+  if [[ "$discard" != "true" ]]; then
+    assert_pristine_experiment "$worktree_path" "$owned_base" || return 1
+    git worktree remove "$worktree_path" || return 1
+  else
+    git worktree remove --force "$worktree_path" || return 1
+  fi
+  git branch -D "$branch_name" >&2 || return 1
   echo -e "${GREEN}Cleaned up: $worktree_name${NC}" >&2
 }
 
-# Clean up all experiment worktrees for a spec
 cleanup_all() {
+  local discard="false"
+  if [[ "${1:-}" == "--discard" ]]; then discard="true"; shift; fi
   local spec_name="${1:?Error: spec_name required}"
   validate_safe_spec_name "$spec_name"
-  local prefix="optimize-${spec_name}-exp-"
-  local count=0
-
-  if [[ ! -d "$WORKTREE_DIR" ]]; then
-    echo -e "${YELLOW}No worktrees directory found${NC}" >&2
-    return 0
-  fi
-  local git_root_real worktree_dir_real
-  git_root_real=$(realpath_existing "$GIT_ROOT")
-  worktree_dir_real=$(realpath_existing "$WORKTREE_DIR")
-  if ! path_within "$worktree_dir_real" "$git_root_real"; then
-    echo -e "${RED}Error: .worktrees escapes the git root; refusing cleanup.${NC}" >&2
-    return 1
-  fi
-
-  for worktree_path in "$WORKTREE_DIR"/${prefix}*; do
-    if [[ -d "$worktree_path" ]]; then
-      assert_cleanup_target_within_worktrees "$worktree_path"
-      local worktree_name
-      worktree_name=$(basename "$worktree_path")
-      # Extract index from name
-      local index_str="${worktree_name#$prefix}"
-
-      git worktree remove "$worktree_path" --force 2>/dev/null || {
-        rm -rf "$worktree_path" 2>/dev/null || true
-      }
-
-      # Delete the branch
-      local branch_name
-      branch_name=$(experiment_branch_name "$spec_name" "$index_str")
-      git branch -D "$branch_name" 2>/dev/null || true
-
+  assert_worktree_container || return 1
+  local prefix="optimize-${spec_name}-exp-" count=0 failed=0
+  local worktree_path worktree_name index_str
+  for worktree_path in "$WORKTREE_DIR"/"$prefix"*; do
+    [[ -e "$worktree_path" || -L "$worktree_path" ]] || continue
+    worktree_name=$(basename "$worktree_path")
+    index_str="${worktree_name#$prefix}"
+    if [[ ! "$index_str" =~ ^[0-9]{3}$ ]]; then
+      echo "Error: unowned experiment-like path preserved: $worktree_path" >&2
+      failed=1
+      continue
+    fi
+    local result=0
+    if [[ "$discard" == "true" ]]; then
+      cleanup_worktree --discard "$spec_name" "$index_str" || result=$?
+    else
+      cleanup_worktree "$spec_name" "$index_str" || result=$?
+    fi
+    if [[ "$result" == 0 ]]; then
       count=$((count + 1))
+    else
+      failed=1
     fi
   done
-
-  git worktree prune 2>/dev/null || true
-
-  # Clean up empty worktree directory
-  if [[ -d "$WORKTREE_DIR" ]] && [[ -z "$(ls -A "$WORKTREE_DIR" 2>/dev/null)" ]]; then
-    rmdir "$WORKTREE_DIR" 2>/dev/null || true
-  fi
-
-  echo -e "${GREEN}Cleaned up $count experiment worktree(s) for $spec_name${NC}" >&2
+  echo "Cleaned up $count experiment worktree(s) for $spec_name" >&2
+  return "$failed"
 }
 
 # Count total worktrees (for budget check)
@@ -554,14 +592,14 @@ Experiment Worktree Manager
 
 Usage:
   experiment-worktree.sh create [--copy-env] <spec_name> <exp_index> <base_branch> [shared_file ...]
-  experiment-worktree.sh cleanup <spec_name> <exp_index>
-  experiment-worktree.sh cleanup-all <spec_name>
+  experiment-worktree.sh cleanup [--discard] <spec_name> <exp_index>
+  experiment-worktree.sh cleanup-all [--discard] <spec_name>
   experiment-worktree.sh count
 
 Commands:
   create       Create an experiment worktree with copied shared files; .env* copy requires --copy-env
-  cleanup      Remove a single experiment worktree and its branch
-  cleanup-all  Remove all experiment worktrees for a spec
+  cleanup      Remove an owned pristine experiment; --discard explicitly permits dropping its changes
+  cleanup-all  Remove owned experiments for a spec; preserve unknown paths and report failure
   count        Count total active worktrees (for budget checking)
 
 Worktrees:  .worktrees/optimize-<spec>-exp-<NNN>/

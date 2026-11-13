@@ -82,7 +82,11 @@ Cap 10 modules. If >10, group by top-level dir; if a group has >5 sub-modules, e
 ### Finish
 After each page is written, flip its manifest entry `pending`→`generated` (interrupt-safe). When all done, set `generation_status:"complete"`. Then run Phase 3 (Validate) with wiki path swap: replace `docs/` with `wiki/` (`ls wiki/*.md wiki/modules/*.md 2>/dev/null`), use maxLoc 300. Output: `✓ Wiki: [N] modules, [M] pages generated`.
 
-## Iteration Loop (init/update/check modes)
+## Check Mode and --no-fix
+
+`check` and `--no-fix` validate existing documentation without changing the reviewed documents, generating replacement pages, staging or committing. Capture document bytes and index state before checking and compare them afterward. Run only read-only validation commands; write findings to the run's report directory. Skip Generate/Update and Fix entirely. Missing or stale documentation is a finding, not permission to repair it. This branch also precedes Wiki generation when `--no-fix` is present.
+
+## Iteration Loop (init/update modes)
 
 ### Phase 1: Scout
 - Scan for documentation gaps
@@ -101,7 +105,7 @@ After each page is written, flip its manifest entry `pending`→`generated` (int
 
 ### Phase 4: Fix (unless --no-fix)
 - If validation finds issues → fix the doc
-- Commit clean doc: `docs: document {file/module}`
+- A verified document may be committed only through the owning workflow and `spec-commit` with explicit commit authorization and run-owned path/hunk isolation; otherwise leave it uncommitted.
 
 ### Phase 5: Log
 Append to TSV: iteration, timestamp, file_documented, validation_status, issues_found, issues_fixed, description

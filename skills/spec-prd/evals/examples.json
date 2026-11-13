@@ -606,14 +606,14 @@
         "failure",
         "readiness-fail"
       ],
-      "input_shape": "PRD has unresolved load-bearing WHAT but omits Outstanding/Planning Recheck, omits write_mode/clarification_evidence/can_enter_spec-plan, and returns ready-for-planning",
+      "input_shape": "PRD has unresolved load-bearing WHAT but omits Outstanding/Planning Recheck, omits write_mode/clarification_evidence/can_enter_spec_plan, and returns ready-for-planning",
       "expected": [
         "core readiness declarations are required for PRD artifacts or ready-for-planning outputs",
         "checker reports missing declaration findings even when Outstanding/Planning Recheck sections are absent"
       ],
       "must_not": [
         "must not avoid checker findings by omitting Outstanding Questions and Planning Recheck",
-        "must not mark ready-for-planning without valid write_mode, clarification_evidence, and can_enter_spec-plan declarations"
+        "must not mark ready-for-planning without valid write_mode, clarification_evidence, and can_enter_spec_plan declarations"
       ],
       "coverage_tags": [
         "readiness",
@@ -2646,7 +2646,7 @@
         "status updates remain short and evidence-aware, naming the active gap, source claim, owner question, PRD write target, or finalize fact",
         "evidence wording labels source-candidate, assumption, external-research, degraded, and checker-owned facts instead of saying 口径已明确",
         "compact Decision Card (write_mode, highest_risk_gap, next_action, why planning will not invent WHAT) must be emitted before durable PRD Write",
-        "checkpoint-prd is non-ready recovery with can_enter_spec-plan: no and next_owner_question, not a planning recommendation",
+        "checkpoint-prd is non-ready recovery with can_enter_spec_plan: no and next_owner_question, not a planning recommendation",
         "closeout reports finalize/checker finding count, blocking reason_codes, receipt status, and readiness_outcome",
         "script-owned facts stay separate from LLM-owned readiness judgment"
       ],

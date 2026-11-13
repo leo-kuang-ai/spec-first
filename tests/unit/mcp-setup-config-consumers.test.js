@@ -22,6 +22,9 @@ const {
   LOCAL_CONFIG_CONSUMERS,
 } = require('../../skills/spec-runtime-setup/scripts/lib/project-config.cjs');
 const localizationProducer = require('../../scripts/check-ce-localization-review.cjs');
+const Ajv2020 = require('ajv/dist/2020');
+const addFormats = require('ajv-formats');
+const { buildInvocationReceipt } = require('../../skills/spec-runtime-setup/scripts/lib/host-authority.cjs');
 
 const repoRoot = path.resolve(__dirname, '../..');
 
@@ -57,6 +60,13 @@ describe('spec-runtime-setup active config consumers', () => {
     }
   });
 
+  test('每个已注册 local key 都有注释示例且模板不激活设置', () => {
+    const template = read('skills/spec-runtime-setup/references/config-template.yaml');
+    const documented = [...template.matchAll(/^# ([a-z][a-z0-9_]*):/gm)].map((match) => match[1]);
+    expect([...new Set(documented)].sort()).toEqual(Object.keys(LOCAL_CONFIG_CONSUMERS).sort());
+    expect(template).not.toMatch(/^[a-z][a-z0-9_]*:/m);
+  });
+
   test('documents every active Product Pulse scheduling key', () => {
     const template = read('skills/spec-runtime-setup/references/config-template.yaml');
     const pulse = read('skills/spec-product-pulse/SKILL.md');
@@ -69,9 +79,9 @@ describe('spec-runtime-setup active config consumers', () => {
   test('classifies every document rendering output key by its active workflow consumer', () => {
     const setup = read('skills/spec-runtime-setup/SKILL.md');
     const template = read('skills/spec-runtime-setup/references/config-template.yaml');
-    const plan = read('skills/spec-plan/SKILL.md');
-    const brainstorm = read('skills/spec-brainstorm/SKILL.md');
-    const ideate = read('skills/spec-ideate/SKILL.md');
+    const plan = read('skills/spec-plan/references/output-mode.md');
+    const brainstorm = read('skills/spec-brainstorm/references/output-mode.md');
+    const ideate = read('skills/spec-ideate/references/output-mode.md');
 
     expect(plan).toContain('active (non-commented)** `plan_output:`');
     expect(brainstorm).toContain('active (non-commented)** `brainstorm_output:`');
@@ -101,13 +111,13 @@ describe('spec-runtime-setup active config consumers', () => {
 });
 
 describe('spec-runtime-setup active Node consumers', () => {
-  test('loads helper metadata from setup-registry v9 without jq', () => {
+  test('loads helper metadata from setup-registry v11 without jq', () => {
     const registry = loadRegistry({ skillRoot: path.join(repoRoot, 'skills', 'spec-runtime-setup') });
-    expect(registry.schema_version).toBe('setup-registry.v10');
+    expect(registry.schema_version).toBe('setup-registry.v11');
     expect(registry.helpers.map((entry) => entry.id)).not.toContain('jq');
 
     const helpers = new Map(registry.helpers.map((entry) => [entry.id, entry]));
-    expect(helpers.get('gh')).toMatchObject({ id: 'gh', baseline_blocking: true });
+    expect(helpers.get('gh')).toMatchObject({ id: 'gh', baseline_blocking: false, readiness_policy: 'workflow-required' });
     for (const platform of ['macos', 'linux', 'windows']) {
       expect(getEffectiveEntry(registry, {
         kind: 'helper',
@@ -166,11 +176,18 @@ describe('spec-runtime-setup active Node consumers', () => {
       expect(effective.tools.find((entry) => entry.id === 'context7').host_config.targets)
         .toBeDefined();
     }
-    // setup-registry 覆盖面是受支持宿主的有意子集：pi 无原生 MCP 支持，
-    // MCP_SETUP_HOST=pi 保持不支持，registry 不得新增 pi 定义（计划 KTD5；
-    // 仅当 pi MCP 官方化时重评）。
+    // setup-registry 覆盖面与受支持宿主一致。pi 曾按 pi-host-support 计划 KTD5
+    // （2026-09-04）被有意排除——当时 MCP 仅 extension 生态且配置面未文档化；
+    // 2026-09-11 owner 决策推翻 KTD5 接入 pi：pi.dev 官方 registry 的
+    // pi-mcp-extension 已文档化 `.pi/mcp.json`（项目）/`~/.pi/agent/mcp.json`
+    // （全局）配置面与 `mcpServers` 容器，setup 据此写入（扩展未装时配置 inert，
+    // 见 SKILL.md 前置说明）。pi 核心原生 MCP 出现时按原生面重评。
     expect(getSupportedPlatforms().filter((platform) => !registryHosts.includes(platform)))
-      .toEqual(['pi']);
+      .toEqual([]);
+    // 反向：setup 侧手工宿主清单不得出现 registry 已退役/拼错的宿主（⊆ 关系）。
+    // pi 的排除是 KTD5 的有意子集，只约束方向不强制全集。
+    const { CANONICAL_HOSTS } = require('../../skills/spec-runtime-setup/scripts/lib/host-authority.cjs');
+    expect(CANONICAL_HOSTS.filter((host) => !getSupportedPlatforms().includes(host))).toEqual([]);
   });
 
   test('host-authority surfaces stay bound to every setup host projection root', () => {
@@ -197,14 +214,14 @@ describe('spec-runtime-setup active Node consumers', () => {
       }
     }
 
-    // 共享面语义：.agents/skills 同时确认 codex 与 zcode。
+    // 共享面语义：.agents/skills 同时确认 codex、zcode 与 pi。
     const sharedRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-surface-guard-'));
     const sharedSkillRoot = path.join(sharedRoot, '.agents', 'skills', 'spec-runtime-setup');
     fs.mkdirSync(sharedSkillRoot, { recursive: true });
     const loaded = resolveLoadedHostSurface(sharedSkillRoot);
     expect(loaded).toMatchObject({
       surface_id: '.agents/skills',
-      hosts: ['codex', 'zcode'],
+      hosts: ['codex', 'zcode', 'pi'],
     });
 
     // receipt schema 的 host enum 必须与 CANONICAL_HOSTS 同步
@@ -218,10 +235,10 @@ describe('spec-runtime-setup active Node consumers', () => {
     const dependency = {
       ecosystem: 'pypi',
       package: 'graphifyy',
-      version: '0.9.29',
+      version: '0.9.57',
       distribution: {
-        wheel_url: 'https://files.pythonhosted.org/packages/f1/b1/0cbe4738ca9784850d40aae0d71c34547230e0445e52067f98b8d0b6c070/graphifyy-0.9.29-py3-none-any.whl',
-        sha256: '143f4002f40d5c302ae43bd58487ad604191f2d0ac8216429894c6a913ecf27b',
+        wheel_url: 'https://files.pythonhosted.org/packages/c8/c2/d1ce4a567a5bf4c36054cede2c70f745a239ed5080b70d7934c5c738b583/graphifyy-0.9.57-py3-none-any.whl',
+        sha256: 'f35c86410e7d92ace69a50ac8dbed568903c880482c656f43437ca657fee8c37',
         index_url: 'https://pypi.org/simple',
       },
     };
@@ -240,11 +257,37 @@ describe('spec-runtime-setup active Node consumers', () => {
         continue;
       }
       const installSkill = plan.actions.find((entry) => entry.kind === 'install-project-skill');
+      const expectedPlatform = host === 'zcode' || host === 'pi' ? 'agents' : host;
       expect(installSkill).toMatchObject({
         command: 'graphify',
-        args: ['install', '--project', '--platform', host],
+        args: ['install', '--project', '--platform', expectedPlatform],
       });
     }
+  });
+
+  test('validates producer receipts including shared-host surface_hosts', () => {
+    const schema = JSON.parse(read('docs/contracts/verification/host-invocation-receipt.schema.json'));
+    const ajv = new Ajv2020({ allErrors: true, strict: true });
+    addFormats(ajv);
+    const validate = ajv.compile(schema);
+    const receipt = buildInvocationReceipt({
+      host: 'pi',
+      loadedSurface: {
+        host: 'codex',
+        hosts: ['codex', 'zcode', 'pi'],
+        surface_id: '.agents/skills',
+        skill_root: '/tmp/.agents/skills/spec-runtime-setup',
+      },
+      skillRoot: '/tmp/.agents/skills/spec-runtime-setup',
+      targetIdentity: '/tmp/repo',
+      verificationStatus: 'confirmed',
+      reasonCode: 'host-authority-loaded-root-bound',
+      now: new Date('2026-09-21T10:00:00Z'),
+    });
+    expect(validate(receipt)).toBe(true);
+    expect(receipt.surface_hosts).toEqual(['codex', 'zcode', 'pi']);
+    const duplicate = { ...receipt, surface_hosts: ['codex', 'pi', 'pi'] };
+    expect(validate(duplicate)).toBe(false);
   });
 
   test('masks only the unified Node entrypoint as comparative Claude runtime prose', () => {

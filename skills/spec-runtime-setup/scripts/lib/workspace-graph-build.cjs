@@ -44,6 +44,7 @@ function buildWorkspaceGraphs({
   refreshMode = 'explicit',
   refreshHook = null,
   deferFinalState = false,
+  executionGuard = () => null,
 } = {}) {
   const graphifyOut = path.join(workspaceRoot, GRAPHIFY_OUT_DIRNAME);
   assertContainedPath(workspaceRoot, graphifyOut, { reasonCode: 'graphify-out-escapes-workspace' });
@@ -81,8 +82,15 @@ function buildWorkspaceGraphs({
     skipped: true,
     reason_code: refreshOnly ? 'workspace-refresh-only' : null,
   };
-  if (!refreshOnly && typeof runners.codegraphInstallGlobal === 'function') {
-    globalInstall = safe(() => runners.codegraphInstallGlobal()) || { ok: false, reason_code: 'codegraph-install-threw' };
+  if (!executionGuard() && !refreshOnly) {
+    // 与 runProvider/runMerge 的 runner-missing 契约对齐(lane finding DR-018):
+    // 非 refresh 路径缺少全局安装 runner 时显式失败,不再静默视为 ready,
+    // 否则 build 可在缺少该步骤的情况下 complete,削弱可测试性保证。
+    if (typeof runners.codegraphInstallGlobal !== 'function') {
+      globalInstall = { ok: false, reason_code: 'codegraph-install-runner-missing' };
+    } else {
+      globalInstall = safe(() => runners.codegraphInstallGlobal()) || { ok: false, reason_code: 'codegraph-install-threw' };
+    }
   }
 
   const repoResults = [];
@@ -101,6 +109,12 @@ function buildWorkspaceGraphs({
       reason_code: '',
     };
 
+    if (executionGuard()) {
+      repoResult.reason_code = executionGuard();
+      repoResults.push(repoResult);
+      continue;
+    }
+
     if (refreshOnly) {
       const preserved = preservedCodegraphState(previousRepos.get(repo.repo_id));
       const cg = syncExistingCodegraph(
@@ -118,10 +132,22 @@ function buildWorkspaceGraphs({
       repoResult.codegraph_status = cg.ok ? 'ready' : 'failed';
       if (!cg.ok) repoResult.reason_code = cg.reason_code || 'codegraph-init-failed';
 
+      if (executionGuard()) {
+        repoResult.reason_code = executionGuard();
+        repoResults.push(repoResult);
+        continue;
+      }
+
       // 2. Managed exclude (only meaningful once .codegraph/ can exist; still safe to add first).
       const excl = safe(() => excludeWriter(repo.git_root, workspaceRoot)) || { ok: false, reason_code: 'exclude-threw' };
       repoResult.exclude_status = excl.ok ? 'applied' : 'failed';
       if (!excl.ok && !repoResult.reason_code) repoResult.reason_code = excl.reason_code || 'exclude-failed';
+    }
+
+    if (executionGuard()) {
+      repoResult.reason_code = executionGuard();
+      repoResults.push(repoResult);
+      continue;
     }
 
     // 3. Graphify per-child subgraph, out-of-tree.
@@ -139,7 +165,7 @@ function buildWorkspaceGraphs({
       if (!repoResult.reason_code) repoResult.reason_code = 'graphify-subgraph-escapes-workspace';
     } else {
       const gf = runProvider(runners.graphifyExtract, repo.git_root, outDir);
-      if (gf.ok) {
+      if (gf.ok && !executionGuard()) {
         const subgraphPath = gf.graphPath || path.join(outDir, GRAPHIFY_OUT_DIRNAME, 'graph.json');
         try {
           assertContainedPath(workspaceRoot, subgraphPath, { reasonCode: 'graphify-subgraph-escapes-workspace' });
@@ -181,7 +207,9 @@ function buildWorkspaceGraphs({
   const stagedMergedPath = path.join(stagingRoot, MERGED_GRAPH_BASENAME);
   let merge;
   let mergePromotion = null;
-  if (subgraphs.length === 0) {
+  if (executionGuard()) {
+    merge = { status: 'failed', reason_code: executionGuard(), merged_graph_path: null };
+  } else if (subgraphs.length === 0) {
     merge = { status: 'not-applicable', reason_code: 'no-eligible-subgraphs', merged_graph_path: null };
   } else if (subgraphs.length === 1) {
     mergePromotion = promoteMerge(runners.graphifyMerge, subgraphs, stagedMergedPath, mergedPath, workspaceRoot);
@@ -210,6 +238,7 @@ function buildWorkspaceGraphs({
     globalInstall,
     refreshOnly,
   });
+  if (executionGuard()) { outcome.status = 'partial'; outcome.reason_code = executionGuard(); }
   const sourceSnapshotCheck = inspectSourceSnapshots(initialState, repos);
   if (outcome.status === 'complete' && !sourceSnapshotCheck.stable) {
     outcome.status = 'partial';
@@ -300,20 +329,30 @@ function inspectSourceSnapshots(initialState, repos) {
 function runFreshCodegraph(fn, repoRoot, workspaceRoot) {
   const target = path.join(repoRoot, '.codegraph');
   const backup = `${target}.spec-first-previous-${process.pid}-${Date.now()}`;
+  let backupCreated = false;
+  let targetCreated = false;
+
   try {
     assertContainedPath(workspaceRoot, target, { reasonCode: 'codegraph-target-escapes-workspace' });
-    if (fs.existsSync(target)) fs.renameSync(target, backup);
+    if (fs.existsSync(target)) {
+      fs.renameSync(target, backup);
+      backupCreated = true;
+    }
     const result = runProvider(fn, repoRoot);
+    targetCreated = true;
+
     if (!result.ok || !codegraphArtifactHasContent(repoRoot, workspaceRoot)) {
       fs.rmSync(target, { recursive: true, force: true });
-      if (fs.existsSync(backup)) fs.renameSync(backup, target);
+      targetCreated = false;
+      if (backupCreated) fs.renameSync(backup, target);
       return result.ok ? { ok: false, reason_code: 'codegraph-artifact-missing' } : result;
     }
-    fs.rmSync(backup, { recursive: true, force: true });
+    if (backupCreated) fs.rmSync(backup, { recursive: true, force: true });
     return result;
   } catch (error) {
-    safe(() => fs.rmSync(target, { recursive: true, force: true }));
-    if (fs.existsSync(backup)) safe(() => fs.renameSync(backup, target));
+    // SUP-26/32 修复：只删除本次调用成功创建的 target
+    if (targetCreated) safe(() => fs.rmSync(target, { recursive: true, force: true }));
+    if (backupCreated) safe(() => fs.renameSync(backup, target));
     return { ok: false, reason_code: error.reason_code || 'codegraph-refresh-failed' };
   }
 }

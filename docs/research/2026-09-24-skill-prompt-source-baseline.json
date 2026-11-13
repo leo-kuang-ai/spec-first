@@ -1,0 +1,601 @@
+{
+  "record_type": "planning-source-snapshot",
+  "captured_at": "2026-09-24T03:52:10.641209+00:00",
+  "git_head": "45b659bc47e4d75b71a0f96acd3440076659af4b",
+  "dirty_before_plan": [
+    " M CHANGELOG.md",
+    " M docs/research/2026-09-24-ai-industry-trends-claude-prompt-shortening.md"
+  ],
+  "scope": "canonical skills/*/SKILL.md and selected source references; excludes generated mirrors and *-workspace",
+  "units": "UTF-8 bytes, Unicode characters, splitlines and whitespace words; NOT model tokens",
+  "skill_count": 38,
+  "skill_entry_bytes": 503455,
+  "skill_entry_lines": 4734,
+  "skills": [
+    {
+      "skill": "autoresearch",
+      "path": "skills/autoresearch/SKILL.md",
+      "bytes": 9653,
+      "characters": 9327,
+      "lines": 108,
+      "whitespace_words": 1284,
+      "sha256": "d51a75af36a3a41095d50a775197635c48238ed24ed6ad3eda1ef24e50f43136",
+      "reference_md_count": 4,
+      "reference_md_bytes": 18025
+    },
+    {
+      "skill": "spec-app-consistency-audit",
+      "path": "skills/spec-app-consistency-audit/SKILL.md",
+      "bytes": 19395,
+      "characters": 18869,
+      "lines": 307,
+      "whitespace_words": 2213,
+      "sha256": "0fe3e99ecba65f49ec62c1fa0bbd870f926760df966f5e68724e75b07ed0f1b4",
+      "reference_md_count": 4,
+      "reference_md_bytes": 17558
+    },
+    {
+      "skill": "spec-brainstorm",
+      "path": "skills/spec-brainstorm/SKILL.md",
+      "bytes": 8461,
+      "characters": 8459,
+      "lines": 78,
+      "whitespace_words": 1096,
+      "sha256": "d3df96643040bebb4cc003ff75f9fdb3f3dac34461abb031eab7808f82167861",
+      "reference_md_count": 18,
+      "reference_md_bytes": 189508
+    },
+    {
+      "skill": "spec-code-review",
+      "path": "skills/spec-code-review/SKILL.md",
+      "bytes": 8615,
+      "characters": 8529,
+      "lines": 76,
+      "whitespace_words": 1162,
+      "sha256": "c6f93d057756425728ba3b3e3e2e9f2b7844e0b4b6d96859c0b8cc59c0aa8486",
+      "reference_md_count": 31,
+      "reference_md_bytes": 311037
+    },
+    {
+      "skill": "spec-commit",
+      "path": "skills/spec-commit/SKILL.md",
+      "bytes": 8761,
+      "characters": 8537,
+      "lines": 121,
+      "whitespace_words": 1277,
+      "sha256": "f1cf7b8801e7d25f706af168a2acd54a864e1df4b893ff474305d415230de8b8",
+      "reference_md_count": 0,
+      "reference_md_bytes": 0
+    },
+    {
+      "skill": "spec-commit-push-pr",
+      "path": "skills/spec-commit-push-pr/SKILL.md",
+      "bytes": 9619,
+      "characters": 9619,
+      "lines": 132,
+      "whitespace_words": 1389,
+      "sha256": "caf7ac9387d1ba3355499fd8a008743d3f78322a6ecf1c4eaefbde4f0919cf93",
+      "reference_md_count": 6,
+      "reference_md_bytes": 48665
+    },
+    {
+      "skill": "spec-compound",
+      "path": "skills/spec-compound/SKILL.md",
+      "bytes": 6774,
+      "characters": 6774,
+      "lines": 61,
+      "whitespace_words": 857,
+      "sha256": "ed6fd3d4f45a86c61adbfb283aad720f6adcb7aa3d20160dac5f23e54c3947cd",
+      "reference_md_count": 19,
+      "reference_md_bytes": 129585
+    },
+    {
+      "skill": "spec-compound-refresh",
+      "path": "skills/spec-compound-refresh/SKILL.md",
+      "bytes": 14725,
+      "characters": 14627,
+      "lines": 164,
+      "whitespace_words": 1956,
+      "sha256": "b0a5dccac1b77e349fa4a99e0e83ea20857fbf992fa6fdd1d3aa5893db0b90e3",
+      "reference_md_count": 13,
+      "reference_md_bytes": 92980
+    },
+    {
+      "skill": "spec-debug",
+      "path": "skills/spec-debug/SKILL.md",
+      "bytes": 36726,
+      "characters": 36648,
+      "lines": 364,
+      "whitespace_words": 5242,
+      "sha256": "6c40fadd87dce2ad56bcf5556366a796ed1583a00c5bf53110b98164a3e2daf7",
+      "reference_md_count": 6,
+      "reference_md_bytes": 47668
+    },
+    {
+      "skill": "spec-doc-review",
+      "path": "skills/spec-doc-review/SKILL.md",
+      "bytes": 5354,
+      "characters": 5292,
+      "lines": 74,
+      "whitespace_words": 582,
+      "sha256": "c96d48de5841a1d3c2692232e54107a5eaccdf0337817dc024c2af6d958eaab0",
+      "reference_md_count": 32,
+      "reference_md_bytes": 240799
+    },
+    {
+      "skill": "spec-dogfood",
+      "path": "skills/spec-dogfood/SKILL.md",
+      "bytes": 9238,
+      "characters": 9236,
+      "lines": 99,
+      "whitespace_words": 1241,
+      "sha256": "9e5057e8670a5a9073b27e8051c0a669d759065ec1997a371d618719b2023a88",
+      "reference_md_count": 3,
+      "reference_md_bytes": 25765
+    },
+    {
+      "skill": "spec-explain",
+      "path": "skills/spec-explain/SKILL.md",
+      "bytes": 10799,
+      "characters": 10763,
+      "lines": 92,
+      "whitespace_words": 1554,
+      "sha256": "bd82dcd441b82fd5336f3ea26bc22c5e382baf1d5dfc52ccb734719db4c6e39e",
+      "reference_md_count": 7,
+      "reference_md_bytes": 21641
+    },
+    {
+      "skill": "spec-handoff",
+      "path": "skills/spec-handoff/SKILL.md",
+      "bytes": 9359,
+      "characters": 9359,
+      "lines": 99,
+      "whitespace_words": 1292,
+      "sha256": "4bc4a2e1da3aa5caa1e547c9f9d59410099823fa315c77f56c8e71ac7a5b6d6c",
+      "reference_md_count": 3,
+      "reference_md_bytes": 8230
+    },
+    {
+      "skill": "spec-ideate",
+      "path": "skills/spec-ideate/SKILL.md",
+      "bytes": 10152,
+      "characters": 10142,
+      "lines": 105,
+      "whitespace_words": 1314,
+      "sha256": "dd427fca3e50bce7dc0fc7bc573633217e696c2f8583a1215c5e571c9665f733",
+      "reference_md_count": 17,
+      "reference_md_bytes": 213479
+    },
+    {
+      "skill": "spec-lfg",
+      "path": "skills/spec-lfg/SKILL.md",
+      "bytes": 9458,
+      "characters": 9446,
+      "lines": 81,
+      "whitespace_words": 1195,
+      "sha256": "6bd097a450c07fa97dc543d15f53fbfc17a5aa6a9c4661054b97a3bcc89ecaa7",
+      "reference_md_count": 9,
+      "reference_md_bytes": 59164
+    },
+    {
+      "skill": "spec-optimize",
+      "path": "skills/spec-optimize/SKILL.md",
+      "bytes": 15776,
+      "characters": 15770,
+      "lines": 178,
+      "whitespace_words": 2004,
+      "sha256": "b4a87c4520835b45cf3a8d1e0c5344267020d48ec6541542d714d68451fb0a84",
+      "reference_md_count": 11,
+      "reference_md_bytes": 102738
+    },
+    {
+      "skill": "spec-plan",
+      "path": "skills/spec-plan/SKILL.md",
+      "bytes": 18771,
+      "characters": 18757,
+      "lines": 123,
+      "whitespace_words": 2533,
+      "sha256": "bcc0e89dd04b3199a09ac16ee74a75a418fe609bd6cf6324f5c78a9d0bc9b416",
+      "reference_md_count": 36,
+      "reference_md_bytes": 435733
+    },
+    {
+      "skill": "spec-polish",
+      "path": "skills/spec-polish/SKILL.md",
+      "bytes": 7292,
+      "characters": 7230,
+      "lines": 88,
+      "whitespace_words": 961,
+      "sha256": "193735fb6913a7851160b6072d898e958f15b5bdcf211009d9ce70d5f574bd55",
+      "reference_md_count": 11,
+      "reference_md_bytes": 28829
+    },
+    {
+      "skill": "spec-pov",
+      "path": "skills/spec-pov/SKILL.md",
+      "bytes": 4989,
+      "characters": 4985,
+      "lines": 59,
+      "whitespace_words": 665,
+      "sha256": "cd51d624dfcd1d697921d740d3e9e6f9ade13d1d40e0b3be60ca6e51b37a58f9",
+      "reference_md_count": 12,
+      "reference_md_bytes": 45241
+    },
+    {
+      "skill": "spec-prd",
+      "path": "skills/spec-prd/SKILL.md",
+      "bytes": 67157,
+      "characters": 65517,
+      "lines": 345,
+      "whitespace_words": 8432,
+      "sha256": "25cc60f639d886c024a61b462c84cb101f6b95a6098984a879f2a750292e230a",
+      "reference_md_count": 9,
+      "reference_md_bytes": 167978
+    },
+    {
+      "skill": "spec-product-pulse",
+      "path": "skills/spec-product-pulse/SKILL.md",
+      "bytes": 7963,
+      "characters": 7963,
+      "lines": 92,
+      "whitespace_words": 1097,
+      "sha256": "4957802c1c1c12e74fec8257207e5e137a5b87c0a4cbfac6f38acf7caa8d597a",
+      "reference_md_count": 6,
+      "reference_md_bytes": 40568
+    },
+    {
+      "skill": "spec-project-rules",
+      "path": "skills/spec-project-rules/SKILL.md",
+      "bytes": 10731,
+      "characters": 6028,
+      "lines": 122,
+      "whitespace_words": 610,
+      "sha256": "6a980fd52f58649626bd327202d95c210d245184b0cd7f58f9fe5779e6000f87",
+      "reference_md_count": 2,
+      "reference_md_bytes": 30836
+    },
+    {
+      "skill": "spec-promote",
+      "path": "skills/spec-promote/SKILL.md",
+      "bytes": 11245,
+      "characters": 11125,
+      "lines": 140,
+      "whitespace_words": 1724,
+      "sha256": "e9f2145d1f6aacc60ed1a753bdd11789350ffbf919704e540bd29a04872a26eb",
+      "reference_md_count": 1,
+      "reference_md_bytes": 12734
+    },
+    {
+      "skill": "spec-prototype",
+      "path": "skills/spec-prototype/SKILL.md",
+      "bytes": 4839,
+      "characters": 4839,
+      "lines": 44,
+      "whitespace_words": 721,
+      "sha256": "51ee1bf5c37d0ea8bbcb3a3d228ae402de6caede717b4f88700a42582562cb22",
+      "reference_md_count": 5,
+      "reference_md_bytes": 9262
+    },
+    {
+      "skill": "spec-resolve-pr-feedback",
+      "path": "skills/spec-resolve-pr-feedback/SKILL.md",
+      "bytes": 10083,
+      "characters": 10083,
+      "lines": 126,
+      "whitespace_words": 1315,
+      "sha256": "594de7ca1be76c76a462c281879e4a0837f6e4c433d7949432e2f5e8a30c580d",
+      "reference_md_count": 6,
+      "reference_md_bytes": 45111
+    },
+    {
+      "skill": "spec-riffrec-feedback-analysis",
+      "path": "skills/spec-riffrec-feedback-analysis/SKILL.md",
+      "bytes": 5436,
+      "characters": 5050,
+      "lines": 47,
+      "whitespace_words": 611,
+      "sha256": "d577685081c41c9f6b9bdcc7eee3644b116e19dbd82ad3bef9e9f3844b304bb8",
+      "reference_md_count": 5,
+      "reference_md_bytes": 19705
+    },
+    {
+      "skill": "spec-rule-miner",
+      "path": "skills/spec-rule-miner/SKILL.md",
+      "bytes": 9100,
+      "characters": 5086,
+      "lines": 77,
+      "whitespace_words": 445,
+      "sha256": "306fc3e4cbe1a067434807b7eed1c765213fa6be357d2e3d16960f79abe434d1",
+      "reference_md_count": 2,
+      "reference_md_bytes": 10399
+    },
+    {
+      "skill": "spec-runtime-setup",
+      "path": "skills/spec-runtime-setup/SKILL.md",
+      "bytes": 58077,
+      "characters": 46191,
+      "lines": 380,
+      "whitespace_words": 5050,
+      "sha256": "cb04249d533bb6c92581cbc8c90d9ab84383d045c495fe62f8902093515b6795",
+      "reference_md_count": 2,
+      "reference_md_bytes": 19306
+    },
+    {
+      "skill": "spec-simplify-code",
+      "path": "skills/spec-simplify-code/SKILL.md",
+      "bytes": 9736,
+      "characters": 9390,
+      "lines": 90,
+      "whitespace_words": 1346,
+      "sha256": "6c23d2047993297e95b17880f2f1c0135538e86900425db646e103f9fc101b23",
+      "reference_md_count": 3,
+      "reference_md_bytes": 6305
+    },
+    {
+      "skill": "spec-strategy",
+      "path": "skills/spec-strategy/SKILL.md",
+      "bytes": 7402,
+      "characters": 7400,
+      "lines": 94,
+      "whitespace_words": 1146,
+      "sha256": "edfd4866fadfb26582068a2195f86a8c65f32626156a0f5bbce10afd265bb0f6",
+      "reference_md_count": 4,
+      "reference_md_bytes": 22189
+    },
+    {
+      "skill": "spec-sweep",
+      "path": "skills/spec-sweep/SKILL.md",
+      "bytes": 12532,
+      "characters": 12510,
+      "lines": 124,
+      "whitespace_words": 1677,
+      "sha256": "b2a87ee7f920913986c8a0a80a4f3aec988025cf25cb794f941af7570bd9d484",
+      "reference_md_count": 10,
+      "reference_md_bytes": 68251
+    },
+    {
+      "skill": "spec-test-browser",
+      "path": "skills/spec-test-browser/SKILL.md",
+      "bytes": 9896,
+      "characters": 9894,
+      "lines": 90,
+      "whitespace_words": 1239,
+      "sha256": "bfe3cdc6e9648c6cec96bbe221a8cdd37cddb322d5b489eb1eb861fab329c4db",
+      "reference_md_count": 2,
+      "reference_md_bytes": 9973
+    },
+    {
+      "skill": "spec-test-xcode",
+      "path": "skills/spec-test-xcode/SKILL.md",
+      "bytes": 3570,
+      "characters": 3570,
+      "lines": 31,
+      "whitespace_words": 478,
+      "sha256": "e9397a88ddba0144200a6595bf353d8676ab3919dceb56d77360390b5317069b",
+      "reference_md_count": 2,
+      "reference_md_bytes": 5814
+    },
+    {
+      "skill": "spec-work",
+      "path": "skills/spec-work/SKILL.md",
+      "bytes": 14749,
+      "characters": 14732,
+      "lines": 126,
+      "whitespace_words": 1868,
+      "sha256": "3a192fe50952380dcf4bf18ee73435ada13b15d44110dde8a33a8c4d0557c879",
+      "reference_md_count": 15,
+      "reference_md_bytes": 180319
+    },
+    {
+      "skill": "spec-worktree",
+      "path": "skills/spec-worktree/SKILL.md",
+      "bytes": 13182,
+      "characters": 13132,
+      "lines": 152,
+      "whitespace_words": 1748,
+      "sha256": "380139d61774f908ab6ae8cf983502d178cbace6e6d8e43a4b7587ea10cfcab6",
+      "reference_md_count": 0,
+      "reference_md_bytes": 0
+    },
+    {
+      "skill": "spec-write-skill",
+      "path": "skills/spec-write-skill/SKILL.md",
+      "bytes": 8869,
+      "characters": 6839,
+      "lines": 62,
+      "whitespace_words": 678,
+      "sha256": "73f6e1a06661d3a1b2a172800b25abca9888681d61f8abf6457fbb769c1f668d",
+      "reference_md_count": 8,
+      "reference_md_bytes": 51176
+    },
+    {
+      "skill": "spec-write-tasks",
+      "path": "skills/spec-write-tasks/SKILL.md",
+      "bytes": 10639,
+      "characters": 10362,
+      "lines": 141,
+      "whitespace_words": 1292,
+      "sha256": "ad4decabc11124b24bfe45b850ba1f4e959f86340159bb5ebdbd90bc8e04c8e2",
+      "reference_md_count": 3,
+      "reference_md_bytes": 52582
+    },
+    {
+      "skill": "using-spec-first",
+      "path": "skills/using-spec-first/SKILL.md",
+      "bytes": 4332,
+      "characters": 4044,
+      "lines": 42,
+      "whitespace_words": 527,
+      "sha256": "0621bf7aa0979a3d5829bf0535aa4d89d2e98c2778a94bfabe6563dbef4329e9",
+      "reference_md_count": 2,
+      "reference_md_bytes": 10369
+    }
+  ],
+  "source_refs": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 20083,
+      "sha256": "f4ff91a078519ebae7922b69166ba8da3115513085715e9898ca6c18eb4152c0"
+    },
+    {
+      "path": "CLAUDE.md",
+      "bytes": 19754,
+      "sha256": "f2d784df3af5c0d56ce100ebf58a629c2700fcb97c1f6da0838ef74b242f0e16"
+    },
+    {
+      "path": "benchmarks/agentic/REPORT-20260820-sonnet5-saturation.md",
+      "bytes": 12316,
+      "sha256": "13b0762673d1889ab23942018b524abc57b3555410bd4d28f957ae92e1c8f764"
+    },
+    {
+      "path": "docs/10-prompt/skill-prompt-设计与优化方法论-v2.md",
+      "bytes": 55737,
+      "sha256": "d3f6c4868a9e39fd1e45c9cbbdcccd22199b050aec2571d3809eae911bb6dd4c"
+    },
+    {
+      "path": "docs/10-prompt/spec-first-skill-prompt压缩优化组合方法论.md",
+      "bytes": 48415,
+      "sha256": "334a8b408fdd920d4f1a70e46083d803244e2b6ffd5e76741b655cf4759d1f62"
+    },
+    {
+      "path": "docs/10-prompt/结构化项目角色契约.md",
+      "bytes": 11307,
+      "sha256": "447e66b751639a36afb455380159f3b800c4a48b1189b304bed92a53a0ba0738"
+    },
+    {
+      "path": "docs/contracts/context-bundle.md",
+      "bytes": 5827,
+      "sha256": "73b1af8ac9cccbf17df68e6d745c4cdd411b18bae296b799e01e11b2118cc12c"
+    },
+    {
+      "path": "docs/contracts/context-governance.md",
+      "bytes": 14670,
+      "sha256": "8ff044344003b27ad9775ffd21a6816c9d3e19c9e1a8a9b8e55c49b36c252062"
+    },
+    {
+      "path": "scripts/sync-instruction-files.js",
+      "bytes": 5806,
+      "sha256": "e8686cfc6c0f6a21757754a7861797b1380896e7ba7540e6191364c53e2594e9"
+    },
+    {
+      "path": "skills/spec-optimize/scripts/measurement-admission.cjs",
+      "bytes": 9866,
+      "sha256": "4af1f0dfbe492193937b4317af3cb20b701e5007754296cb25b4cf498973d879"
+    },
+    {
+      "path": "skills/spec-plan/references/approach-altitude.md",
+      "bytes": 7241,
+      "sha256": "73b85aaa23ae05aa5f533b0b7fa36fd2068cc7a199d4f1a8e3621abaaa95e182"
+    },
+    {
+      "path": "skills/spec-plan/references/deepening-workflow.md",
+      "bytes": 22689,
+      "sha256": "0e696875bc418e78e4a24ce34fb8464261f00ed0b3cbfa395489f5bec6482c27"
+    },
+    {
+      "path": "skills/spec-plan/references/final-review.md",
+      "bytes": 22931,
+      "sha256": "ddb5df9397bf6fb825b02a466416ebe611fe420408d1fd225c2957be3bee69cc"
+    },
+    {
+      "path": "skills/spec-plan/references/frontend-engineering-lens.md",
+      "bytes": 4987,
+      "sha256": "f678b9f905b70ccb70933400ed2171d89184ef3f5e3bc5f88218487d9e826b8d"
+    },
+    {
+      "path": "skills/spec-plan/references/high-risk-plan-lens.md",
+      "bytes": 7734,
+      "sha256": "91eeaf3707ad896bf37066a5473754e4a762cddc75a91ecafa0f770e8e969970"
+    },
+    {
+      "path": "skills/spec-plan/references/html-rendering.md",
+      "bytes": 34875,
+      "sha256": "3a73c760bf2daea7428671862b05af8ba8a5971ed21fec2d911c484e8da44383"
+    },
+    {
+      "path": "skills/spec-plan/references/intake.md",
+      "bytes": 23730,
+      "sha256": "9e0d0e9a808cb116db84e2ca9406e1ae206da6230f7c095532a297e9f92fe6e0"
+    },
+    {
+      "path": "skills/spec-plan/references/interface-and-evolution-lens.md",
+      "bytes": 6189,
+      "sha256": "9d39c05d52bae8076a430e7b34c1c232c5cc7efa6b544a65de761d225c48b640"
+    },
+    {
+      "path": "skills/spec-plan/references/markdown-rendering.md",
+      "bytes": 10321,
+      "sha256": "1cc87b51fa1aa815249a82fe663eb23087453b77ba50070dff30f5c42c737c60"
+    },
+    {
+      "path": "skills/spec-plan/references/output-contracts.md",
+      "bytes": 2896,
+      "sha256": "adb91af964f51938dbdd768f5c93a2364b97b454bcfb2c303481d28cda55b83c"
+    },
+    {
+      "path": "skills/spec-plan/references/output-mode.md",
+      "bytes": 6995,
+      "sha256": "cf7cad35c001153e0e35352f9ce4ad654f2343500fa954ca0b156eb54ac98fba"
+    },
+    {
+      "path": "skills/spec-plan/references/plan-handoff.md",
+      "bytes": 25437,
+      "sha256": "103e4d205215a2b4fdfd05118c782bc497feec5b680dd57204184519f020ebc8"
+    },
+    {
+      "path": "skills/spec-plan/references/plan-sections.md",
+      "bytes": 27441,
+      "sha256": "b68cc6795e7e6ee688cd0f450712715693b74dcd14702eb1a70c83abb207e630"
+    },
+    {
+      "path": "skills/spec-plan/references/planning-evidence-boundaries.md",
+      "bytes": 8047,
+      "sha256": "3147727567747f35055f3f64c2cadb345f1892019736524a3cf1e0710b0212f5"
+    },
+    {
+      "path": "skills/spec-plan/references/research.md",
+      "bytes": 21014,
+      "sha256": "fd31807f2f68dadc00ebac2b8165be9dc6b9fc34c6fe6298b800bcf208d42444"
+    },
+    {
+      "path": "skills/spec-plan/references/resume.md",
+      "bytes": 13051,
+      "sha256": "6c0af1102219eb9fba48a615545f2fe494625b510c3d516608c340cfb5e7ef70"
+    },
+    {
+      "path": "skills/spec-plan/references/settled-decisions.md",
+      "bytes": 4944,
+      "sha256": "5b36b0da843bdd2ca18dae80c2cd6b53d3489ff9e2336a26ec07f75221a60937"
+    },
+    {
+      "path": "skills/spec-plan/references/structure.md",
+      "bytes": 18185,
+      "sha256": "4c657153e2edfc053c885f99fb6878a941ad5ec7fad46d241f12dfe81c82668e"
+    },
+    {
+      "path": "skills/spec-plan/references/synthesis-summary.md",
+      "bytes": 42523,
+      "sha256": "271096c33725b2718e9a96d6902a6ae643a6a342d917df9bf3295b72d2604684"
+    },
+    {
+      "path": "skills/spec-plan/references/universal-planning.md",
+      "bytes": 15339,
+      "sha256": "50139b9e10045d46080d84d992c3bdbca52b879b24343945d774b67972911dc7"
+    },
+    {
+      "path": "src/cli/helpers/context-bundle.js",
+      "bytes": 18509,
+      "sha256": "6e5b5ecfafa9c4971e2c725123eaa166cf60ac09e6bc3287bb9c49a513ed3b3a"
+    },
+    {
+      "path": "src/cli/plugin-sync.js",
+      "bytes": 32613,
+      "sha256": "9f0d78e8fdc704d877e2fc3276f9d1b0ca95fb3e83fab019c548f05463687f9a"
+    }
+  ],
+  "limitations": [
+    "No real Claude/Codex invocation or paid model evaluation in this planning run.",
+    "Reference bytes are source inventory, not activated path cost.",
+    "Model-persona agents inherit current host model; no independent vendor-model experiment."
+  ]
+}

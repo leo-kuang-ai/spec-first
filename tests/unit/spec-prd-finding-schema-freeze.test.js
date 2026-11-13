@@ -231,6 +231,21 @@ const ENRICHED_CASES = [
 ];
 
 describe('spec-prd finding schema freeze (enriched reason_codes only)', () => {
+  test('来源类 OQ 引用优先在推荐列，问题列单独引用不能闭合', () => {
+    const ref = 'docs/decisions/month-filter.md:12';
+    const row = (question, writeTarget, recommended) =>
+      `| OQ-01 | ${question} | ${writeTarget} | source-read | no | source-resolved | no | open | ${recommended} |`;
+    const target = 'docs/brainstorms/source-disposition-columns.md';
+    const report = (...cells) => buildReport(target, readinessFixture({ oqRow: row(...cells) }));
+
+    expect(report('月份来源依据', 'Requirements R-01', ref)
+      .facts.open_oq_without_owner_closure_count).toBe(0);
+    expect(report('月份来源依据', ref, 'none')
+      .facts.open_oq_without_owner_closure_count).toBe(0);
+    expect(report(`月份来源依据 ${ref}`, 'Requirements R-01', 'none')
+      .facts.open_oq_without_owner_closure_count).toBe(1);
+  });
+
   test.each(ENRICHED_CASES.map(({ reasonCode }) => [reasonCode]))(
     '%s carries exactly its frozen field set',
     (reasonCode) => {

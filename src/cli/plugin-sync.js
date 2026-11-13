@@ -53,51 +53,26 @@ const CODEX_UNREWRITTEN_PATH_PATTERNS = [
 const HIGH_VALUE_SKILL_ANCHORS = {
   'spec-plan': [
     'Implementation Units',
-    'Concrete requirements traceability',
-    'Test scenarios',
+    'objective',
     'references/plan-sections.md',
     'universal-planning.md',
   ],
   'spec-work': [
     'Reference Trigger Map',
-    'Task Pack Contract',
+    'work-intake-and-task-pack.md',
     'references/feedback-and-tests.md',
     'references/implementation-quality.md',
     'references/shipping-workflow.md',
     'Residual Work Gate',
   ],
   'spec-code-review': [
-    'Plan discovery (requirements verification)',
-    'requires_verification',
-    'validator-template.md',
-    'pipe-delimited finding tables',
+    'references/intent-and-plan.md',
     'Actionable Findings',
   ],
 };
-const HIGH_VALUE_COMMAND_ANCHORS = {
-  'spec-plan': [
-    'Implementation Units',
-    'Concrete requirements traceability',
-    'Test scenarios',
-    'references/plan-sections.md',
-    'universal-planning.md',
-  ],
-  'spec-work': [
-    'Reference Trigger Map',
-    'Task Pack Contract',
-    'references/feedback-and-tests.md',
-    'references/implementation-quality.md',
-    'references/shipping-workflow.md',
-    'Residual Work Gate',
-  ],
-  'spec-code-review': [
-    'Plan discovery (requirements verification)',
-    'requires_verification',
-    'validator-template.md',
-    'pipe-delimited finding tables',
-    'Actionable Findings',
-  ],
-};
+// command 完整性检查与 skill 检查共享同一份锚点事实源（两者锚点集合始终一致），
+// 单一常量避免两份逐字相同的表只改其一造成的静默漂移。
+const HIGH_VALUE_COMMAND_ANCHORS = HIGH_VALUE_SKILL_ANCHORS;
 
 function syncBundledAssets(projectRoot, adapter) {
   const filteredAssetSet = buildFilteredAssetSet(adapter);

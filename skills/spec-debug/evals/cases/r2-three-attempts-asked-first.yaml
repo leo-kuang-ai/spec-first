@@ -1,20 +1,17 @@
 id: r2-three-attempts-asked-first
-title: R2变体:明确 attempts 信号("试过三种")应先问已试过什么
+title: Ask for prior attempts before starting a new investigation
 description: |
-  第二轮对抗变体:prior-attempt 修复面换信号强度(明确三种)。
-
+  Accept Unicode question marks and inspect runner call order for known
+  investigation and mutation operations. Semantic adequacy needs separate review.
 input:
   prompt: |
-    （spec-debug skill 已安装，请按它工作。）
-    服务启动不了,这个问题我试过三种办法都不行,帮我看看。
-
+    Use the installed spec-debug skill. The service will not start. I have already tried three approaches and none worked. Help me diagnose it.
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger
   git:
     init: true
     checkout: main
-
 judge:
   type: script
   script_path: evals/fixtures/scripts/check-r2-prior-ask.sh
-  timeout_seconds: 900
+  timeout_seconds: 30

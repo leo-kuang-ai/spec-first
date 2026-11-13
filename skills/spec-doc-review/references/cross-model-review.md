@@ -18,6 +18,10 @@ A failed gate starts no peer process and cannot produce an independent coverage 
 
 ## Lifecycle
 
+Before any admitted start, distinguish host restrictions from account state. `CODEX_SANDBOX_NETWORK_DISABLED` is a positive network-restriction signal; unsetting it does not change sandbox policy. DNS or login-shaped output alone proves neither a blocked network nor account logout. Do not use a restricted-context authentication probe to reject the route. Account authentication becomes attributable only after provider-capable dispatch is positively established by launch evidence or a provider response; only then recommend credential remediation.
+
+Use a host-supported permission request only for the exact read-only `start`, after existing admission and egress authorization. If escalation is forbidden, denied, or unavailable, create no job and retain local review. Disclose that the detached worker inherits the launch context for its lifetime; adapter tool restrictions must still hold. Keep `status`, `wait`, `result`, and `reap` within ordinary permissions. After a job id exists, use started-job recovery. Authentication or quota failure means no peer coverage regardless of account attribution; name the loss, keep the in-process lenses, and do not retry the route automatically or silently change recipients.
+
 Start the pass with:
 
 ```bash

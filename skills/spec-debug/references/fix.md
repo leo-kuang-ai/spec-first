@@ -1,0 +1,19 @@
+# Fix and Regression Test Contract
+
+Read this before writing the Phase 2 recommendation or editing any file in Phase 3. The body keeps only the load-time condition; this reference carries the actionable test-first procedure.
+
+**Test-first:**
+
+1. Follow active project instructions and applicable subdirectory-scoped instructions. Inspect existing tests for the affected behavior before adding coverage. Use an existing failing test when it already captures the bug, update an existing test when it owns the contract but has the wrong expectation, narrowly strengthen an over-mocked test that should have caught the bug, or add a new minimal focused test only when no existing test is the right home.
+2. If no available test seam exercises the actual trigger chain or required state, do not add a shallow assertion merely to produce a green test. Record the missing seam, why it matters, a repeatable replacement check and its coverage gap. Use the original symptom check for before/after evidence; a missing seam does not waive required verification. Otherwise, the chosen regression test must fail on the current bug and pass once the corrected behavior lands; name it so the failure message explains the bug. This procedure applies to a confirmed defect. A test that fails because the change deliberately reverses its expectation is the divergent case and must be deferred rather than updated.
+3. Verify the chosen test or recorded replacement check fails for the right reason — the root cause, not unrelated setup.
+4. Implement one minimal change at a time: address the root cause and nothing else. Do not bundle drive-by refactors, formatting, or unrelated cleanup into a bug-fix change.
+5. Verify the regression test or recorded replacement check passes, then re-run Phase 1's reproduction check against the original scenario (not only the minimized or test-shaped one) when that check can run here; when it cannot — the pipeline cannot-reproduce path — say so in the summary or structured return and leave that verification pending for the caller. Future CI is not evidence: only an actual matching run against the fixed tree can close it, and unrelated green checks cannot replace the original symptom. Temporary debug instrumentation must all be gone before handoff; if you tagged your debug lines with one shared marker while investigating, verifying that is a single grep. Then run the broader suite for regressions.
+6. Self-review every changed line for style violations, missed edge cases, adjacent regressions, and missing coverage. Do not run the broader polish/review/PR tail here; Phase 4 owns it after the debug summary.
+7. Retain real command evidence for each check (`ran`, exit code, status, required/missing tools, reason code, and a bounded secret-stripped log). Planned commands, dry runs, or natural-language “passed” statements are not confirmed evidence.
+
+If a fix fails, return to Phase 2, explicitly invalidate the current hypothesis with the evidence that ruled it out, and form a new hypothesis with its own grounding observation and prediction. Three failed fix attempts trigger smart escalation; do not retry variants of the same theory.
+
+**同根影响核查：** 根因确认后，按已定位的失败签名、共享入口及直接消费者做有界检查；即使只有一个其他位置，也应核实它是否满足同一触发条件并补对应回归。搜索命中只是候选，不是同根结论；不因此全仓扫改。已确认且在现有授权范围内的同根缺陷逐处修复、验证；范围外位置记录具体证据与移交，不静默扩权。下述三处阈值仅触发额外的纵深防御/复盘，不是普通影响核查或修复的最低数量。
+
+The entrypoint owns branch safety, pre-fix scope, and the final quality tail; do not repeat their decisions here. When the same root-cause pattern occurs in at least three other files or would be catastrophic in production, read `references/defense-in-depth.md`，先按其条件判断结构性预防，再选择适用层，不只叠加检查。For a production incident or a pattern in at least three locations, examine how it was introduced and escaped detection; carry any reusable finding to the handoff's learning decision.

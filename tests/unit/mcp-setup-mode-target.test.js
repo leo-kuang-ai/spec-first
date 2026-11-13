@@ -22,6 +22,24 @@ function createRepo(root, relativePath = '.') {
   return repo;
 }
 
+test('installation-only 显式选择安装 scope，preview 和 verify 保持各自写权限', () => {
+  const { buildActionPlan } = require('../../skills/spec-runtime-setup/scripts/lib/mode-policy.cjs');
+  const defaults = { knownIds: ['codegraph', 'graphify'], defaultIds: ['codegraph', 'graphify'] };
+  expect(buildActionPlan({ ...defaults, argv: ['--installation-only'] })).toMatchObject({ mode: 'only', mutation: true, selected_ids: defaults.defaultIds });
+  expect(buildActionPlan({ ...defaults, argv: ['--installation-only', '--plan'] })).toMatchObject({ mode: 'plan', mutation: false });
+  expect(buildActionPlan({ ...defaults, argv: ['--installation-only', '--verify-only'] })).toMatchObject({ mode: 'verify' });
+  expect(buildActionPlan({ ...defaults, argv: ['--installation-only', '--only', 'graphify', '--refresh'] }).blocked).toBe(true);
+});
+
+test('裸调用默认收敛 baseline，而不是只读诊断', () => {
+  const { buildActionPlan } = require(modePolicyModule);
+  const plan = buildActionPlan({ knownIds: ['codegraph', 'graphify'], defaultIds: ['codegraph', 'graphify'], argv: [] });
+  expect(plan).toMatchObject({ mode: 'bare', mutation: true, selected_ids: ['codegraph', 'graphify'] });
+  expect(plan.actions.map((action) => action.id)).toEqual([
+    'install-tools', 'write-host-config', 'provider-mutation', 'write-setup-facts',
+  ]);
+});
+
 describe('spec-runtime-setup GNU argument parsing', () => {
   test('normalizes documented flags and comma-separated selections', () => {
     const { parseArgs } = require(argsModule);
@@ -59,6 +77,34 @@ describe('spec-runtime-setup GNU argument parsing', () => {
 });
 
 describe('spec-runtime-setup action policy', () => {
+  test.each([
+    ['--repo', 'child'],
+    ['--folder=child'],
+    ['--user-scope'],
+    ['--requirement-workspace', 'packages/api'],
+    ['--workflow', 'spec-work'],
+    ['--all-repos'],
+    ['--repo', 'child', '--user-scope', '--workflow', 'spec-work'],
+  ])('范围参数 %j 不改变默认安装模式的能力', (...argv) => {
+    const { buildActionPlan } = require(modePolicyModule);
+    const { requireCapability } = require('../../skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs');
+    const plan = buildActionPlan({ argv, knownIds: ['codegraph'], defaultIds: ['codegraph'] });
+    expect(plan).toMatchObject({
+      blocked: false, mode: 'bare', mutation: true,
+      selected_ids: ['codegraph'], selection_source: 'default-required',
+    });
+    expect(() => requireCapability({ actionPlan: plan }, 'install-tools')).not.toThrow();
+  });
+
+  test.each(['--check', '--plan', '--verify-only'])('范围参数不使 %s 获得安装或修复权限', (flag) => {
+    const { buildActionPlan } = require(modePolicyModule);
+    const plan = buildActionPlan({ argv: [flag, '--repo', 'child'], defaultIds: ['codegraph'] });
+    expect(plan.blocked).toBe(false);
+    expect(plan.capabilities).not.toContain('install-tools');
+    expect(plan.capabilities).not.toContain('write-host-config');
+    expect(plan.args.repairHostConfig).toBe(false);
+  });
+
   test('binds every action to an explicit capability', () => {
     const { buildActionPlan } = require(modePolicyModule);
     const plan = buildActionPlan({
@@ -139,13 +185,16 @@ describe('spec-runtime-setup action policy', () => {
     });
   });
 
-  test('selects required providers by default for plan and verify while keeping bare Node mode diagnostic', () => {
+  test('selects required providers by default for bare/plan/verify (bare converges the baseline)', () => {
     const { buildActionPlan } = require(modePolicyModule);
     const input = { knownIds: ['codegraph', 'graphify'], defaultIds: ['codegraph', 'graphify'] };
 
+    // 2026-09-13 起裸调用收敛 registry 声明的基线:默认选择 required providers,
+    // 按 only 模式动作集执行(既有安全门仍拒绝不安全路径与更高优先级冲突)。
     expect(buildActionPlan({ ...input, argv: [] })).toMatchObject({
       mode: 'bare',
-      selected_ids: [],
+      mutation: true,
+      selected_ids: ['codegraph', 'graphify'],
     });
     expect(buildActionPlan({ ...input, argv: ['--plan'] })).toMatchObject({
       mode: 'plan',
@@ -175,6 +224,12 @@ describe('spec-runtime-setup action policy', () => {
       selected_ids: ['codegraph'],
       args: { repairHostConfig: true },
     });
+  });
+
+  test.each([[], ['--repo', '.']])('默认 setup 不隐式授权替换冲突配置 %j', (...argv) => {
+    const { buildActionPlan } = require(modePolicyModule);
+    const plan = buildActionPlan({ argv });
+    expect(plan).toMatchObject({ mode: 'bare', mutation: true, args: { repairHostConfig: false } });
   });
 
   test.each([
@@ -598,5 +653,54 @@ describe('spec-runtime-setup project target resolution', () => {
       state_write_allowed: false,
       candidates: [],
     });
+  });
+});
+
+describe('Provider 默认 installation 与显式 artifact 行为矩阵', () => {
+  const defaults = { knownIds: ['codegraph', 'graphify'], defaultIds: ['codegraph', 'graphify'] };
+  const { buildActionPlan } = require(modePolicyModule);
+  test.each([['--plan'], ['--verify-only'], ['--refresh-facts']])('%s 默认只有 installation scope', (flag) => {
+    expect(buildActionPlan({ ...defaults, argv: [flag] })).toMatchObject({
+      blocked: false, args: { installationOnly: true }, selected_ids: defaults.defaultIds,
+    });
+  });
+  test('显式图 verify 只允许 facts 写入，不授权安装或刷新', () => {
+    expect(buildActionPlan({ ...defaults, argv: ['--verify-only', '--only', 'graphify'] })).toMatchObject({
+      blocked: false, mode: 'verify', args: { installationOnly: false }, selected_ids: ['graphify'], capabilities: ['write-setup-facts'],
+    });
+  });
+  test('显式图 plan 保留图生命周期预览', () => {
+    expect(buildActionPlan({ ...defaults, argv: ['--plan', '--only', 'graphify'] })).toMatchObject({
+      blocked: false, mode: 'plan', mutation: false, args: { installationOnly: false },
+    });
+  });
+});
+
+
+describe('plan 执行建议保持已预览范围', () => {
+  test.each([
+    [],
+    ['--all-repos'],
+    ['--repo', '/tmp/example', '--repair-host-config'],
+    ['--folder', '/tmp/example'],
+    ['--only', 'graphify', '--all-repos'],
+    ['--requirement-workspace', 'feature', '--all-repos'],
+    ['--only', 'graphify', '--refresh'],
+    ['--only', 'graphify', '--installation-only'],
+  ])('计划转执行参数等价 %j', (...selection) => {
+    const { buildActionPlan, planExecutionAdvice } = require(modePolicyModule);
+    const defaults = { knownIds: ['codegraph', 'graphify'], defaultIds: ['codegraph', 'graphify'] };
+    const plan = buildActionPlan({ ...defaults, argv: ['--plan', ...selection] });
+    expect(plan.blocked).toBe(false);
+    const advice = planExecutionAdvice(plan);
+    const explicitScope = advice.match(/显式使用 ([^，]+)/)[1].split(' ');
+    const execution = buildActionPlan({ ...defaults, argv: [...selection, ...explicitScope] });
+    expect(execution.blocked).toBe(false);
+    expect(execution.mode).not.toBe('bare');
+    expect(execution.mutation).toBe(true);
+    expect(execution.selected_ids).toEqual(plan.selected_ids);
+    for (const key of ['installationOnly', 'repo', 'folder', 'allRepos', 'requirementWorkspace', 'repairHostConfig', 'refresh']) {
+      expect(execution.args[key]).toEqual(plan.args[key]);
+    }
   });
 });

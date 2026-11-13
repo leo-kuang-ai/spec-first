@@ -1,15 +1,19 @@
 ---
 name: autoresearch
-description: "Autonomous goal-directed iteration loop: modify, verify, keep/discard against a metric or a checkable success predicate, with bounded cycles, plateau/ceiling backstops, safety-screened commands, and a ship gate that never auto-approves. Use for iterate-and-verify improvement loops, multi-bug zeroing, security hardening loops, and regression-gated shipping. Not for one-shot questions, single-bug diagnosis without a loop (spec-debug), ordinary code review (spec-code-review), implementation planning (spec-plan), or goals whose success cannot be expressed as a checkable signal — name the destination skill and route out."
+description: "Autonomous goal-directed iteration loop: modify, verify, keep/discard against a metric or a checkable success predicate, with bounded cycles, plateau/ceiling backstops, safety-screened commands, and a ship gate that never auto-approves. Use for iterate-and-verify improvement loops, multi-bug zeroing, security hardening loops, and regression-gated shipping. Subjective goals with a natural endpoint (a document written, a decision delivered) are handled by single-pass dispatch to a fitting subcommand. Not for one-shot questions, single-bug diagnosis without a loop (spec-debug), ordinary code review (spec-code-review), implementation planning (spec-plan), or open-ended goals with neither a checkable success signal nor a self-terminating deliverable — name the destination skill and route out."
 ---
 
 # Autoresearch — Autonomous Goal-directed Iteration
 
+## Project Intelligence Evidence Boundary
+
+Graph output is `provider_untrusted` navigation for an iteration or subcommand, never proof that a predicate, diagnosis, security finding, implementation, or field outcome is correct. Re-ground code claims in current source, tests, logs, contracts, or the downstream owner; empty results have no negative authority. Direct reads remain valid when providers are unavailable, and dispatch authorization plus the existing ship gate remain separate from evidence adequacy.
+
 ## Safety Invariants (all subcommands)
 - Never push, publish, or deploy without explicit user approval.
 - Bounded by default. Override with `Iterations: unlimited`.
-- All results logged to `autoresearch/{subcommand}-{YYMMDD}-{HHMM}/` directory.
-- Chain handoff via `handoff.json`. Evals reads `*-results.tsv`.
+- All results logged to `autoresearch/{subcommand}-{YYMMDD}-{HHMM}/` directory. A run directory is exclusive: if the same-minute path already exists (same subcommand re-entered, resume after a crash), never write into it — create `-{YYMMDD}-{HHMM}-r2/` (next free suffix) instead, so each run owns its logs and handoff exclusively.
+- Chain handoff via `handoff.json`. Evals reads `*-results.tsv`. Every orchestrator `hop_log` entry carries the run identity (run directory name) and the producing handoff's path, so a resumed or multi-hop run can bind each outcome to the evidence directory it came from.
 
 ## Dispatch (bare `autoresearch`)
 
@@ -24,6 +28,8 @@ Parse the invocation in this order:
 | `--auto` flag | Force Orchestrator regardless of goal text |
 
 **Mode banner gate.** Resolve the mode from the table below, then emit `[autoresearch] mode: <classic|orchestrator|wizard>` as your next assistant message once the skill definition is loaded — before any work tool call (test runs, file edits, project scaffolding) or planning output. No work may start before the banner is emitted; a run that starts working without it is a dispatch violation even if the work itself is correct. If the mode cannot be resolved, emit `[autoresearch] mode: unresolved` and ask exactly one clarifying question.
+
+**Protocol reads per mode.** The banner also fixes the required protocol reading: Classic loads `autoresearch.md` (ownership, frozen measurement, the unique run directory, and resume reconciliation live there and are load-bearing); Orchestrator loads this section plus `references/orchestrator-routing.md` before classifying; a direct `--<subcommand>` invocation loads the matching `{subcommand}.md` before running. An entry summary in this file never substitutes for the protocol file that owns the rules.
 
 ## Subcommands
 
@@ -65,13 +71,14 @@ Activated when a plain-language goal is given without `Metric:`/`Verify:`. Class
 
 **Two modes based on archetype:**
 - **Orchestration loop** — predicate-bearing archetypes (ship-ready, optimize-metric, fix-broken, harden, build-feature, explore). Goal has a mechanical Success predicate; the loop runs until that predicate is met.
-- **Single-pass dispatch** — subjective/terminal archetypes (document, what-to-build, decide-design). Routes once to the fitting subcommand (learn / improve / reason), lets it self-terminate, then reports. No loop, no Plateau, no ship gate.
+- **Single-pass dispatch** — subjective/terminal archetypes (document, what-to-build, decide-design). Routes once to the fitting subcommand (learn / improve / reason), lets it self-terminate, then reports. No loop, no Plateau, no ship gate. Entry boundary: a single-pass goal must have a self-terminating natural endpoint (deliverable written, decision delivered with options and trade-offs); an open-ended goal with neither a checkable predicate nor such an endpoint is out of scope here — route out to the destination skill instead of dispatching internally.
+- **Forced-flag precedence.** `--classic` and `--auto` are mutually exclusive: an invocation carrying both is rejected with one clarifying question rather than silently preferring either.
 
 ### Orchestration Loop Steps
 
-Backed by `scripts/orchestrate.sh` (deterministic seam — all routing logic lives there). Subcommands exposed: `classify`, `next-hop`, `units`, `plateau`, `screen-cmd`, `verdict`, `validate-state`, `screen-state-predicate`.
+Backed by `scripts/orchestrate.sh` （确定性状态与出口检查；目标语义分类由 LLM 判断）. Subcommands exposed: `classify`, `next-hop`, `units`, `plateau`, `screen-cmd`, `verdict`, `validate-state`, `screen-state-predicate`.
 
-1. **Classify** — `scripts/orchestrate.sh classify "<goal>"` → archetype label + mode.
+1. **Classify** — `scripts/orchestrate.sh classify "<goal>"` → v1 advisory JSON 关键词候选；LLM 根据完整目标、否定语义和语言选择 archetype/mode。无匹配不默认 explore，多匹配不按数组顺序选第一项；候选不授权执行，结果进入下一步确认。
 2. **Derive predicate** — reuse `plan` logic to produce a concrete Success predicate: exact shell command + expected output. For `optimize-metric`, run the full plan/wizard derivation internally.
 3. **Confirm** — ONE `request_user_input` showing: archetype, mode, concrete predicate (command + expected output), terminal choice (stop-at-verified vs proceed-to-ship). Misclassifications are caught here, not mid-run.
 4. **Round-0 dry-run** — prove the predicate command runs and returns a value; safety-screen every derived command via `screen-cmd`; print projected cycle budget. Stop here if `--dry-run`.
@@ -83,7 +90,7 @@ Backed by `scripts/orchestrate.sh` (deterministic seam — all routing logic liv
    e. Fold hop's `handoff.json` into `orchestrator-state.json`.
    f. `scripts/orchestrate.sh units` → recompute **Units remaining**.
 6. **Stop conditions** (checked after each hop):
-   - Predicate met → ship gate (only if ship is in the pipeline) else `CONVERGED`.
+   - 先消费 `verdict`：存在 pending verify、未解决失败、错误或连续 3 次未知指标时不得收敛；仅验证完成且 predicate met 时进入 ship gate（pipeline 包含 ship）或 `CONVERGED`。
    - `scripts/orchestrate.sh plateau orchestrator-state.json` → true → stop + report `PLATEAU`.
    - Cycles > ceiling (default 50, override `--max-cycles N`) → stop + report `CEILING`.
    - Hop outcome `blocked`/`failed` with no alternative route → checkpoint + stop + report `BLOCKED`.

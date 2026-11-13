@@ -1,16 +1,16 @@
 # Explainer Markdown Rendering
 
-How an explainer renders as markdown — the fallback format when intake resolved `output:md`. Load at compose time (Phase 4), not earlier. Content rules match the HTML reference; only the presentation medium differs.
+How an explainer renders as markdown — the fallback format when intake resolved `output:md`. Load at compose time (Phase 3), not earlier. Content rules match the HTML reference; only the presentation medium differs.
 
 ## Hard invariants
 
 - **YAML frontmatter carries the metadata:** `title`, `date`, `input_shape` (concept / diff / idea / recap), `subject`, and `unverified: true` when Phase 2 fell back to model knowledge. Field names are stable — a future library layer indexes them.
 - **Pure markdown.** No HTML elements, no `<details>`, no inline styles.
-- **Display-only.** No exercise or quiz content in the artifact; the check-in lives in the session.
+- **Display-only.** No interactive mechanics in the artifact. The `Check yourself` section is plain text: prompts with visually separated answers the reader commits to before reading.
 - **No internal identifiers in reader content.** Do not render scratch paths,
   run ids, authorization tokens, provider/model receipts, or machine-specific
   identifiers in the explainer body. Report the delivery path separately.
-- **Repo-relative paths** for any file reference; never absolute paths.
+- **Repo-relative source identity; destination-relative links.** Identify source files with their full repo-relative path and line numbers. A Markdown link resolves from the delivered document's directory, not the repository root: compute its target from the known final destination and verify it resolves to the cited file. If the destination is unknown or caller-managed, use plain repo-relative `path:line` pointers instead of guessed hyperlinks. Never expose machine-specific absolute paths.
 
 ## Show-n-tell in markdown
 

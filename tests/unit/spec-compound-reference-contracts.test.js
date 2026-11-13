@@ -1,0 +1,69 @@
+'use strict';
+
+const fs = require('node:fs');
+const { phaseFiles } = require('../helpers/compound-contract');
+const read = file => fs.readFileSync(`skills/spec-compound/${file}`, 'utf8');
+
+describe('compound phase reference migration', () => {
+  test('vocabulary-only maintenance is reported and retains private publication', () => {
+    const assembly = read('references/assembly.md');
+    const vocabulary = read('references/concepts-vocabulary.md');
+    expect(assembly).toContain('even when no new term qualified');
+    expect(assembly).toContain('only in the private candidate');
+    expect(vocabulary).toContain('A synonym fold is not concept retirement');
+    expect(vocabulary).toContain('uncertainty leaves the entry standing');
+    expect(read('references/yaml-schema.md')).toContain('Every material rewrite re-evaluates all classification fields');
+  });
+
+  test('entrypoint routes every phase while retaining publication and mode boundaries', () => {
+    const entry = read('SKILL.md');
+    for (const file of phaseFiles) {
+      expect(entry).toContain(`references/${file}`);
+      expect(read(`references/${file}`).trim()).not.toBe('');
+    }
+    expect(entry).not.toContain('### Phase 2: Assembly');
+    expect(entry).toContain('Final paths stay untouched until semantic promotion');
+    expect(entry).toContain('`mode:headless` runs Full without session history');
+    expect(entry).toContain('instruction-file edits');
+    const assembly = entry.indexOf('3. **Assembly and grounding:**');
+    const enhancement = entry.indexOf('4. **Optional enhancement:**');
+    const publication = entry.indexOf('5. **Publication:**');
+    expect(assembly).toBeGreaterThanOrEqual(0);
+    expect(enhancement).toBeGreaterThan(assembly);
+    expect(publication).toBeGreaterThan(enhancement);
+  });
+
+  test('Lightweight reads its shared validation and publication dependencies', () => {
+    const lightweight = read('references/lightweight.md');
+    for (const file of ['research.md', 'assembly.md', 'promotion.md']) {
+      expect(lightweight).toContain(`references/${file}`);
+    }
+    expect(lightweight).toContain('No subagents are launched');
+    expect(lightweight).toContain('Do **not** bootstrap or seed');
+    const promotion = read('references/promotion.md');
+    expect(promotion).toContain('recompute the recorded existence/SHA-256');
+    expect(promotion).toContain('report the exact partial publication');
+    expect(read('references/report.md')).toContain('never imply that all durable paths stayed unchanged');
+  });
+
+  test('session filters resolve Git context at runtime after restricted-read authorization', () => {
+    const history = read('references/session-history.md');
+    expect(history).toContain('After restricted-read authorization');
+    expect(history).toContain('git rev-parse --abbrev-ref HEAD');
+    expect(history).toContain('git rev-parse --show-toplevel');
+    expect(history).toContain('Skip branch filtering on detached HEAD');
+    expect(history).not.toContain('!`git');
+  });
+
+  test('Lightweight preserves collision, reduced coverage, and partial-publication boundaries', () => {
+    const lightweight = read('references/lightweight.md');
+    expect(lightweight).toContain('same artifact type, reduced research and validation');
+    expect(lightweight).not.toContain('same documentation, fewer tokens');
+    expect(lightweight).toContain('if it exists, read it and update only when it covers the same problem');
+    expect(lightweight).toContain('choose a distinct descriptive filename and recheck that exact path');
+    expect(lightweight).toContain('Do not reopen, offer to edit, or edit instruction files');
+    expect(lightweight).toContain('not applicable - no active project instructions');
+    expect(lightweight).toContain('failure after the first successful publication must report the exact partial publication');
+    expect(lightweight).toContain('only after every intended publication succeeds');
+  });
+});

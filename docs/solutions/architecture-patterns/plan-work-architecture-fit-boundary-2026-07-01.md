@@ -26,7 +26,7 @@ source_refs:
   - "docs/brainstorms/2026-07-01-001-spec-work-minimality-preflight-requirements.md"
   - "skills/spec-plan/SKILL.md"
   - "skills/spec-work/SKILL.md"
-  - "docs/10-prompt/结构化项目角色契约.md"
+  - "docs/methodology/结构化项目角色契约.md"
   - "docs/solutions/workflow-issues/skill-prose-rewrite-contract-test-coverage-2026-06-28.md"
 tags: [spec-plan, spec-work, architecture-fit, minimality, source-runtime, workflow-boundary]
 ---

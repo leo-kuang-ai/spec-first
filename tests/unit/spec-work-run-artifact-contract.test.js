@@ -16,7 +16,7 @@ const SCHEMA_PATH = path.join(
 const USER_ARTIFACT_MAP_PATH = path.join(
   REPO_ROOT,
   'docs',
-  '05-用户手册',
+  'user-guide',
   '04-workflows-artifacts-map.md'
 );
 

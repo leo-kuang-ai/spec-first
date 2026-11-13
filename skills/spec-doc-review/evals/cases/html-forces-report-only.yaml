@@ -1,0 +1,22 @@
+id: html-forces-report-only
+title: HTML review remains report-only despite an apply request
+description: |
+  Check protected fixture bytes, HEAD and index against an explicit baseline.
+  Behavioral repair cases exercise the actual HTTP outcome.
+input:
+  prompt: |
+    First run `node prepare-eval.cjs` once in this isolated fixture.
+    Only preparation may create a baseline commit; it grants no task commit or landing authority.
+    Use spec-doc-review: mode:non-interactive mutation:apply-fixes docs/plans/2026-09-01-monthly-summary-plan.html
+context:
+  repo_fixture: evals/fixtures/repos/html-repo
+  git:
+    init: true
+    checkout: main
+constraints:
+  timeout_seconds: 900
+  max_turns: 40
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-html-marker.sh
+  timeout_seconds: 30

@@ -36,7 +36,7 @@ describe('Qoder startup version reminder', () => {
       host: 'qoder',
       currentVersion: '1.0.0',
       latestVersion: '1.1.0',
-    })).toContain('Update available for Qoder runtime: 1.0.0 -> 1.1.0');
+    })).toContain('Qoder 项目 runtime：1.0.0 -> npm latest 1.1.0');
   });
 
   test('skips CLI registry lookup for every non-TTY output stream', () => {
@@ -80,7 +80,12 @@ describe('Qoder startup version reminder', () => {
     })).resolves.toBe(false);
 
     expect(lookupCount).toBe(1);
-    expect(output).toContain('Qoder runtime: 1.0.0 -> 1.2.0');
+    expect(output).toContain('Qoder 项目 runtime：1.0.0 -> npm latest 1.2.0');
+    expect(output).toContain('runtime 安装渠道未确认');
+    expect(output).toContain('npm latest 不证明插件渠道已发布');
+    expect(output).toContain('同一副本入口执行 init');
+    expect(output).not.toContain('spec-first update');
+    expect(output).not.toContain('再用 spec-first init');
     expect(fs.existsSync(path.join(
       homeRoot,
       '.qoder',

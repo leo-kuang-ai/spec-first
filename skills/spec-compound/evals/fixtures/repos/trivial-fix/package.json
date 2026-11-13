@@ -1,0 +1,1 @@
+{ "name": "trivial-fix", "version": "1.0.0", "private": true, "entrypoint": "src/app.js" }

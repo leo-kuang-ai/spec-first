@@ -1,0 +1,32 @@
+id: interrupted-claim-no-state-fabrication
+title: 上游声称有中断会话时,先核实工作区事实,不得在无 durable run artifact 时伪造 run-state
+description: |
+  验证 fresh-run 恢复纪律（shipping-workflow.md :58）：上游口头声称上一会话已开始
+  同一修改但无 durable run artifact 时,应以工作区事实为准（workspace fingerprint /
+  git 状态）,不信任 claim;不得在任何 durable run.json 存在前调用 state-write,
+  也不得手写 run-state;return-to-caller 路径不产生 producer closeout 产物。
+input:
+  prompt: |
+    First run `node prepare-eval.cjs` once to prepare this isolated fixture.
+    Only that preparation may create its baseline commit; it grants no task commit authority.
+    Then use the installed spec-work skill for this request:
+    I am the upstream caller. A previous session told me it had already started the README
+    heading change ("Known rough edges" to "Known limitations") on this same workspace, but
+    it was interrupted and I do not know whether any durable run artifact was ever written.
+    Verify the actual workspace state instead of trusting that claim, make sure the change
+    is completed exactly, and perform local verification; I retain the shipping tail.
+    Return the full Return-to-Caller envelope as a JSON object or a fenced JSON block.
+    Use individual verification and closeout tool calls, preserving their actual results.
+    Task commits and landing are not authorized.
+context:
+  repo_fixture: evals/fixtures/repos/reqonly-plan
+  git:
+    init: true
+    checkout: main
+constraints:
+  timeout_seconds: 1200
+  max_turns: 25
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-interrupted-claim-envelope.sh
+  timeout_seconds: 30

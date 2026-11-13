@@ -2,18 +2,20 @@
 
 Port resolution runs via `scripts/resolve-port.sh`. This document explains the probe order, framework defaults, and the script's intentional parsing choices.
 
-This cascade runs **only when** `.claude/launch.json` is absent or has no `port` field for the resolved configuration. When `launch.json` specifies a port, use it verbatim and skip this cascade entirely.
+Run this cascade only while the port remains unresolved. Preserve a selected usable numeric port and all other startup facts. Resolve against the selected project directory. The table's Unknown fallback is a script default, not authority to start an unclassified project; unresolved classification still requires the user's startup facts. The resolved port seeds a URL candidate, while server output and attributed reachability determine the actual handoff URL.
 
 ## Priority order
 
-1. **Explicit `--port` flag** -- if the caller passed `--port <n>`, use it directly.
-2. **Framework config files** -- `next.config.*`, `vite.config.*`, `nuxt.config.*`, `astro.config.*` scanned with a conservative regex matching only numeric literal port values. Variable references (`process.env.PORT`, `getPort()`) are deliberately not matched.
+1. **Explicit `--port` flag** -- if the caller passed `--port <n>`, validate an integer in `1..65535` and use it directly. Missing values, unknown flags/types, and extra positional arguments fail with an `ERROR:` on stderr.
+2. **Framework config files** -- `next.config.*`, `vite.config.*`, `nuxt.config.*`, `astro.config.*` scoped to the selected framework (Vite for SvelteKit/modern Remix), then scanned lexically without executing config. Comments and string/template bodies are ignored; only literal numeric properties are candidates. Conflicting literal ports and dynamic expressions fall through. This is not JavaScript semantic evaluation: unrelated object properties or regular-expression literals may still be ambiguous; use an explicit startup fact when needed. Node is required for this optional probe.
 3. **Rails `config/puma.rb`** -- grep for `port <n>`.
-4. **`Procfile.dev`** -- web line scanned for `-p <n>` / `--port <n>` / `-p=<n>` / `--port=<n>`.
+4. **`Procfile.dev`, otherwise `Procfile`** -- web line scanned for `-p <n>` / `--port <n>` / `-p=<n>` / `--port=<n>`.
 5. **`docker-compose.yml`** -- line-anchored grep for `"<n>:<n>"` port mapping patterns. Not full YAML parsing.
 6. **`package.json`** -- `dev`/`start` scripts scanned for `--port <n>` / `-p <n>` / `--port=<n>` / `-p=<n>`.
 7. **`.env` files** -- checked in override order: `.env.local` -> `.env.development` -> `.env` (first hit wins). Parses `PORT=<n>` with quote stripping and comment truncation.
 8. **Framework default lookup table** -- see table below.
+
+All emitted ports are numeric and in `1..65535`; invalid discovered candidates are skipped. Missing or dynamic config is not evidence of the framework's actual listening port.
 
 ## Framework defaults
 
@@ -37,4 +39,4 @@ This cascade runs **only when** `.claude/launch.json` is absent or has no `port`
 
 **(b) Comment stripping on `.env` values.** Truncates at `#` after trimming whitespace (so `PORT=3001 # dev only` resolves to `3001`), because inline comments are common.
 
-**(c) No instruction-file port grep.** Neither `resolve-port.sh` nor the `spec-test-browser` inline cascade scans `AGENTS.md` / `CLAUDE.md` for port references by default. Instruction files carry natural language that may mention ports in contexts unrelated to the dev server (documentation, examples, troubleshooting), producing false positives that are hard to debug; the filename is also harness-specific. Framework config files and `.env` are the reliable sources of truth. The agent may still honor already-loaded project guidance only when it explicitly declares the active dev-server port, but the script does not shell-grep named instruction files.
+**(c) No instruction-file port grep.** `resolve-port.sh` does not scan `AGENTS.md` / `CLAUDE.md` for port references. Instruction files may mention ports in unrelated examples or troubleshooting. Framework configuration and `.env` supply startup facts for the `spec-polish` caller; already-loaded guidance may provide an explicit override. `spec-test-browser` consumes a caller-supplied exact origin and performs no port resolution or listener scan.

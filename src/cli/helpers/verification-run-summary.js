@@ -47,6 +47,38 @@ function runCli(argv) {
   const args = Array.isArray(argv) ? [...argv] : [];
   const subcommand = args[0];
 
+  if (['--help', '-h'].includes(subcommand)
+    || (['record', 'read'].includes(subcommand) && ['--help', '-h'].includes(args[1]))) {
+    writeJson({
+      status: 'help',
+      usage: [
+        'spec-first internal verification-run-summary record --input <input.json> --run-id <run-id> --target-repo <repo> [--workflow <workflow>] [--json]',
+        'spec-first internal verification-run-summary read --run-summary-ref <repo-relative-path> --target-repo <repo> [--json]',
+      ],
+      workflows: [...ALLOWED_WORKFLOWS],
+      input_fields: [...ALLOWED_INPUT_FIELDS],
+      check_fields: [...ALLOWED_CHECK_FIELDS],
+      statuses: [...ALLOWED_STATUSES],
+      redaction_statuses: [...ALLOWED_REDACTION_STATUSES],
+      notes: [
+        '示例为尚未执行的检查，不是验证证据。按实际命令结果填写，不得直接改为 passed。',
+        'reason_code 为具体原因字符串，不是固定枚举；schedulable 与 missing_dependency 仅用于 not-run。检查实际执行后应同步改为实际原因（例如 executed），不能沿用示例的 schedulable。',
+        '已执行检查必须包含真实退出码与脱敏日志；log_path 为仓库相对路径，位于 .spec-first/workflows/<workflow>/<workspace-slug>/<run-id>/logs/。',
+        '输入只包含 profile 和 checks；schema_version、generated_at 和输出路径由 writer 生成。',
+      ],
+      input_example: {
+        profile: { source: 'local', name: 'example', path: null },
+        checks: [{
+          id: 'example-check', service: 'node', command: 'node verify.cjs',
+          status: 'not-run', exit_code: null, ran: false,
+          required_tools: ['node'], missing_tools: [], log_path: null,
+          reason_code: 'schedulable', redaction_status: 'none-required',
+        }],
+      },
+    });
+    return 0;
+  }
+
   if (subcommand === 'record') {
     const parsed = parseRecordArgs(args.slice(1));
     if (parsed.errors.length > 0) {

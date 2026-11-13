@@ -110,7 +110,7 @@ A useful test: read the call-outs aloud. If two or more sound like "and also" ex
 
 Each anti-pattern below produces a call-out that fails the affirmability test. If a candidate call-out matches one of these, it is plan-body content — cut, do not rephrase.
 
-- Names a file path or module name (`internal/artifacts/pii.go`)
+- Lists a file path or module merely to preview implementation. A module may be named when its ownership or placement is the explicit decision the user is weighing
 - Names a flag, env var, or exact env value (`--accept-redaction-list=<finding-id,...>`)
 - Specifies a JSON shape, response format, or exact data structure
 - Names HTTP status codes, event names, or exact error wording
@@ -124,7 +124,7 @@ The line-number, signature, and code-spec rules are not new — they have always
 
 ## When to skip the blocking confirmation
 
-The auto-proceed path (announce without waiting for user confirmation) fires only when **plan depth is Lightweight AND zero call-outs survive the keep test**. For Standard or Deep plans, always fire the confirmation gate even when zero call-outs survive — substance earns the checkpoint, not interaction history. A Deep plan with rich silent decisions and a 1-3 line summary is exactly the case where rubber-stamping is most likely; the explicit confirmation request gives the user a real chance to push back before research or plan-write proceeds.
+先检查 Phase 0.5 的真实产品阻塞，再按当前授权决定等待。WHAT 已闭合且用户已授权自主规划、写入或续跑时，各深度均可说明范围后继续，不因 Standard/Deep 或修订重复确认；明确要求逐阶段确认时仍等待。无自主授权时保留默认：Lightweight 且零 call-outs 自动继续，Standard/Deep 或存在需用户裁决的实质分歧时确认。自动继续必须如实标为已授权执行或委托判断，不能写成用户已逐项审阅。
 
 When auto-proceed applies (Lightweight + zero call-outs), emit a one-line announcement and continue:
 
@@ -136,9 +136,9 @@ No open decisions to weigh in on — proceeding to [research / plan-write]. Inte
 
 The announcement is mandatory when skipping — silent proceeding is not allowed. The "why" (no forks worth flagging) must be visible.
 
-For Standard/Deep with zero call-outs, the confirmation template still fires; the "Call outs:" header is simply omitted. The user gets the summary plus the explicit confirmation request.
+仅在当前需要确认时，Standard/Deep with zero call-outs 使用 confirmation template; the "Call outs:" header is simply omitted. The user gets the summary plus the explicit confirmation request.
 
-There is a third skip condition: the **opt-in `SKIP_SCOPING_CONFIRM` setting** (Phase 0.0 — `confirm:auto` token or the `plan_skip_scoping_confirm` config key). When it resolves to skip, the gate auto-proceeds for *any* tier or call-out count — the user has pre-authorized it. The announcement is still mandatory (it names that confirmation is off and that inferred scope landed in `## Assumptions`), and the skip is scoped to this confirmation only: genuine blocking questions and the Phase 5.4 menu still fire. This differs from headless mode only in that announcement — headless has no synchronous user to announce to.
+There is a third skip condition: the **opt-in `SKIP_SCOPING_CONFIRM` setting** (Phase 0.0 — `confirm:auto` token or the `plan_skip_scoping_confirm` config key). When it resolves to skip, the gate auto-proceeds for *any* tier or call-out count — the user has pre-authorized it. The announcement is still mandatory (it names that confirmation is off and that inferred scope landed in `## Assumptions`), and the skip is scoped to this confirmation only: genuine blocking questions and the Phase 5.4 handoff rules still apply. This differs from headless mode only in that announcement — headless has no synchronous user to announce to.
 
 When the opt-in skip applies, emit this announcement — **not** the auto-proceed template above. The opt-in skip fires for *any* tier and call-out count, so claiming "No open decisions to weigh in on" would be false whenever call-outs survived; the announcement instead names that confirmation is off and that inferred scope is recorded under `## Assumptions`:
 
@@ -160,13 +160,8 @@ Both variants share these structural rules. They address failure modes where the
 
 **Anti-pattern: numerical attestation.** "All nine requirements covered," "all three flows in scope," "five acceptance examples addressed," counts of files or test scenarios. These are the agent showing its work or attesting completeness, not naming scope decisions. "Covers the full brainstorm scope" already conveys the claim; the count adds nothing the user can affirm or redirect. Cut the numbers; keep the scope claim.
 
-**A revision is not a confirmation.** After any user revision (even a trivially-understood swap), integrate the change, re-present the revised stage 2 with the change reflected, and wait for explicit confirmation before writing the plan. The loop is:
+**修订不等于确认，也不撤销已有执行授权。** 合并用户修订后，若范围、重要后果和授权未变且 WHAT 已闭合，简述变化并继续写计划。若用户选择逐阶段共创，或修订产生新的实质产品决策、权限或副作用缺口，重新呈现相关差异并等待必要答案；只阻塞依赖该答案的动作。不得把代理理解、用户沉默或修订本身伪写为人工确认。
 
-1. Present stage 2 → user responds
-2. User confirms → write the plan
-3. User revises → integrate, re-present revised stage 2, return to step 1
-
-Plan-write (Phase 5.2) fires only on explicit confirm or after the soft-cut blocking question's "proceed" option. Never write immediately after a revision, even when the revision is small enough that the agent feels it understood — the confirmation step is what makes the synthesis **confirmed** rather than "agent's last proposal."
 
 ---
 
@@ -239,7 +234,7 @@ Fires only when:
 - AND Phase 0.5 cleared (no unresolved blockers)
 - AND not on Phase 0.1 fast paths (resume normal, deepen-intent)
 
-Each guard is an explicit conditional in SKILL.md, not implicit. R2 solo does NOT fire on resume/deepen, route-out, or brainstorm-sourced paths.
+Each guard is an explicit conditional in `references/intake.md`, not implicit. R2 solo does NOT fire on resume/deepen, route-out, or brainstorm-sourced paths.
 
 **Content focus**: full-breadth internal draft. Phase 0.4 bootstrap is brief by design ("ask one or two clarifying questions"), so the agent has made substantial inferences before Phase 0.7 fires. The Inferred bucket in the internal draft is especially load-bearing here — the agent's bets are widest. Stage 2 compression still applies: most of those inferences will not survive the keep test, and that is correct — the user should only see the forks they can meaningfully redirect.
 
@@ -253,7 +248,7 @@ Each guard is an explicit conditional in SKILL.md, not implicit. R2 solo does NO
 
 **Anti-fluff guidance:** lead with the actual thing being planned in plain words. No qualifiers ("comprehensive," "thoughtful," "substantive"). No re-stating the user's prompt. If the scope cannot be said within the tier budget without filler, the synthesis isn't ready yet.
 
-**Confirmation template (fires for Standard/Deep regardless of call-out count, or for any tier with one or more call-outs surviving):**
+**Confirmation template（仅在上述授权与阻塞判断要求等待时使用）：**
 
 The opener defaults to "Based on your request" — add "and our brief discussion" only when the Phase 0.4 bootstrap actually involved back-and-forth clarifying questions. Solo invocations often proceed with no dialogue, and claiming a discussion the user didn't have reads as off.
 
@@ -276,7 +271,7 @@ Planning: [1-3 line scope claim]
 No open decisions to weigh in on — proceeding to research. Interrupt if I have the scope wrong.
 ```
 
-Then continue to Phase 1 without waiting. Use prose for any user response that does arrive (no `AskUserQuestion` menu). Justification is Interaction Rule 5(a) in SKILL.md.
+Then continue to Phase 1 without waiting. Use prose for any user response that does arrive (no `AskUserQuestion` menu). Justification is the Interaction Method section in SKILL.md: an optional menu is not a waiting condition, and asking is reserved for answers that would change delivery, authorization, or a key decision.
 
 ---
 
@@ -307,7 +302,7 @@ Most of these will not survive the keep test as separate call-outs. Surface only
 
 **Anti-fluff guidance:** lead with the actual implementation shape in plain words. No qualifiers, no re-stating the brainstorm's WHAT. If the summary just restates the brainstorm's Problem Frame, rewrite it to focus on plan-time decisions.
 
-**Confirmation template (fires for Standard/Deep regardless of call-out count, or for any tier with one or more call-outs surviving):**
+**Confirmation template（仅在上述授权与阻塞判断要求等待时使用）：**
 
 ```
 The brainstorm scopes [1-2 sentence restatement of the brainstorm's scope as orientation; in the brainstorm's own vocabulary; NOT an enumeration of Implementation Units, constraints, or acceptance examples].
@@ -328,7 +323,7 @@ Planning [brief brainstorm-scope restatement] — [plan-specific shape in one cl
 No open decisions to weigh in on — proceeding to plan-write. Interrupt if I have the scope wrong.
 ```
 
-Then continue to Phase 5.2 without waiting. Use prose for any user response that does arrive. Justification is Interaction Rule 5(a).
+Then continue to Phase 5.2 without waiting. Use prose for any user response that does arrive. Justification is the Interaction Method section in SKILL.md (an optional menu is not a waiting condition).
 
 ---
 
@@ -343,7 +338,7 @@ When the soft-cut fires, use the platform's blocking question tool with two opti
 - `Proceed and continue to [research / plan-write]`
 - `Hold off — keep discussing before continuing`
 
-Fall back to numbered list in chat only when no blocking tool exists or the call errors. Never silently skip.
+Fall back to numbered list in chat only when no such tool is in the list or a real question call errors. Never silently skip.
 
 ---
 
@@ -366,7 +361,7 @@ The Assumptions routing in this section applies only after Phase 0.5 has cleared
 - **Route internal-draft content with mode- and origin-aware shape:**
   - For direct bootstrap or a new unified plan derived from a legacy origin, **Stated** content may populate Product Contract `### Requirements`, **Out-of-scope** content may populate Product Contract `### Scope Boundaries`, and **Inferred** content routes to Planning Contract `### Assumptions`.
   - For brainstorm-sourced requirements-only enrichment, **Stated** content remains byte-preserved in the existing Product Contract, **Out-of-scope** planning deductions route to Planning Contract `### Implementation Scope Boundaries`, and **Inferred** content routes to Planning Contract `### Assumptions`. Do not add a Summary, normalize IDs, or otherwise rewrite the upstream region.
-  - In headless or skipped-confirmation runs, never route Inferred items into Key Technical Decisions or Implementation Units; that would make un-validated bets indistinguishable from user-confirmed decisions.
+  - In headless or skipped-confirmation runs, keep inferred HOW choices explicitly recorded in Assumptions with source, impact and invalidation conditions. KTDs or units may cite that assumption when within authorized planning judgment, but must not relabel it user-confirmed. A true WHAT or launch-blocking architecture question remains blocking; an assumption cannot clear it.
 
 The `### Assumptions` section appears in non-interactive plans and in interactive plans where the user opted into `SKIP_SCOPING_CONFIRM` — both cases proceed without confirming Inferred bets, so those bets must stay visibly labeled. A normal interactive plan doesn't need it (Inferred bets either get user-corrected via call-outs and become Key Technical Decisions, are revised away, or were judged not-fork material by the keep test and dissolved into Implementation Units silently).
 
@@ -395,7 +390,7 @@ For direct bootstrap or a new unified plan derived from a legacy origin:
 |---|---|
 | Summary (stage 2) | Product Contract `### Summary` (1-3 lines prose, forward-looking) — rewrite to plan convention if the chat-time summary used bullets. Solo variant: scope being targeted. Brainstorm-sourced: implementation approach |
 | Stated bullets | Product Contract `### Requirements` (R-IDs) and where relevant `### Problem Frame` for narrative context |
-| Inferred bullets | Planning Contract `### Key Technical Decisions` (with rationale) and Implementation Units when the bet drives a structural choice. In non-interactive mode **or an interactive `SKIP_SCOPING_CONFIRM` skip run**, route to Planning Contract `### Assumptions` instead — both proceed without confirming the bets, so they must stay labeled; see Headless mode above. |
+| Inferred bullets | Planning Contract `### Key Technical Decisions` (with rationale) and Implementation Units when the bet drives a structural choice. In non-interactive mode **or an interactive `SKIP_SCOPING_CONFIRM` skip run**, route to Planning Contract `### Assumptions` instead — both proceed without confirming the bets, so they must stay labeled; KTDs and units may cite the assumption under the Headless mode rules above. |
 | Out-of-scope bullets | Product Contract `### Scope Boundaries` — including the `#### Deferred to Follow-Up Work` subsection when relevant |
 
 For brainstorm-sourced requirements-only enrichment:
@@ -404,7 +399,7 @@ For brainstorm-sourced requirements-only enrichment:
 |---|---|
 | Summary (stage 2) | Goal Capsule or a concise Planning Contract orientation when useful; never the upstream Product Contract |
 | Stated bullets | Remain in the byte-preserved Product Contract; reference stable IDs rather than copying or normalizing text |
-| Inferred bullets | Planning Contract `### Key Technical Decisions` and Implementation Units after normal interactive confirmation; Planning Contract `### Assumptions` in non-interactive or skipped-confirmation runs |
+| Inferred bullets | Planning Contract `### Key Technical Decisions` and Implementation Units after normal interactive confirmation; Planning Contract `### Assumptions` in non-interactive or skipped-confirmation runs, cited by dependent KTDs/units without claiming user approval |
 | Out-of-scope bullets | Planning Contract `### Implementation Scope Boundaries`; product-scope changes return to the owning producer |
 
 No italic capture-context note (e.g., "Captured at Phase 0.7..."). It would leak engineering process into an artifact whose readers do not need that signal.
@@ -420,4 +415,4 @@ In a newly authored Product Contract, `### Summary` and `### Problem Frame` must
 - Defensive what-ifs and hedges — if a concern is real, state it as Inferred (internal); if speculation, drop it
 - The internal three-bucket draft pasted into chat as a verbatim user-facing artifact — that was the old shape and the volume problem it produced is why stage 2 exists. Compose internally, derive call-outs, present compressed
 - Open questions surfaced outside the buckets/call-outs — by synthesis time, every scope-shaping question must be in **Stated** (internal — asked and answered earlier), **Inferred** (internal — agent's bet for correction, surfaces as a call-out if it survives the keep test), or **Out** (internal — deliberately excluded). There is no fourth status
-- Floating questions adjacent to stage 2 — if a question genuinely cannot be defaulted, pause synthesis and resolve it before presenting. Pick the question shape that matches: a blocking multiple-choice tool when options are bounded and meaningfully distinct, prose when option sets would bias the answer per Interaction Rule 5(a). Integrate the answer, then present stage 2. Never present stage 2 with adjacent floating questions — that gives the user no clear resolution path
+- Floating questions adjacent to stage 2 — if a question genuinely cannot be defaulted, pause synthesis and resolve it before presenting. Pick the question shape that matches: a blocking multiple-choice tool when options are bounded and meaningfully distinct, prose when option sets would bias the answer per the Interaction Method section in SKILL.md (ask only when a missing answer would change delivery, authorization, or a key decision). Integrate the answer, then present stage 2. Never present stage 2 with adjacent floating questions — that gives the user no clear resolution path

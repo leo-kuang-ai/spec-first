@@ -1,0 +1,30 @@
+id: positive-publish-produces-solution
+title: A verified solved problem produces a grounded learning with invalidation conditions
+description: |
+  Verify the positive knowledge-publication path using an executable fixture.
+  The historical incident is supplied context; current regression results must
+  be observed before publication, not inferred from this prompt.
+input:
+  prompt: |
+    Use spec-compound to capture this solved problem. Historical context supplied
+    by the fixture owner: POST /entries accepted string amounts and silently
+    acknowledged invalid accounting data. Investigation found a combination of
+    unchecked JSON values, happy-path-only tests and success responses for invalid
+    input. The parseEntry type guard in src/server.js is the proposed repair;
+    test/entries.test.js covers rejected string amounts and accepted valid amounts.
+    Run `npm test` now and inspect the current source before treating the repair as
+    verified. Preserve the supplied history as attributed context rather than an
+    independently observed production incident. If current evidence supports it,
+    publish the reusable learning with source references and an invalidation condition.
+context:
+  repo_fixture: evals/fixtures/repos/solved-ledger
+  git:
+    init: true
+    checkout: main
+constraints:
+  timeout_seconds: 600
+  max_turns: 25
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-solution-published.sh
+  timeout_seconds: 30

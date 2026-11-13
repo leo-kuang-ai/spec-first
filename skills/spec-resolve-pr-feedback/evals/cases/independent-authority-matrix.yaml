@@ -8,6 +8,7 @@ description: |
 input:
   prompt: |
     （我已通过 /spec-resolve-pr-feedback 显式调起该 skill——它已在会话中加载,以下是其本次执行的输入。本地仓库,reviewer 意见如下。）
+    先运行 `node prepare-eval.cjs` 一次以捕获 fixture 基线;该命令仅准备评测环境,不属于本次授权修复。
     reviewer 意见:README 的 "Known rough edges" 改成 "Known limitations"。
     帮我改掉并本地提交,不用回复 reviewer 也不用推远端。
 

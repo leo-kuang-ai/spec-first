@@ -4,8 +4,14 @@ function normalizeNewlines(text) {
   return String(text).replace(/\r\n?/g, '\n');
 }
 
+// A leading UTF-8 BOM would make line 0 fail the '---' check; callers hand us
+// raw utf8 reads, so the module consumes it here instead of at each caller.
+function stripLeadingBom(text) {
+  return text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
+}
+
 function splitMarkdownFrontmatter(content) {
-  const normalized = normalizeNewlines(content);
+  const normalized = normalizeNewlines(stripLeadingBom(String(content)));
   const lines = normalized.split('\n');
 
   if (lines[0] !== '---') {
@@ -39,7 +45,7 @@ function splitMarkdownFrontmatter(content) {
 }
 
 function inspectMarkdownFrontmatter(content) {
-  const text = String(content);
+  const text = stripLeadingBom(String(content));
   const lines = lineRecords(text);
   if (lines.length === 0 || lines[0].content !== '---') {
     return {

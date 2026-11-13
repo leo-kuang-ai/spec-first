@@ -35,9 +35,66 @@ function initRepo() {
 }
 
 describe('spec-worktree existing-ref isolation contracts', () => {
+  test.each(['create', 'isolate'])('%s rejects symlinked worktree containers and preserves the original checkout and outside files', (mode) => {
+    const dir = initRepo();
+    const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-worktree-outside-'));
+    try {
+      fs.writeFileSync(path.join(outside, 'sentinel'), 'keep');
+      fs.symlinkSync(outside, path.join(dir, '.worktrees'), 'dir');
+      const head = run('git', ['rev-parse', 'HEAD'], { cwd: dir });
+      const index = fs.readFileSync(path.join(dir, '.git/index'));
+      const args = mode === 'create' ? ['create', 'feature/new', 'main'] : ['isolate', 'feature/login'];
+      expect(() => run('bash', [scriptPath, ...args], { cwd: dir })).toThrow();
+      expect(fs.readdirSync(outside)).toEqual(['sentinel']);
+      expect(fs.readFileSync(path.join(outside, 'sentinel'), 'utf8')).toBe('keep');
+      expect(run('git', ['rev-parse', 'HEAD'], { cwd: dir })).toBe(head);
+      expect(fs.readFileSync(path.join(dir, '.git/index'))).toEqual(index);
+      expect(fs.existsSync(path.join(dir, '.gitignore'))).toBe(false);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+      fs.rmSync(outside, { recursive: true, force: true });
+    }
+  });
+
+  test.each(['existing', 'dangling'])('create rejects %s ancestor links in nested branch paths', (kind) => {
+    const dir = initRepo();
+    const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-worktree-ancestor-'));
+    try {
+      fs.mkdirSync(path.join(dir, '.worktrees'));
+      fs.symlinkSync(kind === 'existing' ? outside : path.join(outside, 'missing'), path.join(dir, '.worktrees/feature'), 'dir');
+      expect(() => run('bash', [scriptPath, 'create', 'feature/new', 'main'], { cwd: dir })).toThrow();
+      expect(fs.readdirSync(outside)).toEqual([]);
+      expect(fs.existsSync(path.join(dir, '.gitignore'))).toBe(false);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+      fs.rmSync(outside, { recursive: true, force: true });
+    }
+  });
+
+  test.each(['ordinary', 'linked'])('remote-only branches in %s checkouts explicitly track upstream without detaching', (kind) => {
+    const dir = initRepo();
+    try {
+      run('git', ['remote', 'add', 'origin', dir], { cwd: dir });
+      run('git', ['config', 'branch.autoSetupMerge', 'false'], { cwd: dir });
+      run('git', ['update-ref', 'refs/remotes/origin/remote-feature', 'HEAD'], { cwd: dir });
+      let cwd = dir;
+      if (kind === 'linked') {
+        cwd = path.join(dir, 'linked');
+        run('git', ['worktree', 'add', '-b', 'isolated', cwd], { cwd: dir });
+      }
+      run('bash', [scriptPath, 'isolate', 'remote-feature'], { cwd });
+      const target = kind === 'linked' ? cwd : path.join(dir, '.worktrees/remote-feature');
+      expect(run('git', ['branch', '--show-current'], { cwd: target }).trim()).toBe('remote-feature');
+      expect(run('git', ['rev-parse', '--abbrev-ref', '@{upstream}'], { cwd: target }).trim()).toBe('origin/remote-feature');
+      expect(run('git', ['branch', '--show-current'], { cwd: dir }).trim()).toBe('main');
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
   test('source documents caller-owned isolation for spec-dogfood and spec-work', () => {
     const skill = fs.readFileSync(path.join(repoRoot, 'skills/spec-worktree/SKILL.md'), 'utf8');
-    const dogfood = fs.readFileSync(path.join(repoRoot, 'skills/spec-dogfood/SKILL.md'), 'utf8');
+    const dogfood = fs.readFileSync(path.join(repoRoot, 'skills/spec-dogfood/references/phases.md'), 'utf8');
 
     expect(skill).toContain('isolate [--copy-env] <target-ref|pr:<number>|#<number>> [worktree-slug]');
     expect(skill).toContain('already_checked_out branch=<name> path=<path>');

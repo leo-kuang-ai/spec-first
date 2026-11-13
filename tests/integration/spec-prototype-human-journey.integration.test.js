@@ -50,6 +50,25 @@ describe('spec-prototype preview lifecycle', () => {
     }
   }, 15000);
 
+  test('serves a question-subdirectory build layout at the default URL', async () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-prototype-'));
+    fs.mkdirSync(path.join(root, 'screens', 'density-question'), { recursive: true });
+    fs.writeFileSync(path.join(root, 'screens', 'density-question', 'index.html'), '<!doctype html><title>question build</title>');
+    try {
+      const info = JSON.parse(run(['start', '--root', root], root));
+      expect(info.status).toBe('started');
+      const page = await get(info.url);
+      expect(page.status).toBe(200);
+      expect(page.body).toContain('question build');
+      const direct = await get(`${info.url}/density-question/index.html`);
+      expect(direct.status).toBe(200);
+      expect(JSON.parse(run(['stop', '--root', root])).status).toBe('stopped');
+    } finally {
+      try { run(['stop', '--root', root], root); } catch {}
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  }, 15000);
+
   test('unattended callers do not get a running server from the contract', () => {
     const skill = fs.readFileSync('skills/spec-prototype/SKILL.md', 'utf8');
     expect(skill).toContain('blocked-human-experience-required');
@@ -76,6 +95,18 @@ describe('spec-prototype preview lifecycle', () => {
       const stop = spawnSync(process.execPath, [server, 'stop', '--root', root], { encoding: 'utf8' });
       expect(stop.status).toBe(2);
       expect(JSON.parse(stop.stdout)).toEqual(expect.objectContaining({
+        status: 'blocked',
+        reason_code: 'preview-process-identity-unverified',
+      }));
+      const status = spawnSync(process.execPath, [server, 'status', '--root', root], { encoding: 'utf8' });
+      expect(status.status).toBe(2);
+      expect(JSON.parse(status.stdout)).toEqual(expect.objectContaining({
+        status: 'blocked',
+        reason_code: 'preview-process-identity-unverified',
+      }));
+      const restart = spawnSync(process.execPath, [server, 'start', '--root', root], { encoding: 'utf8' });
+      expect(restart.status).toBe(2);
+      expect(JSON.parse(restart.stdout)).toEqual(expect.objectContaining({
         status: 'blocked',
         reason_code: 'preview-process-identity-unverified',
       }));

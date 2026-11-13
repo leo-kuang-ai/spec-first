@@ -30,9 +30,13 @@ Enter this reference only after the leading mode token is stripped and shallow f
 
 If the task pack is invalid, stale, wrong-chain, unverifiable, source-plan-missing, scope-ambiguous, semantically inadequate, or drifted after intake, stop before creating or continuing execution tasks. Return the copy-ready handoff in [Failure Handoff](#failure-handoff). Do not silently reinterpret the file as a legacy plan, infer tasks from human-readable cards, or continue from a cached validation receipt.
 
+非活跃来源且当前用户明确要求补完时，执行第 1 节的 plan owner 接续分支；仍停止旧任务包执行，不把 handoff 当作校验通过。
+
 ## 1. Lock Roots And Run Deterministic Validation
 
 Resolve one existing artifact root that contains the task pack and its `source_plan`. In a parent workspace, do not guess: require the caller/plan/task pack to identify the artifact root and the downstream mutation `target_repo` or per-task repo scope. The two roots may differ.
+
+Consume `execution_focus[].resolved_target_repo` from the validation receipt as a path-check fact. Reconcile it with the authorized mutation repo and current Git identity before executing the task. It must not silently replace the selected target. A changed target declaration or filesystem/link identity requires fresh validation; a missing target in a parent workspace still blocks mutation despite the validator's single-root compatibility fallback.
 
 Run the actual CLI:
 
@@ -42,6 +46,8 @@ spec-first tasks hash <source-plan-path> --repo <artifact-root> --json
 ```
 
 Require all of the following before semantic intake:
+
+若 CLI 返回 `task-pack-source-plan-non-active` 或 `tasks-source-plan-non-active`，且当前用户明确要求补完，保留失败收据与旧任务包；只将已核验在 artifact root 内且可达的 source plan 路径及发现交给 `spec-plan` Phase 0.1。该交接不视为 validation 成功，不进入下面的 semantic intake；owner 返回有效后继后，从本节重新校验新输入。其他路径、安全、来源或合同错误仍按 Failure Handoff 阻断依赖动作，不从非法任务包猜测 source path。
 
 - validation process succeeded;
 - `schema_version: task-pack-validation/v1`;
@@ -78,7 +84,7 @@ The canonical body hash intentionally excludes Markdown frontmatter, so a matche
 - requirements-only, knowledge-work/non-code, progress-like readiness, HTML metadata/content-shape conflict, or lifecycle/source-path ambiguity stops execution;
 - legacy compatibility follows the direct-plan rules rather than being invented from task-pack prose.
 
-Read the source plan with the unified section-map strategy: metadata, Goal Capsule, relevant Requirements and Scope Boundaries/non-goals, Planning Contract KTDs cited by current tasks, Verification Contract, Definition of Done, and only the source units/refs needed for the active wave. The source plan remains authoritative for scope, acceptance, architecture, non-goals, verification, and lifecycle; the task pack compresses execution order and task context.
+Read the source plan with the unified section-map strategy: metadata, Goal Capsule, relevant Requirements and Scope Boundaries/non-goals, and any plan-wide product permission, state-transition, or exception invariant applicable to the active wave. Also read the Product Contract Key Decisions governing its R-IDs, Planning Contract KTDs cited by current tasks, Verification Contract, Definition of Done, and only the source units/refs needed for that wave. Carry applicable global constraints into the task/worker packet even when a Task Card omits them; if a relevant invariant cannot be located or reconciled, keep the affected behavior decision open rather than treating the task pack as a replacement for product authority. The source plan remains authoritative for scope, acceptance, architecture, non-goals, verification, and lifecycle; the task pack compresses execution order and task context.
 
 ## 3. Semantic-Fit Gate
 
@@ -95,7 +101,7 @@ If the pack omitted a material unit or conflicts with scope/non-goals/KTD, retur
 
 ## 4. Create Task Tracker From The Contract
 
-Use `validation_receipt.task_pack.contract.tasks` and `execution_waves` as the executable task source. Preserve each `task_id` in the platform task subject and carry `source_unit`, `requirement_refs`, dependencies, goal, files, `test_focus`, `done_signal`, `stop_if`, review intent, and repo scope into the bounded worker packet.
+Use `validation_receipt.task_pack.contract.tasks` and `execution_waves` as the executable task source. Preserve each `task_id` in the platform task subject and carry `source_unit`, `requirement_refs`, dependencies, goal, files, `test_focus`, `done_signal`, `stop_if`, review intent, and repo scope into the bounded worker packet. Also carry `context_refs`, `notes` and `risk_note` from the full task object, plus the applicable plan-wide constraints and their source section titles: the abbreviated `execution_focus` view is not a lossless task packet. Reconcile inherited proof-test/seam refs, settled decisions and external/manual done signals with the current source plan; preserve their protection intent in execution and verification evidence. Unbound or stale proof stays explicit and cannot become a synthetic passed check.
 
 Create tasks wave by wave in dependency order. Do not create a parallel task decomposition from the source plan or human-readable Task Cards. Human-readable sections may orient the executor, but they cannot override the validated JSON contract.
 
@@ -109,6 +115,7 @@ Recompute and compare the pinned facts before every task start and before every 
 - current canonical plan hash vs `source_plan_hash`;
 - current source-plan metadata/content-shape vs the implementation-ready code intake;
 - current source-plan lifecycle status; `completed`, `partially-shipped`, and `superseded` are `source-plan-non-active` and invalidate the task pack even when body hash and readiness still match;
+- 当前用户明确授权补完时，将非活跃 source plan 与核验发现交给 `spec-plan` Phase 0.1；保留旧任务包，核验后继计划，必要时重新生成并校验新 task pack，再从 intake 接续。只读请求不触发计划生产，旧 pins 不得重绑以绕过生命周期拒绝；
 - selected artifact root and task/source paths vs the pinned receipt.
 
 On mismatch, stop the current task and all dependent work:
@@ -133,7 +140,7 @@ At work intake, pin `work_run_base` to the current `HEAD` before plan-owned muta
 After task implementation and focused verification, compare current filesystem/git facts with the pre-task facts and build `spec-code-review-task-context/v1`:
 
 - `task_pack_digest`, `source_plan`, and `work_run_base`;
-- `source_plan_section_titles`: the selected Task Card's relevant live-plan headings, derived from its `source_unit` and current source-plan structure; this is a path-plus-title label only, never plan body, hash, byte range, or anchor grammar;
+- `source_plan_section_titles`: the selected Task Card's relevant live-plan headings plus the applicable plan-wide constraint and governing Product Contract Key Decision headings identified at intake, derived from its `source_unit`, requirement refs, and current source-plan structure; this is a path-plus-title label only, never plan body, hash, byte range, or anchor grammar;
 - `pre_task_dirty_files`, `pre_task_untracked_files`, and `pre_task_file_facts`;
 - added/modified/deleted/renamed `task_delta_files` with current hashes;
 - `task_owned_untracked_files` only for files absent before the task and now present;

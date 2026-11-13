@@ -10,14 +10,22 @@ Step Pre-A resolves the commit range, diff, and (for existing PRs) the current P
 
 The diff is already visible on GitHub. The description exists to explain what the diff cannot show: what was impossible before and is now possible, what was broken and is now fixed, and which shape changed. Cut any sentence a reader could reconstruct from the diff itself.
 
-- Bad: "Adds `branch-creation.md`, modifies `spec-commit-push-pr/SKILL.md`, and updates contract tests."
+- Bad (lists what was edited): "Adds `branch-creation.md`, modifies `spec-commit-push-pr/SKILL.md`, and updates contract tests."
 - Good: "Default-branch shipping now verifies a fresh base before any PR work touches the branch."
+- Bad (states how the work was done): "The shipping reference now anchors branch verification to a named checklist."
+- Good: "Shipping to the default branch now catches a stale base before any PR work touches the branch."
 
-If the lead sentence describes what was moved, renamed, or added rather than what is now possible or fixed, rewrite it. This applies to every section, not just the opening. Restating the diff is the default failure mode this reference exists to prevent.
+If the lead sentence describes what was edited rather than what is now different for someone using this, rewrite it — this applies to every section, not just the opening, and restating the diff is the default failure mode this reference exists to prevent. A mechanism written in an outcome's grammar is judged by the same condition: "now anchors its checks to a named framework" is how the work was done, while a mechanism that *is* what the reader gets stays.
 
 For user-facing bugs, run an extra before/after pass before writing the mechanism: name what the user would have seen before and what they now see instead. Only then mention the technical cause or fix, and only if it helps the reviewer understand risk.
 
 ---
+
+## Project PR-body contract
+
+Before composition, use active project instructions, then inspect standard PR-template locations relative to the confirmed repository root: root `PULL_REQUEST_TEMPLATE.md`, `docs/`, `.github/` and `.github/PULL_REQUEST_TEMPLATE/`. Read only applicable templates and directly referenced contribution guidance. Resolve multiple templates from the caller's change category or existing PR; ask only if a consequential template choice remains unresolved.
+
+Required headings, fields, order, checklists and boilerplate outrank this reference's default layout. A minimum template permits useful additions; an exact/template-only contract does not. Preserve truthful unchecked/not-run fields rather than checking them by inference. Fit outcomes, validation and provenance into permitted sections; suppress optional teaching, diagrams and footer when the contract forbids them. Do not scan unrelated documentation or create a template parser.
 
 ## Step Pre-A: Resolve the PR commit range and diff
 
@@ -25,13 +33,13 @@ Determine which commits and diff the description should cover. Run this first; S
 
 ### Mode
 
-- **Current-branch mode.** Describe HEAD vs the repo's default base. Used when the caller has no explicit PR reference (Step 6 of spec-commit-push-pr's full workflow; description-only mode without a PR ref).
-- **PR mode.** Describe a specific PR's commit range. Used by DU-3 (the existing PR on the current branch) and description-only mode (the user pasted a PR URL/number). The PR ref may be a bare number, `#NN`, `pr:NN`, or a full URL — the caller passes it to `gh pr view <ref>` directly. (`gh pr view` accepts numbers and URLs natively; `#NN` and `pr:NN` need the `#` or `pr:` stripped before passing.)
+- **Current-branch mode.** Describe the captured HEAD vs the caller's resolved base, otherwise the confirmed default base. Used when the caller has no explicit PR reference (Step 6 of spec-commit-push-pr's full workflow; description-only mode without a PR ref).
+- **PR mode.** Describe a specific PR's commit range. Used by the Description Update workflow (the existing PR on the current branch) and description-only mode (the user pasted a PR URL/number). The PR ref may be a bare number, `#NN`, `pr:NN`, or a full URL — the caller passes it to `gh pr view <ref>` directly. (`gh pr view` accepts numbers and URLs natively; `#NN` and `pr:NN` need the `#` or `pr:` stripped before passing.)
 
 ### Resolve PR metadata (PR mode and current-branch-with-existing-PR)
 
-```bash
-gh pr view [<ref>] --json baseRefName,headRefOid,baseRefOid,headRepository,headRepositoryOwner,isCrossRepository,url,body,state
+```text
+gh pr view <ref> --repo <host/owner/repo> --json number,baseRefName,headRefName,headRefOid,baseRefOid,headRepository,headRepositoryOwner,isCrossRepository,url,body,state
 ```
 
 If the returned `state` is not `OPEN`, report `"PR <number> is <state>; cannot generate description"` and exit gracefully — do not invent a description.
@@ -40,46 +48,40 @@ If the returned `state` is not `OPEN`, report `"PR <number> is <state>; cannot g
 
 For PR mode (or current-branch mode with an existing PR), use `baseRefName` from the metadata above. For current-branch mode without an existing PR, resolve in priority order:
 
-1. **Caller-supplied base** (if the caller passed `base:<ref>`) — use verbatim. The ref must resolve locally.
+1. **Caller-supplied base** (if the caller passed `base:<ref>`) — validate it in the confirmed base repository; do not substitute a same-named ref from a fork.
 2. **Repo default branch** — `git rev-parse --abbrev-ref origin/HEAD`, strip `origin/` prefix.
-3. **GitHub metadata** — `gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name'`.
-4. **Common names** — try `main`, `master`, `develop`, `trunk` in order via `git rev-parse --verify origin/<candidate>`.
+3. **GitHub metadata** — `gh repo view <host/owner/repo> --json defaultBranchRef`. Parse the returned value; do not guess from common branch names.
 
-If none resolve, ask the user to specify the base branch.
+If none resolve, keep the base unresolved and ask only for that missing fact. A local branch named main is not evidence of the intended base.
 
 For the **base remote**, parse `owner/repo` from the PR URL (or use the repo of the current checkout in current-branch mode without a PR) and match against `git remote -v` fetch URLs (handle both `git@github.com:owner/repo` and `https://github.com/owner/repo` forms; strip `.git`). The matching remote name is `<base-remote>`. **If no remote matches** (fork-based PR with no `upstream` remote), do NOT default to `origin` — `origin` would diff against the wrong base. Skip directly to Case B.
 
 ### Case A — base remote matched, attempt local git
 
-**Only fetch when the refs aren't already local.** Skipping the fetch when refs resolve locally preserves offline / restricted-network / expired-auth workability — a common case when re-running the skill on a branch that's already been fetched recently.
+Bind the description to exact source identity. In PR mode use the metadata's `baseRefOid` and `headRefOid`, never a potentially stale `<remote>/<branch>` merely because it resolves. In current-branch mode capture HEAD and the resolved base commit; disclose a cached/offline base as such. Full shipping uses the separate fresh-base contract in `branch-creation.md`.
 
-```bash
-PR_HEAD_SHA=<headRefOid>   # for current-branch mode, use HEAD instead
+Run each command separately, replacing placeholders with validated literal values and inspecting the actual exit status:
 
-if ! git rev-parse --verify <base-remote>/<baseRefName> >/dev/null 2>&1 \
-  || ! git rev-parse --verify $PR_HEAD_SHA >/dev/null 2>&1; then
-  git fetch --no-tags <base-remote> <baseRefName> $PR_HEAD_SHA
-fi
-
-MERGE_BASE=$(git merge-base <base-remote>/<baseRefName> $PR_HEAD_SHA) \
-  && echo '=== COMMITS ===' && git log --oneline "$MERGE_BASE..$PR_HEAD_SHA" \
-  && echo '=== DIFF ===' && git diff "$MERGE_BASE...$PR_HEAD_SHA"
+```text
+git rev-parse --verify <base-sha>^{commit}
+git rev-parse --verify <head-sha>^{commit}
+git merge-base <base-sha> <head-sha>
+git log --oneline <merge-base>..<head-sha>
+git diff <merge-base>...<head-sha>
 ```
 
-For current-branch mode, `$PR_HEAD_SHA` is `HEAD` which is always local, so only the base ref needs fetching. Using the explicit `$PR_HEAD_SHA` in downstream commands avoids `FETCH_HEAD`'s multi-ref ordering problem.
-
-If `git merge-base` itself fails (shallow clone with insufficient history, or genuinely unrelated histories), do not press on — fall through to Case B and let the API path produce the diff and commits.
+Fetch only missing objects from the matched base remote. Capture and validate each result before consuming it; do not use shell variables, pipelines, redirects or command substitution to hide failures. If merge-base fails, use the API fallback for a known PR rather than inventing a range. Uncommitted changes are context only and must not be described as published PR contents.
 
 ### Case A inner fallback — SHA fetch rejected
 
-Some GHES configurations disallow fetching non-tip SHAs. If the SHA fetch is rejected (PR mode only — current-branch mode uses HEAD which is always local), fall back to fetching the PR head via `refs/pull/<number>/head`:
+When a PR head SHA fetch is rejected, a separate single-ref fetch may retrieve `refs/pull/<number>/head` from the confirmed base repository:
 
-```bash
-git fetch --no-tags <base-remote> "refs/pull/<number>/head"
-PR_HEAD_SHA=$(awk '/refs\/pull\/[0-9]+\/head/ {print $1; exit}' "$(git rev-parse --git-dir)/FETCH_HEAD")
+```text
+git fetch --no-tags <base-remote> refs/pull/<number>/head
+git rev-parse --verify FETCH_HEAD
 ```
 
-Then re-run the merge-base + log + diff with the new `$PR_HEAD_SHA`.
+Capture the returned SHA immediately and compare it with the metadata head. A mismatch requires refreshed PR metadata and a newly bound range; do not quietly compose against mixed revisions. Missing base objects still require a valid fetch or API fallback. Never parse FETCH_HEAD with shell-specific awk/substitution or assume the last of multiple fetched refs is the PR head.
 
 ### Case B — API only
 
@@ -89,12 +91,12 @@ Use Case B when:
 
 Skip local git entirely:
 
-```bash
-gh pr diff <ref>
-gh pr view <ref> --json commits --jq '.commits[] | [.oid[0:7], .messageHeadline] | @tsv'
+```text
+gh pr diff <ref> --repo <host/owner/repo>
+gh pr view <ref> --repo <host/owner/repo> --json commits,headRefOid,baseRefOid
 ```
 
-Note in the user-facing output that the API fallback was used.
+Read metadata again after API diff/commit retrieval and compare both head/base SHAs. If either changed, discard the mixed snapshot and refresh within a bounded retry; continued movement leaves composition pending. Note the API fallback and source identity in the caller handoff. Without a known PR and a valid local range, return the missing evidence instead of guessing.
 
 ### Empty range
 
@@ -110,6 +112,12 @@ Scan the commit list and classify each commit:
 - **Fix-up commits** -- iteration work (code review fixes, lint fixes, test fixes, rebase resolutions, style cleanups). Invisible to the reader.
 
 When sizing the description, mentally subtract fix-up commits: a branch with 12 commits but 9 fix-ups is a 3-commit PR.
+
+Build a compact **scope map** from the complete oneline commit list and final three-dot diff resolved in Pre-A. Use subjects for full-range coverage, then use the final diff to merge overlapping work, remove fix-up-only outcomes, and correct stale subjects. Read fuller messages only when a subject remains unclear or contradicts the diff. Group material outcomes into clusters, identify each cluster's claims, and name one umbrella outcome covering them. Never derive that umbrella from the latest commit, tracker title, branch name, original request, or opening incident alone. The story of how work started is one cluster's origin, not the whole change.
+
+Check program placement using only context already available: the user request, a known plan, existing PR body, commit messages, or explicit series language. If this is part of a program, name the program outcome, this PR's contribution, and known preceding or follow-on work. Do not invent a series or scan all open PRs just for this check.
+
+Before composing, write the finished map as a short run-local working note: umbrella outcome; clusters and their material claims; program placement or `none`. State the umbrella as what is now different for someone using this, never as the mechanism that produced it — the title and the opening both inherit the map's altitude, so a mechanism-shaped umbrella is not something a later step can correct. Keep it to three or four lines. This is drafting context, not another section to publish in the PR body. Step H audits the title and opening against this written map rather than memory.
 
 ---
 
@@ -134,19 +142,29 @@ Do not label test output as "Demo" or "Screenshots". Place any preserved evidenc
 
 ---
 
+## Step B1: Related work and closing semantics
+
+Collect known references from the request, caller handoff, current PR body, selected template and already-available commit/plan/debug context. Read a relevant fuller commit message only when its reference or intent is unclear. Do not search for plans or scan unrelated issues to manufacture provenance.
+
+Distinguish a closing reference from a neutral relationship. Closing requires evidence that the PR fully resolves the item, known tracker syntax and the actual target conditions. For GitHub Issues, use closing keywords only when targeting the confirmed default branch and resolving the whole issue; a partial fix, investigation, validation-only change or non-default target gets a neutral link. Preserve exact cross-repository identity with a full URL or `owner/repo#number`. Unknown tracker semantics or uncertain intent never acquire closing keywords.
+
+On rewrite, preserve existing related references and their meaning. If an existing closing line conflicts with the verified scope/target, retain the reference as neutral and explain that correction; do not silently keep a harmful close or drop its provenance. Follow project tracker conventions without imposing a universal label. Keep non-closing IDs in a separate neutral related-work line, away from close/fix/resolve phrases that integrations could interpret as actions. A PR body can trigger tracker automation; writing style does not authorize an additional tracker action.
+
+---
+
 ## Step B2: Judge new concepts
 
-Decide whether the change introduces a concept: a pattern, technique, library, or domain idea that a reader of this repo would plausibly not know. Skip this step entirely when the skill's concept teaching gate is off.
+Decide whether the change introduces a concept: a pattern, technique, library, or domain idea that a reader of this repo would plausibly not know. Skip this step entirely when the skill's concept teaching gate is off or the project's exact-template contract forbids the section.
 
 **Gather candidates from the diff first.** Read the Pre-A diff for concept-shaped novelty: a dependency put to first real use, a technique the diff visibly introduces, or a domain idea the code now encodes. Most PRs surface no candidate; stop there and compose no section. Absence is the common case, and this path costs zero extra tool calls.
 
 **Check each candidate against the base ref, never the working tree.** The working tree contains this PR's own code, so grepping it finds the concept you just added and wrongly concludes it is already established. Check the base instead, using the base resolved in Pre-A:
 
-```bash
-git grep -il -e "<term>" "<base-remote>/<base>" | head -5
+```text
+git grep -il -e <term> <base-sha>
 ```
 
-Run one call per candidate. Candidates cap at two, so the cost stays bounded. Empty output means the concept is absent from the base.
+Run one call per candidate. Candidates cap at two, so the cost stays bounded. Inspect the exit status: 0 means matches, 1 means no matches for that term, and other failures leave coverage unknown. Read at most the needed matches; no match alone does not prove a concept is absent under other terminology.
 
 A candidate is teachable only when it is both new to this codebase in this PR and transferable beyond it. Never teach routine use of an already-established repo pattern, ordinary refactors, renames, dependency bumps, or project-internal plumbing with no transferable idea. When in doubt, omit; a missing section costs little, while a patronizing one trains readers to skip the feature.
 
@@ -172,9 +190,9 @@ Format by material:
 
 Lead with the point, then the mechanism, then the caveat. Dense is good; long is not. Never hand-draw box-drawing or ASCII diagrams. The section is additive to Step D's sizing: a small PR that introduces a heavy concept still gets the section, and the section never counts against the base description's size rows.
 
-**Rewrite preservation:** when rewriting an existing PR body, preserve an existing `## New concepts` section and any explainer-doc link verbatim, same as `## Demo`, unless the user's focus asks to refresh the concepts. Description-only and description-update runs never write repo files.
+**Rewrite preservation:** when rewriting an existing PR body, preserve an existing `## New concepts` section and any explainer-doc link verbatim, same as `## Demo`, unless the user's focus asks to refresh the concepts. Also preserve caller-written decision-record sections — `## Known Residuals` and `## Post-Deploy Monitoring & Validation` — verbatim: they are durable review records owned by the calling workflow (e.g., `spec-work` shipping), not description prose to regenerate; if they look stale, flag the mismatch in the handoff instead of silently dropping them. Description-only and description-update runs never write repo files.
 
-**Archival hook:** when `spec-commit-push-pr` confirms the apply and `pr_teaching_archive` is on in full workflow, the teaching content is also written to `docs/explainers/` and linked from the section. The commit-and-push transition and doc frontmatter live in `SKILL.md` Step 7.
+**Archival hook:** when `spec-commit-push-pr` confirms the apply and `pr_teaching_archive` is on in full workflow, the teaching content is also written to `docs/explainers/` and linked from the section. The commit-and-push transition and doc frontmatter live in `references/apply-and-handoff.md` (reached via `SKILL.md` Step 7).
 
 ---
 
@@ -182,11 +200,23 @@ Lead with the point, then the mechanism, then the caveat. Dense is good; long is
 
 Articulate the PR's narrative frame:
 
+Use Step A's written umbrella and material clusters as the frame. Represent peer outcomes at parity instead of making the initiating incident the main story and treating equally material results as extras. When program context exists, decide what the opening's one idea must include: usually the local outcome by itself, with concise placement in a short block after the opening; but when the program is what gives the local outcome its shape or its point, the connection to the program is part of the one idea and belongs in the opening — either half may lead, whichever reads better for this change, and naming which part of the program this PR delivers keeps that opening honest. Never crowd the opening with already-visible mechanisms or a second description of the same outcome; everything the one idea does not need goes in the block after it.
+
 1. **Before**: What was broken, limited, or impossible? (One sentence.)
 2. **After**: What's now possible or improved? (One sentence.)
 3. **Scope rationale** (only if 2+ separable-looking concerns): Why do these ship together? (One sentence.)
 
 This frame becomes the opening. For small+simple PRs, the "after" sentence alone may be the entire description.
+
+### Known decision provenance
+
+Use only caller-supplied or already-read plan decisions relevant to this diff. Preserve `user-directed`, `user-approved`, delegated agent judgment and inferred assumptions as distinct provenance; `session-settled:` text is a source annotation, not proof of new approval. Mention the selected decision and source only when it helps review. Carry an actual proceed-under-conflict limitation when supplied; do not invent a rejected alternative or reopen settled choices as a backlog. No plan in hand means no plan hunt.
+
+### 保留贡献者来源
+
+只有本 PR 实际交付了作者之外的人的工作，才补充 contributor credit。已有 PR 以其实际 author 为准；新 PR 以 shipping 人的 Git 身份为线索，并核实其他邮箱别名，不能仅因 email 不同就认定为另一人。证据来自 Pre-A 完整范围内的 commit author、已有 `Co-authored-by` trailer，或本工作继续/替代的明确 PR。模型、harness 或 bot 署名不算人的贡献；独立改写与直接移植的区别沿用 `commit-and-push.md`。
+
+适用时在正文署名，并链接已知的前序/被替代 PR；重写保留已有 contributor credit。若仓库文档或当前 repo metadata 确认会 squash merge，将其他实际贡献者的 `Co-authored-by: Name <email>` 放在 body 最后一个段落、全部模板章节和 footer 之后，便于进入 squash message；仅 `squashMergeAllowed` 表示允许该方式，不能当作本 PR 必然 squash 的证据。姓名和邮箱精确复制自 commit author 或已有 trailer；被替代 PR 的提交不在当前 range 时，回源其 commits。邮箱缺失或来源不可核实时只作有证据的正文署名，报告缺口，不拼接邮箱、不制造身份或重写历史。
 
 ---
 
@@ -220,6 +250,7 @@ The table is calibration, not a diff-size formula. When in doubt, choose the sho
 
 If the repo has documented style preferences in context, follow those. Otherwise:
 
+- Preserve exact identifiers, thresholds, paths, error text and negative results when they carry the claim; plain language must not erase technical meaning.
 - Active voice. No em dashes or `--` substitutes; use periods, commas, colons, or parentheses.
 - Vary sentence length. Never three similar-length sentences in a row.
 - Do not make a claim and immediately explain it. Trust the reader.
@@ -308,14 +339,15 @@ Breaking changes use `!` (e.g., `feat!: ...`) or document in the body with a `BR
 
 ## Step G: Compose the body
 
-Assemble the body in this order:
+Use the project PR-body contract first. The following order is a fallback for unconstrained sections, not permission to omit template fields or add forbidden sections:
 
 1. **Opening** -- the narrative frame from Step C, at the depth chosen in Step D. Under a heading (e.g., `## Summary`) if the description uses any `##` headings elsewhere; a bare paragraph otherwise.
 2. **Body sections** -- only the sections that earn their keep for this change: what changed and why, design decisions, tables for data, visual aids when complexity warrants. Skip empty sections entirely.
 3. **Test plan** -- only when non-obvious per the writing principles. Omit otherwise.
 4. **New concepts section** -- only when Step B2 produced one or preserved one from the existing PR body.
 5. **Evidence block** -- only the preserved or freshly captured block from Step B, if one exists. Do not fabricate or placeholder.
-6. **Spec-First footer** -- append the plain-text footer separated by a `---` rule. Skip if regenerating an existing body that already contains the footer.
+6. **Spec-First footer** -- for a new body use the existing plain-text default only when the project body contract permits it. On rewrite preserve existing branding without duplication; do not add or remove it merely as cleanup. Explicit user/project branding direction takes precedence.
+7. **贡献者 trailers** -- 仅按 Step C 的已核实条件添加，放在 body 最后一个段落；无适用贡献者则省略。
 
 **Footer:**
 
@@ -333,19 +365,24 @@ The footer contains no externally loaded image and does not publish the harness 
 
 Before applying, audit the body against the material claims from Step D:
 
+- Is the umbrella itself an outcome — what is now different for someone using this — rather than the mechanism that produced it? Check this before the two questions below: both compare against the umbrella, so both pass just as readily when it is mechanism-shaped.
+- Does the title express Step A's umbrella outcome instead of one cluster or mechanism?
+- Does the opening express that same umbrella, covering every peer outcome at parity? If one outcome leads while peers appear only as "also" or "comes with", rewrite from the written map.
+- Does the map record program placement or `none`? Include known program context when relevant, and remove any invented series when none is supported.
+
 - Is every claim the diff cannot establish present, and is any claim the diff does show restated needlessly?
 - Is decision-changing evidence stated as a result rather than collapsed into an unexplained "tests passed"?
 - Are demonstrated results, assumptions, and mixed or negative outcomes clearly distinguished?
 
 Then apply these cuts:
 
-- If any body section restates content already in the `## Summary`, remove it. The Summary plus the diff should carry the reader.
+- Preserve every required template field/checklist. If an optional body section restates content already in the `## Summary`, remove it. The Summary plus the diff should carry the reader.
 - If "Testing" or "Test plan" has more than 2 paragraphs, compress to bullets.
 - If a "Commits" section enumerates the commit log, remove it — GitHub shows it in its own tab.
-- If a "Review" or process-oriented section lists how to review, remove it. Move any truly non-obvious review hints inline with the relevant change.
+- If an optional "Review" or process-oriented section lists how to review, remove it. Move any truly non-obvious review hints inline with the relevant change.
 - If the body has 5+ H3 subsections that each describe one mechanism, consolidate them into a single table row per mechanism under one header. Reserve prose H3 callouts for 2-3 genuine design decisions.
 - If the body exceeds the sizing-table target by more than 30%, compress the longest non-Summary section by half.
-- If any other sentence or section can be cut without lowering reviewer confidence, cut it. Do not remove required footer content or a required `## New concepts` section solely to shorten the narrative.
+- If any other sentence or section can be cut without lowering reviewer confidence, cut it. Do not remove project-required content or permitted preserved teaching/evidence solely to shorten the narrative. Exact-template restrictions override optional footer/teaching defaults. 保留 Step C 核实的 contributor credit 和适用 trailers，不为缩短文案删去真实来源。
 
 **Value-lead check.** Re-read the first sentence of the Summary. If it describes what was moved around, renamed, or added ("This PR introduces three-tier autofix..."), rewrite to lead with what's now possible or what was broken and is now fixed ("Document reviews previously produced 14+ findings requiring user judgment; this PR cuts that to 4-6.").
 

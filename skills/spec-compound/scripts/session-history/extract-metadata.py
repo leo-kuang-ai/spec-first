@@ -16,7 +16,7 @@ import sys
 import json
 import os
 
-MAX_LINES = 25  # Only need first ~25 lines for metadata
+MAX_LINES = 200  # 恢复的会话可能先写入大量非消息记录，元数据探测仍保持有界。
 
 
 def json_object(line):
@@ -35,6 +35,7 @@ def try_claude(lines):
             if obj.get("type") == "user" and "gitBranch" in obj:
                 return {
                     "platform": "claude",
+                    "cwd": obj.get("cwd", ""),
                     "branch": obj["gitBranch"],
                     "ts": obj.get("timestamp", ""),
                     "session": obj.get("sessionId", ""),
@@ -362,14 +363,16 @@ def process_file(filepath):
                     result["last_ts"] = last_ts
             return result, None
         else:
-            return None, filepath
+            return None, None
     except (OSError, IOError) as e:
         return None, filepath
 
 
 def cwd_matches_filter(session_cwd, cwd_filter):
-    if not session_cwd or not cwd_filter:
+    if not cwd_filter:
         return True
+    if not session_cwd:
+        return False
     if os.path.isabs(cwd_filter):
         return os.path.normpath(session_cwd) == os.path.normpath(cwd_filter)
     return cwd_filter in session_cwd
@@ -398,6 +401,7 @@ if files:
     # Batch mode: process all files
     processed = 0
     parse_errors = 0
+    no_metadata = 0
     filtered = 0
     matched = 0
     for filepath in files:
@@ -411,7 +415,7 @@ if files:
             # scan cost — Codex discovery returns sessions across all repos,
             # so without this ordering --keyword would scan files that are
             # immediately discarded.
-            if cwd_filter and result.get("cwd") and not cwd_matches_filter(result["cwd"], cwd_filter):
+            if cwd_filter and not cwd_matches_filter(result.get("cwd"), cwd_filter):
                 filtered += 1
                 continue
             # Apply keyword scan only after cheap filters pass.
@@ -425,8 +429,12 @@ if files:
             print(json.dumps(result))
         elif error:
             parse_errors += 1
+        else:
+            no_metadata += 1
 
     meta = {"_meta": True, "files_processed": processed, "parse_errors": parse_errors}
+    if no_metadata:
+        meta["files_without_metadata"] = no_metadata
     if filtered:
         meta["filtered_by_cwd"] = filtered
     if keywords:
@@ -455,4 +463,7 @@ else:
         result = extract_from_lines(lines)
         if result:
             print(json.dumps(result))
-        print(json.dumps({"_meta": True, "files_processed": 1, "parse_errors": 0 if result else 1}))
+        meta = {"_meta": True, "files_processed": 1, "parse_errors": 0}
+        if not result:
+            meta["files_without_metadata"] = 1
+        print(json.dumps(meta))

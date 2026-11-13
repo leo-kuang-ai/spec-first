@@ -1,6 +1,7 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { detectInstallOrigin } = require('./install-origin');
 
 const { getAdapter, getPlatformDisplayName, getStartupReminderHosts } = require('./adapters');
 
@@ -35,29 +36,25 @@ function shouldNotifyVersionReminder(currentVersion, latestVersion) {
 }
 
 function detectInstallChannels(options = {}) {
-  // options.selfPath 供测试注入；生产取当前 bin 真实入口。
-  // 统一按 POSIX 分隔符匹配（宿主在 Windows 上常以正斜杠字符串 spawn），
-  // win32 下再做大小写归一（大小写不敏感文件系统上的目录名变体）。
-  let selfPath = String(options.selfPath || process.argv[1] || '');
-  if (process.platform === 'win32') {
-    selfPath = selfPath.toLowerCase();
-  }
-  selfPath = selfPath.split(path.sep).join('/');
-  const claudePlugin = selfPath.includes('/.claude/plugins/');
-  return { npm: !claudePlugin, claudePlugin };
+  const evidence = detectInstallOrigin(options);
+  return { ...evidence, npm: evidence.origin === 'npm-global', claudePlugin: evidence.origin === 'claude-plugin' };
 }
 
 function formatUpgradeGuidance(channels) {
-  const optOut = `or set ${VERSION_REMINDER_OPT_OUT_ENV}=1 to disable update checks`;
+  const optOut = `设置 ${VERSION_REMINDER_OPT_OUT_ENV}=1 可关闭更新检查`;
   if (channels && channels.claudePlugin) {
-    return `Run \`claude plugin update\` to upgrade (installed as a Claude Code plugin); \`spec-first update\` manages a separate npm copy, ${optOut}.`;
+    return `npm latest 不证明插件渠道已发布。请在宿主插件管理界面确认身份及版本，再使用 claude plugin update；${optOut}。`;
   }
-  return `Run \`spec-first update\` to upgrade, ${optOut}.`;
+  if (channels && channels.npm) return `当前 CLI 已确认为 npm-global，可运行 spec-first update；${optOut}。`;
+  if (channels && channels.origin === 'local') {
+    return `当前 CLI 来源未确认为 npm-global；请通过原安装渠道检查更新，不新增全局 npm 副本。更新原副本后，用更新后的同一副本入口执行 init（示例：node <本地副本>/bin/spec-first.js init），不要依赖 PATH 上的 spec-first；${optOut}。`;
+  }
+  return `当前 CLI 来源未确认为 npm-global；请通过原安装渠道检查更新，不新增全局 npm 副本。更新原副本后，用更新后的同一副本入口执行 init 并预览目标宿主（PATH 上的 spec-first 可能是另一个未更新副本）；${optOut}。`;
 }
 
 function formatVersionReminder({ packageName, currentVersion, latestVersion, channels }) {
   return [
-    `Update available for ${packageName}: ${currentVersion} -> ${latestVersion}`,
+    `当前 CLI ${packageName} 有 npm 上游版本差异：${currentVersion} -> ${latestVersion}`,
     formatUpgradeGuidance(channels || detectInstallChannels()),
   ].join('\n');
 }
@@ -217,12 +214,12 @@ async function buildStartupVersionReminder(options = {}) {
 function formatStartupVersionReminder({ host, currentVersion, latestVersion }) {
   const hostLabel = STARTUP_HOST_LABELS[host] || host;
   const statusLine = currentVersion
-    ? `[spec-first] Update available for ${hostLabel} runtime: ${currentVersion} -> ${latestVersion}`
-    : `[spec-first] ${hostLabel} runtime version is unknown; latest available spec-first is ${latestVersion}.`;
+    ? `[spec-first] ${hostLabel} 项目 runtime：${currentVersion} -> npm latest ${latestVersion}`
+    : `[spec-first] ${hostLabel} 项目 runtime 版本未知；npm latest 为 ${latestVersion}。`;
 
   return [
     statusLine,
-    'Run `spec-first update` in your terminal to upgrade the spec-first CLI. This startup reminder itself is read-only and will not install, refresh runtime assets, or restart the host.',
+    'runtime 安装渠道未确认；调用提醒的 CLI 来源不能证明 runtime 来源。npm latest 不证明插件渠道已发布，请在宿主插件管理界面核实渠道及版本。普通项目投射请先更新原安装副本，再用更新后的同一副本入口执行 init 选择宿主并预览刷新（PATH 上的 spec-first 可能是另一个未更新副本）。此提醒只读，不安装、不刷新、不重启宿主；宿主加载仍待验证。',
   ].join('\n');
 }
 
@@ -239,7 +236,7 @@ async function lookupLatestGitHubPackageVersion(options = {}) {
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const response = await fetch('https://raw.githubusercontent.com/sunrain520/spec-first/main/package.json', {
+    const response = await fetch('https://raw.githubusercontent.com/leo-kuang-ai/spec-first/main/package.json', {
       headers: {
         accept: 'application/json',
       },

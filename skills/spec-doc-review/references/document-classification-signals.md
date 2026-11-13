@@ -4,7 +4,7 @@ This is a **lazy reference** for SKILL.md. Load when the core classification rul
 
 1. First check task-pack identity (`type: task-pack`; malformed packs still keep this classification)
 2. Then check for unified artifact contract (`artifact_contract: spec-unified-plan/v1`)
-3. Otherwise: content shape is authoritative, path is a tie-breaker hint
+3. Otherwise: content shape and metadata are authoritative; path location never resolves a mixed document
 
 ---
 
@@ -32,6 +32,6 @@ This is a **lazy reference** for SKILL.md. Load when the core classification rul
 - Repo-relative file paths to create/modify/test
 - Prose framing focused on technical decisions, sequencing, and implementer-facing detail
 
-## Tie-breaker rule
+## Tie-breaker and ambiguity rule
 
-When the content signals are mixed or sparse, fall back to path: legacy `docs/brainstorms/` → `requirements`, `docs/plans/` → `plan` unless unified metadata says otherwise. When neither path location applies, treat the dominant content shape as authoritative; if shape is genuinely ambiguous, default to `requirements` (the more conservative classification — it activates fewer plan-specific feasibility checks).
+When signals are mixed or sparse, do not infer the type from directory or filename: requirements-only and implementation-ready artifacts may share a directory. Apply the dominant content shape; if it remains genuinely ambiguous, default to `requirements` and record the ambiguity for the caller rather than guessing from path location.

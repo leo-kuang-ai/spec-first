@@ -47,7 +47,10 @@ describe('spec-sweep legacy item import keying', () => {
     const cwd = tempDir();
     fs.writeFileSync(path.join(cwd, 'legacy.json'), JSON.stringify({
       channels: { C42: { last_processed_ts: '1700000000.000100' } },
-      items: { '1234.5678': { channel: 'C42', status: 'closed', title: 'already handled' } },
+      items: { '1234.5678': {
+        channel: 'C42', status: 'closed', title: 'already handled',
+        fix_ref: 'commit:fixture', verified_merge_sha: 'a'.repeat(40), verified_at: '2026-10-29T00:00:00Z',
+      } },
     }), 'utf8');
 
     const result = runSweepState(cwd, [
@@ -73,6 +76,7 @@ describe('spec-sweep legacy item import keying', () => {
       source: 'slack-alpha',
       id: '1234.5678',
       status: 'closed',
+      verified_merge_sha: 'a'.repeat(40),
     });
     expect(data.items['1234.5678']).toBeUndefined();
     expect(Object.keys(data.sources)).toContain('slack-alpha');
@@ -93,7 +97,7 @@ describe('spec-sweep legacy item import keying', () => {
 
     const { data } = readState(cwd, 'state.json');
 
-    expect(data.items[itemKey('alpha', '100')]).toMatchObject({ status: 'closed' });
+    expect(data.items[itemKey('alpha', '100')]).toMatchObject({ status: 'fix_pending' });
     expect(data.items[itemKey('beta', '100')]).toMatchObject({ status: 'open' });
   });
 

@@ -26,9 +26,11 @@ Valid scopes and the phases they control:
 - Multiple scopes combine: `Scope: technology, architecture, patterns` runs three phases.
 - When scoped, produce output sections only for the requested scopes. Omit sections for phases that did not run.
 - Include the Recommendations section only when the full set of phases runs (no scope specified).
-- When `technology` is not in scope but other phases are **and no cached project profile was supplied** (see the next rule), still run Phase 0.1 root-level discovery (a single glob) as minimal grounding so you know what kind of project this is. Do not run 0.1b, 0.2, or 0.3. Do not include Technology & Infrastructure in the output.
-- **When a cached project profile is supplied in your context** (the consumer resolved it from the shared repo-profile cache), use it for `technology`/`architecture`/`conventions` grounding instead of re-deriving — do **not** run Phase 0 or the Phase 0.1 baseline discovery. Run only the question-specific scopes you were asked for (`patterns`/`issues`/`templates`).
+- When `technology` is not in scope, use the caller's current-run orientation only after checking its target repository/worktree identity, dirty-state observations and cited sources. Confirm consequential facts against the current files; HEAD alone does not identify uncommitted content.
+- Do not consume a shared repo-profile cache or orientation from another run, branch or worktree. Without usable current-run orientation, perform only Phase 0.1's bounded root discovery plus the targeted source reads needed for the question. Do not silently run the full technology scan or label stale cache facts current.
 - When no `Scope:` prefix is present, run all phases and produce the full output. This is the default behavior.
+
+The parent owns the requirements, scope and final workflow decisions. Return source-backed facts, recommendations, freshness and limitations; do not rewrite upstream requirements or treat an advisory source as authority.
 
 Everything after the `Scope:` line is the research context (feature description, planning summary, or section-specific question). Use it to focus the requested phases on what matters for the consumer.
 

@@ -6,6 +6,10 @@ argument-hint: "[mode:headless|mode:report-only] [base:<ref>] [source:<path>] [p
 
 # App Consistency Audit
 
+## Project Intelligence Evidence Boundary
+
+Use `project-graph`/`code-graph` only as `provider_untrusted` navigation candidates when the audit expands beyond a bounded screen or source surface. Confirm every impact, ownership, or inconsistency finding in current source, PRD, design, tests, or owner evidence; an empty graph result has no negative authority. Provider unavailability falls back to bounded direct reads and does not block the audit.
+
 Run a static-first consistency audit for mobile App work before simulator, real-device, or package validation.
 
 ## Routing Gate — read before doing anything
@@ -94,7 +98,7 @@ Do not start a simulator, real device, package build, Appium, Maestro, cloud dev
 
 ## Mode Contract
 
-v1 deterministic orchestrator (`scripts/run-audit.js`) accepts `mode:headless` only; `mode:default` and `mode:report-only` orchestration is deferred. Long-lived canonical-token semantics live in [Mode, Output, And Issue Contract](references/mode-output-contract.md).
+v1 deterministic orchestrator (`scripts/run-audit.js`) accepts `mode:headless` only; `mode:default` and `mode:report-only` orchestration is deferred — that deferral covers the runner entrypoint only. Host-side interactive steps, such as Figma MCP materialization into a run-local context file (see Figma MCP Materialization below), remain available in an interactive/default session without a runner orchestration call. Long-lived canonical-token semantics live in [Mode, Output, And Issue Contract](references/mode-output-contract.md).
 
 Keep these route-critical defaults in memory:
 
@@ -287,7 +291,7 @@ Read these on demand; they are not required for routing:
 - [Mode, Output, And Issue Contract](references/mode-output-contract.md): detailed mode tokens, scope resolution, Figma materialization, output/writeback, and issue protocol fields.
 - [`references/report-format.md`](references/report-format.md): the report section structure that downstream Report-Writer steps emit.
 - [`references/pilot-validation.md`](references/pilot-validation.md): minimal pilot-record format gating the v0.2 readiness decision.
-- [`references/ecc-source-lock.json`](references/ecc-source-lock.json): ECC source-lock policy consumed by `scripts/merge-contracts.js` and the orchestrator prompt to keep ECC-derived lenses read-only.
+- [`references/ecc-source-lock.json`](references/ecc-source-lock.json): ECC source-lock policy consumed by the orchestrator prompt (`prompts/orchestrator.md`) to keep ECC-derived lenses read-only.
 
 ## Workflow Handoff Boundary
 

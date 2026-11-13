@@ -1,7 +1,7 @@
 ---
 title: 上游 CE 更新同步到 spec-first 的常态化升级方法
 date: 2026-04-26
-last_updated: 2026-06-22
+last_updated: 2026-09-11
 category: docs/solutions/architecture-patterns
 module: workflow-asset-sync
 problem_type: architecture_pattern
@@ -52,7 +52,7 @@ CE_RANGE=<base-sha>..HEAD
 
 ### 0. 角色边界
 
-同步时必须先按 `docs/10-prompt/结构化项目角色契约.md` 校准：
+同步时必须先按 `docs/methodology/结构化项目角色契约.md` 校准：
 
 - **脚本做确定性流程**：列文件、取 diff、查引用、跑测试、验证格式、重建 runtime。
 - **LLM 做语义判断**：是否同步、如何适配、是否删除、是否保留分叉、是否延后 spike。
@@ -471,6 +471,24 @@ git diff --check
 - 验证命令通过。
 - 最终回复列出实际改动、验证命令、未执行验证和剩余风险。
 
+### 16. skills/ 拓扑变更与 adjudication 宇宙（2026-09-11 增补）
+
+CE-localization 的冻结工件链以包路径集合为源宇宙：`skills/` 下**新增或删除任何包路径**
+都会使 live `package_path_count` 偏离冻结的 `docs/validation/ce-localization/skill-inventory.json`，
+而 closeout 工件（scenarios/baselines/ledger）经 `validateCloseoutArtifacts` 与该 inventory
+绑定，完整重生成依赖一轮真实的 LLM adjudication——`generate-ce-localization-closeout.cjs`
+的 `assertCurrentUpstreamBinding` 显式拒绝脚本代答重绑（stale input 与 stale adjudication
+都会抛错）。文件**内容**修改不受此约束（内容事实走 `spec-first init` 的确定性重绑）。
+
+操作含义：
+
+- 常规同步批次内**避免顺手做拓扑重构**（文件拆分、合并、迁移）；它们会把语义同步批次
+  拖入 adjudication 刷新。确需拓扑变更时，作为批次内的显式任务项与 adjudication 同轮执行。
+- 撞到计数漂移时，`ce-localization-review-contracts` / `ce-localization-closeout-contracts`
+  两个测试会列出路径差集与 remediation——不要手改冻结工件绕过。
+- 实例：peer-job-runner 的 Windows 块拆分原型因该链回退，蓝图与重估条件沉淀于
+  `peer-job-runner-windows-split-blueprint-2026-09-11.md`。
+
 ## Why This Matters
 
 这套协议把 CE 同步从“prompt 文件搬运”升级为可审计的上游吸收流程：
@@ -550,9 +568,10 @@ CE `4b5f28da..06a7cee0` 中，17 个 code-review reviewer agents 的真实变化
 
 ## Related
 
-- `docs/10-prompt/结构化项目角色契约.md` — spec-first 演化判断基线。
+- `docs/methodology/结构化项目角色契约.md` — spec-first 演化判断基线。
 - `docs/plans/2026-04-26-004-sync-ce-e8c118e2-workflow-updates-plan.md` — 本方法论抽取自该次 CE 同步计划。
 - `docs/plans/2026-05-04-001-sync-ce-06a7cee0-workflow-updates-plan.md` — 追加沉淀 agent 权限和 CLI readiness 删除的语义适配判断。
 - `skills/using-spec-first/SKILL.md` — 公共 workflow 路由和 internal-only skill 边界。
 - `docs/solutions/architecture-patterns/workflow-entrypoint-exposure-contract-2026-04-26.md` — workflow 入口暴露的双宿主治理经验。
 - `docs/solutions/workflow-issues/modify-source-not-artifacts-2026-04-13.md` — 修改 source asset 而不是 runtime artifact 的经验。
+- `docs/solutions/architecture-patterns/peer-job-runner-windows-split-blueprint-2026-09-11.md` — Windows 块拆分蓝图与拓扑 trip-wire 实例。

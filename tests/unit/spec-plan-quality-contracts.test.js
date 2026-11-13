@@ -20,6 +20,7 @@ function readJson(relativePath) {
 
 describe('spec-plan quality integration contracts', () => {
   const skill = read('SKILL.md');
+  const contract = require('../helpers/plan-contract').readPlanContract();
   const sections = read('references/plan-sections.md');
   const synthesis = read('references/synthesis-summary.md');
   const deepening = read('references/deepening-workflow.md');
@@ -31,13 +32,71 @@ describe('spec-plan quality integration contracts', () => {
   const deployment = read('references/agents/deployment-verification-agent.md');
   const patterns = read('references/agents/pattern-recognition-specialist.md');
   const handoff = read('references/plan-handoff.md');
-  const enrichmentJudge = read('evals/fixtures/scripts/check-enrichment.sh');
 
-  test('keeps planning-only and blocking handoff in the hot path', () => {
+  test('计划边界允许已授权交接，但不把计划产物当作实施授权', () => {
     expect(skill).toContain('## Planning-Only Safety Contract');
-    expect(skill).toContain('planning is the only authorized effect');
-    expect(skill).toContain('Handoff stays blocking');
+    expect(skill).toContain('plan-only request');
+    expect(skill).toContain('real Plan Mode');
+    expect(skill).toContain('用户已授权规划后实施');
+    expect(skill).not.toContain('Handoff stays blocking');
+    expect(skill).toContain('当前 `spec-plan` 产出者不会因为用户授权实施');
+    expect(skill).toContain('无可用执行路径时即使是单文件低风险任务也只能交付规划');
+    expect(handoff).toContain('只有成功进入执行 owner 后');
+    expect(handoff).toContain('不得以“用户已授权实施”为由自行转入编码');
+    expect(handoff).toContain('用户明确选择且宿主具有可用创建接口的原生 goal 按下文 goal 分支启动');
+    expect(handoff).toContain('且用户未明确选择具有已知可用接口的原生 goal，才报告具体交接阻塞');
+    expect(handoff).toContain('另一宿主的 generated runtime 镜像不能替代该来源');
+    const chatOutput = read('references/output-contracts.md');
+    expect(chatOutput).toContain('同一规划会话和可写工具本身不是执行 owner');
+    expect(chatOutput).toContain('Direct 的“一次陈述并校核”仅核对方案所据的现有事实');
+    expect(chatOutput).toContain('已授权实施时直接交接');
+    expect(chatOutput).toContain('generated runtime 镜像只说明镜像存在');
+    expect(skill).toContain('另一宿主的 generated runtime 镜像不属于该来源');
+    expect(skill).toContain('Direct/Chat brief 按 `references/output-contracts.md` 直接交接');
+    expect(skill).toContain('Direct/Chat brief 不生成这两个元数据字段');
+    expect(handoff).toContain('本节 Phase 5.4 适用于 Durable 计划');
+    expect(skill).not.toContain('This workflow produces a durable implementation plan.');
     expect(skill).toMatch(/do not claim a hard write guarantee from prose alone/i);
+  });
+
+  test('计划交接按请求范围完成，普通复审不继承写权限', () => {
+    for (const source of [skill, handoff]) {
+      expect(source).toContain('mutation:report-only');
+      expect(source).toContain('Ordinary review requests');
+      expect(source).toContain('the menu is not a completion requirement');
+      expect(source).toContain('top-level owner');
+      expect(source).toContain('update_goal');
+      expect(source).not.toMatch(/do \*\*not\*\* call `update_goal`|do not call `update_goal`/);
+      expect(source).not.toContain('Never silently skip the question');
+    }
+    expect(handoff).toContain('existing active goal');
+    expect(handoff).toContain('mutation:apply-fixes');
+    expect(handoff).toContain('byte-identical');
+    expect(handoff).toContain('return control to the caller');
+  });
+
+  test('goal 收尾仅作用于已存在且属于当前完整任务的目标', () => {
+    for (const source of [skill, handoff]) {
+      expect(source).toContain('belongs to the current full task');
+      expect(source).toContain('If no goal exists');
+      expect(source).toContain('do not update an unrelated goal');
+    }
+  });
+
+  test('多宿主 goal 按实际能力分支，创建不推导读取或完成能力', () => {
+    for (const source of [skill, handoff]) {
+      expect(source).not.toContain('available tool list (Codex)');
+      expect(source).not.toContain('`create_goal` on Codex');
+      expect(source).not.toContain('user-typed `/goal` exists (Claude Code)');
+      expect(source).toContain('creation, inspection, and completion');
+    }
+    expect(handoff).toContain('Creation capability does not prove inspection or completion capability');
+    expect(handoff).toContain('exact documented command');
+    expect(handoff).toContain('do not infer support from the host name');
+    expect(handoff).toContain('若只有 documented user command');
+    expect(handoff).toContain('明确实施尚未启动');
+    expect(handoff).toContain('不误判为完全无交接路径，也不宣称已进入执行 owner');
+    expect(handoff).toContain('若既不能调用或按上方来源要求加载执行 owner');
   });
 
   test('新增 assurance 指令遵循项目中文治理且保留 contract literals', () => {
@@ -55,7 +114,7 @@ describe('spec-plan quality integration contracts', () => {
       'verification focus',
       'largest risk or boundary',
     ]) {
-      expect(skill).toContain(anchor);
+      expect(contract).toContain(anchor);
       expect(sections).toContain(anchor);
     }
     expect(sections).toMatch(/first-screen\s+orientation/);
@@ -65,10 +124,10 @@ describe('spec-plan quality integration contracts', () => {
 
   test('restores evidence, source-runtime, composition/ownership, surface, and high-risk lenses conditionally', () => {
     expect(skill).toContain('references/planning-evidence-boundaries.md');
-    expect(skill).toContain('references/high-risk-plan-lens.md');
-    expect(skill).toContain('references/interface-and-evolution-lens.md');
-    expect(skill).toContain('references/frontend-engineering-lens.md');
-    expect(skill).toContain(
+    expect(contract).toContain('references/high-risk-plan-lens.md');
+    expect(contract).toContain('references/interface-and-evolution-lens.md');
+    expect(contract).toContain('references/frontend-engineering-lens.md');
+    expect(contract).toContain(
       'token-value-only changes that do not affect contrast, focus, layout, responsive behavior, motion, or state expression',
     );
     expect(evidence).toContain('advisory');
@@ -141,8 +200,8 @@ describe('spec-plan quality integration contracts', () => {
   });
 
   test('makes composition-first architecture a prompt-level judgment without banning justified new boundaries', () => {
-    expect(skill).toContain('Inventory before invention');
-    expect(skill).toContain('reuse / extend / compose / new');
+    expect(contract).toContain('Inventory before invention');
+    expect(contract).toContain('reuse / extend / compose / new');
     expect(evidence).toContain('## Existing Capability / Composition / Source Ownership Lens');
     expect(evidence).toContain('Thin glue may own only');
     expect(evidence).toContain('contract or representation translation');
@@ -161,16 +220,16 @@ describe('spec-plan quality integration contracts', () => {
   });
 
   test('requires explicit dispatch authorization and preserves inline completion', () => {
-    expect(skill).toContain('A public `spec-plan` invocation authorizes this workflow, not subagents');
+    expect(contract).toContain('A public `spec-plan` invocation authorizes this workflow, not subagents');
     expect(skill).toContain('dispatch_authorization_missing');
-    expect(skill).toContain('apply them inline or serially');
+    expect(contract).toContain('apply them inline or serially');
     expect(deepening).toContain('Plan generation and deepening must still complete through this inline fallback');
   });
 
   test('inline fallback uses bounded semantic lenses instead of preloading worker prompt assets', () => {
-    expect(skill).toContain('worker seed material, not a mandatory inline dependency');
-    expect(skill).toContain('Do not read a worker prompt asset merely because inline fallback is active');
-    expect(skill).toContain('apply the concise scope in this file directly');
+    expect(contract).toContain('worker seed material, not a mandatory inline dependency');
+    expect(contract).toContain('Do not read a worker prompt asset merely because inline fallback is active');
+    expect(contract).toContain('apply the concise scope in this file directly');
 
     expect(deepening).toContain('Conditional Section-to-Specialist Candidate Map');
     expect(deepening).toContain('Selecting a section never selects a prompt asset by itself');
@@ -193,15 +252,9 @@ describe('spec-plan quality integration contracts', () => {
     expect(deployment).toContain('without a concrete deployment or durable-data risk surface');
   });
 
-  test('enrichment Judge compares the complete Product Contract region against the fixture baseline', () => {
-    expect(enrichmentJudge).toContain('git show HEAD:"$plan"');
-    expect(enrichmentJudge).toContain("sed -n '/<!-- PRODUCT_CONTRACT_START -->/,/<!-- PRODUCT_CONTRACT_END -->/p'");
-    expect(enrichmentJudge).toContain('cmp -s');
-    expect(enrichmentJudge).toContain('Product Contract region changed');
-  });
 
   test('reviews HTML plans report-only and keeps producer-owned recompose bounded', () => {
-    expect(skill).toMatch(/HTML.*report-only review/is);
+    expect(contract).toMatch(/HTML.*report-only review/is);
     expect(skill).not.toContain('skipped_reason: output_format_html');
     expect(handoff).toContain('mutation_policy: report-only');
     expect(handoff).toContain('producer-fix candidates');
@@ -223,7 +276,7 @@ describe('spec-plan quality integration contracts', () => {
     expect(handoff).toContain('independent_review: not_run');
     expect(handoff).toContain('must not be described as `Review complete` or `Doc review clean`');
     expect(handoff).toContain('return control to the pipeline caller immediately');
-    expect(skill).toContain(
+    expect(contract).toContain(
       'Do not preload `references/deepening-workflow.md` or `references/plan-handoff.md` before the initial plan write',
     );
     expect(skill).toContain('the explicit degraded fallback completed');

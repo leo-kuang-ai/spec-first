@@ -12,10 +12,10 @@ engine:
 
 cases:
   files:
-    - evals/skillup/cases/bare-request-asks-path.yaml
-    - evals/skillup/cases/remote-input-rejected.yaml
-    - evals/skillup/cases/small-plan-skip.yaml
-    - evals/skillup/cases/non-active-rejected.yaml
+    - evals/cases/bare-request-asks-path.yaml
+    - evals/cases/remote-input-rejected.yaml
+    - evals/cases/small-plan-skip.yaml
+    - evals/cases/non-active-rejected.yaml
   defaults:
     timeout_seconds: 480
     max_turns: 14

@@ -87,6 +87,12 @@ Implementation Units, Verification Contract, or Definition of Done sections.
 implementation-ready. Implementation-ready artifacts include the full registry
 above, except Appendix remains optional.
 
+### One Rule, One Owner
+
+A product rule belongs to its R-ID; a technical choice belongs to its KTD; a unit owns only its implementation delta. Other sections, diagrams and examples cite the owning ID instead of restating a competing rule. Strengthen the owning entry with evidence and rationale. During enrichment, the Product Contract remains byte-preserved: a missing or conflicting product rule returns to its producer rather than being repaired by deduplication.
+
+Assign stable plan-local `KTD<N>` identities. Reordering does not renumber them; deletion leaves a gap; new decisions take an unused number and retired IDs are never reused. Preserve legacy unnumbered labels until an authorized edit assigns identities. Keep unit references, `Governs R...`, `Covers R...` and actual settlement provenance attached to their owners across planning, task derivation, execution and review. An assumption is not user approval.
+
 ### Wayfinding: map before reading (size-aware)
 
 The document does not carry a reading guide; consuming skills own the reading
@@ -169,7 +175,26 @@ present. They carry the contracts downstream consumers depend on.
 - **Goal Capsule** — objective, recommended approach, authority hierarchy,
   decision focus, verification focus, largest risk or scope boundary, stop
   conditions, execution profile, and tail ownership. It is the first-screen
-  orientation for both human reviewers and executors.
+  orientation for both human reviewers and executors. The objective is always
+  the outcome — what is true for users or operators afterwards, anchored
+  above the component being changed: an outcome someone outside that
+  component can verify without knowing its internals is a valid objective
+  even when that component is what changed, while one only its internals can
+  settle is not, however outcome-shaped its wording. Infrastructure and
+  refactor work has such an objective too: what that component's behavior
+  cost the people the system serves. When a request supplies only an
+  approach, that approach is the recommended-approach line, and the objective
+  is the outcome it serves, derived from the request's motivation, the
+  project's stated problem, or asked for — never the approach restated. The
+  objective must be holdable on its own: a reader who has not read the rest
+  of the plan must be able to hold it as the goal — could a colleague who
+  was not in the session say what this work is after the objective alone?
+  Remaining-true constraints live on their owning R-IDs, not as extra
+  objective clauses; user-checkable is not a license to pack them onto the
+  objective. An objective only understandable after later sections is not
+  yet the objective. Tests: if the implementation changed, would the
+  objective still be the goal? And can it be held without the rest of the
+  plan?
 - **Product Contract** — product scope and behavior. Contains Summary, Problem
   Frame, Requirements with stable R-IDs, and any material Actors, Flows,
   Acceptance Examples, Success Criteria, Scope Boundaries, Dependencies,
@@ -209,6 +234,12 @@ present. They carry the contracts downstream consumers depend on.
   measurable threshold as the exit criterion (e.g., "p95 latency < 200ms",
   "build time reduced 30%") and consider routing to `spec-optimize` — a metric
   target is a sharper done signal for a long-running goal than a boolean check.
+  Two closure duties: list the repo contract tests that assert on the files
+  this plan touches (search test suites for the touched paths — governance,
+  byte-budget, ordering, and projection contracts assert on files they never
+  import) and include them in the commands; and state one blind-spot line per
+  command class naming what the chosen commands cannot confirm, so unproven
+  risk is enumerated rather than judged in a single guess.
 - **Definition of Done** — global and per-unit done criteria. This is the
   completion contract for `/goal` or equivalent long-running workflows. Include
   a cleanup criterion: a long autonomous run accumulates dead-end and
@@ -298,7 +329,7 @@ versa.
 
 The agent also picks per artifact:
 
-- Whether Problem Frame merges into Summary
+- Whether Problem Frame merges into Summary for legacy/non-unified artifacts only; unified artifacts retain distinct sections, and upstream Product Contract bytes remain unchanged
 - Sub-groupings (Requirements by capability, KTDs by component, Units phased
   into milestones)
 - How much detail each section carries
@@ -383,6 +414,8 @@ silent lifecycle reset: do not turn `completed`, `partially-shipped`, or
 metadata blocks enrichment for repair. Whether a non-`active` source later
 enters execution remains the existing consumer's decision; this producer does
 not add an intake gate.
+
+当前用户明确要求补完非活跃历史计划时，按 `SKILL.md` Phase 0.1 核验并复用有效后继，或创建仅覆盖已确认剩余范围的新计划。旧计划原文、状态与旧 task-pack pins 保持不变；新计划正文记录历史来源、替代关系、当前证据和验收边界。只读审阅不触发新计划生产，历史完成声明不替代当前验证。
 
 HTML plans do not carry `status`. Likewise, knowledge-work,
 universal-planning, answer-seeking, and approach-plan outputs do not carry

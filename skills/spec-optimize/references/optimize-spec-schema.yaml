@@ -6,6 +6,7 @@
 # Usage: Create a YAML file matching this schema and pass it to spec-optimize.
 # The agent reads this spec, validates required fields, and uses it to
 # configure the entire optimization run.
+# 兼容性：holdout 为可选增量；旧 spec 沿用单集比较，不自动升级为已确认的泛化收益。
 
 # ============================================================================
 # REQUIRED FIELDS
@@ -63,7 +64,7 @@ required_fields:
           target:
             type: number
             default: null
-            description: "Optional target value. Loop stops when this is reached."
+            description: "Optional target value. Loop stops when this is reached. When metric.objectives is set, target_reached instead requires every required objective that declares a target."
             example: 4.2
 
       degenerate_gates:
@@ -86,6 +87,58 @@ required_fields:
               description: "Human-readable explanation of what this gate catches"
 
     optional_children:
+
+      objectives:
+        type: array
+        default: []
+        description: >
+          Additional required or secondary hard targets. The primary is always
+          a required comparison, even when this list omits it. An experiment is
+          eligible when it improves at least one required objective beyond the
+          comparison threshold and does not violate any other required
+          objective. Completion via target_reached requires every declared
+          required target. A spec without metric.objectives keeps single-primary
+          acceptance: the primary is the only required objective.
+        items:
+          type: object
+          required_children:
+            name:
+              type: string
+              description: "Metric name — must match a key in the measurement command's JSON output"
+            direction:
+              type: enum
+              values:
+                - maximize
+                - minimize
+          optional_children:
+            role:
+              type: enum
+              values:
+                - required
+                - secondary
+              default: required
+              description: "required objectives participate in eligibility and completion; secondary objectives are logged only"
+            type:
+              type: enum
+              values:
+                - hard
+              default: hard
+              description: "Always hard. Additional objectives come from the measurement command."
+            target:
+              type: number
+              default: null
+              description: "Declared success value for this objective. target_reached requires every required objective that sets this."
+            max_regression:
+              type: object
+              description: "Optional explicit violation bound. When set, violation uses this bound rather than the comparison threshold, including when the bound is looser. When unset, a comparison-threshold regression is a violation."
+              required_children:
+                type:
+                  type: enum
+                  values:
+                    - relative
+                    - absolute
+                value:
+                  type: number
 
       diagnostics:
         type: array
@@ -126,6 +179,10 @@ required_fields:
                 default: []
                 description: "Additional scoring fields to log (not optimized against)"
         optional_children:
+          confirmation_seed:
+            type: integer
+            default: null
+            description: "独立确认样本的 seed，必须为安全整数且不同于 sample_seed。仅不同 seed 不证明互斥：确认样本须来自 selection 未抽取的 item；不足时使用 measurement.holdout.command 或停止确认。"
           model:
             type: enum
             values:
@@ -198,6 +255,14 @@ required_fields:
         type: string
         default: "."
         description: "Working directory for the measurement command, relative to the repo root"
+      holdout:
+        type: object
+        default: null
+        description: "冻结且独立的确认集，仅在 selection 可 keep 后及最终确认时使用，不进入假设或排名。未配置保留旧比较；配置后决定脚本必须接收第二组 baseline/candidate。"
+        required_children:
+          command:
+            type: string
+            description: "在同一 cwd 运行并输出相同 snapshot 结构的非空确认命令；其执行 envelope 需独立授权。"
       stability:
         type: object
         default: { mode: "stable" }
@@ -208,12 +273,13 @@ required_fields:
             values:
               - stable   # run once, trust the result
               - repeat   # run N times, aggregate
+              - ladder   # smoke, one paired exploratory sample, adaptive extras, full protocol only before keep
             default: stable
         optional_children:
           repeat_count:
             type: integer
             default: 5
-            description: "Number of times to run the harness when mode is 'repeat'"
+            description: "Number of times to run the harness when mode is 'repeat', and the confirmation sample count when mode is 'ladder'"
           aggregation:
             type: enum
             values:
@@ -226,7 +292,53 @@ required_fields:
           noise_threshold:
             type: number
             default: 0.02
-            description: "Minimum improvement that must exceed this value to count as a real improvement (not noise). Applied to hard metrics only."
+            description: "Absolute improvement that must be exceeded when comparison.method is absolute (the default). Applied to hard metrics only."
+          comparison:
+            type: object
+            default: { method: "absolute" }
+            description: "How to decide keep / revert / inconclusive. Unset method preserves the legacy absolute noise_threshold rule."
+            required_children:
+              method:
+                type: enum
+                values:
+                  - absolute
+                  - relative
+                  - paired
+                default: absolute
+                description: "absolute uses noise_threshold; relative uses relative_threshold; paired uses sample ranges / paired diffs and may return inconclusive"
+            optional_children:
+              relative_threshold:
+                type: number
+                default: 0.05
+                description: "Fraction of the current-best value that counts as a real change when method is relative or paired"
+          ladder:
+            type: object
+            description: "Cost-aware measurement stages. Used when mode is ladder; ignored otherwise."
+            optional_children:
+              smoke_command:
+                type: string
+                default: null
+                description: "Cheap correctness check. Failure is degenerate and skips timed measurement."
+              exploratory_pairs:
+                type: integer
+                default: 1
+                description: "Paired exploratory samples before deciding whether to spend more. Must be a positive integer."
+              confirmation_repeats:
+                type: integer
+                default: null
+                description: "Full protocol sample count before keep. Defaults to repeat_count. Must be a positive integer at least as large as exploratory_pairs."
+              futility:
+                type: object
+                description: "Predeclared abort bound for a clearly noncompetitive live run"
+                optional_children:
+                  worse_factor:
+                    type: number
+                    default: 1.2
+                    description: "Censor after the first sample if the candidate is this multiple worse than the current best (minimize: candidate >= best * factor)"
+                  after_elapsed_seconds:
+                    type: number
+                    default: null
+                    description: "Censor a still-noncompetitive live run once elapsed time reaches this bound. When set, must be a positive number."
       calibration:
         type: object
         description: "Optional frozen-arm measurement-only calibration. When enabled, the measurement-only reference owns the sequence and this run cannot mutate or integrate either arm."
@@ -242,7 +354,7 @@ required_fields:
             type: string
             pattern: "^(?:[a-f0-9]{40}|sha256:[a-f0-9]{64})$"
             required_when: "measurement.calibration.mode == 'measurement-only'"
-            description: "Immutable source ref or content hash for the baseline arm"
+            description: "Immutable source ref or content hash for the baseline arm. The value must uniquely identify the measured reference bytes: a revision is enough when it names those bytes; a HEAD shared by different uncommitted trees is not."
           candidate_identity:
             type: string
             pattern: "^(?:[a-f0-9]{40}|sha256:[a-f0-9]{64})$"
@@ -282,6 +394,11 @@ required_fields:
             minimum: 2
             required_when: "measurement.calibration.mode == 'measurement-only'"
             description: "Number of baseline-vs-baseline repetitions; must be at least 2 in measurement-only mode"
+          noise_rule:
+            type: string
+            const: range-v1
+            required_when: "measurement.calibration.mode == 'measurement-only'"
+            description: "Admission v2 preregisters max(score)-min(score) over completed A/A result records; v1 admissions require fresh calibration"
           preregistered_acceptance_threshold:
             type: number
             minimum: 0
@@ -448,7 +565,7 @@ optional_fields:
       target_reached:
         type: boolean
         default: true
-        description: "Stop when the primary metric reaches the target value (if set)"
+        description: "Stop when every declared required target is met on the confirmed current-best snapshot"
 
   max_runner_up_merges_per_batch:
     type: integer
@@ -460,6 +577,11 @@ optional_fields:
 # ============================================================================
 
 validation_rules:
+  - "measurement.holdout 非空时必须有非空字符串 command；metric.judge.confirmation_seed 非空时须为不同于 sample_seed（默认 42）的安全整数，且 primary.type 为 judge"
+  - "配置 holdout 后 keep 必须由同一目标在独立确认中改善且无其他必需目标退化；重复/ladder 确认使用完整实测样本，不能用 aggregate 或 sample_count 补证"
+  - "holdout 输入、数据、harness 和 item 划分属于 scope.immutable；确认结果不得用于选候选、排名或生成假设，协议变化另起 run"
+  - "Reject unknown directions, roles, comparison/aggregation modes, duplicate objective names, nonfinite targets, negative thresholds, and invalid regression bounds; do not silently change the approved protocol"
+  - "Paired comparison requires an observed baseline for each candidate sample in the same order; missing pairs cannot be synthesized or replaced by aggregate judge scores"
   - "All required fields must be present"
   - "name must be lowercase kebab-case (`^[a-z0-9]+(?:-[a-z0-9]+)*$`)"
   - "metric.primary.type must be 'hard' or 'judge'"
@@ -477,3 +599,10 @@ validation_rules:
   - "If metric.judge.singleton_sample > 0, metric.judge.singleton_rubric must be present"
   - "If metric.primary.type is 'judge' and metric.judge.max_total_cost_usd is null, the user should explicitly approve uncapped spend"
   - "stopping must have at least one non-default criterion or use defaults"
+  - "If metric.objectives is set, each additional objective is a hard metric whose name is unique and matches a measurement JSON key"
+  - "The primary is always a required comparison, including when metric.objectives omits it"
+  - "If measurement.stability.mode is 'ladder', comparison.method should be relative or paired unless the user explicitly keeps absolute"
+  - "A spec without metric.objectives keeps single-primary acceptance"
+  - "comparison.method, when set, must be one of: absolute, relative, paired"
+  - "If measurement.stability.mode is 'ladder', exploratory_pairs and confirmation_repeats (or repeat_count) must be positive integers, and confirmation must be at least exploratory_pairs"
+  - "futility.after_elapsed_seconds, when set, must be a positive number"

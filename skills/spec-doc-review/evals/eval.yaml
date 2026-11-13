@@ -12,12 +12,12 @@ engine:
 
 cases:
   files:
-    - evals/skillup/cases/flag-conflict-fails-closed.yaml
-    - evals/skillup/cases/headless-no-path-fails.yaml
-    - evals/skillup/cases/default-report-only-no-write.yaml
-    - evals/skillup/cases/task-pack-forces-report-only.yaml
-    - evals/skillup/cases/html-forces-report-only.yaml
-    - evals/skillup/cases/standard-roster-budget.yaml
+    - evals/cases/flag-conflict-fails-closed.yaml
+    - evals/cases/headless-no-path-fails.yaml
+    - evals/cases/default-report-only-no-write.yaml
+    - evals/cases/task-pack-forces-report-only.yaml
+    - evals/cases/html-forces-report-only.yaml
+    - evals/cases/standard-roster-budget.yaml
   defaults:
     timeout_seconds: 600
     max_turns: 40

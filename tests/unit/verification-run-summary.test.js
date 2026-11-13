@@ -87,6 +87,29 @@ function captureStdout(fn) {
 }
 
 describe('verification run summary contract and capture helper', () => {
+  test.each([['--help'], ['record', '--help'], ['read', '-h']])('help is read-only and its example is accepted without inventing a pass: %j', (...args) => {
+    const mkdir = jest.spyOn(fs, 'mkdirSync');
+    let help;
+    try {
+      const result = captureStdout(() => runInternal(['verification-run-summary', ...args]));
+      expect(result.code).toBe(0);
+      help = JSON.parse(result.stdout);
+      expect(help.status).toBe('help');
+      expect(mkdir).not.toHaveBeenCalled();
+    } finally { mkdir.mockRestore(); }
+    expect(validateRunSummaryInput(help.input_example, {}).errors).toEqual([]);
+    expect(help.input_example.checks[0]).toMatchObject({ status: 'not-run', ran: false, exit_code: null });
+    const repo = makeRepo();
+    try {
+      const inputPath = writePayload(repo, help.input_example);
+      const result = writeVerificationRunSummary({ inputPath, runId: 'help-example', targetRepo: repo });
+      expect(result.exitCode).toBe(0);
+      const reread = readVerificationRunSummary({ targetRepo: repo, runSummaryRef: result.output.run_summary_ref });
+      expect(reread.exitCode).toBe(0);
+      expect(reread.output.summary.checks[0].status).toBe('not-run');
+    } finally { fs.rmSync(repo, { recursive: true, force: true }); }
+  });
+
   test('schema validates a captured summary sample', () => {
     const schema = JSON.parse(fs.readFileSync(SCHEMA_PATH, 'utf8'));
     const summary = {

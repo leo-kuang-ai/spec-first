@@ -6,9 +6,9 @@ Load this only when the user asks for the full write-up (SKILL.md Phase 4). The 
 
 The verdict, expanded — lead with the decision, then the evidence the TL;DR omitted:
 
-- **Verdict** — the grade and the conditions ("yes, if ..."), up top.
+- **Position** — adoption grade, holistic document judgment, or preferred approach/tradeoff, with the conditions up top.
 - **Question framed** — subject, intent, the incumbent, and the reversibility tier.
-- **Evidence** — the **project leg** and the **external leg** as cited bullets (`file:line`, issue/PR number, url) drawn from the scout dossiers. This is where the depth lives.
+- **Evidence** — the **project leg** and the **external leg** as cited bullets (`file:line`, issue/PR number, url) drawn from source-checked dossiers or fresh inline reads; an external leg may be inapplicable for project-local document/approach judgments. This is where the depth lives.
 - **Alternatives considered** — including "keep the incumbent" and "do nothing."
 - **Reversal trigger** (Tier 2/3) — what would flip this verdict.
 - **Provenance** — what was verified vs. any unconfirmed conversation hypothesis (warm only).
@@ -21,7 +21,7 @@ The verdict, expanded — lead with the decision, then the evidence the TL;DR om
 
 ## Sharing
 
-Publish via whatever the user has — best available, never required:
+Publish only with explicit destination and publication authority; a requested write-up alone authorizes the local artifact. When authorized, use an available destination:
 
 - An available HTML publishing tool the user has connected.
 - If none is reachable, the local file is the deliverable — announce its path.

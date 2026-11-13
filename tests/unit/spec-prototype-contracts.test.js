@@ -9,6 +9,8 @@ describe('spec-prototype canonical contract', () => {
   test('has a governed source tree and no sibling imports', () => {
     const files = [
       'SKILL.md',
+      'references/scoping.md',
+      'references/build.md',
       'references/craft-floor.md',
       'references/preview.md',
       'references/write-back.md',

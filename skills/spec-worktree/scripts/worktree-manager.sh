@@ -42,6 +42,37 @@ path_within() {
   [[ "$child_path" == "$root_path" || "$child_path" == "$root_path"/* ]]
 }
 
+assert_worktree_path() {
+  node - "$GIT_ROOT" "$1" <<'NODE'
+const fs = require('node:fs');
+const path = require('node:path');
+const [root, target] = process.argv.slice(2).map(value => path.resolve(value));
+const container = path.join(root, '.worktrees');
+const relative = path.relative(container, target);
+try {
+  if (!relative || relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
+    throw new Error('Target escapes .worktrees');
+  }
+  let current = root;
+  for (const part of path.relative(root, target).split(path.sep)) {
+    current = path.join(current, part);
+    let stat;
+    try { stat = fs.lstatSync(current); } catch (error) {
+      if (error.code === 'ENOENT') continue;
+      throw error;
+    }
+    if (stat.isSymbolicLink() || !stat.isDirectory()) throw new Error(`Refusing symlink or non-directory: ${current}`);
+    const real = fs.realpathSync(current);
+    const suffix = path.relative(fs.realpathSync(root), real);
+    if (suffix === '..' || suffix.startsWith(`..${path.sep}`) || path.isAbsolute(suffix)) throw new Error('Physical path escapes repository');
+  }
+} catch (error) {
+  console.error(`reason_code=worktree-path-unsafe ${error.message}`);
+  process.exitCode = 1;
+}
+NODE
+}
+
 validated_worktree_root() {
   local candidate_path="${1:-}"
   [[ -n "$candidate_path" ]] || return 1
@@ -223,8 +254,8 @@ Usage:
 Creates .worktrees/<branch-name> with <branch-name> branched from
 [from-branch] (default: origin's default branch, or main).
 
-The main repo checkout is not modified; from-branch is fetched but
-not checked out.
+The primary checkout branch is preserved while from-branch is fetched.
+Setup may add .worktrees to the caller checkout .gitignore.
 
 isolate attaches .worktrees/<slug> to an existing branch, tag, commit, or PR
 head. A branch can be checked out in only one worktree at a time; if the target
@@ -502,21 +533,13 @@ create_worktree() {
   esac
   init_worktree_paths_from_detect
 
+  git check-ref-format --branch "$branch_name" >/dev/null || return 1
+  local worktree_path="$WORKTREE_DIR/$branch_name"
+  assert_worktree_path "$worktree_path" || return 1
+
   local default_branch
   default_branch=$(get_default_branch)
   from_branch="${from_branch:-$default_branch}"
-
-  local worktree_path="$WORKTREE_DIR/$branch_name"
-  if [[ -d "$worktree_path" ]]; then
-    echo "Error: worktree already exists at $worktree_path" >&2
-    echo "Use 'cd $worktree_path' to switch, or 'git worktree remove' first." >&2
-    exit 1
-  fi
-
-  echo "Creating worktree $branch_name from $from_branch"
-
-  mkdir -p "$WORKTREE_DIR"
-  ensure_gitignore
 
   # Fetch from-branch without touching the main checkout.
   if ! git fetch origin "$from_branch" --quiet; then
@@ -528,6 +551,27 @@ create_worktree() {
   if ! git rev-parse --verify "$base_ref" &>/dev/null; then
     base_ref="$from_branch"
   fi
+
+  # Empty/unborn repository: no ref resolves to a commit. Fail with a structured
+  # reason instead of surfacing an opaque `git worktree add` error or inviting a
+  # raw-wrapper fallback (eval it-1, 2026-09-21).
+  if ! git rev-parse --verify "$base_ref^{commit}" &>/dev/null; then
+    echo "Error: base ref '$base_ref' does not resolve to a commit (empty or unborn repository); make an initial commit before creating a worktree." >&2
+    echo "reason_code=base-ref-unresolvable base_ref=$base_ref" >&2
+    return 1
+  fi
+
+  if [[ -d "$worktree_path" ]]; then
+    echo "Error: worktree already exists at $worktree_path" >&2
+    echo "Use 'cd $worktree_path' to switch, or 'git worktree remove' first." >&2
+    exit 1
+  fi
+
+  echo "Creating worktree $branch_name from $from_branch"
+
+  mkdir -p "$WORKTREE_DIR"
+  assert_worktree_path "$worktree_path" || return 1
+  ensure_gitignore
 
   git worktree add -b "$branch_name" "$worktree_path" "$base_ref"
 
@@ -602,6 +646,10 @@ isolate_existing_ref() {
       report_already_checked_out "$branch_name" "$existing_checkout"
       return 0
     fi
+    validate_worktree_slug "$worktree_slug" || return 1
+    if [[ "$DETECT_STATE" != "linked-worktree" ]]; then
+      assert_worktree_path "$WORKTREE_DIR/$worktree_slug" || return 1
+    fi
     if ! git fetch origin "pull/${branch_name#pr-}/head:refs/heads/$branch_name" --quiet; then
       echo "Error: could not fetch PR ${branch_name#pr-} from origin" >&2
       return 1
@@ -643,13 +691,18 @@ isolate_existing_ref() {
       return 0
     fi
     echo "Already in an isolated worktree; checking out $target_ref in place."
-    git checkout "$checkout_ref"
+    case "$add_mode" in
+      remote-branch) git checkout --no-overwrite-ignore --track -b "$branch_name" "$checkout_ref" ;;
+      detached) git checkout --no-overwrite-ignore --detach "$checkout_ref" ;;
+      *) git checkout --no-overwrite-ignore "$checkout_ref" ;;
+    esac
     echo "Worktree ready: $DETECT_WORKTREE_ROOT"
     return 0
   fi
 
   validate_worktree_slug "$worktree_slug" || exit 1
   local worktree_path="$WORKTREE_DIR/$worktree_slug"
+  assert_worktree_path "$worktree_path" || return 1
   if [[ -d "$worktree_path" ]]; then
     echo "Error: worktree already exists at $worktree_path" >&2
     echo "Use 'cd $worktree_path' to switch, or 'git worktree remove' first." >&2
@@ -659,6 +712,7 @@ isolate_existing_ref() {
   echo "Isolating $target_ref at $worktree_path"
 
   mkdir -p "$WORKTREE_DIR"
+  assert_worktree_path "$worktree_path" || return 1
   ensure_gitignore
 
   case "$add_mode" in
@@ -666,7 +720,7 @@ isolate_existing_ref() {
       git worktree add "$worktree_path" "$checkout_ref"
       ;;
     remote-branch)
-      git worktree add -b "$branch_name" "$worktree_path" "$checkout_ref"
+      git worktree add --track -b "$branch_name" "$worktree_path" "$checkout_ref"
       ;;
     detached)
       git worktree add --detach "$worktree_path" "$checkout_ref"

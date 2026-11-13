@@ -41,6 +41,8 @@ describe('spec-work execution strategy contracts', () => {
   });
 
   test('separates dispatch authorization, capability, and isolation', () => {
+    expect(strategy).toContain('依赖链上必须顺序执行的单元优先');
+    expect(strategy).toContain('只有当前上下文拥挤且 fresh context');
     expect(strategy).toContain('worker_dispatch_authorization');
     expect(strategy).toContain('dispatch_authorization_missing');
     expect(strategy).toContain('subagent_capability_missing');
@@ -60,6 +62,8 @@ describe('spec-work execution strategy contracts', () => {
     expect(strategy).toMatch(/without landing authorization.*do not push.*do not open.*PR/is);
     expect(strategy).toMatch(/do not promise.*upload/is);
     expect(strategy).not.toContain('edits its forked workspace');
+    expect(strategy).toContain('Inspect the full staged diff immediately before committing');
+    expect(strategy).toContain('they do not isolate overlapping user hunks');
   });
 
   test('fails closed when the host cannot enforce Git index and credential isolation', () => {
@@ -90,4 +94,23 @@ describe('spec-work execution strategy contracts', () => {
     expect(shipping).toMatch(/no commit authorization.*uncommitted/is);
     expect(shipping).toMatch(/no landing authorization.*do not push.*do not open a PR/is);
   });
+
+  test('bounded implementation packets retain decisions and isolate unit context', () => {
+    const intake = read('skills/spec-work/references/work-intake.md');
+    const loop = read('skills/spec-work/references/implementation-loop.md');
+    expect(intake).toContain('`Governs R` links name the active unit');
+    expect(strategy).toContain('same-unit recovery may reuse it, but a different unit requires a new context');
+    expect(strategy).toContain('never broaden them');
+    expect(strategy).toContain('reporting concrete defects at full severity');
+    expect(strategy).toContain('Add parser coverage (U3)');
+    expect(loop).toContain('>=30 substantive human-authored code lines');
+    expect(loop).toContain('test-fixture volume alone does not trigger this threshold');
+  });
+});
+
+test('substantial pre-existing dirty work surfaces the worktree isolation option', () => {
+  const strategy = read('skills/spec-work/references/execution-strategy.md');
+  expect(strategy).toContain('**Isolation advisory (not a gate):**');
+  expect(strategy).toContain('surface the `spec-worktree` option');
+  expect(strategy).toContain('a choice instead of an ambient risk');
 });

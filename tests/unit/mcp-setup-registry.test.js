@@ -68,7 +68,7 @@ function expectRegistryError(mutator, code) {
   }
 }
 
-describe('spec-runtime-setup registry v9', () => {
+describe('spec-runtime-setup registry v11', () => {
   test('detects WSL from the real Linux runtime signals', () => {
     expect(detectRuntimePlatform({
       platform: 'linux',
@@ -87,10 +87,48 @@ describe('spec-runtime-setup registry v9', () => {
     })).toBe('linux');
   });
 
+  test('兼容 v10 旧 registry，保留未知条目的旧阻断语义', () => {
+    const fixture = withRegistryMutation((registry) => {
+      registry.schema_version = 'setup-registry.v10';
+      for (const entry of [...registry.tools, ...registry.helpers]) delete entry.readiness_policy;
+      registry.helpers.find((entry) => entry.id === 'gh').baseline_blocking = true;
+    });
+    try {
+      const registry = loadRegistry({ skillRoot: fixture.tempRoot });
+      const { applyReadinessPolicy } = require('../../skills/spec-runtime-setup/scripts/lib/baseline-policy.cjs');
+      const effective = applyReadinessPolicy(getEffectiveRegistry(registry, { host: 'codex', platform: 'linux' }));
+      expect(effective.helpers.find((entry) => entry.id === 'gh')).toMatchObject({
+        required: true, baseline_blocking: true,
+        demand: { migration_warning: 'legacy-readiness-policy' },
+      });
+    } finally { fixture.cleanup(); }
+  });
+
+  test('v10 兼容读取不触发 host override 覆盖不变量（真实 v10 形态）', () => {
+    const fixture = withRegistryMutation((registry) => {
+      registry.schema_version = 'setup-registry.v10';
+      for (const entry of [...registry.tools, ...registry.helpers]) delete entry.readiness_policy;
+      for (const entry of registry.tools) delete entry.host_overrides.zcode;
+      delete registry.providers.find((provider) => provider.id === 'codegraph').host_overrides.zcode;
+    });
+    try {
+      const registry = loadRegistry({ skillRoot: fixture.tempRoot });
+      expect(registry.schema_version).toBe('setup-registry.v10');
+      expect(byId(registry.tools)['sequential-thinking'].host_overrides.zcode).toBeUndefined();
+    } finally {
+      fixture.cleanup();
+    }
+  });
+
+  test('v11 禁止遗漏 readiness policy 或写入未知 enum', () => {
+    expectRegistryError((registry) => { delete registry.helpers[0].readiness_policy; }, 'registry_readiness_policy_missing');
+    expectRegistryError((registry) => { registry.helpers[0].readiness_policy = 'maybe'; }, 'registry_schema_invalid');
+  });
+
   test('matches the captured legacy inventory while retiring the jq helper', () => {
     const registry = loadRegistry({ skillRoot });
 
-    expect(registry.schema_version).toBe('setup-registry.v10');
+    expect(registry.schema_version).toBe('setup-registry.v11');
     expect(registry.install_mirrors).toEqual({
       npm: {
         endpoint: 'https://registry.npmmirror.com',
@@ -105,14 +143,16 @@ describe('spec-runtime-setup registry v9', () => {
         id: 'codegraph',
         ecosystem: 'npm',
         package: '@colbymchenry/codegraph',
-        version: '1.5.0',
+        version: '1.6.0',
+        integrity: 'sha512-nCN40MqmYxF7gH1QTKqlxJ1d2mzwhw3fzSdGV2wjnQKsymjM3JZnH/5rpGqhBkcUEom0qWq0WjDRvOZh2t8mFA==',
+        source: 'npmjs',
         command: 'codegraph',
       },
       {
         id: 'graphify',
         ecosystem: 'pypi',
         package: 'graphifyy',
-        version: '0.9.29',
+        version: '0.9.57',
         command: 'graphify',
         python: {
           requires: '>=3.10',
@@ -123,8 +163,8 @@ describe('spec-runtime-setup registry v9', () => {
           plain_pip_allowed: false,
         },
         distribution: {
-          wheel_url: 'https://files.pythonhosted.org/packages/f1/b1/0cbe4738ca9784850d40aae0d71c34547230e0445e52067f98b8d0b6c070/graphifyy-0.9.29-py3-none-any.whl',
-          sha256: '143f4002f40d5c302ae43bd58487ad604191f2d0ac8216429894c6a913ecf27b',
+          wheel_url: 'https://files.pythonhosted.org/packages/c8/c2/d1ce4a567a5bf4c36054cede2c70f745a239ed5080b70d7934c5c738b583/graphifyy-0.9.57-py3-none-any.whl',
+          sha256: 'f35c86410e7d92ace69a50ac8dbed568903c880482c656f43437ca657fee8c37',
           index_url: 'https://pypi.org/simple',
         },
         hook_normalization_contract: 'graphify-python-hook-normalization.v1',
@@ -160,7 +200,7 @@ describe('spec-runtime-setup registry v9', () => {
 
   test('keeps complete host and artifact contracts at the top level', () => {
     const registry = loadRegistry({ skillRoot });
-    expect(Object.keys(registry.hosts)).toEqual(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder', 'zcode']);
+    expect(Object.keys(registry.hosts)).toEqual(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'pi', 'qoder', 'zcode']);
     for (const host of Object.values(registry.hosts)) {
       expect(host.defaults.tool.host_config.targets).toBeDefined();
       expect(host.defaults.tool.host_config.fallback_order).toBeDefined();
@@ -186,6 +226,65 @@ describe('spec-runtime-setup registry v9', () => {
       expect(artifact.producer).toEqual(expect.any(String));
       expect(artifact.consumers.length).toBeGreaterThan(0);
     }
+  });
+
+  test('covers every declared host with a buildable server command for host-config entries', () => {
+    const registry = loadRegistry({ skillRoot });
+    for (const host of Object.keys(registry.hosts)) {
+      const effective = getEffectiveRegistry(registry, { host, platform: 'macos' });
+      for (const tool of effective.tools) {
+        if (tool.host_config_required === false) continue;
+        expect(tool.host_config.command).toEqual(expect.any(String));
+        expect(tool.host_config.command.length).toBeGreaterThan(0);
+      }
+      expect(byId(effective.providers).codegraph.host_config.command).toBe('codegraph');
+    }
+    const zcode = getEffectiveRegistry(registry, { host: 'zcode', platform: 'macos' });
+    expect(zcode.host_definition.host_config).toMatchObject({
+      scope: 'workspace',
+      json_container_path: ['mcp', 'servers'],
+    });
+    expect(byId(zcode.tools)['sequential-thinking'].host_config).toMatchObject({
+      command: 'npx',
+      args: ['-y', '@modelcontextprotocol/server-sequential-thinking@2026.8.31'],
+      json_container_path: ['mcp', 'servers'],
+    });
+    expect(byId(zcode.tools).context7.host_config).toMatchObject({
+      command: 'npx',
+      args: ['-y', '@upstash/context7-mcp@4.0.7'],
+    });
+    expect(byId(zcode.tools).codegraph.host_config).toMatchObject({
+      command: 'codegraph',
+      args: ['serve', '--mcp'],
+    });
+    const pi = getEffectiveRegistry(registry, { host: 'pi', platform: 'macos' });
+    expect(pi.host_definition.host_config).toMatchObject({
+      scope: 'project',
+      json_container_path: ['mcpServers'],
+    });
+    expect(byId(pi.tools)['sequential-thinking'].host_config).toMatchObject({
+      command: 'npx',
+      json_container_path: ['mcpServers'],
+    });
+    expect(byId(pi.tools).context7.host_config).toMatchObject({
+      command: 'npx',
+      json_container_path: ['mcpServers'],
+    });
+    expect(byId(pi.providers).codegraph.host_config).toMatchObject({
+      command: 'codegraph',
+      args: ['serve', '--mcp'],
+      json_container_path: ['mcpServers'],
+      targets: { project: { config_path: '.pi/mcp.json' } },
+    });
+  });
+
+  test('fails closed when a declared host lacks a host override command', () => {
+    expectRegistryError((registry) => {
+      delete registry.tools.find((tool) => tool.id === 'sequential-thinking').host_overrides.zcode;
+    }, 'registry_host_override_missing');
+    expectRegistryError((registry) => {
+      delete registry.providers.find((provider) => provider.id === 'codegraph').host_overrides.zcode;
+    }, 'registry_host_override_missing');
   });
 
   test('matches the captured legacy effective queries for every host and platform', () => {
@@ -255,7 +354,7 @@ describe('spec-runtime-setup registry v9', () => {
     });
     expect(context7.host_config).toMatchObject({
       command: 'npx',
-      args: ['-y', '@upstash/context7-mcp@latest'],
+      args: ['-y', '@upstash/context7-mcp@4.0.7'],
       json_container_path: ['mcp'],
       server_representation: 'opencode-local',
       permission_policy: { kind: 'opencode-governed-assets-v1' },
@@ -342,6 +441,79 @@ describe('spec-runtime-setup registry v9', () => {
     expectRegistryError((registry) => {
       registry.hosts.opencode.defaults.tool.host_config.targets = {};
     }, 'registry_schema_invalid');
+  });
+
+  test('rejects precedence-guard duplicates and fallback/uninstall references to unknown targets', () => {    // guard-vs-target:target user 的 guard 与 target project 在同一路径指纹上重复。
+    expectRegistryError((registry) => {
+      registry.hosts.cursor.defaults.tool.host_config.targets.user.precedence_guards = [{
+        config_path: '.cursor/mcp.json',
+        config_format: 'jsonc',
+        precedence: 10,
+        reason_code: 'higher-priority-user-config',
+      }];
+    }, 'registry_duplicate_host_target');
+    // guard-vs-guard:同一 target 上两个 guard 解析到同一路径。
+    expectRegistryError((registry) => {
+      registry.hosts.cursor.defaults.tool.host_config.targets.user.precedence_guards = [
+        {
+          config_path: '$HOME/.cursor/rules/x.jsonc',
+          config_format: 'jsonc',
+          precedence: 10,
+          reason_code: 'higher-priority-user-config',
+        },
+        {
+          config_path: '$HOME/.cursor/rules/x.jsonc',
+          config_format: 'jsonc',
+          precedence: 20,
+          reason_code: 'higher-priority-user-config',
+        },
+      ];
+    }, 'registry_duplicate_host_target');
+    // fallback_order 引用未声明 target。
+    expectRegistryError((registry) => {
+      registry.hosts.cursor.defaults.tool.host_config.fallback_order = ['project', 'undeclared-target'];
+    }, 'registry_unknown_host_target');
+    // uninstall_targets 引用未声明 target。
+    expectRegistryError((registry) => {
+      registry.hosts.cursor.defaults.tool.host_config.uninstall_targets = ['project', 'user', 'undeclared-target'];
+    }, 'registry_unknown_host_target');
+  });
+
+  test('rejects provider_readiness metadata drifting from its provider entry', () => {
+    // tools[].provider_readiness 与 providers[] 同 id 条目的共享元数据必须同批更新
+    // (lane finding DR-001);单独改任一段在加载期 fail-closed。
+    expectRegistryError((registry) => {
+      const codegraphTool = registry.tools.find((entry) => entry.id === 'codegraph');
+      codegraphTool.provider_readiness.usage_note = codegraphTool.provider_readiness.usage_note + ' drifted';
+    }, 'registry_provider_metadata_drift');
+    expectRegistryError((registry) => {
+      const codegraphTool = registry.tools.find((entry) => entry.id === 'codegraph');
+      codegraphTool.provider_readiness.fallback_methods = ['rg'];
+    }, 'registry_provider_metadata_drift');
+    expectRegistryError((registry) => {
+      const codegraphProvider = registry.providers.find((entry) => entry.id === 'codegraph');
+      codegraphProvider.first_generation = { ...codegraphProvider.first_generation, extra: true };
+    }, 'registry_provider_metadata_drift');
+  });
+
+  test('rejects schema keywords outside the validator dialect', () => {
+    // validator 只实现方言白名单内的关键字;schema 引入未实现关键字会在加载期
+    // fail-closed,防止校验强度静默下降(lane finding DR-017)。
+    const fixture = withRegistryMutation(() => {});
+    try {
+      const schemaPath = path.join(fixture.tempRoot, 'setup-registry.schema.json');
+      const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+      schema.$defs.installationSpec.properties.kind.maximum = 5;
+      fs.writeFileSync(schemaPath, `${JSON.stringify(schema, null, 2)}\n`);
+      expect(() => loadRegistry({ skillRoot: fixture.tempRoot })).toThrow();
+      try {
+        loadRegistry({ skillRoot: fixture.tempRoot });
+      } catch (error) {
+        expect(error.code).toBe('registry_schema_dialect_keyword_unsupported');
+      }
+    } finally {
+      fixture.cleanup();
+    }
   });
 
   test('allows only schema-declared nullable provider workspace paths', () => {

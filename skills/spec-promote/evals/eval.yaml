@@ -8,6 +8,7 @@ engine:
   name: claude_code
 cases:
   files:
+    - evals/cases/check-unreleased-local-drafts.yaml
     - evals/cases/no-publish-side-effects.yaml
     - evals/cases/nothing-shipped-asks.yaml
 defaults:

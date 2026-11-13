@@ -13,7 +13,13 @@ With authorized, capable dispatch, run parallel ideation sub-agents per the Mode
 
 Fleet variants: **surprise-me** and **`go deep`** dispatch 6 agents, one frame each, all ceiling-tier. **Issue-tracker mode** dispatches 4 agents only when issue-tracker intent was detected in Phase 0.2 AND the issue intelligence agent returned usable themes (see override below — cluster-derived frames capped at 4, dispatched on the generation tier; padded frames keep their native tier). The insufficient-issue-signal fallback from Phase 1 uses the default 5-agent fleet.
 
+Apply the already-resolved scaling state from `references/scope-gates.md` Phase 0.5. Tactical's dials keep the same fleet and frame coverage: 5 roles over six default frames, 6 for Surprise me, or the issue-theme fleet when usable. `go deep` suppresses tactical completely. Issue fallback restores the six-frame fleet and recomputes the per-frame split of any explicit raw total, preserving the resolved overrides and survivor count. Never pack frames to cut cost or re-read raw signals to resurrect a suppressed waiver.
+
 Each frame targets ~6-8 ideas (a two-frame agent targets that per frame), yielding ~36-48 raw ideas in the default path or ~24-32 across 4 frames in issue-tracker mode; roughly 25-30 survive dedupe in the default path and fewer in the 4-frame path. Adjust per-frame targets when volume overrides apply (e.g., "100 ideas" raises it, "top 3" may lower the survivor count instead).
+
+When tactical scope is active, use tactical's dials instead. A raw total overrides the default per-frame target and is divided across the resolved frames; a survivor count changes only the final cut. Apply the verification budget per agent, not per frame: 2-3 targeted reads under tactical scope, 5 by default, and 10 under `go deep`.
+
+When an explicit raw total exceeds the active tactical default, restore at least the default 5-read allowance; `go deep` retains 10. A larger candidate count does not establish deeper verification: disclose reduced evidence depth per idea when the fixed budget cannot cover it. Carry resolved raw total, survivor count and effective read allowance to the verifier and final cut; do not reset them on an issue-signal fallback.
 
 ## Dispatch Payload (cache-friendly, long-context ordered)
 
@@ -31,7 +37,7 @@ The `<constraints>`/`<background>` split is the primary defense against groundin
 
 > This ideation exists so the user can choose a direction worth building — the output's value is decided by whether one idea changes what they do next. Generate the smartest, most inventive ideas your frame can reach: ideas a strong team would say "we have to do this" about. Your first few ideas will be the obvious ones — treat them as warm-up, and keep only the ones that still earn their place after the non-obvious ideas exist. If an idea would appear in a generic listicle about this topic, sharpen it with grounding evidence or drop it. Anchor every idea in specific entries from the grounding.
 
-**Verification reads (repo mode).** After an agent makes its internal cut, it may spend up to 5 targeted reads (10 under `go deep`) following dossier `file:line` pointers to verify or deepen the bases of ideas it will submit. A `direct:` basis must quote a line the agent actually read — in a dossier or in the repo — never a guessed citation. Elsewhere modes verify against the user-supplied context — including reading user-research dossiers when present — instead of reading repo files.
+**Verification reads (repo mode).** After an agent makes its internal cut, it may spend up to 5 targeted reads (2-3 under active tactical scope; 10 under `go deep`) following dossier `file:line` pointers to verify or deepen the bases of ideas it will submit. A `direct:` basis must quote a line the agent actually read — in a dossier or in the repo — never a guessed citation. Elsewhere modes verify against the user-supplied context — including reading user-research dossiers when present — instead of reading repo files.
 
 ## Frames
 
@@ -46,7 +52,7 @@ Assign each sub-agent its frame (or frame pair) as a **starting bias, not a cons
 5. **Cross-domain analogy** — generate ideas by asking how completely different fields solve a structurally analogous problem. The grounding domain is the user's topic; the analogy domain is anywhere else (other industries, biology, games, infrastructure, history). Push past the obvious analogy to non-obvious ones.
 6. **Constraint-flipping** — invert the obvious constraint to its opposite or extreme. What if the budget were 10x or 0? What if the team were 100 people or 1? What if there were no users, or 1M? Use the resulting design as a candidate even if the constraint flip itself is not realistic.
 
-**Issue-tracker mode override (repo mode only).** When issue-tracker intent is active and themes were returned by the issue intelligence agent: each high/medium-confidence theme becomes a frame. Pad with frames from the 6-frame default pool (in the order listed above) if fewer than 3 cluster-derived frames. Cap at 4 total — issue-tracker mode keeps its tighter dispatch by design. Theme frames dispatch on the generation tier (themes are evidence-driven); padded frames keep their native tier.
+**Issue-tracker mode override (repo mode only).** When issue-tracker intent is active and usable themes were returned, choose frames by expected leverage (severity, recurrence, breadth and prevalence), using confidence to distinguish similarly valuable themes. A high-impact low-confidence signal can remain a clearly labeled hypothesis needing evidence; it must not become a confirmed fact. Pad from the six default frames if fewer than 3 theme frames qualify. Cap at 4 total; theme frames use the generation tier and padded frames keep their native tier.
 
 **Axis spread instruction.** When an axis list is present, instruct each sub-agent to distribute its ideas across multiple axes — the frame's lens applies to every axis, but ideas should not all cluster on one. Each idea must be tagged with the axis it targets. The frame is a lens; the axis list is the surface map. A frame that plausibly reaches an axis should produce at least one idea there before doubling up on a different axis. When decomposition was skipped (atomic subject or surprise-me), omit the axis instruction entirely — do not invent axes at dispatch time.
 
@@ -66,7 +72,7 @@ Each sub-agent returns this structure per idea:
   - `external:` named prior art, domain research, adjacent pattern, with source
   - `reasoned:` explicit first-principles argument for why this move likely applies — not a gesture; the argument is written out
 - **why_it_matters** — connects the basis to the move's significance
-- **meeting_test** — one line confirming this would warrant team discussion (waived when Phase 0.5 detected tactical focus signals)
+- **meeting_test** — one line confirming this would warrant team discussion (waived when Phase 0.5 resolved tactical scope as active)
 
 Basis is required, not optional. If a sub-agent cannot articulate a basis of at least one type, the idea does not surface. The failure mode to prevent is generic "AI-slop" ideas that sound plausible but lack a basis the user can verify.
 
@@ -74,7 +80,7 @@ Basis is required, not optional. If a sub-agent cannot articulate a basis of at 
 
 - Every idea carries an articulated basis. Unjustified speculation does not surface, regardless of how plausible it sounds.
 - Bias toward the basis type your frame naturally produces — pain/inversion/leverage tend toward `direct:`; analogy and constraint-flipping tend toward `reasoned:`; assumption-breaking is mixed — but don't exclude other basis types.
-- Apply the meeting-test as a default floor: would this idea warrant team discussion? If not, it's below the floor and does not surface. The floor is relaxed only when Phase 0.5 detected tactical focus signals.
+- Apply the meeting-test as a default floor: would this idea warrant team discussion? If not, it's below the floor and does not surface. The floor is relaxed only when Phase 0.5 resolved tactical scope as active.
 - Stay within the subject's identity. Product expansions, new surfaces, new markets, retirements, and architectural pivots are fair game when the basis supports them. Subject-replacement moves (abandoning the project, pivoting to unrelated domains, becoming a different organization) are out regardless of basis.
 - **Honor the asked scope.** When the focus hint names a part of the subject (a flow, a stage, a section, a feature within a larger product — e.g., "account settings", "onboarding flow", "pricing page copy", "gameplay rules"), ideate at full ambition *within that scope*. Expanding the surface to the whole subject — proposing fundamental changes to the broader product when the user named one slice — is a scope mismatch even when no subject-replacement occurred. Big-picture thinking still applies; it just operates inside the bounded surface the user named, not by widening the surface.
 
@@ -86,6 +92,6 @@ Basis is required, not optional. If a sub-agent cannot articulate a basis of at 
 4. If a focus was provided, weight the merged list toward it without excluding stronger adjacent ideas.
 5. Spread ideas across multiple dimensions when justified: workflow/DX, reliability, extensibility, missing capabilities, docs/knowledge compounding, quality/maintenance, leverage on future work.
 
-**Checkpoint A (V17).** Immediately after the cross-cutting synthesis step completes and the raw candidate list is consolidated, write `<scratch-dir>/raw-candidates.md` (using the absolute path captured in Phase 1) containing the full candidate list with sub-agent attribution. This protects the most expensive output (the parallel ideation dispatches + dedupe) before Phase 3 critique potentially compacts context. Best-effort: if the write fails (disk full, permissions), log a warning and proceed; the checkpoint is not load-bearing. Not cleaned up at the end of the run (the run directory is preserved so the V15 cache remains reusable across run-ids in the same session — see Phase 5).
+**Checkpoint A (V17).** Immediately after the cross-cutting synthesis step completes and the raw candidate list is consolidated, write `<scratch-dir>/raw-candidates.md` (using the absolute path captured in Phase 1) containing the full candidate list with sub-agent attribution. This protects the most expensive output (the parallel ideation dispatches + dedupe) before Phase 3 critique potentially compacts context. Best-effort: if the write fails (disk full, permissions), log a warning and proceed; the checkpoint is not load-bearing. Preserve scratch until the complete deliverable is recoverable, then clean up per Phase 5. Neither this checkpoint nor the cache may cross invocation boundaries.
 
-When the merge, synthesis, and axis-coverage steps are complete, return to SKILL.md Phase 2's closing instruction and load `references/post-ideation-workflow.md` before any critique begins.
+When merge, synthesis, and axis coverage are complete, read `references/post-ideation-workflow.md` before any critique begins. It owns filtering, persistence, and next-step handling.

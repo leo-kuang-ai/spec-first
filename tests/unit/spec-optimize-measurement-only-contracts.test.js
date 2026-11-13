@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('node:fs');
+const crypto = require('node:crypto');
 const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
@@ -18,7 +19,7 @@ describe('spec-optimize measurement-only calibration', () => {
 
   function validAdmission(overrides = {}) {
     return {
-      schema_version: 'spec-optimize-measurement-admission/v1',
+      schema_version: 'spec-optimize-measurement-admission/v2',
       baseline_identity: 'a'.repeat(40),
       candidate_identity: 'b'.repeat(40),
       task_or_corpus_identity: `sha256:${'c'.repeat(64)}`,
@@ -31,6 +32,7 @@ describe('spec-optimize measurement-only calibration', () => {
         aggregation: 'median',
       },
       aa_repetitions: 2,
+      noise_rule: 'range-v1',
       preregistered_acceptance_threshold: 0.03,
       noise_ceiling: 0.01,
       broken_run_policy: {
@@ -45,9 +47,26 @@ describe('spec-optimize measurement-only calibration', () => {
     };
   }
 
-  function runValidator(command, payload) {
+  function runValidator(command, payload, options = {}) {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-optimize-admission-'));
     const input = path.join(root, 'input.json');
+    payload = JSON.parse(JSON.stringify(payload));
+    for (const [index, attempt] of (payload.aa_attempts || []).entries()) {
+      if (attempt.status !== 'completed' || options.noReceipts) continue;
+      const runId = options.duplicateRun ? 'same-run' : `run-${index}`;
+      const record = {
+        schema_version: 'spec-optimize-measurement-result/v1', run_id: runId,
+        source_identity: options.wrongSource ? 'f'.repeat(40) : payload.admission.baseline_identity,
+        admission_sha256: payload.admission_sha256,
+        status: 'completed', exit_code: options.failedExit ? 1 : 0, score: attempt.score,
+      };
+      const raw = Buffer.from(`${JSON.stringify(record)}\n`);
+      const resultRef = `result-${index}.json`;
+      fs.writeFileSync(path.join(root, resultRef), raw);
+      Object.assign(attempt, { run_id: runId, result_ref: resultRef,
+        result_sha256: `sha256:${options.tamperedHash ? '0'.repeat(64) : crypto.createHash('sha256').update(raw).digest('hex')}` });
+      if (options.reusedFile && index > 0) attempt.result_ref = payload.aa_attempts[0].result_ref;
+    }
     fs.writeFileSync(input, `${JSON.stringify(payload, null, 2)}\n`);
     try {
       const result = spawnSync(process.execPath, [validator, command, '--input', input], {
@@ -78,7 +97,7 @@ describe('spec-optimize measurement-only calibration', () => {
     expect(reference).toContain('at least two baseline-vs-baseline A/A repetitions');
     expect(reference).toContain('noise-floor-too-high');
     expect(reference).toMatch(/Do not infer a threshold after observing A\/A or A\/B results/);
-    expect(skill).toContain('scripts/measurement-admission.cjs admit');
+    expect(skill).toContain('"<loaded-skill-dir>/scripts/measurement-admission.cjs" admit');
     expect(skill).toContain('scripts/measurement-admission.cjs');
     expect(skill).toContain('allow-ab');
     expect(reference).toContain('admission_sha256');
@@ -129,7 +148,7 @@ describe('spec-optimize measurement-only calibration', () => {
     expect(first.payload).toMatchObject({
       status: 'admitted',
       reason_code: 'measurement-admission-valid',
-      schema_version: 'spec-optimize-measurement-admission/v1',
+      schema_version: 'spec-optimize-measurement-admission/v2',
     });
     expect(first.payload.admission_sha256).toMatch(/^sha256:[a-f0-9]{64}$/);
     expect(second.payload.admission_sha256).toBe(first.payload.admission_sha256);
@@ -147,6 +166,47 @@ describe('spec-optimize measurement-only calibration', () => {
       expect.objectContaining({ field: 'harness_identity' }),
       expect.objectContaining({ field: 'aa_repetitions' }),
     ]));
+  });
+
+  test('computes noise from A/A results instead of accepting a caller assertion', () => {
+    const admission = runValidator('admit', validAdmission()).payload;
+    const result = runValidator('allow-ab', {
+      admission: admission.normalized_admission,
+      admission_sha256: admission.admission_sha256,
+      aa_attempts: [
+        { status: 'completed', admission_sha256: admission.admission_sha256, score: 0 },
+        { status: 'completed', admission_sha256: admission.admission_sha256, score: 100 },
+      ],
+      observed_noise_floor: 0,
+    });
+    expect(result.status).toBe(1);
+    expect(result.payload.ab_allowed).toBe(false);
+    expect(result.payload.reason_code).toBe('noise-floor-too-high');
+    expect(result.payload.observed_noise_floor).toBe(100);
+  });
+
+  test.each([
+    { noReceipts: true }, { duplicateRun: true }, { wrongSource: true },
+    { failedExit: true }, { tamperedHash: true }, { reusedFile: true },
+  ])('rejects unsupported A/A evidence %j', (options) => {
+    const admission = runValidator('admit', validAdmission()).payload;
+    const result = runValidator('allow-ab', {
+      admission: admission.normalized_admission,
+      admission_sha256: admission.admission_sha256,
+      aa_attempts: [
+        { status: 'completed', admission_sha256: admission.admission_sha256, score: 0.001 },
+        { status: 'completed', admission_sha256: admission.admission_sha256, score: 0.002 },
+      ],
+      observed_noise_floor: 0,
+    }, options);
+    expect(result.status).toBe(1);
+    expect(result.payload.ab_allowed).toBe(false);
+  });
+
+  test('old admission versions and unregistered noise rules require fresh admission', () => {
+    for (const overrides of [{ schema_version: 'spec-optimize-measurement-admission/v1' }, { noise_rule: 'caller-asserted' }]) {
+      expect(runValidator('admit', validAdmission(overrides)).status).toBe(1);
+    }
   });
 
   test('blocks A/B when A/A noise exceeds the preregistered ceiling', () => {
@@ -208,6 +268,9 @@ describe('spec-optimize measurement-only calibration', () => {
     expect(valid.status).toBe(0);
     expect(valid.payload).toMatchObject({
       reason_code: 'aa-calibration-passed',
+      observed_noise_floor: 0.001,
+      noise_rule: 'range-v1',
+      evidence_scope: 'file-integrity-and-arithmetic-only',
       ab_allowed: true,
     });
   });

@@ -40,6 +40,9 @@ describe('spec-riffrec-feedback-analysis artifact path contracts', () => {
     expect(extensive).toContain('ready-to-brainstorm');
     expect(extensive).toContain('Only invoke `spec-brainstorm`');
     expect(extensive).toContain('explicitly requested brainstorm, requirements, or planning');
+    const handoff = extensive.slice(extensive.indexOf('## Authorized handoff'), extensive.indexOf('## Capture scale'));
+    expect(handoff).toMatch(/load the `spec-brainstorm` skill with `requirements-kickoff\.md` and `source-materials\.md`/);
+    expect(handoff).toContain('Let `spec-brainstorm` own confirmation');
     expect(analyzer).toContain('Brainstorm handoff: spec-brainstorm');
     expect(analyzer).toContain('Ready-to-brainstorm handoff only');
     expect(extensive).not.toContain('ce-brainstorm');

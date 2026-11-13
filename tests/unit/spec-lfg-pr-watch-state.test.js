@@ -1,6 +1,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const crypto = require('crypto');
 const { execFileSync, spawnSync } = require('child_process');
 
 const repoRoot = path.resolve(__dirname, '../..');
@@ -58,11 +59,210 @@ describe('spec-lfg PR watch state helper', () => {
     ]);
   }
 
+  test('an unobserved 30-minute gap cannot establish quiet readiness', () => {
+    let current = append(snapshot(), run(['read', '--state-dir', stateDir]));
+    current = append(snapshot({ observed_at: '2026-07-30T00:30:00.000Z' }), current);
+    expect(current.terminal).toBe('watching');
+    expect(current.quiet_seconds).toBe(0);
+    expect(current.observation_gap_seconds).toBe(1800);
+    expect(current.quiet_window_reset_reason).toBe('observation-gap');
+  });
+
+  test('continuous sampling converges and a later failed check remains actionable', () => {
+    let current = append(snapshot(), run(['read', '--state-dir', stateDir]));
+    for (let seconds = 30; seconds <= 300; seconds += 30) {
+      current = append(snapshot({ observed_at: new Date(Date.parse(snapshot().observed_at) + seconds * 1000).toISOString() }), current);
+      expect(current.terminal).toBe(seconds === 300 ? 'looks-ready' : 'watching');
+    }
+    current = append(snapshot({ observed_at: '2026-07-30T00:05:30.000Z', checks: [{ key: 'ci/test', status: 'COMPLETED', conclusion: 'FAILURE' }] }), current);
+    expect(current.events.ci).toEqual(['ci/test']);
+    expect(current.terminal).toBe('watching');
+    expect(current.quiet_seconds).toBe(0);
+  });
+
+  test('legacy journals reset once and the 60-second maximum gap remains usable', () => {
+    append(snapshot(), run(['read', '--state-dir', stateDir]));
+    const file = path.join(stateDir, '000001.json');
+    const legacy = JSON.parse(fs.readFileSync(file, 'utf8'));
+    delete legacy.observation_policy;
+    fs.writeFileSync(file, `${JSON.stringify(legacy)}\n`);
+    let current = run(['read', '--state-dir', stateDir]);
+    current = append(snapshot({ observed_at: '2026-07-30T00:00:30.000Z' }), current);
+    expect(current.quiet_seconds).toBe(0);
+    expect(current.quiet_window_reset_reason).toBe('legacy-observation-policy');
+    for (let seconds = 90; seconds <= 330; seconds += 60) {
+      current = append(snapshot({ observed_at: new Date(Date.parse(snapshot().observed_at) + seconds * 1000).toISOString() }), current);
+    }
+    expect(current.terminal).toBe('looks-ready');
+    expect(current.quiet_seconds).toBe(300);
+  });
+
+  test.each([
+    { observed_at: '2026-07-29T23:59:59.000Z' },
+    { review_items: null },
+    { checks: null },
+  ])('rejects incomplete or backward observations without publishing state: %j', (overrides) => {
+    const current = append(snapshot(), run(['read', '--state-dir', stateDir]));
+    const result = spawnSync(process.execPath, [helper, 'snapshot', '--input', writeInput(root, 'invalid.json', snapshot(overrides)), '--state-dir', stateDir, '--expected-generation', String(current.generation), '--expected-sha256', current.snapshot_sha256], { encoding: 'utf8' });
+    expect(result.status).toBe(1);
+    expect(JSON.parse(result.stdout).reason_code).toBe('snapshot-invalid');
+    expect(run(['read', '--state-dir', stateDir]).generation).toBe(current.generation);
+  });
+
+  function decisionFile(value, name = 'decision.json') {
+    const file = writeInput(root, name, value);
+    fs.chmodSync(file, 0o600);
+    return { path: file, sha256: crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex') };
+  }
+
+  const decision = () => ({
+    type: 'needs-human',
+    sources: [{ kind: 'thread', id: 'T1' }, { kind: 'check', id: 'ci/test' }],
+    decision_context: {
+      quoted_feedback: 'Preserve the session key? $(do-not-execute)',
+      investigation: 'Both consumers read persisted keys.',
+      decision_reason: 'No migration contract chooses a compatible behavior.',
+      options: [{ option: 'Keep the key', tradeoff: 'Preserves sessions but keeps the naming mismatch.' }],
+      recommendation: null,
+    },
+    thread_urls: ['https://example.invalid/o/r/pull/42#discussion_r1'],
+  });
+  const decisionSnapshot = (overrides = {}) => snapshot({
+    checks: [{ key: 'ci/test', status: 'COMPLETED', conclusion: 'FAILURE', run_id: 'run-1' }],
+    review_items: [{ id: 'T1', kind: 'thread', updated_at: 'v1', url: decision().thread_urls[0] }],
+    ...overrides,
+  });
+
+  test('preserves a grouped decision, drains independent work, and never stores its prose in watch state', () => {
+    let current = append(decisionSnapshot(), run(['read', '--state-dir', stateDir]));
+    const ref = decisionFile(decision());
+    current = append(decisionSnapshot({
+      decision_residuals: [ref],
+      review_items: [...decisionSnapshot().review_items, { id: 'I2', kind: 'comment', updated_at: 'v1' }],
+    }), current);
+    expect(current.terminal).toBe('watching');
+    expect(current.events.review).toEqual(['I2']);
+    expect(current.events.ci).toEqual([]);
+    expect(current.needs_human_residuals).toEqual([decision()]);
+    current = append(decisionSnapshot(), current);
+    expect(current.terminal).toBe('manual-blocker');
+    expect(current.reason_code).toBe('needs-human');
+    expect(current.needs_human_residuals).toEqual([decision()]);
+    expect(current.human_decisions[0].decision_id).toMatch(/^decision:[a-f0-9]{64}$/);
+    expect(fs.readFileSync(path.join(stateDir, '000003.json'), 'utf8')).not.toContain('do-not-execute');
+  });
+
+  test.each(['thread-change', 'thread-missing', 'check-rerun', 'head-change'])('%s invalidates the entire decision without inventing an answer', change => {
+    let current = append(decisionSnapshot(), run(['read', '--state-dir', stateDir]));
+    current = append(decisionSnapshot({ decision_residuals: [decisionFile(decision())] }), current);
+    const changed = decisionSnapshot();
+    if (change === 'thread-change') changed.review_items[0].updated_at = 'v2';
+    if (change === 'thread-missing') changed.review_items = [];
+    if (change === 'check-rerun') changed.checks[0].run_id = 'run-2';
+    if (change === 'head-change') changed.head_sha = 'c'.repeat(40);
+    current = append(changed, current);
+    expect(current.needs_human_residuals).toEqual([]);
+    expect(current.answered_human_decisions).toEqual([]);
+    expect(current.events.ci).toEqual(['ci/test']);
+    expect(current.events.review).toEqual(change === 'thread-missing' ? [] : ['T1']);
+  });
+
+  test('an exact answer reactivates all sources and cannot be replaced by remote activity or re-parked', () => {
+    let current = append(decisionSnapshot(), run(['read', '--state-dir', stateDir]));
+    const ref = decisionFile(decision());
+    current = append(decisionSnapshot({ decision_residuals: [ref] }), current);
+    const id = current.human_decisions[0].decision_id;
+    const answer = decisionFile({ answer: 'Keep the existing key.\nDo not weaken CI.' }, 'answer.json');
+    current = append(decisionSnapshot({ decision_answers: [{ decision_id: id, ...answer }] }), current);
+    expect(current.needs_human_residuals).toEqual([]);
+    expect(current.answered_human_decisions[0].answer).toBe('Keep the existing key.\nDo not weaken CI.');
+    expect(current.events.ci).toEqual(['ci/test']);
+    expect(current.events.review).toEqual(['T1']);
+    expect(() => append(decisionSnapshot({ decision_residuals: [ref] }), current)).toThrow();
+  });
+
+  test.each(['missing-options', 'wrong-thread-url', 'duplicate-source', 'missing-source', 'stale-source', 'tampered-file', 'wrong-answer'])('rejects %s without publishing a state generation', failure => {
+    let current = append(decisionSnapshot(), run(['read', '--state-dir', stateDir]));
+    const payload = decision();
+    if (failure === 'missing-options') payload.decision_context.options = [];
+    if (failure === 'wrong-thread-url') payload.thread_urls = ['https://example.invalid/o/r/pull/42#discussion_r2'];
+    if (failure === 'duplicate-source') payload.sources.push(payload.sources[0]);
+    if (failure === 'missing-source') payload.sources.push({ id: 'missing', kind: 'check' });
+    const ref = decisionFile(payload);
+    if (failure === 'tampered-file') fs.appendFileSync(ref.path, ' ');
+    const input = decisionSnapshot({ decision_residuals: [ref] });
+    if (failure === 'stale-source') input.review_items[0].updated_at = 'v2';
+    if (failure === 'wrong-answer') {
+      current = append(input, current);
+      input.decision_residuals = [];
+      input.decision_answers = [{ decision_id: 'decision:wrong', ...decisionFile({ answer: 'yes' }, 'answer.json') }];
+    }
+    const before = fs.readdirSync(stateDir);
+    expect(() => append(input, current)).toThrow();
+    expect(fs.readdirSync(stateDir)).toEqual(before);
+  });
+
+  test('legacy needs-human labels without a complete payload stay actionable', () => {
+    const current = append(decisionSnapshot({ review_items: [{
+      ...decisionSnapshot().review_items[0], disposition: 'needs-human',
+    }] }), run(['read', '--state-dir', stateDir]));
+    expect(current.events.review).toEqual(['T1']);
+    expect(current.terminal).toBe('watching');
+  });
+
+  test('check-only decisions accept null recommendations and retire answers when the check clears', () => {
+    const value = { ...decision(), sources: [{ kind: 'check', id: 'ci/test' }], thread_urls: [] };
+    let current = append(decisionSnapshot({ review_items: [] }), run(['read', '--state-dir', stateDir]));
+    current = append(decisionSnapshot({ review_items: [], decision_residuals: [decisionFile(value)] }), current);
+    expect(current.reason_code).toBe('needs-human');
+    const answer = decisionFile({ answer: 'Keep it strict.' }, 'answer.json');
+    current = append(decisionSnapshot({ review_items: [], decision_answers: [{
+      decision_id: current.human_decisions[0].decision_id, ...answer,
+    }] }), current);
+    expect(current.events.ci).toEqual(['ci/test']);
+    current = append(snapshot(), current);
+    expect(current.answered_human_decisions).toEqual([]);
+  });
+
+  test('a currency answer preserves the repo-policy blocker and independent CI still runs', () => {
+    const value = snapshot({ merge_state_status: 'BEHIND', repo_policy: {} });
+    let current = append(value, run(['read', '--state-dir', stateDir]));
+    const payload = { ...decision(), sources: [{ kind: 'currency', id: current.branch_currency_key }], thread_urls: [] };
+    current = append({ ...value, decision_residuals: [decisionFile(payload)] }, current);
+    expect(current.reason_code).toBe('needs-human');
+    expect(current.events.branch_currency).toBe(false);
+    const id = current.human_decisions[0].decision_id;
+    current = append({ ...value, decision_answers: [{ decision_id: id,
+      ...decisionFile({ answer: 'Inspect the update.' }, 'answer.json'),
+    }] }, current);
+    expect(current.reason_code).toBe('branch-currency-update-required');
+    current = append({ ...value, checks: decisionSnapshot().checks }, current);
+    expect(current.terminal).toBe('watching');
+    expect(current.events.ci).toEqual(['ci/test']);
+  });
+
+  test('lost or altered carried decision artifacts cannot produce successful handoff', () => {
+    let current = append(decisionSnapshot(), run(['read', '--state-dir', stateDir]));
+    const ref = decisionFile(decision());
+    current = append(decisionSnapshot({ decision_residuals: [ref] }), current);
+    fs.appendFileSync(ref.path, ' ');
+    expect(() => append(decisionSnapshot(), current)).toThrow();
+    expect(fs.readdirSync(stateDir)).toHaveLength(2);
+  });
+
+  test.each([{ checks: [] }, { checks: [{ key: 'ci/test', status: 'UNKNOWN' }] }])('unobserved or unknown checks never become green', ({ checks }) => {
+    let current = append(snapshot({ checks }), run(['read', '--state-dir', stateDir]));
+    current = append(snapshot({ checks, observed_at: '2026-07-30T00:05:01.000Z' }), current);
+    expect(current.terminal).not.toBe('looks-ready');
+  });
+
   test('requires a quiet green window and reopens for review after green', () => {
     let current = run(['read', '--state-dir', stateDir]);
     current = append(snapshot(), current);
     expect(current.terminal).toBe('watching');
-    current = append(snapshot({ observed_at: '2026-07-30T00:05:01.000Z' }), current);
+    for (let seconds = 30; seconds <= 300; seconds += 30) {
+      current = append(snapshot({ observed_at: new Date(Date.parse(snapshot().observed_at) + seconds * 1000).toISOString() }), current);
+    }
     expect(current.terminal).toBe('looks-ready');
     current = append(snapshot({
       observed_at: '2026-07-30T00:05:02.000Z',
@@ -140,7 +340,9 @@ describe('spec-lfg PR watch state helper', () => {
     expect(current.terminal).toBe('watching');
     expect(current.quiet_seconds).toBe(0);
 
-    current = append(snapshot({ observed_at: '2026-07-30T00:15:02.000Z' }), current);
+    for (let seconds = 30; seconds <= 300; seconds += 30) {
+      current = append(snapshot({ observed_at: new Date(Date.parse('2026-07-30T00:10:01.000Z') + seconds * 1000).toISOString() }), current);
+    }
     expect(current.terminal).toBe('looks-ready');
   });
 
@@ -161,6 +363,40 @@ describe('spec-lfg PR watch state helper', () => {
     expect(JSON.parse(rejected.stdout).reason_code).toBe('snapshot-invalid');
     expect(rejected.stdout).not.toContain('sentinel-secret');
     expect(fs.existsSync(stateDir)).toBe(false);
+  });
+
+  test('fails closed on malformed review item identity instead of silently narrowing the open set', () => {
+    const initial = run(['read', '--state-dir', stateDir]);
+    const attempt = (reviewItems) => spawnSync(process.execPath, [
+      helper,
+      'snapshot',
+      '--input', writeInput(root, 'bad-review-item.json', snapshot({ review_items: reviewItems })),
+      '--state-dir', stateDir,
+      '--expected-generation', String(initial.generation),
+      '--expected-sha256', initial.snapshot_sha256,
+    ], { encoding: 'utf8' });
+
+    // 缺失/空白/超长 id 与缺失/非法 kind 一律拒绝快照,而非过滤或改写为 comment
+    // (旧版会把 open review 无声移出观测集,lane finding DR-003)。
+    for (const items of [
+      [{ id: '', kind: 'comment' }],
+      [{ id: 'has space', kind: 'comment' }],
+      [{ id: 'x'.repeat(201), kind: 'comment' }],
+      [{ kind: 'comment' }],
+      [{ id: 'T1' }],
+      [{ id: 'T1', kind: 'note' }],
+    ]) {
+      const rejected = attempt(items);
+      expect(rejected.status).toBe(1);
+      expect(JSON.parse(rejected.stdout).reason_code).toBe('snapshot-invalid');
+    }
+    expect(fs.existsSync(stateDir)).toBe(false);
+
+    // GraphQL base64 节点 id(含 '+' 与 '=' padding)是合法不透明身份,必须进入观测。
+    const current = append(snapshot({ review_items: [{
+      id: 'DISCUSSION+node-id==', kind: 'thread', updated_at: 'v1', url: snapshot().pr_url,
+    }] }), run(['read', '--state-dir', stateDir]));
+    expect(current.events.review).toEqual(['DISCUSSION+node-id==']);
   });
 
   test('fails closed on credential-bearing or non-private persisted state', () => {
@@ -223,5 +459,32 @@ describe('spec-lfg PR watch state helper', () => {
 
     expect(rejectedPermissions.status).toBe(1);
     expect(JSON.parse(rejectedPermissions.stdout).reason_code).toBe('state-path-unsafe');
+  });
+
+  test('a recorded decision whose artifact was deleted rejects structurally instead of crashing', () => {
+    let current = append(decisionSnapshot(), run(['read', '--state-dir', stateDir]));
+    const ref = decisionFile(decision());
+    current = append(decisionSnapshot({
+      decision_residuals: [ref],
+      review_items: [...decisionSnapshot().review_items, { id: 'I2', kind: 'comment', updated_at: 'v1' }],
+    }), current);
+    expect(current.terminal).toBe('watching');
+
+    // private-scratch 清理/会话重启后工件可能消失：下一次 snapshot 必须输出结构化
+    // rejected（reason_code=decision-invalid），而不是裸 ENOENT 堆栈使 watch 循环不可解析。
+    fs.rmSync(ref.path);
+    const raw = spawnSync(process.execPath, [helper,
+      'snapshot',
+      '--input', writeInput(root, `input-${current.generation + 1}.json`, decisionSnapshot()),
+      '--state-dir', stateDir,
+      '--expected-generation', String(current.generation),
+      '--expected-sha256', current.snapshot_sha256,
+      '--budget-seconds', '10800',
+    ], { encoding: 'utf8' });
+    expect(raw.status).toBe(1);
+    const parsed = JSON.parse(raw.stdout);
+    expect(parsed.status).toBe('rejected');
+    expect(parsed.reason_code).toBe('decision-invalid');
+    expect(parsed.errors[0]).toContain('decision artifact missing or unreadable');
   });
 });

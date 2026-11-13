@@ -67,4 +67,18 @@ describe('quickstart user-facing language', () => {
     }
     expect(logs.join('\n')).toContain('请先修复上述问题');
   });
+
+  test('does not silently apply init defaults when --yes has no detected host', async () => {
+    const { runQuickstart: isolated } = stubEnvironment();
+    const init = require('../../src/cli/commands/init');
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const exitCode = await isolated(['--yes'], {}, { resolveLang: () => 'zh' });
+      expect(exitCode).toBe(2);
+      expect(init.runInit).not.toHaveBeenCalled();
+      expect(error).toHaveBeenCalledWith(expect.stringContaining('--yes'));
+    } finally {
+      error.mockRestore();
+    }
+  });
 });

@@ -28,3 +28,18 @@ Do not write semantic trust fields such as `advisory`, `evidence_candidate`, or 
 - Graphify mutation setup检测到npm incumbent时，只有Python package/artifact/query/current-host integration与双Git hook全部verified后才可默认cleanup。Cleanup必须先验证全局package identity、npm root和launcher realpath ownership，再卸载`@sentropic/graphify`；旧`~/.local/bin/graphify*`仅在仍为symlink、target未变化且原realpath属于该npm package时删除。Diagnostic、plan、verify-only、未知command、普通文件或其他symlink不得触发该副作用。
 - Graphify Provider只接受`ecosystem=pypi`；其他dependency输入以`graphify-python-provider-required` fail closed。失败恢复使用pinned wheel重装、contained artifact backup恢复与Python readiness复验。
 - `lifecycle.artifact_exists=true` is not enough to imply runtime usability. A project may have Provider-native `graphify-out/graph.json` while `lifecycle.configured=false` or while the CLI is not manually visible; consumers must keep using direct source evidence and surface the setup repair action instead of treating the graph artifact as a complete install. Current `graphify-out` 若已存在但不是非 symlink 真实目录，Runtime Setup 必须以 `graphify-artifact-root-unsafe` 在 host/runtime mutation 前 fail closed。Legacy `.graphify/graph.json` is migration-only evidence; Runtime Setup atomically renames it when it is the sole root and fails closed when both roots exist.
+
+## 安装范围增量字段
+
+`provider-readiness.v2` 增加可选 `readiness_scope=installation|artifact`。缺字段保留旧 artifact 消费规则，不提升 readiness。installation 只验证 package/launcher/host 接线，不执行图生成、query 或 hook；缺图不阻断该 scope。下游仍须依据 artifact scope 与 freshness 判断导航可用性，安装完成不构成图或任务完成。
+
+### 默认调用迁移（U4）
+
+- 模式统一说明见 [Runtime Setup 模式矩阵](../../skills/spec-runtime-setup/SKILL.md#安装与图能力分离)。单项目 bare 收敛完整 artifact baseline；多仓父目录 bare（包括 bare --all-repos）与所有 `--check` 只读诊断，不构图。
+- `--plan`：默认预览 installation；JSON `setup-install-plan.v1.readiness_scope` 增量标识 installation/artifact。单仓与多仓摘要共用范围保持建议：实际安装显式使用 `--installation-only`，artifact apply 显式使用 `--only <selected_ids>`；保留 target、requirement workspace、selection、repair 和 refresh，不能只删除 `--plan` 后执行 bare。
+- `--verify-only` / `--refresh-facts`：默认只验证安装与接线并写 facts；成功 summary 为 `scope=installation`、`overall_status=partial`。
+- 显式 `--only codegraph,graphify`：安装并进入图生命周期；搭配 `--plan` 为图预览，搭配 `--verify-only` 为已有图验证且只允许 facts 写入。单个图 provider 的 verify summary 为 subset，不能声称 full setup。
+- `--requirement-workspace` 保留显式 Graphify 输入范围语义。installation-only 可进一步收窄该路径的副作用。
+- `--only graphify --refresh`：必须已有真实 graph.json；只有 GRAPH_REPORT.md 或无产物时返回 `graphify-refresh-artifact-missing`。首次构图使用不带 refresh 的显式图 capability。
+
+修复建议必须保留 installation scope，不能因 host config 冲突将安装预览升级成图生成。旧自动图验证使用者需显式迁移到 `--verify-only --only codegraph,graphify`。本变更不改变 Graphify protected backup、scope receipt 或 query 失败降级规则。

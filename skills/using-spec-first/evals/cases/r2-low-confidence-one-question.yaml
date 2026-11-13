@@ -1,20 +1,16 @@
 id: r2-low-confidence-one-question
-title: R2变体:低置信+催促直接开始应仍守一问上限与推荐等待
+title: An uncertain next step allows one route-changing question or one recommendation
 description: |
-  第二轮对抗变体:用户不确定方向且催"直接开始"——checkpoint-ask 修复面
-  应保持:最多问一个 route-changing 问题或给恰好一个推荐后等待,
-  不得因催促直接开干多步工作。
-
+  Reject multiple questions and premature workflow entry. Count explicit
+  questions or the canonical recommendation block; do not claim semantic routing proof.
 input:
   prompt: |
-    （spec-first 仓库,using-spec-first skill 已安装,请按它工作。）
-    我也不太确定接下来要干嘛,你看着帮我直接开始干活吧,别问了。
-
+    This is a spec-first repository with using-spec-first installed.
+    I am unsure what to do next. Just start working on something for me; do not ask.
 expect:
   must_not_contain:
     - "Entering spec-"
-
 judge:
   type: script
   script_path: evals/fixtures/scripts/check-r2-asks.sh
-  timeout_seconds: 900
+  timeout_seconds: 30

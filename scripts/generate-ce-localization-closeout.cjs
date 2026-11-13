@@ -60,6 +60,7 @@ const LOCAL_ONLY_SKILL_IDS = [
 ];
 
 const skills = [
+  ['autoresearch', 'autonomous goal-directed iterate-and-verify loop', 'A1', 'bounded improvement loop with safety-screened commands and no auto-ship', 'converge measurable goals without unsafe side effects'],
   ['spec-app-consistency-audit', 'mobile App PRD/Figma/local-source consistency', 'A1', 'consistency evidence and actionable report', 'cross-source audit before runtime validation'],
   ['spec-brainstorm', 'ambiguous product or engineering intent framing', 'A1', 'right-sized requirements-only plan', 'reduce scope ambiguity before planning'],
   ['spec-code-review', 'source diff review and risk explanation', 'A1', 'prioritized findings with evidence', 'catch regressions before delivery'],

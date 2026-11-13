@@ -1,5 +1,6 @@
 'use strict';
 
+const { renderCommand } = require('./command-display.cjs');
 const crypto = require('node:crypto');
 const childProcess = require('node:child_process');
 const fs = require('node:fs');
@@ -71,12 +72,9 @@ function isFile(filePath) {
   }
 }
 
-function quoteCommandArgument(value) {
-  return `"${String(value).replaceAll('"', '\\"')}"`;
-}
-
-function projectConfigNextAction(root, flag) {
-  return `spec-runtime-setup --project-config ${flag} --repo ${quoteCommandArgument(root)}`;
+function projectConfigNextAction(root, flag, targetKind) {
+  const targetFlag = targetKind === 'non-git-folder' ? '--folder' : '--repo';
+  return renderCommand(['spec-runtime-setup', '--project-config', flag, targetFlag, root]);
 }
 
 function workspaceRelativePath(root, target) {
@@ -162,7 +160,7 @@ function inspectLocalConfigContent(raw, localPath = '.spec-first/config.local.ya
   };
 }
 
-function inspectProjectConfig({ repoRoot, templatePath }) {
+function inspectProjectConfig({ repoRoot, templatePath, targetKind }) {
   if (!repoRoot || !isDirectory(repoRoot)) {
     return {
       schema_version: 'project-local-config-status.v1',
@@ -220,7 +218,7 @@ function inspectProjectConfig({ repoRoot, templatePath }) {
       status: exampleStatus,
       next_action: exampleStatus === 'current'
         ? null
-        : projectConfigNextAction(root, '--refresh-example'),
+        : projectConfigNextAction(root, '--refresh-example', targetKind),
     },
     local_config: {
       path: localPath,
@@ -234,7 +232,7 @@ function inspectProjectConfig({ repoRoot, templatePath }) {
       path: gitignorePath,
       status: gitignoreStatus,
       next_action: gitignoreStatus === 'missing'
-        ? projectConfigNextAction(root, '--ensure-gitignore')
+        ? projectConfigNextAction(root, '--ensure-gitignore', targetKind)
         : null,
     },
     legacy_markdown_config: {

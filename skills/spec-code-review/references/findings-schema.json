@@ -27,10 +27,16 @@
           "evidence",
           "pre_existing"
         ],
+        "dependencies": { "validation_status": ["validation_reason", "protected_subject"] },
         "properties": {
+          "settled_conflict": {
+            "type": "boolean",
+            "description": "Context annotation only; never bypasses evidence, confidence or validation gates."
+          },
           "title": {
             "type": "string",
             "description": "Short, specific issue title. 10 words or fewer.",
+            "minLength": 1,
             "maxLength": 100
           },
           "severity": {
@@ -40,7 +46,8 @@
           },
           "file": {
             "type": "string",
-            "description": "Relative file path from repository root"
+            "minLength": 1,
+            "description": "Exact relative file path from repository root; preserve case and whitespace"
           },
           "line": {
             "type": "integer",
@@ -65,6 +72,38 @@
             "type": "boolean",
             "description": "Whether any fix for this finding must be re-verified with targeted tests or a follow-up review pass"
           },
+          "protected_subject": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "memory-safety",
+              "concurrency",
+              "data-loss",
+              "authorization-authentication",
+              "injection",
+              "public-contract",
+              "secrets-exposure",
+              "cryptography",
+              null
+            ],
+            "description": "验证阶段按实际 claim 分类；敏感 claim 拒绝须有具体反证。"
+          },
+          "validation_status": {
+            "type": "string",
+            "enum": [
+              "confirmed",
+              "rejected",
+              "unresolved"
+            ],
+            "description": "验证阶段可选结果；unresolved 仅报告，不是确认缺陷或修复指令。"
+          },
+          "validation_reason": {
+            "type": "string",
+            "minLength": 1,
+            "description": "确认或反驳的证据，或未解决所缺证据。"
+          },
           "suggested_fix": {
             "type": ["string", "null"],
             "description": "Concrete minimal fix the reviewer can defend from the diff and surrounding code. Propose one whenever any defensible code change is reachable from review context (parallel patterns, framework conventions, or the cited code itself). Imperfect information is not grounds for omission -- propose the most defensible default given what you can see, name any assumption you are making, and let the user override. 'I need <specific input> to commit' is a soft punt: the right question is 'what code change would I propose if I had to choose now?' and propose that, with the assumption named. Omit only when there is genuinely no code-level change to propose -- e.g., the finding is a question rather than a fix ('what is the intended SLA here?'), or the resolution is purely an organizational action with no code component (legal sign-off, business policy decision). These cases are rare in code review. A bad suggestion is still worse than none, but a soft punt is the failure mode this field is designed to prevent."
@@ -77,7 +116,7 @@
           "evidence": {
             "type": "array",
             "description": "Code-grounded evidence: snippets, line references, or pattern descriptions. At least 1 item. For any finding at confidence anchor 75 or 100, the first item MUST be the verbatim motivating line(s) with file:line -- the exact code text that makes the finding true (the quote-the-line gate). A finding whose triggering line cannot be quoted must step down to anchor 50.",
-            "items": { "type": "string" },
+            "items": { "type": "string", "minLength": 1 },
             "minItems": 1
           },
           "pre_existing": {
@@ -109,7 +148,7 @@
       "100": "Verifiable from code alone (compile error, type mismatch, definitive logic bug, quoted standards violation) -- report"
     },
     "confidence_thresholds": {
-      "suppress": "Below anchor 75 -- do not report. Exception: P0 findings at anchor 50+ may be reported (critical-but-uncertain issues must not be silently dropped).",
+      "suppress": "Below anchor 75 -- do not report. Exception: P0 findings at anchor 50+ with nonempty motivating evidence may be reported; weaker critical suspicions remain disclosed residual risks.",
       "report": "Anchor 75 or 100 -- include with full evidence."
     },
     "severity_definitions": {

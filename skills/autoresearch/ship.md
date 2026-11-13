@@ -12,7 +12,7 @@ Extract from $ARGUMENTS:
 - `Target:` or `--target` — what to ship (path, PR, artifact, deployment)
 - `--type <type>` — override auto-detection: code-pr, code-release, deployment, content, docs, package, config
 - `--dry-run` — validate everything but don't ship
-- `--auto` — auto-approve if no errors found
+- `--auto` — legacy alias; never bypasses the explicit-approval gate below
 - `--force` — skip non-critical items (blockers still enforced)
 - `--rollback` — undo last ship action
 - `--monitor N` — post-ship monitoring for N minutes
@@ -83,7 +83,7 @@ If `--dry-run` or always before actual ship:
 
 ## Phase 6: Ship
 
-**REQUIRES EXPLICIT USER APPROVAL** (unless --auto with zero errors).
+**REQUIRES EXPLICIT USER APPROVAL** — unconditionally; `--auto` and a zero-error run never waive this gate.
 
 Execute the ship action:
 - Code PR: create/update PR, request reviewers
@@ -110,9 +110,10 @@ Write:
 ## Rollback
 
 If `--rollback`:
-- Identify last ship action from most recent ship log
-- Reverse it (revert PR, unpublish, rollback deployment)
-- Verify rollback succeeded
+- Identify the rollback Target from the invoking request (deployment, release, or artifact it names); do not infer it from "most recent log" alone.
+- Reconcile before acting: the Target named in the request, the object the chosen ship log actually shipped, the current state of that object (still at the shipped version? superseded by a later change?), and the authorized rollback scope for this run must all agree. A later change layered on top makes blind reversal unsafe — surface the conflict and stop instead of overwriting it.
+- Reverse it (revert PR, unpublish, rollback deployment) only within the reconciled scope.
+- Verify rollback succeeded against the same Target and record the reconciliation (log identity, current-state check, scope) in the rollback log entry.
 
 ## Chain Handoff
 

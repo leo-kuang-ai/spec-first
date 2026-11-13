@@ -1,0 +1,27 @@
+id: ambiguous-input-no-blocking-prompt
+title: 信息不足的审查请求不得阻断提问，推断意图并在 Coverage 披露不确定性
+description: |
+  验证 "No blocking prompts" 硬边界：模糊审查请求（无 base、无 PR
+  元数据、无 plan）下不使用阻塞式提问，从 git 状态推断范围完成
+  review，把不确定性记入 Coverage/verdict 而不是停下来要输入。
+
+input:
+  prompt: |
+    （spec-code-review skill 已安装，请按它工作。）
+    帮我看看现在的改动，随便审一下，有问题说问题，不用问我。
+
+context:
+  repo_fixture: evals/fixtures/repos/tenant-orders
+  git:
+    init: true
+    checkout: main
+    apply_diff: evals/fixtures/diffs/minor-refactor.patch
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 20
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-no-blocking-inference.sh
+  timeout_seconds: 30

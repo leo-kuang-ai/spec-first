@@ -6,8 +6,7 @@
 
 **Prototype a remaining behavior or feel question** — when a decision still needs a runnable artifact and a human can experience it, invoke `spec-prototype` with the current brainstorm as its seed. Do not offer this for a visual probe that already settled the question, and do not offer Proof or any external upload.
 
-This content is loaded when Phase 4 begins — after the requirements-only
-unified plan is written.
+This content is loaded when Phase 4 begins — after the warranted document is written or brief alignment has completed without a file. If the user already chose the next destination or ended the discussion, honor that instruction without reopening the menu.
 
 ---
 
@@ -21,7 +20,7 @@ whether the browser option renders and the document-review mutation policy, unre
 for non-software brainstorms (`execution` other than `code`). Count the visible
 options for the current state and choose the rendering mode accordingly:
 
-- **Visible count fits the current platform's option cap:** use the platform's blocking question tool (`AskUserQuestion` in Claude Code — call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded; `request_user_input` in Codex). Claude Code `AskUserQuestion` supports up to 4 explicit options, and Codex `request_user_input` supports only 2-3 explicit options.
+- **Visible count fits the current platform's option cap:** use the host's blocking question tool already in the current tool list, matched by capability (if it is listed but unloaded, load it through the host's tool-discovery primitive). Some hosts cap explicit options (e.g., up to 4 on Claude Code, 2-3 on Codex); count the visible options for the current state and render within that cap.
 - **Visible count exceeds the current platform's option cap:** render as a numbered list in chat. This is the narrow option-overflow fallback; trimming would hide legitimate choices (plan, ship, review, browser, refine are all distinct destinations). Include a hint that free-form input is accepted ("Pick a number or describe what you want.") so the numbered list retains the blocking tool's open-endedness.
 
 Never silently skip the question.
@@ -65,7 +64,7 @@ Present only the options that apply. Renumber so visible options stay contiguous
 4. **Open in browser** — open the HTML unified plan locally for review and sharing. Shown only when an HTML unified plan exists. **Render only when `OUTPUT_FORMAT=html`.**
 5. **More clarifying questions to sharpen the doc** - Keep refining scope, edge cases, constraints, and preferences through further dialogue. Always shown.
 
-There is no "done" / "pause" option — the blocking question already waits, and the user ends by dismissing it (Esc) or saying they're finished. The unified plan artifact is already saved.
+There is no "done" / "pause" option — the blocking question already waits, and the user ends by dismissing it (Esc) or saying they're finished. When a file was earned, the unified plan artifact is already saved; on the chat-only path there is no file and nothing to save.
 
 **Post-review nudge (subsequent rounds only):** If the user has already run `spec-doc-review` this session and residual P0/P1 findings remain unaddressed, add a one-line prose nudge adjacent to the menu (e.g., "Document review flagged 2 P1 findings you may want to address — pick \"Pressure-test the requirements\" to run another pass."). Reference the option by label, not number: the menu renumbers when `Resolve Before Planning` hides `Create the implementation plan` and the spec-lfg option, so a hardcoded option number can point users at the wrong action. Do not add a separate menu option; reuse the existing `Pressure-test the requirements` option in both output formats.
 
@@ -150,7 +149,7 @@ Key decisions:
 - [Decision 1]
 - [Decision 2]
 
-Recommended next step: `spec-plan <plan artifact path>`
+Recommended next step: `spec-plan <actual artifact path or concise confirmed scope>`
 ```
 
 If the user pauses with `Resolve Before Planning` still populated, display:

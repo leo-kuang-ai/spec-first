@@ -16,15 +16,13 @@ const {
 const SESSION_START_TEMPLATE_PATH = path.join(__dirname, '..', '..', '..', 'templates', 'zcode', 'hooks', 'session-start');
 
 /**
- * ZCode platform adapter
+ * ZCode 平台 adapter
  *
- * ZCode is an AGENTS.md-ecosystem native host: it discovers workflow skills from
- * the shared `.agents/skills/` projection (the same surface Codex consumes) and
- * reads the shared `AGENTS.md` instruction file, so skill content transforms and
- * the shared-surface cleanup contract reuse the Codex pipeline verbatim.
- * ZCode-specific state lives under `.zcode/spec-first/`, and the SessionStart
- * hook is registered through the `.zcode/config.json` managed slice
- * (`hooks.events.SessionStart` + `hooks.enabled`), not a hooks.json file.
+ * ZCode 是 AGENTS.md 生态原生宿主：从共享 `.agents/skills/` 投影发现 workflow
+ * skills（与 Codex 消费同一面），读取共享 `AGENTS.md` 指令文件，因此 skill 内容
+ * transform 与共享面清理契约原样复用 Codex 管线。ZCode 专属 state 位于
+ * `.zcode/spec-first/`；SessionStart hook 经 `.zcode/config.json` 受管 slice
+ * （`hooks.events.SessionStart` + `hooks.enabled`）注册，而非 hooks.json 文件。
  */
 class ZcodeAdapter extends CodexAdapter {
   get id() {
@@ -40,7 +38,9 @@ class ZcodeAdapter extends CodexAdapter {
   }
 
   get commandRoot() {
-    return '.zcode/commands/spec';
+    // hasCommands=false 使其不参与写路径；收在受管命名空间内，避免 clean 的
+    // 无守卫 commandRoot 存在性探针把用户自有的 .zcode/commands/ 误判为已安装。
+    return '.zcode/spec-first/commands';
   }
 
   get agentsRoot() {
@@ -76,8 +76,8 @@ class ZcodeAdapter extends CodexAdapter {
     });
 
     const rendered = renderManagedZcodeConfig(projectRoot);
-    // A corrupt user-owned config is never overwritten; the drift surfaces via
-    // inspectRuntimeFiles/doctor instead of failing the whole init.
+    // 用户自有的损坏 config 永不被覆盖；drift 经 inspectRuntimeFiles/doctor
+    // 浮出，而不是让整个 init 失败。
     const skippedConfigWrite = Boolean(rendered.blocked);
     if (!skippedConfigWrite) {
       operations.push({

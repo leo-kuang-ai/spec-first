@@ -1,5 +1,5 @@
 {
-  "schema_version": "setup-registry.v10",
+  "schema_version": "setup-registry.v11",
   "summary_columns": [
     "tool",
     "type",
@@ -29,14 +29,16 @@
       "id": "codegraph",
       "ecosystem": "npm",
       "package": "@colbymchenry/codegraph",
-      "version": "1.5.0",
+      "version": "1.6.0",
+      "integrity": "sha512-nCN40MqmYxF7gH1QTKqlxJ1d2mzwhw3fzSdGV2wjnQKsymjM3JZnH/5rpGqhBkcUEom0qWq0WjDRvOZh2t8mFA==",
+      "source": "npmjs",
       "command": "codegraph"
     },
     {
       "id": "graphify",
       "ecosystem": "pypi",
       "package": "graphifyy",
-      "version": "0.9.29",
+      "version": "0.9.57",
       "command": "graphify",
       "python": {
         "requires": ">=3.10",
@@ -50,8 +52,8 @@
         "plain_pip_allowed": false
       },
       "distribution": {
-        "wheel_url": "https://files.pythonhosted.org/packages/f1/b1/0cbe4738ca9784850d40aae0d71c34547230e0445e52067f98b8d0b6c070/graphifyy-0.9.29-py3-none-any.whl",
-        "sha256": "143f4002f40d5c302ae43bd58487ad604191f2d0ac8216429894c6a913ecf27b",
+        "wheel_url": "https://files.pythonhosted.org/packages/c8/c2/d1ce4a567a5bf4c36054cede2c70f745a239ed5080b70d7934c5c738b583/graphifyy-0.9.57-py3-none-any.whl",
+        "sha256": "f35c86410e7d92ace69a50ac8dbed568903c880482c656f43437ca657fee8c37",
         "index_url": "https://pypi.org/simple"
       },
       "hook_normalization_contract": "graphify-python-hook-normalization.v1"
@@ -71,6 +73,12 @@
                   "linux": "/etc/claude-code/managed-mcp.json",
                   "wsl": "/etc/claude-code/managed-mcp.json",
                   "windows": "C:\\Program Files\\ClaudeCode\\managed-mcp.json"
+                },
+                "containment_root": {
+                  "macos": "/Library/Application Support/ClaudeCode",
+                  "linux": "/etc/claude-code",
+                  "wsl": "/etc/claude-code",
+                  "windows": "C:\\Program Files\\ClaudeCode"
                 },
                 "config_format": "json",
                 "precedence": 100,
@@ -94,7 +102,44 @@
           }
         },
         "helper": {},
-        "provider": {}
+        "provider": {
+          "host_config": {
+            "scope": "managed",
+            "targets": {
+              "managed": {
+                "config_path": {
+                  "macos": "/Library/Application Support/ClaudeCode/managed-mcp.json",
+                  "linux": "/etc/claude-code/managed-mcp.json",
+                  "wsl": "/etc/claude-code/managed-mcp.json",
+                  "windows": "C:\\Program Files\\ClaudeCode\\managed-mcp.json"
+                },
+                "containment_root": {
+                  "macos": "/Library/Application Support/ClaudeCode",
+                  "linux": "/etc/claude-code",
+                  "wsl": "/etc/claude-code",
+                  "windows": "C:\\Program Files\\ClaudeCode"
+                },
+                "config_format": "json",
+                "precedence": 100,
+                "writable_check": "parent-or-file"
+              },
+              "user": {
+                "config_path": "$HOME/.claude.json",
+                "config_format": "json",
+                "precedence": 10,
+                "writable_check": "parent-or-file"
+              }
+            },
+            "fallback_order": [
+              "managed",
+              "user"
+            ],
+            "uninstall_targets": [
+              "managed",
+              "user"
+            ]
+          }
+        }
       }
     },
     "codex": {
@@ -112,6 +157,7 @@
               },
               "system": {
                 "config_path": "/etc/codex/config.toml",
+                "containment_root": "/etc/codex",
                 "config_format": "toml",
                 "precedence": 100,
                 "writable_check": "file-only"
@@ -127,7 +173,33 @@
           }
         },
         "helper": {},
-        "provider": {}
+        "provider": {
+          "host_config": {
+            "scope": "user",
+            "targets": {
+              "user": {
+                "config_path": "$HOME/.codex/config.toml",
+                "config_format": "toml",
+                "precedence": 50,
+                "writable_check": "parent-or-file"
+              },
+              "system": {
+                "config_path": "/etc/codex/config.toml",
+                "containment_root": "/etc/codex",
+                "config_format": "toml",
+                "precedence": 100,
+                "writable_check": "file-only"
+              }
+            },
+            "fallback_order": [
+              "user"
+            ],
+            "uninstall_targets": [
+              "user",
+              "system"
+            ]
+          }
+        }
       }
     },
     "cursor": {
@@ -161,7 +233,33 @@
           }
         },
         "helper": {},
-        "provider": {}
+        "provider": {
+          "host_config": {
+            "scope": "project",
+            "targets": {
+              "project": {
+                "config_path": ".cursor/mcp.json",
+                "config_format": "json",
+                "precedence": 50,
+                "writable_check": "parent-or-file"
+              },
+              "user": {
+                "config_path": "$HOME/.cursor/mcp.json",
+                "config_format": "json",
+                "precedence": 100,
+                "writable_check": "parent-or-file",
+                "requires_user_scope_opt_in": true
+              }
+            },
+            "fallback_order": [
+              "project"
+            ],
+            "uninstall_targets": [
+              "project",
+              "user"
+            ]
+          }
+        }
       }
     },
     "kiro": {
@@ -195,7 +293,33 @@
           }
         },
         "helper": {},
-        "provider": {}
+        "provider": {
+          "host_config": {
+            "scope": "workspace",
+            "targets": {
+              "workspace": {
+                "config_path": ".kiro/settings/mcp.json",
+                "config_format": "json",
+                "precedence": 50,
+                "writable_check": "parent-or-file"
+              },
+              "user": {
+                "config_path": "$HOME/.kiro/settings/mcp.json",
+                "config_format": "json",
+                "precedence": 100,
+                "writable_check": "parent-or-file",
+                "requires_user_scope_opt_in": true
+              }
+            },
+            "fallback_order": [
+              "workspace"
+            ],
+            "uninstall_targets": [
+              "workspace",
+              "user"
+            ]
+          }
+        }
       }
     },
     "opencode": {
@@ -252,7 +376,56 @@
           }
         },
         "helper": {},
-        "provider": {}
+        "provider": {
+          "host_config": {
+            "scope": "project",
+            "json_container_path": [
+              "mcp"
+            ],
+            "server_representation": "opencode-local",
+            "permission_policy": {
+              "kind": "opencode-governed-assets-v1"
+            },
+            "targets": {
+              "project": {
+                "config_path": "opencode.json",
+                "config_format": "json",
+                "precedence": 100,
+                "writable_check": "parent-or-file",
+                "precedence_guards": [
+                  {
+                    "config_path": "opencode.jsonc",
+                    "config_format": "jsonc",
+                    "precedence": 110,
+                    "reason_code": "host-config-jsonc-precedence-blocked"
+                  }
+                ]
+              },
+              "user": {
+                "config_path": "${XDG_CONFIG_HOME}/opencode/opencode.json",
+                "config_format": "json",
+                "precedence": 50,
+                "writable_check": "parent-or-file",
+                "requires_user_scope_opt_in": true,
+                "precedence_guards": [
+                  {
+                    "config_path": "${XDG_CONFIG_HOME}/opencode/opencode.jsonc",
+                    "config_format": "jsonc",
+                    "precedence": 60,
+                    "reason_code": "host-config-jsonc-precedence-blocked"
+                  }
+                ]
+              }
+            },
+            "fallback_order": [
+              "project"
+            ],
+            "uninstall_targets": [
+              "project",
+              "user"
+            ]
+          }
+        }
       }
     },
     "qoder": {
@@ -286,7 +459,33 @@
           }
         },
         "helper": {},
-        "provider": {}
+        "provider": {
+          "host_config": {
+            "scope": "local",
+            "targets": {
+              "local": {
+                "config_path": ".qoder/settings.local.json",
+                "config_format": "json",
+                "precedence": 50,
+                "writable_check": "parent-or-file"
+              },
+              "user": {
+                "config_path": "$HOME/.qoder/settings.json",
+                "config_format": "json",
+                "precedence": 100,
+                "writable_check": "parent-or-file",
+                "requires_user_scope_opt_in": true
+              }
+            },
+            "fallback_order": [
+              "local"
+            ],
+            "uninstall_targets": [
+              "local",
+              "user"
+            ]
+          }
+        }
       }
     },
     "zcode": {
@@ -316,7 +515,95 @@
           }
         },
         "helper": {},
-        "provider": {}
+        "provider": {
+          "host_config": {
+            "scope": "workspace",
+            "json_container_path": [
+              "mcp",
+              "servers"
+            ],
+            "targets": {
+              "workspace": {
+                "config_path": ".zcode/config.json",
+                "config_format": "json",
+                "precedence": 50,
+                "writable_check": "parent-or-file"
+              }
+            },
+            "fallback_order": [
+              "workspace"
+            ],
+            "uninstall_targets": [
+              "workspace"
+            ]
+          }
+        }
+      }
+    },
+    "pi": {
+      "id": "pi",
+      "defaults": {
+        "tool": {
+          "host_config": {
+            "scope": "project",
+            "json_container_path": [
+              "mcpServers"
+            ],
+            "targets": {
+              "project": {
+                "config_path": ".pi/mcp.json",
+                "config_format": "json",
+                "precedence": 50,
+                "writable_check": "parent-or-file"
+              },
+              "user": {
+                "config_path": "$HOME/.pi/agent/mcp.json",
+                "config_format": "json",
+                "precedence": 100,
+                "writable_check": "parent-or-file",
+                "requires_user_scope_opt_in": true
+              }
+            },
+            "fallback_order": [
+              "project"
+            ],
+            "uninstall_targets": [
+              "project",
+              "user"
+            ]
+          }
+        },
+        "helper": {},
+        "provider": {
+          "host_config": {
+            "scope": "project",
+            "json_container_path": [
+              "mcpServers"
+            ],
+            "targets": {
+              "project": {
+                "config_path": ".pi/mcp.json",
+                "config_format": "json",
+                "precedence": 50,
+                "writable_check": "parent-or-file"
+              },
+              "user": {
+                "config_path": "$HOME/.pi/agent/mcp.json",
+                "config_format": "json",
+                "precedence": 100,
+                "writable_check": "parent-or-file",
+                "requires_user_scope_opt_in": true
+              }
+            },
+            "fallback_order": [
+              "project"
+            ],
+            "uninstall_targets": [
+              "project",
+              "user"
+            ]
+          }
+        }
       }
     }
   },
@@ -350,7 +637,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest"
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
             ]
           }
         },
@@ -359,7 +646,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest"
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
             ]
           }
         },
@@ -368,7 +655,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest"
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
             ]
           }
         },
@@ -377,7 +664,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest"
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
             ]
           }
         },
@@ -386,7 +673,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest"
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
             ]
           }
         },
@@ -396,7 +683,25 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest"
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            ]
+          }
+        },
+        "zcode": {
+          "host_config": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            ]
+          }
+        },
+        "pi": {
+          "host_config": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
             ]
           }
         }
@@ -407,7 +712,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest",
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
               "--help"
             ]
           }
@@ -417,7 +722,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest",
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
               "--help"
             ]
           }
@@ -427,7 +732,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest",
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
               "--help"
             ]
           }
@@ -437,11 +742,18 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@latest",
+              "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
               "--help"
             ]
           }
         }
+      },
+      "readiness_policy": "always-required",
+      "resolved_dependency": {
+        "package": "@modelcontextprotocol/server-sequential-thinking",
+        "version": "2026.8.31",
+        "integrity": "sha512-/EMH++1j2e+VmHwpibw1IUPHxA0tcQY09Yo5/OIPwW/8irEKLAufJNGSZQhCK18n8TUvV6WwZyQOuaDKxe/CeQ==",
+        "source": "npmjs"
       }
     },
     {
@@ -473,7 +785,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest"
+              "@upstash/context7-mcp@4.0.7"
             ]
           }
         },
@@ -482,7 +794,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest"
+              "@upstash/context7-mcp@4.0.7"
             ]
           }
         },
@@ -491,7 +803,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest"
+              "@upstash/context7-mcp@4.0.7"
             ]
           }
         },
@@ -500,7 +812,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest"
+              "@upstash/context7-mcp@4.0.7"
             ]
           }
         },
@@ -509,7 +821,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest"
+              "@upstash/context7-mcp@4.0.7"
             ]
           }
         },
@@ -519,7 +831,25 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest"
+              "@upstash/context7-mcp@4.0.7"
+            ]
+          }
+        },
+        "zcode": {
+          "host_config": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@upstash/context7-mcp@4.0.7"
+            ]
+          }
+        },
+        "pi": {
+          "host_config": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@upstash/context7-mcp@4.0.7"
             ]
           }
         }
@@ -530,7 +860,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest",
+              "@upstash/context7-mcp@4.0.7",
               "--help"
             ]
           }
@@ -540,7 +870,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest",
+              "@upstash/context7-mcp@4.0.7",
               "--help"
             ]
           }
@@ -550,7 +880,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest",
+              "@upstash/context7-mcp@4.0.7",
               "--help"
             ]
           }
@@ -560,11 +890,18 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@latest",
+              "@upstash/context7-mcp@4.0.7",
               "--help"
             ]
           }
         }
+      },
+      "readiness_policy": "always-required",
+      "resolved_dependency": {
+        "package": "@upstash/context7-mcp",
+        "version": "4.0.7",
+        "integrity": "sha512-56+UVpy1Mwe7IE5ehRuvuqAdyCBRHEAOHh/ztFnlH1ZYkVVrp7ptWMAVhbdSZplD0rKC7byYsBYXyrqbMJHWmA==",
+        "source": "npmjs"
       }
     },
     {
@@ -715,6 +1052,24 @@
               "--mcp"
             ]
           }
+        },
+        "zcode": {
+          "host_config": {
+            "command": "codegraph",
+            "args": [
+              "serve",
+              "--mcp"
+            ]
+          }
+        },
+        "pi": {
+          "host_config": {
+            "command": "codegraph",
+            "args": [
+              "serve",
+              "--mcp"
+            ]
+          }
         }
       },
       "platform_overrides": {
@@ -794,7 +1149,8 @@
             ]
           }
         }
-      }
+      },
+      "readiness_policy": "advisory"
     }
   ],
   "helpers": [
@@ -811,7 +1167,9 @@
       "required": true,
       "baseline_blocking": false,
       "required_for": [
-        "surface-ui"
+        "spec-test-browser",
+        "spec-dogfood",
+        "spec-polish"
       ],
       "recommended_for": [
         "browser automation",
@@ -887,7 +1245,8 @@
             "npx"
           ]
         }
-      }
+      },
+      "readiness_policy": "workflow-required"
     },
     {
       "id": "gh",
@@ -899,9 +1258,11 @@
       ],
       "surface_overlays": [],
       "required": true,
-      "baseline_blocking": true,
+      "baseline_blocking": false,
       "required_for": [
-        "github issue and pull request workflows"
+        "spec-commit-push-pr",
+        "spec-resolve-pr-feedback",
+        "spec-lfg"
       ],
       "recommended_for": [
         "spec-code-review",
@@ -976,7 +1337,8 @@
           },
           "platform_required_tools": []
         }
-      }
+      },
+      "readiness_policy": "workflow-required"
     },
     {
       "id": "vhs",
@@ -1040,7 +1402,8 @@
           },
           "platform_required_tools": []
         }
-      }
+      },
+      "readiness_policy": "advisory"
     },
     {
       "id": "silicon",
@@ -1104,7 +1467,8 @@
           },
           "platform_required_tools": []
         }
-      }
+      },
+      "readiness_policy": "advisory"
     },
     {
       "id": "ffmpeg",
@@ -1115,8 +1479,10 @@
       ],
       "surface_overlays": [],
       "required": true,
-      "baseline_blocking": true,
-      "required_for": [],
+      "baseline_blocking": false,
+      "required_for": [
+        "video"
+      ],
       "recommended_for": [
         "video composition"
       ],
@@ -1195,7 +1561,8 @@
           },
           "platform_required_tools": []
         }
-      }
+      },
+      "readiness_policy": "workflow-required"
     },
     {
       "id": "ast-grep",
@@ -1209,7 +1576,7 @@
       "required": true,
       "baseline_blocking": false,
       "required_for": [
-        "structural code search"
+        "structural-search"
       ],
       "recommended_for": [
         "spec-code-review",
@@ -1265,7 +1632,8 @@
           },
           "platform_required_tools": []
         }
-      }
+      },
+      "readiness_policy": "workflow-required"
     },
     {
       "id": "ast-grep-skill",
@@ -1277,9 +1645,9 @@
       ],
       "surface_overlays": [],
       "required": true,
-      "baseline_blocking": true,
+      "baseline_blocking": false,
       "required_for": [
-        "ast-grep usage guidance"
+        "structural-search"
       ],
       "recommended_for": [
         "structural search guidance"
@@ -1300,7 +1668,8 @@
           "pin_status": "latest"
         },
         "review_required": true,
-        "install_effect": "global skill"
+        "install_effect": "global skill",
+        "pin_reassessment": "版本 pin 的重估条件(lane finding DR-002,2026-09-13):需先在联网环境确认 skills CLI 的稳定版本号并验证其支持内容 ref 钉扎(如 ast-grep/agent-skill@<ref>),再以 verified 版本替换 skills@latest 并补 archive 校验;在此之前执行面已由 unpinned-npx(review-required 集合成员)+ review_required 闸住,plan 输出 review-required 且不自动执行,不会静默安装。"
       },
       "runner_kind": "cross-platform",
       "installation": {
@@ -1396,7 +1765,8 @@
             "npx"
           ]
         }
-      }
+      },
+      "readiness_policy": "workflow-required"
     }
   ],
   "providers": [
@@ -1491,34 +1861,6 @@
             "args": [
               "serve",
               "--mcp"
-            ],
-            "scope": "managed",
-            "targets": {
-              "managed": {
-                "config_path": {
-                  "macos": "/Library/Application Support/ClaudeCode/managed-mcp.json",
-                  "linux": "/etc/claude-code/managed-mcp.json",
-                  "wsl": "/etc/claude-code/managed-mcp.json",
-                  "windows": "C:\\Program Files\\ClaudeCode\\managed-mcp.json"
-                },
-                "config_format": "json",
-                "precedence": 100,
-                "writable_check": "parent-or-file"
-              },
-              "user": {
-                "config_path": "$HOME/.claude.json",
-                "config_format": "json",
-                "precedence": 10,
-                "writable_check": "parent-or-file"
-              }
-            },
-            "fallback_order": [
-              "managed",
-              "user"
-            ],
-            "uninstall_targets": [
-              "managed",
-              "user"
             ]
           }
         },
@@ -1528,28 +1870,6 @@
             "args": [
               "serve",
               "--mcp"
-            ],
-            "scope": "user",
-            "targets": {
-              "user": {
-                "config_path": "$HOME/.codex/config.toml",
-                "config_format": "toml",
-                "precedence": 50,
-                "writable_check": "parent-or-file"
-              },
-              "system": {
-                "config_path": "/etc/codex/config.toml",
-                "config_format": "toml",
-                "precedence": 100,
-                "writable_check": "file-only"
-              }
-            },
-            "fallback_order": [
-              "user"
-            ],
-            "uninstall_targets": [
-              "user",
-              "system"
             ]
           }
         },
@@ -1559,29 +1879,6 @@
             "args": [
               "serve",
               "--mcp"
-            ],
-            "scope": "workspace",
-            "targets": {
-              "workspace": {
-                "config_path": ".kiro/settings/mcp.json",
-                "config_format": "json",
-                "precedence": 50,
-                "writable_check": "parent-or-file"
-              },
-              "user": {
-                "config_path": "$HOME/.kiro/settings/mcp.json",
-                "config_format": "json",
-                "precedence": 100,
-                "writable_check": "parent-or-file",
-                "requires_user_scope_opt_in": true
-              }
-            },
-            "fallback_order": [
-              "workspace"
-            ],
-            "uninstall_targets": [
-              "workspace",
-              "user"
             ]
           }
         },
@@ -1591,49 +1888,6 @@
             "args": [
               "serve",
               "--mcp"
-            ],
-            "scope": "project",
-            "json_container_path": [
-              "mcp"
-            ],
-            "server_representation": "opencode-local",
-            "targets": {
-              "project": {
-                "config_path": "opencode.json",
-                "config_format": "json",
-                "precedence": 100,
-                "writable_check": "parent-or-file",
-                "precedence_guards": [
-                  {
-                    "config_path": "opencode.jsonc",
-                    "config_format": "jsonc",
-                    "precedence": 110,
-                    "reason_code": "host-config-jsonc-precedence-blocked"
-                  }
-                ]
-              },
-              "user": {
-                "config_path": "${XDG_CONFIG_HOME}/opencode/opencode.json",
-                "config_format": "json",
-                "precedence": 50,
-                "writable_check": "parent-or-file",
-                "requires_user_scope_opt_in": true,
-                "precedence_guards": [
-                  {
-                    "config_path": "${XDG_CONFIG_HOME}/opencode/opencode.jsonc",
-                    "config_format": "jsonc",
-                    "precedence": 60,
-                    "reason_code": "host-config-jsonc-precedence-blocked"
-                  }
-                ]
-              }
-            },
-            "fallback_order": [
-              "project"
-            ],
-            "uninstall_targets": [
-              "project",
-              "user"
             ]
           }
         },
@@ -1643,62 +1897,34 @@
             "args": [
               "serve",
               "--mcp"
-            ],
-            "scope": "local",
-            "targets": {
-              "local": {
-                "config_path": ".qoder/settings.local.json",
-                "config_format": "json",
-                "precedence": 50,
-                "writable_check": "parent-or-file"
-              },
-              "user": {
-                "config_path": "$HOME/.qoder/settings.json",
-                "config_format": "json",
-                "precedence": 100,
-                "writable_check": "parent-or-file",
-                "requires_user_scope_opt_in": true
-              }
-            },
-            "fallback_order": [
-              "local"
-            ],
-            "uninstall_targets": [
-              "local",
-              "user"
             ]
           }
         },
         "cursor": {
           "host_config": {
-            "type": "stdio",
             "command": "codegraph",
             "args": [
               "serve",
               "--mcp"
             ],
-            "scope": "project",
-            "targets": {
-              "project": {
-                "config_path": ".cursor/mcp.json",
-                "config_format": "json",
-                "precedence": 50,
-                "writable_check": "parent-or-file"
-              },
-              "user": {
-                "config_path": "$HOME/.cursor/mcp.json",
-                "config_format": "json",
-                "precedence": 100,
-                "writable_check": "parent-or-file",
-                "requires_user_scope_opt_in": true
-              }
-            },
-            "fallback_order": [
-              "project"
-            ],
-            "uninstall_targets": [
-              "project",
-              "user"
+            "type": "stdio"
+          }
+        },
+        "zcode": {
+          "host_config": {
+            "command": "codegraph",
+            "args": [
+              "serve",
+              "--mcp"
+            ]
+          }
+        },
+        "pi": {
+          "host_config": {
+            "command": "codegraph",
+            "args": [
+              "serve",
+              "--mcp"
             ]
           }
         }
@@ -1806,7 +2032,7 @@
         "hook_default": true,
         "usage_owner": "downstream-skill"
       },
-      "usage_note": "标准 Runtime Setup（或高级子集 `spec-runtime-setup --only graphify`）优先使用已安装 uv、其次 pipx，将 pinned `graphifyy@0.9.29` direct wheel安装到隔离Python tool environment；缺少兼容Python或tool manager时返回action-required，不自动bootstrap、不使用plain pip。首次生成固定运行 Provider 原生 `graphify extract . --code-only`，唯一current artifact位于原生默认目录`graphify-out/`，不注入`GRAPHIFY_OUT`。仅有旧版spec-first适配目录`.graphify/`时，setup将其原子迁移到`graphify-out/`；两个目录同时存在则fail closed。已有`graphify-out/`时普通setup执行裸query；显式`--refresh`使用官方`graphify update <workspace>`原位更新代码索引，复用Provider lock、临时graph、shrink guard和未变节点保留能力，不创建spec-first顶层staging/backup。Claude/Codex/Cursor/Kiro使用Provider-native project integration，Qoder使用spec-first adapter；两个Git hook必须验证marker、interpreter和Provider原生默认输出，不依赖spec-first环境变量。Graphify mutation setup在Python package/artifact/query/host/hook全部verified后默认卸载已确认的全局npm incumbent，并只删除被证明归属该package的旧launcher symlink；诊断、plan、verify-only及未知PATH命令保持只读。Graphify MCP、watch与semantic extraction仍为opt-in。所有Graphify输出仅是provider_untrusted advisory candidate，结论必须回到source/test/log/contract或owner evidence。",
+      "usage_note": "标准 Runtime Setup（或高级子集 `spec-runtime-setup --only graphify`）优先使用已安装 uv、其次 pipx，将 pinned `graphifyy@0.9.57` direct wheel安装到隔离Python tool environment；缺少兼容Python或tool manager时返回action-required，不自动bootstrap、不使用plain pip。首次生成固定运行 Provider 原生 `graphify extract . --code-only`，唯一current artifact位于原生默认目录`graphify-out/`，不注入`GRAPHIFY_OUT`。仅有旧版spec-first适配目录`.graphify/`时，setup将其原子迁移到`graphify-out/`；两个目录同时存在则fail closed。已有`graphify-out/`时普通setup执行裸query；显式`--refresh`使用官方`graphify update <workspace>`原位更新代码索引，复用Provider lock、临时graph、shrink guard和未变节点保留能力，不创建spec-first顶层staging/backup。Claude/Codex/Cursor/Kiro/OpenCode使用Provider-native project integration（Zcode与Pi均映射 Graphify 原生`agents`平台写入共享`.agents/skills/`投影根——Graphify无zcode平台，其原生pi平台写`.pi/agent/skills/`且不在Pi项目级skills发现路径内），Qoder使用spec-first adapter；两个Git hook必须验证marker、interpreter和Provider原生默认输出，不依赖spec-first环境变量。Graphify mutation setup在Python package/artifact/query/host/hook全部verified后默认卸载已确认的全局npm incumbent，并只删除被证明归属该package的旧launcher symlink；诊断、plan、verify-only及未知PATH命令保持只读。Graphify MCP、watch与semantic extraction仍为opt-in。所有Graphify输出仅是provider_untrusted advisory candidate，结论必须回到source/test/log/contract或owner evidence。",
       "detection": {
         "kind": "command",
         "command": "graphify",
@@ -1832,12 +2058,12 @@
           "git-hook-write"
         ],
         "source": "pypi",
-        "source_repo": "https://pypi.org/project/graphifyy/0.9.29/",
+        "source_repo": "https://pypi.org/project/graphifyy/0.9.57/",
         "version_policy": {
           "pin_status": "pinned"
         },
         "review_required": true,
-        "install_effect": "Installs the release-reviewed `graphifyy@0.9.29` wheel with uv or pipx using compatible Python >=3.10, no managed Python download, official PyPI index and verified direct SHA-256. Resolves an absolute launcher and confirms importlib distribution identity plus CLI version. Project setup normalizes only recognized Provider-owned instruction/skill/rule/steering/hook surfaces to the Provider-native `graphify-out/` root and the selected launcher. First generation is local AST `extract --code-only` with no `GRAPHIFY_OUT` override; a legacy `.graphify/` tree is atomically migrated when it is the sole artifact root, while dual roots fail closed. Explicit refresh uses provider-native `graphify update` against the existing graph and does not create spec-first top-level staging or backup directories. Git hook readiness requires both Provider marker blocks, verified interpreter and allowed rebuild command without a spec-first output override. After Python package/artifact/query/host/hook readiness is fully verified, mutation setup removes a confirmed global `@sentropic/graphify` incumbent and only stale launcher symlinks proven to resolve into that package. Setup never installs MCP extras, never bootstraps Python/tool managers, never edits shell profiles, and never promotes Graphify output beyond advisory evidence."
+        "install_effect": "Installs the release-reviewed `graphifyy@0.9.57` wheel with uv or pipx using compatible Python >=3.10, no managed Python download, official PyPI index and verified direct SHA-256. Resolves an absolute launcher and confirms importlib distribution identity plus CLI version. Project setup normalizes only recognized Provider-owned instruction/skill/rule/steering/hook surfaces to the Provider-native `graphify-out/` root and the selected launcher. First generation is local AST `extract --code-only` with no `GRAPHIFY_OUT` override; a legacy `.graphify/` tree is atomically migrated when it is the sole artifact root, while dual roots fail closed. Explicit refresh uses provider-native `graphify update` against the existing graph and does not create spec-first top-level staging or backup directories. Git hook readiness requires both Provider marker blocks, verified interpreter and allowed rebuild command without a spec-first output override. After Python package/artifact/query/host/hook readiness is fully verified, mutation setup removes a confirmed global `@sentropic/graphify` incumbent and only stale launcher symlinks proven to resolve into that package. Setup never installs MCP extras, never bootstraps Python/tool managers, never edits shell profiles, and never promotes Graphify output beyond advisory evidence."
       },
       "readiness": {
         "producer": "spec-runtime-setup",

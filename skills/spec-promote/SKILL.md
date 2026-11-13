@@ -1,6 +1,6 @@
 ---
 name: spec-promote
-description: "Draft launch or promotion copy for a shipped feature."
+description: "Draft launch or promotion copy with availability claims grounded in the supplied delivery evidence."
 disable-model-invocation: true
 argument-hint: "[optional: what shipped and/or channels, e.g. 'a tweet thread and a LinkedIn post']"
 ---
@@ -26,12 +26,14 @@ spec-promote 3 tweet options for the new export feature
 
 ## Phase 1 — Figure out what shipped
 
-If the user gave a free-form description of the feature, use it as the source of truth.
+If the user gave a free-form description, preserve their intended value and attribute any unverified availability claim. Carry the caller's verified delivery state: implemented, merged, released, deployed, or unknown. An active/merged PR, commit, diff or Unreleased entry proves no deployment. Use “implemented” or “planned for release” when appropriate; never turn those artifacts into “live now” claims.
 
-Otherwise, derive it from context (use what's available; don't block on any one source):
+Resolve one target repository from the current request/caller and verify its root before reads. Use the confirmed PR/base identity or resolved upstream comparison; do not assume a `main` branch. If no Git root exists, draft from supplied material and skip repository/config reads.
 
-- **Merged/active PR** — `gh pr view --json title,body,url 2>/dev/null` (and `gh pr view` for the current branch). The title and body usually state the user-facing value.
-- **The diff** — `git diff main...HEAD --stat` and skim notable changes to ground the claim in what actually changed.
+When the description lacks detail, derive it from available context:
+
+- **Merged/active PR** — `gh pr view <confirmed-pr> --repo <confirmed-owner/repo> --json title,body,url,baseRefName,headRefOid`. The title and body usually state the user-facing value.
+- **The diff** — `git -C <confirmed-root> diff <confirmed-base>...HEAD --stat` and skim notable changes to ground the claim in what actually changed.
 - **Changelog** — the top/`[Unreleased]` entry in `docs/changelog.md`, `CHANGELOG.md`, or similar.
 - **Recent commits** — `git log --oneline -15` for the arc of the change.
 
@@ -50,7 +52,7 @@ Scale to what the change warrants and to what the user asked for. If they named 
 
 ## Phase 3 — Draft the copy
 
-First, detect Spiral's state with the Skill-owned bounded probe. Resolve `SKILL_DIR` from the `spec-promote/SKILL.md` you loaded; do not run `spiral auth status` directly because provider stdout/stderr may contain secret-like fields:
+If local drafting is requested, go directly to Path B with no provider probe or setup prompt. Otherwise, detect Spiral's state with the Skill-owned bounded probe. Resolve `SKILL_DIR` from the `spec-promote/SKILL.md` you loaded; do not run `spiral auth status` directly because provider stdout/stderr may contain secret-like fields:
 
 ```bash
 SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
@@ -59,23 +61,15 @@ node "$SKILL_DIR/scripts/check-spiral-auth.cjs"
 
 Classify into one of three states:
 
-- **Unavailable** — `status: unavailable` → **Path 0** (install), then Path A if set up, else **Path B**.
+- **Unavailable** — `status: unavailable` → **Path B**, with optional Path 0 after delivery.
 - **Ready** — `status: ready` and `authenticated: true` → **Path A** (voice-matched).
-- **Not ready / unverified** — every other allowlisted status → **Path 0** when interactive, else **Path B**. Treat non-JSON, timeout, non-zero, and malformed provider output as unverified without inspecting or surfacing the raw bytes.
+- **Not ready / unverified** — every other allowlisted status → **Path B**, with optional Path 0 after delivery. Treat non-JSON, timeout, non-zero, and malformed provider output as unverified without inspecting or surfacing the raw bytes.
 
 Never let a Spiral failure, timeout, or odd output block or slow the skill — when in doubt, treat it as not-ready and continue.
 
 ### Path 0 — Offer Spiral setup (first run, declinable)
 
-When Spiral isn't ready, offer to set it up **once** — unless the user previously opted out. The point is one proactive nudge, never a recurring one, and never a blocker: a decline always proceeds to Path B. **Any dismissal records the opt-out**, so a single first-run decline stops the offer for good in this repo — the user is never asked twice.
-
-Read `references/spiral-cli.md` for the exact setup prompt (built with the platform's blocking-question tool), the connect/install steps, and how the opt-out is recorded so later runs skip this. In short:
-
-- **Unauthed** → the agent runs `spiral login --json` (CLI >= 1.8.0; non-blocking, the API key never passes through the agent). On `status: already_authenticated` → use Path A. On `status: pending` → surface the `auth_url`, the user approves in their browser, then re-run the bounded auth probe after the user's confirmation; `status: ready` → Path A. Never have the user paste a key into chat. (Older CLI without agent login → suggest `npm i -g @every-env/spiral-cli@latest`, or have the user run `spiral login` themselves.) Escape hatch: "or the agent can just draft directly, without Spiral's personalization and humanization."
-- **Absent** → guide the user to install + connect in one step via the pairing-code command from Settings → Connect an Agent.
-- **Decline** → record the opt-out (best-effort) and go to Path B.
-
-Skip Path 0 entirely — straight to Path B — when the opt-out is already recorded, or when running headless / non-interactive (no human to answer). If a human is present but no blocking-question tool is available, do **not** skip — fall back to a numbered list of the two options in chat and wait for a reply (per the Ask section of `references/spiral-cli.md`).
+When Spiral is not ready, complete the requested local drafts first. An optional setup offer may follow once if there is no recorded opt-out; it must not delay the deliverable. No response is not opt-in or opt-out. Enter setup only when requested, reading `references/spiral-cli.md` for installation, authentication and the separately disclosed local preference write. A plain request to draft locally grants no persistent-preference write.
 
 ### Path A — Spiral ready (voice-matched)
 
@@ -126,7 +120,8 @@ Show every draft as a clean, copy-pasteable block, labeled by channel. For each:
 
 - If Spiral produced them, also surface the `session_id` and each draft's `url` so the user can open and tweak them in the Spiral web app.
 - Offer to revise (tone, length, angle, more variations, another channel).
-- **Do not post, publish, schedule, commit, or open a PR.** End by reminding the user the drafts are theirs to ship.
+- **Do not post, publish, schedule, commit, or open a PR.** End by reminding the user the drafts are theirs to ship — say so explicitly (drafts only; publication is the user's move), not just by omission.
+- When the run reports machine-checkable delivery facts, use these exact tokens: `delivery_status: implemented-not-released` and `provider_attempt: not-attempted` (hyphenated, no spaces or parentheticals) when work exists locally and no provider call was made — machines match these strings verbatim. In the same machine-readable block, `drafts[].channel` carries a lowercase machine id — `x`, `changelog`, `linkedin`, `email`, `blog`, `demo-script` — not a human label like "X post" or "Changelog blurb"; the human-facing description lives in `content`.
 - If Path 0 recorded the local preference exception, disclose that local-only write once and keep it separate from the draft-output claim.
 
 ## Examples

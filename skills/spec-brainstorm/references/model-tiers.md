@@ -1,5 +1,7 @@
 # Model Tiers
 
+For an authorized dispatch, correct a pre-launch argument rejection once, changing only the rejected arguments while preserving scope and required capabilities. Capacity-limited work stays queued until a slot frees; repeated zero capacity uses the bounded inline degradation below. Other launch failures use that same fallback. After an agent launches, collect its outcome before retrying; never duplicate a possibly running job.
+
 Read this when dispatching a sub-agent (the Phase 1.1 grounding scout, the Phase 2.6 claim verifier, or the opt-in Slack researcher). Sub-agent dispatch is tiered by task shape, never hardcoded to a model name:
 
 - **Extraction tier** — the grounding scout: retrieval and quoting work. Request the cheapest capable tier only when `worker_model_override: supported`. "Capable" is part of the spec — escalate to the generation tier when the repo is large or the stack obscure.

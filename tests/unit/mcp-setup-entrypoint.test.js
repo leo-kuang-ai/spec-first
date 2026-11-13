@@ -5,6 +5,8 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
+const codegraphStatus = require('../fixtures/mcp-setup/codegraph-status.cjs');
+
 const repoRoot = path.resolve(__dirname, '..', '..');
 const skillRoot = path.join(repoRoot, 'skills', 'spec-runtime-setup');
 const {
@@ -111,6 +113,8 @@ function createReadOnlyAuditRunner() {
 }
 
 function fakeRunner(command, args, options = {}) {
+  const packed = require('../fixtures/mcp-setup/npm-archives/runner.cjs').materializeNpmPack(command, args);
+  if (packed) return packed;
   const cwd = options.cwd || process.cwd();
   const graphifyCommand = path.basename(command).replace(/\.(?:exe|cmd)$/i, '') === 'graphify';
   if (command === 'uv' && args[0] === 'tool' && args[1] === 'install') {
@@ -189,10 +193,10 @@ function fakeRunner(command, args, options = {}) {
     timeout: false,
     stdout: /^python(?:3(?:\.\d+)?)?$/.test(path.basename(command)) && args[0] === '-c'
       ? (String(args[1]).includes('importlib.metadata')
-        ? JSON.stringify({ version: '0.9.29', packages: [['graphifyy', '0.9.29']] })
+        ? JSON.stringify({ version: '0.9.57', packages: [['graphifyy', '0.9.57']] })
         : '3.12.1')
       : (graphifyCommand && args[0] === '--version'
-        ? 'graphify 0.9.29'
+        ? 'graphify 0.9.57'
         : (command === 'uv' && args.join(' ') === 'tool dir --bin'
           ? path.join((options.env && options.env.HOME) || os.homedir(), '.local', 'bin')
           : (args[0] === 'status' ? 'ready' : 'ok'))),
@@ -249,8 +253,9 @@ function visibleHostRunner(visibleHost) {
 }
 
 describe('spec-runtime-setup unified Node entrypoint', () => {
+  // bare 自 2026-09-13 起为基线收敛 mutation(需显式宿主 authority),不再属于只读面;
+  // 其无 authority 时 fail-closed 的行为由 mode-target/entrypoint 阻断用例覆盖。
   test.each([
-    [[], 'bare'],
     [['--check'], 'check'],
     [['--plan', '--only', 'graphify'], 'plan'],
   ])('%j is read-only', (argv, expectedMode) => {
@@ -285,16 +290,12 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       expect(result.payload.planned_operations.map((entry) => entry.kind)).toEqual(expect.arrayContaining([
         'warmup-tool',
         'write-host-config',
-        'verify-helper',
-        'install-helper',
         'install-project-skill',
         'write-setup-facts',
       ]));
       expect(result.payload.safety.map((entry) => entry.id)).toEqual(expect.arrayContaining([
         'context7',
         'sequential-thinking',
-        'gh',
-        'ast-grep-skill',
         'graphify',
       ]));
     }
@@ -461,17 +462,18 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(updated).toContain('[mcp_servers.unrelated]');
     expect(updated).toContain('command = "keep-me"');
     expect(updated).toContain('[mcp_servers.context7]');
-    expect(updated).toContain('@upstash/context7-mcp@latest');
+    expect(updated).toContain('@upstash/context7-mcp@4.0.7');
     expect(updated).toContain('[mcp_servers.sequential-thinking]');
-    expect(updated).toContain('@modelcontextprotocol/server-sequential-thinking@latest');
+    expect(updated).toContain('@modelcontextprotocol/server-sequential-thinking@2026.8.31');
     expect(updated).not.toContain('command = "user-owned"');
   });
 
   test('default diagnostic output exposes actionable tools, skills, project, setup, providers, and public next actions', () => {
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('human-diagnostic');
+    // 诊断输出来自 --check(bare 已改为基线收敛 mutation,不再是诊断面)。
     const result = runSetup({
-      argv: [],
+      argv: ['--check'],
       cwd: target,
       skillRoot,
       runner: visibleHostRunner('codex'),
@@ -509,10 +511,10 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     const homeBefore = snapshot(homeDir);
     const runner = (command, args, options) => {
       if (command === 'codegraph' && args[0] === '--version') {
-        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.5.0' };
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
       }
       if (command === 'codegraph' && args[0] === 'status') {
-        return { ...fakeRunner(command, args, options), stdout: 'index ready' };
+        return { ...fakeRunner(command, args, options), stdout: codegraphStatus(options.cwd) };
       }
       return fakeRunner(command, args, options);
     };
@@ -528,8 +530,9 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
 
     expect(result.payload.provider_readiness.find((entry) => entry.provider === 'codegraph'))
       .toMatchObject({
-        readiness_status: 'fresh',
-        lifecycle: { configured: true, query_verified: true },
+        readiness_scope: 'installation',
+        readiness_status: 'unknown',
+        lifecycle: { configured: true, query_verified: false },
       });
     expect(result.payload.mcp_servers.find((entry) => entry.id === 'codegraph')).toMatchObject({
       dependency_status: 'ready',
@@ -590,7 +593,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
   test('uses a uniquely visible host CLI as advisory evidence for bare diagnostics', () => {
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('advisory-cli');
-    const result = runSetup({ argv: [], cwd: target, skillRoot, runner: visibleHostRunner('claude'), env: {} });
+    const result = runSetup({ argv: ['--check'], cwd: target, skillRoot, runner: visibleHostRunner('claude'), env: {} });
     expect(result).toMatchObject({ exit_code: 0, payload: { host: { host: 'claude', authority: 'advisory' } } });
   });
 
@@ -634,7 +637,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       capabilities: ['write-setup-facts'],
     });
     expect(audit.violations).toEqual([]);
-    expect(result).toMatchObject({ exit_code: 1, reason_code: 'missing_dependency' });
+    expect(result).toMatchObject({ exit_code: 1, reason_code: 'host-config-missing' });
     expect(fs.existsSync(path.join(target, '.spec-first', 'config', 'tool-facts.json'))).toBe(true);
     expect(fs.existsSync(path.join(target, '.spec-first', 'config', 'runtime-capabilities.json'))).toBe(true);
     expect(fs.existsSync(path.join(target, '.qoder', 'settings.local.json'))).toBe(false);
@@ -662,7 +665,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(result.payload).toMatchObject({
       execution_summary: {
         overall_status: 'action-required',
-        scope: 'full',
+        scope: 'installation',
         selected_ids: ['codegraph', 'graphify'],
         required_provider_ids: ['codegraph', 'graphify'],
       },
@@ -833,32 +836,43 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(fs.readdirSync(outside)).toEqual([]);
   });
 
-  test('keeps the primary outcome when the scenario status ledger rewrite fails', () => {
+  test.each([[3, false], [4, false], [4, true]])('fails canonical facts rewrite at rename %s while preserving provider failure %s', (failureAt, providerFailed) => {
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('scenario-ledger-failure');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
+    const rename = fs.renameSync;
     let writes = 0;
-    const factsWriter = (filePath, payload) => {
-      writes += 1;
-      if (writes > 2) throw new Error('injected scenario ledger rewrite failure');
-      fs.mkdirSync(path.dirname(filePath), { recursive: true });
-      fs.writeFileSync(filePath, payload);
-    };
-
-    const result = runSetup({
-      argv: ['--only', 'graphify'],
-      cwd: target,
-      skillRoot,
-      runner: fakeRunner,
-      env: { MCP_SETUP_HOST: 'qoder' },
-      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
-      bundledVersion: '1.13.2',
-      factsWriter,
+    const spy = jest.spyOn(fs, 'renameSync').mockImplementation((source, destination) => {
+      if (path.dirname(destination) === path.join(target, '.spec-first', 'config')
+        && ['tool-facts.json', 'runtime-capabilities.json'].includes(path.basename(destination))) {
+        writes += 1;
+        if (writes === failureAt) throw new Error('injected scenario ledger rewrite failure');
+      }
+      return rename(source, destination);
     });
+    let result;
+    try {
+      result = runSetup({
+        argv: ['--only', 'graphify'],
+        cwd: target,
+        skillRoot,
+        runner: (command, args, options) => providerFailed && path.basename(command) === 'graphify' && args[0] === 'query'
+          ? { exit_code: 1, stdout: '', stderr: 'injected query failure' }
+          : fakeRunner(command, args, options),
+        env: { MCP_SETUP_HOST: 'qoder' },
+        homeDir,
+        bundledVersion: '1.13.2',
+      });
+    } finally { spy.mockRestore(); }
+    const primaryReason = providerFailed ? 'graphify-query-verification-failed' : 'scenario-fingerprint-ledger-update-failed';
 
     expect(result).toMatchObject({
-      exit_code: 0,
-      reason_code: 'setup-facts-written',
+      exit_code: 1,
+      reason_code: primaryReason,
       payload: {
+        write_result: { status: 'failed', complete: false },
+        execution_summary: { overall_status: 'action-required', reason_code: primaryReason },
+        host_ledger_write_result: null,
         tool_facts: {
           scenario_fingerprint_setup: {
             status: 'failed',
@@ -876,6 +890,11 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(fs.existsSync(path.join(target, '.spec-first', 'workspace', 'scenario-fingerprint-setup.json'))).toBe(true);
     const persisted = JSON.parse(fs.readFileSync(path.join(target, '.spec-first', 'config', 'runtime-capabilities.json'), 'utf8'));
     expect(persisted.scenario_fingerprint_setup).toBeUndefined();
+    const persistedTools = JSON.parse(fs.readFileSync(path.join(target, '.spec-first', 'config', 'tool-facts.json'), 'utf8'));
+    expect(persistedTools.scenario_fingerprint_setup).toBeUndefined();
+    expect(result.payload.tool_facts.provider_readiness.find((entry) => entry.provider === 'graphify').lifecycle.query_verified).toBe(!providerFailed);
+    fs.rmSync(target, { recursive: true, force: true });
+    fs.rmSync(homeDir, { recursive: true, force: true });
   });
 
   test('project-config writes only project-local config surfaces without host authority', () => {
@@ -1117,14 +1136,14 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     fs.mkdirSync(nested, { recursive: true });
     const runner = (command, args, options) => {
       if (command === 'codegraph' && args[0] === '--version') {
-        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.5.0' };
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
       }
       if (command === 'codegraph' && args[0] === 'init') {
         fs.mkdirSync(path.join(nested, '.codegraph'), { recursive: true });
         fs.writeFileSync(path.join(nested, '.codegraph', 'codegraph.db'), 'db');
       }
       if (command === 'codegraph' && args[0] === 'status') {
-        return { ...fakeRunner(command, args, options), stdout: 'index ready' };
+        return { ...fakeRunner(command, args, options), stdout: codegraphStatus(options.cwd) };
       }
       return fakeRunner(command, args, options);
     };
@@ -1228,7 +1247,11 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
   test('keeps special folder paths as structured cwd data instead of shell source', () => {
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const base = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-structured-action-'));
-    const folder = path.join(base, "space ' $(touch injected) `touch injected2`\nline");
+    // Windows path segments cannot contain newline characters; keep the shell
+    // metacharacters (the property under test) and substitute a space there.
+    const folder = path.join(base, process.platform === 'win32'
+      ? "space ' $(touch injected) `touch injected2` line"
+      : "space ' $(touch injected) `touch injected2`\nline");
     fs.mkdirSync(folder, { recursive: true });
 
     const result = runSetup({
@@ -1263,14 +1286,14 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     const runner = (command, args, options) => {
       calls.push([command, ...args]);
       if (command === 'codegraph' && args[0] === '--version') {
-        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.5.0' };
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
       }
       if (command === 'codegraph' && args[0] === 'init') {
         fs.mkdirSync(path.join(folder, '.codegraph'), { recursive: true });
         fs.writeFileSync(path.join(folder, '.codegraph', 'codegraph.db'), 'db');
       }
       if (command === 'codegraph' && args[0] === 'status') {
-        return { ...fakeRunner(command, args, options), stdout: 'index ready' };
+        return { ...fakeRunner(command, args, options), stdout: codegraphStatus(options.cwd) };
       }
       return fakeRunner(command, args, options);
     };
@@ -1393,6 +1416,42 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(calls.some(([command, action]) => command === 'graphify' && ['install', 'extract', 'update'].includes(action))).toBe(false);
     expect(fs.existsSync(path.join(child, '.qoder', 'settings.local.json'))).toBe(false);
     expect(fs.existsSync(path.join(child, '.spec-first', 'config', 'tool-facts.json'))).toBe(false);
+  });
+
+  test.each(['missing', 'stale', 'current'])('bare 写前 projection 为 %s 时遵守同一 gate', (health) => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const target = tempRepo(`bare-preflight-${health}`);
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-bare-preflight-home-'));
+    try {
+      if (health === 'missing') fs.rmSync(path.join(target, '.codex', 'spec-first', 'state.json'));
+      if (health === 'stale') writeRuntimeState(target, 'codex', '0.0.1');
+      const before = snapshot(target);
+      const homeBefore = snapshot(homeDir);
+      const audit = createReadOnlyAuditRunner();
+      const mutationCalls = [];
+      const result = runSetup({
+        argv: [], cwd: target, skillRoot, homeDir, bundledVersion: '1.13.2',
+        runner: health === 'current' ? (command, args, options) => {
+          mutationCalls.push([command, ...args]);
+          return fakeRunner(command, args, options);
+        } : audit.runner,
+        env: { MCP_SETUP_HOST: 'codex' },
+      });
+      if (health === 'current') {
+        expect(result.mode).toBe('bare');
+        expect(result.reason_code).not.toBe('generated-runtime-projection-preflight-blocked');
+        expect(mutationCalls.some(([command, action]) => command === 'npm' && ['pack', 'install'].includes(action))).toBe(true);
+      } else {
+        expect(result).toMatchObject({ exit_code: 2, reason_code: 'generated-runtime-projection-preflight-blocked' });
+        expect(result.payload.results[0].next_action_command).toMatchObject({ cwd: target, command: 'spec-first', args: ['init', '--codex'] });
+        expect(audit.violations).toEqual([]);
+        expect(snapshot(target)).toEqual(before);
+        expect(snapshot(homeDir)).toEqual(homeBefore);
+      }
+    } finally {
+      fs.rmSync(target, { recursive: true, force: true });
+      fs.rmSync(homeDir, { recursive: true, force: true });
+    }
   });
 
   test('blocks the all-repos mutation before any child provider or facts write when one child projection is missing', () => {
@@ -1676,7 +1735,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(fs.existsSync(path.join(target, 'graphify-out', 'graph.json'))).toBe(true);
     const facts = JSON.parse(fs.readFileSync(path.join(target, '.spec-first', 'config', 'tool-facts.json'), 'utf8'));
     expect(facts.provider_readiness.find((entry) => entry.provider === 'graphify')).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       lifecycle: { query_verified: true },
     });
     const scenarioFingerprintPath = path.join(target, '.spec-first', 'workspace', 'scenario-fingerprint-setup.json');
@@ -1749,7 +1808,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       });
   });
 
-  test('keeps an enclosing Git hook not applicable for a nested non-Git folder at the entrypoint', () => {
+  test('安装范围诊断不推断嵌套非 Git 目录的 enclosing hook 状态', () => {
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const parent = tempRepo('nested-folder-parent-hook');
     const folder = path.join(parent, 'vibops');
@@ -1780,12 +1839,13 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       target_root: folder,
       enclosing_git_root: parent,
     });
+    expect(graphify.readiness_scope).toBe('installation');
     expect(graphify.steady_state).toMatchObject({
-      refresh_mode: 'manual-only',
+      refresh_mode: 'skill-cli-hook-on-demand',
       hook_installed: false,
       hook_verified: false,
-      hook_status: 'skipped',
-      hook_skipped_reason: 'graphify-hook-not-applicable-non-git-folder',
+      hook_status: 'unknown',
+      hook_skipped_reason: null,
     });
   });
 
@@ -1812,7 +1872,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(Object.keys(config.mcp).sort()).toEqual(['context7', 'sequential-thinking']);
     expect(config.mcp.context7).toEqual({
       type: 'local',
-      command: ['npx', '-y', '@upstash/context7-mcp@latest'],
+      command: ['npx', '-y', '@upstash/context7-mcp@4.0.7'],
     });
     expect(config.permission.skill['using-spec-first']).toBe('allow');
     expect(config.permission.skill['spec-work']).toBe('allow');
@@ -1929,7 +1989,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     const runner = (command, args, options = {}) => {
       calls.push({ command, args: [...args], env: { ...(options.env || {}) } });
       if (command === 'codegraph' && args[0] === '--version') {
-        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.5.0' };
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
       }
       if (command === 'codegraph' && args[0] === 'init') {
         fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
@@ -1937,7 +1997,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
         return fakeRunner(command, args, options);
       }
       if (command === 'codegraph' && args[0] === 'status') {
-        return { ...fakeRunner(command, args, options), stdout: 'index ready' };
+        return { ...fakeRunner(command, args, options), stdout: codegraphStatus(options.cwd) };
       }
       return fakeRunner(command, args, options);
     };
@@ -1968,7 +2028,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(calls.filter((call) => path.basename(call.command) === 'graphify' && call.args[0] === 'hook')).toEqual([]);
     expect(snapshot(outsideHooks)).toEqual(before);
     expect(result.payload.tool_facts.provider_readiness.find((entry) => entry.provider === 'graphify')).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       lifecycle: {
         configured: true,
         initialized: true,
@@ -1996,14 +2056,14 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     const target = tempRepo('codegraph-configured');
     const runner = (command, args, options) => {
       if (command === 'codegraph' && args[0] === '--version') {
-        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.5.0' };
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
       }
       if (command === 'codegraph' && args[0] === 'init') {
         fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
         fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
       }
       if (command === 'codegraph' && args[0] === 'status') {
-        return { ...fakeRunner(command, args, options), stdout: 'index ready' };
+        return { ...fakeRunner(command, args, options), stdout: codegraphStatus(options.cwd) };
       }
       return fakeRunner(command, args, options);
     };
@@ -2017,13 +2077,123 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       bundledVersion: '1.13.2',
     });
 
+    // 仅有命令 stub，没有可确认的 npm 安装；配置成功不补造身份。
     const hostConfig = JSON.parse(fs.readFileSync(path.join(target, '.qoder', 'settings.local.json'), 'utf8'));
     expect(hostConfig.mcpServers.codegraph).toMatchObject({ command: 'codegraph', args: ['serve', '--mcp'] });
     expect(result.payload.tool_facts.provider_readiness.find((entry) => entry.provider === 'codegraph'))
       .toMatchObject({
-        readiness_status: 'fresh',
+        readiness_status: 'unknown',
         lifecycle: { installed: true, configured: true, initialized: true, indexed: true },
       });
+  });
+
+  test('installation-only 安装并接线，缺图不阻断，且不执行构图或 query', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const target = tempRepo('installation-scope');
+    const calls = [];
+    const result = runSetup({
+      argv: ['--installation-only'], cwd: target, skillRoot,
+      runner: (command, args, options) => { calls.push([command, ...args]);
+        if (command === 'codegraph' && args[0] === '--version') return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
+        return fakeRunner(command, args, options); },
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-install-home-')),
+      bundledVersion: '1.13.2',
+    });
+    expect({ exit_code: result.exit_code, reason_code: result.reason_code }).toEqual({ exit_code: 0, reason_code: 'setup-facts-written' });
+    expect(fs.existsSync(path.join(target, '.codegraph'))).toBe(false);
+    expect(fs.existsSync(path.join(target, 'graphify-out'))).toBe(false);
+    expect(calls.filter(([command]) => ['codegraph', 'graphify'].includes(path.basename(command)))
+      .some(([, action]) => ['init', 'index', 'sync', 'extract', 'update', 'query'].includes(action))).toBe(false);
+    for (const provider of result.payload.tool_facts.provider_readiness) {
+      expect(provider).toMatchObject({ readiness_scope: 'installation', lifecycle: { installed: true, configured: true, query_verified: false, artifact_exists: false } });
+    }
+  });
+
+  test('默认 plan 不预览图生成，安装后默认 verify 不运行图 probe 或改写旧图', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const target = tempRepo('default-installation');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-default-home-'));
+    try {
+      const calls = [];
+      const context = { cwd: target, skillRoot, homeDir, env: { MCP_SETUP_HOST: 'qoder' }, bundledVersion: '1.13.2',
+        runner: (command, args, options) => {
+          calls.push([command, ...args]);
+          if (command === 'codegraph' && args[0] === '--version') return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
+          return fakeRunner(command, args, options);
+        },
+      };
+      const plan = runSetup({ ...context, argv: ['--plan'] });
+      expect(plan.exit_code).toBe(0);
+      expect(plan.payload.readiness_scope).toBe('installation');
+      expect(plan.payload.planned_operations.find((operation) => operation.tool === 'context7' && operation.kind === 'warmup-tool').archive_verification)
+        .toMatchObject({ command: 'npm', execution_scope: 'verified-local-archive' });
+      expect(plan.payload.next_action).toContain('--installation-only');
+      const graphKinds = ['initialize-if-missing', 'verify-status', 'first-generation', 'verify-query', 'refresh', 'ensure-hook', 'migrate-artifact-root'];
+      expect(plan.payload.planned_operations.filter((entry) => graphKinds.includes(entry.kind))).toEqual([]);
+      expect(runSetup({ ...context, argv: ['--installation-only'] }).exit_code).toBe(0);
+      const graphRoot = path.join(target, 'graphify-out');
+      fs.mkdirSync(graphRoot);
+      fs.writeFileSync(path.join(graphRoot, 'graph.json'), 'existing-graph-bytes');
+      fs.writeFileSync(path.join(graphRoot, 'spec-first-graph-scope.json'), 'existing-receipt-bytes');
+      const before = snapshot(graphRoot);
+      calls.length = 0;
+      const verify = runSetup({ ...context, argv: ['--verify-only'] });
+      expect(verify.exit_code).toBe(0);
+      expect(verify.payload.execution_summary).toMatchObject({ overall_status: 'partial', scope: 'installation' });
+      expect(verify.payload.tool_facts.provider_readiness.every((entry) => entry.readiness_scope === 'installation')).toBe(true);
+      expect(calls.filter(([command]) => ['codegraph', 'graphify'].includes(path.basename(command)))
+        .some(([, action]) => ['init', 'index', 'sync', 'extract', 'update', 'query', 'status'].includes(action))).toBe(false);
+      expect(snapshot(graphRoot)).toEqual(before);
+      expect(fs.existsSync(path.join(target, '.codegraph'))).toBe(false);
+      const graphifyProvider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+      const verifySpy = jest.spyOn(graphifyProvider, 'verify');
+      try {
+        // bare 已是全量收敛 mutation(verify 上下文 installationOnly=false),其图行为
+        // 需在成功收敛环境单独断言;本测试守卫的是只读/installation-only 面不动图。
+        for (const argv of [['--check'], ['--only', 'gh'], ['--verify-only', '--only', 'codegraph']]) {
+          calls.length = 0;
+          verifySpy.mockClear();
+          runSetup({ ...context, argv });
+          expect(verifySpy).toHaveBeenCalled();
+          expect(verifySpy.mock.calls.every(([providerContext]) => providerContext.installationOnly === true)).toBe(true);
+          expect(calls.filter(([command]) => path.basename(command) === 'graphify')
+            .some(([, action]) => ['extract', 'update', 'query'].includes(action))).toBe(false);
+          expect(snapshot(graphRoot)).toEqual(before);
+        }
+      } finally { verifySpy.mockRestore(); }
+      const configPath = path.join(target, '.qoder', 'settings.local.json');
+      const config = JSON.parse(fs.readFileSync(configPath));
+      config.mcpServers.context7.command = 'user-owned';
+      fs.writeFileSync(configPath, JSON.stringify(config));
+      const repairPlan = runSetup({ ...context, argv: ['--plan'] });
+      expect(repairPlan).toMatchObject({ exit_code: 2, reason_code: 'host-config-conflict' });
+      expect(repairPlan.payload.next_action).toContain('--installation-only');
+      expect(repairPlan.payload.next_action).toContain('--repair-host-config');
+    } finally {
+      fs.rmSync(target, { recursive: true, force: true });
+      fs.rmSync(homeDir, { recursive: true, force: true });
+    }
+  });
+
+  test('显式 gh 选择只验证 helper scope，不伪造 Provider 结果或生成图', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const target = tempRepo('only-gh');
+    const calls = [];
+    const result = runSetup({
+      argv: ['--only', 'gh'], cwd: target, skillRoot,
+      runner: (command, args, options) => { calls.push([command, ...args]); return fakeRunner(command, args, options); },
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-gh-home-')),
+      bundledVersion: '1.13.2',
+    });
+    expect(result.exit_code).toBe(0);
+    expect(result.payload.tool_facts.items.find((entry) => entry.id === 'gh')).toMatchObject({
+      required: true, baseline_blocking: true,
+      demand: { blocking: true, demand_source: 'explicit-selection', matched_rule: 'gh' },
+    });
+    expect(fs.existsSync(path.join(target, 'graphify-out'))).toBe(false);
+    expect(calls.some(([command, action]) => command === 'graphify' && ['install', 'extract', 'update'].includes(action))).toBe(false);
   });
 
   test('repairs a missing baseline helper through structured argv operations before provider setup', () => {
@@ -2047,7 +2217,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     };
 
     const result = runSetup({
-      argv: ['--only', 'graphify'],
+      argv: ['--only', 'graphify', '--workflow', 'spec-commit-push-pr'],
       cwd: target,
       skillRoot,
       runner,
@@ -2081,7 +2251,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     };
 
     const result = runSetup({
-      argv: ['--only', 'graphify'],
+      argv: ['--only', 'graphify', '--workflow', 'spec-commit-push-pr'],
       cwd: target,
       skillRoot,
       runner,
@@ -2120,15 +2290,23 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
 
     expect(runSetup(input).exit_code).toBe(0);
     const warmupsAfterFirst = calls.filter((call) =>
-      call[0] === 'npx' && call.some((arg) => String(arg).includes('@modelcontextprotocol/server-sequential-thinking')
-        || String(arg).includes('@upstash/context7-mcp'))
+      call[0] === 'npx' && call.some((arg) => String(arg).includes('server-sequential-thinking')
+        || String(arg).includes('context7-mcp'))
     ).length;
     expect(warmupsAfterFirst).toBe(2);
 
-    expect(runSetup(input).exit_code).toBe(0);
+    const cachedRun = runSetup(input);
+    expect(cachedRun.exit_code).toBe(0);
+    expect(cachedRun.payload.tool_facts.items.find((entry) => entry.id === 'context7')).toMatchObject({
+      install_source: 'official', mirror_used: false, attempts: [],
+      dependency_identity: { package: '@upstash/context7-mcp', version: '4.0.7', integrity_status: 'verified', verification_scope: 'top-level-package-archive' },
+    });
+    const normalized = require('../../src/cli/helpers/setup-facts').normalizeSetupFacts(cachedRun.payload.tool_facts);
+    expect(normalized.items.find((entry) => entry.id === 'context7').dependency_identity)
+      .toEqual(cachedRun.payload.tool_facts.items.find((entry) => entry.id === 'context7').dependency_identity);
     const warmupsAfterSecond = calls.filter((call) =>
-      call[0] === 'npx' && call.some((arg) => String(arg).includes('@modelcontextprotocol/server-sequential-thinking')
-        || String(arg).includes('@upstash/context7-mcp'))
+      call[0] === 'npx' && call.some((arg) => String(arg).includes('server-sequential-thinking')
+        || String(arg).includes('context7-mcp'))
     ).length;
     expect(warmupsAfterSecond).toBe(2);
     expect(fs.existsSync(path.join(
@@ -2140,6 +2318,74 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       process.platform === 'darwin' ? 'macos' : (process.platform === 'win32' ? 'windows' : 'linux'),
       'context7.json',
     ))).toBe(true);
+  });
+
+  test('CodeGraph 安装经实际归档校验发布身份，CLI normalizer 保留限定证据', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const { normalizeSetupFacts } = require('../../src/cli/helpers/setup-facts');
+    const target = tempRepo('codegraph-install-identity');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'codegraph-install-home-'));
+    let installed = false;
+    const calls = [];
+    const runner = (command, args, options) => {
+      calls.push([command, ...args]);
+      if (command === 'codegraph' && args[0] === '--version') {
+        return installed ? { exit_code: 0, stdout: 'codegraph 1.6.0', stderr: '' }
+          : { exit_code: 1, stdout: '', stderr: 'missing' };
+      }
+      if (command === 'npm' && args[0] === 'install') installed = true;
+      return fakeRunner(command, args, options);
+    };
+    try {
+      const preview = runSetup({ argv: ['--plan', '--only', 'codegraph', '--installation-only'],
+        cwd: target, skillRoot, runner, env: { MCP_SETUP_HOST: 'qoder' }, homeDir, bundledVersion: '1.13.2' });
+      expect(preview.payload.planned_operations.filter((entry) => entry.kind === 'install-tool' && entry.tool === 'codegraph')).toEqual([]);
+      expect(preview.payload.planned_operations.find((entry) => entry.kind === 'install-dependency' && entry.provider === 'codegraph'))
+        .toMatchObject({ archive_verification: { execution_scope: 'verified-local-archive' } });
+      const result = runSetup({ argv: ['--only', 'codegraph', '--installation-only'],
+        cwd: target, skillRoot, runner, env: { MCP_SETUP_HOST: 'qoder' }, homeDir, bundledVersion: '1.13.2' });
+      expect({ exit_code: result.exit_code, reason: result.reason_code }).toEqual({ exit_code: 0, reason: 'setup-facts-written' });
+      const facts = result.payload.tool_facts;
+      const readiness = facts.provider_readiness.find((entry) => entry.provider === 'codegraph');
+      expect(readiness.dependency_identity).toMatchObject({
+        package: '@colbymchenry/codegraph', version: '1.6.0', installer: 'npm-pack+npm-install',
+        integrity_status: 'verified', verification_scope: 'top-level-package-archive',
+      });
+      expect(calls.some(([command, verb, ...args]) => command === 'npm' && verb === 'install'
+        && args.some((arg) => arg.startsWith('file:')))).toBe(true);
+      expect(calls.some(([command, verb]) => command === 'codegraph' && ['init', 'index', 'query', 'sync'].includes(verb))).toBe(false);
+      const normalized = normalizeSetupFacts(facts);
+      expect(normalized.provider_readiness.find((entry) => entry.provider === 'codegraph').dependency_identity)
+        .toEqual(readiness.dependency_identity);
+    } finally {
+      fs.rmSync(target, { recursive: true, force: true });
+      fs.rmSync(homeDir, { recursive: true, force: true });
+    }
+  });
+
+  test('统一 setup 的 CodeGraph digest 不符在安装前阻断且保留具体原因', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const registry = JSON.parse(fs.readFileSync(path.join(skillRoot, 'setup-registry.json')));
+    registry.external_dependencies.find((entry) => entry.id === 'codegraph').integrity = `sha512-${Buffer.alloc(64).toString('base64')}`;
+    const target = tempRepo('codegraph-digest-block');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'codegraph-digest-home-'));
+    const installs = [];
+    const runner = (command, args, options) => {
+      if (command === 'codegraph' && args[0] === '--version') return { exit_code: 1, stdout: '', stderr: 'missing' };
+      if (command === 'npm' && args[0] === 'install') installs.push(args);
+      return fakeRunner(command, args, options);
+    };
+    try {
+      const result = runSetup({ argv: ['--only', 'codegraph', '--installation-only'], registry,
+        cwd: target, skillRoot, runner, env: { MCP_SETUP_HOST: 'qoder' }, homeDir, bundledVersion: '1.13.2' });
+      expect(result).toMatchObject({ exit_code: 1, reason_code: 'npm-archive-integrity-mismatch' });
+      expect(installs).toEqual([]);
+      expect(result.payload.tool_facts.provider_readiness.find((entry) => entry.provider === 'codegraph'))
+        .toMatchObject({ readiness_status: 'degraded', lifecycle: { installed: false } });
+    } finally {
+      fs.rmSync(target, { recursive: true, force: true });
+      fs.rmSync(homeDir, { recursive: true, force: true });
+    }
   });
 
   test('uses the npm mirror only after primary install failures and persists install provenance', () => {
@@ -2165,7 +2411,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       const mirror = env.NPM_CONFIG_REGISTRY === 'https://registry.npmmirror.com'
         && env.npm_config_registry === 'https://registry.npmmirror.com';
       const context7Install = command === 'npx'
-        && args.some((arg) => String(arg).includes('@upstash/context7-mcp'));
+        && args.some((arg) => String(arg).includes('context7-mcp'));
       const skillInstall = command === 'npx' && args.includes('ast-grep/agent-skill');
       if ((context7Install || skillInstall) && !mirror) {
         return failed(command, args, 'injected primary registry failure');
@@ -2174,7 +2420,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     };
 
     const result = runSetup({
-      argv: ['--only', 'graphify'],
+      argv: ['--only', 'graphify', '--workflow', 'structural-search'],
       cwd: target,
       skillRoot,
       runner,
@@ -2190,7 +2436,11 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
         result: 'ready',
         install_source: 'mirror',
         mirror_used: true,
-        attempts: [
+        attempts: id === 'context7' ? [
+          expect.objectContaining({ command: 'npm', exit_code: 0 }),
+          expect.objectContaining({ command: 'npx', exit_code: 1 }),
+          expect.objectContaining({ command: 'npx', exit_code: 0 }),
+        ] : [
           expect.objectContaining({ exit_code: 1 }),
           expect.objectContaining({ exit_code: 0 }),
         ],
@@ -2198,7 +2448,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       });
     }
     expect(facts.provider_readiness.find((entry) => entry.provider === 'graphify')).toMatchObject({
-      readiness_status: 'fresh',
+      readiness_status: 'unknown',
       install_source: 'official',
       mirror_used: false,
       attempts: [
@@ -2206,7 +2456,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       ],
     });
     const retriedInstalls = calls.filter((call) => (
-      (call.command === 'npx' && call.args.some((arg) => String(arg).includes('@upstash/context7-mcp')))
+      (call.command === 'npx' && call.args.some((arg) => String(arg).includes('context7-mcp')))
       || (call.command === 'npx' && call.args.includes('ast-grep/agent-skill'))
     ));
     expect(retriedInstalls).toHaveLength(4);
@@ -2232,7 +2482,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     installGlobalSkill(homeDir, 'ast-grep');
     const attempts = [];
     const runner = (command, args, options = {}) => {
-      if (command === 'npx' && args.some((arg) => String(arg).includes('@upstash/context7-mcp'))) {
+      if (command === 'npx' && args.some((arg) => String(arg).includes('context7-mcp'))) {
         attempts.push({ env: { ...(options.env || {}) } });
         return {
           command,
@@ -2272,6 +2522,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       install_source: 'both-failed',
       mirror_used: true,
       attempts: [
+        expect.objectContaining({ command: 'npm', exit_code: 0 }),
         expect.objectContaining({ exit_code: 1 }),
         expect.objectContaining({ exit_code: 1 }),
       ],
@@ -2286,7 +2537,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     installGlobalSkill(homeDir, 'ast-grep');
     const attempts = [];
     const runner = (command, args, options = {}) => {
-      if (command === 'npx' && args.some((arg) => String(arg).includes('@upstash/context7-mcp'))) {
+      if (command === 'npx' && args.some((arg) => String(arg).includes('context7-mcp'))) {
         attempts.push({ ...options });
         if (attempts.length === 1) {
           return {
@@ -2332,6 +2583,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       install_source: 'mirror',
       mirror_used: true,
       attempts: [
+        expect.objectContaining({ command: 'npm', exit_code: 0 }),
         expect.objectContaining({ exit_code: null, signal: 'SIGTERM' }),
         expect.objectContaining({ exit_code: 0 }),
       ],
@@ -2382,7 +2634,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(result.payload.results).toEqual(expect.arrayContaining([
       expect.objectContaining({
         overall_status: 'action-required',
-        reason_code: 'missing_dependency',
+        reason_code: 'host-config-missing',
       }),
     ]));
     expect(fs.existsSync(path.join(first, '.spec-first', 'config', 'tool-facts.json'))).toBe(true);
@@ -2454,18 +2706,23 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(fs.existsSync(path.join(workspace, '.spec-first', 'workspace', 'parent-artifact-quarantine.json'))).toBe(false);
   });
 
-  test('parent --plan previews every selected child without writing workspace receipts, facts, host config, or provider artifacts', () => {
+  test.each([
+    [[], '--installation-only', 'installation'],
+    [['--only', 'graphify'], '--only graphify', 'artifact'],
+    [['--requirement-workspace', 'feature'], '--only codegraph,graphify', 'artifact'],
+  ])('parent --plan preserves execution scope %j and stays read-only', (selection, requiredFlag, scope) => {
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-workspace-plan-'));
     const first = childRepo(workspace, 'apps/first');
     const second = childRepo(workspace, 'packages/second');
+    for (const root of [first, second]) fs.mkdirSync(path.join(root, 'feature'));
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
     const before = snapshot(workspace);
     const homeBefore = snapshot(homeDir);
     const audit = createReadOnlyAuditRunner();
 
     const result = runSetup({
-      argv: ['--plan', '--only', 'graphify', '--all-repos'],
+      argv: ['--plan', ...selection, '--all-repos'],
       cwd: workspace,
       skillRoot,
       runner: audit.runner,
@@ -2495,6 +2752,12 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
         result: expect.objectContaining({ schema_version: 'setup-install-plan.v1' }),
       }),
     ]));
+    expect(result.payload.next_action).toContain(requiredFlag);
+    expect(result.payload.next_action).toContain('target、scope、selection、repair 和 refresh');
+    for (const child of result.payload.results) {
+      expect(child.result.readiness_scope).toBe(scope);
+      expect(child.result.next_action).toBe(result.payload.next_action);
+    }
     expect(audit.violations).toEqual([]);
     expect(snapshot(workspace)).toEqual(before);
     expect(snapshot(homeDir)).toEqual(homeBefore);
@@ -2881,13 +3144,16 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(snapshot(previewTarget)).toEqual(previewBefore);
 
     const applyTarget = tempRepo('blocked-provider-apply');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-blocked-provider-home-'));
+    const before = snapshot(applyTarget);
+    const audit = createReadOnlyAuditRunner();
     const applied = runSetup({
       argv: ['--only', 'graphify', '--requirement-workspace', '../outside'],
       cwd: applyTarget,
       skillRoot,
-      runner: fakeRunner,
+      runner: audit.runner,
       env: { MCP_SETUP_HOST: 'qoder' },
-      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+      homeDir,
       bundledVersion: '1.13.2',
     });
     expect(fs.existsSync(path.join(applyTarget, 'graphify-out'))).toBe(false);
@@ -2895,11 +3161,10 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       exit_code: 1,
       reason_code: 'requirement-workspace-escape',
     });
-    expect(applied.payload.tool_facts.provider_readiness.find((entry) => entry.provider === 'graphify'))
-      .toMatchObject({
-        readiness_status: 'degraded',
-        first_generation: { status: 'failed' },
-      });
+    expect(applied.payload.schema_version).toBe('spec-runtime-setup-error.v1');
+    expect(audit.violations).toEqual([]);
+    expect(snapshot(applyTarget)).toEqual(before);
+    expect(snapshot(homeDir)).toEqual([]);
   });
 
   test('stops dependent host and provider mutations after a baseline install failure', () => {
@@ -2908,7 +3173,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     const calls = [];
     const runner = (command, args, options) => {
       calls.push([command, ...args]);
-      if (command === 'npx' && args.some((arg) => String(arg).includes('@upstash/context7-mcp'))) {
+      if (command === 'npx' && args.some((arg) => String(arg).includes('context7-mcp'))) {
         return {
           command,
           argv: args,

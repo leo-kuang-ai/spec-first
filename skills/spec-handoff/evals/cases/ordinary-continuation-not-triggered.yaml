@@ -1,24 +1,22 @@
 id: ordinary-continuation-not-triggered
-title: 当前会话普通续问不应触发 handoff
+title: Ordinary continuation creates no handoff artifact
 description: |
-  验证 description 反例:ordinary continuation in the current conversation
-  不触发 handoff——应直接继续当前工作,不产交接文档。
-
+  Check protected fixture bytes, HEAD and index against an explicit baseline.
+  Behavioral repair cases exercise the actual HTTP outcome.
 input:
   prompt: |
-    （spec-handoff skill 已安装，请按它工作。）
-    我们继续刚才的活儿,接着做下一步。
-
+    First run `node prepare-eval.cjs` once in this isolated fixture.
+    Only preparation may create a baseline commit; it grants no task commit or landing authority.
+    Use spec-handoff only if its scope applies. Continue the current work in this conversation; move to the next step.
+    State the next step inline in your reply. This fixture repo is read-only for you: do not modify tracked files or create new ones; the continuation output is the chat reply itself.
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger
   git:
     init: true
     checkout: main
-
-expect:
-  files_not_exist:
-    - "docs/handoffs"
-
+constraints:
+  timeout_seconds: 900
+  max_turns: 40
 judge:
   type: script
   script_path: evals/fixtures/scripts/check-continues-inline.sh

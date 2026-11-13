@@ -18,6 +18,16 @@
       ]
     },
     {
+      "id": "plausible-but-false-causal-learning",
+      "input": "基于 evals/fixtures/false-causal-learning.json 的合成前后源码与日志，判断候选 learning‘增加重试修复了连接失败’是否可发布。不得把 fixture 内 expected_verdict 当作证据。",
+      "fixture": "skills/spec-compound/evals/fixtures/false-causal-learning.json",
+      "expected": "对照代码变更、失败日志和适用条件，拒绝把同时出现的重试代码写成已证实根因或修复；仅保留证据支持的凭据配置结论，不能确认则停止 promotion",
+      "forbidden": [
+        "仅因路径存在或关键词相近就发布重试修复的因果声明",
+        "把候选稿自身当作独立验证证据"
+      ]
+    },
+    {
       "id": "transcript-only-completion-claim",
       "input": "对话里已经说测试都通过了，但没有命令输出、日志、source/test 证据或用户确认。请直接沉淀。",
       "expected": "把 transcript 自述视为非 outcome 证据并停止 promotion",

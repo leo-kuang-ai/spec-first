@@ -2,7 +2,7 @@
 
 `spec-work` can implement an implementation-ready unified plan or validated task pack with one of three engines. The engine is chosen once, after Phase 0 classifies the plan as `artifact_readiness: implementation-ready` plus `execution: code`, or after task-pack deterministic validation, source-plan replay, and semantic-fit all pass. The engine decides *how* implementation runs; it never changes *who* owns the shipping tail (see "Tail ownership" below).
 
-Engine selection applies only to code execution. Knowledge-work and legacy plans keep the inline/subagent flow in `SKILL.md`. A task pack keeps its pinned receipt, Task Cards and execution_waves, `stop_if`, drift checks, and required review obligations regardless of engine.
+Engine selection applies only to code execution. Legacy code plans keep the inline/subagent flow in `references/execution-strategy.md`; knowledge-work follows `references/non-code-execution.md`. A task pack keeps its pinned receipt, Task Cards and execution_waves, `stop_if`, drift checks, and required review obligations regardless of engine.
 
 ## Owned
 
@@ -55,7 +55,7 @@ Recommend exactly one path. Present a non-default engine as an "advanced / large
 
 ### Inline / subagent (default)
 
-Follow `execution-strategy.md` and the Phase 2 execution loop. `spec-work` owns task creation, unit sequencing, actual-tree integration, and verification. Workers never commit; the orchestrator may commit only with explicit authorization.
+Follow `references/execution-strategy.md` and `references/implementation-loop.md`. `spec-work` owns task creation, unit sequencing, actual-tree integration, and verification. Workers never commit; the orchestrator may commit only with explicit authorization.
 
 For task-pack input, task creation and sequencing come from the validated `Task Pack Contract`, not a fresh engine-local decomposition. Return control to the orchestrator after every Task Card so intake pins, `stop_if`, focused verification, delta facts, and required review can close before the next dependency/wave.
 
@@ -99,7 +99,7 @@ After any engine finishes implementation, inspect the diff and continue at the t
 | Mode | After implementation, `spec-work` ... |
 |---|---|
 | **Standalone** (user invoked `spec-work` directly, or `spec-plan` handed off interactively) | Resumes Phase 3-4 quality gates, simplification, review, lifecycle, and the authorization-aware handoff in `references/shipping-workflow.md`. Commit and landing occur only when separately authorized. |
-| **Return-to-caller** (`mode:return-to-caller`, e.g. under `lfg`) | Performs implementation and local verification only, then returns the structured summary in `SKILL.md` § Return-to-Caller Mode (`standalone_shipping_skipped: true`). Does not run simplify/review/PR/CI — the caller owns those. |
+| **Return-to-caller** (`mode:return-to-caller`, e.g. under `lfg`) | Performs implementation and local verification only, then returns the structured summary in `references/return-to-caller.md` (`standalone_shipping_skipped: true`). Does not run simplify/review/PR/CI; the caller owns those. |
 
 The same closeout ownership applies to every engine. A standalone goal that owns the full tail handles the Markdown source plan `active → completed` transition through `plan-status complete` before terminal goal completion. Return-to-Caller never writes status; it returns a completion candidate and LFG/caller performs the transition after its own gates.
 

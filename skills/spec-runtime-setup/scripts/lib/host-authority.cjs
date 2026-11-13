@@ -4,7 +4,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const CANONICAL_HOSTS = Object.freeze(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder', 'zcode']);
+const CANONICAL_HOSTS = Object.freeze(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder', 'zcode', 'pi']);
 const CANONICAL_HOST_SET = new Set(CANONICAL_HOSTS);
 // 每个宿主登记 spec-runtime-setup 的全部 generated 投射根（相对 repo 根的正斜杠路径）。
 // Claude 以 workflow_command 投射到 managed workflows 根；其余宿主 workflow 根即
@@ -21,6 +21,9 @@ const HOST_SKILL_SURFACES = Object.freeze({
   // projects to; resolveLoadedHostSurface returns every host bound to the
   // matched surface so a zcode pin confirms against the shared root.
   zcode: Object.freeze(['.agents/skills']),
+  // Pi 的官方项目级 skills 发现根同样包含共享 .agents/skills（cwd 与祖先目录），
+  // 因此 pi pin 与 codex/zcode 一样经共享根确认。
+  pi: Object.freeze(['.agents/skills']),
 });
 
 function resolveHostAuthority({
@@ -129,9 +132,9 @@ function resolveLoadedHostSurface(skillRoot) {
   if (typeof skillRoot !== 'string' || !skillRoot) return null;
   let canonicalRoot;
   try {
-    canonicalRoot = fs.realpathSync.native
-      ? fs.realpathSync.native(path.resolve(skillRoot))
-      : fs.realpathSync(path.resolve(skillRoot));
+    // Use Node's platform-compatible spelling so Windows 8.3 aliases remain
+    // consistent with paths returned by the host runtime and tests.
+    canonicalRoot = fs.realpathSync(path.resolve(skillRoot));
   } catch (_error) {
     return null;
   }
@@ -177,6 +180,11 @@ function buildInvocationReceipt({
     reason_code: reasonCode,
     host,
     loaded_host: loadedSurface ? loadedSurface.host : null,
+    // 共享面（如 .agents/skills 同时绑定 codex/zcode）时 receipt 必须证明 pin
+    // 宿主确实绑定到该面，否则消费方只能看到 first-match 宿主而误拒 pin。
+    surface_hosts: loadedSurface && Array.isArray(loadedSurface.hosts)
+      ? [...loadedSurface.hosts]
+      : [],
     surface_id: loadedSurface ? loadedSurface.surface_id : null,
     skill_root: loadedSurface ? loadedSurface.skill_root : path.resolve(String(skillRoot || '.')),
     canonical_entry_name: 'spec-runtime-setup',

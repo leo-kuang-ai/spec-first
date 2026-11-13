@@ -73,8 +73,9 @@ describe('command companion resource paths', () => {
         `read \`${docReviewRoot}/references/synthesis-and-presentation.md\``,
       );
       expect(docReview).toContain(
-        `@./${docReviewRoot}/references/subagent-template.md`,
+        `[Subagent Template](${docReviewRoot}/references/subagent-template.md)`,
       );
+      expect(docReview).toContain(`[Findings Schema](${docReviewRoot}/references/findings-schema.json)`);
       expect(fs.existsSync(path.join(
         projectRoot,
         docReviewRoot,

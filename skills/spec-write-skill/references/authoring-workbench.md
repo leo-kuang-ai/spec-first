@@ -22,13 +22,23 @@ multi-agent/hybrid 先做 ArchitectureFit：独立子问题是否有不同证据
 
 ## Eval And Topology Preview
 
+For a restructure, place each moved block in the reference read by the step that executes it. Its former phase or neighboring paragraph does not determine ownership. Keep instructions that must act before a read in the body and put each required-read pointer before its consumer. If one block is misplaced, audit every block moved by that restructure; a corpus match alone cannot prove timely reachability. Remove duplicate rules from references when the body still owns them, then reread moved rules against their new neighbors for changed preconditions.
+
+Even a behavior-preserving Tier A restructure must apply the size and pin audit in [Authoring Method](authoring-method.md#size-restructure-checkpoints) and the applicable evaluation guidance in [Evaluation Design](evaluation-design.md#restructure-coverage). This does not require the full Design Record for Tier A.
+
 full apply 在 source patch 前先按 `evaluation-design.md` 形成最小 eval plan。create 至少有 positive、negative/near-neighbor、主要 failure/adversarial 三例；revise 固定旧版 protected behavior 与 before baseline，不能按候选实现反向编写。每个承重行为给出 `protected_behavior → source carrier → contract assertion → semantic eval case`；没有新增 assertion 或 semantic case 时，旧测试全绿不构成覆盖。
 
 只有文件集合、resource placement 或 runtime carrier 发生变化时才展开 package topology preview，区分 spine、triggered references、scripts、assets、maintainer-only evals、target sidecar 与 project governance；单文件 revise 只需报告 changed surfaces。新增或变更的 runtime reference 仍要记录 consumer、trigger condition、must-read、fallback 与 eval case；未满足时不得声称 runtime closure。
 
 ## Preview Handoff
 
-把语义 preview 与私有 manifest 分开。manifest 只承载 canonical/authorized root、snapshot、would-change（path、before hash、after hash、collision disposition）、preserve/generated/not-touch、planned side effects 和 residual risks；不要把 Design Record 正文写入 machine contract。snapshot 至少覆盖 canonical `SKILL.md`、所有已存在的声明路径，以及新文件最近现存父目录的 entry hash。宿主 scope 还要给出 preview-time dirty paths；任何将被改写的 dirty path 必须在 manifest 中逐项记录 current hash、replace/preserve disposition，并说明当前请求已明确覆盖该替换或取得重新确认。
+把语义 preview 与私有 manifest 分开。manifest 只承载 canonical/authorized root、snapshot、would-change（path、before hash、after hash、collision disposition、可选 `supporting: true`）、preserve/generated/not-touch、planned side effects 和 residual risks；不要把 Design Record 正文写入 machine contract。`supporting: true` 的边界：
+
+- 声明 authorized root 内、`canonical_source_root` 外的授权支撑路径（tests、docs、根 CHANGELOG 等交付必然触及的 repo 级文件）；
+- 与 canonical 路径同样受 snapshot、write set、dirty-overlap 与 receipt 绑定，仅豁免 canonical containment；
+- snapshot 至少覆盖 canonical `SKILL.md`、所有已存在的声明路径（含 supporting 路径），以及新文件最近现存父目录的 entry hash。
+
+宿主 scope 还要给出 preview-time dirty paths；任何将被改写的 dirty path 必须在 manifest 中逐项记录 current hash、replace/preserve disposition，并说明当前请求已明确覆盖该替换或取得重新确认。
 
 在宿主创建的私有临时目录中，以 `0700` directory、`0600` exclusive-create file 保存 run-local manifest/scope/write-set。调用：
 

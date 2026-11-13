@@ -93,7 +93,7 @@ Use the shared anchored rubric (see `subagent-template.md` — Confidence rubric
 
 - **`100` — Absolutely certain:** Can quote specific text showing the gap, construct a concrete scenario or counterargument with cited evidence, AND trace the consequence to observable impact. The rare case — use sparingly.
 - **`75` — Highly confident:** The gap is likely to bite and you can describe the scenario concretely, but full confirmation would require information not in the document (codebase details, user research, production data). You double-checked and the concern is material. This is adversarial's normal working ceiling.
-- **`50` — Advisory (routes to FYI):** A plausible-but-unlikely failure mode, or a concern worth surfacing without a strong supporting scenario. Still requires an evidence quote. Surfaces as observation without forcing a decision.
+- **`50` — Advisory (routes to FYI):** A supported consequential concern below the actionable bar; name its evidence and concrete effect. Harmless preferences, stylistic drift and unsupported hypotheticals are suppressed from every bucket.
 - **Suppress entirely:** Anything below anchor `50` — speculative "what if" with no supporting scenario. Do not emit; anchors `0` and `25` exist in the enum only so synthesis can track drops.
 
 ## What you don't flag

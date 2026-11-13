@@ -7,6 +7,7 @@ const {
   makeArtifact,
   parseCommonArgs,
   readText,
+  readTextWithMetadata,
   relativeTo,
   sourceInputFromFiles,
   writeJsonOutput,
@@ -15,7 +16,10 @@ const {
 function extractEngineeringQuality(options = {}) {
   const scan = listSourceTextFiles(options);
   const { repoRoot, files } = scan;
-  const candidates = files.flatMap((filePath) => inspectEngineeringQuality(filePath, repoRoot));
+  // SUP-18 fix: 收集 candidates 和 degradedModes
+  const results = files.map((filePath) => inspectEngineeringQuality(filePath, repoRoot));
+  const candidates = results.flatMap((r) => r.candidates);
+  const fileDegradedModes = results.flatMap((r) => r.degradedModes);
 
   return makeArtifact({
     schemaVersion: 'engineering-quality-contract.v1',
@@ -28,16 +32,20 @@ function extractEngineeringQuality(options = {}) {
       extraction_notes: [
         'Candidates are static signals for App engineering review. Scripts do not classify them as confirmed issues.',
       ],
-      degraded_modes: scan.degraded_modes,
+      // SUP-18 fix: 合并扫描层和文件读取层的 degraded modes
+      degraded_modes: [...scan.degraded_modes, ...fileDegradedModes],
     },
   });
 }
 
 function inspectEngineeringQuality(filePath, repoRoot) {
   const rel = relativeTo(repoRoot, filePath);
-  const text = readText(filePath);
+  // SUP-18 fix: 使用 readTextWithMetadata 获取截断信息
+  const read = readTextWithMetadata(filePath);
+  const text = read.text;
   const blocks = extractFunctionLikeBlocks(text);
   const candidates = [];
+  const degradedModes = [];
 
   if (text.split(/\r?\n/).length > 500) {
     candidates.push(candidate('large_file', rel, 'File exceeds 500 lines and may hide mixed App responsibilities.'));
@@ -86,7 +94,18 @@ function inspectEngineeringQuality(filePath, repoRoot) {
     candidates.push(candidate('viewmodel_holds_ui_context_candidate', rel, 'ViewModel appears near Activity/Context/ViewController type names.'));
   }
 
-  return candidates;
+  // SUP-18 fix: 如果文件被截断，添加 degraded mode
+  if (read.truncated) {
+    degradedModes.push({
+      mode: 'source_truncated',
+      reason: `File truncated at ${read.bytesRead} bytes (${read.maxBytes} limit); tail patterns not extracted`,
+      file: rel,
+      size_bytes: read.sizeBytes,
+      bytes_read: read.bytesRead,
+    });
+  }
+
+  return { candidates, degradedModes };
 }
 
 function extractFunctionLikeBlocks(text) {

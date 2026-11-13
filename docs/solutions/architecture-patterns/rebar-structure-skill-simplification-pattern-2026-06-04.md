@@ -249,7 +249,7 @@ fresh-source eval 没有声称通过：`docs/validation/spec-prd/fresh-source-ev
 - `docs/solutions/architecture-patterns/competitor-skill-borrowing-judgment-2026-06-01.md` — 前置方法论：外部 skill 借鉴时如何“借功底，不借形态”。
 - `docs/solutions/workflow-issues/owner-driven-spec-iteration-methodology-2026-05-29.md` — 通用的加法/减法节奏和拒绝过度设计框架。
 - `docs/solutions/workflow-issues/workflow-host-instruction-reuse-policy-2026-05-25.md` — workflow prompt context economy 与 host instruction 复用边界。
-- `docs/10-prompt/结构化项目角色契约.md` — spec-first source/runtime、script/LLM 职责和 light contract 基线。
+- `docs/methodology/结构化项目角色契约.md` — spec-first source/runtime、script/LLM 职责和 light contract 基线。
 - `skills/spec-prd/SKILL.md` — 当前 `spec-prd` workflow spine。
 - `skills/spec-prd/references/evidence-and-topology.md` — 当前 `spec-prd` 的主钢筋。
 - `tests/unit/spec-prd-contracts.test.js` — 防止 source topology 和语义 contract 回膨胀的测试网。

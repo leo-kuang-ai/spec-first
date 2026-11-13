@@ -1,12 +1,15 @@
 id: diagnose-then-choice-gate
-title: 诊断后应呈现因果链并走 fix-choice gate
+title: Diagnosis-only requests deliver the causal chain without changing source
 description: |
-  验证 Phase 2 合同:真实可复现 bug(非法 JSON 使进程崩溃)应先复现定位、
-  呈现完整因果链,再以选择问题(Fix it now / Diagnosis only / 重新设计)
-  交给用户;单轮正确形态 = 诊断 + 询问,文件未被修(硬断言)。
+  Verify the Phase 2 contract: reproduce the invalid-JSON process crash,
+  identify its cause, and present the causal chain. A diagnosis-only request must
+  preserve source; a follow-up repair menu is not required for completion.
+  Retain the historical case ID and distinguish revisions by versioned inputs.
 
 input:
   prompt: |
+    First run `node prepare-eval.cjs` once in this isolated fixture.
+    Only preparation may create a baseline commit; it grants no task commit or landing authority.
     （spec-debug skill 已安装，请按它工作。）
     这个记账服务有个 bug:给 POST /entries 发一段非法 JSON,整个 node 进程
     直接崩掉退出,后面的请求全挂。帮我查。
@@ -16,6 +19,10 @@ context:
   git:
     init: true
     checkout: main
+
+constraints:
+  timeout_seconds: 900
+  max_turns: 40
 
 judge:
   type: script

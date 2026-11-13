@@ -2,6 +2,9 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { captureSourceSnapshot, sourceContentIdentity } = require('../../../skills/spec-runtime-setup/scripts/lib/source-snapshot.cjs');
+const codegraphEvidence = require('../../../skills/spec-runtime-setup/scripts/providers/codegraph-artifact-evidence.cjs');
+const { isVerifiedNpmArchiveIdentity } = require('../../../skills/spec-runtime-setup/scripts/lib/npm-warmup.cjs');
 
 const SETUP_FACTS_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 const READY_CONFIGURED_STATUSES = new Set(['ready', 'not-applicable', 'not-required', 'fallback-active']);
@@ -82,7 +85,11 @@ function normalizeSetupFacts(facts, options = {}) {
   const configuredDependencies = normalizeConfiguredDependencies(facts.configured_dependencies);
   const providerReadiness = normalizeProviderReadiness(facts.provider_readiness);
   const generatedAt = typeof facts.generated_at === 'string' ? facts.generated_at : null;
-  const freshness = computeFreshness(generatedAt, options.now || new Date(), options.maxAgeMs || SETUP_FACTS_MAX_AGE_MS);
+  const freshness = compareSourceSnapshot(
+    computeFreshness(generatedAt, options.now || new Date(), options.maxAgeMs || SETUP_FACTS_MAX_AGE_MS),
+    facts.source_snapshot,
+    options.currentSourceSnapshot,
+  );
 
   const counts = computeCounts(items);
   const configuredDependencyCounts = computeConfiguredDependencyCounts(configuredDependencies);
@@ -97,6 +104,7 @@ function normalizeSetupFacts(facts, options = {}) {
     },
     artifact_refs: artifactRefs,
     generated_at: generatedAt,
+    source_snapshot: normalizeSourceSnapshot(facts.source_snapshot),
     freshness,
     profile: normalizeProfile(facts.profile),
     repo_root: typeof facts.repo_root === 'string' ? facts.repo_root : null,
@@ -263,6 +271,48 @@ function inferReasonCode({ sourceReasonCode, dependencyStatus, configuredStatus,
   return sourceReasonCode || 'unknown';
 }
 
+function compareSourceSnapshot(freshness, recorded, current) {
+  if (!current || freshness.status !== 'fresh') return freshness;
+  if (current.schema_version !== 'setup-source-snapshot.v2' || recorded?.schema_version !== 'setup-source-snapshot.v2') {
+    return { ...freshness, status: 'unknown', reason_code: 'setup-facts-source-snapshot-unsupported' };
+  }
+  const keys = ['schema_version', 'registry_sha256', 'host', 'platform', 'repo_root', 'source_kind', 'source_content_sha256', 'host_config_sha256'];
+  if (current.source_kind === 'git' || recorded?.source_kind === 'git') keys.push('source_head');
+  if (keys.some((key) => typeof current[key] === 'string' && current[key]
+    && recorded && typeof recorded[key] === 'string' && recorded[key] && recorded[key] !== current[key])) {
+    return { ...freshness, status: 'stale', reason_code: 'setup-facts-source-snapshot-mismatch' };
+  }
+  if (keys.some((key) => typeof current[key] !== 'string' || !current[key]
+    || !recorded || typeof recorded[key] !== 'string' || !recorded[key])
+    || ['registry_sha256', 'host_config_sha256', 'source_content_sha256'].some((key) => !/^[a-f0-9]{64}$/.test(current[key]) || !/^[a-f0-9]{64}$/.test(recorded[key]))
+    || !['git', 'folder'].includes(current.source_kind)
+    || (current.source_kind === 'git' && (!/^[a-f0-9]{40,64}$/.test(current.source_head) || !/^[a-f0-9]{40,64}$/.test(recorded.source_head)))
+    || (current.source_kind === 'folder' && (current.source_head !== null || recorded.source_head !== null))
+    || (Array.isArray(current.limitations) && current.limitations.length > 0)
+    || (recorded && Array.isArray(recorded.limitations) && recorded.limitations.length > 0)) {
+    return { ...freshness, status: 'unknown', reason_code: 'setup-facts-source-snapshot-incomplete' };
+  }
+  return freshness;
+}
+
+function normalizeSourceSnapshot(value) {
+  const source = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+  return {
+    host_config_sha256: normalizeNullableString(source.host_config_sha256),
+    schema_version: normalizeNullableString(source.schema_version),
+    repo_root: normalizeNullableString(source.repo_root),
+    source_head: normalizeNullableString(source.source_head),
+    source_kind: normalizeNullableString(source.source_kind),
+    source_content_sha256: normalizeNullableString(source.source_content_sha256),
+    limitations: normalizeStringList(source.limitations),
+    registry_sha256: typeof source.registry_sha256 === 'string' ? source.registry_sha256 : null,
+    host: typeof source.host === 'string' ? source.host : null,
+    platform: typeof source.platform === 'string' ? source.platform : null,
+    captured_at: typeof source.captured_at === 'string' ? source.captured_at : null,
+    invalidation: normalizeStringList(source.invalidation),
+  };
+}
+
 function normalizeConfiguredScanStatus(value) {
   return ['ok', 'scan-failed', 'unknown'].includes(value) ? value : 'unknown';
 }
@@ -289,9 +339,17 @@ function normalizeProviderReadiness(entries) {
   return entries.map((entry) => ({
     schema_version: 'provider-readiness.v2',
     provider: entry.provider || 'unknown',
+    readiness_scope: entry.readiness_scope === 'installation' ? 'installation' : 'artifact',
     kind: normalizeProviderKind(entry.kind),
     profile: normalizeProviderProfile(entry.profile),
     readiness_status: normalizeProviderStatus(entry.readiness_status),
+    ...(codegraphEvidence.validEvidence(entry.artifact_evidence)
+      ? { artifact_evidence: entry.artifact_evidence } : {}),
+    ...(entry.provider_identity && typeof entry.provider_identity === 'object' && !Array.isArray(entry.provider_identity)
+      && ['package', 'version', 'command'].every((key) => typeof entry.provider_identity[key] === 'string' && entry.provider_identity[key].length > 0)
+      ? { provider_identity: normalizeProviderIdentity(entry.provider_identity) } : {}),
+    ...(isVerifiedNpmArchiveIdentity(entry.dependency_identity, entry.dependency_identity, ['npm-pack+npx', 'npm-pack+npm-install'])
+      ? { dependency_identity: { ...entry.dependency_identity } } : {}),
     lifecycle: {
       installed: Boolean(entry.lifecycle && entry.lifecycle.installed),
       configured: Boolean(entry.lifecycle && entry.lifecycle.configured),
@@ -313,6 +371,20 @@ function normalizeProviderReadiness(entries) {
     steady_state: normalizeSteadyState(entry.steady_state),
     usage_note: typeof entry.usage_note === 'string' ? entry.usage_note : '',
   }));
+}
+
+function normalizeProviderIdentity(identity) {
+  const result = {};
+  for (const key of ['package', 'version', 'interpreter', 'installer', 'command']) {
+    if (typeof identity[key] === 'string' && identity[key].length > 0) result[key] = identity[key];
+  }
+  for (const key of ['interpreter', 'installer']) {
+    if (identity[key] === null) result[key] = null;
+  }
+  if (Object.hasOwn(identity, 'inventory_sha256')) {
+    result.inventory_sha256 = /^[a-f0-9]{64}$/.test(identity.inventory_sha256 || '') ? identity.inventory_sha256 : null;
+  }
+  return result;
 }
 
 function normalizeProfile(value) {
@@ -365,7 +437,23 @@ function normalizeFirstGeneration(value) {
     artifact_root: normalizeNullableString(source.artifact_root),
     artifact_refs: normalizeStringList(source.artifact_refs),
     next_action: normalizeNullableString(source.next_action),
+    ...(source.scope_provenance && typeof source.scope_provenance === 'object' && !Array.isArray(source.scope_provenance)
+      ? { scope_provenance: normalizeScopeProvenance(source.scope_provenance) } : {}),
   };
+}
+
+function normalizeScopeProvenance(source) {
+  const result = {
+    status: ['verified', 'missing', 'mismatch', 'invalid', 'unknown'].includes(source.status) ? source.status : 'unknown',
+  };
+  for (const key of ['reason_code', 'requested_requirement_workspace_path', 'verified_requirement_workspace_path', 'receipt_ref']) {
+    result[key] = normalizeNullableString(source[key]);
+  }
+  if (typeof source.graph_sha256 === 'string' && /^[a-f0-9]{64}$/.test(source.graph_sha256)) result.graph_sha256 = source.graph_sha256;
+  const sourceSnapshot = sourceContentIdentity(source.source_snapshot);
+  if (sourceSnapshot) result.source_snapshot = sourceSnapshot;
+  if (['graphify-source-changed-during-generation', 'graphify-source-snapshot-unavailable'].includes(source.source_reason_code)) result.source_reason_code = source.source_reason_code;
+  return result;
 }
 
 function normalizeSteadyState(value) {
@@ -373,13 +461,13 @@ function normalizeSteadyState(value) {
   const refreshOwner = ['provider-native', 'runtime-setup', 'user', 'none', 'unknown'].includes(source.refresh_owner)
     ? source.refresh_owner
     : 'unknown';
-  const refreshMode = ['watcher', 'skill-cli-hook-on-demand', 'cli-mcp-hook-on-demand', 'manual-only', 'none', 'unknown'].includes(source.refresh_mode)
+  const refreshMode = ['watcher', 'skill-cli-hook-on-demand', 'cli-mcp-hook-on-demand', 'commit-hook-external-verified', 'manual-only', 'none', 'unknown'].includes(source.refresh_mode)
     ? source.refresh_mode
     : 'unknown';
   const usageOwner = ['downstream-skill', 'provider-native', 'user', 'none', 'unknown'].includes(source.usage_owner)
     ? source.usage_owner
     : 'unknown';
-  const hookStatus = ['verified', 'installed', 'failed', 'skipped', 'unknown'].includes(source.hook_status)
+  const hookStatus = ['verified', 'verified-external', 'blocked', 'installed', 'failed', 'skipped', 'unknown'].includes(source.hook_status)
     ? source.hook_status
     : 'unknown';
   return {
@@ -415,7 +503,10 @@ function computeFreshness(generatedAt, now, maxAgeMs) {
     };
   }
   const nowTime = now instanceof Date ? now.getTime() : Date.parse(now);
-  const ageMs = Math.max(0, nowTime - generatedTime);
+  if (!Number.isFinite(nowTime) || generatedTime > nowTime) {
+    return { status: 'unknown', generated_at: generatedAt, age_ms: null, max_age_ms: maxAgeMs, reason_code: 'setup-facts-clock-invalid' };
+  }
+  const ageMs = nowTime - generatedTime;
   if (ageMs > maxAgeMs) {
     return {
       status: 'stale',
@@ -475,7 +566,86 @@ function isRequiredAction(item) {
   return item.baseline_blocking !== false || item.required === true;
 }
 
-function computeDecisionInputHealth({ projectRoot, platforms = [], factsPath, now } = {}) {
+function compareCurrentProviderIdentity(projection, context, provider) {
+  const entries = projection.provider_readiness.filter((entry) => entry.provider === provider);
+  if (!entries.length || projection.freshness.status !== 'fresh') return;
+  let current;
+  try {
+    const registryPath = path.join(context.skillRoot || path.resolve(__dirname, '../../../skills/spec-runtime-setup'), 'setup-registry.json');
+    const registry = readJsonFile(registryPath);
+    const dependency = registry.external_dependencies.find((entry) => entry.id === provider);
+    const owner = provider === 'codegraph'
+      ? require('../../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs')
+      : require('../../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    current = owner.readCurrentIdentity({ ...context, dependency });
+  } catch (_error) {
+    current = { status: 'unknown' };
+  }
+  const keys = ['package', 'version', 'command', 'installer', 'inventory_sha256'];
+  if (provider === 'graphify') keys.push('interpreter');
+  const mismatch = current.status === 'stale' || (current.status === 'confirmed' && entries.some((entry) => keys.some((key) => {
+    const recordedValue = entry.provider_identity?.[key];
+    const currentValue = current.identity?.[key];
+    return typeof recordedValue === 'string' && recordedValue.length > 0
+      && typeof currentValue === 'string' && currentValue.length > 0 && recordedValue !== currentValue;
+  })));
+  const complete = (identity) => identity && keys.every((key) => typeof identity[key] === 'string' && identity[key].length > 0)
+    && /^[a-f0-9]{64}$/.test(identity.inventory_sha256);
+  if (mismatch) {
+    projection.freshness = { ...projection.freshness, status: 'stale', reason_code: 'setup-facts-provider-identity-mismatch' };
+  } else if (current.status !== 'confirmed' || !complete(current.identity) || entries.some((entry) => !complete(entry.provider_identity))) {
+    projection.freshness = { ...projection.freshness, status: 'unknown', reason_code: 'setup-facts-provider-identity-unverified' };
+  }
+  if (projection.freshness.status !== 'fresh') {
+    for (const entry of entries) {
+      if (entry.readiness_status === 'fresh') entry.readiness_status = projection.freshness.status;
+      entry.limitations = [...entry.limitations, `${projection.freshness.reason_code}: 当前安装身份不能支持历史 readiness。`];
+    }
+    projection.provider_counts = computeProviderCounts(projection.provider_readiness);
+  }
+  return current;
+}
+
+function compareCurrentGraphifyReceipt(projection, repoRoot, currentSourceSnapshot) {
+  if (projection.freshness.status !== 'fresh') return;
+  const entries = projection.provider_readiness.filter((entry) => entry.provider === 'graphify' && entry.readiness_scope === 'artifact');
+  for (const entry of entries) {
+    const recorded = entry.first_generation.scope_provenance;
+    const scope = entry.first_generation.requirement_workspace_path;
+    const current = require('../../../skills/spec-runtime-setup/scripts/providers/graphify.cjs').readCurrentScopeProvenance({ repoRoot, requirementWorkspace: scope });
+    const recordedVerified = recorded?.status === 'verified' && recorded.graph_sha256
+      && recorded.verified_requirement_workspace_path === scope && entry.first_generation.artifact_root === 'graphify-out';
+    const mismatch = ['graphify-scope-provenance-artifact-mismatch', 'graphify-scope-provenance-mismatch'].includes(current.reason_code)
+      || (current.status === 'verified' && recordedVerified && recorded.graph_sha256 !== current.graph_sha256);
+    const snapshots = [sourceContentIdentity(recorded?.source_snapshot), sourceContentIdentity(current.source_snapshot), sourceContentIdentity(currentSourceSnapshot)];
+    const knownSources = snapshots.filter(Boolean).map((snapshot) => JSON.stringify(snapshot));
+    const sourceChangedDuringGeneration = current.source_reason_code === 'graphify-source-changed-during-generation';
+    const sourceMismatch = sourceChangedDuringGeneration || new Set(knownSources).size > 1;
+    if (!mismatch && !sourceMismatch && snapshots.every(Boolean) && current.status === 'verified' && recordedVerified) continue;
+    const status = mismatch || sourceMismatch ? 'stale' : 'unknown';
+    const reason = current.reason_code || (mismatch ? 'graphify-scope-provenance-artifact-mismatch'
+      : sourceChangedDuringGeneration ? current.source_reason_code
+        : sourceMismatch ? 'graphify-source-snapshot-mismatch' : 'graphify-scope-provenance-recorded-evidence-missing');
+    if (projection.freshness.status !== 'stale') projection.freshness = { ...projection.freshness, status, reason_code: reason };
+    if (entry.readiness_status === 'fresh') entry.readiness_status = status;
+    entry.limitations = [...entry.limitations, `${reason}: 当前图与历史 scope/query 证据未闭合。`];
+  }
+  projection.provider_counts = computeProviderCounts(projection.provider_readiness);
+}
+
+function compareCurrentCodegraphEvidence(projection, context, identity, source) {
+  if (projection.freshness.status !== 'fresh') return;
+  for (const entry of projection.provider_readiness.filter((item) => item.provider === 'codegraph' && item.readiness_scope === 'artifact')) {
+    const compared = codegraphEvidence.compareEvidence(context, entry.artifact_evidence, identity, source);
+    if (compared.status === 'confirmed') continue;
+    projection.freshness = { ...projection.freshness, status: compared.status, reason_code: compared.reason_code };
+    if (entry.readiness_status === 'fresh') entry.readiness_status = compared.status;
+    entry.limitations = [...entry.limitations, `${compared.reason_code}: 当前数据库与原 query 证据未闭合。`];
+  }
+  projection.provider_counts = computeProviderCounts(projection.provider_readiness);
+}
+
+function computeDecisionInputHealth({ projectRoot, platforms = [], factsPath, now, skillRoot, homeDir, env } = {}) {
   if (!Array.isArray(platforms) || platforms.length === 0) {
     const projection = buildUnavailableProjection({
       status: 'not_checked',
@@ -487,6 +657,17 @@ function computeDecisionInputHealth({ projectRoot, platforms = [], factsPath, no
 
   const resolvedFactsPath = factsPath || path.join(projectRoot, '.spec-first', 'config', 'tool-facts.json');
   const projection = normalizeSetupFactsFile(resolvedFactsPath, { now });
+  if (projection.status === 'ready' && platforms.includes(projection.host)) {
+    const current = captureSourceSnapshot({ repoRoot: projectRoot, skillRoot, homeDir, env, host: projection.host, now });
+    projection.freshness = compareSourceSnapshot(projection.freshness, projection.raw.source_snapshot, current);
+    let codegraphIdentity;
+    for (const provider of ['graphify', 'codegraph']) {
+      const identity = compareCurrentProviderIdentity(projection, { repoRoot: projectRoot, skillRoot, homeDir, env, host: projection.host }, provider);
+      if (provider === 'codegraph') codegraphIdentity = identity;
+    }
+    compareCurrentCodegraphEvidence(projection, { repoRoot: projectRoot, now }, codegraphIdentity, current);
+    compareCurrentGraphifyReceipt(projection, projectRoot, current);
+  }
   if (projection.status === 'missing') {
     return buildDecisionResult('missing', 'setup-facts-missing', projection, { requestedPlatforms: platforms });
   }
@@ -504,6 +685,9 @@ function computeDecisionInputHealth({ projectRoot, platforms = [], factsPath, no
   }
   if (projection.counts.required_action > 0 || projection.configured_dependency_counts.action_required > 0) {
     return buildDecisionResult('error', 'required-runtime-action-required', projection, { requestedPlatforms: platforms });
+  }
+  if (projection.freshness.status !== 'fresh') {
+    return buildDecisionResult('warn', 'setup-facts-freshness-unknown', projection, { requestedPlatforms: platforms });
   }
   // configured dependency scan 失败是诚实降级(丢失 undeclared 可见性),非确定 blocker:
   // 映射成 warn,reason_code 专用以与「真有 degraded helper」区分,不静默 pass。
@@ -555,6 +739,9 @@ function decisionInputNextAction(reasonCode, requestedPlatforms = []) {
   }
   if (reasonCode === 'setup-facts-missing') {
     return `Run \`${command}\` from ${hostLabel} to create setup facts.`;
+  }
+  if (reasonCode === 'setup-facts-freshness-unknown') {
+    return `通过 ${command} --verify-only 刷新当前 host 的 setup facts；时间或来源身份不完整，不能证明当前 readiness。`;
   }
   if (reasonCode === 'setup-facts-stale') {
     return `Rerun \`${command}\` from ${hostLabel} to refresh stale setup facts.`;

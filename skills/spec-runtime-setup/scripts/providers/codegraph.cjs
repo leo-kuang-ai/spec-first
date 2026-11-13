@@ -2,9 +2,14 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { prepareCodegraphLaunch } = require('./codegraph-launcher.cjs');
+const { verifiedNpmInstall } = require('../lib/npm-warmup.cjs');
+const { executeInstallWithMirror, applyInstallProvenance, combinedInstallProvenance } = require('../lib/installation-executor.cjs');
 const {
   assertContainedPath,
 } = require('../lib/path-safety.cjs');
+const { compareEvidence, readRecordedEvidence, captureDatabaseSnapshot, validEvidence, sameFiles, sameIdentity, SCHEMA } = require('./codegraph-artifact-evidence.cjs');
+const { captureSourceSnapshot, sourceContentIdentity } = require('../lib/source-snapshot.cjs');
 const {
   providerLimitation,
   providerResult,
@@ -83,11 +88,17 @@ function plan(context = {}) {
       kind: 'install-dependency',
       command: 'npm',
       args: ['install', '-g', `${context.dependency.package}@${context.dependency.version}`, '--no-audit', '--no-fund', '--loglevel=error'],
+      archive_verification: {
+        command: 'npm',
+        args: ['pack', '--ignore-scripts', '--json', `${context.dependency.package}@${context.dependency.version}`],
+        expected_integrity: context.dependency.integrity || null,
+        execution_scope: 'verified-local-archive',
+      },
     });
   }
-  actions.push(
+  if (!context.installationOnly) actions.push(
     { kind: 'initialize-if-missing', command: 'codegraph', args: ['init'] },
-    { kind: 'verify-status', command: 'codegraph', args: ['status'] },
+    { kind: 'verify-status', command: 'codegraph', args: ['status', '--json'] },
     {
       kind: 'verify-query',
       command: 'codegraph',
@@ -109,7 +120,60 @@ function plan(context = {}) {
   };
 }
 
+function readCurrentIdentity(context = {}) {
+  try {
+    const launchOptions = { command: 'codegraph', args: ['--version'],
+      env: context.env || process.env, cwd: context.repoRoot || process.cwd(),
+      platform: context.platform === 'macos' ? 'darwin' : context.platform,
+      arch: context.arch,
+    };
+    const launch = prepareCodegraphLaunch(launchOptions);
+    if (!launch.ok || !launch.provider_identity) return {
+      status: ['codegraph-version-pin-mismatch', 'codegraph-platform-version-mismatch'].includes(launch.reason_code) ? 'stale' : 'unknown',
+      reason_code: launch.reason_code || 'codegraph-installation-identity-unverified',
+    };
+    const result = run(context, launch.command, launch.args, {
+      cwd: path.resolve(context.repoRoot || process.cwd()), env: context.env || process.env, timeoutMs: 5000,
+    });
+    if (!succeeded(result)) return { status: 'unknown', reason_code: 'codegraph-identity-probe-failed' };
+    if (!versionReady(result, launch.provider_identity.version)) return { status: 'stale', reason_code: 'codegraph-version-pin-mismatch' };
+    const after = prepareCodegraphLaunch(launchOptions);
+    if (!after.ok || !after.provider_identity) return {
+      status: ['codegraph-version-pin-mismatch', 'codegraph-platform-version-mismatch'].includes(after.reason_code) ? 'stale' : 'unknown',
+      reason_code: after.reason_code || 'codegraph-installation-identity-unverified',
+    };
+    if (after.provider_identity.inventory_sha256 !== launch.provider_identity.inventory_sha256) {
+      return { status: 'stale', reason_code: 'codegraph-identity-changed-during-probe' };
+    }
+    return { status: 'confirmed', identity: after.provider_identity };
+  } catch (_error) {
+    return { status: 'unknown', reason_code: 'codegraph-installation-identity-unverified' };
+  }
+}
+
+function attachCurrentIdentity(context, readiness) {
+  if (!readiness.lifecycle.installed || readiness.first_generation.status === 'failed') return readiness;
+  const current = readCurrentIdentity(context);
+  if (current.status === 'confirmed') {
+    readiness.provider_identity = current.identity;
+    if (readiness.artifact_evidence && !sameIdentity(readiness.artifact_evidence.provider_identity, current.identity)) {
+      delete readiness.artifact_evidence;
+      readiness.readiness_status = 'degraded';
+      readiness.limitations.push('codegraph-artifact-identity-mismatch');
+    }
+  } else {
+    delete readiness.artifact_evidence;
+    if (['fresh', 'unknown'].includes(readiness.readiness_status)) readiness.readiness_status = current.status === 'stale' ? 'degraded' : 'unknown';
+    readiness.limitations.push(`${current.reason_code}: 当前安装身份未经确认，不能支持历史 readiness freshness。`);
+  }
+  return readiness;
+}
+
 function verify(context = {}) {
+  return attachCurrentIdentity(context, verifyReadiness(context));
+}
+
+function verifyReadiness(context = {}) {
   const repoRoot = path.resolve(context.repoRoot || process.cwd());
   try {
     assertCodegraphArtifactRoot(repoRoot);
@@ -120,56 +184,63 @@ function verify(context = {}) {
   }
   const versionResult = run(context, 'codegraph', ['--version'], { cwd: repoRoot });
   const installed = versionReady(versionResult, context.dependency && context.dependency.version);
-  const artifactPath = path.join(repoRoot, '.codegraph', 'codegraph.db');
-  const hasArtifact = fs.existsSync(artifactPath);
-  const statusResult = installed && hasArtifact
-    ? run(context, 'codegraph', ['status'], { cwd: repoRoot })
-    : null;
-  const statusOutput = statusResult ? text(statusResult) : '';
-  const indexed = Boolean(statusResult
-    && succeeded(statusResult)
-    && !statusNeedsSync(statusOutput)
-    && !statusNeedsReindex(statusOutput));
-  const queryResult = indexed
-    ? run(context, 'codegraph', ['query', '__spec_first_readiness_probe__', '--limit', '1', '--json'], {
-      cwd: repoRoot,
-      timeoutMs: 10000,
-    })
-    : null;
-  const queryVerified = Boolean(queryResult && succeeded(queryResult));
-  const serverReachable = context.serverReachable === true;
-  const nextActions = [];
-  if (!installed) nextActions.push('显式运行 spec-runtime-setup --only codegraph，安装 pinned CodeGraph CLI。');
-  if (installed && !hasArtifact) nextActions.push('依赖 code-graph candidate 前，先显式执行 CodeGraph first generation。');
-  if (installed && hasArtifact && !indexed) {
-    nextActions.push('运行 spec-runtime-setup --only codegraph，修复 CodeGraph index/query readiness。');
-  }
-  if (installed && hasArtifact && !serverReachable) nextActions.push('将 server_reachable 视为 true 前，先运行 CodeGraph server/probe 验证。');
-  if (indexed && !queryVerified) nextActions.push('运行 spec-runtime-setup --only codegraph，重新执行 bounded CodeGraph query probe。');
-  appendConfigurationAction(nextActions, context);
-  return providerResult(METADATA, {
+  if (context.installationOnly) return providerResult(METADATA, {
+    installed, configured: context.configured === true,
+    readinessStatus: installed ? 'unknown' : 'not-run',
+    readinessScope: 'installation', firstGenerationStatus: 'not-run',
+    nextActions: installed ? [] : [versionResult.next_action || '运行显式 installation-only setup 安装 CodeGraph。'],
+    ...(versionResult.reason_code ? { limitations: [providerLimitation('failed', versionResult.reason_code, '未启动未经确认的 CodeGraph launcher。')] } : {}),
+  });
+  const hasArtifact = fs.existsSync(path.join(repoRoot, '.codegraph', 'codegraph.db'));
+  const identity = installed ? readCurrentIdentity(context) : { status: 'unknown' };
+  const comparison = installed && hasArtifact
+    ? compareEvidence({ ...context, repoRoot }, readRecordedEvidence({ ...context, repoRoot }), identity)
+    : { status: installed ? 'unknown' : 'not-run', reason_code: 'codegraph-artifact-evidence-missing' };
+  const confirmed = comparison.status === 'confirmed';
+  const readiness = providerResult(METADATA, {
     installed,
     configured: context.configured === true,
     initialized: hasArtifact,
-    indexed,
+    indexed: confirmed,
     artifactExists: hasArtifact,
-    serverReachable,
-    queryVerified,
-    readinessStatus: codegraphReadinessStatus(context, {
-      installed,
-      initialized: hasArtifact,
-      indexed,
-      queryVerified,
-    }),
-    repoAligned: 'unknown',
-    firstGenerationStatus: hasArtifact ? 'completed' : 'not-run',
+    serverReachable: context.serverReachable === true,
+    queryVerified: confirmed,
+    readinessStatus: confirmed ? codegraphReadinessStatus(context, { installed, initialized: true, indexed: true, queryVerified: true }) : (comparison.status === 'unknown' && context.configured === false ? 'degraded' : comparison.status),
+    firstGenerationStatus: confirmed ? 'completed' : (hasArtifact ? 'unknown' : 'not-run'),
     artifactRefs: hasArtifact ? ['.codegraph/codegraph.db'] : [],
-    nextActions,
+    ...(confirmed ? { artifactEvidence: comparison.evidence } : {}),
+    limitations: [
+      'CodeGraph query 仅为 advisory；verify 回读原始验证证据，不执行原生 status/query，不刷新 verified_at。',
+      ...(!confirmed ? [comparison.reason_code] : []),
+    ],
+    nextActions: [...configurationActions(context), ...(!confirmed ? ['运行 spec-runtime-setup --only codegraph，修复 CodeGraph index/query readiness。'] : [])],
+  });
+  if (identity.status === 'confirmed') readiness.provider_identity = identity.identity;
+  return readiness;
+}
+
+function installDependency(context, action, executeInstall) {
+  return verifiedNpmInstall({
+    context,
+    repoRoot: path.resolve(context.repoRoot || process.cwd()),
+    identity: context.dependency,
+    command: action.command,
+    args: action.args,
+    executeInstall: executeInstall || ((command, args, options) => executeInstallWithMirror({
+      ...context, runner: (cmd, argv, opts) => run(context, cmd, argv, opts),
+    }, command, args, options)),
   });
 }
 
 function apply(context = {}, actionPlan = plan(context)) {
-  if (!actionPlan || actionPlan.blocked || !actionPlan.mutation) return verify(context);
+  const installations = [];
+  const result = applyActions(context, actionPlan, installations);
+  applyInstallProvenance(result, combinedInstallProvenance(installations));
+  return attachCurrentIdentity(context, result);
+}
+
+function applyActions(context, actionPlan, installations) {
+  if (!actionPlan || actionPlan.blocked || !actionPlan.mutation) return verifyReadiness(context);
   const repoRoot = path.resolve(context.repoRoot || actionPlan.repo_root || process.cwd());
   try {
     assertCodegraphArtifactRoot(repoRoot);
@@ -180,8 +251,9 @@ function apply(context = {}, actionPlan = plan(context)) {
   }
   for (const action of actionPlan.actions || []) {
     if (action.kind === 'install-dependency') {
-      const result = run(context, action.command, action.args, { cwd: repoRoot, timeoutMs: 120000 });
-      if (!succeeded(result)) return degraded(context, repoRoot, 'codegraph-install-failed', {
+      const result = installDependency(context, action);
+      installations.push(result);
+      if (!succeeded(result)) return degraded(context, repoRoot, result.reason_code || 'codegraph-install-failed', {
         versionPin: actionPlan.dependency_version,
       });
       const installed = run(context, 'codegraph', ['--version'], { cwd: repoRoot, timeoutMs: 10000 });
@@ -192,6 +264,9 @@ function apply(context = {}, actionPlan = plan(context)) {
       }
     }
   }
+  if (context.installationOnly) return verifyReadiness(context);
+  const sourceBefore = sourceContentIdentity(captureSourceSnapshot({ ...context, repoRoot }));
+  const identityBefore = readCurrentIdentity(context);
   const artifactPath = path.join(repoRoot, '.codegraph', 'codegraph.db');
   if (!fs.existsSync(artifactPath)) {
     try {
@@ -205,9 +280,9 @@ function apply(context = {}, actionPlan = plan(context)) {
     if (!succeeded(initResult)) return degraded(context, repoRoot, 'codegraph-init-failed');
   }
 
-  let statusResult = run(context, 'codegraph', ['status'], { cwd: repoRoot });
-  let statusText = text(statusResult);
-  if (succeeded(statusResult) && statusNeedsSync(statusText)) {
+  let statusResult = run(context, 'codegraph', ['status', '--json'], { cwd: repoRoot });
+  let status = readStatusFacts(statusResult, repoRoot, actionPlan.dependency_version);
+  if (status.needsSync) {
     const syncResult = run(context, 'codegraph', ['sync'], { cwd: repoRoot, timeoutMs: 120000 });
     if (!succeeded(syncResult)) {
       const reasonCode = /maximum call stack size exceeded/i.test(text(syncResult))
@@ -215,21 +290,19 @@ function apply(context = {}, actionPlan = plan(context)) {
         : 'codegraph-sync-failed';
       return degraded(context, repoRoot, reasonCode);
     }
-    statusResult = run(context, 'codegraph', ['status'], { cwd: repoRoot });
-    statusText = text(statusResult);
+    statusResult = run(context, 'codegraph', ['status', '--json'], { cwd: repoRoot });
+    status = readStatusFacts(statusResult, repoRoot, actionPlan.dependency_version);
   }
-  if (succeeded(statusResult) && statusNeedsSync(statusText)) {
+  if (status.needsSync) {
     return degraded(context, repoRoot, 'codegraph-sync-incomplete');
   }
-  if (succeeded(statusResult) && statusNeedsReindex(statusText)) {
+  if (status.needsReindex) {
     const indexResult = run(context, 'codegraph', ['index', '-f'], { cwd: repoRoot, timeoutMs: 120000 });
     if (!succeeded(indexResult)) return degraded(context, repoRoot, 'codegraph-reindex-failed');
-    statusResult = run(context, 'codegraph', ['status'], { cwd: repoRoot });
-    statusText = text(statusResult);
+    statusResult = run(context, 'codegraph', ['status', '--json'], { cwd: repoRoot });
+    status = readStatusFacts(statusResult, repoRoot, actionPlan.dependency_version);
   }
-  if (!succeeded(statusResult)
-    || statusNeedsSync(statusText)
-    || statusNeedsReindex(statusText)
+  if (!status.ready
     || !fs.existsSync(artifactPath)) {
     return degraded(context, repoRoot, 'codegraph-post-mutation-probe-failed');
   }
@@ -244,15 +317,37 @@ function apply(context = {}, actionPlan = plan(context)) {
   if (!versionReady(versionResult, actionPlan.dependency_version)) {
     return degraded(context, repoRoot, 'codegraph-post-mutation-version-probe-failed');
   }
-  const queryResult = run(
+  const databaseBefore = captureDatabaseSnapshot(repoRoot);
+  let queryResult = run(
     context,
     'codegraph',
     ['query', '__spec_first_readiness_probe__', '--limit', '1', '--json'],
     { cwd: repoRoot, timeoutMs: 10000 },
   );
   if (!succeeded(queryResult)) {
-    return degraded(context, repoRoot, 'codegraph-query-probe-failed');
+    // bounded autonomous recovery: the Provider may transiently miss the
+    // freshly indexed database; retry the same real probe once before fail.
+    queryResult = run(
+      context,
+      'codegraph',
+      ['query', '__spec_first_readiness_probe__', '--limit', '1', '--json'],
+      { cwd: repoRoot, timeoutMs: 10000 },
+    );
+    if (!succeeded(queryResult)) return degraded(context, repoRoot, 'codegraph-query-probe-failed');
   }
+  const evidenceIdentity = readCurrentIdentity(context);
+  const sourceAfter = sourceContentIdentity(captureSourceSnapshot({ ...context, repoRoot }));
+  const databaseAfter = captureDatabaseSnapshot(repoRoot);
+  const changed = (sourceBefore && sourceAfter && JSON.stringify(sourceBefore) !== JSON.stringify(sourceAfter))
+    || (identityBefore.status === 'confirmed' && evidenceIdentity.status === 'confirmed' && !sameIdentity(identityBefore.identity, evidenceIdentity.identity))
+    || (databaseBefore.status === 'confirmed' && databaseAfter.status === 'confirmed' && !sameFiles(databaseBefore.files, databaseAfter.files));
+  const complete = sourceBefore && sourceAfter && identityBefore.status === 'confirmed' && evidenceIdentity.status === 'confirmed'
+    && databaseBefore.status === 'confirmed' && databaseAfter.status === 'confirmed';
+  const artifactEvidence = complete && !changed ? {
+    schema_version: SCHEMA, verified_at: (context.now || new Date()).toISOString(), repo_root: repoRoot,
+    query_verified: true, source_snapshot: sourceAfter, provider_identity: evidenceIdentity.identity, files: databaseAfter.files,
+  } : null;
+  const evidenceReason = changed ? 'codegraph-artifact-changed-during-verification' : 'codegraph-artifact-evidence-unavailable';
   return providerResult(METADATA, {
     installed: true,
     configured: context.configured === true,
@@ -261,7 +356,7 @@ function apply(context = {}, actionPlan = plan(context)) {
     artifactExists: true,
     serverReachable: context.serverReachable === true,
     queryVerified: true,
-    readinessStatus: codegraphReadinessStatus(context, {
+    readinessStatus: !artifactEvidence ? (changed ? 'degraded' : 'unknown') : codegraphReadinessStatus(context, {
       installed: true,
       initialized: true,
       indexed: true,
@@ -270,6 +365,7 @@ function apply(context = {}, actionPlan = plan(context)) {
     repoAligned: 'unknown',
     firstGenerationStatus: 'completed',
     artifactRefs: ['.codegraph/codegraph.db'],
+    ...(artifactEvidence ? { artifactEvidence } : { limitations: [evidenceReason] }),
     nextActions: configurationActions(context),
   });
 }
@@ -314,6 +410,8 @@ function reconcileConfigured(readiness, hostResult = {}) {
   }
   const lifecycle = readiness.lifecycle;
   if (readiness.readiness_status === 'unknown'
+    && readiness.provider_identity
+    && validEvidence(readiness.artifact_evidence)
     && lifecycle.installed
     && lifecycle.initialized
     && lifecycle.indexed
@@ -426,18 +524,38 @@ function commandFromSearchPath(command, searchPath, windows, env = {}) {
   return null;
 }
 
-function statusNeedsSync(output) {
-  return /pending changes|run\s+codegraph\s+sync/i.test(String(output || ''));
-}
-
-function statusNeedsReindex(output) {
-  return /full rebuild|index\s+-f/i.test(String(output || ''));
+function readStatusFacts(result, repoRoot, expectedVersion) {
+  const unavailable = { ready: false, needsSync: false, needsReindex: false };
+  if (!result || !succeeded(result)) return unavailable;
+  let payload;
+  try { payload = JSON.parse(result.stdout); } catch (_error) { return unavailable; }
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)
+    || payload.initialized !== true
+    || typeof payload.version !== 'string'
+    || (expectedVersion && payload.version !== expectedVersion)
+    || typeof payload.projectPath !== 'string' || !path.isAbsolute(payload.projectPath)
+    || path.resolve(payload.projectPath) !== repoRoot
+    || typeof payload.indexPath !== 'string' || !path.isAbsolute(payload.indexPath)
+    || path.resolve(payload.indexPath) !== path.join(repoRoot, '.codegraph')
+    || payload.worktreeMismatch !== null) return unavailable;
+  const pending = payload.pendingChanges;
+  const index = payload.index;
+  if (!pending || !index || Array.isArray(pending) || Array.isArray(index)
+    || !['added', 'modified', 'removed'].every((key) => Number.isSafeInteger(pending[key]) && pending[key] >= 0)
+    || !Number.isSafeInteger(index.pendingRefs) || index.pendingRefs < 0
+    || typeof index.reindexRecommended !== 'boolean'
+    || ![null, 'complete', 'partial', 'indexing', 'failed'].includes(index.state)) return unavailable;
+  const needsSync = pending.added > 0 || pending.modified > 0 || pending.removed > 0 || index.pendingRefs > 0;
+  const needsReindex = index.reindexRecommended || index.state !== 'complete';
+  return { ready: !needsSync && !needsReindex, needsSync, needsReindex };
 }
 
 module.exports = {
   apply,
+  installDependency,
   plan,
   reconcileConfigured,
+  readCurrentIdentity,
   resolveCodegraphCommand,
   refresh,
   uninstall,

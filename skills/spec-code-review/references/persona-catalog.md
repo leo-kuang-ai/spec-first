@@ -29,8 +29,8 @@ Spawned when the orchestrator identifies relevant patterns in the diff. The orch
 | Persona | Agent | Select when diff touches... |
 |---------|-------|---------------------------|
 | `security` | `security-reviewer` | Auth/tenant/resource authorization, untrusted model/tool/web outputs crossing into a reachable dangerous sink, credential handling, privileged agent/tool actions; not schema-only drift or unreachable dependency advisories |
-| `performance` | `performance-reviewer` | Database queries, ORM calls, loop-heavy data transforms, caching layers, async/concurrent code |
-| `api-contract` | `api-contract-reviewer` | Route definitions, serializer/interface changes, event schemas, exported type signatures, API versioning |
+| `performance` | `performance-reviewer` | 数据库/ORM 查询形态、算法复杂度、大规模转换、批处理/fan-out 或缓存策略有具体资源影响；仅有 async/concurrent 或缓存数据结构不足以触发 |
+| `api-contract` | `api-contract-reviewer` | 外部消费的 route/request/response、serializer、event schema、API version 或有下游调用证据的 public package signature 变化；模块内部 export 本身不足以触发 |
 | `frontend-quality` | `frontend-quality-reviewer` | Internal-only diff review for user-visible forms/navigation/components, async state completeness, semantic HTML/ARIA, keyboard/focus, contrast, responsive/layout/motion; semantic activation, not file extension |
 | `data-migration` | `data-migration-reviewer` | Migration files, schema dumps (`db/schema.rb`, `structure.sql`), backfill scripts, data transformations — **not** model/query-only changes without migration artifacts |
 | `reliability` | `reliability-reviewer` | I/O/async failure handling, retry/timeout, correlation propagation, telemetry emission, alert owner/action/runbook, health checks; not pure in-memory transforms |

@@ -23,6 +23,28 @@ function runCli(argv) {
   const args = Array.isArray(argv) ? [...argv] : [];
   const subcommand = args[0];
 
+  if (['--help', '-h'].includes(subcommand)
+    || (subcommand === 'validate' && ['--help', '-h'].includes(args[1]))) {
+    writeJson({
+      status: 'help',
+      usage: 'spec-first internal honest-closeout validate --input <claims.json> --target-repo <repo> [--json]',
+      input_fields: [...ALLOWED_INPUT_FIELDS],
+      claim_fields: [...ALLOWED_CLAIM_FIELDS],
+      claim_types: [...CLAIM_TYPES],
+      notes: [
+        'run_summary_ref 使用 verification-run-summary record 返回的仓库相对路径。',
+        'validation 引用 verification-run-summary:<check-id>；其他 claim 使用目标仓库内的普通文件证据。',
+        '示例只声明 not-run，不能证明验证通过；asserted_status 必须匹配实际证据。',
+        '命令退出码 0 仅表示完成校验，必须读取 overall、overall_reason_code 与每项 verdict。',
+      ],
+      input_example: {
+        run_summary_ref: '.spec-first/workflows/spec-debug/<workspace-slug>/<run-id>/verification-run-summary.json',
+        claims: [{ claim_type: 'validation', asserted_status: 'not-run', evidence_refs: ['verification-run-summary:example-check'] }],
+      },
+    });
+    return 0;
+  }
+
   if (subcommand !== 'validate') {
     writeJson({
       status: 'rejected',

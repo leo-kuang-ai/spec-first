@@ -6,6 +6,8 @@ Active workflow consumers are `spec-work`, `spec-debug`, and `spec-code-review`.
 
 Canonical fields are defined by `docs/contracts/workflows/honest-closeout.schema.json`:
 
+运行 `spec-first internal honest-closeout validate --help` 可读取输入字段和最小示例。输入只含 `run_summary_ref`、`claims`，每个 claim 只含 `claim_type`、`asserted_status`、`evidence_refs`；`verdict` 和 `reason_code` 由 validator 输出。帮助不访问目标仓库或执行校验。示例保持 `not-run`，而命令退出 0 只表示校验执行成功，完成结论仍须检查 `overall` 与逐项 verdict。
+
 - `claims[]`: `claim_type`, `asserted_status`, `evidence_refs[]`, `verdict`, and `reason_code`.
 - `claim_type`: `validation`, `impact_surface`, `review`, or `knowledge_promotion`.
 - `overall`: `verified`, `degraded`, or `unsupported`.

@@ -44,7 +44,7 @@ The core fields below are required for executable handoff and are validated by `
 
 ### Human-Readable Frontmatter
 
-These fields improve review and regeneration quality, but current deterministic validation does not prove them:
+These fields improve review and regeneration quality. Validation checks the optional `target_repo` path mechanically; it does not prove the semantic adequacy of these declarations:
 
 | Field | Meaning |
 | --- | --- |
@@ -58,6 +58,14 @@ These fields improve review and regeneration quality, but current deterministic 
 `source_plan_hash` must be produced by `spec-first tasks hash <plan-path> --repo <artifact-root> --json` using canonical source plan body hashing: UTF-8 text, normalized newlines, complete frontmatter removed when present, and the remaining Markdown body hashed without section extraction or whitespace collapsing. Copy the command's artifact-root-relative POSIX `source_plan` field into task-pack metadata; `plan_path` is an absolute compatibility diagnostic, not portable identity.
 
 Resolve both hash and validation operands under the same existing directory passed as `--repo <artifact-root>`. The CLI reports canonical `artifact_root`; validation temporarily also reports same-value `repo_root` as a compatibility alias. Neither field selects the downstream mutation repository.
+
+### Mutation path facts
+
+Task files resolve relative to the selected mutation repository: task `target_repo` overrides task-pack frontmatter, which otherwise inherits source-plan `target_repo`. A declared target must resolve to a Git repository root inside the artifact root; `.` or the artifact root's own basename identifies that root. Missing declarations retain the single-root compatibility interpretation. In a parent workspace, the producer and Work owner must supply the child target explicitly rather than treating this fallback as mutation authority.
+
+Validation checks each file and every existing ancestor with the shared path owner, including future files and dangling links. Git metadata, secret-denied paths, and managed runtime surfaces are not ordinary task source files. The runtime denylist is shared across CLI consumers and includes current OpenCode, ZCode, and Pi surfaces; it does not claim all files under a host directory are generated.
+
+The additive `execution_focus[].resolved_target_repo` receipt field records the actual root used for path checks. Work must reconcile it with the authorized target and current Git identity before mutation. Revalidate if the target declaration, directory/link structure, or checkout changes. These are deterministic path facts, not scope approval, worker isolation, or semantic execution readiness. Same-wave file overlap uses the resolved repository plus file path, so equal relative names in different repositories do not collide.
 
 If the current environment cannot produce a verifiable hash, do not write an executable handoff. A draft/non-executable task pack is allowed only when:
 

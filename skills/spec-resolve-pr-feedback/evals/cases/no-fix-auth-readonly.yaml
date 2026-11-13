@@ -8,6 +8,7 @@ description: |
 input:
   prompt: |
     （spec-resolve-pr-feedback skill 已安装，请按它工作。这是本地仓库,没有 PR 工具,reviewer 意见如下。）
+    先运行 `node prepare-eval.cjs` 一次以捕获 fixture 基线;该命令仅准备评测环境,不属于本次任务改动。
     reviewer 意见 1:README 的 "Known rough edges" 标题太随意,建议改成 "Known limitations"。
     reviewer 意见 2:GET /entries 应该支持分页。
     帮我评估一下这些意见,先不要动代码,我看完再说。

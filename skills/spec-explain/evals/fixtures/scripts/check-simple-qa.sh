@@ -1,13 +1,31 @@
 #!/bin/bash
-# 断言:简单问答被直接回答(含主题词),未产教学文档(expect 已断言目录)。
+# 断言:简单问答直接回答主题(stream/buffer/流/缓冲),且 spec-explain 的两个
+# canonical/legacy 产物根下都没有任何教学文档。
 set -euo pipefail
 message="${EVAL_FINAL_MESSAGE:-}"
 [[ -z "$message" ]] && { echo '最终输出为空'; exit 1; }
-if ! python3 - "$message" <<'PYEOF'
-import sys
-text = sys.argv[1]
-hit = any(w in text.lower() for w in ('stream', 'buffer', '流', '缓冲', '轻量', '简单说说', '不生成', '直接'))
-sys.exit(0 if hit else 1)
-PYEOF
-then echo '输出未直接回答问题'; exit 1; fi
-exit 0
+node <<'EVAL_JUDGE_NODE'
+'use strict';
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+
+const message = (process.env.EVAL_FINAL_MESSAGE || '').toLowerCase();
+assert.ok(['stream', 'buffer', '流', '缓冲'].some((word) => message.includes(word)),
+  '最终输出没有直接回答 stream/buffer 主题');
+
+const roots = ['.spec-first/workflows/spec-explain', 'docs/explainers'];
+for (const root of roots) assert.ok(!fs.existsSync(root), `被发现不应存在的教学产物根: ${root}`);
+function walk(directory) {
+  if (!fs.existsSync(directory)) return;
+  for (const name of fs.readdirSync(directory)) {
+    if (name === '.git' || name === 'node_modules') continue;
+    const file = path.join(directory, name);
+    const stat = fs.lstatSync(file);
+    if (stat.isDirectory()) walk(file);
+    else assert.ok(!/^explainer\.(?:html|md)$/i.test(name), `发现不应存在的教学文档: ${file}`);
+  }
+}
+walk('.');
+console.log('PASS: 普通问答直接回答主题，未产生 spec-explain 教学文档。');
+EVAL_JUDGE_NODE

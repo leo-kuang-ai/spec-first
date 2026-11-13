@@ -3,7 +3,7 @@ title: 代码理解类问题应指出不属于 setup 职责
 description: |
   验证核心边界("Setup 不得判断代码理解的语义充分性"):
   "帮我看看这个代码库架构合不合理"是语义判断,不是 runtime setup——
-  应指出职责边界并给去向(如 bounded review/其他 workflow),不自行分析。
+  应指出职责边界并给去向(如 bounded review/其他 workflow),不自行分析。脚本只校验可观察边界；语义充分性须另做人工或独立模型审查，不能把脚本PASS当整项通过。
 
 input:
   prompt: |
@@ -15,6 +15,12 @@ context:
   git:
     init: true
     checkout: main
+
+  files:
+    ".claude/settings.json": |
+      {}
+    ".mcp.json": |
+      {}
 
 judge:
   type: script

@@ -18,7 +18,9 @@ context:
 
 expect:
   files_not_exist:
+    - "docs/ai/project-rules.md"
     - "AGENTS.md"
+    - "CLAUDE.md"
 
 judge:
   type: script

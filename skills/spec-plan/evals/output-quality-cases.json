@@ -530,6 +530,65 @@
       "expected_outcome": "Quality lenses remain conditional and the artifact stays right-sized.",
       "evidence_status": "file-backed fixture",
       "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "verification-contract-reconciles-commands-and-contract-tests",
+      "input": "Produce a Standard implementation plan whose units touch files governed by repo-level contract suites (entry-governance lint, byte-budget, ordering, projection).",
+      "input_files": [
+        { "path": "skills/spec-plan/references/plan-sections.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "Plan-level commands cover only the units' own new tests; repo contract suites that assert on the touched files are missed, so budget or ordering regressions surface only in a later full run or CI."
+      ],
+      "with_skill_expectations": [
+        "Verification Contract commands cover every unit's Verification outcomes (no unit left without a plan-level command) and include each repo contract suite found by searching test suites for the touched paths.",
+        "Each command class carries one blind-spot line naming what it cannot confirm."
+      ],
+      "objective_assertions": [
+        "Reconciling the unit set against the command set and the touched-path set against the contract-suite set is mechanical and auditable in the artifact."
+      ],
+      "expected_outcome": "The Verification Contract closes both cross-set gaps at plan time; downstream executors run governing contract tests without a late full-suite or CI round-trip.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "verification-contract-drops-unit-command-fails-reconciliation",
+      "input": "A draft plan where U2's test-file command is absent from the plan-level commands while U1/U3 are covered.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/final-review.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The 5.1 checklist reviews each section's content quality but no check pairs the unit set with the command set, so a dropped unit command ships unnoticed."
+      ],
+      "with_skill_expectations": [
+        "Final review 5.1 cross-set reconciliation flags the uncovered unit as a producer gap and the plan is not declared written until the command set covers it."
+      ],
+      "objective_assertions": [
+        "The reconciliation is a set-pairing check, not a judgment call; the uncovered unit is named concretely."
+      ],
+      "expected_outcome": "Units and plan-level commands reconcile before write; no unit-level verification is left implicit for the implementer to rediscover.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "prd-plan-handoff-source-resolved",
+      "input": "Enrich a requirements-only unified plan whose load-bearing branches are all source-resolved (Canonical stop 2); no owner interview is needed.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/plan-handoff.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The enriching run rewrites or normalizes the upstream Product Contract region instead of preserving it byte-for-byte, or buries planning additions inside it."
+      ],
+      "with_skill_expectations": [
+        "The Product Contract region stays byte-for-byte preserved and planning additions (Planning Contract, Implementation Units, Verification Contract, Definition of Done) land outside it.",
+        "No owner question is asked for branches already closed by source evidence; the run records the source-resolved trace instead of re-interviewing."
+      ],
+      "objective_assertions": [
+        "A diff of the artifact shows zero byte changes inside the Product Contract region and all new content in the planning-owned sections."
+      ],
+      "expected_outcome": "The requirements-only artifact enriches to implementation-ready without mutating the upstream product truth.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
     }
   ]
 }

@@ -37,8 +37,8 @@ The stable loop is:
 
 Current source-of-truth inputs:
 
-- `docs/10-prompt/结构化项目角色契约.md`
-- `docs/10-prompt/历史快照/角色治理演化-历史/自我进化.md`
+- `docs/methodology/结构化项目角色契约.md`
+- `docs/methodology/history/role-governance/自我进化.md`
 - `AGENTS.md` / `CLAUDE.md`
 - `skills/`
 - `agents/`

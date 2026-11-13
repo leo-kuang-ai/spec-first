@@ -21,7 +21,7 @@ describe('remaining script failure-path defenses', () => {
       const result = spawnSync('python3', [validateClaims, doc], { cwd: root, encoding: 'utf8' });
       expect(result.status).toBe(0);
       expect(result.stderr).toBe('');
-      expect(result.stdout).toContain('not a git repository');
+      expect(result.stdout).toContain('Git path/SHA classification unavailable');
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }
@@ -89,7 +89,7 @@ prepared = module.prepare_source(source, root / 'raw')
 media = root / 'sample.webm'
 media.write_bytes(b'x')
 module.shutil.which = lambda _name: 'tool'
-chunk = module.transcribe_media_chunks(media, 'model', root / 'chunks', 0)
+chunk = module.transcribe_media_chunks(media, 'model', root / 'chunks', 0, 'explicit-cli-flag')
 module.subprocess.run = lambda *args, **kwargs: (_ for _ in ()).throw(subprocess.TimeoutExpired('ffprobe', 30))
 timeout_duration = module.ffprobe_duration(media)
 print(json.dumps({'session': prepared['session'], 'events': prepared['events'], 'chunk': chunk, 'timeout_duration': timeout_duration}))

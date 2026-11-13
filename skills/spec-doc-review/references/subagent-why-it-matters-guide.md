@@ -25,10 +25,10 @@ The `why_it_matters` field is how the reader — a developer triaging findings, 
 
 **STRONG (observable consequence first, grounded fix reasoning):**
 
-> Implementers will disagree on which tier a finding lands in, because the Classification Tiers section enumerates four values while the Synthesis routing only handles three. The document does not say which enumeration is authoritative. Suggest the Classification Tiers list is authoritative; drop the fourth value from the tier definition since Synthesis already lacks a route for it.
+> Implementers will disagree on which tier a finding lands in, because the Classification Tiers section enumerates four values while the Synthesis routing only handles three. The document does not say which enumeration is authoritative. The owning requirement explicitly requires all four tiers; add the missing route in Synthesis so its behavior satisfies that requirement.
 
 ### What changed between the two
 
 - Weak leads with section references and a bare directive ("Reconcile"). The reader doesn't know what breaks.
 - Strong leads with the downstream consequence ("Implementers will disagree..."), then cites the document evidence, then proposes a grounded fix.
-- Strong names *why* the fix is chosen ("Synthesis already lacks a route for it") rather than just saying "pick one."
+- Strong names *why* the fix is chosen ("the owning requirement requires all four tiers") rather than just saying "pick one."

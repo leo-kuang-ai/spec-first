@@ -2,6 +2,14 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { randomUUID } = require('node:crypto');
+
+function lstatIfPresent(filename) {
+  try { return fs.lstatSync(filename); } catch (error) {
+    if (error.code === 'ENOENT') return null;
+    throw error;
+  }
+}
 
 function reasonError(reasonCode, message, details = {}) {
   const error = new Error(message);
@@ -26,7 +34,7 @@ function isPathWithin(childPath, parentPath) {
 
 function nearestExistingPath(candidatePath) {
   let current = path.resolve(candidatePath);
-  while (!fs.existsSync(current)) {
+  while (!lstatIfPresent(current)) {
     const parent = path.dirname(current);
     if (parent === current) return current;
     current = parent;
@@ -46,8 +54,8 @@ function assertNoSymlinkSegments(rootPath, candidatePath, reasonCode) {
   const segments = relative === '' ? [] : relative.split(path.sep);
   for (const segment of segments) {
     current = path.join(current, segment);
-    if (!fs.existsSync(current)) continue;
-    if (fs.existsSync(current) && fs.lstatSync(current).isSymbolicLink()) {
+    const stat = lstatIfPresent(current);
+    if (stat && stat.isSymbolicLink()) {
       throw reasonError(reasonCode, `路径使用 symlink segment：${current}`, { root, candidate, segment: current });
     }
   }
@@ -67,6 +75,8 @@ function assertContainedPath(rootPath, candidatePath, options = {}) {
     throw reasonError(reasonCode, `trusted root 不得是 symlink：${root}`, { root, candidate });
   }
 
+  // Inspect each segment with lstat; dangling links are not absent paths.
+  assertNoSymlinkSegments(root, candidate, reasonCode);
   const realRoot = fs.realpathSync.native(root);
   const nearest = nearestExistingPath(candidate);
   const realNearest = fs.realpathSync.native(nearest);
@@ -79,8 +89,36 @@ function assertContainedPath(rootPath, candidatePath, options = {}) {
       real_nearest: realNearest,
     });
   }
-  assertNoSymlinkSegments(root, candidate, reasonCode);
   return candidate;
+}
+
+function writeContainedFile(rootPath, filename, contents, options = {}) {
+  const absolute = assertContainedPath(rootPath, filename, options);
+  const reasonCode = options.reasonCode || 'path-containment-failed';
+  const initial = lstatIfPresent(absolute);
+  if (initial && !initial.isFile()) throw reasonError(reasonCode, `Target is not a regular file: ${absolute}`);
+  const temporary = path.join(path.dirname(absolute), `.spec-first-write-${randomUUID()}`);
+  let created = false;
+  try {
+    // Exclusive same-directory staging and rename avoid following the destination leaf or modifying hardlink peers.
+    const descriptor = fs.openSync(temporary, 'wx', initial ? initial.mode & 0o777 : 0o600);
+    created = true;
+    try {
+      fs.writeFileSync(descriptor, contents, 'utf8');
+      if (initial) fs.fchmodSync(descriptor, initial.mode & 0o777);
+    } finally {
+      fs.closeSync(descriptor);
+    }
+    assertContainedPath(rootPath, absolute, options);
+    const current = lstatIfPresent(absolute);
+    if (initial ? (!current || current.dev !== initial.dev || current.ino !== initial.ino || current.mtimeMs !== initial.mtimeMs || current.size !== initial.size) : current) {
+      throw reasonError(reasonCode, `Target changed before publication: ${absolute}`);
+    }
+    fs.renameSync(temporary, absolute);
+    created = false;
+  } finally {
+    if (created) fs.unlinkSync(temporary);
+  }
 }
 
 function ensureContainedDirectory(rootPath, directoryPath, options = {}) {
@@ -100,4 +138,5 @@ module.exports = {
   isPathWithin,
   nearestExistingPath,
   reasonError,
+  writeContainedFile,
 };

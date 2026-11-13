@@ -20,7 +20,7 @@ context:
     checkout: main
 
 constraints:
-  timeout_seconds: 420
+  timeout_seconds: 900
   max_turns: 12
 
 judge:

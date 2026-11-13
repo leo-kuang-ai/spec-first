@@ -51,6 +51,7 @@ function runNpm(args, options = {}) {
     env: options.env || process.env,
     input: options.input,
     maxBuffer: options.maxBuffer,
+    timeout: options.timeout,
     stdio: options.stdio || 'pipe',
     windowsHide: true,
   });

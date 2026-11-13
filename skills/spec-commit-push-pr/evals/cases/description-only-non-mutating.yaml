@@ -1,26 +1,19 @@
 id: description-only-non-mutating
-title: 仅生成 PR 描述应完全非变异
+title: Description-only preserves Git state and makes no remote writes
 description: |
-  验证 description-only 模式:只要描述文本,不 commit、不 push、不 gh pr edit。
-
+  Verify actual Git state and owned file outcomes. Remote-write checks consume
+  runner tool calls; text containing an authorization word does not prove a boundary.
 input:
   prompt: |
-    （governed caller 上下文。spec-commit-push-pr 已加载。）
-    帮我为当前分支的改动写一份 PR 描述就行,先不要动任何 git 状态。
-
+    First run `node prepare-eval.cjs` once. Only this preparation may create the baseline commit and pending README edit. Then use spec-commit-push-pr in description-only mode to draft a PR description for the current diff. Do not stage, commit, push, create a PR or edit an existing PR.
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger
   git:
     init: true
     checkout: main
-
 constraints:
-  files:
-    "README.md": |
-      # MiniLedger (edited)
-
-      A tiny expense-tracking demo. Known rough edges documented.
-
+  timeout_seconds: 600
+  max_turns: 25
 judge:
   type: script
   script_path: evals/fixtures/scripts/check-desc-only.sh

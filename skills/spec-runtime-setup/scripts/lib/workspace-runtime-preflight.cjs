@@ -8,6 +8,7 @@ const { INTERNAL_REFRESH_ONLY_ENV } = require('./workspace-refresh-contract.cjs'
 const { buildRuntimeInitRemediation } = require('./runtime-remediation.cjs');
 
 const MUTATION_MODES = new Set([
+  'bare',
   'only',
   'graphify-refresh',
   'host-config-repair',

@@ -1,0 +1,19 @@
+{
+  "scenario": "authentication-rejection-with-unrelated-retry-code",
+  "candidate_claim": "增加重试修复了连接失败",
+  "source_before": {
+    "retry.js": "const RETRIES = 3;",
+    "auth.js": "const credential = process.env.OLD_TOKEN;"
+  },
+  "source_after": {
+    "retry.js": "const RETRIES = 3;",
+    "auth.js": "const credential = process.env.ACTIVE_TOKEN;"
+  },
+  "failure_log": "request rejected at authentication: invalid token; retry handler not entered",
+  "passing_log": "authentication accepted with ACTIVE_TOKEN; request completed; retry handler not entered",
+  "expected_verdict": {
+    "retry_causal_claim": "unsupported",
+    "supported_change": "credential source changed from OLD_TOKEN to ACTIVE_TOKEN",
+    "promotion": "revise causal claim to credential configuration only, or stop if current source cannot confirm it"
+  }
+}

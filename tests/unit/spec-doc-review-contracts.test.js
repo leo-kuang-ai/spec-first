@@ -2,12 +2,20 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const os = require('node:os');
+const { spawnSync } = require('node:child_process');
 
-const skill = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/SKILL.md'), 'utf8');
+const skillEntrypoint = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/SKILL.md'), 'utf8');
+const modes = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/modes.md'), 'utf8');
+const documentIntake = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/document-intake.md'), 'utf8');
+const personaSelection = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/persona-selection.md'), 'utf8');
+const dispatch = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/dispatch.md'), 'utf8');
+const skill = [skillEntrypoint, modes, documentIntake, personaSelection, dispatch].join('\n');
 const subagentTemplate = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/subagent-template.md'), 'utf8');
 const synthesis = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/synthesis-and-presentation.md'), 'utf8');
 const walkthrough = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/walkthrough.md'), 'utf8');
 const bulkPreview = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/bulk-preview.md'), 'utf8');
+const classificationSignals = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/document-classification-signals.md'), 'utf8');
 const openQuestions = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/open-questions-defer.md'), 'utf8');
 const reportOnlyCases = JSON.parse(fs.readFileSync(
   path.resolve(__dirname, '../../skills/spec-doc-review/evals/report-only-cases.json'),
@@ -31,6 +39,64 @@ const lazyRefs = [
 
 const refsDir = path.resolve(__dirname, '../../skills/spec-doc-review/references');
 const executionSpines = `${skill}\n${subagentTemplate}\n${synthesis}`;
+
+describe('dormant document peer output contract', () => {
+  test('normalization preserves deferred questions in schema-valid document output', () => {
+    const adapter = fs.readFileSync(path.resolve(__dirname,
+      '../../skills/spec-doc-review/scripts/cross-model-doc-review.sh'), 'utf8');
+    // Exercise the dormant jq transform without bypassing provider admission.
+    const transform = adapter.match(/jq --arg reviewer "whole-doc-\$peer" '([\s\S]*?)' "\$raw_file"/);
+    expect(transform).not.toBeNull();
+    const input = { findings: [], residual_risks: ['Rollback evidence is missing.'],
+      deferred_questions: ['Who owns the migration compatibility window?'] };
+    const result = spawnSync('jq', ['--arg', 'reviewer', 'whole-doc-fixture', transform[1]], {
+      input: JSON.stringify(input), encoding: 'utf8',
+    });
+    expect(result.status).toBe(0);
+    const output = JSON.parse(result.stdout);
+    expect(output).toEqual({ reviewer: 'whole-doc-fixture', ...input });
+    const Ajv = require('ajv');
+    const validate = new Ajv().compile(JSON.parse(fs.readFileSync(
+      path.join(refsDir, 'findings-schema.json'), 'utf8')));
+    expect(validate(output)).toBe(true);
+  });
+});
+
+describe('report-only document integrity judges', () => {
+  test.each([
+    ['plan', 'plan-repo', '2026-09-01-monthly-summary-plan.md'],
+    ['html', 'html-repo', '2026-09-01-monthly-summary-plan.html'],
+    ['taskpack', 'taskpack-repo', '2026-09-01-monthly-summary-tasks.md'],
+  ])('%s judge rejects document tampering even when MARKER remains', (kind, fixture, filename) => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-review-judge-'));
+    const fixtures = path.resolve(__dirname, '../../skills/spec-doc-review/evals/fixtures');
+    try {
+      fs.cpSync(path.join(fixtures, 'repos', fixture), root, { recursive: true });
+      const target = path.join(root, 'docs/plans', filename);
+      const fixtureHome = path.join(root, 'home');
+      fs.mkdirSync(fixtureHome);
+      const env = {
+        ...Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.toUpperCase().startsWith('GIT_'))),
+        HOME: fixtureHome, USERPROFILE: fixtureHome, GIT_CONFIG_NOSYSTEM: '1',
+        EVAL_EXIT_CODE: '0', EVAL_FINAL_MESSAGE: 'Review findings: clarify the migration boundary.',
+      };
+      expect(spawnSync('git', ['init', '-q'], { cwd: root, env }).status).toBe(0);
+      expect(spawnSync(process.execPath, ['prepare-eval.cjs'], { cwd: root, env }).status).toBe(0);
+      const judge = () => spawnSync('bash', [path.join(fixtures, 'scripts', `check-${kind}-marker.sh`)], {
+        cwd: root,
+        encoding: 'utf8',
+        env,
+      });
+      expect(judge().status).toBe(0);
+      fs.appendFileSync(target, '\nUnauthorized document mutation\n');
+      expect(judge().status).not.toBe(0);
+      fs.rmSync(target);
+      expect(judge().status).not.toBe(0);
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+});
 
 describe('spec-doc-review current contracts', () => {
   // --- Existing assertions (preserved) ---
@@ -167,7 +233,23 @@ describe('spec-doc-review current contracts', () => {
 
   test('does not infer document kind from path alone', () => {
     expect(skill).toMatch(/content shape.*not its file path/);
-    expect(skill).toMatch(/Path is a tie-breaker hint/);
+    expect(skill).toMatch(/path location never disambiguates/i);
+    expect(classificationSignals).toMatch(/path location never resolves/i);
+    expect(classificationSignals).not.toMatch(/fall back to path/i);
+  });
+
+  test('passes session-settled decisions through the reviewer context', () => {
+    expect(dispatch).toContain('`{settled_ktds}`');
+    expect(subagentTemplate).toContain('Settled decisions: {settled_ktds}');
+  });
+
+  test('intake prepares provenance and native-format candidates without self-invocation', () => {
+    expect(documentIntake).toContain('Expected arguments: mode:non-interactive <path>');
+    expect(documentIntake).not.toContain('Re-invoke with: Skill');
+    expect(documentIntake).toContain('Always fill both slots');
+    expect(documentIntake).toContain('(`user-directed` or `user-approved`)');
+    expect(documentIntake).toContain('ID-bearing HTML producer-fix candidate');
+    expect(documentIntake).toContain('anchor convention and visible ID text');
   });
 
   // --- U1: Subagent template spine structure ---
@@ -348,6 +430,16 @@ describe('spec-doc-review current contracts', () => {
     expect(matrix).toContain('## adversarial');
     expect(matrix).toContain('high-stakes domain');
     expect(matrix).toContain('product_contract_source: spec-plan-bootstrap');
+  });
+
+  test('product-lens activates on an unsettled product position, not on plausible alternatives', () => {
+    const matrix = fs.readFileSync(path.join(refsDir, 'persona-activation-matrix.md'), 'utf8');
+    const block = matrix.slice(matrix.indexOf('## product-lens'), matrix.indexOf('## design-lens'));
+    expect(block).toMatch(/Unsettled product position/);
+    expect(block).toMatch(/origin did not already settle/);
+    expect(block).toMatch(/implementation decision, not a product position/);
+    expect(block).not.toMatch(/alternatives plausibly exist/);
+    expect(block).toMatch(/Strategic weight/);
   });
 
 

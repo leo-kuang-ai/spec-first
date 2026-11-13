@@ -1,0 +1,17 @@
+--- a/src/orders.js
++++ b/src/orders.js
+@@ -1,9 +1,9 @@
+ 'use strict';
+ 
+ function getOrderForUser(orders, orderId, user) {
+-  const order = orders.find((candidate) => candidate.id === orderId);
+-  if (!order || order.tenantId !== user.tenantId) {
++  const found = orders.find((candidate) => candidate.id === orderId);
++  if (!found || found.tenantId !== user.tenantId) {
+     return null;
+   }
+-  return order;
++  return found;
+ }
+ 
+ module.exports = { getOrderForUser };

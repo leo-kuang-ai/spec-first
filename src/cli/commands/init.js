@@ -2,6 +2,7 @@
 'use strict';
 
 const pkg = require('../../../package.json');
+const { formatSupportedHostFlags } = require('../helpers/supported-host-flags');
 const { getAdapter } = require('../adapters');
 const {
   applyUserLanguageSyncPlan,
@@ -54,7 +55,6 @@ const {
   printInitApplySuccess,
   printInitBrandBanner,
   printInitDryRun,
-  printInitNextStepsForPlatforms,
   printInitPreview,
   printInitPreviews,
   printWorkspaceInitApplySuccess,
@@ -80,7 +80,7 @@ async function runInit(argv, promptOverrides = {}) {
 
   if (parsed.error) {
     console.error(parsed.error);
-    console.error('Usage: spec-first init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [--opencode] [--zcode] [--pi] [-y] [--all-repos|--repo <path>] [-u <name>] [--lang <zh|en>] [--sync-user-language|--no-sync-user-language]');
+    console.error(`Usage: spec-first init ${formatSupportedHostFlags('each')} [-y] [--all-repos|--repo <path>] [-u <name>] [--lang <zh|en>] [--sync-user-language|--no-sync-user-language]`);
     return 2;
   }
 
@@ -88,7 +88,7 @@ async function runInit(argv, promptOverrides = {}) {
     const tty = promptApi.requireTty();
     if (!tty.ok) {
       console.error('spec-first init requires an interactive terminal unless `-y/--yes` is used with defaults or explicit host flags.');
-      console.error('spec-first init 需要交互式终端；如需跳过引导，请使用 `-y/--yes` 并按需指定 `--claude` / `--codex` / `--cursor` / `--kiro` / `--qoder` / `--opencode` / `--zcode` / `--pi`。');
+      console.error(`spec-first init 需要交互式终端；如需跳过引导，请使用 \`-y/--yes\` 并按需指定 ${formatSupportedHostFlags('slash')}。`);
       return 2;
     }
   }
@@ -194,12 +194,26 @@ async function runInit(argv, promptOverrides = {}) {
     };
     const results = [];
     for (const plan of plans) {
-      const result = applyInitPlan(
-        plan.mode === 'all-repos' ? plan.workspaceRoot : plan.projectRoot,
-        plan,
-        applyContext,
-      );
-      results.push(result);
+      try {
+        const result = applyInitPlan(
+          plan.mode === 'all-repos' ? plan.workspaceRoot : plan.projectRoot,
+          plan,
+          applyContext,
+        );
+        results.push(result);
+      } catch (error) {
+        // 保留已完成宿主的结果，并把当前宿主的异常转成 run-level receipt；
+        // 这样多宿主 init 不会因一个 runtime 失败而丢失 partial 状态。
+        results.push({
+          exit_code: 1,
+          overall_status: 'action-required',
+          reason_code: 'init-exception',
+          diagnostic: error instanceof Error ? error.message : String(error),
+          error: error instanceof Error ? error.message : String(error),
+          rollback_status: error && error.runtimeRollback ? error.runtimeRollback : null,
+          globalDeveloperWriteResult,
+        });
+      }
     }
 
     const userLanguageSyncResult = applyUserLanguageSyncPlan(userLanguageSyncPlan);
@@ -218,18 +232,6 @@ async function runInit(argv, promptOverrides = {}) {
       || summaryUpdateFailures.length > 0
       ? 1
       : 0;
-
-    const childProjectionPending = plans.some((plan) => (
-      plan.mode !== 'all-repos' && plan.gitRootTopology === 'multi-repo-workspace'
-    ));
-    if (
-      exitCode === 0
-      && !childProjectionPending
-      && (plans.length > 1 || plans[0].mode !== 'all-repos')
-    ) {
-      console.log('');
-      printInitNextStepsForPlatforms(interactiveInput.platforms, interactiveInput.lang);
-    }
 
     return exitCode;
   } catch (error) {
